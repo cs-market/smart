@@ -1,4 +1,5 @@
 # ignore everything in the root folder
+!.gitignore
 /*
 
 # Addon development -----------------------------------------------------------------
@@ -8,7 +9,7 @@
 !js/
 !design/
 !var/backups/last.sql.zip
-!.gitignore
+
 
 # ignore everything in "lib" directory
 app/lib/
