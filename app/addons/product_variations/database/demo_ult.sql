@@ -1,0 +1,2 @@
+REPLACE INTO ?:ult_objects_sharing (`share_company_id`, `share_object_id`, `share_object_type`) VALUES ('1', '27', 'product_options');
+REPLACE INTO ?:ult_objects_sharing (`share_company_id`, `share_object_id`, `share_object_type`) VALUES ('1', '28', 'product_options');

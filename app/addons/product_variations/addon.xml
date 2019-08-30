@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>product_variations</id>
+    <version>0.1</version>
+    <priority>1500</priority>
+    <status>active</status>
+    <default_language>en</default_language>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <compatibility>
+        <core_version>
+            <min>4.6.1</min>
+        </core_version>
+    </compatibility>
+    <queries>
+        <item for="install">ALTER TABLE ?:products ADD parent_product_id int(11) unsigned NOT NULL DEFAULT '0';</item>
+        <item for="install">ALTER TABLE ?:products ADD variation_code varchar(255) DEFAULT NULL;</item>
+        <item for="install">ALTER TABLE ?:products ADD variation_options varchar(255) DEFAULT NULL;</item>
+        <item for="install">ALTER TABLE ?:products ADD is_default_variation char(1) NOT NULL DEFAULT 'N';</item>
+        <item for="install">CREATE INDEX idx_parent_product_id ON ?:products (parent_product_id);</item>
+        <item for="install">CREATE UNIQUE INDEX idx_variation_code ON ?:products (variation_code);</item>
+        <item for="uninstall">DROP INDEX idx_parent_product_id ON ?:products;</item>
+        <item for="uninstall">DROP INDEX idx_variation_code ON ?:products;</item>
+        <item for="uninstall">ALTER TABLE ?:products DROP parent_product_id;</item>
+        <item for="uninstall">ALTER TABLE ?:products DROP variation_code;</item>
+        <item for="uninstall">ALTER TABLE ?:products DROP variation_options;</item>
+        <item for="uninstall">ALTER TABLE ?:products DROP is_default_variation;</item>
+        <item for="demo" type="file">database/demo.sql</item>
+        <item for="demo" type="file" editions="ULTIMATE">database/demo_ult.sql</item>
+        <item for="demo" type="file" editions="MULTIVENDOR">database/demo_mve.sql</item>
+        <item for="demo" type="file" table="product_descriptions" lang="en">database/demo_products_en.sql</item>
+        <item for="demo" type="file" table="product_options_descriptions" lang="en">database/demo_options_en.sql</item>
+        <item for="demo" type="file" table="product_option_variants_descriptions" lang="en">database/demo_variants_en.sql</item>
+        <item for="demo" type="file" table="product_descriptions" lang="ru">database/demo_products_ru.sql</item>
+        <item for="demo" type="file" table="product_options_descriptions" lang="ru">database/demo_options_ru.sql</item>
+        <item for="demo" type="file" table="product_option_variants_descriptions" lang="ru">database/demo_variants_ru.sql</item>
+    </queries>
+    <functions>
+        <item for="install">fn_product_variations_install</item>
+    </functions>
+</addon>

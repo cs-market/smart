@@ -1,0 +1,1 @@
+{include file="addons/smart_distribution/views/categories/components/categories_search_form.tpl" dispatch="categories.search"}

@@ -1,0 +1,1 @@
+{include file="views/categories/manage.tpl"}

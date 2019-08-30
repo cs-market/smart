@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>ecl_cross_selling</id>
+    <version>1.3</version>
+    <priority>2900</priority>
+    <position>0</position>
+    <status>active</status>
+    <authors>
+        <author>
+            <name>eCom Labs</name>
+            <email>contact@ecom-labs.com</email>
+            <url>https://www.ecom-labs.com</url>
+            <phone>+7 963 234 30 03</phone>
+        </author>
+    </authors>
+    <supplier>eCom Labs</supplier>
+    <supplier_link>https://www.ecom-labs.com</supplier_link>
+    <default_language>en</default_language>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="add_to_cart_notification">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+                    </item>
+                    <item id="reminder_notification">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+                    </item>
+                    <item id="cart_notification">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+                    </item>
+                    <item id="amount_product_add_to_cart">
+                        <type>input</type>
+                        <default_value>3</default_value>
+                    </item>
+                    <item id="amount_product_reminder">
+                        <type>input</type>
+                        <default_value>3</default_value>
+                    </item>
+                    <item id="amount_product_cart">
+                        <type>input</type>
+                        <default_value>3</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+    <queries>
+        <item for="install">DROP TABLE IF EXISTS ?:product_related_products;</item>
+        <item for="install">
+            CREATE TABLE `?:product_related_products` (
+            `product_id` mediumint(8) unsigned NOT NULL default '0',
+            `related_id` mediumint(8) unsigned NOT NULL default '0',
+            PRIMARY KEY  (`product_id`,`related_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:product_related_products;</item>
+    </queries>
+</addon>

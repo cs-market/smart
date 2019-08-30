@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>ecl_additional_block_settings</id>
+    <name>[eCom Labs] Additional Block Settings</name>
+    <description>Allows to enable blocks for mobile, tablet or desktop devices and enable blocks for specific user groups</description>
+    <version>1.6</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <supplier>eCom Labs</supplier>
+    <supplier_link>https://www.ecom-labs.com</supplier_link>
+    <status>active</status>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>en</default_language>
+    <authors>
+        <author>
+            <name>eCom Labs</name>
+            <email>contact@ecom-labs.com</email>
+            <url>https://www.ecom-labs.com</url>
+            <phone>+7 963 234 30 03</phone>
+        </author>
+    </authors>
+    <language_variables>
+        <item lang="en" id="mobile">Mobile</item>
+        <item lang="en" id="tablet">Tablet</item>
+        <item lang="en" id="desktop">Desktop</item>
+        <item lang="ru" id="mobile">Смарфтон</item>
+        <item lang="ru" id="tablet">Планшет</item>
+        <item lang="ru" id="desktop">Настольный ПК, Ноутбук</item>
+    </language_variables>
+    <queries>
+        <item editions="MULTIVENDOR,ULTIMATE">ALTER TABLE  ?:bm_blocks ADD `usergroup_ids` VARCHAR( 255 ) NOT NULL DEFAULT  '0'</item>
+        <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">ALTER TABLE ?:bm_blocks DROP COLUMN `usergroup_ids`</item>
+        <item editions="MULTIVENDOR,ULTIMATE">ALTER TABLE  ?:bm_blocks ADD `enable_for` VARCHAR( 255 ) NOT NULL DEFAULT  'D,T,M'</item>
+        <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">ALTER TABLE ?:bm_blocks DROP COLUMN `enable_for`</item>
+    </queries>
+    <functions>
+        <item for="install">fn_ecl_additional_block_settings_install</item>
+    </functions>
+    <translations>
+        <item for="description" lang="ru">Позволяет показывать определенные блоки только для мобильных устройств, планшетов или обычных компьютеров и/ или для определенных групп пользователей</item>
+        <item for="name" lang="ru">[eCom Labs] Дополнительные Настройки Блоков</item>
+    </translations>
+</addon>

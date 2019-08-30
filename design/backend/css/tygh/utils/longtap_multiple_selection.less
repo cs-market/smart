@@ -1,0 +1,27 @@
+.long-tap-start {
+    -webkit-animation: long-tap-animation .1s linear both;
+            animation: long-tap-animation .1s linear both;
+}
+
+.long-tap-start * {
+    -webkit-touch-callout: none;
+      -webkit-user-select: none;
+       -khtml-user-select: none;
+         -moz-user-select: none;
+          -ms-user-select: none;
+              user-select: none;
+}
+
+.selected {
+    background-color: #d9ebfc !important;
+    outline: 1px solid rgb(137, 191, 252) !important;
+}
+
+@keyframes long-tap-animation {
+    0% {
+        background-color: #fff !important;
+    }
+    100% {
+        background-color: rgb(137, 191, 252) !important;
+    }
+}

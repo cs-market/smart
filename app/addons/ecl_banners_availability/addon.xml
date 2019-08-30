@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>ecl_banners_availability</id>
+    <version>1.4</version>
+    <priority>2900</priority>
+    <position>0</position>
+    <status>active</status>
+    <supplier>eCom Labs</supplier>
+    <supplier_link>https://www.ecom-labs.com</supplier_link>
+    <default_language>en</default_language><authors>
+        <author>
+            <name>eCom Labs</name>
+            <email>contact@ecom-labs.com</email>
+            <url>https://www.ecom-labs.com</url>
+            <phone>+7 963 234 30 03</phone>
+        </author>
+    </authors>
+    <compatibility>
+        <dependencies>banners</dependencies>
+    </compatibility>
+    <queries>
+        <item for="install">ALTER TABLE `?:banners` ADD from_date int(11) unsigned NOT NULL DEFAULT '0'</item>
+        <item for="install">ALTER TABLE `?:banners` ADD to_date int(11) unsigned NOT NULL DEFAULT '0'</item>
+        <item for="install">ALTER TABLE `?:banners` ADD usergroup_ids varchar(255) NOT NULL DEFAULT '0'</item>
+        <item for="uninstall">ALTER TABLE `?:banners` DROP from_date</item>
+        <item for="uninstall">ALTER TABLE `?:banners` DROP to_date</item>
+        <item for="uninstall">ALTER TABLE `?:banners` DROP usergroup_ids</item>
+    </queries>
+</addon>

@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>ecl_staff_notes</id>
+    <name>[eCom Labs] Staff Notes</name>
+    <description>Allows to add staff notes to products, categories, users, blog posts, vendors and CMS pages</description>
+    <version>1.7</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <supplier>eCom Labs</supplier>
+    <supplier_link>https://www.ecom-labs.com</supplier_link>
+	<status>active</status>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>en</default_language>
+    <authors>
+        <author>
+            <name>eCom Labs</name>
+            <email>contact@ecom-labs.com</email>
+            <url>https://www.ecom-labs.com</url>
+            <phone>+7 963 234 30 03</phone>
+        </author>
+    </authors>
+	<settings edition_type="ROOT,ULT:VENDOR">
+        <sections>
+            <section id="general">
+                <name>Generic settings</name>
+                <translations>
+                    <item lang="ru" for="name">Настройки</item>
+                </translations>        
+                <items>
+                    <item id="product_notes">
+                        <type>checkbox</type>
+                        <name>Product notes</name>
+                        <default_value>Y</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Заметки для товара</item>
+                        </translations>
+                    </item>            
+                    <item id="category_notes">
+                        <type>checkbox</type>
+                        <name>Category notes</name>
+                        <default_value>Y</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Заметки для категорий</item>
+                        </translations>
+                    </item>
+                    <item id="page_notes">
+                        <type>checkbox</type>
+                        <name>CMS pages/ blog posts notes</name>
+                        <default_value>Y</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Заметки для страниц / постов</item>
+                        </translations>
+                    </item>
+					<item id="user_notes">
+                        <type>checkbox</type>
+                        <name>User notes</name>
+                        <default_value>Y</default_value>
+                    </item>
+					<item id="vendor_notes">
+                        <type>checkbox</type>
+                        <name>Vendor notes</name>
+						<tooltip><![CDATA[For Multi-Vendor software only]]></tooltip>
+                        <default_value>Y</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Заметки для вендоров</item>
+                            <item lang="ru" for="tooltip">Толья для Multi-Vendor</item>
+                        </translations>
+                    </item>
+				</items>
+            </section>
+        </sections>
+    </settings>
+	<language_variables>
+		<item id="privileges.view_staff_notes" lang="en">View Staff Notes</item>
+		<item id="privileges.manage_staff_notes" lang="en">Manage Staff Notes</item>
+		<item id="staff_notes" lang="en">Staff Notes</item>
+
+        <item id="privileges.view_staff_notes" lang="ru">Смотреть заметки для персонала</item>
+        <item id="privileges.manage_staff_notes" lang="ru">Редактировать заметки для персонала</item>
+        <item id="staff_notes" lang="ru">Заметки</item>
+	</language_variables>
+	<queries>
+		<item for="install">ALTER TABLE ?:products ADD `staff_notes` text NOT NULL</item>
+		<item for="install">ALTER TABLE ?:categories ADD `staff_notes` text NOT NULL</item>
+		<item for="install">ALTER TABLE ?:pages ADD `staff_notes` text NOT NULL</item>
+		<item for="install">ALTER TABLE ?:users ADD `staff_notes` text NOT NULL</item>
+		<item for="install">ALTER TABLE ?:companies ADD `staff_notes` text NOT NULL</item>
+		<item for="install">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('view_staff_notes', 'Y', 'addons')</item>
+		<item for="install">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_staff_notes', 'Y', 'addons')</item>
+		<item for="uninstall">ALTER TABLE ?:products DROP `staff_notes`</item>
+		<item for="uninstall">ALTER TABLE ?:categories DROP `staff_notes`</item>
+		<item for="uninstall">ALTER TABLE ?:pages DROP `staff_notes`</item>
+		<item for="uninstall">ALTER TABLE ?:users DROP `staff_notes`</item>
+		<item for="uninstall">ALTER TABLE ?:companies DROP `staff_notes`</item>
+		<item for="uninstall">DELETE FROM ?:privileges WHERE privilege LIKE 'view_staff_notes'</item>
+		<item for="uninstall">DELETE FROM ?:privileges WHERE privilege LIKE 'manage_staff_notes'</item>
+	</queries>
+    <translations>
+        <item for="description" lang="ru">Ппозволяет оставлять примечания администратора для продуктов, категорий, пользователей, новостей, вендоров и страниц</item>
+        <item for="name" lang="ru">[eCom Labs] Заметки Персонала</item>
+    </translations>
+</addon>

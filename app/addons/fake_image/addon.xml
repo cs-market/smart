@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>fake_image</id>
+	<name>Fake product images</name>
+	<description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+	<priority>26732300</priority>
+	<version>1.0.1</version>
+	<position>0</position>
+	<status>active</status>
+	<default_language>en</default_language>
+	<supplier>CS-Market</supplier>
+	<supplier_link>http://cs-market.com/</supplier_link>
+	<settings>
+		<sections>
+			<section id="general">
+				<items>
+					<item id="image">
+						<name>Image</name>
+						<type>input</type>
+					</item>
+				</items>
+			</section>
+		</sections>
+	</settings>
+</addon>

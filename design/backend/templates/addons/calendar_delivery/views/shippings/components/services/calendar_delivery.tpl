@@ -1,0 +1,1 @@
+<input type="hidden" name="shipping_data[service_params][configured]" value="Y" />

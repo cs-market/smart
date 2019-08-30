@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>azure_theme</id>
+	<name>Azure theme</name>
+	<description><![CDATA[Additional theme possibilities and theme activation. Required to correct theme work. © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+	<version>2.0.1</version>
+	<priority>999</priority>
+	<position>0</position>
+	<status>active</status>
+	<has_icon>Y</has_icon>
+	<supplier>CS-Market</supplier>
+	<supplier_link>http://cs-market.com/</supplier_link>
+	<has_icon>Y</has_icon>
+	<default_language>en</default_language>
+	<settings edition_type="ROOT,ULT:VENDOR">
+		<sections>
+			<section id="general">
+				<items>
+					<item id="license_key">
+						<type>input</type>
+						<name>License key</name>
+					</item>
+					<item id="grid_images">
+						<type>selectbox</type>
+						<name>Appearance of grid images</name>
+						<variants>
+							<item id="gallery">
+								<name>Regular gallery</name>
+							</item>
+							<item id="flip">
+								<name>Flip icons</name>
+							</item>
+						</variants>
+						<default_value>flip</default_value>
+					</item>
+					<item id="menu_height">
+						<type>input</type>
+						<name>Dropdown submenu height, px</name>
+						<default_value>328</default_value>
+					</item>
+					<item id="menu_width">
+						<type>input</type>
+						<name>Dropdown submenu width, px</name>
+						<default_value>200</default_value>
+					</item>
+					<item id="menu_product_image_width">
+						<type>input</type>
+						<name>Menu product image width, px</name>
+						<default_value>150</default_value>
+					</item>
+					<item id="menu_product_image_height">
+						<type>input</type>
+						<name>Menu product image width, px</name>
+						<default_value>150</default_value>
+					</item>
+				</items>
+			</section>
+		</sections>
+	</settings>
+    <functions>
+        <item for="install">fn_azure_theme_show_install_demo_notification</item>
+    </functions>
+    <language_variables>
+        <item lang="en" id="install_demo_data"><![CDATA[You can install demo data using <a href="[link]">this link</a>]]></item>
+    </language_variables>
+</addon>

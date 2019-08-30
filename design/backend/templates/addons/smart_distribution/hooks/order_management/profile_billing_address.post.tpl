@@ -1,0 +1,1 @@
+{if $order_info.profile_id}<p><b>{__('profile')}:</b> {$order_info.profile_id}</p>{/if}

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>auth_by_login</id>
+	<version>1.0.1</version>
+	<default_language>en</default_language>
+	<priority>100</priority>
+	<status>active</status>
+	<name>Auth by login</name>
+	<description></description>
+	<auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+</addon>

@@ -1,0 +1,1 @@
+{style src="addons/old_adminpanel/addons/seo/styles.less"}

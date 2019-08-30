@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>rus_customer_geolocation</id>
+    <version>1.0</version>
+    <priority>4800</priority>
+    <position>0</position>
+    <status>active</status>
+    <default_language>en</default_language>
+    <compatibility>
+        <dependencies>rus_sdek</dependencies>
+        <conflicts>rus_geolocation</conflicts>
+    </compatibility>
+    <queries>
+        <item for="install">
+            CREATE TABLE ?:rus_customer_geolocation_locations (
+                location_id int(11) unsigned NOT NULL AUTO_INCREMENT,
+                country varchar(2) NOT NULL DEFAULT '',
+                state varchar(32) NOT NULL DEFAULT '',
+                city varchar(256) NOT NULL DEFAULT '',
+                company_id int(11) NOT NULL DEFAULT '0',
+                position int(11) NOT NULL DEFAULT '0',
+                PRIMARY KEY (location_id)
+            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:rus_customer_geolocation_locations</item>
+    </queries>
+</addon>

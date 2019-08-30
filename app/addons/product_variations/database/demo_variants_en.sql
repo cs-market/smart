@@ -1,0 +1,11 @@
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (183, 'en', 'White');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (184, 'en', 'Black');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (185, 'en', 'Blue');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (186, 'en', 'Red');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (187, 'en', 'Green');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (188, 'en', 'Yellow');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (189, 'en', 'Small');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (190, 'en', 'Medium');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (191, 'en', 'Large');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (192, 'en', 'X Large');
+REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (193, 'en', 'XX Large');

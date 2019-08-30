@@ -1,0 +1,27 @@
+{
+	"title": "Azure",
+	"description": "Azure CS-Cart premium theme.",
+	"logo": "media/images/azure_logo.png",
+	"mail": "media/images/azure_invoice_logo.png",
+	"gift_cert": "media/images/azure_gift_logo.png",
+	"developer": "CS-Market",
+	"favicon": "media/images/icons/favicon.ico",
+	"parent_theme": "responsive",
+	"default_language": "en",
+	"settings_overrides": {
+		"Appearance": {
+			"default_product_details_view": "azure_template",
+			"thumbnails_gallery": false,
+			"enable_quick_view": true
+		},
+		"Thumbnails": {
+			"convert_to": "png",
+			"thumbnail_background_color": "",
+			"product_lists_thumbnail_width": 275,
+			"product_lists_thumbnail_height": 275,
+			"product_details_thumbnail_height": "",
+			"product_details_thumbnail_width": 650,
+			"category_lists_thumbnail_width": 30
+		}
+	}
+}
