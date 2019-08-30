@@ -1,0 +1,19 @@
+# ignore everything in the root folder
+/*
+
+# Addon development -----------------------------------------------------------------
+
+# Add app,js,design directory
+!app/
+!js/
+!design/
+!var/backups/last.sql.zip
+!.gitignore
+
+# ignore everything in "lib" directory
+app/lib/
+
+# ignore everything in "js" directory
+# except addons directory
+js/*
+!js/addons/
