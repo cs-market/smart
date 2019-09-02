@@ -8,6 +8,7 @@ fn_register_hooks(
 	'vendor_plan_before_save',
 	'get_usergroups',
 	'post_get_usergroups',
+	'get_simple_usergroups_pre',
 	'get_users_pre',
 	'get_users',
 	'get_user_info_before',

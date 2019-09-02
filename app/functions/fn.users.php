@@ -496,6 +496,10 @@ function fn_get_simple_usergroups($type, $get_default = false, $lang_code = CART
         } elseif ($type == 'A') {
             $where .= " AND a.type = 'A'";
         }
+        
+        // [csmarket] add condition to receive correct usergroups
+        fn_set_hook('get_simple_usergroups_pre', $where);
+
         $_usergroups = db_get_hash_single_array(
             'SELECT a.usergroup_id, b.usergroup'
                 . ' FROM ?:usergroups as a'

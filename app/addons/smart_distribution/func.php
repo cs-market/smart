@@ -123,6 +123,14 @@ function fn_smart_distribution_post_get_usergroups(&$usergroups, $type, $lang_co
 	}
 }
 
+function fn_smart_distribution_get_simple_usergroups_pre(&$where) {
+	$company = UG_Company::model()->current();
+	if ($company) {
+		if ($company->usergroup_ids)
+		$where .= db_quote(' AND a.usergroup_id IN (?a)', $company->usergroup_ids);
+	}
+}
+
 function fn_smart_distribution_get_managers($params = array()) {
 	$condition = '';
 	if (Registry::get('runtime.company_id') || !empty($params['company_id'])) {
