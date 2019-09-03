@@ -137,7 +137,6 @@ if ($mode == 'update') {
 
 } elseif ($mode == 'dynamic') {
     Tygh::$app['view']->assign('schema', fn_promotion_get_schema());
-
     Tygh::$app['view']->assign('prefix', $_REQUEST['prefix']);
     Tygh::$app['view']->assign('elm_id', $_REQUEST['elm_id']);
 

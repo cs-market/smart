@@ -1378,7 +1378,6 @@ function fn_get_categories($params = array(), $lang_code = CART_LANGUAGE)
      * @param string $lang_code 2-letters language code
      */
     fn_set_hook('get_categories_pre', $params, $lang_code);
-fn_write_r($params);
 
     $default_params = array(
         'category_id' => 0,

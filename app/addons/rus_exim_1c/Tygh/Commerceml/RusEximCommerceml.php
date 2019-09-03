@@ -3107,7 +3107,7 @@ $amount = 10;
         }
 
         $name_company = empty($order_data['company']) ? $order_data['lastname'] . ' ' . $order_data['firstname'] : $order_data['company'];
-fn_print_die($name_company);
+
         $zipcode = $this->getContactInfoFromAddress($order_data, 'zipcode');
         $country = $this->getContactInfoFromAddress($order_data, 'country_descr');
         $city = $this->getContactInfoFromAddress($order_data, 'city');

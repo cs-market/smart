@@ -715,7 +715,6 @@ function fn_import($pattern, $import_data, $options)
 
             if ($object_exists == true) {
                 fn_set_progress('echo', __('updating') . ' ' . $pattern['name'] . ' <b>' . implode(',', $primary_object_id) . '</b>. ', false);
-                fn_print_r($v[$main_lang]['email']);
                 db_query('UPDATE ?:' . $pattern['table'] . ' SET ?u WHERE ?w', $v[$main_lang], $primary_object_id);
             } else {
                 $o_id = db_query('INSERT INTO ?:' . $pattern['table'] . ' ?e', $v[$main_lang]);
@@ -924,6 +923,7 @@ function fn_import($pattern, $import_data, $options)
                             break;
                         }
                     }
+
                 }
 
                 if ($use_this_group == false) {

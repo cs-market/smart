@@ -402,7 +402,6 @@
                         || $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum
                     )
                 }
-                123
                     <div class="ty-control-group product-list-field">
                         {if $show_amount_label}
                             <label class="ty-control-group__label">{__("availability")}:</label>
