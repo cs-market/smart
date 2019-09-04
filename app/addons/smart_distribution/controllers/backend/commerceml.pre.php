@@ -35,50 +35,50 @@ $params = $_REQUEST;
 $company_id = fn_get_runtime_company_id();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-	 $suffix = '';
+	$suffix = '';
 
 	if ($mode == 'sd_save_offers_data') {
 		if ($s_commerceml['exim_1c_create_prices'] == 'Y') {
-				$prices = $_REQUEST['prices_1c'];
-				if (!empty($_REQUEST['list_price_1c'])) {
-					 $_list_prices = fn_explode(',', $_REQUEST['list_price_1c']);
-					 $list_prices = array();
-					 foreach($_list_prices as $_list_price) {
-						  $list_prices[] = array(
-								'price_1c' => trim($_list_price),
-								'usergroup_id' => 0,
-								'type' => 'list',
-								'company_id' => $company_id
-						  );
-					 }		  
-					 $prices = fn_array_merge($list_prices, $prices, false);
+			$prices = $_REQUEST['prices_1c'];
+			if (!empty($_REQUEST['list_price_1c'])) {
+				$_list_prices = fn_explode(',', $_REQUEST['list_price_1c']);
+				$list_prices = array();
+				foreach($_list_prices as $_list_price) {
+					$list_prices[] = array(
+							'price_1c' => trim($_list_price),
+							'usergroup_id' => 0,
+							'type' => 'list',
+							'company_id' => $company_id
+					);
 				}
+				$prices = fn_array_merge($list_prices, $prices, false);
+			}
 
-				$base_prices = array();
-				if (!empty($_REQUEST['base_price_1c'])) {
-					 $_base_prices = fn_explode(',', $_REQUEST['base_price_1c']);
-					 foreach($_base_prices as $_base_price) {
-						  $base_prices[] = array(
-								'price_1c' => trim($_base_price),
-								'usergroup_id' => 0,
-								'type' => 'base',
-								'company_id' => $company_id
-						  );
-					 }
+			$base_prices = array();
+			if (!empty($_REQUEST['base_price_1c'])) {
+				$_base_prices = fn_explode(',', $_REQUEST['base_price_1c']);
+				foreach($_base_prices as $_base_price) {
+					$base_prices[] = array(
+						'price_1c' => trim($_base_price),
+						'usergroup_id' => 0,
+						'type' => 'base',
+						'company_id' => $company_id
+					);
 				}
-				$prices = fn_array_merge($base_prices, $prices, false);
+			}
+			$prices = fn_array_merge($base_prices, $prices, false);
 
-				db_query("DELETE FROM ?:rus_exim_1c_prices WHERE company_id = ?i", $company_id);
-				foreach ($prices as $price) {
-					 if (!empty($price['price_1c'])) {
-					 	$price['company_id'] = $company_id;
-						  db_query("INSERT INTO ?:rus_exim_1c_prices ?e", $price);
-					 }
+			db_query("DELETE FROM ?:rus_exim_1c_prices WHERE company_id = ?i", $company_id);
+			foreach ($prices as $price) {
+				if (!empty($price['price_1c'])) {
+					$price['company_id'] = $company_id;
+					db_query("INSERT INTO ?:rus_exim_1c_prices ?e", $price);
 				}
-		  }
+			}
+		}
 
-		  return array(CONTROLLER_STATUS_REDIRECT, 'commerceml.offers');
-	 }
+		return array(CONTROLLER_STATUS_REDIRECT, 'commerceml.offers');
+	}
 }
 
 
@@ -100,14 +100,14 @@ if ($mode == 'sync') {
 		$exim_commerceml->addMessageLog($text_message);
 
 		if ($d_status === false) {
-			 fn_echo("failure");
-			 exit;
+			fn_echo("failure");
+			exit;
 		}
 
 		if ($s_commerceml['exim_1c_import_products'] != 'not_import') {
-			 $exim_commerceml->importDataProductFile($xml);
+			$exim_commerceml->importDataProductFile($xml);
 		} else {
-			 fn_echo("success\n");
+			fn_echo("success\n");
 		}
 	}
 	if ($action == 'offers') {
@@ -116,30 +116,30 @@ if ($mode == 'sync') {
 		list($xml, $d_status, $text_message) = $exim_commerceml->getFileCommerceml($filename);
 		$exim_commerceml->addMessageLog($text_message);
 		if ($d_status === false) {
-			 fn_echo("failure");
-			 exit;
+			fn_echo("failure");
+			exit;
 		}
 		if ($s_commerceml['exim_1c_only_import_offers'] == 'Y') {
-			 $exim_commerceml->importDataOffersFile($xml, $service_exchange, $lang_code, $manual);
+			$exim_commerceml->importDataOffersFile($xml, $service_exchange, $lang_code, $manual);
 		} else {
-			 fn_echo("success\n");
+			fn_echo("success\n");
 		}
 	}
 	fn_print_die('done');
 } elseif ($mode == 'base_price' && $action) {
-	 list($products,) = fn_get_products(['company_id' => $action]);
-	 $auth = $_SESSION['auth'];
-	 foreach ($products as $product_id => $p) {
-		  $product = fn_get_product_data($product_id, $auth, DESCR_SL, '', false, false, false, true);
-		  if (count(($product['prices'])) > 1) {
+	list($products,) = fn_get_products(['company_id' => $action]);
+	$auth = $_SESSION['auth'];
+	foreach ($products as $product_id => $p) {
+		$product = fn_get_product_data($product_id, $auth, DESCR_SL, '', false, false, false, true);
+		if (count(($product['prices'])) > 1) {
 				fn_print_die($product['prices'], $product_id);
 				$prices = array_column($product['prices'], 'price');
 				$price = max($prices);
 				$product['price'] = $price;
 				fn_update_product($product, $product_id, DESCR_SL);
-		  }
-	 }
-	 fn_print_die('done');
+		}
+	}
+	fn_print_die('done');
 } elseif ($mode == 'replace_manager') {
 	list($users) = fn_get_users(array('managers' => 1132));
 	$counter = 0;
@@ -152,24 +152,23 @@ if ($mode == 'sync') {
 			db_query('DELETE FROM ?:vendors_customers WHERE customer_id = ?i AND vendor_manager = ?i', $user['user_id'], 1132);
 		}
 	}
-	 fn_print_die('done', $counter);
+	fn_print_die('done', $counter);
 } elseif ($mode == 'pservice_sku') {
-	 $params = array('company_id' => 28);
-	 list($products, ) = fn_get_products($params);
-	 foreach ($products as $pid => $product) {
-		  $pcode = trim($product['product_code']);
-		  if (strlen($pcode) < 11) {
+	$params = array('company_id' => 28);
+	list($products, ) = fn_get_products($params);
+	foreach ($products as $pid => $product) {
+		$pcode = trim($product['product_code']);
+		if (strlen($pcode) < 11) {
 				$pcode = str_pad($pcode, 11, "0", STR_PAD_LEFT);
 				db_query('UPDATE ?:products SET product_code = ?s WHERE product_id = ?i;', $pcode, $pid);
-		  }
-	 }
-	 fn_print_die('stop');
+		}
+	}
+	fn_print_die('stop');
 } elseif ($mode == 'get_profiles') {
-	 $report = db_get_array("SELECT up.user_id, count(profile_id) as count, firstname, lastname, phone, email FROM ?:user_profiles AS up LEFT JOIN ?:users AS u ON u.user_id = up.user_id GROUP BY user_id HAVING count(profile_id) > 1 ");
-	 $params['filename'] = 'profiles.csv';
-	 $params['force_header'] = true;
-	 $export = fn_exim_put_csv($report, $params, '"');
-
+	$report = db_get_array("SELECT up.user_id, count(profile_id) as count, firstname, lastname, phone, email FROM ?:user_profiles AS up LEFT JOIN ?:users AS u ON u.user_id = up.user_id GROUP BY user_id HAVING count(profile_id) > 1 ");
+	$params['filename'] = 'profiles.csv';
+	$params['force_header'] = true;
+	$export = fn_exim_put_csv($report, $params, '"');
 }
 
 
@@ -187,28 +186,28 @@ function fn_merge_products($company_id = 13)
 
   //  get products with dublicate pr_code
   $product_groups = db_get_hash_multi_array("SELECT A.product_id, A.product_code
-	 FROM ?:products A
-	 INNER JOIN (SELECT product_id, product_code, company_id
+	FROM ?:products A
+	INNER JOIN (SELECT product_id, product_code, company_id
 		FROM ?:products
 		WHERE company_id = ?i
 		GROUP BY product_code
 		HAVING COUNT(*) > 1) B
-	 ON A.product_code = B.product_code AND A.company_id = B.company_id",
-	 ['product_code', 'product_id'],
-	 $company_id);
+	ON A.product_code = B.product_code AND A.company_id = B.company_id",
+	['product_code', 'product_id'],
+	$company_id);
   if (!$product_groups) {
-	 fn_echo('Did not find products');
-	 die();
+	fn_echo('Did not find products');
+	die();
   }
 
   foreach ($product_groups as $product_code => $products_info) {
 
-	 fn_echo('Process prodcut code: '  . $product_code);
-	 fn_echo('<br />');
+	fn_echo('Process prodcut code: '  . $product_code);
+	fn_echo('<br />');
 
-	 $product_ids = array_keys($products_info);
-	 $main_product_id = '';
-	 $new_data = [
+	$product_ids = array_keys($products_info);
+	$main_product_id = '';
+	$new_data = [
 		'additional_categories' => [], // from main & additional
 		'price' => 0, // max price
 		'usergroup_ids' => [], // доступность юзергруппе
@@ -217,24 +216,24 @@ function fn_merge_products($company_id = 13)
 		// 'image' => [], // use main
 		// 'name' => '', //Если в названии итогового товара есть [CLONE],  [CLONE] [CLONE], это надо подтереть
 		// остальные товары удаляются.
-	 ];
-	 list($products) = fn_get_products(['pid' => $product_ids]);
+	];
+	list($products) = fn_get_products(['pid' => $product_ids]);
 
-	 fn_gather_additional_products_data($products, array('get_icon' => false, 'get_detailed' => true, 'get_options' => false, 'get_discounts' => false));
+	fn_gather_additional_products_data($products, array('get_icon' => false, 'get_detailed' => true, 'get_options' => false, 'get_discounts' => false));
 
-	 foreach ($products as $product_id => $product) {
+	foreach ($products as $product_id => $product) {
 
 		//  check exclude products
 		if (in_array($product_id, $exclude_products)) {
-		  if(($key = array_search($product_id, $product_ids)) !== false){
-			 unset($product_ids[$key]);
-		  }
+		if(($key = array_search($product_id, $product_ids)) !== false){
+			unset($product_ids[$key]);
+		}
 
-		  continue;
+		continue;
 		}
 
 		if (isset($product['main_pair']) && !empty($product['main_pair']) && empty($main_product_id)) {
-		  $main_product_id = $product_id;
+		$main_product_id = $product_id;
 		}
 
 		$new_data['additional_categories'] = array_merge($new_data['additional_categories'], $product['category_ids']);
@@ -242,37 +241,37 @@ function fn_merge_products($company_id = 13)
 		$new_data['price'] = max($product['price'], $new_data['price']);
 
 		foreach (explode(',', $product['usergroup_ids']) as $user_group) {
-		  $new_data['usergroup_ids'][] = $user_group;
-		  $new_data['prices'][] = [
-			 'lower_limit' => '1',
-			 'price' => $product['price'],
-			 'type' => 'A',
-			 'usergroup_id' => $user_group
-		  ];
+		$new_data['usergroup_ids'][] = $user_group;
+		$new_data['prices'][] = [
+			'lower_limit' => '1',
+			'price' => $product['price'],
+			'type' => 'A',
+			'usergroup_id' => $user_group
+		];
 		}
 		unset($new_data['prices'][0]);
-	 }
+	}
 
-	 $new_data['additional_categories'] = array_unique($new_data['additional_categories']);
-	 $new_data['usergroup_ids'] = array_unique($new_data['usergroup_ids']);
+	$new_data['additional_categories'] = array_unique($new_data['additional_categories']);
+	$new_data['usergroup_ids'] = array_unique($new_data['usergroup_ids']);
 
-	 $main_product = $products[$main_product_id];
+	$main_product = $products[$main_product_id];
 
-	 //  remove clone label
-	 $main_product['product'] = trim(str_replace('[CLONE]', '', $main_product['product']));
+	//  remove clone label
+	$main_product['product'] = trim(str_replace('[CLONE]', '', $main_product['product']));
 
-	 //  some warning on the yml_export add-on
-	 $main_product['yml2_delivery_options'] = (
-		  isset($main_product['yml2_delivery_options'])
-		  && gettype ($main_product['yml2_delivery_options']) !== 'string')
+	//  some warning on the yml_export add-on
+	$main_product['yml2_delivery_options'] = (
+		isset($main_product['yml2_delivery_options'])
+		&& gettype ($main_product['yml2_delivery_options']) !== 'string')
 		? $main_product['yml2_delivery_options']
 		: [$main_product['yml2_delivery_options']];
 
-	 $main_product = array_merge($main_product, $new_data);
-	 $product_id = fn_update_product($main_product, $main_product_id, DESCR_SL);
+	$main_product = array_merge($main_product, $new_data);
+	$product_id = fn_update_product($main_product, $main_product_id, DESCR_SL);
 
 
-	 if ($product_id) {
+	if ($product_id) {
 		fn_echo('Update product #' . $main_product_id);
 		fn_echo('<br />');
 
@@ -280,19 +279,19 @@ function fn_merge_products($company_id = 13)
 		unset($product_ids[array_search($main_product_id, $product_ids)]);
 
 		foreach ($product_ids as $delete_pr_id) {
-		  $result = fn_delete_product($delete_pr_id);
-		  if ($result) {
-			 fn_echo('Deleted product #' . $delete_pr_id);
-		  } else {
-			 fn_echo('Problem to delete product #' . $delete_pr_id);
-		  }
+		$result = fn_delete_product($delete_pr_id);
+		if ($result) {
+			fn_echo('Deleted product #' . $delete_pr_id);
+		} else {
+			fn_echo('Problem to delete product #' . $delete_pr_id);
 		}
-	 } else {
+		}
+	} else {
 		fn_echo('Problem to save product #' . $main_product_id);
-	 }
+	}
 
-	 fn_echo('<hr />');
-	 
+	fn_echo('<hr />');
+	
   }
 
   fn_echo("C'est finit");
