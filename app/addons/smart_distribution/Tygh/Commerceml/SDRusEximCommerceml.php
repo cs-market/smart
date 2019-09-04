@@ -229,17 +229,12 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             $count_import_offers++;
 
-            // [csmarket] limit bering
-            if (Registry::get('runtime.company_id') == 29) {
-                $product['zero_price_action'] = 'P';
-            } else {
-                if (isset($offer -> {$cml['amount']}) && !empty($offer -> {$cml['amount']})) {
-                    $amount = strval($offer -> {$cml['amount']});
+            if (isset($offer -> {$cml['amount']}) && !empty($offer -> {$cml['amount']})) {
+                $amount = strval($offer -> {$cml['amount']});
 
-                } elseif (isset($offer -> {$cml['store']})) {
-                    foreach ($offer -> {$cml['store']} as $store) {
-                        $amount += strval($store[$cml['in_stock']]);
-                    }
+            } elseif (isset($offer -> {$cml['store']})) {
+                foreach ($offer -> {$cml['store']} as $store) {
+                    $amount += strval($store[$cml['in_stock']]);
                 }
             }
 
@@ -281,6 +276,13 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $product_amount[$product_id]['amount'] = $o_amount;
             if (empty($combination_id)) {
                 $product['amount'] = $amount;
+
+                // [csmarket] limit bering
+                if (Registry::get('runtime.company_id') == 29) {
+                    unset($product['amount']);
+                    $product['zero_price_action'] = 'P';
+                }
+
                 $this->db->query(
                     'UPDATE ?:products SET ?u WHERE product_id = ?i',
                     $product,
