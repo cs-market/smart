@@ -24,5 +24,6 @@ fn_register_hooks(
 	'set_product_categories_exist',
 	'pre_add_to_cart',
 	'get_profile_fields',
-	'vendor_communication_add_thread_message_post'
+	'vendor_communication_add_thread_message_post',
+	'pre_update_order'
 );
