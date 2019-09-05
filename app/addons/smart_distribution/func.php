@@ -424,6 +424,12 @@ function fn_smart_distribution_get_profile_fields($location, $select, &$conditio
 			's_address_2',
 			's_lastname'
 		);
+		if (Registry::get('runtime.mode') == 'add') {
+			$stop_fields[] = 'company';
+			$stop_fields[] = 'fax';
+		} else {
+			$stop_fields[] = 'client_city';
+		}
 		$condition .= db_quote(" AND field_name NOT IN (?a)", $stop_fields);
 	}
 }

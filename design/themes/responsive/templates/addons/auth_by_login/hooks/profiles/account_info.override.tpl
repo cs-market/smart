@@ -1,3 +1,4 @@
+{if $runtime.mode != "add"}
 {hook name="profiles:account_info"}
     <div class="ty-control-group">
         <label for="email" class="ty-control-group__title cm-email cm-trim">{__("email")}</label>
@@ -19,3 +20,4 @@
         <input type="password" id="password2" name="user_data[password2]" size="32" maxlength="32" value="{if $runtime.mode == "update"}            {/if}" class="ty-input-text cm-autocomplete-off" />
     </div>
 {/hook}
+{/if}
