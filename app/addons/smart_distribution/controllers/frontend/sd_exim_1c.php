@@ -62,10 +62,6 @@ $s_commerceml = $exim_commerceml->getCompanySettings();
 
 $filename = (!empty($params['filename'])) ? fn_basename($params['filename']) : '';
 $lang_code = (!empty($s_commerceml['exim_1c_lang'])) ? $s_commerceml['exim_1c_lang'] : CART_LANGUAGE;
-// [csmarket] limit bering
-if (Registry::get('runtime.company_id') == 29) {
-    $exim_commerceml->s_commerceml['exim_1c_allow_import_features'] = 'N';
-}
 $exim_commerceml->getDirCommerceML();
 $exim_commerceml->import_params['lang_code'] = $lang_code;
 
