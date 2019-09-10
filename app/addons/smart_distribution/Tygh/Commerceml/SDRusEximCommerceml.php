@@ -659,6 +659,21 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $product['full_description'] = strval($_product -> {$cml['bar']});
             }
 
+            // limit for pinta for Katerina
+            if ($this->company_id == '41') {
+                if ($product_id) {
+                    return "";
+                } else {
+                    $_p = array(
+                        'external_id' => $product['external_id'],
+                        'product' => $product['product'],
+                        'category_id' => $product['category_id'],
+                        'category_ids' => $product['category_ids'],
+                    );
+                    $product = $_p;
+                }
+            }
+
 //	    if (!$product_id) {
 			$product_id = fn_update_product($product, $product_id, $import_params['lang_code']);
 
