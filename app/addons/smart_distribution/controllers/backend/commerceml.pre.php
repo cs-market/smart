@@ -91,7 +91,6 @@ if ($mode == 'sync') {
 	$exim_commerceml->getDirCommerceML();
 	$exim_commerceml->import_params['lang_code'] = $lang_code;
 	$exim_commerceml->import_params['manual'] = true;
-	$exim_commerceml->s_commerceml['exim_1c_allow_import_features'] = 'N';
 	$exim_commerceml->company_id = Registry::get('runtime.company_id');
 	if ($action == 'import') {
 		$filename = (!empty($params['filename'])) ? fn_basename($params['filename']) : 'import.xml';

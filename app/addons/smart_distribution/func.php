@@ -2,6 +2,7 @@
 
 use Tygh\Registry;
 use Tygh\Models\Company;
+use Tygh\Enum\ProductTracking;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -424,6 +425,12 @@ function fn_smart_distribution_get_profile_fields($location, $select, &$conditio
 			's_address_2',
 			's_lastname'
 		);
+		if (Registry::get('runtime.mode') == 'add') {
+			$stop_fields[] = 'company';
+			$stop_fields[] = 'fax';
+		} else {
+			$stop_fields[] = 'client_city';
+		}
 		$condition .= db_quote(" AND field_name NOT IN (?a)", $stop_fields);
 	}
 }
@@ -530,6 +537,12 @@ function fn_sd_add_product_to_wishlist($product_data, &$wishlist, &$auth)
 function fn_smart_distribution_pre_update_order($cart, $order_id) {
 	$wishlist = & Tygh::$app['session']['wishlist'];
 	$auth = & Tygh::$app['session']['auth'];
-	$w_products = fn_array_column($cart['products'], 'product_id', 'product_id');
-	$product_ids = fn_sd_add_product_to_wishlist($w_products, $wishlist, $auth);
+	$product_data = array();
+	foreach ($cart['products'] as $product) {
+		$product_data[$product['product_id']] = array(
+			'product_id' => $product['product_id'],
+			'amount' => $product['amount']
+		);
+	}
+	$product_ids = fn_sd_add_product_to_wishlist($product_data, $wishlist, $auth);
 }

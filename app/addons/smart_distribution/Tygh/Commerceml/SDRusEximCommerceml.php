@@ -749,7 +749,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $cml['unregistered'] => $unregistered,
             $cml['name'] => $name_company,
             $cml['role'] => $cml['seller'],
-            $cml['full_name_contractor'] => $order_data['lastname'] . ' ' . $order_data['firstname'],
+            $cml['full_name_contractor'] => trim($order_data['lastname'] . ' ' . $order_data['firstname']),
             $cml['lastname'] => $order_data['lastname'],
             $cml['firstname'] => $order_data['firstname']
         );
