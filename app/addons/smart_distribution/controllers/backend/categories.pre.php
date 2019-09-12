@@ -15,6 +15,7 @@ if ($mode == 'search' || $mode == 'picker') {
         $cids = db_get_field("SELECT categories FROM ?:vendor_plans AS vp LEFT JOIN ?:companies AS c ON vp.plan_id = c.plan_id WHERE company_id = ?i", $params['company_id']);
         $params['category_ids'] = explode(',', $cids);
     }
+    $params['add_root'] = !empty($_REQUEST['root']) ? $_REQUEST['root'] : '';
 
     list($categories, $search) = fn_get_categories($params);
     Tygh::$app['view']->assign('categories_tree', $categories);
