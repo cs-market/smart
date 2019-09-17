@@ -15,6 +15,9 @@
 <input type="hidden" id="selected_section" name="selected_section" value="{$selected_section}" />
 {/if}
 
+{if $put_request_vars}
+    {array_to_fields data=$smarty.request skip=["callback"] escape=["data_id"]}
+{/if}
 
 {capture name="simple_search"}
 {$extra nofilter}
