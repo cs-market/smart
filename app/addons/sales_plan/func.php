@@ -73,7 +73,7 @@ function fn_generate_sales_report($params) {
 
 		$condition = 1;
 		if (!empty($params['user_ids'])) {
-			$condition .= db_quote(" AND ?:sales_plan.user_id in (?a)", $params['user_ids']);
+			$condition .= db_quote(" AND ?:sales_plan.user_id in (?a)", explode(',', $params['user_ids']));
 		}
 		if (!empty($params['usergroup_id'])) {
 			list($users, ) = fn_get_users(array('usergroup_id' => $params['usergroup_id']), $_SESSION['auth']);
@@ -89,7 +89,7 @@ function fn_generate_sales_report($params) {
 			$condition .= db_quote(" AND ?:sales_plan.company_id = ?i", $params['company_id']);
 		}
 
-		$plans = db_get_hash_array("SELECT *, CONCAT(?:sales_plan.company_id, '_', ?:sales_plan.user_id) AS kkey FROM ?:sales_plan LEFT JOIN ?:users ON ?:users.user_id = ?:sales_plan.user_id WHERE $condition AND status = ?s", 'kkey', 'A');
+		$plans = db_get_hash_array("SELECT ?:sales_plan.*, CONCAT(?:sales_plan.company_id, '_', ?:sales_plan.user_id) AS kkey FROM ?:sales_plan LEFT JOIN ?:users ON ?:users.user_id = ?:sales_plan.user_id WHERE $condition AND status = ?s", 'kkey', 'A');
 
 		foreach ($plans as $iteration => $plan) {
 			$base_timestamp = db_get_field('SELECT max(timestamp) FROM ?:orders WHERE company_id = ?i AND user_id = ?i', $plan['company_id'], $plan['user_id']);
