@@ -42,8 +42,8 @@
 		<item>ALTER TABLE `?:orders` ADD `delvery_date` int(11) unsigned NOT NULL DEFAULT 0;</item>
 		<item for="uninstall">ALTER TABLE `?:orders` DROP `delvery_date`;</item>
 
-		<item>ALTER TABLE `?:companies` ADD `after17rule` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `saturday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y';</item>
-		<item for="uninstall">ALTER TABLE `cscart_companies` DROP `after17rule`, DROP `sunday_shipping`, DROP `saturday_rule`;</item>
+		<item>ALTER TABLE `?:companies` ADD `tomorrow_rule` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `saturday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `tomorrow_timeslot` VARCHAR(8) NOT NULL DEFAULT '17:00';</item>
+		<item for="uninstall">ALTER TABLE `cscart_companies` DROP `tomorrow_rule`, DROP `sunday_shipping`, DROP `saturday_rule`, `tomorrow_timeslot`;</item>
 
 	</queries>
 

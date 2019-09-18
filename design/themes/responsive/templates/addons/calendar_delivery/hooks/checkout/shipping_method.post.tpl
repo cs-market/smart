@@ -7,7 +7,7 @@
 	{$c_data = $group.company_id|fn_get_company_data}
 
 	{$min = '1'}
-	{if ($hours >= 16) && ($minutes >= 30) && $c_data.after17rule != 'Y'}
+	{if $c_data|fn_validate_tomorrow_rule}
 		{$min = $min + 1}
 	{/if}
 	{$min_date = "+{$min}"}

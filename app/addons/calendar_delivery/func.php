@@ -55,9 +55,29 @@ function fn_calendar_delivery_exim1c_order_xml_pre(&$order_xml, $order_data, $cm
 }
 
 function fn_calendar_delivery_get_companies($params, &$fields, $sortings, $condition, $join, $auth, $lang_code, $group) {
-    $fields[] = 'after17rule';
+    $fields[] = 'tomorrow_rule';
     $fields[] = 'sunday_shipping';
     $fields[] = 'saturday_rule';
+    // backward compatibility
+    $fields[] = 'tomorrow_rule as after17rule';
+}
+
+// backward compatibility
+function fn_calendar_delivery_get_company_data($company_id, $lang_code, $extra, &$fields, $join, $condition) {
+    $fields[] = 'tomorrow_rule as after17rule';
+}
+
+function fn_validate_tomorrow_rule($company_data) {
+    $res = false;
+
+    if (is_numeric($company_data)) {
+        $company_data = fn_get_company_data($company_data);
+    }
+    if ($company_data['tomorrow_rule'] != 'Y') {
+        $res = (strtotime(date("G:i")) >= strtotime($company_data['tomorrow_timeslot'])) ? true : false;
+    }
+
+    return $res;
 }
 
 if (!is_callable('fn_ts_this_day')) {

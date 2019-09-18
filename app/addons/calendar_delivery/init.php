@@ -12,3 +12,6 @@ fn_register_hooks(
 	'form_cart_pre_fill',
 	'update_cart_by_data_post'
 );
+
+// backward compatibility
+fn_register_hooks('get_company_data');

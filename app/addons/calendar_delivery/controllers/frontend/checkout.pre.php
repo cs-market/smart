@@ -16,7 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$c_data = fn_get_company_data($company_id);
 
 			$compare_ts = fn_ts_this_day(strtotime('+1 day'));
-			if ((date('H') >= '16' && date('i') >= '30' ) && $c_data['after17rule'] != 'Y') {
+
+			if (fn_validate_tomorrow_rule($c_data)) {
 				$compare_ts = fn_ts_this_day(strtotime('+2 days'));
 			}
 

@@ -6,12 +6,9 @@
 	    {assign var="date_format" value="%d/%m/%Y"}
 	{/if}
 	{$cid = $product_groups[$group_key].company_id}
-	{$c_data = $cid|fn_get_company_data}
-
-	{$hours = $smarty.now|date_format:'%H'}
 	
 	{$min = '1'}
-	{if ($hours >= 16) && ($minutes >= 30) && $c_data.after17rule != 'Y'}
+	{if $c_data|fn_validate_tomorrow_rule}
 		{$min = $min + 1}
 	{/if}
 	{$default = "+{$min} day"|strtotime}
