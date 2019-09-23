@@ -1,5 +1,16 @@
 <?php
 
+function fn_exim_rejoin_user_profiles_export(&$pattern)
+{
+  $pattern['references']['user_profiles'] = array(
+    'reference_fields' => [
+      'user_id' => '#key',
+      'profile_id' => '$profile_id'
+    ],
+    'join_type' => 'LEFT'
+  );
+}
+
 function fn_exim_smart_distribution_add_field_columns_import($import_data, &$pattern)
 {
   //  get field names from columns
@@ -23,13 +34,13 @@ function fn_exim_smart_distribution_add_field_columns_import($import_data, &$pat
 
   foreach ($exist_fields as $field) {
     $pattern['export_fields'][$field['description']] = array(
-      'process_put' => array('fn_exim_smart_distribution_add_field_column_import', '#key', '#this', $field['description']),
+      'process_put' => array('fn_exim_smart_distribution_add_field_column_import', '#key', '#this', $field['description'], '%profile_id%'),
       'linked' => false
     );
   }
 }
 
-function fn_exim_smart_distribution_add_field_column_import($user_id, $value, $name)
+function fn_exim_smart_distribution_add_field_column_import($user_id, $value, $name, $profile_id)
 {
   $profile_ids = fn_exim_smart_distribution_get_user_fields($user_id);
 
@@ -49,8 +60,7 @@ function fn_exim_smart_distribution_add_field_column_import($user_id, $value, $n
       continue;
     }
 
-    foreach ($profile_ids as $profile_id) {
-
+    $profile_fnc = function($profile_id) use ($field, $value, $user_id) {
       //  update default fields additional info
       if ($field['is_default'] == 'Y') {
           db_query("UPDATE ?:user_profiles SET ?u WHERE profile_id = ?i AND user_id = ?i", [$field['field_name'] => $value], $profile_id, $user_id);
@@ -69,7 +79,15 @@ function fn_exim_smart_distribution_add_field_column_import($user_id, $value, $n
           ]);
         }
       }
+    };
 
+    //  if non exist $profile_id add for all profiles
+    if (!$profile_id) {
+      foreach ($profile_ids as $profile_id) {
+        $profile_fnc($profile_id);
+      }
+    } else {
+      $profile_fnc($profile_id);
     }
   }
 }
@@ -107,7 +125,6 @@ function fn_exim_smart_distribution_add_vendors_customers($user_id, $vendor_emai
   //  remove old data
   db_query("DELETE FROM ?:vendors_customers WHERE customer_id = ?i", $user_id);
 
-
   //  get vendor customer ids
   $vendor_customer_ids = db_get_fields(
     "SELECT user_id FROM ?:users WHERE email IN (?a)",
@@ -132,4 +149,39 @@ function fn_exim_smart_distribution_add_vendors_customers($user_id, $vendor_emai
 function fn_exim_smart_distribution_export_vendors_customers($user_id) {
   $managers  = db_get_fields("SELECT email FROM ?:users LEFT JOIN ?:vendors_customers ON ?:users.user_id = ?:vendors_customers.vendor_manager WHERE customer_id = ?i", $user_id);
   return implode(',', $managers);
+}
+
+//  create profile, if empty profile_id
+function fn_exim_smart_distribution_check_profile_id($id, &$object)
+{
+    if (isset($object['profile_id'])
+      && isset($id['user_id'])
+      && !empty($id['user_id'])
+    ) {
+      $profile_id = $object['profile_id'];
+
+      //  check profile by profile id and name
+      if ($profile_id) {
+        $profile_id = db_get_field("SELECT profile_id
+          FROM ?:user_profiles
+          WHERE user_id = ?i AND (profile_id = ?i OR profile_name = ?s)",
+          $id['user_id'],
+          $object['profile_id'],
+          $object['profile_id']
+        );
+      }
+
+      //  create if !exist
+      if (empty($profile_id)) {
+        $profile_id = db_query("INSERT INTO ?:user_profiles ?e", [
+          'user_id' => $id['user_id'],
+          'profile_type' => 'S',
+          'profile_name' => $object['profile_id']
+            ? (String) $object['profile_id']
+            : 'Import create'
+        ]);
+      }
+
+      $object['profile_id'] = $profile_id;
+    }
 }

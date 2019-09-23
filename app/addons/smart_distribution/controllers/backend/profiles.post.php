@@ -7,9 +7,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 if ($mode == 'update') {
-    $user_data = Tygh::$app['view']->getTemplateVars('user_data', $user_data);
+    $user_data = Tygh::$app['view']->getTemplateVars('user_data');
     $user_type = $user_data['user_type'];
-    
+
     if ((!fn_check_user_type_admin_area($user_type) && ($auth['user_type']) == 'V' )
         || (fn_check_user_type_admin_area($user_type) && ($auth['user_type']) == 'A')
     ) {
