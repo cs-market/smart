@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>order_cancellation</id>
+	<name>Order cancellation</name>
+	<version>1.0</version>
+	<priority>3000</priority>
+	<position>0</position>
+	<status>active</status>
+	<default_language>en</default_language>
+	<settings>
+		<sections>
+			<section id="general">
+				<items>
+					<item id="cancellation_status">
+						<type>selectbox</type>
+						<name>Canceled Order Status</name>
+						<default_value>C</default_value>
+					</item>
+				</items>
+			</section>
+		</sections>
+	</settings>
+	<language_variables>
+		<item lang="en" id="cancel_order">Cancel the order</item>
+		<item lang="ru" id="cancel_order">Отменить заказ</item>
+
+		<item lang="en" id="allow_order_cancellation">Allow to cancel the order</item>
+		<item lang="ru" id="allow_order_cancellation">Разрешить отмену заказа</item>
+	</language_variables>
+	<queries>
+		<item for="uninstall">DELETE FROM ?:status_data WHERE param = 'allow_cancel'</item>
+	</queries>
+</addon>
