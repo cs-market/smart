@@ -18,22 +18,6 @@ use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-$path_file = 'exim/1C_' . date('dmY') . '/';
-$path = fn_get_files_dir_path() . $path_file;
-$path_commerceml = fn_get_files_dir_path();
-
-$log = new Logs($path_file, $path);
-
-$exim_commerceml = new SDRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
-list($status, $user_data, $user_login, $password, $salt) = fn_auth_routines($_data, array());
-$exim_commerceml->import_params['user_data'] = $auth;
-
-list($cml, $s_commerceml) = $exim_commerceml->getParamsCommerceml();
-$s_commerceml = $exim_commerceml->getCompanySettings();
-
-$params = $_REQUEST;
-$company_id = fn_get_runtime_company_id();
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$suffix = '';
 
@@ -83,6 +67,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 if ($mode == 'sync') {
+	$path_file = 'exim/1C_' . date('dmY') . '/';
+	$path = fn_get_files_dir_path() . $path_file;
+	$path_commerceml = fn_get_files_dir_path();
+
+	$log = new Logs($path_file, $path);
+
+	$exim_commerceml = new SDRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
+	list($status, $user_data, $user_login, $password, $salt) = fn_auth_routines($_data, array());
+	$exim_commerceml->import_params['user_data'] = $auth;
+
+	list($cml, $s_commerceml) = $exim_commerceml->getParamsCommerceml();
+	$s_commerceml = $exim_commerceml->getCompanySettings();
+
+	$params = $_REQUEST;
+	$company_id = fn_get_runtime_company_id();
 
 	$manual = true;
 	//unset($_SESSION['exim_1c']);
