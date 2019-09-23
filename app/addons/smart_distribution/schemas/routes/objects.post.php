@@ -30,4 +30,9 @@ $schema['/exim_class'] = array (
     'dispatch' => 'sd_exim_1c',
     'service_exchange' => 'exim_class'
 );
+
+$schema['/run_import'] = array(
+    'dispatch' => 'exim.run_import',
+);
+
 return $schema;
