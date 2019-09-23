@@ -56,6 +56,7 @@ function fn_calendar_delivery_exim1c_order_xml_pre(&$order_xml, $order_data, $cm
 
 function fn_calendar_delivery_get_companies($params, &$fields, $sortings, $condition, $join, $auth, $lang_code, $group) {
     $fields[] = 'tomorrow_rule';
+    $fields[] = 'tomorrow_timeslot';
     $fields[] = 'sunday_shipping';
     $fields[] = 'saturday_rule';
     // backward compatibility
