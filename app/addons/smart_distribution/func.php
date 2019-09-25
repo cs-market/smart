@@ -546,3 +546,8 @@ function fn_smart_distribution_pre_update_order($cart, $order_id) {
 	}
 	$product_ids = fn_sd_add_product_to_wishlist($product_data, $wishlist, $auth);
 }
+
+// for exim to escape /n at the end
+function fn_smart_distribution_get_company_id_by_name($company_name, &$condition) {
+	$condition = str_replace('\\n', '', $condition);
+}

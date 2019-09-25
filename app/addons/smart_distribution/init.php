@@ -25,5 +25,6 @@ fn_register_hooks(
 	'pre_add_to_cart',
 	'get_profile_fields',
 	'vendor_communication_add_thread_message_post',
-	'pre_update_order'
+	'pre_update_order',
+	'get_company_id_by_name'
 );
