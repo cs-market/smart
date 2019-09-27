@@ -137,7 +137,10 @@ function fn_generate_sales_report($params) {
 
 		foreach (fn_array_merge($user_company_combinations, $plans) as $plan) {
 			$output[$iteration][__('company_name')] = fn_get_company_name($plan['company_id']);
-			$output[$iteration][__('customer')] = fn_get_user_name($plan['user_id']);
+			$user = fn_get_user_info($plan['user_id']);
+			$output[$iteration][__('customer')] = $user['firstname'];//fn_get_user_name($plan['user_id']);
+			$output[$iteration][__('address')] = $user['b_address'];
+			$output[$iteration][__('code')] = $user['fields'][38];
 
 			$table = array();
 			$sum = array('plan' => 0, 'fact' => 0);
@@ -254,8 +257,11 @@ function fn_generate_category_report($params) {
 						$o[date('d.m.Y', $period)] = '0%';
 					}
 				}
+				$user = fn_get_user_info($user_id);
 				$output[] = array_merge(array(
-					__('customer') => fn_get_user_name($user_id),
+					__('customer') => $user['firstname'],
+					__('address') => $user['b_address'],
+					__('code') => $user['fields'][38],
 					__('category') => fn_get_category_name($category_id),
 				), $o);
 			}
@@ -349,9 +355,11 @@ function fn_generate_unsold_report($params) {
 		}
 
 		foreach ($result_users as $key => $u) {
-			$u_name = fn_get_user_name($u['user_id']);
+			$user = fn_get_user_info($u['user_id']);
 			$output[] = array(
-				__('user') => (!empty(trim($u_name)) ? $u_name : $u['email'])  . " " .  "#" . $u['user_id'],
+				__('user') => (!empty(trim($user['firstname'])) ? $user['firstname'] : $user['email'])  . " " .  "#" . $user['user_id'],
+				__('address') => $user['b_address'],
+				__('code') => $user['fields'][38],
 				__('sales') => ($purchased_users[$key]['total']) ? $purchased_users[$key]['total'] : 0
 			);
 		}
