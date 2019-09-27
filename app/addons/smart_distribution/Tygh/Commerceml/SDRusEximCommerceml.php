@@ -538,21 +538,23 @@ class SDRusEximCommerceml extends RusEximCommerceml
         $barcode = strval($_product -> {$cml['bar']});
 
         $product_data = array();
+        $company_condition = fn_get_company_condition('company_id');
+
         if ($link_type == 'article') {
             $product_data = $this->db->getRow(
-                'SELECT product_id, update_1c FROM ?:products WHERE product_code = ?s',
+                "SELECT product_id, update_1c FROM ?:products WHERE product_code = ?s $company_condition",
                 $article
             );
 
         } elseif ($link_type == 'barcode') {
             $product_data = $this->db->getRow(
-                'SELECT product_id, update_1c FROM ?:products WHERE product_code = ?s',
+                "SELECT product_id, update_1c FROM ?:products WHERE product_code = ?s $company_condition",
                 $barcode
             );
 
         } else {
             $product_data = $this->db->getRow(
-                'SELECT product_id, update_1c FROM ?:products WHERE external_id = ?s',
+                "SELECT product_id, update_1c FROM ?:products WHERE external_id = ?s $company_condition",
                 $guid_product
             );
             if (!$product_data) {
@@ -568,14 +570,13 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     }
 
                     $product_data = $this->db->getRow(
-                        "SELECT p.product_id, update_1c FROM ?:products AS p LEFT JOIN ?:product_descriptions as pd ON pd.product_id = p.product_id AND pd.lang_code = ?s WHERE $cond AND company_id = ?i", DESCR_SL
-                        , $this->company_id
+                        "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE $cond $company_condition", DESCR_SL
                     );
 
                     if (empty($product_data) && !empty($article)) {
                         $product_data = $this->db->getRow(
-                            'SELECT p.product_id, update_1c FROM ?:products AS p LEFT JOIN ?:product_descriptions as pd ON pd.product_id = p.product_id AND pd.lang_code = ?s WHERE p.product_code = ?s AND company_id = ?i', DESCR_SL,
-                            strval($_product -> {$cml['article']}), $this->company_id
+                            "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE product_code = ?s $company_condition", DESCR_SL,
+                            strval($_product -> {$cml['article']})
                         );
                     }
                 }
