@@ -167,9 +167,28 @@ if ($mode == 'sync') {
 	$params['filename'] = 'profiles.csv';
 	$params['force_header'] = true;
 	$export = fn_exim_put_csv($report, $params, '"');
+} elseif ($mode == 'devide_pinta') {
+	$file = 'var/files/pinta1.csv';
+	$content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false) );
+	$sku = array_column($content, 'Номенклатура.Код');
+	array_walk($sku, 'fn_trim_helper');
+	//list($pinta_products, ) = fn_get_products(array('company_id' => 41));
+	//fn_print_die(count($pinta_products));
+	//$products = db_get_hash_single_array('SELECT product_id, product_code FROM ?:products WHERE product_code IN (?a) AND company_id = ?i', array('product_id', 'product_code'), $sku, 41);
+	$products = db_get_fields('SELECT product_code FROM ?:products WHERE product_code IN (?a) AND company_id = ?i',  $sku, 41);
+	$unexist_products = array_diff($sku, $products);
+	fn_print_die($sku, $products, $unexist_products, count($unexist_products), count($products));
+	//fn_print_die('here');
+} elseif ($mode == 'delete_pinta') {
+	$pids = db_get_fields("SELECT product_id FROM ?:products WHERE 1 AND company_id in (?a)", array('41', '46'));
+	$counter = 0;
+	foreach ($pids as $pid) {
+		if (fn_delete_product($pid)) {
+			$counter += 1;
+		}
+	}
+	fn_print_die($counter);
 }
-
-
 
 function fn_merge_products($company_id = 13)
 {
