@@ -538,7 +538,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
         $barcode = strval($_product -> {$cml['bar']});
 
         $product_data = array();
-        $company_condition = fn_get_company_condition('company_id');
+        $company_condition = fn_get_company_condition('company_id', true, '', false, true);
 
         if ($link_type == 'article') {
             $product_data = $this->db->getRow(
