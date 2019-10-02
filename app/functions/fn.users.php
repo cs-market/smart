@@ -1661,8 +1661,7 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
             'user_type' => 'C', // FIXME?
         );
 
-        // [cs-market] allow vendors to create users
-        if (1 || fn_allowed_for('ULTIMATE')) {
+        if (fn_allowed_for('ULTIMATE')) {
             if (!empty($user_data['company_id']) || Registry::get('runtime.company_id') || AREA == 'A') {
                 //company_id can be received when we create user account from the backend
                 $company_id = !empty($user_data['company_id']) ? $user_data['company_id'] : Registry::get('runtime.company_id');
@@ -1675,6 +1674,9 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
 
                 return false;
             }
+        // [cs-market] allow vendors to create users
+        } else {
+                $user_data['company_id'] = Registry::get('runtime.company_id');
         }
 
         $action = 'add';
