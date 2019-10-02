@@ -214,12 +214,13 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $combination_id = reset($ids);
             }
 
-            // [csmarket] 
-            $product_data = $this->db->getRow('SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE external_id = ?s', $guid_product);
+            // [csmarket]
+            $company_condition = fn_get_company_condition('company_id', true, '', false, true);
+            $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE external_id = ?s $company_condition", $guid_product);
             if (empty($product_data)) {
                 $_product_data = $this->getProductDataByLinkType($link_type, $offer, $cml);
                 if (!empty($_product_data))
-                $product_data = $this->db->getRow('SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE product_id = ?s', $_product_data['product_id']);
+                $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE product_id = ?s $company_condition", $_product_data['product_id']);
             }
             $product_id = !empty($product_data['product_id']) ? $product_data['product_id'] : 0;
 
