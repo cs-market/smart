@@ -666,9 +666,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $_p = array(
                     'external_id' => $product['external_id'],
                     'product' => $product['product'],
-                    'category_id' => $product['category_id'],
-                    'category_ids' => $product['category_ids'],
+/*                    'category_id' => $product['category_id'],
+                    'category_ids' => $product['category_ids'],*/
                 );
+                $product = $_p;
             }
 
 //	    if (!$product_id) {
