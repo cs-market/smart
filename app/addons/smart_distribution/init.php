@@ -26,5 +26,6 @@ fn_register_hooks(
 	'get_profile_fields',
 	'vendor_communication_add_thread_message_post',
 	'pre_update_order',
-	'get_company_id_by_name'
+	'get_company_id_by_name',
+	'update_product_pre'
 );

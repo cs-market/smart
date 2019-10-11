@@ -551,3 +551,15 @@ function fn_smart_distribution_pre_update_order($cart, $order_id) {
 function fn_smart_distribution_get_company_id_by_name($company_name, &$condition) {
 	$condition = str_replace('\\n', '', $condition);
 }
+
+// fix qty_discounts update by API for product wo price
+function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $lang_code, $can_update) {
+	if (!isset($product_data['price'])) {
+		$price = db_get_field('SELECT price FROM ?:product_prices WHERE product_id = ?i AND usergroup_id = ?i AND lower_limit = ?i', $product_id, 0, 1);
+		$qty_price = 0;
+		if (isset($product_data['prices'])) {
+			$qty_price = max(array_column($product_data['prices'], 'price'));
+		}
+		$product_data['price'] = ($qty_price > $price) ? $qty_price : $price;
+	}
+}
