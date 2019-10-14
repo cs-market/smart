@@ -907,4 +907,152 @@ class SDRusEximCommerceml extends RusEximCommerceml
             fn_update_product_prices($product_id, $fake_product_data, $this->company_id);
         }
     }
+
+    // send price only to limited products
+    public function dataOrderProducts($xml, $order_data, $discount = 0)
+    {
+        $cml = $this->cml;
+        $export_options = $this->s_commerceml['exim_1c_product_options'];
+
+        $add_tax = $this->s_commerceml['exim_1c_add_tax'];
+        if (!empty($order_data['taxes']) && $add_tax == 'Y') {
+            $data_taxes = $this->dataOrderTaxs($order_data['taxes']);
+        }
+
+        if ($this->s_commerceml['exim_1c_order_shipping'] == 'Y' && $order_data['shipping_cost'] > 0) {
+            $data_product = array(
+                $cml['id'] => 'ORDER_DELIVERY',
+                $cml['name'] => $cml['delivery_order'],
+                $cml['price_per_item'] => $order_data['shipping_cost'],
+                $cml['amount'] => 1,
+                $cml['total'] => $order_data['shipping_cost'],
+                $cml['multiply'] => 1,
+            );
+            $data_product[$cml['base_unit']]['attribute'] = array(
+                $cml['code'] => '796',
+                $cml['full_name_unit'] => $cml['item'],
+                'text' => $cml['item']
+            );
+            $data_product[$cml['value_fields']][][$cml['value_field']] = array(
+                $cml['name'] => $cml['spec_nomenclature'],
+                $cml['value'] => $cml['service']
+            );
+            $data_product[$cml['value_fields']][][$cml['value_field']] = array(
+                $cml['name'] => $cml['type_nomenclature'],
+                $cml['value'] => $cml['service']
+            );
+
+            $data_products[][$cml['product']] = $data_product;
+        }
+
+        if (!empty($order_data['payment_surcharge']) && $order_data['payment_surcharge'] > 0) {
+            $data_product = array(
+                $cml['id'] => 'Payment_surcharge',
+                $cml['name'] => $cml['payment_surcharge'],
+                $cml['price_per_item'] => $order_data['payment_surcharge'],
+                $cml['amount'] => 1,
+                $cml['total'] => $order_data['payment_surcharge'],
+                $cml['multiply'] => 1,
+            );
+            $data_product[$cml['base_unit']]['attribute'] = array(
+                $cml['code'] => '796',
+                $cml['full_name_unit'] => $cml['item'],
+                'text' => $cml['item']
+            );
+            $data_product[$cml['value_fields']][][$cml['value_field']] = array(
+                $cml['name'] => $cml['spec_nomenclature'],
+                $cml['value'] => $cml['service']
+            );
+            $data_product[$cml['value_fields']][][$cml['value_field']] = array(
+                $cml['name'] => $cml['type_nomenclature'],
+                $cml['value'] => $cml['service']
+            );
+
+            $data_products[][$cml['product']] = $data_product;
+        }
+
+        // [cs-market] send price only to limited products
+        $send_price_1c = db_get_hash_single_array('SELECT product_id, send_price_1c FROM ?:products WHERE product_id IN (?a)',  array('product_id', 'send_price_1c'),  fn_array_column($order_data['products'], 'product_id'));
+
+        foreach ($order_data['products'] as $product) {
+            $product_discount = 0;
+            $product_subtotal = $product['subtotal'];
+            $external_id = $this->db->getField("SELECT external_id FROM ?:products WHERE product_id = ?i", $product['product_id']);
+            $external_id = (!empty($external_id)) ? $external_id : $product['product_id'];
+            $product_name = $product['product'];
+            if (!empty($product['product_options']) && $export_options == 'Y') {
+                $this->setDataProductByOptions($product['product_id'], $product['product_options'], $external_id, $product_name);
+            }
+
+            $data_product = array(
+                $cml['id'] => $external_id,
+                $cml['code'] => $product['product_id'],
+                $cml['article'] => $product['product_code'],
+                $cml['name'] => $product_name,
+                $cml['price_per_item'] => $product['base_price'],
+                $cml['amount'] => $product['amount'],
+                $cml['multiply'] => 1
+            );
+
+            $data_product[$cml['base_unit']]['attribute'] = array(
+                $cml['code'] => '796',
+                $cml['full_name_unit'] => $cml['item'],
+                'text' => $cml['item']
+            );
+
+            if (!empty($discount)) {
+                $p_subtotal = $product['price'] * $product['amount'];
+                $product_discount = $p_subtotal * $discount / 100;
+
+                if ($p_subtotal > $product_discount) {
+                    $data_product[$cml['discounts']][][$cml['discount']] = array(
+                        $cml['name'] => $cml['product_discount'],
+                        $cml['total'] => $product_discount,
+                        $cml['in_total'] => 'false'
+                    );
+                }
+            }
+
+            if(isset($product['discount'])) {
+                $data_product[$cml['discounts']][][$cml['discount']] = array(
+                    $cml['name'] => $cml['product_discount'],
+                    $cml['total'] => $product['discount'],
+                    $cml['in_total'] => 'true'
+                );
+            }
+
+            if (!empty($data_taxes['products'][$product['item_id']])) {
+                $tax_value = 0;
+                $subtotal = $product['subtotal'] - $product_discount;
+                foreach ($data_taxes['products'][$product['item_id']] as $product_tax) {
+                    $data_product[$cml['taxes_rates']][][$cml['tax_rate']] = array(
+                        $cml['name'] => $product_tax['name'],
+                        $cml['rate_t'] => $product_tax['value']
+                    );
+
+                    if ($product_tax['tax_in_total'] == 'false') {
+                        $tax_value = $tax_value + ($subtotal * $product_tax['rate_value'] / 100);
+                    }
+                }
+
+                $product_subtotal = $product['subtotal'] + $tax_value;
+            }
+            $data_product[$cml['total']] = $product_subtotal;
+            $data_product[$cml['value_fields']][][$cml['value_field']] = array(
+                $cml['name'] => $cml['spec_nomenclature'],
+                $cml['value'] => $cml['product']
+            );
+            $data_product[$cml['value_fields']][][$cml['value_field']] = array(
+                $cml['name'] => $cml['type_nomenclature'],
+                $cml['value'] => $cml['product']
+            );
+            // [cs-market] send price only to limited products
+            if ($send_price_1c[$product['product_id']] != 'Y') {
+                unset($data_product[$cml['price_per_item']], $data_product[$cml['total']]);
+            }
+            $data_products[][$cml['product']] = $data_product;
+        }
+
+        return $data_products;
+    }
 }

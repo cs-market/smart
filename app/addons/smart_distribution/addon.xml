@@ -38,5 +38,8 @@
 
 		<item>ALTER TABLE `?:vendor_plans` ADD `usergroups` TEXT NOT NULL;</item>
 		<item for="uninstall">ALTER TABLE `?:vendor_plans` DROP `usergroups`;</item>
+
+		<item>ALTER TABLE `?:cscart_products` ADD `send_price_1c` CHAR(1) NOT NULL DEFAULT 'Y' AFTER `update_1c`</item>
+		<item for="uninstall">ALTER TABLE `?:cscart_products` DROP `send_price_1c`;</item>
 	</queries>
 </addon>
