@@ -65,6 +65,27 @@ function fn_smart_distribution_get_order_info(&$order, $additional_data) {
 			$order[$field_name] = $order['fields'][$field_id];
 		}
 	}
+
+	// get_barcode for product
+	if (defined('API')) {
+		foreach ($order['products'] as &$product) {
+			$features = fn_get_product_features_list($product, "A");
+			if (!empty($features)) {
+				foreach ($features as $feature) {
+					if (!empty($feature['feature_code'])) {
+						$product[$feature['feature_code']] = $feature['variant'];
+					}
+				}
+			}
+		}
+	}
+}
+
+// to get a feature code in API request
+function fn_smart_distribution_get_product_features_list_before_select(&$fields, $join, $condition, $product, $display_on, $lang_code) {
+	if (defined('API')) {
+		$fields .=  ', f.feature_code';
+	}
 }
 
 function fn_smart_distribution_is_manager($user_id) {
