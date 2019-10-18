@@ -10,3 +10,14 @@
 	</select>
 	</div>
 </div>
+<div class="control-group">
+	<label class="control-label" for="elm_managers">{__("user_type")}</label>
+	<div class="controls">
+		<select id="user_type" name="user_type">
+			<option value="">{__("all")}</option>
+			<option value="C" {if $search.user_type == "C"}selected="selected"{/if}>{__("customer")}</option>
+			<option value="V" {if $search.user_type == "V"}selected="selected"{/if}>{__("vendor_administrator")}</option>
+			<option value="A" {if $search.user_type == "A"}selected="selected"{/if}>{__("administrator")}</option>
+		</select>
+	</div>
+</div>
