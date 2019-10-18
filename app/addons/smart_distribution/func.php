@@ -190,7 +190,7 @@ function fn_smart_distribution_get_users(&$params, $fields, $sortings, &$conditi
 	if (isset($condition['company_id'])) {
 		unset($condition['company_id']);
 	}
-	if (isset($params['company_id'])) {
+	if (isset($params['company_id']) && !empty($params['company_id'])) {
 		$condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false, $params['company_id']) . db_quote(" OR ?:users.user_id IN (?n) )", fn_get_company_customers_ids($params['company_id']));
 	}
 }
