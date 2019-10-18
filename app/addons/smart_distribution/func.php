@@ -170,12 +170,10 @@ function fn_smart_distribution_get_managers($params = array()) {
 
 function fn_smart_distribution_get_users_pre(&$params, $auth, $items_per_page, $custom_view) {
 	if (Registry::get('runtime.company_id')) {
-		// сомнительно, проверить под юзером 1929 #21475
-		//$params['company_id'] = Registry::get('runtime.company_id');
 		$params['exclude_user_types'] = array('V');
 	}
 }
-function fn_smart_distribution_get_users($params, $fields, $sortings, &$condition, &$join, $auth) {
+function fn_smart_distribution_get_users(&$params, $fields, $sortings, &$condition, &$join, $auth) {
 	if (!empty($params['managers'])) {
 		if (!is_array($params['managers'])) {
 			$managers = explode(',', $params['managers']);
@@ -183,10 +181,17 @@ function fn_smart_distribution_get_users($params, $fields, $sortings, &$conditio
 		$join .= db_quote(' LEFT JOIN ?:vendors_customers ON ?:vendors_customers.customer_id = ?:users.user_id');
 		$condition['vendor_manager'] = db_quote(' AND ?:vendors_customers.vendor_manager in (?a) ', $managers);
 	}
-	if (Registry::get('runtime.company_id') && isset($condition['users_company_id'])) {
-		// сомнительно, проверить под юзером 1929 #21475
+	if (Registry::get('runtime.company_id')) {
+		$params['company_id'] = Registry::get('runtime.company_id');
+	}
+	if (isset($condition['users_company_id'])) {
 		unset($condition['users_company_id']);
-		$condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false) . db_quote(" OR ?:users.user_id IN (?n) )", fn_get_company_customers_ids(Registry::get('runtime.company_id')));
+	}
+	if (isset($condition['company_id'])) {
+		unset($condition['company_id']);
+	}
+	if (isset($params['company_id'])) {
+		$condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false, $params['company_id']) . db_quote(" OR ?:users.user_id IN (?n) )", fn_get_company_customers_ids($params['company_id']));
 	}
 }
 
