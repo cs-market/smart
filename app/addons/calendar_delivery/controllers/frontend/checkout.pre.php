@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			if ($c_data['sunday_shipping'] == 'N' && date('w', $choosed_ts) == 0) {
 				$res = false;
 			}
-			if ($c_data['saturday_rule'] == 'N' && date('w', $choosed_ts) == 1 && ((date('w', time()) == 0) || (date('w', time()) == 6 && date('H', time() >= 16 )))) {
+			if ($c_data['saturday_rule'] == 'N' && date('w', $choosed_ts) == 1 && ((date('w', time()) == 0) || (date('w', time()) == 6 && date('H', time()) >= 16 ))) {
 				$res = false;
 			}
 
