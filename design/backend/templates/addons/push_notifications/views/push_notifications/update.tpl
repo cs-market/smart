@@ -27,7 +27,7 @@
 <div class="control-group">
     <label class="control-label">{__("users")}</label>
     <div class="controls">
-        {include file="pickers/users/picker.tpl" but_text=__("add_recipients_from_users") data_id="return_users" but_meta="btn" input_name="notification_data[user_ids]" item_ids=$notification.user_ids placement="right" extra_url="&mobile_subscribers"}
+        {include file="pickers/users/picker.tpl" but_text=__("add_recipients_from_users") data_id="return_users" but_meta="btn" input_name="notification_data[user_ids]" item_ids=$notification.user_ids placement="right" extra_url="&mobile_app=Y"}
     </div>
 </div>
 

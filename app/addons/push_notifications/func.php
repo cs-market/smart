@@ -77,13 +77,40 @@ function fn_send_push_notification($notification_id) {
 }
 
 function fn_push_notifications_get_users_pre(&$params, $auth, $items_per_page, $custom_view) {
-	if (isset($params['mobile_subscribers'])) {
+	if (isset($params['mobile_app']) && $params['mobile_app'] == 'Y') {
 		unset($params['exclude_user_types']);
 	}
 }
 
-function fn_push_notifications_get_users($params, $fields, $sortings, $condition, &$join, $auth) {
-	if (isset($params['mobile_subscribers'])) {
+function fn_push_notifications_get_users($params, $fields, $sortings, &$condition, &$join, $auth) {
+	if (isset($params['mobile_app']) && $params['mobile_app'] == 'Y') {
 		$join .= db_quote(" RIGHT JOIN ?:mobile_app_notification_subscriptions AS mans ON mans.user_id = ?:users.user_id");
+		if (!empty($params['app_name'])) {
+			$condition['app_name'] = db_quote(' AND mans.app_name = ?s', $params['app_name']);
+		}
+		if (!empty($params['app_version'])) {
+			$condition['app_version'] = db_quote(' AND mans.app_version = ?s', $params['app_version']);
+		}
 	}
+}
+
+function fn_push_notifications_app_update_notification_subscription($user_id, $params) {
+	$params['user_id'] = $user_id;
+
+	db_replace_into('mobile_app_notification_subscriptions', $params);
+
+	$subscription = fn_mobile_app_get_notification_subscriptions(array(
+		'user_id'   => $user_id,
+		'device_id' => $params['device_id'],
+		'platform'  => $params['platform'],
+	));
+
+	$subscription = reset($subscription);
+
+	return (int)$subscription['subscription_id'];
+}
+
+function fn_push_notifications_get_mobile_table_values($param) {
+	if ($param)
+	return db_get_fields("SELECT DISTINCT(?p) FROM ?:mobile_app_notification_subscriptions WHERE ?p != ''", $param, $param);
 }
