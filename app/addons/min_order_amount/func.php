@@ -24,3 +24,26 @@ function fn_min_order_amount_get_user_info($user_id, $get_profile, $profile_id, 
 		}
 	}
 }
+
+function fn_min_order_amount_get_users($params, &$fields, $sortings, $condition, $join, $auth) {
+	if (isset($params['user_id'])) {
+		$fields['min_order_amount'] = '?:users.min_order_amount';
+	}
+}
+
+function fn_min_order_amount_get_users_post(&$users, $params, $auth) {
+	if (isset($params['user_id'])) {
+		foreach ($users as &$user) {
+
+			if (!$user['min_order_amount']) {
+				$usergroups = fn_get_user_usergroups($user['user_id']);
+				$usergroups = array_filter($usergroups, function($v) {
+					return $v['status'] == 'A';
+				});
+				if (!empty($usergroups)) {
+					$user['min_order_amount'] = db_get_field('SELECT max(min_order_amount) FROM ?:usergroups WHERE usergroup_id IN (?a)', array_keys($usergroups));
+				}
+			}
+		}
+	}
+}
