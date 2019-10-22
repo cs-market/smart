@@ -19,9 +19,6 @@
 		<item lang="en" id="min_order_amount">Min order amount</item>
 	</language_variables>
 	<queries>
-		<item>ALTER TABLE `?:companies` ADD `min_order_amount` mediumint(8) unsigned NOT NULL;</item>
-		<item for="uninstall">ALTER TABLE `?:companies` DROP `min_order_amount`;</item>
-
 		<item>CREATE TABLE `?:vendors_customers` (
 		  `vendor_manager` mediumint(8) unsigned NOT NULL,
 		  `customer_id` mediumint(8) unsigned NOT NULL,

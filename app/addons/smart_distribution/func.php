@@ -314,10 +314,6 @@ function fn_array_group(array $array, $key)
 	return $grouped;
 }
 
-function fn_smart_distribution_get_companies($params, &$fields, $sortings, $condition, $join, $auth, $lang_code, $group) {
-	$fields[] = 'min_order_amount';
-}
-
 function fn_smart_distribution_get_default_usergroups(&$default_usergroups, $lang_code) {
 	if (Registry::get('runtime.company_id')) {
 		$default_usergroups = array();

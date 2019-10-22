@@ -15,7 +15,6 @@ fn_register_hooks(
 	'gather_additional_product_data_post',
 	'sales_reports_table_condition',
 	'sales_reports_change_table',
-	'get_companies',
 	'get_default_usergroups',
 	'api_handle_request',
 	'api_send_response',
