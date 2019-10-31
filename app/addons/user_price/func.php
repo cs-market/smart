@@ -70,7 +70,7 @@ function fn_update_product_user_price($product_id, $user_prices, $skip_price_del
 			continue;
 		}
 
-		return db_query(
+		db_query(
 			"REPLACE INTO ?:user_price ?e",
 			[
 				'user_id' => $user_price['user_id'],
