@@ -74,7 +74,7 @@ function fn_validate_tomorrow_rule($company_data) {
     if (is_numeric($company_data)) {
         $company_data = fn_get_company_data($company_data);
     }
-    if ($company_data['tomorrow_rule'] != 'Y') {
+    if ($company_data['tomorrow_rule'] == 'Y') {
         $res = (strtotime(date("G:i")) >= strtotime($company_data['tomorrow_timeslot'])) ? true : false;
     }
 
