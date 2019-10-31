@@ -849,7 +849,12 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $name = trim(str_replace('1Ц', '', strval($_price -> {$cml['name']})));
                 $like_name = '%' . $name . '%';
                 $user_id = db_get_field('SELECT user_id FROM ?:users WHERE firstname LIKE ?l OR lastname LIKE ?l', $like_name, $like_name);
-                //list($users, ) = fn_get_users(array('name' => $name, 'user_type' => 'C'));
+                if (!$user_id) {
+                    list($users, ) = fn_get_users(array('search_query' => $name, 'user_type' => 'C', 'extended_search' => false));
+                    if (!empty($users)) {
+                        $user_id = reset($users)['user_id'];
+                    }
+                }
                 
                 if ($user_id) {
                     $user = reset($users);
@@ -862,6 +867,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
         }
+
         return $prices_commerseml;
     }
 

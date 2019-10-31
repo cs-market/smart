@@ -420,6 +420,14 @@ if ($mode == 'sync') {
 		fn_print_r($file);
 	}
 	fn_print_die('end');
+} elseif ($mode == 'delete_fantom_products') {
+	$products = db_get_fields('SELECT product_id FROM ?:products WHERE product_id > 10000');
+	foreach ($products as $product_id) {
+		$product_data = fn_get_product_data($product_id, $_SESSION['auth']);
+		if (empty($product_data)) {
+			fn_delete_product($product_id);
+		}
+	}
 }
 
 
