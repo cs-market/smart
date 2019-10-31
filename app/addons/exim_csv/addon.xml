@@ -10,6 +10,10 @@
 	<default_language>en</default_language>
 	<supplier>CS-Market</supplier>
 	<supplier_link>http://cs-market.com/</supplier_link>
+	<language_variables>
+		<item lang="en" id="export_order_to_csv">Export orders to CSV</item>
+		<item lang="ru" id="export_order_to_csv">Экспортировать заказ в CSV</item>
+	</language_variables>
 	<queries>
 		<item>ALTER TABLE `?:companies` ADD `export_order_to_csv` char(1) NOT NULL DEFAULT 'N';</item>
 		<item for="uninstall">ALTER TABLE `?:companies` DROP `export_order_to_csv`;</item>
