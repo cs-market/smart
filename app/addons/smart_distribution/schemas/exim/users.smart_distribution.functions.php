@@ -44,6 +44,26 @@ function fn_exim_smart_distribution_add_field_column_import($user_id, $value, $n
 {
   $profile_ids = fn_exim_smart_distribution_get_user_fields($user_id);
 
+  //  set profile name for new users
+  if (count($profile_ids) == 1 && !is_numeric($profile_id)) {
+
+    $profile_name = db_get_field("SELECT profile_name
+      FROM ?:user_profiles
+      WHERE user_id = ?i AND profile_id",
+      $user_id,
+      $profile_ids[0]
+    );
+
+    if (!$profile_name) {
+      db_query("UPDATE ?:user_profiles SET ?u WHERE user_id = ?i AND profile_id",
+      ['profile_name' => $profile_id],
+      $user_id,
+      $profile_ids[0]);
+    }
+
+    $profile_id = $profile_ids[0];
+  }
+
   $exist_fields = db_get_array('SELECT object_id, description FROM ?:profile_field_descriptions WHERE description IN (?a) AND lang_code = ?s', $name, DESCR_SL);
 
   foreach ($exist_fields as $f) {
