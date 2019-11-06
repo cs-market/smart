@@ -42,23 +42,38 @@ if ($mode == 'run_import') {
 					fn_run_import($preset_id);
 				}
 			}
+
 			if (!empty($params['type']) && !empty($params['file'])) {
 				$pattern = fn_exim_get_pattern_definition($params['type'], 'import');
 				if ($pattern) {
-					if (empty($params['delimiter'])) {
-						$params['delimiter'] = ';';
-					} elseif ($params['delimiter'] == ',') {
+					$default_params = array(
+						'delimiter' => ';',
+						'images_path' => 'images/',
+						'price_dec_sign_delimiter' => '.',
+						'category_delimiter' => '///',
+						'skip_creating_new_products' => 'N'
+					);
+					if (is_array($params)) {
+						$params = array_merge($default_params, $params);
+					} else {
+						$params = $default_params;
+					}
+					if ($params['delimiter'] == ',') {
 						$params['delimiter'] = 'C';
 					}
 
-	                if (($data = fn_exim_get_csv($pattern, fn_get_files_dir_path().$params['file'], $params))) {
-	                    if (fn_import($pattern, $data, $params)) {
-	                    	fn_echo('Success');
-	                    	if ($params['unset_file']) {
-	                    		unlink(fn_get_files_dir_path().$params['file']);
-	                    	}
-	                    }
-	                }
+					Registry::set('runtime.skip_area_checking', true);
+
+					if (($data = fn_exim_get_csv($pattern, fn_get_files_dir_path().$params['file'], $params))) {
+
+						if (fn_import($pattern, $data, $params)) {
+							fn_echo('Success');
+							
+							if (isset($params['unset_file']) && $params['unset_file'] == 'true') {
+								unlink(fn_get_files_dir_path().$params['file']);
+							}
+						}
+					}
 				} else {
 					fn_echo("Unexpected import type");
 				}
