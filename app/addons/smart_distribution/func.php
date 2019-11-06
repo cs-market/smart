@@ -191,7 +191,7 @@ function fn_smart_distribution_get_users(&$params, $fields, $sortings, &$conditi
 		unset($condition['company_id']);
 	}
 	if (isset($params['company_id']) && !empty($params['company_id'])) {
-		$condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false, $params['company_id']) . db_quote(" OR ?:users.user_id IN (?n) )", fn_get_company_customers_ids($params['company_id']));
+		$condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false, $params['company_id'], false, true) . db_quote(" OR ?:users.user_id IN (?n) )", fn_get_company_customers_ids($params['company_id']));
 	}
 	// for search in profile fields
 	if (!empty($params['search_query'])) {
