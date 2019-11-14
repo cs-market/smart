@@ -428,8 +428,164 @@ if ($mode == 'sync') {
 			fn_delete_product($product_id);
 		}
 	}
+} elseif ($mode == 'import_lamaree_xml') {
+	$xml = @simplexml_load_file('catalog.xml');
+	$categories_xml = (array) $xml->TNICPackage->TNICXIMessage->Data->DataPacket['1']->RowData;
+	$categories_array = array();
+	foreach ($categories_xml['Row'] as $row) {
+		$atts_object = $row->attributes();
+		$atts_array = (array) $atts_object;
+		$categories_array[$atts_array['@attributes']['ID']] = $atts_array['@attributes'];
+	}
+	$tree = fn_build_tree($categories_array, '.');
+	$new_category_ids = fn_update_categories_tree($tree);
+	$res = db_query('UPDATE ?:vendor_plans SET `categories` = ?s WHERE plan_id = ?i', implode(',', $new_category_ids), 27);
+
+	$links_xml = (array) $xml->TNICPackage->TNICXIMessage->Data->DataPacket['3']->RowData;
+	$links = array();
+	foreach ($links_xml['Row'] as $row) {
+		$atts_object = $row->attributes();
+		$atts_array = (array) $atts_object;
+		$data = $atts_array['@attributes'];
+		$links[$data['ITEM']] = $data['PARENT'];
+	}
+
+	// load features
+	$products_xml = (array) $xml->TNICPackage->TNICXIMessage->Data->DataPacket['2']->RowData;
+	$products = $all_features = array();
+	$allowed_features = array('108' => 'Пищевая ценность', '109' => 'Калорийность', '72' => 'Условия хранения', '83' => 'Срок годности', '92' => 'Страна происхождения');
+	foreach ($products_xml['Row'] as $row) {
+		$atts_object = $row->attributes();
+		$atts_array = (array) $atts_object;
+		$data = $atts_array['@attributes'];
+
+		$ugly_features = explode('|', $data['PROPERTIES']);
+		$features = array();
+		foreach ($ugly_features as $value) {
+			if (!empty($value)) {
+				list($feature_name, $feature_value) = explode('&', $value);
+				if ($feature_value != '28.11.13' && $feature_id = array_search($feature_name, $allowed_features)) {
+					$all_features[$feature_id]['ugly_feature_name'] = $feature_name;
+					$all_features[$feature_id]['feature_id'] = $feature_id;
+					$all_features[$feature_id]['variants'][] = $feature_value;
+				}
+			}
+		}
+	}
+	foreach ($all_features as $feature_id => &$feature_data) {
+		$feature_variants = array_unique($feature_data['variants']);
+		$feature_db_data = fn_get_product_feature_data($feature_id, true);
+		$db_variants = fn_array_column($feature_db_data['variants'], 'variant', 'variant_id');
+		$variants = array();
+		foreach ($feature_variants as $variant) {
+			if (!($variant_id = array_search($variant, $db_variants))) {
+				$variant_id = fn_update_product_feature_variant($feature_id, 'S', array('variant' => $variant));
+			}
+			$variants[$variant_id] = $variant;
+		}
+		$feature_data['variants'] = $variants;
+	}
+
+
+	// load prices
+	$prices_xml = (array) $xml->TNICPackage->TNICXIMessage->Data->DataPacket['4']->RowData;
+	$prices = array();
+	
+	foreach ($prices_xml['Row'] as $row) {
+		$atts_object = $row->attributes();
+		$atts_array = (array) $atts_object;
+		$data = $atts_array['@attributes'];
+		$prices[$data['ITEM']] = $data;
+	}
+
+	// load products
+	foreach ($products_xml['Row'] as $row) {
+		$atts_object = $row->attributes();
+		$atts_array = (array) $atts_object;
+		$data = $atts_array['@attributes'];
+
+		$ugly_features = explode('|', $data['PROPERTIES']);
+		$features = array();
+		foreach ($ugly_features as $value) {
+			if (!empty($value)) {
+				list($feature_name, $feature_value) = explode('&', $value);
+				if ($feature_value != '28.11.13' && $feature_id = array_search($feature_name, $allowed_features)) {
+					$features[$feature_id] = array_search($feature_value, $all_features[$feature_id]['variants']);
+				}
+			}
+		}
+
+		$product_data[$data['ID']] = array(
+			'product' => $data['NAME'],
+			'company_id' => '43',
+			'price' => $prices[$data['ID']]['PRICE'],
+			'category_ids' => array($new_category_ids[$links[$data['ID']]]),
+			'usergroup_ids' => array(150),
+			'status' => 'A',
+			'amount' => $data['OSTATOK'],
+			'product_code' => $data['ARTIKUL'],
+			'full_description' => $data['DESCRIPTION'],
+			'short_description' => $data['DESCRIPTION_SHORT'],
+			'product_features' => $features,
+		);
+		$res = fn_update_product($product_data[$data['ID']]);
+	}
+	fn_print_die(count($product_data));
+} elseif ($mode == 'correct_profiles') {
+	$user_ids = db_get_fields('SELECT user_id FROM ?:users WHERE user_type = ?s', 'C');
+	foreach ($user_ids as $user_id) {
+		$profiles = fn_get_user_profiles($user_id);
+		$update_profile_ids = array();
+		$has_p = false;
+		foreach ($profiles as $profile) {
+			if ($profile['profile_type'] == 'P') {
+				if ($has_p) {
+					$update_profile_ids[] = $profile['profile_id'];
+				} else {
+					$has_p = true;
+				}
+			}
+		}
+		if (!empty($update_profile_ids)) {
+			db_query('UPDATE ?:user_profiles SET `profile_type` = ?s WHERE profile_id in (?a)', 'S', $update_profile_ids);
+		}
+	}
+	
+	fn_print_die('done correct_profiles');
 }
 
+function fn_update_categories_tree(&$tree, $parent_id = 0) {
+	global $new_category_ids;
+	foreach ($tree as $key => &$value) {
+		$category = array(
+			'category' => $value['NAME'],
+			'parent_id' => $parent_id,
+			'usergroup_ids' => array(150),
+		);
+		$new_category_ids[$value['ID']] = $value['category_id'] = fn_update_category($category, 0);
+		if (!empty($value['children'])) {
+			fn_update_categories_tree($value['children'], $value['category_id']);
+		}
+	}
+	return $new_category_ids;
+	
+}
+
+function fn_build_tree(array &$elements, $parentId = 0) {
+        $branch = array();
+
+        foreach ($elements as $element) {
+
+            if ($element['PARENT_ID'] == $parentId) {
+                $children = fn_build_tree($elements, $element['ID']);
+                if ($children) {
+                    $element['children'] = $children;
+                }
+                $branch[] = $element;
+            }
+        }
+        return $branch;
+}
 
 function fn_merge_products($company_id = 13)
 {
