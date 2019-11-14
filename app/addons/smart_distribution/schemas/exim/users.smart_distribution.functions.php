@@ -174,17 +174,17 @@ function fn_exim_smart_distribution_export_vendors_customers($user_id) {
 //  create profile, if empty profile_id
 function fn_exim_smart_distribution_check_profile_id($id, &$object)
 {
-    if (isset($object['profile_id'])
-      && isset($id['user_id'])
+    if (isset($id['user_id'])
       && !empty($id['user_id'])
     ) {
       $profile_id = $object['profile_id'];
 
       //  check profile by profile id and name
       if ($profile_id) {
+        $add = ($profile_id == __("main")) ? db_quote('OR profile_name = ?s', '') : '';
         $profile_id = db_get_field("SELECT profile_id
           FROM ?:user_profiles
-          WHERE user_id = ?i AND (profile_id = ?i OR profile_name = ?s)",
+          WHERE user_id = ?i AND (profile_id = ?i OR profile_name = ?s $add)",
           $id['user_id'],
           $object['profile_id'],
           $object['profile_id']
