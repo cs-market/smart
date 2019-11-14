@@ -552,6 +552,22 @@ if ($mode == 'sync') {
 	}
 	
 	fn_print_die('done correct_profiles');
+} elseif ($mode == 'remove_extra_profiles') {
+	$file = '123.csv';
+	$content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+	$emails = fn_array_column($content, 'E-mail');
+	foreach ($emails as $email) {
+		$user_id = db_get_field('SELECT user_id FROM ?:users WHERE email = ?s', $email);
+		$profiles = fn_get_user_profiles($user_id);
+		if (count($profiles) > 1) {
+			$main = array_shift($profiles);
+			$remove_profiles = fn_array_column($profiles, 'profile_id');
+			foreach ($remove_profiles as $profile_id) {
+				fn_delete_user_profile($user_id, $profile_id);
+			}
+		}
+	}
+	fn_print_die('done remove_extra_profiles');
 }
 
 function fn_update_categories_tree(&$tree, $parent_id = 0) {
