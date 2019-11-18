@@ -447,15 +447,14 @@ function fn_smart_distribution_get_profile_fields($location, $select, &$conditio
 	if (AREA == 'C' && in_array(Registry::get('runtime.controller'), array('checkout', 'profiles'))) {
 		$stop_fields = array(
 			's_address',
-			'b_client_code',
-			's_client_code',
-			's_address_2',
 			's_lastname'
 		);
 		if (Registry::get('runtime.mode') == 'add') {
 			$stop_fields[] = 'company';
 			$stop_fields[] = 'fax';
 		} else {
+			$stop_fields[] = 'b_client_code';
+			$stop_fields[] = 's_client_code';
 			$stop_fields[] = 'client_city';
 		}
 		$condition .= db_quote(" AND field_name NOT IN (?a)", $stop_fields);
