@@ -429,18 +429,20 @@ function fn_smart_distribution_set_product_categories_exist($category_id) {
 }
 
 function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $update) {
-	foreach ($product_data as $key => $product) {
-		if (isset($product['product_code']) && $cart['user_data']['company_id'] && $key == $product['product_code']) {
-			$product_id = db_get_field('SELECT product_id FROM ?:products WHERE company_id = ?i AND product_code = ?s', $cart['user_data']['company_id'], $key);
+	// specual modification for dmitry plotvinov
+	if ((!empty($_SESSION['auth']['company_id'])) && defined('API')) {
+		$_product_data = array();
+		foreach ($product_data as $key => $product) {
+			$product_id = db_get_field('SELECT product_id FROM ?:products WHERE company_id = ?i AND product_code = ?s', $_SESSION['auth']['company_id'], $key);
 			if ($product_id) {
 				$_product_data[$product_id] = $product;
+			} else {
+				$_product_data[$key] = $product;
 			}
-		} else {
-			$_product_data[$key] = $product;
-		}	
+		}
+		$product_data = $_product_data;
+		$cart['skip_notification'] = true;
 	}
-	$product_data = $_product_data;
-	$cart['skip_notification'] = true;
 }
 
 function fn_smart_distribution_get_profile_fields($location, $select, &$condition) {
