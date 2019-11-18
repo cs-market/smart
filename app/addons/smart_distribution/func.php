@@ -433,9 +433,9 @@ function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $u
 	if ((!empty($_SESSION['auth']['company_id'])) && defined('API')) {
 		$_product_data = array();
 		foreach ($product_data as $key => $product) {
-			$product_id = db_get_field('SELECT product_id FROM ?:products WHERE company_id = ?i AND product_code = ?s', $_SESSION['auth']['company_id'], $key);
-			if ($product_id) {
-				$_product_data[$product_id] = $product;
+			if (!fn_check_company_id('products', 'product_id', $key, $_SESSION['auth']['company_id'])) {
+				$product_id = db_get_field('SELECT product_id FROM ?:products WHERE company_id = ?i AND product_code = ?s', $_SESSION['auth']['company_id'], $key);
+				if ($product_id) $_product_data[$product_id] = $product;
 			} else {
 				$_product_data[$key] = $product;
 			}
