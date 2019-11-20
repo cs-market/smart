@@ -11,8 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (!empty($_REQUEST['clone_category']['category_id'])) {
             $clone_category = $_REQUEST['clone_category'];
+            $_SESSION['cloned_products'] = array();
             $cdata = fn_clone_category($clone_category['category_id'], $clone_category);
-
+			unset($_SESSION['cloned_products']);
             if (!empty($cdata['category_id'])) {
                 $cid = $cdata['category_id'];
                 return array(CONTROLLER_STATUS_REDIRECT, 'categories.update&category_id=' . $cid);
@@ -57,7 +58,7 @@ function fn_clone_category($category_id, $params = [])
     ],
     $params
   );
-
+  $cloned_products = &$_SESSION['cloned_products'];
   //  get vendor plan usergroups
   if ($params['company_id']) {
     static $vendor_plan;
@@ -144,18 +145,32 @@ function fn_clone_category($category_id, $params = [])
     foreach ($data as $v) {
 
       if ($params['clone_products'] == 'clone') {
-        $clone_product = fn_clone_product($v['product_id']);
-        if ($clone_product) {
-          $v['product_id'] = $clone_product['product_id'];
+      	if (isset($cloned_products[$v['product_id']])) {
+      		$clone_product = $cloned_products[$v['product_id']];
+      	} elseif (in_array($v['product_id'], fn_array_column($cloned_products, 'orig_product_id', 'product_id'))) {
+      		$key = array_search($v['product_id'], fn_array_column($cloned_products, 'orig_product_id', 'product_id'));
+      		$clone_product = $cloned_products[$key];
+      	} else {
+			$clone_product = fn_clone_product($v['product_id']);
+      		$cloned_products[$clone_product['product_id']] = $clone_product;
+      		$cloned_products[$clone_product['product_id']]['orig_product_id'] = $v['product_id'];
+      	}
 
-          if ($params['company_id']) {
-            //  only vendor usergroups
-            db_query("UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i", $params['company_usergroup_ids'], $v['product_id']);
+        if (!$clone_product) {
+          continue;
+        }
 
-            // change vendor
-            db_query("UPDATE ?:products SET company_id = ?i WHERE product_id = ?i", $params['company_id'], $v['product_id']);
+        $v['product_id'] = $clone_product['product_id'];
 
-          }
+        if ($params['company_id']) {
+          //  only vendor usergroups
+          db_query("UPDATE ?:products SET usergroup_ids = ?s AND company_id = ?i WHERE product_id = ?i", $params['company_usergroup_ids'], $params['company_id'], $v['product_id']);
+
+          // change vendor
+          db_query("UPDATE ?:products SET company_id = ?i WHERE product_id = ?i", $params['company_id'], $v['product_id']);
+
+          //  update product category
+          db_query("UPDATE ?:products_categories SET category_id = ?i WHERE product_id = ?i AND category_id = ?i", $cid, $v['product_id'], $v['category_id']);
         }
       } else {
         // add vendor usergroups
@@ -173,11 +188,15 @@ function fn_clone_category($category_id, $params = [])
 
           db_query("UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i", $new_product_usergroup_ids, $v['product_id']);
         }
+
+        //  add product category
+        $v['category_id'] = $cid;
+        db_query("INSERT INTO ?:products_categories ?e", $v);
       }
 
-      $v['category_id'] = $cid;
-      db_query("INSERT INTO ?:products_categories ?e", $v);
     }
+
+    fn_update_product_count([$category_id, $cid]);
   }
 
   // Clone blocks
