@@ -451,6 +451,9 @@ function fn_smart_distribution_get_profile_fields($location, $select, &$conditio
 			's_address',
 			's_lastname'
 		);
+		if ($_SESSION['auth']['company_id'] != '12') {
+			$stop_fields[] = 's_address_2';
+		}
 		if (Registry::get('runtime.mode') == 'add') {
 			$stop_fields[] = 'company';
 			$stop_fields[] = 'fax';
