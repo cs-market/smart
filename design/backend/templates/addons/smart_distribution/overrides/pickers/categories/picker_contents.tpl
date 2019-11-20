@@ -63,6 +63,17 @@
         return false;
     });
 }(Tygh, Tygh.$));
+
+(function(_, $) {
+    $('.cm-check-all').click(function() {
+        $(this).prev().prop('checked', true);
+        context= $(this).closest('.table-wrapper').next();
+        elms = $(":checkbox", context).each(function() {
+            $(this).prop('checked', true);
+        });
+    });
+}(Tygh, Tygh.$));
+
 </script>
 {/if}
 
