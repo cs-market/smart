@@ -49,7 +49,7 @@
                 <input type="radio" id="input_cat_{$cur_cat.category_id}" name="{$checkbox_name}" value="{$cur_cat.category_id}" class="cm-item" />
                 {else}
                 <input type="checkbox" id="input_cat_{$cur_cat.category_id}" name="{$checkbox_name}[{$cur_cat.category_id}]" value="{$cur_cat.category_id}" class="cm-item" />
-                {if $cur_cat.has_children}
+                {if $cur_cat.has_children || $cur_cat.subcategories}
                     <input type="checkbox" id="input_cat_all_{$cur_cat.category_id}" class="cm-item cm-check-all" />
                 {/if}
                 {/if}

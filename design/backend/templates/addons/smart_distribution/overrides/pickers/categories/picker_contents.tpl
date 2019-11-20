@@ -66,10 +66,11 @@
 
 (function(_, $) {
     $('.cm-check-all').click(function() {
-        $(this).prev().prop('checked', true);
+        checked = $(this).prop('checked');
+        $(this).prev().prop('checked', checked);
         context= $(this).closest('.table-wrapper').next();
         elms = $(":checkbox", context).each(function() {
-            $(this).prop('checked', true);
+            $(this).prop('checked', checked);
         });
     });
 }(Tygh, Tygh.$));
