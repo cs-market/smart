@@ -159,7 +159,7 @@ function fn_smart_distribution_get_managers($params = array()) {
 		$company_id = (Registry::get('runtime.company_id')) ? Registry::get('runtime.company_id') : $params['company_id'];
 	 		$condition .= db_quote(" AND u.company_id = ?i", $company_id);
 	}
-	if (!empty($params['user_id'])) {
+	if (isset($params['user_id'])) {
 		$condition .= db_quote(" AND vc.customer_id = ?i", $params['user_id']);	
 	}
 
@@ -218,6 +218,23 @@ function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user
 	        $condition = " AND $condition ";
 
 	    }
+	}
+}
+
+function fn_smart_distribution_update_profile($action, $user_data, $current_user_data) {
+	if ($user_data['user_id'] && isset($user_data['managers']) && $user_data['user_type'] == 'C') {
+		$managers = fn_smart_distribution_get_managers(array('user_id' => $user_data['user_id']));
+
+		if ($managers) db_query("DELETE FROM ?:vendors_customers WHERE customer_id = ?i AND vendor_manager IN (?a)", $user_data['user_id'], array_keys($managers));
+
+		$udata = array();
+		if (!empty($user_data['managers'])) {
+			$managers = explode(',', $user_data['managers']);
+			foreach ($managers as $m_id) {
+				$udata[] = array('vendor_manager' => $m_id, 'customer_id' => $user_data['user_id']);
+			}
+			db_query('INSERT INTO ?:vendors_customers ?m', $udata);
+		}
 	}
 }
 

@@ -12,6 +12,7 @@ fn_register_hooks(
 	'get_users_pre',
 	'get_users',
 	'get_user_info_before',
+	'update_profile',
 	'gather_additional_product_data_post',
 	'sales_reports_table_condition',
 	'sales_reports_change_table',
