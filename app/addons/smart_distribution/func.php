@@ -343,7 +343,8 @@ function fn_smart_distribution_get_default_usergroups(&$default_usergroups, $lan
 }
 
 function fn_smart_distribution_api_handle_request($_this, $authorized) {
-	//fn_write_r(date('H:m:s d/m/Y'), $_this->getRequest()->getResource() . ' ' . $_this->getRequest()->getMethod());
+	if ($_SESSION['auth']['user_id'] == '2425' && $_this->getRequest()->getMethod() == 'PUT')
+	fn_write_r(date('H:m:s d/m/Y') . ' ' . $_this->getRequest()->getResource() . ' ' . $_this->getRequest()->getMethod(), $_this->getRequest()->getData());
 }
 
 function fn_smart_distribution_api_send_response($this, $response, $authorized) {
