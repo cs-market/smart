@@ -429,7 +429,7 @@ if ($mode == 'sync') {
 		}
 	}
 } elseif ($mode == 'import_lamaree_xml') {
-	$xml = @simplexml_load_file('catalog.xml');
+	$xml = @simplexml_load_file('1574419805_CatalogN.xml');
 	$categories_xml = (array) $xml->TNICPackage->TNICXIMessage->Data->DataPacket['1']->RowData;
 	$categories_array = array();
 	foreach ($categories_xml['Row'] as $row) {
@@ -517,7 +517,7 @@ if ($mode == 'sync') {
 
 		$product_data[$data['ID']] = array(
 			'product' => $data['NAME'],
-			'company_id' => '43',
+			'company_id' => '1792',
 			'price' => $prices[$data['ID']]['PRICE'],
 			'category_ids' => array($new_category_ids[$links[$data['ID']]]),
 			'usergroup_ids' => array(150),
@@ -584,13 +584,14 @@ if ($mode == 'sync') {
 		$_data['user_id'] = $user['user_id'];
 		$_data['email'] = $user['email'];
 		$_data['login'] = $user['login'];
+		$_data['firstname'] = ($user['firstname']) ? $user['firstname'] : (($user['b_firstname']) ? $user['b_firstname'] : $user['s_firstname']);
+		$_data['address'] = ($user['b_address']) ? $user['b_address'] : $user['s_address'];
 		$_data['b_client_code'] = $user['b_client_code'];
 		$_data['points'] = 0;
 		if ($user['points']) {
 			//$_data['points'] = unserialize($user['points']);
 			$_data['points'] = $user['points'];
 		}
-		//fn_print_r($_data);
 		$data[] = $_data;
 	}
 	$opts = array('delimiter' => ';', 'filename' => 'mvest.csv');
