@@ -459,8 +459,10 @@ function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $u
 			}
 		}
 		$product_data = $_product_data;
-		$cart['skip_notification'] = true;
 	}
+
+	// disable popup notification
+	$cart['skip_notification'] = true;
 }
 
 function fn_smart_distribution_get_profile_fields($location, $select, &$condition) {
