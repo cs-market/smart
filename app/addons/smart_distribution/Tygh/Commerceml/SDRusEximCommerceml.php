@@ -284,6 +284,11 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     $product['zero_price_action'] = 'P';
                 }
 
+                // [csmarket] limit pinta
+                if (in_array(Registry::get('runtime.company_id'), array(41,46))) {
+                    unset($product['amount']);
+                }
+
                 $this->db->query(
                     'UPDATE ?:products SET ?u WHERE product_id = ?i',
                     $product,
