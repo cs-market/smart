@@ -568,6 +568,34 @@ if ($mode == 'sync') {
 		}
 	}
 	fn_print_die('done remove_extra_profiles');
+} elseif ($mode == 'get_reward_points') {
+	$company_id = ($_REQUEST['company_id']) ? $_REQUEST['company_id'] : 13;
+	list($users) = fn_get_users(array('company_id' => $company_id));
+	$data = array();
+	foreach ($users as &$user) {
+		$user = fn_get_user_info($user['user_id'], true);
+		if (!empty($user['fields'])) {
+			$fields = db_get_hash_single_array('SELECT field_id, field_name FROM ?:profile_fields WHERE field_id IN (?a)', array('field_id', 'field_name'), array_keys($user['fields']));
+			foreach ($fields as $field_id => $field_name) {
+				$user[$field_name] = $user['fields'][$field_id];
+			}
+		}
+		unset($user['fields'], $user['usergroups']);
+		$_data['user_id'] = $user['user_id'];
+		$_data['email'] = $user['email'];
+		$_data['login'] = $user['login'];
+		$_data['b_client_code'] = $user['b_client_code'];
+		$_data['points'] = 0;
+		if ($user['points']) {
+			//$_data['points'] = unserialize($user['points']);
+			$_data['points'] = $user['points'];
+		}
+		//fn_print_r($_data);
+		$data[] = $_data;
+	}
+	$opts = array('delimiter' => ';', 'filename' => 'mvest.csv');
+	$res = fn_exim_put_csv($data, $opts);
+	fn_print_die($res);
 }
 
 function fn_update_categories_tree(&$tree, $parent_id = 0) {
