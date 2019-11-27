@@ -122,12 +122,12 @@ function fn_clone_category($category_id, $params = [])
   $data = db_get_array("SELECT * FROM ?:category_descriptions WHERE category_id = ?i", $category_id);
   foreach ($data as $v) {
       $v['category_id'] = $cid;
-      if ($v['lang_code'] == CART_LANGUAGE) {
-          $orig_name = $v['category'];
-          $new_name = $v['category'].' [CLONE]';
-      }
+      // if ($v['lang_code'] == CART_LANGUAGE) {
+      //     $orig_name = $v['category'];
+      //     $new_name = $v['category'].' [CLONE]';
+      // }
 
-      $v['category'] .= ' [CLONE]';
+      //$v['category'] .= ' [CLONE]';
       db_query("INSERT INTO ?:category_descriptions ?e", $v);
   }
 
@@ -151,10 +151,15 @@ function fn_clone_category($category_id, $params = [])
       		$key = array_search($v['product_id'], fn_array_column($cloned_products, 'orig_product_id', 'product_id'));
       		$clone_product = $cloned_products[$key];
       	} else {
-			$clone_product = fn_clone_product($v['product_id']);
-      		$cloned_products[$clone_product['product_id']] = $clone_product;
-      		$cloned_products[$clone_product['product_id']]['orig_product_id'] = $v['product_id'];
-      	}
+         $clone_product = fn_clone_product($v['product_id']);
+          $p_data = db_get_array("SELECT * FROM ?:product_descriptions WHERE product_id = ?i", $clone_product['product_id']);
+          foreach ($p_data as $val) {
+              $val['product'] = $clone_product['orig_name'];
+              db_query("REPLACE INTO ?:product_descriptions ?e", $val);
+          }
+          $cloned_products[$clone_product['product_id']] = $clone_product;
+          $cloned_products[$clone_product['product_id']]['orig_product_id'] = $v['product_id'];
+        }
 
         if (!$clone_product) {
           continue;
@@ -169,9 +174,9 @@ function fn_clone_category($category_id, $params = [])
           // change vendor
           db_query("UPDATE ?:products SET company_id = ?i WHERE product_id = ?i", $params['company_id'], $v['product_id']);
 
-          //  update product category
-          db_query("UPDATE ?:products_categories SET category_id = ?i WHERE product_id = ?i AND category_id = ?i", $cid, $v['product_id'], $v['category_id']);
         }
+        //  update product category
+        db_query("UPDATE ?:products_categories SET category_id = ?i WHERE product_id = ?i AND category_id = ?i", $cid, $v['product_id'], $v['category_id']);
       } else {
         // add vendor usergroups
         if ($params['company_id']) {
