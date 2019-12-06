@@ -517,7 +517,7 @@ if ($mode == 'sync') {
 
 		$product_data[$data['ID']] = array(
 			'product' => $data['NAME'],
-			'company_id' => '1792',
+			'company_id' => '43',
 			'price' => $prices[$data['ID']]['PRICE'],
 			'category_ids' => array($new_category_ids[$links[$data['ID']]]),
 			'usergroup_ids' => array(150),
@@ -572,6 +572,9 @@ if ($mode == 'sync') {
 	$company_id = ($_REQUEST['company_id']) ? $_REQUEST['company_id'] : 13;
 	list($users) = fn_get_users(array('company_id' => $company_id));
 	$data = array();
+	require_once(Registry::get('config.dir.functions') . 'fn.sales_reports.php');
+	$intervals = fn_check_intervals(7, strtotime("1 January 2019"), strtotime("30 November 2019"));
+
 	foreach ($users as &$user) {
 		$user = fn_get_user_info($user['user_id'], true);
 		if (!empty($user['fields'])) {
@@ -587,11 +590,11 @@ if ($mode == 'sync') {
 		$_data['firstname'] = ($user['firstname']) ? $user['firstname'] : (($user['b_firstname']) ? $user['b_firstname'] : $user['s_firstname']);
 		$_data['address'] = ($user['b_address']) ? $user['b_address'] : $user['s_address'];
 		$_data['b_client_code'] = $user['b_client_code'];
-		$_data['points'] = 0;
-		if ($user['points']) {
-			//$_data['points'] = unserialize($user['points']);
-			$_data['points'] = $user['points'];
+		foreach ($intervals as $key => $interval) {
+			
+			$_data[$interval['description']] = db_get_field('SELECT sum(amount) FROM ?:reward_point_changes WHERE user_id = ?i AND timestamp >= ?i AND timestamp <= ?i', $user['user_id'], $interval['time_from'], $interval['time_to']);
 		}
+		
 		$data[] = $_data;
 	}
 	$opts = array('delimiter' => ';', 'filename' => 'mvest.csv');
