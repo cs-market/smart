@@ -32,22 +32,8 @@ function fn_user_price_gather_additional_product_data_before_discounts(&$product
 {
 	if (isset($product['user_price']) && !empty($product['user_price']) && AREA == 'C') {
 		$product['price'] = $product['user_price'][0]['price'];
-	}
-}
-
-function fn_user_price_calculate_cart_items($cart, &$cart_products, $auth, $apply_cart_promotions)
-{
-	$product_ids = fn_array_column($cart_products, 'product_id');
-	$user_id = (isset($cart['user_data']['user_id'])) ? $cart['user_data']['user_id'] : 0;
-	$user_prices = fn_get_product_user_price($product_ids, $user_id);
-	$user_prices = fn_array_column($user_prices, null, 'product_id');
-
-	foreach ($cart_products as &$product) {
-		$product_id = $product['product_id'];
-
-		if (isset($user_prices[$product_id])) {
-			$product['price'] = $user_prices[$product_id]['price'];
-		}
+		$product['base_price'] = $product['price'];
+		unset($product['promotions']);
 	}
 }
 
@@ -58,12 +44,19 @@ function fn_user_price_get_order_items_info_post(&$order, $v, $k)
 		$order['products'][$k]['original_price'] = $user_prices[0]['price'];
 	}
 }
+
+function fn_user_price_get_product_price_post($product_id, $amount, $auth, &$price) {
+	$user_prices = fn_get_product_user_price($product_id);
+	if (!empty($user_prices)) {
+		$price = $user_prices[0]['price'];
+	}
+}
 //	[/HOOKs]
 
-function fn_update_product_user_price($product_id, $user_prices, $skip_price_delete = true)
+function fn_update_product_user_price($product_id, $user_prices, $delete_price = true)
 {
 	//	delete old data
-	if ($skip_price_delete) db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);
+	if ($delete_price) db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);
 
 	foreach ($user_prices as $user_price) {
 		if (empty($user_price['user_id']) || empty($user_price['price'])) {
