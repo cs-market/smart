@@ -600,7 +600,41 @@ if ($mode == 'sync') {
 	$opts = array('delimiter' => ';', 'filename' => 'mvest.csv');
 	$res = fn_exim_put_csv($data, $opts);
 	fn_print_die($res);
+} elseif ($mode == 'remove_old_inactive_users') {
+	$ordered_users = db_get_fields('SELECT distinct(user_id) FROM ?:orders');
+	$users = db_get_fields('SELECT user_id FROM ?:users WHERE user_id < ?i AND user_id NOT IN (?a) AND user_type = ?s', 3830, $ordered_users, 'C');
+	foreach ($users as $user_id) {
+		//fn_delete_user($user_id);
+		$user = fn_get_user_info($user_id, true);
+
+		if (!empty($user['fields'])) {
+			$fields = db_get_hash_single_array('SELECT field_id, field_name FROM ?:profile_fields WHERE field_id IN (?a)', array('field_id', 'field_name'), array_keys($user['fields']));
+			foreach ($fields as $field_id => $field_name) {
+				$user[$field_name] = $user['fields'][$field_id];
+			}
+		}
+		unset($user['fields'], $user['usergroups']);
+		$_data['user_id'] = $user['user_id'];
+		$_data['email'] = $user['email'];
+		$_data['login'] = $user['login'];
+		$_data['firstname'] = ($user['firstname']) ? $user['firstname'] : (($user['b_firstname']) ? $user['b_firstname'] : $user['s_firstname']);
+		$_data['address'] = ($user['b_address']) ? $user['b_address'] : $user['s_address'];
+		$_data['b_client_code'] = $user['b_client_code'];
+		$data[] = $_data;
+	}
+	$opts = array('delimiter' => ';', 'filename' => 'inactive_users.csv');
+	$res = fn_exim_put_csv($data, $opts);
+	fn_print_die($res);
+	fn_print_die('end');
+} elseif ($mode == 'correct_reward_points') {
+	$company_id = ($_REQUEST['company_id']) ? $_REQUEST['company_id'] : 13;
+	list($users) = fn_get_users(array('company_id' => $company_id, 'user_id' => array(582)));
+	foreach ($users as &$user) {
+		$user['reward_point_changes'] = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i', $user['user_id']);
+	}
+	fn_print_die($users);
 }
+
 
 function fn_update_categories_tree(&$tree, $parent_id = 0) {
 	global $new_category_ids;
