@@ -39,14 +39,15 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
 				$params['category_id'],
 				explode(',', Registry::get('addons.category_promotion.category_ids'))
 			)) {
-				$promo_condition = db_quote(
-					' AND IF(from_date, from_date <= ?i, 1) AND IF(to_date, to_date >= ?i, 1) AND status IN (?a)',
-					TIME,
-					TIME,
-					array('A', 'H')
+				$promo_params = array(
+					'get_hidden' => true,
+					'active' => true,
+					'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'],
 				);
-				$promo_condition .=' AND (' . fn_find_array_in_set(Tygh::$app['session']['auth']['usergroup_ids'], "usergroup", true) . ')';
-				$data = db_get_fields("SELECT products FROM ?:promotions WHERE products != '' $promo_condition");
+
+				list($promotions, ) = fn_get_promotions($promo_params);
+				$data = fn_array_column($promotions, 'products');
+				$data = array_filter($data);
 				$product_ids = array_unique(explode(',', implode(',', $data)));
 			}
 			if (!empty($product_ids)) {
@@ -69,5 +70,34 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
 				unset($params['cid']);
 			}
 		}
+	}
+}
+
+function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
+    if (!empty($params['product_ids'])) {
+    	$condition .=' AND (' . fn_find_array_in_set($params['product_ids'], "products", false) . ')';
+    }
+    if (!empty($params['usergroup_ids'])) {
+    	$condition .=' AND (' . fn_find_array_in_set($params['usergroup_ids'], "usergroup", false) . ')';
+    }
+    if (!empty($params['fields'])) {
+    	if (!is_array($params['fields'])) {
+    		$params['fields'] = explode(',', $params['fields']);
+    	}
+    	$fields = $params['fields'];
+    }
+}
+
+function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth, $params) {
+	$promo_params = array(
+		'get_hidden' => true,
+		'active' => true,
+		'product_ids' => array($product['product_id']),
+	);
+	list($promotions, ) = fn_get_promotions($promo_params);
+	if (!empty($promotions)) {
+		$promotion = reset($promotions);
+		$product['promo'] = $promotion;
+		$stickers['promotion'] = Registry::get('addons.category_promotion.promotion_sticker_id');
 	}
 }

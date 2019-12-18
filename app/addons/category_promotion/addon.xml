@@ -14,6 +14,9 @@
                     <item id="category_ids">
                         <type>input</type>
                     </item>
+                    <item id="promotion_sticker_id">
+                        <type>input</type>
+                    </item>
                 </items>
             </section>
         </sections>
