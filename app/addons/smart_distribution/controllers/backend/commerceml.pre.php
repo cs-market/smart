@@ -604,8 +604,8 @@ if ($mode == 'sync') {
 	$ordered_users = db_get_fields('SELECT distinct(user_id) FROM ?:orders');
 	$users = db_get_fields('SELECT user_id FROM ?:users WHERE user_id < ?i AND user_id NOT IN (?a) AND user_type = ?s', 3830, $ordered_users, 'C');
 	foreach ($users as $user_id) {
-		//fn_delete_user($user_id);
-		$user = fn_get_user_info($user_id, true);
+		fn_delete_user($user_id);
+/*		$user = fn_get_user_info($user_id, true);
 
 		if (!empty($user['fields'])) {
 			$fields = db_get_hash_single_array('SELECT field_id, field_name FROM ?:profile_fields WHERE field_id IN (?a)', array('field_id', 'field_name'), array_keys($user['fields']));
@@ -620,21 +620,81 @@ if ($mode == 'sync') {
 		$_data['firstname'] = ($user['firstname']) ? $user['firstname'] : (($user['b_firstname']) ? $user['b_firstname'] : $user['s_firstname']);
 		$_data['address'] = ($user['b_address']) ? $user['b_address'] : $user['s_address'];
 		$_data['b_client_code'] = $user['b_client_code'];
-		$data[] = $_data;
+		$data[] = $_data;*/
 	}
-	$opts = array('delimiter' => ';', 'filename' => 'inactive_users.csv');
+/*	$opts = array('delimiter' => ';', 'filename' => 'inactive_users.csv');
 	$res = fn_exim_put_csv($data, $opts);
-	fn_print_die($res);
+	fn_print_die($res);*/
 	fn_print_die('end');
 } elseif ($mode == 'correct_reward_points') {
+	$pattern = array('0' => 1200, '30' => 1800, '40' => 2600, '60' => 3800, '80' => 4900, '90' => 5900, '100' =>  10000000);
+	$points_arr = array_keys($pattern);
+	$pattern = array_values($pattern);
 	$company_id = ($_REQUEST['company_id']) ? $_REQUEST['company_id'] : 13;
-	list($users) = fn_get_users(array('company_id' => $company_id, 'user_id' => array(582)));
+	list($users) = fn_get_users(array('company_id' => $company_id));
 	foreach ($users as &$user) {
-		$user['reward_point_changes'] = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i', $user['user_id']);
+/*		$user['reward_point_changes'] = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id = ?i', $user['user_id']);
+		$user['reward_point_changes'][0]['reason'] = unserialize($user['reward_point_changes'][0]['reason']);
+*/
+		$reward_points = array();
+		$plan = db_get_field('SELECT amount_plan FROM ?:sales_plan WHERE user_id = ?i AND company_id = ?i', $user['user_id'], $company_id);
+		if ($plan) {
+			$between = fn_between($plan, $pattern);
+			$min_order = $pattern[$between] - 0.01;
+			$points = $points_arr[$between];
+
+			if ($min_order) {
+				list($orders, ) = fn_get_orders(array('total_from' => $min_order,'user_id' => $user['user_id'], 'time_to' => '01/08/2019', 'time_from' => '01/12/2018', 'period' => 'C', 'company_id' => $company_id, 'status' => array('P', 'C', 'Y', 'A')));
+				if ($orders) {
+					db_query('DELETE FROM ?:reward_point_changes WHERE user_id = ?i', $user['user_id']);
+					fn_sd_change_user_points(30, $user['user_id'], 'Приветственные бонусы', CHANGE_DUE_ADDITION, (($user['timestamp'])? $user['timestamp'] : '1546300800'));
+					$reward_points[] = 30;
+					foreach ($orders as $order) {
+						$between = fn_between($order['total'], $pattern);
+						$points = $points_arr[$between];
+						$reason = array('order_id' => $order['order_id'], 'to' => $order['status'], 'from' => 'N');
+						fn_sd_change_user_points($points, $user['user_id'], serialize($reason), CHANGE_DUE_ORDER, $order['timestamp']);
+						$reward_points[] = $points;
+					}
+					fn_save_user_additional_data(POINTS, array_sum($reward_points), $user['user_id']);
+				}
+			}
+		}
 	}
 	fn_print_die($users);
 }
 
+function fn_between($val, $pattern)
+{
+	$between = array(0);
+    foreach ($pattern as $key => $limit) {
+    	if (isset($pattern[$key+1])) {
+    		if ( ($val > $limit) and ($value < $pattern[$key+1]-0.01) ) {
+    			$between[] = $key+1;
+    		}
+        }
+    } 
+    return max($between);
+}
+
+function fn_sd_change_user_points($value, $user_id, $reason = '', $action = CHANGE_DUE_ADDITION, $timestamp = TIME)
+{
+
+    $value = (int) $value;
+    if (!empty($value)) {
+        $change_points = array(
+            'user_id' => $user_id,
+            'amount' => $value,
+            'timestamp' => $timestamp,
+            'action' => $action,
+            'reason' => $reason
+        );
+
+        return db_query("REPLACE INTO ?:reward_point_changes ?e", $change_points);
+    }
+
+    return '';
+}
 
 function fn_update_categories_tree(&$tree, $parent_id = 0) {
 	global $new_category_ids;

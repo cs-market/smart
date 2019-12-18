@@ -670,8 +670,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
             if (in_array($this->company_id, array(41, 46))) {
                 $_p = array(
                     'external_id' => $product['external_id'],
-                    'product' => $product['product'],
-/*                    'category_id' => $product['category_id'],
+/*                    'product' => $product['product'],
+                    'category_id' => $product['category_id'],
                     'category_ids' => $product['category_ids'],*/
                 );
                 $product = $_p;
