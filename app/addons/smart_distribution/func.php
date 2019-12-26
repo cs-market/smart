@@ -236,6 +236,12 @@ function fn_smart_distribution_update_profile($action, $user_data, $current_user
 			db_query('INSERT INTO ?:vendors_customers ?m', $udata);
 		}
 	}
+	if ($action == 'add' && AREA == 'C' && !empty($user_data['usergroup_ids'])) {
+		$ids = explode(',', $user_data['usergroup_ids']);
+		foreach ($ids as $ug_id) {
+			fn_change_usergroup_status('A', $user_data['user_id'], $ug_id);
+		}
+	}
 }
 
 function fn_smart_distribution_gather_additional_product_data_post(&$product, $auth, $params) {

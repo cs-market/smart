@@ -1676,7 +1676,7 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
             }
         // [cs-market] allow vendors to create users
         } else {
-                $user_data['company_id'] = Registry::get('runtime.company_id');
+                $user_data['company_id'] = ($user_data['company_id']) ? $user_data['company_id'] : Registry::get('runtime.company_id');
         }
 
         $action = 'add';
