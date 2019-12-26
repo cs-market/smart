@@ -1,0 +1,1 @@
+{script src="js/addons/product_stickers/product_stickers.js"}

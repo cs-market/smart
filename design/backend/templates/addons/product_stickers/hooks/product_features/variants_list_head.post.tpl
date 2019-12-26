@@ -1,0 +1,1 @@
+<th width="27%">{__("stickers")}</th>
