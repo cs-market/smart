@@ -1066,4 +1066,23 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         return $data_products;
     }
+
+    public function addProductFeatures($data_features, $variants_data, $import_params)
+    {
+        foreach ($data_features as $p_feature) {
+            $variant_feature = array_merge($p_feature, $variants_data);
+
+            if (!empty($variants_data['category_id'])) {
+                $feature_categories = fn_explode(',', $this->db->getField("SELECT categories_path FROM ?:product_features WHERE feature_id = ?i", $p_feature['feature_id']));
+                // avoid category addition
+                /* if (!in_array($variants_data['category_id'], $feature_categories)) {
+                    $feature_categories[] = $variants_data['category_id'];
+                    $feature_categories = array_diff($feature_categories, array(''));
+                    $this->db->query("UPDATE ?:product_features SET categories_path = ?s WHERE feature_id = ?i", implode(',', $feature_categories), $p_feature['feature_id']);
+                }*/
+            }
+
+            $this->addFeatureValues($variant_feature);
+        }
+    }
 }
