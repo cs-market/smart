@@ -10,7 +10,8 @@ fn_register_hooks(
 	'update_order',
 	'place_order',
 	'form_cart_pre_fill',
-	'update_cart_by_data_post'
+	'update_cart_by_data_post',
+	'form_cart'
 );
 
 // backward compatibility

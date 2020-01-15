@@ -101,7 +101,7 @@ function fn_calendar_delivery_create_order(&$order) {
         $order['delivery_date'] = array_shift($order['delivery_date']);
     }
     if (!empty($order['delivery_date'])) {
-        $order['delivery_date'] = fn_parse_date_check_year($order['delivery_date']);
+        $order['delivery_date'] = fn_parse_date($order['delivery_date']);
     }
 }
 
@@ -134,8 +134,14 @@ function fn_calendar_delivery_form_cart_pre_fill($order_id, &$cart, $auth, $orde
     if (isset($order_info['delivery_date']))     $cart['delivery_date'] = $order_info['delivery_date'];
 }
 
+function fn_calendar_delivery_form_cart($order_info, &$cart, $auth) {
+    if (!empty($order_info['delivery_date'])) {
+        $cart['delivery_date'] = $order_info['delivery_date'];
+    }
+}
 
-/// TEMP
+
+/// TEMP DEPRECATED! Удалить в середине 2020 года
 function fn_parse_date_check_year($timestamp, $end_time = false)
 {
     if (!empty($timestamp)) {
