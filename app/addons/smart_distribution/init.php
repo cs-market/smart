@@ -28,5 +28,6 @@ fn_register_hooks(
 	'pre_update_order',
 	'get_company_id_by_name',
 	'update_product_pre',
-	'get_product_features_list_before_select'
+	'get_product_features_list_before_select',
+	'shippings_get_shippings_list_conditions'
 );

@@ -813,6 +813,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     );
                 }
             }
+            $link_type = $this->s_commerceml['exim_1c_import_type'];
 
             foreach ($orders_data as $order_data) {
                 $import_id = strval($order_data->{$cml['id']});
@@ -822,6 +823,38 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     if (!empty($order_id) && ($data_field->{$cml['name']} == $cml['status_order']) && (!empty($statuses[strval($data_field->{$cml['value']})]))) {
                         $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $statuses[strval($data_field->{$cml['value']})]['status'], $order_id);
                     }
+                }
+
+                // [cs-market] update order products
+                $order_info = fn_get_order_info($order_id);
+                fn_clear_cart($cart);
+                
+                if (!empty($order_info['user_id'])) {
+                    $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
+                }
+                $customer_auth = fn_fill_auth($_data, array(), false, 'C');
+
+                fn_form_cart($order_id, $cart, $customer_auth);
+                fn_store_shipping_rates($order_id, $cart, $customer_auth);
+                $cart['products'] = array();
+                
+                foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
+                    $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
+                    
+                    $_item = array (
+                        $product_data['product_id'] => array (
+                            'amount' => strval($xml_product->{$cml['amount']}),
+                            'price' => strval($xml_product->{$cml['price_per_item']}),
+                            'stored_price' => 'Y',
+                        ),
+                    );
+                    define('ORDER_MANAGEMENT', true);
+                    fn_add_product_to_cart($_item, $cart, $customer_auth);
+                }
+
+                fn_calculate_cart_content($cart, $customer_auth);
+                if (!fn_cart_is_empty($cart)) {
+                    fn_update_order($cart, $order_id);
                 }
             }
         }
