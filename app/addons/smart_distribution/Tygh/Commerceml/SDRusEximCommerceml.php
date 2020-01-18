@@ -819,12 +819,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $import_id = strval($order_data->{$cml['id']});
                 $order_id = strval($order_data->{$cml['number']});
 
-                foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
-                    if (!empty($order_id) && ($data_field->{$cml['name']} == $cml['status_order']) && (!empty($statuses[strval($data_field->{$cml['value']})]))) {
-                        $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $statuses[strval($data_field->{$cml['value']})]['status'], $order_id);
-                    }
-                }
-
                 // [cs-market] update order products
                 $order_info = fn_get_order_info($order_id);
                 fn_clear_cart($cart);
@@ -855,6 +849,13 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 fn_calculate_cart_content($cart, $customer_auth);
                 if (!fn_cart_is_empty($cart)) {
                     fn_update_order($cart, $order_id);
+                    $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $order_info['status'], $order_id);
+                }
+
+                foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
+                    if (!empty($order_id) && ($data_field->{$cml['name']} == $cml['status_order']) && (!empty($statuses[strval($data_field->{$cml['value']})]))) {
+                        $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $statuses[strval($data_field->{$cml['value']})]['status'], $order_id);
+                    }
                 }
             }
         }
