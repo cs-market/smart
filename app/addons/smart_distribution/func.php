@@ -628,3 +628,36 @@ function fn_smart_distribution_shippings_get_shippings_list_conditions($group, $
 		$condition = str_replace($remove, '', $condition);
 	}
 }
+
+function fn_smart_distribution_order_notification($order_info, $order_statuses, $force_notification) {
+	$mailer = Tygh::$app['mailer'];
+    list($shipments) = fn_get_shipments_info(array('order_id' => $order_info['order_id'], 'advanced_info' => true));
+    $use_shipments = !fn_one_full_shipped($shipments);
+    $payment_id = !empty($order_info['payment_method']['payment_id']) ? $order_info['payment_method']['payment_id'] : 0;
+    $company_lang_code = fn_get_company_language($order_info['company_id']);
+    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, ($order_info['lang_code'] ? $order_info['lang_code'] : CART_LANGUAGE), $order_info['company_id']);
+    $status_settings = $order_statuses[$order_info['status']]['params'];
+    $managers = fn_smart_distribution_get_managers(array('user_id' => $order_info['user_id'], 'company_id' => $order_info['company_id']));
+    if ($managers) {
+    	$to = reset($managers)['email'];
+
+		$mailer->send(array(
+	        'to' => $to,
+	        'from' => 'default_company_orders_department',
+	        'reply_to' => $order_info['email'],
+	        'data' => array(
+	            'order_info' => $order_info,
+	            'shipments' => $shipments,
+	            'use_shipments' => $use_shipments,
+	            'order_status' => fn_get_status_data($order_info['status'], STATUSES_ORDER, $order_info['order_id'], $company_lang_code),
+	            'payment_method' => fn_get_payment_data($payment_id, $order_info['order_id'], $company_lang_code),
+	            'status_settings' => $status_settings,
+	            'profile_fields' => fn_get_profile_fields('I', '', $company_lang_code),
+	            'secondary_currency' => $secondary_currency
+	        ),
+	        'template_code' => $email_template_name,
+	        'tpl' => 'orders/order_notification.tpl', // this parameter is obsolete and is used for back compatibility
+	        'company_id' => $order_info['company_id'],
+	    ), 'A', $company_lang_code);
+    }
+}
