@@ -638,6 +638,8 @@ function fn_smart_distribution_order_notification($order_info, $order_statuses, 
     $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, ($order_info['lang_code'] ? $order_info['lang_code'] : CART_LANGUAGE), $order_info['company_id']);
     $status_settings = $order_statuses[$order_info['status']]['params'];
     $managers = fn_smart_distribution_get_managers(array('user_id' => $order_info['user_id'], 'company_id' => $order_info['company_id']));
+    $email_template_name = 'order_notification.' . strtolower($order_info['status']);
+
     if ($managers) {
     	$to = reset($managers)['email'];
 
