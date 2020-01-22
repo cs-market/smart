@@ -229,7 +229,15 @@ function fn_smart_distribution_update_profile($action, $user_data, $current_user
 
 		$udata = array();
 		if (!empty($user_data['managers'])) {
-			$managers = explode(',', $user_data['managers']);
+			if (!is_array($user_data['managers'])) {
+				$managers = explode(',', $user_data['managers']);
+			}
+			if (defined('API')) {
+				$managers = db_get_fields(
+				"SELECT user_id FROM ?:users WHERE email IN (?a)",
+				array_map('trim', $managers)
+				);
+			}
 			foreach ($managers as $m_id) {
 				$udata[] = array('vendor_manager' => $m_id, 'customer_id' => $user_data['user_id']);
 			}
