@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-ru\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: /release-4.8.2/addons/rus_taxes.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:12\n"
+
+msgctxt "Addons::name::rus_taxes"
+msgid "Russian localization — Taxes"
+msgstr "Налоговые ставки РФ"
+
+msgctxt "Addons::description::rus_taxes"
+msgid "Allows you to select a corresponding Russian tax for each tax you create; this information is used by shipping and payment services to comply with the Russian Federal Law 54"
+msgstr "Позволяет выбрать для каждого созданного налога его российский аналог. Данная информация используется сервисами оплаты и доставки для соответствия 54-ФЗ"
+
+msgctxt "Languages::rus_taxes.tax.none"
+msgid "No VAT"
+msgstr "Без НДС"
+
+msgctxt "Languages::rus_taxes.tax.vat0"
+msgid "VAT 0%"
+msgstr "НДС 0%"
+
+msgctxt "Languages::rus_taxes.tax.vat10"
+msgid "VAT 10%"
+msgstr "НДС 10%"
+
+msgctxt "Languages::rus_taxes.tax.vat18"
+msgid "VAT 18%"
+msgstr "НДС 18%"
+
+msgctxt "Languages::rus_taxes.tax.vat110"
+msgid "VAT 10/110"
+msgstr "Расчётная ставка 10/110"
+
+msgctxt "Languages::rus_taxes.tax.vat118"
+msgid "VAT 18/118"
+msgstr "Расчётная ставка 18/118"
+
+msgctxt "Languages::rus_taxes.tax_type"
+msgid "VAT rate"
+msgstr "Налоговая ставка НДС"
+
+msgctxt "Languages::rus_taxes.tax_type.tooltip"
+msgid "This data will be used by Yandex.Checkout, Yandex.Delivery, ATOL, SDEK, PayMaster, PayAnyWay, etc."
+msgstr "Эти данные будут использоваться сервисами Яндекс.Касса, Яндекс.Доставка, АТОЛ, СДЭК, PayMaster, PayAnyWay и т. д."
+
+msgctxt "Languages::rus_taxes.upgrade_message"
+msgid "<p>To help you comply with the Russian Federal Law 54, we added the ability to send the data for printing of a sales receipt to:</p><ul><li>Yandex.Delivery</li><li>SDEK</li><li>PayMaster</li><li>PayAnyWay</li></ul><p>For that purpose we have added a new add-on called \"Russian localization — Taxes\". It is installed and enabled by default, and it adds a new settings to taxes (VAT rate). Please check the settings of your taxes after the upgrade.</p>"
+msgstr "Для соответствия Федеральному Закону 54 добавлена возможность отправлять данные для печати чеков в:</p><ul><li>Яндекс.Доставку</li><li>СДЭК</li><li>PayMaster</li><li>PayAnyWay</li></ul><p>Для этого мы добавили новый модуль, который называется \"Налоговые ставки РФ\". Он установлен и включен по умолчанию и добавляет новую настройку для налогов (Налоговая ставка НДС). Пожалуйста, проверьте настройки ваших налогов после обновления.</p>"
+
+msgctxt "Languages::rus_taxes.upgrade_message_title"
+msgid "Changes related to the Russian Federal Law 54; please check your taxes"
+msgstr "Изменения, связанные с 54-ФЗ; проверьте ваши налоги"
+

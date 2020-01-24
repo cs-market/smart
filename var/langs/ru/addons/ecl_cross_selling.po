@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: crowdin.com\n"
+"Last-Translator: cscart <zeke@cs-cart.com>\n"
+"PO-Revision-Date: 2014-10-16 03:01-0400\n"
+
+msgctxt "Addons::name::ecl_cross_selling"
+msgid "[eCom Labs] Up-sells And Cross-sells"
+msgstr "[eCom Labs] Up-sells И Cross-sells"
+
+msgctxt "Addons::description::ecl_cross_selling"
+msgid "Shows related products in the Add to cart notification, Cart content and notification on the order landing page"
+msgstr "Показывает сопутствующие товары в уведомлении о добавлении товара в корзину, на странице корзины и на странице после завершения оформления заказа"
+
+msgctxt "Languages::ecl_cross_selling"
+msgid "[eCom Labs] Up-sells And Cross-sells"
+msgstr "[eCom Labs] Up-sells И Cross-sells"
+
+msgctxt "SettingsOptions::ecl_cross_selling::add_to_cart_notification"
+msgid "Show related products in the Add to cart notification"
+msgstr "Показать сопутствующие товары при добавлении в корзину"
+
+msgctxt "SettingsOptions::ecl_cross_selling::reminder_notification"
+msgid "Show related products in the Reminder notification"
+msgstr "Показать сопутствующие товары после оформления заказа"
+
+msgctxt "SettingsOptions::ecl_cross_selling::cart_notification"
+msgid "Show related products on the Cart page"
+msgstr "Показать сопутствующие товары на странице корзины"
+
+msgctxt "SettingsOptions::ecl_cross_selling::amount_product_add_to_cart"
+msgid "Amount of products in the Add to cart notification"
+msgstr "Количество продуктов в уведомлении при добавлении в корзину"
+
+msgctxt "SettingsOptions::ecl_cross_selling::amount_product_reminder"
+msgid "Amount of products in the Reminder notification"
+msgstr "Количество продуктов в уведомлении после оформления заказа"
+
+msgctxt "SettingsOptions::ecl_cross_selling::amount_product_cart"
+msgid "Amount of products on the Cart page"
+msgstr "Количество продуктов на странице корзины"
+
+msgctxt "Languages::related_products"
+msgid "Related products"
+msgstr "Сопутствующие товары"
+
+msgctxt "Languages::customer_who_bought"
+msgid "You may also like"
+msgstr "Вам также может понравиться"
+
+msgctxt "Languages::anything_else_maybe"
+msgid "Anything else, maybe?"
+msgstr "Что-нибудь еще?"
+
+msgctxt "Languages::you_may_also_like"
+msgid "You may also like"
+msgstr "Вам также может понравиться"

@@ -1,0 +1,17 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::ecl_banners_availability"
+msgid "[eCom Labs] Banners Availability"
+msgstr "[eCom Labs] Banners Availability"
+
+msgctxt "Addons::description::ecl_banners_availability"
+msgid "Allows to specify availability dates for banners, assign banners to user groups and display random banners"
+msgstr "Allows to specify availability dates for banners, assign banners to user groups and display random banners"
+
+msgctxt "Languages::random_banners"
+msgid "Random"
+msgstr "Random"

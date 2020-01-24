@@ -1,0 +1,57 @@
+msgid ""
+msgstr "Project-Id-Version: tygh"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::ecl_cross_selling"
+msgid "[eCom Labs] Up-sells And Cross-sells"
+msgstr "[eCom Labs] Up-sells And Cross-sells"
+
+msgctxt "Addons::description::ecl_cross_selling"
+msgid "Shows related products in the Add to cart notification, Cart content and notification on the order landing page"
+msgstr "Shows related products in the Add to cart notification, Cart content and notification on the order landing page"
+
+msgctxt "Languages::ecl_cross_selling"
+msgid "[eCom Labs] Up-sells And Cross-sells"
+msgstr "[eCom Labs] Up-sells And Cross-sells"
+
+msgctxt "SettingsOptions::ecl_cross_selling::add_to_cart_notification"
+msgid "Show related products in the Add to cart notification"
+msgstr "Show related products in the Add to cart notification"
+
+msgctxt "SettingsOptions::ecl_cross_selling::reminder_notification"
+msgid "Show related products in the Reminder notification"
+msgstr "Show related products in the Reminder notification"
+
+msgctxt "SettingsOptions::ecl_cross_selling::cart_notification"
+msgid "Show related products on the Cart page"
+msgstr "Show related products on the Cart page"
+
+msgctxt "SettingsOptions::ecl_cross_selling::amount_product_add_to_cart"
+msgid "Amount of products in the Add to cart notification"
+msgstr "Amount of products in the Add to cart notification"
+
+msgctxt "SettingsOptions::ecl_cross_selling::amount_product_reminder"
+msgid "Amount of products in the Reminder notification"
+msgstr "Amount of products in the Reminder notification"
+
+msgctxt "SettingsOptions::ecl_cross_selling::amount_product_cart"
+msgid "Amount of products on the Cart page"
+msgstr "Amount of products on the Cart page"
+
+msgctxt "Languages::related_products"
+msgid "Related products"
+msgstr "Related products"
+
+msgctxt "Languages::customer_who_bought"
+msgid "You may also like"
+msgstr "You may also like"
+
+msgctxt "Languages::anything_else_maybe"
+msgid "Anything else, maybe?"
+msgstr "Anything else, maybe?"
+
+msgctxt "Languages::you_may_also_like"
+msgid "You may also like"
+msgstr "You may also like"

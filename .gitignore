@@ -8,8 +8,13 @@
 !app/
 !js/
 !design/
-!var/backups/last.sql.zip
+!var/
+var/*
 
+!var/backups/
+var/backups/*
+!var/backups/last.sql.zip
+!var/backups/migration*
 
 # ignore everything in "lib" directory
 app/lib/
@@ -18,3 +23,13 @@ app/lib/
 # except addons directory
 js/*
 !js/addons/
+
+
+!var/langs/
+var/langs/*
+!var/langs/en/
+!var/langs/ru/
+var/langs/en/*
+var/langs/ru/*
+!var/langs/en/addons/
+!var/langs/ru/addons/

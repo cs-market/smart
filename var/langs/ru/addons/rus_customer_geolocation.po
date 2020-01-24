@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-ru\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: /release-4.8.2/addons/rus_customer_geolocation.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:12\n"
+
+msgctxt "Addons::name::rus_customer_geolocation"
+msgid "Customer geolocation"
+msgstr "Местоположение покупателя"
+
+msgctxt "Addons::description::rus_customer_geolocation"
+msgid "Use Yandex Maps geolocation to determine a customer's city"
+msgstr "Определяет город покупателя с помощью Яндекс.Карт"
+
+msgctxt "Languages::rus_customer_geolocation.your_city"
+msgid "Your city"
+msgstr "Ваш город"
+
+msgctxt "Languages::rus_customer_geolocation.select_your_city"
+msgid "Select your city"
+msgstr "Выберите ваш город"
+
+msgctxt "Languages::rus_customer_geolocation.locations"
+msgid "Geolocation cities"
+msgstr "Города (геолокация)"
+
+msgctxt "Languages::block_rus_customer_geolocation_customer_location"
+msgid "Customer location"
+msgstr "Местоположение покупателя"
+
+msgctxt "Languages::block_rus_customer_geolocation_customer_location_description"
+msgid "Customer city and city selection form"
+msgstr "Город покупателя и форма выбора города"
+
+msgctxt "Languages::rus_customer_geolocation.location_detection_disabled"
+msgid "Your location could not be determined. Try enabling the location services on your device or disabling the tracking protection."
+msgstr "Не удалось определить ваше местоположение. Попробуйте включить на устройстве службы геолокации и отключить защиту от отслеживания."
+

@@ -1,0 +1,234 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::product_variations"
+msgid "Product Variations [Beta]"
+msgstr "Product Variations [Beta]"
+
+msgctxt "Addons::description::product_variations"
+msgid "Variants of a product that comes in more than one option, such as color or size."
+msgstr "Variants of a product that comes in more than one option, such as color or size."
+
+msgctxt "Languages::product_variations.btn_generate"
+msgid "Generate variations"
+msgstr "Generate variations"
+
+msgctxt "Languages::product_variations.generating.title"
+msgid "Generating variations: [product]"
+msgstr "Generating variations: [product]"
+
+msgctxt "Languages::product_variations.generating.select_variants"
+msgid "Select variants"
+msgstr "Select variants"
+
+msgctxt "Languages::product_variations.selected_default"
+msgid "Selected by default"
+msgstr "Selected by default"
+
+msgctxt "Languages::product_variations.selected_default_tooltip"
+msgid "The variation which should be selected by default in the Storefront"
+msgstr "The variation which should be selected by default in the Storefront"
+
+msgctxt "Languages::product_variations.product_type"
+msgid "Product variations"
+msgstr "Product variations"
+
+msgctxt "Languages::product_variations.product_type.simple"
+msgid "Simple product"
+msgstr "Simple product"
+
+msgctxt "Languages::product_variations.product_type.variation"
+msgid "Product variation"
+msgstr "Product variation"
+
+msgctxt "Languages::product_variations.product_type.configurable"
+msgid "Configurable product"
+msgstr "Configurable product"
+
+msgctxt "Languages::product_variations.parent_product"
+msgid "Parent product"
+msgstr "Parent product"
+
+msgctxt "Languages::product_variations.variations"
+msgid "Variations"
+msgstr "Variations"
+
+msgctxt "Languages::product_variations.variation_of_product"
+msgid "Variation of <a href=\"[url]\">[product]</a>"
+msgstr "Variation of <a href=\"[url]\">[product]</a>"
+
+msgctxt "Languages::product_variations.error.product_variation_must_have_variation_options"
+msgid "The variation_options field is required for a variation product"
+msgstr "The variation_options field is required for a variation product"
+
+msgctxt "Languages::product_variations.error.product_variation_must_have_parent_product"
+msgid "A product variation must have a parent product"
+msgstr "A product variation must have a parent product"
+
+msgctxt "Languages::product_variations.error.invalid_variation_options_array"
+msgid "The variation_options array is invalid"
+msgstr "The variation_options array is invalid"
+
+msgctxt "Languages::product_variations.error.product_variation_already_exists"
+msgid "A product variation with same variation_code already exists"
+msgstr "A product variation with same variation_code already exists"
+
+msgctxt "Languages::product_variations.convert_to_configurable_product"
+msgid "Convert to configurable product"
+msgstr "Convert to configurable product"
+
+msgctxt "Languages::product_variations.confirm_convert_to_configurable_product"
+msgid "You can't undo this action unless you restore the database from backup or re-create this product as a simple product manually. The option combinations and exceptions (allowed/forbidden combinations) of this product will be lost. Are you sure you want to proceed?"
+msgstr "You can't undo this action unless you restore the database from backup or re-create this product as a simple product manually. The option combinations and exceptions (allowed/forbidden combinations) of this product will be lost. Are you sure you want to proceed?"
+
+msgctxt "Languages::product_variations.convert_to_configurable_product_success"
+msgid "Product successfully converted"
+msgstr "Product successfully converted"
+
+msgctxt "Languages::product_variations.error.configurable_product_must_have_file"
+msgid "A downloadable configurable product must have at least one active file for sale."
+msgstr "A downloadable configurable product must have at least one active file for sale."
+
+msgctxt "Languages::product_variations.variations_filling"
+msgid "Variations"
+msgstr "Variations"
+
+msgctxt "Languages::product_variations.variations_list"
+msgid "Variations"
+msgstr "Variations"
+
+msgctxt "Languages::variations_in_stock"
+msgid "Only \"in stock\" products"
+msgstr "Only \"in stock\" products"
+
+msgctxt "Languages::product_variations.variation_code"
+msgid "Variation code"
+msgstr "Variation code"
+
+msgctxt "Languages::product_variations.hide_add_to_wishlist_button"
+msgid "Hide add to wish list button"
+msgstr "Hide add to wish list button"
+
+msgctxt "Languages::product_variations.cannot_generate_variations_reason_options"
+msgid "Cannot generate product variations. You may have removed some product options (or disabled inventory tracking for these options). Some existing variations depend on these options. Please roll back your changes to options or remove existing variations of the product and try to generate them again."
+msgstr "Cannot generate product variations. You may have removed some product options (or disabled inventory tracking for these options). Some existing variations of the product depend on these options. Please roll back your changes to options or remove existing variations of the product and try to generate them again."
+
+msgctxt "Languages::product_variations.cannot_use_all_options_reason_existent_variations"
+msgid "Cannot use the following options to generate variations: <b>[option_names]</b>. Some existing  variations of the product do not use these options. Please remove existing variations and generate them again to use these options."
+msgstr "Cannot use the following options to generate variations: <b>[option_names]</b>. Some existing variations of the product do not use these options. Please remove existing variations and generate them again to use these options."
+
+msgctxt "Languages::product_variations.variation"
+msgid "Variation"
+msgstr "Variation"
+
+msgctxt "Languages::product_variations.update_name"
+msgid "Update name"
+msgstr "Update name"
+
+msgctxt "Languages::product_variations.add_variations"
+msgid "Add variations"
+msgstr "Add variations"
+
+msgctxt "Languages::product_variations.cannot_change_variation_options"
+msgid "Product options cannot be changed"
+msgstr "Product options cannot be changed"
+
+msgctxt "Languages::product_variations.please_select_combinations"
+msgid "Please select combinations"
+msgstr "Please select combinations"
+
+
+msgctxt "Languages::product_variations.variations_list_block_name"
+msgid "Variations list"
+msgstr "Variations list"
+
+msgctxt "Languages::product_variations.variations_list_tab_name"
+msgid "View all options as list"
+msgstr "View all options as list"
+
+msgctxt "Languages::product_variations.exim_error_conf_product_cannot_have_variation_options"
+msgid "Couldn't import product [product_code]: configurable product can't have variation options."
+msgstr "Couldn't import product [product_code]: configurable product can't have variation options."
+
+msgctxt "Languages::product_variations.exim_error_cannot_find_parent_for_variation"
+msgid "Couldn't import product [product_code]: the parent product for this variation doesn't exist or is located in a wrong place in the imported file."
+msgstr "Couldn't import product [product_code]: the parent product for this variation doesn't exist or is located in a wrong place in the imported file."
+
+msgctxt "Languages::product_variations.exim_error_option_is_not_available"
+msgid "Couldn't import product [product_code]: option \"[option_name]\" is not available for this product variation."
+msgstr "Couldn't import product [product_code]: option \"[option_name]\" is not available for this product variation."
+
+msgctxt "Languages::product_variations.exim_error_invalid_variation_options_format"
+msgid "Couldn't import product [product_code]: invalid format of variation options was provided for this variation."
+msgstr "Couldn't import product [product_code]: invalid format of variation options was provided for this variation."
+
+msgctxt "Languages::product_variations.exim_error_invalid_variation_options_provided"
+msgid "Couldn't import product [product_code]: invalid variation options were provided for this variation."
+msgstr "Couldn't import product [product_code]: invalid variation options were provided for this variation."
+
+msgctxt "Languages::product_variations.exim_error_variation_with_provided_options_exists"
+msgid "Couldn't import product [product_code]: a variation with these variation options already exists."
+msgstr "Couldn't import product [product_code]: a variation with these variation options already exists."
+
+msgctxt "Languages::product_variations.exim_error_variation_cannot_have_empty_variation_options"
+msgid "Couldn't import product [product_code]: a variation must have variation options specified."
+msgstr "Couldn't import product [product_code]: a variation must have variation options specified."
+
+msgctxt "Languages::product_variations.exim_error_cannot_update_product_options_for_variation_or_parent"
+msgid "Couldn't import options for product [product_code]: options can't be updated for a variation or for a product that has at least one variation."
+msgstr "Couldn't import options for product [product_code]: options can't be updated for a variation or for a product that has at least one variation."
+
+msgctxt "Languages::product_variations.exim_error_variant_does_not_exist"
+msgid "Couldn't import product [product_code]: option \"[option_name]\" doesn't have variant \"[variant_name]\"."
+msgstr "Couldn't import product [product_code]: option \"[option_name]\" doesn't have variant \"[variant_name]\"."
+
+msgctxt "Languages::product_variations.text_exim_data_imported"
+msgid "Data is imported successfully. <br />New products - <b>[new]</b>: <ul><li>Simple: <b>[new_simple]</b></li><li>Configurable: <b>[new_conf]</b></li><li>Variations: <b>[new_var]</b></li></ul>Updated products - <b>[exist]</b>: <ul><li>Simple: <b>[upd_simple]</b></li><li>Configurable: <b>[upd_conf]</b></li><li>Variations: <b>[upd_var]</b></li></ul>Skipped products - <b>[skipped]</b>: <ul><li>Simple: <b>[skipped_simple]</b></li><li>Configurable: <b>[skipped_conf]</b></li><li>Variations: <b>[skipped_var]</b></li></ul>Total - <b>[total]</b>."
+msgstr "Data is imported successfully. <br />New products - <b>[new]</b>: <ul><li>Simple: <b>[new_simple]</b></li><li>Configurable: <b>[new_conf]</b></li><li>Variations: <b>[new_var]</b></li></ul>Updated products - <b>[exist]</b>: <ul><li>Simple: <b>[upd_simple]</b></li><li>Configurable: <b>[upd_conf]</b></li><li>Variations: <b>[upd_var]</b></li></ul>Skipped products - <b>[skipped]</b>: <ul><li>Simple: <b>[skipped_simple]</b></li><li>Configurable: <b>[skipped_conf]</b></li><li>Variations: <b>[skipped_var]</b></li></ul>Total - <b>[total]</b>."
+
+msgctxt "Languages::variation_options"
+msgid "Variation options"
+msgstr "Variation options"
+
+msgctxt "Languages::product_variations.cannot_remove_options_that_used_for_variation"
+msgid "Cannot delete option \"[option_name]\" because it is used in product variations. If you'd like to delete this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
+msgstr "Cannot delete option \"[option_name]\" because it is used in product variations. If you'd like to delete this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
+
+msgctxt "Languages::product_variations.cannot_disable_options_that_used_for_variation"
+msgid "Cannot disable option \"[option_name]\" because it is used in product variations. If you'd like to disable this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
+msgstr "Cannot disable option \"[option_name]\" because it is used in product variations. If you'd like to disable this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
+
+msgctxt "Languages::product_variations.show_variation_thumbnails"
+msgid "Show variation thumbnails"
+msgstr "Show variation thumbnails"
+
+msgctxt "Languages::product_variations.show_product_code"
+msgid "Show product code"
+msgstr "Show product code"
+
+msgctxt "Languages::tt_addons_product_variations_hooks_products_update_product_tracking_override_inventory"
+msgid "Track in stock product quantity. Enable the \"Enable inventory tracking\" option (Settings -> General) to modify."
+msgstr "Track in stock product quantity. Enable the \"Enable inventory tracking\" option (Settings -> General) to modify."
+
+msgctxt "Languages::tt_addons_product_variations_hooks_products_categories_section_post_categories"
+msgid "Categories to be displayed in the navigation breadcrumbs."
+msgstr "Categories to be displayed in the navigation breadcrumbs."
+
+msgctxt "Languages::product_variations.inventory_notice"
+msgid "This product doesn't have any options suitable for creating variations. Please make sure that the product has at least one active option with the ticked <b>Inventory</b> checkbox, and variants exist for that option."
+msgstr "This product doesn't have any options suitable for creating variations. Please make sure that the product has at least one active option with the ticked <b>Inventory</b> checkbox, and variants exist for that option."
+
+msgctxt "Languages::product_variations.error.cannot_disable_option_variant"
+msgid "Variant \"[variant_name]\" can't be disabled because some existing product variations use it."
+msgstr "Variant \"[variant_name]\" can't be disabled because some existing product variations use it."
+
+msgctxt "Languages::product_variations.error.cannot_remove_option_variant"
+msgid "Variant \"[variant_name]\" can't be removed because some existing product variations use it."
+msgstr "Variant \"[variant_name]\" can't be removed because some existing product variations use it."
+
+msgctxt "Languages::is_default_product_variation"
+msgid "Is default product variation"
+msgstr "Is default product variation"

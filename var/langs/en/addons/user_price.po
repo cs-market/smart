@@ -1,0 +1,21 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::user_price"
+msgid "User price"
+msgstr "User price"
+
+msgctxt "Addons::description::user_price"
+msgid "Set an individual price for the product for any user"
+msgstr "Set an individual price for the product for any user"
+
+msgctxt "Languages::user_price"
+msgid "User price"
+msgstr "User price"
+
+msgctxt "Languages::user_price__error__dublicate_entry"
+msgid "User price dublicate entry"
+msgstr "Dublicate entry price for: %USER_EMAIL%"
