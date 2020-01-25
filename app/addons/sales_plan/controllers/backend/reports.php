@@ -44,7 +44,8 @@ if ($mode == 'daily_task') {
 		// 	}, ARRAY_FILTER_USE_BOTH);
 
 		//company_notification
-		$company_managers = db_get_fields("SELECT user_id FROM ?:users WHERE user_type = ?s AND company_id = ?i", 'V', $company_id);
+		$company_managers = db_get_fields("SELECT user_id FROM ?:users LEFT JOIN ?:companies ON ?:users.company_id = ?:companies.company_id WHERE user_type = ?s AND ?:users.company_id = ?i AND ?:companies.notify_manager_order_insufficient = 'Y'", 'V', $company_id);
+
 		if ($not_placed) {
 			foreach (array_keys($not_placed) as $user_id) {
 				$not_placed[$user_id]['manager'] = db_get_field('SELECT u.email FROM ?:users AS u LEFT JOIN ?:vendors_customers AS vc ON vc.vendor_manager = u.user_id WHERE vc.customer_id = ?i AND vendor_manager IN (?a)', $user_id, $company_managers);

@@ -23,6 +23,8 @@
 		<item lang="en" id="clone_category_clone_products__copy">копировать товары</item>
 		<item lang="en" id="clone_category_clone_products__clone">клонировать товары</item>
 		<item lang="en" id="clone_category_change_vendor">Изменить вендора категорий/товаров</item>
+		<item lang="en" id="notify_manager_order_create">Уведомлять менеджеров о создании заказа</item>
+		<item lang="en" id="notify_manager_order_update">Уведомлять менеджеров о редактировании заказа</item>
 	</language_variables>
 	<queries>
 		<item>CREATE TABLE `?:vendors_customers` (
@@ -44,5 +46,11 @@
 
 		<item>ALTER TABLE `?:cscart_products` ADD `send_price_1c` CHAR(1) NOT NULL DEFAULT 'Y' AFTER `update_1c`</item>
 		<item for="uninstall">ALTER TABLE `?:cscart_products` DROP `send_price_1c`;</item>
+
+		<item>ALTER TABLE `?:companies` ADD `notify_manager_order_create` char(1) NOT NULL DEFAULT 'Y';</item>
+		<item for="uninstall">ALTER TABLE `?:companies` DROP `notify_manager_order_create`;</item>
+
+		<item>ALTER TABLE `?:companies` ADD `notify_manager_order_update` char(1) NOT NULL DEFAULT 'Y';</item>
+		<item for="uninstall">ALTER TABLE `?:companies` DROP `notify_manager_order_update`;</item>
 	</queries>
 </addon>

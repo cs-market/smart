@@ -203,21 +203,21 @@ function fn_smart_distribution_get_users(&$params, $fields, $sortings, &$conditi
 function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user_fields, $join) {
 	if (trim($condition) && Registry::get('runtime.company_id')) {
 		// reset condition for vendor's user visit
-	    if ($user_id != Tygh::$app['session']['auth']['user_id']
-	        && (!fn_allowed_for('ULTIMATE')
-	            || Registry::ifGet('settings.Stores.share_users', 'N') === 'N'
-	        )
-	    ) {
-	        $condition = fn_get_company_condition('?:users.company_id');
-		    
-	    	$condition = db_quote("(user_type IN (?a) $condition)", array('C', 'V'));
-	        $company_customers = db_get_fields("SELECT user_id FROM ?:orders WHERE company_id = ?i", Registry::get('runtime.company_id'));
-	        if ($company_customers) {
-	            $condition = db_quote("(user_id IN (?n) OR $condition)", $company_customers);
-	        }
-	        $condition = " AND $condition ";
+		if ($user_id != Tygh::$app['session']['auth']['user_id']
+			&& (!fn_allowed_for('ULTIMATE')
+				|| Registry::ifGet('settings.Stores.share_users', 'N') === 'N'
+			)
+		) {
+			$condition = fn_get_company_condition('?:users.company_id');
+			
+			$condition = db_quote("(user_type IN (?a) $condition)", array('C', 'V'));
+			$company_customers = db_get_fields("SELECT user_id FROM ?:orders WHERE company_id = ?i", Registry::get('runtime.company_id'));
+			if ($company_customers) {
+				$condition = db_quote("(user_id IN (?n) OR $condition)", $company_customers);
+			}
+			$condition = " AND $condition ";
 
-	    }
+		}
 	}
 }
 
@@ -370,13 +370,13 @@ function fn_write_r() {
   $args = func_get_args(); 
   $fp = fopen('api_requests.html', 'a+'); 
   if (!empty($args)) { 
-    fwrite($fp, '<ol style="font-family: Courier; font-size: 12px; border: 1px solid #dedede; background-color: #efefef; float: left; padding-right: 20px;">'); 
-    foreach ($args as $k => $v) { 
-      $v = htmlspecialchars(print_r($v, true)); 
-      if ($v == '') { $v = ' '; } 
-      fwrite($fp, '<li><pre>' . $v . "\n" . '</pre></li>'); 
-    } 
-    fwrite($fp, '</ol><div style="clear:left;"></div>'); 
+	fwrite($fp, '<ol style="font-family: Courier; font-size: 12px; border: 1px solid #dedede; background-color: #efefef; float: left; padding-right: 20px;">'); 
+	foreach ($args as $k => $v) { 
+	  $v = htmlspecialchars(print_r($v, true)); 
+	  if ($v == '') { $v = ' '; } 
+	  fwrite($fp, '<li><pre>' . $v . "\n" . '</pre></li>'); 
+	} 
+	fwrite($fp, '</ol><div style="clear:left;"></div>'); 
   }
   $count++; 
 }
@@ -417,14 +417,14 @@ function fn_import_bering_usergroups() {
 function fn_smart_distribution_update_category_pre(&$category_data, $category_id, $lang_code) {
 	if (isset($_REQUEST['preset_id']) && !$category_id) {
 		list($presets) = fn_get_import_presets(array(
-	        'preset_id' => $_REQUEST['preset_id'],
-	    ));
-	    $preset = reset($presets);
-	    if ($preset['company_id']) {
-	    	$usergroup_ids = db_get_field("SELECT usergroup_ids FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $preset['company_id']);
-	    	$category_data['usergroup_ids'] = explode(',',$usergroup_ids);
-	    }
-	    $category_data['add_category_to_vendor_plan'] = $preset['company_id'];
+			'preset_id' => $_REQUEST['preset_id'],
+		));
+		$preset = reset($presets);
+		if ($preset['company_id']) {
+			$usergroup_ids = db_get_field("SELECT usergroup_ids FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $preset['company_id']);
+			$category_data['usergroup_ids'] = explode(',',$usergroup_ids);
+		}
+		$category_data['add_category_to_vendor_plan'] = $preset['company_id'];
 		
 	}
 }
@@ -442,12 +442,12 @@ function fn_smart_distribution_set_product_categories_exist($category_id) {
 	if (isset($_REQUEST['preset_id'])) {
 		list($presets) = fn_get_import_presets(array(
 			'preset_id' => $_REQUEST['preset_id'],
-	    ));
-	    $preset = reset($presets);
-	    if ($preset['company_id']) {
-	    	$usergroups = db_get_field("SELECT usergroup_ids FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $preset['company_id']);
-	    	if (!empty($usergroups)) {
-	    		$c_groups = array();
+		));
+		$preset = reset($presets);
+		if ($preset['company_id']) {
+			$usergroups = db_get_field("SELECT usergroup_ids FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $preset['company_id']);
+			if (!empty($usergroups)) {
+				$c_groups = array();
 				if ($category_id) {
 					$c_groups = db_get_field('SELECT usergroup_ids FROM ?:categories WHERE category_id = ?i', $category_id);
 				}
@@ -455,8 +455,8 @@ function fn_smart_distribution_set_product_categories_exist($category_id) {
 				$c_groups = explode(',',$c_groups);
 				$usergroup_ids = implode(',',array_unique(array_merge($usergroups, $c_groups)));
 				db_query('UPDATE ?:categories SET `usergroup_ids` = ?s WHERE category_id = ?i', $usergroup_ids, $category_id);
-	    	}
-	    }
+			}
+		}
 	}
 }
 
@@ -506,20 +506,20 @@ function fn_smart_distribution_vendor_communication_add_thread_message_post( $th
 		if (!empty($managers)) {
 			$vendor_email = fn_array_column($managers, 'email');
 			if (!empty($thread_full_data['last_message_user_id'])) {
-	            $message_from = fn_vendor_communication_get_user_name($thread_full_data['last_message_user_id']);
-	        }
+				$message_from = fn_vendor_communication_get_user_name($thread_full_data['last_message_user_id']);
+			}
 
-	        $email_data = array(
-	            'area' => 'A',
-	            'email' => $vendor_email,
-	            'email_data' => array(
-	                'thread_url' => fn_url("vendor_communication.view&thread_id={$thread_data['thread_id']}", 'V'),
-	                'message_from' => !empty($message_from) ? $message_from : fn_get_company_name($thread_data['company_id']),
-	            ),
-	            'template_code' => 'vendor_communication.notify_admin',
-	        );
+			$email_data = array(
+				'area' => 'A',
+				'email' => $vendor_email,
+				'email_data' => array(
+					'thread_url' => fn_url("vendor_communication.view&thread_id={$thread_data['thread_id']}", 'V'),
+					'message_from' => !empty($message_from) ? $message_from : fn_get_company_name($thread_data['company_id']),
+				),
+				'template_code' => 'vendor_communication.notify_admin',
+			);
 
-	        $result = fn_vendor_communication_send_email_notification($email_data);
+			$result = fn_vendor_communication_send_email_notification($email_data);
 		}
 	}
 } 
@@ -529,74 +529,74 @@ function fn_sd_add_product_to_wishlist($product_data, &$wishlist, &$auth)
 	if (is_callable('fn_add_product_to_wishlist')) {
 		return fn_add_product_to_wishlist($product_data, $wishlist, $auth);
 	} else {
-	    // Check if products have cusom images
-	    list($product_data, $wishlist) = fn_add_product_options_files($product_data, $wishlist, $auth, false, 'wishlist');
+		// Check if products have cusom images
+		list($product_data, $wishlist) = fn_add_product_options_files($product_data, $wishlist, $auth, false, 'wishlist');
 
-	    fn_set_hook('pre_add_to_wishlist', $product_data, $wishlist, $auth);
+		fn_set_hook('pre_add_to_wishlist', $product_data, $wishlist, $auth);
 
-	    if (!empty($product_data) && is_array($product_data)) {
-	        $wishlist_ids = array();
-	        foreach ($product_data as $product_id => $data) {
-	            if (empty($data['amount'])) {
-	                $data['amount'] = 1;
-	            }
-	            if (!empty($data['product_id'])) {
-	                $product_id = $data['product_id'];
-	            }
+		if (!empty($product_data) && is_array($product_data)) {
+			$wishlist_ids = array();
+			foreach ($product_data as $product_id => $data) {
+				if (empty($data['amount'])) {
+					$data['amount'] = 1;
+				}
+				if (!empty($data['product_id'])) {
+					$product_id = $data['product_id'];
+				}
 
-	            if (empty($data['extra'])) {
-	                $data['extra'] = array();
-	            }
+				if (empty($data['extra'])) {
+					$data['extra'] = array();
+				}
 
-	            // Add one product
-	            if (!isset($data['product_options'])) {
-	                $data['product_options'] = fn_get_default_product_options($product_id);
-	            }
+				// Add one product
+				if (!isset($data['product_options'])) {
+					$data['product_options'] = fn_get_default_product_options($product_id);
+				}
 
-	            // Generate wishlist id
-	            $data['extra']['product_options'] = $data['product_options'];
-	            $_id = fn_generate_cart_id($product_id, $data['extra']);
+				// Generate wishlist id
+				$data['extra']['product_options'] = $data['product_options'];
+				$_id = fn_generate_cart_id($product_id, $data['extra']);
 
-	            $_data = db_get_row('SELECT is_edp, options_type, tracking FROM ?:products WHERE product_id = ?i', $product_id);
-	            $data['is_edp'] = $_data['is_edp'];
-	            $data['options_type'] = $_data['options_type'];
-	            $data['tracking'] = $_data['tracking'];
+				$_data = db_get_row('SELECT is_edp, options_type, tracking FROM ?:products WHERE product_id = ?i', $product_id);
+				$data['is_edp'] = $_data['is_edp'];
+				$data['options_type'] = $_data['options_type'];
+				$data['tracking'] = $_data['tracking'];
 
-	            // Check the sequential options
-	            if (!empty($data['tracking']) && $data['tracking'] == ProductTracking::TRACK_WITH_OPTIONS && $data['options_type'] == 'S') {
-	                $inventory_options = db_get_fields("SELECT a.option_id FROM ?:product_options as a LEFT JOIN ?:product_global_option_links as c ON c.option_id = a.option_id WHERE (a.product_id = ?i OR c.product_id = ?i) AND a.status = 'A' AND a.inventory = 'Y'", $product_id, $product_id);
+				// Check the sequential options
+				if (!empty($data['tracking']) && $data['tracking'] == ProductTracking::TRACK_WITH_OPTIONS && $data['options_type'] == 'S') {
+					$inventory_options = db_get_fields("SELECT a.option_id FROM ?:product_options as a LEFT JOIN ?:product_global_option_links as c ON c.option_id = a.option_id WHERE (a.product_id = ?i OR c.product_id = ?i) AND a.status = 'A' AND a.inventory = 'Y'", $product_id, $product_id);
 
-	                $sequential_completed = true;
-	                if (!empty($inventory_options)) {
-	                    foreach ($inventory_options as $option_id) {
-	                        if (!isset($data['product_options'][$option_id]) || empty($data['product_options'][$option_id])) {
-	                            $sequential_completed = false;
-	                            break;
-	                        }
-	                    }
-	                }
+					$sequential_completed = true;
+					if (!empty($inventory_options)) {
+						foreach ($inventory_options as $option_id) {
+							if (!isset($data['product_options'][$option_id]) || empty($data['product_options'][$option_id])) {
+								$sequential_completed = false;
+								break;
+							}
+						}
+					}
 
-	                if (!$sequential_completed) {
-	                    fn_set_notification('E', __('error'), __('select_all_product_options'));
-	                    // Even if customer tried to add the product from the catalog page, we will redirect he/she to the detailed product page to give an ability to complete a purchase
-	                    $redirect_url = fn_url('products.view?product_id=' . $product_id . '&combination=' . fn_get_options_combination($data['product_options']));
-	                    $_REQUEST['redirect_url'] = $redirect_url; //FIXME: Very very very BAD style to use the global variables in the functions!!!
+					if (!$sequential_completed) {
+						fn_set_notification('E', __('error'), __('select_all_product_options'));
+						// Even if customer tried to add the product from the catalog page, we will redirect he/she to the detailed product page to give an ability to complete a purchase
+						$redirect_url = fn_url('products.view?product_id=' . $product_id . '&combination=' . fn_get_options_combination($data['product_options']));
+						$_REQUEST['redirect_url'] = $redirect_url; //FIXME: Very very very BAD style to use the global variables in the functions!!!
 
-	                    return false;
-	                }
-	            }
+						return false;
+					}
+				}
 
-	            $wishlist_ids[] = $_id;
-	            $wishlist['products'][$_id]['product_id'] = $product_id;
-	            $wishlist['products'][$_id]['product_options'] = $data['product_options'];
-	            $wishlist['products'][$_id]['extra'] = $data['extra'];
-	            $wishlist['products'][$_id]['amount'] = $data['amount'];
-	        }
+				$wishlist_ids[] = $_id;
+				$wishlist['products'][$_id]['product_id'] = $product_id;
+				$wishlist['products'][$_id]['product_options'] = $data['product_options'];
+				$wishlist['products'][$_id]['extra'] = $data['extra'];
+				$wishlist['products'][$_id]['amount'] = $data['amount'];
+			}
 
-	        return $wishlist_ids;
-	    } else {
-	        return false;
-	    }
+			return $wishlist_ids;
+		} else {
+			return false;
+		}
 	}
 }
 function fn_smart_distribution_pre_update_order($cart, $order_id) {
@@ -637,37 +637,38 @@ function fn_smart_distribution_shippings_get_shippings_list_conditions($group, $
 	}
 }
 
-function fn_smart_distribution_order_notification($order_info, $order_statuses, $force_notification) {
-	$mailer = Tygh::$app['mailer'];
-    list($shipments) = fn_get_shipments_info(array('order_id' => $order_info['order_id'], 'advanced_info' => true));
-    $use_shipments = !fn_one_full_shipped($shipments);
-    $payment_id = !empty($order_info['payment_method']['payment_id']) ? $order_info['payment_method']['payment_id'] : 0;
-    $company_lang_code = fn_get_company_language($order_info['company_id']);
-    $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, ($order_info['lang_code'] ? $order_info['lang_code'] : CART_LANGUAGE), $order_info['company_id']);
-    $status_settings = $order_statuses[$order_info['status']]['params'];
-    $managers = fn_smart_distribution_get_managers(array('user_id' => $order_info['user_id'], 'company_id' => $order_info['company_id']));
-    $email_template_name = 'order_notification.' . strtolower($order_info['status']);
+function fn_smart_distribution_place_order($order_id, $action, $order_status, $cart, $auth) {
+	$order_info = fn_get_order_info($order_id);
+	$field = ($action == 'save') ? 'notify_manager_order_update' : 'notify_manager_order_create';
+	if (db_get_field("SELECT $field FROM ?:companies WHERE company_id = ?i", $order_info['company_id']) == 'Y') {
+		$mailer = Tygh::$app['mailer'];
+		list($shipments) = fn_get_shipments_info(array('order_id' => $order_info['order_id'], 'advanced_info' => true));
+		$use_shipments = !fn_one_full_shipped($shipments);
+		$payment_id = !empty($order_info['payment_method']['payment_id']) ? $order_info['payment_method']['payment_id'] : 0;
+		$company_lang_code = fn_get_company_language($order_info['company_id']);
+		$order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, ($order_info['lang_code'] ? $order_info['lang_code'] : CART_LANGUAGE), $order_info['company_id']);
+		$status_settings = $order_statuses[$order_info['status']]['params'];
 
-    if ($managers) {
-    	$to = reset($managers)['email'];
+		$managers = fn_smart_distribution_get_managers(array('user_id' => $order_info['user_id'], 'company_id' => $order_info['company_id']));
+		$email_template_name = 'order_notification.' . strtolower($order_status);
 
 		$mailer->send(array(
-	        'to' => $to,
-	        'from' => 'default_company_orders_department',
-	        'reply_to' => $order_info['email'],
-	        'data' => array(
-	            'order_info' => $order_info,
-	            'shipments' => $shipments,
-	            'use_shipments' => $use_shipments,
-	            'order_status' => fn_get_status_data($order_info['status'], STATUSES_ORDER, $order_info['order_id'], $company_lang_code),
-	            'payment_method' => fn_get_payment_data($payment_id, $order_info['order_id'], $company_lang_code),
-	            'status_settings' => $status_settings,
-	            'profile_fields' => fn_get_profile_fields('I', '', $company_lang_code),
-	            'secondary_currency' => $secondary_currency
-	        ),
-	        'template_code' => $email_template_name,
-	        'tpl' => 'orders/order_notification.tpl', // this parameter is obsolete and is used for back compatibility
-	        'company_id' => $order_info['company_id'],
-	    ), 'A', $company_lang_code);
-    }
+			'to' => array_column($managers, 'email'),
+			'from' => 'default_company_orders_department',
+			'reply_to' => $order_info['email'],
+			'data' => array(
+				'order_info' => $order_info,
+				'shipments' => $shipments,
+				'use_shipments' => $use_shipments,
+				'order_status' => fn_get_status_data($order_status, STATUSES_ORDER, $order_info['order_id'], $company_lang_code),
+				'payment_method' => fn_get_payment_data($payment_id, $order_info['order_id'], $company_lang_code),
+				'status_settings' => $status_settings,
+				'profile_fields' => fn_get_profile_fields('I', '', $company_lang_code),
+				'secondary_currency' => $secondary_currency
+			),
+			'template_code' => $email_template_name,
+			'tpl' => 'orders/order_notification.tpl', // this parameter is obsolete and is used for back compatibility
+			'company_id' => $order_info['company_id'],
+		), 'A', $company_lang_code);
+	}
 }

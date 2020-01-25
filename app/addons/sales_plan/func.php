@@ -416,7 +416,8 @@ function fn_sales_plan_delete_company($company_id, $result) {
 }
 
 function fn_sales_plan_create_order($order) {
-	$manager = db_get_field('SELECT u.email FROM ?:users AS u LEFT JOIN ?:vendors_customers AS vc ON vc.vendor_manager = u.user_id WHERE vc.customer_id = ?i AND vendor_manager IN (SELECT user_id FROM ?:users WHERE user_type = ?s AND company_id = ?i)', $order['user_id'], 'V', $order['company_id']);
+	$manager = db_get_field("SELECT u.email FROM ?:users AS u LEFT JOIN ?:vendors_customers AS vc ON vc.vendor_manager = u.user_id WHERE vc.customer_id = ?i AND vendor_manager IN (SELECT user_id FROM ?:users LEFT JOIN ?:companies ON ?:users.company_id = ?:companies.company_id WHERE user_type = ?s AND ?:users.company_id = ?i AND ?:companies.notify_manager_order_insufficient = 'Y')", $order['user_id'], 'V', $order['company_id']);
+
 	if (!empty($manager)) {
 		$notification_data[$manager]['less_placed'][] = $order['user_id'];
 	}
