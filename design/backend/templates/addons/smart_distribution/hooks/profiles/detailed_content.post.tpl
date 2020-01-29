@@ -13,7 +13,7 @@
 			<div class="controls cm-no-hide-input">
 			<input class="cm-no-hide-input" type="hidden" name="user_id" value="{$id}" >
 				{$extra_url = "&user_type=V"}
-				{include file="pickers/users/picker.tpl" display="checkbox" but_meta="btn" extra_url=$extra_url view_mode="mixed" item_ids=$managers|array_keys data_id="user_id" input_name="user_data[managers]"}
+				{include file="pickers/users/picker.tpl" display="checkbox" but_meta="btn" extra_url=$extra_url view_mode="mixed" item_ids=$user_data.managers|array_keys data_id="user_id" input_name="user_data[managers]"}
 			</div>
 		</div>
 	{/if}

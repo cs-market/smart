@@ -200,6 +200,13 @@ function fn_smart_distribution_get_users(&$params, $fields, $sortings, &$conditi
 	}
 }
 
+function fn_smart_distribution_get_users_post(&$users, $params, $auth) {
+	if (defined('API') && isset($params['user_id']) && is_numeric($params['user_id'])) {
+		// requested info about single user via api
+		$users = array(fn_get_user_info($params['user_id']));
+	}
+}
+
 function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user_fields, $join) {
 	if (trim($condition) && Registry::get('runtime.company_id')) {
 		// reset condition for vendor's user visit
@@ -221,7 +228,12 @@ function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user
 	}
 }
 
-function fn_smart_distribution_update_profile($action, $user_data, $current_user_data) {
+function fn_smart_distribution_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
+	// get managers for single user
+	$user_data['managers'] = fn_smart_distribution_get_managers(array('user_id' => $user_id));
+}
+
+function fn_smart_distribution_update_user_profile_pre($user_id, $user_data, $action) {
 	if ($user_data['user_id'] && isset($user_data['managers']) && $user_data['user_type'] == 'C') {
 		$managers = fn_smart_distribution_get_managers(array('user_id' => $user_data['user_id']));
 
@@ -241,9 +253,13 @@ function fn_smart_distribution_update_profile($action, $user_data, $current_user
 			foreach ($managers as $m_id) {
 				$udata[] = array('vendor_manager' => $m_id, 'customer_id' => $user_data['user_id']);
 			}
+
 			db_query('INSERT INTO ?:vendors_customers ?m', $udata);
 		}
 	}
+}
+
+function fn_smart_distribution_update_profile($action, $user_data, $current_user_data) {
 	if ($action == 'add' && AREA == 'C' && !empty($user_data['usergroup_ids'])) {
 		$ids = explode(',', $user_data['usergroup_ids']);
 		foreach ($ids as $ug_id) {
