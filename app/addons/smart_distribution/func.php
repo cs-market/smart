@@ -666,7 +666,7 @@ function fn_smart_distribution_place_order($order_id, $action, $order_status, $c
 		$status_settings = $order_statuses[$order_info['status']]['params'];
 
 		$managers = fn_smart_distribution_get_managers(array('user_id' => $order_info['user_id'], 'company_id' => $order_info['company_id']));
-		$email_template_name = 'order_notification.' . strtolower($order_status);
+		$email_template_name = 'order_notification.' . (($action == 'save') ? 'y' : 'o');
 
 		$mailer->send(array(
 			'to' => array_column($managers, 'email'),
