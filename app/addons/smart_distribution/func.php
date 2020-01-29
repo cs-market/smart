@@ -235,7 +235,7 @@ function fn_smart_distribution_update_profile($action, $user_data, $current_user
 			if (defined('API')) {
 				$managers = db_get_fields(
 				"SELECT user_id FROM ?:users WHERE email IN (?a)",
-				array_map('trim', $managers)
+				array_map('trim', $user_data['managers'])
 				);
 			}
 			foreach ($managers as $m_id) {
