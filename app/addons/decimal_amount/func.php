@@ -14,6 +14,7 @@
 use Tygh\Enum\ProductTracking;
 use Tygh\Enum\OutOfStockActions;
 use Tygh\Registry;
+use Tygh\Settings;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
