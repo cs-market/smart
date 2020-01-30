@@ -1,0 +1,27 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: /release-4.8.2/addons/pay_by_points.po\n"
+
+msgctxt "Addons::name::pay_by_points"
+msgid "Smart distribution: Pay by points"
+msgstr "Smart distribution: Pay by points"
+
+msgctxt "Addons::description::pay_by_points"
+msgid "Pay for a separate product with points"
+msgstr "Оплата отдельного товара баллами"
+
+msgctxt "Languages::pay_by_points"
+msgid "Pay by points"
+msgstr "Оплата баллами"
+
+msgctxt "Languages::pay_by_points__not_enough_points"
+msgid "Not_enough_points"
+msgstr "Не хватает %points% баллов для оплаты баллами"
