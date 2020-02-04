@@ -1,0 +1,81 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: /release-4.8.2/addons/invoice_for_payment.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:09\n"
+
+msgctxt "Addons::name::invoice_for_payment"
+msgid "Invoice for payment"
+msgstr "Smart distribution: Счет на оплату"
+
+msgctxt "Languages::invoice_for_payment"
+msgid "Invoice for payment"
+msgstr "Счет на оплату"
+
+msgctxt "Languages::invoice_for_payment_pdf"
+msgid "Invoice for payment pdf"
+msgstr "Счет на оплату (PDF)"
+
+msgctxt "Languages::invoice_for_payment_bank_name"
+msgid "invoice_for_payment_bank_name"
+msgstr "Банк получателя"
+
+msgctxt "Languages::invoice_for_payment_inn"
+msgid "invoice_for_payment_inn"
+msgstr "ИНН"
+
+msgctxt "Languages::invoice_for_payment_kpp"
+msgid "invoice_for_payment_kpp"
+msgstr "КПП"
+
+msgctxt "Languages::invoice_for_payment_bank_recipient"
+msgid "invoice_for_payment_bank_recipient"
+msgstr "Получатель"
+
+msgctxt "Languages::invoice_for_payment_bik"
+msgid "invoice_for_payment_bik"
+msgstr "БИК"
+
+msgctxt "Languages::invoice_for_payment_kor"
+msgid "invoice_for_payment_kor"
+msgstr "Кор/счёт"
+
+msgctxt "Languages::invoice_for_payment_rs"
+msgid "invoice_for_payment_rs"
+msgstr "Расчётный счет"
+
+msgctxt "Languages::invoice_for_payment_total_pay"
+msgid "invoice_for_payment_total_pay"
+msgstr "Всего к оплате"
+
+msgctxt "Languages::invoice_for_payment_total_items"
+msgid "invoice_for_payment_total_items"
+msgstr "Всего наименований"
+
+msgctxt "Languages::invoice_for_payment_total_of"
+msgid "invoice_for_payment_total_of"
+msgstr "на сумму"
+
+msgctxt "Languages::invoice_for_payment_supervisor"
+msgid "invoice_for_payment_supervisor"
+msgstr "Руководитель"
+
+msgctxt "Languages::invoice_for_payment_accountant"
+msgid "invoice_for_payment_accountant"
+msgstr "Бухгалтер"
+
+msgctxt "Languages::invoice_for_payment_invoice_print"
+msgid "invoice_for_payment_invoice_print"
+msgstr "Распечатать"
+
+msgctxt "Languages::invoice_for_payment_notification"
+msgid "invoice_for_payment_notification"
+msgstr "<p>Внимание! Оплата данного счета означает согласие с условиями поставки товара. Уведомление об оплате обязательно, в противном случае не гарантируется наличие товара на складе. Товар отпускается по факту прихода денег на р/с Поставщика, самовывозом (при наличии доверенности и паспорта).</p>"
