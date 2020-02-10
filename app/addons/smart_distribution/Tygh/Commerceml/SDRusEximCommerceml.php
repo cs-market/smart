@@ -857,6 +857,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $statuses[strval($data_field->{$cml['value']})]['status'], $order_id);
                     }
                 }
+                fn_set_hook('exim_1c_update_order', $order_data, $cml);
             }
         }
     }
