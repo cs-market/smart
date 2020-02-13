@@ -12,15 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
-
-Tygh::$app->register(new ServiceProvider());
-
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+fn_define('STOREFRONT_FIELD_PROPERTIES', 'properties');
+fn_define('CUSTOM_CHECKOUT_FIELDS', 'CUSTOM');

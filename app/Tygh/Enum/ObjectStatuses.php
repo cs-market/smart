@@ -12,15 +12,20 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
+/**
+ * Class ObjectStatuses contains default statuses of assorted objects: orders, products, etc.
+ *
+ * @package Tygh\Enum
+ */
+class ObjectStatuses
+{
+    const ACTIVE = 'A';
+    const DISABLED = 'D';
+    const HIDDEN = 'H';
+    const PENDING = 'P';
+    const NEW_OBJECT = 'N';
+    const AVAILABLE = 'F';
 
-Tygh::$app->register(new ServiceProvider());
-
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+}

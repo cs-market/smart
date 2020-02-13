@@ -12,15 +12,29 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
-
-Tygh::$app->register(new ServiceProvider());
-
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+/**
+ *  ProfileFieldTypes contains possible values for `profile_fields`.`field_type` DB field.
+ *
+ * @package Tygh\Enum
+ */
+class ProfileFieldTypes
+{
+    const ADDRESS_TYPE = 'N';
+    const CHECKBOX = 'C';
+    const COUNTRY = 'O';
+    const DATE = 'D';
+    const EMAIL = 'E';
+    const HEADER = 'H';
+    const INPUT = 'I';
+    const PASSWORD = 'W';
+    const PHONE = 'P';
+    const POSTAL_CODE = 'Z';
+    const RADIO = 'R';
+    const SELECT_BOX = 'S';
+    const STATE = 'A';
+    const TEXT_AREA = 'T';
+    const USER_GROUP = 'U';
+    const VENDOR_TERMS = 'B';
+}

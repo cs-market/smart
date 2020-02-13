@@ -12,15 +12,37 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
+/**
+ * ProductFeatureStyles contains possible values for feature style
+ *
+ * @package Tygh\Enum
+ */
+class ProductFeatureStyles
+{
+    const MULTIPLE_CHECKBOX = 'multiple_checkbox';
+    const DROP_DOWN = 'dropdown';
+    const DROP_DOWN_IMAGES = 'dropdown_images';
+    const DROP_DOWN_LABELS = 'dropdown_labels';
+    const CHECKBOX = 'checkbox';
+    const NUMBER = 'number';
+    const BRAND = 'brand';
+    const COLOR = 'color';
+    const TEXT = 'text';
 
-Tygh::$app->register(new ServiceProvider());
-
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+    public static function getAllStyles()
+    {
+        return [
+            self::MULTIPLE_CHECKBOX,
+            self::DROP_DOWN,
+            self::DROP_DOWN_IMAGES,
+            self::DROP_DOWN_LABELS,
+            self::CHECKBOX,
+            self::NUMBER,
+            self::BRAND,
+            self::COLOR,
+            self::TEXT,
+        ];
+    }
+}

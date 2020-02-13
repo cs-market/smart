@@ -12,15 +12,19 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
+/**
+ * StorefrontStatuses contains possible values for store_mode (open or closed storefront) setting.
+ *
+ * @package Tygh\Enum
+ */
+class StorefrontStatuses
+{
+    const CLOSED = 'Y';
 
-Tygh::$app->register(new ServiceProvider());
+    /** @deprecated since 4.10.1 */
+    const OPENED = 'N';
 
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+    const OPEN  = 'N';
+}
