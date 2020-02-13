@@ -20,8 +20,22 @@ msgstr "Оплата отдельного товара баллами"
 
 msgctxt "Languages::pay_by_points"
 msgid "Pay by points"
-msgstr "Оплата баллами"
+msgstr "Оплатить баллами"
+
+msgctxt "Languages::payed_by_points"
+msgid "payed_by_points"
+msgstr "Будет оплачено баллами"
 
 msgctxt "Languages::pay_by_points__not_enough_points"
 msgid "Not_enough_points"
 msgstr "Не хватает %points% баллов для оплаты баллами"
+
+#  NOTIFICATIONS
+msgctxt "Languages::pay_by_points__notification__pbp_unavailable"
+msgid "pay_by_points__notification__pbp_unavailable"
+msgstr "Товар %product% не доступен для оплаты баллами"
+
+msgctxt "Languages::pay_by_points__notification__not_enough_points"
+msgid "pay_by_points__notification__not_enough_points"
+msgstr "Недостаточно баллов для оплаты %product%"
+#  /NOTIFICATIONS
