@@ -688,3 +688,32 @@ function fn_smart_distribution_place_order($order_id, $action, $order_status, $c
 		), 'A', $company_lang_code);
 	}
 }
+
+function fn_smart_distribution_get_notification_rules(&$force_notification, $params, $disable_notification) {
+    $force_notification = array();
+    if ($disable_notification) {
+        $force_notification = array('C' => false, 'A' => false, 'V' => false);
+    } else {
+        if (!empty($params['notify_user']) || $params === true) {
+            $force_notification['C'] = true;
+        } else {
+            if (AREA == 'A' || Registry::get('runtime.controller') == 'sd_exim_1c') {
+                $force_notification['C'] = false;
+            }
+        }
+        if (!empty($params['notify_department']) || $params === true) {
+            $force_notification['A'] = true;
+        } else {
+            if (AREA == 'A' || Registry::get('runtime.controller') == 'sd_exim_1c') {
+                $force_notification['A'] = false;
+            }
+        }
+        if (!empty($params['notify_vendor']) || $params === true) {
+            $force_notification['V'] = true;
+        } else {
+            if (AREA == 'A' || Registry::get('runtime.controller') == 'sd_exim_1c') {
+                $force_notification['V'] = false;
+            }
+        }
+    }
+}
