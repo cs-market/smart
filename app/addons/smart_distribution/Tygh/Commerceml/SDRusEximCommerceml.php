@@ -830,6 +830,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
                 fn_form_cart($order_id, $cart, $customer_auth);
                 fn_store_shipping_rates($order_id, $cart, $customer_auth);
+                $cart['order_id'] = $order_id;
+                $cart['order_status'] = $statuses[strval($data_field->{$cml['value']})]['status'];
                 $cart['products'] = array();
                 
                 foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
@@ -848,8 +850,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
                 fn_calculate_cart_content($cart, $customer_auth);
                 if (!fn_cart_is_empty($cart)) {
-                    fn_update_order($cart, $order_id);
-                    $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $order_info['status'], $order_id);
+                    fn_place_order($cart, $customer_auth);
+                    //$this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $order_info['status'], $order_id);
                 }
 
                 foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
