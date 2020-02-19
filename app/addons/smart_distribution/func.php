@@ -377,7 +377,7 @@ function fn_smart_distribution_api_handle_request($_this, $authorized) {
 	//fn_write_r(date('H:m:s d/m/Y') . ' ' . $_this->getRequest()->getResource() . ' ' . $_this->getRequest()->getMethod(), $_this->getRequest()->getData());
 }
 
-function fn_smart_distribution_api_send_response($this, $response, $authorized) {
+function fn_smart_distribution_api_send_response($_this, $response, $authorized) {
 	//fn_write_r($response->body);
 }
 
