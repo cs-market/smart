@@ -850,8 +850,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
                 fn_calculate_cart_content($cart, $customer_auth);
                 if (!fn_cart_is_empty($cart)) {
-                    fn_place_order($cart, $customer_auth);
-                    //$this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $order_info['status'], $order_id);
+                    fn_place_order($cart, $customer_auth, 'save');
                 }
 
                 foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
