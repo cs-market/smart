@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>debt_limit</id>
+	<version>1.0.1</version>
+	<default_language>en</default_language>
+	<priority>100</priority>
+	<status>active</status>
+	<name>Smart distribution: Debt and limit</name>
+	<description></description>
+	<translations> 
+		<item for="name" lang="ru">Smart distribution: Дебиторская задолженность</item>
+	</translations>
+	<language_variables>
+		<item lang="en" id="debt">Debt</item>
+		<item lang="en" id="debt_limit">Debt limit</item>
+		<item lang="ru" id="debt">Дебиторская задолженность</item>
+		<item lang="ru" id="debt_limit">Лимит ДЗ</item>
+		<item lang="en" id="my_debt">My debt</item>
+		<item lang="ru" id="my_debt">Мой долг</item>
+	</language_variables>
+	<queries>
+		<item>ALTER TABLE `?:users` ADD `debt` decimal(12,2) NOT NULL;</item>
+		<item for="uninstall">ALTER TABLE `?:users` DROP `debt`;</item>
+		
+		<item>ALTER TABLE `?:users` ADD `limit` decimal(12,2) NOT NULL;</item>
+		<item for="uninstall">ALTER TABLE `?:users` DROP `limit`;</item>
+	</queries>
+</addon>

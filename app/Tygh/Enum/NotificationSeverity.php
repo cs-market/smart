@@ -12,15 +12,21 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
+/**
+ * Class NotificationSeverity stores possible types of notifications.
+ *
+ * @see     \fn_set_notification()
+ *
+ * @package Tygh\Enum
+ */
+class NotificationSeverity
+{
+    const ERROR = 'E';
+    const WARNING = 'W';
+    const NOTICE = 'N';
 
-Tygh::$app->register(new ServiceProvider());
-
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+    const ORDER = 'O';
+    const INFO = 'I';
+}

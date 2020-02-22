@@ -12,15 +12,18 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
-
-Tygh::$app->register(new ServiceProvider());
-
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+/**
+ *  ProfileFieldLocations contains possible location values for function fn_get_profile_fields.
+ *
+ * @package Tygh\Enum
+ */
+class ProfileFieldLocations
+{
+    const CUSTOMER_FIELDS = 'C';
+    const CHECKOUT_FIELDS = 'O';
+    const ADMIN_FIELDS = 'A';
+    const VENDOR_FIELDS = 'V';
+    const EXTRA_FIELDS = 'I';
+}

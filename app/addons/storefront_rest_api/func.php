@@ -12,9 +12,16 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Enum\ProductFilterProductFieldTypes;
+use Tygh\Enum\ProductFilterStyles;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Tools\SecurityHelper;
+use Tygh\Languages\Languages;
+use Tygh\Enum\ProfileFieldAreas;
+use Tygh\Enum\ProfileFieldSections;
+use Tygh\Enum\ProfileFieldTypes;
+use Tygh\Addons\StorefrontRestApi\ProfileFields\Manager as ProfileFieldsManager;
 
 if (!defined('BOOTSTRAP')) {
     die('Access denied');
@@ -62,6 +69,8 @@ function fn_storefront_rest_api_format_product_prices($product, $currency = CART
         'discount',
         'subtotal',
         'display_subtotal',
+        'taxed_price',
+        'clean_price'
     );
 
     foreach ($fields as $field) {
@@ -360,6 +369,10 @@ function fn_storefront_rest_api_generate_icons($image_data, $sizes)
 
     foreach ($sizes as list($width, $height)) {
         $icons["{$width}x{$height}"] = fn_image_to_display($image_data, $width, $height);
+        unset(
+            $icons["{$width}x{$height}"]['absolute_path'],
+            $icons["{$width}x{$height}"]['generate_image']
+        );
     }
 
     return $icons;
@@ -445,4 +458,212 @@ function fn_storefront_rest_api_set_banner_icons(array $banner, array $sizes)
     }
 
     return $banner;
+}
+
+/**
+ * Gets storefront information.
+ *
+ * @param int $storefront_id Storefront identifier
+ *
+ * @return array return empty array if storefront doesn't exist
+ */
+function fn_storefront_rest_api_get_storefront($storefront_id = 0)
+{
+    $storefront = Tygh::$app['storefront.repository']->findById($storefront_id);
+
+    if (!$storefront) {
+        return [];
+    }
+
+    $languages_params = [
+        'area'           => 'C',
+        'include_hidden' => false
+    ];
+
+    $currencies_params = [
+        'status' => ['A']
+    ];
+
+    $language_ids = $storefront->getLanguageIds();
+    $currency_ids = $storefront->getCurrencyIds();
+
+    if ($language_ids) {
+        $languages_params['language_ids'] = $language_ids;
+    }
+
+    if ($currency_ids) {
+        $currencies_params['currency_id'] = $currency_ids;
+    }
+
+    $storefront = [
+        'url'                       => $storefront->url,
+        'status'                    => $storefront->status,
+        'settings'                  => Settings::instance()->getValues('Company', Settings::CORE_SECTION, true, $storefront_id),
+        'languages'                 => array_values(Languages::getAvailable($languages_params)),
+        'currencies'                => array_values(fn_get_currencies_list($currencies_params)),
+        STOREFRONT_FIELD_PROPERTIES => []
+    ];
+
+    /**
+     * Executes after gets storefront information; allows modifying storefront information.
+     *
+     * @param int   $storefront_id Storefront identifier
+     * @param array $storefront    Storefront information
+     */
+    fn_set_hook('storefront_rest_api_get_storefront', $storefront_id, $storefront);
+
+    return $storefront;
+}
+
+/**
+ * Gets list of fields for checkout location and action.
+ *
+ * @param array  $cart      Cart contents and user information necessary for purchase
+ * @param array  $auth      Current user authentication data
+ * @param string $lang_code Two-letter language code
+ *
+ * @return array
+ */
+function fn_storefront_rest_api_get_checkout_fields(array $cart, $auth, $lang_code)
+{
+    $fields = Tygh::$app['addons.storefront_rest_api.profile_fields.manager']->get(
+        ProfileFieldAreas::CHECKOUT,
+        ProfileFieldsManager::ACTION_UPDATE,
+        $auth,
+        $lang_code
+    );
+
+    unset($fields[ProfileFieldSections::ESSENTIALS]);
+
+    $fields[CUSTOM_CHECKOUT_FIELDS]['accept_terms'] = [
+        'description' => __('checkout_terms_n_conditions_name', $lang_code),
+        'fields' => [
+            [
+                'field_id'    => 'accept_terms',
+                'field_name'  => 'accept_terms',
+                'field_type'  => ProfileFieldTypes::CHECKBOX,
+                'is_default'  => true,
+                'description' => __('terms_and_conditions_content', $lang_code),
+                'required'    => true
+            ]
+        ]
+    ];
+
+    /**
+     * Executes after gets checkout fields; allows modifying checkout fields.
+     *
+     * @param array  $cart      Cart contents and user information necessary for purchase
+     * @param array  $auth      Current user authentication data
+     * @param string $lang_code Two-letter language code
+     * @param array  $fields    Checkout fields
+     */
+    fn_set_hook('storefront_rest_api_get_checkout_fields', $cart, $auth, $lang_code, $fields);
+
+    return $fields;
+}
+
+/**
+ * Determines filter style.
+ *
+ * @param array $filter Filter data
+ *
+ * @return string|null Filter style
+ */
+function fn_storefront_rest_api_get_filter_style($filter)
+{
+    if (!empty($filter['filter_style'])) {
+        return $filter['filter_style'];
+    }
+
+    $filter_style = null;
+    if (!empty($filter['slider'])) {
+        $filter_style = ProductFilterStyles::SLIDER;
+    } elseif (!empty($filter['variants'])) {
+        $filter_style = ProductFilterStyles::CHECKBOX;
+    }
+
+    $field_type = null;
+    if (!empty($filter['field_type'])) {
+        $field_type = $filter['field_type'];
+    }
+    switch ($field_type) {
+        case ProductFilterProductFieldTypes::PRICE:
+            $filter_style = ProductFilterStyles::SLIDER;
+            break;
+        case ProductFilterProductFieldTypes::VENDOR:
+        case ProductFilterProductFieldTypes::FREE_SHIPPING:
+        case ProductFilterProductFieldTypes::IN_STOCK:
+            $filter_style = ProductFilterStyles::CHECKBOX;
+            break;
+    }
+
+    /**
+     * Executes after filter style is determined by the filter data for Storefront REST API, allows you to modify
+     * the detected filter style
+     *
+     * @param array  $filter       Filter data
+     * @param string $filter_style Filter style
+     * @param string $field_type   Product field type
+     */
+    fn_set_hook('storefront_rest_api_get_filter_style_post', $filter, $filter_style, $field_type);
+
+    return $filter_style;
+}
+
+/**
+ * Adds icons for pages images.
+ *
+ * @param array $pages Pages data to inject icons into
+ * @param array $sizes Icon sizes
+ *
+ * @return array Pages data with image icons
+ */
+function fn_storefront_rest_api_set_pages_icons(array $pages, array $sizes)
+{
+    foreach ($pages as &$page) {
+        $page = fn_storefront_rest_api_set_page_icons($page, $sizes);
+    }
+    unset($page);
+
+    return $pages;
+}
+
+/**
+ * Adds icons for page images.
+ *
+ * @param array $page  Page data to inject icons into
+ * @param array $sizes Icon sizes
+ *
+ * @return array Page data with image icons
+ */
+function fn_storefront_rest_api_set_page_icons(array $page, array $sizes)
+{
+    /**
+     * Executes after gets page information; allows sets page icons.
+     *
+     * @param array $page  Page data
+     * @param array $sizes Icon sizes
+     */
+    fn_set_hook('storefront_rest_api_set_page_icons', $page, $sizes);
+
+    return $page;
+}
+
+/**
+ * The "fill_auth" hook handler.
+ *
+ * Actions performed:
+ *  - Sets ip address from headers.
+ *
+ * @see fn_fill_auth
+ */
+function fn_storefront_rest_api_fill_auth(&$auth, $user_data, $area, $original_auth)
+{
+    if (defined('API')) {
+        $headers = fn_storefront_rest_api_get_request_headers();
+
+        if (isset($headers['Storefront-Api-User-Ip'])) {
+            $auth['ip'] = $headers['Storefront-Api-User-Ip'];
+        }
+    }
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+		<id>invoice_for_payment</id>
+		<status>active</status>
+		<version>1.0.5</version>
+		<priority>4294967294</priority>
+		<position>0</position>
+		<default_language>ru</default_language>
+		<queries>
+			<item>ALTER TABLE `?:companies` ADD `invoice_for_payment` TEXT NOT NULL;</item>
+			<item for="uninstall">ALTER TABLE `?:companies` DROP `invoice_for_payment`;</item>
+		</queries>
+		<functions>
+				<item for="install">fn_install_invoice_payment</item>
+				<item for="uninstall">fn_uninstall_invoice_payment</item>
+		</functions>
+</addon>

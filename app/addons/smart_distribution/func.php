@@ -377,7 +377,7 @@ function fn_smart_distribution_api_handle_request($_this, $authorized) {
 	//fn_write_r(date('H:m:s d/m/Y') . ' ' . $_this->getRequest()->getResource() . ' ' . $_this->getRequest()->getMethod(), $_this->getRequest()->getData());
 }
 
-function fn_smart_distribution_api_send_response($this, $response, $authorized) {
+function fn_smart_distribution_api_send_response($_this, $response, $authorized) {
 	//fn_write_r($response->body);
 }
 
@@ -687,4 +687,33 @@ function fn_smart_distribution_place_order($order_id, $action, $order_status, $c
 			'company_id' => $order_info['company_id'],
 		), 'A', $company_lang_code);
 	}
+}
+
+function fn_smart_distribution_get_notification_rules(&$force_notification, $params, $disable_notification) {
+    $force_notification = array();
+    if ($disable_notification) {
+        $force_notification = array('C' => false, 'A' => false, 'V' => false);
+    } else {
+        if (!empty($params['notify_user']) || $params === true) {
+            $force_notification['C'] = true;
+        } else {
+            if (AREA == 'A' || Registry::get('runtime.controller') == 'sd_exim_1c') {
+                $force_notification['C'] = false;
+            }
+        }
+        if (!empty($params['notify_department']) || $params === true) {
+            $force_notification['A'] = true;
+        } else {
+            if (AREA == 'A' || Registry::get('runtime.controller') == 'sd_exim_1c') {
+                $force_notification['A'] = false;
+            }
+        }
+        if (!empty($params['notify_vendor']) || $params === true) {
+            $force_notification['V'] = true;
+        } else {
+            if (AREA == 'A' || Registry::get('runtime.controller') == 'sd_exim_1c') {
+                $force_notification['V'] = false;
+            }
+        }
+    }
 }

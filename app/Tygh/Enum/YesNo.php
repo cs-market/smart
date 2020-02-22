@@ -12,15 +12,41 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
+/**
+ * Class YesNo contains possible values of boolean type used in the database.
+ *
+ * @package Tygh\Enum
+ */
+class YesNo
+{
+    const YES = 'Y';
+    const NO = 'N';
 
-Tygh::$app->register(new ServiceProvider());
+    /**
+     * Converts value to the string representation.
+     *
+     * @param bool|string $val
+     *
+     * @return string
+     */
+    public static function toId($val)
+    {
+        return $val === true || $val === self::YES
+            ? YesNo::YES
+            : YesNo::NO;
+    }
 
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+    /**
+     * Converts value to the boolean representation.
+     *
+     * @param bool|string $val
+     *
+     * @return bool
+     */
+    public static function toBool($val)
+    {
+        return $val === true || $val === self::YES;
+    }
+}

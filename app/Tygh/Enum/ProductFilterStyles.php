@@ -12,15 +12,27 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
+/**
+ * ProductFilterStyles contains possible values for filter style
+ *
+ * @package Tygh\Enum
+ */
+class ProductFilterStyles
+{
+    const CHECKBOX = 'checkbox';
+    const SLIDER = 'slider';
+    const COLOR = 'color';
+    const DATE = 'date';
 
-Tygh::$app->register(new ServiceProvider());
-
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+    public static function getAllStyles()
+    {
+        return [
+            self::CHECKBOX,
+            self::SLIDER,
+            self::COLOR,
+            self::DATE,
+        ];
+    }
+}

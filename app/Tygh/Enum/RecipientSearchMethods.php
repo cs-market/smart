@@ -12,15 +12,16 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+namespace Tygh\Enum;
 
-use Tygh\Addons\StorefrontRestApi\ServiceProvider;
-
-Tygh::$app->register(new ServiceProvider());
-
-fn_register_hooks(
-    'api_handle_request',
-    'api_check_access',
-    'api_get_user_data',
-    'fill_auth'
-);
+/**
+ * Class RecipientSearchMethods contains possible search methods for Notifications center.
+ *
+ * @package Tygh\Enum
+ */
+class RecipientSearchMethods
+{
+    const USER_ID = 'user_id';
+    const USERGROUP_ID = 'usergroup_id';
+    const EMAIL = 'email';
+}

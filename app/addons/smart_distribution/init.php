@@ -33,5 +33,6 @@ fn_register_hooks(
 	'update_product_pre',
 	'get_product_features_list_before_select',
 	'shippings_get_shippings_list_conditions',
-	'place_order'
+	'place_order',
+	'get_notification_rules'
 );

@@ -14,6 +14,8 @@
 
 namespace Tygh\Api;
 
+use Tygh\Languages\Languages;
+
 abstract class AEntity
 {
     /**
@@ -307,4 +309,32 @@ abstract class AEntity
         }
     }
 
+    /**
+     * Provides valid language code based on the 'lang_code' request parameter.
+     * Falls back to the default area language code if none of the provided language codes is valid.
+     *
+     * @param array  $params                Request parameters
+     * @param string $default_languade_code Language code to use if the 'lang_code' parameter is not present in the
+     *                                      request
+     *
+     * @return string Valid language code
+     */
+    protected function getLanguageCode($params, $default_languade_code = DEFAULT_LANGUAGE)
+    {
+        $languages = Languages::getAvailable([
+            'area'           => $this->area,
+            'include_hidden' => $this->area === 'A',
+        ]);
+        $lang_code = $this->safeGet($params, 'lang_code', $default_languade_code);
+
+        if (isset($languages[$lang_code])) {
+            return $lang_code;
+        }
+
+        if (isset($languages[$default_languade_code])) {
+            return $default_languade_code;
+        }
+
+        return DEFAULT_LANGUAGE;
+    }
 }
