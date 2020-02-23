@@ -1,13 +1,12 @@
 <?php
 
-// use Tygh\Registry;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 //  [HOOKs]
-function fn_pay_by_points_pre_add_to_cart(&$product_data, $cart, $auth, &$update)
+function fn_pay_by_points_pre_add_to_cart($product_data, $cart, $auth, $update)
 {
-  Tygh::$app['session']['cart']['pay_by_points']['in_use'] = 0;
+  $product_ids = fn_array_column($product_data, 'product_id');
+  fn_update_use_pay_by_points($product_ids);
 }
 
 function fn_pay_by_points_check_add_to_cart_post($cart, $product, $product_id, &$result)
@@ -40,12 +39,13 @@ function fn_pay_by_points_add_product_to_cart_get_price($product_data, &$cart, $
     $amount += $cart['products'][$_id]['amount'];
     fn_delete_cart_product($cart, $_id);
   }
+  fn_update_use_pay_by_points([$product_id]);
 
   $available_points = fn_get_available_points();
   $product_cart_point_price = $amount * $price;
 
   if ($product_cart_point_price > $available_points) {
-    //  increase amount or disallow add to cart
+    //  decrease amount or disallow add to cart
     $new_amount = floor($available_points / $price);
 
     if ($new_amount > 0) {
@@ -64,8 +64,8 @@ function fn_pay_by_points_add_product_to_cart_get_price($product_data, &$cart, $
         'pay_by_points__notification__not_enough_points',
         ['%product%' => fn_get_product_name($product_id)]
       ));
+      fn_delete_cart_product($cart, $_id);
       $allow_add = false;
-      return;
     }
   }
 
@@ -99,59 +99,9 @@ function fn_pay_by_points_get_cart_product_data($product_id, &$_pdata, $product,
 
 function fn_pay_by_points_post_add_to_cart($product_data, &$cart, $auth, $update, $ids)
 {
-  //  update point info
-  $total_use_points = 0;
-  foreach ($cart['products'] as $product) {
-    if (
-      isset($product['extra']['pay_by_points'])
-      && $product['extra']['pay_by_points']['product_cart_point_price']
-    ) {
-      $total_use_points += $product['extra']['pay_by_points']['product_cart_point_price'];
-    }
-  }
-
-  $cart['pay_by_points']['in_use'] = $total_use_points;
+  fn_update_use_pay_by_points();
 }
 //  [/HOOKs]
-
-/*
- * If exist in cart, user cart amount
- * otherwise use new product data
- * $cart_products Array of products from session cart
- * $cart_id Int add to cart data id
- * $product Array add to cart data
- * Return [bounus_price, update_status]
- */
-// function fn_get_pre_order_bonus_product_price($cart_products, $cart_id, $product)
-// {
-//   $update = isset($cart_products[$cart_id]);
-//   $pr = $update ? $cart_products[$cart_id] : $product;
-//
-//   return [
-//     $pr['amount'] * $pr['base_price'],
-//     $update
-//   ];
-// }
-
-// /*
-//  * Increase or decrease total use bounus data
-//  * and change use_bonus_pay product data value
-//  * $product Array
-//  * $increase Bool increase | decrease
-//  */
-// function fn_change_total_in_use_bonus(&$product, $increase = true)
-// {
-//   $product['extra']['pay_by_points']['use_bonus_pay'] = $increase ? true : false;
-//
-//   $bonus = ($increase ? 1 : -1) *  $product['extra']['pay_by_points']['product_cart_point_price'];
-//   fn_print_r(Tygh::$app['session']['cart']['points_info']);
-//   fn_print_die("z");
-// // $cart['points_info']['total_price']
-//   Tygh::$app['session']['cart']['points_info']['in_use']['points'] = max(
-//     Tygh::$app['session']['cart']['points_info']['in_use']['points'] + $bonus,
-//     0
-//   );
-// }
 
 /*
  * Get avvaileble point
@@ -160,9 +110,30 @@ function fn_pay_by_points_post_add_to_cart($product_data, &$cart, $auth, $update
  */
 function fn_get_available_points()
 {
-  // FIXME: mb add fnc, availble points - points for curent pr
   return max(
     Tygh::$app['session']['cart']['user_data']['points'] - Tygh::$app['session']['cart']['pay_by_points']['in_use'],
     0
   );
+}
+
+/*
+ * Update point info
+ * unclude product list
+ * use session
+ * $disallow_products array product_ids
+ * return void
+ */
+function fn_update_use_pay_by_points($disallow_products = [])
+{
+  $total_use_points = 0;
+  foreach (Tygh::$app['session']['cart']['products'] as $product) {
+    if (
+      !in_array($product['product_id'], $disallow_products)
+      && isset($product['extra']['pay_by_points'])
+      && $product['extra']['pay_by_points']['product_cart_point_price']
+    ) {
+      $total_use_points += $product['extra']['pay_by_points']['product_cart_point_price'];
+    }
+  }
+  Tygh::$app['session']['cart']['pay_by_points']['in_use'] = $total_use_points;
 }
