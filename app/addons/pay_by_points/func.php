@@ -97,7 +97,12 @@ function fn_pay_by_points_get_cart_product_data($product_id, &$_pdata, $product,
   }
 }
 
-function fn_pay_by_points_post_add_to_cart($product_data, &$cart, $auth, $update, $ids)
+function fn_pay_by_points_post_add_to_cart($product_data, $cart, $auth, $update, $ids)
+{
+  fn_update_use_pay_by_points();
+}
+
+function fn_pay_by_points_save_cart_content_pre($cart, $user_id, $type, $user_type)
 {
   fn_update_use_pay_by_points();
 }

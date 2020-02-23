@@ -8,5 +8,6 @@ fn_register_hooks(
   'add_product_to_cart_get_price',
   'add_to_cart',
   'get_cart_product_data',
-  'post_add_to_cart'
+  'post_add_to_cart',
+  'save_cart_content_pre'
 );
