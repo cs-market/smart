@@ -5,6 +5,8 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 fn_register_hooks(
   'pre_add_to_cart',
   'check_add_to_cart_post',
+  'add_product_to_cart_get_price',
   'add_to_cart',
-  'get_cart_product_data'
+  'get_cart_product_data',
+  'post_add_to_cart'
 );

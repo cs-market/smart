@@ -38,4 +38,8 @@ msgstr "Товар %product% не доступен для оплаты балл�
 msgctxt "Languages::pay_by_points__notification__not_enough_points"
 msgid "pay_by_points__notification__not_enough_points"
 msgstr "Недостаточно баллов для оплаты %product%"
+
+msgctxt "Languages::pay_by_points__notification__change_amount"
+msgid "pay_by_points__notification__change_amount"
+msgstr "%product% Недостаточно баллов для оплаты %old_amount%шт, в корзину добавленно %new_amount%шт"
 #  /NOTIFICATIONS
