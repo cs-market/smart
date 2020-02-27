@@ -106,6 +106,55 @@ function fn_pay_by_points_save_cart_content_pre($cart, $user_id, $type, $user_ty
 {
   fn_update_use_pay_by_points();
 }
+
+function fn_pay_by_points_pre_place_order(&$cart, $allow, &$product_groups)
+{
+  foreach($product_groups as $group_id => $group) {
+
+    $bonus_products = [];
+
+    foreach($group['products'] as $cart_id => $product) {
+      if (
+        isset($product['extra']['pay_by_points']['use_bonus_pay'])
+        && $product['extra']['pay_by_points']['use_bonus_pay']
+      ) {
+        $bonus_products[$cart_id] = $product;
+        unset($product_groups[$group_id]['products'][$cart_id]);
+      }
+    }
+
+    //  clone group for separate order isset bonus products
+    if ($bonus_products) {
+      $new_group = $group;
+      $new_group['products'] = $bonus_products;
+      $product_groups[] = $new_group;
+    }
+  }
+}
+
+function fn_pay_by_points_get_orders_post($params, &$orders)
+{
+  foreach ($orders as &$order) {
+    $order['total_bonus'] = fn_get_order_total_bonus($order['order_id']);
+  }
+  unset($order);
+}
+
+function fn_pay_by_points_get_order_info(&$order, $additional_data)
+{
+  $total_bonus = 0;
+
+  foreach ($order['products'] as $product) {
+    if (
+      isset($product['extra']['pay_by_points']['product_cart_point_price'])
+    ) {
+      $total_bonus += $product['extra']['pay_by_points']['product_cart_point_price'];
+    }
+  }
+  unset($product);
+
+  $order['total_bonus'] = $total_bonus;
+}
 //  [/HOOKs]
 
 /*
@@ -134,11 +183,33 @@ function fn_update_use_pay_by_points($disallow_products = [])
   foreach (Tygh::$app['session']['cart']['products'] as $product) {
     if (
       !in_array($product['product_id'], $disallow_products)
-      && isset($product['extra']['pay_by_points'])
+      && isset($product['extra']['pay_by_points']['product_cart_point_price'])
       && $product['extra']['pay_by_points']['product_cart_point_price']
     ) {
       $total_use_points += $product['extra']['pay_by_points']['product_cart_point_price'];
     }
   }
   Tygh::$app['session']['cart']['pay_by_points']['in_use'] = $total_use_points;
+}
+
+/*
+ * Get order total bonus info
+ *
+ * $order_id Int
+ * return $total_bonus Int
+ */
+function fn_get_order_total_bonus($order_id)
+{
+  $total_bonus = 0;
+  $datas = db_get_fields("SELECT extra FROM ?:order_details WHERE order_id = ?i", $order_id);
+
+  foreach ($datas as $data) {
+    $data = unserialize($data);
+
+    if (isset($data['pay_by_points']['product_cart_point_price'])) {
+      $total_bonus += $data['pay_by_points']['product_cart_point_price'];
+    }
+  }
+
+  return $total_bonus;
 }
