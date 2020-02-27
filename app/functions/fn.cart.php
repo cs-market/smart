@@ -1543,7 +1543,7 @@ function fn_mark_payment_started($order_id)
     );
 
     db_query("REPLACE INTO ?:order_data ?e", $payment_data);
-
+    
     return $payment_data;
 }
 
@@ -2020,7 +2020,7 @@ function fn_get_order_info($order_id, $native_language = false, $format_info = t
                             fn_array_combine(fn_array_column($source_options, $option_id_key), $source_options),
                             true
                         );
-
+                        
                     }
 
                     $product_options_value = ($skip_static_values == false && !empty($v['extra']['product_options_value'])) ? $v['extra']['product_options_value'] : array();
@@ -3883,7 +3883,7 @@ function fn_get_customer_location($auth, $cart, $billing = false)
         }
     } else {
         $u_info = array_filter($u_info);
-
+        
         $u_info += array(
             $prefix . 'country' => Registry::get('settings.General.default_country'),
             $prefix . 'state' => Registry::get('settings.General.default_state'),
@@ -4886,7 +4886,7 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
             && $global_inventory_tracking
             && !$allow_product_preorder
         )
-        && isset($product_not_in_cart)
+        && isset($product_not_in_cart) 
         && !$product_not_in_cart
     ) {
         if (($current_amount < $min_qty || $current_amount == 0)
@@ -8261,7 +8261,7 @@ function fn_get_checkout_payment_buttons(&$cart, &$cart_products, &$auth)
     }
 
     fn_set_hook('get_checkout_payment_buttons_post', $cart, $cart_products, $auth, $checkout_buttons);
-
+    
     if (Registry::get('settings.Checkout.disable_anonymous_checkout') == 'Y'
         && empty($auth['user_id'])
         && !empty($checkout_buttons)
