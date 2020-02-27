@@ -243,7 +243,11 @@ function fn_smart_distribution_update_user_profile_pre($user_id, $user_data, $ac
 		if (!empty($user_data['managers'])) {
 			if (!is_array($user_data['managers'])) {
 				$managers = explode(',', $user_data['managers']);
+			} else {
+				$managers = array_column($user_data['managers'], 'user_id');
 			}
+
+			// API OPERATES BY EMAILS!
 			if (defined('API')) {
 				$managers = db_get_fields(
 				"SELECT user_id FROM ?:users WHERE email IN (?a)",
@@ -251,10 +255,10 @@ function fn_smart_distribution_update_user_profile_pre($user_id, $user_data, $ac
 				);
 			}
 			foreach ($managers as $m_id) {
-				$udata[] = array('vendor_manager' => $m_id, 'customer_id' => $user_data['user_id']);
+				if ($m_id) $udata[] = array('vendor_manager' => $m_id, 'customer_id' => $user_data['user_id']);
 			}
 
-			db_query('INSERT INTO ?:vendors_customers ?m', $udata);
+			if (!empty($udata)) db_query('INSERT INTO ?:vendors_customers ?m', $udata);
 		}
 	}
 }
