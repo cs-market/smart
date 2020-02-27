@@ -33,3 +33,11 @@ var/langs/en/*
 var/langs/ru/*
 !var/langs/en/addons/
 !var/langs/ru/addons/
+
+!var/themes_repository/
+var/themes_repository/*
+!var/themes_repository/responsive/
+var/themes_repository/responsive/*
+!var/themes_repository/responsive/templates/
+var/themes_repository/responsive/templates/*
+!var/themes_repository/responsive/templates/addons/

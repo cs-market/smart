@@ -1,0 +1,1 @@
+{script src="js/addons/rus_customer_geolocation/locator.js"}

@@ -1,0 +1,1 @@
+{style src="addons/ecl_cross_selling/styles.less"}
