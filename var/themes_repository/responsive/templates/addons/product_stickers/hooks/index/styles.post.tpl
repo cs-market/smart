@@ -1,0 +1,1 @@
+{style src="addons/product_stickers/styles.css"}
