@@ -849,7 +849,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
 
                 fn_calculate_cart_content($cart, $customer_auth);
-                if (!fn_cart_is_empty($cart)) {
+                if (!fn_cart_is_empty($cart) && $order_info['company_id'] != 12) {
                     fn_place_order($cart, $customer_auth, 'save');
                 }
 
