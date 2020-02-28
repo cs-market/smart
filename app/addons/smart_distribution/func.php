@@ -721,3 +721,45 @@ function fn_smart_distribution_get_notification_rules(&$force_notification, $par
         }
     }
 }
+
+function fn_render_xml_from_array($data, $parent_tag = '', $parent_attributes = '') {
+	$rendered = '';
+	if (is_array($data)) {
+		foreach ($data as $tag => $value) {
+			if (is_numeric($tag)) {
+				$is_numeric = true;
+				$tag = $parent_tag;
+				$attributes = $parent_attributes;
+			}
+			if (!is_array($value)) {
+				$rendered .= fn_render_xml_from_array($value, $tag, $attributes);
+			} else {
+				if (isset($value['@attributes'])) {
+					$attributes = '';
+					foreach ($value['@attributes'] as $attr_name => $attr) {
+						$attributes .= ' ' . $attr_name . '="' . $attr . '"';
+					}
+					unset($value['@attributes']);
+					if (empty($value)) {
+						$value = '';
+					}
+				}
+
+				$tag_content = fn_render_xml_from_array($value, $tag, $attributes);
+				if (!empty($value) && !is_numeric(key($value))) {
+					$rendered .= fn_render_xml_from_array($tag_content, $tag, $attributes);
+				} else {
+					$rendered .= $tag_content;
+				}
+			}
+		}
+	} else {
+		if (trim($data) != '') {
+			$rendered .= "<$parent_tag$parent_attributes>$data</$parent_tag>";
+		} else {
+			$rendered .= "<$parent_tag$parent_attributes/>";
+		}
+	}
+
+	return $rendered;
+}
