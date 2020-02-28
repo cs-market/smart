@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>monolith</id>
+	<version>1.0.1</version>
+	<default_language>en</default_language>
+	<priority>100</priority>
+	<status>active</status>
+	<name>Smart distribution: Monolith</name>
+	<description></description>
+	<translations> 
+		<item for="name" lang="ru">Smart distribution: Монолит</item>
+	</translations>
+	<settings>
+		<sections>
+			<section id="general">
+				<items>
+					<item id="company_ids">
+						<type>input</type>
+						<name>Allowed company ids</name>
+						<default_value>45</default_value>
+					</item>
+					<item id="environment_url">
+						<type>input</type>
+						<name>Environment url</name>
+						<default_value>monxweb.baltika.ru/xTest/xDataLink/xDataLink.asmx/Request</default_value>
+					</item>
+					<item id="gate_code">
+						<type>input</type>
+						<name>Gate code</name>
+						<default_value>DS2501</default_value>
+					</item>
+					<item id="order_prefix">
+						<type>input</type>
+						<name>Order prefix</name>
+						<default_value>Smart.</default_value>
+					</item>
+				</items>
+			</section>
+		</sections>
+	</settings>
+</addon>
