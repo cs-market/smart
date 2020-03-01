@@ -13,5 +13,6 @@ fn_register_hooks(
   'pre_place_order',
   'get_orders_post',
   'get_order_info',
-  'change_order_status'
+  'change_order_status',
+  'calculate_cart_post'
 );

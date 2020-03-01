@@ -185,6 +185,11 @@ function fn_pay_by_points_change_order_status($status_to, $status_from, &$order_
 
   $order_info['points_info']['in_use']['points'] = $total_bonus;
 }
+
+function fn_pay_by_points_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups)
+{
+  $cart['pay_by_points']['reward'] = fn_get_use_pay_by_points();
+}
 //  [/HOOKs]
 
 /*
@@ -209,6 +214,11 @@ function fn_get_available_points()
  */
 function fn_update_use_pay_by_points($disallow_products = [])
 {
+  Tygh::$app['session']['cart']['pay_by_points']['in_use'] = fn_get_use_pay_by_points($disallow_products);
+}
+
+function fn_get_use_pay_by_points($disallow_products = [])
+{
   $total_use_points = 0;
   foreach (Tygh::$app['session']['cart']['products'] as $product) {
     if (
@@ -219,7 +229,8 @@ function fn_update_use_pay_by_points($disallow_products = [])
       $total_use_points += $product['extra']['pay_by_points']['product_cart_point_price'];
     }
   }
-  Tygh::$app['session']['cart']['pay_by_points']['in_use'] = $total_use_points;
+
+  return $total_use_points;
 }
 
 /*
