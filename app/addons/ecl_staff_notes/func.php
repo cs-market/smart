@@ -34,7 +34,7 @@ function fn_update_staff_notes($params, $auth = array())
 
 function fn_ecl_check_staff_notes_privilege($priv = '')
 {
-	if (ACCOUNT_TYPE != 'admin') {
+	if (ACCOUNT_TYPE != 'admin' && ACCOUNT_TYPE != 'vendor') {
 		return false;
 	}
 	if ($_SESSION['auth']['is_root'] != 'Y' && !empty($_SESSION['auth']['usergroup_ids'])) {
