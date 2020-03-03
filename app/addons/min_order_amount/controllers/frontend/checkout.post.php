@@ -20,7 +20,7 @@ if ($mode == 'checkout') {
 	} else {
 		foreach ($cart['product_groups'] as $group) {
 			$min_order_amount = db_get_field('SELECT min_order_amount FROM ?:companies WHERE company_id = ?i', $group['company_id']);
-			if ($min_order_amount && $min_order_amount > $group['package_info']['C']) {
+			if ($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total']) {
 				Tygh::$app['view']->assign('value', $min_order_amount);
 				$min_amount = Tygh::$app['view']->fetch('common/price.tpl');
 				fn_set_notification('W', __('notice'), __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('with_company') . ' ' . $group['name']);
