@@ -41,12 +41,14 @@ function fn_pay_by_points_add_product_to_cart_get_price($product_data, &$cart, $
   }
   fn_update_use_pay_by_points([$product_id]);
 
+  $reward_point_product_price = fn_get_price_in_points($product_id, $auth) ?: $price;
+
   $available_points = fn_get_available_points();
-  $product_cart_point_price = $amount * $price;
+  $product_cart_point_price = $amount * $reward_point_product_price;
 
   if ($product_cart_point_price > $available_points) {
     //  decrease amount or disallow add to cart
-    $new_amount = floor($available_points / $price);
+    $new_amount = floor($available_points / $reward_point_product_price);
 
     if ($new_amount > 0) {
       fn_set_notification('N', __('notice'), __(
@@ -58,7 +60,7 @@ function fn_pay_by_points_add_product_to_cart_get_price($product_data, &$cart, $
         ]
       ));
       $amount = $new_amount;
-      $product_cart_point_price = $amount * $price;
+      $product_cart_point_price = $amount * $reward_point_product_price;
     } else {
       fn_set_notification('E', __('error'), __(
         'pay_by_points__notification__not_enough_points',
