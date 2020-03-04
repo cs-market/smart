@@ -14,6 +14,7 @@ fn_register_hooks(
 	'get_users_post',
 	'get_user_info_before',
 	'get_user_info',
+	'update_user_pre',
 	'update_user_profile_pre',
 	'update_profile',
 	'gather_additional_product_data_post',

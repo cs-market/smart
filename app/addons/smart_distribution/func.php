@@ -173,7 +173,8 @@ function fn_smart_distribution_get_users_pre(&$params, $auth, $items_per_page, $
 		$params['exclude_user_types'] = array('V');
 	}
 }
-function fn_smart_distribution_get_users(&$params, $fields, $sortings, &$condition, &$join, $auth) {
+function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condition, &$join, $auth) {
+	$fields[] = 'last_update';
 	if (!empty($params['managers'])) {
 		if (!is_array($params['managers'])) {
 			$managers = explode(',', $params['managers']);
@@ -231,6 +232,10 @@ function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user
 function fn_smart_distribution_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
 	// get managers for single user
 	$user_data['managers'] = fn_smart_distribution_get_managers(array('user_id' => $user_id));
+}
+
+function fn_smart_distribution_update_user_pre($user_id, &$user_data, $auth, $ship_to_another, $notify_user) {
+	$user_data['last_update'] = time();
 }
 
 function fn_smart_distribution_update_user_profile_pre($user_id, $user_data, $action) {
