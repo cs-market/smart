@@ -768,3 +768,10 @@ function fn_render_xml_from_array($data, $parent_tag = '', $parent_attributes = 
 
 	return $rendered;
 }
+
+// remove keys for sorting in mobile application
+function fn_smart_distribution_get_product_features_list_post(&$features_list, $product, $display_on, $lang_code) {
+	if (defined('API')) {
+		$features_list = array_values($features_list);
+	}
+}
