@@ -79,7 +79,7 @@ function fn_pay_by_points_add_to_cart(&$cart, $product_id, $_id)
   $product = &$cart['products'][$_id];
 
   if (
-    isset($product['extra']['pay_by_points'])
+    isset($product['extra']['pay_by_points']['allowed_bonus_pay'])
     && $product['extra']['pay_by_points']['allowed_bonus_pay']
   ) {
     $product['extra']['pay_by_points']['use_bonus_pay'] = true;
@@ -93,6 +93,7 @@ function fn_pay_by_points_get_cart_product_data($product_id, &$_pdata, $product,
 {
   if (
     $product['price'] == 0
+    && isset($product['extra']['pay_by_points']['use_bonus_pay'])
     && $product['extra']['pay_by_points']['use_bonus_pay']
   ) {
     $_pdata['price'] = 0;

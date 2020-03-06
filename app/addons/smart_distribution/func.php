@@ -51,7 +51,7 @@ function fn_smart_distribution_get_order_info(&$order, $additional_data) {
 		} else {
 			$order['profile_id'] = db_get_field('SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i AND s_address = ?s', $order['user_id'], $order['s_address']);
 			if (!$order['profile_id']) {
-				
+
 			}
 		}
 	}
@@ -128,12 +128,12 @@ function fn_smart_distribution_get_usergroups($params, $lang_code, $field_list, 
 		if ($company->usergroup_ids)
 		$condition .= db_quote(' AND a.usergroup_id IN (?a)', $company->usergroup_ids);
 	}
-	
+
 }
 
 function fn_smart_distribution_post_get_usergroups(&$usergroups, $type, $lang_code) {
 	$company = UG_Company::model()->current();
-	
+
 	if ($company) {
 		if ($company->usergroup_ids) {
 			$ug_uds = $company->usergroup_ids;
@@ -160,7 +160,7 @@ function fn_smart_distribution_get_managers($params = array()) {
 	 		$condition .= db_quote(" AND u.company_id = ?i", $company_id);
 	}
 	if (isset($params['user_id'])) {
-		$condition .= db_quote(" AND vc.customer_id = ?i", $params['user_id']);	
+		$condition .= db_quote(" AND vc.customer_id = ?i", $params['user_id']);
 	}
 
 	$managers = db_get_hash_array("SELECT DISTINCT(vc.vendor_manager) as user_id, u.email, IF(CONCAT(firstname, lastname) = '', email, CONCAT(firstname, ' ', lastname)) AS name, u.company_id FROM ?:vendors_customers AS vc LEFT JOIN ?:users AS u ON u.user_id = vc.vendor_manager WHERE 1 $condition", 'user_id');
@@ -192,7 +192,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condit
 		unset($condition['company_id']);
 	}
 	if (isset($params['company_id']) && !empty($params['company_id'])) {
-		$condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false, $params['company_id'], false, true) . db_quote(" OR ?:users.user_id IN (?n) )", fn_get_company_customers_ids($params['company_id']));
+		$condition['sd_condition'] = ' AND (' . fn_get_company_condition('?:users.company_id', false, $params['company_id'], false, true) . db_quote(" OR ?:users.user_id IN (?n)" . ' )', fn_get_company_customers_ids($params['company_id']));
 	}
 	// for search in profile fields
 	if (!empty($params['search_query'])) {
@@ -217,7 +217,7 @@ function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user
 			)
 		) {
 			$condition = fn_get_company_condition('?:users.company_id');
-			
+
 			$condition = db_quote("(user_type IN (?a) $condition)", array('C', 'V'));
 			$company_customers = db_get_fields("SELECT user_id FROM ?:orders WHERE company_id = ?i", Registry::get('runtime.company_id'));
 			if ($company_customers) {
@@ -390,20 +390,20 @@ function fn_smart_distribution_api_send_response($_this, $response, $authorized)
 	//fn_write_r($response->body);
 }
 
-function fn_write_r() { 
-  static $count = 0; 
-  $args = func_get_args(); 
-  $fp = fopen('api_requests.html', 'a+'); 
-  if (!empty($args)) { 
-	fwrite($fp, '<ol style="font-family: Courier; font-size: 12px; border: 1px solid #dedede; background-color: #efefef; float: left; padding-right: 20px;">'); 
-	foreach ($args as $k => $v) { 
-	  $v = htmlspecialchars(print_r($v, true)); 
-	  if ($v == '') { $v = ' '; } 
-	  fwrite($fp, '<li><pre>' . $v . "\n" . '</pre></li>'); 
-	} 
-	fwrite($fp, '</ol><div style="clear:left;"></div>'); 
+function fn_write_r() {
+  static $count = 0;
+  $args = func_get_args();
+  $fp = fopen('api_requests.html', 'a+');
+  if (!empty($args)) {
+	fwrite($fp, '<ol style="font-family: Courier; font-size: 12px; border: 1px solid #dedede; background-color: #efefef; float: left; padding-right: 20px;">');
+	foreach ($args as $k => $v) {
+	  $v = htmlspecialchars(print_r($v, true));
+	  if ($v == '') { $v = ' '; }
+	  fwrite($fp, '<li><pre>' . $v . "\n" . '</pre></li>');
+	}
+	fwrite($fp, '</ol><div style="clear:left;"></div>');
   }
-  $count++; 
+  $count++;
 }
 
 
@@ -450,7 +450,7 @@ function fn_smart_distribution_update_category_pre(&$category_data, $category_id
 			$category_data['usergroup_ids'] = explode(',',$usergroup_ids);
 		}
 		$category_data['add_category_to_vendor_plan'] = $preset['company_id'];
-		
+
 	}
 }
 
@@ -547,7 +547,7 @@ function fn_smart_distribution_vendor_communication_add_thread_message_post( $th
 			$result = fn_vendor_communication_send_email_notification($email_data);
 		}
 	}
-} 
+}
 
 function fn_sd_add_product_to_wishlist($product_data, &$wishlist, &$auth)
 {
@@ -624,7 +624,7 @@ function fn_sd_add_product_to_wishlist($product_data, &$wishlist, &$auth)
 		}
 	}
 }
-function fn_smart_distribution_pre_update_order($cart, $order_id) {
+function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
 	$wishlist = & Tygh::$app['session']['wishlist'];
 	$auth = & Tygh::$app['session']['auth'];
 	$product_data = array();
@@ -635,6 +635,11 @@ function fn_smart_distribution_pre_update_order($cart, $order_id) {
 		);
 	}
 	$product_ids = fn_sd_add_product_to_wishlist($product_data, $wishlist, $auth);
+
+	//	original products
+	if (isset($cart['original_products'])) {
+		$cart['products'] = fn_diff_original_products($cart['original_products'], $cart['products']);
+	}
 }
 
 // for exim to escape /n at the end
@@ -774,4 +779,43 @@ function fn_smart_distribution_get_product_features_list_post(&$features_list, $
 	if (defined('API')) {
 		$features_list = array_values($features_list);
 	}
+}
+
+function fn_smart_distribution_form_cart($order_info, &$cart, $auth) {
+	$cart['original_products'] = $order_info['products'];
+}
+
+function fn_smart_distribution_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
+	if (isset($cart['original_products'])) {
+	  $cart_products = fn_diff_original_products($cart['original_products'], $cart['products']);
+	}
+}
+
+function fn_smart_distribution_update_cart_by_data_post(&$cart, $new_cart_data, $auth) {
+	if (isset($cart['original_products']) && AREA == 'A') {
+		foreach($new_cart_data['cart_products'] as $key => $product) {
+			if (isset($cart['original_products'][$key])) {
+				if ($product['amount'] == 0) {
+					$cart['products'][$key]['amount'] = 0;
+				} else {
+					$cart['original_products'][$key]['change_amount'] = $product['amount'];
+				}
+			}
+		}
+	}
+}
+
+function fn_diff_original_products($original_products, $products)
+{
+	$diff_product = array_diff_key($original_products, $products);
+
+	if ($diff_product) {
+		array_walk($diff_product, function(&$p) {
+			$p['amount'] = $p['change_amount'] ?? 0;
+		});
+
+		$products = fn_array_merge($diff_product, $products);
+	}
+
+	return $products;
 }
