@@ -662,6 +662,34 @@ if ($mode == 'sync') {
 		}
 	}
 	fn_print_die($users);
+} elseif ($mode == 'cleanup_orders') {
+	$max = 42772;
+
+	$current = ($_SESSION['current_order_id']) ? $_SESSION['current_order_id'] : 0;
+	
+	$payment_info = db_get_hash_single_array("SELECT data, order_id FROM ?:order_data WHERE type = 'G' AND order_id > ?i ORDER BY order_id limit 500", array('order_id', 'data'), $current);
+
+	$payment_info = array_map('unserialize', $payment_info);
+
+	foreach ($payment_info as $order_id => &$info) {
+		if ($info[0]['products'])
+		foreach ($info[0]['products'] as &$product) {
+			unset($product['main_pair']);	
+		}
+	}
+
+	$payment_info = array_map('serialize', $payment_info);
+	foreach ($payment_info as $order_id => $data) {
+		db_query("UPDATE ?:order_data SET data = ?s WHERE order_id = ?i AND type = 'G'", $data, $order_id);
+	}
+	$_SESSION['current_order_id'] = max(array_keys($payment_info));
+	if ($_SESSION['current_order_id'] < $max) {
+		fn_print_r($_SESSION['current_order_id']);
+		fn_redirect('commerceml.cleanup_orders');
+	} else {
+		db_query("OPTIMIZE TABLE `cscart_order_data` ");
+		fn_print_die('done');
+	}
 }
 
 function fn_between($val, $pattern)
