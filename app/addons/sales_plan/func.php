@@ -195,7 +195,6 @@ function fn_generate_sales_report_old($params) {
 }
 
 function fn_generate_sales_report($params) {
-	
 	$default_params = array(
 		'delimiter' => 'S',
 		'period' => 'custom',
@@ -205,11 +204,12 @@ function fn_generate_sales_report($params) {
 		'show_null' => true,
 		'group_by' => 'day'
 	);
-
-	if (empty($params['time_from'])) unset($params['time_from']);
-	if (empty($params['time_to'])) unset($params['time_to']);
+		
 	if (isset($params['period']) && $params['period'] == 'A') unset($params['period']);
 	list($params['time_from'], $params['time_to']) = fn_create_periods($params);
+	if (empty($params['time_from'])) unset($params['time_from']);
+	if (empty($params['time_to'])) unset($params['time_to']);
+
 	if ($params['time_to'] > time()) $params['time_to'] = time();
 
 	if (is_array($params)) {
@@ -223,6 +223,7 @@ function fn_generate_sales_report($params) {
 		$key_function = is_callable("fn_ts_this_" . $params['group_by']) ? "fn_ts_this_" . $params['group_by'] : 'fn_ts_this_day';
 
 		$interval_id = db_get_field('SELECT interval_id FROM ?:sales_reports_intervals WHERE interval_code = ?s', $params['group_by']);
+
 		$intervals = fn_check_intervals($interval_id, $params['time_from'], $params['time_to']);
 
 		$elements_fields = $elements_condition = $elements_join = array();
@@ -243,7 +244,7 @@ function fn_generate_sales_report($params) {
 			$elements_condition['usergroup_links'] = " AND ul.status = 'A'";
 		}
 		if (!empty($params['company_id'])) {
-			list($users, ) = fn_get_users(array('company_id' => $params['company_id']));
+			list($users, ) = fn_get_users(array('company_id' => $params['company_id']), $_SESSION['auth']);
 			if (!empty($users)) $elements_condition['company_user_id'] = db_quote(' AND u.user_id IN (?a)', fn_array_column($users, 'user_id'));
 		}
 		if ($params['with_purchases'] == 'Y') {
@@ -460,6 +461,10 @@ function fn_generate_unsold_report($params) {
 	}
 
 	list($params['time_from'], $params['time_to']) = fn_create_periods($params);
+
+	if (Registry::get('runtime.company_id')) {
+		$params['company_id'] = Registry::get('runtime.company_id');
+	}
 
 	$output = array();
 	if (isset($params['is_search'])) {

@@ -41,6 +41,7 @@ $schema = array(
 		'type' => 'checkbox',
 		'name' => 'with_purchases',
 		'class' => 'clearfix',
+		'selected' => true,
 	),
 	'show_plan' => array(
 		'label' => 'sales_plan.show_plan',
