@@ -34,8 +34,8 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 			'f' => array(
 				$addon['order_prefix'] . $order_id,
 				date("Y-m-d\TH:i:s", $order_info['timestamp']),
-				$order_info['fields']['38'], 
-				$order_info['fields']['38'],
+				'', //CompanyId
+				$order_info['fields']['38'], //AddressId
 				'',
 				$order_info['user_id'],
 				date("Y-m-d\TH:i:s", $order_info['timestamp']),
@@ -80,5 +80,8 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 	}
 
 	$xml = fn_render_xml_from_array($schema);
+	if ($action == 'print') {
+		fn_print_die($xml);
+	}
 	$result = HTTP::POST($addon['environment_url'], array('XMLData'=>$xml));
 }
