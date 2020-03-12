@@ -218,6 +218,10 @@ function fn_generate_sales_report($params) {
 		$params = $default_params;
 	}
 
+	if (Registry::get('runtime.company_id')) {
+		$params['company_id'] = Registry::get('runtime.company_id');
+	}
+
 	$output = array();
 	if (isset($params['is_search'])) {
 		$key_function = is_callable("fn_ts_this_" . $params['group_by']) ? "fn_ts_this_" . $params['group_by'] : 'fn_ts_this_day';
@@ -225,6 +229,12 @@ function fn_generate_sales_report($params) {
 		$interval_id = db_get_field('SELECT interval_id FROM ?:sales_reports_intervals WHERE interval_code = ?s', $params['group_by']);
 
 		$intervals = fn_check_intervals($interval_id, $params['time_from'], $params['time_to']);
+		if ($interval_id == 5) {
+			foreach ($intervals as &$interval) {
+				$interval['description'] = date('d.m.Y', $interval['time_from']);
+			}
+		}
+		unset($interval);
 
 		$elements_fields = $elements_condition = $elements_join = array();
 		$elements_group = '';
