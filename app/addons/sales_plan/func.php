@@ -292,11 +292,13 @@ function fn_generate_sales_report($params) {
 			if (!empty($params['company_id'])) {
 				$company_condition = db_quote(' AND ?:orders.company_id = ?i', $params['company_id']);
 			}
-			$fact = db_get_hash_array("SELECT SUM(total) as total $add_field FROM ?:orders WHERE user_id = ?i AND $time_condition AND ?:orders.status != 'T' AND ?:orders.status != 'I' AND ?:orders.is_parent_order != 'Y' $group_condition $company_condition", 'interval', $element['user_id']);
+			$fact = db_get_hash_array("SELECT SUM(total) as total $add_field, count(order_id) as count FROM ?:orders WHERE user_id = ?i AND $time_condition AND ?:orders.status != 'T' AND ?:orders.status != 'I' AND ?:orders.is_parent_order != 'Y' $group_condition $company_condition", 'interval', $element['user_id']);
 
 			if ($params['only_zero'] == 'Y' && count($fact) == count($intervals)) {
-				break;
+				continue;
 			}
+
+			$plan = array(0);
 			if ($params['show_plan'] == 'Y' && $element['frequency']) {
 				$base_timestamp = max(fn_array_column($fact, 'timestamp'));
 				$element['frequency_ts'] = $element['frequency'] * SECONDS_IN_DAY;
@@ -317,8 +319,8 @@ function fn_generate_sales_report($params) {
 			$user = fn_get_user_info($element['user_id']);
 			$row = array();
 			$row[__('company_name')] = ($user['company_id']) ? fn_get_company_name($user['company_id']) : '-';
+			$row[__('date')] = date('d.m.Y', $user['timestamp']);
 			$row[__('customer')] = $user['firstname'] . (($params['show_user_id'] == 'Y') ? ' #' . $element['user_id'] : '');//fn_get_user_name($plan['user_id']);
-
 			$row[__('address')] = $user['b_address'];
 			$row[__('code')] = $user['fields'][38];
 			foreach ($intervals as $interval) {
@@ -353,16 +355,20 @@ function fn_generate_sales_report($params) {
 				}
 			}
 			if ($params['summ'] == 'Y') {
-				$fact = array_sum(fn_array_column($fact, 'total'));
-				$plan = array_sum($plan);
+				$f = array_sum(fn_array_column($fact, 'total'));
+				$p = array_sum($plan);
 
 				if ($params['show_plan'] == 'Y') {
-					$row[__('total') . ' ' . __('fact')] = $fact;
-					$row[__('total') . ' ' . __('plan')] = $plan;
-					$row[__('total') . ' %'] = round($fact/$plan*100);
+					$row[__('total') . ' ' . __('fact')] = $f;
+					$row[__('total') . ' ' . __('plan')] = $p;
+					$row[__('total') . ' %'] = ($p) ? round($f/$p*100) : 0;
 				} else {
-					$row[__('total')] = $fact;
+					$row[__('total')] = $f;
 				}
+			}
+			if ($params['amount'] == 'Y') {
+				$f = array_sum(fn_array_column($fact, 'count'));
+				$row[__('quantity')] = $f;
 			}
 
 			$output[] = $row;

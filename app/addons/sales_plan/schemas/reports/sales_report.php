@@ -30,6 +30,13 @@ $schema = array(
 		'class' => 'clearfix',
 		'selected' => true,
 	),
+	'amount' => array(
+		'label' => 'sales_plan.amount',
+		'type' => 'checkbox',
+		'name' => 'amount',
+		'class' => 'clearfix',
+		'selected' => true,
+	),
 	'only_zero' => array(
 		'label' => 'sales_plan.only_zero',
 		'type' => 'checkbox',
