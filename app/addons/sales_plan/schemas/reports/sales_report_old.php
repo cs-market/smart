@@ -9,7 +9,7 @@ $schema = array(
 	'manager' => array(
 		'label' => 'manager',
 		'type' => 'manager_selectbox',
-		'name' => 'manager',
+		'name' => 'managers',
 	),
 	'usergroup' => array(
 		'label' => 'usergroup',
@@ -30,28 +30,24 @@ $schema = array(
 		'class' => 'clearfix',
 		'selected' => true,
 	),
+	'amount' => array(
+		'label' => 'sales_plan.amount',
+		'type' => 'checkbox',
+		'name' => 'amount',
+		'class' => 'clearfix',
+		'selected' => true,
+	),
+	'average' => array(
+		'label' => 'sales_plan.average',
+		'type' => 'checkbox',
+		'name' => 'average',
+		'class' => 'clearfix',
+		'selected' => true,
+	),
 	'only_zero' => array(
 		'label' => 'sales_plan.only_zero',
 		'type' => 'checkbox',
 		'name' => 'only_zero',
-		'class' => 'clearfix',
-	),
-	'with_purchases' => array(
-		'label' => 'sales_plan.with_purchases',
-		'type' => 'checkbox',
-		'name' => 'with_purchases',
-		'class' => 'clearfix',
-	),
-	'show_plan' => array(
-		'label' => 'sales_plan.show_plan',
-		'type' => 'checkbox',
-		'name' => 'show_plan',
-		'class' => 'clearfix',
-	),
-	'show_user_id' => array(
-		'label' => 'sales_plan.show_user_id',
-		'type' => 'checkbox',
-		'name' => 'show_user_id',
 		'class' => 'clearfix',
 	),
 	'group_by' => array(
@@ -63,7 +59,7 @@ $schema = array(
 	'type' => array(
 		'type' => 'hidden',
 		'name' => 'type',
-		'value' => 'sales_report',
+		'value' => 'sales_report_old',
 	),
 	'find' => array(
 		'type' => 'button',
