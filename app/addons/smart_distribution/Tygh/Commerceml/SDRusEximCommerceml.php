@@ -27,6 +27,8 @@ use Tygh\Enum\ImagePairTypes;
 
 class SDRusEximCommerceml extends RusEximCommerceml 
 {
+    public $prices_commerseml = array();
+    
     public function importCategoriesFile($data_categories, $import_params, $parent_id = 0)
     {
         $categories_import = array();
@@ -143,6 +145,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
     public function importProductOffersFile($data_offers, $import_params)
     {
+        $prices_commerseml = &$this->prices_commerseml;
+        if (!empty(\Tygh::$app['session']['exim_1c']['prices_commerseml'])) {
+            $prices_commerseml = \Tygh::$app['session']['exim_1c']['prices_commerseml'];
+        }
         $cml = $this->cml;
         $create_prices = $this->s_commerceml['exim_1c_create_prices'];
         $schema_version = $this->s_commerceml['exim_1c_schema_version'];
@@ -151,7 +157,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         $all_currencies = $this->dataProductCurrencies();
 
-        if (isset($data_offers -> {$cml['prices_types']} -> {$cml['price_type']})) {
+        if (isset($data_offers -> {$cml['prices_types']} -> {$cml['price_type']}) && empty($prices_commerseml)) {
             $price_offers = $this->dataPriceOffers($data_offers -> {$cml['prices_types']});
 
             if ($create_prices == 'Y') {
@@ -441,6 +447,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
         } else {
             fn_echo("success\n");
             unset(\Tygh::$app['session']['exim_1c']['import_offers']);
+            unset(\Tygh::$app['session']['exim_1c']['prices_commerseml']);
         }
     }
 
@@ -889,15 +896,16 @@ class SDRusEximCommerceml extends RusEximCommerceml
             if (!$found) {
                 $name = trim(str_replace('1Ц', '', strval($_price -> {$cml['name']})));
                 $like_name = '%' . $name . '%';
-                $user_id = db_get_field('SELECT user_id FROM ?:users WHERE firstname LIKE ?l OR lastname LIKE ?l', $like_name, $like_name);
-                if (!$user_id) {
+
+                //$user_id = db_get_field('SELECT user_id FROM ?:users WHERE firstname LIKE ?l OR lastname LIKE ?l OR email LIKE ?l OR user_login LIKE ?l', $like_name, $like_name, $like_name, $like_name);
+                //if (!$user_id) {
                     list($users, ) = fn_get_users(array('search_query' => $name, 'user_type' => 'C', 'extended_search' => false), $_SESSION['auth']);
                     if (!empty($users)) {
                         $user_id = reset($users)['user_id'];
                     }
-                }
-                
+                //}
                 if ($user_id) {
+                
                     $user = reset($users);
                     $prices_commerseml[] = array(
                         'price_1c' => strval($_price -> {$cml['name']}),
@@ -908,6 +916,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
         }
+
+        Tygh::$app['session']['exim_1c']['prices_commerseml'] = $prices_commerseml;
 
         return $prices_commerseml;
     }
