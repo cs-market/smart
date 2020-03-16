@@ -20,10 +20,10 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 		'@attributes' => array('name' => 'CRMOrderParam'),
 		'r' => array(
 			'f' => array(
-				'', //date("Y-m-d\TH:i:s", $order_info['timestamp']),
+				date("Y-m-d\T00:00:00", $order_info['timestamp']),
 				1,
 				1,
-				'', //date("Y-m-d\TH:i:s", $order_info['timestamp']),
+				date("Y-m-d\T00:00:00", $order_info['timestamp']),
 			),
 		),
 	);
@@ -33,12 +33,12 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 		'r' => array(
 			'f' => array(
 				$addon['order_prefix'] . $order_id,
-				date("Y-m-d\TH:i:s", $order_info['timestamp']),
+				date("Y-m-d\T00:00:00", $order_info['timestamp']),
 				//'', //CompanyId
 				$order_info['fields']['38'], //CRMClientId
 				'123',
 				$order_info['user_id'],
-				date("Y-m-d\TH:i:s", $order_info['timestamp']),
+				date("Y-m-d\T00:00:00", $order_info['timestamp']),
 				'CustOrder',
 				'Entered',
 			),
