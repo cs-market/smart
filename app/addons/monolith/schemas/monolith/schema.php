@@ -67,16 +67,22 @@ $schema = array(
                                 ),
                                 '2' => array (
                                     '@attributes' => array (
-                                        'name' => 'CompanyId',
+                                        'name' => 'CRMClientId',
                                         'type' => 'String',
                                     ),
                                 ),
-                                '3' => array (
-                                    '@attributes' => array (
-                                        'name' => 'AddressId',
-                                        'type' => 'String',
-                                    ),
-                                ),
+                                // '2' => array (
+                                //     '@attributes' => array (
+                                //         'name' => 'CompanyId',
+                                //         'type' => 'String',
+                                //     ),
+                                // ),
+                                // '3' => array (
+                                //     '@attributes' => array (
+                                //         'name' => 'AddressId',
+                                //         'type' => 'String',
+                                //     ),
+                                // ),
                                 '4' => array (
                                     '@attributes' => array (
                                         'name' => 'WareHouseId',
@@ -126,18 +132,18 @@ $schema = array(
                                         'type' => 'Integer',
                                     ),
                                 ),
-                                '2' => array (
-                                    '@attributes' => array (
-                                        'name' => 'CRMWareHouseId',
-                                        'type' => 'String',
-                                    ),
-                                ),
-                                '3' => array (
-                                    '@attributes' => array (
-                                        'name' => 'WareHouseId',
-                                        'type' => 'String',
-                                    ),
-                                ),
+                                // '2' => array (
+                                //     '@attributes' => array (
+                                //         'name' => 'CRMWareHouseId',
+                                //         'type' => 'String',
+                                //     ),
+                                // ),
+                                // '3' => array (
+                                //     '@attributes' => array (
+                                //         'name' => 'WareHouseId',
+                                //         'type' => 'String',
+                                //     ),
+                                // ),
                                 '4' => array (
                                     '@attributes' => array (
                                         'name' => 'WareId',

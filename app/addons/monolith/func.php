@@ -20,10 +20,10 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 		'@attributes' => array('name' => 'CRMOrderParam'),
 		'r' => array(
 			'f' => array(
-				date("Y-m-d\TH:i:s", $order_info['timestamp']),
+				'', //date("Y-m-d\TH:i:s", $order_info['timestamp']),
 				1,
 				1,
-				date("Y-m-d\TH:i:s", $order_info['timestamp']),
+				'', //date("Y-m-d\TH:i:s", $order_info['timestamp']),
 			),
 		),
 	);
@@ -34,9 +34,9 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 			'f' => array(
 				$addon['order_prefix'] . $order_id,
 				date("Y-m-d\TH:i:s", $order_info['timestamp']),
-				'', //CompanyId
-				$order_info['fields']['38'], //AddressId
-				'',
+				//'', //CompanyId
+				$order_info['fields']['38'], //CRMClientId
+				'123',
 				$order_info['user_id'],
 				date("Y-m-d\TH:i:s", $order_info['timestamp']),
 				'CustOrder',
@@ -54,8 +54,8 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 				'f' => array(
 					$addon['order_prefix'] . $order_id,
 					$iterator,
-					'smart.wh1',
-					'',
+					// 'smart.wh1',
+					// '',
 					$p['product_code'],
 					'ea',
 					$p['price'],
