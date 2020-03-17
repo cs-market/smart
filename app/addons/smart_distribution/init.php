@@ -39,5 +39,7 @@ fn_register_hooks(
 	'get_product_features_list_post',
 	'form_cart',
 	'calculate_cart_post',
-	'update_cart_by_data_post'
+	'update_cart_by_data_post',
+	'get_products',
+	'get_categories'
 );

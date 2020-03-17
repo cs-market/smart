@@ -819,3 +819,46 @@ function fn_diff_original_products($original_products, $products)
 
 	return $products;
 }
+
+function fn_smart_distribution_get_products($params, $fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
+	if (Tygh::$app['session']['auth']['area'] == 'A') {
+		$condition = explode(' AND ', $condition);
+	  foreach($condition as $id => $cond) {
+	    if (strpos($cond, 'usergroup_ids') !== false
+	      || strpos($cond, 'usergroup_id') !== false
+	    ) {
+	      unset($condition[$id]);
+	    }
+	  }
+	  $condition = implode(' AND ', $condition);
+
+		$join = explode(' JOIN ', $join);
+		foreach($join as &$j) {
+			$j = explode(' AND ', $j);
+		  foreach($j as $id => $cond) {
+		    if (strpos($cond, 'usergroup_ids') !== false
+		      || strpos($cond, 'usergroup_id') !== false
+		    ) {
+		      unset($j[$id]);
+		    }
+		  }
+		  $j = implode(' AND ', $j);
+		}
+		unset($j);
+		$join = implode(' JOIN ', $join);
+	}
+}
+
+function fn_smart_distribution_get_categories($params, $join, &$condition, $fields, $group_by, $sortings, $lang_code) {
+	if (Tygh::$app['session']['auth']['area'] == 'A') {
+		$condition = explode(' AND ', $condition);
+	  foreach($condition as $id => $cond) {
+	    if (strpos($cond, 'usergroup_ids') !== false
+	      || strpos($cond, 'usergroup_id') !== false
+	    ) {
+	      unset($condition[$id]);
+	    }
+	  }
+	  $condition = implode(' AND ', $condition);
+	}
+}
