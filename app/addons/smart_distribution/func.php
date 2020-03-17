@@ -862,3 +862,22 @@ function fn_smart_distribution_get_categories($params, $join, &$condition, $fiel
 	  $condition = implode(' AND ', $condition);
 	}
 }
+
+function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, $condition) {
+	if (Tygh::$app['session']['auth']['area'] == 'A') {
+		$join = explode(' JOIN ', $join);
+		foreach($join as &$j) {
+			$j = explode(' AND ', $j);
+		  foreach($j as $id => $cond) {
+		    if (strpos($cond, 'usergroup_ids') !== false
+		      || strpos($cond, 'usergroup_id') !== false
+		    ) {
+		      unset($j[$id]);
+		    }
+		  }
+		  $j = implode(' AND ', $j);
+		}
+		unset($j);
+		$join = implode(' JOIN ', $join);
+	}
+}
