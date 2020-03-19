@@ -77,7 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 }
 
-
+if ($mode =='monolith' && !empty($action)) {
+	fn_monolith_place_order($action, 'print', '','','');
+}
 if ($mode == 'sync') {
 	$params = $_REQUEST;
 
