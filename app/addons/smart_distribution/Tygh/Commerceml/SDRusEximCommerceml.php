@@ -458,6 +458,12 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         $order_xml = $this->getOrderDataForXml($order_data, $cml);
 
+        // univita currency exception
+        if ($this->company_id == 1787) { 
+		$order_xml[$cml['currency']] = '643';
+		//unset($order_xml[$cml['currency']]);
+        }
+
         if (empty($order_data['firstname'])) {
             unset($order_data['firstname']);
         }
