@@ -39,7 +39,7 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 				'123',
 				$order_info['user_id'],
 				date("Y-m-d\T00:00:00", $order_info['timestamp']),
-				'CustOrder',
+				($order_info['company_id'] == '1804') ? 'CustReturn' : 'CustOrder',
 				'Entered',
 			),
 		),

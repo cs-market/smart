@@ -820,7 +820,7 @@ function fn_diff_original_products($original_products, $products)
 	return $products;
 }
 
-function fn_smart_distribution_get_products($params, $fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
+function fn_smart_distribution_get_products($params, &$fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
 	if (Tygh::$app['session']['auth']['area'] == 'A') {
 		$condition = explode(' AND ', $condition);
 	  foreach($condition as $id => $cond) {
@@ -846,6 +846,9 @@ function fn_smart_distribution_get_products($params, $fields, $sortings, &$condi
 		}
 		unset($j);
 		$join = implode(' JOIN ', $join);
+	}
+	if (AREA == 'A') {
+		$fields['timestamp'] = "products.timestamp";
 	}
 }
 
