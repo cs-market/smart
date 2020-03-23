@@ -80,8 +80,35 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 	}
 
 	$xml = fn_render_xml_from_array($schema);
+
+$soap = <<<EOT
+<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+<soap12:Body>
+<Request xmlns="http://www.monolit.com/xDataLink/">
+<XMLData>
+EOT;
+	$soap .= fn_html_escape($xml);
+	$soap .= <<<EOT
+</XMLData>
+</Request>
+</soap12:Body>
+</soap12:Envelope>
+EOT;
+
+	/*$result = HTTP::POST($addon['environment_url'], array('XMLData'=>$str),array(
+	    'headers' => array(
+	        'Content-type: application/soap+xml; charset=utf-8'
+	    ))
+	);*/
 	if ($action == 'print') {
-		fn_print_die($xml);
+		fn_print_die($xml, $soap);
 	}
-	$result = HTTP::POST($addon['environment_url'], array('XMLData'=>$xml));
+	$result = HTTP::POST($addon['environment_url'], $soap ,array(
+		'headers' => array(
+			'Content-type: application/soap+xml; charset=utf-8'
+		))
+	);
 }
