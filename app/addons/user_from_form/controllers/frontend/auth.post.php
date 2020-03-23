@@ -13,7 +13,9 @@ if ($mode == 'login_form') {
 
 			return $v['company_id'] == $company_id;
 		}, ARRAY_FILTER_USE_BOTH);
-		list($pages, ) = fn_get_pages(array('item_ids' => implode(',', array_keys($pages))));
-		Tygh::$app['view']->assign('registration_pages', $pages);
+		if ($pages) {
+			list($pages, ) = fn_get_pages(array('item_ids' => implode(',', array_keys($pages))));
+			Tygh::$app['view']->assign('registration_pages', $pages);
+		}
 	}
 }
