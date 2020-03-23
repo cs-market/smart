@@ -56,6 +56,11 @@ function fn_create_user_field_from_form($fields, $values)
   $field_data = [];
 
   foreach ($fields as $key => $name) {
+
+    if ($name == 'password') {
+      $name = ['password', 'password1', 'password2'];
+    }
+
     if (is_array($name)) {
       foreach ($name as $n) {
         $field_data[$n] = $values[$key];
