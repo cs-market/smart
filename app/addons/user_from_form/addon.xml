@@ -2,7 +2,7 @@
 <addon scheme="3.0">
     <id>user_from_form</id>
     <version>1.0.1</version>
-    <priority>4294967294</priority>
+    <priority>450</priority>
     <position>0</position>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
     <default_language>ru</default_language>
