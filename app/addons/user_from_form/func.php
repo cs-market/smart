@@ -31,7 +31,7 @@ function fn_user_from_form_send_form($page_data, $form_values, $result, $from, $
       '',
       $user_data,
       $auth,
-      false,   // ship_to_another
+      true,   // ship_to_another
       false   // notify_customer
   );
 
@@ -44,6 +44,9 @@ function fn_user_from_form_send_form($page_data, $form_values, $result, $from, $
 
       fn_change_usergroup_status('A', $user_id, $id);
     }
+  }
+  if ($user_id) {
+    $result = db_query("UPDATE ?:users SET status = ?s WHERE user_id = ?i", "A", $user_id);
   }
 }
 //  [HOOKs]
