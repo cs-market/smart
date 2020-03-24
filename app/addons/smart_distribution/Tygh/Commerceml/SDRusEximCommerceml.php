@@ -157,7 +157,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         $all_currencies = $this->dataProductCurrencies();
 
-        if (isset($data_offers -> {$cml['prices_types']} -> {$cml['price_type']}) && empty($prices_commerseml)) {
+        if (isset($data_offers -> {$cml['prices_types']} -> {$cml['price_type']})) {
             $price_offers = $this->dataPriceOffers($data_offers -> {$cml['prices_types']});
 
             if ($create_prices == 'Y') {
@@ -171,8 +171,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         'SELECT price_1c, type, usergroup_id FROM ?:rus_exim_1c_prices'
                     );
                 }
-
-                $prices_commerseml = $this->getPricesDataFromFile($data_offers -> {$cml['prices_types']}, $data_prices);
+                if (empty($prices_commerseml)) $prices_commerseml = $this->getPricesDataFromFile($data_offers -> {$cml['prices_types']}, $data_prices);
             }
         }
 
