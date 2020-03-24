@@ -17,5 +17,5 @@ $schema['controllers']['sales_reports']['permissions'] = true;
 $schema['controllers']['commerceml']['permissions'] = true;
 
 $schema['controllers']['usergroups']['modes']['update_status']['permissions'] = true;
-
+$schema['controllers']['tools']['modes']['update_status']['param_permissions']['table']['promotions'] = true;
 return $schema;
