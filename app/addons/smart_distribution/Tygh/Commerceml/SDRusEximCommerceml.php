@@ -902,7 +902,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
             if (!$found) {
                 $name = trim(str_replace('1Ц', '', strval($_price -> {$cml['name']})));
                 $like_name = '%' . $name . '%';
-
+                $user_id = 0;
                 //$user_id = db_get_field('SELECT user_id FROM ?:users WHERE firstname LIKE ?l OR lastname LIKE ?l OR email LIKE ?l OR user_login LIKE ?l', $like_name, $like_name, $like_name, $like_name);
                 //if (!$user_id) {
                     list($users, ) = fn_get_users(array('search_query' => $name, 'user_type' => 'C', 'extended_search' => false), $_SESSION['auth']);
