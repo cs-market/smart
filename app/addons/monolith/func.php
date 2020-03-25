@@ -5,7 +5,7 @@ use Tygh\Http;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth) {
+function fn_monolith_generate_xml($order_id) {
 	$schema = fn_get_schema('monolith', 'schema');
 	$addon = Registry::get('addons.monolith');
 	$allowed_companies = explode(',', $addon['company_ids']);
@@ -79,8 +79,10 @@ function fn_monolith_place_order($order_id, $action, $order_status, $cart, $auth
 		unset($schema['extdata']['scheme']['data']['s']['d'][3]);
 	}
 
-	$xml = fn_render_xml_from_array($schema);
+	return fn_render_xml_from_array($schema);
+}
 
+function fn_monolith_send_xml($xml) {
 $soap = <<<EOT
 <?xml version="1.0" encoding="utf-8"?>
 <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -98,17 +100,10 @@ EOT;
 </soap12:Envelope>
 EOT;
 
-	/*$result = HTTP::POST($addon['environment_url'], array('XMLData'=>$str),array(
-	    'headers' => array(
-	        'Content-type: application/soap+xml; charset=utf-8'
-	    ))
-	);*/
-	if ($action == 'print') {
-		fn_print_die($xml, $soap);
-	}
-	$result = HTTP::POST($addon['environment_url'], $soap ,array(
+	$result = HTTP::POST($addon['environment_url'], $soap, array(
 		'headers' => array(
 			'Content-type: application/soap+xml; charset=utf-8'
 		))
 	);
+	return $result;
 }
