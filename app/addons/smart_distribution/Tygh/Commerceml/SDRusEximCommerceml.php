@@ -290,9 +290,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
 
                 // [csmarket] limit pinta
-                if (in_array(Registry::get('runtime.company_id'), array(41,46))) {
+                /* if (in_array(Registry::get('runtime.company_id'), array(41,46))) {
                     unset($product['amount']);
-                }
+                }*/
 
                 $this->db->query(
                     'UPDATE ?:products SET ?u WHERE product_id = ?i',
