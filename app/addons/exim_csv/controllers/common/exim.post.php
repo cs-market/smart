@@ -7,7 +7,7 @@ if ($mode == 'cron') {
 	if (!empty($action)) {
 		$condition .= db_quote(' AND company_id = ?i', $action);
 	}
-	$companies = db_get_fields("SELECT company_id FROM ?:companies WHERE $condition");
+	$companies = db_get_fields("SELECT company_id FROM ?:companies WHERE 1 $condition");
 	foreach ($companies as $company_id) {
 		$files = fn_exim_csv_find_csvs($company_id);
 		fn_exim_csv_run_import($files, $company_id);

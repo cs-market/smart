@@ -33,9 +33,11 @@ function fn_exim_csv_marr_exim_csv_find_csvs($dir, $cid) {
 		if ($ftp) {
 			@ftp_chdir($ftp, Registry::get('addons.exim_csv_marr.input_directory'));
 			$files = ftp_nlist($ftp, '.');
+	
 			if ($files) {
 				foreach ($files as $file) {
 					if(fn_ftp_is_file($ftp, $file)) {
+						fn_mkdir($dir);
 						if (ftp_get($ftp, $dir.$file, $file, FTP_BINARY)) {
 							@ftp_delete($ftp, $file);   
 						}

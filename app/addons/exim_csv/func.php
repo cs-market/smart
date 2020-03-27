@@ -20,7 +20,7 @@ function fn_exim_csv_place_order($order_id, $action, $order_status, $cart, $auth
 			$options = array(
 				'delimiter' => 'S',
 				'output' => 'S',
-				'filename' => 'output/order_#'.$order['order_id'].'.csv',
+				'filename' => 'output/order.'.$order['order_id'].'.' . $order['fields']['38'] . '.' . $order['timestamp'] . '.csv',
 			);
 			fn_mkdir(fn_get_files_dir_path().'output/');
 			$cid = Registry::get('runtime.company_id');
@@ -110,7 +110,7 @@ function fn_exim_csv_run_import($imports, $company_id) {
 			}
 		} else {
 			if (!empty($import['import_object'])) {
-				$pattern = fn_exim_get_pattern_definition($import['import_object'], 'import');
+				$pattern = fn_exim_get_pattern_definition(strtolower($import['import_object']), 'import');
 				
 				if (!empty($pattern)) {
 					$default_params = array(
