@@ -26,6 +26,20 @@ return [
       '46' => 's_address',
       '47' => 'fax',
     ],
+    'render_document' => 60,
+    'document_map' => [
+      '56' => 'director',
+      '55' => 'k_ch',
+      '54' => 'bik',
+      '53' => 'bank',
+      '52' => 'r_ch',
+      '51' => 'ogrn',
+      '50' => 'kpp',
+      '44' => 'company',
+      '45' => 'ur_address',
+      '46' => 'mail_address',
+      '47' => 'inn'
+    ],
   ],
   '59' => [
     'page_id' => 59,
@@ -39,6 +53,32 @@ return [
       '83' => 'b_address',
       '84' => 's_address',
       '85' => 'fax',
+    ],
+    'render_document' => 60,
+    'document_map' => [
+      '93' => 'director',
+      '92' => 'k_ch',
+      '91' => 'bik',
+      '90' => 'bank',
+      '89' => 'r_ch',
+      '88' => 'ogrn',
+      '87' => 'kpp',
+      '82' => 'company',
+      '83' => 'ur_address',
+      '84' => 'mail_address',
+      '85' => 'inn'
+    ]
+  ],
+  '61' => [
+    'page_id' => 61,
+    'company_id' => 1797,
+    'usergroup_id' => [549],
+    'fields_map' => [
+      '96' => 'firstname',
+      '97' => 'password',
+      '99' => ['email', 'user_login'],
+      '98' => 'phone',
+      '100' => ['s_address', 's_address2'],
     ],
   ],
 ];
