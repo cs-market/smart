@@ -13,9 +13,14 @@
 	<language_variables>
 		<item lang="en" id="export_order_to_csv">Export orders to CSV</item>
 		<item lang="ru" id="export_order_to_csv">Экспортировать заказ в CSV</item>
+		<item lang="en" id="autoload_csv">Autoimport CSV</item>
+		<item lang="ru" id="autoload_csv">Автоматически загружать CSV</item>
 	</language_variables>
 	<queries>
 		<item>ALTER TABLE `?:companies` ADD `export_order_to_csv` char(1) NOT NULL DEFAULT 'N';</item>
 		<item for="uninstall">ALTER TABLE `?:companies` DROP `export_order_to_csv`;</item>
+
+		<item>ALTER TABLE `?:companies` ADD `autoload_csv` char(1) NOT NULL DEFAULT 'N';</item>
+		<item for="uninstall">ALTER TABLE `?:companies` DROP `autoload_csv`;</item>
 	</queries>
 </addon>
