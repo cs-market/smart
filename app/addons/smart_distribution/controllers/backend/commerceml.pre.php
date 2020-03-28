@@ -692,6 +692,76 @@ if ($mode == 'sync') {
 		db_query("OPTIMIZE TABLE `cscart_order_data` ");
 		fn_print_die('done');
 	}
+} elseif ($mode == 'load_pinta_csvs') {
+	$folder = 'load/';
+	$files = fn_get_dir_contents($folder, false, true, '.csv');
+	$company_ids = array('Пинта 1' => 41, 'Пинта 2' => 46);
+
+	foreach ($files as $file) {
+		$content = fn_exim_get_csv(array(), $folder.$file, array('validate_schema'=> false, 'delimiter' => ';') );
+		$header = array_keys(reset($content));
+		foreach ($header as &$value) {
+			if ($value == 'Алкоголь') $value = 'Крепость (ABV)';
+			if ($value == 'Тип тары') $value = 'Тип упаковки (тары)';
+		}
+		unset($value);
+		$features = db_get_array('SELECT feature_id, description FROM ?:product_features_descriptions WHERE description IN (?a)', $header);
+		foreach ($features as &$feature) {
+			if ($feature['description'] == 'Крепость (ABV)') {
+				$feature['data_id'] = 'Алкоголь';
+			} elseif ($feature['description'] == 'Тип упаковки (тары)') {
+				$feature['data_id'] = 'Тип тары';
+			} else {
+				$feature['data_id'] = $feature['description'];
+			}
+			list($feature['variants']) = fn_get_product_feature_variants(array(
+                'feature_id' => $feature['feature_id'],
+            ));
+		}
+		unset($feature);
+
+		foreach ($content as $data) {
+			$company_id = ($company_ids[$data['Продавец']]) ? $company_ids[$data['Продавец']] : $company_ids[$data['продавец']];
+			$product_id = db_get_field('SELECT product_id FROM ?:products WHERE external_id = ?i AND company_id = ?i', $data['GUID'], $company_id);
+			if (empty($product_id)) {
+				$product_id = db_get_field('SELECT product_id FROM ?:products WHERE product_code = ?s AND company_id = ?i', $data['Аритикул (код товара)'], $company_id);
+				if (empty($product_id)) {
+					$product_id = db_get_field(
+						'SELECT ?:product_descriptions.product_id FROM ?:product_descriptions LEFT JOIN ?:products ON ?:products.product_id = ?:product_descriptions.product_id WHERE ?:product_descriptions.product = ?s AND company_id = ?i', 
+						$data['Название'], 
+						$company_id
+					);
+					$u_data = array('external_id' => $data['GUID'], 'product_code' => $data['Аритикул (код товара)']);
+					db_query('UPDATE ?:products SET ?u WHERE product_id = ?i', $u_data, $product_id);
+				} else {
+					$u_data = array('external_id' => $data['GUID']);
+					db_query('UPDATE ?:products SET ?u WHERE product_id = ?i', $u_data, $product_id);
+				}
+			}
+			if (!$product_id) {
+				$unknown_products[] = $data;
+			} else {
+				$product_features = $add_new_variant = array();
+				foreach ($features as $feature) {
+					$variant = $data[$feature['data_id']];
+					$variants = fn_array_column($feature['variants'],  'variant', 'variant_id');
+
+					array_walk($variants, 'fn_trim_helper');
+
+					$variant_id = array_search(trim($variant), $variants);
+					if ($variant_id) {
+						$product_features[$feature['feature_id']] = $variant_id;
+					} else {
+						$add_new_variant[$feature['feature_id']]['variant'] = trim($variant);
+					}
+					
+				}
+				fn_update_product_features_value($product_id, $product_features, $add_new_variant, DESCR_SL);
+			}
+		}
+	}
+	fn_print_die($unknown_products);
+	fn_print_die('done');
 }
 
 function fn_between($val, $pattern)
