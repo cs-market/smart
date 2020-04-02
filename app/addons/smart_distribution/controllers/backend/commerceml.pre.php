@@ -693,6 +693,16 @@ if ($mode == 'sync') {
 		fn_print_die('done');
 	}
 } elseif ($mode == 'load_pinta_csvs') {
+	$products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id IN (?a)', array(41,46));
+	$fantoms = 0;
+	foreach ($products as $product_id ) {
+		$data = fn_get_product_data($product_id, $auth);
+		if (empty($data)) {
+			fn_delete_product($product_id);
+			$fantoms += 1;
+		}
+	}
+fn_print_r($fantoms);
 	$folder = 'load/';
 	$files = fn_get_dir_contents($folder, false, true, '.csv');
 	$company_ids = array('Пинта 1' => 41, 'Пинта 2' => 46);
@@ -711,6 +721,8 @@ if ($mode == 'sync') {
 				$feature['data_id'] = 'Алкоголь';
 			} elseif ($feature['description'] == 'Тип упаковки (тары)') {
 				$feature['data_id'] = 'Тип тары';
+			} elseif (!in_array($feature['description'], $header) && $feature['description'] == 'Объем') {
+				$feature['data_id'] = 'объем';
 			} else {
 				$feature['data_id'] = $feature['description'];
 			}
@@ -722,7 +734,9 @@ if ($mode == 'sync') {
 
 		foreach ($content as $data) {
 			$company_id = ($company_ids[$data['Продавец']]) ? $company_ids[$data['Продавец']] : $company_ids[$data['продавец']];
-			$product_id = db_get_field('SELECT product_id FROM ?:products WHERE external_id = ?i AND company_id = ?i', $data['GUID'], $company_id);
+			$product_id = db_get_field('SELECT product_id FROM ?:products WHERE external_id = ?s AND company_id = ?i', $data['GUID'], $company_id);
+			$product_id_srt = db_quote('SELECT product_id FROM ?:products WHERE external_id = ?s AND company_id = ?i', $data['GUID'], $company_id);
+			//if ($data['GUID'] == 'c0cecd75-d555-11e9-80e1-6045cba72548') fn_print_die($product_id, $data, $product_id_srt, $company_ids[$data['Продавец']], $company_ids[$data['продавец']], $company_id);
 			if (empty($product_id)) {
 				$product_id = db_get_field('SELECT product_id FROM ?:products WHERE product_code = ?s AND company_id = ?i', $data['Аритикул (код товара)'], $company_id);
 				if (empty($product_id)) {
@@ -737,6 +751,9 @@ if ($mode == 'sync') {
 					$u_data = array('external_id' => $data['GUID']);
 					db_query('UPDATE ?:products SET ?u WHERE product_id = ?i', $u_data, $product_id);
 				}
+			} else {
+				$u_data = array('product_code' => $data['Аритикул (код товара)']);
+				db_query('UPDATE ?:products SET ?u WHERE product_id = ?i', $u_data, $product_id);
 			}
 			if (!$product_id) {
 				$unknown_products[] = $data;

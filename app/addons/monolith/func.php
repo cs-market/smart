@@ -83,6 +83,7 @@ function fn_monolith_generate_xml($order_id) {
 }
 
 function fn_monolith_send_xml($xml) {
+$addon = Registry::get('addons.monolith');
 $soap = <<<EOT
 <?xml version="1.0" encoding="utf-8"?>
 <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

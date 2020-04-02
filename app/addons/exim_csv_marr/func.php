@@ -39,7 +39,9 @@ function fn_exim_csv_marr_exim_csv_find_csvs($dir, $cid) {
 					if(fn_ftp_is_file($ftp, $file)) {
 						fn_mkdir($dir);
 						if (ftp_get($ftp, $dir.$file, $file, FTP_BINARY)) {
-							@ftp_delete($ftp, $file);   
+							@ftp_delete($ftp, $file);
+							@ftp_chdir($ftp, 'Archive');
+							ftp_put($ftp, time() . '_' . $file, $dir.$file,  FTP_BINARY);
 						}
 					}
 				}
@@ -57,6 +59,7 @@ function fn_exim_csv_marr_export_order_to_csv($pattern, $options, $res, $order) 
 			if (ftp_put($ftp, fn_basename(fn_get_files_dir_path().$options['filename']), fn_get_files_dir_path().$options['filename'],  FTP_BINARY)) {
 				fn_rm(fn_get_files_dir_path().$options['filename']);
 			}
+			@ftp_close($ftp);
 		}
 	}
 }

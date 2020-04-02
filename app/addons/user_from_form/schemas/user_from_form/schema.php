@@ -81,4 +81,16 @@ return [
       '100' => ['s_address', 's_address2'],
     ],
   ],
+  '62' => [
+    'page_id' => 62,
+    'company_id' => 1805,
+    'usergroup_id' => [550],
+    'fields_map' => [
+      '106' => 'firstname',
+      '107' => 'password',
+      '109' => ['email', 'user_login'],
+      '108' => 'phone',
+      '110' => ['s_address', 's_address2'],
+    ],
+  ],
 ];

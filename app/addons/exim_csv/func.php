@@ -15,6 +15,8 @@ function fn_exim_csv_place_order($order_id, $action, $order_status, $cart, $auth
 		$pattern_id = 'order_items';
 		$layout = db_get_row("SELECT ?:exim_layouts.* FROM ?:exim_layouts LEFT JOIN ?:companies ON ?:exim_layouts.name = ?:companies.company WHERE pattern_id = ?s and company_id = ?i", $pattern_id, $order['company_id']);
 		if (!empty($layout)) {
+			$cid = Registry::get('runtime.company_id');
+			Registry::set('runtime.company_id', $order['company_id']);
 			$layout['cols'] = explode(',', $layout['cols']);
 			$pattern = fn_exim_get_pattern_definition($pattern_id, 'export');
 			$options = array(
@@ -23,8 +25,6 @@ function fn_exim_csv_place_order($order_id, $action, $order_status, $cart, $auth
 				'filename' => 'output/order.'.$order['order_id'].'.' . $order['fields']['38'] . '.' . $order['timestamp'] . '.csv',
 			);
 			fn_mkdir(fn_get_files_dir_path().'output/');
-			$cid = Registry::get('runtime.company_id');
-			Registry::set('runtime.company_id', $order['company_id']);
 			if (is_file(fn_get_files_dir_path().$options['filename'])) {
 				fn_rm(fn_get_files_dir_path().$options['filename']);
 			}
