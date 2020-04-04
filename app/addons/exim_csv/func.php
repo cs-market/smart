@@ -12,29 +12,31 @@ function fn_exim_csv_place_order($order_id, $action, $order_status, $cart, $auth
 	$order = fn_get_order_info($order_id);
 	fn_define('DB_LIMIT_SELECT_ROW', 30);
 	if (db_get_field('SELECT export_order_to_csv FROM ?:companies WHERE company_id = ?i', $order['company_id']) == 'Y') {
-		$pattern_id = 'order_items';
-		$layout = db_get_row("SELECT ?:exim_layouts.* FROM ?:exim_layouts LEFT JOIN ?:companies ON ?:exim_layouts.name = ?:companies.company WHERE pattern_id = ?s and company_id = ?i", $pattern_id, $order['company_id']);
-		if (!empty($layout)) {
-			$cid = Registry::get('runtime.company_id');
-			Registry::set('runtime.company_id', $order['company_id']);
-			$layout['cols'] = explode(',', $layout['cols']);
-			$pattern = fn_exim_get_pattern_definition($pattern_id, 'export');
-			$options = array(
-				'delimiter' => 'S',
-				'output' => 'S',
-				'filename' => 'output/order.'.$order['order_id'].'.' . $order['fields']['38'] . '.' . $order['timestamp'] . '.csv',
-			);
-			fn_mkdir(fn_get_files_dir_path().'output/');
-			if (is_file(fn_get_files_dir_path().$options['filename'])) {
-				fn_rm(fn_get_files_dir_path().$options['filename']);
+		foreach (array('orders', 'order_items') as $pattern_id) {
+			$layout = db_get_row("SELECT ?:exim_layouts.* FROM ?:exim_layouts LEFT JOIN ?:companies ON ?:exim_layouts.name = ?:companies.company WHERE pattern_id = ?s and company_id = ?i", $pattern_id, $order['company_id']);
+			if (!empty($layout)) {
+				$cid = Registry::get('runtime.company_id');
+				Registry::set('runtime.company_id', $order['company_id']);
+				$layout['cols'] = explode(',', $layout['cols']);
+				$pattern = fn_exim_get_pattern_definition($pattern_id, 'export');
+				$options = array(
+					'delimiter' => 'S',
+					'output' => 'S',
+					'force_header' => true,
+					'filename' => 'output/' . $pattern_id . '.' . $order['order_id'] . '.csv',
+				);
+				fn_mkdir(fn_get_files_dir_path().'output/');
+				if (is_file(fn_get_files_dir_path().$options['filename'])) {
+					fn_rm(fn_get_files_dir_path().$options['filename']);
+				}
+				//$pattern['func_save_content_to_file'] = 'fn_exim_csv_put_csv';
+				$pattern['condition']['conditions'] = fn_array_merge($pattern['condition']['conditions'], array('order_id' => $order['order_id']));
+				ob_start(null, 0, PHP_OUTPUT_HANDLER_REMOVABLE);
+				$res = fn_export($pattern, $layout['cols'], $options);
+				fn_set_hook('export_order_to_csv', $pattern, $options, $res, $order);
+				ob_end_clean();
+				Registry::set('runtime.company_id', $cid);
 			}
-			//$pattern['func_save_content_to_file'] = 'fn_exim_csv_put_csv';
-			$pattern['condition']['conditions'] = fn_array_merge($pattern['condition']['conditions'], array('order_id' => $order['order_id']));
-			ob_start(null, 0, PHP_OUTPUT_HANDLER_REMOVABLE);
-			$res = fn_export($pattern, $layout['cols'], $options);
-			fn_set_hook('export_order_to_csv', $pattern, $options, $res, $order);
-			ob_end_clean();
-			Registry::set('runtime.company_id', $cid);
 		}
 	}
 }
