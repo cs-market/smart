@@ -868,7 +868,7 @@ function fn_smart_distribution_get_categories($params, $join, &$condition, $fiel
 	}
 }
 
-function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, $condition) {
+function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, $condition, &$price_usergroup) {
 	if (Tygh::$app['session']['auth']['area'] == 'A') {
 		$join = explode(' JOIN ', $join);
 		foreach($join as &$j) {
@@ -885,4 +885,56 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
 		unset($j);
 		$join = implode(' JOIN ', $join);
 	}
+
+	$price_usergroup = db_quote(" AND ?:product_prices.usergroup_id = ?i", USERGROUP_ALL);
+}
+
+function fn_smart_distribution_get_usergroups_price($product_id, $usergroup_ids = array()) {
+	$usergroup_ids = empty($usergroup_ids) ? Tygh::$app['session']['auth']['usergroup_ids'] : $usergroup_ids;
+	$usergroup_ids = array_filter($usergroup_ids);
+	return db_get_field("SELECT IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE prices.product_id = ?i AND prices.usergroup_id IN (?n) ORDER BY lower_limit", $product_id, $usergroup_ids);
+}
+
+function fn_smart_distribution_get_product_data_post(&$product_data, $auth, $preview, $lang_code) {
+	if (AREA == 'C') {
+		$product_data['usergroup_price'] = fn_smart_distribution_get_usergroups_price($product_data['product_id'], $auth['usergroup_ids']);
+		if (!empty($product_data['usergroup_price'])) {
+			$product_data['price'] = $product_data['usergroup_price'];
+		}
+	}
+}
+
+function fn_smart_distribution_get_product_price_post($product_id, $amount, $auth, &$price) {
+	$usergroup_condition = db_quote(" AND ?:product_prices.usergroup_id = ?i", USERGROUP_ALL);
+
+	$price = db_get_field(
+		"SELECT MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, "
+			. "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) as price "
+		. "FROM ?:product_prices "
+		. "WHERE lower_limit <=?i AND ?:product_prices.product_id = ?i ?p "
+		. "ORDER BY lower_limit DESC LIMIT 1",
+		$amount, $product_id, $usergroup_condition
+	);
+	$usergroup_price = fn_smart_distribution_get_usergroups_price($product_id, $auth['usergroup_ids']);
+	if (!empty($usergroup_price)) {
+		$price = $usergroup_price;
+	}
+}
+
+function fn_smart_distribution_load_products_extra_data(&$extra_fields, $products, $product_ids, $params, $lang_code) {
+	if (
+	in_array('prices', $params['extend'])
+	&& $params['sort_by'] != 'price'
+	&& !in_array('prices2', $params['extend'])
+	) {
+		$extra_fields['?:product_prices']['condition'] = db_quote(
+			' AND ?:product_prices.lower_limit = 1 AND ?:product_prices.usergroup_id = ?i', USERGROUP_ALL);
+	}
+}
+
+function fn_smart_distribution_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
+	$usergroup_ids = Tygh::$app['session']['auth']['usergroup_ids'];
+	$usergroup_ids = array_filter($usergroup_ids);
+	$prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a)", 'product_id', $product_ids, 1, $usergroup_ids);
+	$products = fn_array_merge($products, $prices);
 }

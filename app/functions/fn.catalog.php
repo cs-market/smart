@@ -140,7 +140,7 @@ function fn_get_product_data($product_id, &$auth, $lang_code = CART_LANGUAGE, $f
          * @param string $lang_code Two-letter language code (e.g. 'en', 'ru', etc.)
          * @param string $condition Condition for selecting product data
          */
-        fn_set_hook('get_product_data', $product_id, $field_list, $join, $auth, $lang_code, $condition);
+        fn_set_hook('get_product_data', $product_id, $field_list, $join, $auth, $lang_code, $condition, $price_usergroup);
 
         $product_data = db_get_row("SELECT $field_list FROM ?:products LEFT JOIN ?:product_prices ON ?:product_prices.product_id = ?:products.product_id AND ?:product_prices.lower_limit = 1 ?p LEFT JOIN ?:product_descriptions ON ?:product_descriptions.product_id = ?:products.product_id AND ?:product_descriptions.lang_code = ?s ?p WHERE ?:products.product_id = ?i ?p GROUP BY ?:products.product_id", $price_usergroup, $lang_code, $join, $product_id, $condition);
 

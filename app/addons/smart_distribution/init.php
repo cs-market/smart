@@ -42,5 +42,9 @@ fn_register_hooks(
 	'update_cart_by_data_post',
 	'get_products',
 	'get_categories',
-	'get_product_data'
+	'get_product_data',
+	'get_product_data_post',
+	'get_product_price_post',
+	'load_products_extra_data',
+	'load_products_extra_data_post'
 );
