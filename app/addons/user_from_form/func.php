@@ -59,22 +59,63 @@ function fn_create_user_field_from_form($fields, $values)
 {
   $field_data = [];
 
-  foreach ($fields as $key => $name) {
+  if (isset($fields['password'])) {
+    $fields['password1'] = $fields['password'];
+    $fields['password2'] = $fields['password'];
+  }
 
-    if ($name == 'password') {
-      $name = ['password', 'password1', 'password2'];
-    }
+  $fn_check_form_const = function($key) use ($values) {
+    return $values[$key] ?? $key;
+  };
 
-    if (is_array($name)) {
-      foreach ($name as $n) {
-        $field_data[$n] = $values[$key];
+  foreach ($fields as $name => $key) {
+    if (is_array($key)) {
+      $str = '';
+      foreach ($key as $n) {
+        $str[] = $fn_check_form_const($n);
       }
+
+      $data = implode(' ', $str);
     } else {
-      $field_data[$name] = $values[$key];
+      $data = $fn_check_form_const($key);
     }
+
+    $field_data = array_merge(
+      $field_data,
+      fn_profile_field_data_array($name, $data)
+    );
   }
 
   return $field_data;
+}
+
+//  return array with key
+//    name if default
+//    [fields][field_id]
+//    [] if not fount field
+function fn_profile_field_data_array($name, $data)
+{
+  static $fields_info;
+
+  if (!$fields_info) {
+    $fields_info = db_get_hash_array("SELECT field_id, field_name, is_default FROM ?:profile_fields", 'field_name');
+  }
+
+  $return = [];
+  $id = null;
+
+  if (isset($fields_info[$name])) {
+    if ($fields_info[$name]['is_default'] == 'Y') {
+      $return[$name] = $data;
+    } else {
+      $return['fields'][$fields_info[$name]['field_id']] = $data;
+    }
+  } elseif (strpos($name, 'field_') !== false) {
+    $id = (Int) str_replace('field_', '', $name);
+    $return['fields'][$id] = $data;
+  }
+
+  return $return;
 }
 
 function fn_send_document_from_form($map, $values, $page_id, $user_id) {
