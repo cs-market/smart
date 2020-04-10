@@ -214,8 +214,8 @@ function fn_decimal_amount_post_check_amount_in_stock($product_id, &$amount, $pr
 				&& $global_inventory_tracking
 				&& !$allow_product_preorder
 			)
-			&& isset($product_not_in_cart)
-			&& !$product_not_in_cart
+			/* && isset($product_not_in_cart)
+			&& !$product_not_in_cart*/
 		) {
 			if (($current_amount < $min_qty || $current_amount == 0)
 				&& !$allow_negative_ammount
