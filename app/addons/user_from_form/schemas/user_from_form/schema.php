@@ -16,7 +16,7 @@ return [
   '56' => [
     'page_id' => 56,
     'company_id' => 16,
-    'usergroup_id' => [546],
+    'usergroup_id' => [9],
     'fields_map' => [
       '56' => 'firstname',
       '94' => 'password',
@@ -44,7 +44,7 @@ return [
   '59' => [
     'page_id' => 59,
     'company_id' => 16,
-    'usergroup_id' => [545],
+    'usergroup_id' => [542],
     'fields_map' => [
       '93' => 'firstname',
       '95' => 'password',
