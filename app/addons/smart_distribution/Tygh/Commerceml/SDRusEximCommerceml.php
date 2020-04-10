@@ -679,7 +679,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
             }
 
             // limit for pinta for Katerina
-            if (in_array($this->company_id, array(41, 46))) {
+            if (in_array($this->company_id, array(41, 46)) && $product_id) {
                 $_p = array(
                     'external_id' => $product['external_id'],
 /*                    'product' => $product['product'],
