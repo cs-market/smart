@@ -20,7 +20,6 @@ if ($mode == 'cron') {
         );
         foreach ($allowed_companies as $params['company_id']) {
             list($orders) = fn_get_orders($params);
-            fn_print_die($orders);
             if (!empty($orders)) {
                 foreach ($orders as $order) {
                     $xml = fn_monolith_generate_xml($order['order_id']);
