@@ -292,7 +292,7 @@ function fn_generate_sales_report($params) {
 			if (!empty($params['company_id'])) {
 				$company_condition = db_quote(' AND ?:orders.company_id = ?i', $params['company_id']);
 			}
-			$fact = db_get_hash_array("SELECT SUM(total) as total $add_field, count(order_id) as count FROM ?:orders WHERE user_id = ?i AND $time_condition AND ?:orders.status != 'T' AND ?:orders.status != 'I' AND ?:orders.is_parent_order != 'Y' $group_condition $company_condition", 'interval', $element['user_id']);
+			$fact = db_get_hash_array("SELECT SUM(total) as total $add_field, count(order_id) as count FROM ?:orders WHERE user_id = ?i AND $time_condition AND ?:orders.status != 'T' AND ?:orders.status != 'I' AND ?:orders.is_parent_order != 'Y' $company_condition $group_condition", 'interval', $element['user_id']);
 
 			if ($params['only_zero'] == 'Y' && count($fact) == count($intervals)) {
 				continue;

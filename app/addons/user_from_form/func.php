@@ -70,7 +70,7 @@ function fn_create_user_field_from_form($fields, $values)
 
   foreach ($fields as $name => $key) {
     if (is_array($key)) {
-      $str = '';
+      $str = [];
       foreach ($key as $n) {
         $str[] = $fn_check_form_const($n);
       }
@@ -80,7 +80,7 @@ function fn_create_user_field_from_form($fields, $values)
       $data = $fn_check_form_const($key);
     }
 
-    $field_data = array_merge(
+    $field_data = fn_array_merge(
       $field_data,
       fn_profile_field_data_array($name, $data)
     );
@@ -113,6 +113,8 @@ function fn_profile_field_data_array($name, $data)
   } elseif (strpos($name, 'field_') !== false) {
     $id = (Int) str_replace('field_', '', $name);
     $return['fields'][$id] = $data;
+  } else {
+    $return[$name] = $data;
   }
 
   return $return;

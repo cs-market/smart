@@ -659,6 +659,16 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
 		}
 		$product_data['price'] = ($qty_price > $price) ? $qty_price : $price;
 	}
+
+	// limit vendors usergroups
+	$company = UG_Company::model()->find($product_data['company_id']);
+	if ($company && !empty($company->usergroup_ids)) {
+		if (!$product_id && !$product_data['usergroup_ids']) {
+			$product_data['usergroup_ids'] = $company->usergroup_ids;
+		}
+		$allowed_ug = array_merge($company->usergroup_ids, [0,1,2]);
+		$product_data['usergroup_ids'] = array_intersect($product_data['usergroup_ids'], $allowed_ug);
+	}
 }
 
 // for update order products content by back sync from 1c

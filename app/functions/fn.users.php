@@ -42,7 +42,7 @@ function fn_get_user_info($user_id, $get_profile = true, &$profile_id = NULL)
     );
 
     $condition = '';
-
+    
     if ($user_id != Tygh::$app['session']['auth']['user_id']
         && (!fn_allowed_for('ULTIMATE')
             || Registry::ifGet('settings.Stores.share_users', 'N') === 'N'
@@ -496,7 +496,7 @@ function fn_get_simple_usergroups($type, $get_default = false, $lang_code = CART
         } elseif ($type == 'A') {
             $where .= " AND a.type = 'A'";
         }
-
+        
         // [csmarket] add condition to receive correct usergroups
         fn_set_hook('get_simple_usergroups_pre', $where);
 
