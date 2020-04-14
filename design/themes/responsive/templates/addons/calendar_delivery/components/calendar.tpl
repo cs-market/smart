@@ -34,6 +34,9 @@
                     if(now.getDay()){ m.setDate(now.getDate() + 8 - now.getDay()) } else { m.setDate(now.getDate() + 1) }
                     res = res && !((m.getDate() == date.getDate()) && (m.getMonth() == date.getMonth()));
                 {/if}
+                {if $limit_weekdays != ''}
+                    res = res && (date.getDay() == {$limit_weekdays});
+                {/if}
                 return [res];
             },
             firstDay: {if $settings.Appearance.calendar_week_format == "sunday_first"}0{else}1{/if},

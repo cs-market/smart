@@ -31,6 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$res = false;
 			}
 
+			$shipping = reset($cart['shipping']);
+			if (isset($shipping['service_params']['limit_weekday']) && $shipping['service_params']['limit_weekday'] != '' ) {
+				if (date('w', $choosed_ts) != $shipping['service_params']['limit_weekday']) {
+					$res = false;
+				}
+			}
+
 			if (!$res) {
 				if (count($cart['product_groups']) > 1)
 					fn_set_notification('N', __('notice'), __('calendar_delivery.choose_another_day_vendor') . ' ' . $c_data['company']);
