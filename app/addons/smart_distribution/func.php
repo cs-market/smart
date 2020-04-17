@@ -661,13 +661,20 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
 	}
 
 	// limit vendors usergroups
-	$company = UG_Company::model()->find($product_data['company_id']);
-	if ($company && !empty($company->usergroup_ids)) {
-		if (!$product_id && !$product_data['usergroup_ids']) {
-			$product_data['usergroup_ids'] = $company->usergroup_ids;
+	$cid = ($product_data['company_id']) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id);
+
+	if ($cid) {
+		$company = UG_Company::model()->find($cid);
+		if ($company && !empty($company->usergroup_ids)) {
+			if (!$product_id && !$product_data['usergroup_ids']) {
+				$product_data['usergroup_ids'] = $company->usergroup_ids;
+			}
+
+			if ($product_data['usergroup_ids']) {
+				$allowed_ug = array_merge($company->usergroup_ids, [0,1,2]);
+				$product_data['usergroup_ids'] = array_intersect($product_data['usergroup_ids'], $allowed_ug);
+			}
 		}
-		$allowed_ug = array_merge($company->usergroup_ids, [0,1,2]);
-		$product_data['usergroup_ids'] = array_intersect($product_data['usergroup_ids'], $allowed_ug);
 	}
 }
 

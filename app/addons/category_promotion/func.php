@@ -36,7 +36,7 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
 	if (AREA != 'A') {
 		if (!empty($params['cid'])) {
 			if (in_array(
-				$params['category_id'],
+				$params['cid'],
 				explode(',', Registry::get('addons.category_promotion.category_ids'))
 			)) {
 				$promo_params = array(
@@ -67,9 +67,18 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
 				}
 
 				$condition .= db_quote(" AND (?:categories.category_id IN (?n) OR products.product_id IN (?n))", $cids, $product_ids);
+				$params['backup_cid'] = $params['cid'];
 				unset($params['cid']);
 			}
 		}
+	}
+}
+
+function fn_category_promotion_get_products(&$params, $fields, $sortings, $condition, $join, $sorting, $group_by, $lang_code, $having) {
+	// cid necessary for mobile application
+	if (isset($params['backup_cid'])) {
+		$params['cid'] = $params['backup_cid'];
+		unset($params['backup_cid']);
 	}
 }
 

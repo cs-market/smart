@@ -1,6 +1,7 @@
 <?php
 
 use Tygh\Pdf;
+use Tygh\Registry;
 
 //  [HOOKs]
 function fn_user_from_form_send_form($page_data, $form_values, $result, $from, $sender, $attachments, $is_html, $subject)
@@ -26,7 +27,7 @@ function fn_user_from_form_send_form($page_data, $form_values, $result, $from, $
       'company_id' => $form_schema['company_id'],
     ]
   );
-
+  Registry::set('settings.General.approve_user_profiles', 'N');
   list($user_id) = fn_update_user(
       '',
       $user_data,

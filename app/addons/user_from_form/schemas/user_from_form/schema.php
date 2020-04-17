@@ -3,7 +3,7 @@
 return [
   '57' => [
     'page_id' => 57,
-    'company_id' => 16,
+    'company_id' => 1809,
     'usergroup_id' => [544],
     'fields_map' => [
        'firstname' => '57',
@@ -13,6 +13,8 @@ return [
        'email' => '60',
        'user_login' => '60',
        'address' => '61',
+       'b_address' => '61',
+       's_address' => '61',
        'b_firstname' => '57',
     ],
   ],
@@ -48,7 +50,7 @@ return [
   ],
   '59' => [
     'page_id' => 59,
-    'company_id' => 16,
+    'company_id' => 1809,
     'usergroup_id' => [542],
     'fields_map' => [
        'firstname' => '93',
@@ -119,8 +121,8 @@ return [
        'user_login' => '132',
        'phone' => '131',
        's_phone' => '131',
-       's_address' => ['133', '139', '140', '141'],
-       's_address2' => ['133', '139', '140', '141'],
+       's_address' => '133',
+       's_address2' => '133',
        's_client_code' => '9999',
        'b_client_code' => '9999',
        'b_firstname' => '129',
