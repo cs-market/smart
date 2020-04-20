@@ -55,19 +55,32 @@ function fn_calendar_delivery_exim1c_order_xml_pre(&$order_xml, $order_data, $cm
 }
 
 function fn_calendar_delivery_get_companies($params, &$fields, $sortings, $condition, $join, $auth, $lang_code, $group) {
-    $fields[] = 'tomorrow_rule';
-    $fields[] = 'tomorrow_timeslot';
+    //$fields[] = 'tomorrow_rule';
+    //$fields[] = 'tomorrow_timeslot';
+    $fields[] = 'nearest_delivery';
+    $fields[] = 'working_time_till';
+    $fields[] = 'saturday_shipping';
     $fields[] = 'sunday_shipping';
-    $fields[] = 'saturday_rule';
-    // backward compatibility
-    $fields[] = 'tomorrow_rule as after17rule';
+    $fields[] = 'monday_rule';
+    // backward compatibility remove in June 2020
+    $fields[] = "'Y' as after17rule";
+    // extra backward compatibility remove in October 2020
+    $fields[] = "'Y' as tomorrow_rule";
+    $fields[] = 'working_time_till as tomorrow_timeslot';
+    $fields[] = 'monday_rule as saturday_rule';
 }
 
 // backward compatibility
 function fn_calendar_delivery_get_company_data($company_id, $lang_code, $extra, &$fields, $join, $condition) {
-    $fields[] = 'tomorrow_rule as after17rule';
+    // remove in October 2020
+    $fields[] = "'Y' as tomorrow_rule";
+    $fields[] = 'working_time_till as tomorrow_timeslot';
+    $fields[] = 'monday_rule as saturday_rule';
+    // remove in June 2020
+    $fields[] = "'Y' as after17rule";
 }
 
+// backward compatibility remove in October 2020
 function fn_validate_tomorrow_rule($company_data) {
     $res = false;
 
@@ -79,6 +92,24 @@ function fn_validate_tomorrow_rule($company_data) {
     }
 
     return $res;
+}
+
+function fn_calendar_get_nearest_delivery_day($company_data, $get_ts = false) {
+    $res = false;
+
+    if (is_numeric($company_data)) {
+        $company_data = fn_get_company_data($company_data);
+    }
+    $nearest_delivery = $company_data['nearest_delivery'];
+    if (!empty($company_data['working_time_till']) && strtotime(date("G:i")) >= strtotime($company_data['working_time_till'])) {
+        $nearest_delivery += 1;
+    }
+    if ($get_ts) {
+        $ts = ($nearest_delivery) ? strtotime("+$nearest_delivery days") : time();
+        return $ts;
+    } else {
+        return $nearest_delivery;
+    }
 }
 
 if (!is_callable('fn_ts_this_day')) {

@@ -12,22 +12,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$delivery_date = $_REQUEST['delivery_date'];
 		foreach ($delivery_date as $company_id => $date) {
 			$res = true;
-			$choosed_ts = fn_parse_date($date, true);
+			$choosed_ts = fn_parse_date($date);
+
 			$c_data = fn_get_company_data($company_id);
-
-			$compare_ts = fn_ts_this_day(strtotime('+1 day'));
-
+			$compare_ts = fn_ts_this_day(fn_calendar_get_nearest_delivery_day($c_data, true));
+/*			$compare_ts = fn_ts_this_day(strtotime('+1 days'));
 			if (fn_validate_tomorrow_rule($c_data)) {
 				$compare_ts = fn_ts_this_day(strtotime('+2 days'));
-			}
+			}*/
+			// $f = 'w, d.m.Y H:i:s';
+			// fn_print_die(date($f, $choosed_ts), date($f, $compare_ts));
 
 			if ($choosed_ts < $compare_ts) {
+				$res = false;
+			}
+			if ($c_data['saturday_shipping'] == 'N' && date('w', $choosed_ts) == 6) {
 				$res = false;
 			}
 			if ($c_data['sunday_shipping'] == 'N' && date('w', $choosed_ts) == 0) {
 				$res = false;
 			}
-			if ($c_data['saturday_rule'] == 'N' && date('w', $choosed_ts) == 1 && ((date('w', time()) == 0) || (date('w', time()) == 6 && date('H', time()) >= 16 ))) {
+			if ($c_data['monday_rule'] == 'N' && date('w', $choosed_ts) == 1 && ((date('w', time()) == 0) || (date('w', time()) == 6 && date('H', time()) >= 16 ))) {
 				$res = false;
 			}
 

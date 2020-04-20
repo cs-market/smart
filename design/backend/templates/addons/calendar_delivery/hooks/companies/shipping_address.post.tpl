@@ -1,21 +1,27 @@
 {include file="common/subheader.tpl" title=__("calendar_delivery")}
 
 <div class="control-group">
-    <label for="elm_company_tomorrow_rule" class="control-label">{__("calendar_delivery.tomorrow_rule")}:</label>
+    <label for="elm_company_nearest_delivery" class="control-label">{__("calendar_delivery.nearest_delivery")}:</label>
     <div class="controls">
-    	<input type="hidden" name="company_data[tomorrow_rule]" value="N">
-        <input type="checkbox" name="company_data[tomorrow_rule]" id="elm_company_tomorrow_rule" value="Y" {if $company_data.tomorrow_rule == 'Y'} checked="checked" {/if} />
+        <label class="radio inline" for="company_data_nearest_delivery_today"><input type="radio" name="company_data[nearest_delivery]" id="company_data_nearest_delivery_today" {if $company_data.nearest_delivery == '0'}checked="checked"{/if} value="0">{__('today')}</label>
+        <label class="radio inline" for="company_data_nearest_delivery_tomorrow"><input type="radio" name="company_data[nearest_delivery]" id="company_data_nearest_delivery_tomorrow" {if $company_data.nearest_delivery == '1'}checked="checked"{/if} value="1">{__('tomorrow')}</label>
     </div>
 </div>
 
 <div class="control-group">
-    <label for="elm_company_tomorrow_timeslot" class="control-label cm-regexp" data-ca-regexp="^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$" data-ca-message="__('tomorrow_timeslot_error_message')">{__("calendar_delivery.tomorrow_timeslot")}:</label>
+    <label for="elm_company_working_time_till" class="control-label cm-regexp" data-ca-regexp="^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$" data-ca-message="__('working_time_till_error_message')">{__("calendar_delivery.working_time_till")}:</label>
     <div class="controls">
-        <input class="input-time cm-trim" id="elm_company_tomorrow_timeslot" size="5" maxlength="5" type="text" name="company_data[tomorrow_timeslot]" value="{$company_data.tomorrow_timeslot}" placeholder="00:00" />
+        <input class="input-time cm-trim" id="elm_company_working_time_till" size="5" maxlength="5" type="text" name="company_data[working_time_till]" value="{$company_data.working_time_till}" placeholder="00:00" />
     </div>
 </div>
 
-
+<div class="control-group">
+    <label for="elm_company_saturday_shipping" class="control-label">{__("calendar_delivery.saturday_shipping")}:</label>
+    <div class="controls">
+        <input type="hidden" name="company_data[saturday_shipping]" value="N">
+        <input type="checkbox" name="company_data[saturday_shipping]" id="elm_company_saturday_shipping" value="Y" {if $company_data.saturday_shipping == 'Y'} checked="checked" {/if} />
+    </div>
+</div>
 <div class="control-group">
     <label for="elm_company_sunday_shipping" class="control-label">{__("calendar_delivery.sunday_shipping")}:</label>
     <div class="controls">
@@ -25,9 +31,9 @@
 </div>
 
 <div class="control-group">
-    <label for="elm_company_saturday_rule" class="control-label">{__("calendar_delivery.saturday_rule")}:</label>
+    <label for="elm_company_monday_rule" class="control-label">{__("calendar_delivery.monday_rule")}:</label>
     <div class="controls">
-        <input type="hidden" name="company_data[saturday_rule]" value="N">
-        <input type="checkbox" name="company_data[saturday_rule]" id="elm_company_saturday_rule" value="Y" {if $company_data.saturday_rule == 'Y'} checked="checked" {/if} />
+        <input type="hidden" name="company_data[monday_rule]" value="N">
+        <input type="checkbox" name="company_data[monday_rule]" id="elm_company_monday_rule" value="Y" {if $company_data.monday_rule == 'Y'} checked="checked" {/if} />
     </div>
 </div>

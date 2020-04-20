@@ -5,16 +5,13 @@
 
 	{$day = $smarty.now|date_format:'%w'}
 	{$c_data = $group.company_id|fn_get_company_data}
+	{$min = $c_data|fn_calendar_get_nearest_delivery_day}
 
-	{$min = '1'}
-	{if $c_data|fn_validate_tomorrow_rule}
-		{$min = $min + 1}
-	{/if}
 	{$min_date = "+{$min}"}
 	{$default = "+{$min} day"|strtotime}
 
 	{$cid = $group.company_id}
 
 	{$saturday = ($c_data.saturday_rule != 'Y' && ($hours >= 15 && $day == 6) || $day == 7)}
-	{include file="addons/calendar_delivery/components/calendar.tpl" date_id="delivery_date`$cid`" date_name="delivery_date[`$cid`]" date_val = $cart.delivery_date.$cid|default:$default|fn_parse_date min_date=$min_date sunday=$c_data.sunday_shipping saturday=$saturday limit_weekdays=$shipping.service_params.limit_weekday}
+	{include file="addons/calendar_delivery/components/calendar.tpl" date_id="delivery_date`$cid`" date_name="delivery_date[`$cid`]" date_val = $cart.delivery_date.$cid|default:$default|fn_parse_date min_date=$min_date sunday=$c_data.sunday_shipping saturday=$c_data.saturday_shipping monday=$saturday limit_weekdays=$shipping.service_params.limit_weekday}
 {/if}

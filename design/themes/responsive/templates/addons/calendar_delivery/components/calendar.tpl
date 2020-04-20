@@ -24,11 +24,15 @@
             showOtherMonths: true,
             beforeShowDay: function(date) {
                 res = true;
+                {if !($saturday != N) }
+                    var day = date.getDay();
+                    res = res && (day != 6);
+                {/if}
                 {if !($sunday != N) }
                     var day = date.getDay();
                     res = res && (day != 0);
                 {/if}
-                {if !($saturday != N) }
+                {if !($monday != N) }
                     now = new Date();
                     m = new Date();
                     if(now.getDay()){ m.setDate(now.getDate() + 8 - now.getDay()) } else { m.setDate(now.getDate() + 1) }

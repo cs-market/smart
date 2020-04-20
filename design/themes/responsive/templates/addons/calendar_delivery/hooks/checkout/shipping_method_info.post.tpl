@@ -7,10 +7,10 @@
 	{/if}
 	{$cid = $product_groups[$group_key].company_id}
 	
-	{$min = '1'}
-	{if $c_data|fn_validate_tomorrow_rule}
-		{$min = $min + 1}
-	{/if}
+	{$c_data = $cid|fn_get_company_data}
+	{$min = $c_data|fn_calendar_get_nearest_delivery_day}
+
+	{$min_date = "+{$min}"}
 	{$default = "+{$min} day"|strtotime}
 
 	{$default = $default|date_format:"`$date_format`"}
