@@ -1,4 +1,4 @@
-{if $product.point_price}
+{if $product.pay_by_points == 'Y'}
   {$points_to_add = $product.point_price - ''|fn_get_available_points}
 
   {if $points_to_add > 0}

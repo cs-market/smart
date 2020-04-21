@@ -15,5 +15,7 @@ fn_register_hooks(
   'get_order_info',
   'change_order_status',
   'calculate_cart_post',
-  'load_products_extra_data'
+  'load_products_extra_data',
+  'get_products_post',
+  'get_product_data_post'
 );

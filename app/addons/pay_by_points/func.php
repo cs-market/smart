@@ -3,8 +3,20 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 //  [HOOKs]
-function fn_pay_by_points_pre_add_to_cart($product_data, $cart, $auth, $update)
+function fn_pay_by_points_pre_add_to_cart(&$product_data, $cart, $auth, $update)
 {
+  //  check is pbp
+  foreach($product_data as &$product) {
+    $product['is_pbp']  = db_get_field("SELECT is_pbp FROM ?:products WHERE product_id = ?i", $product['product_id']);
+
+    $product['point_price'] = ($product['is_pbp'] == 'Y')
+    ? fn_get_price_in_points($product['product_id'], $auth)
+    : 0;
+
+    $product['pay_by_points'] = fn_check_product_pay_by_points($product);
+  }
+  unset($product);
+
   $product_ids = fn_array_column($product_data, 'product_id');
   fn_update_use_pay_by_points($product_ids);
 }
@@ -206,17 +218,30 @@ function fn_pay_by_points_load_products_extra_data(&$extra_fields, $products, $p
       'point_price' => 'MIN(point_price)'
     ],
     'condition' => db_quote(' AND ?:product_point_prices.lower_limit = 1 AND ?:product_point_prices.usergroup_id IN (?n)',
-      $user_groups
+    $user_groups
     )
   ];
+}
+
+function fn_pay_by_points_get_products_post(&$products, $params, $lang_code)
+{
+  foreach($products as &$product) {
+    $product['pay_by_points'] = fn_check_product_pay_by_points($product);
+  }
+  unset($product);
+}
+
+function fn_pay_by_points_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
+{
+  $product_data['pay_by_points'] = fn_check_product_pay_by_points($product_data);
 }
 //  [/HOOKs]
 
 /*
- * Get avvaileble point
- * get from session
- * return float
- */
+* Get avvaileble point
+* get from session
+* return float
+*/
 function fn_get_available_points()
 {
   return max(
@@ -226,12 +251,12 @@ function fn_get_available_points()
 }
 
 /*
- * Update point info
- * unclude product list
- * use session
- * $disallow_products array product_ids
- * return void
- */
+* Update point info
+* unclude product list
+* use session
+* $disallow_products array product_ids
+* return void
+*/
 function fn_update_use_pay_by_points($disallow_products = [])
 {
   Tygh::$app['session']['cart']['pay_by_points']['in_use'] = fn_get_use_pay_by_points($disallow_products);
@@ -254,11 +279,11 @@ function fn_get_use_pay_by_points($disallow_products = [])
 }
 
 /*
- * Get order total bonus info
- *
- * $order_id Int
- * return $total_bonus String
- */
+* Get order total bonus info
+*
+* $order_id Int
+* return $total_bonus String
+*/
 function fn_get_order_total_bonus($order_id)
 {
   $total_bonus = "0";
@@ -273,4 +298,12 @@ function fn_get_order_total_bonus($order_id)
   }
 
   return (String) $total_bonus;
+}
+
+function fn_check_product_pay_by_points($product)
+{
+  $is_pbp = $product['is_pbp'] ?? 'N';
+  $point_price = $product['point_price'] ?? '0';
+
+  return ($is_pbp == 'Y' && $point_price) ? 'Y' : 'N';
 }
