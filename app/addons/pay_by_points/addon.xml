@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <addon scheme="3.0" edition_type="ROOT,ULT:VENDOR">
     <id>pay_by_points</id>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <priority>1900</priority>
     <position>180</position>
     <status>active</status>
