@@ -193,6 +193,23 @@ function fn_pay_by_points_calculate_cart_post(&$cart, $auth, $calculate_shipping
 {
   $cart['pay_by_points']['reward'] = fn_get_use_pay_by_points();
 }
+
+function fn_pay_by_points_load_products_extra_data(&$extra_fields, $products, $product_ids, $params, $lang_code)
+{
+  $user_groups = ($params['area'] == 'A')
+  ? USERGROUP_ALL
+  : array_unique(array_merge(array(USERGROUP_ALL), Tygh::$app['session']['auth']['usergroup_ids']));
+
+  $extra_fields['?:product_point_prices'] = [
+    'primary_key' => 'product_id',
+    'fields' => [
+      'point_price' => 'MIN(point_price)'
+    ],
+    'condition' => db_quote(' AND ?:product_point_prices.lower_limit = 1 AND ?:product_point_prices.usergroup_id IN (?n)',
+      $user_groups
+    )
+  ];
+}
 //  [/HOOKs]
 
 /*
