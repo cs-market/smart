@@ -219,8 +219,10 @@ function fn_pay_by_points_load_products_extra_data(&$extra_fields, $products, $p
     ],
     'condition' => db_quote(' AND ?:product_point_prices.lower_limit = 1 AND ?:product_point_prices.usergroup_id IN (?n)',
     $user_groups
-    )
+    ),
+    'group_by' => 'GROUP BY ?:product_point_prices.product_id'
   ];
+
 }
 
 function fn_pay_by_points_get_products_post(&$products, $params, $lang_code)

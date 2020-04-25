@@ -779,6 +779,74 @@ fn_print_r($fantoms);
 	}
 	fn_print_die($unknown_products);
 	fn_print_die('done');
+} elseif ($mode == 'correct_users') {
+	$users = db_get_array('SELECT user_id, email, user_login, company_id, timestamp FROM ?:users WHERE user_type = "C" AND status = "A" ORDER BY user_id ASC');
+	$jun2019 = 1559347200;
+	foreach ($users as &$user) {
+		// is active user
+		if ($user['timestamp'] < $jun2019) {
+			$orders = db_get_array('SELECT order_id, company_id FROM ?:orders WHERE user_id = ?i', $user['user_id']);
+			if (empty($orders)) {
+				//fn_print_die('delete', $user['user_id']);
+				//fn_delete_user($user['user_id']);
+				continue;
+			}
+		}
+		if (empty($user['company_id'])) {
+			$order = db_get_row('SELECT count(company_id) as count, company_id FROM ?:orders WHERE user_id = ?i GROUP BY company_id ORDER BY count DESC', $user['user_id']);
+			fn_print_die($user, $order);
+			if ($order) $user['company_id'] = $order['company_id'];
+		}
+		// backup login info
+		$bak_login = $user['user_login'];
+
+		$user_data = fn_get_user_info($user['user_id']);
+		array_walk($user_data['fields'], 'fn_trim_helper');
+		$code = empty($user_data['fields']['38']) ? $user_data['fields']['39'] : $user_data['fields']['38'];
+
+		if (!empty($code) && $code != '9999') {
+			$user['user_login'] = $user_data['fields'][38];
+			// NEED TO ADD POSTFIX!!!
+		} elseif (!empty(trim($user['email'])) && $user['email'] != $user['user_login']) {
+			// иначе заполним логин emailом
+			if (strpos($user['user_login'], 'user_') !== false || empty(trim($user['user_login']))) {
+				$user['user_login'] = $user['email'];
+			}
+		}
+		//db_query('UPDATE ?:users SET ?u WHERE user_id = ?i', $user, $user['user_id']);
+/*		// если в логине user_ или ничего, то загрузим код1с
+		
+			$user_data = fn_get_user_info($user['user_id']);
+			array_walk($user_data['fields'], 'fn_trim_helper');
+			
+			if (!empty($code)) {
+				$user['user_login'] = $user_data['fields'][38];
+			} elseif (!empty(trim($user['email']))) {
+				// иначе заполним логин emailом
+				$user['user_login'] = $user['email'];
+			} else {
+				
+			}
+		} else {
+			// иначе логин заполнен
+			//fn_print_r($user);
+		}
+		if (empty($user['email'])) {
+			$user['email'] = $user['user_login'];
+		}
+		if (!$user['company_id']) {
+			$order = db_get_row('SELECT count(company_id) as count, company_id FROM ?:orders WHERE user_id = ?i GROUP BY company_id ORDER BY count DESC', $user['user_id']);
+			if ($order) $user['company_id'] = $order['company_id'];
+		}
+
+		if ($user['company_id'] && $user['company_id'] != 13) {
+			
+			fn_print_r(strpos($user['user_login'], '@'), $user);
+			//fn_print_die(123, strpos());
+		}*/
+	}
+	fn_print_die($delete_users);
+	fn_print_die('stop');
 }
 
 function fn_between($val, $pattern)

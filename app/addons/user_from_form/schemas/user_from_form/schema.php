@@ -20,7 +20,7 @@ return [
   ],
   '56' => [
     'page_id' => 56,
-    'company_id' => 1809,
+    'company_id' => 16,
     'usergroup_id' => [9],
     'fields_map' => [
        'firstname' => '56',
@@ -50,7 +50,7 @@ return [
   ],
   '59' => [
     'page_id' => 59,
-    'company_id' => 1809,
+    'company_id' => 16,
     'usergroup_id' => [542],
     'fields_map' => [
        'firstname' => '93',
@@ -126,6 +126,24 @@ return [
        's_client_code' => '9999',
        'b_client_code' => '9999',
        'b_firstname' => '129',
+    ],
+  ],
+  '63' => [
+    'page_id' => 63,
+    'company_id' => 46,
+    'usergroup_id' => [564],
+    'fields_map' => [
+       'firstname' => '116',
+       'password' => '117',
+       'email' => '119',
+       'user_login' => '119',
+       'phone' => '118',
+       's_phone' => '118',
+       // 's_address' => '120',
+       // 's_address2' => '120',
+       's_client_code' => '9999',
+       'b_client_code' => '9999',
+       'b_firstname' => '116',
     ],
   ],
 ];
