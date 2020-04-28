@@ -9,7 +9,7 @@
             <div class="ty-checkout-login-form">{include file="common/subheader.tpl" title=__("returning_customer")}
         {/if}
         <div class="ty-control-group">
-            <label for="login_{$id}" class="ty-login__filed-label ty-control-group__label cm-required cm-trim">{__("email")}/{__("login")}</label>
+            <label for="login_{$id}" class="ty-login__filed-label ty-control-group__label cm-required cm-trim">{__("email")}/{__("login")}/{__("phone")}</label>
             <input type="text" id="login_{$id}" name="user_login" size="30" value="{$config.demo_username}" class="ty-login__input cm-focus" />
         </div>
 
