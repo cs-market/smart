@@ -10,4 +10,11 @@ $schema['export_fields']['Send price to 1c'] = array (
 
 $schema['export_fields']['Detailed image']['process_put'] = ['fn_exim_smart_distribution_import_images', '@images_path', '%Thumbnail%', '#this', '0', 'M', '#key', 'product'];
 
+$schema['export_fields']['Category']['process_put'][0] = 'fn_exim_sd_set_product_categories';
+$schema['export_fields']['Secondary categories']['process_put'][0] = 'fn_exim_sd_set_product_categories';
+if (fn_allowed_for('MULTIVENDOR') && (!Registry::get('runtime.company_id'))) {
+	$schema['export_fields']['Category']['process_put'][] = '%Vendor%';
+	$schema['export_fields']['Secondary categories']['process_put'][] = '%Vendor%';
+}
+
 return $schema;
