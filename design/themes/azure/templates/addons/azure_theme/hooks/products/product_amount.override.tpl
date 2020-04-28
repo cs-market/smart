@@ -53,8 +53,8 @@
                         {if $show_amount_label}
                             <label class="ty-control-group__label">{__("availability")}:</label>
                         {/if}
-                        <span class="{if $product_amount > 0}ty-qty-in-stock{else}ty-qty-out-of-stock{/if} ty-control-group__item" id="in_stock_info_{$obj_prefix}{$obj_id}">
-                            {if $product_amount > 0}
+                        <span class="{if $product_amount > 0 || $product.tracking == "ProductTracking::DO_NOT_TRACK"|enum}ty-qty-in-stock{else}ty-qty-out-of-stock{/if} ty-control-group__item" id="in_stock_info_{$obj_prefix}{$obj_id}">
+                            {if $product_amount > 0 || $product.tracking == "ProductTracking::DO_NOT_TRACK"|enum}
                                 {__("in_stock")}
                             {else}
                                 {__("on_backorder")}

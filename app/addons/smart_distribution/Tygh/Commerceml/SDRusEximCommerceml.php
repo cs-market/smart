@@ -210,7 +210,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
             }
 
             $product = array();
-            $amount = 0;
             $combination_id = 0;
             $ids = fn_explode('#', strval($offer -> {$cml['id']}));
             $guid_product = array_shift($ids);
@@ -281,7 +280,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             $product_amount[$product_id]['amount'] = $o_amount;
             if (empty($combination_id)) {
-                $product['amount'] = $amount;
+		if (isset($amount)) {
+			$product['amount'] = $amount;
+		}
 
                 // [csmarket] limit bering
                 if (Registry::get('runtime.company_id') == 29) {
@@ -293,7 +294,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 /* if (in_array(Registry::get('runtime.company_id'), array(41,46))) {
                     unset($product['amount']);
                 }*/
-
+		if (!empty($product))
                 $this->db->query(
                     'UPDATE ?:products SET ?u WHERE product_id = ?i',
                     $product,
@@ -651,6 +652,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
         if ($this->checkUploadProduct($product_id, $product_update)) {
             //$this->s_commerceml['exim_1c_allow_import_categories'] = 'N';
             $product = $this->dataProductFile($_product, $product_id, $guid_product, $categories_commerceml, $import_params);
+            // [cs-market] default func adds default category to existing ones
+            if (($key = array_search($this->s_commerceml['exim_1c_default_category'], $product['category_ids'])) !== false && count($product['category_ids']) > 1) {
+                unset($product['category_ids'][$key]);
+            }
 
             if ($product_id == 0) {
                 $this->newDataProductFile($product, $import_params);
@@ -899,7 +904,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
             if (!$found) {
-                $name = trim(str_replace('1Ц', '', strval($_price -> {$cml['name']})));
+                //$name = trim(str_replace('1Ц', '', strval($_price -> {$cml['name']})));
                 $like_name = '%' . $name . '%';
                 $user_id = 0;
                 //$user_id = db_get_field('SELECT user_id FROM ?:users WHERE firstname LIKE ?l OR lastname LIKE ?l OR email LIKE ?l OR user_login LIKE ?l', $like_name, $like_name, $like_name, $like_name);
