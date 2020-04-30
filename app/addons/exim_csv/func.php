@@ -12,7 +12,8 @@ function fn_exim_csv_place_order($order_id, $action, $order_status, $cart, $auth
 	$order = fn_get_order_info($order_id);
 	fn_define('DB_LIMIT_SELECT_ROW', 30);
 	if (db_get_field('SELECT export_order_to_csv FROM ?:companies WHERE company_id = ?i', $order['company_id']) == 'Y') {
-		foreach (array('orders', 'order_items') as $pattern_id) {
+
+		foreach (array('orders', 'order_items', 'orders_with_items') as $pattern_id) {
 			$layout = db_get_row("SELECT ?:exim_layouts.* FROM ?:exim_layouts LEFT JOIN ?:companies ON ?:exim_layouts.name = ?:companies.company WHERE pattern_id = ?s and company_id = ?i", $pattern_id, $order['company_id']);
 			if (!empty($layout)) {
 				$cid = Registry::get('runtime.company_id');

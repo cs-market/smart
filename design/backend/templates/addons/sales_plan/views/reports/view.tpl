@@ -144,14 +144,14 @@
 			{/if}
 		{/foreach}
 	</form></div>
-	<script type="text/javascript">
+	{*<script type="text/javascript">
 		$('#elm_only_zero').click(function () {
 			if ($(this).prop( "checked" )) {
 				select = $("select[id$='period_selects']", $(this).closest('form'));
 				$("option[value='D']", select).prop('selected', true).change();
 			}
 		});
-	</script>
+	</script>*}
 {/capture}
 
 

@@ -112,7 +112,7 @@ function fn_orders_with_items_timestamp_to_date($field, $key, $timestamp)
 		return '';
 	} else {
 		$orders[$field][] = $key;
-	    return !empty($timestamp) ? date('d M Y H:i:s', intval($timestamp)) : '';
+	    return !empty($timestamp) ? date('d.m.Y H:i:s', intval($timestamp)) : '';
 	}	
 }
 

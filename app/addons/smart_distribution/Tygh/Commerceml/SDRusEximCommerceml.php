@@ -669,6 +669,24 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             if ((isset($_product -> {$cml['properties_values']} -> {$cml['property_values']}) || isset($_product -> {$cml['manufacturer']})) && ($allow_import_features == 'Y') && (!empty($this->features_commerceml))) {
                 $product = $this->dataProductFeatures($_product, $product, $import_params);
+                if (!empty($this->features_commerceml['sticker'])) {
+                    foreach ($_product -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
+                        $feature_id = strval($_feature -> {$cml['id']});
+                        if ($this->features_commerceml['sticker']['id'] != $feature_id) {
+                            continue;
+                        }
+                        $p_feature_name = (string) $_feature->{$cml['value']};
+                        if (!empty($this->features_commerceml['sticker']['variants'])) {
+                            $p_feature_name = empty($this->features_commerceml['sticker']['variants'][$p_feature_name]['value'])
+                                ? ''
+                                : (string) $this->features_commerceml['sticker']['variants'][$p_feature_name]['value'];
+                        }
+                        if (is_callable('fn_get_stickers')) {
+                            $stickers = fn_get_stickers(['name' => $p_feature_name]);
+                            $product['sticker_ids'] = fn_array_column($stickers, 'sticker_id');
+                        }
+                    }
+                }
             }
 
             if (isset($_product -> {$cml['value_fields']} -> {$cml['value_field']})) {
@@ -1140,5 +1158,202 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             $this->addFeatureValues($variant_feature);
         }
+    }
+
+    public function importFeaturesFile($data_features, $import_params, $data_pos_start, &$import_pos, &$progress)
+    {
+        $cml = $this->cml;
+        $features_import = array();
+        if (isset($data_features -> {$cml['property']})) {
+            $promo_text = trim($this->s_commerceml['exim_1c_property_product']);
+            $shipping_params = $this->getShippingFeatures();
+            $features_list = fn_explode("\n", $this->s_commerceml['exim_1c_features_list']);
+            $deny_or_allow_list = $this->s_commerceml['exim_1c_deny_or_allow'];
+            $company_id = $this->company_id;
+            foreach ($data_features -> {$cml['property']} as $_feature) {
+                if ($import_params['service_exchange'] == '') {
+                    $import_pos++;
+
+                    if ($import_pos % COUNT_IMPORT_PRODUCT == 0) {
+                        fn_echo('imported: ' . COUNT_IMPORT_PRODUCT . "\n");
+                    }
+
+                    if ($import_pos < $data_pos_start) {
+                        continue;
+                    }
+
+                    if (\Tygh::$app['session']['exim_1c']['f_count_imports'] >= COUNT_1C_IMPORT) {
+                        $progress = true;
+                        break;
+                    }
+                    \Tygh::$app['session']['exim_1c']['f_count_imports']++;
+                }
+
+                $_variants = array();
+                $feature_data = array();
+                $feature_name = strval($_feature -> {$cml['name']});
+                if ($feature_name == $cml['sticker']) {
+                    $features_import['sticker']['id'] = strval($_feature -> {$cml['id']});
+                    $features_import['sticker']['name'] = $cml['sticker'];
+                    if (!empty($_feature -> {$cml['variants_values']})) {
+                        $_feature_data = $_feature -> {$cml['variants_values']} -> {$cml['directory']};
+                        foreach ($_feature_data as $_variant) {
+                            $_variants[strval($_variant -> {$cml['id_value']})]['id'] = strval($_variant -> {$cml['id_value']});
+                            $_variants[strval($_variant -> {$cml['id_value']})]['value'] = strval($_variant -> {$cml['value']});
+                            $f_variants[strval($_variant -> {$cml['id_value']})]['external_id'] = strval($_variant -> {$cml['id_value']});
+                            $f_variants[strval($_variant -> {$cml['id_value']})]['variant'] = strval($_variant -> {$cml['value']});
+                        }
+                    }
+                    $features_import['sticker']['variants'] = $_variants;
+                }
+
+                if ($deny_or_allow_list == 'do_not_import') {
+                    if (in_array($feature_name, $features_list)) {
+                        $this->addMessageLog("Feature is not added (do not import): " . $feature_name);
+                        continue;
+                    }
+                } elseif ($deny_or_allow_list == 'import_only') {
+                    if (!in_array($feature_name, $features_list)) {
+                        $this->addMessageLog("Feature is not added (import only): " . $feature_name);
+                        continue;
+                    }
+                }
+
+                $feature_id = $this->db->getField("SELECT feature_id FROM ?:product_features WHERE external_id = ?s", strval($_feature -> {$cml['id']}));
+                $new_feature = false;
+
+                if (empty($feature_id)) {
+                    $new_feature = true;
+                    $feature_id = 0;
+                }
+
+                $f_variants = array();
+                if (!empty($_feature -> {$cml['variants_values']})) {
+                    $_feature_data = $_feature -> {$cml['variants_values']} -> {$cml['directory']};
+                    foreach ($_feature_data as $_variant) {
+                        $_variants[strval($_variant -> {$cml['id_value']})]['id'] = strval($_variant -> {$cml['id_value']});
+                        $_variants[strval($_variant -> {$cml['id_value']})]['value'] = strval($_variant -> {$cml['value']});
+                        $f_variants[strval($_variant -> {$cml['id_value']})]['external_id'] = strval($_variant -> {$cml['id_value']});
+                        $f_variants[strval($_variant -> {$cml['id_value']})]['variant'] = strval($_variant -> {$cml['value']});
+                    }
+                }
+
+                $feature_data = $this->dataFeatures($feature_name, $feature_id, strval($_feature -> {$cml['type_field']}), $this->s_commerceml['exim_1c_used_brand'], $this->s_commerceml['exim_1c_property_for_manufacturer'], strval($_feature -> {$cml['id']}));
+
+                if ($this->displayFeatures($feature_name, $shipping_params)) {
+                    if ($promo_text != $feature_name) {
+
+                        if (!empty($f_variants)) {
+                            $feature_data['variants'] = $f_variants;
+                        }
+
+                        $feature_id = fn_update_product_feature($feature_data, $feature_id);
+                        $this->addMessageLog("Feature is added: " . $feature_name);
+
+                        // [csmarket] mve compatibility changes!!
+                        if ($new_feature && !fn_allowed_for('MULTIVENDOR')) {
+                            $this->db->query("INSERT INTO ?:ult_objects_sharing VALUES ($company_id, $feature_id, 'product_features')");
+                        }
+                    } else {
+                        fn_delete_feature($feature_id);
+                        $feature_id = 0;
+                    }
+                } else {
+                    fn_delete_feature($feature_id);
+                    $feature_id = 0;
+                }
+                $features_import[strval($_feature -> {$cml['id']})]['id'] = $feature_id;
+                $features_import[strval($_feature -> {$cml['id']})]['name'] = $feature_name;
+                $features_import[strval($_feature -> {$cml['id']})]['type'] = $feature_data['feature_type'];
+
+                if (!empty($_variants)) {
+                    $features_import[strval($_feature -> {$cml['id']})]['variants'] = $_variants;
+                }
+            }
+        }
+
+        $feature_data = array();
+        if ($this->s_commerceml['exim_1c_used_brand'] == 'field_brand') {
+            $company_id = $this->company_id;
+            $feature_id = $this->db->getField("SELECT feature_id FROM ?:product_features WHERE external_id = ?s AND company_id = ?i", "brand1c", $company_id);
+            $new_feature = false;
+
+            if (empty($feature_id)) {
+                $new_feature = true;
+                $feature_id = 0;
+            }
+
+            $feature_data = $this->dataFeatures($cml['brand'], $feature_id, ProductFeatures::EXTENDED, $this->s_commerceml['exim_1c_used_brand'], $this->s_commerceml['exim_1c_property_for_manufacturer'], "brand1c");
+            $_feature_id = fn_update_product_feature($feature_data, $feature_id);
+            $this->addMessageLog("Feature brand is added");
+
+            if ($feature_id == 0) {
+                $this->db->query("INSERT INTO ?:ult_objects_sharing VALUES ($company_id, $_feature_id, 'product_features')");
+            }
+
+            $features_import['brand1c']['id'] = (!empty($feature_id)) ? $feature_id : $_feature_id;
+            $features_import['brand1c']['name'] = $cml['brand'];
+        }
+
+        if (!empty($features_import)) {
+            if (!empty($this->features_commerceml)) {
+                $_features_commerceml = $this->features_commerceml;
+                $this->features_commerceml = fn_array_merge($_features_commerceml, $features_import);
+            } else {
+                $this->features_commerceml = $features_import;
+            }
+        }
+
+        if (!empty($this->features_commerceml)) {
+            \Tygh::$app['session']['exim_1c']['features_commerceml'] = $this->features_commerceml;
+        }
+
+        if ($import_params['service_exchange'] == '') {
+            if (\Tygh::$app['session']['exim_1c']['f_count_imports'] + 1 >= COUNT_1C_IMPORT) {
+                $progress = true;
+            }
+        } else {
+            \Tygh::$app['session']['exim_1c']['f_count_imports'] = count($data_features -> {$cml['property']});
+        }
+    }
+
+    public function checkParameterFileUpload()
+    {
+        $message = "";
+        $log_message = "";
+
+        if ($this->s_commerceml['status'] != 'A') {
+            $message = "Addon Commerceml disabled";
+        }
+
+        if (!empty($_SERVER['PHP_AUTH_USER'])) {
+            $_data['user_login'] = $_SERVER['PHP_AUTH_USER'];
+
+            list($status, $user_data, $user_login, $password, $salt) = fn_auth_routines($_data, array());
+
+            $this->import_params['user_data'] = $user_data;
+
+            if (empty($user_data) || empty($user_data['password']) || $user_data['password'] != fn_generate_salted_password($_SERVER['PHP_AUTH_PW'], $salt)) {
+                $message = "\n Error in login or password user";
+            }
+
+            if (!$this->checkPatternPermissionsCommerceml($user_data)) {
+                $message = "\n Privileges for user not setted";
+            }
+
+            $log_message = $this->getCompanyStore($user_data);
+
+        } else {
+            $message = "\n Enter login and password user";
+        }
+
+        if (!empty($message) || !empty($log_message)) {
+            $this->showMessageError($message);
+            $this->addMessageLog($log_message);
+
+            return true;
+        }
+
+        return false;
     }
 }
