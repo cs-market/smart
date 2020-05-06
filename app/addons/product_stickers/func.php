@@ -128,7 +128,7 @@ function fn_execute_data_replacement(&$stickers, &$params) {
 					$piece = &$params['product'];
 					$parts = explode('.', $content);
 					foreach ($parts as $i => $part) {
-						if (!is_array($piece) || !array_key_exists($part, $piece)) {
+						if (!is_array($piece) || !array_key_exists($part, $piece) || empty($piece[$part])) {
 							unset($stickers[$sticker_id]);
 							continue 2;
 						}
@@ -167,6 +167,7 @@ function fn_update_sticker($sticker_data, $sticker_id = 0, $lang_code = DESCR_SL
 			$sticker_data['usergroup_ids'] = empty($sticker_data['usergroup_ids']) ? '0' : implode(',', $sticker_data['usergroup_ids']);
 		}
 
+		$sticker_data['params'] = '';
 		if ($sticker_data['type'] == 'T' && !empty($sticker_data['properties'])) {
 			$sticker_data['params'] = serialize($sticker_data['properties']);
 		}
@@ -368,11 +369,35 @@ function fn_product_stickers_gather_additional_product_data_post(&$product, $aut
 		$_params['get_stickers_for'] = $params['get_stickers_for'];
 		$_params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
 		$_params['product'] = $product;
-
+		if (!empty($_params['product']['product_features']))
+		foreach ($_params['product']['product_features'] as $feature_id => &$feature) {
+			if (!empty($feature['variant_id']) && empty($feature['value'])) {
+				$feature['value'] = $feature['variants'][$feature['variant_id']]['variant'];
+			}
+		}
+		unset($feature);
 		if (!empty($_params['sticker_id'])) {
 			$product['stickers'] = fn_get_stickers($_params);
 		}
+
+		if ($auth['user_type'] == 'A' && AREA == 'C' && isset($_REQUEST['show_replacement_variants'])) {
+			$replacement = fn_collect_sticker_replacement($_params['product']);
+			fn_print_die($replacement);
+		}
 	}
+}
+
+function fn_collect_sticker_replacement($data, $param_name = '') {
+	static $replacement;
+	foreach ($data as $key => $value) {
+		$arr_key = empty($param_name) ? $key : $param_name . '.' . $key;
+		if (is_array($value)) {
+			fn_collect_sticker_replacement($value, $arr_key);
+		} else {
+			$replacement[$arr_key] = $value;
+		}
+	}
+	return $replacement;
 }
 
 function fn_get_sticker_image_id($sticker_id, $lang_code = DESCR_SL) {
@@ -503,35 +528,37 @@ function fn_product_stickers_get_product_features(&$fields, &$join, &$condition,
 function fn_product_sticker_render_styles($properties) {
 	$schema = fn_get_schema('styles', 'properties');
 	$styles = array();
-	foreach ($properties as $name => $value) {
-		if ($schema[$name]['type'] == 'checkbox' && $value != 'Y') continue;
-		if ($schema[$name]['type'] == 'select') $value = $schema[$name]['variants'][$value];
-		if (isset($schema[$name]['render'])) {
-			if (!is_array($schema[$name]['render'])) $schema[$name]['render'] = array($schema[$name]['name'] => $schema[$name]['render']);
-			foreach ($schema[$name]['render'] as $style => $val) {
-				// render val with value
-				$val = str_replace('#value', $value, $val);
-				if (isset($schema[$name]['prefix'])) {
-					if (strpos($val, '#prefix') !== false) {
-						$val = str_replace('#prefix', $schema[$name]['prefix'], $val);
-					} else {
-						$val = $schema[$name]['prefix'] . $val;
+	if (!empty($properties)) {
+		foreach ($properties as $name => $value) {
+			if ($schema[$name]['type'] == 'checkbox' && $value != 'Y') continue;
+			if ($schema[$name]['type'] == 'select') $value = $schema[$name]['variants'][$value];
+			if (isset($schema[$name]['render'])) {
+				if (!is_array($schema[$name]['render'])) $schema[$name]['render'] = array($schema[$name]['name'] => $schema[$name]['render']);
+				foreach ($schema[$name]['render'] as $style => $val) {
+					// render val with value
+					$val = str_replace('#value', $value, $val);
+					if (isset($schema[$name]['prefix'])) {
+						if (strpos($val, '#prefix') !== false) {
+							$val = str_replace('#prefix', $schema[$name]['prefix'], $val);
+						} else {
+							$val = $schema[$name]['prefix'] . $val;
+						}
 					}
-				}
-				if (isset($schema[$name]['suffix'])) {
-					if (strpos($val, '#suffix') !== false) {
-						$val = str_replace('#suffix', $schema[$name]['suffix'], $val);
-					} else {
-						$val .= $schema[$name]['suffix'];
+					if (isset($schema[$name]['suffix'])) {
+						if (strpos($val, '#suffix') !== false) {
+							$val = str_replace('#suffix', $schema[$name]['suffix'], $val);
+						} else {
+							$val .= $schema[$name]['suffix'];
+						}
 					}
+					$styles[] = $style . ': ' . $val;
 				}
-				$styles[] = $style . ': ' . $val;
+			} else {
+				$styles[] = $schema[$name]['name'] . ': ' . ((isset($schema[$name]['prefix'])) ? $schema[$name]['prefix'] : '') . $value . ((isset($schema[$name]['suffix'])) ? $schema[$name]['suffix'] : '');
 			}
-		} else {
-			$styles[] = $schema[$name]['name'] . ': ' . ((isset($schema[$name]['prefix'])) ? $schema[$name]['prefix'] : '') . $value . ((isset($schema[$name]['suffix'])) ? $schema[$name]['suffix'] : '');
 		}
 	}
-	return implode('; ', $styles) . ';';
+	return ($styles) ? implode('; ', $styles) . ';' : '';
 }
 
 function fn_product_stickers_dispatch_assign_template($controller, $mode, $area, $controllers_cascade) {

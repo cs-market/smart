@@ -25,5 +25,12 @@ function fn_auth_by_login_auth_routines($request, $auth, &$field, &$condition, &
 }
 
 function fn_auth_by_login_is_user_exists_pre($user_id, &$user_data) {
-	unset($user_data['email'], $user_data['user_login']);
+	//unset($user_data['email'], $user_data['user_login']);
+}
+
+function fn_auth_by_login_user_exist($user_id, $user_data, &$condition) {
+	if (!empty($user_data['company_id']) && !empty($user_data['user_login'])) {
+		$condition = db_quote(' user_login = ?s AND company_id = ?i', $user_data['user_login'], $user_data['company_id']);
+		$condition .= db_quote(" AND user_id != ?i", $user_id);
+	}
 }

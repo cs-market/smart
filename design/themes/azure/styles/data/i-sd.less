@@ -3,16 +3,16 @@
 @menu_links: #9d9d9d;
 /*red*/
 /*#e9536b*/
-@menu: #f90;
+@menu: rgb(164,194,244);
 /*purple*/
 @menu_bg: @menu;
 @menu_dropdown: #fff;
 @base: #EDEFF1;
 
 @font: #191919;
-@primary_button: rgb(221,126,107);
-@secondary_button: rgb(221,126,107);
-@tertiary_button: rgb(221,126,107);
+@primary_button: rgb(74,134,232);
+@secondary_button: rgb(74,134,232);
+@tertiary_button: rgb(74,134,232);
 @sidebar: #fff;
 @price: #838383;
 @discount_label: #c44d9b;
@@ -24,7 +24,7 @@
 
 /*red*/
 @decorative: rgb(255,255,255);
-
+@companion: darken(@menu, 15%);
 @general_bg_color: #ffffff;
 @general_bg_image: transparent;
 @general_bg_repeat: repeat;
@@ -97,7 +97,7 @@
 }
 
 .ty-search-block .ty-search-magnifier {
-	background: #f90;
+	background: @menu;
 }
 .azure-top-menu-grid {
 	.ty-dropdown-box__title {
@@ -217,7 +217,7 @@ label > input.cm-product-filters-checkbox + span::before {
 .azure-top-menu-grid .ty-dropdown-box__title.open,
 .azure-top-menu-grid .azure-cart-content .ty-dropdown-box__title:hover,
 .azure-top-menu-grid .azure-cart-content .ty-dropdown-box__title.open {
-	background: #f70;
+	background: @companion;
 }
 .azure-top-menu-grid .ty-dropdown-box__title {
 	background: transparent;
@@ -240,12 +240,12 @@ label > input.cm-product-filters-checkbox + span::before {
     text-align: center;
 }
 .ty-grid-list__item{
-    border: 1px solid @decorative;
+    border: 1px solid lighten(@companion, 25%);
     &:hover {
-        border-color: #f90;
+        border-color: @companion;
     }
     .ty-btn__text {
-        color: #f90;
+        color: @companion;
     }
 }
 .ty-grid-list__item-name .ty-grid-list__item-name__inner, 
@@ -257,10 +257,10 @@ label > input.cm-product-filters-checkbox + span::before {
 }
 .ty-btn.ty-btn__primary, 
 .ty-btn.ty-btn__secondary {
-    border: 1px solid #cc4125;
+    border: 1px solid @companion;
     color: #fff;
     &:hover {
-       color: #cc4125; 
+       color: @companion; 
     }
 }
 .ty-select-block__a {
@@ -284,7 +284,7 @@ label > input.cm-product-filters-checkbox + span::before {
     margin-top: 14px;
 }
 .ty-dropdown-box__content {
-    border: 1px solid @decorative;
+    border: 1px solid @companion;
     
     .ty-dropdown-box__item:hover {
         background: @decorative; 
@@ -312,7 +312,7 @@ label > input.cm-product-filters-checkbox + span::before {
     }
 }
 .ty-footer-menu h2 {
-    color: #f90;
+    color: @companion;
 }
 .azure-main-menu .ty-dropdown-box__content .ty-menu__items .ty-menu__item:hover > .ty-menu__submenu-item-header .ty-menu__item-link, 
 .azure-main-menu .ty-dropdown-box__content .ty-menu__items .ty-menu__item.ty-menu__item-active > .ty-menu__submenu-item-header .ty-menu__item-link, 
@@ -321,15 +321,14 @@ label > input.cm-product-filters-checkbox + span::before {
     background: @decorative;
 }
 .footer-stay-connected {
-    background: #f90;
+    background: @companion;
 }
 .side-grid .left-categories {
+    border: 1px solid lighten(@companion, 20%);
     .ty-menu__items {
         background: transparent
     }
-    .ty-menu__item-active .ty-menu__item-link {
-        background: #ffe599;
-    }
+
     .ty-menu__item:nth-child(2) .ty-menu__item-link {
         border-radius: 0;
     }
@@ -340,19 +339,14 @@ label > input.cm-product-filters-checkbox + span::before {
 .ty-menu-vertical .ty-menu__items {
     z-index: initial;
 }
-.no-touch .ty-menu__item:hover .ty-menu__item-link, 
-.is-hover-menu .ty-menu__item-link, 
-.is-hover-menu.ty-menu__item-active .ty-menu__item-link {
-    background: #ffe599;
-    color: #000;
-}
+
 .no-touch .ty-menu-vertical .ty-menu__submenu .ty-menu__item:hover > .ty-menu__submenu-item-header .ty-menu__item-link, 
 .ty-menu-vertical .ty-menu__submenu .is-hover-menu > .ty-menu__submenu-item-header .ty-menu__item-link {
-    background: #f90;
+    background: @companion;
     color: #000;
 }
 .ty-tabs {
-    border-bottom-color: #f90;
+    border-bottom-color: @companion;
 }
 .ty-product-azure-bigpicture__right .ty-btn__add-to-cart {
     //float: left;
@@ -361,7 +355,7 @@ label > input.cm-product-filters-checkbox + span::before {
     transform: translateY(33px) translateY(-100%);
 }
 .ty-search-block .ty-search-magnifier:hover {
-    background-color: #f90;
+    background-color: @companion;
 }
 .grid-list1 .button-container {
     float: right;
@@ -390,7 +384,7 @@ label > input.cm-product-filters-checkbox + span::before {
 }
 .ty-tabs .ty-tabs__item:before, 
 .ty-tabs__item.active .ty-tabs__a {
-    background: #f90;
+    background: @companion;
 }
 .ty-menu__item .ty-menu__item-link {
     color: #000;
@@ -405,7 +399,7 @@ label > input.cm-product-filters-checkbox + span::before {
     min-width: initial
 }
 .ui-dialog .ui-dialog-titlebar {
-    background-color: #f90;
+    background-color: @companion;
 }
 .ty-grid-list__image {
     padding: 0;
@@ -419,7 +413,7 @@ label > input.cm-product-filters-checkbox + span::before {
 }
 .no-touch .ty-value-changer__increase:hover, 
 .no-touch .ty-value-changer__decrease:hover {
-    background: #f90;
+    background: @companion;
 }
 .ty-qty .ty-value-changer__increase:hover, 
 .ty-qty .ty-value-changer__decrease:hover {
@@ -497,7 +491,7 @@ label > input.cm-product-filters-checkbox + span::before {
         float: none;
     }
     .ty-sort-container .ty-per-page {
-        border-left: 1px solid #f90;
+        border-left: 1px solid @companion;
     }
     .ty-sort-dropdown__wrapper {
         display: block;
@@ -569,9 +563,9 @@ label > input.cm-product-filters-checkbox + span::before {
         }
     }
     .ty-grid-list__item {
-        border-color: lighten(#f90, 40%);
+        border-color: lighten(@companion, 40%);
         &:hover {
-            border-color: #f90;
+            border-color: @companion;
         }
     }
 }
@@ -581,6 +575,8 @@ label > input.cm-product-filters-checkbox + span::before {
 	display: block;
     }
 }
+
+
 
 
 
