@@ -234,7 +234,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             $count_import_offers++;
 
-            if (isset($offer -> {$cml['amount']}) && !empty($offer -> {$cml['amount']})) {
+            if (isset($offer -> {$cml['amount']})) {
                 $amount = strval($offer -> {$cml['amount']});
 
             } elseif (isset($offer -> {$cml['store']})) {
@@ -280,10 +280,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             $product_amount[$product_id]['amount'] = $o_amount;
             if (empty($combination_id)) {
-		if (isset($amount)) {
-			$product['amount'] = $amount;
-		}
-
+        		if (isset($amount)) {
+        			$product['amount'] = $amount;
+        		}
                 // [csmarket] limit bering
                 if (Registry::get('runtime.company_id') == 29) {
                     unset($product['amount']);

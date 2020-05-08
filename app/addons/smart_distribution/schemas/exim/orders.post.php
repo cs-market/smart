@@ -9,4 +9,6 @@ $schema['export_fields']['1c'] = array(
 	'process_get' => array('fn_get_1c_code', '#key')
 );
 
+$schema['export_fields']['E-mail']['required'] = false;
+
 return $schema;
