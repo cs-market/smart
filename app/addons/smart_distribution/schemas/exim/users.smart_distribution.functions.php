@@ -2,6 +2,10 @@
 
 function fn_exim_rejoin_user_profiles_export(&$pattern)
 {
+  if ($pattern['use_profile_functionality'] == 'N') {
+    return;
+  }
+
   $pattern['references']['user_profiles'] = array(
     'reference_fields' => [
       'user_id' => '#key',
@@ -30,7 +34,7 @@ function fn_exim_smart_distribution_add_field_columns_import($import_data, &$pat
     return;
   }
 
-  $exist_fields = db_get_hash_array('SELECT object_id, description FROM ?:profile_field_descriptions WHERE description IN (?a) AND lang_code = ?s', 'description', $field_names, DESCR_SL);
+  $exist_fields = db_get_hash_array('SELECT pd.object_id, pd.description, pf.field_name FROM ?:profile_field_descriptions AS pd LEFT JOIN ?:profile_fields AS pf ON pd.object_id = pf.field_id WHERE pd.description IN (?a) AND pd.lang_code = ?s', 'description', $field_names, DESCR_SL);
 
   foreach ($exist_fields as $field) {
     $pattern['export_fields'][$field['description']] = array(
@@ -38,6 +42,25 @@ function fn_exim_smart_distribution_add_field_columns_import($import_data, &$pat
       'linked' => false
     );
   }
+
+  // [check use profile]
+  $use_profile_functionality = 'N';
+  $check_fields = $file_fields;
+
+  if (isset($file_fields['profile_id'])) {
+    $use_profile_functionality = 'Y';
+  } else {
+    // because several with the email id
+    unset($check_fields[array_search('email', $check_fields)]);
+
+    $check_fields = array_merge($check_fields, fn_array_column($exist_fields, 'field_name'));
+    $profile_fields = db_get_field("SELECT count(field_name) FROM ?:profile_fields WHERE section != ?s AND field_name IN (?a)",'C', $check_fields);
+
+    $use_profile_functionality = $profile_fields ? 'Y' : 'N';
+  }
+
+  $pattern['use_profile_functionality'] = $use_profile_functionality;
+  // [/check use profile]
 }
 
 function fn_exim_smart_distribution_add_field_column_import($user_id, $value, $name, $profile_id)
@@ -172,12 +195,16 @@ function fn_exim_smart_distribution_export_vendors_customers($user_id) {
 }
 
 //  create profile, if empty profile_id
-function fn_exim_smart_distribution_check_profile_id($id, &$object)
+function fn_exim_smart_distribution_check_profile_id($id, &$object, $pattern)
 {
+  if ($pattern['use_profile_functionality'] == 'N') {
+    return;
+  }
+
     if (isset($id['user_id'])
       && !empty($id['user_id'])
     ) {
-      $profile_id = $object['profile_id'];
+      $profile_id = $object['profile_id'] ?? '';
 
       //  check profile by profile id and name
       if ($profile_id) {
