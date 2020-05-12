@@ -47,7 +47,7 @@ function fn_exim_rejoin_user_profiles_export(&$pattern)
         $use_profile_functionality = 'N';
         $check_fields = $file_fields;
 
-        if (isset($file_fields['profile_id'])) {
+        if (in_array('profile_id', $file_fields)) {
             $use_profile_functionality = 'Y';
         } else {
             // because several with the email id
