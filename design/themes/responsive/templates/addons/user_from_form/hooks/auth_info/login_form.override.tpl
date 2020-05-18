@@ -8,5 +8,13 @@
 			</p>
 		{/foreach}
 	</div>
+	{if $smarty.session.custom_registration}
+		{$cid = $smarty.session.custom_registration}
+		{if "welcome_text.`$cid`"|fn_is_lang_var_exists}
+			<div class="ty-login-info__welcome-txt">
+				{__("welcome_text.`$cid`") nofilter}
+			</div>
+		{/if}
+	{/if}
 {/hook}
 {/if}

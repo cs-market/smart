@@ -919,6 +919,14 @@ function fn_smart_distribution_get_product_data_post(&$product_data, $auth, $pre
 			$product_data['price'] = $product_data['usergroup_price'];
 		}
 	}
+	// buy together for mobile application
+	if (defined('API')) {
+		$p['product_id'] = $product_data['product_id'];
+		$p['status'] = 'A';
+		$p['full_info'] = true;
+		$p['date'] = true;
+		$product_data['buy_together'] = fn_buy_together_get_chains($p, $auth);
+	}
 }
 
 function fn_smart_distribution_get_product_price_post($product_id, $amount, $auth, &$price) {
