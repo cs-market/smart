@@ -882,16 +882,23 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     fn_add_product_to_cart($_item, $cart, $customer_auth);
                 }
 
+                foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
+                    if (!empty($order_id) && ($data_field->{$cml['name']} == $cml['status_order']) && (!empty($statuses[strval($data_field->{$cml['value']})]))) {
+                        $new_status = $statuses[strval($data_field->{$cml['value']})]['status'];
+                    }
+                    // TODO move to settings
+                    if ($data_field->{$cml['name']} == 'Дата отгрузки по 1С' && !empty(strtotime(strval($data_field->{$cml['value']})))) {
+                        $cart['delivery_date'] = strtotime(strval($data_field->{$cml['value']}));
+                    }
+                }
+
                 fn_calculate_cart_content($cart, $customer_auth);
                 if (!fn_cart_is_empty($cart) && $order_info['company_id'] != 12) {
                     fn_place_order($cart, $customer_auth, 'save');
                 }
 
-                foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
-                    if (!empty($order_id) && ($data_field->{$cml['name']} == $cml['status_order']) && (!empty($statuses[strval($data_field->{$cml['value']})]))) {
-                        $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $statuses[strval($data_field->{$cml['value']})]['status'], $order_id);
-                    }
-                }
+                if ($new_status) $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $new_status, $order_id);
+
                 fn_set_hook('exim_1c_update_order', $order_data, $cml);
             }
         }
@@ -1354,5 +1361,31 @@ class SDRusEximCommerceml extends RusEximCommerceml
         }
 
         return false;
+    }
+
+
+    public function dataProductFields($data_product, &$product)
+    {
+        $cml = $this->cml;
+
+        if (!empty($data_product -> {$cml['value_fields']} -> {$cml['value_field']})) {
+            foreach ($data_product -> {$cml['value_fields']} -> {$cml['value_field']} as $value_field) {
+                $_name_field = strval($value_field -> {$cml['name']});
+                $_v_field = strval($value_field -> {$cml['value']});
+
+
+                if (!empty($_v_field)) {
+                    $product_params = $this->dataShippingParams($_v_field, $_name_field);
+
+                    if (!empty($product_params)) {
+                        $product = array_merge($product, $product_params);
+                    }
+                }
+                // TODO move string to add-on settings
+                if (in_array($_name_field, array('КвантЗаказа'))) {
+                    $product['qty_step'] = (float) $_v_field;
+                }
+            }
+        }
     }
 }

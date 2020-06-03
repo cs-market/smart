@@ -39,7 +39,7 @@ return array(
         ),
         'Price' => array(
             'db_field' => 'price',
-            'required' => true,
+            'required' => false,
             'convert_put' => array('fn_exim_import_price', '#this', '@price_dec_sign_delimiter'),
         ),
         'Name' => array(

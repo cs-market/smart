@@ -59,18 +59,21 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
 	if ($delete_price) db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);
 
 	foreach ($user_prices as $user_price) {
-		if (empty($user_price['user_id']) || empty($user_price['price'])) {
+		if (empty($user_price['user_id'])) {
 			continue;
 		}
-
-		db_query(
-			"REPLACE INTO ?:user_price ?e",
-			[
-				'user_id' => $user_price['user_id'],
-				'price' => $user_price['price'],
-				'product_id' => $product_id
-			]
-		);
+		if (isset($user_price['price']) && $user_price['price'] == '') {
+			db_query("DELETE FROM ?:user_price WHERE product_id = ?i AND user_id = ?i", $product_id, $user_price['user_id']);
+		} elseif (is_numeric($user_price['price'])) {
+			db_query(
+				"REPLACE INTO ?:user_price ?e",
+				[
+					'user_id' => $user_price['user_id'],
+					'price' => $user_price['price'],
+					'product_id' => $product_id
+				]
+			);
+		}
 	}
 }
 

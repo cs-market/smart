@@ -747,12 +747,12 @@ function fn_update_subscriber($subscriber_data, $subscriber_id = 0)
     }
 
     fn_update_subscriptions($subscriber_id, $subscriber_data['list_ids'], isset($subscriber_data['confirmed']) ? $subscriber_data['confirmed'] : $subscriber_data['mailing_lists'], fn_get_notification_rules($subscriber_data), $subscriber_data['lang_code']);
-
-    if (!empty($invalid_emails)) {
-        fn_set_notification('E', __('error'), __('error_invalid_emails', array(
-            '[emails]' => implode(', ', $invalid_emails)
-        )));
-    }
+// [cs-market] do not show notification.
+//     if (!empty($invalid_emails)) {
+//         fn_set_notification('E', __('error'), __('error_invalid_emails', array(
+//             '[emails]' => implode(', ', $invalid_emails)
+//         )));
+//     }
 
     return $subscriber_id;
 }

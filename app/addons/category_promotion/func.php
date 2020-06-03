@@ -42,9 +42,8 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
 				$params['category_promotion'] = true;
 				if (isset($params['custom_extend'])) {
 					$params['custom_extend'][] = 'prices';
-				} else {
-					$params['extend'][] = 'prices';
 				}
+				$params['extend'][] = 'prices';
 				$promo_params = array(
 					'get_hidden' => true,
 					'active' => true,
