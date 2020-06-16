@@ -36,6 +36,18 @@
 
 		<item lang="en" id="calendar_delivery.choose_another_day">Choose another day</item>
 		<item lang="ru" id="calendar_delivery.choose_another_day">Выберите другой день доставки</item>
+
+		<item lang="en" id="calendar_delivery.period_start">Period start</item>
+		<item lang="ru" id="calendar_delivery.period_start">Время начала периода</item>
+
+		<item lang="en" id="calendar_delivery.period_finish">Period finish</item>
+		<item lang="ru" id="calendar_delivery.period_finish">Время окончания периода</item>
+
+		<item lang="en" id="calendar_delivery.period_step">Period step</item>
+		<item lang="ru" id="calendar_delivery.period_step">Шаг периода</item>
+
+		<item lang="en" id="period_start_error_message">Please, enter correct time</item>
+		<item lang="ru" id="period_start_error_message">Пожалуйста, введите корректное значение времени</item>
 	</language_variables>
 
 	<queries>
@@ -45,6 +57,13 @@
 		<item>ALTER TABLE `?:companies` ADD `tomorrow_rule` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `saturday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `tomorrow_timeslot` VARCHAR(8) NOT NULL DEFAULT '17:00';</item>
 		<item for="uninstall">ALTER TABLE `cscart_companies` DROP `tomorrow_rule`, DROP `sunday_shipping`, DROP `saturday_rule`, `tomorrow_timeslot`;</item>
 
+		<item>
+            ALTER TABLE `?:companies` 
+                ADD `period_start` varchar(8) NOT NULL DEFAULT '',
+                ADD `period_finish` varchar(8) NOT NULL DEFAULT '',
+                ADD `period_step` varchar(8) NOT NULL DEFAULT '';
+		</item>
+		<item for="uninstall">ALTER TABLE `cscart_companies` DROP `period_start`, `period_finish`, `period_step`;</item>
 	</queries>
 
 	<functions>

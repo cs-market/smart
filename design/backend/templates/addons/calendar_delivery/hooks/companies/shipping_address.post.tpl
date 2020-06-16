@@ -37,3 +37,24 @@
         <input type="checkbox" name="company_data[monday_rule]" id="elm_company_monday_rule" value="Y" {if $company_data.monday_rule == 'Y'} checked="checked" {/if} />
     </div>
 </div>
+
+<div class="control-group">
+    <label for="elm_company_period_start" class="control-label cm-regexp" data-ca-regexp="^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$" data-ca-message="__('period_start_error_message')">{__("calendar_delivery.period_start")}:</label>
+    <div class="controls">
+        <input class="input-time cm-trim" id="elm_company_period_start" size="5" maxlength="5" type="text" name="company_data[period_start]" value="{$company_data.period_start}" placeholder="00:00" />
+    </div>
+</div>
+
+<div class="control-group">
+    <label for="elm_company_period_finish" class="control-label cm-regexp" data-ca-regexp="^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$" data-ca-message="__('period_finish_error_message')">{__("calendar_delivery.period_finish")}:</label>
+    <div class="controls">
+        <input class="input-time cm-trim" id="elm_company_period_finish" size="5" maxlength="5" type="text" name="company_data[period_finish]" value="{$company_data.period_finish}" placeholder="00:00" />
+    </div>
+</div>
+
+<div class="control-group">
+    <label for="elm_company_period_step" class="control-label">{__("calendar_delivery.period_step")}:</label>
+    <div class="controls">
+        <input class="cm-trim" id="elm_company_period_step" size="2" maxlength="2" type="text" name="company_data[period_step]" value="{$company_data.period_step}" placeholder="2" />
+    </div>
+</div>
