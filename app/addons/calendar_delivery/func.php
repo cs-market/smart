@@ -204,3 +204,48 @@ function fn_parse_date_check_year($timestamp, $end_time = false)
 
     return !empty($timestamp) ? $timestamp : TIME;
 }
+
+function fn_get_calendar_delivery_period($period_start, $period_finish, $period_step)
+{
+    if (!$period_step) {
+        return [];
+    }
+
+    list($start_hour, $start_minute) = 
+        (strpos($period_start, ':') !== false)
+        ? explode(':', $period_start)
+        : [$period_start, '00'];
+
+    list($end_hour, $end_minute) = 
+        (strpos($period_finish, ':') !== false)
+        ? explode(':', $period_finish)
+        : [$period_finish, '00'];
+
+    list($period) = 
+        (strpos($period_step, ':') !== false)
+        ? explode(':', $period_step)
+        : [$period_step];
+
+    $periods = [];
+    
+    while ($start_hour < $end_hour) {
+        $end_period = $start_hour + $period;
+
+        if ($end_period < $end_hour) {
+            $data = ($start_hour < 10 ? '0' : '') . $start_hour . ':' . $start_minute . '-' . $end_period . ':' . $start_minute;
+        } else {
+            // last
+            $data = ($start_hour < 10 ? '0' : '') . $start_hour . ':' . $start_minute . '-' . $end_hour . ':' . $end_minute;
+        }
+        
+        $periods[$data] = [
+            'value' => $data,
+            'hour' => $start_hour,
+        ];
+        
+        $start_hour = $end_period;
+    }
+
+
+    return $periods;
+}
