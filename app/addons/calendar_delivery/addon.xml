@@ -48,6 +48,12 @@
 
 		<item lang="en" id="period_start_error_message">Please, enter correct time</item>
 		<item lang="ru" id="period_start_error_message">Пожалуйста, введите корректное значение времени</item>
+
+		<item lang="en" id="calendar_delivery.choose_another_period_vendor">Choose another period for vendor</item>
+		<item lang="ru" id="calendar_delivery.choose_another_period_vendor">Выберите другой период доставки по продавцу</item>
+
+		<item lang="en" id="calendar_delivery.choose_another_period">Choose another period</item>
+		<item lang="ru" id="calendar_delivery.choose_another_day">Выберите другой период доставки</item>
 	</language_variables>
 
 	<queries>
@@ -64,6 +70,9 @@
                 ADD `period_step` varchar(8) NOT NULL DEFAULT '';
 		</item>
 		<item for="uninstall">ALTER TABLE `cscart_companies` DROP `period_start`, `period_finish`, `period_step`;</item>
+        
+        <item>ALTER TABLE `?:orders` ADD `delivery_period` varchar(30) NOT NULL default '';</item>
+		<item for="uninstall">ALTER TABLE `?:orders` DROP `delivery_period`;</item>
 	</queries>
 
 	<functions>

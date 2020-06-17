@@ -53,6 +53,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			}
 		}
 
-		$cart['delivery_date'] = $_REQUEST['delivery_date'];
+        $cart['delivery_date'] = $_REQUEST['delivery_date'];
+
+		foreach ($_REQUEST['delivery_period'] as $company_id => $period) {
+            $choosed_ts = fn_parse_date($delivery_date[$company_id]);
+
+            // if !today
+            if (date('d', $choosed_ts) != date('d')) {
+                continue;
+            }
+
+            // if start period hour < now
+            if (strstr($period, ':', true) < date('h')) {
+                $c_data = fn_get_company_data($company_id);
+
+                if (count($cart['product_groups']) > 1)
+                    fn_set_notification('N', __('notice'), __('calendar_delivery.choose_another_period_vendor') . ' ' . $c_data['company']);
+                else {
+                    fn_set_notification('N', __('notice'), __('calendar_delivery.choose_another_period'));
+                }
+                $_REQUEST['next_step'] = 'ster_three';
+            }
+        }
+
+        $cart['delivery_period'] = $_REQUEST['delivery_period'];
 	}
 }
