@@ -53,7 +53,10 @@
 		<item lang="ru" id="calendar_delivery.choose_another_period_vendor">Выберите другой период доставки по продавцу</item>
 
 		<item lang="en" id="calendar_delivery.choose_another_period">Choose another period</item>
-		<item lang="ru" id="calendar_delivery.choose_another_day">Выберите другой период доставки</item>
+		<item lang="ru" id="calendar_delivery.choose_another_period">Выберите другой период доставки</item>
+
+		<item lang="en" id="calendar_delivery.delivery_period">Delivery period</item>
+		<item lang="ru" id="calendar_delivery.delivery_period">Период доставки</item>
 	</language_variables>
 
 	<queries>

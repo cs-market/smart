@@ -3,4 +3,11 @@
     <div class="control-label">{__('delivery_date')}</div>
     <div id="tygh_delivery_date" class="controls">{$order_info.delivery_date|date_format:"`$settings.Appearance.date_format`"}</div>
 </div>
+
+{if $order_info.delivery_period}
+<div class="control-group">
+    <div class="control-label">{__('calendar_delivery.delivery_period')}</div>
+    <div id="tygh_delivery_period" class="controls">{$order_info.delivery_period}</div>
+</div>
+{/if}
 {/if}

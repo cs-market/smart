@@ -43,6 +43,9 @@ function fn_calendar_delivery_get_order_info(&$order, $additional_data) {
     if (empty($order['delivery_date']) && !empty($order['shipping'][0]['delivery_date'])) {
         $order['delivery_date'] = $order['shipping'][0]['delivery_date'];
     }
+    if (empty($order['delivery_period']) && !empty($order['shipping'][0]['delivery_period'])) {
+        $order['delivery_period'] = $order['shipping'][0]['delivery_period'];
+    }
 }
 
 function fn_calendar_delivery_exim1c_order_xml_pre(&$order_xml, $order_data, $cml) {
@@ -50,6 +53,12 @@ function fn_calendar_delivery_exim1c_order_xml_pre(&$order_xml, $order_data, $cm
         $order_xml[$cml['value_fields']][][$cml['value_field']] = array(
             $cml['name'] => $cml['delivery_date'],
             $cml['value'] => fn_date_format($order_data['delivery_date'], Registry::get('settings.Appearance.date_format'))
+        );
+    }
+    if (isset($order_data['delivery_period']) && !empty($order_data['delivery_period'])) {
+        $order_xml[$cml['value_fields']][][$cml['value_field']] = array(
+            $cml['name'] => $cml['delivery_period'],
+            $cml['value'] => $order_data['delivery_period']
         );
     }
 }
@@ -126,10 +135,12 @@ if (!is_callable('fn_ts_this_day')) {
 function fn_calendar_delivery_create_order(&$order) {
     if ($order['company_id'] && isset( $_SESSION['cart']['delivery_date'][$order['company_id']] )) {
         $order['delivery_date'] = $_SESSION['cart']['delivery_date'][$order['company_id']];
+        $order['delivery_period'] = $_SESSION['cart']['delivery_period'][$order['company_id']];
     }
     // backward compatibility with mobile app
     if (is_array($order['delivery_date'])) {
         $order['delivery_date'] = array_shift($order['delivery_date']);
+        $order['delivery_period'] = array_shift($order['delivery_period']);
     }
     if (!empty($order['delivery_date'])) {
         $order['delivery_date'] = fn_parse_date($order['delivery_date']);
@@ -158,16 +169,21 @@ function fn_calendar_delivery_place_order($order_id, $action, $order_status, $ca
 
 function fn_calendar_delivery_update_cart_by_data_post(&$cart, $new_cart_data, $auth) {
     if (isset($new_cart_data['delivery_date'])) $cart['delivery_date'] = $new_cart_data['delivery_date'];
+    if (isset($new_cart_data['delivery_period'])) $cart['delivery_period'] = $new_cart_data['delivery_period'];
 
 }
 
 function fn_calendar_delivery_form_cart_pre_fill($order_id, &$cart, $auth, $order_info) {
     if (isset($order_info['delivery_date']))     $cart['delivery_date'] = $order_info['delivery_date'];
+    if (isset($order_info['delivery_period']))     $cart['delivery_period'] = $order_info['delivery_period'];
 }
 
 function fn_calendar_delivery_form_cart($order_info, &$cart, $auth) {
     if (!empty($order_info['delivery_date'])) {
         $cart['delivery_date'] = $order_info['delivery_date'];
+    }
+    if (!empty($order_info['delivery_period'])) {
+        $cart['delivery_period'] = $order_info['delivery_period'];
     }
 }
 
