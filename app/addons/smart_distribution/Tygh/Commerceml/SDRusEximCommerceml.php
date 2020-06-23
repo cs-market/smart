@@ -431,6 +431,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 fn_echo("imported: " . $count_import_offers . "\n");
                 $count_import_offers = 0;
             }
+            unset($amount);
         }
 
         if ($progress) {
@@ -1099,7 +1100,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     $data_product[$cml['discounts']][][$cml['discount']] = array(
                         $cml['name'] => $cml['product_discount'],
                         $cml['total'] => $product_discount,
-                        $cml['in_total'] => 'false'
+                        $cml['in_total'] => 'false',
+                        $cml['rate_discounts'] => $discount,
                     );
                 }
             }
@@ -1108,7 +1110,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $data_product[$cml['discounts']][][$cml['discount']] = array(
                     $cml['name'] => $cml['product_discount'],
                     $cml['total'] => $product['discount'],
-                    $cml['in_total'] => 'true'
+                    $cml['in_total'] => 'true',
+                    $cml['rate_discounts'] => floor($product['discount'] / $product['base_price'] * 100),
                 );
             }
 

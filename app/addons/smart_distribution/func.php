@@ -395,7 +395,7 @@ function fn_smart_distribution_api_send_response($_this, $response, $authorized)
 function fn_write_r() {
   static $count = 0;
   $args = func_get_args();
-  $fp = fopen('api_requests.html', 'a+');
+  $fp = fopen('api_requests.html', 'w+');
   if (!empty($args)) {
 	fwrite($fp, '<ol style="font-family: Courier; font-size: 12px; border: 1px solid #dedede; background-color: #efefef; float: left; padding-right: 20px;">');
 	foreach ($args as $k => $v) {
@@ -868,6 +868,9 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
 	}
 	if (AREA == 'A') {
 		$fields['timestamp'] = "products.timestamp";
+		if (isset($params['product_code']) && !empty($params['product_code'])) {
+			$condition .= db_quote(" AND products.product_code LIKE ?l", trim($params['product_code']));
+		}
 	}
 }
 
@@ -966,4 +969,8 @@ function fn_smart_distribution_load_products_extra_data_post(&$products, $produc
 
 function fn_smart_distribution_get_stickers_pre($params, $fields, &$condition, $lang_code) {
 	if (isset($params['name'])) $condition .= db_quote(' AND ?:product_stickers.name = ?s', $params['name']);
+}
+
+function fn_timestamp_to_date_wo_time($timestamp) {
+    return !empty($timestamp) ? date('d.m.Y', intval($timestamp)) : '';
 }
