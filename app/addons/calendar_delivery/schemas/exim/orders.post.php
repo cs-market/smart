@@ -2,7 +2,7 @@
 
 $schema['export_fields']['Delivery date'] = array(
 	'db_field' => 'delivery_date',
-	'process_get' => array('fn_timestamp_to_date', '#this'),
+	'process_get' => array('fn_timestamp_to_date_wo_time', '#this'),
 );
 
 $schema['export_fields']['Delivery period'] = array(
