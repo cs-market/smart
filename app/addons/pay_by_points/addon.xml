@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
 <addon scheme="3.0" edition_type="ROOT,ULT:VENDOR">
     <id>pay_by_points</id>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <priority>1900</priority>
     <position>180</position>
     <status>active</status>
     <default_language>ru</default_language>
     <compatibility>
-      <dependencies>reward_points</dependencies>
+        <dependencies>reward_points</dependencies>
     </compatibility>
+	<queries>
+        <item>ALTER TABLE `?:products` ADD `points_eq_price` CHAR(1) NOT NULL DEFAULT 'N' AFTER `is_pbp`</item>
+		<item for="uninstall">ALTER TABLE `products` DROP `points_eq_price`;</item>
+    </queries>
 </addon>

@@ -43,3 +43,7 @@ msgctxt "Languages::pay_by_points__notification__change_amount"
 msgid "pay_by_points__notification__change_amount"
 msgstr "%product% Недостаточно баллов для оплаты %old_amount%шт, в корзину добавленно %new_amount%шт"
 #  /NOTIFICATIONS
+
+msgctxt "Languages::pay_by_points__points_eq_price"
+msgid "points_eq_price"
+msgstr "Цена в баллах равна цене в валюте"

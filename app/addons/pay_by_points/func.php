@@ -9,11 +9,19 @@ function fn_pay_by_points_pre_add_to_cart(&$product_data, $cart, $auth, $update)
   foreach($product_data as &$product) {
     $product['is_pbp']  = db_get_field("SELECT is_pbp FROM ?:products WHERE product_id = ?i", $product['product_id']);
 
-    $product['point_price'] = ($product['is_pbp'] == 'Y')
-    ? fn_get_price_in_points($product['product_id'], $auth)
-    : 0;
+    $points_eq_price = (!isset($product['points_eq_price']))
+        ? db_get_field("SELECT points_eq_price FROM ?:products WHERE product_id = ?i", $product['product_id'])
+        : $product['points_eq_price'];
 
-    $product['pay_by_points'] = fn_check_product_pay_by_points($product);
+    $product['point_price'] = ($product['is_pbp'] == 'Y')
+        ? (
+            (AREA == 'C' && $points_eq_price == 'Y')
+            ? $product['price']
+            : fn_get_price_in_points($product['product_id'], $auth)
+        )
+        : 0;
+
+    list($product['pay_by_points'], $product['point_price']) = fn_check_product_pay_by_points($product);
   }
   unset($product);
 
@@ -53,37 +61,43 @@ function fn_pay_by_points_add_product_to_cart_get_price($product_data, &$cart, $
   }
   fn_update_use_pay_by_points([$product_id]);
 
-  $reward_point_product_price = fn_get_price_in_points($product_id, $auth) ?: $price;
+    $points_eq_price = (!isset($product_data['points_eq_price']))
+        ? db_get_field("SELECT points_eq_price FROM ?:products WHERE product_id = ?i", $product_id)
+        : $product_data['points_eq_price'];
 
-  $available_points = fn_get_available_points();
-  $product_cart_point_price = $amount * $reward_point_product_price;
+    $reward_point_product_price = (AREA == 'C' && $points_eq_price == 'Y') 
+        ? $price 
+        : fn_get_price_in_points($product_id, $auth);
 
-  if ($product_cart_point_price > $available_points) {
-    //  decrease amount or disallow add to cart
-    $new_amount = floor($available_points / $reward_point_product_price);
+    $available_points = fn_get_available_points();
+    $product_cart_point_price = $amount * $reward_point_product_price;
 
-    if ($new_amount > 0) {
-      fn_set_notification('N', __('notice'), __(
-        'pay_by_points__notification__change_amount',
-        [
-          '%product%' => fn_get_product_name($product_id),
-          '%old_amount%' => $amount,
-          '%new_amount%' => $new_amount,
-        ]
-      ));
-      $amount = $new_amount;
-      $product_cart_point_price = $amount * $reward_point_product_price;
-    } else {
-      fn_set_notification('E', __('error'), __(
-        'pay_by_points__notification__not_enough_points',
-        ['%product%' => fn_get_product_name($product_id)]
-      ));
-      fn_delete_cart_product($cart, $_id);
-      $allow_add = false;
+    if ($product_cart_point_price > $available_points) {
+        //  decrease amount or disallow add to cart
+        $new_amount = floor($available_points / $reward_point_product_price);
+
+        if ($new_amount > 0) {
+            fn_set_notification('N', __('notice'), __(
+                'pay_by_points__notification__change_amount',
+                [
+                '%product%' => fn_get_product_name($product_id),
+                '%old_amount%' => $amount,
+                '%new_amount%' => $new_amount,
+                ]
+            ));
+            $amount = $new_amount;
+            $product_cart_point_price = $amount * $reward_point_product_price;
+        } else {
+            fn_set_notification('E', __('error'), __(
+                'pay_by_points__notification__not_enough_points',
+                ['%product%' => fn_get_product_name($product_id)]
+            ));
+            fn_delete_cart_product($cart, $_id);
+            $allow_add = false;
+        }
     }
-  }
 
-  $data['extra']['pay_by_points']['product_cart_point_price'] = $product_cart_point_price;
+    $data['extra']['pay_by_points']['product_cart_point_price'] = $product_cart_point_price;
 }
 
 function fn_pay_by_points_add_to_cart(&$cart, $product_id, $_id)
@@ -227,15 +241,19 @@ function fn_pay_by_points_load_products_extra_data(&$extra_fields, $products, $p
 
 function fn_pay_by_points_get_products_post(&$products, $params, $lang_code)
 {
-  foreach($products as &$product) {
-    $product['pay_by_points'] = fn_check_product_pay_by_points($product);
-  }
-  unset($product);
+    foreach($products as &$product) {
+        list($product['pay_by_points'], $product['point_price']) = fn_check_product_pay_by_points($product);
+    }
+    unset($product);
 }
 
 function fn_pay_by_points_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
 {
-  $product_data['pay_by_points'] = fn_check_product_pay_by_points($product_data);
+    list($product_data['pay_by_points'], $product_data['point_price']) = fn_check_product_pay_by_points($product_data);
+
+    if ($product_data['point_price']) {
+        $product_data['points_info']['price'] = $product_data['point_price'];
+    }
 }
 //  [/HOOKs]
 
@@ -302,10 +320,40 @@ function fn_get_order_total_bonus($order_id)
   return (String) $total_bonus;
 }
 
+/*
+* Get pay_by_points and correct bonus price
+*
+* $product array
+* return [pay_by_points, point_price]
+*/
 function fn_check_product_pay_by_points($product)
 {
-  $is_pbp = $product['is_pbp'] ?? 'N';
-  $point_price = $product['point_price'] ?? '0';
+    $is_pbp = $product['is_pbp'] ?? 'N';
+    if ($is_pbp != 'Y') {
+        return ['N', 0];
+    }
 
-  return ($is_pbp == 'Y' && $point_price) ? 'Y' : 'N';
+    $points_eq_price = (!isset($product['points_eq_price']))
+        ? db_get_field("SELECT points_eq_price FROM ?:products WHERE product_id = ?i", $product['product_id'])
+        : $product['points_eq_price'];
+
+    if (AREA == 'C' && $points_eq_price == 'Y') {
+        if (!isset($product['price']) || !$product['price']) {
+            $product['price'] = fn_get_product_price(
+                $product['product_id'],
+                $product['amount'] ?? 1
+            );
+        }
+        $point_price = round($product['price'], 2);
+    } else {
+        if (!isset($product['point_price']) || !$product['point_price']) {
+            $product['point_price'] = fn_get_price_in_points($product['product_id'], $auth);
+        }
+        $point_price = $product['point_price'];
+    }
+
+    return [
+        $point_price ? 'Y' : 'N',
+        $point_price
+    ];
 }
