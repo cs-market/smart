@@ -1111,7 +1111,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     $cml['name'] => $cml['product_discount'],
                     $cml['total'] => $product['discount'],
                     $cml['in_total'] => 'true',
-                    $cml['rate_discounts'] => floor($product['discount'] / $product['base_price'] * 100),
+                    $cml['rate_discounts'] => round($product['discount'] / $product['base_price'] * 100),
                 );
             }
 

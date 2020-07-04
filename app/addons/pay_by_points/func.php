@@ -75,8 +75,9 @@ function fn_pay_by_points_add_product_to_cart_get_price($product_data, &$cart, $
     if ($product_cart_point_price > $available_points) {
         //  decrease amount or disallow add to cart
         $new_amount = floor($available_points / $reward_point_product_price);
-
-        if ($new_amount > 0) {
+        $min_qty = db_get_field("SELECT min_qty FROM ?:products WHERE product_id = ?i", $product_id);
+        $min_qty = $min_qty ? $min_qty : 0;
+        if ($new_amount > $min_qty) {
             fn_set_notification('N', __('notice'), __(
                 'pay_by_points__notification__change_amount',
                 [
@@ -247,18 +248,16 @@ function fn_pay_by_points_get_products_post(&$products, $params, $lang_code)
     unset($product);
 }
 
-function fn_pay_by_points_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
-{
-    list($product_data['pay_by_points'], $product_data['point_price']) = fn_check_product_pay_by_points($product_data);
-
-    if ($product_data['point_price']) {
-        $product_data['points_info']['price'] = $product_data['point_price'];
+function fn_pay_by_points_gather_additional_product_data_before_discounts(&$product, $auth, $params) {
+    list($product['pay_by_points'], $product['point_price']) = fn_check_product_pay_by_points($product);
+    if ($product['point_price']) {
+        $product['points_info']['price'] = $product['point_price'];
     }
 }
 //  [/HOOKs]
 
 /*
-* Get avvaileble point
+* Get availeble point
 * get from session
 * return float
 */

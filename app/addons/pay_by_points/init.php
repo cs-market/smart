@@ -17,5 +17,5 @@ fn_register_hooks(
   'calculate_cart_post',
   'load_products_extra_data',
   'get_products_post',
-  'get_product_data_post'
+  ['gather_additional_product_data_before_discounts', 4394967294]
 );

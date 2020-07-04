@@ -76,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        $cart['delivery_period'] = $_REQUEST['delivery_period'];
 	}
+
+        $cart['delivery_period'] = ($_REQUEST['delivery_period']) ? $_REQUEST['delivery_period'] : '';
 }

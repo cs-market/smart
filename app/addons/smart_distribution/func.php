@@ -281,8 +281,10 @@ function fn_smart_distribution_update_profile($action, $user_data, $current_user
 
 function fn_smart_distribution_gather_additional_product_data_post(&$product, $auth, $params) {
 	// for discount label in mobile application
-	if (isset($product['discount']) && !( (float) $product['list_price'])) {
-		$product['list_price'] = $product['base_price'];
+	if (isset($product['discount'])) {
+		if (!( (float) $product['list_price'])) {
+			$product['list_price'] = $product['base_price'];
+		}
 		if (!isset($product['list_discount'])) {
 			$product['list_discount'] = $product['discount'];
 			$product['list_discount_prc'] = $product['discount_prc'];

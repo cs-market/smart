@@ -77,6 +77,10 @@ function fn_calendar_delivery_get_companies($params, &$fields, $sortings, $condi
     $fields[] = "'Y' as tomorrow_rule";
     $fields[] = 'working_time_till as tomorrow_timeslot';
     $fields[] = 'monday_rule as saturday_rule';
+
+    $fields[] = 'period_start';
+    $fields[] = 'period_finish';
+    $fields[] = 'period_step';
 }
 
 // backward compatibility
