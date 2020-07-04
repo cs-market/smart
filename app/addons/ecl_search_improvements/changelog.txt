@@ -1,0 +1,21 @@
+Legend:
+[+] - new feature/improvement
+[*] - functionality changes
+[!] - bugfix
+
+Version 1.9, 10 December 2018
+
+[+] Ability to search by vendor name added
+
+Version 1.10, 24 June 2019
+
+[+] Search type setting is used by quick search now
+
+Version 1.11, 19 August 2019
+
+[*] Basic theme is not supported anymore
+[+] Ability to export search results were added
+
+Version 1.12, 19 August 2019
+
+[!] Match type was not processed by filters

@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>ecl_search_improvements</id>
+    <name>[eCom Labs] Search Improvements</name>
+    <description>Adds minimum character amount for the search fields and other useful settings. Also the module adds ability to track search words</description>
+    <version>1.12</version>
+    <priority>2900</priority>
+    <position>0</position>
+    <status>active</status>
+    <supplier>eCom Labs</supplier>
+    <supplier_link>https://www.ecom-labs.com</supplier_link>
+    <default_language>en</default_language>
+    <authors>
+        <author>
+            <name>eCom Labs</name>
+            <email>contact@ecom-labs.com</email>
+            <url>https://www.ecom-labs.com</url>
+            <phone>+7 963 234 30 03</phone>
+        </author>
+    </authors>
+    <translations>
+        <item for="name" lang="ru">[eCom Labs] Улучшение Поиска</item>
+        <item for="description" lang="ru">Позволяет задавать минимальное кол-во символов и другие полезные настройки для оптимизации поиска. Так же добавляется логирование поисковых запросов</item>
+    </translations>
+    <settings edition_type="ROOT,ULT:VENDOR">
+        <sections>
+            <section id="section1">
+                <name>Generic settings</name>        
+                <translations>
+                    <item lang="ru" for="name">Обычные настройки</item>
+                </translations>
+                <items>
+                    <item id="char_amount">
+                        <type>input</type>
+                        <name>Minimum charactrs amount</name>
+                        <default_value>3</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Минимальное кол-во символов для поиска</item>
+                        </translations>
+                    </item>
+                    <item id="border_color">
+                        <type>input</type>
+                        <name>Border color</name>
+                        <tooltip>Wrong amount of characters colors the border.</tooltip>
+                        <default_value>red</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Цвет рамки</item>
+                            <item lang="ru" for="tooltip">Неправильное кол-во символов подсвечивает поле ввода</item>
+                        </translations>
+                    </item>
+                    <item id="search_type">
+                        <type>selectbox</type>
+                        <name>Search type</name>
+                        <variants>
+                            <item id="all">
+                                <name>All of these words</name>
+                                <translations>
+                                    <item lang="ru">Все слова</item>
+                                </translations>
+                            </item>
+                            <item id="any">
+                                <name>Any of these words</name>
+                                <translations>
+                                    <item lang="ru">Любое слово</item>
+                                </translations>                      
+                            </item>
+                            <item id="exact">
+                                <name>Exact phrase</name>
+                                <translations>
+                                    <item lang="ru">Точная фраза</item>
+                                </translations>                      
+                            </item>
+                        </variants>
+                        <default_value>all</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Тип поиска</item>
+                        </translations>
+                    </item>
+					<item id="multiple_checkboxes">
+                        <type>multiple checkboxes</type>
+                        <name>Search in</name>
+                         <variants>
+                            <item id="pname">
+                                <name>Product name</name>
+                                <translations>
+                                    <item lang="ru">Имя товара</item>
+                                </translations>
+                            </item>
+                            <item id="pshort">
+                                <name>Short description</name>
+                                <translations>
+                                    <item lang="ru">Краткое описание</item>
+                                </translations>
+                            </item>
+							<item id="pfull">
+                                <name>Full description</name>
+                                <translations>
+                                    <item lang="ru">Полное описание</item>
+                                </translations>
+                            </item>
+							<item id="pkeywords">
+                                <name>Keywords</name>
+                                <translations>
+                                    <item lang="ru">Ключевые слова</item>
+                                </translations>
+                            </item>
+							<item id="pcode">
+                                <name>Product code</name>
+                                <translations>
+                                    <item lang="ru">Артикул</item>
+                                </translations>
+                            </item>
+                            <item id="vendor">
+                                <name>Vendor name</name>
+                                <translations>
+                                    <item lang="ru">Продавец</item>
+                                </translations>
+                            </item>
+                        </variants>
+                        <translations>
+                            <item lang="ru" for="name">Искать в</item>
+                        </translations>
+                    </item>
+                    <item id="single_product">
+                        <type>checkbox</type>
+                        <name>Single product redirect</name>                
+                        <tooltip>Redirect to product details if found single product.</tooltip>
+                        <default_value>Y</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Переадресация на карточку товара</item>
+                            <item lang="ru" for="tooltip">Переадресация на страницу товара, если найден только один продукт</item>
+                        </translations>
+                    </item>
+					<item id="admin_search_type">
+                        <type>selectbox</type>
+                        <name>Admin search type</name>
+                        <variants>
+                            <item id="all">
+                                <name>All of these words</name>
+                                <translations>
+                                    <item lang="ru">Все слова</item>
+                                </translations>
+                            </item>
+                            <item id="any">
+                                <name>Any of these words</name>
+                                <translations>
+                                    <item lang="ru">Любое слово</item>
+                                </translations>                      
+                            </item>
+                            <item id="exact">
+                                <name>Exact phrase</name>
+                                <translations>
+                                    <item lang="ru">Точная фраза</item>
+                                </translations>                      
+                            </item>
+                        </variants>
+                        <default_value>any</default_value>
+                        <translations>
+                            <item lang="ru" for="name">Тип поиска в панели администратора</item>
+                        </translations>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+	<language_variables>
+        <item id="search_words_menu_description" lang="en">View popular search words</item>
+        <item id="search_words_menu_description" lang="ru">Популярные поисковые запросы</item>
+        <item id="export_search_results" lang="en">Export search results</item>
+        <item id="export_search_results" lang="ru">Экспортировать найденные товары</item>
+    </language_variables>
+	<queries>
+	    <item>CREATE TABLE `?:search_key_words` (
+  `key_word_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `key_word` varchar(255) NOT NULL DEFAULT '',
+  `timestamp` int(11) unsigned NOT NULL DEFAULT '0',
+  `popularity` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `company_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `lang_code` char(2) NOT NULL default '',
+  PRIMARY KEY (`key_word_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8</item>
+		<item for="uninstall">DROP TABLE IF EXISTS ?:search_key_words</item>
+    </queries>
+</addon>
