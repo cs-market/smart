@@ -1391,4 +1391,36 @@ class SDRusEximCommerceml extends RusEximCommerceml
             }
         }
     }
+
+    public function exportDataOrdersGetXML($lang_code) {
+        $params = array(
+            'company_id' => $this->company_id,
+            'company_name' => true,
+            'place' => 'exim_1c',
+        );
+
+        $statuses = $this->s_commerceml['exim_1c_order_statuses'];
+        if (!empty($statuses)) {
+            foreach($statuses as $key => $status) {
+                if (!empty($status)) {
+                    $params['status'][] = $key;
+                }
+            }
+        }
+
+        list($orders, $search) = fn_get_orders($params);
+        
+        $begin = "\xEF\xBB\xBF";
+        $xml = new \XMLWriter();
+        $xml -> openMemory();
+        $xml -> startDocument();
+        $xml -> startElement($this->cml['commerce_information']);
+        foreach ($orders as $k => $data) {
+            $order_data = fn_get_order_info($data['order_id']);
+            $xml = $this->dataOrderToFile($xml, $order_data, $lang_code);
+        }
+        $xml -> endElement();
+        $data = $begin . $xml -> outputMemory();
+        return $data;
+    }
 }

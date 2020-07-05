@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
 //	[HOOKs]
 function fn_user_price_update_product_post($product_data, $product_id, $lang_code, $create)
 {
