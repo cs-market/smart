@@ -14,6 +14,6 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
-	'get_users_pre',
-	'get_users'
+    'get_users_pre',
+    'get_users'
 );

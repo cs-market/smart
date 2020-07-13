@@ -85,7 +85,7 @@ function fn_exim_csv_find_csvs($cid) {
 
 	$fs_files = fn_get_dir_contents($dir, false, true, 'csv');
 	$files = array();
-	$priority = array('products' => 10, 'users' => 20, 'user_price' => 30, 'orders' => 40);
+	$priority = array('products' => 10, 'users' => 20, 'user_price' => 30, 'qty_discounts' => 35, 'orders' => 40);
 	foreach ($fs_files as $file) {
 		$data = pathinfo($file);
 		list($data['import_object'], $tmp) = explode('.', $data['filename']);

@@ -11,7 +11,11 @@
 	<supplier>CS-Market</supplier>
 	<supplier_link>http://cs-market.com/</supplier_link>
 	<language_variables>
-		<item lang="en" id="export_order_to_csv">Export orders to XML</item>
-		<item lang="ru" id="export_order_to_csv">Экспортировать заказ в XML</item>
+		<item lang="en" id="export_order_to_xml">Export orders to XML</item>
+		<item lang="ru" id="export_order_to_xml">Экспортировать заказ в XML</item>
 	</language_variables>
+	<queries>
+		<item>ALTER TABLE ?:companies ADD `export_order_to_xml` CHAR(1) NOT NULL DEFAULT 'N' AFTER `export_order_to_csv`;</item>
+		<item for="uninstall">ALTER TABLE ?:companies DROP `export_order_to_xml`;</item>
+	</queries>
 </addon>

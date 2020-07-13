@@ -508,6 +508,11 @@ function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $u
 	$cart['skip_notification'] = true;
 }
 
+// wishlist in mobile application should have qty_step
+function fn_smart_distribution_add_to_cart(&$cart, $product_id, $_id) {
+	$cart['products'][$_id]['qty_step'] = db_get_field('SELECT qty_step FROM ?:products WHERE product_id = ?i', $product_id);
+}
+
 function fn_smart_distribution_get_profile_fields($location, $select, &$condition) {
 	if (AREA == 'C' && in_array(Registry::get('runtime.controller'), array('checkout', 'profiles'))) {
 		$stop_fields = array(
