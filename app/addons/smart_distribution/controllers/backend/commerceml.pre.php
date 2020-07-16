@@ -851,6 +851,28 @@ fn_print_r($fantoms);
 		}*/
 	}
 	fn_print_die('stop');
+} elseif ($mode == 'correct_users2') {
+	$jun2019 = 1559347200;
+	$users = db_get_fields('SELECT user_id FROM ?:users WHERE user_type = "C" AND timestamp > ?i AND company_id = 0 ORDER BY user_id ASC', 0);
+	foreach ($users as $user_id) {
+		$order = db_get_row('SELECT count(company_id) as count, company_id FROM ?:orders WHERE user_id = ?i GROUP BY company_id ORDER BY count DESC', $user_id);
+		if ($order) {
+			db_query('UPDATE ?:users SET company_id = ?i WHERE user_id = ?i', $order['company_id'], $user_id);
+			$corrected_users[] = $user_id;
+		}
+	}
+	fn_print_die(count($corrected_users), $corrected_users);
+} elseif ($mode == 'fix_user_price') {
+	$users = db_get_fields('SELECT user_id FROM ?:users');
+	$products = db_get_fields('SELECT product_id FROM ?:products');
+	db_query('DELETE FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
+	db_query('DELETE FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
+	$user_price_products = db_get_hash_multi_array('SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id', ['company_id', 'product_id', 'product_id']);
+	foreach ($user_price_products as $company_id => $products) {
+		$company_users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i', $company_id);
+		db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
+	}
+	fn_print_die('stop');
 }
 
 function fn_between($val, $pattern)

@@ -117,3 +117,11 @@ function fn_get_user_price_user_data(&$user_prices)
 		$user_price['user_data'] = $user_datas[$user_price['user_id']] ?? '';
 	});
 }
+
+function fn_user_price_delete_product_post($product_id, $product_deleted) {
+	if ($product_deleted) db_query('DELETE FROM ?:user_price WHERE product_id = ?i', $product_id);
+}
+
+function fn_user_price_post_delete_user($user_id, $user_data, $result) {
+	if ($result) db_query('DELETE FROM ?:user_price WHERE user_id = ?i', $user_id);
+}

@@ -198,7 +198,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condit
 	}
 	// for search in profile fields
 	if (!empty($params['search_query'])) {
-		$condition['name'] .= db_quote(' OR (?:profile_fields_data.value = ?s)', $params['search_query']);
+		$condition['name'] = ' AND ( 1 ' . $condition['name'] . db_quote(' OR (?:profile_fields_data.value = ?s))', $params['search_query']);
 		$join .= db_quote(' LEFT JOIN ?:profile_fields_data ON ?:profile_fields_data.object_id = ?:user_profiles.profile_id AND ?:profile_fields_data.object_type = ?s', 'P');
 	}
 }
