@@ -124,7 +124,7 @@ function fn_exim_csv_run_import($imports, $company_id) {
 						'images_path' => 'images/',
 						'price_dec_sign_delimiter' => '.',
 						'category_delimiter' => '///',
-						'skip_creating_new_products' => 'N',
+						'skip_creating_new_products' => 'Y',
 						'unset_file' => true
 					);
 					if (is_array($import)) {

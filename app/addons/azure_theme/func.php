@@ -138,4 +138,9 @@ function fn_azure_theme_get_category_data_post($category_id, $field_list, $get_m
 	if ($get_main_pair == true) {
 		$category_data['menu_icon'] = fn_get_image_pairs($category_id, 'category', 'I', true, true, $lang_code);
 	}
+
+}
+
+function fn_azure_search_split($str) {
+	return preg_split('//u',$str,-1,PREG_SPLIT_NO_EMPTY);
 }
