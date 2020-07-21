@@ -47,3 +47,7 @@ msgstr "%product% Недостаточно баллов для оплаты %old
 msgctxt "Languages::pay_by_points__points_eq_price"
 msgid "points_eq_price"
 msgstr "Цена в баллах равна цене в валюте"
+
+msgctxt "Languages::pay_by_points__earned_points_eq_price"
+msgid "earned_points_eq_price"
+msgstr "Баллы за товары равны цене"
