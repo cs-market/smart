@@ -1,0 +1,1 @@
+<input type="hidden" id="alt_host_address" value="{$config.admin_index}">

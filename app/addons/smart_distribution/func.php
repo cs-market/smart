@@ -198,7 +198,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condit
 	}
 	// for search in profile fields
 	if (!empty($params['search_query'])) {
-		$condition['name'] .= db_quote(' OR (?:profile_fields_data.value = ?s)', $params['search_query']);
+		$condition['name'] = ' AND ( 1 ' . $condition['name'] . db_quote(' OR (?:profile_fields_data.value = ?s))', $params['search_query']);
 		$join .= db_quote(' LEFT JOIN ?:profile_fields_data ON ?:profile_fields_data.object_id = ?:user_profiles.profile_id AND ?:profile_fields_data.object_type = ?s', 'P');
 	}
 }
@@ -281,8 +281,10 @@ function fn_smart_distribution_update_profile($action, $user_data, $current_user
 
 function fn_smart_distribution_gather_additional_product_data_post(&$product, $auth, $params) {
 	// for discount label in mobile application
-	if (isset($product['discount']) && !( (float) $product['list_price'])) {
-		$product['list_price'] = $product['base_price'];
+	if (isset($product['discount'])) {
+		if (!( (float) $product['list_price'])) {
+			$product['list_price'] = $product['base_price'];
+		}
 		if (!isset($product['list_discount'])) {
 			$product['list_discount'] = $product['discount'];
 			$product['list_discount_prc'] = $product['discount_prc'];
@@ -504,6 +506,11 @@ function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $u
 
 	// disable popup notification
 	$cart['skip_notification'] = true;
+}
+
+// wishlist in mobile application should have qty_step
+function fn_smart_distribution_add_to_cart(&$cart, $product_id, $_id) {
+	$cart['products'][$_id]['qty_step'] = db_get_field('SELECT qty_step FROM ?:products WHERE product_id = ?i', $product_id);
 }
 
 function fn_smart_distribution_get_profile_fields($location, $select, &$condition) {

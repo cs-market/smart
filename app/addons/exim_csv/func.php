@@ -85,7 +85,7 @@ function fn_exim_csv_find_csvs($cid) {
 
 	$fs_files = fn_get_dir_contents($dir, false, true, 'csv');
 	$files = array();
-	$priority = array('products' => 10, 'users' => 20, 'user_price' => 30, 'orders' => 40);
+	$priority = array('products' => 10, 'users' => 20, 'user_price' => 30, 'qty_discounts' => 35, 'orders' => 40);
 	foreach ($fs_files as $file) {
 		$data = pathinfo($file);
 		list($data['import_object'], $tmp) = explode('.', $data['filename']);
@@ -124,7 +124,7 @@ function fn_exim_csv_run_import($imports, $company_id) {
 						'images_path' => 'images/',
 						'price_dec_sign_delimiter' => '.',
 						'category_delimiter' => '///',
-						'skip_creating_new_products' => 'N',
+						'skip_creating_new_products' => 'Y',
 						'unset_file' => true
 					);
 					if (is_array($import)) {

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>exim_xml</id>
+	<name>Smart distribution: Exim XML</name>
+	<description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+	<priority>26732300</priority>
+	<version>1.0.1</version>
+	<position>0</position>
+	<status>active</status>
+	<default_language>en</default_language>
+	<supplier>CS-Market</supplier>
+	<supplier_link>http://cs-market.com/</supplier_link>
+	<language_variables>
+		<item lang="en" id="export_order_to_xml">Export orders to XML</item>
+		<item lang="ru" id="export_order_to_xml">Экспортировать заказ в XML</item>
+	</language_variables>
+	<queries>
+		<item>ALTER TABLE ?:companies ADD `export_order_to_xml` CHAR(1) NOT NULL DEFAULT 'N' AFTER `export_order_to_csv`;</item>
+		<item for="uninstall">ALTER TABLE ?:companies DROP `export_order_to_xml`;</item>
+	</queries>
+</addon>

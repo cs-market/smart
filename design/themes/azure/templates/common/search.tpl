@@ -13,19 +13,22 @@
         {strip}
             {if $block.properties.seacrch_string_random_product == 'Y'}
                 {$search_title = ""|fn_azure_theme_get_random_product_name}
+            {elseif $settings.General.search_objects}
+                {assign var="search_title" value=__("search")}
             {else}
                 {assign var="search_title" value=__("search_products")}
             {/if}
+            
             <input type="text" name="q" value="{$search.q}" id="search_input{$smarty.capture.search_input_id}" title="{*$search_title*}" class="ty-search-block__input cm-hint" />
-            <div class="ty-search-placeholder">{foreach from=$search_title|fn_azure_theme_get_split_str item="char"}<span class="char">{$char}</span>{/foreach}</div>
+            {if !$search.q}
+                <div class="ty-search-placeholder">{foreach from=$search_title|fn_azure_search_split item="char"}<span class="char">{$char}</span>{/foreach}</div>
+            {/if}
             {if $settings.General.search_objects}
                 {include file="buttons/magnifier.tpl" but_name="search.results" alt=__("search")}
             {else}
                 {include file="buttons/magnifier.tpl" but_name="products.search" alt=__("search")}
             {/if}
         {/strip}
-
         {capture name="search_input_id"}{$block.snapping_id}{/capture}
-
     </form>
 </div>

@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
 //	[HOOKs]
 function fn_user_price_update_product_post($product_data, $product_id, $lang_code, $create)
 {
@@ -114,4 +116,12 @@ function fn_get_user_price_user_data(&$user_prices)
 	array_walk($user_prices, function(&$user_price) use ($user_datas) {
 		$user_price['user_data'] = $user_datas[$user_price['user_id']] ?? '';
 	});
+}
+
+function fn_user_price_delete_product_post($product_id, $product_deleted) {
+	if ($product_deleted) db_query('DELETE FROM ?:user_price WHERE product_id = ?i', $product_id);
+}
+
+function fn_user_price_post_delete_user($user_id, $user_data, $result) {
+	if ($result) db_query('DELETE FROM ?:user_price WHERE user_id = ?i', $user_id);
 }

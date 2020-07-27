@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>targetsms</id>
+    <version>2.1.2</version>
+    <status>active</status>
+    <priority>1000</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>en</default_language>
+    <has_icon>Y</has_icon>
+    <supplier>TargetSMS</supplier>
+    <supplier_link>https://targetsms.ru/</supplier_link>  
+    <compatibility>
+        <conflicts>clickatell,turbosms,smsgateway</conflicts>
+        <core_version>
+            <min>4.2.0</min>
+        </core_version>
+    </compatibility>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="elm_targetsms_settings">
+                        <type>header</type>
+                    </item>
+                    <item id="targetsms_login">
+                        <type>input</type>
+                        <default_value/>
+                    </item>
+                    <item id="targetsms_password">
+                        <type>password</type>
+                        <default_value/>
+                    </item>
+                    <item id="form_url">
+                        <type>info</type>
+                        <handler>fn_targetsms_get_form_url_info</handler>
+                    </item>
+                </items>
+            </section>
+            <section id="sender_names">
+                <items>      
+                    <item id="sender_template">
+                        <type>template</type>
+                        <default_value>senders.tpl</default_value> 
+                    </item>
+                </items>
+            </section>
+            <section id="admin_notifications">
+                <items>
+                    <item id="admin_phone_number">
+                        <type>input</type>
+                        <variants/>
+                    </item>
+                    <item id="elm_admin_send_sms_if">
+                        <type>header</type>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_new_cusomer_registered">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_product_negative_amount">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_new_order_placed">
+                        <type>checkbox</type>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_order_updated">
+                        <type>checkbox</type>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_send_min_amount">
+                        <type>input</type>
+                        <default_value>0</default_value>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_send_shipping">
+                        <type>multiple checkboxes</type>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_send_order_statuses">
+                        <type>multiple checkboxes</type>
+                        <variants/>
+                    </item>
+                    <item id="admin_elm_sms_content">
+                        <type>header</type>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_send_payment_info">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_send_customer_email">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_templates">
+                        <type>header</type>
+                        <variants/>
+                    </item>
+                    <item id="admin_sms_order_place_template">
+                        <type>textarea</type>
+                        <default_value>%LANG_ORDER% #%ORDER_ID% %LANG_FOR_THE_SUM% %TOTAL% %LANG_ORDER_PLACED% %LANG_PAYMENT_INFO%:%ORDER_PAYMENT_INFO% %LANG_CUSTOMER_EMAIL%:%ORDER_EMAIL%</default_value>
+                    </item>
+                    <item id="admin_sms_order_update_template">
+                        <type>textarea</type>
+                        <default_value>%LANG_ORDER% #%ORDER_ID% %LANG_FOR_THE_SUM% %TOTAL% %LANG_IS% %ORDER_STATUS_NAME%</default_value>
+                    </item>
+                    <item id="admin_sms_profile_update_template">
+                        <type>textarea</type>
+                        <default_value>%LANG_CUSTOMER_REGISTRED%</default_value>
+                    </item>
+                    <item id="admin_sms_update_product_amount_template">
+                        <type>textarea</type>
+                        <default_value>%COMPANY_NAME%: %LANG_LOW_STOCK_SUBJ%</default_value>
+                    </item>
+                    <item id="admin_sms_create_shipments_template">
+                        <type>textarea</type>
+                        <default_value>%LANG_NEW_SHIPMENT%</default_value>
+                    </item>
+                </items>
+            </section>
+            <section id="customer_notifications">
+                <items>
+                    <item id="customer_phone_field">
+                        <type>selectbox</type>
+                        <default_value>s</default_value>
+                        <variants>
+                            <item id="s"/>
+                            <item id="b"/>
+                        </variants>
+                    </item>
+                    <item id="elm_customer_send_sms_if">
+                        <type>header</type>
+                        <variants/>
+                    </item>
+                    <item id="customer_sms_order_updated">
+                        <type>checkbox</type>
+                        <variants/>
+                    </item>
+                    <item id="customer_sms_send_shipping">
+                        <type>multiple checkboxes</type>
+                        <variants/>
+                    </item>
+                    <item id="customer_sms_send_order_statuses">
+                        <type>multiple checkboxes</type>
+                        <variants/>
+                    </item>
+                    <item id="customer_sms_send_min_amount">
+                        <type>input</type>
+                        <default_value>0</default_value>
+                        <variants/>
+                    </item>
+                    <item id="customer_sms_create_shipments">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item>
+                </items>
+            </section>
+            <section id="custom_sms">
+                <items>
+                    <item id="phone_numbers">
+                        <type>input</type>
+                        <default_value/>
+                    </item>
+                    <item id="custom_sms_content">
+                        <type>textarea</type>
+                        <default_value/>
+                    </item>
+                    <item id="custom_sms_sender">
+                        <type>selectbox</type>
+                        <default_value/>
+                    </item>
+                    <item id="send_btn">
+                        <type>info</type>
+                        <handler>fn_targetsms_send_btn</handler>
+                    </item>
+                </items>
+            </section>
+            <section id="balance">
+                <items>
+                    <item id="customer_balance">
+                        <type>info</type>
+                        <handler>fn_targetsms_get_balance</handler>
+                    </item>
+                </items>                
+            </section>
+        </sections>
+    </settings>
+
+    <queries>
+        <item for="install">
+            ALTER TABLE `?:status_descriptions` ADD sms_body TEXT NULL DEFAULT NULL;
+        </item>
+        <item for="install">
+            ALTER TABLE `?:companies` ADD sms_sender_name TEXT NULL DEFAULT NULL;
+        </item>
+        <item for="uninstall">
+            ALTER TABLE `?:status_descriptions` DROP sms_body;
+        </item>
+        <item for="uninstall">
+            ALTER TABLE `?:companies` DROP sms_sender_name;
+        </item>
+    </queries>
+
+<marketplace_product_id>1816</marketplace_product_id></addon>
