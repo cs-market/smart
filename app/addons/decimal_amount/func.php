@@ -388,6 +388,10 @@ if (!is_callable('fn_fmod')) {
 	}
 }
 
+function fn_decimal_amount_get_product_price_pre($product_id, &$amount, $auth) {
+	if ($amount < 1 ) $amount = 1;
+}
+
 function fn_decimal_amount_dispatch_assign_template($controller, $mode, $area, $controllers_cascade) {
 	if ($controller == '_no_page') {
 		$parent_directories = fn_get_parent_directory_stack(str_replace(Registry::get('config.dir.addons'), '', __FILE__), '\\/');

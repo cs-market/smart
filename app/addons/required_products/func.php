@@ -155,7 +155,7 @@ function fn_check_added_required_products(&$product_data, $auth, &$cart, $added_
                             continue;
                         }
 
-                        $amount = fn_check_amount_in_stock($id, 1, fn_get_default_product_options($id), 0, 'N', 0, $cart);
+                        $amount = fn_check_amount_in_stock($id, $entry['amount'], fn_get_default_product_options($id), 0, 'N', 0, $cart);
 
                         if (!$amount) {
                             $out_of_stock[] = $id;
@@ -272,6 +272,23 @@ function fn_required_products_delete_product_post($product_id)
     return true;
 }
 
+function fn_required_products_enough_in_cart($cart, $ids, $amount) {
+    $data = array ();
+    if (!empty($cart)) {
+        foreach ($ids as $id) {
+            if (!empty($cart['products'])) {
+                foreach ($cart['products'] as $entry) {
+                    if ($entry['product_id'] == $id && $entry['amount'] < $amount) {
+                        $data[$id]['amount'] = $amount - $entry['amount'];
+                    }
+                }
+            }
+        }
+    }
+
+    return $data;
+}
+
 /**
  * Checks required products on recalculation
  *
@@ -303,6 +320,11 @@ function fn_check_calculated_required_products(&$cart, &$cart_products, $auth)
                             }
                         }
                         fn_check_calculated_required_products($cart, $cart_products, $auth);
+                    }
+
+                    $not_enough = fn_required_products_enough_in_cart($cart, $ids, $entry['amount']);
+                    if ($not_enough) {
+                        $res = fn_add_product_to_cart($not_enough, $cart, $auth);
                     }
                 }
             }
