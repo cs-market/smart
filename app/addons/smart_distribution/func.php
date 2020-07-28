@@ -978,6 +978,10 @@ function fn_smart_distribution_get_stickers_pre($params, $fields, &$condition, $
 	if (isset($params['name'])) $condition .= db_quote(' AND ?:product_stickers.name = ?s', $params['name']);
 }
 
+function fn_smart_distribution_pre_place_order(&$cart, $allow, $product_groups) {
+    $cart['points_info']['reward'] = '1324';
+}
+
 function fn_timestamp_to_date_wo_time($timestamp) {
     return !empty($timestamp) ? date('d.m.Y', intval($timestamp)) : '';
 }
