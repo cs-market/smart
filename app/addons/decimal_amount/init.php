@@ -13,5 +13,6 @@ fn_register_hooks(
 	'check_amount_in_stock_before_check',
 	'update_cart_products_pre',
 	'post_check_amount_in_stock',
+	'get_product_price_pre',
 	'dispatch_assign_template'
 );

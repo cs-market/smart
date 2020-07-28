@@ -3,5 +3,6 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
-	'place_order'
+    'update_company_pre',
+    'send_order_notification'
 );
