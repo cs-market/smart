@@ -979,7 +979,31 @@ function fn_smart_distribution_get_stickers_pre($params, $fields, &$condition, $
 }
 
 function fn_smart_distribution_pre_place_order(&$cart, $allow, $product_groups) {
-    $cart['points_info']['reward'] = '1324';
+    $reward = 0;
+    foreach ($cart['products'] as &$product) {
+        $eq_price = false;
+
+        // check in the product
+        $eq_price = (db_get_field("SELECT earned_points_eq_price FROM ?:products WHERE product_id = ?i", $product['product_id']) == 'Y');
+
+        // check in categories
+        if (!$eq_price) {
+            $category_ids = fn_get_category_ids_with_parent($product['category_ids']);
+            $eq_price = (Bool) db_get_field("SELECT COUNT(category_id) FROM ?:categories WHERE category_id IN (?n) AND earned_points_eq_price = ?s", $category_ids, 'Y');
+        }
+
+
+        if ($eq_price) {
+            $product['extra']['points_info']['reward'] = $product['price'];
+            $bonus_price = $product['amount'] * $product['price'];
+        } else {
+            $bonus_price = $product['extra']['points_info']['reward'] ?: '0';
+        }
+
+        $reward += $bonus_price;
+    }
+
+    $cart['points_info']['reward'] = $reward;
 }
 
 function fn_timestamp_to_date_wo_time($timestamp) {
