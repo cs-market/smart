@@ -17,4 +17,10 @@ if (fn_allowed_for('MULTIVENDOR') && (!Registry::get('runtime.company_id'))) {
 	$schema['export_fields']['Secondary categories']['process_put'][] = '%Vendor%';
 }
 
+$schema['export_fields']['Add user group IDs'] = [
+    'process_put' => array('fn_exim_set_add_product_usergroups', '#key', '#this'),
+    'import_only' => true,
+    'linked' => false,
+];
+
 return $schema;

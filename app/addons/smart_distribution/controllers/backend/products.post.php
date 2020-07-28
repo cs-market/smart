@@ -13,7 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				db_query("REPLACE INTO ?:products_categories ?e", $data);				
 			}
 			$return_url = "categories.update&category_id=" . $params['category_id'];
-		}
+        }
+        
+        return array(CONTROLLER_STATUS_OK, $return_url);
 	}
-    return array(CONTROLLER_STATUS_OK, $return_url);
 }

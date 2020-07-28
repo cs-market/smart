@@ -46,4 +46,10 @@ $schema['export_fields']['Reward points'] = [
     'table' => 'user_data',
 ];
 
+$schema['export_fields']['Add user group IDs'] = [
+    'process_put' => array('fn_exim_set_add_usergroups', '#key', '#this'),
+    'import_only' => true,
+    'linked' => false,
+];
+
 return $schema;

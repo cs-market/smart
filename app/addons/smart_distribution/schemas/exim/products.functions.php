@@ -203,3 +203,17 @@ function fn_exim_sd_set_product_categories($product_id, $link_type, $categories_
 
 	return false;
 }
+
+function
+fn_exim_set_add_product_usergroups($product_id, $data)
+{
+    $old_usergroups = db_get_field("SELECT usergroup_ids FROM ?:products WHERE product_id = ?i", $product_id);
+    $usergoups = array_unique(
+        array_merge(
+            explode(',', $old_usergroups),
+            explode(',', $data)
+        )
+    );
+
+    db_query("UPDATE ?:products SET ?u WHERE product_id = ?i", ['usergroup_ids' => implode(',', $usergoups)], $product_id);
+}

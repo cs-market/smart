@@ -47,6 +47,14 @@
     {include file="common/subheader.tpl" title=__("earned_points") target="#reward_points_products_earned_hook"}
     <div id="reward_points_products_earned_hook" class="in collapse">
         <fieldset>
+            <div class="control-group">
+                <label class="control-label" for="pd_earned_points_eq_price">{__("pay_by_points__earned_points_eq_price")}</label>
+                <div class="controls">
+                    <input type="hidden" name="product_data[earned_points_eq_price]" value="N" />
+                    <input type="checkbox" name="product_data[earned_points_eq_price]" id="pd_earned_points_eq_price" value="Y" {if $data.earned_points_eq_price == "Y"}checked="checked"{/if}>
+                </div>
+            </div>
+
             <input type="hidden" name="product_data[is_op]" value="N">
             <label for="rp_is_op" class="checkbox">
                 <input type="checkbox" name="product_data[is_op]" id="rp_is_op" value="Y" {if $data.is_op == "Y"}checked="checked"{/if} onclick="Tygh.$.disable_elms([{foreach from=$reward_usergroups item=m}'earned_points_{$object_type}_{$m.usergroup_id}',{/foreach}{foreach from=$reward_usergroups item=m}'points_type_{$object_type}_{$m.usergroup_id}',{/foreach}], !this.checked);">
