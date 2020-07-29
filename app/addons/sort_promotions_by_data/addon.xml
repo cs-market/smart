@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>sort_promotions_by_data</id>
+    <version>1.0.0</version>
+    <priority>100</priority>
+    <position>0</position>
+    <default_language>en</default_language>
+</addon>

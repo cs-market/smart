@@ -1,0 +1,40 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest
+"
+"Content-Type: text/plain; charset=UTF-8
+"
+"Language-Team: Russian
+"
+"Language: ru_RU
+"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));
+"
+"X-Generator: crowdin.com
+"
+"X-Crowdin-Project: cs-cart-latest
+"
+"X-Crowdin-Language: ru
+"
+"X-Crowdin-File: /release-4.11.1/addons/sort_promotions_by_data.po
+"
+"Last-Translator: cscart
+"
+"PO-Revision-Date: 2019-11-06 09:42
+"
+
+msgctxt "Addons::name::sort_promotions_by_data"
+msgid "sort_promotions_by_data"
+msgstr "Smart distribution: Sort promotions by data"
+
+msgctxt "Addons::description::sort_promotions_by_data"
+msgid "sort_promotions_by_data"
+msgstr "Add promotions data to promotion list"
+
+msgctxt "Languages::sort_promotions_by_data__available_from"
+msgid "sort_promotions_by_data__available_from"
+msgstr "Доступен С"
+
+msgctxt "Languages::sort_promotions_by_data__available_to"
+msgid "sort_promotions_by_data__available_to"
+msgstr "Доступен До"
