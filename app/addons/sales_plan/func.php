@@ -133,6 +133,9 @@ function fn_generate_sales_report($params) {
 			$row[__('company_name')] = ($user['company_id']) ? fn_get_company_name($user['company_id']) : '-';
 			$row[__('date')] = date('d.m.Y', $user['timestamp']);
 			$row[__('customer')] = $user['firstname'] . (($params['show_user_id'] == 'Y') ? ' #' . $element['user_id'] : '');//fn_get_user_name($plan['user_id']);
+			if ($params['show_manager'] == 'Y') {
+				$row[__('manager')] = reset($user['managers'])['name'];
+			}
 			$row[__('address')] = $user['b_address'];
 			$row[__('code')] = $user['fields'][38];
 			foreach ($intervals as $interval) {

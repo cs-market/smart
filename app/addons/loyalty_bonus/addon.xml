@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>loyalty_bonus</id>
+    <name>Alt-team: Loyalty bonus</name>
+    <description>Allows to add total paid condition to promotion.</description>
+    <version>1.0</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <status>active</status>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>en</default_language>
+    <translations></translations>
+    <language_variables>
+        <item id="promotion_cond_total_paid" lang="en">Total paid</item>
+    </language_variables>
+</addon>

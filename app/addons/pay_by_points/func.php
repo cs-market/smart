@@ -368,7 +368,8 @@ function fn_check_product_pay_by_points($product)
         if (!isset($product['price']) || !$product['price']) {
             $product['price'] = fn_get_product_price(
                 $product['product_id'],
-                $product['amount'] ?? 1
+                $product['amount'] ?? 1,
+                $_SESSION['auth']
             );
         }
         $point_price = round($product['price'], 2);

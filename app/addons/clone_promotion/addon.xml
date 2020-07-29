@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>clone_promotion</id>
+	<name>Clone Promotion</name>
+	<priority>31337</priority>
+	<position>0</position>
+	<status>active</status>
+    <language_variables>
+        <item lang="en" id="clone_promotion">Clone promotion</item>
+		<item lang="en" id="promotion_cloned">The promotion has been cloned</item>
+		<item lang="ru" id="clone_promotion">Клонировать промоакцию</item>
+		<item lang="ru" id="promotion_cloned">Промоакция склонирована</item>
+	</language_variables>
+</addon>

@@ -62,6 +62,12 @@ $schema = array(
 		'name' => 'show_user_id',
 		'class' => 'clearfix',
 	),
+	'show_manager' => array(
+		'label' => 'sales_plan.show_manager',
+		'type' => 'checkbox',
+		'name' => 'show_manager',
+		'class' => 'clearfix',
+	),
 	'group_by' => array(
 		'label' => 'sales_plan.group_by',
 		'type' => 'select',

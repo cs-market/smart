@@ -699,6 +699,13 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             if ($this->company_id == '29') {
                 $product['full_description'] = strval($_product -> {$cml['bar']});
+            } elseif ($this->company_id == '1815') {
+                foreach ($_product -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
+                    $feature_id = strval($_feature -> {$cml['id']});
+                    if ($this->features_commerceml['product_description']['id'] == $feature_id) {
+                        $product['full_description'] = strval($_feature -> {$cml['value']});
+                    }
+                }
             }
 
             // limit for pinta for Katerina
@@ -1214,6 +1221,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         }
                     }
                     $features_import['sticker']['variants'] = $_variants;
+                } elseif ($feature_name == 'О продукте') {
+                    $features_import['product_description']['id'] = strval($_feature -> {$cml['id']});
+                    $features_import['product_description']['name'] = 'product_description';
                 }
 
                 if ($deny_or_allow_list == 'do_not_import') {
