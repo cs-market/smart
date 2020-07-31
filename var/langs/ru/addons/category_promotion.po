@@ -27,3 +27,7 @@ msgstr "Category ids"
 msgctxt "Languages::category_promotion"
 msgid "Category Promotion"
 msgstr "Category Promotion"
+
+msgctxt "Languages::promotion_products"
+msgid "Promotion products"
+msgstr "Товары промоакций"
