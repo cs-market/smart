@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>product_groups</id>
+    <name>Smart distribution: Группы товаров</name>
+    <priority>26732300</priority>
+    <version>1.0.1</version>
+    <position>0</position>
+    <status>active</status>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <language_variables>
+        <item lang="ru" id="product_groups.add_product_group">Добавить группу товаров</item>
+        <item lang="ru" id="product_groups.new_product_group">Новая группа товаров</item>
+        <item lang="ru" id="product_groups.product_group">Uруппа товаров</item>
+    </language_variables>
+    <queries>
+        <item>CREATE TABLE `?:product_groups` (
+          `group_id` mediumint(8) unsigned NOT NULL auto_increment,
+          `group` varchar(32) NOT NULL DEFAULT '',
+          `status` char(1) NOT NULL DEFAULT 'A',
+          PRIMARY KEY (`group_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:product_groups;</item>
+
+        <item>ALTER TABLE `?:products` ADD `group_id` mediumint(8) unsigned NOT NULL;</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `group_id`;</item>
+
+        <item>ALTER TABLE `?:orders` ADD `group_id` mediumint(8) unsigned NOT NULL;</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `group_id`;</item>
+    </queries>
+</addon>
