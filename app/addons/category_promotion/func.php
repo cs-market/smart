@@ -19,7 +19,7 @@ function fn_get_conditions($conditions, &$promo_extra) {
     }
 }
 
-function fn_get_bonuses(array $bonuses)
+function fn_get_promotion_bonus_products(array $bonuses)
 {
     $product_ids = [];
 
@@ -35,6 +35,27 @@ function fn_get_bonuses(array $bonuses)
     return $product_ids;
 }
 
+function fn_get_promotion_condition_categories(array $conditions, array &$caregory_ids = [])
+{
+    if (!empty($conditions['conditions'])) {
+        foreach ($conditions['conditions'] as $condition) {
+            if (!empty($condition['conditions'])) {
+                fn_get_promotion_condition_categories($condition, $caregory_ids);
+            } elseif (
+                !empty($condition['value'])
+                && !empty($condition['operator'])
+                && $condition['operator'] === 'in'
+                && !empty($condition['condition'])
+                && $condition['condition'] === 'categories'
+            ) {
+                $caregory_ids[] = $condition['value'];
+            }
+        }
+    }
+
+    return array_unique($caregory_ids);
+}
+
 function fn_category_promotion_update_promotion_post($data, $promotion_id, $lang_code) {
     $conditions = unserialize($data['conditions']);
 
@@ -45,7 +66,8 @@ function fn_category_promotion_update_promotion_post($data, $promotion_id, $lang
 
     $promo_extra = array_map(function($arr) {return  implode(',', $arr);}, $promo_extra);
 
-    $promo_extra['bonus_products'] = implode(',', fn_get_bonuses(unserialize($data['bonuses'])));
+    $promo_extra['bonus_products'] = implode(',', fn_get_promotion_bonus_products(unserialize($data['bonuses'])));
+    $promo_extra['condition_categories'] = implode(',', fn_get_promotion_condition_categories(unserialize($data['conditions'])));
 
     if (!empty($promo_extra)) {
         db_query('UPDATE ?:promotions SET ?u WHERE promotion_id = ?i', $promo_extra, $promotion_id);
@@ -105,7 +127,16 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
         $promotion_id = fn_category_promotion_get_product_promotion_id($params['promotion_pid']);
 
         if ($promotion_id) {
-            $params['pid'] = db_get_field('SELECT products FROM ?:promotions WHERE promotion_id = ?i', $promotion_id);
+            $promotion_data = db_get_row('SELECT products, condition_categories FROM ?:promotions WHERE promotion_id = ?i', $promotion_id);
+            $promotion_product_ids  = explode(',', $promotion_data['products']);
+            $promotion_category_ids = explode(',', $promotion_data['condition_categories']);
+
+            $promotion_product_ids = array_merge(
+                $promotion_product_ids,
+                db_get_fields('SELECT product_id FROM ?:products_categories WHERE category_id IN (?n)', $promotion_category_ids)
+            );
+
+            $params['pid'] = implode(',', array_unique($promotion_product_ids));
         } else {
             // To skip get products request
             $params['force_get_by_ids'] = true;
@@ -180,16 +211,32 @@ function fn_category_promotion_get_product_promotion_id($product_id)
         return null;
     }
 
+    $category_ids = db_get_fields('SELECT category_id FROM ?:products_categories WHERE product_id = ?i', $product_id);
+
     $condition = '';
     $condition_params = [
         '%,' . $product_id . ',%',
-        '%,' . $product_id . '',
-        '' . $product_id . ',%'
+        '%,' . $product_id,
+        $product_id . ',%',
+        $product_id
     ];
 
     foreach ($condition_params as $condition_param) {
         $condition .= !$condition ? db_quote('products LIKE ?l', $condition_param) : db_quote(' OR products LIKE ?l', $condition_param);
         $condition .= db_quote(' OR bonus_products LIKE ?l', $condition_param);
+    }
+
+    foreach ($category_ids as $category_id) {
+        $condition_params = [
+            '%,' . $category_id . ',%',
+            '%,' . $category_id,
+            $category_id . ',%',
+            $category_id
+        ];
+
+        foreach ($condition_params as $condition_param) {
+            $condition .= db_quote(' OR condition_categories LIKE ?l', $condition_param);
+        }
     }
 
     $condition = 'AND (' . $condition . ')';
