@@ -903,9 +903,9 @@ fn_print_r($fantoms);
             "DELETE FROM ?:product_features_values WHERE product_id IN (?n)",
             $non_existent_products
         );
-        fn_echo_br("Drop non-existent products: " . $drop_non_existent_products_count);
+        fn_echo_br("Drop non-existent products variants: " . $drop_non_existent_products_count);
     } else {
-        fn_echo_br("There aren't non-existent products");
+        fn_echo_br("There aren't non-existent products variants");
     }
     // /[Drop feature values with non-existent products]
 

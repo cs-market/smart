@@ -48,5 +48,6 @@ fn_register_hooks(
 	'get_product_price_post',
 	'load_products_extra_data',
 	'load_products_extra_data_post',
-    'get_stickers_pre'
+    'get_stickers_pre',
+    'get_product_features'
 );

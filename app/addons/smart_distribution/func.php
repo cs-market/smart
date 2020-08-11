@@ -978,6 +978,23 @@ function fn_smart_distribution_get_stickers_pre($params, $fields, &$condition, $
 	if (isset($params['name'])) $condition .= db_quote(' AND ?:product_stickers.name = ?s', $params['name']);
 }
 
+function fn_smart_distribution_get_product_features($fields, $join, &$condition, $params)
+{
+    // [only vendor features]
+    if (isset($params['product_id']) && !empty($params['product_id'])) {
+        if (
+            AREA == 'A'
+            && fn_allowed_for('MULTIVENDOR')
+            && Registry::get('runtime.company_id')
+        ) {
+            $product_company_id = db_get_field("SELECT company_id FROM ?:products WHERE product_id = ?i", $params['product_id']);
+
+            $condition .= db_quote(" AND (pf.company_id = 0 OR pf.company_id = ?i)", $product_company_id);
+        }
+    }
+    // [/only vendor features]
+}
+
 function fn_timestamp_to_date_wo_time($timestamp) {
     return !empty($timestamp) ? date('d.m.Y', intval($timestamp)) : '';
 }
