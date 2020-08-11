@@ -24,6 +24,7 @@ $path_commerceml = fn_get_files_dir_path();
 $log = new Logs($path_file, $path);
 $company_id = fn_get_runtime_company_id();
 $exim_commerceml = new SDRusEximCommerceml(Tygh::$app['db'], $log, $path_commerceml);
+$_data = $_data ?? [];
 list($status, $user_data, $user_login, $password, $salt) = fn_auth_routines($_data, array());
 $exim_commerceml->import_params['user_data'] = $auth;
 
@@ -872,7 +873,182 @@ fn_print_r($fantoms);
 		$company_users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i', $company_id);
 		db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
 	}
-	fn_print_die('stop');
+    fn_print_die('stop');
+} elseif ($mode == 'separate_features_by_vendor') {
+    /*
+     * Automatic division and duplication 
+     * of characteristics by vendors
+     */
+
+    // [Drop all empty feature values in DB]
+    if (db_get_field("SELECT count(*) FROM ?:product_features_values WHERE variant_id = '0' AND value = '' AND value_int IS NULL")) {
+        $drop_empty_feature_calue_count = db_query(
+            "DELETE FROM ?:product_features_values WHERE variant_id = '0' AND value = '' AND value_int IS NULL");
+        fn_echo_br("Drop empty feature values: " . $drop_empty_feature_calue_count);
+    } else {
+        fn_echo_br("There aren't empty feature values");
+    }
+    // /[Drop all empty feature values in DB]
+    
+    // [Drop feature values with non-existent products]
+    $non_existent_products = db_get_fields("
+        SELECT ?:product_features_values.product_id
+        FROM ?:product_features_values
+        LEFT JOIN ?:products ON (?:product_features_values.product_id = ?:products.product_id)
+        WHERE ?:products.product_id IS NULL
+    ");
+
+    if ($non_existent_products) {
+        $drop_non_existent_products_count = db_query(
+            "DELETE FROM ?:product_features_values WHERE product_id IN (?n)",
+            $non_existent_products
+        );
+        fn_echo_br("Drop non-existent products: " . $drop_non_existent_products_count);
+    } else {
+        fn_echo_br("There aren't non-existent products");
+    }
+    // /[Drop feature values with non-existent products]
+
+    // function to create condition for feature value unique
+    $create_feat_cond = function($f) {
+        return db_quote(
+            "?w", 
+            [
+                'feature_id' => $f['feature_id'],
+                'product_id' => $f['product_id'],
+                'variant_id' => $f['variant_id'],
+            ]
+        );
+    };
+
+    // clear all external_id
+    db_query(
+        'UPDATE ?:product_feature_variants SET ?u', 
+        ['external_id' => '']
+    );
+    db_query(
+        'UPDATE ?:product_features SET ?u', 
+        ['external_id' => '']
+    );
+
+    // get all values without company features
+    $old_features = db_get_hash_multi_array("SELECT ?:product_features_values.*, ?:products.company_id AS product_company_id 
+        FROM ?:product_features_values 
+        LEFT JOIN ?:product_features ON ?:product_features_values.feature_id = ?:product_features.feature_id 
+        LEFT JOIN ?:products ON ?:product_features_values.product_id = ?:products.product_id 
+        WHERE ?:product_features.company_id = '0'", 
+        ['feature_id', 'product_id']
+    );
+
+    $statistic = [
+        'skip_feat' => 0, // default feature
+        'skip_new_feat' => 0, // use created before feature
+        'new_feat' => 0, // create new feature
+        'change_value' => 0, // change product value if use value|value_int
+        'skip_variant' => 0, // use created before variant
+        'new_variant' => 0, // create new variant
+    ];
+
+    foreach ($old_features as $old_feature_id => $products) {
+        $first_product = array_shift($products);
+        $old_company_id = $first_product['product_company_id'];
+        $tmp_match_list = []; // [company_id => new_feat_id]
+        $tmp_feat_variant_list = []; // [variant_id => [$feat_id => new_variant_id]]
+
+        db_query('UPDATE ?:product_features SET ?u WHERE feature_id = ?i', ['company_id' => $old_company_id], $first_product['feature_id']);
+
+        foreach ($products as $product) {
+            $new_company_id = $product['product_company_id'];
+
+            // skip, if old company
+            if ($new_company_id == $old_company_id) {
+                $statistic['skip_feat']++;
+                continue;
+            }
+
+            if (isset($tmp_match_list[$new_company_id])) {
+                $new_feature_id = $tmp_match_list[$new_company_id];
+                $statistic['skip_new_feat']++;
+            } else {
+                // Dublicate the feature
+                $old_feature_data = fn_get_product_feature_data($product['feature_id']);
+
+                unset($old_feature_data['feature_id']);
+                // unset($old_feature_data['external_id']);
+                
+                $old_feature_data['company_id'] = $new_company_id;
+
+                $new_feature_id = fn_update_product_feature($old_feature_data, 0);
+
+                $tmp_match_list[$new_company_id] = $new_feature_id;
+                $statistic['new_feat']++;
+            }
+
+            // change feature value
+            if ($product['value'] || $product['value_int']) {
+                db_query('UPDATE ?:product_features_values SET ?u WHERE ?p', ['feature_id' => $new_feature_id], $create_feat_cond($product));
+                $statistic['change_value']++;
+            } elseif ($product['variant_id']) {
+                // if use variant types
+
+                // check if created new variant
+                if (isset($tmp_feat_variant_list[$product['variant_id']][$new_feature_id])) {
+                    $new_variant_id = $tmp_feat_variant_list[$product['variant_id']][$new_feature_id];
+                    $statistic['skip_variant']++;
+                } else {
+                    // dublicat variant
+                    $variant_data = fn_get_product_feature_variant($product['variant_id']);
+
+                    unset($variant_data['variant_id']);
+                    // unset($variant_data['external_id']);
+                    $variant_data['feature_id'] = $new_feature_id;
+                    $new_variant_id = fn_add_feature_variant($new_feature_id, $variant_data);
+
+                    $tmp_feat_variant_list[$product['variant_id']] = [$new_feature_id => $new_variant_id];
+                    
+                    $statistic['new_variant']++;
+                }
+
+                db_query(
+                    'UPDATE ?:product_features_values SET ?u WHERE feature_id = ?s AND product_id = ?s AND variant_id = ?s', 
+                    [
+                        'feature_id' => $new_feature_id,
+                        'variant_id' => $new_variant_id,
+                    ],
+                    $product['feature_id'],
+                    $product['product_id'],
+                    $product['variant_id']
+                );
+            }
+            fn_echo('.');
+        }
+        fn_echo('<br />');
+    }
+
+    foreach ($statistic as $key => $value) {
+        fn_echo_br($key . ": " . $value);
+    }
+
+    // [remove not use variants]
+    $non_existent_variants = db_get_fields("
+        SELECT ?:product_feature_variants.variant_id
+        FROM ?:product_feature_variants
+        LEFT JOIN ?:product_features_values ON (?:product_features_values.variant_id = ?:product_feature_variants.variant_id)
+        WHERE ?:product_features_values.variant_id IS NULL
+    ");
+
+    if ($non_existent_variants) {
+        $drop_non_existent_variants = db_query(
+            "DELETE FROM ?:product_feature_variants WHERE variant_id IN (?n)",
+            $non_existent_variants
+        );
+        fn_echo_br("Drop non-existent products: " . $drop_non_existent_variants);
+    } else {
+        fn_echo_br("There aren't non-existent variants");
+    }
+    // [/remove not use variants]
+
+    die('Finis');
 }
 
 function fn_between($val, $pattern)
@@ -1059,8 +1235,12 @@ function fn_merge_products($company_id = 13)
 
 	fn_echo('<hr />');
 	
-  }
+    }
 
-  fn_echo("C'est finit");
-  exit;
+    fn_echo("C'est finit");
+    exit;
+}
+
+function fn_echo_br($data) {
+    fn_echo($data . '<br />');
 }
