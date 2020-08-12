@@ -169,7 +169,7 @@ function fn_auto_exim_run_import($imports, $company_id) {
                         'images_path' => 'images/',
                         'price_dec_sign_delimiter' => '.',
                         'category_delimiter' => '///',
-                        'skip_creating_new_products' => 'Y',
+                        'skip_creating_new_products' => 'N',
                         'unset_file' => true
                     );
                     if (is_array($import)) {

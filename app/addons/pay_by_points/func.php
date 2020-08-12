@@ -178,32 +178,48 @@ function fn_pay_by_points_pre_place_order(&$cart, $allow, &$product_groups)
   }
 
     // earned_points_eq_price
-    $reward = 0;
-    foreach ($cart['products'] as &$product) {
-        $eq_price = false;
+    // $reward = 0;
+    // foreach ($cart['products'] as &$product) {
+    //     $eq_price = false;
 
-        // check in the product
-        $eq_price = (db_get_field("SELECT earned_points_eq_price FROM ?:products WHERE product_id = ?i", $product['product_id']) == 'Y');
+    //     // check in the product
+    //     $eq_price = (db_get_field("SELECT earned_points_eq_price FROM ?:products WHERE product_id = ?i", $product['product_id']) == 'Y');
 
-        // check in categories
-        if (!$eq_price) {
-            $category_ids = fn_get_category_ids_with_parent($product['category_ids']);
-            $eq_price = (bool) db_get_field("SELECT COUNT(category_id) FROM ?:categories WHERE category_id IN (?n) AND earned_points_eq_price = ?s", $category_ids, 'Y');
-        }
+    //     // check in categories
+    //     if (!$eq_price) {
+    //         $category_ids = fn_get_category_ids_with_parent($product['category_ids']);
+    //         $eq_price = (bool) db_get_field("SELECT COUNT(category_id) FROM ?:categories WHERE category_id IN (?n) AND earned_points_eq_price = ?s", $category_ids, 'Y');
+    //     }
 
 
-        if ($eq_price) {
-            $product['extra']['points_info']['reward'] = $product['price'];
-            $bonus_price = $product['amount'] * $product['price'];
-        } else {
-            $bonus_price = $product['extra']['points_info']['reward'] ?: '0';
-        }
+    //     if ($eq_price) {
+    //         $product['extra']['points_info']['reward'] = $product['price'];
+    //         $bonus_price = $product['amount'] * $product['price'];
+    //     } else {
+    //         $bonus_price = $product['extra']['points_info']['reward'] ?: '0';
+    //     }
 
-        $reward += $bonus_price;
+    //     $reward += $bonus_price;
+    // }
+
+    // $cart['points_info']['reward'] = $reward;
+    // /earned_points_eq_price
+}
+
+function fn_pay_by_points_reward_points_calculate_item(&$cart_products, $cart, $k, $v) {
+	$eq_price = false;
+    // check in the product
+    $eq_price = (db_get_field("SELECT earned_points_eq_price FROM ?:products WHERE product_id = ?i", $v['product_id']) == 'Y');
+
+    // check in categories
+    if (!$eq_price) {
+        $category_ids = fn_get_category_ids_with_parent($v['category_ids']);
+        $eq_price = (bool) db_get_field("SELECT COUNT(category_id) FROM ?:categories WHERE category_id IN (?n) AND earned_points_eq_price = ?s", $category_ids, 'Y');
     }
 
-    $cart['points_info']['reward'] = $reward;
-    // /earned_points_eq_price
+    if ($eq_price) {
+    	$cart_products[$k]['points_info']['reward']['raw_amount'] = $v['price'];
+    }
 }
 
 function fn_pay_by_points_get_orders_post($params, &$orders)
