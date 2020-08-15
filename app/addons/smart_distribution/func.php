@@ -81,11 +81,24 @@ function fn_smart_distribution_get_order_info(&$order, $additional_data) {
 	}
 }
 
-// to get a feature code in API request
-function fn_smart_distribution_get_product_features_list_before_select(&$fields, $join, $condition, $product, $display_on, $lang_code) {
-	if (defined('API')) {
-		$fields .=  ', f.feature_code';
+function fn_smart_distribution_get_product_features_list_before_select(&$fields, $join, &$condition, $product, $display_on, $lang_code) {
+    // to get a feature code in API request
+    if (defined('API')) {
+        $fields .=  ', f.feature_code';
 	}
+    // /to get a feature code in API request
+
+    // [only vendor features]
+    if (isset($product['product_id']) && $product['product_id']) {
+        if (
+            AREA == 'A'
+            && fn_allowed_for('MULTIVENDOR')
+        ) {
+            $product_company_id = db_get_field("SELECT company_id FROM ?:products WHERE product_id = ?i", $product['product_id']);
+            $condition .= db_quote(" AND (f.company_id = 0 OR f.company_id = ?i)", $product_company_id);
+        }
+    }
+    // [/only vendor features]
 }
 
 function fn_smart_distribution_is_manager($user_id) {
@@ -985,10 +998,9 @@ function fn_smart_distribution_get_product_features($fields, $join, &$condition,
         if (
             AREA == 'A'
             && fn_allowed_for('MULTIVENDOR')
-            && Registry::get('runtime.company_id')
+            // && Registry::get('runtime.company_id')
         ) {
             $product_company_id = db_get_field("SELECT company_id FROM ?:products WHERE product_id = ?i", $params['product_id']);
-
             $condition .= db_quote(" AND (pf.company_id = 0 OR pf.company_id = ?i)", $product_company_id);
         }
     }

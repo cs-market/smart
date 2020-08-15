@@ -2,6 +2,7 @@
 
 use Tygh\Registry;
 
+include_once(Registry::get('config.dir.schemas') . 'exim/products.functions.php');
 include_once(Registry::get('config.dir.addons') . 'smart_distribution/schemas/exim/products.functions.php');
 
 $schema['export_fields']['Send price to 1c'] = array (
@@ -22,5 +23,7 @@ $schema['export_fields']['Add user group IDs'] = [
     'import_only' => true,
     'linked' => false,
 ];
+
+$schema['export_fields']['Features']['process_put'] = ['fn_exim_smart_distribution_set_product_features', '#key', '#this', '@features_delimiter', '#lang_code', '%Vendor%' ];
 
 return $schema;
