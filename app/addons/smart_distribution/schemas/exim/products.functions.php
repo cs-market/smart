@@ -421,3 +421,18 @@ function fn_exim_smart_distribution_find_feature($name, $type, $group_id, $lang_
 
     return $result;
 }
+function fn_fill_vendor_ugroups_if_empty(&$primary_object_id, &$object, &$pattern, &$options, &$processed_data, &$processing_groups, &$skip_record) {
+	if (empty($primary_object_id) && !isset($object['usergroup_ids'])) {
+		$company_id = (Registry::get('runtime.company_id')) ? Registry::get('runtime.company_id') : fn_get_company_id_by_name($object['company']);
+		if ($company_id) {
+			$rcid = Registry::get('runtime.company_id');
+			Registry::set('runtime.company_id', $company_id);
+			$ugroups = fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')));
+			Registry::set('runtime.company_id', $rcid);
+			$ugroups = array_keys($ugroups);
+			if ($ugroups) {
+				$object['usergroup_ids'] = implode(',', $ugroups);
+			}
+		}
+	}
+}

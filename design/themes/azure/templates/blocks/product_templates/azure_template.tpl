@@ -92,14 +92,6 @@
                 </div>
                 {if $capture_options_vs_qty}{/capture}{/if}
 
-                {hook name="products:promo_text"}
-                {if $product.promo_text}
-                <div class="ty-product-block__note">
-                    {$product.promo_text nofilter}
-                </div>
-                {/if}
-                {/hook}
-
                 {if $show_descr}
                 {assign var="prod_descr" value="prod_descr_`$obj_id`"}
                     <h3 class="ty-product-block__description-title">{__("description")}</h3>
@@ -134,6 +126,14 @@
                     {$smarty.capture.$list_buttons nofilter}
                 </div>
                 {if $capture_buttons}{/capture}{/if}
+
+                {hook name="products:promo_text"}
+                {if $product.promo_text}
+                <div class="ty-product-block__note clearfix">
+                    {$product.promo_text nofilter}
+                </div>
+                {/if}
+                {/hook}
 
                 {assign var="form_close" value="form_close_`$obj_id`"}
                 {$smarty.capture.$form_close nofilter}
