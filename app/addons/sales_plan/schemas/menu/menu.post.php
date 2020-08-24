@@ -8,14 +8,6 @@ $schema['central']['orders']['items']['sales_plan'] = array(
 	'alt' => 'reports.view?type=sales_report',
 	'position' => 910
 );
-$schema['central']['orders']['items']['sales_plan_old'] = array(
-	'attrs' => array(
-		'class'=>'is-addon'
-	),
-	'href' => 'reports.view?type=sales_report_old',
-	'alt' => 'reports.view?type=sales_report_old',
-	'position' => 915
-);
 $schema['central']['orders']['items']['category_reports'] = array(
 	'attrs' => array(
 		'class'=>'is-addon'

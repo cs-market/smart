@@ -81,6 +81,7 @@ function fn_smart_distribution_get_order_info(&$order, $additional_data) {
     }
 }
 
+<<<<<<< HEAD
 function fn_smart_distribution_get_product_features_list_before_select(&$fields, $join, &$condition, $product, $display_on, $lang_code) {
     // to get a feature code in API request
     if (defined('API')) {
@@ -99,6 +100,13 @@ function fn_smart_distribution_get_product_features_list_before_select(&$fields,
         }
     }
     // [/only vendor features]
+=======
+// to get a feature code in API request
+function fn_smart_distribution_get_product_features_list_before_select(&$fields, $join, $condition, $product, $display_on, $lang_code) {
+    if (defined('API')) {
+        $fields .=  ', f.feature_code';
+    }
+>>>>>>> cf247bbe78d7596d3087a5d1546fd57f85a57a57
 }
 
 function fn_smart_distribution_is_manager($user_id) {

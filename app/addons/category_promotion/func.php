@@ -200,8 +200,10 @@ function fn_category_promotion_get_product_data_post(&$product_data, $auth, $pre
         $promotion_id = fn_category_promotion_get_product_promotion_id($product_data['product_id']);
 
         if ($promotion_id) {
-            $product_data['promo_text'] = db_get_field('SELECT detailed_description FROM ?:promotion_descriptions WHERE promotion_id = ?i AND lang_code = ?s', $promotion_id, $lang_code);
+            $product_data['promo_text'] = db_get_field('SELECT detailed_description FROM ?:promotion_descriptions WHERE promotion_id = ?i AND lang_code = ?s', $promotion_id, $lang_code);   
         }
+        // correct after November 2020
+        $product_data['promo_text_plain'] = $product_data['promo_text'] = strip_tags($product_data['promo_text']);
     }
 }
 

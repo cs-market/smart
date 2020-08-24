@@ -97,3 +97,11 @@ function fn_product_groups_pre_update_order(&$cart, $order_id) {
         $cart['product_groups'] = $groups;
     }
 }
+
+function fn_exim_import_product_group($group) {
+    return db_get_field('SELECT `group_id` FROM ?:product_groups WHERE `group` = ?s', $group) ?? 0;
+}
+
+function fn_exim_get_product_group($group_id) {
+    return db_get_field('SELECT `group` FROM ?:product_groups WHERE group_id = ?i', $group_id);
+}

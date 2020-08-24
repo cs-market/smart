@@ -167,9 +167,9 @@ function fn_auto_exim_run_import($imports, $company_id) {
                     $default_params = array(
                         'delimiter' => ';',
                         'images_path' => 'images/',
-                        'price_dec_sign_delimiter' => '.',
+                        'price_dec_sign_delimiter' => ',',
                         'category_delimiter' => '///',
-                        'skip_creating_new_products' => 'Y',
+                        'skip_creating_new_products' => 'N',
                         'unset_file' => true
                     );
                     if (is_array($import)) {
