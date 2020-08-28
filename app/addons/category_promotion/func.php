@@ -96,12 +96,13 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
                 $data = fn_array_column($promotions, 'products');
                 $data = array_filter($data);
                 $product_ids = array_unique(explode(',', implode(',', $data)));
-            }
-            $usergroup_ids = db_get_field('SELECT usergroup_ids FROM ?:categories WHERE category_id = ?i', $params['cid']);
-            $ug_condition = fn_find_array_in_set(explode(',', $usergroup_ids), 'usergroup_ids', true); 
-            $company_id = db_get_field("SELECT company_id FROM ?:companies AS c LEFT JOIN ?:vendor_plans AS vc ON c.plan_id = vc.plan_id WHERE $ug_condition");
-            if ($company_id) {
-                $params['company_id'] = $company_id;
+
+                $usergroup_ids = db_get_field('SELECT usergroup_ids FROM ?:categories WHERE category_id = ?i', $params['cid']);
+                $ug_condition = fn_find_array_in_set(explode(',', $usergroup_ids), 'usergroup_ids', true); 
+                $company_id = db_get_field("SELECT company_id FROM ?:companies AS c LEFT JOIN ?:vendor_plans AS vc ON c.plan_id = vc.plan_id WHERE $ug_condition");
+                if ($company_id) {
+                    $params['company_id'] = $company_id;
+                }
             }
 
             if (!empty($product_ids)) {

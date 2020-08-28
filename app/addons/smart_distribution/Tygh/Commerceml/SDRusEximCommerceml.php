@@ -220,7 +220,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             // [csmarket]
             $company_condition = fn_get_company_condition('company_id', true, '', false, true);
-            $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE external_id = ?s $company_condition", $guid_product);
+            if ($guid_product) $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE external_id = ?s $company_condition", $guid_product);
             if (empty($product_data)) {
                 $_product_data = $this->getProductDataByLinkType($link_type, $offer, $cml);
                 if (!empty($_product_data))
