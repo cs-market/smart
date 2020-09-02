@@ -14,27 +14,30 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
 			}
 			//process_qty_discounts
 		} else {
-			$like_name = '%' . $name . '%';
-			//TODO make fn_get_users more smart!
-			list($users, ) = fn_get_users(array('user_login' => $name), $auth);
-			if (!empty($users)) {
-				$user = array_shift($users);
-			} else {
-				list($users, ) = fn_get_users(array('name' => $name), $auth);
-				$user = array_shift($users);
-			}
-			if (!empty($user)) {
-				$price = array(
-					'user_id' => $user['user_id'],
-					'price' => $object['price'],
-				);
-				//process_user_prices
-				if (fn_update_product_user_price($primary_object_id['product_id'], array($price), false)) {
-					$processed_data['E'] += 1;
+			$names = explode(',', $name);
+
+			foreach ($names as $n) {
+				//TODO make fn_get_users more smart!
+				list($users, ) = fn_get_users(array('user_login' => $n), $_SESSION['auth']);
+				if (!empty($users)) {
+					$user = array_shift($users);
+				} else {
+					list($users, ) = fn_get_users(array('name' => $n), $_SESSION['auth']);
+					$user = array_shift($users);
 				}
-			} else {
-				// skip record
-				$processed_data['S'] += 1;
+				if (!empty($user)) {
+					$price = array(
+						'user_id' => $user['user_id'],
+						'price' => $object['price'],
+					);
+					//process_user_prices
+					if (fn_update_product_user_price($primary_object_id['product_id'], array($price), false)) {
+						$processed_data['E'] += 1;
+					}
+				} else {
+					// skip record
+					$processed_data['S'] += 1;
+				}
 			}
 		}
 	} else {

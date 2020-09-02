@@ -208,15 +208,21 @@ function fn_exim_sd_set_product_categories($product_id, $link_type, $categories_
 function
 fn_exim_set_add_product_usergroups($product_id, $data)
 {
-    $old_usergroups = db_get_field("SELECT usergroup_ids FROM ?:products WHERE product_id = ?i", $product_id);
-    $usergoups = array_unique(
-        array_merge(
-            explode(',', $old_usergroups),
-            explode(',', $data)
-        )
-    );
+    if (!empty($data)) {
+        $old_usergroups = db_get_field("SELECT usergroup_ids FROM ?:products WHERE product_id = ?i", $product_id);
+        if ($old_usergroups) {
+            $usergoups = array_unique(
+                array_merge(
+                    explode(',', $old_usergroups),
+                    explode(',', $data)
+                )
+            );
+        } else {
+            $usergoups = explode(',', $data);
+        }
 
-    db_query("UPDATE ?:products SET ?u WHERE product_id = ?i", ['usergroup_ids' => implode(',', $usergoups)], $product_id);
+        db_query("UPDATE ?:products SET ?u WHERE product_id = ?i", ['usergroup_ids' => implode(',', $usergoups)], $product_id);
+    }
 }
 
 /**
@@ -422,7 +428,8 @@ function fn_exim_smart_distribution_find_feature($name, $type, $group_id, $lang_
     return $result;
 }
 function fn_fill_vendor_ugroups_if_empty(&$primary_object_id, &$object, &$pattern, &$options, &$processed_data, &$processing_groups, &$skip_record) {
-	if (empty($primary_object_id) && !isset($object['usergroup_ids'])) {
+
+	if (empty($primary_object_id) && !isset($object['usergroup_ids']) && empty($object['Add user group IDs'])) {
 		$company_id = (Registry::get('runtime.company_id')) ? Registry::get('runtime.company_id') : fn_get_company_id_by_name($object['company']);
 		if ($company_id) {
 			$rcid = Registry::get('runtime.company_id');

@@ -351,7 +351,7 @@ function fn_generate_unsold_report($params) {
 				return array($output, $params);
 			}
 		}
-		list($users, ) = fn_get_users($users_params);
+		list($users, ) = fn_get_users($users_params, $_SESSION['auth']);
 		$users = fn_array_value_to_key($users, 'user_id');
 		
 

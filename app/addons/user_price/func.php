@@ -77,6 +77,7 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
 			);
 		}
 	}
+	return true;
 }
 
 function fn_get_product_user_price($product_id, $user_id = 0)
