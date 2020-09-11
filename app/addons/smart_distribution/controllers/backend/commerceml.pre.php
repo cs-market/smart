@@ -1049,6 +1049,11 @@ fn_print_r($fantoms);
     // [/remove not use variants]
 
     die('Finis');
+} elseif ($mode == 'remove_vega_images') {
+	fn_delete_image_pairs($pid, 'product');
+	$product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 1810);
+	foreach ($product_ids as $pid) { fn_delete_image_pairs($pid, 'product'); }
+	fn_print_die('Fin');
 }
 
 function fn_between($val, $pattern)

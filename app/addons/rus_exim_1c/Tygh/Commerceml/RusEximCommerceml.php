@@ -2639,7 +2639,7 @@ class RusEximCommerceml
     public function getProductStatusByAmount($amount)
     {
         $product_status = self::PRODUCT_STATUS_ACTIVE;
-$amount = 10;
+
         if ($this->s_commerceml['exim_1c_add_out_of_stock'] == 'Y' && $amount <= 0) {
             $product_status = self::PRODUCT_STATUS_HIDDEN;
 

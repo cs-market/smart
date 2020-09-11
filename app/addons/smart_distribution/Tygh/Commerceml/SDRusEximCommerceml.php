@@ -753,6 +753,18 @@ class SDRusEximCommerceml extends RusEximCommerceml
         return $log_message;
     }
 
+    public function getProductStatusByAmount($amount)
+    {
+        $product_status = self::PRODUCT_STATUS_ACTIVE;
+
+        if ($amount != '' && $this->s_commerceml['exim_1c_add_out_of_stock'] == 'Y' && $amount <= 0) {
+            $product_status = self::PRODUCT_STATUS_HIDDEN;
+
+        }
+
+        return $product_status;
+    }
+
     /**
      * Prepares the array of user data for export to the accounting systems.
      *
@@ -905,7 +917,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     fn_place_order($cart, $customer_auth, 'save');
                 }
 
-                if ($new_status) $this->db->query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $new_status, $order_id);
+                if ($new_status) fn_change_order_status($order_id, $new_status);
 
                 fn_set_hook('exim_1c_update_order', $order_data, $cml);
             }
