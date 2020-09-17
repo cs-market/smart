@@ -1,35 +1,69 @@
-# ignore everything in the root folder
-!.gitignore
+# ignore everything in the root folder except default files
 /*
 
-# Addon development -----------------------------------------------------------------
+!.gitignore
+!.htaccess
+!.editorconfig
+
+!*.php
+local_conf.php
+get_api.php
+sp*.php
+
+!changelog.txt
+!copyright.txt
+!edost.txt
+!robots.txt
+!install.html
+!store_closed.html
+!README.rst
 
 # Add app,js,design directory
 !app/
 !js/
 !design/
 !var/
-var/*
-
-!var/backups/
+var/addons/
+var/cache/
+var/files/
+var/custom_files/
 var/backups/*
 !var/backups/last.sql.zip
 !var/backups/migration*
+images/*
+!**/images/
+!images/.gitkeep
 
-# ignore everything in "lib" directory
-app/lib/
-
-# ignore everything in "js" directory
-# except addons directory
-js/*
-!js/addons/
-
-
+!var/conf/
 !var/langs/
-var/langs/*
-!var/langs/en/
-!var/langs/ru/
-var/langs/en/*
-var/langs/ru/*
-!var/langs/en/addons/
-!var/langs/ru/addons/
+var/snapshots/
+!var/snapshots/*_dist.php
+
+!var/theme_repository/
+!var/.htaccess
+!var/install.log
+
+upgrades/*
+!upgrades/source_restore.php
+
+
+
+*.bak
+*.DS_Store*
+*.sublime*
+*.sw*
+*~
+.buildpath
+.idea
+.vscode
+.project
+.projectile
+nbproject
+/tags
+Thumbs.db
+get_addon.php
+get_addons/
+var/addons/
+langs.php
+qb.php
+/isph*
