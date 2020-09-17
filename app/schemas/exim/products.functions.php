@@ -1511,17 +1511,21 @@ function fn_exim_parse_features($data, $features_delimiter)
 /**
  * Save product features values
  *
- * @param int       $product_id Product identifier
- * @param array     $features   List of feature data
- * @param string    $lang_code  Language code
+ * @param int    $product_id   Product identifier
+ * @param array  $features     List of feature data
+ * @param string $lang_code    Language code
+ * @param bool   $reset_values Whether to reset values
  */
-function fn_exim_save_product_features_values($product_id, array $features, $lang_code)
+function fn_exim_save_product_features_values($product_id, array $features, $lang_code, $reset_values = true)
 {
     $feature_ids = $existent_feature_variants = $variant_names = array();
     $product_features = $product_lang_features = array();
 
-    $current_product_feature_ids = db_get_fields("SELECT feature_id FROM ?:product_features_values WHERE product_id = ?i GROUP BY feature_id", $product_id);
-    $default_features_values = array_fill_keys($current_product_feature_ids, '');
+    if ($reset_values) {
+        $current_product_feature_ids = db_get_fields("SELECT feature_id FROM ?:product_features_values WHERE product_id = ?i GROUP BY feature_id", $product_id);
+        $default_features_values = array_fill_keys($current_product_feature_ids, '');
+    }
+
     $runtime_company_id = fn_get_runtime_company_id();
 
     foreach ($features as $key => &$feature) {
@@ -1619,7 +1623,9 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
         }
     }
 
-    $product_features = $product_features + $default_features_values;
+    if ($reset_values) {
+        $product_features = $product_features + $default_features_values;
+    }
 
     if (!empty($product_features)) {
         fn_update_product_features_value($product_id, $product_features, array(), $lang_code);

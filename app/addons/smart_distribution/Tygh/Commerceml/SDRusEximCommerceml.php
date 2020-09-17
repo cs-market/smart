@@ -1251,6 +1251,13 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
 
                 $feature_id = $this->db->getField("SELECT feature_id FROM ?:product_features WHERE external_id = ?s", strval($_feature -> {$cml['id']}));
+                if (empty($feature_id)) {
+                    $feature_id = $this->db->getField("SELECT ?:product_features.feature_id FROM ?:product_features LEFT JOIN ?:product_features_descriptions ON ?:product_features.feature_id = ?:product_features_descriptions.feature_id AND lang_code = ?s WHERE ?:product_features_descriptions.description = ?s AND ?:product_features.company_id = ?i", $import_params['lang_code'], strval($_feature -> {$cml['name']}), $company_id);
+                    if ($feature_id) {
+                        $this->db->query("UPDATE ?:product_features SET external_id = ?s WHERE feature_id = ?i", strval($_feature -> {$cml['id']}), $feature_id);
+                    }
+                }
+
                 $new_feature = false;
 
                 if (empty($feature_id)) {

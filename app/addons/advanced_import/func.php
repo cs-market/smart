@@ -107,8 +107,10 @@ function fn_advanced_import_set_product_features($product_id, $features_list, $v
     unset($feature);
 
     if ($features_list) {
-        fn_exim_save_product_features_values($product_id, $features_list, $main_lang);
+        return fn_exim_save_product_features_values($product_id, $features_list, $main_lang, false);
     }
+
+    return [];
 }
 
 /**
