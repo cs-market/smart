@@ -65,6 +65,9 @@ function fn_decimal_amount_pre_add_to_cart(&$product_data, $cart, $auth, $update
 			$data['extra']['decimal_amount'] = $data['amount'];
 			//$data['original_amount'] = $data['amount'];
 		}
+		if (isset($data['extra']['exclude_from_calculate'])) {
+			$data['original_amount'] = $data['amount'];
+		}
 	}
 	unset($data);
 }
@@ -271,7 +274,7 @@ function fn_decimal_amount_post_check_amount_in_stock($product_id, &$amount, $pr
 		}
 
 		if ($cart_amount_changed) {
-			fn_set_notification('W', __('important'), __('text_cart_amount_changed', array('[product]' => $product['product'])));
+			//fn_set_notification('W', __('important'), __('text_cart_amount_changed', array('[product]' => $product['product'])));
 		}		
 	}
 }
