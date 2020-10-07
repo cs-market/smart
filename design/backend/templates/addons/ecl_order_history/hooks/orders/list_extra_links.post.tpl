@@ -1,0 +1,1 @@
+<li>{btn type="list" href="orders.details?order_id=`$o.order_id`&selected_section=order_history" text={__("privileges.view_order_history")}}</li>

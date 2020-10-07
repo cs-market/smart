@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+<id>promotion_step</id>
+<version>1.0</version>
+<position>0</position>
+<status>active</status>
+<default_language>en</default_language>
+<compatibility>
+</compatibility>
+<queries>
+</queries>
+<functions>
+</functions>
+</addon>
