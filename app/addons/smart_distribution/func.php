@@ -998,15 +998,13 @@ function fn_smart_distribution_get_stickers_pre($params, $fields, &$condition, $
 function fn_smart_distribution_get_product_features($fields, $join, &$condition, $params)
 {
     // [only vendor features]
-    if (isset($params['product_id']) && !empty($params['product_id'])) {
-        if (
-            AREA == 'A'
-            && fn_allowed_for('MULTIVENDOR')
-            // && Registry::get('runtime.company_id')
-        ) {
-            $product_company_id = db_get_field("SELECT company_id FROM ?:products WHERE product_id = ?i", $params['product_id']);
-            $condition .= db_quote(" AND (pf.company_id = 0 OR pf.company_id = ?i)", $product_company_id);
+    if (AREA == 'A' && fn_allowed_for('MULTIVENDOR')) {
+        if (isset($params['product_id']) && !empty($params['product_id'])) {
+            $company_id = db_get_field("SELECT company_id FROM ?:products WHERE product_id = ?i", $params['product_id']);
+        } else {
+            $company_id = Registry::get('runtime.company_id');
         }
+        if (!empty($company_id)) $condition .= db_quote(" AND (pf.company_id = 0 OR pf.company_id = ?i)", Registry::get('runtime.company_id'));
     }
     // [/only vendor features]
 }

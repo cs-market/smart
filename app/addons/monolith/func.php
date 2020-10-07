@@ -23,7 +23,7 @@ function fn_monolith_generate_xml($order_id) {
 				date("Y-m-d\T00:00:00", $order_info['timestamp']),
 				1,
 				1,
-				date("Y-m-d\T00:00:00", $order_info['timestamp']),
+				date("Y-m-d\T00:00:00", $order_info['delivery_date']),
 			),
 		),
 	);
@@ -66,6 +66,13 @@ function fn_monolith_generate_xml($order_id) {
 	}
 
 	// if we have comment
+	if (!empty($order_info['promotions'])) {
+		$promotions = fn_array_column($order_info['promotions'], 'name');
+		$promotions = implode(', ', $promotions);
+		if (!empty($promotions)) {
+			$order_info['notes'] = $promotions . '; ' . $order_info['notes'];
+		}
+	}
 	if (!empty($order_info['notes'])) {
 		$monolith_order['d'][] = array(
 			'@attributes' => array ('name' => 'CRMOrderOption'),
