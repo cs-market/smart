@@ -11,11 +11,6 @@ if ($mode == 'checkout') {
     fn_product_groups_pre_update_order($tmp_cart);
 
     foreach ($tmp_cart['product_groups'] as $key => &$product_group) {
-        $total_products_price = 0;
-        foreach ($product_group['products'] as $product) {
-            $total_products_price += ($product['price'] * $product['amount']);
-        }
-        $product_group['subtotal'] = $total_products_price;
         if ($product_group['group']['min_order'] && $product_group['group']['min_order'] > $product_group['subtotal']) {
             $formatter = Tygh::$app['formatter'];
             $min_amount = $formatter->asPrice($product_group['group']['min_order']);
