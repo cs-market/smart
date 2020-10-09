@@ -32,6 +32,13 @@
         </div>
     </div>
 
+    <div class="control-group{if $runtime.company_id} cm-hide-inputs{/if}">
+        <label for="min_order_{$id}" class="control-label">{__("order_split.min_order")}:</label>
+        <div class="controls">
+            <input type="text" size="70" id="min_order_{$id}" name="product_group_data[min_order]" value="{$product_group.min_order}" class="input-large">
+        </div>
+    </div>
+
     {include file="common/select_status.tpl" input_name="product_group_data[status]" id="elm_product_group_status_{$id}" obj=$product_group}
 </fieldset>
 </div>
