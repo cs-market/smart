@@ -90,6 +90,7 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
                     'get_hidden' => true,
                     'active' => true,
                     'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'],
+                    'promotion_id' => fn_category_promotion_get_promotion_ids($params['cid'])
                 );
 
                 list($promotions, ) = fn_get_promotions($promo_params);
@@ -254,4 +255,28 @@ function fn_category_promotion_get_product_promotion_id($product_id)
     $promotion_id = db_get_field('SELECT MAX(promotion_id) FROM ?:promotions WHERE 1 ?p', $condition);
 
     return $promotion_id;
+}
+
+function fn_category_promotion_get_promotion_ids($category_id)
+{
+    if (!$category_id) {
+        return [];
+    }
+
+    $condition = '';
+    $condition_params = [
+        '%,' . $category_id . ',%',
+        '%,' . $category_id,
+        $category_id . ',%',
+        $category_id
+    ];
+
+    foreach ($condition_params as $condition_param) {
+        $condition .= !$condition ? db_quote('categories LIKE ?l', $condition_param) : db_quote(' OR categories LIKE ?l', $condition_param);
+    }
+
+    $condition = 'AND (' . $condition . ')';
+    $promotion_ids = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE 1 ?p', $condition);
+
+    return $promotion_ids;
 }
