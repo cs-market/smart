@@ -80,9 +80,8 @@ function fn_product_groups_gather_additional_products_data_params($product_ids, 
     }
 }
 
-function fn_product_groups_pre_update_order(&$cart, $order_id) {
-
-    if (count($cart['product_groups']) == 1) {
+function fn_product_groups_pre_update_order(&$cart, $order_id = 0) {
+    if (count($cart['product_groups']) == 1 && !$cart['parent_order_id']) {
         $proto = $cart['product_groups'][0];
         unset($proto['products']);
         foreach ($cart['products'] as $cart_id => $product) {
@@ -106,4 +105,32 @@ function fn_exim_import_product_group($group) {
 
 function fn_exim_get_product_group($group_id) {
     return db_get_field('SELECT `group` FROM ?:product_groups WHERE group_id = ?i', $group_id);
+}
+
+function fn_product_groups_check_min_amount($cart, &$check = true) {
+    fn_product_groups_pre_update_order($cart);
+    if (count($cart['product_groups']) == 1) {
+        $product_group = reset($cart['product_groups']);
+        if (isset($product_group['group']['min_order'])) {
+            if ($product_group['group']['min_order'] > $product_group['subtotal']) {
+                $formatter = Tygh::$app['formatter'];
+                $min_amount = $formatter->asPrice($product_group['group']['min_order']);
+                fn_set_notification(
+                    'W',
+                    __('notice'),
+                    __('checkout.min_cart_subtotal_required', [
+                        '[amount]' => $min_amount,
+                        '[group]' => $product_group['group']['group'],
+                    ])
+                );
+            }
+            $check = false;
+        }
+    }
+}
+
+function fn_product_groups_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups) {
+    if (defined('API')) {
+        fn_product_groups_pre_update_order($cart);
+    }
 }

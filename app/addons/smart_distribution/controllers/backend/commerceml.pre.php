@@ -571,6 +571,26 @@ if ($mode == 'sync') {
 		}
 	}
 	fn_print_die('done remove_extra_profiles');
+} elseif ($mode == 'remove_extra_profiles_alidi') {
+
+	list($users) = fn_get_users(array('company_id' => 1824), $auth);
+	foreach ($users as $user) {
+		$profiles = fn_get_user_profiles($user['user_id']);
+		if (count($profiles) > 1) {
+			$profiles = array_filter($profiles, function($v, $k) {
+				return $v['profile_name'] == 'Import create';
+			}, ARRAY_FILTER_USE_BOTH);
+
+			$remove_profiles = fn_array_column($profiles, 'profile_id');
+			if ($remove_profiles) {
+				foreach ($remove_profiles as $profile_id) {
+					fn_delete_user_profile($user['user_id'], $profile_id);
+					$removed_profiles[] = $product_id;
+				}
+			}
+		}
+	}
+	fn_print_die(count($removed_profiles));
 } elseif ($mode == 'get_reward_points') {
 	$company_id = ($_REQUEST['company_id']) ? $_REQUEST['company_id'] : 13;
 	list($users) = fn_get_users(array('company_id' => $company_id));
