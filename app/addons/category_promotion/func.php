@@ -261,10 +261,3 @@ function fn_category_promotion_get_product_promotion_id($product_id)
 
     return $promotion_id;
 }
-
-function fn_category_promotion_get_category_promotion_ids($category_id)
-{
-    return $category_id
-        ? db_get_fields('SELECT promotion_id FROM ?:promotions WHERE ?p', fn_find_array_in_set([$category_id], 'categories'))
-        : [];
-}
