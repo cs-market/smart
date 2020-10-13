@@ -86,19 +86,16 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
                     $params['custom_extend'][] = 'prices';
                 }
                 $params['extend'][] = 'prices';
-                $promotion_ids = fn_category_promotion_get_category_promotion_ids($params['cid']);
 
                 $promo_params = array(
                     'get_hidden' => true,
                     'active' => true,
-                    'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids']
+                    'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'],
+                    'category_id' => $params['cid'],
                 );
 
-                if ($promotion_ids) {
-                    $promo_params['promotion_id'] = $promotion_ids;
-                }
-
                 list($promotions, ) = fn_get_promotions($promo_params);
+
                 $data = fn_array_column($promotions, 'products');
                 $data = array_filter($data);
                 $product_ids = array_unique(explode(',', implode(',', $data)));
@@ -191,6 +188,9 @@ function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$co
             $params['fields'] = explode(',', $params['fields']);
         }
         $fields = $params['fields'];
+    }
+    if (!empty($params['category_id'])) {
+        $condition .=' AND (' . fn_find_array_in_set([$params['category_id']], "categories", true) . ')';
     }
 }
 
