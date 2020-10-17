@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>form_tracker</id>
+	<name>Form tracker</name>
+	<description>Track the sent forms</description>
+	<priority>31337</priority>
+	<position>0</position>
+	<status>active</status>
+	<default_language>ru</default_language>
+	<language_variables>
+		<item lang="ru" id="sent_forms">Отправленный формы</item>
+		<item lang="ru" id="sent_forms_description">Позволяет отслеживать отправленные формы</item>
+		<item lang="ru" id="new_sent_forms">Новые отправленные формы</item>
+		<item lang="ru" id="new_sent_forms_description">Показывает только новые отправленные формы</item>
+	</language_variables>
+	<queries>
+		<item>ALTER TABLE `?:banners` ADD `popup_page_id` mediumint(8) UNSIGNED NOT NULL</item>
+		<item for="uninstall">ALTER TABLE `?:banners` DROP `popup_page_id`</item>
+
+		<item>  CREATE TABLE `?:sent_forms` (
+			`submit_id` mediumint(8) unsigned NOT NULL auto_increment,
+			`form_id` mediumint(8) NOT NULL,
+			`form_data` text NOT NULL,
+			`user_id` mediumint(8) NOT NULL,
+			`comments` text NOT NULL,
+			`timestamp` int(11) unsigned NOT NULL default 0,
+			`status` char(1) NOT NULL default 'N', 
+			PRIMARY KEY (`submit_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8
+		</item>
+		<item for="uninstall">DROP TABLE IF EXISTS `?:sent_forms`</item>
+	</queries>
+	<functions>
+		<item for="install">fn_form_tracker_addon_install</item>
+		<item for="uninstall">fn_form_tracker_addon_uninstall</item>
+	</functions>
+</addon>

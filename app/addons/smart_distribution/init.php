@@ -49,5 +49,7 @@ fn_register_hooks(
 	'load_products_extra_data',
 	'load_products_extra_data_post',
     'get_stickers_pre',
-    'get_product_features'
+    'get_product_features',
+    'send_form',
+    'get_submitted_forms_pre'
 );

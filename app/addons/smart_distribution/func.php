@@ -1012,3 +1012,19 @@ function fn_smart_distribution_get_product_features($fields, $join, &$condition,
 function fn_timestamp_to_date_wo_time($timestamp) {
     return !empty($timestamp) ? date('d.m.Y', intval($timestamp)) : '';
 }
+
+function fn_smart_distribution_send_form(&$page_data, $form_values, $result, $from, $sender, $attachments, $is_html, $subject) {
+    if (Tygh::$app['session']['auth']['user_id']) {
+        $managers = fn_smart_distribution_get_managers(['user_id' => Tygh::$app['session']['auth']['user_id']]);
+        if (!empty($managers)) {
+            $page_data['form']['general'][FORM_RECIPIENT] = fn_array_column($managers, 'email', 'name');
+        }
+    }
+}
+
+function fn_smart_distribution_get_submitted_forms_pre($params, &$condition, $order_by, $limit) {
+    if (fn_smart_distribution_is_manager(Tygh::$app['session']['auth']['user_id'])) {
+        $customer_ids = db_get_fields('SELECT customer_id FROM ?:vendors_customers WHERE vendor_manager = ?i', Tygh::$app['session']['auth']['user_id']);
+        $condition .= db_quote(' AND user_id IN (?a)', $customer_ids);
+    }
+}
