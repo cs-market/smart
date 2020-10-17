@@ -86,19 +86,17 @@ function fn_form_tracker_get_page_data(&$page_data)
 
 function fn_form_tracker_send_form(&$page_data, $form_values, $result, $from, $sender, $attachments, $is_html, $subject) {
     // if form trackable
-    $submitted_form = array(
-        'form_data' => $form_values,
-        'form_id' => $page_data['page_id'],
-        'user_id' => Tygh::$app['session']['auth']['user_id'],
-        'comments' => '',
-        'timestamp' => TIME,
-        'status' => 'N'
-    );
+    if (isset($page_data['form']['general']['U']) && $page_data['form']['general']['U'] == 'Y') {
+        $submitted_form = array(
+            'form_data' => $form_values,
+            'form_id' => $page_data['page_id'],
+            'user_id' => Tygh::$app['session']['auth']['user_id'],
+            'comments' => '',
+            'timestamp' => TIME,
+            'status' => 'N'
+        );
 
-    fn_update_submitted_form($submitted_form);
-
-    if (defined('AJAX_REQUEST')) {
-        fn_set_notification('N', __('notice'), $page_data['form']['general']['L']);
+        fn_update_submitted_form($submitted_form);
     }
 }
 
