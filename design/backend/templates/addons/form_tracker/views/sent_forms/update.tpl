@@ -106,8 +106,7 @@
                         {/foreach}
                     </select>
                 {elseif $element.element_type == $smarty.const.FORM_FILE}
-                    {script src="js/tygh/fileuploader_scripts.js"}
-                    {include file="common/fileuploader.tpl" var_name="fb_files[`$element.element_id`]"}
+                    {$form_values.$element_id}
                 {/if}
             </div>
         </div>

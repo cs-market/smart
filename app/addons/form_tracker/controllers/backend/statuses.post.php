@@ -15,5 +15,5 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if (($mode == 'update' || $mode == 'manage') && $_REQUEST['type'] == STATUSES_FORM_TRACKER) {
-	Tygh::$app['view']->assign('hide_email', true);
+    Tygh::$app['view']->assign('hide_email', true);
 }
