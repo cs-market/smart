@@ -60,11 +60,6 @@ class DateTimeHelper
     {
         $week_period_modifier = '';
 
-        // Workaround for the php bug https://bugs.php.net/bug.php?id=63740
-        if (date('w') === '0') {
-            $week_period_modifier = date('Y-m-d', strtotime('-1 day'));
-        }
-
         return array(
             self::PERIOD_TODAY => array(
                 'from' => 'today',
