@@ -21,7 +21,7 @@ function fn_get_product_groups($params) {
         $condition .= db_quote(' AND status = ?s', $params['status']);
     }
 
-    if (!empty($params['group_id'])) {
+    if (isset($params['group_id'])) {
         $condition .= db_quote(' AND group_id = ?i', $params['group_id']);
     }
     if (!empty($params['group_ids'])) {

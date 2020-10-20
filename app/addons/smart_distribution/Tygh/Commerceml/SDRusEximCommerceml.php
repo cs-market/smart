@@ -1012,6 +1012,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
         if (!empty($prices['user_price']) && is_callable('fn_update_product_user_price')) {
             fn_update_product_user_price($product_id, $prices['user_price']);
         }
+        if (empty($fake_product_data['prices'])) {
+            unset($fake_product_data['prices']);
+        }
+
         fn_update_product_prices($product_id, $fake_product_data);
 
         if (fn_ult_is_shared_product($product_id) == 'Y') {

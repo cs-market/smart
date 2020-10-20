@@ -6,7 +6,7 @@
             {assign var="obj_id" value=$product.product_id}
             {include file="common/product_data.tpl" product=$product but_text=__("add_to_cart")}
 
-            <div class="span10 ty-product-azure-bigpicture__left">
+            <div class="span8 ty-product-azure-bigpicture__left">
                 <div class="ty-product-bigpicture__left-wrapper1">
                     {hook name="products:image_wrap"}
                         {if !$no_images}
@@ -19,7 +19,7 @@
             </div>
 
 
-            <div class="span6 ty-product-azure-bigpicture__right">
+            <div class="span8 ty-product-azure-bigpicture__right">
                 <div class="bottom-hr">
                     {hook name="products:main_info_title"}
                         {if !$hide_title}
@@ -37,6 +37,9 @@
                     {/hook}
                 </div>
                 <div class="bottom-hr product-middle-section">
+                    {assign var="product_amount" value="product_amount_`$obj_id`"}
+                    {$smarty.capture.$product_amount nofilter}
+
                     <div class="ty-product-block__sku">
                         {assign var="sku" value="sku_`$obj_id`"}
                         {$smarty.capture.$sku nofilter}
@@ -48,9 +51,6 @@
                         {$smarty.capture.$advanced_options nofilter}
                     </div>
                     {if $capture_options_vs_qty}{/capture}{/if}
-
-                    {assign var="product_amount" value="product_amount_`$obj_id`"}
-                    {$smarty.capture.$product_amount nofilter}
                 </div>
 
                 {assign var="form_open" value="form_open_`$obj_id`"}
@@ -62,70 +62,73 @@
                 {assign var="list_discount" value="list_discount_`$obj_id`"}
                 {assign var="discount_label" value="discount_label_`$obj_id`"}
 
+                <div class="clearfix">
+	                <div class="{if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}prices-container {/if}price-wrap ty-float-left">
+	                    {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
+	                        <div class="ty-product-bigpicture__prices">
+	                            {if $smarty.capture.$old_price|trim}{$smarty.capture.$old_price nofilter}{/if}
+	                    {/if}
 
-                <div class="{if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}prices-container {/if}price-wrap">
-                    {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
-                        <div class="ty-product-bigpicture__prices">
-                            {if $smarty.capture.$old_price|trim}{$smarty.capture.$old_price nofilter}{/if}
-                    {/if}
+	                    {if $smarty.capture.$price|trim}
+	                        <div class="ty-product-block__price-actual">
+	                            {$smarty.capture.$price nofilter}
+	                        </div>
+	                    {/if}
 
-                    {if $smarty.capture.$price|trim}
-                        <div class="ty-product-block__price-actual">
-                            {$smarty.capture.$price nofilter}
-                        </div>
-                    {/if}
+	                    {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
+	                            {$smarty.capture.$clean_price nofilter}
+	                            {$smarty.capture.$list_discount nofilter}
 
-                    {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
-                            {$smarty.capture.$clean_price nofilter}
-                            {$smarty.capture.$list_discount nofilter}
+	                            {assign var="discount_label" value="discount_label_`$obj_prefix``$obj_id`"}
+	                            {$smarty.capture.$discount_label nofilter}
+	                        </div>
+	                    {/if}
+	                </div>
+	                <div class="">
+		                {if $capture_options_vs_qty}{capture name="product_options"}{$smarty.capture.product_options nofilter}{/if}
+		                <div class="ty-product-block__option">
+		                    {assign var="product_options" value="product_options_`$obj_id`"}
+		                    {$smarty.capture.$product_options nofilter}
+		                </div>
+		                {if $capture_options_vs_qty}{/capture}{/if}
 
-                            {assign var="discount_label" value="discount_label_`$obj_prefix``$obj_id`"}
-                            {$smarty.capture.$discount_label nofilter}
-                        </div>
-                    {/if}
+		                {if $show_descr}
+		                {assign var="prod_descr" value="prod_descr_`$obj_id`"}
+		                    <h3 class="ty-product-block__description-title">{__("description")}</h3>
+		                    <div class="ty-product-block__description">{$smarty.capture.$prod_descr nofilter}</div>
+		                {/if}
+
+		                {if $capture_options_vs_qty}{capture name="product_options"}{$smarty.capture.product_options nofilter}{/if}
+		                <div class="ty-product-block__field-group">
+		                    {assign var="min_qty" value="min_qty_`$obj_id`"}
+		                    {$smarty.capture.$min_qty nofilter}
+
+		                    {assign var="product_edp" value="product_edp_`$obj_id`"}
+		                    {$smarty.capture.$product_edp nofilter}
+		                </div>
+		                <div class="qty-container">
+		                    {assign var="qty" value="qty_`$obj_id`"}
+		                    {$smarty.capture.$qty nofilter}
+		                </div>
+
+		                {if $capture_options_vs_qty}{/capture}{/if}
+
+		                {if $capture_buttons}{capture name="buttons"}{/if}
+		                <div class="ty-product-block__button">
+		                    {if $show_details_button}
+		                        {include file="buttons/button.tpl" but_href="products.view?product_id=`$product.product_id`" but_text=__("view_details") but_role="submit"}
+		                    {/if}
+
+		                    {assign var="add_to_cart" value="add_to_cart_`$obj_id`"}
+		                    {$smarty.capture.$add_to_cart nofilter}
+
+		                    {assign var="list_buttons" value="list_buttons_`$obj_id`"}
+		                    {$smarty.capture.$list_buttons nofilter}
+		                </div>
+		                {if $capture_buttons}{/capture}{/if}
+	                </div>
+                	
                 </div>
-
-                {if $capture_options_vs_qty}{capture name="product_options"}{$smarty.capture.product_options nofilter}{/if}
-                <div class="ty-product-block__option">
-                    {assign var="product_options" value="product_options_`$obj_id`"}
-                    {$smarty.capture.$product_options nofilter}
-                </div>
-                {if $capture_options_vs_qty}{/capture}{/if}
-
-                {if $show_descr}
-                {assign var="prod_descr" value="prod_descr_`$obj_id`"}
-                    <h3 class="ty-product-block__description-title">{__("description")}</h3>
-                    <div class="ty-product-block__description">{$smarty.capture.$prod_descr nofilter}</div>
-                {/if}
-
-                {if $capture_options_vs_qty}{capture name="product_options"}{$smarty.capture.product_options nofilter}{/if}
-                <div class="ty-product-block__field-group">
-                    {assign var="min_qty" value="min_qty_`$obj_id`"}
-                    {$smarty.capture.$min_qty nofilter}
-
-                    {assign var="product_edp" value="product_edp_`$obj_id`"}
-                    {$smarty.capture.$product_edp nofilter}
-                </div>
-                <div class="qty-container">
-                    {assign var="qty" value="qty_`$obj_id`"}
-                    {$smarty.capture.$qty nofilter}
-                </div>
-
-                {if $capture_options_vs_qty}{/capture}{/if}
-
-                {if $capture_buttons}{capture name="buttons"}{/if}
-                <div class="ty-product-block__button">
-                    {if $show_details_button}
-                        {include file="buttons/button.tpl" but_href="products.view?product_id=`$product.product_id`" but_text=__("view_details") but_role="submit"}
-                    {/if}
-
-                    {assign var="add_to_cart" value="add_to_cart_`$obj_id`"}
-                    {$smarty.capture.$add_to_cart nofilter}
-
-                    {assign var="list_buttons" value="list_buttons_`$obj_id`"}
-                    {$smarty.capture.$list_buttons nofilter}
-                </div>
-                {if $capture_buttons}{/capture}{/if}
 
                 {hook name="products:promo_text"}
                 {if $product.promo_text}
