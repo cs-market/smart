@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>product_step_admin_order</id>
+    <version>1.0.0</version>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <priority>100</priority>
+    <status>active</status>
+    <position>0</position>
+    <default_language>ru</default_language>
+</addon>

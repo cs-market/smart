@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest
+"
+"Content-Type: text/plain; charset=UTF-8
+"
+"Language-Team: Russian
+"
+"Language: ru_RU
+"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));
+"
+"X-Generator: crowdin.com
+"
+"X-Crowdin-Project: cs-cart-latest
+"
+"X-Crowdin-Language: ru
+"
+"X-Crowdin-File: /release-4.11.1/addons/product_step_admin_order.po
+"
+"Last-Translator: cscart
+"
+"PO-Revision-Date: 2019-11-06 09:42
+"
+
+msgctxt "Addons::name::product_step_admin_order"
+msgid "product_step_admin_order"
+msgstr "Smart distribution: Шаг товара в админке"
+
+msgctxt "Addons::description::product_step_admin_order"
+msgid "product_step_admin_order"
+msgstr "Шаг количества товара при редактировании заказа в административной части"
