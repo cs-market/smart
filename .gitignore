@@ -67,3 +67,4 @@ var/addons/
 langs.php
 qb.php
 /isph*
+/create_addon.php
