@@ -215,10 +215,13 @@ function fn_category_promotion_get_product_data_post(&$product_data, $auth, $pre
 
         if ($promotion_id) {
 	    
-            $product_data['promo_text'] = '<div class="promotion-subheader">' . __('promo_subheader') . '</div>' . db_get_field('SELECT detailed_description FROM ?:promotion_descriptions WHERE promotion_id = ?i AND lang_code = ?s', $promotion_id, $lang_code);   
+            $product_data['promo_text'] = db_get_field('SELECT detailed_description FROM ?:promotion_descriptions WHERE promotion_id = ?i AND lang_code = ?s', $promotion_id, $lang_code);
+            if (!empty(trim($product_data['promo_text']))) {
+                $product_data['promo_text'] = '<div class="promotion-subheader">' . __('promo_subheader') . '</div>' . $product_data['promo_text'];
+            }
         }
         // correct after November 2020
-        $product_data['promo_text_plain'] = strip_tags($product_data['promo_text']);
+        if (defined('API')) $product_data['promo_text_plain'] = $product_data['promo_text'] = strip_tags($product_data['promo_text']);
     }
 }
 

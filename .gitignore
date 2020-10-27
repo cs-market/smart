@@ -17,6 +17,7 @@ sp*.php
 !install.html
 !store_closed.html
 !README.rst
+!README.md
 
 # Add app,js,design directory
 !app/
@@ -29,7 +30,8 @@ var/files/
 var/custom_files/
 var/backups/*
 !var/backups/last.sql.zip
-!var/backups/migration*
+!var/backups/structure.sql.zip
+!var/backups/migration_*
 images/*
 !**/images/
 !images/.gitkeep

@@ -112,8 +112,8 @@ return [
 	],
 	'64' => [
 		'page_id' => 64,
-		'company_id' => 1807,
-		'usergroup_id' => [554],
+		'company_id' => 1810,
+		'usergroup_id' => [601],
 		'fields_map' => [
 			'firstname' => '129',
 			'password' => '130',
