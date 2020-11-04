@@ -1028,3 +1028,20 @@ function fn_smart_distribution_get_submitted_forms_pre($params, &$condition, $or
         $condition .= db_quote(' AND user_id IN (?a)', $customer_ids);
     }
 }
+
+function microtime_float()
+{
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float)$usec + (float)$sec);
+}
+
+function fn_set_checkpoint() {
+    static $prev_time;
+    if (!$prev_time) {
+        $prev_time = microtime_float();
+    }
+    $current_time = microtime_float();
+    $time = $current_time - $prev_time;
+    $prev_time = $current_time;
+    return $time;
+}

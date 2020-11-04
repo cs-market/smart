@@ -886,14 +886,22 @@ fn_print_r($fantoms);
 } elseif ($mode == 'fix_user_price') {
 	$users = db_get_fields('SELECT user_id FROM ?:users');
 	$products = db_get_fields('SELECT product_id FROM ?:products');
-	db_query('DELETE FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
+	$count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
+	$res = db_query('DELETE FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
+	$count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
 	db_query('DELETE FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
+
 	$user_price_products = db_get_hash_multi_array('SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id', ['company_id', 'product_id', 'product_id']);
 	foreach ($user_price_products as $company_id => $products) {
 		$company_users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i', $company_id);
 		db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
 	}
+
     fn_print_die('stop');
+} elseif ($mode == 'remove_user_price') {
+	$products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 1824);
+	db_query('DELETE FROM ?:user_price WHERE product_id IN (?a)', $products);
+	fn_print_die('stop');
 } elseif ($mode == 'separate_features_by_vendor') {
     /*
      * Automatic division and duplication 
