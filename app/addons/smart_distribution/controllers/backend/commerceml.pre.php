@@ -899,8 +899,45 @@ fn_print_r($fantoms);
 
     fn_print_die('stop');
 } elseif ($mode == 'remove_user_price') {
-	$products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 1824);
-	db_query('DELETE FROM ?:user_price WHERE product_id IN (?a)', $products);
+	$users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = "C"', 1824);
+
+	// db_query('DELETE FROM ?:user_price WHERE product_id IN (?a)', $products);
+	$prices = db_get_fields('SELECT distinct(user_id) FROM ?:user_price WHERE user_id IN (?a)', $users);
+	$diff = array_diff($users, $prices);
+	fn_print_die($diff, count($users), count($prices));
+	fn_print_die('stop');
+} elseif ($mode == 'import_user_price_alidi') {
+    $dir = 'alidi/';
+    $files = fn_get_dir_contents($dir, false, true, 'csv');
+    fn_set_checkpoint();
+    foreach ($files as $file) {
+        fn_echo_br('file '. $file);
+        $pattern = fn_exim_get_pattern_definition(strtolower('user_price'), 'import');
+                
+        if (!empty($pattern)) {
+            $params = array(
+                'delimiter' => ';',
+                'price_dec_sign_delimiter' => ',',
+                'category_delimiter' => '///',
+                'skip_creating_new_products' => 'N',
+                'unset_file' => true
+            );
+            if ($params['delimiter'] == ',') {
+                $params['delimiter'] = 'C';
+            }
+
+            Registry::set('runtime.skip_area_checking', true);
+
+            if (($data = fn_exim_get_csv($pattern, $dir.$file, $params))) {
+
+                $res = fn_import($pattern, $data, $params);
+            }
+        }
+        if ($res) {
+        	fn_rm($dir . $file);
+        }
+        fn_echo_br(fn_set_checkpoint());
+	}
 	fn_print_die('stop');
 } elseif ($mode == 'separate_features_by_vendor') {
     /*
