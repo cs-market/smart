@@ -24,7 +24,7 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
             foreach ($search_fields as $level => $field) {
                 $parts = array();
                 foreach ($names as $search) {
-                    $parts[] = db_quote("$field LIKE ?l", '%'.$search.'%');
+                    $parts[] = db_quote("$field = ?s", $search);
                 }
 
                 $expression[] = ' WHEN (' . implode(' OR ', $parts) . ') THEN ' . $level;

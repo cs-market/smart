@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+
+<addon scheme='2.0'>
+    <id>psbankpayment</id>
+    <version>1.0</version>
+    <name>Промсвязьбанк:Интернет эквайринг</name>
+    <description>Промсвязьбанк эквайринг</description>
+    <priority>100500</priority>
+    <status>active</status>
+	<queries>
+        <item for="install">DROP TABLE IF EXISTS ?:psbankpayment;</item>
+        <item for="install">DROP TABLE IF EXISTS ?:psbankpayment_history;</item>
+		<item for="install">
+            CREATE TABLE `?:psbankpayment` (
+				ORDER_ID		INT(11)  NOT NULL,
+				AMOUNT			DECIMAL(13,2) NOT NULL,
+				AUTHCODE		VARCHAR(32) NULL,
+				CARD			VARCHAR(250) NULL,
+				DATE			DATETIME NOT NULL,
+				EMAIL			VARCHAR(80) NOT NULL,
+				INT_REF			VARCHAR(25) NULL,
+				NAME			VARCHAR(250) NULL,
+				ORG_AMOUNT		DECIMAL(13,2) NULL,
+				RC				VARCHAR(2)	NULL,
+				RCTEXT			VARCHAR(250) NULL,
+				RESULT			VARCHAR(1) NULL,
+				RRN				VARCHAR(12) NULL,
+				STATUS			INT(11) DEFAULT '0',
+				TRTYPE			INT(11) NOT NULL,
+				NONCE			VARCHAR(40) NOT NULL,
+				PRIMARY KEY (ORDER_ID)
+			) Engine=MyISAM DEFAULT CHARSET UTF8;
+		</item>
+        <item for="install">
+            CREATE TABLE `?:psbankpayment_history` (
+                ID              INT(11)  NOT NULL AUTO_INCREMENT,
+                `ORDER`         INT(11)  NOT NULL,
+                AMOUNT          DECIMAL(13,2) NOT NULL,
+                ORG_AMOUNT      DECIMAL(13,2) NOT NULL,
+                CURRENCY        VARCHAR(32) NULL,
+                `DESC`          VARCHAR(250) NULL,
+                MERCH_NAME      VARCHAR(250) NULL,
+                MERCHANT        VARCHAR(250) NULL,
+                TERMINAL        VARCHAR(250) NULL,
+                EMAIL           VARCHAR(80) NOT NULL,
+                TRTYPE          INT(11) NOT NULL,
+                `TIMESTAMP`     VARCHAR(14) NOT NULL,
+                NONCE           VARCHAR(40) NOT NULL,
+                INT_REF         VARCHAR(25) NULL,
+                NAME            VARCHAR(250) NULL,
+                RC              VARCHAR(2)  NULL,
+                RCTEXT          VARCHAR(250) NULL,
+                RESULT          VARCHAR(1) NULL,
+                RRN             VARCHAR(12) NULL,
+                AUTHCODE        VARCHAR(32) NULL,
+                CARD            VARCHAR(250) NULL,
+                CHANNEL         VARCHAR(250) NULL,
+                PRIMARY KEY (ID)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:psbankpayment;</item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:psbankpayment_history;</item>
+	</queries>
+	<functions>
+        <item for="install">fn_psbankpayment_install</item>
+        <item for="uninstall">fn_psbankpayment_uninstall</item>
+	</functions>
+	<language_variables>
+        <item lang="ru" id="addons.psbankpayment.payment_success">ОПЕРАЦИЯ ОДОБРЕНА</item>
+        <item lang="ru" id="addons.psbankpayment.action_success">операция одобрена</item>
+        <item lang="ru" id="addons.psbankpayment.action_fail">Ошибка получения результата операции</item>
+        <item lang="ru" id="addons.psbankpayment.action_fail_text">операция отклонена: [rctext]</item>
+        <item lang="ru" id="psbankpayment">Промсвязьбанк: транзакции</item>
+        <item lang="ru" id="addons.psbankpayment.transactions">Транзакции</item>
+        <item lang="ru" id="psbankpayment_merchant">Merchant</item>
+        <item lang="ru" id="psbankpayment_terminal">Terminal</item>
+        <item lang="ru" id="psbankpayment_key">Key</item>
+        <item lang="ru" id="psbankpayment_url_notice">URL CGI-скрипта, обрабатывающего уведомления: [psbankpayment_url]</item>
+        <item lang="ru" id="psbankpayment_trtype">Тип списания</item>
+        <item lang="ru" id="psbankpayment_trtype_1">Оплата</item>
+        <item lang="ru" id="psbankpayment_trtype_12">Предавторизация</item>
+        <item lang="ru" id="psbankpayment_test">Ражим работы</item>
+        <item lang="ru" id="psbankpayment_test_off">Рабочий</item>
+        <item lang="ru" id="psbankpayment_test_on">Тестовый</item>
+        <item lang="ru" id="psbankpayment_notify">Отправлять уведомление клиенту на почту</item>
+        <item lang="ru" id="psbankpayment_notify_off">Нет</item>
+        <item lang="ru" id="psbankpayment_notify_on">Да</item>
+        <item lang="ru" id="psbankpayment_status_success">Статус заказа при оплате</item>
+        <item lang="ru" id="psbankpayment_status_preauth">Статус предавторизованного заказа</item>
+        <item lang="ru" id="addons.psbankpayment.order_number">Номер заказа</item>
+        <item lang="ru" id="addons.psbankpayment.order_amount">Сумма</item>
+        <item lang="ru" id="addons.psbankpayment.date">Дата</item>
+        <item lang="ru" id="addons.psbankpayment.email">Email</item>
+        <item lang="ru" id="addons.psbankpayment.name">Имя</item>
+        <item lang="ru" id="addons.psbankpayment.status">Статус</item>
+        <item lang="ru" id="addons.psbankpayment.action">Операция</item>
+        <item lang="ru" id="addons.psbankpayment.return">Возврат</item>
+        <item lang="ru" id="addons.psbankpayment.cancel">Отменить</item>
+        <item lang="ru" id="addons.psbankpayment.complete">Завершить</item>
+        <item lang="ru" id="addons.psbankpayment.history">история операций</item>
+        <item lang="ru" id="addons.psbankpayment.order_history">История операций по заказу [order_id]</item>
+        <item lang="ru" id="addons.psbankpayment.status_0">Ожидается оплата</item>
+        <item lang="ru" id="addons.psbankpayment.status_1">Заказ оплачен</item>
+        <item lang="ru" id="addons.psbankpayment.status_12">Предавторизация</item>
+        <item lang="ru" id="addons.psbankpayment.status_14">Возврат оплаты</item>
+        <item lang="ru" id="addons.psbankpayment.status_21">Заказ оплачен</item>
+        <item lang="ru" id="addons.psbankpayment.status_22">Предавторизация отменена</item>
+        <item lang="ru" id="addons.psbankpayment.history_amount">Сумма</item>
+        <item lang="ru" id="addons.psbankpayment.history_org_amount">Сумма оригинальной операции</item>
+        <item lang="ru" id="addons.psbankpayment.history_trtype">Тип операции</item>
+        <item lang="ru" id="addons.psbankpayment.history_result">Результат</item>
+        <item lang="ru" id="addons.psbankpayment.history_rc">Код ответа</item>
+        <item lang="ru" id="addons.psbankpayment.history_authcode">Код авторизации</item>
+        <item lang="ru" id="addons.psbankpayment.history_rrn">Ссылка RRN</item>
+        <item lang="ru" id="addons.psbankpayment.history_int_ref">Ссылка INT_REF</item>
+        <item lang="ru" id="addons.psbankpayment.history_name">Имя держателя карты</item>
+        <item lang="ru" id="addons.psbankpayment.history_card">Номер карты</item>
+        <item lang="ru" id="addons.psbankpayment.history_timestamp">Дата операции</item>
+        <item lang="ru" id="addons.psbankpayment.trtype_1">Оплата</item>
+        <item lang="ru" id="addons.psbankpayment.trtype_12">Предавторизация</item>
+        <item lang="ru" id="addons.psbankpayment.trtype_14">Возврат</item>
+        <item lang="ru" id="addons.psbankpayment.trtype_21">Завершение расчета</item>
+        <item lang="ru" id="addons.psbankpayment.trtype_22">Отмена</item>
+    </language_variables>
+</addon>
