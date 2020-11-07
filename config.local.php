@@ -39,10 +39,10 @@ if (!defined('CONSOLE')) {
 /*
  * Database connection options
  */
-$config['db_host'] = 'localhost';
-$config['db_name'] = 'smart';
-$config['db_user'] = 'root';
-$config['db_password'] = 'root';
+$config['db_host'] = '%DB_HOST%';
+$config['db_name'] = '%DB_NAME%';
+$config['db_user'] = '%DB_USER%';
+$config['db_password'] = '%DB_PASSWORD%';
 
 $config['database_backend'] = 'mysqli';
 
@@ -64,19 +64,19 @@ $config['table_prefix'] = 'cscart_';
  */
 
 // Host and directory where software is installed on no-secure server
-$config['http_host'] = 'localhost';
-$config['http_path'] = '/smart';
+$config['http_host'] = '%HTTP_HOST%';
+$config['http_path'] = '%HOST_DIR%';
 
 // Host and directory where software is installed on secure server
-$config['https_host'] = 'i-sd.ru';
-$config['https_path'] = '';
+$config['https_host'] = '%HTTPS_HOST%';
+$config['https_path'] = '%HOST_DIR%';
 
 /*
  * Misc options
  */
 // Names of index files for the frontend and backend
 $config['customer_index'] = 'index.php';
-$config['admin_index']    = 'fadCcCyH9P.php';
+$config['admin_index']    = 'admin.php';
 $config['vendor_index']   = 'vendor.php';
 
 // DEMO mode
@@ -95,16 +95,16 @@ $config['tweaks'] = array (
     'dev_js' => false, // set to true to disable js files compilation
     'redirect_to_cart' => false, // Redirect customer to the cart contents page. Used with the "disable_dhtml" setting.
     'api_https_only' => false, // Allows the use the API functionality only by the HTTPS protocol
-    'api_allow_customer' => true, // Allow open API for unauthorized customers
+    'api_allow_customer' => false, // Allow open API for unauthorized customers
     'lazy_thumbnails' => false, // generate image thumbnails on the fly
-    'image_resize_lib' => 'gd', // library to resize images - "auto", "gd" or "imagick"
+    'image_resize_lib' => 'auto', // library to resize images - "auto", "gd" or "imagick"
     'products_found_rows_no_cache_limit' => 100, // Max count of SQL found rows without saving to cache
     'show_database_changes' => false, // Show database changes in View changes tool
-    'backup_db_mysqldump' => true, // Backup database using mysqldump when available
+    'backup_db_mysqldump' => false, // Backup database using mysqldump when available
 );
 
 // Key for sensitive data encryption
-$config['crypt_key'] = 'YOURVERYSECRETCEY';
+$config['crypt_key'] = 'YOURVERYSECRETKEY';
 
 // Cache backend
 // Available backends: file, sqlite, database, redis, xcache, apc, apcu
