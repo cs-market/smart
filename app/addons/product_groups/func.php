@@ -96,7 +96,7 @@ function fn_product_groups_pre_update_order(&$cart, $order_id = 0) {
             $groups[$product['group_id']]['subtotal'] += $product['price'] * $product['amount'];
         }
         $cart['product_groups'] = $groups;
-        $cart['group_id'] = reset($groups)['group']['group_id'];
+        $cart['group_id'] = reset($groups)['group']['group_id'] ? : 0;
     }
 }
 
