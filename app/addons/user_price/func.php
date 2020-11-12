@@ -5,9 +5,9 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 //	[HOOKs]
 function fn_user_price_update_product_post($product_data, $product_id, $lang_code, $create)
 {
-	// if (isset($product_data['user_price'])) {
-	// 	fn_update_product_user_price($product_id, $product_data['user_price']);
-	// }
+	if (isset($product_data['user_price'])) {
+		fn_update_product_user_price($product_id, $product_data['user_price'], false);
+	}
 }
 
 function fn_user_price_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
@@ -82,9 +82,21 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
 	return true;
 }
 
-function fn_get_product_user_price($product_id, $user_id = 0, $params = [])
+function fn_get_product_user_price($product_id, $user_id = 0)
+{
+	// backward compability
+	list($user_price) = fn_get_product_user_price_with_params([
+		'product_id' => $product_id,
+		'user_ids' => $user_id ?: []
+	]);
+
+	return $user_price;
+}
+
+function fn_get_product_user_price_with_params($params = [])
 {
 	$default_params = [
+		'product_id' => 0,
 		'pname' => '',
 		'user_ids' => [],
 		'limit' => 0,
@@ -94,14 +106,10 @@ function fn_get_product_user_price($product_id, $user_id = 0, $params = [])
 
 	$params = array_merge($default_params, $params);
 
-	if ($user_id && !$params['user_ids']) {
-		$params['user_ids'] = $user_id;
-	}
-
 	$condition = '';
 	$join = '';
 
-	$product_id = is_array($product_id) ? $product_id : (array) $product_id;
+	$product_id = is_array($params['product_id']) ? $params['product_id'] : (array)$params['product_id'];
 	$condition .= db_quote(" AND p.product_id IN (?n)", $product_id);
 
 	if ($params['pname']) {
@@ -121,7 +129,7 @@ function fn_get_product_user_price($product_id, $user_id = 0, $params = [])
 			$condition .= db_quote(" AND p.user_id = ?i", Tygh::$app['session']['auth']['user_id']);
 		} else {
 			//	only for signed users
-			return null;
+			return [null, []];
 		}
 	} else {
 		if ($params['user_ids']) {
@@ -136,14 +144,20 @@ function fn_get_product_user_price($product_id, $user_id = 0, $params = [])
 		$limit = db_paginate($params['page'], $params['items_per_page']);
 	}
 
-	$user_prices = db_get_array("SELECT p.* FROM ?:user_price as p $join WHERE 1 $condition $limit");
+	$calc_found_rows = 'SQL_CALC_FOUND_ROWS';
+
+	$user_prices = db_get_array("SELECT $calc_found_rows p.* FROM ?:user_price as p $join WHERE 1 $condition $limit");
+
+	$params['total_items'] = empty($params['items_per_page'])
+		? count($user_prices)
+		: db_get_found_rows();
 
 	//	info for settings
 	if (AREA == 'A') {
 		fn_get_user_price_user_data($user_prices);
 	}
 
-	return $user_prices;
+	return [$user_prices, $params];
 }
 
 function fn_get_user_price_user_data(&$user_prices)
