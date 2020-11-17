@@ -2,7 +2,7 @@
 <addon scheme="3.0">
     <id>user_price</id>
     <status>active</status>
-    <version>1.0.3</version>
+    <version>1.0.7</version>
     <priority>4294967294</priority>
     <position>0</position>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>

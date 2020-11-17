@@ -6,13 +6,15 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 function fn_user_price_update_product_post($product_data, $product_id, $lang_code, $create)
 {
 	if (isset($product_data['user_price'])) {
-		fn_update_product_user_price($product_id, $product_data['user_price']);
+		fn_update_product_user_price($product_id, $product_data['user_price'], false);
 	}
 }
 
 function fn_user_price_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
 {
-	$product_data['user_price'] = fn_get_product_user_price($product_data['product_id']);
+	if (AREA == 'C') {
+		$product_data['user_price'] = fn_get_product_user_price($product_data['product_id']);
+	}
 }
 
 function fn_user_price_get_products_post(&$products, $params, $lang_code)
@@ -82,31 +84,80 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
 
 function fn_get_product_user_price($product_id, $user_id = 0)
 {
+	// backward compability
+	list($user_price) = fn_get_product_user_price_with_params([
+		'product_id' => $product_id,
+		'user_ids' => $user_id ?: []
+	]);
+
+	return $user_price;
+}
+
+function fn_get_product_user_price_with_params($params = [])
+{
+	$default_params = [
+		'product_id' => 0,
+		'pname' => '',
+		'user_ids' => [],
+		'limit' => 0,
+		'page' => 1,
+		'items_per_page' => 0
+	];
+
+	$params = array_merge($default_params, $params);
+
 	$condition = '';
+	$join = '';
+
+	$product_id = is_array($params['product_id']) ? $params['product_id'] : (array)$params['product_id'];
+	$condition .= db_quote(" AND p.product_id IN (?n)", $product_id);
+
+	if ($params['pname']) {
+		$pname = '%' . $params['pname'] . '%';
+		$join .= db_quote(" LEFT JOIN ?:users as u ON u.user_id = p.user_id");
+		$condition .= db_quote(" AND ("
+			. " u.user_login LIKE ?l"
+			. " OR u.email LIKE ?l"
+			. " OR u.firstname LIKE ?l"
+			. " OR u.lastname LIKE ?l"
+		. ")", $pname, $pname, $pname, $pname);
+	}
 
 	//	only for current user
 	if (AREA == 'C') {
 		if (!empty(Tygh::$app['session']['auth']['user_id'])) {
-			$condition = db_quote(" AND user_id = ?i", Tygh::$app['session']['auth']['user_id']);
+			$condition .= db_quote(" AND p.user_id = ?i", Tygh::$app['session']['auth']['user_id']);
 		} else {
 			//	only for signed users
-			return null;
+			return [null, []];
+		}
+	} else {
+		if ($params['user_ids']) {
+			$condition .= db_quote(" AND p.user_id IN (?n)", $params['user_ids']);
 		}
 	}
 
-	if ($user_id) {
-		$condition = db_quote(" AND user_id = ?i", $user_id);
+	$limit = '';
+	if (!empty($params['limit'])) {
+		$limit = db_quote(" LIMIT 0, ?i", $params['limit']);
+	} elseif (!empty($params['items_per_page'])) {
+		$limit = db_paginate($params['page'], $params['items_per_page']);
 	}
 
-	$product_id = is_array($product_id) ? $product_id : (Array) $product_id;
-	$user_prices = db_get_array("SELECT * FROM ?:user_price WHERE product_id IN (?n) $condition", $product_id);
+	$calc_found_rows = 'SQL_CALC_FOUND_ROWS';
+
+	$user_prices = db_get_array("SELECT $calc_found_rows p.* FROM ?:user_price as p $join WHERE 1 $condition $limit");
+
+	$params['total_items'] = empty($params['items_per_page'])
+		? count($user_prices)
+		: db_get_found_rows();
 
 	//	info for settings
 	if (AREA == 'A') {
 		fn_get_user_price_user_data($user_prices);
 	}
 
-	return $user_prices;
+	return [$user_prices, $params];
 }
 
 function fn_get_user_price_user_data(&$user_prices)
