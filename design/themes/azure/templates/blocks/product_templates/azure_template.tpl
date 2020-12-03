@@ -45,6 +45,13 @@
                         {$smarty.capture.$sku nofilter}
                     </div>
 
+                    {if $product.weight}
+                    <div class="ty-control-group">
+                        <label class="ty-control-group__label">{__('weight')}:</label>
+                        <span class="ty-control-group__item">{$product.weight} {$settings.General.weight_symbol}</span>
+                    </div>
+                    {/if}
+
                     {if $capture_options_vs_qty}{capture name="product_options"}{$smarty.capture.product_options nofilter}{/if}
                     <div class="ty-product-block__advanced-option clearfix">
                         {assign var="advanced_options" value="advanced_options_`$obj_id`"}

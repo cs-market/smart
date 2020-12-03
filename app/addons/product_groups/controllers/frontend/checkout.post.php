@@ -7,7 +7,7 @@ $tmp_cart = Tygh::$app['session']['cart'];
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return [CONTROLLER_STATUS_OK];
 }
-if ($mode == 'checkout') {
+/*if ($mode == 'checkout') {
     fn_product_groups_pre_update_order($tmp_cart);
 
     foreach ($tmp_cart['product_groups'] as $key => &$product_group) {
@@ -26,4 +26,4 @@ if ($mode == 'checkout') {
             return [CONTROLLER_STATUS_REDIRECT, 'checkout.cart'];
         }
     }
-}
+}*/

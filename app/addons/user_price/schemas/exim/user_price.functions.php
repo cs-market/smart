@@ -17,32 +17,42 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
             //process_qty_discounts
         } else {
             $names = explode(',', $name);
-            foreach ($names as $n) {
-                //TODO make fn_get_users more smart!
-                list($users, ) = fn_get_users(array('user_login' => $n), $_SESSION['auth']);
+            $search_fields = array('cscart_users.user_login', 'cscart_users.firstname', 'cscart_users.email');
 
-                if (empty($users)) {
-                    list($users, ) = fn_get_users(array('name' => $n), $_SESSION['auth']);
-                    if (empty($users)) {
-                        list($users, ) = fn_get_users(array('email' => $n), $_SESSION['auth']);
-                    }
+            list($fields, $join, $condition) = fn_get_users(['get_conditions' => true], $_SESSION['auth']);
+
+            foreach ($search_fields as $level => $field) {
+                $parts = array();
+                foreach ($names as $search) {
+                    $parts[] = db_quote("$field = ?s", $search);
                 }
-                
-                if (!empty($users)) {
-                    foreach ($users as $user) {
 
-                        $price = array(
-                            'user_id' => $user['user_id'],
-                            'price' => $object['price'],
-                        );
-                        //process_user_prices
-                        if (fn_update_product_user_price($primary_object_id['product_id'], array($price), false)) {
-                            $processed_data['E'] += 1;
-                        }
-                    }
+                $expression[] = ' WHEN (' . implode(' OR ', $parts) . ') THEN ' . $level;
+                $conditions[] = implode(' OR ', $parts);
+            }
+            if (!empty($expression)) {
+                $case = ' CASE ' . implode(' ', $expression) . ' END AS level';
+                $fields[] = $case;
+                $condition['case_condition'] = ' AND ( ' . implode(' OR ', $conditions) . ' ) ';
+            }
+
+            $users = db_get_hash_multi_array("SELECT " . implode(', ', $fields) . " FROM ?:users $join WHERE 1" . implode('', $condition) . " $group $sorting $limit" , array('level'));
+
+            if (!empty($users)) {
+                ksort($users);
+                $users = reset($users);
+                $price = array();
+                foreach ($users as $user) {
+                    $price[] = array(
+                        'user_id' => $user['user_id'],
+                        'price' => $object['price'],
+                    );
+                }
+                if (fn_update_product_user_price($primary_object_id['product_id'], $price, false)) {
+                    $processed_data['E'] += count($price);
                 } else {
                     // skip record
-                    $processed_data['S'] += 1;
+                    $processed_data['S'] += count($price);
                 }
             }
         }

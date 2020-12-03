@@ -135,12 +135,12 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
         && !empty($params['block_data']['content']['items']['filling'])
         && $params['block_data']['content']['items']['filling'] === 'promotion_products'
     ) {
-        $promotion_id = fn_category_promotion_get_product_promotion_id($params['promotion_pid']);
+        list($promotions, ) = list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $params['promotion_pid'], 'active' => true, 'track' => true], 10);
 
-        if ($promotion_id) {
-            $promotion_data = db_get_row('SELECT products, condition_categories FROM ?:promotions WHERE promotion_id = ?i', $promotion_id);
-            $promotion_product_ids  = explode(',', $promotion_data['products']);
-            $promotion_category_ids = explode(',', $promotion_data['condition_categories']);
+        if ($promotions) {
+            $promotion = reset($promotions);
+            $promotion_product_ids  = explode(',', $promotion['products']);
+            $promotion_category_ids = explode(',', $promotion['condition_categories']);
 
             $promotion_product_ids = array_merge(
                 $promotion_product_ids,
@@ -192,6 +192,12 @@ function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$co
     if (!empty($params['category_id'])) {
         $condition .=' AND (' . fn_find_array_in_set([$params['category_id']], "categories", true) . ')';
     }
+    if (isset($params['product_or_bonus_product'])) {
+        $category_ids = db_get_fields('SELECT category_id FROM ?:products_categories WHERE product_id = ?i', $params['product_or_bonus_product']);
+        
+
+        $condition .=' AND (' . fn_find_array_in_set([$params['product_or_bonus_product']], "products", false) . ' OR ' . fn_find_array_in_set([$params['product_or_bonus_product']], "bonus_products", false) . ' OR ' . fn_find_array_in_set($category_ids, "condition_categories", false) . ')';
+    }
 }
 
 function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth, $params) {
@@ -211,54 +217,16 @@ function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth
 function fn_category_promotion_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
 {
     if (!empty($product_data['product_id']) && AREA === 'C') {
-        $promotion_id = fn_category_promotion_get_product_promotion_id($product_data['product_id']);
+        list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product_data['product_id'], 'active' => true], 1);
 
-        if ($promotion_id) {
-	    
-            $product_data['promo_text'] = '<div class="promotion-subheader">' . __('promo_subheader') . '</div>' . db_get_field('SELECT detailed_description FROM ?:promotion_descriptions WHERE promotion_id = ?i AND lang_code = ?s', $promotion_id, $lang_code);   
+        if ($promotions) {
+            $promotion = reset($promotions);
+            $product_data['promo_text'] = $promotion['detailed_description'];
+            if (!empty(trim($product_data['promo_text']))) {
+                $product_data['promo_text'] = '<div class="promotion-subheader">' . __('promo_subheader') . '</div>' . $product_data['promo_text'];
+            }
         }
         // correct after November 2020
-        $product_data['promo_text_plain'] = strip_tags($product_data['promo_text']);
+        if (defined('API')) $product_data['promo_text_plain'] = $product_data['promo_text'] = strip_tags($product_data['promo_text']);
     }
-}
-
-function fn_category_promotion_get_product_promotion_id($product_id)
-{
-    if (!$product_id) {
-        return null;
-    }
-
-    $category_ids = db_get_fields('SELECT category_id FROM ?:products_categories WHERE product_id = ?i', $product_id);
-
-    $condition = '';
-    $condition_params = [
-        '%,' . $product_id . ',%',
-        '%,' . $product_id,
-        $product_id . ',%',
-        $product_id
-    ];
-
-    foreach ($condition_params as $condition_param) {
-        $condition .= !$condition ? db_quote('products LIKE ?l', $condition_param) : db_quote(' OR products LIKE ?l', $condition_param);
-        $condition .= db_quote(' OR bonus_products LIKE ?l', $condition_param);
-    }
-
-    foreach ($category_ids as $category_id) {
-        $condition_params = [
-            '%,' . $category_id . ',%',
-            '%,' . $category_id,
-            $category_id . ',%',
-            $category_id
-        ];
-
-        foreach ($condition_params as $condition_param) {
-            $condition .= db_quote(' OR condition_categories LIKE ?l', $condition_param);
-        }
-    }
-
-    $condition = 'AND (' . $condition . ')';
-
-    $promotion_id = db_get_field('SELECT MAX(promotion_id) FROM ?:promotions WHERE 1 ?p', $condition);
-
-    return $promotion_id;
 }

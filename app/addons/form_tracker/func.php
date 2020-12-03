@@ -77,16 +77,18 @@ function fn_form_tracker_update_page_post(&$page_data, &$page_id, &$lang_code) {
 function fn_form_tracker_get_page_data(&$page_data)
 {
     if (!empty($page_data['page_type']) && $page_data['page_type'] == PAGE_TYPE_FORM) {
-        $value = db_get_field('SELECT value FROM ?:form_options WHERE page_id = ?i AND element_type = ?s', $page_data['page_id'], FORM_IS_TRACKED);
-        if ($value) {
-            $page_data['form']['general'][FORM_IS_TRACKED] = $value;
+        foreach ($page_data['form']['elements'] as $key => $elm) {
+            if ($elm['element_type'] == FORM_IS_TRACKED) {
+                $page_data['form']['general'][FORM_IS_TRACKED] = $elm['value'];
+                unset($page_data['form']['elements'][$key]);
+            }
         }
     }
 }
 
 function fn_form_tracker_send_form(&$page_data, $form_values, $result, $from, $sender, $attachments, $is_html, $subject) {
     // if form trackable
-    if (isset($page_data['form']['general']['U']) && $page_data['form']['general']['U'] == 'Y') {
+    if (isset($page_data['form']['general'][FORM_IS_TRACKED]) && $page_data['form']['general'][FORM_IS_TRACKED] == 'Y') {
         $submitted_form = array(
             'form_data' => $form_values,
             'form_id' => $page_data['page_id'],
