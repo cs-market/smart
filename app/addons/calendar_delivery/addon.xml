@@ -21,16 +21,16 @@
 
 		<item lang="en" id="calendar_delivery">Сalendar delivery</item>
 		<item lang="ru" id="calendar_delivery">Календарь</item>
-	
+
 		<item lang="en" id="calendar_delivery.after17rule">Accept for tomorrow delivery for orders after 17:00</item>
-		<item lang="ru" id="calendar_delivery.after17rule">Принимать на доставку на завтра для заказов после 17:00</item>	
+		<item lang="ru" id="calendar_delivery.after17rule">Принимать на доставку на завтра для заказов после 17:00</item>
 
 		<item lang="en" id="calendar_delivery.sunday_shipping">Sunday shipping allowed</item>
 		<item lang="ru" id="calendar_delivery.sunday_shipping">Доставка в Воскресение</item>
 
 		<item lang="en" id="calendar_delivery.saturday_rule">Saturday shipping for weekend orders</item>
 		<item lang="ru" id="calendar_delivery.saturday_rule">Доставка в понедельник при заказе в выходные</item>
-		
+
 		<item lang="en" id="calendar_delivery.choose_another_day_vendor">Choose another day for vendor</item>
 		<item lang="ru" id="calendar_delivery.choose_another_day_vendor">Выберите другой день доставки по продавцу</item>
 
@@ -57,6 +57,9 @@
 
 		<item lang="en" id="calendar_delivery.delivery_period">Delivery period</item>
 		<item lang="ru" id="calendar_delivery.delivery_period">Период доставки</item>
+
+		<item lang="en" id="calendar_delivery.from_customer_settings">From customer settings</item>
+		<item lang="ru" id="calendar_delivery.from_customer_settings">Исходя из пользователя</item>
 	</language_variables>
 
 	<queries>
@@ -73,7 +76,7 @@
                 ADD `period_step` varchar(8) NOT NULL DEFAULT '';
 		</item>
 		<item for="uninstall">ALTER TABLE `cscart_companies` DROP `period_start`, `period_finish`, `period_step`;</item>
-        
+
         <item>ALTER TABLE `?:orders` ADD `delivery_period` varchar(30) NOT NULL default '';</item>
 		<item for="uninstall">ALTER TABLE `?:orders` DROP `delivery_period`;</item>
 	</queries>

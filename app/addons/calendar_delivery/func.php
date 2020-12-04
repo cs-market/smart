@@ -191,6 +191,13 @@ function fn_calendar_delivery_form_cart($order_info, &$cart, $auth) {
     }
 }
 
+function fn_calendar_delivery_update_user_pre($user_id, &$user_data, $auth, $ship_to_another, $notify_user) {
+    $user_data['delivery_date'] = fn_delivery_date_to_line($user_data['delivery_date']);
+}
+
+function fn_calendar_delivery_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
+    $user_data['delivery_date'] = fn_delivery_date_from_line($user_data['delivery_date']);
+}
 
 /// TEMP DEPRECATED! Удалить в середине 2020 года
 function fn_parse_date_check_year($timestamp, $end_time = false)
@@ -231,7 +238,7 @@ function fn_get_calendar_delivery_period($period_start, $period_finish, $period_
         return [];
     }
 
-    list($start_hour, $start_minute) = 
+    list($start_hour, $start_minute) =
         (strpos($period_start, ':') !== false)
         ? explode(':', $period_start)
         : [$period_start, '00'];
@@ -247,7 +254,7 @@ function fn_get_calendar_delivery_period($period_start, $period_finish, $period_
         : [$period_step];
 
     $periods = [];
-    
+
     while ($start_hour < $end_hour) {
         $end_period = $start_hour + $period;
 
@@ -257,15 +264,55 @@ function fn_get_calendar_delivery_period($period_start, $period_finish, $period_
             // last
             $data = ($start_hour < 10 ? '0' : '') . $start_hour . ':' . $start_minute . '-' . $end_hour . ':' . $end_minute;
         }
-        
+
         $periods[$data] = [
             'value' => $data,
             'hour' => $start_hour,
         ];
-        
+
         $start_hour = $end_period;
     }
 
 
     return $periods;
+}
+
+/**
+ * convert array weekdays to string
+ *
+ * Convert array weekdays data to string weekdays
+ *
+ * First elm is a sunday
+ *
+ * @param array $days_array list of active day array
+ * @return string
+ **/
+function fn_delivery_date_to_line(array $days_array = [])
+{
+    $days_str = '';
+    for ($i=0; $i <= 6; $i++) {
+        $days_str[$i] = in_array($i, $days_array) ? '1' : '0';
+    }
+    return (string) $days_str;
+}
+
+/**
+ * convert string weekdays to array
+ *
+ * Convert string weekdays data to array weekdays only with select days
+ *
+ * First elm is a sunday
+ *
+ * @param string $days_str list of active day array
+ * @return array
+ **/
+function fn_delivery_date_from_line(string $days_str = '')
+{
+    $days_array = [];
+    for ($i=0; $i < strlen($days_str); $i++) {
+        if ($days_str[$i]) {
+            $days_array[] = $i;
+        }
+    }
+    return (array) $days_array;
 }

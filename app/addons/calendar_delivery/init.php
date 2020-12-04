@@ -11,7 +11,9 @@ fn_register_hooks(
 	'place_order',
 	'form_cart_pre_fill',
 	'update_cart_by_data_post',
-	'form_cart'
+    'form_cart',
+    'update_user_pre',
+    'get_user_info'
 );
 
 // backward compatibility
