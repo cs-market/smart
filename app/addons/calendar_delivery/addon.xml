@@ -4,7 +4,7 @@
 	<name>Calendar delivery</name>
 	<description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
 	<priority>26732300</priority>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<position>0</position>
 	<status>active</status>
 	<default_language>en</default_language>
@@ -60,6 +60,17 @@
 
 		<item lang="en" id="calendar_delivery.from_customer_settings">From customer settings</item>
 		<item lang="ru" id="calendar_delivery.from_customer_settings">Исходя из пользователя</item>
+
+		<item lang="en" id="calendar_delivery.exim_user_delivery_date">Shipping %day%</item>
+		<item lang="ru" id="calendar_delivery.exim_user_delivery_date">Shipping %day%</item>
+
+		<item lang="ru" id="weekday_exim_1">Monday</item>
+		<item lang="ru" id="weekday_exim_2">Tuesday</item>
+		<item lang="ru" id="weekday_exim_3">Wednesday</item>
+		<item lang="ru" id="weekday_exim_4">Thursday</item>
+		<item lang="ru" id="weekday_exim_5">Friday</item>
+		<item lang="ru" id="weekday_exim_6">Saturday</item>
+		<item lang="ru" id="weekday_exim_0">Sunday</item>
 	</language_variables>
 
 	<queries>

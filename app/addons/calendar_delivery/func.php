@@ -303,7 +303,7 @@ function fn_delivery_date_to_line(array $days_array = [])
  *
  * First elm is a sunday
  *
- * @param string $days_str list of active day array
+ * @param string $days_str list of day
  * @return array
  **/
 function fn_delivery_date_from_line(string $days_str = '')
