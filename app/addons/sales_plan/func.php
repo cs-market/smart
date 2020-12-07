@@ -373,6 +373,7 @@ function fn_generate_unsold_report($params) {
 	return array($output, $params);
 }
 
+if (!is_callable('fn_ts_this_day')) {
 function fn_ts_this_day($timestamp){
 	$calendar_format = "d/m/Y";
 	if (Registry::get('settings.Appearance.calendar_date_format') == 'month_first') {
@@ -380,6 +381,7 @@ function fn_ts_this_day($timestamp){
 	}
 	$ts = fn_parse_date(date($calendar_format, $timestamp));
 	return $ts;
+}
 }
 
 function fn_ts_this_week($timestamp){

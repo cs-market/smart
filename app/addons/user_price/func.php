@@ -19,16 +19,18 @@ function fn_user_price_get_product_data_post(&$product_data, $auth, $preview, $l
 
 function fn_user_price_get_products_post(&$products, $params, $lang_code)
 {
-	$product_ids = array_keys($products);
+	if (AREA == 'C') {
+		$product_ids = array_keys($products);
 
-	if (!$product_ids) {
-		return true;
-	}
+		if (!$product_ids) {
+			return true;
+		}
 
-	$user_prices = fn_get_product_user_price($product_ids);
+		$user_prices = fn_get_product_user_price($product_ids);
 
-	foreach ($user_prices as $user_price) {
-		$products[$user_price['product_id']]['user_price'][] = $user_price;
+		foreach ($user_prices as $user_price) {
+			$products[$user_price['product_id']]['user_price'][] = $user_price;
+		}
 	}
 }
 

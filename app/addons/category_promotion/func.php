@@ -135,7 +135,7 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
         && !empty($params['block_data']['content']['items']['filling'])
         && $params['block_data']['content']['items']['filling'] === 'promotion_products'
     ) {
-        list($promotions, ) = list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $params['promotion_pid'], 'active' => true, 'track' => true], 10);
+        list($promotions, ) = list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $params['promotion_pid'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true, 'track' => true], 10);
 
         if ($promotions) {
             $promotion = reset($promotions);
@@ -217,7 +217,7 @@ function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth
 function fn_category_promotion_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
 {
     if (!empty($product_data['product_id']) && AREA === 'C') {
-        list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product_data['product_id'], 'active' => true], 1);
+        list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product_data['product_id'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true], 1);
 
         if ($promotions) {
             $promotion = reset($promotions);

@@ -52,4 +52,10 @@ $schema['export_fields']['Add user group IDs'] = [
     'linked' => false,
 ];
 
+$schema['import_process_data']['get_salts'] = array(
+    'function' => 'fn_exim_get_salts',
+    'args' => array('$primary_object_id', '$object', '$pattern', '$import_data'),
+    'import_only' => true,
+);
+
 return $schema;

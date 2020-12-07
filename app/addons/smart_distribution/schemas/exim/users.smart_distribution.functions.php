@@ -263,3 +263,9 @@ fn_exim_set_add_usergroups($user_id, $data)
 
     return true;
 }
+
+function fn_exim_get_salts($primary_object_id, &$object) {
+    if (!isset($object['salt']) || empty($object['salt']) && !empty($primary_object_id['user_id'])) {
+        $object['salt'] = db_get_field('SELECT salt FROM ?:users WHERE user_id = ?i', $primary_object_id['user_id']);
+    }
+}
