@@ -14,7 +14,7 @@
 
 	{$monday = ($c_data.monday_rule != 'Y' && ($hours >= 15 && $day == 6) || $day == 7)}
 
-	{include file="addons/calendar_delivery/components/calendar.tpl" date_id="delivery_date`$cid`_`$shipping.shipping_id`" date_name="delivery_date[`$cid`]" date_val = $cart.delivery_date.$cid|default:$default|fn_parse_date min_date=$min_date sunday=$c_data.sunday_shipping saturday=$c_data.saturday_shipping monday=$monday limit_weekdays=$shipping.service_params.limit_weekday}
+	{include file="addons/calendar_delivery/components/calendar.tpl" date_id="delivery_date`$cid`_`$shipping.shipping_id`" date_name="delivery_date[`$cid`]" date_val = $cart.delivery_date.$cid|default:$default|fn_parse_date min_date=$min_date sunday=$c_data.sunday_shipping saturday=$c_data.saturday_shipping monday=$monday limit_weekdays=$shipping.service_params.limit_weekday service_params=$shipping.service_params}
 
 	{include
         file="addons/calendar_delivery/components/period.tpl"

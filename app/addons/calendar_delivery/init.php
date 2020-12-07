@@ -13,7 +13,8 @@ fn_register_hooks(
 	'update_cart_by_data_post',
     'form_cart',
     'update_user_pre',
-    'get_user_info'
+    'get_user_info',
+    'shippings_get_shippings_list_post'
 );
 
 // backward compatibility

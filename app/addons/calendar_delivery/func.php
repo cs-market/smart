@@ -199,6 +199,26 @@ function fn_calendar_delivery_get_user_info($user_id, $get_profile, $profile_id,
     $user_data['delivery_date'] = fn_delivery_date_from_line($user_data['delivery_date']);
 }
 
+function fn_calendar_delivery_shippings_get_shippings_list_post($group, $lang, $area, &$shippings_info) {
+    if (isset(Tygh::$app['session']['auth']['user_id']) && !empty(Tygh::$app['session']['auth']['user_id'])) {
+        $customer_calendar_shipping_ids = [];
+        foreach ($shippings_info as $shipping_id => $shipping) {
+            if (isset($shipping['service_params']['limit_weekday']) && $shipping['service_params']['limit_weekday'] == 'C') {
+                $customer_calendar_shipping_ids[] = $shipping_id;
+            }
+        }
+
+        if (!empty($customer_calendar_shipping_ids)) {
+            $delivery_dates = fn_get_customer_delivery_dates(Tygh::$app['session']['auth']['user_id']);
+            $delivery_dates = fn_delivery_date_from_line($delivery_dates);
+
+            foreach ($customer_calendar_shipping_ids as $shipping_id) {
+                $shippings_info[$shipping_id]['service_params']['customer_shipping_calendar'] = $delivery_dates;
+            }
+        }
+    }
+}
+
 /// TEMP DEPRECATED! Удалить в середине 2020 года
 function fn_parse_date_check_year($timestamp, $end_time = false)
 {
@@ -315,4 +335,29 @@ function fn_delivery_date_from_line(string $days_str = '')
         }
     }
     return (array) $days_array;
+}
+
+/**
+ * add calendar disalow days
+ *
+ * @param array $arr disalow days
+ * @param string $day
+ * @return array
+ **/
+function fn_add_calendar_disalow_days($arr, $day)
+{
+    $arr[] = $day;
+    fn_print_r('adwe', $arr);
+    return $arr;
+}
+
+/**
+ * get customer delivery dates
+ *
+ * @param int $user_id User ID
+ * @return array
+ **/
+function fn_get_customer_delivery_dates($user_id)
+{
+    return db_get_field("SELECT delivery_date FROM ?:users WHERE user_id = ?i", $user_id);
 }

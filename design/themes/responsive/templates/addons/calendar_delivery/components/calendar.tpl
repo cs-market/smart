@@ -38,8 +38,12 @@
                     if(now.getDay()){ m.setDate(now.getDate() + 8 - now.getDay()) } else { m.setDate(now.getDate() + 1) }
                     res = res && !((m.getDate() == date.getDate()) && (m.getMonth() == date.getMonth()));
                 {/if}
-                {if $limit_weekdays != ''}
+                {if $limit_weekdays != '' && $limit_weekdays != 'C'}
                     res = res && (date.getDay() == {$limit_weekdays});
+                {/if}
+                {if $limit_weekdays == 'C'}
+                    let customerCalendar = {$service_params.customer_shipping_calendar|to_json};
+                    res = res && (customerCalendar.indexOf(date.getDay()) !== -1);
                 {/if}
                 return [res];
             },

@@ -36,6 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$res = false;
 			}
 
+// WIFIXME: set hear: if shipping param && shipping_param != C and add hear checking calendar customer days
+
 			$shipping = reset($cart['shipping']);
 			if (isset($shipping['service_params']['limit_weekday']) && $shipping['service_params']['limit_weekday'] != '' ) {
 				if (date('w', $choosed_ts) != $shipping['service_params']['limit_weekday']) {

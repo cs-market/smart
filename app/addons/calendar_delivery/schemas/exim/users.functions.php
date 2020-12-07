@@ -9,7 +9,7 @@
  **/
 function fn_exim_get_delivery_date($user_id, $day_number)
 {
-    $days_string = db_get_field("SELECT delivery_date FROM ?:users WHERE user_id = ?i", $user_id);
+    $days_string = fn_get_customer_delivery_dates($user_id);
 
     return (string) $days_string[$day_number] ? 'Y' : 'N';
 }
@@ -28,7 +28,8 @@ function fn_exim_set_delivery_date($days_value, $user_id, $day_number)
         'y', 'Y', 'true', '1', 'da', 'Da'
     ];
 
-    $days_string = db_get_field("SELECT delivery_date FROM ?:users WHERE user_id = ?i", $user_id);
+    $days_string = fn_get_customer_delivery_dates($user_id);
+
     $days_string = $days_string ?? '0000000';
 
     $allow = in_array($days_value, $allow_words) ? true : false;
