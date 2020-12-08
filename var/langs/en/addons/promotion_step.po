@@ -1,0 +1,21 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+
+msgctxt "Addons::name::promotion_step"
+msgid "Promotion step"
+msgstr "Promotion step"
+
+msgctxt "Addons::description::promotion_step"
+msgid "promotion_step_description"
+msgstr "The module adds new conditions for the promotion"
+
+msgctxt "Languages::promotion_cond_promotion_step"
+msgid "Promotion step"
+msgstr "Promotion step"
+
+msgctxt "Languages::promotion_bonus_promotion_step_free_products"
+msgid "Promotion step(free product)"
+msgstr "Promotion step(free product)"

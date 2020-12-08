@@ -1,0 +1,22 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Polish\n"
+"Language: pl_PL\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: pl\n"
+"X-Crowdin-File: /release-4.8.2/addons/old_adminpanel.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:08\n"
+
+msgctxt "Addons::name::old_adminpanel"
+msgid "Old Admin Panel [Deprecated]"
+msgstr "Stary panel administracyjny [Deprecated]"
+
+msgctxt "Addons::description::old_adminpanel"
+msgid "We left the old admin panel for backward compatibility. Turn on this module if you need an old admin panel. Or turn it off to use Responsive Admin Panel."
+msgstr "Po lewej mamy stary panel administracyjny w celu zapewnienia kompatybilności wstecznej. Włącz ten moduł, jeśli potrzebujesz starego panelu administracyjnego lub wyłącz go, aby korzystać z responsywnego panelu administracyjnego."
+

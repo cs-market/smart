@@ -1,0 +1,210 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Chinese Simplified\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: zh-CN\n"
+"X-Crowdin-File: /release-4.8.2/addons/call_requests.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:02\n"
+
+msgctxt "Addons::name::call_requests"
+msgid "Call requests"
+msgstr "热线"
+
+msgctxt "Addons::description::call_requests"
+msgid "Adds a call-requests system"
+msgstr "添加一个呼叫请求系统"
+
+msgctxt "SettingsSections::call_requests::general"
+msgid "General"
+msgstr "常规"
+
+msgctxt "SettingsOptions::call_requests::general"
+msgid "General"
+msgstr "常规"
+
+msgctxt "SettingsOptions::call_requests::phone"
+msgid "Rewrite phone"
+msgstr "重写电话"
+
+msgctxt "SettingsOptions::call_requests::phone_prefix_length"
+msgid "Highlight first chars"
+msgstr "突出显示第一个字符"
+
+msgctxt "SettingsOptions::call_requests::buy_now_with_one_click"
+msgid "Enable the \"Buy now with one click\" option"
+msgstr "启用\"现在买一次点击\"选项"
+
+msgctxt "SettingsOptions::call_requests::order_status"
+msgid "Order status"
+msgstr "订单状态"
+
+msgctxt "SettingsOptions::call_requests::phone_mask"
+msgid "Phone mask"
+msgstr "隐藏电话号码"
+
+msgctxt "SettingsTooltips::call_requests::phone_mask"
+msgid "Leave empty to use automatic country-based phone pattern, or type in a custom pattern. You can use spaces, commas, +, -, and digits. Note that 9 represents any digit; if you need a 9, type \\\\9. Examples: +9 (999) 999 99 99, 99999999, 999 999 99 or +99-99-9999-9999."
+msgstr ""
+
+msgctxt "SettingsTooltips::call_requests::phone_prefix_length"
+msgid "Including parenthesis, spaces, etc. Use to highlight country code, area code, and phone prefix."
+msgstr "其中包括括号、 空格等。使用突出显示国家/地区代码、 区号和电话前缀。"
+
+msgctxt "Languages::privileges.manage_call_requests"
+msgid "Manage Call requests"
+msgstr "管理呼叫请求"
+
+msgctxt "Languages::privileges.view_call_requests"
+msgid "View Call requests"
+msgstr "查看呼叫请求"
+
+msgctxt "Languages::call_requests"
+msgid "Call requests"
+msgstr "呼叫请求"
+
+msgctxt "Languages::call_requests_menu_description"
+msgid "Manage customer call requests"
+msgstr "管理客户呼叫请求"
+
+msgctxt "Languages::call_requests.request_call"
+msgid "Request call"
+msgstr "请求呼叫"
+
+msgctxt "Languages::call_requests.buy_now_with_one_click"
+msgid "Buy now with 1-click"
+msgstr "立刻购买"
+
+msgctxt "Languages::call_requests.error_validate_call_form"
+msgid "Please enter your email or phone number"
+msgstr "请输入您的电子邮件或电话号码"
+
+msgctxt "Languages::call_requests.request_recieved"
+msgid "We have received your request! Our manager will contact you soon."
+msgstr "我们收到您的请求 ！我们的服务人员会尽快与您联系。"
+
+msgctxt "Languages::call_requests.order_placed"
+msgid "We have received your request! The order #[order_id] has been successfully created. Our manager will contact you soon."
+msgstr "我们已收到您的请求！订单 #[order_id] 已成功创建。我们的经理将很快与您联系。"
+
+msgctxt "Languages::call_requests.phone_from_settings"
+msgid "Phone from settings"
+msgstr "来自设置的电话"
+
+msgctxt "Languages::call_requests.enter_phone_or_email_text"
+msgid "Please enter your phone number or email (for our manager to contact you)"
+msgstr "请输入您的电话号码或电子邮件 (以便于我们的经理与您联系)"
+
+msgctxt "Languages::call_requests.status.new"
+msgid "New"
+msgstr "新增功能"
+
+msgctxt "Languages::call_requests.status.in_progress"
+msgid "In progress"
+msgstr "处理中"
+
+msgctxt "Languages::call_requests.status.completed"
+msgid "Completed"
+msgstr "完成"
+
+msgctxt "Languages::call_requests.status.no_answer"
+msgid "No answer"
+msgstr "没有答案"
+
+msgctxt "Languages::call_requests.responsible"
+msgid "Responsible"
+msgstr "负责"
+
+msgctxt "Languages::call_requests.notes"
+msgid "Notes"
+msgstr "提示"
+
+msgctxt "Languages::call_requests.requested_product"
+msgid "Requested product"
+msgstr "需求产品"
+
+msgctxt "Languages::call_requests.convenient_time"
+msgid "Convenient time"
+msgstr "最佳联络时间"
+
+msgctxt "Languages::call_requests.awaiting_call"
+msgid "Awaiting call"
+msgstr "等待呼叫"
+
+msgctxt "Languages::call_requests.order_exists"
+msgid "Order exists"
+msgstr "存在的次序"
+
+msgctxt "Languages::call_requests.person_name_and_phone"
+msgid "Name and phone"
+msgstr "姓名和电话"
+
+msgctxt "Languages::call_requests.no_name_specified"
+msgid "No name specified"
+msgstr "没有指定的名称"
+
+msgctxt "Languages::call_requests.use_for_call_requests"
+msgid "Call request and buy now with one click form"
+msgstr "呼叫请求，并且通过点击形式现在购买"
+
+msgctxt "Languages::block_call_request"
+msgid "Call request"
+msgstr "呼叫请求"
+
+msgctxt "Languages::block_call_request_description"
+msgid "Store phone number and form for requesting a call"
+msgstr "存储电话号码和表单以请求呼叫"
+
+msgctxt "Languages::tmpl_call_request"
+msgid "Call request form"
+msgstr "呼叫请求"
+
+msgctxt "Languages::call_requests.text_call_request"
+msgid "Customer [customer] is <a href=\"[href]\">awaiting your call</a> on [phone_number]."
+msgstr "客户 [customer] 是在 [phone_number] 上 <a href=\"[href]\"> 等待你的电话</a>。"
+
+msgctxt "Languages::call_requests.text_call_request_call_time"
+msgid "The convenient call time is between [time_from] and [time_to]."
+msgstr "方便的通话时间介于[time_from] 和 [time_to] 之间。"
+
+msgctxt "Languages::call_requests.text_buy_with_one_click_request"
+msgid "Сustomer [customer] is <a href=\"[href]\">awaiting your call</a> on [phone_number], regarding the purchase of the product <a href=\"[product_href]\">[product_name]</a>."
+msgstr "Сustomer [customer] 正在 <a href=\"[href]\"> 等待您的电话 </a> 在 [phone_number]，关于产品 <a href=\"[product_href]\">[product_name] </a> 的购买。"
+
+msgctxt "Languages::call_requests.error_validator_phone"
+msgid "The phone number in the <b>[field]</b> field is invalid."
+msgstr "<b>[field] </b> 字段中的电话号码无效。"
+
+msgctxt "Languages::email_template.call_requests_buy_with_one_click"
+msgid "Call requests: buy with one click notification"
+msgstr "呼叫请求: 通过用点击通知购买"
+
+msgctxt "Languages::email_template.call_requests_call_request"
+msgid "Call requests: call request notification"
+msgstr "呼叫请求: 呼叫请求通知"
+
+msgctxt "Languages::call_request.work_time"
+msgid "Mon-Fr 9a.m.-6p.m."
+msgstr "星期一至星期五上午9时 - 下午6时"
+
+msgctxt "Languages::call_requests.request_call_request_form"
+msgid "Call requests: request form"
+msgstr ""
+
+msgctxt "Languages::call_requests.agreement_text_full_request_call_request_form"
+msgid "<p>We ([company]) will use the data you provide here to contact you regarding your call request or order. That data will remain in our system, visible to our staff (or the relevant vendor), until you withdraw your consent. If you’d like to have your personal data removed, send an email to [email].</p> <p>If you believe that your personal data has been misused, you have the right to lodge a complaint with a supervisory authority. We’re obliged by EU General Data Protection Regulation to let you know about this right; we don’t actually intend to misuse your data.</p>"
+msgstr ""
+
+msgctxt "Languages::call_requests.agreement_text_short_request_call_request_form"
+msgid "I agree to have my personal data <u>processed as follows.</u>"
+msgstr ""
+
+msgctxt "Languages::gdpr_call_requests"
+msgid "Personal data from call requests"
+msgstr ""
+

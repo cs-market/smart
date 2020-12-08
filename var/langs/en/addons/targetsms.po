@@ -1,0 +1,283 @@
+msgid ""
+msgstr "Project-Id-Version: tygh"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::targetsms"
+msgid "[TargetSMS] intergation"
+msgstr "[TargetSMS] intergation"
+
+msgctxt "Addons::description::targetsms"
+msgid "Allows you to set up administrator and customer SMS notifications"
+msgstr "Allows you to set up administrator and customer SMS notifications"
+
+msgctxt "SettingsVariants::targetsms::customer_phone_field::s"
+msgid "Shipping address phone"
+msgstr "Shipping address phone"
+
+msgctxt "SettingsVariants::targetsms::customer_phone_field::b"
+msgid "Billing address phone"
+msgstr "Billing address phone"
+
+msgctxt "SettingsSections::targetsms::general"
+msgid "General"
+msgstr "General"
+
+msgctxt "SettingsOptions::targetsms::elm_targetsms_settings"
+msgid "Settings"
+msgstr "Settings"
+
+msgctxt "SettingsOptions::targetsms::targetsms_login"
+msgid "Login"
+msgstr "Login"
+
+msgctxt "SettingsOptions::targetsms::targetsms_password"
+msgid "Password"
+msgstr "Password"
+
+msgctxt "SettingsOptions::targetsms::targetsms_sender"
+msgid "Display name"
+msgstr "Display name"
+
+msgctxt "SettingsOptions::targetsms::elm_admin_send_sms_if"
+msgid "Send SMS if"
+msgstr "Send SMS if"
+
+msgctxt "SettingsOptions::targetsms::elm_customer_send_sms_if"
+msgid "Send SMS if"
+msgstr "Send SMS if"
+
+msgctxt "SettingsSections::targetsms::admin_notifications"
+msgid "Administrator notifications"
+msgstr "Administrator notifications"
+
+msgctxt "SettingsOptions::targetsms::admin_phone_number"
+msgid "Administrator phone number"
+msgstr "Administrator phone number"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_new_cusomer_registered"
+msgid "New customer has been registered"
+msgstr "New customer has been registered"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_new_order_placed"
+msgid "New order has been placed"
+msgstr "New order has been placed"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_order_updated"
+msgid "Order has been updated"
+msgstr "Order has been updated"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_send_min_amount"
+msgid "Only send when order total amount is more than"
+msgstr "Only send when order total amount is more than"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_send_shipping"
+msgid "Only send for these shipping methods"
+msgstr "Only send for these shipping methods"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_send_order_statuses"
+msgid "Only send for these order statuses"
+msgstr "Only send for these order statuses"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_product_negative_amount"
+msgid "Product quantity is less than zero"
+msgstr "Product quantity is less than zero"
+
+msgctxt "SettingsOptions::targetsms::admin_elm_sms_content"
+msgid "SMS content"
+msgstr "SMS content"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_send_payment_info"
+msgid "Add payment info"
+msgstr "Add payment info"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_send_customer_email"
+msgid "Add customers e-mail"
+msgstr "Add customers e-mail"
+
+msgctxt "SettingsSections::targetsms::customer_notifications"
+msgid "Customer notifications"
+msgstr "Customer notifications"
+
+msgctxt "SettingsOptions::targetsms::customer_phone_field"
+msgid "Customer phone field"
+msgstr "Customer phone field"
+
+msgctxt "SettingsOptions::targetsms::customer_sms_order_updated"
+msgid "Order has been updated"
+msgstr "Order has been updated"
+
+msgctxt "SettingsOptions::targetsms::customer_sms_send_shipping"
+msgid "Only send for these shipping methods"
+msgstr "Only send for these shipping methods"
+
+msgctxt "SettingsOptions::targetsms::customer_sms_send_order_statuses"
+msgid "Only send for these order statuses"
+msgstr "Only send for these order statuses"
+
+msgctxt "SettingsOptions::targetsms::customer_sms_send_min_amount"
+msgid "Only send when order total amount is more than"
+msgstr "Only send when order total amount is more than"
+
+msgctxt "Languages::addons.targetsms.custom_sms_message"
+msgid "Custom SMS message"
+msgstr "Custom SMS message"
+
+msgctxt "Languages::addons.targetsms.sms_placeholders"
+msgid "You can use these placeholders:<br /><strong>%ORDER_ID%</strong> equals to order ID;<br /><strong>%AMOUNT%</strong> equal to the amount of the order;<br /><strong>%NAME%</strong> equals to customers name;<br /><strong>%LAST_NAME%</strong> equals to customers last name;<br /><strong>%USER_EMAIL%</strong> equals to customers E-Mail;<br /><strong>%COUNTRY%</strong> is the country of delivery;<br /><strong>%ADDRESS%</strong> is equal to the delivery address;<br /><strong>%CITY%</strong> it is a city delivery;<br /><strong>%STATE%</strong> is the area delivery.<br /><strong>%PHONE%</strong> is the customer phone number.<br /><strong>%TRACK_NUMBER%</strong> is the order track number.<br />"
+msgstr "You can use these placeholders:<br /><strong>%ORDER_ID%</strong> equals to order ID;<br /><strong>%AMOUNT%</strong> equal to the amount of the order;<br /><strong>%NAME%</strong> equals to customers name;<br /><strong>%LAST_NAME%</strong> equals to customers last name;<br /><strong>%USER_EMAIL%</strong> equals to customers E-Mail;<br /><strong>%COUNTRY%</strong> is the country of delivery;<br /><strong>%ADDRESS%</strong> is equal to the delivery address;<br /><strong>%CITY%</strong> it is a city delivery;<br /><strong>%STATE%</strong> is the area delivery.<br /><strong>%PHONE%</strong> is the customer phone number.<br /><strong>%TRACK_NUMBER%</strong> is the order track number.<br />"
+
+msgctxt "Languages::addons.targetsms.new_shipment_sms"
+msgid "Shipment for order [order_id] was send. Shipping method: [shipping_method]. It was assigned [tracking_number] tracking number"
+msgstr "Shipment for order [order_id] was send. Shipping method: [shipping_method]. It was assigned [tracking_number] tracking number"
+
+msgctxt "Languages::addons.targetsms.is"
+msgid "is"
+msgstr "is"
+
+msgctxt "Languages::targetsms_form_info_text"
+msgid "<p>For sending SMS notifications the service <a target=\"_blank"\ href=\"https://targetsms.ru\">TargetSMS.ru</a> is used.</p><p>To register in the service TargetSMS.ru fill out the <a target=\"_blank"\ href=\"https://sms.targetsms.ru/ru/reg.html?ref=cscart\">form</a>.</p><p>Detailed instructions for setting up the module
+: <a target=\"_blank"\ href=\"https://targetsms.ru/otpravka-sms-iz-cs-cart"\ target=\"_blank"\>https://targetsms.ru/otpravka-sms-iz-cs-cart</a></p>"
+msgstr "<p>For sending SMS notifications the service <a target=\"_blank"\ href=\"https://targetsms.ru\">TargetSMS.ru</a> is used.</p><p>To register in the service TargetSMS.ru fill out the <a href=\"https://sms.targetsms.ru/ru/reg.html?ref=cscart\">form</a>.</p><p>Detailed instructions for setting up the module
+: <a href=\"https://targetsms.ru/otpravka-sms-iz-cs-cart"\ target=\"_blank"\>https://targetsms.ru/otpravka-sms-iz-cs-cart</a></p>"
+
+msgctxt "SettingsSections::targetsms::balance"
+msgid "Balance"
+msgstr "Balance"
+
+msgctxt "SettingsOptions::targetsms::customer_balance"
+msgid "Your balance"
+msgstr "Your balance"
+
+msgctxt "Languages::targetsms::sender_names_not_detect"
+msgid "Sender names weren't found"
+msgstr "Sender names weren't found"
+
+msgctxt "Languages::targetsms::rechardge_btn"
+msgid "Rechardge"
+msgstr "Rechardge"
+
+msgctxt "Languages::targetsms::balance_currency"
+msgid " rub."
+msgstr " rub."
+
+msgctxt "Languages::targetsms::rechardge_href"
+msgid "https://sms.targetsms.ru/ru/cabinet/pay.html"
+msgstr "https://sms.targetsms.ru/ru/cabinet/pay.html"
+
+msgctxt "Languages::targetsms::your_balance"
+msgid "Your balance: "
+msgstr "Your balance: "
+
+msgctxt "Languages::targetsms::wrong_login_or_password"
+msgid "Wrong login or password"
+msgstr "Wrong login or password"
+
+msgctxt "Languages::targetsms::is_send_sms"
+msgid "Send SMS"
+msgstr "Send SMS"
+
+msgctxt "SettingsOptions::targetsms::customer_sms_create_shipments"
+msgid "Shipment has been created"
+msgstr "Shipment has been created"
+
+msgctxt "SettingsOptions::targetsms::customer_sms_create_shipments_template"
+msgid "Shipments SMS template"
+msgstr "Shipments SMS template"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_templates"
+msgid "Admin SMS template"
+msgstr "Admin SMS template"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_order_place_template"
+msgid "When order placed"
+msgstr "When order placed"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_order_update_template"
+msgid "When order updated"
+msgstr "When order updated"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_profile_update_template"
+msgid "When profile updated"
+msgstr "When profile updated"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_update_product_amount_template"
+msgid "When product amount updated"
+msgstr "When product amount updated"
+
+msgctxt "SettingsOptions::targetsms::admin_sms_create_shipments_template"
+msgid "When shipment created"
+msgstr "When shipment created"
+
+msgctxt "Languages::targetsms::sms_sender_for_company"
+msgid "SMS Display name"
+msgstr "SMS Display name"
+
+msgctxt "SettingsSections::targetsms::custom_sms"
+msgid "Custom SMS"
+msgstr "Custom SMS"
+
+msgctxt "SettingsOptions::targetsms::phone_numbers"
+msgid "Phone numbers"
+msgstr "Phone numbers"
+
+msgctxt "SettingsTooltips::targetsms::phone_numbers"
+msgid "Enter phone numbers in comma-separated format +79001234567"
+msgstr "Enter phone numbers in comma-separated format +79001234567"
+
+msgctxt "SettingsOptions::targetsms::custom_sms_content"
+msgid "SMS Content"
+msgstr "SMS Content"
+
+msgctxt "SettingsSections::targetsms::sender_names"
+msgid "Sender Names"
+msgstr "Sender Names"
+
+msgctxt "SettingsOptions::targetsms::list_of_companies"
+msgid "List of companies"
+msgstr "List of companies"
+
+msgctxt "SettingsOptions::targetsms::customer_senders"
+msgid "List of senders for companies"
+msgstr "List of senders for companies"
+
+msgctxt "SettingsTooltips::targetsms::customer_senders"
+msgid "Please enter a comma separated signatures (from the 'Available signatures' list) that you want to install. Each signature will correspond to the showcase from the 'List of Available Companies' list in the same order."
+msgstr "Please enter a comma separated signatures (from the 'Available signatures' list) that you want to install. Each signature will correspond to the showcase from the 'List of Available Companies' list in the same order."
+
+msgctxt "Languages::targetsms::list_availiables_companies"
+msgid "List of Available Companies - "
+msgstr "List of Available Companies - "
+
+msgctxt "Languages::targetsms::availiable_senders"
+msgid "Available signatures - "
+msgstr "Available signatures - "
+
+msgctxt "Languages::targetsms::success_sms_sent"
+msgid "SMS was sent"
+msgstr "SMS was sent"
+
+msgctxt "Languages::targetsms::send_sms"
+msgid "Send SMS"
+msgstr "Send SMS"
+
+msgctxt "SettingsOptions::targetsms::custom_sms_sender"
+msgid "SMS sender name"
+msgstr "SMS sender name"
+
+msgctxt "SettingsTooltips::targetsms::custom_sms_sender"
+msgid "For correct sending of SMS, you need to enter only the agreed name of the sender (the register is important!). All available names
+senders can be seen on the 'Senders Names' tab or in your personal SMS account."
+msgstr "For correct sending of SMS, you need to enter only the agreed name of the sender (the register is important!). All available names
+senders can be seen on the 'Senders Names' tab or in your personal SMS account."
+
+msgctxt "Languages::targetsms::custom_sms"
+msgid "Custom SMS"
+msgstr "Custom SMS"
+
+msgctxt "Languages::targetsms::send_custom_sms"
+msgid "Send custom SMS"
+msgstr "Send custom SMS"
+
+

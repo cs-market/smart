@@ -1,0 +1,62 @@
+/* ==========================================================================
+Product variations
+========================================================================== */
+
+.ty-variations-list {
+
+    &__wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+    &__product-elem {
+
+        .ty-control-group {
+            margin-bottom: 0;
+            
+            &__item {
+                padding: 0;
+            }
+        }
+        .ty-btn {
+            margin-left: 10px;
+        }
+        .ty-qty-out-of-stock {
+            margin-left: 15px;
+        }
+    }
+    &__image img {
+        max-width: none;
+    }
+    &__sku .ty-sku-item {
+        font-size: 13px;
+        color: #465f73;
+    }
+    &__controls {
+        white-space: nowrap;
+        text-align: right;
+        
+        .ty-add-to-wish.ty-btn i {
+            margin-left: 3px;
+            margin-right: 3px;
+        }
+        form > div {
+            display: inline-block;
+        }
+    }
+    &.ty-table {
+        border: none;
+
+        & th {
+            background: none;
+            border-right: none;
+        }
+        & tbody tr:nth-child(2n) {
+            background: none;
+        }
+        & td, & .table td {
+            border-right: none;
+        }
+    }
+}
+
+/* /Product variations */

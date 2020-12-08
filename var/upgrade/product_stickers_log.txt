@@ -1,0 +1,110 @@
+2019-12-20 02:43:15: Downloading "product_stickers" upgrade package
+2019-12-20 02:43:15: Upgrade package has been downloaded and ready to install
+
+
+################################################################################
+################################################################################
+2019-12-20 02:43:21: Starting installation of the "product_stickers" upgrade package
+2019-12-20 02:43:21: Upgrading version 1.3.2 to 2.0.1
+2019-12-20 02:43:21: Running as user "service"
+2019-12-20 02:43:21: Storing entry point files permissions...
+2019-12-20 02:43:21: index.php ==> 33279 (-rwxrwxrwx)
+2019-12-20 02:43:21: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2019-12-20 02:43:21: api.php ==> 33279 (-rwxrwxrwx)
+2019-12-20 02:43:21: vendor.php ==> 33279 (-rwxrwxrwx)
+2019-12-20 02:43:21:  ==> 16893 (drwxrwxr-x)
+2019-12-20 02:43:21: Executing pre-upgrade validators
+2019-12-20 02:43:21: Found 0 validators at package
+2019-12-20 02:43:21: Executing "collisions" validator
+2019-12-20 02:43:21: Executing "permissions" validator
+2019-12-20 02:43:21: Executing "restore" validator
+2019-12-20 02:43:21: Backup filename is "upg_product_stickers_1.3.2-2.0.1_20Dec2019_024321"
+2019-12-20 02:43:21: Preparing restore script
+2019-12-20 02:43:21: Upgrades directory permissions: drwxrwxrwx developer:service
+2019-12-20 02:43:21: Source restore script permissions: -rwxrwxrwx developer:service
+2019-12-20 02:43:21: Created directory for restore script at "/srv/projects/i-sd.ru/public_html/upgrades/product_stickers_1.3.2-2.0.1/"
+2019-12-20 02:43:21: Directory permissions: drwxr-xr-x service:service
+2019-12-20 02:43:21: Created restore script at "/srv/projects/i-sd.ru/public_html/upgrades/product_stickers_1.3.2-2.0.1/restore_2019-12-20_02-43-21.php"
+2019-12-20 02:43:21: Restore script permissions: -rw-r--r-- service:service
+2019-12-20 02:43:21: Correcting target restore script directory permissions...
+2019-12-20 02:43:21: ----------
+2019-12-20 02:43:21: Changing permissions of "/srv/projects/i-sd.ru/public_html/upgrades/product_stickers_1.3.2-2.0.1/" to 755
+2019-12-20 02:43:21: Using chmod()... OK
+2019-12-20 02:43:21: ----------
+2019-12-20 02:43:21: Target restore script directory permissions: drwxr-xr-x service:service
+2019-12-20 02:43:21: Correcting upgrades directory permissions...
+2019-12-20 02:43:21: ----------
+2019-12-20 02:43:21: Changing permissions of "/srv/projects/i-sd.ru/public_html/upgrades" to 755
+2019-12-20 02:43:21: Using chmod()... FAILED
+2019-12-20 02:43:21: Using FTP...
+2019-12-20 02:43:21: Connection established
+2019-12-20 02:43:21: FTP chmod result: FAILED
+2019-12-20 02:43:21: ----------
+2019-12-20 02:43:21: Upgrades directory permissions: drwxrwxrwx developer:service
+2019-12-20 02:43:21: Checking restore script availability via HTTP
+2019-12-20 02:43:21: Closing storefront
+2019-12-20 02:43:21: Backing up files and database
+2019-12-20 02:43:21: mysqldump is not available
+2019-12-20 02:51:28: Backup created at "/srv/projects/i-sd.ru/public_html/var/backups/upg_product_stickers_1.3.2-2.0.1_20Dec2019_024321.zip"
+2019-12-20 02:51:28: Sending upgrade information e-mail to: s.gorbunov@i-sd.ru, admin@i-sd.ru
+2019-12-20 02:51:28: PHP Warning: Error while sending QUERY packet. PID=19408 in /srv/projects/i-sd.ru/public_html/app/Tygh/Backend/Database/Mysqli.php on line 79
+2019-12-20 02:51:28: E-mail was successfully sent
+2019-12-20 02:51:28: No migrations found at package
+2019-12-20 02:51:28: Copying package files
+2019-12-20 02:51:28: Deleting files removed at new version
+2019-12-20 02:51:28: PHP Warning: Invalid argument supplied for foreach() in /srv/projects/i-sd.ru/public_html/app/Tygh/UpgradeCenter/App.php on line 1449
+2019-12-20 02:51:28: Processing themes files
+2019-12-20 02:51:28: Installing languages using upgraded *.po files
+2019-12-20 02:51:28: PHP Warning: Invalid argument supplied for foreach() in /srv/projects/i-sd.ru/public_html/app/Tygh/UpgradeCenter/App.php on line 1592
+2019-12-20 02:51:28: Already installed languages: ru
+2019-12-20 02:51:28: Languages to be installed: 
+2019-12-20 02:51:28: Installing "ru" language... SKIPPED
+2019-12-20 02:51:28: Executing post-upgrade script "/srv/projects/i-sd.ru/public_html/var/upgrade/packages/product_stickers/content/scripts/upgrade.post.php"
+2019-12-20 02:51:28: Post-upgrade script executed successfully
+2019-12-20 02:51:28: Cleaning cache
+2019-12-20 02:51:28: Saving upgrade information to DB
+2019-12-20 02:51:28: Sending statistics
+2019-12-20 02:51:29: PHP Warning: Invalid argument supplied for foreach() in /srv/projects/i-sd.ru/public_html/app/Tygh/UpgradeCenter/App.php on line 1185
+2019-12-20 02:51:29: Deleting package contents
+2019-12-20 02:51:29: Restoring entry point files permissions...
+2019-12-20 02:51:29: index.php ==> 33279 (-rwxrwxrwx)
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: Changing permissions of "/srv/projects/i-sd.ru/public_html/index.php" to 100777
+2019-12-20 02:51:29: Using chmod()... FAILED
+2019-12-20 02:51:29: Using FTP...
+2019-12-20 02:51:29: Connection established
+2019-12-20 02:51:29: FTP chmod result: FAILED
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: Changing permissions of "/srv/projects/i-sd.ru/public_html/fadCcCyH9P.php" to 100777
+2019-12-20 02:51:29: Using chmod()... FAILED
+2019-12-20 02:51:29: Using FTP...
+2019-12-20 02:51:29: Connection established
+2019-12-20 02:51:29: FTP chmod result: FAILED
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: api.php ==> 33279 (-rwxrwxrwx)
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: Changing permissions of "/srv/projects/i-sd.ru/public_html/api.php" to 100777
+2019-12-20 02:51:29: Using chmod()... FAILED
+2019-12-20 02:51:29: Using FTP...
+2019-12-20 02:51:29: Connection established
+2019-12-20 02:51:29: FTP chmod result: FAILED
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: vendor.php ==> 33279 (-rwxrwxrwx)
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: Changing permissions of "/srv/projects/i-sd.ru/public_html/vendor.php" to 100777
+2019-12-20 02:51:29: Using chmod()... FAILED
+2019-12-20 02:51:29: Using FTP...
+2019-12-20 02:51:29: Connection established
+2019-12-20 02:51:29: FTP chmod result: FAILED
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29:  ==> 16893 (drwxrwxr-x)
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: Changing permissions of "/srv/projects/i-sd.ru/public_html/" to 40775
+2019-12-20 02:51:29: Using chmod()... FAILED
+2019-12-20 02:51:29: Using FTP...
+2019-12-20 02:51:29: Connection established
+2019-12-20 02:51:29: FTP chmod result: FAILED
+2019-12-20 02:51:29: ----------
+2019-12-20 02:51:29: Upgrade completed!

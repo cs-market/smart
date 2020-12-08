@@ -1,0 +1,242 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Polish\n"
+"Language: pl_PL\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: pl\n"
+"X-Crowdin-File: /release-4.8.2/addons/product_variations.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:08\n"
+
+msgctxt "Addons::name::product_variations"
+msgid "Product Variations [Beta]"
+msgstr "[Beta] Warianty produktu"
+
+msgctxt "Addons::description::product_variations"
+msgid "Variants of a product that comes in more than one option, such as color or size."
+msgstr "Warianty produktu, które występuje w więcej niż jednej opcji, takiej jak kolor lub rozmiar."
+
+msgctxt "Languages::product_variations.btn_generate"
+msgid "Generate variations"
+msgstr "Generowanie wariantów"
+
+msgctxt "Languages::product_variations.generating.title"
+msgid "Generating variations: [product]"
+msgstr "Generowanie wariantów: [product]"
+
+msgctxt "Languages::product_variations.generating.select_variants"
+msgid "Select variants"
+msgstr "Wybierz warianty"
+
+msgctxt "Languages::product_variations.selected_default"
+msgid "Selected by default"
+msgstr "Domyślnie zaznaczone"
+
+msgctxt "Languages::product_variations.selected_default_tooltip"
+msgid "The variation which should be selected by default in the Storefront"
+msgstr "Odmiana, która powinna być domyślnie wybrana w tym sklepie (storefroncie)"
+
+msgctxt "Languages::product_variations.product_type"
+msgid "Product variations"
+msgstr "Warianty produktu"
+
+msgctxt "Languages::product_variations.product_type.simple"
+msgid "Simple product"
+msgstr "Prosty produkt"
+
+msgctxt "Languages::product_variations.product_type.variation"
+msgid "Product variation"
+msgstr "Warianty produktu"
+
+msgctxt "Languages::product_variations.product_type.configurable"
+msgid "Configurable product"
+msgstr "Konfigurowalny produkt"
+
+msgctxt "Languages::product_variations.parent_product"
+msgid "Parent product"
+msgstr "Produkt nadrzędny"
+
+msgctxt "Languages::product_variations.variations"
+msgid "Variations"
+msgstr "Warianty"
+
+msgctxt "Languages::product_variations.variation_of_product"
+msgid "Variation of <a href=\"[url]\">[product]</a>"
+msgstr "Odmiana <a href=\"[url]\">[product]</a>"
+
+msgctxt "Languages::product_variations.error.product_variation_must_have_variation_options"
+msgid "The variation_options field is required for a variation product"
+msgstr "Pole variation_options jest wymagane dla wariacji produktu"
+
+msgctxt "Languages::product_variations.error.product_variation_must_have_parent_product"
+msgid "A product variation must have a parent product"
+msgstr "Wariant produktu musi mieć produkt nadrzędny"
+
+msgctxt "Languages::product_variations.error.invalid_variation_options_array"
+msgid "The variation_options array is invalid"
+msgstr "Tablica variation_options jest nieprawidłowa"
+
+msgctxt "Languages::product_variations.error.product_variation_already_exists"
+msgid "A product variation with same variation_code already exists"
+msgstr "Istnieje już odmiana produktu o tym samym kodzie variation_code"
+
+msgctxt "Languages::product_variations.convert_to_configurable_product"
+msgid "Convert to configurable product"
+msgstr "Przekonwertowuj w konfigurowalny produkt"
+
+msgctxt "Languages::product_variations.confirm_convert_to_configurable_product"
+msgid "You can't undo this action unless you restore the database from backup or re-create this product as a simple product manually. The option combinations and exceptions (allowed/forbidden combinations) of this product will be lost. Are you sure you want to proceed?"
+msgstr "Nie można cofnąć tej operacji, chyba że przywrócisz bazę danych z kopii zapasowej lub ponownie utworzysz ten produkt ręcznie jako produkt prosty. Kombinacje opcji i wyjątki (dozwolone / zabronione kombinacje) tego produktu zostaną utracone. Czy na pewno chcesz kontynuować?"
+
+msgctxt "Languages::product_variations.convert_to_configurable_product_success"
+msgid "Product successfully converted"
+msgstr "Produkt przekonwertowany pomyślnie"
+
+msgctxt "Languages::product_variations.error.configurable_product_must_have_file"
+msgid "A downloadable configurable product must have at least one active file for sale."
+msgstr "Do pobrania, konfigurowalny produkt musi mieć co najmniej jeden aktywny plik do sprzedaży."
+
+msgctxt "Languages::product_variations.variations_filling"
+msgid "Variations"
+msgstr "Warianty"
+
+msgctxt "Languages::product_variations.variations_list"
+msgid "Variations"
+msgstr "Warianty"
+
+msgctxt "Languages::variations_in_stock"
+msgid "Only \"in stock\" products"
+msgstr "Tylko produkty \"w magazynie\""
+
+msgctxt "Languages::product_variations.variation_code"
+msgid "Variation code"
+msgstr "Kod wariantu"
+
+msgctxt "Languages::product_variations.hide_add_to_wishlist_button"
+msgid "Hide add to wish list button"
+msgstr "Ukryj przycisk dodania do przechowalni"
+
+msgctxt "Languages::product_variations.cannot_generate_variations_reason_options"
+msgid "Cannot generate product variations. You may have removed some product options (or disabled inventory tracking for these options). Some existing variations depend on these options. Please roll back your changes to options or remove existing variations of the product and try to generate them again."
+msgstr "Nie można wygenerować wariacji produktu. Być może usunięto niektóre opcje produktu (lub wyłączono śledzenie magazynu dla tych opcji). Niektóre istniejące wariacje produktu zależą od tych opcji. Cofnij zmiany do opcji lub Usuń istniejące wariacje produktu i spróbuj ponownie je wygenerować."
+
+msgctxt "Languages::product_variations.cannot_use_all_options_reason_existent_variations"
+msgid "Cannot use the following options to generate variations: <b>[option_names]</b>. Some existing  variations of the product do not use these options. Please remove existing variations and generate them again to use these options."
+msgstr "Nie można użyć następujących opcji do generowania wariacji produktu: <b>[option_names]</b>. Niektóre wariacje istniejącego produktu nie mogą używać tych opcji. Należy usunąć istniejące różnice i wygenerować je ponownie, aby użyć tych opcji."
+
+msgctxt "Languages::product_variations.variation"
+msgid "Variation"
+msgstr "Wariacja"
+
+msgctxt "Languages::product_variations.update_name"
+msgid "Update name"
+msgstr "Aktualizacji nazwy"
+
+msgctxt "Languages::product_variations.add_variations"
+msgid "Add variations"
+msgstr "Dodaj wariacje"
+
+msgctxt "Languages::product_variations.cannot_change_variation_options"
+msgid "Product options cannot be changed"
+msgstr "Nie można zmienić opcji produktu"
+
+msgctxt "Languages::product_variations.please_select_combinations"
+msgid "Please select combinations"
+msgstr "Proszę wybrać kombinacje"
+
+msgctxt "Languages::product_variations.variations_list_block_name"
+msgid "Variations list"
+msgstr "Listy wariantów"
+
+msgctxt "Languages::product_variations.variations_list_tab_name"
+msgid "View all options as list"
+msgstr "Zobacz wszystkie opcje jako listę"
+
+msgctxt "Languages::product_variations.exim_error_conf_product_cannot_have_variation_options"
+msgid "Couldn't import product [product_code]: configurable product can't have variation options."
+msgstr "Nie można zaimportować produktu [product_code]: produkt konfigurowalny nie może mieć wariacji opcji."
+
+msgctxt "Languages::product_variations.exim_error_cannot_find_parent_for_variation"
+msgid "Couldn't import product [product_code]: the parent product for this variation doesn't exist or is located in a wrong place in the imported file."
+msgstr "Nie mogłem zaimportować [product_code] produktu: produkt nadrzędny dla tej zmiany nie istnieje lub znajduje się w niewłaściwym miejscu w importowanym pliku."
+
+msgctxt "Languages::product_variations.exim_error_option_is_not_available"
+msgid "Couldn't import product [product_code]: option \"[option_name]\" is not available for this product variation."
+msgstr "Nie mogłem zaimportować [product_code] produktu: opcja \"[option_name]\" nie jest dostępna dla tej wariacji produktu."
+
+msgctxt "Languages::product_variations.exim_error_invalid_variation_options_format"
+msgid "Couldn't import product [product_code]: invalid format of variation options was provided for this variation."
+msgstr "Nie mogłem zaimportować [product_code] produktu: nieprawidłowy format zmienności opcji został dostarczony dla tej zmiany."
+
+msgctxt "Languages::product_variations.exim_error_invalid_variation_options_provided"
+msgid "Couldn't import product [product_code]: invalid variation options were provided for this variation."
+msgstr "Nie mogłem zaimportować [product_code] produktu: nieprawidłowa wariacje opcji zostały przewidziane dla tej zmiany."
+
+msgctxt "Languages::product_variations.exim_error_variation_with_provided_options_exists"
+msgid "Couldn't import product [product_code]: a variation with these variation options already exists."
+msgstr "Nie mogłem zaimportować [product_code] produktu: wariacja tych opcji już istnieje."
+
+msgctxt "Languages::product_variations.exim_error_variation_cannot_have_empty_variation_options"
+msgid "Couldn't import product [product_code]: a variation must have variation options specified."
+msgstr "Nie mogłem zaimportować [product_code] produktu: wariacja musi mieć podane opcje zmiany."
+
+msgctxt "Languages::product_variations.exim_error_cannot_update_product_options_for_variation_or_parent"
+msgid "Couldn't import options for product [product_code]: options can't be updated for a variation or for a product that has at least one variation."
+msgstr "Nie mogłem zaimportować opcje dla [product_code] produktu: opcji nie można zaktualizować, dla wariacji lub produktu, który ma co najmniej jedną wariację."
+
+msgctxt "Languages::product_variations.exim_error_variant_does_not_exist"
+msgid "Couldn't import product [product_code]: option \"[option_name]\" doesn't have variant \"[variant_name]\"."
+msgstr "Nie mogłem zaimportować [product_code] produktu: opcja \"[option_name]\" nie ma wariantu \"[variant_name]\"."
+
+msgctxt "Languages::product_variations.text_exim_data_imported"
+msgid "Data is imported successfully. <br />New products - <b>[new]</b>: <ul><li>Simple: <b>[new_simple]</b></li><li>Configurable: <b>[new_conf]</b></li><li>Variations: <b>[new_var]</b></li></ul>Updated products - <b>[exist]</b>: <ul><li>Simple: <b>[upd_simple]</b></li><li>Configurable: <b>[upd_conf]</b></li><li>Variations: <b>[upd_var]</b></li></ul>Skipped products - <b>[skipped]</b>: <ul><li>Simple: <b>[skipped_simple]</b></li><li>Configurable: <b>[skipped_conf]</b></li><li>Variations: <b>[skipped_var]</b></li></ul>Total - <b>[total]</b>."
+msgstr "Dane zostały zaimportowane pomyślnie. <br />Nowe produkty - <b>[new]</b>: <ul><li>Proste: <b>[new_simple]</b></li> <li>Konfigurowalne: <b>[new_conf]</b></li> <li>Wariacje: <b>[new_var]</b></li></ul> Aktualizacja produktów - <b>[exist]</b>: <ul><li>Proste: <b>[upd_simple] </b></li> <li>Konfigurowalne: <b>[upd_conf]</b></li> <li>Wariacje: <b>[upd_var]</b></li></ul>Pominięte produkty - <b>[skipped]</b>: <ul><li>Proste: <b>[skipped_simple]</b></li> <li>Konfigurowalne: <b>[skipped_conf]</b></li> <li>Wariacje: <b>[skipped_var]</b></li></ul>Ogółem - <b>[total]</b>."
+
+msgctxt "Languages::variation_options"
+msgid "Variation options"
+msgstr "Wariacje opcji"
+
+msgctxt "Languages::product_variations.cannot_remove_options_that_used_for_variation"
+msgid "Cannot delete option \"[option_name]\" because it is used in product variations. If you'd like to delete this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
+msgstr "Nie można usunąć opcji [option_name] ponieważ jest używana w wariacjach produktu. Jeżeli chciałbyś usunąć tę opcję, proszę najpierw usuń <a href=\"[search_link]\">wariacje produktu</a>które używają tej opcji."
+
+msgctxt "Languages::product_variations.cannot_disable_options_that_used_for_variation"
+msgid "Cannot disable option \"[option_name]\" because it is used in product variations. If you'd like to disable this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
+msgstr "Nie można wyłaczyć opcji [option_name] ponieważ jest używana w wariacjach produktu. Jeżeli chciałbyś wyłączyć tę opcję, proszę najpierw usuń <a href=\"[search_link]\">wariacje produktu</a>które używają tej opcji."
+
+msgctxt "Languages::product_variations.show_variation_thumbnails"
+msgid "Show variation thumbnails"
+msgstr "Pokaż miniatury wariacji"
+
+msgctxt "Languages::product_variations.show_product_code"
+msgid "Show product code"
+msgstr "Pokaż kod produktu"
+
+msgctxt "Languages::tt_addons_product_variations_hooks_products_update_product_tracking_override_inventory"
+msgid "Track in stock product quantity. Enable the \"Enable inventory tracking\" option (Settings -> General) to modify."
+msgstr "Śledzenie ilości produktu w magazynie. Włącz opcje \"Włącz śledzenie magazynu\" w menu (Ustawienia-> Ustawienia ogólne)."
+
+msgctxt "Languages::tt_addons_product_variations_hooks_products_categories_section_post_categories"
+msgid "Categories to be displayed in the navigation breadcrumbs."
+msgstr "Kategorie mają być wyświetlane w okruszkach."
+
+msgctxt "Languages::product_variations.inventory_notice"
+msgid "This product doesn't have any options suitable for creating variations. Please make sure that the product has at least one active option with the ticked <b>Inventory</b> checkbox, and variants exist for that option."
+msgstr "Ten produkt nie ma żadnych opcji odpowiednich do tworzenia wariacji produktów. Upewnij się, że produkt ma co najmniej jedną aktywną opcję z zaznaczonym polem <b>Magazyn</b> i istnieją warianty dla tej opcji."
+
+msgctxt "Languages::product_variations.error.cannot_disable_option_variant"
+msgid "Variant \"[variant_name]\" can't be disabled because some existing product variations use it."
+msgstr "Nie można wyłączyć wariantu \"[variant_name]\", ponieważ niektóre istniejące produkty mogą go używać."
+
+msgctxt "Languages::product_variations.error.cannot_remove_option_variant"
+msgid "Variant \"[variant_name]\" can't be removed because some existing product variations use it."
+msgstr "Nie można usunąć wariantu \"[variant_name]\", ponieważ niektóre istniejące produkty mogą go używać."
+
+msgctxt "Languages::is_default_product_variation"
+msgid "Is default product variation"
+msgstr "Jest domyślną odmianą produktu"
+

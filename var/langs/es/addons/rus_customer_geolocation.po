@@ -1,0 +1,37 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Spanish\n"
+"Language: es_ES\n"
+
+msgctxt "Addons::name::rus_customer_geolocation"
+msgid "Customer geolocation"
+msgstr "Customer geolocation"
+
+msgctxt "Addons::description::rus_customer_geolocation"
+msgid "Use Yandex Maps geolocation to determine a customer's city"
+msgstr "Use Yandex Maps geolocation to determine a customer's city"
+
+msgctxt "Languages::rus_customer_geolocation.your_city"
+msgid "Your city"
+msgstr "Your city"
+
+msgctxt "Languages::rus_customer_geolocation.select_your_city"
+msgid "Select your city"
+msgstr "Select your city"
+
+msgctxt "Languages::rus_customer_geolocation.locations"
+msgid "Geolocation cities"
+msgstr "Geolocation cities"
+
+msgctxt "Languages::block_rus_customer_geolocation_customer_location"
+msgid "Customer location"
+msgstr "Customer location"
+
+msgctxt "Languages::block_rus_customer_geolocation_customer_location_description"
+msgid "Customer city and city selection form"
+msgstr "Current city and city selection form"
+
+msgctxt "Languages::rus_customer_geolocation.location_detection_disabled"
+msgid "Your location could not be determined. Try enabling the location services on your device or disabling the tracking protection."
+msgstr "Your location could not be determined. Try enabling the location services on your device or disabling the tracking protection."

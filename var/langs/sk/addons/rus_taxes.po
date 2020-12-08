@@ -1,0 +1,53 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Slovak\n"
+"Language: sk_SK\n"
+
+msgctxt "Addons::name::rus_taxes"
+msgid "Russian localization — Taxes"
+msgstr "Russian localization — Taxes"
+
+msgctxt "Addons::description::rus_taxes"
+msgid "Allows you to select a corresponding Russian tax for each tax you create; this information is used by shipping and payment services to comply with the Russian Federal Law 54"
+msgstr "Allows you to select a corresponding Russian tax for each tax you create; this information is used by shipping and payment services to comply with the Russian Federal Law 54"
+
+msgctxt "Languages::rus_taxes.tax.none"
+msgid "No VAT"
+msgstr "No VAT"
+
+msgctxt "Languages::rus_taxes.tax.vat0"
+msgid "VAT 0%"
+msgstr "VAT 0%"
+
+msgctxt "Languages::rus_taxes.tax.vat10"
+msgid "VAT 10%"
+msgstr "VAT 10%"
+
+msgctxt "Languages::rus_taxes.tax.vat18"
+msgid "VAT 18%"
+msgstr "VAT 18%"
+
+msgctxt "Languages::rus_taxes.tax.vat110"
+msgid "VAT 10/110"
+msgstr "VAT 10/110"
+
+msgctxt "Languages::rus_taxes.tax.vat118"
+msgid "VAT 18/118"
+msgstr "VAT 18/118"
+
+msgctxt "Languages::rus_taxes.tax_type"
+msgid "VAT rate"
+msgstr "VAT rate"
+
+msgctxt "Languages::rus_taxes.tax_type.tooltip"
+msgid "This data will be used by Yandex.Checkout, Yandex.Delivery, ATOL, SDEK, PayMaster, PayAnyWay, etc."
+msgstr "This data will be used by Yandex.Checkout, Yandex.Delivery, ATOL, SDEK, PayMaster, PayAnyWay, etc."
+
+msgctxt "Languages::rus_taxes.upgrade_message"
+msgid "<p>To help you comply with the Russian Federal Law 54, we added the ability to send the data for printing of a sales receipt to:</p><ul><li>Yandex.Delivery</li><li>SDEK</li><li>PayMaster</li><li>PayAnyWay</li></ul><p>For that purpose we have added a new add-on called \"Russian localization — Taxes\". It is installed and enabled by default, and it adds a new settings to taxes (VAT rate). Please check the settings of your taxes after the upgrade.</p>"
+msgstr "<p>To help you comply with the Russian Federal Law 54, we added the ability to send the data for printing of a sales receipt to:</p><ul><li>Yandex.Delivery</li><li>SDEK</li><li>PayMaster</li><li>PayAnyWay</li></ul><p>For that purpose we have added a new add-on called \"Russian localization — Taxes\". It is installed and enabled by default, and it adds a new settings to taxes (VAT rate). Please check the settings of your taxes after the upgrade.</p>"
+
+msgctxt "Languages::rus_taxes.upgrade_message_title"
+msgid "Changes related to the Russian Federal Law 54; please check your taxes"
+msgstr "Changes related to the Russian Federal Law 54; please check your taxes"

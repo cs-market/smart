@@ -1,0 +1,22 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Greek\n"
+"Language: el_GR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: el\n"
+"X-Crowdin-File: /release-4.8.2/addons/old_adminpanel.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:04\n"
+
+msgctxt "Addons::name::old_adminpanel"
+msgid "Old Admin Panel [Deprecated]"
+msgstr "Παλιο Admin Panel [Υπό κατάργηση]"
+
+msgctxt "Addons::description::old_adminpanel"
+msgid "We left the old admin panel for backward compatibility. Turn on this module if you need an old admin panel. Or turn it off to use Responsive Admin Panel."
+msgstr "Αφήσαμε τον παλιό πίνακα διαχειριστή για συμβατότητα προς τα πίσω. Ενεργοποιήστε αυτήν την ενότητα εάν χρειάζεστε έναν παλιό πίνακα διαχείρισης. Ή απενεργοποιήστε το για να χρησιμοποιήσετε το Responsive Admin Panel."
+

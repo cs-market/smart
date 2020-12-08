@@ -1,0 +1,56 @@
+/* ==========================================================================
+Product Variations Responsive
+========================================================================== */
+
+/* Responsive: Tablet and phone
+========================================================================== */
+
+@media (max-width: 979px) {
+    .ty-variations-list {
+
+        &.ty-table th {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        &.ty-table td, .ty-table .table td {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    }
+}
+/* Responsive: Landscape phone to desktop/tablet
+========================================================================== */
+@media (max-width: 767px) {
+    .ty-variations-list {
+
+        .ty-table__responsive-content {
+            display: inline-block;
+            width: auto;
+        }
+
+        &__controls {
+
+            .ty-table__responsive-header {
+                display: none;
+            }
+        }
+        &__controls form > &__price {
+            display: block;
+            margin-bottom: 13px;
+        }
+        &__product-elem 
+            .ty-btn {
+                margin-left: 0;
+                margin-right: 10px;
+                margin-bottom: 13px;
+            }
+            .ty-qty-out-of-stock {
+                margin-left: 0;
+                margin-right: 10px;
+                margin-bottom: 13px;
+                vertical-align: middle;
+            }
+    }
+}
+
+/* /Product variations responsive*/

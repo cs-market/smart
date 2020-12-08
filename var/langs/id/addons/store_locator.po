@@ -1,0 +1,126 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Indonesian\n"
+"Language: id_ID\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: id\n"
+"X-Crowdin-File: /release-4.8.2/addons/store_locator.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:05\n"
+
+msgctxt "Addons::name::store_locator"
+msgid "Store locator"
+msgstr "Penunjuk lokasi toko"
+
+msgctxt "Addons::description::store_locator"
+msgid "Lets you place local stores on map and inform customers about their nearest stores"
+msgstr "Memungkinkan Anda menempatkan toko lokal di peta dan menginformasikan pelanggan tentang toko terdekat mereka"
+
+msgctxt "Languages::view_on_map"
+msgid "View on map"
+msgstr "Lihat di peta"
+
+msgctxt "Languages::get_api_key"
+msgid "Obtaining an API Key"
+msgstr "Obtaining an API Key"
+
+msgctxt "Languages::block_store_locator"
+msgid "Store locator"
+msgstr "Pencari lokasi"
+
+msgctxt "Languages::block_store_locator_description"
+msgid "Store locator block"
+msgstr "Blok loker toko"
+
+msgctxt "Languages::text_address_not_found"
+msgid "Address not found"
+msgstr "Alamat tidak ditemukan"
+
+msgctxt "Languages::select_coordinates"
+msgid "Select coordinates"
+msgstr "Pilih koordinat"
+
+msgctxt "Languages::set"
+msgid "Set"
+msgstr "Set"
+
+msgctxt "Languages::editing_store_location"
+msgid "Editing store location"
+msgstr "Mengedit lokasi toko"
+
+msgctxt "Languages::new_store_location"
+msgid "New store location"
+msgstr "Lokasi toko baru"
+
+msgctxt "Languages::add_store_location"
+msgid "Add store location"
+msgstr "Tambahkan lokasi toko"
+
+msgctxt "Languages::coordinates"
+msgid "Coordinates"
+msgstr "Koordinat"
+
+msgctxt "Languages::latitude_short"
+msgid "lat"
+msgstr "tahun"
+
+msgctxt "Languages::longitude_short"
+msgid "long"
+msgstr "panjang"
+
+msgctxt "Languages::all_stores"
+msgid "All stores"
+msgstr "Semua toko"
+
+msgctxt "Languages::zoom"
+msgid "Map zoom"
+msgstr "Zoom peta"
+
+msgctxt "Languages::map_type_control"
+msgid "MapType control"
+msgstr "Kontrol MapType"
+
+msgctxt "Languages::zoom_control"
+msgid "Zoom control"
+msgstr "Kontrol Zoom"
+
+msgctxt "Languages::scale_control"
+msgid "Scale control"
+msgstr "Kontrol skala"
+
+msgctxt "SettingsSections::store_locator::general"
+msgid "General"
+msgstr "Umum"
+
+msgctxt "SettingsOptions::store_locator::provider"
+msgid "Map provider"
+msgstr "Penyedia peta"
+
+msgctxt "SettingsOptions::store_locator::map_provider"
+msgid "Map"
+msgstr "Peta"
+
+msgctxt "SettingsOptions::store_locator::settings"
+msgid "Settings"
+msgstr "Pengaturan"
+
+msgctxt "SettingsVariants::store_locator::map_provider::google"
+msgid "Google"
+msgstr "Google"
+
+msgctxt "SettingsVariants::store_locator::map_provider::yandex"
+msgid "Yandex"
+msgstr "Yandex"
+
+msgctxt "Languages::privileges.manage_store_locator"
+msgid "Manage store locator"
+msgstr "Kelola pencari toko"
+
+msgctxt "Languages::privileges.view_store_locator"
+msgid "View store locator"
+msgstr "Lihat pencari toko"
+

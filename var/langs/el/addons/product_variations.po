@@ -1,0 +1,242 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Greek\n"
+"Language: el_GR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: el\n"
+"X-Crowdin-File: /release-4.8.2/addons/product_variations.po\n"
+"Last-Translator: cscart <translations@cs-cart.com>\n"
+"PO-Revision-Date: 2018-08-20 09:04\n"
+
+msgctxt "Addons::name::product_variations"
+msgid "Product Variations [Beta]"
+msgstr "[Beta] παραλλαγές προϊόντος"
+
+msgctxt "Addons::description::product_variations"
+msgid "Variants of a product that comes in more than one option, such as color or size."
+msgstr "Παραλλαγές ενός προϊόντος που διατίθεταιι σε περισσότερες από μία επιλογή, όπως χρώμα ή μέγεθος."
+
+msgctxt "Languages::product_variations.btn_generate"
+msgid "Generate variations"
+msgstr "Δημιουργία παραλλαγών"
+
+msgctxt "Languages::product_variations.generating.title"
+msgid "Generating variations: [product]"
+msgstr "Δημιουργία παραλλαγών: [product]"
+
+msgctxt "Languages::product_variations.generating.select_variants"
+msgid "Select variants"
+msgstr "Επιλέξτε παραλλαγές"
+
+msgctxt "Languages::product_variations.selected_default"
+msgid "Selected by default"
+msgstr "Επιλεγμένο από προεπιλογή"
+
+msgctxt "Languages::product_variations.selected_default_tooltip"
+msgid "The variation which should be selected by default in the Storefront"
+msgstr "Η παραλλαγή που θα πρέπει να επιλεγεί από προεπιλογή στο Καταστημα"
+
+msgctxt "Languages::product_variations.product_type"
+msgid "Product variations"
+msgstr "Παραλλαγές προϊόντος"
+
+msgctxt "Languages::product_variations.product_type.simple"
+msgid "Simple product"
+msgstr "Απλό προϊόν"
+
+msgctxt "Languages::product_variations.product_type.variation"
+msgid "Product variation"
+msgstr "Παραλλαγή προϊόντος"
+
+msgctxt "Languages::product_variations.product_type.configurable"
+msgid "Configurable product"
+msgstr "Διαμορφώσιμο προϊόν"
+
+msgctxt "Languages::product_variations.parent_product"
+msgid "Parent product"
+msgstr "Γονικό προϊόν"
+
+msgctxt "Languages::product_variations.variations"
+msgid "Variations"
+msgstr "Παραλλαγές"
+
+msgctxt "Languages::product_variations.variation_of_product"
+msgid "Variation of <a href=\"[url]\">[product]</a>"
+msgstr "Παραλλαγή του <a href=\"[url]\">[product]</a>"
+
+msgctxt "Languages::product_variations.error.product_variation_must_have_variation_options"
+msgid "The variation_options field is required for a variation product"
+msgstr "Το πεδίο variation_options είναι απαραίτητη για ένα προϊόν με παραλλαγή"
+
+msgctxt "Languages::product_variations.error.product_variation_must_have_parent_product"
+msgid "A product variation must have a parent product"
+msgstr "Μια παραλλαγή του προϊόντος πρέπει να έχει ένα γονικό προϊόν"
+
+msgctxt "Languages::product_variations.error.invalid_variation_options_array"
+msgid "The variation_options array is invalid"
+msgstr "Ο πίνακας variation_options δεν είναι έγκυρος"
+
+msgctxt "Languages::product_variations.error.product_variation_already_exists"
+msgid "A product variation with same variation_code already exists"
+msgstr "Υπάρχει ήδη μια παραλλαγή προϊόντος με το ίδιο variation_code"
+
+msgctxt "Languages::product_variations.convert_to_configurable_product"
+msgid "Convert to configurable product"
+msgstr "Μετατροπή σε διαμορφώσιμο προϊόν"
+
+msgctxt "Languages::product_variations.confirm_convert_to_configurable_product"
+msgid "You can't undo this action unless you restore the database from backup or re-create this product as a simple product manually. The option combinations and exceptions (allowed/forbidden combinations) of this product will be lost. Are you sure you want to proceed?"
+msgstr "Δεν μπορείτε να αναιρέσετε αυτήν την ενέργεια, εκτός και αν επαναφέρετε τη βάση δεδομένων από αντίγραφο ασφαλείας ή δημιουργήστε ξανά το προϊόν αυτό ως ένα απλό προϊόν με μη αυτόματο τρόπο. Οι Συνδυασμοι Επιλογών και οι εξαιρέσεις (επιτρέπεται/απαγορεύεται συνδυασμος) αυτού του προϊόντος θα χαθούν. Είστε βέβαιοι ότι θέλετε να συνεχίσετε;"
+
+msgctxt "Languages::product_variations.convert_to_configurable_product_success"
+msgid "Product successfully converted"
+msgstr "Το προϊόν μετατράπηκε επιτυχώς"
+
+msgctxt "Languages::product_variations.error.configurable_product_must_have_file"
+msgid "A downloadable configurable product must have at least one active file for sale."
+msgstr "Ένα παραμετροποιήσιμο προϊόν με δυνατότητα λήψης πρέπει να διαθέτει τουλάχιστον ένα ενεργό αρχείο προς πώληση."
+
+msgctxt "Languages::product_variations.variations_filling"
+msgid "Variations"
+msgstr "Παραλλαγές"
+
+msgctxt "Languages::product_variations.variations_list"
+msgid "Variations"
+msgstr "Παραλλαγές"
+
+msgctxt "Languages::variations_in_stock"
+msgid "Only \"in stock\" products"
+msgstr "Μόνο  Προϊόντα με απόθεμα"
+
+msgctxt "Languages::product_variations.variation_code"
+msgid "Variation code"
+msgstr "Κωδικος Παραλλαγης"
+
+msgctxt "Languages::product_variations.hide_add_to_wishlist_button"
+msgid "Hide add to wish list button"
+msgstr "Απόκρυψη κουμπιού προσθήκη στα αγαπημενα"
+
+msgctxt "Languages::product_variations.cannot_generate_variations_reason_options"
+msgid "Cannot generate product variations. You may have removed some product options (or disabled inventory tracking for these options). Some existing variations depend on these options. Please roll back your changes to options or remove existing variations of the product and try to generate them again."
+msgstr "Δεν είναι δυνατή η δημιουργία παραλλαγών προϊόντων. Ίσως έχετε αφαιρέσει κάποιες επιλογές προϊόντος (ή εχει γινει απενεργοποίηση εντοπισμού αποθέματος για αυτές τις επιλογές). Ορισμένες υπάρχουσες παραλλαγές εξαρτώνται από αυτές τις επιλογές. Επαναφέρετε τις αλλαγές στις επιλογές ή καταργήστε τις υπάρχουσες παραλλαγές του προϊόντος και προσπαθήστε να τις δημιουργήσετε ξανά."
+
+msgctxt "Languages::product_variations.cannot_use_all_options_reason_existent_variations"
+msgid "Cannot use the following options to generate variations: <b>[option_names]</b>. Some existing  variations of the product do not use these options. Please remove existing variations and generate them again to use these options."
+msgstr "Δεν είναι δυνατή η χρήση των ακόλουθων επιλογών για τη δημιουργία παραλλαγών: <b> [option_names] </ b>. Ορισμένες υπάρχουσες παραλλαγές του προϊόντος δεν χρησιμοποιούν αυτές τις επιλογές. Καταργήστε τις υπάρχουσες παραλλαγές και τις δημιουργήστε ξανά για να χρησιμοποιήσετε αυτές τις επιλογές."
+
+msgctxt "Languages::product_variations.variation"
+msgid "Variation"
+msgstr "Παραλλαγή"
+
+msgctxt "Languages::product_variations.update_name"
+msgid "Update name"
+msgstr "Ανανεωση ονοματος"
+
+msgctxt "Languages::product_variations.add_variations"
+msgid "Add variations"
+msgstr "Προσθηκη παραλλαγων"
+
+msgctxt "Languages::product_variations.cannot_change_variation_options"
+msgid "Product options cannot be changed"
+msgstr "Οι επιλογές προϊόντων δεν μπορούν να αλλάξουν"
+
+msgctxt "Languages::product_variations.please_select_combinations"
+msgid "Please select combinations"
+msgstr "Επιλέξτε συνδυασμούς"
+
+msgctxt "Languages::product_variations.variations_list_block_name"
+msgid "Variations list"
+msgstr "Λιστα Παραλλαγων"
+
+msgctxt "Languages::product_variations.variations_list_tab_name"
+msgid "View all options as list"
+msgstr "Προβολη ολων των επιλογων ως λίστα"
+
+msgctxt "Languages::product_variations.exim_error_conf_product_cannot_have_variation_options"
+msgid "Couldn't import product [product_code]: configurable product can't have variation options."
+msgstr "Couldn't import product [product_code]: configurable product can't have variation options."
+
+msgctxt "Languages::product_variations.exim_error_cannot_find_parent_for_variation"
+msgid "Couldn't import product [product_code]: the parent product for this variation doesn't exist or is located in a wrong place in the imported file."
+msgstr "Couldn't import product [product_code]: the parent product for this variation doesn't exist or is located in a wrong place in the imported file."
+
+msgctxt "Languages::product_variations.exim_error_option_is_not_available"
+msgid "Couldn't import product [product_code]: option \"[option_name]\" is not available for this product variation."
+msgstr "Couldn't import product [product_code]: option \"[option_name]\" is not available for this product variation."
+
+msgctxt "Languages::product_variations.exim_error_invalid_variation_options_format"
+msgid "Couldn't import product [product_code]: invalid format of variation options was provided for this variation."
+msgstr "Couldn't import product [product_code]: invalid format of variation options was provided for this variation."
+
+msgctxt "Languages::product_variations.exim_error_invalid_variation_options_provided"
+msgid "Couldn't import product [product_code]: invalid variation options were provided for this variation."
+msgstr "Couldn't import product [product_code]: invalid variation options were provided for this variation."
+
+msgctxt "Languages::product_variations.exim_error_variation_with_provided_options_exists"
+msgid "Couldn't import product [product_code]: a variation with these variation options already exists."
+msgstr "Couldn't import product [product_code]: a variation with these variation options already exists."
+
+msgctxt "Languages::product_variations.exim_error_variation_cannot_have_empty_variation_options"
+msgid "Couldn't import product [product_code]: a variation must have variation options specified."
+msgstr "Couldn't import product [product_code]: a variation must have variation options specified."
+
+msgctxt "Languages::product_variations.exim_error_cannot_update_product_options_for_variation_or_parent"
+msgid "Couldn't import options for product [product_code]: options can't be updated for a variation or for a product that has at least one variation."
+msgstr "Couldn't import options for product [product_code]: options can't be updated for a variation or for a product that has at least one variation."
+
+msgctxt "Languages::product_variations.exim_error_variant_does_not_exist"
+msgid "Couldn't import product [product_code]: option \"[option_name]\" doesn't have variant \"[variant_name]\"."
+msgstr "Couldn't import product [product_code]: option \"[option_name]\" doesn't have variant \"[variant_name]\"."
+
+msgctxt "Languages::product_variations.text_exim_data_imported"
+msgid "Data is imported successfully. <br />New products - <b>[new]</b>: <ul><li>Simple: <b>[new_simple]</b></li><li>Configurable: <b>[new_conf]</b></li><li>Variations: <b>[new_var]</b></li></ul>Updated products - <b>[exist]</b>: <ul><li>Simple: <b>[upd_simple]</b></li><li>Configurable: <b>[upd_conf]</b></li><li>Variations: <b>[upd_var]</b></li></ul>Skipped products - <b>[skipped]</b>: <ul><li>Simple: <b>[skipped_simple]</b></li><li>Configurable: <b>[skipped_conf]</b></li><li>Variations: <b>[skipped_var]</b></li></ul>Total - <b>[total]</b>."
+msgstr "Τα δεδομένα εισηχθησαν με επιτυχία.<br />Νέα προϊόντα  - <b>[new]</b>: <ul><li>Απλα: <b>[new_simple]</b></li><li>Διαμορφωσιμα: <b>[new_conf]</b></li><li>Παραλλαγες: <b>[new_var]</b></li></ul>Ανανεωμενα Προιοντα - <b>[exist]</b>: <ul><li>Απλα: <b>[upd_simple]</b></li><li>Διαμορφωιμα: <b>[upd_conf]</b></li><li>Παραλαλγες: <b>[upd_var]</b></li></ul>Παράλειψη προϊόντων - <b>[skipped]</b>: <ul><li>Απλα: <b>[skipped_simple]</b></li><li>Διαμορφωσιμα: <b>[skipped_conf]</b></li><li>Παραλλαγες: <b>[skipped_var]</b></li></ul>Συνολο - <b>[total]</b>."
+
+msgctxt "Languages::variation_options"
+msgid "Variation options"
+msgstr "Επιλογες Παραλλαγης"
+
+msgctxt "Languages::product_variations.cannot_remove_options_that_used_for_variation"
+msgid "Cannot delete option \"[option_name]\" because it is used in product variations. If you'd like to delete this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
+msgstr "Δεν είναι δυνατή η διαγραφή της επιλογής \"[option_name]\" επειδή χρησιμοποιείται σε παραλλαγές προϊόντων. Αν θέλετε να διαγράψετε αυτήν την επιλογή, διαγράψτε τις <a href=\"[search_link]\"> παραλλαγές προϊόντων </a> που χρησιμοποιούν αυτήν την επιλογή πρώτα."
+
+msgctxt "Languages::product_variations.cannot_disable_options_that_used_for_variation"
+msgid "Cannot disable option \"[option_name]\" because it is used in product variations. If you'd like to disable this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
+msgstr ""
+
+msgctxt "Languages::product_variations.show_variation_thumbnails"
+msgid "Show variation thumbnails"
+msgstr "Προβολη μικρογραφιών παραλλαγής"
+
+msgctxt "Languages::product_variations.show_product_code"
+msgid "Show product code"
+msgstr "Εμφάνιση κωδικού προϊόντος"
+
+msgctxt "Languages::tt_addons_product_variations_hooks_products_update_product_tracking_override_inventory"
+msgid "Track in stock product quantity. Enable the \"Enable inventory tracking\" option (Settings -> General) to modify."
+msgstr "Παρακολουθηση ποσότητας προϊόντων σε απόθεμα. Ενεργοποιείστε την \"παρακολούθηση αποθέματος\" (ρυθμίσεις-> γενικά) για τροποποιηση."
+
+msgctxt "Languages::tt_addons_product_variations_hooks_products_categories_section_post_categories"
+msgid "Categories to be displayed in the navigation breadcrumbs."
+msgstr "Οι Κατηγορίες που θα εμφανιστουν στην πλοηγηση με breadcrumbs."
+
+msgctxt "Languages::product_variations.inventory_notice"
+msgid "This product doesn't have any options suitable for creating variations. Please make sure that the product has at least one active option with the ticked <b>Inventory</b> checkbox, and variants exist for that option."
+msgstr ""
+
+msgctxt "Languages::product_variations.error.cannot_disable_option_variant"
+msgid "Variant \"[variant_name]\" can't be disabled because some existing product variations use it."
+msgstr "Η παραλλαγή \"[variant_name]\" δεν μπορεί να απενεργοποιηθεί επειδή χρησιμοποιειται σε μερικές υπάρχουσες παραλλαγές προϊόντων."
+
+msgctxt "Languages::product_variations.error.cannot_remove_option_variant"
+msgid "Variant \"[variant_name]\" can't be removed because some existing product variations use it."
+msgstr "Η παραλλαγή \"[variant_name]\" δεν μπορεί να απενεργοποιηθεί επειδή χρησιμοποιειται σε μερικές υπάρχουσες παραλλαγές προϊόντων."
+
+msgctxt "Languages::is_default_product_variation"
+msgid "Is default product variation"
+msgstr "Είναι η προεπιλεγμένη παραλλαγή του προϊόντος"
+
