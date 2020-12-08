@@ -6,6 +6,6 @@ pipelines:
         script:
           - pipe: atlassian/ssh-run:0.2.4
             variables:
-              SSH_USER: 'molvest'
+              SSH_USER: 'smart'
               SERVER: 'i-sd.ru'
               COMMAND: 'sh deploy.smart.sh'
