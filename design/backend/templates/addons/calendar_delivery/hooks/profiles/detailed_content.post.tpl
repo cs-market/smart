@@ -1,6 +1,6 @@
 {include file="common/subheader.tpl" title=__("delivery_date")}
 <div class="control-group">
-    <label class="control-label" for="debt">{__("debt")}</label>
+    <label class="control-label" for="delivery_date">{__("delivery_date")}</label>
     <div class="controls">
         {$calendar_days = [
             '1' => {__("weekday_1")},
