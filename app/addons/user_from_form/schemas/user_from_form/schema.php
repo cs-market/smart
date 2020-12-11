@@ -248,4 +248,21 @@ return [
 			'b_firstname' => '142',
 		],
 	],
+	'95' => [
+		'page_id' => 95,
+		'company_id' => 1810,
+		'usergroup_id' => [601],
+		'fields_map' => [
+			'firstname' => '375',
+			'phone' => '373',
+			'email' => '372',
+			'user_login' => '372',
+			'password' => '371',
+			's_phone' => '373',
+			's_address' => '146',
+			's_client_code' => '9999',
+			'b_client_code' => '9999',
+			'b_firstname' => '374',
+		],
+	],
 ];
