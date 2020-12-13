@@ -214,6 +214,26 @@ function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condit
         $condition['name'] = ' AND ( 1 ' . $condition['name'] . db_quote(' OR (?:profile_fields_data.value = ?s))', $params['search_query']);
         $join .= db_quote(' LEFT JOIN ?:profile_fields_data ON ?:profile_fields_data.object_id = ?:user_profiles.profile_id AND ?:profile_fields_data.object_type = ?s', 'P');
     }
+
+    $without_order_prefix = 'without_order_';
+    if (!empty($params[$without_order_prefix . 'period']) && $params[$without_order_prefix. 'period'] != 'A') {
+        list(
+            $w_time_from,
+            $w_time_to,
+        ) = [
+            $without_order_prefix . 'time_from',
+            $without_order_prefix . 'time_to',
+        ];
+
+        list($params[$w_time_from], $params[$w_time_to]) = fn_create_periods([
+            'period' => $params[$without_order_prefix . 'period'],
+            'time_from' => $params[$w_time_from],
+            'time_to' => $params[$w_time_to]
+        ]);
+
+        $join .= db_quote(" LEFT JOIN ?:orders as without_order ON ?:users.user_id = without_order.user_id AND (without_order.timestamp >= ?i AND without_order.timestamp <= ?i)", $params[$w_time_from], $params[$w_time_to]);
+        $condition['without_order'] = db_quote(" AND without_order.user_id IS NULL");
+    }
 }
 
 function fn_smart_distribution_get_users_post(&$users, $params, $auth) {
