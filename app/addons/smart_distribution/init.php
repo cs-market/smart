@@ -51,5 +51,6 @@ fn_register_hooks(
     'get_stickers_pre',
     'get_product_features',
     'send_form',
-    'get_submitted_forms_pre'
+    'get_submitted_forms_pre',
+    'mailer_send_post'
 );

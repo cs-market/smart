@@ -22,9 +22,30 @@
 	</div>
 </div>
 
+</div><div class="group span6 form-horizontal">
+<div class="control-group">
+    <label class="control-label" for="elm_wo_orders">{__("wo_orders")}</label>
+    <div class="controls">
+        <input type="hidden" name="wo_orders" value="N">
+        <input type="checkbox" id="elm_wo_orders" name="wo_orders" value="Y" {if $search.wo_orders == 'Y'}checked="checked"{/if} onclick="fn_change_period_avalability(!this.checked);">
+    </div>
+</div>
 {include
     file="common/period_selector.tpl"
     period=$search.without_order_period
     prefix="without_order_"
     display="form"
 }
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        flag = !$('#elm_wo_orders').is(':checked');
+        fn_change_period_avalability(flag);
+    });
+
+    function fn_change_period_avalability(flag) {
+        $('[name="without_order_time_from"]').prop('disabled', flag);
+        $('[name="without_order_time_to"]').prop('disabled', flag);
+        $('[name="without_order_period"]').prop('disabled', flag);
+    }
+</script>

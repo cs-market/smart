@@ -85,7 +85,7 @@ function fn_smart_distribution_get_product_features_list_before_select(&$fields,
     // to get a feature code in API request
     if (defined('API')) {
         $fields .=  ', f.feature_code';
-	}
+    }
     // /to get a feature code in API request
 
     // [only vendor features]
@@ -216,7 +216,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condit
     }
 
     $without_order_prefix = 'without_order_';
-    if (!empty($params[$without_order_prefix . 'period']) && $params[$without_order_prefix. 'period'] != 'A') {
+    if (!empty($params['wo_orders'])) {
         list(
             $w_time_from,
             $w_time_to,
@@ -1064,4 +1064,22 @@ function fn_set_checkpoint() {
     $time = $current_time - $prev_time;
     $prev_time = $current_time;
     return $time;
+}
+
+function fn_smart_distribution_mailer_send_post($_this, $transport, $message, $result, $area, $lang_code) {
+    foreach ($result->getErrors() as $error) {
+        fn_delete_notification_by_message(__('error_message_not_sent') . ' ' . $error);
+    }
+}
+
+function fn_delete_notification_by_message($message) {
+    $notifications = &Tygh::$app['session']['notifications'];
+
+    if (!empty($notifications)) {
+        foreach ($notifications as $key => $data) {
+            if ($data['message'] == $message) {
+                unset($notifications[$key]);
+            }
+        }
+    }
 }
