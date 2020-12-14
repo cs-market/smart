@@ -216,7 +216,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condit
     }
 
     $without_order_prefix = 'without_order_';
-    if (!empty($params['wo_orders'])) {
+    if (!empty($params['wo_orders']) && $params['wo_orders'] == 'Y') {
         list(
             $w_time_from,
             $w_time_to,

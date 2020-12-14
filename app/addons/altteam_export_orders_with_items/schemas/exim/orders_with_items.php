@@ -327,4 +327,9 @@ if (fn_allowed_for('MULTIVENDOR')) {
     }
 }
 
+$schema['post_processing']['unset_static_orders'] = array (
+    'function' => 'fn_exim_orders_with_items_get',
+    'args' => array('', '', '', true),
+);
+
 return $schema;
