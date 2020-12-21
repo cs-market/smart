@@ -123,6 +123,8 @@ function fn_category_promotion_get_products_before_select(&$params, $join, &$con
 
                     $cids = fn_array_merge($cids, $_ids, false);
                 }
+
+                if (!isset($params['extra_condition'])) $params['extra_condition'] = array();
                 $params['extra_condition'][] = db_quote("(?:categories.category_id IN (?n) OR products.product_id IN (?n))", $cids, $product_ids);
                 $params['backup_cid'] = $params['cid'];
                 unset($params['cid']);
