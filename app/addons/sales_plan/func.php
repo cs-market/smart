@@ -74,9 +74,13 @@ function fn_generate_sales_report($params) {
 			$elements_condition['orders'] = db_quote(' AND o.timestamp BETWEEN ?i AND ?i', $params['time_from'], $params['time_to']);
 			$elements_group = ' GROUP BY o.user_id';
 		}
+        if ($params['show_plan'] == 'Y') {
+            $elements_fields['sales_plan'] = 'sp.amount_plan, sp.frequency';
+            $elements_join['sales_plan'] = ' LEFT JOIN ?:sales_plan AS sp ON sp.user_id = u.user_id AND sp.company_id = u.company_id';
+        }
 
 		$elements = db_get_array(
-			"SELECT " . implode(' ', $elements_fields)
+			"SELECT " . implode(', ', $elements_fields)
 			. " FROM ?:users as u"
 			. implode(' ', $elements_join)
 			. " WHERE 1 " . implode(' ', $elements_condition)
@@ -113,19 +117,26 @@ function fn_generate_sales_report($params) {
 			$plan = array(0);
 			if ($params['show_plan'] == 'Y' && $element['frequency']) {
 				$base_timestamp = max(fn_array_column($fact, 'timestamp'));
+
 				$element['frequency_ts'] = $element['frequency'] * SECONDS_IN_DAY;
 
-				while ($params['time_from'] <= $base_timestamp) {
-					//if ($params['time_to'] >= $ts) {
-						$key = call_user_func($key_function, $base_timestamp);
+                $ts = $base_timestamp;
+				while ($params['time_from'] <= $ts) {
+					if ($params['time_to'] >= $ts) {
+						$key = call_user_func($key_function, $ts);
 						$plan[$key] += $element['amount_plan'];
-						/*if (!isset($orders_plan[$key][$plan['company_id']][$plan['user_id']])) {
-							$orders_plan[$key][$plan['company_id']][$plan['user_id']] = $empty;
-						}
-						$orders_plan[$key][$plan['company_id']][$plan['user_id']]['plan'] += $plan['amount_plan'];*/
-					//}
-					$base_timestamp -= $element['frequency_ts'];
+					}
+					$ts -= $element['frequency_ts'];
 				}
+
+                $ts = $base_timestamp += $plan['frequency_ts'];
+                while ($params['time_from'] <= $ts) {
+                    if ($params['time_to'] >= $ts) {
+                        $key = call_user_func($key_function, $ts);
+                        $plan[$key] += $element['amount_plan'];
+                    }
+                    $ts -= $element['frequency_ts'];
+                }
 			}
 
 			$user = fn_get_user_info($element['user_id']);
@@ -146,7 +157,7 @@ function fn_generate_sales_report($params) {
 					$f = __('fact') . ' ' . $f;
 					if (!empty($plan)) {
 						foreach ($plan as $ts => $value) {
-							if ($ts['timestamp'] >= $interval['time_from'] && $ts <= $interval['time_to']) {
+							if ($ts >= $interval['time_from'] && $ts <= $interval['time_to']) {
 								$row[$p] = $value;
 								break;
 							}
@@ -170,6 +181,7 @@ function fn_generate_sales_report($params) {
 					$row[$f] = 0;
 				}
 			}
+
 			if ($params['summ'] == 'Y') {
 				$f = array_sum(fn_array_column($fact, 'total'));
 				$p = array_sum($plan);
