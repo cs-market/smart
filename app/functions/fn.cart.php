@@ -1404,6 +1404,22 @@ function fn_place_suborders($order_id, $cart, &$auth, $action, $issuer_id)
         $total_products_price = 0;
         $total_shipping_cost = 0;
         $suborder_part = 0;
+        
+        /**
+         * Executes before building child cart contents,
+         * allows you to modify the child cart contents.
+         *
+         * @param int    $order_id      Order identifier
+         * @param array  $cart          Cart contents
+         * @param array  $auth          Authentication data
+         * @param string $action        Current action. Can be empty or "save"
+         * @param int    $issuer_id     Issuer identifier
+         * @param array  $suborder_cart Child cart contents
+         * @param array  $key_group     Child cart products group key
+         * @param array  $group         Child cart products
+         */
+        fn_set_hook('place_suborders_pre', $order_id, $cart, $auth, $action, $issuer_id, $suborder_cart, $key_group, $group);
+
         foreach ($group['products'] as $product) {
             $total_products_price += ($product['price'] * $product['amount']);
         }

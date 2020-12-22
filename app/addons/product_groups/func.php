@@ -86,6 +86,7 @@ function fn_product_groups_pre_update_order(&$cart, $order_id = 0) {
     foreach ($cart['products'] as $cart_id => $product) {
         if (!isset($groups[$product['group_id']])) {
             $groups[$product['group_id']] = $proto;
+            $groups[$product['group_id']]['group_id'] = $product['group_id'];
             $groups[$product['group_id']]['group'] = fn_get_product_groups(array('group_id' => $product['group_id']));
             $groups[$product['group_id']]['group'] = reset($groups[$product['group_id']]['group']);
             $groups[$product['group_id']]['subtotal'] = 0;
@@ -133,5 +134,20 @@ function fn_product_groups_check_min_amount($cart, &$check = true) {
 function fn_product_groups_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups) {
     if (defined('API')) {
         fn_product_groups_pre_update_order($cart);
+    }
+}
+
+function fn_product_groups_place_suborders_pre($order_id, $cart, $auth, $action, $issuer_id, &$suborder_cart, $key_group, $group) {
+    $suborder_cart['group_id'] = $group['group_id'] ? : 0;
+}
+
+function fn_product_groups_place_suborders($cart, &$suborder_cart) {
+    $group_id = $suborder_cart['group_id'];
+    $products = $suborder_cart['products'];
+    $suborder_cart['products'] = array_filter($products, function($product) use ($group_id) {
+        return ($product['group_id'] == $group_id);
+    });
+    if ($products != $suborder_cart['products']) {
+        unset($suborder_cart['promotions'], $suborder_cart['applied_promotions']);
     }
 }

@@ -8,5 +8,7 @@ fn_register_hooks(
     'gather_additional_products_data_params',
     'pre_update_order',
     'check_min_amount',
-    'calculate_cart_post'
+    'calculate_cart_post',
+    'place_suborders_pre',
+    'place_suborders'
 );
