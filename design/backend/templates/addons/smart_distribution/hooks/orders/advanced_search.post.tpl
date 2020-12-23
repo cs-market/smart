@@ -23,3 +23,16 @@
     </select>
     </div>
 </div>
+
+{$promotions = []|fn_get_promotions|reset}
+<div class="control-group">
+    <label class="control-label" for="promotion">{__("promotion")}</label>
+    <div class="controls">
+    <select name="promotion_id" id="promotion">
+        <option value="">--</option>
+        {foreach from=$promotions item=promotion}
+            <option value="{$promotion.promotion_id}" {if $search.promotion_id == $promotion.promotion_id}selected="selected"{/if}>{$promotion.name}</option>
+        {/foreach}
+    </select>
+    </div>
+</div>
