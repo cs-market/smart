@@ -158,7 +158,7 @@ function fn_product_groups_place_suborders($cart, &$suborder_cart) {
                     $products = fn_array_column($bonus['value'], 'product_id');
                     $cart_products = array_column($suborder_cart['products'], 'product_id');
                     foreach ($products as $pid) {
-                        $found = in_array($pid, $cart_products);
+                        $found = ($found || in_array($pid, $cart_products));
                     }
                 }
             }
