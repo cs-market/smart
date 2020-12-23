@@ -150,4 +150,21 @@ function fn_product_groups_place_suborders($cart, &$suborder_cart) {
     if ($products != $suborder_cart['products']) {
         unset($suborder_cart['promotions'], $suborder_cart['applied_promotions']);
     }
+    if ($suborder_cart['subtotal'] == 0) {
+        foreach ($suborder_cart['promotions'] as $promotion_id => $promo_data) {
+            $found = false;
+            foreach ($promo_data['bonuses'] as $bonus) {
+                if ($bonus['bonus'] == 'free_products') {
+                    $products = fn_array_column($bonus['value'], 'product_id');
+                    $cart_products = array_column($suborder_cart['products'], 'product_id');
+                    foreach ($products as $pid) {
+                        $found = in_array($pid, $cart_products);
+                    }
+                }
+            }
+            if (!$found) {
+                unset($suborder_cart['promotions'][$promotion_id]);
+            }
+        }
+    }
 }
