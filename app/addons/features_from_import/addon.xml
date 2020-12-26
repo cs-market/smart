@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>features_from_import</id>
+    <name>Smart distribution: Features from import</name>
+    <description></description>
+    <version>1.0.1</version>
+    <priority>4100</priority>
+    <status>active</status>
+    <default_language>en</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <compatibility>
+        <core_version>
+            <min>4.3.1</min>
+        </core_version>
+    </compatibility>
+</addon>
