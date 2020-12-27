@@ -11,6 +11,7 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
+use Tygh\Registry;
 use Tygh\Enum\Addons\OrderSplit\OrderSplitTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -19,6 +20,10 @@ function fn_get_product_groups($params) {
     $condition = '';
     if (!empty($params['status'])) {
         $condition .= db_quote(' AND status = ?s', $params['status']);
+    }
+
+    if (Registry::get('runtime.company_id')) {
+        $condition .= db_quote(" AND company_id = ?i", Registry::get('runtime.company_id'));
     }
 
     if (isset($params['group_id'])) {

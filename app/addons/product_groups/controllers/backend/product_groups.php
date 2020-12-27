@@ -45,6 +45,9 @@ if ($mode == 'manage') {
     if (isset($params['status']) && !empty($params['status'])) {
         $condition .= db_quote(" AND status = ?s", $params['status']);
     }
+    if (Registry::get('runtime.company_id')) {
+        $condition .= db_quote(" AND company_id = ?i", Registry::get('runtime.company_id'));
+    }
 
     $groups = db_get_hash_array("SELECT ?:product_groups.group_id as value, ?:product_groups.group as name FROM ?:product_groups WHERE 1 ?p AND ?:product_groups.group LIKE ?l ORDER BY ?:product_groups.group LIMIT ?i, ?i", 'value', $condition, $pattern . '%', $start, $limit);
     if (!$start) {

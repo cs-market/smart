@@ -12,11 +12,11 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 $schema['central']['products']['items']['product_groups'] = array(
-	'attrs' => array(
-		'class'=>'is-addon'
-	),
-	'href' => 'product_groups.manage',
-	'position' => 660,
+    'attrs' => array(
+        'class'=>'is-addon'
+    ),
+    'href' => 'product_groups.manage',
+    'position' => 660,
 );
 
 return $schema;
