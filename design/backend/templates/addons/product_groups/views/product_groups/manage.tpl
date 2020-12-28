@@ -30,6 +30,7 @@
                     status=$group.status
                     tool_items=$smarty.capture.tool_items
                     extra_data=$smarty.capture.extra_data
+                    company_object=$group
                 }
             {/foreach}
         </tbody>

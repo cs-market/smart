@@ -39,6 +39,13 @@
         </div>
     </div>
 
+    {include file="views/companies/components/company_field.tpl"
+        name="product_group_data[company_id]"
+        id="elm_product_group_data_`$product_group.group_id`"
+        selected=$product_group.company_id
+        zero_company_id_name_lang_var="none"
+    }
+
     {include file="common/select_status.tpl" input_name="product_group_data[status]" id="elm_product_group_status_{$id}" obj=$product_group}
 </fieldset>
 </div>
