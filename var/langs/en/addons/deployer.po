@@ -1,0 +1,46 @@
+msgid ""
+msgstr "Project-Id-Version: tygh"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+
+msgctxt "Addons::name::deployer"
+msgid "Deployer"
+msgstr "Deployer"
+
+msgctxt "Addons::description::deployer"
+msgid "Helps to configure deployment from your store's git repository© <a href=\"http://cs-market.com\" target=\"_blank\">CS-Market</a>"
+msgstr "Helps to configure deployment from your store's git repository© <a href=\"http://cs-market.com\" target=\"_blank\">CS-Market</a>"
+
+msgctxt "SettingsOptions::deployer::branch"
+msgid "Branch name"
+msgstr "Branch name"
+
+msgctxt "SettingsOptions::deployer::remote"
+msgid "Remote name"
+msgstr "Remote name"
+
+msgctxt "SettingsOptions::deployer::reset"
+msgid "Reset before pull"
+msgstr "Reset before pull"
+
+msgctxt "SettingsOptions::deployer::migrations_path"
+msgid "Migrations path"
+msgstr "Migrations path"
+
+msgctxt "SettingsOptions::deployer::git_path"
+msgid "Git path"
+msgstr "Git path"
+
+msgctxt "SettingsTooltips::deployer.migrations_path"
+msgid "Specify migrations path. It should be related to CS-Cart root folder"
+msgstr "Specify migrations path. It should be related to CS-Cart root folder"
+
+msgctxt "SettingsTooltips::deployer.migrations_path"
+msgid "Fill this input if your git repository location does not equals CS-Cart root folder"
+msgstr "Fill this input if your git repository location does not equals CS-Cart root folder"
+
+msgctxt "Languages::deployer.webhook_info"
+msgid "You need to use the following URL during webhook configuration:</br><pre><code><b>[url]</b></code></pre>"
+msgstr "You need to use the following URL during webhook configuration:</br><pre><code><b>[url]</b></code></pre>"
+
