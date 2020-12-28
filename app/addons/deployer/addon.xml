@@ -10,4 +10,32 @@
     <default_language>en</default_language>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="branch">
+                        <type>input</type>
+                        <name>Branch name</name>
+                        <default_value>master</default_value>
+                    </item>
+                    <item id="remote">
+                        <type>input</type>
+                        <name>Remote name</name>
+                        <default_value>origin</default_value>
+                    </item>
+                    <item id="reset">
+                        <type>checkbox</type>
+                        <name>Reset before pull</name>
+                        <default_value>Y</default_value>
+                    </item>
+                    <item id="migrations_path">
+                        <type>input</type>
+                        <name>Migrations path</name>
+                        <default_value>var/migrations/</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
 </addon>
