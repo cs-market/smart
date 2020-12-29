@@ -2,7 +2,7 @@
 
 use Tygh\Registry;
 
-if ( !defined('AREA') ) { die('Access denied'); }
+if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 require_once(Registry::get('config.dir.functions') . 'fn.sales_reports.php');
 

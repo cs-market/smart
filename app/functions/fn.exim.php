@@ -1910,6 +1910,7 @@ function fn_exim_set_company($object_type, $object_key, $object_id, $company_nam
         return false;
     }
 
+    $company_name = trim($company_name);
     if (Registry::get('runtime.company_id')) {
         $company_id = Registry::get('runtime.company_id');
     } else {
