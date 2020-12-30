@@ -17,17 +17,14 @@
                 <items>
                     <item id="branch">
                         <type>input</type>
-                        <name>Branch name</name>
                         <default_value>production</default_value>
                     </item>
                     <item id="remote">
                         <type>input</type>
-                        <name>Remote name</name>
                         <default_value>origin</default_value>
                     </item>
                     <item id="reset">
                         <type>checkbox</type>
-                        <name>Reset before pull</name>
                         <default_value>Y</default_value>
                     </item>
                     <item id="migrations_path">
