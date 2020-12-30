@@ -1,9 +1,21 @@
 <?php
+/** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*      Copyright (c) 2013 CS-Market Ltd. All rights reserved.             *
+*                                                                         *
+*  This is commercial software, only users who have purchased a valid     *
+*  license and accept to the terms of the License Agreement can install   *
+*  and use this program.                                                  *
+*                                                                         *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*  PLEASE READ THE FULL TEXT OF THE SOFTWARE LICENSE AGREEMENT IN THE     *
+*  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\UpgradeCenter\Migrations\Migration;
 use Tygh\Tools\SecurityHelper;
+use Tygh\Validators;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -32,6 +44,7 @@ function fn_deploy($webhook) {
             }
             if (!empty(trim($addon['migrations_path']))) {
                 $old_migrations = fn_get_dir_contents($addon['migrations_path'], false, true, 'php');
+                $old_sql_files = fn_get_dir_contents($addon['migrations_path'], false, true, array('.sql', '.tgz', '.zip'));
             }
 
             chdir($addon['git_path']);
@@ -39,6 +52,7 @@ function fn_deploy($webhook) {
             chdir($current_dir);
             fn_write_deploy_log('result: ' . reset($output));
 
+            // apply phinx migrations
             if (!empty(trim($addon['migrations_path']))) {
                 $current_migrations = fn_get_dir_contents($addon['migrations_path'], false, true, 'php');
                 $new_migrations = array_diff($current_migrations, $old_migrations);
@@ -65,6 +79,27 @@ function fn_deploy($webhook) {
                         }
                     fn_rm($addon['migrations_path'] . 'run/', true);
                     }
+                }
+            }
+
+            //apply zip and sql backups
+            fn_mkdir($addon['migrations_path'] . 'run/');
+            $sql_files = fn_get_dir_contents($addon['migrations_path'], false, true, array('.sql', '.tgz', '.zip'));
+            $new_sql_files = array_diff($sql_files, $old_sql_files);
+            foreach ($new_sql_files as $file) {
+                $ext = fn_get_file_ext($addon['migrations_path'] . $file);
+
+                if ($ext == 'tgz' && !$validators->isPharDataAvailable()) {
+                    continue;
+                }
+                if ($ext == 'zip' && !$validators->isZipArchiveAvailable()) {
+                    continue;
+                }
+                $restore_result = DataKeeper::restore($file);
+                if ($restore_result === true) {
+                    fn_write_deploy_log(__('done') . ': ' . $file);
+                } else {
+                    fn_write_deploy_log(__('error_occured') . ': ' . $file);
                 }
             }
 
