@@ -25,22 +25,21 @@ msgid "Reset before pull"
 msgstr "Reset before pull"
 
 msgctxt "SettingsOptions::deployer::migrations_path"
-msgid "Migrations path"
-msgstr "Migrations path"
+msgid "Migrations location"
+msgstr "Migrations location"
+
+msgctxt "SettingsTooltips::deployer::migrations_path"
+msgid "Specify migrations path. It should be related to CS-Cart root folder"
+msgstr "Specify migrations path. It should be related to CS-Cart root folder"
 
 msgctxt "SettingsOptions::deployer::git_path"
 msgid "Git path"
 msgstr "Git path"
 
-msgctxt "SettingsTooltips::deployer.migrations_path"
-msgid "Specify migrations path. It should be related to CS-Cart root folder"
-msgstr "Specify migrations path. It should be related to CS-Cart root folder"
-
-msgctxt "SettingsTooltips::deployer.migrations_path"
-msgid "Fill this input if your git repository location does not equals CS-Cart root folder"
-msgstr "Fill this input if your git repository location does not equals CS-Cart root folder"
+msgctxt "SettingsTooltips::deployer::git_path"
+msgid "Specify git project path. It should be absolute path"
+msgstr "Specify git project path. It should be absolute path"
 
 msgctxt "Languages::deployer.webhook_info"
 msgid "You need to use the following URL during webhook configuration:</br><pre><code><b>[url]</b></code></pre>"
 msgstr "You need to use the following URL during webhook configuration:</br><pre><code><b>[url]</b></code></pre>"
-
