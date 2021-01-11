@@ -12,7 +12,6 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-
 namespace Tygh\Api\Entities\v40;
 
 use Tygh\Api\Entities\Products;
@@ -25,13 +24,14 @@ use Tygh\Api\Entities\Products;
 class SraProducts extends Products
 {
     protected $icon_size_small = [500, 500];
+
     protected $icon_size_big = [1000, 1000];
 
-
     /** @inheritdoc */
-    public function index($id = 0, $params = array())
+    public function index($id = 0, $params = [])
     {
         $result = parent::index($id, $params);
+        $lang_code = $this->getLanguageCode($params);
 
         $is_discussion_enabled = SraDiscussion::isAddonEnabled();
 
@@ -43,20 +43,34 @@ class SraProducts extends Products
         $products = [];
         if ($id && !empty($result['data'])) {
             $products = [$result['data']['product_id'] => $result['data']];
-
-            fn_gather_additional_products_data($products, [
-                'get_options'         => true,
-                'get_features'        => true,
-                'get_detailed'        => true,
-                'get_icon'            => true,
-                'get_additional'      => true,
-                'features_display_on' => 'A',
-            ]);
         } elseif (!empty($result['data']['products'])) {
             $products = $result['data']['products'];
         }
 
         foreach ($products as &$product) {
+            $amount = $this->getRequestedProductAmount($params, $product['product_id']);
+            if ($amount > 1) {
+                $product['price'] = fn_get_product_price($product['product_id'], $amount, $this->auth);
+            }
+        }
+        unset($product);
+
+        fn_gather_additional_products_data($products, [
+            'get_options'         => true,
+            'get_features'        => true,
+            'get_detailed'        => true,
+            'get_icon'            => true,
+            'get_additional'      => true,
+            'get_discounts'       => true,
+            'features_display_on' => 'A',
+        ]);
+
+        foreach ($products as &$product) {
+            $amount = $this->getRequestedProductAmount($params, $product['product_id']);
+            if ($amount > 1) {
+                $product = $this->calculateQuantityPrice($product, $amount);
+            }
+
             $product = fn_storefront_rest_api_format_product_prices($product);
 
             if ($is_discussion_enabled) {
@@ -71,8 +85,89 @@ class SraProducts extends Products
             $result['data'] = reset($products);
         } else {
             $result['data']['products'] = $products;
+            if ($this->safeGet($params, 'get_filters', false)) {
+                $filter_params = $params;
+                if (!empty($result['data']['params']['cid'])) {
+                    $filter_params['category_id'] = $result['data']['params']['cid'];
+                }
+                $result['data']['filters'] = $this->getFilters($filter_params, $lang_code);
+            }
+
         }
 
         return $result;
+    }
+
+    /**
+     * Gets requested amount of a product.
+     *
+     * @param array $params     Request parameters
+     * @param int   $product_id Product ID
+     *
+     * @return int
+     */
+    protected function getRequestedProductAmount($params, $product_id)
+    {
+        $amount = 1;
+        if (isset($params['amount'][$product_id])) {
+            $amount = (int) $params['amount'][$product_id];
+        } elseif (isset($params['amount'])) {
+            $amount = (int) $params['amount'];
+        }
+
+        return $amount;
+    }
+
+    /**
+     * Calculates cost of the specified amount of products with both promotions and quantity discounts applied.
+     *
+     * FIXME: Must be implemented in fn_gather_additional_products_data
+     *
+     * @param array $product Product data
+     * @param int   $amount  Product amount
+     *
+     * @return array
+     */
+    protected function calculateQuantityPrice($product, $amount)
+    {
+        if (isset($product['discount']) && isset($product['base_price'])) {
+            $product['price'] = $product['base_price'] - $product['discount'];
+        }
+        foreach (['price', 'list_price', 'base_price'] as $price) {
+            if (isset($product[$price])) {
+                $product[$price] *= $amount;
+            }
+        }
+
+        return $product;
+    }
+
+    protected function getFilters(array $params, $lang_code)
+    {
+        list($filters) = fn_product_filters_get_filters_products_count($params, $lang_code);
+        foreach ($filters as $id => &$filter) {
+            $filter['filter_style'] = fn_storefront_rest_api_get_filter_style($filter);
+
+            if (!$this->isFilterSupported($filter)) {
+                unset($filters[$id]);
+            }
+
+            if (empty($filter['variants'])) {
+                continue;
+            }
+
+            $filter['variants'] = array_values($filter['variants']);
+            if (isset($filter['selected_variants'])) {
+                $filter['selected_variants'] = array_values($filter['selected_variants']);
+            }
+        }
+        unset($filter);
+
+        return array_values($filters);
+    }
+
+    protected function isFilterSupported($filter)
+    {
+        return !empty($filter['filter_style']);
     }
 }
