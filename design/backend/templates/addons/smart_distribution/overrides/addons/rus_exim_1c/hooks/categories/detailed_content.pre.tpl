@@ -16,4 +16,11 @@
         <textarea name="category_data[alternative_names]" id="elm_category_alternative_names" cols="55" rows="4" class="input-large">{$category_data.alternative_names}</textarea>
         </div>
     </div>
+    
+    {include file="views/companies/components/company_field.tpl"
+        name="category_data[company_id]"
+        id="category_data_company_id"
+        selected=$category_data.company_id
+        zero_company_id_name_lang_var="none"
+    }
 </div>
