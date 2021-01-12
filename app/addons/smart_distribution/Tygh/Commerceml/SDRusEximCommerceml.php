@@ -42,7 +42,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
                 $category_id = 0;
                 if (!empty($category_ids)) {
-                    $category_id = $this->db->getField("SELECT category_id FROM ?:categories WHERE category_id IN (?a) AND company_id = ?i", $category_ids, $this->company_id);
+                    //$category_id = $this->db->getField("SELECT category_id FROM ?:categories WHERE category_id IN (?a) AND company_id = ?i", $category_ids, $this->company_id);
+                    $category_id = reset($category_ids);
                 }
 
                 if (empty($category_id)) {
@@ -54,7 +55,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 if ($import_params['user_data']['user_type'] != 'V' && !Registry::get('runtime.company_id')) {
                     $category_id = fn_update_category($category_data, $category_id, $import_params['lang_code']);
                     $this->addMessageLog("Add category: " . $category_data['category']);
-                } else {
+                } elseif (empty($category_id)) {
                     $category_id = $default_category;
                     // [csmarket] get extra categories
                     $id = $this->db->getField("SELECT category_id FROM ?:category_descriptions WHERE lang_code = ?s AND (category = ?s OR alternative_names LIKE ?l) ", $import_params['lang_code'], strval($_group -> {$cml['name']}), '%'.strval($_group -> {$cml['name']}).'%' );
