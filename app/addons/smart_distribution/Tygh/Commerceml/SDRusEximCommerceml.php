@@ -468,6 +468,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
 		$order_xml[$cml['currency']] = 'руб';
 		//unset($order_xml[$cml['currency']]);
         }
+        if ($this->company_id == 1829) { 
+        $order_xml[$cml['currency']] = 'руб';
+        //unset($order_xml[$cml['currency']]);
+        }
 
         if (empty($order_data['firstname'])) {
             unset($order_data['firstname']);
