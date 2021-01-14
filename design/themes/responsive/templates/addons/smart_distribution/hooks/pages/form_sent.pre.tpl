@@ -1,0 +1,1 @@
+{include file="buttons/button.tpl" but_text=__('previous') but_meta='ty-btn__primary' but_onclick="window.history.back();"}
