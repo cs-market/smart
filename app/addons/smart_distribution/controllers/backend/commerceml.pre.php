@@ -1119,6 +1119,12 @@ fn_print_r($fantoms);
 	$product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 1810);
 	foreach ($product_ids as $pid) { fn_delete_image_pairs($pid, 'product'); }
 	fn_print_die('Fin');
+} elseif ($mode == 'remove_univita_products') {
+    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE updated_timestamp = 0 AND company_id = 1787');
+    foreach ($product_ids as $product_id) {
+        fn_delete_product($product_id);
+    }
+    fn_print_die(count($product_ids));
 }
 
 function fn_between($val, $pattern)
