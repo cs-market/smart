@@ -144,7 +144,7 @@ class SraProducts extends Products
 
     protected function getFilters(array $params, $lang_code)
     {
-        list($filters) = fn_product_filters_get_filters_products_count($params, $lang_code);
+        list($filters) = fn_get_filters_products_count($params, $lang_code);
         foreach ($filters as $id => &$filter) {
             $filter['filter_style'] = fn_storefront_rest_api_get_filter_style($filter);
 
