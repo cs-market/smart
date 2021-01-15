@@ -1125,6 +1125,12 @@ fn_print_r($fantoms);
         fn_delete_product($product_id);
     }
     fn_print_die(count($product_ids));
+} elseif ($mode == 'remove_univita_images') {
+    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = 1787');
+    foreach ($product_ids as $product_id) {
+        fn_delete_image_pairs($product_id, 'product');
+    }
+    fn_print_die(count($product_ids));
 }
 
 function fn_between($val, $pattern)
