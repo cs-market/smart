@@ -554,7 +554,7 @@ function fn_smart_distribution_add_to_cart(&$cart, $product_id, $_id) {
 function fn_smart_distribution_get_profile_fields($location, $select, &$condition) {
     if (AREA == 'C' && in_array(Registry::get('runtime.controller'), array('checkout', 'profiles'))) {
         $stop_fields = array(
-            's_address',
+            //'s_address',
             's_lastname'
         );
         if ($_SESSION['auth']['company_id'] != '12') {
