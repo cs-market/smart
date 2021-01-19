@@ -1138,7 +1138,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
 
-            if(isset($product['discount'])) {
+            if(isset($product['discount']) && !empty($product['discount'])) {
                 $data_product[$cml['discounts']][][$cml['discount']] = array(
                     $cml['name'] => $cml['product_discount'],
                     $cml['total'] => $product['discount'],
@@ -1173,6 +1173,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $cml['value'] => $cml['product']
             );
             // [cs-market] send price only to limited products
+            // todo remove after konix change on their side
             if ($send_price_1c[$product['product_id']] != 'Y') {
                 unset($data_product[$cml['price_per_item']], $data_product[$cml['total']]);
             }
@@ -1302,9 +1303,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         $this->addMessageLog("Feature is added: " . $feature_name);
 
                         // [csmarket] mve compatibility changes!!
-                        if ($new_feature && !fn_allowed_for('MULTIVENDOR')) {
-                            $this->db->query("INSERT INTO ?:ult_objects_sharing VALUES ($company_id, $feature_id, 'product_features')");
-                        }
+                        // if ($new_feature && !fn_allowed_for('MULTIVENDOR')) {
+                        //     $this->db->query("INSERT INTO ?:ult_objects_sharing VALUES ($company_id, $feature_id, 'product_features')");
+                        // }
                     } else {
                         fn_delete_feature($feature_id);
                         $feature_id = 0;
