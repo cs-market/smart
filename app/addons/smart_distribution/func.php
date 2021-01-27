@@ -1090,3 +1090,20 @@ function fn_delete_notification_by_message($message) {
         }
     }
 }
+
+function fn_smart_distribution_update_product_feature_pre(&$feature_data, $feature_id, $deleted_variants, $lang_code) {
+    if (!intval($feature_id)) $feature_data['action'] = 'create';
+}
+
+function fn_smart_distribution_update_product_feature_post($feature_data, $feature_id, $deleted_variants, $lang_code) {
+    if (isset($feature_data['action']) && $feature_data['action'] == 'create') {
+        $filter_data = array(
+            'display' => 'Y',
+            'display_count' => 10,
+            'round_to' => '0.01',
+            'filter_type' => 'FF-'.$feature_id,
+            'filter' => fn_get_feature_name($feature_id)
+        );
+        fn_update_product_filter($filter_data, 0);
+    }
+}

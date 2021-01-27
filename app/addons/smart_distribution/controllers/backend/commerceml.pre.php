@@ -1131,6 +1131,91 @@ fn_print_r($fantoms);
         fn_delete_image_pairs($product_id, 'product');
     }
     fn_print_die(count($product_ids));
+} elseif ($mode == 'features_maintenance') {
+    //delete fantom products
+    $pids = db_get_fields('SELECT product_id FROM ?:products');
+    $iteration = 0;
+    foreach ($pids as $product_id) {
+        $iteration ++;
+        $data = fn_get_product_data($product_id);
+        if (empty(fn_get_product_data($product_id))) {
+            fn_delete_product($product_id);
+            fn_print_r($iteration, $product_id);
+        }
+    }
+
+    $condition = '';
+    if (!empty($action)) {
+        $condition = db_quote(' WHERE company_id = ?i', $action);
+    }
+    $all_features = db_get_hash_multi_array("SELECT * from ?:product_features LEFT JOIN ?:product_features_descriptions ON ?:product_features.feature_id = ?:product_features_descriptions.feature_id AND lang_code = ?s $condition", ['company_id', 'feature_id'], 'ru');
+    foreach ($all_features as $company_id => $features) {
+        foreach ($features as $feature_id => &$feature) {
+            if ($feature['feature_type'] == 'G') {
+                fn_delete_feature($feature_id);
+                unset($features[$feature_id]);
+            }
+            if ($feature['description'] == 'Бренд*') {
+                $feature['description'] = 'Бренд';
+            }
+        }
+        $feature_groups = fn_array_group($features, 'description');
+        foreach ($feature_groups as $group) {
+            if (count($group) > 1) {
+                unset($target_feature);
+                foreach ($group as $feature) {
+                    if (strlen($feature['external_id']) > 20) {
+                        $target_feature = $feature['feature_id'];
+                    }
+                }
+                if (!$target_feature) {
+                    $target_feature = reset($group)['feature_id'];
+                }
+                $group = fn_array_value_to_key($group, 'feature_id');
+                unset($group[$target_feature]);
+                fn_merge_product_features($target_feature, $group);
+            }
+        }
+    }
+} elseif ($mode == 'create_filters') {
+    $filters = db_get_fields('SELECT feature_id FROM ?:product_filters');
+    $features = db_get_fields('SELECT feature_id FROM ?:product_features WHERE feature_id NOT IN (?a)', $filters);
+    $filter_data = array(
+        'display' => 'Y',
+        'display_count' => 10,
+        'round_to' => '0.01'
+    );
+    foreach ($features as $featire_id) {
+        $filter_data['filter_type'] = 'FF-'.$featire_id;
+        $filter_data['filter'] = fn_get_feature_name($featire_id);
+        fn_update_product_filter($filter_data, 0);
+    }
+    fn_print_die(count($features));
+}
+
+function fn_merge_product_features($target_feature, $group) {
+    $target_feature_data = fn_get_product_feature_data($target_feature, true, true);
+    $target_variants = array();
+    foreach ($target_feature_data['variants'] as $variant) {
+        $name = trim(mb_strtolower($variant['variant']));
+        $target_variants[$name] = $variant;
+    }
+    foreach ($group as $feature_id => $feature) {
+        $data = fn_get_product_feature_data($feature_id, true, true);
+        foreach ($data['variants'] as $variant_id => $variant) {
+            if (array_key_exists(trim(mb_strtolower($variant['variant'])), $target_variants)) {
+                $target_variant = $target_variants[trim(mb_strtolower($variant['variant']))];
+                $u = array('feature_id' => $target_variant['feature_id'], 'variant_id' => $target_variant['variant_id']);
+                if (!(db_get_field('SELECT variant_id FROM ?:product_features_values WHERE ?w', $u)))
+                    db_query("UPDATE ?:product_features_values SET ?u WHERE variant_id = ?i", $u, $variant['variant_id']);
+            } else {
+                db_query("UPDATE ?:product_features_values SET feature_id = ?i WHERE variant_id = ?i", $feature_id, $variant['variant_id']);
+                db_query("UPDATE ?:product_feature_variants SET feature_id = ?i WHERE variant_id = ?i", $feature_id, $variant['variant_id']);
+            }
+        }
+
+        fn_delete_feature($feature_id);
+    }
 }
 
 function fn_between($val, $pattern)

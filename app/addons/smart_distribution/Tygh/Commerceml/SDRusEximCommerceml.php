@@ -1339,9 +1339,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $_feature_id = fn_update_product_feature($feature_data, $feature_id);
             $this->addMessageLog("Feature brand is added");
 
-            if ($feature_id == 0) {
-                $this->db->query("INSERT INTO ?:ult_objects_sharing VALUES ($company_id, $_feature_id, 'product_features')");
-            }
+            // if ($feature_id == 0) {
+            //     $this->db->query("INSERT INTO ?:ult_objects_sharing VALUES ($company_id, $_feature_id, 'product_features')");
+            // }
 
             $features_import['brand1c']['id'] = (!empty($feature_id)) ? $feature_id : $_feature_id;
             $features_import['brand1c']['name'] = $cml['brand'];
