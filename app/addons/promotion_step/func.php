@@ -19,7 +19,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_promotion_step_check_amount_in_stock_before_check($product_id, $amount, $product_options, $cart_id, $is_edp, $original_amount, $cart, $update_id, &$product, $current_amount){
     foreach ($cart['products'] as $key => $products) {
-        if($products['product'] == $product['product'] && $products['extra']['bonus'] == 'apply_bonus'){
+        if(isset($products['extra']['bonus']) && $products['product'] == $product['product'] && $products['extra']['bonus'] == 'apply_bonus'){
             $product['min_qty'] = $product['extra']['amount_bonus'];
 
         }
@@ -30,7 +30,7 @@ function fn_promotion_step_calculate_cart_post($cart, $auth, $calculate_shipping
 
     foreach ($cart['products'] as $key => &$products) {
 
-        if($products['extra']['bonus'] == 'apply_bonus'&&$products['amount']!=$products['extra']['amount_bonus']*$products['extra']['amount_step']){
+        if(isset($products['extra']['bonus']) && $products['extra']['bonus'] == 'apply_bonus'&&$products['amount']!=$products['extra']['amount_bonus']*$products['extra']['amount_step']){
             $condition_amount = $products['extra']['amount_bonus']*$products['extra']['amount_step'];
             $cart_products[$key]['amount'] = $condition_amount;
             $products['amount'] = $condition_amount;
@@ -43,42 +43,42 @@ function fn_promotion_step_calculate_cart_post($cart, $auth, $calculate_shipping
 function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_products, $type = 'S')
 { 
     $promotion =  fn_get_promotion_data($promotion_id);
-	$amount = 0;
-	foreach ($promotion['conditions']['conditions'] as $key => $conditions) {
-		if($conditions['condition'] == 'products'){
-			foreach ($conditions['value'] as $key => $value) {
-				foreach ($cart_products as $k => $v) {
-					if ($type == 'S') {
-	            		if (fn_exclude_from_shipping_calculate($cart['products'][$k])) {
-	                		continue;
-	           			}
-	        		}elseif ($type == 'C') {
-	            		if (isset($v['exclude_from_calculate'])) {
-	                		continue;
-	            		}
-	        		}
-	        		if($value['product_id'] == $v['product_id']){
-	        			$amount += $v['amount'];
-	        		}		
-				}
-			}
-		}else{
-				foreach ($cart_products as $k => $v) {
-					if ($type == 'S') {
-			    		if (fn_exclude_from_shipping_calculate($cart['products'][$k])) {
-			        		continue;
-			    		}
-					} elseif ($type == 'C') {
-			    		if (isset($v['exclude_from_calculate'])) {
-			        		continue;
-			    		}
-					}
-					if(in_array($promotion['condition_categories'], $v['category_ids'])){
-						$amount += $v['amount'];
-					}
-				}
-		}
-	}
+    $amount = 0;
+    foreach ($promotion['conditions']['conditions'] as $key => $conditions) {
+        if($conditions['condition'] == 'products'){
+            foreach ($conditions['value'] as $key => $value) {
+                foreach ($cart_products as $k => $v) {
+                    if ($type == 'S') {
+                        if (fn_exclude_from_shipping_calculate($cart['products'][$k])) {
+                            continue;
+                        }
+                    }elseif ($type == 'C') {
+                        if (isset($v['exclude_from_calculate'])) {
+                            continue;
+                        }
+                    }
+                    if($value['product_id'] == $v['product_id']){
+                        $amount += $v['amount'];
+                    }       
+                }
+            }
+        }else{
+                foreach ($cart_products as $k => $v) {
+                    if ($type == 'S') {
+                        if (fn_exclude_from_shipping_calculate($cart['products'][$k])) {
+                            continue;
+                        }
+                    } elseif ($type == 'C') {
+                        if (isset($v['exclude_from_calculate'])) {
+                            continue;
+                        }
+                    }
+                    if(in_array($promotion['condition_categories'], $v['category_ids'])){
+                        $amount += $v['amount'];
+                    }
+                }
+        }
+    }
     return $amount;
 }
 

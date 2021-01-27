@@ -80,7 +80,7 @@ function fn_product_groups_gather_additional_products_data_params($product_ids, 
     if ($group_ids) {
         $groups = fn_get_product_groups(array('group_ids' => $group_ids));
         foreach ($products as &$product) {
-            $product['group'] = $groups[$product['group_id']];
+            if ($product['group_id']) $product['group'] = $groups[$product['group_id']];
         }
     }
 }
@@ -89,20 +89,23 @@ function fn_product_groups_pre_update_order(&$cart, $order_id = 0) {
     $proto = $cart['product_groups'][0];
     unset($proto['products']);
     foreach ($cart['products'] as $cart_id => $product) {
-        if (!isset($groups[$product['group_id']])) {
-            $groups[$product['group_id']] = $proto;
-            $groups[$product['group_id']]['group_id'] = $product['group_id'];
-            $groups[$product['group_id']]['group'] = fn_get_product_groups(array('group_id' => $product['group_id']));
-            $groups[$product['group_id']]['group'] = reset($groups[$product['group_id']]['group']);
-            $groups[$product['group_id']]['subtotal'] = 0;
+        $group_id = $product['group_id'];
+        if (!isset($groups[$group_id])) {
+            $groups[$group_id] = $proto;
+            $groups[$group_id]['group_id'] = $group_id;
+            if ($group_id) {
+                $groups[$group_id]['group'] = fn_get_product_groups(array('group_id' => $group_id));
+                $groups[$group_id]['group'] = reset($groups[$group_id]['group']);
+                $groups[$group_id]['name'] = $groups[$group_id]['group']['group'];
+            }
+            $groups[$group_id]['subtotal'] = 0;
         }
-        $groups[$product['group_id']]['products'][$cart_id] = $product;
-        $groups[$product['group_id']]['name'] = $groups[$product['group_id']]['group']['group'];
-        $groups[$product['group_id']]['subtotal'] += $product['price'] * $product['amount'];
+        $groups[$group_id]['products'][$cart_id] = $product;
+        $groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
     }
     $cart['product_groups'] = array_values($groups);
     if (count($cart['product_groups']) == 1) {
-        $cart['group_id'] = reset($groups)['group']['group_id'] ? : 0;
+        $cart['group_id'] = isset(reset($groups)['group']['group_id']) ? : 0;
     }
 }
 

@@ -716,7 +716,7 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
                 $product_data['usergroup_ids'] = $company->usergroup_ids;
             }
 
-            if ($product_data['usergroup_ids']) {
+            if (isset($product_data['usergroup_ids'])) {
                 $allowed_ug = array_merge($company->usergroup_ids, [0,1,2]);
                 $product_data['usergroup_ids'] = array_intersect($product_data['usergroup_ids'], $allowed_ug);
             }
