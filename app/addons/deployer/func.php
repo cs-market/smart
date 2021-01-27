@@ -103,7 +103,7 @@ function fn_deploy($webhook) {
                 }
             }
 
-            fn_clear_cache();
+            //fn_clear_cache();
             fn_clear_template_cache();
         }
     }

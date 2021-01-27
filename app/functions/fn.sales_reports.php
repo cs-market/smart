@@ -1317,7 +1317,7 @@ function fn_get_order_totals($table)
 {
     $table_condition = fn_get_table_condition($table['table_id'], true);
     // [cs-market]
-    fn_set_hook('sales_reports_table_condition', $table_condition, $k, $v);
+    fn_set_hook('sales_reports_table_condition', $table_condition, $k, $v, $table);
     $order_ids = fn_proceed_table_conditions($table_condition, '?:orders');
 
     $last_elm = end($table['intervals']);

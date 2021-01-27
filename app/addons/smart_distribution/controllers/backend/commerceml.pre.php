@@ -1137,8 +1137,8 @@ fn_print_r($fantoms);
     $iteration = 0;
     foreach ($pids as $product_id) {
         $iteration ++;
-        $data = fn_get_product_data($product_id);
-        if (empty(fn_get_product_data($product_id))) {
+        $data = fn_get_product_data($product_id, $auth);
+        if (empty($data)) {
             fn_delete_product($product_id);
             fn_print_r($iteration, $product_id);
         }
