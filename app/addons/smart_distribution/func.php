@@ -1091,7 +1091,7 @@ function fn_delete_notification_by_message($message) {
     }
 }
 
-function fn_smart_distribution_update_product_feature_pre(&$feature_data, $feature_id, $deleted_variants, $lang_code) {
+function fn_smart_distribution_update_product_feature_pre(&$feature_data, $feature_id, $lang_code) {
     if (!intval($feature_id)) $feature_data['action'] = 'create';
 }
 
