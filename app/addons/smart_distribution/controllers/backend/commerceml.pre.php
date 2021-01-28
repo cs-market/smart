@@ -1158,6 +1158,7 @@ fn_print_r($fantoms);
             if ($feature['description'] == 'Бренд*') {
                 $feature['description'] = 'Бренд';
             }
+            $feature['description'] = trim(mb_strtolower($feature['description']));
         }
         $feature_groups = fn_array_group($features, 'description');
         foreach ($feature_groups as $group) {
@@ -1177,6 +1178,38 @@ fn_print_r($fantoms);
             }
         }
     }
+} elseif ($mode == 'merge_variants') {
+    $all_features = db_get_fields("SELECT feature_id FROM ?:product_features;");
+    $merge = $tmp = array();
+
+    foreach ($all_features as $feature_id) {
+        $feature = fn_get_product_feature_data($feature_id, true, true);
+        if (isset($feature['variants']) && count($feature['variants']) > 1) {
+            foreach ($feature['variants'] as $variant_id => $variant) {
+                $variant_name = trim(mb_strtolower($variant['variant']));
+                if (array_key_exists($variant_name, $tmp[$feature_id])) {
+                    // merge
+                    if (strlen($variant['external_id']) > 20) {
+                        $merge[$feature_id][$variant['variant_id']][] = $tmp[$feature_id][$variant_name]['variant_id'];
+
+                        fn_print_die(123);
+                    } else {
+                        $merge[$feature_id][$tmp[$feature_id][$variant_name]['variant_id']][] = $variant['variant_id'];
+                    }
+                } else {
+                    $tmp[$feature_id][$variant_name] = $variant;
+                }
+            }
+        }
+    }
+
+    foreach ($merge as $feature_id => $data) {
+        foreach ($data as $source_variant_id => $merge_variants) {
+            db_query("UPDATE ?:product_features_values SET variant_id = ?i WHERE variant_id IN (?a)", $source_variant_id, $merge_variants);
+            fn_delete_product_feature_variants(0, $merge_variants);
+        }
+    }
+    fn_print_die($merge);
 } elseif ($mode == 'create_filters') {
     $filters = db_get_fields('SELECT feature_id FROM ?:product_filters');
     $features = db_get_fields('SELECT feature_id FROM ?:product_features WHERE feature_id NOT IN (?a)', $filters);
