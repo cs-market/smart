@@ -1223,7 +1223,55 @@ fn_print_r($fantoms);
         $filter_data['filter'] = fn_get_feature_name($featire_id);
         fn_update_product_filter($filter_data, 0);
     }
-    fn_print_die(count($features));
+} elseif ($mode == 'cleanup_images') {
+    //$product_ids = db_get_fields('SELECT product_id FROM ?:products');
+    // $pair_ids = db_get_fields("SELECT pair_id FROM ?:images_links WHERE object_id NOT IN (?a) AND object_type = ?s", $product_ids, 'product');
+    // foreach ($pair_ids as $pair_id) {
+    //     fn_delete_image_pair($pair_id, 'product');
+    // }
+    // всего чистит 500 мегабайт из 8.2 гига
+    $product_ids = db_get_fields('SELECT product_id FROM ?:products');
+    
+    foreach ($product_ids as $product_id) {
+        $images[] = array(fn_get_image_pairs($product_id, 'product', 'M'));
+        $images[] = fn_get_image_pairs($product_id, 'product', 'A');
+    }
+    $images = array_filter($images);
+    $db_files = array();
+    foreach ($images as $img) {
+        foreach ($img as $i) {
+            $db_images[$i['pair_id']] = str_replace('detailed/', '', $i['detailed']['relative_path']);
+        }
+    }
+
+    $category_ids = db_get_fields('SELECT category_id FROM ?:categories');
+    foreach ($category_ids as $category_id) {
+        $i = fn_get_image_pairs($category_id, 'category', 'M', true, true, $lang_code);
+        $db_images[$i['pair_id']] = str_replace('detailed/', '', $i['detailed']['relative_path']);
+    }
+
+    ksort($db_images);
+    $fs_images = fn_get_dir_contents('/home/bizon/www/smart/images/detailed', false, true, '', '', true);
+    $diff = array_diff($fs_images, $db_images);
+
+    // $orig_diff = $diff;
+    // foreach ($diff as &$image_path) {
+    //     $path = explode('/', $image_path);
+    //     $image_path = array_pop($path);
+    // }
+    // $pair_ids = db_get_array('SELECT ?:images.*, ?:images_links.* FROM ?:images LEFT JOIN ?:images_links ON ?:images_links.detailed_id = ?:images.image_id WHERE image_path IN (?a)', $diff);
+    // array_filter($pair_ids);
+
+    foreach ($diff as $path) {
+        $res[] = fn_rm("images/detailed/" . $path);
+    }
+
+    fn_print_die(count($diff), $res);
+} elseif ($mode == 'vendorize_filters') {
+    $filters = db_get_array('SELECT filter_id, f.feature_id, f.company_id FROM ?:product_filters LEFT JOIN ?:product_features AS f ON f.feature_id = ?:product_filters.feature_id');
+    foreach ($filters as $filter) {
+        db_query('UPDATE ?:product_filters SET ?u WHERE filter_id = ?i', $filter, $filter['filter_id']);
+    }
 }
 
 function fn_merge_product_features($target_feature, $group) {

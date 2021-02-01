@@ -54,5 +54,6 @@ fn_register_hooks(
     'get_submitted_forms_pre',
     'mailer_send_post',
     'update_product_feature_pre',
-    'update_product_feature_post'
+    'update_product_feature_post',
+    'get_product_filters_before_select'
 );

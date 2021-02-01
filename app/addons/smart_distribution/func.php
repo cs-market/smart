@@ -1107,3 +1107,7 @@ function fn_smart_distribution_update_product_feature_post($feature_data, $featu
         fn_update_product_filter($filter_data, 0);
     }
 }
+
+function fn_smart_distribution_get_product_filters_before_select($fields, $join, &$condition, $group_by, $sorting, $limit, $params, $lang_code) {
+    $condition .= fn_get_company_condition('?:product_filters.company_id');
+}
