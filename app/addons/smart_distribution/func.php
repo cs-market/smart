@@ -722,6 +722,10 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
             }
         }
     }
+
+    if (!empty($product_data['avail_till'])) {
+        $product_data['avail_till'] = fn_parse_date($product_data['avail_till']);
+    }
 }
 
 // for update order products content by back sync from 1c
@@ -918,6 +922,10 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
         if (isset($params['product_code']) && !empty($params['product_code'])) {
             $condition .= db_quote(" AND products.product_code LIKE ?l", trim($params['product_code']));
         }
+    }
+
+    if (AREA == 'C') {
+        $condition .= db_quote(' AND IF(avail_till, avail_till >= ?i, 1)', TIME);
     }
 }
 

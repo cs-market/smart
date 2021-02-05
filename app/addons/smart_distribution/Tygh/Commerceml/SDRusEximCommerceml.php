@@ -1440,6 +1440,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 if (in_array($_name_field, array('КвантЗаказа'))) {
                     $product['qty_step'] = (float) $_v_field;
                 }
+                if ($_name_field == $cml['avail_till']) $product['avail_till'] = fn_parse_date($_v_field, true);
             }
         }
     }
