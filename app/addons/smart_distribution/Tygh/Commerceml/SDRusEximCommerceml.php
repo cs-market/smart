@@ -880,64 +880,66 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             foreach ($orders_data as $order_data) {
                 $import_id = strval($order_data->{$cml['id']});
-                $order_id = strval($order_data->{$cml['number']});
+                $order_id = db_get_field('SELECT order_id FROM ?:orders WHERE order_id = ?i', intval($order_data->{$cml['number']}));
 
                 // [cs-market] update order products
-                $order_info = fn_get_order_info($order_id);
-                foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
-                    $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
-                    $xml_products[$product_data['product_id']] = intval($xml_product->{$cml['amount']});
-                }
-                $order_products = fn_array_column($order_info['products'], 'amount', 'product_id');
-
-                if (!empty(array_diff_assoc($xml_products, $order_products) + array_diff_assoc($order_products, $xml_products))) {
-                    if (!empty($order_info['user_id'])) {
-                        $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
-                    }
-                    $customer_auth = fn_fill_auth($_data, array(), false, 'C');
-
-                    fn_form_cart($order_id, $cart, $customer_auth);
-                    fn_store_shipping_rates($order_id, $cart, $customer_auth);
-                    $cart['order_id'] = $order_id;
-                    $cart['order_status'] = $statuses[strval($data_field->{$cml['value']})]['status'];
-                    $cart['products'] = array();
-
+                if (!empty($order_id)) {
+                    $order_info = fn_get_order_info($order_id);
                     foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
                         $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
-                        
-                        $_item = array (
-                            $product_data['product_id'] => array (
-                                'amount' => strval($xml_product->{$cml['amount']}),
-                                'price' => strval($xml_product->{$cml['price_per_item']}),
-                                'stored_price' => 'Y',
-                            ),
-                        );
-                        define('ORDER_MANAGEMENT', true);
-                        fn_add_product_to_cart($_item, $cart, $customer_auth);
+                        $xml_products[$product_data['product_id']] = intval($xml_product->{$cml['amount']});
                     }
+                    $order_products = fn_array_column($order_info['products'], 'amount', 'product_id');
 
-                    foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
-                        // TODO move to settings
-                        if ($data_field->{$cml['name']} == 'Дата отгрузки по 1С' && !empty(strtotime(strval($data_field->{$cml['value']})))) {
-                            $cart['delivery_date'] = strtotime(strval($data_field->{$cml['value']}));
+                    if (!empty(array_diff_assoc($xml_products, $order_products) + array_diff_assoc($order_products, $xml_products))) {
+                        if (!empty($order_info['user_id'])) {
+                            $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
+                        }
+                        $customer_auth = fn_fill_auth($_data, array(), false, 'C');
+
+                        fn_form_cart($order_id, $cart, $customer_auth);
+                        fn_store_shipping_rates($order_id, $cart, $customer_auth);
+                        $cart['order_id'] = $order_id;
+                        $cart['order_status'] = $statuses[strval($data_field->{$cml['value']})]['status'];
+                        $cart['products'] = array();
+
+                        foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
+                            $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
+                            
+                            $_item = array (
+                                $product_data['product_id'] => array (
+                                    'amount' => strval($xml_product->{$cml['amount']}),
+                                    'price' => strval($xml_product->{$cml['price_per_item']}),
+                                    'stored_price' => 'Y',
+                                ),
+                            );
+                            define('ORDER_MANAGEMENT', true);
+                            fn_add_product_to_cart($_item, $cart, $customer_auth);
+                        }
+
+                        foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
+                            // TODO move to settings
+                            if ($data_field->{$cml['name']} == 'Дата отгрузки по 1С' && !empty(strtotime(strval($data_field->{$cml['value']})))) {
+                                $cart['delivery_date'] = strtotime(strval($data_field->{$cml['value']}));
+                            }
+                        }
+
+                        fn_calculate_cart_content($cart, $customer_auth);
+                        if (!fn_cart_is_empty($cart) && $order_info['company_id'] != 12) {
+                            fn_place_order($cart, $customer_auth, 'save');
                         }
                     }
 
-                    fn_calculate_cart_content($cart, $customer_auth);
-                    if (!fn_cart_is_empty($cart) && $order_info['company_id'] != 12) {
-                        fn_place_order($cart, $customer_auth, 'save');
+                    foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
+                        if (!empty($order_id) && ($data_field->{$cml['name']} == $cml['status_order']) && (!empty($statuses[strval($data_field->{$cml['value']})]))) {
+                            $new_status = $statuses[strval($data_field->{$cml['value']})]['status'];
+                        }
                     }
+
+                    if ($new_status) fn_change_order_status($order_id, $new_status);
+
+                    fn_set_hook('exim_1c_update_order', $order_data, $cml);
                 }
-
-                foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
-                    if (!empty($order_id) && ($data_field->{$cml['name']} == $cml['status_order']) && (!empty($statuses[strval($data_field->{$cml['value']})]))) {
-                        $new_status = $statuses[strval($data_field->{$cml['value']})]['status'];
-                    }
-                }
-
-                if ($new_status) fn_change_order_status($order_id, $new_status);
-
-                fn_set_hook('exim_1c_update_order', $order_data, $cml);
             }
         }
     }
