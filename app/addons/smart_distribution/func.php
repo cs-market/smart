@@ -738,7 +738,7 @@ function fn_smart_distribution_shippings_get_shippings_list_conditions($group, $
 
 function fn_smart_distribution_place_order($order_id, $action, $order_status, $cart, $auth) {
     $order_info = fn_get_order_info($order_id);
-    $field = ($action == 'save') ? 'notify_manager_order_update' : 'notify_manager_order_create';
+    $field = (isset($cart['order_id']) && !empty($cart['order_id'])) ? 'notify_manager_order_update' : 'notify_manager_order_create';
     if (db_get_field("SELECT $field FROM ?:companies WHERE company_id = ?i", $order_info['company_id']) == 'Y') {
         $mailer = Tygh::$app['mailer'];
         list($shipments) = fn_get_shipments_info(array('order_id' => $order_info['order_id'], 'advanced_info' => true));
