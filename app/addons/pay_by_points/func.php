@@ -391,7 +391,7 @@ function fn_check_product_pay_by_points($product)
         $point_price = round($product['price'], 2);
     } else {
         if (!isset($product['point_price']) || !$product['point_price']) {
-            $product['point_price'] = fn_get_price_in_points($product['product_id'], $auth);
+            $product['point_price'] = fn_get_price_in_points($product['product_id'], Tygh::$app['session']['auth']);
         }
         $point_price = $product['point_price'];
     }

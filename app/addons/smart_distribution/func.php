@@ -925,7 +925,7 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
     }
 
     if (AREA == 'C') {
-        $condition .= db_quote(' AND IF(avail_till, avail_till >= ?i, 1)', TIME);
+        $condition .= db_quote(' AND IF(products.avail_till, products.avail_till >= ?i, 1)', TIME);
     }
 }
 
