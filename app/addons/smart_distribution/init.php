@@ -55,5 +55,8 @@ fn_register_hooks(
     'mailer_send_post',
     'update_product_feature_pre',
     'update_product_feature_post',
-    'get_product_filters_before_select'
+    'get_product_filters_before_select',
+
+    'calculate_cart_items',
+    'promotion_apply_pre'
 );
