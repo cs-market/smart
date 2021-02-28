@@ -1119,3 +1119,28 @@ function fn_smart_distribution_update_product_feature_post($feature_data, $featu
 function fn_smart_distribution_get_product_filters_before_select($fields, $join, &$condition, $group_by, $sorting, $limit, $params, $lang_code) {
     $condition .= fn_get_company_condition('?:product_filters.company_id');
 }
+
+function fn_smart_distribution_calculate_cart_items(&$cart, $cart_products, $auth, $apply_cart_promotions) {
+    if ($apply_cart_promotions && $cart['subtotal'] >= 0 && !empty($cart['order_id'])) {
+        if (!empty($cart['stored_subtotal_discount'])) {
+            $prev_discount = $cart['subtotal_discount'];
+        }
+        $cart['applied_promotions'] = fn_promotion_apply('cart', $cart, $auth, $cart_products);
+        if (!empty($cart['stored_subtotal_discount'])) {
+            $cart['subtotal_discount'] = $prev_discount;
+        }
+    }
+}
+
+function fn_smart_distribution_promotion_apply_pre(&$promotions, $zone, $data, $auth, $cart_products) {
+    // apply only old promotions when update order
+    if ($data['order_id']) {
+        $permitted_promotions = array_keys(
+            unserialize(
+                db_get_field("SELECT promotions FROM ?:orders WHERE order_id = ?i", $data['order_id'])
+            )
+        );
+
+        $promotions[$zone] = array_intersect_key($promotions[$zone], array_flip($permitted_promotions));
+    }
+}
