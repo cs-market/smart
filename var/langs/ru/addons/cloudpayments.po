@@ -1,0 +1,125 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+
+msgctxt "Addons::name::cloudpayments"
+msgid "CloudPayments"
+msgstr "CloudPayments"
+
+msgctxt "Addons::description::cloudpayments"
+msgid "Payment widget CloudPayments"
+msgstr "Виджет оплаты CloudPayments"
+
+msgctxt "Languages::cloudpayments_order_desc_prefix"
+msgid "Order payment #"
+msgstr "Оплата заказа #"
+
+msgctxt "Languages::cloudpayments_notify_url_notice"
+msgid "Copy and paste this URL in CloudPayments account:<br/><b>Check: </b><br/>[check_url]<br/><b>Pay: </b><br/>[pay_url]<br/><b>Confirm: </b><br/>[confirm_url]<br/><b>Fail: </b><br/>[fail_url]<br/><b>Refund: </b><br/>[refund_url]<br/><b>Cancel: </b><br/>[cancel_url]<br/>"
+msgstr "Скопируйте и добавьте следующие URL уведомлений в личном кабинете CloudPayments у соответствующих уведомлений в настройках сайта:<br/><b>Check: </b><br/>[check_url]<br/><b>Pay: </b><br/>[pay_url]<br/><b>Confirm: </b><br/>[confirm_url]<br/><b>Fail: </b><br/>[fail_url]<br/><b>Refund: </b><br/>[refund_url]<br/><b>Cancel: </b><br/>[cancel_url]<br/>"
+
+msgctxt "Languages::cloudpayments_public_id"
+msgid "Public ID"
+msgstr "Идентификатор сайта"
+
+msgctxt "Languages::cloudpayments_secret_key"
+msgid "Secret key"
+msgstr "Секретный ключ"
+
+msgctxt "Languages::cloudpayments_language"
+msgid "Widget language"
+msgstr "Язык виджета"
+
+msgctxt "Languages::cloudpayments_receipt"
+msgid "Online receipt"
+msgstr "Онлайн-касса"
+
+msgctxt "Languages::cloudpayments_payment_scheme"
+msgid "Payment Schemes"
+msgstr "Схема проведения платежа"
+
+msgctxt "Languages::cloudpayments_payment_scheme_charge"
+msgid "Single message payment"
+msgstr "Одностадийная оплата"
+
+msgctxt "Languages::cloudpayments_payment_scheme_auth"
+msgid "Dual message payment"
+msgstr "Двухстадийная оплата"
+
+msgctxt "Languages::cloudpayments_skin"
+msgid "Widget design"
+msgstr "Дизайн виджета"
+
+msgctxt "Languages::cloudpayments_skin_classic"
+msgid "Classic"
+msgstr "Classic"
+
+msgctxt "Languages::cloudpayments_skin_modern"
+msgid "Modern"
+msgstr "Modern"
+
+msgctxt "Languages::cloudpayments_skin_mini"
+msgid "Mini"
+msgstr "Mini"
+
+msgctxt "Languages::cloudpayments_taxation_system"
+msgid "Taxation system"
+msgstr "Система налогообложения"
+
+msgctxt "Languages::cloudpayments_taxation_system_osn"
+msgid "General taxation system"
+msgstr "Общая система налогообложения"
+
+msgctxt "Languages::cloudpayments_taxation_system_usn_income"
+msgid "Simplified taxation system (Income)"
+msgstr "Упрощенная система налогообложения (Доход)"
+
+msgctxt "Languages::cloudpayments_taxation_system_usn_income_outcome"
+msgid "Simplified taxation system (Income minus Expenditure)"
+msgstr "Упрощенная система налогообложения (Доход минус Расход)"
+
+msgctxt "Languages::cloudpayments_taxation_system_envd"
+msgid "A single tax on imputed income"
+msgstr "Единый налог на вмененный доход"
+
+msgctxt "Languages::cloudpayments_taxation_system_esn"
+msgid "Unified agricultural tax"
+msgstr "Единый сельскохозяйственный налог"
+
+msgctxt "Languages::cloudpayments_taxation_system_patent"
+msgid "Patent system of taxation"
+msgstr "Патентная система налогообложения"
+
+msgctxt "Languages::cloudpayments_text_status_map"
+msgid "Map of order statuses"
+msgstr "Карта статусов заказа"
+
+msgctxt "Languages::cloudpayments_status.paid"
+msgid "Paid"
+msgstr "Оплачен"
+
+msgctxt "Languages::cloudpayments_status.confirm"
+msgid "Payment authorized"
+msgstr "Платеж авторизован"
+
+msgctxt "Languages::cloudpayments_status.cancel"
+msgid "Payment canceled"
+msgstr "Платеж отменен"
+
+msgctxt "Languages::cloudpayments_status.failed"
+msgid "Failed"
+msgstr "Отклонен"
+
+msgctxt "Languages::cloudpayments_status.refunded"
+msgid "Refunded"
+msgstr "Возвращен"
+
+msgctxt "Languages::cloudpayments_payment_failed"
+msgid "Payment declined"
+msgstr "Платеж отклонен"
+
+msgctxt "Languages::cloudpayments_payment_canceled"
+msgid "Payment canceled"
+msgstr "Платеж отменен"

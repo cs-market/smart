@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<addon scheme='3.0' edition_type="ROOT,ULT:VENDOR">
+    <id>cloudpayments</id>
+    <version>1.0</version>
+    <name>CloudPayments</name>
+    <description>CloudPayments payment widget</description>
+    <priority>100</priority>
+    <default_language>ru</default_language>
+    <auto_install>ULTIMATE,MULTIVENDOR</auto_install>
+    <status>active</status>
+    <compatibility>
+        <dependencies>rus_taxes</dependencies>
+    </compatibility>
+    <functions>
+        <item for="install">fn_cloudpayments_install</item>
+        <item for="uninstall">fn_cloudpayments_uninstall</item>
+    </functions>
+</addon>
