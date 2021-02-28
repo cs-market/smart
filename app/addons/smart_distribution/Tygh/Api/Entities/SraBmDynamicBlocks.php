@@ -29,7 +29,7 @@ use Tygh\BlockManager\Container;
  *
  * @package Tygh\Api\Entities
  */
-class SraBmBlocks extends ASraEntity
+class SraBmDynamicBlocks extends ASraEntity
 {
     protected $icon_size_small = [500, 500];
     protected $icon_size_big = [1000, 1000];
