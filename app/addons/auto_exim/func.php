@@ -125,7 +125,7 @@ function fn_auto_exim_find_files($cid) {
         $data = pathinfo($file);
         list($data['import_object'], $tmp) = explode('.', $data['filename']);
         if (strpos($tmp, 'preset_') !== false) {
-            $import['preset_id'] = str_replace('preset_', '', $tmp);
+            $data['preset_id'] = str_replace('preset_', '', $tmp);
         }
         $data['dirname'] = $dir;
         $data['priority'] = $priority[$data['import_object']];

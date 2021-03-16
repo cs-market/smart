@@ -1,0 +1,125 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+
+msgctxt "Addons::name::cloudpayments"
+msgid "CloudPayments"
+msgstr "CloudPayments"
+
+msgctxt "Addons::description::cloudpayments"
+msgid "Payment widget CloudPayments"
+msgstr "Payment widget CloudPayments"
+
+msgctxt "Languages::cloudpayments_order_desc_prefix"
+msgid "Order payment #"
+msgstr "Order payment #"
+
+msgctxt "Languages::cloudpayments_notify_url_notice"
+msgid "Copy and paste this URL in CloudPayments account:<br/><b>Check: </b><br/>[check_url]<br/><b>Pay: </b><br/>[pay_url]<br/><b>Confirm: </b><br/>[confirm_url]<br/><b>Fail: </b><br/>[fail_url]<br/><b>Refund: </b><br/>[refund_url]<br/><b>Cancel: </b><br/>[cancel_url]<br/>"
+msgstr "Copy and paste this URL in CloudPayments account:<br/><b>Check: </b><br/>[check_url]<br/><b>Pay: </b><br/>[pay_url]<br/><b>Confirm: </b><br/>[confirm_url]<br/><b>Fail: </b><br/>[fail_url]<br/><b>Refund: </b><br/>[refund_url]<br/><b>Cancel: </b><br/>[cancel_url]<br/>"
+
+msgctxt "Languages::cloudpayments_public_id"
+msgid "Public ID"
+msgstr "Public ID"
+
+msgctxt "Languages::cloudpayments_secret_key"
+msgid "Secret key"
+msgstr "Secret key"
+
+msgctxt "Languages::cloudpayments_language"
+msgid "Widget language"
+msgstr "Widget language"
+
+msgctxt "Languages::cloudpayments_receipt"
+msgid "Online receipt"
+msgstr "Online receipt"
+
+msgctxt "Languages::cloudpayments_payment_scheme"
+msgid "Payment Schemes"
+msgstr "Payment Schemes"
+
+msgctxt "Languages::cloudpayments_payment_scheme_charge"
+msgid "Single message payment"
+msgstr "Single message payment"
+
+msgctxt "Languages::cloudpayments_payment_scheme_auth"
+msgid "Dual message payment"
+msgstr "Dual message payment"
+
+msgctxt "Languages::cloudpayments_skin"
+msgid "Widget design"
+msgstr "Widget design"
+
+msgctxt "Languages::cloudpayments_skin_classic"
+msgid "Classic"
+msgstr "Classic"
+
+msgctxt "Languages::cloudpayments_skin_modern"
+msgid "Modern"
+msgstr "Modern"
+
+msgctxt "Languages::cloudpayments_skin_mini"
+msgid "Mini"
+msgstr "Mini"
+
+msgctxt "Languages::cloudpayments_taxation_system"
+msgid "Taxation system"
+msgstr "Taxation system"
+
+msgctxt "Languages::cloudpayments_taxation_system_osn"
+msgid "General taxation system"
+msgstr "General taxation system"
+
+msgctxt "Languages::cloudpayments_taxation_system_usn_income"
+msgid "Simplified taxation system (Income)"
+msgstr "Simplified taxation system (Income)"
+
+msgctxt "Languages::cloudpayments_taxation_system_usn_income_outcome"
+msgid "Simplified taxation system (Income minus Expenditure)"
+msgstr "Simplified taxation system (Income minus Expenditure)"
+
+msgctxt "Languages::cloudpayments_taxation_system_envd"
+msgid "A single tax on imputed income"
+msgstr "A single tax on imputed income"
+
+msgctxt "Languages::cloudpayments_taxation_system_esn"
+msgid "Unified agricultural tax"
+msgstr "Unified agricultural tax"
+
+msgctxt "Languages::cloudpayments_taxation_system_patent"
+msgid "Patent system of taxation"
+msgstr "Patent system of taxation"
+
+msgctxt "Languages::cloudpayments_text_status_map"
+msgid "Map of order statuses"
+msgstr "Map of order statuses"
+
+msgctxt "Languages::cloudpayments_status.paid"
+msgid "Paid"
+msgstr "Paid"
+
+msgctxt "Languages::cloudpayments_status.confirm"
+msgid "Payment authorized"
+msgstr "Payment authorized"
+
+msgctxt "Languages::cloudpayments_status.cancel"
+msgid "Payment canceled"
+msgstr "Payment canceled"
+
+msgctxt "Languages::cloudpayments_status.failed"
+msgid "Failed"
+msgstr "Failed"
+
+msgctxt "Languages::cloudpayments_status.refunded"
+msgid "Refunded"
+msgstr "Refunded"
+
+msgctxt "Languages::cloudpayments_payment_failed"
+msgid "Payment declined"
+msgstr "Payment declined"
+
+msgctxt "Languages::cloudpayments_payment_canceled"
+msgid "Payment canceled"
+msgstr "Payment canceled"

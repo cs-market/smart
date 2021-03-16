@@ -1447,6 +1447,44 @@ class SDRusEximCommerceml extends RusEximCommerceml
         }
     }
 
+    public function exportDataOrders($lang_code)
+    {
+        $params = array(
+            'company_id' => $this->company_id,
+            'company_name' => true,
+            'place' => 'exim_1c',
+        );
+
+        $statuses = $this->s_commerceml['exim_1c_order_statuses'];
+        if (!empty($statuses)) {
+            foreach($statuses as $key => $status) {
+                if (!empty($status)) {
+                    $params['status'][] = $key;
+                }
+            }
+        }
+        if ($this->company_id) {
+            $statuses = db_get_field('SELECT export_statuses FROM ?:companies WHERE company_id = ?i', $this->company_id);
+            if (!empty($statuses)) {
+                $params['status'] = explode(',', $statuses);
+            }
+        }
+
+        list($orders, $search) = fn_get_orders($params);
+        header("Content-type: text/xml; charset=utf-8");
+        fn_echo("\xEF\xBB\xBF");
+        $xml = new \XMLWriter();
+        $xml -> openMemory();
+        $xml -> startDocument();
+        $xml -> startElement($this->cml['commerce_information']);
+        foreach ($orders as $k => $data) {
+            $order_data = fn_get_order_info($data['order_id']);
+            $xml = $this->dataOrderToFile($xml, $order_data, $lang_code);
+        }
+        $xml -> endElement();
+        fn_echo($xml -> outputMemory());
+    }
+
     public function exportDataOrdersGetXML($lang_code) {
         $params = array(
             'company_id' => $this->company_id,
@@ -1460,6 +1498,12 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 if (!empty($status)) {
                     $params['status'][] = $key;
                 }
+            }
+        }
+        if ($this->company_id) {
+            $statuses = db_get_field('SELECT export_statuses FROM ?:companies WHERE company_id = ?i', $this->company_id);
+            if (!empty($statuses)) {
+                $params['status'] = explode(',', $statuses);
             }
         }
 
