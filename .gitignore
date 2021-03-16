@@ -23,31 +23,28 @@ sp*.php
 !app/
 !js/
 !design/
-!var/
-var/addons/
-var/cache/
-var/files/
-var/custom_files/
-var/backups/*
-!var/backups/last.sql.zip
-!var/backups/structure.sql.zip
-!var/backups/migration_*
 images/*
 !**/images/
 !images/.gitkeep
 
-!var/conf/
+!var/
+var/*
+!var/backups/
+var/backups/*
+!var/backups/last.sql.zip
+!var/backups/structure.sql.zip
+!var/backups/migration_*
 !var/langs/
+!var/conf/
+!var/migrations/
+!var/themes_repository/
+!var/.htaccess
+!var/install.log
 var/snapshots/
 !var/snapshots/*_dist.php
 
-!var/theme_repository/
-!var/.htaccess
-!var/install.log
-
 upgrades/*
 !upgrades/source_restore.php
-
 
 
 *.bak
