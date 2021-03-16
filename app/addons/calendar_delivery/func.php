@@ -146,7 +146,8 @@ function fn_calendar_delivery_create_order(&$order) {
         $order['delivery_date'] = array_shift($order['delivery_date']);
         $order['delivery_period'] = array_shift($order['delivery_period']);
     }
-    if (!empty($order['delivery_date'])) {
+    // 16.03.2021. strpos temporary for mobile app! Need to be removed.
+    if (!empty($order['delivery_date']) && !strpos($order['delivery_date'], 'undefined')) {
         $order['delivery_date'] = fn_parse_date($order['delivery_date']);
     }
 }
