@@ -58,11 +58,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 } elseif (empty($category_id)) {
                     $category_id = $default_category;
                     // [csmarket] get extra categories
-                    $id = $this->db->getField("SELECT category_id FROM ?:category_descriptions WHERE lang_code = ?s AND (category = ?s OR alternative_names LIKE ?l) ", $import_params['lang_code'], strval($_group -> {$cml['name']}), '%'.strval($_group -> {$cml['name']}).'%' );
-
-                    
-                    if (!empty($id)) {
-                        $category_id = $id;
+                    list($categories) = fn_get_categories(['search_query' => strval($_group -> {$cml['name']}), 'total_items' => 1], $import_params['lang_code']);
+                    if (!empty($categories)) {
+                        $category_id = reset(array_keys($categories));
                     }
                 }
 
