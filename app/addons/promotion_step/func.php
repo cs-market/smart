@@ -26,8 +26,7 @@ function fn_promotion_step_check_amount_in_stock_before_check($product_id, $amou
     }
 }
 
-function fn_promotion_step_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups){
-
+function fn_promotion_step_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
     foreach ($cart['products'] as $key => &$products) {
 
         if(isset($products['extra']['bonus']) && $products['extra']['bonus'] == 'apply_bonus'&&$products['amount']!=$products['extra']['amount_bonus']*$products['extra']['amount_step']){
@@ -124,44 +123,39 @@ $promotion =  fn_get_promotion_data($bonus['promotion_id']);
                     )
                 )
             ) {
+                foreach ($promotion['conditions']['conditions'] as $key => $condition) {
+                    if($condition['operator'] == 'gte' && $condition['condition'] == 'promotion_step'){
+                        $step = floor($amount/$condition['value']);
+                        $product_data = array (
+                            $p_data['product_id'] => array (
+                                'amount' => $step,
+                                'product_id' => $p_data['product_id'],
+                                'extra' => array (
+                                    'bonus' => 'apply_bonus',
+                                    'amount_step' => $step,
+                                    'amount_bonus' => $p_data['amount'],
+                                    'exclude_from_calculate' => true,
+                                    'bonus' => 'apply_bonus',
+                                    'aoc' => empty($p_data['product_options']),
+                                    'saved_options_key' => $bonus['promotion_id'] . '_' . $p_data['product_id'],
+                                )
+                            ),
+                        );
+                        $ids = fn_add_product_to_cart($product_data, $cart, $auth);
 
-foreach ($promotion['conditions']['conditions'] as $key => $condition) {
-    if($condition['operator'] == 'gte' && $condition['condition'] == 'promotion_step'){
-        $step = floor($amount/$condition['value']);
-        for ($i = 1; $i <= $step; $i++) {
-        $check_min_qty =  db_get_field("SELECT min_qty FROM ?:products WHERE product_id = ?i", $p_data['product_id']);
-                $product_data = array (
-                    $p_data['product_id'] => array (
-                        'amount' => !empty($check_min_qty) ? $check_min_qty :$p_data['amount'],
-                        'product_id' => $p_data['product_id'],
-                        'extra' => array (
-                            'bonus' => 'apply_bonus',
-                            'amount_step' => $step,
-                            'amount_bonus' => $p_data['amount'],
-                            'exclude_from_calculate' => true,
-                            'bonus' => 'apply_bonus',
-                            'aoc' => empty($p_data['product_options']),
-                            'saved_options_key' => $bonus['promotion_id'] . '_' . $p_data['product_id'],
-                        )
-                    ),
-            );
-                    if ($ids = fn_add_product_to_cart($product_data, $cart, $auth)) {
-                    $new_products = array_diff(array_keys($cart['products']), $existing_products);
-                    if (!empty($new_products)) {
-                        $hash = array_pop($new_products);
-                    } else {
-                        $hash = key($ids);
-                    }
+                        $new_products = array_diff(array_keys($cart['products']), $existing_products);
+                        if (!empty($new_products)) {
+                            $hash = array_pop($new_products);
+                        } else {
+                            $hash = key($ids);
+                        }
 
-                    $_cproduct = fn_get_cart_product_data($hash, $cart['products'][$hash], true, $cart, $auth, !empty($new_products) ? 0 : $p_data['amount']);
-                    if (!empty($_cproduct)) {
-                        $cart_products[$hash] = $_cproduct;
+                        $_cproduct = fn_get_cart_product_data($hash, $cart['products'][$hash], true, $cart, $auth, !empty($new_products) ? 0 : $p_data['amount']);
+                        if (!empty($_cproduct)) {
+                            $cart_products[$hash] = $_cproduct;
+                        }
                     }
                 }
-}
-    }
-}
-
             }
         }
     }
