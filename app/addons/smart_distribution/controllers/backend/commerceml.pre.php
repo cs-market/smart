@@ -1272,6 +1272,18 @@ fn_print_r($fantoms);
     foreach ($filters as $filter) {
         db_query('UPDATE ?:product_filters SET ?u WHERE filter_id = ?i', $filter, $filter['filter_id']);
     }
+} elseif ($mode == 'zero_company_orders') {
+    $order_ids = db_get_fields('SELECT order_id FROM ?:orders WHERE company_id = ?i AND is_parent_order = ?s', 0, 'N');
+    foreach ($order_ids as $order_id) {
+        $order_info = fn_get_order_info($order_id);
+        if ($order_info['products']) {
+            $companies = array_unique(fn_array_column($order_info['products'], 'company_id'));
+            if (!empty($companies) && count($companies) == 1) {
+                db_query('UPDATE ?:orders SET company_id = ?i WHERE order_id = ?i', reset($companies), $order_id);
+            }
+        }
+    }
+    fn_print_die($order_ids);
 }
 
 function fn_merge_product_features($target_feature, $group) {
