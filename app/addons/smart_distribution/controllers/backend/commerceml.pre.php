@@ -1284,6 +1284,17 @@ fn_print_r($fantoms);
         }
     }
     fn_print_die($order_ids);
+} elseif ($mode == 'remove_import_create') {
+    $profile_ids = db_get_hash_single_array('SELECT profile_id, user_id FROM ?:user_profiles WHERE profile_name LIKE ?s', ['profile_id', 'user_id'], 'Import create');
+
+    foreach ($profile_ids as $profile_id => $user_id) {
+        if (db_get_field('SELECT count(profile_id) FROM ?:user_profiles WHERE user_id = ?i', $user_id) > 1 ) {
+            if (!(fn_delete_user_profile($user_id, $profile_id))) {
+                $failure[$profile_id] = $user_id;
+            }
+        }
+    }
+    fn_print_die(count($profile_ids), $failure);
 }
 
 function fn_merge_product_features($target_feature, $group) {
