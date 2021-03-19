@@ -184,6 +184,7 @@ function fn_auto_exim_run_import($imports, $company_id) {
                     Registry::set('runtime.skip_area_checking', true);
 
                     if (($data = fn_exim_get_csv($pattern, $params['dirname'].$params['basename'], $params))) {
+                        $data = array_map('array_filter', $data);
                         $res = fn_import($pattern, $data, $params);
                     }
                 } else {
