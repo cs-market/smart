@@ -10,5 +10,6 @@ fn_register_hooks(
     'check_min_amount',
     'calculate_cart_post',
     'place_suborders_pre',
-    'place_suborders'
+    'place_suborders',
+    'get_product_fields'
 );

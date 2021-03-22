@@ -12,7 +12,8 @@
     <language_variables>
         <item lang="ru" id="product_groups.add_product_group">Добавить группу товаров</item>
         <item lang="ru" id="product_groups.new_product_group">Новая группа товаров</item>
-        <item lang="ru" id="product_groups.product_group">Uруппа товаров</item>
+        <item lang="ru" id="product_groups.product_group">Группа товаров</item>
+        <item lang="ru" id="group_id">Группа товаров</item>
     </language_variables>
     <queries>
         <item>CREATE TABLE `?:product_groups` (

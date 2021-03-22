@@ -176,3 +176,7 @@ function fn_product_groups_place_suborders($cart, &$suborder_cart) {
         }
     }
 }
+
+function fn_product_groups_get_product_fields(&$fields) {
+    $fields[] = array('name' => '[data][group_id]', 'text' => __('product_group'));
+}
