@@ -732,6 +732,31 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
 			$log_message = "\n Added product: " . $product['product'] . " commerceml_id: " . strval($_product -> {$cml['id']});
 
+            // import barcode to feature
+            $data = json_decode(json_encode($_product), true);
+            $data = array_filter($data, function($val) {
+                return (!is_array($val));
+            });
+            array_walk($data, 'fn_trim_helper');
+            $company_condition = fn_get_company_condition('company_id', true, '', false, true);
+            $base_features = db_get_hash_single_array("SELECT feature_code, feature_id FROM ?:product_features WHERE feature_code IN (?a) $company_condition", ['feature_id', 'feature_code'], array_keys($data));
+
+            if (!empty($base_features)) {
+                $variant_data['product_id'] = $product_id;
+                foreach ($base_features as $variant_data['feature_id'] => $feature) {
+                    $variant = $data[$feature];
+                    list($d_variant, $params_variant) = $this->checkFeatureVariant($variant_data['feature_id'], $variant, $import_params['lang_code']);
+                    if (!empty($d_variant)) {
+                        $variant_data['variant_id'] = $d_variant;
+                    } else {
+                        $variant_data['variant_id'] = fn_add_feature_variant($variant_data['feature_id'], array('variant' => $variant));
+                    }
+
+                    $this->addFeatureValues($variant_data);
+                }
+            }
+            // import barcode to feature
+
 			// Import product features
 			if (!empty($product['features'])) {
 			    $variants_data['product_id'] = $product_id;
