@@ -1139,7 +1139,7 @@ function fn_smart_distribution_calculate_cart_items(&$cart, $cart_products, $aut
 
 function fn_smart_distribution_promotion_apply_pre(&$promotions, $zone, $data, $auth, $cart_products) {
     // apply only old promotions when update order
-    if ($data['order_id']) {
+    if (isset($data['order_id']) && !empty($data['order_id'])) {
         $permitted_promotions = array_keys(
             unserialize(
                 db_get_field("SELECT promotions FROM ?:orders WHERE order_id = ?i", $data['order_id'])
