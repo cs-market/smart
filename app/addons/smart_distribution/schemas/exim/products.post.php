@@ -32,4 +32,6 @@ $schema['import_process_data']['fill_vendor_ugroups_if_empty'] = array(
     'import_only' => true,
 );
 
+$schema['export_fields']['Show out of stock']['db_field'] = 'show_out_of_stock_product';
+
 return $schema;

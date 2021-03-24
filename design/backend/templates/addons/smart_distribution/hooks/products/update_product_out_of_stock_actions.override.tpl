@@ -9,4 +9,14 @@
         </select>
     </div>
 </div>
+
+<div class="control-group">
+    <label class="control-label" for="elm_show_out_of_stock_product">{__("show_out_of_stock_product")}:</label>
+    <div class="controls">
+        <label class="checkbox">
+            <input type="hidden" name="product_data[show_out_of_stock_product]" value="N" />
+            <input type="checkbox" name="product_data[show_out_of_stock_product]" id="elm_show_out_of_stock_product" value="Y" {if $product_data.show_out_of_stock_product == "Y"}checked="checked"{/if}>
+        </label>
+    </div>
+</div>
 {/hook}

@@ -926,6 +926,14 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
 
     if (AREA == 'C') {
         $condition .= db_quote(' AND IF(products.avail_till, products.avail_till >= ?i, 1)', TIME);
+        // Cut off out of stock products
+        $condition .= db_quote(
+            ' AND (CASE products.show_out_of_stock_product' .
+            "   WHEN ?s THEN (products.amount >= products.min_qty OR products.tracking = 'D')" .
+            '   ELSE 1' .
+            ' END)',
+            'N'
+        );
     }
 }
 
@@ -952,7 +960,7 @@ function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fie
     }
 }
 
-function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, $condition, &$price_usergroup) {
+function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
     if (Tygh::$app['session']['auth']['area'] == 'A') {
         $join = explode(' JOIN ', $join);
         foreach($join as &$j) {
@@ -971,6 +979,17 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
     }
 
     $price_usergroup = db_quote(" AND ?:product_prices.usergroup_id = ?i", USERGROUP_ALL);
+
+    // Cut off out of stock products
+    if (AREA == 'C') {
+        $condition .= db_quote(
+            ' AND (CASE ?:products.show_out_of_stock_product' .
+            "   WHEN ?s THEN (?:products.amount >= ?:products.min_qty OR ?:products.tracking = 'D')" .
+            '   ELSE 1' .
+            ' END)',
+            'N'
+        );
+    }
 }
 
 function fn_smart_distribution_get_usergroups_price($product_id, $usergroup_ids = array()) {
