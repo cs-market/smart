@@ -126,33 +126,35 @@ $promotion =  fn_get_promotion_data($bonus['promotion_id']);
                 foreach ($promotion['conditions']['conditions'] as $key => $condition) {
                     if($condition['operator'] == 'gte' && $condition['condition'] == 'promotion_step'){
                         $step = floor($amount/$condition['value']);
-                        $product_data = array (
-                            $p_data['product_id'] => array (
-                                'amount' => $step,
-                                'product_id' => $p_data['product_id'],
-                                'extra' => array (
-                                    'bonus' => 'apply_bonus',
-                                    'amount_step' => $step,
-                                    'amount_bonus' => $p_data['amount'],
-                                    'exclude_from_calculate' => true,
-                                    'bonus' => 'apply_bonus',
-                                    'aoc' => empty($p_data['product_options']),
-                                    'saved_options_key' => $bonus['promotion_id'] . '_' . $p_data['product_id'],
-                                )
-                            ),
-                        );
-                        $ids = fn_add_product_to_cart($product_data, $cart, $auth);
+                        if ($step) {
+                            $product_data = array (
+                                $p_data['product_id'] => array (
+                                    'amount' => $step,
+                                    'product_id' => $p_data['product_id'],
+                                    'extra' => array (
+                                        'bonus' => 'apply_bonus',
+                                        'amount_step' => $step,
+                                        'amount_bonus' => $p_data['amount'],
+                                        'exclude_from_calculate' => true,
+                                        'bonus' => 'apply_bonus',
+                                        'aoc' => empty($p_data['product_options']),
+                                        'saved_options_key' => $bonus['promotion_id'] . '_' . $p_data['product_id'],
+                                    )
+                                ),
+                            );
+                            $ids = fn_add_product_to_cart($product_data, $cart, $auth);
 
-                        $new_products = array_diff(array_keys($cart['products']), $existing_products);
-                        if (!empty($new_products)) {
-                            $hash = array_pop($new_products);
-                        } else {
-                            $hash = key($ids);
-                        }
+                            $new_products = array_diff(array_keys($cart['products']), $existing_products);
+                            if (!empty($new_products)) {
+                                $hash = array_pop($new_products);
+                            } else {
+                                $hash = key($ids);
+                            }
 
-                        $_cproduct = fn_get_cart_product_data($hash, $cart['products'][$hash], true, $cart, $auth, !empty($new_products) ? 0 : $p_data['amount']);
-                        if (!empty($_cproduct)) {
-                            $cart_products[$hash] = $_cproduct;
+                            $_cproduct = fn_get_cart_product_data($hash, $cart['products'][$hash], true, $cart, $auth, !empty($new_products) ? 0 : $p_data['amount']);
+                            if (!empty($_cproduct)) {
+                                $cart_products[$hash] = $_cproduct;
+                            }
                         }
                     }
                 }
