@@ -12,7 +12,6 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 use Tygh\Registry;
-use Tygh\Enum\Addons\OrderSplit\OrderSplitTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -63,11 +62,16 @@ function fn_delete_product_group($group_id) {
     return $result;
 }
 
-function fn_product_groups_calculate_cart_taxes_pre(&$cart, $cart_products, $product_groups, $calculate_taxes, $auth) {
+function fn_product_groups_calculate_cart_items(&$cart, $cart_products, $auth, $apply_cart_promotions) {
     foreach ($cart_products as $cart_id => $product) {
         if (isset($product['group_id'])) {
             $cart['products'][$cart_id]['group_id'] = $product['group_id'];
         }
+    }
+
+    if ($cart['recalculate'] == true) {
+        $group_ids = array_unique(fn_array_column($cart_products, 'group_id'));
+        $cart['groups'] = fn_get_product_groups(array('group_ids' => $group_ids));
     }
 }
 
@@ -75,38 +79,39 @@ function fn_product_groups_pre_get_cart_product_data($hash, $product, $skip_prom
     $fields[] = 'group_id';
 }
 
-function fn_product_groups_gather_additional_products_data_params($product_ids, $params, &$products, $auth, $products_images, $additional_images, $product_options, $has_product_options, $has_product_options_links) {
-    $group_ids = fn_array_column($products, 'group_id');
-    if ($group_ids) {
-        $groups = fn_get_product_groups(array('group_ids' => $group_ids));
-        foreach ($products as &$product) {
-            if ($product['group_id']) $product['group'] = $groups[$product['group_id']];
+// return product_groups
+function fn_product_groups_split_cart($cart) {
+    if (!$cart['groups']) {
+        $group_ids = array_unique(fn_array_column($cart['products'], 'group_id'));
+        $cart['groups'] = fn_get_product_groups(array('group_ids' => $group_ids));
+    }
+
+    $p_groups = array();
+
+    if (count($cart['groups']) > 1) {
+        $proto = reset($cart['product_groups']);
+        unset($proto['products']);
+        foreach ($cart['products'] as $cart_id => $product) {
+            $group_id = $product['group_id'];
+            if (!isset($p_groups[$group_id])) {
+                $p_groups[$group_id] = $proto;
+                $p_groups[$group_id]['group_id'] = $group_id;
+                if ($group_id) {
+                    $p_groups[$group_id]['group'] = $cart['groups'][$product['group_id']];
+                    $p_groups[$group_id]['name'] = $p_groups[$group_id]['group']['group'];
+                }
+                $p_groups[$group_id]['subtotal'] = 0;
+            }
+            $p_groups[$group_id]['products'][$cart_id] = $product;
+            $p_groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
         }
     }
+
+    return !empty($p_groups) ? array_values($p_groups) : $cart['product_groups'];
 }
 
 function fn_product_groups_pre_update_order(&$cart, $order_id = 0) {
-    $proto = $cart['product_groups'][0];
-    unset($proto['products']);
-    foreach ($cart['products'] as $cart_id => $product) {
-        $group_id = $product['group_id'];
-        if (!isset($groups[$group_id])) {
-            $groups[$group_id] = $proto;
-            $groups[$group_id]['group_id'] = $group_id;
-            if ($group_id) {
-                $groups[$group_id]['group'] = fn_get_product_groups(array('group_id' => $group_id));
-                $groups[$group_id]['group'] = reset($groups[$group_id]['group']);
-                $groups[$group_id]['name'] = $groups[$group_id]['group']['group'];
-            }
-            $groups[$group_id]['subtotal'] = 0;
-        }
-        $groups[$group_id]['products'][$cart_id] = $product;
-        $groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
-    }
-    $cart['product_groups'] = array_values($groups);
-    if (count($cart['product_groups']) == 1) {
-        $cart['group_id'] = isset(reset($groups)['group']['group_id']) ? : 0;
-    }
+    $cart['product_groups'] = fn_product_groups_split_cart($cart);
 }
 
 function fn_exim_import_product_group($group) {
@@ -115,28 +120,6 @@ function fn_exim_import_product_group($group) {
 
 function fn_exim_get_product_group($group_id) {
     return db_get_field('SELECT `group` FROM ?:product_groups WHERE group_id = ?i', $group_id);
-}
-
-function fn_product_groups_check_min_amount($cart, &$check = true) {
-    fn_product_groups_pre_update_order($cart);
-    if (count($cart['product_groups']) == 1) {
-        $product_group = reset($cart['product_groups']);
-        if (isset($product_group['group']['min_order'])) {
-            if ($product_group['group']['min_order'] > $product_group['subtotal']) {
-                $formatter = Tygh::$app['formatter'];
-                $min_amount = $formatter->asPrice($product_group['group']['min_order']);
-                fn_set_notification(
-                    'W',
-                    __('notice'),
-                    __('checkout.min_cart_subtotal_required', [
-                        '[amount]' => $min_amount,
-                        '[group]' => $product_group['group']['group'],
-                    ])
-                );
-            }
-            $check = false;
-        }
-    }
 }
 
 function fn_product_groups_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups) {

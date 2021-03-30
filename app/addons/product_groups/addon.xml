@@ -19,7 +19,6 @@
         <item>CREATE TABLE `?:product_groups` (
           `group_id` mediumint(8) unsigned NOT NULL auto_increment,
           `group` varchar(32) NOT NULL DEFAULT '',
-          `min_order` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `group`
           `company_id` INT(11) UNSIGNED NOT NULL DEFAULT '0'
           `status` char(1) NOT NULL DEFAULT 'A',
           PRIMARY KEY (`group_id`)
