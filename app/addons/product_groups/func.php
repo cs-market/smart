@@ -89,7 +89,7 @@ function fn_product_groups_split_cart($cart) {
             $cart['groups'] = fn_get_product_groups(array('group_ids' => $group_ids));
         }
 
-        if (count($cart['groups']) > 1) {
+        // if (count($cart['groups']) > 1) {
             $proto = reset($cart['product_groups']);
             unset($proto['products']);
             foreach ($cart['products'] as $cart_id => $product) {
@@ -106,7 +106,7 @@ function fn_product_groups_split_cart($cart) {
                 $p_groups[$group_id]['products'][$cart_id] = $product;
                 $p_groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
             }
-        }
+        // }
     }
 
     return !empty($p_groups) ? array_values($p_groups) : $cart['product_groups'];

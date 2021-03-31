@@ -82,8 +82,8 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
         }
 
         // для аппетитпром в заказе один, игнорировать мин сумму по вендору, так как должна отработать только группа
-        if (!(count($cart['product_groups']) == 1 && isset(reset($cart['product_groups'])['group']) && reset($cart['product_groups'])['group']['group_id'] == '6')) {
-            foreach ($cart['product_groups'] as $group) {
+        if (!(count($p_groups) == 1 && isset(reset($p_groups)['group']) && reset($p_groups)['group']['group_id'] == '6')) {
+            foreach ($p_groups as $group) {
                 $min_order_amount = db_get_field('SELECT min_order_amount FROM ?:companies WHERE company_id = ?i', $group['company_id']);
                 
                 if ($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total']) {
