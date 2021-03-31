@@ -954,7 +954,7 @@ function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fie
         $condition = str_replace($search, '', $condition);
         $condition .= db_quote(' AND (?:category_descriptions.category LIKE ?l OR ?:category_descriptions.alternative_names LIKE ?l)', '%' . trim($params['search_query']) . '%', '%' . trim($params['search_query']) . '%');
     }
-    if ($params['is_search'] == 'Y') {
+    if (isset($params['is_search']) && $params['is_search'] == 'Y') {
         $params['group_by_level'] = false;
         $params['simple'] = false;
     }

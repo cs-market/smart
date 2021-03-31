@@ -1,0 +1,77 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+
+msgctxt "Addons::name::sberbank_fz"
+msgid "Sberbank with mobile app support"
+msgstr "Расширенный Сбербанк Онлайн"
+
+msgctxt "Addons::description::sberbank_fz"
+msgid "Sberbank with rusian tax and mobile application support"
+msgstr "Сбербанк с ФЗ-54 и поддержкой мобильного приложения"
+
+msgctxt "Languages::addons.sberbank_fz.login"
+msgid "Login"
+msgstr "Логин"
+
+msgctxt "Languages::addons.sberbank_fz.password"
+msgid "Password"
+msgstr "Пароль"
+
+msgctxt "Languages::addons.sberbank_fz.two_staging"
+msgid "Payments staging"
+msgstr "Стадийность платежей"
+
+msgctxt "Languages::addons.sberbank_fz.one-stage"
+msgid "One stage"
+msgstr "Одностадийные"
+
+msgctxt "Languages::addons.sberbank_fz.two-stage"
+msgid "Two stage"
+msgstr "Двустадийные"
+
+msgctxt "Languages::addons.sberbank_fz.confirmed_order_status"
+msgid "Confirmed Order status"
+msgstr "Статус успешного заказа"
+
+msgctxt "Languages::addons.sberbank_fz.send_order"
+msgid "Send Order"
+msgstr "Отправка корзины на шлюз"
+
+msgctxt "Languages::addons.sberbank_fz.tax_system"
+msgid "Tax system"
+msgstr "Система налогообложения"
+
+
+msgctxt "Languages::addons.sberbank_fz.logging"
+msgid "Write log"
+msgstr "Логирование"
+
+msgctxt "Languages::addons.sberbank_fz.wrong_amount"
+msgid "The order total doesn't match the sum that was paid. Please contact the store administration about this your order."
+msgstr "Сумма заказа не совпадает с оплаченной суммой. Пожалуйста, свяжитесь с администратором магазина по поводу данного заказа."
+
+msgctxt "Languages::addons.sberbank_fz.text_ofd_map"
+msgid "Send order to the payment gate"
+msgstr "Передача товарной корзины (ФЗ-54)"
+
+msgctxt "Languages::addons.sberbank_fz.tax_type"
+msgid "Default VAT for product"
+msgstr "Ставка НДС по умолчанию"
+
+msgctxt "Languages::addons.sberbank_fz.ffd_version"
+msgid "FFD Version"
+msgstr "Формат фискальных документов"
+
+msgctxt "Languages::addons.sberbank_fz.ffd_payment_method_type"
+msgid "Type of the payment method"
+msgstr "Тип оплаты"
+
+msgctxt "Languages::addons.sberbank_fz.ffd_payment_object_type"
+msgid "Type of the payment object"
+msgstr "Тип оплачиваемой позиции"
+
