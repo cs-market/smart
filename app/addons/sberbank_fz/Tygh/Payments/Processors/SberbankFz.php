@@ -4,7 +4,7 @@ namespace Tygh\Payments\Processors;
 
 use Tygh\Registry;
 use Tygh\Http;
-use Tygh\Payments\Processors\SberDiscountHelper;
+use Tygh\Payments\SberDiscountHelper;
 
 class SberbankFz extends Sberbank
 {
