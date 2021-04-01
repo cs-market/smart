@@ -80,6 +80,7 @@ class SberbankMobile implements IRedirectionPayment
                         array(
                             'payment'  => 'sberbank',
                             'ordernumber' => $this->order_info['order_id'],
+                            'orderId' => $sberbank_response['orderId'],
                         )
                     ))
                     ->setCancelUrl($this->getUrl(
@@ -87,6 +88,7 @@ class SberbankMobile implements IRedirectionPayment
                         array(
                             'payment'  => 'sberbank',
                             'ordernumber' => $this->order_info['order_id'],
+                            'orderId' => $sberbank_response['orderId'],
                         )
                     ))
                     ->asArray()
