@@ -60,6 +60,12 @@ class Sberbank implements IRedirectionPayment
     {
         $sberbank_response = $this->registerPayment($this->payment_info, $this->order_info);
 
+        $pp_response = array(
+            'transaction_id' => $sberbank_response['orderId']
+        );
+
+        fn_update_order_payment_info($this->order_info['order_id'], $pp_response);
+
         $this->preparation_result->setSuccess($this->isUrlReturned($sberbank_response));
 
         if (isset($sberbank_response['formUrl'])) {
