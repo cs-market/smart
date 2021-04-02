@@ -23,7 +23,10 @@ function fn_auto_exim_send_order_notification($order, $edp_data, $force_notifica
             $layout = db_get_row("SELECT ?:exim_layouts.* FROM ?:exim_layouts LEFT JOIN ?:companies ON ?:exim_layouts.name = ?:companies.company WHERE pattern_id = ?s and company_id = ?i", $pattern_id, $order['company_id']);
             if (!empty($layout)) {
                 $cid = Registry::get('runtime.company_id');
+                $c_data = Registry::get('runtime.company_data');
                 Registry::set('runtime.company_id', $order['company_id']);
+                Registry::set('runtime.company_data', fn_get_company_data($order['company_id']));
+                $company_data = fn_get_company_data($company_id);
                 $layout['cols'] = explode(',', $layout['cols']);
                 $pattern = fn_exim_get_pattern_definition($pattern_id, 'export');
                 $options = array(
@@ -43,6 +46,7 @@ function fn_auto_exim_send_order_notification($order, $edp_data, $force_notifica
                 fn_set_hook('export_order_to_csv', $pattern, $options, $res, $order);
                 ob_end_clean();
                 Registry::set('runtime.company_id', $cid);
+                Registry::set('runtime.company_data', $c_data);
             }
         }
     }
