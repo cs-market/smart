@@ -124,7 +124,7 @@ $promotion =  fn_get_promotion_data($bonus['promotion_id']);
                 )
             ) {
                 foreach ($promotion['conditions']['conditions'] as $key => $condition) {
-                    if($condition['operator'] == 'gte' && $condition['condition'] == 'promotion_step'){
+                    if($condition['operator'] == 'gte' && $condition['condition'] == 'promotion_step' && $condition['value']){
                         $step = floor($amount/$condition['value']);
                         if ($step) {
                             $product_data = array (
