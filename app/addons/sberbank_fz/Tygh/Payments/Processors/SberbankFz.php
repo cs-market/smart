@@ -53,20 +53,20 @@ class SberbankFz extends Sberbank
         $this->_ffd_paymentObjectType = (!empty($processor_data['processor_params']['ffd_paymentObjectType'])) ? $processor_data['processor_params']['ffd_paymentObjectType'] : 1;
     }
 
-    public function register($order_info, $protocol = 'current')
+    public function register($order_info, $protocol = 'current', $is_mobile = false)
     {
         $order_total = $this->convertSum($order_info['total']);
 
         $order_id = $order_info['order_id'];
         $orderNumber = $order_id . '_' . substr(md5($order_id . TIME), 0, 3);
-
+        $mobile_postfix = $is_mobile ? '&isMobilePayment=1' : '';
         $data = array(
             'userName' => $this->_login,
             'password' => $this->_password,
             'orderNumber' => $orderNumber,
             'amount' => $order_total * 100,
-            'returnUrl' => fn_url("payment_notification.return?payment=sberbank_fz&ordernumber=$order_id", AREA, $protocol),
-            'failUrl' => fn_url("payment_notification.error?payment=sberbank_fz&ordernumber=$order_id", AREA, $protocol),
+            'returnUrl' => fn_url("payment_notification.return?payment=sberbank_fz&ordernumber=$order_id" . $mobile_postfix, AREA, $protocol),
+            'failUrl' => fn_url("payment_notification.error?payment=sberbank_fz&ordernumber=$order_id" . $mobile_postfix, AREA, $protocol),
             'jsonParams' => json_encode(
                 [
                     'CMS:' => 'cs-cart 4.12.x',

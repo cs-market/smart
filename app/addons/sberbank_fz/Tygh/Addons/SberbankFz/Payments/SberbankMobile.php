@@ -78,17 +78,15 @@ class SberbankMobile implements IRedirectionPayment
                     ->setReturnUrl($this->getUrl(
                         array('payment_notification', 'return'),
                         array(
-                            'payment'  => 'sberbank',
+                            'payment'  => 'sberbank_fz',
                             'ordernumber' => $this->order_info['order_id'],
-                            'orderId' => $sberbank_response['orderId'],
                         )
                     ))
                     ->setCancelUrl($this->getUrl(
                         array('payment_notification', 'error'),
                         array(
-                            'payment'  => 'sberbank',
+                            'payment'  => 'sberbank_fz',
                             'ordernumber' => $this->order_info['order_id'],
-                            'orderId' => $sberbank_response['orderId'],
                         )
                     ))
                     ->asArray()
@@ -108,7 +106,7 @@ class SberbankMobile implements IRedirectionPayment
     protected function registerPayment($payment_info, $order_info)
     {
         $sberbank = new SberbankCore($payment_info);
-        $response = $sberbank->register($order_info);
+        $response = $sberbank->register($order_info, 'https', true);
 
         if (!empty($this->payment_info['processor_params']['logging']) && $this->payment_info['processor_params']['logging'] == 'Y') {
             SberbankCore::writeLog($response, 'sberbank.log');
@@ -138,6 +136,6 @@ class SberbankMobile implements IRedirectionPayment
      */
     protected function getUrl($dispatch, $query_params = array())
     {
-        return fn_url(Url::buildUrn($dispatch, $query_params));
+        return fn_url(Url::buildUrn($dispatch, $query_params), AREA, 'https');
     }
 }

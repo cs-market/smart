@@ -63,7 +63,11 @@ if (defined('PAYMENT_NOTIFICATION')) {
         }
 
         fn_finish_payment($order_id, $pp_response);
-        fn_order_placement_routines('route', $order_id, false);
+        if (isset($_REQUEST['isMobilePayment']) && $_REQUEST['isMobilePayment']) {
+            echo(__('processing_order'));
+        } else {
+            fn_order_placement_routines('route', $order_id, false);
+        }
     }
 
     exit;
