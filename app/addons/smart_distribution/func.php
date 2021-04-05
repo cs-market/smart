@@ -1168,3 +1168,16 @@ function fn_smart_distribution_promotion_apply_pre(&$promotions, $zone, $data, $
         $promotions[$zone] = array_intersect_key($promotions[$zone], array_flip($permitted_promotions));
     }
 }
+
+function fn_smart_distribution_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, &$data, $product_id, $amount, $price, $zero_price_action, $allow_add) {
+    $usergroup_condition = db_quote("AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'C' || defined('ORDER_MANAGEMENT')) ? array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']) : USERGROUP_ALL));
+    $data['extra']['usergroup_id'] = db_get_field(
+        "SELECT ?:product_prices.usergroup_id "
+        . "FROM ?:product_prices "
+        . "WHERE lower_limit <=?i AND ?:product_prices.product_id = ?i ?p "
+        . "GROUP BY ?:product_prices.usergroup_id "
+        . "ORDER BY MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, "
+        . "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) LIMIT 1 ",
+        $amount, $product_id, $usergroup_condition
+    );
+}

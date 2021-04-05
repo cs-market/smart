@@ -28,6 +28,7 @@ use Tygh\Enum\ImagePairTypes;
 class SDRusEximCommerceml extends RusEximCommerceml 
 {
     public $prices_commerseml = array();
+    public $data_prices = array();
     
     public function importCategoriesFile($data_categories, $import_params, $parent_id = 0)
     {
@@ -456,7 +457,11 @@ class SDRusEximCommerceml extends RusEximCommerceml
         $cml = $this->cml;
 
         $order_xml = $this->getOrderDataForXml($order_data, $cml);
-
+        $this->data_prices = $this->db->getHash(
+            'SELECT price_1c, type, usergroup_id FROM ?:rus_exim_1c_prices WHERE company_id = ?i',
+            'usergroup_id',
+            $this->company_id
+        );
         // univita currency exception
         if ($this->company_id == 1787) { 
 		$order_xml[$cml['currency']] = '643';
@@ -1210,6 +1215,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
             // todo remove after konix change on their side
             if ($send_price_1c[$product['product_id']] != 'Y') {
                 unset($data_product[$cml['price_per_item']], $data_product[$cml['total']]);
+            }
+            if (isset($product['extra']['usergroup_id']) && $product['extra']['usergroup_id'] && array_key_exists($product['extra']['usergroup_id'], $this->data_prices)) {
+                $data_product[$cml['price_type']] = $this->data_prices[$product['extra']['usergroup_id']]['price_1c'];
             }
             $data_products[][$cml['product']] = $data_product;
         }
