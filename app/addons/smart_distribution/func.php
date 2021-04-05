@@ -330,7 +330,7 @@ function fn_smart_distribution_gather_additional_product_data_post(&$product, $a
         }
     }
     // for in_stock | out_of_stock in mobile application
-    if ($product['tracking'] == 'D' && $product['amount'] < 0 ) {
+    if (isset($product['tracking']) && $product['tracking'] == 'D' && $product['amount'] < 0 ) {
         $product['amount'] = abs($product['amount']);
     }
 }
