@@ -127,12 +127,6 @@ function fn_exim_get_product_group($group_id) {
     return db_get_field('SELECT `group` FROM ?:product_groups WHERE group_id = ?i', $group_id);
 }
 
-function fn_product_groups_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups) {
-    if (defined('API')) {
-        fn_product_groups_pre_update_order($cart);
-    }
-}
-
 function fn_product_groups_place_suborders_pre($order_id, $cart, $auth, $action, $issuer_id, &$suborder_cart, $key_group, $group) {
     $suborder_cart['group_id'] = $group['group_id'] ? : 0;
 }
