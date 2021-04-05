@@ -19,10 +19,15 @@
     <language_variables>
         <item lang="en" id="min_order_amount">Min order amount</item>
         <item lang="ru" id="min_order_amount">Минимальная сумма заказа</item>
+        <item lang="en" id="allow_additional_ordering">Allow additional ordering</item>
+        <item lang="ru" id="allow_additional_ordering">Разрешить дозаказ</item>
+        
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `min_order_amount` mediumint(8) UNSIGNED NOT NULL DEFAULT 0;</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `min_order_amount`;</item>
+        <item>ALTER TABLE `?:companies` ADD `allow_additional_ordering` char(1) NOT NULL DEFAULT 'N';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `allow_additional_ordering`;</item>
         <item>ALTER TABLE `?:usergroups` ADD `min_order_amount` mediumint(8) UNSIGNED NOT NULL DEFAULT 0;</item>
         <item for="uninstall">ALTER TABLE `?:usergroups` DROP `min_order_amount`;</item>
         <item>ALTER TABLE `?:users` ADD `min_order_amount` mediumint(8) UNSIGNED NOT NULL DEFAULT 0;</item>
@@ -31,3 +36,4 @@
         <item for="uninstall">ALTER TABLE `?:product_groups` DROP `min_order`;</item>
     </queries>
 </addon>
+
