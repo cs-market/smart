@@ -114,6 +114,9 @@ function fn_product_groups_split_cart($cart) {
 
 function fn_product_groups_pre_update_order(&$cart, $order_id = 0) {
     $cart['product_groups'] = fn_product_groups_split_cart($cart);
+    if (count($cart['product_groups']) == 1) {
+        $cart['group_id'] = reset($cart['product_groups'])['group_id'] ? : 0;
+    }
 }
 
 function fn_exim_import_product_group($group) {
@@ -164,4 +167,8 @@ function fn_product_groups_place_suborders($cart, &$suborder_cart) {
 
 function fn_product_groups_get_product_fields(&$fields) {
     $fields[] = array('name' => '[data][group_id]', 'text' => __('product_group'));
+}
+
+function fn_product_groups_pre_get_orders($params, &$fields, $sortings, $get_totals, $lang_code) {
+    $fields[] = '?:orders.group_id';
 }

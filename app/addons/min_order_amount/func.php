@@ -53,9 +53,10 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
     $cart['min_order_failed'] = false;
     unset($cart['min_order_notification']);
     $formatter = Tygh::$app['formatter'];
+    list($orders) = fn_get_orders(['period' => 'D', 'user_id' => $cart['user_data']['user_id']]);
 
     if (!empty($cart['user_data']['min_order_amount'])) {
-        if ($cart['total'] < $cart['user_data']['min_order_amount']) {
+        if ($cart['total'] < $cart['user_data']['min_order_amount'] && empty($orders)) {
             $cart['min_order_failed'] = true;
             $min_amount = $formatter->asPrice($cart['user_data']['min_order_amount']);
 
@@ -69,7 +70,7 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
                     if (count($p_groups) > 1 && isset($product_group['group']) && $product_group['group']['group_id'] == '6') {
                         continue;
                     }
-                    if ($product_group['group']['min_order'] > $product_group['subtotal']) {
+                    if (isset($product_group['group']) && $product_group['group']['min_order'] > $product_group['subtotal'] && !in_array($product_group['group_id'], array_column($orders, 'group_id'))) {
                         $cart['min_order_failed'] = true;
                         $min_amount = $formatter->asPrice($product_group['group']['min_order']);
                         $cart['min_order_notification'] = __('checkout.min_cart_subtotal_required', [
@@ -79,19 +80,23 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
                     }
                 }
             }
+            // для аппетитпром в заказе один, игнорировать мин сумму по вендору, так как должна отработать только группа
+            if ((count($p_groups) == 1 && isset(reset($p_groups)['group']) && reset($p_groups)['group']['group_id'] == '6')) return;
         }
 
-        // для аппетитпром в заказе один, игнорировать мин сумму по вендору, так как должна отработать только группа
-        if (!(count($p_groups) == 1 && isset(reset($p_groups)['group']) && reset($p_groups)['group']['group_id'] == '6')) {
-            foreach ($p_groups as $group) {
-                $min_order_amount = db_get_field('SELECT min_order_amount FROM ?:companies WHERE company_id = ?i', $group['company_id']);
-                
-                if ($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total']) {
-                    $cart['min_order_failed'] = true;
-                    $min_amount = $formatter->asPrice($min_order_amount);
+        foreach ($cart['product_groups'] as $group) {
+            $company_id = $group['company_id'];
+            $group_orders = array_filter($orders, function($v) use ($company_id) {
+                return $v['company_id'] == $company_id;
+            });
+            
+            $min_order_amount = db_get_field('SELECT min_order_amount FROM ?:companies WHERE company_id = ?i', $company_id) - array_sum(array_column($group_orders, 'total'));
 
-                    $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('with_company') . ' ' . $group['name'];
-                }
+            if ($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total']) {
+                $cart['min_order_failed'] = true;
+                $min_amount = $formatter->asPrice($min_order_amount);
+
+                $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('with_company') . ' ' . $group['name'];
             }
         }
     }
