@@ -330,7 +330,7 @@ function fn_update_use_pay_by_points($disallow_products = [])
 function fn_get_use_pay_by_points($disallow_products = [])
 {
     $total_use_points = 0;
-    if (Tygh::$app['session']['cart']['products'])
+    if (!empty(Tygh::$app['session']['cart']['products']))
     foreach (Tygh::$app['session']['cart']['products'] as $product) {
         if (
             !in_array($product['product_id'], $disallow_products)
