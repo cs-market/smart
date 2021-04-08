@@ -319,19 +319,21 @@ function fn_smart_distribution_update_profile($action, $user_data, $current_user
 }
 
 function fn_smart_distribution_gather_additional_product_data_post(&$product, $auth, $params) {
-    // for discount label in mobile application
-    if (isset($product['discount'])) {
-        if (!( (float) $product['list_price'])) {
-            $product['list_price'] = $product['base_price'];
+    if (AREA == 'C') {
+        // for discount label in mobile application
+        if (isset($product['discount'])) {
+            if (!isset($product['list_price']) || !( (float) $product['list_price'])) {
+                $product['list_price'] = $product['base_price'];
+            }
+            if (!isset($product['list_discount'])) {
+                $product['list_discount'] = $product['discount'];
+                $product['list_discount_prc'] = $product['discount_prc'];
+            }
         }
-        if (!isset($product['list_discount'])) {
-            $product['list_discount'] = $product['discount'];
-            $product['list_discount_prc'] = $product['discount_prc'];
+        // for in_stock | out_of_stock in mobile application
+        if (isset($product['tracking']) && $product['tracking'] == 'D' && $product['amount'] < 0 ) {
+            $product['amount'] = abs($product['amount']);
         }
-    }
-    // for in_stock | out_of_stock in mobile application
-    if (isset($product['tracking']) && $product['tracking'] == 'D' && $product['amount'] < 0 ) {
-        $product['amount'] = abs($product['amount']);
     }
 }
 
@@ -1046,8 +1048,10 @@ function fn_smart_distribution_load_products_extra_data(&$extra_fields, $product
 function fn_smart_distribution_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
     $usergroup_ids = Tygh::$app['session']['auth']['usergroup_ids'];
     $usergroup_ids = array_filter($usergroup_ids);
-    $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a)", 'product_id', $product_ids, 1, $usergroup_ids);
-    $products = fn_array_merge($products, $prices);
+    if ($usergroup_ids) {
+        $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a)", 'product_id', $product_ids, 1, $usergroup_ids);
+        $products = fn_array_merge($products, $prices);
+    }
 }
 
 function fn_smart_distribution_get_stickers_pre($params, $fields, &$condition, $lang_code) {

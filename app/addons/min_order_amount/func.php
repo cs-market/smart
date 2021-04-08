@@ -1,9 +1,5 @@
 <?php
 
-use Tygh\Registry;
-use Tygh\Models\Company;
-use Tygh\Enum\ProductTracking;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_min_order_amount_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
@@ -23,7 +19,7 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
     unset($cart['min_order_notification']);
     $formatter = Tygh::$app['formatter'];
     $orders = array();
-    if (db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $cart['user_data']['company_id']) == 'Y') {
+    if ( isset($cart['user_data']['company_id']) && db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $cart['user_data']['company_id']) == 'Y') {
         list($orders) = fn_get_orders(['period' => 'D', 'user_id' => $cart['user_data']['user_id']]);
     }
 

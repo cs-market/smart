@@ -72,7 +72,7 @@ function fn_decimal_amount_pre_add_to_cart(&$product_data, $cart, $auth, $update
 	unset($data);
 }
 function fn_decimal_amount_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, $data, $product_id, &$amount, &$price, $zero_price_action, $allow_add) {
-	if ($data['extra']['decimal_amount']) {
+	if (isset($data['extra']['decimal_amount'])) {
 		$amount = fn_decimal_amount_normalize_amount(@$data['extra']['decimal_amount']);
 		$price = fn_get_product_price($product_id, $amount, $auth);
 	}
@@ -343,7 +343,7 @@ function fn_decimal_amount_get_product_qty_content($product, $allow_negative_amo
 		$max_list_qty = $default_list_qty_count * $product['qty_step'] + $min_qty - $product['qty_step'];
 	}
 
-	if ($product['tracking'] != ProductTracking::DO_NOT_TRACK
+	if (isset($product['tracking']) && $product['tracking'] != ProductTracking::DO_NOT_TRACK
 		&& $allow_negative_amount != 'Y'
 		&& $inventory_tracking == 'Y'
 	) {
