@@ -303,19 +303,19 @@ function fn_product_stickers_gather_additional_product_data_post(&$product, $aut
         if (isset($product['list_price'])) {
             $stickers['on_sale'] = ($product['price'] < $product['list_price'] && !empty($settings['sale_sticker_id'])) ? $settings['sale_sticker_id'] : '';
         }
-        if (isset($product['timestamp'])) {
+        if (isset($product['timestamp']) && is_numeric($settings['novelty_days'])) {
             $stickers['novel'] = (($product['timestamp'] + $settings['novelty_days'] * SECONDS_IN_DAY) > TIME && $product['timestamp'] < TIME && !empty($settings['novelty_sticker_id'])) ? $settings['novelty_sticker_id'] : '';
         }
-        if (isset($product['avail_since'])) {
+        if (isset($product['avail_since']) && is_numeric($settings['coming_soon_days'])) {
             $stickers['coming_soon'] = (($product['avail_since'] - $settings['coming_soon_days'] * SECONDS_IN_DAY) < TIME && $product['avail_since'] > TIME && !empty($settings['coming_soon_sticker_id'])) ? $settings['coming_soon_sticker_id'] : '';
         }
         if (isset($product['free_shipping'])) {
             $stickers['free_shipping'] = ($product['free_shipping'] == "Y" && !empty($settings['free_shipping_sticker_id'])) ? $settings['free_shipping_sticker_id'] : '';
         }
-        if (isset($product['popularity'])) {
+        if (isset($product['popularity']) && is_numeric($settings['popularity'])) {
             $stickers['popularity'] = ($product['popularity'] > $settings['popularity'] && !empty($settings['most_popular_sticker_id']) ) ? $settings['most_popular_sticker_id'] : '';
         }
-        if (Registry::get('addons.bestsellers.status') == 'A' && isset($product['sales_amount'])) {
+        if (Registry::get('addons.bestsellers.status') == 'A' && isset($product['sales_amount']) && is_numeric($settings['sales_count'])) {
             $stickers['bestsellers'] = ($product['sales_amount'] > $settings['sales_count'] && !empty($settings['bestseller_sticker_id']) ) ? $settings['bestseller_sticker_id'] : '';
         }
 
