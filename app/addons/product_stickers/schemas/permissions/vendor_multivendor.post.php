@@ -11,7 +11,11 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-$schema['controllers']['stickers']['modes']['picker']['permissions'] = true;
-$schema['controllers']['stickers']['permissions'] = array('GET' => true, 'POST' => true);
+use \Tygh\Registry;
+
+if (Registry::get('addons.product_stickers.vendor_stickers') == 'Y' || !fn_allowed_for('MULTIVENDOR')) {
+    $schema['controllers']['stickers']['modes']['picker']['permissions'] = true;
+    $schema['controllers']['stickers']['permissions'] = array('GET' => true, 'POST' => true);
+}
 
 return $schema;

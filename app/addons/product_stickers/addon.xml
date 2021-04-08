@@ -1,203 +1,202 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
-	<id>product_stickers</id>
-	<name>Product stickers</name>
-	<description><![CDATA[Allows to set stickers to the product. © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
-	<version>2.0.1</version>
-	<priority>4100</priority>
-	<status>active</status>
-	<default_language>en</default_language>
-	<supplier>CS-Market</supplier>
-	<supplier_link>http://cs-market.com/</supplier_link>
-	<has_icon>Y</has_icon>
-	<compatibility>
-		<core_version>
-			<min>4.3.1</min>
-		</core_version>
-	</compatibility>
-	<settings>
-		<sections>
-			<section id="general">
-				<items>
-					<item id="general_header">
-						<name>General settings</name>
-						<type>header</type>
-					</item>
-					<item id="license_key">
-						<type>input</type>
-						<name>License key</name>
-					</item>
-<!-- 					<item id="wysiwyg_editor">
-						<type>checkbox</type>
-						<name>WYSIWYG editor for text stickers</name>
-					</item> -->
-					<item id="auto_stickers">
-						<name>Auto stickers</name>
-						<type>header</type>
-					</item>
-					<item id="sticker_settings">
-						<type>template</type>
-						<default_value>stickers.tpl</default_value>
-					</item>
-					<item id="sale_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="novelty_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="novelty_days">
-						<type>hidden</type>
-					</item>
-					<item id="coming_soon_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="coming_soon_days">
-						<type>hidden</type>
-					</item>
-					<item id="free_shipping_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="most_popular_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="popularity">
-						<type>hidden</type>
-					</item>
-					<item id="bestseller_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="sales_count">
-						<type>hidden</type>
-					</item>
-					<item id="top_rated_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="rating_equal">
-						<type>hidden</type>
-					</item>
-					<item id="sold_out_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="in_stock_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="returnable_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="weight_sticker_id">
-						<type>hidden</type>
-					</item>
-					<item id="weight_condition">
-						<type>hidden</type>
-					</item>
-					<item id="weight_value">
-						<type>hidden</type>
-					</item>
-					<item id="age_verification_sticker_id">
-						<type>hidden</type>
-					</item>
-				</items>
-			</section>
-		</sections>
-	</settings>
+    <id>product_stickers</id>
+    <name>Product stickers</name>
+    <description><![CDATA[Allows to set stickers to the product. © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <version>2.1.2</version>
+    <priority>4100</priority>
+    <status>active</status>
+    <default_language>en</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <compatibility>
+        <core_version>
+            <min>4.3.1</min>
+        </core_version>
+    </compatibility>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="general_header">
+                        <name>General settings</name>
+                        <type>header</type>
+                    </item>
+                    <item id="license_key">
+                        <type>input</type>
+                        <name>License key</name>
+                    </item>
+                    <item id="vendor_stickers" edition_type="MVE:ROOT">
+                        <type>checkbox</type>
+                        <name>Allow stickers for vendors</name>
+                    </item>
+                    <item id="auto_stickers">
+                        <name>Auto stickers</name>
+                        <type>header</type>
+                    </item>
+                    <item id="sticker_settings">
+                        <type>template</type>
+                        <default_value>stickers.tpl</default_value>
+                    </item>
+                    <item id="sale_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="novelty_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="novelty_days">
+                        <type>hidden</type>
+                    </item>
+                    <item id="coming_soon_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="coming_soon_days">
+                        <type>hidden</type>
+                    </item>
+                    <item id="free_shipping_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="most_popular_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="popularity">
+                        <type>hidden</type>
+                    </item>
+                    <item id="bestseller_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="sales_count">
+                        <type>hidden</type>
+                    </item>
+                    <item id="top_rated_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="rating_equal">
+                        <type>hidden</type>
+                    </item>
+                    <item id="sold_out_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="in_stock_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="returnable_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="weight_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                    <item id="weight_condition">
+                        <type>hidden</type>
+                    </item>
+                    <item id="weight_value">
+                        <type>hidden</type>
+                    </item>
+                    <item id="age_verification_sticker_id">
+                        <type>hidden</type>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
 
-	<queries>
-		<item>CREATE TABLE `?:product_stickers` (
-			`sticker_id` mediumint(8) unsigned NOT NULL auto_increment,
-			`name` varchar(255) NOT NULL,
-			`position` char(1) NOT NULL default 'A',
-			`class` varchar(255) NOT NULL,
-			`status` char(1) NOT NULL default 'A',
-			`display` varchar(16) NOT NULL default 'P,C,B',
-			`use_avail_period` char(1) NOT NULL default 'N',
-			`avail_from_timestamp` int(11) UNSIGNED NOT NULL default 0,
-			`avail_till_timestamp` int(11) UNSIGNED NOT NULL default 0,
-			`usergroup_ids` varchar(255) NOT NULL default '0',
-			`type` char(1) NOT NULL default 'G',
-			`params` TEXT NOT NULL,
-			`url` varchar(255) NOT NULL,
-			PRIMARY KEY (`sticker_id`)
-		) ENGINE=MyISAM DEFAULT CHARSET=utf8
-		</item>
-		<item editions="MULTIVENDOR">ALTER TABLE `?:product_stickers` ADD company_id int(11) unsigned NOT NULL default 0</item>
-		<item>
-			CREATE TABLE `?:product_stickers_images` (
-			`sticker_image_id` mediumint(8) unsigned NOT NULL auto_increment,
-			`sticker_id` mediumint(8) unsigned NOT NULL default 0,
-			`lang_code` char(2) NOT NULL default '',
-			PRIMARY KEY  (`sticker_image_id`),
-			UNIQUE KEY  `sticker` (`sticker_id`,`lang_code`)
-			) Engine=MyISAM DEFAULT CHARSET UTF8;
-		</item>
-		<item>
-			CREATE TABLE `?:product_sticker_descriptions` (
-			`sticker_id` mediumint(8) unsigned NOT NULL default 0,
-			`lang_code` char(2) NOT NULL default '',
-			`text` mediumtext,
-			UNIQUE KEY  `sticker` (`sticker_id`,`lang_code`)
-			) Engine=MyISAM DEFAULT CHARSET UTF8;
-		</item>
-		<item for="uninstall">  DROP TABLE IF EXISTS `?:product_stickers`</item>
-		<item for="uninstall">  DROP TABLE IF EXISTS `?:product_stickers_images`</item>
-		<item for="uninstall">  DROP TABLE IF EXISTS `?:product_sticker_descriptions`</item>
+    <queries>
+        <item>CREATE TABLE `?:product_stickers` (
+            `sticker_id` mediumint(8) unsigned NOT NULL auto_increment,
+            `name` varchar(255) NOT NULL,
+            `position` char(1) NOT NULL default 'A',
+            `class` varchar(255) NOT NULL,
+            `status` char(1) NOT NULL default 'A',
+            `display` varchar(16) NOT NULL default 'P,C,B',
+            `use_avail_period` char(1) NOT NULL default 'N',
+            `avail_from_timestamp` int(11) UNSIGNED NOT NULL default 0,
+            `avail_till_timestamp` int(11) UNSIGNED NOT NULL default 0,
+            `usergroup_ids` varchar(255) NOT NULL default '0',
+            `type` char(1) NOT NULL default 'G',
+            `params` TEXT NOT NULL,
+            `url` varchar(255) NOT NULL,
+            PRIMARY KEY (`sticker_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8
+        </item>
+        <item editions="MULTIVENDOR">ALTER TABLE `?:product_stickers` ADD company_id int(11) unsigned NOT NULL default 0</item>
+        <item>
+            CREATE TABLE `?:product_stickers_images` (
+            `sticker_image_id` mediumint(8) unsigned NOT NULL auto_increment,
+            `sticker_id` mediumint(8) unsigned NOT NULL default 0,
+            `lang_code` char(2) NOT NULL default '',
+            PRIMARY KEY  (`sticker_image_id`),
+            UNIQUE KEY  `sticker` (`sticker_id`,`lang_code`)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item>
+            CREATE TABLE `?:product_sticker_descriptions` (
+            `sticker_id` mediumint(8) unsigned NOT NULL default 0,
+            `lang_code` char(2) NOT NULL default '',
+            `text` mediumtext,
+            UNIQUE KEY  `sticker` (`sticker_id`,`lang_code`)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">  DROP TABLE IF EXISTS `?:product_stickers`</item>
+        <item for="uninstall">  DROP TABLE IF EXISTS `?:product_stickers_images`</item>
+        <item for="uninstall">  DROP TABLE IF EXISTS `?:product_sticker_descriptions`</item>
 
-		<item>ALTER TABLE `?:products` ADD `sticker_ids` varchar(255) NOT NULL</item>
-		<item for="uninstall">ALTER TABLE `?:products` DROP `sticker_ids`</item>
+        <item>ALTER TABLE `?:products` ADD `sticker_ids` varchar(255) NOT NULL</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `sticker_ids`</item>
 
-		<item>ALTER TABLE `?:categories` ADD `sticker_ids` varchar(255) NOT NULL</item>
-		<item for="uninstall">ALTER TABLE `?:categories` DROP `sticker_ids`</item>
-		
-		<item>ALTER TABLE `?:product_feature_variants` ADD `sticker_ids` varchar(255) NOT NULL</item>
-		<item for="uninstall">ALTER TABLE `?:product_feature_variants` DROP `sticker_ids`</item>
+        <item>ALTER TABLE `?:categories` ADD `sticker_ids` varchar(255) NOT NULL</item>
+        <item for="uninstall">ALTER TABLE `?:categories` DROP `sticker_ids`</item>
+        
+        <item>ALTER TABLE `?:product_feature_variants` ADD `sticker_ids` varchar(255) NOT NULL</item>
+        <item for="uninstall">ALTER TABLE `?:product_feature_variants` DROP `sticker_ids`</item>
 
-		<item>ALTER TABLE `?:product_features` ADD `sticker_ids` varchar(255) NOT NULL</item>
-		<item for="uninstall">ALTER TABLE `?:product_features` DROP `sticker_ids`</item>
-	</queries>
-	<language_variables>
-		<item lang="en" id="stickers">Product Stickers</item>
-		<item lang="en" id="stickers_menu_description">Allows to set stickers to the product</item>
-		<item lang="en" id="text_sticker_name">Sticker name</item>
-		<item lang="en" id="new_sticker">New sticker</item>
-		<item lang="en" id="editing_sticker">Editing sticker</item>
-		<item lang="en" id="add_stickers">Add stickers</item>
-		<item lang="en" id="add_stickers_and_close">Add stickers and close</item>
-		<item lang="en" id="sticker_ids">Stickers</item>
+        <item>ALTER TABLE `?:product_features` ADD `sticker_ids` varchar(255) NOT NULL</item>
+        <item for="uninstall">ALTER TABLE `?:product_features` DROP `sticker_ids`</item>
+    </queries>
+    <language_variables>
+        <item lang="en" id="stickers">Product Stickers</item>
+        <item lang="en" id="stickers_menu_description">Allows to set stickers to the product</item>
+        <item lang="en" id="text_sticker_name">Sticker name</item>
+        <item lang="en" id="new_sticker">New sticker</item>
+        <item lang="en" id="editing_sticker">Editing sticker</item>
+        <item lang="en" id="add_stickers">Add stickers</item>
+        <item lang="en" id="add_stickers_and_close">Add stickers and close</item>
+        <item lang="en" id="sticker_ids">Stickers</item>
 
-		<item lang="en" id="top_left">Top left</item>
-		<item lang="en" id="top_center">Top center</item>
-		<item lang="en" id="top_right">Top right</item>
-		<item lang="en" id="middle_left">Middle left</item>
-		<item lang="en" id="middle_center">Middle center</item>
-		<item lang="en" id="middle_right">Middle right</item>
-		<item lang="en" id="bottom_left">Bottom left</item>
-		<item lang="en" id="bottom_center">Bottom center</item>
-		<item lang="en" id="bottom_right">Bottom right</item>
+        <item lang="en" id="top_left">Top left</item>
+        <item lang="en" id="top_center">Top center</item>
+        <item lang="en" id="top_right">Top right</item>
+        <item lang="en" id="middle_left">Middle left</item>
+        <item lang="en" id="middle_center">Middle center</item>
+        <item lang="en" id="middle_right">Middle right</item>
+        <item lang="en" id="bottom_left">Bottom left</item>
+        <item lang="en" id="bottom_center">Bottom center</item>
+        <item lang="en" id="bottom_right">Bottom right</item>
 
-		<item lang="en" id="stickers.on_sale_sticker">On sale sticker</item>
-		<item lang="en" id="stickers.novelty_sticker">New arrivals sticker</item>
-		<item lang="en" id="stickers.during">during</item>
-		<item lang="en" id="stickers.days">days</item>
-		<item lang="en" id="stickers.coming_soon_sticker">Coming soon sticker</item>
-		<item lang="en" id="stickers.days_before_selling">days before start selling</item>
-		<item lang="en" id="stickers.free_shipping_sticker">Free shipping sticker</item>
-		<item lang="en" id="stickers.most_popular_sticker">Most popular sticker</item>
-		<item lang="en" id="stickers.popularity_more">popularity more than</item>
-		<item lang="en" id="stickers.bestseller_sticker">Bestseller sticker</item>
-		<item lang="en" id="stickers.sales_count">number of sales more than</item>
-		<item lang="en" id="stickers.top_rated_sticker">Top rated sticker</item>
-		<item lang="en" id="stickers.rating_equal">rating more than</item>
-		<item lang="en" id="stickers.sold_out_sticker">Sold out sticker</item>
+        <item lang="en" id="stickers.on_sale_sticker">On sale sticker</item>
+        <item lang="en" id="stickers.novelty_sticker">New arrivals sticker</item>
+        <item lang="en" id="stickers.during">during</item>
+        <item lang="en" id="stickers.days">days</item>
+        <item lang="en" id="stickers.coming_soon_sticker">Coming soon sticker</item>
+        <item lang="en" id="stickers.days_before_selling">days before start selling</item>
+        <item lang="en" id="stickers.free_shipping_sticker">Free shipping sticker</item>
+        <item lang="en" id="stickers.most_popular_sticker">Most popular sticker</item>
+        <item lang="en" id="stickers.popularity_more">popularity more than</item>
+        <item lang="en" id="stickers.bestseller_sticker">Bestseller sticker</item>
+        <item lang="en" id="stickers.sales_count">number of sales more than</item>
+        <item lang="en" id="stickers.top_rated_sticker">Top rated sticker</item>
+        <item lang="en" id="stickers.rating_equal">rating more than</item>
+        <item lang="en" id="stickers.sold_out_sticker">Sold out sticker</item>
 
-		<item lang="en" id="stickers.in_stock_sticker">In stock sticker</item>
-		<item lang="en" id="stickers.returnable_sticker">Returnable sticker</item>
-		<item lang="en" id="stickers.weight_sticker">Weight sticker</item>
-		<item lang="en" id="stickers.than">than</item>
-		<item lang="en" id="stickers.age_verification_sticker">Age verification sticker</item>
-		
-		<item lang="en" id="stickers.product_page">Product details page</item>
-		<item lang="en" id="stickers.category_page">Category page</item>
-		<item lang="en" id="stickers.blocks">Product blocks</item>
-		<item lang="en" id="stickers.css_properties">CSS properties</item>
-		
-	</language_variables>
+        <item lang="en" id="stickers.in_stock_sticker">In stock sticker</item>
+        <item lang="en" id="stickers.returnable_sticker">Returnable sticker</item>
+        <item lang="en" id="stickers.weight_sticker">Weight sticker</item>
+        <item lang="en" id="stickers.than">than</item>
+        <item lang="en" id="stickers.age_verification_sticker">Age verification sticker</item>
+        
+        <item lang="en" id="stickers.product_page">Product details page</item>
+        <item lang="en" id="stickers.category_page">Category page</item>
+        <item lang="en" id="stickers.blocks">Product blocks</item>
+        <item lang="en" id="stickers.css_properties">CSS properties</item>
+    </language_variables>
 </addon>

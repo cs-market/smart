@@ -12,11 +12,11 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 $schema['central']['marketing']['items']['stickers'] = array(
-	'attrs' => array(
-		'class'=>'is-addon'
-	),
-	'href' => 'stickers.manage',
-	'position' => 660,
+    'attrs' => array(
+        'class'=>'is-addon'
+    ),
+    'href' => 'stickers.manage',
+    'position' => 660,
 );
 
 return $schema;

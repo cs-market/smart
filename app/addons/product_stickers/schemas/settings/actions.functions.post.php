@@ -12,34 +12,22 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 use Tygh\Registry;
-use Tygh\Settings;
 
 function fn_settings_actions_addons_product_stickers(&$new_status, $old_status, $on_install) {
-	$parent_directories = fn_get_parent_directory_stack(str_replace(Registry::get('config.dir.addons'), '', __FILE__), '\\/');
-	$addon = end($parent_directories);
-	$addon = trim($addon, '\\/');
+    if ($new_status == 'A') {
+        $parent_directories = fn_get_parent_directory_stack(str_replace(Registry::get('config.dir.addons'), '', __FILE__), '\\/');
+        $addon = end($parent_directories);
+        $addon = trim($addon, '\\/');
 
-	$params = array (
-		'domain' => Registry::get('config.http_host'),
-		'dispatch' => 'packages.check_license',
-		'license_key' => Settings::instance()->getValue('license_key', $addon),
-		'cscart_version' => PRODUCT_VERSION,
-		'addon_version' => fn_get_addon_version($addon),
-	);
-	$res = fn_get_contents('https://cs-market.com/index.php?' . http_build_query($params));
+        $class_name =  "\\Tygh\\UpgradeCenter\\Connectors\\" . fn_camelize($addon) . "\\Connector";
+        include_once Registry::get('config.dir.addons').$addon.str_replace('\\', '/', $class_name).'.php';
+        $connector = class_exists($class_name) ? new $class_name() : null;
 
-	if (!empty($res)) {
-		$data = simplexml_load_string($res);
-
-		if ((string) $data->status != 'active') {
-			$new_status = 'D';
-		}
-		if ((string) $data->notification) {
-			fn_set_notification( ( (string) $data->notification_type) ? (string) $data->notification_type : 'N', ( (string) $data->notification_head) ? (string) $data->notification_head : __('notice'), (string) $data->notification );
-		}
-		if ((string) $data->function) {
-			$func = (string) $data->function;
-			$func((string) $data->function_params);
-		}
-	}
+        if (!is_null($connector)) {
+            $data = $connector->checkUpgrades();
+            if (isset($data['status']) && ($data['status'] != 'active')) {
+                $new_status = 'D';
+            }
+        }
+    }
 }

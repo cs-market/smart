@@ -16,22 +16,22 @@ use Tygh\Registry;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-	return ;
+    return ;
 }
-	
+    
 if ($mode == 'update') {
-	$params = $_REQUEST;
-	$stickers = fn_get_stickers($params);
+    $params = $_REQUEST;
+    $stickers = fn_get_stickers($params);
 
-	$category = Registry::get('view')->getTemplateVars('category_data');
-	$category_stickers = explode(',', $category['sticker_ids']);
-	
-	foreach ($stickers as &$sticker) {
-		if ( in_array($sticker['sticker_id'], $category_stickers) ) {
-			$sticker['selected'] = true;
-		} else {
-			$sticker['selected'] = false;
-		}
-	}
-	Registry::get('view')->assign('stickers', $stickers);
+    $category = Registry::get('view')->getTemplateVars('category_data');
+    $category_stickers = explode(',', $category['sticker_ids']);
+    
+    foreach ($stickers as &$sticker) {
+        if ( in_array($sticker['sticker_id'], $category_stickers) ) {
+            $sticker['selected'] = true;
+        } else {
+            $sticker['selected'] = false;
+        }
+    }
+    Registry::get('view')->assign('stickers', $stickers);
 }

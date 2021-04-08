@@ -12,7 +12,7 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 $schema['export_fields']['Stickers'] = array (
-	'db_field' => 'sticker_ids',
+    'db_field' => 'sticker_ids',
 );
 
 return $schema;

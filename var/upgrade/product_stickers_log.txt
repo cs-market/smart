@@ -108,3 +108,362 @@
 2019-12-20 02:51:29: FTP chmod result: FAILED
 2019-12-20 02:51:29: ----------
 2019-12-20 02:51:29: Upgrade completed!
+2021-04-08 15:44:02: Downloading "product_stickers" upgrade package
+2021-04-08 15:44:03: Upgrade package has been downloaded and ready to install
+2021-04-08 15:44:42: Downloading "product_stickers" upgrade package
+2021-04-08 15:44:42: Upgrade package has been downloaded and ready to install
+
+
+################################################################################
+################################################################################
+2021-04-08 15:46:36: Starting installation of the "product_stickers" upgrade package
+2021-04-08 15:46:36: Upgrading version 2.0.1 to 2.0.2
+2021-04-08 15:46:36: Running as user "www-data"
+2021-04-08 15:46:36: Storing entry point files permissions...
+2021-04-08 15:46:36: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:46:36: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:46:36: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:46:36: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:46:36:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:46:36: Executing pre-upgrade validators
+2021-04-08 15:46:36: Found 0 validators at package
+2021-04-08 15:46:36: Executing "collisions" validator
+2021-04-08 15:46:36: Executing "permissions" validator
+2021-04-08 15:46:36: Executing "restore" validator
+2021-04-08 15:46:36: Upgrade stopped: awaiting resolving "restore" validator errors
+
+
+################################################################################
+################################################################################
+2021-04-08 15:47:27: Starting installation of the "product_stickers" upgrade package
+2021-04-08 15:47:27: Upgrading version 2.0.1 to 2.0.2
+2021-04-08 15:47:27: Running as user "www-data"
+2021-04-08 15:47:27: Storing entry point files permissions...
+2021-04-08 15:47:27: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:47:27: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:47:27: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:47:27: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:47:27:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:47:27: Executing pre-upgrade validators
+2021-04-08 15:47:27: Found 0 validators at package
+2021-04-08 15:47:27: Executing "collisions" validator
+2021-04-08 15:47:27: Executing "permissions" validator
+2021-04-08 15:47:27: Executing "restore" validator
+2021-04-08 15:47:27: Upgrade stopped: awaiting resolving "restore" validator errors
+
+
+################################################################################
+################################################################################
+2021-04-08 15:48:18: Starting installation of the "product_stickers" upgrade package
+2021-04-08 15:48:18: Upgrading version 2.0.1 to 2.0.2
+2021-04-08 15:48:18: Running as user "www-data"
+2021-04-08 15:48:18: Storing entry point files permissions...
+2021-04-08 15:48:18: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:18: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:18: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:18: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:18:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:48:18: Executing pre-upgrade validators
+2021-04-08 15:48:18: Found 0 validators at package
+2021-04-08 15:48:18: Executing "collisions" validator
+2021-04-08 15:48:18: Executing "permissions" validator
+2021-04-08 15:48:18: Executing "restore" validator
+2021-04-08 15:48:18: Backup filename is "upg_product_stickers_2.0.1-2.0.2_08Apr2021_154818"
+2021-04-08 15:48:18: Preparing restore script
+2021-04-08 15:48:18: Upgrades directory permissions: drwxrwxrwx bizon:bizon
+2021-04-08 15:48:18: Source restore script permissions: -rwxrwxrwx bizon:bizon
+2021-04-08 15:48:18: Created directory for restore script at "/home/bizon/www/smart/upgrades/product_stickers_2.0.1-2.0.2/"
+2021-04-08 15:48:18: Directory permissions: drwxr-xr-x www-data:www-data
+2021-04-08 15:48:18: Created restore script at "/home/bizon/www/smart/upgrades/product_stickers_2.0.1-2.0.2/restore_2021-04-08_15-48-18.php"
+2021-04-08 15:48:18: Restore script permissions: -rw-r--r-- www-data:www-data
+2021-04-08 15:48:18: Correcting target restore script directory permissions...
+2021-04-08 15:48:18: ----------
+2021-04-08 15:48:18: Changing permissions of "/home/bizon/www/smart/upgrades/product_stickers_2.0.1-2.0.2/" to 755
+2021-04-08 15:48:18: Using chmod()... OK
+2021-04-08 15:48:18: ----------
+2021-04-08 15:48:18: Target restore script directory permissions: drwxr-xr-x www-data:www-data
+2021-04-08 15:48:18: Correcting upgrades directory permissions...
+2021-04-08 15:48:18: ----------
+2021-04-08 15:48:18: Changing permissions of "/home/bizon/www/smart/upgrades" to 755
+2021-04-08 15:48:18: Using chmod()... FAILED
+2021-04-08 15:48:18: Using FTP...
+2021-04-08 15:48:18: Connection established
+2021-04-08 15:48:18: FTP chmod result: FAILED
+2021-04-08 15:48:18: ----------
+2021-04-08 15:48:18: Upgrades directory permissions: drwxrwxrwx bizon:bizon
+2021-04-08 15:48:18: Checking restore script availability via HTTP
+2021-04-08 15:48:18: Closing storefront
+2021-04-08 15:48:18: No migrations found at package
+2021-04-08 15:48:18: Copying package files
+2021-04-08 15:48:18: Deleting files removed at new version
+2021-04-08 15:48:18: Processing themes files
+2021-04-08 15:48:18: Installing languages using upgraded *.po files
+2021-04-08 15:48:18: Already installed languages: ru
+2021-04-08 15:48:18: Languages to be installed: 
+2021-04-08 15:48:18: Installing "ru" language... SKIPPED
+2021-04-08 15:48:18: Executing post-upgrade script "/home/bizon/www/smart/var/upgrade/packages/product_stickers/content/scripts/upgrade.post.php"
+2021-04-08 15:48:18: Post-upgrade script executed successfully
+2021-04-08 15:48:18: Cleaning cache
+2021-04-08 15:48:18: Saving upgrade information to DB
+2021-04-08 15:48:18: Sending statistics
+2021-04-08 15:48:20: PHP Warning: Invalid argument supplied for foreach() in /home/bizon/www/smart/app/Tygh/UpgradeCenter/App.php on line 1185
+2021-04-08 15:48:20: Deleting package contents
+2021-04-08 15:48:20: Restoring entry point files permissions...
+2021-04-08 15:48:20: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: Changing permissions of "/home/bizon/www/smart/index.php" to 100777
+2021-04-08 15:48:20: Using chmod()... FAILED
+2021-04-08 15:48:20: Using FTP...
+2021-04-08 15:48:20: Connection established
+2021-04-08 15:48:20: FTP chmod result: FAILED
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: Changing permissions of "/home/bizon/www/smart/fadCcCyH9P.php" to 100777
+2021-04-08 15:48:20: Using chmod()... FAILED
+2021-04-08 15:48:20: Using FTP...
+2021-04-08 15:48:20: Connection established
+2021-04-08 15:48:20: FTP chmod result: FAILED
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: Changing permissions of "/home/bizon/www/smart/api.php" to 100777
+2021-04-08 15:48:20: Using chmod()... FAILED
+2021-04-08 15:48:20: Using FTP...
+2021-04-08 15:48:20: Connection established
+2021-04-08 15:48:20: FTP chmod result: FAILED
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: Changing permissions of "/home/bizon/www/smart/vendor.php" to 100777
+2021-04-08 15:48:20: Using chmod()... FAILED
+2021-04-08 15:48:20: Using FTP...
+2021-04-08 15:48:20: Connection established
+2021-04-08 15:48:20: FTP chmod result: FAILED
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: Changing permissions of "/home/bizon/www/smart/" to 40777
+2021-04-08 15:48:20: Using chmod()... FAILED
+2021-04-08 15:48:20: Using FTP...
+2021-04-08 15:48:20: Connection established
+2021-04-08 15:48:20: FTP chmod result: FAILED
+2021-04-08 15:48:20: ----------
+2021-04-08 15:48:20: Upgrade completed!
+2021-04-08 15:48:37: Downloading "product_stickers" upgrade package
+2021-04-08 15:48:38: Upgrade package has been downloaded and ready to install
+
+
+################################################################################
+################################################################################
+2021-04-08 15:48:50: Starting installation of the "product_stickers" upgrade package
+2021-04-08 15:48:50: Upgrading version 2.0.2 to 2.1.1
+2021-04-08 15:48:50: Running as user "www-data"
+2021-04-08 15:48:50: Storing entry point files permissions...
+2021-04-08 15:48:50: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:50: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:50: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:50: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:50:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:48:50: Executing pre-upgrade validators
+2021-04-08 15:48:50: Found 0 validators at package
+2021-04-08 15:48:50: Executing "collisions" validator
+2021-04-08 15:48:50: Executing "permissions" validator
+2021-04-08 15:48:50: Executing "restore" validator
+2021-04-08 15:48:50: Backup filename is "upg_product_stickers_2.0.2-2.1.1_08Apr2021_154849"
+2021-04-08 15:48:50: Preparing restore script
+2021-04-08 15:48:50: Upgrades directory permissions: drwxrwxrwx bizon:bizon
+2021-04-08 15:48:50: Source restore script permissions: -rwxrwxrwx bizon:bizon
+2021-04-08 15:48:50: Created directory for restore script at "/home/bizon/www/smart/upgrades/product_stickers_2.0.2-2.1.1/"
+2021-04-08 15:48:50: Directory permissions: drwxr-xr-x www-data:www-data
+2021-04-08 15:48:50: Created restore script at "/home/bizon/www/smart/upgrades/product_stickers_2.0.2-2.1.1/restore_2021-04-08_15-48-49.php"
+2021-04-08 15:48:50: Restore script permissions: -rw-r--r-- www-data:www-data
+2021-04-08 15:48:50: Correcting target restore script directory permissions...
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Changing permissions of "/home/bizon/www/smart/upgrades/product_stickers_2.0.2-2.1.1/" to 755
+2021-04-08 15:48:50: Using chmod()... OK
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Target restore script directory permissions: drwxr-xr-x www-data:www-data
+2021-04-08 15:48:50: Correcting upgrades directory permissions...
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Changing permissions of "/home/bizon/www/smart/upgrades" to 755
+2021-04-08 15:48:50: Using chmod()... FAILED
+2021-04-08 15:48:50: Using FTP...
+2021-04-08 15:48:50: Connection established
+2021-04-08 15:48:50: FTP chmod result: FAILED
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Upgrades directory permissions: drwxrwxrwx bizon:bizon
+2021-04-08 15:48:50: Checking restore script availability via HTTP
+2021-04-08 15:48:50: Closing storefront
+2021-04-08 15:48:50: No migrations found at package
+2021-04-08 15:48:50: Copying package files
+2021-04-08 15:48:50: Deleting files removed at new version
+2021-04-08 15:48:50: Processing themes files
+2021-04-08 15:48:50: Installing languages using upgraded *.po files
+2021-04-08 15:48:50: Already installed languages: ru
+2021-04-08 15:48:50: Languages to be installed: 
+2021-04-08 15:48:50: Installing "ru" language... SKIPPED
+2021-04-08 15:48:50: Executing post-upgrade script "/home/bizon/www/smart/var/upgrade/packages/product_stickers/content/scripts/upgrade.post.php"
+2021-04-08 15:48:50: Post-upgrade script executed successfully
+2021-04-08 15:48:50: Cleaning cache
+2021-04-08 15:48:50: Saving upgrade information to DB
+2021-04-08 15:48:50: Sending statistics
+2021-04-08 15:48:50: Deleting package contents
+2021-04-08 15:48:50: Restoring entry point files permissions...
+2021-04-08 15:48:50: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Changing permissions of "/home/bizon/www/smart/index.php" to 100777
+2021-04-08 15:48:50: Using chmod()... FAILED
+2021-04-08 15:48:50: Using FTP...
+2021-04-08 15:48:50: Connection established
+2021-04-08 15:48:50: FTP chmod result: FAILED
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Changing permissions of "/home/bizon/www/smart/fadCcCyH9P.php" to 100777
+2021-04-08 15:48:50: Using chmod()... FAILED
+2021-04-08 15:48:50: Using FTP...
+2021-04-08 15:48:50: Connection established
+2021-04-08 15:48:50: FTP chmod result: FAILED
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Changing permissions of "/home/bizon/www/smart/api.php" to 100777
+2021-04-08 15:48:50: Using chmod()... FAILED
+2021-04-08 15:48:50: Using FTP...
+2021-04-08 15:48:50: Connection established
+2021-04-08 15:48:50: FTP chmod result: FAILED
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Changing permissions of "/home/bizon/www/smart/vendor.php" to 100777
+2021-04-08 15:48:50: Using chmod()... FAILED
+2021-04-08 15:48:50: Using FTP...
+2021-04-08 15:48:50: Connection established
+2021-04-08 15:48:50: FTP chmod result: FAILED
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Changing permissions of "/home/bizon/www/smart/" to 40777
+2021-04-08 15:48:50: Using chmod()... FAILED
+2021-04-08 15:48:50: Using FTP...
+2021-04-08 15:48:50: Connection established
+2021-04-08 15:48:50: FTP chmod result: FAILED
+2021-04-08 15:48:50: ----------
+2021-04-08 15:48:50: Upgrade completed!
+2021-04-08 15:50:50: Downloading "product_stickers" upgrade package
+2021-04-08 15:50:50: Upgrade package has been downloaded and ready to install
+
+
+################################################################################
+################################################################################
+2021-04-08 15:51:03: Starting installation of the "product_stickers" upgrade package
+2021-04-08 15:51:03: Upgrading version 2.1.1 to 2.1.2
+2021-04-08 15:51:03: Running as user "www-data"
+2021-04-08 15:51:03: Storing entry point files permissions...
+2021-04-08 15:51:03: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:51:03: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:51:03: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:51:03: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:51:03:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:51:03: Executing pre-upgrade validators
+2021-04-08 15:51:03: Found 0 validators at package
+2021-04-08 15:51:03: Executing "collisions" validator
+2021-04-08 15:51:03: Upgrade stopped: awaiting resolving "collisions" validator errors
+
+
+################################################################################
+################################################################################
+2021-04-08 15:53:33: Starting installation of the "product_stickers" upgrade package
+2021-04-08 15:53:33: Upgrading version 2.1.1 to 2.1.2
+2021-04-08 15:53:33: Running as user "www-data"
+2021-04-08 15:53:33: Storing entry point files permissions...
+2021-04-08 15:53:33: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:53:33: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:53:33: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:53:33: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:53:33:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:53:33: Executing pre-upgrade validators
+2021-04-08 15:53:33: Found 0 validators at package
+2021-04-08 15:53:33: Executing "collisions" validator
+2021-04-08 15:53:33: Executing "permissions" validator
+2021-04-08 15:53:33: Executing "restore" validator
+2021-04-08 15:53:33: Backup filename is "upg_product_stickers_2.1.1-2.1.2_08Apr2021_155333"
+2021-04-08 15:53:33: Preparing restore script
+2021-04-08 15:53:33: Upgrades directory permissions: drwxrwxrwx bizon:bizon
+2021-04-08 15:53:33: Source restore script permissions: -rwxrwxrwx bizon:bizon
+2021-04-08 15:53:33: Created directory for restore script at "/home/bizon/www/smart/upgrades/product_stickers_2.1.1-2.1.2/"
+2021-04-08 15:53:33: Directory permissions: drwxr-xr-x www-data:www-data
+2021-04-08 15:53:33: Created restore script at "/home/bizon/www/smart/upgrades/product_stickers_2.1.1-2.1.2/restore_2021-04-08_15-53-33.php"
+2021-04-08 15:53:33: Restore script permissions: -rw-r--r-- www-data:www-data
+2021-04-08 15:53:33: Correcting target restore script directory permissions...
+2021-04-08 15:53:33: ----------
+2021-04-08 15:53:33: Changing permissions of "/home/bizon/www/smart/upgrades/product_stickers_2.1.1-2.1.2/" to 755
+2021-04-08 15:53:33: Using chmod()... OK
+2021-04-08 15:53:33: ----------
+2021-04-08 15:53:33: Target restore script directory permissions: drwxr-xr-x www-data:www-data
+2021-04-08 15:53:33: Correcting upgrades directory permissions...
+2021-04-08 15:53:33: ----------
+2021-04-08 15:53:33: Changing permissions of "/home/bizon/www/smart/upgrades" to 755
+2021-04-08 15:53:33: Using chmod()... FAILED
+2021-04-08 15:53:33: Using FTP...
+2021-04-08 15:53:33: Connection established
+2021-04-08 15:53:33: FTP chmod result: FAILED
+2021-04-08 15:53:33: ----------
+2021-04-08 15:53:33: Upgrades directory permissions: drwxrwxrwx bizon:bizon
+2021-04-08 15:53:33: Checking restore script availability via HTTP
+2021-04-08 15:53:33: Closing storefront
+2021-04-08 15:53:33: No migrations found at package
+2021-04-08 15:53:33: Copying package files
+2021-04-08 15:53:33: Deleting files removed at new version
+2021-04-08 15:53:33: Processing themes files
+2021-04-08 15:53:33: Installing languages using upgraded *.po files
+2021-04-08 15:53:33: Already installed languages: ru
+2021-04-08 15:53:33: Languages to be installed: 
+2021-04-08 15:53:33: Installing "ru" language... SKIPPED
+2021-04-08 15:53:33: Cleaning cache
+2021-04-08 15:53:33: Saving upgrade information to DB
+2021-04-08 15:53:33: Sending statistics
+2021-04-08 15:53:35: Deleting package contents
+2021-04-08 15:53:35: Restoring entry point files permissions...
+2021-04-08 15:53:35: index.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: Changing permissions of "/home/bizon/www/smart/index.php" to 100777
+2021-04-08 15:53:35: Using chmod()... FAILED
+2021-04-08 15:53:35: Using FTP...
+2021-04-08 15:53:35: Connection established
+2021-04-08 15:53:35: FTP chmod result: FAILED
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: fadCcCyH9P.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: Changing permissions of "/home/bizon/www/smart/fadCcCyH9P.php" to 100777
+2021-04-08 15:53:35: Using chmod()... FAILED
+2021-04-08 15:53:35: Using FTP...
+2021-04-08 15:53:35: Connection established
+2021-04-08 15:53:35: FTP chmod result: FAILED
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: api.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: Changing permissions of "/home/bizon/www/smart/api.php" to 100777
+2021-04-08 15:53:35: Using chmod()... FAILED
+2021-04-08 15:53:35: Using FTP...
+2021-04-08 15:53:35: Connection established
+2021-04-08 15:53:35: FTP chmod result: FAILED
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: vendor.php ==> 33279 (-rwxrwxrwx)
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: Changing permissions of "/home/bizon/www/smart/vendor.php" to 100777
+2021-04-08 15:53:35: Using chmod()... FAILED
+2021-04-08 15:53:35: Using FTP...
+2021-04-08 15:53:35: Connection established
+2021-04-08 15:53:35: FTP chmod result: FAILED
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35:  ==> 16895 (drwxrwxrwx)
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: Changing permissions of "/home/bizon/www/smart/" to 40777
+2021-04-08 15:53:35: Using chmod()... FAILED
+2021-04-08 15:53:35: Using FTP...
+2021-04-08 15:53:35: Connection established
+2021-04-08 15:53:35: FTP chmod result: FAILED
+2021-04-08 15:53:35: ----------
+2021-04-08 15:53:35: Upgrade completed!

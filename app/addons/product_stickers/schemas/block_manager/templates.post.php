@@ -12,11 +12,11 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 foreach ($schema as $template => &$data) {
-	if (isset($data['bulk_modifier']['fn_gather_additional_products_data'])) {
-		if (!in_array($template, array('blocks/products/products_small_items.tpl', 'blocks/products/short_list.tpl'))) {
-			$data['bulk_modifier']['fn_gather_additional_products_data']['params']['get_stickers_for'] = 'B';
-		}
-	}
+    if (isset($data['bulk_modifier']['fn_gather_additional_products_data'])) {
+        if (!in_array($template, array('blocks/products/products_small_items.tpl', 'blocks/products/short_list.tpl'))) {
+            $data['bulk_modifier']['fn_gather_additional_products_data']['params']['get_stickers_for'] = 'B';
+        }
+    }
 }
 
 return $schema;
