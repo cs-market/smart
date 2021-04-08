@@ -765,8 +765,7 @@ function fn_smart_distribution_place_order($order_id, $action, $order_status, $c
                 'order_status' => fn_get_status_data($order_status, STATUSES_ORDER, $order_info['order_id'], $company_lang_code),
                 'payment_method' => fn_get_payment_data($payment_id, $order_info['order_id'], $company_lang_code),
                 'status_settings' => $status_settings,
-                'profile_fields' => fn_get_profile_fields('I', '', $company_lang_code),
-                'secondary_currency' => $secondary_currency
+                'profile_fields' => fn_get_profile_fields('I', '', $company_lang_code)
             ),
             'template_code' => $email_template_name,
             'tpl' => 'orders/order_notification.tpl', // this parameter is obsolete and is used for back compatibility

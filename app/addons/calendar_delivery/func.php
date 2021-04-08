@@ -144,6 +144,8 @@ function fn_calendar_delivery_create_order(&$order) {
     // backward compatibility with mobile app
     if (is_array($order['delivery_date'])) {
         $order['delivery_date'] = array_shift($order['delivery_date']);
+    }
+    if (is_array($order['delivery_period'])) {
         $order['delivery_period'] = array_shift($order['delivery_period']);
     }
     // 16.03.2021. strpos temporary for mobile app! Need to be removed.
