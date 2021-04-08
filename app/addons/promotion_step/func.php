@@ -44,7 +44,7 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
     $promotion =  fn_get_promotion_data($promotion_id);
     $amount = 0;
     foreach ($promotion['conditions']['conditions'] as $key => $conditions) {
-        if($conditions['condition'] == 'products'){
+        if(isset($conditions['condition']) && $conditions['condition'] == 'products'){
             foreach ($conditions['value'] as $key => $value) {
                 foreach ($cart_products as $k => $v) {
                     if ($type == 'S') {
@@ -61,7 +61,7 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
                     }       
                 }
             }
-        }else{
+        } else {
                 foreach ($cart_products as $k => $v) {
                     if ($type == 'S') {
                         if (fn_exclude_from_shipping_calculate($cart['products'][$k])) {
