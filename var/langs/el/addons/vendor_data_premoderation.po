@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_data_premoderation.po\n"
-"X-Crowdin-File-ID: 3666\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_data_premoderation.po\n"
+"X-Crowdin-File-ID: 4158\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::vendor_data_premoderation"
 msgid "Vendor data premoderation"
@@ -69,16 +69,16 @@ msgid "Disapprove selected"
 msgstr "Απόρριψη Επιλογής"
 
 msgctxt "Languages::pre_moderation"
-msgid "Products require prior approval"
-msgstr "Προϊόντα απαιτούν προηγούμενη έγκριση"
+msgid "Require approval for new products"
+msgstr ""
 
 msgctxt "Languages::pre_moderation_edit"
-msgid "Approve product info updates"
-msgstr "Εγκρίνετε τις ενημερώσεις πληροφοριων προϊόντος"
+msgid "Require approval for updated products"
+msgstr ""
 
 msgctxt "Languages::pre_moderation_edit_vendors"
-msgid "Approve vendor profile updates"
-msgstr "Εγκρίνετε ενημερώσεις προφίλ πελάτη"
+msgid "Require approval for vendor profile changes"
+msgstr ""
 
 msgctxt "Languages::text_not_approved_products"
 msgid "You have products that require your approval. Please <a href=\"[link]\">follow this link</a> to review these products."
@@ -118,11 +118,11 @@ msgstr "Έγκριση για τα νέο δημιουργηθέντα προϊ�
 
 msgctxt "SettingsOptions::vendor_data_premoderation::products_updates_approval"
 msgid "Approval of product info updates"
-msgstr ""
+msgstr "Εγκρίνετε ενημερώσεις πληροφοριων προϊόντος"
 
 msgctxt "SettingsOptions::vendor_data_premoderation::vendor_profile_updates_approval"
 msgid "Approval of vendor profile updates"
-msgstr ""
+msgstr "Εγκρίνετε ενημερώσεις προφίλ πωλητη"
 
 msgctxt "SettingsOptions::vendor_data_premoderation::product_approval_notifications"
 msgid "Notify vendors about product moderation results"
@@ -130,7 +130,7 @@ msgstr "Ειδοποίηση πωλητών για τα αποτελέσματα
 
 msgctxt "SettingsOptions::vendor_data_premoderation::product_premoderation_fields"
 msgid "Require approval for updates of"
-msgstr ""
+msgstr "Απαιτείται έγκριση για ενημερώσεις του"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::none"
 msgid "Isn't required"
@@ -138,11 +138,11 @@ msgstr "Δεν απαιτείται"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::custom"
 msgid "Required for some vendors"
-msgstr ""
+msgstr "Απαιτείται για μερικούς πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::all"
 msgid "Required for all vendors"
-msgstr ""
+msgstr "Απαιτείται για όλους τους πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::none"
 msgid "Isn't required"
@@ -150,11 +150,11 @@ msgstr "Δεν απαιτείται"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::custom"
 msgid "Required for some vendors"
-msgstr ""
+msgstr "Απαιτείται για μερικούς πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::all"
 msgid "Required for all vendors"
-msgstr ""
+msgstr "Απαιτείται για όλους τους πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::none"
 msgid "Isn't required"
@@ -162,11 +162,11 @@ msgstr "Δεν απαιτείται"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::custom"
 msgid "Required for some vendors"
-msgstr ""
+msgstr "Απαιτείται για μερικούς πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::all"
 msgid "Required for all vendors"
-msgstr ""
+msgstr "Απαιτείται για όλους τους πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::none"
 msgid "Don't notify"
@@ -278,17 +278,17 @@ msgstr "Προ έγκριση στοιχείων Πωλητή: το προϊόν
 
 msgctxt "Languages::vendor_data_premoderation.approval_info_text"
 msgid "If approval is required only for some vendors, you'll be able to set what vendors need moderation on the Add-ons tab of the vendor editing page."
-msgstr ""
+msgstr "Εάν απαιτείται έγκριση μόνο για ορισμένους πωλητές, θα μπορείτε να ορίσετε ποιοι πωλητές χρειάζονται εποπτεία στην καρτέλα Πρόσθετα στη σελίδα επεξεργασίας πωλητή."
 
 msgctxt "Languages::internal_template.vendor_data_premoderation_product_approved"
 msgid "Vendor data premoderation: your product was approved"
-msgstr ""
+msgstr "Προ έγκριση στοιχείων Πωλητή: το προϊόν σας έχει εγκριθεί."
 
 msgctxt "Languages::internal_template.vendor_data_premoderation_product_disapproved"
 msgid "Vendor data premoderation: your product was disapproved"
-msgstr ""
+msgstr "Προ έγκριση στοιχείων Πωλητή: το προϊόν σας έχει απορριφθεί"
 
 msgctxt "Languages::vendor_data_premoderation.moderation"
 msgid "Moderation"
-msgstr ""
+msgstr "εποπτεία"
 

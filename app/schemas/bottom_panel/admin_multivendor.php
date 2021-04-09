@@ -52,4 +52,29 @@ $schema['products.manage&company_id'] = [
     ]
 ];
 
+// vendor microstore
+
+/** @var array<string, string> $schema */
+$schema['products.manage'] = [
+    'from' => [
+        'dispatch' => 'products.manage'
+    ],
+    'to_customer' => [
+        'dispatch' => 'companies.products',
+        'company_id' => Registry::get('runtime.company_id')
+    ]
+];
+
+$schema['products.manage&cid'] = [
+    'from' => [
+        'dispatch' => 'products.manage',
+        'cid'
+    ],
+    'to_customer' => [
+        'dispatch' => 'companies.products',
+        'category_id' => '%cid%',
+        'company_id' => Registry::get('runtime.company_id')
+    ]
+];
+
 return $schema;

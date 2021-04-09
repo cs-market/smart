@@ -141,14 +141,13 @@ class Debugger
 
     public static function getData($data_time)
     {
-        $data = array();
-        if (!empty($data_time)) {
-            $debugger_data = Registry::get('dbg_' . $data_time);
-            $data = !empty($debugger_data) ? $debugger_data : array();
-            $data = json_decode($data, true);
+        if (empty($data_time)) {
+            return [];
         }
 
-        return $data;
+        $debugger_data = Registry::get('dbg_' . $data_time);
+
+        return empty($debugger_data) ? [] : json_decode($debugger_data, true);
     }
 
     public static function checkpoint($name)

@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: id\n"
-"X-Crowdin-File: /release-4.11.5/addons/call_requests.po\n"
-"X-Crowdin-File-ID: 3628\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.2/addons/call_requests.po\n"
+"X-Crowdin-File-ID: 4044\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::call_requests"
 msgid "Call requests"
@@ -34,7 +34,7 @@ msgstr "Menulis ulang telepon"
 
 msgctxt "SettingsOptions::call_requests::phone_prefix_length"
 msgid "Highlight first chars [Deprecated]"
-msgstr ""
+msgstr "Sorot karakter pertama [Deprecated]"
 
 msgctxt "SettingsOptions::call_requests::buy_now_with_one_click"
 msgid "Enable the \"Buy now with one click\" option"
@@ -46,7 +46,7 @@ msgstr "Status pesanan"
 
 msgctxt "SettingsOptions::call_requests::phone_mask"
 msgid "Phone mask [Deprecated]"
-msgstr ""
+msgstr "Masker telepon [Deprecated]"
 
 msgctxt "SettingsTooltips::call_requests::phone_mask"
 msgid "Leave empty to use automatic country-based phone pattern, or type in a custom pattern. You can use spaces, commas, +, -, and digits. Note that 9 represents any digit; if you need a 9, type \\\\9. Examples: +9 (999) 999 99 99, 99999999, 999 999 99 or +99-99-9999-9999."
@@ -58,11 +58,11 @@ msgstr "Termasuk tanda kurung, Ruang, dll. Digunakan untuk menyoroti kode negara
 
 msgctxt "SettingsOptions::call_requests::enable_call_requests_for_vendors"
 msgid "Enable call requests for vendors"
-msgstr ""
+msgstr "Aktifkan permintaan panggilan untuk penjaja"
 
 msgctxt "SettingsTooltips::call_requests::enable_call_requests_for_vendors"
 msgid "This will also replace marketplace contact information with vendors' where necessary."
-msgstr ""
+msgstr "Ini juga akan menggantikan informasi kontak pasar dengan penjaja jika diperlukan."
 
 msgctxt "Languages::privileges.manage_call_requests"
 msgid "Can edit"
@@ -210,7 +210,7 @@ msgstr "Permintaan panggilan: formulir permintaan"
 
 msgctxt "Languages::call_requests.agreement_text_full_request_call_request_form"
 msgid "<p>We ([company]) will use the data you provide here to contact you regarding your call request or order. That data will remain in our system, visible to our staff (or the relevant vendor), until you withdraw your consent. If you’d like to have your personal data removed, send an email to [email].</p> <p>If you believe that your personal data has been misused, you have the right to lodge a complaint with a supervisory authority. We’re obliged by EU General Data Protection Regulation to let you know about this right; we don’t actually intend to misuse your data.</p>"
-msgstr ""
+msgstr "<p>Kami ([company]) akan menggunakan data yang anda berikan disini untuk menghubungi anda terkait permintaan atau pesanan panggilan anda. Data tersebut akan tetap ada dalam sistem kami, terlihat oleh staff kami (atau penjaja yang relevan), sampai Anda menarik persetujuan Anda. Jika Anda ingin data pribadi Anda dihapus, kirim email ke [email]. </p> <p>Jika Anda percaya bahwa data pribadi Anda telah disalahgunakan, Anda memiliki hak untuk mengajukan keluhan ke otoritas pengawas. Kami diwajibkan oleh Regulasi Perlindungan Data Umum Uni Eropa untuk memberitahukan anda tentang hal ini; Kami sama sekali tidak berniat menyalahgunakan data Anda.</p>"
 
 msgctxt "Languages::call_requests.agreement_text_short_request_call_request_form"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
@@ -222,9 +222,9 @@ msgstr "Data pribadi dari permintaan panggilan"
 
 msgctxt "Languages::call_requests.event.request_created.name"
 msgid "Call requests: request created"
-msgstr ""
+msgstr "Permintaan panggilan: permintaan dibuat"
 
 msgctxt "Languages::call_requests.event.request_about_product_created.name"
 msgid "Call requests: request about product created"
-msgstr ""
+msgstr "Permintaan panggilan: permintaan tentang produk dibuat"
 

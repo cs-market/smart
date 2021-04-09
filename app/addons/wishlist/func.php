@@ -156,6 +156,10 @@ function fn_wishlist_get_count()
  */
 function fn_wishlist_save_cart_content_pre(&$cart, $user_id, $type, $user_type)
 {
+    if (!empty($user_id)) {
+        return;
+    }
+
     if ($type == 'W') {
         if (empty($cart['user_data']) && !empty(Tygh::$app['session']['cart']['user_data'])) {
             $cart['user_data'] = Tygh::$app['session']['cart']['user_data'];

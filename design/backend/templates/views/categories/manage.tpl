@@ -35,7 +35,14 @@
     {include file="views/categories/components/categories_select_fields.tpl"}
 
     <div class="buttons-container">
-        {include file="buttons/save_cancel.tpl" but_text=__("modify_selected") but_meta="cm-process-items" but_name="dispatch[categories.store_selection]" cancel_action="close"}
+        <a class="cm-dialog-closer cm-inline-dialog-closer tool-link btn bulkedit-unchanged">{__("cancel")}</a>
+
+        {include file="buttons/button.tpl" 
+            but_text=__("modify_selected") 
+            but_role="submit" 
+            but_name="dispatch[categories.store_selection]" 
+            but_meta="btn-primary cm-process-items"
+        }
     </div>
 {/capture}
 

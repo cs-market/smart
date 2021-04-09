@@ -32,9 +32,11 @@ if ($mode == 'update') {
 
     $discussion = fn_get_discussion($_REQUEST['category_id'], DiscussionObjectTypes::CATEGORY, true, $_REQUEST);
 
-    if (!empty($discussion) &&
-        $discussion['type'] !== DiscussionTypes::TYPE_DISABLED &&
-        fn_check_permissions('discussion', 'view', 'admin')
+    if (
+        !empty($discussion)
+        && $discussion['type'] !== DiscussionTypes::TYPE_DISABLED
+        && fn_check_permissions('discussion', 'view', 'admin')
+        && (fn_get_runtime_company_id() || fn_allowed_for('MULTIVENDOR'))
     ) {
         Registry::set('navigation.tabs.discussion', [
             'title' => __('discussion_title_category'),

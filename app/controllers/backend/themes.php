@@ -227,6 +227,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+
+    if ($mode == 'update_logos') {
+        fn_attach_image_pairs('logotypes', 'logos');
+
+        return [CONTROLLER_STATUS_OK, 'themes.manage'];
+    }
+
     if ($mode == 'update_dev_mode') {
         if (!empty($_REQUEST['dev_mode'])) {
 
@@ -287,6 +294,12 @@ if ($mode == 'manage') {
 
     $style = Styles::factory($theme_name)->get($layout['style_id']);
     $layout['style_name'] = empty($style['name']) ? '' : $style['name'];
+    $theme_logos = fn_get_logos(
+        Registry::get('runtime.company_id'),
+        $layout['layout_id'],
+        $layout['style_id'],
+        $layout['storefront_id']
+    );
 
     foreach ($available_themes['installed'] as $theme_id => $theme) {
         $layouts_params = array(
@@ -314,5 +327,7 @@ if ($mode == 'manage') {
         'storefront'       => $storefront,
         'available_themes' => $available_themes,
         'dev_modes'        => Development::get(),
+        'theme_logos'      => $theme_logos,
+        'show_all_logos'   => isset($_REQUEST['show_all_logos'])
     ]);
 }

@@ -12,17 +12,12 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Settings;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-    if ($mode == 'update' && $_REQUEST['addon'] == 'rus_yandex_metrika' ) {
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($mode === 'update' && $_REQUEST['addon'] === 'rus_yandex_metrika') {
         fn_yandex_metrika_sync_goals();
-
-        return array(CONTROLLER_STATUS_OK, "addons.update?addon=" . $_REQUEST['addon']);
     }
 }
+
+return [CONTROLLER_STATUS_OK];

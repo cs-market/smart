@@ -15,6 +15,7 @@
 use Tygh\BlockManager\Block;
 use Tygh\BlockManager\Layout;
 use Tygh\BlockManager\ProductTabs;
+use Tygh\Enum\ProfileTypes;
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Languages\Languages;
@@ -25,9 +26,10 @@ use Tygh\Settings;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Tools\Url;
 use Tygh\Tygh;
-use Tygh\Enum\SiteArea;
 use Tygh\Enum\VendorStatuses;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\SiteArea;
 
 /**
  * Gets brief company data array: <i>(company_id => company_name)</i>
@@ -156,6 +158,16 @@ function fn_get_companies($params, &$auth, $items_per_page = 0, $lang_code = CAR
 {
     // Init filter
     $_view = 'companies';
+
+    /**
+     * Changes params for selecting companies
+     *
+     * @param array  $params         Companies search params
+     * @param int    $items_per_page Items per page
+     * @param string $lang_code      Two-letter language code (e.g. 'en', 'ru', etc.)
+     */
+    fn_set_hook('get_companies_pre', $params, $items_per_page, $lang_code);
+
     $params = LastView::instance()->update($_view, $params);
 
     // Set default values to input params
@@ -323,7 +335,7 @@ function fn_get_companies($params, &$auth, $items_per_page = 0, $lang_code = CAR
     $companies = db_get_array('SELECT ' . implode(', ', $fields) . ' FROM ?:companies ?p WHERE 1 ?p ?p ?p ?p', $join, $condition, $group, $sorting, $limit);
 
     if (!empty($params['extend'])) {
-        $company_ids = fn_array_column($companies, 'company_id');
+        $company_ids = array_column($companies, 'company_id');
 
         if ($company_ids && !empty($params['extend']['products_count'])) {
             $companies_products_count = fn_get_companies_active_products_count($company_ids);
@@ -514,6 +526,10 @@ function fn_get_company_data($company_id, $lang_code = DESCR_SL, $extra = array(
 
     $cache_key = md5($company_id . $lang_code . serialize($extra));
 
+    if (!empty($extra['reset_cache'])) {
+        $company_data_cache = [];
+    }
+
     if (empty($extra['skip_cache']) && isset($company_data_cache[$cache_key])) {
         return $company_data_cache[$cache_key];
     }
@@ -670,7 +686,9 @@ function fn_get_available_company_ids($company_ids = array())
         $condition = db_quote(' AND company_id IN (?n)', $company_ids);
     }
 
-    return db_get_fields("SELECT company_id FROM ?:companies WHERE 1 ?p AND status IN ('A', 'P', 'N')", $condition);
+    $allowed_statuses = VendorStatuses::getList([VendorStatuses::DISABLED]);
+
+    return db_get_fields('SELECT company_id FROM ?:companies WHERE 1 ?p AND status IN (?a)', $condition, $allowed_statuses);
 }
 
 function fn_check_company_id($table, $key, $key_id, $company_id = '')
@@ -829,12 +847,12 @@ function fn_update_company($company_data, $company_id = 0, $lang_code = CART_LAN
     unset($company_data['company_id']);
     $_data = $company_data;
 
-    if (fn_allowed_for('MULTIVENDOR')) {
+    if (fn_allowed_for('MULTIVENDOR') && !empty($_data['email'])) {
         // Check if company with same email already exists
-        $is_exist = db_get_field("SELECT email FROM ?:companies WHERE company_id != ?i AND email = ?s", $company_id, $_data['email']);
+        $is_exist = db_get_field('SELECT email FROM ?:companies WHERE company_id != ?i AND email = ?s', $company_id, $_data['email']);
         if (!empty($is_exist)) {
             $_text = 'error_vendor_exists';
-            fn_set_notification('E', __('error'), __($_text));
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __($_text));
 
             return false;
         }
@@ -1294,42 +1312,47 @@ function fn_change_company_status($company_id, $status_to, $reason = '', &$statu
     fn_set_hook('change_company_status_pre', $company_id, $status_to, $reason, $status_from, $skip_query, $notify);
 
     if (empty($status_from)) {
-        $status_from = db_get_field("SELECT status FROM ?:companies WHERE company_id = ?i", $company_id);
+        $status_from = db_get_field('SELECT status FROM ?:companies WHERE company_id = ?i', $company_id);
     }
 
-    if (!in_array($status_to, array('A', 'P', 'D')) || $status_from == $status_to) {
+    if (!in_array($status_to, VendorStatuses::getStatusesTo()) || $status_from === $status_to) {
         return false;
     }
 
-    $result = $skip_query ? true : db_query("UPDATE ?:companies SET status = ?s WHERE company_id = ?i", $status_to, $company_id);
+    $result = $skip_query ? true : db_query('UPDATE ?:companies SET status = ?s WHERE company_id = ?i', $status_to, $company_id);
 
     if (!$result) {
         return false;
     }
 
-    $company_data = fn_get_company_data($company_id);
+    $company_data = fn_get_company_data($company_id, DESCR_SL, ['reset_cache' => true]);
 
-    $account = $username = '';
-    if ($status_from == 'N' && ($status_to == 'A' || $status_to == 'P')) {
-        if (Registry::get('settings.Vendors.create_vendor_administrator_account') == 'Y') {
+    $account = '';
+    if (
+        $status_from === VendorStatuses::NEW_ACCOUNT
+        && (
+            $status_to === VendorStatuses::ACTIVE
+            || $status_to === VendorStatuses::PENDING
+        )
+    ) {
+        if (YesNo::toBool(Registry::get('settings.Vendors.create_vendor_administrator_account'))) {
             if (!empty($company_data['request_user_id'])) {
-                $password_change_timestamp = db_get_field("SELECT password_change_timestamp FROM ?:users WHERE user_id = ?i", $company_data['request_user_id']);
+                $password_change_timestamp = db_get_field('SELECT password_change_timestamp FROM ?:users WHERE user_id = ?i', $company_data['request_user_id']);
                 $_set = '';
                 if (empty($password_change_timestamp)) {
-                    $_set = ", password_change_timestamp = 1 ";
+                    $_set = ', password_change_timestamp = 1';
                 }
-                db_query("UPDATE ?:users SET company_id = ?i, user_type = 'V'$_set WHERE user_id = ?i", $company_id, $company_data['request_user_id']);
+                db_query('UPDATE ?:users SET company_id = ?i, user_type = ?s, is_root = ?s?p WHERE user_id = ?i', $company_id, UserTypes::VENDOR, YesNo::YES, $_set, $company_data['request_user_id']);
 
-                $username = fn_get_user_name($company_data['request_user_id']);
                 $account = 'updated';
 
                 $msg = __('new_administrator_account_created') . '<a href="' . fn_url('profiles.update?user_id=' . $company_data['request_user_id']) . '">' . __('you_can_edit_account_details') . '</a>';
-                fn_set_notification('N', __('notice'), $msg, 'K');
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), $msg, 'K');
 
             } else {
                 $request_account_data = (array) unserialize($company_data['request_account_data']);
                 $_company_data = $company_data + $request_account_data;
-                $_company_data['status'] = 'A';
+                $_company_data['status'] = VendorStatuses::ACTIVE;
 
                 if (!empty($_company_data['request_account_name'])) {
                     $_company_data['admin_username'] = $_company_data['request_account_name'];
@@ -1339,7 +1362,6 @@ function fn_change_company_status($company_id, $status_to, $reason = '', &$statu
                 $user_data = fn_create_company_admin($_company_data, $fields, false);
 
                 if (!empty($user_data['user_id'])) {
-                    $username = $user_data['user_login'];
                     $account = 'new';
                 }
             }
@@ -1369,11 +1391,15 @@ function fn_change_company_status($company_id, $status_to, $reason = '', &$statu
     if ($notify && !empty($company_data['email'])) {
         $e_username = $e_account = $e_password = '';
         if (
-            $status_from == VendorStatuses::NEW_ACCOUNT
-            && ($status_to == VendorStatuses::ACTIVE || $status_to == VendorStatuses::PENDING)
+            $status_from === VendorStatuses::NEW_ACCOUNT
+            && (
+                $status_to === VendorStatuses::ACTIVE
+                || $status_to === VendorStatuses::PENDING
+                || $status_to === VendorStatuses::SUSPENDED
+            )
         ) {
             list($e_username, $e_account) = [$user_data['email'], $account];
-            if ($account == 'new') {
+            if ($account === 'new') {
                 $e_password = $user_data['password1'];
             }
         }
@@ -1382,10 +1408,11 @@ function fn_change_company_status($company_id, $status_to, $reason = '', &$statu
 
         $event_dispatcher = Tygh::$app['event.dispatcher'];
         $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
-        $force_notification[UserTypes::VENDOR] = $notify;
+        $force_notification = [UserTypes::VENDOR => $notify];
         $notification_rules = $notification_settings_factory->create($force_notification);
         $data = [
             'company'       => $company_info,
+            'to_company_id' => $company_id,
             'status_to'     => $status_to,
             'reason'        => $reason,
             'status_from'   => $status_from,
@@ -1395,20 +1422,33 @@ function fn_change_company_status($company_id, $status_to, $reason = '', &$statu
             'e_password'    => $e_password,
             'vendor_url'    => fn_url('', SiteArea::VENDOR_PANEL),
         ];
+
+        $event_code = '';
+
         switch ($status_to) {
-            case ObjectStatuses::DISABLED:
-                $data['status'] = __('disabled');
-                $event_dispatcher->dispatch('vendor_status_changed_disabled', $data, $notification_rules);
+            case VendorStatuses::DISABLED:
+                $data['status'] = 'disabled';
+                $event_code = 'vendor_status_changed_disabled';
                 break;
-            case ObjectStatuses::PENDING:
-                $data['status'] = __('pending');
-                $event_dispatcher->dispatch('vendor_status_changed_pending', $data, $notification_rules);
+            case VendorStatuses::PENDING:
+                $data['status'] = 'pending';
+                $event_code = 'vendor_status_changed_pending';
                 break;
-            case ObjectStatuses::ACTIVE:
-                $data['status'] = __('active');
-                $event_dispatcher->dispatch('vendor_status_changed_active', $data, $notification_rules);
+            case VendorStatuses::ACTIVE:
+                $data['status'] = 'active';
+                $event_code = 'vendor_status_changed_active';
+                break;
+            case VendorStatuses::SUSPENDED:
+                $data['status'] = 'suspended';
+                $event_code = 'vendor_status_changed_suspended';
                 break;
         }
+
+        if ($status_from === VendorStatuses::SUSPENDED) {
+            $event_code = 'vendor_status_changed_from_suspended';
+        }
+
+        $event_dispatcher->dispatch($event_code, $data, $notification_rules);
     }
 
     return $result;
@@ -1794,4 +1834,73 @@ function fn_get_company_root_admin_user_id($company_id, array $auth = null)
     $user = reset($users);
 
     return $user['user_id'];
+}
+
+/**
+ * Filtering company data by profile fields.
+ *
+ * @param array<string|int|array>                                                $company_data Company data
+ * @param array{field_prefix?: string, fields_map?: array<string|array<string>>} $params       Array of params:
+ *                                                                                             - 'field_prefix' - prefix for company profile fields
+ *                                                                                             - 'fields_map' - custom fields mapping
+ *
+ * @return array<string|int> $company_data
+ */
+function fn_filter_company_data_by_profile_fields(array $company_data = [], array $params = [])
+{
+    if (!$company_data) {
+        return $company_data;
+    }
+
+    static $company_profile_fields = null;
+
+    if ($company_profile_fields === null) {
+        $company_profile_fields = db_get_hash_array('SELECT * FROM ?:profile_fields WHERE profile_type = ?s', 'field_name', ProfileTypes::CODE_SELLER);
+    }
+
+    $default_fields_map = [
+        'phone'   => 'phone_2',
+        'email'   => [
+            'users_department',
+            'site_administrator',
+            'orders_department',
+            'support_department',
+            'newsletter_email',
+        ],
+        'country' => 'country_descr',
+        'state'   => 'state_descr',
+        'url'     => 'website',
+    ];
+
+    $params['field_prefix'] = empty($params['field_prefix']) ? '' : (string) $params['field_prefix'];
+    $params['fields_map'] = isset($params['fields_map'])
+        ? array_merge_recursive($default_fields_map, (array) $params['fields_map'])
+        : $default_fields_map;
+
+    array_walk(
+        $company_profile_fields,
+        static function ($value, $field_name) use (&$company_data, $params) {
+            if (YesNo::toBool($value['storefront_show'])) {
+                return;
+            }
+
+            if (isset($company_data[$params['field_prefix'] . $field_name])) {
+                $company_data[$params['field_prefix'] . $field_name] = '';
+            }
+
+            if (!isset($params['fields_map'][$field_name])) {
+                return;
+            }
+
+            foreach ((array) $params['fields_map'][$field_name] as $company_field) {
+                if (!isset($company_data[$params['field_prefix'] . $company_field])) {
+                    continue;
+                }
+
+                $company_data[$params['field_prefix'] . $company_field] = '';
+            }
+        }
+    );
+
+    return $company_data;
 }

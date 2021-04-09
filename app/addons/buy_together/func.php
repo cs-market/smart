@@ -18,6 +18,7 @@ use Tygh\Registry;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Languages\Languages;
 use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -361,7 +362,7 @@ function fn_buy_together_get_chains($params = array(), $auth = array(), $lang_co
                         && ($product['status'] == 'H'
                             || (
                                 isset($product['tracking'])
-                                && $product['tracking'] != ProductTracking::DO_NOT_TRACK
+                                && $product['tracking'] !== ProductTracking::DO_NOT_TRACK
                                 && Registry::get('settings.General.show_out_of_stock_products') == 'N'
                                 && empty($product['amount'])
                             )
@@ -984,7 +985,9 @@ function fn_buy_together_calculate_cart_items(&$cart, &$cart_products, &$auth)
     }
 
     $is_valid = true;
-    $check_amount = (Registry::get('settings.General.inventory_tracking') == 'Y' && Registry::get('settings.General.allow_negative_amount') != 'Y') ? true : false;
+
+    $check_amount =
+        Registry::get('settings.General.inventory_tracking') !== YesNo::NO && Registry::get('settings.General.allow_negative_amount') !== YesNo::YES;
 
     foreach ($cart['products'] as $key => $product) {
         if (!empty($product['extra']['buy_together'])) {
@@ -1007,7 +1010,14 @@ function fn_buy_together_calculate_cart_items(&$cart, &$cart_products, &$auth)
 
             $_product = fn_get_product_data($product['product_id'], $auth, CART_LANGUAGE, '', false, false, false, false);
 
-            if (empty($_product) || ($check_amount && $product['amount'] > $_product['amount'] && $_product['tracking'] != ProductTracking::DO_NOT_TRACK && $_product['out_of_stock_actions'] != OutOfStockActions::BUY_IN_ADVANCE)) {
+            if (
+                empty($_product) || (
+                    $check_amount
+                    && $product['amount'] > $_product['amount']
+                    && $_product['tracking'] !== ProductTracking::DO_NOT_TRACK
+                    && $_product['out_of_stock_actions'] !== OutOfStockActions::BUY_IN_ADVANCE
+                )
+            ) {
                 $allowed = false;
             }
 
@@ -1023,7 +1033,13 @@ function fn_buy_together_calculate_cart_items(&$cart, &$cart_products, &$auth)
                     if ($allowed) {
                         $_product = fn_get_product_data($v['product_id'], $auth, CART_LANGUAGE, '', false, false, false, false);
 
-                        if (empty($_product) || ($check_amount && $v['amount'] > $_product['amount']) && !defined('ORDER_MANAGEMENT') && $_product['tracking'] != ProductTracking::DO_NOT_TRACK && $_product['out_of_stock_actions'] != OutOfStockActions::BUY_IN_ADVANCE) {
+                        if (
+                            empty($_product)
+                            || ($check_amount && $v['amount'] > $_product['amount'])
+                            && !defined('ORDER_MANAGEMENT')
+                            && $_product['tracking'] !== ProductTracking::DO_NOT_TRACK
+                            && $_product['out_of_stock_actions'] !== OutOfStockActions::BUY_IN_ADVANCE
+                        ) {
                             fn_set_notification('E', __('notice'), __('buy_together_product_was_removed', array(
                                 '[product]' => $_product['product'],
                                 '[amount]' => $v['amount']

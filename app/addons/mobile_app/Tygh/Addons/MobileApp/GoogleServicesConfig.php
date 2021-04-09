@@ -23,15 +23,27 @@ use Tygh\Storage;
  */
 class GoogleServicesConfig
 {
-    protected static $file_path = 'mobile_app/google-services.json';
+    /** @var string */
+    protected static $file_path = 'mobile_app';
 
-    public static function upload($uploaded_data)
+    /** @var string */
+    protected static $file_name = 'google-services.json';
+
+    /**
+     * Uploads data
+     *
+     * @param array<array<string|int>> $uploaded_data Uploaded data
+     * @param int                      $storefront_id Storefront identifier
+     *
+     * @return bool
+     */
+    public static function upload($uploaded_data, $storefront_id = 0)
     {
         if (empty($uploaded_data['google_services_config_file']['path'])) {
             return false;
         }
 
-        list($size) = Storage::instance('downloads')->put(self::$file_path, [
+        list($size) = Storage::instance('downloads')->put(self::getFullFilePath($storefront_id), [
             'file'      => $uploaded_data['google_services_config_file']['path'],
             'overwrite' => true,
         ]);
@@ -39,23 +51,63 @@ class GoogleServicesConfig
         return $size > 0;
     }
 
-    public static function isExist()
+    /**
+     * Checks if a file exists
+     *
+     * @param int $storefront_id Storefront identifier
+     *
+     * @return bool
+     */
+    public static function isExist($storefront_id = 0)
     {
-        return Storage::instance('downloads')->isExist(self::$file_path);
+        return Storage::instance('downloads')->isExist(self::getFullFilePath($storefront_id));
     }
 
-    public static function getFilePath()
+    /**
+     * Gets file path
+     *
+     * @param int $storefront_id Storefront identifier
+     *
+     * @return string
+     */
+    public static function getFilePath($storefront_id = 0)
     {
-        return Storage::instance('downloads')->getAbsolutePath(self::$file_path);
+        return Storage::instance('downloads')->getAbsolutePath(self::getFullFilePath($storefront_id));
     }
 
-    public static function getFile()
+    /**
+     * Gets the file
+     *
+     * @param int $storefront_id Storefront identifier
+     *
+     * @return bool
+     */
+    public static function getFile($storefront_id = 0)
     {
-        return Storage::instance('downloads')->get(self::$file_path);
+        return Storage::instance('downloads')->get(self::getFullFilePath($storefront_id));
     }
 
-    public static function deleteFile()
+    /**
+     * Deletes the file
+     *
+     * @param int $storefront_id Storefront identifier
+     *
+     * @return bool
+     */
+    public static function deleteFile($storefront_id = 0)
     {
-        return Storage::instance('downloads')->delete(self::$file_path);
+        return Storage::instance('downloads')->delete(self::getFullFilePath($storefront_id));
+    }
+
+    /**
+     * Gets full file path
+     *
+     * @param int $storefront_id Storefront identifier
+     *
+     * @return string
+     */
+    public static function getFullFilePath($storefront_id)
+    {
+        return implode(DIRECTORY_SEPARATOR, [self::$file_path, $storefront_id, self::$file_name]);
     }
 }

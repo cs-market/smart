@@ -7,7 +7,7 @@
     <default_language>en</default_language>
     <status>disabled</status>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
-    <settings edition_type="ROOT,ULT:VENDOR">
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>

@@ -3,5 +3,6 @@
         variation_features=$thread.object.variation_features
         features_split=true
         features_inline=true
+        features_secondary=true
     }
 {/if}

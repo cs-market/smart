@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.11.5/addons/stripe_connect.po\n"
-"X-Crowdin-File-ID: 3658\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/stripe_connect.po\n"
+"X-Crowdin-File-ID: 4192\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::stripe_connect"
 msgid "Stripe Connect payments"
@@ -39,6 +39,10 @@ msgstr "Комісія з замовлення і невиплачені вип�
 msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+msgctxt "Languages::stripe_connect.stripe_connect_short"
+msgid "Stripe"
+msgstr "Stripe"
 
 msgctxt "Languages::stripe_connect.redirect_uri_admin"
 msgid "Redirect URI for administrator"
@@ -163,4 +167,44 @@ msgstr "З цим замовленням використовувався под
 msgctxt "Languages::stripe_connect.payment_intent_error"
 msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
 msgstr "При створенні PaymentIntent у способу оплати #[payment_id] виникла помилка: [error]"
+
+msgctxt "Languages::log_type_stripe_connect"
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgctxt "Languages::log_action_sc_failure"
+msgid "Error"
+msgstr "Помилка"
+
+msgctxt "Languages::stripe_connect.log_context"
+msgid "Context"
+msgstr "Контекст"
+
+msgctxt "Languages::stripe_connect.unexpected_payment_intent_status"
+msgid "Unexpected status \"[status]\" of PaymentIntent"
+msgstr "Несподіваний статус \"[status]\" у PaymentIntent"
+
+msgctxt "Languages::stripe_connect.account_link_error"
+msgid "A vendor with company ID [company_id] is not linked to a Stripe account"
+msgstr "У продавця з company ID [company_id] не прив'язано обліковий запис Stripe"
+
+msgctxt "Languages::stripe_connect.transfer_creating_error"
+msgid "An error occurred during the creation of a Stripe transfer: [error]"
+msgstr "Помилка при створенні переказу (Transfer) в Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.charge_creating_error"
+msgid "An error occurred during the creation of a Stripe charge: [error]"
+msgstr "Помилка при створенні відрахування (Charge) в Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_creating_error"
+msgid "An error occurred during the creation of a Stripe customer: [error]"
+msgstr "Помилка при створенні покупця (Customer) в Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_sharing_error"
+msgid "An error occurred during the share of a Stripe customer: [error]"
+msgstr "Помилка при спробі створенні покупця (Customer) з Stripe доступним для підключеного продавця: [error]"
+
+msgctxt "Languages::stripe_connect.stripe_processor_params_missing"
+msgid "Stripe processor params missing"
+msgstr "Відсутні параметри процесора Stripe"
 

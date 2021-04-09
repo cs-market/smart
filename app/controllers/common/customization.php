@@ -12,18 +12,29 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Registry;
 
 defined('BOOTSTRAP') or die('Access denied');
+
+/** @var string $mode */
+/** @var array $auth */
 
 $request_method = $_SERVER['REQUEST_METHOD'];
 $has_permissions = Registry::get('config.demo_mode')
     ? fn_check_permissions('customization', $mode, 'demo', $request_method, $_REQUEST, AREA, $auth['user_id'])
     : fn_check_permissions('customization', $mode, 'admin', $request_method, $_REQUEST, AREA, $auth['user_id']);
 
-if (AREA === 'C' &&
-    $mode === 'update_mode' && ($auth['user_type'] !== UserTypes::ADMIN || !$has_permissions)
+if (SiteArea::isStorefront(AREA) && UserTypes::isVendor($auth['user_type'])) {
+    Registry::set('runtime.vendor_id', $auth['company_id']);
+    $has_permissions = $has_permissions && fn_check_company_permissions('customization', $mode, $request_method, $_REQUEST);
+}
+
+if (
+    $mode === 'update_mode'
+    && SiteArea::isStorefront(AREA)
+    && (!in_array($auth['user_type'], [UserTypes::ADMIN, UserTypes::VENDOR], true) || !$has_permissions)
 ) {
     return [CONTROLLER_STATUS_DENIED];
 }
@@ -44,28 +55,29 @@ if ($mode === 'update_mode') {
         $status = $_REQUEST['status'];
         $avail_modes = array_keys(fn_get_customization_modes());
 
-        if (!in_array($c_mode, $avail_modes)) {
+        if (!in_array($c_mode, $avail_modes, true)) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        if ($c_mode === 'theme_editor' && UserTypes::isVendor($auth['user_type']) && !fn_get_styles_owner()) {
             return [CONTROLLER_STATUS_NO_PAGE];
         }
 
         $changed_modes = [];
 
-        if ($status == 'enable') {
+        if ($status === 'enable') {
             // disable all other modes
             $changed_modes = array_fill_keys($avail_modes, 'disable');
         }
 
         $changed_modes[$c_mode] = $status;
 
-        fn_update_customization_mode($changed_modes);
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        $storefront_id = $storefront->storefront_id;
 
-        if ($status === 'enable' && AREA !== 'C') {
+        if ($status === 'enable' && !SiteArea::isStorefront(AREA)) {
             // redirect to frontend after enabling mode
-            /** @var \Tygh\Storefront\Repository $repository */
-            $repository = Tygh::$app['storefront.repository'];
-            /** @var \Tygh\Storefront\Storefront $storefront */
-            $storefront = Tygh::$app['storefront'];
-            $storefront_id = $storefront->storefront_id;
             $extra_url = '&s_storefront=' . $storefront_id;
 
             if (!empty($_REQUEST['s_layout'])) {
@@ -79,12 +91,10 @@ if ($mode === 'update_mode') {
                 $extra_url .= '&redirect_url=' . urlencode($_REQUEST['frontend_url']);
             }
 
-            if (fn_get_styles_owner() && $c_mode == 'theme_editor') {
-                $extra_url .= '&customize_theme=Y';
-            }
-
             $return_url = 'profiles.act_as_user?user_id=' . $auth['user_id'] . '&area=C' . $extra_url;
         }
+
+        fn_update_customization_mode($changed_modes, $storefront_id);
 
         return [CONTROLLER_STATUS_REDIRECT, $return_url];
     }

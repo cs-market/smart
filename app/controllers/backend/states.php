@@ -64,6 +64,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    if ($mode === 'update_status') {
+        if (!empty($_REQUEST['state_ids'])) {
+            foreach ($_REQUEST['state_ids'] as $state_id) {
+                fn_tools_update_status([
+                    'table'             => 'states',
+                    'status'            => $_REQUEST['status'],
+                    'id_name'           => 'state_id',
+                    'id'                => $state_id,
+                    'show_error_notice' => false
+                ]);
+            }
+        }
+
+        return [CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']];
+    }
+
     return array(CONTROLLER_STATUS_OK, 'states.manage?country_code=' . $_REQUEST['country_code']);
 }
 

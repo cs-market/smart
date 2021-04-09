@@ -442,6 +442,14 @@ class Manager
         ]);
 
         $this->db->query('DROP TEMPORARY TABLE _warehouse_affected_products');
+
+        /**
+         * Executes after deleting warehouse data
+         * Allows to delete related data
+         *
+         * @param int $warehouse_id Warehouse identifier
+         */
+        fn_set_hook('warehouses_manager_remove_warehouse', $warehouse_id);
     }
 
     public function recalculateDestinationProductsStocksByProductIds(array $product_ids)

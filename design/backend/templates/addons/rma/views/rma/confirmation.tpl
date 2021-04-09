@@ -1,6 +1,6 @@
 {capture name="mainbox"}
 
-<p>{__("text_confirmation_page_header")}</p>
+<p>{__("rma.please_confirm_decision")}</p>
 
 {if $change_return_status}
 <form action="{""|fn_url}" method="post" name="change_return_status">
@@ -12,11 +12,11 @@
 <div>
     {assign var="status_to" value=$change_return_status.status_to}
     {assign var="status_from" value=$change_return_status.status_from}
-    {__("text_return_change_warning", ["[return_id]" => $change_return_status.return_id])}&nbsp;<span>{$status_descr.$status_from}&nbsp;&rarr;&nbsp;{$status_descr.$status_to}</span>.
+    {__("rma.text_return_change_warning", ["[old_status]" => $status_descr.$status_from, "[new_status]" => $status_descr.$status_to])}
 </div>
 {if $change_return_status.recalculate_order == "Addons\\Rma\\RecalculateOperations::MANUALLY"|enum}
 <div class="control-group">
-    <label for="total" class="cm-required control-label">{__("order_total_will_changed")}:</label>
+    <label for="total" class="cm-required control-label">{__("rma.order_total_will_changed")}:</label>
     <div class="controls">
         <input id="total" type="text" name="change_return_status[total]" value="{$change_return_status.total}" size="5" class="input-text cm-numeric" />
     </div>
@@ -25,7 +25,7 @@
 
 {if $shipping_info}
 <div>
-    {__("shipping_costs_will_changed")}:
+    {__("rma.shipping_costs_will_changed")}:
 </div>
 {foreach from=$shipping_info item="shipping"}
 <div class="control-group">
@@ -42,10 +42,11 @@
 
 <div class="buttons-container">    
     {include file="buttons/button.tpl" but_text=__("yes") but_name="dispatch[rma.update_details]"}
-    {include file="buttons/button.tpl" but_text=__("no") but_meta="cm-back-link"}
+    {include file="buttons/button.tpl" but_text=__("no") but_meta="cm-back-link" but_role="action"}
 </div>
 
 </form>
 {/if}
 {/capture}
+
 {include file="common/mainbox.tpl" title=__("confirmation_dialog") content=$smarty.capture.mainbox}

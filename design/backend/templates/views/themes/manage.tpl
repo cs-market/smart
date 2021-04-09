@@ -107,7 +107,10 @@
 
         </form>
     {/capture}
-
+    <div class="span12 section-headers">
+        <h4 class="lead">{$theme.title}{if $layout.style_name}: {$layout.style_name}{/if}</h4>
+        <span class="muted">{__("theme_styles_and_layouts")}</span>
+    </div>
 {if $theme.screenshot}
     <div id="theme_image" class="span4">
         {if $theme.styles[$layout.style_id].image}
@@ -119,15 +122,14 @@
     <!--theme_image--></div>
 {/if}
 <div class="span8 theme-description" id="theme_description_container">
-    <h4 class="lead">{$theme.title}{if $layout.style_name}: {$layout.style_name}{/if}</h4>
     {hook name="themes:current_theme_options"}
-    <span class="muted">{__("theme_styles_and_layouts")}</span>
-        <div class="table-wrapper">
-            <table class="table table-middle table--relative">
+        <div class="table-responsive-wrapper">
+            <table class="table table-middle table--relative table-responsive">
                 <thead>
                     <tr>
                         <th>{__("layout")}</th>
                         <th>{__("theme_editor.style")}</th>
+                        {hook name="themes:list_extra_th"}{/hook}
                         <th> </th>
                     </tr>
                 </thead>
@@ -135,8 +137,8 @@
                     {$has_styles = !!$theme.styles}
                     {foreach $theme.layouts as $available_layout}
                         <tr>
-                            <td>{$available_layout.name}</td>
-                            <td>
+                            <td data-th="{__("layout")}">{$available_layout.name}</td>
+                            <td data-th="{__("theme_editor.style")}">
                                 {$styles_descr = []}
                                 {foreach $available_themes.current.styles as $style}
                                     {$styles_descr[$style.style_id] = $style.name}
@@ -148,8 +150,10 @@
                                     <span class="muted">{__("theme_no_styles_text")}</span>
                                 {/if}
                             </td>
-                            <td class="right btn-toolbar btn-toolbar--theme-editor">
+                            {hook name="themes:list_extra_td"}{/hook}
+                            <td class="right btn-toolbar btn-toolbar--theme-editor" data-th="&nbsp;">
                                 {if $available_layout.is_default}
+                                    {$default_layout_name = $available_layout.name}
                                     {$but_meta = "btn-small btn-primary cm-post"}
                                 {else}
                                     {$but_meta = "btn-small cm-post"}
@@ -192,6 +196,9 @@
         </div>
     {/hook}
 <!--theme_description_container--></div>
+    {if $theme_logos}
+        {include file="views/themes/components/logos_list.tpl" logos=$theme_logos company_id=$id default_layout_name=$default_layout_name|default:""}
+    {/if}
 </div>
 
 {capture name="tabsbox"}
@@ -449,6 +456,9 @@
         {/hook}
     {/capture}
     {dropdown content=$smarty.capture.tools_list}
+    {/if}
+    {if $theme_logos}
+        {include file="buttons/save.tpl" but_name="dispatch[themes.update_logos]" but_role="action" but_target_form="update_logos_form" but_meta="cm-submit"}
     {/if}
 {/capture}
 

@@ -32,8 +32,8 @@
         {if $shipping.data.stores|count >= $_max_desktop_items}
         <div class="pickup__search">
             <div class="pickup__search-field litecheckout__field">
-                <input type="text" id="pickup-search" class="litecheckout__input js-pickup-search-input" placeholder=" "
-                    value />
+                <input type="text" id="pickup-search" class="litecheckout__input js-pickup-search-input"
+                       data-ca-pickup-group-key="{$group_key}" placeholder=" " value />
                 <label class="litecheckout__label" for="pickup-search">{__("search")}</label>
             </div>
         </div>

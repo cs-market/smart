@@ -6,12 +6,12 @@
 
 <tr {if !$clone}id="{$holder}_{$banner_id}" {/if}class="cm-js-item{if $clone} cm-clone hidden{/if}">
     {if $position_field}
-        <td>
+        <td data-th="{__("position_short")}">
             <input type="text" name="{$input_name}[{$banner_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro" {if $clone}disabled="disabled"{/if} />
         </td>
     {/if}
-    <td><a href="{"banners.update?banner_id=`$banner_id`"|fn_url}">{$banner}</a></td>
-    <td>
+    <td data-th="{__("name")}"><a href="{"banners.update?banner_id=`$banner_id`"|fn_url}">{$banner}</a></td>
+    <td data-th="&nbsp;">
         {capture name="tools_list"}
             {if !$hide_delete_button && !$view_only}
                 <li><a onclick="Tygh.$.cePicker('delete_js_item', '{$holder}', '{$banner_id}', 'b'); return false;">{__("delete")}</a></li>

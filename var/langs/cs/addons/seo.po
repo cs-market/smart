@@ -6,9 +6,11 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.11.3/addons/seo.po\n"
-"PO-Revision-Date: 2020-02-04 07:11\n"
+"X-Crowdin-File: /release-4.12.2/addons/seo.po\n"
+"X-Crowdin-File-ID: 4172\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::seo"
 msgid "SEO"
@@ -60,15 +62,15 @@ msgstr "strana [n]"
 
 msgctxt "Languages::privileges.manage_seo_rules"
 msgid "Can edit"
-msgstr ""
+msgstr "Může upravovat"
 
 msgctxt "Languages::privilege_groups.seo"
 msgid "SEO"
-msgstr ""
+msgstr "SEO"
 
 msgctxt "Languages::privileges.view_seo_rules"
 msgid "Can view"
-msgstr ""
+msgstr "Může vidět"
 
 msgctxt "Languages::seo.redirects_manager"
 msgid "301 redirects"
@@ -135,8 +137,8 @@ msgid "Other SEO URL format"
 msgstr "Další formát URL (SEO)"
 
 msgctxt "SettingsOptions::seo::seo_language"
-msgid "Show language in the URL"
-msgstr "Zobrazovat kód jazyka v URL"
+msgid "Show additional language in the URL"
+msgstr "Zobrazit další jazyk v URL"
 
 msgctxt "SettingsOptions::seo::single_url"
 msgid "Use single URL for all languages"
@@ -204,5 +206,61 @@ msgstr "/item.html"
 
 msgctxt "Languages::seo.important_language_text"
 msgid "<b>Warning!</b> The <b>SEO</b> add-on is currently configured to use a single URL for all languages. If you hide, disable, or delete a default language of one of the storefronts, the SEO URLs will be changed."
-msgstr ""
+msgstr "<b>Varování!</b> <b>SEO</b> doplněk je aktuálně nakonfigurován pro použití jedné URL pro všechny jazyky. Pokud skryjete, zakážete nebo smažete defaultní jazyk v jednom z obchodů, SEO URL budou změněny! "
+
+msgctxt "Languages::seo.upgrade_notes.seo_language.title"
+msgid "Changes in SEO add-on"
+msgstr "Změny v doplňku SEO"
+
+msgctxt "Languages::seo.upgrade_notes.seo_language.message"
+msgid "To improve rating in search engines, we have changed the behavior of the \"Show language in URL\" setting. The default language of the storefront will no longer be displayed in the URL. If your storefront in the default language was previously located at <b>[old_store_url]</b>, it will now be available at <b>[new_store_url]</b>.<br/>All old URLs will be redirected correctly to the new ones."
+msgstr "K vylepšení hodnocení ve vyhledávacích službách jsme změnili chování  v nastavení \"Zobraz jazyk URL\". Defaultní jazyk obchodu již v odkaze není zobrazen. Pokud váš obchod byl dříve s defaultním jazykem lokalizován na této adrese <b>[old_store_url]</b>, bude nyní dostupný zde <b>[new_store_url]</b>. <br/>Všechny staré adresy budou správně přesměrovány na nové adresy. "
+
+msgctxt "Languages::seo.product_feature.feature_code.notice"
+msgid "A suitable code can help this feature appear with the product in search engines. Supported codes:"
+msgstr "Patřičný kód může pomoci s touto možností lépe zobrazovat produkty ve vyhledávačích. Podporované kódy: "
+
+msgctxt "Languages::seo.brand"
+msgid "Brand"
+msgstr "Značka"
+
+msgctxt "Languages::seo.feature_code.brand.description"
+msgid "Name used by an organization or business person for labeling a product"
+msgstr "Jméno použité organizací nebo podnikatelem pro označení produktu"
+
+msgctxt "Languages::seo.isbn"
+msgid "ISBN"
+msgstr "ISBN"
+
+msgctxt "Languages::seo.feature_code.isbn.description"
+msgid "International Standard Book Number"
+msgstr "Mezinárodní standardní číslo knížky (ISBN)"
+
+msgctxt "Languages::seo.gtin"
+msgid "GTIN"
+msgstr "GTIN"
+
+msgctxt "Languages::seo.feature_code.gtin.description"
+msgid "Global Trade Item Number"
+msgstr "Globální obchodní číslo produktu"
+
+msgctxt "Languages::seo.MPN"
+msgid "MPN"
+msgstr "MPN"
+
+msgctxt "Languages::seo.feature_code.mpn.description"
+msgid "Manufacturer Part Number"
+msgstr "Číslo výrobce (part)"
+
+msgctxt "Languages::seo.storefront_frontend_default_language_warning"
+msgid "The <a href=\"[link]\">SEO</a> add-on is currently configured to use a single URL for all languages. If you change a default language of this storefront, the SEO URLs will be changed."
+msgstr "<a href=\"[link]\">SEO</a> doplněk je aktuálně nakonfigurován k použití jedné URL adresy pro všechny jazyky. Pokud změníte defaultní jazyk tohoto obchodu, SEO URL budou změněny pro všechny obchody."
+
+msgctxt "Languages::seo.default_storefront_frontend_default_language_warning"
+msgid "The <a href=\"[link]\">SEO</a> add-on is currently configured to use a single URL for all languages. If you change a default language of the default storefront, the SEO URLs will be changed for all storefronts."
+msgstr "<a href=\"[link]\">SEO</a> doplněk je aktuálně nakonfigurován k použití jedné URL adresy pro všechny jazyky. Pokud změníte defaultní jazyk defaultního obchodu, SEO URL budou změněny pro všechny obchody."
+
+msgctxt "Languages::seo.error_at_creation_seo_name"
+msgid "The following SEO name already exists in your store: <b>[names]</b>. <p> The following SEO name was used instead: <b>[new_names]</b>.|The following SEO names already exist in your store: <b>[names]</b>. The following SEO names were used instead: <b>[new_names]</b>."
+msgstr "Následující SEO název již existuje ve vašem obchodě: <b>[names]</b>.<p>Namísto toho bylo použito toto: <b>[new_names]</b>. |Následující SEO názvy již existují ve vašem obchodě: <b>[names]</b>.<p>Namísto toho bylo použito toto: <b>[new_names]</b>. "
 

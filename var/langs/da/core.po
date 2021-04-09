@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: da\n"
-"X-Crowdin-File: /release-4.11.5/core.po\n"
-"X-Crowdin-File-ID: 3710\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/core.po\n"
+"X-Crowdin-File-ID: 4196\n"
+"PO-Revision-Date: 2021-02-01 09:02\n"
 
 msgctxt "LanguageName"
 msgid "Localized language name"
@@ -300,6 +300,10 @@ msgctxt "Languages::add_feature"
 msgid "Add feature"
 msgstr "Tilføj indehold"
 
+msgctxt "Languages::advanced_feature_creation"
+msgid "Advanced feature creation"
+msgstr ""
+
 msgctxt "Languages::add_field"
 msgid "Add field"
 msgstr "Tilføj felt"
@@ -395,6 +399,10 @@ msgstr "Tilføj ny variant"
 msgctxt "Languages::add_option"
 msgid "Add option"
 msgstr "Tilføj muligheder"
+
+msgctxt "Languages::advanced_option_creation"
+msgid "Advanced option creation"
+msgstr ""
 
 msgctxt "Languages::add_order"
 msgid "Add order"
@@ -856,6 +864,10 @@ msgctxt "Languages::approve_selected"
 msgid "Approve selected"
 msgstr "Godkend valgt"
 
+msgctxt "Languages::enter_disapproval_reason"
+msgid "Enter the reason for disapproval"
+msgstr ""
+
 msgctxt "Languages::arabic"
 msgid "Arabic"
 msgstr "arabisk"
@@ -1248,6 +1260,10 @@ msgctxt "Languages::block_manager.forbid_changing_layout_in_css_mode"
 msgid "Changing layout when the theme is converted to CSS is not permitted. Please enable LESS mode in the <a target=\"_blank\" class=\"cm-post\" href=\"[url]\">Theme editor</a>."
 msgstr "Skiftende layout når temaet er konverteret til CSS er ikke tilladt. Venligst aktiver mindre tilstand i <a target=\"_blank\" class=\"cm-post\" href=\"[url]\"> tema-editor</a>."
 
+msgctxt "Languages::block_manager.can_not_add_product"
+msgid "Sorry, we couldn't take you to the checkout page. It requires at least one product in cart, and we couldn't add any. Please create a product and make it available on the storefront first."
+msgstr ""
+
 msgctxt "Languages::block_manager.add_layout_page"
 msgid "Add layout page"
 msgstr "Tilføje sidelayout"
@@ -1528,9 +1544,9 @@ msgctxt "Languages::broken_po_pack"
 msgid "Incorrect PO-pack structure. The uploaded pack cannot be installed."
 msgstr "Forkert PO-pack struktur. Den uploadede pack kan ikke installeres."
 
-msgctxt "Languages::incorrect_po_pack_structure"
-msgid "The structure of package that contains \".po\" translation files located at <b>\"[pack_path]\"</b> is incorrect."
-msgstr "Strukturen af pakke, der indeholder \".po\" oversættelsesfiler placeret i <b>\"[pack_path]\"</b> er forkert."
+msgctxt "Languages::incorrect_po_pack_structure_file_not_exist"
+msgid "The structure of package that contains \".po\" translation files located at <b>\"[pack_path]\"</b> is incorrect. The file <b>\"[po_file]\"</b> does not exist."
+msgstr ""
 
 msgctxt "Languages::browse"
 msgid "Browse..."
@@ -2988,9 +3004,17 @@ msgctxt "Languages::dec_sign"
 msgid "Dec sign"
 msgstr "Dec underskrive"
 
+msgctxt "Languages::select_selectbox_option"
+msgid "Select option"
+msgstr ""
+
 msgctxt "Languages::default"
 msgid "Default"
 msgstr "Standard"
+
+msgctxt "Languages::select_default"
+msgid "Select default"
+msgstr ""
 
 msgctxt "Languages::default_category_view"
 msgid "Default category view"
@@ -3023,6 +3047,58 @@ msgstr "Det store billede"
 msgctxt "Languages::default_value"
 msgid "Default value"
 msgstr "Standard værdi"
+
+msgctxt "Languages::default_custom.disabled"
+msgid "Disabled"
+msgstr ""
+
+msgctxt "Languages::default_custom.custom"
+msgid "Custom..."
+msgstr ""
+
+msgctxt "Languages::default_custom.custom_value"
+msgid "Custom ([value])"
+msgstr ""
+
+msgctxt "Languages::default_custom.parent"
+msgid "Parent ([name])"
+msgstr ""
+
+msgctxt "Languages::default_custom.global"
+msgid "Global ([name])"
+msgstr ""
+
+msgctxt "Languages::default_custom.edit_parent"
+msgid "Edit parent ([name])..."
+msgstr ""
+
+msgctxt "Languages::default_custom.edit_global"
+msgid "Edit global ([name])..."
+msgstr ""
+
+msgctxt "Languages::global_individual.global"
+msgid "Global"
+msgstr ""
+
+msgctxt "Languages::global_individual.individual"
+msgid "Individual"
+msgstr ""
+
+msgctxt "Languages::global_individual.global_value_all_items"
+msgid "Global value for all items"
+msgstr ""
+
+msgctxt "Languages::global_individual.individual_values_each_item"
+msgid "Individual values for each item"
+msgstr ""
+
+msgctxt "Languages::global_individual.individual_tooltip"
+msgid "This setting is currently global. Click here to allow changing its value for individual items."
+msgstr ""
+
+msgctxt "Languages::global_individual.global_tooltip"
+msgid "The value of this setting can be changed for individual items. Click here to make this setting global."
+msgstr ""
 
 msgctxt "Languages::deferred"
 msgid "Deferred"
@@ -4224,6 +4300,10 @@ msgctxt "Languages::feature_comparison"
 msgid "Feature comparison"
 msgstr "Feature sammenligning"
 
+msgctxt "Languages::feature_category"
+msgid "Feature category"
+msgstr ""
+
 msgctxt "Languages::feature_display_on_catalog"
 msgid "Show in product list"
 msgstr "Vis i produktliste"
@@ -4235,6 +4315,18 @@ msgstr "Vis i headeren på siden produkt detaljer"
 msgctxt "Languages::feature_display_on_product"
 msgid "Show on the Features tab"
 msgstr "Vis på fanen funktioner"
+
+msgctxt "Languages::feature_hide_on_catalog"
+msgid "Hide in product list"
+msgstr ""
+
+msgctxt "Languages::feature_hide_on_header"
+msgid "Hide in header on the product details page"
+msgstr ""
+
+msgctxt "Languages::feature_hide_on_product"
+msgid "Hide on the Features tab"
+msgstr ""
 
 msgctxt "Languages::feedback_is_sent_successfully"
 msgid "The feedback has been sent successfully."
@@ -4952,6 +5044,14 @@ msgctxt "Languages::inventory"
 msgid "Inventory"
 msgstr "Lagerliste"
 
+msgctxt "Languages::track_inventory"
+msgid "Track inventory"
+msgstr ""
+
+msgctxt "Languages::track_inventory_tooltip"
+msgid "When inventory is tracked, the number of products in stock will decrease after each purchase."
+msgstr ""
+
 msgctxt "Languages::invitees"
 msgid "Invitees"
 msgstr "Inviteret"
@@ -5119,6 +5219,10 @@ msgstr "Sprogkode"
 msgctxt "Languages::languages"
 msgid "Languages"
 msgstr "Sprog"
+
+msgctxt "Languages::texts_languages"
+msgid "Texts & languages"
+msgstr ""
 
 msgctxt "Languages::language_code"
 msgid "Language code"
@@ -5341,8 +5445,8 @@ msgid "List price"
 msgstr "Listepris"
 
 msgctxt "Languages::list_quantity_count"
-msgid "List quantity count"
-msgstr "Liste antal count"
+msgid "Number of available quantities"
+msgstr ""
 
 msgctxt "Languages::tmpl_list_without_options"
 msgid "List without options"
@@ -5665,8 +5769,8 @@ msgid "Number of items"
 msgstr "Antal poster"
 
 msgctxt "Languages::max_order_qty"
-msgid "Maximum order quantity"
-msgstr "Maksimum ordre mængde"
+msgid "Maximum quantity to buy per product"
+msgstr ""
 
 msgctxt "Languages::max_uploading_file_size"
 msgid "Max uploading file size"
@@ -5805,8 +5909,8 @@ msgid "minute(s)"
 msgstr "minut(s)"
 
 msgctxt "Languages::min_order_qty"
-msgid "Minimum order quantity"
-msgstr "Minimum ordre mængde"
+msgid "Minimum quantity to buy per product"
+msgstr ""
 
 msgctxt "Languages::missing_variants_handling"
 msgid "Missing variants handling"
@@ -6976,6 +7080,10 @@ msgctxt "Languages::pending"
 msgid "Pending"
 msgstr "Afventende"
 
+msgctxt "Languages::suspended"
+msgid "Suspended"
+msgstr ""
+
 msgctxt "Languages::per"
 msgid "Per [object]"
 msgstr "Pr [object]"
@@ -7309,7 +7417,7 @@ msgid "Can edit"
 msgstr ""
 
 msgctxt "Languages::privileges.edit_order"
-msgid "Can edit"
+msgid "Can edit entire order (select other products, payment and shipping methods, customers)"
 msgstr ""
 
 msgctxt "Languages::privileges.edit_files"
@@ -7410,6 +7518,10 @@ msgstr ""
 
 msgctxt "Languages::privileges.update_settings"
 msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privileges.update_order_details"
+msgid "Can edit minor details (select manager; edit shipments, notes, and tracking number)"
 msgstr ""
 
 msgctxt "Languages::privileges.upgrade_store"
@@ -7623,6 +7735,10 @@ msgstr "Ingen produkter blev valgt til forsendelse"
 msgctxt "Languages::products_found"
 msgid "Products found"
 msgstr "Produkt fundet"
+
+msgctxt "Languages::n_products_found"
+msgid "[n] product found|[n] products found"
+msgstr ""
 
 msgctxt "Languages::products_grid"
 msgid "Products grid"
@@ -8069,8 +8185,8 @@ msgid "Quick links"
 msgstr "Hurtig link"
 
 msgctxt "Languages::quick_menu"
-msgid "Quick menu"
-msgstr "Hurtig menu"
+msgid "Quick start menu"
+msgstr ""
 
 msgctxt "Languages::quick_product_viewer"
 msgid "Quick product viewer"
@@ -8104,13 +8220,21 @@ msgctxt "Languages::rate_calculation_manual"
 msgid "Manual (by defined location)"
 msgstr "Manual (som defineret sted)"
 
-msgctxt "Languages::rate_calculation_by_rate_area"
-msgid "Manual (by defined rate area)"
+msgctxt "Languages::rate_calculation_manual_by_rate_area"
+msgid "Manual (by rate areas)"
+msgstr ""
+
+msgctxt "Languages::rate_calculation_by_customer_address"
+msgid "By customer's address"
 msgstr ""
 
 msgctxt "Languages::rate_calculation_realtime"
 msgid "Realtime"
 msgstr "virkelig tid"
+
+msgctxt "Languages::rate_calculation_realtime_automatic"
+msgid "Real-time (automatic)"
+msgstr ""
 
 msgctxt "Languages::rate_value"
 msgid "Rate value"
@@ -8728,10 +8852,6 @@ msgctxt "Languages::search_string"
 msgid "Search string"
 msgstr "Søg string"
 
-msgctxt "Languages::search_tooltip"
-msgid "Search for products, customers, orders and CMS pages"
-msgstr "Søg efter produkter, kunder, ordrer og CMS sider"
-
 msgctxt "Languages::search_words"
 msgid "Search words"
 msgstr "Søg ord"
@@ -9127,6 +9247,98 @@ msgstr "Forsendelses adressen den samme som fakturering sadresse"
 msgctxt "Languages::shipping_service"
 msgid "Shipping service"
 msgstr "Leverings service"
+
+msgctxt "Languages::shipping_time"
+msgid "Shipping time"
+msgstr ""
+
+msgctxt "Languages::shipping_rate"
+msgid "Rate"
+msgstr ""
+
+msgctxt "Languages::shipping_price_condition"
+msgid "Price condition"
+msgstr ""
+
+msgctxt "Languages::shipping_weight_condition"
+msgid "Weight condition"
+msgstr ""
+
+msgctxt "Languages::shipping_items_condition"
+msgid "Items condition"
+msgstr ""
+
+msgctxt "Languages::shipping_surcharge_discount"
+msgid "Surcharge / Discount"
+msgstr ""
+
+msgctxt "Languages::shipping_per"
+msgid "per"
+msgstr ""
+
+msgctxt "Languages::shipping_from_value"
+msgid "From"
+msgstr ""
+
+msgctxt "Languages::shipping_to_value"
+msgid "To"
+msgstr ""
+
+msgctxt "Languages::shipping_and_up"
+msgid "and up"
+msgstr ""
+
+msgctxt "Languages::shipping_item"
+msgid "item"
+msgstr ""
+
+msgctxt "Languages::shipping_add_conditions"
+msgid "Add conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_hide_conditions"
+msgid "Hide conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_add_price_condition"
+msgid "Add price conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_add_weight_condition"
+msgid "Add weight conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_add_items_condition"
+msgid "Add items conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_remove_price_condition"
+msgid "Remove price conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_remove_weight_condition"
+msgid "Remove weight conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_remove_items_condition"
+msgid "Remove items conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_edit_rate_area"
+msgid "Edit rate area"
+msgstr ""
+
+msgctxt "Languages::shipping_remove_rate_area"
+msgid "Remove rate area from shipping"
+msgstr ""
+
+msgctxt "Languages::shipping_rate_range_overlap_error_message"
+msgid "Condition must not fall within existing range."
+msgstr ""
+
+msgctxt "Languages::shipping_rate_range_limit_error_message"
+msgid "The beginning of the range can't be higher than the end."
+msgstr ""
 
 msgctxt "Languages::ship_dhl_height"
 msgid "Package height"
@@ -9672,10 +9884,6 @@ msgctxt "Languages::show_items_in_line"
 msgid "Show items inline"
 msgstr "Vis elementer inline"
 
-msgctxt "Languages::show_menu_on_mouse_over"
-msgid "Show menu on mouse over"
-msgstr "Vis menuen når mus henover"
-
 msgctxt "Languages::show_orders"
 msgid "Show orders"
 msgstr "Vis ordre"
@@ -9900,8 +10108,16 @@ msgctxt "Languages::type_to_search"
 msgid "Type to search..."
 msgstr ""
 
+msgctxt "Languages::type_to_create"
+msgid "Type to create..."
+msgstr ""
+
 msgctxt "Languages::type_to_search_or_click_button"
 msgid "Type to search, or click the button on the right for advanced search"
+msgstr ""
+
+msgctxt "Languages::use_comma_enter_to_separate_variants"
+msgid "Use a comma or Enter to separate variants."
 msgstr ""
 
 msgctxt "Languages::enter_color_name_and_code"
@@ -10723,10 +10939,6 @@ msgstr "Virksomheden blev deaktiveret."
 msgctxt "Languages::text_conditions_cleared"
 msgid "Table conditions were cleared"
 msgstr "Tabelbetingelser blev ryddet"
-
-msgctxt "Languages::text_confirmation_page_header"
-msgid "This is a confirmation page. You must confirm the operation before it is performed."
-msgstr "Dette er en bekræftelse side. Du skal bekræfte handlingen, før det udføres."
 
 msgctxt "Languages::text_confirm_passwd_recovery"
 msgid "Please follow this link to confirm your password recovery procedure"
@@ -11976,6 +12188,10 @@ msgctxt "Languages::theme_editor.mail"
 msgid "Mail"
 msgstr "Mail"
 
+msgctxt "Languages::theme_editor_logo.mail"
+msgid "E-mails"
+msgstr ""
+
 msgctxt "Languages::theme_editor.main"
 msgid "Main content"
 msgstr "Main content"
@@ -12123,6 +12339,10 @@ msgstr "Alle ændringer efter sidste Gem nulstilles"
 msgctxt "Languages::theme_editor.theme"
 msgid "Theme"
 msgstr "Tema"
+
+msgctxt "Languages::theme_editor_logo.theme"
+msgid "Theme"
+msgstr ""
 
 msgctxt "Languages::theme_editor.top_panel"
 msgid "Top panel"
@@ -12520,6 +12740,10 @@ msgctxt "Languages::translations"
 msgid "Translations"
 msgstr "Oversættelser"
 
+msgctxt "Languages::edit_texts"
+msgid "Edit texts"
+msgstr ""
+
 msgctxt "Languages::tree"
 msgid "Tree"
 msgstr "Træ"
@@ -12585,7 +12809,7 @@ msgid "ON—the storefront is open; everyone will see it. OFF—the storefront i
 msgstr ""
 
 msgctxt "Languages::access_for_authorized_customers_only"
-msgid "Access for authorized customers only."
+msgid "Access for authorized customers only"
 msgstr ""
 
 msgctxt "Languages::tts_activate_menu_tab_for"
@@ -12619,10 +12843,6 @@ msgstr "Én placering skal plukkes som standard. Dens Top og bund containere vil
 msgctxt "Languages::tt_views_cart_components_carts_search_form_online_only"
 msgid "If enabled, search results include only users who are online at the moment."
 msgstr "Hvis aktiveret, søgeresultater omfatter kun brugere, der er online i øjeblikket."
-
-msgctxt "Languages::tt_views_categories_update_product_details_layout"
-msgid "By default, the template that is defined in the appearance settings of the storefront is used"
-msgstr "Som standard bruges skabelonen, der er defineret i indstillinger for udseende af butik"
 
 msgctxt "Languages::tt_views_currencies_update_after_sum"
 msgid "If enabled, the symbol of the currency is shown after the sum."
@@ -12695,10 +12915,6 @@ msgstr "Producentens vejledende udsalgspris."
 msgctxt "Languages::tt_views_products_update_out_of_stock_actions"
 msgid "'Buy in advance' lets customers buy out-of-stock products and products that will be available since a specific date. 'Sign up for notification' works only when the product has zero or negative quantity."
 msgstr ""
-
-msgctxt "Languages::tt_views_products_update_product_details_layout"
-msgid "By default, the template that is defined in the settings of the main product category is used"
-msgstr "Den skabelon, der er defineret i indstillinger i kategorien vigtigste produkt bruges som standard,"
 
 msgctxt "Languages::tt_views_product_features_update_feature_display_on_catalog"
 msgid "Show this feature on product list pages along with product description."
@@ -13185,8 +13401,8 @@ msgid "Use Existing Block"
 msgstr "Brug eksisterende blok"
 
 msgctxt "Languages::use_existing_store"
-msgid "Copy existing store configuration"
-msgstr "Kopiere eksisterende butik konfiguration"
+msgid "Copy existing storefront configuration"
+msgstr ""
 
 msgctxt "Languages::use_negotiated_rates"
 msgid "Use negotiated rates"
@@ -14229,7 +14445,7 @@ msgid "Days before a log entry is removed"
 msgstr ""
 
 msgctxt "SettingsTooltips::log_lifetime"
-msgid "Logs older than the specified number of days will be removed automatically. Enter 0 if you don't want any automatic removal of old logs."
+msgid "Enter 0 if you don't want any automatic removal of old logs."
 msgstr ""
 
 msgctxt "SettingsOptions::log_type_orders"
@@ -14419,10 +14635,6 @@ msgstr "Luk butik"
 msgctxt "SettingsOptions::cron_password"
 msgid "Access key to cron script which sends e-mail notifications of password change. Use: http://www.example.com/admin.php?dispatch=profiles.password_reminder&cron_password=key_value."
 msgstr "Adgangs nøgle til \"cron script\" der sender e-mail beskeden ud. Brug: http://www.example.com/admin.php?dispatch=profiles.password_reminder&amp;cron_password=key_value."
-
-msgctxt "SettingsOptions::store_access_key"
-msgid "Access key to temporarily closed store"
-msgstr ""
 
 msgctxt "SettingsOptions::store_optimization_dev"
 msgid "Rebuild cache automatically"
@@ -14664,6 +14876,54 @@ msgctxt "SettingsOptions::display_options_modifiers"
 msgid "Display modifiers for product options"
 msgstr "Vis modifiers for produkt-optioner"
 
+msgctxt "SettingsOptions::default_options_type"
+msgid "Options type"
+msgstr ""
+
+msgctxt "SettingsOptions::default_tracking"
+msgid "Track inventory"
+msgstr ""
+
+msgctxt "SettingsOptions::default_exceptions_type"
+msgid "Exceptions type"
+msgstr ""
+
+msgctxt "SettingsOptions::default_zero_price_action"
+msgid "Zero price action"
+msgstr ""
+
+msgctxt "SettingsOptions::default_min_qty"
+msgid "Minimum quantity to buy per product"
+msgstr ""
+
+msgctxt "SettingsTooltips::default_min_qty"
+msgid "Sell no less than X units of a product in an order."
+msgstr ""
+
+msgctxt "SettingsOptions::default_max_qty"
+msgid "Maximum quantity to buy per product"
+msgstr ""
+
+msgctxt "SettingsTooltips::default_max_qty"
+msgid "Sell no more than X units of a product in an order."
+msgstr ""
+
+msgctxt "SettingsOptions::default_qty_step"
+msgid "Quantity step"
+msgstr ""
+
+msgctxt "SettingsTooltips::default_qty_step"
+msgid "Increase or decrease the number of purchased product units only by X."
+msgstr ""
+
+msgctxt "SettingsOptions::default_list_qty_count"
+msgid "Number of available quantities"
+msgstr ""
+
+msgctxt "SettingsTooltips::default_list_qty_count"
+msgid "Replace product quantity selector with a dropdown list with X variants."
+msgstr ""
+
 msgctxt "SettingsOptions::exception_style"
 msgid "Exception style"
 msgstr "undtagelse stil"
@@ -14833,8 +15093,8 @@ msgid "Disable anonymous checkout"
 msgstr "Deaktiver anonym kassen"
 
 msgctxt "SettingsOptions::checkout_redirect"
-msgid "Allow checkout only from the Cart content page"
-msgstr "Tillad kun checkout fra indkøbsvognsindhold"
+msgid "Allow checkout only from cart"
+msgstr ""
 
 msgctxt "SettingsOptions::allow_usergroup_signup"
 msgid "Allow customer to signup for user group"
@@ -14853,8 +15113,8 @@ msgid "Unsaved changes warning"
 msgstr "Ikke-gemte ændringer advarsel"
 
 msgctxt "SettingsOptions::show_menu_descriptions"
-msgid "Show menu description"
-msgstr "Vis menu beskrivelse"
+msgid "Show menu description in admin panel"
+msgstr ""
 
 msgctxt "SettingsOptions::notice_displaying_time"
 msgid "Notice displaying time (to turn off the autohide function enter 0)"
@@ -14869,8 +15129,8 @@ msgid "Ask customers to agree with terms &amp; conditions during checkout"
 msgstr "Spørg kunderne at blive enige med vilkår og betingelser i kassen"
 
 msgctxt "SettingsTooltips::agree_terms_conditions"
-msgid "The text of terms & conditions will be retrieved from the \"terms_and_conditions_content\" language variable."
-msgstr "Tekst af vilkår & betingelser bliver hentet fra \"terms_and_conditions_content\" sprog variabel."
+msgid "The text of terms & conditions is in the \"terms_and_conditions_content\" language variable."
+msgstr ""
 
 msgctxt "SettingsOptions::repay"
 msgid "Allow customers to pay order again if transaction was declined"
@@ -14937,8 +15197,8 @@ msgid "Display \"Shipping method\" step"
 msgstr "Vis \"Shipping metode\" trin"
 
 msgctxt "SettingsTooltips::display_shipping_step"
-msgid "If hidden, the first active method will be used by default."
-msgstr "Hvis skjult, vil den første aktive metode blive anvendt som standard."
+msgid "If the step is hidden, the first active method will be used by default."
+msgstr ""
 
 msgctxt "SettingsOptions::email_templates"
 msgid "Email templates mode"
@@ -14948,17 +15208,13 @@ msgctxt "SettingsOptions::phone_validation_mode"
 msgid "Supported phone numbers"
 msgstr ""
 
-msgctxt "SettingsTooltips::phone_validation_mode"
-msgid "Determines what users can enter as their phone number."
-msgstr ""
-
 msgctxt "SettingsOptions::display_payment_step"
 msgid "Display \"Payment method\" step"
 msgstr "Vis \"Payment method\" trin"
 
 msgctxt "SettingsTooltips::display_payment_step"
-msgid "If hidden, the first active method will be used by default."
-msgstr "Hvis skjult, vil den første aktive metode blive anvendt som standard."
+msgid "If the step is hidden, the first active method will be used by default."
+msgstr ""
 
 msgctxt "SettingsOptions::enable_edp"
 msgid "Enable selling downloadable products"
@@ -14969,48 +15225,44 @@ msgid "Allow customers to compare products"
 msgstr "Giver kunderne mulighed for at sammenligne produkter"
 
 msgctxt "SettingsTooltips::secure_storefront"
-msgid "SSL certificate is required to be installed on your server"
-msgstr "SSL-certifikatet er obligatorisk for at være installeret på din server"
+msgid "SSL certificate must be installed on your server."
+msgstr ""
 
 msgctxt "SettingsTooltips::secure_admin"
-msgid "SSL certificate is required to be installed on your server"
-msgstr "SSL-certifikatet er obligatorisk for at være installeret på din server"
-
-msgctxt "SettingsTooltips::store_access_key"
-msgid "Use: http://www.example.com/index.php?store_access_key=key_value"
-msgstr "Brug: http://www.example.com/index.php?store_access_key=key_value"
+msgid "SSL certificate must be installed on your server."
+msgstr ""
 
 msgctxt "SettingsTooltips::order_start_id"
-msgid "Enter a number between 1 and 10,000,000 (use digits only) or leave empty for auto-filling."
-msgstr "Angiv et tal mellem 1 og 10.000.000 (brug cifre kun) eller lad være tomt for auto-udfyldning."
+msgid "Use a number between 1 and 10000000 or leave empty for auto-filling."
+msgstr ""
 
 msgctxt "SettingsTooltips::user_multiple_profiles"
-msgid "Shipping and billing addresses"
-msgstr "Adresser på forsendelses- og faktureringsoplysninger"
+msgid "A profile is a combination of shipping and billing address."
+msgstr ""
 
 msgctxt "SettingsTooltips::thumbnail_background_color"
-msgid "Leave empty for transparent background"
-msgstr "Lad være tom for gennemsigtig baggrund"
+msgid "Leave empty for transparent background."
+msgstr ""
 
 msgctxt "SettingsTooltips::secure_auth"
-msgid "SSL certificate is required to be installed on your server"
-msgstr "SSL-certifikatet er obligatorisk for at være installeret på din server"
+msgid "SSL certificate must be installed on your server."
+msgstr ""
 
 msgctxt "SettingsTooltips::checkout_redirect"
-msgid "When the customer clicks on any Checkout button/link in the store"
-msgstr "Når kunden klikker på hvilken som helst Checkout knap/link i butikken"
+msgid "Show the Checkout button only on the Cart Content page."
+msgstr ""
 
 msgctxt "SettingsTooltips::store_optimization_dev"
 msgid "Track modifications in real-time and automatically re-cache modified files (works with files modified directly on server, too.) May slightly affect store performance. Recommended to disable on production."
 msgstr "Spor ændringer i realtid og automatisk re-cache ændrede filer (virker også med filerne der er ændret direkte på serveren) Kan let påvirke butikkens resultater. Anbefales for at deaktivere på produktion."
 
 msgctxt "SettingsTooltips::show_menu_descriptions"
-msgid "If you disable this check box, description of menu items will be hidden"
-msgstr "Hvis du deaktivere dette afkrydsningsfelt, skjules beskrivelse af menupunkter"
+msgid "Affects the menus like Products and Orders in the admin panel."
+msgstr ""
 
 msgctxt "SettingsTooltips::quick_registration"
-msgid "Require only contact information on registration"
-msgstr "Kræve kun kontaktoplysninger på registrering"
+msgid "Require only contact information for registration."
+msgstr ""
 
 msgctxt "SettingsVariants::default_products_sorting::position"
 msgid "Default"
@@ -15311,6 +15563,34 @@ msgstr "3. januar 2006"
 msgctxt "SettingsVariants::exception_style::warning"
 msgid "Show warning on exception"
 msgstr "Vis advarelse på undtagelser"
+
+msgctxt "SettingsVariants::default_options_type::P"
+msgid "Simultaneous"
+msgstr ""
+
+msgctxt "SettingsVariants::default_options_type::S"
+msgid "Sequential"
+msgstr ""
+
+msgctxt "SettingsVariants::default_exceptions_type::F"
+msgid "Forbidden"
+msgstr ""
+
+msgctxt "SettingsVariants::default_exceptions_type::A"
+msgid "Allowed"
+msgstr ""
+
+msgctxt "SettingsVariants::default_zero_price_action::R"
+msgid "Do not allow customers to add the product to cart"
+msgstr ""
+
+msgctxt "SettingsVariants::default_zero_price_action::P"
+msgid "Allow customers to add the product to cart"
+msgstr ""
+
+msgctxt "SettingsVariants::default_zero_price_action::A"
+msgid "Ask customer to enter the price"
+msgstr ""
 
 msgctxt "SettingsVariants::alternative_currency::use_selected_and_alternative"
 msgid "Show prices in default and selected currencies"
@@ -15695,10 +15975,6 @@ msgstr ""
 msgctxt "SettingsVariants::phone_validation_mode::any_symbols"
 msgid "Any symbols"
 msgstr ""
-
-msgctxt "SettingsTooltips::quick_registration"
-msgid "Require only contact information on registration"
-msgstr "Kræve kun kontaktoplysninger på registrering"
 
 msgctxt "Languages::views"
 msgid "Views"
@@ -16445,6 +16721,22 @@ msgctxt "Languages::trash_category_description"
 msgid "When a product is deleted from the last category in the store, it will be moved to this category."
 msgstr "Når et produkt er slettet fra den sidste kategori i butikken, vil det blive flyttet til denne kategori."
 
+msgctxt "Languages::products_without_category"
+msgid "Products without category"
+msgstr ""
+
+msgctxt "Languages::products_without_category_description"
+msgid "When a product is created without a category during import, it will be placed into this category."
+msgstr ""
+
+msgctxt "Languages::products_without_category_notification_text"
+msgid "Some of your products currently don't have a category. It may be harder for customers to find those products.<br /> <a href=\"[url]\" target=\"_blank\">Please check these products and assign them a category.</a>"
+msgstr ""
+
+msgctxt "Languages::deleting_required_category_notification_text"
+msgid "Category \"[category]\" is required and can't be deleted."
+msgstr ""
+
 msgctxt "Languages::free_shipping_upgrade_notification_title"
 msgid "Free shipping changes"
 msgstr "Gratis forsendelsesændringer"
@@ -16537,8 +16829,8 @@ msgctxt "Languages::tools_addons_disabled_msg"
 msgid "An administrator disabled all add-ons or third-party add-ons.<br> Press the Re-enable add-ons button to initialize the add-ons that were previously active."
 msgstr "En administrator deaktiveret alle tilføjelser eller tredjeparts-tilføjelser. <br>Tryk på at genaktivere tilføjelser knap at initialisere de tilføjelser, der var tidligere aktive."
 
-msgctxt "Languages::tools_addons_additional_shipping_methods"
-msgid "There may be more carriers. They'll show up if you activate the corresponding <a href=\"[url]\">shipping add-ons</a>."
+msgctxt "Languages::tools_addons_additional_shipping_methods_msg"
+msgid "There may be more ways to calculate shipping rates. They'll show up if you activate the corresponding <a href=\"[url]\">shipping add-ons</a>."
 msgstr ""
 
 msgctxt "Languages::tools_addons_additional_payment_methods"
@@ -17178,8 +17470,8 @@ msgid "<p><b>UPS Canada: Expedited SM</b> and <b>UPS Polish: Today Intercity</b>
 msgstr "<p><b>UPS Canada: fremskyndet SM</b> og <b>UPS polsk: i dag IC</b> shipping tjenester understøttes ikke siden denne [product] version. Hvis du bruger dem, skal du gøre følgende:</p> <ul><li>gå til Administration > Shipping & skatter > Shipping metoder</li> <li>vælge den leveringsmetode, der bruger UPS som transportør til at beregne fragtpriser</li> <li>Skift til fanen Generelt, og Angiv den korrekte rutefart</li></ul>"
 
 msgctxt "Languages::warning_default_language_sharing_removed"
-msgid "The default language defined in settings has been removed for the <b>[company]</b> store. Please update the Frontend default language value on the following page: <a href=\"[link]\">Settings :: Appearance</a>"
-msgstr "Det standardsprog, der er defineret i indstillinger er blevet fjernet for <b>[company]</b> butik. Opdater værdien Frontend standard sprog på følgende side: <a href=\"[link]\"> Indstillinger:: udseende</a>"
+msgid "The default language defined in settings has been removed for the <b>[company]</b> storefront. Please update the Frontend default language value on the following page: <a href=\"[link]\">Settings :: Appearance</a>"
+msgstr ""
 
 msgctxt "Languages::page_url"
 msgid "Page URL"
@@ -18301,12 +18593,24 @@ msgctxt "Languages::sort_by_null_desc"
 msgid "No sorting"
 msgstr ""
 
+msgctxt "Languages::storefront_name"
+msgid "Storefront name"
+msgstr ""
+
 msgctxt "Languages::internal_option_name"
 msgid "Internal name"
 msgstr ""
 
 msgctxt "Languages::internal_option_name_tooltip"
 msgid "This name is shown only in the Administration panel to help you distinguish between multiple options that have the same displayed name."
+msgstr ""
+
+msgctxt "Languages::internal_feature_name_tooltip"
+msgid "This name is shown only in the Administration panel to help you distinguish between multiple features that have the same displayed name."
+msgstr ""
+
+msgctxt "Languages::internal_feature_group_name_tooltip"
+msgid "This name is shown only in the Administration panel to help you distinguish between multiple feature groups that have the same displayed name."
 msgstr ""
 
 msgctxt "Languages::edit_corresponding_profile_field"
@@ -19378,15 +19682,15 @@ msgid "Status"
 msgstr ""
 
 msgctxt "Languages::storefront_status.tooltip"
-msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed store</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed storefront</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
 msgstr ""
 
 msgctxt "Languages::storefront_access_key"
-msgid "Access key to temporarily closed store"
+msgid "Access key to temporarily closed storefront"
 msgstr ""
 
 msgctxt "Languages::storefront_access_key.setting_notice"
-msgid "You can set the access key on the store editing page"
+msgid "You can set the access key on the storefront editing page"
 msgstr ""
 
 msgctxt "Languages::close_storefront"
@@ -19394,7 +19698,7 @@ msgid "Close storefront"
 msgstr ""
 
 msgctxt "Languages::close_storefront.setting_notice"
-msgid "You can open or close a store on the store editing page"
+msgid "You can open or close a storefront on the storefront editing page"
 msgstr ""
 
 msgctxt "Languages::open_selected_storefronts"
@@ -19538,7 +19842,11 @@ msgid "Edit structure"
 msgstr ""
 
 msgctxt "Languages::bottom_panel.build_mode.not_available"
-msgid "Available only at the checkout page. Add a product to cart and go to checkout to see how it works."
+msgid "Available at the following page types: homepage, product, category, checkout."
+msgstr ""
+
+msgctxt "Languages::bottom_panel.theme_mode.not_available"
+msgid "Available only in your microstore or on the pages of your products and blog articles."
 msgstr ""
 
 msgctxt "Languages::bottom_panel.text_mode"
@@ -19621,28 +19929,12 @@ msgctxt "Languages::bottom_panel.trial_left"
 msgid "Remaining trial period"
 msgstr ""
 
-msgctxt "Languages::administration_panel.live_editor.enable"
-msgid "Edit сontent<br/><br/>Change the texts and other data directly on the storefront, without using the administration panel"
-msgstr ""
-
-msgctxt "Languages::demo_panel.live_editor.enable"
-msgid "Edit сontent<br/><br/>Change the texts and other data directly on the storefront, without using the administration panel.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit content on-site\""
-msgstr ""
-
-msgctxt "Languages::administration_panel.theme_editor.enable"
-msgid "Edit style<br/><br/>Change the style of your store (logos, colors, fonts, and so on) and see the changes as you make them"
-msgstr ""
-
 msgctxt "Languages::demo_panel.theme_editor.enable"
 msgid "Edit style<br/><br/>Change the style of your store (logos, colors, fonts, and so on) and see the changes as you make them.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Theme editor\""
 msgstr ""
 
-msgctxt "Languages::administration_panel.block_manager.enable"
-msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works only at the checkout page. Add a product to cart and proceed to checkout to see the editor"
-msgstr ""
-
 msgctxt "Languages::demo_panel.block_manager.enable"
-msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works only at the checkout page. Add a product to cart and proceed to checkout to see the editor.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit layout on-site\""
+msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works at the following page types: homepage, product, category, checkout.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit layout on-site\""
 msgstr ""
 
 msgctxt "Languages::individual"
@@ -19651,6 +19943,10 @@ msgstr ""
 
 msgctxt "Languages::link_an_existing_option"
 msgid "Link an existing option"
+msgstr ""
+
+msgctxt "Languages::create_or_link_an_existing_option"
+msgid "Create or link an existing option"
 msgstr ""
 
 msgctxt "Languages::checkout_location_was_rewritten_upgrade_notification_title"
@@ -19778,11 +20074,15 @@ msgid "E-mail"
 msgstr ""
 
 msgctxt "Languages::event.transport.internal"
-msgid "Notifications Center"
+msgid "Notifications center"
 msgstr ""
 
 msgctxt "Languages::event.order.edp.name"
 msgid "Access to downloadable products granted"
+msgstr ""
+
+msgctxt "Languages::event.notification_type"
+msgid "Notification type"
 msgstr ""
 
 msgctxt "Languages::notifications"
@@ -19954,7 +20254,19 @@ msgid "Other"
 msgstr ""
 
 msgctxt "Languages::see_full_templates_list"
-msgid "Can't find a notification you're looking for?<br/><a href=\"[email_template_manage]\">See the full list of email templates</a><br/><a href=\"[internal_template_manage]\">See the full list of on-site notification templates</a>"
+msgid "Can't find a notification you're looking for?<br/><a href=\"[email_template_manage]\"></a><br/><a href=\"[internal_template_manage]\">See the full list of on-site notification templates</a>"
+msgstr ""
+
+msgctxt "Languages::other_notifications.title"
+msgid "Can't find a notification you're looking for?"
+msgstr ""
+
+msgctxt "Languages::other_notifications.email_templates"
+msgid "See the full list of email templates"
+msgstr ""
+
+msgctxt "Languages::other_notifications.internal_templates"
+msgid "See the full list of on-site notification templates"
 msgstr ""
 
 msgctxt "Languages::internal_templates"
@@ -19997,12 +20309,12 @@ msgctxt "Languages::notification_template.tab.internal"
 msgid "On-site"
 msgstr ""
 
-msgctxt "Languages::notifications_center.section.communication"
-msgid "Communication"
+msgctxt "Languages::lite_checkout.chosen_shipping_not_avaliable"
+msgid "Sorry, we can't get the rates for your selected shipping method. Please check your address and make sure that it is correct. If this doesn't help, please select another shipping method or contact us."
 msgstr ""
 
-msgctxt "Languages::notifications_center.tag.messages"
-msgid "Messages"
+msgctxt "Languages::lite_checkout.not_available"
+msgid "Not available"
 msgstr ""
 
 msgctxt "Languages::last_login"
@@ -20021,6 +20333,94 @@ msgctxt "Languages::total_spent_money"
 msgid "Total spend"
 msgstr ""
 
+msgctxt "Languages::notifications_center.section.communication"
+msgid "Communication"
+msgstr ""
+
+msgctxt "Languages::notifications_center.tag.messages"
+msgid "Messages"
+msgstr ""
+
+msgctxt "Languages::settled_order_status"
+msgid "Consider order paid"
+msgstr ""
+
+msgctxt "Languages::edit_on_site"
+msgid "Edit on site"
+msgstr ""
+
+msgctxt "Languages::order_manager"
+msgid "Order manager"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.internal_templates"
+msgid "On-site notification templates"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.notification_settings"
+msgid "Notifications"
+msgstr ""
+
+msgctxt "Languages::logo_section.theme"
+msgid "Site logo"
+msgstr ""
+
+msgctxt "Languages::logo_section.favicon"
+msgid "Favicon"
+msgstr ""
+
+msgctxt "Languages::logo_section.mail"
+msgid "E-mail logo"
+msgstr ""
+
+msgctxt "Languages::show_extra_logos"
+msgid "Show extra logos"
+msgstr ""
+
+msgctxt "Languages::hide_extra_logos"
+msgid "Hide extra logos"
+msgstr ""
+
+msgctxt "Languages::test_rate_calculation"
+msgid "Test rate calculation"
+msgstr ""
+
+msgctxt "Languages::calculated_rate"
+msgid "Calculated rate"
+msgstr ""
+
+msgctxt "Languages::calculated_automatically"
+msgid "Calculated automatically"
+msgstr ""
+
+msgctxt "Languages::additional_settings"
+msgid "Additional settings"
+msgstr ""
+
+msgctxt "Languages::rates_calculated_info"
+msgid "Rates are calculated for [n] product that costs [price].|Rates are calculated for [n] products that cost [price]."
+msgstr ""
+
+msgctxt "Languages::base_rate"
+msgid "Base rate"
+msgstr ""
+
+msgctxt "Languages::price_rate_not_set"
+msgid "Price rate was not set."
+msgstr ""
+
+msgctxt "Languages::receivers"
+msgid "Receivers"
+msgstr ""
+
+msgctxt "Languages::notification"
+msgid "Notification"
+msgstr ""
+
+msgctxt "Languages::owner_company"
+msgid "Storefront"
+msgstr ""
+
 msgctxt "Languages::block_manager.brands_per_screen"
 msgid "Brands per screen"
 msgstr ""
@@ -20029,8 +20429,16 @@ msgctxt "Languages::block_manager.total_displayed_brands"
 msgid "Total amount of brands displayed"
 msgstr ""
 
-msgctxt "Languages::privilege_groups.notification_settings"
-msgid "Notifications"
+msgctxt "Languages::add_all_destinations"
+msgid "Add all"
+msgstr ""
+
+msgctxt "SettingsOptions::show_unavailable_shipping_methods"
+msgid "Show unavailable shippings"
+msgstr ""
+
+msgctxt "SettingsTooltips::show_unavailable_shipping_methods"
+msgid "Show real-time shipping methods even if their servers haven't returned the rates"
 msgstr ""
 
 msgctxt "Languages::block_manager.manage_layout_in_tab_not_exist_location"
@@ -20069,11 +20477,63 @@ msgctxt "Languages::payment_processors.category.russian"
 msgid "Russian payment methods"
 msgstr ""
 
+msgctxt "Languages::add_in_all_realtime_shippings"
+msgid "Add in all realtime shipping methods"
+msgstr ""
+
 msgctxt "Languages::event.system.realtime_shipping_error.name"
 msgid "Realtime shipping errors"
 msgstr ""
 
-msgctxt "Language::exim_reset_inventory_tooltip"
+msgctxt "Languages::profile_field_contains_information"
+msgid "Сouldn't change the field type: someone has already submitted data in this field."
+msgstr ""
+
+msgctxt "Languages::text_cannot_create_file_check_file"
+msgid "Сouldn't create the file. Please try again or choose another file."
+msgstr ""
+
+msgctxt "Languages::error_profile_field_code_exists"
+msgid "A profile field with this code already exists. Please choose another code."
+msgstr ""
+
+msgctxt "Languages::can_not_add_file_type_profile_field"
+msgid "Sorry, this page doesn't support fields with the \"File\" type, and they weren't added."
+msgstr ""
+
+msgctxt "Languages::day_or_days"
+msgid "day(s)"
+msgstr ""
+
+msgctxt "Languages::feature_already_in_use"
+msgid "Couldn't delete the feature. It is already used by your or someone else's products."
+msgstr ""
+
+msgctxt "Languages::feature_variants_already_in_use"
+msgid "Couldn't delete some feature variants. They are already used by your or someone else's products."
+msgstr ""
+
+msgctxt "Languages::stop_following_rules"
+msgid "Stop following rules"
+msgstr ""
+
+msgctxt "SettingsOptions::product_variant_mini_icon_width"
+msgid "Product variant selector thumbnail width"
+msgstr ""
+
+msgctxt "SettingsOptions::product_variant_mini_icon_height"
+msgid "Product variant selector thumbnail height"
+msgstr ""
+
+msgctxt "Languages::exim_features"
+msgid "Features (Deprecated)"
+msgstr ""
+
+msgctxt "Languages::exim_storefront_feature_name"
+msgid "Storefront feature name"
+msgstr ""
+
+msgctxt "Languages::exim_reset_inventory_tooltip"
 msgid "This won't affect the products that have the quantity specified in the imported file."
 msgstr ""
 
@@ -20111,6 +20571,10 @@ msgstr ""
 
 msgctxt "Languages::invoice_pdf"
 msgid "Invoice (PDF)"
+msgstr ""
+
+msgctxt "Languages::exim_import_detailed_image"
+msgid "Detailed image (Deprecated)"
 msgstr ""
 
 msgctxt "Languages::settings.smtp_error"
@@ -20165,6 +20629,14 @@ msgctxt "SettingsVariants::timezone::Asia/Urumqi"
 msgid "(GMT+06:00) Urumqi"
 msgstr ""
 
+msgctxt "Languages::update_notification.remove_percentage_surcharges_from_all_shipping_methods_title"
+msgid "Shipping methods: Percent surcharges no longer supported"
+msgstr ""
+
+msgctxt "Languages::update_notification.remove_percentage_surcharges_from_all_shipping_methods_message"
+msgid "<p>Starting with version 4.12.1, shipping methods no longer support \"a percentage of order total\" surcharges. During the upgrade, this type of surcharge has been removed from the following shipping methods:</p><ul>[shipping_methods]</ul><p>Please check these shipping methods and make sure that their rates and surcharges are correct.</p>"
+msgstr ""
+
 msgctxt "Languages::sync_data"
 msgid "Sync data"
 msgstr ""
@@ -20183,5 +20655,101 @@ msgstr ""
 
 msgctxt "Languages::log_file"
 msgid "Log file"
+msgstr ""
+
+msgctxt "Languages::select_developer"
+msgid "Select developer"
+msgstr ""
+
+msgctxt "Languages::popular_developer"
+msgid "Popular developer"
+msgstr ""
+
+msgctxt "Languages::developers"
+msgid "Developers"
+msgstr ""
+
+msgctxt "Languages::storefronts.manage_language_availability"
+msgid "Configure the languages available on this storefront"
+msgstr ""
+
+msgctxt "Languages::storefronts.manage_currency_availability"
+msgid "Configure the currencies available on this storefront"
+msgstr ""
+
+msgctxt "Languages::variant_with_name_already_exist"
+msgid "Couldn't rename feature variant \"[variant]\". Reason: a variant with the new name already exists."
+msgstr ""
+
+msgctxt "Languages::delete_default_destination_notice"
+msgid "Couldn't delete the default rate area. It must always exist."
+msgstr ""
+
+msgctxt "Languages::display"
+msgid "Display"
+msgstr ""
+
+msgctxt "Languages::create_filters"
+msgid "Create filters"
+msgstr ""
+
+msgctxt "Languages::text_n_filters_created"
+msgid "Filters created: [n]."
+msgstr ""
+
+msgctxt "Languages::error_n_filters_already_exists"
+msgid "Some filters ([n]) already exist."
+msgstr ""
+
+msgctxt "Languages::bulk_product_features_warning"
+msgid "This change won't affect some of the selected features, because they belong to a feature group. You can assign categories to an entire feature group."
+msgstr ""
+
+msgctxt "Languages::view_feature_groups"
+msgid "View feature groups"
+msgstr ""
+
+msgctxt "Languages::show_on_storefront"
+msgid "Show on Storefront"
+msgstr ""
+
+msgctxt "Languages::parent"
+msgid "Parent"
+msgstr ""
+
+msgctxt "Languages::attempt_to_set_itself_or_a_own_child_as_its_parent_warning"
+msgid "The parent page wasn't changed. Reason: can't assign child page as a parent for its own parent."
+msgstr ""
+
+msgctxt "Languages::bulk_attempt_to_set_itself_or_a_own_child_as_its_parent_warning"
+msgid "The parent page of some of the selected pages wasn't changed. Reason: can't assign child page as a parent for its own parent."
+msgstr ""
+
+msgctxt "Languages::usergroup_must_have_privileges"
+msgid "Usergroup must have at least one privilege."
+msgstr ""
+
+msgctxt "Languages::saved_search.set_as_default"
+msgid "Set as default"
+msgstr ""
+
+msgctxt "Languages::saved_search.set_as_non_default"
+msgid "Set as non-default"
+msgstr ""
+
+msgctxt "Languages::saved_search.set_as_default_confirm"
+msgid "Saved search \"[name]\" will open by default instead of the full list of objects. Is that what you'd like?"
+msgstr ""
+
+msgctxt "Languages::saved_search.set_as_non_default_confirm"
+msgid "The full list of objects will open by default instead of saved search \"[name]\". Is that what you'd like?"
+msgstr ""
+
+msgctxt "Languages::exim_subtotal_discount"
+msgid "Subtotal discount"
+msgstr ""
+
+msgctxt "Languages::storefront_languages_assigned"
+msgid "The \"<a href=\"[url]\">[name]</a>\" storefront had no available languages configured. All languages has been made available for it."
 msgstr ""
 

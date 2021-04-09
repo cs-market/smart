@@ -19,7 +19,7 @@
     {if $po.option_type == "ProductOptionTypes::SELECTBOX"|enum} {*Selectbox*}
         {if $po.variants}
             <select id="option_{$id}_{$po.option_id}" name="{$name}[{$id}][product_options][{$po.option_id}]" {if $product.options_update || $update_options}onchange="fn_change_options('{$id}', {$id}, '{$po.option_id}');"{/if} {if $cp.exclude_from_calculate && !$product.aoc || $po.disabled}disabled="disabled"{/if} {if $po.disabled}class="cm-skip-avail-switch"{/if}>
-            {if $product.options_type == "S"}<option value="">{if $po.disabled}{__("select_option_above")}{else}{__("please_select_one")}{/if}</option>{/if}
+            {if $product.options_type == "ProductOptionsApplyOrder::SEQUENTIAL"|enum}<option value="">{if $po.disabled}{__("select_option_above")}{else}{__("please_select_one")}{/if}</option>{/if}
             {foreach from=$po.variants item="vr"}
                 <option value="{$vr.variant_id}" {if $po.value == $vr.variant_id}selected="selected"{/if}>{$vr.variant_name}{if $settings.General.display_options_modifiers == "Y"}{if $vr.modifier|floatval} ({include file="common/modifier.tpl" mod_type=$vr.modifier_type mod_value=$vr.modifier display_sign=true}){/if}{hook name="products:select_options"}{/hook}{/if}</option>
             {/foreach}
@@ -37,7 +37,7 @@
                 <input id="{$id}_variant_{$vr.variant_id}" type="radio" name="{$name}[{$id}][product_options][{$po.option_id}]" value="{$vr.variant_id}" {if $po.value == $vr.variant_id}checked="checked"{/if} {if $product.options_update || $update_options}onclick="fn_change_options('{$c_obj|default:$id}', {$id}, '{$po.option_id}');"{/if} {if $cp.exclude_from_calculate && !$product.aoc || $po.disabled}disabled="disabled"{/if} {if $po.disabled}class="cm-skip-avail-switch"{/if} />
                 {$vr.variant_name}&nbsp;{if $settings.General.display_options_modifiers == "Y"}{if $vr.modifier|floatval}({include file="common/modifier.tpl" mod_type=$vr.modifier_type mod_value=$vr.modifier display_sign=true}){/if}{hook name="products:select_options"}{/hook}{/if}</label>
             {/foreach}
-            {if !$po.value && $product.options_type == "S" && !$po.disabled}<p class="description clear-both">{__("please_select_one")}</p>{/if}
+            {if !$po.value && $product.options_type == "ProductOptionsApplyOrder::SEQUENTIAL"|enum && !$po.disabled}<p class="muted description clear-both">{__("please_select_one")}</p>{/if}
         {else}
             {__("na")}
             <input type="hidden" name="{$name}[{$id}][product_options][{$po.option_id}]" value="{$po.value}" id="option_{$id}_{$po.option_id}" />

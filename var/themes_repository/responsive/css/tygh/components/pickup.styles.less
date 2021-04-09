@@ -59,10 +59,9 @@
                 max-height: 502px;
 
                 border: 1px solid @base;
-                border-right: 0;
 
                 margin: 0;
-                border-radius: 6px 0 0 6px;
+                border-radius: 6px;
 
                 &--near-map {
                     flex-basis: 100% !important;
@@ -137,22 +136,29 @@
         &--list {
             .pickup__offices-wrapper {
                 flex-basis: 100%;
-                border: 0;
-
                 overflow: initial;
-
                 height: auto;
             }
 
             .pickup__offices {
                 padding: 0;
-                margin: 0 -6.5px;
-
                 height: auto;
             }
 
             .pickup__offices.litecheckout__fields-row--wrapped .ty-one-store {
-                flex-basis: 33.3%;
+                flex-basis: 100%;
+            }
+        }
+    }
+
+    .pickup--map-list {
+        .pickup {
+            &__offices {
+                &-wrapper {
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 0;
+                    border-right: 0;
+                }
             }
         }
     }

@@ -25,12 +25,12 @@ namespace Tygh\Addons\CommerceML\Tools;
 class RuntimeCacheStorage
 {
     /**
-     * @var array<string, mixed>
+     * @var array<string|int, mixed>
      */
     private $cache = [];
 
     /**
-     * @var array<string, int>
+     * @var array<string|int, int>
      */
     private $cache_usage_counts = [];
 
@@ -52,7 +52,7 @@ class RuntimeCacheStorage
     /**
      * Gets item from cache by key
      *
-     * @param string     $key           Cache key
+     * @param string|int $key           Cache key
      * @param mixed|null $default_value Default value if cache not found
      *
      * @return mixed|null
@@ -71,7 +71,7 @@ class RuntimeCacheStorage
     /**
      * Check if storage has cache key
      *
-     * @param string $key Cache key
+     * @param string|int $key Cache key
      *
      * @return bool
      */
@@ -83,8 +83,8 @@ class RuntimeCacheStorage
     /**
      * Gets or set cache
      *
-     * @param string   $key           Cache key
-     * @param callable $default_value Callable function which will be executed if storage has not cache item.
+     * @param string|int $key           Cache key
+     * @param callable   $default_value Callable function which will be executed if storage has not cache item.
      *
      * @return mixed|null
      */
@@ -100,8 +100,8 @@ class RuntimeCacheStorage
     /**
      * Adds cache item to storage
      *
-     * @param string $key   Cache key
-     * @param mixed  $value Cache value
+     * @param string|int $key   Cache key
+     * @param mixed      $value Cache value
      */
     public function add($key, $value)
     {
@@ -121,7 +121,7 @@ class RuntimeCacheStorage
     /**
      * Removes cache item from storage
      *
-     * @param string $key Cache key
+     * @param string|int $key Cache key
      */
     public function remove($key)
     {

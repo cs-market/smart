@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-ru\n"
 "X-Crowdin-Project-ID: 54044\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.11.5/addons/rus_yandex_metrika.po\n"
-"X-Crowdin-File-ID: 3766\n"
-"PO-Revision-Date: 2020-08-28 13:38\n"
+"X-Crowdin-File: /release-4.12.2/addons/rus_yandex_metrika.po\n"
+"X-Crowdin-File-ID: 4248\n"
+"PO-Revision-Date: 2021-01-26 12:32\n"
 
 msgctxt "Addons::name::rus_yandex_metrika"
 msgid "Russian localization — Yandex.Metrika"
@@ -38,11 +38,11 @@ msgstr "Узнайте в личном кабинете на сайте <a href=
 
 msgctxt "SettingsOptions::rus_yandex_metrika::is_obsolete_code_snippet_used"
 msgid "Obsolete code snippet"
-msgstr "Устаревший сниппет"
+msgstr "Устаревший код счетчика"
 
 msgctxt "SettingsTooltips::rus_yandex_metrika::is_obsolete_code_snippet_used"
 msgid "You should install the obsolete version of the code snippet only if you'd like to use the previous version of Session Replay. The up-to-date code snippet supports only Session Replay 2.0"
-msgstr "Устаревший сниппет нужен только для работы с Вебвизором 1.0 (старой версией). Для работы с Вебвизором 2.0 использйте новый сниппет."
+msgstr "Устаревший код счетчика стоит устанавливать на сайт, только если вы хотите использовать предыдущую версию Вебвизора. Актуальная версия кода счетчика поддерживает только Вебвизор 2.0."
 
 msgctxt "SettingsOptions::rus_yandex_metrika::base_settings"
 msgid "Settings"

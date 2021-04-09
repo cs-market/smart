@@ -27,4 +27,5 @@ class ImportStatuses
     const SENT       = 'sent';
     const DONE       = 'done';
     const ERROR      = 'sync_error';
+    const SUSPENDED  = 'suspended';
 }

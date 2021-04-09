@@ -2,7 +2,7 @@
     {if $selected_features}
         {include
             file="views/products/components/products_search_form.tpl"
-            dispatch="product_variations.update"
+            dispatch="product_variations.find_variations"
             extra="<input type=\"hidden\" name=\"result_ids\" value=\"product_group_form_list,tools_tab_link_existing_{$product_data.product_id}\">"
             put_request_vars=true
             form_meta="cm-ajax"
@@ -12,7 +12,7 @@
         }
     {/if}
 
-    <form action="{"product_variations.update"|fn_url}" class="form-horizontal form-edit" name="add_product_to_group_form" method="post">
+    <form action="{"product_variations.link"|fn_url}" class="form-horizontal form-edit" name="add_product_to_group_form" method="post">
         <input type="hidden" name="product_id" value="{$product_data.product_id}" />
 
         <div class="items-container" id="product_group_form_list">
@@ -66,7 +66,7 @@
                 {/if}
             {else}
                 <div class="no-items row-fluid">
-                    <div class="span8 offset2 left">{__("product_variations.no_available_features")}</div>
+                    <div class="span8 offset2 left">{__("product_variations.no_available_features", ["[manage_features_href]" => "product_features.manage"|fn_url])}</div>
                 </div>
             {/if}
         <!--product_group_form_list--></div>

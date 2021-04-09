@@ -35,7 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //
     if ($mode == 'update') {
         if (!empty($_REQUEST['attachment_data'])) {
-            fn_update_attachments($_REQUEST['attachment_data'], $_REQUEST['attachment_id'], $_REQUEST['object_type'], $_REQUEST['object_id'], 'M', null, DESCR_SL);
+            fn_update_attachments(
+                $_REQUEST['attachment_data'],
+                $_REQUEST['attachment_id'],
+                $_REQUEST['object_type'],
+                $_REQUEST['object_id'],
+                'M',
+                [],
+                DESCR_SL
+            );
         }
     }
 

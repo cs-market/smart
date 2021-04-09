@@ -21,7 +21,7 @@
 
     <div class="controls">
         <input type="password" name="payment_data[processor_params][secret_word]" id="secret_word"
-               value="{$processor_params.secret_word}">
+               value="{$processor_params.secret_word}" autocomplete="new-password">
     </div>
 </div>
 

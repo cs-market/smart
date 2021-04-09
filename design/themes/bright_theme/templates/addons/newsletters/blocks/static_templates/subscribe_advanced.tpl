@@ -20,7 +20,7 @@
             {include file="buttons/button.tpl" but_role="submit" but_name="dispatch[newsletters.add_subscriber]" but_text=__("subscribe") but_meta="ty-btn__subscribe"}
             </div>
         </div>
-        
+        {include file="common/image_verification.tpl" option="newsletters"}
         {/hook}
     </form>
 </div>

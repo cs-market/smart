@@ -12,6 +12,9 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+defined('BOOTSTRAP') or die('Access denied');
+
+/** @var array{controllers: array{mobile_app: array{permissions: bool}}} $schema */
 $schema['controllers']['mobile_app']['permissions'] = false;
 
 return $schema;

@@ -1,6 +1,8 @@
 {capture name="extra"}
+    {$enable_search = $enable_search|default:false}
 
     <div class="pull-left">
+        {if !$enable_search}
         <div class="object-selector object-selector--options">
             <select id="option_add"
                     class="cm-object-selector"
@@ -21,11 +23,12 @@
             >
             </select>
         </div>
+        {/if}
 
         {if $product_options}
             {hook name="products:update_product_options_actions"}
 
-            {if $product_data.exceptions_type == "F"}
+            {if $product_data.exceptions_type === "ProductOptionsExceptionsTypes::FORBIDDEN"|enum}
                 {assign var="except_title" value=__("forbidden_combinations")}
             {else}
                 {assign var="except_title" value=__("allowed_combinations")}
@@ -37,4 +40,4 @@
     </div>
 {/capture}
 
-{include file="views/product_options/manage.tpl" object="product" extra=$smarty.capture.extra product_id=$smarty.request.product_id view_mode="embed"}
+{include file="views/product_options/manage.tpl" object="product" extra=$smarty.capture.extra product_id=$smarty.request.product_id view_mode="embed" enable_search=$enable_search}

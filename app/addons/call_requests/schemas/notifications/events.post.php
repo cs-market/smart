@@ -12,6 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Notifications\DataValue;
 use Tygh\Notifications\Transports\Mail\MailTransport;
@@ -31,7 +32,7 @@ $schema['call_requests.request_created'] = [
     'receivers' => [
         UserTypes::ADMIN => [
             MailTransport::getId() => MailMessageSchema::create([
-                'area'            => 'A',
+                'area'            => SiteArea::ADMIN_PANEL,
                 'from'            => 'default_company_orders_department',
                 'to'              => 'company_orders_department',
                 'template_code'   => 'call_requests_call_request',

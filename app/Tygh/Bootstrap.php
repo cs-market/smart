@@ -17,6 +17,16 @@ namespace Tygh;
 use Tygh\Tools\Url;
 use Tygh\Exceptions\InputException;
 
+/**
+ * Class Bootstrap
+ *
+ * @package Tygh
+ *
+ * phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
+ * phpcs:disable SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification
+ * phpcs:disable Squiz.Commenting.FunctionComment.TypeHintMissing
+ * phpcs:disable Squiz.Commenting.FunctionComment.EmptyThrows
+ */
 class Bootstrap
 {
     const INI_PARAM_TYPE_INT = 1;
@@ -29,7 +39,7 @@ class Bootstrap
     public static function sendHeaders($is_https = false)
     {
         // Click-jacking protection
-        //header("X-Frame-Options: sameorigin");
+        header('X-Frame-Options: SAMEORIGIN');
 
         // Cache-preventing headers sending removed from here,
         // because this is done by session_start() depending on the session.cache_limiter configruation parameter value
@@ -167,13 +177,14 @@ class Bootstrap
     /**
      * Inits console mode
      *
-     * @param  array  $get      GET superglobal array
-     * @param  array  $post     POST superglobal array
-     * @param  array  $server   SERVER superglobal array
-     * @param  string $dir_root root directory
+     * @param array  $get      GET superglobal array
+     * @param array  $post     POST superglobal array
+     * @param array  $server   SERVER superglobal array
+     * @param string $dir_root Root directory
      *
-     * @throws InputException
-     * @return array  list of filtered get and server arrays
+     * @return array{array, array, array} List of filtered get and server arrays
+     *
+     * @throws \Tygh\Exceptions\InputException
      */
     public static function initConsoleMode($get, $post, $server, $dir_root)
     {
@@ -190,7 +201,7 @@ class Bootstrap
                 $method = 'POST';
                 unset($get['p']);
                 $post = $get;
-                $get = array();
+                $get = [];
             }
 
             $server['SERVER_SOFTWARE'] = 'Tygh';
@@ -202,16 +213,18 @@ class Bootstrap
             @set_time_limit(0); // the script, running in console mode has no time limits
         }
 
-        return array($get, $post, $server);
+        return [$get, $post, $server];
     }
 
     /**
      * Inits environment
-     * @param  array  $get      GET superglobal array
-     * @param  array  $post     POST subperglobal array
-     * @param  array  $server   SERVER superglobal array
-     * @param  string $dir_root root directory
-     * @return array  combined and filtered GET/POST array
+     *
+     * @param array  $get      GET superglobal array
+     * @param array  $post     POST subperglobal array
+     * @param array  $server   SERVER superglobal array
+     * @param string $dir_root Root directory
+     *
+     * @return array{array, array, array, array} Combined and filtered GET/POST array
      */
     public static function initEnv($get, $post, $server, $dir_root)
     {
@@ -231,7 +244,7 @@ class Bootstrap
             self::sendHeaders(defined('HTTPS'));
         }
 
-        return array(self::processRequest($get, $post), $server, $get, $post);
+        return [self::processRequest($get, $post), $server, $get, $post];
     }
 
     /**
@@ -269,9 +282,11 @@ class Bootstrap
 
     /**
      * Processes request vars and combine them
-     * @param  array $get  GET vars
-     * @param  array $post POST vars
-     * @return array combined filtered array with post and get vars
+     *
+     * @param array $get  GET vars
+     * @param array $post POST vars
+     *
+     * @return array Combined filtered array with post and get vars
      */
     public static function processRequest($get, $post)
     {

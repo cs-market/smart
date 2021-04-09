@@ -44,7 +44,9 @@ class CreateImportCommandHandlerTest extends BaseXmlTestCase
         $handler = new CreateImportCommandHandler(
             $this->getImportStorageFactory(),
             $this->getXmlParser(),
-            $this->getEntitiesSchema()
+            function () {
+                return $this->getEntitiesSchema();
+            }
         );
 
         $command = new CreateImportCommand();
@@ -54,6 +56,7 @@ class CreateImportCommandHandlerTest extends BaseXmlTestCase
             __DIR__ . '/../data/offers.xml',
             __DIR__ . '/../data/import.xml',
         ];
+        $command->import_type = 'catalog';
 
         $handler->handle($command);
 

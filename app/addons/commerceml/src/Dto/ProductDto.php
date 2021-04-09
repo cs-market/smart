@@ -120,7 +120,17 @@ class ProductDto implements RepresentEntityDto
     /**
      * @var bool
      */
+    public $is_creatable = true;
+
+    /**
+     * @var bool
+     */
     public $is_removed = false;
+
+    /**
+     * @var bool
+     */
+    public $is_new = true;
 
     /**
      * ProductDto constructor.

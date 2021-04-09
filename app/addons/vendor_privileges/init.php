@@ -26,5 +26,6 @@ fn_register_hooks(
     'check_can_usergroup_have_privileges_post',
     'update_profile',
     'get_payment_usergroups',
-    'define_usergroups'
+    'define_usergroups',
+    'mve_check_permission_order_management'
 );

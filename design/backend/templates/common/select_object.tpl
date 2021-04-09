@@ -63,8 +63,15 @@
         </a>
         <ul class="dropdown-menu cm-select-list pull-right">
             {foreach $items as $id => $item}
+
+                {* Link and suffix with the same identifier. Example: UI and content languages *}
+                {$link = "`$link_tpl``$id`"|fn_url}
+                {if $link_suffix}
+                    {$link = $link|fn_link_attach:"`$link_suffix``$id`"}
+                {/if}
+
                 <li {if $id == $selected_id}class="active"{/if}>
-                    <a name="{$id}" href="{"`$link_tpl``$id`"|fn_url}">
+                    <a name="{$id}" href="{$link}">
                         {if $display_icons}
                             {$icon_class=$item.icon_class|default:"flag flag-{$item.country_code|lower}"}
                             {if $icon_class}

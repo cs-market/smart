@@ -9,6 +9,14 @@ import { reducer, actions } from "./reducer";
 import { getNotifications } from "./api";
 import { NotificationsCenter, NotificationsCenterCounter } from "./component";
 
+var langVars = {
+  loading: Tygh.tr('loading'),
+  showMore: Tygh.tr('showMore'),
+  showLess: Tygh.tr('showLess'),
+  noData: Tygh.tr('notifications_center.noData'),
+  notifications: Tygh.tr('notifications_center.notifications')
+};
+
 const NotificationsCenterStore = createStore(reducer);
 
 const initNotificationsCenter = async function() {
@@ -34,9 +42,11 @@ const initNotificationsCenter = async function() {
     ),
     document.querySelector('[data-ca-notifications-center-counter]')
   );
+
+  Tygh.ceNotificationsCenterInited = true;
 }
 
-$.ceEvent('one', 'ce.commoninit', initNotificationsCenter);
+initNotificationsCenter();
 
 $.ceEvent('on', 'ce.notifications_center.reloaded', function (callback) {
     initNotificationsCenter().then(function() {
@@ -46,7 +56,7 @@ $.ceEvent('on', 'ce.notifications_center.reloaded', function (callback) {
     });
 });
 
-$.ceEvent('on', 'ce.notifications_center.enabled', async function (langVars) {
+$.ceEvent('on', 'ce.notifications_center.enabled', async function () {
   ReactDOM.render(
     (
       <Provider store={NotificationsCenterStore}>

@@ -44,9 +44,7 @@
             </select>
         </td>
         <td class="nowrap" data-th="">
-            <div class="hidden-tools">
-                {include file="buttons/multiple_buttons.tpl" item_id="new_product"}
-            </div>
+            {include file="buttons/multiple_buttons.tpl" item_id="new_product"}
         </td>
     </tr>
     </table>

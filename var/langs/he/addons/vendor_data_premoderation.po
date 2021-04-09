@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: he\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_data_premoderation.po\n"
-"X-Crowdin-File-ID: 3666\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_data_premoderation.po\n"
+"X-Crowdin-File-ID: 4158\n"
+"PO-Revision-Date: 2021-02-01 09:06\n"
 
 msgctxt "Addons::name::vendor_data_premoderation"
 msgid "Vendor data premoderation"
@@ -69,16 +69,16 @@ msgid "Disapprove selected"
 msgstr "אל תאשר את הנבחרים"
 
 msgctxt "Languages::pre_moderation"
-msgid "Products require prior approval"
-msgstr "המוצרים מחייבים אישור מראש"
+msgid "Require approval for new products"
+msgstr "דרוש אישור למוצרים חדשים"
 
 msgctxt "Languages::pre_moderation_edit"
-msgid "Approve product info updates"
-msgstr "אשר את העדכונים של נתוני המוצרים"
+msgid "Require approval for updated products"
+msgstr "דרוש אישור למוצרים מעודכנים"
 
 msgctxt "Languages::pre_moderation_edit_vendors"
-msgid "Approve vendor profile updates"
-msgstr "אשר עדכונים של פרופיל הספקים"
+msgid "Require approval for vendor profile changes"
+msgstr "דרוש אישור לשינויים בפרופיל הספק"
 
 msgctxt "Languages::text_not_approved_products"
 msgid "You have products that require your approval. Please <a href=\"[link]\">follow this link</a> to review these products."
@@ -290,5 +290,5 @@ msgstr "קידומת מוקדמת של נתוני ספק: המוצר שלך לא
 
 msgctxt "Languages::vendor_data_premoderation.moderation"
 msgid "Moderation"
-msgstr ""
+msgstr "מְתִינוּת"
 

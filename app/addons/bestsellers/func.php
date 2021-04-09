@@ -117,6 +117,12 @@ function fn_bestsellers_get_products_before_select(&$params, $join, $condition, 
 
         }
     }
+
+    // in stock conditions are applied if out of stock products are not cut-off in ::fn_get_products
+    // phpcs:disable SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+    if (!empty($params['similar_in_stock']) && $params['similar_in_stock'] === YesNo::YES) {
+        $params['hide_out_of_stock_products'] = true;
+    }
 }
 
 function fn_bestsellers_get_products(&$params, &$fields, &$sortings, &$condition, &$join, &$sorting, &$group_by, &$lang_code, &$having)
@@ -198,24 +204,6 @@ function fn_bestsellers_get_products(&$params, &$fields, &$sortings, &$condition
         } else {
             $fields[] = 'MAX(100 - ((prices.price * 100) / products.list_price)) AS sales_discount';
         }
-    }
-
-    // in stock conditions are applied if out of stock products are not cut-off in ::fn_get_products
-    if (
-        !empty($params['similar_in_stock'])
-        && $params['similar_in_stock'] == YesNo::YES
-        && !(
-            Registry::get('settings.General.inventory_tracking') == YesNo::YES
-            && Registry::get('settings.General.show_out_of_stock_products') == YesNo::NO
-        )
-    ) {
-        $condition .= db_quote(
-            ' AND (IF(products.tracking = ?s, inventory_b.amount >= 1, products.amount >= 1) OR (products.tracking = ?s))',
-            ProductTracking::TRACK_WITH_OPTIONS,
-            ObjectStatuses::DISABLED
-        );
-
-        $join .= " LEFT JOIN ?:product_options_inventory as inventory_b ON inventory_b.product_id = products.product_id AND inventory_b.amount >= 1";
     }
 
     return true;

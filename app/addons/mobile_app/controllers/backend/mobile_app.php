@@ -14,19 +14,25 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+use Tygh\Enum\ImagePairTypes;
+use Tygh\Enum\YesNo;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Storage;
 use Tygh\Tools\Archivers\ArchiverException;
 use Tygh\Addons\MobileApp\GoogleServicesConfig;
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+$storefront_id = !empty($_REQUEST['storefront_id']) && (int) $_REQUEST['storefront_id']
+    ? (int) $_REQUEST['storefront_id']
+    : StorefrontProvider::getStorefront()->storefront_id;
 
-    if ($mode == 'download_config') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($mode === 'download_config') {
         fn_set_progress('set_scale', 10);
         fn_set_progress('title', __('mobile_app.preparing_config'));
         fn_set_progress('echo', __('mobile_app.preparing_config'));
         fn_set_progress('parts', 7);
-        $settings = fn_mobile_app_get_mobile_app_settings();
-        $images = fn_mobile_app_get_mobile_app_images();
+        $settings = fn_mobile_app_get_mobile_app_settings($storefront_id);
+        $images = fn_mobile_app_get_mobile_app_images($storefront_id);
 
         // prepare settings, for save config first structure
         $new_schema = $settings['app_appearance']['colors'];
@@ -48,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ]
         );
 
-        if (GoogleServicesConfig::isExist()) {
-            $g_config_file_path = GoogleServicesConfig::getFilePath();
+        if (GoogleServicesConfig::isExist($storefront_id)) {
+            $g_config_file_path = GoogleServicesConfig::getFilePath($storefront_id);
             Storage::instance('custom_files')->put(
                 implode(DIRECTORY_SEPARATOR, [$working_dir, 'android', 'app', 'google-services.json']),
                 [
@@ -60,8 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             );
         }
 
-        $images = fn_mobile_app_get_mobile_app_images();
         $schema = fn_get_schema('mobile_app', 'app_settings');
+        $crop_when_resize = isset($settings['app_settings']['images']['crop_when_resize'])
+            ? YesNo::toBool($settings['app_settings']['images']['crop_when_resize'])
+            : false;
 
         foreach ($schema['images'] as $key => $image_types_schema) {
 
@@ -70,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             $name = $image_types_schema['image_params']['name'];
-            $pair_data = fn_get_image_pairs(0, $image_types_schema['type'], 'M');
+            $pair_data = fn_get_image_pairs($storefront_id, $image_types_schema['type'], ImagePairTypes::MAIN);
 
             if (empty($pair_data)) {
                 // TODO: set error notification
@@ -81,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 fn_set_progress('echo', __('mobile_app.preparing_android_images'));
                 $image_sizes_schema = $schema['image_sizes']['android'][$name];
 
-                fn_mobile_app_resize_android_images($image_types_schema, $image_sizes_schema, $pair_data);
+                fn_mobile_app_resize_android_images($image_types_schema, $image_sizes_schema, $pair_data, $crop_when_resize);
             }
 
             if (isset($schema['image_sizes']['ios'][$name])) {
@@ -89,10 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if ($name === 'icon') {
                     fn_set_progress('echo', __('mobile_app.preparing_ios_icons'));
-                    fn_mobile_app_resize_ios_icons($image_types_schema, $image_sizes_schema, $pair_data);
+                    fn_mobile_app_resize_ios_icons($image_types_schema, $image_sizes_schema, $pair_data, $crop_when_resize);
                 } else {
                     fn_set_progress('echo', __('mobile_app.preparing_ios_images'));
-                    fn_mobile_app_resize_ios_images($image_types_schema, $image_sizes_schema, $pair_data);
+                    fn_mobile_app_resize_ios_images($image_types_schema, $image_sizes_schema, $pair_data, $crop_when_resize);
                 }
             }
         }
@@ -121,20 +129,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         return [CONTROLLER_STATUS_REDIRECT, 'addons.update&addon=mobile_app'];
     }
 
-    if ($mode == 'delete_google_config_file') {
-        GoogleServicesConfig::deleteFile();
-        return [CONTROLLER_STATUS_REDIRECT, 'addons.update&addon=mobile_app'];
+    if ($mode === 'delete_google_config_file') {
+        GoogleServicesConfig::deleteFile($storefront_id);
+        return [CONTROLLER_STATUS_REDIRECT, 'addons.update&addon=mobile_app&storefront_id=' . $storefront_id];
     }
 
     return [CONTROLLER_STATUS_OK];
 }
 
-if ($mode == 'get_file') {
+if ($mode === 'get_file') {
     $archive_path = fn_mobile_app_get_archive_full_path();
 
     if (file_exists($archive_path)) {
         fn_get_file($archive_path, '', true);
     }
-} elseif ($mode == 'get_google_config_file') {
-    GoogleServicesConfig::getFile();
+} elseif ($mode === 'get_google_config_file') {
+    GoogleServicesConfig::getFile($storefront_id);
 }

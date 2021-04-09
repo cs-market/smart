@@ -32,6 +32,38 @@ if ($_SERVER['REQUEST_METHOD']	== 'POST') {
         $suffix = '.manage';
     }
 
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['banner_ids'])
+        && is_array($_REQUEST['banner_ids'])
+        && !empty($_REQUEST['status'])
+    ) {
+        $status_to = (string) $_REQUEST['status'];
+
+        foreach ($_REQUEST['banner_ids'] as $banner_id) {
+            if (!fn_check_company_id('banners', 'banner_id', $banner_id)) {
+                continue;
+            }
+            fn_tools_update_status([
+                'table'             => 'banners',
+                'status'            => $status_to,
+                'id_name'           => 'banner_id',
+                'id'                => $banner_id,
+                'show_error_notice' => false
+            ]);
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('banners.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+    }
+
     //
     // Add/edit banners
     //

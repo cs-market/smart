@@ -16,6 +16,10 @@ msgctxt "Languages::app_params"
 msgid "Application"
 msgstr "Application"
 
+msgctxt "Languages::mobile_app.mobile_apply"
+msgid "Apply"
+msgstr "Apply"
+
 msgctxt "Languages::mobile_app.section.category"
 msgid "Categories"
 msgstr "Categories"
@@ -44,11 +48,39 @@ msgctxt "Languages::mobile_app.appname"
 msgid "App Name"
 msgstr "App Name"
 
+msgctxt "Languages::mobile_app.mobile_settings"
+msgid "Settings"
+msgstr "Settings"
+
+msgctxt "Languages::mobile_app.mobile_select_language"
+msgid "Select Language"
+msgstr "Select Language"
+
+msgctxt "Languages::mobile_app.mobile_pages"
+msgid "Pages"
+msgstr "Pages"
+
+msgctxt "Languages::mobile_app.mobile_currency"
+msgid "Currency"
+msgstr "Currency"
+
+msgctxt "Languages::mobile_app.mobile_language"
+msgid "Language"
+msgstr "Language"
+
+msgctxt "Languages::mobile_app.mobile_favorite"
+msgid "Favorite"
+msgstr "Favorite"
+
 msgctxt "Languages::mobile_app.appshortdescription"
 msgid "Short description"
 msgstr "Short description"
 
 msgctxt "Languages::mobile_app.appfulldescription"
+msgid "Full description"
+msgstr "Full description"
+
+msgctxt "Languages::mobile_app.mobile_full_product_description"
 msgid "Full description"
 msgstr "Full description"
 
@@ -87,6 +119,10 @@ msgstr "Push notifications"
 msgctxt "Languages::ttc_mobile_app.pushnotifications"
 msgid "Push notifications"
 msgstr "Push notifications"
+
+msgctxt "Languages::mobile_app.mobile_buyer"
+msgid "Buyer"
+msgstr "Buyer"
 
 msgctxt "Languages::bundleid"
 msgid "Bundle Id"
@@ -253,8 +289,8 @@ msgid "Update texts using existing locale files"
 msgstr "Update texts using existing locale files"
 
 msgctxt "Languages::mobile_app.invalid_locale_file"
-msgid "Invalid locale file selected for the \"[language]\" language"
-msgstr "Invalid locale file selected for the \"[language]\" language"
+msgid "Locale file selected for the \"[language]\" language is not a valid JSON file"
+msgstr "Locale file selected for the \"[language]\" language is not a valid JSON file"
 
 msgctxt "Languages::mobile_app.app_translation_updated.item"
 msgid "[language]: [n] texts|[language]: [n] texts"
@@ -1255,6 +1291,10 @@ msgstr "Fife"
 msgctxt "Languages::mobile_app.mobile_fiji"
 msgid "Fiji"
 msgstr "Fiji"
+
+msgctxt "Languages::mobile_app.mobile_filter"
+msgid "Filter"
+msgstr "Filter"
 
 msgctxt "Languages::mobile_app.mobile_finistere"
 msgid "Finistère"
@@ -2996,6 +3036,14 @@ msgctxt "Languages::mobile_app.mobile_selkirkshire"
 msgid "Selkirkshire"
 msgstr "Selkirkshire"
 
+msgctxt "Languages::mobile_app.mobile_seller"
+msgid "Seller"
+msgstr "Seller"
+
+msgctxt "Languages::mobile_app.mobile_sellers"
+msgid "Sellers"
+msgstr "Sellers"
+
 msgctxt "Languages::mobile_app.mobile_senegal"
 msgid "Senegal"
 msgstr "Senegal"
@@ -3796,6 +3844,10 @@ msgctxt "Languages::mobile_app.mobile_clear_all_cart"
 msgid "Clear all cart ?"
 msgstr "Clear all cart ?"
 
+msgctxt "Languages::mobile_app.mobile_clear_all_filter"
+msgid "Clear all"
+msgstr "Clear all"
+
 msgctxt "Languages::mobile_app.mobile_clear_wish_list"
 msgid "Clear wish list?"
 msgstr "Clear wish list?"
@@ -3875,6 +3927,10 @@ msgstr "List is empty"
 msgctxt "Languages::mobile_app.mobile_login"
 msgid "Login"
 msgstr "Login"
+
+msgctxt "Languages::mobile_app.mobile_logout"
+msgid "Logout"
+msgstr "Logout"
 
 msgctxt "Languages::mobile_app.mobile_looking_for_ideas"
 msgid "Looking for ideas?"
@@ -4180,6 +4236,10 @@ msgctxt "Languages::mobile_app.mobile_name"
 msgid "Name"
 msgstr "Name"
 
+msgctxt "Languages::mobile_app.mobile_description_optional"
+msgid "Description (optional)"
+msgstr "Description (optional)"
+
 msgctxt "Languages::mobile_app.mobile_description"
 msgid "Description"
 msgstr "Description"
@@ -4267,3 +4327,43 @@ msgstr "Weight (lbs)"
 msgctxt "Languages::mobile_app.mobile_free_shipping"
 msgid "Free shipping"
 msgstr "Free shipping"
+
+msgctxt "Languages::mobile_app.promotion"
+msgid "Promotion"
+msgstr "Promotion"
+
+msgctxt "Languages::mobile_app.app_store_app_id"
+msgid "App Store application ID"
+msgstr "App Store application ID"
+
+msgctxt "Languages::mobile_app.google_play_app_id"
+msgid "Google Play application ID"
+msgstr "Google Play application ID"
+
+msgctxt "Languages::mobile_app.promotion_note"
+msgid "Visitors of your site who use iOS or Android devices will see a prompt to install the mobile application.<br>To show your application's icon in this prompt, <a href=\"[icon_url]\">upload App Icon</a> in the add-on settings. If App Icon is not specified, the favicon of a storefront will be used instead."
+msgstr "Visitors of your site who use iOS or Android devices will see a prompt to install the mobile application.<br>To show your application's icon in this prompt, <a href=\"[icon_url]\">upload App Icon</a> in the add-on settings. If App Icon is not specified, the favicon of a storefront will be used instead."
+
+msgctxt "Languages::mobile_app.we_also_have_a_mobile_app"
+msgid "We also have a mobile app"
+msgstr "We also have a mobile app"
+
+msgctxt "Languages::mobile_app.view_demo"
+msgid "View demo"
+msgstr "View demo"
+
+msgctxt "Languages::mobile_app.open"
+msgid "Open"
+msgstr "Open"
+
+msgctxt "Languages::mobile_app.app_store_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://www.apple.com/app-store\" target=\"_blank\">App Store</a>. <br> For example, in https://apps.apple.com/us/app/multi-vendor-app-by-cs-cart/id1304872157 the ID is 1304872157."
+msgstr "Take it from the application link in <a href=\"https://www.apple.com/app-store\" target=\"_blank\">App Store</a>. <br> For example, in https://apps.apple.com/us/app/multi-vendor-app-by-cs-cart/id1304872157 the ID is 1304872157."
+
+msgctxt "Languages::mobile_app.google_play_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://play.google.com/store\" target=\"_blank\">Google Play</a>. <br> For example, in https://play.google.com/store/apps/details?id=com.simtech.multivendor&hl=en_US the ID is com.simtech.multivendor."
+msgstr "Take it from the application link in <a href=\"https://play.google.com/store\" target=\"_blank\">Google Play</a>. <br> For example, in https://play.google.com/store/apps/details?id=com.simtech.multivendor&hl=en_US the ID is com.simtech.multivendor."
+
+msgctxt "Languages::mobile_app.mobile_yookassa"
+msgid "YooKassa"
+msgstr "YooKassa"

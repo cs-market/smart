@@ -110,7 +110,7 @@ XML;
         $product_feature1 = new ProductFeatureDto();
         $product_feature1->id = new IdDto('9d68a9cd-baf9-11e6-853e-60a44c5c87dc');
         $product_feature1->name = TranslatableValueDto::create('Бренд');
-        $product_feature1->type = ProductFeatureDto::TYPE_EXTENDED;
+        $product_feature1->type = ProductFeatureDto::TYPE_DIRECTORY;
         $product_feature1->variants[] = ProductFeatureVariantDto::create(IdDto::createByExternalId('9d68a9cd-baf9-11e6-853e-60a44c5c87dc#9d68a9cf-baf9-11e6-853e-60a44c5c87dc'), TranslatableValueDto::create('Format'));
 
         $xml = <<<XML
@@ -131,8 +131,8 @@ XML;
             $xml,
             array_merge([$product_feature1], $product_feature1->variants),
             [
-                'convertor_brand_source' => 'property',
-                'convertor_brand_property_source' => 'Бренд'
+                'catalog_convertor.brand_source' => 'property',
+                'catalog_convertor.brand_property_source' => 'Бренд'
             ]
         ];
     }

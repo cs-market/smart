@@ -128,6 +128,17 @@
 </script>
 
 {hook name="index:index"}
+
+    {hook name="index:alert_block"}
+        {if "MULTIVENDOR"|fn_allowed_for && $dashboard_alert}
+            <div class="alert alert-block">
+                <div class="debt-notification__text">
+                    {$dashboard_alert nofilter}
+                </div>
+            </div>
+        {/if}
+    {/hook}
+
     <div class="dashboard row-fluid" id="dashboard">
 
         <div class="dashboard-cards span3">
@@ -208,11 +219,11 @@
                         <h3><a href="{"products.manage?status=A"|fn_url}">{$general_stats.products.total_products|number_format}</a></h3>
                     </div>
                 </div>
-                {if $settings.General.inventory_tracking == "Y"}
+                {if $settings.General.inventory_tracking !== "YesNo::NO"|enum}
                     <div class="dashboard-card">
                         <div class="dashboard-card-title">{__("out_of_stock_products")}</div>
                         <div class="dashboard-card-content">
-                            <h3><a href="{"products.manage?amount_from=&amount_to=0&tracking[0]={"ProductTracking::TRACK_WITHOUT_OPTIONS"|enum}&tracking[1]={"ProductTracking::TRACK_WITH_OPTIONS"|enum}"|fn_url}">{$general_stats.products.out_of_stock_products|number_format}</a></h3>
+                            <h3><a href="{"products.manage?amount_from=&amount_to=0&tracking[0]={"ProductTracking::TRACK"|enum}"|fn_url}">{$general_stats.products.out_of_stock_products|number_format}</a></h3>
                         </div>
                     </div>
                 {/if}
@@ -301,29 +312,31 @@
                             <div class="span6">
                                 <table class="table">
                                     <tbody>
-                                    <tr>
-                                        <td class="dashboard-vendors-activity__label">
-                                            <a href="{"companies.manage?not_login_from={$time_from}&not_login_to={$time_to}&status=A"|fn_url}">
-                                                {__("vendors_activity.not_logged_in_vendors")}
-                                            </a>
-                                        </td>
-                                        <td class="dashboard-vendors-activity__value">
-                                            {$dashboard_vendors_activity.vendors_not_logged}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="dashboard-vendors-activity__label">
-                                            {hook name="index:dashboard_new_products_link"}
-                                            {$url = "products.manage?time_from={$time_from}&time_to={$time_to}&period=C&status[]=A&company_status[]=A"}
-                                            {/hook}
-                                            <a href="{$url|fn_url}">
-                                                {__("vendors_activity.new_products")}
-                                            </a>
-                                        </td>
-                                        <td class="dashboard-vendors-activity__value">
-                                            {$dashboard_vendors_activity.new_products}
-                                        </td>
-                                    </tr>
+                                        {hook name="index:vendors_activity"}
+                                            <tr>
+                                                <td class="dashboard-vendors-activity__label">
+                                                    <a href="{"companies.manage?not_login_from={$time_from}&not_login_to={$time_to}&status=A"|fn_url}">
+                                                        {__("vendors_activity.not_logged_in_vendors")}
+                                                    </a>
+                                                </td>
+                                                <td class="dashboard-vendors-activity__value">
+                                                    {$dashboard_vendors_activity.vendors_not_logged}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="dashboard-vendors-activity__label">
+                                                    {hook name="index:dashboard_new_products_link"}
+                                                    {$url = "products.manage?time_from={$time_from}&time_to={$time_to}&period=C&status[]=A&company_status[]=A"}
+                                                    {/hook}
+                                                    <a href="{$url|fn_url}">
+                                                        {__("vendors_activity.new_products")}
+                                                    </a>
+                                                </td>
+                                                <td class="dashboard-vendors-activity__value">
+                                                    {$dashboard_vendors_activity.new_products}
+                                                </td>
+                                            </tr>
+                                        {/hook}
                                     </tbody>
                                 </table>
                             </div>
@@ -375,20 +388,20 @@
 
                         <div class="cm-tabs-content">
                             <div class="tab-pane" id="content_tab_recent_all">
-                                <div class="table-wrapper">
-                                    <table class="table table-middle table--relative table-last-td-align-right">
+                                <div class="table-responsive-wrapper">
+                                    <table class="table table-middle table--relative table-last-td-align-right table-responsive table-responsive-w-titles">
                                         <tbody>
                                         {foreach $orders.all as $order}
                                             <tr>
-                                                <td>
+                                                <td data-th="&nbsp;">
                                                     <span class="label btn-info o-status-{$order.status|lower} label--text-wrap">{$order_statuses[$order.status].description}</span>
                                                 </td>
-                                                <td><a href="{"orders.details?order_id=`$order.order_id`"|fn_url}">{__("order")} <bdi>#{$order.order_id}</bdi></a> {__("by")} {if $order.user_id}<a href="{"profiles.update?user_id=`$order.user_id`"|fn_url}">{/if}{$order.lastname} {$order.firstname}{if $order.user_id}</a>{/if}</td>
-                                                <td><span class="date">{$order.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</span></td>
-                                                <td><h4>{include file="common/price.tpl" value=$order.total}</h4></td>
+                                                <td data-th="&nbsp;"><a href="{"orders.details?order_id=`$order.order_id`"|fn_url}">{__("order")} <bdi>#{$order.order_id}</bdi></a> {__("by")} {if $order.user_id}<a href="{"profiles.update?user_id=`$order.user_id`"|fn_url}">{/if}{$order.lastname} {$order.firstname}{if $order.user_id}</a>{/if}</td>
+                                                <td data-th="&nbsp;"><span class="date">{$order.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</span></td>
+                                                <td data-th="&nbsp;"><h4>{include file="common/price.tpl" value=$order.total}</h4></td>
                                             </tr>
                                             {foreachelse}
-                                            <tr><td>{__("no_data")}</td></tr>
+                                            <tr><td data-th="&nbsp;">{__("no_data")}</td></tr>
                                         {/foreach}
                                         </tbody>
                                     </table>
@@ -396,20 +409,20 @@
                             </div>
                             {foreach $order_statuses as $status}
                                 <div class="tab-pane" id="content_tab_recent_{$status.status}">
-                                    <div class="table-wrapper">
-                                        <table class="table table-middle table--relative table-last-td-align-right">
+                                    <div class="table-responsive-wrapper">
+                                        <table class="table table-middle table--relative table-last-td-align-right table-responsive table-responsive-w-titles">
                                             <tbody>
                                             {foreach $orders[$status.status] as $order}
                                                 <tr>
-                                                    <td>
+                                                    <td data-th="&nbsp;">
                                                         <span class="label btn-info o-status-{$order.status|lower} label--text-wrap">{$order_statuses[$order.status].description}</span>
                                                     </td>
-                                                    <td><a href="{"orders.details?order_id=`$order.order_id`"|fn_url}">{__("order")} <bdi>#{$order.order_id}</bdi></a> {__("by")} {if $order.user_id}<a href="{"profiles.update?user_id=`$order.user_id`"|fn_url}">{/if}{$order.lastname} {$order.firstname}{if $order.user_id}</a>{/if}</td>
-                                                    <td><span class="date">{$order.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</span></td>
-                                                    <td><h4>{include file="common/price.tpl" value=$order.total}</h4></td>
+                                                    <td data-th="&nbsp;"><a href="{"orders.details?order_id=`$order.order_id`"|fn_url}">{__("order")} <bdi>#{$order.order_id}</bdi></a> {__("by")} {if $order.user_id}<a href="{"profiles.update?user_id=`$order.user_id`"|fn_url}">{/if}{$order.lastname} {$order.firstname}{if $order.user_id}</a>{/if}</td>
+                                                    <td data-th="&nbsp;"><span class="date">{$order.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</span></td>
+                                                    <td data-th="&nbsp;"><h4>{include file="common/price.tpl" value=$order.total}</h4></td>
                                                 </tr>
                                                 {foreachelse}
-                                                <tr><td>{__("no_data")}</td></tr>
+                                                <tr><td data-th="&nbsp;">{__("no_data")}</td></tr>
                                             {/foreach}
                                             </tbody>
                                         </table>

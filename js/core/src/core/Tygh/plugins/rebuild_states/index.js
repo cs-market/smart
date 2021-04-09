@@ -13,6 +13,7 @@ function _rebuildStates(section, elm) {
     var default_state = inp.val();
     var cntr = $('.cm-country.cm-location-' + section).last();
     var cntr_disabled;
+    var isFocusStates = sbox.is(":focus") || inp.is(":focus");
 
     if (cntr.length) {
         cntr_disabled = cntr.prop('disabled');
@@ -42,6 +43,9 @@ function _rebuildStates(section, elm) {
 
         sbox.prop('id', elm).prop('disabled', false).removeClass('cm-skip-avail-switch');
         inp.prop('id', elm + '_d').prop('disabled', true).addClass('cm-skip-avail-switch');
+        if (isFocusStates) {
+            sbox.focus();
+        }
 
         if (!inp.hasClass('disabled')) {
             sbox.removeClass('disabled');
@@ -50,6 +54,9 @@ function _rebuildStates(section, elm) {
     } else { // Disable states
         sbox.prop('id', elm + '_d').prop('disabled', true).addClass('hidden cm-skip-avail-switch');
         inp.prop('id', elm).prop('disabled', false).removeClass('hidden cm-skip-avail-switch').val(default_state);
+        if (isFocusStates) {
+            inp.focus();
+        }
 
         if (!sbox.hasClass('disabled')) {
             inp.removeClass('disabled');

@@ -83,7 +83,7 @@ class SecurityHelper
         $schema = fn_get_schema('security', 'object_sanitization');
         $auth = & \Tygh::$app['session']['auth'];
 
-        if ($auth['user_type'] === UserTypes::VENDOR) {
+        if (!empty($auth['user_type']) && $auth['user_type'] === UserTypes::VENDOR) {
             $vendor_schema = fn_get_schema('security', 'object_sanitization_vendor');
             $schema = array_merge_recursive($schema, $vendor_schema);
         }
@@ -200,6 +200,8 @@ class SecurityHelper
              */
             fn_set_hook('sanitize_html', $config_instance, $raw_html);
 
+            $old_umask = umask(0);
+
             /** @var \HTMLPurifier_HTMLDefinition $html_definition */
             if ($html_definition = $config_instance->maybeGetRawHTMLDefinition()) {
                 $html_definition->addAttribute('a',
@@ -222,6 +224,8 @@ class SecurityHelper
             $purifier_instance = \HTMLPurifier::instance($config_instance);
 
             $html_purify = $purifier_instance->purify($raw_html);
+
+            umask($old_umask);
 
             return html_entity_decode($html_purify, ENT_QUOTES, 'UTF-8');
 

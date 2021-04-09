@@ -142,7 +142,7 @@ string $select_mode    Storefront selection mode
                 <div class="control-group">
                     <label for="elm_companies"
                            class="control-label"
-                    >{__("companies")}</label>
+                    >{__("vendors")}</label>
                     <div class="controls">
                         {include file="pickers/companies/picker.tpl"
                             show_add_button=true
@@ -151,7 +151,7 @@ string $select_mode    Storefront selection mode
                             view_mode="list"
                             input_name="company_ids"
                             checkbox_name="company_ids"
-                            no_item_text=__("all_companies")
+                            no_item_text=__("all_vendors")
                         }
                     </div>
                 </div>

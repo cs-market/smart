@@ -322,26 +322,57 @@ function fn_rus_boxberry_pickup_point_variable_init(
 }
 
 /**
- * Hook handler: modifies the detected zipcode.
+ * The "rus_cities_location_manager_detect_zipcode_post_post" hook handler.
+ *
+ * Action performed:
+ * - Modifies the detected zipcode for skipping Central Post Office codes, which ends on 2 or 3 zeros.
+ *
+ * @param string                $country_code ISO 3166-1 country code
+ * @param string                $state_code   ISO 3166-2 state code
+ * @param array<string, string> $city         City information
+ * @param string                $zipcode      Detected zipcode
+ *
+ * @see fn_rus_cities_location_manager_detect_zipcode_post()
  */
-function fn_rus_boxberry_rus_cities_location_manager_detect_zipcode_post_post($country_code, $state_code, $city, &$zipcode)
+function fn_rus_boxberry_rus_cities_location_manager_detect_zipcode_post_post($country_code, $state_code, array $city, &$zipcode)
 {
-    if ($city) {
-        $city = reset($city);
-        $city_postal_codes = explode(',', $city['zipcode']);
-        $zipcode = count($city_postal_codes) > 1 ? $city_postal_codes[1] : $city_postal_codes[0];
+    if (!$city) {
+        return;
+    }
+    $city_postal_codes = explode(',', $city['zipcode']);
+    foreach ($city_postal_codes as $postal_code) {
+        if (preg_match('/00$/', $postal_code)) {
+            continue;
+        }
+        $zipcode = $postal_code;
+        break;
     }
 }
 
 /**
- * Hook handler: modifies the detected location.
+ * The "rus_cities_geo_maps_set_customer_location_pre_post" hook handler.
+ *
+ * Action performed:
+ *  - Modifies the detected location to skip Central Post Office zip codes.
+ *
+ * @param array<string, string>        $location Customer location data
+ * @param array<array<string, string>> $cities   List of available cities and their data
+ *
+ * @see fn_rus_cities_geo_maps_set_customer_location_pre()
  */
 function fn_rus_boxberry_rus_cities_geo_maps_set_customer_location_pre_post(&$location, $cities)
 {
-    if (!empty($cities)) {
-        $city = reset($cities);
-        $city_postal_codes = explode(',', $city['zipcode']);
-        $location['postal_code'] = count($city_postal_codes) > 1 ? $city_postal_codes[1] : $city_postal_codes[0];
+    if (empty($cities)) {
+        return;
+    }
+    $city = reset($cities);
+    $city_postal_codes = explode(',', $city['zipcode']);
+    foreach ($city_postal_codes as $postal_code) {
+        if (preg_match('/00$/', $postal_code)) {
+            continue;
+        }
+        $location['postal_code'] = $postal_code;
+        break;
     }
 }
 

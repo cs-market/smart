@@ -24,14 +24,6 @@
                     <item id="general">
                         <type>header</type>
                     </item>
-                    <item id="exim_1c_schema_version"><!-- Select schema version -->
-                        <type>selectbox</type>
-                        <default_value>2.05</default_value>
-                        <variants>
-                            <item id="2.05"></item>
-                            <item id="2.07"></item>
-                        </variants>
-                    </item>
                     <item id="exim_1c_lang"><!-- Select default language -->
                         <type>selectbox</type>
                     </item>
@@ -273,30 +265,6 @@
                     </item>
                 </items>
             </section>
-            <section id="features_options">
-                <items>
-                    <item id="exim_1c_options_info">
-                        <type>info</type>
-                        <handler>fn_rus_exim_1c_get_options_information</handler>
-                    </item>
-                    <item id="exim_1c_type_option">
-                        <type>radiogroup</type>
-                        <default_value>S</default_value>
-                        <variants>
-                            <item id="S"></item>
-                            <item id="R"></item>
-                        </variants>
-                    </item>
-                    <item id="exim_1c_import_mode_offers">
-                        <type>selectbox</type>
-                        <default_value>variations</default_value>
-                    </item>
-                    <item id="exim_1c_import_option_name">
-                        <type>inputbox</type>
-                        <default_value>Варианты</default_value>
-                    </item>
-                </items>
-            </section>
         </sections>
     </settings>
     <functions>
@@ -311,7 +279,6 @@
         <item for="install">ALTER TABLE ?:product_feature_variants ADD external_id VARCHAR(128) NOT NULL default ''</item>
         <item for="install">ALTER TABLE ?:product_options ADD external_id VARCHAR(128) NOT NULL default ''</item>
         <item for="install">ALTER TABLE ?:product_option_variants ADD external_id VARCHAR(128) NOT NULL default ''</item>
-        <item for="install">ALTER TABLE ?:product_options_inventory ADD external_id VARCHAR(128) NOT NULL default ''</item>
         <item for="install">ALTER TABLE ?:users ADD external_id VARCHAR(128) NOT NULL default ''</item>
         <item for="install">DROP TABLE IF EXISTS ?:rus_exim_1c_taxes;</item>
         <item for="install">DROP TABLE IF EXISTS ?:rus_exim_1c_prices;</item>
@@ -346,7 +313,6 @@
         <item for="uninstall">ALTER TABLE ?:product_feature_variants DROP external_id</item>
         <item for="uninstall">ALTER TABLE ?:product_options DROP external_id</item>
         <item for="uninstall">ALTER TABLE ?:product_option_variants DROP external_id</item>
-        <item for="uninstall">ALTER TABLE ?:product_options_inventory DROP external_id</item>
         <item for="uninstall">ALTER TABLE ?:users DROP external_id</item>
         <item for="uninstall">ALTER TABLE ?:profile_fields DROP checkout_export_1c</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:rus_exim_1c_taxes;</item>

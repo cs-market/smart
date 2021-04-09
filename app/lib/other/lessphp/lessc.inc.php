@@ -655,7 +655,7 @@ class lessc
 
         // check for a rest
         $last = end($args);
-        if ($last[0] == "rest") {
+        if ($last && $last[0] == "rest") {
             $rest = array_slice($orderedValues, count($args) - 1);
             $this->set($last[1], $this->reduce(array("list", " ", $rest)));
         }

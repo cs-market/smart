@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /release-4.11.5/addons/hybrid_auth.po\n"
-"X-Crowdin-File-ID: 3702\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/hybrid_auth.po\n"
+"X-Crowdin-File-ID: 4084\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
@@ -250,13 +250,13 @@ msgstr "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/li
 
 msgctxt "Languages::hybrid_auth.linkedin_api_v1"
 msgid "v1"
-msgstr ""
+msgstr "v1"
 
 msgctxt "Languages::hybrid_auth.linkedin_api_v2"
 msgid "v2"
-msgstr ""
+msgstr "v2"
 
 msgctxt "Languages::hybrid_auth.instruction_paypal_application"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
-msgstr ""
+msgstr "<a href='https://developer.paypal.com/developer/applications' target='_blank'> PayPal Developers </a>でアプリケーションを作成した後に受け取ったアプリケーションIDとシークレットキーを使用します。 PayPalアプリケーション設定のアドレスとアカウント情報の、すべてのPersonal Profileのスコープと少なくとも1つのスコープを有効にしてください。"
 

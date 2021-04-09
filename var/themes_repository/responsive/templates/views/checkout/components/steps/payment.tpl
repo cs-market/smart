@@ -1,4 +1,4 @@
-<div class="litecheckout__step litecheckout__container" id="litecheckout_step_payment">
+<div class="litecheckout__step litecheckout__container cm-save-fields" id="litecheckout_step_payment">
     <div class="litecheckout__section">
         {if $show_title}
             <div class="litecheckout__group">

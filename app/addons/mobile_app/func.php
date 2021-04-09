@@ -15,32 +15,38 @@
 use Imagine\Image\Box;
 use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
+use Tygh\Addons\MobileApp\Notifications\Sender;
 use Tygh\BlockManager\Exim;
 use Tygh\BlockManager\Layout;
+use Tygh\Common\OperationResult;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
 use Tygh\Exceptions\DeveloperException;
-use Tygh\Languages\Languages;
-use Tygh\Languages\Values;
+use Tygh\Http;
 use Tygh\Less;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Storage;
+use Tygh\Storefront\Storefront;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 /**
  * Saves mobile application config
  *
- * @param int   $setting_id Setting identifier
- * @param array $settings   List of colors and parameters from form
+ * @param int                                                                                        $setting_id    Setting identifier
+ * @param array{app_settings: array<array<string>>, app_appearance: array<array<array<string|int>>>} $settings      List of colors and parameters from form
+ * @param int                                                                                        $storefront_id Storefront identifier
  *
  * @return void
  */
-function fn_mobile_app_update_settings($setting_id, array $settings)
+function fn_mobile_app_update_settings($setting_id, array $settings, $storefront_id = 0)
 {
     $setting_id = (int) $setting_id;
-    
+
     // Get addon settings before its updated
-    $current_colors = fn_mobile_app_get_mobile_app_settings();
+    $current_colors = fn_mobile_app_get_mobile_app_settings($storefront_id);
     $current_colors = $current_colors['app_appearance']['colors'];
 
     // Merge structure from setting with structure from form
@@ -54,8 +60,9 @@ function fn_mobile_app_update_settings($setting_id, array $settings)
     }
 
     if ($setting_id) {
-        $settings = json_encode((array) $settings);
-        Settings::instance()->updateValueById((int) $setting_id, $settings);
+        $settings = (array) $settings;
+        $settings['modified_time'] = TIME;
+        Settings::instance(['storefront_id' => $storefront_id])->updateValueById((int) $setting_id, json_encode($settings));
     }
 }
 
@@ -127,23 +134,26 @@ function fn_mobile_app_extract_apple_pay_settings(array $settings)
 /**
  * Fetches saved mobile application settings along with additional that required for application config
  *
+ * @param int $storefront_id Storefront identifier
+ *
  * @return array
  */
-function fn_mobile_app_get_mobile_app_settings()
+function fn_mobile_app_get_mobile_app_settings($storefront_id = 0)
 {
-    $section = Settings::instance()->getSectionByName('mobile_app', Settings::ADDON_SECTION);
-    $options = Settings::instance()->getList($section['section_id']);
+    $section = Settings::instance(['storefront_id' => $storefront_id])->getSectionByName('mobile_app', Settings::ADDON_SECTION);
+    $options = Settings::instance(['storefront_id' => $storefront_id])->getList($section['section_id']);
+
     list(, $settings) = fn_mobile_app_extract_settings_from_options($options);
 
-    $root_user_email = db_get_field('SELECT email FROM ?:users WHERE is_root = ?s AND user_type = ?s LIMIT 1', 'Y', 'A');
+    $root_user_email = db_get_field('SELECT email FROM ?:users WHERE is_root = ?s AND user_type = ?s LIMIT 1', YesNo::YES, UserTypes::ADMIN);
     $settings['app_settings']['utility']['username'] = $root_user_email;
     $settings['app_settings']['utility']['apiKey'] = Registry::get('addons.storefront_rest_api.access_key');
 
-    list($storefront_url, $api_url) = fn_mobile_app_get_store_urls();
+    list($storefront_url, $api_url) = fn_mobile_app_get_store_urls($storefront_id);
     $settings['app_settings']['utility']['siteUrl'] = $storefront_url;
     $settings['app_settings']['utility']['baseUrl'] = $api_url;
 
-    $theme_name = fn_get_theme_path('[theme]', 'C');
+    $theme_name = fn_get_theme_path('[theme]', SiteArea::STOREFRONT, null, true, $storefront_id);
     $layouts_id = db_get_field('SELECT layout_id FROM ?:bm_layouts WHERE name = ?s AND theme_name = ?s', 'MobileAppLayout', $theme_name);
     $settings['app_settings']['utility']['layoutId'] = $layouts_id;
 
@@ -163,30 +173,34 @@ function fn_mobile_app_get_mobile_app_settings()
 /**
  * Fetches store urls that required for application
  *
+ * @param int $storefront_id Storefront identifier
+ *
  * @return array
  */
-function fn_mobile_app_get_store_urls()
+function fn_mobile_app_get_store_urls($storefront_id = 0)
 {
-    $store_url = fn_url('', 'C');
-    $current_url = Registry::get('config.current_location');
-    $api_url = sprintf('%s/%s', $current_url, 'api/4.0/');
+    $store_url = fn_url('?storefront_id=' . $storefront_id, SiteArea::STOREFRONT);
+    $api_url = str_replace(Registry::get('config.customer_index'), '', $store_url);
+    $api_url .= 'api/4.0/';
 
-    return array($store_url, $api_url);
+    return [$store_url, $api_url];
 }
 
 /**
  * Fetches mobile app images data
  *
+ * @param int $storefront_id Storefront identifier
+ *
  * @return array
  */
-function fn_mobile_app_get_mobile_app_images()
+function fn_mobile_app_get_mobile_app_images($storefront_id = 0)
 {
     $images = array();
     $schema = fn_get_schema('mobile_app', 'app_settings');
 
     foreach ($schema['images'] as $data) {
         $type = $data['type'];
-        $images[$type] = fn_get_image_pairs(0, $type, 'M');
+        $images[$type] = fn_get_image_pairs($storefront_id, $type, 'M');
     }
 
     return $images;
@@ -227,37 +241,7 @@ function fn_mobile_app_install_layout()
 
     /** @var \Tygh\Storefront\Storefront $storefront */
     foreach ($storefronts as $storefront) {
-        $theme_name = $storefront->theme_name;
-        $storefront_id = $storefront->storefront_id;
-
-        $layout_exists = db_get_field(
-            'SELECT layout_id FROM ?:bm_layouts WHERE name = ?s AND theme_name = ?s AND storefront_id = ?i',
-            'MobileAppLayout',
-            $theme_name,
-            $storefront_id
-        );
-
-        if ($layout_exists) {
-            continue;
-        }
-
-        $layout_id = Exim::instance(0, 0, $theme_name, $storefront_id)->importFromFile($layout_path, array(
-            'override_by_dispatch' => true,
-            'clean_up' => true,
-            'import_style' => 'create',
-        ));
-
-        if (!$layout_id) {
-            continue;
-        }
-
-        $layout_data = Layout::instance()->get($layout_id);
-
-        $company_ids = $storefront->getCompanyIds();
-
-        foreach ($company_ids as $company_id) {
-            fn_create_theme_logos_by_layout_id($theme_name, $layout_id, $company_id, false, $layout_data['style_id']);
-        }
+        fn_mobile_app_create_mobile_layout($storefront);
     }
 }
 
@@ -277,10 +261,11 @@ function fn_mobile_app_get_working_dir()
  * @param array $image_types_schema Existent image types
  * @param array $image_sizes_schema Android phone image sizes
  * @param array $pair_data          Image pair
+ * @param bool  $crop_when_resize   Crop image
  *
  * @return void
  */
-function fn_mobile_app_resize_android_images(array $image_types_schema, array $image_sizes_schema, array $pair_data)
+function fn_mobile_app_resize_android_images(array $image_types_schema, array $image_sizes_schema, array $pair_data, $crop_when_resize = false)
 {
     if (empty($pair_data['detailed']['absolute_path'])) {
         return;
@@ -308,7 +293,7 @@ function fn_mobile_app_resize_android_images(array $image_types_schema, array $i
             ? $resolution[$resized_image_orientation]
             : $resolution;
 
-        list($contents, $extension) = fn_mobile_app_resize_image($pair_data, $resolution);
+        list($contents, $extension) = fn_mobile_app_resize_image($pair_data, $resolution, $crop_when_resize);
 
         if (!$contents) {
             continue;
@@ -348,10 +333,11 @@ function fn_mobile_app_resize_android_images(array $image_types_schema, array $i
  * @param array $image_types_schema Existent image types
  * @param array $image_sizes_schema iOS phone image sizes
  * @param array $pair_data          Image pair
+ * @param bool  $crop_when_resize   Crop image
  *
  * @return void
  */
-function fn_mobile_app_resize_ios_images(array $image_types_schema, array $image_sizes_schema, array $pair_data)
+function fn_mobile_app_resize_ios_images(array $image_types_schema, array $image_sizes_schema, array $pair_data, $crop_when_resize = false)
 {
     $working_dir = fn_mobile_app_get_working_dir();
     $resized_image_path = isset($image_sizes_schema['path']) ? $image_sizes_schema['path'] : '';
@@ -367,7 +353,7 @@ function fn_mobile_app_resize_ios_images(array $image_types_schema, array $image
 
     // add resized images
     foreach ($image_sizes_schema['resolutions'][$resized_image_orientation] as $resolution) {
-        list($contents, $extension) = fn_mobile_app_resize_image($pair_data, $resolution);
+        list($contents, $extension) = fn_mobile_app_resize_image($pair_data, $resolution, $crop_when_resize);
 
         if (!$contents) {
             continue;
@@ -388,12 +374,13 @@ function fn_mobile_app_resize_ios_images(array $image_types_schema, array $image
 /**
  * Resizes image and return it's content as blob
  *
- * @param array $pair_data  Original image data
- * @param array $resolution Target resolution data
+ * @param array<string|array<string, string>> $pair_data        Original image data
+ * @param array<int>                          $resolution       Target resolution data
+ * @param bool                                $crop_when_resize Crop image
  *
  * @return array
  */
-function fn_mobile_app_resize_image($pair_data, $resolution)
+function fn_mobile_app_resize_image(array $pair_data, array $resolution, $crop_when_resize = false)
 {
     $extension = 'png';
 
@@ -403,11 +390,6 @@ function fn_mobile_app_resize_image($pair_data, $resolution)
     ) {
         return [false, $extension];
     }
-
-    $settings = fn_mobile_app_get_mobile_app_settings();
-    $crop_when_resize = isset($settings['app_settings']['images']['crop_when_resize'])
-        ? $settings['app_settings']['images']['crop_when_resize'] === 'Y'
-        : false;
 
     if ($crop_when_resize) {
         list($content, $extension) = fn_mobile_app_resize_with_crop($pair_data, $resolution);
@@ -527,10 +509,11 @@ function fn_mobile_app_resize_with_borders($pair_data, $resolution)
  * @param array $image_types_schema Existent image types
  * @param array $image_sizes_schema iOS phone icon sizes
  * @param array $pair_data          Image pair
+ * @param bool  $crop_when_resize   Crop image
  *
  * @return void
  */
-function fn_mobile_app_resize_ios_icons(array $image_types_schema, array $image_sizes_schema, array $pair_data)
+function fn_mobile_app_resize_ios_icons(array $image_types_schema, array $image_sizes_schema, array $pair_data, $crop_when_resize = false)
 {
     $working_dir = fn_mobile_app_get_working_dir();
     $file_path = isset($image_sizes_schema['path']) ? $image_sizes_schema['path'] : '';
@@ -561,10 +544,14 @@ function fn_mobile_app_resize_ios_icons(array $image_types_schema, array $image_
                 }
             }
 
-            list($contents, $extension) = fn_mobile_app_resize_image($pair_data, [
-                'width' => $width * $scale,
-                'height' => $height * $scale,
-            ]);
+            list($contents, $extension) = fn_mobile_app_resize_image(
+                $pair_data,
+                [
+                    'width'  => $width * $scale,
+                    'height' => $height * $scale,
+                ],
+                $crop_when_resize
+            );
 
             if (!$contents) {
                 continue;
@@ -586,31 +573,36 @@ function fn_mobile_app_resize_ios_icons(array $image_types_schema, array $image_
 /**
  * Creates or updates a notification subscription.
  *
- * @param int    $user_id   User identifier
- * @param string $device_id Device UUID
- * @param string $platform  Device OS
- * @param string $locale    Device locale
- * @param string $token     Firebase Cloud Messaging token
+ * @param int    $user_id       User identifier
+ * @param string $device_id     Device UUID
+ * @param string $platform      Device OS
+ * @param string $locale        Device locale
+ * @param string $token         Firebase Cloud Messaging token
+ * @param int    $storefront_id Storefront identifier
  *
  * @return int Subscription ID
  */
-function fn_mobile_app_update_notification_subscription($user_id, $device_id, $platform, $locale, $token)
+function fn_mobile_app_update_notification_subscription($user_id, $device_id, $platform, $locale, $token, $storefront_id = 0)
 {
-    $params = array(
-        'user_id'   => $user_id,
-        'device_id' => $device_id,
-        'platform'  => $platform,
-        'locale'    => $locale,
-        'token'     => $token,
-    );
+    $params = [
+        'user_id'       => $user_id,
+        'device_id'     => $device_id,
+        'platform'      => $platform,
+        'locale'        => $locale,
+        'token'         => $token,
+        'storefront_id' => $storefront_id,
+    ];
 
     db_replace_into('mobile_app_notification_subscriptions', $params);
 
-    $subscription = fn_mobile_app_get_notification_subscriptions(array(
-        'user_id'   => $user_id,
-        'device_id' => $device_id,
-        'platform'  => $platform,
-    ));
+    $subscription = fn_mobile_app_get_notification_subscriptions(
+        [
+            'user_id'       => $user_id,
+            'device_id'     => $device_id,
+            'platform'      => $platform,
+            'storefront_id' => $storefront_id,
+        ]
+    );
 
     $subscription = reset($subscription);
 
@@ -652,12 +644,19 @@ function fn_mobile_app_remove_notification_subscriptions($conditions)
  * @param string $title         Notification title
  * @param string $message       Notification text
  * @param string $target_screen Target screen to open in the mobile app
+ * @param int    $storefront_id Storefront identifier
  *
  * @return bool Whether notification have been sent
  */
-function fn_mobile_app_notify_user($user_id, $title, $message, $target_screen = '')
+function fn_mobile_app_notify_user($user_id, $title, $message, $target_screen = '', $storefront_id = 0)
 {
-    $connected_devices = fn_mobile_app_get_notification_subscriptions(array('user_id' => $user_id));
+    $connected_devices = fn_mobile_app_get_notification_subscriptions(
+        [
+            'user_id'       => $user_id,
+            'storefront_id' => $storefront_id,
+        ]
+    );
+
     if (!$connected_devices) {
         return false;
     }
@@ -665,7 +664,10 @@ function fn_mobile_app_notify_user($user_id, $title, $message, $target_screen = 
     /** @var \Tygh\Addons\MobileApp\Notifications\Factory $notifications_factory */
     $notifications_factory = Tygh::$app['addons.mobile_app.notifications.factory'];
     /** @var \Tygh\Addons\MobileApp\Notifications\Sender $notifications_sender */
-    $notifications_sender = Tygh::$app['addons.mobile_app.notifications.sender'];
+    $notifications_sender = new Sender(
+        fn_mobile_app_get_mobile_app_settings($storefront_id),
+        new Http()
+    );
 
     if (!$notifications_sender->isSetUp()) {
         return false;
@@ -726,7 +728,8 @@ function fn_mobile_app_change_order_status(
         $user_id,
         $title,
         $message,
-        Registry::get('config.customer_index') . '?dispatch=orders.details&order_id=' . $order_id
+        Registry::get('config.customer_index') . '?dispatch=orders.details&order_id=' . $order_id,
+        $order_info['storefront_id']
     );
 }
 
@@ -788,4 +791,110 @@ function fn_mobile_app_get_apple_pay_supported_networks()
         'visa'            => 'Visa',
         'vPay'            => 'V Pay',
     ];
+}
+
+/**
+ * The "delete_image_pre" hook handler.
+ *
+ * Actions performed:
+ * - Updates mobile app add-on settings to initiate cache cleanup.
+ *
+ * @param int    $image_id    Image identifier
+ * @param int    $pair_id     Image pair identifier
+ * @param string $object_type Image object type
+ */
+function fn_mobile_app_delete_image_pre($image_id, $pair_id, $object_type)
+{
+    if (
+        $object_type !== 'detailed'
+        || AREA !== SiteArea::ADMIN_PANEL
+    ) {
+        return;
+    }
+
+    $is_mobile_app_icon = (bool) db_get_field(
+        'SELECT 1' .
+        ' FROM ?:images_links' .
+        ' WHERE pair_id = ?i' .
+        ' AND detailed_id = ?i' .
+        ' AND object_type = ?s',
+        $pair_id,
+        $image_id,
+        'm_app_icon'
+    );
+
+    if (!$is_mobile_app_icon) {
+        return;
+    }
+
+    $mobile_app_config_data = json_decode(Registry::ifGet('addons.mobile_app.config_data', '[]'), true);
+    $mobile_app_config_data['modified_time'] = TIME;
+    Settings::instance()->updateValue('config_data', json_encode($mobile_app_config_data), 'mobile_app');
+}
+
+/**
+ * Creates a mobile layout for a new storefront.
+ *
+ * @param \Tygh\Storefront\Storefront  $storefront  Storefront
+ * @param \Tygh\Common\OperationResult $save_result Result of the save process
+ */
+function fn_mobile_app_storefront_repository_save_post(Storefront $storefront, OperationResult $save_result)
+{
+    if ($storefront->storefront_id) {
+        // exit if this is a storefront update
+        return;
+    }
+
+    $storefront->storefront_id = $save_result->getData();
+
+    fn_mobile_app_create_mobile_layout($storefront);
+}
+
+/**
+ * Creates a mobile layout by storefront.
+ *
+ * @param \Tygh\Storefront\Storefront $storefront Storefront
+ */
+function fn_mobile_app_create_mobile_layout(Storefront $storefront)
+{
+    if (fn_allowed_for('MULTIVENDOR')) {
+        $layout_path = Registry::get('config.dir.addons') . 'mobile_app/resources/layouts_mve.xml';
+    } else {
+        $layout_path = Registry::get('config.dir.addons') . 'mobile_app/resources/layouts.xml';
+    }
+
+    $theme_name = $storefront->theme_name;
+    $storefront_id = $storefront->storefront_id;
+
+    $layout_exists = db_get_field(
+        'SELECT layout_id FROM ?:bm_layouts WHERE name = ?s AND theme_name = ?s AND storefront_id = ?i',
+        'MobileAppLayout',
+        $theme_name,
+        $storefront_id
+    );
+
+    if ($layout_exists) {
+        return;
+    }
+
+    $layout_id = Exim::instance(0, 0, $theme_name, $storefront_id)->importFromFile(
+        $layout_path,
+        [
+            'override_by_dispatch' => true,
+            'clean_up'             => true,
+            'import_style'         => 'create',
+        ]
+    );
+
+    if (!$layout_id) {
+        return;
+    }
+
+    $layout_data = Layout::instance(0, [], $storefront_id)->get($layout_id);
+
+    $company_ids = $storefront->getCompanyIds();
+
+    foreach ($company_ids as $company_id) {
+        fn_create_theme_logos_by_layout_id($theme_name, $layout_id, $company_id, false, $layout_data['style_id']);
+    }
 }

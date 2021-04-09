@@ -14,8 +14,12 @@
 
 namespace Tygh\SmartyEngine;
 
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Tygh\Enum\SiteArea;
 use Tygh\Exceptions\PermissionsException;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Themes\Themes;
 use Tygh\Tygh;
@@ -180,15 +184,7 @@ class Core extends \Smarty
         }
         $this->assign('self_images_dir', Registry::get('config.current_location') . '/' . $path_rel . '/media/images');
 
-        if ($this->use_runtime_layout_for_logos) {
-            $this->assign('logos', fn_get_logos(
-                $company_id,
-                Registry::get('runtime.layout.layout_id'),
-                Registry::get('runtime.layout.style_id')
-            ));
-        } else {
-            $this->assign('logos', fn_get_logos($company_id));
-        }
+        $this->initLogos($company_id);
     }
 
     /**
@@ -306,13 +302,44 @@ class Core extends \Smarty
     }
 
     /**
-     * This realisation much faster and has less memory consumption than default, but does not support storages except file system.
-     * @param  string  $resource_name relative template path
-     * @return boolean true if exists, false - otherwise
+     * Checks if template file exists.
+     * Tip: this realisation much faster and has less memory consumption than default, but does not support storages except file system.
+     *
+     * @param string $resource_name Relative template path
+     *
+     * @return bool true if exists, false - otherwise
      */
     public function templateExists($resource_name)
     {
+        $exists = $this->templateExistsViaSnapshot($resource_name);
+
+        if ($exists !== null) {
+            return $exists;
+        }
+
+        /** @var array<string> $dirs */
         $dirs = $this->getTemplateDir();
+
+        foreach ($dirs as $dir) {
+            if (file_exists($dir . trim($resource_name, '/'))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if template dir exists.
+     *
+     * @param string $resource_name Relative template dir path
+     *
+     * @return bool
+     */
+    public function templateDirExists($resource_name)
+    {
+        /** @var array<string> $dirs */
+        $dirs = $this->getTemplateDir();
+
         foreach ($dirs as $dir) {
             if (file_exists($dir . trim($resource_name, '/'))) {
                 return true;
@@ -320,5 +347,97 @@ class Core extends \Smarty
         }
 
         return false;
+    }
+
+    /**
+     * Checks if template file exists via snapshot
+     *
+     * @param string $resource_name Relative template dir path
+     *
+     * @return bool|null
+     */
+    private function templateExistsViaSnapshot($resource_name)
+    {
+        static $snapshot = null;
+        static $use_snapshot = null;
+
+        if ($use_snapshot === null && SiteArea::isStorefront(AREA)) {
+            $key = __FUNCTION__;
+            Registry::registerCache($key, ['addons'], Registry::cacheLevel('static'));
+
+            if (Registry::isExist($key)) {
+                $use_snapshot = false;
+            } else {
+                Registry::set($key, 1);
+                $use_snapshot = true;
+            }
+        }
+
+        if (!$use_snapshot) {
+            return null;
+        }
+
+        if ($snapshot === null) {
+            $snapshot = [];
+            $dirs = $this->getTemplateDir();
+
+            foreach ($dirs as $dir) {
+                $directory_iterator = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator(
+                        $dir,
+                        FilesystemIterator::SKIP_DOTS |
+                        FilesystemIterator::CURRENT_AS_FILEINFO
+                    ),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
+
+                foreach ($directory_iterator as $spl_file_info) {
+                    /** @var \SplFileInfo $spl_file_info */
+                    if (!$spl_file_info->isFile() && !$spl_file_info->isLink()) {
+                        continue;
+                    }
+                    $snapshot[str_replace($dir, '', $spl_file_info->getPathname())] = true;
+                }
+            }
+        }
+
+        return
+            isset($snapshot[$resource_name])
+            || ('\\' === DIRECTORY_SEPARATOR && isset($snapshot[str_replace('/', '\\', $resource_name)]));
+    }
+
+    /**
+     * Inits logos
+     *
+     * @param int|null $company_id Company ID
+     */
+    private function initLogos($company_id)
+    {
+        $key = sprintf(
+            'init_logos_%s_%s_%s',
+            $company_id === null ? '_' : (int) $company_id,
+            Registry::get('runtime.layout.layout_id'),
+            Registry::get('runtime.layout.style_id')
+        );
+
+        $logos = Registry::getOrSetCache(
+            ['template_logos', $key],
+            ['logos', 'images', 'images_links'],
+            ['static', 'storefront'],
+            function () use ($company_id) {
+                $layout_id = $this->use_runtime_layout_for_logos ? (int) Registry::get('runtime.layout.layout_id') : null;
+                $style_id = $this->use_runtime_layout_for_logos ? (string) Registry::get('runtime.layout.style_id') : null;
+                $storefront_id = $company_id ? null : StorefrontProvider::getStorefront()->storefront_id;
+
+                return fn_get_logos(
+                    $company_id,
+                    $layout_id,
+                    $style_id,
+                    $storefront_id
+                );
+            }
+        );
+
+        $this->assign('logos', $logos);
     }
 }

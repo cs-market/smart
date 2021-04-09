@@ -31,6 +31,7 @@ $schema = [
     'product_features_values'       => OneToManyViaPrimaryKeyTable::create('product_features_values', ['product_id', 'feature_id', 'variant_id', 'lang_code'], 'product_id'),
     'product_status'                => CallableSyncItem::create('fn_master_products_sync_product_status'),
     'product_popularity'            => OneToManyViaPrimaryKeyTable::create('product_popularity', ['product_id'], 'product_id'),
+    'product_tabs'                  => CallableSyncItem::create('fn_master_products_sync_product_tabs'),
 ];
 
 return $schema;

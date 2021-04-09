@@ -97,10 +97,10 @@
 
 <div class="buttons-container">
     {if $smarty.request.display == "radio"}
-        {assign var="but_close_text" value=__("choose")}
+        {$but_close_text = $picker_but_close_text|default:__("choose")}
     {else}
-        {assign var="but_close_text" value=__("add_companies_and_close")}
-        {assign var="but_text" value=__("add_companies")}
+        {$but_close_text = $picker_but_close_text|default:__("add_companies_and_close")}
+        {$but_text = $picker_but_text|default:__("add_companies")}
     {/if}
     {include file="buttons/add_close.tpl" is_js=$smarty.request.extra|fn_is_empty}
 </div>

@@ -21,9 +21,9 @@ use Tygh\Notifications\DataProviders\ProfileDataProvider;
 use Tygh\Notifications\Transports\Mail\MailMessageSchema;
 use Tygh\Registry;
 
-require_once Registry::get('config.dir.schemas') . 'notifications/events.functions.php';
-
 defined('BOOTSTRAP') or die('Access denied');
+
+require_once __DIR__ . '/events.functions.php';
 
 /**
  * This schema contains all notification events in the product.
@@ -64,7 +64,7 @@ defined('BOOTSTRAP') or die('Access denied');
  */
 $schema = [
     'order.shipment_updated' => [
-        'group'     => 'order',
+        'group'     => 'orders',
         'name'      => [
             'template' => 'event.order.shipment_updated.name',
             'params'   => [],
@@ -85,7 +85,7 @@ $schema = [
         ],
     ],
     'order.edp' => [
-        'group'     => 'order',
+        'group'     => 'orders',
         'name'      => [
             'template' => 'event.order.edp.name',
             'params'   => [],
@@ -222,7 +222,7 @@ $schema = [
         ],
     ],
     'profile.usergroup_request' => [
-        'group'     => 'profile',
+        'group'     => 'users',
         'name'      => [
             'template' => 'event.profile.usergroup_request.name',
             'params'   => [],
@@ -333,7 +333,7 @@ $schema = [
     ],
 
     'profile.added' => [
-        'group'     => 'profile',
+        'group'     => 'users',
         'name'      => [
             'template' => 'event.profile.added.name',
             'params'   => [],
@@ -520,7 +520,7 @@ $schema = [
 
 $order_event = [
     'id'        => 'order.status_changed',
-    'group'     => 'order',
+    'group'     => 'orders',
     'name'      => [
         'template' => 'event.order.status_changed.name',
         'params'   => [
@@ -570,16 +570,16 @@ if (fn_allowed_for('MULTIVENDOR')) {
     ]);
 }
 
-foreach (fn_get_simple_statuses() as $status_to => $status_description) {
-    $status_to = strtolower($status_to);
+foreach (fn_get_simple_statuses() as $status_id => $status_description) {
+    $status_id = strtolower($status_id);
 
     $order_change_status_event = $order_event;
-    $order_change_status_event['id'] = "order.status_changed.{$status_to}";
+    $order_change_status_event['id'] = "order.status_changed.{$status_id}";
     $order_change_status_event['name']['params']['[status]'] = $status_description;
 
     foreach ($order_event['receivers'] as $receiver => $transports) {
         $mail_message_schema = clone $transports[MailTransport::getId()];
-        $mail_message_schema->template_code = "order_notification.{$status_to}";
+        $mail_message_schema->template_code = "order_notification.{$status_id}";
 
         $order_change_status_event['receivers'][$receiver][MailTransport::getId()] = $mail_message_schema;
     }
@@ -588,8 +588,8 @@ foreach (fn_get_simple_statuses() as $status_to => $status_description) {
 }
 
 $order_updated_status_event = $order_event;
-$order_updated_status_event['id'] = "order.updated";
-$order_updated_status_event['name']['template'] = 'event.order.updated.name';
+$order_updated_status_event['id'] = 'order.updated';
+$order_updated_status_event['name']['template'] = "event.order.updated.name";
 
 $schema[$order_updated_status_event['id']] = $order_updated_status_event;
 

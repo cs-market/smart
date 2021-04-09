@@ -15,7 +15,13 @@
 use Tygh\Enum\YesNo;
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
+
+/** @var string $mode */
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    return [CONTROLLER_STATUS_OK];
+}
 
 if (in_array($mode, ['add', 'update', 'manage'])) {
     $dynamic_sections = Registry::ifGet('navigation.dynamic.sections', []);
@@ -34,7 +40,7 @@ if ($mode === 'update') {
     /** @var array $services */
     $services = $view->getTemplateVars('services');
     $module = null;
-    if (!empty($services[$shipping['service_id']]['module'])) {
+    if (!empty($shipping['service_id']) && !empty($services[$shipping['service_id']]['module'])) {
         $module = $services[$shipping['service_id']]['module'];
     }
 

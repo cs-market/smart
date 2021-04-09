@@ -91,7 +91,9 @@
         {/if}
 
         {if $field.checkout_required == "Y" || $field.checkout_required == "1"}
-            {$label_meta = "`$label_meta` cm-required"}
+            {$label_meta = "`$label_meta` cm-required cm-trim"}
+            {$field.attributes["required"] = true}
+            {$field.attributes["data-ca-custom-validation"] = true}
         {/if}
 
         {if $field.is_default == "YesNo::YES"|enum}

@@ -56,7 +56,6 @@
  *      option_name         Color
  *      required            Y
  *      allowed_extensions  jpg,png
- *      inventory           N
  *      ...                 (any field from :?product_options)
  *      option_type         S
  *
@@ -89,7 +88,6 @@
  *      option_name         Color
  *      required            Y
  *      allowed_extensions  jpg,png
- *      inventory           N
  *      ...                 (any field from :?product_options)
  *      option_type         S
  *

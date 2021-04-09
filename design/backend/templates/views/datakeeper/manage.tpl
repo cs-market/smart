@@ -13,45 +13,66 @@
             {$result_ids = "backup_management,actions_panel"}
                 <input type="hidden" name="result_ids" value="{$result_ids}"/>
             {if $backup_files}
-            <div class="table-responsive-wrapper">
+
+            {hook name="datakeeper:bulk_edit"}
+                {include file="views/datakeeper/components/bulk_edit.tpl"}
+            {/hook}
+
+            <div class="table-responsive-wrapper longtap-selection">
                 <table class="table table-middle table--relative table-responsive">
-                    <thead>
+                    <thead
+                        data-ca-bulkedit-default-object="true"
+                        data-ca-bulkedit-component="defaultObject"
+                    >
                     <tr>
-                        <th width="1%" class="mobile-hide">
-                            {include file="common/check_items.tpl"}</th>
-                        <th>
+                        <th width="6%" class="mobile-hide">
+                            {include file="common/check_items.tpl" is_check_all_shown=true}
+
+                            <input type="checkbox"
+                                class="bulkedit-toggler hide"
+                                data-ca-bulkedit-toggler="true"
+                                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+                            />
+                        </th>
+                        <th width="40%">
                             <a class="cm-ajax"
                                href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}"
                                data-ca-target-id="backup_management">{__("filename")}
                             </a>
                         </th>
-                        <th>
+                        <th width="15%">
                             <a class="cm-ajax"
                                href="{"`$c_url`&sort_by=mtime&sort_order=`$search.sort_order_rev`"|fn_url}"
                                data-ca-target-id="backup_management">{__("date")}
                             </a>
                             {if $search.sort_by == "date"}{$sort_sign nofilter}{/if}
                         </th>
-                        <th>
+                        <th width="15%">
                             <a class="cm-ajax"
                                href="{"`$c_url`&sort_by=size&sort_order=`$search.sort_order_rev`"|fn_url}"
                                data-ca-target-id="backup_management">{__("filesize")}
                             </a>
                         </th>
-                        <th>{__("type")}</th>
-                        <th>&nbsp;</th>
+                        <th width="10%">{__("type")}</th>
+                        <th width="8%">&nbsp;</th>
                     </tr>
                     </thead>
 
                     {foreach $backup_files as $name => $file}
-                        <tr>
-                            <td><input type="checkbox" name="backup_files[]" value="{$file.name}" class="cm-item mobile-hide"/>
+                        <tr class="cm-longtap-target"
+                            data-ca-longtap-action="setCheckBox"
+                            data-ca-longtap-target="input.cm-item"
+                            data-ca-id="{$file.name}"
+                        >
+                            <td width="6%">
+                                <input type="checkbox" name="backup_files[]" value="{$file.name}" class="cm-item mobile-hide hide"/>
                             </td>
-                            <td data-th="{__("filename")}"><a href="{"datakeeper.getfile?file=`$file.name`"|fn_url}"><span>{$file.name}</span></a></td>
-                            <td data-th="{__("date")}">{$file.create}</td>
-                            <td data-th="{__("filesize")}">{$file.size|number_format}&nbsp;{__("bytes")}</td>
-                            <td data-th="{__("type")}">{__($file.type)}</td>
-                            <td class="nowrap" data-th="{__("tools")}">
+                            <td width="40%" data-th="{__("filename")}"><a href="{"datakeeper.getfile?file=`$file.name`"|fn_url}"><span>{$file.name}</span></a></td>
+                            <td width="15%" data-th="{__("date")}">{$file.create}</td>
+                            <td width="15%" data-th="{__("filesize")}">{$file.size|number_format}&nbsp;{__("bytes")}</td>
+                            <td width="10%" data-th="{__("type")}">{__($file.type)}</td>
+                            <td width="8%" class="nowrap" data-th="{__("tools")}">
                                 <div class="hidden-tools">
                                     {capture name="tools_list"}
                                         <li>{btn type="list" text=__("download") href="datakeeper.getfile?file=`$file.name`"}</li>
@@ -101,13 +122,7 @@
             <li>{btn type="list" text=__("logs") href="logs.manage"}</li>
             <li>{btn type="dialog" text=__("upload_file") target_id="content_upload_backup" form="upload_backup_form" class="cm-dialog-auto-size"}</li>
             <li><a href="{"datakeeper.optimize"|fn_url}" data-ca-target-id="elm_sidebar"
-                   class="cm-post cm-comet cm-ajax">{__("optimize_database")}</a></li>
-            {if $backup_files}
-                <li class="divider mobile-hide"></li>
-                <li class="mobile-hide">
-                    {btn type="delete_selected" dispatch="dispatch[datakeeper.m_delete]" form="backups_form" class="cm-ajax"}
-                </li>
-            {/if}
+                class="cm-post cm-comet cm-ajax">{__("optimize_database")}</a></li>
         {/capture}
         {dropdown content=$smarty.capture.tools_list}
     {/capture}
@@ -200,7 +215,7 @@
                                             onclick="Tygh.$('#dbdump_tables').selectOptions(false); return false;"
                                             class="underlined">{__("unselect_all")}</a></p>
 
-                                <div class="muted">{__("multiple_selectbox_notice")}</div>
+                                <div class="muted description">{__("multiple_selectbox_notice")}</div>
                             </div>
                         </div>
 
@@ -214,11 +229,13 @@
                                     <input type="checkbox" name="dbdump_schema" id="dbdump_schema" value="Y"
                                            checked="checked">
                                     {__("backup_schema")}
+                                    <p class="muted description">{__("tt_views_database_manage_backup_schema")}</p>
                                 </label>
                                 <label for="dbdump_data" class="checkbox">
                                     <input type="checkbox" name="dbdump_data" id="dbdump_data" value="Y"
                                            checked="checked">
                                     {__("backup_data")}
+                                    <p class="muted description">{__("tt_views_database_manage_backup_data")}</p>
                                 </label>
                             </div>
                         </div>
@@ -234,7 +251,7 @@
                                        value="backup_{$smarty.const.PRODUCT_VERSION}_{"dMY_His"|date:$smarty.now}" class="input-text">
                                 <span class="add-on">.zip</span>
                             </div>
-                            <p class="muted">{__("text_backup_filename_hint")}</p>
+                            <p class="muted description">{__("text_backup_filename_hint")}</p>
                         </div>
                     </div>
 

@@ -43,6 +43,11 @@ if ($mode == 'apply_for_vendor') {
         'allowed_for_company_id' => 0,
         'storefront_id'          => Tygh::$app['storefront']->storefront_id,
     ));
+
+    if (empty($vendor_plans)) {
+        return [CONTROLLER_STATUS_REDIRECT, 'companies.apply_for_vendor'];
+    }
+
     Tygh::$app['view']->assign('vendor_plans', $vendor_plans);
 
     fn_add_breadcrumb(__('vendor_plans.choose_your_plan'));

@@ -162,34 +162,33 @@ function fn_vendor_data_premoderation_update_product_pre(array &$product_data, $
     // indicate that product update is performed
     Registry::set('vendor_data_premoderation.is_updating_product', true, true);
 
-    $runtime_company_id = fn_get_runtime_company_id();
+    if (!$product_id || !fn_get_runtime_company_id()) {
+        return;
+    }
+
+    $current_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
+    $requires_premoderation = fn_vendor_data_premoderation_product_requires_approval(Registry::get('runtime.company_data'), false, $current_status);
 
     // get initial state only when the product is updated and updates premoderation is required by the company settings
-    if ($product_id
-        && $runtime_company_id
-        && fn_vendor_data_premoderation_product_requires_approval(Registry::get('runtime.company_data'), false)
-    ) {
+    if ($requires_premoderation) {
         $initial_product_state = fn_vendor_data_premoderation_get_product_state($product_id);
         Registry::set('vendor_data_premoderation.initial_product_state', $initial_product_state, true);
     }
 
-    if (!isset($product_data['status']) || !$product_id) {
+    if (!isset($product_data['status'])) {
         return;
     }
 
     // Admin actions: approve or disapprove products
-    $current_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
     $new_status = $product_data['status'];
 
-    if (
-        !fn_vendor_data_premoderation_is_product_status_can_be_changed($new_status, $current_status)
-        && $runtime_company_id
-    ) {
+    if (!fn_vendor_data_premoderation_is_product_status_can_be_changed($new_status, $current_status)) {
         unset($product_data['status']);
         return;
     }
 
-    if (in_array($current_status, [ProductStatuses::REQUIRES_APPROVAL, ProductStatuses::DISAPPROVED])
+    if (
+        in_array($current_status, [ProductStatuses::REQUIRES_APPROVAL, ProductStatuses::DISAPPROVED])
         && !in_array($new_status, [ProductStatuses::REQUIRES_APPROVAL, ProductStatuses::DISAPPROVED])
     ) {
         fn_vendor_data_premoderation_approve_products([$product_id], false);
@@ -225,21 +224,19 @@ function fn_vendor_data_premoderation_update_product_post($product_data, $produc
 
     unset($product_data['premoderation_reason']);
 
-    $product_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
-    if ($product_status === ProductStatuses::REQUIRES_APPROVAL) {
-        return;
-    }
-
-    $requires_premoderation = fn_vendor_data_premoderation_product_requires_approval(Registry::get('runtime.company_data'), $is_created);
+    $current_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
+    $requires_premoderation = fn_vendor_data_premoderation_product_requires_approval(Registry::get('runtime.company_data'), $is_created, $current_status);
     if (!$is_created && $requires_premoderation) {
         $initial_product_state = Registry::ifGet('vendor_data_premoderation.initial_product_state', null);
         $resulting_product_state = fn_vendor_data_premoderation_get_product_state($product_id);
         $requires_premoderation = fn_vendor_data_premoderation_is_product_changed($initial_product_state, $resulting_product_state);
     }
 
-    if ($requires_premoderation) {
-        fn_vendor_data_premoderation_request_approval_for_products([$product_id], true);
+    if (!$requires_premoderation) {
+        return;
     }
+
+    fn_vendor_data_premoderation_request_approval_for_products([$product_id], true);
 }
 
 
@@ -262,12 +259,13 @@ function fn_vendor_data_premoderation_update_product_categories_pre($product_id,
         return;
     }
 
-    if (!fn_vendor_data_premoderation_product_requires_approval(Registry::get('runtime.company_data'), false)) {
+    $current_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
+    $requires_premoderation = fn_vendor_data_premoderation_product_requires_approval(Registry::get('runtime.company_data'), false, $current_status);
+    if (!$requires_premoderation) {
         return;
     }
 
-    $product_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
-    if ($product_status === ProductStatuses::REQUIRES_APPROVAL) {
+    if ($current_status === ProductStatuses::REQUIRES_APPROVAL) {
         return;
     }
 
@@ -294,8 +292,13 @@ function fn_vendor_data_premoderation_update_product_categories_post($product_id
         return;
     }
 
-    $product_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
-    if ($product_status === ProductStatuses::REQUIRES_APPROVAL) {
+    $current_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
+    $requires_premoderation = fn_vendor_data_premoderation_product_requires_approval(Registry::get('runtime.company_data'), false, $current_status);
+    if (!$requires_premoderation) {
+        return;
+    }
+
+    if ($current_status === ProductStatuses::REQUIRES_APPROVAL) {
         return;
     }
 
@@ -303,9 +306,11 @@ function fn_vendor_data_premoderation_update_product_categories_post($product_id
     $resulting_product_state = fn_vendor_data_premoderation_get_product_state($product_id);
     $has_changes_to_moderate = fn_vendor_data_premoderation_is_product_changed($initial_product_state, $resulting_product_state);
 
-    if ($has_changes_to_moderate) {
-        fn_vendor_data_premoderation_request_approval_for_products([$product_id], true);
+    if (!$has_changes_to_moderate) {
+        return;
     }
+
+    fn_vendor_data_premoderation_request_approval_for_products([$product_id], true);
 }
 
 /**

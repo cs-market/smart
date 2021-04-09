@@ -182,7 +182,7 @@ function fn_data_feeds_export($datafeed_id, $options = array(), $pattern = '')
     fn_set_hook('data_feeds_export_before_get_products', $datafeed_data, $pattern, $params);
 
     list($products, $search) = fn_get_products($params);
-    $pids = fn_array_column($products, 'product_id');
+    $pids = array_column($products, 'product_id');
 
     if (empty($pids)) {
         fn_set_notification(NotificationSeverity::ERROR, __('error'), __('data_feed.error_exim_no_data_exported'));

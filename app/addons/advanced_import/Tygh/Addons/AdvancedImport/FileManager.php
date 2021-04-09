@@ -99,8 +99,9 @@ class FileManager
      */
     public function getFilePath($filename, $company_id = null, array $file_dirs = null)
     {
-        $company_id = $this->getCompanyId($company_id);
-
+        if (strpos($filename, 'C:\fakepath') === 0) {
+            $filename = str_replace('C:\fakepath\\', '', $filename);
+        }
         if ($file_dirs === null) {
             if ($company_id == $this->company_id) {
                 $file_dirs = $this->file_dirs;
@@ -127,8 +128,6 @@ class FileManager
      */
     public function initFilesDirectories($company_id = null)
     {
-        $company_id = $this->getCompanyId($company_id);
-
         return [
             'private' => $this->getPrivateFilesPath($company_id),
             'public'  => $this->getPublicFilesPath($company_id),
@@ -226,7 +225,7 @@ class FileManager
             return $data;
         }
 
-        $data['file'] = preg_replace("!^{$data['company_id']}/!", '', $data['file']);
+        $data['file'] = preg_replace("!^{$this->company_id}/!", '', $data['file']);
 
         return $data;
     }
@@ -241,8 +240,6 @@ class FileManager
      */
     protected function getPrivateFilesPath($company_id = null)
     {
-        $company_id = $this->getCompanyId($company_id);
-
         $path = fn_get_files_dir_path($company_id);
 
         fn_mkdir($path);
@@ -260,8 +257,6 @@ class FileManager
      */
     protected function getPublicFilesPath($company_id = null)
     {
-        $company_id = $this->getCompanyId($company_id);
-
         $path = fn_get_public_files_path($company_id);
 
         fn_mkdir($path);
@@ -337,5 +332,27 @@ class FileManager
         $company_id = $this->getCompanyId($company_id);
 
         return $this->getPrivateFilesPath($company_id) . $filename;
+    }
+
+    /**
+     * @param $filename
+     * @param $source_path
+     * @param $company_id
+     *
+     * @return bool
+     */
+    public function copyUpload($filename, $company_id, $source_path = null)
+    {
+        $info = fn_pathinfo($this->getPrivateFilePath($filename, 0));
+        $source_path = isset($source_path) ? $source_path : fn_get_files_dir_path($company_id) . $filename;
+
+        while (file_exists($info['dirname'] . '/' . $info['filename'] . '.' . $info['extension'])) {
+            $info['filename'] = fn_strtolower(fn_generate_code($info['filename'], 8));
+        }
+
+        $new_filename = $info['filename'] . '.' . $info['extension'];
+        $new_file_location = $this->getPrivateFilePath($new_filename, 0);
+
+        return fn_copy($source_path, $new_file_location);
     }
 }

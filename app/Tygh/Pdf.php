@@ -19,7 +19,7 @@ use Tygh\Http;
 class Pdf
 {
     protected static $transaction_id;
-    protected static $url = 'http://converter.cart-services.com';
+    protected static $url = 'https://converter.cart-services.com';
 
     /**
      * Pushes HTML code to batch to render PDF later

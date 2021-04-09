@@ -122,7 +122,7 @@
                                         {if $show_modifiers}
                                             {hook name="products:options_modifiers"}
                                                 {if $vr.modifier|floatval}
-                                                    ({$smarty.capture.modifier|strip_tags|replace:' ':'' nofilter})
+                                                    ({$smarty.capture.modifier|strip_tags|strip:'' nofilter})
                                                 {/if}
                                             {/hook}
                                         {/if}
@@ -347,8 +347,8 @@
                             {include file="common/image.tpl"
                                     class="$_class ty-product-options__image"
                                     images=$var.image_pair
-                                    image_width="50"
-                                    image_height="50"
+                                    image_width=$settings.Thumbnails.product_variant_mini_icon_width
+                                    image_height=$settings.Thumbnails.product_variant_mini_icon_height
                                     obj_id="variant_image_`$obj_prefix``$id`_`$po.option_id`_`$var.variant_id`"
                                     image_onclick="fn_set_option_value('`$obj_prefix``$id`', '`$po.option_id`', '`$var.variant_id`'); void(0);"
                             }

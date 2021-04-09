@@ -44,8 +44,9 @@ class ZipArchiveReader implements IArchiveReader
 
         if ($zip->open($this->file) === true) {
             $result = $zip->extractTo($dir);
+            $zip->close();
         }
-        $zip->close();
+
         $zip = null;
 
         return $result;

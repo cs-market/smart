@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/gift_certificates.po\n"
-"X-Crowdin-File-ID: 3598\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/gift_certificates.po\n"
+"X-Crowdin-File-ID: 4072\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -188,6 +188,10 @@ msgctxt "Languages::theme_editor.gift_cert"
 msgid "Gift Certificate"
 msgstr "Δωροεπιταγή"
 
+msgctxt "Languages::theme_editor_logo.gift_cert"
+msgid "Gift Certificate"
+msgstr "Δωροεπιταγή"
+
 msgctxt "Languages::promo_code_or_certificate"
 msgid "Gift certificate or promo code"
 msgstr "Δωροεπιταγή ή Κωδικός Προσφοράς"
@@ -291,4 +295,8 @@ msgstr "Η κατάσταση δωροεπιταγης άλλαξε σε [status
 msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
 msgid "Gift certificate updated"
 msgstr "Δωροεπιταγή Ενημερωθηκε"
+
+msgctxt "Languages::logo_section.gift_cert"
+msgid "Gift certificate logo"
+msgstr "Λογότυπο δωροεπιταγής"
 

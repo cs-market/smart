@@ -187,7 +187,6 @@
 
         .title {
             width: 100% !important;
-            max-width: ~"calc(100% - 51px)" !important;
 
             padding: 0px !important;
             padding-top: 7px !important;
@@ -262,39 +261,36 @@
             z-index: 1;
 
             &__title-block {
+                display: flex;
+                align-items: center;
                 padding-left: 10px;
                 margin: 0;
                 padding-top: 10px;
                 padding-bottom: 10px;
-                font-size: 22.75px;
                 line-height: 40px;
                 box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.322);
                 cursor: pointer;
 
-                &--text {
-                    word-wrap: break-word;
-                    overflow-wrap: break-word;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    overflow: hidden;
-
-                    max-width: 70%;
-                    display: block;
+                &.openned .caret {
+                    transform: rotate(180deg);
                 }
+            }
 
-                .caret {
-                    display: inline-block;
-                    margin-top: 20px;
-                    margin-left: 10px;
-                    transform: scale(1.5);
-                    transition: .3s all;
-                }
+            &__title-text {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow-x: hidden;
+                max-width: 60%;
+                max-width: ~"calc(100% - 120px)";   // 100% - Close button
+                margin-left: 5px;
+                margin-right: 5px;
+            }
 
-                &.openned {
-                    .caret {
-                        transform: rotate(180deg) scale(1.5);
-                    }
-                }
+            &__title-caret {
+                display: inline-block;
+                transition: .3s all;
             }
 
             &__dropdowned {
@@ -365,7 +361,7 @@
 }
 
 // Hide quick-search and quick-menu
-@media (max-width: 920px) {
+@media (max-width: @TabletBreakpoint) {
     .subnav {
         .search,
         .quick-menu-container {

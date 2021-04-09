@@ -34,4 +34,4 @@
     </tr>
     </table>
 </div>
-<div class="muted">{__("multiple_selectbox_notice")}</div>
+<div class="muted description">{__("multiple_selectbox_notice")}</div>

@@ -46,6 +46,7 @@
             <div class="controls">
             {include file="views/categories/components/picker/picker.tpl"
                 input_name="cid"
+                show_advanced=true
                 multiple=false
                 show_empty_variant=true
                 item_ids=[$s_cid]
@@ -56,6 +57,7 @@
         {else}
             {include file="views/categories/components/picker/picker.tpl"
                 input_name="cid"
+                show_advanced=true
                 multiple=false
                 show_empty_variant=true
                 item_ids=[$s_cid]
@@ -132,6 +134,7 @@
             <label class="control-label" for="popularity_from">{__("popularity")}</label>
             <div class="controls">
                 <input type="text" name="popularity_from" id="popularity_from" value="{$search.popularity_from}" onfocus="this.select();" class="input-mini" /> - <input type="text" name="popularity_to" value="{$search.popularity_to}" onfocus="this.select();" class="input-mini" />
+                <p class="muted description">{__("ttc_popularity")}</p>
             </div>
         </div>
         <div class="control-group">

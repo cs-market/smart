@@ -16,7 +16,9 @@ namespace Tygh\Addons\YandexCheckout\Payments;
 
 use Tygh\Addons\YandexCheckout\Services\ReceiptService;
 use Tygh\Enum\YesNo;
-use YandexCheckout\Client;
+use Tygh\Tygh;
+use YooKassa\Client;
+use YooKassa\Request\Payments\CreatePaymentResponse;
 
 /**
  * Class YandexCheckout
@@ -31,7 +33,7 @@ class YandexCheckout
     /** @var string  */
     protected $secret_key;
 
-    /** @var \YandexCheckout\Client */
+    /** @var \YooKassa\Client */
     protected $client;
 
     /** @var \Tygh\Addons\YandexCheckout\Services\ReceiptService */
@@ -73,29 +75,38 @@ class YandexCheckout
     }
 
     /**
-     * Creates payment at Yandex.Checkout server side.
+     * Creates payment at YooKassa server side.
      *
-     * @param array<string, string|float> $order_info       Order information.
-     * @param array<string, string>       $processor_params Payment processor parameters.
+     * @param array<string, string|float|int> $order_info       Order information.
+     * @param array<string, string>           $processor_params Payment processor parameters.
      *
-     * @return \YandexCheckout\Request\Payments\CreatePaymentResponse
+     * @return \YooKassa\Request\Payments\CreatePaymentResponse
      *
-     * @throws \YandexCheckout\Common\Exceptions\ApiException                Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\BadApiRequestException      Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ForbiddenException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\InternalServerError         Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\NotFoundException           Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ResponseProcessingException Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\TooManyRequestsException    Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\UnauthorizedException       Yandex.Checkout API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiException                YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\BadApiRequestException      YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ForbiddenException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\InternalServerError         YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\NotFoundException           YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ResponseProcessingException YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\TooManyRequestsException    YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\UnauthorizedException       YooKassa API Exception.
+     * @throws \Exception                                              YooKassa API Exception.
      */
     public function createPayment(array $order_info, array $processor_params)
     {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        $storefront = $repository->findById((int) $order_info['storefront_id']);
+        if (!$storefront) {
+            return new CreatePaymentResponse([]);
+        }
+        $protocol = fn_get_storefront_protocol() . '://';
+        $storefront_url = $protocol . $storefront->url;
         $params = [
             'amount' => $this->createPaymentAmount((float) $order_info['total'], $processor_params['currency']),
             'confirmation' => [
                 'type' => 'redirect',
-                'return_url' => fn_url('yandex_checkout.return_to_store&order_id=' . $order_info['order_id']),
+                'return_url' => $storefront_url . '/yoomoney/return_to_store/' . $order_info['order_id'],
             ],
             'capture' => !YesNo::toBool($processor_params['are_held_payments_enabled']),
             'metadata' => [
@@ -120,17 +131,17 @@ class YandexCheckout
     /**
      * @param $payment_id
      *
-     * @return \YandexCheckout\Model\PaymentInterface
+     * @return \YooKassa\Model\PaymentInterface
      *
-     * @throws \YandexCheckout\Common\Exceptions\ApiException                Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\BadApiRequestException      Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ExtensionNotFoundException  Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ForbiddenException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\InternalServerError         Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\NotFoundException           Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ResponseProcessingException Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\TooManyRequestsException    Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\UnauthorizedException       Yandex.Checkout API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiException                YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\BadApiRequestException      YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ExtensionNotFoundException  YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ForbiddenException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\InternalServerError         YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\NotFoundException           YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ResponseProcessingException YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\TooManyRequestsException    YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\UnauthorizedException       YooKassa API Exception.
      */
     public function getPaymentInfo($payment_id)
     {
@@ -140,18 +151,18 @@ class YandexCheckout
     /**
      * @param array $order_info
      *
-     * @return \YandexCheckout\Request\Receipts\AbstractReceiptResponse|null
+     * @return \YooKassa\Request\Receipts\AbstractReceiptResponse|null
      *
-     * @throws \YandexCheckout\Common\Exceptions\BadApiRequestException      Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ApiConnectionException      Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ApiException                Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\AuthorizeException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ForbiddenException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\InternalServerError         Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\NotFoundException           Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ResponseProcessingException Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\TooManyRequestsException    Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\UnauthorizedException       Yandex.Checkout API Exception.
+     * @throws \YooKassa\Common\Exceptions\BadApiRequestException      YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiConnectionException      YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiException                YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\AuthorizeException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ForbiddenException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\InternalServerError         YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\NotFoundException           YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ResponseProcessingException YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\TooManyRequestsException    YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\UnauthorizedException       YooKassa API Exception.
      */
     public function createReceipt(array $order_info)
     {
@@ -160,20 +171,20 @@ class YandexCheckout
     }
 
     /**
-     * Gets payment methods connected to Yandex.Checkout account.
+     * Gets payment methods connected to YooKassa account.
      *
      * @return array<string>
      *
-     * @throws \YandexCheckout\Common\Exceptions\BadApiRequestException      Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ApiException                Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\AuthorizeException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ExtensionNotFoundException  Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ForbiddenException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\InternalServerError         Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\NotFoundException           Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ResponseProcessingException Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\TooManyRequestsException    Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\UnauthorizedException       Yandex.Checkout API Exception.
+     * @throws \YooKassa\Common\Exceptions\BadApiRequestException      YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiException                YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\AuthorizeException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ExtensionNotFoundException  YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ForbiddenException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\InternalServerError         YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\NotFoundException           YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ResponseProcessingException YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\TooManyRequestsException    YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\UnauthorizedException       YooKassa API Exception.
      */
     public function getPaymentMethods()
     {
@@ -186,17 +197,17 @@ class YandexCheckout
      * @param array<string, array<string, string>> $order_info       Order information.
      * @param array<string, string>                $processor_params Payment processor parameters.
      *
-     * @return \YandexCheckout\Request\Payments\Payment\CreateCaptureResponse
+     * @return \YooKassa\Request\Payments\Payment\CreateCaptureResponse
      *
-     * @throws \YandexCheckout\Common\Exceptions\BadApiRequestException      Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ApiException                Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ForbiddenException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\InternalServerError         Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\NotFoundException           Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ResponseProcessingException Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\TooManyRequestsException    Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\UnauthorizedException       Yandex.Checkout API Exception.
-     * @throws \Exception                                                    Yandex.Checkout API Exception.
+     * @throws \YooKassa\Common\Exceptions\BadApiRequestException      YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiException                YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ForbiddenException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\InternalServerError         YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\NotFoundException           YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ResponseProcessingException YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\TooManyRequestsException    YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\UnauthorizedException       YooKassa API Exception.
+     * @throws \Exception                                              YooKassa API Exception.
      */
     public function capturePayment(array $order_info, array $processor_params)
     {
@@ -209,21 +220,21 @@ class YandexCheckout
     }
 
     /**
-     * Creates refund request in Yandex.Checkout.
+     * Creates refund request in YooKassa.
      *
      * @param array{amount: array{currency: string, value: float}, payment_id: string, receipt?: array{customer: array{email: string, phone: string}, items: list<array{amount: array{currency: string, value: float}, description: string, quantity: float, vat_code: string}>}|null} $params Required parameters for request.
      *
-     * @return \YandexCheckout\Request\Refunds\CreateRefundResponse
+     * @return \YooKassa\Request\Refunds\CreateRefundResponse
      *
-     * @throws \YandexCheckout\Common\Exceptions\ApiException                Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\BadApiRequestException      Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ForbiddenException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\InternalServerError         Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\NotFoundException           Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ResponseProcessingException Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\TooManyRequestsException    Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\UnauthorizedException       Yandex.Checkout API Exception.
-     * @throws \Exception                                                    Yandex.Checkout API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiException                YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\BadApiRequestException      YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ForbiddenException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\InternalServerError         YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\NotFoundException           YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ResponseProcessingException YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\TooManyRequestsException    YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\UnauthorizedException       YooKassa API Exception.
+     * @throws \Exception                                              YooKassa API Exception.
      */
     public function createRefund(array $params)
     {

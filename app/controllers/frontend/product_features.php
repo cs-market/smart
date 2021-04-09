@@ -122,8 +122,19 @@ if ($mode == 'view_all') {
     if (empty($filter_id)) {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
+    
+    if (isset($_REQUEST['order_ids'])) {
+        $order_ids = is_array($_REQUEST['order_ids']) ? $_REQUEST['order_ids'] : explode(',', $_REQUEST['order_ids']);
+        foreach ($order_ids as $order_id) {
+            /** @psalm-suppress UndefinedGlobalVariable */
+            if (!fn_is_order_allowed($order_id, $auth)) {
+                unset($_REQUEST['order_ids']);
+                break;
+            }
+        }
+    }
 
-    list($filters) = fn_get_filters_products_count($_REQUEST);
+    list($filters) = fn_product_filters_get_filters_products_count($_REQUEST);
 
     if (empty($filters[$filter_id]) || $filters[$filter_id]['feature_type'] != ProductFeatures::EXTENDED) {
         return array(CONTROLLER_STATUS_NO_PAGE);
@@ -185,12 +196,23 @@ if ($mode == 'view_all') {
         $params['sort_order'] = $sort_order;
     }
 
+    if (isset($params['order_ids'])) {
+        $order_ids = is_array($params['order_ids']) ? $params['order_ids'] : explode(',', $params['order_ids']);
+        foreach ($order_ids as $order_id) {
+            /** @psalm-suppress UndefinedGlobalVariable */
+            if (!fn_is_order_allowed($order_id, $auth)) {
+                return [CONTROLLER_STATUS_NO_PAGE];
+            }
+        }
+    }
+
     list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'));
 
-    if (defined('AJAX_REQUEST') && (!empty($params['features_hash']) && !$products)) {
-        fn_filters_not_found_notification();
-        exit;
+    if (isset($search['page']) && ($search['page'] > 1) && empty($products) && (!defined('AJAX_REQUEST'))) {
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
+
+    fn_filters_handle_search_result($params, $products, $search);
 
     fn_gather_additional_products_data($products, array(
         'get_icon' => true,

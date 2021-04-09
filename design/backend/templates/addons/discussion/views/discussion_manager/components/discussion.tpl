@@ -1,15 +1,15 @@
 {if $discussion && $discussion.object_type && !$discussion.is_empty}
 
-    {$is_allowed_to_add_posts = "discussion.add"|fn_check_view_permissions}
-    {$is_allowed_to_update_posts = "discussion.update"|fn_check_view_permissions}
+    {$is_allowed_to_add_reviews = $is_allowed_to_add_reviews|default:fn_check_permissions("discussion", "add", "admin", "")}
+    {$is_allowed_to_update_reviews = fn_check_permissions("discussion", "update", "admin")}
+    {$is_allowed_to_bulk_delete_reviews = fn_check_permissions("discussion", "m_delete", "admin")}
     {$is_owned_object = $runtime.company_id == $object_company_id}
-    {$is_company_reviews = $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::COMPANY"|enum}
-    {$allow_save = $is_allowed_to_update_posts && !($runtime.company_id && (!$is_owned_object || $is_company_reviews))}
-
-    <div id="content_discussion">
+    {$is_company_reviews = $discussion.object_type === "Addons\Discussion\DiscussionObjectTypes::COMPANY"|enum}
+    {$allow_save = $is_allowed_to_update_reviews && !($runtime.company_id && (!$is_owned_object || $is_company_reviews))}
+    <div class="{if $selected_section !== "discussion" && $runtime.controller !== "discussion"}hidden{/if}" id="content_discussion">
     <div class="clearfix">
         <div class="buttons-container buttons-bg pull-right">
-            {if $is_allowed_to_add_posts && !($runtime.company_id && (!$is_owned_object || $is_company_reviews))}
+            {if $is_allowed_to_add_reviews && !($runtime.company_id && (!$is_owned_object || $is_company_reviews))}
                 {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT"|enum}
                     {capture name="adv_buttons"}
                         {include file="common/popupbox.tpl" id="add_new_post" title=__("add_post") icon="icon-plus" act="general" link_class="cm-dialog-switch-avail"}
@@ -18,12 +18,12 @@
                     {include file="common/popupbox.tpl" id="add_new_post" link_text=__("add_post") act="general" link_class="cm-dialog-switch-avail"}
                 {/if}
             {/if}
-            {if $discussion.posts && "discussion_manager"|fn_check_view_permissions}
+            {if $discussion.posts && $is_allowed_to_update_reviews}
                 {$show_save_btn = true scope = root}
                 {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT"|enum}
                     {capture name="buttons_insert"}
                 {/if}
-                {if "discussion.m_delete"|fn_check_view_permissions}
+                {if $is_allowed_to_bulk_delete_reviews}
                     {capture name="tools_list"}
                         <li>{btn type="delete_selected" dispatch="dispatch[discussion.m_delete]" form="update_posts_form"}</li>
                     {/capture}

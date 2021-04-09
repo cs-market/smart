@@ -12,34 +12,43 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\YesNo;
 use Tygh\Http;
 use Tygh\Languages\Languages;
 use Tygh\Registry;
-use Tygh\Enum\YesNo;
 
-function fn_paypal_complete_checkout($token, $processor_data, $order_info)
+/**
+ * Completes payment initiated in PayPal.
+ *
+ * @param string                    $token                         Payment token
+ * @param array<string, string>     $processor_data                Payment method settings
+ * @param array<string, int|string> $order_info                    Order info
+ * @param bool                      $is_checkout_redirect_required Whether customer should be redirected to checkout after order placement
+ *
+ * @psalm-param array{
+ *   order_id: int
+ * } $order_info
+ */
+function fn_paypal_complete_checkout($token, array $processor_data, array $order_info, $is_checkout_redirect_required = true)
 {
-    $pp_response['order_status'] = 'F';
-    $reason_text = '';
+    $pp_response = [
+        'order_status' => 'F'
+    ];
 
     $paypal_checkout_details = fn_paypal_get_express_checkout_details($processor_data, $token);
     if (fn_paypal_ack_success($paypal_checkout_details)) {
         $result = fn_paypal_do_express_checkout($processor_data, $paypal_checkout_details, $order_info);
         if (fn_paypal_ack_success($result)) {
-
             $status = $result['PAYMENTINFO_0_PAYMENTSTATUS'];
             $pp_response['transaction_id'] = $result['PAYMENTINFO_0_TRANSACTIONID'];
 
-            if ($status == 'Completed' || $status == 'Processed') {
+            $reason_text = 'Declined ';
+            if ($status === 'Completed' || $status === 'Processed') {
                 $pp_response['order_status'] = 'O';
                 $reason_text = 'Accepted, awaiting ipn for processing ';
-
-            } elseif ($status == 'Pending') {
+            } elseif ($status === 'Pending') {
                 $pp_response['order_status'] = 'O';
                 $reason_text = 'Pending ';
-
-            } else {
-                $reason_text = 'Declined ';
             }
 
             $reason_text = fn_paypal_process_add_fields($result, $reason_text);
@@ -56,12 +65,18 @@ function fn_paypal_complete_checkout($token, $processor_data, $order_info)
 
     $pp_response['reason_text'] = $reason_text;
 
-    if (fn_check_payment_script($processor_data['processor_script'], $order_info['order_id'])) {
-        unset(Tygh::$app['session']['pp_express_details']);
-
-        fn_finish_payment($order_info['order_id'], $pp_response);
-        fn_order_placement_routines('route', $order_info['order_id'], false);
+    if (!fn_check_payment_script($processor_data['processor_script'], $order_info['order_id'])) {
+        return;
     }
+
+    unset(Tygh::$app['session']['pp_express_details']);
+    fn_finish_payment($order_info['order_id'], $pp_response);
+
+    if (!$is_checkout_redirect_required) {
+        return;
+    }
+
+    fn_order_placement_routines('route', $order_info['order_id'], false);
 }
 
 function fn_paypal_ack_success($paypal_checkout_details)
@@ -197,7 +212,7 @@ function fn_paypal_do_express_checkout($processor_data, $paypal_checkout_details
 
     fn_paypal_build_request($processor_data, $request, $post_url, $cert_file);
 
-    $order_details = fn_paypal_build_details($order_info, $processor_data, false);
+    $order_details = fn_paypal_build_details($order_info, $processor_data);
     $request = array_merge($request, $order_details);
 
     if ($currency['code'] == CART_PRIMARY_CURRENCY && !empty($order_info)) {
@@ -276,39 +291,46 @@ function fn_paypal_request($request, $post_url, $cert_file)
     return $result;
 }
 
-function fn_paypal_build_details($data, $processor_data, $express = true)
+/**
+ * Builds payment request details for the NVP API.
+ *
+ * @param array<string, int|float|string>      $data           Order info
+ * @param array<string, array<string, string>> $processor_data Payment method data
+ *
+ * @return array<string, int|float|string>
+ */
+function fn_paypal_build_details(array $data, array $processor_data)
 {
     $currency = fn_paypal_get_valid_currency($processor_data['processor_params']['currency']);
 
-    if ($currency['code'] == CART_PRIMARY_CURRENCY) {
+    if ($currency['code'] === CART_PRIMARY_CURRENCY) {
         $details = [];
         $shipping_data = [];
 
-        if (!empty($processor_data['processor_params']['send_adress']) && $processor_data['processor_params']['send_adress'] == 'Y') {
-            if ($express) {
-                $shipping_data = fn_paypal_get_shipping_data($data['user_data']);
-            } else {
-                $shipping_data = fn_paypal_get_shipping_data($data);
-            }
+        if (
+            !empty($processor_data['processor_params']['send_adress'])
+            && YesNo::toBool($processor_data['processor_params']['send_adress'])
+        ) {
+            $shipping_data = fn_paypal_get_shipping_data($data);
         }
         $order_data = fn_paypal_get_order_data($data);
 
         return array_merge($details, $shipping_data, $order_data);
-    } else {
-        $total = fn_format_price_by_currency($data['total'], CART_PRIMARY_CURRENCY, $currency['code']);
-
-        return [
-            'L_PAYMENTREQUEST_0_NAME0'     => __('total_product_cost'),
-            'L_PAYMENTREQUEST_0_NUMBER0'   => 'ORDER_ID_' . (isset($data['order_id']) ? $data['order_id'] : 'NEW'),
-            'L_PAYMENTREQUEST_0_DESC0'     => '',
-            'L_PAYMENTREQUEST_0_QTY0'      => 1,
-            'L_PAYMENTREQUEST_0_AMT0'      => $total,
-            'PAYMENTREQUEST_0_ITEMAMT'     => $total,
-            'PAYMENTREQUEST_0_TAXAMT'      => 0,
-            'PAYMENTREQUEST_0_SHIPPINGAMT' => 0,
-            'PAYMENTREQUEST_0_AMT'         => $total
-        ];
     }
+
+    $total = fn_format_price_by_currency((float) $data['total'], CART_PRIMARY_CURRENCY, $currency['code']);
+
+    return [
+        'L_PAYMENTREQUEST_0_NAME0'     => __('total_product_cost'),
+        'L_PAYMENTREQUEST_0_NUMBER0'   => 'ORDER_ID_' . (isset($data['order_id']) ? $data['order_id'] : 'NEW'),
+        'L_PAYMENTREQUEST_0_DESC0'     => '',
+        'L_PAYMENTREQUEST_0_QTY0'      => 1,
+        'L_PAYMENTREQUEST_0_AMT0'      => $total,
+        'PAYMENTREQUEST_0_ITEMAMT'     => $total,
+        'PAYMENTREQUEST_0_TAXAMT'      => 0,
+        'PAYMENTREQUEST_0_SHIPPINGAMT' => 0,
+        'PAYMENTREQUEST_0_AMT'         => $total
+    ];
 }
 
 function fn_paypal_get_shipping_data($data)
@@ -395,19 +417,29 @@ function fn_paypal_substr($str, $maxlen = MAX_PAYPAL_DESCR_LENGTH)
 
 function fn_paypal_sum_taxes($order_info)
 {
-    $sum_taxes = array('P' => 0, 'S' => 0, 'O' => 0);
-    if (!empty($order_info['taxes'])) {
-        foreach ($order_info['taxes'] as $tax) {
-            if ($tax['price_includes_tax'] != 'Y') {
-                foreach ($tax['applies'] as $key => $value) {
-                    if (strpos($key, 'P_') !== false) {
-                        $sum_taxes['P'] += $value;
-                    } elseif (strpos($key, 'S_') !== false) {
-                        $sum_taxes['S'] += $value;
-                    } elseif (!is_array($value)) {
-                        $sum_taxes['O'] += $value;
-                    }
+    $sum_taxes = ['P' => 0, 'S' => 0, 'O' => 0, 'PS' => 0];
+    if (empty($order_info['taxes'])) {
+        return $sum_taxes;
+    }
+
+    $is_surcharge_tax_included = YesNo::toBool(Registry::get('settings.Appearance.cart_prices_w_taxes'));
+
+    foreach ($order_info['taxes'] as $tax) {
+        if (YesNo::toBool($tax['price_includes_tax'])) {
+            continue;
+        }
+
+        foreach ($tax['applies'] as $key => $value) {
+            if (strpos($key, 'P_') !== false) {
+                $sum_taxes['P'] += $value;
+            } elseif (strpos($key, 'PS_') !== false) {
+                if (!$is_surcharge_tax_included) {
+                    $sum_taxes['PS'] += $value;
                 }
+            } elseif (strpos($key, 'S_') !== false) {
+                $sum_taxes['S'] += $value;
+            } elseif (!is_array($value)) {
+                $sum_taxes['O'] += $value;
             }
         }
     }
@@ -540,11 +572,21 @@ function fn_paypal_set_express_checkout($payment_id, $order_id = 0, $order_info 
     $currency = fn_paypal_get_valid_currency($processor_data['processor_params']['currency']);
 
     if (!empty($order_id)) {
-        $return_url = fn_url("payment_notification.notify?payment=paypal_express&order_id=$order_id", $area, 'current');
-        $cancel_url = fn_url("payment_notification.cancel?payment=paypal_express&order_id=$order_id", $area, 'current');
+        $return_url = fn_url("payment_notification.notify?payment=paypal_express&order_id={$order_id}", $area, 'current');
+        $cancel_url = fn_url("payment_notification.cancel?payment=paypal_express&order_id={$order_id}", $area, 'current');
     } else {
-        $return_url = fn_url("paypal_express.express_return?payment_id=$payment_id", $area, 'current');
-        $cancel_url = fn_url("checkout.cart", $area, 'current');
+        $return_url = fn_url("paypal_express.express_return?payment_id={$payment_id}", $area, 'current');
+        $cancel_url = fn_url('checkout.cart', $area, 'current');
+    }
+    if (isset($order_info['extra']['return_url_params'])) {
+        foreach ((array) $order_info['extra']['return_url_params'] as $param_name => $param_value) {
+            $return_url = fn_link_attach($return_url, "{$param_name}={$param_value}");
+        }
+    }
+    if (isset($order_info['extra']['cancel_url_params'])) {
+        foreach ((array) $order_info['extra']['cancel_url_params'] as $param_name => $param_value) {
+            $cancel_url = fn_link_attach($cancel_url, "{$param_name}={$param_value}");
+        }
     }
 
     $request = [
@@ -564,27 +606,39 @@ function fn_paypal_set_express_checkout($payment_id, $order_id = 0, $order_info 
     $paypal_settings = fn_get_paypal_settings();
 
     if (!empty($paypal_settings) && !empty($paypal_settings['main_pair']['detailed'])) {
-        $image_path_type = Registry::get('settings.Security.secure_storefront') === YesNo::YES ? 'https_image_path' : 'http_image_path';
-        $request['LOGOIMG'] = !empty($paypal_settings['main_pair']['detailed'][$image_path_type]) ? $paypal_settings['main_pair']['detailed'][$image_path_type] : $paypal_settings['main_pair']['detailed']['image_path'];
-        $exploded_logo = explode('?', $request['LOGOIMG']);
-        $request['LOGOIMG'] = $exploded_logo[0];
+        $image_path_type = YesNo::toBool(Registry::get('settings.Security.secure_storefront'))
+            ? 'https_image_path'
+            : 'http_image_path';
+        $request['LOGOIMG'] = !empty($paypal_settings['main_pair']['detailed'][$image_path_type])
+            ? $paypal_settings['main_pair']['detailed'][$image_path_type]
+            : $paypal_settings['main_pair']['detailed']['image_path'];
+        list($request['LOGOIMG'],) = explode('?', $request['LOGOIMG']);
     }
 
     fn_paypal_build_request($processor_data, $request, $post_url, $cert_file);
 
-    $order_details = (!empty($order_info)) ? fn_paypal_build_details($order_info, $processor_data, false) : fn_paypal_build_details($cart, $processor_data);
-    $request = array_merge($request, $order_details);
-
-    if ($currency['code'] == CART_PRIMARY_CURRENCY && !empty($order_info)) {
-        //We need to minus taxes when it based on unit price because product subtotal already include this tax.
-        if (Registry::get('settings.Checkout.tax_calculation') == 'unit_price') {
-            $sum_taxes = fn_paypal_sum_taxes($order_info);
-            $request['PAYMENTREQUEST_0_ITEMAMT'] -= $sum_taxes['P'];
-            $request['PAYMENTREQUEST_0_SHIPPINGAMT'] -= $sum_taxes['S'];
-        }
+    $is_cart_page_checkout = false;
+    if (!$order_info && $order_id) {
+        $order_info = fn_get_order_info($order_id);
+    }
+    if (!$order_info && $cart) {
+        $order_info = $cart;
+        $is_cart_page_checkout = true;
     }
 
-    $result = fn_paypal_request($request, $post_url, $cert_file);
+    $order_details = fn_paypal_build_details((array) $order_info, $processor_data);
+    $request = array_merge($request, $order_details);
 
-    return $result;
+    if (
+        $currency['code'] === CART_PRIMARY_CURRENCY
+        && !$is_cart_page_checkout
+        && Registry::get('settings.Checkout.tax_calculation') === 'unit_price'
+    ) {
+        // We need to exclude taxes based on unit price because product subtotal already include them
+        $sum_taxes = fn_paypal_sum_taxes($order_info);
+        $request['PAYMENTREQUEST_0_ITEMAMT'] -= $sum_taxes['P'];
+        $request['PAYMENTREQUEST_0_SHIPPINGAMT'] -= $sum_taxes['S'];
+    }
+
+    return fn_paypal_request($request, $post_url, $cert_file);
 }

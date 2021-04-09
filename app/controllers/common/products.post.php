@@ -12,6 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\SiteArea;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -45,15 +46,36 @@ if ($mode == 'picker') {
     $params['skip_view'] = 'Y';
     $params['is_picker'] = true;
 
-    list($products, $search) = fn_get_products($params, AREA == 'C' ? Registry::get('settings.Appearance.products_per_page') : Registry::get('settings.Appearance.admin_elements_per_page'));
+    $can_view_products = true;
+    if (isset($params['order_ids']) && SiteArea::isStorefront(AREA)) {
+        $order_ids = is_array($params['order_ids']) ? $params['order_ids'] : explode(',', $params['order_ids']);
+        foreach ($order_ids as $order_id) {
+            /** @psalm-suppress UndefinedGlobalVariable */
+            if (!fn_is_order_allowed($order_id, $auth)) {
+                $can_view_products = false;
+                break;
+            }
+        }
+    }
 
-    fn_gather_additional_products_data($products, [
-        'get_icon'      => true,
-        'get_detailed'  => true,
-        'get_discounts' => true,
-        'get_options'   => !empty($_REQUEST['display']) || AREA === 'C',
-        'get_active_options' => !empty($params['is_order_management'])
-    ]);
+    if ($can_view_products) {
+        list($products, $search) = fn_get_products(
+            $params,
+            SiteArea::isStorefront(AREA)
+                ? Registry::get('settings.Appearance.products_per_page')
+                : Registry::get('settings.Appearance.admin_elements_per_page')
+        );
+
+        fn_gather_additional_products_data($products, [
+            'get_icon' => true,
+            'get_detailed' => true,
+            'get_discounts' => true,
+            'get_options' => !empty($_REQUEST['display']) || AREA === 'C',
+            'get_active_options' => !empty($params['is_order_management'])
+        ]);
+    } else {
+        $products = $search = [];
+    }
 
     if (!empty($params['is_order_management'])) {
         Tygh::$app['view']->assign(array(

@@ -17,7 +17,9 @@ namespace Tygh\Template\Document\Variables;
 
 
 use Tygh\Enum\ProfileTypes;
+use Tygh\Enum\SiteArea;
 use Tygh\Template\IActiveVariable;
+use Tygh\Template\IContext;
 
 /**
  * The class of the `company` variable; it allows access to company data in the document editor.
@@ -43,11 +45,12 @@ class CompanyVariable implements IActiveVariable, \ArrayAccess
     /**
      * CompanyVariable constructor.
      *
-     * @param array     $config     Variable config.
-     * @param int       $company_id Company identifier.
-     * @param string    $lang_code  Language code.
+     * @param array<string|array<string>> $config     Variable config.
+     * @param int                         $company_id Company identifier.
+     * @param string                      $lang_code  Language code.
+     * @param IContext                    $context    Context.
      */
-    public function __construct($config, $company_id, $lang_code)
+    public function __construct(array $config, $company_id, $lang_code, IContext $context)
     {
         $this->data = fn_get_company_placement_info($company_id, $lang_code);
         $this->logos = fn_get_logos($company_id);
@@ -73,27 +76,41 @@ class CompanyVariable implements IActiveVariable, \ArrayAccess
                     $this->data['company_' . $field['field_name']] = $value;
                 }
             }
+
+            if (
+                !empty($context->getArea())
+                && SiteArea::isStorefront($context->getArea())
+                || empty($context->getArea())
+                && SiteArea::isStorefront(AREA)
+            ) {
+                $this->data = fn_filter_company_data_by_profile_fields(
+                    $this->data,
+                    [
+                        'field_prefix' => 'company_',
+                    ]
+                );
+            }
         }
 
         if (!empty($this->logos['mail']['image'])) {
-            $this->logo_mail = array(
-                'path' => $this->logos['mail']['image']['image_path'],
-                'alt' => $this->logos['mail']['image']['alt'],
+            $this->logo_mail = [
+                'path'   => $this->logos['mail']['image']['image_path'],
+                'alt'    => $this->logos['mail']['image']['alt'],
                 'height' => $this->logos['mail']['image']['image_y'],
-                'width' => $this->logos['mail']['image']['image_x'],
-            );
+                'width'  => $this->logos['mail']['image']['image_x'],
+            ];
         }
         $this->config = $config;
 
         $email_fields = isset($this->config['email_fields'])
-            ? $this->config['email_fields']
-            : array(
+            ? (array) $this->config['email_fields']
+            : [
                 'company_users_department', 'company_site_administrator', 'company_orders_department',
                 'company_support_department', 'company_newsletter_email'
-            );
+            ];
 
         foreach ($email_fields as $field) {
-            $this->data[$field . '_display'] = strtr($this->data[$field], array(',' => $this->config['email_separator'], ' ' => ''));
+            $this->data[$field . '_display'] = strtr($this->data[$field], [',' => $this->config['email_separator'], ' ' => '']);
         }
     }
 

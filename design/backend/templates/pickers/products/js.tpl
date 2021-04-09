@@ -8,8 +8,8 @@
 
 {if $type == "options"}
 <tr {if !$clone}id="{$root_id}_{$delete_id}" {/if}class="cm-js-item{if $clone} cm-clone hidden{/if}">
-{if $position_field}<td><input type="text" name="{$input_name}[{$delete_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro" {if $clone}disabled="disabled"{/if} /></td>{/if}
-<td>
+{if $position_field}<td data-th="&nbsp;"><input type="text" name="{$input_name}[{$delete_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro" {if $clone}disabled="disabled"{/if} /></td>{/if}
+<td data-th="{__("name")}">
     {$product}{if $show_only_name}{include file="views/companies/components/company_name.tpl" object=$product_data}{/if}
     {if $options}
         <br>
@@ -28,7 +28,7 @@
     {/if}
 </td>
     {if $amount_input == "text"}
-<td class="center">
+<td class="center" data-th="{__("quantity")}">
     {if $show_only_name}
         {$amount}
     {else}
@@ -42,7 +42,7 @@
 <td class="nowrap">
     {if !$hide_delete_button && !$show_only_name}
         {capture name="tools_list"}
-            <li>{btn type="list" icon="" text=__("delete") onclick="Tygh.$.cePicker('delete_js_item', '{$root_id}', '{$delete_id}', 'p'); return false;"}</li>
+            <li>{btn type="list" text=__("delete") onclick="Tygh.$.cePicker('delete_js_item', '{$root_id}', '{$delete_id}', 'p'); return false;"}</li>
         {/capture}
         <div class="hidden-tools">
             {dropdown content=$smarty.capture.tools_list}
@@ -74,11 +74,11 @@
                 }
             {/hook}
         </td>
-        <td class="mobile-hide">&nbsp;</td>
+        <td class="mobile-hide" data-th="&nbsp;">>&nbsp;</td>
         <td class="nowrap" data-th="{__("tools")}">{if !$hide_delete_button && !$show_only_name}
             {capture name="tools_list"}
-                <li>{btn type="list" icon="" text=__("edit") href="products.update?product_id=`$delete_id`"}</li>
-                <li>{btn type="list" icon="" text=__("remove") onclick="Tygh.$.cePicker('delete_js_item', '{$root_id}', '{$delete_id}', 'p'); return false;"}</li>
+                <li>{btn type="list" text=__("edit") href="products.update?product_id=`$delete_id`"}</li>
+                <li>{btn type="list" text=__("remove") onclick="Tygh.$.cePicker('delete_js_item', '{$root_id}', '{$delete_id}', 'p'); return false;"}</li>
             {/capture}
             <div class="hidden-tools">
                 {dropdown content=$smarty.capture.tools_list}

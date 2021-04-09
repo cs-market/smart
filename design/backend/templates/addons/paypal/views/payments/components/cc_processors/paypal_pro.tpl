@@ -90,30 +90,34 @@
     {include file="common/subheader.tpl" title=__("3d_secure")}
 
     <div class="control-group">
-        <label class="control-label" for="merchant_id">{__("merchant_id")}{include file="common/tooltip.tpl" tooltip=__("addons.paypal.3d_secure_mandatory_notice")}:</label>
+        <label class="control-label" for="merchant_id">{__("merchant_id")}:</label>
             <div class="controls">
                 <input type="text" name="payment_data[processor_params][merchant_id]" id="merchant_id" value="{$processor_params.merchant_id}" >
+                <p class="muted description">{__("addons.paypal.3d_secure_mandatory_notice")}</p>
             </div>
     </div>
 
     <div class="control-group">
-        <label class="control-label" for="processor_id">{__("processor_id")}{include file="common/tooltip.tpl" tooltip=__("addons.paypal.3d_secure_mandatory_notice")}:</label>
+        <label class="control-label" for="processor_id">{__("processor_id")}:</label>
         <div class="controls">
             <input type="text" name="payment_data[processor_params][processor_id]" id="processor_id" value="{$processor_params.processor_id}" >
+            <p class="muted description">{__("addons.paypal.3d_secure_mandatory_notice")}</p>
         </div>
     </div>
 
     <div class="control-group">
-        <label class="control-label" for="transaction_password">{__("transaction_password")}{include file="common/tooltip.tpl" tooltip=__("addons.paypal.3d_secure_mandatory_notice")}:</label>
+        <label class="control-label" for="transaction_password">{__("transaction_password")}:</label>
         <div class="controls">
             <input type="text" name="payment_data[processor_params][transaction_password]" id="transaction_password" value="{$processor_params.transaction_password}" >
+            <p class="muted description">{__("addons.paypal.3d_secure_mandatory_notice")}</p>
         </div>
     </div>
 
     <div class="control-group">
-        <label class="control-label" for="transaction_url">{__("transaction_url")}{include file="common/tooltip.tpl" tooltip=__("addons.paypal.3d_secure_mandatory_notice")}:</label>
+        <label class="control-label" for="transaction_url">{__("transaction_url")}:</label>
         <div class="controls">
             <input type="text" name="payment_data[processor_params][transaction_url]" id="transaction_url" value="{$processor_params.transaction_url}" >
+            <p class="muted description">{__("addons.paypal.3d_secure_mandatory_notice")}</p>
         </div>
     </div>
 

@@ -39,7 +39,7 @@ class PaypalExpressGetDetailsTest extends ATestCase
     {
         return array(
             array(
-                array('order_id' => 1,),
+                array('order_id' => 1),
                 array(),
                 array(
                     'payment_id'       => 1,
@@ -59,8 +59,8 @@ class PaypalExpressGetDetailsTest extends ATestCase
                         'method'           => 'GET',
                         'payment_url'      => 'https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=TEST-TOKEN-1',
                         'query_parameters' => array(),
-                        'return_url'       => 'payment_notification.notify?payment=paypal_express&order_id=1',
-                        'cancel_url'       => 'payment_notification.cancel?payment=paypal_express&order_id=1',
+                        'return_url'       => 'payment_notification.notify?payment=paypal_express&order_id=1&is_mobile_app=1',
+                        'cancel_url'       => 'payment_notification.cancel?payment=paypal_express&order_id=1&is_mobile_app=1',
                     ),
                     'errors'     => array(),
                 ),
@@ -87,8 +87,8 @@ class PaypalExpressGetDetailsTest extends ATestCase
                         'method'           => 'GET',
                         'payment_url'      => 'https://www.paypal.com/webscr?cmd=_express-checkout&token=TEST-TOKEN-2',
                         'query_parameters' => array(),
-                        'return_url'       => 'payment_notification.notify?payment=paypal_express&order_id=2',
-                        'cancel_url'       => 'payment_notification.cancel?payment=paypal_express&order_id=2',
+                        'return_url'       => 'payment_notification.notify?payment=paypal_express&order_id=2&is_mobile_app=1',
+                        'cancel_url'       => 'payment_notification.cancel?payment=paypal_express&order_id=2&is_mobile_app=1',
                     ),
                     'errors'     => array(),
                 ),

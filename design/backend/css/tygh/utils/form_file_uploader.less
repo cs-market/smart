@@ -319,6 +319,21 @@
             overflow: hidden;
         }
 
+        &-menu {
+
+            @media (max-width: @TabletBreakpoint) {
+                position: fixed;
+                bottom: 0;
+            }
+
+            .dropup & {
+                
+                @media (max-width: @TabletBreakpoint) {
+                    bottom: 0;
+                }
+            }
+        }
+
         &--expanded {
             position: absolute;
             z-index: 1;

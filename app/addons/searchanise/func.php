@@ -31,6 +31,7 @@ use Tygh\Enum\Addons\Searchanise\QueueStatuses;
 use Tygh\Enum\Addons\Searchanise\AddonStatuses;
 use Tygh\Enum\Addons\Searchanise\SignupStatuses;
 use Tygh\Enum\Addons\Searchanise\ServerErrors;
+use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -58,6 +59,9 @@ fn_define('SE_CONTACT_EMAIL', 'feedback@searchanise.com');
 fn_define('SE_NOT_DATA', 'N;');
 fn_define('SE_PRICE_USERGROUP_PREFIX', 'price_');
 fn_define('SE_GROUPED_PREFIX', 'se_grouped_');
+
+// phpcs:disable SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+// phpcs:disable SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification
 
 function fn_searchanise_dispatch_assign_template($controller, $mode, $area)
 {
@@ -257,16 +261,24 @@ function fn_se_add_action($action, $data = NULL, $company_id = NULL, $lang_code 
         db_query("TRUNCATE ?:se_queue");
 
     } elseif ($action == QueueActions::PREPARE_FULL_IMPORT && !empty($company_id)) {
-        db_query("DELETE FROM ?:se_queue WHERE company_id = ?i", $company_id);
+        if (!empty($lang_code)) {
+            db_query('DELETE FROM ?:se_queue WHERE company_id = ?i AND lang_code = ?s', $company_id, $lang_code);
+        } else {
+            db_query('DELETE FROM ?:se_queue WHERE company_id = ?i', $company_id);
+        }
     }
 
     $engines_data = fn_se_get_engines_data($company_id, $lang_code);
 
     foreach ($data as $d) {
         foreach ($engines_data as $engine_data) {
-			db_query("DELETE FROM ?:se_queue WHERE status = ?s AND action = ?s AND data = ?s AND company_id = ?i AND lang_code = ?s", QueueStatuses::PENDING, $action, $d, $engine_data['company_id'], $engine_data['lang_code']);
+            db_query('DELETE FROM ?:se_queue WHERE status = ?s AND action = ?s AND data = ?s AND company_id = ?i AND lang_code = ?s', QueueStatuses::PENDING, $action, $d, $engine_data['company_id'], $engine_data['lang_code']);
 
-            db_query("INSERT INTO ?:se_queue ?e", [
+            if (fn_se_get_import_status($engine_data['company_id'], $engine_data['lang_code']) === ImportStatuses::SUSPENDED) {
+                continue;
+            }
+
+            db_query('INSERT INTO ?:se_queue ?e', [
                 'action'     => $action,
                 'data'       => $d,
                 'company_id' => $engine_data['company_id'],
@@ -291,15 +303,21 @@ function fn_se_add_chunk_product_action($action, $product_ids, $company_id = NUL
 
 function fn_searchanise_update_product_amount($new_amount, $product_id, $cart_id, $tracking)
 {
-    if ($tracking == ProductTracking::TRACK_WITHOUT_OPTIONS) { // track whole product inventory only - we don't use combinations yet
-        fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+    if ($tracking === ProductTracking::DO_NOT_TRACK) {
+        return;
+    }
 
-        $united_product_ids = fn_se_get_united_product_ids((array) $product_id);
-        if (!empty($united_product_ids)) {
-            foreach ($united_product_ids as $parent_id) {
-                fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $parent_id);
-            }
-        }
+    // track whole product inventory only - we don't use combinations yet
+    fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+
+    $united_product_ids = fn_se_get_united_product_ids((array) $product_id);
+
+    if (empty($united_product_ids)) {
+        return;
+    }
+
+    foreach ($united_product_ids as $parent_id) {
+        fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $parent_id);
     }
 }
 
@@ -354,13 +372,6 @@ function fn_searchanise_global_update_products($table, $field, $value, $type, $m
         }
     } else {
         fn_se_queue_import();
-    }
-}
-
-function fn_searchanise_update_option_combination_post($combination_data, $combination_hash, $inventory_amount)
-{
-    if (!empty($combination_data['product_id'])) {
-        fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $combination_data['product_id']);
     }
 }
 
@@ -517,7 +528,7 @@ function fn_searchanise_tools_change_status($params, $result)
     } elseif ($params['table'] == 'product_filters' && !empty($result) && !empty($params['id_name']) && $params['id_name'] == 'filter_id' && !empty($params['id'])) {
         // It used exist function-hook
         if ($params['status'] == ObjectStatuses::ACTIVE) {
-            fn_searchanise_update_product_filter(NULL, $params['id']);
+            fn_searchanise_update_product_filter_post(NULL, $params['id']);
         } elseif ($params['status'] == ObjectStatuses::DISABLED) {
             fn_searchanise_delete_product_filter_pre($params['id']);
         }
@@ -544,16 +555,36 @@ function fn_se_get_engines_data($company_id = NULL, $lang_code = NULL, $skip_ava
     $company_id = fn_se_check_company_id($company_id);
 
     if (empty($engines_data) || !empty($skip_available_check)) {
+        $languages = [];
+        $available = $skip_available_check ? '1' : "status = 'A'";
+        $all_languages = db_get_array('SELECT * FROM ?:languages WHERE ?p', $available);
+
         if (fn_allowed_for('ULTIMATE')) {
-            $available = ($skip_available_check == true)? '1' : "c.status = 'A' AND l.status = 'A'";
-            $languages = db_get_array("
-                SELECT c.company_id, c.storefront, c.email, l.name, l.lang_code, l.status
-                FROM ?:languages as l
-                INNER JOIN ?:ult_objects_sharing as s ON (s.share_object_id = l.lang_id AND s.share_object_type = 'languages')
-                LEFT JOIN ?:companies as c ON c.company_id = s.share_company_id WHERE ?p ORDER BY l.lang_code = ?s DESC", $available, DEFAULT_LANGUAGE);
+            list($storefronts,) = Tygh::$app['storefront.repository']->find([
+                'get_total' => false,
+            ]);
+
+            foreach ($storefronts as $storefront) {
+                $language_ids = $storefront->getLanguageIds();
+                $s_c_ids = $storefront->getCompanyIds();
+
+                foreach ($all_languages as $l) {
+                    // Check if language is shared for any storefront or not
+                    $exist_lang_id = db_get_field('SELECT language_id FROM ?:storefronts_languages WHERE language_id = ?i', $l['lang_id']);
+
+                    if (empty($exist_lang_id) || in_array($l['lang_id'], $language_ids)) {
+                        $languages[] = [
+                            'lang_code'  => $l['lang_code'],
+                            'company_id' => $s_c_ids[0], // one to one relation for ULT
+                            'storefront' => $storefront->url,
+                            'status'     => $l['status'],
+                            'name'       => $l['name'],
+                        ];
+                    }
+                }
+            }
         } else {
-            $available = ($skip_available_check == true)? '1' : "status = 'A'";
-            $languages = db_get_array("SELECT * FROM ?:languages WHERE $available");
+            $languages = $all_languages;
         }
 
         foreach ($languages as $l) {
@@ -669,6 +700,9 @@ function fn_se_signup($_company_id = NULL, $_lang_code = NULL, $show_notificatio
         if (!empty($response)) {
             $response = fn_se_parse_response($response, true);
 
+            /**
+             * @psalm-suppress InvalidArrayAccess
+             */
             if (!empty($response['keys']['api']) && !empty($response['keys']['private'])) {
                 $api_key = (string) $response['keys']['api'];
                 $private_key = (string) $response['keys']['private'];
@@ -724,11 +758,11 @@ function fn_se_queue_import($company_id = NULL, $lang_code = NULL, $show_notific
         return;
     }
 
-    fn_se_add_action(QueueActions::PREPARE_FULL_IMPORT, NULL, $company_id, $lang_code);
-
     $engines_data = fn_se_get_engines_data($company_id, $lang_code);
+
     foreach ($engines_data as $engine_data) {
         fn_se_set_import_status(ImportStatuses::QUEUED, $engine_data['company_id'], $engine_data['lang_code']);
+        fn_se_add_action(QueueActions::PREPARE_FULL_IMPORT, null, $engine_data['company_id'], $engine_data['lang_code']);
     }
 
     if ($show_notification == true) {
@@ -879,7 +913,11 @@ function fn_se_prepare_request_params($params)
         $restrict_by['usergroup_ids'] = join('|', Tygh::$app['session']['auth']['usergroup_ids']);
     }
 
-    if (Registry::get('settings.General.inventory_tracking') == YesNo::YES && Registry::get('settings.General.show_out_of_stock_products') == YesNo::NO && AREA == 'C') {
+    if (
+        Registry::get('settings.General.inventory_tracking') !== YesNo::NO
+        && Registry::get('settings.General.show_out_of_stock_products') === YesNo::NO
+        && SiteArea::isStorefront(AREA)
+    ) {
         $restrict_by['amount'] = '1,';
     }
 
@@ -899,18 +937,21 @@ function fn_se_prepare_request_params($params)
         $restrict_by['product_type'] = ProductVariationTypes::PRODUCT_TYPE_SIMPLE;
     }
 
-    if (Registry::ifGet('addons.master_products.status', ObjectStatuses::NEW_OBJECT) == ObjectStatuses::ACTIVE) {
-        $restrict_by['is_vendor_product'] = YesNo::YES;
-        $restrict_by['master_product_status'] = ObjectStatuses::ACTIVE;
-    }
-
     //
     // Company_id
     //
     if (fn_allowed_for('MULTIVENDOR')) {
         $restrict_by['active_company'] = YesNo::YES;
 
-        if (isset($params['company_id']) && $params['company_id'] != '') {
+        if (Registry::ifGet('addons.master_products.status', ObjectStatuses::NEW_OBJECT) === ObjectStatuses::ACTIVE) {
+            $restrict_by['master_product_status'] = ObjectStatuses::ACTIVE;
+
+            if (!empty($params['company_id'])) {
+                $restrict_by['company_id'] = $params['company_id'];
+            } else {
+                $restrict_by['company_id'] = 0;
+            }
+        } elseif (!empty($params['company_id'])) {
             $restrict_by['company_id'] = $params['company_id'];
         }
     }
@@ -1229,12 +1270,12 @@ function fn_searchanise_get_filters_products_count(array $params = [], $lang_cod
         !empty($params['disable_searchanise']) ||
         !fn_se_is_search_allowed(fn_se_get_company_id(), CART_LANGUAGE)
     ) {
-        return fn_get_filters_products_count($params, $lang_code);
+        return fn_product_filters_get_filters_products_count($params, $lang_code);
     }
 
     $received_facets = Registry::get('searchanise.received_facets');
     if (is_null($received_facets)) {
-         return fn_get_filters_products_count($params, $lang_code);
+         return fn_product_filters_get_filters_products_count($params, $lang_code);
     }
 
     $_params = ['status' => ObjectStatuses::ACTIVE, 'get_variants' => true];
@@ -1261,7 +1302,7 @@ function fn_searchanise_get_filters_products_count(array $params = [], $lang_cod
         $result = fn_searchanise_send_search_request($request_params);
 
         if (empty($result)) {
-            return fn_get_filters_products_count($params);
+            return fn_product_filters_get_filters_products_count($params);
         } else {
             $clear_rfacets = $result['facets'];
         }
@@ -1330,11 +1371,15 @@ function fn_searchanise_get_filters_products_count(array $params = [], $lang_cod
                 }
             }
 
+            // Needs for check to disabling slider.
+            $min = Math::floorToPrecision($rfilter['buckets'][0]['from'], $sfilter['round_to'] * 0.1);
+            $max = Math::floorToPrecision($rfilter['buckets'][0]['to'], $sfilter['round_to'] * 0.1);
 
-            $filter['min']    = Math::ceilToPrecision($rfilter['buckets'][0]['from'], $sfilter['round_to']);
-            $filter['max']    = Math::ceilToPrecision($rfilter['buckets'][0]['to'], $sfilter['round_to']);
-            $filter['extra']  = CART_SECONDARY_CURRENCY; //TODO
-            $filter['slider'] = true;
+            $filter['min']     = Math::ceilToPrecision($min, $sfilter['round_to']);
+            $filter['max']     = Math::ceilToPrecision($max, $sfilter['round_to']);
+            $filter['extra']   = CART_SECONDARY_CURRENCY; //TODO
+            $filter['disable'] = round(abs($max - $min), 2) < $sfilter['round_to'];
+            $filter['slider']  = true;
 
             if (!empty($rfilter['buckets'][0]['selected'])) {
                 $filter['left']  = Math::floorToPrecision($rfilter['buckets'][0]['left'], $sfilter['round_to']);
@@ -1450,7 +1495,7 @@ function fn_searchanise_update_product_feature_post($feature_data, $feature_id, 
     }
 }
 
-function fn_searchanise_update_product_filter($filter_data, $filter_id)
+function fn_searchanise_update_product_filter_post($filter_data, $filter_id)
 {
     fn_se_add_action(QueueActions::UPDATE_FACETS, $filter_id);
 }
@@ -1525,14 +1570,35 @@ function fn_se_send_request($url_part, $private_key, $data)
         'timeout' => SE_REQUEST_TIMEOUT
     ]);
 
-    $response = fn_se_parse_response($result, false);
+    $response = fn_se_parse_response($result, false, static function ($err) use ($private_key) {
+        if ($err === 'inactive_private_key') {
+            $engines_data = fn_se_get_engines_data();
+
+            foreach ($engines_data as $e) {
+                if ($e['private_key'] === $private_key) {
+                    fn_se_set_import_status(ImportStatuses::SUSPENDED, $e['company_id'], $e['lang_code']);
+                    db_query('DELETE FROM ?:se_queue WHERE company_id = ?i AND lang_code = ?s', $e['company_id'], $e['lang_code']);
+                    break;
+                }
+            }
+        }
+    });
 
     fn_se_set_simple_setting('last_request', TIME);
 
     return $response;
 }
 
-function fn_se_parse_response($response, $show_notification = false)
+/**
+ * Parses response from Searchanise server
+ *
+ * @param string        $response          Searchanise response
+ * @param bool          $show_notification If true and error occurs, it will be shown
+ * @param callable|null $err_callback      Error callback action
+ *
+ * @return bool|array
+ */
+function fn_se_parse_response($response, $show_notification = false, $err_callback = null)
 {
     $data = json_decode($response, true);
 
@@ -1540,21 +1606,27 @@ function fn_se_parse_response($response, $show_notification = false)
         return false;
     }
 
+    if ($data === 'ok') {
+        return true;
+    }
+
     if (!empty($data['errors']) && is_array($data['errors'])) {
         foreach ($data['errors'] as $e) {
             if ($show_notification == true) {
                 fn_set_notification(NotificationSeverity::ERROR, __('error'), 'Searchanise: ' . (string) $e);
             }
+
+            if (!is_callable($err_callback)) {
+                continue;
+            }
+
+            call_user_func($err_callback, $e);
         }
 
         return false;
-
-    } elseif ($data === 'ok') {
-        return true;
-
-    } else {
-        return $data;
     }
+
+    return $data;
 }
 
 function fn_se_parse_state_response($response)
@@ -1683,7 +1755,7 @@ function fn_se_check_import_is_done($company_id = NULL, $lang_code = NULL)
                             $skip_time_check = true;
                             fn_se_set_import_status(ImportStatuses::DONE, $c_id, $l_code);
                         } elseif ($variables['status'] == 'disabled') {
-                            fn_se_set_import_status(ImportStatuses::NONE, $c_id, $l_code); //disable status check for disabled engine
+                            fn_se_set_import_status(ImportStatuses::SUSPENDED, $c_id, $l_code); //disable status check for disabled engine
                         }
                     }
                 }

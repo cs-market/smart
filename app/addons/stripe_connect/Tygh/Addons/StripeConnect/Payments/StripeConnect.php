@@ -29,6 +29,8 @@ use Tygh\Addons\StripeConnect\PriceFormatter;
 use Tygh\Common\OperationResult;
 use Tygh\Database\Connection;
 use Tygh\Enum\ObjectStatuses;
+use Tygh\Addons\StripeConnect\Logger;
+use Tygh\Addons\StripeConnect\StripeException;
 
 /**
  * Class StripeConnect implements Stipe Connect payment method.
@@ -115,6 +117,7 @@ class StripeConnect
         Stripe::setApiKey($this->processor_params['secret_key']);
         Stripe::setClientId($this->processor_params['client_id']);
         Stripe::setApiVersion(self::API_VERSION);
+        Stripe::setLogger(new Logger());
     }
 
     /**
@@ -143,6 +146,8 @@ class StripeConnect
         if ($payment_id && $processor_data = fn_get_processor_data($payment_id)) {
             return $processor_data['processor_params'];
         }
+
+        Logger::log(Logger::ACTION_FAILURE, __('stripe_connect.stripe_processor_params_missing'));
 
         return [
             'client_id'       => null,
@@ -235,31 +240,42 @@ class StripeConnect
                     continue;
                 }
 
-                if (empty($suborder_info['use_gift_certificates'])) {
-
-                    $transfer = $this->transferFunds($suborder_info, $payouts_manager, $charge);
-                    fn_update_order_payment_info(
-                        $order_id,
-                        [
-                            'stripe_connect.transfer_id' => $transfer->id,
-                            'stripe_connect.payment_id'  => $transfer->destination_payment,
-                        ]
-                    );
-
-                    $withdrawal = $transfer->metadata['withdrawal'];
-                    if ($withdrawal) {
-                        $payouts_manager->createWithdrawal($withdrawal, $order_id);
-                        if ($this->addon_settings['collect_payouts']) {
-                            $payouts_manager->acceptPayouts();
-                        }
-                    }
+                if (!empty($suborder_info['use_gift_certificates'])) {
+                    continue;
                 }
+
+                $transfer = $this->transferFunds($suborder_info, $payouts_manager, $charge);
+                if (!$transfer) {
+                    continue;
+                }
+
+                fn_update_order_payment_info(
+                    $order_id,
+                    [
+                        'stripe_connect.transfer_id' => $transfer->id,
+                        'stripe_connect.payment_id'  => $transfer->destination_payment,
+                    ]
+                );
+
+                $withdrawal = $transfer->metadata['withdrawal'];
+                if (!$withdrawal) {
+                    continue;
+                }
+
+                $payouts_manager->createWithdrawal($withdrawal, $order_id);
+                if (!$this->addon_settings['collect_payouts']) {
+                    continue;
+                }
+
+                $payouts_manager->acceptPayouts();
             }
 
             $pp_response['order_status'] = 'P';
         } catch (Exception $e) {
             $pp_response['order_status'] = 'F';
             $pp_response['reason_text'] = $e->getMessage();
+
+            Logger::logException($e);
         }
 
         return $pp_response;
@@ -355,6 +371,8 @@ class StripeConnect
             foreach ($charges_to_capture as $charge) {
                 $charge->refund();
             }
+
+            Logger::logException($e);
         }
 
         if ($customer) {
@@ -404,6 +422,13 @@ class StripeConnect
             } else {
                 static::$receivers_cache[$company_id] = static::getOwnerAccountId();
             }
+        }
+
+        if (empty(static::$receivers_cache[$company_id])) {
+            Logger::log(
+                Logger::ACTION_FAILURE,
+                __('stripe_connect.account_link_error', ['[company_id]' => $company_id])
+            );
         }
 
         return static::$receivers_cache[$company_id];
@@ -520,12 +545,19 @@ class StripeConnect
      */
     protected function validateOrdersQueueReceivers(array $orders_queue)
     {
+        $company_id = null;
         try {
             foreach ($orders_queue as $company_id) {
                 $account_id = StripeConnect::getChargeReceiver($company_id);
                 Account::retrieve($account_id);
             }
         } catch (Exception $e) {
+            if ($company_id) {
+                Logger::logException($e, [
+                    'company_id' => $company_id,
+                    'company_name' => fn_get_company_name($company_id)
+                ]);
+            }
             return false;
         }
 
@@ -539,17 +571,18 @@ class StripeConnect
      */
     public static function getOwnerAccountId()
     {
-        $params = static::getProcessorParameters();
-
-        Stripe::setApiKey($params['secret_key']);
-        Stripe::setClientId($params['client_id']);
-        Stripe::setApiVersion(self::API_VERSION);
-
         $owner_id = null;
         try {
+            $params = static::getProcessorParameters();
+
+            Stripe::setApiKey($params['secret_key']);
+            Stripe::setClientId($params['client_id']);
+            Stripe::setApiVersion(self::API_VERSION);
+
             $owner = Account::retrieve();
             $owner_id = $owner->id;
         } catch (Exception $e) {
+            Logger::logException($e);
         }
 
         return $owner_id;
@@ -567,13 +600,15 @@ class StripeConnect
     {
         $result = new OperationResult(false);
 
-        $intent = PaymentIntent::create([
+        $intent_params = [
             'payment_method'      => $payment_intent_payment_method_id,
             'amount'              => $this->formatAmount($total),
             'currency'            => $this->processor_params['currency'],
             'confirmation_method' => 'manual',
             'confirm'             => true,
-        ]);
+        ];
+
+        $intent = PaymentIntent::create($intent_params);
 
         $is_success = in_array($intent->status,
             [
@@ -589,6 +624,17 @@ class StripeConnect
             $result->setData($intent->client_secret, 'client_secret');
         }
 
+        if (!$is_success) {
+            Logger::log(
+                Logger::ACTION_FAILURE,
+                __('stripe_connect.unexpected_payment_intent_status', ['[status]' => $intent->status]),
+                array_merge([
+                    'intent_id' => $intent->id,
+                    'status' => $intent->status
+                ], $intent_params)
+            );
+        }
+
         return $result;
     }
 
@@ -599,16 +645,21 @@ class StripeConnect
      * @param \Tygh\Addons\StripeConnect\PayoutsManager $payouts_manager
      * @param \Stripe\Charge                            $charge
      *
-     * @return \Stripe\Transfer
+     * @return \Stripe\Transfer|null
+     *
+     * @throws StripeException If the transfers vendor's withdrawal creating failed.
      */
     protected function transferFunds(array $order_info, PayoutsManager $payouts_manager, Charge $charge)
     {
-        $receiver = static::getChargeReceiver($order_info['company_id']);
-
         list($accounting_withdrawal, $transfer_amount) = $this->getWithdrawalAmount($order_info, $payouts_manager, $charge);
+        if (!$transfer_amount) {
+            return null;
+        }
+
+        $receiver = static::getChargeReceiver($order_info['company_id']);
         $description = $this->getWithdrawalDescription($order_info['order_id'], $order_info['company_id']);
 
-        $transfer = Transfer::create([
+        $transfer_params = [
             'currency'           => $this->processor_params['currency'],
             'destination'        => $receiver,
             'amount'             => $transfer_amount,
@@ -618,7 +669,16 @@ class StripeConnect
                 'withdrawal' => $accounting_withdrawal,
             ],
             'source_transaction' => $charge->id,
-        ]);
+        ];
+
+        try {
+            $transfer = Transfer::create($transfer_params);
+        } catch (Exception $e) {
+            throw new StripeException(
+                __('stripe_connect.transfer_creating_error', ['[error]' => $e->getMessage()]),
+                $transfer_params
+            );
+        }
 
         return $transfer;
     }
@@ -670,6 +730,21 @@ class StripeConnect
         return $this->nets_cache[$charge->id];
     }
 
+    /**
+     * @param array          $order_info      Order info
+     * @param Customer       $customer        Stripe customer
+     * @param PayoutsManager $payouts_manager Payouts manager
+     *
+     * @return Charge
+     *
+     * @psalm-param array{
+     *  total: float,
+     *  order_id: int,
+     *  company_id: int
+     * } $order_info Some order fields
+     *
+     * @throws StripeException If failed to create a customer' charge.
+     */
     protected function chargeCustomer(array $order_info, Customer $customer, PayoutsManager $payouts_manager)
     {
         $amount = $this->formatAmount($order_info['total']);
@@ -699,7 +774,16 @@ class StripeConnect
             unset($params['customer']);
         }
 
-        return Charge::create($params, $options);
+        try {
+            $charger = Charge::create($params, $options);
+        } catch (Exception $e) {
+            throw new StripeException(
+                __('stripe_connect.charge_creating_error', ['[error]' => $e->getMessage()]),
+                $params
+            );
+        }
+
+        return $charger;
     }
 
     /**
@@ -708,13 +792,26 @@ class StripeConnect
      * @param array $order_info
      *
      * @return \Stripe\Customer
+     *
+     * @throws StripeException If a Customer object creating failed.
      */
     protected function createCustomer(array $order_info)
     {
-        $customer = Customer::create([
-            'email'  => $order_info['email'],
-            'source' => $order_info['payment_info']['stripe_connect.token'],
-        ]);
+        try {
+            $customer = Customer::create([
+                'email'  => $order_info['email'],
+                'source' => $order_info['payment_info']['stripe_connect.token'],
+            ]);
+        } catch (Exception $e) {
+            throw new StripeException(
+                __('stripe_connect.customer_creating_error', ['[error]' => $e->getMessage()]),
+                [
+                    'order_id' => $order_info['order_id'],
+                    'email' => $order_info['email'],
+                    'payment_info' => $order_info['payment_info']
+                ]
+            );
+        }
 
         return $customer;
     }
@@ -726,13 +823,25 @@ class StripeConnect
      * @param string   $connected_account_id Connected account identifier
      *
      * @return string Payment token
+     *
+     * @throws StripeException If failed to share a Stripe customer to a connected vendor account.
      */
     protected function shareCustomer(Customer $customer, $connected_account_id)
     {
-        $token = Token::create(
-            ['customer' => $customer->id],
-            ['stripe_account' => $connected_account_id]
-        );
+        try {
+            $token = Token::create(
+                ['customer' => $customer->id],
+                ['stripe_account' => $connected_account_id]
+            );
+        } catch (Exception $e) {
+            throw new StripeException(
+                __('stripe_connect.customer_sharing_error', ['[error]' => $e->getMessage()]),
+                [
+                    'customer' => $customer->id,
+                    'stripe_account' => $connected_account_id
+                ]
+            );
+        }
 
         return $token->id;
     }

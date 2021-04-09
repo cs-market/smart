@@ -21,7 +21,7 @@
             {$first_payment = $payments|reset}
 
             <li id="payments_{$tab_id}" class="ty-tabs__item{if $tab_id == $active_tab || (!$active_tab && $payments[$payment_id])} active{/if}">
-                <a class="ty-tabs__a cm-ajax cm-ajax-full-render" data-ca-event-name="payments_tab_switch" data-ca-target-id="{$result_ids}" href="{"`$url`?active_tab=`$tab_id`&payment_id=`$first_payment.payment_id`"|fn_url}">{__($tab_name)}</a>
+                <a class="ty-tabs__a cm-ajax cm-ajax-full-render" data-ca-event="ce.payments_tab_switch" data-ca-target-id="{$result_ids}" href="{"`$url`?active_tab=`$tab_id`&payment_id=`$first_payment.payment_id`"|fn_url}">{__($tab_name)}</a>
             </li>
         {/foreach}
     </ul>

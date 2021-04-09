@@ -5,12 +5,12 @@
     {$comb_id="cat_`$category.category_id`"}
 
     {if $category.company_categories !== "YesNo::YES"|enum}
-        <div class="longtap-selection">
+        <div class="longtap-selection" data-ca-bulkedit-component="tableWrapper">
     {/if}
     <table class="table table-tree table-middle table--relative">
         {if $header && !$parent_id}
             {$header=""}
-            <thead data-ca-bulkedit-default-object="true">
+            <thead data-ca-bulkedit-default-object="true" data-ca-bulkedit-component="defaultObject">
                 <tr>
                     {hook name="categories:categories_tree_header"}
                     <th width="5%" class="mobile-hide">
@@ -79,16 +79,16 @@
                 {hook name="categories:categories_tree_row"}
                 <td width="5%" class="mobile-hide">
                     <input type="checkbox" name="category_ids[]" value="{$category.category_id}" class="hide checkbox cm-item  cm-item-status-{$category.status|lower}" /></td>
-                <td width="8%" class="mobile-hide" data-th="{__("position_short")}">
+                <td width="8%" class="mobile-hide">
                     <input type="text" name="categories_data[{$category.category_id}][position]" value="{$category.position}" size="3" class="input-micro input-hidden" /></td>
-                <td width="54%" data-th="{__("name")}">
+                <td width="54%">
                     {strip}
                     <span style="padding-{$direction}: {$shift}px;">
                         {if $category.has_children || $category.subcategories}
                                 {if $show_all}
                                     <a href="#" alt="{__("expand_sublist_of_items")}" title="{__("expand_sublist_of_items")}" id="on_cat_{$category.category_id}" class="cm-combination {if $expand_all}hidden{/if}" ><span class="icon-caret-right"> </span></a>
                                 {else}
-                                    <a href="#" alt="{__("expand_sublist_of_items")}" title="{__("expand_sublist_of_items")}" id="on_cat_{$category.category_id}" class="cm-combination" onclick="if (!Tygh.$('#cat_{$category.category_id}').children().get(0)) Tygh.$.ceAjax('request', '{"categories.manage?category_id=`$category.category_id`"|fn_url nofilter}', {$ldelim}result_ids: 'cat_{$category.category_id}'{$rdelim})"><span class="icon-caret-right"> </span></a>
+                                    <a href="#" alt="{__("expand_sublist_of_items")}" title="{__("expand_sublist_of_items")}" id="on_cat_{$category.category_id}" class="cm-combination"><span class="icon-caret-right" onclick="if (!Tygh.$('#cat_{$category.category_id}').children().get(0)) Tygh.$.ceAjax('request', '{"categories.manage?category_id=`$category.category_id`"|fn_url nofilter}', {$ldelim}result_ids: 'cat_{$category.category_id}'{$rdelim})"> </span></a>
                                 {/if}
                                 <a href="#" alt="{__("collapse_sublist_of_items")}" title="{__("collapse_sublist_of_items")}" id="off_cat_{$category.category_id}" class="cm-combination{if !$expand_all || !$show_all} hidden{/if}" ><span class="icon-caret-down"> </span></a>
                         {/if}
@@ -99,7 +99,7 @@
                     </span>
                     {/strip}
                 </td>
-                <td width="12%" class="center" data-th="{__("products")}">
+                <td width="12%" class="center">
                     <a href="{"products.manage?cid=`$category.category_id`"|fn_url}" class="badge">{$category.product_count}</a>
                 </td>
                 <td width="10%" class="center mobile-hide">
@@ -115,7 +115,7 @@
                         {dropdown content=$smarty.capture.tools_items}
                     </div>
                 </td>
-                <td width="10%" class="nowrap right mobile-hide" data-th="{__("status")}">
+                <td width="10%" class="nowrap right mobile-hide">
                     {include file="common/select_popup.tpl" popup_additional_class="dropleft" id=$category.category_id status=$category.status hidden=true object_id_name="category_id" table="categories" non_editable=$hide_inputs}
                 </td>
                 {/hook}

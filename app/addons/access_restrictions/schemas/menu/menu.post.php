@@ -12,12 +12,12 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['top']['addons']['items']['access_restrictions'] = array(
-    'attrs' => array(
+$schema['top']['administration']['items']['access_restrictions'] = [
+    'attrs' => [
         'class' => 'is-addon'
-    ),
+    ],
     'href' => 'access_restrictions.manage',
-    'position' => 100
-);
+    'position' => 506,
+];
 
 return $schema;

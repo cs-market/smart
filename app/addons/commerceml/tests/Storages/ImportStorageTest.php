@@ -20,6 +20,7 @@ use Tygh\Addons\CommerceML\Dto\CategoryDto;
 use Tygh\Addons\CommerceML\Dto\IdDto;
 use Tygh\Addons\CommerceML\Dto\ImportDto;
 use Tygh\Addons\CommerceML\Dto\ImportItemDto;
+use Tygh\Addons\CommerceML\Dto\LocalIdDto;
 use Tygh\Addons\CommerceML\Dto\ProductDto;
 use Tygh\Addons\CommerceML\Repository\ImportRemovedEntityRepository;
 use Tygh\Addons\CommerceML\Storages\ImportStorage;
@@ -131,7 +132,7 @@ class ImportStorageTest extends ATestCase
         $product1->id = IdDto::createByExternalId('product1');
         $product1->id->local_id = 12;
 
-        $this->assertEquals(12, $storage->findEntityLocalId($product1));
+        $this->assertEquals(12, $storage->findEntityLocalId(ProductDto::REPRESENT_ENTITY_TYPE, $product1->id)->asInt());
 
         $product1 = new ProductDto();
         $product1->id = IdDto::createByExternalId('product2');
@@ -142,7 +143,7 @@ class ImportStorageTest extends ATestCase
         $product1 = new ProductDto();
         $product1->id = IdDto::createByExternalId('product2');
 
-        $this->assertEquals(13, $storage->findEntityLocalId($product1));
+        $this->assertEquals(13, $storage->findEntityLocalId(ProductDto::REPRESENT_ENTITY_TYPE, $product1->id)->asInt());
     }
 
     /**

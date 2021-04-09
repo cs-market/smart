@@ -4,7 +4,9 @@
     {assign var="id" value=0}
 {/if}
 
-<form action="{""|fn_url}" method="post" class="form-horizontal form-edit cm-check-changes {if !$product_file_folder|fn_allow_save_object:""} cm-hide-inputs{/if}" name="folders_form_{$id}" enctype="multipart/form-data">
+{$allow_save=$product_file_folder|fn_allow_save_object:""}
+
+<form action="{""|fn_url}" method="post" class="form-horizontal form-edit cm-check-changes {if !$allow_save} cm-hide-inputs{/if}" name="folders_form_{$id}" enctype="multipart/form-data">
 <input type="hidden" name="product_id" value="{$product_id}" />
 <input type="hidden" name="selected_section" value="files" />
 <input type="hidden" name="folder_id" value="{$id}" />
@@ -39,10 +41,13 @@
 </div>
 
 <div class="modal-footer buttons-container">
-{if $product_file_folder|fn_allow_save_object:""}
-    {include file="buttons/save_cancel.tpl" but_name="dispatch[products.update_folder]" cancel_action="close" save=$id}
-{/if}
-
+    {include
+        file="buttons/save_cancel.tpl"
+        but_name="dispatch[products.update_folder]"
+        cancel_action="close"
+        save=$id
+        hide_first_button=!$allow_save
+    }
 </div>
 
 </form>

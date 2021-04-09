@@ -6,9 +6,11 @@ msgstr ""
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.11.3/addons/call_requests.po\n"
-"PO-Revision-Date: 2020-01-29 14:52\n"
+"X-Crowdin-File: /release-4.12.2/addons/call_requests.po\n"
+"X-Crowdin-File-ID: 4044\n"
+"PO-Revision-Date: 2021-02-01 09:11\n"
 
 msgctxt "Addons::name::call_requests"
 msgid "Call requests"
@@ -53,6 +55,14 @@ msgstr "Lasă necompletat pentru a utiliza automat modelul de cod de țară, sau
 msgctxt "SettingsTooltips::call_requests::phone_prefix_length"
 msgid "Including parenthesis, spaces, etc. Use to highlight country code, area code, and phone prefix."
 msgstr "Inclusiv paranteza, spatii, etc. Utilizaţi pentru a evidenţia codul țării, prefixul zonal şi telefon prefix."
+
+msgctxt "SettingsOptions::call_requests::enable_call_requests_for_vendors"
+msgid "Enable call requests for vendors"
+msgstr "Activați solicitările de apeluri pentru furnizori(vendors)"
+
+msgctxt "SettingsTooltips::call_requests::enable_call_requests_for_vendors"
+msgid "This will also replace marketplace contact information with vendors' where necessary."
+msgstr "Aceasta va înlocui, de asemenea, informațiile de contact ale furnizorilor, acolo unde este necesar."
 
 msgctxt "Languages::privileges.manage_call_requests"
 msgid "Can edit"
@@ -212,9 +222,9 @@ msgstr "Datele cu caracter personal de cereri de apel"
 
 msgctxt "Languages::call_requests.event.request_created.name"
 msgid "Call requests: request created"
-msgstr ""
+msgstr "Cereri de apel: solicitare creată"
 
 msgctxt "Languages::call_requests.event.request_about_product_created.name"
 msgid "Call requests: request about product created"
-msgstr ""
+msgstr "Cereri de apel: cerere despre produsul creat"
 

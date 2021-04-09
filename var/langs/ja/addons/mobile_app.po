@@ -8,217 +8,253 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /release-4.11.5/addons/mobile_app.po\n"
-"X-Crowdin-File-ID: 3668\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/mobile_app.po\n"
+"X-Crowdin-File-ID: 4184\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::mobile_app"
 msgid "Mobile application"
-msgstr ""
+msgstr "モバイルアプリ"
 
 msgctxt "Addons::description::mobile_app"
 msgid "Mobile application"
-msgstr ""
+msgstr "モバイルアプリ"
 
 msgctxt "Languages::app_params"
 msgid "Application"
+msgstr "アプリ"
+
+msgctxt "Languages::mobile_app.mobile_apply"
+msgid "Apply"
 msgstr ""
 
 msgctxt "Languages::mobile_app.section.category"
 msgid "Categories"
-msgstr ""
+msgstr "カテゴリー "
 
 msgctxt "Languages::mobile_app.section.drawer"
 msgid "Drawer (sidebar menu)"
-msgstr ""
+msgstr "ドロワー（サイドバーメニュー）"
 
 msgctxt "Languages::mobile_app.section.navbar"
 msgid "Navigation bar"
-msgstr ""
+msgstr "ナビゲーションバー"
 
 msgctxt "Languages::mobile_app.section.product_screen"
 msgid "Product screen"
-msgstr ""
+msgstr "商品画面"
 
 msgctxt "Languages::mobile_app.section.main"
 msgid "Main screen"
-msgstr ""
+msgstr "メイン画面"
 
 msgctxt "Languages::mobile_app.settings.access_key"
 msgid "Access key:"
-msgstr ""
+msgstr "アクセスキー"
 
 msgctxt "Languages::mobile_app.appname"
 msgid "App Name"
+msgstr "アプリ名"
+
+msgctxt "Languages::mobile_app.mobile_settings"
+msgid "Settings"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_select_language"
+msgid "Select Language"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_pages"
+msgid "Pages"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_currency"
+msgid "Currency"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_language"
+msgid "Language"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_favorite"
+msgid "Favorite"
 msgstr ""
 
 msgctxt "Languages::mobile_app.appshortdescription"
 msgid "Short description"
-msgstr ""
+msgstr "簡単な説明"
 
 msgctxt "Languages::mobile_app.appfulldescription"
+msgid "Full description"
+msgstr "詳細説明"
+
+msgctxt "Languages::mobile_app.mobile_full_product_description"
 msgid "Full description"
 msgstr ""
 
 msgctxt "Languages::mobile_app.supportemail"
 msgid "Support email"
-msgstr ""
+msgstr "サポートメール"
 
 msgctxt "Languages::mobile_app.privacypolicyurl"
 msgid "Privacy Policy URL"
-msgstr ""
+msgstr "プライバシーポリシーURL"
 
 msgctxt "Languages::ttc_mobile_app.appname"
 msgid "Application name (up to 30 symbols)"
-msgstr ""
+msgstr "アプリ名（最大30文字）"
 
 msgctxt "Languages::ttc_mobile_app.appshortdescription"
 msgid "Application short description (up to 80 symbols)"
-msgstr ""
+msgstr "アプリの簡単な説明（最大80文字）"
 
 msgctxt "Languages::ttc_mobile_app.appfulldescription"
 msgid "Application full description (up to 4000 symbols)"
-msgstr ""
+msgstr "アプリの詳細説明（最大4,000文字）"
 
 msgctxt "Languages::ttc_mobile_app.supportemail"
 msgid "Will be displayed in 'about app' section"
-msgstr ""
+msgstr "「アプリについて」セクションに表示されます。"
 
 msgctxt "Languages::ttc_mobile_app.privacypolicyurl"
 msgid "URL of the Privacy Policy page of your store"
-msgstr ""
+msgstr "あなたのショップのプライバシーポリシーページURL"
 
 msgctxt "Languages::mobile_app.pushnotifications"
 msgid "Push notifications"
-msgstr ""
+msgstr "プッシュ通知"
 
 msgctxt "Languages::ttc_mobile_app.pushnotifications"
 msgid "Push notifications"
+msgstr "プッシュ通知"
+
+msgctxt "Languages::mobile_app.mobile_buyer"
+msgid "Buyer"
 msgstr ""
 
 msgctxt "Languages::bundleid"
 msgid "Bundle Id"
-msgstr ""
+msgstr "バンドルID"
 
 msgctxt "Languages::apikey"
 msgid "API Key"
-msgstr ""
+msgstr "APIキー"
 
 msgctxt "Languages::baseurl"
 msgid "Base URL"
-msgstr ""
+msgstr "ベースURL"
 
 msgctxt "Languages::siteurl"
 msgid "Site URL"
-msgstr ""
+msgstr "サイトURL"
 
 msgctxt "Languages::mobile_app.shopname"
 msgid "Shop Name"
-msgstr ""
+msgstr "ショップ名"
 
 msgctxt "Languages::ttc_mobile_app.shopname"
 msgid "Shop Name"
-msgstr ""
+msgstr "ショップ名"
 
 msgctxt "Languages::layoutid"
 msgid "Layout Id"
-msgstr ""
+msgstr "レイアウトID"
 
 msgctxt "Languages::images_params"
 msgid "Images"
-msgstr ""
+msgstr "画像"
 
 msgctxt "Languages::mobile_app.m_app_icon"
 msgid "App Icon"
-msgstr ""
+msgstr "アプリアイコン"
 
 msgctxt "Languages::tt_mobile_app.m_app_icon"
 msgid "1024 x 1024 (the big one is because it's Apple requirement, please note that it should look fine even if resized to 256x256)"
-msgstr ""
+msgstr "1,024 x 1,024（大きな画像は、Appleの要件であるため、256x256にサイズ変更しても問題なく表示されることに注意してください）"
 
 msgctxt "Languages::mobile_app.m_app_splash_portrait"
 msgid "Splash Screen (portrait)"
-msgstr ""
+msgstr "スプラッシュ・スクリーン（縦向き表示）"
 
 msgctxt "Languages::tt_mobile_app.m_app_splash_portrait"
 msgid "Recommended image size 1536x2208. It is displayed when you start the application on your mobile phone"
-msgstr ""
+msgstr "推奨画像サイズ 1,536x2,208。 携帯電話でアプリを起動すると表示されます。"
 
 msgctxt "Languages::mobile_app.m_app_splash_landscape"
 msgid "Splash Screen (landscape)"
-msgstr ""
+msgstr "スプラッシュ・スクリーン（横向き表示）"
 
 msgctxt "Languages::tt_mobile_app.m_app_splash_landscape"
 msgid "Recommended image size 2208x1536. It is displayed when you start the application on your mobile phone"
-msgstr ""
+msgstr "推奨画像サイズ 2,208x1,536。 携帯電話でアプリを起動すると表示されます。"
 
 msgctxt "Languages::mobile_app.m_app_store_logo"
 msgid "Feature Graphic image"
-msgstr ""
+msgstr "フィーチャー グラフィック画像"
 
 msgctxt "Languages::tt_mobile_app.m_app_store_logo"
 msgid "(1024 x 500). It's the image shown in the Google Play page of your application, see \"Feature Graphic\" section <a href=\"https://support.google.com/googleplay/android-developer/answer/1078870?hl=en\" target=\"_blank\">here</a>"
-msgstr ""
+msgstr "(1,024 x 500）。これは、アプリケーションのGooglePlayページに表示される画像です。「フィーチャー・グラフィック」セクションを参照してください。<a href=\"https://support.google.com/googleplay/android-developer/answer/1078870?hl=en\" target=\"_blank\">ここ</a>"
 
 msgctxt "Languages::mobile_app.download_config"
 msgid "Download config"
-msgstr ""
+msgstr "設定をダウンロード"
 
 msgctxt "Languages::mobile_app.preparing_config"
 msgid "Preparing config"
-msgstr ""
+msgstr "設定の準備"
 
 msgctxt "Languages::mobile_app.preparing_android_images"
 msgid "Preparing Android images"
-msgstr ""
+msgstr "Android画像の準備"
 
 msgctxt "Languages::mobile_app.preparing_android_images"
 msgid "Preparing Android images"
-msgstr ""
+msgstr "Android画像の準備"
 
 msgctxt "Languages::mobile_app.preparing_ios_icons"
 msgid "Preparing iOS icons"
-msgstr ""
+msgstr "iOSアイコンの準備"
 
 msgctxt "Languages::mobile_app.preparing_ios_images"
 msgid "Preparing iOS images"
-msgstr ""
+msgstr "iOS画像の準備"
 
 msgctxt "Languages::mobile_app.preparing_archive"
 msgid "Preparing archive"
-msgstr ""
+msgstr "アーカイブ の準備"
 
 msgctxt "SettingsSections::mobile_app::general"
 msgid "General"
-msgstr ""
+msgstr "一般設定"
 
 msgctxt "SettingsSections::mobile_app::service"
 msgid "Configure"
-msgstr ""
+msgstr "設定"
 
 msgctxt "Languages::mobile_app.configure_colors"
 msgid "Configure Colors"
-msgstr ""
+msgstr "色設定"
 
 msgctxt "Languages::mobile_app.fcm_api_key"
 msgid "API key for push notifications"
-msgstr ""
+msgstr "プッシュ通知用のAPIキー"
 
 msgctxt "Languages::mobile_app.fcm_api_key_tooltip"
 msgid "Obtain the Cloud Messaging <b>Legacy server key</b> from the <a href=\"https://console.firebase.google.com\" target=\"_blank\">Firebase console</a> using your bundle ID: [bundle_id]"
-msgstr ""
+msgstr "バンドルID:[bundle_id]を使用して、<a href=\"https://console.firebase.google.com\" target=\"_blank\"> Firebaseコンソール</a>からCloudMessagingの<b>レガシーサーバーキー</b>を取得します。"
 
 msgctxt "Languages::mobile_app.services_config"
 msgid "Firebase config file (Android)"
-msgstr ""
+msgstr "Firebase設定ファイル(Android)"
 
 msgctxt "Languages::tt_mobile_app.services_config"
 msgid "Upload the google-services.json file that was generated when you added an Android application in Firebase."
-msgstr ""
+msgstr "FirebaseにAndroidアプリケーションを追加したときに生成されたgoogle-services.jsonファイルをアップロードします。"
 
 msgctxt "Languages::mobile_app.crop_when_resize"
 msgid "Crop image"
-msgstr ""
+msgstr "クロップ画像"
 
 msgctxt "Languages::tt_mobile_app.crop_when_resize"
 msgid "If ticked, some part of an image might be lost (cut out) when it's resized, otherwise transparent borders might be added."
@@ -261,7 +297,7 @@ msgid "Update texts using existing locale files"
 msgstr ""
 
 msgctxt "Languages::mobile_app.invalid_locale_file"
-msgid "Invalid locale file selected for the \"[language]\" language"
+msgid "Locale file selected for the \"[language]\" language is not a valid JSON file"
 msgstr ""
 
 msgctxt "Languages::mobile_app.app_translation_updated.item"
@@ -414,39 +450,39 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_arizona"
 msgid "Arizona"
-msgstr ""
+msgstr "アリゾナ"
 
 msgctxt "Languages::mobile_app.mobile_ariege"
 msgid "Ariège"
-msgstr ""
+msgstr "アリエージュ"
 
 msgctxt "Languages::mobile_app.mobile_arkansas"
 msgid "Arkansas"
-msgstr ""
+msgstr "アーカンソー"
 
 msgctxt "Languages::mobile_app.mobile_armenia"
 msgid "Armenia"
-msgstr ""
+msgstr "アルメニア"
 
 msgctxt "Languages::mobile_app.mobile_aruba"
 msgid "Aruba"
-msgstr ""
+msgstr "アルバ"
 
 msgctxt "Languages::mobile_app.mobile_ascoli_piceno"
 msgid "Ascoli Piceno"
-msgstr ""
+msgstr "アスコリ・ピチェーノ"
 
 msgctxt "Languages::mobile_app.mobile_asia_pacific"
 msgid "Asia-Pacific"
-msgstr ""
+msgstr "アジア太平洋地域"
 
 msgctxt "Languages::mobile_app.mobile_asti"
 msgid "Asti"
-msgstr ""
+msgstr "アスティ"
 
 msgctxt "Languages::mobile_app.mobile_astrahanskaja_oblast"
 msgid "Astrahanskaja oblast'"
-msgstr ""
+msgstr "アストラハン"
 
 msgctxt "Languages::mobile_app.mobile_asturias"
 msgid "Asturias"
@@ -1262,6 +1298,10 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_fiji"
 msgid "Fiji"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_filter"
+msgid "Filter"
 msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_finistere"
@@ -3004,6 +3044,14 @@ msgctxt "Languages::mobile_app.mobile_selkirkshire"
 msgid "Selkirkshire"
 msgstr ""
 
+msgctxt "Languages::mobile_app.mobile_seller"
+msgid "Seller"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_sellers"
+msgid "Sellers"
+msgstr ""
+
 msgctxt "Languages::mobile_app.mobile_senegal"
 msgid "Senegal"
 msgstr ""
@@ -3804,6 +3852,10 @@ msgctxt "Languages::mobile_app.mobile_clear_all_cart"
 msgid "Clear all cart ?"
 msgstr "カートを空にしますか?"
 
+msgctxt "Languages::mobile_app.mobile_clear_all_filter"
+msgid "Clear all"
+msgstr ""
+
 msgctxt "Languages::mobile_app.mobile_clear_wish_list"
 msgid "Clear wish list?"
 msgstr "ほしい物リストの消去をしますか？"
@@ -3883,6 +3935,10 @@ msgstr "リストは空です"
 msgctxt "Languages::mobile_app.mobile_login"
 msgid "Login"
 msgstr "ログイン"
+
+msgctxt "Languages::mobile_app.mobile_logout"
+msgid "Logout"
+msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_looking_for_ideas"
 msgid "Looking for ideas?"
@@ -4188,6 +4244,10 @@ msgctxt "Languages::mobile_app.mobile_name"
 msgid "Name"
 msgstr ""
 
+msgctxt "Languages::mobile_app.mobile_description_optional"
+msgid "Description (optional)"
+msgstr ""
+
 msgctxt "Languages::mobile_app.mobile_description"
 msgid "Description"
 msgstr ""
@@ -4274,5 +4334,45 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_free_shipping"
 msgid "Free shipping"
+msgstr ""
+
+msgctxt "Languages::mobile_app.promotion"
+msgid "Promotion"
+msgstr ""
+
+msgctxt "Languages::mobile_app.app_store_app_id"
+msgid "App Store application ID"
+msgstr ""
+
+msgctxt "Languages::mobile_app.google_play_app_id"
+msgid "Google Play application ID"
+msgstr ""
+
+msgctxt "Languages::mobile_app.promotion_note"
+msgid "Visitors of your site who use iOS or Android devices will see a prompt to install the mobile application.<br>To show your application's icon in this prompt, <a href=\"[icon_url]\">upload App Icon</a> in the add-on settings. If App Icon is not specified, the favicon of a storefront will be used instead."
+msgstr ""
+
+msgctxt "Languages::mobile_app.we_also_have_a_mobile_app"
+msgid "We also have a mobile app"
+msgstr ""
+
+msgctxt "Languages::mobile_app.view_demo"
+msgid "View demo"
+msgstr ""
+
+msgctxt "Languages::mobile_app.open"
+msgid "Open"
+msgstr ""
+
+msgctxt "Languages::mobile_app.app_store_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://www.apple.com/app-store\" target=\"_blank\">App Store</a>. <br> For example, in https://apps.apple.com/us/app/multi-vendor-app-by-cs-cart/id1304872157 the ID is 1304872157."
+msgstr ""
+
+msgctxt "Languages::mobile_app.google_play_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://play.google.com/store\" target=\"_blank\">Google Play</a>. <br> For example, in https://play.google.com/store/apps/details?id=com.simtech.multivendor&hl=en_US the ID is com.simtech.multivendor."
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_yookassa"
+msgid "YooKassa"
 msgstr ""
 

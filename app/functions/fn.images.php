@@ -52,12 +52,17 @@ function fn_attach_absolute_image_paths(&$image_data, $object_type)
     $image_data['relative_path'] = $image_data['http_image_path'] = $image_data['https_image_path'] = $image_data['absolute_path'] = '';
 
     if (!empty($image_data['image_path'])) {
+
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        $url = $storefront->url;
+
         $image_name = $image_data['image_path'];
         $image_data['relative_path'] = $path . '/' . $image_name;
-        $image_data['http_image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, 'http');
-        $image_data['https_image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, 'https');
+        $image_data['http_image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, 'http', $url);
+        $image_data['https_image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, 'https', $url);
         $image_data['absolute_path'] = Storage::instance('images')->getAbsolutePath($path . '/' . $image_name);
-        $image_data['image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name);
+        $image_data['image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, '', $url);
     }
 
     fn_set_hook('attach_absolute_image_paths', $image_data, $object_type, $path, $image_name);
@@ -68,17 +73,18 @@ function fn_attach_absolute_image_paths(&$image_data, $object_type)
 /**
  * Function creates or updates image
  *
- * @param mixed $image_data Array with image data
- * @param int $image_id Image ID
- * @param string $image_type Type (object) of image (may be product, category, and so on)
- * @param string $lang_code 2 letters language code
- * @param bool $is_clone True if image is copied from an existing image object
+ * @param array{name: string, path: string, params?: array<string, string>, size: int} $image_data Array with image data
+ * @param int                                                                          $image_id   Image ID
+ * @param string                                                                       $image_type Type (object) of image (may be product, category, and so on)
+ * @param string                                                                       $lang_code  Two letters language code
+ * @param bool                                                                         $is_clone   True if image is copied from an existing image object
+ *
  * @return int Updated or inserted image ID. False on failure.
  */
-function fn_update_image($image_data, $image_id = 0, $image_type = 'product', $lang_code = CART_LANGUAGE, $is_clone = false)
+function fn_update_image(array $image_data, $image_id = 0, $image_type = 'product', $lang_code = CART_LANGUAGE, $is_clone = false)
 {
     $images_path = $image_type . '/' . fn_get_image_subdir($image_id) . '/';
-    $_data = array();
+    $_data = [];
 
     list($_data['image_x'], $_data['image_y'], $mime_type) = fn_get_image_size($image_data['path']);
 
@@ -89,7 +95,11 @@ function fn_update_image($image_data, $image_id = 0, $image_type = 'product', $l
     }
 
     // Check if image path already set
-    $image_path = db_get_field("SELECT image_path FROM ?:images WHERE image_id = ?i", $image_id);
+    if ($image_id) {
+        $image_path = db_get_field('SELECT image_path FROM ?:images WHERE image_id = ?i', $image_id);
+    } else {
+        $image_path = null;
+    }
 
     // Delete existing image
     if (!empty($image_path)) {
@@ -114,9 +124,9 @@ function fn_update_image($image_data, $image_id = 0, $image_type = 'product', $l
      */
     fn_set_hook('update_image', $image_data, $image_id, $image_type, $images_path, $_data, $mime_type, $is_clone);
 
-    $params = array(
+    $params = [
         'file' => $image_data['path'],
-    );
+    ];
 
     if (!empty($image_data['params'])) {
         $params = fn_array_merge($params, $image_data['params']);
@@ -127,9 +137,9 @@ function fn_update_image($image_data, $image_id = 0, $image_type = 'product', $l
     $_data['image_path'] = fn_basename($_data['image_path']); // we need to store file name only
 
     if (!empty($image_id)) {
-        db_query("UPDATE ?:images SET ?u WHERE image_id = ?i", $_data, $image_id);
+        db_query('UPDATE ?:images SET ?u WHERE image_id = ?i', $_data, $image_id);
     } else {
-        $image_id = db_query("INSERT INTO ?:images ?e", $_data);
+        $image_id = db_query('INSERT INTO ?:images ?e', $_data);
     }
 
     return $image_id;
@@ -280,7 +290,7 @@ function fn_get_image_pairs($object_ids, $object_type, $pair_type, $get_icon = t
 
     if (is_array($object_ids)) {
         $cond = $object_ids
-            ? db_quote('AND ?:images_links.object_id IN (?a)', $object_ids)
+            ? db_quote('AND ?:images_links.object_id IN (?n)', $object_ids)
             : db_quote('AND ?:images_links.object_id IS NULL'); // backward compatibility: prevents SQL empty array deprecation notice
     } else {
         $cond = db_quote('AND ?:images_links.object_id = ?s', $object_ids);
@@ -504,11 +514,13 @@ function fn_update_image_pairs($icons, $detailed, $pairs_data, $object_id = 0, $
                     $p_data['type']
                 );
                 $pair_id = !empty($pair_data['pair_id']) ? $pair_data['pair_id'] : 0;
-            } else {
+            } elseif ($pair_id) {
                 $pair_data = db_get_row('SELECT image_id, detailed_id FROM ?:images_links WHERE pair_id = ?i', $pair_id);
                 if (empty($pair_data)) {
                     $pair_id = 0;
                 }
+            } else {
+                $pair_data = [];
             }
 
             // Update detailed image
@@ -1018,17 +1030,17 @@ function fn_get_image_subdir($image_id = 0)
  * @param string $object_type The type of object
  * @param int    $object_id   Object identifier
  * @param string $lang_code   Two-letters languag code
- * @param array  $object_ids  Array of object identifiers
+ * @param int[]  $object_ids  Array of object identifiers
  *
- * @return array
+ * @return int[]
  */
-function fn_attach_image_pairs($name, $object_type, $object_id = 0, $lang_code = CART_LANGUAGE, $object_ids = array())
+function fn_attach_image_pairs($name, $object_type, $object_id = 0, $lang_code = CART_LANGUAGE, array $object_ids = [])
 {
     // @TODO: get rid of direct $_REQUEST array usage inside this function and fn_filter_uploaded_data too
-    $allowed_extensions = array('png', 'gif', 'jpg', 'jpeg', 'ico');
+    $allowed_extensions = ['png', 'gif', 'jpg', 'jpeg', 'ico'];
     $icons = fn_filter_uploaded_data($name . '_image_icon', $allowed_extensions);
     $detailed = fn_filter_uploaded_data($name . '_image_detailed', $allowed_extensions);
-    $pairs_data = !empty($_REQUEST[$name . '_image_data']) ? $_REQUEST[$name . '_image_data'] : array();
+    $pairs_data = !empty($_REQUEST[$name . '_image_data']) ? $_REQUEST[$name . '_image_data'] : [];
 
     return fn_update_image_pairs($icons, $detailed, $pairs_data, $object_id, $object_type, $object_ids, true, $lang_code);
 }
@@ -1042,10 +1054,11 @@ function fn_attach_image_pairs($name, $object_type, $object_id = 0, $lang_code =
  * @param bool   $lazy            lazy generation - returns script URL that generates thumbnail
  * @param bool   $return_rel_path Return relative path
  * @param array  $image           An array of image object in the database, for which the thumbnail will be generated.
+ * @param string $url             Input URL
  *
  * @return string path
  */
-function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, $return_rel_path = false, array $image = [])
+function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, $return_rel_path = false, array $image = [], $url = '')
 {
     /**
      * Actions before thumbnail generate
@@ -1134,13 +1147,23 @@ function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, 
     fn_set_hook('generate_thumbnail_post', $th_filename, $lazy, $image_path, $width, $height, $image);
 
     if (!$return_rel_path && $th_filename) {
-        $th_filename = Storage::instance('images')->getUrl($th_filename);
+        $th_filename = Storage::instance('images')->getUrl($th_filename, '', $url);
     }
 
     return !empty($th_filename) ? $th_filename : '';
 }
 
-function fn_image_to_display($images, $image_width = 0, $image_height = 0)
+/**
+ * Generates thumbnail with given size from image
+ *
+ * @param array{image_x: int|float, image_y: int|float, image_path: string, alt: string, absolute_path: string, relative_path: string, icon: array{image_x: int|float, image_y: int|float, image_path: string, alt: string, absolute_path: string, relative_path: string}, detailed: array{image_x: int|float, image_y: int|float, image_path: string, alt: string, absolute_path: string, relative_path: string}} $images       Array with initial images
+ * @param int|float                                                                                                                                                                                                                                                                                                                                                                                                $image_width  Result image width
+ * @param int|float                                                                                                                                                                                                                                                                                                                                                                                                $image_height Result image height
+ * @param string                                                                                                                                                                                                                                                                                                                                                                                                   $url          Input URL
+ *
+ * @return array<empty, empty>|array{image_path:string, detailed_image_path:string, alt:string, width:int, height:int, absolute_path:string, generate_image:bool, is_thumbnail:bool} Image data
+ */
+function fn_image_to_display($images, $image_width = 0, $image_height = 0, $url = '')
 {
     if (empty($images)) {
         return [];
@@ -1189,7 +1212,8 @@ function fn_image_to_display($images, $image_width = 0, $image_height = 0)
             $image_height,
             Registry::get('config.tweaks.lazy_thumbnails'),
             false,
-            $images
+            $images,
+            $url
         );
         $is_thumbnail = true;
     } else {

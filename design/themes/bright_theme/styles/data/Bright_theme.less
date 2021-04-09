@@ -1486,7 +1486,7 @@ but it's slower:
 }
 
 h3.ty-social-link__title {
-  font-size: 16px !important;
+  font-size: 15px !important;
   font-family: @headings_font;
   font-weight: bold;
   text-transform: uppercase;
@@ -1503,12 +1503,12 @@ h3.ty-social-link__title {
 @media screen and (max-width: 767px){
   h3.ty-social-link__title{
     margin-top: 0;
+    display: block;
   }
 }
 
 .ty-social-link {
   top: 0;
-  margin-right: 0;
 }
 
 /* ==========================================================================
@@ -1999,7 +1999,7 @@ Smarty blocks
 @promo_container_bg_color__secondary: #ffe400;
 @with_side_icon_font_size: 36px;
 @subscribe_button_size: 16px;
-@subscribe_button_padding: 6px 15px 5.5px 15px;
+@subscribe_button_padding: 6px 8px 5.5px 8px;
 @subscribe_button: @secondary_button;
 
 // ========================================================= Payments icons
@@ -2118,7 +2118,8 @@ Banners
 /* Content pages: Menu items
    ========================================================================== */
 
-.ty-menu-item__sale .ty-menu__item-link {
+.ty-menu-item__sale .ty-menu__item-link,
+.ty-menu-item__promotions .ty-menu__item-link {
   color: #FE7400 !important;
   font-weight: bold;
 }
@@ -2167,8 +2168,13 @@ Banners
     margin: 0;
     padding-top: 2px;
 
-    @media screen and (max-width: 767px){
+    @media (max-width: 767px) {
       padding-top: 15px;
+    }
+  }
+  .ty-footer-menu__icon-open, .ty-footer-menu__icon-hide {
+    @media (max-width: 767px) {
+      top: 18px;
     }
   }
 }

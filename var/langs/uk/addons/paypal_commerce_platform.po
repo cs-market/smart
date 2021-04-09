@@ -8,13 +8,13 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.11.5/addons/paypal_commerce_platform.po\n"
-"X-Crowdin-File-ID: 3620\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/paypal_commerce_platform.po\n"
+"X-Crowdin-File-ID: 4174\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::paypal_commerce_platform"
 msgid "PayPal Commerce Platform"
-msgstr ""
+msgstr "PayPal Commerce Platform"
 
 msgctxt "Addons::description::paypal_commerce_platform"
 msgid "This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
@@ -34,11 +34,11 @@ msgstr "Комісія з замовлення"
 
 msgctxt "SettingsVariants::paypal_commerce_platform::collect_payouts::Y"
 msgid "Order commission and unpaid payouts"
-msgstr ""
+msgstr "Комісія з замовлення і невиплачені виплати"
 
 msgctxt "SettingsOptions::paypal_commerce_platform::rma_refunded_order_status"
 msgid "Order status on refund"
-msgstr ""
+msgstr "Статус замовлення після повернення"
 
 msgctxt "Languages::paypal_commerce_platform.paypal_commerce_platform"
 msgid "PayPal Commerce Platform"
@@ -62,11 +62,11 @@ msgstr "App Secret"
 
 msgctxt "Languages::paypal_commerce_platform.connect_with_paypal"
 msgid "Connect with PayPal"
-msgstr ""
+msgstr "З'єднання до PayPal"
 
 msgctxt "Languages::paypal_commerce_platform.disconnect"
 msgid "Disconnect account"
-msgstr ""
+msgstr "Відключення облікового запису"
 
 msgctxt "Languages::paypal_commerce_platform.paypal_account"
 msgid "PayPal account"
@@ -78,67 +78,67 @@ msgstr "Підключено"
 
 msgctxt "Languages::paypal_commerce_platform.not_connected"
 msgid "Not connected"
-msgstr ""
+msgstr "Не підключено"
 
 msgctxt "Languages::paypal_commerce_platform.account_connected"
 msgid "Your PayPal account has been successfully connected to the store"
-msgstr ""
+msgstr "Обліковий запис PayPal успішно підключився до магазину"
 
 msgctxt "Languages::paypal_commerce_platform.account_connection_failure"
 msgid "Unable to connect your PayPal account to the store"
-msgstr ""
+msgstr "Неможливо підключити ваш обліковий запис PayPal до магазину"
 
 msgctxt "Languages::paypal_commerce_platform.account_disconnected"
 msgid "Your PayPal account has been successfully disconnected from the store"
-msgstr ""
+msgstr "Обліковий запис PayPal успішно відключився від магазину"
 
 msgctxt "Languages::paypal_commerce_platform.withdrawal_for_the_order"
 msgid "Withdrawal for the order #[order_id]"
-msgstr ""
+msgstr "Виплата за замовлення #[order_id]"
 
 msgctxt "Languages::paypal_commerce_platform.refund_id"
 msgid "Refund transaction ID in PayPal"
-msgstr ""
+msgstr "ID транзакції повернення в PayPal"
 
 msgctxt "Languages::paypal_commerce_platform.withdrawal"
 msgid "Withdrawal amount"
-msgstr ""
+msgstr "Сума виплати"
 
 msgctxt "Languages::paypal_commerce_platform.rma.perform_refund"
 msgid "Give a refund via PayPal Commerce Platform"
-msgstr ""
+msgstr "Повернути гроші через PayPal Commerce Platform"
 
 msgctxt "Languages::ttc_paypal_commerce_platform.rma.perform_refund"
 msgid "A refund will be made once an administrator changes the return request status"
-msgstr ""
+msgstr "Повернення коштів буде зроблено відразу після того, як адміністратор змінить статус запиту"
 
 msgctxt "Languages::paypal_commerce_platform.rma.refund_performed"
 msgid "The refund has been made via PayPal Commerce Platform"
-msgstr ""
+msgstr "Відшкодування здійснено через PayPal Commerce Platform"
 
 msgctxt "Languages::paypal_commerce_platform.order_id"
 msgid "Order ID in PayPal"
-msgstr ""
+msgstr "ID замовлення в PayPal"
 
 msgctxt "Languages::paypal_commerce_platform.capture_id"
 msgid "Capture ID in PayPal"
-msgstr ""
+msgstr "Capture ID в PayPal"
 
 msgctxt "Languages::paypal_commerce_platform.payout_id"
 msgid "Payout transaction ID in PayPal"
-msgstr ""
+msgstr "ID транзакції виплати в PayPal"
 
 msgctxt "Languages::paypal_commerce_platform.payout_failure_reason"
 msgid "Payout failure reason"
-msgstr ""
+msgstr "Причина несправності виплат"
 
 msgctxt "Languages::paypal_commerce_platform.own_account_cant_be_used_for_vendor"
 msgid "Your own PayPal account can't be used to connect a vendor to the store"
-msgstr ""
+msgstr "Не можна використовувати власний обліковий запис PayPal для підключення продавця до магазину"
 
 msgctxt "Languages::ttc_paypal_commerce_platform.rma.order_status_on_refund"
 msgid "Determines whether or not to change the order status after a refund was performed via the RMA add-on."
-msgstr ""
+msgstr "Визначає, чи змінювати статус замовлення після того, як буде виконано повернення через модуль \"Повернення товарів\"."
 
 msgctxt "Languages::paypal_commerce_platform.do_not_change"
 msgid "Do not change"
@@ -146,27 +146,27 @@ msgstr "Залишити без змін"
 
 msgctxt "Languages::paypal_commerce_platform.set_status_to"
 msgid "Set to:"
-msgstr ""
+msgstr "Обрати статус:"
 
 msgctxt "Languages::paypal_commerce_platform.webhook_help_message"
 msgid "Specify the following URL when configuring a webhook for your REST application:"
-msgstr ""
+msgstr "Вкажіть наступну URL-адресу під час налаштування веб-ключа для REST додатку:"
 
 msgctxt "Languages::paypal_commerce_platform.webhook"
 msgid "PayPal Commerce Platform webhook: [payload]"
-msgstr ""
+msgstr "Веб-хук PayPal Commerce Platform: [payload]"
 
 msgctxt "Languages::paypal_commerce_platform.settings.account"
 msgid "Account settings"
-msgstr ""
+msgstr "Налаштування аккаунта"
 
 msgctxt "Languages::paypal_for_markeplaces.settings.enable_funding"
 msgid "Funding sources to show on checkout"
-msgstr ""
+msgstr "Способи оплати при оформленні замовлення"
 
 msgctxt "Languages::paypal_commerce_platform.funding.card"
 msgid "Credit or debit cards"
-msgstr ""
+msgstr "Дебетові або кредитні карти"
 
 msgctxt "Languages::paypal_commerce_platform.funding.credit"
 msgid "PayPal Credit"
@@ -210,7 +210,7 @@ msgstr "Sofort"
 
 msgctxt "Languages::paypal_for_markeplaces.settings.enable_cards"
 msgid "Cards to show on checkout"
-msgstr ""
+msgstr "Карти на сторінці оформлення замовлення"
 
 msgctxt "Languages::paypal_commerce_platform.card.visa"
 msgid "Visa"
@@ -283,4 +283,12 @@ msgstr "Прямокутні"
 msgctxt "Languages::paypal_commerce_platform.style.height"
 msgid "Height"
 msgstr "Висота"
+
+msgctxt "Languages::paypal_commerce_platform.bn_code"
+msgid "Partner integration code"
+msgstr "Код інтеграції партнера"
+
+msgctxt "Languages::paypal_commerce_platform.debug_id"
+msgid "PayPal Debug ID"
+msgstr "PayPal Debug ID"
 

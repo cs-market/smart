@@ -39,7 +39,7 @@
         {if $params_schema}
             {foreach from=$params_schema key=name item=field}
                 <div class="control-group">
-                    <label class="control-label" for="elm_internal_template_params_{$id}_{$name}">{__($field.title)}{if $field.description}{include file="common/tooltip.tpl" tooltip=__($field.description)}{/if}:</label>
+                    <label class="control-label" for="elm_internal_template_params_{$id}_{$name}">{__($field.title)}:</label>
                     <div class="controls">
 
                         {if $field.type == 'checkbox'}
@@ -64,6 +64,9 @@
                             <textarea id="elm_internal_template_params_{$id}_{$name}" name="internal_template[params][{$name}]" cols="55" rows="3" class="span9">{$params.$name}</textarea>
                         {else}
                             <input type="text" id="elm_internal_template_params_{$id}_{$name}" name="internal_template[params][{$name}]" value="{$params.$name}" />
+                        {/if}
+                        {if $field.description}
+                            <p class="muted description">{__($field.description)}</p>
                         {/if}
                     </div>
                 </div>
@@ -156,8 +159,7 @@
 {/capture}
 
 {include file="common/mainbox.tpl"
-    title_start=__("editing_internal_template")
-    title_end=$internal_template->getName()
+    title=$internal_template->getName()
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
     sidebar=$smarty.capture.sidebar

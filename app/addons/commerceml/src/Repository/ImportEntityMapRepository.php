@@ -320,6 +320,43 @@ class ImportEntityMapRepository
     }
 
     /**
+     * Removes map by external ID
+     *
+     * @param string     $entity_type Entity type
+     * @param string|int $external_id External ID
+     *
+     * @return void
+     */
+    public function removeByExternalId($entity_type, $external_id)
+    {
+        $this->removeByExternalIds($entity_type, [$external_id]);
+    }
+
+    /**
+     * Removes map by external IDs
+     *
+     * @param string            $entity_type  Entity type
+     * @param array<string|int> $external_ids External IDs
+     *
+     * @return void
+     */
+    public function removeByExternalIds($entity_type, array $external_ids)
+    {
+        $external_ids = array_filter($external_ids);
+
+        if (empty($external_ids)) {
+            return;
+        }
+
+        $this->db->query(
+            'DELETE FROM ?:?p WHERE entity_type = ?s AND entity_id IN (?a)',
+            self::TABLE_NAME,
+            $entity_type,
+            $external_ids
+        );
+    }
+
+    /**
      * Gets summary count of matched entities
      *
      * @param int           $company_id   Company ID

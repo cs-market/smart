@@ -30,6 +30,7 @@
             <label for="poll_results" class="control-label">{__("poll_results")}:</label>
             <div class="controls">
                 <textarea name="page_data[poll_data][results]" id="poll_results" cols="50" rows="5" class="cm-wysiwyg input-textarea-long input-fill">{$page_data.poll.results}</textarea>
+                <p class="muted description">{__("tt_addons_polls_hooks_pages_tabs_content_post_poll_results")}</p>
             </div>
         </div>
 

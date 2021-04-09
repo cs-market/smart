@@ -87,7 +87,7 @@
         {if !$o.import_only}
         <div class="control-group">
             <label for="{$p_id}_{$k}" class="control-label">
-                {__($o.title)}{if $o.description}{include file="common/tooltip.tpl" tooltip=__($o.description)}{/if}:
+                {__($o.title)}:
             </label>
             <div class="controls">
                 {if $o.type == "checkbox"}
@@ -114,7 +114,11 @@
                 {/if}
 
                 {if $o.notes}
-                    <p class="muted">{$o.notes nofilter}</p>
+                    <p class="muted description">{$o.notes nofilter}</p>
+                {/if}
+
+                {if $o.description}
+                    <p class="muted description">{__($o.description)}</p>
                 {/if}
             </div>
         </div>
@@ -139,6 +143,7 @@
         <label for="output" class="control-label">{__("output")}:</label>
         <div class="controls">
             {include file="views/exim/components/csv_output.tpl" name="export_options[output]" value=$active_layout.options.output}
+            <p class="muted description">{__("tt_views_exim_export_output")}</p>
         </div>
     </div>
     {/if}
@@ -147,9 +152,9 @@
         <div class="controls">
             <input type="text" name="export_options[filename]" id="filename" size="50" class="input-large" value="{if $pattern.filename}{$pattern.filename}{else}{$p_id}_{$active_layout.name}_{$smarty.const.TIME|date_format:"%m%d%Y"}.csv{/if}" />
             {assign var="filename_description" value=$pattern.filename_description}
-            {if $pattern.filename_description}<p><small>{__($filename_description)}</small></p>{/if}
+            {if $pattern.filename_description}<p class="muted description">{__($filename_description)}</p>{/if}
 
-            <p class="muted">
+            <p class="muted description">
                 {__('text_file_editor_notice', ["[href]" => "file_editor.manage?path=/"|fn_url])}
             </p>
         </div>
@@ -163,27 +168,27 @@
 {assign var="c_url" value=$config.current_url|escape:url}
 <div class="hidden" title="{__("exported_files")}" id="content_exported_files">
 {if $export_files}
-    <div class="table-wrapper">
-        <table class="table">
+    <div class="table-wrapper table-responsive-wrapper">
+        <table class="table table-responsive">
         <thead>
             <tr>
-                <th width="70%">{__("filename")}</th>
+                <th width="65%">{__("filename")}</th>
                 <th width="20%">{__("filesize")}</th>
-                <th width="10%">&nbsp;</th>
+                <th width="15%">&nbsp;</th>
             </tr>
         </thead>
         <tbody>
         {foreach from=$export_files item=file name="export_files"}
         {assign var="file_name" value=$file.name|escape:"url"}
         <tr>
-            <td>
+            <td data-th="{__("filename")}">
                 <a href="{"exim.get_file?filename=`$file_name`"|fn_url}">{$file.name}</a></td>
-            <td>
+            <td data-th="{__("filesize")}">
                 {$file.size|number_format}&nbsp;{__("bytes")}</td>
-            <td class="right">
+            <td class="right" data-th="&nbsp;">
                 <div class="hidden-tools">
-                    <a href="{"exim.get_file?filename=`$file_name`"|fn_url}" title="{__("download")}" class="cm-tooltip icon-download"></a>    
-                    <a class="cm-ajax cm-confirm cm-post icon-trash cm-tooltip" title="{__("delete")}" href="{"exim.delete_file?filename=`$file_name`&redirect_url=`$c_url`"|fn_url}" data-ca-target-id="content_exported_files"></a>
+                    <a href="{"exim.get_file?filename=`$file_name`"|fn_url}" title="{__("download")}" class="cm-tooltip btn"><i class="icon-download"></i></a>
+                    <a class="cm-ajax cm-confirm cm-post btn cm-tooltip" title="{__("delete")}" href="{"exim.delete_file?filename=`$file_name`&redirect_url=`$c_url`"|fn_url}" data-ca-target-id="content_exported_files"><i class="icon-trash"></i></a>
                 </div>
             </td>
         </tr>
@@ -209,7 +214,17 @@
 
 {/capture}
 
-{include file="common/mainbox.tpl" title=__("export_data") buttons=$smarty.capture.buttons content=$smarty.capture.mainbox}
+{if ("MULTIVENDOR"|fn_allowed_for)}
+    {$show_all_storefront = false}
+{/if}
+
+{include file="common/mainbox.tpl"
+    title=__("export_data")
+    buttons=$smarty.capture.buttons
+    content=$smarty.capture.mainbox
+    select_storefront=true
+    show_all_storefront=$show_all_storefront
+}
 
 {if $smarty.request.output == "D"}
 <meta http-equiv="Refresh" content="0;URL={"exim.get_file?filename=`$smarty.request.filename`"|fn_url}" />

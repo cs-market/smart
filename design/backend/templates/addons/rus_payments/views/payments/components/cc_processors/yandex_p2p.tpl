@@ -1,8 +1,9 @@
 {if $settings.Security.secure_storefront === "YesNo::YES"|enum}
-    {assign var="redirect_url" value="payment_notification.process?payment=yandex_p2p"|fn_url:'C':'https'}
+    {$redirect_url = fn_url("", "SiteArea::STOREFRONT"|enum, "https")|replace:$config.customer_index:""|rtrim:"/"}
 {else}
-    {assign var="redirect_url" value="payment_notification.process?payment=yandex_p2p"|fn_url:'C':'http'}
+    {$redirect_url = fn_url("", "SiteArea::STOREFRONT"|enum, "http")|replace:$config.customer_index:""|rtrim:"/"}
 {/if}
+{$redirect_url = "{$redirect_url}/payment_notification/process/yoomoney_p2p"}
 <p>
     {__("text_yandex_money_redirect_url", ["[redirect_url]" => $redirect_url])}
 </p>

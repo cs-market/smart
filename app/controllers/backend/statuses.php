@@ -60,7 +60,7 @@ if ($mode == 'update') {
     Tygh::$app['view']->assign('type', $type);
     Tygh::$app['view']->assign('status_params', fn_get_status_params_definition($type));
 
-    $existing_statuses = fn_array_column($statuses, 'status');
+    $existing_statuses = array_column($statuses, 'status');
     // Orders only
     if ($type == STATUSES_ORDER) {
         Tygh::$app['view']->assign('title', __('order_statuses'));
@@ -92,55 +92,59 @@ if (
 
 function fn_get_status_params_definition($type)
 {
-    $status_params = array();
+    $status_params = [];
 
     if ($type == STATUSES_ORDER) {
-        $status_params = array (
-            'color' => array (
+        $status_params = [
+            'color' => [
                 'type' => 'color',
                 'label' => 'color'
-            ),
-            'notify' => array (
+            ],
+            'notify' => [
                 'type' => 'checkbox',
                 'label' => 'notify_customer',
                 'default_value' => 'Y'
-            ),
-            'notify_department' => array (
+            ],
+            'notify_department' => [
                 'type' => 'checkbox',
                 'label' => 'notify_orders_department'
-            ),
-            'notify_vendor' => array (
+            ],
+            'notify_vendor' => [
                 'type' => 'checkbox',
                 'label' => 'notify_vendor'
-            ),
-            'inventory' => array (
+            ],
+            'inventory' => [
                 'type' => 'select',
                 'label' => 'inventory',
-                'variants' => array (
+                'variants' => [
                     'I' => 'increase',
                     'D' => 'decrease',
-                ),
-            ),
-            'remove_cc_info' => array (
+                ],
+            ],
+            'payment_received' => [
+                'type'  => 'checkbox',
+                'label' => 'settled_order_status'
+            ],
+            'remove_cc_info' => [
                 'type' => 'checkbox',
                 'label' => 'remove_cc_info',
                 'default_value' => 'Y'
-            ),
-            'repay' => array (
+            ],
+            'repay' => [
                 'type' => 'checkbox',
                 'label' => 'pay_order_again'
-            ),
-            'appearance_type' => array (
+            ],
+            'appearance_type' => [
                 'type' => 'select',
                 'label' => 'invoice_credit_memo',
-                'variants' => array (
+                'variants' => [
                     'D' => 'default',
                     'I' => 'invoice',
                     'C' => 'credit_memo',
                     'O' => 'order'
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         if (fn_allowed_for('MULTIVENDOR')) {
             $status_params['calculate_for_payouts'] = array(
                 'type' => 'checkbox',

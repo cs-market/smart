@@ -1,7 +1,7 @@
 {if "ULTIMATE"|fn_allowed_for && !$runtime.company_id}
 <div id="wt_settings_block">
-    <div class="right update-for-all">
-        {include file="buttons/update_for_all.tpl" display=true object_id="wt_settings" name="wt_settings[update_all_vendors]" hide_element="wt_settings_block"}
+    <div class="right">
+        {include file="buttons/update_for_all.tpl" display=true object_id="wt_settings" name="wt_settings[update_all_vendors]" hide_element="wt_settings_block" meta="cm-wt-settings-update-for-all"}
     </div>
 {/if}
 
@@ -138,7 +138,7 @@ var $ = Tygh.$;
     $('#wt_settings_block').find(':input').prop('disabled', true);
 {/if}
 {literal}
-    $('.cm-update-for-all-icon[data-ca-disable-id=wt_settings]').on('click', function() {
+    $('.cm-wt-settings-update-for-all').on('click', function() {
         $(this).toggleClass('visible');
         $('#wt_settings_block').find(':input').prop('disabled', !$(this).hasClass('visible'));
         if ($(this).hasClass('visible')) {

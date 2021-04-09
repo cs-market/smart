@@ -25,6 +25,7 @@
             <p class="{if $form[$smarty.const.FORM_SUBJECT] !== "0"}hidden{/if}" id="form_subject_text">
                 <input type="text" name="page_data[form][general][{$smarty.const.FORM_SUBJECT_TEXT}]" value="{$form[$smarty.const.FORM_SUBJECT_TEXT]}" />
             </p>
+            <p class="muted description">{__("ttc_addons.form_builder.email_subject_field")}</p>
         </div>
         <script>
             (function(_, $) {
@@ -38,14 +39,14 @@
             })(Tygh, Tygh.$);
         </script>
     </div>
-    
+
     <div class="control-group">
         <label for="form_submit_text" class="control-label">{__("form_submit_text")}:</label>
         {assign var="form_submit_const" value=$smarty.const.FORM_SUBMIT}
         <div class="controls">
             <textarea id="form_submit_text" class="cm-wysiwyg input-textarea-long" rows="5" cols="50" name="page_data[form][general][{$form_submit_const}]" rows="5">{$form.$form_submit_const}</textarea>
         </div>
-        
+
     </div>
 
     <div class="control-group">

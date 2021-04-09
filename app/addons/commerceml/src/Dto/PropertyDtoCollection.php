@@ -93,15 +93,23 @@ class PropertyDtoCollection implements IteratorAggregate, Countable
     /**
      * Gets values map
      *
-     * @return array<string, string>
+     * @param array<string> $exclude_list Exclude list
+     *
+     * @return array<string, string|array<int|string, int|string>|mixed>
      */
-    public function getValueMap()
+    public function getValueMap(array $exclude_list = [])
     {
         $map = [];
 
         /** @var \Tygh\Addons\CommerceML\Dto\PropertyDto $property */
         foreach ($this->collections as $property) {
-            $map[$property->property_id] = (string) $property->value;
+            if ($exclude_list && in_array($property->property_id, $exclude_list, true)) {
+                continue;
+            }
+
+            $map[$property->property_id] = ($property->value instanceof ProductPropertyValue)
+                ? $property->value->getPropertyValue()
+                : (string) $property->value;
         }
 
         return $map;
@@ -110,17 +118,21 @@ class PropertyDtoCollection implements IteratorAggregate, Countable
     /**
      * Gets translatable values map
      *
-     * @param string $lang_code Language code (en, ru, etc)
+     * @param string        $lang_code    Language code (en, ru, etc)
+     * @param array<string> $exclude_list Exclude list
      *
      * @return array<string, string>
      */
-    public function getTranslatableValueMap($lang_code)
+    public function getTranslatableValueMap($lang_code, array $exclude_list = [])
     {
         $map = [];
 
         /** @var \Tygh\Addons\CommerceML\Dto\PropertyDto $property */
         foreach ($this->collections as $property) {
             if (!$property->value instanceof TranslatableValueDto || !$property->value->hasTraslate($lang_code)) {
+                continue;
+            }
+            if ($exclude_list && in_array($property->property_id, $exclude_list, true)) {
                 continue;
             }
 

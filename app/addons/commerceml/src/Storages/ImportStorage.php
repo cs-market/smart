@@ -16,6 +16,8 @@
 namespace Tygh\Addons\CommerceML\Storages;
 
 
+use Tygh\Addons\CommerceML\Dto\IdDto;
+use Tygh\Addons\CommerceML\Dto\LocalIdDto;
 use Tygh\Addons\CommerceML\Dto\ImportDto;
 use Tygh\Addons\CommerceML\Dto\ImportItemDto;
 use Tygh\Addons\CommerceML\Dto\RepresentSubEntityDto;
@@ -126,7 +128,10 @@ class ImportStorage
 
         /** @var RepresentEntityDto $entity */
         foreach ($entities as $entity) {
-            if (isset($this->mappable_entity_types[$entity->getEntityType()]) && $this->findEntityLocalId($entity) === null) {
+            if (
+                isset($this->mappable_entity_types[$entity->getEntityType()])
+                && $this->findEntityLocalId($entity->getEntityType(), $entity->getEntityId())->isNullValue()
+            ) {
                 $this->mapEntityId($entity);
             }
 
@@ -174,43 +179,29 @@ class ImportStorage
     /**
      * Finds local ID for entity
      *
-     * @param \Tygh\Addons\CommerceML\Dto\RepresentEntityDto $entity Entity DTO
+     * @param string                            $entity_type   Entity type
+     * @param \Tygh\Addons\CommerceML\Dto\IdDto $id_dto        ID instnace
+     * @param string|int|null                   $default_value Default value
      *
-     * @return string|int|null
+     * @return \Tygh\Addons\CommerceML\Dto\LocalIdDto
      */
-    public function findEntityLocalId(RepresentEntityDto $entity)
+    public function findEntityLocalId($entity_type, IdDto $id_dto, $default_value = null)
     {
-        $local_id = '';
-
-        if ($entity->getEntityId()->hasLocalId()) {
-            $local_id = $entity->getEntityId()->local_id;
+        if ($id_dto->hasLocalId()) {
+            return LocalIdDto::create($id_dto->local_id);
         }
 
-        if (!$local_id) {
-            $local_id = $this->findEntityLocalIdByExternalId(
-                $entity->getEntityType(),
-                $entity->getEntityId()->getId()
-            );
-        }
-
-        return $local_id;
-    }
-
-    /**
-     * Finds local ID by external ID
-     *
-     * @param string $entity_type Entity type
-     * @param string $external_id External ID
-     *
-     * @return string|null
-     */
-    public function findEntityLocalIdByExternalId($entity_type, $external_id)
-    {
-        return $this->import_entity_map_repository->findLocalId(
+        $value = $this->import_entity_map_repository->findLocalId(
             $this->import->company_id,
             $entity_type,
-            $external_id
+            $id_dto->external_id
         );
+
+        if ($value === null) {
+            $value = $default_value;
+        }
+
+        return LocalIdDto::create($value);
     }
 
     /**
@@ -265,6 +256,22 @@ class ImportStorage
             $external_id,
             $local_id,
             $entity_name
+        );
+    }
+
+    /**
+     * Removes mapping by external ID
+     *
+     * @param string $entity_type Entity type
+     * @param string $external_id External ID
+     *
+     * @return void
+     */
+    public function removeMappingByExternalId($entity_type, $external_id)
+    {
+        $this->import_entity_map_repository->removeByExternalId(
+            $entity_type,
+            $external_id
         );
     }
 

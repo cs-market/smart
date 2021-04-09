@@ -48,6 +48,7 @@ class XmlParserTest extends BaseXmlTestCase
             [
                 'property' => [
                     '28b6895a-24a9-11e0-aeec-0015e9b8c48d',
+                    '9d68a9cd-baf9-11e6-853e-60a44c5c87dc'
                 ],
                 'group' => [
                     'bd72d90d-55bc-11d9-848a-00112f43529a',

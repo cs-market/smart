@@ -68,7 +68,7 @@ class ProductFeatureImporterTest extends StorageBasedTestCase
                 '9d67a9cd-baf9-11e6-853e-60a44c5c87dc#9d67a9d0-baf9-11e6-853e-60a44c5c87dc' => '3',
                 '9d67a9cd-baf9-11e6-853e-60a44c5c87dc#' . md5('Другое')                     => '4',
             ],
-            $import_storage->getImportEntityMapRepository()->getMap()
+            $import_storage->getImportEntityMapRepository()->getIdMap()
         );
 
         $this->assertEquals(

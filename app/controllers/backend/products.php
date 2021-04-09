@@ -16,6 +16,7 @@ use Tygh\BlockManager\SchemesManager;
 use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\ProductFeatures;
 use Tygh\Enum\ProductTracking;
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Tools\Url;
 
@@ -529,6 +530,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    if ($mode === 'update_feature') {
+        $lang_code = isset($_REQUEST['lang_code']) ? (string) $_REQUEST['lang_code'] : CART_LANGUAGE;
+        $product_id = isset($_REQUEST['product_id']) ? (int) $_REQUEST['product_id'] : null;
+        $feature_id = isset($_REQUEST['feature_id']) ? (int) $_REQUEST['feature_id'] : null;
+        $feature_value = isset($_REQUEST['feature_value']) ? (string) $_REQUEST['feature_value'] : '';
+
+        if (!$product_id || !$feature_id) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        fn_update_product(['product_features' => [$feature_id => $feature_value]], $product_id, $lang_code);
+
+        if (isset($_REQUEST['return_url'])) {
+            return [CONTROLLER_STATUS_REDIRECT, (string) $_REQUEST['return_url']];
+        } else {
+            return [CONTROLLER_STATUS_REDIRECT, Url::buildUrn('products.update', [
+                'product_id'       => $product_id,
+                'selected_section' => 'features'
+            ])];
+        }
+    }
+
+    if ($mode === 'update_option') {
+        $option_id = isset($_REQUEST['option_id']) ? (int) $_REQUEST['option_id'] : null;
+        $product_id = isset($_REQUEST['product_id']) ? (int) $_REQUEST['product_id'] : null;
+
+        if (!$product_id || !$option_id) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        fn_add_global_option_link($product_id, $option_id);
+
+        if (isset($_REQUEST['return_url'])) {
+            return [CONTROLLER_STATUS_REDIRECT, (string) $_REQUEST['return_url']];
+        } else {
+            return [CONTROLLER_STATUS_REDIRECT, Url::buildUrn('products.update', [
+                'product_id'       => $product_id,
+                'selected_section' => 'options'
+            ])];
+        }
+    }
+
     if ($mode === 'manage') {
         $params = [];
         if (!empty($_REQUEST['company_ids'])) {
@@ -704,32 +747,27 @@ if ($mode == 'add') {
     }
 
     list($product_features, $features_search) = fn_get_paginated_product_features(
-        array('product_id' => $product_data['product_id']),
+        ['product_id' => $product_data['product_id']],
         $auth, $product_data,
         DESCR_SL
     );
 
     $taxes = fn_get_taxes();
+    $allow_save_feature =
+        fn_allowed_for('ULTIMATE')
+        || !fn_get_runtime_company_id()
+        || YesNo::toBool(Registry::get('settings.Vendors.allow_vendor_manage_features'));
 
     Tygh::$app['view']->assign([
-        'product_features' => $product_features,
-        'features_search'  => $features_search,
-        'product_data'     => $product_data,
-        'taxes'            => $taxes,
+        'product_features'   => $product_features,
+        'features_search'    => $features_search,
+        'product_data'       => $product_data,
+        'taxes'              => $taxes,
+        'allow_save_feature' => $allow_save_feature,
+        'selected_section'   => $selected_section,
     ]);
 
     $product_options = fn_get_product_options($_REQUEST['product_id'], DESCR_SL);
-
-    if (!empty($product_options)) {
-        $has_inventory = false;
-        foreach ($product_options as $p) {
-            if ($p['inventory'] == 'Y') {
-                $has_inventory = true;
-                break;
-            }
-        }
-        Tygh::$app['view']->assign('has_inventory', $has_inventory);
-    }
 
     list($global_options) = fn_get_product_global_options();
     Tygh::$app['view']->assign([
@@ -829,13 +867,11 @@ if ($mode == 'add') {
         'title' => __('addons'),
         'js' => true
     );
-
-    // If we have some additional product fields, lets add a tab for them
     if (!empty($product_features)) {
-        $tabs['features'] = array(
+        $tabs['features'] = [
             'title' => __('features'),
-            'js' => true
-        );
+            'js'    => true
+        ];
     }
 
     // [Product tabs]
@@ -947,8 +983,7 @@ if ($mode == 'add') {
             'tracking' => array (
                 'name' => 'products_data',
                 'variants' => array (
-                    ProductTracking::TRACK_WITH_OPTIONS => 'track_with_options',
-                    ProductTracking::TRACK_WITHOUT_OPTIONS => 'track_without_options',
+                    ProductTracking::TRACK => 'track',
                     ProductTracking::DO_NOT_TRACK => 'dont_track'
                 ),
             ),
@@ -1288,4 +1323,5 @@ if ($mode == 'add') {
         CONTROLLER_STATUS_OK,
         'exim.export?section=products&pattern_id=' . Tygh::$app['session']['export_ranges']['products']['pattern_id'],
     ];
+
 }

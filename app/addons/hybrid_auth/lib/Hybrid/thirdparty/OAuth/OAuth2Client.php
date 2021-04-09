@@ -81,7 +81,8 @@ class OAuth2Client
     $response = $this->parseRequestResult( $response );
 
     if( ! $response || ! isset( $response->access_token ) ){
-      throw new Exception( "The Authorization Service has return: " . $response->error );
+      // phpcs:ignore
+      throw new Exception('The Authorization Service has return: ' . empty($response->error) ? '' : $response->error);
     }
 
     if( isset( $response->access_token  ) )  $this->access_token           = $response->access_token;

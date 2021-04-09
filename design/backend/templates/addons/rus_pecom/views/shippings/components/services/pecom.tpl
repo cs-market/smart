@@ -60,32 +60,35 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="pecom_take_tent">{__("rus_pecom.take.tent")} {include file="common/tooltip.tpl" tooltip=__("rus_pecom.ttl_tent")}:</label>
+    <label class="control-label" for="pecom_take_tent">{__("rus_pecom.take.tent")}:</label>
     <div class="controls">
         <label class="checkbox">
             <input type="hidden" name="shipping_data[service_params][take_tent]" value="N" />
             <input type="checkbox" name="shipping_data[service_params][take_tent]" id="pecom_take_tent" value="Y" {if $shipping.service_params.take_tent == "Y"}checked="checked"{/if}/>
         </label>
+        <p class="muted description">{__("rus_pecom.ttl_tent")}</p>
     </div>
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="pecom_take_gidro">{__("rus_pecom.take.gidro")} {include file="common/tooltip.tpl" tooltip=__("rus_pecom.ttl_gidro")}:</label>
+    <label class="control-label" for="pecom_take_gidro">{__("rus_pecom.take.gidro")}:</label>
     <div class="controls">
         <label class="checkbox">
             <input type="hidden" name="shipping_data[service_params][take_gidro]" value="N" />
             <input type="checkbox" name="shipping_data[service_params][take_gidro]" id="pecom_take_gidro" value="Y" {if $shipping.service_params.take_gidro == "Y"}checked="checked"{/if}/>
         </label>
+        <p class="muted description">{__("rus_pecom.ttl_gidro")}</p>
     </div>
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="pecom_take_speed">{__("rus_pecom.take.speed")} {include file="common/tooltip.tpl" tooltip=__("rus_pecom.ttl_gidro")}:</label>
+    <label class="control-label" for="pecom_take_speed">{__("rus_pecom.take.speed")}:</label>
     <div class="controls">
         <label class="checkbox">
             <input type="hidden" name="shipping_data[service_params][take_speed]" value="N" />
             <input type="checkbox" name="shipping_data[service_params][take_speed]" id="pecom_take_speed]" value="Y" {if $shipping.service_params.take_speed == "Y"}checked="checked"{/if}/>
         </label>
+        <p class="muted description">{__("rus_pecom.ttl_gidro")}</p>
     </div>
 </div>
 
@@ -102,33 +105,36 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="pecom_deliver_tent">{__("rus_pecom.deliver.tent")} {include file="common/tooltip.tpl" tooltip=__("rus_pecom.ttl_tent")}:</label>
+    <label class="control-label" for="pecom_deliver_tent">{__("rus_pecom.deliver.tent")}:</label>
     <div class="controls">
         <label class="checkbox">
             <input type="hidden" name="shipping_data[service_params][deliver_tent]" value="N" />
             <input type="checkbox" name="shipping_data[service_params][deliver_tent]" id="pecom_deliver_tent" value="Y" {if $shipping.service_params.deliver_tent == "Y"}checked="checked"{/if}/>
         </label>
+        <p class="muted description">{__("rus_pecom.ttl_tent")}</p>
     </div>
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="pecom_deliver_gidro">{__("rus_pecom.deliver.gidro")} {include file="common/tooltip.tpl" tooltip=__("rus_pecom.ttl_gidro")}:</label>
+    <label class="control-label" for="pecom_deliver_gidro">{__("rus_pecom.deliver.gidro")}:</label>
     <div class="controls">
         <label class="checkbox">
             <input type="hidden" name="shipping_data[service_params][deliver_gidro]" value="N" />
             <input type="checkbox" name="shipping_data[service_params][deliver_gidro]" id="pecom_deliver_gidro" value="Y" {if $shipping.service_params.deliver_gidro == "Y"}checked="checked"{/if}/>
         </label>
+        <p class="muted description">{__("rus_pecom.ttl_gidro")}</p>
     </div>
 </div>
 
 
 <div class="control-group">
-    <label class="control-label" for="pecom_deliver_speed">{__("rus_pecom.deliver.speed")} {include file="common/tooltip.tpl" tooltip=__("rus_pecom.ttl_gidro")}:</label>
+    <label class="control-label" for="pecom_deliver_speed">{__("rus_pecom.deliver.speed")}:</label>
     <div class="controls">
         <label class="checkbox">
             <input type="hidden" name="shipping_data[service_params][deliver_speed]" value="N" />
             <input type="checkbox" name="shipping_data[service_params][deliver_speed]" id="pecom_deliver_speed" value="Y" {if $shipping.service_params.deliver_gidro == "Y"}checked="checked"{/if}/>
         </label>
+        <p class="muted description">{__("rus_pecom.ttl_gidro")}</p>
     </div>
 </div>
 

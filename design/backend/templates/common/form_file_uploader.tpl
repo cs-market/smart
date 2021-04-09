@@ -47,7 +47,7 @@
                         {__("drop_images_to_upload")}
                         <span class="file-uploader__pickers-text file-uploader__pickers-text--small">{__("or")}</span>
                     </p>
-                    <div class="btn-group file-uploader__pickers-buttons" id="last_edited_items">
+                    <div class="btn-group file-uploader__pickers-buttons" id="last_edited_items" data-ca-fileupload-picker-container>
                         <a class="btn file-uploader__pickers-buttons-select" data-ca-fileupload-picker-local>
                             {if $existing_files}
                                 {$upload_file_text|default:__("drop_images_select_short")}
@@ -55,10 +55,10 @@
                                 {$upload_file_text|default:__("drop_images_select")}
                             {/if}
                         </a>
-                        <a class="btn file-uploader__pickers-buttons-select dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-                        <ul class="dropdown-menu">
+                        <a class="btn file-uploader__pickers-buttons-select dropdown-toggle" data-toggle="dropdown" data-ca-fileupload-picker-btn href="#"><span class="caret"></span></a>
+                        <ul class="dropdown-menu file-uploader__pickers-menu" data-ca-fileupload-picker-menu>
                             {if $breadcrumbs|sizeof >= 1}
-                                {if !($hide_server || "RESTRICTED_ADMIN"|defined)}
+                                {if !$hide_server}
                                     <li><a data-ca-fileupload-picker-server>{__("add_image_from_server")}</a></li>
                                 {/if}
                                 <li><a data-ca-fileupload-picker-url>{__("add_image_from_url")}</a></li>
@@ -92,9 +92,9 @@
             </div>
 
             <div class="file-uploader__file-section file-uploader__file-section_under-image">
-                <textarea 
+                <textarea
                     class="cm-file-uploader-dynamic-field file-uploader__file-description-input"
-                    data-ca-alt-text-detailed   
+                    data-ca-alt-text-detailed
                     placeholder="{__("alternative_text")}"></textarea>
 
                 <div class="file-uploader__file-control-menu file-uploader__file-control-menu--expanded">

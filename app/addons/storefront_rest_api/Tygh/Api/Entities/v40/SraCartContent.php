@@ -249,6 +249,8 @@ class SraCartContent extends ASraEntity
 
         $cart_service_id = (int) $id;
 
+        $currency = $this->getCurrencyCode($params);
+
         $params['icon_sizes'] = $this->safeGet($params, 'icon_sizes', [
             'main_pair'   => [$this->icon_size_big, $this->icon_size_small],
             'image_pairs' => [$this->icon_size_small],
@@ -256,7 +258,7 @@ class SraCartContent extends ASraEntity
 
         // normalize coupon codes
         if ($coupon_codes = $this->safeGet($params, 'coupon_codes', [])) {
-            $params['coupon_codes'] = array_map(function ($code) {
+            $params['coupon_codes'] = array_map(static function ($code) {
                 return fn_strtolower(trim($code));
             }, array_unique((array) $coupon_codes));
         }
@@ -274,10 +276,7 @@ class SraCartContent extends ASraEntity
 
         $cart = $this->calculate($cart, $params, $lang_code);
 
-        $data = fn_storefront_rest_api_format_order_prices(
-            $cart,
-            $this->safeGet($params, 'currency', CART_PRIMARY_CURRENCY)
-        );
+        $data = fn_storefront_rest_api_format_order_prices($cart, $currency);
 
         $data['products'] = fn_storefront_rest_api_set_products_icons($data['products'], $params['icon_sizes']);
         foreach ($data['product_groups'] as &$product_group) {

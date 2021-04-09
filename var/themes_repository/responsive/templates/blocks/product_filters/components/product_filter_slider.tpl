@@ -17,13 +17,29 @@
     <p class="ty-price-slider__inputs">
         <bdi class="ty-price-slider__bidi-container">
             <span class="ty-price-slider__filter-prefix">{$filter.prefix nofilter}</span>
-            <input type="text" class="ty-price-slider__input-text" id="slider_{$filter_uid}_left" name="left_{$filter_uid}" value="{$left}"{if $disable_slider} disabled="disabled"{/if} />
+            <input type="text"
+                class="ty-price-slider__input-text"
+                id="slider_{$filter_uid}_left"
+                name="left_{$filter_uid}"
+                value="{$left}"
+                {if $disable_slider}
+                    disabled="disabled"
+                {/if}
+                data-ca-previous-value="{$left}"/>
             {$filter.suffix nofilter}
         </bdi>
         &nbsp;–&nbsp;
         <bdi class="ty-price-slider__bidi-container">
             <span class="ty-price-slider__filter-prefix">{$filter.prefix nofilter}</span>
-            <input type="text" class="ty-price-slider__input-text" id="slider_{$filter_uid}_right" name="right_{$filter_uid}" value="{$right}"{if $disable_slider} disabled="disabled"{/if} />
+            <input type="text"
+                class="ty-price-slider__input-text"
+                id="slider_{$filter_uid}_right"
+                name="right_{$filter_uid}"
+                value="{$right}"
+                {if $disable_slider}
+                    disabled="disabled"
+                {/if}
+                data-ca-previous-value="{$right}"/>
             {$filter.suffix nofilter}
         </bdi>
     </p>

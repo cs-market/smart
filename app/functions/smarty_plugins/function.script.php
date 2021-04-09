@@ -26,6 +26,8 @@ function smarty_function_script($params, &$template)
 
         $scripts[$params['src']] = '<script type="text/javascript"'
                                     . (!empty($params['class']) ? ' class="' . $params['class'] . '" ' : '')
+                                    . (!empty($params['async']) ? ' async ' : '')
+                                    . (!empty($params['defer']) ? ' defer ' : '')
                                     . ' src="' . $src . '" ' . (isset($params['charset']) ? ('charset="' . $params['charset'] . '"') : '') . (isset($params['escape']) ? '><\/script>' : '></script>');
 
         if (defined('AJAX_REQUEST') || Registry::get('runtime.inside_scripts')) {

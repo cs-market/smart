@@ -221,8 +221,7 @@
 {/capture}
 
 {include file="common/mainbox.tpl"
-    title_start=__("editing")
-    title_end=$document->getName()
+    title=$document->getName()
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
     adv_buttons=$smarty.capture.adv_buttons

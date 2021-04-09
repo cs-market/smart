@@ -18,6 +18,8 @@ namespace Tygh\Template;
 
 use Tygh\Common\OperationResult;
 use Tygh\Twig\TwigEnvironment;
+use Twig\Error\SyntaxError;
+use Twig\Node\Expression\GetAttrExpression;
 
 /**
  * The class that implements the logic of template rendering.
@@ -31,7 +33,7 @@ class Renderer
     const TEMPLATE_VARIABLE_KEY = '__template';
     const VARIABLE_COLLECTION_VARIABLE_KEY = '__variable_collection';
 
-    /** @var \Twig_Environment  */
+    /** @var \Twig\Environment  */
     protected $twig;
 
     /**
@@ -89,7 +91,7 @@ class Renderer
 
         try {
             $this->twig->parse($this->twig->tokenize($template));
-        } catch (\Twig_Error_Syntax $e) {
+        } catch (SyntaxError $e) {
             $result->setSuccess(false);
             $result->addError($e->getCode(), $e->getMessage());
         }
@@ -131,7 +133,7 @@ class Renderer
             $node_class = get_class($node);
             if ($node_class == 'Twig_Node_Expression_Name' || $node_class == 'Twig_Node_Expression_TempName') { // TempName - for php 5.3
                 $variables[] = $node->getAttribute('name');
-            } elseif ($node instanceof \Twig_Node_Expression_GetAttr) {
+            } elseif ($node instanceof GetAttrExpression) {
                 $variables = array_merge($variables, $this->parseNodes($node));
             } elseif ($node instanceof \Traversable) {
                 $variables = array_merge($variables, $this->parseNodes($node));

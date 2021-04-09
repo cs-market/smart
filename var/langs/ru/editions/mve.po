@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.11.5/editions/mve.po\n"
-"X-Crowdin-File-ID: 3708\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/editions/mve.po\n"
+"X-Crowdin-File-ID: 4194\n"
+"PO-Revision-Date: 2021-02-01 09:12\n"
 
 msgctxt "Languages::add_companies"
 msgid "Add vendors"
@@ -165,12 +165,12 @@ msgid "Can view"
 msgstr "Просмотр"
 
 msgctxt "Languages::privilege_sections.vendors"
-msgid "Store privileges"
-msgstr "Магазины"
+msgid "Vendors privileges"
+msgstr "Привилегии продавцов"
 
 msgctxt "Languages::privilege_groups.vendors"
-msgid "Stores"
-msgstr "Магазины"
+msgid "Vendors"
+msgstr "Продавцы"
 
 msgctxt "Languages::sales_period"
 msgid "Sales period"
@@ -364,9 +364,21 @@ msgctxt "SettingsOptions::mailer_send_from_admin"
 msgid "Send vendor emails from marketplace email addresses"
 msgstr "Отправлять письма продавцов с общего почтового адреса маркета"
 
+msgctxt "SettingsOptions::allow_vendor_manage_features"
+msgid "Allow vendors to manage product features"
+msgstr "Разрешить продавцам управлять характеристиками товаров"
+
 msgctxt "SettingsTooltips::need_agree_with_terms_n_conditions"
 msgid "The text of terms & conditions will be retrieved from the \"vendor_terms_n_conditions_content\" language variable."
 msgstr "Текст Условий соглашения будет взят из языковой переменной \"vendor_terms_n_conditions_content\"."
+
+msgctxt "SettingsOptions::allow_approve_vendors_in_two_steps"
+msgid "Approve vendors in 2 steps"
+msgstr "Одобрять продавцов в 2 шага"
+
+msgctxt "SettingsTooltips::allow_approve_vendors_in_two_steps"
+msgid "New vendors will get the \"Pending\" status after approval. This will hide them on the storefront."
+msgstr "Новые продавцы после одобрения получат статус \"Неподтвержденный\". Это скроет их с витрины."
 
 msgctxt "Languages::use_for_apply_for_vendor_account"
 msgid "Apply for a vendor account form"
@@ -490,7 +502,7 @@ msgstr "[product] Ultimate"
 
 msgctxt "Languages::text_mve_plus_license_required"
 msgid "<p>Let your vendors receive money from customers directly via your marketplace.</p><p>Manage vendors' abilities via user groups, and allow your vendors to change the looks of their stores.</p><p>Create a unified catalog, where vendors can start selling any product in a matter of minutes.</p>"
-msgstr "<p>Позвольте продавцам получать деньги от покупателей напрямую через ваш маркетплейс.</p><p>Управляйте правами продавцов через группы пользователей и дайте им возможность менять внешний вид их магазинов.</p><p>Создайте единый каталог товаров, каждый из которых продавец сможет начать продавать за пару минут.</p>"
+msgstr "<p>Позвольте продавцам получать деньги от покупателей напрямую через ваш маркетплейс.</p><p>Управляйте правами продавцов через группы пользователей и дайте им возможность менять внешний вид их магазинов.</p><p>Создайте единый каталог товаров; продавец сможет выбрать любой товар и начать его продавать за пару минут.</p>"
 
 msgctxt "Languages::text_mve_ultimate_license_required"
 msgid "<p>Branch out: get an unlimited number of storefronts for your marketplace.</p><p>A storefront is another domain created either for a specific country or city, or for a specific part of your product catalog.</p><p>Get all the other functionality of [product] Plus.</p>"
@@ -892,22 +904,6 @@ msgctxt "Languages::all_companies"
 msgid "All vendors"
 msgstr "Все продавцы"
 
-msgctxt "Languages::storefront_access_key"
-msgid "Access key to temporarily closed storefront"
-msgstr "Ключ доступа ко временно закрытой витрине"
-
-msgctxt "Languages::storefront_status.tooltip"
-msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed storefront</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
-msgstr "Даже если витрина закрыта (статус OFF), вы сможете её посетить, если у вас есть ключ доступа. Задайте <i>Ключ доступа ко временно закрытой витрине</i> ниже.<br/>Чтобы посетить закрытую витрину, используйте ссылку наподобие http://www.example.com/index.php?store_access_key=key_value"
-
-msgctxt "Languages::storefront_access_key.setting_notice"
-msgid "You can set the access key on the storefront editing page"
-msgstr "Ключ доступа можно задать на странице редактирования витрины"
-
-msgctxt "Languages::close_storefront.setting_notice"
-msgid "You can open or close a storefront on the storefront editing page"
-msgstr "Открыть или закрыть витрину можно на странице редактирования витрины"
-
 msgctxt "Languages::is_default_storefront"
 msgid "Default storefront"
 msgstr "Витрина по умолчанию"
@@ -940,6 +936,14 @@ msgctxt "Languages::event.vendor_status_changed.name"
 msgid "Vendor status changed to [status]"
 msgstr "Статус продавца изменился на \"[status]\""
 
+msgctxt "Languages::event.vendor_status_changed_from.name"
+msgid "Vendor status changed from [status]"
+msgstr "Продавец вышел из статуса \"[status]\""
+
+msgctxt "Languages::email_template.company_status_suspended_notification"
+msgid "Company status change to Suspended"
+msgstr "Изменение статуса компании на \"Приостановлен\""
+
 msgctxt "Languages::event.vendor_status_changed.title"
 msgid "Your status has been changed to [status]"
 msgstr "Ваш статус изменился на \"[status]\""
@@ -960,11 +964,47 @@ msgctxt "Languages::log_in_as_vendor"
 msgid "Log in as vendor"
 msgstr "Войти как продавец"
 
+msgctxt "Languages::vendor_owner"
+msgid "Vendor's main administrator"
+msgstr "Главный администратор продавца"
+
+msgctxt "Languages::owner_company"
+msgid "Vendor"
+msgstr "Продавец"
+
 msgctxt "Languages::block_manager.dynamic_entity_companies"
 msgid "vendor"
 msgstr "продавец"
 
+msgctxt "Languages::vendor_features_only"
+msgid "Features created by vendors"
+msgstr "Характеристики, созданные продавцами"
+
+msgctxt "Languages::any_vendor"
+msgid "Any vendor"
+msgstr "Любой продавец"
+
 msgctxt "Languages::event.apply_for_vendor_notification.name"
 msgid "New vendor account application"
 msgstr "Новый запрос на создание учетной записи продавца"
+
+msgctxt "Languages::suspend_alert"
+msgid "<p>Your account is suspended. To lift the suspension, please contact us.</p>"
+msgstr "<p>Ваша учётная запись приостановлена. Чтобы возобновить её, свяжитесь с нами.</p>"
+
+msgctxt "Languages::event.vendor_status_changed.suspended.title"
+msgid "Your account is suspended"
+msgstr "Ваша учётная запись приостановлена"
+
+msgctxt "Languages::event.vendor_status_changed.suspended.message"
+msgid "To lift the suspension, please contact us."
+msgstr "Чтобы возобновить учётную запись, свяжитесь с нами."
+
+msgctxt "Languages::text_company_status_suspended_subj"
+msgid "Your account is suspended"
+msgstr "Ваша учётная запись приостановлена"
+
+msgctxt "Languages::logo_section.vendor"
+msgid "Default logo for new vendors"
+msgstr "Логотип по умолчанию для новых продавцов"
 

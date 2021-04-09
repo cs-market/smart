@@ -6,9 +6,11 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.11.3/addons/advanced_import.po\n"
-"PO-Revision-Date: 2020-02-04 07:10\n"
+"X-Crowdin-File: /release-4.12.2/addons/advanced_import.po\n"
+"X-Crowdin-File-ID: 4098\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::advanced_import"
 msgid "Advanced products import"
@@ -76,31 +78,31 @@ msgstr "Mapování polí"
 
 msgctxt "Languages::advanced_import.fields_mapping.description"
 msgid "This table contains the list of columns from the imported file. For each column you'd like to import, select a corresponding product property in [product]. Then check what sort of data will be imported from that column, and use modifiers to change that data, if necessary. Remember to save your changes."
-msgstr ""
+msgstr "Tato tabulka obsahuje seznam sloupců z importovaného souboru. Pro každý sloupec, který byste chtěli importovat, vyberte odpovídající vlastnost produktu v [product]. Dále zkontrolujte, jaký druh dat bude ze sloupce importován a použijte modifikátory pro změny dat, pokud to bude nutné. Nezapomeňte uložit vaše změny."
 
 msgctxt "Languages::advanced_import.column_header"
 msgid "Column name in the imported file"
-msgstr ""
+msgstr "Název sloupce v importovaném souboru"
 
 msgctxt "Languages::advanced_import.product_property"
 msgid "Product property in [product]"
-msgstr ""
+msgstr "Možnost produktu v [product]"
 
 msgctxt "Languages::advanced_import.first_line_import_value"
 msgid "Example of the imported value"
-msgstr ""
+msgstr "Příklad importované hodnoty"
 
 msgctxt "Languages::advanced_import.editing_preset"
 msgid "Editing preset: [preset]"
-msgstr ""
+msgstr "Editovat přednastavení (preset): [preset]"
 
 msgctxt "Languages::advanced_import.add_preset"
 msgid "Add preset"
-msgstr ""
+msgstr "Přidat přednastavení (preset)"
 
 msgctxt "Languages::advanced_import.new_preset"
 msgid "New preset"
-msgstr ""
+msgstr "Nové přednastavení (preset)"
 
 msgctxt "Languages::advanced_import.properties"
 msgid "Properties"
@@ -128,11 +130,11 @@ msgstr "Možnosti"
 
 msgctxt "Languages::advanced_import.images_delimiter"
 msgid "Images delimiter"
-msgstr ""
+msgstr "Oddělovač obrázků"
 
 msgctxt "Languages::advanced_import.images_delimiter.description"
 msgid "Delimiter between images of a product."
-msgstr ""
+msgstr "Oddělovač mezi obrázky produktu"
 
 msgctxt "Languages::advanced_import_images"
 msgid "Product images"
@@ -140,19 +142,19 @@ msgstr "Obrázky produktu"
 
 msgctxt "Languages::advanced_import.remove_images"
 msgid "Remove additional images"
-msgstr ""
+msgstr "Odebrat dodatečné obrázky"
 
 msgctxt "Languages::advanced_import.remove_images"
 msgid "Remove additional images"
-msgstr ""
+msgstr "Odebrat dodatečné obrázky"
 
 msgctxt "Languages::advanced_import.import_fields"
 msgid "Import fields"
-msgstr ""
+msgstr "Importovat pole"
 
 msgctxt "Languages::advanced_import.advanced_products_import"
 msgid "Products"
-msgstr ""
+msgstr "Zboží"
 
 msgctxt "Languages::advanced_import.coming_soon"
 msgid "... coming soon"
@@ -164,11 +166,11 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.cant_load_file"
 msgid "File can't be loaded"
-msgstr ""
+msgstr "Soubor nelze nahrát"
 
 msgctxt "Languages::advanced_import.uploading_file"
 msgid "Uploading file for the preset: [preset]"
-msgstr ""
+msgstr "Nahrávání souboru pro přednastavení (preset): [preset]"
 
 msgctxt "Languages::advanced_import.previewing_fields_mapping"
 msgid "Previewing fields mapping for the preset: [preset]"
@@ -176,11 +178,11 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.preset_not_found"
 msgid "Preset not found"
-msgstr ""
+msgstr "Přednastavení (preset) nenalezeno"
 
 msgctxt "Languages::advanced_import.modifiers_list"
 msgid "Modifiers list"
-msgstr ""
+msgstr "Seznam modifikátorů"
 
 msgctxt "Languages::advanced_import.invalid_number_of_parameters_provided"
 msgid "Invalid number of parameters provided for modifier: <b>[modifier]</b>: expected [expected_count], got [actual_count]."
@@ -204,11 +206,11 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.modifier_number_of_parameters"
 msgid "Number of parameters"
-msgstr ""
+msgstr "Počet parametrů"
 
 msgctxt "Languages::advanced_import.modifiers_description"
 msgid "Use these functions in the <b>Modifier</b> column to alter the values in the fields from the imported file. Enter the functions as follows: <b>function(parameter, parameter)</b>. Please note that nesting of functions isn't supported."
-msgstr ""
+msgstr "Použijte tyto funkce ve sloupci <b>Modifikátor</b> ke modifikaci hodnot v polích v importovaném souboru. Použijte následující: <b>function(parameter, parameter)</b>. Mějte na paměti, že vnoření funkcí není podporováno."
 
 msgctxt "Languages::advanced_import.modifiers_self_referencing_info"
 msgid "Most functions allow you to use the non-modified value of the imported field by using <b>$value</b> as a parameter. If there are any exceptions, they will be mentioned in function descriptions."
@@ -224,7 +226,7 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.modifier_description.mul"
 msgid "<b>mul</b>&mdash;multiplies the numbers provided as parameters. <ul><li>Examples:</li><ul><li><b>mul(3, 1)</b> equals <i>3</i></li> <li><b>mul($value, 7)</b> equals <i>the value of the imported field × 7</i></li></ul></ul>"
-msgstr ""
+msgstr "<b>mul</b>&mdash; násobí čísla poskytnutá jako parametry. <ul><li> Příklad: </li><ul><li><b>mul(3,1)</b> se rovná <i>3</i></li> <li><b> mul($value, 7)</b> se rovná <i> hodnota importovaného pole x 7</i></li></ul></ul>"
 
 msgctxt "Languages::advanced_import.modifier_description.div"
 msgid "<b>div</b>&mdash;divides the first parameter by the second. <ul><li>Examples:</li><ul><li><b>div(9, 3)</b> equals <i>3</i></li> <li><b>div($value, 7)</b> equals <i>the value of the imported field ÷ 7</i></li></ul></ul>"
@@ -276,7 +278,7 @@ msgstr "Cílový uzel XML"
 
 msgctxt "Languages::advanced_import.target_node.description"
 msgid "The full path to the XML node with the information about an imported entity. The nodes nested in the specified node will be used as columns of the imported file. Here is an example of the path: yml_catalog/shop/offers/offer"
-msgstr ""
+msgstr "Úplná cesta k XML uzlu s informací o importovaném subjektu. Uzly vnořené v zadaném uzlu budou použity jako sloupce importovaného souboru. Zde je příklad cesty: yml_catalog/shop/offers/offer"
 
 msgctxt "Languages::advanced_import.fetching_schema_failed_check_target_node"
 msgid "Please make sure that the <b>XML target node</b> field is filled in properly."
@@ -292,7 +294,7 @@ msgstr "Další volby"
 
 msgctxt "Languages::advanced_import.delete_additional_images"
 msgid "Delete existing additional images"
-msgstr ""
+msgstr "Vymazat všechny dodatečné obrázky"
 
 msgctxt "Languages::advanced_import.delete_additional_images_tooltip"
 msgid "If you enable this setting, then the existing additional images of the imported products will be replaced with the images specified in the imported file (if no images are specified, the old images will remain). If the setting is disabled, the new additional images will simply be added to the existing images."
@@ -300,11 +302,11 @@ msgstr "Pokud toto nastavení povolíte, pak na stávající další obrázky z 
 
 msgctxt "Languages::advanced_import.fetching_schema_failed_check_file"
 msgid "Before you can run the import, please make sure that:<ul><li>You have created the import preset by using the Create button. If you see Save instead of Create, then you've already done that.</li><li>You have specified the correct XML target node on the File tab and saved the preset.</li><li>You have matched the imported information with the product properties in CS-Cart on the Fields mapping tab and saved the preset.</li></ul>If you see this message, you haven't completed point 1 or 2."
-msgstr ""
+msgstr "Předtím, než spustíte import, ujistěte se, že<ul><li> jste správně přednastavili import pomocí tlačítka Vytvořit. Pokud vidíte Uložit místo Vytvořit, již jste to udělali.</li><li> Dále, že jste správně specifikovali cílový XML uzel na záložce Soubor a uložili jste toto nastavení.</li><li>A také, že máte správně vytvořený importovaný soubor, který odpovídá požadavkům CS-cartu, resp. aby všechna pole v záložce Zmapování polí, byla nastavena správně a nastavení bylo uloženo.</li></ul> Pokud vidíte tuto správu, máte nekompletní bod 1 nebo 2. "
 
 msgctxt "Languages::advanced_import.test_import"
 msgid "Perform test import"
-msgstr ""
+msgstr "Zkusit testovací import"
 
 msgctxt "Languages::advanced_import.test_import_tooltip"
 msgid "If you enable this setting, only the first [n] product will be processed.|If you enable this setting, only the first [n] products will be processed."
@@ -312,19 +314,19 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.import_strategy"
 msgid "Import strategy"
-msgstr ""
+msgstr "Strategie importu"
 
 msgctxt "Languages::advanced_import.import_strategy_tooltip"
 msgid "If you select \"Update existing products only\", products that don't exist in the database of your store will be skipped during import.<br>If you select \"Create new products only\", products that exist in the database of your store will be skipped during import."
-msgstr ""
+msgstr "Pokud vyberete \"Aktualizovat pouze existující produkty\", produkty, které neexistují v databázi vašeho obchodu, budou přeskočeny během importu. <br> Pokud zvolíte \"Pouze vytvořit nové produkty , produkty, které existují v databázi vašeho obchodu, budou přeskočeny během importu."
 
 msgctxt "Languages::advanced_import.import_all"
 msgid "Import all products from the file"
-msgstr ""
+msgstr "Importovat všechny produkty ze seznamu"
 
 msgctxt "Languages::advanced_import.create_new_products_only"
 msgid "Create new products only"
-msgstr ""
+msgstr "Pouze vytvořit nové produkty"
 
 msgctxt "Languages::advanced_import.cant_save_preset_invalid_modifiers"
 msgid "The preset can't be saved because it contains invalid modifiers"
@@ -344,5 +346,41 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.incorrect_delimiter"
 msgid "Specified (or auto detected) delimiter seems to be incorrect. Please specify the correct delimiter manually in the additional settings on the \"File\" tab."
+msgstr ""
+
+msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
+msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
+msgstr ""
+
+msgctxt "Languages::advanced_import.common_preset"
+msgid "All vendors"
+msgstr "Všichni prodejci"
+
+msgctxt "Languages::advanced_import.your_presets"
+msgid "Vendor's presets"
+msgstr "Prodejcovo přednastavení (preset)"
+
+msgctxt "Languages::advanced_import.common_presets"
+msgid "Marketplace presets"
+msgstr "Přednastavení obchodu"
+
+msgctxt "Languages::advanced_import.file_not_loaded"
+msgid "File was not loaded. Please reload the page and try again."
+msgstr ""
+
+msgctxt "Languages::advanced_import.local_file_selected"
+msgid "Local file selected"
+msgstr "Vybrán místní soubor"
+
+msgctxt "Languages::advanced_import.text_popup_file_editor_notice_full_link"
+msgid "You can upload and download files via <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
+msgstr ""
+
+msgctxt "Languages::advanced_import.file_extension_was_not_supported_by_owner"
+msgid "Couldn't use your file [name]. This import preset only allows the following extensions: [ext]."
+msgstr ""
+
+msgctxt "Languages::advanced_import.save_selected_file"
+msgid "Save selected file"
 msgstr ""
 

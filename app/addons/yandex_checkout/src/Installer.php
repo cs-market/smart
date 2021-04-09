@@ -71,7 +71,7 @@ class Installer implements InstallerInterface
     protected function installYandexCheckoutProcessor()
     {
         $processor = [
-            'processor' => 'Яндекс.Касса',
+            'processor' => 'ЮKassa',
             'processor_script' => ProcessorScript::YANDEX_CHECKOUT,
             'admin_template' => 'yandex_checkout.tpl',
             'callback'  => YesNo::YES,
@@ -86,7 +86,7 @@ class Installer implements InstallerInterface
     protected function installYandexCheckoutForMarketplacesProcessor()
     {
         $processor = [
-            'processor' => 'Яндекс.Касса для платформ',
+            'processor' => 'ЮKassa для платформ',
             'processor_script' => ProcessorScript::YANDEX_CHECKOUT_FOR_MARKETPLACES,
             'admin_template' => 'yandex_checkout_for_marketplaces.tpl',
             'callback'  => YesNo::YES,

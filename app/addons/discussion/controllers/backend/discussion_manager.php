@@ -27,6 +27,7 @@ if ($mode == 'manage') {
 
     $params = array_merge([
         'object_type' => key($discussion_object_types),
+        'company_id'  => '',
     ], $_REQUEST);
 
     $runtime_company_id = fn_get_runtime_company_id();
@@ -36,6 +37,13 @@ if ($mode == 'manage') {
 
     foreach ($discussion_object_types as $obj_type => $obj) {
         if ($obj_type === DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT && !$are_testimonials_enabled) {
+            continue;
+        }
+
+        if (fn_allowed_for('MULTIVENDOR')
+            && $runtime_company_id
+            && ($obj_type === DiscussionObjectTypes::CATEGORY || $obj_type === DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT)
+        ) {
             continue;
         }
 
@@ -55,8 +63,11 @@ if ($mode == 'manage') {
         }
     }
 
-    Tygh::$app['view']->assign('posts', $posts);
-    Tygh::$app['view']->assign('search', $search);
-    Tygh::$app['view']->assign('discussion_object_type', $params['object_type']);
-    Tygh::$app['view']->assign('discussion_object_types', $discussion_object_types);
+    Tygh::$app['view']->assign([
+        'company_id'              => $runtime_company_id,
+        'posts'                   => $posts,
+        'search'                  => $search,
+        'discussion_object_type'  => $params['object_type'],
+        'discussion_object_types' => $discussion_object_types,
+    ]);
 }

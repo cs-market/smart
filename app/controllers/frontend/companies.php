@@ -12,6 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\ProfileFieldSections;
 use Tygh\Registry;
 use Tygh\Enum\ProfileTypes;
 use Tygh\Enum\VendorStatuses;
@@ -136,10 +137,13 @@ if (fn_allowed_for('ULTIMATE')) {
     }
 }
 
-if ($mode == 'view') {
+if ($mode === 'view') {
+    if (!isset($_REQUEST['company_id'])) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
 
     $company_id = (int) $_REQUEST['company_id'];
-    $company_data = !empty($company_id) ? fn_get_company_data($company_id) : array();
+    $company_data = !empty($company_id) ? fn_get_company_data($company_id) : [];
 
     /** @var \Tygh\Storefront\Storefront $storefront */
     $storefront = Tygh::$app['storefront'];
@@ -159,19 +163,36 @@ if ($mode == 'view') {
 
     $company_data['logos'] = fn_get_logos($company_data['company_id']);
 
-    Registry::set('navigation.tabs', array(
-        'description' => array(
-            'title' => __('description'),
-            'js' => true
-        )
-    ));
-
     $params = array(
         'company_id' => $company_id,
     );
 
-    Tygh::$app['view']->assign('company_data', $company_data);
+    $company_data = fn_filter_company_data_by_profile_fields($company_data);
+    $profile_fields = fn_get_profile_fields(
+        ProfileFieldSections::CONTACT_INFORMATION,
+        [],
+        CART_LANGUAGE,
+        [
+            'profile_type'     => ProfileTypes::CODE_SELLER,
+            'skip_email_field' => false,
+            'storefront_show'  => true,
+        ]
+    );
 
+    if (!empty($company_data['company_description'])) {
+        Registry::set(
+            'navigation.tabs',
+            [
+                'description' => [
+                    'title' => __('description'),
+                    'js'    => true,
+                ]
+            ]
+        );
+    }
+
+    Tygh::$app['view']->assign('company_data', $company_data);
+    Tygh::$app['view']->assign('profile_fields', $profile_fields);
 } elseif ($mode == 'catalog') {
 
     fn_add_breadcrumb(__('all_vendors'));
@@ -191,11 +212,11 @@ if ($mode == 'view') {
 
     foreach ($companies as &$company) {
         $company['logos'] = fn_get_logos($company['company_id']);
+        $company = fn_filter_company_data_by_profile_fields($company);
     }
 
     Tygh::$app['view']->assign('companies', $companies);
     Tygh::$app['view']->assign('search', $search);
-
 } elseif ($mode == 'apply_for_vendor') {
 
     if (Registry::get('settings.Vendors.apply_for_vendor') != 'Y') {
@@ -310,12 +331,19 @@ if ($mode == 'view') {
         $params['sort_order'] = $sort_order;
     }
 
+    if (isset($params['order_ids'])) {
+        $order_ids = is_array($params['order_ids']) ? $params['order_ids'] : explode(',', $params['order_ids']);
+        foreach ($order_ids as $order_id) {
+            /** @psalm-suppress UndefinedGlobalVariable */
+            if (!fn_is_order_allowed($order_id, $auth)) {
+                return [CONTROLLER_STATUS_NO_PAGE];
+            }
+        }
+    }
+
     list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'));
 
-    if (defined('AJAX_REQUEST') && (!empty($params['features_hash']) && !$products)) {
-        fn_filters_not_found_notification();
-        exit;
-    }
+    fn_filters_handle_search_result($params, $products, $search);
 
     fn_gather_additional_products_data($products, array('get_icon' => true, 'get_detailed' => true, 'get_additional' => true, 'get_options'=> true));
 

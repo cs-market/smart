@@ -18,11 +18,11 @@ namespace Tygh\Notifications\DataProviders;
 interface IDataProvider
 {
     /**
-     * Gets data for recipient
+     * Gets data for receiver
      *
-     * @param string $recipient_type
+     * @param string $receiver_type
      *
      * @return \Tygh\Notifications\Data
      */
-    public function get($recipient_type);
+    public function get($receiver_type);
 }

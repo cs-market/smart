@@ -36,6 +36,11 @@ class Layout extends CompanySingleton
     protected $storefront_id;
 
     /**
+     * @var int
+     */
+    protected $instance_company_id;
+
+    /**
      * Gets layout by ID
      *
      * @param int $layout_id layout ID

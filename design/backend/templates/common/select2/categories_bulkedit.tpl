@@ -1,5 +1,5 @@
 {script src="js/tygh/backend/select2_categories.js"}
-<div class="object-categories-add cm-object-categories-add-container {$select2_wrapper_meta}">
+<div class="object-categories-add object-categories-add--bulk-edit cm-object-categories-add-container {$select2_wrapper_meta}">
     {$select_id=$select2_select_id|default:"categories_add"}
     {$category_ids = $select2_category_ids|default:[]|array_unique}
 

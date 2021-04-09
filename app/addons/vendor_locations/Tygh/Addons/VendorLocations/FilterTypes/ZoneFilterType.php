@@ -115,7 +115,7 @@ class ZoneFilterType extends BaseFilterType
 
         if ($this->area->getLat() && $this->area->getLng()) {
             return $this->connection->quote(
-                "{$this->table_alias}.lat IS NULL, (?i * acos(cos(radians(?p)) * cos(radians({$this->table_alias}.lat)) * cos(radians({$this->table_alias}.lng) "
+                "(?i * acos(cos(radians(?p)) * cos(radians({$this->table_alias}.lat)) * cos(radians({$this->table_alias}.lng) "
                 . "- radians(?p)) + sin(radians(?p)) * sin(radians({$this->table_alias}.lat))))",
                 $units[$this->distance_unit],
                 $this->area->getLat(),
@@ -125,5 +125,15 @@ class ZoneFilterType extends BaseFilterType
         }
 
         return false;
+    }
+
+    /**
+     * Gets table alias
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return $this->table_alias;
     }
 }

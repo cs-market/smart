@@ -14,9 +14,17 @@
 
 namespace Tygh;
 
+use Closure;
 use Tygh\Exceptions\DeveloperException;
 use Tygh\Providers\StorefrontProvider;
 
+/**
+ * Class Registry
+ *
+ * @package Tygh
+ *
+ * @phpcs:disable SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
+ */
 class Registry
 {
     private static $_storage = array();
@@ -365,7 +373,7 @@ class Registry
     /**
      * Inits cache backend
      *
-     * @return boolean always true
+     * @return bool Always true
      */
     public static function cacheInit()
     {
@@ -377,6 +385,20 @@ class Registry
         }
 
         return true;
+    }
+
+    /**
+     * Resets cache instance component
+     *
+     * @internal
+     */
+    public static function resetCacheCompanyId()
+    {
+        if (empty(self::$_cache)) {
+            return;
+        }
+
+        self::$_cache->resetCompanyId();
     }
 
     /**
@@ -527,15 +549,15 @@ class Registry
     public static function cacheLevel($id)
     {
         if (is_array($id)) {
-            return implode('__', array_map(function ($id) {
+            return implode('__', array_map(static function ($id) {
                 return self::cacheLevel($id);
             }, $id));
         }
 
         if (!isset(self::$_cache_levels[$id])) {
             $usergroups_condition = '';
-            if (!empty(\Tygh::$app['session']['auth']['usergroup_ids'])) {
-                $usergroups_condition = implode('_', \Tygh::$app['session']['auth']['usergroup_ids']);
+            if (Tygh::$app->hasInstance('session') && !empty(Tygh::$app['session']['auth']['usergroup_ids'])) {
+                $usergroups_condition = implode('_', Tygh::$app['session']['auth']['usergroup_ids']);
             }
 
             if ($id === 'time') {
@@ -547,8 +569,16 @@ class Registry
             } elseif ($id === 'company') {
                 $key = fn_get_runtime_company_id();
             } elseif ($id === 'storefront') {
-                $storefront = StorefrontProvider::getStorefront();
-                $key = $storefront->storefront_id;
+                $key = Registry::get('runtime.storefront_id');
+
+                if (!$key) {
+                    $storefront = StorefrontProvider::getStorefront();
+                    $key = $storefront->storefront_id;
+                }
+            } elseif ($id === 'lang') {
+                $key = CART_LANGUAGE;
+            } elseif ($id === 'currency') {
+                $key = defined('CART_SECONDARY_CURRENCY') ? CART_SECONDARY_CURRENCY : '_';
             } elseif ($id === 'locale') {
                 $key = (defined('CART_LOCALIZATION') ? (CART_LOCALIZATION . '_') : '')
                     . CART_LANGUAGE . '_' . CART_SECONDARY_CURRENCY;
@@ -562,13 +592,13 @@ class Registry
                     . '.' . (defined('CART_LOCALIZATION') ? (CART_LOCALIZATION . '_') : '')
                     . CART_LANGUAGE . '.' . CART_SECONDARY_CURRENCY;
             } elseif ($id === 'locale_auth') {
-                $key = AREA . '_' . $_SERVER['REQUEST_METHOD'] . '_' . (!empty(\Tygh::$app['session']['auth']['user_id']) ? 1 : 0)
+                $key = AREA . '_' . $_SERVER['REQUEST_METHOD'] . '_' . (Tygh::$app->hasInstance('session') && !empty(Tygh::$app['session']['auth']['user_id']) ? 1 : 0)
                     . '.' . $usergroups_condition
                     . (defined('CART_LOCALIZATION') ? (CART_LOCALIZATION . '_') : '')
                     . CART_LANGUAGE . '.' . CART_SECONDARY_CURRENCY;
             } elseif ($id === 'html_blocks') {
                 $promotion_condition = '';
-                if (!empty(\Tygh::$app['session']['auth']['user_id'])) {
+                if (Tygh::$app->hasInstance('session') && !empty(Tygh::$app['session']['auth']['user_id'])) {
                     $active_promotions = db_get_fields(
                         "SELECT promotion_id FROM ?:promotions"
                         . " WHERE status = 'A' AND zone = 'catalog' AND users_conditions_hash LIKE ?l",
@@ -588,7 +618,7 @@ class Registry
             }
 
             if (!isset($key)) {
-                DeveloperException::undefinedCacheLevel();
+                DeveloperException::undefinedCacheLevel($id);
             }
 
             self::$_cache_levels[$id] = $key;
@@ -730,5 +760,39 @@ class Registry
             self::CACHE_HANDLERS_TABLE,
             $condition
         );
+    }
+
+    /**
+     * Method combines both set() and get() methods to retrieve value identified by a $key, or to store the result of $callable execution if there is no cache available for the $key.
+     *
+     * @param string|string[]                                      $key         Key name. Array with 2 values can be passed: first - key name, second - key alias.
+     * @param string[]|array{update_handlers: string[], ttl?: int} $conditions  Cache reset condition - array with table names.
+     * @param string|string[]                                      $cache_level Indicates the cache dependencies on controller, language, user group, etc.
+     * @param \Closure                                             $callable    The callable or closure that will be used to generate a value to be cached.
+     * @param bool                                                 $remove_key  Remove key from runtime storage
+     *
+     * @return mixed
+     */
+    public static function getOrSetCache($key, $conditions, $cache_level, Closure $callable, $remove_key = true)
+    {
+        if (is_array($key)) {
+            list(, $cache_key) = $key;
+        } else {
+            $cache_key = $key;
+        }
+
+        Registry::registerCache($key, $conditions, Registry::cacheLevel($cache_level));
+
+        if (Registry::isExist($cache_key) === false) {
+            Registry::set($cache_key, $callable());
+        }
+
+        $result = Registry::get($cache_key);
+
+        if ($remove_key) {
+            Registry::del($cache_key);
+        }
+
+        return $result;
     }
 }

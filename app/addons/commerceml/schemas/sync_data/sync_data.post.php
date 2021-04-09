@@ -21,7 +21,7 @@ include_once Registry::get('config.dir.addons') . 'commerceml/schemas/sync_data/
 /**
  * @var array<string, string|array> $schema
  */
-$schema['commerceml_catalog'] = [
+$schema['commerceml'] = [
     'name'           => __('commerceml.sync_data_name'),
     'last_sync_info' => [
         'function' => 'fn_sync_data_commerceml_get_last_sync_info',

@@ -63,6 +63,11 @@ function fn_settings_variants_appearance_default_products_view_templates()
     return fn_get_products_views(true);
 }
 
+/**
+ * Gets available variants for default_product_details_view setting in appearance section
+ *
+ * @return array<string, string> List of the variants
+ */
 function fn_settings_variants_appearance_default_product_details_view()
 {
     return fn_get_product_details_views();

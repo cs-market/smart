@@ -78,9 +78,6 @@ if ($mode == 'add') {
     $view->assign('product_type', Type::createByProduct($product_data));
     $view->assign('product_data', $product_data);
 
-
-    ServiceProvider::notifyIfProductIsOldProductVariation($product_data);
-
 } elseif ($mode == 'm_update') {
     /** @var \Tygh\SmartyEngine\Core $view */
     $view = Tygh::$app['view'];

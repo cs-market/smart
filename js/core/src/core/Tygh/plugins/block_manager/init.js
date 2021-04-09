@@ -14,6 +14,10 @@ export const init = {
 
         sortable._sortable();
 
+        $(params.block_selector).each(function () {
+            actions._setMenuPosition($(this));
+        });
+
         $(Tygh.doc).on('click', params.action_selector, function (e) {
             params._self = $(this);
             var jelm = params._self.parents(params.menu_selector).parent().parent();
@@ -22,6 +26,10 @@ export const init = {
             var action = params._self.data('caBlockManagerAction');
 
             return actions._executeAction(action);
+        });
+
+        $(Tygh.doc).on('block_manager:animation_complete', function (event) {
+            actions._setMenuPosition($(event.target));
         });
 
         isInit = true;

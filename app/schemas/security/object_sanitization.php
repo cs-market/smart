@@ -79,6 +79,11 @@ $schema = [
             'full_description' => SecurityHelper::ACTION_SANITIZE_HTML,
         ]
     ],
+    'product_feature_variant' => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'variant' => SecurityHelper::ACTION_REMOVE_HTML,
+        ]
+    ],
     'block'           => [
         SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
             'name' => SecurityHelper::ACTION_SANITIZE_HTML,

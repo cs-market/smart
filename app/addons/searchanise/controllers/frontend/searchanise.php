@@ -172,7 +172,7 @@ if ($mode == 'async') {
                 ]);
 
                 if (!empty($filters)) {
-                    $filter_ids = fn_array_column($filters, 'filter_id');
+                    $filter_ids = array_column($filters, 'filter_id');
                     db_query("INSERT INTO ?:se_queue ?e", [
                         'data'       => serialize($filter_ids),
                         'action'     => QueueActions::UPDATE_FACETS,
@@ -239,7 +239,7 @@ if ($mode == 'async') {
 
         } elseif ($q['action'] == QueueActions::UPDATE_FACETS) {
             list($filters, ) = fn_get_product_filters([
-                'filter_id'    => $filter_ids,
+                'filter_id'    => $data,
                 'get_variants' => false
             ], 0, $lang_code);
 
@@ -554,8 +554,6 @@ function fn_se_get_products_data(array $product_ids, $company_id = 0, $lang_code
 
         fn_se_get_products_features($products, $company_id, $lang_code);
 
-        fn_se_get_products_options_combinations_codes($products);
-
         foreach ($products as $product) {
             $item = [];
             $data = fn_se_prepare_product_data($product, $usergroups, $company_id, $lang_code);
@@ -620,23 +618,6 @@ function fn_se_get_products_features(array &$products, $company_id, $lang_code)
 }
 
 /**
- * Adds option option product codes to products list
- * 
- * @param array $products Products list
- */
-function fn_se_get_products_options_combinations_codes(array &$products)
-{
-    foreach ($products as &$product) {
-        $product['options_combinations_codes'] = implode(' ', db_get_fields(
-            "SELECT DISTINCT product_code FROM ?:product_options_inventory WHERE product_id = ?i AND product_code <> ''",
-            $product['product_id']
-        ));
-    }
-
-    unset($product);
-}
-
-/**
  * Adds additional products data to products list
  * 
  * @param array $products   Products data
@@ -657,7 +638,10 @@ function fn_se_get_products_additionals(array &$products, $company_id, $lang_cod
         $product_categories = db_get_hash_multi_array("SELECT pc.product_id, c.category_id, c.usergroup_ids, c.status FROM ?:categories AS c LEFT JOIN ?:products_categories AS pc ON c.category_id = pc.category_id WHERE product_id IN (?n) AND c.status IN (?a)", array('product_id', 'category_id'), $product_ids, [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN]);
     }
 
-    if (Registry::get('settings.General.inventory_tracking') == YesNo::YES && Registry::get('settings.General.show_out_of_stock_products') == YesNo::NO) {
+    if (
+        Registry::get('settings.General.inventory_tracking') !== YesNo::NO
+        && Registry::get('settings.General.show_out_of_stock_products') === YesNo::NO
+    ) {
         $product_options = db_get_hash_single_array("SELECT product_id, max(amount) as amount FROM ?:product_options_inventory WHERE product_id IN (?n) GROUP BY product_id", array('product_id', 'amount'), $product_ids);
     }
 
@@ -678,7 +662,7 @@ function fn_se_get_products_additionals(array &$products, $company_id, $lang_cod
             $product['se_prices'] = ['0' => ['price' => 0]];
         }
 
-        if (empty($product['is_master_product']) && $product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS && isset($product_options[$product_id])) {
+        if (empty($product['is_master_product']) && $product['tracking'] === ProductTracking::TRACK && isset($product_options[$product_id])) {
             $product['amount'] = $product_options[$product_id];
         }
 
@@ -728,7 +712,7 @@ function fn_se_get_product_quantity(array $product_data, $united_products = [])
             }
         }
 
-    } elseif (isset($product_data['tracking']) && $product_data['tracking'] == ProductTracking::DO_NOT_TRACK) {
+    } elseif (isset($product_data['tracking']) && $product_data['tracking'] === ProductTracking::DO_NOT_TRACK) {
         $quantity = 1;
 
     } else {
@@ -764,15 +748,25 @@ function fn_se_get_children_products(array &$product_data, $company_id, $lang_co
             // It's main product
             $children_product_ids = ProductVariationsServiceProvider::getGroupRepository()->getProductChildrenIds($product_data['product_id']);
         }
+
+    } else {
+        $product_data['product_type'] = ProductVariationTypes::PRODUCT_TYPE_SIMPLE;
     }
 
     // Find vendor products (for master_products)
     if (Registry::get('addons.master_products.status') == ObjectStatuses::ACTIVE) {
-        $product_data['is_master_product'] = (int) $product_data['master_product_id'] == 0 && (int) $product_data['master_product_offers_count'] > 0;
-        $product_data['is_vendor_product'] = (int) $product_data['master_product_id'] > 0 || $product_data['company_id'] > 0;
+        $product_id_map = MasterProductsServiceProvider::getProductIdMap();
+
+        $product_data['is_master_product'] = $product_id_map->isMasterProduct($product_data['product_id']);
+        $product_data['is_vendor_product'] = $product_id_map->isVendorProduct($product_data['product_id']);
 
         if ($product_data['is_master_product']) {
             $vendor_product_ids = MasterProductsServiceProvider::getProductRepository()->findVendorProductIds($product_data['product_id']);
+
+            if (empty($vendor_product_ids)) {
+                // Do not display master products if there is no any vendor products
+                $product_data['master_product_status'] = ObjectStatuses::HIDDEN;
+            }
         }
 
     } else {
@@ -806,7 +800,6 @@ function fn_se_get_children_products(array &$product_data, $company_id, $lang_co
 
         fn_se_get_products_additionals($products, $company_id, $lang_code);
         fn_se_get_products_features($products, $company_id, $lang_code);
-        fn_se_get_products_options_combinations_codes($products);
     }
 
     return $products;
@@ -1115,16 +1108,6 @@ function fn_se_prepare_product_data(array $product_data, array $usergroups, $com
 
     $entry += fn_se_prepare_product_features_data($united_products);
 
-    if (!empty($product_data['options_combinations_codes'])) {
-        $entry['options_combinations_codes'] = [
-            'name'        => 'options_combinations_codes',
-            'title'       => __('se_options_combinations_codes'),
-            'text_search' => YesNo::YES,
-            'weight'      => 100,
-            'value'       => $product_data['options_combinations_codes'],
-        ];
-    }
-
     if (!empty($product_data['short_description']) && !empty($product_data['se_full_description'])) {
         $entry['full_description'] = [
             'name'        => 'full_description',
@@ -1225,7 +1208,7 @@ function fn_se_prepare_product_data(array $product_data, array $usergroups, $com
 
     // Collect grouped data
     foreach ($entry as $entry_id => &$entry_data) {
-        if (in_array($entry_id, ['product_code', 'title', 'options_combinations_codes', 'full_description', 'search_words'])) {
+        if (in_array($entry_id, ['product_code', 'title', 'full_description', 'search_words'])) {
             $attribute = $entry_id == 'title'
                 ? 'product'
                 : ($entry_id == 'full_description' ? 'se_full_description' : $entry_id);
@@ -1247,6 +1230,18 @@ function fn_se_prepare_product_data(array $product_data, array $usergroups, $com
             }
         }
     }
+
+    /**
+     * Company_id
+     */
+    $entry['company_id'] = [
+        'name'  => 'company_id',
+        'title' => __('se_company_id'),
+        'type'  => ValueTypes::TYPE_TEXT,
+        'value' => fn_allowed_for('MULTIVENDOR')
+            ? array_unique([0, $product_data['company_id']])
+            : $product_data['company_id'],
+    ];
 
     /*
      * Support for add-on "Vendor data premoderation".
@@ -1300,15 +1295,14 @@ function fn_se_prepare_product_data(array $product_data, array $usergroups, $com
             'type'  => ValueTypes::TYPE_NONE,
             'value' => YesNo::toId($product_data['is_master_product']),
         ];
+
+        if ($product_data['is_master_product']) {
+            $entry['company_id']['value'] = 0;
+        }
     }
 
-    if (isset($product_data['is_vendor_product'])) {
-        $entry['is_vendor_product'] = [
-            'name'  => 'is_vendor_product',
-            'title' => __('se_is_vendor_product'),
-            'type'  => ValueTypes::TYPE_TEXT,
-            'value' => YesNo::toId($product_data['is_vendor_product']),
-        ];
+    if (isset($product_data['is_vendor_product']) && $product_data['is_vendor_product']) {
+        $entry['company_id']['value'] = $product_data['company_id'];
     }
 
     /**
@@ -1348,7 +1342,6 @@ function fn_se_prepare_product_data(array $product_data, array $usergroups, $com
     //
     //
     $additional_attrs = [
-        'company_id'       => ValueTypes::TYPE_TEXT,
         'weight'           => ValueTypes::TYPE_FLOAT,
         'popularity'       => ValueTypes::TYPE_FLOAT,
         'amount'           => ValueTypes::TYPE_INT,
@@ -1364,9 +1357,7 @@ function fn_se_prepare_product_data(array $product_data, array $usergroups, $com
     }
 
     foreach ($additional_attrs as $name => $type) {
-        if ($name == 'company_id') {
-            $title = __('se_company_id');
-        } elseif ($name == 'empty_categories') {
+        if ($name === 'empty_categories') {
             $title = __('se_empty_categories');
         } elseif ($name == 'active_company') {
             $title = __('se_active_companies');

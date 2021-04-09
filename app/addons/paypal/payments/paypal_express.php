@@ -1,52 +1,64 @@
 <?php
 /***************************************************************************
-*                                                                          *
-*   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
-*                                                                          *
-* This  is  commercial  software,  only  users  who have purchased a valid *
-* license  and  accept  to the terms of the  License Agreement can install *
-* and use this program.                                                    *
-*                                                                          *
-****************************************************************************
-* PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
-* "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
-****************************************************************************/
+ *                                                                          *
+ *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
+ *                                                                          *
+ * This  is  commercial  software,  only  users  who have purchased a valid *
+ * license  and  accept  to the terms of the  License Agreement can install *
+ * and use this program.                                                    *
+ *                                                                          *
+ ****************************************************************************
+ * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
+ * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
+ ****************************************************************************/
 
 if (!defined('BOOTSTRAP')) {
     require './../../../payments/init_payment.php';
 }
 
 /**
- * @var array $order_info
- * @var array $processor_data
- * @var string $mode
+ * @var array                 $order_info
+ * @var array                 $processor_data
+ * @var string                $mode
+ * @var array<string, string> $pp_response
  */
-
 if (defined('PAYMENT_NOTIFICATION')) {
+    $is_mobile_app_return = !empty($_REQUEST['is_mobile_app']);
+    $order_id = !empty($_REQUEST['order_id'])
+        ? (int) $_REQUEST['order_id']
+        : 0;
 
-    if ($mode == 'cancel') {
-
+    if ($mode === 'cancel') {
         $order_info = fn_get_order_info($_REQUEST['order_id']);
         fn_pp_save_mode($order_info);
-        if ($order_info['status'] == 'O' || $order_info['status'] == 'I') {
+        if ($order_info['status'] === 'O' || $order_info['status'] === 'I') {
+            // phpcs:ignore
             $pp_response['order_status'] = 'I';
-            $pp_response["reason_text"] = __('text_transaction_cancelled');
+            // phpcs:ignore
+            $pp_response['reason_text'] = __('text_transaction_cancelled');
             fn_finish_payment($order_info['order_id'], $pp_response);
         }
 
-        fn_order_placement_routines('route', $_REQUEST['order_id'], false);
-
+        if (!$is_mobile_app_return) {
+            fn_order_placement_routines('route', $order_id, false);
+        }
     } else {
-        $order_id = (!empty($_REQUEST['order_id'])) ? $_REQUEST['order_id'] : 0;
-        $token = (!empty($_REQUEST['token'])) ? $_REQUEST['token'] : 0;
+        $token = !empty($_REQUEST['token'])
+            ? $_REQUEST['token']
+            : '';
 
-        $payment_id = db_get_field("SELECT payment_id FROM ?:orders WHERE order_id = ?i", $order_id);
+        $payment_id = db_get_field('SELECT payment_id FROM ?:orders WHERE order_id = ?i', $order_id);
         $processor_data = fn_get_payment_method_data($payment_id);
         $processor_data['processor_script'] = 'paypal_express.php';
+        /** @var array $order_info */
         $order_info = fn_get_order_info($order_id);
         fn_pp_save_mode($order_info);
 
-        fn_paypal_complete_checkout($token, $processor_data, $order_info);
+        fn_paypal_complete_checkout($token, $processor_data, $order_info, !$is_mobile_app_return);
+    }
+
+    if ($is_mobile_app_return) {
+        exit(0);
     }
 }
 

@@ -22,7 +22,11 @@
             <table width="100%" class="table table-middle table--relative table-responsive" id="payouts_list">
                 <thead>
                 <tr>
-                    <th class="left">{include file="common/check_items.tpl"}</th>
+                    <th class="left">
+                        {if !$hide_controls}
+                            {include file="common/check_items.tpl"}
+                        {/if}
+                    </th>
                     <th width="5%">
                         <div class="btn-expand-wrapper">
                             <span id="on_st"
@@ -51,15 +55,15 @@
                     {if !$hide_controls}
                         <th>{__("vendor")}</th>
                     {/if}
-                    <th class="center" width="5%">&nbsp;</th>
                     {hook name="companies:balance_list_th"}{/hook}
+                    <th class="center" width="5%">&nbsp;</th>
                     <th width="15%" class="right">{__("vendor_payouts.transaction_value")}</th>
                 </tr>
                 </thead>
                 {foreach name="payouts" from=$payouts item=payout}
                     <tr class="payout payout-{$payout.payout_type|lower}">
                         <td class="left mobile-hide">
-                            <input type="checkbox" name="payout_ids[]" value="{$payout.payout_id}" class="cm-item"/>
+                            <input type="checkbox" name="payout_ids[]" value="{$payout.payout_id}" class="cm-item {if $hide_controls} hide {/if}"/>
                         </td>
                         <td class="left approval-status-{$payout.approval_status|lower}">
                             <span name="plus_minus"

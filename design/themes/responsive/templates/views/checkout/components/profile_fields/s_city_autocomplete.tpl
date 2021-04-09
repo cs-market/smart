@@ -38,7 +38,7 @@
            value="{$zipcode}"
     />
 
-    <input class="litecheckout__input litecheckout__input--selectable litecheckout__input--selectable--like-link cm-no-failed-msg cm-select-text"
+    <input class="litecheckout__input litecheckout__input--selectable litecheckout__input--selectable--like-field cm-no-failed-msg cm-select-text"
            id="litecheckout_city_state"
            data-ca-select-id="litecheckout_city_state"
            type="search"

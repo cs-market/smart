@@ -121,7 +121,7 @@ $opts = [
     ]
 ];
 
-if ($mode == 'images') {
+if ($mode === 'images') {
     unset($opts['roots'][0]);
 }
 

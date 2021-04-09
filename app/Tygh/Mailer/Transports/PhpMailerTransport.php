@@ -16,38 +16,42 @@
 namespace Tygh\Mailer\Transports;
 
 
+use Tygh\Enum\YesNo;
 use Tygh\Mailer\ITransport;
 use Tygh\Mailer\Message;
 use Tygh\Mailer\SendResult;
+use PHPMailer\PHPMailer\PHPMailer;
 
 /**
  * The class responsible for sending the message.
  *
  * @package Tygh\Mailer\Transports
+ *
+ * @phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
+ * @phpcs:disable Squiz.Commenting.FunctionComment.EmptyThrows
  */
-class PhpMailerTransport extends \PHPMailer implements ITransport
+class PhpMailerTransport extends PHPMailer implements ITransport
 {
     /**
      * PhpMailerTransport constructor.
-     * @param array $settings
+     *
+     * @param array $settings Settings
      */
-    public function __construct($settings)
+    public function __construct(array $settings)
     {
-        $this->LE = (defined('IS_WINDOWS')) ? "\r\n" : "\n";
+        self::$LE = (defined('IS_WINDOWS')) ? "\r\n" : "\n";
         $method = isset($settings['mailer_send_method']) ? $settings['mailer_send_method'] : '';
 
-        if ($method == 'smtp') {
+        if ($method === 'smtp') {
             $this->isSMTP();
-            $this->SMTPAuth = $settings['mailer_smtp_auth'] == 'Y' ? true : false;
+            $this->SMTPAuth = $settings['mailer_smtp_auth'] === YesNo::YES;
             $this->Host = $settings['mailer_smtp_host'];
             $this->Username = $settings['mailer_smtp_username'];
             $this->Password = $settings['mailer_smtp_password'];
             $this->SMTPSecure = $settings['mailer_smtp_ecrypted_connection'];
-
-        } elseif ($method == 'sendmail') {
+        } elseif ($method === 'sendmail') {
             $this->isSendmail();
             $this->Sendmail = $settings['mailer_sendmail_path'];
-
         } else {
             $this->isMail();
         }
@@ -58,8 +62,9 @@ class PhpMailerTransport extends \PHPMailer implements ITransport
     /**
      * Initialize object by message
      *
-     * @param Message $message
-     * @throws \phpmailerException
+     * @param \Tygh\Mailer\Message $message Message
+     *
+     * @throws \PHPMailer\PHPMailer\Exception
      */
     public function initByMessage(Message $message)
     {
@@ -115,8 +120,8 @@ class PhpMailerTransport extends \PHPMailer implements ITransport
          * Executes before actually sending a message via PHPMailer,
          * allows you to perform low-level manipulations on the PHPMailer itself.
          *
-         * @param \Tygh\Mailer\Transports\PhpMailerTransport $this PHPMailerTransport instance
-         * @param \Tygh\Mailer\Message $message Sent message
+         * @param \Tygh\Mailer\Transports\PhpMailerTransport $this    PHPMailerTransport instance
+         * @param \Tygh\Mailer\Message                       $message Sent message
          */
         fn_set_hook('phpmailertransport_send_message_before_send', $this, $message);
         

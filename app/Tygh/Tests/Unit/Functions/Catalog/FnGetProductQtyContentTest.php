@@ -32,7 +32,7 @@ class FnGetProductQtyContentTest extends ATestCase
 
     protected function setUp()
     {
-        $this->requireCore('functions/fn.catalog.php');
+        $this->requireCore('functions/fn.products.php');
         $this->requireCore('functions/fn.common.php');
     }
 

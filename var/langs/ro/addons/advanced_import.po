@@ -6,13 +6,15 @@ msgstr ""
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.11.3/addons/advanced_import.po\n"
-"PO-Revision-Date: 2020-01-29 14:52\n"
+"X-Crowdin-File: /release-4.12.2/addons/advanced_import.po\n"
+"X-Crowdin-File-ID: 4098\n"
+"PO-Revision-Date: 2021-02-01 09:11\n"
 
 msgctxt "Addons::name::advanced_import"
 msgid "Advanced products import"
-msgstr "Import produse avansate"
+msgstr "Import avansat produse"
 
 msgctxt "Addons::description::advanced_import"
 msgid "Allows you to match the fields in the imported file with the product properties. These matchings and other import settings can also be saved as presets for later use."
@@ -96,7 +98,7 @@ msgstr "Editare presetare: [preset]"
 
 msgctxt "Languages::advanced_import.add_preset"
 msgid "Add preset"
-msgstr "Adaugă model"
+msgstr "Adaugă presetare"
 
 msgctxt "Languages::advanced_import.new_preset"
 msgid "New preset"
@@ -345,4 +347,40 @@ msgstr "Nu se poate detecta automat delimitatorul. Vă rugăm să specificaţi m
 msgctxt "Languages::advanced_import.incorrect_delimiter"
 msgid "Specified (or auto detected) delimiter seems to be incorrect. Please specify the correct delimiter manually in the additional settings on the \"File\" tab."
 msgstr "Nu se poate detecta automat delimitatorul. Vă rugăm să specificaţi manual delimitator corect în Setări suplimentare pe fila \"Fișier\"."
+
+msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
+msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
+msgstr "Ștergerea acestui import predefinit va șterge și fișierul atașat la aceasta. Sigur doriți să continuați?"
+
+msgctxt "Languages::advanced_import.common_preset"
+msgid "All vendors"
+msgstr "Toți vânzătorii"
+
+msgctxt "Languages::advanced_import.your_presets"
+msgid "Vendor's presets"
+msgstr "Presetările vânzătorului"
+
+msgctxt "Languages::advanced_import.common_presets"
+msgid "Marketplace presets"
+msgstr "Presetări marketplace"
+
+msgctxt "Languages::advanced_import.file_not_loaded"
+msgid "File was not loaded. Please reload the page and try again."
+msgstr "Fișierul nu a fost încărcat. Reîncarcă pagina și încearcă din nou."
+
+msgctxt "Languages::advanced_import.local_file_selected"
+msgid "Local file selected"
+msgstr "Fișier local selectat"
+
+msgctxt "Languages::advanced_import.text_popup_file_editor_notice_full_link"
+msgid "You can upload and download files via <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
+msgstr "Puteţi încărca şi descărca fişiere prin intermediul <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\"> Fişier Editor</a>"
+
+msgctxt "Languages::advanced_import.file_extension_was_not_supported_by_owner"
+msgid "Couldn't use your file [name]. This import preset only allows the following extensions: [ext]."
+msgstr "Nu s-a putut utiliza fișierul [name]. Această presetare de import permite numai următoarele extensii: [ext]."
+
+msgctxt "Languages::advanced_import.save_selected_file"
+msgid "Save selected file"
+msgstr "Salvați fișierul selectat"
 

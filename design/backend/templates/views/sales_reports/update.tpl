@@ -105,10 +105,9 @@
 
 {/capture}
 
-{if $report_id}
-    {$title_start = __("editing_report")}
-    {$title_end = $report.description}
-{else}
-    {$title = __("new_report")}
-{/if}
-{include file="common/mainbox.tpl" title=$title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons}
+{include
+    file="common/mainbox.tpl"
+    title=($report_id) ? $report.description : __("new_report")
+    content=$smarty.capture.mainbox
+    buttons=$smarty.capture.buttons
+}

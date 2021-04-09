@@ -12,14 +12,13 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
 use Tygh\Shippings\RusPickpoint;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($mode == 'postamat_update') {
-    $url = RusPickpoint::Url();
+if ($mode === 'postamat_update') {
+    $url = RusPickpoint::url();
     RusPickpoint::postamatPickpoint($url . 'postamatlist');
 
-    return array(CONTROLLER_STATUS_REDIRECT, "addons.update?addon=rus_pickpoint");
+    return [CONTROLLER_STATUS_REDIRECT, 'addons.update?addon=rus_pickpoint'];
 }

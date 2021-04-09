@@ -774,7 +774,11 @@ function fn_gift_certificates_place_order(&$order_id, &$action, &$order_status, 
             $use_gift_certificate_products = array();
             if (!empty($cart['products'])) {
                 foreach ($cart['products'] as $product) {
-                    if (!empty($product['extra']['exclude_from_calculate']) && $product['extra']['exclude_from_calculate'] == GIFT_CERTIFICATE_EXCLUDE_PRODUCTS) {
+                    if (
+                        !empty($product['extra']['exclude_from_calculate'])
+                        && $product['extra']['exclude_from_calculate'] == GIFT_CERTIFICATE_EXCLUDE_PRODUCTS
+                        && isset($product['extra']['in_use_certificate'])
+                    ) {
                         foreach ($product['extra']['in_use_certificate'] as $gift_cert_code => $quantity) {
                             $use_gift_certificate_products[$gift_cert_code][$product['product_id']] = $quantity;
                         }

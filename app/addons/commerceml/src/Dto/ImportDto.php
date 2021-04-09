@@ -26,6 +26,16 @@ use Tygh\Enum\SyncDataStatuses;
 class ImportDto
 {
     /**
+     * Orders import
+     */
+    const IMPORT_TYPE_ORDERS = 'sale';
+
+    /**
+     * Products import
+     */
+    const IMPORT_TYPE_CATALOG = 'catalog';
+
+    /**
      * @var int
      */
     public $import_id;
@@ -49,6 +59,11 @@ class ImportDto
      * @var string
      */
     public $status;
+
+    /**
+     * @var string
+     */
+    public $type;
 
     /**
      * @var bool
@@ -86,6 +101,7 @@ class ImportDto
             'company_id'       => $this->company_id,
             'user_id'          => $this->user_id,
             'status'           => $this->status,
+            'type'             => $this->type,
             'has_only_changes' => YesNo::toId($this->has_only_changes),
             'created_at'       => $this->created_at,
             'updated_at'       => $this->updated_at,
@@ -108,6 +124,7 @@ class ImportDto
         $self->company_id = isset($data['company_id']) ? (int) $data['company_id'] : 0;
         $self->user_id = isset($data['user_id']) ? (int) $data['user_id'] : 0;
         $self->status = isset($data['status']) ? (string) $data['status'] : '';
+        $self->type = isset($data['type']) ? (string) $data['type'] : '';
         $self->has_only_changes = isset($data['has_only_changes']) ? YesNo::toBool($data['has_only_changes']) : false;
         $self->created_at = isset($data['created_at']) ? (int) $data['created_at'] : time();
         $self->updated_at = isset($data['updated_at']) ? (int) $data['updated_at'] : time();

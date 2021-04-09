@@ -89,11 +89,7 @@
 <div class="control-group">
     <label class="control-label"
            for="elm_send_receipt_{$payment_id}"
-    >
-        {__("addons.rus_payments.send_receipt_to_yandex_checkpoint")}
-        {include file="common/tooltip.tpl" tooltip=__("addons.rus_payments.yandex_checkpoint.only_rub_allowed")}
-        :
-    </label>
+    >{__("addons.rus_payments.send_receipt_to_yandex_checkpoint")}:</label>
     <div class="controls">
         <input type="checkbox"
                name="payment_data[processor_params][send_receipt]"
@@ -101,6 +97,7 @@
                value="Y"
                {if $processor_params.send_receipt == "Y" && $processor_params.currency|default:"RUB" == "RUB"}checked="checked"{/if}
         />
+        <p class="muted description">{__("addons.rus_payments.yandex_checkpoint.only_rub_allowed")}</p>
     </div>
 </div>
 
@@ -111,7 +108,7 @@
     <fieldset>
 
         <div class="control-group">
-            <label class="control-label" for="certificate_filename">{__("yandex_certificate_filename")} {include file="common/tooltip.tpl" tooltip=__("addons.rus_payments.pkcs12_format")} :</label>
+            <label class="control-label" for="certificate_filename">{__("yandex_certificate_filename")}:</label>
             <div class="controls" id="certificate_filename">
                 {if $processor_params.certificate_filename}
                     <div class="text-type-value pull-left">
@@ -123,13 +120,15 @@
                 {/if}
 
                 <div {if $processor_params.certificate_filename}class="clear"{/if}>{include file="common/fileuploader.tpl" var_name="payment_certificate[]"}</div>
+                <p class="muted description">{__("addons.rus_payments.pkcs12_format")}</p>
             <!--certificate_filename--></div>
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="yandex_p12_password">{__("yandex_p12_password")} {include file="common/tooltip.tpl" tooltip=__("addons.rus_payments.p12_password_descr")}:</label>
+            <label class="control-label" for="yandex_p12_password">{__("yandex_p12_password")}:</label>
             <div class="controls">
                 <input type="text" name="payment_data[processor_params][p12_password]" id="yandex_p12_password" value="{$processor_params.p12_password}" />
+                <p class="muted description">{__("addons.rus_payments.p12_password_descr")}</p>
             </div>
         </div>
 

@@ -25,8 +25,7 @@
 
                 {if $field.type == 'input'}
                     <div class="control-group">
-                        <label for="elm_ym_{$field_name}" class="control-label{if $field.required} cm-required{/if}">{__("yml_export.param_{$field_name}")}
-                            {if $field.tooltip}{include file="common/tooltip.tpl" tooltip=$field.tooltip}{/if}:
+                        <label for="elm_ym_{$field_name}" class="control-label{if $field.required} cm-required{/if}">{__("yml_export.param_{$field_name}")}:
                         </label>
                         <div class="controls">
                             <input type="text" name="pricelist_data[{$field_name}]" id="elm_ym_{$field_name}" size="55"
@@ -34,26 +33,30 @@
                                    {if $field.placeholder}placeholder="{$field.placeholder}"{/if}
                                    value="{if isset($price.param_data.$field_name)}{$price.param_data.$field_name}{elseif isset($field.default)}{$field.default}{/if}"
                             />
+                            {if $field.tooltip}
+                                <p class="muted description">{$field.tooltip nofilter}</p>
+                            {/if}
                         </div>
                     </div>
 
                 {elseif $field.type == 'checkbox'}
                     <div class="control-group">
-                        <label for="elm_ym_{$field_name}" class="control-label{if $field.required} cm-required{/if}">{__("yml_export.param_{$field_name}")}
-                            {if $field.tooltip}{include file="common/tooltip.tpl" tooltip=$field.tooltip}{/if}:
+                        <label for="elm_ym_{$field_name}" class="control-label{if $field.required} cm-required{/if}">{__("yml_export.param_{$field_name}")}:
                         </label>
                         <div class="controls">
                             <input type="hidden" name="pricelist_data[{$field_name}]" value="N">
                             <input type="checkbox" name="pricelist_data[{$field_name}]" id="elm_ym_{$field_name}"
                                 {if (isset($price.param_data.$field_name) && $price.param_data.$field_name == 'Y') ||
                                     (!isset($price.param_data.$field_name) && $field.default == 'Y')} checked{/if} value="Y"/>
+                            {if $field.tooltip}
+                                <p class="muted description">{$field.tooltip nofilter}</p>
+                            {/if}
                         </div>
                     </div>
 
                 {elseif $field.type == 'selectbox'}
                     <div class="control-group">
-                        <label for="elm_ym_{$field_name}" class="control-label{if $field.required} cm-required{/if}">{__("yml_export.param_{$field_name}")}
-                            {if $field.tooltip}{include file="common/tooltip.tpl" tooltip=$field.tooltip}{/if}:
+                        <label for="elm_ym_{$field_name}" class="control-label{if $field.required} cm-required{/if}">{__("yml_export.param_{$field_name}")}:
                         </label>
                         <div class="controls">
                             <select name="pricelist_data[{$field_name}]" id="elm_ym_{$field_name}">
@@ -63,6 +66,9 @@
                                             (!isset($price.param_data.$field_name) && $field.default == $option_code)} selected="selected"{/if}>{__($option_name)}</option>
                                 {/foreach}
                             </select>
+                            {if $field.tooltip}
+                                <p class="muted description">{$field.tooltip nofilter}</p>
+                            {/if}
                         </div>
                     </div>
 

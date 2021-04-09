@@ -2,7 +2,7 @@
 
 {capture name="mainbox"}
 
-{assign var="r_url" value=$config.current_url|escape:url}
+{$r_url = $config.current_url|escape:url}
 
 <div class="items-container" id="manage_tabs_list">
 
@@ -10,11 +10,11 @@
 <div class="table-responsive-wrapper">
     <table class="table table-middle table--relative table-objects table-responsive table-responsive-w-titles">
         {foreach from=$menus item="menu"}
-            {assign var="_href_delete" value="menus.delete?menu_id=`$menu.menu_id`"}        
-            {assign var="dialog_name" value="{__("editing_menu")}: `$menu.name`"}
-            {assign var="name" value=$menu.name}
-            {assign var="edit_link" value="menus.update?menu_data[menu_id]=`$menu.menu_id`&return_url=$r_url"}
-            {assign var="manage_items_link" value="static_data.manage?section=A&menu_id=`$menu.menu_id`"}
+            {$_href_delete = "menus.delete?menu_id=`$menu.menu_id`"}        
+            {$dialog_name = $menu.name}
+            {$name = $menu.name}
+            {$edit_link = "menus.update?menu_data[menu_id]=`$menu.menu_id`&return_url=$r_url"}
+            {$manage_items_link = "static_data.manage?section=A&menu_id=`$menu.menu_id`"}
             {capture name = "items_link"}            
                 <li>{btn type="list" text=__("manage_items") href=$manage_items_link}</li>
                 <li class="divider"></li>

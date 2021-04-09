@@ -12,17 +12,20 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Illuminate\Support\Collection;
 use Tygh\BlockManager\Location;
 use Tygh\BlockManager\SchemesManager;
 use Tygh\Bootstrap;
 use Tygh\Debugger;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\YesNo;
 use Tygh\Exceptions\DeveloperException;
 use Tygh\Navigation\LastView;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Router;
 use Tygh\Settings;
 use Tygh\Themes\Themes;
-use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -353,6 +356,7 @@ function fn_dispatch($controller = '', $mode = '', $action = '', $dispatch_extra
         }
     }
 
+    /** @psalm-suppress NullReference for $_REQUEST */
     LastView::instance()->prepare($_REQUEST);
 
     $controllers_cascade = array();
@@ -582,6 +586,8 @@ function fn_dispatch($controller = '', $mode = '', $action = '', $dispatch_extra
             $view->assign('page_title', __('page_not_found'));
         }
     }
+
+    Registry::set('runtime.controller_status', $status);
 
     fn_set_hook('dispatch_before_display');
 
@@ -1119,23 +1125,43 @@ function fn_check_requested_url($area = AREA)
 /**
  * Gets storefront protocol (depends on security settings)
  *
- * @param int|null $company_id Company to get protocol for
+ * @param int|null $company_id    Company to get protocol for.
+ *                                This parameter is deprecated. Use $storefront_id instead
+ * @param int|null $storefront_id Storefront to get protocol for
  *
- * @return string protocol - http or https
+ * @return string Either https or http
  */
-function fn_get_storefront_protocol($company_id = null)
+function fn_get_storefront_protocol($company_id = null, $storefront_id = null)
 {
-    static $protocols = array();
+    static $protocols = [];
 
-    if (!$company_id) {
-        $company_id = Registry::get('runtime.company_id');
+    if (fn_allowed_for('ULTIMATE')) {
+        fn_ult_bootstrap_company_storefront($company_id, $storefront_id);
     }
 
-    if (empty($protocols[$company_id])) {
-        $protocols[$company_id] = Settings::instance($company_id)->getValue('secure_storefront', 'Security') === YesNo::YES ? 'https' : 'http';
+    if (!$storefront_id && SiteArea::isStorefront(AREA)) {
+        $storefront_id = StorefrontProvider::getStorefront()->storefront_id;
+    }
+    $storefront_id = (int) $storefront_id;
+
+    if (isset($protocols[$storefront_id])) {
+        return $protocols[$storefront_id];
     }
 
-    return $protocols[$company_id];
+    $protocols[$storefront_id] = Registry::getOrSetCache(
+        ['storefront_protocol', 'storefront_protocol' . $storefront_id],
+        ['settings_objects'],
+        'static',
+        static function () use ($storefront_id) {
+            $settings_manager = Settings::instance(['storefront_id' => $storefront_id]);
+
+            return YesNo::toBool($settings_manager->getValue('secure_storefront', 'Security'))
+                ? 'https'
+                : 'http';
+        }
+    );
+
+    return $protocols[$storefront_id];
 }
 
 /**
@@ -1178,4 +1204,58 @@ function fn_get_dispatch_routing($request)
     $dispatch_extra = !empty($parts[3]) ? $parts[3] : '';
 
     return array($dispatch, $controller, $mode, $action, $dispatch_extra);
+}
+
+/**
+ * Filters out setting sections that can't be accessed by the current company or storefront.
+ *
+ * @param array<string, array<string, int|string>> $sections_from_menu  Setting sections from menu
+ * @param array<string, array<string, int|string>> $accessible_sections Setting sections that can be accessed by the
+ *                                                                      current company or storefront
+ *
+ * @return array<string, array<string, int|string>> Setting sections from menu that can be accessed
+ * @see \Tygh\Settings::getCoreSections()
+ *
+ * @internal
+ */
+function fn_filter_settings_sections_by_accessibility(array $sections_from_menu, array $accessible_sections)
+{
+    $sections = new Collection($sections_from_menu);
+
+    $sections = $sections->filter(
+        function (array $section_data) use ($accessible_sections) {
+            if (!isset($section_data['type']) || $section_data['type'] === 'title') {
+                return false;
+            }
+
+            if ($section_data['type'] === 'divider') {
+                return true;
+            }
+
+            $href_params = explode('?', $section_data['href']);
+            parse_str(end($href_params), $href_params);
+            if (empty($href_params['section_id'])) {
+                return true;
+            }
+
+            if (isset($accessible_sections[$href_params['section_id']])) {
+                return true;
+            }
+
+            return false;
+        }
+    );
+
+    $is_divider = true;
+    foreach ($sections as $section_id => $section_data) {
+        if ($is_divider && $section_data['type'] === 'divider') {
+            unset($sections[$section_id]);
+        }
+        $is_divider = $section_data['type'] === 'divider';
+    }
+    if ($sections->last() && $sections->last()['type'] === 'divider') {
+        $sections->pop();
+    }
+
+    return $sections->toArray();
 }

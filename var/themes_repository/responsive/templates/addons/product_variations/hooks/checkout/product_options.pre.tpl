@@ -10,13 +10,17 @@
                     {/if}
                     <select class="cm-ajax" data-ca-target-id="checkout*,cart*">
                         {foreach $feature.variants as $variant}
-                            <option data-ca-variant-id="{$variant.variant_id}"
-                                data-ca-product-id="{$variant.product.product_id}"
-                                data-ca-change-url="{"checkout.change_variation?cart_item_id={$key}&product_id={$variant.product.product_id}"|fn_url}"
-                                {if $feature.variant_id == $variant.variant_id}selected="selected"{/if}
-                            >
-                                {$variant.variant}
-                            </option>
+                            {if $variant.product}
+                                <option data-ca-variant-id="{$variant.variant_id}"
+                                    data-ca-product-id="{$variant.product.product_id}"
+                                    data-ca-change-url="{"checkout.change_variation?cart_item_id={$key}&product_id={$variant.product.product_id}"|fn_url}"
+                                    {if $feature.variant_id == $variant.variant_id}selected="selected"{/if}
+                                >
+                                    {$variant.variant}
+                                </option>
+                            {elseif $addons.product_variations.variations_show_all_possible_feature_variants === "YesNo::YES"|enum}
+                                <option disabled>{$variant.variant}</option>
+                            {/if}
                         {/foreach}
                     </select>
                     {if $feature.suffix}

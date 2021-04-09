@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: da\n"
-"X-Crowdin-File: /release-4.11.5/addons/mobile_app.po\n"
-"X-Crowdin-File-ID: 3668\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/mobile_app.po\n"
+"X-Crowdin-File-ID: 4184\n"
+"PO-Revision-Date: 2021-02-01 09:02\n"
 
 msgctxt "Addons::name::mobile_app"
 msgid "Mobile application"
@@ -22,6 +22,10 @@ msgstr ""
 
 msgctxt "Languages::app_params"
 msgid "Application"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_apply"
+msgid "Apply"
 msgstr ""
 
 msgctxt "Languages::mobile_app.section.category"
@@ -52,11 +56,39 @@ msgctxt "Languages::mobile_app.appname"
 msgid "App Name"
 msgstr ""
 
+msgctxt "Languages::mobile_app.mobile_settings"
+msgid "Settings"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_select_language"
+msgid "Select Language"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_pages"
+msgid "Pages"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_currency"
+msgid "Currency"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_language"
+msgid "Language"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_favorite"
+msgid "Favorite"
+msgstr ""
+
 msgctxt "Languages::mobile_app.appshortdescription"
 msgid "Short description"
 msgstr ""
 
 msgctxt "Languages::mobile_app.appfulldescription"
+msgid "Full description"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_full_product_description"
 msgid "Full description"
 msgstr ""
 
@@ -94,6 +126,10 @@ msgstr ""
 
 msgctxt "Languages::ttc_mobile_app.pushnotifications"
 msgid "Push notifications"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_buyer"
+msgid "Buyer"
 msgstr ""
 
 msgctxt "Languages::bundleid"
@@ -261,7 +297,7 @@ msgid "Update texts using existing locale files"
 msgstr ""
 
 msgctxt "Languages::mobile_app.invalid_locale_file"
-msgid "Invalid locale file selected for the \"[language]\" language"
+msgid "Locale file selected for the \"[language]\" language is not a valid JSON file"
 msgstr ""
 
 msgctxt "Languages::mobile_app.app_translation_updated.item"
@@ -1262,6 +1298,10 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_fiji"
 msgid "Fiji"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_filter"
+msgid "Filter"
 msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_finistere"
@@ -3004,6 +3044,14 @@ msgctxt "Languages::mobile_app.mobile_selkirkshire"
 msgid "Selkirkshire"
 msgstr ""
 
+msgctxt "Languages::mobile_app.mobile_seller"
+msgid "Seller"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_sellers"
+msgid "Sellers"
+msgstr ""
+
 msgctxt "Languages::mobile_app.mobile_senegal"
 msgid "Senegal"
 msgstr ""
@@ -3804,6 +3852,10 @@ msgctxt "Languages::mobile_app.mobile_clear_all_cart"
 msgid "Clear all cart ?"
 msgstr ""
 
+msgctxt "Languages::mobile_app.mobile_clear_all_filter"
+msgid "Clear all"
+msgstr ""
+
 msgctxt "Languages::mobile_app.mobile_clear_wish_list"
 msgid "Clear wish list?"
 msgstr ""
@@ -3882,6 +3934,10 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_login"
 msgid "Login"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_logout"
+msgid "Logout"
 msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_looking_for_ideas"
@@ -4188,6 +4244,10 @@ msgctxt "Languages::mobile_app.mobile_name"
 msgid "Name"
 msgstr ""
 
+msgctxt "Languages::mobile_app.mobile_description_optional"
+msgid "Description (optional)"
+msgstr ""
+
 msgctxt "Languages::mobile_app.mobile_description"
 msgid "Description"
 msgstr ""
@@ -4274,5 +4334,45 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_free_shipping"
 msgid "Free shipping"
+msgstr ""
+
+msgctxt "Languages::mobile_app.promotion"
+msgid "Promotion"
+msgstr ""
+
+msgctxt "Languages::mobile_app.app_store_app_id"
+msgid "App Store application ID"
+msgstr ""
+
+msgctxt "Languages::mobile_app.google_play_app_id"
+msgid "Google Play application ID"
+msgstr ""
+
+msgctxt "Languages::mobile_app.promotion_note"
+msgid "Visitors of your site who use iOS or Android devices will see a prompt to install the mobile application.<br>To show your application's icon in this prompt, <a href=\"[icon_url]\">upload App Icon</a> in the add-on settings. If App Icon is not specified, the favicon of a storefront will be used instead."
+msgstr ""
+
+msgctxt "Languages::mobile_app.we_also_have_a_mobile_app"
+msgid "We also have a mobile app"
+msgstr ""
+
+msgctxt "Languages::mobile_app.view_demo"
+msgid "View demo"
+msgstr ""
+
+msgctxt "Languages::mobile_app.open"
+msgid "Open"
+msgstr ""
+
+msgctxt "Languages::mobile_app.app_store_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://www.apple.com/app-store\" target=\"_blank\">App Store</a>. <br> For example, in https://apps.apple.com/us/app/multi-vendor-app-by-cs-cart/id1304872157 the ID is 1304872157."
+msgstr ""
+
+msgctxt "Languages::mobile_app.google_play_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://play.google.com/store\" target=\"_blank\">Google Play</a>. <br> For example, in https://play.google.com/store/apps/details?id=com.simtech.multivendor&hl=en_US the ID is com.simtech.multivendor."
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_yookassa"
+msgid "YooKassa"
 msgstr ""
 

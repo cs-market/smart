@@ -22,6 +22,7 @@ $this_dir = dirname(__FILE__);
 $classLoader = require($this_dir . '/app/lib/vendor/autoload.php');
 $classLoader->add('Tygh', $this_dir . '/app');
 class_alias('\Tygh\Tygh', 'Tygh');
+class_alias('\Tygh\Enum\ReceiverSearchMethods', '\Tygh\Enum\RecipientSearchMethods');
 
 // Prepare environment and process request vars
 list($_REQUEST, $_SERVER, $_GET, $_POST) = Bootstrap::initEnv($_GET, $_POST, $_SERVER, $this_dir);
@@ -48,7 +49,12 @@ if ($config['db_host'] == '%DB_HOST%') {
 $fn_list = array(
     'fn.database.php',
     'fn.users.php',
-    'fn.catalog.php',
+    'fn.categories.php',
+    'fn.features.php',
+    'fn.filters.php',
+    'fn.options.php',
+    'fn.product_files.php',
+    'fn.products.php',
     'fn.cms.php',
     'fn.cart.php',
     'fn.locations.php',

@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_plans.po\n"
-"X-Crowdin-File-ID: 3640\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_plans.po\n"
+"X-Crowdin-File-ID: 4156\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -26,7 +26,7 @@ msgstr "取引手数料"
 
 msgctxt "SettingsOptions::vendor_plans::include_shipping"
 msgid "Include shipping cost in vendor commissions"
-msgstr ""
+msgstr "出品者手数料に送料を含める"
 
 msgctxt "SettingsOptions::vendor_plans::include_taxes_in_commission"
 msgid "Include taxes in vendor commissions"
@@ -39,6 +39,14 @@ msgstr "取引手数料を税込みで計算する。"
 msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
 msgstr "出品者がプランを変更することを許可する"
+
+msgctxt "SettingsOptions::vendor_plans::collect_taxes_from_vendors"
+msgid "Collect taxes from vendors"
+msgstr "出品者から税金を徴収する"
+
+msgctxt "SettingsTooltips::vendor_plans::collect_taxes_from_vendors"
+msgid "Send collected taxes to the account of the marketplace."
+msgstr "徴収した税金をマーケットプレイスの管理者に送信する。"
 
 msgctxt "Languages::vendor_plans.vendor_plans"
 msgid "Vendor plans"
@@ -55,6 +63,10 @@ msgstr "選択した出品者のプランについて表示する"
 msgctxt "Languages::vendor_plans.plan"
 msgid "Plan"
 msgstr "プラン"
+
+msgctxt "Languages::vendor_plans.plan_short"
+msgid "Plan"
+msgstr ""
 
 msgctxt "Languages::vendor_plans.commission"
 msgid "Commission"
@@ -202,7 +214,7 @@ msgstr "販売可能金額 <strong>無制限</strong>"
 
 msgctxt "Languages::vendor_plans.transaction_fee_value"
 msgid "Transaction fee: <strong>[value]</strong>"
-msgstr ""
+msgstr "取引手数料:<strong>[value]</strong>"
 
 msgctxt "Languages::vendor_plans.vendor_commission"
 msgid "Vendor commission"
@@ -347,4 +359,20 @@ msgstr "新しいプランで使用中のショップに出品者を追加"
 msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
 msgid "Remove the vendor from the storefronts available in his previous plan"
 msgstr "以前のプランで使用していたショップから出品者を削除"
+
+msgctxt "Languages::vendor_plans.advanced_vendor_plan_creation"
+msgid "Advanced vendor plan creation"
+msgstr "上位の出品者プランを作成する"
+
+msgctxt "Languages::vendor_plans.text_vendor_plan_created"
+msgid "A new vendor plan \"[plan_name]\" has been created. You can now <a href=\"[link]\">set restrictions for vendors using this plan</a>."
+msgstr "新しい出品者プラン「[plan_name]」が作成されました。 <a href=\"[link]\">このプランを使用する出品者に制限を設定</a>できるようになりました。"
+
+msgctxt "Languages::vendor_plans.commission_fee"
+msgid "[commission]% fee"
+msgstr "手数料 [commission]%"
+
+msgctxt "Languages::vendor_plans.default_vendor_plan"
+msgid "Default plan"
+msgstr "標準プラン"
 

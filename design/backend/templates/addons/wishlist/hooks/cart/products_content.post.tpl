@@ -9,36 +9,34 @@
     {if $wishlist_products}
     <h4 class="mobile-visible">{__("wishlist_products")}</h4>
     <div class="table-responsive-wrapper">
-        <div class="table-wrapper">
-            <table width="100%" class="table table-condensed table--relative table-responsive">
-                <thead>
-                    <tr class="no-hover">
-                        <th>{__("wishlist_products")}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {foreach $wishlist_products as $product}
-                        {hook name="cart:product_row"}
-                            {if !$product.extra.extra.parent}
-                                <tr>
-                                    <td>
-                                    {if $product.item_type == "P"}
-                                        {if $product.product}
-                                        <a href="{"products.update?product_id=`$product.product_id`"|fn_url}">{$product.product nofilter}</a>
-                                        {else}
-                                        {__("deleted_product")}
-                                        {/if}
+        <table width="100%" class="table table-condensed table--relative table-responsive table-responsive-w-titles">
+            <thead>
+                <tr class="no-hover">
+                    <th>{__("wishlist_products")}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach $wishlist_products as $product}
+                    {hook name="cart:product_row"}
+                        {if !$product.extra.extra.parent}
+                            <tr>
+                                <td data-th="&nbsp;">
+                                {if $product.item_type == "P"}
+                                    {if $product.product}
+                                    <a href="{"products.update?product_id=`$product.product_id`"|fn_url}">{$product.product nofilter}</a>
+                                    {else}
+                                    {__("deleted_product")}
                                     {/if}
-                                    {hook name="cart:products_list"}
-                                    {/hook}
-                                    </td>
-                                </tr>
-                            {/if}
-                        {/hook}
-                    {/foreach}
-                </tbody>
-            </table>
-        </div>
+                                {/if}
+                                {hook name="cart:products_list"}
+                                {/hook}
+                                </td>
+                            </tr>
+                        {/if}
+                    {/hook}
+                {/foreach}
+            </tbody>
+        </table>
     </div>
     {/if}
 {/if}

@@ -32,6 +32,14 @@ msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
 msgstr "Allow vendors to change their current plan"
 
+msgctxt "SettingsOptions::vendor_plans::collect_taxes_from_vendors"
+msgid "Collect taxes from vendors"
+msgstr "Collect taxes from vendors"
+
+msgctxt "SettingsTooltips::vendor_plans::collect_taxes_from_vendors"
+msgid "Send collected taxes to the account of the marketplace."
+msgstr "Send collected taxes to the account of the marketplace."
+
 msgctxt "Languages::vendor_plans.vendor_plans"
 msgid "Vendor plans"
 msgstr "Vendor plans"
@@ -45,6 +53,10 @@ msgid "Shows information about the selected vendor plan"
 msgstr "Shows information about the selected vendor plan"
 
 msgctxt "Languages::vendor_plans.plan"
+msgid "Plan"
+msgstr "Plan"
+
+msgctxt "Languages::vendor_plans.plan_short"
 msgid "Plan"
 msgstr "Plan"
 
@@ -339,3 +351,19 @@ msgstr "Add the vendor to the storefronts available in the new vendor plan"
 msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
 msgid "Remove the vendor from the storefronts available in his previous plan"
 msgstr "Remove the vendor from the storefronts available in his previous plan"
+
+msgctxt "Languages::vendor_plans.advanced_vendor_plan_creation"
+msgid "Advanced vendor plan creation"
+msgstr "Advanced vendor plan creation"
+
+msgctxt "Languages::vendor_plans.text_vendor_plan_created"
+msgid "A new vendor plan \"[plan_name]\" has been created. You can now <a href=\"[link]\">set restrictions for vendors using this plan</a>."
+msgstr "A new vendor plan \"[plan_name]\" has been created. You can now <a href=\"[link]\">set restrictions for vendors using this plan</a>."
+
+msgctxt "Languages::vendor_plans.commission_fee"
+msgid "[commission]% fee"
+msgstr "[commission]% fee"
+
+msgctxt "Languages::vendor_plans.default_vendor_plan"
+msgid "Default plan"
+msgstr "Default plan"

@@ -21,7 +21,7 @@ defined('BOOTSTRAP') or die('Access denied');
 
 $supplier_event = [
     'id'        => 'suppliers.order.supplier_notified',
-    'group'     => 'order',
+    'group'     => 'orders',
     'name'      => [
         'template' => 'suppliers.event.order.supplier_notified.name',
         'params'   => [

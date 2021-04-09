@@ -7,3 +7,7 @@ REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`,
 REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(19, 'Подарочные сертификаты', 'index.php?dispatch=pages.view&page_id=19', '', 'ru');
 REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(6, 'Бесплатная доставка', 'index.php?dispatch=pages.view&page_id=22', '', 'ru');
 REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(9, 'Скидка при выборе пункта самовывоза', 'index.php?dispatch=pages.view&page_id=20', '', 'ru');
+
+REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(22, 'Multivendor demo mobile', 'index.php?dispatch=pages.view&page_id=24', '', 'ru');
+REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(21, 'Acme Mobile', 'index.php?dispatch=pages.view&page_id=25', '', 'ru');
+REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(20, 'X-Box Mobile', 'index.php?dispatch=products.view&product_id=5764', '', 'ru');

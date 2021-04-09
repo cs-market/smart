@@ -22,6 +22,7 @@ use Tygh\Addons\ProductVariations\HookHandlers\DiscussionsHookHandler;
 use Tygh\Addons\ProductVariations\HookHandlers\ProductsHookHandler;
 use Tygh\Addons\ProductVariations\HookHandlers\CartsHookHandler;
 use Tygh\Addons\ProductVariations\HookHandlers\SeoHookHandler;
+use Tygh\Addons\ProductVariations\Product\CombinationsGenerator;
 use Tygh\Addons\ProductVariations\Product\ProductIdMap;
 use Tygh\Addons\ProductVariations\Product\Repository;
 use Tygh\Addons\ProductVariations\Product\Sync\ProductDataIdentityMapRepository;
@@ -30,6 +31,7 @@ use Tygh\Addons\ProductVariations\Product\Group\Repository as ProductGroupReposi
 use Tygh\Addons\ProductVariations\Product\Repository as ProductRepository;
 use Tygh\Addons\ProductVariations\Product\Type\TypeCollection;
 use Tygh\Addons\ProductVariations\Tools\QueryFactory;
+use Tygh\Enum\YesNo;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Registry;
 use Tygh\Tygh;
@@ -84,8 +86,9 @@ class ServiceProvider implements ServiceProviderInterface
                 self::getDataIdentityMapRepository(),
                 self::getSyncService(),
                 self::getProductIdMap(),
+                self::getCombinationsGenerator(),
                 fn_allowed_for('MULTIVENDOR'),
-                Registry::get('settings.General.inventory_tracking') === 'Y',
+                Registry::get('settings.General.inventory_tracking') !== YesNo::NO,
                 Registry::get('addons.product_variations.variations_allow_auto_change_default_variation') === 'Y'
             );
         };
@@ -104,6 +107,10 @@ class ServiceProvider implements ServiceProviderInterface
 
         $app['addons.product_variations.product.type.type_collection'] = function(Container $app) {
             return new TypeCollection((array) fn_get_schema('product_variations', 'product_types'));
+        };
+
+        $app['addons.product_variations.product.compbinations_generator'] = function (Container $app) {
+            return new CombinationsGenerator(self::getProductRepository());
         };
 
         $app['addons.product_variations.hook_handlers.products'] = function (Container $app) {
@@ -204,6 +211,14 @@ class ServiceProvider implements ServiceProviderInterface
     }
 
     /**
+     * @return \Tygh\Addons\ProductVariations\Product\CombinationsGenerator
+     */
+    public static function getCombinationsGenerator()
+    {
+        return Tygh::$app['addons.product_variations.product.compbinations_generator'];
+    }
+
+    /**
      * @return bool
      */
     public static function isAllowOwnImages()
@@ -217,87 +232,5 @@ class ServiceProvider implements ServiceProviderInterface
     public static function isAllowOwnFeatures()
     {
         return Registry::get('addons.product_variations.variations_allow_own_features') === 'Y';
-    }
-
-    /**
-     * @return bool
-     * @internal
-     */
-    public static function areOldProductVariationsExists()
-    {
-        $product_columns = fn_get_table_fields('products');
-        $product_columns = array_combine($product_columns, $product_columns);
-        $required_columns = ['__variation_code', '__variation_options', '__is_default_variation'];
-
-        foreach ($required_columns as $column) {
-            if (!isset($product_columns[$column])) {
-                return false;
-            }
-        }
-
-        $query = self::getQueryFactory()->createQuery(Repository::TABLE_PRODUCTS, [
-            'product_type' => 'C'
-        ]);
-
-        $query
-            ->addCondition('__variation_options IS NOT NULL')
-            ->setLimit(1)
-            ->setFields(['product_id']);
-
-        return (bool) $query->scalar();
-    }
-
-    /**
-     * @internal
-     */
-    public static function notifyIfOldProductVariationsExists()
-    {
-        static $exists;
-
-        if ($exists === null) {
-            $exists = self::areOldProductVariationsExists();
-        }
-
-        if (!$exists || !fn_check_permissions('product_variations_converter', 'process', 'admin', 'POST')) {
-            return;
-        }
-
-        fn_set_notification(
-            'W',
-            __('warning'),
-            __('product_variations.notice.old_product_variations_exists', [
-                '[convert_url]' => fn_url('product_variations_converter.process?by_combinations=0&by_variations=1&switch_company_id=0'),
-            ]),
-            'S',
-            'old_product_variations_exists'
-        );
-    }
-
-    /**
-     * @param array $product_data
-     *
-     * @internal
-     */
-    public static function notifyIfProductIsOldProductVariation(array $product_data)
-    {
-        $product_type = isset($product_data['product_type']) ? $product_data['product_type'] : null;
-
-        if (empty($product_data['__variation_options']) || !in_array($product_type, ['C', 'V'])) {
-            return;
-        }
-
-        if (!fn_check_permissions('product_variations_converter', 'process', 'admin', 'POST')) {
-            return;
-        }
-
-        fn_set_notification(
-            'W',
-            __('warning'),
-            __('product_variations.notice.is_old_product_variation', [
-                '[convert_url]' => fn_url('product_variations_converter.process?by_combinations=0&by_variations=1&switch_company_id=0'),
-            ]),
-            'S',
-            'is_old_product_variation'
-        );
     }
 }

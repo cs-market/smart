@@ -1,43 +1,72 @@
 {capture name="mainbox"}
 
-<form action="{""|fn_url}" method="post" name="taxes_form" class="{if ""|fn_check_form_permissions} cm-hide-inputs{/if}">
+<form action="{""|fn_url}" method="post" id="taxes_form" name="taxes_form" class="{if ""|fn_check_form_permissions} cm-hide-inputs{/if}">
+
+{$tax_statuses=""|fn_get_default_statuses:false}
+{$has_permission = fn_check_permissions("taxes", "update", "admin", "POST", ["table" => "states"]) && fn_check_permissions("states", "m_delete", "admin", "POST", ["table" => "states"])}
+
+{if $has_permission}
+    {hook name="taxes:bulk_edit"}
+        {include file="views/taxes/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
 
 {if $taxes}
-<div class="table-responsive-wrapper">
+<div class="table-responsive-wrapper longtap-selection" id="taxes_content">
     <table width="100%" class="table table-middle table--relative table-responsive">
-    <thead>
+    <thead
+        data-ca-bulkedit-default-object="true"
+        data-ca-bulkedit-component="defaultObject"
+    >
     <tr>
-        <th class="mobile-hide">{include file="common/check_items.tpl"}</th>
+        <th width="6%" class="mobile-hide">
+            {include file="common/check_items.tpl" check_statuses=($has_permission) ? $tax_statuses : ''}
+
+            <input type="checkbox"
+                class="bulkedit-toggler hide"
+                data-ca-bulkedit-toggler="true"
+                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+            />
+        </th>
         <th width="15%">{__("name")}</th>
-        <th>{__("regnumber")}</th>
-        <th>{__("priority")}</th>
-        <th>{__("rates_depend_on")}</th>
-        <th class="center">{__("price_includes_tax")}</th>
+        <th width="10%">{__("regnumber")}</th>
+        <th width="8%">{__("priority")}</th>
+        <th width="15%">{__("rates_depend_on")}</th>
+        <th width="10%" class="center">{__("price_includes_tax")}</th>
 
         {hook name="taxes:manage_header"}
         {/hook}
 
-        <th width="5%">&nbsp;</th>
+        <th width="8%">&nbsp;</th>
         <th width="10%" class="right">{__("status")}</th>
     </tr>
     </thead>
     {foreach from=$taxes item=tax}
-    <tr class="cm-row-status-{$tax.status|lower}" data-ct-tax-id="{$tax.tax_id}">
-        <td class="center mobile-hide" width="1%">
-            <input type="checkbox" name="tax_ids[]" value="{$tax.tax_id}" class="cm-item" /></td>
-        <td class="nowrap" data-ct-tax-name="{$tax.tax}" data-th="{__("name")}">
+    <tr class="cm-row-status-{$tax.status|lower} cm-longtap-target" 
+        data-ct-tax-id="{$tax.tax_id}"
+        {if $has_permission}
+            data-ca-longtap-action="setCheckBox"
+            data-ca-longtap-target="input.cm-item"
+            data-ca-id="{$tax.tax_id}"
+        {/if}
+    >
+        <td class="center mobile-hide" width="6%">
+            <input type="checkbox" name="tax_ids[]" value="{$tax.tax_id}" class="cm-item cm-item-status-{$tax.status|lower} hide" />
+        </td>
+        <td width="15%" class="nowrap" data-ct-tax-name="{$tax.tax}" data-th="{__("name")}">
             <a href="{"taxes.update?tax_id=`$tax.tax_id`"|fn_url}">{$tax.tax}</a>
         </td>
-        <td data-th="{__("regnumber")}">
+        <td width="10%" data-th="{__("regnumber")}">
             <input type="text" name="tax_data[{$tax.tax_id}][regnumber]" size="10" value="{$tax.regnumber}" class="input-mini input-hidden" /></td>
-        <td class="center" data-th="{__("priority")}">
+        <td width="8%" class="center" data-th="{__("priority")}">
             <input type="text" name="tax_data[{$tax.tax_id}][priority]" size="3" value="{$tax.priority}" class="input-micro input-hidden" /></td>
-        <td data-th="{__("rates_depend_on")}"><select name="tax_data[{$tax.tax_id}][address_type]">
+        <td width="15%" data-th="{__("rates_depend_on")}"><select name="tax_data[{$tax.tax_id}][address_type]">
                 <option value="S" {if $tax.address_type == "S"}selected="selected"{/if}>{__("shipping_address")}</option>
                 <option value="B" {if $tax.address_type == "B"}selected="selected"{/if}>{__("billing_address")}</option>
             </select>
         </td>
-        <td class="center" data-th="{__("price_includes_tax")}">
+        <td width="10%" class="center" data-th="{__("price_includes_tax")}">
             <input type="hidden" name="tax_data[{$tax.tax_id}][price_includes_tax]" value="N" />
             <input type="checkbox" name="tax_data[{$tax.tax_id}][price_includes_tax]" value="Y" {if $tax.price_includes_tax == "Y"}checked="checked"{/if} />
         </td>
@@ -45,7 +74,7 @@
         {hook name="taxes:manage_data"}
         {/hook}
 
-        <td class="nowrap" data-th="{__("tools")}">
+        <td width="8%" class="nowrap" data-th="{__("tools")}">
             {capture name="tools_list"}
                 {hook name="taxes:list_extra_links"}
                     <li>{btn type="list" text=__("edit") href="taxes.update?tax_id=`$tax.tax_id`"}</li>
@@ -56,14 +85,14 @@
                 {dropdown content=$smarty.capture.tools_list}
             </div>
         </td>
-        <td class="right nowrap" data-th="{__("status")}">
+        <td width="10%" class="right nowrap" data-th="{__("status")}">
             {$has_permission = fn_check_permissions("tools", "update_status", "admin", "GET", ["table" => "taxes"])}
             {include file="common/select_popup.tpl" id=$tax.tax_id status=$tax.status object_id_name="tax_id" table="taxes" non_editable=!$has_permission}
         </td>
     </tr>
     {/foreach}
     </table>
-</div>
+<!--taxes_content--></div>
 {else}
     <p class="no-items">{__("no_data")}</p>
 {/if}
@@ -74,10 +103,6 @@
     {if $taxes}
         {capture name="tools_list"}
             {hook name="taxes:manage_tools_list"}
-                <li>{btn type="list" text=__("apply_tax_to_products") dispatch="dispatch[taxes.apply_selected_taxes]" form="taxes_form"}</li>
-                <li>{btn type="list" text=__("unset_tax_to_products") dispatch="dispatch[taxes.unset_selected_taxes]" form="taxes_form"}</li>
-                <li class="divider mobile-hide"></li>
-                <li class="mobile-hide">{btn type="delete_selected" dispatch="dispatch[taxes.m_delete]" form="taxes_form"}</li>
             {/hook}
         {/capture}
         {dropdown content=$smarty.capture.tools_list}

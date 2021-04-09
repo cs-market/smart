@@ -42,7 +42,7 @@
                         extra_data=$smarty.capture.extra_data
                         nostatus=true
                         act=$act
-                        header_text={__("addons.rus_exim_1c.editing_currency", ["[currency_name]" => $commerceml_currency.commerceml_currency])}
+                        header_text=$commerceml_currency.commerceml_currency
                     }
                 {/foreach}
                 </tbody>

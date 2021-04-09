@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: pl\n"
-"X-Crowdin-File: /release-4.11.5/addons/stripe_connect.po\n"
-"X-Crowdin-File-ID: 3658\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/stripe_connect.po\n"
+"X-Crowdin-File-ID: 4192\n"
+"PO-Revision-Date: 2021-02-01 09:10\n"
 
 msgctxt "Addons::name::stripe_connect"
 msgid "Stripe Connect payments"
@@ -39,6 +39,10 @@ msgstr "Prowizja od zamówień i niewypłaconych wypłat"
 msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+msgctxt "Languages::stripe_connect.stripe_connect_short"
+msgid "Stripe"
+msgstr ""
 
 msgctxt "Languages::stripe_connect.redirect_uri_admin"
 msgid "Redirect URI for administrator"
@@ -163,4 +167,44 @@ msgstr "W tym zamówieniu użyto bonu upominkowego. [product] nie wie, który ze
 msgctxt "Languages::stripe_connect.payment_intent_error"
 msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
 msgstr "Wystąpił błąd podczas tworzenia PaymentIntent o numerze płatności #[payment_id]: [error]"
+
+msgctxt "Languages::log_type_stripe_connect"
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgctxt "Languages::log_action_sc_failure"
+msgid "Error"
+msgstr "Błąd"
+
+msgctxt "Languages::stripe_connect.log_context"
+msgid "Context"
+msgstr "Kontekst"
+
+msgctxt "Languages::stripe_connect.unexpected_payment_intent_status"
+msgid "Unexpected status \"[status]\" of PaymentIntent"
+msgstr "Nieoczekiwany status \"[status]\" PaymentIntent"
+
+msgctxt "Languages::stripe_connect.account_link_error"
+msgid "A vendor with company ID [company_id] is not linked to a Stripe account"
+msgstr "Sprzedawca z identyfikatorem [company_id] nie jest powiązany z kontem Stripe"
+
+msgctxt "Languages::stripe_connect.transfer_creating_error"
+msgid "An error occurred during the creation of a Stripe transfer: [error]"
+msgstr "Wystąpił błąd podczas tworzenia transferu Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.charge_creating_error"
+msgid "An error occurred during the creation of a Stripe charge: [error]"
+msgstr "Wystąpił błąd podczas tworzenia obciążenia Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_creating_error"
+msgid "An error occurred during the creation of a Stripe customer: [error]"
+msgstr "Wystąpił błąd podczas tworzenia klienta Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_sharing_error"
+msgid "An error occurred during the share of a Stripe customer: [error]"
+msgstr "Wystąpił błąd podczas udostępniania klienta Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.stripe_processor_params_missing"
+msgid "Stripe processor params missing"
+msgstr "Brak parametrów procesora Stripe"
 

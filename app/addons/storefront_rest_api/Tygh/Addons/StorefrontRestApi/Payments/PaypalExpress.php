@@ -58,20 +58,26 @@ class PaypalExpress implements IRedirectionPayment
                 $this->details_builder
                     ->setMethod(RedirectionPaymentDetailsBuilder::GET)
                     ->setPaymentUrl($payment_link)
-                    ->setReturnUrl($this->getUrl(
-                        array('payment_notification', 'notify'),
-                        array(
-                            'payment'  => 'paypal_express',
-                            'order_id' => $this->order_info['order_id'],
+                    ->setReturnUrl(
+                        $this->getUrl(
+                            ['payment_notification', 'notify'],
+                            [
+                                'payment'       => 'paypal_express',
+                                'order_id'      => $this->order_info['order_id'],
+                                'is_mobile_app' => 1,
+                            ]
                         )
-                    ))
-                    ->setCancelUrl($this->getUrl(
-                        array('payment_notification', 'cancel'),
-                        array(
-                            'payment'  => 'paypal_express',
-                            'order_id' => $this->order_info['order_id'],
+                    )
+                    ->setCancelUrl(
+                        $this->getUrl(
+                            ['payment_notification', 'cancel'],
+                            [
+                                'payment'       => 'paypal_express',
+                                'order_id'      => $this->order_info['order_id'],
+                                'is_mobile_app' => 1,
+                            ]
                         )
-                    ))
+                    )
                     ->asArray()
             );
         } else {
@@ -116,6 +122,13 @@ class PaypalExpress implements IRedirectionPayment
      */
     protected function requestPaymentToken($payment_id, $order_id, array $order_info)
     {
+        $order_info['extra']['return_url_params'] = [
+            'is_mobile_app' => 1,
+        ];
+        $order_info['extra']['cancel_url_params'] = [
+            'is_mobile_app' => 1,
+        ];
+
         return fn_paypal_set_express_checkout($payment_id, $order_id, $order_info);
     }
 

@@ -50,6 +50,9 @@ use Exception;
  * @method Storefront addPromotionIds(int|int[] $ids)
  *
  * @package Tygh\Storefront
+ *
+ * phpcs:disable SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
+ * phpcs:disable SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
  */
 class Storefront
 {
@@ -113,6 +116,11 @@ class Storefront
     protected $relations = [];
 
     /**
+     * @var array<array-key, array<array-key, mixed>|null>
+     */
+    protected $stored_relations = [];
+
+    /**
      * @var bool
      */
     public $is_accessible_for_authorized_customers_only = false;
@@ -161,6 +169,10 @@ class Storefront
                 $this->relations[$relation_name] = isset($relations[$relation_name])
                     ? $relations[$relation_name]
                     : null;
+            }
+
+            if ($storefront_id) {
+                $this->stored_relations = $this->relations;
             }
         }
     }
@@ -325,5 +337,41 @@ class Storefront
         $new_values = array_unique(array_merge($current_values, $added_values));
 
         return $this->setRelationValue($relation_name, array_values($new_values));
+    }
+
+    /**
+     * @param string $relation_name Relation name
+     *
+     * @return bool
+     */
+    public function isReleationChanged($relation_name)
+    {
+        $stored_value = isset($this->stored_relations[$relation_name]) ? $this->stored_relations[$relation_name] : null;
+        $current_value = isset($this->relations[$relation_name]) ? $this->relations[$relation_name] : null;
+
+        return $stored_value !== $current_value;
+    }
+
+    /**
+     * Sets value as stored value for relation
+     *
+     * @param string $relation_name Relation name
+     * @param mixed  $value         Value
+     */
+    public function setStoredRelationValue($relation_name, $value)
+    {
+        $this->stored_relations[$relation_name] = $value;
+    }
+
+    /**
+     * Gets stored relation value
+     *
+     * @param string $relation_name Relation name
+     *
+     * @return mixed
+     */
+    public function getStoredRelationValue($relation_name)
+    {
+        return isset($this->stored_relations[$relation_name]) ? $this->stored_relations[$relation_name] : null;
     }
 }

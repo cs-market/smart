@@ -43,25 +43,25 @@ class CreateImportCommandHandler
     private $xml_parser;
 
     /**
-     * @var array<string, callable>
+     * @var callable
      */
-    private $xml_parser_callbacks;
+    private $xml_parser_callbacks_factory;
 
     /**
      * CreateImportCommandHandler constructor.
      *
-     * @param callable                              $import_storage_factory Import storage factory
-     * @param \Tygh\Addons\CommerceML\Xml\XmlParser $xml_parser             XML parser
-     * @param array<string, callable>               $xml_parser_callbacks   Xml parser callbacks
+     * @param callable                              $import_storage_factory       Import storage factory
+     * @param \Tygh\Addons\CommerceML\Xml\XmlParser $xml_parser                   XML parser
+     * @param callable                              $xml_parser_callbacks_factory Xml parser callbacks factory
      */
     public function __construct(
         callable $import_storage_factory,
         XmlParser $xml_parser,
-        array $xml_parser_callbacks
+        callable $xml_parser_callbacks_factory
     ) {
         $this->import_storage_factory = $import_storage_factory;
         $this->xml_parser = $xml_parser;
-        $this->xml_parser_callbacks = $xml_parser_callbacks;
+        $this->xml_parser_callbacks_factory = $xml_parser_callbacks_factory;
     }
 
     /**
@@ -77,7 +77,7 @@ class CreateImportCommandHandler
 
         $file_paths = $this->sortFiles($command->xml_file_paths);
         $import_storage = $this->createImportStorage($command);
-        $callbacks = $this->getCallbacks($import_storage);
+        $callbacks = $this->getCallbacks($import_storage, $command->import_type);
 
         try {
             foreach ($file_paths as $file_path) {
@@ -128,12 +128,14 @@ class CreateImportCommandHandler
      * Gets xml parser callbacks
      *
      * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage instance
+     * @param string                                         $import_type    Import type
      *
      * @return array<string, callable>
      */
-    private function getCallbacks(ImportStorage $import_storage)
+    private function getCallbacks(ImportStorage $import_storage, $import_type)
     {
-        $xml_parser_callbacks = $this->xml_parser_callbacks;
+        /** @var array<string, callable> $xml_parser_callbacks */
+        $xml_parser_callbacks = call_user_func($this->xml_parser_callbacks_factory, $import_type);
 
         foreach ($xml_parser_callbacks as $key => $callback) {
             $xml_parser_callbacks[$key] = static function (SimpleXmlElement $xml) use ($callback, $import_storage) {
@@ -158,6 +160,7 @@ class CreateImportCommandHandler
         $import->user_id = $command->user_id;
         $import->import_key = $command->import_key;
         $import->status = ObjectStatuses::NEW_OBJECT;
+        $import->type = $command->import_type;
         $import->created_at = time();
         $import->updated_at = time();
 

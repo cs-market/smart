@@ -1,7 +1,7 @@
 {capture name="mainbox"}
 
 {if $return_info}
-<form action="{""|fn_url}" method="post" name="return_info_form" class="form-horizontal form-edit" />
+<form action="{""|fn_url}" method="post" name="return_info_form" id="return_request_form" class="form-horizontal form-edit {if !fn_check_view_permissions("rma.update_details", "POST")}cm-hide-inputs{/if}" />
 <input type="hidden" name="change_return_status[order_id]" value="{$return_info.order_id}" />
 <input type="hidden" name="change_return_status[action]" value="{$return_info.action}" />
 <input type="hidden" name="change_return_status[status_from]" value="{$return_info.status}" />
@@ -16,14 +16,16 @@
         {assign var="time_to" value=$return_info.timestamp|date_format:$settings.Appearance.date_format|escape:url}
         {__("on")}&nbsp;<a href="{"rma.returns?period=C&time_from=`$time_from`&time_to=`$time_to`"|fn_url}">{$return_info.timestamp|date_format:"`$settings.Appearance.date_format`"}</a>,&nbsp;&nbsp;{$return_info.timestamp|date_format:"`$settings.Appearance.time_format`"}
 </div>
+
+{include file="views/order_management/components/profiles_info.tpl" user_data=$order_info location="I" form_id="return_request_form"}
 {/capture}
 
 {hook name="rma:items_content"}
 {/hook}
 
-{assign var="check_disabled" value=false}
+{$is_check_disabled=false}
 {if $return_info.status != "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum}
-    {assign var="check_disabled" value=true}
+    {$is_check_disabled=true}
 {/if}
 
 {capture name="tabsbox"}
@@ -46,18 +48,18 @@
             <tr>
                 <th width="1%" class="center">
                     {hook name="rma:returned_items_header"}
-                    {include file="common/check_items.tpl" check_disabled=$check_disabled}
+                    {include file="common/check_items.tpl" is_check_disabled=$is_check_disabled}
                     {/hook}
                 </th>
-                <th width="100%">{__("product")}</th>
-                <th>{__("price")}</th>
-                <th class="nowrap">{__("quantity")}</th>
-                <th>{__("reason")}</th>
+                <th width="55%">{__("product")}</th>
+                <th width="7%">{__("price")}</th>
+                <th width="7%" class="nowrap">{__("quantity")}</th>
+                <th width="30%">{__("reason")}</th>
             </tr>
             </thead>
             {foreach from=$return_info.items["Addons\\Rma\\ReturnOperationStatuses::APPROVED"|enum] item="ri" key="key"}
             <tr>
-                <td width="1%" class="center" data-th="">
+                <td class="center" data-th="">
                     {hook name="rma:returned_items_content"}
                     <input type="checkbox" name="accepted[{$ri.item_id}][chosen]" value="Y"{if $return_info.status != "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum} disabled="disabled"{/if} class="cm-item" />
                     {/hook}
@@ -65,7 +67,7 @@
                 <td data-th="{__("product")}">{if !$ri.deleted_product}<a href="{"products.update?product_id=`$ri.product_id`"|fn_url}">{/if}{$ri.product|default:$ri.product nofilter}{if !$ri.deleted_product}</a>{/if}
                 {if $ri.product_options}<div class="options-info">&nbsp;{include file="common/options_info.tpl" product_options=$ri.product_options}</div>{/if}
                 </td>
-                <td width="10%" class="nowrap" data-th="{__("price")}">
+                <td class="nowrap" data-th="{__("price")}">
                     {if !$ri.price}{__("free")}{else}{include file="common/price.tpl" value=$ri.price}{/if}
                 </td>
                 <td data-th="{__("quantity")}">
@@ -77,7 +79,7 @@
                             <option value="{$smarty.section.$key.index}" {if $smarty.section.$key.index == $ri.amount}selected="selected"{/if}>{$smarty.section.$key.index}</option>
                     {/section}
                     </select></td>
-                <td class="nowrap" data-th="{__("reason")}">
+                <td data-th="{__("reason")}">
                     {assign var="reason_id" value=$ri.reason}
                     &nbsp;{$reasons.$reason_id.property}&nbsp;
                 </td>
@@ -107,7 +109,7 @@
             <thead>
             <tr>
                 <th>
-                    {include file="common/check_items.tpl" check_disabled=$check_disabled}
+                    {include file="common/check_items.tpl" is_check_disabled=$is_check_disabled}
                 <th width="100%">{__("product")}</th>
                 <th>{__("price")}</th>
                 <th class="nowrap">{__("quantity")}</th>
@@ -156,18 +158,6 @@
         </div>
     </div>
 </fieldset>
-{* Customer info *}
-<div class="buttons-container">
-    <div class="controls">
-        {include file="buttons/button.tpl" but_text=__("customer_information") but_onclick="Tygh.$('#customer_info').toggle();" but_role="text" but_meta="text-button"}
-    </div>
-</div>
-<div id="customer_info" class="hidden">
-    <div class="controls">
-        {include file="views/profiles/components/profiles_info.tpl" user_data=$order_info location="I"}
-    </div>
-</div>
-{* /Customer info *}
 
 <div class="control-group">
     <div class="controls">
@@ -178,63 +168,57 @@
 
 <div id="content_actions" class="cm-hide-save-button hidden">
 
-<fieldset>
-{hook name="rma:details_actions"}
-<div class="control-group">
-    <label class="control-label" for="elm_status">{__("status")}:</label>
-    <div class="controls">
-        {include file="common/status.tpl" select_id="elm_status" status=$return_info.status display="select" name="change_return_status[status_to]" status_type=$smarty.const.STATUSES_RETURN}
-    </div>
-</div>
+    <fieldset>
+        {hook name="rma:details_actions"}
+            <div class="control-group">
+                <label class="control-label" for="elm_status">{__("status")}:</label>
+                <div class="controls">
+                    {include file="common/status.tpl" select_id="elm_status" status=$return_info.status display="select" name="change_return_status[status_to]" status_type=$smarty.const.STATUSES_RETURN}
+                </div>
+            </div>
 
-<div class="control-group">
-    <label for="elm_recalc_order" class="control-label">{__("recalculate_order")}</label>
-    <div class="controls">
-        <label class="radio">
-            <input id="elm_recalc_order" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::AUTO"|enum} />
-        </label>
-    </div>
-</div>
+        <div class="control-group">
+            <label for="elm_recalc_order" class="control-label">{__("rma.choose_change_return_status")}</label>
+            <div class="controls">
+                <p>
+                    <label class="radio">{__("rma.recalculate_order")}
+                        <input id="elm_recalc_order" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::AUTO"|enum} />
+                    </label>
+                </p>
+                {if $is_refund == "YesNo::YES"|enum}
+                    <p>
+                        <label class="radio">{__("rma.manually_recalculate_order")}
+                            <input id="elm_recalc_manually" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::MANUALLY"|enum} />
+                        </label>
+                    </p>
+                {/if}
+                <p>
+                    <label class="radio">{__("rma.dont_recalculate_order")}
+                        <input id="elm_recalc_skip" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::NOT_RECALCULATE"|enum} checked="checked" />
+                    </label>
+                </p>
+            </div>
+        </div>
 
-{if $is_refund == "Y"}
-<div class="control-group">
-    <label for="elm_recalc_manually" class="control-label">{__("manually_recalculate_order")}</label>
-    <div class="controls">
-        <label class="radio">
-            <input id="elm_recalc_manually" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::MANUALLY"|enum} />
-        </label>
-    </div>
-</div>
-{/if}
+        <div class="control-group notify-customer">
+            <label class="control-label" for="notify_user">{__("notify_customer")}</label>
+            <div class="controls">
+                <label class="checkbox">
+                    <input type="checkbox" name="change_return_status[notify_user]" id="notify_user" value="Y"/>
+                </label>
+            </div>
+        </div>
 
-<div class="control-group">
-    <label class="control-label" for="elm_recalc_skip">{__("dont_recalculate_order")}</label>
-    <div class="controls">
-        <label class="radio">
-            <input id="elm_recalc_skip" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::NOT_RECALCULATE"|enum} checked="checked" />
-        </label>
-    </div>
-</div>
+        <div class="control-group notify-department">
+            <label class="control-label" for="notify_department">{__("notify_orders_department")}</label>
+            <div class="controls">
+                <label class="checkbox">
+                    <input type="checkbox" name="change_return_status[notify_department]" id="notify_department" value="Y"/>
+                </label>
+            </div>
+        </div>
 
-<div class="control-group notify-customer">
-    <label class="control-label" for="notify_user">{__("notify_customer")}</label>
-    <div class="controls">
-        <label class="checkbox">
-            <input type="checkbox" name="change_return_status[notify_user]" id="notify_user" value="Y"/>
-        </label>
-    </div>
-</div>
-
-<div class="control-group notify-department">
-    <label class="control-label" for="notify_department">{__("notify_orders_department")}</label>
-    <div class="controls">
-        <label class="checkbox">
-            <input type="checkbox" name="change_return_status[notify_department]" id="notify_department" value="Y"/>
-        </label>
-    </div>
-</div>
-
-{if "MULTIVENDOR"|fn_allowed_for}
+{if "MULTIVENDOR"|fn_allowed_for && !$runtime.company_id}
 <div class="control-group notify-department">
     <label class="control-label" for="notify_vendor">{__("notify_vendor")}</label>
     <div class="controls">

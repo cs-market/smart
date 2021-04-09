@@ -14,6 +14,8 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
+use Tygh\Addons\CommerceML\Dto\IdDto;
+use Tygh\Addons\CommerceML\Dto\PropertyDto;
 use Tygh\Addons\Warehouses\Manager;
 use Tygh\Addons\Warehouses\ProductWarehouse;
 use Tygh\Addons\Warehouses\ServiceProvider;
@@ -24,6 +26,14 @@ use Tygh\Enum\YesNo;
 use Tygh\Languages\Languages;
 use Tygh\Registry;
 use Tygh\Storefront\Storefront;
+use Tygh\Addons\Warehouses\CommerceML\Dto\WarehouseDto;
+use Tygh\Addons\Warehouses\CommerceML\Dto\ProductWarehouseQuantityDto;
+use Tygh\Addons\Warehouses\CommerceML\Dto\ProductWarehouseQuantityDtoCollection;
+use Tygh\Addons\CommerceML\ServiceProvider as CommerceMLServiceProvider;
+use Tygh\Addons\CommerceML\Xml\SimpleXmlElement;
+use Tygh\Addons\CommerceML\Dto\ProductDto;
+use Tygh\Addons\CommerceML\Storages\ImportStorage;
+use Tygh\Common\OperationResult;
 
 function fn_warehouses_install()
 {
@@ -315,19 +325,28 @@ function fn_warehouses_update_product_post($product_data, $product_id, $lang_cod
     }
 
     $warehouses_amounts = [];
+    $total_amount = 0;
     foreach ($product_data['warehouses'] as $warehouse_id => $amount) {
         $warehouses_amounts[] = [
             'warehouse_id' => $warehouse_id,
             'amount'       => $amount,
         ];
+        $total_amount += (int) $amount;
     }
 
     /** @var Tygh\Addons\Warehouses\Manager $manager */
     $manager = Tygh::$app['addons.warehouses.manager'];
+    $stock = $manager->getProductWarehousesStock($product_id);
+    if ($stock->hasStockSplitByWarehouses()) {
+        $amount = $stock->getAmount();
+        if ($total_amount > 0 && $amount <= 0) {
+            fn_send_product_notifications($product_id);
+        }
+    }
     /** @var Tygh\Addons\Warehouses\ProductStock $product_stock */
     $product_stock = $manager->createProductStockFromWarehousesData($product_id, $warehouses_amounts);
 
-    $remove_all = fn_allowed_for('MULTIVENDOR') || !Registry::get('runtime.company_id');
+    $remove_all = empty($product_data['warehouses_update_stock_only']) && (fn_allowed_for('MULTIVENDOR') || !Registry::get('runtime.company_id'));
 
     $manager->saveProductStock($product_stock, $remove_all);
 }
@@ -367,9 +386,21 @@ function fn_warehouses_get_product_data_post(&$product_data, $auth, $preview, $l
  * Actions performed:
  *  - Extends filter by product.amount with filter by warehouse product amount
  *
+ * @param array<string, string> $params    Parameters of request.
+ * @param array<string, string> $fields    Requested fields.
+ * @param array<string, string> $sortings  Parameters for sortings request data.
+ * @param string                $condition Condition for request.
+ * @param string                $join      Join parameter for request.
+ * @param string                $sorting   Specified sorting field.
+ * @param string                $group_by  Specified group field.
+ * @param string                $lang_code Language code.
+ * @param string                $having    Having sql query parameter.
+ *
+ * @param-out array<string, Tygh\Storefront\Storefront|string> $params
+ *
  * @see \fn_get_products()
  */
-function fn_warehouses_get_products($params, $fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having)
+function fn_warehouses_get_products(array &$params, array &$fields, array &$sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having)
 {
     if (!empty($params['ignore_warehouses'])) {
         return;
@@ -377,7 +408,7 @@ function fn_warehouses_get_products($params, $fields, $sortings, &$condition, &$
 
     $check_warehouse_product_amount = SiteArea::isStorefront($params['area']) && (
         (
-            Registry::get('settings.General.inventory_tracking') === YesNo::YES
+            Registry::get('settings.General.inventory_tracking') !== YesNo::NO
             && Registry::get('settings.General.show_out_of_stock_products') === YesNo::NO
         )
         || (isset($params['amount_from']) && fn_is_numeric($params['amount_from']))
@@ -556,10 +587,12 @@ function fn_warehouses_update_product_amount_pre($product_id, $amount_delta, $pr
         return;
     }
 
-    $location = fn_warehouses_get_location_from_order($order_info);
-    $destination_id = fn_warehouses_get_destination_id($location);
+    if ($order_info) {
+        $location = fn_warehouses_get_location_from_order($order_info);
+        $destination_id = fn_warehouses_get_destination_id($location);
+    }
 
-    if ($destination_id) {
+    if (!empty($destination_id)) {
         $warehouses_product_amount = $product_stock->getAmountForDestination($destination_id);
     } else {
         $warehouses_product_amount = $product_stock->getAmount();
@@ -586,19 +619,24 @@ function fn_warehouses_update_product_amount(&$new_amount, $product_id, $cart_id
     // return amount that will be save to main table to its original amount
     $new_amount = $original_amount;
 
-    $location = fn_warehouses_get_location_from_order($order_info);
-    $pickup_point_id = fn_warehouses_get_pickup_point_id_from_order($order_info, $product_id, $cart_id);
-    $destination_id = fn_warehouses_get_destination_id($location);
+    if ($order_info) {
+        $location = fn_warehouses_get_location_from_order($order_info);
+        $pickup_point_id = fn_warehouses_get_pickup_point_id_from_order($order_info, $product_id, $cart_id);
+        $destination_id = fn_warehouses_get_destination_id($location);
+    }
 
     if ($sign == '-') {
-        if ($pickup_point_id && $product_stock->getWarehousesById($pickup_point_id)) {
+        if (!empty($pickup_point_id) && $product_stock->getWarehousesById($pickup_point_id)) {
             $product_stock->reduceStockByAmountForStore($amount_delta, $pickup_point_id);
-        } elseif ($destination_id) {
+        } elseif (!empty($destination_id)) {
             $product_stock->reduceStockByAmountForDestination($amount_delta, $destination_id);
         } else {
             $product_stock->reduceStockByAmount($amount_delta);
         }
     } else {
+        if ($product_stock->getAmount() <= 0 && $amount_delta > 0) {
+            fn_send_product_notifications($product_id);
+        }
         $product_stock->increaseStockByAmount($amount_delta);
     }
 
@@ -877,42 +915,6 @@ function fn_warehouses_ult_delete_company($company_id, $result, $storefronts)
 }
 
 /**
- * The "ult_update_share_object" hook handler.
- *
- * Actions performed:
- *     - Updates links store location to storefronts
- *     - Recalculates products amount by storefront and destination
- *
- * @see \fn_ult_update_share_object()
- */
-function fn_warehouses_ult_update_share_object($object_id, $object_type, $company_id, $affected_rows_count)
-{
-    if (!$affected_rows_count || $object_type !== 'store_locations') {
-        return;
-    }
-
-    $manager = ServiceProvider::getManager();
-    $manager->recalculateDestinationProductsStocksByWarehouseIds([$object_id]);
-}
-
-/**
- * The "ult_unshare_object" hook handler.
- *
- * Actions performed:
- *     - Recalculates products amount by storefront and destination
- *
- * @see \fn_ult_unshare_object()
- */
-function fn_warehouses_ult_unshare_object($object_id, $object_type, $company_id, $affected_rows_count)
-{
-    if (!$affected_rows_count || $object_type !== 'store_locations') {
-        return;
-    }
-
-    ServiceProvider::getManager()->recalculateDestinationProductsStocksByWarehouseIds([$object_id]);
-}
-
-/**
  * The "tools_change_status" hook handler.
  *
  * Actions performed:
@@ -1064,4 +1066,141 @@ function fn_warehouses_get_destination_id_by_product_params(array $params)
     }
 
     return $destination_id;
+}
+
+/**
+ * Recalculates products amount by storefront and destination
+ *
+ * @param int        $object_id   Object id
+ * @param string     $object_type Object type
+ * @param array<int> $companies   Company ids
+ */
+function fn_warehouses_update_share_objects_post_processing($object_id, $object_type, array $companies)
+{
+    if ($object_type !== 'store_locations') {
+        return;
+    }
+
+    ServiceProvider::getManager()->recalculateDestinationProductsStocksByWarehouseIds([$object_id]);
+}
+
+/**
+ * The "commerceml_product_importer_import_pre" hook handler.
+ *
+ * Actions performed:
+ *  - Saves quantity by warehouses into ProductDto properties
+ *
+ * @param \Tygh\Addons\CommerceML\Xml\SimpleXmlElement          $element        Xml element
+ * @param \Tygh\Addons\CommerceML\Storages\ImportStorage        $import_storage Import storage instance
+ * @param \Tygh\Addons\CommerceML\Dto\ProductDto                $product        Product DTO
+ * @param array<\Tygh\Addons\CommerceML\Dto\RepresentEntityDto> $entities       Other entites data
+ *
+ * @see \Tygh\Addons\CommerceML\Convertors\ProductConvertor::convert
+ */
+function fn_warehouses_commerceml_product_convertor_convert(SimpleXmlElement $element, ImportStorage $import_storage, ProductDto &$product, array $entities)
+{
+    /** @var \Tygh\Addons\Warehouses\CommerceML\Dto\ProductWarehouseQuantityDtoCollection $product_warehouses_qty */
+    $product_warehouses_qty = new ProductWarehouseQuantityDtoCollection();
+
+    if (!$element->has('warehouse')) {
+        return;
+    }
+
+    /**
+     * @psalm-suppress PossiblyNullIterator
+     */
+    foreach ($element->get('warehouse', []) as $item) {
+        if (!$item->has('@warehouse_id')) {
+            return;
+        }
+        $warehouse_quantity_dto = ProductWarehouseQuantityDto::create(
+            IdDto::createByExternalId($item->getAsString('@warehouse_id')),
+            $item->getAsInt('@warehouse_in_stock', 0)
+        );
+        $product_warehouses_qty->add($warehouse_quantity_dto);
+    }
+
+    $product->properties->add(PropertyDto::create(
+        'warehouses',
+        $product_warehouses_qty
+    ));
+}
+
+/**
+ * The "commerceml_product_importer_import_pre" hook handler.
+ *
+ * Actions performed:
+ *  - Adds import warehouses in CommerceML format
+ *
+ * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
+ * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage instance
+ * @param \Tygh\Common\OperationResult                   $main_result    Parent category DTO
+ *
+ * @see \Tygh\Addons\CommerceML\Importers\ProductImporter::import
+ */
+function fn_warehouses_commerceml_product_importer_import_pre(ProductDto &$product, ImportStorage $import_storage, OperationResult &$main_result)
+{
+    if (!$product->properties->has('warehouses')) {
+        return;
+    }
+
+    $allow_import_warehouses = $import_storage->getSetting('catalog_importer.allow_import_warehouses', true);
+    $warehouse_importer = ServiceProvider::getWarehouseImporter();
+
+    /**
+     * @var \Tygh\Addons\Warehouses\CommerceML\Dto\ProductWarehouseQuantityDtoCollection $warehouse_quantity_dto_collections
+     */
+    $warehouse_quantity_dto_collections = $product->properties->get('warehouses', [])->value;
+    if (!$warehouse_quantity_dto_collections instanceof ProductWarehouseQuantityDtoCollection) {
+        return;
+    }
+
+    $product->properties->add(PropertyDto::create('warehouses_update_stock_only', true));
+
+    foreach ($warehouse_quantity_dto_collections as $warehouse_quantity_dto) {
+        $warehouse_id_dto = $warehouse_quantity_dto->warehouse_id;
+        if ($warehouse_id_dto->hasLocalId()) {
+            continue;
+        }
+
+        $warehouse = $import_storage->findEntity(WarehouseDto::REPRESENT_ENTITY_TYPE, $warehouse_id_dto->getId());
+
+        if ($warehouse && $warehouse instanceof WarehouseDto && $allow_import_warehouses === true) {
+            $result = $warehouse_importer->import($warehouse, $import_storage);
+
+            $main_result->merge($result);
+
+            if ($result->isFailure()) {
+                $main_result->setSuccess(false);
+                return;
+            }
+        }
+
+        $warehouse_local_id = $import_storage->findEntityLocalId(WarehouseDto::REPRESENT_ENTITY_TYPE, $warehouse_id_dto);
+
+        if ($warehouse_local_id->hasNotValue()) {
+            $main_result->setSuccess(false);
+            $main_result->addError('product.warehouse_not_found', __('warehouses.commerceml.import.error.product.warehouse_not_found', [
+                '[id]' => $warehouse_id_dto->getId()
+            ]));
+            return;
+        }
+
+        $warehouse_id_dto->local_id = $warehouse_local_id->asInt();
+    }
+}
+
+/**
+ * The "warehouses_manager_remove_warehouse" hook handler.
+ *
+ * Actions performed:
+ *  - Delete CommerceML warehouse entity from entities map
+ *
+ * @param int $warehouse_id Warehouse identifier
+ *
+ * @see \Tygh\Addons\Warehouses\Manager::removeWarehouse
+ */
+function fn_commerceml_warehouses_manager_remove_warehouse($warehouse_id)
+{
+    CommerceMLServiceProvider::getImportEntityMapRepository()->removeByLocalId(WarehouseDto::REPRESENT_ENTITY_TYPE, $warehouse_id);
 }

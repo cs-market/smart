@@ -11,7 +11,6 @@
             {include file="common/popupbox.tpl"
                 id="add_column"
                 text="{__("add_table_column")}"
-                title=__("add_table_column")
                 link_text=__("add_table_column")
                 act="general"
                 icon="icon-plus"
@@ -32,8 +31,8 @@
 
     <div class="items-container {if $can_update}cm-sortable{/if}" {if $can_update}data-ca-sortable-table="template_table_columns" data-ca-sortable-id-name="column_id"{/if} id="content_table_column_list_{$snippet->getId()}">
         {if $columns}
-            <div class="table-wrapper">
-                <table class="table table-middle table--relative table-objects table-striped">
+            <div class="table-responsive-wrapper">
+                <table class="table table-middle table--relative table-objects table-striped table-responsive table-responsive-w-titles">
                     <tbody>
                     {foreach from=$columns item="column"}
                         {include file="common/object_group.tpl"
@@ -45,7 +44,7 @@
                             table="template_table_columns"
                             href_delete="snippets.delete_table_column?column_id={$column->getId()}&return_url={$return_url_escape}"
                             delete_target_id="content_table_column_list_{$snippet->getId()}"
-                            header_text="{__("editing_table_column")}: {$column->getName()}"
+                            header_text=$column->getName()
                             additional_class="cm-sortable-row cm-sortable-id-{$column->getId()}"
                             no_table=true
                             draggable=true

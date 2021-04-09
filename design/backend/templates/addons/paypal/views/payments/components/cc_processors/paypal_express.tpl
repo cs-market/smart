@@ -34,6 +34,7 @@
         <div class="controls">
             <input type="hidden" name="payment_data[processor_params][in_context]" value="N" />
             <input type="checkbox" name="payment_data[processor_params][in_context]" {if $processor_params.in_context|default:"Y" == "Y"}checked="checked"{/if} id="elm_in_context{$suffix}" value="Y" />
+            <p class="muted description">{__("ttc_paypal_use_in_context_checkout")}</p>
         </div>
     </div>
 
@@ -41,7 +42,7 @@
         <label class="control-label{if $processor_params.in_context|default:"Y" == "Y"} cm-required{/if}" for="elm_merchant_id{$suffix}" id="lbl_merchant_id{$suffix}">{__("merchant_id")}:</label>
         <div class="controls">
             <input type="text" name="payment_data[processor_params][merchant_id]" id="elm_merchant_id{$suffix}" size="24" value="{$processor_params.merchant_id}" >
-            <div class="muted" id="elm_merchant_id_notice{$suffix}">{__("paypal_express_notice")}</div>
+            <div class="muted description" id="elm_merchant_id_notice{$suffix}">{__("paypal_express_notice")}</div>
         </div>
     </div>
 

@@ -100,7 +100,10 @@ class ClientWrapper
             $this->processor_params['secret'],
             $this->processor_params['access_token'],
             $this->processor_params['expiry_time'],
-            $this->processor_params['mode'] === 'test'
+            $this->processor_params['mode'] === 'test',
+            isset($this->processor_params['bn_code'])
+                ? $this->processor_params['bn_code']
+                : null
         );
     }
 

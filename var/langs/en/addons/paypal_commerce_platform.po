@@ -275,3 +275,11 @@ msgstr "Rectangular"
 msgctxt "Languages::paypal_commerce_platform.style.height"
 msgid "Height"
 msgstr "Height"
+
+msgctxt "Languages::paypal_commerce_platform.bn_code"
+msgid "Partner integration code"
+msgstr "Partner integration code"
+
+msgctxt "Languages::paypal_commerce_platform.debug_id"
+msgid "PayPal Debug ID"
+msgstr "PayPal Debug ID"

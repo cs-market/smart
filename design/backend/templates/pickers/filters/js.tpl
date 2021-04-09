@@ -6,9 +6,9 @@
 
 {if $multiple}
 <tr {if !$clone}id="{$holder}_{$filter_id}" {/if}class="cm-js-item{if $clone} cm-clone hidden{/if}">
-    {if $position_field}<td><input type="text" name="{$input_name}[{$filter_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro"{if $clone} disabled="disabled"{/if} /></td>{/if}
-    <td><a href="{"product_filters.update?filter_id=`$filter_id`"|fn_url}">{$filter}</a></td>
-    <td>
+    {if $position_field}<td data-th="&nbsp;"><input type="text" name="{$input_name}[{$filter_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro"{if $clone} disabled="disabled"{/if} /></td>{/if}
+    <td data-th="&nbsp;"><a href="{"product_filters.update?filter_id=`$filter_id`"|fn_url}">{$filter}</a></td>
+    <td data-th="&nbsp;">
         <div class="hidden-tools">
         {if !$hide_delete_button && !$view_only}
             {capture name="tools_list"}

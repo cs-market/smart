@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: he\n"
-"X-Crowdin-File: /release-4.11.5/addons/newsletters.po\n"
-"X-Crowdin-File-ID: 3700\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/newsletters.po\n"
+"X-Crowdin-File-ID: 4120\n"
+"PO-Revision-Date: 2021-02-01 09:06\n"
 
 msgctxt "Addons::name::newsletters"
 msgid "Newsletters"
@@ -471,4 +471,12 @@ msgstr "אני מסכים לקבל את הנתונים האישיים שלי <u>
 msgctxt "Languages::newsletters.agreement_text_full_subscribe_to_newsletters"
 msgid "<p>When you sign up for a specific newsletter, we ([company]) add your email address to a corresponding mailing list. While it is there, we know that we can contact you by email regarding that topic.</p> <p>You can always have your email address removed from our mailing lists. There are multiple ways to do it:</p><ul> <li>Once your account is registered, just sign in and unsubscribe from newsletters in profile settings.</li> <li>Use the “Unsubscribe” link in our newsletters that you receive.</li> <li>Send an email to [email].</li> </ul> <p>We may use a third-party email service (MailChimp and/or Mad Mimi) to send newsletters. Some members of our staff can view mailing lists with email addresses. That way they’ll be able to remove your email address from the mailing list, should you request us to do so.</p> <p>Please note that mailing lists are independent from each other. If you decide not to receive newsletters at all, you’ll have to unsubscribe from all the mailing lists. Even if you do that, you’ll still receive account-related emails (such as order status notifications, password reset emails, and more). It is essential for operating an online store.</p> <p>If you decide that you no longer want to use our store and would like to have your personal data removed from our database (or if you’d like to get all the personal data associated with your account that we have), please send an email to [email].</p> <p>If you believe that your personal data has been misused, you have the right to lodge a complaint with a supervisory authority. We’re obliged by EU General Data Protection Regulation to let you know about this right; we don’t actually intend to misuse your data.</p>"
 msgstr "<p>כאשר אתה נרשם לניוזלטר ספציפי, אנו ([company]) הוסף את כתובת הדוא\"ל שלך לרשימת דיוור מתאימה. בזמן שהוא נמצא שם, אנו יודעים שנוכל ליצור איתך קשר בדוא\"ל בנוגע לנושא זה.</p> <p>תוכל תמיד להסיר את כתובת האימייל שלך מרשימות התפוצה שלנו. ישנן מספר דרכים לעשות זאת:</p><ul> <li>לאחר שהחשבון שלך רשום, היכנס והבטל את הרישום לעלונים בהגדרות הפרופיל.</li> <li>השתמש בקישור \"בטל רישום\" בעלונים שאנו מקבלים.</li> <li>שלח דואר אלקטרוני ל [email].</li> </ul> <p>אנו עשויים להשתמש בשירות דואר אלקטרוני של צד שלישי (MailChimp ו / או Mad Mimi) כדי לשלוח עלונים. חלק מחברי הצוות שלנו יכולים להציג רשימות דיוור עם כתובות דוא\"ל. כך יוכלו להסיר את כתובת הדוא\"ל שלך מרשימת התפוצה, אם תבקש מאיתנו לעשות זאת.</p> <p>שים לב שרשימות התפוצה אינן תלויות זו בזו. אם תחליט לא לקבל ידיעונים בכלל, יהיה עליך לבטל את הרישום מכל רשימות התפוצה. גם אם תעשה זאת, עדיין תקבל הודעות דוא\"ל הקשורות לחשבון (כגון הודעות מצב הזמנה, אימיילים לאיפוס סיסמה ועוד). זה חיוני להפעלת חנות מקוונת.</p> <p>אם תחליט שאינך רוצה עוד להשתמש בחנות שלנו וברצונך להסיר את הנתונים האישיים שלך ממסד הנתונים שלנו (או אם ברצונך לקבל את כל הנתונים האישיים המשויכים לחשבון שלך), שלח דוא\"ל ל [email].</p> <p>אם אתה סבור כי נעשה שימוש לרעה בנתונים האישיים שלך, יש לך זכות להגיש תלונה לרשות פיקוחית. אנו מחויבים על ידי כללי האיחוד האירופי להגנה על נתונים כדי ליידע אותך על זכות זו; אנחנו לא מתכוונים לעשות שימוש לרעה בנתונים שלך.</p>"
+
+msgctxt "Languages::newsletters.use_for_subscribe_form"
+msgid "Subscribe form"
+msgstr "טופס להרשמה"
+
+msgctxt "Languages::newsletters.default_mailing_list"
+msgid "Default mailing list"
+msgstr "רשימת תפוצה המוגדרת כברירת מחדל"
 

@@ -61,7 +61,8 @@ class AuthTokens extends AEntity
                 ),
                 array()
             );
-            if ($user_data && fn_generate_salted_password($password, $salt) == $user_data['password']) {
+
+            if ($user_data && fn_user_password_verify((int) $user_data['user_id'], $password, (string) $user_data['password'], $salt)) {
                 list($token, $expiry_time) = fn_get_user_auth_token($user_data['user_id']);
 
                 $status = Response::STATUS_CREATED;

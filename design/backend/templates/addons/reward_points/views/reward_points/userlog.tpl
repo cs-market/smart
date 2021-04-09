@@ -2,24 +2,40 @@
 {capture name="mainbox"}
 
 {** userlog description section **}
-{assign var="c_url" value=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
+{$c_url=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
 
 <form action="{""|fn_url}" method="post" name="userlog_form" class="" enctype="multipart/form-data">
     <input type="hidden" name="user_id" value="{$smarty.request.user_id}">
 
     {include file="common/pagination.tpl" save_current_url=true}
     
-    {assign var="c_icon" value="<i class=\"icon-`$search.sort_order_rev`\"></i>"}
-    {assign var="c_dummy" value="<i class=\"icon-dummy\"></i>"}
+    {$c_icon="<i class=\"icon-`$search.sort_order_rev`\"></i>"}
+    {$c_dummy="<i class=\"icon-dummy\"></i>"}
 
     {if $userlog}
-    <div class="table-responsive-wrapper">
+
+    {hook name="reward_points:bulk_edit"}
+        {include file="addons/reward_points/views/reward_points/components/bulk_edit.tpl"}
+    {/hook}
+
+    <div class="table-responsive-wrapper longtap-selection">
         <table class="table table-middle table--relative table-responsive">
-        <thead>
+        <thead
+            data-ca-bulkedit-default-object="true" 
+            data-ca-bulkedit-component="defaultObject"
+        >
             <tr>
-                <th width="5%" class="left mobile-hide">
-                    {include file="common/check_items.tpl"}</th>
-                <th width="15%"><a class="cm-ajax{if $search.sort_by == "timestamp"} sort-link-{$search.sort_order_rev}{/if}" href="{"`$c_url`&sort_by=timestamp&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("date")} {if $search.sort_by == "timestamp"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
+                <th width="6%" class="left mobile-hide">
+                    {include file="common/check_items.tpl" is_check_all_shown=true}
+
+                    <input type="checkbox"
+                        class="bulkedit-toggler hide"
+                        data-ca-bulkedit-toggler="true"
+                        data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                        data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+                    />
+                </th>
+                <th width="14%"><a class="cm-ajax{if $search.sort_by == "timestamp"} sort-link-{$search.sort_order_rev}{/if}" href="{"`$c_url`&sort_by=timestamp&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("date")} {if $search.sort_by == "timestamp"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
                 <th width="10%"><a class="cm-ajax{if $search.sort_by == "amount"} sort-link-{$search.sort_order_rev}{/if}" href="{"`$c_url`&sort_by=amount&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("points")} {if $search.sort_by == "amount"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
                 <th width="60%">{__("reason")}</th>
                 <th width="10%">&nbsp;</th>
@@ -27,12 +43,17 @@
         </thead>
         <tbody>
             {foreach from=$userlog item="ul"}
-            <tr>
-                <td class="left mobile-hide">
-                    <input type="checkbox" name="change_ids[]" value="{$ul.change_id}" class="cm-item"></td>
-                <td data-th="{__("date")}">{$ul.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
-                <td data-th="{__("points")}">{$ul.amount}</td>
-                <td data-th="{__("reason")}">
+            <tr class="cm-longtap-target"
+                data-ca-longtap-action="setCheckBox"
+                data-ca-longtap-target="input.cm-item"
+                data-ca-id="{$ul.change_id}"
+            >
+                <td width="6%" class="left mobile-hide">
+                    <input type="checkbox" name="change_ids[]" value="{$ul.change_id}" class="cm-item hide">
+                </td>
+                <td width="14%" data-th="{__("date")}">{$ul.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
+                <td width="10%" data-th="{__("points")}">{$ul.amount}</td>
+                <td width="60%" data-th="{__("reason")}">
                     {if $ul.action == $smarty.const.CHANGE_DUE_ORDER}
                         {assign var="statuses" value=$smarty.const.STATUSES_ORDER|fn_get_simple_statuses:true:true}
                         {assign var="reason" value=$ul.reason|unserialize}
@@ -56,7 +77,7 @@
                         {/hook}
                     {/if}
                 </td>
-                <td class="nowrap right" data-th="{__("tools")}">
+                <td width="10%" class="nowrap right" data-th="{__("tools")}">
                     <div class="hidden-tools">
                         {capture name="tools_list"}
                             <li>{btn type="delete" href="reward_points.delete?user_id=`$smarty.request.user_id`&change_id=`$ul.change_id`" class="cm-confirm" method="POST"}</li>
@@ -94,7 +115,6 @@
 {capture name="buttons"}
     {if $userlog}
         {capture name="tools_list"}
-            <li>{btn type="delete_selected" dispatch="dispatch[reward_points.m_delete]" form="userlog_form"}</li>
             <li>{btn type="delete" text=__("cleanup_log") class="cm-submit" dispatch="dispatch[reward_points.cleanup_logs]" form="userlog_form"}</li>
         {/capture}
         {dropdown content=$smarty.capture.tools_list class="mobile-hide"}

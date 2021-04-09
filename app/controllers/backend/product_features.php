@@ -12,8 +12,11 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
+use Tygh\Common\OperationResult;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProductFeatures;
+use Tygh\Enum\YesNo;
+use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -31,30 +34,70 @@ $navigation_sections = [
     ],
 ];
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     fn_trusted_vars('feature_data');
     $return_url = 'product_features.manage';
 
     // Update features
-    if ($mode == 'update') {
+    if ($mode === 'update') {
         $feature_id = fn_update_product_feature($_REQUEST['feature_data'], $_REQUEST['feature_id'], DESCR_SL);
 
-        return [CONTROLLER_STATUS_OK, 'product_features.update?feature_id=' . $feature_id];
-    }
+        if (defined('AJAX_REQUEST')) {
+            /** @var \Tygh\Ajax $ajax */
+            $ajax = Tygh::$app['ajax'];
 
-    if ($mode == 'update_status') {
+            if ($feature_id === false) {
+                $ajax->assign('success', false);
+            } else {
+                list($variants) = fn_get_product_feature_variants(['feature_id' => $feature_id]);
 
-        fn_tools_update_status($_REQUEST);
-
-        if (!empty($_REQUEST['status']) && in_array($_REQUEST['status'], ['D', 'H'], true)) {
-            fn_disable_product_feature_filters($_REQUEST['id']);
+                $ajax->assign('success', true);
+                $ajax->assign('feature_id', $feature_id);
+                $ajax->assign('variants', $variants);
+            }
         }
 
-        exit;
+        if ($feature_id === false) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        } else {
+            return [CONTROLLER_STATUS_OK, 'product_features.update?feature_id=' . $feature_id];
+        }
     }
 
-    if ($mode == 'delete') {
+    if ($mode === 'update_status') {
+        $params = array_merge(
+            [
+                'table'   => 'product_features',
+                'id_name' => 'feature_id',
+                'status'  => ObjectStatuses::ACTIVE,
+                'id'      => null,
+            ],
+            $_REQUEST
+        );
+        OperationResult::wrap(
+            static function () use ($params) {
+                $feature_id = (int) $params['id'];
+                if (!fn_check_company_id('product_features', 'feature_id', $feature_id)) {
+                    fn_company_access_denied_notification();
+                    return false;
+                }
 
+                if (!fn_tools_update_status($params)) {
+                    return false;
+                }
+
+                if (in_array($params['status'], [ObjectStatuses::DISABLED, ObjectStatuses::HIDDEN], true)) {
+                    fn_disable_product_feature_filters($feature_id);
+                }
+
+                return true;
+            }
+        )->showNotifications();
+
+        return [CONTROLLER_STATUS_NO_CONTENT];
+    }
+
+    if ($mode === 'delete') {
         if (!empty($_REQUEST['feature_id'])) {
             fn_delete_feature($_REQUEST['feature_id']);
         }
@@ -64,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    if ($mode == 'm_delete') {
+    if ($mode === 'm_delete') {
         if (!empty($_REQUEST['feature_ids'])) {
             $feature_ids = (array) $_REQUEST['feature_ids'];
 
@@ -78,11 +121,189 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['feature_ids'])
+        && is_array($_REQUEST['feature_ids'])
+        && !empty($_REQUEST['status'])
+        && in_array($_REQUEST['status'], [ObjectStatuses::ACTIVE, ObjectStatuses::DISABLED, ObjectStatuses::HIDDEN], true)
+    ) {
+        $status_to = $_REQUEST['status'];
+
+        foreach ($_REQUEST['feature_ids'] as $feature_id) {
+            OperationResult::wrap(
+                static function () use ($feature_id, $status_to) {
+                    $feature_id = (int) $feature_id;
+                    $params = [
+                        'table'             => 'product_features',
+                        'status'            => $status_to,
+                        'id_name'           => 'feature_id',
+                        'id'                => $feature_id,
+                        'show_error_notice' => false,
+                    ];
+
+                    if (!fn_check_company_id('product_features', 'feature_id', $feature_id)) {
+                        fn_company_access_denied_notification();
+                        return false;
+                    }
+
+                    if (!fn_tools_update_status($params)) {
+                        return false;
+                    }
+
+                    if (in_array($params['status'], [ObjectStatuses::DISABLED, ObjectStatuses::HIDDEN], true)) {
+                        fn_disable_product_feature_filters($feature_id);
+                    }
+
+                    return true;
+                }
+            )->showNotifications();
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('product_features.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+    }
+
+    if (
+        $mode === 'm_set_display'
+        && !empty($_REQUEST['display_on'])
+        && in_array($_REQUEST['display_on'], ['product', 'catalog', 'header'], true)
+        && !empty($_REQUEST['value'])
+        && in_array($_REQUEST['value'], [YesNo::YES, YesNo::NO], true)
+        && !empty($_REQUEST['feature_ids'])
+        && is_array($_REQUEST['feature_ids'])
+    ) {
+        $field_name = 'display_on_' . $_REQUEST['display_on'];
+        $value = $_REQUEST['value'];
+
+        foreach ($_REQUEST['feature_ids'] as $feature_id) {
+            $feature_data = [
+                $field_name => $value,
+            ];
+
+            OperationResult::wrap(
+                static function () use ($feature_id, $feature_data) {
+                    if (!fn_check_company_id('product_features', 'feature_id', $feature_id)) {
+                        fn_company_access_denied_notification();
+                        return false;
+                    }
+
+                    return fn_update_product_feature($feature_data, $feature_id);
+                }
+            )->showNotifications();
+        }
+    }
+
+    if (
+        $mode === 'm_set_categories'
+        && !empty($_REQUEST['features_ids'])
+        && is_array($_REQUEST['features_ids'])
+        && !empty($_REQUEST['categories_map'])
+        && is_array($_REQUEST['categories_map'])
+    ) {
+        $added_categories = empty($_REQUEST['categories_map']['A']) ? [] : $_REQUEST['categories_map']['A'];
+        $deleted_categories = empty($_REQUEST['categories_map']['D']) ? [] : $_REQUEST['categories_map']['D'];
+
+        foreach ($_REQUEST['features_ids'] as $feature_id) {
+            $feature_data = fn_get_product_feature_data($feature_id);
+
+            if (!$feature_data) {
+                continue;
+            }
+
+            $feature_categories = explode(',', $feature_data['categories_path']);
+            $feature_categories = array_merge($feature_categories, $added_categories);
+            $feature_categories = array_unique(array_filter(array_diff($feature_categories, $deleted_categories)));
+            $categories_path = implode(',', $feature_categories);
+
+            OperationResult::wrap(
+                static function () use ($feature_id, $categories_path) {
+                    if (!fn_check_company_id('product_features', 'feature_id', $feature_id)) {
+                        fn_company_access_denied_notification();
+                        return false;
+                    }
+
+                    return fn_update_product_feature(
+                        [
+                            'categories_path' => $categories_path,
+                        ],
+                        $feature_id
+                    );
+                }
+            )->showNotifications();
+        }
+    }
+
+    if (
+        $mode === 'm_set_group'
+        && !empty($_REQUEST['feature_ids'])
+        && is_array($_REQUEST['feature_ids'])
+        && isset($_REQUEST['selected_group'])
+    ) {
+        $group_id = (int) $_REQUEST['selected_group'];
+
+        foreach ($_REQUEST['feature_ids'] as $feature_id) {
+            OperationResult::wrap(
+                static function () use ($group_id, $feature_id) {
+                    if (!fn_check_company_id('product_features', 'feature_id', $feature_id)) {
+                        fn_company_access_denied_notification();
+                        return false;
+                    }
+
+                    return fn_update_product_feature(
+                        [
+                            'parent_id' => $group_id,
+                        ],
+                        $feature_id
+                    );
+                }
+            )->showNotifications();
+        }
+    }
+
     return [CONTROLLER_STATUS_OK, $return_url];
 }
 
-if ($mode == 'update') {
+if ($mode === 'quick_add' || $mode === 'add') {
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_REDIRECT, 'product_features.manage'];
+    }
 
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+    $feature = isset($_REQUEST['feature_data']) ? (array) $_REQUEST['feature_data'] : [];
+
+    list($group_features) = fn_get_product_features(['feature_types' => ProductFeatures::GROUP], 0, DESCR_SL);
+    $purposes = fn_get_product_feature_purposes();
+
+    if (!empty($_REQUEST['filter_purposes'])) {
+        $filter_purposes = array_filter((array) $_REQUEST['filter_purposes']);
+
+        $purposes = array_filter($purposes, function ($key) use ($filter_purposes) {
+            return in_array($key, $filter_purposes);
+        },  ARRAY_FILTER_USE_KEY);
+    }
+
+    $view->assign([
+        'purposes'         => $purposes,
+        'default_purpose'  => fn_get_default_product_feature_purpose(),
+        'group_features'   => $group_features,
+        'feature'          => $feature,
+        'feature_variants' => isset($feature['variants']) ? (array)$feature['variants'] : [],
+        'category_id'      => isset($_REQUEST['category_id']) ? (int)$_REQUEST['category_id'] : 0,
+        'show_purposes'    => isset($_REQUEST['show_purposes']) ? (bool)$_REQUEST['show_purposes'] : false,
+        'ajax_mode'        => true,
+        'in_popup'         => true,
+        'category_ids'     => isset($_REQUEST['category_ids']) ? array_filter((array) $_REQUEST['category_ids']) : null,
+    ]);
+} elseif ($mode == 'update') {
     $selected_section = (empty($_REQUEST['selected_section']) ? 'detailed' : $_REQUEST['selected_section']);
 
     $feature = fn_get_product_feature_data($_REQUEST['feature_id'], false, false, DESCR_SL);
@@ -121,7 +342,7 @@ if ($mode == 'update') {
     if (fn_allowed_for('ULTIMATE') && !Registry::get('runtime.company_id')) {
         Tygh::$app['view']->assign('picker_selected_companies', fn_ult_get_controller_shared_companies($_REQUEST['feature_id']));
     }
-} elseif ($mode == 'manage') {
+} elseif ($mode === 'manage') {
     Registry::set('navigation.dynamic.sections', $navigation_sections);
     Registry::set('navigation.dynamic.active_section', 'features');
 
@@ -144,7 +365,7 @@ if ($mode == 'update') {
     if (empty($features) && defined('AJAX_REQUEST')) {
         Tygh::$app['ajax']->assign('force_redirection', fn_url('product_features.manage'));
     }
-} elseif ($mode == 'groups') {
+} elseif ($mode === 'groups') {
     Registry::set('navigation.dynamic.sections', $navigation_sections);
     Registry::set('navigation.dynamic.active_section', 'groups');
 
@@ -153,6 +374,7 @@ if ($mode == 'update') {
     $params['search_in_subcats'] = true;
     $params['exclude_group'] = true;
     $params['feature_types'] = ProductFeatures::GROUP;
+    $params['get_top_features'] = true;
 
     list($features, $search) = fn_get_product_features($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
     list($group_features) = fn_get_product_features(['feature_types' => ProductFeatures::GROUP], 0, DESCR_SL);
@@ -166,7 +388,7 @@ if ($mode == 'update') {
     if (empty($features) && defined('AJAX_REQUEST')) {
         Tygh::$app['ajax']->assign('force_redirection', fn_url('product_features.manage'));
     }
-} elseif ($mode == 'get_feature_variants_list') {
+} elseif ($mode === 'get_feature_variants_list') {
     if (empty($_REQUEST['feature_id'])) {
         exit;
     }
@@ -174,14 +396,31 @@ if ($mode == 'update') {
     $pattern = !empty($_REQUEST['pattern']) ? $_REQUEST['pattern'] : '';
     $start = !empty($_REQUEST['start']) ? $_REQUEST['start'] : 0;
     $limit = (!empty($_REQUEST['limit']) ? $_REQUEST['limit'] : 10) + 1;
-    $sorting = db_quote("?:product_feature_variants.position, ?:product_feature_variant_descriptions.variant");
+    $sorting = db_quote('?:product_feature_variants.position, ?:product_feature_variant_descriptions.variant');
 
-    $join = db_quote(" LEFT JOIN ?:product_feature_variant_descriptions ON ?:product_feature_variant_descriptions.variant_id = ?:product_feature_variants.variant_id AND ?:product_feature_variant_descriptions.lang_code = ?s", DESCR_SL);
-    $condition = db_quote(" AND ?:product_feature_variants.feature_id = ?i", $_REQUEST['feature_id']);
+    $join = db_quote(
+        ' LEFT JOIN ?:product_feature_variant_descriptions'
+        . ' ON ?:product_feature_variant_descriptions.variant_id = ?:product_feature_variants.variant_id'
+        . ' AND ?:product_feature_variant_descriptions.lang_code = ?s',
+        DESCR_SL
+    );
+    $condition = db_quote(' AND ?:product_feature_variants.feature_id = ?i', $_REQUEST['feature_id']);
 
     fn_set_hook('get_feature_variants_list', $condition, $join, $pattern, $start, $limit);
 
-    $objects = db_get_hash_array("SELECT SQL_CALC_FOUND_ROWS ?:product_feature_variants.variant_id AS value, ?:product_feature_variant_descriptions.variant AS name FROM ?:product_feature_variants $join WHERE 1 $condition AND ?:product_feature_variant_descriptions.variant LIKE ?l ORDER BY ?p LIMIT ?i, ?i", 'value', '%' . $pattern . '%', $sorting, $start, $limit);
+    $objects = db_get_hash_array(
+        'SELECT SQL_CALC_FOUND_ROWS ?:product_feature_variants.variant_id AS value, ?:product_feature_variant_descriptions.variant AS name'
+        . ' FROM ?:product_feature_variants ?p'
+        . ' WHERE 1 ?p AND ?:product_feature_variant_descriptions.variant LIKE ?l'
+        . ' ORDER BY ?p LIMIT ?i, ?i',
+        'value',
+        $join,
+        $condition,
+        '%' . $pattern . '%',
+        $sorting,
+        $start,
+        $limit
+    );
 
     if (defined('AJAX_REQUEST') && sizeof($objects) < $limit) {
         Tygh::$app['ajax']->assign('completed', true);
@@ -189,7 +428,7 @@ if ($mode == 'update') {
         array_pop($objects);
     }
 
-    if (empty($_REQUEST['enter_other']) || $_REQUEST['enter_other'] != 'N') {
+    if (empty($_REQUEST['enter_other']) || $_REQUEST['enter_other'] !== YesNo::NO) {
         $total = db_get_found_rows();
         if (!Registry::get('runtime.company_id') || (fn_allowed_for('ULTIMATE') && fn_check_company_id('product_features', 'feature_id', $_REQUEST['feature_id']))) {
             if ($start + $limit >= $total + 1) {
@@ -214,7 +453,7 @@ if ($mode == 'update') {
  *
  * @TODO: Class that implements common methods for Select2 controller modes.
  */
-elseif ($mode == 'get_variants_list') {
+elseif ($mode === 'get_variants_list') {
     if (empty($_REQUEST['feature_id']) && empty($_REQUEST['ids'])) {
         return [CONTROLLER_STATUS_NO_PAGE];
     }
@@ -261,16 +500,16 @@ elseif ($mode == 'get_variants_list') {
             }
         }
 
-        return array(
-            'id' => $feature_variant['variant_id'],
-            'text' => $feature_variant['variant'],
+        return [
+            'id'        => $feature_variant['variant_id'],
+            'text'      => $feature_variant['variant'],
             'image_url' => $image_url,
-            'data' => [
+            'data'      => [
                 'image_url' => $image_url,
-                'name' => $feature_variant['variant'],
-                'color' => $feature_variant['color'],
+                'name'      => $feature_variant['variant'],
+                'color'     => $feature_variant['color'],
             ]
-        );
+        ];
     }, $variants));
 
     Tygh::$app['ajax']->assign('objects', $objects);
@@ -283,7 +522,7 @@ elseif ($mode == 'get_variants_list') {
  *
  * @TODO: Class that implements common methods for Select2 controller modes.
  */
-elseif ($mode == 'get_features_list') {
+elseif ($mode === 'get_features_list') {
     $page_number = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
     $page_size = isset($_REQUEST['page_size']) ? (int) $_REQUEST['page_size'] : 10;
     $search_query = isset($_REQUEST['q']) ? $_REQUEST['q'] : null;
@@ -312,6 +551,10 @@ elseif ($mode == 'get_features_list') {
         $search['feature_types'] = ProductFeatures::getSelectableList();
     }
 
+    if (!empty($_REQUEST['feature_types'])) {
+        $search['feature_types'] = $_REQUEST['feature_types'];
+    }
+
     if (isset($_REQUEST['exclude_empty_groups'])) {
         $search['exclude_empty_groups'] = true;
     }
@@ -332,21 +575,22 @@ elseif ($mode == 'get_features_list') {
         return array_values(array_map(function ($feature) use (&$feature_converter, $lang_code) {
             $return = [
                 'id'     => (int) $feature['feature_id'],
-                'text'   => $feature['description'],
+                'text'   => $feature['internal_name'],
                 'object' => [
                     'feature_type' => $feature['feature_type'],
                 ],
                 'data'  => [
+                    'internal_name' => $feature['internal_name'],
                     'description'   => $feature['description']
                 ]
             ];
             if ($feature['feature_type'] == ProductFeatures::SINGLE_CHECKBOX) {
                 $return['object']['variants'] = [
-                    ['id' => 'Y', 'text' => __('yes')],
-                    ['id' => 'N', 'text' => __('no')],
+                    ['id' => YesNo::YES, 'text' => __('yes')],
+                    ['id' => YesNo::NO, 'text' => __('no')],
                 ];
             } elseif ($feature['feature_type'] == ProductFeatures::GROUP) {
-                $return['children'] = array();
+                $return['children'] = [];
 
                 if (!empty($feature['subfeatures'])) {
                     // Recursive call that fills subfeatures list
@@ -370,7 +614,7 @@ elseif ($mode == 'get_features_list') {
     $objects = $feature_converter($features);
 
     Tygh::$app['ajax']->assign('objects', $objects);
-    Tygh::$app['ajax']->assign('total_objects', $search['total_items']);
+    Tygh::$app['ajax']->assign('total_objects', empty($search['total_items']) ? 0 : $search['total_items']);
 
     exit;
 }

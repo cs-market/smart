@@ -29,5 +29,7 @@ fn_register_hooks(
     /** @see \fn_paypal_commerce_platform_vendor_data_premoderation_diff_company_data_post() */
     'vendor_data_premoderation_diff_company_data_post',
     /** @see \fn_paypal_commerce_platform_update_addon_status_post() */
-    'update_addon_status_post'
+    'update_addon_status_post',
+    /** @see \fn_paypal_commerce_platform_save_log() */
+    'save_log'
 );

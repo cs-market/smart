@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/advanced_import.po\n"
-"X-Crowdin-File-ID: 3646\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/advanced_import.po\n"
+"X-Crowdin-File-ID: 4098\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::advanced_import"
 msgid "Advanced products import"
@@ -352,4 +352,36 @@ msgstr "Ο προσδιορισμένος (ή αυτόματα ανιχνευμ�
 msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
 msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
 msgstr "Η διαγραφή αυτής της προκαθορισμένης εισαγωγής θα διαγράψει επίσης το συνημμένο αρχείο. Είστε βέβαιοι ότι θέλετε να συνεχίσετε;"
+
+msgctxt "Languages::advanced_import.common_preset"
+msgid "All vendors"
+msgstr "Όλοι οι πωλητές"
+
+msgctxt "Languages::advanced_import.your_presets"
+msgid "Vendor's presets"
+msgstr "Προεπιλογές Πωλητή"
+
+msgctxt "Languages::advanced_import.common_presets"
+msgid "Marketplace presets"
+msgstr "Προεπιλογές Marketplace"
+
+msgctxt "Languages::advanced_import.file_not_loaded"
+msgid "File was not loaded. Please reload the page and try again."
+msgstr "Το αρχείο δεν μεταφορτώθηκε. Ανανεώστε τη σελίδα και δοκιμάστε ξανά."
+
+msgctxt "Languages::advanced_import.local_file_selected"
+msgid "Local file selected"
+msgstr "επιλέχθηκε τοπικό αρχείο "
+
+msgctxt "Languages::advanced_import.text_popup_file_editor_notice_full_link"
+msgid "You can upload and download files via <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
+msgstr "Μπορείτε να ανεβάζετε και να κατεβάζετε αρχεία μέσω του <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">Επεξεργαστή αρχείων</a>"
+
+msgctxt "Languages::advanced_import.file_extension_was_not_supported_by_owner"
+msgid "Couldn't use your file [name]. This import preset only allows the following extensions: [ext]."
+msgstr ""
+
+msgctxt "Languages::advanced_import.save_selected_file"
+msgid "Save selected file"
+msgstr ""
 

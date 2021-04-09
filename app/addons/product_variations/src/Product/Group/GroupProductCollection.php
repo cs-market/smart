@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************************
  *                                                                          *
  *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
@@ -185,11 +186,9 @@ class GroupProductCollection implements ArrayAccess, Iterator, Countable
         foreach ($product->getFeatureValues() as $feature_value) {
             unset($this->feature_variants_map[$feature_value->getVariantId()][$product->getProductId()]);
 
-            if (!empty($this->feature_variants_map[$feature_value->getVariantId()])) {
-                continue;
+            if (empty($this->feature_variants_map[$feature_value->getVariantId()])) {
+                unset($this->feature_variants_map[$feature_value->getVariantId()]);
             }
-
-            unset($this->feature_variants_map[$feature_value->getVariantId()]);
         }
     }
 
@@ -260,6 +259,16 @@ class GroupProductCollection implements ArrayAccess, Iterator, Countable
     }
 
     /**
+     * Gets features vairant IDs that used to the products collection
+     *
+     * @return array<int, int>
+     */
+    public function getFeaturesVariantIds()
+    {
+        return array_keys($this->feature_variants_map);
+    }
+
+    /**
      * @return bool
      */
     public function isEmpty()
@@ -268,7 +277,7 @@ class GroupProductCollection implements ArrayAccess, Iterator, Countable
     }
 
     /**
-     * @param \Tygh\Addons\ProductVariations\Product\Group\GroupFeatureValue $feature_value Feature value
+     * @param \Tygh\Addons\ProductVariations\Product\Group\GroupFeatureValue $feature_value
      *
      * @return bool
      */

@@ -39,7 +39,7 @@
         {if $params_schema}
             {foreach from=$params_schema key=name item=field}
                 <div class="control-group">
-                    <label class="control-label" for="elm_email_template_params_{$id}_{$name}">{__($field.title)}{if $field.description}{include file="common/tooltip.tpl" tooltip=__($field.description)}{/if}:</label>
+                    <label class="control-label" for="elm_email_template_params_{$id}_{$name}">{__($field.title)}:</label>
                     <div class="controls">
 
                         {if $field.type == 'checkbox'}
@@ -64,6 +64,9 @@
                             <textarea id="elm_email_template_params_{$id}_{$name}" name="email_template[params][{$name}]" cols="55" rows="3" class="span9">{$params.$name}</textarea>
                         {else}
                             <input type="text" id="elm_email_template_params_{$id}_{$name}" name="email_template[params][{$name}]" value="{$params.$name}" />
+                        {/if}
+                        {if $field.description}
+                            <p class="muted description">{__($field.description)}</p>
                         {/if}
                     </div>
                 </div>
@@ -92,6 +95,11 @@
                     <span class="cm-emltpl-insert-variable label hand"
                           data-ca-template-value="{$variable}"
                     >{$variable}</span>
+                    {hook name="email_templates:variable_link"}
+                        {if $variable == "logos"}
+                            <a class="variables-list__item__edit" href="{"themes.manage?show_all_logos#attach_additional_logos"|fn_url}" title="{__("edit")}"><i class="icon icon-edit"></i></a>
+                        {/if}
+                    {/hook}
                 </li>
             {/foreach}
         </ul>
@@ -147,8 +155,7 @@
 {/capture}
 
 {include file="common/mainbox.tpl"
-    title_start=__("editing_email_template")
-    title_end=$email_template->getName()
+    title=$email_template->getName()
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
     sidebar=$smarty.capture.sidebar

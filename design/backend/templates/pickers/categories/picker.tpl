@@ -18,11 +18,11 @@
 {script src="js/tygh/picker.js"}
 
 {if $item_ids == ""}
-    {assign var="item_ids" value=null}
+    {$item_ids=null}
 {/if}
 
 {if $item_ids && !$item_ids|is_array}
-    {assign var="item_ids" value=","|explode:$item_ids}
+    {$item_ids=","|explode:$item_ids}
 {/if}
 
 {if $view_mode != "blocks"}
@@ -30,13 +30,13 @@
         {if $view_mode != "list"}
 
             {if $multiple == true}
-                {assign var="display" value="checkbox"}
+                {$display="checkbox"}
                 {else}
-                {assign var="display" value="radio"}
+                {$display="radio"}
             {/if}
 
             {if !$extra_url}
-                {assign var="extra_url" value="&get_tree=multi_level"}
+                {$extra_url="&get_tree=multi_level"}
             {/if}
 
             {if $disable_cancel}
@@ -44,18 +44,19 @@
             {/if}
 
             {if $extra_var}
-                {assign var="extra_var" value=$extra_var|escape:url}
+                {$extra_var=$extra_var|escape:url}
             {/if}
 
             {if !$runtime.company_id || $runtime.controller != "companies"}
         
                 {if $multiple}
-                    {assign var="_but_text" value=$but_text|default:__("add_categories")}
-                    {assign var="_but_role" value="add"}
-                    {assign var="_but_icon" value=$but_icon|default:"icon-plus"}
-                    {else}
-                    {assign var="_but_text" value="<i class='icon-plus'></i>"}
-                    {assign var="_but_role" value="icon"}
+                    {$_but_text=(isset($but_text)) ? ($but_text) : (__("add_categories"))}
+                    {$_but_role="add"}
+                    {$_but_icon=$but_icon|default:"icon-plus"}
+                {else}
+                    {$_but_text=($but_role) ? ("") : ("<i class='icon-plus'></i>")}
+                    {$_but_role=$but_role|default:"icon"}
+                    {$_but_icon=$but_icon|default:""}
                 {/if}
                 
                 {if $_but_role != "icon"}
@@ -75,20 +76,20 @@
 
         {else}
 
-            {assign var="display" value="checkbox"}
+            {$display="checkbox"}
 
             {if !$extra_url}
-                {assign var="extra_url" value="&get_tree=multi_level"}
+                {$extra_url="&get_tree=multi_level"}
             {/if}
 
             {if $extra_var}
-                {assign var="extra_var" value=$extra_var|escape:url}
+                {$extra_var=$extra_var|escape:url}
             {/if}
 
             {if !$runtime.company_id || $runtime.controller != "companies"}
-                {assign var="_but_text" value=$but_text|default:__("add_categories")}
-                {assign var="_but_role" value="add"}
-                {assign var="_but_icon" value="icon-plus"}
+                {$_but_text=$but_text|default:__("add_categories")}
+                {$_but_role="add"}
+                {$_but_icon="icon-plus"}
 
             {if $disable_cancel}
                 {$extra_url = "`$extra_url`&disable_cancel=true"}
@@ -119,8 +120,9 @@
 
 {if !$extra_var && $view_mode != "button"}
     {if $multiple}
-    <div class="table-wrapper">
-        <table width="100%" class="table table-middle table--relative">
+    <div class="clearfix"></div>
+    <div class="table-responsive-wrapper">
+        <table width="100%" class="table table-middle table--relative table-responsive">
         <thead>
         <tr>
             {if $positions}<th width="5%">{__("position_short")}</th>{/if}

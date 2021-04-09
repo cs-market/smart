@@ -14,6 +14,7 @@
 
 namespace Tygh\Shippings;
 
+use Tygh\Enum\YesNo;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
 use Tygh\Tygh;
@@ -115,17 +116,19 @@ class Shippings
                 'state'   => Registry::get('settings.Company.company_state'),
                 'zipcode' => Registry::get('settings.Company.company_zipcode'),
                 'phone'   => Registry::get('settings.Company.company_phone'),
+                'company_id' => empty($company_id) ? 0 : $company_id,
             );
         } else {
             $company_data = fn_get_company_data($company_id, DESCR_SL, ['skip_company_condition' => true]);
             $data = array(
-                'name'    => $company_data['company'],
-                'address' => $company_data['address'],
-                'city'    => $company_data['city'],
-                'country' => $company_data['country'],
-                'state'   => $company_data['state'],
-                'zipcode' => $company_data['zipcode'],
-                'phone'   => $company_data['phone'],
+                'name'       => $company_data['company'],
+                'address'    => $company_data['address'],
+                'city'       => $company_data['city'],
+                'country'    => $company_data['country'],
+                'state'      => $company_data['state'],
+                'zipcode'    => $company_data['zipcode'],
+                'phone'      => $company_data['phone'],
+                'company_id' => $company_id,
             );
         }
 
@@ -548,7 +551,6 @@ class Shippings
         );
 
         $shipping_info['rate_info'] = self::_getRateInfoByLocation($shipping_id, $package_info['location']);
-        $shipping_info['rate_calculation'] = 'R';
         $shipping_info['service_params'] = !empty($service_params) ? $service_params : unserialize($shipping_info['service_params']);
         $shipping_info['package_info'] = $package_info;
         $shipping_info['package_info_full'] = $package_info;
@@ -598,7 +600,7 @@ class Shippings
         $rate_info = [];
         if ($destination_id = fn_get_available_destination($location)) {
             $rate_info = db_get_row(
-                'SELECT rate_id, shipping_id, rate_value, destination_id FROM ?:shipping_rates'
+                'SELECT rate_id, shipping_id, rate_value, destination_id, base_rate FROM ?:shipping_rates'
                 . ' WHERE shipping_id = ?i AND destination_id = ?i'
                 . ' ORDER BY destination_id desc',
                 $shipping_id, $destination_id
@@ -675,6 +677,9 @@ class Shippings
         if (!empty($mode['manual'])) {
             foreach ($mode['manual'] as $shipping) {
                 $rate = self::_calculateManualRate($shipping);
+                if (!empty($shipping['rate_info']['base_rate'])) {
+                    $rate += $shipping['rate_info']['base_rate'];
+                }
                 unset($shipping['keys']['mode_key']);
                 $rates[] = [
                     'price'                   => $rate,
@@ -896,20 +901,20 @@ class Shippings
             $shipping['package_info'] = $shipping['package_info_full'];
         }
         unset($shipping['package_info_full']);
-
-        $base_cost = $shipping['package_info']['C'];
+        
         $rate = 0;
 
         foreach ($shipping['package_info'] as $type => $amount) {
             if (isset($shipping['rate_info']['rate_value'][$type]) && is_array($shipping['rate_info']['rate_value'][$type])) {
                 $rate_value = array_reverse($shipping['rate_info']['rate_value'][$type], true);
-                foreach ($rate_value as $rate_amount => $data) {
-                    if ($rate_amount < $amount || ($rate_amount == 0.00 && $amount == 0.00)) {
-                        $value = $data['type'] == 'F' ? $data['value'] : (($base_cost * $data['value']) / 100);
-                        $per_unit = (!empty($data['per_unit']) && $data['per_unit'] == 'Y') ? $shipping['package_info'][$type] : 1;
-
+                foreach ($rate_value as $rate_min => $data) {
+                    $amount_less_than_range_max = $amount < $data['range_to_value'] || empty($data['range_to_value']);
+                    if (($rate_min <= $amount && $amount_less_than_range_max)
+                        || ($rate_min == 0.00 && $amount == 0.00)
+                    ) {
+                        $value = $data['value'];
+                        $per_unit = (!empty($data['per_unit']) && YesNo::toBool($data['per_unit'])) ? $shipping['package_info'][$type] : 1;
                         $rate += $value * $per_unit;
-
                         break;
                     }
                 }
@@ -942,17 +947,17 @@ class Shippings
         }
 
         $rate_info['rate_value'] = unserialize($rate_info['rate_value']);
-        $base_cost = $shipping['package_info']['C'];
         $rate = 0;
 
         foreach ($shipping['package_info'] as $type => $amount) {
             if (isset($rate_info['rate_value'][$type]) && is_array($rate_info['rate_value'][$type])) {
                 $rate_value = array_reverse($rate_info['rate_value'][$type], true);
                 foreach ($rate_value as $rate_amount => $data) {
-                    if ($rate_amount < $amount || ($rate_amount == 0.00 && $amount == 0.00)) {
-                        $value = $data['type'] == 'F' ? $data['value'] : (($base_cost * $data['value']) / 100);
-                        $per_unit = (!empty($data['per_unit']) && $data['per_unit'] == 'Y') ? $shipping['package_info'][$type] : 1;
-
+                    if (($rate_amount <= $amount && ($amount < $data['range_to_value'] || empty($data['range_to_value'])))
+                        || ($rate_amount == 0.00 && $amount == 0.00)
+                    ) {
+                        $value = $data['value'];
+                        $per_unit = (!empty($data['per_unit']) && YesNo::toBool($data['per_unit'])) ? $shipping['package_info'][$type] : 1;
                         $rate += $value * $per_unit;
                         break;
                     }
@@ -973,7 +978,12 @@ class Shippings
      */
     private static function _calculateManualRealRate($shipping, $rate)
     {
-        $destination_id = !empty($rate['destination_id']) ? $rate['destination_id'] : 0;
+        $destination_id = 0;
+        if (!empty($rate['destination_id'])) {
+            $destination_id = (int) $rate['destination_id'];
+        } elseif (!empty($shipping['rate_info']['destination_id'])) {
+            $destination_id = (int) $shipping['rate_info']['destination_id'];
+        }
         if (!self::isFreeShipping($shipping)) {
             $shipping['package_info'] = $shipping['package_info_full'];
         }

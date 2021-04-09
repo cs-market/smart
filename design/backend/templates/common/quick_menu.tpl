@@ -8,8 +8,11 @@
 </script>
 
 <div class="quick-menu-container" id="quick_menu">
-    <div class="quick-menu {if $settings.show_menu_mouseover == "Y"} quick-menu-show-on-hover{/if}">
-        <a id="sw_quick_menu_content" class="quick-menu-link {if $edit_quick_menu || $expand_quick_menu}open{/if} cm-combination">{__("quick_menu")}</a>
+    <div class="quick-menu quick-menu-show-on-hover">
+        <a id="sw_quick_menu_content" class="quick-menu-link {if $edit_quick_menu || $expand_quick_menu}open{/if} cm-combination btn">
+            <span class="quick-menu-link__text">{__("quick_menu")} <b class="caret"></b></span>
+            <i class="icon-ellipsis-vertical quick-menu-link__icon"></i>
+        </a>
 
         <div id="quick_menu_content" class="quick-menu-content cm-popup-box{if !$edit_quick_menu && !$expand_quick_menu} hidden{/if}">
         {if $edit_quick_menu}
@@ -51,15 +54,6 @@
             </div>
             <div class="table-wrapper">
             <table width="100%" class="quick-menu-edit">
-                <tr colspan="2">
-                    <td>
-                        <label class="checkbox" for="show_menu_mouseover">
-                            <input class="cm-qm-show-hide" id="show_menu_mouseover" type="checkbox"
-                                   name="show_menu_mouseover" value="Y"
-                                   {if $settings.show_menu_mouseover == "Y"}checked="checked"{/if}/>{__("show_menu_on_mouse_over")}
-                            </label>
-                    </td>
-                </tr>
                 <tr>
                     <td class="nowrap top">
                         <a class="edit cm-add-section">{__("add_section")}</a>

@@ -32,9 +32,18 @@
                 ADD master_product_offers_count int(11) unsigned NOT NULL DEFAULT '0';
         </item>
         <item for="install">CREATE INDEX idx_master_product_id ON ?:products (master_product_id);</item>
-
+        <item>
+            CREATE TABLE ?:master_products_storefront_offers_count (
+                storefront_id int(11) unsigned NOT NULL,
+                product_id int(11) unsigned NOT NULL,
+                count int(11) unsigned NOT NULL DEFAULT '0',
+                PRIMARY KEY (product_id, storefront_id),
+                KEY idx_storefront_id (storefront_id)
+            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        </item>
         <item for="uninstall">DROP INDEX idx_master_product_id ON ?:products;</item>
         <item for="uninstall">ALTER TABLE ?:products DROP master_product_id, DROP master_product_status, DROP master_product_offers_count;</item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:master_products_storefront_offers_count;</item>
     </queries>
     <functions>
         <item for="install">fn_master_products_install</item>

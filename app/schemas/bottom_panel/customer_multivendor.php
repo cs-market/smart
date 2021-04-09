@@ -50,9 +50,7 @@ $schema['companies.products'] = [
         'dispatch'   => 'products.manage',
         'company_id' => '%company_id%'
     ],
-    'to_vendor' => [
-        'dispatch'   => 'products.manage'
-    ]
+    'to_vendor' => 'fn_bottom_panel_mve_get_company_products_url_params'
 ];
 
 return $schema;

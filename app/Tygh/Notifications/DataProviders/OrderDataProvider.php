@@ -65,9 +65,9 @@ class OrderDataProvider extends BaseDataProvider
         parent::__construct($data);
     }
 
-    public function get($recipient_type)
+    public function get($receiver_type)
     {
-        switch ($recipient_type) {
+        switch ($receiver_type) {
             case UserTypes::CUSTOMER:
                 $data = $this->getForCustomer();
                 break;
@@ -78,7 +78,7 @@ class OrderDataProvider extends BaseDataProvider
                 $data = $this->getForVendor();
                 break;
             default:
-                return parent::get($recipient_type);
+                return parent::get($receiver_type);
         }
 
         return new Data(array_merge($this->data, $data));

@@ -17,16 +17,6 @@ defined('BOOTSTRAP') or die('Access denied');
 /**
  * @var array<string, array> $schema
  */
-$schema['sync_data'] = [
-    'modes' => [
-        'update' => [
-            'param_permissions' => [
-                'sync_provider_id' => [
-                    'commerceml_catalog' => 'commerceml'
-                ],
-            ]
-        ],
-    ],
-];
+$schema['sync_data']['modes']['update']['param_permissions']['sync_provider_id']['commerceml'] = 'commerceml';
 
 return $schema;

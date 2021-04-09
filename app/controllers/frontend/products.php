@@ -51,10 +51,7 @@ if ($mode == 'search') {
 
         list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'));
 
-        if (defined('AJAX_REQUEST') && (!empty($params['features_hash']) && !$products)) {
-            fn_filters_not_found_notification();
-            exit;
-        }
+        fn_filters_handle_search_result($params, $products, $search);
 
         fn_gather_additional_products_data($products, array(
             'get_icon' => true,
@@ -71,6 +68,7 @@ if ($mode == 'search') {
 
         Tygh::$app['view']->assign('products', $products);
         Tygh::$app['view']->assign('search', $search);
+        Tygh::$app['view']->assign('is_selected_filters', !empty($params['features_hash']));
         Tygh::$app['view']->assign('selected_layout', $selected_layout);
     }
 

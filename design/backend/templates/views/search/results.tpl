@@ -48,5 +48,11 @@
 {/if}
 
 {/capture}
-{assign var="title" value=__("search_results_for", ["[search]" => $smarty.request.q])}
-{include file="common/mainbox.tpl" title=$title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons main_buttons_meta=""}
+{$title=__("search_results_for", ["[search]" => $smarty.request.q])}
+{include 
+    file="common/mainbox.tpl" 
+    title=$title content=$smarty.capture.mainbox 
+    buttons=$smarty.capture.buttons 
+    main_buttons_meta="bulkedit-buttons-disabled" 
+    mainbox_content_wrapper_class="bulkedit-disabled"
+}

@@ -12,12 +12,15 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Enum\Addons\VendorCommunication\CommunicationTypes;
+
 $schema['vendor_communication.threads'] = [
     'from' => [
         'dispatch' => 'vendor_communication.threads',
     ],
     'to_admin' => [
-        'dispatch' => 'vendor_communication.threads'
+        'dispatch'           => 'vendor_communication.threads',
+        'communication_type' => CommunicationTypes::VENDOR_TO_CUSTOMER
     ]
 ];
 

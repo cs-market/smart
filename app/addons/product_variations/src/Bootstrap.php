@@ -135,7 +135,7 @@ class Bootstrap implements BootstrapInterface, HookHandlerProviderInterface
             ],
             'delete_product_feature_variants_pre' => [
                 'addons.product_variations.hook_handlers.products',
-                'onDeleteProductFeatureVariantsPre'
+                'onDeleteProductFeatureVariantsPre',
             ],
             'update_image_pairs' => [
                 'addons.product_variations.hook_handlers.products',
@@ -160,6 +160,14 @@ class Bootstrap implements BootstrapInterface, HookHandlerProviderInterface
             'update_product_feature' => [
                 'addons.product_variations.hook_handlers.products',
                 'onUpdateProductFeature'
+            ],
+            'update_image' => [
+                'addons.product_variations.hook_handlers.products',
+                'onUpdateImage'
+            ],
+            'tools_change_status' => [
+                'addons.product_variations.hook_handlers.products',
+                'onChangeStatus'
             ],
 
             // Popularity
@@ -305,8 +313,7 @@ class Bootstrap implements BootstrapInterface, HookHandlerProviderInterface
             'vendor_plans_companies_get_products_count_pre' => [
                 'addons.product_variations.hook_handlers.products',
                 'onVendorPlansCompaniesGetProductsCountPre'
-            ],
-            'storefront_repository_save_post' => [ServiceProvider::class, 'notifyIfOldProductVariationsExists']
+            ]
         ];
     }
 }

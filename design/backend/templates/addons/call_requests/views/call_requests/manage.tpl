@@ -14,7 +14,7 @@
 
 
 {if $call_requests}
-<div class="table-wrapper-responsive">
+<div class="table-responsive-wrapper">
     <table width="100%" class="table table-middle table-responsive">
     <thead>
         <tr>

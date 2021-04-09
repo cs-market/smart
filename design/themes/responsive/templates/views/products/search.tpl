@@ -1,6 +1,7 @@
 <div id="products_search_{$block.block_id}">
 
 {assign var="products_search" value="Y"}
+{$is_selected_filters = $smarty.request.features_hash}
 
 {if $products}
     {assign var="title_extra" value="{__("products_found")}: `$search.total_items`"}
@@ -11,7 +12,17 @@
     {/if}
 {else}
     {hook name="products:search_results_no_matching_found"}
-        <p class="ty-no-items">{__("text_no_matching_products_found")}</p>
+        {if !$show_not_found_notification && $is_selected_filters}
+            {include file="common/no_items.tpl"
+                text_no_found=__("text_no_products_found")
+                no_items_extended=true
+                reset_url=$config.current_url|fn_query_remove:"features_hash"
+            }
+        {else}
+            {include file="common/no_items.tpl"
+                text_no_found=__("text_no_matching_products_found")
+            }
+        {/if}
     {/hook}
 {/if}
 

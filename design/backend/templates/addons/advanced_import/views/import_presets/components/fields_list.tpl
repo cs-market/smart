@@ -5,7 +5,7 @@
         preset_fields: {$preset.fields|default:[]|json_encode nofilter}
     };
 </script>
-
+{$detailed_preset_page = false}
 <div data-ca-advanced-import-preset-file-extension="{$preset['file_extension']|default:""}"
      class="preview-fields-mapping__wrapper clearfix"
 >
@@ -28,9 +28,11 @@
                 <th class="import-field__related_object">
                     {__("advanced_import.product_property", ["[product]" => $smarty.const.PRODUCT_NAME])}
                 </th>
-                <th class="import-field__preview">
-                    {__("advanced_import.first_line_import_value")}
-                </th>
+                {if !$detailed_preset_page}
+                    <th class="import-field__preview">
+                        {__("advanced_import.first_line_import_value")}
+                    </th>
+                {/if}
                 <th class="import-field__modifier">
                     {__("advanced_import.modifier")}
                 </th>
@@ -38,7 +40,10 @@
             </thead>
             <tbody>
             {foreach $fields|default:[] as $id => $name}
-                {include file="addons/advanced_import/views/import_presets/components/field.tpl"}
+                {include file="addons/advanced_import/views/import_presets/components/field.tpl"
+                    view_only=$view_only
+                    detailed_preset_page=$detailed_preset_page
+                }
             {foreachelse}
                 <tr>
                     <td colspan="4">

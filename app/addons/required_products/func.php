@@ -40,7 +40,7 @@ function fn_required_products_get_product_data_post(&$product, &$auth)
         if (count($required)) {
             $product['have_required'] = 'Y';
 
-            $ids = fn_array_column($required, 'product_id');
+            $ids = array_column($required, 'product_id');
             $have = fn_required_products_get_existent($auth, $ids);
 
             $product['required_products'] = [];
@@ -100,7 +100,7 @@ function fn_required_products_get_existent($auth, $ids, $cart = array())
     }
 
     if (!empty($auth['user_id'])) {
-        $data = db_get_fields('SELECT ?:order_details.product_id FROM ?:orders LEFT JOIN ?:order_details ON ?:orders.order_id = ?:order_details.order_id WHERE ?:orders.status IN (?a) AND ?:orders.user_id = ?i AND ?:order_details.product_id IN (?n) GROUP BY ?:order_details.product_id', array ('P', 'C'), $auth['user_id'], $ids);
+        $data = db_get_fields('SELECT ?:order_details.product_id FROM ?:orders LEFT JOIN ?:order_details ON ?:orders.order_id = ?:order_details.order_id WHERE ?:orders.status IN (?a) AND ?:orders.user_id = ?i AND ?:order_details.product_id IN (?n) GROUP BY ?:order_details.product_id', fn_get_settled_order_statuses(), $auth['user_id'], $ids);
     } else {
         $data = array();
     }
@@ -230,7 +230,7 @@ function fn_check_deleted_required_products(&$cart, $cart_id)
     $auth = !empty(Tygh::$app['session']['auth']['user_id']) ? Tygh::$app['session']['auth']['user_id'] : array();
 
     if (!empty($cart_id) && !empty($cart['products'][$cart_id]) && empty($cart['products'][$cart_id]['extra']['is_checked_deleted_products'])) {
-        $all_cart_products = fn_array_column($cart['products'], 'product_id');
+        $all_cart_products = array_column($cart['products'], 'product_id');
         $count_products = array_count_values($all_cart_products);
 
         // deleted product id

@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: tr\n"
-"X-Crowdin-File: /release-4.11.5/addons/store_locator.po\n"
-"X-Crowdin-File-ID: 3692\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.2/addons/store_locator.po\n"
+"X-Crowdin-File-ID: 4142\n"
+"PO-Revision-Date: 2021-02-01 09:14\n"
 
 msgctxt "Addons::name::store_locator"
 msgid "Stores and pickup points"
@@ -278,6 +278,10 @@ msgstr ""
 
 msgctxt "Languages::store_locator.any_rate_area"
 msgid "Any rate area"
+msgstr ""
+
+msgctxt "Languages::store_locator.pickup_from_store"
+msgid "Pickup from store"
 msgstr ""
 
 msgctxt "Languages::store_locator.any_vendor"

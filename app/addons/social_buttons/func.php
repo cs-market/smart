@@ -309,7 +309,7 @@ function fn_sb_format_page_title()
     $page_title = Tygh::$app['view']->getTemplateVars('page_title');
     if (empty($page_title)) {
         $breadcrumbs = Tygh::$app['view']->getTemplateVars('breadcrumbs');
-        $breadcrumb_titles = fn_array_column($breadcrumbs, 'title');
+        $breadcrumb_titles = array_column($breadcrumbs, 'title');
         if (fn_is_rtl_language()) {
             $page_title = implode(' :: ', array_reverse($breadcrumb_titles));
         } else {

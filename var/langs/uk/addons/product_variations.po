@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.11.5/addons/product_variations.po\n"
-"X-Crowdin-File-ID: 3686\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/product_variations.po\n"
+"X-Crowdin-File-ID: 4118\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::product_variations"
 msgid "Product Variations"
@@ -33,8 +33,8 @@ msgid "If child variations aren't allowed to have their own images, they will us
 msgstr "Якщо для дочірніх варіацій не включені свої власні зображення, вони будуть запозичувати зображення у варіації, обраної за замовчуванням."
 
 msgctxt "SettingsOptions::product_variations::variations_allow_auto_change_default_variation"
-msgid "Change default variation when it runs out of stock"
-msgstr "Змінювати варіацію за замовчуванням, коли вона закінчується на складі"
+msgid "Change default variation when it gets hidden or runs out of stock"
+msgstr "Змінювати варіацію за замовчуванням, коли вона прихована чи закінчується на складі"
 
 msgctxt "SettingsTooltips::product_variations::variations_allow_auto_change_default_variation"
 msgid "Ensure that customers always see the products that are in stock first. We recommend leaving this setting enabled for better filtering of variations."
@@ -47,6 +47,14 @@ msgstr "Свої значення характеристик для дочірн
 msgctxt "SettingsTooltips::product_variations::variations_allow_own_features"
 msgid "If child variations aren't allowed to have their own values for features, they will use the values from the default variation of the catalog item."
 msgstr "Якщо для дочірніх варіацій не включені свої власні значення характеристик, вони будуть запозичувати значення у варіації, обраної за замовчуванням."
+
+msgctxt "SettingsOptions::product_variations::variations_show_all_possible_feature_variants"
+msgid "Show all possible feature variants"
+msgstr "Показати всі можливі варіанти характеристик"
+
+msgctxt "SettingsTooltips::product_variations::variations_show_all_possible_feature_variants"
+msgid "Show a feature variant even if it is not available for this variation."
+msgstr "Показати варіант характеристики, навіть якщо він недоступний для цієї варіації."
 
 msgctxt "Languages::product_variations.product_type"
 msgid "Product type"
@@ -88,10 +96,6 @@ msgctxt "Languages::product_variations.group_code.link"
 msgid "Add to variation group"
 msgstr "Додати до групи варіацій"
 
-msgctxt "Languages::product_variations.group_code.link.description"
-msgid "Select the code of the group to which this product will be added as a variation. If the desired variation group doesn't appear among suggestions, please make sure that you have specified the value for every feature that defines the group."
-msgstr "Виберіть код групи, в яку цей товар потрібно додати як варіацію. Якщо потрібний код не з'являється серед пропозицій, то перевірте, щоб у товару були вказані значення для всіх характеристик, на основі яких побудована група."
-
 msgctxt "Languages::product_variations.add_variations"
 msgid "Add variations"
 msgstr "Додати варіації"
@@ -105,8 +109,8 @@ msgid "Create new products"
 msgstr "Створити новый товар"
 
 msgctxt "Languages::product_variations.add_variations_description"
-msgid "Allow customers to switch between similar products by selecting the desired value of their common features."
-msgstr "Дозволяє клієнтам переключатися між аналогічними товарами, вибравши потрібне значення їх загальних ознак."
+msgid "Add variations to generate a group of similar products that differ in color, size, etc. Or add this product to an existing group by entering the group code."
+msgstr "Додайте варіації, щоб створити групу схожих товарів, які відрізняються кольором, розміром і т. п. Або введіть код існуючої групи, щоб додати цей товар туди."
 
 msgctxt "Languages::product_variations.manage"
 msgid "Manage variations"
@@ -133,8 +137,8 @@ msgid "Set as default variation"
 msgstr "Встановити як варіація за замовчуванням"
 
 msgctxt "Languages::product_variations.no_available_features"
-msgid "This product doesn't have features that allow grouping products. Please make sure that:<ol><li>You have created at least one feature with <b>Purpose:</b> <i>Variations as separate products</i> or <i>Variations as one product</i>.</li><li>You have specified the value of that feature for the product.</li></ol>"
-msgstr "У цього товару немає характеристик, за якими можна групувати товари. Перевірте, що: <ol><li>У магазині створена хоча б одна характеристика, у якій <b>Призначення:</b> <i>Варіації як окремі товари</i> або <i>Варіації як один товар</i>.</li><li>Ви задали товару певне значення цієї характеристики.</li></ol>"
+msgid "This product doesn't have features that allow grouping products. Please make sure that:<ol><li>You have created at least one feature with <b>Purpose:</b> <i>Variations as separate products</i> or <i>Variations as one product</i>.</li><li>You have specified the value of that feature for the product.</li></ol><a href=[manage_features_href]>Manage features</a>"
+msgstr "У цього товару немає характеристик, за якими можна групувати товари. Перевірте, що: <ol><li>У магазині створена хоча б одна характеристика, у якій <b>Призначення:</b> <i>Варіації як окремі товари</i> або <i>Варіації як один товар</i>.</li><li>Ви задали товару певне значення цієї характеристики.</li></ol><a href=[manage_features_href]>Керування характеристиками</a>"
 
 msgctxt "Languages::product_feature.purpose.group_catalog_item"
 msgid "Variations as separate products"
@@ -304,114 +308,6 @@ msgctxt "Languages::product_variations.variations_naming_strategy.value"
 msgid "Red, Small"
 msgstr "Червоний, S"
 
-msgctxt "Languages::product_variations.converter.progress.features.title"
-msgid "Creating features"
-msgstr "Створення характеристик"
-
-msgctxt "Languages::product_variations.converter.progress.features.error"
-msgid "Couldn't create feature \"[feature]\""
-msgstr "Неможливо створити характеристику \"[feature]\""
-
-msgctxt "Languages::product_variations.converter.progress.variations.title"
-msgid "Converting variations"
-msgstr "Конвертування варіацій"
-
-msgctxt "Languages::product_variations.converter.progress.variations.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr "Не вдалося перетворити товар \"[product]\""
-
-msgctxt "Languages::product_variations.converter.progress.configurable_products.title"
-msgid "Converting configurable products"
-msgstr "Перетворити в налаштовуємі товари"
-
-msgctxt "Languages::product_variations.converter.progress.configurable_products.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr "Не вдалося перетворити товар \"[product]\""
-
-msgctxt "Languages::product_variations.converter.progress.result.title"
-msgid "Conversion results"
-msgstr "Результати перетворення"
-
-msgctxt "Languages::product_variations.converter.progress.result.configurable_products_count"
-msgid "Number of converted configurable products:"
-msgstr "Число перетворених настроюваних товарів:"
-
-msgctxt "Languages::product_variations.converter.progress.result.variations_count"
-msgid "Number of converted variations:"
-msgstr "Кількість перетворених варіацій:"
-
-msgctxt "Languages::product_variations.converter.progress.result.products_with_combinations_count"
-msgid "Number of converted products with option combinations:"
-msgstr "Число перетворених товарів з комбінаціями опцій:"
-
-msgctxt "Languages::product_variations.converter.progress.result.combinations_count"
-msgid "Number of converted option combinations:"
-msgstr "Кількість перетворених комбынацій опцій:"
-
-msgctxt "Languages::product_variations.converter.progress.result.go_on_products"
-msgid "Go to products"
-msgstr "До товарів"
-
-msgctxt "Languages::product_variations.converter.view.title"
-msgid "Converting products into variations"
-msgstr "Перетворення товарів в варіації"
-
-msgctxt "Languages::product_variations.converter.view.no_data"
-msgid "No data for conversion found: it appears that your store doesn't have option combinations or product variations."
-msgstr "Не знайдені дані для перетворення: схоже, в вашому магазині немає комбінацій опцій або варіацій товарів."
-
-msgctxt "Languages::product_variations.converter.view.configurable_products_count"
-msgid "Number of configurable products found:"
-msgstr "Число знайдених настроюваних товарів:"
-
-msgctxt "Languages::product_variations.converter.view.variations_count"
-msgid "Number of product variations found:"
-msgstr "Число знайдених варіацій:"
-
-msgctxt "Languages::product_variations.converter.view.products_with_combinations_count"
-msgid "Number of products with option combinations found:"
-msgstr "Число знайдених товарів з комбінаціями опцій:"
-
-msgctxt "Languages::product_variations.converter.view.combinations_count"
-msgid "Number of option combinations found:"
-msgstr "Число знайдених комбінацій опцій:"
-
-msgctxt "Languages::product_variations.converter.progress.combinations.title"
-msgid "Converting option combinations"
-msgstr "Перетворення комбінації опцій"
-
-msgctxt "Languages::product_variations.converter.progress.combinations.error"
-msgid "Couldn't convert option combination \"[combination]\" of product \"[product]\""
-msgstr "Не вдалося перетворити комбінацію \"[combination]\" товару \"[product]\""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.title"
-msgid "Converting products with option combinations"
-msgstr "Перетворення товарів з комбінаціями опцій"
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr "Не вдалося перетворити товар \"[product]\""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.error_with_reason"
-msgid "Couldn't convert product \"[product]\". Reason: [error]"
-msgstr "Не вдалося конвертувати товар \"[product]\". Причина: [error]"
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.no_available_combinations"
-msgid "Product doesn't have any option combinations."
-msgstr "Продукт не має жодних комбінацій опцій."
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.only_one_combination"
-msgid "A product with only one available option combination can't be converted to a variation. It will work properly even without conversion."
-msgstr "Товар з лише однією доступною комбінацією опцій не може бути перетворений у варіацію. Він буде працювати належним чином навіть без перетворення."
-
-msgctxt "Languages::product_variations.converter.progress.errors"
-msgid "Errors"
-msgstr "Помилки"
-
-msgctxt "Languages::product_variations.converter.progress.wait_another_process"
-msgid "Please wait while another process will be complete"
-msgstr "Будь ласка, зачекайте, поки інший процес буде завершений"
-
 msgctxt "Languages::product_variations.upgrade_notification.convert_variations_title"
 msgid "Convert product variations to use features"
 msgstr "Переведіть варіації товарів на характеристики"
@@ -423,10 +319,6 @@ msgstr "<p>У версії 4.10.1 варіації можуть займати �
 msgctxt "Languages::product_variations.feature_can_be_deleted"
 msgid "Couldn't delete a feature or its variant because at least one variation group is based on it. Please delete <a href=\"[href]\">these products</a> or disband their product groups, and try again."
 msgstr "Не вдалося видалити характеристику або її варіант, тому що хоча б одна група варіацій заснована на них. Видаліть <a href=\"[href]\">ці товари</a> або розпустіть їх групи варіацій і спробуйте знову."
-
-msgctxt "Languages::product_variations.converter.result.problems_encountered"
-msgid "Some of the products couldn't be converted. This is not a standard situation and wasn't supposed to happen. There are several ways to address it:<ul><li>Check the products that couldn't be converted and configure them manually.</li><li>Contact our technical support via Help Desk, and we'll see why products weren't converted and what can be done about it.</li></ul>"
-msgstr "Не вдалося конвертувати деякі товари. Це нестандартна ситуація, яка не повинна була статися. Є кілька способів вирішити проблему: <ul><li>Перевірте товари, які не вдалося конвертувати, і налаштуйте їх вручну.</li><li>Зверніться в нашу технічну підтримку через Help Desk, і ми подивимося, чому товари не конвертувалися і що з цим можна зробити.</li></ul>"
 
 msgctxt "Languages::product_variations.notice.old_product_variations_exists"
 msgid "Your store still has old product variations. They currently appear as separate products, without the ability to switch between them. To make them work as before the upgrade, <a href=\"[convert_url]\">convert old variations to new variations</a>. It's easy and automatic."
@@ -440,22 +332,6 @@ msgctxt "Languages::variation_set_as_default"
 msgid "Variation set as default"
 msgstr "Встановити варіацію як за замовчуванням"
 
-msgctxt "Languages::product_variations.converter.features.merge"
-msgid "Merge selected"
-msgstr "Зклеїти вибрані"
-
-msgctxt "Languages::product_variations.converter.features.unmerge"
-msgid "Split"
-msgstr "Розділити"
-
-msgctxt "Languages::product_variations.converter.features.list.title"
-msgid "Features and feature variants"
-msgstr "Характеристики і варіації характеристик"
-
-msgctxt "Languages::product_variations.converter.features.list.hint"
-msgid "Below you'll find the list of features and feature variants that will be created during the conversion."
-msgstr "Нижче ви знайдете список характеристик і варіацій характеристик, що будуть створені під час перетворення."
-
 msgctxt "Languages::product_variations.cant_edit_feature_categories"
 msgid "Couldn't assign feature to categories or a feature group. Some variations use this feature and aren't in the categories you tried to assign. Please delete <a href=\"[href]\">these products</a>, or disband their variation groups, or assign them to the same categories as feature or feature group, and try again."
 msgstr "Не вдалося призначити характеристиці категорії або групу характеристик. Деякі варіації використовують цю характеристику і не знаходяться в одній з категорій, які ви намагалися призначити. Або видаліть<a href=\"[href]\">ці товари</a>, або розформуйте їх групи варіацій, або призначте їм ті ж категорії, що й характеристиці або групу характеристик."
@@ -463,6 +339,30 @@ msgstr "Не вдалося призначити характеристиці к
 msgctxt "Languages::product_variations.too_many_combinations"
 msgid "Sorry, there are too many possible variations that can be generated. To prevent heavy load, we won't display them here. Please create the products with the right feature values manually or via import, and add them to the group."
 msgstr "На жаль, занадто багато можливих варіантів, які можуть бути згенеровані. Щоб запобігти великому навантаженню, ми їх не відображатимемо. Створіть товари з потрібними значеннями опцій вручну або за допомогою імпорту та додайте їх до групи."
+
+msgctxt "Languages::product_variations.generator.features.placeholder"
+msgid "Search for features that can generate variations"
+msgstr "Пошук опцій, що можуть створити варіації"
+
+msgctxt "Languages::product_variations.generator.warning.new_features_add"
+msgid "You can add a new feature if you disband the group in the actions menu and create variations again."
+msgstr "Ви можете додати нову опцію, якщо розділити групу в меню дій і знову створити варіації."
+
+msgctxt "Languages::product_variations.generator.feature_variants.placeholder"
+msgid "Type to search"
+msgstr "Введіть пошуковий запит"
+
+msgctxt "Languages::product_variations.generator.feature_variants.add_all_variants"
+msgid "Add all variants"
+msgstr "Додати всі варіанти"
+
+msgctxt "Languages::product_variations.generator.table.title"
+msgid "Modify the variations to be created:"
+msgstr "Модифікувати створені варіанти:"
+
+msgctxt "Languages::product_variations.generator.create_btn"
+msgid "Create [n] variation|Create [n] variations"
+msgstr "Створити [n] варіацію|Створити [n] варіації"
 
 msgctxt "Languages::product_variations.allow_own_features_setting_changing"
 msgid "You've disabled the <b>Allow own feature values for child variations</b> setting. Please export <a href=\"[url]\">all your default variations</a> (use \"Export found products\" in the gear button) and reimport them. This will apply their feature values to existing child variations."
@@ -484,4 +384,8 @@ msgctxt "Languages::product_variations.upgrade_notification.convert_combination_
 msgid "<p>In the upcoming version 4.12.1, product variations will fully replace option combinations. The code that handles option combinations will be removed. Please note that ONLY <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\">option combinations</a> and their code will be removed. <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\">Options</a> themselves will remain exactly as they are now.</p><p>Your store still has option combinations. That's why we ask you to convert option combinations into product variations. The process is mostly automatic. We only ask your input to make sure that everything goes smoothly and according to your expectations.</p><p>However, the Product Variations add-on isn't active in your store yet. You'll need to install or enable it first, and run the conversion.</p><p><a href=\"[search_for_addon]\" target=\"_blank\" class=\"btn btn-large\">1. Activate the add-on</a> <a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large\">2. Convert option combinations</a></p>"
 msgstr "<p>У майбутньої версії 4.12.1 варіації повністю замінять собою комбінації опцій. Код, що відповідає за комбінації опцій, буде видалений. Зверніть увагу, що видалення торкнеться ТІЛЬКИ <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\">комбінації опцій</a>. Самі <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\">опції</a> залишаться.</p><p>У вашому магазині ще залишилися комбінації опцій. Тому ми просимо вас перетворити комбінації в варіації. Процес здебільшого автоматичний. Вас ми просимо тільки перевірити, що все пройшло гладко і відповідно до вашими очікуваннями. Але перед тим, як запускати перетворення, встановіть і включіть модуль \"Варіації товарів\".</p><p><a href=\"[search_for_addon]\" target=\"_blank\" class=\"btn btn-large\">1. Включити модуль</a>\n"
 "<a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large\">2. Перетворити комбінації опцій</a></p>"
+
+msgctxt "Languages::product_variations.add_all_variants"
+msgid "Add all variants"
+msgstr "Додати всі варіанти"
 

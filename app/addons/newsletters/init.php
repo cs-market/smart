@@ -21,5 +21,6 @@ define('NEWSLETTER_TYPE_AUTORESPONDER', 'A');
 
 fn_register_hooks(
     'get_predefined_statuses',
-    array('newsletters_update_subscriptions_post', '', 'gdpr')
+    'settings_variants_image_verification_use_for',
+    ['newsletters_update_subscriptions_post', '', 'gdpr']
 );

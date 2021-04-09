@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/call_requests.po\n"
-"X-Crowdin-File-ID: 3628\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/call_requests.po\n"
+"X-Crowdin-File-ID: 4044\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::call_requests"
 msgid "Call requests"
@@ -58,11 +58,11 @@ msgstr "Συμπεριλαμβανομένων παρένθεση, κενών, �
 
 msgctxt "SettingsOptions::call_requests::enable_call_requests_for_vendors"
 msgid "Enable call requests for vendors"
-msgstr ""
+msgstr "Ενεργοποίηση αιτημάτων κλήσης για πωλητές"
 
 msgctxt "SettingsTooltips::call_requests::enable_call_requests_for_vendors"
 msgid "This will also replace marketplace contact information with vendors' where necessary."
-msgstr ""
+msgstr "Αυτό θα αντικαταστήσει επίσης τα στοιχεία επικοινωνίας του marketpalce μεμε αυτα των πωλητων όπου είναι απαραίτητο."
 
 msgctxt "Languages::privileges.manage_call_requests"
 msgid "Can edit"

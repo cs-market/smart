@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: de\n"
-"X-Crowdin-File: /release-4.11.5/addons/newsletters.po\n"
-"X-Crowdin-File-ID: 3700\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/newsletters.po\n"
+"X-Crowdin-File-ID: 4120\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::newsletters"
 msgid "Newsletters"
@@ -475,4 +475,12 @@ msgstr "<p>Wenn Sie sich für einen bestimmten Newsletter anmelden, tragen wir (
 "> <li>>>Wenn Ihr Konto registriert ist, melden Sie sich einfach in den Profileinstellungen an und kündigen Sie den Newsletter ab. Einige unserer Mitarbeiter können Mailinglisten mit E-Mail-Adressen einsehen. Auf diese Weise können Sie Ihre E-Mail-Adresse aus der Mailingliste entfernen, wenn Sie uns dazu auffordern.\n\n"
 "<p>Bitte beachten Sie, dass die Mailinglisten voneinander unabhängig sind. Wenn Sie keine Newsletter mehr erhalten möchten, müssen Sie sich von allen Mailinglisten abmelden. Selbst wenn Sie das tun, erhalten Sie immer noch kontobezogene E-Mails (z. B. Benachrichtigungen über den Auftragsstatus, E-Mails zum Zurücksetzen des Passworts und mehr). Wenn Sie entscheiden, dass Sie unseren Shop nicht mehr nutzen möchten und Ihre persönlichen Daten aus unserer Datenbank entfernt werden sollen (oder wenn Sie alle persönlichen Daten, die mit Ihrem Konto verbunden sind, erhalten möchten), senden Sie bitte eine E-Mail an[email].\n\n"
 "<p>Wenn Sie glauben, dass Ihre persönlichen Daten missbraucht wurden, haben Sie das Recht, eine Beschwerde bei einer Aufsichtsbehörde einzureichen. Wir sind durch die Allgemeine Datenschutzverordnung der EU verpflichtet, Sie auf dieses Recht hinzuweisen; wir beabsichtigen nicht, Ihre Daten zu missbrauchen"
+
+msgctxt "Languages::newsletters.use_for_subscribe_form"
+msgid "Subscribe form"
+msgstr ""
+
+msgctxt "Languages::newsletters.default_mailing_list"
+msgid "Default mailing list"
+msgstr ""
 

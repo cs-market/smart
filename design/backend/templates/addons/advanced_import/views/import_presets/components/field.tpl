@@ -11,14 +11,16 @@
                name="fields[{$name|md5}][related_object_type]"
                id="elm_field_related_object_type_{$id}"
         />
-        <label class="cm-adv-import-placeholder cm-adv-import-placeholder--empty" 
+        <label class="cm-adv-import-placeholder cm-adv-import-placeholder--empty {if $view_only}cm-adv-import-placeholder--view_only{/if}"
             data-ca-advanced-import-field-id="{$id}"
             data-ca-advanced-import-select-name="fields[{$name|md5}][related_object]"
             data-ca-advanced-import-field-name="{$name}"
             data-ca-placeholder="-{__("none")}-"
+            data-ca-view-only="{$view_only|default: "false"}"
         >-{__("none")}-</label>
         <input type="hidden" id="elm_field_related_object_{$id}" name="fields[{$name|md5}][related_object]" value=""/>
     </td>
+    {if !$detailed_preset_page}
     <td class="import-field__preview" data-th="{__("advanced_import.first_line_import_value")}">
         {if $preview}
             {foreach $preview as $preview_item}
@@ -55,6 +57,7 @@
             </div>
         {/if}
     </td>
+    {/if}
     <td class="import-field__modifier" data-th="{__("advanced_import.modifier")}">
         <div class="control-group import-field__modifier-input-group">
             <input type="text"
@@ -64,6 +67,7 @@
                    value="{$preset.fields.$name.modifier}"
                    data-ca-advanced-import-original-value="{$preview_item.$name.original|default:""}"
                    data-ca-advanced-import-element="modifier"
+                   {if $view_only}disabled{/if}
             />
         </div>
     </td>

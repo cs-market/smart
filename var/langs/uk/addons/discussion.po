@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.11.5/addons/discussion.po\n"
-"X-Crowdin-File-ID: 3578\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/discussion.po\n"
+"X-Crowdin-File-ID: 4056\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::discussion"
 msgid "Comments and reviews"
@@ -220,14 +220,6 @@ msgctxt "SettingsOptions::discussion::product_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Дозволено лише один пост з однієї IP-адреси"
 
-msgctxt "SettingsOptions::discussion::product_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Надіслати сповіщення на цей E-mail"
-
-msgctxt "SettingsOptions::discussion::product_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "Надсилати сповіщення продавцю"
-
 msgctxt "SettingsOptions::discussion::product_share_discussion"
 msgid "Share discussions with all stores"
 msgstr "Поширити обговерення на всі вітрини"
@@ -248,10 +240,6 @@ msgctxt "SettingsOptions::discussion::category_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Дозволено лише один пост з однієї IP-адреси"
 
-msgctxt "SettingsOptions::discussion::category_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Надіслати сповіщення на цю електронну пошту"
-
 msgctxt "SettingsOptions::discussion::order_posts_per_page"
 msgid "Posts per page"
 msgstr "Записів на сторінці"
@@ -259,10 +247,6 @@ msgstr "Записів на сторінці"
 msgctxt "SettingsOptions::discussion::order_initiate"
 msgid "Allow customer to initiate discussion"
 msgstr "Дозволити замовнику ініціювати обговорення"
-
-msgctxt "SettingsOptions::discussion::order_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "Надсилати сповіщення постачальнику"
 
 msgctxt "SettingsOptions::discussion::page_posts_per_page"
 msgid "Posts per page"
@@ -275,14 +259,6 @@ msgstr "Адміністратор повинен схвалити повідо�
 msgctxt "SettingsOptions::discussion::page_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Дозволено лише один пост з однієї IP-адреси"
-
-msgctxt "SettingsOptions::discussion::page_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Надіслати сповіщення на електронну пошту"
-
-msgctxt "SettingsOptions::discussion::page_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "Надсилати сповіщення постачальнику"
 
 msgctxt "SettingsOptions::discussion::page_share_discussion"
 msgid "Share discussions with all stores"
@@ -303,10 +279,6 @@ msgstr "Адміністратор повинен схвалити повідо�
 msgctxt "SettingsOptions::discussion::home_page_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Дозволено лише один пост з однієї IP-адреси"
-
-msgctxt "SettingsOptions::discussion::home_page_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Надіслати сповіщення на електронну пошту"
 
 msgctxt "SettingsOptions::discussion::home_page_testimonials"
 msgid "Testimonials"
@@ -371,14 +343,6 @@ msgstr "Адміністратор повинен схвалити повідо�
 msgctxt "SettingsOptions::discussion::company_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Дозволено лише один пост з однієї IP-адреси"
-
-msgctxt "SettingsOptions::discussion::company_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Надіслати сповіщення на електронну пошту"
-
-msgctxt "SettingsOptions::discussion::company_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "Надсилати сповіщення постачальнику"
 
 msgctxt "SettingsVariants::discussion::company_post_approval::any"
 msgid "Any customer"
@@ -507,4 +471,28 @@ msgstr "Налаштування модуля коментарів та відг
 msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification"
 msgid "In the 4.9.1 version the <strong>Only anonymous customers</strong> variant of the <strong>Administrator must approve posts submitted by</strong> setting was removed. Now, it is available again, with the ability to leave reviews for nonauthorized customers. Please check if the desirable value of the setting is selected."
 msgstr "У версії 4.9.1 варіант <strong>Тільки анонімні клієнти</strong> параметра <strong>Адміністратор повинен підтверджувати відправлені повідомлення</strong> в налаштуваннях було видалено. Тепер він доступний знову, з можливістю залишити відгуки для неавторизованих клієнтів. Перевірте, чи вибрано бажане значення параметра."
+
+msgctxt "Languages::discussion.event.products.new_post"
+msgid "Products: new review posted"
+msgstr "Товари: з'явився новий відгук"
+
+msgctxt "Languages::discussion.event.testimonials.new_post"
+msgid "Testimonials: new review posted"
+msgstr "Відгук про сайт: з'явився новий відгук"
+
+msgctxt "Languages::discussion.event.orders.new_post"
+msgid "Order communication: new message added"
+msgstr "Спілкування про замовлення: відправлено нове повідомлення"
+
+msgctxt "Languages::discussion.event.categories.new_post"
+msgid "Categories: new review posted"
+msgstr "Категорії з'явився новий відгук"
+
+msgctxt "Languages::discussion.event.pages.new_post"
+msgid "Pages: new comment posted"
+msgstr "Сторінки: з'явився новий коментарій"
+
+msgctxt "Languages::discussion.event.vendors.new_post"
+msgid "Vendors: new review posted"
+msgstr "Продавці: з'явився новий відгук"
 

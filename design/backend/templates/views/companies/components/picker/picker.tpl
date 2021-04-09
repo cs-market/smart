@@ -28,6 +28,8 @@
 {$autoopen = $autoopen|default:false}
 {$allow_clear = $allow_clear|default:false}
 {$item_ids = $item_ids|default:[]|array_filter}
+{$close_on_select = $close_on_select|default:true}
+{$select_id=$select_id|default:"companies_add_`$picker_id`"}
 
 {if $multiple && $show_advanced}
     {$empty_variant_text = $empty_variant_text|default:__("type_to_search_or_click_button")}
@@ -39,6 +41,7 @@
     <div class="object-picker__select-group object-picker__select-group--companies {$select_group_class}">
         <div class="object-picker__simple {if $type == "list"}object-picker__simple--list{/if} {if $show_advanced}object-picker__simple--advanced{/if} object-picker__simple--companies {$simple_class}">
             <select {if $multiple}multiple{/if}
+                    id="{$select_id}"
                     name="{$input_name}"
                     class="cm-object-picker object-picker__select object-picker__select--companies {$select_class}"
                     data-ca-object-picker-object-type="company"
@@ -48,6 +51,7 @@
                     data-ca-object-picker-template-selection-selector="#object_picker_selection_template_{$picker_id}"
                     data-ca-object-picker-template-selection-load-selector="#object_picker_selection_load_template_{$picker_id}"
                     data-ca-object-picker-autofocus="{$autofocus|to_json}"
+                    data-ca-object-picker-close-on-select="{$close_on_select|to_json}"
                     data-ca-object-picker-autoopen="{$autoopen}"
                     data-ca-dispatch="{$submit_url}"
                     data-ca-target-form="{$submit_form}"

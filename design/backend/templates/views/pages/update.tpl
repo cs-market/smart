@@ -64,13 +64,15 @@
                 <label class="control-label" for="elm_page_descr">{__("description")}:</label>
             {/hook}
             <div class="controls">
-                <textarea id="elm_page_descr"
-                          name="page_data[description]"
-                          cols="55"
-                          rows="8"
-                          class="cm-wysiwyg input-large"
-                          data-ca-is-block-manager-enabled="{fn_check_view_permissions("block_manager.block_selection", "GET")|intval}"
-                >{$page_data.description}</textarea>
+                {hook name="pages:detailed_description_textarea"}
+                    <textarea id="elm_page_descr"
+                        name="page_data[description]"
+                        cols="55"
+                        rows="8"
+                        class="cm-wysiwyg input-large"
+                        data-ca-is-block-manager-enabled="{fn_check_view_permissions("block_manager.block_selection", "GET")|intval}"
+                    >{$page_data.description}</textarea>
+                {/hook}
 
                 {if $view_uri}
                     {include
@@ -151,9 +153,7 @@
               <label class="control-label" for="elm_page_use_avail_period">{__("use_avail_period")}:</label>
               <div class="controls">
                   <input type="hidden" name="page_data[use_avail_period]" value="N">
-                    <span class="checkbox">
-                        <input type="checkbox" name="page_data[use_avail_period]" id="elm_page_use_avail_period" {if $page_data.use_avail_period == "Y"}checked="checked"{/if} value="Y" onclick="fn_activate_calendar(this);">
-                    </span>
+                  <input type="checkbox" name="page_data[use_avail_period]" id="elm_page_use_avail_period" {if $page_data.use_avail_period == "Y"}checked="checked"{/if} value="Y" onclick="fn_activate_calendar(this);">
               </div>
           </div>
 
@@ -194,18 +194,10 @@
     {hook name="pages:tabs_content"}
     {/hook}
 
-{if !$id}
-    {$_title = __($page_type_data.new_name)}
-{else}
-    {$title_start = __($page_type_data.edit_name)}
-    {$title_end = $page_data.page}
-
-    {$select_languages = true}
-    {if $view_uri}
-        {capture name="preview"}
-            <li>{btn type="list" target="_blank" text=__("preview") href=$view_uri}</li>
-        {/capture}
-    {/if}
+{if $id && $view_uri}
+    {capture name="preview"}
+        <li>{btn type="list" target="_blank" text=__("preview") href=$view_uri}</li>
+    {/capture}
 {/if}
 
 {capture name="buttons"}
@@ -261,7 +253,15 @@
     {/hook}
 {/capture}
 
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$_title sidebar=$smarty.capture.sidebar sidebar_position="left" content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons}
+{include file="common/mainbox.tpl"
+    title=($id) ? $page_data.page : __($page_type_data.new_name)
+    sidebar=$smarty.capture.sidebar
+    sidebar_position="left"
+    select_languages=(bool) $id
+    content=$smarty.capture.mainbox
+    buttons=$smarty.capture.buttons
+    adv_buttons=$smarty.capture.adv_buttons
+}
 
 {if "MULTIVENDOR"|fn_allowed_for}
   <script type="text/javascript">

@@ -25,8 +25,9 @@ defined('BOOTSTRAP') or die('Access denied');
 
 if ($mode === 'map') {
     $mappable_schema = ServiceProvider::getManualMappableEntitiesSchema();
-    $settings = ServiceProvider::getCatalogSettings();
     $company_id = fn_get_runtime_company_id();
+    $settings_schema = ServiceProvider::getImportSettingsSchema($company_id);
+    $settings = ServiceProvider::getImportSettings($company_id);
 
     $type = isset($_REQUEST['type']) ? (string) $_REQUEST['type'] : null;
     $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 0;
@@ -95,7 +96,8 @@ if ($mode === 'map') {
         'records'         => $records,
         'items'           => $items,
         'search'          => $search,
-        'import_settings' => $settings
+        'import_settings' => $settings,
+        'settings_schema' => $settings_schema
     ]);
 }
 

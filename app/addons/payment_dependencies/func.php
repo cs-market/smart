@@ -41,15 +41,10 @@ function fn_payment_dependencies_update_shipping_post(array $shipping_data, $shi
             $shipping_data['enable_payment_ids'] = [];
         }
 
-        $params = [];
-
-        if (fn_allowed_for('MULTIVENDOR')) {
-            $params = [
-                'company_ids' => [0, (int) Registry::get('runtime.company_id')],
-            ];
-        }
-
-        $disable_payment_ids = array_diff(array_keys(fn_get_payments($params)), $shipping_data['enable_payment_ids']);
+        $disable_payment_ids = array_diff(
+            array_keys(fn_get_payments(['direct_payments_skip_company_id' => true])),
+            $shipping_data['enable_payment_ids']
+        );
 
         fn_payment_dependencies_update_dependencies($shipping_id, $disable_payment_ids);
     }
@@ -153,7 +148,7 @@ function fn_payment_dependencies_update_dependencies($shipping_id, array $disabl
  */
 function fn_payment_dependencies_update_payment_post(array $payment_data, $payment_id, $lang_code, array $certificate_file, $certificates_dir, array $processor_params, $action)
 {
-    if (fn_allowed_for('ULTIMATE')) {
+    if (fn_allowed_for('ULTIMATE') || $action === 'update') {
         return;
     }
 
@@ -240,9 +235,48 @@ function fn_payment_dependencies_prepare_checkout_payment_methods_before_get_pay
     $payment_methods,
     &$get_payments_params
 ) {
+    if (!fn_allowed_for('MULTIVENDOR')) {
+        return;
+    }
     if (!empty($get_payments_params['company_ids']) && is_array($get_payments_params['company_ids'])) {
         $get_payments_params['company_ids'][] = (int) Registry::get('runtime.company_id');
     } else {
         $get_payments_params['company_ids'] = [(int) Registry::get('runtime.company_id')];
     }
+}
+
+/**
+ * The "calculate_cart_content_before_shipping_calculation" hook handler.
+ *
+ * Actions performed:
+ *  - Adds a payments table to the list of tables by witch the checkout cache is updated.
+ *
+ * @param array<string> $cart                  Cart data
+ * @param array<string> $auth                  Authentication data
+ * @param string        $calculate_shipping    One-letter flag indicating how to calculate the shipping cost:
+ *                                             A - calculate all available methods
+ *                                             E - calculate selected methods only (from cart[shipping])
+ *                                             S - skip calculation
+ * @param bool          $calculate_taxes       Whether taxes should be calculated
+ * @param string        $options_style         One-letter flag indicating how to obtain options information:
+ *                                             F - full
+ *                                             S - skip selection
+ *                                             I - info
+ * @param bool          $apply_cart_promotions Whether promotions should be applied to the cart
+ * @param array<string> $shipping_cache_tables Database tables that cause shipping recalculation
+ * @param string        $shipping_cache_key    Shipping rates cache key
+ *
+ * @see fn_calculate_cart_content
+ */
+function fn_payment_dependencies_calculate_cart_content_before_shipping_calculation(
+    array $cart,
+    array $auth,
+    $calculate_shipping,
+    $calculate_taxes,
+    $options_style,
+    $apply_cart_promotions,
+    array &$shipping_cache_tables,
+    $shipping_cache_key
+) {
+    $shipping_cache_tables[] = 'payments';
 }

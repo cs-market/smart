@@ -5,6 +5,15 @@ const _ = Tygh;
 
 export const methods = {
     open: function (params) {
+        params = params || {};
+
+        const dialog_state = {
+            is_opening_allowed: true
+        }
+        $.ceEvent('trigger', 'ce.dialog.before_open', [dialog_state, params]);
+        if (!dialog_state.is_opening_allowed) {
+            return false;
+        }
 
         var container = $(this);
 
@@ -17,7 +26,6 @@ export const methods = {
 
         $('html').addClass('dialog-is-open');
 
-        params = params || {};
         if (!container.hasClass('ui-dialog-content')) { // dialog is not generated yet, init if
             if (container.ceDialog('_load_content', params)) {
                 return false;
@@ -38,6 +46,7 @@ export const methods = {
 
         if ($(".object-container", container).length == 0) {
             container.wrapInner('<div class="object-container ' + (params.containerClass ? params.containerClass : '') + '" />');
+            container.find('.object-container').prepend('<div class="cm-notification-container-dialog notification-container-dialog"/>');
         }
 
         if (params) {
@@ -84,7 +93,8 @@ export const methods = {
     },
 
     _load_content: function (params) {
-        var container = $(this);
+        var container = $(this),
+            data = {};
 
         params.href = params.href || '';
 
@@ -93,11 +103,24 @@ export const methods = {
                 container.data('caViewId', params.view_id);
             }
 
+            if (params.contentRequestForm) {
+                let $contentRequestForm = $('#' + params.contentRequestForm);
+
+                if ($contentRequestForm.length) {
+                    data = $contentRequestForm.serializeObject();
+                }
+            }
+
+            if (params.actionContext) {
+                data._action_context = params.actionContext;
+            }
+
             $.ceAjax('request', params.href, {
                 full_render: 0,
                 result_ids: container.prop('id'),
                 skip_result_ids_check: true,
                 keep_status_box: true,
+                data: data,
                 callback: function () {
 
                     if (!container.ceDialog('_is_empty')) {
@@ -497,7 +520,7 @@ var stackInitedBody = [];
 
 /**
  * Dialog opener
- * @param {JQueryStatic} $ 
+ * @param {JQueryStatic} $
  */
 export const ceDialogInit = function ($) {
     $.fn.ceDialog = function (method) {
@@ -535,6 +558,7 @@ export const ceDialogInit = function ($) {
 
             if (!container.length) {
                 dlg.wrapInner('<div class="object-container" />');
+                dlg.find('.object-container').prepend('<div class="cm-notification-container-dialog notification-container-dialog"/>');
             }
 
             if (dlg.length && dlg.is(':visible')) {
@@ -550,6 +574,9 @@ export const ceDialogInit = function ($) {
             return (params.jelm.closest('.ui-dialog-content').length != 0);
 
         } else if (action == 'get_params') {
+            if (!params.length) {
+                return;
+            }
 
             var dialog_params = {
                 keepInPlace: params.hasClass('cm-dialog-keep-in-place'),
@@ -557,7 +584,8 @@ export const ceDialogInit = function ($) {
                 scroll: params.data('caScroll') ? params.data('caScroll') : '',
                 titleTemplate: params.data('caDialogTemplate') || null,
                 titleFirstChunk: params.data('caDialogTextFirst') || null,
-                titleSecondChunk: params.data('caDialogTextSecond') || null
+                titleSecondChunk: params.data('caDialogTextSecond') || null,
+                purpose: params.data('caDialogPurpose') || null
             };
 
             // `title` field should exist when title data-attribute exist too
@@ -602,6 +630,14 @@ export const ceDialogInit = function ($) {
 
             if (params.data('caDialogClass')) {
                 dialog_params['dialogClass'] = params.data('caDialogClass');
+            }
+
+            if (params.data('caDialogContentRequestForm')) {
+                dialog_params['contentRequestForm'] = params.data('caDialogContentRequestForm');
+            }
+
+            if (params.data('caDialogActionContext')) {
+                dialog_params['actionContext'] = params.data('caDialogActionContext');
             }
 
             return dialog_params;

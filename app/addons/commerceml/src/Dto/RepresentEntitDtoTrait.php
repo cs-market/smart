@@ -52,7 +52,8 @@ trait RepresentEntitDtoTrait
      */
     public function getEntityName()
     {
-        $name = isset($this->full_name) ? $this->full_name : $this->name;
+        $name = isset($this->name) ? $this->name : '';
+        $name = isset($this->full_name) ? $this->full_name : $name;
 
         if ($name instanceof TranslatableValueDto) {
             return $name->default_value;

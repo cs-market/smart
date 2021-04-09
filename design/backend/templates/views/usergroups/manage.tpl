@@ -3,41 +3,68 @@
 {capture name="mainbox"}
 
 {$hide_inputs = ""|fn_check_form_permissions}
-<form action="{""|fn_url}" method="post" name="usergroups_form" class="{if $hide_inputs} cm-hide-inputs{/if}">
+<form action="{""|fn_url}" method="post" id="usergroups_form" name="usergroups_form" class="{if $hide_inputs} cm-hide-inputs{/if}">
+
+{$user_group_statuses=""|fn_get_default_statuses:true}
+{$has_permission = fn_check_permissions("usergroups", "update", "admin", "POST", ["table" => "states"]) && fn_check_permissions("states", "m_delete", "admin", "POST", ["table" => "states"])}
+
+{if $has_permission}
+    {hook name="usergroups:bulk_edit"}
+        {include file="views/usergroups/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
 
 {hook name="usergroups:manage"}
 {if $usergroups}
-<div class="table-responsive-wrapper">
+<div class="table-responsive-wrapper longtap-selection">
     <table class="table table-middle table--relative table-responsive">
-    <thead>
+    <thead
+        data-ca-bulkedit-default-object="true"
+        data-ca-bulkedit-component="defaultObject"
+    >
     <tr>
-        <th width="1%" class="mobile-hide">
-            {include file="common/check_items.tpl"}</th>
+        <th width="6%" class="mobile-hide">
+            {include file="common/check_items.tpl" check_statuses=($has_permission) ? $user_group_statuses : ''}
+
+            <input type="checkbox"
+                class="bulkedit-toggler hide"
+                data-ca-bulkedit-toggler="true"
+                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+            />
+        </th>
         <th width="20%">{__("usergroup")}</th>
         <th width="45%">{__("type")}</th>
         {hook name="usergroups:manage_header"}{/hook}
-        <th width="5%" class="mobile-hide">&nbsp;</th>
-        <th class="right" width="15%">{__("status")}</th>
+        <th width="8%" class="mobile-hide">&nbsp;</th>
+        <th width="10%">{__("status")}</th>
     </tr>
     </thead>
     {foreach from=$usergroups item=usergroup}
-    <tr class="cm-row-status-{$usergroup.status|lower}">
-        <td width="1%" class="mobile-hide">
-            <input type="checkbox" name="usergroup_ids[]" value="{$usergroup.usergroup_id}" class="cm-item" /></td>
-        <td class="row-status" data-th="{__("usergroup")}">
+    <tr class="cm-row-status-{$usergroup.status|lower} cm-longtap-target"
+        {if $has_permission}
+            data-ca-longtap-action="setCheckBox"
+            data-ca-longtap-target="input.cm-item"
+            data-ca-id="{$state.state_id}"
+        {/if}
+    >
+        <td width="6%" class="mobile-hide">
+            <input type="checkbox" name="usergroup_ids[]" value="{$usergroup.usergroup_id}" class="cm-item cm-item-status-{$usergroup.status|lower} hide" />
+        </td>
+        <td width="20%" class="row-status" data-th="{__("usergroup")}">
             {if $hide_inputs}
                 {$usergroup.usergroup}
             {else}
-                <a class="row-status cm-external-click" data-ca-external-click-id="{"opener_group`$usergroup.usergroup_id`"}">{$usergroup.usergroup}</a>
+                <a class="row-status cm-external-click bulkedit-deselect" data-ca-external-click-id="{"opener_group`$usergroup.usergroup_id`"}">{$usergroup.usergroup}</a>
             {/if}
         </td>
-        <td class="row-status" data-th="{__("type")}">
+        <td width="45%" class="row-status" data-th="{__("type")}">
             {$usergroup_types[$usergroup.type]}
         </td>
 
         {hook name="usergroups:manage_data"}{/hook}
 
-        <td class="row-status mobile-hide">
+        <td width="8%" class="row-status mobile-hide">
             {if $usergroup.type == "A"}
                 {assign var="_href" value="usergroups.assign_privileges?usergroup_id=`$usergroup.usergroup_id`"}
                 {assign var="_link_text" value=__("privileges")}
@@ -55,7 +82,7 @@
                 {dropdown content=$smarty.capture.tools_list}
             </div>
         </td>
-        <td class="nowrap right" data-th="{__("status")}">
+        <td width="10% class="nowrap right" data-th="{__("status")}">
             {assign var="hide_for_vendor" value=false}
             {if !"usergroups.manage"|fn_check_view_permissions:"POST"}
                 {assign var="hide_for_vendor" value=true}
@@ -78,10 +105,6 @@
         {capture name="tools_list"}
             {hook name="usergroups:manage_tools_list"}
                 <li>{btn type="list" text=__("user_group_requests") href="usergroups.requests"}</li>
-                {if $usergroups}
-                    <li class="divider mobile-hide"></li>
-                    <li class="mobile-hide">{btn type="delete_selected" dispatch="dispatch[usergroups.m_delete]" form="usergroups_form"}</li>
-                {/if}
             {/hook}
         {/capture}
         {dropdown content=$smarty.capture.tools_list}
@@ -91,7 +114,7 @@
 {capture name="adv_buttons"}
     {if "usergroups.update"|fn_check_view_permissions}
         {capture name="add_new_picker"}
-            {include file="views/usergroups/update.tpl" usergroup=[]}
+            {include file="views/usergroups/update.tpl" usergroup=[] show_privileges_tab=true}
         {/capture}
         {include file="common/popupbox.tpl" id="add_new_usergroups" text=__("new_usergroups") title=__("new_usergroups") content=$smarty.capture.add_new_picker act="general" icon="icon-plus"}
     {/if}

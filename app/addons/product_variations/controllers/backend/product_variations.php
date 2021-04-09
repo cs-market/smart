@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************************
  *                                                                          *
  *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
@@ -12,15 +13,18 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Addons\ProductVariations\Form\GenerateVariationsForm;
+use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection;
+use Tygh\Addons\ProductVariations\Request\GenerateProductsAndAttachToGroupRequest;
+use Tygh\Addons\ProductVariations\Request\GenerateProductsAndCreateGroupRequest;
 use Tygh\Addons\ProductVariations\ServiceProvider;
 use Tygh\Addons\ProductVariations\Product\FeaturePurposes;
-use Tygh\Addons\ProductVariations\Product\Group\GroupFeature;
-use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection;
 use Tygh\Addons\ProductVariations\Product\Type\Type;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
 use Illuminate\Support\Collection;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 /**
  * @var string $mode
@@ -29,7 +33,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
  */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if ($mode === 'update') {
+    if ($mode === 'link') {
         $product_id = isset($_REQUEST['product_id']) ? (int) $_REQUEST['product_id'] : 0;
         $product_ids = isset($_REQUEST['product_ids']) ? (array) array_filter($_REQUEST['product_ids']) : [];
 
@@ -172,9 +176,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($mode === 'generate') {
         $product_id = isset($_REQUEST['product_id']) ? (int) $_REQUEST['product_id'] : 0;
-        $combination_ids = isset($_REQUEST['combination_ids']) ? (array) $_REQUEST['combination_ids'] : [];
 
         if (!$product_id) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        $generation_form = GenerateVariationsForm::create($product_id, $_REQUEST);
+        $product_data = $generation_form->getProductData();
+
+        if (!$product_data) {
             return [CONTROLLER_STATUS_NO_PAGE];
         }
 
@@ -184,9 +194,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $group_id = $group_repository->findGroupIdByProductId($product_id);
 
         if ($group_id) {
-            $result = $service->generateProductsAndAttachToGroup($group_id, $product_id, $combination_ids);
+            $request = new GenerateProductsAndAttachToGroupRequest(
+                $group_id,
+                $product_id,
+                $generation_form->getCombinationsData()
+            );
+            $request->setFeaturesVariantsMap($generation_form->getFeaturesVariantsMap());
+            $result = $service->generateProductsAndAttachToGroup($request);
         } else {
-            $result = $service->generateProductsAndCreateGroup($product_id, $combination_ids);
+            $request = new GenerateProductsAndCreateGroupRequest(
+                $product_id,
+                $generation_form->getCombinationsData(),
+                $generation_form->getFeatureCollection()
+            );
+            $request->setFeaturesVariantsMap($generation_form->getFeaturesVariantsMap());
+            $result = $service->generateProductsAndCreateGroup($request);
         }
 
         $result->showNotifications();
@@ -202,7 +224,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    return [CONTROLLER_STATUS_OK];
+    if ($mode !== 'create_variations') {
+        return [CONTROLLER_STATUS_OK];
+    }
 }
 
 if ($mode === 'manage') {
@@ -317,7 +341,38 @@ if ($mode === 'manage') {
             'group_codes' => $group_codes
         ]);
     }
-} elseif ($mode === 'update') {
+} elseif ($mode === 'create_variations') {
+    $product_id = isset($_REQUEST['product_id']) ? (int) $_REQUEST['product_id'] : 0;
+
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_REDIRECT, 'products.update?selected_section=variations&product_id=' . $product_id];
+    }
+
+    $generation_form = GenerateVariationsForm::create($product_id, $_REQUEST);
+    $product_data = $generation_form->getProductData();
+
+    if (!$product_data) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+    $product_type = Type::createByProduct($product_data);
+
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+    $view->assign([
+        'product_data'                 => $product_data,
+        'feature_value_collection'     => $generation_form->getFeatureValueCollection(),
+        'group'                        => $generation_form->getGroup(),
+        'combinations'                 => $generation_form->getCombinations(),
+        'selected_features'            => $generation_form->getFeatures(),
+        'new_combinations_count'       => $generation_form->getNewCombinationsCount(),
+        'feature_ids'                  => array_keys($generation_form->getFeatures()),
+        'features_variant_ids'         => $generation_form->getFeaturesVariantsMap(),
+        'exists_features_variant_ids'  => $generation_form->getExistsFeaturesVariantsMap(),
+        'is_allow_generate_variations' => $product_type->isAllowGenerateVariations(),
+        'is_all_combinations_active'   => $generation_form->isAllCombinationsActive(),
+    ]);
+} elseif ($mode === 'find_variations') {
     $product_id = isset($_REQUEST['product_id']) ? (int) $_REQUEST['product_id'] : 0;
 
     if (!defined('AJAX_REQUEST')) {
@@ -334,14 +389,16 @@ if ($mode === 'manage') {
     }
 
     $product_type = Type::createByProduct($product_data);
-
     $group_repository = ServiceProvider::getGroupRepository();
     $product_repository = ServiceProvider::getProductRepository();
-    $service = ServiceProvider::getService();
+
+    $generator = ServiceProvider::getCombinationsGenerator();
+    $generator->setDefaulIsActive(!empty($_REQUEST['features_variants_ids']));
 
     $group = $group_repository->findGroupByProductId($product_id);
-    $search = $products = $combinations = $selected_features = [];
-    $count_available_combinations = 0;
+
+    $search = $products = [];
+    $selected_features = [];
 
     if ($group) {
         $group_features = $group->getFeatures();
@@ -380,34 +437,6 @@ if ($mode === 'manage') {
         ]);
 
         $products = $product_repository->loadProductsFeatures($products, $group_features);
-
-        if ($product_type->isAllowGenerateVariations()) {
-            $combinations_count = array_reduce(array_map(function ($feature_id) {
-                return (int) fn_get_product_feature_variants([
-                    'feature_id'             => $feature_id,
-                    'fetch_total_count_only' => true
-                ]);
-            }, $feature_ids), function ($carry, $item) { return $carry * $item; }, 1);
-
-            if ($combinations_count > 5000) { // FIXME Will be refactored, see 1-24713
-                $view->assign('is_too_many_combinations', true);
-            } else {
-                if ($group) {
-                    $combinations = $service->getFeaturesVariantsCombinationsByGroup($group);
-                } else {
-                    $combinations = $service->getFeaturesVariantsCombinations($group_features, [$product_id]);
-                }
-
-                foreach ($combinations as $combination) {
-                    if (!$combination['exists']) {
-                        $count_available_combinations++;
-                    }
-                }
-            }
-        } else {
-            $combinations = [];
-            $count_available_combinations = 0;
-        }
     }
 
     $view->assign([
@@ -416,19 +445,17 @@ if ($mode === 'manage') {
         'selected_features'            => $selected_features,
         'feature_ids'                  => $feature_ids,
         'products'                     => $products,
-        'combinations'                 => $combinations,
-        'count_available_combinations' => $count_available_combinations,
         'search'                       => $search,
         'is_allow_generate_variations' => $product_type->isAllowGenerateVariations()
     ]);
 
     if (!empty($product_data['product_features'])) {
         $feature_params = [
-            'feature_id' => array_keys($product_data['product_features']),
-            'plain' => true,
-            'statuses' => array('A', 'H'),
-            'variants' => true,
-            'exclude_group' => true,
+            'feature_id'      => array_keys($product_data['product_features']),
+            'plain'           => true,
+            'statuses'        => [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN],
+            'variants'        => true,
+            'exclude_group'   => true,
             'exclude_filters' => false
         ];
         // Preload variants selected at search form. They will be shown at AJAX variants loader as pre-selected.

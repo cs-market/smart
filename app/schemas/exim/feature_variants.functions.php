@@ -123,26 +123,33 @@ function fn_exim_get_feature_data_by_name($feature_name, $parent_name = '')
     $condition = '';
     if (!empty($parent_name)) {
         $parent = fn_exim_get_feature_data_by_name($parent_name);
-        $condition = db_quote(" AND parent_id = ?i", $parent['feature_id']);
+        $condition = db_quote(' AND parent_id = ?i', $parent['feature_id']);
     }
 
-    $join = "INNER JOIN ?:product_features AS pf ON pf.feature_id = pfd.feature_id";
-    return db_get_row("SELECT pfd.feature_id, company_id FROM ?:product_features_descriptions AS pfd $join WHERE description = ?s $condition", $feature_name);
+    $join = 'INNER JOIN ?:product_features AS pf ON pf.feature_id = pfd.feature_id';
+    return db_get_row('SELECT pfd.feature_id, company_id FROM ?:product_features_descriptions AS pfd ?p WHERE internal_name = ?s ?p', $join, $feature_name, $condition);
 }
 
 function fn_exim_get_feature_name($variant_id, $lang_code)
 {
-    $join = "INNER JOIN ?:product_feature_variants AS pfv ON pfd.feature_id = pfv.feature_id";
+    $join = 'INNER JOIN ?:product_feature_variants AS pfv ON pfd.feature_id = pfv.feature_id';
 
-    return db_get_field("SELECT description FROM ?:product_features_descriptions AS pfd $join WHERE variant_id = ?i AND lang_code = ?s", $variant_id, $lang_code);
+    return db_get_field('SELECT description FROM ?:product_features_descriptions AS pfd ?p WHERE variant_id = ?i AND lang_code = ?s', $join, $variant_id, $lang_code);
+}
+
+function fn_exim_get_feature_internal_name($variant_id, $lang_code)
+{
+    $join = 'INNER JOIN ?:product_feature_variants AS pfv ON pfd.feature_id = pfv.feature_id';
+
+    return db_get_field('SELECT internal_name FROM ?:product_features_descriptions AS pfd ?p WHERE variant_id = ?i AND lang_code = ?s', $join, $variant_id, $lang_code);
 }
 
 function fn_exim_get_product_feature_group_name($variant_id, $lang_code)
 {
-    $join = " INNER JOIN ?:product_features AS pf ON pfd.feature_id = pf.parent_id ";
-    $join .= " INNER JOIN ?:product_feature_variants AS pfv ON pf.feature_id = pfv.feature_id ";
+    $join = ' INNER JOIN ?:product_features AS pf ON pfd.feature_id = pf.parent_id';
+    $join .= ' INNER JOIN ?:product_feature_variants AS pfv ON pf.feature_id = pfv.feature_id';
 
-    return db_get_field("SELECT description FROM ?:product_features_descriptions AS pfd $join WHERE variant_id = ?i AND lang_code = ?s", $variant_id, $lang_code);
+    return db_get_field('SELECT internal_name FROM ?:product_features_descriptions AS pfd ?p WHERE variant_id = ?i AND lang_code = ?s', $join, $variant_id, $lang_code);
 }
 
 /**

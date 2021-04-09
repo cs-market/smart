@@ -20,7 +20,7 @@ use Tygh\Addons\YandexCheckout\Payments\YandexCheckout;
 use Tygh\Addons\YandexCheckout\ServiceProvider;
 use Tygh\Common\OperationResult;
 use Tygh\Enum\YesNo;
-use YandexCheckout\Model\PaymentInterface;
+use YooKassa\Model\PaymentInterface;
 
 class ChangeOrderStatusWithYandexCheckout
 {
@@ -49,7 +49,7 @@ class ChangeOrderStatusWithYandexCheckout
     /**
      * @param \Tygh\Addons\YandexCheckout\Payments\YandexCheckout $payment_processor
      *
-     * @return \YandexCheckout\Model\PaymentInterface|null
+     * @return \YooKassa\Model\PaymentInterface|null
      */
     protected function getPaymentInfo(YandexCheckout $payment_processor)
     {

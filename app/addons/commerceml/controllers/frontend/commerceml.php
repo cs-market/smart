@@ -19,7 +19,12 @@ use Tygh\Addons\CommerceML\Commands\AuthCommand;
 use Tygh\Addons\CommerceML\Commands\UploadImportFileCommand;
 use Tygh\Addons\CommerceML\Commands\UnzipImportFileCommand;
 use Tygh\Addons\CommerceML\Commands\CreateImportCommand;
-use Tygh\Addons\CommerceML\Commands\ExecuteImportCommand;
+use Tygh\Addons\CommerceML\Commands\ExecuteCatalogImportCommand;
+use Tygh\Addons\CommerceML\Commands\ExportOrdersCommand;
+use Tygh\Addons\CommerceML\Commands\ExecuteSaleImportCommand;
+use Tygh\Addons\CommerceML\Dto\ImportDto;
+use Tygh\Addons\CommerceML\Dto\OrderDto;
+use Tygh\Addons\CommerceML\Dto\ProductDto;
 use Tygh\Registry;
 
 defined('BOOTSTRAP') or die('Access denied');
@@ -29,6 +34,13 @@ if (empty($_SERVER['PHP_AUTH_USER'])) {
     header('HTTP/1.0 401 Unauthorized');
     fn_echo('Enter user login and password');
     exit;
+}
+
+/** @var \Tygh\Web\Session $session */
+$session = Tygh::$app['session'];
+
+if (!$session->isStarted()) {
+    $session->start();
 }
 
 $command_bus = ServiceProvider::getCommandBus();
@@ -43,11 +55,10 @@ if (!$auth_result->isSuccess()) {
 }
 
 $user_data = $auth_result->getData();
+$session['auth'] = fn_fill_auth($user_data);
 
 Registry::set('runtime.company_id', $user_data['company_id']);
 
-/** @var \Tygh\Web\Session $session */
-$session = Tygh::$app['session'];
 $logger = ServiceProvider::getLogger();
 $params = $_REQUEST;
 
@@ -58,6 +69,7 @@ $mode = sprintf('%s_%s', $type, $mode);
 $filename = isset($params['filename']) ? fn_basename($params['filename']) : null;
 $is_import_file = $filename && strpos($filename, 'import') !== false;
 $company_id = (int) $user_data['company_id'];
+$user_id = (int) $user_data['user_id'];
 
 if (!isset($session['commerecml_import_key'])) {
     $key = 'last_commerecml_import_key_' . $company_id;
@@ -92,7 +104,7 @@ if ($mode === 'catalog_checkauth' || $mode === 'sale_checkauth') {
     fn_echo($session->getID());
 
     $logger->info(__('commerceml.controller.end_handle_catalog_checkauth_request', ['[session_id]' => $session->getID()]));
-} elseif ($mode === 'catalog_init') {
+} elseif ($mode === 'catalog_init' || $mode === 'sale_init') {
     $logger->info(__('commerceml.controller.start_handle_catalog_init'));
 
     if (ServiceProvider::isZipAllowed()) {
@@ -103,14 +115,28 @@ if ($mode === 'catalog_checkauth' || $mode === 'sale_checkauth') {
 
     fn_echo('file_limit=' . ServiceProvider::getUploadFileLimit() . "\n");
 
-    ServiceProvider::getCommandBus()->dispatch(CleanUpFilesDirCommand::create($upload_dir_path));
+    $command_bus->dispatch(CleanUpFilesDirCommand::create($upload_dir_path));
 
     $logger->info(__('commerceml.controller.upload_directory_cleaned', ['[dir]' => fn_get_rel_dir($upload_dir_path)]));
     $logger->info(__('commerceml.controller.end_handle_catalog_init', [
         '[limit]' => ServiceProvider::getUploadFileLimit(),
         '[zip]'   => ServiceProvider::isZipAllowed() ? 'yes' : 'no'
     ]));
-} elseif ($mode === 'catalog_file') {
+} elseif ($mode === 'catalog_file' || $mode === 'sale_file') {
+    if (
+        $mode === 'sale_file' && (
+            !ServiceProvider::isImportChangesToOrderEnabled($company_id) || (
+                !fn_check_permissions('orders', 'update_status', 'admin', '', [], AREA, $user_id)
+                && !fn_check_permissions('order_management', 'edit', 'admin', '', [], AREA, $user_id)
+            )
+        )
+    ) {
+        $logger->info(__('commerceml.controller.import_orders_is_disabled'));
+
+        fn_echo('failure');
+        exit;
+    }
+
     $logger->info(__('commerceml.controller.start_handle_catalog_file', ['[filename]' => $filename]));
 
     if (!isset($session['uploaded_zip_files'])) {
@@ -141,7 +167,7 @@ if ($mode === 'catalog_checkauth' || $mode === 'sale_checkauth') {
     }
 
     $logger->info(__('commerceml.controller.end_handle_catalog_file', ['[filename]' => $filename]));
-} elseif ($mode === 'catalog_import' && !empty($session['uploaded_zip_files'])) {
+} elseif (($mode === 'catalog_import' || $mode === 'sale_import') && !empty($session['uploaded_zip_files'])) {
     $file_path = reset($session['uploaded_zip_files']);
     $logger->info(__('commerceml.controller.start_handle_catalog_import_unzip', ['[filename]' => basename($file_path)]));
 
@@ -159,25 +185,33 @@ if ($mode === 'catalog_checkauth' || $mode === 'sale_checkauth') {
     }
 
     $logger->info(__('commerceml.controller.end_handle_catalog_import_unzip', ['[filename]' => basename($file_path)]));
-} elseif ($mode === 'catalog_import' && $filename && empty($session['converted_files'][$filename])) {
-    $logger->info(__('commerceml.controller.start_handle_catalog_import_convert', ['[filename]' => $filename]));
+} elseif (($mode === 'catalog_import' || $mode === 'sale_import') && $filename && empty($session['converted_files'][$filename])) {
+    if ($mode === 'catalog_import') {
+        $logger->info(__('commerceml.controller.start_handle_catalog_import_convert', ['[filename]' => $filename]));
 
-    if ($is_import_file && !ServiceProvider::isCatalogImportEnabled($company_id)) {
-        fn_echo('success');
-        $logger->info(__('commerceml.controller.convert_import_file_skiped_by_import_mode', ['[filename]' => $filename]));
-        exit;
-    }
+        if ($is_import_file && !ServiceProvider::isCatalogImportEnabled($company_id)) {
+            fn_echo('success');
+            $logger->info(__('commerceml.controller.convert_import_file_skiped_by_import_mode', ['[filename]' => $filename]));
+            exit;
+        }
 
-    if (!$is_import_file && !ServiceProvider::isOffersImportEnabled($company_id)) {
-        fn_echo('success');
-        $logger->info(__('commerceml.controller.convert_offers_file_skiped_by_import_mode', ['[filename]' => $filename]));
-        exit;
+        if (!$is_import_file && !ServiceProvider::isOffersImportEnabled($company_id)) {
+            fn_echo('success');
+            $logger->info(__('commerceml.controller.convert_offers_file_skiped_by_import_mode', ['[filename]' => $filename]));
+            exit;
+        }
+    } elseif ($mode === 'sale_import') {
+        $logger->info(__('commerceml.controller.start_handle_sale_import_convert', ['[filename]' => $filename]));
     }
 
     $file_path = sprintf('%s/%s', rtrim($upload_dir_path, '/'), $filename);
 
+    $import_type = $mode === 'catalog_import'
+        ? ImportDto::IMPORT_TYPE_CATALOG
+        : ImportDto::IMPORT_TYPE_ORDERS;
+
     $result = $command_bus->dispatch(
-        CreateImportCommand::create([$file_path], $user_data, $import_key)
+        CreateImportCommand::create([$file_path], $user_data, $import_key, $import_type)
     );
 
     $logger->logResult($result);
@@ -198,7 +232,11 @@ if ($mode === 'catalog_checkauth' || $mode === 'sale_checkauth') {
         fn_echo('progress');
     }
 
-    $logger->info(__('commerceml.controller.end_handle_catalog_import_convert', ['[filename]' => $filename]));
+    if ($mode === 'catalog_import') {
+        $logger->info(__('commerceml.controller.end_handle_catalog_import_convert', ['[filename]' => $filename]));
+    } elseif ($mode === 'sale_import') {
+        $logger->info(__('commerceml.controller.end_handle_sale_import_convert', ['[filename]' => $filename]));
+    }
 } elseif ($mode === 'catalog_import' && $filename && !empty($session['converted_files'][$filename])) {
     $import_id = (int) $session['import_id'];
 
@@ -207,8 +245,78 @@ if ($mode === 'catalog_checkauth' || $mode === 'sale_checkauth') {
         $command = RemoveImportCommand::create($import_id);
     } else {
         $logger->info(__('commerceml.controller.start_handle_catalog_import_execute', ['[filename]' => $filename]));
-        $command = ExecuteImportCommand::create($import_id, 60);
+        $command = ExecuteCatalogImportCommand::create($import_id, 60, ProductDto::REPRESENT_ENTITY_TYPE);
     }
+
+    $result = $command_bus->dispatch($command);
+
+    $logger->logResult($result);
+
+    if ($result->isFailure()) {
+        fn_echo('failure');
+
+        if (!empty($params['is_manual'])) {
+            unset($session['converted_files'], $session['import_id']);
+        }
+    } else {
+        /** @var \Tygh\Addons\CommerceML\Dto\ImportDto $import */
+        $import = $result->getData('import');
+
+        if ($import->isStatusFinished()) {
+            fn_echo('success');
+
+            if (!empty($params['is_manual'])) {
+                unset($session['converted_files'], $session['import_id']);
+            }
+        } else {
+            fn_echo('progress');
+        }
+    }
+
+    if ($action === 'analyze') {
+        $logger->info(__('commerceml.controller.end_handle_catalog_import_analyze', ['[filename]' => $filename]));
+    } else {
+        $logger->info(__('commerceml.controller.end_handle_catalog_import_execute', ['[filename]' => $filename]));
+    }
+} elseif ($mode === 'sale_query') {
+    if (!fn_check_permissions('orders', 'manage', 'admin', '', [], AREA, $user_id)) {
+        $logger->info(__('commerceml.controller.access_denied'));
+
+        fn_echo('failure');
+        exit;
+    }
+
+    $logger->info(__('commerceml.controller.start_handle_export_orders'));
+
+    $result = $command_bus->dispatch(
+        ExportOrdersCommand::create($company_id, ServiceProvider::getImportSettings())
+    );
+
+    $logger->logResult($result);
+
+    $xml_exported_orders = $result->getData('exported_orders');
+
+    header('Content-type: text/xml; charset=utf-8');
+
+    fn_echo("\xEF\xBB\xBF");
+    fn_echo($xml_exported_orders);
+
+    ExportOrdersCommand::updateLastExportTime($company_id);
+    $logger->info(__('commerceml.controller.end_handle_export_orders'));
+} elseif ($mode === 'sale_success') {
+    fn_echo('success');
+} elseif ($mode === 'sale_import' && $filename && !empty($session['converted_files'][$filename])) {
+    $import_id = (int) $session['import_id'];
+
+    $logger->info(__('commerceml.controller.start_handle_sale_import_execute', ['[filename]' => $filename]));
+    $command = ExecuteSaleImportCommand::create(
+        $import_id,
+        60,
+        OrderDto::REPRESENT_ENTITY_TYPE,
+        fn_check_permissions('orders', 'update_status', 'admin', '', [], AREA, $user_id),
+        fn_check_permissions('order_management', 'edit', 'admin', '', [], AREA, $user_id)
+    );
+
 
     $result = $command_bus->dispatch($command);
 
@@ -227,11 +335,7 @@ if ($mode === 'catalog_checkauth' || $mode === 'sale_checkauth') {
         }
     }
 
-    if ($action === 'analyze') {
-        $logger->info(__('commerceml.controller.end_handle_catalog_import_analyze', ['[filename]' => $filename]));
-    } else {
-        $logger->info(__('commerceml.controller.end_handle_catalog_import_execute', ['[filename]' => $filename]));
-    }
+    $logger->info(__('commerceml.controller.end_handle_sale_import_execute', ['[filename]' => $filename]));
 }
 
 exit;

@@ -1,3 +1,5 @@
+{$object = $thread.object}
+
 {capture name="mainbox"}
     <div class="messages clearfix" id="messages_list_{$thread_id}">
         {foreach from=$messages item=post}
@@ -12,7 +14,21 @@
                 </div>
                 <div class="vendor-communication-post__img">
                     {if $post.user_type == "V"}
-                        {include file="common/image.tpl" image=$post.vendor_info.logos.theme.image image_width="60" image_height="60" href={"profiles.update&user_id=`$post.vendor_info.logos.theme.company_id`"|fn_url} class="vendor-communication-logo__image"}
+                        {if $auth.user_type === "UserTypes::ADMIN"|enum}
+                            {$show_detailed_link = true}
+                        {else}
+                            {$show_detailed_link = false}
+                        {/if}
+
+                        {include
+                            file="common/image.tpl"
+                            image=$post.vendor_info.logos.theme.image
+                            image_width="60"
+                            image_height="60"
+                            show_detailed_link=$show_detailed_link
+                            href={"profiles.update?user_id=`$post.vendor_info.logos.theme.company_id`"|fn_url}
+                            class="vendor-communication-logo__image"
+                        }
                     {/if}
                     {if $post.user_type == "A"}
                         <i class="icon-user"></i>
@@ -47,49 +63,50 @@
                 id="add_message_form_{$thread_id}">
 
                 <input type="hidden" name="result_ids" value="messages_list_{$thread_id},new_message_form_{$thread_id}">
+                <input type="hidden" name="communication_type" value="{$thread.communication_type}"/>
                 <input type="hidden" name="message[thread_id]" value="{$thread_id}" />
 
                 <div id="new_message_{$thread_id}" class="add_message_form--wrapper">
-                    <textarea
-                        id="thread_message_{$thread_id}" 
-                        name="message[message]" 
-                        class="cm-focus add_message_form--textarea"
-                        rows="5"
-                        autofocus 
-                        placeholder="{__("vendor_communication.type_message")}"
-                    ></textarea>
+                    {if $allow_send}
+                        <textarea
+                            id="thread_message_{$thread_id}"
+                            name="message[message]"
+                            class="cm-focus add_message_form--textarea"
+                            rows="5"
+                            autofocus
+                            placeholder="{__("vendor_communication.type_message")}"
+                        ></textarea>
+                    {/if}
                     <div class="buttons-container">
-                        {include
-                            file="buttons/button.tpl"
-                            but_id="refresh_thread_`$thread_id`"
-                            but_icon="icon-refresh"
-                            but_text=__("refresh")
-                            but_role="action"
-                            but_href="vendor_communication.view&thread_id=`$thread_id`&result_ids=messages_list_`$thread_id`"|fn_url
-                            but_target_id="messages_list_`$thread_id`"
-                            but_meta="cm-ajax btn btn-link btn-icon-link animation-rotate add_message_form--refresh-btn"
-                            but_rel="nofollow"
-                        }
-                        {include
-                            file="buttons/button.tpl"
-                            but_text=__("send")
-                            but_meta="btn btn-primary btn-send cm-post pull-right"
-                            but_role="submit"
-                            but_name="dispatch[vendor_communication.post_message]"
-                        }
-
-                        {if $thread.object && $thread.object_type == $smarty.const.VC_OBJECT_TYPE_PRODUCT}
-                            <a href={"products.update?product_id=`$thread.object.product_id`"|fn_url}
-                                class="post-object" title="{$thread.object.product}">
-                                {$thread.object.product}
-                            </a>
-                            <div class="additional-info">/ 
-                                {hook name="vendor_communication:product_info"}
-                                    {$thread.object.product_code}
-                                {/hook}
-                                <span class="additional-text">/ 
-                                {include file="common/price.tpl" value=$thread.object.price}</span>
-                            </div>
+                        {if $thread.thread_id}
+                            {include
+                                file="buttons/button.tpl"
+                                but_id="refresh_thread_`$thread_id`"
+                                but_icon="icon-refresh"
+                                but_text=__("refresh")
+                                but_role="action"
+                                but_href="vendor_communication.view?thread_id=`$thread_id`&result_ids=messages_list_`$thread_id`&communication_type=`$thread.communication_type`"|fn_url
+                                but_target_id="messages_list_`$thread_id`"
+                                but_meta="cm-ajax btn btn-link btn-icon-link animation-rotate add_message_form--refresh-btn"
+                                but_rel="nofollow"
+                            }
+                            {if $allow_send}
+                                {include
+                                    file="buttons/button.tpl"
+                                    but_text=__("send")
+                                    but_meta="btn btn-primary btn-send cm-post pull-right"
+                                    but_role="submit"
+                                    but_name="dispatch[vendor_communication.post_message]"
+                                }
+                            {/if}
+                        {else}
+                            {include
+                                file="buttons/save_cancel.tpl"
+                                but_text=__("send")
+                                cancel_action="close"
+                                but_meta="btn btn-primary btn-send cm-post pull-right"
+                                but_role="submit"
+                                but_name="dispatch[vendor_communication.post_message]"}
                         {/if}
                     </div>
                 </div>
@@ -99,13 +116,26 @@
 {/capture}
 
 {capture name="mainbox_title"}
-    {__("vendor_communication.ticket")} &lrm;#{$thread.thread_id} 
-    <span class="f-middle">{$thread.firstname} {$thread.lastname} / {$thread.company_id|fn_get_company_name}</span>
-    <span class="f-small">
-    {assign var="last_updated" value=$thread.last_updated|date_format:"`$settings.Appearance.date_format`"|escape:url} /
-    {$thread.last_updated|date_format:"`$settings.Appearance.date_format`"},
-    {$thread.last_updated|date_format:"`$settings.Appearance.time_format`"}
-    </span>
+    {if $thread.thread_id}
+        {__("vendor_communication.ticket")} &lrm;#{$thread.thread_id}
+        <span class="f-middle">{$thread.firstname} {$thread.lastname} / {$thread.company_id|fn_get_company_name}</span>
+        <span class="f-small">
+            {assign var="last_updated" value=$thread.last_updated|date_format:"`$settings.Appearance.date_format`"|escape:url} /
+            {$thread.last_updated|date_format:"`$settings.Appearance.date_format`"},
+            {$thread.last_updated|date_format:"`$settings.Appearance.time_format`"}
+        </span>
+    {else}
+        {__("vendor_communication.contact_admin")}
+    {/if}
+{/capture}
+
+{capture name="sidebar"}
+    {hook name="vendor_communication:view_sidebar"}
+        {include file="addons/vendor_communication/views/vendor_communication/components/sidebar_thread_object_data.tpl"
+            object=$object
+            object_id=$object_id
+        }
+    {/hook}
 {/capture}
 
 {include

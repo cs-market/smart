@@ -82,6 +82,10 @@ a:hover {
     &-info {
         background-color: @infoText;
     }
+
+    &-text {
+        background-color: @grayLight;
+    }
 }
 select {
     border-color: #d3dbe2;
@@ -107,11 +111,6 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
     min-height: 32px;
-}
-
-input[type="checkbox"] {
-    width: 13px;
-    height: 13px;
 }
 
 .a-pseudo,
@@ -143,6 +142,17 @@ input[type="checkbox"] {
     .box-shadow(none);
 }
 
+// Type
+.description {
+    word-break: break-all;
+    word-break: break-word;
+    margin-top: 5px;
+}
+
+.controls .description {
+    margin-top: 5px;
+}
+
 // Order statuses styles resets
 [class^="o-status-"], [class*=" o-status-"] {
     background-image: none !important;
@@ -161,15 +171,6 @@ input[type="checkbox"] {
 .ajax-content-more span {
     padding-right: 20px;
     background: no-repeat url('../media/images/ajax_loader_small.gif') center right;
-}
-.label-html-checkboxes {
-    display: inline-block;
-    margin-right: 60px;
-    white-space: nowrap;
-    input[type="checkbox"] {
-        margin-top: -2px !important;
-        margin-right: 6px;
-    }
 }
 
 // Localization

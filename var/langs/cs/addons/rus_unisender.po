@@ -219,3 +219,7 @@ msgstr "Unisender"
 msgctxt "Languages::privileges.view_unisender"
 msgid "Can view"
 msgstr "Can view"
+
+msgctxt "Languages::addons.rus_unisender.errors_logging"
+msgid "Unisender: api/[api_method]: Error was returned from service: [error]."
+msgstr "Unisender: api/[api_method]: Error was returned from service: [error]."

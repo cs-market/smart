@@ -63,13 +63,6 @@ class ProductFeatureConvertor
             ));
         }
 
-        if (
-            $import_storage->getSetting('convertor_brand_source', 'none') === 'property'
-            && $this->isBrandFeature($element->getAsString('name', ''), $import_storage)
-        ) {
-            $product_feature->type = ProductFeatureDto::TYPE_EXTENDED;
-        }
-
         /**
          * @psalm-suppress PossiblyNullIterator
          */
@@ -119,18 +112,5 @@ class ProductFeatureConvertor
         }
 
         return IdDto::createByExternalId(sprintf('%s#%s', $feature_id, $variant_id));
-    }
-
-    /**
-     * Checks if feature is Brand feature
-     *
-     * @param string        $feature_name   Feature name
-     * @param ImportStorage $import_storage Import storage
-     *
-     * @return bool
-     */
-    private static function isBrandFeature($feature_name, ImportStorage $import_storage)
-    {
-        return mb_strtolower(trim($import_storage->getSetting('convertor_brand_property_source', 'none'))) === mb_strtolower(trim($feature_name));
     }
 }

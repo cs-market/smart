@@ -2,8 +2,8 @@
 
 <div class="items-container" id="mailing_lists">
 {if $mailing_lists}
-<div class="table-wrapper">
-    <table width="100%" class="table table-middle table--relative">
+<div class="table-responsive-wrapper">
+    <table width="100%" class="table table-middle table--relative table-responsive table-responsive-w-titles">
         <thead>
             <tr>
                 <th></th>
@@ -21,7 +21,7 @@
             <li class="divider"></li>
         {/capture}
 
-        {include file="common/object_group.tpl" no_table=true id=$mailing_list.list_id text=$mailing_list.object status=$mailing_list.status hidden=true href="mailing_lists.update?list_id=`$mailing_list.list_id`" details="{__("subscribers_num")}: `$mailing_list.subscribers_num`" object_id_name="list_id" table="mailing_lists" href_delete="mailing_lists.delete?list_id=`$mailing_list.list_id`" delete_target_id="mailing_lists" header_text="{__("editing_mailing_list")}: `$mailing_list.object`" tool_items=$smarty.capture.tool_items}
+        {include file="common/object_group.tpl" no_table=true id=$mailing_list.list_id text=$mailing_list.object status=$mailing_list.status hidden=true href="mailing_lists.update?list_id=`$mailing_list.list_id`" details="{__("subscribers_num")}: `$mailing_list.subscribers_num`" object_id_name="list_id" table="mailing_lists" href_delete="mailing_lists.delete?list_id=`$mailing_list.list_id`" delete_target_id="mailing_lists" header_text=$mailing_list.object tool_items=$smarty.capture.tool_items}
 
     {/foreach}
     </tbody>

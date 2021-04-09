@@ -14,10 +14,12 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
+use Tygh\Enum\ReceiverSearchMethods;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
+use Tygh\Notifications\Receivers\SearchCondition;
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
-use Tygh\Enum\YesNo;
-use Tygh\Enum\UserTypes;
 
 function fn_call_requests_info()
 {
@@ -323,10 +325,12 @@ function fn_do_call_request($params, $product_data, &$cart, &$auth)
 
     $force_notification = [];
 
-    if (!empty($company_id)) {
-        $force_notification[UserTypes::ADMIN] = false;
-    } else {
-        $force_notification[UserTypes::VENDOR] = false;
+    if (fn_allowed_for('MULTIVENDOR')) {
+        if (!empty($company_id)) {
+            $force_notification[UserTypes::ADMIN] = false;
+        } else {
+            $force_notification[UserTypes::VENDOR] = false;
+        }
     }
 
     /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
@@ -493,6 +497,54 @@ function fn_call_requests_addon_install()
             ),
         ), STATUSES_ORDER);
     }
+
+    list($root_admins,) = fn_get_users([
+        'is_root' => YesNo::YES,
+        'user_type' => UserTypes::ADMIN,
+    ], Tygh::$app['session']['auth']);
+
+    foreach ($root_admins as $root_admin) {
+        if (!$root_admin['company_id']) {
+            fn_update_notification_receiver_search_conditions(
+                'group',
+                'call_requests',
+                UserTypes::ADMIN,
+                [
+                    new SearchCondition(ReceiverSearchMethods::USER_ID, $root_admin['user_id']),
+                ]
+            );
+
+            break;
+        }
+    }
+
+    if (fn_allowed_for('MULTIVENDOR')) {
+        fn_update_notification_receiver_search_conditions(
+            'group',
+            'call_requests',
+            UserTypes::VENDOR,
+            [
+                new SearchCondition(ReceiverSearchMethods::VENDOR_OWNER, ReceiverSearchMethods::VENDOR_OWNER),
+            ]
+        );
+    }
+}
+
+function fn_call_requests_addon_uninstall()
+{
+    fn_update_notification_receiver_search_conditions(
+        'group',
+        'call_requests',
+        UserTypes::ADMIN,
+        []
+    );
+
+    fn_update_notification_receiver_search_conditions(
+        'group',
+        'call_requests',
+        UserTypes::VENDOR,
+        []
+    );
 }
 
 function fn_settings_variants_addons_call_requests_order_status()

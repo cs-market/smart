@@ -13,9 +13,12 @@
 ****************************************************************************/
 
 use Tygh\Enum\Addons\Seo\ItemAvailability;
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\ProductFeatures;
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\YesNo;
 use Tygh\Languages\Languages;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\SeoCache;
 use Tygh\Settings;
@@ -130,16 +133,20 @@ function fn_delete_seo_names($company_id)
 /**
  * Creates SEO name
  *
- * @param integer $object_id       object ID
- * @param string  $object_type     object type
- * @param string  $object_name     object name
- * @param integer $index           index
- * @param string  $dispatch        dispatch (for static object type)
- * @param integer $company_id      company ID
- * @param string  $lang_code       language code
- * @param boolean $create_redirect creates 301 redirect if set to true
- * @param string  $area            current working area
- * @param array   $params          Additional params
+ * @param int                            $object_id       Object ID
+ * @param string                         $object_type     Object type
+ * @param string                         $object_name     Object name
+ * @param int                            $index           Index
+ * @param string                         $dispatch        Dispatch (for static object type)
+ * @param int|string                     $company_id      Company ID
+ * @param string                         $lang_code       Language code
+ * @param bool                           $create_redirect Creates 301 redirect if set to true
+ * @param string                         $area            Current working area
+ * @param array<string, int|string|bool> $params          Additional params
+ *
+ * @psalm-param array{
+ *   use_generated_paths_cache?: bool
+ * } $params
  *
  * @return string SEO name
  */
@@ -153,7 +160,7 @@ function fn_create_seo_name(
     $lang_code = CART_LANGUAGE,
     $create_redirect = false,
     $area = AREA,
-    $params = array()
+    array $params = []
 ) {
     $cache_max_length = 200;
     static $names_cache = null;
@@ -313,22 +320,49 @@ function fn_create_seo_name(
 /**
  * Gets corrected language code
  *
- * @param string $lang_code    Language code
- * @param array  $seo_settings Storefront SEO settings
+ * @param string                $lang_code    Language code
+ * @param array<string, string> $seo_settings Storefront SEO settings
  *
  * @return string corrected language code
  */
-function fn_get_corrected_seo_lang_code($lang_code, $seo_settings = array())
+function fn_get_corrected_seo_lang_code($lang_code, array $seo_settings = [])
 {
     if (!empty($seo_settings)) {
-        $single_url = $seo_settings['single_url'];
+        $use_single_seo_name = YesNo::toBool($seo_settings['single_url']);
         $default_lang_code = $seo_settings['frontend_default_language'];
     } else {
-        $single_url = Registry::get('addons.seo.single_url');
+        $use_single_seo_name = YesNo::toBool(Registry::get('addons.seo.single_url'));
         $default_lang_code = Registry::get('settings.Appearance.frontend_default_language');
+        if (fn_allowed_for('MULTIVENDOR' && $use_single_seo_name)) {
+            $default_lang_code = fn_seo_get_default_storefront_lang_code();
+        }
     }
 
-    return $single_url === 'Y' ? $default_lang_code : $lang_code;
+    return $use_single_seo_name
+        ? $default_lang_code
+        : $lang_code;
+}
+
+/**
+ * Gets default frontent language code of the default storefront.
+ *
+ * @return string
+ */
+function fn_seo_get_default_storefront_lang_code()
+{
+    static $default_storefront_lang_code = null;
+
+    if ($default_storefront_lang_code === null) {
+        $default_storefront = StorefrontProvider::getRepository()->findDefault();
+        $default_storefront_id = $default_storefront
+            ? $default_storefront->storefront_id
+            : 0;
+
+        $settings = fn_get_seo_settings(null, $default_storefront_id);
+        $default_storefront_lang_code = $settings['base_frontend_default_language'];
+    }
+
+    return $default_storefront_lang_code;
 }
 
 /**
@@ -363,7 +397,19 @@ function fn_get_seo_vars($type = '', $param = '')
  */
 function fn_get_rewrite_rules()
 {
-    $prefix = ((Registry::get('addons.seo.seo_language') == 'Y') ? '\/([a-z]+)' : '()');
+    $show_secondary_language_in_uri = YesNo::toBool(Registry::get('addons.seo.seo_language'));
+    $frontend_default_language = Registry::get('settings.Appearance.frontend_default_language');
+
+    static $valid_languages;
+    if ($valid_languages === null) {
+        $valid_languages = array_filter(array_keys(fn_seo_get_active_languages()), static function ($lang_code) use ($frontend_default_language) {
+            return $lang_code !== $frontend_default_language;
+        });
+    }
+
+    $prefix = $show_secondary_language_in_uri
+        ? '\/(' . implode('|', $valid_languages) . ')'
+        : '()';
 
     $rewrite_rules = array();
 
@@ -374,7 +420,7 @@ function fn_get_rewrite_rules()
     $rewrite_rules['!^' . $prefix . '\/(.*\/)?([^\/]+)-page-([0-9]+|full_list)\.(' . $extension . ')$!'] = 'object_name=$matches[3]&page=$matches[4]&sl=$matches[1]&extension=$matches[5]';
     $rewrite_rules['!^' . $prefix . '\/(.*\/)?([^\/]+)\.(' . $extension . ')$!'] = 'object_name=$matches[3]&sl=$matches[1]&extension=$matches[4]';
 
-    if (Registry::get('addons.seo.seo_language') == 'Y') {
+    if ($show_secondary_language_in_uri) {
         $rewrite_rules['!^' . $prefix . '\/?$!'] = '$customer_index?sl=$matches[1]';
     }
     $rewrite_rules['!^' . $prefix . '\/(.*\/)?([^\/]+)\/page-([0-9]+|full_list)(\/)?$!'] = 'object_name=$matches[3]&page=$matches[4]&sl=$matches[1]';
@@ -382,191 +428,381 @@ function fn_get_rewrite_rules()
     $rewrite_rules['!^' . $prefix . '\/(.*\/)?([^\/?]+)\/?$!'] = 'object_name=$matches[3]&sl=$matches[1]';
     $rewrite_rules['!^' . $prefix . '/$!'] = '';
 
+    if ($show_secondary_language_in_uri) {
+        $prefix = '()';
+        $rewrite_rules['!^' . $prefix . '\/(.*\/)?([^\/]+)-page-([0-9]+|full_list)\.(' . $extension . ')$!'] = 'object_name=$matches[3]&page=$matches[4]&sl=' . $frontend_default_language . '&extension=$matches[5]';
+        $rewrite_rules['!^' . $prefix . '\/(.*\/)?([^\/]+)\.(' . $extension . ')$!'] = 'object_name=$matches[3]&sl=' . $frontend_default_language . '&extension=$matches[4]';
+        $rewrite_rules['!^' . $prefix . '\/?$!'] = '$customer_index?sl=' . $frontend_default_language;
+        $rewrite_rules['!^' . $prefix . '\/(.*\/)?([^\/]+)\/page-([0-9]+|full_list)(\/)?$!'] = 'object_name=$matches[3]&page=$matches[4]&sl=' . $frontend_default_language;
+        $rewrite_rules['!^' . $prefix . '\/(.*\/)?([^\/?]+)\/?$!'] = 'object_name=$matches[3]&sl=' . $frontend_default_language;
+    }
+
     return $rewrite_rules;
 }
 
 /**
  * "get_route" hook implemetation
- * @param array &$req input request
- * @param array &$result result of init function
- * @param string $area current working area
- * @param boolean $is_allowed_url Flag that determines if url is supported
- * @return bool true on success, false on failure
+ *
+ * @param array<int|string, int|string> $req            Input request
+ * @param array<int|bool|string>        $result         Result of init function
+ * @param string                        $area           Current working area
+ * @param bool                          $is_allowed_url Flag that determines if url is supported
+ *
+ * @psalm-suppress ReferenceConstraintViolation
  */
-function fn_seo_get_route(&$req, &$result, &$area, &$is_allowed_url)
+function fn_seo_get_route(array &$req, array &$result, &$area, &$is_allowed_url)
 {
-    if (($area == 'C') && !$is_allowed_url) {
+    if (!SiteArea::isStorefront($area) || $is_allowed_url) {
+        return;
+    }
 
-        $uri = fn_get_request_uri($_SERVER['REQUEST_URI']);
+    $uri = fn_get_request_uri($_SERVER['REQUEST_URI']);
 
-        if (!empty($uri)) {
+    if (!empty($uri)) {
+        $frontend_default_language = Registry::get('settings.Appearance.frontend_default_language');
+        $show_secondary_language_in_uri = YesNo::toBool(Registry::get('addons.seo.seo_language'));
+        $use_single_seo_name = YesNo::toBool(Registry::get('addons.seo.single_url'));
 
-            $rewrite_rules = fn_get_rewrite_rules();
-            foreach ($rewrite_rules as $pattern => $query) {
-                if (preg_match($pattern, $uri, $matches) || preg_match($pattern, urldecode($query), $matches)) {
-                    $_query = preg_replace("!^.+\?!", '', $query);
-                    parse_str($_query, $objects);
-                    $result_values = 'matches';
-                    $url_query = '';
+        $requested_language = null;
+        $language_in_uri = fn_seo_get_language_from_uri($uri);
+        $is_requested_language_in_path = false;
 
-                    foreach ($objects as $key => $value) {
-                        preg_match('!^.+\[([0-9])+\]$!', $value, $_id);
-                        $objects[$key] = (substr($value, 0, 1) == '$') ? ${$result_values}[$_id[1]] : $value;
+        if ($language_in_uri && $show_secondary_language_in_uri) {
+            $requested_language = $language_in_uri;
+            $is_requested_language_in_path = true;
+        }
+        if (isset($req['sl'])) {
+            $requested_language = $req['sl'];
+        }
+
+        if ($show_secondary_language_in_uri && $requested_language === $frontend_default_language) {
+            if ($is_requested_language_in_path) {
+                $uri = fn_seo_remove_language_from_uri($uri);
+            }
+            unset($req['sl']);
+
+            $redirect_url = trim(Registry::get('config.current_location'), '/') . $uri;
+
+            if ($req) {
+                $redirect_url .= '?' . http_build_query($req);
+            }
+
+            $result = [
+                INIT_STATUS_REDIRECT,
+                $redirect_url,
+                false,
+                true,
+            ];
+
+            return;
+        }
+
+        $rewrite_rules = fn_get_rewrite_rules();
+        foreach ($rewrite_rules as $pattern => $query) {
+            if (
+                !preg_match($pattern, $uri, $matches)
+                && !preg_match($pattern, urldecode($query), $matches)
+            ) {
+                continue;
+            }
+            $_query = preg_replace('!^.+\\?!', '', $query);
+            parse_str($_query, $objects);
+            $result_values = 'matches';
+            $url_query = '';
+
+            foreach ($objects as $key => $value) {
+                preg_match('!^.+\[([0-9])+\]$!', $value, $_id);
+                $objects[$key] = (strpos($value, '$') === 0) ? ${$result_values}[$_id[1]] : $value;
+            }
+
+            // For the locations wich names stored in the table
+            if (!empty($objects) && !empty($objects['object_name'])) {
+                if ($use_single_seo_name) {
+                    $objects['sl'] = $show_secondary_language_in_uri ? $objects['sl'] : '';
+                    $objects['sl'] = !empty($req['sl']) ? $req['sl'] : $objects['sl'];
+                }
+
+                $lang_cond = db_quote('AND lang_code = ?s', !empty($objects['sl']) ? $objects['sl'] : $frontend_default_language);
+                if ($use_single_seo_name) {
+                    $lang_cond = '';
+                }
+
+                $object_type = db_get_field(
+                    'SELECT type FROM ?:seo_names WHERE name = ?s ?p',
+                    $objects['object_name'],
+                    fn_get_seo_company_condition('?:seo_names.company_id')
+                );
+
+                $_seo = db_get_array(
+                    'SELECT * FROM ?:seo_names WHERE name = ?s ?p ?p',
+                    $objects['object_name'],
+                    fn_get_seo_company_condition('?:seo_names.company_id', $object_type),
+                    $lang_cond
+                );
+
+                if (empty($_seo)) {
+                    $_seo = db_get_array(
+                        'SELECT * FROM ?:seo_names WHERE name = ?s ?p',
+                        $objects['object_name'],
+                        fn_get_seo_company_condition('?:seo_names.company_id')
+                    );
+                }
+
+                if (empty($_seo) && !empty($objects['extension'])) {
+                    $_seo = db_get_array(
+                        'SELECT * FROM ?:seo_names WHERE name = ?s ?p ?p',
+                        $objects['object_name'] . '.' . $objects['extension'],
+                        fn_get_seo_company_condition('?:seo_names.company_id'),
+                        $lang_cond
+                    );
+                    if (empty($_seo)) {
+                        $_seo = db_get_array(
+                            'SELECT * FROM ?:seo_names WHERE name = ?s ?p',
+                            $objects['object_name'] . '.' . $objects['extension'],
+                            fn_get_seo_company_condition('?:seo_names.company_id', $object_type)
+                        );
+                    }
+                }
+
+                if (!empty($_seo)) {
+                    $_seo_valid = false;
+
+                    foreach ($_seo as $__seo) {
+                        $_objects = $objects;
+                        if (!$use_single_seo_name && empty($_objects['sl'])) {
+                            $_objects['sl'] = $__seo['lang_code'];
+                        }
+
+                        if (fn_seo_validate_object($__seo, $uri, $_objects)) {
+                            $_seo_valid = true;
+                            $_seo = $__seo;
+                            $objects = $_objects;
+
+                            break;
+                        }
                     }
 
-                    // For the locations wich names stored in the table
-                    if (!empty($objects) && !empty($objects['object_name'])) {
-                        if (Registry::get('addons.seo.single_url') == 'Y') {
-                            $objects['sl'] = (Registry::get('addons.seo.seo_language') == 'Y') ? $objects['sl'] : '';
-                            $objects['sl'] = !empty($req['sl']) ? $req['sl'] : $objects['sl'];
-                        }
+                    if ($_seo_valid) {
+                        $req['sl'] = $objects['sl'];
 
-                        $lang_cond = db_quote("AND lang_code = ?s", !empty($objects['sl']) ? $objects['sl'] : Registry::get('settings.Appearance.frontend_default_language'));
-
-                        $object_type = db_get_field("SELECT type FROM ?:seo_names WHERE name = ?s ?p", $objects['object_name'], fn_get_seo_company_condition('?:seo_names.company_id'));
-
-                        $_seo = db_get_array("SELECT * FROM ?:seo_names WHERE name = ?s ?p ?p", $objects['object_name'], fn_get_seo_company_condition('?:seo_names.company_id', $object_type), $lang_cond);
-
-                        if (empty($_seo)) {
-                            $_seo = db_get_array("SELECT * FROM ?:seo_names WHERE name = ?s ?p", $objects['object_name'], fn_get_seo_company_condition('?:seo_names.company_id'));
-                        }
-
-                        if (empty($_seo) && !empty($objects['extension'])) {
-                            $_seo = db_get_array("SELECT * FROM ?:seo_names WHERE name = ?s ?p ?p", $objects['object_name'] . '.' . $objects['extension'], fn_get_seo_company_condition('?:seo_names.company_id'), $lang_cond);
-                            if (empty($_seo)) {
-                                $_seo = db_get_array("SELECT * FROM ?:seo_names WHERE name = ?s ?p", $objects['object_name'] . '.' . $objects['extension'], fn_get_seo_company_condition('?:seo_names.company_id', $object_type));
-                            }
-                        }
-
-                        if (!empty($_seo)) {
-                            $_seo_valid = false;
-
-                            foreach ($_seo as $__seo) {
-                                $_objects = $objects;
-                                if (Registry::get('addons.seo.single_url') != 'Y' && empty($_objects['sl'])) {
-                                    $_objects['sl'] = $__seo['lang_code'];
-                                }
-
-                                if (fn_seo_validate_object($__seo, $uri, $_objects) == true) {
-                                    $_seo_valid = true;
-                                    $_seo = $__seo;
-                                    $objects = $_objects;
-
-                                    break;
-                                }
-                            }
-
-                            if ($_seo_valid == true) {
-                                $req['sl'] = $objects['sl'];
-
-                                $_seo_vars = fn_get_seo_vars($_seo['type']);
-                                if ($_seo['type'] == 's') {
-                                    $url_query = $_seo['dispatch'];
-                                    $req['dispatch'] = $_seo['dispatch'];
-                                } else {
-                                    $page_suffix = (!empty($objects['page'])) ? ('&page=' . $objects['page']) : '';
-                                    $url_query = $_seo_vars['dispatch'] . '?' . $_seo_vars['item'] . '=' . $_seo['object_id'] . $page_suffix;
-
-                                    $req['dispatch'] = $_seo_vars['dispatch'];
-                                }
-
-                                if (!empty($_seo['object_id'])) {
-                                    $req[$_seo_vars['item']] = $_seo['object_id'];
-                                }
-
-                                if (!empty($objects['page'])) {
-                                    $req['page'] = $objects['page'];
-                                }
-
-                                $is_allowed_url = true;
-                            }
-                        }
-
-                    // For the locations wich names are not in the table
-                    } elseif (!empty($objects)) {
-                        if (empty($objects['dispatch'])) {
-                            if (!empty($req['dispatch'])) {
-                                $req['dispatch'] = is_array($req['dispatch']) ? key($req['dispatch']) : $req['dispatch'];
-                                $url_query = $req['dispatch'];
-                            }
+                        $_seo_vars = fn_get_seo_vars($_seo['type']);
+                        if ($_seo['type'] === 's') {
+                            $url_query = $_seo['dispatch'];
+                            $req['dispatch'] = $_seo['dispatch'];
                         } else {
-                            $url_query = $objects['dispatch'];
-                            $req['dispatch'] = $objects['dispatch'];
+                            $page_suffix = (!empty($objects['page'])) ? ('&page=' . $objects['page']) : '';
+                            $url_query = $_seo_vars['dispatch'] . '?' . $_seo_vars['item'] . '=' . $_seo['object_id'] . $page_suffix;
+
+                            $req['dispatch'] = $_seo_vars['dispatch'];
+                        }
+
+                        if (!empty($_seo['object_id'])) {
+                            $req[$_seo_vars['item']] = $_seo['object_id'];
+                        }
+
+                        if (!empty($objects['page'])) {
+                            $req['page'] = $objects['page'];
                         }
 
                         $is_allowed_url = true;
-
-                        if (!empty($objects['sl'])) {
-                            $is_allowed_url = false;
-                            $req['sl'] = $objects['sl'];
-                            if (Registry::get('addons.seo.seo_language') == 'Y') {
-                                $lang_statuses = !empty(Tygh::$app['session']['auth']['area']) && Tygh::$app['session']['auth']['area'] == 'A' ? array('A', 'H') : array('A');
-                                $check_language = db_get_field("SELECT count(*) FROM ?:languages WHERE lang_code = ?s AND status IN (?a)", $req['sl'], $lang_statuses);
-                                if (!empty($check_language)) {
-                                    $is_allowed_url = true;
-                                }
-                            } else {
-                                $is_allowed_url = true;
-                            }
-                        }
-                        $req += $objects;
-
-                        // Empty query
-                    } else {
-                        $url_query = '';
-                    }
-
-                    if ($is_allowed_url) {
-                        $lang_code = empty($objects['sl']) ? Registry::get('settings.Appearance.frontend_default_language') : $objects['sl'];
-
-                        if (empty($req['sl'])) {
-                            unset($req['sl']);
-                        }
-
-                        $query_string = http_build_query($req);
-                        $_SERVER['REQUEST_URI'] = fn_url($url_query . '?' . $query_string, 'C', 'rel', $lang_code);
-                        $_SERVER['QUERY_STRING'] = $query_string;
-
-                        $_SERVER['X-SEO-REWRITE'] = true;
-
-                        break;
                     }
                 }
+
+            // For the locations wich names are not in the table
+            } elseif (!empty($objects)) {
+                if (empty($objects['dispatch'])) {
+                    if (!empty($req['dispatch'])) {
+                        $req['dispatch'] = is_array($req['dispatch']) ? key($req['dispatch']) : $req['dispatch'];
+                        $url_query = $req['dispatch'];
+                    }
+                } else {
+                    $url_query = $objects['dispatch'];
+                    $req['dispatch'] = $objects['dispatch'];
+                }
+
+                $is_allowed_url = true;
+
+                if (!empty($objects['sl'])) {
+                    $is_allowed_url = false;
+                    $req['sl'] = $objects['sl'];
+                    if ($show_secondary_language_in_uri) {
+                        $lang_statuses = !empty(Tygh::$app['session']['auth']['area']) && Tygh::$app['session']['auth']['area'] === 'A'
+                            ? ['A', 'H']
+                            : ['A'];
+                        $check_language = db_get_field(
+                            'SELECT count(*) FROM ?:languages WHERE lang_code = ?s AND status IN (?a)',
+                            $req['sl'],
+                            $lang_statuses
+                        );
+                        if (!empty($check_language)) {
+                            $is_allowed_url = true;
+                        }
+                    } else {
+                        $is_allowed_url = true;
+                    }
+                }
+                $req += $objects;
+
+                // Empty query
+            } else {
+                $url_query = '';
             }
+
+            if (!$is_allowed_url) {
+                continue;
+            }
+
+            $lang_code = empty($objects['sl']) ? $frontend_default_language : $objects['sl'];
+
+            if (empty($req['sl'])) {
+                unset($req['sl']);
+            }
+
+            $query_string = http_build_query($req);
+            $_SERVER['REQUEST_URI'] = fn_url($url_query . '?' . $query_string, 'C', 'rel', $lang_code);
+            $_SERVER['QUERY_STRING'] = $query_string;
+
+            $_SERVER['X-SEO-REWRITE'] = true;
+
+            break;
         }
     }
 
     // check redirects
-    if (empty($is_allowed_url)) {
-
-        $query_string = array();
-        $uri = fn_get_request_uri($_SERVER['REQUEST_URI']);
-
-        // Attach additinal params to URI if passed
-        if (!empty($_SERVER['QUERY_STRING'])) {
-            parse_str($_SERVER['QUERY_STRING'], $query_string);
-        }
-
-        // Remove pagination from URI
-        if (preg_match('#(?P<pagination>-page-(?P<page>\d+))\\' . SEO_FILENAME_EXTENSION . '$#', $uri, $m)
-            || preg_match('#(?P<pagination>/page-(?P<page>\d+)/?$)#', $uri, $m)
-        ) {
-            $query_string['page'] = $m['page'];
-            $uri = str_replace($m['pagination'], '', $uri);
-        }
-
-        $condition = fn_get_seo_company_condition("?:seo_redirects.company_id");
-
-        $redirect_data = db_get_row("SELECT type, object_id, dest, lang_code FROM ?:seo_redirects WHERE src = ?s ?p", $uri, $condition);
-
-        if (!empty($redirect_data)) {
-            $result = array(INIT_STATUS_REDIRECT, fn_generate_seo_url_from_schema($redirect_data, true, $query_string), false, true);
-        } else {
-            $req = array(
-                'dispatch' => '_no_page'
-            );
-        }
+    if (!empty($is_allowed_url)) {
+        return;
     }
+
+    $query_string = [];
+    $uri = fn_get_request_uri($_SERVER['REQUEST_URI']);
+
+    // Attach additinal params to URI if passed
+    if (!empty($_SERVER['QUERY_STRING'])) {
+        parse_str($_SERVER['QUERY_STRING'], $query_string);
+    }
+
+    // Remove pagination from URI
+    if (
+        preg_match('#(?P<pagination>-page-(?P<page>\d+))\\' . SEO_FILENAME_EXTENSION . '$#', $uri, $m)
+        || preg_match('#(?P<pagination>/page-(?P<page>\d+)/?$)#', $uri, $m)
+    ) {
+        $query_string['page'] = $m['page'];
+        $uri = str_replace($m['pagination'], '', $uri);
+    }
+
+    $condition = fn_get_seo_company_condition('?:seo_redirects.company_id');
+
+    $redirect_data = db_get_row('SELECT type, object_id, dest, lang_code FROM ?:seo_redirects WHERE src = ?s ?p', $uri, $condition);
+
+    if (!empty($redirect_data)) {
+        $result = [
+            INIT_STATUS_REDIRECT,
+            fn_generate_seo_url_from_schema($redirect_data, true, $query_string),
+            false,
+            true,
+        ];
+    } else {
+        $req = [
+            'dispatch' => '_no_page'
+        ];
+    }
+}
+
+/**
+ * Extracts path parts from URI.
+ *
+ * @param $uri
+ *
+ * @return array
+ *
+ * @internal
+ */
+function fn_seo_get_uri_path_parts($uri)
+{
+    $path_parts = [];
+
+    list($path) = explode('?', $uri);
+
+    if ($path) {
+        $path_parts = explode('/', $path);
+        $path_parts = array_values(array_filter($path_parts, function($part) {
+            return $part !== '';
+        }));
+    }
+
+    return $path_parts;
+}
+
+/**
+ * Gets language code specified in the URI.
+ *
+ * @param string $uri
+ *
+ * @return string|null
+ *
+ * @internal
+ */
+function fn_seo_get_language_from_uri($uri)
+{
+    $uri_path_parts = fn_seo_get_uri_path_parts($uri);
+
+    if (!$uri_path_parts) {
+        return null;
+    }
+
+    $valid_languages = fn_seo_get_active_languages();
+
+    $lang_code_candidate = reset($uri_path_parts);
+    if (isset($valid_languages[$lang_code_candidate])) {
+        return $lang_code_candidate;
+    }
+
+    return null;
+}
+
+/**
+ * @phpcs:disable SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification
+ *
+ * Gets active languges
+ *
+ * @return array<string, array>
+ *
+ * @internal
+ */
+function fn_seo_get_active_languages()
+{
+    static $valid_languages;
+
+    if ($valid_languages !== null) {
+        return $valid_languages;
+    }
+
+    $valid_languages = Registry::getOrSetCache(
+        'seo_active_languages',
+        ['languages', 'storefronts_languages'],
+        ['static', 'storefront'],
+        static function () {
+            return Languages::getActive();
+        }
+    );
+
+    return $valid_languages;
+}
+
+/**
+ * Rebuilds URI by removing language code from it.
+ *
+ * @param string $uri
+ *
+ * @return string
+ *
+ * @internal
+ */
+function fn_seo_remove_language_from_uri($uri)
+{
+    $uri = ltrim($uri, '/');
+
+    return '/' . substr($uri, 3);
 }
 
 /**
@@ -575,7 +811,8 @@ function fn_seo_get_route(&$req, &$result, &$area, &$is_allowed_url)
  * @param array $object_id object ID
  * @param string $type object type
  * @param string $lang_code language code
- * @return mixed, updated SEO name on success, false on failure
+ *
+ * @return string|bool, updated SEO name on success, true if SEO name stayed the same, false on failure
  */
 function fn_seo_update_object($object_data, $object_id, $type, $lang_code)
 {
@@ -654,9 +891,7 @@ function fn_seo_update_object($object_data, $object_id, $type, $lang_code)
             }
         }
 
-        fn_create_seo_name($object_id, $type, $_object_name, 0, '', $_company_id, $lang_code, $create_redirect);
-
-        return true;
+        return fn_create_seo_name($object_id, $type, $_object_name, 0, '', $_company_id, $lang_code, $create_redirect);
     }
 
     return false;
@@ -671,12 +906,10 @@ function fn_seo_update_object($object_data, $object_id, $type, $lang_code)
  */
 function fn_seo_validate_object($seo, $path, $objects)
 {
-    $result = true;
-    if (Registry::get('addons.seo.single_url') == 'Y' && $seo['lang_code'] != Registry::get('settings.Appearance.frontend_default_language')) {
-        return false;
-    }
+    $use_single_seo_name = YesNo::toBool(Registry::get('addons.seo.single_url'));
+    $show_secondary_language_in_uri = YesNo::toBool(Registry::get('addons.seo.seo_language'));
 
-    if (!empty($objects['sl']) && $objects['sl'] != $seo['lang_code'] && Registry::get('addons.seo.single_url') != 'Y') {
+    if (!empty($objects['sl']) && $objects['sl'] !== $seo['lang_code'] && !$use_single_seo_name) {
         return false;
     }
 
@@ -693,8 +926,8 @@ function fn_seo_validate_object($seo, $path, $objects)
         $path = substr_replace($path, '', strrpos($path, $matches[2]));
     }
 
-    if (Registry::get('addons.seo.seo_language') == 'Y') {
-        $path = substr($path, 3); // remove language prefix
+    if ($show_secondary_language_in_uri && fn_seo_get_language_from_uri($path)) {
+        $path = fn_seo_remove_language_from_uri($path);
     }
 
     $path = rtrim($path, '/'); // remove trailing slash
@@ -1056,7 +1289,15 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
     $parsed_url = parse_url($url);
     $rewritten = false;
 
-    $index_script = Registry::get('config.customer_index');
+    static $index_script;
+    if ($index_script === null) {
+        $index_script = Registry::get('config.customer_index');
+    }
+
+    static $default_frontend_language;
+    if ($default_frontend_language === null) {
+        $default_frontend_language = Registry::get('settings.Appearance.frontend_default_language');
+    }
 
     $settings_company_id = empty($company_id_in_url) ? 0 : $company_id_in_url;
 
@@ -1070,6 +1311,7 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
 
     $seo_settings = fn_get_seo_settings($settings_company_id);
     $current_path = '';
+    $show_secondary_language_in_uri = YesNo::toBool($seo_settings['seo_language']);
 
     if (empty($parsed_url['scheme'])) {
         $current_path = (defined('HTTPS')) ? $https_path . '/' : $http_path . '/';
@@ -1106,17 +1348,15 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
         parse_str($parsed_url['query'], $parsed_query);
     }
 
-    if (!fn_allowed_for('ULTIMATE:FREE')) {
-        if (!empty($parsed_query['lc'])) {
-            //if localization parameter is exist we will get language code for this localization.
-            $loc_languages = db_get_hash_single_array("SELECT a.lang_code, a.name FROM ?:languages as a LEFT JOIN ?:localization_elements as b ON b.element_type = 'L' AND b.element = a.lang_code WHERE b.localization_id = ?i ORDER BY position", array('lang_code', 'name'), $parsed_query['lc']);
-            $new_lang_code = (!empty($loc_languages)) ? key($loc_languages) : '';
-            $lang_code = (!empty($new_lang_code)) ? $new_lang_code : $lang_code;
-        }
+    if (!empty($parsed_query['lc'])) {
+        //if localization parameter is exist we will get language code for this localization.
+        $loc_languages = db_get_hash_single_array("SELECT a.lang_code, a.name FROM ?:languages as a LEFT JOIN ?:localization_elements as b ON b.element_type = 'L' AND b.element = a.lang_code WHERE b.localization_id = ?i ORDER BY position", array('lang_code', 'name'), $parsed_query['lc']);
+        $new_lang_code = (!empty($loc_languages)) ? key($loc_languages) : '';
+        $lang_code = (!empty($new_lang_code)) ? $new_lang_code : $lang_code;
     }
 
     if (!empty($parsed_url['path']) && empty($parsed_url['query']) && $parsed_url['path'] == $index_script) {
-        $url = $current_path . (($seo_settings['seo_language'] == 'Y') ? $lang_code . '/' : '');
+        $url = $current_path . (($seo_settings['seo_language'] == 'Y' && $lang_code !== $default_frontend_language) ? $lang_code . '/' : '');
 
         return $url;
     }
@@ -1133,7 +1373,9 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
         'scheme' => !empty($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '',
         'host' => !empty($parsed_url['host']) ? $parsed_url['host'] : '',
         'path' => $current_path . $path,
-        'lang_code' => ($seo_settings['seo_language'] == 'Y') ? $lang_code . '/' : '',
+        'lang_code' => ($show_secondary_language_in_uri && $lang_code !== $default_frontend_language)
+            ? $lang_code . '/'
+            : '',
         'parent_items_names' => '',
         'name' => '',
         'page' => '',
@@ -1149,8 +1391,10 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
                 unset($parsed_query['sl']);
             }
 
-            if ($seo_settings['seo_language'] == 'Y') {
-                $link_parts['lang_code'] = $lang_code . '/';
+            if ($show_secondary_language_in_uri) {
+                $link_parts['lang_code'] = $lang_code !== $default_frontend_language
+                    ? $lang_code . '/'
+                    : '';
                 $unset_lang_code = isset($parsed_query['sl']) ? $parsed_query['sl'] : $unset_lang_code;
                 unset($parsed_query['sl']);
             }
@@ -1224,6 +1468,7 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
                     // for non-rewritten links
                     $link_parts['path'] .= $index_script;
                     $link_parts['lang_code'] = '';
+
                     if (!empty($unset_lang_code)) {
                         $parsed_query['sl'] = $unset_lang_code;
                     }
@@ -1761,24 +2006,59 @@ function fn_seo_get_object_children($object_type)
 /**
  * Gets SEO settings
  *
- * @param int $company_id company ID
+ * @param int      $company_id    Company ID
+ * @param int|null $storefront_id Storefront ID
  *
- * @return array SEO settings
+ * @return array<string, string> SEO settings
  */
-function fn_get_seo_settings($company_id)
+function fn_get_seo_settings($company_id, $storefront_id = null)
 {
-    static $cache = array();
+    static $settings_cache = [];
 
-    if (isset($cache[$company_id])) {
-        $seo_settings = $cache[$company_id];
-    } else {
-        $seo_settings = Settings::instance()->getValues('seo', Settings::ADDON_SECTION, false, $company_id);
-        $seo_settings['frontend_default_language'] = Settings::instance()->getValue('frontend_default_language', 'Appearance', $company_id);
+    $cache_key = sprintf('seo_settings_%d_%d', (int) $company_id, (int) $storefront_id);
 
-        $cache[$company_id] = $seo_settings;
+    if (isset($settings_cache[$cache_key])) {
+        return $settings_cache[$cache_key];
     }
 
-    return $seo_settings;
+    $settings_cache[$cache_key] = Registry::getOrSetCache(
+        ['seo_settings', $cache_key],
+        [
+            'settings_objects',
+            'settings_vendor_values',
+            'storefronts',
+            'storefronts_languages'
+        ],
+        'static',
+        static function () use ($company_id, $storefront_id) {
+            /** @var \Tygh\Settings $settings_manager */
+            $settings_manager = Settings::instance(['company_id' => $company_id, 'storefront_id' => $storefront_id]);
+            /**
+             * @psalm-var array{
+             *   frontend_default_language: string,
+             *   single_url: string,
+             * } $seo_settings
+             */
+            $seo_settings = $settings_manager->getValues('seo', Settings::ADDON_SECTION, false);
+            $seo_settings['frontend_default_language'] = $settings_manager->getValue('frontend_default_language', 'Appearance');
+            $seo_settings['base_frontend_default_language'] = $seo_settings['frontend_default_language'];
+
+            if (fn_allowed_for('MULTIVENDOR') && YesNo::toBool($seo_settings['single_url'])) {
+                $default_storefront = StorefrontProvider::getRepository()->findDefault();
+                $default_storefront_id = $default_storefront
+                    ? $default_storefront->storefront_id
+                    : 0;
+
+                /** @var \Tygh\Settings $settings_manager */
+                $settings_manager = Settings::instance(['storefront_id' => $default_storefront_id]);
+                $seo_settings['frontend_default_language'] = $settings_manager->getValue('frontend_default_language', 'Appearance');
+            }
+
+            return $seo_settings;
+        }
+    );
+
+    return $settings_cache[$cache_key];
 }
 
 /* Product hooks */
@@ -1919,23 +2199,25 @@ function fn_seo_load_products_extra_data(&$extra_fields, $products, $product_ids
  * Hook "load_products_extra_data_post" handler.
  * Performs caching lazy-loaded SEO names.
  *
- * @param $products
- * @param $product_ids
- * @param $params
- * @param $lang_code
+ * @param array<array-key, array<string, int|string|array>> $products    List of products
+ * @param array<int, int>                                   $product_ids List of product identifiers
+ * @param array<string, string>                             $params      Array of additional params
+ * @param string                                            $lang_code   Language code
  */
 function fn_seo_load_products_extra_data_post($products, $product_ids, $params, $lang_code)
 {
-    if (AREA == 'C') {
-        foreach ($products as $k => $product) {
-            SeoCache::set(
-                'p',
-                $product['product_id'],
-                $product,
-                isset($product['company_id']) ? $product['company_id'] : '',
-                fn_get_corrected_seo_lang_code($lang_code)
-            );
-        }
+    if (!SiteArea::isStorefront(AREA) || (isset($params['area']) && !SiteArea::isStorefront($params['area']))) {
+        return;
+    }
+
+    foreach ($products as $product) {
+        SeoCache::set(
+            'p',
+            $product['product_id'],
+            $product,
+            isset($product['company_id']) ? (int) $product['company_id'] : 0,
+            fn_get_corrected_seo_lang_code($lang_code)
+        );
     }
 }
 
@@ -1945,7 +2227,19 @@ function fn_seo_update_product_post(&$product_data, &$product_id, &$lang_code)
         $product_data['company_id'] = $company_id;
     }
 
-    fn_seo_update_object($product_data, $product_id, 'p', $lang_code);
+    $new_seo_name = fn_seo_update_object($product_data, $product_id, 'p', $lang_code);
+    if (
+        empty($product_data['seo_name'])
+        || $new_seo_name === (string) $product_data['seo_name']
+        || $new_seo_name === true
+    ) {
+        return;
+    }
+    fn_set_notification(
+        NotificationSeverity::WARNING,
+        __('notice'),
+        __('seo.error_at_creation_seo_name', [1, '[names]' => $product_data['seo_name'], '[new_names]' => $new_seo_name])
+    );
 }
 
 function fn_seo_delete_product_post(&$product_id)
@@ -2059,7 +2353,19 @@ function fn_seo_update_category_post(&$category_data, &$category_id, &$lang_code
         }
     }
 
-    fn_seo_update_object($category_data, $category_id, 'c', $lang_code);
+    $new_seo_name = fn_seo_update_object($category_data, $category_id, 'c', $lang_code);
+    if (
+        empty($category_data['seo_name'])
+        || $new_seo_name === (string) $category_data['seo_name']
+        || $new_seo_name === true
+    ) {
+        return;
+    }
+    fn_set_notification(
+        NotificationSeverity::WARNING,
+        __('notice'),
+        __('seo.error_at_creation_seo_name', [1, '[names]' => $category_data['seo_name'], '[new_names]' => $new_seo_name])
+    );
 }
 
 function fn_seo_delete_category_before(&$category_id)
@@ -2186,7 +2492,19 @@ function fn_seo_update_page_post(&$page_data, &$page_id, &$lang_code)
         $page_data['company_id'] = Registry::get('runtime.company_id');
     }
 
-    fn_seo_update_object($page_data, $page_id, 'a', $lang_code);
+    $new_seo_name = fn_seo_update_object($page_data, $page_id, 'a', $lang_code);
+    if (
+        empty($page_data['seo_name'])
+        || $new_seo_name === (string) $page_data['seo_name']
+        || $new_seo_name === true
+    ) {
+        return;
+    }
+    fn_set_notification(
+        NotificationSeverity::WARNING,
+        __('notice'),
+        __('seo.error_at_creation_seo_name', [1, '[names]' => $page_data['seo_name'], '[new_names]' => $new_seo_name])
+    );
 }
 
 function fn_seo_delete_page(&$page_id)
@@ -2246,7 +2564,19 @@ function fn_seo_get_companies(&$params, &$fields, &$sortings, &$condition, &$joi
 
 function fn_seo_update_company(&$company_data, &$company_id, &$lang_code)
 {
-    fn_seo_update_object($company_data, $company_id, 'm', $lang_code);
+    $new_seo_name = fn_seo_update_object($company_data, $company_id, 'm', $lang_code);
+    if (
+        empty($company_data['seo_name'])
+        || $new_seo_name === (string) $company_data['seo_name']
+        || $new_seo_name === true
+    ) {
+        return;
+    }
+    fn_set_notification(
+        NotificationSeverity::WARNING,
+        __('notice'),
+        __('seo.error_at_creation_seo_name', [1, '[names]' => $company_data['seo_name'], '[new_names]' => $new_seo_name])
+    );
 }
 
 function fn_seo_delete_company(&$company_id)
@@ -2278,14 +2608,38 @@ function fn_seo_update_product_feature_post(&$feature_data, &$feature_id, &$dele
 {
     if ($feature_data['feature_type'] == ProductFeatures::EXTENDED && !empty($feature_data['variants'])) {
         if (!empty($feature_data['variants'])) {
+            $errors = [];
+            $new_names = [];
             foreach ($feature_data['variants'] as $v) {
                 if (!empty($v['variant_id'])) {
 
                     if (!empty($feature_data['company_id'])) {
                         $v['company_id'] = $feature_data['company_id'];
                     }
-                    fn_seo_update_object($v, $v['variant_id'], 'e', $lang_code);
+                    $new_seo_name = fn_seo_update_object($v, $v['variant_id'], 'e', $lang_code);
+                    if (
+                        !empty($v['seo_name'])
+                        && (string) $v['seo_name'] !== $new_seo_name
+                        && $new_seo_name !== true
+                    ) {
+                        $errors[] = $v['seo_name'];
+                        $new_names[] = $new_seo_name;
+                    }
                 }
+            }
+            if (!empty($errors)) {
+                fn_set_notification(
+                    NotificationSeverity::WARNING,
+                    __('notice'),
+                    __(
+                        'seo.error_at_creation_seo_name',
+                        [
+                            count($errors),
+                            '[names]' => implode(', ', $errors),
+                            '[new_names]' => implode(', ', $new_names)
+                        ]
+                    )
+                );
             }
         }
 
@@ -2327,6 +2681,7 @@ function fn_seo_get_product_feature_variants_post(&$vars, &$params, &$lang_code)
                     $vars[$k]['seo_name'] = fn_seo_get_name('e', $variant['variant_id'], '', null, $lang_code);
                 }
 
+                /** @psalm-suppress NullArgument */
                 SeoCache::set('e', $variant['variant_id'], $vars[$k], null, $lang_code);
             }
         }
@@ -2614,7 +2969,25 @@ function fn_seo_dispatch_before_display()
 
         $show_price = !empty($auth['user_id'])
             || Registry::get('settings.Checkout.allow_anonymous_shopping') !== 'hide_price_and_add_to_cart';
-        $schema_org_markup_items = fn_seo_get_schema_org_markup_items($product, $show_price);
+
+        $key = 'seo_schema_org_markup_items_' . $product['product_id'] . '_' . $show_price;
+
+        $schema_org_markup_items = Registry::getOrSetCache(
+            ['seo_schema_org_markup_items', $key],
+            [
+                'products',
+                'product_features',
+                'product_features_descriptions',
+                'product_features_values',
+                'settings_objects',
+                'settings_vendor_values'
+            ],
+            ['static', 'storefront', 'lang', 'currency'],
+            static function () use ($product, $show_price) {
+                return fn_seo_get_schema_org_markup_items($product, $show_price);
+            }
+        );
+
         $view->assign('schema_org_markup_items', $schema_org_markup_items);
 
         $product['seo_snippet'] = fn_seo_get_legacy_markup_data($product, $schema_org_markup_items, $show_price);
@@ -2625,48 +2998,38 @@ function fn_seo_dispatch_before_display()
     $view->assign('seo_alt_hreflangs_list', $seo_alt_hreflangs_list);
 }
 
-/** Full-page cache add-on hooks */
-
 /**
- * Hook is used to replace non-cached dispatch rules with non-cached path rules.
- * Paths will be generated using corresponding SEO names.
+ * The "init_language_post" hook handler.
  *
- * @param \Tygh\Addons\FullPageCache\Varnish\VclGenerator $vcl_generator VCL generator instance
+ * Actions performed:
+ *     - Forces default language when the "Show secondary language in URL" setting is disabled
+ *
+ * @see \fn_init_language()
  */
-function fn_seo_varnish_generate_vcl_pre($vcl_generator)
+function fn_seo_init_language_post($params, $area, $default_language, $session_display_language, $avail_languages, &$display_language, &$description_language, $browser_language)
 {
-    $dispatch_to_find_list = array();
-    $controllers_to_find_condition = array('0');
-
-    foreach ($vcl_generator->getNonCachedDispatches() as $dispatch) {
-        if (strpos($dispatch, '.*') !== false) {
-            list($controller, $asterisk) = explode('.', $dispatch);
-
-            $controllers_to_find_condition[] = db_quote('OR `dispatch` LIKE ?l', $controller . '.%');
-        } else {
-            $dispatch_to_find_list[] = $dispatch;
-        }
+    if (
+        !empty($params['sl'])
+        || empty($params['dispatch'])
+        || !SiteArea::isStorefront($area)
+        || $params['dispatch'] !== 'index.index'
+    ) {
+        return;
     }
 
-    $seo_rules_paths = db_get_fields(
-        "SELECT `name` FROM ?:seo_names"
-        . " WHERE `type` = 's' AND (`dispatch` IN (?a) OR (?p)) ?p",
-        empty($dispatch_to_find_list) ? array('') : $dispatch_to_find_list,
-        implode(' ', $controllers_to_find_condition),
-        fn_get_seo_company_condition('?:seo_names.company_id', 's', $vcl_generator->getStorefront()->id)
-    );
+    $show_secondary_language_in_uri = YesNo::toBool(Registry::get('addons.seo.seo_language'));
 
-    $seo_rules_paths = array_map(function ($path) {
-        return trim($path, '\\/') . '/';
-    }, $seo_rules_paths);
+    if (!$show_secondary_language_in_uri) {
+        return;
+    }
 
+    $is_first_visit = empty($session_display_language);
+    $is_browser_language_preferred = $is_first_visit && $browser_language;
 
-    // Add paths generated using SEO-names
-    $vcl_generator->addNonCachedPaths($seo_rules_paths);
+    $description_language = $display_language = $is_browser_language_preferred
+        ? $browser_language
+        : $default_language;
 }
-
-/** /Full-page cache add-on hooks */
-
 
 /**
  * Gets Schema.org markup items for a product.
@@ -2677,7 +3040,7 @@ function fn_seo_varnish_generate_vcl_pre($vcl_generator)
  *
  * @return array Markup items
  */
-function fn_seo_get_schema_org_markup_items(array $product_data, $show_price = true, $currency = CART_PRIMARY_CURRENCY)
+function fn_seo_get_schema_org_markup_items(array $product_data, $show_price = true, $currency = CART_SECONDARY_CURRENCY)
 {
     if (!isset($product_data['schema_org_features'])) {
         $product_data['schema_org_features'] = fn_seo_get_schema_org_product_features($product_data['product_id']);
@@ -2712,7 +3075,11 @@ function fn_seo_get_schema_org_markup_items(array $product_data, $show_price = t
         ];
 
         if (!empty($product_data['price'])) {
-            $offer['price'] = fn_format_price($product_data['price'], $currency);
+            $offer['price'] = fn_format_price_by_currency(
+                $product_data['price'],
+                CART_PRIMARY_CURRENCY,
+                $currency
+            );
         }
 
         $product_item['offers'][] = $offer;
@@ -2899,12 +3266,109 @@ function fn_seo_get_schema_org_product_features($product_id)
 {
     $markup_feature_codes = array_keys(fn_get_schema('seo', 'feature_codes'));
     list($schema_org_features, ) = fn_get_product_features([
-        'plain'        => true,
-        'product_id'   => $product_id,
-        'feature_code' => $markup_feature_codes,
+        'plain'         => true,
+        'product_id'    => $product_id,
+        'feature_code'  => $markup_feature_codes,
+        'exclude_group' => true
     ]);
 
     return $schema_org_features;
+}
+
+/**
+ * Gets markup features for multiple products at once.
+ *
+ * @param array<int> $product_ids The product IDS to get the features for
+ * @param string     $lang_code   The language code of the variants to fetch
+ *
+ * @return array An array of features sorted by product id, with all corresponding variants
+ */
+function fn_seo_get_schema_org_products_features(array $product_ids, $lang_code = CART_LANGUAGE)
+{
+    if (empty($product_ids)) {
+        return [];
+    }
+
+    $condition = $join = '';
+    $markup_feature_codes = array_keys(fn_get_schema('seo', 'feature_codes'));
+
+    $fields = [
+        'pf.feature_id',
+        'pf.company_id',
+        'pf.feature_type',
+        'pf.parent_id',
+        'pf.display_on_product',
+        'pf.display_on_catalog',
+        'pf.display_on_header',
+        'pf.categories_path',
+        'pf.status',
+        'pf.comparison',
+        'pf.position',
+        'pf.purpose',
+        'pf.feature_style',
+        'pf.filter_style',
+        'pf.feature_code',
+
+        'pfd.description',
+        'pfd.lang_code',
+        'pfd.prefix',
+        'pfd.suffix',
+        'pfd.full_description',
+
+        'pfv.value',
+        'pfv.variant_id',
+        'pfv.value_int',
+        'pfv.product_id'
+    ];
+
+    $join .= db_quote(' LEFT JOIN ?:product_features AS pf ON pfv.feature_id = pf.feature_id');
+    $join .= db_quote(' LEFT JOIN ?:product_features_descriptions AS pfd ON pfd.feature_id = pf.feature_id AND pfd.lang_code = ?s', $lang_code);
+    $condition .= db_quote(' AND pfv.product_id IN (?n) AND pfv.lang_code = ?s', $product_ids, $lang_code);
+    $condition .= db_quote(' AND pf.feature_code IN (?a)', $markup_feature_codes);
+
+    $product_features = db_get_hash_multi_array(
+        'SELECT ?p'
+        . ' FROM ?:product_features_values AS pfv'
+        . ' ?p WHERE 1=1 ?p',
+        ['product_id', 'feature_id'],
+        implode(', ', $fields),
+        $join,
+        $condition
+    );
+
+    if (!empty($product_features)) {
+        $variant_ids = [];
+
+        foreach ($product_features as $features) {
+            $variant_ids = array_merge($variant_ids, array_filter(array_column($features, 'variant_id')));
+        }
+
+        if (!empty($variant_ids)) {
+            $variants = db_get_hash_array(
+                'SELECT pfvd.*, pfv.*'
+                . ' FROM ?:product_feature_variants pfv'
+                . ' LEFT JOIN ?:product_feature_variant_descriptions pfvd ON pfvd.variant_id = pfv.variant_id AND pfvd.lang_code = ?s'
+                . ' WHERE pfv.variant_id IN (?n)',
+                'variant_id',
+                $lang_code,
+                $variant_ids
+            );
+
+            foreach ($product_features as &$features) {
+                foreach ($features as &$variant) {
+                    if (!isset($variants[$variant['variant_id']])) {
+                        continue;
+                    }
+
+                    $variant = array_merge($variant, $variants[$variant['variant_id']]);
+                }
+                unset($variant);
+            }
+            unset($features);
+        }
+    }
+
+    return $product_features;
 }
 
 /**
@@ -2964,9 +3428,12 @@ function fn_seo_get_legacy_markup_data(array $product, array $schema_org_markup_
     $seo_snippet['name'] = $schema_org_markup_items['product']['name'];
     $seo_snippet['description'] = $schema_org_markup_items['product']['description'];
 
-    $offer = reset($schema_org_markup_items['product']['offers']);
-    if (isset($offer['offers'])) {
-        $offer = reset($offer['offers']);
+    $offer = null;
+    if (isset($schema_org_markup_items['product']['offers'])) {
+        $offer = reset($schema_org_markup_items['product']['offers']);
+        if (isset($offer['offers'])) {
+            $offer = reset($offer['offers']);
+        }
     }
 
     $seo_snippet['show_price'] = $show_price;

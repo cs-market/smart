@@ -26,9 +26,23 @@ if ($mode == 'view') {
             $params = $_REQUEST;
             $params['extend'] = array('description');
 
-            list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'));
-
-            fn_gather_additional_products_data($products, array('get_icon' => true, 'get_detailed' => true, 'get_options' => true, 'get_discounts' => true));
+            $can_view_products = true;
+            if (isset($params['order_ids'])) {
+                $order_ids = is_array($params['order_ids']) ? $params['order_ids'] : explode(',', $params['order_ids']);
+                foreach ($order_ids as $order_id) {
+                    /** @psalm-suppress UndefinedGlobalVariable */
+                    if (!fn_is_order_allowed($order_id, $auth)) {
+                        $can_view_products = false;
+                        break;
+                    }
+                }
+            }
+            if ($can_view_products) {
+                list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'));
+                fn_gather_additional_products_data($products, ['get_icon' => true, 'get_detailed' => true, 'get_options' => true, 'get_discounts' => true]);
+            } else {
+                $products = $search = [];
+            }
 
             $selected_layout = fn_get_products_layout($params);
 

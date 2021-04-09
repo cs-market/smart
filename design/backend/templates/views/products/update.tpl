@@ -5,6 +5,8 @@
 {else}
     {$direction = "left"}
 {/if}
+{$page_title_seo_length = 60}
+{$description_seo_length = 145}
 
 {capture name="mainbox"}
 
@@ -41,7 +43,7 @@
 
             {** Product description section **}
 
-            <div class="product-manage hidden" id="content_detailed"> {* content detailed *}
+            <div class="product-manage {if $selected_section !== "detailed"}hidden{/if}" id="content_detailed"> {* content detailed *}
 
                 {** General info section **}
                 {include file="common/subheader.tpl" title=__("information") target="#acc_information"}
@@ -99,17 +101,18 @@
                                     id="product_categories_add_{$rnd}"
                                     tabindex=$tabindex
                                     item_ids=$product_data.category_ids
-                                    meta="input-large object-categories-add"
+                                    meta="input-large object-categories-add object-categories-add--multiple"
                                     show_advanced=true
                                     allow_add=fn_check_permissions("categories", "update", "admin", "POST")
                                     allow_sorting=true
-                                    result_class="object-picker__result--product-categories"
+                                    result_class="object-picker__result--inline"
                                     selection_class="object-picker__selection--product-categories"
                                     required=true
                                     close_on_select=false
                                     allow_multiple_created_objects=true
                                     created_object_holder_selector="[name='product_data[add_new_category][]']"
                                 }
+                                <p class="muted description">{__("tt_views_products_update_categories")}</p>
                         </div>
                     <!--product_categories--></div>
                     {/hook}
@@ -118,7 +121,7 @@
                     <div class="control-group {$no_hide_input_if_shared_product}">
                         <label for="elm_price_price" class="control-label cm-required">{__("price")} ({$currencies.$primary_currency.symbol nofilter}):</label>
                         <div class="controls">
-                            <input type="text" name="product_data[price]" id="elm_price_price" size="10" value="{$product_data.price|default:"0.00"|fn_format_price:$primary_currency:null:false}" class="input-long" />
+                            <input type="text" name="product_data[price]" id="elm_price_price" size="10" value="{$product_data.price|default:"0.00"|fn_format_price:$primary_currency:null:false}" class="input-long cm-numeric" data-a-sep/>
                             {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="price" name="update_all_vendors[price]"}
                             </div>
                         </div>
@@ -178,34 +181,61 @@
                 </div>
 
                 {hook name="products:update_product_options_settings"}
-                <hr>
+                    {capture name="select_options_type"}
+                        {component
+                            name="product.overridable_field_input"
+                            type="SettingTypes::SELECTBOX"|enum
+                            value=$product_data.options_type_raw
+                            field_name="options_type"
+                            variants=[
+                                "ProductOptionsApplyOrder::SIMULTANEOUS"|enum => __("simultaneous"),
+                                "ProductOptionsApplyOrder::SEQUENTIAL"|enum   => __("sequential")
+                            ]
+                            disable_inputs=$disable_selectors
+                            company_id=$product_data.company_id|default:null
+                        }{/component}
+                    {/capture}
+                    {capture name="select_exceptions_type"}
+                        {component
+                            name="product.overridable_field_input"
+                            type="SettingTypes::SELECTBOX"|enum
+                            value=$product_data.exceptions_type_raw
+                            field_name="exceptions_type"
+                            variants=[
+                                "ProductOptionsExceptionsTypes::FORBIDDEN"|enum => __("forbidden"),
+                                "ProductOptionsExceptionsTypes::ALLOWED"|enum   => __("allowed")
+                            ]
+                            disable_inputs=$disable_selectors
+                            company_id=$product_data.company_id|default:null
+                        }{/component}
+                    {/capture}
+                    {if $smarty.capture.select_options_type|trim && $smarty.capture.select_exceptions_type|trim}
+                        <hr>
+                        {include file="common/subheader.tpl" title=__("options_settings") target="#acc_options"}
 
-                {include file="common/subheader.tpl" title=__("options_settings") target="#acc_options"}
-
-                <div id="acc_options" class="collapse in">
-                    {hook name="products:update_product_options_type"}
-                    <div class="control-group {$promo_class}">
-                        <label class="control-label" for="elm_options_type">{__("options_type")}:</label>
-                        <div class="controls">
-                            <select class="span3" name="product_data[options_type]" id="elm_options_type" {if $disable_selectors}disabled="disabled"{/if}>
-                                <option value="P" {if $product_data.options_type == "P"}selected="selected"{/if}>{__("simultaneous")}</option>
-                                <option value="S" {if $product_data.options_type == "S"}selected="selected"{/if}>{__("sequential")}</option>
-                            </select>
+                        <div id="acc_options" class="collapse in">
+                            {hook name="products:update_product_options_type"}
+                                 {if $smarty.capture.select_options_type|trim}
+                                    <div class="control-group {$promo_class}">
+                                        <label class="control-label" for="elm_options_type">{__("options_type")}:</label>
+                                        <div class="controls">
+                                            {$smarty.capture.select_options_type nofilter}
+                                        </div>
+                                    </div>
+                                {/if}
+                            {/hook}
+                            {hook name="products:update_product_exceptions_type"}
+                                {if $smarty.capture.select_exceptions_type|trim}
+                                    <div class="control-group {$promo_class}">
+                                        <label class="control-label" for="elm_exceptions_type">{__("exceptions_type")}:</label>
+                                        <div class="controls">
+                                            {$smarty.capture.select_exceptions_type nofilter}
+                                        </div>
+                                    </div>
+                                {/if}
+                            {/hook}
                         </div>
-                    </div>
-                    {/hook}
-                    {hook name="products:update_product_exceptions_type"}
-                    <div class="control-group {$promo_class}">
-                        <label class="control-label" for="elm_exceptions_type">{__("exceptions_type")}:</label>
-                        <div class="controls">
-                            <select class="span3" name="product_data[exceptions_type]" id="elm_exceptions_type" {if $disable_selectors}disabled="disabled"{/if}>
-                                <option value="F" {if $product_data.exceptions_type == "F"}selected="selected"{/if}>{__("forbidden")}</option>
-                                <option value="A" {if $product_data.exceptions_type == "A"}selected="selected"{/if}>{__("allowed")}</option>
-                            </select>
-                        </div>
-                    </div>
-                    {/hook}
-                </div>
+                    {/if}
                 {/hook}
 
                 <hr>
@@ -225,9 +255,10 @@
                     <div class="control-group">
                         <label class="control-label" for="elm_list_price">{__("list_price")} ({$currencies.$primary_currency.symbol nofilter}) :</label>
                         <div class="controls">
-                            <input type="text" name="product_data[list_price]" id="elm_list_price" size="10" value="{$product_data.list_price|default:"0.00"|fn_format_price:$primary_currency:null:false}" class="input-long" />
-                            </div>
+                            <input type="text" name="product_data[list_price]" id="elm_list_price" size="10" value="{$product_data.list_price|default:"0.00"|fn_format_price:$primary_currency:null:false}" class="input-long cm-numeric" data-a-sep />
+                            <p class="muted description">{__("tt_views_products_update_list_price")}</p>
                         </div>
+                    </div>
                     {/hook}
 
                     <div id="product_amount">
@@ -235,78 +266,132 @@
                     <div class="control-group">
                         <label class="control-label" for="elm_in_stock">{__("in_stock")}:</label>
                         <div class="controls">
-                        {if $product_data.tracking == "ProductTracking::TRACK_WITH_OPTIONS"|enum}
-                            {include file="buttons/button.tpl" but_text=__("edit") but_href="product_options.inventory?product_id=`$id`" but_role="edit"}
-                        {else}
                             <input type="text" name="product_data[amount]" id="elm_in_stock" size="10" value="{$product_data.amount|default:"1"}" class="input-small" />
-                        {/if}
                         </div>
                     </div>
                     {/hook}
                     <!--product_amount--></div>
 
                     {hook name="products:update_product_zero_price_action"}
-                    <div class="control-group">
-                        <label class="control-label" for="elm_zero_price_action">{__("zero_price_action")}:</label>
-                        <div class="controls">
-                            <select class="span5" name="product_data[zero_price_action]" id="elm_zero_price_action">
-                                <option value="R" {if $product_data.zero_price_action == "R"}selected="selected"{/if}>{__("zpa_refuse")}</option>
-                                <option value="P" {if $product_data.zero_price_action == "P"}selected="selected"{/if}>{__("zpa_permit")}</option>
-                                <option value="A" {if $product_data.zero_price_action == "A"}selected="selected"{/if}>{__("zpa_ask_price")}</option>
-                            </select>
-                        </div>
-                    </div>
+                        {component
+                            name="product.overridable_field_input"
+                            type="SettingTypes::SELECTBOX"|enum
+                            value=$product_data.zero_price_action_raw
+                            field_name="zero_price_action"
+                            variants=[
+                                "ProductZeroPriceActions::NOT_ALLOW_ADD_TO_CART"|enum => __("zpa_refuse"),
+                                "ProductZeroPriceActions::ALLOW_ADD_TO_CART"|enum => __("zpa_permit"),
+                                "ProductZeroPriceActions::ASK_TO_ENTER_PRICE"|enum => __("zpa_ask_price")
+                            ]
+                            disable_inputs=$disable_selectors
+                            company_id=$product_data.company_id|default:null
+                        }
+                            <div class="control-group">
+                                <label class="control-label" for="elm_zero_price_action">{__("zero_price_action")}:</label>
+                                <div class="controls">
+                                    #INPUT#
+                                </div>
+                            </div>
+                        {/component}
                     {/hook}
 
                     {hook name="products:update_product_tracking"}
-                    <div class="control-group">
-                        <label class="control-label" for="elm_product_tracking">{__("inventory")}:</label>
-                        <div class="controls">
-                            <select class="span5" name="product_data[tracking]" id="elm_product_tracking" {if $settings.General.inventory_tracking == "N"}disabled="disabled"{/if}>
-                                {if $product_options}
-                                    <option value="{"ProductTracking::TRACK_WITH_OPTIONS"|enum}" {if $product_data.tracking == "ProductTracking::TRACK_WITH_OPTIONS"|enum && $settings.General.inventory_tracking == "Y"}selected="selected"{/if}>{__("track_with_options")}</option>
-                                {/if}
-                                <option value="{"ProductTracking::TRACK_WITHOUT_OPTIONS"|enum}" {if $product_data.tracking == "{"ProductTracking::TRACK_WITHOUT_OPTIONS"|enum}" && $settings.General.inventory_tracking == "Y"}selected="selected"{/if}>{__("track_without_options")}</option>
-                                <option value="{"ProductTracking::DO_NOT_TRACK"|enum}" {if $product_data.tracking == "{"ProductTracking::DO_NOT_TRACK"|enum}" || $settings.General.inventory_tracking == "N"}selected="selected"{/if}>{__("dont_track")}</option>
-                            </select>
-                        </div>
-                    </div>
+                        {component
+                            name="product.overridable_field_input"
+                            type="SettingTypes::SELECTBOX"|enum
+                            value=$product_data.tracking_raw
+                            field_name="tracking"
+                            variants=[
+                                "ProductTracking::TRACK"|enum => __("yes"),
+                                "ProductTracking::DO_NOT_TRACK"|enum => __("no")
+                            ]
+                            disable_inputs=$disable_selectors || $settings.General.inventory_tracking === "YesNo::NO"|enum
+                            company_id=$product_data.company_id|default:null
+                        }
+                            <div class="control-group">
+                                <label class="control-label" for="elm_product_tracking">{__("track_inventory")}:</label>
+                                <div class="controls">
+                                    #INPUT#
+                                    <p class="muted description">{__("track_inventory_tooltip")}</p>
+                                </div>
+                            </div>
+                        {/component}
                     {/hook}
 
                     {hook name="products:update_product_min_qty"}
-                    <div class="control-group">
-                        <label class="control-label" for="elm_min_qty">{__("min_order_qty")}:</label>
-                        <div class="controls">
-                            <input type="text" name="product_data[min_qty]" size="10" id="elm_min_qty" value="{$product_data.min_qty|default:"0"}" class="input-small" />
-                        </div>
-                    </div>
+                        {component
+                            name="product.overridable_field_input"
+                            type="SettingTypes::INPUT"|enum
+                            value=$product_data.min_qty_raw
+                            field_name="min_qty"
+                            disable_inputs=$disable_selectors
+                            company_id=$product_data.company_id|default:null
+                            custom_input_styles="cm-numeric"
+                        }
+                            <div class="control-group">
+                                <label class="control-label" for="elm_min_qty">{__("min_order_qty")}:</label>
+                                <div class="controls">
+                                    #INPUT#
+                                </div>
+                            </div>
+                        {/component}
                     {/hook}
 
                     {hook name="products:update_product_max_qty"}
-                    <div class="control-group">
-                        <label class="control-label" for="elm_max_qty">{__("max_order_qty")}:</label>
-                        <div class="controls">
-                            <input type="text" name="product_data[max_qty]" id="elm_max_qty" size="10" value="{$product_data.max_qty|default:"0"}" class="input-small" />
-                        </div>
-                    </div>
+                        {component
+                            name="product.overridable_field_input"
+                            type="SettingTypes::INPUT"|enum
+                            value=$product_data.max_qty_raw
+                            field_name="max_qty"
+                            disable_inputs=$disable_selectors
+                            company_id=$product_data.company_id|default:null
+                            custom_input_styles="cm-numeric"
+                        }
+                            <div class="control-group">
+                                <label class="control-label" for="elm_max_qty">{__("max_order_qty")}:</label>
+                                <div class="controls">
+                                    #INPUT#
+                                </div>
+                            </div>
+                        {/component}
                     {/hook}
 
                     {hook name="products:update_product_qty_step"}
-                    <div class="control-group">
-                        <label class="control-label" for="elm_qty_step">{__("quantity_step")}:</label>
-                        <div class="controls">
-                            <input type="text" data-v-min="0" data-m-dec="0" data-a-sep="" name="product_data[qty_step]" id="elm_qty_step" value="{$product_data.qty_step|default:"0"}" class="input-small cm-numeric" />
-                        </div>
-                    </div>
+                        {component
+                            name="product.overridable_field_input"
+                            type="SettingTypes::INPUT"|enum
+                            value=$product_data.qty_step_raw
+                            field_name="qty_step"
+                            disable_inputs=$disable_selectors
+                            company_id=$product_data.company_id|default:null
+                            custom_input_styles="cm-numeric"
+                        }
+                            <div class="control-group">
+                                <label class="control-label" for="elm_qty_step">{__("quantity_step")}:</label>
+                                <div class="controls">
+                                    #INPUT#
+                                </div>
+                            </div>
+                        {/component}
                     {/hook}
 
                     {hook name="products:update_product_list_qty_count"}
-                    <div class="control-group">
-                        <label class="control-label" for="elm_list_qty_count">{__("list_quantity_count")}:</label>
-                        <div class="controls">
-                            <input type="text" name="product_data[list_qty_count]" id="elm_list_qty_count" size="10" value="{$product_data.list_qty_count|default:"0"}" class="input-small" />
-                        </div>
-                    </div>
+                        {component
+                            name="product.overridable_field_input"
+                            type="SettingTypes::INPUT"|enum
+                            value=$product_data.list_qty_count_raw
+                            field_name="list_qty_count"
+                            disable_inputs=$disable_selectors
+                            company_id=$product_data.company_id|default:null
+                            custom_input_styles="cm-numeric"
+                        }
+                            <div class="control-group">
+                                <label class="control-label" for="elm_list_qty_count">{__("list_quantity_count")}:</label>
+                                <div class="controls">
+                                    #INPUT#
+                                </div>
+                            </div>
+                        {/component}
                     {/hook}
 
                     {hook name="products:update_product_tax_ids"}
@@ -368,6 +453,7 @@
                                 <option value="B" {if $product_data.out_of_stock_actions == "B"}selected="selected"{/if}>{__("buy_in_advance")}</option>
                                 <option value="S" {if $product_data.out_of_stock_actions == "S"}selected="selected"{/if}>{__("sign_up_for_notification")}</option>
                             </select>
+                            <p class="muted description">{__("tt_views_products_update_out_of_stock_actions")}</p>
                         </div>
                     </div>
                     {/hook}
@@ -376,16 +462,19 @@
 
                 {capture name="product_extra"}
                     {hook name="products:update_product_details_layout"}
-                    <div class="control-group">
-                        <label class="control-label" for="elm_details_layout">{__("product_details_view")}:</label>
-                        <div class="controls">
-                            <select class="span5" id="elm_details_layout" name="product_data[details_layout]">
-                                {foreach from=$id|fn_get_product_details_views key="layout" item="item"}
-                                    <option {if $product_data.details_layout == $layout}selected="selected"{/if} value="{$layout}">{$item}</option>
-                                {/foreach}
-                            </select>
-                        </div>
-                    </div>
+                        {component
+                            name="product.layout_input"
+                            id=$id|default:0
+                            value=$product_data.details_layout_raw|default:"default"
+                            company_id=$product_data.company_id
+                        }
+                            <div class="control-group">
+                                <label class="control-label" for="elm_details_layout">{__("product_details_view")}:</label>
+                                <div class="controls">
+                                    #INPUT#
+                                </div>
+                            </div>
+                        {/component}
                     {/hook}
 
                     {hook name="products:update_edp_section"}
@@ -444,6 +533,7 @@
                         <label class="control-label" for="elm_product_popularity">{__("popularity")}:</label>
                         <div class="controls">
                             <input type="text" {if $disable_edit_popularity}disabled="disabled"{/if} name="product_data[popularity]" id="elm_product_popularity" size="55" value="{$product_data.popularity|default:0}" class="input-long" />
+                            <p class="muted description">{__("ttc_popularity")}</p>
                         </div>
                     </div>
                     {/hook}
@@ -453,7 +543,8 @@
                         <label class="control-label" for="elm_product_search_words">{__("search_words")}:</label>
                         <div class="controls">
                             <textarea name="product_data[search_words]" id="elm_product_search_words" cols="55" rows="2" class="input-large">{$product_data.search_words}</textarea>
-                                {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="search_words" name="update_all_vendors[search_words]"}
+                            {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="search_words" name="update_all_vendors[search_words]"}
+                            <p class="muted description">{__("ttc_search_words")}</p>
                         </div>
                     </div>
                     {/hook}
@@ -482,7 +573,7 @@
 
             {hook name="products:update_product_seo_settings"}
             {** SEO settings section **}
-            <div id="content_seo" class="hidden">
+            <div class="{if $selected_section !== "seo"}hidden{/if}" id="content_seo">
 
                 {hook name="products:update_seo"}
                 {include file="common/subheader.tpl" title=__("seo_meta_data") target="#acc_seo_meta"}
@@ -490,7 +581,14 @@
                     <div class="control-group {$no_hide_input_if_shared_product}">
                         <label class="control-label" for="elm_product_page_title">{__("page_title")}:</label>
                         <div class="controls">
-                            <input type="text" name="product_data[page_title]" id="elm_product_page_title" size="55" value="{$product_data.page_title}" class="input-large" />
+                            <input type="text"
+                                name="product_data[page_title]"
+                                id="elm_product_page_title"
+                                size="55"
+                                value="{$product_data.page_title}"
+                                class="input-large"
+                                data-ca-seo-length="{$page_title_seo_length}"
+                            />
                             {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="page_title" name="update_all_vendors[page_title]"}
                         </div>
                     </div>
@@ -498,7 +596,13 @@
                     <div class="control-group {$no_hide_input_if_shared_product}">
                         <label class="control-label" for="elm_product_meta_descr">{__("meta_description")}:</label>
                         <div class="controls">
-                            <textarea name="product_data[meta_description]" id="elm_product_meta_descr" cols="55" rows="2" class="input-large">{$product_data.meta_description}</textarea>
+                            <textarea name="product_data[meta_description]"
+                                id="elm_product_meta_descr"
+                                cols="55"
+                                rows="2"
+                                class="input-large"
+                                data-ca-seo-length="{$description_seo_length}"
+                            >{$product_data.meta_description}</textarea>
                             {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="meta_description" name="update_all_vendors[meta_description]"}
                         </div>
                     </div>
@@ -518,7 +622,7 @@
 
             {hook name="products:update_product_shipping_settings"}
             {** Shipping settings section **}
-            <div id="content_shippings" class="hidden"> {* content shippings *}
+            <div class="{if $selected_section !== "shippings"}hidden{/if}" id="content_shippings"> {* content shippings *}
                 {include file="views/products/components/products_shipping_settings.tpl"}
             </div> {* /content shippings *}
             {** /Shipping settings section **}
@@ -532,12 +636,12 @@
 
             {hook name="products:update_product_features"}
             {** Product features section **}
-            {include file="views/products/components/products_update_features.tpl" product_id=$product_data.product_id}
+            {include file="views/products/components/products_update_features.tpl" product_id=$product_data.product_id allow_save=$allow_save_feature}
             {** /Product features section **}
             {/hook}
 
             {hook name="products:update_addons_section"}
-            <div id="content_addons" class="hidden">
+            <div class="{if $selected_section !== "addons"}hidden{/if}" id="content_addons">
                 {hook name="products:detailed_content"}
                 {/hook}
             </div>
@@ -586,14 +690,14 @@
 
         {if $id}
             {** Product options section **}
-            <div class="cm-hide-save-button hidden" id="content_options">
-                {include file="views/products/components/products_update_options.tpl"}
+            <div class="cm-hide-save-button {if $selected_section !== "options"}hidden{/if}" id="content_options">
+                {include file="views/products/components/products_update_options.tpl" enable_search=true}
             </div>
             {** /Product options section **}
 
             {** Products files section **}
             {if $settings.General.enable_edp == "Y"}
-            <div id="content_files" class="cm-hide-save-button hidden">
+            <div class="cm-hide-save-button {if $selected_section !== "files"}hidden{/if}" id="content_files">
                 {hook name="products:content_files"}
                 {include file="views/products/components/products_update_files.tpl"}
                 {/hook}
@@ -602,36 +706,31 @@
             {** /Products files section **}
 
             {** Subscribers section **}
-            <div id="content_subscribers" class="cm-hide-save-button hidden">
+            <div class="cm-hide-save-button {if $selected_section !== "subscribers"}hidden{/if}" id="content_subscribers">
                 {include file="views/products/components/product_subscribers.tpl" product_id=$id}
             </div>
             {** /Subscribers section **}
         {/if}
 
     {/capture}
-    {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox group_name=$runtime.controller active_tab=$smarty.request.selected_section track=true}
+    {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox group_name=$runtime.controller active_tab=$selected_section track=true}
 
 {/capture}
 
 {hook name="products:update_mainbox_params"}
 
 {if $id}
-    {$title_start = __("editing_product")}
-    {$title_end = $product_data.product|strip_tags}
+    {$title = $product_data.product|strip_tags}
 {else}
-    {capture name="mainbox_title"}
-        {__("new_product")}
-    {/capture}
+    {$title = __("new_product")}
 {/if}
 
 {/hook}
 
 {include file="common/mainbox.tpl"
-    title_start=$title_start
-    title_end=$title_end
-    title=$smarty.capture.mainbox_title
+    title=$title
     content=$smarty.capture.mainbox
-    select_languages=$id
+    select_languages=(bool) $id
     buttons=$smarty.capture.buttons
     adv_buttons=$smarty.capture.adv_buttons
 }

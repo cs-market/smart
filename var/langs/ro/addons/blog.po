@@ -6,9 +6,11 @@ msgstr ""
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.11.3/addons/blog.po\n"
-"PO-Revision-Date: 2020-01-29 14:52\n"
+"X-Crowdin-File: /release-4.12.2/addons/blog.po\n"
+"X-Crowdin-File-ID: 4038\n"
+"PO-Revision-Date: 2021-02-01 09:11\n"
 
 msgctxt "Addons::name::blog"
 msgid "Blog"
@@ -66,6 +68,10 @@ msgctxt "Languages::block_blog"
 msgid "Recent posts"
 msgstr "Posturi recente"
 
+msgctxt "Languages::block_vendor_blog"
+msgid "Vendor recent posts"
+msgstr "Postări recente ale vânzătorului"
+
 msgctxt "Languages::blog.text_links"
 msgid "Blog: text links"
 msgstr "Blog: link-uri text"
@@ -88,5 +94,5 @@ msgstr "<p>Utilizează aceasta pagina pentru a gestiona blog-ul dvs. Acest lucru
 
 msgctxt "Languages::n_posts"
 msgid "[n] post|[n] posts"
-msgstr ""
+msgstr "[n] post | [n] postări"
 

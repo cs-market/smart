@@ -2,7 +2,7 @@
 
 namespace Tygh\Addons\YandexCheckout\Services;
 
-use YandexCheckout\Model\PaymentInterface;
+use YooKassa\Model\PaymentInterface;
 
 /**
  * Class PaymentService collects functions that requires to operations with payment information

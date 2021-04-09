@@ -96,7 +96,7 @@ return [
                 return [
                     'dispatch' => 'product_features.update',
                     'feature_id' => $filter[$filter_id]['feature_id'],
-                    'selected_section' => sprintf('tab_variants_%s', $filter[$filter_id]['feature_id'])
+                    'selected_section' => sprintf('tab_feature_variants_%s', $filter[$filter_id]['feature_id'])
                 ];
             } else {
                 return false;

@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: tr\n"
-"X-Crowdin-File: /release-4.11.5/addons/advanced_import.po\n"
-"X-Crowdin-File-ID: 3646\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.2/addons/advanced_import.po\n"
+"X-Crowdin-File-ID: 4098\n"
+"PO-Revision-Date: 2021-02-01 09:14\n"
 
 msgctxt "Addons::name::advanced_import"
 msgid "Advanced products import"
@@ -238,7 +238,7 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.modifier_description.replace"
 msgid "<b>replace</b>&mdash;replaces all occurrences of the search string with the replacement string. <br>The order of parameters is important: <b>replace('search', 'replace', 'subject')</b>. <ul><li>Examples:</li><ul><li><b>replace('a', !, \"banana\")</b> will result in <i>b!n!n!</i></li> <li><b>replace(\"t-shirt\", 'T-Shirt', $value)</b> will replace every occurrence of <i>t-shirt</i> with <i>T-Shirt</i> in every entry in the column.</li></ul></ul>"
-msgstr ""
+msgstr "<b>yer değiştir</b>&mdash;arama dizgisinin tüm olaylarının yerini, yer değiştirme dizgisi ile değiştirir. <br>Parametrelerin sırası önemlidir: <b>yer değiştir('arama', 'yer değiştirme', 'konu')</b>. <ul><li>Örnekler:</li><ul><li><b>yer değiştir('u', !, \"muz\")</b>şu şekilde sonuçlanır: <i>m!z</i></li><li><b>yer değiştir(\"tişört\", 'Tişört', $value)</b> bu iki değerin tüm olaylarını sütundaki bütün veri girişlerinde yer değiştirir: <i>tişört </i>  ile <i>Tişört.</li></ul></ul>"
 
 msgctxt "Languages::advanced_import.modifier_description.w_replace"
 msgid "<b>w_replace</b>&mdash;replaces all occurrences of the search string with the replacement string using wildcards. <br>The order of parameters is important: <b>w_replace('search', 'replace', 'subject')</b>. <br>Supported wildcards: <b>?</b>&mdash;any single character; <b>*</b>&mdash;any number of characters to the end of the word. <ul><li>Examples</li><ul><li><b>w_replace('banan?', bananas, banana banans bananz)</b> will result in <i>bananas bananas bananas</i></li> <li><b>w_replace(\"ban*\", 'bananas', banana banans bananz)</b> will also result in <i>bananas bananas bananas</i></li></ul></ul>"
@@ -350,5 +350,37 @@ msgstr "Belirtilen (veya otomatik olarak algılanan) sınırlayıcı yanlış g�
 
 msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
 msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
-msgstr ""
+msgstr "Bu içe aktarma ön ayarını silmek aynı zamanda ona bağlı dosyayı da silecektir. İlerlemek istediğinize emin misiniz?"
+
+msgctxt "Languages::advanced_import.common_preset"
+msgid "All vendors"
+msgstr "Tüm sağlayıcılar"
+
+msgctxt "Languages::advanced_import.your_presets"
+msgid "Vendor's presets"
+msgstr "Sağlayıcıların ön ayarı"
+
+msgctxt "Languages::advanced_import.common_presets"
+msgid "Marketplace presets"
+msgstr "Pazar ön ayarları"
+
+msgctxt "Languages::advanced_import.file_not_loaded"
+msgid "File was not loaded. Please reload the page and try again."
+msgstr "Dosya yüklenmedi. Lütfen sayfayı yenileyin ve tekrar deneyin."
+
+msgctxt "Languages::advanced_import.local_file_selected"
+msgid "Local file selected"
+msgstr "Yerel dosya seçildi"
+
+msgctxt "Languages::advanced_import.text_popup_file_editor_notice_full_link"
+msgid "You can upload and download files via <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
+msgstr "<a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\"> [link_text] </a> aracılığıyla dosya yükleyebilir ve indirebilirsiniz."
+
+msgctxt "Languages::advanced_import.file_extension_was_not_supported_by_owner"
+msgid "Couldn't use your file [name]. This import preset only allows the following extensions: [ext]."
+msgstr "[name] isimli dosyanız kullanılamadı. Bu içe aktarım ön ayarı yalnızca şu uzantılara izin verir: [ext]."
+
+msgctxt "Languages::advanced_import.save_selected_file"
+msgid "Save selected file"
+msgstr "Seçili dosyayı kaydet"
 

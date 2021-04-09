@@ -1,4 +1,4 @@
-<div class="hidden" id="content_required_products">
+<div class="{if $selected_section !== "required_products"}hidden{/if}" id="content_required_products">
     {include file="views/products/components/picker/picker.tpl"
         input_name="required_product_ids[]"
         item_ids=$required_products

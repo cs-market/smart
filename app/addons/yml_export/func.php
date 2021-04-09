@@ -202,25 +202,25 @@ function fn_yml_export_get_product_feature_data_post(&$feature_data)
 
 function fn_yml_export_get_product_features_list_before_select(&$fields)
 {
-    $fields .= ", f.yml2_exclude_prices, fd.yml2_variants_unit";
+    $fields .= ', f.yml2_exclude_prices, fd.yml2_variants_unit, vd.yml2_unit';
 }
 
 function fn_yml_export_get_product_features_list_post(&$features_list, $product, $display_on, $lang_code)
 {
     foreach($features_list as $feature_id => &$feature) {
-
         if (isset($feature['yml2_exclude_prices'])) {
-            $features_list[$feature_id]['yml2_exclude_prices'] = explode(",", $feature['yml2_exclude_prices']);
+            $features_list[$feature_id]['yml2_exclude_prices'] = explode(',', $feature['yml2_exclude_prices']);
         }
 
-        if (!empty($feature['variant_id'])) {
-            $yml_variant_unit = db_get_field("SELECT yml2_unit FROM ?:product_feature_variant_descriptions WHERE variant_id = ?i AND lang_code = ?s", $feature['variant_id'], $lang_code);
-            $feature['variants'][$feature['variant_id']]['yml2_unit'] = $yml_variant_unit;
+        if (!empty($feature['yml2_unit'])) {
+            $yml_variant_unit = $feature['yml2_unit'];
+            $feature['variants'][$feature['variant_id']]['yml2_unit'] = $feature['yml2_unit'];
+        } else {
+            $yml_variant_unit = '';
         }
 
         if (!empty($yml_variant_unit)) {
             $feature['suffix'] = $yml_variant_unit . $feature['suffix'];
-
         } elseif (isset($feature['yml2_variants_unit'])) {
             $feature['suffix'] = $feature['yml2_variants_unit'] . $feature['suffix'];
         }
@@ -229,6 +229,7 @@ function fn_yml_export_get_product_features_list_post(&$features_list, $product,
             fn_yml_export_get_product_features_list_post($feature, $product, $display_on, $lang_code);
         }
     }
+    unset($feature);
 }
 
 function fn_yml_export_get_product_option_data_pre($option_id, $product_id, $fields, $condition, $join, &$extra_variant_fields)
@@ -241,21 +242,49 @@ function fn_yml_export_get_selected_product_options_before_select($fields, $cond
     $extra_variant_fields .= "a.yml2_variant, ";
 }
 
-
-function fn_yml_export_update_product_feature_variant($feature_id, $feature_type, $variant, $lang_code, &$variant_id)
+/**
+ * The "update_product_feature_variant_before_select" hook handler.
+ *
+ * Actions performed:
+ *  - Add to conditions to search variant by name, check unique od variant also by yml2_unit.
+ *
+ * @param int                       $feature_id   Feature identifier
+ * @param string                    $feature_type Feature type
+ * @param array<string, int|string> $variant      Feature variant data
+ * @param string                    $lang_code    Two letters language code
+ * @param int                       $variant_id   Variant identifier
+ * @param array<string, string>     $fields       Fields which will be got from database
+ * @param array<string, string>     $joins        Prepared query for joined tables
+ * @param array<string, string>     $conditions   Prepared condition which will be add to query divided by AND
+ *
+ * @see fn_update_product_feature_variant
+ */
+function fn_yml_export_update_product_feature_variant_before_select($feature_id, $feature_type, $variant, $lang_code, $variant_id, array $fields, array $joins, array &$conditions)
 {
-    if (!empty($variant_id)) {
-        $yml2_unit = !empty($variant['yml2_unit']) ? $variant['yml2_unit'] : '';
-        $variant_id_with_yml = db_get_field(
-            'SELECT fv.variant_id FROM ?:product_feature_variants as fv '
-            . 'INNER JOIN ?:product_feature_variant_descriptions as fvd ON fv.variant_id = fvd.variant_id '
-            . 'WHERE feature_id = ?i AND fvd.variant = ?s AND yml2_unit = ?s AND lang_code = ?s', $feature_id, $variant['variant'], $yml2_unit, $lang_code
-        );
+    $yml2_unit = !empty($variant['yml2_unit']) ? $variant['yml2_unit'] : '';
+    $conditions['yml2_unit'] = db_quote('yml2_unit = ?s', $yml2_unit);
+}
 
-        if (!empty($variant_id_with_yml)) {
-            $variant_id = $variant_id_with_yml;
-        }
+/**
+ * The "get_product_feature_variant_name_post" hook handler.
+ *
+ * Actions performed:
+ *  - Adds yml unit to feature variant name.
+ *
+ * @param int    $variant_id   Product identifier
+ * @param string $lang_code    Two letters language code
+ * @param string $variant_name Feature variant name
+ *
+ * @see fn_get_product_feature_variant_name
+ */
+function fn_yml_export_get_product_feature_variant_name_post($variant_id, $lang_code, &$variant_name)
+{
+    $yml2_unit = db_get_field('SELECT yml2_unit FROM ?:product_feature_variant_descriptions WHERE variant_id = ?i AND lang_code = ?s', $variant_id, $lang_code);
+
+    if (empty($yml2_unit)) {
+        return;
     }
+    $variant_name = sprintf('%s %s', $variant_name, $yml2_unit);
 }
 
 /**
@@ -742,7 +771,7 @@ function fn_yml_add_logs()
             'type' => 'N',
             'position' => 10,
             'is_global' => 'N',
-            'edition_type' => 'ROOT,VENDOR',
+            'edition_type' => 'ROOT,ULT:VENDOR',
             'value' => '#M#export'
         );
 
@@ -1103,4 +1132,20 @@ function fn_product_variations_yml_export_generate_offers_before_gather_addition
 function fn_warehouses_yml_export_generate_offers_before_gather_additional_products_data($yml2, $products, &$params)
 {
     $params['get_warehouse_total_amount'] = true;
+}
+
+/**
+ * Removes add-on logging settings.
+ *
+ * @return void
+ */
+function fn_yml_addon_uninstall()
+{
+    $setting = Settings::instance()->getSettingDataByName('log_type_yml_export');
+    if (!$setting) {
+        return;
+    }
+
+    /** @psalm-var array{object_id: int} $setting */
+    Settings::instance()->removeById($setting['object_id']);
 }

@@ -264,7 +264,15 @@ function fn_direct_payments_get_route_runtime(
  */
 function fn_direct_payments_get_payments_pre(array &$params)
 {
-    if (AREA === SiteArea::ADMIN_PANEL && !isset($params['company_id'])) {
+    //for payment_dependencies add-on
+    if (isset($params['direct_payments_skip_company_id'])) {
+        return;
+    }
+
+    if (
+        SiteArea::isAdmin(AREA)
+        && !isset($params['company_id'])
+    ) {
         $params['company_id'] = (int) Registry::get('runtime.company_id');
     }
 
@@ -282,12 +290,8 @@ function fn_direct_payments_get_payments_pre(array &$params)
  */
 function fn_direct_payments_get_promotions(&$params, $fields, $sortings, &$condition, $join, $group, $lang_code)
 {
-    if (AREA === SiteArea::ADMIN_PANEL) {
+    if (SiteArea::isAdmin(AREA)) {
         $params['company_id'] = (int) Registry::get('runtime.company_id');
-    }
-
-    if ($vendor_id = Registry::get('runtime.direct_payments.cart.vendor_id')) {
-        $params['company_id'] = $vendor_id;
     }
 
     if (isset($params['company_id'])) {
@@ -390,7 +394,8 @@ function fn_direct_payments_promotion_apply_before_get_promotions(
     $auth,
     $cart_products,
     &$promotions,
-    $applied_promotions
+    $applied_promotions,
+    array &$get_promotions_params
 )
 {
     static $cache = array();
@@ -414,6 +419,8 @@ function fn_direct_payments_promotion_apply_before_get_promotions(
     } else {
         unset($promotions[$zone]);
     }
+
+    $get_promotions_params['company_id'] = $company_id;
 }
 
 /**
@@ -747,11 +754,79 @@ function fn_direct_payments_storefront_rest_api_get_cart_service_ids_post(array 
 
     $vendor_ids = (new Collection($cart_service->getVendorIdsByUserId($auth['user_id'])))
         ->filter()
+        ->unique()
         ->sort()
         ->values()
         ->toArray();
 
     if ($vendor_ids) {
         $cart_service_ids = $vendor_ids;
+    }
+}
+
+/**
+ * The "calculate_cart_post" hook handler.
+ *
+ * Actions performed:
+ * - Adds name of the current vendor as a cart name.
+ *
+ * @param array<string, string|array<string>> $cart                  Cart to calculate
+ * @param array<string, string>               $auth                  Current user authentication data
+ * @param string                              $calculate_shipping    Shipping calculation policy
+ * @param bool                                $calculate_taxes       Whether to calculate taxes
+ * @param string                              $options_style         Options calculation policy
+ * @param bool                                $apply_cart_promotions Whether to apply promotions
+ * @param array<string, string>               $cart_products         Cart products
+ * @param array<array<string>>                $product_groups        Products grouped by packages, suppliers, vendors
+ */
+function fn_direct_payments_calculate_cart_post(
+    array &$cart,
+    array $auth,
+    $calculate_shipping,
+    $calculate_taxes,
+    $options_style,
+    $apply_cart_promotions,
+    array $cart_products,
+    array &$product_groups
+) {
+    if (count($product_groups) !== 1) {
+        return;
+    }
+
+    $cart['cart_name'] = reset($product_groups)['name'];
+}
+
+/**
+ * The "sucess_user_login" hook handler.
+ *
+ * Actions performed:
+ * - Extracts vendors carts after customer login
+ *
+ * @param array $udata User data
+ * @param array $auth  Auth data
+ *
+ * @return void
+ *
+ * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
+ */
+function fn_direct_payments_sucess_user_login(array $udata, array $auth)
+{
+    if (!SiteArea::isStorefront(AREA) || empty($udata['user_id'])) {
+        return;
+    }
+
+    /** @var \Tygh\Addons\DirectPayments\Cart\Service $cart_service */
+    $cart_service = Tygh::$app['addons.direct_payments.cart.service'];
+    $cart_service->load($udata['user_id']);
+
+    $carts = $cart_service->getCarts();
+
+    foreach ($carts as $cart) {
+        if (empty($cart['vendor_id'])) {
+            continue;
+        }
+
+        $cart_service->setCurrentVendorId($cart['vendor_id']);
+        break;
     }
 }

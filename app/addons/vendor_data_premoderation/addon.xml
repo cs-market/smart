@@ -132,6 +132,7 @@
     </email_templates>
     <internal_templates type="file">resources/internal_templates.xml</internal_templates>
     <functions>
-        <item for="uninstall">fn_vendor_data_premoderation_display_notification_for_deleted_statuses</item>
+        <item for="install">fn_vendor_data_premoderation_install</item>
+        <item for="uninstall">fn_vendor_data_premoderation_uninstall</item>
     </functions>
 </addon>

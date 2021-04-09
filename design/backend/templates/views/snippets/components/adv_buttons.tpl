@@ -6,7 +6,6 @@
         id="add_snippet"
         text="{__("add_snippet")}"
         link_text=$link_text|default:""
-        title=__("add_snippet")
         act="general"
         icon="icon-plus"
         href="snippets.update?snippet_id=0&return_url={$return_url_escape}&current_result_ids={$result_ids}&type={$type}&addon={$addon}"

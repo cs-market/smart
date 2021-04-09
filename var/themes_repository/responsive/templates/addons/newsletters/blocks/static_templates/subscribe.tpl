@@ -16,7 +16,7 @@
                 {include file="buttons/go.tpl" but_name="newsletters.add_subscriber" alt=__("go")}
             </div>
         </div>
-
+        {include file="common/image_verification.tpl" option="newsletters"}
         {/hook}
     </form>
 </div>

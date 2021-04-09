@@ -35,15 +35,15 @@ div.snize-ac-results{
     Searchanise.AutoCmpParams.restrictBy.product_type = '{"\Tygh\Addons\ProductVariations\Product\Type\Type::PRODUCT_TYPE_SIMPLE"|constant}';
 {/if}
 {if $addons.master_products.status == "ObjectStatuses::ACTIVE"|enum}
-    Searchanise.AutoCmpParams.restrictBy.is_vendor_product = '{"YesNo::YES"|enum}';
     Searchanise.AutoCmpParams.restrictBy.master_product_status = '{"ObjectStatuses::ACTIVE"|enum}';
+    Searchanise.AutoCmpParams.restrictBy.company_id = '{if $company_id}{$company_id}{else}0{/if}';
 {/if}
 {if $searchanise_prices}
     Searchanise.AutoCmpParams.union = {ldelim}{rdelim};
     Searchanise.AutoCmpParams.union.price = {ldelim}{rdelim};
     Searchanise.AutoCmpParams.union.price.min = '{$searchanise_prices}';
 {/if}
-{if $settings.General.inventory_tracking == "YesNo::YES"|enum && $settings.General.show_out_of_stock_products == "YesNo::NO"|enum && $smarty.const.AREA == "C"}
+{if $settings.General.inventory_tracking !== "YesNo::NO"|enum && $settings.General.show_out_of_stock_products == "YesNo::NO"|enum && $smarty.const.AREA == "C"}
     Searchanise.AutoCmpParams.restrictBy.amount = '1,';
 {/if}
 {if "MULTIVENDOR"|fn_allowed_for}

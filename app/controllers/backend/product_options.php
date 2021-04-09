@@ -14,6 +14,7 @@
 
 use Tygh\Registry;
 use Tygh\Tygh;
+use Tygh\Enum\NotificationSeverity;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -74,11 +75,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if (!empty($updated_products)) {
-                fn_set_notification('N', __('notice'), __('options_have_been_applied_to_products'));
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('options_have_been_applied_to_products'));
             }
         }
 
-        $suffix = ".apply";
+        if (isset($_REQUEST['option_ids'])) {
+            return [CONTROLLER_STATUS_OK, 'product_options.apply?' . http_build_query(['option_ids' => $_REQUEST['option_ids']])];
+        }
+
+        $suffix = '.apply';
     }
 
     if ($mode == 'update') {
@@ -102,14 +107,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         $option_id = fn_update_product_option($_REQUEST['option_data'], $_REQUEST['option_id'], DESCR_SL);
+        if (defined('AJAX_REQUEST')) {
+            /** @var \Tygh\Ajax $ajax */
+            $ajax = Tygh::$app['ajax'];
 
-        if (!empty($_REQUEST['object']) && $_REQUEST['object'] == 'product') { // FIXME (when assigning page and current url will be removed from ajax)
+            if ($option_id === false) {
+                $ajax->assign('success', false);
+            } else {
 
-            return array(CONTROLLER_STATUS_OK, $_SERVER['HTTP_REFERER'] . '&selected_section=options');
+                $ajax->assign('success', true);
+                $ajax->assign('option_id', $option_id);
+            }
+        } elseif (!empty($_REQUEST['object']) && $_REQUEST['object'] === 'product') {
+            return [CONTROLLER_STATUS_OK, $_SERVER['HTTP_REFERER'] . '&selected_section=options'];
         }
 
-        $suffix = ".manage";
+        if ($option_id !== false) {
+            $suffix = '.manage';
+        } else {
+            return [CONTROLLER_STATUS_OK, 'product_options.update?option_id=' . $option_id];
+        }
     }
+
+
+
 
     if ($mode == 'm_delete') {
         $return_url = isset($_REQUEST['return_url']) ? $_REQUEST['return_url'] : 'product_options.manage';
@@ -127,6 +148,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         return [CONTROLLER_STATUS_OK, $return_url];
+    }
+
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['option_ids'])
+        && is_array($_REQUEST['option_ids'])
+        && !empty($_REQUEST['status'])
+    ) {
+        $status_to = (string) $_REQUEST['status'];
+
+        foreach ($_REQUEST['option_ids'] as $option_id) {
+            if (!fn_check_company_id('product_options', 'option_id', $option_id)) {
+                continue;
+            }
+            fn_tools_update_status([
+                'table'             => 'product_options',
+                'status'            => $status_to,
+                'id_name'           => 'option_id',
+                'id'                => $option_id,
+                'show_error_notice' => false
+            ]);
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('product_options.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
     }
 
     if ($mode == 'delete') {
@@ -207,6 +260,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //
 // Options list
 //
+if ($mode === 'quick_add' || $mode === 'add') {
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_REDIRECT, 'product_options.add'];
+    }
+
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+    $option = isset($_REQUEST['option_data']) ? (array) $_REQUEST['option_data'] : [];
+
+    $view->assign([
+        'option_data' => $option,
+        'ajax_mode'   => true
+    ]);
+}
+
 if ($mode == 'manage') {
     $params = $_REQUEST;
 
@@ -235,9 +303,12 @@ if ($mode == 'manage') {
         ];
     }
 
+    $option_ids = isset($_REQUEST['option_ids']) ? $_REQUEST['option_ids'] : [];
+
     list($product_options, $search) = fn_get_product_global_options($search);
 
     Tygh::$app['view']->assign('product_options', $product_options);
+    Tygh::$app['view']->assign('option_ids', $option_ids);
 
 //
 // Update option

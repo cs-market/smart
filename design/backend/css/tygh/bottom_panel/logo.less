@@ -1,6 +1,7 @@
 .bp-logo {
     display: none;
     grid-area: logo;
+    padding: 10px;
 
     @media (min-width: 768px) {
         display: -webkit-box;
@@ -27,5 +28,11 @@
     
     &-icon {
         pointer-events: none;
+    }
+
+    &-img--no-color {
+        -webkit-filter: grayscale(100%);
+        -moz-filter: grayscale(100%);
+        filter: grayscale(100%);
     }
 }

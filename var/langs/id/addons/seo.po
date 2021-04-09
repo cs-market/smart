@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: id\n"
-"X-Crowdin-File: /release-4.11.5/addons/seo.po\n"
-"X-Crowdin-File-ID: 3546\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.2/addons/seo.po\n"
+"X-Crowdin-File-ID: 4172\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::seo"
 msgid "SEO"
@@ -137,8 +137,8 @@ msgid "Other SEO URL format"
 msgstr "Format URL SEO lainnya"
 
 msgctxt "SettingsOptions::seo::seo_language"
-msgid "Show language in the URL"
-msgstr "Tampilkan bahasa di URL"
+msgid "Show additional language in the URL"
+msgstr ""
 
 msgctxt "SettingsOptions::seo::single_url"
 msgid "Use single URL for all languages"
@@ -208,6 +208,14 @@ msgctxt "Languages::seo.important_language_text"
 msgid "<b>Warning!</b> The <b>SEO</b> add-on is currently configured to use a single URL for all languages. If you hide, disable, or delete a default language of one of the storefronts, the SEO URLs will be changed."
 msgstr "<b>Peringatan!</b> Pengaya <b>SEO</b> saat ini dikonfigurasi untuk menggunakan satu URL untuk semua bahasa. Jika Anda menyembunyikan, menonaktifkan, atau menghapus bahasa default dari salah satu etalase, URL SEO akan diubah."
 
+msgctxt "Languages::seo.upgrade_notes.seo_language.title"
+msgid "Changes in SEO add-on"
+msgstr ""
+
+msgctxt "Languages::seo.upgrade_notes.seo_language.message"
+msgid "To improve rating in search engines, we have changed the behavior of the \"Show language in URL\" setting. The default language of the storefront will no longer be displayed in the URL. If your storefront in the default language was previously located at <b>[old_store_url]</b>, it will now be available at <b>[new_store_url]</b>.<br/>All old URLs will be redirected correctly to the new ones."
+msgstr ""
+
 msgctxt "Languages::seo.product_feature.feature_code.notice"
 msgid "A suitable code can help this feature appear with the product in search engines. Supported codes:"
 msgstr ""
@@ -242,5 +250,17 @@ msgstr ""
 
 msgctxt "Languages::seo.feature_code.mpn.description"
 msgid "Manufacturer Part Number"
+msgstr ""
+
+msgctxt "Languages::seo.storefront_frontend_default_language_warning"
+msgid "The <a href=\"[link]\">SEO</a> add-on is currently configured to use a single URL for all languages. If you change a default language of this storefront, the SEO URLs will be changed."
+msgstr ""
+
+msgctxt "Languages::seo.default_storefront_frontend_default_language_warning"
+msgid "The <a href=\"[link]\">SEO</a> add-on is currently configured to use a single URL for all languages. If you change a default language of the default storefront, the SEO URLs will be changed for all storefronts."
+msgstr ""
+
+msgctxt "Languages::seo.error_at_creation_seo_name"
+msgid "The following SEO name already exists in your store: <b>[names]</b>. <p> The following SEO name was used instead: <b>[new_names]</b>.|The following SEO names already exist in your store: <b>[names]</b>. The following SEO names were used instead: <b>[new_names]</b>."
 msgstr ""
 

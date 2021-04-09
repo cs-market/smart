@@ -21,7 +21,7 @@ defined('BOOTSTRAP') or die('Access denied');
 $schema['advanced_import'] = function () {
 
     return (bool) db_get_field(
-        'SELECT preset_id FROM ?:import_presets WHERE last_status IN (?a) LIMIT 1',
+        'SELECT preset_id FROM ?:import_preset_states WHERE last_status IN (?a) LIMIT 1',
         ImportStatuses::getFinished()
     );
 };

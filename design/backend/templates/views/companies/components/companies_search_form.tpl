@@ -98,10 +98,11 @@
         <div class="controls">
         <select name="status" id="status">
             <option value="">--</option>
-            <option value="A" {if $search.status == "A"}selected="selected"{/if}>{__("active")}</option>
-            <option value="P" {if $search.status == "P"}selected="selected"{/if}>{__("pending")}</option>
-            <option value="N" {if $search.status == "N"}selected="selected"{/if}>{__("new")}</option>
-            <option value="D" {if $search.status == "D"}selected="selected"{/if}>{__("disabled")}</option>
+            <option value="{"VendorStatuses::ACTIVE"|enum}" {if $search.status == "VendorStatuses::ACTIVE"|enum}selected="selected"{/if}>{__("active")}</option>
+            <option value="{"VendorStatuses::PENDING"|enum}" {if $search.status == "VendorStatuses::PENDING"|enum}selected="selected"{/if}>{__("pending")}</option>
+            <option value="{"VendorStatuses::SUSPENDED"|enum}" {if $search.status == "VendorStatuses::SUSPENDED"|enum}selected="selected"{/if}>{__("suspended")}</option>
+            <option value="{"VendorStatuses::NEW_ACCOUNT"|enum}" {if $search.status == "VendorStatuses::NEW_ACCOUNT"|enum}selected="selected"{/if}>{__("new")}</option>
+            <option value="{"VendorStatuses::DISABLED"|enum}" {if $search.status == "VendorStatuses::DISABLED"|enum}selected="selected"{/if}>{__("disabled")}</option>
         </select>
         </div>
     </div>

@@ -57,7 +57,7 @@
 
         <item for="install">
             ALTER TABLE `?:categories`
-                ADD `yml2_market_category` VARCHAR(255) NOT NULL,
+                ADD `yml2_market_category` VARCHAR(255) NOT NULL DEFAULT '',
                 ADD `yml2_offer_type` VARCHAR(32) NOT NULL DEFAULT '',
                 ADD `yml2_type_prefix_select` VARCHAR(32) NOT NULL DEFAULT '',
                 ADD `yml2_model_select` VARCHAR(32) NOT NULL DEFAULT '',
@@ -178,6 +178,7 @@
 
     <functions>
         <item for="install">fn_yml_addon_install</item>
+        <item for="uninstall">fn_yml_addon_uninstall</item>
     </functions>
 
 </addon>

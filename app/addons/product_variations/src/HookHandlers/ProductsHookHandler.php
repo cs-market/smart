@@ -27,6 +27,7 @@ use Tygh\Enum\ProductFeatures;
 use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Tools\Url;
+use Tygh\Enum\ImagePairTypes;
 
 /**
  * This class describes the hook handlers related to product management
@@ -100,10 +101,11 @@ class ProductsHookHandler
             $group_by = 'product_id';
         }
 
-        if (!empty($params['variations_in_stock'])
-            && $params['variations_in_stock'] == 'Y'
-            && Registry::get('settings.General.inventory_tracking') == 'Y'
-            && Registry::get('settings.General.allow_negative_amount') != 'Y'
+        if (
+            !empty($params['variations_in_stock'])
+            && $params['variations_in_stock'] === YesNo::YES
+            && Registry::get('settings.General.inventory_tracking') !== YesNo::NO
+            && Registry::get('settings.General.allow_negative_amount') !== YesNo::YES
         ) {
             $params['amount_from'] = 0;
         }
@@ -474,9 +476,14 @@ class ProductsHookHandler
      * Actions performed:
      *  - Starts the syncing of data if a variation product is changed
      *
+     * @param array<string, string|int> $product_data Product data
+     * @param int                       $product_id   Product ID
+     *
      * @see fn_update_product
+     *
+     * @phpcs:disable SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
      */
-    public function onUpdateProductPost($product_data, $product_id)
+    public function onUpdateProductPost(array $product_data, $product_id)
     {
         $sync_service = ServiceProvider::getSyncService();
 
@@ -488,8 +495,12 @@ class ProductsHookHandler
             $sync_service->onTableChanged('ult_product_descriptions', $product_id);
         }
 
-        if (isset($product_data['amount']) && $product_data['amount'] == 0) {
-            ServiceProvider::getService()->onChangedProductQuantityInZero($product_id);
+        if (isset($product_data['amount'])) {
+            ServiceProvider::getService()->onChangedProductQuantity($product_id);
+        }
+
+        if (isset($product_data['status'])) {
+            ServiceProvider::getService()->onChangedVariationProductState($product_id);
         }
     }
 
@@ -855,7 +866,7 @@ class ProductsHookHandler
             $search_link = Url::buildUrn(['products', 'manage'], ['variation_group_id' => $group_ids]);
 
             $feature_id = 0;
-            $variant_ids = 0;
+            $variant_ids = [];
 
             fn_set_notification(
                 NotificationSeverity::WARNING,
@@ -973,16 +984,103 @@ class ProductsHookHandler
      * Actions performed:
      *  - Forbids to update the child variation image if the special setting is turn on
      *
+     * @param array<int, array<string, int>>                   $icons           Icons images data
+     * @param array<int|string, array<string, array<int>|int>> $detailed        Detailed images data
+     * @param array<int, array<string, int|string>>            $pairs_data      Pairs data
+     * @param int                                              $object_id       Object identifier
+     * @param string                                           $object_type     Object type
+     * @param array<int>                                       $object_ids      Objects identifier
+     * @param bool                                             $update_alt_desc True if image alt text should be updated
+     * @param string                                           $lang_code       Two-letter language code
+     *
      * @see fn_update_image_pairs
      */
-    public function onUpdateImagePairsPre($icons, $detailed, &$pairs_data, $object_id, $object_type)
-    {
-        if (empty($object_id) || $object_type !== 'product' || ServiceProvider::isAllowOwnImages()) {
+    public function onUpdateImagePairsPre(
+        array $icons,
+        array &$detailed,
+        array &$pairs_data,
+        $object_id,
+        $object_type,
+        array $object_ids,
+        $update_alt_desc,
+        $lang_code
+    ) {
+        if ($object_type !== 'product') {
             return;
         }
 
-        if (ServiceProvider::getProductIdMap()->isChildProduct($object_id)) {
-            $pairs_data = [];
+        $product_id_map = ServiceProvider::getProductIdMap();
+
+        foreach ($pairs_data as $pair_id => $pair_data) {
+            $product_id = empty($object_id) ? (int) $pair_data['object_id'] : $object_id;
+
+            if (
+                empty($product_id)
+                || empty($detailed[$pair_id])
+                || !$product_id_map->isVariationProduct($product_id)
+            ) {
+                continue;
+            }
+
+            if (!ServiceProvider::isAllowOwnImages() && $product_id_map->isChildProduct($product_id)) {
+                unset($pairs_data[$pair_id]);
+                continue;
+            }
+
+            $is_new = isset($pair_data['is_new']) ? YesNo::toBool($pair_data['is_new']) : null;
+
+            if ($pair_data['type'] !== ImagePairTypes::MAIN || $is_new) {
+                continue;
+            }
+
+            $main_image = fn_get_image_pairs($product_id, $object_type, $pair_data['type'], true, true, $lang_code);
+
+            if (empty($main_image)) {
+                continue;
+            }
+
+            $image_id = empty($main_image['image_id']) ? $main_image['detailed_id'] : $main_image['image_id'];
+
+            $is_image_in_use = db_get_row(
+                'SELECT object_id FROM ?:images_links WHERE (detailed_id = ?i OR image_id = ?i) AND object_id <> ?i LIMIT 1',
+                $image_id,
+                $image_id,
+                $product_id
+            );
+
+            if (empty($is_image_in_use)) {
+                continue;
+            }
+
+            if (!isset($detailed[$pair_id]['pairs_to_remove'])) {
+                $detailed[$pair_id]['pairs_to_remove'] = [];
+            }
+
+            /** @var array<int> $detailed[$pair_id]['pairs_to_remove'] */
+            $detailed[$pair_id]['pairs_to_remove'][] = (int) $main_image['pair_id'];
+
+            $pairs_data[$pair_id]['pair_id'] = 0;
+            $pairs_data[$pair_id]['is_new'] = YesNo::YES;
+        }
+    }
+
+    /**
+     * The "update_image" hook handler.
+     *
+     * Actions performed:
+     *  - Remove products pairs links
+     *
+     * @param array<string, string|int|array> $image_data Image data
+     */
+    public function onUpdateImage(array $image_data)
+    {
+        if (!isset($image_data['pairs_to_remove'])) {
+            return;
+        }
+
+        /** @var array<int> $image_data['pairs_to_remove'] */
+        foreach ($image_data['pairs_to_remove'] as $pair_id) {
+            db_query('DELETE FROM ?:images_links WHERE pair_id = ?i', $pair_id);
         }
     }
 
@@ -1013,9 +1111,11 @@ class ProductsHookHandler
      */
     public function onUpdateProductAmountPost($product_id, $amount_delta, $product_options, $sign, $tracking, $current_amount, $new_amount, $product_code, $notify)
     {
-        if ($new_amount == 0) {
-            ServiceProvider::getService()->onChangedProductQuantityInZero($product_id);
+        if (!ServiceProvider::getProductIdMap()->isVariationProduct($product_id)) {
+            return;
         }
+
+        ServiceProvider::getService()->onChangedProductQuantity($product_id);
     }
 
     /**
@@ -1130,6 +1230,28 @@ class ProductsHookHandler
         if (!empty($child_ids)) {
             $sync_service->sync('product_popularity', $parent_id, $child_ids);
         }
+    }
+
+    /**
+     * The "tools_change_status" hook handler.
+     *
+     * Actions performed:
+     *  - Starts the automatic selection of a new parent product if the status of a product changes to not active
+     *
+     * @param array<string, string> $params Request params
+     * @param int                   $result Updating status result
+     *
+     * @see \fn_tools_update_status()
+     */
+    public function onChangeStatus(array $params, $result)
+    {
+        if (!$result || $params['table'] !== 'products') {
+            return;
+        }
+
+        $product_id = (int) $params['id'];
+
+        ServiceProvider::getService()->onChangedVariationProductState($product_id, true);
     }
 
     /**

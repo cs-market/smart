@@ -18,7 +18,7 @@
 
 <div id="content_internal_templates_{$group_id}" class="hidden">
 <div class="items-container">
-    <div class="table-wrapper">
+    <div class="table-responsive-wrapper">
         <table class="table table-middle table--relative table-objects table-responsive table-responsive-w-titles">
             <tbody>
                 {foreach from=$group item="internal_template"}
@@ -29,11 +29,11 @@
                         status=$internal_template->getStatus()
                         href="internal_templates.update?template_id=`$internal_template->getId()`"
                         object_id_name="template_id"
-                        table="template_internals"
+                        table="template_internal_notifications"
                         href_delete=""
                         delete_target_id=""
                         skip_delete=true
-                        header_text="{__("editing_internal_template")}: `$internal_template->getName()`"
+                        header_text=$internal_template->getName()
                         no_popup=true
                         no_table=true
                         draggable=false

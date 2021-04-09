@@ -44,17 +44,18 @@ class ProductConvertorXmlTest extends StorageBasedTestCase
     {
         return new ProductConvertor(
             TranslatableValueDto::create('Вариант', ['en' => 'Variant']),
-            TranslatableValueDto::create('Бренд', ['en' => 'Brand']),
+            TranslatableValueDto::create('Производитель', ['en' => 'Manufacturer']),
             ProductFeatureDto::BRAND_EXTERNAL_ID
         );
     }
 
     /**
      * @param $xml
+     * @param $is_product_creatable
      * @param $expected_entities
      * @dataProvider dpConvert
      */
-    public function testConvert($xml, $expected_entities, array $entites_in_storage = [], array $settings = [])
+    public function testConvert($xml, $expected_entities, $is_product_creatable, array $entites_in_storage = [], array $settings = [])
     {
         $convertor = $this->getConvertor();
         $import_storage = $this->getImportStorage(null, $settings);
@@ -63,7 +64,7 @@ class ProductConvertorXmlTest extends StorageBasedTestCase
             $import_storage->saveEntities($entites_in_storage);
         }
 
-        $convertor->convert(simplexml_load_string($xml, SimpleXmlElement::class, LIBXML_NOCDATA), $import_storage);
+        $convertor->convert(simplexml_load_string($xml, SimpleXmlElement::class, LIBXML_NOCDATA), $import_storage, $is_product_creatable);
 
         $this->assertEquals($expected_entities, $import_storage->getImportEntityRepository()->getEntites());
     }
@@ -86,6 +87,8 @@ class ProductConvertorXmlTest extends StorageBasedTestCase
 
             $this->getConvertManufacturerCase1(),
             $this->getConvertManufacturerCase2(),
+
+            $this->getConvertProductDescriptionCase1(),
         ];
     }
 
@@ -93,6 +96,7 @@ class ProductConvertorXmlTest extends StorageBasedTestCase
     {
         $product1 = new ProductDto();
         $product1->id = new IdDto('0d9efc08-d695-11e8-8324-b010418127da');
+        $product1->is_creatable = true;
         $product1->product_code = 'P005';
         $product1->is_removed = true;
         $product1->name = new TranslatableValueDto('Тайтсы GIVOVA SLIM');
@@ -171,13 +175,14 @@ class ProductConvertorXmlTest extends StorageBasedTestCase
     </СтавкиНалогов>
 </Товар>
 XML;
-        return [$xml, [$product1, $tax_dto]];
+        return [$xml, [$product1, $tax_dto], true];
     }
 
     public function get205OfferCase1()
     {
         $product1 = new ProductDto();
         $product1->id = new IdDto('0d9efc08-d695-11e8-8324-b010418127da');
+        $product1->is_creatable = false;
         $product1->product_code = 'P005';
         $product1->name = new TranslatableValueDto('Тайтсы GIVOVA SLIM');
         $product1->quantity = 2682;
@@ -269,12 +274,13 @@ XML;
     <Склад ИдСклада="a4212b46-730a-11df-b338-0011955cba6b" КоличествоНаСкладе="0"/>
 </Предложение>
 XML;
-        return [$xml, [$product1]];
+        return [$xml, [$product1], false];
     }
 
     public function get205ImportCase2()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = true;
         $product1->id = IdDto::createByExternalId('8de3d432-9a21-11e7-8b00-94de80a9c64c');
         $product1->name = TranslatableValueDto::create('006 Product');
         $product1->product_code = 'T-006';
@@ -306,12 +312,13 @@ XML;
     </СтавкиНалогов>
 </Товар>
 XML;
-        return [$xml, [$product1, $tax_dto]];
+        return [$xml, [$product1, $tax_dto], true];
     }
 
     public function get205OfferCase2()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = false;
         $product1->id = IdDto::createByExternalId('8de3d432-9a21-11e7-8b00-94de80a9c64c#8de3d433-9a21-11e7-8b00-94de80a9c64c');
         $product1->parent_id = IdDto::createByExternalId('8de3d432-9a21-11e7-8b00-94de80a9c64c');
         $product1->is_variation = true;
@@ -409,12 +416,13 @@ XML;
 </Предложение>
 XML;
 
-        return [$xml, [$product1, $product_feature_1, $product_feature_2, $variant_1, $variant_2]];
+        return [$xml, [$product1, $product_feature_1, $product_feature_2, $variant_1, $variant_2], false];
     }
 
     public function get207ImportCase1()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = true;
         $product1->id = IdDto::createByExternalId('b08229ef-6368-11e8-8544-14dda9ec887b#b08229f2-6368-11e8-8544-14dda9ec887b');
         $product1->parent_id = IdDto::createByExternalId('b08229ef-6368-11e8-8544-14dda9ec887b');
         $product1->is_variation = true;
@@ -466,12 +474,13 @@ XML;
     </ХарактеристикиТовара>
 </Товар>
 XML;
-        return [$xml, [$product1, $product_feature1, $variant1, $tax_dto]];
+        return [$xml, [$product1, $product_feature1, $variant1, $tax_dto], true];
     }
 
     public function get207OfferCase1()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = false;
         $product1->id = IdDto::createByExternalId('b08229ef-6368-11e8-8544-14dda9ec887b#b08229f2-6368-11e8-8544-14dda9ec887b');
         $product1->parent_id = IdDto::createByExternalId('b08229ef-6368-11e8-8544-14dda9ec887b');
         $product1->is_variation = true;
@@ -517,12 +526,13 @@ XML;
     <Количество>6</Количество>
 </Предложение>
 XML;
-        return [$xml, [$product1]];
+        return [$xml, [$product1], false];
     }
 
     public function get207ImportCase2()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = true;
         $product1->id = IdDto::createByExternalId('75c55206-01d1-11e8-9381-002590d8abfc#ae134154-01d1-11e8-9381-002590d8abfc');
         $product1->parent_id = IdDto::createByExternalId('75c55206-01d1-11e8-9381-002590d8abfc');
         $product1->is_variation = true;
@@ -531,6 +541,11 @@ XML;
             IdDto::createByExternalId('969ff21e-cae6-11e7-9381-002590d8abfc'),
             'http://format.bike/catalog/junior-kids/format-6413-2017/',
             IdDto::createByExternalId('969ff21e-cae6-11e7-9381-002590d8abfc#http://format.bike/catalog/junior-kids/format-6413-2017/')
+        ));
+        $product1->product_feature_values->add(ProductFeatureValueDto::create(
+            IdDto::createByExternalId('brand1c'),
+            'Format2',
+            IdDto::createByExternalId('brand1c#' . md5('Format2'))
         ));
         $product1->images[] = ImageDto::create('import_files/75/75c5520601d111e89381002590d8abfc_a6b3a4ea6b5711e89e89525400436b93.jpg');
         $product1->categories[] = IdDto::createByExternalId('6e4bef5d-a11d-11e3-9416-002590d8abfd');
@@ -547,6 +562,14 @@ XML;
         $product_feature1->id = IdDto::createByExternalId(md5('Вариант'));
         $product_feature1->name = TranslatableValueDto::create('Вариант', ['en' => 'Variant']);
         $product_feature1->variants[] = $variant1;
+
+        $variant2 = ProductFeatureVariantDto::create(IdDto::createByExternalId('brand1c' . '#' . md5('Format2')), TranslatableValueDto::create('Format2'));
+
+        $product_feature2 = new ProductFeatureDto();
+        $product_feature2->type = ProductFeatureDto::TYPE_EXTENDED;
+        $product_feature2->id = IdDto::createByExternalId('brand1c');
+        $product_feature2->name = TranslatableValueDto::create('Производитель', ['en' => 'Manufacturer']);
+        $product_feature2->variants[] = $variant2;
 
         $xml = <<<XML
 <Товар>
@@ -566,7 +589,7 @@ XML;
     <Картинка>import_files/75/75c5520601d111e89381002590d8abfc_a6b3a4ea6b5711e89e89525400436b93.jpg</Картинка>
     <Изготовитель>
         <Ид>b34dc9bc-d944-11e5-039b-002590d8abfc</Ид>
-        <Наименование>Format</Наименование>
+        <Наименование>Format2</Наименование>
     </Изготовитель>
     <ЗначенияСвойств>
         <ЗначенияСвойства>
@@ -584,12 +607,14 @@ XML;
     </ХарактеристикиТовара>
 </Товар>
 XML;
-        return [$xml, [$product1, $product_feature1, $variant1]];
+
+        return [$xml, [$product_feature2, $variant2, $product1, $product_feature1, $variant1], true];
     }
 
     public function get207OfferCase2()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = false;
         $product1->id = IdDto::createByExternalId('75c55206-01d1-11e8-9381-002590d8abfc#ae134154-01d1-11e8-9381-002590d8abfc');
         $product1->parent_id = IdDto::createByExternalId('75c55206-01d1-11e8-9381-002590d8abfc');
         $product1->is_variation = true;
@@ -624,12 +649,13 @@ XML;
     <Количество>2</Количество>
 </Предложение>
 XML;
-        return [$xml, [$product1]];
+        return [$xml, [$product1], false];
     }
 
     public function get207ImportCase3()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = true;
         $product1->id = IdDto::createByExternalId('81fd1ccb-fa7f-11e7-a636-fcaa14ba6a8b#81fd1ccc-fa7f-11e7-a636-fcaa14ba6a8b');
         $product1->parent_id = IdDto::createByExternalId('81fd1ccb-fa7f-11e7-a636-fcaa14ba6a8b');
         $product1->is_variation = true;
@@ -642,6 +668,7 @@ XML;
         ));
 
         $product2 = new ProductDto();
+        $product2->is_creatable = true;
         $product2->id = IdDto::createByExternalId('81fd1ccb-fa7f-11e7-a636-fcaa14ba6a8b#81fd1ccd-fa7f-11e7-a636-fcaa14ba6a8b');
         $product2->parent_id = IdDto::createByExternalId('81fd1ccb-fa7f-11e7-a636-fcaa14ba6a8b');
         $product2->is_variation = true;
@@ -692,12 +719,13 @@ XML;
     </ХарактеристикиТовара>
 </Товар>
 XML;
-        return [$xml, [$product1, $product2, $product_feature1, $variant1, $variant2]];
+        return [$xml, [$product1, $product2, $product_feature1, $variant1, $variant2], true];
     }
 
     public function get207OfferCase3()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = false;
         $product1->id = IdDto::createByExternalId('81fd1ccb-fa7f-11e7-a636-fcaa14ba6a8b#81fd1ccd-fa7f-11e7-a636-fcaa14ba6a8b');
         $product1->parent_id = IdDto::createByExternalId('81fd1ccb-fa7f-11e7-a636-fcaa14ba6a8b');
         $product1->is_variation = true;
@@ -732,12 +760,13 @@ XML;
     </Цены>
 </Предложение>
 XML;
-        return [$xml, [$product1]];
+        return [$xml, [$product1], false];
     }
 
     public function get207ImportCase4()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = true;
         $product1->id = IdDto::createByExternalId('a518088a-3414-11e8-958e-525400436b93#b749cf70-3414-11e8-958e-525400436b93');
         $product1->parent_id = IdDto::createByExternalId('a518088a-3414-11e8-958e-525400436b93');
         $product1->is_variation = true;
@@ -758,8 +787,14 @@ XML;
             'cefcc889-a79d-11e3-9417-002590d8abfd',
             IdDto::createByExternalId('51cd5c98-a79d-11e3-9417-002590d8abfd#cefcc889-a79d-11e3-9417-002590d8abfd')
         ));
+        $product1->product_feature_values->add(ProductFeatureValueDto::create(
+            IdDto::createByExternalId('brand1c'),
+            'Stels',
+            IdDto::createByExternalId('brand1c#' . md5('Stels'))
+        ));
 
         $product2 = new ProductDto();
+        $product2->is_creatable = true;
         $product2->id = IdDto::createByExternalId('a518088a-3414-11e8-958e-525400436b93#e0e7a224-47c6-11e8-a287-525400436b93');
         $product2->parent_id = IdDto::createByExternalId('a518088a-3414-11e8-958e-525400436b93');
         $product2->is_variation = true;
@@ -780,6 +815,11 @@ XML;
             'cefcc889-a79d-11e3-9417-002590d8abfd',
             IdDto::createByExternalId('51cd5c98-a79d-11e3-9417-002590d8abfd#cefcc889-a79d-11e3-9417-002590d8abfd')
         ));
+        $product2->product_feature_values->add(ProductFeatureValueDto::create(
+            IdDto::createByExternalId('brand1c'),
+            'Stels',
+            IdDto::createByExternalId('brand1c#' . md5('Stels'))
+        ));
 
         $variant1 = ProductFeatureVariantDto::create(IdDto::createByExternalId(md5('Вариант') . '#' . md5('рама 12", серый/зеленый')), TranslatableValueDto::create('рама 12", серый/зеленый'));
         $variant2 = ProductFeatureVariantDto::create(IdDto::createByExternalId(md5('Вариант') . '#' . md5('рама 12", темно-синий/красный')), TranslatableValueDto::create('рама 12", темно-синий/красный'));
@@ -790,6 +830,14 @@ XML;
         $product_feature1->name = TranslatableValueDto::create('Вариант', ['en' => 'Variant']);
         $product_feature1->variants[] = $variant1;
         $product_feature1->variants[] = $variant2;
+
+        $variant3 = ProductFeatureVariantDto::create(IdDto::createByExternalId('brand1c' . '#' . md5('Stels')), TranslatableValueDto::create('Stels'));
+
+        $product_feature2 = new ProductFeatureDto();
+        $product_feature2->type = ProductFeatureDto::TYPE_EXTENDED;
+        $product_feature2->id = IdDto::createByExternalId('brand1c');
+        $product_feature2->name = TranslatableValueDto::create('Производитель', ['en' => 'Manufacturer']);
+        $product_feature2->variants[] = $variant3;
 
         $xml = <<<XML
 <Товар>
@@ -836,12 +884,14 @@ XML;
     </ХарактеристикиТовара>
 </Товар>
 XML;
-        return [$xml, [$product1, $product2, $product_feature1, $variant1, $variant2]];
+
+        return [$xml, [$product_feature2, $variant3, $product1, $product2, $product_feature1, $variant1, $variant2], true];
     }
 
     public function get207OfferCase4()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = false;
         $product1->id = IdDto::createByExternalId('a518088a-3414-11e8-958e-525400436b93#b749cf70-3414-11e8-958e-525400436b93');
         $product1->parent_id = IdDto::createByExternalId('a518088a-3414-11e8-958e-525400436b93');
         $product1->is_variation = true;
@@ -911,12 +961,13 @@ XML;
     <Склад ИдСклада="b195ecda-0d9d-11e5-f499-002590d8abfc" КоличествоНаСкладе="0"/>
 </Предложение>
 XML;
-        return [$xml, [$product1]];
+        return [$xml, [$product1], false];
     }
 
     public function getConvertManufacturerCase1()
     {
         $product1 = new ProductDto();
+        $product1->is_creatable = true;
         $product1->id = IdDto::createByExternalId('75c55206-01d1-11e8-9381-002590d8abfc');
         $product1->name = TranslatableValueDto::create('Велосипед Формат');
         $product1->product_feature_values->add(ProductFeatureValueDto::create(
@@ -931,7 +982,7 @@ XML;
         $product_feature1 = new ProductFeatureDto();
         $product_feature1->type = ProductFeatureDto::TYPE_EXTENDED;
         $product_feature1->id = IdDto::createByExternalId('brand1c');
-        $product_feature1->name = TranslatableValueDto::create('Бренд', ['en' => 'Brand']);
+        $product_feature1->name = TranslatableValueDto::create('Производитель', ['en' => 'Manufacturer']);
         $product_feature1->variants[] = $variant1;
 
         $xml = <<<XML
@@ -955,8 +1006,8 @@ XML;
     </Изготовитель>
 </Товар>
 XML;
-        return [$xml, [$product_feature1, $variant1, $product1], [], [
-            'convertor_brand_source' => 'manufacturer'
+        return [$xml, [$product_feature1, $variant1, $product1], true, [], [
+            'catalog_convertor.brand_source' => 'manufacturer'
         ]];
     }
 
@@ -971,6 +1022,7 @@ XML;
         $brand_feature1->variants[] = ProductFeatureVariantDto::create(IdDto::createByExternalId('brand1c' . '#' . md5('Велосипедмастер')), TranslatableValueDto::create('Велосипедмастер'));
 
         $product1 = new ProductDto();
+        $product1->is_creatable = true;
         $product1->id = IdDto::createByExternalId('75c55206-01d1-11e8-9381-002590d8abfc');
         $product1->name = TranslatableValueDto::create('Велосипед Формат');
         $product1->product_feature_values->add(ProductFeatureValueDto::create(
@@ -1009,8 +1061,40 @@ XML;
         return [
             $xml,
             array_merge([$brand_feature1], $brand_feature1->variants, [$brand_feature2], [$variant1], [$product1]),
+            true,
             array_merge([$brand_feature1], $brand_feature1->variants),
-            ['convertor_brand_source' => 'manufacturer']
+            ['catalog_convertor.brand_source' => 'manufacturer']
         ];
+    }
+
+    public function getConvertProductDescriptionCase1()
+    {
+        $product1 = new ProductDto();
+        $product1->is_creatable = true;
+        $product1->id = IdDto::createByExternalId('8de3d432-9a21-11e7-8b00-94de80a9c64c');
+        $product1->name = TranslatableValueDto::create('006 Product');
+        $product1->description = TranslatableValueDto::create("Текст с переносом строки.<br />\nТекст с переносом строки.");
+        $product1->product_code = 'T-006';
+        $product1->categories[] = IdDto::createByExternalId('dee6e199-55bc-11d9-848a-00112f43529a');
+
+        $xml = <<<XML
+<Товар>
+    <Ид>8de3d432-9a21-11e7-8b00-94de80a9c64c</Ид>
+    <Артикул>T-006</Артикул>
+    <Наименование>006 Product</Наименование>
+    <БазоваяЕдиница Код="796" НаименованиеПолное="Штука" МеждународноеСокращение="PCE">
+        <Пересчет>
+            <Единица>796</Единица>
+            <Коэффициент>1</Коэффициент>
+        </Пересчет>
+    </БазоваяЕдиница>
+    <Группы>
+        <Ид>dee6e199-55bc-11d9-848a-00112f43529a</Ид>
+    </Группы>
+    <Описание><![CDATA[Текст с переносом строки.
+Текст с переносом строки.]]></Описание>
+</Товар>
+XML;
+        return [$xml, [$product1], true];
     }
 }

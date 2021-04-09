@@ -14,22 +14,26 @@
         <conflicts>vendor_commission</conflicts>
     </compatibility>
     <auto_install>MULTIVENDOR</auto_install>
-    <settings>
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>
                     <item id="commissions_header">
                         <type>header</type>
                     </item>
-                    <item id="include_shipping">
+                    <item id="include_shipping" edition_type="ROOT">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>
-                    <item id="include_taxes_in_commission">
+                    <item id="include_taxes_in_commission" edition_type="ROOT">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>
-                    <item id="allow_vendors_to_change_plan">
+                    <item id="collect_taxes_from_vendors">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+                    </item>
+                    <item id="allow_vendors_to_change_plan" edition_type="ROOT">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>

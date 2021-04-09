@@ -1,6 +1,10 @@
 <div class="bulk-edit-inner bulk-edit-inner--price">
     <div class="bulk-edit-inner__header">
-        <span>{__("bulk_edit.price_and_stock")}</span>
+        <span>
+            {hook name="products:bulk_edit_prices_block_title"}
+                {__("bulk_edit.price_and_stock")}
+            {/hook}
+        </span>
     </div>
 
     <div class="bulk-edit-inner__body">
@@ -41,18 +45,20 @@
             </select>
         </div>
 
-        <div class="bulk-edit-inner__input-group">
-            <input type="number" 
-                   class="input-group__text input-group__text--full" 
-                   placeholder="{__("in_stock")}"
-                   data-ca-bulkedit-mod-changer
-                   data-ca-bulkedit-mod-affect-on="[data-ca-bulkedit-mod-instock]"
-                   data-ca-bulkedit-mod-filter="[data-ca-bulkedit-mod-price-filter-is]"
-                   data-ca-bulkedit-equal-field="[name='products_data[?][amount]']"
-                   data-ca-name="amount"
-            />
-            <input type="hidden" value="number" data-ca-bulkedit-mod-price-filter-is/>
-        </div>
+        {if $show_stock_control_in_bulk_edit|default:true}
+            <div class="bulk-edit-inner__input-group">
+                <input type="number"
+                       class="input-group__text input-group__text--full"
+                       placeholder="{__("in_stock")}"
+                       data-ca-bulkedit-mod-changer
+                       data-ca-bulkedit-mod-affect-on="[data-ca-bulkedit-mod-instock]"
+                       data-ca-bulkedit-mod-filter="[data-ca-bulkedit-mod-price-filter-is]"
+                       data-ca-bulkedit-equal-field="[name='products_data[?][amount]']"
+                       data-ca-name="amount"
+                />
+                <input type="hidden" value="number" data-ca-bulkedit-mod-price-filter-is/>
+            </div>
+        {/if}
 
         {/hook}
 
@@ -90,18 +96,20 @@
                 </span>
             </p>
 
-            <p class="bulk-edit-inner__example-line">
-                <span class="bulk-edit-inner__example-line--left">{__("in_stock")}:</span>
-                <span class="bulk-edit-inner__example-line--right"
-                      data-ca-bulkedit-mod-default-value="10"
-                      data-ca-bulkedit-mod-affected-write-into=".bulk-edit-inner__example-line--red"
-                      data-ca-bulkedit-mod-affected-old-value=".bulk-edit-inner__example-line--green"
-                      data-ca-bulkedit-mod-instock
-                >
-                    <span class="bulk-edit-inner__example-line--green">10</span>
-                    <span class="bulk-edit-inner__example-line--red"></span>
-                </span>
-            </p>
+            {if $show_stock_control_in_bulk_edit|default:true}
+                <p class="bulk-edit-inner__example-line">
+                    <span class="bulk-edit-inner__example-line--left">{__("in_stock")}:</span>
+                    <span class="bulk-edit-inner__example-line--right"
+                          data-ca-bulkedit-mod-default-value="10"
+                          data-ca-bulkedit-mod-affected-write-into=".bulk-edit-inner__example-line--red"
+                          data-ca-bulkedit-mod-affected-old-value=".bulk-edit-inner__example-line--green"
+                          data-ca-bulkedit-mod-instock
+                    >
+                        <span class="bulk-edit-inner__example-line--green">10</span>
+                        <span class="bulk-edit-inner__example-line--red"></span>
+                    </span>
+                </p>
+            {/if}
 
             {/hook}
         </div>

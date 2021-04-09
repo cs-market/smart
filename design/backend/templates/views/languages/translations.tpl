@@ -38,15 +38,15 @@
                 {include file="buttons/update_for_all.tpl" display=true object_id=$key name="lang_data[`$key`][overwrite]"}
             {/if}
             {capture name="tools_items"}
-            <a class="cm-confirm cm-post" href="{"languages.delete_variable?name=`$var.name`&redirect_url=`$c_url`"|fn_url}" title="{__("delete")}">
-                {if "ULTIMATE"|fn_allowed_for}
-                    {if $runtime.company_id}
-                        {__("restore_default")}
-                    {/if}
-                {else}
+            {if "ULTIMATE"|fn_allowed_for && $runtime.company_id}
+                <a class="btn cm-confirm cm-post" href="{"languages.delete_variable?name=`$var.name`&redirect_url=`$c_url`"|fn_url}" title="{__("restore_default")}">
+                    <i class="icon-undo"></i>
+                </a>
+            {else}
+                <a class="btn cm-confirm cm-post" href="{"languages.delete_variable?name=`$var.name`&redirect_url=`$c_url`"|fn_url}" title="{__("delete")}">
                     <i class="icon-trash"></i>
-                {/if}
-            </a>
+                </a>
+            {/if}
             {/capture}
             <div class="hidden-tools">
                 {include file="common/table_tools_list.tpl" prefix=$var.name tools_list=$smarty.capture.tools_items}

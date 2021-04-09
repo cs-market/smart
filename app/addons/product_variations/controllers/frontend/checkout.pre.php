@@ -62,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Tygh::$app['session']['cart'] = $cart;
         }
 
+        fn_save_cart_content(Tygh::$app['session']['cart'], $auth['user_id']);
+
         return [CONTROLLER_STATUS_REDIRECT, 'checkout.cart'];
     }
 }

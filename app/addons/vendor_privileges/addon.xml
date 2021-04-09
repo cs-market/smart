@@ -36,5 +36,7 @@
         <item for="uninstall">DELETE FROM ?:usergroups WHERE type = 'V';</item>
 
         <item for="demo">INSERT INTO ?:usergroup_links (user_id, usergroup_id, status) (SELECT users.user_id, usergroups.usergroup_id, 'A' FROM ?:users AS users LEFT JOIN ?:usergroups AS usergroups ON usergroups.type = 'V' WHERE users.user_type = 'V' GROUP BY users.user_id, usergroups.usergroup_id);</item>
+        <item for="demo">REPLACE INTO ?:usergroup_privileges (usergroup_id, privilege) (SELECT usergroup_id, 'view_payments' FROM ?:usergroups WHERE type = 'V');</item>
+        <item for="demo">REPLACE INTO ?:usergroup_privileges (usergroup_id, privilege) (SELECT usergroup_id, 'manage_payments' FROM ?:usergroups WHERE type = 'V');</item>
     </queries>
 </addon>

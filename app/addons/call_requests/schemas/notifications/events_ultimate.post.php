@@ -13,6 +13,7 @@
  ****************************************************************************/
 
 use Tygh\Addons\CallRequests\Notifications\DataProviders\RequestAboutProductCreatedDataProvider;
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Notifications\DataValue;
 use Tygh\Notifications\Transports\Mail\MailMessageSchema;
@@ -29,7 +30,7 @@ $schema['call_requests.request_about_product_created'] = [
     'receivers' => [
         UserTypes::ADMIN => [
             MailTransport::getId() => MailMessageSchema::create([
-                'area'            => 'A',
+                'area'            => SiteArea::ADMIN_PANEL,
                 'from'            => 'default_company_orders_department',
                 'to'              => 'company_orders_department',
                 'template_code'   => 'call_requests_buy_with_one_click',

@@ -76,14 +76,6 @@ msgctxt "SettingsSections::social_buttons::vkontakte"
 msgid "Vkontakte"
 msgstr "Vkontakte"
 
-msgctxt "SettingsOptions::social_buttons::yandex_header"
-msgid "Yandex settings"
-msgstr "Yandex settings"
-
-msgctxt "SettingsOptions::social_buttons::twitter_header"
-msgid "Twitter settings"
-msgstr "Twitter settings"
-
 msgctxt "SettingsOptions::social_buttons::yandex_enable"
 msgid "Show Yandex.Share block"
 msgstr "Show Yandex.Share block"
@@ -127,10 +119,6 @@ msgstr "Display count"
 msgctxt "SettingsOptions::social_buttons::twitter_display_on"
 msgid "Display on"
 msgstr "Display on"
-
-msgctxt "SettingsOptions::social_buttons::facebook_header"
-msgid "Facebook settings"
-msgstr "Facebook settings"
 
 msgctxt "SettingsOptions::social_buttons::facebook_enable"
 msgid "Show Facebook button"
@@ -179,10 +167,6 @@ msgstr "Color scheme"
 msgctxt "SettingsOptions::social_buttons::facebook_display_on"
 msgid "Display on"
 msgstr "Display on"
-
-msgctxt "SettingsOptions::social_buttons::vkontakte_header"
-msgid "Vkontakte settings"
-msgstr "Vkontakte settings"
 
 msgctxt "SettingsOptions::social_buttons::vkontakte_enable"
 msgid "Show Vkontakte button"
@@ -675,10 +659,6 @@ msgstr "Pages"
 msgctxt "SettingsSections::social_buttons::pinterest"
 msgid "Pinterest"
 msgstr "Pinterest"
-
-msgctxt "SettingsOptions::social_buttons::pinterest_header"
-msgid "Pinterest settings"
-msgstr "Pinterest settings"
 
 msgctxt "SettingsOptions::social_buttons::pinterest_enable"
 msgid "Show Pinterest button"

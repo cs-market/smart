@@ -12,7 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
+use Tygh\Providers\StorefrontProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -26,6 +26,17 @@ if ($mode == 'get') {
     $class_name = '\Tygh\PriceList\\' . fn_camelize($_REQUEST['display']);
     if (class_exists($class_name)) {
         $generator = new $class_name;
+        if (isset($_REQUEST['storefront_id'])) {
+            $generator->setStorefrontId($_REQUEST['storefront_id']);
+        } elseif (fn_allowed_for('ULTIMATE')) {
+            $company_id = fn_get_runtime_company_id();
+            $repository = StorefrontProvider::getRepository();
+            /** @var \Tygh\Storefront\Storefront|null $storefront */
+            $storefront = $repository->findByCompanyId($company_id, true);
+            if ($storefront) {
+                $generator->setStorefrontId($storefront->storefront_id);
+            }
+        }
         $filename = $generator->getFileName();
         if (file_exists($filename)) {
             fn_get_file($filename, 'price_list.' . $schema['types'][$_REQUEST['display']]['extension']);

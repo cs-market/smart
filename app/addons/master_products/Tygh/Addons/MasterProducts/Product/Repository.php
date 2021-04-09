@@ -155,7 +155,7 @@ class Repository
      *
      * @return int[] Vendor product IDs
      */
-    public function findVendorProductIds($master_product_id, array $status = null, array $company_status = null, $is_show_out_of_stock_products_enabled = false)
+    public function findVendorProductIds($master_product_id, array $status = null, array $company_status = null, $is_show_out_of_stock_products_enabled = true)
     {
         if (!$master_product_id) {
             return [];

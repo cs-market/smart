@@ -49,8 +49,8 @@ $schema = array(
             'return_result' => true,
             'return_field'  => 'product_features',
         ),
-        'Advanced Import: Images' => array(
-            'process_put' => array(
+        'Images' => [
+            'process_put' => [
                 'fn_advanced_import_set_product_images',
                 '#key',
                 '#this',
@@ -58,11 +58,11 @@ $schema = array(
                 '@images_delimiter',
                 '@remove_images',
                 '@preset'
-            ),
+            ],
             'linked'      => false,
             'import_only' => true,
             'is_aggregatable' => true,
-        ),
+        ],
         'Detailed image' => array(
             'process_put' => array(
                 'fn_advanced_import_import_detailed_image',
@@ -173,6 +173,18 @@ $schema = array(
             'default_value'             => ImportStrategies::IMPORT_ALL,
             'option_data_post_modifier' => 'fn_advanced_import_set_import_strategy_option_value',
         ),
+        'files_path' => [
+            'title' => 'downloadable_product_files_directory',
+            'description' => 'text_files_directory',
+            'type' => 'input',
+            'default_value' => 'exim/backup/downloads/',
+            'option_template' => 'addons/advanced_import/views/import_presets/components/option_fileeditor_open.tpl',
+            'notes' => __('advanced_import.text_popup_file_editor_notice_full_link', [
+                '[target]'    => 'files_path',
+                '[link_text]' => __('file_editor'),
+            ]),
+            'position' => 700,
+        ],
     ),
 );
 

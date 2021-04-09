@@ -9,24 +9,45 @@
             {/capture}
 
             {* FIXME: HARDCODE checking permissions. We need to divide these two forms by different modes *}
-            <form action="{""|fn_url}" method="post" name="languages_form" class="{if $runtime.company_id}cm-hide-inputs{/if}">
+            <form action="{""|fn_url}" method="post" id="languages_form" name="languages_form" class="{if $runtime.company_id}cm-hide-inputs{/if}">
                 <input type="hidden" name="page" value="{$smarty.request.page}" />
                 <input type="hidden" name="selected_section" value="{$smarty.request.selected_section}" />
                 
-                <div class="table-responsive-wrapper">
+                {$has_permission = fn_check_permissions("states", "update", "admin", "POST")}
+                {$language_statuses = ""|fn_get_default_statuses:true}
+                {$is_not_only_default_lang = $langs|count > 1}
+
+                {if $has_permission && $is_not_only_default_lang }
+                    {hook name="languages:bulk_edit"}
+                        {include file="views/languages/components/bulk_edit.tpl"}
+                    {/hook}
+                {/if}
+
+                <div class="table-responsive-wrapper longtap-selection">
                     <table class="table table-middle table--relative table-responsive">
-                    <thead>
+                    <thead data-ca-bulkedit-default-object="true">
                         <tr class="cm-first-sibling">
-                            <th width="3" class="left" data-th="">
-                                {include file="common/check_items.tpl"}</th>
-                            <th>{__("language_code")}</th>
-                            <th>{__("name")}</th>
-                            <th>{__("country")}</th>
+                            <th width="6%" class="left" data-th="">
+                                {include file="common/check_items.tpl" 
+                                    check_statuses=($has_permission && $is_not_only_default_lang) ? $language_statuses : ''
+                                    is_check_disabled=!$is_not_only_default_lang || !$has_permission
+                                }
+
+                                <input type="checkbox"
+                                    class="bulkedit-toggler hide"
+                                    data-ca-bulkedit-toggler="true"
+                                    data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                                    data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+                                />
+                            </th>
+                            <th width="15%">{__("language_code")}</th>
+                            <th width="20%">{__("name")}</th>
+                            <th width="20%">{__("country")}</th>
 
                             {hook name="languages:manage_header"}{/hook}
 
-                            <th>&nbsp;</th>
-                            <th class="right">{__("status")}</th>
+                            <th width="8%">&nbsp;</th>
+                            <th width="10%" class="right">{__("status")}</th>
                         </tr>
                     </thead>
                     {if $langs|count == 1}
@@ -34,23 +55,30 @@
                     {/if}
                     <tbody>
                     {foreach from=$langs item="language"}
-                    <tr class="cm-row-status-{$language.status|lower}">
-                        <td class="left" data-th="">
-                            <input type="checkbox" name="lang_ids[]" value="{$language.lang_id}" {if $language.lang_code == $smarty.const.DEFAULT_LANGUAGE}disabled="disabled"{/if} class="cm-item"></td>
-                        <td data-th="{__("language_code")}">
+                    <tr class="cm-longtap-target cm-row-status-{$language.status|lower}"
+                        {if $has_permission && $is_not_only_default_lang}
+                            data-ca-longtap-action="setCheckBox"
+                            data-ca-longtap-target="input.cm-item"
+                            data-ca-id="{$language.lang_id}"
+                            data-ca-bulkedit-dispatch-parameter="lang_ids[]"
+                        {/if} 
+                    >
+                        <td width="6%" class="left" data-th="">
+                            <input type="checkbox" name="lang_ids[]" value="{$language.lang_id}" class="cm-item cm-item-status-{$language.status|lower} hide"></td>
+                        <td width="15%" data-th="{__("language_code")}">
                             <input type="hidden" name="update_language[{$language.lang_id}][lang_code]" value="{$language.lang_code}">
                             {btn type="dialog" text=$language.lang_code href="languages.update?lang_id=`$language.lang_id`" target_id="content_group`$language.lang_id`" prefix=$language.lang_id}
                         </td>
-                        <td data-th="{__("name")}">
-                            {$language.name}
+                        <td width="20%" data-th="{__("name")}">
+                            {$language.name} {if $language.lang_code == $smarty.const.DEFAULT_LANGUAGE}({__("Default")}){/if}
                         </td>
-                        <td data-th="{__("country")}">
+                        <td width="20%" data-th="{__("country")}">
                             <i class="flag flag-{$language.country_code|strtolower}"></i>{$countries[$language.country_code]}
                         </td>
 
                         {hook name="languages:manage_data"}{/hook}
 
-                        <td class="nowrap right" data-th="{__("tools")}">
+                        <td width="8%" class="nowrap right" data-th="{__("tools")}">
                             <div class="hidden-tools">
                                 {capture name="tools_list"}
                                     {hook name="languages:list_extra_links"}
@@ -73,10 +101,10 @@
                         </td>
                         {capture name="popups"}
                             {$smarty.capture.popups nofilter}
-                            <div id="content_group{$language.lang_id}" class="hidden" title="{"{__("editing_language")}: `$language.name`"}"></div>
+                            <div id="content_group{$language.lang_id}" class="hidden" title={$language.name}></div>
                         {/capture}
 
-                        <td class="right" data-th="{__("status")}">
+                        <td width="10%" class="right" data-th="{__("status")}">
                             {assign var="lang_id" value=$language.lang_id}
                             {include file="common/select_popup.tpl" id=$lang_id prefix="lng" status=$language.status hidden="Y" object_id_name="lang_id" table="languages" update_controller="languages" st_result_ids="content_languages" non_editable=$runtime.company_id}
                         </td>
@@ -88,13 +116,6 @@
                 </div>
 
             </form>
-
-            {capture name="delete_button"}
-                <li class="cm-tab-tools mobile-hide" id="tools_languages_delete_buttons">
-                    {btn type="delete_selected" dispatch="dispatch[languages.m_delete]" form="languages_form"}
-                </li>
-            {/capture}
-
         <!--content_languages--></div>
 
         {if !$runtime.company_id}
@@ -120,8 +141,6 @@
     {capture name="tools_list"}
         {hook name="languages:manage_tools_list"}
             <li>{btn type="list" text=__("on_site_live_editing") href="customization.update_mode?type=live_editor&status=enable"|fn_url target="_blank" method="POST"}</li>
-            <li class="divider mobile-hide"></li>
-            {$smarty.capture.delete_button nofilter}
         {/hook}
     {/capture}
     {dropdown content=$smarty.capture.tools_list}

@@ -1,6 +1,6 @@
 {
     "require": {
-        "yandex-money/yandex-checkout-sdk-php": "^1.6"
+        "yoomoney/yookassa-sdk-php": "^2.0"
     },
     "replace": {
         "psr/log": "*"
@@ -8,11 +8,11 @@
     "scripts": {
         "post-update-cmd": [
             "echo [WARNING] Delete all .git dirs",
-            "rm -rf vendor/yandex-money/yandex-checkout-sdk-php/tests"
+            "rm -rf vendor/yoomoney/yookassa-sdk-php/tests"
         ],
         "post-install-cmd": [
             "echo [WARNING] Delete all .git dirs",
-            "rm -rf vendor/yandex-money/yandex-checkout-sdk-php/tests"
+            "rm -rf vendor/yoomoney/yookassa-sdk-php/tests"
         ]
     }
 }

@@ -35,13 +35,19 @@ $schema['controllers']['discussion'] = [
         'm_delete' => [
             'permissions' => false,
         ],
+        /**
+         * For add-on Vendor privileges
+         */
+        'products_and_pages' => [
+            'permissions' => true,
+        ],
     ],
 ];
 
 $schema['controllers']['discussion_manager'] = [
     'modes' => [
         'manage' => [
-            'permissions' => false,
+            'permissions' => true,
         ],
     ],
 ];

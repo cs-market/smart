@@ -37,7 +37,8 @@ fn_register_hooks(
     'store_locator_update_store_location_post',
     'render_block_pre',
     'ult_delete_company',
-    'ult_update_share_object',
-    'ult_unshare_object',
-    'tools_change_status'
+    'tools_change_status',
+    'commerceml_product_importer_import_pre',
+    'commerceml_product_convertor_convert',
+    ['warehouses_manager_remove_warehouse', '', 'commerceml']
 );

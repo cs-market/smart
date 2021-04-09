@@ -45,7 +45,7 @@ class SraOrders extends Orders
             $result['data']['orders'] = $this->getChildrenOrdersData($id);
         }
 
-        $currency = $this->safeGet($params, 'currency', CART_PRIMARY_CURRENCY);
+        $currency = $this->getCurrencyCode($params);
 
         $params['icon_sizes'] = $this->safeGet($params, 'icon_sizes', [
             'main_pair'   => [$this->icon_size_big, $this->icon_size_small],

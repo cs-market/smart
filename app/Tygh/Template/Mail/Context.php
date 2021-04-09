@@ -16,6 +16,7 @@ namespace Tygh\Template\Mail;
 
 
 use Tygh\BlockManager\Layout;
+use Tygh\Enum\SiteArea;
 use Tygh\Registry;
 use Tygh\Template\IContext;
 use Tygh\Themes\Styles;
@@ -33,6 +34,9 @@ class Context implements IContext
 
     /** @var array */
     public $data;
+
+    /** @var string */
+    protected $area;
 
     /**
      * Context constructor.
@@ -59,16 +63,15 @@ class Context implements IContext
             }
         }
 
-        $storefront_id = 0;
-        if (!empty($data['storefront_data']['storefront_id'])) {
+        $storefront_id = null;
+
+        if (fn_allowed_for('ULTIMATE')) {
+            fn_ult_bootstrap_company_storefront($company_id, $storefront_id);
+        } elseif (!empty($data['storefront_data']['storefront_id'])) {
             $storefront_id = $data['storefront_data']['storefront_id'];
         }
 
-        if (empty($storefront_id) && fn_allowed_for('ULTIMATE')) {
-            fn_ult_bootstrap_company_storefront($company_id, $storefront_id);
-        }
-
-        if (empty($storefront_id)) {
+        if (empty($storefront_id) && !SiteArea::isStorefront(AREA)) {
             $storefront_id = Tygh::$app['storefront.repository']->findDefault()->storefront_id;
         }
 
@@ -84,13 +87,14 @@ class Context implements IContext
 
         $this->data = $data;
         $this->lang_code = $lang_code;
+        $this->area = $area;
     }
 
     /**
      * Gets company logos by company identifier
      *
-     * @param int $company_id    Company identifier
-     * @param int $storefront_id Storefront identifier
+     * @param int      $company_id    Company identifier
+     * @param int|null $storefront_id Storefront identifier
      *
      * @return array
      */
@@ -102,8 +106,8 @@ class Context implements IContext
     /**
      * Gets company theme styles by company identifier
      *
-     * @param int $company_id    Company identifier
-     * @param int $storefront_id Storefront identifier
+     * @param int      $company_id    Company identifier
+     * @param int|null $storefront_id Storefront identifier
      *
      * @return array
      */
@@ -124,5 +128,13 @@ class Context implements IContext
     public function getLangCode()
     {
         return $this->lang_code;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArea()
+    {
+        return $this->area;
     }
 }

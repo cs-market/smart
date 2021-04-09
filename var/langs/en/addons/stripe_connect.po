@@ -32,6 +32,10 @@ msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
 
+msgctxt "Languages::stripe_connect.stripe_connect_short"
+msgid "Stripe"
+msgstr "Stripe"
+
 msgctxt "Languages::stripe_connect.redirect_uri_admin"
 msgid "Redirect URI for administrator"
 msgstr "Redirect URI for administrator"
@@ -155,3 +159,43 @@ msgstr "A gift certificate was used in this order. [product] doesn't know which 
 msgctxt "Languages::stripe_connect.payment_intent_error"
 msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
 msgstr "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
+
+msgctxt "Languages::log_type_stripe_connect"
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgctxt "Languages::log_action_sc_failure"
+msgid "Error"
+msgstr "Error"
+
+msgctxt "Languages::stripe_connect.log_context"
+msgid "Context"
+msgstr "Context"
+
+msgctxt "Languages::stripe_connect.unexpected_payment_intent_status"
+msgid "Unexpected status \"[status]\" of PaymentIntent"
+msgstr "Unexpected status \"[status]\" of PaymentIntent"
+
+msgctxt "Languages::stripe_connect.account_link_error"
+msgid "A vendor with company ID [company_id] is not linked to a Stripe account"
+msgstr "A vendor with company ID [company_id] is not linked to a Stripe account"
+
+msgctxt "Languages::stripe_connect.transfer_creating_error"
+msgid "An error occurred during the creation of a Stripe transfer: [error]"
+msgstr "An error occurred during the creation of a Stripe transfer: [error]"
+
+msgctxt "Languages::stripe_connect.charge_creating_error"
+msgid "An error occurred during the creation of a Stripe charge: [error]"
+msgstr "An error occurred during the creation of a Stripe charge: [error]"
+
+msgctxt "Languages::stripe_connect.customer_creating_error"
+msgid "An error occurred during the creation of a Stripe customer: [error]"
+msgstr "An error occurred during the creation of a Stripe customer: [error]"
+
+msgctxt "Languages::stripe_connect.customer_sharing_error"
+msgid "An error occurred during the share of a Stripe customer: [error]"
+msgstr "An error occurred during the share of a Stripe customer: [error]"
+
+msgctxt "Languages::stripe_connect.stripe_processor_params_missing"
+msgid "Stripe processor params missing"
+msgstr "Stripe processor params missing"

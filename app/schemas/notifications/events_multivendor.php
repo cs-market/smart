@@ -13,8 +13,8 @@
  ****************************************************************************/
 
 use Tygh\Enum\NotificationSeverity;
-use Tygh\Enum\RecipientSearchMethods;
 use Tygh\Enum\UserTypes;
+use Tygh\Enum\VendorStatuses;
 use Tygh\Enum\SiteArea;
 use Tygh\Notifications\DataProviders\ProfileDataProvider;
 use Tygh\Notifications\DataValue;
@@ -24,13 +24,14 @@ use Tygh\Notifications\Transports\Mail\MailMessageSchema;
 use Tygh\Notifications\Transports\Mail\MailTransport;
 use Tygh\NotificationsCenter\NotificationsCenter;
 use Tygh\Registry;
-use Tygh\Enum\VendorStatuses;
-
-require_once Registry::get('config.dir.schemas') . 'notifications/events.functions.php';
 
 defined('BOOTSTRAP') or die('Access denied');
 
-/** @var array $schema */
+require_once __DIR__ . '/events.functions.php';
+
+/**
+ * @var array<string, array> $schema
+ */
 
 $schema['profile.activated.v'] = [
     'group'     => 'profile',
@@ -87,6 +88,7 @@ $schema['profile.updated.v'] = [
             MailTransport::getId() => MailMessageSchema::create([
                 'area'            => SiteArea::ADMIN_PANEL,
                 'from'            => 'default_company_users_department',
+                'to'              => DataValue::create('user_data.email'),
                 'template_code'   => 'update_profile',
                 'legacy_template' => 'profiles/update_profile.tpl',
                 'company_id'      => 0,
@@ -179,7 +181,7 @@ $schema['profile.password_recover.v'] = [
                 'legacy_template' => 'profiles/recover_password.tpl',
                 'language_code'   => DataValue::create('user_data.lang_code', CART_LANGUAGE),
                 'storefront_id'   => DataValue::create('storefront_id'),
-                'data_modifier'   => function (array $data) {
+                'data_modifier'   => static function (array $data) {
                     return array_merge($data, [
                         'url' => fn_url('auth.recover_password?ekey=' . $data['ekey'], 'V'),
                     ]);
@@ -190,7 +192,7 @@ $schema['profile.password_recover.v'] = [
 ];
 
 $schema['vendor_status_changed_active'] = [
-    'group' => 'vendor',
+    'group' => 'vendors',
     'name' => [
         'template' => 'event.vendor_status_changed.name',
         'params' => [
@@ -203,17 +205,25 @@ $schema['vendor_status_changed_active'] = [
                 'area'            => SiteArea::ADMIN_PANEL,
                 'from'            => 'default_company_support_department',
                 'to'              => DataValue::create('user_data.email'),
+                'company_id'      => DataValue::create('company.company_id'),
                 'template_code'   => 'company_status_notification',
                 'legacy_template' => 'companies/status_notification.tpl',
                 'language_code'   => DataValue::create('user_data.lang_code', CART_LANGUAGE),
+                'data_modifier'   => static function (array $data) {
+                    if (empty($data['status']) || empty($data['user_data']['lang_code'])) {
+                        return $data;
+                    }
+
+                    $data['status'] = __($data['status'], [], $data['user_data']['lang_code']);
+                    return $data;
+                }
             ]),
             InternalTransport::getId() => InternalMessageSchema::create([
                 'tag'                       => 'vendor_status',
                 'area'                      => SiteArea::VENDOR_PANEL,
                 'section'                   => NotificationsCenter::SECTION_ADMINISTRATION,
-                'recipient_search_method'   => RecipientSearchMethods::USER_ID,
-                'recipient_search_criteria' => DataValue::create('user_data.user_id'),
-                'language_code'             => DataValue::create('user_data.lang_code', CART_LANGUAGE),
+                'to_company_id'             => DataValue::create('to_company_id'),
+                'language_code'             => DataValue::create('company.lang_code', CART_LANGUAGE),
                 'severity'                  => NotificationSeverity::NOTICE,
                 'title'                     => [
                     'template' => 'event.vendor_status_changed.title',
@@ -223,14 +233,22 @@ $schema['vendor_status_changed_active'] = [
                 ],
                 'message'                   => [
                     'template' => 'event.vendor_status_changed.active.message',
-                ]
+                ],
+                'data_modifier'   => static function (array $data) {
+                    if (empty($data['status']) || empty($data['company']['lang_code'])) {
+                        return $data;
+                    }
+
+                    $data['status'] = __($data['status'], [], $data['company']['lang_code']);
+                    return $data;
+                }
             ]),
         ],
     ]
 ];
 
 $schema['vendor_status_changed_pending'] = [
-    'group' => 'vendor',
+    'group' => 'vendors',
     'name' => [
         'template' => 'event.vendor_status_changed.name',
         'params' => [
@@ -243,17 +261,25 @@ $schema['vendor_status_changed_pending'] = [
                 'area'            => SiteArea::ADMIN_PANEL,
                 'from'            => 'default_company_support_department',
                 'to'              => DataValue::create('user_data.email'),
+                'company_id'      => DataValue::create('company.company_id'),
                 'template_code'   => 'company_status_notification',
                 'legacy_template' => 'companies/status_notification.tpl',
                 'language_code'   => DataValue::create('user_data.lang_code', CART_LANGUAGE),
+                'data_modifier'   => static function (array $data) {
+                    if (empty($data['status']) || empty($data['user_data']['lang_code'])) {
+                        return $data;
+                    }
+
+                    $data['status'] = __($data['status'], [], $data['user_data']['lang_code']);
+                    return $data;
+                }
             ]),
             InternalTransport::getId() => InternalMessageSchema::create([
                 'tag'                       => 'vendor_status',
                 'area'                      => SiteArea::VENDOR_PANEL,
                 'section'                   => NotificationsCenter::SECTION_ADMINISTRATION,
-                'recipient_search_method'   => RecipientSearchMethods::USER_ID,
-                'recipient_search_criteria' => DataValue::create('user_data.user_id'),
-                'language_code'             => DataValue::create('user_data.lang_code', CART_LANGUAGE),
+                'to_company_id'             => DataValue::create('to_company_id'),
+                'language_code'             => DataValue::create('company.lang_code', CART_LANGUAGE),
                 'severity'                  => NotificationSeverity::NOTICE,
                 'title'                     => [
                     'template' => 'event.vendor_status_changed.title',
@@ -263,14 +289,22 @@ $schema['vendor_status_changed_pending'] = [
                 ],
                 'message'                   => [
                     'template' => 'event.vendor_status_changed.pending.message',
-                ]
+                ],
+                'data_modifier'   => static function (array $data) {
+                    if (empty($data['status']) || empty($data['company']['lang_code'])) {
+                        return $data;
+                    }
+
+                    $data['status'] = __($data['status'], [], $data['company']['lang_code']);
+                    return $data;
+                }
             ]),
         ],
     ]
 ];
 
 $schema['vendor_status_changed_disabled'] = [
-    'group' => 'vendor',
+    'group' => 'vendors',
     'name' => [
         'template' => 'event.vendor_status_changed.name',
         'params' => [
@@ -283,16 +317,110 @@ $schema['vendor_status_changed_disabled'] = [
                 'area'            => SiteArea::ADMIN_PANEL,
                 'from'            => 'default_company_support_department',
                 'to'              => DataValue::create('user_data.email'),
+                'company_id'      => DataValue::create('company.company_id'),
                 'template_code'   => 'company_status_notification',
                 'legacy_template' => 'companies/status_notification.tpl',
                 'language_code'   => DataValue::create('user_data.lang_code', CART_LANGUAGE),
+                'data_modifier'   => static function (array $data) {
+                    if (empty($data['status']) || empty($data['user_data']['lang_code'])) {
+                        return $data;
+                    }
+
+                    $data['status'] = __($data['status'], [], $data['user_data']['lang_code']);
+                    return $data;
+                }
+            ]),
+        ],
+    ],
+];
+
+$schema['vendor_status_changed_from_suspended'] = [
+    'group' => 'vendors',
+    'name' => [
+        'template' => 'event.vendor_status_changed_from.name',
+        'params' => [
+            '[status]' => __('suspended'),
+        ],
+    ],
+    'receivers' => [
+        UserTypes::VENDOR => [
+            MailTransport::getId()     => MailMessageSchema::create([
+                'area'            => SiteArea::ADMIN_PANEL,
+                'from'            => 'default_company_support_department',
+                'to'              => DataValue::create('user_data.email'),
+                'company_id'      => DataValue::create('company.company_id'),
+                'template_code'   => 'company_status_changed_from_suspended_notification',
+                'language_code'   => DataValue::create('user_data.lang_code', CART_LANGUAGE),
+                'data_modifier'   => static function (array $data) {
+                    if (empty($data['status']) || empty($data['user_data']['lang_code'])) {
+                        return $data;
+                    }
+
+                    $data['status'] = __($data['status'], [], $data['user_data']['lang_code']);
+                    return $data;
+                }
+            ]),
+        ],
+    ],
+];
+
+$schema['vendor_status_changed_suspended'] = [
+    'group' => 'vendors',
+    'name' => [
+        'template' => 'event.vendor_status_changed.name',
+        'params' => [
+            '[status]' => __('suspended'),
+        ],
+    ],
+    'receivers' => [
+        UserTypes::VENDOR => [
+            MailTransport::getId()     => MailMessageSchema::create([
+                'area'            => SiteArea::ADMIN_PANEL,
+                'from'            => 'default_company_support_department',
+                'to'              => DataValue::create('user_data.email'),
+                'company_id'      => DataValue::create('company.company_id'),
+                'template_code'   => 'company_status_suspended_notification',
+                'language_code'   => DataValue::create('user_data.lang_code', CART_LANGUAGE),
+                'data_modifier'   => static function (array $data) {
+                    if (empty($data['status']) || empty($data['user_data']['lang_code'])) {
+                        return $data;
+                    }
+
+                    $data['status'] = __($data['status'], [], $data['user_data']['lang_code']);
+                    return $data;
+                }
+            ]),
+            InternalTransport::getId() => InternalMessageSchema::create([
+                'tag'                       => 'vendor_status',
+                'area'                      => SiteArea::VENDOR_PANEL,
+                'section'                   => NotificationsCenter::SECTION_ADMINISTRATION,
+                'to_company_id'             => DataValue::create('to_company_id'),
+                'language_code'             => DataValue::create('company.lang_code', CART_LANGUAGE),
+                'severity'                  => NotificationSeverity::NOTICE,
+                'title'                     => [
+                    'template' => 'event.vendor_status_changed.suspended.title',
+                    'params' => [
+                        '[status]' => DataValue::create('status'),
+                    ]
+                ],
+                'message'                   => [
+                    'template' => 'event.vendor_status_changed.suspended.message',
+                ],
+                'data_modifier'   => static function (array $data) {
+                    if (empty($data['status']) || empty($data['company']['lang_code'])) {
+                        return $data;
+                    }
+
+                    $data['status'] = __($data['status'], [], $data['company']['lang_code']);
+                    return $data;
+                }
             ]),
         ],
     ],
 ];
 
 $schema['vendors_require_approval'] = [
-    'group' => 'vendor',
+    'group' => 'vendors',
     'name' => [
         'template' => 'event.vendors_require_approval.name',
         'params' => [],
@@ -304,9 +432,9 @@ $schema['vendors_require_approval'] = [
                 'area'                      => SiteArea::ADMIN_PANEL,
                 'section'                   => NotificationsCenter::SECTION_ADMINISTRATION,
                 'severity'                  => NotificationSeverity::WARNING,
-                'recipient_search_method'   => RecipientSearchMethods::USER_ID,
-                'recipient_search_criteria' => DataValue::create('user_id', 1),
-                'language_code'             => DataValue::create('lang_code', CART_LANGUAGE),
+                'to_company_id'             => 0,
+                'language_code'             => Registry::get('settings.Appearance.backend_default_language'),
+                'action_url'                => 'companies.manage?status[]=' . VendorStatuses::NEW_ACCOUNT . '&status[]=' . VendorStatuses::PENDING,
                 'title'                     => [
                     'template' => 'event.vendors_require_approval.title',
                 ],
@@ -333,7 +461,7 @@ $schema['apply_for_vendor_notification'] = [
                 'area'            => SiteArea::ADMIN_PANEL,
                 'from'            => 'default_company_support_department',
                 'to'              => 'default_company_support_department',
-                'company_id'      => DataValue::create('company_id'),
+                'company_id'      => 0,
                 'template_code'   => 'apply_for_vendor_notification',
                 'legacy_template' => 'companies/apply_for_vendor_notification.tpl',
                 'language_code'   => Registry::get('settings.Appearance.backend_default_language'),

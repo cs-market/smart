@@ -105,7 +105,19 @@ class Bootstrap implements BootstrapInterface, HookHandlerProviderInterface
                 /** @var \Tygh\Web\Session $session */
                 $session = Tygh::$app['session'];
                 unset($req[$session->getName()]);
-            }
+            },
+            'get_orders' => static function ($params, $fields, $sortings, &$condition) {
+                if (!isset($params['from_order_id'])) {
+                    return;
+                }
+
+                $condition .= db_quote(' AND ?:orders.order_id >= ?i', (int) $params['from_order_id']);
+            },
+            'get_feedback_data' => [
+                'addons.commerceml.hook_handlers.feedback',
+                /** @see \Tygh\Addons\CommerceML\HookHandlers\FeedbackHookHandler::onGetFeedbackData() */
+                'onGetFeedbackData'
+            ]
         ];
     }
 }

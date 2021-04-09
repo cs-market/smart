@@ -27,12 +27,14 @@
         <label class="control-label" for="elm_shipping_can_customer_number">{__("shippings.can.customer_number")}</label>
         <div class="controls">
             <input id="elm_shipping_can_customer_number" type="text" name="shipping_data[service_params][customer_number]" size="30" value="{$shipping.service_params.customer_number}" />
+            <p class="muted description">{__("ttc_shippings.can.customer_number")}</p>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="elm_shipping_can_contract_id">{__("shippings.can.contract_id")}</label>
         <div class="controls">
             <input id="elm_shipping_can_contract_id" type="text" name="shipping_data[service_params][contract_id]" size="30" value="{$shipping.service_params.contract_id}" />
+            <p class="muted description">{__("ttc_shippings.can.contract_id")}</p>
         </div>
     </div>
 </fieldset>
@@ -51,6 +53,7 @@
         <label class="control-label" for="elm_shipping_can_option_cov">{__("shippings.can.option_cov")}</label>
         <div class="controls">
             <input id="elm_shipping_can_option_cov" type="checkbox" name="shipping_data[service_params][options][cov]" value="cov" {if $shipping.service_params.options.cov}checked="checked"{/if} />
+            <p class="muted description">{__("ttc_shippings.can.option_cov")}</p>
         </div>
     </div>
     <div class="control-group">

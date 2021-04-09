@@ -9,24 +9,26 @@
     ],
     "repositories": [
         {
-            "type": "git",
-            "url": "https://github.com/cscart/smarty.git"
+            "type": "package",
+            "package": {
+                "name": "smarty/smarty",
+                "version": "3.1.21.2",
+                "dist": {
+                    "url": "https://github.com/cscart/smarty/archive/v3.1.21.2.zip",
+                    "type": "zip"
+                },
+                "autoload": {
+                    "classmap": [
+                        "libs/Smarty.class.php",
+                        "libs/SmartyBC.class.php",
+                        "libs/sysplugins/smarty_security.php"
+                    ]
+                }
+            }
         },
         {
             "type": "git",
             "url": "https://github.com/cscart/collect.git"
-        },
-        {
-            "type":"package",
-            "package": {
-                "name": "wareczek/phpcs-teamcity-reporter",
-                "version":"master",
-                "source": {
-                    "url": "https://github.com/cscart/phpcs-teamcity-reporter",
-                    "type": "git",
-                    "reference":"master"
-                }
-            }
         }
     ],
     "config": {
@@ -37,19 +39,19 @@
     "require": {
         "educoder/pest": "1.0.0",
         "robmorgan/phinx": "0.4.3",
-        "phpmailer/phpmailer": "5.2.*",
-        "ezyang/htmlpurifier": "4.6.*",
-        "tedivm/jshrink": "~1.0",
+        "phpmailer/phpmailer": "6.1.8",
+        "ezyang/htmlpurifier": "4.13.*",
+        "tedivm/jshrink": "dev-master#0513ba1407b1f235518a939455855e6952a48bbc",
         "imagine/imagine": "^1.2.2",
         "pimple/pimple": "3.2.3",
-        "cssjanus/cssjanus": "~1.1",
+        "cssjanus/cssjanus": "~1.3",
         "jdorn/sql-formatter": "^1.2",
-        "twig/twig": "~1.24",
+        "twig/twig": "1.42.5",
         "tijsverkoyen/css-to-inline-styles": "~1.5",
         "twig/extensions": "~1.3",
         "symfony/console": "~2.6.0",
         "google/recaptcha": "~1.1",
-        "smarty/smarty": "3.1.21.1",
+        "smarty/smarty": "3.1.21.2",
         "fzaninotto/faker": "^1.7",
         "symfony/lock": "^3.4",
         "paragonie/random_compat": "<9.99",
@@ -61,11 +63,9 @@
     },
     "require-dev": {
         "phpunit/dbunit": "^2.0.0",
-        "squizlabs/php_codesniffer": "^2.2 || ^3.0.2",
-        "wimg/php-compatibility": "^8.1",
-        "wareczek/phpcs-teamcity-reporter": "dev-master",
         "phpunit/phpunit": "^5.7",
-        "brianium/paratest": "^0.15.0"
+        "brianium/paratest": "^0.15.0",
+        "cweagans/composer-patches": "^1.7"
     },
     "autoload": {
         "psr-0": {
@@ -85,11 +85,32 @@
             "other/elfinder/elFinderConnector.class.php",
             "other/elfinder/elFinderVolumeLocalFileSystem.class.php",
             "other/elfinder/elFinder.class.php",
-            "other/elfinder/elFinderVolumeDriver.class.php"
+            "other/elfinder/elFinderVolumeDriver.class.php",
+            "other/Gregwar/Captcha/CaptchaBuilder.php",
+            "other/Gregwar/Captcha/CaptchaBuilderInterface.php",
+            "other/Gregwar/Captcha/ImageFileHandler.php",
+            "other/Gregwar/Captcha/PhraseBuilderInterface.php",
+            "other/Gregwar/Captcha/PhraseBuilder.php"
         ]
     },
+    "extra": {
+        "patches": {
+            "phpunit/phpunit-mock-objects": {
+                "phpunit_php74_fix": "other/dev/patches/phpunit_php74_fix.patch"
+            }
+        },
+        "enable-patching": true
+    },
     "scripts": {
-        "post-update-cmd": ["echo [WARNING] Delete all .git dirs", "rm -rf vendor/**/**/.git"],
-        "post-install-cmd": ["echo [WARNING] Delete all .git dirs", "rm -rf vendor/**/**/.git"]
+        "post-update-cmd": [
+            "echo [WARNING] Delete all .git dirs",
+            "rm -rf vendor/**/**/.git",
+            "rm -rf vendor/phpmailer/phpmailer/examples"
+        ],
+        "post-install-cmd": [
+            "echo [WARNING] Delete all .git dirs",
+            "rm -rf vendor/**/**/.git",
+            "rm -rf vendor/phpmailer/phpmailer/examples"
+        ]
     }
 }

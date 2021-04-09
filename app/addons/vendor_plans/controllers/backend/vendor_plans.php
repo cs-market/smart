@@ -12,6 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Models\Company;
 use Tygh\Models\VendorPlan;
 use Tygh\Registry;
@@ -37,7 +38,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $plan = new VendorPlan;
         }
         $plan->attributes($_REQUEST['plan_data']);
-        $plan->save();
+        $plan_saved = $plan->save();
+
+        if (defined('AJAX_REQUEST')) {
+            /** @var \Tygh\Ajax $ajax */
+            $ajax = Tygh::$app['ajax'];
+
+            if ($plan_saved === false) {
+                $ajax->assign('success', false);
+            } else {
+                fn_set_notification(NotificationSeverity::NOTICE, __('successful'), __('vendor_plans.text_vendor_plan_created', [
+                    '[link]' => fn_url('vendor_plans.manage#plan_' . $plan->plan_id),
+                    '[plan_name]' => $plan->plan
+                ]));
+
+                $ajax->assign('success', true);
+                $ajax->assign('vendor_plan_id', $plan->plan_id);
+            }
+
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
     }
 
     if ($mode == 'm_update') {
@@ -88,6 +108,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return array(CONTROLLER_STATUS_OK, 'vendor_plans.' . $suffix);
 }
 
+if ($mode === 'quick_add') {
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_REDIRECT, 'vendor_plans.add'];
+    }
+
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+    $plan = isset($_REQUEST['plan_data']) ? (array) $_REQUEST['plan_data'] : [];
+
+    $view->assign([
+        'plan' => $plan
+    ]);
+}
+
 if ($mode == 'manage') {
 
     $params = array_merge(
@@ -102,6 +136,7 @@ if ($mode == 'manage') {
         )
     );
     list($plans, $search) = VendorPlan::model()->findMany($params);
+
     Tygh::$app['view']->assign('plans', $plans);
     Tygh::$app['view']->assign('search', $search);
 
@@ -120,29 +155,31 @@ if ($mode == 'manage') {
 
         $view->assign('plan', $plan);
         $id = $plan->plan_id;
+    } elseif (!empty($_REQUEST['plan_data'])) {
+        $view->assign('plan', (array) $_REQUEST['plan_data']);
     }
 
     $tabs = array(
-        'general_' . $id => array(
+        'plan_general_' . $id => array(
             'title' => __('general'),
             'js' => true,
         ),
-        'commission_' . $id => array(
+        'plan_commission_' . $id => array(
             'title' => __('vendor_plans.commission'),
             'js' => true,
         ),
-        'restrictions_' . $id => array(
+        'plan_restrictions_' . $id => array(
             'title' => __('vendor_plans.restrictions'),
             'js' => true,
         ),
-        'categories_' . $id => array(
+        'plan_categories_' . $id => array(
             'title' => __('categories'),
             'js' => true,
         ),
     );
 
     if (fn_allowed_for('MULTIVENDOR:ULTIMATE')) {
-        $tabs['storefronts_' . $id] = [
+        $tabs['plan_storefronts_' . $id] = [
             'title' => __('storefronts'),
             'js' => true,
         ];
@@ -154,7 +191,12 @@ if ($mode == 'manage') {
             }, $affected_vendors);
             $view->assign('affected_vendors', $affected_vendors);
         }
+    }
 
+    if (defined('AJAX_REQUEST') && !empty($_REQUEST['_action_context'])) {
+        $view->assign([
+            'ajax_mode' => true
+        ]);
     }
 
     Registry::set('navigation.tabs', $tabs);
@@ -164,6 +206,60 @@ if ($mode == 'manage') {
     Company::periodicityPayments();
     exit;
 
+} elseif ($mode === 'picker') {
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+    /** @var \Tygh\Ajax $ajax */
+    $ajax = Tygh::$app['ajax'];
+
+    /** @var \Tygh\Tools\Formatter $formatter */
+    $formatter = Tygh::$app['formatter'];
+
+    $page_number = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
+    $page_size = isset($_REQUEST['page_size']) ? (int) $_REQUEST['page_size'] : 10;
+    $lang_code = isset($_REQUEST['lang_code']) ? $_REQUEST['lang_code'] : CART_LANGUAGE;
+    $search_query = isset($_REQUEST['q']) ? $_REQUEST['q'] : null;
+
+    $params = [
+        'items_per_page'      => Registry::get('settings.Appearance.admin_elements_per_page'),
+        'return_params'       => true,
+        'get_companies_count' => true,
+        'lang_code'           => $lang_code,
+        'plan'                => $search_query
+    ];
+
+    if (isset($_REQUEST['ids'])) {
+        $params['ids'] = (array) $_REQUEST['ids'];
+        $params['items_per_page'] = 0;
+    }
+
+    list($plans, $search) = VendorPlan::model()->findMany($params);
+
+    $objects = array_values(array_map(function (VendorPlan $plan) use ($formatter) {
+        return [
+            'id'   => $plan->plan_id,
+            'text' => $plan->plan,
+            'data' => [
+                'name'              => $plan->plan,
+                'commission'        => $plan->commission,
+                'commission_text'   => __('vendor_plans.commission_fee', ['[commission]' => $plan->commission]),
+                'price'             => $formatter->asPrice($plan->price),
+                'periodicity'       => __('vendor_plans.periodicity_' . $plan->periodicity),
+                'vendor_count'      => (int) $plan->companies_count,
+                'vendor_count_text' => __('n_vendors', [(int) $plan->companies_count]),
+                'status'            => $plan->getStatusText(),
+            ]
+        ];
+    }, $plans));
+
+    $ajax->assign('objects', $objects);
+    $ajax->assign('total_objects', isset($search['total_items']) ? $search['total_items'] : count($objects));
+
+    Registry::set('runtime.vendor_plans.picker.plans', $plans);
+
+    return [CONTROLLER_STATUS_NO_CONTENT];
 }
 
 Tygh::$app['view']->assign('periodicities', VendorPlan::getPeriodicitiesList());

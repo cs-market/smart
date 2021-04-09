@@ -51,6 +51,10 @@ fn_register_hooks(
     'storefront_rest_api_group_cart_products_post',
     /** @see \fn_direct_payments_storefront_rest_api_get_cart_service_ids_post() */
     'storefront_rest_api_get_cart_service_ids_post',
-    'allow_save_object_post'
+    /** @see \fn_direct_payments_allow_save_object_post() */
+    'allow_save_object_post',
+    /** @see \fn_direct_payments_calculate_cart_post() */
+    'calculate_cart_post',
+    /** @see \fn_direct_payments_sucess_user_login() */
+    'sucess_user_login'
 );
-

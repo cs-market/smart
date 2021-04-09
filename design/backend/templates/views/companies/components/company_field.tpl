@@ -39,9 +39,12 @@
 {if !$runtime.simple_ultimate}
     {if !$no_wrap}
         <div class="control-group">
-            <label class="control-label {if $required}cm-required{/if}" for="{$id|default:"company_id"}">{__("vendor")}{if $tooltip} {capture name="tooltip"}{$tooltip}{/capture}{include file="common/tooltip.tpl" tooltip=$smarty.capture.tooltip}{/if}</label>
+            <label class="control-label {if $required}cm-required{/if}" for="{$id|default:"company_id"}">{__("owner_company")}</label>
             <div class="controls">
                 {$smarty.capture.c_body nofilter}
+                {if $tooltip}
+                    <p class="muted description">{$tooltip nofilter}</p>
+                {/if}
             </div>
         </div>
     {else}

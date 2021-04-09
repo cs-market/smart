@@ -108,7 +108,7 @@ function fn_exim_get_product_feature_group($group_id, $lang_code = CART_LANGUAGE
     $group_name = false;
 
     if (!empty($group_id)) {
-        $group_name = db_get_field('SELECT description FROM ?:product_features_descriptions WHERE feature_id = ?i AND lang_code = ?s', $group_id, $lang_code);
+        $group_name = db_get_field('SELECT internal_name FROM ?:product_features_descriptions WHERE feature_id = ?i AND lang_code = ?s', $group_id, $lang_code);
     }
 
     return $group_name;
@@ -148,7 +148,7 @@ function fn_exim_get_product_feature_group_id($group_name, $company_id, &$create
 function fn_import_get_feature_id(&$primary_object_id, $object, &$skip_get_primary_object_id)
 {
 
-    $feature_id = db_get_field('SELECT feature_id FROM ?:product_features_descriptions WHERE description = ?s AND lang_code = ?s', $object['description'], $object['lang_code']);
+    $feature_id = db_get_field('SELECT feature_id FROM ?:product_features_descriptions WHERE intenral_name = ?s AND lang_code = ?s', $object['description'], $object['lang_code']);
 
     if ($feature_id) {
         $primary_object_id = array(
@@ -216,7 +216,7 @@ function fn_import_feature($data, &$processed_data, &$skip_record, $category_del
 
     if (!$feature_id) {
         $feature_data = fn_exim_features_find_feature(
-            $feature['description'],
+            $feature['internal_name'],
             $feature['feature_type'],
             isset($feature['parent_id']) ? $feature['parent_id'] : 0,
             $company_id,
@@ -338,7 +338,7 @@ function fn_exim_features_find_feature($feature_name, $feature_type, $feature_pa
     $features = db_get_hash_array(
         'SELECT pf.feature_id, pf.company_id FROM ?:product_features_descriptions AS pfd'
         . ' LEFT JOIN ?:product_features AS pf ON pf.feature_id = pfd.feature_id'
-        . ' WHERE description = ?s AND lang_code = ?s AND feature_type = ?s AND parent_id = ?i',
+        . ' WHERE internal_name = ?s AND lang_code = ?s AND feature_type = ?s AND parent_id = ?i',
         'company_id',
         $feature_name, $lang_code, $feature_type, $feature_parent_id
     );

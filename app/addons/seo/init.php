@@ -20,6 +20,7 @@ fn_define('SEO_RUNTIME_CACHE_COUNT', 10000);
 fn_register_hooks(
     'url_post',
     'get_route',
+    'init_language_post',
     'compare_dispatch',
 
     'update_category_post',

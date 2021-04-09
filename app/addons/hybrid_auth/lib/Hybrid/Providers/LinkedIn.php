@@ -73,7 +73,7 @@ class Hybrid_Providers_LinkedIn extends Hybrid_Provider_Model_OAuth2 {
         $response = $response ? json_decode($response, true) : [];
 
         if (empty($response['id'])) {
-            throw new Exception($response['message'], 6);
+            throw new Exception(empty($response['message']) ? '' : $response['message'], 6);
         }
 
         // Handle localized names.

@@ -31,7 +31,6 @@
         <input type="checkbox"
                name="store_location_data[shipping_destinations][{literal}${data.destination_id}{/literal}][warn_about_delay]"
                value="1"
-               class="checkbox--large"
                {literal}
                    ${data.warn_about_delay
                        ? `checked="checked"`

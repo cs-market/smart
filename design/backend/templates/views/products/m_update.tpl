@@ -157,8 +157,7 @@
                             </table>
                         {elseif $field == "tracking"}
                             <select    id="field_{$field}__" name="override_products_data[{$field}]" class="elm-disabled" disabled="disabled">
-                                <option value="{"ProductTracking::TRACK_WITH_OPTIONS"|enum}">{__("track_with_options")}</option>
-                                <option value="{"ProductTracking::TRACK_WITHOUT_OPTIONS"|enum}">{__("track_without_options")}</option>
+                                <option value="{"ProductTracking::TRACK"|enum}">{__("track")}</option>
                                 <option value="{"ProductTracking::DO_NOT_TRACK"|enum}">{__("dont_track")}</option>
                             </select>
                         {elseif $field == "zero_price_action"}
@@ -366,6 +365,8 @@
                                     select2_select_id="categories_add_`$product.product_id`"
                                     select2_wrapper_meta="form-inline object-categories-add--fix-width"
                                     select2_width="100%"
+                                    product_id=$product.product_id
+                                    is_multiple_update=true
                                 }
                             {elseif $type == "W"} {* Product details layout *}
                                 <select name="{$name}[{$product.product_id}][{$field}]">
@@ -393,9 +394,8 @@
                         {if $field == "main_pair"}
                             <table width="420"><tr><td>{include file="common/attach_images.tpl" image_name="product_main" image_key=$product.product_id image_pair=$product.main_pair image_object_id=$product.product_id image_object_type="product" image_type="M" no_thumbnail=true}</td></tr></table>
                         {elseif $field == "tracking"}
-                            <select    name="products_data[{$product.product_id}][{$field}]">
-                                <option value="{"ProductTracking::TRACK_WITH_OPTIONS"|enum}" {if $product.tracking == "ProductTracking::TRACK_WITH_OPTIONS"|enum}selected="selected"{/if}>{__("track_with_options")}</option>
-                                <option value="{"ProductTracking::TRACK_WITHOUT_OPTIONS"|enum}" {if $product.tracking == "ProductTracking::TRACK_WITHOUT_OPTIONS"|enum}selected="selected"{/if}>{__("track_without_options")}</option>
+                            <select name="products_data[{$product.product_id}][{$field}]">
+                                <option value="{"ProductTracking::TRACK"|enum}" {if $product.tracking != "ProductTracking::DO_NOT_TRACK"|enum}selected="selected"{/if}>{__("track")}</option>
                                 <option value="{"ProductTracking::DO_NOT_TRACK"|enum}" {if $product.tracking == "ProductTracking::DO_NOT_TRACK"|enum}selected="selected"{/if}>{__("dont_track")}</option>
                             </select>
                         {elseif $field == "zero_price_action"}

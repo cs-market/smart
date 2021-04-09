@@ -6,6 +6,7 @@
 
 {$order_status_descr = $smarty.const.STATUSES_ORDER|fn_get_simple_statuses:true:true}
 {$order_statuses = $smarty.const.STATUSES_ORDER|fn_get_statuses:$statuses:true:true}
+{$can_change_status = "orders.update_status"|fn_check_view_permissions:"POST"}
 
 {capture name="sidebar"}
     {hook name="orders:manage_sidebar"}
@@ -30,12 +31,12 @@
             
 {if $orders}
 {hook name="orders:bulk_edit"}
-    {include file="views/orders/components/bulk_edit.tpl"}
+    {include file="views/orders/components/bulk_edit.tpl" can_change_status=$can_change_status}
 {/hook}
 
 <div class="table-responsive-wrapper longtap-selection">
     <table width="100%" class="table table-middle table--relative table-responsive table-manage-orders">
-    <thead data-ca-bulkedit-default-object="true">
+    <thead data-ca-bulkedit-default-object="true" data-ca-bulkedit-component="defaultObject">
     <tr>
         <th width="6%" class="left mobile-hide">
 
@@ -192,10 +193,14 @@
 
 {capture name="buttons"}
     {capture name="tools_list"}
+        <li class="bulkedit-action--legacy hide">{btn type="list" text=__("view_purchased_products") dispatch="dispatch[orders.products_range]" form="orders_list_form"}</li>
+        <li class="bulkedit-action--legacy hide divider"></li>
+        <li class="bulkedit-action--legacy hide mobile-hide">{btn type="list" text=__("export_selected") dispatch="dispatch[orders.export_range]" form="orders_list_form"}</li>
+        <li class="bulkedit-action--legacy hide mobile-hide">{btn type="delete_selected" dispatch="dispatch[orders.m_delete]" form="orders_list_form"}</li>
         {hook name="orders:list_tools"}
         {/hook}
     {/capture}
-    {dropdown content=$smarty.capture.tools_list}
+    {dropdown content=$smarty.capture.tools_list class="bulkedit-dropdown--legacy hide"}
 {/capture}
 
 {include file="common/mainbox.tpl"

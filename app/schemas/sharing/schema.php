@@ -60,38 +60,6 @@
 */
 
 return array(
-    'currencies' => array(
-        'controller' => 'currencies',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@currency_id',
-            'object' => 'currencies'
-        ),
-        'table' => array(
-            'name' => 'currencies',
-            'key_field' => 'currency_id',
-        ),
-        'request_object' => 'currency_description',
-        'have_owner' => false,
-    ),
-
-    'languages' => array(
-        'controller' => 'languages',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@lang_id',
-            'object' => 'languages'
-        ),
-        'table' => array(
-            'name' => 'languages',
-            'key_field' => 'lang_id',
-        ),
-        'request_object' => 'language',
-        'have_owner' => false,
-    ),
-
     'profile_fields' => array(
         'controller' => 'profile_fields',
         'mode' => 'update',

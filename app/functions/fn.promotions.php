@@ -14,12 +14,15 @@
 ****************************************************************************/
 
 use Tygh\Enum\ProductFeatures;
+use Tygh\Enum\YesNo;
 use Tygh\Exceptions\DeveloperException;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Navigation\LastView;
 use Tygh\Registry;
 use Tygh\Languages\Languages;
 use Tygh\Tygh;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ImagePairTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -41,11 +44,12 @@ function fn_get_promotions($params, $items_per_page = 0, $lang_code = CART_LANGU
     $params = LastView::instance()->update('promotions', $params);
 
     // Set default values to input params
-    $default_params = array (
-        'page' => 1,
+    $default_params = [
+        'page'           => 1,
         'items_per_page' => $items_per_page,
-        'get_hidden' => true
-    );
+        'get_hidden'     => true,
+        'extend'         => []
+    ];
 
     if (AREA == 'C' && !isset($params['storefront_id'])) {
         $storefront = Tygh::$app['storefront'];
@@ -64,24 +68,28 @@ function fn_get_promotions($params, $items_per_page = 0, $lang_code = CART_LANGU
     fn_set_hook('get_promotions_pre', $params, $items_per_page, $lang_code);
 
     // Define fields that should be retrieved
-    $fields = array (
+    $fields = [
         '?:promotions.*',
         '?:promotion_descriptions.name',
         '?:promotion_descriptions.detailed_description',
         '?:promotion_descriptions.short_description',
-    );
+    ];
 
     // Define sort fields
-    $sortings = array (
-        'name' => '?:promotion_descriptions.name',
+    $sortings = [
+        'name'     => '?:promotion_descriptions.name',
         'priority' => '?:promotions.priority',
-        'zone' => '?:promotions.zone',
-        'status' => '?:promotions.status',
-    );
+        'zone'     => '?:promotions.zone',
+        'status'   => '?:promotions.status',
+        'stop_other_rules_and_priority' => [
+            '?:promotions.stop_other_rules',
+            '?:promotions.priority',
+        ],
+    ];
 
     $condition = $join = $group = '';
 
-    $statuses = array('A');
+    $statuses = ['A'];
     if (!empty($params['get_hidden'])) {
         $statuses[] = 'H';
     }
@@ -137,6 +145,16 @@ function fn_get_promotions($params, $items_per_page = 0, $lang_code = CART_LANGU
         );
         $condition .= db_quote(' AND (storefronts_promotions.storefront_id = ?i OR storefronts_promotions.storefront_id IS NULL)', $params['storefront_id']);
     }
+
+    if (in_array('get_images', $params['extend'])) {
+        $fields[] = '?:promotion_images.promotion_image_id';
+        $join .= db_quote(
+            ' LEFT JOIN ?:promotion_images ON ?:promotion_images.promotion_id = ?:promotions.promotion_id'
+            . ' AND ?:promotion_images.lang_code = ?s',
+            $lang_code
+        );
+    }
+
 
     /**
      *  This hook allows you to modify the parameters by which the selection from the database will be performed
@@ -194,6 +212,19 @@ function fn_get_promotions($params, $items_per_page = 0, $lang_code = CART_LANGU
         }
     }
 
+    if (in_array('get_images', $params['extend'])) {
+        $promo_image_ids = array_filter(array_column($promotions, 'promotion_image_id'));
+        if (!empty($promo_image_ids)) {
+            $images = fn_get_image_pairs($promo_image_ids, 'promotion', ImagePairTypes::MAIN, true, false, $lang_code);
+
+            foreach ($promotions as $promo_id => &$promo) {
+                $image_id = $promo['promotion_image_id'];
+                $promo['image'] = empty($images[$image_id]) ? [] : reset($images[$image_id]);
+            }
+            unset($promo);
+        }
+    }
+
     /**
      * This hook allows you to modify the parameters and the result of the function after it has been executed.
      *
@@ -219,35 +250,35 @@ function fn_get_promotions($params, $items_per_page = 0, $lang_code = CART_LANGU
  */
 function fn_promotion_apply($zone, &$data, &$auth = NULL, &$cart_products = NULL)
 {
-    static $promotions = array();
-    $applied_promotions = array();
+    static $promotions = [];
+    $applied_promotions = [];
+    $get_promotions_params = [
+        'active' => true,
+        'expand' => true,
+        'zone' => $zone,
+        'sort_by' => 'stop_other_rules_and_priority',
+        'sort_order' => 'descasc',
+    ];
+
+    $storefront = Tygh::$app['storefront'];
+    $get_promotions_params['storefront_id'] = $storefront->storefront_id;
 
     /**
      * Executes when applying promotions, before obtaining applicable promotions.
      * Allows to modify cached promotions list.
      *
-     * @param string     $zone               Promotiontion zone (catalog, cart)
-     * @param array      $data               Data array (product - for catalog rules, cart - for cart rules)
-     * @param array|null $auth               Authentication information (for cart rules)
-     * @param array|null $cart_products      Cart products (for cart rules)
-     * @param array      $promotions         Cached promotions
-     * @param array      $applied_promotions Applied promotions
+     * @param string     $zone                  Promotiontion zone (catalog, cart)
+     * @param array      $data                  Data array (product - for catalog rules, cart - for cart rules)
+     * @param array|null $auth                  Authentication information (for cart rules)
+     * @param array|null $cart_products         Cart products (for cart rules)
+     * @param array      $promotions            Cached promotions
+     * @param array      $applied_promotions    Applied promotions
+     * @param array      $get_promotions_params Promotions search params
      */
-    fn_set_hook('promotion_apply_before_get_promotions', $zone, $data, $auth, $cart_products, $promotions, $applied_promotions);
+    fn_set_hook('promotion_apply_before_get_promotions', $zone, $data, $auth, $cart_products, $promotions, $applied_promotions, $get_promotions_params);
 
     if (!isset($promotions[$zone])) {
-        $params = array(
-            'active' => true,
-            'expand' => true,
-            'zone' => $zone,
-            'sort_by' => 'priority',
-            'sort_order' => 'asc'
-        );
-
-        $storefront = Tygh::$app['storefront'];
-        $params['storefront_id'] = $storefront->storefront_id;
-
-        list($promotions[$zone]) = fn_get_promotions($params);
+        list($promotions[$zone]) = fn_get_promotions($get_promotions_params);
     }
 
     // If we're in cart, set flag that promotions available
@@ -310,6 +341,7 @@ function fn_promotion_apply($zone, &$data, &$auth = NULL, &$cart_products = NULL
             fn_promotion_check_coupon($data, true);
         }
     }
+
     foreach ($promotions[$zone] as $promotion) {
         // Rule is valid and can be applied
         if ($zone == 'cart') {
@@ -320,7 +352,7 @@ function fn_promotion_apply($zone, &$data, &$auth = NULL, &$cart_products = NULL
                 $applied_promotions[$promotion['promotion_id']] = $promotion;
 
                 // Stop processing further rules, if needed
-                if ($promotion['stop'] == 'Y') {
+                if (YesNo::toBool($promotion['stop']) || YesNo::toBool($promotion['stop_other_rules'])) {
                     break;
                 }
             }
@@ -413,7 +445,7 @@ function fn_check_promotion_notices()
         foreach (Tygh::$app['session']['promotion_notices'] as $addon => $notices) {
             if (!empty($notices['messages'])) {
                 foreach ($notices['messages'] as $message_key) {
-                    fn_set_notification('W', __('warning'), __($message_key), '', $message_key);
+                    fn_set_notification(NotificationSeverity::WARNING, __('warning'), __($message_key), '', $message_key);
                     break;
                 }
                 unset(Tygh::$app['session']['promotion_notices']);
@@ -816,24 +848,22 @@ function fn_promotion_validate($promotion_id, $promotion, $data, $auth, $cart_pr
         $parent_order_id = $data['parent_order_id'];
 
         if (!isset($parent_orders[$parent_order_id])) {
-            $parent_orders[$parent_order_id] = array(
-                'cart' => array(
-                    'order_id' => $parent_order_id
-                ),
-                'cart_products' => array(),
-                'product_groups' => array(),
-            );
-
-            fn_form_cart($parent_order_id, $parent_orders[$parent_order_id]['cart'], $auth);
-            list (
-                $parent_orders[$parent_order_id]['cart_products'],
-                $parent_orders[$parent_order_id]['product_groups']
-            ) = fn_calculate_cart_content($parent_orders[$parent_order_id]['cart'], $auth);
+            $parent_orders[$parent_order_id] = fn_get_order_info($parent_order_id);
         }
 
         if (isset($parent_orders[$parent_order_id])) {
-            $data = $parent_orders[$parent_order_id]['cart'];
-            $cart_products = $parent_orders[$parent_order_id]['cart_products'];
+            $data = $parent_orders[$parent_order_id];
+            $data['user_data'] = fn_array_merge(
+                fn_check_table_fields($data, 'users'),
+                fn_check_table_fields($data, 'user_profiles')
+            );
+            $cart_products = [];
+
+            foreach ($parent_orders[$parent_order_id]['product_groups'] as $product_group) {
+                foreach ($product_group['products'] as $key => $product) {
+                    $cart_products[$key] = $product;
+                }
+            }
         }
     }
 
@@ -1406,8 +1436,12 @@ function fn_promotion_validate_product($promotion, $product, $cart_products)
                 }
             }
 
-            foreach ($product['product_options'] as $item) {
-                $options[$item['option_id']] = $item['value'];
+            foreach ($product['product_options'] as $key => $item) {
+                if (isset($item['option_id']) && isset($item['value'])) {
+                    $options[$item['option_id']] = $item['value'];
+                    continue;
+                }
+                $options[$key] = $item;
             }
 
             $upd_product = array('product_options' => $options, 'product_id' => $product['product_id'], 'amount' => $product['amount']);
@@ -1611,7 +1645,31 @@ function fn_get_promotion_data($promotion_id, $lang_code = DESCR_SL)
         $extra_condition = db_quote(' AND p.zone = ?s', 'catalog');
     }
 
-    $promotion_data = db_get_row("SELECT * FROM ?:promotions as p LEFT JOIN ?:promotion_descriptions as d ON p.promotion_id = d.promotion_id AND d.lang_code = ?s WHERE p.promotion_id = ?i ?p", $lang_code, $promotion_id, $extra_condition);
+    $fields = [
+        'p.*',
+        'd.*',
+        'images.promotion_image_id'
+    ];
+
+    $joins = [
+        'promotion_descriptions' => db_quote(
+            'LEFT JOIN ?:promotion_descriptions as d'
+            . ' ON p.promotion_id = d.promotion_id AND d.lang_code = ?s',
+            $lang_code
+        ),
+        'promotion_images'       => db_quote(
+            ' LEFT JOIN ?:promotion_images AS images'
+            . ' ON images.promotion_id = p.promotion_id AND images.lang_code = ?s',
+            $lang_code
+        )
+    ];
+
+    $promotion_data = db_get_row('SELECT ?p FROM ?:promotions as p ?p WHERE p.promotion_id = ?i ?p',
+        implode(', ', $fields),
+        implode(' ', $joins),
+        $promotion_id,
+        $extra_condition
+    );
 
     if (!empty($promotion_data)) {
         $promotion_data['conditions'] = !empty($promotion_data['conditions']) ? unserialize($promotion_data['conditions']) : array();
@@ -1619,7 +1677,7 @@ function fn_get_promotion_data($promotion_id, $lang_code = DESCR_SL)
 
         /** @var \Tygh\Storefront\Repository $repository */
         $repository = Tygh::$app['storefront.repository'];
-        list($storefronts,) = $repository->find(['promotion_ids' => $promotion_data['promotion_id']]);
+        list($storefronts,) = $repository->find(['promotion_ids' => $promotion_data['promotion_id'], 'get_total' => false]);
         $promotion_data['storefront_ids'] = implode(',', array_keys($storefronts));
 
         if (!empty($promotion_data['conditions']['conditions'])) {
@@ -1630,6 +1688,18 @@ function fn_get_promotion_data($promotion_id, $lang_code = DESCR_SL)
                 }
             }
         }
+    }
+
+    if (!empty($promotion_data)) {
+        $promotion_data['image'] = fn_get_image_pairs(
+            $promotion_data['promotion_image_id'],
+            'promotion',
+            ImagePairTypes::MAIN,
+            true,
+            false,
+            $lang_code
+        );
+
     }
 
     return $promotion_data;
@@ -1900,10 +1970,10 @@ function fn_delete_promotions($promotion_ids)
             }
         }
     }
-
     foreach ($promotion_ids as $pr_id) {
         db_query('DELETE FROM ?:promotions WHERE promotion_id = ?i', $pr_id);
         db_query('DELETE FROM ?:promotion_descriptions WHERE promotion_id = ?i', $pr_id);
+        fn_promotions_delete_image($pr_id);
     }
 
     /**
@@ -1990,19 +2060,35 @@ function fn_promotion_shippings($promotion_condition, $cart)
 {
     $result = false;
 
-    if ($promotion_condition['operator'] == 'eq') {
+    if ($promotion_condition['operator'] === 'eq') {
         $result = false;
-    } elseif ($promotion_condition['operator'] == 'neq') {
+    } elseif ($promotion_condition['operator'] === 'neq') {
         $result = true;
     }
 
+    $chosen_shipping = [];
+
     if (!empty($cart['chosen_shipping'])) {
-        foreach ($cart['chosen_shipping'] as $id) {
-            if ($promotion_condition['operator'] == 'eq' && $id == $promotion_condition['value']) {
-                $result = true;
-            } elseif ($promotion_condition['operator'] == 'neq' && $id != $promotion_condition['value']) {
-                $result = false;
+        $chosen_shipping = $cart['chosen_shipping'];
+    }
+
+    if (empty($chosen_shipping) && !empty($cart['product_groups'])) {
+        foreach ($cart['product_groups'] as $product_group) {
+            if (empty($product_group['chosen_shippings'])) {
+                continue;
             }
+
+            foreach ($product_group['chosen_shippings'] as $shipping) {
+                $chosen_shipping[] = $shipping['shipping_id'];
+            }
+        }
+    }
+
+    foreach ($chosen_shipping as $id) {
+        if ($promotion_condition['operator'] === 'eq' && (int) $id === (int) $promotion_condition['value']) {
+            $result = true;
+        } elseif ($promotion_condition['operator'] === 'neq' && (int) $id !== (int) $promotion_condition['value']) {
+            $result = false;
         }
     }
 
@@ -2179,6 +2265,8 @@ function fn_update_promotion($data, $promotion_id, $lang_code = DESCR_SL)
             $repository->save($storefront->removePromotionIds($promotion_id));
         }
     }
+
+    fn_promotions_update_image($promotion_id, $lang_code);
 
     /**
      * This hook allows you to modify the parameters and the result of the function after it has been executed.
@@ -2387,5 +2475,198 @@ function fn_promotions_filter_int_condition_value($value, $operator)
         return implode(',', $values);
     } else {
         return (int) $value;
+    }
+}
+
+/**
+ * Updates promotion image for specified language, will be uploaded for all langs if new
+ *
+ * @param int    $promotion_id Promotion identifier
+ * @param string $lang_code    Two letter language code
+ */
+function fn_promotions_update_image($promotion_id, $lang_code = DESCR_SL)
+{
+    if (empty($promotion_id)) {
+        return;
+    }
+
+    $exists_image_ids = db_get_hash_array(
+        'SELECT promotion_image_id, lang_code FROM ?:promotion_images WHERE promotion_id = ?i',
+        'lang_code',
+        $promotion_id
+    );
+
+    if (fn_filter_uploaded_data('promo_main_image_icon')) {
+        $image_data = [
+            'promotion_id' => $promotion_id,
+            'lang_code'    => $lang_code
+        ];
+
+        if (isset($exists_image_ids[$lang_code])) {
+            fn_promotions_delete_image($promotion_id, $lang_code);
+        }
+
+        $promo_image_id = db_query('INSERT INTO ?:promotion_images ?e', $image_data);
+    }
+
+    if (empty($promo_image_id) && empty($exists_image_ids[$lang_code])) {
+        return;
+    }
+
+    $promo_image_id = empty($promo_image_id) ? $exists_image_ids[$lang_code] : $promo_image_id;
+    fn_attach_image_pairs('promo_main', 'promotion', $promo_image_id, $lang_code);
+
+    if (empty($exists_image_ids)) {
+        fn_promotions_copy_image_link_to_langs($promotion_id, $lang_code);
+    }
+}
+
+/**
+ * Deletes promotion image
+ *
+ * @param int         $promotion_id Promotion identifier
+ * @param null|string $lang_code    Two letter language code
+ */
+function fn_promotions_delete_image($promotion_id, $lang_code = null)
+{
+    $conditions = [
+        'promotion_id' => (int) $promotion_id,
+        'lang_code'    => $lang_code ? (string) $lang_code : null
+    ];
+
+    $images = db_get_array('SELECT promotion_image_id FROM ?:promotion_images WHERE ?w', array_filter($conditions));
+
+    if (empty($images)) {
+        return;
+    }
+
+    $promotion_image_ids = array_column($images, 'promotion_image_id');
+    $promotion_image_pairs = fn_get_image_pairs($promotion_image_ids, 'promotion', ImagePairTypes::MAIN);
+
+    db_query('DELETE FROM ?:promotion_images WHERE promotion_image_id IN (?n)', $promotion_image_ids);
+
+    foreach ($promotion_image_pairs as $pairs) {
+        $pair = reset($pairs);
+        fn_delete_image($pair['image_id'], $pair['pair_id'], 'promotion');
+    }
+}
+
+/**
+ * Clones promotion images links for specified languages
+ *
+ * @param int    $promotion_id  Promotion identifier
+ * @param string $original_lang Two letter language code which data is cloned from
+ * @param array  $cloned_langs  List of two letter lang codes for cloning, will be cloned for all cart langs if empty
+ *
+ * @return bool True if success, false otherwise
+ */
+function fn_promotions_copy_image_link_to_langs($promotion_id, $original_lang = CART_LANGUAGE, array $cloned_langs = [])
+{
+    if (empty($promotion_id)) {
+        return false;
+    }
+
+    if (empty($cloned_langs)) {
+        $languages = Languages::getAll();
+        unset($languages[$original_lang]);
+
+        $cloned_langs = array_keys($languages);
+    }
+
+    $promotion_image = db_get_row(
+        'SELECT promo_images.promotion_image_id, images_links.pair_id'
+        . ' FROM ?:promotion_images AS promo_images'
+        . ' INNER JOIN ?:images_links AS images_links'
+        . '     ON images_links.object_id = promo_images.promotion_image_id AND images_links.object_type = ?s'
+        . ' WHERE promo_images.promotion_id = ?i AND promo_images.lang_code = ?s',
+        'promotion',
+        $promotion_id,
+        $original_lang
+    );
+
+    if (empty($promotion_image)) {
+        return false;
+    }
+
+    foreach ($cloned_langs as $lang_code) {
+        $promo_image_id = db_replace_into('promotion_images', [
+            'promotion_id' => $promotion_id,
+            'lang_code'    => $lang_code
+        ]);
+        if (empty($promo_image_id)) {
+            continue;
+        }
+        fn_add_image_link($promo_image_id, $promotion_image['pair_id']);
+    }
+
+    return true;
+}
+
+/**
+ * Clones promotion images links to added language
+ *
+ * @param array $language_data Information about updated languages
+ */
+function fn_promotions_update_language_post($language_data)
+{
+    $from_lang_code = empty($language_data['from_lang_code']) ? CART_LANGUAGE : $language_data['from_lang_code'];
+
+    $promotion_ids = db_get_fields(
+        'SELECT promotion_id'
+        . ' FROM ?:promotion_images'
+        . ' WHERE lang_code IN (?a)',
+        $from_lang_code
+    );
+
+    foreach ($promotion_ids as $promotion_id) {
+        fn_promotions_copy_image_link_to_langs(
+            $promotion_id,
+            $from_lang_code,
+            [$language_data['lang_code']]
+        );
+    }
+}
+
+/**
+ * Deletes promotion images for deleted languages
+ *
+ * @param array $deleted_lang_codes List of two letters language code which were deleted
+ */
+function fn_promotions_delete_languages_post($deleted_lang_codes)
+{
+    if (!$deleted_lang_codes) {
+        return;
+    }
+
+    $promotion_image_pairs = db_get_array(
+        'SELECT images_links.pair_id, images_links.image_id'
+        . ' FROM ?:promotion_images AS promo_images'
+        . ' LEFT JOIN ?:images_links AS images_links'
+        . ' ON images_links.object_id = promo_images.promotion_image_id AND images_links.object_type = ?s'
+        . ' WHERE promo_images.lang_code IN (?a)',
+        'promotion',
+        $deleted_lang_codes
+    );
+
+    foreach ($promotion_image_pairs as $pair) {
+        //Data from promotion_images table will be deleted by hook handler on 'delete_image_pre'
+        fn_delete_image($pair['image_id'], $pair['pair_id'], 'promotion');
+    }
+}
+
+/**
+ * Deletes image data specified for promotions.
+ *
+ * @param int $pair_id Identifier image pair for deleting
+ */
+function fn_promotions_delete_image_pre($pair_id)
+{
+    $promotion_image_id = db_get_field(
+        'SELECT object_id FROM ?:images_links WHERE pair_id = ?i',
+        $pair_id
+    );
+
+    if ($promotion_image_id) {
+        db_query('DELETE FROM ?:promotion_images WHERE promotion_image_id = ?i', $promotion_image_id);
     }
 }

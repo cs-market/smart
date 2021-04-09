@@ -1,5 +1,6 @@
 {$show_layout_controls = !$dynamic_object.object_id && ("ULTIMATE"|fn_allowed_for || !$runtime.company_id)}
 {$m_url = $smarty.request.manage_url|escape:"url"}
+{$storefront_id = $storefront->storefront_id|default:0}
 
 {script src="js/tygh/block_manager.js"}
 
@@ -133,7 +134,7 @@
         {/if}
         {capture name="tools_list"}
             <li>
-                {btn type="list" text=__("preview") href="{"?s_layout=`$layout_data.layout_id`"|fn_url:"C"}" target="_blank"}
+                {btn type="list" text=__("preview") href="{"?s_layout=`$layout_data.layout_id`&storefront_id=`$storefront_id`"|fn_url:"C"}" target="_blank"}
             </li>
             <li class="divider"></li>
             {if !$layouts[$layout_data.layout_id].is_default}
@@ -143,7 +144,7 @@
                 {capture name="add_new_picker"}
                     {include file="views/block_manager/components/update_layout.tpl" layout_data=$layouts[$layout_data.layout_id]}
                 {/capture}
-                {include file="common/popupbox.tpl" id="upate_layout_{$layout_data.layout_id}" text="{__("editing_layout")}: `$layout_data.name`" content=$smarty.capture.add_new_picker act="link" link_text=__("properties")}
+                {include file="common/popupbox.tpl" id="upate_layout_{$layout_data.layout_id}" text=$layout_data.name content=$smarty.capture.add_new_picker act="link" link_text=__("properties")}
             </li>
             <li class="divider"></li>
             {if !$layouts[$layout_data.layout_id].is_default}
@@ -182,7 +183,7 @@
         {foreach from=$navigation.tabs item=tab key=key name=tabs}
                 <li id="{$key}{$id_suffix}" class="{if $tab.hidden == "Y"}hidden {/if}{if $key == "location_`$location.location_id`"}active extra-tab{/if}">
                     {if $key == "location_`$location.location_id`" && $show_layout_controls}
-                        {btn type="dialog" class="cm-ajax-force hand icon-cog" href="block_manager.update_location?location=`$location.location_id`&s_layout=`$location.layout_id`" id="tab_location_`$location.location_id`" title="{__("block_manager.editing_layout_page")}: `$tab.title`"}
+                        {btn type="dialog" class="cm-ajax-force hand icon-cog" href="block_manager.update_location?location=`$location.location_id`&s_layout=`$location.layout_id`" id="tab_location_`$location.location_id`" title=$tab.title}
                     {/if}
                     <a {if $tab.href}href="{$tab.href|fn_url}"{/if}>{$tab.title}</a>
                 </li>
@@ -218,18 +219,17 @@
                     {foreach $layouts as $layout}
                         <li class="with-menu {if $layout.layout_id == $runtime.layout.layout_id} active{/if}">
                             {capture name="tools_list"}
-                                <li>{btn type="list" text=__("preview") href="{"?s_layout=`$layout.layout_id`"|fn_url:"C"}" target="_blank"}</li>
+                                <li>{btn type="list" text=__("preview") href="{"?s_layout=`$layout.layout_id`&storefront_id=`$storefront_id`"|fn_url:"C"}" target="_blank"}</li>
                                 {if $show_layout_controls}
                                     <li class="divider"></li>
                                     {if !$layout.is_default}
                                     <li>{btn type="list" text=__("make_default") href="block_manager.set_default_layout?layout_id={$layout.layout_id}&from_layout_id={$layout_data.layout_id}" class="cm-ajax" data=["data-ca-target-id" => "actions_panel,block_manager_sidebar"] method="POST"}</li>
                                     {/if}
-
                                     <li>
                                         {capture name="add_new_picker"}
                                             {include file="views/block_manager/components/update_layout.tpl" layout_data=$layout}
                                         {/capture}
-                                        {include file="common/popupbox.tpl" id="upate_layout_{$layout.layout_id}" text="{__("editing_layout")}: `$layout.name`" content=$smarty.capture.add_new_picker act="link" link_text=__("properties")}
+                                        {include file="common/popupbox.tpl" id="upate_layout_{$layout.layout_id}" text=$layout.name content=$smarty.capture.add_new_picker act="link" link_text=__("properties")}
                                     </li>
 
                                     {if !$layout.is_default}

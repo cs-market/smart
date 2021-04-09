@@ -55,7 +55,7 @@ $schema['export_fields'][PRODUCT_VARIATION_EXIM_DEFAULT_VARIATION] = [
 ];
 
 foreach (fn_product_variations_exim_get_features() as $feature) {
-    $field = sprintf(PRODUCT_VARIATION_EXIM_FEATURE_FIELD_TEMPLATE, $feature['description']);
+    $field = sprintf(PRODUCT_VARIATION_EXIM_FEATURE_FIELD_TEMPLATE, $feature['internal_name']);
 
     $schema['export_fields'][$field] = [
         'process_get' => ['fn_product_variations_exim_get_variation_feature_value', '#key', $feature['feature_id']],

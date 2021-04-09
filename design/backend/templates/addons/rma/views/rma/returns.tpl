@@ -4,17 +4,21 @@
 
 {include file="common/pagination.tpl"}
 
-{assign var="c_url" value=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
-{assign var="c_icon" value="<i class=\"icon-`$search.sort_order_rev`\"></i>"}
-{assign var="c_dummy" value="<i class=\"icon-dummy\"></i>"}
+{$c_url = $config.current_url|fn_query_remove:"sort_by":"sort_order"}
+{$c_icon = "<i class=\"icon-`$search.sort_order_rev`\"></i>"}
+{$c_dummy = "<i class=\"icon-dummy\"></i>"}
+{$has_permissions = fn_check_permissions("rma", "delete", "admin", "POST")}
 
 {if $return_requests}
 <div class="table-responsive-wrapper">
     <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
-        <th class="left mobile-hide">
-            {include file="common/check_items.tpl"}</th>
+        <th width="6%" class="left mobile-hide">
+            {if $has_permissions}
+                {include file="common/check_items.tpl"}
+            {/if}
+        </th>
         <th width="5%" class="nowrap"><a class="cm-ajax" href="{"`$c_url`&sort_by=return_id&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("id")}{if $search.sort_by == "return_id"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         <th width="15%"><a class="cm-ajax" href="{"`$c_url`&sort_by=status&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("status")}{if $search.sort_by == "status"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         <th width="25%"><a class="cm-ajax" href="{"`$c_url`&sort_by=customer&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("customer")}{if $search.sort_by == "customer"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
@@ -27,8 +31,8 @@
     </thead>
     {foreach from=$return_requests item="request"}
     <tr>
-        <td class="left mobile-hide">
-            <input type="checkbox" name="return_ids[]" value="{$request.return_id}" class="cm-item" /></td>
+        <td width="6%" class="left mobile-hide">
+            <input type="checkbox" name="return_ids[]" value="{$request.return_id}" class="cm-item{if !$has_permissions} hide{/if}" /></td>
         <td data-th="{__("id")}"><a href="{"rma.details?return_id=`$request.return_id`"|fn_url}" class="underlined">#{$request.return_id}</a></td>
         <td data-th="{__("status")}">
             {include file="common/status.tpl" status=$request.status display="view" name="return_statuses[`$request.return_id`]" status_type=$smarty.const.STATUSES_RETURN}

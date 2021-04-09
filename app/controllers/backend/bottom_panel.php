@@ -14,6 +14,7 @@
 
 
 use Tygh\Tools\Url;
+use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -33,23 +34,44 @@ if ($mode === 'redirect') {
         return [CONTROLLER_STATUS_NO_PAGE];
     }
 
-    if (!defined('THEMES_PANEL') && $from_area != 'C') {
-        return [CONTROLLER_STATUS_NO_PAGE];
-    }
-
     $url = fn_bottom_panel_get_redirect_url($from_area, $from_url, $current_area, $current_account_type);
 
     if (empty($url)) {
-        $url = 'index.index';
+        /** @psalm-suppress TypeDoesNotContainType */
+        if (
+            $current_account_type === 'vendor'
+            && $from_area === 'A'
+            && $current_area === 'C'
+        ) {
+            // vendor microstore url
+            $url = 'companies.products?company_id=' . Registry::get('runtime.company_id');
+        } else {
+            $url = 'index.index';
+        }
     }
 
-    if ($current_area === 'C' && $current_account_type == 'admin' && !empty($user_id)) {
+    if ($current_area === 'C' && in_array($current_account_type, ['admin', 'vendor']) && !empty($user_id)) {
         $url = Url::buildUrn('profiles.act_as_user', [
             'user_id' => $user_id,
             'area' => 'C',
             'redirect_url' => $url
         ]);
         $current_area = 'A';
+    } elseif (
+        $from_area === 'C'
+        && $current_area === 'A'
+        && $current_account_type === 'vendor'
+        && !empty($user_id)
+        && !empty($_REQUEST['ekey'])
+    ) {
+        $ekey = $_REQUEST['ekey'];
+
+        $url = Url::buildUrn('auth.ekey_login', [
+            'user_id' => $user_id,
+            'area' => 'C',
+            'redirect_url' => fn_url($url, $current_area),
+            'ekey'  => $ekey
+        ]);
     }
 
     return [CONTROLLER_STATUS_REDIRECT, fn_url($url, $current_area)];

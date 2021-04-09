@@ -27,17 +27,18 @@
             title="{__("check_uncheck_all")}" 
             class="{if $check_statuses}pull-left{/if} cm-check-items {$class}" 
             {if $check_onclick}onclick="{$check_onclick}"{/if} 
-            {$check_data nofilter} 
-            {if $check_disabled}disabled="disabled"{/if} 
+            {$check_data nofilter}
+            {if $checked}checked="checked"{/if}
+            {if $is_check_disabled}disabled="disabled"{/if} 
         />
     {/if}
 {/capture}
 
-{if $check_statuses}
+{if ($check_statuses || $is_check_all_shown) && !$is_check_disabled} 
     {if !$wrap_select_actions_into_dropdown}
     <div class="btn-group btn-checkbox cm-check-items">
         <a href="" data-toggle="dropdown" class="btn dropdown-toggle">
-            <span class="caret pull-right"></span>
+            <span class="caret"></span>
         </a>
         {$smarty.capture.check_items_checkbox nofilter}
     {/if}

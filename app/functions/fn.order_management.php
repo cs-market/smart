@@ -13,6 +13,7 @@
  ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Enum\ProductOptionsApplyOrder;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -268,7 +269,7 @@ function fn_get_product_options_data($cart_products, &$cart, $params)
 
             if (
                 isset($product_data['options_type'])
-                && $product_data['options_type'] === 'S'
+                && $product_data['options_type'] === ProductOptionsApplyOrder::SEQUENTIAL
                 && isset($item['product_options'])
                 && isset($params['changed_option'][$cart_id])
             ) {

@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: tr\n"
-"X-Crowdin-File: /release-4.11.5/addons/stripe_connect.po\n"
-"X-Crowdin-File-ID: 3658\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.2/addons/stripe_connect.po\n"
+"X-Crowdin-File-ID: 4192\n"
+"PO-Revision-Date: 2021-02-01 09:14\n"
 
 msgctxt "Addons::name::stripe_connect"
 msgid "Stripe Connect payments"
@@ -39,6 +39,10 @@ msgstr "Sipariş komisyon ve tamamlanmamış ödemeler"
 msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
 msgstr "Stripe Bağlantısı"
+
+msgctxt "Languages::stripe_connect.stripe_connect_short"
+msgid "Stripe"
+msgstr ""
 
 msgctxt "Languages::stripe_connect.redirect_uri_admin"
 msgid "Redirect URI for administrator"
@@ -162,5 +166,45 @@ msgstr ""
 
 msgctxt "Languages::stripe_connect.payment_intent_error"
 msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
+msgstr ""
+
+msgctxt "Languages::log_type_stripe_connect"
+msgid "Stripe Connect"
+msgstr ""
+
+msgctxt "Languages::log_action_sc_failure"
+msgid "Error"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.log_context"
+msgid "Context"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.unexpected_payment_intent_status"
+msgid "Unexpected status \"[status]\" of PaymentIntent"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.account_link_error"
+msgid "A vendor with company ID [company_id] is not linked to a Stripe account"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.transfer_creating_error"
+msgid "An error occurred during the creation of a Stripe transfer: [error]"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.charge_creating_error"
+msgid "An error occurred during the creation of a Stripe charge: [error]"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.customer_creating_error"
+msgid "An error occurred during the creation of a Stripe customer: [error]"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.customer_sharing_error"
+msgid "An error occurred during the share of a Stripe customer: [error]"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.stripe_processor_params_missing"
+msgid "Stripe processor params missing"
 msgstr ""
 

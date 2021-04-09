@@ -58,7 +58,7 @@
                     class="cm-object-picker object-picker__select object-picker__select--profiles {$select_class}"
                     data-ca-object-picker-object-type="profiles"
                     data-ca-object-picker-escape-html="false"
-                    data-ca-object-picker-ajax-url="{"profiles.get_manager_list?company_id={$company_id}"|fn_url}"
+                    data-ca-object-picker-ajax-url="{"profiles.get_manager_list?company_id={$company_id}&ids[]={"ids[]="|implode:$item_ids}"|fn_url}"
                     data-ca-object-picker-ajax-delay="250"
                     data-ca-object-picker-autofocus="{$autofocus|to_json}"
                     data-ca-object-picker-autoopen="{$autoopen}"

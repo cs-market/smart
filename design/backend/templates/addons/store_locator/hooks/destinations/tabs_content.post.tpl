@@ -1,8 +1,8 @@
 <div class="hidden" id="content_pickup">
     {if $pickup_locations}
         <div id="pickup_list">
-            <div class="table-wrapper">
-                <table class="table table-responsive" data-ca-sortable="true" data-ca-sort-list="[[0, 0]]">
+            <div class="table-responsive-wrapper">
+                <table class="table table--relative table-responsive" data-ca-sortable="true" data-ca-sort-list="[[0, 0]]">
                     <thead>
                     <tr>
                         <th data-ca-sortable-column="true">{__("store_locator.name")}</th>

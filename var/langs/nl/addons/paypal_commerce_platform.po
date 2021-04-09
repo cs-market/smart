@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.11.5/addons/paypal_commerce_platform.po\n"
-"X-Crowdin-File-ID: 3620\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.2/addons/paypal_commerce_platform.po\n"
+"X-Crowdin-File-ID: 4174\n"
+"PO-Revision-Date: 2021-02-01 09:02\n"
 
 msgctxt "Addons::name::paypal_commerce_platform"
 msgid "PayPal Commerce Platform"
@@ -282,5 +282,13 @@ msgstr ""
 
 msgctxt "Languages::paypal_commerce_platform.style.height"
 msgid "Height"
+msgstr ""
+
+msgctxt "Languages::paypal_commerce_platform.bn_code"
+msgid "Partner integration code"
+msgstr ""
+
+msgctxt "Languages::paypal_commerce_platform.debug_id"
+msgid "PayPal Debug ID"
 msgstr ""
 

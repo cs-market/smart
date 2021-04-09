@@ -16,7 +16,9 @@
 namespace Tygh\Addons\CommerceML\Storages;
 
 
+use Tygh\Addons\CommerceML\Tools\RuntimeCacheStorage;
 use Tygh\Common\OperationResult;
+use Tygh\Registry;
 
 /**
  * Class ProductStorage
@@ -33,6 +35,11 @@ class ProductStorage
     private $default_language_code;
 
     /**
+     * @var \Tygh\Addons\CommerceML\Tools\RuntimeCacheStorage
+     */
+    private $product_features_cache;
+
+    /**
      * ProductStorage constructor.
      *
      * @param string $default_language_code Default language code
@@ -40,6 +47,7 @@ class ProductStorage
     public function __construct($default_language_code)
     {
         $this->default_language_code = $default_language_code;
+        $this->product_features_cache = new RuntimeCacheStorage(100);
     }
 
     /**
@@ -172,6 +180,72 @@ class ProductStorage
     }
 
     /**
+     * Remove image pairs
+     *
+     * @param array<int> $pair_ids Pair ids
+     */
+    public function removeImagePairs(array $pair_ids)
+    {
+        foreach ($pair_ids as $pair_id) {
+            fn_delete_image_pair($pair_id);
+        }
+    }
+
+    /**
+     * Finds product features by IDs
+     *
+     * @param array<int> $product_feautre_ids Product feature IDs
+     *
+     * @return array<int, mixed>
+     */
+    public function findProductFeatures(array $product_feautre_ids = [])
+    {
+        $result = [];
+
+        foreach ($product_feautre_ids as $key => $feautre_id) {
+            if (!$this->product_features_cache->has($feautre_id)) {
+                continue;
+            }
+            $result[$feautre_id] = $this->product_features_cache->get($feautre_id);
+            unset($product_feautre_ids[$key]);
+        }
+
+        if ($product_feautre_ids) {
+            $sharing_backup = Registry::get('runtime.skip_sharing_selection');
+            Registry::set('runtime.skip_sharing_selection', true);
+
+            $product_feautres = db_get_hash_array(
+                'SELECT feature_id, purpose, feature_type, feature_code FROM ?:product_features WHERE feature_id IN (?n)',
+                'feature_id',
+                $product_feautre_ids
+            );
+
+            Registry::set('runtime.skip_sharing_selection', $sharing_backup);
+
+            foreach ($product_feautres as $feautre_id => $feautre) {
+                $result[$feautre_id] = $feautre;
+                $this->product_features_cache->add($feautre_id, $feautre);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Finds product feature by ID
+     *
+     * @param int $product_feautre_id Product feature ID
+     *
+     * @return array<mixed>
+     */
+    public function findProductFeature($product_feautre_id)
+    {
+        $features = $this->findProductFeatures([$product_feautre_id]);
+
+        return isset($features[$product_feautre_id]) ? $features[$product_feautre_id] : [];
+    }
+
+    /**
      * Gets raw product data
      *
      * @param int $product_id Product ID
@@ -185,10 +259,23 @@ class ProductStorage
         $product_data = db_get_row('SELECT * FROM ?:products WHERE product_id = ?i', $product_id);
 
         if ($product_data) {
-            $product_data['category_ids'] = db_get_fields(
-                'SELECT category_id FROM ?:products_categories WHERE product_id = ?i',
+            $product_data['category_ids'] = [];
+            $product_data['main_category'] = null;
+
+            $category_links = db_get_array(
+                'SELECT category_id, link_type FROM ?:products_categories WHERE product_id = ?i',
                 $product_id
             );
+
+            foreach ($category_links as $link) {
+                $product_data['category_ids'][] = (int) $link['category_id'];
+
+                if ($link['link_type'] !== 'M' || $product_data['main_category']) {
+                    continue;
+                }
+
+                $product_data['main_category'] = (int) $link['category_id'];
+            }
 
             $product_data['images'] = db_get_hash_array(
                 'SELECT images.*, links.*, images.image_id AS images_image_id'

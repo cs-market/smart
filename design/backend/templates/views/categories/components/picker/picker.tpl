@@ -37,6 +37,16 @@
 {$allow_multiple_created_objects = $allow_multiple_created_objects|default:false}
 {$close_on_select = $close_on_select|default:true}
 {$container_css_class = $container_css_class|default:".object-picker--categories"}
+{$predefined_variants = $predefined_variants|default:[]}
+{$predefined_variant_items = []}
+
+{if $show_empty_variant}
+    {$predefined_variants["0"] = $empty_variant_text}
+{/if}
+
+{foreach $predefined_variants as $id => $variant}
+    {$predefined_variant_items[] = ["id" => $id, "text" => $variant, "data" => ["name" => $variant]]}
+{/foreach}
 
 <input type="hidden" name="{$allow_multiple_created_objects}" value=""/>
 
@@ -52,8 +62,9 @@
                     view_mode="button"
                     but_meta="object-categories-add__picker object-picker__advanced-btn object-picker__advanced-btn--categories `$object_picker_advanced_btn_class`"
                     but_icon="icon-reorder"
-                    but_text=false
-                    multiple=true
+                    but_role="add"
+                    but_text=""
+                    multiple=$multiple
                 }
             </div>
         {/if}
@@ -84,6 +95,9 @@
             data-ca-object-picker-width="{$width}"
             data-ca-object-picker-extended-picker-id="object_picker_advanced_{$picker_id}"
             data-ca-object-picker-extended-picker-text-key="{$picker_text_key}"
+            {if $view_mode == "external"}
+                data-ca-object-picker-external-container-selector="#object_picker_selected_external_{$picker_id}"
+            {/if}
             {if $allow_add}
                 data-ca-object-picker-enable-create-object="true"
                 data-ca-object-picker-template-result-new-selector="#object_picker_result_new_selector_categories_template_{$picker_id}"
@@ -91,9 +105,9 @@
                 data-ca-object-picker-created-object-holder-selector="{$created_object_holder_selector}"
                 data-ca-object-picker-allow-multiple-created-objects="{$allow_multiple_created_objects}"
             {/if}
-            {if $show_empty_variant}
+            {if $predefined_variant_items}
                 data-ca-object-picker-allow-clear="{$allow_clear}"
-                data-ca-object-picker-predefined-variants="{[["id" => 0, "text" => {$empty_variant_text}, "data" => ["name" => {$empty_variant_text}]]]|to_json}"
+                data-ca-object-picker-predefined-variants="{$predefined_variant_items|array_reverse|to_json}"
             {/if}
         >
             {foreach $item_ids as $item_id}
@@ -101,6 +115,17 @@
             {/foreach}
         </select>
     </div>
+
+    {if $view_mode === "external"}      
+        <div class="object-picker__categories-check-all {if $item_ids|@count === 0}hide-check-all{/if}" data-ca-bulkedit-default-object="true">
+            {include file="common/check_items.tpl"}
+            {btn type="delete" class="btn cm-object-picker-remove-multiple-objects" text=__("delete_selected")}
+        </div>
+
+        <div id="object_picker_selected_external_{$picker_id}" class="object-picker__selected-external object-picker__selected-external--categories {$selected_external_class}"></div>
+
+        <p class="no-items object-picker__selected-external-not-items">{__("no_data")}</p>
+    {/if}
 </div>
 
 <script type="text/template" id="object_picker_result_template_{$picker_id}" data-no-defer="true" data-no-execute="§">
@@ -113,15 +138,31 @@
     </div>
 </script>
 
-<script type="text/template" id="object_picker_selection_template_{$picker_id}" data-no-defer="true" data-no-execute="§">
-    <div class="object-picker__selection object-picker__selection--categories {$selection_class}">
-        {include file="views/categories/components/picker/item.tpl"
-            type="selection"
-            title_pre=$selection_title_pre
-            title_post=$selection_title_post
-        }
-    </div>
-</script>
+{if $view_mode == "external"}
+    <script type="text/template" id="object_picker_selection_template_{$picker_id}" data-no-defer="true" data-no-execute="§">
+        <div class="cm-object-picker-object object-picker__selection-extended object-picker__selection-extended--categories">
+            <input type="checkbox" name="category_ids[]" value="{literal}${data.id}{/literal}" class="checkbox cm-item"/>
+            {include file="views/categories/components/picker/item.tpl"
+                type="selection_external"
+                title_pre=$selection_title_pre
+                title_post=$selection_title_post
+            }
+            <a href="#" class="btn object-picker__categories-delete cm-object-picker-remove-object" title="{__("delete")}">
+                <span class="icon-remove"></span>
+            </a>
+        </div>
+    </script>
+{else}
+    <script type="text/template" id="object_picker_selection_template_{$picker_id}" data-no-defer="true" data-no-execute="§">
+        <div class="object-picker__selection object-picker__selection--categories {$selection_class}">
+            {include file="views/categories/components/picker/item.tpl"
+                type="selection"
+                title_pre=$selection_title_pre
+                title_post=$selection_title_post
+            }
+        </div>
+    </script>
+{/if}
 
 <script type="text/template" id="object_picker_selection_load_template_{$picker_id}" data-no-defer="true" data-no-execute="§">
     {include file="views/categories/components/picker/item.tpl" type="load"}

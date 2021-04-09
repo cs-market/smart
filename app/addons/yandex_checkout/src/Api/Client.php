@@ -14,12 +14,12 @@
 
 namespace Tygh\Addons\YandexCheckout\Api;
 
-use YandexCheckout\Client as BaseClient;
-use YandexCheckout\Common\HttpVerb;
-use YandexCheckout\Helpers\UUID;
-use YandexCheckout\Request\Payments\CreatePaymentRequest;
-use YandexCheckout\Request\Payments\CreatePaymentRequestSerializer;
-use YandexCheckout\Request\Payments\CreatePaymentResponse;
+use YooKassa\Client as BaseClient;
+use YooKassa\Common\HttpVerb;
+use YooKassa\Helpers\UUID;
+use YooKassa\Request\Payments\CreatePaymentRequest;
+use YooKassa\Request\Payments\CreatePaymentRequestSerializer;
+use YooKassa\Request\Payments\CreatePaymentResponse;
 
 class Client extends BaseClient
 {

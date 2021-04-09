@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: he\n"
-"X-Crowdin-File: /release-4.11.5/addons/warehouses.po\n"
-"X-Crowdin-File-ID: 3610\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/warehouses.po\n"
+"X-Crowdin-File-ID: 4180\n"
+"PO-Revision-Date: 2021-02-01 09:06\n"
 
 msgctxt "Addons::name::warehouses"
 msgid "Warehouses [Beta]"
@@ -126,7 +126,7 @@ msgstr "חלק מהמוצרים שהזמנת הם במחסן הרוחק. המש�
 
 msgctxt "Languages::warehouses.product_available_if_ordered"
 msgid "Available if ordered"
-msgstr ""
+msgstr "זמין בהזמנה"
 
 msgctxt "Languages::warehouses.product_in_stock"
 msgid "In stock"
@@ -202,5 +202,21 @@ msgstr "בחנות זו אין חנויות או מחסנים. אנא <a href=\"
 
 msgctxt "Languages::warehouses.exim_reset_inventory_tooltip"
 msgid "This won't affect the products that have the quantity specified in the imported file. This also won't affect products at the warehouses that aren't updated in this preset."
-msgstr ""
+msgstr "זה לא ישפיע על המוצרים שצוינו בכמות הקובץ המיובא. זה גם לא ישפיע על מוצרים במחסנים שאינם מעודכנים בקביעה מוגדרת זו."
+
+msgctxt "Languages::commerceml.map.entity_type.warehouse"
+msgid "Warehouses"
+msgstr "מחסנים"
+
+msgctxt "Languages::commerceml.tab.warehouse"
+msgid "Warehouses"
+msgstr "מחסנים"
+
+msgctxt "Languages::warehouses.commerceml.import.error.product.warehouse_not_found"
+msgid "Couldn't find warehouse [id]"
+msgstr "לא נמצא מחסן [id]"
+
+msgctxt "Languages::warehouses.commerceml.import.message.warehouse.created"
+msgid "Category [id] created; local ID: [local_id]"
+msgstr "נוצרה קטגוריה [id]; מזהה מקומי: [local_id]"
 

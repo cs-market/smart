@@ -38,15 +38,15 @@ class VariableCollectionFactory
     /**
      * Create collection from schema.
      *
-     * @param string    $schema_dir     Scheme name (subdirectory in /schema directory).
-     * @param string    $schema_name    Scheme file name.
-     * @param IContext  $context        Instance of context.
+     * @param string   $schema_dir  Scheme name (subdirectory in /schema directory).
+     * @param string   $schema_name Scheme file name.
+     * @param IContext $context     Instance of context.
      *
      * @return Collection
      */
     public function createCollection($schema_dir, $schema_name, IContext $context)
     {
-        $variables = array();
+        $variables = [];
         $schema_variables = $this->getVariablesSchema($schema_dir, $schema_name);
 
         if ($schema_variables) {

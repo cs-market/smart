@@ -12,7 +12,7 @@
 
     <autoload>
         <psr4 prefix="Tygh\Addons\YandexCheckout\">src</psr4>
-        <psr4 prefix="YandexCheckout\">lib/vendor/yandex-money/yandex-checkout-sdk-php/lib</psr4>
+        <psr4 prefix="YooKassa\">lib/vendor/yoomoney/yookassa-sdk-php/lib</psr4>
     </autoload>
 
     <bootstrap>\Tygh\Addons\YandexCheckout\Bootstrap</bootstrap>

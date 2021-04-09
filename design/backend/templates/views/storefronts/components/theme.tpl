@@ -14,7 +14,7 @@ string  $theme_url     Theme selection URL
 {if $id}
     <div class="control-group">
         <label for="theme_{$id}"
-               class="control-label cm-required"
+               class="control-label"
         >
             {__("store_theme")}
         </label>

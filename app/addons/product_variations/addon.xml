@@ -20,19 +20,23 @@
     <bootstrap>\Tygh\Addons\ProductVariations\Bootstrap</bootstrap>
     <installer>\Tygh\Addons\ProductVariations\Installer</installer>
 
-    <settings edition_type="ROOT">
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>
-                    <item id="variations_allow_own_images">
+                    <item id="variations_allow_own_images" edition_type="ROOT">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>
-                    <item id="variations_allow_own_features">
+                    <item id="variations_allow_own_features" edition_type="ROOT">
                         <type>checkbox</type>
                         <default_value>N</default_value>
                     </item>
-                    <item id="variations_allow_auto_change_default_variation">
+                    <item id="variations_allow_auto_change_default_variation" edition_type="ROOT">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item>
+                    <item id="variations_show_all_possible_feature_variants" edition_type="ROOT,STOREFRONT">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>

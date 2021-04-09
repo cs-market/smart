@@ -27,6 +27,9 @@ class OfferFeature
     /** @var string */
     protected $type;
 
+    /** @var string */
+    protected $purpose;
+
     /** @var int */
     protected $id;
 
@@ -109,6 +112,22 @@ class OfferFeature
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPurpose()
+    {
+        return $this->purpose;
+    }
+
+    /**
+     * @param string $purpose Feature purpose
+     */
+    public function setPurpose($purpose)
+    {
+        $this->purpose = $purpose;
     }
 
     /**

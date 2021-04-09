@@ -23,11 +23,14 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
  */
 function fn_advanced_import_filter_out_null_values(&$row)
 {
-    foreach ($row as $key => $value) {
+    $global_settings_schema = fn_get_schema('products', 'globals');
 
-        if ($value === null) {
-            unset($row[$key]);
+    foreach ($row as $key => $value) {
+        if ($value !== null || isset($global_settings_schema[$key])) {
+            continue;
         }
+
+        unset($row[$key]);
     }
 
     return true;

@@ -24,13 +24,13 @@ class SettingsTest extends ATestCase
             ->getMock();
 
         $this->storage_settings->method('getValue')->willReturnMap(array(
-            array('retailcrm_map_order_statuses', 'retailcrm', null, json_encode(array(
+            array('retailcrm_map_order_statuses', 'retailcrm', null, null, json_encode(array(
                 'P' => 'processed',
                 'C' => 'complete',
                 'O' => 'new',
                 'I' => 'cancel-other'
             ))),
-            array('retailcrm_map_payment_types', 'retailcrm', null, json_encode(array(
+            array('retailcrm_map_payment_types', 'retailcrm', null, null, json_encode(array(
                 '1' => 'bank-card',
                 '2' => 'e-money',
                 '3' => 'credit'

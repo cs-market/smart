@@ -14,6 +14,7 @@
 
 use Tygh\Enum\ProductFeatures;
 use Tygh\Enum\ProfileFieldSections;
+use Tygh\Enum\ProfileFieldTypes;
 use Tygh\Registry;
 
 require_once Registry::get('config.dir.schemas') . 'block_manager/blocks.functions.php';
@@ -79,7 +80,9 @@ $schema = array(
         'wrappers' => 'blocks/wrappers',
         'cache' => array(
             'update_handlers' => array('menus', 'menus_descriptions', 'static_data'),
-            'request_handlers' => array('*')
+            'callable_handlers' => array(
+                'request' => ['fn_blocks_menu_get_request_hash', ['$block_data', '$_REQUEST', '$_SERVER']]
+            ),
         ),
         'brief_info_function' => 'fn_block_get_menu_info'
     ),
@@ -233,11 +236,10 @@ $schema = array(
                     'product_options',
                     'product_options_descriptions',
                     'product_options_exceptions',
-                    'product_options_inventory',
                     'product_global_option_links',
                 ),
                 'callable_handlers' => array(
-                    'layout' => array('fn_get_products_layout', array('$_REQUEST')),
+                    'layout' => array('fn_get_products_layout', array([])),
                     'currency' => array('fn_get_secondary_currency')
                 )
             ),
@@ -264,7 +266,6 @@ $schema = array(
                     'product_options',
                     'product_options_descriptions',
                     'product_options_exceptions',
-                    'product_options_inventory',
                     'product_global_option_links',
                 ),
                 'callable_handlers' => array(
@@ -317,10 +318,11 @@ $schema = array(
                 'hide_label' => true,
                 'fillings' => array(
                     'manually' => array(
-                        'picker' => 'pickers/products/picker.tpl',
+                        'picker' => 'views/products/components/picker/block_manager_picker.tpl',
                         'picker_params' => array(
-                            'type' => 'links',
-                            'positions' => true,
+                            'multiple' => true,
+                            'view_mode' => 'external',
+                            'show_positions' => true,
                         ),
                     ),
                     'newest' => array(
@@ -677,7 +679,7 @@ $schema = array(
             'items' => array(
                 'type' => 'enum',
                 'object' => 'filters',
-                'items_function' => 'fn_get_filters_products_count',
+                'items_function' => 'fn_product_filters_get_filters_products_count',
                 'remove_indent' => true,
                 'hide_label' => true,
                 'fillings' => array(
@@ -839,6 +841,7 @@ $schema = array(
                             'sortable'      => true,
                             'section'       => ProfileFieldSections::SHIPPING_ADDRESS,
                             'exclude_names' => ['s_country', 's_city', 's_state'],
+                            'exclude_types' => [ProfileFieldTypes::FILE],
                         ],
                         'after_save_handlers' => [
                             'checkout_visibility' => 'fn_blocks_update_shipping_address_profile_fields_visibility',
@@ -864,8 +867,9 @@ $schema = array(
                     'manually' => [
                         'picker'        => 'pickers/profile_fields/picker.tpl',
                         'picker_params' => [
-                            'sortable' => true,
-                            'section'  => ProfileFieldSections::CONTACT_INFORMATION,
+                            'sortable'      => true,
+                            'section'       => ProfileFieldSections::CONTACT_INFORMATION,
+                            'exclude_types' => [ProfileFieldTypes::FILE],
                         ],
                         'before_save_handlers' => [
                             'checkout_required_fields' => 'fn_blocks_update_contact_information_check_required_fields',
@@ -896,6 +900,7 @@ $schema = array(
                         'picker_params' => [
                             'sortable' => true,
                             'section'  => ProfileFieldSections::BILLING_ADDRESS,
+                            'exclude_types' => [ProfileFieldTypes::FILE],
                         ],
                         'after_save_handlers' => [
                             'checkout_visibility' => 'fn_blocks_update_billing_address_profile_fields_visibility',
@@ -970,11 +975,10 @@ if (fn_allowed_for('MULTIVENDOR')) {
             'product_options',
             'product_options_descriptions',
             'product_options_exceptions',
-            'product_options_inventory',
             'product_global_option_links',
         ),
         'callable_handlers' => array(
-            'layout' => array('fn_get_products_layout', array('$_REQUEST')),
+            'layout' => array('fn_get_products_layout', array([])),
             'currency' => array('fn_get_secondary_currency')
         )
     );

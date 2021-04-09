@@ -47,3 +47,40 @@ function fn_master_products_sync_update_products_count($source_product_id, $dest
         fn_update_product_count($category_ids);
     }
 }
+
+/**
+ * Sync product tabs data
+ *
+ * @param int                   $product_id              Product identifier
+ * @param array<int>            $destination_product_ids Destination product identifiers
+ * @param array<string, string> $conditions              Condition of the sync
+ */
+function fn_master_products_sync_product_tabs($product_id, array $destination_product_ids, array $conditions)
+{
+    $query = ServiceProvider::getQueryFactory()->createQuery('product_tabs', [], ['tab_id', 'product_ids']);
+    $query->addCondition("product_ids != ''");
+
+    if (isset($conditions['tab_id'])) {
+        $query->addConditions(['tab_id' => $conditions['tab_id']]);
+    }
+
+    $list = $query->select();
+
+    foreach ($list as $item) {
+        $item['product_ids'] = $product_ids = fn_explode(',', $item['product_ids']);
+
+        if (!in_array($product_id, $product_ids)) {
+            $product_ids = array_diff($product_ids, $destination_product_ids);
+        } elseif (array_diff($destination_product_ids, $product_ids)) {
+            $product_ids = array_merge($product_ids, $destination_product_ids);
+            $product_ids = array_unique($product_ids);
+        }
+
+        if ($product_ids === $item['product_ids']) {
+            continue;
+        }
+        $query = ServiceProvider::getQueryFactory()->createQuery('product_tabs');
+        $query->addConditions(['tab_id' => $item['tab_id']]);
+        $query->update(['product_ids' => implode(',', $product_ids)]);
+    }
+}

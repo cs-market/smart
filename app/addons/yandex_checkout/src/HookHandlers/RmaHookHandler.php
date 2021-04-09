@@ -22,7 +22,7 @@ use Tygh\Enum\Addons\Rma\ReturnOperationStatuses;
 use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\YesNo;
 use Tygh\Tygh;
-use YandexCheckout\Common\Exceptions\BadApiRequestException;
+use YooKassa\Common\Exceptions\BadApiRequestException;
 
 class RmaHookHandler
 {
@@ -30,7 +30,7 @@ class RmaHookHandler
      * The "rma_update_details_post" hook handler.
      *
      * Actions performed:
-     *     - Creates refund at Yandex.Checkout in right conditions.
+     *     - Creates refund at YooKassa in right conditions.
      *
      * @param array<string, string|array<string, int|string>> $data                   Information about returning products.
      * @param bool                                            $show_confirmation_page Status of next step in return process.
@@ -39,14 +39,14 @@ class RmaHookHandler
      * @param array<string, string>                           $_data                  Modified information about returning products.
      * @param string                                          $confirmed              Y - operation confirmed by user, N - operation not confirmed by user.
      *
-     * @throws \YandexCheckout\Common\Exceptions\ApiException                Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ForbiddenException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\InternalServerError         Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\NotFoundException           Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ResponseProcessingException Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\TooManyRequestsException    Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\UnauthorizedException       Yandex.Checkout API Exception.
-     * @throws \Exception                                                    Yandex.Checkout API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiException                YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ForbiddenException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\InternalServerError         YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\NotFoundException           YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ResponseProcessingException YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\TooManyRequestsException    YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\UnauthorizedException       YooKassa API Exception.
+     * @throws \Exception                                              YooKassa API Exception.
      *
      * @see \fn_rma_update_details()
      */
@@ -180,14 +180,14 @@ class RmaHookHandler
      * @param int                                                 $return_id  Return identifier.
      * @param array<string, string>                               $extra      Additional return information.
      *
-     * @throws \YandexCheckout\Common\Exceptions\ApiException                Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ForbiddenException          Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\InternalServerError         Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\NotFoundException           Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\ResponseProcessingException Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\TooManyRequestsException    Yandex.Checkout API Exception.
-     * @throws \YandexCheckout\Common\Exceptions\UnauthorizedException       Yandex.Checkout API Exception.
-     * @throws \Exception                                                    Yandex.Checkout API Exception.
+     * @throws \YooKassa\Common\Exceptions\ApiException                YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ForbiddenException          YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\InternalServerError         YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\NotFoundException           YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\ResponseProcessingException YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\TooManyRequestsException    YooKassa API Exception.
+     * @throws \YooKassa\Common\Exceptions\UnauthorizedException       YooKassa API Exception.
+     * @throws \Exception                                              YooKassa API Exception.
      */
     protected function makeRefundRequest(array $params, array $order_info, $return_id, array $extra)
     {

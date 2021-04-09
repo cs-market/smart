@@ -16,39 +16,27 @@ defined('BOOTSTRAP') or die('Access denied');
 
 use Tygh\Registry;
 use Tygh\VendorPayouts;
+use Tygh\Enum\VendorStatuses;
+use Tygh\Enum\YesNo;
 
 /** @var string $mode */
 
 if ($mode == 'index') {
     $vendor_id = Registry::get('runtime.company_id');
     if (!$vendor_id || !defined('AJAX_REQUEST')) {
-        return array(CONTROLLER_STATUS_OK);
+        return [CONTROLLER_STATUS_OK];
     }
 
-    $payouts_manager = VendorPayouts::instance(array('vendor' => $vendor_id));
-    list($is_debt_limit_exceeded, $balance,) = fn_vendor_debt_payout_is_debt_limit_exceeded($payouts_manager);
+    fn_vendor_debt_payout_check_vendor_debt($vendor_id);
 
-    $show_pay_button = $balance < 0;
-    $pay_debt_text = __('vendor_debt_payout.pay_fees');
+    list($debt_alert, $is_block_alert) = fn_vendor_debt_payout_get_dashboard_debt_alert($vendor_id);
 
-    if (fn_vendor_debt_payout_is_vendor_plans_addon_active()) {
-        list($is_payout_overdue, , , $pending_payouts) = fn_vendor_debt_payout_has_overdue_payouts($payouts_manager);
-        $show_pay_button = $show_pay_button || $pending_payouts;
+    if (empty($debt_alert)) {
+        return [CONTROLLER_STATUS_OK];
     }
 
-    $pay_debt_url = fn_vendor_debt_payout_get_pay_url($vendor_id, Tygh::$app['session']['auth']);
-
-    $block_alert = __('vendor_debt_payout.block_alert', array(
-        '[current_balance]' => Tygh::$app['formatter']->asPrice($balance),
-        '[pay_url]'         => $pay_debt_url,
-    ));
-    $show_block_alert = !empty($is_debt_limit_exceeded) || !empty($is_payout_overdue);
-
-    Tygh::$app['view']->assign(array(
-        'pay_debt_url'     => $pay_debt_url,
-        'pay_debt_text'    => $pay_debt_text,
-        'block_alert'      => $block_alert,
-        'show_block_alert' => $show_block_alert,
-        'show_pay_button'  => $show_pay_button && !$show_block_alert,
-    ));
+    Tygh::$app['view']->assign([
+        'dashboard_alert' => $debt_alert,
+        'is_block_alert'  => $is_block_alert,
+    ]);
 }

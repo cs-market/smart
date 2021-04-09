@@ -13,8 +13,11 @@
 ****************************************************************************/
 
 use MaxMind\Db\Reader;
+use Tygh\Enum\LocalizationTypes;
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Languages\Languages;
 use Tygh\Registry;
+use Tygh\Enum\DestinationElementTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -583,9 +586,9 @@ function fn_get_localization_data($localization_id , $lang_code = CART_LANGUAGE,
         }
 
         if ($additional_data == true) {
-            $loc_data['countries'] = db_get_hash_single_array("SELECT a.code, b.country FROM ?:countries as a LEFT JOIN ?:country_descriptions as b ON b.code = a.code AND b.lang_code = ?s LEFT JOIN ?:localization_elements as c ON c.element_type = 'C' AND c.element = a.code WHERE c.localization_id = ?i ORDER BY position" , array('code' , 'country'), $lang_code, $localization_id);
-            $loc_data['currencies'] = db_get_hash_single_array("SELECT a.currency_code, a.description FROM ?:currency_descriptions as a LEFT JOIN ?:localization_elements as b ON b.element_type = 'M' AND b.element = a.currency_code WHERE b.localization_id = ?i AND a.lang_code = ?s ORDER BY position" , array('currency_code' , 'description'), $localization_id, $lang_code);
-            $loc_data['languages'] = db_get_hash_single_array("SELECT a.lang_code, a.name FROM ?:languages as a LEFT JOIN ?:localization_elements as b ON b.element_type = 'L' AND b.element = a.lang_code WHERE b.localization_id = ?i ORDER BY position" , array('lang_code' , 'name'), $localization_id);
+            $loc_data['countries'] = db_get_hash_single_array('SELECT a.code, b.country FROM ?:countries as a LEFT JOIN ?:country_descriptions as b ON b.code = a.code AND b.lang_code = ?s LEFT JOIN ?:localization_elements as c ON c.element_type = ?s AND c.element = a.code WHERE c.localization_id = ?i ORDER BY position' , array('code' , 'country'), $lang_code, LocalizationTypes::COUNTRIES, $localization_id);
+            $loc_data['currencies'] = db_get_hash_single_array('SELECT a.currency_id, a.description FROM ?:currency_descriptions as a LEFT JOIN ?:localization_elements as b ON b.element_type = ?s AND b.element = a.currency_id WHERE b.localization_id = ?i AND a.lang_code = ?s ORDER BY position' , array('currency_id' , 'description'), LocalizationTypes::CURRENCIES, $localization_id, $lang_code);
+            $loc_data['languages'] = db_get_hash_single_array('SELECT a.lang_code, a.name FROM ?:languages as a LEFT JOIN ?:localization_elements as b ON b.element_type = ?s AND b.element = a.lang_code WHERE b.localization_id = ?i ORDER BY position' , array('lang_code' , 'name'), LocalizationTypes::LANGUAGES, $localization_id);
         }
     }
 
@@ -645,6 +648,8 @@ function fn_delete_destinations($destination_ids)
             db_query("DELETE FROM ?:destination_elements WHERE destination_id = ?i", $dest_id);
             db_query("DELETE FROM ?:shipping_rates WHERE destination_id = ?i", $dest_id);
             db_query("DELETE FROM ?:tax_rates WHERE destination_id = ?i", $dest_id);
+        } elseif ((int) $dest_id === 1) {
+            fn_set_notification(NotificationSeverity::WARNING, __('notice'), __('delete_default_destination_notice'));
         }
     }
 
@@ -687,6 +692,16 @@ function fn_update_destination($data, $destination_id, $lang_code = DESCR_SL)
 
         foreach (Languages::getAll() as $data['lang_code'] => $_v) {
             db_query("REPLACE INTO ?:destination_descriptions ?e", $data);
+        }
+
+        if (isset($data['add_in_all_realtime_shippings'])) {
+            $all_realtime_shippings = db_get_fields('SELECT shipping_id FROM ?:shippings WHERE rate_calculation = ?s', 'R');
+            foreach ($all_realtime_shippings as $realtime_shipping_id) {
+                db_replace_into('shipping_rates', [
+                    'shipping_id'    => $realtime_shipping_id,
+                    'destination_id' => $destination_id
+                ]);
+            }
         }
     }
 
@@ -772,4 +787,187 @@ function fn_destination_get_states($lang_code)
 
     return $states;
 
+}
+
+/**
+ * Gets short summary of all elements that rate area has.
+ *
+ * @param int    $destination_id
+ * @param string $lang_code
+ * @param array  $params
+ * @return string
+ */
+function fn_destination_get_short_summary($destination_id, $lang_code = DESCR_SL, $params = [])
+{
+    $default_params = [
+        DestinationElementTypes::STATE => [
+            'length' => 2,
+        ],
+        DestinationElementTypes::COUNTRY => [
+            'length' => 2,
+        ],
+        DestinationElementTypes::CITY => [
+            'length' => 2,
+        ],
+        DestinationElementTypes::ZIPCODE => [
+            'length' => 2,
+        ],
+    ];
+    $params = array_merge($default_params, $params);
+    $summary = '';
+    $states = db_get_array('SELECT CONCAT(d.country, ?s, b.state) as state FROM ?:states as a LEFT JOIN ?:state_descriptions as b ON b.state_id = a.state_id AND b.lang_code = ?s LEFT JOIN ?:destination_elements as c ON c.element_type = ?s AND c.element = a.state_id LEFT JOIN ?:country_descriptions as d ON d.code = a.country_code AND d.lang_code = ?s WHERE c.destination_id = ?i', ': ', $lang_code, DestinationElementTypes::STATE, $lang_code, $destination_id);
+    $states = array_column($states, 'state');
+    if (count($states) > $params[DestinationElementTypes::STATE]['length']) {
+        $summary .= __('states') . ': ' . count($states);
+    } else {
+        $states = implode(', ', $states);
+        if ($states) {
+            $summary .= $states;
+        }
+    }
+    $countries = db_get_array('SELECT b.country FROM ?:countries as a LEFT JOIN ?:country_descriptions as b ON b.code = a.code AND b.lang_code = ?s LEFT JOIN ?:destination_elements as c ON c.element_type = ?s AND c.element = a.code WHERE c.destination_id = ?i', $lang_code, DestinationElementTypes::COUNTRY, $destination_id);
+    $countries = array_column($countries, 'country');
+    if (count($countries) > $params[DestinationElementTypes::COUNTRY]['length']) {
+        if ($summary) {
+            $summary .= ', ';
+        }
+        $summary .= __('countries') . ': ' . count($countries);
+    } else {
+        $countries = implode(', ', $countries);
+        if ($countries) {
+            if ($summary) {
+                $summary .= ', ';
+            }
+            $summary .= $countries;
+        }
+    }
+    $zipcodes = db_get_array('SELECT element FROM ?:destination_elements WHERE element_type = ?s AND destination_id = ?i', DestinationElementTypes::ZIPCODE, $destination_id);
+    $zipcodes = array_column($zipcodes, 'element');
+    if (count($zipcodes) > $params[DestinationElementTypes::ZIPCODE]['length']) {
+        if ($summary) {
+            $summary .= ', ';
+        }
+        $summary .= __('zipcodes') . ': ' . count($zipcodes);
+    } else {
+        $zipcodes = implode(', ', $zipcodes);
+        if ($zipcodes) {
+            if ($summary) {
+                $summary .= ', ';
+            }
+            $summary .= $zipcodes;
+        }
+    }
+    $cities = db_get_array('SELECT element FROM ?:destination_elements WHERE element_type = ?s AND destination_id = ?i', DestinationElementTypes::CITY, $destination_id);
+    $cities = array_column($cities, 'element');
+    if (count($cities) > $params[DestinationElementTypes::CITY]['length']) {
+        if ($summary) {
+            $summary .= ', ';
+        }
+        $summary .= __('cities') . ': ' . count($cities);
+    } else {
+        $cities = implode(', ', $cities);
+        if ($cities) {
+            if ($summary) {
+                $summary .= ', ';
+            }
+            $summary .= $cities;
+        }
+    }
+    return $summary;
+}
+
+/**
+ * Selects needed destinations for destination picker
+ *
+ * @param array $params
+ * @param string $lang_code
+ *
+ * @return array
+ */
+function fn_get_destinations_for_picker(array $params, $lang_code = DESCR_SL)
+{
+    $params = array_merge(
+        [
+            'ids'               => [],
+            'shipping_id'       => null,
+            'page'              => null,
+            'page_size'         => null,
+            'q'                 => '',
+        ],
+        $params
+    );
+    $destinations = fn_get_destinations($lang_code);
+    if ($params['ids']) {
+        $destinations = array_filter(
+            $destinations,
+            function ($destination) use ($params) {
+                return in_array($destination['destination_id'], $params['ids']);
+            }
+        );
+    }
+    if ($params['q'] !== '') {
+        $destinations = array_filter(
+            $destinations,
+            function ($destination) use ($params) {
+                $search_critiera = fn_strtolower($params['q']);
+                $destination_name = fn_strtolower($destination['destination']);
+                return strstr($destination_name, $search_critiera) !== false;
+            }
+        );
+    }
+
+    $shipping_info = fn_get_shipping_info($params['shipping_id'], $lang_code);
+    $destinations = array_map(
+        function ($destination) use ($shipping_info) {
+            $destination_id = (int) $destination['destination_id'];
+            $destination_name = $destination['destination'];
+            $rates = $shipping_info['rates'][$destination_id];
+            return [
+                'id'   => $destination_id,
+                'text' => $destination_name,
+                'data' => [
+                    'destination'      => $destination_name,
+                    'destination_id'   => $destination_id,
+                    'description'      => fn_destination_get_short_summary($destination_id),
+                    'delivery_time'    => isset($rates['delivery_time'])
+                        ? $rates['delivery_time']
+                        : '',
+                    'price'       => isset($rates['base_rate'])
+                        ? $rates['base_rate']
+                        : 0,
+                    'rate_value'    => isset($rates['rate_value'])
+                        ? $rates['rate_value']
+                        : [],
+                ],
+            ];
+        },
+        $destinations
+    );
+    $objects = $destinations;
+    if ($params['page'] && $params['page_size']) {
+        $objects = array_slice($objects, ($params['page'] - 1) * $params['page_size'], $params['page_size']);
+    }
+    $total_objects = count($destinations);
+    return [$objects, $total_objects];
+}
+
+/**
+ * Returns a hash of available countries.
+ *
+ * @return string
+ *
+ * @internal
+ */
+function fn_get_hash_of_available_countries()
+{
+    Registry::registerCache('available_countries_hash', ['countries'], Registry::cacheLevel('static'));
+
+    if (Registry::isExist('available_countries_hash')) {
+        $avail_countries_hash = Registry::get('available_countries_hash');
+    } else {
+        $avail_countries_hash = md5(json_encode(fn_get_simple_countries(true)));
+        Registry::set('available_countries_hash', $avail_countries_hash);
+    }
+
+    return $avail_countries_hash;
 }

@@ -15,6 +15,7 @@
 namespace Tygh\Addons;
 
 use Tygh\Core\ApplicationInterface;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\ExSimpleXmlElement;
 use Tygh\Registry;
 use Tygh\Languages\Languages;
@@ -400,6 +401,20 @@ abstract class AXmlScheme
         }
 
         return null;
+    }
+
+    /**
+     * Gets supplier page url from addon scheme if add-on is active.
+     *
+     * @param string $status Current add-on status.
+     *
+     * @return string Url of supplier page or default option if page not defined.
+     */
+    public function getSupplierPage($status)
+    {
+        return isset($this->_xml->supplier_page) && ($status === ObjectStatuses::ACTIVE)
+            ? (string) $this->_xml->supplier_page
+            : '';
     }
 
     /**

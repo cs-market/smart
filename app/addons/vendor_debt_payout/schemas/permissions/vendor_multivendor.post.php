@@ -14,6 +14,13 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
+/**
+ * @var array<string, array<string, array>> $schema
+ */
+
+$schema['controllers']['debt']['modes']['refill_balance']['permissions'] = true;
+$schema['controllers']['debt']['modes']['drop_plans_lowers_balance']['permissions'] = false;
+
 if (isset($schema['controllers']['auth'])) {
     $schema['controllers']['auth']['permissions_blocked'] = true;
 }
@@ -44,6 +51,10 @@ if (isset($schema['controllers']['companies']['modes'])) {
         ? $schema['controllers']['companies']['modes']['get_companies_list']
         : ['permissions' => true];
     $schema['controllers']['companies']['modes']['get_companies_list']['permissions_blocked'] = true;
+}
+
+if (isset($schema['controllers']['debt']['modes']['refill_balance'])) {
+    $schema['controllers']['debt']['modes']['refill_balance']['permissions_blocked'] = true;
 }
 
 return $schema;

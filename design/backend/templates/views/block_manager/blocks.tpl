@@ -15,81 +15,91 @@
 
 
         {if $blocks}
-                <div class="table-responsive-wrapper">
-                    <table width="100%" class="table table-middle table--relative table-objects table-responsive">
-                        <thead>
-                        <tr>
-                            <th class="left mobile-hide" width="1%">
-                                {include file="common/check_items.tpl"}
-                            </th>
-                            <th width="9%"></th>
-                            <th width="20%"><a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("name")}{if $search.sort_by == "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a> /&nbsp;&nbsp;&nbsp; <a class="{$ajax_class}" href="{"`$c_url`&sort_by=type&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("type")}{if $search.sort_by == "type"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
-                            <th width="20%">{__("content")}</th>
-                            <th width="30%" class="mobile-hide">{__("locations")}</th>
-                            <th width="9%" class="center nowrap">{__("quantity")}</th>
+            {hook name="block_manager:bulk_edit"}
+                {include file="views/block_manager/components/bulk_edit.tpl"}
+            {/hook}
+
+            <div class="table-responsive-wrapper longtap-selection">
+                <table width="100%" class="table table-middle table--relative table-responsive">
+                    <thead
+                        data-ca-bulkedit-default-object="true"
+                        data-ca-bulkedit-component="defaultObject"
+                    >
+                    <tr>
+                        <th class="left mobile-hide" width="6%">
+                            {include file="common/check_items.tpl" is_check_all_shown=true}
+
+                            <input type="checkbox"
+                                class="bulkedit-toggler hide"
+                                data-ca-bulkedit-toggler="true"
+                                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+                            />
+                        </th>
+                        <th width="9%"></th>
+                        <th width="20%"><a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("name")}{if $search.sort_by == "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a> /&nbsp;&nbsp;&nbsp; <a class="{$ajax_class}" href="{"`$c_url`&sort_by=type&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("type")}{if $search.sort_by == "type"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
+                        <th width="20%">{__("content")}</th>
+                        <th width="30%" class="mobile-hide">{__("locations")}</th>
+                        <th width="9%" class="center nowrap">{__("quantity")}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach $blocks as $block}
+                        <tr class="cm-row-item " 
+                            data-ca-id="{$block.block_id}"
+                            data-ca-longtap-action="setCheckBox"
+                            data-ca-longtap-target="input.cm-item"
+                            data-ca-id="{$block.block_id}"
+                        >
+                            <td width="6%" class="left mobile-hide">
+                                <input type="checkbox" name="block_ids[]" value="{$block.block_id}" class="cm-item hide" />
+                            </td>
+                            <td width="9%" class="block-list__image">
+                                <div class="bmicon-{$block.type|replace:"_":"-"}"></div>
+                            </td>
+                            <td width="20%" class="block-name-column" data-th="{__("name")}">
+                                <input type="hidden" name="block_data[{$block.block_id}][block]" value="{$block.name}" />
+                                {include file="common/popupbox.tpl" id=$block.block_id link_text=$block.name title_start=__("editing_block") title_end=$block.name act="edit" href="block_manager.update_block?block_data[block_id]=`$block.block_id`&r_url=`$c_url|escape:url`" no_icon_link=true}<span class="muted"><small> #{$block.block_id}</small></span>
+                                <div class="block-list__labels">
+                                    <div class="block-type">
+                                        <span class="block-type__label muted">{$block_types.{$block.type}.name}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td width="20%" data-th="{__("content")}">
+                                <div class="row-status object-group-details">
+                                    {$block.info.content nofilter}
+                                </div>
+                            </td>
+                            <td width="30%" class="mobile-hide" data-th="{__("locations")}">
+                                <div class="row-status object-group-details">
+                                    {foreach $block.locations as $location}
+                                        {$location.layout_name nofilter}&nbsp;({$location.theme_name nofilter}) : {", "|implode:$location.locations nofilter};
+                                    {/foreach}
+                                </div>
+                            </td>
+                            <td width="9%" data-th="{__("quantity")}">
+                                <div class="row-status object-group-details center nowrap">
+                                    {$block.quantity nofilter}
+                                </div>
+                            </td>
+                            <td width="9%" class="nowrap mobile-hide">
+                                <div class="hidden-tools">
+                                    {capture name="tools_list"}
+                                            <li>{include file="common/popupbox.tpl" id=$block.block_id link_text=__("edit") title_start=__("editing_block") title_end=$block.name act="edit" href="block_manager.update_block?block_data[block_id]=`$block.block_id`&r_url=block_manager.blocks" no_icon_link=true}</li>
+                                            <li>{btn type="text" text=__("delete") href="block_manager.block.delete&block_id=`$block.block_id`" class="cm-confirm cm-tooltip cm-ajax cm-ajax-force cm-ajax-full-render cm-delete-row" data=["data-ca-target-id" => "pagination_contents"] method="POST"}</li>
+                                    {/capture}
+                                    {dropdown content=$smarty.capture.tools_list}
+                                </div>
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {foreach $blocks as $block}
-                                <tr class="cm-row-item " data-ca-id="{$block.block_id}">
-                                    <td class="left mobile-hide">
-                                        <input type="checkbox" name="block_ids[]" value="{$block.block_id}" class="cm-item" />
-                                    </td>
-                                    <td class="block-list__image">
-                                        <div class="bmicon-{$block.type|replace:"_":"-"}"></div>
-                                    </td>
-                                    <td class="block-name-column" data-th="{__("name")}">
-                                        <input type="hidden" name="block_data[{$block.block_id}][block]" value="{$block.name}" />
-                                        {include file="common/popupbox.tpl" id=$block.block_id link_text=$block.name title_start=__("editing_block") title_end=$block.name act="edit" href="block_manager.update_block?block_data[block_id]=`$block.block_id`&r_url=`$c_url|escape:url`" no_icon_link=true}<span class="muted"><small> #{$block.block_id}</small></span>
-                                        <div class="block-list__labels">
-                                            <div class="block-type">
-                                                <span class="block-type__label muted">{$block_types.{$block.type}.name}</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td width="13%" data-th="{__("content")}">
-                                        <div class="row-status object-group-details">
-                                            {$block.info.content nofilter}
-                                        </div>
-                                    </td>
-                                    <td width="30%" class="mobile-hide" data-th="{__("locations")}">
-                                        <div class="row-status object-group-details">
-                                            {foreach $block.locations as $location}
-                                                {$location.layout_name nofilter}&nbsp;({$location.theme_name nofilter}) : {", "|implode:$location.locations nofilter};
-                                            {/foreach}
-                                        </div>
-                                    </td>
-                                    <td width="9%" data-th="{__("quantity")}">
-                                        <div class="row-status object-group-details center nowrap">
-                                            {$block.quantity nofilter}
-                                        </div>
-                                    </td>
-                                    <td width="9%" class="nowrap mobile-hide">
-                                        <div class="hidden-tools">
-                                            {capture name="tools_list"}
-                                                    <li>{include file="common/popupbox.tpl" id=$block.block_id link_text=__("edit") title_start=__("editing_block") title_end=$block.name act="edit" href="block_manager.update_block?block_data[block_id]=`$block.block_id`&r_url=block_manager.blocks" no_icon_link=true}</li>
-                                                    <li>{btn type="text" text=__("delete") href="block_manager.block.delete&block_id=`$block.block_id`" class="cm-confirm cm-tooltip cm-ajax cm-ajax-force cm-ajax-full-render cm-delete-row" data=["data-ca-target-id" => "pagination_contents"] method="POST"}</li>
-                                            {/capture}
-                                            {dropdown content=$smarty.capture.tools_list}
-                                        </div>
-                                    </td>
-                                </tr>
-                        {/foreach}
-                        </tbody>
-                    </table>
-                </div>
+                    {/foreach}
+                    </tbody>
+                </table>
+            </div>
         {else}
             <p class="no-items">{__("no_data")}</p>
         {/if}
-
-        {capture name="buttons"}
-            {capture name="tools_list"}
-                {if $blocks}
-                    <li>{btn type="delete_selected" dispatch="dispatch[block_manager.block.m_delete]" form="manage_blocks_form"}</li>
-                {/if}
-            {/capture}
-            {dropdown content=$smarty.capture.tools_list class="mobile-hide"}
-        {/capture}
 
         {capture name="adv_buttons"}
             {include file="common/popupbox.tpl"
@@ -125,7 +135,6 @@
     content=$smarty.capture.mainbox
     adv_buttons=$smarty.capture.adv_buttons
     select_languages=true
-    buttons=$smarty.capture.buttons
     sidebar=$smarty.capture.sidebar
     content_id="manage_blocks"
 }

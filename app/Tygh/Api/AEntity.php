@@ -337,4 +337,16 @@ abstract class AEntity
 
         return DEFAULT_LANGUAGE;
     }
+
+    /**
+     * Gets currency code to display prices with.
+     *
+     * @param array<string, string> $params Request parameters
+     *
+     * @return string
+     */
+    protected function getCurrencyCode(array $params)
+    {
+        return $this->safeGet($params, 'currency', CART_PRIMARY_CURRENCY);
+    }
 }

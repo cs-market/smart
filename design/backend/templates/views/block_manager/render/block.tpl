@@ -18,7 +18,7 @@
         {/capture}
     {/if}
 
-    <div class="{$default_class|default:"device-specific-block block"} {if $status != "A"}block-off{/if} {if $parent_grid.content_align == "\Tygh\BlockManager\Grid::ALIGN_RIGHT"|constant}pull-right{elseif $parent_grid.content_align == "\Tygh\BlockManager\Grid::ALIGN_LEFT"|constant}pull-left{/if} {if $external_render}bm-external-render{/if}"
+    <div class="{$default_class|default:"device-specific-block block"} {if $status != "A"}block-off{/if} {if $external_render}bm-external-render{/if}"
          data-ca-status="{if $status != "A"}disabled{else}active{/if}"
          data-block-id="{$block_data.block_id}"
          {include file="views/block_manager/components/device_availability_attributes.tpl" item=$block_data}
@@ -28,10 +28,17 @@
             {include file="views/block_manager/components/device_icons.tpl"
                 item=$block_data
             }
-            <div class="block-header-icon {if $block_data.type}bmicon-{$block_data.type|replace:"_":"-"}{/if}" {if $parent_grid.width == 1}hidden{/if}></div>
-            <h4 class="block-header-title {if $show_for_location && $block_data.location != $show_for_location}fixed-block{/if} {if $parent_grid.width == 1}hidden{/if}">
-                {$block_data.name}
-            </h4>
+            <div class="block-header-icon {if $block_data.type}bmicon-{$block_data.type|replace:"_":"-"}{/if}"></div>
+            <div class="block-header__name">
+                <div class="block-header-title {if $show_for_location && $block_data.location != $show_for_location}fixed-block{/if}">
+                    {$block_data.name}
+                </div>
+                <div class="block-header__secondary muted">
+                    <small>
+                        #{$block_data.block_id}
+                    </small>
+                </div>
+            </div>            
         </div>
 
         <div class="bm-full-menu block-control-menu bm-control-menu {if $parent_grid.width <= 2 && !$external_render}hidden keep-hidden{/if}">

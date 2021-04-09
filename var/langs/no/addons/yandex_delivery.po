@@ -5,8 +5,8 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: no_NO\n"
 
 msgctxt "Addons::name::yandex_delivery"
-msgid "Yandex.Delivery"
-msgstr "Yandex.Delivery"
+msgid "Yandex.Delivery [Deprecated]"
+msgstr "Yandex.Delivery [Deprecated]"
 
 msgctxt "Addons::description::yandex_delivery"
 msgid "Yandex delivery service"
@@ -81,8 +81,8 @@ msgid "Weekend"
 msgstr "Weekend"
 
 msgctxt "Languages::carrier_yandex"
-msgid "Yandex.Delivery"
-msgstr "Yandex.Delivery"
+msgid "Yandex.Delivery [Deprecated]"
+msgstr "Yandex.Delivery [Deprecated]"
 
 msgctxt "Languages::yandex_delivery_shipping"
 msgid "Delivery type"

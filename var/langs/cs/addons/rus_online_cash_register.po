@@ -28,6 +28,14 @@ msgctxt "SettingsOptions::rus_online_cash_register::statuses_refund"
 msgid "Statuses for refunded orders"
 msgstr "Statuses for refunded orders"
 
+msgctxt "SettingsOptions::rus_online_cash_register::statuses_prepaid"
+msgid "Statuses for prepaid orders"
+msgstr "Statuses for prepaid orders"
+
+msgctxt "SettingsTooltips::rus_online_cash_register::statuses_prepaid"
+msgid "When an order gets one of these statuses, a prepayment receipt is issued."
+msgstr "When an order gets one of these statuses, a prepayment receipt is issued."
+
 msgctxt "SettingsTooltips::rus_online_cash_register::statuses_refund"
 msgid "When an order gets one of these statuses, a return receipt is issued."
 msgstr "When an order gets one of these statuses, a return receipt is issued."

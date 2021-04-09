@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: vi\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_plans.po\n"
-"X-Crowdin-File-ID: 3640\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.1/addons/vendor_plans.po\n"
+"X-Crowdin-File-ID: 3922\n"
+"PO-Revision-Date: 2020-12-01 09:11\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -39,6 +39,14 @@ msgstr ""
 msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
 msgstr "Cho phép các nhà cung cấp để thay đổi kế hoạch hiện tại của họ"
+
+msgctxt "SettingsOptions::vendor_plans::collect_taxes_from_vendors"
+msgid "Collect taxes from vendors"
+msgstr ""
+
+msgctxt "SettingsTooltips::vendor_plans::collect_taxes_from_vendors"
+msgid "Send collected taxes to the account of the marketplace."
+msgstr ""
 
 msgctxt "Languages::vendor_plans.vendor_plans"
 msgid "Vendor plans"
@@ -346,5 +354,21 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
 msgid "Remove the vendor from the storefronts available in his previous plan"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.advanced_vendor_plan_creation"
+msgid "Advanced vendor plan creation"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.text_vendor_plan_created"
+msgid "A new vendor plan \"[plan_name]\" has been created. You can now <a href=\"[link]\">set restrictions for vendors using this plan</a>."
+msgstr ""
+
+msgctxt "Languages::vendor_plans.commission_fee"
+msgid "[commission]% fee"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.default_vendor_plan"
+msgid "Default plan"
 msgstr ""
 

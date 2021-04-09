@@ -132,7 +132,11 @@
         color: #333;
         border: 1px solid transparent;
 
-        &:hover {
+        &--view_only {
+            cursor: not-allowed;
+        }
+
+        &:not(.cm-adv-import-placeholder--view_only):hover {
             background-color: #fff;
             line-height: 28px;
             border: 1px solid #ccc;
@@ -182,7 +186,7 @@ body[class^="screen--"] .import-field {
 .import-preset {
 
     &__checker {
-        width: 2%;
+        width: 6%;
     }
     &__preset {
         width: 20%;
@@ -190,22 +194,22 @@ body[class^="screen--"] .import-field {
         word-break: break-word;
     }
     &__run {
-        width: 8%;
+        width: 10%;
     }
     &__last-launch {
-        width: 12%;
+        width: 10%;
     }
     &__last-status {
-        width: 12%;
+        width: 10%;
     }
     &__has-modifiers {
-        width: 12%;
+        width: 10%;
     }
     &__tools {
         width: 6%;
     }
     &__file {
-        width: 28%;
+        width: 25%;
         word-break: break-all;
         word-break: break-word;
     }

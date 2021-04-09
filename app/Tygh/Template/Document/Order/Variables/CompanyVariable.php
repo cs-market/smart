@@ -27,6 +27,6 @@ class CompanyVariable extends \Tygh\Template\Document\Variables\CompanyVariable
     public function __construct(Context $context, array $config = array())
     {
         $order = $context->getOrder();
-        parent::__construct($config, $order->getCompanyId(), $context->getLangCode());
+        parent::__construct($config, $order->getCompanyId(), $context->getLangCode(), $context);
     }
 }

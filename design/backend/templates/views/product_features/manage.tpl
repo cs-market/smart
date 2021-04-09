@@ -1,26 +1,45 @@
 {script src="js/tygh/tabs.js"}
+{script src="js/tygh/backend/product_features_bulk_edit.js"}
 
 {capture name="mainbox"}
 
     {include file="common/pagination.tpl"}
 
-    {assign var="r_url" value=$config.current_url|escape:url}
+    {$r_url=$config.current_url|escape:url}
+    {$product_feature_statuses=""|fn_get_default_statuses:true}
+    {$has_permission=fn_check_permissions("product_features", "update", "admin", "POST")}
 
     <form action="{""|fn_url}" method="post" name="manage_product_features_form" id="manage_product_features_form">
+    
+    {if $has_permission}
+        {hook name="product_features:bulk_edit"}
+            {include file="views/product_features/components/bulk_edit.tpl"}
+        {/hook}
+    {/if}
+
     <input type="hidden" name="return_url" value="{$config.current_url}">
-    <div class="items-container{if ""|fn_check_form_permissions} cm-hide-inputs{/if}" id="update_features_list">
+    <div class="items-container{if ""|fn_check_form_permissions} cm-hide-inputs{/if} longtap-selection" id="update_features_list">
         {if $features}
             <div class="table-responsive-wrapper">
-                <table width="100%" class="table table-middle table--relative table-objects table-responsive">
-                    <thead>
+                <table width="100%" class="table table-middle table--relative table-responsive">
+                    <thead 
+                        data-ca-bulkedit-default-object="true" 
+                        data-ca-bulkedit-component="defaultObject"
+                    >
                     <tr>
-                        <th class="left mobile-hide" width="1%">
-                            {include file="common/check_items.tpl" check_statuses=""|fn_get_default_status_filters:true}
+                        <th width="6%" class="left mobile-hide">
+                            {include file="common/check_items.tpl" check_statuses=$product_feature_statuses}
+                            <input type="checkbox"
+                                class="bulkedit-toggler hide"
+                                data-ca-bulkedit-toggler="true"
+                                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+                            />
                         </th>
-                        <th width="20%">{__("feature")}</th>
+                        <th width="20%">{__("name")}{include file="common/tooltip.tpl" tooltip=__("internal_feature_name_tooltip")} / {__("storefront_name")}</th>
                         <th width="20%">{__("group")}</th>
                         <th class="mobile-hide" width="40%">{__("categories")}</th>
-                        <th class="mobile-hide" width="5%">&nbsp;</th>
+                        <th class="mobile-hide" width="8%">&nbsp;</th>
                         <th width="10%" class="right">{__("status")}</th>
                     </tr>
                     </thead>
@@ -41,23 +60,34 @@
                         {/if}
                         {$href_edit="product_features.update?feature_id=`$p_feature.feature_id`{if $show_in_popup}&return_url=`$r_url`{/if}"}
                         {$href_delete="product_features.delete?feature_id=`$p_feature.feature_id`&return_url=$r_url"}
+                        {$feature_category_ids = ($p_feature.categories_path) ? (","|explode:$p_feature.categories_path) : ([])}
 
-                        <tr class="cm-row-item cm-row-status-{$p_feature.status|lower}" data-ct-product_features="{$p_feature.feature_id}">
-                            <td class="left mobile-hide">
-                                <input type="checkbox" name="feature_ids[]" value="{$p_feature.feature_id}" class="cm-item cm-item-status-{$p_feature.status|lower}" />
+                        <tr class="cm-row-item cm-row-status-{$p_feature.status|lower}{if $has_permission} cm-longtap-target{/if}" 
+                            data-ct-product_features="{$p_feature.feature_id}"
+                            {if $has_permission}
+                                data-ca-longtap-action="setCheckBox"
+                                data-ca-longtap-target="input.cm-item"
+                                data-ca-id="{$p_feature.feature_id}"
+                                data-ca-category-ids="{($group_feature) ? ([]|to_json) : ($feature_category_ids|to_json)}"
+                                data-ca-feature-group="{($group_feature) ? "true" : "false"}"
+                            {/if}
+                        >
+                            <td width="6%" class="left mobile-hide">
+                                <input type="checkbox" name="feature_ids[]" value="{$p_feature.feature_id}" class="hide cm-item cm-item-status-{$p_feature.status|lower}" />
                             </td>
-                            <td data-th="{__("feature")}">
+                            <td width="20%" data-th="{__("feature")}">
                                 <div class="object-group-link-wrap">
                                     {if !$non_editable}
-                                        <a {if !$show_in_popup}href="{$href_edit|fn_url}"{/if} class="row-status cm-external-click {if $non_editable} no-underline{/if}"{if !$non_editable} data-ca-external-click-id="opener_group{$p_feature.feature_id}"{/if}>{$p_feature.description}</a>
+                                        <a {if !$show_in_popup}href="{$href_edit|fn_url}"{/if} class="row-status cm-external-click bulkedit-deselect {if $non_editable} no-underline{/if}"{if !$non_editable} data-ca-external-click-id="opener_group{$p_feature.feature_id}"{/if}>{$p_feature.internal_name}</a>
                                     {else}
-                                        <span class="unedited-element block">{$p_feature.description|default:__("view")}</span>
+                                        <span class="unedited-element block">{$p_feature.internal_name|default:__("view")}</span>
                                     {/if}
                                     <span class="muted"><small> #{$p_feature.feature_id}</small></span>
+                                    <div><small>{$p_feature.description}</small></div>
                                     {include file="views/companies/components/company_name.tpl" object=$p_feature}
                                 </div>
                             </td>
-                            <td data-th="{__("group")}">
+                            <td width="20%" data-th="{__("group")}">
                                 {if $group_feature}
                                     <div class="object-group-link-wrap cm-row-status-{$group_feature.status|lower}">
                                         {if $group_feature.status != "A"}
@@ -66,16 +96,16 @@
                                             {$group_link_class = ""}
                                         {/if}
                                         {if !$non_editable}
-                                            {include file="common/popupbox.tpl" link_class="{$group_link_class}" id="group`$group_feature.feature_id`" link_text=$group_feature.description title_start=__("editing_group") title_end=$group_feature.description act="edit" href="product_features.update?feature_id=`$group_feature.feature_id`&return_url=`$r_url`" no_icon_link=true}
+                                            {include file="common/popupbox.tpl" link_class="{$group_link_class}" id="group`$group_feature.feature_id`" link_text=$group_feature.internal_name text=$group_feature.internal_name act="edit" href="product_features.update?feature_id=`$group_feature.feature_id`&return_url=`$r_url`" no_icon_link=true}
                                         {else}
-                                            <span class="unedited-element block">{$group_feature.description|default:__("view")}</span>
+                                            <span class="unedited-element block">{$group_feature.internal_name|default:__("view")}</span>
                                         {/if}
                                     </div>
                                 {else}
                                     -
                                 {/if}
                             </td>
-                            <td class="mobile-hide" data-th="{__("categories")}">
+                            <td width="40%" class="mobile-hide" data-th="{__("categories")}">
                                 <div class="row-status object-group-details">
                                 {if $group_feature}
                                     {$group_feature.feature_description nofilter}
@@ -84,24 +114,24 @@
                                 {/if}
                                 </div>
                             </td>
-                            <td class="nowrap mobile-hide">
+                            <td width="8%" class="nowrap mobile-hide">
                                 <div class="hidden-tools">
                                     {capture name="tools_list"}
                                         {if !$non_editable}
                                             {if !$show_in_popup}
                                                 <li>{btn type="list" text=__("edit") href=$href_edit}</li>
                                             {else}
-                                                <li>{include file="common/popupbox.tpl" id="group`$p_feature.feature_id`" title_start=__("editing_product_feature") title_end=$p_feature.description act="edit" href=$href_edit no_icon_link=true}</li>
+                                                <li>{include file="common/popupbox.tpl" id="group`$p_feature.feature_id`" text=$p_feature.description act="edit" href=$href_edit no_icon_link=true}</li>
                                             {/if}
-                                            <li>{btn type="text" text=__("delete") href=$href_delete class="cm-confirm cm-tooltip cm-ajax cm-ajax-force cm-ajax-full-render cm-delete-row" data=["data-ca-target-id" => "pagination_contents"] method="POST"}</li>
+                                            <li>{btn type="text" text=__("delete") href=$href_delete class="cm-confirm cm-ajax cm-ajax-force cm-ajax-full-render cm-delete-row" data=["data-ca-target-id" => "pagination_contents"] method="POST"}</li>
                                         {else}
-                                            <li>{include file="common/popupbox.tpl" id="group`$p_feature.feature_id`" title_start=__("view_product_features") title_end=$p_feature.description act="edit" link_text=__("view") href=$href_edit no_icon_link=true}</li>
+                                            <li>{include file="common/popupbox.tpl" id="group`$p_feature.feature_id`" text=$p_feature.description act="edit" link_text=__("view") href=$href_edit no_icon_link=true}</li>
                                         {/if}
                                     {/capture}
                                     {dropdown content=$smarty.capture.tools_list}
                                 </div>
                             </td>
-                            <td class="right nowrap" data-th="{__("status")}">
+                            <td width="10%" class="right nowrap" data-th="{__("status")}">
                                 {include file="common/select_popup.tpl" popup_additional_class="dropleft" id=$p_feature.feature_id status=$p_feature.status hidden=true object_id_name="feature_id" table="product_features" update_controller="product_features"}
                             </td>
                         </tr>
@@ -131,7 +161,8 @@
     {capture name="buttons"}
         {capture name="tools_list"}
             {if $features}
-                <li>{btn type="delete_selected" dispatch="dispatch[product_features.m_delete]" form="manage_product_features_form"}</li>
+                {hook name="product_features:list_extra_links"}
+                {/hook}
             {/if}
         {/capture}
         {dropdown content=$smarty.capture.tools_list class="mobile-hide"}

@@ -65,7 +65,7 @@ class CategoryImporterTest extends StorageBasedTestCase
                 '104e79a9-816f-11e9-9c72-e0d55e229524' => 2,
                 '16b791bb-816f-11e9-9c72-e0d55e229524' => 3,
             ],
-            $import_storage->getImportEntityMapRepository()->getMap()
+            $import_storage->getImportEntityMapRepository()->getIdMap()
         );
 
         $this->assertEquals(

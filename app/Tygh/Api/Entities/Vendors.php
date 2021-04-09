@@ -16,4 +16,18 @@ namespace Tygh\Api\Entities;
 
 class Vendors extends Stores
 {
+    /**
+     * Returns privileges for Vendors entity
+     *
+     * @return array<string, string>
+     */
+    public function privileges()
+    {
+        return [
+            'create' => 'manage_vendors',
+            'update' => 'manage_vendors',
+            'delete' => 'manage_vendors',
+            'index'  => 'view_vendors'
+        ];
+    }
 }

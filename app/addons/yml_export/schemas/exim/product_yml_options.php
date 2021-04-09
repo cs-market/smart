@@ -15,6 +15,7 @@
 use Tygh\Registry;
 
 include_once(Registry::get('config.dir.addons') . 'yml_export/schemas/exim/product_yml_options.functions.php');
+include_once(Registry::get('config.dir.schemas') . 'exim/products.functions.php');
 
 $schema = array(
     'section' => 'products',

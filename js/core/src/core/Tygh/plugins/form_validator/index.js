@@ -21,6 +21,18 @@ function _fillRequirements(form, check_filter)
         lbls = $('label', form);
     }
 
+    if (form.hasClass('cm-outside-inputs')) {
+        $.each(form.get(0).elements, function (index, input) {
+            if (!input.labels || !input.labels.length) {
+                return;
+            }
+
+            input.labels.forEach(function (label) {
+                lbls = lbls.add($(label));
+            })
+        });
+    }
+
     for (var k = 0; k < lbls.length; k++) {
         lbl = $(lbls[k]);
         id = lbl.prop('for');
@@ -31,6 +43,10 @@ function _fillRequirements(form, check_filter)
         }
 
         elm = $('#' + id);
+
+        if (elm.prop('form') && (elm.prop('form') !== form.get(0))) {
+            continue;
+        }
 
         if (elm.length && !elm.prop('disabled')) {
             requirements[id] = {
@@ -43,7 +59,7 @@ function _fillRequirements(form, check_filter)
     return requirements;
 }
 
-function _checkFields(form, requirements, only_check)
+function _checkFields(form, requirements, show_validation_errors)
 {
     var set_mark, elm, lbl, container, _regexp, _message;
     var message_set = false;
@@ -210,7 +226,7 @@ function _checkFields(form, requirements, only_check)
             elm = container;
         }
 
-        if (!only_check) {
+        if (show_validation_errors) {
 
             $('[id="' + elm_id + '_error_message"].help-inline', elm.parent()).remove();
 
@@ -328,6 +344,7 @@ function _check(form, params)
 
     params = params || {};
     params.only_check = params.only_check || false;
+    params.show_validation_errors = params.show_validation_errors || !params.only_check;
 
     if (!clicked_elm) { // workaround for IE when the form has one input only
         if ($('[type=submit]', form).length) {
@@ -343,8 +360,7 @@ function _check(form, params)
         if ($.ceEvent('trigger', 'ce.formpre_' + form.prop('name'), [form, clicked_elm]) === false) {
             form_result = false;
         }
-
-        check_fields_result = _checkFields(form, requirements, params.only_check);
+        check_fields_result = _checkFields(form, requirements, params.show_validation_errors);
     }
 
     if (params.only_check) {
@@ -540,7 +556,7 @@ export const methods = {
     setClicked: function(elm) {
         clicked_elm = elm;
     },
-    check: function(only_check, filter) {
+    check: function(only_check, filter, show_validation_errors) {
         var form = $(this);
         if (typeof only_check === 'undefined') {
             only_check = true;
@@ -550,16 +566,21 @@ export const methods = {
             filter = null;
         }
 
+        if (typeof show_validation_errors === 'undefined') {
+            show_validation_errors = false;
+        }
+
         return _check(form, {
             only_check: only_check,
-            filter: filter
+            filter: filter,
+            show_validation_errors: show_validation_errors
         });
     },
-    checkFields: function(only_check, filter) {
+    checkFields: function(show_validation_errors, filter) {
         const form = $(this);
 
-        if (typeof only_check === 'undefined') {
-            only_check = true;
+        if (typeof show_validation_errors === 'undefined') {
+            show_validation_errors = true;
         }
 
         if (typeof filter === 'undefined') {
@@ -568,7 +589,7 @@ export const methods = {
 
         const requirements = _fillRequirements(form, filter);
 
-        return _checkFields(form, requirements, only_check);
+        return _checkFields(form, requirements, show_validation_errors);
     }
 };
 

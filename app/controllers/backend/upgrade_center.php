@@ -255,6 +255,11 @@ if ($mode == 'refresh') {
     return array(CONTROLLER_STATUS_OK, "upgrade_center.manage?skip_checking=true");
 
 } elseif ($mode == 'manage') {
+
+    // Some upgrade validators keep agreement in session
+    // We must clear it when upgrade install again
+    unset(Tygh::$app['session']['uc_validators']);
+    
     $tabs = array(
         'packages' => array(
             'title' => __('available_upgrades'),

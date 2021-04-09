@@ -15,13 +15,13 @@
 
     <div class="control-group">
 
-        <label class="control-label">{__("license_number")}{include file="common/tooltip.tpl" tooltip={__("addon_license_key_tooltip")}}
-            :</label>
+        <label class="control-label">{__("license_number")}:</label>
 
         <div class="controls">
             <input type="text" name="marketplace_license_key"
                    value="{$addon_data.marketplace_license_key}"
                    size="30"/>
+            <p class="muted description">{__("addon_license_key_tooltip")}</p>
         </div>
     </div>
 

@@ -10,41 +10,69 @@
 
 {capture name="mainbox"}
 
+{$has_permission = fn_check_permissions("em_subscribers", "delete", "admin", "POST")}
+
 <form action="{""|fn_url}" method="post" name="subscribers_form">
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
+
+{if $has_permission}
+    {hook name="em_subscribers:bulk_edit"}
+        {include file="addons/email_marketing/views/em_subscribers/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
+
 {if $subscribers}
-<div class="table-wrapper">
-    <table width="100%" class="table table-middle table--relative">
-    <thead>
+
+<div class="table-responsive-wrapper longtap-selection">
+    <table width="100%" class="table table-middle table--relative table-responsive">
+    <thead
+        data-ca-bulkedit-default-object="true"
+        data-ca-bulkedit-component="defaultObject"
+    >
     <tr>
-        <th width="1%">
-            {include file="common/check_items.tpl"}</th>
+        <th width="6%">
+            {include file="common/check_items.tpl" is_check_all_shown=true is_check_disabled=!$has_permission} 
+
+            <input type="checkbox"
+                class="bulkedit-toggler hide"
+                data-ca-bulkedit-toggler="true"
+                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+            />
+        </th>
         <th>{__("email")}</th>
-        <th>{__("name")}</th>
-        <th>{__("registered")}</th>
-        <th>{__("status")}</th>
-        <th>&nbsp;</th>
+        <th width="20%">{__("name")}</th>
+        <th width="20%">{__("registered")}</th>
+        <th width="10%">{__("status")}</th>
+        <th width="8%">&nbsp;</th>
     </tr>
     </thead>
     {foreach from=$subscribers item="s"}
     <tbody>
-    <tr>
-        <td>
-            <input type="checkbox" name="subscriber_ids[]" value="{$s.subscriber_id}" class="cm-item" /></td>
-        <td>
+    <tr class="cm-longtap-target"
+        {if $has_permission}
+            data-ca-longtap-action="setCheckBox"
+            data-ca-longtap-target="input.cm-item"
+            data-ca-id="{$s.subscriber_id}"
+        {/if}
+    >
+        <td width="6%" class="mobile-hide">
+            <input type="checkbox" name="subscriber_ids[]" value="{$s.subscriber_id}" class="cm-item hide" />
+        </td>
+        <td data-th="{__("email")}">
             <input type="hidden" name="subscribers[{$s.subscriber_id}][email]" value="{$s.email}" />
             <a href="mailto:{$s.email|escape:url}">{$s.email}</a>
         </td>
-        <td>
+        <td width="20%" data-th="{__("name")}">
             {$s.name|default:"-"}
         </td>
-        <td>
+        <td width="20%" data-th="{__("registered")}">
             {$s.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}
         </td>
-        <td class="center nowrap">
+        <td width="10%" class="nowrap" data-th="{__("status")}">
             {if $s.status == "A"}{__("active")}{else}{__("pending")}{/if}
         </td>
-        <td class="nowrap right">
+        <td width="8%" class="nowrap right" data-th="{__("tools")}">
             {capture name="tools_list"}
                 <li>{btn type="list" class="cm-confirm" text=__("delete") href="em_subscribers.delete?subscriber_id=`$s.subscriber_id`" method="POST"}</li>
             {/capture}
@@ -128,13 +156,11 @@
 
         {capture name="tools_list"}
             {if $em_support.manual_sync}
-            <li>{btn type="list" text=__("email_marketing.sync") href="em_subscribers.sync" method="POST"}</li>
+                <li>{btn type="list" text=__("email_marketing.sync") href="em_subscribers.sync" method="POST"}</li>
             {/if}
 
             {if $subscribers}
-            <li>{btn type="list" text=__("export_selected") dispatch="dispatch[em_subscribers.export_range]" form="subscribers_form"}</li>
-            <li>{btn type="list" text=__("email_marketing.export_all") href="exim.delete_range?section=subscribers&pattern_id=em_subscribers"|fn_url method="POST"}</li>
-            <li>{btn type="delete_selected" dispatch="dispatch[em_subscribers.m_delete]" form="subscribers_form"}</li>
+                <li>{btn type="list" text=__("email_marketing.export_all") href="exim.delete_range?section=subscribers&pattern_id=em_subscribers"|fn_url method="POST"}</li>
             {/if}
         {/capture}
         {dropdown content=$smarty.capture.tools_list}

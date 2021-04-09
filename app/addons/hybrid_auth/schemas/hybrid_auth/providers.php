@@ -12,162 +12,165 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-$schema = array(
-    'openid' => array(
+use Tygh\Enum\YesNo;
+
+/** @var array $schema */
+$schema = [
+    'openid' => [
         'provider' => 'OpenID',
         'enabled'  => false,
-    ),
-    'aol' => array(
+    ],
+    'aol' => [
         'provider' => 'AOL',
         'enabled'  => false,
-    ),
-    'google' => array(
+    ],
+    'google' => [
         'provider' => 'Google',
-        'keys' => array(
-            'id' => array(
+        'keys' => [
+            'id' => [
                 'db_field' => 'app_id',
-                'label' => 'id',
+                'label'    => 'id',
                 'required' => true
-            ),
-            'secret' => array(
+            ],
+            'secret' => [
                 'db_field' => 'app_secret_key',
-                'label' => 'secret_key',
+                'label'    => 'secret_key',
                 'required' => true
-            ),
-        ),
-        'wrapper' => array(
+            ],
+        ],
+        'wrapper' => [
             'class' => '\Tygh\HybridProvidersGoogle',
-        ),
-        'params' => array(
-            'google_callback' => array(
-                'type' => 'template',
+        ],
+        'params' => [
+            'google_callback' => [
+                'type'     => 'template',
                 'template' => 'addons/hybrid_auth/components/callback_url.tpl',
-            )
-        ),
-        'instruction' => 'hybrid_auth.instruction_google',
+            ]
+        ],
+        'instruction'           => 'hybrid_auth.instruction_google',
         'hauth_done_param_name' => 'hauth.done',
-    ),
-    'facebook' => array(
+    ],
+    'facebook' => [
         'provider' => 'Facebook',
-        'keys' => array(
-            'id' => array(
+        'keys' => [
+            'id' => [
                 'db_field' => 'app_id',
-                'label' => 'id',
+                'label'    => 'id',
                 'required' => true
-            ),
-            'secret' => array(
+            ],
+            'secret' => [
                 'db_field' => 'app_secret_key',
-                'label' => 'secret_key',
+                'label'    => 'secret_key',
                 'required' => true
-            ),
-        ),
-        'wrapper' => array(
+            ],
+        ],
+        'wrapper' => [
             'class' => '\Tygh\HybridProvidersFacebookNewScope',
-        ),
-        'params' => array(
-            'facebook_oauth_redirect_uris' => array(
-                'type' => 'template',
+        ],
+        'params' => [
+            'facebook_oauth_redirect_uris' => [
+                'type'     => 'template',
                 'template' => 'addons/hybrid_auth/components/callback_url.tpl',
-                'label' => __('hybrid_auth.facebook_oauth_redirect_uris'),
-            )
-        ),
+                'label'    => __('hybrid_auth.facebook_oauth_redirect_uris'),
+            ]
+        ],
         'instruction' => 'hybrid_auth.instruction_facebook_login',
-    ),
-    'paypal' => array(
+    ],
+    'paypal' => [
         'provider' => 'Paypal',
-        'keys' => array(
-            'id' => array(
+        'keys' => [
+            'id' => [
                 'db_field' => 'app_id',
-                'label' => 'id',
+                'label'    => 'id',
                 'required' => true
-            ),
-            'secret' => array(
+            ],
+            'secret' => [
                 'db_field' => 'app_secret_key',
-                'label' => 'secret_key',
+                'label'    => 'secret_key',
                 'required' => true
-            ),
-        ),
-        'wrapper' => array(
+            ],
+        ],
+        'wrapper' => [
             'class' => '\Tygh\HybridProvidersPaypal',
-        ),
-        'params' => array(
-            'paypal_seamless' => array(
-                'type' => 'checkbox',
-                'label' => 'paypal_seamless',
-                'default' => 'Y'
-            ),
-            'paypal_sandbox' => array(
-                'type' => 'checkbox',
+        ],
+        'params' => [
+            'paypal_seamless' => [
+                'type'    => 'checkbox',
+                'label'   => 'paypal_seamless',
+                'default' => YesNo::YES
+            ],
+            'paypal_sandbox' => [
+                'type'  => 'checkbox',
                 'label' => 'paypal_sandbox',
-            ),
-            'paypal_callback' => array(
-                'type' => 'template',
+            ],
+            'paypal_callback' => [
+                'type'     => 'template',
                 'template' => 'addons/hybrid_auth/components/callback_url.tpl',
-            )
-        ),
+            ]
+        ],
         'instruction' => 'hybrid_auth.instruction_paypal_application',
-    ),
-    'twitter' => array(
+    ],
+    'twitter' => [
         'provider' => 'Twitter',
-        'keys' => array(
-            'key' => array(
+        'keys' => [
+            'key' => [
                 'db_field' => 'app_id',
-                'label' => 'id',
+                'label'    => 'id',
                 'required' => true
-            ),
-            'secret' => array(
+            ],
+            'secret' => [
                 'db_field' => 'app_secret_key',
-                'label' => 'secret_key',
+                'label'    => 'secret_key',
                 'required' => true
-            ),
-        ),
-        'params' => array(
-            'twitter_callback' => array(
-                'type' => 'template',
-                'template' => 'addons/hybrid_auth/components/callback_url.tpl',
+            ],
+        ],
+        'params' => [
+            'twitter_callback' => [
+                'type'         => 'template',
+                'template'     => 'addons/hybrid_auth/components/callback_url.tpl',
                 'callback_url' => '/auth/twitter',
-            )
-        ),
+            ]
+        ],
         'instruction' => 'hybrid_auth.instruction_twitter'
-    ),
-    'yahoo' => array(
+    ],
+    'yahoo' => [
         'provider' => 'Yahoo',
-        'keys' => array(
-            'id' => array(
+        'keys' => [
+            'id' => [
                 'db_field' => 'app_id',
-                'label' => 'id',
+                'label'    => 'id',
                 'required' => true
-            ),
-            'secret' => array(
+            ],
+            'secret' => [
                 'db_field' => 'app_secret_key',
-                'label' => 'secret_key',
+                'label'    => 'secret_key',
                 'required' => true
-            ),
-        ),
+            ],
+        ],
         'instruction' => 'hybrid_auth.instruction_yahoo'
-    ),
-    'live' => array(
+    ],
+    'live' => [
         'provider' => 'Live',
-        'keys' => array(
-            'id' => array(
+        'keys' => [
+            'id' => [
                 'db_field' => 'app_id',
-                'label' => 'id',
+                'label'    => 'id',
                 'required' => true
-            ),
-            'secret' => array(
+            ],
+            'secret' => [
                 'db_field' => 'app_secret_key',
-                'label' => 'secret_key',
+                'label'    => 'secret_key',
                 'required' => true
-            )
-        ),
-        'params' => array(
-            'redirect_url' => array(
+            ]
+        ],
+        'params' => [
+            'redirect_url' => [
                 'type'     => 'template',
                 'template' => 'addons/hybrid_auth/components/redirect_url.tpl',
-            ),
-        ),
+            ],
+        ],
         'instruction' => 'hybrid_auth.instruction_live'
-    ),
+    ],
     'linkedin' => [
         'provider' => 'LinkedIn',
         'keys' => [
@@ -214,25 +217,25 @@ $schema = array(
         ],
         'instruction' => 'hybrid_auth.instruction_linkedin'
     ],
-    'foursquare' => array(
+    'foursquare' => [
         'provider' => 'Foursquare',
-        'keys' => array(
-            'id' => array(
+        'keys' => [
+            'id' => [
                 'db_field' => 'app_id',
-                'label' => 'id',
+                'label'    => 'id',
                 'required' => true
-            ),
-            'secret' => array(
+            ],
+            'secret' => [
                 'db_field' => 'app_secret_key',
-                'label' => 'secret_key',
+                'label'    => 'secret_key',
                 'required' => true
-            )
-        ),
-        'wrapper' => array(
+            ]
+        ],
+        'wrapper' => [
             'class' => '\Tygh\HybridProvidersFoursquare',
-        ),
+        ],
         'instruction' => 'hybrid_auth.instruction_foursquare'
-    ),
-);
+    ],
+];
 
 return $schema;

@@ -10,9 +10,7 @@ string $input_name Input name
 <div class="control-group">
     <label for="url_{$id}"
            class="control-label cm-required"
-    >
-        {__("storefront_url")}
-    </label>
+    >{__("storefront_url")}</label>
     <div class="controls">
         {if $readonly}
             {$url|puny_decode}

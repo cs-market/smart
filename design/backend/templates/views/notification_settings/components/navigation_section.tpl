@@ -8,8 +8,12 @@
         {hook name="notification_settings:dynamic_menu_user_types"}
         {/hook}
         {if ($settings.Appearance.email_templates == "new")}
-            <li class="{if $active_section == "code_snippets"} active{/if}"><a href="{"email_templates.snippets"|fn_url}">{__("code_snippets")}</a></li>
-            <li class="{if $active_section == "documents"} active{/if}"><a href="{"documents.manage"|fn_url}">{__("documents")}</a></li>
+            {if fn_check_view_permissions("email_templates.snippets", "GET")}
+                <li class="{if $active_section == "code_snippets"} active{/if}"><a href="{"email_templates.snippets"|fn_url}">{__("code_snippets")}</a></li>
+            {/if}
+            {if fn_check_view_permissions("documents.manage", "GET")}
+                <li class="{if $active_section == "documents"} active{/if}"><a href="{"documents.manage"|fn_url}">{__("documents")}</a></li>
+            {/if}
         {/if}
     </ul>
 </div>

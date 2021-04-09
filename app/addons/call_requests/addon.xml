@@ -9,7 +9,7 @@
     <default_language>en</default_language>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
 
-    <settings edition_type="ROOT,ULT:VENDOR">
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>
@@ -39,7 +39,7 @@
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>
-                    <item id="order_status">
+                    <item id="order_status" edition_type="ROOT,ULT:VENDOR">
                         <type>selectbox</type>
                         <default_value>Y</default_value>
                     </item>
@@ -90,6 +90,7 @@
 
     <functions>
         <item for="install">fn_call_requests_addon_install</item>
+        <item for="uninstall">fn_call_requests_addon_uninstall</item>
     </functions>
     <email_templates>
         <templates>

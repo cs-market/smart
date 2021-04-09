@@ -27,6 +27,7 @@
         <label class="control-label" for="elm_regnumber">{__("regnumber")}:</label>
         <div class="controls">
             <input type="text" name="tax_data[regnumber]" id="elm_regnumber" size="30" value="{$tax.regnumber}" class="input-text" />
+            <p class="muted description">{__("tt_views_taxes_update_regnumber")}</p>
         </div>
     </div>
     
@@ -110,10 +111,9 @@
 
 {/capture}
 
-{if $runtime.mode == "add"}
-    {assign var="title" value=__("new_tax")}
-{else}
-    {$title_start = __("editing_tax")}
-    {$title_end = $tax.tax}
-{/if}
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$title content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($id) ? $tax.tax : __("new_tax")
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+}

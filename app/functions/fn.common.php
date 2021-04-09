@@ -19,27 +19,35 @@ use Tygh\BlockManager\Exim;
 use Tygh\BlockManager\Layout;
 use Tygh\BlockManager\RenderManager;
 use Tygh\Bootstrap;
+use Tygh\Common\OperationResult;
 use Tygh\Debugger;
 use Tygh\Development;
 use Tygh\Embedded;
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\StorefrontStatuses;
+use Tygh\Enum\UserTypes;
 use Tygh\Enum\YesNo;
 use Tygh\Exceptions\DeveloperException;
 use Tygh\Languages\Helper as LanguageHelper;
 use Tygh\Languages\Languages;
 use Tygh\Languages\Values as LanguageValues;
 use Tygh\Less;
+use Tygh\Notifications\Receivers\SearchCondition;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Storage;
+use Tygh\Storefront\Storefront;
 use Tygh\Themes\Styles;
 use Tygh\Themes\Themes;
 use Tygh\Tools\DateTimeHelper;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Tools\Url;
+use Tygh\Tygh;
 use Tygh\Web\Antibot;
-use Tygh\Enum\SiteArea;
+use Tygh\Web\Antibot\NullDriver;
 
 /**
  * Returns True if the object can be saved, otherwise False.
@@ -232,13 +240,12 @@ function fn_print_r()
 }
 
 /**
-* Redirect browser to the new location
-*
-* @param string $location - destination of redirect
-* @param bool $allow_external_redirect - allow redirection to external resource
-* @param bool $is_permanent - if true, perform 301 redirect
-* @return
-*/
+ * Redirect browser to the new location
+ *
+ * @param string $location                Destination of redirect
+ * @param bool   $allow_external_redirect Allow redirection to external resource
+ * @param bool   $is_permanent            If true, perform 301 redirect
+ */
 function fn_redirect($location, $allow_external_redirect = false, $is_permanent = false)
 {
     $external_redirect = false;
@@ -246,20 +253,20 @@ function fn_redirect($location, $allow_external_redirect = false, $is_permanent 
     $meta_redirect = false;
 
     // Cleanup location from &amp; signs and call fn_url()
-    $location = fn_url(str_replace(array('&amp;', "\n", "\r"), array('&', '', ''), $location));
+    $location = fn_url(str_replace(['&amp;', "\n", "\r"], ['&', '', ''], $location));
 
     // Convert absolute link with location to relative one
-    if (strpos($location, '://') !== false || substr($location, 0, 7) == 'mailto:') {
-        if (strpos($location, Registry::get('config.http_location')) !== false) {
-            $location = str_replace(array(Registry::get('config.http_location') . '/', Registry::get('config.http_location')), '', $location);
+    if (strpos($location, '://') !== false || substr($location, 0, 7) === 'mailto:') {
+        if (strpos($location, Registry::get('config.http_location') . '/') !== false) {
+            $location = str_replace([Registry::get('config.http_location') . '/', Registry::get('config.http_location')], '', $location);
             $protocol = 'http';
 
-        } elseif (strpos($location, Registry::get('config.https_location')) !== false) {
-            $location = str_replace(array(Registry::get('config.https_location') . '/', Registry::get('config.https_location')), '', $location);
+        } elseif (strpos($location, Registry::get('config.https_location') . '/') !== false) {
+            $location = str_replace([Registry::get('config.https_location') . '/', Registry::get('config.https_location')], '', $location);
             $protocol = 'https';
 
         } else {
-            if ($allow_external_redirect == false) { // if external redirects aren't allowed, redirect to index script
+            if ($allow_external_redirect === false) { // if external redirects aren't allowed, redirect to index script
                 $location = '';
             } else {
                 $external_redirect = true;
@@ -268,39 +275,38 @@ function fn_redirect($location, $allow_external_redirect = false, $is_permanent 
 
     // Convert absolute link without location to relative one
     } else {
-        $_protocol = "";
-        $_location = "";
+        $_protocol = '';
+        $_location = '';
         $http_path = Registry::get('config.http_path');
         $https_path = Registry::get('config.https_path');
-        if (!empty($http_path) && substr($location, 0, strlen($http_path)) == $http_path) {
+        if (!empty($http_path) && substr($location, 0, strlen($http_path)) === $http_path) {
             $_location = substr($location, strlen($http_path) + 1);
             $_protocol = 'http';
 
         }
-        if (!empty($https_path) && substr($location, 0, strlen($https_path)) == $https_path) {
+        if (!empty($https_path) && substr($location, 0, strlen($https_path)) === $https_path) {
             // if https path partially equal to http path check if https path is not just a part of http path
             // e. g. http://example.com/pathsimple & https://example.com/path
-            if ($_protocol != 'http' || empty($http_path) || substr($http_path, 0, strlen($https_path)) != $https_path) {
+            if ($_protocol !== 'http' || empty($http_path) || substr($http_path, 0, strlen($https_path)) !== $https_path) {
                 $_location = substr($location, strlen($https_path) + 1);
                 $_protocol = 'https';
             }
         }
-        $protocol = (Registry::get('config.http_path') != Registry::get('config.https_path') && !empty($_protocol)) ? $_protocol : $protocol;
+        $protocol = (Registry::get('config.http_path') !== Registry::get('config.https_path') && !empty($_protocol)) ? $_protocol : $protocol;
         $location = !empty($_protocol) ? $_location : $location;
     }
 
-    if ($external_redirect == false) {
-
+    if ($external_redirect === false) {
         fn_set_hook('redirect', $location);
 
-        $protocol_changed = (defined('HTTPS') && $protocol == 'http') || (!defined('HTTPS') && $protocol == 'https');
+        $protocol_changed = (defined('HTTPS') && $protocol === 'http') || (!defined('HTTPS') && $protocol === 'https');
 
         // For correct redirection, location must be absolute with path
-        $location = (($protocol == 'http') ? Registry::get('config.http_location') : Registry::get('config.https_location')) . '/' . ltrim($location, '/');
+        $location = (($protocol === 'http') ? Registry::get('config.http_location') : Registry::get('config.https_location')) . '/' . ltrim($location, '/');
 
         // Parse the query string
         $fragment = '';
-        $query_array = array();
+        $query_array = [];
         $parsed_location = parse_url($location);
         if (!empty($parsed_location['query'])) {
             parse_str($parsed_location['query'], $query_array);
@@ -312,7 +318,7 @@ function fn_redirect($location, $allow_external_redirect = false, $is_permanent 
             $location = str_replace($fragment, '', $location);
         }
 
-        if ($protocol_changed && (Registry::get('config.http_host') != Registry::get('config.https_host') || Registry::get('config.http_path') != Registry::get('config.https_path'))) {
+        if ($protocol_changed && (Registry::get('config.http_host') !== Registry::get('config.https_host') || Registry::get('config.http_path') !== Registry::get('config.https_path'))) {
             $query_array[Tygh::$app['session']->getName()] = Tygh::$app['session']->getID();
         }
 
@@ -359,8 +365,8 @@ function fn_redirect($location, $allow_external_redirect = false, $is_permanent 
     if (defined('AJAX_REQUEST')) { // make in-script redirect during ajax request
         $_purl = parse_url($location);
 
-        $_GET = array();
-        $_POST = array();
+        $_GET = [];
+        $_POST = [];
 
         if (!empty($_purl['query'])) {
             parse_str($_purl['query'], $_GET);
@@ -386,7 +392,8 @@ function fn_redirect($location, $allow_external_redirect = false, $is_permanent 
 
         Tygh::$app['ajax']->updateRequest();
 
-        return fn_dispatch();
+        fn_dispatch();
+        return;
 
     } elseif (!ob_get_contents() && !headers_sent() && !$meta_redirect) {
 
@@ -899,7 +906,7 @@ function fn_send_product_notifications($product_id)
                 $subscribers_by_companies[$company_id][] = $subscription['email'];
             }
         } else {
-            $subscribers_by_companies[$product_company_id] = fn_array_column($subscriptions_data, 'email');
+            $subscribers_by_companies[$product_company_id] = array_column($subscriptions_data, 'email');
         }
 
         /** @var \Tygh\Mailer\Mailer $mailer */
@@ -1634,32 +1641,33 @@ function fn_echo($value)
 }
 
 /**
-* Set state for time-consuming processes
-*
-* @param string $prop property name
-* @param string $value value to set
-* @param mixed $extra extra data
-* @return boolean - always true
-*/
+ * Sets state for time-consuming processes.
+ *
+ * @param string     $prop  Action
+ * @param int|string $value Value to set
+ * @param bool|null  $extra Extra data
+ *
+ * @return bool Always true
+ */
 function fn_set_progress($prop, $value = '', $extra = null)
 {
-    if (Registry::get('runtime.comet') == true) {
-        if ($prop == 'step_scale') {
-            Tygh::$app['ajax']->setStepScale($value);
-
-        } elseif ($prop == 'parts') {
-            Tygh::$app['ajax']->setProgressParts($value);
-
-        } elseif ($prop == 'echo') {
-            Tygh::$app['ajax']->progressEcho($value, ($extra === false) ? $extra : true);
-
-        } elseif ($prop == 'title') {
-            Tygh::$app['ajax']->changeTitle($value);
+    if (Registry::get('runtime.comet')) {
+        switch ($prop) {
+            case 'step_scale':
+                Tygh::$app['ajax']->setStepScale($value);
+                break;
+            case 'parts':
+                Tygh::$app['ajax']->setProgressParts($value);
+                break;
+            case 'echo':
+                Tygh::$app['ajax']->progressEcho($value, ($extra === false) ? $extra : true);
+                break;
+            case 'title':
+                Tygh::$app['ajax']->changeTitle($value);
+                break;
         }
-    } else {
-        if ($prop == 'echo') {
-            fn_echo($value);
-        }
+    } elseif ($prop === 'echo') {
+        fn_echo($value);
     }
 
     fn_set_hook('after_set_progress', $prop, $value, $extra);
@@ -1832,7 +1840,10 @@ function fn_parse_datetime($datetime)
 
         $timestamp = fn_parse_date($date);
 
-        list($h, $m) = explode(':', $time);
+        $time = date_parse($time);
+        $h = $time['hour'] ? $time['hour'] : '00';
+        $m = $time['minute'] ? $time['minute'] : '00';
+
         $h = str_pad($h, 2, '0', STR_PAD_LEFT);
         $m = str_pad($m, 2, '0', STR_PAD_LEFT);
 
@@ -2018,12 +2029,11 @@ function fn_is_inet_ip($ip, $is_int = false)
     $_ip = explode('.', $ip);
 
     return
-        ($_ip[0] == 10 ||
+        !($_ip[0] == 10 ||
         ($_ip[0] == 172 && $_ip[1] >= 16 && $_ip[1] <= 31) ||
         ($_ip[0] == 192 && $_ip[1] == 168) ||
         ($_ip[0] == 127 && $_ip[1] == 0 && $_ip[2] == 0 && $_ip[3] == 1) ||
-        ($_ip[0] == 255 && $_ip[1] == 255 && $_ip[2] == 255 && $_ip[3] == 255))
-        ? false : true;
+        ($_ip[0] == 255 && $_ip[1] == 255 && $_ip[2] == 255 && $_ip[3] == 255));
 }
 
 /**
@@ -2102,7 +2112,7 @@ function fn_image_verification($scenario, $http_request_data)
     $validation_result = $antibot->validateHttpRequestByScenario((string) $scenario, (array) $http_request_data);
 
     if (!$validation_result) {
-        fn_set_notification('E', __('error'), __('error_confirmation_code_invalid'));
+        fn_set_notification(NotificationSeverity::ERROR, __('error'), $antibot->getErrorMessage($scenario));
     }
 
     return $validation_result;
@@ -2239,14 +2249,20 @@ function fn_link_attach($url, $attachment)
 }
 
 /**
- * Get views for the object
+ * Gets views for the object
  *
- * @param string $object object to init view for
- * @return array views list
+ * @param string $object_type Object to init view for
+ *
+ * @return array<int, array{name: string, view_id: int, is_default: string}> Views list
  */
-function fn_get_views($object)
+function fn_get_views($object_type)
 {
-    return db_get_hash_array("SELECT name, view_id FROM ?:views WHERE object = ?s AND user_id = ?i", 'view_id', $object, Tygh::$app['session']['auth']['user_id']);
+    return db_get_hash_array(
+        'SELECT name, view_id, is_default FROM ?:views WHERE object = ?s AND user_id = ?i ORDER BY is_default DESC',
+        'view_id',
+        $object_type,
+        Tygh::$app['session']['auth']['user_id']
+    );
 }
 
 /**
@@ -2291,19 +2307,29 @@ function fn_compare_dispatch($_url1, $_url2)
 /**
  * Get all schema files (e.g. exim schemas, admin area menu)
  *
- * @param string $schema_dir schema name (subdirectory in /schema directory)
- * @param string $name file name/prefix
- * @param string $type schema type (php/xml)
- * @param bool $force_addon_init initialize disabled addons also
+ * @param string        $schema_dir                  Schema name (subdirectory in /schema directory)
+ * @param string        $name                        File name/prefix
+ * @param string        $type                        Schema type (php/xml)
+ * @param bool          $force_addon_init            Initialize disabled addons also
+ * @param array<string> $addons_to_load_schemas_from List of add-ons names from which schema required.
+ *
  * @return array schema definition (if exists)
  */
-function fn_get_schema($schema_dir, $name, $type = 'php', $force_addon_init = false)
+function fn_get_schema($schema_dir, $name, $type = 'php', $force_addon_init = false, array $addons_to_load_schemas_from = null)
 {
-    Registry::registerCache(array('schemas', 'schema_' . $schema_dir . '_' . $name), array('settings_objects', 'addons'), Registry::cacheLevel('static')); // FIXME: hardcoded for settings-based schemas
+    $cache_key = 'schema_' . $schema_dir . '_' . $name;
+    if ($addons_to_load_schemas_from !== null) {
+        $addons_names = md5(implode('_', $addons_to_load_schemas_from));
+        $cache_key .= '_' . $addons_names;
+    }
+    Registry::registerCache(
+        ['schemas', $cache_key],
+        ['settings_objects', 'addons'],
+        Registry::cacheLevel('static')
+    ); // FIXME: hardcoded for settings-based schemas
 
-    if (!Registry::isExist('schema_' . $schema_dir . '_' . $name)) {
-
-        $files = array();
+    if (!Registry::isExist($cache_key)) {
+        $files = [];
         $path_name = Registry::get('config.dir.schemas') . $schema_dir . '/' . $name;
         if (file_exists($path_name . '.' . $type)) {
             $files[] = $path_name . '.' . $type;
@@ -2312,8 +2338,14 @@ function fn_get_schema($schema_dir, $name, $type = 'php', $force_addon_init = fa
         if (file_exists($path_name . '_' . fn_strtolower(PRODUCT_EDITION) . '.' . $type)) {
             $files[] = $path_name . '_' . fn_strtolower(PRODUCT_EDITION) . '.' . $type;
         }
-
-        $addons = Registry::get('addons');
+        if ($addons_to_load_schemas_from === null) {
+            $addons = Registry::get('addons');
+        } else {
+            $addons = array_intersect_key(
+                Registry::get('addons'),
+                array_fill_keys($addons_to_load_schemas_from, true)
+            );
+        }
         if (!empty($addons)) {
             foreach ($addons as $k => $v) {
                 if ($force_addon_init && $v['status'] == 'D' && file_exists(Registry::get('config.dir.addons') . $k . '/func.php')) { // force addon initialization
@@ -2344,7 +2376,7 @@ function fn_get_schema($schema_dir, $name, $type = 'php', $force_addon_init = fa
             }
         }
 
-        Registry::set('schema_' . $schema_dir . '_' . $name, $files);
+        Registry::set($cache_key, $files);
     }
 
     if ($type === 'php') {
@@ -2355,7 +2387,7 @@ function fn_get_schema($schema_dir, $name, $type = 'php', $force_addon_init = fa
 
     $include_once = (strpos($name, '.functions') !== false);
 
-    foreach (Registry::get('schema_' . $schema_dir . '_' . $name) as $file) {
+    foreach (Registry::get($cache_key) as $file) {
         if ($type == 'php') {
             $schema = $include_once ? include_once($file) : include($file);
         } else {
@@ -2364,6 +2396,64 @@ function fn_get_schema($schema_dir, $name, $type = 'php', $force_addon_init = fa
     }
 
     return $schema;
+}
+
+/**
+ * Gets schema declared into specified add-on.
+ *
+ * @param string $addon Name of specified addon.
+ *
+ * @return array<array<string>, array<string>>
+ *
+ * @psalm-return array{list<string>, list<string>}
+ */
+function fn_get_scheme_from_addon($addon)
+{
+    $all_menu = fn_get_schema('menu', 'menu', 'php', false, []);
+    $all_menu = fn_get_admin_panel_menu_items($all_menu);
+    $all_hrefs = [];
+    $all_names = [];
+    if ($all_menu) {
+        array_walk_recursive($all_menu, static function ($value, $key) use (&$all_hrefs, &$all_names) {
+            if ($value && $key === 'href') {
+                $all_hrefs[] = (string) $value;
+            } elseif ($value && $key === 'name') {
+                $all_names[] = (string) $value;
+            }
+        });
+    }
+    $addon_menu_schema = fn_get_schema('menu', 'menu', 'php', false, [$addon]);
+    $addon_menu_schema = fn_get_admin_panel_menu_items($addon_menu_schema);
+    $addons_hrefs = [];
+    $addons_names = [];
+    if ($addon_menu_schema) {
+        array_walk_recursive($addon_menu_schema, static function ($value, $key) use (&$addons_hrefs, &$addons_names) {
+            if ($value && $key === 'href') {
+                $addons_hrefs[] = (string) $value;
+            } elseif ($value && $key === 'name') {
+                $addons_names[] = (string) $value;
+            }
+        });
+    }
+
+    // addon menu can contain links that have other menus,
+    // so we cannot use array_diff function in this case
+    $hrefs = array_filter($addons_hrefs, static function ($href) use (&$all_hrefs) {
+        $pos = array_search($href, $all_hrefs, true);
+        if ($pos !== false) {
+            unset($all_hrefs[$pos]);
+            return false;
+        }
+        return true;
+    });
+
+    /**
+     * @psalm-var array{
+     * string
+     * } $names
+     */
+    $names = array_diff($addons_names, $all_names);
+    return [array_values($hrefs), array_values($names)];
 }
 
 /**
@@ -2478,7 +2568,9 @@ function fn_check_company_permissions($controller, $mode, $request_method = '', 
 
         // Check common permissions
         if (!isset($permission) && isset($schema[$controller]['permissions'])) {
-            $permission = is_array($schema[$controller]['permissions']) ? $schema[$controller]['permissions'][$request_method] : $schema[$controller]['permissions'];
+            $permission = is_array($schema[$controller]['permissions']) && isset($schema[$controller]['permissions'][$request_method])
+                ? $schema[$controller]['permissions'][$request_method]
+                : $schema[$controller]['permissions'];
 
             if (isset($schema[$controller]['condition'])) {
                 $condition = $schema[$controller]['condition'];
@@ -2646,9 +2738,22 @@ function fn_check_permission_manage_usergroups()
     return true;
 }
 
+/**
+ * Checks view permissions
+ *
+ * @param string $data            Item data
+ * @param string $request_method  Request method
+ * @param bool   $is_html_content Flag if is HTML content
+ *
+ * @return bool
+ */
 function fn_check_view_permissions($data, $request_method = '', $is_html_content = false)
 {
-    if ((!defined('RESTRICTED_ADMIN') && !Registry::get('runtime.company_id')) || !trim($data) || $data == 'submit') {
+    if (
+        (!defined('RESTRICTED_ADMIN') && !Registry::get('runtime.company_id'))
+        || !trim($data)
+        || $data === 'submit'
+    ) {
         return true;
     }
 
@@ -2734,7 +2839,10 @@ function fn_check_change_storefront_permission()
 {
     $auth = Tygh::$app['session']['auth'];
 
-    return isset($auth['user_type']) && $auth['user_type'] === 'A' && empty($auth['company_id']);
+    return isset($auth['user_type']) && (
+        ($auth['user_type'] === UserTypes::ADMIN && empty($auth['company_id']))
+        || $auth['user_type'] === UserTypes::VENDOR
+    );
 }
 
 /**
@@ -3045,7 +3153,7 @@ function fn_set_store_mode($store_mode, $company_id = null)
         $mode = $store_mode == 'open'
             ? StorefrontStatuses::OPEN
             : StorefrontStatuses::CLOSED;
-        
+
         /** @var \Tygh\Storefront\Repository $repository */
         $repository = Tygh::$app['storefront.repository'];
 
@@ -3145,6 +3253,13 @@ function fn_is_utf8($str)
     $c = 0; $b = 0;
     $bits = 0;
     $len = strlen($str);
+    $byte_order_mark = chr(239) . chr(187) . chr(191);
+
+    if (substr($str, 0, 3) === $byte_order_mark) {
+        //string is UTF-8 with BOM
+        return true;
+    }
+
     for ($i = 0; $i < $len; $i++) {
         $c = ord($str[$i]);
         if ($c > 128) {
@@ -3599,7 +3714,7 @@ function fn_url($url = '', $area = AREA, $protocol = 'current', $lang_code = CAR
                     : 'http://' . $default_storefront->url,
             ];
         }
-        
+
         $admin_http_location = empty($conf['origin_http_location'])
             ? $conf['http_location']
             : $conf['origin_http_location'];
@@ -5117,10 +5232,9 @@ function fn_create_theme_logos_by_layout_id(
     $logo_types = fn_get_logo_types($for_company);
 
     Registry::set('runtime.allow_upload_external_paths', true);
+    $logos = fn_get_logos(0, $layout_id ?: null, $style_id ?: null, $storefront_id);
 
     if ($for_company) {
-        $logos = fn_get_logos(0, $layout_id ?: null, $style_id ?: null, $storefront_id);
-
         foreach ($logos as $logo) {
             if (!isset($logo_types[$logo['type']]) || empty($logo['image'])) {
                 continue;
@@ -5160,6 +5274,9 @@ function fn_create_theme_logos_by_layout_id(
         ];
 
         if (fn_allowed_for('MULTIVENDOR') && !empty($company_id)) {
+            if (!empty($logos['vendor']['image']['absolute_path'])) {
+                $logo_data['image_path'] = $logos['vendor']['image']['absolute_path'];
+            }
             // Vendors have only one global logo
             unset($logo_data['style_id'], $logo_data['layout_id']);
         }
@@ -5370,7 +5487,7 @@ function fn_get_logo_image_path($logo_image, $type, $style_id, $theme_name = '')
  * @param string   $style_id      Style ID
  * @param int|null $storefront_id Storefront ID
  *
- * @return array Logos list
+ * @return array<string, array> Logos list
  */
 function fn_get_logos($company_id = null, $layout_id = null, $style_id = null, $storefront_id = null)
 {
@@ -5402,17 +5519,17 @@ function fn_get_logos($company_id = null, $layout_id = null, $style_id = null, $
     if ($layout_id === null || $style_id === null || $storefront_id === null) {
         if (!empty($company_id) && fn_allowed_for('ULTIMATE')) {
             $layout_data = Layout::instance($company_id)->getDefault();
-        } else {
-            if (SiteArea::isStorefront(AREA)) {
+        } elseif (SiteArea::isStorefront(AREA)) {
                 $layout_data = Registry::get('runtime.layout');
-            } else {
-                /** @var \Tygh\Storefront\Repository $storefront_repository */
-                $storefront_repository = Tygh::$app['storefront.repository'];
-                /** @var \Tygh\Storefront\Storefront $storefront */
-                $storefront = $storefront_repository->findDefault();
-                $layout_data = Layout::instance(0, [], $storefront->storefront_id)->getDefault();
+        } else {
+            if ($storefront_id === null) {
+                $storefront = StorefrontProvider::getRepository()->findDefault();
+                $storefront_id = $storefront ? $storefront->storefront_id : null;
             }
+
+            $layout_data = Layout::instance(0, [], $storefront_id)->getDefault();
         }
+
         $layout_id = $layout_id !== null
             ? $layout_id
             : $layout_data['layout_id'];
@@ -5471,12 +5588,13 @@ function fn_get_logos($company_id = null, $layout_id = null, $style_id = null, $
     /**
      * Changes logos before returning
      *
-     * @param int    $company_id company ID
-     * @param int    $layout_id  layout ID
-     * @param string $style_id   Style ID
-     * @param array  $logos      Selected logos
+     * @param int                  $company_id    Company ID
+     * @param int                  $layout_id     Layout ID
+     * @param string               $style_id      Style ID
+     * @param array<string, array> $logos         Selected logos
+     * @param int|null             $storefront_id Storefront ID
      */
-    fn_set_hook('get_logos_post', $company_id, $layout_id, $style_id, $logos);
+    fn_set_hook('get_logos_post', $company_id, $layout_id, $style_id, $logos, $storefront_id);
 
     return $logos;
 }
@@ -5612,23 +5730,23 @@ function fn_delete_logo($type, $company_id = null, $style_id = '')
  */
 function fn_get_logo_types($for_company = false)
 {
-    $types = array(
-        'theme' => array (
+    $types = [
+        'theme' => [
             'for_layout' => true,
-            'text' => 'text_customer_area_logo',
-            'image' => 'logo.png',
-        ),
-        'favicon' => array(
+            'text'       => 'text_customer_area_logo',
+            'image'      => 'logo.png',
+        ],
+        'favicon' => [
             'for_layout' => true,
-            'text' => '',
-            'image' => 'favicon.ico',
-        ),
-        'mail' => array (
+            'text'       => '',
+            'image'      => 'favicon.ico',
+        ],
+        'mail' => [
             'for_layout' => true,
-            'text' => 'text_mail_area_logo',
-            'image' => 'mail.png',
-        ),
-    );
+            'text'       => 'text_mail_area_logo',
+            'image'      => 'mail.png',
+        ],
+    ];
 
     fn_set_hook('logo_types', $types, $for_company);
 
@@ -5724,11 +5842,18 @@ function fn_get_customization_modes()
         ],
     ];
 
-    $enabled_modes = explode(',', Registry::get('settings.customization_mode'));
-    foreach ($enabled_modes as $e_mode) {
-        if (!empty($modes[$e_mode])) {
-            $modes[$e_mode]['enabled'] = true;
+    $session = Tygh::$app['session'];
+
+    $enabled_modes = isset($session['customization']['modes'])
+        ? (array) $session['customization']['modes']
+        : [];
+
+    foreach (array_keys($enabled_modes) as $e_mode) {
+        if (empty($modes[$e_mode])) {
+            continue;
         }
+
+        $modes[$e_mode]['enabled'] = true;
     }
 
     fn_set_hook('get_customization_modes', $modes, $enabled_modes);
@@ -5738,44 +5863,60 @@ function fn_get_customization_modes()
 
 /**
  * Updates customization mode (design/translation/css editor)
- * @param array $modes list of modes with statuses
+ *
+ * @param array<string, string> $modes         List of modes with statuses
+ * @param int                   $storefront_id Storefront ID to set customization modes for
+ *
  * @return bool true if mode updated, false - otherwise
  */
-function fn_update_customization_mode($modes)
+function fn_update_customization_mode(array $modes, $storefront_id = null)
 {
     if (empty($modes)) {
         return false;
     }
 
+    $session = Tygh::$app['session'];
+
+    if ($storefront_id === null) {
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        $storefront_id = $storefront->storefront_id;
+    }
+
     $available_modes = fn_get_customization_modes();
-    $enabled_modes = fn_array_combine(explode(',', Registry::get('settings.customization_mode')), true);
+    $enabled_modes = isset($session['customization']['modes'])
+        ? (array) $session['customization']['modes']
+        : [];
 
     foreach ($modes as $c_mode => $c_status) {
         if (empty($available_modes[$c_mode])) { // skip enable/disable for non-existent modes
             continue;
         }
 
-        if ($c_status == 'enable') {
+        if ($c_status === 'enable') {
             $enabled_modes[$c_mode] = true;
-        } elseif ($c_status == 'disable') {
+        } elseif ($c_status === 'disable') {
             unset($enabled_modes[$c_mode]);
         }
     }
 
-    $enabled_modes = array_filter($enabled_modes, function($key) {
+    $enabled_modes = array_filter($enabled_modes, static function ($key) {
         return (bool) $key;
     }, ARRAY_FILTER_USE_KEY);
 
     /**
      * Hook is executed before saving enabled customization modes to DB.
      *
-     * @param array $modes List of modes to be changed passed to function
-     * @param array $enabled_modes Modes that will be enabled
+     * @param array $modes           List of modes to be changed passed to function
+     * @param array $enabled_modes   Modes that will be enabled
      * @param array $available_modes All available modes
      */
     fn_set_hook('update_customization_mode', $modes, $enabled_modes, $available_modes);
 
-    Settings::instance()->updateValue('customization_mode', implode(',', array_keys($enabled_modes)));
+    $session['customization'] = [
+        'modes'         => $enabled_modes,
+        'storefront_id' => $storefront_id
+    ];
 
     return true;
 }
@@ -5853,6 +5994,13 @@ function fn_get_phpinfo($type = -1)
  */
 function __($var, $params = array(), $lang_code = CART_LANGUAGE)
 {
+    $is_live_editor = Registry::get('runtime.customization_mode.live_editor');
+    $skip_live_editor = !empty($params['skip_live_editor']);
+
+    if ($skip_live_editor && $is_live_editor) {
+        Registry::set('runtime.customization_mode.live_editor', false);
+    }
+
     $var = LanguageValues::getLangVar($var, $lang_code);
 
     if (!empty($params) && is_array($params)) {
@@ -5880,6 +6028,10 @@ function __($var, $params = array(), $lang_code = CART_LANGUAGE)
         }
 
         $var = strtr($var, $params);
+    }
+
+    if ($skip_live_editor && $is_live_editor) {
+        Registry::set('runtime.customization_mode.live_editor', true);
     }
 
     return $var;
@@ -6203,7 +6355,7 @@ function fn_merge_styles($files, $styles='', $prepend_prefix = '', $params = arr
 
         $tracked_files = array_combine(
             array_keys($css_files),
-            fn_array_column($css_files, Themes::PATH_ABSOLUTE)
+            array_column($css_files, Themes::PATH_ABSOLUTE)
         );
 
         foreach ($names as $index => $name) {
@@ -6478,6 +6630,21 @@ function fn_get_currencies()
  */
 function fn_get_currencies_list($params = array(), $area = AREA, $lang_code = CART_LANGUAGE)
 {
+    $default_params = [
+        'status'        => null,
+        'currency_id'   => null,
+        'currency_code' => null,
+        'only_primary'  => false,
+        'storefront_id' => null,
+    ];
+
+    $params = array_merge($default_params, $params);
+    if ($area === 'C' && $params['storefront_id'] === null) {
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        $params['storefront_id'] = $storefront->storefront_id;
+    }
+
     /**
      * Performs actions before getting currencies list
      *
@@ -6493,35 +6660,43 @@ function fn_get_currencies_list($params = array(), $area = AREA, $lang_code = CA
      */
     fn_set_hook('get_currencies_list_pre', $params, $area, $lang_code);
 
-    $cond = $join = $order_by = '';
+    $condition = $join = $order_by = '';
 
-    if (!fn_allowed_for('ULTIMATE:FREE')) {
-        if ($area == 'C' && defined('CART_LOCALIZATION')) {
-            $join = " LEFT JOIN ?:localization_elements as c ON c.element = a.currency_code AND c.element_type = 'M'";
-            $cond = db_quote('AND c.localization_id = ?i', CART_LOCALIZATION);
-            $order_by = "ORDER BY c.position ASC";
-        }
-
+    if ($area == 'C' && defined('CART_LOCALIZATION')) {
+        $join = " LEFT JOIN ?:localization_elements as c ON c.element = a.currency_code AND c.element_type = 'M'";
+        $condition = db_quote('AND c.localization_id = ?i', CART_LOCALIZATION);
+        $order_by = "ORDER BY c.position ASC";
     }
 
     if (!$order_by) {
         $order_by = 'ORDER BY a.position';
     }
 
-    if (!empty($params['status'])) {
-        $cond .= db_quote(' AND status IN (?a)', $params['status']);
+    if ($params['status']) {
+        $condition .= db_quote(' AND status IN (?a)', $params['status']);
     }
 
-    if (!empty($params['currency_id'])) {
-        $cond .= db_quote(' AND currency_id IN (?n)', (array) $params['currency_id']);
+    if ($params['currency_id']) {
+        $condition .= db_quote(' AND currency_id IN (?n)', (array) $params['currency_id']);
     }
 
-    if (!empty($params['currency_code'])) {
-        $cond .= db_quote(' AND a.currency_code = ?s', $params['currency_code']);
+    if ($params['currency_code']) {
+        $condition .= db_quote(' AND a.currency_code = ?s', $params['currency_code']);
     }
 
-    if (!empty($params['only_primary']) && $params['only_primary'] == 'Y') {
-        $cond .= db_quote(' AND a.is_primary = ?s', 'Y');
+    if (YesNo::toBool($params['only_primary'])) {
+        $condition .= db_quote(' AND a.is_primary = ?s', 'Y');
+    }
+
+    if ($params['storefront_id']) {
+        $join .= db_quote(
+            ' LEFT JOIN ?:storefronts_currencies AS storefronts_currencies'
+            . ' ON storefronts_currencies.currency_id = a.currency_id'
+        );
+        $condition .= db_quote(
+            'AND (storefronts_currencies.storefront_id IN (?n) OR storefronts_currencies.storefront_id IS NULL)',
+            (array) $params['storefront_id']
+        );
     }
 
     /**
@@ -6538,30 +6713,35 @@ function fn_get_currencies_list($params = array(), $area = AREA, $lang_code = CA
      * @param string $lang_code 2-letters language code
      * @param string $join String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
      * @param string $order_by Order SQL data
-     * @param string $cond String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
+     * @param string $condition String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
      */
-    fn_set_hook('get_currencies_list_before_select', $params, $area, $lang_code, $join, $order_by, $cond);
+    fn_set_hook('get_currencies_list_before_select', $params, $area, $lang_code, $join, $order_by, $condition);
 
     if (!empty($params['raw_query'])) {
         Tygh::$app['db']->raw = true;
     }
 
     $currencies = db_get_hash_array(
-        "SELECT a.*, b.description FROM ?:currencies as a"
-        . " LEFT JOIN ?:currency_descriptions as b ON a.currency_code = b.currency_code AND lang_code = ?s $join"
-        . " WHERE 1 ?p $order_by",
-        'currency_code', $lang_code, $cond
+        'SELECT a.*, b.description FROM ?:currencies as a'
+        . ' LEFT JOIN ?:currency_descriptions as b ON a.currency_id = b.currency_id AND lang_code = ?s'
+        . ' ?p'
+        . ' WHERE 1 ?p'
+        . ' ?p',
+        'currency_code',
+        $lang_code,
+        $join,
+        $condition,
+        $order_by
     );
 
-    if (fn_allowed_for('ULTIMATE:FREE')) {
-        foreach ($currencies as $code => $currency) {
-            if ($currency['is_primary'] != 'Y') {
-                $currencies[$code]['status'] = 'D';
-            } else {
-                $currencies[$code]['status'] = 'A';
-            }
+    array_walk($currencies, static function (&$currency) {
+        if (!is_array($currency) || !isset($currency['currency_id'])) {
+            return;
         }
-    }
+
+        list($storefronts,) = StorefrontProvider::getRepository()->find(['currency_ids' => $currency['currency_id']]);
+        $currency['storefront_ids'] = implode(',', array_keys($storefronts));
+    });
 
     /**
      * Gets currencies list
@@ -6580,6 +6760,26 @@ function fn_get_currencies_list($params = array(), $area = AREA, $lang_code = CA
     fn_set_hook('get_currencies_list_post', $params, $area, $lang_code, $currencies);
 
     return $currencies;
+}
+
+function fn_get_currency_data($currency_id, $lang_code = DESCR_SL)
+{
+    $currency = db_get_row(
+        'SELECT a.*, b.description'
+        . ' FROM ?:currencies as a'
+        . ' LEFT JOIN ?:currency_descriptions as b'
+        . ' ON a.currency_id = b.currency_id AND lang_code = ?s'
+        . ' WHERE a.currency_id = ?s',
+        $lang_code,
+        $currency_id
+    );
+
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository'];
+    list($storefronts,) = $repository->find(['currency_ids' => $currency_id]);
+    $currency['storefront_ids'] = implode(',', array_keys($storefronts));
+
+    return $currency;
 }
 
 /**
@@ -6775,13 +6975,15 @@ function fn_get_predefined_statuses($type, $status = '')
 /**
  * Generates ekey for access to object
  *
- * @param int|string $object_id object ID
- * @param string     $type      object type
- * @param int        $ttl       ekey TTL (from the current time)
- * @param string     $ekey      ekey ID if you generated it yourselves
- * @param array      $data      ekey data
+ * @param int|string   $object_id Object ID
+ * @param string       $type      Object type
+ * @param int          $ttl       Ekey TTL (from the current time)
+ * @param string       $ekey      Ekey ID if you generated it yourselves
+ * @param array<mixed> $data      Ekey data
  *
  * @return string ekey ID
+ *
+ * @phpcsSuppress SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
  */
 function fn_generate_ekey($object_id, $type, $ttl = 0, $ekey = '', array $data = [])
 {
@@ -6802,7 +7004,7 @@ function fn_generate_ekey($object_id, $type, $ttl = 0, $ekey = '', array $data =
 
     $_data[$field_name] = $object_id;
 
-    db_query('REPLACE INTO ?:ekeys ?e', $_data);
+    db_replace_into('ekeys', $_data);
 
     return $key;
 }
@@ -6952,7 +7154,7 @@ function fn_live_editor_update_object($params)
             $rule = $schema[$object];
 
             if (!empty($rule['function'])) {
-                $vars = $params + compact('object', 'field', 'id', 'rule', 'object_data');
+                $vars = $params + compact('object', 'field', 'id', 'rule');
                 $args = fn_live_editor_prepare_callback_args($rule['args'], $vars);
                 call_user_func_array($rule['function'], $args);
 
@@ -7283,37 +7485,13 @@ function fn_change_session_param(&$session, $request, $param_name)
  * @param array $array input array
  * @param mixed $column_key key for column
  * @param mixed $index_key key for index
+ *
+ * @deprecated since 4.11.5. Use the native array_column instead.
  * @return array values of column key
  */
 function fn_array_column($array, $column_key, $index_key = null)
 {
-    if (function_exists('array_column')) {
-        return array_column($array, $column_key, $index_key); // phpcs:ignore
-    }
-
-    $result = array();
-    foreach ($array as $item) {
-        if (!is_array($item)) {
-            continue;
-        }
-
-        if (is_null($column_key)) {
-            $value = $item;
-        } elseif (isset($item[$column_key])) {
-            $value = $item[$column_key];
-        } else {
-            continue;
-        }
-
-        if (!is_null($index_key)) {
-            $key = $item[$index_key];
-            $result[$key] = $value;
-        } else {
-            $result[] = $value;
-        }
-    }
-
-    return $result;
+    return array_column($array, $column_key, $index_key);
 }
 
 /**
@@ -7468,13 +7646,17 @@ function fn_core_mailer_send_pre($mailer, $transport, $message, $area, $lang_cod
         }
 
         if (!empty($params['attach_order_document']) && !empty($data['order_info']['order_id'])) {
-            $invoice_path = fn_print_order_invoices($data['order_info']['order_id'], array(
-                'pdf' => true,
-                'save' => true,
-                'lang_code' => $lang_code,
-                'template_code' => $params['attach_order_document'],
-                'secondary_currency' => $secondary_currency,
-            ));
+            $invoice_path = fn_print_order_invoices(
+                $data['order_info']['order_id'],
+                [
+                    'pdf'                => true,
+                    'save'               => true,
+                    'lang_code'          => $lang_code,
+                    'template_code'      => $params['attach_order_document'],
+                    'secondary_currency' => $secondary_currency,
+                    'area'               => $area,
+                ]
+            );
 
             $message->addAttachment($invoice_path, fn_basename($invoice_path));
 
@@ -7690,7 +7872,7 @@ function fn_get_paginated_product_features($request, $auth, $product_data = arra
         'variants' => true,
         'plain' => false,
         'display_on' => '',
-        'existent_only' => false,
+        'existent_only' => isset($request['show_existent_only']) ? $request['show_existent_only'] : false,
         'variants_selected_only' => false,
     ));
 
@@ -8071,54 +8253,6 @@ function fn_get_storefront_status_manage_url($repository = null, $company_id = n
 }
 
 /**
- * Gets product statuses to display in the status picker on the product management pages.
- *
- * @param string $status     Current product status
- * @param bool   $add_hidden Whether to add the Hidden status
- * @param string $lang_code  Two-letter language code
- *
- * @return string[]
- */
-function fn_get_product_statuses($status, $add_hidden = false, $lang_code = CART_LANGUAGE)
-{
-    $statuses = fn_get_default_statuses($status, $add_hidden, $lang_code);
-
-    /**
-     * Executes after product statuses list is obtained, allows you to add or remove product statuses from it
-     *
-     * @param string   $status     Current product status
-     * @param bool     $add_hidden Whether to add the Hidden status
-     * @param string   $lang_code  Two-letter language code
-     * @param string[] $statuses   Product statuses
-     */
-    fn_set_hook('get_product_statuses_post', $status, $add_hidden, $lang_code, $statuses);
-
-    return $statuses;
-}
-
-/**
- * Gets product statuses to display in the status picker on the product search form.
- *
- * @param string $lang_code Two-letter language code
- *
- * @return string[]
- */
-function fn_get_all_product_statuses($lang_code = CART_LANGUAGE)
-{
-    $statuses = fn_get_default_statuses('', true, $lang_code);
-
-    /**
-     * Executes after product statuses list is obtained, allows you to add or remove product statuses from it
-     *
-     * @param string   $lang_code Two-letter language code
-     * @param string[] $statuses  Product statuses
-     */
-    fn_set_hook('get_all_product_statuses_post', $lang_code, $statuses);
-
-    return $statuses;
-}
-
-/**
  * Gets all rules about notifications
  *
  * @return array Rules for notifications about all events to all receivers by all transports
@@ -8156,6 +8290,406 @@ function fn_set_notification_settings($event_id, $transport_id, $receiver, $allo
     db_query('REPLACE INTO ?:notification_settings ?e', $data);
 }
 
+function fn_get_customer_layout_theme_path()
+{
+    $company_id = null;
+    if (fn_allowed_for('ULTIMATE') && !Registry::get('runtime.company_id')) {
+        $company_id = db_get_field("SELECT MIN(company_id) FROM ?:companies");
+    }
+
+    $theme_name = fn_get_theme_path('[theme]', 'C', $company_id);
+    $theme_path = fn_get_theme_path('[themes]/[theme]', 'C', $company_id);
+
+    return array($theme_path, $theme_name);
+}
+
+/**
+ * Checks if objects should be displayed in a picker
+ *
+ * @param string $table     Name of SQL table with objects
+ * @param int    $threshold Value of the threshold after which the picker should be displayed
+ *
+ * @return boolean Flag that defines if picker should be displayed
+ */
+function fn_show_picker($table, $threshold)
+{
+    /**
+     * Changes params for the 'fn_show_picker' function
+     *
+     * @param string $table     Table name
+     * @param string $threshold Value of the threshold after which the picker should be displayed
+     */
+    fn_set_hook('show_picker_pre', $table, $threshold);
+
+    $picker = db_has_table($table) && db_get_field("SELECT COUNT(*) FROM ?:$table") > $threshold
+        ? true
+        : false;
+
+    /**
+     * Changes result of the 'fn_show_picker' function
+     *
+     * @param string  $table     Table name
+     * @param string  $threshold Value of the threshold after which the picker should be displayed
+     * @param boolean $picker    Flag that defines if data should be displayed in picker
+     */
+    fn_set_hook('show_picker_post', $table, $threshold, $picker);
+
+    return $picker;
+}
+
+/**
+ * Recursively sorts an array using a user-supplied comparison function
+ *
+ * @param array    $array    Array for sorting
+ * @param string   $key      Key of subarray for sorting
+ * @param callback $function Comparison function
+ */
+function fn_sort(&$array, $key, $function)
+{
+    usort($array, $function);
+    foreach ($array as $k => $v) {
+        if (!empty($v[$key])) {
+            fn_sort($array[$k][$key], $key, $function);
+        }
+    }
+}
+
+/**
+ * Generate url-safe name for the object
+ * Example:
+ *  Hello, World! => hello-world
+ *  Русский код => russky-kod
+ *
+ * @param string  $str           String to be checked and converted
+ * @param string  $object_type   Extra string, object type (e.g.: 'products', 'categories'). Result: some-string-products
+ * @param int     $object_id     Extra string, Object identifier. Result: some-string-products-34
+ * @param boolean $is_multi_lang Support multi-language names
+ * @return string Url-safe name
+ */
+function fn_generate_name($str, $object_type = '', $object_id = 0, $is_multi_lang = false)
+{
+    /**
+     * Change parameters for generating file name
+     *
+     * @param string $str         Basic file name
+     * @param string $object_type Object type
+     * @param int    $object_id   Object identifier
+     */
+    fn_set_hook('generate_name_pre', $str, $object_type, $object_id);
+
+    $delimiter = SEO_DELIMITER;
+    $str = html_entity_decode($str, ENT_QUOTES, 'UTF-8'); // convert html special chars back to original chars
+
+    $result = '';
+
+    if (!empty($str)) {
+        if ($is_multi_lang) {
+            $literals = "/[^a-z\p{Ll}\p{Lu}\p{Lt}\p{Lm}\p{Lo}\p{Nd}\p{Pc}\p{Mn}0-9-\.]/u";
+            $convert_letters = fn_get_schema('literal_converter', 'general');
+        } else {
+            $literals = "/[^a-z0-9-\.]/";
+            $convert_letters = fn_get_schema('literal_converter', 'schema');
+        }
+        $str = strtr($str, $convert_letters);
+
+        if (!empty($object_type)) {
+            $str .= $delimiter . $object_type . $object_id;
+        }
+
+        $str = fn_strtolower($str); // only lower letters
+        $str = preg_replace($literals, '', $str); // URL can contain latin letters, numbers, dashes and points only
+        $str = preg_replace("/($delimiter){2,}/", $delimiter, $str); // replace double (and more) dashes with one dash
+
+        $result = trim($str, '-'); // remove trailing dash if exist
+    }
+
+    /**
+     * Change generated file name
+     *
+     * @param string $result      Generated file name
+     * @param string $str         Basic file name
+     * @param string $object_type Object type
+     * @param int    $object_id   Object identifier
+     */
+    fn_set_hook('generate_name_post', $result, $str, $object_type, $object_id);
+
+    return $result;
+}
+
+function fn_sort_by_ids($items, $ids, $field = 'product_id')
+{
+    $tmp = array();
+
+    foreach ($items as $k => $item) {
+        foreach ($ids as $key => $item_id) {
+            if ($item_id == $item[$field]) {
+                $tmp[$key] = $item;
+                break;
+            }
+        }
+    }
+
+    ksort($tmp);
+
+    return $tmp;
+}
+
+/**
+ * Loads additional data related to given enities from corresponding tables.
+ * Each specified table triggers single SQL-query.
+ *
+ * @param array $params Configuration of which fields should be loaded in the following format:
+ * array(
+ *      table_name => array(
+ *          // Name of primary key used by items' table. You may specify SQL expression to use in "fields" array.
+ *          'primary_key' => 'product_id',
+ *          'fields' => array( // list of fields names from this table to be loaded
+ *              'product_id' => 'table_name.object_id',
+ *              'short_description',
+ *              // you may specify SQL expression that would be used instead field name in the SQL query
+ *              'full_description' => 'IF(table_name.full_description = '', table_name.short_description, '')
+ *          ),
+ *          // optional parameter, allows to specify additional conditions used by SQL query
+ *          'condition' => db_query(' AND table_name.company_id = ?i', $company_id),
+ *          // optional parameter, allows to specify additional joins used by SQL query
+ *          'join' => '',
+ *          // optional parameter, allows to specify grouping used by SQL query
+ *          'group_by' => '',
+ *      )
+ * )
+ * @param array $item_ids List of entity identifiers
+ *
+ * @return array List of extra data in format: array(table_name => array(item_id => extra_data, ...), ...)
+ */
+function fn_load_extra_data_by_entity_ids($params, $item_ids)
+{
+    $extra_data = [];
+    foreach ($params as $table_name => $table_config) {
+        if (empty($table_config) || empty($table_config['primary_key']) || empty($table_config['fields'])) {
+            continue;
+        }
+        $primary_key_field = $table_config['primary_key'];
+        if (isset($table_config['fields'][$primary_key_field])) {
+            $primary_key_expr = $table_config['fields'][$primary_key_field];
+        } else {
+            $primary_key_expr = $table_name . '.' . $primary_key_field;
+        }
+
+        $select_fields = in_array('*', $table_config['fields'])
+            ? []
+            : [$primary_key_field => $primary_key_expr];
+
+        foreach ($table_config['fields'] as $k => $v) {
+            if (is_integer($k)) {
+                $select_fields[$v] = $table_name . '.' . $v;
+            } else {
+                $select_fields[$k] = $v . ' AS ' . $k;
+            }
+        }
+        $select_fields = implode(', ', $select_fields);
+
+        $condition = empty($table_config['condition'])
+            ? ''
+            : $table_config['condition'];
+        $join = empty($table_config['join'])
+            ? ''
+            : $table_config['join'];
+        $group_by = empty($table_config['group_by'])
+            ? ''
+            : $table_config['group_by'];
+
+        $extra_data[$table_name] = db_get_hash_array(
+            "SELECT $select_fields FROM $table_name $join WHERE $primary_key_expr IN (?n) $condition $group_by",
+            $primary_key_field,
+            $item_ids
+        );
+    }
+
+    return $extra_data;
+}
+
+/**
+ * Merges extra data loaded by fn_load_extra_data to given entity list.
+ *
+ * @param array $extra_data Data in the following format: array(entity_id => additional_data, ...)
+ * @param array $entities   Entity list passed by reference in format: array(entity_id => entity_data, ...)
+ */
+function fn_merge_extra_data_to_entity_list($extra_data, &$entities)
+{
+    foreach ($extra_data as $table_name => $table_extra_data) {
+        foreach ($table_extra_data as $entity_id => $data) {
+            if (isset($entities[$entity_id])) {
+                $entities[$entity_id] = array_merge($entities[$entity_id], $data);
+            }
+        }
+    }
+}
+
+function fn_convert_weight($weight)
+{
+    /**
+     * Change weight before converting
+     *
+     * @param float $weight Weight for converting
+     */
+    fn_set_hook('convert_weight_pre', $weight);
+
+    if (!fn_allowed_for('ULTIMATE:FREE')) {
+        if (Registry::get('config.localization.weight_unit')) {
+            $g = Registry::get('settings.General.weight_symbol_grams');
+            $weight = $weight * Registry::get('config.localization.weight_unit') / $g;
+        }
+    }
+    $result = sprintf('%01.2f', $weight);
+
+    /**
+     * Change the converted weight
+     *
+     * @param float $result Converted weight
+     * @param float $weight Weight for converting
+     */
+    fn_set_hook('convert_weight_post', $result, $weight);
+
+    return $result;
+}
+
+/**
+ * @param string[] $receivers
+ *
+ * @return array
+ *
+ * @internal
+ */
+function fn_get_notification_receiver_search_conditions(array $receivers)
+{
+    $recipients = [
+        'groups' => array_fill_keys($receivers, []),
+        'events' => array_fill_keys($receivers, []),
+    ];
+
+    $group_settings = db_get_array('SELECT * FROM ?:notification_group_receivers ORDER BY id ASC');
+    $event_settings = db_get_array('SELECT * FROM ?:notification_event_receivers ORDER BY id ASC');
+
+    foreach ($group_settings as $data) {
+        $recipients['groups'][$data['group_id']][$data['receiver']][] = SearchCondition::makeOne($data);
+    }
+
+    foreach ($event_settings as $data) {
+        $recipients['events'][$data['event_id']][$data['receiver']][] = SearchCondition::makeOne($data);
+    }
+
+    return $recipients;
+}
+
+/**
+ * @param string                                          $object_type
+ * @param string                                          $object_id
+ * @param string                                          $receiver_type
+ * @param \Tygh\Notifications\Receivers\SearchCondition[] $conditions
+ *
+ * @internal
+ */
+function fn_update_notification_receiver_search_conditions($object_type, $object_id, $receiver_type, array $conditions)
+{
+    $table = "notification_{$object_type}_receivers";
+    $id_field = "{$object_type}_id";
+
+    db_query(
+        'DELETE FROM ?:?f WHERE ?w',
+        $table,
+        [
+            $id_field    => $object_id,
+            'receiver'   => $receiver_type,
+        ]
+    );
+
+    if (!$conditions) {
+        return;
+    }
+
+    $conditions_data = array_map(
+        function ($condition) use ($id_field, $object_id, $receiver_type) {
+            /** @var \Tygh\Notifications\Receivers\SearchCondition $condition */
+            return [
+                $id_field   => (string) $object_id,
+                'method'    => $condition->getMethod(),
+                'criterion' => $condition->getCriterion(),
+                'receiver'  => (string) $receiver_type,
+            ];
+        },
+        $conditions
+    );
+
+    db_query('INSERT INTO ?:?f ?m', $table, $conditions_data);
+}
+
+/**
+ * Convert price from particular currency to base currency
+ *
+ * @param float  $price         Currency
+ * @param string $currency_code Currency code
+ *
+ * @return float Converted currencty
+ */
+function fn_convert_price($price, $currency_code = CART_PRIMARY_CURRENCY)
+{
+    /**
+     * Change price before converting
+     *
+     * @param float  $price         Price for converting
+     * @param string $currency_code Price currency code
+     */
+    fn_set_hook('convert_price_pre', $price, $currency_code);
+
+    $currencies = Registry::get('currencies');
+    $result = $price * $currencies[$currency_code]['coefficient'];
+
+    /**
+     * Change the converted price
+     *
+     * @param float  $result        Converted price
+     * @param float  $price         Price for converting
+     * @param string $currency_code Price currency code
+     */
+    fn_set_hook('convert_price_post', $result, $price, $currency_code);
+
+    return $result;
+}
+
+/**
+ * Gets statuses list with specific param
+ *
+ * @param string $type   One-letter status type code
+ * @param array  $params Array for searching param like [param_name => param_value] if status is matched at least one of the condition it will be found
+ *
+ * @return array Status identifiers list with specific params
+ */
+function fn_get_status_by_type_and_param($type, array $params)
+{
+    if (empty($type) || empty($params)) {
+        return [];
+    }
+
+    $conditions = [];
+
+    foreach ($params as $param_name => $param_value) {
+        $conditions[] = db_quote('(?s, ?s)', $param_name, $param_value);
+    }
+
+    $condition = implode(', ', $conditions);
+
+    return db_get_fields(
+        'SELECT ?:statuses.status'
+        . ' FROM ?:statuses'
+        . ' INNER JOIN ?:status_data'
+            . ' ON ?:status_data.status_id = ?:statuses.status_id'
+        . ' WHERE type = ?s'
+            . ' AND (param, value) IN (?p)',
+        $type,
+        $condition
+    );
+}
+
 /**
  * Checks if a user is an administrator.
  *
@@ -8164,6 +8698,231 @@ function fn_set_notification_settings($event_id, $transport_id, $receiver, $allo
 function fn_is_admin_account_type()
 {
     return AREA === 'A' && ACCOUNT_TYPE === 'admin';
+}
+
+/**
+ * Validates controller via antibot rules schema.
+ *
+ * @param string $controller
+ * @param string $mode
+ * @param string $request_method
+ * @param array  $request
+ *
+ * @return array|null
+ */
+function fn_validate_controller_with_antibot($controller, $mode, $request_method, array $request)
+{
+    /** @var \Tygh\Web\Antibot $antibot */
+    $antibot = Tygh::$app['antibot'];
+
+    if ($antibot->getDriver() instanceof NullDriver) {
+        return null;
+    }
+
+    $antibot_rules = fn_get_schema('security', 'antibot_rules');
+
+    if (!isset($antibot_rules[$controller][$mode])) {
+        return null;
+    }
+
+    $rule = $antibot_rules[$controller][$mode];
+
+    if (isset($rule['condition']) && is_callable($rule['condition'])) {
+        $condition_result = call_user_func($rule['condition'], $request);
+
+        if (!$condition_result) {
+            return null;
+        }
+    }
+
+    if (
+        isset($rule['request_method'])
+        && fn_strtolower($request_method) !== fn_strtolower($rule['request_method'])
+    ) {
+        return null;
+    }
+
+    if (empty($rule['verification_scenario'])) {
+        throw new DeveloperException('Antibot validation rule must contain "verification_scenario" parameter.');
+    }
+
+    if (false !== fn_image_verification($rule['verification_scenario'], $request)) {
+        return null;
+    }
+
+    if (isset($rule['save_post_data'])) {
+        call_user_func_array('fn_save_post_data', (array) $rule['save_post_data']);
+    }
+
+    if (!empty($rule['terminate_process'])) {
+        return [CONTROLLER_STATUS_NO_CONTENT];
+    }
+
+    if (!isset($rule['rewrite_controller_status']) || !is_array($rule['rewrite_controller_status'])) {
+        return null;
+    }
+
+    if (!empty($rule['rewrite_controller_status'][1])) {
+        $location = array_pop($rule['rewrite_controller_status']);
+        if (is_callable($location)) {
+            $location = call_user_func($location);
+        }
+        $rule['rewrite_controller_status'][] = $location;
+    } // Redirect was desired, but no redirect URL was passed
+    elseif ($rule['rewrite_controller_status'][0] === CONTROLLER_STATUS_REDIRECT) {
+        // Just exit here, because core will continue executing controller stack when no redirect URL is given
+        if (empty($request['redirect_url'])) {
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+
+        $rule['rewrite_controller_status'][] = $request['redirect_url'];
+    }
+
+    return $rule['rewrite_controller_status'];
+}
+
+/**
+ * Defines is admin panel will be shown or not
+ *
+ * @param array $auth Authentication user data
+ *
+ * @return bool True if bottom panel is available, false otherwise
+ */
+function fn_is_bottom_panel_available(array $auth)
+{
+    return defined('THEMES_PANEL')
+        || (!empty($auth['user_type']) && in_array($auth['user_type'], [UserTypes::VENDOR, UserTypes::ADMIN]));
+}
+
+/**
+ * Defines is theme editor can be activated by authorized user
+ *
+ * @param array $auth Authentication user data
+ *
+ * @return bool True if theme editor is available, false otherwise
+ */
+function fn_is_theme_editor_available_for_user(array $auth)
+{
+    if (
+        empty($auth)
+        || empty($auth['user_id'])
+        || empty($auth['user_type'])
+    ) {
+        return false;
+    }
+
+    if ($auth['user_type'] !== UserTypes::VENDOR) {
+        return fn_check_permissions('customization', 'update_mode', 'admin', '', ['type' => 'theme_editor'], AREA, $auth['user_id']);
+    }
+
+    return fn_check_company_permissions('customization', 'update_mode', '', ['type' => 'theme_editor'])
+        && ((int) fn_get_styles_owner() === (int) $auth['company_id']);
+}
+
+/**
+ *  Prepares some data for bottom panel
+ *
+ * @return array Prepared bottom panel data
+ */
+function fn_prepare_bottom_panel_data()
+{
+    $quick_menu = fn_get_quick_menu_data();
+
+    $bottom_panel_data = [
+        'quick_menu' => $quick_menu
+    ];
+
+    /**
+     * Allows to extend data provided to bottom panel
+     *
+     * @param array $bottom_panel_data Bottom panel data for this user
+     */
+    fn_set_hook('prepare_bottom_panel_data', $bottom_panel_data);
+
+    return $bottom_panel_data;
+}
+
+/**
+ * The "update_language_post" hook handler.
+ *
+ * Actions performed:
+ *  - Updates data which is not directly relate to language, but depends on it.
+ *
+ * @see \Tygh\Languages\Languages::update()
+ *
+ * @internal
+ */
+function fn_core_update_language_post($language_data, $lang_id, $action, array $previous_language_data)
+{
+    if ($action === 'add') {
+        fn_promotions_update_language_post($language_data);
+    }
+
+    if (
+        $action !== 'update'
+        || $previous_language_data['storefront_ids']
+        || empty($language_data['storefront_ids'])
+    ) {
+        return;
+    }
+
+    Languages::saveStorefrontLanguageIntegrity();
+}
+
+/**
+ * The "delete_languages_post" hook handler.
+ *
+ * Actions performed:
+ *  - Deletes data which is not directly relate to language, but depends on it.
+ *
+ * @see \Tygh\Languages\Languages::deleteLanguages()
+ */
+function fn_core_delete_languages_post($lang_ids, $lang_codes, $deleted_lang_codes)
+{
+    fn_promotions_delete_languages_post($deleted_lang_codes);
+}
+
+/**
+ * The "delete_image_pre" hook handler.
+ *
+ * Actions performed:
+ *  - Deletes image data from related tables
+ *
+ * @see fn_delete_image()
+ */
+function fn_core_delete_image_pre($image_id, $pair_id, $object_type)
+{
+    if ($object_type == 'promotion') {
+        fn_promotions_delete_image_pre($pair_id);
+    }
+}
+
+/**
+ * Gets menu items that declared into specified schema fragment.
+ * @codingStandardsIgnoreStart
+ *
+ * @param array<string, string|array<string, string>> $schema Schema fragment.
+ *
+ * @return array @psalm-return {array<string, string>}
+ *
+ * @codingStandardsIgnoreFinish
+ */
+function fn_get_admin_panel_menu_items(array $schema)
+{
+    $menu_items = [];
+    foreach ($schema as $item_name => $item) {
+        if (isset($item['href'])) {
+            $menu_items[] = [
+                'name' => $item_name,
+                'href' => $item['href'],
+            ];
+        }
+        if (!is_array($item)) {
+            continue;
+        }
+        $menu_items[] = fn_get_admin_panel_menu_items($item);
+    }
+    return $menu_items;
 }
 
 /**
@@ -8225,4 +8984,31 @@ function fn_check_permission_sync_data()
     }
 
     return true;
+}
+
+/**
+ * The "storefront_repository_save_post" hook handler.
+ *
+ * Actions performed:
+ * - Sets all languages available for a storefront storefront when all languages are assigned to another storefronts.
+ *
+ * @param \Tygh\Storefront\Storefront  $storefront  Updated storefront
+ * @param \Tygh\Common\OperationResult $save_result Storefront update result
+ *
+ * @return void
+ *
+ * @see \Tygh\Storefront\Repository::save
+ *
+ * @internal
+ */
+function fn_core_storefront_repository_save_post(Storefront $storefront, OperationResult $save_result)
+{
+    if (
+        $storefront->storefront_id
+        || $save_result->isFailure()
+    ) {
+        return;
+    }
+
+    Languages::saveStorefrontLanguageIntegrity();
 }

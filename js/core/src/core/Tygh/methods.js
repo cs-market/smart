@@ -97,7 +97,7 @@ export const formIsChanged = function () {
     if ($(this).hasClass('cm-skip-check-items')) {
         return false;
     }
-    $(':input:visible,.cm-wysiwyg, .cm-object-picker', this).each(function () {
+    $(':input:visible,.cm-wysiwyg,.cm-object-picker', this).each(function () {
         changed = $(this).fieldIsChanged();
 
         // stop checking fields if changed field finded
@@ -139,9 +139,12 @@ export const fieldIsChanged = function (check_cm_item) {
             changed = true;
         }
     } else if (self.is('input,textarea')) {
-        let val;
+        let val,
+            dom_elm_default_value = dom_elm.defaultValue;
+
         if (self.hasClass('cm-numeric')) {
-            val = self.autoNumeric('get');
+            val = parseFloat(self.autoNumeric('get'));
+            dom_elm_default_value = parseFloat(dom_elm_default_value);
         } else if (self.hasClass('cm-wysiwyg')) {
             val = dom_elm.value;
             const editorValue = $(dom_elm).ceEditor('val');
@@ -152,7 +155,7 @@ export const fieldIsChanged = function (check_cm_item) {
             val = dom_elm.value;
         }
 
-        if (val !== dom_elm.defaultValue) {
+        if (val !== dom_elm_default_value) {
             changed = true;
         }
     }
@@ -299,6 +302,9 @@ export const switchAvailability = function (flag, hide) {
 
     if (flag == false || flag == true) {
         $(':input:not(.cm-skip-avail-switch)', this).prop('disabled', flag).toggleClass('disabled', flag);
+        var fileuploader = $('.cm-fileuploader:not(.cm-skip-avail-switch)', this);
+        fileuploader.prop('hidden', flag);
+        $(fileuploader).find('.cm-fileuploader-field').prop('disabled', flag);
         if (hide) {
             this.toggle(!flag);
         }
@@ -308,6 +314,12 @@ export const switchAvailability = function (flag, hide) {
             var state = self.prop('disabled');
             self.prop('disabled', !state);
             self[state ? 'removeClass' : 'addClass']('disabled');
+        });
+        $('.cm-fileuploader:not(.cm-skip-avail-switch)', this).each(function () {
+            var self = $(this);
+            var state = self.prop('hidden');
+            self.prop('hidden', !state);
+            self.find('.cm-fileuploader-field').prop('disabled', !state);
         });
         if (hide) {
             this.toggle();

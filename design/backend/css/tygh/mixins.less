@@ -99,3 +99,13 @@
     top: -9999px !important;
     left: -9999px !important;
 }
+
+// Hidden control group
+// --------------------------------------------------
+.ifControlGroupHiddenInput(@isControlGroupHidden) when (@isControlGroupHidden) {
+    border-color: transparent;
+}
+
+.ifControlGroupHiddenIcon(@isControlGroupHidden) when (@isControlGroupHidden) {
+    opacity: 0;
+}

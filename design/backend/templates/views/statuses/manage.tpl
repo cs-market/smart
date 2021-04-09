@@ -5,8 +5,8 @@
 <div class="items-container {if $ability_sorting}cm-sortable  ui-sortable{/if}" id="statuses_list"
      {if $ability_sorting}data-ca-sortable-table="statuses" data-ca-sortable-id-name="status_id"{/if}>
 {if $statuses}
-<div class="table-wrapper">
-    <table class="table table-middle table-objects">
+<div class="table-responsive-wrapper">
+    <table class="table table-middle table-objects table-responsive table-responsive-w-titles">
     {foreach from=$statuses item="s" key="key"}
         {if $s.is_default !== "Y"}
             {assign var="cur_href_delete" value="statuses.delete?status=`$s.status`&type=`$type`"}
@@ -40,7 +40,7 @@
             text=$s.description
             href="statuses.update?status=`$s.status`&type=`$type`"
             href_delete=$cur_href_delete delete_target_id="statuses_list,actions_panel"
-            header_text="{__("editing_status")}: `$s.description`"
+            header_text=$s.description
             additional_class="cm-sortable-row cm-sortable-id-`$s.status_id`"
             table="statuses"
             object_id_name="status_id"

@@ -22,9 +22,17 @@ class SchemesManager
 {
     /**
      * Static storage for already read schemes
-     * @var array Static storage for already read schemes
+     *
+     * @var array{block: array<string, array<string, string>>, templates: string, content: array<string, string|bool|array>} $schemes Static storage for already read schemes
      */
     private static $schemes;
+
+    /**
+     * Static storage for already read schemes for grids
+     *
+     * @var array{wrappers: array<string, string>} $grid_schemes Static storage for already read schemes for grids
+     */
+    private static $grid_schemes;
 
     /**
      * Returns list of dispatches and it's descriptions
@@ -613,9 +621,29 @@ class SchemesManager
         }
 
         if (!$object_schema) {
-            $object_schema = isset($object['type']) ? SchemesManager::getBlockScheme($object['type'], []) : fn_get_schema('block_manager', 'grids');
+            $object_schema = SchemesManager::getBlockScheme($object['type'], []);
         }
 
-        return in_array($object['wrapper'], array_keys($object_schema['wrappers']));
+        return isset($object_schema['wrappers'][$object['wrapper']]);
+    }
+
+    /**
+     * Checks selected wrapper for specified grid and allows or denies usage of that wrapper.
+     *
+     * @param array{s_layout: string|NULL, grid_id: int, container_id: int, parent_id: int, width: int, content_align: string, user_class: string, active_tab: string, alpha: int, omega: int, order: int} $object Object data
+     *
+     * @return bool True if wrapper is allowed, false - if forbidden.
+     */
+    public static function isGridWrapperAvailable(array $object)
+    {
+        if (empty($object['wrapper'])) {
+            return true;
+        }
+
+        if (empty(self::$grid_schemes)) {
+            self::$grid_schemes = fn_get_schema('block_manager', 'grids');
+        }
+
+        return in_array($object['wrapper'], self::$grid_schemes['wrappers']);
     }
 }

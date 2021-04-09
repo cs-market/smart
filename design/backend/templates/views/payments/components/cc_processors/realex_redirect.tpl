@@ -15,7 +15,7 @@
 <div class="control-group">
     <label class="control-label" for="secret_word">{__("shared_secret")}:</label>
     <div class="controls">
-        <input type="password" name="payment_data[processor_params][secret_word]" id="secret_word" value="{$processor_params.secret_word}" >
+        <input type="password" name="payment_data[processor_params][secret_word]" id="secret_word" value="{$processor_params.secret_word}" autocomplete="new-password" >
     </div>
 </div>
 

@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Settings;
 
 include_once(Registry::get('config.dir.schemas') . 'exim/products.functions.php');
 include_once(Registry::get('config.dir.schemas') . 'exim/features.functions.php');
@@ -70,11 +71,16 @@ $schema = [
             'args'        => ['$import_data'],
             'import_only' => true,
         ],
+        'prepare_default_categories' => [
+            'function'    => 'fn_import_prepare_default_categories',
+            'args'        => ['$processed_data'],
+            'import_only' => true,
+        ],
     ],
     'post_processing' => [
         'send_product_notifications' => [
             'function'    => 'fn_exim_send_product_notifications',
-            'args'        => ['$primary_object_ids', '$import_data', '$auth'],
+            'args'        => ['$primary_object_ids', '$import_data', '$processed_data'],
             'import_only' => true,
         ],
     ],
@@ -100,14 +106,12 @@ $schema = [
             'function'    => 'fn_import_skip_new_products',
             'args'        => ['$primary_object_id', '$object', '$pattern', '$options', '$processed_data', '$processing_groups', '$skip_record'],
             'import_only' => true,
-        ]
-    ],
-    'import_after_process_data' => [
-        'set_company_id' => [
-            'function'    => 'fn_exim_set_product_company_after_process_data',
-            'args'        => ['$primary_object_id', '$object', '$processed_data'],
-            'import_only' => true
         ],
+        'prepare_overridable_fields' => [
+            'function'    => 'fn_import_prepare_product_overridable_fields',
+            'args'        => ['$object'],
+            'import_only' => true,
+        ]
     ],
     'range_options' => [
         'selector_url' => 'products.manage',
@@ -204,14 +208,14 @@ $schema = [
         ],
         'Category' => [
             'process_get' => ['fn_exim_get_product_categories', '#key', 'M', '@category_delimiter', '#lang_code'],
-            'process_put' => ['fn_exim_set_product_categories', '#key', 'M', '#this', '@category_delimiter'],
+            'process_put' => ['fn_exim_set_product_categories', '#key', 'M', '#this', '@category_delimiter', '%Store%', '#counter', '#new'],
             'multilang'   => true,
             'linked'      => false, // this field is not linked during import-export
-            'default'     => 'Products' // default value applies only when we creating new record
+            'default'     => ''
         ],
         'Secondary categories' => [
             'process_get' => ['fn_exim_get_product_categories', '#key', 'A', '@category_delimiter', '#lang_code'],
-            'process_put' => ['fn_exim_set_product_categories', '#key', 'A', '#this', '@category_delimiter'],
+            'process_put' => ['fn_exim_set_product_categories', '#key', 'A', '#this', '@category_delimiter', '%Store%', '#counter', '#new'],
             'multilang'   => true,
             'linked'      => false, // this field is not linked during import-export
         ],
@@ -241,16 +245,16 @@ $schema = [
             'db_field' => 'weight'
         ],
         'Min quantity' => [
-            'db_field' => 'min_qty'
+            'db_field' => 'min_qty',
         ],
         'Max quantity' => [
-            'db_field' => 'max_qty'
+            'db_field' => 'max_qty',
         ],
         'Quantity step' => [
-            'db_field' => 'qty_step'
+            'db_field' => 'qty_step',
         ],
         'List qty count' => [
-            'db_field' => 'list_qty_count'
+            'db_field' => 'list_qty_count',
         ],
         'Shipping freight' => [
             'db_field'    => 'shipping_freight',
@@ -413,10 +417,10 @@ $schema = [
             'return_result' => true
         ],
         'Options type' => [
-            'db_field' => 'options_type'
+            'db_field' => 'options_type',
         ],
         'Exceptions type' => [
-            'db_field' => 'exceptions_type'
+            'db_field' => 'exceptions_type',
         ],
     ],
 ];
@@ -443,9 +447,34 @@ if (fn_allowed_for('ULTIMATE')) {
 
     if (!Registry::get('runtime.company_id')) {
         $schema['export_fields']['Store']['required'] = true;
-        $schema['export_fields']['Category']['process_put'] = ['fn_exim_set_product_categories', '#key', 'M', '#this', '@category_delimiter', '%Store%'];
-        $schema['export_fields']['Features']['process_put'] = ['fn_exim_set_product_features', '#key', '#this', '@features_delimiter', '#lang_code', '%Store%'];
-        $schema['export_fields']['Secondary categories']['process_put'] = ['fn_exim_set_product_categories', '#key', 'A', '#this', '@category_delimiter', '%Store%'];
+        $schema['export_fields']['Category']['process_put'] = [
+            'fn_exim_set_product_categories',
+            '#key',
+            'M',
+            '#this',
+            '@category_delimiter',
+            '%Store%',
+            '#counter',
+            '#new'
+        ];
+        $schema['export_fields']['Features']['process_put'] = [
+            'fn_exim_set_product_features',
+            '#key',
+            '#this',
+            '@features_delimiter',
+            '#lang_code',
+            '%Store%'
+        ];
+        $schema['export_fields']['Secondary categories']['process_put'] = [
+            'fn_exim_set_product_categories',
+            '#key',
+            'A',
+            '#this',
+            '@category_delimiter',
+            '%Store%',
+            '#counter',
+            '#new'
+        ];
     }
     $schema['import_process_data']['check_product_company_id'] = [
         'function'    => 'fn_import_check_product_company_id',
@@ -475,4 +504,23 @@ if (fn_allowed_for('MULTIVENDOR')) {
         $schema['references']['product_popularity']['import_skip_db_processing'] = true;
     }
 }
+
+$overridable_product_fields_schema = fn_get_product_overridable_fields_schema();
+
+foreach ($schema['export_fields'] as $key => $export_field) {
+    if (empty($export_field['db_field']) || !isset($overridable_product_fields_schema[$export_field['db_field']])) {
+        continue;
+    }
+
+    $overridable_product_field_schema = $overridable_product_fields_schema[$export_field['db_field']];
+
+    $global_value = Settings::getSettingValue($overridable_product_field_schema['global_setting']);
+
+    if ($global_value === null) {
+        continue;
+    }
+
+    unset($schema['export_fields'][$key]);
+}
+
 return $schema;

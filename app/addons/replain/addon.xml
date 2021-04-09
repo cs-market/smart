@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
-<addon scheme="3.0" edition_type="ROOT,ULT:VENDOR">
+<addon scheme="3.0">
     <id>replain</id>
     <version>1.0</version>
     <default_language>en</default_language>
     <priority>5000</priority>
     <status>active</status>
-    <settings edition_type="ROOT,ULT:VENDOR">
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>
@@ -15,7 +15,7 @@
                     </item>  
                     <item id="replain_script">
                         <type>textarea</type>
-                        <default_value></default_value>
+                        <default_value/>
                     </item>
                 </items>
             </section>

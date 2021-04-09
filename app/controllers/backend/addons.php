@@ -14,15 +14,28 @@
 
 use Tygh\Addons\SchemesManager;
 use Tygh\Enum\NotificationSeverity;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Snapshot;
+use Tygh\Tools\Url;
 use Tygh\Tygh;
 
 defined('BOOTSTRAP') or die('Access denied');
 
 /** @var \Tygh\SmartyEngine\Core $view */
 $view = Tygh::$app['view'];
+
+$storefront_id = empty($_REQUEST['storefront_id'])
+    ? 0
+    : (int) $_REQUEST['storefront_id'];
+
+if (fn_allowed_for('ULTIMATE')) {
+    $storefront_id = 0;
+    if (fn_get_runtime_company_id()) {
+        $storefront_id = StorefrontProvider::getStorefront()->storefront_id;
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -34,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     fn_trusted_vars(
         'addon_data'
     );
-    
+
     $redirect_url = !empty($_REQUEST['return_url'])
         ? $_REQUEST['return_url']
         : 'addons.manage';
@@ -47,10 +60,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         if (isset($_REQUEST['addon_data'])) {
-            fn_update_addon($_REQUEST['addon_data']);
+            fn_update_addon($_REQUEST['addon_data'], $storefront_id);
         }
 
-        return [CONTROLLER_STATUS_OK, 'addons.update?addon=' . $_REQUEST['addon']];
+        $redirect_url_params = [
+            'addon' => $_REQUEST['addon'],
+        ];
+
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $redirect_url_params['storefront_id'] = $storefront_id;
+        }
+
+        return [
+            CONTROLLER_STATUS_OK,
+            Url::buildUrn(['addons', 'update'], $redirect_url_params),
+        ];
     } elseif ($mode === 'recheck') {
         $addon_name = $_REQUEST['addon_name'];
         $addon_extract_path = $_REQUEST['addon_extract_path'];
@@ -256,13 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             return [CONTROLLER_STATUS_NO_PAGE];
         }
 
-        db_query(
-            'UPDATE ?:addons SET ?u WHERE addon = ?s',
-            [
-                'marketplace_license_key' => $license_key,
-            ],
-            $addon_id
-        );
+        fn_update_addon_license_key($addon_id, $license_key);
 
         fn_set_notification(
             NotificationSeverity::NOTICE,
@@ -294,20 +312,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             Tygh::$app['ajax']->assign('return_status', $status);
         }
         Registry::clearCachedKeyValues();
-        
+
         return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
     }
 
     if ($mode == 'install') {
         fn_install_addon($_REQUEST['addon']);
         Registry::clearCachedKeyValues();
-        
+
         return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
     }
 
     if ($mode == 'uninstall') {
         fn_uninstall_addon($_REQUEST['addon']);
-        
+
         return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
     }
 
@@ -358,7 +376,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     ])
                 );
             }
-            
+
             return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
         }
     }
@@ -366,23 +384,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return [CONTROLLER_STATUS_OK, $redirect_url];
 }
 
-if ($mode == 'update') {
+if ($mode === 'update') {
     $addon_scheme = SchemesManager::getScheme($_REQUEST['addon']);
 
     if ($addon_scheme === false || $addon_scheme->isPromo()) {
         return [CONTROLLER_STATUS_NO_PAGE];
     }
 
-    $addon_name = addslashes($_REQUEST['addon']);
+    $settings_manager = Settings::instance(['storefront_id' => $storefront_id]);
 
-    $section = Settings::instance()->getSectionByName($_REQUEST['addon'], Settings::ADDON_SECTION);
+    $view->assign('selected_storefront_id', $storefront_id);
+
+    $section = $settings_manager->getSectionByName($_REQUEST['addon'], Settings::ADDON_SECTION);
 
     if (empty($section)) {
         return [CONTROLLER_STATUS_NO_PAGE];
     }
 
-    $subsections = Settings::instance()->getSectionTabs($section['section_id'], CART_LANGUAGE);
-    $options = Settings::instance()->getList($section['section_id']);
+    $subsections = $settings_manager->getSectionTabs($section['section_id'], CART_LANGUAGE);
+    $options = $settings_manager->getList($section['section_id']);
 
     fn_update_lang_objects('sections', $subsections);
     fn_update_lang_objects('options', $options);
@@ -411,23 +431,40 @@ if ($mode == 'update') {
             'addon_name' => $addon['name'],
         ]);
     }
-} elseif ($mode == 'manage') {
-    list($addons, $search, $addons_counter) = fn_get_addons([]);
-    $suppliers = array_filter(array_unique(array_column($addons, 'supplier')), function($supplier) {return !empty($supplier);});
+} elseif ($mode === 'manage') {
+    list($addons, $search, $addons_counter) = fn_get_addons(
+        [],
+        0,
+        CART_LANGUAGE,
+        $storefront_id,
+        fn_get_runtime_company_id()
+    );
+    $developers = array_filter(array_unique(array_column($addons, 'supplier')));
+    $all_suppliers = fn_get_addon_suppliers($addons);
+    $view->assign(['all_suppliers' => $all_suppliers]);
+    $suppliers = array_slice($all_suppliers, 0, 4, true);
 
     if (!empty($_REQUEST)) {
         $params = $_REQUEST;
         $params['for_company'] = (bool) Registry::get('runtime.company_id');
 
-        list($addons, $search, $addons_counter) = fn_get_addons($params);
+        list($addons, $search, $addons_counter) = fn_get_addons(
+            $params,
+            0,
+            CART_LANGUAGE,
+            $storefront_id,
+            fn_get_runtime_company_id()
+        );
     }
 
     $view->assign([
-        'search'         => $search,
-        'addons_list'    => $addons,
-        'addons_counter' => $addons_counter,
-        'snapshot_exist' => Snapshot::exist(),
-        'developers'     => $suppliers,
+        'search'                 => $search,
+        'addons_list'            => $addons,
+        'addons_counter'         => $addons_counter,
+        'snapshot_exist'         => Snapshot::exist(),
+        'developers'             => $developers,
+        'selected_storefront_id' => $storefront_id,
+        'suppliers'              => $suppliers,
     ]);
 } elseif ($mode == 'licensing') {
     if (empty($_REQUEST['addon'])) {

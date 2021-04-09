@@ -26,7 +26,7 @@
                     input_name="sl_search[company_id]"
                     show_advanced=false
                     show_empty_variant=true
-                    empty_variant_text=__("all")
+                    empty_variant_text=__("all", ["skip_live_editor" => true])
                 }
             </div>
         {/if}
@@ -38,7 +38,7 @@
                 show_advanced=false
                 show_empty_variant=true
                 item_ids=($sl_search.city) ? [$sl_search.city] : []
-                empty_variant_text=__("all")
+                empty_variant_text=__("all", ["skip_live_editor" => true])
             }
         <!--store_location_search_city--></div>
     </div>

@@ -14,13 +14,9 @@
 
 namespace Tygh\Notifications\Transports\Internal;
 
-use Tygh\Database\Connection;
-use Tygh\Enum\RecipientSearchMethods;
-use Tygh\Enum\UserTypes;
 use Tygh\Exceptions\DeveloperException;
 use Tygh\Notifications\Transports\BaseMessageSchema;
 use Tygh\Notifications\Transports\ITransport;
-use Tygh\NotificationsCenter\IFactory;
 
 /**
  * Class InternalTransport implements a transport that creates notifications in the Notifications center
@@ -45,14 +41,17 @@ class InternalTransport implements ITransport
      */
     protected $factory;
 
+    /**
+     * @var \Tygh\Notifications\Transports\Internal\ReceiverFinderFactory
+     */
+    protected $receiver_finder_factory;
+
     public function __construct(
         $notifications_center,
-        Connection $db,
-        IFactory $factory
+        ReceiverFinderFactory $receiver_finder_factory
     ) {
         $this->notifications_center = $notifications_center;
-        $this->db = $db;
-        $this->factory = $factory;
+        $this->receiver_finder_factory = $receiver_finder_factory;
     }
 
     public static function getId()
@@ -61,19 +60,17 @@ class InternalTransport implements ITransport
     }
 
     /**
-     * @param \Tygh\Notifications\Transports\BaseMessageSchema $schema
-     *
-     * @return bool
+     * @inheritDoc
      */
-    public function process(BaseMessageSchema $schema)
+    public function process(BaseMessageSchema $schema, array $receiver_search_conditions)
     {
         if (!$schema instanceof InternalMessageSchema) {
             throw new DeveloperException('Input data should be instance of InternalMessageSchema');
         }
 
-        $recipients = $this->getRecipients($schema->recipient_search_method, $schema->recipient_search_criteria);
+        $receivers = $this->getReceivers($receiver_search_conditions, $schema);
 
-        foreach ($recipients as $user_id => $area) {
+        foreach ($receivers as $user_id => $area) {
             $notificaion_data = array_filter([
                 'user_id'       => $user_id,
                 'title'         => $schema->title,
@@ -97,48 +94,21 @@ class InternalTransport implements ITransport
     }
 
     /**
-     * Gets message recipients.
+     * Gets message receivers.
      *
-     * @param string                    $method   Recipients search method
-     * @param int|string|int[]|string[] $criteria Recipients search criteria
+     * @param \Tygh\Notifications\Receivers\SearchCondition[]               $receiver_search_conditions Receiver search conditions.
+     * @param \Tygh\Notifications\Transports\Internal\InternalMessageSchema $schema                     Internal message schema
      *
-     * @see \Tygh\Enum\RecipientSearchMethods Possible $type values
-     *
-     * @return array
+     * @return array<int, string>
      */
-    protected function getRecipients($method, $criteria)
+    protected function getReceivers(array $receiver_search_conditions, InternalMessageSchema $schema)
     {
-        $conditions = [
-            'users.status' => 'A',
-        ];
+        $users = [];
 
-        switch ($method) {
-            case RecipientSearchMethods::USER_ID:
-                $conditions['users.user_id'] = $criteria;
-                break;
-            case RecipientSearchMethods::EMAIL:
-                $conditions['users.email'] = $criteria;
-                break;
-            case RecipientSearchMethods::USERGROUP_ID:
-                $conditions['usergroups.usergroup_id'] = $criteria;
-                $conditions['usergroups.status'] = 'A';
-                break;
-            default:
-                return [];
+        foreach ($receiver_search_conditions as $condition) {
+            $finder = $this->receiver_finder_factory->get($condition->getMethod());
+            $users += $finder->find($condition->getCriterion(), $schema);
         }
-
-        $users = $this->db->getSingleHash(
-            'SELECT users.user_id AS user_id, (CASE WHEN users.user_type = ?s THEN ?s ELSE ?s END) AS area'
-            . ' FROM ?:users AS users'
-            . ' LEFT JOIN ?:usergroup_links AS usergroups ON usergroups.user_id = users.user_id'
-            . ' WHERE ?w'
-            . ' GROUP BY users.user_id',
-            ['user_id', 'area'],
-            UserTypes::CUSTOMER,
-            UserTypes::CUSTOMER,
-            UserTypes::ADMIN,
-            $conditions
-        );
 
         return $users;
     }

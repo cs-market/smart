@@ -73,7 +73,7 @@ class AuthCommandHandler
         if (
             $command->auth_login !== $user_login
             || empty($user_data['password'])
-            || $user_data['password'] !== fn_generate_salted_password($command->auth_password, $salt)
+            || !fn_user_password_verify((int) $user_data['user_id'], $command->auth_password, (string) $user_data['password'], $salt)
         ) {
             $result->addError('login_error', 'Error in user login or password');
             return $result;

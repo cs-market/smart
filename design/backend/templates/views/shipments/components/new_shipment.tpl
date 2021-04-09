@@ -98,7 +98,7 @@
                 <div class="controls">
                     <select name="shipment_data[shipping_id]" id="shipping_name">
                         {foreach from=$shippings item="shipping"}
-                            <option    value="{$shipping.shipping_id}">{$shipping.shipping}</option>
+                            <option value="{$shipping.shipping_id}" {if $current_shipping_id === $shipping.shipping_id}selected{/if}>{$shipping.shipping}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -135,7 +135,7 @@
                             <option value="{$key}">{$status}</option>
                         {/foreach}
                     </select>
-                    <p class="description">
+                    <p class="muted description">
                         {__("text_order_status_notification")}
                     </p>
                 </div>

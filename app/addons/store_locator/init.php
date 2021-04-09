@@ -32,8 +32,6 @@ fn_register_hooks(
     'update_cart_by_data_post',
     /** @see \fn_store_locator_pickup_point_variable_init() */
     'pickup_point_variable_init',
-    /** @see \fn_store_locator_get_shipping_info_after_select() */
-    'get_shipping_info_after_select',
     /** @see \fn_store_locator_calculate_cart_content_before_shipping_calculation() */
     'calculate_cart_content_before_shipping_calculation',
     /** @see \fn_store_locator_update_shipping() */

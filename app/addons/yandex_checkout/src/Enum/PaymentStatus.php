@@ -15,7 +15,7 @@
 namespace Tygh\Addons\YandexCheckout\Enum;
 
 /**
- * Class PaymentStatus represents all available payment statuses in Yandex.Checkout API
+ * Class PaymentStatus represents all available payment statuses in YooKassa API
  *
  * @package Tygh\Addons\YandexCheckout\Enum
  */

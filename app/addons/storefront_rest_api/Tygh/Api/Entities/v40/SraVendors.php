@@ -7,6 +7,7 @@ use Tygh\Api\Response;
 use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
+use Tygh\Tygh;
 
 class SraVendors extends Vendors
 {
@@ -54,6 +55,12 @@ class SraVendors extends Vendors
     public function index($id = 0, $params = [])
     {
         $params['status'] = 'A';
+
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        if ($storefront->getCompanyIds()) {
+            $params['company_id'] = $storefront->getCompanyIds();
+        }
 
         $response = parent::index($id, $params);
 
@@ -154,7 +161,7 @@ class SraVendors extends Vendors
     {
 
         $params = array();
-        
+
         $params['extend'] = array('products_count' => $company_id);
         $params['company_id'] = $company_id;
 

@@ -5,8 +5,8 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: de_DE\n"
 
 msgctxt "Addons::name::commerceml"
-msgid "CommerceML (1C, MoySklad, Business.ru) [Dev]"
-msgstr "CommerceML (1C, MoySklad, Business.ru) [Dev]"
+msgid "CommerceML (1C, MoySklad, Business.ru) [Beta]"
+msgstr "CommerceML (1C, MoySklad, Business.ru) [Beta]"
 
 msgctxt "Addons::description::commerceml"
 msgid "Allows you to import products from and export orders to CRMs that support CommerceML: 1C, MoySklad, Business.ru."
@@ -77,8 +77,8 @@ msgid "Disabled"
 msgstr "Disabled"
 
 msgctxt "Languages::commerceml.cml_default_lang"
-msgid "Default language"
-msgstr "Default language"
+msgid "Content language in CRM"
+msgstr "Content language in CRM"
 
 msgctxt "Languages::commerceml.cml_catalog_default_category_id"
 msgid "Default category"
@@ -216,22 +216,6 @@ msgctxt "Languages::commerceml.cml_catalog_convertor_page_title_source.full_name
 msgid "Full name"
 msgstr "Full name"
 
-msgctxt "Languages::commerceml.cml_catalog_convertor_brand_source"
-msgid "Brand"
-msgstr "Brand"
-
-msgctxt "Languages::commerceml.cml_catalog_convertor_brand_source.none"
-msgid "Do not import"
-msgstr "Do not import"
-
-msgctxt "Languages::commerceml.cml_catalog_convertor_brand_source.manufacturer"
-msgid "Use \"Manufacturer\" field"
-msgstr "Use \"Manufacturer\" field"
-
-msgctxt "Languages::commerceml.cml_catalog_convertor_brand_source.property"
-msgid "Use another field"
-msgstr "User another field"
-
 msgctxt "Languages::commerceml.cml_catalog_convertor_promo_text_property_source.custom_field"
 msgid "Custom field"
 msgstr "Custom field"
@@ -279,6 +263,26 @@ msgstr "Box width"
 msgctxt "Languages::commerceml.cml_catalog_convertor_box_height_property_source_list"
 msgid "Box height"
 msgstr "Box height"
+
+msgctxt "Languages::commerceml.orders_export"
+msgid "Orders export"
+msgstr "Orders export"
+
+msgctxt "Languages::commerceml.orders_import"
+msgid "Orders import"
+msgstr "Orders import"
+
+msgctxt "Languages::commerceml.cml_order_export_strategy"
+msgid "Export strategy"
+msgstr "Export strategy"
+
+msgctxt "Languages::commerceml.cml_orders_exporter_strategy.a"
+msgid "Export all orders"
+msgstr "Export all orders"
+
+msgctxt "Languages::commerceml.cml_orders_exporter_strategy.n"
+msgid "Export new orders and changes to existing orders only"
+msgstr "Export new orders and changes to existing orders only"
 
 msgctxt "Languages::commerceml.product_features"
 msgid "Product features"
@@ -388,13 +392,13 @@ msgctxt "Languages::commerceml.store"
 msgid "store"
 msgstr "store"
 
-msgctxt "Languages::commerceml.cml_order_export_shipping"
-msgid "Display shipping fees for orders as a separate line in 1C"
-msgstr "Display shipping fees for orders as a separate line in 1C"
+msgctxt "Languages::commerceml.cml_order_export_shipping_fee"
+msgid "Export shipping fee"
+msgstr "Export shipping fee"
 
-msgctxt "Languages::commerceml.cml_order_export_shipping.tooltip"
-msgid "Shipping fee for an order from the store will be added to 1C as a separate line"
-msgstr "Shipping fee for an order from the store will be added to 1C as a separate line"
+msgctxt "Languages::commerceml.cml_order_export_shipping_fee.tooltip"
+msgid "Orders will have shipping fee as a separate product"
+msgstr "Orders will have shipping fee as a separate product"
 
 msgctxt "Languages::commerceml.cml_order_export_product_options"
 msgid "Export product options"
@@ -404,37 +408,29 @@ msgctxt "Languages::commerceml.cml_order_export_product_options.tooltip"
 msgid "Export order with product options"
 msgstr "Export order with product options"
 
+msgctxt "Languages::commerceml.cml_order_export_statuses.tooltip"
+msgid "Export order statuses in CommerceML format"
+msgstr "Export order statuses in CommerceML format"
+
 msgctxt "Languages::commerceml.cml_order_export_from_order_id"
 msgid "Start export from Order #"
 msgstr "Start export from Order #"
 
 msgctxt "Languages::commerceml.cml_order_export_from_order_id.tooltip"
-msgid "If there is no value, all the orders will be exported."
-msgstr "If there is no value, all the orders will be exported."
-
-msgctxt "Languages::commerceml.cml_order_import_statuses"
-msgid "Import order statuses"
-msgstr "Import order statuses"
-
-msgctxt "Languages::commerceml.cml_order_import_statuses.tooltip"
-msgid "Import order statuses in CommerceML format"
-msgstr "Import order statuses in CommerceML format"
+msgid "Leave empty to export all orders"
+msgstr "Leave empty to export all orders"
 
 msgctxt "Languages::commerceml.cml_order_export_statuses"
 msgid "Export order statuses"
 msgstr "Export order statuses"
 
-msgctxt "Languages::commerceml.cml_order_export_statuses.tooltip"
-msgid "Export order statuses in CommerceML format"
-msgstr "Export order statuses in CommerceML format"
-
 msgctxt "Languages::commerceml.cml_order_statuses_filter"
 msgid "Order statuses"
 msgstr "Order statuses"
 
-msgctxt "Languages::commerceml.cml_order_statuses_filter.tooltip"
-msgid "Export orders with chosen statuses. If no statuses are chosen, orders will be exported without them."
-msgstr "Export orders with chosen statuses. If no statuses are chosen, orders will be exported without them."
+msgctxt "Languages::commerceml.cml_orders_import_changes"
+msgid "Import changes to orders"
+msgstr "Import changes to orders"
 
 msgctxt "Languages::commerceml.map.entity_name"
 msgid "External name"
@@ -508,6 +504,10 @@ msgctxt "Languages::commerceml.import.message.product.default_category_used"
 msgid "Couldn't find category [id]; default category [local_id] used instead"
 msgstr "Couldn't find category [id]; default category [local_id] used instead"
 
+msgctxt "Languages::commerceml.import.message.product.no_categories_default_category_used"
+msgid "Product [product_id] does not have categories; default category [local_id] used instead"
+msgstr "Product [product_id] does not have categories; default category [local_id] used instead"
+
 msgctxt "Languages::commerceml.import.message.product.created"
 msgid "Product [id] created; local ID: [local_id], price: [price], quantity: [amount]"
 msgstr "Product [id] created; local ID: [local_id], price: [price], quantity: [amount]"
@@ -559,6 +559,18 @@ msgstr "Category [id] created; local ID: [local_id]"
 msgctxt "Languages::commerceml.import.message.product_feature.created"
 msgid "Product feature [id] created; local ID: [local_id]"
 msgstr "Product feature [id] created; local ID: [local_id]"
+
+msgctxt "Languages::commerceml.import.message.product_feature.skipped"
+msgid "Skipping product feature [id]; reason: import this product feature is disabled in the mapping settings"
+msgstr "Skipping product feature [id]; reason: import this product feature is disabled in the mapping settings"
+
+msgctxt "Languages::commerceml.import.message.product_feature.variant_skipped"
+msgid "Skipping product feature variant [id]; reason: import this product feature variant is disabled in the mapping settings"
+msgstr "Skipping product feature variant [id]; reason: import this product feature variant is disabled in the mapping settings"
+
+msgctxt "Languages::commerceml.import.message.category.skipped"
+msgid "Skipping product category [id]; reason: import this product category is disabled in the mapping settings"
+msgstr "Skipping product category [id]; reason: import this product category is disabled in the mapping settings"
 
 msgctxt "Languages::commerceml.import.error.product_feature.not_found"
 msgid "Couldn't find product feature [id]"
@@ -612,6 +624,50 @@ msgctxt "Languages::commerceml.import.message.end_import_product"
 msgid "Finishing the import of product [id]"
 msgstr "Finishing the import of product [id]"
 
+msgctxt "Languages::commerceml.controller.import_orders_is_disabled"
+msgid "Import changes to orders is disabled. Importing order was canceled."
+msgstr "Import changes to orders is disabled. Importing order was canceled."
+
+msgctxt "Lnaguages::commerceml.controller.start_handle_export_orders"
+msgid "Request for exporting the orders received"
+msgstr "Request for exporting the orders received"
+
+msgctxt "Lnaguages::commerceml.controller.end_handle_export_orders"
+msgid "Request for exporting the orders processed"
+msgstr "Request for exporting the orders processed"
+
+msgctxt "Languages::commerceml.controller.start_handle_sale_file"
+msgid "Request for downloading the sale synchronization file [filename] received"
+msgstr "Request for downloading the sale synchronization file [filename] received"
+
+msgctxt "Languages::commerceml.controller.end_handle_sale_file"
+msgid "Request for downloading the sale synchronization file [filename] processed"
+msgstr "Request for downloading the sale synchronization file [filename] processed"
+
+msgctxt "Languages::commerceml.controller.start_handle_sale_import_convert"
+msgid "Request for converting the sale synchronization file [filename] received"
+msgstr "Request for converting the sale synchronization file [filename] received"
+
+msgctxt "Languages::commerceml.controller.end_handle_sale_import_convert"
+msgid "Request for converting the catalog synchronization file [filename] processed"
+msgstr "Request for converting the catalog synchronization file [filename] processed"
+
+msgctxt "Languages::commerceml.controller.start_handle_sale_import_execute"
+msgid "Request for importing data from the sale synchronization file [filename] received"
+msgstr "Request for importing data from the sale synchronization file [filename] received"
+
+msgctxt "Languages::commerceml.controller.end_handle_sale_import_execute"
+msgid "Request for importing data from the sale synchronization file [filename] processed"
+msgstr "Request for importing data from the sale synchronization file [filename] processed"
+
+msgctxt "Languages::commerceml.import.message.start_update_order"
+msgid "Starting the import of order [id]"
+msgstr "Starting the import of order [id]"
+
+msgctxt "Languages::commerceml.import.message.end_update_order"
+msgid "Finishing the import of order [id]"
+msgstr "Finishing the import of order [id]"
+
 msgctxt "Languages::commerceml.controller.start_handle_catalog_checkauth_request"
 msgid "Request for synchronization session received"
 msgstr "Request for synchronization session received"
@@ -645,28 +701,28 @@ msgid "Request for unpacking the synchronization file [filename] processed"
 msgstr "Request for unpacking the synchronization file [filename] processed"
 
 msgctxt "Languages::commerceml.controller.start_handle_catalog_import_convert"
-msgid "Request for converting the synchronization file [filename] received"
-msgstr "Request for converting the synchronization file [filename] received"
+msgid "Request for converting the catalog synchronization file [filename] received"
+msgstr "Request for converting the catalog synchronization file [filename] received"
 
 msgctxt "Languages::commerceml.controller.end_handle_catalog_import_convert"
-msgid "Request for converting the synchronization file [filename] processed"
-msgstr "Request for converting the synchronization file [filename] processed"
+msgid "Request for converting the catalog synchronization file [filename] processed"
+msgstr "Request for converting the catalog synchronization file [filename] processed"
 
 msgctxt "Languages::commerceml.controller.start_handle_catalog_import_analyze"
-msgid "Request for analyzing the synchronization file [filename] received"
-msgstr "Request for analyzing the synchronization file [filename] received"
+msgid "Request for analyzing the catalog synchronization file [filename] received"
+msgstr "Request for analyzing the catalog synchronization file [filename] received"
 
 msgctxt "Languages::commerceml.controller.end_handle_catalog_import_analyze"
-msgid "Request for analyzing the synchronization file [filename] processed"
-msgstr "Request for analyzing the synchronization file [filename] processed"
+msgid "Request for analyzing the catalog synchronization file [filename] processed"
+msgstr "Request for analyzing the catalog synchronization file [filename] processed"
 
 msgctxt "Languages::commerceml.controller.start_handle_catalog_import_execute"
-msgid "Request for importing data from the synchronization file [filename] received"
-msgstr "Request for importing data from the synchronization file [filename] received"
+msgid "Request for importing data from the catalog synchronization file [filename] received"
+msgstr "Request for importing data from the catalog synchronization file [filename] received"
 
 msgctxt "Languages::commerceml.controller.end_handle_catalog_import_execute"
-msgid "Request for importing data from the synchronization file [filename] processed"
-msgstr "Request for importing data from the synchronization file [filename] processed"
+msgid "Request for importing data from the catalog synchronization file [filename] processed"
+msgstr "Request for importing data from the catalog synchronization file [filename] processed"
 
 msgctxt "Languages::commerceml.controller.end_handle_request"
 msgid "Finishing the processing of the [mode] request"
@@ -688,9 +744,17 @@ msgctxt "Languages::commerceml.controller.error"
 msgid "Error: [message]"
 msgstr "Error: [message]"
 
-msgctxt "Languages::commerceml.brand_default_product_feature_name"
-msgid "Brand"
-msgstr "Brand"
+msgctxt "Languages::commerceml.controller.start_handle_export_orders"
+msgid "Request for exporting orders received"
+msgstr "Request for exporting orders received"
+
+msgctxt "Languages::commerceml.controller.end_handle_export_orders"
+msgid "Request for exporting orders processed"
+msgstr "Request for exporting orders processed"
+
+msgctxt "Languages::commerceml.brand_manufacturer_default_product_feature_name"
+msgid "Manufacturer"
+msgstr "Manufacturer"
 
 msgctxt "Languages::commerceml.sync_data_name"
 msgid "CommerceML: 1C, MoySklad, Business.ru"
@@ -741,16 +805,16 @@ msgid "Create product feature on next sync"
 msgstr "Create product feature on next sync"
 
 msgctxt "Languages::commerceml.map.product_feature.skip"
-msgid "Skip product feature"
-msgstr "Skip product feature"
+msgid "Don't import"
+msgstr "Don't import"
 
 msgctxt "Languages::commerceml.map.product_feature_variant.create"
 msgid "Create product feature variant on next sync"
 msgstr "Create product feature variant on next sync"
 
 msgctxt "Languages::commerceml.map.product_feature_variant.skip"
-msgid "Skip product feature variant"
-msgstr "Skip product feature variant"
+msgid "Don't import"
+msgstr "Don't import"
 
 msgctxt "Languages::commerceml.n_items_will_be_created_automatically"
 msgid "[n] item will be created automatically|[n] items will be created automatically"
@@ -759,3 +823,91 @@ msgstr "[n] item will be created automatically|[n] items will be created automat
 msgctxt "Languages::commerceml.n_items_will_be_skipped"
 msgid "[n] item not matched and will be skipped|[n] item not matched and will be skipped"
 msgstr "[n] item not matched and will be skipped|[n] item not matched and will be skipped"
+
+msgctxt "Languages::commerceml.cml_catalog_product_feature_creation"
+msgid "Product feature creation"
+msgstr "Product feature creation"
+
+msgctxt "Languages::commerceml.cml_catalog_product_feature_creation.y"
+msgid "Create new features and variants from CRM automatically"
+msgstr "Create new features and variants from CRM automatically"
+
+msgctxt "Languages::commerceml.cml_catalog_product_feature_creation.n"
+msgid "Don't create features and variants from CRM until I check them"
+msgstr "Don't create features and variants from CRM until I check them"
+
+msgctxt "Languages::commerceml.cml_catalog_category_creation"
+msgid "Category creation"
+msgstr "Category creation"
+
+msgctxt "Languages::commerceml.cml_catalog_category_creation.y"
+msgid "Create new categories from CRM automatically"
+msgstr "Create new categories from CRM automatically"
+
+msgctxt "Languages::commerceml.cml_catalog_category_creation.n"
+msgid "Don't create features and variants from CRM until I check them"
+msgstr "Don't create categories from CRM until I check them"
+
+msgctxt "Languages::commerceml.cml_catalog_product_category_update_strategy"
+msgid "If the category of a product changes in CRM"
+msgstr "If the category of a product changes in CRM"
+
+msgctxt "Languages::commerceml.cml_catalog_product_category_update_strategy.append"
+msgid "Add the new category alongside the existing ones"
+msgstr "Add the new category alongside the existing ones"
+
+msgctxt "Languages::commerceml.cml_catalog_product_category_update_strategy.replace_main"
+msgid "Change the main category of the product"
+msgstr "Change the main category of the product"
+
+msgctxt "Languages::commerceml.cml_catalog_product_category_update_strategy.ignore"
+msgid "Ignore the change; assign a category only to new products"
+msgstr "Ignore the change; assign a category only to new products"
+
+msgctxt "Languages::commerceml.cml_catalog_product_image_update_strategy"
+msgid "If the image of a product changes in CRM"
+msgstr "If the image of a product changes in CRM"
+
+msgctxt "Languages::commerceml.cml_catalog_product_image_update_strategy.append"
+msgid "Add the new image alongside the existing ones"
+msgstr "Add the new image alongside the existing ones"
+
+msgctxt "Languages::commerceml.cml_catalog_product_image_update_strategy.replace"
+msgid "Replace all images of the product"
+msgstr "Replace all images of the product"
+
+msgctxt "Languages::commerceml.cml_catalog_product_image_update_strategy.ignore"
+msgid "Ignore the change; assign an image only to new products"
+msgstr "Ignore the change; assign an image only to new products"
+
+msgctxt "Languages::commerceml.additional_settings_title"
+msgid "Additional settings"
+msgstr "Additional settings"
+
+msgctxt "Languages::commerceml.field_import_only_for_new_products"
+msgid "Import only for new products"
+msgstr "Import only for new products"
+
+msgctxt "Languages::commerceml.dont_import"
+msgid "Don't import"
+msgstr "Don't import"
+
+msgctxt "Languages::commerceml.import.message.order.updated"
+msgid "Order [local_id] was updated: Products id: [products];"
+msgstr "Order [local_id] was updated: Products id: [products];"
+
+msgctxt "Languages::commerceml.import.message.order.status_updated"
+msgid "Status for order [local_id] was updated: Old status: [old_status]; New status: [new_status];"
+msgstr "Status for order [local_id] was updated: Old status: [old_status]; New status: [new_status];"
+
+msgctxt "Languages::commerceml.import.error.order.local_order_not_found"
+msgid "Local order was not found"
+msgstr "Local order was not found"
+
+msgctxt "Languages::commerceml.import.error.order.local_product_not_found"
+msgid "Was not found local equivalent of products"
+msgstr "Was not found local equivalent of products"
+
+msgctxt "Languages::commerceml.products_were_disabled_after_addon_was_activated"
+msgid "We detected some duplicate entities (products, features, etc.) loaded from your CRM. They were created by mistake when the old CommerceML add-on was replaced with the new one. For your convenience, we've changed the status of the duplicates to \"Disabled\". For example, <a href=\"[href]\">here is the list of duplicate products which you can safely delete.</a>"
+msgstr "We detected some duplicate entities (products, features, etc.) loaded from your CRM. They were created by mistake when the old CommerceML add-on was replaced with the new one. For your convenience, we've changed the status of the duplicates to \"Disabled\". For example, <a href=\"[href]\">here is the list of duplicate products which you can safely delete.</a>"

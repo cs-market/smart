@@ -19,7 +19,9 @@ use Tygh\Addons\CommerceML\Commands\AuthCommand;
 use Tygh\Addons\CommerceML\ServiceProvider;
 use Tygh\Addons\CommerceML\Commands\UploadImportFileCommand;
 use Tygh\Addons\CommerceML\Commands\UnzipImportFileCommand;
-use Tygh\Addons\CommerceML\Commands\ExecuteImportCommand;
+use Tygh\Addons\CommerceML\Commands\ExecuteCatalogImportCommand;
+use Tygh\Addons\CommerceML\Commands\ExportOrdersCommand;
+use Tygh\Addons\CommerceML\Commands\ExecuteSaleImportCommand;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -51,9 +53,9 @@ $schema = [
             return ServiceProvider::getUnzipImportFileCommandHandler()->handle($command);
         }
     ],
-    ExecuteImportCommand::class => [
+    ExecuteCatalogImportCommand::class => [
         'middleware' => [],
-        'handler'    => static function (ExecuteImportCommand $command) {
+        'handler'    => static function (ExecuteCatalogImportCommand $command) {
             return ServiceProvider::getExecuteImportCommandHandler()->handle($command);
         }
     ],
@@ -67,6 +69,18 @@ $schema = [
         'middleware' => [],
         'handler'    => static function (CleanUpFilesDirCommand $command) {
             return ServiceProvider::getCleanUpFilesDirCommandHandler()->handle($command);
+        }
+    ],
+    ExportOrdersCommand::class => [
+        'middleware' => [],
+        'handler'    => static function (ExportOrdersCommand $command) {
+            return ServiceProvider::getExportOrderCommandHandler()->handle($command);
+        }
+    ],
+    ExecuteSaleImportCommand::class => [
+        'middleware' => [],
+        'handler'    => static function (ExecuteSaleImportCommand $command) {
+            return ServiceProvider::getExecuteSaleImportCommandHandler()->handle($command);
         }
     ]
 ];

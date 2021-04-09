@@ -272,6 +272,24 @@ abstract class AModel implements IModel, \IteratorAggregate, \ArrayAccess
     }
 
     /**
+     * Find the first models by params
+     *
+     * @param array<string, string> $params Params to search vendor plan
+     *
+     * @return \Tygh\Models\Components\AModel|null
+     */
+    public function findOne(array $params = [])
+    {
+        $models = $this->findMany($params);
+
+        if (empty($models)) {
+            return null;
+        }
+
+        return reset($models);
+    }
+
+    /**
      * Gets attributes
      *
      * @param array $attributes

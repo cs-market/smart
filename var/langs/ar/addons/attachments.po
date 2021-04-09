@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.11.5/addons/attachments.po\n"
-"X-Crowdin-File-ID: 3650\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.1/addons/attachments.po\n"
+"X-Crowdin-File-ID: 3784\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::attachments"
 msgid "Attachments"
@@ -35,4 +35,48 @@ msgstr "إضافة مرفق"
 msgctxt "Languages::editing_attachment"
 msgid "Editing attachment"
 msgstr "تحرير المرفقات"
+
+msgctxt "Languages::attachments.attachments_need_located_root_dir"
+msgid "Please specify the attachments directory within the store root directory. Put the attachments to import in this directory."
+msgstr ""
+
+msgctxt "Languages::attachments.error_exim_get_attachments_for_products"
+msgid "Could not import attachments for some of the products. Either those attachments don't exist (or can't be accessed), or the paths to those attachments in the imported file are incorrect."
+msgstr ""
+
+msgctxt "Languages::advanced_import_attachments"
+msgid "Product attachments"
+msgstr "مرفقات المنتح"
+
+msgctxt "Languages::attachments.attachments_delimiter"
+msgid "Attachments delimiter"
+msgstr ""
+
+msgctxt "Languages::attachments.attachments_delimiter.description"
+msgid "Delimiter between attachments of a product."
+msgstr ""
+
+msgctxt "Languages::attachments.delete_attachments"
+msgid "Delete existing attachments"
+msgstr "احذف المرفقات الموجودة"
+
+msgctxt "Languages::attachments.delete_attachments_tooltip"
+msgid "If you enable this setting, then the existing attachments of the imported products will be replaced with the attachments specified in the imported file (if no attachments are specified, the old attachments will remain). If the setting is disabled, the new attachments will simply be added to the existing attachments."
+msgstr ""
+
+msgctxt "Languages::attachments.attachments_directory"
+msgid "Attachments directory"
+msgstr "مجلد الملفات"
+
+msgctxt "SettingsSections::attachments::general"
+msgid "General"
+msgstr "عام"
+
+msgctxt "SettingsOptions::attachments::allow_save_attachments_to_server"
+msgid "Save attachments to your server"
+msgstr "احفظ المرفقات الى سيرفرك"
+
+msgctxt "SettingsTooltips::attachments::allow_save_attachments_to_server"
+msgid "Attachments listed as URLs in the imported file will be downloaded to your server."
+msgstr ""
 

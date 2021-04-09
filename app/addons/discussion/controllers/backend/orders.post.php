@@ -18,18 +18,17 @@ use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-    if ($mode == 'update_details') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($mode === 'update_details') {
         if (!empty($_REQUEST['posts'])
             && is_array($_REQUEST['posts'])
             && fn_discussion_check_update_posts_permission($_REQUEST['posts'], $auth)
         ) {
 
             foreach ($_REQUEST['posts'] as $p_id => $data) {
-                db_query("UPDATE ?:discussion_posts SET ?u WHERE post_id = ?i", $data, $p_id);
-                db_query("UPDATE ?:discussion_messages SET ?u WHERE post_id = ?i", $data, $p_id);
-                db_query("UPDATE ?:discussion_rating SET ?u WHERE post_id = ?i", $data, $p_id);
+                db_query('UPDATE ?:discussion_posts SET ?u WHERE post_id = ?i', $data, $p_id);
+                db_query('UPDATE ?:discussion_messages SET ?u WHERE post_id = ?i', $data, $p_id);
+                db_query('UPDATE ?:discussion_rating SET ?u WHERE post_id = ?i', $data, $p_id);
             }
         }
 
@@ -39,11 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if (!empty($discussion['thread_id']) && $discussion['type'] != $_REQUEST['discussion']['type']) {
                 db_query('UPDATE ?:discussion SET ?u WHERE thread_id = ?i', $_REQUEST['discussion'], $discussion['thread_id']);
-                if ($_REQUEST['discussion']['type'] != 'D') {
+                if ($_REQUEST['discussion']['type'] !== DiscussionTypes::TYPE_DISABLED) {
                     $_REQUEST['selected_section'] = 'discussion';
                 }
             } elseif (empty($discussion['thread_id']) && !empty($_REQUEST['discussion']['type'])) {
                 $data = $_REQUEST['discussion'];
+                $data['company_id'] = Registry::ifGet('runtime.company_id', 0);
 
                 if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
                     $data['company_id'] = Registry::get('runtime.company_id');
@@ -51,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $data['company_id'] = Registry::get('runtime.forced_company_id');
                 }
 
-                db_query("REPLACE INTO ?:discussion ?e", $data);
-                if ($_REQUEST['discussion']['type'] != 'D') {
+                db_replace_into('discussion', (array) $data);
+                if ($_REQUEST['discussion']['type'] !== DiscussionTypes::TYPE_DISABLED) {
                     $_REQUEST['selected_section'] = 'discussion';
                 }
             }
@@ -60,12 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-if ($mode == 'details') {
-
+if ($mode === 'details') {
     $discussion = fn_get_discussion($_REQUEST['order_id'], DiscussionObjectTypes::ORDER, true, $_REQUEST);
-    if (!empty($discussion) &&
-        $discussion['type'] !== DiscussionTypes::TYPE_DISABLED &&
-        fn_check_permissions('discussion', 'view', 'admin')
+    if (
+        !empty($discussion)
+        && $discussion['type'] !== DiscussionTypes::TYPE_DISABLED
+        && fn_check_permissions('discussion', 'view', 'admin')
+        && (fn_get_runtime_company_id() || fn_allowed_for('MULTIVENDOR'))
     ) {
         Registry::set('navigation.tabs.discussion', [
             'title' => __('communication'),

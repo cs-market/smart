@@ -23,6 +23,19 @@
 />
 
 <div class="control-group">
+    <label for="elm_bn_code{$suffix}"
+           class="control-label cm-required"
+    >{__("paypal_commerce_platform.bn_code")}:</label>
+    <div class="controls">
+        <input type="text"
+               name="payment_data[processor_params][bn_code]"
+               id="elm_bn_code{$suffix}"
+               value="{$processor_params.bn_code}"
+        />
+    </div>
+</div>
+
+<div class="control-group">
     <label for="elm_payer_id{$suffix}"
            class="control-label cm-required"
     >{__("paypal_commerce_platform.payer_id")}:</label>
@@ -57,6 +70,7 @@
                name="payment_data[processor_params][secret]"
                id="elm_secret{$suffix}"
                value="{$processor_params.secret}"
+               autocomplete="new-password"
         />
     </div>
 </div>

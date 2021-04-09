@@ -22,7 +22,7 @@ use Tygh\Addons\YandexCheckout\Payments\YandexCheckoutForMarketplaces;
 use Tygh\Addons\YandexCheckout\ServiceProvider;
 use Tygh\Common\OperationResult;
 use Tygh\Enum\YesNo;
-use YandexCheckout\Model\PaymentInterface;
+use YooKassa\Model\PaymentInterface;
 
 class ChangeOrderStatusWithYandexCheckoutForMarketplaces
 {
@@ -53,7 +53,7 @@ class ChangeOrderStatusWithYandexCheckoutForMarketplaces
     /**
      * @param \Tygh\Addons\YandexCheckout\Payments\YandexCheckoutForMarketplaces $payment_processor
      *
-     * @return \YandexCheckout\Model\PaymentInterface|null
+     * @return \YooKassa\Model\PaymentInterface|null
      */
     protected function getPaymentInfo(YandexCheckoutForMarketplaces $payment_processor)
     {
@@ -145,7 +145,7 @@ class ChangeOrderStatusWithYandexCheckoutForMarketplaces
     }
 
     /**
-     * @param \YandexCheckout\Model\PaymentInterface $payment_info
+     * @param PaymentInterface $payment_info Information about payment.
      *
      * @return bool
      */

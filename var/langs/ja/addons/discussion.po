@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /release-4.11.5/addons/discussion.po\n"
-"X-Crowdin-File-ID: 3578\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/discussion.po\n"
+"X-Crowdin-File-ID: 4056\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::discussion"
 msgid "Comments and reviews"
@@ -220,14 +220,6 @@ msgctxt "SettingsOptions::discussion::product_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "1IPにつき1件の投稿のみ許可"
 
-msgctxt "SettingsOptions::discussion::product_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "投稿通知先Eメール"
-
-msgctxt "SettingsOptions::discussion::product_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "出品者に通知"
-
 msgctxt "SettingsOptions::discussion::product_share_discussion"
 msgid "Share discussions with all stores"
 msgstr "商品へのコメントを複数ショップで共有"
@@ -248,10 +240,6 @@ msgctxt "SettingsOptions::discussion::category_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "1IPにつき1件の投稿のみ許可"
 
-msgctxt "SettingsOptions::discussion::category_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "投稿通知先Eメール"
-
 msgctxt "SettingsOptions::discussion::order_posts_per_page"
 msgid "Posts per page"
 msgstr "1ページあたりの表示件数"
@@ -259,10 +247,6 @@ msgstr "1ページあたりの表示件数"
 msgctxt "SettingsOptions::discussion::order_initiate"
 msgid "Allow customer to initiate discussion"
 msgstr "顧客からのコメント投稿を許可"
-
-msgctxt "SettingsOptions::discussion::order_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "出品者に通知"
 
 msgctxt "SettingsOptions::discussion::page_posts_per_page"
 msgid "Posts per page"
@@ -275,14 +259,6 @@ msgstr "投稿について管理者の承認が必要な顧客タイプ"
 msgctxt "SettingsOptions::discussion::page_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "1IPにつき1件の投稿のみ許可"
-
-msgctxt "SettingsOptions::discussion::page_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "投稿通知先Eメール"
-
-msgctxt "SettingsOptions::discussion::page_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "出品者に通知"
 
 msgctxt "SettingsOptions::discussion::page_share_discussion"
 msgid "Share discussions with all stores"
@@ -303,10 +279,6 @@ msgstr "投稿について管理者の承認が必要な顧客タイプ"
 msgctxt "SettingsOptions::discussion::home_page_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "1IPにつき1件の投稿のみ許可"
-
-msgctxt "SettingsOptions::discussion::home_page_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "投稿通知先Eメール"
 
 msgctxt "SettingsOptions::discussion::home_page_testimonials"
 msgid "Testimonials"
@@ -371,14 +343,6 @@ msgstr "投稿について管理者の承認が必要な顧客タイプ"
 msgctxt "SettingsOptions::discussion::company_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "1IPにつき1件の投稿のみ許可"
-
-msgctxt "SettingsOptions::discussion::company_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "投稿通知先Eメール"
-
-msgctxt "SettingsOptions::discussion::company_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "出品者に通知"
 
 msgctxt "SettingsVariants::discussion::company_post_approval::any"
 msgid "Any customer"
@@ -470,23 +434,23 @@ msgstr "コメントとレビューに関する通知"
 
 msgctxt "Languages::show_rating"
 msgid "Show review rating"
-msgstr ""
+msgstr "レビュー評価を表示"
 
 msgctxt "Languages::gdpr_discussions_data"
 msgid "Personal data from discussions"
-msgstr ""
+msgstr "ディスカッションからの個人データ"
 
 msgctxt "Languages::discussion.add_new_review"
 msgid "Discussion: new review"
-msgstr ""
+msgstr "ディスカッション:新しいレビュー"
 
 msgctxt "Languages::discussion.agreement_text_full_add_new_review"
 msgid "<p>Your name will appear next to your review or comment, visible to everyone. We ([company]) also save your IP address as a security precaution, but in can only be viewed by our staff. It will remain in our system until you withdraw your consent. If you’d like to have your personal data removed, send an email to [email].</p> <p>If you believe that your personal data has been misused, you have the right to lodge a complaint with a supervisory authority. We’re obliged by EU General Data Protection Regulation to let you know about this right; we don’t actually intend to misuse your data.</p>"
-msgstr ""
+msgstr "<p>あなたの名前はレビューやコメントの横に表示され、誰でも見ることができます。 私たち（[company]）もセキュリティ上の予防措置としてあなたのIPアドレスを保存しますが、見ることができるのは私たちのスタッフだけです。 同意を撤回するまでは、私たちのシステムに残ります。 個人データの削除をご希望の場合は、[email]にメールを送信してください。</p> <p>個人データが悪用されたと思われる場合は、監督当局に苦情を申し立てる権利があります。 EU一般データ保護規則により、この権利についてお知らせする義務があります。 実際にデータを悪用することはありません。</p>"
 
 msgctxt "Languages::discussion.agreement_text_short_add_new_review"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
-msgstr ""
+msgstr "個人データを<u>次のように処理することに</u>同意します。"
 
 msgctxt "Languages::discussion.please_log_in_to_write_a_review"
 msgid "Please sign in to write a review"
@@ -502,9 +466,33 @@ msgstr "この出品者へのレビューは投稿できません。この出品
 
 msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification_title"
 msgid "Comments and reviews add-on settings were changed"
-msgstr ""
+msgstr "コメントとレビューのアドオン設定が変更されました。"
 
 msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification"
 msgid "In the 4.9.1 version the <strong>Only anonymous customers</strong> variant of the <strong>Administrator must approve posts submitted by</strong> setting was removed. Now, it is available again, with the ability to leave reviews for nonauthorized customers. Please check if the desirable value of the setting is selected."
-msgstr ""
+msgstr "4.9.1バージョンでは、<strong>管理者が送信した投稿を承認する必要がある</strong>設定で<strong>匿名の顧客のみ</strong>の選択肢が削除されました。 今では、許可されていない顧客でもレビューを残すことができるようになりました。 設定の望ましい値が選択されているかどうかを確認してください。"
+
+msgctxt "Languages::discussion.event.products.new_post"
+msgid "Products: new review posted"
+msgstr "商品：新しいレビューが投稿されました"
+
+msgctxt "Languages::discussion.event.testimonials.new_post"
+msgid "Testimonials: new review posted"
+msgstr "お客様の声：新しいレビューが投稿されました"
+
+msgctxt "Languages::discussion.event.orders.new_post"
+msgid "Order communication: new message added"
+msgstr "注文の連絡：新しいメッセージが追加されました"
+
+msgctxt "Languages::discussion.event.categories.new_post"
+msgid "Categories: new review posted"
+msgstr "カテゴリー :新しいレビューが投稿されました"
+
+msgctxt "Languages::discussion.event.pages.new_post"
+msgid "Pages: new comment posted"
+msgstr "ページ：新しいコメントが投稿されました"
+
+msgctxt "Languages::discussion.event.vendors.new_post"
+msgid "Vendors: new review posted"
+msgstr "出品者：新しいレビューが投稿されました"
 

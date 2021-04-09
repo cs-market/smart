@@ -125,7 +125,8 @@ class Repository
                 'host'       => $host_without_www,
                 'sort_by'    => 'host',
                 'sort_order' => 'desc',
-                'cache'      => true
+                'cache'      => true,
+                'get_total'  => false
             ]);
 
             if (count($storefronts_by_host) === 1) {
@@ -134,7 +135,7 @@ class Repository
                 $this->cache_by_url[$url] = $this->findClosestMatchingByPath($path, $storefronts_by_host);
             }
 
-            self::addStorefrontToCache($this->cache_by_url[$url]);
+            $this->addStorefrontToCache($this->cache_by_url[$url]);
         }
 
         return $this->cache_by_url[$url];
@@ -159,7 +160,7 @@ class Repository
             return $this->cache_by_id[$storefront_id];
         }
 
-        list($storefronts,) = $this->find(['storefront_id' => $storefront_id]);
+        list($storefronts,) = $this->find(['storefront_id' => $storefront_id, 'get_total' => false]);
 
         $storefront = reset($storefronts);
 
@@ -167,7 +168,7 @@ class Repository
             return null;
         }
 
-        self::addStorefrontToCache($storefront);
+        $this->addStorefrontToCache($storefront);
 
         return $storefront;
     }
@@ -183,7 +184,7 @@ class Repository
             return $this->cache_default_storefront;
         }
 
-        list($storefronts,) = $this->find(['is_default' => true]);
+        list($storefronts,) = $this->find(['is_default' => true, 'get_total' => false]);
 
         /** @var \Tygh\Storefront\Storefront $storefront */
         $storefront = reset($storefronts);
@@ -193,7 +194,7 @@ class Repository
         }
 
         $this->cache_default_storefront = $storefront;
-        self::addStorefrontToCache($storefront);
+        $this->addStorefrontToCache($storefront);
 
         return $storefront;
     }
@@ -211,9 +212,30 @@ class Repository
         if (isset($this->cache_by_company_id[$company_id])) {
             $storefronts = $this->cache_by_company_id[$company_id];
         } else {
-            list($storefronts,) = $this->find(['company_ids' => [$company_id]]);
+            list($storefronts,) = $this->find(['company_ids' => [$company_id], 'get_total' => false]);
             $this->cache_by_company_id[$company_id] = $storefronts;
         }
+
+        if ($get_single) {
+            $storefront = reset($storefronts);
+
+            return $storefront ? $storefront : null;
+        }
+
+        return $storefronts;
+    }
+
+    /**
+     * Gets storefronts which are available for company.
+     *
+     * @param int  $company_id Company identifier
+     * @param bool $get_single Get single flag
+     *
+     * @return \Tygh\Storefront\Storefront[]|\Tygh\Storefront\Storefront|null
+     */
+    public function findAvailableForCompanyId($company_id, $get_single = true)
+    {
+        list($storefronts,) = $this->find(['company_ids' => [$company_id], 'is_search' => true]);
 
         if ($get_single) {
             $storefront = reset($storefronts);
@@ -238,6 +260,7 @@ class Repository
 
         $matching_storefront = null;
         $max_path_match = 0;
+
         foreach ($storefronts as $storefront) {
             $storefront_path = trim(parse_url('//' . $storefront->url, PHP_URL_PATH) ?: '', '/');
             $storefront_path_parts = explode('/', $storefront_path);
@@ -249,10 +272,15 @@ class Repository
 
             $matching_path_parts = array_intersect_assoc($storefront_path_parts, $path_parts);
 
-            if (count($matching_path_parts) > $max_path_match) {
-                $max_path_match = count($matching_path_parts);
-                $matching_storefront = $storefront;
+            if (count($matching_path_parts) < $max_path_match) {
+                continue;
             }
+            $max_path_match = count($matching_path_parts);
+
+            if (count($storefront_path_parts) > $max_path_match) {
+                continue;
+            }
+            $matching_storefront = $storefront;
         }
 
         return $matching_storefront;
@@ -339,7 +367,9 @@ class Repository
         }
         unset($storefront);
 
-        $params['total_items'] = $this->getCount($params);
+        if ($params['get_total']) {
+            $params['total_items'] = $this->getCount($params);
+        }
 
         return [$storefronts, $params];
     }
@@ -731,6 +761,7 @@ class Repository
             'theme_name'        => null,
             'is_search'         => false,
             'group_by'          => 'storefront_id',
+            'get_total'         => true,
         ];
 
         // lazy-loaded fields
@@ -821,7 +852,7 @@ class Repository
         $company_ids = (array) $company_ids;
 
         /** @var \Tygh\Storefront\Storefront[] $storefronts */
-        list($storefronts) = $this->find(['storefront_id' => $storefront_ids]);
+        list($storefronts) = $this->find(['storefront_id' => $storefront_ids, 'get_total' => false]);
         foreach ($storefronts as $storefront) {
             $storefront_company_ids = array_merge($storefront->getCompanyIds(), $company_ids);
             $storefront_company_ids = array_unique($storefront_company_ids);
@@ -841,7 +872,7 @@ class Repository
         $company_ids = (array) $company_ids;
 
         /** @var \Tygh\Storefront\Storefront[] $storefronts */
-        list($storefronts) = $this->find(['storefront_id' => $storefront_ids]);
+        list($storefronts) = $this->find(['storefront_id' => $storefront_ids, 'get_total' => false]);
         foreach ($storefronts as $storefront) {
             $storefront_company_ids = array_diff($storefront->getCompanyIds(), $company_ids);
             $storefront->setCompanyIds($storefront_company_ids);
@@ -869,7 +900,7 @@ class Repository
             }
         }
 
-        list($storefronts_with_same_url,) = $this->find(['url' => $storefront->url]);
+        list($storefronts_with_same_url,) = $this->find(['url' => $storefront->url, 'get_total' => false]);
         foreach ($storefronts_with_same_url as $storefront_with_same_url) {
             if ($storefront_with_same_url->storefront_id != $storefront->storefront_id) {
                 $result->setSuccess(false);
@@ -888,7 +919,7 @@ class Repository
      */
     protected function undefaultOherStorefronts($new_default_storefront_id)
     {
-        list($default_storefronts,) = $this->find(['is_default' => true]);
+        list($default_storefronts,) = $this->find(['is_default' => true, 'get_total' => false]);
         foreach ($default_storefronts as $old_default_storefront) {
             if ($old_default_storefront->storefront_id != $new_default_storefront_id) {
                 $old_default_storefront->is_default = false;
@@ -962,7 +993,7 @@ class Repository
         );
 
         /** @var \Tygh\Storefront\Storefront[] $storefronts */
-        list($storefronts,) = $this->find(['storefront_id' => $storefronts_by_layout]);
+        list($storefronts,) = $this->find(['storefront_id' => $storefronts_by_layout, 'get_total' => false]);
 
         if ($get_single) {
             $storefront = reset($storefronts);
@@ -1086,7 +1117,7 @@ class Repository
      */
     public function findFirstActiveStorefront()
     {
-        list($storefronts,) = $this->find(['status' => StorefrontStatuses::OPEN], 1);
+        list($storefronts,) = $this->find(['status' => StorefrontStatuses::OPEN, 'get_total' => false], 1);
 
         $storefront = array_shift($storefronts);
 

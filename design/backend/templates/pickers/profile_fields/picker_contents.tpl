@@ -2,36 +2,51 @@
 <script type="text/javascript">
 (function(_, $) {
     _.tr('text_items_added', '{__("text_items_added")|escape:"javascript"}');
+    _.tr('text_can_not_add_file_type', '{__("can_not_add_file_type_profile_field")|escape:"javascript"}');
 
     $.ceEvent('on', 'ce.formpost_add_profile_fields', function(frm, elm) {
         var max_displayed_qty = {$smarty.request.max_displayed_qty|default:"0"};
         var details_url = '{"profile_fields.update?field_id="|fn_url}';
         var profile_fields = {};
+        var profile_fields_count = 0;
 
         if ($('input.cm-item:checked', frm).length > 0) {
             $('input.cm-item:checked', frm).each( function() {
-                var id = $(this).val();
-                var item = $(this).parent().parent();
-                profile_fields[id] = {
-                    description: item.find('td.cm-profile-field-description').text(),
-                };
+                var type = $(this).data('type');
+                if (type !== '{"ProfileFieldTypes::FILE"|enum}') {
+                    var id = $(this).val();
+                    var item = $(this).parent().parent();
+                    profile_fields[id] = {
+                        description: item.find('td.cm-profile-field-description').text(),
+                    };
+                    profile_fields_count ++;
+                } else {
+                    $.ceNotification('show', {
+                        type: 'W',
+                        title: _.tr('warning'),
+                        message: _.tr('text_can_not_add_file_type'),
+                        message_state: 'I'
+                    });
+                }
             });
-            
-            {literal}
-            $.cePicker('add_js_item', frm.data('caResultId'), profile_fields, 'pf_', {
-                '{field_id}': '%id',
-                '{description}': '%item.description',
-            });
-            {/literal}
 
-            $.cePicker('check_items_qty', frm.data('caResultId'), details_url, max_displayed_qty);
-            
-            $.ceNotification('show', {
-                type: 'N', 
-                title: _.tr('notice'), 
-                message: _.tr('text_items_added'), 
-                message_state: 'I'
-            });            
+            if (profile_fields_count > 0) {
+                {literal}
+                $.cePicker('add_js_item', frm.data('caResultId'), profile_fields, 'pf_', {
+                    '{field_id}': '%id',
+                    '{description}': '%item.description',
+                });
+                {/literal}
+
+                $.cePicker('check_items_qty', frm.data('caResultId'), details_url, max_displayed_qty);
+
+                $.ceNotification('show', {
+                    type: 'N',
+                    title: _.tr('notice'),
+                    message: _.tr('text_items_added'),
+                    message_state: 'I'
+                });
+            }
         }
 
         return false;   
@@ -54,7 +69,7 @@
     {foreach $profile_fields as $field}
     <tr>
         <td class="center" width="1%" data-th="">
-            <input type="checkbox" name="add_parameter[]" value="{$field.field_id}" class="mrg-check cm-item" /></td>
+            <input type="checkbox" name="add_parameter[]" value="{$field.field_id}" data-type="{$field.field_type}" class="mrg-check cm-item" /></td>
         <td data-th="{__("id")}">
             <span>#{$field.field_id}</span></td>
         <td class="cm-profile-field-description" data-th="{__("description")}"><input type="hidden" name="origin_statuses[{$field.field_id}]" value="{$field.description}" />{$field.description}</td>

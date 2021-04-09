@@ -14,6 +14,10 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
+/**
+ * @var array<string, array> $schema
+ */
 $schema['controllers']['russian_post']['modes']['get_services_list']['permissions'] = true;
-
+$schema['controllers']['rus_post_blank']['modes']['print']['permissions'] = true;
+$schema['controllers']['rus_post_blank']['modes']['edit']['permissions'] = true;
 return $schema;

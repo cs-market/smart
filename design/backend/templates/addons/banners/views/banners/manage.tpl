@@ -2,25 +2,45 @@
 
 {capture name="mainbox"}
 
-<form action="{""|fn_url}" method="post" name="banners_form" class=" cm-hide-inputs" enctype="multipart/form-data">
+<form action="{""|fn_url}" method="post" id="banners_form" name="banners_form" enctype="multipart/form-data">
 <input type="hidden" name="fake" value="1" />
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true div_id="pagination_contents_banners"}
 
-{assign var="c_url" value=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
+{$c_url=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
 
-{assign var="rev" value=$smarty.request.content_id|default:"pagination_contents_banners"}
-{assign var="c_icon" value="<i class=\"icon-`$search.sort_order_rev`\"></i>"}
-{assign var="c_dummy" value="<i class=\"icon-dummy\"></i>"}
+{$rev=$smarty.request.content_id|default:"pagination_contents_banners"}
+{$c_icon="<i class=\"icon-`$search.sort_order_rev`\"></i>"}
+{$c_dummy="<i class=\"icon-dummy\"></i>"}
+{$banner_statuses=""|fn_get_default_statuses:true}
+{$has_permission = fn_check_permissions("banners", "update_status", "admin", "POST")}
 
 {if $banners}
-<div class="table-responsive-wrapper">
+
+{if $has_permission}
+    {hook name="banners:bulk_edit"}
+        {include file="addons/banners/views/banners/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
+
+<div class="table-responsive-wrapper longtap-selection">
     <table class="table table-middle table--relative table-responsive">
-    <thead>
+    <thead
+        data-ca-bulkedit-default-object="true"
+        data-ca-bulkedit-component="defaultObject"
+    >
     <tr>
-        <th width="1%" class="left mobile-hide">
-            {include file="common/check_items.tpl" class="cm-no-hide-input"}</th>
+        <th width="6%" class="left mobile-hide">
+            {include file="common/check_items.tpl" is_check_disabled=!$has_permission check_statuses=($has_permission) ? $banner_statuses : '' }
+
+            <input type="checkbox"
+                class="bulkedit-toggler hide"
+                data-ca-bulkedit-toggler="true"
+                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]"
+                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+            />
+        </th>
         <th><a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("banner")}{if $search.sort_by == "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
-        <th class="mobile-hide"><a class="cm-ajax" href="{"`$c_url`&sort_by=type&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("type")}{if $search.sort_by == "type"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
+        <th width="10%" class="mobile-hide"><a class="cm-ajax" href="{"`$c_url`&sort_by=type&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("type")}{if $search.sort_by == "type"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
 
         {hook name="banners:manage_header"}
         {/hook}
@@ -30,22 +50,28 @@
     </tr>
     </thead>
     {foreach from=$banners item=banner}
-    <tr class="cm-row-status-{$banner.status|lower}">
-        {assign var="allow_save" value=$banner|fn_allow_save_object:"banners"}
+    <tr class="cm-row-status-{$banner.status|lower} cm-longtap-target"
+        {if $has_permission}
+            data-ca-longtap-action="setCheckBox"
+            data-ca-longtap-target="input.cm-item"
+            data-ca-id="{$banner.banner_id}"
+        {/if}
+    >
+        {$allow_save=$banner|fn_allow_save_object:"banners"}
 
         {if $allow_save}
-            {assign var="no_hide_input" value="cm-no-hide-input"}
+            {$no_hide_input="cm-no-hide-input"}
         {else}
-            {assign var="no_hide_input" value=""}
+            {$no_hide_input=""}
         {/if}
 
-        <td class="left mobile-hide">
-            <input type="checkbox" name="banner_ids[]" value="{$banner.banner_id}" class="cm-item {$no_hide_input}" /></td>
+        <td width="6%" class="left mobile-hide">
+            <input type="checkbox" name="banner_ids[]" value="{$banner.banner_id}" class="cm-item {$no_hide_input} cm-item-status-{$banner.status|lower} hide" /></td>
         <td class="{$no_hide_input}" data-th="{__("banner")}">
             <a class="row-status" href="{"banners.update?banner_id=`$banner.banner_id`"|fn_url}">{$banner.banner}</a>
             {include file="views/companies/components/company_name.tpl" object=$banner}
         </td>
-        <td class="nowrap row-status {$no_hide_input} mobile-hide">
+        <td width="10%" class="nowrap row-status {$no_hide_input} mobile-hide">
             {hook name="banners:manage_banner_type"}
             {if $banner.type == "G"}{__("graphic_banner")}{else}{__("text_banner")}{/if}
             {/hook}
@@ -54,7 +80,7 @@
         {hook name="banners:manage_data"}
         {/hook}
 
-        <td class="mobile-hide">
+        <td width="6%" class="mobile-hide">
             {capture name="tools_list"}
                 <li>{btn type="list" text=__("edit") href="banners.update?banner_id=`$banner.banner_id`"}</li>
             {if $allow_save}
@@ -65,7 +91,7 @@
                 {dropdown content=$smarty.capture.tools_list}
             </div>
         </td>
-        <td class="right" data-th="{__("status")}">
+        <td width="10%" class="right" data-th="{__("status")}">
             {include file="common/select_popup.tpl" id=$banner.banner_id status=$banner.status hidden=true object_id_name="banner_id" table="banners" popup_additional_class="`$no_hide_input` dropleft"}
         </td>
     </tr>
@@ -78,14 +104,6 @@
 
 {include file="common/pagination.tpl" div_id="pagination_contents_banners"}
 
-{capture name="buttons"}
-    {capture name="tools_list"}
-        {if $banners}
-            <li>{btn type="delete_selected" dispatch="dispatch[banners.m_delete]" form="banners_form"}</li>
-        {/if}
-    {/capture}
-    {dropdown content=$smarty.capture.tools_list class="mobile-hide"}
-{/capture}
 {capture name="adv_buttons"}
     {hook name="banners:adv_buttons"}
     {include file="common/tools.tpl" tool_href="banners.add" prefix="top" hide_tools="true" title=__("add_banner") icon="icon-plus"}
@@ -108,6 +126,6 @@
     {$select_languages = true}
 {/hook}
 
-{include file="common/mainbox.tpl" title=$page_title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons select_languages=$select_languages sidebar=$smarty.capture.sidebar}
+{include file="common/mainbox.tpl" title=$page_title content=$smarty.capture.mainbox adv_buttons=$smarty.capture.adv_buttons select_languages=$select_languages sidebar=$smarty.capture.sidebar}
 
 {** ad section **}

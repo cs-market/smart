@@ -32,8 +32,9 @@ interface ITransport
      * Processes a transport message schema of an event to notification.
      *
      * @param \Tygh\Notifications\Transports\BaseMessageSchema $schema
+     * @param \Tygh\Notifications\Receivers\SearchCondition[]  $receiver_search_conditions
      *
      * @return bool Whether a notification was successfully processed
      */
-    public function process(BaseMessageSchema $schema);
+    public function process(BaseMessageSchema $schema, array $receiver_search_conditions);
 }

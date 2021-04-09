@@ -88,12 +88,12 @@ function fn_exim_vendor_data_premoderation_set_approval_status($primary_object_i
 
         Registry::del("vendor_data_premoderation.initial_product_state.{$product_id}");
 
-        $product_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
-        if ($product_status === ProductStatuses::REQUIRES_APPROVAL) {
+        $current_status = fn_vendor_data_premoderation_get_current_product_statuses([$product_id])[$product_id];
+        if ($current_status === ProductStatuses::REQUIRES_APPROVAL) {
             continue;
         }
 
-        $requires_premoderation = fn_vendor_data_premoderation_product_requires_approval($runtime_company_data, $is_created);
+        $requires_premoderation = fn_vendor_data_premoderation_product_requires_approval($runtime_company_data, $is_created, $current_status);
         if (!$is_created && $requires_premoderation) {
             $resulting_product_state = fn_vendor_data_premoderation_get_product_state($product_id);
             $requires_premoderation = fn_vendor_data_premoderation_is_product_changed($initial_product_state, $resulting_product_state);

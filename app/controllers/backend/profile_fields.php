@@ -65,8 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $dispatch['mode'] = 'update';
             $query_string['field_id'] = $field_id_redirect_to;
-        } else {
-            $dispatch['mode'] = 'add';
+        } elseif (isset($_REQUEST['field_id'])) {
+            $dispatch['mode'] = 'update';
+            $query_string['field_id'] = $_REQUEST['field_id'];
         }
     }
 
@@ -199,6 +200,7 @@ if ($mode == 'manage') {
         'section'       => $section,
         'exclude_names' => !empty($_REQUEST['exclude_names']) ? explode(',', $_REQUEST['exclude_names']) : [],
         'include_names' => !empty($_REQUEST['include_names']) ? explode(',', $_REQUEST['include_names']) : [],
+        'exclude_types' => !empty($_REQUEST['exclude_types']) ? explode(',', $_REQUEST['exclude_types']) : [],
     ];
 
     $section_profile_fields = fn_get_profile_fields('all', [], DESCR_SL, $params);

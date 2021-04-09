@@ -58,6 +58,7 @@
         <label for="elm_cf_key" class="control-label cm-required">{__("key")}:</label>
         <div class="controls">
             <input type="text" name="cdn_data[key]" id="elm_cf_key" size="55" value="{$cdn_data.key}" class="input-large" />
+            <p class="muted description">{__("tt_views_storage_cdn_key")}</p>
         </div>
     </div>
 

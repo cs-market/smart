@@ -6,7 +6,7 @@
 
     <div id="apply_for_vendor_account" >
 
-        <form action="{"companies.apply_for_vendor"|fn_url}" method="post" name="apply_for_vendor_form">
+        <form action="{"companies.apply_for_vendor"|fn_url}" method="post" name="apply_for_vendor_form" enctype="multipart/form-data">
             {if $invitation_key}
                 <input type="hidden" name="company_data[invitation_key]" value="{$invitation_key}" />
             {/if}

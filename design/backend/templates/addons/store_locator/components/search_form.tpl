@@ -11,7 +11,7 @@
                     {/foreach}
                 </select>
             </div>
-            {if "MULTIVENDOR"|fn_allowed_for}
+            {if "MULTIVENDOR"|fn_allowed_for && !$runtime.company_id}
                 <div class="sidebar-field">
                     <label for="elm_owner">{__("owner")}</label>
                     {include file="views/companies/components/picker/picker.tpl"

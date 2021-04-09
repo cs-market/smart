@@ -27,6 +27,7 @@ define('WATERMARK_PADDING', 3);
 fn_register_hooks(
     'attach_absolute_image_paths',
     'delete_image',
+    'update_image',
     'init_company_data',
     'generate_thumbnail_file_pre',
     'generate_thumbnail_post',

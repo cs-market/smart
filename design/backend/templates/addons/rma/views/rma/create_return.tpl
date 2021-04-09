@@ -5,12 +5,12 @@
 <input name="user_id" type="hidden" value="{$order_info.user_id}" />
 
 {if $actions}
-<div class="table-wrapper">
-    <table width="100%">
+<div class="table-responsive-wrapper">
+    <table width="100%" class="table table--relative table-responsive table-responsive-w-titles">
     <tr>
-        <td class="nowrap"><span>{__("what_you_would_like_to_do")}</span>:</td>
-        <td>&nbsp;&nbsp;</td>
-        <td width="100%">
+        <td class="nowrap" data-th="&nbsp;"><span>{__("what_you_would_like_to_do")}</span>:</td>
+        <td data-th="&nbsp;">&nbsp;&nbsp;</td>
+        <td width="100%" data-th="&nbsp;">
             <select name="action">
             {foreach from=$actions item="action" key="action_id"}
                 <option value="{$action_id}">{$action.property}</option>
@@ -21,8 +21,8 @@
 </div>
 {/if}
 
-<div class="table-wrapper">
-    <table width="100%" class="table">
+<div class="table-responsive-wrapper">
+    <table width="100%" class="table table--relative table-responsive">
     <thead>
     <tr>
         <th width="1%">
@@ -36,22 +36,22 @@
     </thead>
     {foreach from=$order_info.products item="oi" key="key"}
     <tr>
-        <td width="1%" class="left">
+        <td width="1%" class="left" data-th="&nbsp;">
             <input type="checkbox" name="returns[{$oi.cart_id}][chosen]" value="Y" class="cm-item" />
             <input type="hidden" name="returns[{$oi.cart_id}][product_id]" value="{$oi.product_id}" /></td>
-        <td class="product-code product-code__rma"><span class="product-code__label-normal">{$oi.product_code}</span></td>
-        <td><a href="{"products.update?product_id=`$oi.product_id`"|fn_url}">{$oi.product nofilter}</a>
+        <td class="product-code product-code__rma" data-th="{__("sku")}"><span class="product-code__label-normal">{$oi.product_code}</span></td>
+        <td data-th="{__("product")}"><a href="{"products.update?product_id=`$oi.product_id`"|fn_url}">{$oi.product nofilter}</a>
         {if $oi.product_options}<div class="options-info">&nbsp;{include file="common/options_info.tpl" product_options=$oi.product_options}</div>{/if}</td>
-        <td class="nowrap">
+        <td class="nowrap" data-th="{__("price")}">
             {if $oi.extra.exclude_from_calculate}{__("free")}{else}{include file="common/price.tpl" value=$oi.price}{/if}</td>
-        <td>
+        <td data-th="{__("amount")}">
             <input type="hidden" name="returns[{$oi.cart_id}][available_amount]" value="{$oi.amount}" />
             <select name="returns[{$oi.cart_id}][amount]">
             {section name=$key loop=$oi.amount+1 start="1" step="1"}
                     <option value="{$smarty.section.$key.index}">{$smarty.section.$key.index}</option>
             {/section}
             </select></td>
-        <td>
+        <td data-th="{__("reason")}">
             {if $reasons}
                 <select name="returns[{$oi.cart_id}][reason]">
                 {foreach from=$reasons item="reason" key="reason_id"}

@@ -19,6 +19,7 @@ use Pimple\ServiceProviderInterface;
 use Tygh\BlockManager\Layout;
 use Tygh\Common\Robots;
 use Tygh\Embedded;
+use Tygh\Enum\SiteArea;
 use Tygh\Registry;
 use Tygh\Storefront\RelationsManager;
 use Tygh\Storefront\Factory;
@@ -164,6 +165,8 @@ class StorefrontProvider implements ServiceProviderInterface
             } elseif (isset($this->params['s_storefront'])) {
                 $storefront_id = (int) $this->params['s_storefront'];
                 $is_storefront_stored = true;
+            } elseif (SiteArea::isStorefront(AREA) && Registry::get('runtime.storefront_id')) {
+                $storefront_id = Registry::get('runtime.storefront_id');
             }
 
             $embedded_suffix = Embedded::isEnabled()
@@ -189,7 +192,7 @@ class StorefrontProvider implements ServiceProviderInterface
                     && !in_array($runtime_company_id, $storefront->getCompanyIds())
                 )
             ) {
-                $storefront = $repository->findByCompanyId($runtime_company_id);
+                $storefront = $repository->findAvailableForCompanyId($runtime_company_id);
             }
 
             if (!$storefront) {
@@ -207,7 +210,6 @@ class StorefrontProvider implements ServiceProviderInterface
         };
 
         $app['storefront.switcher.selected_storefront_id'] = function (Container $app) {
-            $is_storefront_stored = isset($this->params['s_storefront']);
             $runtime_company_id = fn_get_runtime_company_id();
             $storefront_id = 0;
 
@@ -215,7 +217,8 @@ class StorefrontProvider implements ServiceProviderInterface
                 /** @var \Tygh\Storefront\Repository $repository */
                 $repository = $app['storefront.repository'];
 
-                $storefront = $repository->findByCompanyId($runtime_company_id);
+                /** @var \Tygh\Storefront\Storefront $storefront */
+                $storefront = $repository->findAvailableForCompanyId($runtime_company_id);
 
                 if ($storefront) {
                     $storefront_id = $storefront->storefront_id;
@@ -229,7 +232,11 @@ class StorefrontProvider implements ServiceProviderInterface
             return $storefront_id;
         };
 
-        $app['storefront.switcher.dispatches_schema'] = function () {
+        $app['storefront.switcher.dispatches_schema'] = static function () {
+            if (fn_allowed_for('MULTIVENDOR') && !empty(fn_get_runtime_company_id())) {
+                return fn_get_schema('storefronts', 'switcher_dispatches_vendor');
+            }
+
             return fn_get_schema('storefronts', 'switcher_dispatches');
         };
 
@@ -258,6 +265,10 @@ class StorefrontProvider implements ServiceProviderInterface
                 }
             }
 
+            if (fn_allowed_for('MULTIVENDOR') && !empty(fn_get_runtime_company_id())) {
+                return false;
+            }
+
             return true;
         };
 
@@ -271,15 +282,23 @@ class StorefrontProvider implements ServiceProviderInterface
                 $is_ultimate = fn_allowed_for('ULTIMATE');
                 $result = [
                     'storefronts' => [],
-                    'count'       => 0,
                     'threshold'   => $storefronts_threshold
                 ];
 
                 /** @var \Tygh\Storefront\Repository $repository */
                 $repository = $app['storefront.repository'];
 
-                /** @var \Tygh\Storefront\Storefront[] $storefronts */
-                list($storefronts) = $repository->find();
+                if (fn_allowed_for('MULTIVENDOR') && !empty(Registry::get('runtime.company_id'))) {
+                    /** @var \Tygh\Storefront\Storefront[] $storefronts */
+                    $storefronts = $repository->findAvailableForCompanyId((int) Registry::get('runtime.company_id'), false);
+                } else {
+                    /** @var \Tygh\Storefront\Storefront[] $storefronts */
+                    list($storefronts) = $repository->find(['get_total' => false]);
+                }
+
+                if (empty($storefronts)) {
+                    return false;
+                }
 
                 /** @var \Tygh\Storefront\Storefront[] $visible_storefronts */
                 $visible_storefronts = array_slice($storefronts, 0, $storefronts_threshold, true);
@@ -315,10 +334,18 @@ class StorefrontProvider implements ServiceProviderInterface
                     ];
                 }
 
-                $result['count'] = count($storefronts);
-
                 return $result;
             };
         };
+    }
+
+    /**
+     * Gets storefront repository.
+     *
+     * @return \Tygh\Storefront\Repository
+     */
+    public static function getRepository()
+    {
+        return Tygh::$app['storefront.repository'];
     }
 }

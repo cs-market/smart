@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.11.5/addons/product_variations.po\n"
-"X-Crowdin-File-ID: 3686\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.2/addons/product_variations.po\n"
+"X-Crowdin-File-ID: 4118\n"
+"PO-Revision-Date: 2021-02-01 09:02\n"
 
 msgctxt "Addons::name::product_variations"
 msgid "Product Variations"
@@ -33,7 +33,7 @@ msgid "If child variations aren't allowed to have their own images, they will us
 msgstr ""
 
 msgctxt "SettingsOptions::product_variations::variations_allow_auto_change_default_variation"
-msgid "Change default variation when it runs out of stock"
+msgid "Change default variation when it gets hidden or runs out of stock"
 msgstr ""
 
 msgctxt "SettingsTooltips::product_variations::variations_allow_auto_change_default_variation"
@@ -46,6 +46,14 @@ msgstr ""
 
 msgctxt "SettingsTooltips::product_variations::variations_allow_own_features"
 msgid "If child variations aren't allowed to have their own values for features, they will use the values from the default variation of the catalog item."
+msgstr ""
+
+msgctxt "SettingsOptions::product_variations::variations_show_all_possible_feature_variants"
+msgid "Show all possible feature variants"
+msgstr ""
+
+msgctxt "SettingsTooltips::product_variations::variations_show_all_possible_feature_variants"
+msgid "Show a feature variant even if it is not available for this variation."
 msgstr ""
 
 msgctxt "Languages::product_variations.product_type"
@@ -88,10 +96,6 @@ msgctxt "Languages::product_variations.group_code.link"
 msgid "Add to variation group"
 msgstr ""
 
-msgctxt "Languages::product_variations.group_code.link.description"
-msgid "Select the code of the group to which this product will be added as a variation. If the desired variation group doesn't appear among suggestions, please make sure that you have specified the value for every feature that defines the group."
-msgstr ""
-
 msgctxt "Languages::product_variations.add_variations"
 msgid "Add variations"
 msgstr "Voeg variaties toe"
@@ -105,7 +109,7 @@ msgid "Create new products"
 msgstr "Maak nieuwe producten"
 
 msgctxt "Languages::product_variations.add_variations_description"
-msgid "Allow customers to switch between similar products by selecting the desired value of their common features."
+msgid "Add variations to generate a group of similar products that differ in color, size, etc. Or add this product to an existing group by entering the group code."
 msgstr ""
 
 msgctxt "Languages::product_variations.manage"
@@ -133,7 +137,7 @@ msgid "Set as default variation"
 msgstr ""
 
 msgctxt "Languages::product_variations.no_available_features"
-msgid "This product doesn't have features that allow grouping products. Please make sure that:<ol><li>You have created at least one feature with <b>Purpose:</b> <i>Variations as separate products</i> or <i>Variations as one product</i>.</li><li>You have specified the value of that feature for the product.</li></ol>"
+msgid "This product doesn't have features that allow grouping products. Please make sure that:<ol><li>You have created at least one feature with <b>Purpose:</b> <i>Variations as separate products</i> or <i>Variations as one product</i>.</li><li>You have specified the value of that feature for the product.</li></ol><a href=[manage_features_href]>Manage features</a>"
 msgstr ""
 
 msgctxt "Languages::product_feature.purpose.group_catalog_item"
@@ -304,114 +308,6 @@ msgctxt "Languages::product_variations.variations_naming_strategy.value"
 msgid "Red, Small"
 msgstr "Rood, klein"
 
-msgctxt "Languages::product_variations.converter.progress.features.title"
-msgid "Creating features"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.features.error"
-msgid "Couldn't create feature \"[feature]\""
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.variations.title"
-msgid "Converting variations"
-msgstr "Variaties omzetten"
-
-msgctxt "Languages::product_variations.converter.progress.variations.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.configurable_products.title"
-msgid "Converting configurable products"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.configurable_products.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.result.title"
-msgid "Conversion results"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.result.configurable_products_count"
-msgid "Number of converted configurable products:"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.result.variations_count"
-msgid "Number of converted variations:"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.result.products_with_combinations_count"
-msgid "Number of converted products with option combinations:"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.result.combinations_count"
-msgid "Number of converted option combinations:"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.result.go_on_products"
-msgid "Go to products"
-msgstr "Ga naar producten"
-
-msgctxt "Languages::product_variations.converter.view.title"
-msgid "Converting products into variations"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.view.no_data"
-msgid "No data for conversion found: it appears that your store doesn't have option combinations or product variations."
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.view.configurable_products_count"
-msgid "Number of configurable products found:"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.view.variations_count"
-msgid "Number of product variations found:"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.view.products_with_combinations_count"
-msgid "Number of products with option combinations found:"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.view.combinations_count"
-msgid "Number of option combinations found:"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.combinations.title"
-msgid "Converting option combinations"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.combinations.error"
-msgid "Couldn't convert option combination \"[combination]\" of product \"[product]\""
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.title"
-msgid "Converting products with option combinations"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.error_with_reason"
-msgid "Couldn't convert product \"[product]\". Reason: [error]"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.no_available_combinations"
-msgid "Product doesn't have any option combinations."
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.only_one_combination"
-msgid "A product with only one available option combination can't be converted to a variation. It will work properly even without conversion."
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.progress.errors"
-msgid "Errors"
-msgstr "Fouten"
-
-msgctxt "Languages::product_variations.converter.progress.wait_another_process"
-msgid "Please wait while another process will be complete"
-msgstr ""
-
 msgctxt "Languages::product_variations.upgrade_notification.convert_variations_title"
 msgid "Convert product variations to use features"
 msgstr ""
@@ -422,10 +318,6 @@ msgstr ""
 
 msgctxt "Languages::product_variations.feature_can_be_deleted"
 msgid "Couldn't delete a feature or its variant because at least one variation group is based on it. Please delete <a href=\"[href]\">these products</a> or disband their product groups, and try again."
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.result.problems_encountered"
-msgid "Some of the products couldn't be converted. This is not a standard situation and wasn't supposed to happen. There are several ways to address it:<ul><li>Check the products that couldn't be converted and configure them manually.</li><li>Contact our technical support via Help Desk, and we'll see why products weren't converted and what can be done about it.</li></ul>"
 msgstr ""
 
 msgctxt "Languages::product_variations.notice.old_product_variations_exists"
@@ -440,28 +332,36 @@ msgctxt "Languages::variation_set_as_default"
 msgid "Variation set as default"
 msgstr ""
 
-msgctxt "Languages::product_variations.converter.features.merge"
-msgid "Merge selected"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.features.unmerge"
-msgid "Split"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.features.list.title"
-msgid "Features and feature variants"
-msgstr ""
-
-msgctxt "Languages::product_variations.converter.features.list.hint"
-msgid "Below you'll find the list of features and feature variants that will be created during the conversion."
-msgstr ""
-
 msgctxt "Languages::product_variations.cant_edit_feature_categories"
 msgid "Couldn't assign feature to categories or a feature group. Some variations use this feature and aren't in the categories you tried to assign. Please delete <a href=\"[href]\">these products</a>, or disband their variation groups, or assign them to the same categories as feature or feature group, and try again."
 msgstr ""
 
 msgctxt "Languages::product_variations.too_many_combinations"
 msgid "Sorry, there are too many possible variations that can be generated. To prevent heavy load, we won't display them here. Please create the products with the right feature values manually or via import, and add them to the group."
+msgstr ""
+
+msgctxt "Languages::product_variations.generator.features.placeholder"
+msgid "Search for features that can generate variations"
+msgstr ""
+
+msgctxt "Languages::product_variations.generator.warning.new_features_add"
+msgid "You can add a new feature if you disband the group in the actions menu and create variations again."
+msgstr ""
+
+msgctxt "Languages::product_variations.generator.feature_variants.placeholder"
+msgid "Type to search"
+msgstr ""
+
+msgctxt "Languages::product_variations.generator.feature_variants.add_all_variants"
+msgid "Add all variants"
+msgstr ""
+
+msgctxt "Languages::product_variations.generator.table.title"
+msgid "Modify the variations to be created:"
+msgstr ""
+
+msgctxt "Languages::product_variations.generator.create_btn"
+msgid "Create [n] variation|Create [n] variations"
 msgstr ""
 
 msgctxt "Languages::product_variations.allow_own_features_setting_changing"
@@ -482,5 +382,9 @@ msgstr ""
 
 msgctxt "Languages::product_variations.upgrade_notification.convert_combination_message_without_variations"
 msgid "<p>In the upcoming version 4.12.1, product variations will fully replace option combinations. The code that handles option combinations will be removed. Please note that ONLY <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\">option combinations</a> and their code will be removed. <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\">Options</a> themselves will remain exactly as they are now.</p><p>Your store still has option combinations. That's why we ask you to convert option combinations into product variations. The process is mostly automatic. We only ask your input to make sure that everything goes smoothly and according to your expectations.</p><p>However, the Product Variations add-on isn't active in your store yet. You'll need to install or enable it first, and run the conversion.</p><p><a href=\"[search_for_addon]\" target=\"_blank\" class=\"btn btn-large\">1. Activate the add-on</a> <a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large\">2. Convert option combinations</a></p>"
+msgstr ""
+
+msgctxt "Languages::product_variations.add_all_variants"
+msgid "Add all variants"
 msgstr ""
 

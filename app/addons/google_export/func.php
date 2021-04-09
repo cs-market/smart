@@ -525,7 +525,13 @@ function fn_google_export_add_additional_google_categories()
                 'S' => fn_get_google_categories($lang)
             )
         );
-        $parent_feature_id = db_get_field("SELECT feature_id FROM ?:product_features_descriptions WHERE description = 'Google export features' AND lang_code = ?s", DEFAULT_LANGUAGE);
+        $parent_feature_id = db_get_field(
+            'SELECT feature_id FROM ?:product_features_descriptions'
+            . ' WHERE (description = ?s OR internal_name = ?s) AND lang_code = ?s',
+            'Google export features',
+            'Google export features',
+            DEFAULT_LANGUAGE
+        );
         fn_google_export_add_feature($new_feature, $parent_feature_id, true);
         fn_google_export_update_alt_languages('product_features_descriptions', 'feature_id', true);
         fn_google_export_update_alt_languages('product_feature_variant_descriptions', 'variant_id', true);
@@ -637,97 +643,6 @@ function fn_export_get_options_product_google_export($data, &$result, &$export_f
                 $d_product[$lang_code]['item_group_id'] = $product['variation_sub_group_id'];
                 $data_products[][$lang_code] = $d_product[$lang_code];
                 $f_option = true;
-            } elseif (!empty($options)) {
-                $_options = $options;
-                $key_option = key($options);
-                $options = array_shift($_options);
-                $combination = array();
-                foreach ($options as $name_option => $option) {
-                    $combination[$key_option] = $option;
-                    $combination['combinations'][$key_option] = $name_option;
-                    if (!empty($_options)) {
-                        fn_google_export_generate_product_options($combinations, $combination, $count_combination, $_options, $export_options);
-                    } else {
-                        $combinations[$count_combination] = $combination;
-                        $count_combination++;
-                    }
-                }
-
-                foreach ($combinations as $combination) {
-                    $d_combination = $d_product[$lang_code];
-                    $product_options = array();
-                    foreach ($combination['combinations'] as $_combination) {
-                        $_options = explode("_", $_combination);
-                        $option_id = array_shift($_options);
-                        $variant_id = reset($_options);
-                        $product_options['product_options'][$option_id] = $variant_id;
-                    }
-
-                    $cart_id = fn_generate_cart_id($product_id, $product_options);
-
-                    $data_product = db_get_row(
-                        'SELECT combination_hash, product_code'
-                        . ' FROM ?:product_options_inventory'
-                        . ' WHERE product_id = ?i AND combination_hash = ?s',
-                        $product_id,
-                        $cart_id
-                    );
-
-                    if (!empty($data_product)) {
-                        $count_products++;
-
-                        if (!empty($d_product[$lang_code]['Google price'])) {
-                            $combination['Google price'] = str_replace(' ' . CART_PRIMARY_CURRENCY, '', $d_product[$lang_code]['Google price']);
-                            $price_combination = fn_apply_options_modifiers($product_options['product_options'], $combination['Google price'], 'P');
-                            $combination['Google price'] = $price_combination . ' ' . CART_PRIMARY_CURRENCY;
-                        }
-
-                        if (!empty($d_product[$lang_code]['Google price (with tax included)'])) {
-                            $combination['Google price (with tax included)'] = str_replace(' ' . CART_PRIMARY_CURRENCY, '', $d_product[$lang_code]['Google price (with tax included)']);
-                            $price_combination = fn_apply_options_modifiers($product_options['product_options'], $combination['Google price (with tax included)'], 'P');
-                            $combination['Google price (with tax included)'] = $price_combination . ' ' . CART_PRIMARY_CURRENCY;
-                        }
-
-                        if (!empty($data_product['product_code'])) {
-                            if (!empty($d_product[$lang_code]['GTIN'])) {
-                                $combination['GTIN'] = $data_product['product_code'];
-
-                            } elseif (!empty($feature_fields['GTIN']) && !empty($d_product[$lang_code][$feature_fields['GTIN']])) {
-                                $combination[$feature_fields['GTIN']] = $data_product['product_code'];
-                            }
-                        }
-
-                        $image_url = fn_exim_get_image_url($cart_id, 'product_option', 'M', true, false, $lang_code);
-
-                        if (!empty($image_url)) {
-                            if (!empty($d_product[$lang_code]['Image URL'])) {
-                                $combination['Image URL'] = $image_url;
-                            }
-                        }
-
-                        $d_image_url = fn_exim_get_detailed_image_url($cart_id, 'product_option', 'M', $lang_code);
-
-                        if (!empty($d_image_url)) {
-                            if (!empty($d_product[$lang_code]['Detailed image URL'])) {
-                                $combination['Detailed image URL'] = $d_image_url;
-                            }
-                        }
-
-                        $d_combination['item_group_id'] = $product_id;
-                        $d_combination['Product id'] = $cart_id;
-
-                        foreach ($combination as $k_combination => $_combination) {
-                            if (isset($d_combination[$k_combination])) {
-                                $d_combination[$k_combination] = $_combination;
-                            }
-                        }
-
-                        $data_products[][$lang_code] = $d_combination;
-
-                        $_id++;
-                    }
-                }
-
             } else {
                 $d_product[$lang_code]['item_group_id'] = '';
                 $data_products[][$lang_code] = $d_product[$lang_code];

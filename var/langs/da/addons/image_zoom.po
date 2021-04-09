@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: da\n"
-"X-Crowdin-File: /release-4.11.5/addons/image_zoom.po\n"
-"X-Crowdin-File-ID: 3696\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/image_zoom.po\n"
+"X-Crowdin-File-ID: 4086\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::image_zoom"
 msgid "Image zoom"
@@ -37,72 +37,24 @@ msgid "Duration of the animation effects in milliseconds."
 msgstr "Varighed af animationseffekter i millisekunder."
 
 msgctxt "SettingsTooltips::image_zoom::cz_zoom_position"
-msgid "Specifies position of zoom window. The position is relative to image as shown by the following key (blue squares represent zoom window). <br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
+msgid "Specifies position of zoom window."
 msgstr ""
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::0"
-msgid "Zoom position №0"
-msgstr "Zoom position №0"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::1"
-msgid "Zoom position №1"
-msgstr "Zoom position №0"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::2"
-msgid "Zoom position №2"
-msgstr "Zoom position №0"
-
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::3"
-msgid "Zoom position №3"
-msgstr "Zoom position №0"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::4"
-msgid "Zoom position №4"
-msgstr "Zoom position №0"
+msgid "Upper right corner"
+msgstr ""
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::5"
-msgid "Zoom position №5"
-msgstr "Zoom position №5"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::6"
-msgid "Zoom position №6"
-msgstr "Zoom position №6"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::7"
-msgid "Zoom position №7"
-msgstr "Zoom position №7"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::8"
-msgid "Zoom position №8"
-msgstr "Zoom position №8"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::9"
-msgid "Zoom position №9"
-msgstr "Zoom position №9"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::10"
-msgid "Zoom position №10"
-msgstr "Zoom position №10"
+msgid "Bottom right corner"
+msgstr ""
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::11"
-msgid "Zoom position №11"
-msgstr "Zoom position №11"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::12"
-msgid "Zoom position №12"
-msgstr "Zoom position №12"
+msgid "Bottom left corner"
+msgstr ""
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::13"
-msgid "Zoom position №13"
-msgstr "Zoom position №13"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::14"
-msgid "Zoom position №14"
-msgstr "Zoom position №14"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::15"
-msgid "Zoom position №15"
-msgstr "Zoom position №15"
+msgid "Upper left corner"
+msgstr ""
 
 msgctxt "Languages::image_zoom.rework_update_notification.title"
 msgid "Image Zoom add-on reworked"

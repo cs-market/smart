@@ -6,9 +6,11 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.11.3/addons/call_requests.po\n"
-"PO-Revision-Date: 2020-02-04 07:10\n"
+"X-Crowdin-File: /release-4.12.2/addons/call_requests.po\n"
+"X-Crowdin-File-ID: 4044\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::call_requests"
 msgid "Call requests"
@@ -32,7 +34,7 @@ msgstr "Přepsat telefon"
 
 msgctxt "SettingsOptions::call_requests::phone_prefix_length"
 msgid "Highlight first chars [Deprecated]"
-msgstr ""
+msgstr "Zvýraznit první znaky [Deprecated]"
 
 msgctxt "SettingsOptions::call_requests::buy_now_with_one_click"
 msgid "Enable the \"Buy now with one click\" option"
@@ -44,7 +46,7 @@ msgstr "Stav objednávky"
 
 msgctxt "SettingsOptions::call_requests::phone_mask"
 msgid "Phone mask [Deprecated]"
-msgstr ""
+msgstr "Maska telefonu [Deprecated]"
 
 msgctxt "SettingsTooltips::call_requests::phone_mask"
 msgid "Leave empty to use automatic country-based phone pattern, or type in a custom pattern. You can use spaces, commas, +, -, and digits. Note that 9 represents any digit; if you need a 9, type \\\\9. Examples: +9 (999) 999 99 99, 99999999, 999 999 99 or +99-99-9999-9999."
@@ -54,17 +56,25 @@ msgctxt "SettingsTooltips::call_requests::phone_prefix_length"
 msgid "Including parenthesis, spaces, etc. Use to highlight country code, area code, and phone prefix."
 msgstr "Včetně závorek, mezer, atd. Slouží k zvýraznění kódu země, kódu oblasti a telefonního předčíslí."
 
+msgctxt "SettingsOptions::call_requests::enable_call_requests_for_vendors"
+msgid "Enable call requests for vendors"
+msgstr "Povolit požadavky na zavolání pro prodejce"
+
+msgctxt "SettingsTooltips::call_requests::enable_call_requests_for_vendors"
+msgid "This will also replace marketplace contact information with vendors' where necessary."
+msgstr "Toto také nahradí kontakt na obchod tím prodejcovým, pokud to bude nutné."
+
 msgctxt "Languages::privileges.manage_call_requests"
 msgid "Can edit"
-msgstr ""
+msgstr "Může upravovat"
 
 msgctxt "Languages::privileges.view_call_requests"
 msgid "Can view"
-msgstr ""
+msgstr "Může vidět"
 
 msgctxt "Languages::privilege_groups.call_requests"
 msgid "Call requests"
-msgstr ""
+msgstr "Požadavky na zavolání"
 
 msgctxt "Languages::call_requests"
 msgid "Call requests"
@@ -212,9 +222,9 @@ msgstr "Osobní údaje z požadavků na zavolání"
 
 msgctxt "Languages::call_requests.event.request_created.name"
 msgid "Call requests: request created"
-msgstr ""
+msgstr "Požadavky na zavolání: požadavek vytvořen"
 
 msgctxt "Languages::call_requests.event.request_about_product_created.name"
 msgid "Call requests: request about product created"
-msgstr ""
+msgstr "Požadavek na zavolání: vytvořen požadavek na produkt"
 

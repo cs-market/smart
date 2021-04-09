@@ -74,6 +74,8 @@ class UpdateOrder implements OperationInterface
             }
         }
 
+        $order_data['updated_at'] = isset($order_data['updated_at']) ? fn_parse_date($order_data['updated_at']) : TIME;
+
         /** @var \Tygh\Database\Connection $db */
         $db = $this->context->getApp()['db'];
 

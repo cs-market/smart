@@ -134,17 +134,8 @@
     {/hook}
 {/notes}
 
-{if !$id}
-    {$title = __("banners.new_banner")}
-{else}
-    {$title_start = __("banners.editing_banner")}
-    {$title_end = $banner.banner}
-{/if}
-
 {include file="common/mainbox.tpl"
-    title_start=$title_start
-    title_end=$title_end
-    title=$title
+    title=($id) ? $banner.banner : __("banners.new_banner")
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
     select_languages=true}

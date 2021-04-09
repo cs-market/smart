@@ -90,7 +90,7 @@ class Sdek implements IService, IPickupService
     {
         return [
             'name'         => __('carrier_sdek'),
-            'tracking_url' => 'https://new.cdek.ru/tracking?order_id=%s',
+            'tracking_url' => 'https://www.cdek.ru/tracking?order_id=%s',
         ];
     }
 
@@ -206,7 +206,7 @@ class Sdek implements IService, IPickupService
         $width = !empty($shipping_settings['width']) ? $shipping_settings['width'] : SDEK_DEFAULT_DIMENSIONS;
         $height = !empty($shipping_settings['height']) ? $shipping_settings['height'] : SDEK_DEFAULT_DIMENSIONS;
 
-        if (empty($weight_kg)) {
+        if ($weight_kg < 0.1) {
             $weight_kg = 0.1;
         }
 

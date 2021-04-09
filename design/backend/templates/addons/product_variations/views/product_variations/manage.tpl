@@ -37,26 +37,36 @@
                     {dropdown content=$smarty.capture.tools_list icon=" " text=__("actions")}
                 {/if}
                 {if !$is_form_readonly}
-                    {include file="common/popupbox.tpl" id="update_product_group" text=__("product_variations.add_variations") href="product_variations.update?product_id=`$product_id`" link_text=__("product_variations.add_variations") act="general" icon="icon-plus" meta="shift-left"}
+                    {include file="common/popupbox.tpl"
+                        id="update_product_group"
+                        text=__("product_variations.add_variations")
+                        href="product_variations.create_variations?product_id=`$product_id`"
+                        link_text=__("product_variations.add_variations")
+                        link_class="cm-dialog-destroy-on-close"
+                        act="general"
+                        icon="icon-plus"
+                        meta="shift-left"
+                    }
                 {/if}
             </div>
         </div>
 
         {if $products}
-            <div class="object-container product-variations__container">
-                <table width="100%" class="table table-middle table--relative" data-ca-main-content>
+            <div class="object-container product-variations__container table-responsive-wrapper">
+                <table width="100%" class="table table-middle table--relative table-responsive product-variations__table" data-ca-main-content>
                     <thead>
                     <tr>
-                        <th width="2%">&nbsp;</th>
-                        <th width="5%" class="product-variations__th-img">&nbsp;</th>
-                        <th width="25%" class="nowrap"><span>{__("name")}</span></th>
-                        <th width="13%" class="nowrap">{__("sku")}</th>
+                        <th width="40">&nbsp;</th>
+                        <th width="70" class="product-variations__th-img">&nbsp;</th>
+                        <th width="30%" class="nowrap"><span>{__("name")}</span></th>
+                        <th width="15%" class="nowrap">{__("sku")}</th>
                         {foreach $selected_features as $feature}
-                            <th><span>{$feature.description}</span></th>
+                            <th><span>{$feature.internal_name}</span></th>
                         {/foreach}
-                        <th width="13%" class="nowrap">{__("price")} ({$currencies.$primary_currency.symbol nofilter})</th>
-                        <th width="9%" class="nowrap">{__("quantity")}</th>
-                        <th width="6%" class="mobile-hide">&nbsp;</th>
+                        <th width="10%" class="nowrap">{__("price")} ({$currencies.$primary_currency.symbol nofilter})</th>
+                        <th width="10%" class="nowrap">{__("quantity")}</th>
+                        <th width="60" class="mobile-hide">&nbsp;</th>
+                        <th width="9%" class="right"></th>
                     </tr>
                     </thead>
                     {foreach $products as $product}

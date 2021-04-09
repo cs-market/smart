@@ -148,11 +148,12 @@
         <div class="control-group">
             <label class="control-label" for="{$location}_{$id}{$block_type}_block_width">{__("block_width")}</label>
             <div class="controls">
-            <input type="text" name="block[width]" id="{$location}_{$id}{$block_type}_block_width" size="25" value="{$block.properties.width}" class="input-text-short cm-value-integer" />
-            <select name="block[width_unit]">
-                <option value="P"{if $block.properties.width_unit == "P"} selected="selected"{/if}>{__("percent")|lower}</option>
-                <option value="A"{if $block.properties.width_unit == "A"} selected="selected"{/if}>{__("pixels")}</option>
-            </select>
+                <input type="text" name="block[width]" id="{$location}_{$id}{$block_type}_block_width" size="25" value="{$block.properties.width}" class="input-text-short cm-value-integer" />
+                <select name="block[width_unit]">
+                    <option value="P"{if $block.properties.width_unit == "P"} selected="selected"{/if}>{__("percent")|lower}</option>
+                    <option value="A"{if $block.properties.width_unit == "A"} selected="selected"{/if}>{__("pixels")}</option>
+                </select>
+                <p class="muted description">{__("tt_views_block_manager_update_block_width")}</p>
             </div>
         </div>
         {/if}

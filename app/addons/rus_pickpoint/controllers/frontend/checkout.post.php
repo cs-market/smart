@@ -38,7 +38,6 @@ if (!empty($cart['user_data'])) {
     } elseif (!empty($cart['user_data']['b_city'])) {
         $city = $cart['user_data']['b_city'];
     }
-
     Tygh::$app['view']->assign('fromcity', $fromcity);
     Tygh::$app['view']->assign('pickpoint_city', $city);
 }

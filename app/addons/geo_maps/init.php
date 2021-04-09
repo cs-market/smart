@@ -15,5 +15,6 @@
 defined('BOOTSTRAP') or die('Access denied');
 
 fn_register_hooks(
-    'check_amount_in_stock_before_check'
+    'check_amount_in_stock_before_check',
+    'yandex_delivery_v3_modify_pickup_points'
 );

@@ -138,7 +138,7 @@ define('CS_PHP_VERSION', phpversion());
 
 // Product information
 define('PRODUCT_NAME', 'Multi-Vendor');
-define('PRODUCT_VERSION', '4.11.5');
+define('PRODUCT_VERSION', '4.12.2.SP2');
 define('PRODUCT_STATUS', '');
 
 
@@ -241,8 +241,8 @@ $config['updates_server'] = 'https://updates.cs-cart.com';
 
 // external resources, related to product
 $config['resources'] = array(
-    'docs_url'                      => 'https://docs.cs-cart.ru/4.11.x/',
-    'knowledge_base'                => 'https://docs.cs-cart.com/4.11.x/install/index.html',
+    'docs_url'                      => 'https://docs.cs-cart.ru/4.12.x/',
+    'knowledge_base'                => 'https://docs.cs-cart.com/4.12.x/install/index.html',
     'faq'                           => 'https://www.cs-cart.ru/vopros-otvet.html',
     'updates_server'                => 'https://updates.cs-cart.com',
     'twitter'                       => 'cscart',
@@ -258,18 +258,18 @@ $config['resources'] = array(
     'mve_plus_license_url'          => 'https://multivendor.cs-cart.ru',
     'mve_ultimate_license_url'      => 'https://multivendor.cs-cart.ru',
     'marketplace_url'               => 'https://marketplace.cs-cart.com',
-    'admin_protection_url'          => 'https://docs.cs-cart.com/4.11.x/install/security.html#step-1-rename-admin-php',
-    'widget_mode_url'               => 'https://docs.cs-cart.com/4.11.x/user_guide/look_and_feel/layouts/widget_mode/index.html',
+    'admin_protection_url'          => 'https://docs.cs-cart.com/4.12.x/install/security.html#step-1-rename-admin-php',
+    'widget_mode_url'               => 'https://docs.cs-cart.com/4.12.x/user_guide/look_and_feel/layouts/widget_mode/index.html',
     'developers_catalog'            => 'https://marketplace.cs-cart.com/developers-catalog.html',
     'upgrade_center_specialist_url' => 'https://marketplace.cs-cart.com/developers-catalog.html?services=M',
     'upgrade_center_team_url'       => 'https://www.cs-cart.com/index.php?dispatch=communication.tickets&submit_ticket=Y',
-    'kb_https_failed_url'           => 'https://docs.cs-cart.com/4.11.x/install/possible_issues/secure_connection_failed.html',
+    'kb_https_failed_url'           => 'https://docs.cs-cart.com/4.12.x/install/possible_issues/secure_connection_failed.html',
     'curl_error_interpretation'     => 'https://curl.haxx.se/libcurl/c/libcurl-errors.html',
     'product_buy_url'               => 'https://multivendor.cs-cart.ru?utm_source=trial',
     'forum'                         => 'https://forum.cs-cart.ru',
     'bug_tracker_url'               => 'https://forum.cs-cart.com/index.php?app=tracker&module=post&section=post&do=postnew&pid=11&new_module_versions_id=138',
     'core_addons_supplier_url'      => 'https://helpdesk.cs-cart.com',
-    'docs_guideline'                => 'https://docs.cs-cart.com/4.11.x/developer_guide/getting_started/guidelines.html',
+    'docs_guideline'                => 'https://docs.cs-cart.com/4.12.x/developer_guide/getting_started/guidelines.html',
     'translate'                     => 'https://translate.cs-cart.com',
     'changelog_url'                 => 'http://docs.cs-cart.com/latest/history/index.html',
     'video_tutorials'               => 'https://www.cs-cart.ru/videos/admin'
@@ -282,6 +282,7 @@ $config['lazy_thumbnails'] = array(
 
 // Debugger token
 $config['debugger_token'] = 'debug';
+$config['allowed_pack_exts'] = ['tgz', 'gz', 'zip'];
 
 // Get local configuration
 require_once($config['dir']['root'] . '/config.local.php');
@@ -298,7 +299,5 @@ $config['http_location'] = 'http://' . $config['http_host'] . $config['http_path
 $config['https_location'] = 'https://' . $config['https_host'] . $config['https_path'];
 $config['current_location'] = (defined('HTTPS')) ? $config['https_location'] : $config['http_location'];
 $config['current_host'] = (defined('HTTPS')) ? $config['https_host'] : $config['http_host'];
-
-$config['allowed_pack_exts'] = array('tgz', 'gz', 'zip');
 
 return $config;

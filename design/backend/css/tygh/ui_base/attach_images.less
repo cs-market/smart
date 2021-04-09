@@ -1,5 +1,8 @@
 .attach-images {
     margin-bottom: 0px;
+    &.logos-section__item {
+        margin-bottom: 10px;
+    }
     .desc {
         color: #868686;
         font-size: 11px;
@@ -7,20 +10,21 @@
     .image-wrap {
         position: relative;
         width: 200px;
+
+        .image-delete {
+            position: absolute;
+            top: -7px;
+            left: 152px + 4;
+            z-index: 1;
+            display: none;
+            line-height: 0;
+        }
+        &:hover {
             .image-delete {
-                position: absolute;
-                top: -7px;
-                left: 152px + 4;
-                z-index: 1;
-                display: none;
-                line-height: 0;
-            }
-            &:hover {
-                .image-delete {
-                    display: block;
-                }
+                display: block;
             }
         }
+    }
     .upload-box {
         margin-top: 10px;
         margin-bottom: 25px;
@@ -70,6 +74,11 @@
             }
             input {
                 width: 127px;
+            }
+        }
+        .logos-section__image.favicon {
+            img {
+                width: 16px;
             }
         }
     }

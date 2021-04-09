@@ -43,9 +43,16 @@ class SessionProvider implements \Pimple\ServiceProviderInterface
                 return $session;
             }
 
+            $name_suffix = '_' . substr(md5(Registry::get('config.http_location')), 0, 5);
+
+            if (defined('HTTPS') && Registry::ifGet('config.tweaks.secure_cookies', false)) {
+                $name_suffix = '_s' . $name_suffix;
+                $session->cookie_secure = true;
+            }
+
             // Configure session component
             $session->setSessionNamePrefix('sid_');
-            $session->setSessionNameSuffix('_' . substr(md5(Registry::get('config.http_location')), 0, 5));
+            $session->setSessionNameSuffix($name_suffix);
             $session->setName(ACCOUNT_TYPE);
             $session->setSessionIDSuffix('-' . AREA);
 

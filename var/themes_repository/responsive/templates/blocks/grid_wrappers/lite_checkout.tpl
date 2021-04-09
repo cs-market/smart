@@ -34,13 +34,16 @@
                 data-ca-lite-checkout-auto-save-on-change="true"
             >
             <div
-                class="litecheckout__group"
+                class="litecheckout__group
                 {if $runtime.customization_mode.block_manager && $location_data.is_frontend_editing_allowed}
-                    data-ca-block-manager-grid-id="{$grid.grid_id}"
+                    bm-block-manager__blocks-place
+                {/if}"
+                {if $runtime.customization_mode.block_manager && $location_data.is_frontend_editing_allowed}
+                    data-ca-block-manager-blocks-place="true"
                 {/if}
-            >
+            >{strip}
                 {$content nofilter}
-            </div>
+            {/strip}</div>
 
             {capture name="image_verification"}{include file="common/image_verification.tpl" option="checkout"}{/capture}
 

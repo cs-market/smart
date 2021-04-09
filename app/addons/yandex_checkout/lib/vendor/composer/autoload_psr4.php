@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'YandexCheckout\\' => array($vendorDir . '/yandex-money/yandex-checkout-sdk-php/lib'),
+    'YooKassa\\' => array($vendorDir . '/yoomoney/yookassa-sdk-php/lib'),
 );

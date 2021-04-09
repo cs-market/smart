@@ -5,16 +5,20 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: en_US"
 
 msgctxt "Addons::name::vendor_communication"
-msgid "Ask seller a question"
-msgstr "Ask seller a question"
+msgid "Message center"
+msgstr "Message center"
 
 msgctxt "Addons::description::vendor_communication"
-msgid "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
-msgstr "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
+msgid "Allows customers, vendors, and administrators to contact each other via the built-in chat."
+msgstr "Allows customers, vendors, and administrators to contact each other via the built-in chat."
 
 msgctxt "SettingsSections::vendor_communication::general"
 msgid "General"
 msgstr "General"
+
+msgctxt "SettingsSections::vendor_communication::vendor_to_customer"
+msgid "For customers"
+msgstr "For customers"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_product"
 msgid "Contact button on product pages"
@@ -35,6 +39,14 @@ msgstr "Show the \"Ask a question\" button on product pages."
 msgctxt "SettingsTooltips::vendor_communication::show_on_vendor"
 msgid "Show the \"Ask a question\" button in vendors' microstores."
 msgstr "Show the \"Ask a question\" button in vendors' microstores."
+
+msgctxt "SettingsOptions::vendor_communication::vendor_to_customer_communication"
+msgid "Customer-to-seller communication"
+msgstr "Customer-to-seller communication"
+
+msgctxt "SettingsOptions::vendor_communication::vendor_to_admin_communication"
+msgid "Vendor-to-admin communication"
+msgstr "Vendor-to-admin communication"
 
 msgctxt "Languages::vendor_communication.messages"
 msgid "Messages"
@@ -148,6 +160,18 @@ msgctxt "Languages::vendor_communication.you"
 msgid "You"
 msgstr "You"
 
+msgctxt "Languages::vendor_communication.product_details"
+msgid "Product details"
+msgstr "Product details"
+
+msgctxt "Languages::vendor_communication.order_details"
+msgid "Order details"
+msgstr "Order details"
+
+msgctxt "Languages::vendor_communication.import_details"
+msgid "Import details"
+msgstr "Import details"
+
 msgctxt "Languages::vendor_communication.thread_deleted"
 msgid "Thread has been deleted"
 msgstr "Thread has been deleted"
@@ -193,8 +217,8 @@ msgid "Can view"
 msgstr "Can view"
 
 msgctxt "Languages::privilege_groups.vendor_communication"
-msgid "Message center"
-msgstr "Message center"
+msgid "Message center: customer-to-vendor communication"
+msgstr "Message center: customer-to-vendor communication"
 
 msgctxt "Languages::vendor_communication.your_message_to_vendor_name"
 msgid "Your message to [vendor_name]"
@@ -205,12 +229,16 @@ msgid "Please sign in so that we can notify you about a reply"
 msgstr "Please sign in so that we can notify you about a reply"
 
 msgctxt "Languages::vendor_communication"
-msgid "Ask seller a question"
-msgstr "Ask seller a question"
+msgid "Message center"
+msgstr "Message center"
 
 msgctxt "Languages::vendor_communication.event.message_received.name"
-msgid "New message received"
-msgstr "New message received"
+msgid "Customer-to-vendor: New message received"
+msgstr "Customer-to-vendor: New message received"
+
+msgctxt "Languages::vendor_communication.event.vendor_to_admin_message_received.name"
+msgid "Vendor-to-admin: New message received"
+msgstr "Vendor-to-admin: New message received"
 
 msgctxt "Languages::internal_template.vendor_communication_message_received"
 msgid "New message received"
@@ -223,3 +251,59 @@ msgstr "[company_name] has a new message from [customer]"
 msgctxt "Languages::vendor_communication.new_message.message"
 msgid "Click this notification to see the message"
 msgstr "Click this notification to see the message"
+
+msgctxt "Languages::vendor_communication.contact_admin"
+msgid "Contact administrator"
+msgstr "Contact administrator"
+
+msgctxt "Languages::vendor_communication.contact_vendor"
+msgid "Contact vendor"
+msgstr "Contact vendor"
+
+msgctxt "Languages::vendor_communication.communication"
+msgid "Communication"
+msgstr "Communication"
+
+msgctxt "Languages::vendor_communication.message_center_vendor_name"
+msgid "Message center"
+msgstr "Message center"
+
+msgctxt "Languages::vendor_communication.message_center_vendor_name_menu_description"
+msgid "Messages from vendor to administrator"
+msgstr "Messages from vendor to administrator"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_admin"
+msgid "Vendor communication"
+msgstr "Vendor communication"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_customer"
+msgid "Customer communication"
+msgstr "Customer communication"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_admin_for_vendor_panel"
+msgid "Admin communication"
+msgstr "Admin communication"
+
+msgctxt "Languages::vendor_communication.your_message_to_admin"
+msgid "Your message to administrator"
+msgstr "Your message to administrator"
+
+msgctxt "Languages::vendor_communication.some_threads_have_not_been_created"
+msgid "Some threads have not been created: [count]"
+msgstr "Some threads have not been created: [count]"
+
+msgctxt "Languages::vendor_communication.vendor_to_admin.message_sent"
+msgid "Your message has been sent to <b>[name]</b>.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+msgstr "Your message has been sent to <b>[name]</b>.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+
+msgctxt "Languages::vendor_communication.vendor_to_admin.message_list_sent"
+msgid "Your messages have been sent.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+msgstr "Your messages have been sent.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+
+msgctxt "Languages::privilege_groups.admin_communication"
+msgid "Message center: vendor-to-admin communication"
+msgstr "Message center: vendor-to-admin communication"
+
+msgctxt "Languages::customer_to_admin_communication.event.message_received.name"
+msgid "Customer-to-Admin: New message received"
+msgstr "Customer-to-Admin: New message received"

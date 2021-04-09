@@ -12,10 +12,10 @@
 
     // Extended selection
     &__selection-extended--products {
-        grid-template-areas: "object-picker__products-image  object-picker__products-main  object-picker__products-delete"
-                             "object-picker__products-image  object-picker__products-price object-picker__products-delete";
-        -ms-grid-columns: 50px 8px minmax(170px, 1fr) 8px minmax(40px, auto);
-        grid-template-columns: 50px minmax(170px, 1fr) minmax(40px, auto);
+        grid-template-areas: "object-picker__products_position object-picker__products-image  object-picker__products-main  object-picker__products-delete"
+                             "object-picker__products_position object-picker__products-image  object-picker__products-price object-picker__products-delete";
+        -ms-grid-columns: minmax(0, 40px) 8px 50px 8px minmax(170px, 1fr) 8px minmax(40px, auto);
+        grid-template-columns: minmax(0, 40px) 50px minmax(170px, 1fr) minmax(40px, auto);
         -webkit-column-gap: 8px;
         -moz-column-gap: 8px;
         column-gap: 8px;
@@ -23,11 +23,11 @@
         padding-bottom: 8px;
 
         @media (min-width: 768px) {
-            grid-template-areas: "object-picker__products-image object-picker__products-main object-picker__products-price object-picker__products-delete";
-            -ms-grid-columns: 50px 16px minmax(170px, 1fr) 16px minmax(74px, 150px) 16px minmax(40px, auto);
-            grid-template-columns: 50px minmax(170px, 1fr) minmax(74px, 150px) minmax(40px, auto);
+            grid-template-areas: "object-picker__products_position object-picker__products-image object-picker__products-main object-picker__products-price object-picker__products-delete";
+            -ms-grid-columns: minmax(0, 40px) 16px 50px 16px minmax(170px, 1fr) 16px minmax(74px, 150px) 16px minmax(40px, auto);
+            grid-template-columns: minmax(0, 40px) 50px minmax(170px, 1fr) minmax(74px, 150px) minmax(40px, auto);
             grid-gap: 16px;
-        }        
+        }
     }
 
     // Result
@@ -123,6 +123,10 @@
         }
     }
 
+    &__products-position {
+        grid-area: object-picker__products_position;
+    }
+
     &__selection-extended--products:not(:hover) &__products-delete {
 
         @media (min-width: 1200px) {
@@ -200,5 +204,23 @@
                 opacity: 0;
             }
         }
+    }
+
+    &__selection-product-feature, &__result-product-feature {
+        display: flex;
+        align-items: center;
+    }
+
+    &__result-product-feature {
+        flex: 1 1 auto;
+    }
+
+    &__product-feature-help {
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    &__product-feature-no-image.no-image {
+        margin: 0;
     }
 }

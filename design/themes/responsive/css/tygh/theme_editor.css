@@ -1402,6 +1402,12 @@ x:-moz-any-link {
     color: #ccc;
     line-height: 25px;
 }
+.te-description {
+    clear: both;
+    padding-top: 8px;
+    color: #808080;
+    font-size: 13px;
+}
 .te-advanced-options {
     display: inline-block;
     float: right;

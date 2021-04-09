@@ -56,27 +56,23 @@ class Factory
     {
         $file_to_load = $preset['file'];
 
-        if (!$this->company_id && isset($preset['company_id'])) {
-            $company_id = $preset['company_id'];
-            if (preg_match('!^(?P<company_id_in_path>\d+)/(?P<file_to_load>.+)!', $file_to_load, $matches)
-                && $matches['company_id_in_path'] != $company_id
-            ) {
-                throw new PermissionsException();
-            }
-            $file_to_load = preg_replace("!^{$company_id}/!", '', $file_to_load);
-        } else {
-            $company_id = $this->company_id;
+        if (
+            preg_match('!^(?P<company_id_in_path>\d+)/(?P<file_to_load>.+)!', $file_to_load, $matches)
+            && ($this->company_id && (int) $matches['company_id_in_path'] !== $this->company_id)
+        ) {
+            throw new PermissionsException();
         }
 
-        if ($preset['file_type'] == PresetFileTypes::URL) {
-            $file = $this->file_manager->download($preset['file'], $company_id);
+        if ($preset['file_type'] === PresetFileTypes::URL) {
+            $file = $this->file_manager->download($preset['file'], $this->company_id);
             if (!$file) {
                 throw new DownloadException();
             }
             $file_path = $file['path'];
             $file_to_load = $file['name'];
         } else {
-            $file_path = $this->file_manager->getFilePath($file_to_load, $company_id);
+            $file_to_load = preg_replace("!^{$this->company_id}/!", '', $file_to_load);
+            $file_path = $this->file_manager->getFilePath($file_to_load, $this->company_id);
         }
 
         if (!$file_path) {
@@ -92,7 +88,7 @@ class Factory
 
         $options = isset($preset['options'])
             ? $preset['options']
-            : array();
+            : [];
 
         /** @var \Tygh\Addons\AdvancedImport\Readers\IReader $reader */
         $reader = new $reader_class($file_path, $options);

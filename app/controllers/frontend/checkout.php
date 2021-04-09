@@ -12,11 +12,10 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\OrderDataTypes;
-use Tygh\Enum\UserTypes;
 use Tygh\Enum\YesNo;
 use Tygh\Registry;
+use Tygh\Shippings\Shippings;
 use Tygh\Storage;
 use Tygh\Tygh;
 use Tygh\Enum\ProfileFieldSections;
@@ -25,6 +24,7 @@ defined('BOOTSTRAP') or die('Access denied');
 
 /** @var string $controller */
 /** @var string $mode */
+/** @var array $auth */
 
 fn_enable_checkout_mode();
 
@@ -42,6 +42,9 @@ $cart = &Tygh::$app['session']['cart'];
 $view = Tygh::$app['view'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!empty($auth['user_id'])) {
+        fn_extract_cart_content($cart, $auth['user_id']);
+    }
 
     fn_restore_processed_user_password($_REQUEST['user_data'], $_POST['user_data']);
 
@@ -612,6 +615,12 @@ if ($mode === 'cart') {
 
     $shipping_calculation_type = fn_checkout_get_shippping_calculation_type($cart, $is_location_changed);
 
+    $show_unavailable_shippings = YesNo::toBool(Registry::get('settings.Checkout.show_unavailable_shipping_methods'));
+    $view->assign('show_unavailable_shippings', $show_unavailable_shippings);
+
+    $cart['keep_chosen_shipping'] = isset($cart['keep_chosen_shipping']) ? $cart['keep_chosen_shipping'] : true;
+    $cart['keep_chosen_shipping'] = $cart['keep_chosen_shipping'] && $show_unavailable_shippings;
+
     list($cart_products, $product_groups) = fn_calculate_cart_content($cart, $auth, $shipping_calculation_type, true, 'F');
 
     if (!empty($_REQUEST['shipping_ids'])) {
@@ -645,6 +654,10 @@ if ($mode === 'cart') {
         && $cart['shipping_required']
     ) {
         fn_set_notification('W', __('important'), __('text_shipping_rates_changed'), '', 'shipping_rates_changed');
+
+        $view->assign([
+            'shipping_rates_changed' => true,
+        ]);
     }
 
     Tygh::$app['session']['shipping_hash'] = $shipping_hash;
@@ -726,20 +739,30 @@ if ($mode === 'cart') {
 
     $profile_field_sections = fn_get_profile_fields_sections();
 
+    $location = fn_get_customer_location($auth, $cart);
+    $product_groups = Shippings::groupProductsList($cart_products, $location);
+    $shippings_group = [];
+    foreach ($product_groups as $key_group => $group) {
+        $shippings_group[$key_group] = Shippings::getShippingsList($group);
+    }
+
+    $all_shippings = $shippings_group;
+
     $view->assign([
-        'user_data'                                  => $cart['user_data'],
-        'profile_fields'                             => $profile_fields,
-        'profile_field_sections'                     => $profile_field_sections,
-        'payment_info'                               => $payment_info,
-        'usergroups'                                 => fn_get_usergroups(['type' => UserTypes::CUSTOMER, 'status' => ObjectStatuses::ACTIVE]),
-        'countries'                                  => fn_get_simple_countries(true),
-        'states'                                     => fn_get_all_states(true),
-        'payment_methods'                            => $payment_methods,
-        'use_ajax'                                   => 'true',
-        'location'                                   => 'checkout',
-        'cart'                                       => $cart,
-        'cart_products'                              => array_reverse($cart_products, true),
-        'product_groups'                             => $cart['product_groups'],
+        'user_data'              => $cart['user_data'],
+        'profile_fields'         => $profile_fields,
+        'profile_field_sections' => $profile_field_sections,
+        'payment_info'           => $payment_info,
+        'usergroups'             => fn_get_usergroups(['type' => 'C', 'status' => 'A']),
+        'countries'              => fn_get_simple_countries(true),
+        'states'                 => fn_get_all_states(true),
+        'payment_methods'        => $payment_methods,
+        'use_ajax'               => 'true',
+        'location'               => 'checkout',
+        'cart'                   => $cart,
+        'cart_products'          => array_reverse($cart_products, true),
+        'product_groups'         => $cart['product_groups'],
+        'all_shippings'          => $all_shippings,
         'is_terms_and_conditions_agreement_required' => fn_checkout_is_terms_and_conditions_agreement_required(),
     ]);
 // Delete product from the cart

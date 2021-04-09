@@ -5,14 +5,14 @@
 <div class="items-container cm-sortable" data-ca-sortable-table="hybrid_auth_providers" data-ca-sortable-id-name="provider_id" id="manage_providers_list">
 {if $providers_list}
 
-<div class="table-wrapper">
-    <table class="table table-middle table--relative table-objects table-striped">
-    {foreach from=$providers_list item=provider_data}
+<div class="table-responsive-wrapper">
+    <table class="table table-middle table--relative table-objects table-striped table-responsive table-responsive-w-titles">
+    {foreach $providers_list as $provider_data}
         {include file="common/object_group.tpl"
             id=$provider_data.provider_id
-            text=$providers_schema[$provider_data.provider].provider|default:$provider_data.provider
-            href="hybrid_auth.update?provider=`$provider_data.provider`"
-            href_delete="hybrid_auth.delete_provider?provider=`$provider_data.provider`"
+            text=$provider_data.name|default:$provider_data.provider
+            href="hybrid_auth.update?provider_id=`$provider_data.provider_id`"
+            href_delete="hybrid_auth.delete_provider?provider_id=`$provider_data.provider_id`"
             table="hybrid_auth_providers"
             object_id_name="provider_id"
             delete_target_id="manage_providers_list,content_group_*"
@@ -20,7 +20,7 @@
             additional_class="cm-sortable-row cm-sortable-id-`$provider_data.provider_id`"
             no_table=true
             is_view_link=false
-            header_text="{__("hybrid_auth.editing_provider")}: `$providers_schema[$provider_data.provider].provider`"
+            header_text="{__("hybrid_auth.editing_provider")}: `$provider_data.name`"
             draggable=true
         }
     {/foreach}

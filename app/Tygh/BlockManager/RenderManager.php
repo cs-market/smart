@@ -21,6 +21,7 @@ use Tygh\Embedded;
 use Tygh\Registry;
 use Tygh\SmartyEngine\Core;
 use Tygh\Tygh;
+use Tygh\Enum\SiteArea;
 
 class RenderManager
 {
@@ -229,7 +230,7 @@ class RenderManager
             $grids_content[$index] = trim($this->renderGrid($grid));
         }
 
-        if ($this->_area != 'A') {
+        if ($this->_area !== SiteArea::ADMIN_PANEL && !$this->is_frontend_layout_editing_enabled) {
             $grids = $this->recalculateGridsBoundingBox($grids, $grids_content);
         }
 
@@ -674,7 +675,12 @@ class RenderManager
             }
 
             if (!empty($block['wrapper']) && $smarty->templateExists($block['wrapper']) && $display_this_block) {
+                $smarty->assign('grid_id', $block['grid_id']);
+                $smarty->assign('snapping_id', $block['snapping_id']);
+                $smarty->assign('order', $block['order']);
+
                 $smarty->assign('content', $block_content);
+                $smarty->assign('wrapper', $block['wrapper']);
 
                 if ($block['type'] == Block::TYPE_MAIN) {
                     $smarty->assign(
@@ -685,7 +691,7 @@ class RenderManager
                         false
                     );
                 }
-                $block_content = $smarty->fetch($block['wrapper']);
+                $block_content = $smarty->fetch('views/block_manager/render/wrapper.tpl');
             } else {
                 $smarty->assign('grid_id', $block['grid_id']);
                 $smarty->assign('snapping_id', $block['snapping_id']);
@@ -742,15 +748,15 @@ class RenderManager
     /**
      * Returns true if cache used for blocks
      *
-     * @static
-     * @return bool true if we may use cahce, false otherwise
+     * @return bool True if we may use cahce, false otherwise
      */
     public static function allowCache()
     {
         $use_cache = true;
-        if (Registry::ifGet('config.tweaks.disable_block_cache', false)
-            || Registry::get('runtime.customizaton_mode.design')
-            || Registry::get('runtime.customizaton_mode.translation')
+
+        if (
+            Registry::ifGet('config.tweaks.disable_block_cache', false)
+            || Registry::get('runtime.customization_mode')
             || Development::isEnabled('compile_check')
         ) {
             $use_cache = false;
@@ -983,20 +989,20 @@ class RenderManager
         }
 
         foreach ($callable_handlers as $handler_name => $callable_definition) {
-
             if (isset($callable_definition[0]) && is_callable($callable_definition[0])) {
                 $arguments = array();
 
                 if (isset($callable_definition[1]) && is_array($callable_definition[1])) {
                     foreach ($callable_definition[1] as $argument) {
-
-                        if (strpos($argument, '$') === 0) {
-                            // Superglobal variables like $_REQUEST
+                        if (is_string($argument) && strpos($argument, '$') === 0) {
                             if (isset(${$argument})) {
                                 $arguments[] = ${$argument};
-                            }
-                            // Argument variable name listed at allowed variables to pass
-                            elseif (
+                            } elseif ($argument === '$_REQUEST') {
+                                $arguments[] = $_REQUEST;
+                            } elseif ($argument === '$_SERVER') {
+                                $arguments[] = $_SERVER;
+                            } elseif (
+                                // Argument variable name listed at allowed variables to pass
                                 ($argument_variable_name = substr($argument, 1))
                                 &&
                                 array_key_exists($argument_variable_name, $variables_to_pass)

@@ -14,5 +14,7 @@
 
 fn_register_hooks(
     'delete_company',
-    'post_delete_user'
+    'post_delete_user',
+    ['vendor_communication_get_object_type', '', 'advanced_import'],
+    ['vendor_communication_get_object_data', '', 'advanced_import']
 );

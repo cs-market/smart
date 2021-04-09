@@ -18,24 +18,6 @@ $schema['central']['orders']['items']['return_requests'] = array(
     ),
     'href' => 'rma.returns',
     'position' => 900,
-    'subitems' => array(
-        /*'return_requests' => array(
-            'href' => 'rma.returns',
-            'position' => 910,
-        ),*/
-        // 'rma_reasons' => array(
-        //     'href' => 'rma.properties?property_type=R',
-        //     'position' => 920,
-        // ),
-        // 'rma_actions' => array(
-        //     'href' => 'rma.properties?property_type=A',
-        //     'position' => 930,
-        // ),
-        // 'rma_request_statuses' => array(
-        //     'href' => 'statuses.manage?type=R',
-        //     'position' => 940,
-        // ),
-    )
 );
 
 $schema['top']['administration']['items']['rma_request_statuses'] = array(

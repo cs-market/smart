@@ -23,6 +23,6 @@
     </div>
 {else}
     <div class="no-items row-fluid">
-        <div class="span8 offset2 left">{__("product_variations.no_available_features")}</div>
+        <div class="span8 offset2 left">{__("product_variations.no_available_features", ["[manage_features_href]" => "product_features.manage"|fn_url])}</div>
     </div>
 {/if}

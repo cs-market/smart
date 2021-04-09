@@ -142,12 +142,13 @@ if ($mode == 'view') {
  */
 function fn_settings_wizard_update_password($new_password)
 {
-    if (!empty($new_password)) {
-        $salt = fn_generate_salt();
-        $password = fn_generate_salted_password($new_password, $salt);
-
-        db_query('UPDATE ?:users SET salt = ?s, password = ?s WHERE user_id = ?i', $salt, $password, 1);
+    if (empty($new_password)) {
+        return;
     }
+
+    $password = fn_password_hash($new_password);
+
+    db_query('UPDATE ?:users SET salt = ?s, password = ?s WHERE user_id = ?i', '', $password, 1);
 }
 
 /**

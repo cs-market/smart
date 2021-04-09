@@ -22,7 +22,7 @@ if ($mode == 'details') {
 
     if (isset($order_info['shipping']) && is_array($order_info['shipping'])) {
         $shipping = reset($order_info['shipping']);
-        if ($shipping['module'] != 'rus_boxberry') {
+        if (isset($shipping['module']) && $shipping['module'] !== 'rus_boxberry') {
             unset($carriers['boxberry']);
         }
     }

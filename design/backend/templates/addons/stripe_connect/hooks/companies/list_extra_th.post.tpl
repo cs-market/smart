@@ -1,1 +1,1 @@
-<th>{__("stripe_connect.stripe_account")}</th>
+<th title="{__("stripe_connect.stripe_connect")}">{__("stripe_connect.stripe_connect_short")}</th>

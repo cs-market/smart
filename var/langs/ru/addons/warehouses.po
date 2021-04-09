@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.11.5/addons/warehouses.po\n"
-"X-Crowdin-File-ID: 3610\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/warehouses.po\n"
+"X-Crowdin-File-ID: 4180\n"
+"PO-Revision-Date: 2021-02-01 09:12\n"
 
 msgctxt "Addons::name::warehouses"
 msgid "Warehouses [Beta]"
@@ -203,4 +203,20 @@ msgstr "На этой витрине нет магазинов или склад
 msgctxt "Languages::warehouses.exim_reset_inventory_tooltip"
 msgid "This won't affect the products that have the quantity specified in the imported file. This also won't affect products at the warehouses that aren't updated in this preset."
 msgstr "Это не повлияет на товары, у которых в импортируемом файле указано количество. Также это не повлияет на товары с тех складов, которые не затрагиваются этим пресетом."
+
+msgctxt "Languages::commerceml.map.entity_type.warehouse"
+msgid "Warehouses"
+msgstr "Склады"
+
+msgctxt "Languages::commerceml.tab.warehouse"
+msgid "Warehouses"
+msgstr "Склады"
+
+msgctxt "Languages::warehouses.commerceml.import.error.product.warehouse_not_found"
+msgid "Couldn't find warehouse [id]"
+msgstr "Не удалось найти склад [id]"
+
+msgctxt "Languages::warehouses.commerceml.import.message.warehouse.created"
+msgid "Category [id] created; local ID: [local_id]"
+msgstr "Категория [id] создана; локальный ID: [local_id]"
 

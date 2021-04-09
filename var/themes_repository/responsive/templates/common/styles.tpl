@@ -21,7 +21,7 @@
         {style src="tygh/components/block_manager.less"}
     {/if}
 
-    {if $language_direction == 'rtl'}
+    {if $language_direction == "rtl"}
         {style src="tygh/rtl.less"}
     {/if}
 {/hook}

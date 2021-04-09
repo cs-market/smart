@@ -1,5 +1,6 @@
 <div class="bulk-edit clearfix hidden"
      data-ca-bulkedit-expanded-object="true"
+     data-ca-bulkedit-component="expandedObject"
 >
 
     <ul class="btn-group bulk-edit__wrapper">
@@ -24,11 +25,13 @@
 
         {if "products.m_update_prices"|fn_check_view_permissions}
         <li class="btn bulk-edit__btn bulk-edit__btn--category dropleft-mod">
-            <span class="bulk-edit__btn-content bulk-edit-toggle bulk-edit__btn-content--category" data-toggle=".bulk-edit-categories-content">{__("category")} <span class="caret mobile-hide"></span></span>
+            <span class="bulk-edit__btn-content bulk-edit-toggle bulk-edit__btn-content--category" data-toggle=".bulk-edit__content--categories">{__("category")} <span class="caret mobile-hide"></span></span>
 
-            <div class="bulk-edit--reset-dropdown-menu bulk-edit-categories-content">
+            <div class="bulk-edit--reset-dropdown-menu  bulk-edit__content bulk-edit__content--categories">
                 {include file="views/products/components/bulk_edit/categories.tpl"}
             </div>
+
+            <div class="bulk-edit--overlay"></div>
         </li>
         {/if}
 

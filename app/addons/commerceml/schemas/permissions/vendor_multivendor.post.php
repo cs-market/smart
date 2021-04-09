@@ -27,7 +27,7 @@ $schema['controllers']['commerceml'] = [
 $schema['controllers']['sync_data']['modes']['update'] = [
     'param_permissions' => [
         'sync_provider_id' => [
-            'commerceml_catalog' => true
+            'commerceml' => true
         ],
     ],
     'default_permissions' => false,

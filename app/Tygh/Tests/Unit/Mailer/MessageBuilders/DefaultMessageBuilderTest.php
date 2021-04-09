@@ -13,6 +13,7 @@ class DefaultMessageBuilderTest extends ATestCase
     public function setUp()
     {
         $this->requireMockFunction('fn_disable_live_editor_mode');
+        $this->requireMockFunction('fn_filter_company_data_by_profile_fields');
     }
 
     public function testCreateMessage()

@@ -1,7 +1,14 @@
 {if $company_data.company_id}
-    {assign var="id" value=$company_data.company_id}
+    {$id=$company_data.company_id}
 {else}
-    {assign var="id" value=0}
+    {$id=0}
+{/if}
+{$is_allowed_to_update_companies = fn_check_view_permissions("companies.update", "POST")}
+
+{* Show approve and disapprove button instead of status dropdown *}
+{if $company_data.status == "VendorStatuses::NEW_ACCOUNT"|enum}
+    {$show_approve = true}
+    {$status_display = "text"}
 {/if}
 
 {include file="views/profiles/components/profiles_scripts.tpl"}
@@ -11,7 +18,7 @@
 {capture name="tabsbox"}
 {** /Item menu section **}
 
-<form class="form-horizontal form-edit {$form_class} {if !fn_check_view_permissions("companies.update", "POST")}cm-hide-inputs{/if} {if !$id}cm-ajax cm-comet cm-disable-check-changes{/if}" action="{""|fn_url}" method="post" id="company_update_form" enctype="multipart/form-data"> {* company update form *}
+<form class="form-horizontal form-edit {$form_class} {if !$is_allowed_to_update_companies}cm-hide-inputs{/if} {if !$id && "ULTIMATE"|fn_allowed_for}cm-ajax cm-comet cm-disable-check-changes{/if}" action="{""|fn_url}" method="post" id="company_update_form" enctype="multipart/form-data"> {* company update form *}
 {* class=""*}
 <input type="hidden" name="fake" value="1" />
 <input type="hidden" name="selected_section" id="selected_section" value="{$smarty.request.selected_section}" />
@@ -25,7 +32,7 @@
     {include file="common/subheader.tpl" title=__("use_existing_store")}
 
     <div class="control-group">
-        <label class="control-label" for="elm_company_exists_store">{__("store")}:</label>
+        <label class="control-label" for="elm_company_exists_store">{__("storefront")}:</label>
         <div class="controls">
             <input type="hidden" name="company_data[clone_from]" id="elm_company_exists_store" value="" onchange="fn_switch_store_settings(this);" />
             {include file="common/ajax_select_object.tpl" data_url="companies.get_companies_list?show_all=Y&default_label=none" text=__("none") result_elm="elm_company_exists_store" id="exists_store_selector"}
@@ -71,7 +78,7 @@
 
 {if "ULTIMATE"|fn_allowed_for}
 <div class="control-group">
-    <label for="elm_company_name" class="control-label cm-required">{__("vendor_name")}:</label>
+    <label for="elm_company_name" class="control-label cm-required">{__("name")}:</label>
     <div class="controls">
         <input type="text" name="company_data[company]" id="elm_company_name" size="32" value="{$company_data.company}" class="input-large" />
     </div>
@@ -81,11 +88,12 @@
 <div class="control-group">
     <label for="elm_company_storefront" class="control-label cm-required">{__("storefront_url")}:</label>
     <div class="controls">
-    {if $runtime.company_id}
-        http://{$company_data.storefront|puny_decode}
-    {else}
-        <input type="text" name="company_data[storefront]" id="elm_company_storefront" size="32" value="{$company_data.storefront|puny_decode}" class="input-large" />
-    {/if}
+        {if $runtime.company_id}
+            http://{$company_data.storefront|puny_decode}
+        {else}
+            <input type="text" name="company_data[storefront]" id="elm_company_storefront" size="32" value="{$company_data.storefront|puny_decode}" class="input-large" />
+        {/if}
+        <p class="muted description">{__("ttc_storefront_url")}</p>
     </div>
 </div>
 {/hook}
@@ -122,6 +130,22 @@
     current_style=$current_style
     input_name="company_data[theme_name]"
 }
+
+{if $id}
+    {include file="common/subheader.tpl"
+        title=__("localization")
+    }
+
+    {include file="views/storefronts/components/languages.tpl"
+        id=$storefront_id
+        all_languages=$all_languages
+    }
+
+    {include file="views/storefronts/components/currencies.tpl"
+        id=$storefront_id
+        all_currencies=$all_currencies
+    }
+{/if}
 {/hook}
 
 {/if}
@@ -129,12 +153,29 @@
 {if "MULTIVENDOR"|fn_allowed_for}
     {include file="views/profiles/components/profile_fields.tpl" section="C" default_data_name="company_data" profile_data=$company_data include=["company"] nothing_extra=true}
     {if !$runtime.company_id}
-        {include file="common/select_status.tpl" input_name="company_data[status]" id="company_data" obj=$company_data items_status="companies"|fn_get_predefined_statuses:$company_data.status}
+        {include file="common/select_status.tpl"
+            input_name="company_data[status]"
+            id="company_data"
+            obj=$company_data
+            items_status="companies"|fn_get_predefined_statuses:$company_data.status
+            display=$status_display
+        }
     {else}
         <div class="control-group">
             <label class="control-label">{__("status")}:</label>
             <div class="controls">
-                <label class="radio"><input type="radio" checked="checked" />{if $company_data.status == "A"}{__("active")}{elseif $company_data.status == "P"}{__("pending")}{elseif $company_data.status == "N"}{__("new")}{elseif $company_data.status == "D"}{__("disabled")}{/if}</label>
+                <label class="radio">
+                    <input type="radio" checked="checked" id="elm_company_status"/>
+                    {if $company_data.status === "ObjectStatuses::ACTIVE"|enum}
+                        {__("active")}
+                    {elseif $company_data.status === "ObjectStatuses::PENDING"|enum}
+                        {__("pending")}
+                    {elseif $company_data.status === "ObjectStatuses::NEW_OBJECT"|enum}
+                        {__("new")}
+                    {elseif $company_data.status === "ObjectStatuses::DISABLED"|enum}
+                        {__("disabled")}
+                    {/if}
+                </label>
             </div>
         </div>
     {/if}
@@ -205,9 +246,13 @@
 {if "ULTIMATE"|fn_allowed_for}
     {include file="common/subheader.tpl" title="{__("settings")}: {__("company")}" }
 
-    {foreach from=$company_settings key="field_id" item="item"}
-        {include file="common/settings_fields.tpl" item=$item section="Company" html_id="field_`$section`_`$item.name`_`$item.object_id`" html_name="update[`$item.object_id`]"}
-    {/foreach}
+    {component
+        name="settings.settings_section"
+        subsection=$company_settings
+        section="Company"
+        html_id_prefix="field_"
+        html_name="update"
+    }{/component}
 {/if}
 
 {/hook}
@@ -374,9 +419,9 @@
                 <a href="{"products.manage?company_id=`$id`&status=A&product_type[]=P"|fn_url}">{$company_data.products_count}</a>
                 <span>{__("active_products")}</span>
             </li>
-            {if $settings.General.inventory_tracking == "Y"}
+            {if $settings.General.inventory_tracking !== "YesNo::NO"|enum}
                 <li class="vendor-statistics">
-                    <a href="{"products.manage?company_id=`$id`&amount_from=&amount_to=0&tracking[0]={"ProductTracking::TRACK_WITHOUT_OPTIONS"|enum}&tracking[1]={"ProductTracking::TRACK_WITH_OPTIONS"|enum}"|fn_url}">
+                    <a href="{"products.manage?company_id=`$id`&amount_from=&amount_to=0&tracking[0]={"ProductTracking::TRACK"|enum}"|fn_url}">
                         {$company_data.out_of_stock}
                     </a>
                     <span>{__("out_of_stock_products")}</span>
@@ -395,12 +440,29 @@
     {if $id}
         {capture name="tools_list"}
         {hook name="companies:tools_list"}
+            {if $show_approve}
+                <li>{btn type="list" text=__("save") class="cm-update-company" dispatch="dispatch[companies.update]" form="company_update_form" method="POST"}</li>
+            {/if}
             <li>{btn type="list" text=__("delete") class="cm-confirm" href="companies.delete?company_id=$id" method="POST"}</li>
         {/hook}
         {/capture}
         {dropdown content=$smarty.capture.tools_list}
+        {if $show_approve}
+            {if $settings.Vendors.allow_approve_vendors_in_two_steps == "YesNo::YES"|enum}
+                {$approve_status = "VendorStatuses::PENDING"|enum}
+            {else}
+                {$approve_status = "VendorStatuses::ACTIVE"|enum}
+            {/if}
 
-        {include file="buttons/save_cancel.tpl" but_name="dispatch[companies.update]" but_target_form="company_update_form" save=$id but_meta="cm-update-company"}
+            {include file="buttons/approve_disapprove.tpl"
+                id=$id
+                dispatch="companies.update_status"
+                header_view=true
+                approve_status=$approve_status
+            }
+        {else}
+            {include file="buttons/save_cancel.tpl" but_name="dispatch[companies.update]" but_target_form="company_update_form" save=$id but_meta="cm-update-company"}
+        {/if}
     {else}
         {if $is_companies_limit_reached}
             {include file="buttons/save_cancel.tpl" but_meta="btn cm-promo-popup"}
@@ -411,14 +473,20 @@
 {/capture}
 {** /Form submit section **}
 
+{capture name="page_title"}
 {if $id}
-    {include file="common/mainbox.tpl"
-        title_start=__("editing_vendor")
-        title_end=$company_data.company
-        content=$smarty.capture.mainbox
-        select_languages=true
-        buttons=$smarty.capture.buttons
-        sidebar=$smarty.capture.sidebar}
+    {$company_data.company}
+{elseif fn_allowed_for("MULTIVENDOR")}
+    {__("new_vendor")}
 {else}
-    {include file="common/mainbox.tpl" title=__("new_vendor") content=$smarty.capture.mainbox sidebar=$smarty.capture.sidebar buttons=$smarty.capture.buttons}
+    {__("add_storefront")}
 {/if}
+{/capture}
+
+{include file="common/mainbox.tpl"
+    title=$smarty.capture.page_title
+    select_languages=(bool) $id
+    content=$smarty.capture.mainbox
+    sidebar=$smarty.capture.sidebar
+    buttons=$smarty.capture.buttons
+}

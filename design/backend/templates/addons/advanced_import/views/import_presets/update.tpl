@@ -2,6 +2,7 @@
     {capture name="tabsbox"}
 
         {$id = $preset.preset_id|default:0}
+        {$disable_picker = $disable_picker|default: false}
 
         <form action="{""|fn_url}"
               method="post"
@@ -27,21 +28,21 @@
                 {* adds a CRON task message *}
                 {if $preset.file && $auth.is_root == "Y" && (!$runtime.company_id || $runtime.simple_ultimate)}
                     <p>{__("advanced_import.run_import_via_cron_message")}</p>
-		    <pre><code>{"php /path/to/cart/"|fn_get_console_command:$config.admin_index:[
-			       "dispatch"  => "advanced_import.import.import",
-			       "preset_id" => {$id},
-			       "p"
-			       ]}</code></pre>
+		            <pre><code>{"php /path/to/cart/"|fn_get_console_command:$config.admin_index:[
+			            "dispatch"  => "advanced_import.import.import",
+			            "preset_id" => {$id},
+			            "p"
+			        ]}</code></pre>
                 {/if}
 
                 {include file="common/subheader.tpl"
-                         title=__("advanced_import.general_settings")
-                         target="#information"
+                    title=__("advanced_import.general_settings")
+                    target="#information"
                 }
 
                 <div id="information" class="in collapse">
 
-                    <div class="control-group">
+                    <div class="control-group {if $preset.file}cm-skip-validation{/if}">
                         <input type="hidden"
                                data-ca-advanced-import-element="file_type"
                                name="file_type"
@@ -52,25 +53,23 @@
                                data-ca-advanced-import-element="file"
                                value="{$preset.file|default:""}"
                         />
-                        <label class="control-label">{__("file")}:</label>
+
+                        {$var_name = "upload[{$id}]"}
+                        {$id_var_name = "upload_{$id}"}
+
+                        <label for="type_{$id_var_name}" class="control-label cm-required">{__("file")}:</label>
                         <div class="controls import-preset__fileuploader">
                             {include file="addons/advanced_import/views/import_presets/components/fileuploader.tpl"
-                                     var_name="upload[]"
-                                     prefix=$id
-                                     allowed_ext=["csv", "xml"]
+                                var_name=$var_name
+                                id_var_name=$id_var_name
+                                allowed_ext=$allowed_ext|default: ["csv", "xml"]
                             }
                         </div>
                     </div>
 
                     <div class="control-group {$preset.options.target_node.control_group_meta}" data-ca-default-hidden="{if $preset.file}false{else}true{/if}">
                         <label for="target_node" class="control-label">
-                            {strip}
-                                {__($preset.options.target_node.title)}
-                                {if $preset.options.target_node.description}
-                                    {include file="common/tooltip.tpl" tooltip=__($preset.options.target_node.description)}
-                                {/if}
-                                :
-                            {/strip}
+                            {__($preset.options.target_node.title)}
                         </label>
                         <div class="controls">
                             <input class="input-large"
@@ -80,6 +79,9 @@
                                    size="55"
                                    value="{$preset.options.target_node.selected_value|default:$preset.options.target_node.default_value}"
                             />
+                            {if $preset.options.target_node.description}
+                                <p class="muted description">{__($preset.options.target_node.description)}</p>
+                            {/if}
                         </div>
                     </div>
 
@@ -98,9 +100,7 @@
 
                     <div class="control-group">
                         {$images_path = $preset.options.images_path}
-                        <label for="images_path" class="control-label">{__("images_directory")}{strip}
-                        {include file="common/tooltip.tpl" tooltip=__($images_path.description)}
-                        :{/strip}</label>
+                        <label for="images_path" class="control-label">{__("images_directory")}:</label>
                         <div class="controls">
                             <div class="input-prepend">
                                 <span class="add-on" id="advanced_import_images_path_prefix" data-companies-image-directories="{$images_path.companies_image_directories|to_json}">
@@ -116,73 +116,111 @@
                             </div>
 
                             <div id="images_path_dialog" class="hidden"></div>
-                            <p class="muted">{__("text_file_editor_notice_full_link", ["[link]" => "<a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"images_path\">{__("file_editor")}</a>"])}</p>
+                            <p class="muted description">{__("advanced_import.text_popup_file_editor_notice_full_link", ["[target]" => "images_path", "[link_text]" => {__("file_editor")}])}</p>
+                            <p class="muted description">{__($images_path.description)}</p>
                         </div>
                     </div>
 
-                    {include file="views/companies/components/company_field.tpl"
-                             name="company_id"
-                             id="elm_company_id"
-                             selected=$preset.company_id
-                             js_action="$.ceAdvancedImport('changeCompanyId');"
-                             required=true
-                             zero_company_id_name_lang_var="none"
-                    }
+                    {hook name="import_presets:options"}{/hook}
+                    {if $is_mve}
+                        {include file="views/companies/components/company_field.tpl"
+                            name="company_id"
+                            id="elm_company_id"
+                            selected=$preset.company_id
+                            disable_company_picker=$disable_picker
+                            js_action="$.ceAdvancedImport('changeCompanyId');"
+                            required=false
+                            zero_company_id_name_lang_var="advanced_import.common_preset"
+                        }
+                    {else}
+                        {include file="views/companies/components/company_field.tpl"
+                            name="company_id"
+                            id="elm_company_id"
+                            selected=$preset.company_id
+                            js_action="$.ceAdvancedImport('changeCompanyId');"
+                            required=true
+                            zero_company_id_name_lang_var="none"
+                        }
+                    {/if}
                 </div>
 
                 {include file="common/subheader.tpl"
-                         title=__("advanced_import.additional_settings")
-                         target="#import_file"
-                         meta="collapsed"
+                    title=__("advanced_import.additional_settings")
+                    target="#import_file"
+                    meta="collapsed"
                 }
 
-                <div id="import_file" class="out collapse">
+                <div id="import_file" class="{if $view_only}cm-hide-inputs{/if} out collapse">
 
                     <div class="control-group">
                         <label class="control-label">{__("csv_delimiter")}:</label>
                         <div class="controls" data-ca-advanced-import-element="delimiter_container">
                             {$auto_delimiter = "Addons\AdvancedImport\CsvDelimiters::AUTO"|enum}
                             {include file="views/exim/components/csv_delimiters.tpl"
-                                    name="options[delimiter]"
-                                    value="{$preset.options.delimiter|default:$auto_delimiter}"
-                                    allow_auto_detect=true
+                                name="options[delimiter]"
+                                value="{$preset.options.delimiter|default:$auto_delimiter}"
+                                allow_auto_detect=true
                             }
                         </div>
                     </div>
 
                     {include file="addons/advanced_import/views/import_presets/components/options.tpl"
-                             options=$preset.options|default:[]
-                             field_name_prefix="options"
-                             display=true
-                             tab="general"
+                        options=$preset.options|default:[]
+                        field_name_prefix="options"
+                        display=true
+                        tab="general"
                     }
 
                     {capture name="buttons"}
+                        {capture name="tools_list"}
+                            {hook name="advanced_import:update_tools_list"}
+                            {/hook}
+                        {/capture}
+                        {dropdown content=$smarty.capture.tools_list}
+
                         {if $start_import}
                             {include file="buttons/button.tpl"
-                                     but_text=__("import")
-                                     but_role="action"
-                                     but_id="advanced_import_start_import"
-                                     but_meta="cm-submit hidden cm-advanced-import-start-import"
-                                     but_target_form="import_preset_update_form"
-                                     but_name="dispatch[advanced_import.import]"
+                                but_text=__("import")
+                                but_role="action"
+                                but_id="advanced_import_start_import"
+                                but_meta="cm-submit hidden cm-advanced-import-start-import"
+                                but_target_form="import_preset_update_form"
+                                but_name="dispatch[advanced_import.import]"
                             }
                         {/if}
                         {include file="buttons/button.tpl"
-                                 but_text="{__("import")}"
-                                 but_role="action"
-                                 but_id="advanced_import_save_and_import"
-                                 but_name="dispatch[import_presets.update.import]"
-                                 but_target_form="import_preset_update_form"
-                                 but_meta="cm-submit btn-primary{if !$id} hidden{/if}"
+                            but_text="{__("import")}"
+                            but_role="action"
+                            but_id="advanced_import_save_and_import"
+                            but_name="dispatch[import_presets.update.import]"
+                            but_target_form="import_preset_update_form"
+                            but_meta="cm-submit btn-primary{if !$id || !$preset.file} hidden{/if}"
                         }
-                        {include file="buttons/button.tpl"
-                                 but_text="{if $id}{__("save")}{else}{__("create")}{/if}"
-                                 but_role="action"
-                                 but_name="dispatch[import_presets.update]"
-                                 but_target_form="import_preset_update_form"
-                                 but_meta="cm-submit{if !$id} btn-primary{/if}"
-                        }
+                        {if $view_only}
+                            {include file="buttons/button.tpl"
+                                but_text=__("advanced_import.save_selected_file")
+                                but_role="action"
+                                but_id="advanced_import_upload"
+                                but_meta="btn-primary cm-submit cm-ajax cm-post hidden"
+                                but_target_form="import_preset_update_form"
+                                but_name="dispatch[import_presets.upload.detailed]"
+                            }
+                            {include file="buttons/button.tpl"
+                                but_text="{__("clone")}"
+                                but_role="action"
+                                but_name="dispatch[advanced_import.clone]"
+                                but_target_form="import_preset_update_form"
+                                but_meta="cm-submit{if !$id} btn-primary{/if}"
+                            }
+                        {else}
+                            {include file="buttons/button.tpl"
+                                but_text="{if $id}{__("save")}{else}{__("create")}{/if}"
+                                but_role="action"
+                                but_name="dispatch[import_presets.update]"
+                                but_target_form="import_preset_update_form"
+                                but_meta="cm-submit{if !$id} btn-primary{/if}"
+                            }
+                        {/if}
                     {/capture}
                 </div>
 
@@ -191,36 +229,36 @@
             <div class="hidden" id="content_fields">
             <!--content_fields--></div>
 
-            <div class="hidden" id="content_options">
+            <div class="hidden {if $view_only}cm-hide-inputs{/if}" id="content_options">
 
                 {include file="common/subheader.tpl"
-                         title=__("advanced_import.general_settings")
-                         target="#settings_general"
+                    title=__("advanced_import.general_settings")
+                    target="#settings_general"
                 }
 
                 <div id="settings_general" class="out">
                     {include file="addons/advanced_import/views/import_presets/components/options.tpl"
-                             options=$preset.options|default:[]
-                             field_name_prefix="options"
-                             display=true
-                             tab="settings"
-                             section="general"
+                        options=$preset.options|default:[]
+                        field_name_prefix="options"
+                        display=true
+                        tab="settings"
+                        section="general"
                     }
                 </div>
 
                 {include file="common/subheader.tpl"
-                         title=__("advanced_import.additional_settings")
-                         target="#settings_additional"
-                         meta="collapsed"
+                    title=__("advanced_import.additional_settings")
+                    target="#settings_additional"
+                    meta="collapsed"
                 }
 
                 <div id="settings_additional" class="out collapse">
                     {include file="addons/advanced_import/views/import_presets/components/options.tpl"
-                             options=$preset.options|default:[]
-                             field_name_prefix="options"
-                             display=true
-                             tab="settings"
-                             section="additional"
+                        options=$preset.options|default:[]
+                        field_name_prefix="options"
+                        display=true
+                        tab="settings"
+                        section="additional"
                     }
                 </div>
             <!--content_options--></div>
@@ -231,16 +269,8 @@
     {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox active_tab="general"}
 {/capture}
 
-{capture name="mainbox_title"}
-    {if $preset.preset_id|default:0}
-        {__("advanced_import.editing_preset", ["[preset]" => $preset.preset])}
-    {else}
-        {__("advanced_import.new_preset")}
-    {/if}
-{/capture}
-
 {include file="common/mainbox.tpl"
-         title=$smarty.capture.mainbox_title
-         content=$smarty.capture.mainbox
-         buttons=$smarty.capture.buttons
+    title=($preset.preset_id) ? $preset.preset : __("advanced_import.new_preset")
+    content=$smarty.capture.mainbox
+    buttons=$smarty.capture.buttons
 }

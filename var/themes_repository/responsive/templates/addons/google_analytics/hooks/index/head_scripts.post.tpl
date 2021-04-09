@@ -1,13 +1,31 @@
-<script type="text/javascript" data-no-defer>
-(function(i,s,o,g,r,a,m){
-    i['GoogleAnalyticsObject']=r;
-    i[r]=i[r]||function(){$ldelim}(i[r].q=i[r].q||[]).push(arguments){$rdelim},i[r].l=1*new Date();
-    a=s.createElement(o), m=s.getElementsByTagName(o)[0];
-    a.async=1;
-    a.src=g;
-    m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-ga('create', '{$addons.google_analytics.tracking_code}', 'auto');
-ga('send', 'pageview', '{$ga_pageview_url|escape:javascript nofilter}');
+<script async src="https://www.googletagmanager.com/gtag/js?id={$addons.google_analytics.tracking_code}"></script>
+<script type="text/javascript">
+    // Global site tag (gtag.js) - Google Analytics
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', '{$addons.google_analytics.tracking_code}');
 </script>
 
+<script type="text/javascript">
+    (function(_, $) {
+        // Setting up sending pageviews in Google analytics when changing the page dynamically(ajax)
+        $.ceEvent('on', 'ce.history_load', function(url) {
+            if (typeof(gtag) !== 'undefined') {
+
+                // disabling page tracking by default
+                gtag('config', '{$addons.google_analytics.tracking_code}', { send_page_view: false });
+
+                // send pageview for google analytics
+                gtag('event', 'page_view', {
+                    page_path: url.replace('!', ''),
+                    send_to: '{$addons.google_analytics.tracking_code}'
+                });
+            }
+        });
+    }(Tygh, Tygh.$));    
+</script>

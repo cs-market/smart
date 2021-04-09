@@ -73,15 +73,13 @@
                name="payment_data[processor_params][payment_type]"
                value="card_simple"
         />
-        <span class="checkbox">
-            <input type="checkbox"
-                   name="payment_data[processor_params][payment_type]"
-                   value="card"
-                   {if $processor_params.payment_type === "card"}
-                       checked="checked"
-                   {/if}
-            />
-        </span>
+        <input type="checkbox"
+                name="payment_data[processor_params][payment_type]"
+                value="card"
+                {if $processor_params.payment_type === "card"}
+                    checked="checked"
+                {/if}
+        />
         <div class="stripe-config-form__3d-secure-description">
             {__("stripe_connect.enable_3d_secure.description")}
         </div>

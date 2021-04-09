@@ -16,6 +16,7 @@ namespace Tygh\Api\Entities;
 
 use Tygh\Api\AEntity;
 use Tygh\Api\Response;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Tygh;
 
@@ -157,6 +158,7 @@ class Orders extends AEntity
         if ($valid_params) {
 
             $cart['payment_id'] = $params['payment_id'];
+            $cart['storefront_id'] = StorefrontProvider::getStorefront()->storefront_id;
 
             $customer_auth = fn_fill_auth($cart['user_data']);
 

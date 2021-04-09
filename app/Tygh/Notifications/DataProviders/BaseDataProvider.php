@@ -26,7 +26,7 @@ class BaseDataProvider implements IDataProvider
         $this->data = $data;
     }
 
-    public function get($recipient_type)
+    public function get($receiver_type)
     {
         return new Data($this->data);
     }

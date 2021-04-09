@@ -15,7 +15,7 @@
 namespace Tygh\Addons\YandexCheckout\Enum;
 
 /**
- * Class CommissionType contains possible values for commission type for Yandex.Checkout for Marketplace payment.
+ * Class CommissionType contains possible values for commission type for YooKassa for Marketplace payment.
  *
  * @package Tygh\Addons\YandexCheckout\Enum
  */

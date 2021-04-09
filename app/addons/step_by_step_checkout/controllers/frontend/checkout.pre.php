@@ -53,4 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$cart['keep_chosen_shipping'] = false;
+
 return [CONTROLLER_STATUS_OK];

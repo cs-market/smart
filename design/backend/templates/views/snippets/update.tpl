@@ -32,9 +32,10 @@
 
                     {if !$id}
                         <div class="control-group">
-                            <label for="elm_snippet_code_{$id}" class="cm-required cm-focus control-label">{__("code")}{include file="common/tooltip.tpl" tooltip=__("text_character_identifier_tooltip")}:</label>
+                            <label for="elm_snippet_code_{$id}" class="cm-required cm-focus control-label">{__("code")}:</label>
                             <div class="controls">
                                 <input id="elm_snippet_code_{$id}" type="text" name="snippet[code]" value="{$snippet->getCode()}" class="span9 cm-emltpl-set-active">
+                                <p class="muted description">{__("text_character_identifier_tooltip")}</p>
                             </div>
                         </div>
                     {/if}
@@ -130,8 +131,7 @@
     {$smarty.capture.mainbox nofilter}
 {else}
     {include file="common/mainbox.tpl"
-        title_start=__("editing_snippet")
-        title_end=$snippet->getName()
+        title=$snippet->getName()
         content=$smarty.capture.mainbox
         buttons=$smarty.capture.buttons
     }

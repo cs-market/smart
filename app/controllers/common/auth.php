@@ -43,11 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             return array(CONTROLLER_STATUS_REDIRECT, $redirect_url);
         }
+
         //
         // Success login
         //
-        if (!empty($user_data) && !empty($password) && fn_generate_salted_password($password, $salt) == $user_data['password']) {
-
+        if (
+            !empty($user_data)
+            && !empty($password)
+            && fn_user_password_verify((int) $user_data['user_id'], $password, (string) $user_data['password'], (string) $salt)
+        ) {
             // Regenerate session ID for security reasons
             Tygh::$app['session']->regenerateID();
 

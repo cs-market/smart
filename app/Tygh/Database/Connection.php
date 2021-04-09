@@ -392,6 +392,8 @@ class Connection
      * @param array<string>           $update_fields List of field usage to update
      *
      * @return int
+     *
+     * @throws DatabaseException Wrong sql query or issues with execution.
      */
     public function replaceInto($table, array $data, $is_multiple = false, array $update_fields = null)
     {
@@ -447,8 +449,8 @@ class Connection
      * @param mixed ... unlimited number of variables for placeholders
      *
      * @return bool|int|\mysqli_result|\PDOStatement mixed result set for "SELECT" statement / generated ID for an AUTO_INCREMENT field for insert statement / Affected rows count for DELETE/UPDATE statements
-     * @throws \Tygh\Exceptions\DatabaseException
-     * @throws \Tygh\Exceptions\DeveloperException
+     *
+     * @throws DatabaseException Wrong sql query or issues with execution.
      */
     public function query($query)
     {

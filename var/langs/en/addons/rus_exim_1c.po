@@ -823,3 +823,7 @@ msgstr "External ID is already used by another store or warehouse. One external 
 msgctxt "Languages::rus_exim_1c.store_locator_already_used_external_id_link"
 msgid "<b>[external_id]</b> -> <a href=\"[warehouse_link]\">[warehouse_name]</a></br>"
 msgstr "<b>[external_id]</b> -> <a href=\"[warehouse_link]\">[warehouse_name]</a></br>"
+
+msgctxt "Languages::rus_exim_1c.confirmation_deleting"
+msgid "Uninstalling this add-on will delete the links between entities in your CRM and CS-Cart. If you're planning to use the new CommerceML add-on, please install and activate the new add-on first. While the new add-on is active, you can keep the old add-on disabled without uninstalling it. This will help if you decide to use the old add-on again in the future.\n\rAre you sure you want to uninstall this add-on?"
+msgstr "Uninstalling this add-on will delete the links between entities in your CRM and CS-Cart. If you're planning to use the new CommerceML add-on, please install and activate the new add-on first. While the new add-on is active, you can keep the old add-on disabled without uninstalling it. This will help if you decide to use the old add-on again in the future.\n\rAre you sure you want to uninstall this add-on?"

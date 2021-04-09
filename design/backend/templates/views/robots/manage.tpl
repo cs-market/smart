@@ -22,7 +22,7 @@
             <textarea id="elm_robots_robots" name="robots_data[content]" cols="55" rows="12" class="span12">{$robots}</textarea>
 
             {if !$runtime.company_id}
-                <div class="right update-for-all">
+                <div class="right">
                     {include file="buttons/update_for_all.tpl" display=true object_id="robots" name="robots_data[update_content]" hide_element="robots_uploader"}
                 </div>
             {/if}

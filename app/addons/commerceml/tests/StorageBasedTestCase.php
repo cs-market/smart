@@ -16,20 +16,29 @@
 namespace Tygh\Addons\CommerceML\Tests\Unit;
 
 
+use Tygh\Addons\CommerceML\Convertors\CategoryConvertor;
+use Tygh\Addons\CommerceML\Convertors\OrderConvertor;
+use Tygh\Addons\CommerceML\Convertors\PriceTypeConvertor;
+use Tygh\Addons\CommerceML\Convertors\ProductConvertor;
+use Tygh\Addons\CommerceML\Convertors\ProductFeatureConvertor;
 use Tygh\Addons\CommerceML\Dto\CategoryDto;
 use Tygh\Addons\CommerceML\Dto\CurrencyDto;
 use Tygh\Addons\CommerceML\Dto\ImportDto;
 use Tygh\Addons\CommerceML\Dto\ImportItemDto;
+use Tygh\Addons\CommerceML\Dto\LocalIdDto;
 use Tygh\Addons\CommerceML\Dto\PriceTypeDto;
 use Tygh\Addons\CommerceML\Dto\ProductFeatureDto;
 use Tygh\Addons\CommerceML\Dto\ProductFeatureVariantDto;
 use Tygh\Addons\CommerceML\Dto\TaxDto;
+use Tygh\Addons\CommerceML\Dto\TranslatableValueDto;
 use Tygh\Addons\CommerceML\Repository\ImportEntityMapRepository;
 use Tygh\Addons\CommerceML\Repository\ImportEntityRepository;
 use Tygh\Addons\CommerceML\Repository\ImportRemovedEntityRepository;
 use Tygh\Addons\CommerceML\Repository\ImportRepository;
 use Tygh\Addons\CommerceML\Storages\ImportStorage;
 use Tygh\Addons\CommerceML\Storages\ProductStorage;
+use Tygh\Addons\CommerceML\Xml\SimpleXmlElement;
+use Tygh\Addons\CommerceML\Xml\XmlParser;
 use Tygh\Common\OperationResult;
 
 class StorageBasedTestCase extends BaseXmlTestCase
@@ -56,6 +65,41 @@ class StorageBasedTestCase extends BaseXmlTestCase
     public function getProductStorage()
     {
         return new TestProductStorage('ru');
+    }
+
+    public function getXmlParser()
+    {
+        return new XmlParser();
+    }
+
+    public function getParserCallbacksCatalog()
+    {
+        return [
+            'classifier/properties/property'   => static function (SimpleXmlElement $xml, ImportStorage $import_storage) {
+                (new ProductFeatureConvertor())->convert($xml, $import_storage);
+            },
+            'classifier/groups/group'          => static function (SimpleXmlElement $xml, ImportStorage $import_storage) {
+                (new CategoryConvertor(new ProductFeatureConvertor()))->convert($xml, $import_storage);
+            },
+            'catalog/products/product'         => static function (SimpleXmlElement $xml, ImportStorage $import_storage) {
+                (new ProductConvertor(new TranslatableValueDto('variant'), new TranslatableValueDto('brand'), ProductFeatureDto::BRAND_EXTERNAL_ID))->convert($xml, $import_storage, true);
+            },
+            'packages/prices_types/price_type' => static function (SimpleXmlElement $xml, ImportStorage $import_storage) {
+                (new PriceTypeConvertor())->convert($xml, $import_storage);
+            },
+            'packages/offers/offer'            => static function (SimpleXmlElement $xml, ImportStorage $import_storage) {
+                (new ProductConvertor(new TranslatableValueDto('variant'), new TranslatableValueDto('brand'), ProductFeatureDto::BRAND_EXTERNAL_ID))->convert($xml, $import_storage, false);
+            }
+        ];
+    }
+
+    public function getParserCallbacksSale()
+    {
+        return [
+            'document' => static function (SimpleXmlElement $xml, ImportStorage $import_storage) {
+                (new OrderConvertor())->convert($xml, $import_storage);
+            }
+        ];
     }
 }
 
@@ -96,6 +140,10 @@ class TestProductStorage extends ProductStorage
 
         if (!isset($this->products[$product_id][$lang_code])) {
             $this->products[$product_id][$lang_code] = [];
+        }
+
+        if (isset($this->products[$product_id][$lang_code]['product_features'], $product_data['product_features'])) {
+            $product_data['product_features'] = array_replace($this->products[$product_id][$lang_code]['product_features'], $product_data['product_features']);
         }
 
         $this->products[$product_id][$lang_code] = array_merge($this->products[$product_id][$lang_code], $product_data);
@@ -221,6 +269,41 @@ class TestProductStorage extends ProductStorage
 
         return new OperationResult(true);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function removeImagePairs(array $pair_ids)
+    {
+        foreach ($this->products as &$product) {
+            foreach ($pair_ids as $pair_id) {
+                if (!isset($product[$this->default_language_code]['images'][$pair_id])) {
+                    continue;
+                }
+                unset($product[$this->default_language_code]['images'][$pair_id]);
+            }
+        }
+        unset($product);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findProductFeatures(array $product_feautre_ids = [])
+    {
+        $result = [];
+
+        foreach ($product_feautre_ids as $feautre_id) {
+            if (!isset($this->product_features[$feautre_id])) {
+                continue;
+            }
+
+            $result[$feautre_id] = $this->product_features[$feautre_id][$this->default_language_code];
+        }
+
+        return $result;
+    }
+
     /**
      * @inheritDoc
      */
@@ -288,6 +371,34 @@ class TestProductStorage extends ProductStorage
         ];
 
         return isset($currencies[$currency_code]) ? (array) $currencies[$currency_code] : null;
+    }
+
+    public function getProductFeatureMap()
+    {
+        $map = [];
+
+        foreach ($this->product_features as $id => $product_feature) {
+            $map[$product_feature['ru']['description']] = $id;
+        }
+
+        return $map;
+    }
+
+    public function getProductFeatureVariantMap()
+    {
+        $map = [];
+
+        foreach ($this->product_features as $id => $product_feature) {
+            if (empty($product_feature['ru']['variants'])) {
+                continue;
+            }
+
+            foreach ($product_feature['ru']['variants'] as $variant_id => $variant) {
+                $map[$product_feature['ru']['description']][$variant['variant']] = $variant_id;
+            }
+        }
+
+        return $map;
     }
 }
 
@@ -359,6 +470,18 @@ class TestImportStorage extends ImportStorage
     {
         return $this->import_repository;
     }
+
+    public function newInstance(array $settings)
+    {
+        return new self(
+            $this->getImport(),
+            $this->getImportRepository(),
+            $this->getImportEntityRepository(),
+            $this->getImportEntityMapRepository(),
+            $this->getImportRemoveEntityRepository(),
+            $settings
+        );
+    }
 }
 
 class TestImportRepository extends ImportRepository
@@ -378,7 +501,7 @@ class TestImportRepository extends ImportRepository
     public function save(ImportDto $import)
     {
         if (!$import->import_id) {
-            $import->import_id = count($this->storage);
+            $import->import_id = count($this->storage) + 1;
         }
 
         $this->storage[$import->import_id] = $import;
@@ -535,6 +658,7 @@ class TestImportEntityRepository extends ImportEntityRepository
             }
         }
 
+        $this->index = 0;
         return null;
     }
 
@@ -600,7 +724,7 @@ class TestImportEntityMapRepository extends ImportEntityMapRepository
                 && $item['company_id'] == $company_id
                 && $item['entity_id'] == $entity_id
             ) {
-                return $item['local_id'];
+                return $item['local_id'] ?: null;
             }
         }
 
@@ -660,7 +784,7 @@ class TestImportEntityMapRepository extends ImportEntityMapRepository
         }
     }
 
-    public function getMap()
+    public function getIdMap()
     {
         $result = [];
 

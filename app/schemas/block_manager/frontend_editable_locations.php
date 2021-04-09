@@ -15,6 +15,9 @@
 defined('BOOTSTRAP') or die('Access denied');
 
 $schema = [
+    'index.index' => true,
+    'products.view' => true,
+    'categories.view' => true,
     'checkout' => true,
 ];
 

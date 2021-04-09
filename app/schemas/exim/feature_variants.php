@@ -80,10 +80,16 @@ $schema = array(
             'multilang' => true
         ),
         'Feature name' => array(
-            'process_get' => array('fn_exim_get_feature_name', '#key', '#lang_code'),
+            'process_get' => array('fn_exim_get_feature_internal_name', '#key', '#lang_code'),
             'linked' => false,
             'required' => true,
             'multilang' => true,
+        ),
+        'Storefront feature name' => array(
+            'process_get' => array('fn_exim_get_feature_name', '#key', '#lang_code'),
+            'linked' => false,
+            'multilang' => true,
+            'export_only' => true,
         ),
         'Feature group' => array(
             'process_get' => array('fn_exim_get_product_feature_group_name', '#key', '#lang_code'),

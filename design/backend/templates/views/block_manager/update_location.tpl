@@ -48,10 +48,11 @@
                     <div class="controls">
                         <input id="location_title" type="text" name="location_data[title]" value="{$location.title}">
                         {if $location.is_default}
-                        <div>
-                        <label class="checkbox inline"><input type="checkbox" name="location_data[copy_translated][]" value="title" />{__("copy_to_other_locations")}</label>
-                        </div>
-                        {/if}                        
+                            <div>
+                                <label class="checkbox inline"><input type="checkbox" name="location_data[copy_translated][]" value="title" />{__("copy_to_other_locations")}</label>
+                            </div>
+                        {/if}
+                        <p class="muted description">{__("ttc_page_title")}</p>
                     </div>
                 </div>
 
@@ -80,8 +81,9 @@
                     <div class="controls">
                         <textarea id="location_custom_html" name="location_data[custom_html]" class="span9" cols="55" rows="4">{$location.custom_html}</textarea>
                         {if $location.is_default}
-                        <label class="checkbox inline"><input type="checkbox" name="location_data[copy][]" value="custom_html" />{__("copy_to_other_locations")}</label>
+                            <label class="checkbox inline"><input type="checkbox" name="location_data[copy][]" value="custom_html" />{__("copy_to_other_locations")}</label>
                         {/if}
+                        <p class="muted description">{__("tt_views_block_manager_update_location_head_custom_html")}</p>
                     </div>
                 </div>
 
@@ -90,6 +92,7 @@
                     <div class="controls">
                         <input type="hidden" name="location_data[is_default]" value="N">
                         <input type="checkbox" name="location_data[is_default]" value="Y" id="location_is_default" {if $location.is_default}checked="checked" disabled="disabled"{/if}>
+                        <p class="muted description">{__("tt_views_block_manager_update_location_default")}</p>
                     </div>
                 </div>
 

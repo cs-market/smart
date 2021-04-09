@@ -22,6 +22,8 @@ use Tygh\Enum\YesNo;
  * Class Factory creates Storefronts.
  *
  * @package Tygh\Storefront
+ *
+ * phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
  */
 class Factory
 {
@@ -50,11 +52,12 @@ class Factory
     /**
      * Creates a storefront from an array.
      *
-     * @param array $data Storefront data
+     * @param array      $data              Storefront data
+     * @param Storefront $stored_storefront Stored storefront instnace
      *
      * @return \Tygh\Storefront\Storefront
      */
-    public function fromArray(array $data)
+    public function fromArray(array $data, Storefront $stored_storefront = null)
     {
         $data = array_merge([
             'storefront_id'                               => 0,
@@ -93,6 +96,12 @@ class Factory
 
         if ($data['extra']) {
             $storefront->extra = $data['extra'];
+        }
+
+        if ($stored_storefront) {
+            foreach (array_keys($relations) as $relation_name) {
+                $storefront->setStoredRelationValue($relation_name, $stored_storefront->getRelationValue($relation_name));
+            }
         }
 
         return $storefront;

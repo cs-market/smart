@@ -16,7 +16,9 @@ namespace Tygh\Addons\PaypalCommercePlatform\Api;
 
 use Tygh\Addons\PaypalCommercePlatform\Exception\ApiException;
 use Tygh\Addons\PaypalCommercePlatform\Exception\ContentException;
+use Tygh\Enum\YesNo;
 use Tygh\Http;
+use Tygh\Registry;
 
 class Client
 {
@@ -107,7 +109,7 @@ class Client
      */
     public function setTestMode($is_test = true)
     {
-        $this->is_test = $is_test === true || $is_test === 'Y';
+        $this->is_test = YesNo::toBool($is_test);
     }
 
     /**
@@ -172,8 +174,8 @@ class Client
         $error_message = $response;
         if (isset($decoded_response['message'])) {
             $error_message = $decoded_response['message'];
-        } elseif (isset($decoded_response['error_decsription'])) {
-            $error_message = $decoded_response['error_decsription'];
+        } elseif (isset($decoded_response['error_description'])) {
+            $error_message = $decoded_response['error_description'];
         }
 
         $details = [];
@@ -230,6 +232,14 @@ class Client
         );
 
         $extra['headers'] = array_unique($extra['headers']);
+        $extra['log_preprocessor'] = static function ($method, $url, $data, $extra, $content) {
+            if (preg_match('/paypal-debug-id:\s*(?P<debug_id>\S+)/ui', Http::getHeaders(), $headers)) {
+                /** @see \fn_paypal_commerce_platform_save_log() */
+                Registry::set('runtime.paypal_commerce_platform.debug_id', $headers['debug_id']);
+            }
+
+            return [$url, $data, $content];
+        };
 
         $response = $this->request($url, $data, $extra, $method);
 
@@ -288,10 +298,10 @@ class Client
     /**
      * Performs request to API endpoint.
      *
-     * @param string                                     $url    API method URL
-     * @param array<string, string|array<string>>|string $data   API request data
-     * @param array<string, string|array<string>>        $extra  Extra settings for curl
-     * @param string                                     $method HTTP method to perform request
+     * @param string                                       $url    API method URL
+     * @param array<string, string|array<string>>|string   $data   API request data
+     * @param array<string, string|array<string>|callable> $extra  Extra settings for curl
+     * @param string                                       $method HTTP method to perform request
      *
      * @return array<string, string|array<string|array<string>>> API response
      *

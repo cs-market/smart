@@ -25,6 +25,7 @@ use Tygh\Addons\ProductVariations\Product\Group\Group;
 use Tygh\Addons\ProductVariations\Product\Group\GroupFeature;
 use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection;
 use Tygh\Addons\ProductVariations\Product\Group\GroupProduct;
+use Tygh\Addons\ProductVariations\Request\GenerateProductsAndAttachToGroupRequest;
 use Tygh\Addons\ProductVariations\Product\Group\Repository as GroupRepository;
 use Tygh\Addons\ProductVariations\Service as GroupService;
 use Tygh\Common\OperationResult;
@@ -102,10 +103,10 @@ class ProductVariationAsProductImporter
             return  $main_result;
         }
 
-        $local_id = $import_storage->findEntityLocalId($product);
+        $local_id = $import_storage->findEntityLocalId(ProductDto::REPRESENT_ENTITY_TYPE, $product->id);
 
-        if ($local_id) {
-            $product->id->local_id = $local_id;
+        if ($local_id->hasValue()) {
+            $product->id->local_id = $local_id->asInt();
             $this->processImportWithLocalId($main_result, $product, $import_storage);
             return $main_result;
         }
@@ -213,8 +214,8 @@ class ProductVariationAsProductImporter
 
             $parent_product_id = $this->findParentProductId($product, $import_storage);
 
-            if ($parent_product_id) {
-                $product->id->local_id = $parent_product_id;
+            if ($parent_product_id->hasValue()) {
+                $product->id->local_id = $parent_product_id->asInt();
                 $product->name = null;
             }
         }
@@ -229,6 +230,7 @@ class ProductVariationAsProductImporter
         }
 
         if (!$group && !$this->createProductVariationsGroup($main_result, $product, $import_storage)) {
+            $import_storage->removeMappingByExternalId(ProductDto::REPRESENT_ENTITY_TYPE, $product->id->external_id);
             return false;
         }
 
@@ -351,7 +353,7 @@ class ProductVariationAsProductImporter
     {
         $parent_product_id = $this->findParentProductId($product, $import_storage);
 
-        if (!$parent_product_id) {
+        if ($parent_product_id->hasNotValue()) {
             $main_result->addError('product_variation.parent_product_not_found', __('commerceml.import.error.product_variation.parent_product_not_found', [
                 '[id]' => $product->id->getId()
             ]));
@@ -387,9 +389,11 @@ class ProductVariationAsProductImporter
             return false;
         }
 
-        $result = $this->product_variations_service->generateProductsAndAttachToGroup($group->getId(), $parent_product_id, [$combination_id]);
+        $result = $this->product_variations_service->generateProductsAndAttachToGroup(
+            GenerateProductsAndAttachToGroupRequest::create($group->getId(), $parent_product_id->asInt(), [$combination_id])
+        );
 
-        if ($result->isSuccess()) {
+        if ($result->isSuccess() && $result->getData('group')) {
             /** @var Group $group */
             $group = $result->getData('group');
 
@@ -441,16 +445,21 @@ class ProductVariationAsProductImporter
         $parent_product_id = $this->findParentProductId($product, $import_storage);
         $product_ids = [$product_id];
 
-        if ($parent_product_id) {
-            array_unshift($product_ids, $parent_product_id);
+        if ($parent_product_id->hasValue()) {
+            array_unshift($product_ids, $parent_product_id->asInt());
             $product_ids = array_unique($product_ids);
         }
 
         /** @var \Tygh\Addons\CommerceML\Dto\ProductFeatureValueDto $feature_value */
         foreach ($product->variation_feature_values as $feature_value) {
             $feature_id = (int) $feature_value->feature_id->local_id;
+            $feature_data = $this->product_storage->findProductFeature($feature_id);
 
-            $group_feature_collection->addFeature(GroupFeature::create($feature_id, FeaturePurposes::CREATE_VARIATION_OF_CATALOG_ITEM));
+            $feature_purpose = (isset($feature_data['purpose']) && $feature_data['purpose'] === FeaturePurposes::CREATE_CATALOG_ITEM)
+                ? FeaturePurposes::CREATE_CATALOG_ITEM
+                : FeaturePurposes::CREATE_VARIATION_OF_CATALOG_ITEM;
+
+            $group_feature_collection->addFeature(GroupFeature::create($feature_id, $feature_purpose));
         }
 
         $result = $this->product_variations_service->createGroup(
@@ -465,7 +474,7 @@ class ProductVariationAsProductImporter
         $product_status = isset($product_statuses[$product_id]) ? $product_statuses[$product_id] : null;
 
         if (
-            $product_id !== $parent_product_id
+            $product_id !== $parent_product_id->asInt()
             && (!$product_status || Group::isResultError($product_status))
         ) {
             $this->product_storage->removeProduct($product_id);
@@ -479,7 +488,7 @@ class ProductVariationAsProductImporter
             return false;
         }
 
-        if (!$parent_product_id && $result->isSuccess()) {
+        if ($parent_product_id->hasNotValue() && $result->isSuccess()) {
             $import_storage->mapEntityIdByParams(ProductDto::REPRESENT_ENTITY_TYPE, $product->parent_id->external_id, $product_id);
         }
 
@@ -497,20 +506,16 @@ class ProductVariationAsProductImporter
      * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
      * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
      *
-     * @return int
+     * @return \Tygh\Addons\CommerceML\Dto\LocalIdDto
      */
     private function findParentProductId(ProductDto $product, ImportStorage $import_storage)
     {
-        if ($product->parent_id->hasLocalId()) {
-            $parent_product_id = (int) $product->parent_id->local_id;
-        } else {
-            $parent_product_id = (int) $import_storage->findEntityLocalIdByExternalId(
-                $product->getEntityType(),
-                $product->parent_id->getId()
-            );
+        $parent_product_id = $import_storage->findEntityLocalId(
+            $product->getEntityType(),
+            $product->parent_id
+        );
 
-            $product->parent_id->local_id = $parent_product_id;
-        }
+        $product->parent_id->local_id = $parent_product_id->asInt();
 
         return $parent_product_id;
     }
@@ -529,8 +534,8 @@ class ProductVariationAsProductImporter
         $group = null;
         $parent_product_id = $this->findParentProductId($product, $import_storage);
 
-        if ($parent_product_id) {
-            $group_id = $this->product_group_repository->findGroupIdByProductId($parent_product_id);
+        if ($parent_product_id->hasValue()) {
+            $group_id = $this->product_group_repository->findGroupIdByProductId($parent_product_id->asInt());
         }
 
         if (!$group_id && $product->variation_group_code) {

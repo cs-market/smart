@@ -20,11 +20,15 @@ if ($mode == 'list') {
 
     fn_add_breadcrumb(__('promotions'));
 
-    $params = array (
-        'active' => true,
+    $params = [
+        'active'     => true,
         /*'zone' => 'catalog',*/
         'get_hidden' => false,
-    );
+        'mode'       => 'list',
+        'extend'     => ['get_images'],
+        'sort_by' => 'priority',
+        'sort_order' => 'asc',
+    ];
 
     list($promotions, $search) = fn_get_promotions($params);
 

@@ -126,7 +126,7 @@
                 <span class="text-warning strong">{__("attention")}</span>
                 <span class="text-warning">{__("notice_update_customer_details")}</span>
 
-                <label for="update_customer_details" class="checkbox">
+                <label for="update_customer_details" class="checkbox checkbox--multiline">
                     <input type="checkbox" name="update_customer_details" id="update_customer_details" value="Y"{if $form_id} form={$form_id}{/if} />
                 {__("update_customer_info")}</label>
         {/if}

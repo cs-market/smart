@@ -1,4 +1,4 @@
-<div class="bulk-edit clearfix hidden" data-ca-bulkedit-expanded-object="true">
+<div class="bulk-edit clearfix hidden" data-ca-bulkedit-expanded-object="true" data-ca-bulkedit-component="expandedObject">
     <ul class="btn-group bulk-edit__wrapper">
         {hook name="categories:bulk_edit_items"}
             <li class="btn bulk-edit__btn bulk-edit__btn--check-items">

@@ -1213,12 +1213,12 @@ msgid "This type of payment cannot be made at this time. To be able to make thes
 msgstr "This type of payment cannot be made at this time. To be able to make these types of payments, the user must go to the following <a href=\"[ext_action_uri]\" target=\"_blank\">page</a> and follow the instructions on it."
 
 msgctxt "Languages::text_yandex_money_redirect_url"
-msgid "Please use the following Redirect URL while adjusting the API Yandex.Money application: <br/> [redirect_url]"
-msgstr "Please use the following Redirect URL while adjusting the API Yandex.Money application: <br/> [redirect_url]"
+msgid "Please use the following Redirect URL while adjusting the API YooMoney application: <br/> [redirect_url]"
+msgstr "Please use the following Redirect URL while adjusting the API YooMoney application: <br/> [redirect_url]"
 
 msgctxt "Languages::text_yandex_money_note"
-msgid "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the Yandex.Money service can freeze your wallet."
-msgstr "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the Yandex.Money service can freeze your wallet."
+msgid "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the YooMoney service can freeze your wallet."
+msgstr "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the YooMoney service can freeze your wallet."
 
 msgctxt "Languages::text_avangard_redirect_url"
 msgid "Please use the following Redirect URL while adjusting the API Avangard application: <br/> [redirect_url]"

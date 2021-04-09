@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: da\n"
-"X-Crowdin-File: /release-4.11.5/addons/gift_certificates.po\n"
-"X-Crowdin-File-ID: 3598\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/gift_certificates.po\n"
+"X-Crowdin-File-ID: 4072\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -188,6 +188,10 @@ msgctxt "Languages::theme_editor.gift_cert"
 msgid "Gift Certificate"
 msgstr "Gavekort"
 
+msgctxt "Languages::theme_editor_logo.gift_cert"
+msgid "Gift Certificate"
+msgstr ""
+
 msgctxt "Languages::promo_code_or_certificate"
 msgid "Gift certificate or promo code"
 msgstr "Gavekort eller rabatkode"
@@ -290,5 +294,9 @@ msgstr ""
 
 msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
 msgid "Gift certificate updated"
+msgstr ""
+
+msgctxt "Languages::logo_section.gift_cert"
+msgid "Gift certificate logo"
 msgstr ""
 

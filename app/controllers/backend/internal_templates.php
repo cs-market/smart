@@ -15,6 +15,7 @@
 use Tygh\Enum\UserTypes;
 use Tygh\Mailer\Message;
 use Tygh\Notifications\Transports\Mail\MailTransport;
+use Tygh\Providers\EventDispatcherProvider;
 use Tygh\Registry;
 use Tygh\Template\Collection;
 use Tygh\Template\Internal\Context as NotificationContext;
@@ -286,7 +287,7 @@ if ($mode == 'manage') {
     if (!empty($_REQUEST['event_id']) && !empty($_REQUEST['receiver'])) {
         $event_id = $_REQUEST['event_id'];
         $receiver = $_REQUEST['receiver'];
-        $events = Tygh::$app['event.events_schema'];
+        $events = EventDispatcherProvider::getEventsSchema();
         if (isset($events[$event_id]['receivers'][$receiver][MailTransport::getId()])) {
             /** @var \Tygh\Notifications\Transports\Mail\MailMessageSchema $schema */
             $schema = $events[$event_id]['receivers'][$receiver][MailTransport::getId()];

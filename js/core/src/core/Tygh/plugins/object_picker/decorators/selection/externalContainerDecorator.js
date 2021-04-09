@@ -26,6 +26,11 @@ ExternalContainerDecorator.prototype.update = function (decorated, data) {
 
     for (var d = 0; d < data.length; d++) {
         let selection = data[d];
+
+        if (selection.data) {
+            selection.data._index = d;
+        }
+
         let $selection = $(this.display(selection, ''));
 
         if (selectionMap.has(selection.id)) {

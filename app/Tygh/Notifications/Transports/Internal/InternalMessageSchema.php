@@ -57,20 +57,9 @@ class InternalMessageSchema extends BaseMessageSchema
     public $is_read;
 
     /**
-     * @var int|int
+     * @var int
      */
     public $timestamp;
-
-    /**
-     * @var string
-     * @see \Tygh\Enum\RecipientSearchMethods
-     */
-    public $recipient_search_method;
-
-    /**
-     * @var string
-     */
-    public $recipient_search_criteria;
 
     /**
      * @var string
@@ -87,9 +76,15 @@ class InternalMessageSchema extends BaseMessageSchema
      */
     public $template_code;
 
+    /**
+     * @var int
+     */
+    public $to_company_id;
+
     public function init(Data $data)
     {
         $self = parent::init($data);
+        $data = new Data($self->data);
 
         if (is_array($self->title)) {
             $self->title = $self->getText($data, $self->title);
@@ -139,9 +134,9 @@ class InternalMessageSchema extends BaseMessageSchema
         $self->is_read = self::get($schema, 'is_read');
         $self->timestamp = self::get($schema, 'timestamp');
         $self->language_code = self::get($schema, 'language_code');
-        $self->recipient_search_method = self::get($schema, 'recipient_search_method');
-        $self->recipient_search_criteria = self::get($schema, 'recipient_search_criteria');
         $self->template_code = self::get($schema, 'template_code');
+        $self->to_company_id = self::get($schema, 'to_company_id');
+        $self->data_modifier = self::get($schema, 'data_modifier');
 
         return $self;
     }

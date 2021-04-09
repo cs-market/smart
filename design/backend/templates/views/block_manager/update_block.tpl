@@ -208,6 +208,7 @@
                     <div class="controls">
                         <input type="hidden" class="cm-no-hide-input" name="block_data[content_data][override_by_this]" value="N" />
                         <input id="block_{$html_id}_override_by_this" type="checkbox" class="cm-no-hide-input" name="block_data[content_data][override_by_this]" value="Y" />
+                        <p class="muted description">{__("tt_views_block_manager_update_block_override_by_this")}</p>
                     </div>
                 </div>
                 <div class="statistics-box">

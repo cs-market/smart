@@ -56,7 +56,7 @@
                                 <li>
                                     {include file="common/popupbox.tpl"
                                         id="snippet_`$snippet->getId()`"
-                                        text="{__("editing_snippet")}: {$snippet->getName()}"
+                                        text=$snippet->getName()
                                         link_text=$edit_link_text
                                         act="link"
                                         href="snippets.update?snippet_id={$snippet->getId()}&return_url={$return_url_escape}&current_result_ids={$snippet_result_ids}"

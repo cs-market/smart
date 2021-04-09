@@ -1,4 +1,4 @@
-<div class="hidden" id="content_yml">
+<div class="{if $selected_section !== "yml"}hidden{/if}" id="content_yml">
 
     {script src="js/addons/yml_export/yml_tab_products.js"}
 
@@ -15,8 +15,8 @@
                     {foreach from=$yml2_offer_types item="offer_name" key="offer_type"}
                         <option value="{$offer_type}" {if $product_data.yml2_offer_type == $offer_type}selected="selected"{/if}>{__($offer_name)}</option>
                     {/foreach}
-
                 </select>
+                <p class="muted description">{__("tt_addons_yml_export_hooks_products_tabs_content_post_yml2_offer_type")}</p>
             </div>
         </div>
 
@@ -41,6 +41,7 @@
                     <option value="Y" {if $product_data.yml2_cpa == "Y"}selected="selected"{/if}>{__("yml2_true")}</option>
                     <option value="N" {if $product_data.yml2_cpa == "N"}selected="selected"{/if}>{__("yml2_false")}</option>
                 </select>
+                <p class="muted description">{__("ttc_yml_export.yml2_cpa")}</p>
             </div>
         </div>
 
@@ -55,6 +56,7 @@
             <label class="control-label" for="elm_yml_product_descr">{__("yml_export.yml2_description")}:</label>
             <div class="controls">
                 <textarea id="elm_yml_product_descr" name="product_data[yml2_description]" cols="55" rows="4" class="input-large">{$product_data.yml2_description}</textarea>
+                <p class="muted description">{__("ttc_yml_export.yml2_description")}</p>
             </div>
         </div>
 
@@ -62,6 +64,7 @@
             <label for="yml2_model" class="control-label">{__("yml2_model")}:</label>
             <div class="controls">
                 <input type="text" name="product_data[yml2_model]" id="yml2_model" size="55" value="{$product_data.yml2_model}" class="input-text-large" {if (!empty($yml2_model_category))}placeholder="{$yml2_model_category}"{/if}/>
+                <p class="muted description">{__("tt_addons_yml_export_hooks_products_detailed_content_post_yml2_model")}</p>
             </div>
         </div>
 
@@ -69,6 +72,7 @@
             <label for="yml2_type_prefix" class="control-label">{__("yml2_type_prefix")}:</label>
             <div class="controls">
                 <input type="text" name="product_data[yml2_type_prefix]" id="yml2_type_prefix" size="55" value="{$product_data.yml2_type_prefix}" class="input-text-large"  {if (!empty($yml2_type_prefix_category))}placeholder="{$yml2_type_prefix_category}"{/if}/>
+                <p class="muted description">{__("tt_addons_yml_export_hooks_products_detailed_content_post_yml2_type_prefix")}</p>
             </div>
         </div>
 
@@ -103,6 +107,7 @@
             <label for="yml2_expiry" class="control-label">{__("yml2_expiry")}:</label>
             <div class="controls">
                 <input type="text" name="product_data[yml2_expiry]" id="yml2_expiry" size="55" value="{$product_data.yml2_expiry}" class="input-text-large" />
+                <p class="muted description">{__("tt_addons_yml_export_hooks_products_tabs_content_post_yml2_expiry")}</p>
             </div>
         </div>
 
@@ -124,6 +129,7 @@
             <label for="yml2_fee" class="control-label">{__("yml_export.fee")}:</label>
             <div class="controls">
                 <input type="text" name="product_data[yml2_fee]" id="yml2_fee" size="10" value="{$product_data.yml2_fee}" class="input-small" />
+                <p class="muted description">{__("ttc_yml_export.fee")}</p>
             </div>
         </div>
 

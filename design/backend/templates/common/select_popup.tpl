@@ -1,19 +1,32 @@
 {$notify_customer_status = true}
 {$notify_department_status = true}
 {$notify_vendor_status = true}
+{$_update_controller = $update_controller|default:"tools"}
+{$custom_href = $custom_href|default:false}
+
+{if !$non_editable}
+    {$has_permission = fn_check_permissions($_update_controller, "update_status", "admin", "POST", ["table" => $table])}
+    {if !$has_permission}
+        {$non_editable = true}
+    {/if}
+{/if}
 
 {if $non_editable || $display == "text"}
     <span class="view-status">
-        {if $status == "A"}
-            {__("active")}
-        {elseif $status == "H"}
-            {__("hidden")}
-        {elseif $status == "D"}
-            {__("disabled")}
-        {elseif $status == "P"}
-            {__("pending")}
-        {elseif $status == "N"}
-            {__("new")}
+        {if $items_status}
+            {$items_status.$status|default:$default_status_text}
+        {else}
+            {if $status == "A"}
+                {__("active")}
+            {elseif $status == "H"}
+                {__("hidden")}
+            {elseif $status == "D"}
+                {__("disabled")}
+            {elseif $status == "P"}
+                {__("pending")}
+            {elseif $status == "N"}
+                {__("new")}
+            {/if}
         {/if}
     </span>
 {else}
@@ -44,7 +57,6 @@
         </a>
     {/if}
     {if $id && !$hide_for_vendor}
-        {assign var="_update_controller" value=$update_controller|default:"tools"}
         {if $table && $object_id_name}{capture name="_extra"}&table={$table}&id_name={$object_id_name}{/capture}{/if}
             <ul class="dropdown-menu">
             {if !$items_status}
@@ -59,7 +71,21 @@
             {/if}
             {if $items_status}
                 {foreach from=$items_status item="val" key="st"}
-                <li {if $status == $st}class="disabled"{/if}><a class="{if $text_wrap}dropdown--text-wrap{/if} {if $confirm}cm-confirm {/if}status-link-{$st|lower} {if $status == $st}active{else}cm-ajax cm-post{if $ajax_full_render} cm-ajax-full-render{/if}{/if} {if $status_meta}{$status_meta}{/if}"{if $status_target_id} data-ca-target-id="{$status_target_id}"{/if} href="{"`$_update_controller`.update_status?id=`$id`&status=`$st``$extra_params``$dynamic_object`"|fn_url}" onclick="return fn_check_object_status(this, '{$st|lower}', '{if $statuses}{$statuses[$st].params.color|default:''}{/if}');" {if $st_result_ids}data-ca-target-id="{$st_result_ids}"{/if} data-ca-event="ce.update_object_status_callback" title="{$val}">{$val}</a></li>
+                <li {if $status == $st}class="disabled"{/if}>
+                    <a
+                        class="{if $text_wrap}dropdown--text-wrap{/if} {if $confirm}cm-confirm {/if}status-link-{$st|lower} {if $status == $st}active{else}cm-ajax cm-post{if $ajax_full_render} cm-ajax-full-render{/if}{/if} {if $status_meta}{$status_meta}{/if}"
+                        {if $status_target_id} data-ca-target-id="{$status_target_id}"{/if}
+                        {if $custom_href}
+                            href="{$custom_href}"
+                        {else}
+                            href="{"`$_update_controller`.update_status?id=`$id`&status=`$st``$extra_params``$dynamic_object`"|fn_url}"
+                        {/if}
+                        onclick="return fn_check_object_status(this, '{$st|lower}', '{if $statuses}{$statuses[$st].params.color|default:''}{/if}');"
+                        {if $st_result_ids}data-ca-target-id="{$st_result_ids}"{/if}
+                        data-ca-event="ce.update_object_status_callback"
+                        title="{if $custom_title}{$custom_title}{else}{$val}{/if}"
+                    >{$val}</a>
+                </li>
                 {/foreach}
             {/if}
             {capture name="list_items"}

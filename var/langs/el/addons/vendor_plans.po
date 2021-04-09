@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_plans.po\n"
-"X-Crowdin-File-ID: 3640\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_plans.po\n"
+"X-Crowdin-File-ID: 4156\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -40,6 +40,14 @@ msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
 msgstr "Επιτρέψτε πωλητές να αλλάξουν το τρέχον πακετο"
 
+msgctxt "SettingsOptions::vendor_plans::collect_taxes_from_vendors"
+msgid "Collect taxes from vendors"
+msgstr "Συλλέξτε φόρους από πωλητές"
+
+msgctxt "SettingsTooltips::vendor_plans::collect_taxes_from_vendors"
+msgid "Send collected taxes to the account of the marketplace."
+msgstr "Στείλτε εισπραχθέντες φόρους στο λογαριασμό του marketplace."
+
 msgctxt "Languages::vendor_plans.vendor_plans"
 msgid "Vendor plans"
 msgstr "Πακετα πωλητων"
@@ -55,6 +63,10 @@ msgstr "Εμφανίζει πληροφορίες σχετικά με το επ�
 msgctxt "Languages::vendor_plans.plan"
 msgid "Plan"
 msgstr "Πακετο"
+
+msgctxt "Languages::vendor_plans.plan_short"
+msgid "Plan"
+msgstr ""
 
 msgctxt "Languages::vendor_plans.commission"
 msgid "Commission"
@@ -347,4 +359,20 @@ msgstr "Προσθέστε τον πωλητή στα διαθεσιμα κατ�
 msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
 msgid "Remove the vendor from the storefronts available in his previous plan"
 msgstr "Αφαιρέστε τον πωλητή από τα διαθεσιμα καταστηματα στο προηγούμενο σχέδιο του"
+
+msgctxt "Languages::vendor_plans.advanced_vendor_plan_creation"
+msgid "Advanced vendor plan creation"
+msgstr "Προηγμένη δημιουργία σχεδιου πωλητη"
+
+msgctxt "Languages::vendor_plans.text_vendor_plan_created"
+msgid "A new vendor plan \"[plan_name]\" has been created. You can now <a href=\"[link]\">set restrictions for vendors using this plan</a>."
+msgstr "Δημιουργήθηκε ένα νέο σχέδιο πωλητή \"[plan_name]\". Τώρα μπορείτε να <a href=\"[link]\"> ορίσετε περιορισμούς για πωληές που χρησιμοποιούν αυτό το πρόγραμμα </a>."
+
+msgctxt "Languages::vendor_plans.commission_fee"
+msgid "[commission]% fee"
+msgstr "[commission]% αμοιβή"
+
+msgctxt "Languages::vendor_plans.default_vendor_plan"
+msgid "Default plan"
+msgstr "Προεπιλεγμένο σχέδιο"
 

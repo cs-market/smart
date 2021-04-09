@@ -6,11 +6,11 @@
 
 {if $multiple}
 <tr {if !$clone}id="{$holder}_{$page_id}" {/if}class="cm-js-item{if $clone} cm-clone hidden{/if}">
-    {if $position_field}<td><input type="text" name="{$input_name}[{$page_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro"{if $clone} disabled="disabled"{/if} /></td>{/if}
+    {if $position_field}<td data-th="&nbsp;"><input type="text" name="{$input_name}[{$page_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro"{if $clone} disabled="disabled"{/if} /></td>{/if}
     
-    <td><a href="{"pages.update?page_id=`$page_id`"|fn_url}">{$page}</a></td>
+    <td data-th="&nbsp;"><a href="{"pages.update?page_id=`$page_id`"|fn_url}">{$page}</a></td>
 
-    <td>
+    <td data-th="&nbsp;">
         <div class="hidden-tools">
         {if !$hide_delete_button && !$view_only}
             {capture name="tools_list"}

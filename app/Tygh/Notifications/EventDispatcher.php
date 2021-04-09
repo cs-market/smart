@@ -18,6 +18,7 @@ use Tygh\Exceptions\DeveloperException;
 use Tygh\Notifications\DataProviders\BaseDataProvider;
 use Tygh\Notifications\DataProviders\IDataProvider;
 use Tygh\Notifications\EventIdProviders\IProvider;
+use Tygh\Notifications\Receivers\SearchCondition;
 use Tygh\Notifications\Settings\Ruleset;
 use Tygh\Notifications\Transports\ITransportFactory;
 use Tygh\Notifications\Transports\BaseMessageSchema;
@@ -47,6 +48,8 @@ class EventDispatcher
      * @var \Tygh\Notifications\Transports\ITransportFactory
      */
     protected $transport_factory;
+
+    protected $receiver_search_conditions_param = 'receiver_search_conditions';
 
     /**
      * @var array[]
@@ -81,9 +84,8 @@ class EventDispatcher
         $data_provider = $this->getDataProvider($event_id, $data);
 
         foreach ($this->events_schema[$event_id]['receivers'] as $receiver => $transports) {
-            //TODO Do not retrieve data if all receiver notifications are disabled
+            // TODO Do not retrieve data if all receiver notifications are disabled
             $data = $data_provider->get($receiver);
-
             foreach ($transports as $transport_id => $message_schema) {
                 if (empty($notification_settings['receivers'][$receiver][$transport_id])) {
                     continue;
@@ -105,7 +107,11 @@ class EventDispatcher
                 }
 
                 $transport = $this->transport_factory->create($transport_id);
-                $transport->process($message_schema->init($data));
+
+                $transport->process(
+                    $message_schema->init($data),
+                    $this->getReceiverSearchConditions($data, $notification_settings, $receiver)
+                );
             }
         }
     }
@@ -174,5 +180,69 @@ class EventDispatcher
         }
 
         return new BaseDataProvider($data);
+    }
+
+    protected function convertLegacyReceiverSearchConditionsParameters(array $data)
+    {
+        if (isset($data['recipient_search_critieria']) && isset($data['recipient_search_method'])) {
+            foreach ((array) $data['recipient_search_critieria'] as $criterion) {
+                $data[$this->receiver_search_conditions_param][] = new SearchCondition($data['recipient_search_method'], $criterion);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return \Tygh\Notifications\Receivers\SearchCondition[]
+     */
+    protected function getReceiverSearchConditionsFromMessageData(array $data)
+    {
+        if (!isset($data[$this->receiver_search_conditions_param])) {
+            $data[$this->receiver_search_conditions_param] = [];
+        }
+
+        $data = $this->convertLegacyReceiverSearchConditionsParameters($data);
+
+        foreach ($data[$this->receiver_search_conditions_param] as &$condition) {
+            if (!$condition instanceof SearchCondition) {
+                $condition = SearchCondition::makeOne($condition);
+            }
+        }
+        unset($condition);
+
+        if ($data[$this->receiver_search_conditions_param]) {
+            return $data[$this->receiver_search_conditions_param];
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array $notification_settings
+     * @param string      $receiver
+     *
+     * @return \Tygh\Notifications\Receivers\SearchCondition[]
+     */
+    protected function getReceiverSearchConditionsFromSettings(array $notification_settings, $receiver)
+    {
+        return isset($notification_settings[$this->receiver_search_conditions_param][$receiver])
+            ? $notification_settings[$this->receiver_search_conditions_param][$receiver]
+            : [];
+    }
+
+    /**
+     * @param \Tygh\Notifications\Data $data
+     * @param array $notification_settings
+     * @param string      $receiver
+     *
+     * @return \Tygh\Notifications\Receivers\SearchCondition[]
+     */
+    protected function getReceiverSearchConditions(Data $data, array $notification_settings, $receiver)
+    {
+        return $this->getReceiverSearchConditionsFromMessageData($data->toArray())
+            ?: $this->getReceiverSearchConditionsFromSettings($notification_settings, $receiver);
     }
 }

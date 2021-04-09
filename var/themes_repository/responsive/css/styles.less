@@ -400,11 +400,11 @@ input[type="radio"],
 input[type="checkbox"] {
 
     &.ty-checkbox__input {
-        border: 0; 
-        clip: rect(0 0 0 0); 
+        border: 0;
+        clip: rect(0 0 0 0);
         -webkit-clip-path: polygon(0px 0px, 0px 0px, 0px 0px);
         clip-path: polygon(0px 0px, 0px 0px, 0px 0px);
-        height: 1px; 
+        height: 1px;
         margin: -1px;
         overflow: hidden;
         padding: 0;
@@ -492,7 +492,7 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
@@ -573,7 +573,11 @@ input[type="email"].cm-failed-field,
 input[type="tel"].cm-failed-field,
 input[type="number"].cm-failed-field,
 textarea.cm-failed-field,
-.cm-field-container.cm-failed-field input[type="text"] {
+.cm-field-container.cm-failed-field input[type="text"],
+.cm-field-container.cm-failed-field input[type="password"],
+.cm-field-container.cm-failed-field input[type="email"],
+.cm-field-container.cm-failed-field input[type="tel"],
+.cm-field-container.cm-failed-field input[type="number"] {
     border: 1px solid #bf4d4d;
     background: #fff;
 }
@@ -828,6 +832,12 @@ select.disabled {
     text-align: center;
     font-size: 115%;
     margin-bottom: 20px;
+
+    &--extended {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 }
 .ty-icon-cancel-circle {
     font-size: 16px;
@@ -1054,7 +1064,9 @@ Menus
 
 // Custom menu classes
 .ty-menu-item__sale .ty-menu__item-link,
-.no-touch .ty-menu-item__sale .ty-menu__item-link:hover {
+.no-touch .ty-menu-item__sale .ty-menu__item-link:hover,
+.ty-menu-item__promotions .ty-menu__item-link,
+.no-touch .ty-menu-item__promotions .ty-menu__item-link:hover {
     color: yellow;
 }
 
@@ -1079,10 +1091,11 @@ html.dialog-is-open {
     background: #fff;
     overflow: auto;
 }
-.object-container .notification-content {
+.notification-container-dialog {
     top: 11px;
-    right: 24px;
-    min-width: 420px;
+    right: 20px;
+    min-width: 260px;
+    max-width: ~"calc(100% - 40px)";
     position: absolute;
     z-index: 1510;
 }
@@ -1354,7 +1367,7 @@ WYSIWYG
 .ty-wysiwyg-content .ty-image {
     padding: 10px;
     border: 4px solid #ffffff;
-    outline: 2px solid @base; 
+    outline: 2px solid @base;
     box-sizing: border-box;
 }
 
@@ -1596,7 +1609,7 @@ WYSIWYG
     @media (max-width: 1024px) {
         float: none !important;
         width: auto !important;
-        
+
         > .ty-geo-maps__geolocation {
             float: right;
         }
@@ -1616,10 +1629,10 @@ WYSIWYG
         .ty-text-links-btn.visible-phone {
             display: inherit !important;
         }
-    }  
+    }
     .ty-text-links_show_inline {
         @media (min-width: 1025px) {
-            display: block !important;            
+            display: block !important;
         }
 
         & > .ty-text-links__item {
@@ -2057,7 +2070,7 @@ Product temlates
             border: 1px solid #acbdcd;
             border-top: 0;
             margin-left: -11px;
-            padding: 0px 10px 20px 10px;
+            padding: 0px 10px 25px 10px;
         }
 
         &--control {
@@ -2325,7 +2338,7 @@ Product temlates
             position: static;
             padding-top: 5px;
             padding-bottom: 0;
-            border-color: transparent;
+            width: 100%;
             border-bottom: 0;
         }
     }
@@ -3093,6 +3106,36 @@ input.ty-value-changer__input {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+
+}
+.ty-tooltip--mobile {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 25px;
+    left: 20px !important;
+    width: ~"calc(100% - 40px)";
+    max-width: none;
+
+    .tooltip-arrow {
+        display: none;
+    }
+}
+.ty-tooltip--link {
+    border: 0;
+}
+.ty-tooltip--filter:not(.ty-tooltip--mobile) {
+    margin-left: 20px;
+}
+.ty-tooltip--filter.arrow-left:not(.ty-tooltip--mobile) {
+    margin-left: -20px;
+}
+[dir='rtl'] .ty-tooltip--filter.arrow-left:not(.ty-tooltip--mobile) {
+    margin-right: 20px;
+}
+.ty-tooltip--link:hover,
+.ty-tooltip--link:focus {
+    color: #fff;
+    outline: none;
 }
 .tooltip p {
     color: #fff;
@@ -3124,6 +3167,9 @@ input.ty-value-changer__input {
     padding: 9px;
     text-align: left !important;
 }
+.ty-tooltip--mobile.right {
+    text-align: center !important;
+}
 .arrow-top.right .tooltip-arrow {
     left: 3px;
     right: auto;
@@ -3151,7 +3197,20 @@ input.ty-value-changer__input {
     border-width: 10px 10px 0 0;
     border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }
-
+.arrow-right .tooltip-arrow {
+    top: 50%;
+    margin-top: -5px;
+    right: 100%;
+    border-width: 5px 5px 5px 0;
+    border-color: transparent rgba(0, 0, 0, 0.8) transparent transparent;
+}
+.arrow-left .tooltip-arrow {
+    top: 50%;
+    margin-top: -5px;
+    left: 100%;
+    border-width: 5px 0 5px 5px;
+    border-color: transparent transparent transparent rgba(0, 0, 0, 0.8);
+}
 
 /* width image */
 .tooltip img {
@@ -4011,6 +4070,9 @@ input.ty-search-block__input {
     width: 280px;
     vertical-align: top;
 }
+.ty-help-info {
+    display: inline;
+}
 .ty-product-feature__value {
     display: inline-block;
     margin-left: 5px;
@@ -4134,9 +4196,9 @@ Layout
     vertical-align: bottom;
     position: relative;
     top: 7px;
-    
+
     @media (min-width: 980px) {
-        margin-right: 15px;
+        margin-right: 3px;
     }
 }
 .ty-social-link a {
@@ -4159,7 +4221,7 @@ h3.ty-social-link__title {
     vertical-align: middle;
     font-size: 22px;
     font-weight: normal;
-    margin: 0px 20px 5px 0px;
+    margin: 0px 15px 5px 0px;
     color: #fff;
 }
 .ty-social-link:last-child {
@@ -4571,7 +4633,6 @@ Product detail
     margin: 2px 0;
     border: 2px solid lighten(@base, 30%);
     cursor: pointer;
-    min-height: 52px;
 }
 
 .ty-product-options__image--wrapper {
@@ -4606,9 +4667,13 @@ Product detail
     }
 
     &:checked + &--label,
-    &--label:hover,
-    &--label:active {
+    &--label:not(&--label--disabled):hover,
+    &--label:not(&--label--disabled):active {
         border-color: darken(@base, 20%);
+    }
+    &--label--disabled {
+        opacity: 0.3;
+        cursor: default;
     }
 }
 
@@ -4898,7 +4963,7 @@ a.ty-quick-view__title {
 }
 
 .touchevents .ty-grid-list__item--overlay {
-                
+
     &:hover {
         border-color: transparent;
     }
@@ -5029,6 +5094,12 @@ Product filter (Block)
     color: lighten(@font, 55%);
     cursor: default;
 }
+.ty-product-filters__tooltip {
+    float: right;
+}
+.ty-product-filters__tooltip--right {
+    float: left;
+}
 .ty-product-filters__item-more {
     margin-bottom: -9px;
 }
@@ -5043,22 +5114,27 @@ Product filter (Block)
     cursor: pointer;
 }
 .ty-product-filters__color {
-
-    &-filter {
-        display: flex;
-        flex-wrap: wrap;
-    }
     &-list-item {
-        display: flex;
-        position: relative;
+        display: inline-block;
         padding: 0;
         margin: 3px;
+    }
+    &-filter {
+        position: relative;
+
+        .ty-product-filters__tooltip {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            z-index: -1;
+        }
     }
     &-filter-item {
         display: flex;
         padding: 5px;
         justify-content: center;
         align-items: center;
+        position: relative;
 
         &:hover {
             cursor: pointer;
@@ -5069,6 +5145,9 @@ Product filter (Block)
             &:hover {
                 cursor: auto;
             }
+        }
+        &--selected {
+            opacity: 0.3;
         }
     }
     &-filter-item:hover &-filter-check,
@@ -5082,7 +5161,7 @@ Product filter (Block)
         position: absolute;
         color: #fff;
         opacity: 0;
-        
+
         &--invert {
             color: #555;
         }
@@ -5099,7 +5178,7 @@ Product filter (Block)
         height: 26px;
         border-radius: 13px;
         box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
-        
+
         &--selected {
             box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
         }
@@ -5107,6 +5186,9 @@ Product filter (Block)
     &-filter-checkbox:focus + &-filter-item &-filter-swatch {
         box-shadow: inset 0 0 0 1px @primary_button, inset 0 0 0 3px #fff;
     }
+}
+.ty-product-filters__empty-result span {
+    opacity: 0.5;
 }
 .ty-filter-icon {
     position: absolute;
@@ -5304,8 +5386,8 @@ Horizontal product filters (Block)
  */
 .cm-date-range {
     display: inline-block;
-    padding: 15px 10px 9px;
-    margin-bottom: 15px;
+    padding: 15px 10px 15px;
+    margin-bottom: 10px;
     a {
         color: @font;
     }
@@ -5390,7 +5472,6 @@ Horizontal product filters (Block)
     color: rgb(144, 149, 152);
 }
 .ty-price-slider__input-text {
-    margin: 0 0 5px 0;
     width: 74px;
 }
 .ty-range-slider__wrapper {
@@ -5420,7 +5501,7 @@ Horizontal product filters (Block)
 }
 .ty-range-slider {
     position: relative;
-    margin: 15px 12px;
+    margin: 20px 12px 15px 12px;
     height: 5px;
     border: 1px solid darken(@base, 10%);
     background: #ecf0f1;
@@ -5549,7 +5630,7 @@ td.ty-cart-content__description {
     margin-bottom: 5px;
 }
 .ty-cart-content .ty-control-group__label {
-    
+
     @media (min-width: 1200px) {
         width: 200px;
     }
@@ -5616,7 +5697,15 @@ td.ty-cart-content__description {
     overflow: auto;
     padding: 10px 22px;
     max-height: 400px;
-    width: 320px;
+    width: 256px;
+
+    @media (min-width: 375px) {
+        width: 311px;
+    }
+
+    @media (min-width: 481px) {
+        width: 320px;
+    }
 }
 .ty-cart-items__list-item {
     padding: 10px 0px;
@@ -5641,6 +5730,15 @@ td.ty-cart-content__description {
 }
 .ty-cart-items__list-item-desc {
     overflow: hidden;
+    width: 187px;
+
+    @media (min-width: 375px) {
+        width: 240px;
+    }
+
+    @media (min-width: 481px) {
+        width: 250px;
+    }
 }
 .ty-cart-items__list-item-tools {
     position: absolute;
@@ -6165,7 +6263,7 @@ input.ty-shipping-options__checkbox {
 /*
  * Template: templates/views/orders/components/payments/cc.tpl
  */
- 
+
  .ty-credit-card {
     display: inline-block;
     float: left;
@@ -6175,6 +6273,10 @@ input.ty-shipping-options__checkbox {
     border: 1px solid #f2f2f2;
     .border-radius(5px);
     background: white;
+
+    @media (max-width: 480px) {
+        max-width: 100%;
+    }
 }
 .ty-credit-card__control-group {
     position: relative;
@@ -7119,7 +7221,7 @@ Company
 .ty-company-detail__info-list {
     float: left;
     margin-bottom: 20px;
-    max-width: 240px;
+    max-width: 320px;
     word-break: break-all;
 }
 .ty-company-detail_info-first {
@@ -7130,7 +7232,9 @@ Company
 }
 .ty-company-detail__control-label {
     display: inline-block;
-    width: 65px;
+    width: 95px;
+    word-break: break-word;
+    vertical-align: top;
 }
 .ty-company__terms {
     margin: 25px 20px;
@@ -7207,6 +7311,43 @@ Entry page
     display: block;
 }
 /* /Entry page */
+
+/* ==========================================================================
+Promotions
+========================================================================== */
+/*
+ * Template: templates/views/promotions/list.tpl
+ */
+.ty-grid-promotions {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+.ty-grid-promotions__item {
+    border: 1px solid #ebebeb;
+    margin: 10px 10px 25px 10px;
+    padding: 0;
+}
+.ty-grid-promotions__content {
+    padding: 20px 20px 25px 20px;
+}
+.ty-grid-list__available {
+    margin-bottom: 7px;
+    color: #adadad;
+    font-size: 13px;
+}
+.ty-grid-promotions__company {
+    margin-bottom: 7px;
+}
+.ty-grid-promotions__header {
+    margin-bottom: 7px;
+    line-height: 1.2;
+}
+.ty-grid-promotions__description table {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+}
+/* /Promotions */
 
 
 /* ==========================================================================
@@ -7755,8 +7896,8 @@ Carousel
  */
 /* clearfix */
 .owl-item {
-    -ms-touch-action: pan-y;
-    touch-action: pan-y;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -8063,6 +8204,8 @@ Carousel
 /* preloading images */
 .owl-item.loading {
     .ajax-loader;
+    .ajax-loader--vertical-center;
+    .ajax-loader--horizontal-center;
 }
 .owl-more-theme .owl-controls {
     width: 100%;

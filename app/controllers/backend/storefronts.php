@@ -66,31 +66,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ? null
             : $params['storefront_data']['storefront_id'];
 
-        if ($storefront_id && !$repository->findById($storefront_id)) {
+        $stored_storefront = $storefront_id ? $repository->findById($storefront_id) : null;
+
+        if ($storefront_id && !$stored_storefront) {
             return [CONTROLLER_STATUS_NO_PAGE];
-        } elseif (!$storefront_id && $is_storefronts_limit_reached) {
+        }
+
+        if (!$storefront_id && $is_storefronts_limit_reached) {
             return [CONTROLLER_STATUS_DENIED];
         }
 
-        $storefront = $factory->fromArray($params['storefront_data']);
+        $storefront = $factory->fromArray($params['storefront_data'], $stored_storefront);
 
         $result = $repository->save($storefront);
         $result->showNotifications(true);
+
+        $redirect_mode = 'manage';
+        $redirect_query_params = [];
 
         if (!$result->isSuccess()) {
             fn_save_post_data('storefront_data');
 
             $redirect_mode = 'add';
-            $redirect_query_params = [];
 
             if ($storefront_id) {
                 $redirect_mode = 'update';
                 $redirect_query_params['storefront_id'] = $storefront_id;
             }
-
-            return [CONTROLLER_STATUS_REDIRECT, Url::buildUrn(['storefronts', $redirect_mode], $redirect_query_params)];
+        } else {
+            $redirect_mode = 'update';
+            $redirect_query_params['storefront_id'] = $result->getData();
         }
 
+        return [CONTROLLER_STATUS_OK, Url::buildUrn(['storefronts', $redirect_mode], $redirect_query_params)];
     }
 
     if ($mode === 'delete') {

@@ -16,7 +16,7 @@
 namespace Tygh\Addons\MasterProducts;
 
 use Tygh\Addons\MasterProducts\Product\ProductIdMap;
-use Tygh\Addons\MasterProducts\Product\Repository as ProductRepository;
+use Tygh\Addons\MasterProducts\Product\Repository;
 use Tygh\Addons\ProductVariations\Product\Type\Type as ProductType;
 use Tygh\Common\OperationResult;
 
@@ -27,7 +27,7 @@ use Tygh\Common\OperationResult;
  */
 class Service
 {
-    /** @var ProductRepository */
+    /** @var Repository */
     protected $product_repository;
 
     /** @var ProductIdMap */
@@ -49,21 +49,33 @@ class Service
     protected $is_show_out_of_stock_products_enabled;
 
     /**
+     * @var \Tygh\Addons\MasterProducts\Indexer
+     */
+    private $indexer;
+
+    /**
      * Service constructor.
      *
-     * @param \Tygh\Addons\MasterProducts\Product\Repository    $product_repository
-     * @param \Tygh\Addons\MasterProducts\Product\ProductIdMap  $product_id_map
-     * @param callable                                          $sync_schema_factory
-     * @param callable                                          $copy_schema_factory
-     * @param bool                                              $is_show_out_of_stock_products_enabled
+     * @param \Tygh\Addons\MasterProducts\Product\Repository   $product_repository                    Product repository
+     * @param \Tygh\Addons\MasterProducts\Product\ProductIdMap $product_id_map                        Product ID map service
+     * @param callable                                         $sync_schema_factory                   The "Sync" schema factory
+     * @param callable                                         $copy_schema_factory                   The "Copy" schema factory
+     * @param bool                                             $is_show_out_of_stock_products_enabled Whether to Show out of stock products
      */
-    public function __construct(ProductRepository $product_repository, ProductIdMap $product_id_map, callable $sync_schema_factory, callable $copy_schema_factory, $is_show_out_of_stock_products_enabled)
-    {
+    public function __construct(
+        Repository $product_repository,
+        ProductIdMap $product_id_map,
+        callable $sync_schema_factory,
+        callable $copy_schema_factory,
+        $is_show_out_of_stock_products_enabled,
+        Indexer $indexer
+    ) {
         $this->product_repository = $product_repository;
         $this->product_id_map = $product_id_map;
         $this->sync_schema_factory = $sync_schema_factory;
         $this->copy_schema_factory = $copy_schema_factory;
         $this->is_show_out_of_stock_products_enabled = $is_show_out_of_stock_products_enabled;
+        $this->indexer = $indexer;
     }
 
     /**
@@ -126,7 +138,6 @@ class Service
          * @param array                        $product           Master product data
          * @param int                          $vendor_product_id Vendor product ID
          * @param \Tygh\Common\OperationResult $result            Result of operation
-         *
          */
         fn_set_hook('master_products_create_vendor_product', $master_product_id, $company_id, $product, $vendor_product_id, $result);
 
@@ -187,6 +198,8 @@ class Service
         $this->product_repository->updateProduct($master_product_id, [
             'master_product_offers_count' => $vendor_products_count
         ]);
+
+        $this->indexer->markMasterProductToReindexStorefrontOffersCount($master_product_id);
     }
 
     /**
@@ -207,6 +220,14 @@ class Service
         $this->product_repository->updateProduct($master_product_id, [
             'amount' => $quantity
         ]);
+
+        /**
+         * Executes after master product quantity actualized.
+         *
+         * @param int $product_id        Product identifier
+         * @param int $master_product_id Master product identifier
+         */
+        fn_set_hook('master_products_actualize_master_product_quantity', $product_id, $master_product_id);
     }
 
     /**

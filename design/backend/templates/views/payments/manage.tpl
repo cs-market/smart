@@ -43,8 +43,8 @@ function fn_switch_processor(payment_id, processor_id)
 <div class="items-container payment-methods {if $draggable}cm-sortable{/if}"
      {if $draggable}data-ca-sortable-table="payments" data-ca-sortable-id-name="payment_id"{/if}
      id="payments_list">
-<div class="table-wrapper">
-    <table class="table table-middle table--relative table-objects table-striped payment-methods__list">
+<div class="table-responsive-wrapper">
+    <table class="table table-middle table--relative table-objects table-striped table-responsive table-responsive-w-titles payment-methods__list">
         <tbody>
             {foreach $payments as $pf => $payment}
                 {if "ULTIMATE"|fn_allowed_for}
@@ -86,7 +86,7 @@ function fn_switch_processor(payment_id, processor_id)
                     href_delete="payments.delete?payment_id=`$payment.payment_id`"
                     delete_target_id="payments_list"
                     skip_delete=$skip_delete
-                    header_text="{__("editing_payment")}: `$payment.payment`"
+                    header_text=$payment.payment
                     additional_class="cm-sortable-row cm-sortable-id-`$payment.payment_id`"
                     no_table=true
                     draggable=$draggable

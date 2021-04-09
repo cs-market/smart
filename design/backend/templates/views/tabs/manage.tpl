@@ -68,7 +68,7 @@
                 href=$_href_update
                 href_delete=$_href_delete
                 delete_target_id="pagination_contents"
-                header_text="{__("editing_tab")}: `$tab.name`"
+                header_text=$tab.name
                 table="product_tabs"
                 object_id_name="tab_id"
                 draggable=$draggable

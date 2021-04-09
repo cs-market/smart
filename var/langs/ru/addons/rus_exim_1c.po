@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-ru\n"
 "X-Crowdin-Project-ID: 54044\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.11.5/addons/rus_exim_1c.po\n"
-"X-Crowdin-File-ID: 3732\n"
-"PO-Revision-Date: 2020-08-28 13:38\n"
+"X-Crowdin-File: /release-4.12.2/addons/rus_exim_1c.po\n"
+"X-Crowdin-File-ID: 4220\n"
+"PO-Revision-Date: 2021-01-26 12:32\n"
 
 msgctxt "Addons::name::rus_exim_1c"
 msgid "CommerceML synchronizes your web store with 1C, MoySklad, Class365"
@@ -839,4 +839,10 @@ msgstr "Код связывания уже используется другим
 msgctxt "Languages::rus_exim_1c.store_locator_already_used_external_id_link"
 msgid "<b>[external_id]</b> -> <a href=\"[warehouse_link]\">[warehouse_name]</a></br>"
 msgstr "<b>[external_id]</b> -> <a href=\"[warehouse_link]\">[warehouse_name]</a></br>"
+
+msgctxt "Languages::rus_exim_1c.confirmation_deleting"
+msgid "Uninstalling this add-on will delete the links between entities in your CRM and CS-Cart. If you're planning to use the new CommerceML add-on, please install and activate the new add-on first. While the new add-on is active, you can keep the old add-on disabled without uninstalling it. This will help if you decide to use the old add-on again in the future.\n"
+"\\rAre you sure you want to uninstall this add-on?"
+msgstr "Удаление этого модуля удалит связи между сущностями в CRM и в CS-Cart. Если вы планируете использовать новый модуль CommerceML, сначала установите и включите его. Пока новый модуль включен, можно держать старый модуль выключенным, без удаления. Так вы сможете вернуться к старому модулю, если понадобится.\n"
+"\\rВы уверены, что хотите удалить этот модуль?"
 

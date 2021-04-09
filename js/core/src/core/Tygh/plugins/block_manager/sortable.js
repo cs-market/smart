@@ -8,6 +8,7 @@ export const sortable = {
 
         var sortable_params = {
             items: params.sortable_items_selector,
+            connectWith: params.blocks_place_selector,
             update: function (event, ui) {
                 var snapping = actions._snapBlocks($(ui.item));
 
@@ -19,6 +20,6 @@ export const sortable = {
 
         $.extend(params, sortable_params);
 
-        $(params.grid_selector).sortable(params);
+        $(params.blocks_place_selector).sortable(params);
     }
 };

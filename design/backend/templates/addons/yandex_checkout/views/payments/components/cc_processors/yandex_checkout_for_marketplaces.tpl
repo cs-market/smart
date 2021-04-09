@@ -1,8 +1,13 @@
 {include file="common/subheader.tpl" title=__("information") target="#yandex_checkout_for_marketplaces_payment_instruction_`$payment_id`"}
+{if $settings.Security.secure_storefront === "YesNo::YES"|enum}
+    {$storefront_url = fn_url("", "SiteArea::STOREFRONT"|enum, "https")|replace:$config.customer_index:""|rtrim:"/"}
+{else}
+    {$storefront_url = fn_url("", "SiteArea::STOREFRONT"|enum, "http")|replace:$config.customer_index:""|rtrim:"/"}
+{/if}
 <div id="yandex_checkout_for_marketplaces_payment_instruction_{$payment_id}" class="in collapse">
     {include file="common/widget_copy.tpl"
-    widget_copy_text=__("yandex_checkout.url_for_payment_notifications")
-    widget_copy_code_text="yandex_checkout.check_payment"|fn_url:"C"
+        widget_copy_text=__("yandex_checkout.url_for_payment_notifications")
+        widget_copy_code_text="{$storefront_url}/yoomoney/check_payment"
     }
 
     {if fn_get_storefront_protocol() != "https"}

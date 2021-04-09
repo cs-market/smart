@@ -12,13 +12,29 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Helpdesk;
+use Tygh\Tools\Url;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
-$section_id = empty($_REQUEST['section_id']) ? 'General' : $_REQUEST['section_id'];
+$storefront_id = empty($_REQUEST['storefront_id'])
+    ? 0
+    : (int) $_REQUEST['storefront_id'];
+
+if (fn_allowed_for('ULTIMATE')) {
+    $storefront_id = 0;
+    if (fn_get_runtime_company_id()) {
+        $storefront_id = StorefrontProvider::getStorefront()->storefront_id;
+    }
+}
+
+$section_id = empty($_REQUEST['section_id'])
+    ? 'General'
+    : $_REQUEST['section_id'];
+
 // Convert section name to section_id
 $section = Settings::instance()->getSectionByName($section_id);
 if (isset($section['section_id'])) {
@@ -35,16 +51,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'update') {
         if (isset($_REQUEST['update']) && is_array($_REQUEST['update'])) {
             foreach ($_REQUEST['update'] as $k => $v) {
-                Settings::instance()->updateValueById($k, $v);
+                Settings::instance(['storefront_id' => $storefront_id])->updateValueById($k, $v);
 
                 if (!empty($_REQUEST['update_all_vendors'][$k])) {
-                    Settings::instance()->resetAllVendorsSettings($k);
+                    Settings::instance(['storefront_id' => $storefront_id])->resetAllOverrides($k);
                 }
             }
         }
-        $_suffix = ".manage";
+        $_suffix = 'manage';
         if (defined('AJAX_REQUEST')) {
-            exit();
+            return [CONTROLLER_STATUS_NO_PAGE];
         }
 
     }
@@ -125,7 +141,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         return array(CONTROLLER_STATUS_REDIRECT, $redirect_url);
     }
 
-    return array(CONTROLLER_STATUS_OK, 'settings' . $_suffix . '?section_id=' . Settings::instance()->getSectionTextId($section_id));
+    $redirect_url_params = [
+        'section_id' => Settings::instance()->getSectionTextId($section_id),
+    ];
+
+    if (fn_allowed_for('MULTIVENDOR')) {
+        $redirect_url_params['storefront_id'] = $storefront_id;
+    }
+
+    return [
+        CONTROLLER_STATUS_OK,
+        Url::buildUrn(['settings', $_suffix], $redirect_url_params),
+    ];
 }
 
 //
@@ -134,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 if ($mode == 'manage') {
     $subsections = Settings::instance()->getSectionTabs($section_id, CART_LANGUAGE);
 
-    $options = Settings::instance()->getList($section_id);
+    $options = Settings::instance(['storefront_id' => $storefront_id])->getList($section_id);
 
     $ln = Settings::instance()->getSettingDataByName('license_number');
     if (!empty($options[$ln['section_tab_name']][$ln['object_id']]['value'])) {
@@ -164,7 +191,40 @@ if ($mode == 'manage') {
 
     // Set navigation menu
     $sections = Registry::get('navigation.static.top.settings.items');
+    if (!Registry::get('runtime.simple_ultimate') && $storefront_id) {
+        $sections = fn_filter_settings_sections_by_accessibility(
+            $sections,
+            Settings::instance(['storefront_id' => $storefront_id])->getCoreSections()
+        );
+        $sections = array_map(
+            function (array $section_data) use ($storefront_id) {
+                if (!isset($section_data['href'])) {
+                    return $section_data;
+                }
+
+                $section_data['href'] = fn_link_attach($section_data['href'], "storefront_id={$storefront_id}");
+
+                return $section_data;
+            },
+            $sections
+        );
+    }
+
     fn_update_lang_objects('sections', $sections);
+
+    $select_storefront = false;
+    //display storefront switch if at least one setting in the selected section supports multiple storefronts
+    foreach ($options as $settings) {
+        foreach ((array) $settings as $setting) {
+            if (
+                !empty($setting['edition_type'])
+                && strpos($setting['edition_type'], Settings::STOREFRONT) !== false
+            ) {
+                $select_storefront = true;
+                break 2;
+            }
+        }
+    }
 
     Registry::set('navigation.dynamic.sections', $sections);
     Registry::set('navigation.dynamic.active_section', Settings::instance()->getSectionTextId($section_id));
@@ -173,5 +233,6 @@ if ($mode == 'manage') {
     Tygh::$app['view']->assign('subsections', $subsections);
     Tygh::$app['view']->assign('section_id', Settings::instance()->getSectionTextId($section_id));
     Tygh::$app['view']->assign('settings_title', Settings::instance()->getSectionName($section_id));
+    Tygh::$app['view']->assign('selected_storefront_id', $storefront_id);
+    Tygh::$app['view']->assign('select_storefront', $select_storefront);
 }
-

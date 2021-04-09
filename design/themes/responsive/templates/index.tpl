@@ -91,8 +91,8 @@ window.onerror = function(message, source, lineno, colno, error) {
                 title=__("on_site_template_editing")
                 href="customization.disable_mode?type=design&return_url={$config.current_url|urlencode}"
             }
-        {elseif "THEMES_PANEL"|defined || $auth.user_type === "UserTypes::ADMIN"|enum}
-            {include file="backend:components/bottom_panel/bottom_panel.tpl"}
+        {elseif $is_bottom_panel_available}
+            {include file="backend:components/bottom_panel/bottom_panel.tpl" logo = $logo.theme.image|default:$logos.theme.image}
         {/if}
 
         <div class="ty-tygh {if $runtime.customization_mode.theme_editor}te-mode{/if} {if $runtime.customization_mode.live_editor || $runtime.customization_mode.design || $runtime.customization_mode.block_manager || $smarty.const.THEMES_PANEL}ty-top-panel-padding{/if} bp-tygh-container" id="tygh_container">

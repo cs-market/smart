@@ -38,7 +38,9 @@ fn_register_hooks(
     'process_paypal_ipn_create_payout',
     'vendor_payouts_get_list',
     'vendor_payouts_get_income',
+    'vendor_data_premoderation_diff_company_data_post',
     'get_profile_fields_post',
     'vendor_payouts_update',
-    'storefront_repository_delete_post'
+    'storefront_repository_delete_post',
+    'get_products_pre'
 );

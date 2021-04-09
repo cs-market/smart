@@ -17,6 +17,7 @@ namespace Tygh\Ym\Offers;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Storage;
 use Tygh\Registry;
+use Tygh\Enum\ProductTracking;
 
 class Base
 {
@@ -124,7 +125,7 @@ class Base
         $category_id = $product['category_id'];
 
         $available = 'true';
-        if ($product['tracking'] == 'B' && $product['amount'] <= 0) {
+        if ($product['tracking'] !== ProductTracking::DO_NOT_TRACK && $product['amount'] <= 0) {
             $available = 'false';
         }
 
@@ -312,12 +313,14 @@ class Base
                 $this->options['thumbnail_height']
             );
 
-            if (!empty($image_data)) {
-                if (strpos($image_data['image_path'], '.php')) {
+            if (!empty($image_data['image_path'])) {
+                if (strpos($image_data['image_path'], '.php') && !empty($image_data['detailed_image_path']) && !empty($image_data['width']) && !empty($image_data['height'])) {
                     $image_data['image_path'] = fn_generate_thumbnail(
                         $image_data['detailed_image_path'],
                         $image_data['width'],
                         $image_data['height'],
+                        false,
+                        false,
                         $image_pair
                     );
                 }

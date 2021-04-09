@@ -1,4 +1,4 @@
-<p class="muted">{__("text_exim_export_notice")}</p>
+<p class="muted description">{__("text_exim_export_notice")}</p>
 <div class="table-wrapper">
     <table width="100%">
         <tr>
@@ -19,13 +19,13 @@
                 <select id="{$left_id}" name="{$left_name}[]" multiple="multiple" class="input-full toll-select">
                 {foreach from=$assigned_ids item=key}
                     {if $items.$key}
-                        {$label=$key|fn_exim_get_field_label}
+                        {$label=$key|fn_exim_get_field_label:"export"}
                         <option value="{$key}" selected="selected" {if $items.$key.required}class=" selectbox-highlighted cm-required"{/if}>{$key}{if $label} — {$label}{/if}</option>
                     {/if}
                 {/foreach}
                 {foreach from=$items item="item" key="key"}
                     {if $item.required && !$key|in_array:$assigned_ids}
-                        {$label=$key|fn_exim_get_field_label}
+                        {$label=$key|fn_exim_get_field_label:"export"}
                         <option value="{$key}" selected="selected"  class="selectbox-highlighted cm-required">{$key}{if $label} — {$label}{/if}</option>
                     {/if}
                 {/foreach}
@@ -44,7 +44,7 @@
                 <select id="{$left_id}_right" name="unset_mbox[]" multiple="multiple" class="input-full toll-select">
                 {foreach from=$items item=item key=key}
                     {if !$key|in_array:$assigned_ids && !$item.required}
-                        {$label=$key|fn_exim_get_field_label}
+                        {$label=$key|fn_exim_get_field_label:"export"}
                         <option value="{$key}" {if $item.required}class="selectbox-highlighted cm-required"{/if}>{$key}{if $label} — {$label}{/if}</option>
                     {/if}
                 {/foreach}

@@ -12,13 +12,15 @@
  * 'copyright.txt' FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Addons\ProductVariations\Product\Group\Repository AS GroupRepository;
+use Tygh\Addons\ProductVariations\Product\Group\Repository as GroupRepository;
 use Tygh\Addons\ProductVariations\Product\Repository as ProductRepository;
 use Tygh\Addons\ProductVariations\Product\Group\Group;
 use Tygh\Addons\ProductVariations\Product\FeaturePurposes;
+use Tygh\Common\OperationResult;
 use Tygh\Enum\ProductFeatures;
 use Tygh\Registry;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Addons\ProductVariations\ServiceProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -137,7 +139,6 @@ function fn_product_variations_exim_set_variation_group_code($row, $key)
 function fn_product_variations_exim_post_processing($primary_object_ids, $import_data, $processed_data, &$final_import_notification)
 {
     $has_variation_group_code = false;
-    $has_product_with_zero_quantity = false;
 
     foreach ($import_data as $item) {
         $item = reset($item);
@@ -146,11 +147,7 @@ function fn_product_variations_exim_post_processing($primary_object_ids, $import
             $has_variation_group_code = true;
         }
 
-        if (isset($item['amount']) && (int) $item['amount'] === 0) {
-            $has_product_with_zero_quantity = true;
-        }
-
-        if ($has_product_with_zero_quantity && $has_variation_group_code) {
+        if ($has_variation_group_code) {
             break;
         }
     }
@@ -159,10 +156,7 @@ function fn_product_variations_exim_post_processing($primary_object_ids, $import
         fn_product_variations_exim_update_variation_groups($primary_object_ids, $import_data, $processed_data, $final_import_notification);
     }
 
-    if ($has_product_with_zero_quantity) {
-        fn_product_variations_exim_update_default_variations($primary_object_ids, $import_data, $processed_data, $final_import_notification);
-    }
-
+    fn_product_variations_exim_update_default_variations($primary_object_ids, $import_data, $processed_data, $final_import_notification);
     fn_product_variations_exim_sync_variations($primary_object_ids);
 }
 
@@ -187,6 +181,7 @@ function fn_product_variations_exim_update_variation_groups($primary_object_ids,
         'removed' => 0,
         'updated' => 0
     ];
+    $warning_messages = [];
 
     foreach ($import_data as $key => $items) {
         if (empty($primary_object_ids[$key]['product_id'])) {
@@ -224,7 +219,8 @@ function fn_product_variations_exim_update_variation_groups($primary_object_ids,
 
     foreach ($on_remove_list as $group_id => $product_ids) {
         $result = $service->detachProductsFromGroup($group_id, $product_ids);
-        $result->showNotifications();
+
+        $warning_messages = fn_product_variations_exim_get_warnings($result, $warning_messages);
 
         $counter['removed'] += count($product_ids);
     }
@@ -241,7 +237,7 @@ function fn_product_variations_exim_update_variation_groups($primary_object_ids,
         $product_group = $result->getData('group', []);
         $product_group_id  = $product_group ? $product_group->getId() : 0;
 
-        $result->showNotifications();
+        $warning_messages = fn_product_variations_exim_get_warnings($result, $warning_messages);
 
         foreach ($result->getData('products_status', []) as $product_id => $status) {
             if (!Group::isResultError($status)) {
@@ -256,7 +252,7 @@ function fn_product_variations_exim_update_variation_groups($primary_object_ids,
     foreach ($on_update_list as $group_id => $products) {
         $result = $service->changeProductsFeatureValues($group_id, array_intersect_key($products_feature_values, $products));
 
-        $result->showNotifications();
+        $warning_messages = fn_product_variations_exim_get_warnings($result, $warning_messages);
 
         foreach ($result->getData('products_status', []) as $product_id => $status) {
             if (!Group::isResultError($status)) {
@@ -290,7 +286,7 @@ function fn_product_variations_exim_update_variation_groups($primary_object_ids,
         $product_group = $result->getData('group', []);
         $product_group_id  = $product_group ? $product_group->getId() : 0;
 
-        $result->showNotifications();
+        $warning_messages = fn_product_variations_exim_get_warnings($result, $warning_messages);
 
         foreach ($result->getData('products_status', []) as $product_id => $status) {
             if (!Group::isResultError($status)) {
@@ -317,6 +313,18 @@ function fn_product_variations_exim_update_variation_groups($primary_object_ids,
         '[variation_updated]' => $counter['updated'],
         '[variation_removed]' => $counter['removed'],
     ]);
+
+    if (!count($warning_messages)) {
+        return;
+    }
+
+    $smarty = Tygh::$app['view'];
+    $smarty->assign('messages', $warning_messages);
+    fn_set_notification(
+        NotificationSeverity::INFO,
+        __('warning'),
+        $smarty->fetch('addons/product_variations/views/product_variations/components/export_warnings.tpl')
+    );
 }
 
 function fn_product_variations_exim_update_default_variations($primary_object_ids, $import_data, $processed_data, &$final_import_notification)
@@ -335,8 +343,19 @@ function fn_product_variations_exim_update_default_variations($primary_object_id
         $product_id = $primary_object_ids[$key]['product_id'];
         $item = reset($item);
 
-        if (isset($item['amount']) && (int) $item['amount'] === 0) {
-            $service->onChangedProductQuantityInZero($product_id);
+        if (!isset($item['amount']) && !isset($item['status'])) {
+            continue;
+        }
+
+        if (isset($item['amount'])) {
+            $service->onChangedProductQuantity($product_id);
+        }
+
+        /**
+         * @phpcs:disable SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+         */
+        if (isset($item['status'])) {
+            $service->onChangedVariationProductState($product_id);
         }
     }
 }
@@ -427,4 +446,31 @@ function fn_product_variations_exim_set_variation_set_as_default($row, $key)
     } else {
         return null;
     }
+}
+
+/**
+ * Gets warning and error operation messages
+ *
+ * @param OperationResult $result   Operation result
+ * @param string[]        $messages Existing messages
+ *
+ * @return string[]
+ */
+function fn_product_variations_exim_get_warnings(OperationResult $result, array $messages = [])
+{
+    if ($result->hasErrors()) {
+        $errors = $result->getErrors();
+        foreach ($errors as $error) {
+            $messages[] = $error;
+        }
+    }
+
+    if ($result->hasWarnings()) {
+        $warnings = $result->getWarnings();
+        foreach ($warnings as $warning) {
+            $messages[] = $warning;
+        }
+    }
+
+    return $messages;
 }

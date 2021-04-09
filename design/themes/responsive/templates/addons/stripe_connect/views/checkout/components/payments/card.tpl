@@ -33,35 +33,47 @@
             </div>
         </div>
 
-        <div class="ty-control-group ty-credit-card__cvv-field cvv-field">
-            <label for="credit_card_cvv2" class="ty-control-group__title cm-required cm-cc-cvv2  cc-cvv2 cm-autocomplete-off">{__("cvv2")}</label>
-            <div class="stripe-payment-form__cvc"
-                data-ca-stripe-element="cvc"
-            >{* CVC field *}</div>
+        <div class="ty-credit-card__cvv-field cvv-field">
+            <div class="ty-control-group">
+                <label for="credit_card_cvv2" class="ty-control-group__title cm-required cm-cc-cvv2  cc-cvv2 cm-autocomplete-off">{__("cvv2")}</label>
+                <div class="stripe-payment-form__cvc"
+                    data-ca-stripe-element="cvc"
+                >{* CVC field *}</div>
 
-            <div class="ty-cvv2-about">
-                <span class="ty-cvv2-about__title">{__("what_is_cvv2")}</span>
-                <div class="ty-cvv2-about__note">
+                <div class="ty-cvv2-about">
+                    <span class="ty-cvv2-about__title">{__("what_is_cvv2")}</span>
+                    <div class="ty-cvv2-about__note">
 
-                    <div class="ty-cvv2-about__info mb30 clearfix">
-                        <div class="ty-cvv2-about__image">
-                            <img src="{$images_dir}/visa_cvv.png" alt="" />
+                        <div class="ty-cvv2-about__info mb30 clearfix">
+                            <div class="ty-cvv2-about__image">
+                                <img src="{$images_dir}/visa_cvv.png" alt="" />
+                            </div>
+                            <div class="ty-cvv2-about__description">
+                                <h5 class="ty-cvv2-about__description-title">{__("visa_card_discover")}</h5>
+                                <p>{__("credit_card_info")}</p>
+                            </div>
                         </div>
-                        <div class="ty-cvv2-about__description">
-                            <h5 class="ty-cvv2-about__description-title">{__("visa_card_discover")}</h5>
-                            <p>{__("credit_card_info")}</p>
-                        </div>
-                    </div>
-                    <div class="ty-cvv2-about__info clearfix">
-                        <div class="ty-cvv2-about__image">
-                            <img src="{$images_dir}/express_cvv.png" alt="" />
-                        </div>
-                        <div class="ty-cvv2-about__description">
-                            <h5 class="ty-cvv2-about__description-title">{__("american_express")}</h5>
-                            <p>{__("american_express_info")}</p>
+                        <div class="ty-cvv2-about__info clearfix">
+                            <div class="ty-cvv2-about__image">
+                                <img src="{$images_dir}/express_cvv.png" alt="" />
+                            </div>
+                            <div class="ty-cvv2-about__description">
+                                <h5 class="ty-cvv2-about__description-title">{__("american_express")}</h5>
+                                <p>{__("american_express_info")}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="ty-control-group">
+                <label for="credit_card_postal_code"
+                       class="ty-control-group__title cm-cc-postal-code cm-required"
+                >{__("zip_postal_code")}</label>
+                <div class="stripe-payment-form__postal_code"
+                     data-ca-stripe-element="postal_code"
+                     data-ca-stripe-element-value="{$user_data.b_zipcode|default:$user_data.s_zipcode}"
+                >{* Postal code field *}</div>
             </div>
         </div>
     </div>

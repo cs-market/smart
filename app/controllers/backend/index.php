@@ -15,12 +15,15 @@
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProductTracking;
 use Tygh\Registry;
-use Tygh\Settings;
 use Tygh\Tools\DateTimeHelper;
 use Tygh\Enum\UserTypes;
+use Tygh\Enum\VendorStatuses;
 use Tygh\VendorPayouts;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
+/** @var array<string, int|string|array> $auth */
+$auth = Tygh::$app['session']['auth'];
 
 $runtime_company_id = Registry::get('runtime.company_id');
 $storefront_id = empty($_REQUEST['storefront_id'])
@@ -162,6 +165,15 @@ if ($mode == 'index') {
             Tygh::$app['view']->assign([
                 'period_income' => $period_income,
             ]);
+
+            if ($auth['user_type'] === UserTypes::VENDOR) {
+                /** @var array{company_id: int} $auth */
+                $vendor_data = fn_get_company_data($auth['company_id']);
+
+                if ($vendor_data['status'] === VendorStatuses::SUSPENDED) {
+                    Tygh::$app['view']->assign(['dashboard_alert' => __('suspend_alert')]);
+                }
+            }
         }
     }
 
@@ -237,7 +249,7 @@ function fn_calculate_differences($new_value, $old_value)
  *
  * @return array $graphs
  */
-function fn_dashboard_get_graphs_data($time_from, $time_to, $is_day, $company_ids, $storefront_id)
+function fn_dashboard_get_graphs_data($time_from, $time_to, $is_day, $company_ids = [], $storefront_id = 0)
 {
     $company_condition = fn_get_company_condition('?:orders.company_id', true, $company_ids);
     $storefront_condition = empty($storefront_id) ? '' : db_quote(' AND ?:orders.storefront_id = ?i', $storefront_id);
@@ -335,7 +347,7 @@ function fn_dashboard_get_graphs_data($time_from, $time_to, $is_day, $company_id
  *
  * @return array $order_by_statuses
  */
-function fn_dashboard_get_order_by_statuses($timestamp_from, $timestamp_to, $company_ids, $storefront_id)
+function fn_dashboard_get_order_by_statuses($timestamp_from, $timestamp_to, $company_ids = [], $storefront_id = 0)
 {
     $order_by_statuses = [];
 
@@ -382,7 +394,7 @@ function fn_dashboard_get_order_by_statuses($timestamp_from, $timestamp_to, $com
  *
  * @return array
  */
-function fn_dashboard_get_vendor_activities($timestamp_from, $timestamp_to, $company_ids)
+function fn_dashboard_get_vendor_activities($timestamp_from, $timestamp_to, $company_ids = [])
 {
     $dashboard_vendors_activity = [];
 
@@ -530,6 +542,15 @@ function fn_dashboard_get_vendor_activities($timestamp_from, $timestamp_to, $com
         $conditions
     );
 
+    /**
+     * Adds additional vendors activity statistic to dashboard
+     *
+     * @param array $dashboard_vendors_activity Vendors activity statistic
+     * @param int   $timestamp_from             From timestamp
+     * @param int   $timestamp_to               To timestamp
+     */
+    fn_set_hook('dashboard_get_vendor_activities_post', $timestamp_from, $timestamp_to, $dashboard_vendors_activity);
+
     return $dashboard_vendors_activity;
 }
 
@@ -542,7 +563,7 @@ function fn_dashboard_get_vendor_activities($timestamp_from, $timestamp_to, $com
  *
  * @return array
  */
-function fn_dashboard_get_orders_statistics($timestamp_from, $timestamp_to, $storefront_id)
+function fn_dashboard_get_orders_statistics($timestamp_from, $timestamp_to, $storefront_id = 0)
 {
     $orders_stat = [];
 
@@ -631,7 +652,7 @@ function fn_dashboard_get_orders_statistics($timestamp_from, $timestamp_to, $sto
  *
  * @return array $general_stats
  */
-function fn_dashboard_get_general_stats($runtime_company_id, array $company_ids)
+function fn_dashboard_get_general_stats($runtime_company_id, array $company_ids =[])
 {
     $general_stats = [];
 
@@ -650,7 +671,7 @@ function fn_dashboard_get_general_stats($runtime_company_id, array $company_ids)
         $params = [
             'amount_to'   => 0,
             'tracking'    => [
-                ProductTracking::TRACK_WITHOUT_OPTIONS, ProductTracking::TRACK_WITH_OPTIONS,
+                ProductTracking::TRACK,
             ],
             'company_ids' => $company_ids,
         ];

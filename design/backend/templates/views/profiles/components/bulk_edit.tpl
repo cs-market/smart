@@ -1,5 +1,6 @@
 <div class="bulk-edit clearfix hidden"
      data-ca-bulkedit-expanded-object="true"
+     data-ca-bulkedit-component="expandedObject"
 >
 
     <ul class="btn-group bulk-edit__wrapper">

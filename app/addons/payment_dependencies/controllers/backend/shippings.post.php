@@ -12,9 +12,12 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\UserTypes;
 use Tygh\Registry;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
+
+$auth = & Tygh::$app['session']['auth'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     return ;
@@ -23,10 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($mode === 'update' || $mode === 'add') {
     $params = [];
 
-    if (fn_allowed_for('MULTIVENDOR')) {
-        $params = [
-            'company_ids' => [0, (int) Registry::get('runtime.company_id')],
-        ];
+    if (fn_allowed_for('MULTIVENDOR') && UserTypes::isVendor($auth['user_type'])) {
+        $params['company_ids'] = [0, (int) Registry::get('runtime.company_id')];
+    } else {
+        $params['direct_payments_skip_company_id'] = true;
     }
 
     Tygh::$app['view']->assign('payments', fn_get_payments($params));

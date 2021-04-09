@@ -24,7 +24,7 @@ $schema = array(
         'addon' => 'rus_payments',
     ),
     'yandex_p2p' => array(
-        'processor' => 'Яндекс.Деньги: Перевод на счёт',
+        'processor' => 'ЮMoney: Перевод на счёт',
         'processor_script' => 'yandex_p2p.php',
         'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
         'admin_template' => 'yandex_p2p.tpl',

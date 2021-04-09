@@ -1,7 +1,7 @@
 {if $view_mode == "list" || $view_mode == "mixed"}
     <tr {if !$clone}id="{$holder}_{$user_id}" {/if}class="cm-js-item{if $clone} cm-clone hidden{/if}">
-        <td>{$user_name} (<a href="{"profiles.update?user_id=`$user_id`"|fn_url}" class="user-email"><span>{$email}</span></a>)</td>
-        <td class="nowrap">
+        <td data-th="&nbsp;">{$user_name} (<a href="{"profiles.update?user_id=`$user_id`"|fn_url}" class="user-email"><span>{$email}</span></a>)</td>
+        <td class="nowrap" data-th="&nbsp;">
             {if !$view_only}
                 {capture name="tools_list"}
                     <li>{btn type="list" text=__("edit") href="profiles.update?user_id=`$user_id`"}</li>

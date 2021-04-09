@@ -53,6 +53,7 @@ class DBTemplateMessageBuilderTest extends ATestCase
         $this->message_style_formatter->method('convert')->willReturnCallback([$this, 'styleFormatterConvert']);
         $this->requireMockFunction('fn_allowed_for');
         $this->requireMockFunction('fn_disable_live_editor_mode');
+        $this->requireMockFunction('fn_filter_company_data_by_profile_fields');
 
         $this->storefront_repository = $this->createMock(Repository::class);
     }

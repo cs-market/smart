@@ -1,5 +1,4 @@
 <?php
-
 /***************************************************************************
  *                                                                          *
  *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *

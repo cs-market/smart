@@ -72,6 +72,7 @@ class OAuthHelper
         } catch (Exception $e) {
             $result->setSuccess(false);
             $result->addError($e->getCode(), $e->getMessage());
+            Logger::logException($e);
         }
 
         return $result;
@@ -96,6 +97,7 @@ class OAuthHelper
         } catch (Exception $e) {
             $decoded_response['error_description'] = $e->getMessage();
             $decoded_response['error'] = $e->getCode();
+            Logger::logException($e);
         }
 
         $result = new OperationResult();
@@ -111,6 +113,7 @@ class OAuthHelper
         } elseif (isset($decoded_response['error_description'])) {
             $result->setSuccess(false);
             $result->addError($decoded_response['error'], $decoded_response['error_description']);
+            Logger::log(Logger::ACTION_FAILURE, $decoded_response['error_description']);
         } else {
             $result->setSuccess(false);
         }
@@ -139,6 +142,7 @@ class OAuthHelper
         } catch (Exception $e) {
             $result->setSuccess(false);
             $result->addError($e->getCode(), $e->getMessage());
+            Logger::logException($e);
         }
 
         return $result;

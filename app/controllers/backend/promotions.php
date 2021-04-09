@@ -64,6 +64,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix = ".manage";
     }
 
+    if ($mode === 'update_status') {
+        if (!empty($_REQUEST['promotion_ids'])) {
+            foreach ($_REQUEST['promotion_ids'] as $promotion_id) {
+                fn_tools_update_status([
+                    'table'             => 'promotions',
+                    'status'            => $_REQUEST['status'],
+                    'id_name'           => 'promotion_id',
+                    'id'                => $promotion_id,
+                    'show_error_notice' => false
+                ]);
+            }
+        }
+
+        return [CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']];
+    }
+
     return array(CONTROLLER_STATUS_OK, 'promotions' . $suffix);
 }
 
@@ -91,6 +107,14 @@ if ($mode == 'update') {
 
     ];
 
+    if (fn_allowed_for('MULTIVENDOR:ULTIMATE'))  {
+        $tabs['storefronts'] = [
+            'title' => __('storefronts'),
+            'href' => "promotions.update?promotion_id={$_REQUEST['promotion_id']}&selected_section=storefronts",
+            'js' => true,
+        ];
+    }
+
     if (fn_allowed_for('ULTIMATE')) {
         /** @var \Tygh\Storefront\Repository $repository */
         $repository = Tygh::$app['storefront.repository'];
@@ -103,19 +127,11 @@ if ($mode == 'update') {
 
         if ($is_sharing_enabled) {
             $tabs['storefronts'] = [
-                'title' => __('share'),
+                'title' => __('storefronts'),
                 'href' => "promotions.update?promotion_id={$_REQUEST['promotion_id']}&selected_section=storefronts",
                 'js' => true,
             ];
         }
-    }
-
-    if (fn_allowed_for('MULTIVENDOR:ULTIMATE'))  {
-        $tabs['storefronts'] = [
-            'title' => __('storefronts'),
-            'href' => "promotions.update?promotion_id={$_REQUEST['promotion_id']}&selected_section=storefronts",
-            'js' => true,
-        ];
     }
 
     Registry::set('navigation.tabs', $tabs);

@@ -15,7 +15,6 @@
 namespace Tygh\Backend\Cache;
 
 use Tygh\Registry;
-use Tygh\Exceptions\DeveloperException;
 
 /**
  * Cache backend class, implements 8 methods:
@@ -35,13 +34,15 @@ abstract class ABackend
      */
     public function __construct($config)
     {
-        $company_id = (int) Registry::get('runtime.company_id');
+        $this->resetCompanyId();
+    }
 
-        if (AREA === 'C' && empty($company_id) && fn_allowed_for('ULTIMATE')) {
-            throw new DeveloperException('Caching is used before company ID was initialized');
-        }
-
-        $this->_company_id = $company_id;
+    /**
+     * Resets company ID
+     */
+    public function resetCompanyId()
+    {
+        $this->_company_id = (int) Registry::get('runtime.company_id');
     }
 
     /**

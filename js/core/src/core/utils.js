@@ -90,10 +90,8 @@ export const fn_url = function (url) {
     } else if (components.file != Tygh.index_script) {
         if (url.indexOf('?') == 0) {
             url = index_url + url;
-
         } else {
             url = index_url + '?dispatch=' + url.replace('?', '&');
-
         }
     }
 

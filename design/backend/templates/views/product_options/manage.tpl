@@ -1,4 +1,7 @@
 {script src="js/tygh/tabs.js"}
+{if $enable_search}
+    {script src="js/tygh/backend/products/products_update_options.js"}
+{/if}
 {literal}
     <script type="text/javascript">
     function fn_check_option_type(value, tag_id)
@@ -29,10 +32,12 @@
 
 {$c_url = $config.current_url|fn_query_remove:"sort_by":"sort_order"}
 {$c_icon = "<i class=\"icon-`$search.sort_order_rev`\"></i>"}
+{$allow_add_option = fn_check_permissions("product_options", "quick_add", "admin", "POST")}
+{$is_global = $object === "global"}
 
 {capture name="mainbox"}
 
-    {if $object == "global"}
+    {if $is_global}
         {$select_languages = true}
         {$delete_target_id = "pagination_contents"}
         {$show_checkboxes = true}
@@ -45,60 +50,105 @@
 
     {if !($runtime.company_id && (fn_allowed_for("MULTIVENDOR") || $product_data.shared_product == "Y") && $runtime.company_id != $product_data.company_id)}
         {capture name="toolbar"}
-            {capture name="add_new_picker"}
-                {if $product_data}
-                    {include file="views/product_options/update.tpl" option_id="0" company_id=$product_data.company_id disable_company_picker=true}
-                {else}
-                    {include file="views/product_options/update.tpl" option_id="0"}
+            <div class="control-toolbar__btns-center">
+                {capture name="add_new_picker"}
+                    {if $product_data}
+                        {include file="views/product_options/update.tpl" option_id="0" company_id=$product_data.company_id disable_company_picker=true}
+                    {else}
+                        {include file="views/product_options/update.tpl" option_id="0"}
+                    {/if}
+                {/capture}
+                {if $object == "product"}
+                    {$position = "pull-right"}
                 {/if}
-            {/capture}
-            {if $object == "product"}
-                {$position = "pull-right"}
-            {/if}
-            {if $view_mode == "embed"}
-                {include file="common/popupbox.tpl" id="add_new_option" text=__("new_option") link_text=__("add_option") act="general" content=$smarty.capture.add_new_picker meta=$position icon="icon-plus"}
+                {if $view_mode == "embed" && $enable_search}
+                    {$enable_add = $enable_add|default:true}
 
-            {else}
-                {include file="common/popupbox.tpl" id="add_new_option" text=__("new_option") title=__("add_option") act="general" content=$smarty.capture.add_new_picker meta=$position icon="icon-plus"}
-            {/if}
+                    {if $object == "product" && "products.update"|fn_check_view_permissions}
+                            {include file="views/product_options/components/picker/picker.tpl"
+                                input_id="option_add"
+                                input_name="product_data[linked_option_ids][]"
+                                multiple=true
+                                meta="control-toolbar__select"
+                                select_class="cm-object-product-options-add"
+                                autofocus=$autofocus
+                                empty_variant_text=__("create_or_link_an_existing_option")
+                                allow_add=$enable_add && $allow_add_option
+                                create_option_to_end="true"
+                                form="form"
+                            }
+                    {/if}
 
+                {elseif $view_mode == "embed" && !$enable_search}
+                    {include file="common/popupbox.tpl" id="add_new_option" text=__("new_option") link_text=__("add_option") act="general" content=$smarty.capture.add_new_picker meta=$position icon="icon-plus"}
+
+                {else}
+                    {include file="common/popupbox.tpl" id="add_new_option" text=__("new_option") title=__("add_option") act="general" content=$smarty.capture.add_new_picker meta=$position icon="icon-plus"}
+                {/if}
+
+            {$extra nofilter}
+        </div>
         {/capture}
-        {$extra nofilter}
     {/if}
-        {if $object != "global"}
-            <div class="btn-toolbar clearfix cm-toggle-button">
-                {$smarty.capture.toolbar nofilter}
+        {if $object != "global" && $allow_add_option}
+            <div class="control-toolbar cm-toggle-button">
+                <div class="control-toolbar__btns">
+                    {$smarty.capture.toolbar nofilter}
+                </div>
+                <div class="control-toolbar__panel">
+                    <div id="product_options_quick_add_option"
+                        data-ca-product-id="{$product_id}"
+                        data-ca-target-id="product_options_list"
+                        data-ca-inline-dialog-action-context="products_update_options"
+                        data-ca-inline-dialog-url="{"product_options.quick_add"|fn_url}">
+                    </div>
+                </div>
             </div>
         {else}
-            {capture name="buttons"}
-                {if $product_options && $object == "global"}
-                    {capture name="tools_list"}
-                        <li>{btn type="list" text=__("apply_to_products") href="product_options.apply"}</li>
-                        <li>{btn type="delete_selected" dispatch="dispatch[product_options.m_delete]" form="manage_product_options_form"}</li>
-                    {/capture}
-                    {dropdown content=$smarty.capture.tools_list}
-                {/if}
-            {/capture}
             {capture name="adv_buttons"}
                 {$smarty.capture.toolbar nofilter}
             {/capture}
         {/if}
 
+        {$product_option_statuses = ""|fn_get_default_statuses:false}
+        {$has_permissions = fn_check_permissions("product_options", "update", "admin", "POST")}
+        {$has_available_options = empty($runtime.company_id) || in_array($runtime.company_id, array_column($product_options, 'company_id'))}
+
         <form action="{""|fn_url}" method="post" name="manage_product_options_form" id="manage_product_options_form">
             <input type="hidden" name="return_url" value="{$config.current_url}">
+            
+            {if $is_global && $has_permissions}
+                {hook name="product_options:bulk_edit"}
+                    {include file="views/product_options/components/bulk_edit.tpl"}
+                {/hook}
+            {/if}
+
             <div class="items-container {if ""|fn_check_form_permissions} cm-hide-inputs{/if}" id="product_options_list">
                 {if $product_options}
-                    <div class="table-responsive-wrapper">
+                    <div class="table-responsive-wrapper longtap-selection">
                         <table width="100%" class="table table-middle table--relative table-objects table-responsive">
-                            {if $object == "global"}
-                                <thead>
+                            {if $is_global}
+                                <thead
+                                        data-ca-bulkedit-default-object="true"
+                                        data-ca-bulkedit-component="defaultObject"
+                                    >
                                     <tr>
-                                        <th class="left mobile-hide" width="5%">
-                                            {include file="common/check_items.tpl" check_statuses=""|fn_get_default_status_filters:true}
+                                        <th width="6%" class="left mobile-hide" >
+                                            {include file="common/check_items.tpl" 
+                                                check_statuses=($has_permissions) ? ($product_option_statuses) : ""
+                                                is_check_disabled=!$has_available_options
+                                            }
+
+                                            <input type="checkbox"
+                                                class="bulkedit-toggler hide"
+                                                data-ca-bulkedit-toggler="true"
+                                                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                                                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+                                            />
                                         </th>
                                         <th>
-                                            <a class="cm-ajax" href="{"`$c_url`&sort_by=option_name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("name")}</a>{if $search.sort_by == "option_name"}{$c_icon nofilter}{/if} /
-                                            <a class="cm-ajax" href="{"`$c_url`&sort_by=internal_option_name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("code")}</a>{if $search.sort_by == "internal_option_name"}{$c_icon nofilter}{/if}{include file="common/tooltip.tpl" tooltip={__("internal_option_name_tooltip")}}
+                                            <a class="cm-ajax" href="{"`$c_url`&sort_by=internal_option_name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("name")}</a>{if $search.sort_by == "internal_option_name"}{$c_icon nofilter}{/if}{include file="common/tooltip.tpl" tooltip=__("internal_option_name_tooltip")} /
+                                            <a class="cm-ajax" href="{"`$c_url`&sort_by=option_name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("storefront_name")}</a>{if $search.sort_by == "option_name"}{$c_icon nofilter}{/if}
                                         </th>
                                         <th></th>
                                         <th></th>
@@ -135,11 +185,11 @@
                                     {if "MULTIVENDOR"|fn_allowed_for}
                                         {if $allow_save && ($product_option.company_id || !$runtime.company_id)}
                                             {$link_text = __("edit")}
-                                            {$additional_class = "cm-no-hide-input"}
+                                            {$additional_class = "cm-no-hide-input cm-longtap-target"}
                                             {$hide_for_vendor = false}
                                         {else}
                                             {$link_text = __("view")}
-                                            {$additional_class = ""}
+                                            {$additional_class = "cm-longtap-target"}
                                             {$hide_for_vendor = true}
                                         {/if}
                                     {/if}
@@ -158,9 +208,6 @@
                                     {/if}
 
                                     {$option_name = $product_option.option_name}
-                                    {if $product_option.internal_option_name}
-                                        {$internal_option_name = "<br />{$product_option.internal_option_name}"}
-                                    {/if}
 
                                     {include file="common/object_group.tpl"
                                         no_table=true
@@ -168,8 +215,8 @@
                                         id=$product_option.option_id
                                         id_prefix="_product_option_"
                                         details=$details
-                                        text=$product_option.option_name
-                                        href_desc=$internal_option_name
+                                        text=$product_option.internal_option_name
+                                        href_desc="<br />{$product_option.option_name}"
                                         hide_for_vendor=$hide_for_vendor
                                         status=$status
                                         table="product_options"
@@ -177,17 +224,21 @@
                                         href="product_options.update?option_id=`$product_option.option_id``$query_product_id`"
                                         href_delete=$href_delete
                                         delete_target_id=$delete_target_id
-                                        header_text="{__("editing_option")}: `$product_option.option_name`"
+                                        header_text=$product_option.option_name
                                         skip_delete=!$allow_save
                                         additional_class=$additional_class
                                         prefix="product_options"
                                         link_text=$link_text
                                         non_editable=$non_editable
                                         company_object=$product_option
-                                        href_desc_row_hint="{__("name")} / {__("code")}"
+                                        href_desc_row_hint="{__("storefront_name")} / {__("name")}"
                                         status_row_hint="{__("status")}"
                                         checkbox_name="option_ids[]"
                                         show_checkboxes=$show_checkboxes
+                                        hidden_checkbox=true
+                                        checkbox_col_width="6%"
+                                        is_bulkedit_menu=($is_global && $has_permissions && $has_available_options)
+                                        link_meta="bulkedit-deselect"
                                     }
                                 {/foreach}
                             </tbody>
@@ -205,5 +256,5 @@
 {if $object == "product"}
     {$smarty.capture.mainbox nofilter}
 {else}
-    {include file="common/mainbox.tpl" title=__("options") content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons select_language=$select_language}
+    {include file="common/mainbox.tpl" title=__("options") content=$smarty.capture.mainbox adv_buttons=$smarty.capture.adv_buttons select_language=$select_language}
 {/if}

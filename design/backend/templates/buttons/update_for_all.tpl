@@ -1,4 +1,6 @@
 {if $display}
+    {$absolute_position = $absolute_position|default:false}
+
     {if $hide_element}
         {$title_act = __("update_for_all_hid_act")}
         {$title_dis = __("update_for_all_hid_dis")}
@@ -15,7 +17,39 @@
     {if $runtime.simple_ultimate}
         {$visible = "hidden"}
     {/if}
+    {$object_ids = $object_ids|default:[$object_id]}
+    {$names = $names|default:[$object_id => $name]}
 
-    <a class="cm-update-for-all-icon icon-group cm-tooltip {$visible} {$meta}" title="{$title}" data-ca-title-active="{$title_act}" data-ca-title-disabled="{$title_dis}" data-ca-disable-id="{$object_id}" {if $hide_element}data-ca-hide-id="{$hide_element}"{/if}></a>
-    <input type="hidden" class="cm-no-hide-input" id="hidden_update_all_vendors_{$object_id}" name="{$name}" value="Y" {if $settings.Stores.default_state_update_for_all == 'not_active' && !$runtime.simple_ultimate}disabled="disabled"{/if} />
+    <div class="update-for-all
+        {if $absolute_position}
+            update-for-all--absolute
+        {elseif $static_position}
+            update-for-all--static
+        {/if}
+    ">
+        <a class="cm-update-for-all-icon
+            icon-group
+            update-for-all__icon
+            cm-tooltip
+            {$visible}
+            {$meta}"
+            href="#"
+            title="{$title}"
+            data-ca-title-active="{$title_act}"
+            data-ca-title-disabled="{$title_dis}"
+            data-ca-disable-id="{$object_ids|to_json}"
+            {if $hide_element}data-ca-hide-id="{$hide_element}"{/if}>
+        </a>
+        {foreach $names as $object_id => $name}
+            <input type="hidden"
+                class="cm-no-hide-input"
+                id="hidden_update_all_vendors_{$object_id}"
+                name="{$name}"
+                value="{"YesNo::YES"|enum}"
+                {if $settings.Stores.default_state_update_for_all === "not_active" && !$runtime.simple_ultimate}
+                    disabled="disabled"
+                {/if}
+            />
+        {/foreach}
+    </div>
 {/if}

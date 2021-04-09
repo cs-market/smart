@@ -129,7 +129,7 @@ function fn_get_banners($params = array(), $lang_code = CART_LANGUAGE, $items_pe
         $banners = fn_sort_by_ids($banners, explode(',', $params['item_ids']), 'banner_id');
     }
 
-    $banner_image_ids = fn_array_column($banners, 'banner_image_id');
+    $banner_image_ids = array_column($banners, 'banner_image_id');
     $images = fn_get_image_pairs($banner_image_ids, 'promo', 'M', true, false, $lang_code);
 
     foreach ($banners as $banner_id => $banner) {

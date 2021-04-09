@@ -27,8 +27,23 @@ class SiteArea
     const VENDOR_PANEL = 'V';
     const ADMIN_PANEL = 'A';
 
+    /**
+     * @param string $area Area
+     *
+     * @return bool
+     */
     public static function isStorefront($area)
     {
         return $area === self::STOREFRONT;
+    }
+
+    /**
+     * @param string $area Area
+     *
+     * @return bool
+     */
+    public static function isAdmin($area)
+    {
+        return $area === self::ADMIN_PANEL;
     }
 }

@@ -13,6 +13,8 @@
 ****************************************************************************/
 
 use Tygh\BlockManager\Block;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Languages\Languages;
 use Tygh\Menu;
 use Tygh\Navigation\LastView;
@@ -403,7 +405,7 @@ function fn_get_pages($params = array(), $items_per_page = 0, $lang_code = CART_
         if (!empty($params['get_children_count'])) {
             $where_condition = !empty($params['except_id']) ? db_quote(' AND page_id != ?i', $params['except_id']) : '';
             if ($params['get_tree'] == 'plain') {
-                $_page_ids = fn_array_column($pages, 'page_id');
+                $_page_ids = array_column($pages, 'page_id');
             } else {
                 $_page_ids = array_keys($pages);
             }
@@ -582,6 +584,23 @@ function fn_change_page_parent($page_id, $new_parent_id)
          * @param int $new_parent_id Identifier of new page parent
          */
         fn_set_hook('update_page_parent_pre', $page_id, $new_parent_id);
+
+        // checks for an attempt to set itself or a own child as its parent
+        $parent_page_data = fn_get_page_data($new_parent_id);
+        $parent_page_path_ids = explode('/', empty($parent_page_data['id_path']) ? '' : $parent_page_data['id_path']);
+
+        if (
+            (int) $page_id === (int) $new_parent_id
+            || in_array($page_id, $parent_page_path_ids)
+        ) {
+            fn_set_notification(
+                NotificationSeverity::WARNING,
+                __('warning'),
+                __('attempt_to_set_itself_or_a_own_child_as_its_parent_warning')
+            );
+
+            return false;
+        }
 
         $paths = db_get_hash_array("SELECT page_id, parent_id, id_path FROM ?:pages WHERE page_id IN (?n)", 'page_id', array($new_parent_id, $page_id));
 
@@ -983,26 +1002,27 @@ function fn_get_file_description($path, $descr_key, $get_lang_var = false)
 /**
  *  Delete page and its subpages
  *
- * @param int $page_id Page ID
+ * @param int  $page_id Page ID
  * @param bool $recurse Delete page recursively or not
- * @return array Returns ids of deleted pages or false if function can't delete page
+ *
+ * @return array<int>|bool Returns ids of deleted pages or false if function can't delete page
  */
 function fn_delete_page($page_id, $recurse = true)
 {
     $page_id = (int) $page_id;
     if (!empty($page_id) && fn_check_company_id('pages', 'page_id', $page_id)) {
         // Delete all subpages
-        if ($recurse == true) {
-            $id_path = db_get_field("SELECT id_path FROM ?:pages WHERE page_id = ?i", $page_id);
-            $page_ids	= db_get_fields("SELECT page_id FROM ?:pages WHERE page_id = ?i OR id_path LIKE ?l", $page_id, "$id_path/%");
+        if ($recurse === true) {
+            $id_path = db_get_field('SELECT id_path FROM ?:pages WHERE page_id = ?i', $page_id);
+            $page_ids = db_get_fields('SELECT page_id FROM ?:pages WHERE page_id = ?i OR id_path LIKE ?l', $page_id, $id_path . '/%');
         } else {
             $page_ids = array($page_id);
         }
 
         foreach ($page_ids as $v) {
             // Deleting page
-            db_query("DELETE FROM ?:pages WHERE page_id = ?i", $v);
-            db_query("DELETE FROM ?:page_descriptions WHERE page_id = ?i", $v);
+            db_query('DELETE FROM ?:pages WHERE page_id = ?i', $v);
+            db_query('DELETE FROM ?:page_descriptions WHERE page_id = ?i', $v);
             fn_set_hook('delete_page', $v);
 
             Block::instance()->removeDynamicObjectData('pages', $v);
@@ -1066,9 +1086,7 @@ function fn_get_avail_languages($area = AREA, $include_hidden = false)
  */
 function fn_get_simple_currencies($only_avail = true)
 {
-    $status_cond = ($only_avail) ? "WHERE status = 'A'" : '';
-
-    return db_get_hash_single_array("SELECT a.*, b.description FROM ?:currencies as a LEFT JOIN ?:currency_descriptions as b ON a.currency_code = b.currency_code AND lang_code = ?s $status_cond ORDER BY a.position", array('currency_code' , 'description'), CART_LANGUAGE);
+    return array_column(fn_get_currencies_list() , 'description', 'currency_code');
 }
 
 /**
@@ -1627,4 +1645,108 @@ function fn_page_exists($page_id, $additional_condition = null)
         'SELECT COUNT(*) FROM ?:pages WHERE page_id = ?i ' . $additional_condition,
         $page_id
     );
+}
+
+/**
+ * Gets depenencies for menu items.
+ * Usable for generating block cache hash.
+ *
+ * @param int $menu_id
+ *
+ * @return array
+ * @internal
+ */
+function fn_menu_get_menu_items_dependencies($menu_id)
+{
+    $key = 'menu_items_dependencies_' . $menu_id;
+
+    Registry::registerCache(['menu_items_dependencies', $key], ['static_data'], Registry::cacheLevel('static'));
+
+    if (Registry::isExist($key)) {
+        return Registry::get($key);
+    }
+
+    $dependencies = [
+        'request' => [],
+        'runtime' => [],
+    ];
+
+    $static_datas = db_get_array(
+        'SELECT param, param_3 FROM ?:static_data WHERE param_5 = ?s AND section = ?s',
+        $menu_id,
+        ObjectStatuses::ACTIVE
+    );
+
+    if (empty($static_datas)) {
+        return $dependencies;
+    }
+
+    foreach ($static_datas as $item) {
+        $url = $item['param'];
+        $sub_menu = $item['param_3'];
+        $dispatch = null;
+        $request = [];
+        $runtime = [];
+
+        if ($url) {
+            if (
+                ($pos = strpos($url, '&')) !== false
+                && strpos($url, '?') === false
+            ) {
+                $url[$pos] = '?';
+            }
+
+            $parsed = parse_url($url);
+
+            if (!isset($parsed['path'])) {
+                $parsed['path'] = 'index.index';
+            }
+
+            if (isset($parsed['query'])) {
+                parse_str($parsed['query'], $parsed['query']);
+            } else {
+                $parsed['query'] = [];
+            }
+
+            if (isset($parsed['query']['dispatch'])) {
+                $dispatch = trim($parsed['query']['dispatch']);
+                $request = $parsed['query'];
+
+                unset($request['dispatch']);
+            } else {
+                $dispatch = $parsed['path'];
+                $request = $parsed['query'];
+            }
+        } elseif ($sub_menu) {
+            list($sub_menu_type) = explode(':', $sub_menu);
+
+            if ($sub_menu_type === 'C') {
+                $dispatch = 'categories.view';
+                $runtime['active_category_ids'] = 'active_category_ids';
+                $request['category_id'] = '*';
+            } elseif ($sub_menu_type === 'A') {
+                $dispatch = 'pages.view';
+                $runtime['active_page_ids'] = 'active_page_ids';
+                $request['page_id'] = '*';
+            }
+        }
+
+        if (!isset($dependencies['request'][$dispatch])) {
+            $dependencies['request'][$dispatch] = [];
+        }
+
+        $dependencies['request'][$dispatch][] = $request;
+        $dependencies['runtime'] = array_merge($dependencies['runtime'], $runtime);
+    }
+
+    foreach ($dependencies['request'] as &$items) {
+        usort($items, static function ($r1, $r2) {
+            return count($r1) < count($r2) ? 1 : -1;
+        });
+    }
+    unset($items);
+
+    Registry::set($key, $dependencies);
+
+    return $dependencies;
 }

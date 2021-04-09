@@ -7,6 +7,7 @@ namespace Tygh\Tests\Unit\Mailer\MessageBuilders;
 use Tygh\Mailer\AMessageBuilder;
 use Tygh\Mailer\Message;
 use Tygh\Storefront\Repository;
+use Tygh\Storefront\Storefront;
 use Tygh\Tests\Unit\ATestCase;
 
 class MessageBuilderTest extends ATestCase
@@ -18,6 +19,7 @@ class MessageBuilderTest extends ATestCase
     public function setUp()
     {
         $this->requireMockFunction('fn_disable_live_editor_mode');
+        $this->requireMockFunction('fn_filter_company_data_by_profile_fields');
     }
 
     /**
@@ -26,7 +28,7 @@ class MessageBuilderTest extends ATestCase
      */
     public function getMessageBuilder($data = array())
     {
-        return new MessageBuilder($data, $this->createMock(Repository::class));
+        return new MessageBuilder($data, $this->createMock(Repository::class), $this->createMock(Storefront::class));
     }
 
     public function testGetMessageFrom()
@@ -182,7 +184,7 @@ class MessageBuilderTest extends ATestCase
      * @param $files
      * @dataProvider dpRetrieveEmbeddedImages
      */
-    public function testRetrieveEmbeddedImages($body, $files)
+    public function testRetrieveEmbeddedImages($body, $files, $strorefront_url = null)
     {
         $builder = $this->getMessageBuilder(array(
             'http_location' => 'http://http_location.loc',
@@ -197,7 +199,15 @@ class MessageBuilderTest extends ATestCase
         $message = new Message();
         $message->setBody($body);
 
-        $builder->retrieveEmbeddedImages($message);
+        if ($strorefront_url) {
+            /** @var Storefront $storefront */
+            $storefront = $this->createMock(Storefront::class);
+            $storefront->url = $strorefront_url;
+        } else {
+            $storefront = null;
+        }
+
+        $builder->retrieveEmbeddedImages($message, $storefront);
 
         if (!empty($files)) {
             $this->assertNotEmpty($message->getEmbeddedImages());
@@ -241,6 +251,15 @@ class MessageBuilderTest extends ATestCase
                     __DIR__ . '/images/path/detailed.jpeg'
                 )
             ),
+            [
+                '<div style="background: transparent url(\'http://acme.cs-cart.loc/http_path/images/image.jpeg\')">Background image</div>'
+                . 'Tag image: <img src="https://acme.cs-cart.loc/http_path/images/path/detailed.jpeg">',
+                [
+                    __DIR__ . '/images/image.jpeg',
+                    __DIR__ . '/images/path/detailed.jpeg'
+                ],
+                'acme.cs-cart.loc/http_path'
+            ]
         );
     }
 
@@ -251,7 +270,7 @@ class MessageBuilderTest extends ATestCase
      */
     public function testCreateMessage($params, $expected)
     {
-        $builder = new MessageBuilder(array(), $this->createMock(Repository::class));
+        $builder = new MessageBuilder(array(), $this->createMock(Repository::class), $this->createMock(Storefront::class));
         $message = $builder->createMessage($params, 'C', 'en');
 
         foreach ($expected as $key => $value) {

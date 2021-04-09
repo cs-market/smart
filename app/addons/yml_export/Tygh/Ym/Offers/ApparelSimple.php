@@ -16,6 +16,7 @@ namespace Tygh\Ym\Offers;
 
 use Tygh\Ym\Offers;
 use Tygh\Ym\Logs;
+use Tygh\Enum\ProductTracking;
 
 class ApparelSimple extends Simple
 {
@@ -68,7 +69,7 @@ class ApparelSimple extends Simple
         $this->getApparelOffer($product);
 
         if ($this->options['export_stock'] == 'Y') {
-            if ($product['tracking'] == 'B' && $product['amount'] <= 0) {
+            if ($product['tracking'] !== ProductTracking::DO_NOT_TRACK && $product['amount'] <= 0) {
                 $this->log->write(Logs::SKIP_PRODUCT, $product, __('yml2_log_product_amount_is_empty'));
                 $yml2_product_skip++;
 
@@ -89,11 +90,8 @@ class ApparelSimple extends Simple
 
         } else {
             $product['product_options'] = empty($product['product_options']) ? fn_get_product_options($product['product_id'], CART_LANGUAGE) : $product['product_options'];
-            list($product_combinations,) = fn_get_product_options_inventory(array('product_id' => $product['product_id']));
 
-            if (empty($product_combinations)) {
-                $product_combinations = $this->generateCombinations($product);
-            }
+            $product_combinations = $this->generateCombinations($product);
 
             if (empty($product_combinations)) {
                 $this->log->write(Logs::SKIP_PRODUCT, $product, __('yml2_log_product_combinations_are_empty'));
@@ -128,41 +126,13 @@ class ApparelSimple extends Simple
         $this->offer['items']['param'] = $this->params;
         $product_options = $product['product_options'];
 
-        $skip = false;
         foreach($combination['combination'] as $option_id => $variant_id) {
             if (!isset($product_options[$option_id]['variants'][$variant_id])) {
-                $skip = true;
-                break;
+                return false;
             }
         }
 
         $options = fn_get_selected_product_options($product['product_id'], $combination['combination']);
-        if ($this->options['export_stock'] == 'Y') {
-            if ($product['tracking'] == 'O' && $combination['amount'] <= 0) {
-
-                $combination_text = array();
-                foreach ($options as $option) {
-                    if (!empty($option['yml2_type_options'])) {
-                        list($value, $variant_name) = $this->getValueOption($option);
-                        $variant_name = str_replace(";", " ", $variant_name);
-                        $combination_text[] = $value . ": " . $variant_name;
-                    }
-                }
-
-                $this->log->write(Logs::SKIP_PRODUCT_COMBINATION, $product, __('yml2_log_product_amount_combination_is_empty', array(
-                    '[combinations]' => implode(', ' , $combination_text)))
-                );
-                $skip = true;
-            }
-        }
-
-        if ($skip) {
-            return false;
-        }
-
-        if ($product['tracking'] == 'O' && $combination['amount'] <= 0) {
-            $this->offer['attr']['available'] = 'false';
-        }
 
         if (!empty($combination['image_pairs'])) {
             $url = $this->getImageUrl($combination['image_pairs']);

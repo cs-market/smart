@@ -131,12 +131,12 @@ function fn_storefront_rest_api_format_order_prices(array $order, $currency = CA
     }
 
     if (!empty($order['products'])) {
-        $order['products'] = fn_storefront_rest_api_format_products_prices($order['products']);
+        $order['products'] = fn_storefront_rest_api_format_products_prices($order['products'], $currency);
     }
 
     if (!empty($order['product_groups'])) {
         foreach ($order['product_groups'] as &$group) {
-            $group['products'] = fn_storefront_rest_api_format_products_prices($group['products']);
+            $group['products'] = fn_storefront_rest_api_format_products_prices($group['products'], $currency);
             foreach ($group['shippings'] as &$shipping) {
                 $shipping['rate_formatted'] = fn_storefront_rest_api_format_price($shipping['rate'], $currency);
             }
@@ -901,4 +901,49 @@ function fn_storefront_rest_api_strip_service_data(array $cart)
     fn_set_hook('storefront_rest_api_strip_service_data_post', $cart);
 
     return $cart;
+}
+
+/**
+ * Gathers additional product data for an API request.
+ *
+ * @param array<int, array<string, string|int|bool>> $products Products to gather data for
+ * @param array<string, string>                      $params   Request parameters
+ *
+ * @return array<int, array<string|int|bool>> Products with additional data gathered
+ */
+function fn_storefront_rest_api_gather_additional_products_data(array $products, array $params = [])
+{
+    $data_gather_params = [
+        'get_options'         => true,
+        'get_features'        => true,
+        'get_detailed'        => true,
+        'get_icon'            => true,
+        'get_additional'      => true,
+        'get_discounts'       => true,
+        'features_display_on' => 'A',
+    ];
+
+    /**
+     * Executes before gathering additional product data for an API request,
+     * allows you to modify data gather parameters.
+     *
+     * @param array<int, array<string, string|int|bool>> $products           Products
+     * @param array<string, string>                      $params             Request parameters
+     * @param array<string, string>                      $data_gather_params Product data gather parameters
+     */
+    fn_set_hook('storefront_rest_api_gather_additional_products_data_pre', $products, $params, $data_gather_params);
+
+    fn_gather_additional_products_data($products, $data_gather_params);
+
+    /**
+     * Executes after gathering additional product data for an API request,
+     * allows you to modify gathered data.
+     *
+     * @param array<int, array<string, string|int|bool>> $products           Products
+     * @param array<string, string>                      $params             Request parameters
+     * @param array<string, string>                      $data_gather_params Product data gather parameters
+     */
+    fn_set_hook('storefront_rest_api_gather_additional_products_data_post', $products, $params, $data_gather_params);
+
+    return $products;
 }

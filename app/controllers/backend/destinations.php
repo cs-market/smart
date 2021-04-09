@@ -45,6 +45,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix = ".manage";
     }
 
+    if ($mode === 'update_status') {
+        if (!empty($_REQUEST['destination_ids'])) {
+            foreach ($_REQUEST['destination_ids'] as $destination_id) {
+                fn_tools_update_status([
+                    'table'             => 'destinations',
+                    'status'            => $_REQUEST['status'],
+                    'id_name'           => 'destination_id',
+                    'id'                => $destination_id,
+                    'show_error_notice' => false
+                ]);
+            }
+        }
+
+        return [CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']];
+    }
+
     return array(CONTROLLER_STATUS_OK, 'destinations' . $suffix);
 }
 
@@ -104,7 +120,15 @@ if ($mode === 'update') {
 } elseif ($mode === 'manage') {
 
     $destinations = fn_get_destinations(DESCR_SL);
-    Tygh::$app['view']->assign('destinations', $destinations);
+    Tygh::$app['view']->assign('destinations', $destinations);  
+} elseif ($mode === 'selector') {
+    list($objects, $total_objects) = fn_get_destinations_for_picker($_REQUEST);
+
+    /** @var \Tygh\Ajax $ajax */
+    $ajax = Tygh::$app['ajax'];
+    $ajax->assign('objects', $objects);
+    $ajax->assign('total_objects', $total_objects);
+    return [CONTROLLER_STATUS_NO_CONTENT];
 }
 
 if (in_array($mode, ['add', 'update', 'manage'])) {

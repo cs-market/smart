@@ -122,7 +122,8 @@
         current_url: '{$config.current_url|fn_url|escape:javascript nofilter}',
         current_host: '{$config.current_host|escape:javascript nofilter}',
         init_context: '{$smarty.request.init_context|escape:javascript nofilter}',
-        phone_validation_mode: '{$settings.Appearance.phone_validation_mode}'
+        phone_validation_mode: '{$settings.Appearance.phone_validation_mode}',
+        hash_of_available_countries: '{$hash_of_available_countries}'
     });
 
     {if $live_editor_objects}

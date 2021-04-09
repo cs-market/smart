@@ -25,5 +25,17 @@ fn_register_hooks(
     'dispatch_before_display',
     'get_order_info',
     'catalog_mode_pre_add_to_cart',
-    'promotion_apply_pre'
+    'promotion_apply_pre',
+    'change_company_status_before_mail',
+    'vendor_payouts_update_post',
+    'get_companies_pre',
+    'get_companies',
+    'get_products_before_select',
+    'login_user_post',
+    'dashboard_get_vendor_activities_post',
+    'dispatch_before_send_response',
+    'get_product_data_pre',
+    'pre_get_cart_product_data',
+    'init_templater_post',
+    'get_product_data_post'
 );

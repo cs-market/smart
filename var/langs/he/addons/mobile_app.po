@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: he\n"
-"X-Crowdin-File: /release-4.11.5/addons/mobile_app.po\n"
-"X-Crowdin-File-ID: 3668\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/mobile_app.po\n"
+"X-Crowdin-File-ID: 4184\n"
+"PO-Revision-Date: 2021-02-01 09:06\n"
 
 msgctxt "Addons::name::mobile_app"
 msgid "Mobile application"
@@ -23,6 +23,10 @@ msgstr "יישום מובייל"
 msgctxt "Languages::app_params"
 msgid "Application"
 msgstr "יישום"
+
+msgctxt "Languages::mobile_app.mobile_apply"
+msgid "Apply"
+msgstr ""
 
 msgctxt "Languages::mobile_app.section.category"
 msgid "Categories"
@@ -52,6 +56,30 @@ msgctxt "Languages::mobile_app.appname"
 msgid "App Name"
 msgstr "שם האפליקציה"
 
+msgctxt "Languages::mobile_app.mobile_settings"
+msgid "Settings"
+msgstr "הגדרות"
+
+msgctxt "Languages::mobile_app.mobile_select_language"
+msgid "Select Language"
+msgstr "בחר שפה"
+
+msgctxt "Languages::mobile_app.mobile_pages"
+msgid "Pages"
+msgstr "דפים"
+
+msgctxt "Languages::mobile_app.mobile_currency"
+msgid "Currency"
+msgstr "מטבע"
+
+msgctxt "Languages::mobile_app.mobile_language"
+msgid "Language"
+msgstr "שפה"
+
+msgctxt "Languages::mobile_app.mobile_favorite"
+msgid "Favorite"
+msgstr "מועדף"
+
 msgctxt "Languages::mobile_app.appshortdescription"
 msgid "Short description"
 msgstr "תיאור קצר"
@@ -59,6 +87,10 @@ msgstr "תיאור קצר"
 msgctxt "Languages::mobile_app.appfulldescription"
 msgid "Full description"
 msgstr "תיאור מלא"
+
+msgctxt "Languages::mobile_app.mobile_full_product_description"
+msgid "Full description"
+msgstr ""
 
 msgctxt "Languages::mobile_app.supportemail"
 msgid "Support email"
@@ -95,6 +127,10 @@ msgstr "התראות sms"
 msgctxt "Languages::ttc_mobile_app.pushnotifications"
 msgid "Push notifications"
 msgstr "התראות sms"
+
+msgctxt "Languages::mobile_app.mobile_buyer"
+msgid "Buyer"
+msgstr ""
 
 msgctxt "Languages::bundleid"
 msgid "Bundle Id"
@@ -261,8 +297,8 @@ msgid "Update texts using existing locale files"
 msgstr "עדכן טקסטים באמצעות קבצי מקום קיימים"
 
 msgctxt "Languages::mobile_app.invalid_locale_file"
-msgid "Invalid locale file selected for the \"[language]\" language"
-msgstr "קובץ אזור לא חוקי שנבחר לשפת \"[שפה]\""
+msgid "Locale file selected for the \"[language]\" language is not a valid JSON file"
+msgstr "קובץ האזור שנבחר עבור השפה \"[שפה]\" אינו קובץ JSON חוקי"
 
 msgctxt "Languages::mobile_app.app_translation_updated.item"
 msgid "[language]: [n] texts|[language]: [n] texts"
@@ -1263,6 +1299,10 @@ msgstr "פייף"
 msgctxt "Languages::mobile_app.mobile_fiji"
 msgid "Fiji"
 msgstr "פיג'י"
+
+msgctxt "Languages::mobile_app.mobile_filter"
+msgid "Filter"
+msgstr "מסנן"
 
 msgctxt "Languages::mobile_app.mobile_finistere"
 msgid "Finistère"
@@ -3004,6 +3044,14 @@ msgctxt "Languages::mobile_app.mobile_selkirkshire"
 msgid "Selkirkshire"
 msgstr "סלקירקשייר"
 
+msgctxt "Languages::mobile_app.mobile_seller"
+msgid "Seller"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_sellers"
+msgid "Sellers"
+msgstr ""
+
 msgctxt "Languages::mobile_app.mobile_senegal"
 msgid "Senegal"
 msgstr "סנגל"
@@ -3730,11 +3778,11 @@ msgstr "אווילה"
 
 msgctxt "Languages::mobile_app.mobile_address"
 msgid "Address"
-msgstr ""
+msgstr "כתובת"
 
 msgctxt "Languages::mobile_app.mobile_address_2"
 msgid "Address 2"
-msgstr ""
+msgstr "כתובת 2"
 
 msgctxt "Languages::mobile_app.mobile_add_to_cart"
 msgid "Add to cart"
@@ -3774,7 +3822,7 @@ msgstr "מספר כרטיס"
 
 msgctxt "Languages::mobile_app.mobile_categories"
 msgid "Categories"
-msgstr ""
+msgstr "קטגוריות"
 
 msgctxt "Languages::mobile_app.mobile_change_address"
 msgid "Change address"
@@ -3803,6 +3851,10 @@ msgstr "ספקים"
 msgctxt "Languages::mobile_app.mobile_clear_all_cart"
 msgid "Clear all cart ?"
 msgstr "לנקות את כל העגלה?"
+
+msgctxt "Languages::mobile_app.mobile_clear_all_filter"
+msgid "Clear all"
+msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_clear_wish_list"
 msgid "Clear wish list?"
@@ -3838,7 +3890,7 @@ msgstr "תגובות"
 
 msgctxt "Languages::mobile_app.mobile_email"
 msgid "Email"
-msgstr ""
+msgstr "דואר אלקטרוני"
 
 msgctxt "Languages::mobile_app.mobile_your_wish_lists_will_love_here"
 msgid "Your Wish Lists will love here."
@@ -3858,7 +3910,7 @@ msgstr "פקס"
 
 msgctxt "Languages::mobile_app.mobile_features"
 msgid "Features"
-msgstr ""
+msgstr "תכונות"
 
 msgctxt "Languages::mobile_app.mobile_go_to_store"
 msgid "Go To Store"
@@ -3874,7 +3926,7 @@ msgstr "מידע"
 
 msgctxt "Languages::mobile_app.mobile_items"
 msgid "{{count}} item(s)"
-msgstr ""
+msgstr "{{count}} פריטים"
 
 msgctxt "Languages::mobile_app.mobile_list_is_empty"
 msgid "List is empty"
@@ -3883,6 +3935,10 @@ msgstr "הרשימה ריקה"
 msgctxt "Languages::mobile_app.mobile_login"
 msgid "Login"
 msgstr "כניסה"
+
+msgctxt "Languages::mobile_app.mobile_logout"
+msgid "Logout"
+msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_looking_for_ideas"
 msgid "Looking for ideas?"
@@ -3906,11 +3962,11 @@ msgstr "לא נמצאו פרסומים"
 
 msgctxt "Languages::mobile_app.mobile_reviews_quantity"
 msgid "{{count}} reviews"
-msgstr ""
+msgstr "{{count}} תגובות"
 
 msgctxt "Languages::mobile_app.mobile_products_found"
 msgid "Products found: {{count}}"
-msgstr ""
+msgstr "מוצרים שנמצאו: {{count}}"
 
 msgctxt "Languages::mobile_app.mobile_ok"
 msgid "Ok"
@@ -3970,7 +4026,7 @@ msgstr "הרשמה הסתיימה."
 
 msgctxt "Languages::mobile_app.mobile_reviews_product_details"
 msgid "Reviews ({{count}})"
-msgstr ""
+msgstr "{{count}} תגובות"
 
 msgctxt "Languages::mobile_app.mobile_search"
 msgid "Search"
@@ -3994,11 +4050,11 @@ msgstr "כתובת למשלוח"
 
 msgctxt "Languages::mobile_app.mobile_shipping_cost"
 msgid "Shipping cost"
-msgstr ""
+msgstr "עלות משלוח"
 
 msgctxt "Languages::mobile_app.mobile_shipping_method"
 msgid "Shipping method"
-msgstr ""
+msgstr "שיטת המשלוח"
 
 msgctxt "Languages::mobile_app.mobile_show_all"
 msgid "Show all"
@@ -4014,7 +4070,7 @@ msgstr "להתחבר כמשתמש אחר"
 
 msgctxt "Languages::mobile_app.mobile_subtotal"
 msgid "Subtotal"
-msgstr ""
+msgstr "סה\"כ"
 
 msgctxt "Languages::mobile_app.mobile_success"
 msgid "Success"
@@ -4054,7 +4110,7 @@ msgstr "תודה על פוסט שלך."
 
 msgctxt "Languages::mobile_app.mobile_there_are_no_features"
 msgid "There are no features."
-msgstr ""
+msgstr "אין תכונות."
 
 msgctxt "Languages::mobile_app.mobile_valid_thru_mm"
 msgid "Valid thru (mm)"
@@ -4118,19 +4174,19 @@ msgstr "שמך"
 
 msgctxt "Languages::mobile_app.mobile_password"
 msgid "Password"
-msgstr ""
+msgstr "סיסמה"
 
 msgctxt "Languages::mobile_app.mobile_zip_code"
 msgid "Zip code"
-msgstr ""
+msgstr "מיקוד"
 
 msgctxt "Languages::mobile_app.mobile_add"
 msgid "Add"
-msgstr ""
+msgstr "להוסיף"
 
 msgctxt "Languages::mobile_app.mobile_including_tax"
 msgid "Including tax"
-msgstr ""
+msgstr "כולל מיסים"
 
 msgctxt "Languages::mobile_app.mobile_orders"
 msgid "Orders"
@@ -4154,125 +4210,169 @@ msgstr "|"
 
 msgctxt "Languages::mobile_app.mobile_add_product"
 msgid "Add product"
-msgstr ""
+msgstr "הוסף מוצר"
 
 msgctxt "Languages::mobile_app.mobile_vendor_orders"
 msgid "Vendor Orders"
-msgstr ""
+msgstr "הזמנות הספק"
 
 msgctxt "Languages::mobile_app.mobile_select_product_image"
 msgid "Select product image"
-msgstr ""
+msgstr "בחר תמונה של מוצר"
 
 msgctxt "Languages::mobile_app.mobile_image"
 msgid "Image"
-msgstr ""
+msgstr "תמונה"
 
 msgctxt "Languages::mobile_app.mobile_select_image"
 msgid "Select image"
-msgstr ""
+msgstr "בחר תמונה"
 
 msgctxt "Languages::mobile_app.mobile_there_are_no_images"
 msgid "There are no images"
-msgstr ""
+msgstr "אין תמונות"
 
 msgctxt "Languages::mobile_app.mobile_select"
 msgid "Select"
-msgstr ""
+msgstr "בחר"
 
 msgctxt "Languages::mobile_app.mobile_enter_the_name"
 msgid "Enter the name"
-msgstr ""
+msgstr "הזן את שם"
 
 msgctxt "Languages::mobile_app.mobile_name"
 msgid "Name"
+msgstr "שם"
+
+msgctxt "Languages::mobile_app.mobile_description_optional"
+msgid "Description (optional)"
 msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_description"
 msgid "Description"
-msgstr ""
+msgstr "תיאור"
 
 msgctxt "Languages::mobile_app.mobile_enter_the_price"
 msgid "Enter the price"
-msgstr ""
+msgstr "הזן את המחיר"
 
 msgctxt "Languages::mobile_app.mobile_price"
 msgid "Price"
-msgstr ""
+msgstr "מחיר"
 
 msgctxt "Languages::mobile_app.mobile_in_stock"
 msgid "In stock"
-msgstr ""
+msgstr "במלאי"
 
 msgctxt "Languages::mobile_app.mobile_create"
 msgid "Create"
-msgstr ""
+msgstr "צור"
 
 msgctxt "Languages::mobile_app.mobile_the_product_was_created"
 msgid "The product was created"
-msgstr ""
+msgstr "המוצר נוצר"
 
 msgctxt "Languages::mobile_app.mobile_the_product_was_updated"
 msgid "The product was updated"
-msgstr ""
+msgstr "המוצר עודכן"
 
 msgctxt "Languages::mobile_app.mobile_the_product_was_deleted"
 msgid "The product was deleted"
-msgstr ""
+msgstr "המוצר נמחק"
 
 msgctxt "Languages::mobile_app.mobile_delete_this_product"
 msgid "Delete This Product"
-msgstr ""
+msgstr "מחק מוצר זה"
 
 msgctxt "Languages::mobile_app.mobile_status"
 msgid "Status"
-msgstr ""
+msgstr "סטטוס"
 
 msgctxt "Languages::mobile_app.mobile_active"
 msgid "Active"
-msgstr ""
+msgstr "פעיל"
 
 msgctxt "Languages::mobile_app.mobile_hidden"
 msgid "Hidden"
-msgstr ""
+msgstr "מוסתר"
 
 msgctxt "Languages::mobile_app.mobile_disabled"
 msgid "Disabled"
-msgstr ""
+msgstr "מושבת"
 
 msgctxt "Languages::mobile_app.mobile_make_product_active"
 msgid "Make Product Active"
-msgstr ""
+msgstr "הפוך את המוצר לפעיל"
 
 msgctxt "Languages::mobile_app.mobile_make_product_hidden"
 msgid "Make Product Hidden"
-msgstr ""
+msgstr "הפוך את המוצר לנסתר"
 
 msgctxt "Languages::mobile_app.mobile_make_product_disabled"
 msgid "Make Product Disabled"
-msgstr ""
+msgstr "הפוך את המוצר למושב"
 
 msgctxt "Languages::mobile_app.mobile_pricing_slash_inventory"
 msgid "Pricing / Inventory"
-msgstr ""
+msgstr "תמחור / מלאי"
 
 msgctxt "Languages::mobile_app.mobile_code"
 msgid "CODE"
-msgstr ""
+msgstr "קוד"
 
 msgctxt "Languages::mobile_app.mobile_list_price_dollar"
 msgid "List price ($)"
-msgstr ""
+msgstr "מחיר מחירון ($)"
 
 msgctxt "Languages::mobile_app.mobile_shipping_properties"
 msgid "Shipping properties"
-msgstr ""
+msgstr "מאפייני המשלוח"
 
 msgctxt "Languages::mobile_app.mobile_weight_lbs"
 msgid "Weight (lbs)"
-msgstr ""
+msgstr "משקל (ק\"ג)"
 
 msgctxt "Languages::mobile_app.mobile_free_shipping"
 msgid "Free shipping"
-msgstr ""
+msgstr "משלוח חינם"
+
+msgctxt "Languages::mobile_app.promotion"
+msgid "Promotion"
+msgstr "מבצע"
+
+msgctxt "Languages::mobile_app.app_store_app_id"
+msgid "App Store application ID"
+msgstr "מזהה יישום App Store"
+
+msgctxt "Languages::mobile_app.google_play_app_id"
+msgid "Google Play application ID"
+msgstr "מזהה יישום של Google Play"
+
+msgctxt "Languages::mobile_app.promotion_note"
+msgid "Visitors of your site who use iOS or Android devices will see a prompt to install the mobile application.<br>To show your application's icon in this prompt, <a href=\"[icon_url]\">upload App Icon</a> in the add-on settings. If App Icon is not specified, the favicon of a storefront will be used instead."
+msgstr "מבקרים באתר שלך המשתמשים במכשירי iOS או Android יראו הנחיה להתקין את היישום הנייד.<br>כדי להציג את סמל היישום שלך בהנחיה זו,<a href=\"[icon_url]\">העלה אייקון יישום</a>בהגדרות התוספת. אם אייקון האפליקציה לא צוין, ישתמש במקומו בפאב של חלון ראווה."
+
+msgctxt "Languages::mobile_app.we_also_have_a_mobile_app"
+msgid "We also have a mobile app"
+msgstr "יש לנו גם אפליקציה לנייד"
+
+msgctxt "Languages::mobile_app.view_demo"
+msgid "View demo"
+msgstr "צפו בהדגמה"
+
+msgctxt "Languages::mobile_app.open"
+msgid "Open"
+msgstr "פתח"
+
+msgctxt "Languages::mobile_app.app_store_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://www.apple.com/app-store\" target=\"_blank\">App Store</a>. <br> For example, in https://apps.apple.com/us/app/multi-vendor-app-by-cs-cart/id1304872157 the ID is 1304872157."
+msgstr "קח את זה מקישור היישום<a href=\"https://www.apple.com/app-store\" target=\"_blank\">App Store</a>. <br>לדוגמא, ב https://apps.apple.com/us/app/multi-vendor-app-by-cs-cart/id1304872157 the ID is 1304872157."
+
+msgctxt "Languages::mobile_app.google_play_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://play.google.com/store\" target=\"_blank\">Google Play</a>. <br> For example, in https://play.google.com/store/apps/details?id=com.simtech.multivendor&hl=en_US the ID is com.simtech.multivendor."
+msgstr "קח את זה מקישור היישום ב- <a href=\"https://play.google.com/store\" target=\"_blank\">Google Play</a> .<br> לדוגמה, ב- https://play.google.com/store/apps/details?id=com.simtech.multivendor&hl=en_US המזהה הוא com.simtech.multivendor."
+
+msgctxt "Languages::mobile_app.mobile_yookassa"
+msgid "YooKassa"
+msgstr "YooKassa"
 

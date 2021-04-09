@@ -72,13 +72,16 @@ class ProductConvertor
     /**
      * Convertes CommerceML element product to ProductDTO
      *
-     * @param \Tygh\Addons\CommerceML\Xml\SimpleXmlElement   $element        Xml element
-     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage instance
+     * @param \Tygh\Addons\CommerceML\Xml\SimpleXmlElement   $element              Xml element
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage       Import storage instance
+     * @param bool                                           $is_product_creatable Flag if product is creatable, or not
      */
-    public function convert(SimpleXmlElement $element, ImportStorage $import_storage)
+    public function convert(SimpleXmlElement $element, ImportStorage $import_storage, $is_product_creatable = true)
     {
         $entities = [];
         $product = new ProductDto();
+
+        $product->is_creatable = $is_product_creatable;
 
         $product->id = IdDto::createByExternalId($element->getAsString('id'));
 
@@ -167,16 +170,18 @@ class ProductConvertor
 
         $entities = array_merge($variation_entities, $entities);
 
-        /**
-         * Executes after CommerceML element product converted to product DTO
-         * Allows to modify or extend product DTO
-         *
-         * @param \Tygh\Addons\CommerceML\Xml\SimpleXmlElement          $element        Xml element
-         * @param \Tygh\Addons\CommerceML\Storages\ImportStorage        $import_storage Import storage instance
-         * @param array<\Tygh\Addons\CommerceML\Dto\ProductDto>         $products       List of product DTO
-         * @param array<\Tygh\Addons\CommerceML\Dto\RepresentEntityDto> $entities       Other entites data
-         */
-        fn_set_hook('commerceml_product_convertor_convert', $element, $import_storage, $product, $entities);
+        foreach ($products as $product) {
+            /**
+             * Executes after CommerceML element product converted to product DTO
+             * Allows to modify or extend product DTO
+             *
+             * @param \Tygh\Addons\CommerceML\Xml\SimpleXmlElement          $element        Xml element
+             * @param \Tygh\Addons\CommerceML\Storages\ImportStorage        $import_storage Import storage instance
+             * @param \Tygh\Addons\CommerceML\Dto\ProductDto                $product        Product Dto
+             * @param array<\Tygh\Addons\CommerceML\Dto\RepresentEntityDto> $entities       Other entites data
+             */
+            fn_set_hook('commerceml_product_convertor_convert', $element, $import_storage, $product, $entities);
+        }
 
         $import_storage->saveEntities(array_merge($products, $entities));
     }
@@ -358,9 +363,7 @@ class ProductConvertor
                 )
             );
 
-            if ($this->tryConvertPropertyValueToLocalProperty($item, $product, $product_feature_value, $import_storage)) {
-                continue;
-            }
+            $this->tryConvertPropertyValueToLocalProperty($item, $product, $product_feature_value, $import_storage);
 
             if (!$this->isProductPropertyAllowToImport($item, $import_storage)) {
                 continue;
@@ -379,10 +382,12 @@ class ProductConvertor
      */
     private function convertProductName(SimpleXmlElement $element, ProductDto $product, ImportStorage $import_storage)
     {
-        $product_name_source = (string) $import_storage->getSetting('convertor_product_name_source', 'name');
+        $product_name_source = (string) $import_storage->getSetting('catalog_convertor.product_name_source', 'name');
 
         if ($element->hasAndNotEmpty($product_name_source)) {
-            $product->name = TranslatableValueDto::create($element->getAsString((string) $import_storage->getSetting('convertor_product_name_source', 'name')));
+            $product->name = TranslatableValueDto::create(
+                $element->getAsString((string) $import_storage->getSetting('catalog_convertor.product_name_source', 'name'))
+            );
 
             return;
         }
@@ -405,7 +410,7 @@ class ProductConvertor
      */
     private function convertProductCode(SimpleXmlElement $element, ProductDto $product, ImportStorage $import_storage)
     {
-        $product_code_source = (string) $import_storage->getSetting('convertor_product_code_source', 'article');
+        $product_code_source = (string) $import_storage->getSetting('catalog_convertor.product_code_source', 'article');
 
         if ($element->hasAndNotEmpty($product_code_source)) {
             $product->product_code = $element->getAsString($product_code_source);
@@ -431,10 +436,15 @@ class ProductConvertor
      */
     private function convertProductDescription(SimpleXmlElement $element, ProductDto $product, ImportStorage $import_storage)
     {
-        $description_source = (string) $import_storage->getSetting('convertor_full_description_source', 'description');
+        $description_source = (string) $import_storage->getSetting('catalog_convertor.full_description_source', 'description');
 
         if ($element->hasAndNotEmpty($description_source)) {
-            $product->description = TranslatableValueDto::create($element->getAsString($description_source));
+            if ($description_source === 'description') {
+                $description = nl2br($element->getAsString($description_source));
+            } else {
+                $description = $element->getAsString($description_source);
+            }
+            $product->description = TranslatableValueDto::create($description);
 
             return;
         }
@@ -459,13 +469,13 @@ class ProductConvertor
      */
     private function convertProductFieldsToProductProperties(SimpleXmlElement $element, ProductDto $product, ImportStorage $import_storage)
     {
-        $short_description_source = (string) $import_storage->getSetting('convertor_short_description_source', 'none');
+        $short_description_source = (string) $import_storage->getSetting('catalog_convertor.short_description_source', 'none');
 
         if ($short_description_source !== 'none') {
             $value = null;
 
             if ($element->hasAndNotEmpty($short_description_source)) {
-                $value = TranslatableValueDto::create($element->getAsString($short_description_source));
+                $value = $element->getAsString($short_description_source);
             } else {
                 $value = $this->findFieldValue($element, $short_description_source);
             }
@@ -473,12 +483,12 @@ class ProductConvertor
             if (!empty($value)) {
                 $product->properties->add(PropertyDto::create(
                     'short_description',
-                    $value
+                    TranslatableValueDto::create($value)
                 ));
             }
         }
 
-        $page_title_source = (string) $import_storage->getSetting('convertor_page_title_source', 'none');
+        $page_title_source = (string) $import_storage->getSetting('catalog_convertor.page_title_source', 'none');
 
         if ($page_title_source !== 'none') {
             $value = null;
@@ -496,6 +506,8 @@ class ProductConvertor
                 ));
             }
         }
+
+
     }
 
     /**
@@ -566,55 +578,46 @@ class ProductConvertor
      *
      * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
      *
-     * @return array<string, array{properties:array<mixed>, type: string, display: bool}>
+     * @return array<string, array{properties:array<mixed>, type: string}>
      */
     private function getLocalProductProperies(ImportStorage $import_storage)
     {
         $list = [
             'promo_text' => [
-                'properties' => (array) $import_storage->getSetting('convertor_promo_text_property_source'),
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.promo_text_property_source'),
                 'type'       => 'string',
-                'display'    => false,
             ],
             'weight' => [
-                'properties' => (array) $import_storage->getSetting('convertor_weight_property_source_list', []),
-                'type'       => 'float',
-                'display'    => (bool) $import_storage->getSetting('convertor_display_weight', false),
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.weight_property_source_list', []),
+                'type'       => 'float'
             ],
             'free_shipping' => [
-                'properties' => (array) $import_storage->getSetting('convertor_free_shipping_property_source_list', []),
-                'type'       => 'yesno',
-                'display'    => (bool) $import_storage->getSetting('convertor_display_free_shipping', false)
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.free_shipping_property_source_list', []),
+                'type'       => 'yesno'
             ],
             'shipping_freight' => [
-                'properties' => (array) $import_storage->getSetting('convertor_shipping_cost_property_source_list', []),
-                'type'       => 'float',
-                'display'    => false,
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.shipping_cost_property_source_list', []),
+                'type'       => 'float'
             ],
             'min_items_in_box' => [
-                'properties' => (array) $import_storage->getSetting('convertor_number_of_items_property_source_list', []),
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.number_of_items_property_source_list', []),
                 'type'       => 'int',
-                'display'    => false,
             ],
             'max_items_in_box' => [
-                'properties' => (array) $import_storage->getSetting('convertor_number_of_items_property_source_list', []),
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.number_of_items_property_source_list', []),
                 'type'       => 'int',
-                'display'    => false,
             ],
             'box_length' => [
-                'properties' => (array) $import_storage->getSetting('convertor_box_length_property_source_list', []),
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.box_length_property_source_list', []),
                 'type'       => 'float',
-                'display'    => false,
             ],
             'box_width' => [
-                'properties' => (array) $import_storage->getSetting('convertor_box_width_property_source_list', []),
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.box_width_property_source_list', []),
                 'type'       => 'float',
-                'display'    => false,
             ],
             'box_height' => [
-                'properties' => (array) $import_storage->getSetting('convertor_box_height_property_source_list', []),
+                'properties' => (array) $import_storage->getSetting('catalog_convertor.box_height_property_source_list', []),
                 'type'       => 'float',
-                'display'    => false,
             ]
         ];
 
@@ -672,8 +675,6 @@ class ProductConvertor
             return false;
         }
 
-        $allow_set_product_feature_values = false;
-
         if ($product_feature_value->value_id) {
             /** @var ProductFeatureVariantDto $variant */
             $variant = $import_storage->findEntity(ProductFeatureVariantDto::REPRESENT_ENTITY_TYPE, $product_feature_value->value_id->getId());
@@ -704,11 +705,9 @@ class ProductConvertor
                 $property_id,
                 $value
             ));
-
-            $allow_set_product_feature_values = $allow_set_product_feature_values || $property_data['display'];
         }
 
-        return !$allow_set_product_feature_values;
+        return true;
     }
 
     /**
@@ -725,7 +724,7 @@ class ProductConvertor
         ProductDto $product,
         ImportStorage $import_storage
     ) {
-        if (!$element->has('manufacturer') || $import_storage->getSetting('convertor_brand_source', 'none') !== 'manufacturer') {
+        if (!$element->has('manufacturer')) {
             return false;
         }
 
@@ -769,8 +768,8 @@ class ProductConvertor
      */
     private function isProductPropertyAllowToImport(SimpleXmlElement $element, ImportStorage $import_storage)
     {
-        $allow_list = $import_storage->getSetting('convertor_property_allowlist', []);
-        $block_list = $import_storage->getSetting('convertor_property_blocklist', []);
+        $allow_list = $import_storage->getSetting('catalog_convertor.property_allowlist', []);
+        $block_list = $import_storage->getSetting('catalog_convertor.property_blocklist', []);
 
         if (empty($block_list) && empty($allow_list)) {
             return true;

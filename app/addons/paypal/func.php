@@ -13,10 +13,12 @@
 ****************************************************************************/
 
 use Tygh\Embedded;
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\YesNo;
+use Tygh\Http;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Settings;
-use Tygh\Http;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -141,57 +143,119 @@ function fn_paypal_payment_url(&$method, &$script, &$url, &$payment_dir)
     }
 }
 
-function fn_update_paypal_settings($settings)
+/**
+ * Updates add-on settings.
+ *
+ * @param array<string, string|array> $settings      Add-on settings
+ * @param int|null                    $storefront_id Storefront ID to set settings for
+ *
+ * @psalm-param array{
+ *   pp_logo_update_all_storefronts?: string,
+ *   pp_statuses?: array<string>|string,
+ * } $settings
+ *
+ * @internal
+ */
+function fn_update_paypal_settings(array $settings, $storefront_id = null)
 {
     if (isset($settings['pp_statuses'])) {
         $settings['pp_statuses'] = serialize($settings['pp_statuses']);
     }
 
+    $settings_manager = Settings::instance(['storefront_id' => $storefront_id]);
     foreach ($settings as $setting_name => $setting_value) {
-        Settings::instance()->updateValue($setting_name, $setting_value);
+        $settings_manager->updateValue($setting_name, $setting_value);
     }
 
-    //Get company_ids for which we should update logos. If root admin click 'update for all', get all company_ids
-    if (isset($settings['pp_logo_update_all_vendors']) && $settings['pp_logo_update_all_vendors'] == 'Y') {
-        $company_ids = db_get_fields('SELECT company_id FROM ?:companies');
-        $company_id = array_shift($company_ids);
-    } elseif (!Registry::get('runtime.simple_ultimate')) {
-        $company_id = Registry::get('runtime.company_id');
-    } else {
-        $company_id = 1;
-    }
-    //Use company_id as pair_id
-    fn_attach_image_pairs('paypal_logo', 'paypal_logo', $company_id);
-    if (isset($company_ids)) {
-        foreach ($company_ids as $logo_id) {
-            fn_clone_image_pairs($logo_id, $company_id, 'paypal_logo');
+    if (
+        isset($settings['pp_logo_update_all_storefronts'])
+        && YesNo::toBool($settings['pp_logo_update_all_storefronts'])
+    ) {
+        list($storefronts,) = StorefrontProvider::getRepository()->find();
+        foreach ($storefronts as $storefront) {
+            fn_delete_image_pairs($storefront->storefront_id, 'paypal_logo');
         }
     }
+
+    fn_attach_image_pairs('paypal_logo', 'paypal_logo', (int) $storefront_id);
 }
 
-function fn_get_paypal_settings($lang_code = DESCR_SL)
+/**
+ * Gets add-on settings.
+ *
+ * @param int|null $storefront_id Storefront to get settings for
+ *
+ * @return array<string, string|array>
+ *
+ * @psalm-return array{
+ *   main_pair: array{
+ *     pair_id: int,
+ *     object_id: int,
+ *     detailed: array{
+ *       object_id: int,
+ *     },
+ *   }|array<empty, empty>,
+ *   pp_statuses: array<string, string>,
+ *   partial_refund_action: string,
+ *   override_customer_info: string,
+ * }
+ *
+ * @internal
+ */
+function fn_get_paypal_settings($storefront_id = null)
 {
-    $pp_settings = Settings::instance()->getValues('paypal', 'ADDON');
-    if (!empty($pp_settings['general']['pp_statuses'])) {
-        $pp_settings['general']['pp_statuses'] = unserialize($pp_settings['general']['pp_statuses']);
-    }
-
-    $pp_settings['general']['main_pair'] = fn_get_image_pairs(fn_paypal_get_logo_id(), 'paypal_logo', 'M', false, true, $lang_code);
-
-    return $pp_settings['general'];
-}
-
-function fn_paypal_get_logo_id()
-{
-    if (Registry::get('runtime.simple_ultimate')) {
-        $logo_id = 1;
-    } elseif (Registry::get('runtime.company_id')) {
-        $logo_id = Registry::get('runtime.company_id');
+    /**
+     * @psalm-var array{
+     *   main_pair: array{
+     *     pair_id: int,
+     *     object_id: int,
+     *     detailed: array{
+     *       object_id: int,
+     *     },
+     *   },
+     *   pp_statuses: string,
+     *   partial_refund_action: string,
+     *   override_customer_info: string,
+     * } $pp_settings
+     */
+    $pp_settings = Settings::instance()->getValues('paypal', 'ADDON', false);
+    if (!empty($pp_settings['pp_statuses'])) {
+        $pp_settings['pp_statuses'] = unserialize($pp_settings['pp_statuses']);
     } else {
-        $logo_id = 0;
+        $pp_settings['pp_statuses'] = [];
     }
 
-    return $logo_id;
+    if (!$storefront_id && SiteArea::isStorefront(AREA)) {
+        $storefront_id = StorefrontProvider::getStorefront()->storefront_id;
+    }
+
+    $pp_settings['main_pair'] = fn_get_image_pairs($storefront_id, 'paypal_logo', 'M', false, true);
+    if (!$pp_settings['main_pair']) {
+        $fallback_logo = fn_get_image_pairs(0, 'paypal_logo', 'M', false, true);
+        if ($fallback_logo) {
+            $fallback_logo['pair_id'] = 0;
+            $fallback_logo['object_id'] = $storefront_id;
+            $fallback_logo['detailed']['object_id'] = $storefront_id;
+        }
+        $pp_settings['main_pair'] = $fallback_logo;
+    }
+
+    /**
+     * @psalm-var array{
+     *   main_pair: array{
+     *     pair_id: int,
+     *     object_id: int,
+     *     detailed: array{
+     *       object_id: int,
+     *     },
+     *   }|array<empty, empty>,
+     *   pp_statuses: array<string, string>,
+     *   partial_refund_action: string,
+     *   override_customer_info: string,
+     * } $pp_settings
+     */
+
+    return $pp_settings;
 }
 
 function fn_paypal_update_payment_pre(&$payment_data, &$payment_id, &$lang_code, &$certificate_file, &$certificates_dir)

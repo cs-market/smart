@@ -26,24 +26,9 @@ defined('BOOTSTRAP') or die('Access denied');
  */
 function fn_master_products_get_vendor_products(array &$products, array $params)
 {
-    list($companies,) = fn_get_companies([
-        'company_id' => fn_array_column($products, 'company_id'),
-        'extend'     => [
-            'product_count'  => YesNo::NO,
-            'logos'          => true,
-            'placement_info' => true,
-        ],
-    ], Tygh::$app['session']['auth']);
-
-    $companies = fn_array_combine(fn_array_column($companies, 'company_id'), $companies);
+    $products = fn_master_products_load_products_seller_data($products);
 
     fn_gather_additional_products_data($products, $params);
-
-    foreach ($products as &$product) {
-        $product['company'] = $companies[$product['company_id']];
-        $product['is_vendor_products_list_item'] = true;
-    }
-    unset($product);
 }
 
 /**

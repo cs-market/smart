@@ -47,7 +47,13 @@ function fn_warehouses_exim_set_product_quantities($product_id, array $quantity_
     if (empty($warehouse_amounts)) {
         return;
     }
-
+    $default_stock = $manager->getProductWarehousesStock($product_id);
+    if ($default_stock->hasStockSplitByWarehouses()) {
+        $new_amount = array_sum(array_column($warehouse_amounts, 'amount'));
+        if ($default_stock->getAmount() <= 0 && $new_amount > 0) {
+            fn_send_product_notifications($product_id);
+        }
+    }
     $product_stock = $manager->createProductStockFromWarehousesData($product_id, $warehouse_amounts);
 
     $manager->saveProductStock($product_stock, false);

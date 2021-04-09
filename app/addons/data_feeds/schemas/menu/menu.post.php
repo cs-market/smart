@@ -12,12 +12,14 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['top']['addons']['items']['data_feeds'] = array(
-    'attrs' => array(
+defined('BOOTSTRAP') or die('Access denied');
+
+$schema['top']['administration']['items']['export_data']['subitems']['data_feeds'] = [
+    'attrs' => [
         'class' => 'is-addon'
-    ),
+    ],
     'href' => 'data_feeds.manage',
-    'position' => 200
-);
+    'position' => 1,
+];
 
 return $schema;

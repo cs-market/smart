@@ -118,14 +118,14 @@
                             checked=$user_data.api_key != ""
                             input_id="sw_api_container"
                             input_name="user_api_status"
-                            input_value="Y"
+                            input_value="YesNo::YES"|enum
                             input_attrs=["data-ca-api-key-container-id" => "api_container", "data-ca-show-api-key-warning" => "{if $user_data.api_key}false{else}true{/if}"]
                         }
                     </div>
                 </div>
             {/if}
 
-            <div id="api_container"{if $user_data.api_key == ""} class="hidden"{/if}>
+            <div id="api_container"{if $user_data.api_key === ""} class="hidden"{/if}>
                 <div class="control-group">
                     <label class="control-label">{__("api_key")}</label>
                     <div class="controls">
@@ -165,17 +165,14 @@
 {if !$id}
     {$_user_desc = $user_type|fn_get_user_type_description}
 
-    {$title_start = __("new_profile")}
-    {$title_end = $_user_desc}
+    {$title = "{__("new_profile")}: `$_user_desc`"}
 {else}
-    {$title_start = __("editing_profile")}
-
     {if $user_data.firstname}
-        {$title_end = "`$user_data.firstname` `$user_data.lastname`"}
+        {$title = "`$user_data.firstname` `$user_data.lastname`"}
     {elseif $user_data.b_firstname}
-        {$title_end = "`$user_data.b_firstname` `$user_data.b_lastname`"}
+        {$title = "`$user_data.b_firstname` `$user_data.b_lastname`"}
     {else}
-        {$title_end = "`$user_data.email`"}
+        {$title = "`$user_data.email`"}
     {/if}
 {/if}
 
@@ -220,8 +217,7 @@
 {/capture}
 
 {include file="common/mainbox.tpl"
-    title_start=$title_start
-    title_end=$title_end
+    title=$title
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
     sidebar=$smarty.capture.sidebar}

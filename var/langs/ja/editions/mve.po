@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /release-4.11.5/editions/mve.po\n"
-"X-Crowdin-File-ID: 3708\n"
-"PO-Revision-Date: 2020-08-28 13:35\n"
+"X-Crowdin-File: /release-4.12.2/editions/mve.po\n"
+"X-Crowdin-File-ID: 4194\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Languages::add_companies"
 msgid "Add vendors"
@@ -165,12 +165,12 @@ msgid "Can view"
 msgstr "閲覧"
 
 msgctxt "Languages::privilege_sections.vendors"
-msgid "Store privileges"
-msgstr "出品者"
+msgid "Vendors privileges"
+msgstr ""
 
 msgctxt "Languages::privilege_groups.vendors"
-msgid "Stores"
-msgstr "出品者"
+msgid "Vendors"
+msgstr ""
 
 msgctxt "Languages::sales_period"
 msgid "Sales period"
@@ -364,9 +364,21 @@ msgctxt "SettingsOptions::mailer_send_from_admin"
 msgid "Send vendor emails from marketplace email addresses"
 msgstr "出品者からのEメールを運営会社のEメールアドレスから送信する"
 
+msgctxt "SettingsOptions::allow_vendor_manage_features"
+msgid "Allow vendors to manage product features"
+msgstr "出品者が商品の機能を管理できるよう許可する"
+
 msgctxt "SettingsTooltips::need_agree_with_terms_n_conditions"
 msgid "The text of terms & conditions will be retrieved from the \"vendor_terms_n_conditions_content\" language variable."
 msgstr "出品者向け利用規約には、言語変数 \"vendor_terms_n_conditions_content\" に設定した値が使用されます。"
+
+msgctxt "SettingsOptions::allow_approve_vendors_in_two_steps"
+msgid "Approve vendors in 2 steps"
+msgstr "2ステップで出品者を承認"
+
+msgctxt "SettingsTooltips::allow_approve_vendors_in_two_steps"
+msgid "New vendors will get the \"Pending\" status after approval. This will hide them on the storefront."
+msgstr "新しい出品者は承認後に「保留」ステータスになります。 ストアフロントでは非表示になります。"
 
 msgctxt "Languages::use_for_apply_for_vendor_account"
 msgid "Apply for a vendor account form"
@@ -478,7 +490,7 @@ msgstr "この操作には、[product] Ultimateまたは[product] Plusが必要�
 
 msgctxt "Languages::max_storefronts_reached"
 msgid "<p>You have reached the limit of storefronts available for your license. Adding another storefront requires buying a <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, an edition with an unlimited number of storefronts.</p>"
-msgstr ""
+msgstr "<p>ライセンスで利用できるストアフロントの制限に達しました。別のストアフロントを追加するには、ストアフロントの数に制限がないライセンスである<a href=\"[mve_ultimate_license_url]\" target=\"_blank\"> [product] Ultimate </a>を購入する必要があります。</ p>"
 
 msgctxt "Languages::mve_plus_license"
 msgid "[product] Plus"
@@ -490,15 +502,15 @@ msgstr "[product] Ultimate"
 
 msgctxt "Languages::text_mve_plus_license_required"
 msgid "<p>Let your vendors receive money from customers directly via your marketplace.</p><p>Manage vendors' abilities via user groups, and allow your vendors to change the looks of their stores.</p><p>Create a unified catalog, where vendors can start selling any product in a matter of minutes.</p>"
-msgstr ""
+msgstr "<p>出品者がマーケットプレイスを介して顧客から直接お金を受け取るようにします。</p><p>ユーザーグループからベンダーの機能を管理し、出品者が店舗の外観を変更できるようにします。</p><p>出品者が数分であらゆる商品の販売を開始できる統合カタログを作成。</p>"
 
 msgctxt "Languages::text_mve_ultimate_license_required"
 msgid "<p>Branch out: get an unlimited number of storefronts for your marketplace.</p><p>A storefront is another domain created either for a specific country or city, or for a specific part of your product catalog.</p><p>Get all the other functionality of [product] Plus.</p>"
-msgstr ""
+msgstr "<p>ブランチアウト：マーケットプレイス用に無制限の数のストアフロントを取得します。</p><p>ストアフロントは、特定の国や都市、または商品カタログの特定の部分用に作成された別のドメインです。</p><p> [product] Plusの他のすべての機能を入手してください。</p>"
 
 msgctxt "Languages::text_mve_ultimate_license"
 msgid "A special edition of [product] that offers all the features of [product] Plus and an unlimited number of storefronts. If you switch to <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, you'll never see the message about the storefront limit again."
-msgstr ""
+msgstr "[product] Plusのすべての機能と無制限の数のストアフロントを提供する[product]の特別版。 <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>に切り替えると、ストアフロントの制限に関するメッセージが表示されなくなります。"
 
 msgctxt "Languages::product_state_description.mve.new"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
@@ -510,7 +522,7 @@ msgstr "<p>ライセンス認証が完了しました。CS-Cartのすべての�
 
 msgctxt "Languages::product_state_description.mve.plus"
 msgid "<p>Access to all the functionality, except for multiple storefronts. To have domains for specific audiences, get the <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br />"
-msgstr ""
+msgstr "<p>複数のストアフロントを除くすべての機能へのアクセス。 特定のオーディエンス向けのドメインを作成するには、<a href=\"[mve_ultimate_license_url]\" target=\"_blank\"> [product] Ultimate ライセンス</a>を取得してください。</p><br />"
 
 msgctxt "Languages::product_state_description.mve.ultimate"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
@@ -518,19 +530,19 @@ msgstr "<p>ライセンス認証が完了しました。CS-Cartのすべての�
 
 msgctxt "Languages::product_state_description.mve.ru.new"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p> <br />"
-msgstr ""
+msgstr "<p>すべての機能への完全な無制限アクセス。 有効なライセンス番号を入力してアクティブにします。</p><p>このモードはいつでもアクティブにできます。</p><br />"
 
 msgctxt "Languages::product_state_description.mve.ru"
 msgid "<p>You've activated your [product]. You can use it without time restrictions now. For advanced features (such as separate checkout for each vendor, and vendor-created promotions), get the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus license.</a> To use multiple domains for your marketplace, get the <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br>"
-msgstr ""
+msgstr "<p>[product]を有効にしました。時間制限なしでご利用いただけるようになりました。高度な機能（出品者毎のお支払いや出品者が作成したプロモーションなど）については、<a href=\"[mve_plus_license_url]\" target=\"_blank\"> [product] Plusライセンスを取得してください。</a>複数のドメインを使用するマーケットプレイスについては、<a href=\"[mve_ultimate_license_url]\" target=\"_blank\"> [product] Ultimate ライセンス</a>を取得してください。</p><br>"
 
 msgctxt "Languages::product_state_description.mve.ru.plus"
 msgid "<p>Access to all the functionality, except for multiple storefronts. To have domains for specific audiences, get the <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br />"
-msgstr ""
+msgstr "<p>複数のストアフロントを除くすべての機能へのアクセス。特定のオーディエンス向けのドメインを作成するには、<a href=\"[mve_ultimate_license_url]\" target=\"_blank\"> [product] Ultimate ライセンス</a>を取得してください。</p><br />"
 
 msgctxt "Languages::product_state_description.mve.ru.ultimate"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
-msgstr ""
+msgstr "<p>すべての機能への完全な無制限アクセス。 有効なライセンス番号を入力してアクティブにします。</p> <p>このモードはいつでもアクティブにできます。</p><br />"
 
 msgctxt "Languages::text_store_mode_changed_to_mve"
 msgid "Your store now uses active license. With the [product] edition, you get almost all the features we offer. The additional features (such as separate checkout for each vendor, and vendor-created promotions) are available with the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus edition</a>. There is an even more advanced edition, <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, that lets you use multiple storefronts for different audiences."
@@ -546,15 +558,15 @@ msgstr "<p>ライセンス認証が完了しました。CS-Cartのすべての�
 
 msgctxt "Languages::text_store_mode_changed_to_mve.ru"
 msgid "Your store now uses active license. With the [product] edition, you get almost all the features we offer. The additional features (such as separate checkout for each vendor, and vendor-created promotions) are available with the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus edition</a>. There is an even more advanced edition, <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, that lets you use multiple storefronts for different audiences."
-msgstr ""
+msgstr "現在、ストアは有効なライセンスを使用しています。 [product] エディションでは、私たちが提供するほぼすべての機能を利用できます。 追加機能（ベンダーごとの個別の注文手続き、ベンダーが作成したプロモーションなど）は、<a href=\"[mve_plus_license_url]\" target=\"_blank\"> [product] Plusエディション</a>で利用できます。 さらに高度なエディションである<ahref = \"[mve_ultimate_license_url]\" target = \"_ blank\"> [product] Ultimate </a>があり、さまざまなオーディエンスに複数のストアフロントを使用できます。"
 
 msgctxt "Languages::text_store_mode_changed_to_mve.ru.plus"
 msgid "<strong>Plus mode</strong> has been activated. This mode offers all the advanced eCommerce features, except for multiple storefronts. If your marketplace ever needs separate domains for different audiences, upgrade your license to <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>."
-msgstr ""
+msgstr "<strong>プラスモード</strong>が有効になりました。 このモードは、複数のストアフロントを除いて、すべての高度なECサイト機能を提供します。 マーケットプレイスでオーディエンスごとに別々のドメインが必要な場合は、ライセンスを<a href=\"[mve_ultimate_license_url]\" target=\"_blank\"> [product] Ultimate </a>にアップグレードしてください。"
 
 msgctxt "Languages::text_store_mode_changed_to_mve.ru.ultimate"
 msgid "<strong>Ultimate mode</strong> has been activated. In this mode, all the advanced eCommerce features are available."
-msgstr ""
+msgstr "<strong>Ultimate モード</ strong>が有効になりました。 このモードでは、すべての高度なECサイト機能を利用できます。"
 
 msgctxt "Languages::store_mode.plus"
 msgid "Plus"
@@ -892,22 +904,6 @@ msgctxt "Languages::all_companies"
 msgid "All vendors"
 msgstr "すべての出品者"
 
-msgctxt "Languages::storefront_access_key"
-msgid "Access key to temporarily closed storefront"
-msgstr "一時閉鎖中のショップへのアクセスキー"
-
-msgctxt "Languages::storefront_status.tooltip"
-msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed storefront</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
-msgstr "ショップがクローズ状態（ステータスがオフ）でもアクセスキーがあればショップへアクセスできます。<i>一時閉鎖中のショップへの アクセスキー</i> を下記のように指定してください。<br/>Use http://www.example.com/index.php?store_access_key=key_value"
-
-msgctxt "Languages::storefront_access_key.setting_notice"
-msgid "You can set the access key on the storefront editing page"
-msgstr "ショップの編集画面でアクセスキーを設定"
-
-msgctxt "Languages::close_storefront.setting_notice"
-msgid "You can open or close a storefront on the storefront editing page"
-msgstr "ショップの編集画面でショップをオープンまたはクローズ"
-
 msgctxt "Languages::is_default_storefront"
 msgid "Default storefront"
 msgstr "デフォルトショップ"
@@ -940,6 +936,14 @@ msgctxt "Languages::event.vendor_status_changed.name"
 msgid "Vendor status changed to [status]"
 msgstr "ベンダーステータスは [status] に変更されました"
 
+msgctxt "Languages::event.vendor_status_changed_from.name"
+msgid "Vendor status changed from [status]"
+msgstr "[status] から出品者ステータスが変更されました"
+
+msgctxt "Languages::email_template.company_status_suspended_notification"
+msgid "Company status change to Suspended"
+msgstr "会社のステータスが一時停止に変更されました。"
+
 msgctxt "Languages::event.vendor_status_changed.title"
 msgid "Your status has been changed to [status]"
 msgstr "ベンダーステータス [status] は変更されています"
@@ -960,11 +964,47 @@ msgctxt "Languages::log_in_as_vendor"
 msgid "Log in as vendor"
 msgstr "出品者としてログイン"
 
+msgctxt "Languages::vendor_owner"
+msgid "Vendor's main administrator"
+msgstr "出品者のメイン管理者"
+
+msgctxt "Languages::owner_company"
+msgid "Vendor"
+msgstr "出品者"
+
 msgctxt "Languages::block_manager.dynamic_entity_companies"
 msgid "vendor"
 msgstr "出品者"
 
+msgctxt "Languages::vendor_features_only"
+msgid "Features created by vendors"
+msgstr "出品者が作成した機能"
+
+msgctxt "Languages::any_vendor"
+msgid "Any vendor"
+msgstr "いくつかの出品者"
+
 msgctxt "Languages::event.apply_for_vendor_notification.name"
 msgid "New vendor account application"
 msgstr "新しい出品者のアカウント申請"
+
+msgctxt "Languages::suspend_alert"
+msgid "<p>Your account is suspended. To lift the suspension, please contact us.</p>"
+msgstr "<p>あなたのアカウントは停止されています。 停止を解除するには、お問合せください。</ p>"
+
+msgctxt "Languages::event.vendor_status_changed.suspended.title"
+msgid "Your account is suspended"
+msgstr "あなたのアカウントは停止されています。 "
+
+msgctxt "Languages::event.vendor_status_changed.suspended.message"
+msgid "To lift the suspension, please contact us."
+msgstr "停止を解除する場合は、お問合せください。"
+
+msgctxt "Languages::text_company_status_suspended_subj"
+msgid "Your account is suspended"
+msgstr "あなたのアカウントは停止されています。 "
+
+msgctxt "Languages::logo_section.vendor"
+msgid "Default logo for new vendors"
+msgstr "新しい出品者のデフォルトロゴ"
 

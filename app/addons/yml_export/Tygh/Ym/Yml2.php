@@ -14,6 +14,7 @@
 
 namespace Tygh\Ym;
 
+use Tygh\Enum\ProductTracking;
 use Tygh\Registry;
 use Tygh\Tygh;
 use Tygh\Ym\Offers;
@@ -688,15 +689,15 @@ class Yml2 implements IYml2
      */
     protected function gatherProductsFeatures($products, $product_ids)
     {
-        static $features = array();
+        static $features = [];
 
-        if (empty($short_features_data)) {
-            $params = array(
-                'plain' => true,
-                'variants' => true,
-                'exclude_group' => true,
+        if (empty($features)) {
+            $params = [
+                'plain'          => true,
+                'variants'       => true,
+                'exclude_group'  => true,
                 'variant_images' => false
-            );
+            ];
 
             list($features, ) = fn_get_product_features($params);
         }
@@ -874,11 +875,27 @@ class Yml2 implements IYml2
             'p.product_type'
         );
 
+        $company_ordering = '';
+        if (!empty($this->company_id)) {
+            $company_ordering = db_quote('c.company_id = ?i DESC,', $this->company_id);
+        }
+
         $fields[] = db_quote(
-            '(SELECT GROUP_CONCAT(IF(pc2.link_type = ?s, CONCAT(pc2.category_id, ?s), pc2.category_id)) as category_ids'
-            . ' FROM ?:products_categories as pc2 LEFT JOIN ?:categories as c ON pc2.category_id = c.category_id'
+            '(SELECT'
+            . ' GROUP_CONCAT('
+                . 'IF(pc2.link_type = ?s, CONCAT(pc2.category_id, ?s), pc2.category_id)'
+                . ' ORDER BY ?p (pc2.link_type = ?s) DESC,'
+                . ' pc2.category_position ASC,'
+                . ' pc2.category_id ASC'
+            . ') as category_ids'
+            . ' FROM ?:products_categories as pc2'
+            . ' LEFT JOIN ?:categories as c ON pc2.category_id = c.category_id'
             . ' WHERE product_id = p.product_id AND c.status IN (?a)) as category_ids',
-            'M', 'M', array('A', 'H')
+            'M',
+            'M',
+            $company_ordering,
+            'M',
+            ['A', 'H']
         );
 
         $joins = array(
@@ -1116,7 +1133,7 @@ class Yml2 implements IYml2
         $product['short_description'] = $this->escape($product['short_description']);
 
         if ($this->options['export_stock'] == 'Y') {
-            if ($product['tracking'] == 'B' && $product['amount'] <= 0) {
+            if ($product['tracking'] !== ProductTracking::DO_NOT_TRACK && $product['amount'] <= 0) {
                 $this->log->write(Logs::SKIP_PRODUCT, $product, __('yml2_log_product_amount_is_empty'));
                 $is_broken = true;
             }
@@ -1289,7 +1306,7 @@ class Yml2 implements IYml2
             $product = array_merge($product, $company_product_data);
         }
 
-        $product['category_ids'] = array_intersect($this->export_category_ids, $product['category_ids']);
+        $product['category_ids'] = array_intersect($product['category_ids'], $this->export_category_ids);
         $product['category_id'] = reset($product['category_ids']);
     }
 
@@ -1562,7 +1579,7 @@ class Yml2 implements IYml2
             }
         }
 
-        $categories_list = array_combine(fn_array_column($categories_list, 'path'), $categories_list);
+        $categories_list = array_combine(array_column($categories_list, 'path'), $categories_list);
 
         return $categories_list;
     }

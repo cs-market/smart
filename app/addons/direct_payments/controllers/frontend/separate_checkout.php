@@ -22,6 +22,10 @@ fn_enable_checkout_mode();
 /** @var \Tygh\Addons\DirectPayments\Cart\Service $cart_service */
 $cart_service = Tygh::$app['addons.direct_payments.cart.service'];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($auth['user_id'])) {
+    $cart_service->load($auth['user_id']);
+}
+
 if (isset($_REQUEST['vendor_id'])) {
     $cart_service->setCurrentVendorId((int) $_REQUEST['vendor_id']);
 }
@@ -242,7 +246,7 @@ if ($mode === 'cart') {
 
     foreach ($carts as $vendor_id => &$cart) {
         // for promotions
-        $cart_service->setRuntimeVendorId($cart['vendor_id']);
+        $cart_service->setCurrentVendorId($cart['vendor_id']);
 
         if (!fn_cart_is_empty($cart)) {
             list($cart_products, $product_groups) = fn_calculate_cart_content($cart, $auth, 'E', true, 'F', true);
@@ -265,6 +269,7 @@ if ($mode === 'cart') {
             $group_payment_methods[$vendor_id] = fn_prepare_checkout_payment_methods($cart, $auth);
         }
     }
+    unset($cart);
 
     $view->assign([
         'group_cart_products'        => $group_cart_products,

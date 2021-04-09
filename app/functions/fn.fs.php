@@ -17,6 +17,9 @@ use Tygh\Http;
 use Tygh\Registry;
 use Tygh\Storage;
 use Tygh\Tools\Url;
+use Tygh\Enum\FileUploadTypes;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Tools\SecurityHelper;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -789,9 +792,10 @@ function fn_get_url_data($val)
     $_data = fn_get_contents($val);
 
     if (!empty($_data)) {
-        $result = array(
-            'name' => fn_basename($val)
-        );
+        $result = [
+            'name' => fn_basename($val),
+            'url'  => $val,
+        ];
 
         // Check if the file is dynamically generated
         if (strpos($result['name'], '&') !== false || strpos($result['name'], '?') !== false) {
@@ -889,45 +893,53 @@ function fn_get_last_key(&$arr, $fn = '', $is_first = false)
  *
  * @return array filtered file data
  */
-function fn_filter_uploaded_data($name, $filter_by_ext = array())
+function fn_filter_uploaded_data($name, array $filter_by_ext = [])
 {
     $udata_local = fn_rebuild_files('file_' . $name);
-    $udata_other = !empty($_REQUEST['file_' . $name]) ? $_REQUEST['file_' . $name] : array();
-    $utype = !empty($_REQUEST['type_' . $name]) ? $_REQUEST['type_' . $name] : array();
+    $udata_other = !empty($_REQUEST['file_' . $name]) ? $_REQUEST['file_' . $name] : [];
+    $utype = !empty($_REQUEST['type_' . $name]) ? $_REQUEST['type_' . $name] : [];
 
     if (empty($utype)) {
-        return array();
+        return [];
     }
 
-    $filtered = array();
+    $filtered = [];
 
     foreach ($utype as $id => $type) {
-        if ($type == 'local' && !fn_is_empty(@$udata_local[$id])) {
+        if ($type === FileUploadTypes::LOCAL && !fn_is_empty(@$udata_local[$id])) {
             $filtered[$id] = fn_get_local_data(Bootstrap::stripSlashes($udata_local[$id]));
 
-        } elseif ($type == 'server' && !fn_is_empty(@$udata_other[$id]) && (Registry::get('runtime.skip_area_checking') || AREA == 'A')) {
+        } elseif (
+            $type === FileUploadTypes::SERVER
+            && !fn_is_empty(@$udata_other[$id])
+            && (Registry::get('runtime.skip_area_checking') || AREA === 'A')
+        ) {
             fn_get_last_key($udata_other[$id], 'fn_get_server_data', true);
             $filtered[$id] = $udata_other[$id];
 
-        } elseif ($type == 'url' && !fn_is_empty(@$udata_other[$id])) {
+        } elseif ($type === FileUploadTypes::URL && !fn_is_empty(@$udata_other[$id])) {
             fn_get_last_key($udata_other[$id], 'fn_get_url_data', true);
             $filtered[$id] = $udata_other[$id];
-        } elseif ($type == 'uploaded' && !fn_is_empty(@$udata_other[$id])) {
+        } elseif ($type === FileUploadTypes::UPLOADED && !fn_is_empty(@$udata_other[$id])) {
             fn_get_last_key($udata_other[$id], function ($file_path) {
-                return fn_get_server_data($file_path, array(Storage::instance('custom_files')->getAbsolutePath('')));
+                return fn_get_server_data($file_path, [Storage::instance('custom_files')->getAbsolutePath('')]);
             }, true);
 
             $filtered[$id] = $udata_other[$id];
         }
 
+        if (!empty($filtered[$id])) {
+            $filtered[$id]['upload_type'] = $type;
+        }
+
         if (isset($filtered[$id]) && $filtered[$id] === false) {
             unset($filtered[$id]);
-            fn_set_notification('E', __('error'), __('cant_upload_file', ['[product]' => PRODUCT_NAME]));
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('cant_upload_file', ['[product]' => PRODUCT_NAME]));
             continue;
         }
 
         if (!empty($filtered[$id]['name'])) {
-            $filtered[$id]['name'] = \Tygh\Tools\SecurityHelper::sanitizeFileName(urldecode($filtered[$id]['name']));
+            $filtered[$id]['name'] = SecurityHelper::sanitizeFileName(urldecode($filtered[$id]['name']));
             
             if (!fn_check_uploaded_data($filtered[$id], $filter_by_ext)) {
                 unset($filtered[$id]);

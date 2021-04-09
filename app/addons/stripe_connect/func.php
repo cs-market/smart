@@ -14,8 +14,11 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
+use Tygh\Addons\StripeConnect\Logger;
 use Tygh\Addons\StripeConnect\Payments\StripeConnect;
+use Tygh\Languages\Languages;
 use Tygh\Registry;
+use Tygh\Settings;
 
 /**
  * Installs Stripe Connect payment processor.
@@ -37,6 +40,8 @@ function fn_stripe_connect_add_payment_processor()
             'addon'              => StripeConnect::getPaymentName(),
         ));
     }
+
+    fn_stripe_connect_add_logging_settings();
 }
 
 /**
@@ -66,6 +71,80 @@ function fn_stripe_connect_remove_payment_processor()
         ),
         $processor_id
     );
+
+    fn_stripe_connect_remove_logging_settings();
+}
+
+/**
+ * Adds logging settings
+ */
+function fn_stripe_connect_add_logging_settings()
+{
+    $settings_name = 'log_type_' . Logger::LOG_TYPE;
+    $settings = Settings::instance()->getSettingDataByName($settings_name);
+
+    if ($settings) {
+        return;
+    }
+
+    $logging_section = Settings::instance()->getSectionByName('Logging');
+    $lang_codes = array_keys(Languages::getAll());
+
+    $settings = [
+        'name'           => $settings_name,
+        'section_id'     => $logging_section['section_id'],
+        'section_tab_id' => 0,
+        'type'           => 'N',
+        'position'       => 10,
+        'is_global'      => 'N',
+        'edition_type'   => 'ROOT,VENDOR',
+    ];
+
+    $descriptions = [];
+    foreach ($lang_codes as $lang_code) {
+        $descriptions[] = [
+            'object_type'   => Settings::SETTING_DESCRIPTION,
+            'lang_code'     => $lang_code,
+            'value'         => __('log_type_stripe_connect'),
+        ];
+    }
+
+    $settings_id = Settings::instance()->update($settings, null, $descriptions, true);
+
+    foreach (Logger::getActions() as $position => $variant) {
+        $variant_id = Settings::instance()->updateVariant(
+            [
+                'object_id' => $settings_id,
+                'name'      => $variant,
+                'position'  => $position,
+            ]
+        );
+
+        foreach ($lang_codes as $lang_code) {
+            $description = [
+                'object_id' => (int) $variant_id,
+                'object_type' => Settings::VARIANT_DESCRIPTION,
+                'lang_code'   => $lang_code,
+                'value'       => __('log_action_' . $variant),
+            ];
+            Settings::instance()->updateDescription($description);
+        }
+    }
+
+    Settings::instance()->updateValue($settings_name, [Logger::ACTION_FAILURE], 'Logging');
+}
+
+/**
+ * Removes logging settings
+ */
+function fn_stripe_connect_remove_logging_settings()
+{
+    $setting = Settings::instance()->getSettingDataByName('log_type_' . Logger::LOG_TYPE);
+    if (!$setting) {
+        return;
+    }
+
+    Settings::instance()->removeById((int) $setting['object_id']);
 }
 
 /**
@@ -175,6 +254,7 @@ function fn_stripe_connect_rma_update_details_post(
                 fn_set_notification('N', __('notice'), __('stripe_connect.rma.refund_performed'));
             } catch (Exception $e) {
                 fn_set_notification('E', __('error'), $e->getMessage());
+                Logger::logException($e);
             }
         }
     }
@@ -256,4 +336,39 @@ function fn_stripe_connect_prepare_checkout_payment_methods_after_get_payments(
             }
         }
     }
+}
+
+/**
+ * Hook handler: Prepares log data before saving the log
+ *
+ * @param string $type    Log type
+ * @param string $action  Log action
+ * @param array  $data    Log data
+ * @param int    $user_id User ID
+ * @param array  $content Save content
+ *
+ * @psalm-param array{
+ *  message: string
+ * } $content
+ *
+ * @psalm-param array{
+ *  message: string,
+ *  context?: string
+ * } $data
+ */
+function fn_stripe_connect_save_log($type, $action, array $data, $user_id, array &$content)
+{
+    if ($type !== Logger::LOG_TYPE) {
+        return;
+    }
+
+    $content = [
+        'message' => $data['message']
+    ];
+
+    if (empty($data['context'])) {
+        return;
+    }
+
+    $content['stripe_connect.log_context'] = $data['context'];
 }

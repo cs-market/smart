@@ -1,7 +1,7 @@
 {hook name="companies:view"}
 
-{assign var="obj_id" value=$company_data.company_id}
-{assign var="obj_id_prefix" value="`$obj_prefix``$obj_id`"}
+{$obj_id=$company_data.company_id}
+{$obj_id_prefix="`$obj_prefix``$obj_id`"}
     {include file="common/company_data.tpl" company=$company_data show_name=true show_descr=true show_rating=true show_logo=true show_links=true show_address=true show_location_full=true}
     <div class="ty-company-detail clearfix">
 
@@ -18,65 +18,84 @@
             </div>
             <div class="ty-company-detail__info">
                 <div class="ty-company-detail__logo">
-                    {assign var="capture_name" value="logo_`$obj_id`"}
+                    {$capture_name="logo_`$obj_id`"}
                     {$smarty.capture.$capture_name nofilter}
                 </div>
-                <div class="ty-company-detail__info-list ty-company-detail_info-first">
-                    <h5 class="ty-company-detail__info-title">{__("contact_information")}</h5>
-                    {if $company_data.email}
-                        <div class="ty-company-detail__control-group">
-                            <label class="ty-company-detail__control-lable">{__("email")}:</label>
-                            <span><a href="mailto:{$company_data.email}">{$company_data.email}</a></span>
-                        </div>
-                    {/if}
-                    {if $company_data.phone}
-                        {hook name="companies:phone_field"}
-                            <div class="ty-company-detail__control-group">
-                                <label class="ty-company-detail__control-lable">{__("phone")}:</label>
-                                <span>{$company_data.phone}</span>
-                            </div>
-                        {/hook}
-                    {/if}
-                    {if $company_data.fax}
-                        <div class="ty-company-detail__control-group">
-                            <label class="ty-company-detail__control-lable">{__("fax")}:</label>
-                            <span>{$company_data.fax}</span>
-                        </div>
-                    {/if}
-                    {if $company_data.url}
-                        <div class="ty-company-detail__control-group">
-                            <label class="ty-company-detail__control-lable">{__("website")}:</label>
-                            <span><a href="{$company_data.url|normalize_url}">{$company_data.url}</a></span>
-                        </div>
-                    {/if}
-                </div>
-                <div class="ty-company-detail__info-list">
-                    <h5 class="ty-company-detail__info-title">{__("shipping_address")}</h5>
 
-                    {$address="address_`$obj_id`"}
-                    {if $smarty.capture.$address|trim}
+                {capture name = "profile_fields_{$obj_id}"}
+                    {foreach $profile_fields["ProfileFieldSections::CONTACT_INFORMATION"|enum] as $field_id => $field_data}
+                        {$data_source = $company_data.fields}
+                        {if $field_data.is_default === "YesNo::YES"|enum}
+                            {$field_id = $field_data.field_name}
+                            {$data_source = $company_data}
+                        {/if}
+                        {if !$data_source[$field_id]}
+                            {continue}
+                        {/if}
+                        {$field_value = $data_source[$field_id]}
                         <div class="ty-company-detail__control-group">
-                            <span>{$smarty.capture.$address nofilter}</span>
+                            <label class="ty-company-detail__control-label">{$field_data.description}:</label>
+                            {if $field_data.field_type === "ProfileFieldTypes::EMAIL"|enum}
+                                <span><a href="mailto:{$field_value}">{$field_value}</a></span>
+                            {elseif $field_data.field_type === "ProfileFieldTypes::CHECKBOX"|enum}
+                                <span>{if $field_value === "YesNo::YES"|enum}{__("yes")}{else}{__("no")}{/if}</span>
+                            {elseif $field_data.field_type === "ProfileFieldTypes::DATE"|enum}
+                                <span>{$field_value|date_format:"`$settings.Appearance.date_format`"}</span>
+                            {elseif $field_data.field_type === "ProfileFieldTypes::RADIO"|enum
+                                || $field_data.field_type === "ProfileFieldTypes::SELECT_BOX"|enum
+                            }
+                                <span>{$field_data.values.$field_value}</span>
+                            {elseif $field_data.field_type === "ProfileFieldTypes::FILE"|enum && $field_value.file_name}
+                                <span><a href="{$field_value.link|default:""}">{$field_value.file_name}</a></span>
+                            {elseif $field_id === "url"} {* FIXME: URL display is hardcoded *}
+                                <span><a href="{$field_value|normalize_url}">{$field_value}</a></span>
+                            {else}
+                                <span>{$field_value}</span>
+                            {/if}
                         </div>
-                    {/if}
+                    {/foreach}
+                {/capture}
 
-                    {$location_full="location_full_`$obj_id`"}
-                    {if $smarty.capture.$location_full|trim}
-                        <div class="ty-company-detail__control-group">
-                            <span>{$smarty.capture.$location_full nofilter}</span>
-                        </div>
-                    {/if}
-
-                    <div class="ty-company-detail__control-group">
-                        <span>{$company_data.country|fn_get_country_name}</span>
+                {if $smarty.capture["profile_fields_{$obj_id}"]|trim}
+                    <div class="ty-company-detail__info-list ty-company-detail_info-first">
+                        <h5 class="ty-company-detail__info-title">{__("contact_information")}</h5>
+                        {$smarty.capture["profile_fields_{$obj_id}"] nofilter}
                     </div>
-                </div>
+                {/if}
+
+                {$address="address_`$obj_id`"}
+                {$location_full="location_full_`$obj_id`"}
+                {if
+                    $smarty.capture.$address|trim
+                    || $smarty.capture.$location_full|trim
+                    || $company_data.country
+                }
+                    <div class="ty-company-detail__info-list">
+                        <h5 class="ty-company-detail__info-title">{__("shipping_address")}</h5>
+
+                        {if $smarty.capture.$address|trim}
+                            <div class="ty-company-detail__control-group">
+                                <span>{$smarty.capture.$address nofilter}</span>
+                            </div>
+                        {/if}
+
+                        {if $smarty.capture.$location_full|trim}
+                            <div class="ty-company-detail__control-group">
+                                <span>{$smarty.capture.$location_full nofilter}</span>
+                            </div>
+                        {/if}
+
+                        <div class="ty-company-detail__control-group">
+                            <span>{$company_data.country|fn_get_country_name}</span>
+                        </div>
+                    </div>
+                {/if}
             </div>
         </div>
 
         {capture name="tabsbox"}
             <div id="content_description"
-                 class="{if $selected_section && $selected_section != "description"}hidden{/if}">
+                 class="{if $selected_section && $selected_section !== "description"}hidden{/if}">
                 {if $company_data.company_description}
                     <div class="ty-wysiwyg-content">
                         {$company_data.company_description nofilter}

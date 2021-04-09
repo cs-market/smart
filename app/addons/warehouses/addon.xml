@@ -2,7 +2,7 @@
 <addon scheme="3.0">
     <id>warehouses</id>
     <version>1.0</version>
-    <priority>1000</priority>
+    <priority>1300</priority>
     <position>0</position>
     <status>active</status>
     <compatibility>

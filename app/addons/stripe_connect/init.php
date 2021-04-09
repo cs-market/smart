@@ -23,5 +23,6 @@ fn_register_hooks(
     'rma_update_details_post',
     'get_companies',
     'prepare_checkout_payment_methods_before_get_payments',
-    'prepare_checkout_payment_methods_after_get_payments'
+    'prepare_checkout_payment_methods_after_get_payments',
+    'save_log'
 );

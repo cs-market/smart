@@ -151,9 +151,6 @@
                 &:first-child {
                     margin-top: 0;
                 }
-                .nav-list {
-                    padding-right: 1px;
-                }
             }
             .sidebar-wrapper {
                 width: 100%;
@@ -314,7 +311,7 @@
                 .content-wrap {
                     padding: 15px; // MVP feature, disable/enable content-language selector
                     .language-wrap {
-                        display: @displayContentLanguage;
+                        display: none;
                     }
                 }
             }
@@ -758,24 +755,25 @@
     .post-item {
         .tools {
             >.pull-left,
+            .post__statuses,
             >.pull-right {
                 float: none;
             }
             .post-object {
+                display: -webkit-box;
                 margin: 5px 0;
+                width: auto;
+                height: auto;
+                max-height: 60px;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
             }
             .muted {
                 float: none !important;
                 margin: 5px 0;
             }
             .calendar {
-                display: block;
                 margin: 10px 0;
-            }
-            @media (max-width: @TabletBreakpoint) {
-                .calendar {
-                    margin-top: 25px;
-                }
             }
         }
     }
@@ -882,6 +880,7 @@
                 width: 38% !important;
                 float: left;
                 &-checkbox {
+                    margin-top: 4px;
                     margin-right: 10px;
                 }
                 &:before {
@@ -1026,7 +1025,7 @@
                     display: none;
                 }
             }
-            span:not(.label-info):not(.switch-mini) {
+            span:not(.label):not(.label-info):not(.switch-mini) {
                 padding: 0 !important;
             }
             &:empty {
@@ -1254,6 +1253,13 @@
 @media (max-width: @TabletBreakpoint) {
     .tools .hidden-tools a {
         visibility: visible !important;
+    }
+    .post-item {
+        .tools {
+            .calendar {
+                display: block;
+            }
+        }
     }
 }
 

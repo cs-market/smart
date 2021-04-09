@@ -32,10 +32,11 @@
         <item for="install">
             CREATE TABLE ?:commerceml_imports (
                 import_id int(11) unsigned NOT NULL auto_increment,
-                import_key VARCHAR(32) NOT NULL default '',
+                import_key varchar(32) NOT NULL default '',
                 company_id int(11) unsigned NOT NULL,
                 user_id int(11) unsigned NOT NULL,
                 status char(1) NOT NULL DEFAULT 'N',
+                type varchar(32) NOT NULL DEFAULT '',
                 has_only_changes char(1) NOT NULL DEFAULT 'N',
                 created_at int(11) unsigned NOT NULL DEFAULT '0',
                 updated_at int(11) unsigned NOT NULL DEFAULT '0',
@@ -50,7 +51,7 @@
                 entity_type varchar(64) NOT NULL DEFAULT '',
                 status char(1) NOT NULL DEFAULT 'N',
                 process_id varchar(32) NULL,
-                entity text,
+                entity mediumblob,
                 created_at int(11) unsigned NOT NULL DEFAULT '0',
                 updated_at int(11) unsigned NOT NULL DEFAULT '0',
                 microtime bigint(20) unsigned NOT NULL DEFAULT '0',

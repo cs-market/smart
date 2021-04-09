@@ -29,6 +29,7 @@
             <option value="O" {if $processor_params.new_order_status == "O"}selected="selected"{/if}>{__("open")}</option>
             <option value="{$smarty.const.STATUS_INCOMPLETED_ORDER}" {if $processor_params.new_order_status == $smarty.const.STATUS_INCOMPLETED_ORDER}selected="selected"{/if}>{__("incompleted")}</option>
         </select>
+        <p class="muted description">{__("ttc_addons.paypal.status_for_new_orders")}</p>
     </div>
 </div>
 

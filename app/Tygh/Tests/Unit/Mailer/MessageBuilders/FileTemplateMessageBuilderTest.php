@@ -27,6 +27,7 @@ class FileTemplateMessageBuilderTest extends ATestCase
 
         $this->smarty->method('displayMail')->willReturnCallback(array($this, 'smartyRender'));
         $this->requireMockFunction('fn_disable_live_editor_mode');
+        $this->requireMockFunction('fn_filter_company_data_by_profile_fields');
     }
 
     public function smartyRender($template, $to_screen, $area, $company_id, $lang_code)

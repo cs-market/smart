@@ -22,10 +22,12 @@ use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\OrderDataTypes;
 use Tygh\Enum\OutOfStockActions;
 use Tygh\Enum\ProductTracking;
+use Tygh\Enum\ProfileDataTypes;
 use Tygh\Enum\ProfileFieldSections;
 use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\ShippingRateTypes;
 use Tygh\Languages\Languages;
 use Tygh\Navigation\LastView;
 use Tygh\Notifications\EventIdProviders\OrderProvider;
@@ -36,6 +38,7 @@ use Tygh\Storage;
 use Tygh\Themes\Themes;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Tygh;
+use Tygh\Enum\VendorStatuses;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -67,6 +70,12 @@ function fn_get_cart_product_data($hash, &$product, $skip_promotion, &$cart, &$a
      */
     fn_set_hook('get_cart_product_data_pre', $hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, $lang_code);
 
+    $params = [
+        'company_statuses' => [
+            VendorStatuses::ACTIVE
+        ]
+    ];
+
     if (!empty($product['product_id'])) {
 
         $fields = array(
@@ -97,8 +106,8 @@ function fn_get_cart_product_data($hash, &$product, $skip_promotion, &$cart, &$a
 
         $join  = db_quote("LEFT JOIN ?:product_descriptions ON ?:product_descriptions.product_id = ?:products.product_id AND ?:product_descriptions.lang_code = ?s", $lang_code);
 
-        $_p_statuses = array('A', 'H');
-        $_c_statuses = array('A', 'H');
+        $_p_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
+        $_c_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
 
         $avail_cond = '';
 
@@ -119,12 +128,33 @@ function fn_get_cart_product_data($hash, &$product, $skip_promotion, &$cart, &$a
         $join .= " INNER JOIN ?:products_categories ON ?:products_categories.product_id = ?:products.product_id INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id $avail_cond";
         $join .= " LEFT JOIN ?:companies ON ?:companies.company_id = ?:products.company_id";
 
-        fn_set_hook('pre_get_cart_product_data', $hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, $fields, $join);
+        /**
+         * Prepare params before getting product data from cart
+         *
+         * @param string                           $hash             Unique product HASH
+         * @param array<string, int|string|array>  $product          Product data
+         * @param bool                             $skip_promotion   Skip promotion calculation
+         * @param array<string, int|string|array>  $cart             Array of cart content and user information necessary for purchase
+         * @param array<string, int|string|array>  $auth             Array with authorization data
+         * @param int                              $promotion_amount Amount of product in promotion (like Free products, etc)
+         * @param array<string, string>            $fields           SQL query fields
+         * @param string                           $join             JOIN statement
+         * @param array<string, array>             $params           Array of additional params
+         */
+        fn_set_hook('pre_get_cart_product_data', $hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, $fields, $join, $params);
 
         $_pdata = db_get_row("SELECT " . implode(', ', $fields) . " FROM ?:products ?p WHERE ?:products.product_id = ?i GROUP BY ?:products.product_id", $join, $product['product_id']);
+        $_pdata = fn_normalize_product_overridable_fields($_pdata);
 
         // delete product from cart if vendor was disabled.
-        if (empty($_pdata) || (!empty($_pdata['company_id']) && !defined('ORDER_MANAGEMENT') && $_pdata['company_status'] != 'A')) {
+        if (
+            empty($_pdata)
+            || (
+                !empty($_pdata['company_id'])
+                && !defined('ORDER_MANAGEMENT')
+                && !in_array($_pdata['company_status'], $params['company_statuses'])
+            )
+        ) {
             fn_delete_cart_product($cart, $hash);
 
             return false;
@@ -159,13 +189,6 @@ function fn_get_cart_product_data($hash, &$product, $skip_promotion, &$cart, &$a
             $cart['products'][$hash]['product_options'] = fn_get_default_product_options($product['product_id']);
         }
 
-        if (Registry::get('settings.General.inventory_tracking') == 'Y' &&
-            !empty($_pdata['tracking']) && $_pdata['tracking'] == ProductTracking::TRACK_WITH_OPTIONS &&
-            !empty($product['selectable_cart_id'])
-        ) {
-            $_pdata['in_stock'] = db_get_field("SELECT amount FROM ?:product_options_inventory WHERE combination_hash = ?s", $product['selectable_cart_id']);
-        }
-
         $product['amount'] = fn_check_amount_in_stock($product['product_id'], $product['amount'], $product['product_options'], $hash, $_pdata['is_edp'], !empty($product['original_amount']) ? $product['original_amount'] : 0, $cart);
 
         if ($product['amount'] == 0) {
@@ -177,6 +200,7 @@ function fn_get_cart_product_data($hash, &$product, $skip_promotion, &$cart, &$a
             $exceptions = fn_get_product_exceptions($product['product_id'], true);
             if (!isset($product['options_type']) || !isset($product['exceptions_type'])) {
                 $product = array_merge($product, db_get_row('SELECT options_type, exceptions_type FROM ?:products WHERE product_id = ?i', $product['product_id']));
+                $product = fn_normalize_product_overridable_fields($product);
             }
 
             if (!fn_is_allowed_options_exceptions($exceptions, $product['product_options'], $product['options_type'], $product['exceptions_type']) && !defined('GET_OPTIONS')) {
@@ -708,11 +732,9 @@ function fn_update_payment($payment_data, $payment_id, $lang_code = DESCR_SL)
  * @param string $lang_code     2-letter language code
  *
  * @return int Currency id
- * @throws \Tygh\Exceptions\DeveloperException
  */
 function fn_update_currency($currency_data, $currency_id, $lang_code = DESCR_SL)
 {
-
     /**
      * Updates currency data before updating
      *
@@ -753,13 +775,33 @@ function fn_update_currency($currency_data, $currency_id, $lang_code = DESCR_SL)
         db_query("UPDATE ?:currencies SET is_primary = 'N' WHERE is_primary = 'Y'");
     }
 
+    $previous_storefronts = [];
+
     if (empty($currency_id)) {
-        $currency_id = db_query("INSERT INTO ?:currencies ?e", $currency_data);
-        fn_create_description('currency_descriptions', 'currency_code', $currency_data['currency_code'], $currency_data);
+        $currency_data['currency_id'] = $currency_id = db_query('INSERT INTO ?:currencies ?e', $currency_data);
+        fn_create_description('currency_descriptions', 'currency_id', $currency_data['currency_id'], $currency_data);
     } else {
-        $old_currency_code = db_get_field("SELECT currency_code FROM ?:currencies WHERE currency_id = ?i", $currency_id);
-        db_query("UPDATE ?:currencies SET ?u WHERE currency_id = ?i", $currency_data, $currency_id);
-        db_query('UPDATE ?:currency_descriptions SET ?u WHERE currency_code = ?s AND lang_code = ?s', $currency_data, $old_currency_code, $lang_code);
+        db_query('UPDATE ?:currencies SET ?u WHERE currency_id = ?i', $currency_data, $currency_id);
+        db_query('UPDATE ?:currency_descriptions SET ?u WHERE currency_id = ?i AND lang_code = ?s', $currency_data, $currency_id, $lang_code);
+
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($previous_storefronts,) = $repository->find(['currency_ids' => $currency_id]);
+    }
+
+    if (isset($currency_data['storefront_ids'])) {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($new_storefronts,) = $repository->find(['storefront_id' => $currency_data['storefront_ids']]);
+        $added_storefronts = array_diff_key($new_storefronts, $previous_storefronts);
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        foreach ($added_storefronts as $storefront) {
+            $repository->save($storefront->addCurrencyIds($currency_id));
+        }
+        $removed_storefronts = array_diff_key($previous_storefronts, $new_storefronts);
+        foreach ($removed_storefronts as $storefront) {
+            $repository->save($storefront->removeCurrencyIds($currency_id));
+        }
     }
 
     /**
@@ -858,11 +900,12 @@ function fn_update_product_amount($product_id, $amount_delta, $product_options, 
      */
     fn_set_hook('update_product_amount_before_tracking_checking', $product_id, $amount_delta, $product_options, $sign, $notify, $order_info);
 
-    if (Registry::get('settings.General.inventory_tracking') != 'Y') {
+    if (Registry::get('settings.General.inventory_tracking') === YesNo::NO) {
         return true;
     }
 
-    $tracking_info = db_get_row("SELECT tracking, out_of_stock_actions FROM ?:products WHERE product_id = ?i", $product_id);
+    $tracking_info = db_get_row('SELECT tracking, out_of_stock_actions FROM ?:products WHERE product_id = ?i', $product_id);
+    $tracking_info = fn_normalize_product_overridable_fields($tracking_info);
 
     // Return if product does not exist
     if (empty($tracking_info)) {
@@ -872,24 +915,14 @@ function fn_update_product_amount($product_id, $amount_delta, $product_options, 
     $tracking = $tracking_info['tracking'];
     $allow_pre_orders = $tracking_info['out_of_stock_actions'] == OutOfStockActions::BUY_IN_ADVANCE;
 
-    if ($tracking == ProductTracking::DO_NOT_TRACK) {
+    if ($tracking === ProductTracking::DO_NOT_TRACK) {
         return true;
     }
 
-    if ($tracking == ProductTracking::TRACK_WITHOUT_OPTIONS) {
+    if ($tracking !== ProductTracking::DO_NOT_TRACK) {
         $product = db_get_row("SELECT amount, product_code FROM ?:products WHERE product_id = ?i", $product_id);
         $current_amount = $original_amount = $product['amount'];
         $product_code = $product['product_code'];
-    } else {
-        $cart_id = fn_generate_cart_id($product_id, array('product_options' => $product_options), true);
-        $product = db_get_row("SELECT amount, product_code FROM ?:product_options_inventory WHERE combination_hash = ?s", $cart_id);
-        $current_amount = $original_amount = empty($product['amount']) ? 0 : $product['amount'];
-
-        if (empty($product['product_code'])) {
-            $product_code = db_get_field("SELECT product_code FROM ?:products WHERE product_id = ?i", $product_id);
-        } else {
-            $product_code = $product['product_code'];
-        }
     }
 
     /**
@@ -929,9 +962,6 @@ function fn_update_product_amount($product_id, $amount_delta, $product_options, 
             ));
             $lang_code = fn_get_company_language($company_id);
             $lang_code = !empty($lang_code) ? $lang_code : Registry::get('settings.Appearance.backend_default_language');
-            $selected_product_options = ($tracking == ProductTracking::TRACK_WITH_OPTIONS)
-                ? fn_get_selected_product_options_info($product_options, $lang_code)
-                : '';
 
             /** @var \Tygh\Mailer\Mailer $mailer */
             $mailer = Tygh::$app['mailer'];
@@ -940,7 +970,7 @@ function fn_update_product_amount($product_id, $amount_delta, $product_options, 
                 'to' => 'company_orders_department',
                 'from' => 'default_company_orders_department',
                 'data' => array(
-                    'product_options' => $selected_product_options,
+                    'product_options' => '',
                     'new_qty' => $new_amount,
                     'product_id' => $product_id,
                     'product_code' => $product_code,
@@ -972,11 +1002,7 @@ function fn_update_product_amount($product_id, $amount_delta, $product_options, 
      */
     fn_set_hook('update_product_amount', $new_amount, $product_id, $cart_id, $tracking, $notify, $order_info, $amount_delta, $current_amount, $original_amount, $sign);
 
-    if ($tracking == ProductTracking::TRACK_WITHOUT_OPTIONS) {
-        db_query("UPDATE ?:products SET amount = ?i WHERE product_id = ?i", $new_amount, $product_id);
-    } else {
-        db_query("UPDATE ?:product_options_inventory SET amount = ?i WHERE combination_hash = ?s", $new_amount, $cart_id);
-    }
+    db_query('UPDATE ?:products SET amount = ?i WHERE product_id = ?i', $new_amount, $product_id);
 
     if (($current_amount <= 0) && ($new_amount > 0) && $notify === true) {
         fn_send_product_notifications($product_id);
@@ -1056,6 +1082,7 @@ function fn_update_order(&$cart, $order_id = 0)
         $ip = fn_get_ip();
         $order['ip_address'] = fn_ip_to_db($ip['host']);
         $order['timestamp']  = isset($order['timestamp']) ? fn_parse_date($order['timestamp']) : TIME;
+        $order['updated_at'] = $order['timestamp'];
         $order['lang_code']  = CART_LANGUAGE;
         $order['company_id'] = 0;
         $order['status']     = STATUS_INCOMPLETED_ORDER; // incomplete by default to increase inventory
@@ -1098,6 +1125,7 @@ function fn_update_order(&$cart, $order_id = 0)
 
         $order_id = db_query("INSERT INTO ?:orders ?e", $order);
     } else {
+        $order['updated_at']  = isset($order['updated_at']) ? fn_parse_date($order['updated_at']) : TIME;
         unset($order['order_id'], $order['timestamp']);
 
         // We're editing existing order
@@ -1156,7 +1184,7 @@ function fn_update_order(&$cart, $order_id = 0)
         }
     }
 
-    fn_store_profile_fields($cart['user_data'], $order_id, 'O');
+    fn_store_user_profile_fields($cart['user_data'], $order_id, ProfileDataTypes::ORDER);
     fn_create_order_details($order_id, $cart);
     fn_update_order_data($order_id, $cart);
 
@@ -1223,11 +1251,6 @@ function fn_create_order_details($order_id, $cart)
 
                 $extra['product_options'] = $v['product_options'];
                 $cart_id = fn_generate_cart_id($v['product_id'], array('product_options' => $v['product_options']), true);
-                $tracking = db_get_field("SELECT tracking FROM ?:products WHERE product_id = ?i", $v['product_id']);
-
-                if ($tracking == ProductTracking::TRACK_WITH_OPTIONS) {
-                    $product_code = db_get_field("SELECT product_code FROM ?:product_options_inventory WHERE combination_hash = ?s", $cart_id);
-                }
 
                 $extra['product_options_value'] = fn_get_selected_product_options_info($v['product_options']);
             } else {
@@ -1723,6 +1746,8 @@ function fn_finish_payment($order_id, $pp_response, $force_notification = array(
  * @param string $user_type User type
  *
  * @return bool True
+ *
+ * @phpcsSuppress Squiz.Commenting.FunctionComment.TypeHintMissing
  */
 function fn_save_cart_content(&$cart, $user_id, $type = 'C', $user_type = 'R')
 {
@@ -1747,23 +1772,28 @@ function fn_save_cart_content(&$cart, $user_id, $type = 'C', $user_type = 'R')
     }
 
     if (!empty($user_id)) {
-        $condition = fn_user_session_products_condition(array(
+        $condition = fn_user_session_products_condition([
             'user_id'             => $user_id,
             'type'                => $type,
             'user_type'           => $user_type,
             'get_session_user_id' => false,
-        ));
+            'get_session_id'      => false,
+        ]);
+
         db_query('DELETE FROM ?:user_session_products WHERE 1=1 AND ?p', $condition);
 
-        $product_groups = [];
-        $is_wish_list = empty($cart['product_groups']) && !empty($cart['products']);
-        if ($is_wish_list) {
-            $product_groups[0] = ['products' => $cart['products']];
-        } elseif (!empty($cart['product_groups'])) {
-            $product_groups = $cart['product_groups'];
-        }
+        $product_groups = empty($cart['product_groups']) ? [] : (array) $cart['product_groups'];
+        $products = empty($cart['products']) ?  [] : (array) $cart['products'];
 
-        if ($product_groups) {
+        if ($products) {
+            $product_groups_map = [];
+
+            foreach ($product_groups as $group_id => $product_group) {
+                foreach ($product_group['products'] as $key => $product) {
+                    $product_groups_map[$key] = $group_id;
+                }
+            }
+
             if (!empty($cart['user_data'])) {
                 $cart['user_data']['firstname'] = !empty($cart['user_data']['firstname']) ? $cart['user_data']['firstname'] : null;
                 $cart['user_data']['lastname'] = !empty($cart['user_data']['lastname']) ? $cart['user_data']['lastname'] : null;
@@ -1777,64 +1807,65 @@ function fn_save_cart_content(&$cart, $user_id, $type = 'C', $user_type = 'R')
             $company_id = fn_allowed_for('ULTIMATE') ? Registry::get('runtime.company_id') : null;
             $session_id = Tygh::$app['session']->getID();
 
-            foreach ($product_groups as $group_id => $group) {
-                foreach ($group['products'] as $cart_id => $product) {
-                    if (!empty($cart['user_data'])) {
-                        $product['firstname'] = isset($user_data['firstname']) ? $user_data['firstname'] : null;
-                        $product['lastname'] = isset($user_data['lastname']) ? $user_data['lastname'] : null;
-                        $product['phone'] = isset($user_data['phone']) ? $user_data['phone'] : null;
+            foreach ($products as $cart_id => $product) {
+                if (!empty($cart['user_data'])) {
+                    $product['firstname'] = isset($user_data['firstname']) ? $user_data['firstname'] : null;
+                    $product['lastname'] = isset($user_data['lastname']) ? $user_data['lastname'] : null;
+                    $product['phone'] = isset($user_data['phone']) ? $user_data['phone'] : null;
 
-                        $product['email'] = (!empty($cart['user_data']['email'])) ? $cart['user_data']['email'] : '';
-                        $product['user_data'] = !empty($cart['user_data']) ? $cart['user_data'] : [];
-                        $product['group_id'] = $group_id;
-                        $product['chosen_shipping'] = !empty($cart['chosen_shipping'][$group_id]) ? $cart['chosen_shipping'][$group_id] : null;
-                    }
+                    $product['email'] = (!empty($cart['user_data']['email'])) ? $cart['user_data']['email'] : '';
+                    $product['user_data'] = !empty($cart['user_data']) ? $cart['user_data'] : [];
 
-                    $product_data = [
-                        'user_id'    => $user_id,
-                        'timestamp'  => TIME,
-                        'type'       => $type,
-                        'user_type'  => $user_type,
-                        'item_id'    => $cart_id,
-                        'item_type'  => 'P',
-                        'product_id' => $product['product_id'],
-                        'amount'     => !empty($product['amount']) ? $product['amount'] : 1,
-                        'price'      => !empty($product['price']) ? $product['price'] : 0,
-                        'extra'      => serialize($product),
-                        'session_id' => $session_id,
-                        'ip_address' => $ip_address,
-                        'order_id'   => !empty($product['order_id']) ? $product['order_id'] : '',
-                    ];
-
-                    //FIXME This is a workaround. See @1-17222 for details.
-                    if (empty($product_data['order_id'])) {
-                        unset($product_data['order_id']);
-                    }
-
-                    if ($company_id !== null) {
-                        $product_data['company_id'] = $company_id;
-                    }
-
-                    /** @var \Tygh\Storefront\Storefront $storefront */
-                    $storefront = Tygh::$app['storefront'];
-                    $product_data['storefront_id'] = $storefront->storefront_id;
-
-                    /**
-                     * Executes when saving cart content, right before saving product data,
-                     * allows you to modify the stored data.
-                     *
-                     * @param array  $cart         Cart contents
-                     * @param int    $user_id      User identifier
-                     * @param string $type         Cart type
-                     * @param string $user_type    User type
-                     * @param array  $product_data Product data
-                     */
-                    fn_set_hook('save_cart_content_before_save', $cart, $user_id, $type, $user_type, $product_data);
-
-                    /** @var \Tygh\Database\Connection $db */
-                    $db = Tygh::$app['db'];
-                    $db->replaceInto('user_session_products', $product_data);
+                    $product['group_id'] = isset($product_groups_map[$cart_id]) ? $product_groups_map[$cart_id] : null;
+                    $product['chosen_shipping'] = $product['group_id'] && !empty($cart['chosen_shipping'][$product['group_id']])
+                        ? $cart['chosen_shipping'][$product['group_id']]
+                        : null;
                 }
+
+                $product_data = [
+                    'user_id'    => $user_id,
+                    'timestamp'  => TIME,
+                    'type'       => $type,
+                    'user_type'  => $user_type,
+                    'item_id'    => $cart_id,
+                    'item_type'  => 'P',
+                    'product_id' => $product['product_id'],
+                    'amount'     => !empty($product['amount']) ? $product['amount'] : 1,
+                    'price'      => !empty($product['price']) ? $product['price'] : 0,
+                    'extra'      => serialize($product),
+                    'session_id' => $session_id,
+                    'ip_address' => $ip_address,
+                    'order_id'   => !empty($product['order_id']) ? $product['order_id'] : '',
+                ];
+
+                //FIXME This is a workaround. See @1-17222 for details.
+                if (empty($product_data['order_id'])) {
+                    unset($product_data['order_id']);
+                }
+
+                if ($company_id !== null) {
+                    $product_data['company_id'] = $company_id;
+                }
+
+                /** @var \Tygh\Storefront\Storefront $storefront */
+                $storefront = Tygh::$app['storefront'];
+                $product_data['storefront_id'] = $storefront->storefront_id;
+
+                /**
+                 * Executes when saving cart content, right before saving product data,
+                 * allows you to modify the stored data.
+                 *
+                 * @param array  $cart         Cart contents
+                 * @param int    $user_id      User identifier
+                 * @param string $type         Cart type
+                 * @param string $user_type    User type
+                 * @param array  $product_data Product data
+                 */
+                fn_set_hook('save_cart_content_before_save', $cart, $user_id, $type, $user_type, $product_data);
+
+                /** @var \Tygh\Database\Connection $db */
+                $db = Tygh::$app['db'];
+                $db->replaceInto('user_session_products', $product_data);
             }
         }
 
@@ -1860,13 +1891,15 @@ function fn_save_cart_content(&$cart, $user_id, $type = 'C', $user_type = 'R')
 /**
  * Extract cart content from the customer's profile.
  *
- * @param array   $cart      Cart to extract contents to
- * @param integer $user_id   User ID
- * @param string  $type      Cart type: C for cart, W for wishlist
- * @param string  $user_type User type: R for registered, U for guest
- * @param string  $lang_code Two-letter language code
+ * @param array  $cart      Cart to extract contents to
+ * @param int    $user_id   User ID
+ * @param string $type      Cart type: C for cart, W for wishlist
+ * @param string $user_type User type: R for registered, U for guest
+ * @param string $lang_code Two-letter language code
  *
  * @return void
+ *
+ * @phpcsSuppress Squiz.Commenting.FunctionComment.TypeHintMissing
  */
 function fn_extract_cart_content(&$cart, $user_id, $type = 'C', $user_type = 'R', $lang_code = CART_LANGUAGE)
 {
@@ -1876,7 +1909,7 @@ function fn_extract_cart_content(&$cart, $user_id, $type = 'C', $user_type = 'R'
     if (!empty($user_id)) {
         $item_types = fn_get_cart_content_item_types('X');
 
-        $condition = db_quote("user_id = ?i AND type = ?s AND user_type = ?s AND item_type IN (?a)", $user_id, $type, $user_type, $item_types);
+        $condition = db_quote('user_id = ?i AND type = ?s AND user_type = ?s AND item_type IN (?a)', $user_id, $type, $user_type, $item_types);
 
         if (fn_allowed_for('MULTIVENDOR')) {
 
@@ -1889,24 +1922,42 @@ function fn_extract_cart_content(&$cart, $user_id, $type = 'C', $user_type = 'R'
 
         fn_set_hook('pre_extract_cart', $cart, $condition, $item_types, $user_id, $type, $user_type);
 
-        $_prods = db_get_hash_array("SELECT * FROM ?:user_session_products WHERE " . $condition, 'item_id');
+        $_prods = db_get_hash_array('SELECT * FROM ?:user_session_products WHERE ' . $condition, 'item_id');
         if (!empty($_prods) && is_array($_prods)) {
-            $cart['products'] = empty($cart['products']) ? array() : $cart['products'];
-            foreach ($_prods as $_item_id => $_prod) {
-                $old_session_id = $_prod['session_id'];
-                $_prod_extra = unserialize($_prod['extra']);
-                unset($_prod['extra']);
-                $cart['products'][$_item_id] = empty($cart['products'][$_item_id]) ? fn_array_merge($_prod, $_prod_extra, true) : $cart['products'][$_item_id];
+            $cart['products'] = empty($cart['products']) ? [] : $cart['products'];
+
+            // For authorized users, the data in the database takes precedence over the data in the session,
+            // except for the situation when the user has just logged in,
+            // in which case the data should be merged.
+            // For just authorized users user_data.user_id is temporarily empty.
+            if (!empty($cart['user_data']['user_id'])) {
+                $cart['products'] = [];
             }
+
+            foreach ($_prods as $_item_id => $_prod) {
+                if (!empty($cart['products'][$_item_id])) {
+                    $product = $cart['products'][$_item_id];
+                } else {
+                    $_prod_extra = unserialize($_prod['extra']);
+                    unset($_prod['extra']);
+                    $product = fn_array_merge($_prod, $_prod_extra, true);
+                }
+
+                $cart['products'][$_item_id] = $product;
+            }
+        } elseif (empty($_prods) && !empty($cart['user_data']['user_id'])) {
+            $cart['products'] = [];
         }
     }
 
     fn_set_hook('extract_cart', $cart, $user_id, $type, $user_type);
 
-    if ($type == 'C') {
-        $cart['change_cart_products'] = true;
-        fn_calculate_cart_content($cart, $auth, 'S', false, 'I', false, $lang_code);
+    if ($type !== 'C') {
+        return;
     }
+
+    $cart['change_cart_products'] = true;
+    fn_calculate_cart_content($cart, $auth, 'S', false, 'I', false, $lang_code);
 }
 
 /**
@@ -1949,29 +2000,18 @@ function fn_get_order_name($order_id)
 }
 
 /**
- * Gets order paid statuses
+ * Gets order statuses which decreasing the inventory
  *
- * @return array Available paid statuses
+ * @return array Available decreasing the inventory statuses
  */
 function fn_get_order_paid_statuses()
 {
-    $order_status_list = fn_get_statuses_by_type(STATUSES_ORDER);
-    $paid_statuses = db_get_fields(
-        "SELECT status_id"
-        . " FROM ?:status_data"
-        . " WHERE status_id IN (?n)"
-            . " AND param = ?s"
-            . " AND value = ?s",
-        array_keys($order_status_list),
-        'inventory',
-        'D'
-    );
-    $paid_statuses = array_values(array_intersect_key($order_status_list, array_combine($paid_statuses, $paid_statuses)));
+    $paid_statuses = fn_get_status_by_type_and_param(STATUSES_ORDER, ['inventory' => 'D']);
 
     /**
-     * Get order paid statuses (at the end of fn_get_order_paid_statuses())
+     *  Gets order statuses which decreasing the inventory (at the end of fn_get_order_paid_statuses())
      *
-     * @param array $paid_statuses List of order paid statuses
+     * @param array $paid_statuses List of order decreasing the inventory statuses
      */
     fn_set_hook('get_order_paid_statuses_post', $paid_statuses);
 
@@ -2189,8 +2229,8 @@ function fn_get_order_info($order_id, $native_language = false, $format_info = t
                         $option_id_key  = 'option_id';
 
                         $order['products'][$k]['product_options'] = fn_array_merge(
-                            fn_array_combine(fn_array_column($stored_options, $option_id_key), $stored_options),
-                            fn_array_combine(fn_array_column($source_options, $option_id_key), $source_options),
+                            fn_array_combine(array_column($stored_options, $option_id_key), $stored_options),
+                            fn_array_combine(array_column($source_options, $option_id_key), $source_options),
                             true
                         );
 
@@ -2344,7 +2384,7 @@ function fn_check_first_order(&$order)
     if (AREA == 'A' && !fn_get_storage_data('first_order') && Tygh::$app['session']['auth']['is_root'] == 'Y') {
         $status = !empty($order['status']) ? $order['status'] : '';
 
-        if ($status == 'P' || $status == 'C') {
+        if (in_array($status, fn_get_settled_order_statuses())) {
             $order['first_order'] = true;
             fn_set_storage_data('first_order', true);
             Tygh::$app['view']->assign('mode','notification');
@@ -2494,56 +2534,60 @@ function fn_change_order_status($order_id, $status_to, $status_from = '', $force
         }
 
         // Update product amount if inventory tracking is enabled
-        if (Registry::get('settings.General.inventory_tracking') == 'Y') {
+        if (Registry::get('settings.General.gloabl_inventory_tracking') === YesNo::NO) {
+            continue;
+        }
 
-            /**
-             * Executes when changing order status before changing a product stock balance in the database.
-             *
-             * @param int     $order_id            Parent order identifier
-             * @param string  $status_to           New parent order status (one char)
-             * @param string  $status_from         Old parent order status (one char)
-             * @param array   $force_notification  Array with notification rules
-             * @param boolean $place_order         True, if this function have been called inside of fn_place_order function.
-             * @param int     $child_order_id      Child order identifier
-             * @param string  $child_status_to     New child order status (one char)
-             * @param boolean $change_child_status If true, the child order status will be changed
-             * @param string  $k                   Product cart ID
-             * @param array   $v                   Cart product data
-             */
-            fn_set_hook('change_order_status_before_update_product_amount', $order_id, $status_to, $status_from, $force_notification, $place_order, $order_info, $k, $v);
+        /**
+         * Executes when changing order status before changing a product stock balance in the database.
+         *
+         * @param int     $order_id            Parent order identifier
+         * @param string  $status_to           New parent order status (one char)
+         * @param string  $status_from         Old parent order status (one char)
+         * @param array   $force_notification  Array with notification rules
+         * @param bool    $place_order         True, if this function have been called inside of fn_place_order function.
+         * @param int     $child_order_id      Child order identifier
+         * @param string  $child_status_to     New child order status (one char)
+         * @param bool    $change_child_status If true, the child order status will be changed
+         * @param string  $k                   Product cart ID
+         * @param array   $v                   Cart product data
+         */
+        fn_set_hook(
+            'change_order_status_before_update_product_amount',
+            $order_id,
+            $status_to,
+            $status_from,
+            $force_notification,
+            $place_order,
+            $order_info,
+            $k,
+            $v
+        );
 
-            if ($order_statuses[$status_to]['params']['inventory'] == 'D' && $order_statuses[$status_from]['params']['inventory'] == 'I') {
-                // decrease amount
-                if (!fn_update_product_amount(
-                    $v['product_id'],
-                    $v['amount'],
-                    @$v['extra']['product_options'],
-                    '-',
-                    $force_notification !== false,
-                    $order_info
-                )) {
-                    $status_to = STATUS_BACKORDERED_ORDER;
+        if ($order_statuses[$status_to]['params']['inventory'] === 'D' && $order_statuses[$status_from]['params']['inventory'] === 'I') {
+            // decrease amount
+            if (!fn_update_product_amount($v['product_id'], $v['amount'], @$v['extra']['product_options'], '-', $force_notification !== false, $order_info)) {
+                $status_to = STATUS_BACKORDERED_ORDER;
 
-                    $_error = true;
-                    fn_set_notification('W', __('warning'), __('low_stock_subj', array(
-                        '[product]' => fn_get_product_name($v['product_id']) . ' #' . $v['product_id'],
-                    )));
+                $_error = true;
+                fn_set_notification('W', __('warning'), __('low_stock_subj', [
+                    '[product]' => fn_get_product_name($v['product_id']) . ' #' . $v['product_id'],
+                ]));
 
-                    break;
-                } else {
-                    $_updated_ids[] = $k;
-                }
-            } elseif ($order_statuses[$status_to]['params']['inventory'] == 'I' && $order_statuses[$status_from]['params']['inventory'] == 'D') {
-                // increase amount
-                fn_update_product_amount(
-                    $v['product_id'],
-                    $v['amount'],
-                    @$v['extra']['product_options'],
-                    '+',
-                    $force_notification !== false,
-                    $order_info
-                );
+                break;
             }
+
+            $_updated_ids[] = $k;
+        } elseif ($order_statuses[$status_to]['params']['inventory'] === 'I' && $order_statuses[$status_from]['params']['inventory'] === 'D') {
+            // increase amount
+            fn_update_product_amount(
+                $v['product_id'],
+                $v['amount'],
+                @$v['extra']['product_options'],
+                '+',
+                $force_notification !== false,
+                $order_info
+            );
         }
     }
 
@@ -2614,7 +2658,7 @@ function fn_change_order_status($order_id, $status_to, $status_from = '', $force
     $edp_data = fn_generate_ekeys_for_edp(array('status_from' => $status_from, 'status_to' => $status_to), $order_info);
     $order_info['status'] = $status_to;
 
-    db_query("UPDATE ?:orders SET status = ?s WHERE order_id = ?i", $status_to, $order_id);
+    db_query('UPDATE ?:orders SET status = ?s, updated_at = ?i WHERE order_id = ?i', $status_to, TIME, $order_id);
 
     if ($status_to !== STATUS_PARENT_ORDER && $status_to !== STATUS_INCOMPLETED_ORDER) {
         $status_id = strtolower($status_to);
@@ -2625,7 +2669,7 @@ function fn_change_order_status($order_id, $status_to, $status_from = '', $force
         /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
         $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
         $notification_rules = $notification_settings_factory->create($force_notification);
-        
+
         $event_dispatcher->dispatch(
             "order.status_changed.{$status_id}",
             ['order_info' => $order_info],
@@ -2633,7 +2677,7 @@ function fn_change_order_status($order_id, $status_to, $status_from = '', $force
             new OrderProvider($order_info)
         );
         if ($edp_data) {
-            $notification_rules = fn_get_edp_notification_rules($force_notification, $edp_data);
+            $notification_rules = fn_get_edp_notification_rules($force_notification ?: [], $edp_data);
             $event_dispatcher->dispatch(
                 'order.edp',
                 ['order_info' => $order_info, 'edp_data' => $edp_data],
@@ -2689,12 +2733,13 @@ function fn_delete_order($order_id)
     db_query("DELETE FROM ?:order_details WHERE order_id = ?i", $order_id);
     $result = db_query("DELETE FROM ?:orders WHERE order_id = ?i", $order_id);
     db_query("DELETE FROM ?:product_file_ekeys WHERE order_id = ?i", $order_id);
-    db_query("DELETE FROM ?:profile_fields_data WHERE object_id = ?i AND object_type='O'", $order_id);
     db_query("DELETE FROM ?:order_docs WHERE order_id = ?i", $order_id);
 
     // Delete shipments
     $shipment_ids = db_get_fields('SELECT shipment_id FROM ?:shipment_items WHERE order_id = ?i GROUP BY shipment_id', $order_id);
     fn_delete_shipments($shipment_ids);
+
+    fn_delete_profile_fields_data(ProfileDataTypes::ORDER, $order_id);
 
     return $result;
 }
@@ -2740,7 +2785,7 @@ function fn_generate_ekeys_for_edp(array $statuses, array $order_info, array $ac
                 $paid_statuses = fn_get_settled_order_statuses();
 
                 // If order status changed to "Processed"
-                if (($activation_type === 'P') && !empty($statuses)) {
+                if (($activation_type === 'P') && !empty($statuses) && !isset($active_files[$v['product_id']][$file_id])) {
                     if (in_array($statuses['status_to'], $paid_statuses)) {
                         $active_files[$v['product_id']][$file_id] = YesNo::YES;
                     } else {
@@ -2915,12 +2960,13 @@ function fn_get_shipping_info($shipping_id, $lang_code = CART_LANGUAGE)
             implode(', ', $fields), $join, $shipping_id, $conditions
         );
     }
-    
+
     if (empty($shipping)) {
         return [];
     }
 
-    $shipping['allow_multiple_locations'] = isset($shipping['rate_calculation']) && $shipping['rate_calculation'] === 'M';
+    //FIXME Saved for backward compatibility
+    $shipping['allow_multiple_locations'] = true;
 
     /**
      * Modify shipping data after selection
@@ -2938,24 +2984,7 @@ function fn_get_shipping_info($shipping_id, $lang_code = CART_LANGUAGE)
         if (!empty($shipping['service_params'])) {
             $shipping['service_params'] = unserialize($shipping['service_params']);
         }
-
-        $destinations = [];
-        if ($shipping['allow_multiple_locations']) {
-            $destinations = fn_get_shipping_destinations($shipping_id, $shipping, $lang_code);
-        } else {
-            $single_destination_id = 0;
-            $destinations[$single_destination_id] = db_get_row(
-                'SELECT rate_id, rate_value, destination_id FROM ?:shipping_rates'
-                . ' WHERE shipping_id = ?i AND destination_id = ?i',
-                $shipping_id, $single_destination_id
-            );
-            $destinations[$single_destination_id] = array_merge(
-                $destinations[$single_destination_id],
-                fn_get_shipping_rate($shipping_id, $single_destination_id)
-            );
-        }
-
-        $shipping['rates'] = $destinations;
+        $shipping['rates'] = fn_get_shipping_destinations($shipping_id, $shipping, $lang_code);
     }
 
     /** @var \Tygh\Storefront\Repository $repository */
@@ -3023,22 +3052,11 @@ function fn_get_shipping_destinations($shipping_id, array $shipping, $lang_code 
  */
 function fn_get_shipping_rate($shipping_id, $destination_id)
 {
-    $rate = db_get_row("SELECT rate_id, rate_value, destination_id, IF(rate_value = '', 0, 1) as rates_defined FROM ?:shipping_rates WHERE shipping_id = ?i AND destination_id = ?i", $shipping_id, $destination_id);
+    $rate = db_get_row("SELECT rate_id, rate_value, destination_id, IF(rate_value = '', 0, 1) as rates_defined, base_rate FROM ?:shipping_rates WHERE shipping_id = ?i AND destination_id = ?i", $shipping_id, $destination_id);
 
     if (!empty($rate)) {
         $rate['rate_value'] = unserialize($rate['rate_value']);
     }
-
-    if (empty($rate['rate_value']['C'][0])) {
-        $rate['rate_value']['C'][0] = array();
-    }
-    if (empty($rate['rate_value']['W'][0])) {
-        $rate['rate_value']['W'][0] = array();
-    }
-    if (empty($rate['rate_value']['I'][0])) {
-        $rate['rate_value']['I'][0] = array();
-    }
-
     return $rate;
 }
 
@@ -3170,18 +3188,31 @@ function fn_update_shipping($shipping_data, $shipping_id, $lang_code = DESCR_SL)
             foreach (array_keys(Languages::getAll()) as $shipping_data['lang_code']) {
                 db_query('INSERT INTO ?:shipping_descriptions ?e', $shipping_data);
             }
+
+            if ($shipping_data['rate_calculation'] === 'R') {
+                $all_destinations = db_get_fields('SELECT destination_id FROM ?:destinations');
+                $rates = [];
+                foreach ($all_destinations as $destination_id) {
+                    $rates['delivery_time'][$destination_id] = null;
+                    $rates[$destination_id]['base_rate'] = 0;
+                }
+                $shipping_data['rates'] = $rates;
+            }
         }
 
         if ($shipping_id) {
             fn_attach_image_pairs('shipping', 'shipping', $shipping_id, $lang_code);
-            if (!empty($shipping_data['rates'])) {
-                $destination_deliveries = isset($shipping_data['rates']['delivery_time'])
-                    ? $shipping_data['rates']['delivery_time']
-                    : [];
-                unset($shipping_data['rates']['delivery_time']);
+            $destination_deliveries = isset($shipping_data['rates']['delivery_time'])
+                ? $shipping_data['rates']['delivery_time']
+                : [];
+            unset($shipping_data['rates']['delivery_time']);
+
+            if (isset($shipping_data['rates'])) {
+                $shipping_data['rates'] = array_filter($shipping_data['rates']);
                 fn_update_shipping_rates($shipping_data, $shipping_id);
-                fn_update_shipping_destination_delivery_time($shipping_id, $destination_deliveries, $lang_code);
             }
+
+            fn_update_shipping_destination_delivery_time($shipping_id, $destination_deliveries, $lang_code);
 
             if (isset($shipping_data['storefront_ids'])) {
                 /** @var \Tygh\Storefront\Repository $repository */
@@ -3283,6 +3314,11 @@ function fn_get_shipping_destination_delivery_time($shipping_id, $destination_id
 function fn_update_shipping_rates($shipping_data, $shipping_id)
 {
     if (!empty($shipping_id)) {
+        db_query('DELETE FROM ?:shipping_rates WHERE shipping_id = ?i', $shipping_id);
+
+        if (empty($shipping_data['rates'])) {
+            return;
+        }
 
         foreach ($shipping_data['rates'] as $destination_id => $rate) {
 
@@ -3290,18 +3326,8 @@ function fn_update_shipping_rates($shipping_data, $shipping_id)
                 $destination_id = $rate['destination_id'];
             }
 
-            $rate_types = array('C','W','I'); // Rate types: Cost, Weight, Items
-            $normalized_data = array();
-
-            if (empty($rate['rate_value']['C'][0])) {
-                $rates['C'][0] = array();
-            }
-            if (empty($rates['rate_value']['W'][0])) {
-                $rates['W'][0] = array();
-            }
-            if (empty($rates['rate_value']['I'][0])) {
-                $rates['I'][0] = array();
-            }
+            $rate_types = ShippingRateTypes::getAll();
+            $normalized_data = [];
 
             foreach ($rate_types as $type) {
                 // Update rate values
@@ -3318,21 +3344,15 @@ function fn_update_shipping_rates($shipping_data, $shipping_id)
                     ksort($normalized_data[$type], SORT_NUMERIC);
                 }
             }
-
-            if (is_array($normalized_data)) {
-                foreach ($normalized_data as $k => $v) {
-                    if ((count($v) == 1) && (floatval($v[0]['value']) == 0)) {
-                        unset($normalized_data[$k]);
-                        continue;
-                    }
-                }
-            }
-
-            if (fn_is_empty($normalized_data)) {
-                db_query("DELETE FROM ?:shipping_rates WHERE shipping_id = ?i AND destination_id = ?i", $shipping_id, $destination_id);
-            } else {
-                $normalized_data = serialize($normalized_data);
-                db_query("REPLACE INTO ?:shipping_rates (rate_value, shipping_id, destination_id) VALUES(?s, ?i, ?i)", $normalized_data, $shipping_id, $destination_id);
+            $base_rate = isset($rate['base_rate']) ? $rate['base_rate'] : 0;
+            if (!fn_is_empty($normalized_data) || isset($rate['base_rate'])) {
+                $normalized_data = fn_is_empty($normalized_data) ? null : serialize($normalized_data);
+                db_replace_into('shipping_rates', [
+                    'rate_value'     => $normalized_data,
+                    'shipping_id'    => $shipping_id,
+                    'destination_id' => $destination_id,
+                    'base_rate'      => $base_rate,
+                ]);
             }
         }
     }
@@ -3342,31 +3362,43 @@ function fn_update_shipping_rates($shipping_data, $shipping_id)
 /**
  * Normalized shipping rates
  *
- * @param array  $normalized_data shipping info
- * @param array  $rate            rate info
- * @param string $rate_type       rate types: Cost, Weight, Items
+ * @param array<string, array<string, array<string, float|int|string>>> $normalized_data Normalized information about rates.
+ * @param array<string, array<string, float|int|string>>                $rates           Raw rates data.
+ * @param string                                                        $rate_type       Rate types: Cost, Weight, Items
  */
-function fn_normalized_shipping_rate(&$normalized_data, $rate, $rate_type)
+function fn_normalized_shipping_rate(&$normalized_data, $rates, $rate_type)
 {
-    foreach ($rate as $amount => $v) {
+    foreach ($rates as $rate) {
+        if ($rate['value'] === '') {
+            continue;
+        }
+        if (
+            isset($normalized_data[$rate_type][(string) $rate['range_from_value']])
+            && $normalized_data[$rate_type][(string) $rate['range_from_value']]['value'] !== 0
+        ) {
+            continue;
+        }
+        if ($rate['range_to_value'] !== '') {
+            $rate['range_to_value'] = $rate_type === 'I'
+                ? (int) $rate['range_to_value']
+                : (float) $rate['range_to_value'];
+        }
+        $rate['range_from_value'] = $rate_type === 'I'
+            ? (int) $rate['range_from_value']
+            : (float) $rate['range_from_value'];
+        /** @var float|int|string $formatted_value */
+        $formatted_value = fn_format_price($rate['value']);
+        $rate['value'] = $formatted_value;
+        $rate['per_unit'] = empty($rate['per_unit'])
+            ? YesNo::NO
+            : (string) $rate['per_unit'];
 
-        if (!isset($v['value'])) {
-            $v['value'] = 0;
-        }
-        if (!isset($v['type'])) {
-            $v['type'] = 'F';
-        }
-        if (!isset($v['amount'])) {
-            $v['amount'] = $amount;
-        }
-
-        $v['amount'] = strval(($rate_type == 'I') ? intval($v['amount']) : floatval($v['amount']));
-        $v['value'] = fn_format_price($v['value']);
-        $v['per_unit'] = empty($v['per_unit']) ? 'N' : $v['per_unit'];
-
-        if (!isset($normalized_data[$rate_type][$v['amount']]) || floatval($normalized_data[$rate_type][$v['amount']]['value']) == 0) {
-            $normalized_data[$rate_type]["$v[amount]"] = array ('amount' => $v['amount'], 'value' => $v['value'], 'type' => $v['type'], 'per_unit' => $v['per_unit']);
-        }
+        $normalized_data[$rate_type][(string) $rate['range_from_value']] = [
+            'range_from_value' => $rate['range_from_value'],
+            'range_to_value'   => $rate['range_to_value'],
+            'value'            => $rate['value'],
+            'per_unit'         => $rate['per_unit'],
+        ];
     }
 }
 
@@ -3898,11 +3930,18 @@ function fn_calculate_cart_content(
         $is_shipping_selected = !empty($cart['chosen_shipping'])
             && count($cart['chosen_shipping']) === count($product_groups);
 
-        $cart['calculate_shipping'] = $is_shipping_calculation_forced
-            || $is_shipping_calculation_required_for_selected && $is_shipping_selected;
+        $cart['calculate_shipping'] = $cart['shipping_required']
+            && (
+                $is_shipping_calculation_forced
+                || (
+                    $is_shipping_calculation_required_for_selected
+                    && $is_shipping_selected
+                )
+        );
 
         if ($cart['calculate_shipping'] || empty($cart['product_groups'])) {
             $shippings = [];
+            $shippings_groups = [];
 
             foreach ($product_groups as $key_group => $group) {
                 if ($cart['shipping_required'] === false) {
@@ -3914,6 +3953,8 @@ function fn_calculate_cart_content(
                 $shippings_group = Shippings::getShippingsList($group, $lang_code, $area, ['get_images' => true]);
 
                 foreach ($shippings_group as $shipping_id => $shipping) {
+                    $shippings_groups[$shipping_id] = $shipping;
+
                     $product_group = $group;
                     if (!empty($shipping['service_params']['max_weight_of_box'])) {
                         $product_group = Shippings::repackProductsByWeight($group, $shipping['service_params']['max_weight_of_box']);
@@ -3925,6 +3966,7 @@ function fn_calculate_cart_content(
                         'keys'              => [
                             'group_key'   => $key_group,
                             'shipping_id' => $shipping_id,
+                            'company_id'  => $product_group['company_id']
                         ],
                     ]);
 
@@ -3949,26 +3991,35 @@ function fn_calculate_cart_content(
             }
 
             if ($cart['calculate_shipping']) {
+                $cart['product_groups'] = $product_groups;
                 $rates = Shippings::calculateRates($shippings);
                 Registry::set($shipping_cache_key, $rates);
 
                 foreach ($rates as $rate) {
                     $group_key = $rate['keys']['group_key'];
                     $shipping_id = $rate['keys']['shipping_id'];
+                    if (!Shippings::isFreeShipping($shippings_groups[$shipping_id])) {
+                        $package_info = $product_groups[$group_key]['package_info_full'];
+                    } else {
+                        $package_info = $product_groups[$group_key]['package_info'];
+                    }
+                    if (!empty($product_groups[$group_key]['shippings'][$shipping_id]['rate_info'])) {
+                        if ($rate['price'] !== false) {
+                            $rate['price'] += !empty($package_info['shipping_freight'])
+                                ? $package_info['shipping_freight']
+                                : 0;
+                            $product_groups[$group_key]['shippings'][$shipping_id]['rate'] = empty($product_groups[$group_key]['shippings'][$shipping_id]['free_shipping'])
+                                ? $rate['price']
+                                : 0;
+                        } else {
+                            unset($product_groups[$group_key]['shippings'][$shipping_id]);
+                        }
 
-                    if ($rate['price'] !== false) {
-                        $rate['price'] += !empty($product_groups[$group_key]['package_info']['shipping_freight'])
-                            ? $product_groups[$group_key]['package_info']['shipping_freight']
-                            : 0;
-                        $product_groups[$group_key]['shippings'][$shipping_id]['rate'] = empty($product_groups[$group_key]['shippings'][$shipping_id]['free_shipping'])
-                            ? $rate['price']
-                            : 0;
+                        if (!empty($rate['service_delivery_time'])) {
+                            $product_groups[$group_key]['shippings'][$shipping_id]['service_delivery_time'] = $rate['service_delivery_time'];
+                        }
                     } else {
                         unset($product_groups[$group_key]['shippings'][$shipping_id]);
-                    }
-
-                    if (!empty($rate['service_delivery_time'])) {
-                        $product_groups[$group_key]['shippings'][$shipping_id]['service_delivery_time'] = $rate['service_delivery_time'];
                     }
                 }
             }
@@ -4035,7 +4086,7 @@ function fn_calculate_cart_content(
         foreach ($product_groups as $key_group => $group) {
             if ($cart['calculate_shipping'] && (
                     !isset($cart['chosen_shipping'][$key_group]) ||
-                    empty($group['shippings'][$cart['chosen_shipping'][$key_group]])
+                    (empty($cart['keep_chosen_shipping']) && empty($group['shippings'][$cart['chosen_shipping'][$key_group]]))
                 ) && (
                     !$group['free_shipping'] ||
                     $group['all_free_shipping']
@@ -4075,13 +4126,18 @@ function fn_calculate_cart_content(
             $cart['shipping_failed'] = true;
         }
 
+        $cart['chosen_shipping_disabled'] = false;
         foreach ($cart['chosen_shipping'] as $key_group => $shipping_id) {
             if (!empty($product_groups[$key_group]) && !empty($product_groups[$key_group]['shippings'][$shipping_id])) {
                 $shipping = $product_groups[$key_group]['shippings'][$shipping_id];
                 $shipping['group_name'] = $product_groups[$key_group]['name'];
                 $product_groups[$key_group]['chosen_shippings'] = array($shipping);
             } else {
-                unset($cart['chosen_shipping'][$key_group]);
+                if (empty($cart['keep_chosen_shipping'])) {
+                    unset($cart['chosen_shipping'][$key_group]);
+                } else {
+                    $cart['chosen_shipping_disabled'] = true;
+                }
             }
         }
 
@@ -5429,7 +5485,7 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
     }
 
     $product = db_get_row(
-        'SELECT p.tracking, p.amount, p.min_qty, p.max_qty, p.qty_step, p.list_qty_count, p.out_of_stock_actions, pd.product'
+        'SELECT p.tracking, p.amount, p.min_qty, p.max_qty, p.qty_step, p.list_qty_count, p.out_of_stock_actions, p.product_type, pd.product'
         . ' FROM ?:products AS p'
         . ' LEFT JOIN ?:product_descriptions AS pd ON pd.product_id = p.product_id AND lang_code = ?s'
         . ' WHERE p.product_id = ?i',
@@ -5437,37 +5493,23 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
         $product_id
     );
 
-    if (isset($product['tracking'])
-        && $product['tracking'] != ProductTracking::DO_NOT_TRACK
-        && Registry::get('settings.General.inventory_tracking') == 'Y'
-    ) {
-        // Track amount for ordinary product
-        if ($product['tracking'] == ProductTracking::TRACK_WITHOUT_OPTIONS) {
-            $current_amount = $product['amount'];
+    $product = fn_normalize_product_overridable_fields($product);
 
-        // Track amount for product with options
-        } elseif ($product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-            $selectable_cart_id = fn_generate_cart_id($product_id, array('product_options' => $product_options), true);
-            $current_amount = (int)db_get_field(
-                "SELECT amount FROM ?:product_options_inventory WHERE combination_hash = ?s",
-                $selectable_cart_id
-            );
-        }
+    if (
+        isset($product['tracking'])
+        && $product['tracking'] !== ProductTracking::DO_NOT_TRACK
+        && Registry::get('settings.General.inventory_tracking') !== YesNo::NO
+    ) {
+        $current_amount = $product['amount'];
 
         if (!empty($cart['products']) && is_array($cart['products'])) {
             $product_not_in_cart = true;
             foreach ($cart['products'] as $k => $v) {
                 // Check if the product with the same selectable options already exists ( for tracking = O)
                 if ($k != $cart_id) {
-                    if (isset ($product['tracking']) &&
-                        (
-                            $product['tracking'] == ProductTracking::TRACK_WITHOUT_OPTIONS &&
-                            $v['product_id'] == $product_id
-                        ) ||
-                        (
-                            $product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS &&
-                            @$v['selectable_cart_id'] == $selectable_cart_id
-                        )
+                    if (
+                        isset($product['tracking'])
+                        && ($product['tracking'] !== ProductTracking::DO_NOT_TRACK && (int) $v['product_id'] === (int) $product_id)
                     ) {
                         $current_amount -= $v['amount'];
                     }
@@ -5476,19 +5518,13 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
                 }
             }
 
-            if ($product['tracking'] == ProductTracking::TRACK_WITHOUT_OPTIONS &&
-                !empty($update_id) && $product_not_in_cart && !empty($cart['products'][$update_id])
+            if (
+                $product['tracking'] !== ProductTracking::DO_NOT_TRACK
+                && !empty($update_id)
+                && $product_not_in_cart
+                && !empty($cart['products'][$update_id])
             ) {
                 $current_amount += $cart['products'][$update_id]['amount'];
-            }
-
-            if ($product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-                // Store cart_id for selectable options in cart variable, so if the same product is added to
-                // the cart with the same selectable options, but different text options,
-                // the total amount will be tracked anyway as it is the one product
-                if (!empty($selectable_cart_id) && isset($cart['products'][$cart_id])) {
-                    $cart['products'][$cart_id]['selectable_cart_id'] = $selectable_cart_id;
-                }
             }
         }
     }
@@ -5531,7 +5567,7 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
     }
 
     $allow_negative_ammount = Registry::get('settings.General.allow_negative_amount') === YesNo::YES;
-    $global_inventory_tracking = Registry::get('settings.General.inventory_tracking') === YesNo::YES;
+    $inventory_tracking = Registry::get('settings.General.inventory_tracking') !== YesNo::NO;
     $allow_product_preorder = ($product['out_of_stock_actions'] === OutOfStockActions::BUY_IN_ADVANCE)
         && ($product['amount'] <= 0 || $product['amount'] < $min_qty);
 
@@ -5551,24 +5587,16 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
                 )));
                 $amount = fn_ceil_to_step($current_amount, $product['qty_step']);
             } else {
-                if ($product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-                    fn_set_notification($notification_type, __('warning'), __('text_combination_out_of_stock'));
-                } else {
-                    fn_set_notification('W', __('warning'), __('text_cart_not_enough_inventory'));
-                }
+                fn_set_notification('W', __('warning'), __('text_cart_not_enough_inventory'));
             }
         } elseif ($current_amount < $amount) {
-            if ($product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-                fn_set_notification($notification_type, __('notice'), __('text_combination_out_of_stock'));
-            } else {
-                fn_set_notification(
-                    $notification_type,
-                    __('notice'),
-                    __('text_cart_zero_inventory', array('[product]' => $product['product'])),
-                    '',
-                    'zero_inventory'
-                );
-            }
+            fn_set_notification(
+                $notification_type,
+                __('notice'),
+                __('text_cart_zero_inventory', array('[product]' => $product['product'])),
+                '',
+                'zero_inventory'
+            );
 
             return false;
         } elseif ($current_amount <= 0 && $amount <= 0) {
@@ -5587,7 +5615,7 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
             isset($current_amount)
             && $amount > $current_amount
             && !$allow_negative_ammount
-            && $global_inventory_tracking
+            && $inventory_tracking
             && !$allow_product_preorder
         )
         && isset($product_not_in_cart)
@@ -5595,27 +5623,20 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
     ) {
         if (($current_amount < $min_qty || $current_amount == 0)
             && !$allow_negative_ammount
-            && $global_inventory_tracking
+            && $inventory_tracking
             && !$allow_product_preorder
         ) {
-            if ($product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-                fn_set_notification($notification_type, __('warning'), __('text_combination_out_of_stock'));
-            } else {
-                fn_set_notification('W', __('warning'), __('text_cart_not_enough_inventory'));
-            }
+            fn_set_notification('W', __('warning'), __('text_cart_not_enough_inventory'));
             if (!defined('ORDER_MANAGEMENT')) {
                 $amount = false;
             }
         } elseif ($amount > $current_amount
             && !$allow_negative_ammount
-            && $global_inventory_tracking
+            && $inventory_tracking
             && !$allow_product_preorder
         ) {
-            if ($product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-                fn_set_notification($notification_type, __('warning'), __('text_combination_out_of_stock'));
-            } else {
-                fn_set_notification('W', __('warning'), __('text_cart_not_enough_inventory'));
-            }
+            fn_set_notification('W', __('warning'), __('text_cart_not_enough_inventory'));
+
             if (!defined('ORDER_MANAGEMENT')) {
                 $amount = fn_floor_to_step($current_amount, $product['qty_step']);
             }
@@ -5660,8 +5681,6 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
 //
 function fn_generate_cart_id($product_id, $extra, $only_selectable = false)
 {
-    static $cache_options = [];
-
     $_cid = array();
 
     if (!empty($extra['product_options']) && is_array($extra['product_options'])) {
@@ -5671,19 +5690,7 @@ function fn_generate_cart_id($product_id, $extra, $only_selectable = false)
 
         foreach ($extra['product_options'] as $k => $v) {
             if ($only_selectable == true) {
-                if ((string) intval($v) != $v) {
-                    continue;
-                }
-
-                if (!isset($cache_options[$k])) {
-                    $inventory = $cache_options[$k] = db_get_field('SELECT inventory FROM ?:product_options WHERE option_id = ?i', $k);
-                } else {
-                    $inventory = $cache_options[$k];
-                }
-
-                if ($inventory !== YesNo::YES) {
-                    continue;
-                }
+                continue;
             }
 
             $_cid[] = $v;
@@ -5999,7 +6006,8 @@ function fn_add_product_to_cart($product_data, &$cart, &$auth, $update = false)
                     $allow_add = true;
                     // Check if the product price with options modifiers equals to zero
                     $price = fn_get_product_price($product_id, $amount, $auth);
-                    $zero_price_action = db_get_field("SELECT zero_price_action FROM ?:products WHERE product_id = ?i", $product_id);
+                    $zero_price_action = db_get_field('SELECT zero_price_action FROM ?:products WHERE product_id = ?i', $product_id);
+                    $zero_price_action = fn_normalize_product_overridable_field_value('zero_price_action', $zero_price_action);
 
                     /**
                      * Executed when a product is added to cart, once the price of the product is determined.
@@ -6066,6 +6074,7 @@ function fn_add_product_to_cart($product_data, &$cart, &$auth, $update = false)
             }
 
             $_data = db_get_row('SELECT is_edp, options_type, tracking, unlimited_download FROM ?:products WHERE product_id = ?i', $product_id);
+            $_data = fn_normalize_product_overridable_fields($_data);
             if (isset($_data['is_edp'])) {
                 $data['is_edp'] = $_data['is_edp'];
             } elseif (!isset($data['is_edp'])) {
@@ -6079,33 +6088,6 @@ function fn_add_product_to_cart($product_data, &$cart, &$auth, $update = false)
             }
             if (isset($_data['unlimited_download'])) {
                 $data['extra']['unlimited_download'] = $_data['unlimited_download'];
-            }
-
-            // Check the sequential options
-            if (!empty($data['tracking']) &&
-                $data['tracking'] == ProductTracking::TRACK_WITH_OPTIONS &&
-                $data['options_type'] == 'S'
-            ) {
-                $inventory_options = db_get_fields("SELECT a.option_id FROM ?:product_options as a LEFT JOIN ?:product_global_option_links as c ON c.option_id = a.option_id WHERE (a.product_id = ?i OR c.product_id = ?i) AND a.status = 'A' AND a.inventory = 'Y'", $product_id, $product_id);
-
-                $sequential_completed = true;
-                if (!empty($inventory_options)) {
-                    foreach ($inventory_options as $option_id) {
-                        if (!isset($data['product_options'][$option_id]) || empty($data['product_options'][$option_id])) {
-                            $sequential_completed = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (!$sequential_completed) {
-                    fn_set_notification('E', __('error'), __('select_all_product_options'));
-                    // Even if customer tried to add the product from the catalog page, we will redirect he/she to the detailed product page to give an ability to complete a purchase
-                    $redirect_url = fn_url('products.view?product_id=' . $product_id . '&combination=' . fn_get_options_combination($data['product_options']));
-                    $_REQUEST['redirect_url'] = $redirect_url; //FIXME: Very very very BAD style to use the global variables in the functions!!!
-
-                    return false;
-                }
             }
 
             if (!isset($cart['products'][$_id])) { // If product doesn't exists in the cart
@@ -6863,7 +6845,7 @@ function fn_order_shipping_taxes_cost($order_info)
  *                           encrypted string to store in datbase when $order_id isn't set and $return_info is false,
  *                           nothing otherwise.
  */
-function fn_cleanup_payment_info($order_id = '', $payment_info, $silent = false, $return_info = false)
+function fn_cleanup_payment_info($order_id, $payment_info, $silent = false, $return_info = false)
 {
     if ($silent == false) {
         fn_set_progress('echo', __('processing_order') . '&nbsp;<b>#'.$order_id.'</b>...');
@@ -6902,6 +6884,8 @@ function fn_cleanup_payment_info($order_id = '', $payment_info, $silent = false,
  */
 function fn_allow_place_order(&$cart, $auth = null, $parent_order_id = null)
 {
+    $result = true;
+
     $total = Registry::get('settings.General.min_order_amount_type') === 'products_with_shippings'
         ? $cart['total']
         : $cart['subtotal'];
@@ -6915,23 +6899,34 @@ function fn_allow_place_order(&$cart, $auth = null, $parent_order_id = null)
     }
 
     if (!empty($cart['amount_failed']) || !empty($cart['shipping_failed']) || !empty($cart['company_shipping_failed'])) {
-        return false;
+        $result = false;
     }
 
-    return true;
+    /**
+     * Action after checking if order can be placed.
+     *
+     * @param array|null $cart            Array of the cart contents and user information necessary for purchase
+     * @param array|null $auth            Array with authorization data
+     * @param int|null   $parent_order_id Parent order id
+     * @param int        $total           Order total
+     * @param bool       $result          Flag determines if order can be placed
+     */
+    fn_set_hook('allow_place_order_post', $cart, $auth, $parent_order_id, $total, $result);
+
+    return $result;
 }
 
 /**
  * Returns orders
  *
- * @param array  $params array with search params
- * @param int    $items_per_page
- * @param bool   $get_totals
- * @param string $lang_code
+ * @param array  $params         Orders search params
+ * @param int    $items_per_page Items per page
+ * @param bool   $get_totals     Whether to get totals
+ * @param string $lang_code      Two-letter language code (e.g. 'en', 'ru', etc.)
  *
  * @return array
  */
-function fn_get_orders($params, $items_per_page = 0, $get_totals = false, $lang_code = CART_LANGUAGE)
+function fn_get_orders(array $params, $items_per_page = 0, $get_totals = false, $lang_code = CART_LANGUAGE)
 {
     // Init filter
     $params = LastView::instance()->update('orders', $params);
@@ -7199,6 +7194,14 @@ function fn_get_orders($params, $items_per_page = 0, $get_totals = false, $lang_
         $condition .= db_quote(" AND (?:orders.timestamp >= ?i AND ?:orders.timestamp <= ?i)", $params['time_from'], $params['time_to']);
     }
 
+    if (isset($params['updated_at_from'])) {
+        $condition .= db_quote(' AND ?:orders.updated_at >= ?i', $params['updated_at_from']);
+    }
+
+    if (isset($params['updated_at_to'])) {
+        $condition .= db_quote(' AND ?:orders.updated_at <= ?i', $params['updated_at_to']);
+    }
+
     if (!empty($params['custom_files']) && $params['custom_files'] == 'Y') {
         $condition .= db_quote(" AND ?:order_details.extra LIKE ?l", '%custom_files%');
 
@@ -7253,22 +7256,43 @@ function fn_get_orders($params, $items_per_page = 0, $get_totals = false, $lang_
         }
     }
 
-    if ($get_totals == true) {
+    if ($get_totals) {
         $paid_statuses = fn_get_settled_order_statuses();
+        $totals = [];
 
-        fn_set_hook('get_orders_totals', $paid_statuses, $join, $condition, $group);
+        /**
+         * Executes before get orders totals. Allows to modify and extend totals.
+         *
+         * @param array<string> $paid_statuses List of settled order statuses
+         * @param string        $join          String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
+         * @param string        $condition     String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
+         * @param string        $group         String containing the SQL-query GROUP BY field
+         * @param array         $totals        Orders totals
+         */
+        fn_set_hook('get_orders_totals', $paid_statuses, $join, $condition, $group, $totals);
 
-        $totals = [
-            'gross_total'  => db_get_field("SELECT sum(t.total) FROM (SELECT total FROM ?:orders $join WHERE 1 $condition $group) as t"),
-            'totally_paid' => db_get_field("SELECT sum(t.total) FROM (SELECT total FROM ?:orders $join WHERE ?:orders.status IN (?a) $condition $group) as t", $paid_statuses),
-        ];
+        $totals['gross_total'] = db_get_field(
+            'SELECT sum(t.total) FROM (SELECT total FROM ?:orders ?p WHERE 1 ?p ?p) as t',
+            $join,
+            $condition,
+            $group
+        );
+        $totals['totally_paid'] = db_get_field(
+            'SELECT sum(t.total) FROM (SELECT total FROM ?:orders ?p WHERE ?:orders.status IN (?a) ?p ?p) as t',
+            $join,
+            $paid_statuses,
+            $condition,
+            $group
+        );
 
         $params['paid_statuses'] = $paid_statuses;
+    } else {
+        $totals = [];
     }
 
     LastView::instance()->processResults('orders', $orders, $params);
 
-    return [$orders, $params, ($get_totals == true ? $totals : [])];
+    return [$orders, $params, $totals];
 }
 
 /**
@@ -7755,13 +7779,7 @@ function fn_update_stored_cart_taxes(&$cart, $update_id, $new_id, $consider_exis
 function fn_define_original_amount($product_id, $cart_id, &$product, $prev_product)
 {
     if (!empty($prev_product['original_product_data']) && !empty($prev_product['original_product_data']['amount'])) {
-        $tracking = db_get_field("SELECT tracking FROM ?:products WHERE product_id = ?i", $product_id);
-        if ($tracking != ProductTracking::TRACK_WITH_OPTIONS ||
-            $tracking == ProductTracking::TRACK_WITH_OPTIONS &&
-            $prev_product['original_product_data']['cart_id'] == $cart_id
-        ) {
-            $product['original_amount'] = $prev_product['original_product_data']['amount'];
-        }
+        $product['original_amount'] = $prev_product['original_product_data']['amount'];
         $product['original_product_data'] = $prev_product['original_product_data'];
     } elseif (!empty($prev_product['original_amount'])) {
         $product['original_amount'] = $prev_product['original_amount'];
@@ -8137,6 +8155,20 @@ function fn_update_shipment($shipment_data, $shipment_id = 0, $group_key = 0, $a
                     'comments'        => $shipment_data['comments'],
                     'products'        => $shipment_data['products'],
                 ];
+
+                /**
+                 * Executes before sending a notification about the new shipment creation,
+                 * allows you to modify the notification shipment data.
+                 *
+                 * @param array $shipment_data      Shipment data
+                 * @param int   $shipment_id        Shipment identifier
+                 * @param int   $group_key          Cart products group key
+                 * @param bool  $all_products       Whether to use all products to create the new shipment
+                 * @param array $force_notification Array with notification rules
+                 * @param array $order_info         Shipment order information
+                 * @param array $shipment           Notification shipment data
+                 */
+                fn_set_hook('update_shipment_before_send_notification', $shipment_data, $shipment_id, $group_key, $all_products, $force_notification, $order_info, $shipment);
 
                 /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
                 $event_dispatcher = Tygh::$app['event.dispatcher'];
@@ -8557,8 +8589,16 @@ function fn_print_order_invoices($order_ids, $params = array())
             );
             $data['status_settings'] = fn_get_status_params($order_info['status']);
 
-            $data['company_data'] = fn_get_company_placement_info($order_info['company_id'], $params['lang_code']);
-
+            if (fn_allowed_for('MULTIVENDOR') && SiteArea::isStorefront($params['area'])) {
+                $data['company_data'] = fn_filter_company_data_by_profile_fields(
+                    fn_get_company_placement_info($order_info['company_id'], $params['lang_code']),
+                    [
+                        'field_prefix' => 'company_',
+                    ]
+                );
+            } else {
+                $data['company_data'] = fn_get_company_placement_info($order_info['company_id'], $params['lang_code']);
+            }
 
             /** @var \Tygh\SmartyEngine\Core $view */
             $view = Tygh::$app['view'];
@@ -8574,7 +8614,7 @@ function fn_print_order_invoices($order_ids, $params = array())
             /** @var \Tygh\Template\Document\Order\Type $document_type */
             $document_type = Tygh::$app['template.document.order.type'];
             $template_code = isset($params['template_code']) ? $params['template_code'] : 'invoice';
-            $template = $document_type->renderById($order_id, $template_code, $params['lang_code'], $params['secondary_currency']);
+            $template = $document_type->renderById($order_id, $template_code, $params['lang_code'], $params['secondary_currency'], $params['area']);
 
             if ($params['html_wrap']) {
                 /** @var \Tygh\SmartyEngine\Core $view */
@@ -8646,7 +8686,7 @@ function fn_update_order_customer_info($data, $order_id)
 function fn_get_available_shippings($company_id = null, $get_service_params = false, $storefront_id = null)
 {
     $condition = '1=1';
-    if ($company_id != null && !fn_allowed_for('ULTIMATE')) {
+    if ($company_id !== null && !fn_allowed_for('ULTIMATE')) {
         /** @var string $company_shippings */
         $company_shippings = db_get_field('SELECT shippings FROM ?:companies WHERE company_id = ?i', $company_id);
         $condition .= db_quote(' AND (a.company_id = ?i ', $company_id);
@@ -9474,6 +9514,13 @@ function fn_checkout_update_steps(&$cart, &$auth, $params)
         $cart['user_data']['user_exists'] = true;
         $cart['user_data']['found_user_id'] = $found_user_id;
         $cart['user_data']['found_user_email'] = $user_data['email'];
+        list($cart, $auth) = fn_checkout_update_user_data(
+            $cart,
+            $auth,
+            $user_data,
+            $params['ship_to_another'],
+            $found_user_id
+        );
 
         return array(false, $redirect_params);
     } else {
@@ -9705,6 +9752,7 @@ function fn_checkout_place_order(&$cart, &$auth, $params)
                 $exceptions = fn_get_product_exceptions($product['product_id'], true);
                 if (!isset($product['options_type']) || !isset($product['exceptions_type'])) {
                     $product = array_merge($product, db_get_row('SELECT options_type, exceptions_type FROM ?:products WHERE product_id = ?i', $product['product_id']));
+                    $product = fn_normalize_product_overridable_fields($product);
                 }
 
                 if (!fn_is_allowed_options_exceptions($exceptions, $product['product_options'], $product['options_type'], $product['exceptions_type'])) {
@@ -9833,6 +9881,7 @@ function fn_user_session_products_condition($params = array())
         'type' => 'C',
         'user_type' => '',
         'get_session_user_id' => true,
+        'get_session_id' => true,
     ), $params);
 
     if (is_null($params['user_id']) && $params['get_session_user_id']) {
@@ -9849,7 +9898,7 @@ function fn_user_session_products_condition($params = array())
         $conditions['user_id'] = db_quote("user_id = ?i", $params['user_id']);
     }
 
-    if (!empty($params['session_id'])) {
+    if (!empty($params['session_id']) && $params['get_session_id'] === true) {
         $conditions['session_id'] = db_quote("session_id = ?s", $params['session_id']);
     }
 
@@ -10297,7 +10346,7 @@ function fn_get_cart_products($user_id, $params = array())
  * @param array $cart          Cart contents
  * @param array $customer_auth Authentication data
  */
-function fn_store_shipping_rates($order_id = 0, &$cart, $customer_auth)
+function fn_store_shipping_rates($order_id, &$cart, $customer_auth)
 {
     fn_set_hook('store_shipping_rates_pre', $order_id, $cart, $customer_auth);
     if (!empty($cart['product_groups'])) {
@@ -10723,22 +10772,17 @@ function fn_checkout_get_shippping_calculation_type($cart, $is_location_changed)
  */
 function fn_delete_currency($currency_id)
 {
-    $currency_code = db_get_field("SELECT currency_code FROM ?:currencies WHERE currency_id = ?i", $currency_id);
+    $currency_code = db_get_field('SELECT currency_code FROM ?:currencies WHERE currency_id = ?i', $currency_id);
 
-    db_query("DELETE FROM ?:currencies WHERE currency_code = ?s", $currency_code);
-    db_query("DELETE FROM ?:currency_descriptions WHERE currency_code = ?s", $currency_code);
+    db_query('DELETE FROM ?:currencies WHERE currency_code = ?s', $currency_code);
+    db_query('DELETE FROM ?:currency_descriptions WHERE currency_id = ?i', $currency_id);
 
     /** @var \Tygh\Storefront\Repository $storefronts_repository */
     $storefronts_repository = Tygh::$app['storefront.repository'];
-    /** @var \Tygh\Storefront\Storefront[] $storefronts */
     list($storefronts,) = $storefronts_repository->find(['currency_id' => $currency_id]);
+    /** @var \Tygh\Storefront\Storefront $storefront */
     foreach ($storefronts as $storefront) {
-        $storefront_currency_ids = $storefront->getCurrencyIds();
-        $storefront_currency_ids = array_filter($storefront_currency_ids, function($storefront_currency_id) use ($currency_id) {
-            return $storefront_currency_id != $currency_id;
-        });
-        $storefront->setCurrencyIds($storefront_currency_ids);
-        $storefronts_repository->save($storefront);
+        $storefronts_repository->save($storefront->removeCurrencyIds($currency_id));
     }
 }
 
@@ -10848,7 +10892,7 @@ function fn_checkout_set_cart_profile_id(&$cart, $auth, $profile_id)
  *
  * @param array $force_notification
  * @param array $edp_data
- *                       
+ *
  * @return \Tygh\Notifications\Settings\Ruleset
  *
  * @internal
@@ -10887,11 +10931,11 @@ function fn_update_order_staff_only_notes($order_id, $text = '')
 /**
  * Gets order statuses which marked as payment received
  *
- * @return array
+ * @return array List of one-letter status codes
  */
 function fn_get_settled_order_statuses()
 {
-    $settled_order_statuses = ['P', 'C'];
+    $settled_order_statuses = fn_get_status_by_type_and_param(STATUSES_ORDER, ['payment_received' => YesNo::YES]);
 
     /**
      * Gets order statuses which marked as payment received (at the end of fn_get_order_paid_statuses())
@@ -10900,7 +10944,20 @@ function fn_get_settled_order_statuses()
      */
     fn_set_hook('get_settled_order_statuses_post', $settled_order_statuses);
 
-    return $settled_order_statuses;
+    return empty($settled_order_statuses) ? ['P', 'C'] : $settled_order_statuses;
+}
+
+/**
+ * Gets currency information.
+ *
+ * @param int $currency_id Currency ID
+ * @param string $lang_code 2 letters language code
+ *
+ * @return array
+ */
+function fn_get_currency($currency_id, $lang_code = DESCR_SL)
+{
+    return  db_get_row('SELECT a.*, b.description FROM ?:currencies as a LEFT JOIN ?:currency_descriptions as b ON a.currency_id = b.currency_id AND lang_code = ?s WHERE a.currency_id = ?i', $lang_code, $currency_id);
 }
 
 /**
@@ -10913,8 +10970,8 @@ function fn_get_payment_processors_by_category($allow_multiple_categories = fals
 {
     $processors = fn_get_payment_processors();
     $categories = fn_get_schema('payments', 'categories');
-    usort($categories, function ($a, $b) {
-        return $a['position'] > $b['position'];
+    usort($categories, static function ($a, $b) {
+        return $a['position'] > $b['position'] ? 1 : -1;
     });
     $category_criteria = array_column($categories, 'criteria', 'name');
 

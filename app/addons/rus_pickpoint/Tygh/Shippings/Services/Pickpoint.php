@@ -117,9 +117,9 @@ class Pickpoint implements IService
     {
         $data = array();
         $key_data = array();
-        $pickpoint_info = Registry::get('addons.rus_pickpoint');
-        $login = RusPickpoint::Login();
-        $url = RusPickpoint::Url();
+        $pickpoint_info = $this->_shipping_info['service_params']['pickpoint_info'];
+        $login = RusPickpoint::login($pickpoint_info);
+        $url = RusPickpoint::url($pickpoint_info);
         $extra_data = RusPickpoint::$extra_data;
 
         $delivery_mode = empty($this->_shipping_info['service_params']['delivery_mode']) ? '' : $this->_shipping_info['service_params']['delivery_mode'];
@@ -260,73 +260,61 @@ class Pickpoint implements IService
     /**
      * Gets shipping cost and information about possible errors
      *
-     * @param  string $resonse Reponse from Shipping service server
-     * @return array  Shipping cost and errors
+     * @param string $response Response from Shipping service server
+     *
+     * @return array<string, bool|int|string|array<string, int|string>> Shipping cost and errors
      */
     public function processResponse($response)
     {
-        $return = array(
+        $return = [
             'cost' => false,
             'error' => false,
-        );
+        ];
 
-        $result = json_decode($response);
-        $data_services = json_decode(json_encode($result), true);
-        if (isset($data_services['Error']) && ($data_services['Error'] == 1) && !empty($data_services['ErrorMessage'])){
+        $data_services = json_decode($response, true);
+        if (isset($data_services['Error']) && ((int) $data_services['Error'] === 1) && !empty($data_services['ErrorMessage'])) {
             $this->_internalError($data_services['ErrorMessage']);
-
         } elseif (isset($data_services['Error']) && !empty($data_services['Error'])) {
             $this->_internalError($data_services['Error']);
-
         } elseif (isset($data_services['Services'])) {
-            $_result = array();
+            $_result = [];
             $shipping_settings = $this->_shipping_info['service_params'];
             $delivery_mode = empty($shipping_settings['delivery_mode']) ? 'Standart' : $shipping_settings['delivery_mode'];
 
             foreach ($data_services['Services'] as $service) {
                 $discount = empty($service['Discount']) ? 0 : $service['Tariff'] * $service['Discount'] / 100;
-
                 $cost = $service['Tariff'] + $service['NDS'] - $discount;
-
                 if (empty($_result[$service['DeliveryMode']])) {
-                    $_result[$service['DeliveryMode']] = array(
+                    $_result[$service['DeliveryMode']] = [
                         'Tariff_Type' => '',
                         'Total_Dost' => 0,
                         'Total_DopUsl' => 0,
-                        'Cost' => 0
-                    );
+                        'Cost' => 0,
+                    ];
                 }
-
                 $_result[$service['DeliveryMode']]['Tariff_Type'] = $service['Name'];
                 $_result[$service['DeliveryMode']]['Total_Dost'] += $service['Tariff'];
                 $_result[$service['DeliveryMode']]['Total_DopUsl'] += $service['NDS'];
                 $_result[$service['DeliveryMode']]['Cost'] += $cost;
             }
-
             if (count($_result) > 1 && !empty($_result[$delivery_mode])) {
                 $pickpoint = $_result[$delivery_mode];
-
             } else {
                 $pickpoint = reset($_result);
-
             }
-
             if (isset($pickpoint)) {
                 $this->fillSessionPostamat($pickpoint);
-
                 $return['cost'] = $pickpoint['Cost'];
                 $return['delivery_time'] = $this->date_zone;
                 $return['tariff'] = $pickpoint;
             }
         }
-
         if (!empty($this->_error_stack)) {
             foreach ($this->_error_stack as $error) {
                 $return['error'] .= $error . '; ';
             }
         }
-
-        RusPickpoint::Logout();
+        RusPickpoint::logout();
 
         return $return;
     }

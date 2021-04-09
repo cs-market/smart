@@ -14,9 +14,8 @@
 
 namespace Tygh\Shippings;
 
+use Tygh\Enum\YesNo;
 use Tygh\Http;
-use Tygh\Settings;
-use Tygh\Registry;
 
 class RusPickpoint
 {
@@ -31,16 +30,26 @@ class RusPickpoint
         'timeout' => 3,
     );
 
-    public static function Url()
+    /**
+     * Returns URL address for Pickpoint API server.
+     *
+     * @param array<string, string> $pickpoint_info Shipping method settings.
+     *
+     * @return string URL address for Pickpoint API server.
+     */
+    public static function url(array $pickpoint_info = null)
     {
-        $pickpoint_info = Registry::get('addons.rus_pickpoint');
-
         $url_path = 'http://';
-        if ($pickpoint_info['secure_protocol'] == 'Y') {
+        if (empty($pickpoint_info)) {
+            $url_path = fn_get_storefront_protocol();
+            return $url_path . '://e-solution.pickpoint.ru/api/';
+        }
+
+        if (YesNo::toBool($pickpoint_info['secure_protocol'])) {
             $url_path = 'https://';
         }
 
-        if ($pickpoint_info['server'] == 'test') {
+        if ($pickpoint_info['server'] === 'test') {
             $url = self::$url = $url_path . 'e-solution.pickpoint.ru/apitest/';
         } else {
             $url = self::$url = $url_path . 'e-solution.pickpoint.ru/api/';
@@ -49,14 +58,20 @@ class RusPickpoint
         return $url;
     }
 
-    public static function Login()
+    /**
+     * Performs login operation to Pickpoint remote service.
+     *
+     * @param array<string, string> $pickpoint_info Shipping method settings.
+     *
+     * @return bool Result of login operation.
+     */
+    public static function login(array $pickpoint_info)
     {
         $return = false;
-        $pickpoint_info = Registry::get('addons.rus_pickpoint');
 
         $login = self::$login = $pickpoint_info['login'];
         $password = $pickpoint_info['password'];
-        $url = self::Url() . 'login';
+        $url = self::url($pickpoint_info) . 'login';
 
         $data = array(
             'Login' => $login,
@@ -78,10 +93,14 @@ class RusPickpoint
         return $return;
     }
 
-    public static function Logout()
+    /**
+     * Performs logout operation from Pickpoint remote service.
+     *
+     * @return bool|string
+     */
+    public static function logout()
     {
         $sid = self::$sid;
-        $login = self::$login;
         $url = self::$url;
         $data_url = self::$extra_data;
 

@@ -197,10 +197,13 @@ class Amazon extends ABackend
     /**
      * Get file URL
      *
-     * @param  string $file file to get URL
+     * @param string $file     File to get URL
+     * @param string $protocol Protocol (http, https or short)
+     * @param string $url      Storefront URL
+     *
      * @return string file URL
      */
-    public function getUrl($file = '', $protocol = '')
+    public function getUrl($file = '', $protocol = '', $url = '')
     {
         if (strpos($file, '://') !== false) {
             return $file;

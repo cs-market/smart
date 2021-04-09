@@ -24,15 +24,13 @@
             DROP TABLE IF EXISTS ?:import_preset_fields
         </item>
         <item for="install">
+            DROP TABLE IF EXISTS ?:import_preset_states
+        </item>
+        <item for="install">
             CREATE TABLE ?:import_presets (
                 preset_id int(11) unsigned not null auto_increment,
                 company_id int(11) unsigned not null default 0,
                 object_type varchar(32) not null default 'products',
-                last_launch int(11) unsigned not null default 0,
-                last_status char(1) not null default 'X',
-                last_result text,
-                file varchar(255) not null default '',
-                file_type varchar(32) not null default 'server',
                 file_extension varchar(6) not null default '',
                 options text,
                 PRIMARY KEY (preset_id)
@@ -57,6 +55,18 @@
                 PRIMARY KEY (field_id)
             ) ENGINE=MyISAM DEFAULT CHARSET=UTF8
         </item>
+        <item for="install">
+            CREATE TABLE ?:import_preset_states (
+                preset_id int(11) unsigned not null default 0,
+                company_id int(11) unsigned not null default 0,
+                last_launch int(11) unsigned not null default 0,
+                last_status char(1) not null default 'X',
+                last_result text,
+                file varchar(255) not null default '',
+                file_type varchar(32) not null default '',
+                PRIMARY KEY (preset_id, company_id)
+            ) ENGINE=MyISAM DEFAULT CHARSET=UTF8
+        </item>
         <item for="uninstall">
             DROP TABLE IF EXISTS ?:import_presets
         </item>
@@ -65,6 +75,9 @@
         </item>
         <item for="uninstall">
             DROP TABLE IF EXISTS ?:import_preset_fields
+        </item>
+        <item for="uninstall">
+            DROP TABLE IF EXISTS ?:import_preset_states
         </item>
     </queries>
 </addon>

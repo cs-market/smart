@@ -61,16 +61,16 @@ msgid "Disapprove selected"
 msgstr "Disapprove selected"
 
 msgctxt "Languages::pre_moderation"
-msgid "Products require prior approval"
-msgstr "Products require prior approval"
+msgid "Require approval for new products"
+msgstr "Require approval for new products"
 
 msgctxt "Languages::pre_moderation_edit"
-msgid "Approve product info updates"
-msgstr "Approve product info updates"
+msgid "Require approval for updated products"
+msgstr "Require approval for updated products"
 
 msgctxt "Languages::pre_moderation_edit_vendors"
-msgid "Approve vendor profile updates"
-msgstr "Approve vendor profile updates"
+msgid "Require approval for vendor profile changes"
+msgstr "Require approval for vendor profile changes"
 
 msgctxt "Languages::text_not_approved_products"
 msgid "You have products that require your approval. Please <a href=\"[link]\">follow this link</a> to review these products."

@@ -14,7 +14,7 @@
                 {/if}
 
                 {if !$non_editable}
-                    <li>{include file="common/popupbox.tpl" id="group_folder_`$id`" title_start=__("editing_folder") title_end=$folder.folder_name act=$act|default:"edit" opener_ajax_class="cm-ajax"}</li>
+                    <li>{include file="common/popupbox.tpl" id="group_folder_`$id`" text=$folder.folder_name act=$act|default:"edit" opener_ajax_class="cm-ajax"}</li>
                 {/if}
 
                 {if !$non_editable && !$skip_delete}

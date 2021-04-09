@@ -33,6 +33,9 @@ class Context implements IContext
     /** @var array */
     public $data;
 
+    /** @var string */
+    protected $area;
+
     /**
      * Context constructor.
      *
@@ -48,6 +51,7 @@ class Context implements IContext
 
         $this->data = $data;
         $this->lang_code = $lang_code;
+        $this->area = $area;
     }
 
     /**
@@ -56,5 +60,13 @@ class Context implements IContext
     public function getLangCode()
     {
         return $this->lang_code;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArea()
+    {
+        return $this->area;
     }
 }

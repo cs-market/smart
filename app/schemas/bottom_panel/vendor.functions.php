@@ -14,6 +14,7 @@
 
 use Tygh\Tools\Url;
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 /**
  * Checks availability product for company and gets url params. Lead to product update, products list otherwise
@@ -107,4 +108,31 @@ function fn_bottom_panel_mve_get_order_url_params(Url $url)
             'dispatch' => 'orders.manage',
         ];
     }
+}
+
+/**
+ * Checks availability products for company and gets url params.
+ * Lead to products list, dashboard otherwise
+ *
+ * @param Url $url Url which come from customer
+ *
+ * @psalm-return array{dispatch: string, cid?: int, subcats?: "Y"}
+ *
+ * @return array{string: string|int}
+ */
+function fn_bottom_panel_mve_get_company_products_url_params(Url $url)
+{
+    $category_id = $url->getQueryParam('category_id');
+
+    if (empty($category_id)) {
+        return [
+            'dispatch' => 'index.index'
+        ];
+    }
+
+    return [
+        'dispatch' => 'products.manage',
+        'cid' => (int) $category_id,
+        'subcats' => YesNo::YES
+    ];
 }

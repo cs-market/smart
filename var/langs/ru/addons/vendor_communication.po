@@ -8,21 +8,25 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_communication.po\n"
-"X-Crowdin-File-ID: 3682\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_communication.po\n"
+"X-Crowdin-File-ID: 4186\n"
+"PO-Revision-Date: 2021-02-01 09:12\n"
 
 msgctxt "Addons::name::vendor_communication"
-msgid "Ask seller a question"
-msgstr "Чат с продавцом"
+msgid "Message center"
+msgstr "Центр сообщений"
 
 msgctxt "Addons::description::vendor_communication"
-msgid "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
-msgstr "Позволяет покупателям задавать вопросы о товаре со страницы товара. Отвечать на эти вопросы можно во встроенном Центре сообщений."
+msgid "Allows customers, vendors, and administrators to contact each other via the built-in chat."
+msgstr "Позволяет покупателям, продавцам и администраторам общаться друг с другом через встроенный чат."
 
 msgctxt "SettingsSections::vendor_communication::general"
 msgid "General"
 msgstr "Общие"
+
+msgctxt "SettingsSections::vendor_communication::vendor_to_customer"
+msgid "For customers"
+msgstr "Для покупателей"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_product"
 msgid "Contact button on product pages"
@@ -43,6 +47,14 @@ msgstr "Показывать кнопку \"Задать вопрос\" на с�
 msgctxt "SettingsTooltips::vendor_communication::show_on_vendor"
 msgid "Show the \"Ask a question\" button in vendors' microstores."
 msgstr "Показывать кнопку \"Задать вопрос\" на странице микромагазина продавца."
+
+msgctxt "SettingsOptions::vendor_communication::vendor_to_customer_communication"
+msgid "Customer-to-seller communication"
+msgstr "Общение покупателей с продавцами"
+
+msgctxt "SettingsOptions::vendor_communication::vendor_to_admin_communication"
+msgid "Vendor-to-admin communication"
+msgstr "Общение продавцов с администраторами"
 
 msgctxt "Languages::vendor_communication.messages"
 msgid "Messages"
@@ -156,6 +168,18 @@ msgctxt "Languages::vendor_communication.you"
 msgid "You"
 msgstr "Вы"
 
+msgctxt "Languages::vendor_communication.product_details"
+msgid "Product details"
+msgstr "Товар"
+
+msgctxt "Languages::vendor_communication.order_details"
+msgid "Order details"
+msgstr "Заказ"
+
+msgctxt "Languages::vendor_communication.import_details"
+msgid "Import details"
+msgstr "Пресет импорта"
+
 msgctxt "Languages::vendor_communication.thread_deleted"
 msgid "Thread has been deleted"
 msgstr "Вопрос был удалён"
@@ -201,8 +225,8 @@ msgid "Can view"
 msgstr "Просмотр"
 
 msgctxt "Languages::privilege_groups.vendor_communication"
-msgid "Message center"
-msgstr "Центр сообщений"
+msgid "Message center: customer-to-vendor communication"
+msgstr "Центр сообщений: общение покупателей с продавцами"
 
 msgctxt "Languages::vendor_communication.your_message_to_vendor_name"
 msgid "Your message to [vendor_name]"
@@ -213,12 +237,16 @@ msgid "Please sign in so that we can notify you about a reply"
 msgstr "Войдите в учётную запись, чтобы мы могли сообщить вам об ответе"
 
 msgctxt "Languages::vendor_communication"
-msgid "Ask seller a question"
-msgstr "Задать вопрос продавцу"
+msgid "Message center"
+msgstr "Центр сообщений"
 
 msgctxt "Languages::vendor_communication.event.message_received.name"
-msgid "New message received"
-msgstr "Получено новое сообщение"
+msgid "Customer-to-vendor: New message received"
+msgstr "\"Покупатель > продавец\": получено новое сообщение"
+
+msgctxt "Languages::vendor_communication.event.vendor_to_admin_message_received.name"
+msgid "Vendor-to-admin: New message received"
+msgstr "\"Продавец > администратор\": Получено новое сообщение"
 
 msgctxt "Languages::internal_template.vendor_communication_message_received"
 msgid "New message received"
@@ -231,4 +259,60 @@ msgstr "Новое сообщение для [company_name] от [customer]"
 msgctxt "Languages::vendor_communication.new_message.message"
 msgid "Click this notification to see the message"
 msgstr "Нажмите на это уведомление, чтобы прочитать сообщение"
+
+msgctxt "Languages::vendor_communication.contact_admin"
+msgid "Contact administrator"
+msgstr "Связаться с администратором"
+
+msgctxt "Languages::vendor_communication.contact_vendor"
+msgid "Contact vendor"
+msgstr "Связаться с продавцом"
+
+msgctxt "Languages::vendor_communication.communication"
+msgid "Communication"
+msgstr "Обсуждение"
+
+msgctxt "Languages::vendor_communication.message_center_vendor_name"
+msgid "Message center"
+msgstr "Центр сообщений"
+
+msgctxt "Languages::vendor_communication.message_center_vendor_name_menu_description"
+msgid "Messages from vendor to administrator"
+msgstr "Сообщения от продавцов для администрации"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_admin"
+msgid "Vendor communication"
+msgstr "Общение с продавцами"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_customer"
+msgid "Customer communication"
+msgstr "Общение с покупателями"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_admin_for_vendor_panel"
+msgid "Admin communication"
+msgstr "Общение с администрацией"
+
+msgctxt "Languages::vendor_communication.your_message_to_admin"
+msgid "Your message to administrator"
+msgstr "Ваше сообщение администратору"
+
+msgctxt "Languages::vendor_communication.some_threads_have_not_been_created"
+msgid "Some threads have not been created: [count]"
+msgstr "Некоторые сообщения не были созданы: [count]"
+
+msgctxt "Languages::vendor_communication.vendor_to_admin.message_sent"
+msgid "Your message has been sent to <b>[name]</b>.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+msgstr "Ваше сообщение отправлено <b>[name]</b>. <br/><br/>История сообщений находится <a href=\"[thread_url]\">в Центре сообщений</a> в меню \"Продавцы\"."
+
+msgctxt "Languages::vendor_communication.vendor_to_admin.message_list_sent"
+msgid "Your messages have been sent.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+msgstr "Ваши сообщения отправлены. <br/><br/>История сообщений находится <a href=\"[thread_url]\">в Центре сообщений</a> в меню \"Продавцы\"."
+
+msgctxt "Languages::privilege_groups.admin_communication"
+msgid "Message center: vendor-to-admin communication"
+msgstr "Центр сообщений: общение с администратором"
+
+msgctxt "Languages::customer_to_admin_communication.event.message_received.name"
+msgid "Customer-to-Admin: New message received"
+msgstr "\"Покупатель > администратор\": получено новое сообщение"
 

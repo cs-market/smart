@@ -41,7 +41,7 @@ if ($request_method === 'POST') {
             Block::instance()->updateStatus($_REQUEST);
 
         } elseif ($type == 'grid') {
-            if (SchemesManager::isWrapperAvailable($_REQUEST)) {
+            if (SchemesManager::isGridWrapperAvailable($_REQUEST)) {
                 Grid::update($_REQUEST);
             }
         } elseif ($type == 'container') {

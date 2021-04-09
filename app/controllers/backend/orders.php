@@ -214,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'order_id' => $order_id,
         ));
 
-        db_query('UPDATE ?:orders SET issuer_id = ?i WHERE order_id = ?i', $user_id, $order_id);
+        db_query('UPDATE ?:orders SET issuer_id = ?i, updated_at = ?i WHERE order_id = ?i', $user_id, TIME, $order_id);
 
         return [CONTROLLER_STATUS_REDIRECT, 'orders.details?order_id=' . $order_id];
     }
@@ -257,6 +257,7 @@ if ($mode == 'print_invoice') {
 
 } elseif ($mode == 'details') {
     $_REQUEST['order_id'] = empty($_REQUEST['order_id']) ? 0 : $_REQUEST['order_id'];
+    $selected_section = (empty($_REQUEST['selected_section']) ? 'general' : $_REQUEST['selected_section']);
 
     $order_info = fn_get_order_info($_REQUEST['order_id'], false, true, true, false);
     fn_check_first_order($order_info);
@@ -332,7 +333,11 @@ if ($mode == 'print_invoice') {
     }
 
     foreach ($shipments as $shipment_key => $shipment) {
-        $order_info['shipping'][$shipment['group_key']]['shipment_keys'][] = $shipment_key;
+        if (isset($order_info['shipping'][$shipment['group_key']])) {
+            $order_info['shipping'][$shipment['group_key']]['shipment_keys'][] = $shipment_key;
+        } else {
+            $order_info['shipping'][0]['shipment_keys'][] = $shipment_key;
+        }
     }
 
     Tygh::$app['view']->assign('shipments', $shipments);
@@ -341,6 +346,7 @@ if ($mode == 'print_invoice') {
 
     Tygh::$app['view']->assign('order_info', $order_info);
     Tygh::$app['view']->assign('status_settings', fn_get_status_params($order_info['status']));
+    Tygh::$app['view']->assign('selected_section', $selected_section);
 
     // Check if customer's email is changed
     if (!empty($order_info['user_id'])) {
@@ -536,6 +542,8 @@ function fn_update_order_details(array $params)
     fn_log_event('orders', 'update', array(
         'order_id' => $params['order_id'],
     ));
+
+    $params['update_order']['updated_at'] = isset($params['update_order']['updated_at']) ? fn_parse_date($params['update_order']['updated_at']) : TIME;
 
     db_query('UPDATE ?:orders SET ?u WHERE order_id = ?i', $params['update_order'], $params['order_id']);
 

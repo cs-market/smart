@@ -74,7 +74,7 @@ function _pickFromDialog(event) {
 function _addToDialog(notification) {
     var dlg = $.ceDialog('get_last');
     if (dlg.length) {
-        $('.object-container', dlg).prepend(notification);
+        $('.cm-notification-container-dialog', dlg).prepend(notification);
         dlg.off('dialogclose', _pickFromDialog);
         dlg.on('dialogclose', _pickFromDialog);
         return true;

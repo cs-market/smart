@@ -43,7 +43,7 @@
                             {/if}
                         {/foreach}
                     </select>
-                    <div class="right update-for-all">
+                    <div class="right">
                     </div>
                 </div>
             </div>

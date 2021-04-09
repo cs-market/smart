@@ -12,6 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Enum\SiteArea;
 use Tygh\Notifications\DataValue;
 use Tygh\Addons\GiftCertificates\Notifications\DataProviders\GiftCertificateDataProvider;
 use Tygh\Notifications\Transports\Mail\MailMessageSchema;
@@ -33,7 +34,7 @@ $certificate_event = [
     'receivers' => [
         UserTypes::CUSTOMER => [
             MailTransport::getId() => MailMessageSchema::create([
-                'area'            => 'C',
+                'area'            => SiteArea::STOREFRONT,
                 'from'            => 'company_orders_department',
                 'to'              => DataValue::create('certificate_data.email'),
                 'template_code'   => 'gift_certificates_notification',

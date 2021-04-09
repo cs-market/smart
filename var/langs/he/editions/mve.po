@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: he\n"
-"X-Crowdin-File: /release-4.11.5/editions/mve.po\n"
-"X-Crowdin-File-ID: 3708\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/editions/mve.po\n"
+"X-Crowdin-File-ID: 4194\n"
+"PO-Revision-Date: 2021-02-01 09:06\n"
 
 msgctxt "Languages::add_companies"
 msgid "Add vendors"
@@ -165,12 +165,12 @@ msgid "Can view"
 msgstr "יכול לצפות"
 
 msgctxt "Languages::privilege_sections.vendors"
-msgid "Store privileges"
-msgstr "הרשאות חנות"
+msgid "Vendors privileges"
+msgstr "הרשאות הספק"
 
 msgctxt "Languages::privilege_groups.vendors"
-msgid "Stores"
-msgstr "חנויות"
+msgid "Vendors"
+msgstr "ספקים"
 
 msgctxt "Languages::sales_period"
 msgid "Sales period"
@@ -330,7 +330,7 @@ msgstr "צפה במשתמשי הספק"
 
 msgctxt "Languages::view_vendor_admins"
 msgid "View vendor admins"
-msgstr ""
+msgstr "צפו במנהלי ספקים"
 
 msgctxt "Languages::you_can_edit_account_details"
 msgid "You can edit the account details now."
@@ -364,9 +364,21 @@ msgctxt "SettingsOptions::mailer_send_from_admin"
 msgid "Send vendor emails from marketplace email addresses"
 msgstr "שלח הודעות דוא\"ל של ספקים מכתובות דוא\"ל של זירות מסחר"
 
+msgctxt "SettingsOptions::allow_vendor_manage_features"
+msgid "Allow vendors to manage product features"
+msgstr "אפשר לספקים לנהל את תכונות המוצר"
+
 msgctxt "SettingsTooltips::need_agree_with_terms_n_conditions"
 msgid "The text of terms & conditions will be retrieved from the \"vendor_terms_n_conditions_content\" language variable."
 msgstr "הטקסט של תנאי שימוש יילקח מתוך \"vendor_terms_n_conditions_content\" משתנה שפה."
+
+msgctxt "SettingsOptions::allow_approve_vendors_in_two_steps"
+msgid "Approve vendors in 2 steps"
+msgstr "אשר ספקים בשני שלבים"
+
+msgctxt "SettingsTooltips::allow_approve_vendors_in_two_steps"
+msgid "New vendors will get the \"Pending\" status after approval. This will hide them on the storefront."
+msgstr "ספקים חדשים יקבלו את הסטטוס \"בהמתנה\" לאחר האישור. זה יסתיר אותם בחלון הראווה."
 
 msgctxt "Languages::use_for_apply_for_vendor_account"
 msgid "Apply for a vendor account form"
@@ -786,7 +798,7 @@ msgstr "לא ניתן לערוך את המראה של דף זה באמצעות �
 
 msgctxt "Languages::error_admin_registers_as_vendor"
 msgid "You can't become a vendor because you are currently signed in as an administrator. Please sign out and resubmit the form. <p><a class=\"ty-btn ty-btn__secondary\" href=\"[sign_out_link]\">Sign out</a></p>"
-msgstr ""
+msgstr "אינך יכול להפוך לספק מכיוון שאתה מחובר כרגע כמנהל. אנא צא והגש את הטופס מחדש. <p style=\";text-align:right;direction:rtl\"> <a class=\"ty-btn ty-btn__secondary\" href=\"[sign_out_link]\">התנתק</a> </p>"
 
 msgctxt "Languages::logo_for_the_customer_area"
 msgid "Logo for the customer area"
@@ -892,22 +904,6 @@ msgctxt "Languages::all_companies"
 msgid "All vendors"
 msgstr "כל הספקים"
 
-msgctxt "Languages::storefront_access_key"
-msgid "Access key to temporarily closed storefront"
-msgstr "מפתח גישה לחזית החנות שנסגרה זמנית"
-
-msgctxt "Languages::storefront_status.tooltip"
-msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed storefront</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
-msgstr "גם אם חזית החנות סגורה (סטטוס לא פעיל), תוכל לצפות בה אם יש ברשותך מפתח גישה. ציין את <i>מפתח גישה לחזית החנות שנסגרה זמנית <i>למטה.<br/>השתמש בhttp://www.example.com/index.php?store_access_key=key_value כדי לקבל גישה לחזית החנות הסגורה."
-
-msgctxt "Languages::storefront_access_key.setting_notice"
-msgid "You can set the access key on the storefront editing page"
-msgstr "תוכל להגדיר את מפתח הגישה בדף עריכה של חזית החנות"
-
-msgctxt "Languages::close_storefront.setting_notice"
-msgid "You can open or close a storefront on the storefront editing page"
-msgstr "תוכל לפתוח או לסגור חזית חנות בדף עריכה של חזית החנות"
-
 msgctxt "Languages::is_default_storefront"
 msgid "Default storefront"
 msgstr "חזית חנות של ברירת מחדל"
@@ -930,27 +926,35 @@ msgstr "[n] ספק|[n] ספקים"
 
 msgctxt "Languages::event.vendors_require_approval.name"
 msgid "Vendors require approval"
-msgstr ""
+msgstr "ספקים דורשים אישור"
 
 msgctxt "Languages::event.vendors_require_approval.title"
 msgid "Some vendors are pending approval"
-msgstr ""
+msgstr "חלק מהספקים ממתינים לאישור"
 
 msgctxt "Languages::event.vendor_status_changed.name"
 msgid "Vendor status changed to [status]"
-msgstr ""
+msgstr "סטטוס הספק השתנה ל [סטטוס]"
+
+msgctxt "Languages::event.vendor_status_changed_from.name"
+msgid "Vendor status changed from [status]"
+msgstr "סטטוס הספק השתנה מ- [סטטוס]"
+
+msgctxt "Languages::email_template.company_status_suspended_notification"
+msgid "Company status change to Suspended"
+msgstr "שינוי סטטוס החברה למושעה"
 
 msgctxt "Languages::event.vendor_status_changed.title"
 msgid "Your status has been changed to [status]"
-msgstr ""
+msgstr "הסטטוס שלך השתנה ל [סטטוס]"
 
 msgctxt "Languages::event.vendor_status_changed.active.message"
 msgid "All your active products will now appear in the store"
-msgstr ""
+msgstr "כל המוצרים הפעילים שלך יופיעו כעת בחנות"
 
 msgctxt "Languages::event.vendor_status_changed.pending.message"
 msgid "You can work with the admin panel and manage your products, but they won't appear to customers until your status changes to Active."
-msgstr ""
+msgstr "אתה יכול לעבוד עם לוח הניהול ולנהל את המוצרים שלך, אך הם לא יופיעו בפני לקוחות עד שהסטטוס שלך ישתנה לפעיל."
 
 msgctxt "Languages::vendor_notifications"
 msgid "Vendor notifications"
@@ -960,11 +964,47 @@ msgctxt "Languages::log_in_as_vendor"
 msgid "Log in as vendor"
 msgstr "להתחבר כספק"
 
+msgctxt "Languages::vendor_owner"
+msgid "Vendor's main administrator"
+msgstr "המנהל הראשי של הספק"
+
+msgctxt "Languages::owner_company"
+msgid "Vendor"
+msgstr "ספק"
+
 msgctxt "Languages::block_manager.dynamic_entity_companies"
 msgid "vendor"
 msgstr "ספק"
 
+msgctxt "Languages::vendor_features_only"
+msgid "Features created by vendors"
+msgstr "תכונות שנוצרו על ידי ספקים"
+
+msgctxt "Languages::any_vendor"
+msgid "Any vendor"
+msgstr "כל ספק"
+
 msgctxt "Languages::event.apply_for_vendor_notification.name"
 msgid "New vendor account application"
-msgstr ""
+msgstr "יישום חשבון ספק חדש"
+
+msgctxt "Languages::suspend_alert"
+msgid "<p>Your account is suspended. To lift the suspension, please contact us.</p>"
+msgstr "<p> חשבונך מושעה. לביטול ההשעיה, אנא צרו איתנו קשר. </p>"
+
+msgctxt "Languages::event.vendor_status_changed.suspended.title"
+msgid "Your account is suspended"
+msgstr "חשבונך מושעה"
+
+msgctxt "Languages::event.vendor_status_changed.suspended.message"
+msgid "To lift the suspension, please contact us."
+msgstr "לביטול ההשעיה, אנא צרו איתנו קשר."
+
+msgctxt "Languages::text_company_status_suspended_subj"
+msgid "Your account is suspended"
+msgstr "חשבונך מושעה"
+
+msgctxt "Languages::logo_section.vendor"
+msgid "Default logo for new vendors"
+msgstr "לוגו ברירת מחדל לספקים חדשים"
 

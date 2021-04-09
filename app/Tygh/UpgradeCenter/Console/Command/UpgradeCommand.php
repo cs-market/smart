@@ -158,7 +158,7 @@ EOF
         $this->upgrade_app->validator_callback = array($this, 'upgradeCenterValidatorCallback');
 
         if ($this->upgrade_app->downloadPackage($id)) {
-            list($result) = $this->upgrade_app->install($id, array());
+            list($result) = $this->upgrade_app->install($id, ['id' => $id]);
 
             if ($result === App::PACKAGE_INSTALL_RESULT_SUCCESS) {
                 $output->writeln('<info>Successful</info>');

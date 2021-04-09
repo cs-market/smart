@@ -612,10 +612,10 @@ function fn_rus_cities_location_manager_detect_zipcode_post($country_code, $stat
      * Executes when automatically detecting a customer's zipcode after the zipcode is detected,
      * allows you to modify the detected zipcode.
      *
-     * @param string $country_code ISO 3166-1 country code
-     * @param string $state_code   ISO 3166-2 state code
-     * @param string $city         City name
-     * @param string $zipcode      Detected zipcode
+     * @param string                $country_code ISO 3166-1 country code
+     * @param string                $state_code   ISO 3166-2 state code
+     * @param array<string, string> $city         City name
+     * @param string                $zipcode      Detected zipcode
      */
     fn_set_hook('rus_cities_location_manager_detect_zipcode_post_post', $country_code, $state_code, $city, $zipcode);
 }

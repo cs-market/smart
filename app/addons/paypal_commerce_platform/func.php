@@ -365,3 +365,36 @@ function fn_paypal_commerce_platform_set_order_status_on_refund_setting_visibili
 
     $settings_manager->update($data);
 }
+
+/**
+ * The "save_log" hook handler.
+ *
+ * Actions performed:
+ * - Adds PayPal Debug ID response header value to the logged HTTP request.
+ *
+ * @param string                $type                Log type
+ * @param string                $action              Event action
+ * @param string                $data                Request data
+ * @param int                   $user_id             Logged in user ID
+ * @param array<string, string> $content             Logged data
+ * @param string                $event_type          Event type
+ * @param string                $object_primary_keys Object primary key names
+ */
+function fn_paypal_commerce_platform_save_log($type, $action, $data, $user_id, array &$content, $event_type, $object_primary_keys)
+{
+    if (
+        $type !== 'requests'
+        || $action !== 'http'
+    ) {
+        return;
+    }
+
+    /** @var string $request_debug_id */
+    $request_debug_id = Registry::ifGet('runtime.paypal_commerce_platform.debug_id', '');
+    if (!$request_debug_id) {
+        return;
+    }
+
+    $content['paypal_commerce_platform.debug_id'] = $request_debug_id;
+    Registry::del('runtime.paypal_commerce_platform.debug_id');
+}

@@ -48,7 +48,7 @@
                     {/foreach}
                 </select>
                 <div class="controls">
-                    <div class="right update-for-all">
+                    <div class="right">
                         {include file="buttons/update_for_all.tpl" display=$item.update_for_all object_id=$item.object_id name="update_all_vendors[`$item.object_id`]" hide_element=$html_id}
                     </div>
                 </div>

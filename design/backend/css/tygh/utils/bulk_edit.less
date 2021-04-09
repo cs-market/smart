@@ -7,9 +7,14 @@
         margin-bottom: 6.5px;
     }
 
-    &--overlay {
+    &__content.open ~ &--overlay {
         display: block;
+    }
+
+    &--overlay {
+        display: none;
         position: fixed;
+        cursor: default;
     
         right: 0;
         top: 0;
@@ -40,8 +45,8 @@
     
     & &__btn-content--checkbox {
         vertical-align: middle;
-        margin-top: -2px;
-        margin-left: 12px;
+        margin-top: -3px;
+        margin-left: 6px;
         margin-right: 6px;
     }
 
@@ -122,6 +127,24 @@
     &--categories {
         width: 100vw; // like 100% for js' auto positioned dropdown
         max-width: 550px;
+
+        .cm-object-categories-add-container {
+            .select2-selection__rendered {
+                max-height: 150px;
+                overflow: overlay;
+                margin-bottom: 45px;
+            }
+
+            .select2-search.select2-search--inline {
+                position: absolute;
+                bottom: 0;
+                pointer-events: inherit;
+            }
+
+            .select2 .select2-selection .select2-selection__choice:nth-last-child(2) {
+                margin-bottom: 0;
+            }
+        }
     }
 
     &__header {

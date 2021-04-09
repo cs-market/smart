@@ -58,7 +58,6 @@ $schema = [
                     'position' => 20
                 ],
             ],
-            'position' => 100,
         ],
         'administration' => [
             'items' => [
@@ -163,9 +162,24 @@ $schema = [
                 'languages' => [
                     'href' => 'languages.manage',
                     'type' => 'title',
+                    'title' => __('texts_languages'),
                     'position' => 700,
                     'subitems' => [
+                        'edit_on_site' => [
+                            'href' => 'customization.update_mode?type=live_editor&status=enable',
+                            'attrs' => [
+                                'href' => [ // Attributes for <a>
+                                    'target' => '_blank',
+                                ],
+                            ],
+                            'position' => 10,
+                        ],
+                        'edit_on_site_divider' => [
+                            'type' => 'divider',
+                            'position' => 20,
+                        ],
                         'translations' => [
+                            'title' => __('edit_texts'),
                             'href' => 'languages.translations',
                             'position' => 100,
                         ],
@@ -242,9 +256,13 @@ $schema = [
                             'href' => 'exim.import?section=translations',
                             'position' => 300,
                         ],
+                        'states' => [
+                            'href' => 'exim.import?section=states',
+                            'position' => 400,
+                        ],
                         'users' => [
                             'href' => 'exim.import?section=users',
-                            'position' => 400,
+                            'position' => 500,
                         ],
                     ],
                 ],
@@ -264,14 +282,17 @@ $schema = [
                             'href' => 'exim.export?section=features',
                             'position' => 100,
                         ],
-
                         'translations' => [
                             'href' => 'exim.export?section=translations',
                             'position' => 400,
                         ],
+                        'states' => [
+                            'href' => 'exim.export?section=states',
+                            'position' => 500,
+                        ],
                         'users' => [
                             'href' => 'exim.export?section=users',
-                            'position' => 500,
+                            'position' => 600,
                         ],
                     ],
                 ],
@@ -299,10 +320,6 @@ $schema = [
                 'themes' => [
                     'href' => 'themes.manage',
                     'position' => 100,
-                ],
-                'layouts' => [
-                    'href' => 'block_manager.manage',
-                    'position' => 200,
                 ],
                 'layouts' => [
                     'href' => 'block_manager.manage',

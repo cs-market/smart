@@ -12,9 +12,12 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Storage;
+use Tygh\Enum\ProductZeroPriceActions;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -58,8 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // Change payment method
-        $update_order['payment_id'] = $_REQUEST['payment_id'];
-        $update_order['repaid'] = ++ $order_info['repaid'];
+        $update_order = [
+            'payment_id' => $_REQUEST['payment_id'],
+            'repaid'     => ++$order_info['repaid'],
+            'updated_at' => TIME
+        ];
 
         // Add new customer notes
         if (!empty($_REQUEST['customer_notes'])) {
@@ -125,8 +131,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $allowed_id = db_get_field(
                 'SELECT user_id '
                 . 'FROM ?:orders '
-                . 'WHERE user_id = ?i AND order_id = ?i AND is_parent_order != ?s' . $condition,
-                $auth['user_id'], $_REQUEST['track_data'], 'Y'
+                . 'WHERE user_id = ?i AND order_id = ?i AND is_parent_order != ?s ?p',
+                $auth['user_id'],
+                $_REQUEST['track_data'],
+                YesNo::YES,
+                $condition
             );
 
             if (!empty($allowed_id)) {
@@ -134,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     fn_url('orders.details?order_id=' . $_REQUEST['track_data']));
                 exit;
             } else {
-                fn_set_notification('E', __('error'), __('warning_track_orders_not_allowed'));
+                fn_set_notification(NotificationSeverity::ERROR, __('error'), __('warning_track_orders_not_allowed'));
             }
         } else {
             $email = '';
@@ -143,12 +152,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $o_id = 0;
                 // If track by email
                 if (strpos($_REQUEST['track_data'], '@') !== false) {
-                    $order_info = db_get_row("SELECT order_id, email, company_id, lang_code FROM ?:orders WHERE email = ?s $condition ORDER BY timestamp DESC LIMIT 1",
-                        $_REQUEST['track_data']);
+                    $order_info = db_get_row(
+                        'SELECT order_id, email, company_id, lang_code, storefront_id'
+                        . ' FROM ?:orders'
+                        . ' WHERE email = ?s ?p ORDER BY timestamp DESC LIMIT 1',
+                        $_REQUEST['track_data'],
+                        $condition
+                    );
                     // Assume that this is order number
                 } else {
-                    $order_info = db_get_row("SELECT order_id, email, company_id, lang_code FROM ?:orders WHERE order_id = ?i $condition",
-                        $_REQUEST['track_data']);
+                    $order_info = db_get_row(
+                        'SELECT order_id, email, company_id, lang_code, storefront_id'
+                        . ' FROM ?:orders'
+                        . ' WHERE order_id = ?i ?p',
+                        $_REQUEST['track_data'],
+                        $condition
+                    );
                 }
             }
 
@@ -161,35 +180,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 $company_id = fn_get_company_id('orders', 'order_id', $order_info['order_id']);
 
-                $result = $mailer->send(array(
-                    'to' => $order_info['email'],
-                    'from' => 'company_orders_department',
-                    'data' => array(
-                        'access_key' => $ekey,
-                        'order_id' => $order_info['order_id'],
-                        'url' => fn_url("orders.track?ekey=$ekey&o_id=" . $order_info['order_id'], 'C', 'http'),
-                        'track_all_url' => fn_url("orders.track?ekey=$ekey", 'C', 'http')
-                    ),
-                    'template_code' => 'track',
-                    'tpl' => 'orders/track.tpl', // this parameter is obsolete and is used for back compatibility
-                    'company_id' => $company_id,
-                ), 'C', $order_info['lang_code']);
+                $result = $mailer->send(
+                    [
+                        'to'            => $order_info['email'],
+                        'from'          => 'company_orders_department',
+                        'data'          => [
+                            'access_key'    => $ekey,
+                            'order_id'      => $order_info['order_id'],
+                            'url'           => fn_url(
+                                'orders.track?ekey=' . $ekey . '&o_id=' . $order_info['order_id'] . '&storefront_id=' . $order_info['storefront_id'],
+                                SiteArea::STOREFRONT,
+                                'http'
+                            ),
+                            'track_all_url' => fn_url(
+                                'orders.track?ekey=' . $ekey . '&storefront_id=' . $order_info['storefront_id'],
+                                SiteArea::STOREFRONT,
+                                'http'
+                            ),
+                        ],
+                        'template_code' => 'track',
+                        'tpl'           => 'orders/track.tpl', // this parameter is obsolete and is used for back compatibility
+                        'company_id'    => $company_id,
+                        'storefront_id' => $order_info['storefront_id'],
+                    ],
+                    SiteArea::STOREFRONT,
+                    $order_info['lang_code']
+                );
 
                 if ($result) {
-                    fn_set_notification('N', __('notice'), __('text_track_instructions_sent'));
+                    fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_track_instructions_sent'));
                 }
             } else {
-                fn_set_notification('E', __('error'), __('warning_track_orders_not_found'));
+                fn_set_notification(NotificationSeverity::ERROR, __('error'), __('warning_track_orders_not_found'));
             }
         }
 
-        return array(CONTROLLER_STATUS_OK, $_REQUEST['return_url']);
+        return [CONTROLLER_STATUS_OK, $_REQUEST['return_url']];
     }
 
-    return array(CONTROLLER_STATUS_OK, 'orders.details?order_id=' . $_REQUEST['order_id']);
+    return [CONTROLLER_STATUS_OK, 'orders.details?order_id=' . $_REQUEST['order_id']];
 }
 
-fn_add_breadcrumb(__('orders'), $mode == 'search' ? '' : "orders.search");
+fn_add_breadcrumb(__('orders'), $mode === 'search' ? '' : 'orders.search');
 
 //
 // Show invoice
@@ -516,7 +548,8 @@ function fn_reorder($order_id, &$cart, &$auth)
 
             // Check if the product price with options modifiers equals to zero
             $price = fn_get_product_price($product['product_id'], $amount, $auth);
-            $zero_price_action = db_get_field("SELECT zero_price_action FROM ?:products WHERE product_id = ?i", $product['product_id']);
+            $zero_price_action = db_get_field('SELECT zero_price_action FROM ?:products WHERE product_id = ?i', $product['product_id']);
+            $zero_price_action = fn_normalize_product_overridable_field_value('zero_price_action', $zero_price_action);
 
             /**
              * Executed for each product when an order is re-ordered.
@@ -533,7 +566,7 @@ function fn_reorder($order_id, &$cart, &$auth)
              */
             fn_set_hook('reorder_product', $order_info, $cart, $auth, $product, $amount, $price, $zero_price_action, $k);
 
-            if (!floatval($price) && $zero_price_action == 'A') {
+            if (!(float) $price && $zero_price_action === ProductZeroPriceActions::ASK_TO_ENTER_PRICE) {
                 if (isset($product['custom_user_price'])) {
                     $price = $product['custom_user_price'];
                 }

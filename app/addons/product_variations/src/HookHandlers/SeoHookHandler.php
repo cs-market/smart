@@ -79,6 +79,7 @@ class SeoHookHandler
         $parent_product_id = ServiceProvider::getProductIdMap()->getParentProductId($product_id);
 
         if (!$parent_product_id) {
+            ServiceProvider::getProductIdMap()->setParentProductId($product_id, 0);
             return;
         }
 
@@ -224,6 +225,11 @@ class SeoHookHandler
             return;
         }
 
+        $aggregate_offer = reset($markup_items['product']['offers']);
+        if (!isset($aggregate_offer['@type']) || $aggregate_offer['@type'] !== 'http://schema.org/Offer') {
+            return;
+        }
+
         $group_repository = ServiceProvider::getGroupRepository();
         $group = $group_repository->findGroupById($product_data['variation_group_id']);
 
@@ -237,10 +243,6 @@ class SeoHookHandler
             return;
         }
 
-        $aggregate_offer = reset($markup_items['product']['offers']);
-        if (!$aggregate_offer) {
-            return;
-        }
         $offer_id = key($markup_items['product']['offers']);
 
         $base_offer_url = $aggregate_offer['url'];
@@ -257,16 +259,23 @@ class SeoHookHandler
         if (count($offers) <= Registry::ifGet('config.product_variations.seo_snippet_offers_threshold', 100)) {
             $product_repository = ServiceProvider::getProductRepository();
             $products = $product_repository->findProducts(array_keys($offers->toArray()), ['product_name'], SiteArea::STOREFRONT);
+            $product_features = fn_seo_get_schema_org_products_features(array_column($products, 'product_id'));
 
             foreach ($products as $product) {
-                $price = fn_format_price($product['price'], $currency);
+                $price = fn_format_price_by_currency(
+                    $product['price'],
+                    CART_PRIMARY_CURRENCY,
+                    $currency
+                );
 
                 if ($price < $low_price) {
                     $low_price = $price;
                 }
 
                 if (!isset($product['schema_org_features'])) {
-                    $product['schema_org_features'] = fn_seo_get_schema_org_product_features($product['product_id']);
+                    $product['schema_org_features'] = isset($product_features[$product['product_id']])
+                        ? $product_features[$product['product_id']]
+                        : [];
                 }
 
                 $aggregate_offer['offers'][] = [

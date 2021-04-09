@@ -28,4 +28,11 @@ interface IContext
      * @return string
      */
     public function getLangCode();
+
+    /**
+     * Gets area.
+     *
+     * @return string Area identifier.
+     */
+    public function getArea();
 }

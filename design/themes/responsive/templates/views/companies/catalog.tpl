@@ -1,6 +1,6 @@
 {hook name="companies:catalog"}
 
-{assign var="title" value=__("all_vendors")}
+{$title=__("all_vendors")}
 
 {include file="common/pagination.tpl"}
 
@@ -8,9 +8,9 @@
 
 {if $companies}
 
-{foreach from=$companies item=company key=key name="companies"}
-{assign var="obj_id" value=$company.company_id}
-{assign var="obj_id_prefix" value="`$obj_prefix``$obj_id`"}
+{foreach $companies as $company}
+{$obj_id=$company.company_id}
+{$obj_id_prefix="`$obj_prefix``$obj_id`"}
 {include file="common/company_data.tpl" company=$company show_name=true show_descr=true show_rating=true show_vendor_rating=true show_logo=true show_links=true}
 <div class="ty-companies">
     <div class="ty-companies__img">

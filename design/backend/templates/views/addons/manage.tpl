@@ -15,6 +15,7 @@
 
 {capture name="sidebar"}
     {hook name="addons:manage_sidebar"}
+    {include file="views/addons/components/addons_developers.tpl"}
     {include file="views/addons/components/addons_search_form.tpl" dispatch="addons.manage"}
     {hook name="addons:manage_sidebar_marketplace"}
         <div class="sidebar-row marketplace">
@@ -79,4 +80,12 @@
 {/capture}
 
 {/capture}
-{include file="common/mainbox.tpl" title=__("addons") content=$smarty.capture.mainbox sidebar=$smarty.capture.sidebar adv_buttons=$smarty.capture.adv_buttons}
+{include file="common/mainbox.tpl"
+    title=__("addons")
+    content=$smarty.capture.mainbox
+    sidebar=$smarty.capture.sidebar
+    adv_buttons=$smarty.capture.adv_buttons
+    select_storefront=true
+    show_all_storefront=true
+    storefront_switcher_param_name="storefront_id"
+}

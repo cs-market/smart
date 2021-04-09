@@ -253,8 +253,32 @@ if ($mode == 'edit') {
     Tygh::$app['view']->assign('pre_total', $total);
     Tygh::$app['view']->assign('order_info', $order_info);
 
-    $pre_data = Registry::get('addons.rus_russianpost');
-    $pre_data['company_phone'] = fn_rus_russianpost_normalize_phone($pre_data['company_phone']);
+    $shipping = reset($order_info['shipping']);
+    $shipping = fn_get_shipping_info($shipping['shipping_id']);
+    if (isset($shipping['service_params']['post_blank_info'])) {
+        $pre_data = $shipping['service_params']['post_blank_info'];
+        $pre_data['company_phone'] = fn_rus_russianpost_normalize_phone($pre_data['company_phone']);
+    } else {
+        $pre_data = [
+            '107_list_width' => 293,
+            '107_list_height' => 205,
+            '107_top' => 0,
+            '107_left' => 0,
+            '116_list_width' => 293,
+            '116_list_height' => 205,
+            '116_top' => 0,
+            '116_left' => 0,
+            '7p_top' => 0,
+            '7p_left' => 0,
+            '7a_top' => 0,
+            '7a_left' => 0,
+            '112_list_width' => 210,
+            '112_list_height' => 293,
+            '112_top' => 0,
+            '112_left' => 0,
+        ];
+    }
+
 
     Tygh::$app['view']->assign('pre_data', $pre_data);
 }

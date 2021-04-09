@@ -43,6 +43,10 @@ class Normalizer
             $data['url'] = Url::clean($data['url']);
         }
 
+        if (isset($data['storefront_id'])) {
+            $data['storefront_id'] = (int) $data['storefront_id'];
+        }
+
         foreach ($this->enumerated_fields as $field) {
             if (isset($data[$field])) {
                 $data[$field] = $this->getEnumeration($data[$field]);

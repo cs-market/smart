@@ -2,7 +2,9 @@ import { Tygh } from '../..';
 import { ObjectStorage } from './objectStorage';
 import { BaseMultipleDecorator } from "./decorators/selection/baseMultipleDecorator";
 import { ExternalContainerDecorator } from "./decorators/selection/externalContainerDecorator";
+import { HideSelectionDecorator } from "./decorators/selection/hideSelectionDecorator";
 import { PredefinedVariantsDecorator } from "./decorators/data/predefinedVariantsDecorator";
+import { BaseResultDecorator } from "./decorators/data/baseResultDecorator";
 import $ from "jquery";
 
 const _ = Tygh;
@@ -193,6 +195,7 @@ export class ObjectPicker {
             closeOnSelect: this.options.closeOnSelect,
             containerCssClass: this.options.containerCssClass,
             dropdownCssClass: this.options.dropdownCssClass,
+            showDropdown: this.options.showDropdown,
             language: {
                 loadingMore: function () {
                     return _.tr(self.options.languageLoadingMore);
@@ -212,6 +215,8 @@ export class ObjectPicker {
             minimumInputLength: this.options.minimumInputLength,
             minimumResultsForSearch: this.options.enableSearch ? this.options.minimumResultsForSearch : Infinity,
             externalContainerSelector: this.options.externalContainerSelector,
+            unremovableItemIds: this.options.unremovableItemIds,
+            enablePermanentPlaceholder: this.options.enablePermanentPlaceholder,
             placeholder: {
                 id: this.options.placeholderValue,
                 text: this.options.placeholder,
@@ -227,8 +232,14 @@ export class ObjectPicker {
             templateSelection: function (object, container) {
                 return self.renderSelectionItemTemplate(object, container);
             },
-            predefinedVariants: this.options.predefinedVariants
+            predefinedVariants: this.options.predefinedVariants,
+            tokenSeparators: this.options.tokenSeparators
         };
+
+        if (!this.options.showDropdown) {
+            options.containerCssClass += ' ' + this.options.containerHideCssClass + ' ';
+            options.dropdownCssClass += ' ' + this.options.dropdownHideCssClass + ' ';
+        }
 
         if (this.options.dropdownParentSelector) {
             options.dropdownParent = $(this.options.dropdownParentSelector);
@@ -280,6 +291,10 @@ export class ObjectPicker {
             options.createTag = function (params) {
                 return self.createNewObjectCallback(params);
             }
+
+            options.insertTag = function (data, tag) {
+                return self.insertNewObjectCallback(data, tag);
+            }
         }
 
         if (!this.options.escapeHtml) {
@@ -302,6 +317,13 @@ export class ObjectPicker {
             opts.set('selectionAdapter', selectionAdapter);
         }
 
+        if (this.options.hideSelection) {
+            let selectionAdapter = opts.get('selectionAdapter');
+
+            selectionAdapter = Utils.Decorate(selectionAdapter, HideSelectionDecorator);
+            opts.set('selectionAdapter', selectionAdapter);
+        }
+
         if (this.options.predefinedVariants.length) {
             let dataAdapter = opts.get('dataAdapter');
 
@@ -309,6 +331,10 @@ export class ObjectPicker {
 
             opts.set('dataAdapter', dataAdapter);
         }
+
+        let resultAdapter = opts.get('resultsAdapter');
+        resultAdapter = Utils.Decorate(resultAdapter, BaseResultDecorator);
+        opts.set('resultsAdapter', resultAdapter);
 
         return opts.options;
     }
@@ -333,6 +359,7 @@ export class ObjectPicker {
         object.data = object.data || {};
 
         if (object.isPredefined && this.options.templateResultPredefinedSelector) {
+            object.data.text = object.text;
             template = this.renderTemplate(object.data, this.getItemTemplate(this.options.templateResultPredefinedSelector));
         } else if (object.isNew && this.options.templateResultNewSelector) {
             object.data.text = object.text;
@@ -380,8 +407,11 @@ export class ObjectPicker {
 
     createNewObjectCallback(params) {
         let term = $.trim(params.term);
+        params.enableCreateNewObject = true;
 
-        if (term === '') {
+        this.fireEvent('before_create_object', params, object);
+
+        if (term === '' || !params.enableCreateNewObject) {
             return null;
         }
 
@@ -400,6 +430,18 @@ export class ObjectPicker {
         this.fireEvent('create_object', params, object);
 
         return object;
+    }
+
+    insertNewObjectCallback(data, tag) {
+        this.fireEvent('before_insert_object', data, tag);
+
+        if (this.options.createObjectToEnd) {
+            data.push(tag);
+        } else {
+            data.unshift(tag);
+        }
+
+        this.fireEvent('insert_object', data, tag);
     }
 
     bindEvents() {

@@ -13,7 +13,7 @@
                 {/if}
 
                 {if !$non_editable}
-                    <li>{include file="common/popupbox.tpl" id="group`$id_prefix``$id`" title_start=__("editing_file") title_end=$product_file.file_name act="edit" opener_ajax_class="cm-ajax"}</li>
+                    <li>{include file="common/popupbox.tpl" id="group`$id_prefix``$id`" text=$product_file.file_name act="edit" opener_ajax_class="cm-ajax"}</li>
                 {/if}
 
                 {if !$non_editable && !$skip_delete}

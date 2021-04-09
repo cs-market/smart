@@ -8,21 +8,25 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: he\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_communication.po\n"
-"X-Crowdin-File-ID: 3682\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_communication.po\n"
+"X-Crowdin-File-ID: 4186\n"
+"PO-Revision-Date: 2021-02-01 09:06\n"
 
 msgctxt "Addons::name::vendor_communication"
-msgid "Ask seller a question"
-msgstr ""
+msgid "Message center"
+msgstr "מרכז ההודעות"
 
 msgctxt "Addons::description::vendor_communication"
-msgid "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
-msgstr ""
+msgid "Allows customers, vendors, and administrators to contact each other via the built-in chat."
+msgstr "מאפשר ללקוחות, ספקים ומנהלי מערכת ליצור קשר זה עם זה באמצעות הצ'אט המובנה."
 
 msgctxt "SettingsSections::vendor_communication::general"
 msgid "General"
 msgstr "כללי"
+
+msgctxt "SettingsSections::vendor_communication::vendor_to_customer"
+msgid "For customers"
+msgstr "ללקוחות"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_product"
 msgid "Contact button on product pages"
@@ -34,15 +38,23 @@ msgstr "לחצן קשר בחנות של ספק"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_messages"
 msgid "Contact button at \"Messages\" menu"
-msgstr ""
+msgstr "לחצן יצירת קשר בתפריט \"הודעות\""
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_product"
 msgid "Show the \"Ask a question\" button on product pages."
-msgstr ""
+msgstr "הצג את כפתור \"שאל שאלה\" בדפי המוצר."
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_vendor"
 msgid "Show the \"Ask a question\" button in vendors' microstores."
-msgstr ""
+msgstr "הצג את הלחצן \"שאל שאלה\" במיקרוסטוסטרים של הספקים."
+
+msgctxt "SettingsOptions::vendor_communication::vendor_to_customer_communication"
+msgid "Customer-to-seller communication"
+msgstr "תקשורת בין הלקוח למוכר"
+
+msgctxt "SettingsOptions::vendor_communication::vendor_to_admin_communication"
+msgid "Vendor-to-admin communication"
+msgstr "תקשורת ספק-מנהל"
 
 msgctxt "Languages::vendor_communication.messages"
 msgid "Messages"
@@ -58,7 +70,7 @@ msgstr "מרכז הודעות"
 
 msgctxt "Languages::vendor_communication.message_center_name_menu_description"
 msgid "Messages from customers"
-msgstr ""
+msgstr "הודעות מהלקוחות"
 
 msgctxt "Languages::vendor_communication.message_center_menu_description"
 msgid "Customer-to-vendor messages"
@@ -78,11 +90,11 @@ msgstr "ההודעה"
 
 msgctxt "Languages::vendor_communication.contact_vendor"
 msgid "Contact vendor"
-msgstr "פנה אל ספק"
+msgstr "צור קשר עם הספק"
 
 msgctxt "Languages::vendor_communication.ask_a_question"
 msgid "Ask a question"
-msgstr ""
+msgstr "שאל/י שאלה"
 
 msgctxt "Languages::vendor_communication.contact_vendor_name"
 msgid "Contact [vendor_name]"
@@ -98,7 +110,7 @@ msgstr "ההודעה שלך נשלחה ל- <b>[vendor_name]</b>.<br/><br/>תגו
 
 msgctxt "Languages::vendor_communication.message_sent"
 msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>We'll notify you about a reply. To view your message history, please <a href=\"[thread_url]\" target=\"_blank\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
-msgstr ""
+msgstr "ההודעה שלך נשלחה אל <b>[vendor_name]</b> . <br/><br/> אנו נודיע לך על תשובה. לצפייה בהיסטוריית ההודעות שלך, אנא <a href=\"[thread_url]\" target=\"_blank\">גש למרכז ההודעות</a> שנמצא בחלק \"הודעות\" בתפריט \"החשבון שלי\"."
 
 msgctxt "Languages::vendor_communication.cannot_update_thread"
 msgid "Cannot update thread"
@@ -110,11 +122,11 @@ msgstr "אין אפשרות ליצור"
 
 msgctxt "Languages::email_template.vendor_communication.notify_admin"
 msgid "Ask seller a question: Admin Notification"
-msgstr ""
+msgstr "שאל שאלה למוכר: הודעת מנהל מערכת"
 
 msgctxt "Languages::email_template.vendor_communication.notify_customer"
 msgid "Ask seller a question: Customer Notification"
-msgstr ""
+msgstr "שאל שאלה למוכר: הודעת לקוח"
 
 msgctxt "Languages::vendor_communication.you_have_new_message"
 msgid "You have a new <a href=\"[thread_url]\">message</a> from [message_from]."
@@ -155,6 +167,18 @@ msgstr "הקלד הודעה..."
 msgctxt "Languages::vendor_communication.you"
 msgid "You"
 msgstr "אתה"
+
+msgctxt "Languages::vendor_communication.product_details"
+msgid "Product details"
+msgstr "פרטי מוצר"
+
+msgctxt "Languages::vendor_communication.order_details"
+msgid "Order details"
+msgstr "פרטי הזמנה"
+
+msgctxt "Languages::vendor_communication.import_details"
+msgid "Import details"
+msgstr "יבוא נתונים"
 
 msgctxt "Languages::vendor_communication.thread_deleted"
 msgid "Thread has been deleted"
@@ -201,28 +225,32 @@ msgid "Can view"
 msgstr "יכול לראות"
 
 msgctxt "Languages::privilege_groups.vendor_communication"
-msgid "Message center"
-msgstr "מרכז הודעות"
+msgid "Message center: customer-to-vendor communication"
+msgstr "מרכז הודעות: תקשורת בין לקוחות לספק"
 
 msgctxt "Languages::vendor_communication.your_message_to_vendor_name"
 msgid "Your message to [vendor_name]"
-msgstr ""
+msgstr "ההודעה שלך ל- [vendor_name]"
 
 msgctxt "Languages::vendor_communication.please_log_in_to_be_notified"
 msgid "Please sign in so that we can notify you about a reply"
-msgstr ""
+msgstr "אנא היכנס כדי שנוכל להודיע לך על תשובה"
 
 msgctxt "Languages::vendor_communication"
-msgid "Ask seller a question"
+msgid "Message center"
 msgstr ""
 
 msgctxt "Languages::vendor_communication.event.message_received.name"
-msgid "New message received"
-msgstr ""
+msgid "Customer-to-vendor: New message received"
+msgstr "מלקוח לספק: הודעה חדשה התקבלה"
+
+msgctxt "Languages::vendor_communication.event.vendor_to_admin_message_received.name"
+msgid "Vendor-to-admin: New message received"
+msgstr "מספק למנהל: הודעה חדשה התקבלה"
 
 msgctxt "Languages::internal_template.vendor_communication_message_received"
 msgid "New message received"
-msgstr ""
+msgstr "הודעה חדשה התקבלה"
 
 msgctxt "Languages::vendor_communication.new_message.title"
 msgid "[company_name] has a new message from [customer]"
@@ -231,4 +259,60 @@ msgstr "ל- [company_name] יש הודעה חדשה מאת [customer]"
 msgctxt "Languages::vendor_communication.new_message.message"
 msgid "Click this notification to see the message"
 msgstr "לחץ על הודעה זו כדי לראות את ההודעה"
+
+msgctxt "Languages::vendor_communication.contact_admin"
+msgid "Contact administrator"
+msgstr "צור קשר עם מנהל המערכת"
+
+msgctxt "Languages::vendor_communication.contact_vendor"
+msgid "Contact vendor"
+msgstr "צור קשר עם הספק"
+
+msgctxt "Languages::vendor_communication.communication"
+msgid "Communication"
+msgstr "תקשורת"
+
+msgctxt "Languages::vendor_communication.message_center_vendor_name"
+msgid "Message center"
+msgstr "מרכז ההודעות"
+
+msgctxt "Languages::vendor_communication.message_center_vendor_name_menu_description"
+msgid "Messages from vendor to administrator"
+msgstr "הודעות מהספק למנהל"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_admin"
+msgid "Vendor communication"
+msgstr "תקשורת ספקים"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_customer"
+msgid "Customer communication"
+msgstr "תקשורת לקוחות"
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_admin_for_vendor_panel"
+msgid "Admin communication"
+msgstr "תקשורת מנהלתית"
+
+msgctxt "Languages::vendor_communication.your_message_to_admin"
+msgid "Your message to administrator"
+msgstr "ההודעה שלך למנהל"
+
+msgctxt "Languages::vendor_communication.some_threads_have_not_been_created"
+msgid "Some threads have not been created: [count]"
+msgstr "שרשורים מסוימים לא נוצרו: [ספירה]"
+
+msgctxt "Languages::vendor_communication.vendor_to_admin.message_sent"
+msgid "Your message has been sent to <b>[name]</b>.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+msgstr "ההודעה שלך נשלחה אל <b>[שם]</b> . <br/><br/> לצפייה בהיסטוריית ההודעות שלך, <a href=\"[thread_url]\">עבור אל מרכז ההודעות</a> שנמצא בתפריט \"ספקים\"."
+
+msgctxt "Languages::vendor_communication.vendor_to_admin.message_list_sent"
+msgid "Your messages have been sent.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+msgstr "ההודעות שלך נשלחו. <br/><br/> לצפייה בהיסטוריית ההודעות שלך, <a href=\"[thread_url]\">היכנס למרכז ההודעות</a> שנמצא בתפריט \"ספקים\"."
+
+msgctxt "Languages::privilege_groups.admin_communication"
+msgid "Message center: vendor-to-admin communication"
+msgstr "מרכז ההודעות: תקשורת ספק-לניהול"
+
+msgctxt "Languages::customer_to_admin_communication.event.message_received.name"
+msgid "Customer-to-Admin: New message received"
+msgstr ""
 

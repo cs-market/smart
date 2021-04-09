@@ -22,9 +22,12 @@
 
     {if !$no_wrap}
         <div class="control-group" id="suppliers_selector">
-            <label class="control-label" for="{$id|default:"supplier_id"}">{__("supplier")}{if $tooltip} {capture name="tooltip"}{$tooltip}{/capture}{include file="common/tooltip.tpl" tooltip=$smarty.capture.tooltip}{/if}</label>
+            <label class="control-label" for="{$id|default:"supplier_id"}">{__("supplier")}</label>
             <div class="controls">
                 {$smarty.capture.s_body nofilter}
+                {if $tooltip}
+                    <p class="muted description">{$tooltip nofilter}</p>
+                {/if}
             </div>
         <!--suppliers_selector--></div>
     {else}

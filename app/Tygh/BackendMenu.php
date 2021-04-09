@@ -65,22 +65,108 @@ class BackendMenu
         $menu['top'] = $this->_sort($menu['top']);
         $menu['central'] = $this->_sort($menu['central']);
         $menu = $this->_getSettingsSections($menu);
+        $menu = $this->getTopSuppliers($menu);
 
         LanguageHelper::preloadLangVars($this->_lang_cache);
-
-        $selected = $this->_selected;
 
         /**
          * Changes generated menu items
          *
-         * @param  array $request request params
+         * @param array $request request params
          * @param array $menu items
          * @param array $actions items Action value, if exists. See: fn_get_route
          * @param array $this->selected Menu item, selected by the dispatch
          */
         fn_set_hook('backend_menu_generate_post', $request, $menu, $actions, $this->_selected);
 
+        if (Registry::ifGet('config.tweaks.validate_menu', false)) {
+            $menu = $this->cleanUpTopLevelMenus($menu);
+        }
+
         return array($menu, $actions, $this->_selected);
+    }
+
+    /**
+     * Filters elements of top and central admin panel menu and items from Add-ons top menu.
+     *
+     * @param array<string, array<string, array<string, string>>> $menu Current state of admin panel menu.
+     *
+     * @return array<string, array<string, array<string, string>>>
+     */
+    protected function cleanUpTopLevelMenus(array $menu)
+    {
+        $core_addons = array_values(Snapshot::getCoreAddons());
+        $addons_menu = fn_get_schema('menu', 'menu', 'php', false, $core_addons);
+        if (isset($menu['top'], $menu['central'], $addons_menu['top'], $addons_menu['central'])) {
+            $core_top_elements = array_keys($addons_menu['top']);
+            $core_central_elements = array_keys($addons_menu['central']);
+            foreach (array_keys($menu['top']) as $element_name) {
+                if (in_array($element_name, $core_top_elements)) {
+                    continue;
+                }
+                unset($menu['top'][$element_name]);
+            }
+            foreach (array_keys($menu['central']) as $element_name) {
+                if (in_array($element_name, $core_central_elements)) {
+                    continue;
+                }
+                unset($menu['central'][$element_name]);
+            }
+        }
+        return $menu;
+    }
+
+    /**
+     * Get top N add-on suppliers for Add-ons top menu.
+     *
+     * @param array<string, array<string, array<string, array<string, array<string, string|int>>>>> $menu   Current state of admin panel menu.
+     * @param int                                                                                   $amount Amount of suppliers required to be returned.
+     *
+     * @psalm-param
+     * array{
+     *  top: array{
+     *      addons: array{
+     *          items: array{
+     *              manage_addons: array{
+     *                  subitems: array<string, array{href: string, position: int}>
+     *              }
+     *          }
+     *      }
+     *      <string, string>
+     *  }<string, array<string, string>>
+     * }<string, array<string, array<string, string>>> $menu Current state of admin panel menu.
+     *
+     * @psalm-suppress InvalidReturnType
+     *
+     * @return array<string, array<string, array<string, array<string, array<string, string|int>>>>>
+     */
+    protected function getTopSuppliers(array $menu, $amount = 10)
+    {
+        if (!isset($menu['top']['addons']['items']['manage_addons'])) {
+            return $menu;
+        }
+        $cache_key = "top_{$amount}_supplier";
+        Registry::registerCache(
+            ['addons', $cache_key],
+            ['addons'],
+            Registry::cacheLevel('static')
+        );
+        if (!Registry::isExist($cache_key)) {
+            list($addons,) = fn_get_addons(
+                ['type' => 'active'],
+                0,
+                CART_LANGUAGE,
+                null,
+                Registry::get('runtime.company_id')
+            );
+            $suppliers = fn_get_addon_suppliers($addons, $amount);
+            Registry::set($cache_key, $suppliers);
+        } else {
+            $suppliers = Registry::get($cache_key);
+        }
+        $menu['top']['addons']['items']['manage_addons']['subitems'] = $suppliers;
+        /** @psalm-suppress InvalidReturnStatement */
+        return $menu;
     }
 
     /**
@@ -136,7 +222,7 @@ class BackendMenu
             }
 
             // Remove item from list if we have no permissions to acces it or it disabled by option
-            if (fn_check_view_permissions($it['href'], 'GET') == false || $this->_isOptionActive($it) == false) {
+            if (fn_check_view_permissions($it['href'], 'GET') === false || $this->_isOptionActive($it) === false) {
                 unset($items[$item_title]);
                 continue;
             }

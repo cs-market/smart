@@ -146,7 +146,7 @@ Tygh.tr('text_gift_cert_amount_alert',  '{$text_gift_cert_amount_alert|escape:ja
 
 
                 {if $currencies.$primary_currency.after == "Y"}{$currencies.$primary_currency.symbol nofilter}{/if}
-                <p><small>{$text_gift_cert_amount_alert nofilter}</small></p>
+                <p class="muted description">{$text_gift_cert_amount_alert nofilter}</p>
             </div>
         </div>
 
@@ -362,14 +362,11 @@ Tygh.tr('text_gift_cert_amount_alert',  '{$text_gift_cert_amount_alert|escape:ja
         {/capture}
         {dropdown content=$smarty.capture.tools_list}
 
-        {if !$id}
-            {$title =__("new_certificate")}
-        {else}
-            {$title_start = __('editing_certificate')}
-            {$title_end = $gift_cert_data.gift_cert_code}
-        {/if}
-
         {include file="buttons/save_cancel.tpl" but_name="dispatch[gift_certificates.update]" but_role="submit-link" extra=$smarty.capture.gift_extra_tools save=$id but_target_form="gift_certificates_form"}
     {/capture}
 
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($id) ? $gift_cert_data.gift_cert_code : __("new_certificate")
+    content=$smarty.capture.mainbox
+    buttons=$smarty.capture.buttons
+}

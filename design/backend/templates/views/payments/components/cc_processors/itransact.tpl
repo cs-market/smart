@@ -16,7 +16,7 @@
     <label class="control-label" for="secret_key">{__("secret_key")}:</label>
     <div class="controls">
     	<input type="text" name="payment_data[processor_params][secret_key]" id="secret_key" value="{$processor_params.secret_key}" >
-    	<p><small>{__("text_secret_key_notice")}</small></p>
+    	<p class="muted description">{__("text_secret_key_notice")}</p>
     </div>
 </div>
 

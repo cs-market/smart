@@ -15,6 +15,7 @@
 use Tygh\Registry;
 
 include_once(Registry::get('config.dir.schemas') . 'exim/option_exceptions.functions.php');
+include_once(Registry::get('config.dir.schemas') . 'exim/products.functions.php');
 
 $schema = array(
     'section' => 'products',

@@ -2,7 +2,7 @@
     {assign var="usergroups" value=["type"=>"C", "status"=>["A", "H"]]|fn_get_usergroups}
 {/if}
 
-<div id="content_qty_discounts" class="hidden">
+<div class="{if $selected_section !== "qty_discounts"}hidden{/if}" id="content_qty_discounts">
     <div class="table-responsive-wrapper">
         <table class="table table-middle table--relative table-responsive" width="100%">
         <thead class="cm-first-sibling">
@@ -29,7 +29,7 @@
                 {if $price.lower_limit == "1" && $price.usergroup_id == "0"}
                     &nbsp;{if $price.percentage_discount == 0}{$price.price|default:"0.00"|fn_format_price:$primary_currency:null:false}{else}{$price.percentage_discount}{/if}
                 {else}
-                <input type="text" name="product_data[prices][{$_key}][price]" value="{if $price.percentage_discount == 0}{$price.price|default:"0.00"|fn_format_price:$primary_currency:null:false}{else}{$price.percentage_discount}{/if}" size="10" class="input-medium" />
+                <input type="text" name="product_data[prices][{$_key}][price]" value="{if $price.percentage_discount == 0}{$price.price|default:"0.00"|fn_format_price:$primary_currency:null:false}{else}{$price.percentage_discount}{/if}" size="10" class="input-medium cm-numeric" data-a-sep />
                 {/if}</td>
             <td width="25%" class="{$no_hide_input_if_shared_product}" data-th="{__("type")}">
                 {if $price.lower_limit == "1" && $price.usergroup_id == "0"}
@@ -78,7 +78,7 @@
             <td width="5%" data-th="{__("quantity")}">
                 <input type="text" name="product_data[prices][{$new_key}][lower_limit]" value="" class="input-micro" /></td>
             <td width="20%" data-th="{__("value")}">
-                <input type="text" name="product_data[prices][{$new_key}][price]" value="0.00" size="10" class="input-medium" /></td>
+                <input type="text" name="product_data[prices][{$new_key}][price]" value="0.00" size="10" class="input-medium cm-numeric" data-a-sep /></td>
             <td width="25%" data-th="{__("type")}">
             <select class="span3" name="product_data[prices][{$new_key}][type]">
                 <option value="A" selected="selected">{__("absolute")} ({$currencies.$primary_currency.symbol nofilter})</option>

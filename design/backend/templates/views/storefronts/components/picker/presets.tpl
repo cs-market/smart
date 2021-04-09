@@ -49,7 +49,7 @@
                     {include file="common/image.tpl"
                         image=$storefront.images
                         image_height="64"
-                        image_css_class="storefront__picker-logo-img `$storefront_picker_logo_img_class`"
+                        image_css_class="storefront__picker-logo-img storefront__picker-logo-img--inactive `$storefront_picker_logo_img_class`"
                         show_detailed_link=false
                     }
                 </div>
@@ -60,20 +60,41 @@
         {/foreach}
     {/capture}
 
-    {if $preset_data.count > $preset_data.threshold}
+    {if $runtime.is_multiple_storefronts}
         <div class="storefront__picker-logo-list js-storefront-switcher"
             data-ca-switcher-param-name="{$storefront_switcher_param_name}"
             data-ca-switcher-data-name="{$storefront_switcher_data_name}">
 
             {$smarty.capture.storefronts_list nofilter}
-            <div class="dropdown storefront__picker-dropdown">
-                <a class="dropdown-toggle storefront__picker-logo-link"
+            <div class="dropdown storefront__picker-dropdown {if $runtime.storefronts_count > $preset_data.threshold}storefront__picker-dropdown--threshold{/if}">
+                <a class="dropdown-toggle storefront__picker-logo-link storefront__picker-logo-link--dropdown-toggle"
                     data-toggle="dropdown"
                     data-ca-dropdown-object-picker-autoopen=".object-picker__select--storefronts"
-                    title="{__("show_all_storefronts_with_count", ["[count]" => $preset_data.count])}">
-                    <div class="storefront__picker-logo-wrapper">
+                    title="{__("show_all_storefronts_with_count", ["[count]" => $runtime.storefronts_count])}">
+                    {if $selected_storefront_id}
+                        {foreach $preset_data.storefronts as $storefront}
+                            {if $storefront.is_selected}
+                                <div class="storefront__picker-logo-wrapper storefront__picker-logo-wrapper--mobile">
+                                    {include file="common/image.tpl"
+                                        image=$storefront.images
+                                        image_height="64"
+                                        image_css_class="storefront__picker-logo-img `$storefront_picker_logo_img_class`"
+                                        show_detailed_link=false
+                                    }
+                                </div>
+                            {/if}
+                        {/foreach}
+                    {else}
+                        <div class="storefront__picker-logo-wrapper storefront__picker-logo-wrapper--mobile">
+                            <div class="storefront__picker-logo-text
+                                {if __("all_storefronts_short")|count_characters > 3}storefront__picker-logo-text--small{/if}">
+                                {__("all_storefronts_short")}
+                            </div>
+                        </div>
+                    {/if}
+                    <div class="storefront__picker-logo-wrapper storefront__picker-logo-wrapper--desktop">
                         <div class="storefront__picker-logo-text">
-                            +{($preset_data.count - $preset_data.threshold)}
+                            +{($runtime.storefronts_count - $preset_data.threshold)}
                         </div>
                     </div>
                 </a>
@@ -85,13 +106,10 @@
                         dropdown_parent_selector="#storefront_picker_dropdown_menu"
                         empty_variant_text=__("all_storefronts")
                         show_advanced=false
+                        dropdown_css_class="storefront__picker-dropdown-picker"
                     }
                 </ul>
             </div>
-        </div>
-    {elseif $preset_data.count > 1}
-        <div class="storefront__picker-logo-list">
-            {$smarty.capture.storefronts_list nofilter}
         </div>
     {/if}
 {/if}

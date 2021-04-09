@@ -55,7 +55,7 @@
         </tbody>
         <tbody id="{$data_id}_no_item"{if $item_ids} class="hidden"{/if}>
         <tr class="no-items">
-            <td colspan="{if $positions}4{else}3{/if}"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
+            <td colspan="{if $positions}4{else}3{/if}" data-th="&nbsp;"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
         </tr>
         </tbody>
         </table>
@@ -78,8 +78,9 @@
     {if !isset($display)}
         {assign var="display" value="options"}
     {/if}
-    <div class="table-wrapper">
-    <table class="table table-middle table--relative">
+    <div class="clearfix"></div>
+    <div class="table-responsive-wrapper">
+    <table class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="80%">{__("name")}</th>
@@ -120,7 +121,7 @@
     </tbody>
     <tbody id="{$data_id}_no_item"{if $item_ids} class="hidden"{/if}>
     <tr class="no-items">
-        <td colspan="{$colspan|default:"3"}"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
+        <td colspan="{$colspan|default:"3"}" data-th="&nbsp;"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
     </tr>
     </tbody>
     </table>

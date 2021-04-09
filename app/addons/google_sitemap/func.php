@@ -14,9 +14,12 @@
 
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProductFeatures;
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\YesNo;
 use Tygh\Languages\Languages;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
+use Tygh\Settings;
 use Tygh\Storefront\Storefront;
 use Tygh\Tools\SecurityHelper;
 
@@ -154,50 +157,32 @@ function fn_google_sitemap_get_priority()
     return $priority;
 }
 
-function fn_google_sitemap_clear_url_info()
+/**
+ * Generates sitemaps.
+ *
+ * @param array<int>|null $storefront_ids Storefront to generate sitemap for
+ */
+function fn_google_sitemap_get_content(array $storefront_ids = null)
 {
-    $storefront_url = fn_get_storefront_url(fn_get_storefront_protocol());
-    if (fn_allowed_for('ULTIMATE')) {
-        if (Registry::get('runtime.company_id') || Registry::get('runtime.simple_ultimate')) {
-        } else {
-            $storefront_url = '';
-        }
+    $storefronts = fn_google_sitemap_get_storefronts($storefront_ids);
+
+    $parts = 0;
+    foreach ($storefronts as $storefront) {
+        // homepage is always written into a sitemap, thus progress counter contains at least one record
+        $parts++;
+        $sitemap_settings = Settings::instance(['storefront_id' => $storefront->storefront_id])->getValues('google_sitemap', Settings::ADDON_SECTION, false);
+        $parts += YesNo::toBool($sitemap_settings['include_categories']);
+        $parts += YesNo::toBool($sitemap_settings['include_products']);
+        $parts += YesNo::toBool($sitemap_settings['include_pages']);
+        $parts += YesNo::toBool($sitemap_settings['include_extended']);
+        $parts += fn_allowed_for('MULTIVENDOR') && YesNo::toBool($sitemap_settings['include_companies']);
     }
 
-    if (!empty($storefront_url)) {
-        $sitemap_available_in_customer = __('sitemap_available_in_customer', array(
-            '[http_location]' => $storefront_url,
-            '[sitemap_url]' => fn_url('xmlsitemap.view', 'C', fn_get_storefront_protocol()),
-        ));
-
-        return __('google_sitemap.text_regenerate', array(
-            '[http_location]' => $storefront_url,
-            '[regenerate_url]' =>  fn_url('xmlsitemap.generate'),
-            '[sitemap_available_in_customer]' => $sitemap_available_in_customer
-        ));
-
-    } else {
-        return __('google_sitemap.text_select_storefront');
-    }
-}
-
-function fn_google_sitemap_get_content()
-{
-    $sitemap_settings = Registry::get('addons.google_sitemap');
-
-    // homepage is always written into a sitemap, thus progress counter contains at least one record
-    $parts = 1;
-    $parts += YesNo::toBool($sitemap_settings['include_categories']);
-    $parts += YesNo::toBool($sitemap_settings['include_products']);
-    $parts += YesNo::toBool($sitemap_settings['include_pages']);
-    $parts += YesNo::toBool($sitemap_settings['include_extended']);
-    $parts += fn_allowed_for('MULTIVENDOR') && YesNo::toBool($sitemap_settings['include_companies']);
-
-    $storefronts = fn_google_sitemap_get_storefronts();
-
-    fn_set_progress('parts', $parts * count($storefronts));
+    fn_set_progress('parts', $parts);
 
     foreach ($storefronts as $storefront) {
+        /** @var array<string, int|string> $sitemap_settings */
+        $sitemap_settings = Settings::instance(['storefront_id' => $storefront->storefront_id])->getValues('google_sitemap', Settings::ADDON_SECTION, false);
         fn_google_sitemap_generate_sitemap_for_storefront($storefront, $sitemap_settings);
     }
 
@@ -447,10 +432,8 @@ function fn_google_sitemap_get_sitemap_languages(Storefront $storefront)
     $languages_conditions = [
         'area'           => 'C',
         'include_hidden' => false,
+        'storefront_id'  => empty($storefront->storefront_id) ? null : $storefront->storefront_id
     ];
-    if ($storefront->getLanguageIds()) {
-        $languages_conditions['language_ids'] = $storefront->getLanguageIds();
-    }
 
     $languages = array_map(function($language) {
         return $language['name'];
@@ -801,17 +784,22 @@ function fn_google_sitemap_write_companies_to_sitemap(
 /**
  * Gets a list of storefronts to generate the sitemap for.
  *
+ * @param array<int>|null $storefront_ids Storefront to generate sitemap for
+ *
  * @return \Tygh\Storefront\Storefront[]
  */
-function fn_google_sitemap_get_storefronts()
+function fn_google_sitemap_get_storefronts(array $storefront_ids = null)
 {
+    if ($storefront_ids) {
+        list($storefronts,) = StorefrontProvider::getRepository()->find(['storefront_id' => $storefront_ids]);
+        return $storefronts;
+    }
+
     if (fn_allowed_for('ULTIMATE')) {
         return [Tygh::$app['storefront']];
     }
 
-    /** @var \Tygh\Storefront\Repository $repository */
-    $repository = Tygh::$app['storefront.repository'];
-    list($storefronts,) = $repository->find();
+    list($storefronts,) = StorefrontProvider::getRepository()->find();
 
     return $storefronts;
 }
@@ -841,7 +829,7 @@ function fn_google_sitemap_create_sitemap_index(Storefront $storefront, $last_mo
 {
     $maps = '';
 
-    $location = fn_get_storefront_protocol() . '://' . $storefront->url;
+    $location = fn_get_storefront_protocol($storefront->storefront_id) . '://' . $storefront->url;
     for ($i = 1; $i <= $file_counter; $i++) {
         $sitemap_location_url = $location . '/sitemap' . $i . '.xml';
         $sitemap_location_url = htmlentities($sitemap_location_url);
@@ -869,4 +857,96 @@ HEAD;
     fwrite($file, $index_map);
 
     return fclose($file);
+}
+
+/**
+ * Provides action buttons for sitemap management.
+ *
+ * @return string
+ *
+ * @internal
+ */
+function fn_google_sitemap_clear_url_info()
+{
+    // FIXME: Bad style
+    $storefront_id = isset($_REQUEST['storefront_id'])
+        ? (int) $_REQUEST['storefront_id']
+        : 0;
+
+    $regenerate_url = fn_url('xmlsitemap.generate');
+    $sitemap_url = fn_url('xmlsitemap.view', SiteArea::STOREFRONT, fn_get_storefront_protocol(null, $storefront_id));
+    $storefront_url = fn_google_sitemap_get_storefront_url_for_sitemap_xml();
+
+    if (fn_allowed_for('MULTIVENDOR')) {
+        $sitemap_available_in_customer = '';
+        if ($storefront_id) {
+            $regenerate_url = fn_link_attach($regenerate_url, "storefront_id={$storefront_id}");
+            $sitemap_url = fn_url('xmlsitemap.view?storefront_id=' . $storefront_id, SiteArea::STOREFRONT, fn_get_storefront_protocol(null, $storefront_id));
+            $storefront_url = fn_google_sitemap_get_storefront_url_for_sitemap_xml($storefront_id);
+
+            $sitemap_available_in_customer = __(
+                'sitemap_available_in_customer',
+                [
+                    '[http_location]' => $storefront_url,
+                    '[sitemap_url]'   => $sitemap_url,
+                ]
+            );
+        }
+
+        return __(
+            'google_sitemap.text_regenerate',
+            [
+                '[regenerate_url]'                => $regenerate_url,
+                '[sitemap_available_in_customer]' => $sitemap_available_in_customer,
+            ]
+        );
+    }
+
+    if (fn_get_runtime_company_id()) {
+        $sitemap_available_in_customer = __(
+            'sitemap_available_in_customer',
+            [
+                '[http_location]' => $storefront_url,
+                '[sitemap_url]'   => $sitemap_url,
+            ]
+        );
+
+        return __(
+            'google_sitemap.text_regenerate',
+            [
+                '[regenerate_url]'                => $regenerate_url,
+                '[sitemap_available_in_customer]' => $sitemap_available_in_customer,
+            ]
+        );
+    }
+
+    return __('google_sitemap.text_select_storefront');
+}
+
+/**
+ * Gets storefront URL for the sitemap.xml file.
+ *
+ * @param int|null $storefront_id Storefront to get URL for
+ *
+ * @return string
+ *
+ * @internal
+ */
+function fn_google_sitemap_get_storefront_url_for_sitemap_xml($storefront_id = null)
+{
+    if ($storefront_id) {
+        $storefront_url = str_replace(
+            '/' . Registry::get('config.customer_index'),
+            '',
+            fn_url('?storefront_id=' . $storefront_id, SiteArea::STOREFRONT, fn_get_storefront_protocol(null, $storefront_id))
+        );
+    } else {
+        $storefront_url = str_replace(
+            '/' . Registry::get('config.customer_index'),
+            '',
+            fn_url('', SiteArea::STOREFRONT, fn_get_storefront_protocol())
+        );
+    }
+
+    return rtrim($storefront_url, '/');
 }

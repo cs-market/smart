@@ -3,6 +3,7 @@
         name="{$but_name}"
         {if $but_onclick}onclick="{$but_onclick nofilter}"{/if}
         {if $but_id}id="{$but_id}"{/if}
+        {if $but_disabled}disabled{/if}
 >
     {capture name="order_total"}
         {if $cart.payment_surcharge && !$take_surcharge_from_vendor}

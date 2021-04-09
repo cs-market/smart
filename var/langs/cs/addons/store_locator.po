@@ -6,9 +6,11 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.11.3/addons/store_locator.po\n"
-"PO-Revision-Date: 2020-02-04 07:11\n"
+"X-Crowdin-File: /release-4.12.2/addons/store_locator.po\n"
+"X-Crowdin-File-ID: 4142\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::store_locator"
 msgid "Stores and pickup points"
@@ -276,5 +278,13 @@ msgstr ""
 
 msgctxt "Languages::store_locator.any_rate_area"
 msgid "Any rate area"
+msgstr ""
+
+msgctxt "Languages::store_locator.pickup_from_store"
+msgid "Pickup from store"
+msgstr ""
+
+msgctxt "Languages::store_locator.any_vendor"
+msgid "Any vendor"
 msgstr ""
 

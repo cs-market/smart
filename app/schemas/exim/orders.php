@@ -60,6 +60,9 @@ $schema = array(
         'Discount' => array(
             'db_field' => 'discount'
         ),
+        'Subtotal discount' => [
+            'db_field' => 'subtotal_discount'
+        ],
         'Payment surcharge' => array(
             'db_field' => 'payment_surcharge'
         ),

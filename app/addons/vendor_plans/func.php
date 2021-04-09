@@ -14,6 +14,7 @@
 
 use Tygh\Addons\VendorPlans\ServiceProvider;
 use Tygh\Enum\ProfileTypes;
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\VendorPayoutTypes;
 use Tygh\Enum\VendorStatuses;
 use Tygh\Languages\Languages;
@@ -23,6 +24,7 @@ use Tygh\Registry;
 use Tygh\Tygh;
 use Tygh\VendorPayouts;
 use Tygh\Enum\YesNo;
+use Tygh\Settings;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -38,6 +40,9 @@ function fn_vendor_plans_install()
     }
     if (!in_array('commission_type', $fields)) {
         db_query("ALTER TABLE ?:vendor_payouts ADD `commission_type` char(1) NOT NULL default 'A'");
+    }
+    if (!in_array('marketplace_profit', $fields)) {
+        db_query("ALTER TABLE ?:vendor_payouts ADD `marketplace_profit` decimal(12,2) NOT NULL default '0'");
     }
 
     // import data exported from the vendor commission add-on
@@ -251,6 +256,21 @@ function fn_vendor_plans_storefront_repository_delete_post($storefront, $operati
 }
 
 /**
+ * Returns vendor plan by company id
+ *
+ * @param int $company_id Company identifier
+ *
+ * @return \Tygh\Models\VendorPlan|null
+ */
+function fn_vendor_plans_get_vendor_plan_by_company_id($company_id)
+{
+    /** @var \Tygh\Models\VendorPlan $vendor_plan */
+    $vendor_plan =  VendorPlan::model()->findOne(['company_id' => $company_id]);
+
+    return $vendor_plan;
+}
+
+/**
  * Hook handler: adds commission values based on the order totals when the order is placed.
  *
  * @param array  $order_info   Order infromation from ::fn_get_order_info()
@@ -299,6 +319,13 @@ function fn_vendor_plans_mve_update_order($new_order_info, $order_id, $old_order
         $old_order_shipping_cost = $old_order_info['shipping_cost'] - $old_order_tax_amount_included_to_shipping;
         $shipping_cost_difference_not_included_to_commission = $new_order_shipping_cost - $old_order_shipping_cost;
     }
+    $storefront_id = isset($new_order_info['storefront_id']) ? $new_order_info['storefront_id'] : null;
+
+    if (fn_vendor_plans_is_collect_taxes_from_vendors($storefront_id)) {
+        $new_order_tax_full_amount = array_sum(array_column($new_order_info['taxes'], 'tax_subtotal'));
+        $old_order_tax_full_amount = array_sum(array_column($old_order_info['taxes'], 'tax_subtotal'));
+        $payout_data['taxes'] = $new_order_tax_full_amount - $old_order_tax_full_amount;
+    }
 
     $payout_data['order_amount'] =
         ($new_order_info['total'] - ($new_order_shipping_cost + $new_order_tax_amount)) -
@@ -339,7 +366,7 @@ function fn_vendor_plans_vendor_payouts_get_list(&$instance, &$params, &$items_p
     if ($instance->getVendor()) {
         $fields['payout_amount'] = 'CASE WHEN payouts.order_id <> 0 THEN payouts.order_amount - payouts.commission_amount ELSE payouts.payout_amount END';
     } else {
-        $fields['payout_amount'] = 'CASE WHEN payouts.order_id <> 0 THEN payouts.commission_amount                        ELSE payouts.payout_amount END';
+        $fields['payout_amount'] = 'CASE WHEN payouts.order_id <> 0 THEN payouts.marketplace_profit ELSE payouts.payout_amount END';
     }
 }
 
@@ -358,7 +385,7 @@ function fn_vendor_plans_vendor_payouts_get_income(&$instance, &$params, &$field
     if ($instance->getVendor()) {
         $fields['orders_summary'] = 'SUM(payouts.order_amount) - SUM(payouts.commission_amount)';
     } else {
-        $fields['orders_summary'] = 'SUM(payouts.commission_amount)';
+        $fields['orders_summary'] = 'SUM(payouts.marketplace_profit)';
     }
 }
 
@@ -521,15 +548,99 @@ function fn_vendor_plans_import_check_object_id($primary_object_id, &$processed_
 }
 
 /**
+ * @param string|int         $company_id                Company identifier
+ * @param string             $company_name              Company name
+ * @param string             $main_category_path        Main category path
+ * @param string             $secondary_categories_path Secondary categories paths
+ * @param string             $category_delimiter        Category delimiter
+ * @param array<string, int> $processed_data            Quantity of the loaded objects. Objects:
+ *                                                      'E' - quantity existent products, 'N' - quantity new products,
+ *                                                      'S' - quantity skipped products, 'C' - quantity vendors
+ * @param string             $lang_code                 Two-letter language code (e.g. 'en', 'ru', etc.)
+ * @param bool               $skip_record               Skip record flag
+ */
+function fn_vendor_plans_import_skip_products_with_unavailable_categories($company_id, $company_name, $main_category_path, $secondary_categories_path, $category_delimiter, array &$processed_data, $lang_code, &$skip_record)
+{
+    if (empty($company_id)) {
+        $company_id = fn_get_company_id_by_name((string) $company_name);
+    }
+
+    if (!$company_id) {
+        return;
+    }
+
+    $lang_code = !empty($lang_code) ? $lang_code : CART_LANGUAGE;
+
+    /** @var \Tygh\Models\Company $company */
+    $company = Company::model()->find($company_id);
+    if (!$company) {
+        return;
+    }
+
+    $company_category_ids = $company->category_ids;
+
+    if (!$company_category_ids) {
+        //if vendor has no category restrictions
+        return;
+    }
+
+    $set_delimiter = ';';
+    if ($main_category_path && $secondary_categories_path) {
+        $categories_paths = explode($set_delimiter, implode($set_delimiter, [$main_category_path, $secondary_categories_path]));
+    } else {
+        $categories_paths = $main_category_path ? [$main_category_path] : explode($set_delimiter, $secondary_categories_path);
+    }
+
+
+    foreach ($categories_paths as $category_path) {
+        if (strpos($category_path, $category_delimiter) !== false) {
+            $paths = explode($category_delimiter, $category_path);
+            array_walk($paths, 'fn_trim_helper');
+        } else {
+            $paths = [trim($category_path)];
+        }
+
+        $category_id = $parent_id = 0;
+        if (!empty($paths)) {
+            foreach ($paths as $name) {
+                $sql = 'SELECT ?:categories.category_id FROM ?:category_descriptions'
+                    . ' INNER JOIN ?:categories ON ?:categories.category_id = ?:category_descriptions.category_id'
+                    . ' WHERE ?:category_descriptions.category = ?s AND lang_code = ?s AND parent_id = ?i';
+
+                $category_id = db_get_field($sql, $name, $lang_code, $parent_id);
+
+                if (empty($category_id)) {
+                    // Skip record if category does not exist (trying to create new category)
+                    $skip_record = true;
+                    $processed_data['S']++;
+
+                    return;
+                }
+
+                $parent_id = $category_id;
+            }
+        }
+
+        if ($category_id && !in_array($category_id, $company_category_ids)) {
+            // Skip record if the category not available to vendor
+            $skip_record = true;
+            $processed_data['S']++;
+
+            return;
+        }
+    }
+}
+
+/**
  * Calculates commission based on payout.
  *
- * @param array $order_info   Order information
- * @param array $company_data Company to which order belongs to
- * @param array $payout_data  Payout data to be written to database
+ * @param array<string, string|int|array> $order_info   Order information
+ * @param array<string, string|int|array> $company_data Company to which order belongs to
+ * @param array<string, string|int|array> $payout_data  Payout data to be written to database
  *
- * @return array Payout data with calculated commission
+ * @return array<string, string|int|array> Payout data with calculated commission
  */
-function fn_calculate_commission_for_payout($order_info, $company_data, $payout_data)
+function fn_calculate_commission_for_payout(array $order_info, array $company_data, array $payout_data)
 {
     if (
         $payout_data
@@ -539,8 +650,7 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
         $commission = $order_info['total'] > 0 ? $plan->commission : 0;
         $fixed_commission = $order_info['total'] > 0 ? $plan->fixed_commission : 0;
         $total = $order_info['total'];
-        $shipping_cost = 0;
-        $taxes = 0;
+        $shipping_cost = $owner_taxes = 0;
 
         if ($payout_data['payout_type'] == VendorPayoutTypes::ORDER_CHANGED
             || $payout_data['payout_type'] == VendorPayoutTypes::ORDER_REFUNDED
@@ -549,12 +659,20 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
             $total = $payout_data['order_amount']; // When order was refunded - $total always has to be a negative value or 0.
             $commission = $total == 0 ? 0 : $plan->commission;
             $fixed_commission = $total == 0 ? 0 : $plan->fixed_commission;
-        } else {
-            $tax_amount_included_to_shipping = fn_vendor_plans_get_tax_amount_included_to_shipping($order_info['taxes']);
+            $taxes = isset($payout_data['taxes']) ? $payout_data['taxes'] : 0;
 
-            if (Registry::get('addons.vendor_plans.include_taxes_in_commission') === YesNo::NO) {
-                $taxes = array_sum(array_column($order_info['taxes'], 'tax_subtotal'));
+            if (isset($payout_data['old_order_info'])) {
+                $new_taxes = array_sum(array_column((array) $order_info['taxes'], 'tax_subtotal'));
+
+                /** @var array<string, array> $payout_data['old_order_info'] */
+                $old_taxes = array_sum(array_column($payout_data['old_order_info']['taxes'], 'tax_subtotal'));
+
+                $owner_taxes = $old_taxes - $new_taxes;
+                unset($payout_data['old_order_info']);
             }
+        } else {
+            $tax_amount_included_to_shipping = fn_vendor_plans_get_tax_amount_included_to_shipping((array) $order_info['taxes']);
+            $taxes = array_sum(array_column((array) $order_info['taxes'], 'tax_subtotal'));
 
             if (Registry::get('addons.vendor_plans.include_shipping') === YesNo::NO) {
                 // Calculate commission amount and check if we need to include shipping cost
@@ -581,12 +699,24 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
         $formatter = ServiceProvider::getPriceFormatter();
 
         // Calculate commission excluding payment surcharge
-        $percent_commission = ($total - $shipping_cost - $surcharge_from_total - $taxes) * $commission / 100;
+
+        if (Registry::get('addons.vendor_plans.include_taxes_in_commission') === YesNo::NO) {
+            $total_for_commission = $total - $shipping_cost - $surcharge_from_total - $taxes;
+            $percent_commission = $total_for_commission * $commission / 100;
+        } else {
+            $total_for_commission = $total - $shipping_cost - $surcharge_from_total;
+            $percent_commission = ($total_for_commission) * $commission / 100;
+        }
+
         $percent_commission = $formatter->round($percent_commission);
 
-        if ($percent_commission >= 0) {
+        $is_refund = $total_for_commission < 0;
+
+        if (!$is_refund) {
+            $fixed_commission = ((float) $order_info['total'] === (float) $payout_data['order_amount']) ? $fixed_commission : 0;
             $commission_amount = $percent_commission + $fixed_commission + $surcharge_to_commission; // Payment surcharge has always go to the admin
         } else {
+            $fixed_commission = ((int) $order_info['subtotal'] === 0) ? $fixed_commission : 0;
             $commission_amount = $percent_commission - $fixed_commission - $surcharge_to_commission; // Refund situation
         }
 
@@ -596,8 +726,10 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
             $commission_amount = $total;
         }
 
+        $storefront_id = isset($order_info['storefront_id']) ? $order_info['storefront_id'] : null;
+
         $payout_data['commission'] = $commission;
-        $payout_data['commission_amount'] = $commission_amount;
+        $payout_data['marketplace_profit'] = $commission_amount;
         $payout_data['commission_type'] = 'P'; // Backward compatibility
         $payout_data['plan_id'] = $company_data['plan_id'];
         $payout_data['extra'] = [
@@ -605,11 +737,23 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
             'percent_commission'      => $percent_commission,
             'surcharge_to_commission' => $surcharge_to_commission,
             'shipping_cost'           => $shipping_cost,
-            'taxes'                   => $taxes,
+            'taxes'                   => !YesNo::toBool(Registry::get('addons.vendor_plans.include_taxes_in_commission'))
+                ? $taxes
+                : 0,
             'fixed_commission'        => $fixed_commission,
             'total'                   => $total,
             'commission'              => $commission,
         ];
+
+        if (fn_vendor_plans_is_collect_taxes_from_vendors($storefront_id)) {
+            if (!$is_refund) {
+                $payout_data['commission_amount'] = $commission_amount + $taxes;
+            } else {
+                $payout_data['commission_amount'] = $commission_amount - $owner_taxes;
+            }
+        } else {
+            $payout_data['commission_amount'] = $commission_amount;
+        }
 
         /**
          * This hook is executed after the commission amount was calculated for a payout.
@@ -696,14 +840,17 @@ function fn_vendor_plans_is_need_tax_amount_included_to_shipping(array $tax)
 /**
  * Hook handler: adds commission values to refunds performed via RMA add-on.
  *
- * @param array $data        Request parameters
- * @param array $order_info  Order information from ::fn_get_orders()
- * @param array $return_info Return request from ::fn_get_return_info()
- * @param array $payout_data Payout data to be stored in the DB
+ * @param array<string, int|string|array> $data           Request parameters
+ * @param array<string, int|string|array> $order_info     Order information from ::fn_get_orders()
+ * @param array<string, int|string|array> $return_info    Return request from ::fn_get_return_info()
+ * @param array<string, int|string|array> $payout_data    Payout data to be stored in the DB
+ * @param array<string, int|string|array> $old_order_info Order information before refund
  */
-function fn_vendor_plans_rma_update_details_create_payout(&$data, &$order_info, &$return_info, &$payout_data)
+function fn_vendor_plans_rma_update_details_create_payout(array &$data, array &$order_info, array &$return_info, array &$payout_data, array $old_order_info)
 {
-    $company_data = fn_get_company_data($order_info['company_id']);
+    $company_data = fn_get_company_data((int) $order_info['company_id']);
+
+    $payout_data['old_order_info'] = $old_order_info;
 
     $payout_data = fn_calculate_commission_for_payout($order_info, $company_data, $payout_data);
 }
@@ -772,3 +919,61 @@ function fn_vendor_plans_vendor_payouts_update($vendor_payouts, &$data, $payout_
     }
 }
 
+/**
+ * The "get_products_pre" hook handler.
+ *
+ * Actions performed:
+ *     - Adds filtering of products by categories for a common products.
+ *
+ * @param array{show_master_products_only?: bool} $params         Product search params
+ * @param int                                     $items_per_page Items per page
+ * @param string                                  $lang_code      Two-letter language code (e.g. 'en', 'ru', etc.)
+ *
+ * @see fn_get_products
+ */
+function fn_vendor_plans_get_products_pre(array &$params, $items_per_page, $lang_code)
+{
+    if (empty($params['show_master_products_only']) || AREA !== SiteArea::ADMIN_PANEL) {
+        return;
+    }
+
+    $company = Company::current();
+
+    if (!$company || empty($company->category_ids)) {
+        return;
+    }
+
+    $params['cid'] = implode(',', $company->category_ids);
+}
+
+/**
+ * Hook handler: ignores pre-moderation when a vendor to change its plan
+ *
+ * @param array<string,string|int|bool|string[]> $company_data      Company data
+ * @param array<string,string|int|bool|string[]> $orig_company_data Original company data
+ * @param array<string,string|int|bool|string[]> $company_data_diff Changed company data
+ *
+ * @param-out array<string,string|int|bool|string[]>|array<empty,empty> $company_data_diff Changed company data
+ *
+ * @return void
+ */
+function fn_vendor_plans_vendor_data_premoderation_diff_company_data_post(array $company_data, array $orig_company_data, array &$company_data_diff)
+{
+    unset($company_data_diff['plan_id']);
+}
+
+/**
+ * Defines is collect taxes from vendor or not
+ *
+ * @param int|null $storefront_id Storefront identifier
+ *
+ * @return bool True if taxes are collect from vendors, false otherwise
+ */
+function fn_vendor_plans_is_collect_taxes_from_vendors($storefront_id = null)
+{
+    $is_collect_taxes_from_vendors = isset($storefront_id)
+        ? Settings::instance(['storefront_id' => (int) $storefront_id])->getValue('collect_taxes_from_vendors', 'vendor_plans')
+        : Registry::get('addons.vendor_plans.collect_taxes_from_vendors');
+
+    return YesNo::toBool($is_collect_taxes_from_vendors);
+}

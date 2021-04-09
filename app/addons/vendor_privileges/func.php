@@ -18,6 +18,7 @@ use Tygh\Enum\UserTypes;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Addons\VendorPrivileges\ServiceProvider;
+use Tygh\Enum\UsergroupStatuses;
 
 /**
  * Add-on install handler
@@ -137,4 +138,30 @@ function fn_vendor_privileges_define_usergroups($user_data, $area, &$usergroup_t
     if (isset($user_data['user_type']) && $user_data['user_type'] === 'V') {
         $usergroup_types[] = USERGROUP_TYPE_VENDOR;
     }
+}
+
+/**
+ * Checks if vendor administrator can use order_management
+ *
+ * @return bool Flag: indicates if vendor administrator has the permission to order management
+ */
+function fn_vendor_privileges_check_permission_order_management()
+{
+    $have_privilege = fn_check_current_user_access('edit_order');
+    $user_id = isset(Tygh::$app['session']['auth']['user_id']) ? Tygh::$app['session']['auth']['user_id'] : null;
+    $auth_user_type = isset(Tygh::$app['session']['auth']['user_type']) ? Tygh::$app['session']['auth']['user_type'] : null;
+
+    if (!$user_id || !$auth_user_type || $auth_user_type != UserTypes::VENDOR) {
+        return $have_privilege;
+    }
+
+    $have_vendor_user_group = false;
+    foreach (fn_get_user_usergroups($user_id) as $user_usergroup) {
+        if ($user_usergroup['type'] === USERGROUP_TYPE_VENDOR && $user_usergroup['status'] == UsergroupStatuses::ACTIVE) {
+            $have_vendor_user_group = true;
+            break;
+        }
+    }
+
+    return $have_vendor_user_group && $have_privilege;
 }

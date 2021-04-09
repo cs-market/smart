@@ -40,6 +40,7 @@ $schema = [
     'email_templates'        => false,
     'documents'              => false,
     'storage.cdn'            => false,
+    'notification_settings'  => false,
 
     'settings.manage' => function (array $params) {
         return !isset($params['section_id']) || !in_array($params['section_id'], [

@@ -81,7 +81,7 @@ class YandexCheckout implements IRedirectionPayment
 
         try {
             $response = $payment->createPayment($this->order_info, $this->payment_info['processor_params']);
-            /** @var \YandexCheckout\Model\Confirmation\ConfirmationRedirect $confirmation */
+            /** @var \YooKassa\Model\Confirmation\ConfirmationRedirect $confirmation */
             $confirmation = $response->getConfirmation();
             $confirmation_url = $confirmation->getConfirmationUrl();
 
@@ -93,8 +93,9 @@ class YandexCheckout implements IRedirectionPayment
                 $this->details_builder
                     ->setMethod(RedirectionPaymentDetailsBuilder::GET)
                     ->setPaymentUrl($confirmation_url)
-                    ->setReturnUrl(fn_url('checkout.complete?order_id=' . $this->order_info['order_id']))
-                    ->setCancelUrl(fn_url('checkout.checkout'))
+                    // FIXME: Add better successful return detection
+                    ->setReturnUrl(fn_url('auth.login_form'))
+                    ->setCancelUrl(fn_url('checkout.cart'))
                     ->asArray()
             );
         } catch (\Exception $exception) {

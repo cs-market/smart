@@ -1,8 +1,27 @@
 <div class="object-picker__categories-main">
-    {if $type === "result" || $type === "selection"}
+    {if $type === "result" || $type === "selection" || $type === "selection_external"}
         <div class="object-picker__categories-main-content">
             {$title_pre} 
-            {literal}${data.name}{/literal} 
+                <span class="select2-selection__choice__handler"></span>
+                <div class="select2__category-name">
+                    {if $type === "selection_external"}
+                        <a href="{literal}${data.url}{/literal}">{literal}${data.name}{/literal}</a>                        
+                    {else}
+                        {literal}${data.name}{/literal}
+                    {/if}
+                </div>
+                <div class="select2__category-parents">
+                    {literal}${data.parents_path ? data.parents_path : ``}{/literal}
+                </div>
+                
+                {if !$runtime.simple_ultimate}
+                    {literal}
+                        ${data.company 
+                        ? `<div class="select2__category-company">${data.company}</div>`
+                            : ``
+                        }
+                    {/literal}
+                {/if}
             {$title_post}
         </div>
     {elseif $type === "load"}

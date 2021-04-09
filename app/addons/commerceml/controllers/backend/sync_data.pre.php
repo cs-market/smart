@@ -19,10 +19,12 @@ use Tygh\Languages\Languages;
 
 defined('BOOTSTRAP') or die('Access denied');
 
+/** @var string $mode */
+
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST'
     && !empty($_REQUEST['sync_provider_id'])
-    && $_REQUEST['sync_provider_id'] === 'commerceml_catalog'
+    && $_REQUEST['sync_provider_id'] === 'commerceml'
 ) {
     if ($mode === 'update') {
         if (isset($_REQUEST['records'])) {
@@ -44,7 +46,7 @@ if (
                         'company_id'  => (int) $company_id,
                         'entity_type' => (string) $type,
                         'entity_id'   => (string) $record_data['entity_id'],
-                        'local_id'    => (string) $record_data['local_id'],
+                        'local_id'    => (string) trim($record_data['local_id']),
                     ];
                 }
             }
@@ -56,7 +58,7 @@ if (
             unset($_REQUEST['records']);
         }
 
-        return [CONTROLLER_STATUS_OK, 'sync_data.update?sync_provider_id=commerceml_catalog'];
+        return [CONTROLLER_STATUS_OK, 'sync_data.update?sync_provider_id=commerceml'];
     }
 
     return [CONTROLLER_STATUS_DENIED];
@@ -65,7 +67,7 @@ if (
 if (
     $mode === 'update'
     && !empty($_REQUEST['sync_provider_id'])
-    && $_REQUEST['sync_provider_id'] === 'commerceml_catalog'
+    && $_REQUEST['sync_provider_id'] === 'commerceml'
 ) {
     $company_id = fn_get_runtime_company_id();
 
@@ -73,6 +75,7 @@ if (
         'general',
         'catalog',
         'products',
+        'orders',
     ];
 
     $tab_list = [];
@@ -92,6 +95,8 @@ if (
 
     $mappable_schema = ServiceProvider::getManualMappableEntitiesSchema();
     $map_repository = ServiceProvider::getImportEntityMapRepository();
+    $settings_schema = ServiceProvider::getImportSettingsSchema($company_id);
+    $settings = ServiceProvider::getImportSettings($company_id);
 
     $mapping_count_summary = $map_repository->getCountSummary($company_id, array_keys($mappable_schema));
 
@@ -132,7 +137,7 @@ if (
     }
     unset($schema);
 
-    $last_sync_info = ServiceProvider::getLastSyncInfo($company_id);
+    $last_sync_info = ServiceProvider::getLastSyncInfo(['company_id' => $company_id]);
 
     $steps_results['step_3'] = isset($last_sync_info['status_code']) && $last_sync_info['status_code'] === SyncDataStatuses::STATUS_SUCCESS
         ? $last_sync_info['last_sync_timestamp']
@@ -145,8 +150,8 @@ if (
 
     $view->assign([
         'mappable_schema'       => $mappable_schema,
-        'languages'             => Languages::getAll(),
-        'order_statuses'        => fn_get_simple_statuses(STATUSES_ORDER, false, false, CART_LANGUAGE),
+        'settings_schema'       => $settings_schema,
+        'import_settings'       => $settings,
         'mapping_count_summary' => $mapping_count_summary,
         'steps_results'         => $steps_results
     ]);

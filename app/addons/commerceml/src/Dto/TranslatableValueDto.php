@@ -20,7 +20,7 @@ namespace Tygh\Addons\CommerceML\Dto;
  *
  * @package Tygh\Addons\CommerceML\Dto
  */
-class TranslatableValueDto
+class TranslatableValueDto implements ProductPropertyValue
 {
     /**
      * @var string
@@ -100,5 +100,13 @@ class TranslatableValueDto
     public static function create($default_value, array $translates = [])
     {
         return new self((string) $default_value, $translates);
+    }
+
+    /**
+     * @return string Default value
+     */
+    public function getPropertyValue()
+    {
+        return (string) $this->default_value;
     }
 }

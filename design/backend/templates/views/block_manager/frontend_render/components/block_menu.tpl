@@ -1,10 +1,10 @@
 {$is_block_enabled = $block.status === "A"}
-<div class="bm-block-manager__menu-wrapper">
+<div class="bm-block-manager__menu-wrapper" data-ca-block-manager-menu-wrapper>
     <div class="bm-block-manager__menu" data-ca-block-manager-menu>
         <div class="bm-block-manager__handler">
             <i class="ty-icon-handler bm-block-manager__icon"></i>
         </div>
-        <a href="{fn_url("block_manager.manage&selected_location={$location_data.location_id}&object_id={$block.snapping_id}&type=snapping", "A")}"
+        <a href="{fn_url("block_manager.manage&selected_location={$parent_grid.location_id}&object_id={$block.snapping_id}&type=snapping", "A")}"
            class="bm-block-manager__btn bm-block-manager__properties"
            target="_blank"
         >

@@ -28,6 +28,7 @@
 {$autoopen = $autoopen|default:false}
 {$allow_clear = $allow_clear|default:false}
 {$item_ids = $item_ids|default:[]|array_filter}
+{$dropdown_css_class = "object-picker__dropdown object-picker__dropdown--storefronts `$dropdown_css_class`"|default:"object-picker__dropdown object-picker__dropdown--storefronts"}
 
 {if $multiple && $show_advanced}
     {$empty_variant_text = $empty_variant_text|default:__("type_to_search_or_click_button")}
@@ -69,6 +70,7 @@
                     data-ca-object-picker-placeholder-value=""
                     data-ca-object-picker-width="{$width}"
                     data-ca-object-picker-extended-picker-id="object_extended_picker_{$picker_id}"
+                    data-ca-object-picker-dropdown-css-class="{$dropdown_css_class}"
                     data-ca-object-picker-extended-picker-text-key="{$picker_text_key}"
                     {if $view_mode == "external"}
                         data-ca-object-picker-external-container-selector="#object_picker_external_seleceted_products_{$picker_id}"

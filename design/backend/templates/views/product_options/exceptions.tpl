@@ -117,7 +117,7 @@
 
 {/capture}
 
-{if $product_data.exceptions_type == "F"}
+{if $product_data.exceptions_type == "ProductOptionsExceptionsTypes::FORBIDDEN"|enum}
     {assign var="except_title" value=__("forbidden_combinations")}
 {else}
     {assign var="except_title" value=__("allowed_combinations")}

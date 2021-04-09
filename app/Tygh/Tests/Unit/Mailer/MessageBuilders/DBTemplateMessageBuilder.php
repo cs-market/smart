@@ -59,4 +59,12 @@ class Context implements IContext
     {
         return 'en';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArea()
+    {
+        return 'A';
+    }
 }

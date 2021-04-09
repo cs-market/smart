@@ -24,8 +24,8 @@
          id="vendor_payments_list"
     >
         {if $vendor_payments}
-            <div class="table-wrapper">
-                <table class="table table-middle table--relative table-objects table-striped">
+            <div class="table-responsive-wrapper">
+                <table class="table table-middle table--relative table-objects table-striped table-responsive table-responsive-w-titles">
                     <tbody>
                     {foreach $vendor_payments as $vendor_payment}
                         {if $vendor_payment.processor_status == "D"}
@@ -56,7 +56,7 @@
                                 href_delete="payments.delete?payment_id=`$vendor_payment.payment_id`"
                                 delete_target_id="vendor_payments_list"
                                 skip_delete=$skip_delete
-                                header_text="{__("editing_payment")}: `$vendor_payment.payment`"
+                                header_text=$vendor_payment.payment
                                 additional_class="cm-sortable-row cm-sortable-id-`$vendor_payment.payment_id`"
                                 no_table=true
                                 draggable=true

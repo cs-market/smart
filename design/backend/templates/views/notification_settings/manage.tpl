@@ -1,3 +1,7 @@
+{$can_update_settings = fn_check_view_permissions("notification_settings.update", "POST")}
+{$can_edit_email_templates = fn_check_view_permissions("email_templates.manage", "GET")}
+{$can_edit_internal_templates = fn_check_view_permissions("internal_templates.manage", "GET")}
+
 {capture name="sidebar"}
     {include file="views/notification_settings/components/navigation_section.tpl" active_section=$active_section}
 {/capture}
@@ -13,16 +17,19 @@
 {/hook}
 
 {capture name="mainbox"}
-    <form action="{""|fn_url}" method="post" name="notifications_form" class=" form-horizontal form-edit form-setting">
+    <form action="{""|fn_url}" method="post" name="notifications_form" class="form-horizontal form-edit form-setting">
         <input type="hidden" id="receiver_type" name="receiver_type" value="{$receiver_type}" />
-
-        <table class="table">
+        {$rec = 70 / count($transports[$receiver_type])}
+        <table class="table table-responsive table--sticky notification-settings__table">
+            <thead class="notification-settings__header">
             <tr>
-                <td></td>
+                <th class="table__head-sticky" width="40%">{__("event.notification_type")}</th>
                 {foreach $transports[$receiver_type] as $transport => $value}
-                    <td>{__("event.transport.$transport")}</td>
+                    <th class="table__head-sticky">{__("event.transport.$transport")}</th>
                 {/foreach}
+                <th class="table__head-sticky" width="15%"></th>
             </tr>
+            </thead>
             {foreach $event_groups as $group_name => $events}
 
                 {capture name="events_group"}
@@ -34,53 +41,157 @@
                         {$template_code = $event["receivers"][$receiver_type]["template_code"]|default:""}
                         {$template_area = $event["receivers"][$receiver_type]["template_area"]|default:""}
                         <tr>
-                            <td id="ev_name">
-                                {if $template_code && $template_area}
+                            <td class="notification-settings__name" data-th="{__("notification")}">
+                                {if $template_code && $template_area && $can_edit_email_templates}
                                     <a href="{fn_url("email_templates.update?code={$template_code}&area={$template_area}&event_id={$event_id}&receiver={$receiver_type}")}">
                                 {/if}
                                 {__($event["name"]["template"], $event["name"]["params"])}
-                                {if ($template_code) && $template_area}
+                                {if ($template_code) && $template_area && $can_edit_email_templates}
                                     </a>
+                                {/if}
+                                {if $event.description}
+                                    <p class="muted">{__($event.description.template, $event.description.params)}</p>
                                 {/if}
                             </td>
                             {foreach $transports[$receiver_type] as $transport => $value}
-                                <td>
-                                    {foreach $array_transports as $transport_name => $regulation}
-                                        {if $transport_name == $transport}
-                                            <input type="hidden" name="notification_settings[{$event_id}][{$receiver_type}][{$transport_name}]" value="N"/>
-                                            <input name="notification_settings[{$event_id}][{$receiver_type}][{$transport_name}]" type="checkbox" value="Y" {if $regulation}checked{/if}/>
-                                        {/if}
-                                    {/foreach}
+                                <td data-th="{__("event.transport.$transport")}">
+                                    {if $transport|array_key_exists:$array_transports}
+                                        {foreach $array_transports as $transport_name => $is_enabled}
+                                            {if $transport_name == $transport}
+                                                <input type="hidden"
+                                                    name="notification_settings[{$event_id}][{$receiver_type}][{$transport_name}]"
+                                                    value="{"YesNo::NO"|enum}"
+                                                />
+                                                <input name="notification_settings[{$event_id}][{$receiver_type}][{$transport_name}]"
+                                                    class="checkbox--nomargin"
+                                                    type="checkbox"
+                                                    value="{"YesNo::YES"|enum}"
+                                                    {if $is_enabled}checked{/if}
+                                                    {if !$can_update_settings}disabled{/if}
+                                                />
+                                            {/if}
+                                        {/foreach}
+                                    {else}
+                                        <span>&mdash;</span>
+                                    {/if}
                                 </td>
                             {/foreach}
+                            <td data-th="">
+                                {if $event.is_configurable && $group_settings.$group_name.$receiver_type.methods}
+                                    {include file="views/notification_settings/components/receivers_editor.tpl"
+                                        is_editable = $can_update_settings
+                                        object_type = "event"
+                                        object_id = $event_id
+                                        receivers = $event.receiver_search_conditions.$receiver_type
+                                        receiver_search_methods = $group_settings.$group_name.$receiver_type.methods
+                                        manage_button_text = "{__("receivers")} ({$event.receiver_search_conditions.$receiver_type|count})"
+                                    }
+                                {/if}
+                            </td>
                         </tr>
                     {/foreach}
                 {/capture}
 
                 {if $smarty.capture.events_group|trim}
-                    <tr>
-                        <td id="group" colspan="{count($transports[$receiver_type]) + 1}"><h3>{__($group_name)}</h3></td>
+                <tbody>
+                    <tr class="notification-settings__group">
+                        <td data-th=""><h4>{__($group_name)}</h4></td>
+                        <td data-th="" colspan="{count($transports[$receiver_type])}"></td>
+                        <td data-th=""></td>
                     </tr>
+                    {if $group_settings.$group_name.$receiver_type.is_configurable && $group_settings.$group_name.$receiver_type.methods}
+                        <tr class="row-gray notification-settings__receiver" id="group_{$group_name}">
+                            <td data-th="" colspan="{count($transports[$receiver_type]) + 1}">
+                                {include file="views/notification_settings/components/receivers.tpl"
+                                    object_type = "group"
+                                    object_id = $group_name
+                                    show_heading = true
+                                    receivers = $event.receiver_search_conditions.$receiver_type
+                                    values = $event.receiver_search_conditions_readable.$receiver_type
+                                }
+                            </td>
+                            <td data-th="">
+                                {include file="views/notification_settings/components/receivers_editor.tpl"
+                                    is_editable = $can_update_settings
+                                    object_type = "group"
+                                    object_id = $group_name
+                                    receivers = $event.receiver_search_conditions.$receiver_type
+                                    receiver_search_methods = $group_settings.$group_name.$receiver_type.methods
+                                }
+                            </td>
+                        <!--group_{$group_name}--></tr>
+                    {/if}
                     {$smarty.capture.events_group nofilter}
+                </tbody>
                 {/if}
-
             {/foreach}
-            <tr>
-                <td id="group" colspan="{count($transports[$receiver_type]) + 1}"><h3>{__("other_notification")}</h3></td>
-            </tr>
-            <tr>
-                <td colspan="{count($transports[$receiver_type]) + 1}">
-                    {__("see_full_templates_list", [
-                        "[email_template_manage]" => "email_templates.manage"|fn_url,
-                        "[internal_template_manage]" => "internal_templates.manage"|fn_url
-                    ])}
-                </td>
-            </tr>
+            <tfoot>
+            {if $can_edit_email_templates || $can_edit_internal_templates}
+                <tr>
+                    <td colspan="{count($transports[$receiver_type]) + 2}"><h4>{__("other_notification")}</h4></td>
+                </tr>
+                <tr>
+                    <td colspan="{count($transports[$receiver_type]) + 2}">
+                        <p>{__("other_notifications.title")}</p>
+                        {if $can_edit_email_templates}
+                            <p>
+                                <a href="{fn_url("email_templates.manage")}">{__("other_notifications.email_templates")}</a>
+                            </p>
+                        {/if}
+                        {if $can_edit_internal_templates}
+                            <p>
+                                <a href="{fn_url("internal_templates.manage")}">{__("other_notifications.internal_templates")}</a>
+                            </p>
+                        {/if}
+                    </td>
+                </tr>
+            {/if}
+            </tfoot>
         </table>
     </form>
     {capture name="buttons"}
         {include file="buttons/save.tpl" but_name="dispatch[notification_settings.m_update]" but_role="submit-link" but_target_form="notifications_form"}
     {/capture}
+
+    <template id="template_result_add_email">
+        <div class="object-selector-result-wrapper">
+            <span class="object-selector-result">
+                <span class="object-selector-result__icon-wrapper">
+                    <i class="icon-plus-sign object-selector-result__icon"></i>
+                </span>
+                <span class="object-selector-result__text">
+                    <span class="object-selector-result__prefix">{__("add")}</span>
+                    {literal}
+                    <span class="object-selector-result__body">${data.text}</span>
+                    {/literal}
+                </span>
+            </span>
+        </div>
+    </template>
+
+    <template id="template_result_add_user">
+        <div class="object-selector-result-wrapper">
+            <span class="object-selector-result">
+                {literal}
+                <span class="object-selector-result__text">
+                    <span class="object-selector-result__body">${data.name}</span>
+                </span>
+                <span class="object-selector-result__append">${data.email}</span>
+                {/literal}
+                {if !$runtime.simple_ultimate}
+                {literal}
+                    <div class="object-selector-result__group">${data.company_name}</div>
+                {/literal}
+                {/if}
+            </span>
+        </div>
+    </template>
 {/capture}
 
-{include file="common/mainbox.tpl" title=$page_title|default:{__("notifications")} buttons=$smarty.capture.buttons content=$smarty.capture.mainbox sidebar_position="right" sidebar=$smarty.capture.sidebar}
+{include file="common/mainbox.tpl"
+    title=$page_title|default:__("notifications")
+    buttons=$smarty.capture.buttons
+    content=$smarty.capture.mainbox
+    sidebar_position="right"
+    sidebar=$smarty.capture.sidebar
+}

@@ -30,6 +30,7 @@
             <label for="elm_mailing_list_from_name_{$id}" class="control-label">{__("from_name")}</label>
             <div class="controls">
                 <input type="text" name="mailing_list_data[from_name]" id="elm_mailing_list_from_name_{$id}" value="{$mailing_list.from_name}" />
+                <p class="muted description">{__("tt_addons_newsletters_views_mailing_lists_update_from_name")}</p>
             </div>
         </div>
 
@@ -37,6 +38,7 @@
             <label class="control-label cm-email cm-required" for="elm_mailing_list_from_email_{$id}" >{__("from_email")}</label>
             <div class="controls">
                 <input type="text" name="mailing_list_data[from_email]" id="elm_mailing_list_from_email_{$id}" value="{$mailing_list.from_email|default:$settings.Company.company_newsletter_email}" />
+                <p class="muted description">{__("tt_addons_newsletters_views_mailing_lists_update_from_email")}</p>
             </div>
         </div>
 
@@ -44,6 +46,7 @@
             <label class="control-label cm-email cm-required" for="elm_mailing_list_reply_to_{$id}">{__("reply_to")}</label>
             <div class="controls">
                 <input type="text" name="mailing_list_data[reply_to]" id="elm_mailing_list_reply_to_{$id}" value="{$mailing_list.reply_to|default:$settings.Company.company_newsletter_email}" />
+                <p class="muted description">{__("tt_addons_newsletters_views_mailing_lists_update_reply_to")}</p>
             </div>
         </div>
 

@@ -26,7 +26,7 @@
 {if $users}
 <div class="table-responsive-wrapper longtap-selection">
     <table width="100%" class="table table-middle table--relative table-responsive">
-    <thead data-ca-bulkedit-default-object="true">
+    <thead data-ca-bulkedit-default-object="true" data-ca-bulkedit-component="defaultObject">
     <tr>
         <th width="8%" class="center {$no_hide_input} mobile-hide">
            {include file="common/check_items.tpl" check_statuses=""|fn_get_default_status_filters:true}
@@ -40,7 +40,7 @@
                 <input type="checkbox"
                     class="bulkedit-toggler hide"
                     data-ca-bulkedit-toggler="true"
-                    data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                    data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]"
                     data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
                     data-ca-bulkedit-dispatch-parameter="user_ids[]"
                 />
@@ -109,7 +109,22 @@
                         <li>{btn type="list" text=__("view_all_orders") href="orders.manage?user_id=`$user.user_id`"}</li>
                         {$list_extra_links = true}
                     {/if}
-                    {if $user.user_type|fn_user_need_login && (!$runtime.company_id || $runtime.company_id == $auth.company_id && fn_check_permission_act_as_user()) && $user.user_id != $auth.user_id && !($user.user_type == $auth.user_type && $user.is_root == 'Y' && (!$user.company_id || $user.company_id == $auth.company_id))}
+                    {if
+                        fn_user_need_login($user.user_type)
+                        && (
+                            !$runtime.company_id
+                            || fn_check_permission_manage_profiles($user.user_type)
+                        )
+                        && $user.user_id != $auth.user_id
+                        && !(
+                            $user.user_type === $auth.user_type
+                            && $user.is_root === "YesNo::YES"|enum
+                            && (
+                                !$user.company_id
+                                || $user.company_id == $auth.company_id
+                            )
+                        )
+                    }
                         <li>{btn type="list" target="_blank" text=__("log_in_as_user") href="profiles.act_as_user?user_id=`$user.user_id`"}</li>
                         {$list_extra_links = true}
                     {/if}
@@ -150,7 +165,7 @@
         <td widht="10%" class="right" data-th="{__("status")}">
             <input type="hidden" name="user_types[{$user.user_id}]" value="{$user.user_type}" />
             {if $user.is_root == "Y" && ($user.user_type == "A" || $user.user_type == "V" && $runtime.company_id && $runtime.company_id == $user.company_id)}
-                {$u_id=""}           
+                {$u_id=""}
             {else}
                 {$u_id=$user.user_id}
             {/if}
@@ -178,10 +193,14 @@
         {capture name="tools_list"}
             {if "ULTIMATE"|fn_allowed_for || !$runtime.company_id}
                 {hook name="profiles:list_tools"}
+                    <li>{btn type="list" text=__("export_selected") dispatch="dispatch[profiles.export_range]" form="userlist_form"}</li>
                 {/hook}
             {/if}
+            {if fn_check_permissions("profiles", "m_delete", "admin", "POST", ["user_type" => $smarty.request.user_type])}
+                <li>{btn type="delete_selected" dispatch="dispatch[profiles.m_delete]" form="userlist_form"}</li>
+            {/if}     
         {/capture}
-        {dropdown content=$smarty.capture.tools_list class="mobile-hide"}
+        {dropdown content=$smarty.capture.tools_list class="mobile-hide bulkedit-dropdown--legacy hide"}
     {/if}
 {/capture}
 </form>

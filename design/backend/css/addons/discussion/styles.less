@@ -43,7 +43,9 @@
         }
     }
     .tools {
-        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+
         .hidden-tools a {
             visibility: hidden;
         }
@@ -51,7 +53,7 @@
             margin-right: 8px;
         }
         .label {
-            margin-right: 10px;
+            margin-right: 5px;
         }
         .muted {
             margin-right: 10px;
@@ -72,10 +74,12 @@
         }
     }
     .post-object {
-        margin-left: 170px;
+        margin-left: 230px;
+        padding-left: 5px;
         margin-right: 300px;
+        margin-top: 5px;
         display: block;
-        width: 300px;
+        width: 220px;
         height: 20px;
         line-height: 20px;
         overflow: hidden;
@@ -87,6 +91,22 @@ input.input-time {
     margin: 0px;
     width: 35px;
 }
+
+.post__btn-status-switch,
+.post__btn-delete {
+    border: 1px solid transparent;
+    background-color: transparent;
+}
+
+.post-item:hover {
+
+    .post__btn-status-switch,
+    .post__btn-delete {
+        border-color: @btnBorder;
+        background-color: @btnBackground;
+    }
+}
+
 
 
 /* Rate stars */

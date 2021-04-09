@@ -104,10 +104,6 @@ if ($mode == 'update_steps' || $mode == 'shipping_estimation') {
             }
         }
 
-        if (!empty($service_data)) {
-            fn_pickpoint_cost_by_shipment($cart, $shipping_info, $service_data, $city);
-        }
-
         $pickpoint_office = array();
         if (!empty($cart['pickpoint_office'])) {
             $pickpoint_offices = reset($cart['pickpoint_office']);

@@ -1,8 +1,9 @@
 {script src="js/tygh/backend/select2_categories.js"}
-<div class="object-categories-add cm-object-categories-add-container {$select2_wrapper_meta}">
+<div class="object-categories-add {if $select2_multiple}object-categories-add--multiple{/if} cm-object-categories-add-container {$select2_wrapper_meta}">
     {$select_id=$select2_select_id|default:"categories_add"}
     {$category_ids = $select2_category_ids|default:[]|array_unique}
     {$enable_add = $select2_enable_add|default:"true"}
+    {$select2_show_advanced = $select2_show_advanced|default:"true"}
 
     {if "MULTIVENDOR"|fn_allowed_for}
         {$zero_company_id_name_lang_var = "none"}
@@ -27,7 +28,8 @@
 
     <input type="hidden" name="{$select2_name}" value="" />
 
-    <input type="hidden" name="product_data[add_new_category][]" value=""/>
+    {$new_category_field_name = ($is_multiple_update) ? ("products_data[`$product_id`][add_new_category][]") : ("product_data[add_new_category][]")}
+    <input type="hidden" name="{$new_category_field_name}" value=""/>
 
     {if $select2_multiple}
         {$select2_name="`$select2_name`[]"}
@@ -65,7 +67,7 @@
         data-ca-template-type="category"
         data-ca-template-selection-selector="#template_selection_category"
         data-ca-template-result-add-selector="#template_result_add_category"
-        data-ca-new-value-holder-selector="[name='product_data[add_new_category][]']"
+        data-ca-new-value-holder-selector="[name='{$new_category_field_name}']"
         data-ca-new-value-allow-multiple="true"
     >
         {if $category_ids}
@@ -76,7 +78,7 @@
             {/foreach}
         {/if}
     </select>
-    {if !$select2_disabled}
+    {if $select2_show_advanced && !$select2_disabled}
         {include file="pickers/categories/picker.tpl"
             company_ids=$runtime.company_id
             rnd=$select2_select_id

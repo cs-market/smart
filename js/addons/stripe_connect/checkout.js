@@ -1,63 +1,58 @@
 (function (_, $) {
+  var stripeInstance;
+  var stripeElementsApi;
+  var stripeElements;
+  var self = {
+    init: function init(publishableKey, langCode, elements) {
+      if (_.stripe.view.isInitialized(elements)) {
+        return;
+      }
 
-    var stripeInstance;
-    var stripeElementsApi;
-    var stripeElements;
+      stripeElements = stripeElements || {};
+      stripeInstance = stripeInstance || Stripe(publishableKey);
+      stripeElementsApi = stripeElementsApi || stripeInstance.elements({
+        locale: langCode
+      }); // remove previously rendered form
 
-    var self = {
+      _.stripe.view.teardown(stripeElements); // render payment form
 
-        init: function (publishableKey, langCode, elements) {
 
-            if (_.stripe.view.isInitialized(elements)) {
-                return;
-            }
+      _.stripe.view.render(stripeInstance, stripeElementsApi, stripeElements, elements); // add submit logic
 
-            stripeElements = stripeElements || {};
-            stripeInstance = stripeInstance || Stripe(publishableKey);
-            stripeElementsApi = stripeElementsApi || stripeInstance.elements({
-                locale: langCode
-            });
 
-            // remove previously rendered form
-            _.stripe.view.teardown(stripeElements);
+      _.stripe.view.addSubmitHandler(stripeInstance, stripeElementsApi, stripeElements, elements);
+    }
+  };
+  $.extend({
+    ceStripeCheckout: function ceStripeCheckout(method) {
+      if (self[method]) {
+        return self[method].apply(this, Array.prototype.slice.call(arguments, 1));
+      } else {
+        $.error('ty.stripeCheckout: method ' + method + ' does not exist');
+      }
+    }
+  });
+  $.ceEvent('on', 'ce.commoninit', function (context) {
+    var $form = $('[data-ca-stripe-element="form"]', context);
 
-            // render payment form
-            _.stripe.view.render(stripeInstance, stripeElementsApi, stripeElements, elements);
+    if (!$form.length) {
+      return;
+    }
 
-            // add submit logic
-            _.stripe.view.addSubmitHandler(stripeInstance, stripeElementsApi, stripeElements, elements);
-        },
-    };
+    var publishableKey = $form.data('caStripePublishableKey');
 
-    $.extend({
-        ceStripeCheckout: function (method) {
-            if (self[method]) {
-                return self[method].apply(this, Array.prototype.slice.call(arguments, 1));
-            } else {
-                $.error('ty.stripeCheckout: method ' + method + ' does not exist');
-            }
-        }
-    });
+    var elements = _.stripe.view.getElements($form);
 
-    $.ceEvent('on', 'ce.commoninit', function (context) {
-        var $form = $('[data-ca-stripe-element="form"]', context);
-        if (!$form.length) {
-            return;
-        }
+    elements.form = $form.closest('form');
 
-        var publishableKey = $form.data('caStripePublishableKey');
-
-        var elements = _.stripe.view.getElements($form);
-        elements.form = $form.closest('form');
-
-        if (publishableKey) {
-            if (typeof Stripe === "undefined") {
-                $.getScript('https://js.stripe.com/v3/', function () {
-                    $.ceStripeCheckout('init', publishableKey, _.cart_language, elements);
-                });
-            } else {
-                $.ceStripeCheckout('init', publishableKey, _.cart_language, elements);
-            }
-        }
-    });
+    if (publishableKey) {
+      if (typeof Stripe === "undefined") {
+        $.getScript('https://js.stripe.com/v3/', function () {
+          $.ceStripeCheckout('init', publishableKey, _.cart_language, elements);
+        });
+      } else {
+        $.ceStripeCheckout('init', publishableKey, _.cart_language, elements);
+      }
+    }
+  });
 })(Tygh, Tygh.$);

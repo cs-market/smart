@@ -68,19 +68,31 @@
 {foreach $fields as $field}
 
 {$value = $field.value}
-{if $field.field_name && $field.is_default == "Y"}
-    {assign var="data_name" value=$default_data_name}
-    {assign var="data_id" value=$field.field_name}
+{if $field.field_name && $field.is_default == "YesNo::YES"|enum}
+    {$data_name=$default_data_name}
+    {$data_id=$field.field_name}
 {else}
-    {assign var="data_name" value="`$default_data_name`[fields]"}
-    {assign var="data_id" value=$field.field_id}
+    {$data_name="`$default_data_name`[fields]"}
+    {$data_id=$field.field_id}
+{/if}
+
+{$element_id = "`$id_prefix`elm_`$field.field_id`"}
+{$required = $field.required}
+
+{if $field.field_type == "ProfileFieldTypes::FILE"|enum}
+    {$var_name = "profile_fields[{$data_id}]"}
+    {$hash_name = $var_name|md5}
+    {$element_id = "type_{$hash_name}"}
+    {if isset($value.file_name)}
+        {$required = "YesNo::NO"|enum}
+    {/if}
 {/if}
 
 {hook name="profiles:profile_fields"}
 <div class="control-group profile-field-{$field.field_name}">
     <label
-        for="{$id_prefix}elm_{$field.field_id}"
-        class="control-label cm-profile-field {if $field.required == "Y"}cm-required{/if}{if $field.field_type == "ProfileFieldTypes::PHONE"|enum || ($field.autocomplete_type == "phone-full")} cm-mask-phone-label {/if}{if $field.field_type == "Z"} cm-zipcode{/if}{if $field.field_type == "E"} cm-email{/if} {if $field.field_type == "Z"}{if $section == "S"}cm-location-shipping{else}cm-location-billing{/if}{/if}"
+        for={$element_id}
+        class="control-label cm-profile-field {if $required == "Y"}cm-required{/if}{if $field.field_type == "ProfileFieldTypes::PHONE"|enum || ($field.autocomplete_type == "phone-full")} cm-mask-phone-label {/if}{if $field.field_type == "Z"} cm-zipcode{/if}{if $field.field_type == "E"} cm-email{/if} {if $field.field_type == "Z"}{if $section == "S"}cm-location-shipping{else}cm-location-billing{/if}{/if}"
     >{$field.description}:</label>
 
     <div class="controls">
@@ -89,7 +101,7 @@
         {$_country = $settings.Checkout.default_country}
         {$_state = $value}
 
-        <select class="cm-state {if $section == "S"}cm-location-shipping{else}cm-location-billing{/if}" id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" {$disabled_param nofilter}>
+        <select class="cm-state {if $section == "S"}cm-location-shipping{else}cm-location-billing{/if}" id={$element_id} name="{$data_name}[{$data_id}]" {$disabled_param nofilter}>
             <option value="">- {__("select_state")} -</option>
             {if $states && $states.$_country}
                 {foreach from=$states.$_country item=state}
@@ -101,7 +113,7 @@
 
     {elseif $field.field_type == "ProfileFieldTypes::COUNTRY"|enum}
         {assign var="_country" value=$value|default:$settings.Checkout.default_country}
-        <select id="{$id_prefix}elm_{$field.field_id}" class="cm-country {if $section == "S"}cm-location-shipping{else}cm-location-billing{/if}" name="{$data_name}[{$data_id}]" {$disabled_param nofilter}>
+        <select id={$element_id} class="cm-country {if $section == "S"}cm-location-shipping{else}cm-location-billing{/if}" name="{$data_name}[{$data_id}]" {$disabled_param nofilter}>
             {hook name="profiles:country_selectbox_items"}
             <option value="">- {__("select_country")} -</option>
             {foreach from=$countries item="country" key="code"}
@@ -113,17 +125,17 @@
     {elseif $field.field_type == "ProfileFieldTypes::CHECKBOX"|enum}
         <input type="hidden" name="{$data_name}[{$data_id}]" value="N" {$disabled_param nofilter} />
         <label class="checkbox">
-        <input type="checkbox" id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" value="Y" {if $value == "Y"}checked="checked"{/if} {$disabled_param nofilter} /></label>
+        <input type="checkbox" id={$element_id} name="{$data_name}[{$data_id}]" value="Y" {if $value == "Y"}checked="checked"{/if} {$disabled_param nofilter} /></label>
 
     {elseif $field.field_type == "ProfileFieldTypes::TEXT_AREA"|enum}
-        <textarea class="input-large" id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" cols="32" rows="3" {$disabled_param nofilter}>{$value}</textarea>
+        <textarea class="input-large" id={$element_id} name="{$data_name}[{$data_id}]" cols="32" rows="3" {$disabled_param nofilter}>{$value}</textarea>
 
     {elseif $field.field_type == "ProfileFieldTypes::DATE"|enum}
         {include file="common/calendar.tpl" date_id="elm_`$field.field_id`" date_name="`$data_name`[`$data_id`]" date_val=$value extra=$disabled_param}
 
     {elseif $field.field_type == "ProfileFieldTypes::SELECT_BOX"|enum}
-        <select id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" {$disabled_param nofilter}>
-            {if $field.required != "Y"}
+        <select id={$element_id} name="{$data_name}[{$data_id}]" {$disabled_param nofilter}>
+            {if $required != "Y"}
             <option value="">--</option>
             {/if}
             {foreach from=$field.values key=k item=v}
@@ -134,13 +146,29 @@
     {elseif $field.field_type == "ProfileFieldTypes::RADIO"|enum}
         <div class="select-field">
         {foreach from=$field.values key=k item=v name="rfe"}
-        <input class="radio" type="radio" id="{$id_prefix}elm_{$field.field_id}_{$k}" name="{$data_name}[{$data_id}]" value="{$k}" {if (!$value && $smarty.foreach.rfe.first) || $value == $k}checked="checked"{/if} {$disabled_param nofilter} /><label for="{$id_prefix}elm_{$field.field_id}_{$k}">{$v}</label>
+        <input class="radio" type="radio" id="{$element_id}_{$k}" name="{$data_name}[{$data_id}]" value="{$k}" {if (!$value && $smarty.foreach.rfe.first) || $value == $k}checked="checked"{/if} {$disabled_param nofilter} /><label for="{$element_id}_{$k}">{$v}</label>
         {/foreach}
         </div>
 
     {elseif $field.field_type == "ProfileFieldTypes::ADDRESS_TYPE"|enum}
-        <input class="radio valign {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if}" type="radio" id="{$id_prefix}elm_{$field.field_id}_residential" name="{$data_name}[{$data_id}]" value="residential" {if !$value || $value == "residential"}checked="checked"{/if} {if !$skip_field}{$disabled_param nofilter}{/if} /><span class="radio">{__("address_residential")}</span>
-        <input class="radio valign {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if}" type="radio" id="{$id_prefix}elm_{$field.field_id}_commercial" name="{$data_name}[{$data_id}]" value="commercial" {if $value == "commercial"}checked="checked"{/if} {if !$skip_field}{$disabled_param nofilter}{/if} /><span class="radio">{__("address_commercial")}</span>
+        <input class="radio valign {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if}" type="radio" id="{$element_id}_residential" name="{$data_name}[{$data_id}]" value="residential" {if !$value || $value == "residential"}checked="checked"{/if} {if !$skip_field}{$disabled_param nofilter}{/if} /><span class="radio">{__("address_residential")}</span>
+        <input class="radio valign {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if}" type="radio" id="{$element_id}_commercial" name="{$data_name}[{$data_id}]" value="commercial" {if $value == "commercial"}checked="checked"{/if} {if !$skip_field}{$disabled_param nofilter}{/if} /><span class="radio">{__("address_commercial")}</span>
+    {elseif $field.field_type == "ProfileFieldTypes::FILE"|enum}
+        {if isset($value.file_name)}
+            <div class="text-type-value" data-file-id="{$hash_name}">
+                <i id="{$hash_name}" title="{__("remove_this_item")}" class="icon-remove-sign cm-tooltip hand cm-file-remove {if $field.required == "YesNo::YES"|enum}cm-file-required{/if}"></i>
+                <span><a href="{$value.link|default:""}">{$value.file_name}</a></span>
+            </div>
+        {/if}
+        {include file="common/fileuploader.tpl"
+            var_name=$var_name
+            label_id="elm_{$id_prefix}{$field.field_id}"
+            hidden_name="{$data_name}[{$data_id}]"
+            hidden_value=$value.file_name|default:""
+            prefix=$id_prefix
+            disabled_param=$disabled_param
+            max_upload_filesize=$config.tweaks.profile_field_max_upload_filesize
+        }
 
     {else}  {* Simple input (or another types of input) *}
         <input

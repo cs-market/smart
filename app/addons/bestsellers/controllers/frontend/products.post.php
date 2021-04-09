@@ -73,9 +73,23 @@ if ($mode == 'final_sale' || $mode == 'on_sale' || $mode == 'bestsellers' || $mo
 
     fn_add_breadcrumb($title);
 
+    if (isset($params['order_ids'])) {
+        $order_ids = is_array($params['order_ids']) ? $params['order_ids'] : explode(',', $params['order_ids']);
+        foreach ($order_ids as $order_id) {
+            /** @psalm-suppress UndefinedGlobalVariable */
+            if (!fn_is_order_allowed($order_id, $auth)) {
+                return [CONTROLLER_STATUS_NO_PAGE];
+            }
+        }
+    }
+
     list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'));
 
-    fn_gather_additional_products_data($products, array('get_icon' => true, 'get_detailed' => true, 'get_additional' => true, 'get_options'=> true));
+    if (isset($search['page']) && ($search['page'] > 1) && empty($products)) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+    fn_gather_additional_products_data($products, ['get_icon' => true, 'get_detailed' => true, 'get_additional' => true, 'get_options' => true]);
 
     $selected_layout = fn_get_products_layout($params);
 

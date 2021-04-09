@@ -6,14 +6,10 @@
     <priority>100</priority>
     <status>active</status>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
-    <settings edition_type="ROOT,ULT:VENDOR">
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="twitter">
                 <items>
-                    <item id="twitter_header">
-                        <type>header</type>
-                        <variants/>
-                    </item>
                     <item id="twitter_enable">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
@@ -57,9 +53,6 @@
             </section>
             <section id="facebook">
                 <items>
-                    <item id="facebook_header">
-                        <type>header</type>
-                    </item>
                     <item id="facebook_enable">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
@@ -306,10 +299,6 @@
             </section>
             <section id="vkontakte">
                 <items>
-                    <item id="vkontakte_header">
-                        <type>header</type>
-                        <variants/>
-                    </item>
                     <item id="vkontakte_enable">
                         <type>checkbox</type>
                     </item>
@@ -362,10 +351,6 @@
 
             <section id="yandex">
                 <items>
-                    <item id="yandex_header">
-                        <type>header</type>
-                        <variants/>
-                    </item>
                     <item id="yandex_enable">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
@@ -387,9 +372,6 @@
 
             <section id="pinterest">
                 <items>
-                    <item id="pinterest_header">
-                        <type>header</type>
-                    </item>
                     <item id="pinterest_enable">
                         <default_value>Y</default_value>
                         <type>checkbox</type>

@@ -28,15 +28,15 @@ class PropertyDto
     public $property_id;
 
     /**
-     * @var string|float|null|\Tygh\Addons\CommerceML\Dto\TranslatableValueDto
+     * @var string|float|null|bool|\Tygh\Addons\CommerceML\Dto\ProductPropertyValue
      */
     public $value;
 
     /**
      * Creates property object
      *
-     * @param string                                                             $property_id Property ID (short_name, variation_code, etc)
-     * @param string|float|null|\Tygh\Addons\CommerceML\Dto\TranslatableValueDto $value       Property value
+     * @param string                                                                  $property_id Property ID (short_name, variation_code, etc)
+     * @param string|float|null|bool|\Tygh\Addons\CommerceML\Dto\ProductPropertyValue $value       Property value
      *
      * @return \Tygh\Addons\CommerceML\Dto\PropertyDto
      */

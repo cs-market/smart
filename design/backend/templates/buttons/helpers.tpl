@@ -35,7 +35,7 @@
         {/if}
         {$data['data-ca-target-form'] = $form}
         {$data['data-ca-dispatch'] = $dispatch}
-        {btn type="text" target=$target href=$href data=$data class=$class onclick=$onclick text=$text method=$method raw=$raw}
+        {btn type="text" target=$target href=$href data=$data class=$class onclick=$onclick text=$text method=$method raw=$raw icon=""}
     {/if}
 
     {* shortcut for the delete_selected *}

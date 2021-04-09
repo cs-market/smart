@@ -7,11 +7,14 @@
 {/if}
 
 {if (fn_allowed_for('MULTIVENDOR:ULTIMATE'))}
-    {$select_storefront = $select_storefront|default:false}
+    {if !$runtime.is_multiple_storefronts}
+        {$select_storefront = false}
+    {/if}
     {$selected_storefront_id = $selected_storefront_id|default:$app["storefront"]->storefront_id}
 {else}
-    {$select_storefront = true}
+    {$select_storefront = $runtime.is_multiple_storefronts}
 {/if}
+
 
 {if $anchor}
 <a name="{$anchor}"></a>
@@ -78,30 +81,30 @@ var menu_content = {$data|unescape|default:"''" nofilter};
             <i class="icon icon-align-justify mobile-visible-inline overlay-navbar-open"></i>
         </a></div>
     </div>
-    <div class="title pull-left">
+    <div class="title pull-left {if $select_storefront}title--storefronts{/if}">
         {if isset($title_start) && isset($title_end)}
-            <h2 class="title__heading"
+            <h2 class="title__heading {if $select_storefront}title__heading--storefronts{/if}"
                 title="{$title_alt|default:"`$title_start` `$title_end`"|strip_tags|strip|html_entity_decode}"
             >
                 <span class="title__part-start mobile-hidden">{$title_start}: </span>
                 <span class="title__part-end">{$title_end|strip_tags|html_entity_decode}</span>
             </h2>
         {else}
-            <h2 class="title__heading" title="{$title_alt|default:$title|strip_tags|strip|html_entity_decode}">{$title|default:"&nbsp;"|sanitize_html nofilter}</h2>
+            <h2 class="title__heading {if $select_storefront}title__heading--storefronts{/if}" title="{$title_alt|default:$title|strip_tags|strip|html_entity_decode}">{$title|default:"&nbsp;"|sanitize_html nofilter}</h2>
         {/if}
 
         <!--mobile quick search-->
         <div class="mobile-visible pull-right search-mobile-group cm-search-mobile-group" 
-            data-ca-search-mobile-back="search_mobile_back"
-            data-ca-search-mobile-btn="search_mobile_btn"
-            data-ca-search-mobile-block="search_mobile_block"
-            data-ca-search-mobile-input="gs_text_mobile"
+            data-ca-search-mobile-back="#search_mobile_back"
+            data-ca-search-mobile-btn="#search_mobile_btn"
+            data-ca-search-mobile-block="#search_mobile_block"
+            data-ca-search-mobile-input="#gs_text_mobile"
         >
             <button class="btn search-mobile-btn" id="search_mobile_btn"><i class="icon-search search-mobile-icon"></i></button>
             <div class="search search-mobile-block cm-search-mobile-search hidden" id="search_mobile_block">
                 <button class="search-mobile-back" type="button" id="search_mobile_back"><i class="icon-remove"></i></button>
-                <button class="search_button search-mobile-button" type="submit" title="{__("search_tooltip")}" id="search_button_mobile" form="global_search"><i class="icon-search"></i></button>
-                <label for="gs_text_mobile" class="search-mobile-label"><input type="text" class="cm-autocomplete-off search-mobile-input" id="gs_text_mobile" name="q" value="{$smarty.request.q}" form="global_search" disabled /></label>
+                <button class="search_button search-mobile-button" type="submit" id="search_button_mobile" form="global_search"><i class="icon-search"></i></button>
+                <label for="gs_text_mobile" class="search-mobile-label"><input type="text" class="cm-autocomplete-off search-mobile-input" id="gs_text_mobile" name="q" value="{$smarty.request.q}" form="global_search" placeholder="{__("search")}" disabled /></label>
             </div>
         </div>
         <!--mobile end quick search-->
@@ -113,6 +116,7 @@ var menu_content = {$data|unescape|default:"''" nofilter};
                 file="common/select_object.tpl"
                 style="dropdown"
                 link_tpl=$config.current_url|fn_link_attach:"sl="
+                link_suffix="descr_sl="
                 items=$languages
                 selected_id=$smarty.const.CART_LANGUAGE
                 display_icons=true
@@ -127,7 +131,7 @@ var menu_content = {$data|unescape|default:"''" nofilter};
 
         </div>
 
-        {if $select_storefront}            
+        {if $select_storefront}
             {include file="views/storefronts/components/picker/presets.tpl"
                 input_name=$storefronts_picker_name
                 item_ids=[$runtime.company_data.company_id]
@@ -139,7 +143,9 @@ var menu_content = {$data|unescape|default:"''" nofilter};
         {/if}
 
         <div class="{if isset($main_buttons_meta)}{$main_buttons_meta}{else}btn-bar btn-toolbar{/if} dropleft pull-right" {if $content_id}id="tools_{$content_id}_buttons"{/if}>
-            
+            {hook name="index:toolbar"}
+            {/hook}
+
             {if $navigation.dynamic.actions}
                 {capture name="tools_list"}
                     {foreach from=$navigation.dynamic.actions key=title item=m name="actions"}

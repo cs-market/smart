@@ -124,21 +124,19 @@
     },
     "fonts": {
         "families": {
-            "Arial,Helvetica,sans-serif": "Arial",
-            "Arial Black,Gadget,sans-serif": "Arial Black",
-            "Comic Sans MS,cursive": "Comic Sans MS",
-            "Courier New,Courier,monospace": "Courier New",
+            "'Open Sans','Helvetica Neue',-apple-system,sans-serif": "Open Sans",
+            "'Comic Sans MS',cursive": "Comic Sans MS",
+            "'Courier New',Courier,monospace": "Courier New",
             "Georgia,serif": "Georgia",
-            "Open Sans Condensed Bold,sans-serif": "Open Sans Condensed",
             "Impact,Charcoal,sans-serif": "Impact",
-            "Lucida Console,Monaco,monospace": "Lucida Console",
-            "Lucida Sans Unicode,Lucida Grande,sans-serif": "Lucida Sans Unicode",
-            "Palatino Linotype,Book Antiqua,Palatino,serif": "Palatino Linotype",
+            "'Lucida Console',Monaco,monospace": "Lucida Console",
+            "'Lucida Sans Unicode','Lucida Grande',sans-serif": "Lucida Sans Unicode",
+            "'Palatino Linotype','Book Antiqua',Palatino,serif": "Palatino Linotype",
             "Tahoma,Geneva,sans-serif": "Tahoma",
-            "Times New Roman,Times,serif": "Times New Roman",
-            "Trebuchet MS,Helvetica,sans-serif": "Trebuchet MS",
+            "'Times New Roman',Times,serif": "Times New Roman",
+            "'Trebuchet MS',Helvetica,sans-serif": "Trebuchet MS",
             "Verdana,Geneva,sans-serif": "Verdana",
-            "Gill Sans,Geneva,sans-serif": "Gill Sans"
+            "'Gill Sans',Geneva,sans-serif": "Gill Sans"
         },
         "fields": {
             "body_font": {
@@ -329,7 +327,7 @@
                     "repeat": false,
                     "attachment": false
                 },
-                
+
                 "full_width": {
                     "type": "checkbox",
                     "true": "true",

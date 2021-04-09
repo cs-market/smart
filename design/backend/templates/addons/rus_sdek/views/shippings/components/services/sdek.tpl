@@ -77,23 +77,26 @@
     <label class="control-label" for="city">{__("shippings.sdek.sendercityid")}</label>
     <div class="controls">
         <input x-autocompletetype="city" type="text" id="city" name="shipping_data[service_params][sendercityid]" size="30" maxlength="64" value="{$shipping.service_params.sendercityid}" class=""/>
-        <a href="#" id="sdek_get_city_link">{__("shipping.sdek.get_city_data")} {include file="common/tooltip.tpl" tooltip=__("shipping.sdek.get_city_data.tooltip")}</a>
+        <a href="#" id="sdek_get_city_link">{__("shipping.sdek.get_city_data")}</a>
+        <p class="muted description">{__("shipping.sdek.get_city_data.tooltip")}</p>
     </div>
 </div>
 
 <div id="sdek_city_div">
 {if $shipping.service_params.from_city_id && !$sdek_new_city_data}
     <div class="control-group">
-        <label class="control-label" for="sdek_city_id">{__("shipping.sdek.city_id")} {include file="common/tooltip.tpl" tooltip=__("shipping.sdek.city_id.tooltip")}:</label>
+        <label class="control-label" for="sdek_city_id">{__("shipping.sdek.city_id")}:</label>
         <div class="controls">
             <input id="sdek_city_id" type="text" name="shipping_data[service_params][from_city_id]" size="60" value="{$shipping.service_params.from_city_id}"/>
+            <p class="muted description">{__("shipping.sdek.city_id.tooltip")}</p>
         </div>
     </div>
     {else}
     <div class="control-group">
-        <label class="control-label" for="sdek_city_id">{__("shipping.sdek.city_id")} {include file="common/tooltip.tpl" tooltip=__("shipping.sdek.city_id.tooltip")}:</label>
+        <label class="control-label" for="sdek_city_id">{__("shipping.sdek.city_id")}:</label>
         <div class="controls">
             <input id="sdek_city_id" type="text" name="shipping_data[service_params][from_city_id]" size="60" value="{$sdek_new_city_data.from_city_id}"/>
+            <p class="muted description">{__("shipping.sdek.city_id.tooltip")}</p>
         </div>
     </div>
 {/if}
@@ -107,13 +110,14 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="ship_tariff">{__("shippings.sdek.tariffid")} {include file="common/tooltip.tpl" tooltip=__("shippings.sdek.tariffid.tooltip")}</label>
+    <label class="control-label" for="ship_tariff">{__("shippings.sdek.tariffid")}</label>
     <div class="controls">
         <select id="ship_tariff" name="shipping_data[service_params][tariffid]">
             {foreach from=$sdek_delivery item="delivery"}
                 <option value="{$delivery.code}" {if ($shipping.service_params.tariffid == $delivery.code)}selected="selected"{/if}>{$delivery.tariff}</option>
             {/foreach}
         </select>
+        <p class="muted description">{__("shippings.sdek.tariffid.tooltip")}</p>
     </div>
 </div>
 

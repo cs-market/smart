@@ -3,12 +3,8 @@
     display: grid;
     position: relative;
     grid-area: nav;
-    -ms-grid-columns:
-        minmax(90px, auto)
-        minmax(90px, auto);
-    grid-template-columns:
-        minmax(90px, auto)
-        minmax(90px, auto);
+    grid-template-columns: repeat(auto-fit, minmax(90px,auto));
+    grid-auto-flow: column;
 
     &__item {
         display: -webkit-box;
@@ -66,16 +62,5 @@
         &--activated {
             background: #fff;
         }
-    }
-
-    &--mv {
-        -ms-grid-columns:
-            minmax(90px, auto)
-            minmax(90px, auto)
-            minmax(90px, auto);
-        grid-template-columns:
-            minmax(90px, auto)
-            minmax(90px, auto)
-            minmax(90px, auto);
     }
 }

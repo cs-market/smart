@@ -14,24 +14,28 @@
 
 {$return_url=$config.current_url|escape:"url"}
 
+{if "MULTIVENDOR"|fn_allowed_for}
 {hook name="products:bulk_edit"}
     {include file="views/companies/components/bulk_edit.tpl"}
 {/hook}
+{/if}
 
 {if $companies}
-<div class="table-responsive-wrapper longtap-selection">
+<div class="table-responsive-wrapper {if "MULTIVENDOR"|fn_allowed_for}longtap-selection{/if}">
     <table width="100%" class="table table-middle table--relative table-responsive">
-    <thead data-ca-bulkedit-default-object="true">
+    <thead {if "MULTIVENDOR"|fn_allowed_for}data-ca-bulkedit-default-object="true"{/if}>
     <tr>
-        <th width="8%" class="left mobile-hide">
+        <th width="1%" class="left mobile-hide">
             {include file="common/check_items.tpl" check_statuses=$c_statuses}
 
+            {if "MULTIVENDOR"|fn_allowed_for}
              <input type="checkbox"
                    class="bulkedit-toggler hide"
                    data-ca-bulkedit-toggler="true"
                    data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
                    data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
             />
+            {/if}
         </th>
         <th width="8%"><a class="cm-ajax" href="{"`$c_url`&sort_by=id&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("id")}{if $search.sort_by == "id"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         <th width="25%"><a class="cm-ajax" href="{"`$c_url`&sort_by=company&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("name")}{if $search.sort_by == "company"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
@@ -39,20 +43,20 @@
             <th width="25%"><a class="cm-ajax" href="{"`$c_url`&sort_by=email&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("email")}{if $search.sort_by == "email"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         {/if}
         {if "ULTIMATE"|fn_allowed_for}
-            <th width="25%"><a class="cm-ajax" href="{"`$c_url`&sort_by=storefront&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("storefront")}{if $search.sort_by == "storefront"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
+            <th width="25%"><a class="cm-ajax" href="{"`$c_url`&sort_by=storefront&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("storefront_url")}{if $search.sort_by == "storefront"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         {/if}
-        <th width="20%"><a class="cm-ajax" href="{"`$c_url`&sort_by=date&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("registered")}{if $search.sort_by == "date"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
+        <th width="16%"><a class="cm-ajax nowrap" href="{"`$c_url`&sort_by=date&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("registered")}{if $search.sort_by == "date"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         {hook name="companies:list_extra_th"}{/hook}
-        <th width="5%" class="nowrap">&nbsp;</th>
+        <th width="4%" class="nowrap">&nbsp;</th>
         {if "MULTIVENDOR"|fn_allowed_for}
-            <th width="10%" class="right"><a class="cm-ajax" href="{"`$c_url`&sort_by=status&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("status")}{if $search.sort_by == "status"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
+            <th width="7%" class="nowrap right"><a class="nowrap cm-ajax" href="{"`$c_url`&sort_by=status&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("status")}{if $search.sort_by == "status"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         {else}
-            <th width="13%"><span class="cm-tooltip" title="{__("ttc_stores_status")}">{__("stores_status")}&nbsp;<i class="icon-question-sign"></i>{if $search.sort_by == "stores_status"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</span></th>
+            <th width="7%"><span class="nowrap cm-tooltip" title="{__("ttc_stores_status")}">{__("stores_status")}&nbsp;<i class="icon-question-sign"></i>{if $search.sort_by == "stores_status"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</span></th>
         {/if}
     </tr>
     </thead>
     {foreach from=$companies item=company}
-    <tr class="cm-row-status-{$company.status|lower} cm-longtap-target" 
+    <tr class="cm-row-status-{$company.status|lower} {if "MULTIVENDOR"|fn_allowed_for}cm-longtap-target{/if}"
         {if "MULTIVENDOR"|fn_allowed_for}
             data-ct-company-id="{$company.company_id}"
             data-ca-longtap-action="setCheckBox"
@@ -61,7 +65,7 @@
             data-ca-bulkedit-dispatch-parameter="company_ids[]"
         {/if}
     >
-        <td width="8%" class="left mobile-hide">
+        <td width="1%" class="left mobile-hide">
             <input type="checkbox"
                    name="company_ids[]"
                    value="{$company.company_id}"
@@ -72,9 +76,9 @@
             />
         </td>
         <td width="8%" class="row-status" data-th="{__("id")}"><a href="{"companies.update?company_id=`$company.company_id`"|fn_url}">&nbsp;<span>{$company.company_id}</span>&nbsp;</a></td>
-        <td width="25%" class="row-status" data-th="{__("name")}"><a href="{"companies.update?company_id=`$company.company_id`"|fn_url}">{$company.company}</a></td>
+        <td width="25%" class="row-status wrap" data-th="{__("name")}"><a href="{"companies.update?company_id=`$company.company_id`"|fn_url}">{$company.company}</a></td>
         {if "MULTIVENDOR"|fn_allowed_for}
-            <td width="25%" class="row-status" data-th="{__("email")}"><a href="mailto:{$company.email}">{$company.email}</a></td>
+            <td width="25%" class="row-status wrap" data-th="{__("email")}"><a href="mailto:{$company.email}">{$company.email}</a></td>
         {/if}
         {if "ULTIMATE"|fn_allowed_for}
             {$storefront_href = "http://`$company.storefront`"}
@@ -83,9 +87,9 @@
             {/if}
             <td width="25%" data-th="{__("storefront")}" id="storefront_url_{$company.company_id}"><a href="{$storefront_href}">{$company.storefront|puny_decode}</a><!--storefront_url_{$company.company_id}--></td>
         {/if}
-        <td width="20%" class="row-status" data-th="{__("registered")}">{$company.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
+        <td width="16%" class="row-status" data-th="{__("registered")}">{$company.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
         {hook name="companies:list_extra_td"}{/hook}
-        <td width="5%" class="nowrap" data-th="{__("tools")}">
+        <td width="4%" class="nowrap" data-th="{__("tools")}">
             {capture name="tools_items"}
             {hook name="companies:list_extra_links"}
                 <li>{btn type="list" href="products.manage?company_id=`$company.company_id`" text=__("view_vendor_products")}</li>
@@ -113,27 +117,23 @@
                 {dropdown content=$smarty.capture.tools_items}
             </div>
         </td>
-        {if "MULTIVENDOR"|fn_allowed_for}
-            <td width="10%" class="right nowrap" data-th="{__("status")}">
-                {$notify=true}
-                {include file="common/select_popup.tpl"
-                    id=$company.company_id
-                    status=$company.status
-                    items_status="companies"|fn_get_predefined_statuses:$company.status
-                    object_id_name="company_id"
-                    hide_for_vendor=$runtime.company_id
-                    update_controller="companies"
-                    notify=$notify
-                    notify_text=__("notify_vendor")
-                    status_target_id="pagination_contents"
-                    extra="&return_url=`$return_url`"
-                }
-            </td>
-        {else}
-            <td width="13%" class="row-status" data-th="{__("stores_status")}">
-                {include file="views/companies/components/company_status_switcher.tpl" company=$company}
-            </td>
-        {/if}
+        <td width="7%"
+            {if "MULTIVENDOR"|fn_allowed_for}
+                class="right nowrap"
+                data-th="{__("status")}"
+            {else}
+                class="row-status"
+                data-th="{__("stores_status")}"
+            {/if}
+        >
+            {include file="views/companies/components/status_on_manage.tpl"
+                id=$company.company_id
+                status=$company.status
+                items_status="companies"|fn_get_predefined_statuses:$company.status
+                company=$company
+                text_wrap=true
+            }
+        </td>
     </tr>
     {/foreach}
     </table>
@@ -201,25 +201,31 @@
     {/if}
 {/capture}
 
+{if fn_allowed_for("MULTIVENDOR")}
+    {$add_vendor_text = __("add_vendor")}
+{else}
+    {$add_vendor_text = __("add_storefront")}
+{/if}
+
 {capture name="adv_buttons"}
     {hook name="companies:manage_adv_buttons"}
         {if $is_companies_limit_reached}
             {$promo_popup_title = __("ultimate_or_storefront_license_required", ["[product]" => $smarty.const.PRODUCT_NAME])}
+
             {include file="common/tools.tpl"
                 tool_override_meta="btn cm-dialog-opener cm-dialog-auto-height"
                 tool_href="functionality_restrictions.ultimate_or_storefront_license_required"
                 prefix="top"
                 hide_tools=true
-                title=__("add_vendor")
+                title=$add_vendor_text
                 icon="icon-plus"
-                meta_data="data-ca-dialog-title='$promo_popup_title'"
-            }
+                meta_data="data-ca-dialog-title='{$promo_popup_title}'"}
         {else}
             {include file="common/tools.tpl"
                 tool_href="companies.add"
                 prefix="top"
                 hide_tools=true
-                title=__("add_vendor")
+                title=$add_vendor_text
                 icon="icon-plus"
             }
         {/if}
@@ -233,4 +239,12 @@
     {/hook}
 {/capture}
 
-{include file="common/mainbox.tpl" title=__("vendors") content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons sidebar=$smarty.capture.sidebar}
+{capture name="page_title"}
+    {if fn_allowed_for("MULTIVENDOR")}
+        {__("vendors")}
+    {else}
+        {__("storefronts")}
+    {/if}
+{/capture}
+
+{include file="common/mainbox.tpl" title=$smarty.capture.page_title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons sidebar=$smarty.capture.sidebar}

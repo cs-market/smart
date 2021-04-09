@@ -213,7 +213,8 @@ class Service
             return false;
         }
 
-        $this->current_vendor_id = $vendor_id;
+        /** @psalm-suppress RedundantCastGivenDocblockType */
+        $this->current_vendor_id = (int) $vendor_id;
 
         unset($_SESSION[self::SESSION_LEGACY_CART_FIELD]);
         $_SESSION[self::SESSION_CURRENT_VENDOR_FIELD] = $vendor_id;

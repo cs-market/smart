@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: pl\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_plans.po\n"
-"X-Crowdin-File-ID: 3640\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_plans.po\n"
+"X-Crowdin-File-ID: 4156\n"
+"PO-Revision-Date: 2021-02-01 09:10\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -40,6 +40,14 @@ msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
 msgstr "Pozwól sprzedawcom na zmianę ich aktualnego planu"
 
+msgctxt "SettingsOptions::vendor_plans::collect_taxes_from_vendors"
+msgid "Collect taxes from vendors"
+msgstr "Pobieraj podatki od sprzedawców"
+
+msgctxt "SettingsTooltips::vendor_plans::collect_taxes_from_vendors"
+msgid "Send collected taxes to the account of the marketplace."
+msgstr "Prześlij zebrane podatki na konto platformy marketplace."
+
 msgctxt "Languages::vendor_plans.vendor_plans"
 msgid "Vendor plans"
 msgstr "Plany sprzedawcy"
@@ -55,6 +63,10 @@ msgstr "Informacje o planie wybranego sprzedawcy"
 msgctxt "Languages::vendor_plans.plan"
 msgid "Plan"
 msgstr "Plan"
+
+msgctxt "Languages::vendor_plans.plan_short"
+msgid "Plan"
+msgstr ""
 
 msgctxt "Languages::vendor_plans.commission"
 msgid "Commission"
@@ -138,7 +150,7 @@ msgstr "Mini sklep sprzedawcy"
 
 msgctxt "Languages::vendor_plans.best_choise"
 msgid "Offer as the best choice"
-msgstr "Oferta z najlepszym wyborem"
+msgstr "Oznacz jako najlepszy wybór"
 
 msgctxt "Languages::vendor_plans.best_choise_short"
 msgid "Best choice"
@@ -347,4 +359,20 @@ msgstr "Dodaj sprzedawcę do storefrontów dostępnych w nowym planie dostawcy"
 msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
 msgid "Remove the vendor from the storefronts available in his previous plan"
 msgstr "Usuń sprzedawcę z storefronts dostępnych w jego poprzednim planie"
+
+msgctxt "Languages::vendor_plans.advanced_vendor_plan_creation"
+msgid "Advanced vendor plan creation"
+msgstr "Zaawansowane tworzenie planu dostawcy"
+
+msgctxt "Languages::vendor_plans.text_vendor_plan_created"
+msgid "A new vendor plan \"[plan_name]\" has been created. You can now <a href=\"[link]\">set restrictions for vendors using this plan</a>."
+msgstr "Utworzono nowy plan sprzedawcy \"[plan_name]\". Możesz teraz <a href=\"[link]\">ustawić ograniczenia dla sprzedawców korzystających z tego planu</a>."
+
+msgctxt "Languages::vendor_plans.commission_fee"
+msgid "[commission]% fee"
+msgstr "[commission]% prowizji"
+
+msgctxt "Languages::vendor_plans.default_vendor_plan"
+msgid "Default plan"
+msgstr "Domyślny plan"
 

@@ -64,7 +64,7 @@
             <td class="nowrap" width="10%">
                 <div class="pull-right hidden-tools">
                     {capture name="tools_list"}
-                        <li>{include file="common/popupbox.tpl" act="edit" title_start=__($section_data.edit_title) title_end=$item.descr link_text=__("edit") id="group`$item.param_id`" link_class="tool-link" no_icon_link=true href="static_data.update?param_id=`$item.param_id`&section=`$section`&`$owner_condition`"}</li>
+                        <li>{include file="common/popupbox.tpl" act="edit" text=$item.descr link_text=__("edit") id="group`$item.param_id`" link_class="tool-link" no_icon_link=true href="static_data.update?param_id=`$item.param_id`&section=`$section`&`$owner_condition`"}</li>
                         <li>{btn type="list" text=__("delete") href="static_data.delete?param_id=`$item.param_id`&section=`$section`&`$owner_condition`" class="cm-confirm cm-ajax cm-delete-row"  data=['data-ca-target-id'=>'static_data_list'] method="POST"}</li>
                     {/capture}
                     {dropdown content=$smarty.capture.tools_list}

@@ -1,5 +1,8 @@
+{$can_change_status = $can_change_status|default:true}
+
 <div class="bulk-edit clearfix hidden"
      data-ca-bulkedit-expanded-object="true"
+     data-ca-bulkedit-component="expandedObject"
 >
     <ul class="btn-group bulk-edit__wrapper">
         {hook name="orders:bulk_edit_items"}
@@ -21,6 +24,7 @@
                 }
             </li>
 
+            {if $can_change_status}
             <li class="btn bulk-edit__btn bulk-edit__btn--status dropleft-mod">
                 <span class="bulk-edit__btn-content dropdown-toggle" data-toggle="dropdown">{__("status")} <span class="caret mobile-hide"></span></span>
 
@@ -28,6 +32,7 @@
                     {include file="views/orders/components/bulk_edit/status.tpl"}
                 </ul>
             </li>
+            {/if}
 
             <li class="btn bulk-edit__btn bulk-edit__btn--print dropleft-mod">
                 <span class="bulk-edit__btn-content dropdown-toggle" data-toggle="dropdown">{__("print_documents")} <span class="caret mobile-hide"></span></span>

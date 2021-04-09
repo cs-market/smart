@@ -5,7 +5,8 @@
     (function(_, $) {
         _.tr({
             "advanced_import.cant_save_preset_invalid_modifiers":
-                "{__("advanced_import.cant_save_preset_invalid_modifiers")|escape:"javascript"}"
+                "{__("advanced_import.cant_save_preset_invalid_modifiers")|escape:"javascript"}",
+            "file_editor": "{__("file_editor")|escape:"javascript"}"
         });
     }(Tygh, Tygh.$));
 </script>

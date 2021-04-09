@@ -26,5 +26,5 @@ defined('BOOTSTRAP') or die('Access denied');
  */
 function fn_sync_data_commerceml_get_last_sync_info($provider_id, $company_id)
 {
-    return ServiceProvider::getLastSyncInfo($company_id);
+    return ServiceProvider::getLastSyncInfo(['company_id' => $company_id]);
 }

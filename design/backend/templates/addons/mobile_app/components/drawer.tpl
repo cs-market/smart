@@ -45,7 +45,7 @@
 
         {foreach $config_data.app_appearance.colors.drawer as $col_name => $color}
         <div class="control-group">
-            <label class="control-label" for="">{$color.name} {include file="common/tooltip.tpl" tooltip=$color.description}: </label>
+            <label class="control-label" for="">{$color.name}:</label>
             <div class="controls">
                 <div class="colorpicker">
                     <input {if $color.type != "number"}type="text"{else}type="number"{/if} 
@@ -63,6 +63,7 @@
                         {/if}
                     />
                 </div>
+                <p class="muted description">{$color.description}</p>
             </div>
         </div>
         {/foreach}

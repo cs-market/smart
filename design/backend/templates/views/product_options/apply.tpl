@@ -11,7 +11,8 @@
 <input type="hidden" name="apply_options[link]" value="Y" />
 {foreach from=$product_options item="po"}
     <label class="checkbox">
-        <input type="checkbox" value="{$po.option_id}" name="apply_options[options][]" />
+        {$checked = $po.option_id|in_array:$option_ids}
+        <input type="checkbox" value="{$po.option_id}" name="apply_options[options][]" {if $checked}checked="checked"{/if} />
         {$po.option_name} / {$po.internal_option_name}
         {include file="views/companies/components/company_name.tpl" object=$po}
     </label>

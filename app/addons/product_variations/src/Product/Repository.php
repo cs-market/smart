@@ -15,13 +15,14 @@
 
 namespace Tygh\Addons\ProductVariations\Product;
 
-use Tygh\Addons\ProductVariations\Product\Group\GroupProduct;
-use Tygh\Addons\ProductVariations\Product\ProductCollection;
 use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection;
+use Tygh\Addons\ProductVariations\Product\Group\GroupProduct;
 use Tygh\Addons\ProductVariations\Tools\QueryFactory;
 use Tygh\Addons\ProductVariations\Product\Group\Repository as GroupRepository;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProductFeatures;
-use Tygh\Addons\ProductVariations\Product\FeaturePurposes;
+use Tygh\Enum\SiteArea;
+use Tygh\Registry;
 
 /**
  * This class implements the methods for selecting products from the database
@@ -124,6 +125,11 @@ class Repository
             return $result;
         }
 
+        if ($area === SiteArea::ADMIN_PANEL) {
+            $runtime_company_id = Registry::get('runtime.company_id');
+            Registry::set('runtime.company_id', 0);
+        }
+
         list($products) = fn_get_products([
             'area'                   => $area,
             'extend'                 => $extends,
@@ -132,6 +138,11 @@ class Repository
             'skip_rating'            => true,
             'sort_by'                => 'null'
         ], 0, $this->getLangCode());
+
+        if ($area === SiteArea::ADMIN_PANEL) {
+            /** @psalm-suppress PossiblyUndefinedVariable */
+            Registry::set('runtime.company_id', $runtime_company_id);
+        }
 
         foreach ($product_ids as $product_id) {
             if (!isset($products[$product_id])) {
@@ -174,7 +185,7 @@ class Repository
 
         $products = $this->findProductsByParams([
             'area'                     => $product_collection->hasPreviewMarks() ? 'A' : $this->current_area,
-            'extend'                   => ['product_name'],
+            'custom_extend'            => ['product_name', 'categories'],
             'group_child_variations'   => false,
             'include_child_variations' => true,
             'skip_rating'              => true,
@@ -276,7 +287,7 @@ class Repository
             ['feature_id' => $feature_ids],
             [
                 'pf.feature_id', 'pf.feature_style', 'pf.position', 'pf.purpose', 'pf.display_on_catalog',
-                'pfd.description', 'pfd.prefix', 'pfd.suffix'
+                'pfd.description', 'pfd.internal_name', 'pfd.prefix', 'pfd.suffix'
             ],
             'pf'
         );
@@ -620,51 +631,8 @@ class Repository
             return $products;
         }
 
-        $group_combinations = [];
-        $group_features_variants = [];
-
-        foreach ($variation_products as $product) {
-            if (empty($product['variation_features'])) {
-                continue;
-            }
-
-            $group_id = $product['variation_group_id'];
-            $product_id = $product['product_id'];
-            $variant_ids = [];
-            $variant_positions = [];
-
-            foreach ($product['variation_features'] as $feature_id => $feature) {
-                $variant_id = $feature['variant_id'];
-                $variant_positions[$variant_id] = $feature['variant_position'];
-
-                if (!isset($group_features_variants[$group_id][$feature_id][$variant_id])) {
-                    $group_features_variants[$group_id][$feature_id][$variant_id] = [
-                        'variant_id'       => $feature['variant_id'],
-                        'variant_position' => $feature['variant_position'],
-                        'variant'          => $feature['variant'],
-                    ];
-                }
-
-                $combination_position = FeaturePurposes::isCreateCatalogItem($feature['purpose'])
-                    ? (int) !empty($product['parent_product_id'])
-                    : 1;
-
-                $combination_position .= implode('', array_diff_key($variant_positions, $variant_ids));
-
-                $variant_ids[$feature_id] = $variant_id;
-                $combination_id = $this->generateCombinationId($variant_ids);
-
-                if (!isset($group_combinations[$group_id][$combination_id])
-                    || $combination_position < $group_combinations[$group_id][$combination_id]['position']
-                ) {
-                    $group_combinations[$group_id][$combination_id] = [
-                        'product_id' => $product_id,
-                        'position'   => $combination_position
-                    ];
-                }
-            }
-        }
-
+        $group_combinations = $this->getGroupCombinations($variation_products);
+        $group_features_variants = $this->getGroupFeaturesVariants($variation_products);
         $combinations_products = [];
 
         foreach ($products as &$product) {
@@ -685,7 +653,9 @@ class Repository
                     continue;
                 }
 
-                foreach ($group_features_variants[$group_id][$feature_id] as $variation_variant_id => $variation_variant) {
+                $group_feature_variants = $group_features_variants[$group_id][$feature_id];
+
+                foreach ($group_feature_variants as $variation_variant_id => $variation_variant) {
                     $variant_ids[$feature_id] = $variation_variant_id;
                     $variation_variant_ids = array_replace($selected_variant_ids, [
                         $feature_id => $variation_variant_id
@@ -697,35 +667,24 @@ class Repository
                         $combination_id = $this->generateCombinationId($variant_ids);
                     }
 
-                    if (!isset($group_combinations[$group_id][$combination_id])) {
-                        continue;
+                    $feature['variants'][$variation_variant_id] = $variation_variant;
+
+                    if (isset($group_combinations[$group_id][$combination_id])) {
+                        $product_id = $group_combinations[$group_id][$combination_id]['product_id'];
+                        $combinations_products[$product_id] = $variation_products[$product_id];
+
+                        $feature['variants'][$variation_variant_id] = array_merge($variation_variant, [
+                            'product_id' => $product_id
+                        ]);
                     }
-
-                    $product_id = $group_combinations[$group_id][$combination_id]['product_id'];
-                    $combinations_products[$product_id] = $variation_products[$product_id];
-
-                    $feature['variants'][$variation_variant_id] = array_merge($variation_variant, [
-                        'product_id' => $product_id
-                    ]);
                 }
 
                 $variant_ids[$feature_id] = $feature['variant_id'];
 
-                uasort($feature['variants'], function ($a, $b) {
-                    if ($a['variant_position'] > $b['variant_position']) {
-                        return 1;
-                    } elseif ($a['variant_position'] < $b['variant_position']) {
-                        return -1;
-                    } else {
-                        return strnatcmp($a['variant'], $b['variant']);
-                    }
-                });
-
+                $feature['variants'] = $this->sortFeatureVariantsByPosition($feature['variants']);
                 $product['variation_features_variants'][$feature_id] = $feature;
-
-                if (FeaturePurposes::isCreateVariationOfCatalogItem($feature['purpose']) && !empty($feature['variants'])) {
-                    $product['has_child_variations'] = true;
-                }
+                $product['has_child_variations'] = FeaturePurposes::isCreateVariationOfCatalogItem($feature['purpose'])
+                    && !empty($feature['variants']);
             }
         }
         unset($product);
@@ -740,6 +699,10 @@ class Repository
 
                 foreach ($product['variation_features_variants'] as &$feature) {
                     foreach ($feature['variants'] as &$variant) {
+                        if (empty($variant['product_id'])) {
+                            continue;
+                        }
+
                         $product_id = $variant['product_id'];
                         $variant['product'] = $combinations_products[$product_id];
                     }
@@ -849,12 +812,13 @@ class Repository
     public function generateProductsCombinationId(array $products)
     {
         foreach ($products as &$product) {
+            $product['variation_combination_id'] = null;
+            $product['parent_variation_combination_id'] = null;
+
             if (empty($product['variation_feature_ids'])) {
                 continue;
             }
 
-            $product['variation_combination_id'] = null;
-            $product['parent_variation_combination_id'] = null;
             $parent_variant_ids = $variant_ids = [];
 
             foreach ($product['variation_feature_ids'] as $feature_id) {
@@ -932,6 +896,49 @@ class Repository
     }
 
     /**
+     * Updates product
+     *
+     * @param int   $product_id
+     * @param array $product_data
+     */
+    public function updateProduct($product_id, array $product_data)
+    {
+        $base_data = array_intersect_key(
+            $product_data,
+            array_flip([
+                'product_code', 'updated_timestamp', 'amount'
+            ])
+        );
+
+        $description_data = array_intersect_key(
+            $product_data,
+            array_flip(['product'])
+        );
+
+        if ($base_data) {
+            $this->createQuery(self::TABLE_PRODUCTS)
+                ->addConditions(['product_id' => $product_id])
+                ->update($base_data);
+        }
+
+        if ($description_data) {
+            $this->createQuery(self::TABLE_PRODUCT_DESCRIPTIONS)
+                ->addConditions(['product_id' => $product_id])
+                ->update($description_data);
+
+            if (fn_allowed_for('ULTIMATE')) {
+                $this->createQuery(self::TABLE_PRODUCT_ULT_DESCRIPTIONS)
+                    ->addConditions(['product_id' => $product_id])
+                    ->update($description_data);
+            }
+        }
+
+        if (isset($product_data['price'])) {
+            $this->updateProductPrice($product_id, $product_data['price']);
+        }
+    }
+
+    /**
      * Updates product price
      *
      * @param int   $product_id
@@ -959,7 +966,6 @@ class Repository
         }
 
         $this->group_repository->updateFeatureValues($product_id, $values);
-
     }
 
     /**
@@ -1006,9 +1012,9 @@ class Repository
     /**
      * Finds parent products that have their quantity at 0
      *
-     * @param array $product_ids
+     * @param array<int> $product_ids Product IDs
      *
-     * @return array
+     * @return array<array-key, int>
      */
     public function findParentProductIdsWithZeroQuantity(array $product_ids)
     {
@@ -1027,19 +1033,23 @@ class Repository
     /**
      * Finds the most popular active product
      *
-     * @param array $product_ids
+     * @param array<int> $product_ids Product Ids
+     * @param bool       $on_stock    If true finds only in stock products
      *
      * @return int
      */
-    public function findActiveAndMorePopularProductId(array $product_ids)
+    public function findActiveAndMorePopularProductId(array $product_ids, $on_stock = true)
     {
         $query = $this->createQuery([self::TABLE_PRODUCTS => 'product'], [
             'product_id' => $product_ids,
-            'status'     => 'A',
+            'status'     => ObjectStatuses::ACTIVE,
         ]);
 
+        if ($on_stock) {
+            $query->addCondition('product.amount > 0');
+        }
+
         $query
-            ->addCondition('product.amount > 0')
             ->addField('product.product_id')
             ->addLeftJoin('popularity', self::TABLE_PRODUCT_POPULARITY, ['product_id' => 'product_id'])
             ->setOrderBy(['popularity.total DESC', 'product.product_id ASC'])
@@ -1089,5 +1099,112 @@ class Repository
         });
 
         return $features;
+    }
+
+    /**
+     * Sorts feature variants by position and name
+     *
+     * @param array $variants
+     *
+     * @return array
+     */
+    protected function sortFeatureVariantsByPosition(array $variants)
+    {
+        uasort($variants, function ($a, $b) {
+            if ($a['variant_position'] > $b['variant_position']) {
+                return 1;
+            } elseif ($a['variant_position'] < $b['variant_position']) {
+                return -1;
+            } else {
+                return strnatcmp($a['variant'], $b['variant']);
+            }
+        });
+
+        return $variants;
+    }
+
+    /**
+     * Gets feature variants grouped by group ID and feature ID
+     *
+     * @param array $products
+     *
+     * @return array
+     */
+    protected function getGroupFeaturesVariants(array $products)
+    {
+        $group_features_variants = [];
+
+        foreach ($products as $product) {
+            if (empty($product['variation_features'])) {
+                continue;
+            }
+
+            $group_id = $product['variation_group_id'];
+
+            foreach ($product['variation_features'] as $feature_id => $feature) {
+                $variant_id = $feature['variant_id'];
+
+                if (isset($group_features_variants[$group_id][$feature_id][$variant_id])) {
+                    continue;
+                }
+
+                $group_features_variants[$group_id][$feature_id][$variant_id] = [
+                    'variant_id'       => $feature['variant_id'],
+                    'variant_position' => $feature['variant_position'],
+                    'variant'          => $feature['variant'],
+                ];
+            }
+        }
+
+        return $group_features_variants;
+    }
+
+    /**
+     * Gets products grouped by group ID and combination ID
+     *
+     * @param array $products
+     *
+     * @return array
+     */
+    protected function getGroupCombinations(array $products)
+    {
+        $group_combinations = [];
+
+        foreach ($products as $product) {
+            if (empty($product['variation_features'])) {
+                continue;
+            }
+
+            $group_id = $product['variation_group_id'];
+            $product_id = $product['product_id'];
+            $variant_ids = [];
+            $variant_positions = [];
+
+            foreach ($product['variation_features'] as $feature_id => $feature) {
+                $variant_id = $feature['variant_id'];
+                $variant_positions[$variant_id] = $feature['variant_position'];
+
+                $combination_position = FeaturePurposes::isCreateCatalogItem($feature['purpose'])
+                    ? (int) !empty($product['parent_product_id'])
+                    : 1;
+
+                $combination_position .= implode('', array_diff_key($variant_positions, $variant_ids));
+
+                $variant_ids[$feature_id] = $variant_id;
+                $combination_id = $this->generateCombinationId($variant_ids);
+
+                if (
+                    !isset($group_combinations[$group_id][$combination_id])
+                    || $combination_position < $group_combinations[$group_id][$combination_id]['position']
+                ) {
+                    $group_combinations[$group_id][$combination_id] = [
+                        'product_id' => $product_id,
+                        'position'   => $combination_position
+                    ];
+                }
+            }
+        }
+
+        return $group_combinations;
     }
 }

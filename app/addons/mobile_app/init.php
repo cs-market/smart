@@ -19,5 +19,10 @@ use Tygh\Addons\MobileApp\ServiceProvider;
 Tygh::$app->register(new ServiceProvider());
 
 fn_register_hooks(
-    'change_order_status'
+    /** @see \fn_mobile_app_change_order_status() */
+    'change_order_status',
+    /** @see \fn_mobile_app_delete_image_pre() */
+    'delete_image_pre',
+    /** @see \Tygh\Storefront\Repository::save() */
+    'storefront_repository_save_post'
 );

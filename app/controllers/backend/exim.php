@@ -12,6 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\YesNo;
 use Tygh\Languages\Languages;
 use Tygh\Registry;
 use Tygh\Enum\NotificationSeverity;
@@ -75,9 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Delete layout
     //
     if ($mode == 'delete_layout') {
-        db_query("DELETE FROM ?:exim_layouts WHERE layout_id = ?i", $layout_data['layout_id']);
+        db_query('DELETE FROM ?:exim_layouts WHERE layout_id = ?i', $layout_data['layout_id']);
+        $result = db_get_field('SELECT layout_id FROM ?:exim_layouts WHERE pattern_id = ?s LIMIT 1', $layout_data['pattern_id']);
+        if (!empty($result)) {
+            db_query('UPDATE ?:exim_layouts SET active = ?s WHERE layout_id = ?i', YesNo::YES, $result);
+        }
 
-        return array(CONTROLLER_STATUS_OK, 'exim.export?section=' . $_REQUEST['section'] . '&pattern_id=' . $layout_data['pattern_id']);
+        return [CONTROLLER_STATUS_OK, 'exim.export?section=' . $_REQUEST['section'] . '&pattern_id=' . $layout_data['pattern_id']];
     }
 
     //

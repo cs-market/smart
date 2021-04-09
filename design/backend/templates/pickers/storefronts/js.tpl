@@ -9,7 +9,7 @@
         data-ca-storefront-company-ids="{$storefront->getCompanyIds()|json_encode}"
     >
         {if $position_field}
-            <td>
+            <td data-th="&nbsp;">
                 <input type="text"
                        name="{$input_name}[{$storefront_id}]"
                        value="{$position * 10}"
@@ -19,7 +19,7 @@
             </td>
         {/if}
 
-        <td>
+        <td data-th="&nbsp;">
             {if $show_text_storefront_names}
                 {$storefront_name}
             {else}
@@ -30,7 +30,7 @@
 
         </td>
 
-        <td>
+        <td data-th="&nbsp;">
             <div class="hidden-tools">
                 {if !$hide_delete_button && !$view_only}
                     {capture name="tools_list"}

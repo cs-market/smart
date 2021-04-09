@@ -132,11 +132,12 @@ $schema = [
     'tax'                  => 'Налог',
     'multiple'             => 'Множественное',
     'string'               => 'Строка',
-    'number'               => 'Число',
+    'number'               => 'Номер',
     'date_time'            => 'ДатаВремя',
     'recount'              => 'Пересчет',
     'unit'                 => 'Единица',
     'has_only_changes'     => 'СодержитТолькоИзменения',
+    'product_options'      => 'Опции товаров',
 ];
 
 return $schema;

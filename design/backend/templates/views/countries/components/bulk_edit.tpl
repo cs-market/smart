@@ -1,5 +1,6 @@
 <div class="bulk-edit clearfix hidden"
      data-ca-bulkedit-expanded-object="true"
+     data-ca-bulkedit-component="expandedObject"
 >
     <ul class="btn-group bulk-edit__wrapper">
         {hook name="countries:bulk_edit_items"}
@@ -17,7 +18,7 @@
             {include file="common/check_items.tpl"
                      dropdown_menu_class="cm-check-items"
                      wrap_select_actions_into_dropdown=true 
-                     check_statuses=''|fn_get_default_status_filters:true
+                     check_statuses=$country_statuses
             }
         </li>
 

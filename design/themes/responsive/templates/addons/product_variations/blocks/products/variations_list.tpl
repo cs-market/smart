@@ -21,7 +21,7 @@
     {$show_add_to_cart=$_show_add_to_cart|default:true}
     {$but_role="action"}
     {$hide_form=true}
-    {$show_product_amount=$settings.General.inventory_tracking == "Y"}
+    {$show_product_amount=$settings.General.inventory_tracking !== "YesNo::NO"|enum}
     {$hide_stock_info=false}
     {$show_out_of_stock=true}
     {$show_amount_label=false}

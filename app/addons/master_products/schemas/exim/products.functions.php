@@ -260,12 +260,19 @@ function fn_master_products_exim_get_product_vendor($vendor, $row)
  */
 function fn_master_products_exim_set_product_vendor($product_id, $company_name, &$processed_data)
 {
+    $product_id_map = ServiceProvider::getProductIdMap();
+
     $company_name = trim($company_name);
     if ($company_name === '~') {
         return 0;
     }
 
-    return fn_exim_set_product_company($product_id, $company_name, $processed_data);
+    $company_id = fn_exim_set_product_company($product_id, $company_name, $processed_data);
+    if ($company_id) {
+        $product_id_map->removeMasterProductsFromMap([$product_id]);
+    }
+
+    return $company_id;
 }
 
 /**

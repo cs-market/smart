@@ -76,6 +76,8 @@
                         option: _getDescription(frm, id),
                         value: value
                     };
+                } else if(_display === 'radio') {
+                    products[id] = value;
                 } else {
                     products[id] = {
                         value: value

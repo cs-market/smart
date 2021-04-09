@@ -104,78 +104,6 @@ class Filters
 
         return $content;
     }
-    /**
-     * Prefilter: form tooltip
-     * @param  string                    $content  template content
-     * @param  \Smarty_Internal_Template $template template instance
-     * @return string                    template content
-     */
-    public static function preFormTooltip($content, \Smarty_Internal_Template $template)
-    {
-        $pattern = '/\<label[^>]*\>.*(\{__\("([^\}]+)"\)\}[^:\<]*).*\<\/label\>/';
-
-        if (preg_match_all($pattern, $content, $matches)) {
-            $cur_templ = $template->template_resource;
-
-            $template_pattern = '/([^\/\.]+)/';
-            $template_name = '';
-            $ignored_names = array('tpl');
-
-            if (preg_match_all($template_pattern, $cur_templ, $template_matches)) {
-                foreach ($template_matches[0] as $k => $m) {
-                    if (!in_array($template_matches[1][$k], $ignored_names)) {
-                        $template_name .= $template_matches[1][$k] . '_';
-                    }
-                }
-            }
-
-            $template_pref = 'tt_' . $template_name;
-            $template_tooltips = LanguageValues::getLangVarsByPrefix($template_pref);
-
-            foreach ($matches[0] as $k => $m) {
-                $field_name = $matches[2][$k];
-                preg_match("/(^[a-zA-z0-9][\.a-zA-Z0-9_]*)/", $field_name, $name_matches);
-
-                if (@strlen($name_matches[0]) != strlen($field_name)) {
-                    continue;
-                }
-
-                $label = $matches[1][$k];
-
-                $template_lang_var = $template_pref . $field_name;
-                $common_lang_var = 'ttc_' . $field_name;
-
-                if (isset($_REQUEST['stt'])) {
-                    $template_text = isset($template_tooltips[$template_lang_var]) ? '{__("' . $template_lang_var . '")}' : '';
-                    $common_tip = __($common_lang_var);
-                    $common_text = '';
-                    if ($common_tip != '_' . $common_lang_var) {
-                        $common_text = '{__("' . $common_lang_var . '")}';
-                    }
-
-                    $tooltip_text = sprintf("%s: %s <br/> %s: %s", $common_lang_var, $common_text, $template_lang_var, $template_text);
-                    $tooltip = '{capture name="tooltip"}' . $tooltip_text . '{/capture}{include file="common/tooltip.tpl" tooltip=$smarty.capture.tooltip}';
-                } else {
-                    if (isset($template_tooltips[$template_lang_var])) {
-                        $tooltip_text = '__("' . $template_lang_var . '")';
-                    } else {
-                        $tooltip = __($common_lang_var);
-                        if ($tooltip == '_' . $common_lang_var || empty($tooltip)) {
-                            continue;
-                        }
-                        $tooltip_text = '__("' . $common_lang_var . '")';
-                    }
-
-                    $tooltip = '{include file="common/tooltip.tpl" tooltip=' . $tooltip_text . '}';
-                }
-                $tooltip_added = str_replace($label, $label . $tooltip, $matches[0][$k]);
-
-                $content = str_replace($matches[0][$k], $tooltip_added, $content);
-            }
-        }
-
-        return $content;
-    }
 
     /**
      * Prefilter: template wrapper for design mode
@@ -392,7 +320,7 @@ class Filters
                     if (preg_match($tab_expr, $central_content, $matches)) {
                         if (!empty($matches[2])) {
                             // Add a new tab
-                            $tab_content = $matches[1] . $matches[2] . '<li id="tab_share_object' . $data['params']['object_id'] . '" class="cm-js cm-ajax"><a href="' . fn_url('companies.get_object_share?object=' . $data['params']['object'] . '&object_id=' . $data['params']['object_id']) . '">' . __('share') . '</a></li>' . $matches[3];
+                            $tab_content = $matches[1] . $matches[2] . '<li id="tab_share_object' . $data['params']['object_id'] . '" class="cm-js cm-ajax"><a href="' . fn_url('companies.get_object_share?object=' . $data['params']['object'] . '&object_id=' . $data['params']['object_id']) . '">' . __('storefronts') . '</a></li>' . $matches[3];
 
                             $central_content = preg_replace($tab_expr, fn_preg_replacement_quote($tab_content), $central_content, 1);
                         }

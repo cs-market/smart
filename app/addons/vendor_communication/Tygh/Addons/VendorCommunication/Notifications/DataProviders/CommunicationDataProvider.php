@@ -17,6 +17,7 @@ namespace Tygh\Addons\VendorCommunication\Notifications\DataProviders;
 
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\Addons\VendorCommunication\CommunicationTypes;
 use Tygh\Notifications\DataProviders\BaseDataProvider;
 
 /**
@@ -34,12 +35,13 @@ class CommunicationDataProvider extends BaseDataProvider
     {
         $this->company_id = isset($data['company_id']) ? $data['company_id'] : 0;
 
-        $data['lang_code'] = $this->getLangCode();
+        $data['lang_code'] = $this->getLangCode($data);
         $data['to'] = $this->getTo($data);
         $data = $this->getActionUrls($data);
         $data['message_author'] = $this->getMessageAuthor($data);
         $data['company_name'] = fn_get_company_name($this->company_id);
         if (fn_allowed_for('MULTIVENDOR')) {
+            $data['is_vendor_to_admin'] = $data['communication_type'] === CommunicationTypes::VENDOR_TO_ADMIN;
             $data['admin_user_id'] = fn_get_company_admin_user_id($this->company_id);
         }
         parent::__construct($data);
@@ -47,20 +49,30 @@ class CommunicationDataProvider extends BaseDataProvider
 
     protected function getActionUrls(array $data)
     {
-        $data['action_url'] = fn_url("vendor_communication.view?thread_id={$data['thread_id']}", 'A');
-        if (fn_allowed_for('MULTIVENDOR')) {
-            $data['vendor_action_url'] = fn_url("vendor_communication.view?thread_id={$data['thread_id']}", 'V');
-        }
+        $data['action_url'] = 'vendor_communication.view?thread_id=' . $data['thread_id'] . '&communication_type=' . $data['communication_type'];
+
         return $data;
     }
 
-    protected function getLangCode()
+    /**
+     * Finds proper language code for notification receiver.
+     *
+     * @param array<string, string> $data Information about notification.
+     *
+     * @return string
+     */
+    protected function getLangCode(array $data)
     {
         if (isset($this->lang_code)) {
             return $this->lang_code;
         }
-
-        return $this->lang_code = fn_get_company_language($this->company_id);
+        if ($data['last_message_user_type'] !== UserTypes::VENDOR) {
+            $user_id = fn_get_company_root_admin_user_id($this->company_id) ?: 1;
+        } else {
+            $user_id = $data['user_id'];
+        }
+        $user_info = fn_get_user_info((string) $user_id);
+        return $this->lang_code = isset($user_info['lang_code']) ? $user_info['lang_code'] : CART_LANGUAGE;
     }
 
     protected function getTo(array $data)

@@ -335,8 +335,8 @@ class ArchiveTest extends PHPUnit_Framework_TestCase
                     unlink($file);
                 }
             }
-            usort($dirs, function ($a, $b) {
-                return  strlen($a) < strlen($b);
+            usort($dirs, static function ($a, $b) {
+                return strlen($a) < strlen($b) ? 1 : -1;
             });
 
             foreach ($dirs as $dir) {

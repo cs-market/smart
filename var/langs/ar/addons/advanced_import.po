@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.11.5/addons/advanced_import.po\n"
-"X-Crowdin-File-ID: 3646\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.1/addons/advanced_import.po\n"
+"X-Crowdin-File-ID: 3778\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::advanced_import"
 msgid "Advanced products import"
@@ -350,5 +350,29 @@ msgstr "يبدو المحدد (أو الكشف التلقائي) غير صحيح
 
 msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
 msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
+msgstr ""
+
+msgctxt "Languages::advanced_import.common_preset"
+msgid "All vendors"
+msgstr ""
+
+msgctxt "Languages::advanced_import.your_presets"
+msgid "Vendor's presets"
+msgstr ""
+
+msgctxt "Languages::advanced_import.common_presets"
+msgid "Marketplace presets"
+msgstr ""
+
+msgctxt "Languages::advanced_import.file_not_loaded"
+msgid "File was not loaded. Please reload the page and try again."
+msgstr ""
+
+msgctxt "Languages::advanced_import.local_file_selected"
+msgid "Local file selected"
+msgstr ""
+
+msgctxt "Languages::advanced_import.text_popup_file_editor_notice_full_link"
+msgid "You can upload and download files via <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
 msgstr ""
 

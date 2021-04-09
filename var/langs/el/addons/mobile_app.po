@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/mobile_app.po\n"
-"X-Crowdin-File-ID: 3668\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/mobile_app.po\n"
+"X-Crowdin-File-ID: 4184\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::mobile_app"
 msgid "Mobile application"
@@ -23,6 +23,10 @@ msgstr "Εφαρμογή για κινητά"
 msgctxt "Languages::app_params"
 msgid "Application"
 msgstr "Εφαρμογή"
+
+msgctxt "Languages::mobile_app.mobile_apply"
+msgid "Apply"
+msgstr ""
 
 msgctxt "Languages::mobile_app.section.category"
 msgid "Categories"
@@ -52,6 +56,30 @@ msgctxt "Languages::mobile_app.appname"
 msgid "App Name"
 msgstr "Όνομα εφαρμογής"
 
+msgctxt "Languages::mobile_app.mobile_settings"
+msgid "Settings"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_select_language"
+msgid "Select Language"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_pages"
+msgid "Pages"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_currency"
+msgid "Currency"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_language"
+msgid "Language"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_favorite"
+msgid "Favorite"
+msgstr ""
+
 msgctxt "Languages::mobile_app.appshortdescription"
 msgid "Short description"
 msgstr "Σύντομη Περιγραφή"
@@ -59,6 +87,10 @@ msgstr "Σύντομη Περιγραφή"
 msgctxt "Languages::mobile_app.appfulldescription"
 msgid "Full description"
 msgstr "Ολοκληρωμένη Περιγραφή"
+
+msgctxt "Languages::mobile_app.mobile_full_product_description"
+msgid "Full description"
+msgstr ""
 
 msgctxt "Languages::mobile_app.supportemail"
 msgid "Support email"
@@ -95,6 +127,10 @@ msgstr "Ειδοποιήσεις push"
 msgctxt "Languages::ttc_mobile_app.pushnotifications"
 msgid "Push notifications"
 msgstr "Ειδοποιήσεις push"
+
+msgctxt "Languages::mobile_app.mobile_buyer"
+msgid "Buyer"
+msgstr ""
 
 msgctxt "Languages::bundleid"
 msgid "Bundle Id"
@@ -261,8 +297,8 @@ msgid "Update texts using existing locale files"
 msgstr "Ενημέρωση κειμένων χρησιμοποιώντας υπάρχοντα τοπικά αρχεία"
 
 msgctxt "Languages::mobile_app.invalid_locale_file"
-msgid "Invalid locale file selected for the \"[language]\" language"
-msgstr "Επιλέχθηκε μη έγκυρο τοπικό αρχείο για τη γλώσσα  \"[language]\" "
+msgid "Locale file selected for the \"[language]\" language is not a valid JSON file"
+msgstr "Το τοπικό αρχείο που επιλέχθηκε για τη γλώσσα \"[language]\" δεν είναι έγκυρο αρχείο JSON"
 
 msgctxt "Languages::mobile_app.app_translation_updated.item"
 msgid "[language]: [n] texts|[language]: [n] texts"
@@ -298,203 +334,203 @@ msgstr "Alaska"
 
 msgctxt "Languages::mobile_app.mobile_albacete"
 msgid "Albacete"
-msgstr ""
+msgstr "Albacete"
 
 msgctxt "Languages::mobile_app.mobile_albania"
 msgid "Albania"
-msgstr ""
+msgstr "Albania"
 
 msgctxt "Languages::mobile_app.mobile_alessandria"
 msgid "Alessandria"
-msgstr ""
+msgstr "Alessandria"
 
 msgctxt "Languages::mobile_app.mobile_algeria"
 msgid "Algeria"
-msgstr ""
+msgstr "Algeria"
 
 msgctxt "Languages::mobile_app.mobile_alicante"
 msgid "Alicante"
-msgstr ""
+msgstr "Alicante"
 
 msgctxt "Languages::mobile_app.mobile_allier"
 msgid "Allier"
-msgstr ""
+msgstr "Allier"
 
 msgctxt "Languages::mobile_app.mobile_almeria"
 msgid "Almería"
-msgstr ""
+msgstr "Almería"
 
 msgctxt "Languages::mobile_app.mobile_alpes_maritimes"
 msgid "Alpes-Maritimes"
-msgstr ""
+msgstr "Alpes-Maritimes"
 
 msgctxt "Languages::mobile_app.mobile_alpes_de_haute_provence"
 msgid "Alpes-de-Haute-Provence"
-msgstr ""
+msgstr "Alpes-de-Haute-Provence"
 
 msgctxt "Languages::mobile_app.mobile_altajskij_kraj"
 msgid "Altajskij kraj"
-msgstr ""
+msgstr "Altajskij kraj"
 
 msgctxt "Languages::mobile_app.mobile_american_samoa"
 msgid "American Samoa"
-msgstr ""
+msgstr "American Samoa"
 
 msgctxt "Languages::mobile_app.mobile_amurskaja_oblast"
 msgid "Amurskaja oblast'"
-msgstr ""
+msgstr "Amurskaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_ancona"
 msgid "Ancona"
-msgstr ""
+msgstr "Ancona"
 
 msgctxt "Languages::mobile_app.mobile_andorra"
 msgid "Andorra"
-msgstr ""
+msgstr "Andorra"
 
 msgctxt "Languages::mobile_app.mobile_anglesey"
 msgid "Anglesey"
-msgstr ""
+msgstr "Anglesey"
 
 msgctxt "Languages::mobile_app.mobile_angola"
 msgid "Angola"
-msgstr ""
+msgstr "Angola"
 
 msgctxt "Languages::mobile_app.mobile_anguilla"
 msgid "Anguilla"
-msgstr ""
+msgstr "Anguilla"
 
 msgctxt "Languages::mobile_app.mobile_angus"
 msgid "Angus"
-msgstr ""
+msgstr "Angus"
 
 msgctxt "Languages::mobile_app.mobile_antarctica"
 msgid "Antarctica"
-msgstr ""
+msgstr "Antarctica"
 
 msgctxt "Languages::mobile_app.mobile_antigua_and_barbuda"
 msgid "Antigua and Barbuda"
-msgstr ""
+msgstr "Antigua and Barbuda"
 
 msgctxt "Languages::mobile_app.mobile_aosta"
 msgid "Aosta"
-msgstr ""
+msgstr "Aosta"
 
 msgctxt "Languages::mobile_app.mobile_appenzell_rhodes_interieures"
 msgid "Appenzell Rhodes-Intérieures"
-msgstr ""
+msgstr "Appenzell Rhodes-Intérieures"
 
 msgctxt "Languages::mobile_app.mobile_ardennes"
 msgid "Ardennes"
-msgstr ""
+msgstr "Ardennes"
 
 msgctxt "Languages::mobile_app.mobile_ardeche"
 msgid "Ardèche"
-msgstr ""
+msgstr "Ardèche"
 
 msgctxt "Languages::mobile_app.mobile_arezzo"
 msgid "Arezzo"
-msgstr ""
+msgstr "Arezzo"
 
 msgctxt "Languages::mobile_app.mobile_argentina"
 msgid "Argentina"
-msgstr ""
+msgstr "Argentina"
 
 msgctxt "Languages::mobile_app.mobile_argovie"
 msgid "Argovie"
-msgstr ""
+msgstr "Argovie"
 
 msgctxt "Languages::mobile_app.mobile_argyll_and_bute"
 msgid "Argyll and Bute"
-msgstr ""
+msgstr "Argyll and Bute"
 
 msgctxt "Languages::mobile_app.mobile_arhangelskaja_oblast"
 msgid "Arhangel'skaja oblast'"
-msgstr ""
+msgstr "Arhangel'skaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_arizona"
 msgid "Arizona"
-msgstr ""
+msgstr "Arizona"
 
 msgctxt "Languages::mobile_app.mobile_ariege"
 msgid "Ariège"
-msgstr ""
+msgstr "Ariège"
 
 msgctxt "Languages::mobile_app.mobile_arkansas"
 msgid "Arkansas"
-msgstr ""
+msgstr "Arkansas"
 
 msgctxt "Languages::mobile_app.mobile_armenia"
 msgid "Armenia"
-msgstr ""
+msgstr "Armenia"
 
 msgctxt "Languages::mobile_app.mobile_aruba"
 msgid "Aruba"
-msgstr ""
+msgstr "Aruba"
 
 msgctxt "Languages::mobile_app.mobile_ascoli_piceno"
 msgid "Ascoli Piceno"
-msgstr ""
+msgstr "Ascoli Piceno"
 
 msgctxt "Languages::mobile_app.mobile_asia_pacific"
 msgid "Asia-Pacific"
-msgstr ""
+msgstr "Asia-Pacific"
 
 msgctxt "Languages::mobile_app.mobile_asti"
 msgid "Asti"
-msgstr ""
+msgstr "Asti"
 
 msgctxt "Languages::mobile_app.mobile_astrahanskaja_oblast"
 msgid "Astrahanskaja oblast'"
-msgstr ""
+msgstr "Astrahanskaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_asturias"
 msgid "Asturias"
-msgstr ""
+msgstr "Asturias"
 
 msgctxt "Languages::mobile_app.mobile_aube"
 msgid "Aube"
-msgstr ""
+msgstr "Aube"
 
 msgctxt "Languages::mobile_app.mobile_aude"
 msgid "Aude"
-msgstr ""
+msgstr "Aude"
 
 msgctxt "Languages::mobile_app.mobile_australia"
 msgid "Australia"
-msgstr ""
+msgstr "Australia"
 
 msgctxt "Languages::mobile_app.mobile_australian_capital_territory"
 msgid "Australian Capital Territory"
-msgstr ""
+msgstr "Australian Capital Territory"
 
 msgctxt "Languages::mobile_app.mobile_austria"
 msgid "Austria"
-msgstr ""
+msgstr "Austria"
 
 msgctxt "Languages::mobile_app.mobile_avellino"
 msgid "Avellino"
-msgstr ""
+msgstr "Avellino"
 
 msgctxt "Languages::mobile_app.mobile_aveyron"
 msgid "Aveyron"
-msgstr ""
+msgstr "Aveyron"
 
 msgctxt "Languages::mobile_app.mobile_avon"
 msgid "Avon"
-msgstr ""
+msgstr "Avon"
 
 msgctxt "Languages::mobile_app.mobile_awaiting_call"
 msgid "Awaiting call"
-msgstr ""
+msgstr "Awaiting call"
 
 msgctxt "Languages::mobile_app.mobile_azerbaijan"
 msgid "Azerbaijan"
-msgstr ""
+msgstr "Azerbaijan"
 
 msgctxt "Languages::mobile_app.mobile_backordered"
 msgid "Backordered"
-msgstr ""
+msgstr "Backordered"
 
 msgctxt "Languages::mobile_app.mobile_badajoz"
 msgid "Badajoz"
@@ -698,91 +734,91 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_burkina_faso"
 msgid "Burkina Faso"
-msgstr ""
+msgstr "Burkina Faso"
 
 msgctxt "Languages::mobile_app.mobile_burundi"
 msgid "Burundi"
-msgstr ""
+msgstr "Burundi"
 
 msgctxt "Languages::mobile_app.mobile_bale_campagne"
 msgid "Bâle-Campagne"
-msgstr ""
+msgstr "Bâle-Campagne"
 
 msgctxt "Languages::mobile_app.mobile_bale_ville"
 msgid "Bâle-Ville"
-msgstr ""
+msgstr "Bâle-Ville"
 
 msgctxt "Languages::mobile_app.mobile_caerphilly"
 msgid "Caerphilly"
-msgstr ""
+msgstr "Caerphilly"
 
 msgctxt "Languages::mobile_app.mobile_cagliari"
 msgid "Cagliari"
-msgstr ""
+msgstr "Cagliari"
 
 msgctxt "Languages::mobile_app.mobile_caithness"
 msgid "Caithness"
-msgstr ""
+msgstr "Caithness"
 
 msgctxt "Languages::mobile_app.mobile_california"
 msgid "California"
-msgstr ""
+msgstr "California"
 
 msgctxt "Languages::mobile_app.mobile_caltanissetta"
 msgid "Caltanissetta"
-msgstr ""
+msgstr "Caltanissetta"
 
 msgctxt "Languages::mobile_app.mobile_calvados"
 msgid "Calvados"
-msgstr ""
+msgstr "Calvados"
 
 msgctxt "Languages::mobile_app.mobile_cambodia"
 msgid "Cambodia"
-msgstr ""
+msgstr "Cambodia"
 
 msgctxt "Languages::mobile_app.mobile_cambridgeshire"
 msgid "Cambridgeshire"
-msgstr ""
+msgstr "Cambridgeshire"
 
 msgctxt "Languages::mobile_app.mobile_cameroon"
 msgid "Cameroon"
-msgstr ""
+msgstr "Cameroon"
 
 msgctxt "Languages::mobile_app.mobile_campobasso"
 msgid "Campobasso"
-msgstr ""
+msgstr "Campobasso"
 
 msgctxt "Languages::mobile_app.mobile_canada"
 msgid "Canada"
-msgstr ""
+msgstr "Canada"
 
 msgctxt "Languages::mobile_app.mobile_canceled"
 msgid "Canceled"
-msgstr ""
+msgstr "Canceled"
 
 msgctxt "Languages::mobile_app.mobile_cantabria"
 msgid "Cantabria"
-msgstr ""
+msgstr "Cantabria"
 
 msgctxt "Languages::mobile_app.mobile_cantal"
 msgid "Cantal"
-msgstr ""
+msgstr "Cantal"
 
 msgctxt "Languages::mobile_app.mobile_cape_verde"
 msgid "Cape Verde"
-msgstr ""
+msgstr "Cape Verde"
 
 msgctxt "Languages::mobile_app.mobile_carbonia_iglesias"
 msgid "Carbonia-Iglesias"
-msgstr ""
+msgstr "Carbonia-Iglesias"
 
 msgctxt "Languages::mobile_app.mobile_cardiff"
 msgid "Cardiff"
-msgstr ""
+msgstr "Cardiff"
 
 msgctxt "Languages::mobile_app.mobile_carmarthenshire"
 msgid "Carmarthenshire"
-msgstr ""
+msgstr "Carmarthenshire"
 
 msgctxt "Languages::mobile_app.mobile_cart"
 msgid "Cart"
@@ -790,51 +826,51 @@ msgstr "Καλάθι"
 
 msgctxt "Languages::mobile_app.mobile_caserta"
 msgid "Caserta"
-msgstr ""
+msgstr "Caserta"
 
 msgctxt "Languages::mobile_app.mobile_castellon"
 msgid "Castellón"
-msgstr ""
+msgstr "Castellón"
 
 msgctxt "Languages::mobile_app.mobile_catania"
 msgid "Catania"
-msgstr ""
+msgstr "Catania"
 
 msgctxt "Languages::mobile_app.mobile_catanzaro"
 msgid "Catanzaro"
-msgstr ""
+msgstr "Catanzaro"
 
 msgctxt "Languages::mobile_app.mobile_cayman_islands"
 msgid "Cayman Islands"
-msgstr ""
+msgstr "Cayman Islands"
 
 msgctxt "Languages::mobile_app.mobile_central_african_republic"
 msgid "Central African Republic"
-msgstr ""
+msgstr "Central African Republic"
 
 msgctxt "Languages::mobile_app.mobile_ceredigion"
 msgid "Ceredigion"
-msgstr ""
+msgstr "Ceredigion"
 
 msgctxt "Languages::mobile_app.mobile_ceuta"
 msgid "Ceuta"
-msgstr ""
+msgstr "Ceuta"
 
 msgctxt "Languages::mobile_app.mobile_chad"
 msgid "Chad"
-msgstr ""
+msgstr "Chad"
 
 msgctxt "Languages::mobile_app.mobile_charente"
 msgid "Charente"
-msgstr ""
+msgstr "Charente"
 
 msgctxt "Languages::mobile_app.mobile_charente_maritime"
 msgid "Charente-Maritime"
-msgstr ""
+msgstr "Charente-Maritime"
 
 msgctxt "Languages::mobile_app.mobile_chechenskaja_respublika"
 msgid "Chechenskaja respublika"
-msgstr ""
+msgstr "Chechenskaja respublika"
 
 msgctxt "Languages::mobile_app.mobile_checkout"
 msgid "Checkout"
@@ -842,67 +878,67 @@ msgstr "Ταμείο"
 
 msgctxt "Languages::mobile_app.mobile_cheljabinskaja_oblast"
 msgid "Cheljabinskaja oblast'"
-msgstr ""
+msgstr "Cheljabinskaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_cher"
 msgid "Cher"
-msgstr ""
+msgstr "Cher"
 
 msgctxt "Languages::mobile_app.mobile_cheshire"
 msgid "Cheshire"
-msgstr ""
+msgstr "Cheshire"
 
 msgctxt "Languages::mobile_app.mobile_chieti"
 msgid "Chieti"
-msgstr ""
+msgstr "Chieti"
 
 msgctxt "Languages::mobile_app.mobile_chile"
 msgid "Chile"
-msgstr ""
+msgstr "Chile"
 
 msgctxt "Languages::mobile_app.mobile_china"
 msgid "China"
-msgstr ""
+msgstr "China"
 
 msgctxt "Languages::mobile_app.mobile_christmas_island"
 msgid "Christmas Island"
-msgstr ""
+msgstr "Christmas Island"
 
 msgctxt "Languages::mobile_app.mobile_chukotskij_avtonomnyj_okrug"
 msgid "Chukotskij avtonomnyj okrug"
-msgstr ""
+msgstr "Chukotskij avtonomnyj okrug"
 
 msgctxt "Languages::mobile_app.mobile_chuvashskaja_respublika"
 msgid "Chuvashskaja Respublika"
-msgstr ""
+msgstr "Chuvashskaja Respublika"
 
 msgctxt "Languages::mobile_app.mobile_city"
 msgid "City"
-msgstr ""
+msgstr "Πόλη"
 
 msgctxt "Languages::mobile_app.mobile_ciudad_real"
 msgid "Ciudad Real"
-msgstr ""
+msgstr "Ciudad Real"
 
 msgctxt "Languages::mobile_app.mobile_clackmannanshire"
 msgid "Clackmannanshire"
-msgstr ""
+msgstr "Clackmannanshire"
 
 msgctxt "Languages::mobile_app.mobile_cleveland"
 msgid "Cleveland"
-msgstr ""
+msgstr "Cleveland"
 
 msgctxt "Languages::mobile_app.mobile_clwyd"
 msgid "Clwyd"
-msgstr ""
+msgstr "Clwyd"
 
 msgctxt "Languages::mobile_app.mobile_cocos_keeling_islands"
 msgid "Cocos (Keeling) Islands"
-msgstr ""
+msgstr "Cocos (Keeling) Islands"
 
 msgctxt "Languages::mobile_app.mobile_colombia"
 msgid "Colombia"
-msgstr ""
+msgstr "Colombia"
 
 msgctxt "Languages::mobile_app.mobile_colorado"
 msgid "Colorado"
@@ -1106,43 +1142,43 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_dominican_republic"
 msgid "Dominican Republic"
-msgstr ""
+msgstr "Colombia"
 
 msgctxt "Languages::mobile_app.mobile_dordogne"
 msgid "Dordogne"
-msgstr ""
+msgstr "Dordogne"
 
 msgctxt "Languages::mobile_app.mobile_dorset"
 msgid "Dorset"
-msgstr ""
+msgstr "Dorset"
 
 msgctxt "Languages::mobile_app.mobile_doubs"
 msgid "Doubs"
-msgstr ""
+msgstr "Doubs"
 
 msgctxt "Languages::mobile_app.mobile_drome"
 msgid "Drôme"
-msgstr ""
+msgstr "Drôme"
 
 msgctxt "Languages::mobile_app.mobile_dumfries_and_galloway"
 msgid "Dumfries and Galloway"
-msgstr ""
+msgstr "Dumfries and Galloway"
 
 msgctxt "Languages::mobile_app.mobile_dumfries_shire"
 msgid "Dumfries-shire"
-msgstr ""
+msgstr "Dumfries-shire"
 
 msgctxt "Languages::mobile_app.mobile_dundee"
 msgid "Dundee"
-msgstr ""
+msgstr "Dundee"
 
 msgctxt "Languages::mobile_app.mobile_durham"
 msgid "Durham"
-msgstr ""
+msgstr "Durham"
 
 msgctxt "Languages::mobile_app.mobile_dyfed"
 msgid "Dyfed"
-msgstr ""
+msgstr "Dyfed"
 
 msgctxt "Languages::mobile_app.mobile_e_mail"
 msgid "E-mail"
@@ -1150,159 +1186,163 @@ msgstr "E-mail"
 
 msgctxt "Languages::mobile_app.mobile_east_ayrshire"
 msgid "East Ayrshire"
-msgstr ""
+msgstr "East Ayrshire"
 
 msgctxt "Languages::mobile_app.mobile_east_dunbartonshire"
 msgid "East Dunbartonshire"
-msgstr ""
+msgstr "East Dunbartonshire"
 
 msgctxt "Languages::mobile_app.mobile_east_lothian"
 msgid "East Lothian"
-msgstr ""
+msgstr "East Lothian"
 
 msgctxt "Languages::mobile_app.mobile_east_renfrewshire"
 msgid "East Renfrewshire"
-msgstr ""
+msgstr "East Renfrewshire"
 
 msgctxt "Languages::mobile_app.mobile_east_riding_of_yorkshire"
 msgid "East Riding of Yorkshire"
-msgstr ""
+msgstr "East Riding of Yorkshire"
 
 msgctxt "Languages::mobile_app.mobile_east_sussex"
 msgid "East Sussex"
-msgstr ""
+msgstr "East Sussex"
 
 msgctxt "Languages::mobile_app.mobile_east_timor"
 msgid "East Timor"
-msgstr ""
+msgstr "East Timor"
 
 msgctxt "Languages::mobile_app.mobile_ecuador"
 msgid "Ecuador"
-msgstr ""
+msgstr "Ecuador"
 
 msgctxt "Languages::mobile_app.mobile_edinburgh"
 msgid "Edinburgh"
-msgstr ""
+msgstr "Edinburgh"
 
 msgctxt "Languages::mobile_app.mobile_egypt"
 msgid "Egypt"
-msgstr ""
+msgstr "Egypt"
 
 msgctxt "Languages::mobile_app.mobile_el_salvador"
 msgid "El Salvador"
-msgstr ""
+msgstr "El Salvador"
 
 msgctxt "Languages::mobile_app.mobile_enna"
 msgid "Enna"
-msgstr ""
+msgstr "Enna"
 
 msgctxt "Languages::mobile_app.mobile_equatorial_guinea"
 msgid "Equatorial Guinea"
-msgstr ""
+msgstr "Equatorial Guinea"
 
 msgctxt "Languages::mobile_app.mobile_eritrea"
 msgid "Eritrea"
-msgstr ""
+msgstr "Eritrea"
 
 msgctxt "Languages::mobile_app.mobile_essex"
 msgid "Essex"
-msgstr ""
+msgstr "Essex"
 
 msgctxt "Languages::mobile_app.mobile_essonne"
 msgid "Essonne"
-msgstr ""
+msgstr "Essonne"
 
 msgctxt "Languages::mobile_app.mobile_estonia"
 msgid "Estonia"
-msgstr ""
+msgstr "Estonia"
 
 msgctxt "Languages::mobile_app.mobile_ethiopia"
 msgid "Ethiopia"
-msgstr ""
+msgstr "Ethiopia"
 
 msgctxt "Languages::mobile_app.mobile_eure"
 msgid "Eure"
-msgstr ""
+msgstr "Eure"
 
 msgctxt "Languages::mobile_app.mobile_eure_et_loir"
 msgid "Eure-et-Loir"
-msgstr ""
+msgstr "Eure-et-Loir"
 
 msgctxt "Languages::mobile_app.mobile_europe"
 msgid "Europe"
-msgstr ""
+msgstr "Europe"
 
 msgctxt "Languages::mobile_app.mobile_evrejskaja_avtonomnaja_oblast"
 msgid "Evrejskaja avtonomnaja oblast'"
-msgstr ""
+msgstr "Evrejskaja avtonomnaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_failed"
 msgid "Failed"
-msgstr ""
+msgstr "Απετυχε"
 
 msgctxt "Languages::mobile_app.mobile_falkirk"
 msgid "Falkirk"
-msgstr ""
+msgstr "Falkirk"
 
 msgctxt "Languages::mobile_app.mobile_falkland_islands_malvinas"
 msgid "Falkland Islands (Malvinas)"
-msgstr ""
+msgstr "Falkland Islands (Malvinas)"
 
 msgctxt "Languages::mobile_app.mobile_faroe_islands"
 msgid "Faroe Islands"
-msgstr ""
+msgstr "Faroe Islands"
 
 msgctxt "Languages::mobile_app.mobile_ferrara"
 msgid "Ferrara"
-msgstr ""
+msgstr "Ferrara"
 
 msgctxt "Languages::mobile_app.mobile_fife"
 msgid "Fife"
-msgstr ""
+msgstr "Fife"
 
 msgctxt "Languages::mobile_app.mobile_fiji"
 msgid "Fiji"
-msgstr ""
+msgstr "Fiji"
+
+msgctxt "Languages::mobile_app.mobile_filter"
+msgid "Filter"
+msgstr "Φίλτρο"
 
 msgctxt "Languages::mobile_app.mobile_finistere"
 msgid "Finistère"
-msgstr ""
+msgstr "Finistère"
 
 msgctxt "Languages::mobile_app.mobile_finland"
 msgid "Finland"
-msgstr ""
+msgstr "Finland"
 
 msgctxt "Languages::mobile_app.mobile_firenze"
 msgid "Firenze"
-msgstr ""
+msgstr "Firenze"
 
 msgctxt "Languages::mobile_app.mobile_first_name"
 msgid "First name"
-msgstr ""
+msgstr "Ονομα"
 
 msgctxt "Languages::mobile_app.mobile_flevoland"
 msgid "Flevoland"
-msgstr ""
+msgstr "Flevoland"
 
 msgctxt "Languages::mobile_app.mobile_flintshire"
 msgid "Flintshire"
-msgstr ""
+msgstr "Flintshire"
 
 msgctxt "Languages::mobile_app.mobile_florida"
 msgid "Florida"
-msgstr ""
+msgstr "Florida"
 
 msgctxt "Languages::mobile_app.mobile_foggia"
 msgid "Foggia"
-msgstr ""
+msgstr "Foggia"
 
 msgctxt "Languages::mobile_app.mobile_forli_cesena"
 msgid "Forli-Cesena"
-msgstr ""
+msgstr "Forli-Cesena"
 
 msgctxt "Languages::mobile_app.mobile_france"
 msgid "France"
-msgstr ""
+msgstr "France"
 
 msgctxt "Languages::mobile_app.mobile_france_metropolitan"
 msgid "France, Metropolitan"
@@ -1506,203 +1546,203 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_haute_garonne"
 msgid "Haute-Garonne"
-msgstr ""
+msgstr "Haute-Garonne"
 
 msgctxt "Languages::mobile_app.mobile_haute_loire"
 msgid "Haute-Loire"
-msgstr ""
+msgstr "Haute-Loire"
 
 msgctxt "Languages::mobile_app.mobile_haute_marne"
 msgid "Haute-Marne"
-msgstr ""
+msgstr "Haute-Marne"
 
 msgctxt "Languages::mobile_app.mobile_haute_savoie"
 msgid "Haute-Savoie"
-msgstr ""
+msgstr "Haute-Savoie"
 
 msgctxt "Languages::mobile_app.mobile_haute_saone"
 msgid "Haute-Saône"
-msgstr ""
+msgstr "Haute-Saône"
 
 msgctxt "Languages::mobile_app.mobile_haute_vienne"
 msgid "Haute-Vienne"
-msgstr ""
+msgstr "Haute-Vienne"
 
 msgctxt "Languages::mobile_app.mobile_hautes_alpes"
 msgid "Hautes-Alpes"
-msgstr ""
+msgstr "Hautes-Alpes"
 
 msgctxt "Languages::mobile_app.mobile_hautes_pyrenees"
 msgid "Hautes-Pyrénées"
-msgstr ""
+msgstr "Hautes-Pyrénées"
 
 msgctxt "Languages::mobile_app.mobile_hauts_de_seine"
 msgid "Hauts-de-Seine"
-msgstr ""
+msgstr "Hauts-de-Seine"
 
 msgctxt "Languages::mobile_app.mobile_hawaii"
 msgid "Hawaii"
-msgstr ""
+msgstr "Hawaii"
 
 msgctxt "Languages::mobile_app.mobile_heard_and_mcdonald_islands"
 msgid "Heard and McDonald Islands"
-msgstr ""
+msgstr "Heard and McDonald Islands"
 
 msgctxt "Languages::mobile_app.mobile_herefordshire"
 msgid "Herefordshire"
-msgstr ""
+msgstr "Herefordshire"
 
 msgctxt "Languages::mobile_app.mobile_hertfordshire"
 msgid "Hertfordshire"
-msgstr ""
+msgstr "Hertfordshire"
 
 msgctxt "Languages::mobile_app.mobile_hessen"
 msgid "Hessen"
-msgstr ""
+msgstr "Hessen"
 
 msgctxt "Languages::mobile_app.mobile_highlands"
 msgid "Highlands"
-msgstr ""
+msgstr "Highlands"
 
 msgctxt "Languages::mobile_app.mobile_honduras"
 msgid "Honduras"
-msgstr ""
+msgstr "Honduras"
 
 msgctxt "Languages::mobile_app.mobile_hong_kong"
 msgid "Hong Kong"
-msgstr ""
+msgstr "Hong Kong"
 
 msgctxt "Languages::mobile_app.mobile_huelva"
 msgid "Huelva"
-msgstr ""
+msgstr "Huelva"
 
 msgctxt "Languages::mobile_app.mobile_huesca"
 msgid "Huesca"
-msgstr ""
+msgstr "Huesca"
 
 msgctxt "Languages::mobile_app.mobile_humberside"
 msgid "Humberside"
-msgstr ""
+msgstr "Humberside"
 
 msgctxt "Languages::mobile_app.mobile_hungary"
 msgid "Hungary"
-msgstr ""
+msgstr "Hungary"
 
 msgctxt "Languages::mobile_app.mobile_herault"
 msgid "Hérault"
-msgstr ""
+msgstr "Hérault"
 
 msgctxt "Languages::mobile_app.mobile_iceland"
 msgid "Iceland"
-msgstr ""
+msgstr "Iceland"
 
 msgctxt "Languages::mobile_app.mobile_idaho"
 msgid "Idaho"
-msgstr ""
+msgstr "Idaho"
 
 msgctxt "Languages::mobile_app.mobile_ille_et_vilaine"
 msgid "Ille-et-Vilaine"
-msgstr ""
+msgstr "Ille-et-Vilaine"
 
 msgctxt "Languages::mobile_app.mobile_illinois"
 msgid "Illinois"
-msgstr ""
+msgstr "Illinois"
 
 msgctxt "Languages::mobile_app.mobile_imperia"
 msgid "Imperia"
-msgstr ""
+msgstr "Imperia"
 
 msgctxt "Languages::mobile_app.mobile_india"
 msgid "India"
-msgstr ""
+msgstr "India"
 
 msgctxt "Languages::mobile_app.mobile_indiana"
 msgid "Indiana"
-msgstr ""
+msgstr "Indiana"
 
 msgctxt "Languages::mobile_app.mobile_indonesia"
 msgid "Indonesia"
-msgstr ""
+msgstr "Indonesia"
 
 msgctxt "Languages::mobile_app.mobile_indre"
 msgid "Indre"
-msgstr ""
+msgstr "Indre"
 
 msgctxt "Languages::mobile_app.mobile_indre_et_loire"
 msgid "Indre-et-Loire"
-msgstr ""
+msgstr "Indre-et-Loire"
 
 msgctxt "Languages::mobile_app.mobile_inverclyde"
 msgid "Inverclyde"
-msgstr ""
+msgstr "Inverclyde"
 
 msgctxt "Languages::mobile_app.mobile_inverness_shire"
 msgid "Inverness-shire"
-msgstr ""
+msgstr "Inverness-shire"
 
 msgctxt "Languages::mobile_app.mobile_iowa"
 msgid "Iowa"
-msgstr ""
+msgstr "Iowa"
 
 msgctxt "Languages::mobile_app.mobile_iraq"
 msgid "Iraq"
-msgstr ""
+msgstr "Iraq"
 
 msgctxt "Languages::mobile_app.mobile_ireland"
 msgid "Ireland"
-msgstr ""
+msgstr "Ireland"
 
 msgctxt "Languages::mobile_app.mobile_irkutskaja_oblast"
 msgid "Irkutskaja oblast'"
-msgstr ""
+msgstr "Irkutskaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_isernia"
 msgid "Isernia"
-msgstr ""
+msgstr "Isernia"
 
 msgctxt "Languages::mobile_app.mobile_islamic_republic_of_iran"
 msgid "Islamic Republic of Iran"
-msgstr ""
+msgstr "Islamic Republic of Iran"
 
 msgctxt "Languages::mobile_app.mobile_isle_of_man"
 msgid "Isle of Man"
-msgstr ""
+msgstr "Isle of Man"
 
 msgctxt "Languages::mobile_app.mobile_isle_of_wight"
 msgid "Isle of Wight"
-msgstr ""
+msgstr "Isle of Wight"
 
 msgctxt "Languages::mobile_app.mobile_isles_of_scilly"
 msgid "Isles of Scilly"
-msgstr ""
+msgstr "Isles of Scilly"
 
 msgctxt "Languages::mobile_app.mobile_israel"
 msgid "Israel"
-msgstr ""
+msgstr "Israel"
 
 msgctxt "Languages::mobile_app.mobile_isere"
 msgid "Isère"
-msgstr ""
+msgstr "Isère"
 
 msgctxt "Languages::mobile_app.mobile_italy"
 msgid "Italy"
-msgstr ""
+msgstr "Italy"
 
 msgctxt "Languages::mobile_app.mobile_ivanovskaja_oblast"
 msgid "Ivanovskaja oblast'"
-msgstr ""
+msgstr "Ivanovskaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_jamaica"
 msgid "Jamaica"
-msgstr ""
+msgstr "Jamaica"
 
 msgctxt "Languages::mobile_app.mobile_jamalo_neneckij_avtonomnyj_okrug"
 msgid "Jamalo-Neneckij avtonomnyj okrug"
-msgstr ""
+msgstr "Jamalo-Neneckij avtonomnyj okrug"
 
 msgctxt "Languages::mobile_app.mobile_japan"
 msgid "Japan"
-msgstr ""
+msgstr "Japan"
 
 msgctxt "Languages::mobile_app.mobile_jaroslavskaja_oblast"
 msgid "Jaroslavskaja oblast'"
@@ -1906,107 +1946,107 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_lipeckaja_oblast"
 msgid "Lipeckaja oblast'"
-msgstr ""
+msgstr "Lipeckaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_list_price"
 msgid "List price"
-msgstr ""
+msgstr "Τιμή Τιμοκαταλόγου"
 
 msgctxt "Languages::mobile_app.mobile_lithuania"
 msgid "Lithuania"
-msgstr ""
+msgstr "Lithuania"
 
 msgctxt "Languages::mobile_app.mobile_livorno"
 msgid "Livorno"
-msgstr ""
+msgstr "Livorno"
 
 msgctxt "Languages::mobile_app.mobile_lleida"
 msgid "Lleida"
-msgstr ""
+msgstr "Lleida"
 
 msgctxt "Languages::mobile_app.mobile_lodi"
 msgid "Lodi"
-msgstr ""
+msgstr "Lodi"
 
 msgctxt "Languages::mobile_app.mobile_loir_et_cher"
 msgid "Loir-et-Cher"
-msgstr ""
+msgstr "Loir-et-Cher"
 
 msgctxt "Languages::mobile_app.mobile_loire"
 msgid "Loire"
-msgstr ""
+msgstr "Loire"
 
 msgctxt "Languages::mobile_app.mobile_loire_atlantique"
 msgid "Loire-Atlantique"
-msgstr ""
+msgstr "Loire-Atlantique"
 
 msgctxt "Languages::mobile_app.mobile_loiret"
 msgid "Loiret"
-msgstr ""
+msgstr "Loiret"
 
 msgctxt "Languages::mobile_app.mobile_lot"
 msgid "Lot"
-msgstr ""
+msgstr "Lot"
 
 msgctxt "Languages::mobile_app.mobile_lot_et_garonne"
 msgid "Lot-et-Garonne"
-msgstr ""
+msgstr "Lot-et-Garonne"
 
 msgctxt "Languages::mobile_app.mobile_louisiana"
 msgid "Louisiana"
-msgstr ""
+msgstr "Louisiana"
 
 msgctxt "Languages::mobile_app.mobile_lozere"
 msgid "Lozère"
-msgstr ""
+msgstr "Lozère"
 
 msgctxt "Languages::mobile_app.mobile_lucca"
 msgid "Lucca"
-msgstr ""
+msgstr "Lucca"
 
 msgctxt "Languages::mobile_app.mobile_lucerne"
 msgid "Lucerne"
-msgstr ""
+msgstr "Lucerne"
 
 msgctxt "Languages::mobile_app.mobile_lugo"
 msgid "Lugo"
-msgstr ""
+msgstr "Lugo"
 
 msgctxt "Languages::mobile_app.mobile_luxembourg"
 msgid "Luxembourg"
-msgstr ""
+msgstr "Luxembourg"
 
 msgctxt "Languages::mobile_app.mobile_macau"
 msgid "Macau"
-msgstr ""
+msgstr "Macau"
 
 msgctxt "Languages::mobile_app.mobile_macedonia"
 msgid "Macedonia"
-msgstr ""
+msgstr "Macedonia"
 
 msgctxt "Languages::mobile_app.mobile_macerata"
 msgid "Macerata"
-msgstr ""
+msgstr "Macerata"
 
 msgctxt "Languages::mobile_app.mobile_madagascar"
 msgid "Madagascar"
-msgstr ""
+msgstr "Madagascar"
 
 msgctxt "Languages::mobile_app.mobile_madrid"
 msgid "Madrid"
-msgstr ""
+msgstr "Madrid"
 
 msgctxt "Languages::mobile_app.mobile_magadanskaja_oblast"
 msgid "Magadanskaja oblast'"
-msgstr ""
+msgstr "Magadanskaja oblast'"
 
 msgctxt "Languages::mobile_app.mobile_maine"
 msgid "Maine"
-msgstr ""
+msgstr "Maine"
 
 msgctxt "Languages::mobile_app.mobile_maine_et_loire"
 msgid "Maine-et-Loire"
-msgstr ""
+msgstr "Maine-et-Loire"
 
 msgctxt "Languages::mobile_app.mobile_malawi"
 msgid "Malawi"
@@ -3004,6 +3044,14 @@ msgctxt "Languages::mobile_app.mobile_selkirkshire"
 msgid "Selkirkshire"
 msgstr ""
 
+msgctxt "Languages::mobile_app.mobile_seller"
+msgid "Seller"
+msgstr ""
+
+msgctxt "Languages::mobile_app.mobile_sellers"
+msgid "Sellers"
+msgstr ""
+
 msgctxt "Languages::mobile_app.mobile_senegal"
 msgid "Senegal"
 msgstr ""
@@ -3730,11 +3778,11 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_address"
 msgid "Address"
-msgstr ""
+msgstr "Διευθυνση"
 
 msgctxt "Languages::mobile_app.mobile_address_2"
 msgid "Address 2"
-msgstr ""
+msgstr "Διεύθυνση, γραμμή 2"
 
 msgctxt "Languages::mobile_app.mobile_add_to_cart"
 msgid "Add to cart"
@@ -3774,7 +3822,7 @@ msgstr "Αριθμός Πιστωτικής Κάρτας"
 
 msgctxt "Languages::mobile_app.mobile_categories"
 msgid "Categories"
-msgstr ""
+msgstr "Κατηγορίες"
 
 msgctxt "Languages::mobile_app.mobile_change_address"
 msgid "Change address"
@@ -3803,6 +3851,10 @@ msgstr "Πωλητές"
 msgctxt "Languages::mobile_app.mobile_clear_all_cart"
 msgid "Clear all cart ?"
 msgstr "Θέλετε να αδειάσετε το Καλάθι σας ;"
+
+msgctxt "Languages::mobile_app.mobile_clear_all_filter"
+msgid "Clear all"
+msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_clear_wish_list"
 msgid "Clear wish list?"
@@ -3838,7 +3890,7 @@ msgstr "Κριτικές"
 
 msgctxt "Languages::mobile_app.mobile_email"
 msgid "Email"
-msgstr ""
+msgstr "e-mail"
 
 msgctxt "Languages::mobile_app.mobile_your_wish_lists_will_love_here"
 msgid "Your Wish Lists will love here."
@@ -3858,7 +3910,7 @@ msgstr "Φαξ"
 
 msgctxt "Languages::mobile_app.mobile_features"
 msgid "Features"
-msgstr ""
+msgstr "Χαρακτηριστικά"
 
 msgctxt "Languages::mobile_app.mobile_go_to_store"
 msgid "Go To Store"
@@ -3874,7 +3926,7 @@ msgstr "Πληροφορίες"
 
 msgctxt "Languages::mobile_app.mobile_items"
 msgid "{{count}} item(s)"
-msgstr ""
+msgstr "{{count}} είδος (η)"
 
 msgctxt "Languages::mobile_app.mobile_list_is_empty"
 msgid "List is empty"
@@ -3883,6 +3935,10 @@ msgstr "Το καλάθι είναι άδειο"
 msgctxt "Languages::mobile_app.mobile_login"
 msgid "Login"
 msgstr "Σύνδεση"
+
+msgctxt "Languages::mobile_app.mobile_logout"
+msgid "Logout"
+msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_looking_for_ideas"
 msgid "Looking for ideas?"
@@ -3906,11 +3962,11 @@ msgstr "Δεν βρέθηκαν δημοσιεύσεις"
 
 msgctxt "Languages::mobile_app.mobile_reviews_quantity"
 msgid "{{count}} reviews"
-msgstr ""
+msgstr "{{count}} κριτικές"
 
 msgctxt "Languages::mobile_app.mobile_products_found"
 msgid "Products found: {{count}}"
-msgstr ""
+msgstr "Προϊόντα που βρέθηκαν: {{count}}"
 
 msgctxt "Languages::mobile_app.mobile_ok"
 msgid "Ok"
@@ -3970,7 +4026,7 @@ msgstr "Ολοκλήρωση Εγγραφής."
 
 msgctxt "Languages::mobile_app.mobile_reviews_product_details"
 msgid "Reviews ({{count}})"
-msgstr ""
+msgstr "{{count}} Κριτικές"
 
 msgctxt "Languages::mobile_app.mobile_search"
 msgid "Search"
@@ -3994,11 +4050,11 @@ msgstr "Διεύθυνση Αποστολής Εμπορευμάτων"
 
 msgctxt "Languages::mobile_app.mobile_shipping_cost"
 msgid "Shipping cost"
-msgstr ""
+msgstr "Κόστος Αποστολής"
 
 msgctxt "Languages::mobile_app.mobile_shipping_method"
 msgid "Shipping method"
-msgstr ""
+msgstr "Τρόπος Αποστολής"
 
 msgctxt "Languages::mobile_app.mobile_show_all"
 msgid "Show all"
@@ -4014,7 +4070,7 @@ msgstr "Σύνδεση ως διαφορετικός χρήστης"
 
 msgctxt "Languages::mobile_app.mobile_subtotal"
 msgid "Subtotal"
-msgstr ""
+msgstr "Υποσύνολο"
 
 msgctxt "Languages::mobile_app.mobile_success"
 msgid "Success"
@@ -4046,7 +4102,7 @@ msgstr "To Προφίλ σας ανανεώθηκε με επιτυχία."
 
 msgctxt "Languages::mobile_app.mobile_the_profile_data_has_been_updated_successfully"
 msgid "The profile data has been updated successfully"
-msgstr ""
+msgstr "To Προφίλ σας ανανεώθηκε με επιτυχία"
 
 msgctxt "Languages::mobile_app.mobile_thank_you_for_your_post"
 msgid "Thank you for your post."
@@ -4054,7 +4110,7 @@ msgstr "Ευχαριστούμε για την δημοσίευση σας."
 
 msgctxt "Languages::mobile_app.mobile_there_are_no_features"
 msgid "There are no features."
-msgstr ""
+msgstr "Δεν υπάρχουν χαρακτηριστικά."
 
 msgctxt "Languages::mobile_app.mobile_valid_thru_mm"
 msgid "Valid thru (mm)"
@@ -4118,19 +4174,19 @@ msgstr "Το Όνομα σας"
 
 msgctxt "Languages::mobile_app.mobile_password"
 msgid "Password"
-msgstr ""
+msgstr "Κωδικός"
 
 msgctxt "Languages::mobile_app.mobile_zip_code"
 msgid "Zip code"
-msgstr ""
+msgstr "ΤΚ"
 
 msgctxt "Languages::mobile_app.mobile_add"
 msgid "Add"
-msgstr ""
+msgstr "Προσθήκη"
 
 msgctxt "Languages::mobile_app.mobile_including_tax"
 msgid "Including tax"
-msgstr ""
+msgstr "Συμπεριλαμβανομένου ΦΠΑ"
 
 msgctxt "Languages::mobile_app.mobile_orders"
 msgid "Orders"
@@ -4154,125 +4210,169 @@ msgstr "|"
 
 msgctxt "Languages::mobile_app.mobile_add_product"
 msgid "Add product"
-msgstr ""
+msgstr "Προσθήκη Προϊόντος"
 
 msgctxt "Languages::mobile_app.mobile_vendor_orders"
 msgid "Vendor Orders"
-msgstr ""
+msgstr "Παραγγελίες Πωλητή"
 
 msgctxt "Languages::mobile_app.mobile_select_product_image"
 msgid "Select product image"
-msgstr ""
+msgstr "Επιλογή  εικόνας προϊόντος"
 
 msgctxt "Languages::mobile_app.mobile_image"
 msgid "Image"
-msgstr ""
+msgstr "Εικόνα"
 
 msgctxt "Languages::mobile_app.mobile_select_image"
 msgid "Select image"
-msgstr ""
+msgstr "Επιλογή Εικονας"
 
 msgctxt "Languages::mobile_app.mobile_there_are_no_images"
 msgid "There are no images"
-msgstr ""
+msgstr "Δεν υπάρχουν εικόνες"
 
 msgctxt "Languages::mobile_app.mobile_select"
 msgid "Select"
-msgstr ""
+msgstr "Επιλογή"
 
 msgctxt "Languages::mobile_app.mobile_enter_the_name"
 msgid "Enter the name"
-msgstr ""
+msgstr "Εισαγωγή Ονόματος"
 
 msgctxt "Languages::mobile_app.mobile_name"
 msgid "Name"
+msgstr "Όνομα"
+
+msgctxt "Languages::mobile_app.mobile_description_optional"
+msgid "Description (optional)"
 msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_description"
 msgid "Description"
-msgstr ""
+msgstr "Περιγραφή"
 
 msgctxt "Languages::mobile_app.mobile_enter_the_price"
 msgid "Enter the price"
-msgstr ""
+msgstr "Εισαγωγή τιμής"
 
 msgctxt "Languages::mobile_app.mobile_price"
 msgid "Price"
-msgstr ""
+msgstr "Τιμή"
 
 msgctxt "Languages::mobile_app.mobile_in_stock"
 msgid "In stock"
-msgstr ""
+msgstr "Σε αποθεμα"
 
 msgctxt "Languages::mobile_app.mobile_create"
 msgid "Create"
-msgstr ""
+msgstr "Δημιουργία"
 
 msgctxt "Languages::mobile_app.mobile_the_product_was_created"
 msgid "The product was created"
-msgstr ""
+msgstr "Το Προϊόν Δημιουργήθηκε"
 
 msgctxt "Languages::mobile_app.mobile_the_product_was_updated"
 msgid "The product was updated"
-msgstr ""
+msgstr "Το Προϊόν Ενημερώθηκε"
 
 msgctxt "Languages::mobile_app.mobile_the_product_was_deleted"
 msgid "The product was deleted"
-msgstr ""
+msgstr "Το Προϊόν Διαγράφηκε"
 
 msgctxt "Languages::mobile_app.mobile_delete_this_product"
 msgid "Delete This Product"
-msgstr ""
+msgstr "Διαγραφή του Προϊόντος"
 
 msgctxt "Languages::mobile_app.mobile_status"
 msgid "Status"
-msgstr ""
+msgstr "Κατάσταση"
 
 msgctxt "Languages::mobile_app.mobile_active"
 msgid "Active"
-msgstr ""
+msgstr "Ενεργό"
 
 msgctxt "Languages::mobile_app.mobile_hidden"
 msgid "Hidden"
-msgstr ""
+msgstr "Κρυφό"
 
 msgctxt "Languages::mobile_app.mobile_disabled"
 msgid "Disabled"
-msgstr ""
+msgstr "Απενεργοποιημένο"
 
 msgctxt "Languages::mobile_app.mobile_make_product_active"
 msgid "Make Product Active"
-msgstr ""
+msgstr "Ενεργοποίηση Προϊόντος"
 
 msgctxt "Languages::mobile_app.mobile_make_product_hidden"
 msgid "Make Product Hidden"
-msgstr ""
+msgstr "Απόκρυψη Προϊόντος"
 
 msgctxt "Languages::mobile_app.mobile_make_product_disabled"
 msgid "Make Product Disabled"
-msgstr ""
+msgstr "Απενεργοποίηση Προϊόντος"
 
 msgctxt "Languages::mobile_app.mobile_pricing_slash_inventory"
 msgid "Pricing / Inventory"
-msgstr ""
+msgstr "Τιμολόγηση / Απογραφή"
 
 msgctxt "Languages::mobile_app.mobile_code"
 msgid "CODE"
-msgstr ""
+msgstr "ΚΩΔΙΚΟΣ (SKU)"
 
 msgctxt "Languages::mobile_app.mobile_list_price_dollar"
 msgid "List price ($)"
-msgstr ""
+msgstr "Τιμή Τιμοκαταλόγου"
 
 msgctxt "Languages::mobile_app.mobile_shipping_properties"
 msgid "Shipping properties"
-msgstr ""
+msgstr "Ιδιότητες Αποστολής"
 
 msgctxt "Languages::mobile_app.mobile_weight_lbs"
 msgid "Weight (lbs)"
-msgstr ""
+msgstr "Βαρος"
 
 msgctxt "Languages::mobile_app.mobile_free_shipping"
 msgid "Free shipping"
+msgstr "Δωρεάν αποστολή"
+
+msgctxt "Languages::mobile_app.promotion"
+msgid "Promotion"
+msgstr "Προώθηση"
+
+msgctxt "Languages::mobile_app.app_store_app_id"
+msgid "App Store application ID"
+msgstr "App Store application ID"
+
+msgctxt "Languages::mobile_app.google_play_app_id"
+msgid "Google Play application ID"
+msgstr "Google Play application ID"
+
+msgctxt "Languages::mobile_app.promotion_note"
+msgid "Visitors of your site who use iOS or Android devices will see a prompt to install the mobile application.<br>To show your application's icon in this prompt, <a href=\"[icon_url]\">upload App Icon</a> in the add-on settings. If App Icon is not specified, the favicon of a storefront will be used instead."
+msgstr "Οι επισκέπτες του ιστότοπού σας που χρησιμοποιούν συσκευές iOS ή Android θα δουν μια προτροπή για την εγκατάσταση της εφαρμογής για κινητά. <br> Για να εμφανιστεί το εικονίδιο της εφαρμογής σας σε αυτό το μήνυμα, <a href=\"[icon_url]\"> ανεβάστε το εικονίδιο εφαρμογής </a> στο τις ρυθμίσεις πρόσθετου. Εάν το εικονίδιο εφαρμογής δεν έχει καθοριστεί, θα χρησιμοποιηθεί αντ 'αυτού το favicon μιας βιτρίνας."
+
+msgctxt "Languages::mobile_app.we_also_have_a_mobile_app"
+msgid "We also have a mobile app"
+msgstr "Έχουμε επίσης μια εφαρμογή για κινητά"
+
+msgctxt "Languages::mobile_app.view_demo"
+msgid "View demo"
+msgstr "Προβολή Demo"
+
+msgctxt "Languages::mobile_app.open"
+msgid "Open"
+msgstr "Άνοιγμα"
+
+msgctxt "Languages::mobile_app.app_store_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://www.apple.com/app-store\" target=\"_blank\">App Store</a>. <br> For example, in https://apps.apple.com/us/app/multi-vendor-app-by-cs-cart/id1304872157 the ID is 1304872157."
+msgstr "Πάρτε το από τον σύνδεσμο εφαρμογής στο <a href=\"https://www.apple.com/app-store\" target=\"_blank\"> App Store </a>. <br> Για παράδειγμα, στη διεύθυνση https://apps.apple.com/us/app/multi-vendor-app-by-cs-cart/id1304872157 το αναγνωριστικό είναι 1304872157."
+
+msgctxt "Languages::mobile_app.google_play_app_id_tooltip"
+msgid "Take it from the application link in <a href=\"https://play.google.com/store\" target=\"_blank\">Google Play</a>. <br> For example, in https://play.google.com/store/apps/details?id=com.simtech.multivendor&hl=en_US the ID is com.simtech.multivendor."
+msgstr "Πάρτε το από τον σύνδεσμο εφαρμογής στο <a href=\"https://play.google.com/store\" target=\"_blank\"> Google Play </a>. <br> Για παράδειγμ στο  https://play.google.com/store/apps/details?id=com.simtech.multivendor&hl=en_US  είναι com.simtech.multivendor."
+
+msgctxt "Languages::mobile_app.mobile_yookassa"
+msgid "YooKassa"
 msgstr ""
 

@@ -4,9 +4,15 @@
     {$marketplace = "marketplace"}
 {/if}
 
+{if $settings.Security.secure_storefront === "YesNo::YES"|enum}
+    {$storefront_url = fn_url("", "SiteArea::STOREFRONT"|enum, "https")|replace:$config.customer_index:""|rtrim:"/"}
+{else}
+    {$storefront_url = fn_url("", "SiteArea::STOREFRONT"|enum, "http")|replace:$config.customer_index:""|rtrim:"/"}
+{/if}
+
 <div>
     <div class="well">
-        {__("commerceml.general_information.{$marketplace}", ["[http_location]" => "{$config.http_location}/commerceml"])}
+        {__("commerceml.general_information.{$marketplace}", ["[http_location]" => "{$storefront_url}/commerceml"])}
     </div>
 </div>
 
@@ -18,7 +24,7 @@
     </div>
     <div>
         {__("commerceml.step_1_instruction.{$marketplace}")}
-        <p>{__("commerceml.step_1_links", ["[docs_url]" => $config.resources.docs_guideline])}</p>
+        <p>{__("commerceml.step_1_links", ["[docs_url]" => $config.resources.docs_url])}</p>
     </div>
 </div>
 

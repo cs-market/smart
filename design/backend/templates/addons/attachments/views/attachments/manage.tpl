@@ -29,7 +29,24 @@
         {capture name="object_group"}
             {include file="addons/attachments/views/attachments/update.tpl" attachment=$a object_id=$object_id object_type=$object_type hide_inputs=$hide_inputs}
         {/capture}
-        {include file="common/object_group.tpl" content=$smarty.capture.object_group id=$a.attachment_id text=$a.description status=$a.status object_id_name="attachment_id" table="attachments" href_delete="attachments.delete?attachment_id=`$a.attachment_id`&object_id=`$object_id`&object_type=`$object_type`&redirect_url=`$redirect_url`" delete_target_id="attachments_list" header_text="{__("editing_attachment")}: `$a.description`" additional_class="cm-sortable-row cm-sortable-id-`$a.attachment_id`" id_prefix="_attachments_" prefix="attachments" hide_for_vendor=$hide_for_vendor skip_delete=$skip_delete no_table="true" link_text=$edit_link_text draggable=true}
+        {include file="common/object_group.tpl"
+            content=$smarty.capture.object_group
+            id=$a.attachment_id
+            text=$a.description
+            status=$a.status
+            object_id_name="attachment_id"
+            table="attachments"
+            href_delete="attachments.delete?attachment_id=`$a.attachment_id`&object_id=`$object_id`&object_type=`$object_type`&redirect_url=`$redirect_url`"
+            delete_target_id="attachments_list"
+            header_text="{__("editing_attachment")}: `$a.description`" additional_class="cm-sortable-row cm-sortable-id-`$a.attachment_id`"
+            id_prefix="_attachments_"
+            prefix="attachments"
+            hide_for_vendor=$hide_for_vendor
+            skip_delete=$skip_delete
+            no_table="true"
+            link_text=$edit_link_text
+            draggable=true
+        }
     {/foreach}
     </table>
 </div>

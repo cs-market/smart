@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.11.5/addons/vendor_plans.po\n"
-"X-Crowdin-File-ID: 3640\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_plans.po\n"
+"X-Crowdin-File-ID: 4156\n"
+"PO-Revision-Date: 2021-02-01 09:12\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -40,6 +40,14 @@ msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
 msgstr "Разрешить продавцам изменять выбранный план"
 
+msgctxt "SettingsOptions::vendor_plans::collect_taxes_from_vendors"
+msgid "Collect taxes from vendors"
+msgstr "Собирать налоги с продавцов"
+
+msgctxt "SettingsTooltips::vendor_plans::collect_taxes_from_vendors"
+msgid "Send collected taxes to the account of the marketplace."
+msgstr "Отправлять собранные налоги на счёт маркетплейса."
+
 msgctxt "Languages::vendor_plans.vendor_plans"
 msgid "Vendor plans"
 msgstr "Тарифные планы для продавцов"
@@ -55,6 +63,10 @@ msgstr "Отображает информацию о выбранном тари
 msgctxt "Languages::vendor_plans.plan"
 msgid "Plan"
 msgstr "Тарифный план"
+
+msgctxt "Languages::vendor_plans.plan_short"
+msgid "Plan"
+msgstr "План"
 
 msgctxt "Languages::vendor_plans.commission"
 msgid "Commission"
@@ -114,11 +126,11 @@ msgstr "Не удаётся выключить план, так как он ис
 
 msgctxt "Languages::vendor_plans.transaction_fee"
 msgid "Transaction fee"
-msgstr "Плата за транзацкию"
+msgstr "Плата за транзакцию"
 
 msgctxt "Languages::vendor_plans.fixed_transaction_fee"
 msgid "Transaction fee (abs)"
-msgstr "Плата за транзацкию (фикс.)"
+msgstr "Плата за транзакцию (фикс.)"
 
 msgctxt "Languages::vendor_plans.revenue"
 msgid "Revenue"
@@ -347,4 +359,20 @@ msgstr "Добавить продавца на витрины, доступны�
 msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
 msgid "Remove the vendor from the storefronts available in his previous plan"
 msgstr "Убрать продавца с витрин, которые были доступны в его предыдущем плане"
+
+msgctxt "Languages::vendor_plans.advanced_vendor_plan_creation"
+msgid "Advanced vendor plan creation"
+msgstr "Расширенное создание плана"
+
+msgctxt "Languages::vendor_plans.text_vendor_plan_created"
+msgid "A new vendor plan \"[plan_name]\" has been created. You can now <a href=\"[link]\">set restrictions for vendors using this plan</a>."
+msgstr "Создан новый тарифный план \"[plan_name]\". Теперь вы можете <a href=\"[link]\">задать ограничения для продавцов с этим планом</a>."
+
+msgctxt "Languages::vendor_plans.commission_fee"
+msgid "[commission]% fee"
+msgstr "Комиссия [commission]%"
+
+msgctxt "Languages::vendor_plans.default_vendor_plan"
+msgid "Default plan"
+msgstr "План по умолчанию"
 

@@ -50,7 +50,7 @@ function fn_check_field_type(value, tab_id)
         <input type="hidden" name="field_id" value="{$id}" />
 
         <div class="control-group">
-            <label for="elm_field_description" class="control-label cm-required">{__("description")}:</label>
+            <label for="elm_field_description" class="control-label cm-required">{__("name")}:</label>
             <div class="controls">
             <input id="elm_field_description" class="input-large" type="text" name="field_data[description]" value="{$field.description}" />
             </div>
@@ -74,14 +74,15 @@ function fn_check_field_type(value, tab_id)
 
         {if !$field_name}
             <div class="control-group">
-                <label for="elm_field_name" class="control-label cm-required">{__("profile_field_name")}{include file="common/tooltip.tpl" tooltip=__("profile_field_name_tooltip")}:</label>
+                <label for="elm_field_name" class="control-label cm-required">{__("code")}:</label>
                 <div class="controls">
                     <input id="elm_field_name" class="input-text-short" type="text" name="field_data[field_name]" value="{$field.field_name}" />
+                    <p class="muted description">{__("profile_field_name_tooltip")}</p>
                 </div>
             </div>
         {else}
             <div class="control-group">
-                <label class="control-label">{__("profile_field_name")}:</label>
+                <label class="control-label">{__("code")}:</label>
                 <div class="controls">
                     <span class="shift-input">{$field_name}</span>
                 </div>
@@ -115,6 +116,7 @@ function fn_check_field_type(value, tab_id)
                         <option value="{"ProfileFieldTypes::SELECT_BOX"|enum}" {if $field.field_type == "ProfileFieldTypes::SELECT_BOX"|enum}selected="selected"{/if}>{__("selectbox")}</option>
                         <option value="{"ProfileFieldTypes::TEXT_AREA"|enum}" {if $field.field_type == "ProfileFieldTypes::TEXT_AREA"|enum}selected="selected"{/if}>{__("textarea")}</option>
                         <option value="{"ProfileFieldTypes::EMAIL"|enum}" {if $field.field_type == "ProfileFieldTypes::EMAIL"|enum}selected="selected"{/if}>{__("email")}</option>
+                        <option value="{"ProfileFieldTypes::FILE"|enum}" {if $field.field_type == "ProfileFieldTypes::FILE"|enum}selected="selected"{/if}>{__("file")}</option>
                         {if $block_fields}
                             {* NOTE: Type "VENDOR_TERMS" cannot be created manually, but available for seller profile *}
                             <option value="{"ProfileFieldTypes::VENDOR_TERMS"|enum}" {if $field.field_type == "ProfileFieldTypes::VENDOR_TERMS"|enum}selected="selected"{/if}>{__("vendor_terms")}</option>
@@ -196,6 +198,17 @@ function fn_check_field_type(value, tab_id)
                 </div>
             </div>
         {/foreach}
+
+        {if $field.profile_type === "ProfileTypes::CODE_SELLER"|enum || $profile_type === "ProfileTypes::CODE_SELLER"|enum}
+            <div class="control-group">
+                <label class="control-label">{__("show_on_storefront")}:</label>
+                <div class="controls">
+                    <input type="hidden" name="field_data[storefront_show]" value="{if $field.field_name === "company"}{"YesNo::YES"|enum}{else}{"YesNo::NO"|enum}{/if}"/>
+                    <input type="checkbox" name="field_data[storefront_show]" value="{"YesNo::YES"|enum}" {if $field.storefront_show === "YesNo::YES"|enum || !$id}checked="checked"{/if} {if $field.field_name === "company"}disabled="disabled"{/if}/>
+                </div>
+            </div>
+        {/if}
+
         {hook name="profile_fields:profile_data"}
         {/hook}
     <!--content_tab_new_profile{$id}--></div>
@@ -255,10 +268,9 @@ function fn_check_field_type(value, tab_id)
 
 {/capture}
 
-{if !$id}
-    {$title = __("new_profile_field")}
-{else}
-    {$title_start = __("editing_profile_field")}
-    {$title_end = $field.description}
-{/if}
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$title content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($id) ? $field.description : __("new_profile_field")
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+}

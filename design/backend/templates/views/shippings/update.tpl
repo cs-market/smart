@@ -1,10 +1,12 @@
 {if $shipping}
-    {assign var="id" value=$shipping.shipping_id}
+    {$id=$shipping.shipping_id}
 {else}
-    {assign var="id" value=0}
+    {$id=0}
 {/if}
 
-{assign var="allow_save" value=$shipping|fn_allow_save_object:"shippings"}
+{$allow_save=$shipping|fn_allow_save_object:"shippings"}
+{$manual = "M"}
+{$realtime = "R"}
 
 <script type="text/javascript">
 (function(_, $) {
@@ -15,16 +17,6 @@
 
     $(document).ready(function() {
 
-        $('#sw_elm_rate_calculation_suffix_manual,#sw_elm_rate_calculation_suffix_realtime').on('change', function() {
-            var self = $(this);
-
-            if (self.prop('id') == 'sw_elm_rate_calculation_suffix_manual') {
-                $('#configure').hide();
-            } else {
-                $('#elm_service').trigger('change');
-            }
-        });
-
         $('#elm_carrier').on('change', function() {
             var self = $(this);
 
@@ -32,18 +24,29 @@
             var option = self.find('option:selected');
             var options = '';
 
+            if (option.data('caShippingModule') === '{$manual}') {
+                $('#elm_service_group').addClass('hidden');
+                $('#input_elm_rate_calculation').val('{$manual}');
+                $('#configure').hide();
+            } else if (option.data('caShippingModule') === 'store_locator') {
+                $('#elm_service_group').addClass('hidden');
+                $('#input_elm_rate_calculation').val('{$realtime}');
+            } else {
+                $('#elm_service_group').removeClass('hidden');
+                $('#input_elm_rate_calculation').val('{$realtime}');
+            }
+
             services.prop('length', 0);
             for (var k in services_data) {
-                if (services_data[k]['module'] == option.data('caShippingModule')) {
+                if (services_data[k]['module'] === option.data('caShippingModule')) {
                     options += '<option data-ca-shipping-code="' + services_data[k]['code'] +'" data-ca-shipping-module="' + services_data[k]['module'] + '" value="' + services_data[k]['service_id'] + '" ' + (services_data[k]['service_id'] == service_id ? 'selected="selected"' : '') + '>' + services_data[k]['description'] + '</option>';
                 }
             }
-           services.append(options);
-           services.trigger('change');
+            services.append(options);
+            services.trigger('change');
         });
 
         $('#elm_service').on('change', function() {
-
             var self = $(this);
             var option = self.find('option:selected');
             var tabReload = {
@@ -59,10 +62,10 @@
             var href = fn_url('shippings.configure?shipping_id={$id}&module=' + option.data('caShippingModule') + '&code=' + option.data('caShippingCode'));
             var tab = $('#configure');
 
-            if (tab.find('a').prop('href') != href) {
+            if (tab.find('a').prop('href') !== href) {
 
                 // Check if configure is active tab.
-                if($('[name="selected_section"]').val() == 'configure') {
+                if($('[name="selected_section"]').val() === 'configure') {
                     setTimeout(function() {
                         $('#configure a').click();
                     }, 100);
@@ -72,12 +75,11 @@
                 tab.find('a').prop('href', href);
             }
 
-            if($('#sw_elm_rate_calculation_suffix_realtime').is(':checked')) {
+            if ($('#input_elm_rate_calculation').val() === "{$realtime}") {
                 tab.show();
             }
         });
 
-        $('#elm_carrier').trigger('change');
     });
 }(Tygh, Tygh.$));
 </script>
@@ -85,12 +87,12 @@
 
 {capture name="mainbox"}
 
-<form action="{""|fn_url}" method="post" name="shippings_form" enctype="multipart/form-data" class="form-horizontal form-edit {if !$allow_save} cm-hide-inputs{/if}">
+<form action="{""|fn_url}" method="post" name="shippings_form" enctype="multipart/form-data" class="form-horizontal form-edit">
 <input type="hidden" name="shipping_id" value="{$id}" />
 
 {if $id}
 {capture name="tabsbox"}
-<div class="hidden" id="content_general">
+<div class="hidden{if !$allow_save} cm-hide-inputs{/if}" id="content_general">
 {/if}
 
 {include file="common/subheader.tpl" title=__("information") target="#acc_information"}
@@ -109,92 +111,86 @@
     </div>
 </div>
 
-<div class="control-group">
-    <label class="control-label">{__("rate_calculation")}:</label>
-    <div class="controls">
-        <label class="radio">
-            <input
-                type="radio"
-                name="shipping_data[rate_calculation]"
-                id="sw_elm_rate_calculation_suffix_manual"
-                value="M"
-                {if $shipping.rate_calculation == "M" || ! $shipping.rate_calculation}
-                    checked="checked"
-                {/if}
-                class="cm-switch-availability cm-switch-visibility cm-switch-inverse cm-enable-class"
-                data-ca-enable-class-target="#content_configure"
-                data-ca-enable-class-name="cm-skip-validation"
-            />
-            {__("rate_calculation_by_rate_area")}
-        </label>
+<input name="shipping_data[rate_calculation]" 
+    id="input_elm_rate_calculation"
+    type="hidden"
+    {if $shipping.rate_calculation === $manual || !$shipping.rate_calculation}
+        value="{$manual}"
+    {else}
+        value="{$realtime}"
+    {/if}
+/>
 
-        <label class="radio">
-            <input
-                type="radio"
-                name="shipping_data[rate_calculation]"
-                id="sw_elm_rate_calculation_suffix_realtime"
-                value="R"
-                {if $shipping.rate_calculation == "R"}
-                    checked="checked"
-                {/if}
-                class="cm-switch-availability cm-switch-visibility cm-disable-class"
-                data-ca-disable-class-target="#content_configure"
-                data-ca-disable-class-name="cm-skip-validation"
-            />
-            {__("rate_calculation_realtime")}
-        </label>
-    </div>
-</div>
-
-<div id="elm_rate_calculation" {if $shipping.rate_calculation != "R"}class="hidden"{/if}>
-
+<div id="elm_rate_calculation">
+    {if !$allow_save}
+        <input type="hidden" class="cm-no-hide-input" name="shipping_data[service_id]" value="{$shipping.service_id}" />
+    {/if}
     <div class="control-group">
-        <label class="control-label">{__("carrier")}:</label>
+        <label class="control-label">{__("rate_calculation")}:</label>
         <div class="controls">
-        <select name="shipping_data[carrier]" id="elm_carrier" {if $shipping.rate_calculation == "M" || !$id}disabled="disabled"{/if}>
-            {foreach from=$carriers key="module" item="carrier"}
-                <option data-ca-shipping-module="{$module}" {if $id && $services[$shipping.service_id].module == $module}selected="selected"{/if}>{$carrier}</option>
-            {/foreach}
+        <select name="shipping_data[carrier]" id="elm_carrier">
+           <optgroup label="{__("rate_calculation_manual_by_rate_area")}">
+                <option data-ca-shipping-module="{$manual}" {if $shipping.rate_calculation === $manual}selected="selected"{/if}>{__("rate_calculation_by_customer_address")}</option>
+                {foreach $carriers as $carrier_key => $carrier}
+                    {if ($carrier_key === "store_locator")}
+                        <option data-ca-shipping-module="store_locator"
+                            {if $id && $services[$shipping.service_id].module === "store_locator"}selected="selected"{/if}
+                        >
+                            {__("store_locator.pickup_from_store")}
+                        </option>
+                    {/if}
+                {/foreach}
+            </optgroup>
+            <optgroup label="{__("rate_calculation_realtime_automatic")}">
+                {foreach $carriers as $carrier_key => $carrier}
+                    {if ($carrier_key  !== "store_locator")}
+                        <option data-ca-shipping-module="{$carrier_key}" {if $id && $services[$shipping.service_id].module === $carrier_key}selected="selected"{/if}>{$carrier}</option>
+                    {/if}
+                {/foreach}
+            </optgroup>
         </select>
         {if fn_check_permissions("addons", "manage", "admin")}
             <div class="well well-small help-block">
-                {__("tools_addons_additional_shipping_methods", ["[url]" => "addons.manage?type=not_installed"|fn_url])}
+                {__("tools_addons_additional_shipping_methods_msg", ["[url]" => "addons.manage?type=not_installed"|fn_url])}
             </div>
         {/if}
         </div>
     </div>
 
-    <div class="control-group">
+    <div class="control-group {if $shipping.rate_calculation === $manual || !$shipping.rate_calculation || ($id && $services[$shipping.service_id].module === "store_locator")}hidden{/if}" id="elm_service_group">
         <label class="control-label">{__("shipping_service")}:</label>
         <div class="controls">
-        <select name="shipping_data[service_id]" id="elm_service" {if $shipping.rate_calculation == "M" || !$id}disabled="disabled"{/if}>
-        </select>
-
-        {if $allow_save}
-        <div>
-            <a id="sw_elm_test_rates" class="shift-left cm-combination">{__("calculate_shipping_cost")}</a>
-            <div id="elm_test_rates" class="shift-left hidden">
-                {__("weight")} ({$settings.General.weight_symbol})&nbsp;
-                <div class="input-append">
-                    <input id="elm_weight" type="text" class="input-mini" size="3" name="shipping_data[test_weight]" value="0" />
-                    <input type="hidden" name="result_ids" value="elm_shipping_test" />
-                    {include file="buttons/button.tpl" but_role="action" but_name="dispatch[shippings.test]" but_text=__("test") but_meta="cm-submit btn cm-skip-validation cm-ajax cm-form-dialog-opener"}
-                </div>
-            </div>
-        </div>
-        {/if}
+            <select name="shipping_data[service_id]" id="elm_service">
+                {foreach $services as $service}
+                    {if $service.module === $services[$shipping.service_id].module}
+                        <option data-ca-shipping-code="{$service.code}" 
+                            data-ca-shipping-module="{$service.module}" 
+                            value="{$service.service_id}"
+                            {if $service.service_id === $shipping.service_id} selected="selected"{/if}
+                        >
+                            {$service.description} 
+                        </option>
+                    {/if}
+                {/foreach}
+            </select>
         </div>
     </div>
-    <div id="elm_shipping_test" title="{__("test")}"></div>
 </div>
 
 <div class="control-group">
     <label class="control-label" for="elm_delivery_time">{__("delivery_time")}:</label>
     <div class="controls">
-    <input type="text" class="input-medium" name="shipping_data[delivery_time]" id="elm_delivery_time" size="30" value="{$shipping.delivery_time}" />
+        <input type="text" class="input-medium" name="shipping_data[delivery_time]" id="elm_delivery_time" size="30" value="{$shipping.delivery_time}" />
+        <p class="muted description">{__("tt_views_shippings_update_delivery_time")}</p>
     </div>
 </div>
 
+{include file="common/select_status.tpl" input_name="shipping_data[status]" id="elm_shipping_status" obj=$shipping}
+
+</fieldset>
+
+{include file="common/subheader.tpl" title=__("availability") target="#acc_availability"}
+<fieldset id="acc_availability" class="collapse in">
 <div class="control-group">
     <label class="control-label" for="elm_min_weight">{__("weight_limit")}&nbsp;({$settings.General.weight_symbol}):</label>
     <div class="controls">
@@ -205,7 +201,7 @@
 {hook name="shippings:update_shipping_vendor"}
 {if $allow_save}
     {if "MULTIVENDOR"|fn_allowed_for}
-        {assign var="zero_company_id_name_lang_var" value="none"}
+        {$zero_company_id_name_lang_var="none"}
     {/if}
     {include file="views/companies/components/company_field.tpl"
         name="shipping_data[company_id]"
@@ -216,48 +212,7 @@
 {/if}
 {/hook}
 
-{include file="common/select_status.tpl" input_name="shipping_data[status]" id="elm_shipping_status" obj=$shipping}
 
-</fieldset>
-
-{include file="common/subheader.tpl" title=__("extra") target="#acc_extra"}
-<fieldset id="acc_extra" class="collapse in">
-<div class="control-group">
-    <label class="control-label">{__("icon")}:</label>
-    <div class="controls">
-    {include file="common/attach_images.tpl" image_name="shipping" image_object_type="shipping" image_pair=$shipping.icon no_detailed="Y" hide_titles="Y" image_object_id=$id}
-    </div>
-</div>
-
-<div class="control-group">
-    <label class="control-label">{__("taxes")}:</label>
-    <div class="controls">
-            {foreach from=$taxes item="tax"}
-            <label class="checkbox inline" for="elm_shippings_taxes_{$tax.tax_id}">
-            <input type="checkbox" name="shipping_data[tax_ids][{$tax.tax_id}]" id="elm_shippings_taxes_{$tax.tax_id}" {if $tax.tax_id|in_array:$shipping.tax_ids}checked="checked"{/if} value="{$tax.tax_id}" />
-            {$tax.tax}</label>
-        {foreachelse}
-            &ndash;
-        {/foreach}
-    </div>
-</div>
-
-<div class="control-group">
-    <label class="control-label" for="elm_is_address_required"
-    >{__("is_address_required")}:</label>
-    <div class="controls">
-        <input type="hidden"
-               name="shipping_data[is_address_required]"
-               value="N"
-        />
-        <input type="checkbox"
-               name="shipping_data[is_address_required]"
-               id="is_address_required"
-               {if $shipping.is_address_required|default:"Y" == "Y"}checked="checked"{/if}
-               value="Y"
-        />
-    </div>
-</div>
 
 {hook name="shippings:update"}
 {/hook}
@@ -271,14 +226,6 @@
     </div>
 {/if}
 {include file="views/localizations/components/select.tpl" data_name="shipping_data[localization]" data_from=$shipping.localization}
-
-<div class="control-group">
-  <label class="control-label" for="free_shipping">{__("use_for_free_shipping")}:</label>
-  <div class="controls">
-    <input type="hidden" name="shipping_data[free_shipping]" value="N" />
-    <input type="checkbox" name="shipping_data[free_shipping]" id="free_shipping" {if $shipping.free_shipping == 'Y'}checked="checked"{/if} value="Y" />
-  </div>
-</div>
 
 {capture name="buttons"}
     {if $id}
@@ -309,19 +256,24 @@
     <input type="hidden" name="selected_section" value="general" />
     <!--content_general--></div>
 
-    <div class="hidden" id="content_configure">
+    <div class="hidden {if !$allow_save} cm-hide-inputs{/if}" id="content_configure">
     <!--content_configure--></div>
 
-    <div class="hidden" id="content_shipping_charges">
-    {include file="views/shippings/components/rates.tpl" id=$id shipping=$shipping}
+    <div class="hidden {if !$allow_save} cm-hide-inputs{/if}" id="content_shipping_charges">
+    {include file="views/shippings/components/rates.tpl" id=$id shipping=$shipping view_only=!$allow_save}
     <!--content_shipping_charges--></div>
 
+    <div class="hidden {if !$allow_save} cm-hide-inputs{/if}" id="content_additional_settings">
+        {include file="views/shippings/additional_settings.tpl"}
+    <!--content_additional_settings--></div>
+
+    <div class="hidden" id="content_rate_calculation">
+        {include file="views/shippings/calculate_cost.tpl"}
+    <!--content_rate_calculation--></div>
+
     {if fn_allowed_for("MULTIVENDOR:ULTIMATE")|| $is_sharing_enabled}
-        <div class="hidden" id="content_storefronts">
+        <div class="hidden {if !$allow_save} cm-hide-inputs{/if}" id="content_storefronts">
             {$add_storefront_text = __("add_storefronts")}
-            {if fn_allowed_for("ULTIMATE")}
-                {$add_storefront_text = __("add_companies")}
-            {/if}
             {include file="pickers/storefronts/picker.tpl"
                 multiple=true
                 input_name="shipping_data[storefront_ids]"
@@ -345,10 +297,9 @@
 </form>
 {/capture}{*mainbox*}
 
-{if !$id}
-    {assign var="title" value=__("new_shipping_method")}
-{else}
-    {$title_start = __("editing_shipping_method")}
-    {$title_end = $shipping.shipping}
-{/if}
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons select_languages=true}
+{include file="common/mainbox.tpl"
+    title=($id) ? $shipping.shipping : __("new_shipping_method")
+    content=$smarty.capture.mainbox
+    buttons=$smarty.capture.buttons
+    select_languages=true
+}

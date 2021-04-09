@@ -12,8 +12,8 @@
 
 {include file="common/pagination.tpl" div_id="pagination_contents_`$suffix`"}
 {if $votes}
-<div class="table-wrapper">
-  <table class="table">
+<div class="table-responsive-wrapper">
+  <table class="table table-middle table--relative table-responsive">
   <thead>
     <tr>
         <th>{__("date")}</th>
@@ -26,11 +26,11 @@
   <tbody>
   {foreach from=$votes item="vote"}
   <tr class="cm-row-item">
-         <td class="nowrap">{$vote.time|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
-         <td>{if $vote.user_id}{$vote.lastname}{if $vote.lastname && $vote.firstname}&nbsp;{/if}{$vote.firstname}{else}{__("anonymous")}{/if}</td>
-         <td>{$vote.ip_address}</td>
-         <td>{if $vote.type == "C"}{__("yes")}{else}{__("no")}{/if}</td>
-         <td>{include file="buttons/clone_delete.tpl" href_delete="pages.delete_vote?vote_id=`$vote.vote_id`" microformats="cm-post"}</td>
+         <td class="nowrap" data-th="{__("date")}">{$vote.time|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
+         <td data-th="{__("user")}">{if $vote.user_id}{$vote.lastname}{if $vote.lastname && $vote.firstname}&nbsp;{/if}{$vote.firstname}{else}{__("anonymous")}{/if}</td>
+         <td data-th="{__("ip")}">{$vote.ip_address}</td>
+         <td data-th="{__("completed")}">{if $vote.type == "C"}{__("yes")}{else}{__("no")}{/if}</td>
+         <td data-th="&nbsp;">{include file="buttons/clone_delete.tpl" href_delete="pages.delete_vote?vote_id=`$vote.vote_id`" microformats="cm-post"}</td>
   </tr>
   {/foreach}
   </tbody>

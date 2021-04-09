@@ -16,7 +16,11 @@ namespace Tygh\Addons\Warehouses;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Tygh\Addons\Warehouses\CommerceML\Importers\WarehouseImporter;
+use Tygh\Addons\Warehouses\CommerceML\Storages\WarehouseStorage;
 use Tygh\Tygh;
+use Tygh\Addons\Warehouses\CommerceML\Convertors\WarehouseConvertor;
+use Tygh\Addons\CommerceML\ServiceProvider as CommerceMLServiceProvider;
 
 /**
  * Class ServiceProvider is intended to register services and components of the "Warehouses" add-on to the application
@@ -42,6 +46,23 @@ class ServiceProvider implements ServiceProviderInterface
                 Manager::STORE_LOCATOR_TYPE_WAREHOUSE => __('warehouses.store_type_warehouse'),
             ];
         };
+
+        $app['addons.warehouses.commerceml.convertors.warehouse_convertor'] = static function () {
+            return new WarehouseConvertor();
+        };
+
+        $app['addons.warehouses.commerceml.storages.warehouse_storage'] = static function () {
+            $settings = CommerceMLServiceProvider::getImportSettings(fn_get_runtime_company_id());
+
+            /**
+             * @psalm-suppress PossiblyInvalidCast
+             */
+            return new WarehouseStorage((string) $settings['default_lang']);
+        };
+
+        $app['addons.warehouses.commerceml.importers.warehouse_importer'] = static function (Container $app) {
+            return new WarehouseImporter($app['addons.warehouses.commerceml.storages.warehouse_storage']);
+        };
     }
 
     /**
@@ -58,5 +79,21 @@ class ServiceProvider implements ServiceProviderInterface
     public static function getStoreTypes()
     {
         return Tygh::$app['addons.warehouses.store_types'];
+    }
+
+    /**
+     * @return \Tygh\Addons\Warehouses\CommerceML\Convertors\WarehouseConvertor
+     */
+    public static function getWarehouseConvertor()
+    {
+        return Tygh::$app['addons.warehouses.commerceml.convertors.warehouse_convertor'];
+    }
+
+    /**
+     * @return \Tygh\Addons\Warehouses\CommerceML\Importers\WarehouseImporter
+     */
+    public static function getWarehouseImporter()
+    {
+        return Tygh::$app['addons.warehouses.commerceml.importers.warehouse_importer'];
     }
 }

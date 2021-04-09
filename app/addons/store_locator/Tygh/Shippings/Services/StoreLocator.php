@@ -63,7 +63,14 @@ class StoreLocator implements IService, IPickupService
     public function prepareData($shipping_info)
     {
         $this->shipping_info = $shipping_info;
-        $this->company_id = Registry::get('runtime.company_id');
+
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $this->company_id = isset($shipping_info['keys']['company_id'])
+                ? $shipping_info['keys']['company_id']
+                : Registry::get('runtime.company_id');
+        } else {
+            $this->company_id = Registry::get('runtime.company_id');
+        }
     }
 
     /**
@@ -153,18 +160,13 @@ class StoreLocator implements IService, IPickupService
     {
         $fields['all'] = '*';
         $joins['store_location_descriptions'] = db_quote('LEFT JOIN ?:store_location_descriptions as descriptions ON locations.store_location_id = descriptions.store_location_id');
+        $conditions = [];
         $conditions['status'] = db_quote('locations.status = ?s AND descriptions.lang_code = ?s', 'A', CART_LANGUAGE);
         $conditions['destination_ids'] = db_quote('(?p)', fn_find_array_in_set([$destination_id], 'locations.pickup_destinations_ids', true));
         $conditions['main_destination_id'] = db_quote('main_destination_id IS NOT NULL');
 
         if (fn_allowed_for('MULTIVENDOR')) {
-            $group_key = isset($this->shipping_info['keys']['group_key']) ? $this->shipping_info['keys']['group_key'] : null;
-            if ($group_key !== null && isset(Tygh::$app['session']['cart']['product_groups'][$group_key]['company_id'])) {
-                $company_id = Tygh::$app['session']['cart']['product_groups'][$group_key]['company_id'];
-            } else {
-                $company_id = $this->company_id;
-            }
-            $conditions['company_id'] = db_quote('locations.company_id = ?i', $company_id);
+            $conditions['company_id'] = db_quote('locations.company_id = ?i', $this->company_id);
         }
 
         /**

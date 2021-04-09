@@ -115,14 +115,6 @@ if ($mode == 'phpinfo') {
     Tygh::$app['view']->display('common/quick_menu.tpl');
     exit;
 
-} elseif ($mode == 'update_quick_menu_handler') {
-    if (!empty($_REQUEST['enable'])) {
-        Settings::instance()->updateValue('show_menu_mouseover', $_REQUEST['enable']);
-
-        return array(CONTROLLER_STATUS_REDIRECT, 'tools.show_quick_menu.edit');
-    }
-    exit;
-
 } elseif ($mode == 'cleanup_history') {
     Tygh::$app['session']['last_edited_items'] = array();
     fn_save_user_additional_data('L', '');

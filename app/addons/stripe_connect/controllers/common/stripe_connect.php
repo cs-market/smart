@@ -14,6 +14,7 @@
 
 use Tygh\Addons\StripeConnect\Payments\StripeConnect;
 use Tygh\Common\OperationResult;
+use Tygh\Addons\StripeConnect\Logger;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -62,12 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
     try {
         $confirmation_result = $processor->getPaymentConfirmationDetails($params['payment_intent_id'], $total);
     } catch (Exception $e) {
-        fn_log_event('general', 'runtime', [
-            'message' => __('stripe_connect.payment_intent_error', [
-                '[payment_id]' => $payment_id,
-                '[error]' => $e->getMessage(),
-            ]),
-        ]);
+        Logger::log(Logger::ACTION_FAILURE, __('stripe_connect.payment_intent_error', [
+            '[payment_id]' => $payment_id,
+            '[error]' => $e->getMessage(),
+        ]));
     }
 
     if ($confirmation_result->isSuccess()) {

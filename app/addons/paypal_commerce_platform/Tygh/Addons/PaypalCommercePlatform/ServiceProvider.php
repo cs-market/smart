@@ -59,7 +59,10 @@ class ServiceProvider implements ServiceProviderInterface
                 $processor_params['secret'],
                 $processor_params['access_token'],
                 $processor_params['expiry_time'],
-                $processor_params['mode'] === 'test'
+                $processor_params['mode'] === 'test',
+                isset($processor_params['bn_code'])
+                    ? $processor_params['bn_code']
+                    : null
             );
 
             $company_id = Registry::get('runtime.company_id');

@@ -1,6 +1,15 @@
 {$post_max_size = $server_env->getIniVar("post_max_size")}
 {$upload_max_filesize = $server_env->getIniVar("upload_max_filesize")}
 
+{if $max_upload_filesize}
+    {if $post_max_size > $max_upload_filesize}
+        {$post_max_size = $max_upload_filesize}
+    {/if}
+    {if $upload_max_filesize > $max_upload_filesize}
+        {$upload_max_filesize = $max_upload_filesize}
+    {/if}
+{/if}
+
 <script type="text/javascript">
     (function(_, $) {
         $.extend(_, {
@@ -23,7 +32,7 @@
 
 {assign var="id_var_name" value="`$prefix`{$var_name|md5}"}
 
-<div class="ty-fileuploader cm-field-container">
+<div class="ty-fileuploader cm-fileuploader cm-field-container" {if $disabled_param}hidden disabled{/if}>
     <input type="hidden" id="{$label_id}" value="{if $images}{$id_var_name}{/if}" />
 
     {foreach from=$images key="image_id" item="image"}
@@ -67,8 +76,8 @@
 
         {strip}
         <div class="ty-fileuploader__file-link {if $multiupload != "Y" && $images}hidden{/if}" id="link_container_{$id_var_name}">
-            <input type="hidden" name="file_{$var_name}" value="{if $image_name}{$image_name}{/if}" id="file_{$id_var_name}" />
-            <input type="hidden" name="type_{$var_name}" value="{if $image_name}local{/if}" id="type_{$id_var_name}" />
+            <input type="hidden" name="file_{$var_name}" value="{if $image_name}{$image_name}{/if}" id="file_{$id_var_name}" class="cm-fileuploader-field" {if $disabled_param}disabled{/if}/>
+            <input type="hidden" name="type_{$var_name}" value="{if $image_name}local{/if}" id="type_{$id_var_name}" class="cm-fileuploader-field" {if $disabled_param}disabled{/if}/>
             <div class="ty-fileuploader__file-local upload-file-local">
                 <input type="file" class="ty-fileuploader__file-input" name="file_{$var_name}" id="local_{$id_var_name}" onchange="Tygh.fileuploader.show_loader(this.id); {if $multiupload == "Y"}Tygh.fileuploader.check_image(this.id);{else}Tygh.fileuploader.toggle_links(this.id, 'hide');{/if} Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');{if $location == 'cart'}$('#button_cart_save_file').click();{/if}" data-ca-empty-file="" onclick="Tygh.$(this).removeAttr('data-ca-empty-file');">
                 <a data-ca-multi="Y" {if !$images}class="hidden"{/if}>{$upload_another_file_text|default:__("upload_another_file")}</a><a data-ca-target-id="local_{$id_var_name}" data-ca-multi="N" class="ty-fileuploader__a{if $images} hidden{/if}">{$upload_file_text|default:__("upload_file")}</a>
@@ -78,7 +87,7 @@
                 <a onclick="Tygh.fileuploader.show_loader(this.id); {if $multiupload == "Y"}Tygh.fileuploader.check_image(this.id);{else}Tygh.fileuploader.toggle_links(this.id, 'hide');{/if} Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');" id="url_{$id_var_name}">{__("specify_url")}</a>
             {/if}
             {if $hidden_name}
-                <input type="hidden" name="{$hidden_name}" value="{$hidden_value}">
+                <input type="hidden" name="{$hidden_name}" id="hidden_input_{$id_var_name}" value="{$hidden_value}" class="cm-skip-avail-switch">
             {/if}
         </div>
         {/strip}

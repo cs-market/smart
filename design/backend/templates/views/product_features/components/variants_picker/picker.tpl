@@ -40,6 +40,17 @@
 {$enable_color = $enable_color|default:true}
 {$disabled = $disabled|default:false}
 
+{$predefined_variants = $predefined_variants|default:[]}
+{$predefined_variant_items = []}
+
+{if $show_empty_variant}
+    {$predefined_variants["0"] = $empty_variant_text}
+{/if}
+
+{foreach $predefined_variants as $id => $variant}
+    {$predefined_variant_items[] = ["id" => $id, "text" => $variant, "data" => ["name" => $variant]]}
+{/foreach}
+
 {if $multiple && $show_advanced}
     {$empty_variant_text = $empty_variant_text|default:__("type_to_search")}
 {else}
@@ -64,7 +75,7 @@
                     data-ca-object-picker-autofocus="{$autofocus|to_json}"
                     data-ca-object-picker-close-on-select="{$close_on_select|to_json}"
                     data-ca-object-picker-autoopen="{$autoopen}"
-                    data-ca-object-picker-placeholder="{$empty_variant_text|escape:"javascript"}"
+                    data-ca-object-picker-placeholder="{$empty_variant_text}"
                     data-ca-object-picker-placeholder-value=""
                     data-ca-object-picker-search-request-data="{$search_data|to_json}"
                     data-ca-object-picker-width="{$width}"
@@ -84,6 +95,9 @@
                     {/if}
                     {if $enable_permanent_placeholder}
                         data-ca-object-picker-enable-permanent-placeholder="true"
+                    {/if}
+                    {if $predefined_variant_items}
+                        data-ca-object-picker-predefined-variants="{$predefined_variant_items|array_reverse|to_json}"
                     {/if}
             >
                 <option value="">-{__("none")}-</option>

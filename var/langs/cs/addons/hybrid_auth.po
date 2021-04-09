@@ -6,9 +6,11 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.11.3/addons/hybrid_auth.po\n"
-"PO-Revision-Date: 2020-02-04 07:11\n"
+"X-Crowdin-File: /release-4.12.2/addons/hybrid_auth.po\n"
+"X-Crowdin-File-ID: 4084\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
@@ -252,5 +254,9 @@ msgstr ""
 
 msgctxt "Languages::hybrid_auth.linkedin_api_v2"
 msgid "v2"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.instruction_paypal_application"
+msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
 msgstr ""
 

@@ -12,6 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProductFeatures;
 use Tygh\Enum\ProfileTypes;
 use Tygh\Registry;
@@ -54,15 +55,17 @@ function fn_block_products_disable_cache($block_data)
  *
  * @return array An array of companies
  */
-function fn_blocks_get_vendors($params = array())
+function fn_blocks_get_vendors(array $params = [])
 {
-    $params['company_id'] = empty($params['item_ids']) ? array() : fn_explode(',', $params['item_ids']);
+    $params['company_id'] = empty($params['item_ids']) ? [] : fn_explode(',', $params['item_ids']);
 
-    $params['extend'] = array(
-        'products_count' => empty($params['block_data']['properties']['show_products_count']) ? 'N' : $params['block_data']['properties']['show_products_count'],
+    $products_count = !empty($params['block_data']['properties']['show_products_count'])
+        && YesNo::toBool($params['block_data']['properties']['show_products_count']);
+    $params['extend'] = [
+        'products_count' => $products_count,
         'logos'          => true,
         'placement_info' => true,
-    );
+    ];
 
     $displayed_vendors = empty($params['block_data']['properties']['displayed_vendors']) ? 0 : $params['block_data']['properties']['displayed_vendors'];
 
@@ -81,10 +84,14 @@ function fn_blocks_get_vendors($params = array())
     list($companies,) = fn_get_companies($params, Tygh::$app['session']['auth'], $displayed_vendors);
 
     if ($companies) {
-        $companies = fn_array_combine(fn_array_column($companies, 'company_id'), $companies);
+        foreach ($companies as $key => $company_data) {
+            $companies[$key] = fn_filter_company_data_by_profile_fields($company_data);
+        }
+
+        $companies = fn_array_combine(array_column($companies, 'company_id'), $companies);
     }
 
-    return array($companies);
+    return [$companies];
 }
 
 /**
@@ -447,4 +454,66 @@ function fn_blocks_get_brands($value, $block, $schema)
     }
 
     return $variants;
+}
+
+function fn_blocks_menu_get_request_hash(array $block, array $request, array $server)
+{
+    $menu_id = isset($block['content']['menu']) ? (int) $block['content']['menu'] : null;
+
+    if (!$menu_id || empty($request['dispatch'])) {
+        return null;
+    }
+
+    $menu_items_depedncies = fn_menu_get_menu_items_dependencies($menu_id);
+
+    $depedncies = [
+        'dispatch' => null,
+        'request'  => null,
+        'runtime'  => [],
+    ];
+
+    if (Registry::get('runtime.controller_status') !== CONTROLLER_STATUS_NO_PAGE) {
+        $dispatch_requests = [];
+
+        if (isset($menu_items_depedncies['request'][$request['dispatch']])) {
+            $dispatch_requests = $menu_items_depedncies['request'][$request['dispatch']];
+            $dispatch = $request['dispatch'];
+        } else {
+            $request_uri = parse_url($server['REQUEST_URI'], PHP_URL_PATH);
+
+            if (isset($menu_items_depedncies['request'][$request_uri])) {
+                $dispatch_requests = $menu_items_depedncies['request'][$request_uri];
+                $dispatch = $request_uri;
+            }
+        }
+
+        foreach ($dispatch_requests as $dispatch_request) {
+            $is_request_equal = true;
+
+            foreach ($dispatch_request as $request_key => $request_value) {
+                if (
+                    isset($request[$request_key])
+                    && ($request[$request_key] == $request_value || $request_value === '*')
+                ) {
+                    $dispatch_request[$request_key] = $request[$request_key];
+                    continue;
+                }
+
+                $is_request_equal = false;
+                break;
+            }
+
+            if ($is_request_equal) {
+                $depedncies['dispatch'] = $dispatch;
+                $depedncies['request'] = $dispatch_request;
+                break;
+            }
+        }
+    }
+
+    foreach ($menu_items_depedncies['runtime'] as $key) {
+        $depedncies['runtime'] = array_merge($depedncies['runtime'], [$key => Registry::get('runtime.' . $key)]);
+    }
+
+    return md5(serialize($depedncies));
 }

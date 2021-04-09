@@ -21,7 +21,9 @@
                id="sha_sign"
                size="60"
                value="{$processor_params.sha_sign}"
+               autocomplete="new-password"
         />
+        <p class="muted description">{__("ttc_ogone.sha_in")}</p>
     </div>
 </div>
 
@@ -34,6 +36,7 @@
                size="60"
                value="{$processor_params.sha_sign_out}"
         />
+        <p class="muted description">{__("ttc_ogone_web.sha_out")}</p>
     </div>
 </div>
 

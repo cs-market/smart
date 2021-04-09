@@ -89,8 +89,13 @@ function fn_get_feedback_data($mode)
     $fdata['general']['sales_reports'] = db_get_field("SELECT COUNT(*) FROM ?:sales_reports");
     $fdata['general']['sales_tables'] = db_get_field("SELECT COUNT(*) FROM ?:sales_reports_tables");
 
-    $fdata['general']['layouts'] = db_get_field("SELECT COUNT(*) FROM ?:bm_layouts WHERE 1 $company_condition");
-    $fdata['general']['locations'] = db_get_field("SELECT COUNT(*) FROM ?:bm_locations WHERE layout_id IN (SELECT layout_id FROM ?:bm_layouts WHERE is_default = 1 $company_condition)");
+    $layouts = db_get_field("SELECT COUNT(*) FROM ?:bm_layouts WHERE 1 $company_condition");
+    $fdata['general']['layouts'] = $layouts ? $layouts : 0;
+
+    $locations = db_get_field('SELECT COUNT(*) FROM ?:bm_locations ' .
+        "WHERE layout_id  IN (SELECT layout_id FROM ?:bm_layouts WHERE is_default = 1 $company_condition)");
+    $fdata['general']['locations'] = $locations ? $locations : 0;
+
     $fdata['general']['current_theme'] = db_get_field("SELECT theme_name FROM ?:bm_layouts WHERE is_default = 1 $company_condition");
     $fdata['general']['current_style'] = db_get_field("SELECT style_id FROM ?:bm_layouts WHERE is_default = 1 $company_condition");
     $fdata['general']['pages'] = db_get_field("SELECT COUNT(*) FROM ?:pages");
@@ -99,9 +104,10 @@ function fn_get_feedback_data($mode)
         /**
          * Get feedback data
          *
-         * @param array $fdata Feedback data
+         * @param array  $fdata Feedback data
+         * @param string $mode  Dispatch mode
          */
-        fn_set_hook('get_feedback_data', $fdata);
+        fn_set_hook('get_feedback_data', $fdata, $mode);
 
         // Localizations
         $fdata['general']['localizations'] = db_get_field("SELECT COUNT(*) FROM ?:localizations WHERE status='A'");
@@ -171,7 +177,6 @@ function fn_get_feedback_data($mode)
     $fdata['products_stat']['options'] = db_get_field("SELECT COUNT(*) FROM ?:product_options");
     $fdata['products_stat']['global_options'] = db_get_field("SELECT COUNT(*) FROM ?:product_options WHERE product_id='0'");
     $fdata['products_stat']['option_variants'] = db_get_field("SELECT COUNT(*) FROM ?:product_option_variants");
-    $fdata['products_stat']['options_inventory'] = db_get_field("SELECT COUNT(*) FROM ?:product_options_inventory");
     $fdata['products_stat']['configurable'] = db_get_field("SELECT COUNT(*) FROM ?:products WHERE product_type = 'C'");
     $fdata['products_stat']['edp'] = db_get_field("SELECT COUNT(*) FROM ?:products WHERE is_edp = 'Y'");
     $fdata['products_stat']['free_shipping'] = db_get_field("SELECT COUNT(*) FROM ?:products WHERE free_shipping = 'Y'");
@@ -194,7 +199,21 @@ function fn_get_feedback_data($mode)
     unset($item);
 
     // Addon options
-    $allowed_addons = array('access_restrictions', 'affiliate', 'discussion', 'gift_certificates', 'gift_registry', 'google_sitemap', 'barcode', 'polls', 'quickbooks', 'reward_points', 'rma', 'seo', 'tags');
+    $allowed_addons = [
+        'access_restrictions',
+        'affiliate',
+        'discussion',
+        'gift_certificates',
+        'gift_registry',
+        'google_sitemap',
+        'barcode',
+        'polls',
+        'quickbooks',
+        'reward_points',
+        'rma',
+        'seo',
+        'tags'
+    ];
 
     if (is_array($fdata['addons'])) {
         foreach ($fdata['addons'] as $k => $data) {
@@ -355,7 +374,7 @@ function fn_check_feedback_value($value)
             $value[$k] = fn_check_feedback_value($v);
         }
     } else {
-        $pattern = "/([\w-+=_]+(?:\.[\w-+=_]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)/i";
+        $pattern = '/([-+=_\w]+(?:\.[-+=_\w]+)*)@((?:[-\w]+\.)*\w[\w\-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)/i';
         if (preg_match_all($pattern, $value, $matches)) {
             $value = preg_replace($pattern, '[email]', $value);
         }

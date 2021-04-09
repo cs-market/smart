@@ -165,6 +165,7 @@
                                 <option value="{$destination.destination_id}" {if $store_location.main_destination_id === $destination.destination_id}selected{/if}>{$destination.destination}</option>
                             {/foreach}
                         </select>
+                        <p class="muted description">{__("tt_addons_store_locator_views_store_locator_update_store_locator.main_destination")}</p>
                     </div>
                 </div>
 
@@ -185,6 +186,7 @@
                                 />{$destination.destination}
                             </label>
                         {/foreach}
+                        <p class="muted description">{__("tt_addons_store_locator_views_store_locator_update_store_locator.show_to")}</p>
                     </div>
                 </div>
             {/if}
@@ -218,12 +220,10 @@
 {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox track=true}
 {/capture}
 
-{if $id}
-    {$title_start = __('editing_store_location')}
-    {$title_end = $store_location.name}
-{else}
-    {$title = __("new_store_location")}
-{/if}
-
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$title content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($id) ? $store_location.name : __("new_store_location")
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+}
 {script src="js/addons/store_locator/destinations.js"}

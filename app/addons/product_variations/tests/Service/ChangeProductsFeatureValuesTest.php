@@ -4,6 +4,7 @@
 namespace Tygh\Tests\Unit\Addons\ProductVariations\Service;
 
 
+use Tygh\Addons\ProductVariations\Product\CombinationsGenerator;
 use Tygh\Addons\ProductVariations\Product\FeaturePurposes;
 use Tygh\Addons\ProductVariations\Product\Group\Group;
 use Tygh\Addons\ProductVariations\Product\Group\GroupCodeGenerator;
@@ -40,6 +41,9 @@ class ChangeProductsFeatureValuesTest extends ATestCase
 
     /** @var \Tygh\Addons\ProductVariations\Product\ProductIdMap|\PHPUnit_Framework_MockObject_MockObject */
     protected $product_id_map;
+
+    /** @var \Tygh\Addons\ProductVariations\Product\CombinationsGenerator|\PHPUnit_Framework_MockObject_MockObject */
+    protected $combination_generator;
 
     /**
      * @inheritDoc
@@ -84,6 +88,10 @@ class ChangeProductsFeatureValuesTest extends ATestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->combination_generator = $this->getMockBuilder(CombinationsGenerator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->service = new Service(
             $this->group_repository,
             $this->group_code_generator,
@@ -91,6 +99,7 @@ class ChangeProductsFeatureValuesTest extends ATestCase
             $this->identity_map_repository,
             $this->sync_service,
             $this->product_id_map,
+            $this->combination_generator,
             false, false, false
         );
 

@@ -46,7 +46,6 @@ class ImportFileProductTest extends ATestCase
         $this->requireCore('functions/fn.fs.php');
         $this->requireCore('functions/fn.users.php');
         $this->requireCore('functions/fn.database.php');
-        $this->requireCore('functions/fn.catalog.php');
 
         $this->log = $this->getMockBuilder('Tygh\Commerceml\Logs')
             ->setMethods(array())

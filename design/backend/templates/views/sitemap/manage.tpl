@@ -19,7 +19,7 @@
                 additional_class="cm-sortable-row cm-sortable-id-`$section.section_id`"
                 no_table=true
                 is_view_link=false
-                header_text="{__("editing_sitemap_section")}: `$section.section`"
+                header_text=$section.section
                 draggable=true}
         {/foreach}
         </table>

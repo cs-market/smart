@@ -5,7 +5,7 @@
          data-ca-sortable-table="store_location_destination_links"
          data-ca-sortable-id-name="link_id"
     >
-        <div class="table-wrapper">
+        <div class="table-responsive-wrapper">
             <table class="table table-responsive">
                 <thead>
                     <tr>

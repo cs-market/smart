@@ -46,6 +46,7 @@ class ProductImporterTest extends StorageBasedTestCase
     protected function setUp()
     {
         $this->requireMockFunction('__');
+        $this->requireMockFunction('fn_set_hook');
 
         parent::setUp();
     }
@@ -58,6 +59,7 @@ class ProductImporterTest extends StorageBasedTestCase
         $this->loadEntities($import_storage);
 
         $product1 = new ProductDto();
+        $product1->is_creatable = true;
         $product1->id = new IdDto('0d9efc08-d695-11e8-8324-b010418127da');
         $product1->product_code = 'P005';
         $product1->status = ObjectStatuses::DISABLED;
@@ -125,7 +127,7 @@ class ProductImporterTest extends StorageBasedTestCase
                 'USD_1'                                                                     => 'USD',
                 'Без НДС2'                                                                  => 11
             ],
-            $import_storage->getImportEntityMapRepository()->getMap()
+            $import_storage->getImportEntityMapRepository()->getIdMap()
         );
 
         $this->assertEquals(
@@ -156,7 +158,7 @@ class ProductImporterTest extends StorageBasedTestCase
                     ],
                     'en' => [
                         'product' => 'Тайтсы GIVOVA SLIM EN',
-                        'description' => 'description'
+                        'full_description' => 'description'
                     ]
                 ],
             ],

@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Common\OperationResult;
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\ProductFeatures;
 use Tygh\Registry;
 
@@ -39,7 +41,64 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-   
+    if (
+        $mode === 'm_create_by_features'
+        && !empty($_REQUEST['feature_ids'])
+        && is_array($_REQUEST['feature_ids'])
+    ) {
+        $created_filter_count = 0;
+        $runtime_company_id = fn_get_runtime_company_id();
+
+        foreach ($_REQUEST['feature_ids'] as $feature_id) {
+            $feature_data = fn_get_product_feature_data($feature_id);
+            if (!$feature_data) {
+                continue;
+            }
+
+            $result = OperationResult::wrap(
+                static function () use ($feature_data, $runtime_company_id) {
+                    $filter_data = [
+                        'filter'          => $feature_data['description'],
+                        'filter_type'     => 'FF-' . $feature_data['feature_id'],
+                        'categories_path' => $feature_data['categories_path'],
+                    ];
+                    if (fn_allowed_for('ULTIMATE')) {
+                        $filter_data['company_id'] = $runtime_company_id ?: $feature_data['company_id'];
+                    }
+
+                    return fn_update_product_filter($filter_data, 0);
+                }
+            );
+
+
+            if ($result->isSuccess()) {
+                $created_filter_count++;
+            }
+        }
+
+        $messages = [];
+        if ($created_filter_count) {
+            $messages[] = __('text_n_filters_created', ['[n]' => $created_filter_count]);
+        }
+
+        if ($created_filter_count !== count($_REQUEST['feature_ids'])) {
+            $messages[] = __('error_n_filters_already_exists', ['[n]' => count($_REQUEST['feature_ids']) - $created_filter_count]);
+        }
+
+        if ($messages) {
+            fn_set_notification(NotificationSeverity::NOTICE, __('notice'), implode(' ', $messages));
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('product_features.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+    }
 
     if(!empty($_REQUEST['return_url'])) {
         $return_url = $_REQUEST['return_url'];

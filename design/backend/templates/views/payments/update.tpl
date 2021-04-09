@@ -15,10 +15,8 @@
     <ul class="nav nav-tabs">
         <li id="tab_details_{$id}" class="cm-js active"><a>{__("general")}</a></li>
         <li id="tab_conf_{$id}" class="cm-js cm-ajax {if !$payment.processor_id}hidden{/if}"><a {if $payment.processor_id}href="{"payments.processor?payment_id=`$id`"|fn_url}"{/if}>{__("configure")}</a></li>
-        {if fn_allowed_for("MULTIVENDOR:ULTIMATE")}
+        {if fn_allowed_for("MULTIVENDOR:ULTIMATE") || $is_sharing_enabled}
             <li id="tab_storefronts_{$id}" class="cm-js"><a>{__("storefronts")}</a></li>
-        {elseif $is_sharing_enabled}
-            <li id="tab_storefronts_{$id}" class="cm-js"><a>{__("share")}</a></li>
         {/if}
         {hook name="payments:tabs_list"}
         {/hook}
@@ -71,8 +69,8 @@
                         {__("tools_addons_additional_payment_methods", ["[url]" => "addons.manage?type=not_installed"|fn_url])}
                     </div>
                 {/if}
-                <p id="elm_processor_description_{$id}" class="description {if !$payment_processors[$payment.processor_id].description}hidden{/if}"><br>
-                    <small>{$payment_processors[$payment.processor_id].description nofilter}</small>
+                <p id="elm_processor_description_{$id}" class="muted description {if !$payment_processors[$payment.processor_id].description}hidden{/if}">
+                    {$payment_processors[$payment.processor_id].description nofilter}
                 </p>
             </div>
         </div>
@@ -88,6 +86,7 @@
                         {/if}
                     {/foreach}
                 </select>
+                <p class="muted description">{__("tt_views_payments_update_template")}</p>
             </div>
         </div>
 
@@ -122,20 +121,22 @@
             <label class="control-label" for="elm_payment_surcharge_title_{$id}">{__("surcharge_title")}:</label>
             <div class="controls">
                 <input id="elm_payment_surcharge_title_{$id}" type="text" name="payment_data[surcharge_title]" value="{$payment.surcharge_title}">
+                <p class="muted description">{__("tt_views_payments_update_surcharge_title")}</p>
             </div>
         </div>
 
         <div class="control-group" data-ca-form-group="taxes">
         <label class="control-label">{__("taxes")}:</label>
             <div class="controls">
-                    {foreach from=$taxes item="tax"}
-                        <label for="elm_payment_taxes_{$tax.tax_id}" class="checkbox">
-                            <input type="checkbox" name="payment_data[tax_ids][{$tax.tax_id}]" id="elm_payment_taxes_{$tax.tax_id}" {if $tax.tax_id|in_array:$payment.tax_ids}checked="checked"{/if} value="{$tax.tax_id}">
-                            {$tax.tax}
-                        </label>
-                    {foreachelse}
-                        <div class="text-type-value">&mdash;</div>
-                    {/foreach}
+                {foreach from=$taxes item="tax"}
+                    <label for="elm_payment_taxes_{$tax.tax_id}" class="checkbox">
+                        <input type="checkbox" name="payment_data[tax_ids][{$tax.tax_id}]" id="elm_payment_taxes_{$tax.tax_id}" {if $tax.tax_id|in_array:$payment.tax_ids}checked="checked"{/if} value="{$tax.tax_id}">
+                        {$tax.tax}
+                    </label>
+                {foreachelse}
+                    <div class="text-type-value">&mdash;</div>
+                {/foreach}
+                {if fn_allowed_for("MULTIVENDOR")}<p class="muted description">{__("tt_views_payments_update_taxes")}</p>{/if}
             </div>
         </div>
 
@@ -168,9 +169,6 @@
     {if fn_allowed_for("MULTIVENDOR:ULTIMATE")|| $is_sharing_enabled}
         <div class="hidden" id="content_tab_storefronts_{$id}">
             {$add_storefront_text = __("add_storefronts")}
-            {if fn_allowed_for("ULTIMATE")}
-                {$add_storefront_text = __("add_companies")}
-            {/if}
             {include file="pickers/storefronts/picker.tpl"
                 multiple=true
                 input_name="payment_data[storefront_ids]"

@@ -15,6 +15,7 @@
 use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -343,7 +344,7 @@ if ($mode == 'add') {
 
     $fields2update = $selected_fields['data'];
 
-    $data_search_fields = implode($fields2update, ', ');
+    $data_search_fields = implode(', ', $fields2update);
 
     if (!empty($data_search_fields)) {
         $data_search_fields = ', ' . $data_search_fields;
@@ -460,6 +461,7 @@ if ($mode == 'add') {
     $company_id = Registry::get('runtime.company_id');
     $item_template = empty($_REQUEST['template']) ? 'categories_select2_item' : trim($_REQUEST['template'], '.\\/');
     $objects = array();
+    $restricted_by_ids = isset($_REQUEST['restricted_by_ids']) ? array_filter((array) $_REQUEST['restricted_by_ids']) : null;
     $category_ids = null;
     
     if (isset($_REQUEST['ids'])) {
@@ -479,6 +481,9 @@ if ($mode == 'add') {
             'items_per_page'    => $items_per_page,
         );
 
+        if ($restricted_by_ids) {
+            $params['category_ids'] = fn_get_category_ids_with_parent((array) $restricted_by_ids);
+        }
 
         list($categories, $params) = fn_get_categories($params, $lang_code);
 
@@ -491,13 +496,22 @@ if ($mode == 'add') {
         $objects = array_values(array_map(function ($category) use ($view, $company_id, $item_template) {
             $view->assign('category', $category);
 
+            $parents_path = [];
+            foreach ($category['parents'] as $parent) {
+                $parents_path[] = $parent['category'];
+            }
+
             return array(
                 'id' => $category['category_id'],
                 'text' => $category['category'],
                 'data' => array(
-                    'name' => $view->fetch("views/categories/components/{$item_template}.tpl"),
-                    'disabled' => $company_id && !empty($category['company_id']) && $company_id != $category['company_id'],
-                    'content' => $view->fetch("views/categories/components/{$item_template}.tpl")
+                    'id'            => $category['category_id'],
+                    'company'       => $category['company'],
+                    'parents_path'  => implode(' / ', $parents_path),
+                    'url'           => fn_url('categories.update?category_id=' . $category['category_id']),
+                    'name'          => $category['category'],
+                    'disabled'      => $company_id && !empty($category['company_id']) && $company_id !== (int) $category['company_id'],
+                    'content'       => $view->fetch("views/categories/components/{$item_template}.tpl")
                 )
             );
         }, $categories_data));

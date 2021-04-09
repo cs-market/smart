@@ -48,7 +48,7 @@
                 {if $runtime.company_id || $runtime.forced_company_id}
                     <ul class="nav">
                         <li class="dropdown">
-                            <a href="{"companies.update?company_id=`$runtime.company_data.company_id`"|fn_url}">{__("vendor")}: {$runtime.company_data.company}</a>
+                            <a href="{"companies.update?company_id=`$runtime.company_data.company_id`"|fn_url}">{__("storefront")}: {$runtime.company_data.company}</a>
                         </li>
                     </ul>
                 {/if}
@@ -68,7 +68,8 @@
                     {if $auth.user_type == "UserTypes::ADMIN"|enum}
                         {$storefront_url = fn_url("profiles.act_as_user?user_id={$auth.user_id}&area=C")}
                     {else}
-                        {$storefront_url = fn_url("", "C")}
+                        {$storefront_url = ($runtime.company_id) ? "companies.products?company_id={$runtime.company_id}" : ""}
+                        {$storefront_url = fn_url($storefront_url, "C")}
                         {if $runtime.storefront_access_key}
                             {$storefront_url = $storefront_url|fn_link_attach:"store_access_key={$runtime.storefront_access_key}"}
                         {/if}
@@ -108,20 +109,25 @@
 
                 {foreach from=$navigation.static.top key=first_level_title item=m name="first_level_top"}
                     <li class="dropdown dropdown-top-menu-item{if $first_level_title == $navigation.selected_tab} active{/if} navigate-items">
-                        <a id="elm_menu_{$first_level_title}" href="#" class="dropdown-toggle {$first_level_title}">
+                        <a id="elm_menu_{$first_level_title}" href="{if $m.href}{$m.href|fn_url}{else}#{/if}" class="dropdown-toggle {$first_level_title}">
                             {__($first_level_title)}
-                            <b class="caret"></b>
+                            {if $m.items}
+                                <b class="caret"></b>
+                            {/if}
                         </a>
+                        {if $m.items}
                         <ul class="dropdown-menu">
                             {foreach from=$m.items key=second_level_title item="second_level" name="sec_level_top"}
                                 <li class="{if $second_level.subitems}dropdown-submenu{/if}{if $second_level_title == $navigation.subsection} active{/if} {if $second_level.is_promo}cm-promo-popup{/if} {$second_level.attrs.class}" {menu_attrs attrs=$second_level.attrs.main}>
                                     {if $second_level.type == "title"}
-                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}" {if $second_level.attrs.class_href}class="{$second_level.attrs.class_href}"{/if} {menu_attrs attrs=$second_level.attrs.href}>
+                                        {if $second_level.subitems}<div class="dropdown-submenu__link-overlay"></div>{/if}
+                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}" class="{if $second_level.subitems}dropdown-submenu__link{/if} {if $second_level.attrs.class_href}{$second_level.attrs.class_href}{/if}" {menu_attrs attrs=$second_level.attrs.href}>
                                             {$second_level.title|default:__($second_level_title)}
                                             {if $second_level.attrs.class == "is-addon"}<span><i class="icon-is-addon"></i></span>{/if}
                                         </a>
                                     {elseif $second_level.type != "divider"}
-                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}" {if $second_level.attrs.class_href}class="{$second_level.attrs.class_href}"{/if} href="{$second_level.href|fn_url}" {menu_attrs attrs=$second_level.attrs.href}>
+                                        {if $second_level.subitems}<div class="dropdown-submenu__link-overlay"></div>{/if}
+                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}" class="{if $second_level.subitems}dropdown-submenu__link{/if} {if $second_level.attrs.class_href}{$second_level.attrs.class_href}{/if}" href="{$second_level.href|fn_url}" {menu_attrs attrs=$second_level.attrs.href}>
                                             {$second_level.title|default:__($second_level_title)}
                                             {if $second_level.attrs.class == "is-addon"}<span><i class="icon-is-addon"></i></span>{/if}
                                         </a>
@@ -134,7 +140,9 @@
                                                     {if $sm.type == "title"}
                                                         {__($subitem_title)}
                                                     {elseif $sm.type != "divider"}
-                                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}_{$subitem_title}" href="{$sm.href|fn_url}" {menu_attrs attrs=$sm.attrs.href}>{$sm.title|default:__($subitem_title)}</a>
+                                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}_{$subitem_title}" {if $sm.attrs.class}class="{$sm.attrs.class}"{/if} href="{$sm.href|fn_url}" {menu_attrs attrs=$sm.attrs.href}>{$sm.title|default:__($subitem_title)}
+                                                            {if $sm.attrs.class == "is-addon"}<span><i class="icon-is-addon"></i></span>{/if}
+                                                        </a>
                                                     {/if}
                                                 </li>
                                                 {elseif $sm.type == "divider"}
@@ -149,6 +157,7 @@
                                 {/if}
                             {/foreach}
                         </ul>
+                        {/if}
                     </li>
                 {/foreach}
             {/if}
@@ -232,11 +241,13 @@
         <!--quick search-->
         <div class="search pull-right">
             {hook name="index:global_search"}
-                <form id="global_search" method="get" action="{""|fn_url}">
+                <form id="global_search" method="get" action="{""|fn_url}" class="search__form">
                     <input type="hidden" name="dispatch" value="search.results" />
                     <input type="hidden" name="compact" value="Y" />
-                    <button class="icon-search cm-tooltip " type="submit" title="{__("search_tooltip")}" id="search_button"></button>
-                    <label for="gs_text"><input type="text" class="cm-autocomplete-off" id="gs_text" name="q" value="{$smarty.request.q}" /></label>
+                    <label for="gs_text" class="search__group">
+                        <input type="text" class="cm-autocomplete-off search__input" id="gs_text" name="q" placeholder="{__("search")}" value="{$smarty.request.q}" />
+                        <button class="btn search__button" type="submit" id="search_button"></button>
+                    </label>
                 </form>
             {/hook}
 
@@ -254,85 +265,15 @@
 
                 <button class="btn btn-primary mobile-visible-inline mobile-menu-closer">{__("close")}</button>
 
-                {if "ULTIMATE"|fn_allowed_for}
-                    <!-- title of heading -->
-                    <p class="menu-heading__title-block ult">
-                        <span class="menu-heading__title-block--text">
-                            {if $auth.company_id}
-                                <span>{$runtime.company_data.company}</span>
-                            {else}
-                                {if fn_check_view_permissions("companies.manage", "GET")}
-                                    <span>{$name|truncate:60:"...":true}</span>
-                                {/if}
-                            {/if}
-                            {if $storefront_status_icon}<i class="{$storefront_status_icon}"></i>{/if}
-                            <span class="caret"></span>
-                        </span>
-                    </p>
-                {/if}
 
-                {if "MULTIVENDOR"|fn_allowed_for && !$runtime.simple_ultimate}
-                    <!-- title of heading (if multivendor edition) -->
-                    <p class="menu-heading__title-block mve">
-                        <span class="menu-heading__title-block--text">
-                            <span>{$company_name}</span>
-                            <a href="{"storefronts.manage"|fn_url}">
-                                <i class="{$storefront_status_icon}"></i>
-                            </a>
-                            <span class="caret"></span>
-                        </span>
-                    </p>
-                {/if}
+                <!-- title of heading -->
+                <div class="menu-heading__title-block">
+                    <span class="menu-heading__title-text">{$user_info.email}</span>
+                    <span class="caret menu-heading__title-caret"></span>
+                </div>
 
                 <div class="menu-heading__dropdowned closed">
                 <ul class="dropdown-menu menu-heading__dropdowned-menu">
-                    {* select vendor *}
-                    {if "MULTIVENDOR"|fn_allowed_for && !$runtime.simple_ultimate}
-                        <li class="divider"></li>
-                        {if $auth.company_id}
-                            <li class="dropdown" data-disable-dropdown-processing="true">
-                                <a href="{"companies.update?company_id=`$runtime.company_id`"|fn_url}">{__("vendor")}: {$runtime.company_data.company}</a>
-                            </li>
-                        {else}
-                            {if fn_check_view_permissions("companies.get_companies_list", "GET")}
-                                <li class="dropdown" data-disable-dropdown-processing="true">
-                                    <a
-                                        class="unedited-element mobile-menu--js-companies-popup"
-                                        data-ca-selector-href="companies.get_companies_list?show_all=Y&action=href&render_html=N"
-                                        data-ca-selector-elements="20"
-                                        data-ca-selector-start="0"
-                                    >{$company_name}</a>
-                                </li>
-                            {else}
-                                <li class="dropdown" data-disable-dropdown-processing="true">
-                                    <a class="unedited-element">{$company_name}</a>
-                                </li>
-                            {/if}
-                        {/if}
-                    {/if}
-                    {* end select vendor *}
-
-                    {* select store *}
-                    {if "ULTIMATE"|fn_allowed_for}
-                        {if $runtime.companies_available_count > 1}
-                            {if fn_check_view_permissions("companies.get_companies_list", "GET")}
-                                <li class="dropdown" data-disable-dropdown-processing="true">
-                                    <a
-                                        class="unedited-element mobile-menu--js-companies-popup"
-                                        data-ca-selector-href="companies.get_companies_list?show_all=Y&action=href&render_html=N"
-                                        data-ca-selector-elements="20"
-                                        data-ca-selector-start="0"
-                                    >{$name}</a>
-                                </li>
-                            {else}
-                                <li class="dropdown" data-disable-dropdown-processing="true">
-                                    <a class="unedited-element">{$name}</a>
-                                </li>
-                            {/if}
-                        {/if}
-                    {/if}
-                    {* end select store *}
-
                     {* user menu *}
                     <li class="disabled">
                         <a><strong>{__("signed_in_as")}</strong><br>{$user_info.email}</a>
@@ -404,7 +345,9 @@
                     </a>
                     <ul class="dropdown-menu">
                         {foreach from=$m.items key=second_level_title item="second_level" name="sec_level"}
-                            <li class="{$second_level_title}{if $second_level.subitems} dropdown-submenu{/if}{if $second_level_title == $navigation.subsection && $first_level_title == $navigation.selected_tab} active{/if}" {menu_attrs attrs=$second_level.attrs.main}><a class="{if $second_level.is_promo}cm-promo-popup{/if} {$second_level.attrs.class}" {if !$second_level.is_promo}href="{$second_level.href|fn_url}"{/if} {menu_attrs attrs=$second_level.attrs.href}>
+                            <li class="{$second_level_title}{if $second_level.subitems} dropdown-submenu{/if}{if $second_level_title == $navigation.subsection && $first_level_title == $navigation.selected_tab} active{/if}" {menu_attrs attrs=$second_level.attrs.main}>
+                                {if $second_level.subitems}<div class="dropdown-submenu__link-overlay"></div>{/if}
+                                <a class="{if $second_level.is_promo}cm-promo-popup{/if} {if $second_level.subitems}dropdown-submenu__link{/if} {$second_level.attrs.class}" {if !$second_level.is_promo}href="{$second_level.href|fn_url}"{/if} {menu_attrs attrs=$second_level.attrs.href}>
                                 <span>{__($second_level_title)}{if $second_level.attrs.class == "is-addon"}<i class="icon-is-addon"></i>{/if}</span>
                                 {if __($second_level.description) != "_`$second_level_title`_menu_description"}{if $settings.Appearance.show_menu_descriptions == "Y"}<span class="hint">{__($second_level.description)}</span>{/if}{/if}</a>
 
@@ -506,24 +449,3 @@
     <div class="overlayed-mobile-menu-container"></div>
 </div>
 {* End of template for mobile sidebar menu *}
-
-{* Dummy containers for store/vendor selector *}
-<div class="hidden store-vendor-selector--dummy-dialog"></div>
-
-<ul class="hidden store-vendor-selector--list-container">
-    <input
-        class="store-vendor-selector--search cm-ajax-content-input"
-        type="text"
-        value=""
-        placeholder="{__("search")}"
-    />
-    <div class="store-vendor-selector--list-wrapper-container">
-        <ul class="store-vendor-selector--list-wrapper"></ul>
-    </div>
-</ul>
-<li class="hidden store-vendor-selector--list-element">
-    <a class="store-vendor-selector--list-element-link" href="#"></a>
-</li>
-<button class="hidden btn btn-primary store-vendor-selector--show-more-btn">{__("more")}</button>
-<span class="hidden store-vendor-selector--list-element-storefront-status"><i class="icon-lock dropdown-menu__item-icon"></i></span>
-{* Dummy containers for store/vendor selector *}

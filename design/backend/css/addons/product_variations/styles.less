@@ -42,18 +42,6 @@
 
         &-link {
             max-width: none;
-
-            &-tooltip {
-                display: inline-block;
-                line-height: 1;
-                padding: 9px;
-            }
-
-            &-description {
-                display: inline-block;
-                margin-left: 5px;
-                margin-bottom: 15px;                
-            }
         }
 
         .add-on&-addon {
@@ -98,6 +86,7 @@
 
     // Variations container
     &__container {
+        padding-top: 0;
         padding-bottom: 100px;
     }
 
@@ -158,23 +147,37 @@
             display: flex;
             justify-content: flex-end;
     
-            &--main {
-    
+            @media (max-width: @TabletBreakpoint + 1) {
+                justify-content: flex-start;
             }
         }
 
         &-name {
             min-width: 150px;
             white-space: nowrap;
+
+            &--text, &--link {
+                white-space: normal;
+
+                @media (max-width: @TabletBreakpoint + 1) {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: block;
+                } 
+            }
+
+            @media (max-width: @TabletBreakpoint + 1) {
+                table-layout: fixed;
+            }
+        }
+
+        &-code {
+            min-width: 150px;
         }
 
         &-feature {
             min-width: 80px;
             white-space: nowrap;
-        }
-
-        &-code {
-            min-width: 150px;
         }
 
         &-price {
@@ -233,6 +236,22 @@
             display: none;
         }
     }
+
+    &__generator {
+        .product-assign-features__row {
+            display: flex;
+            align-items: center;
+
+            .object-selector {
+                margin-bottom: 0;
+            }
+
+            >* {
+                margin-left: 8px;
+                margin-right: 8px;
+            }
+        }
+    }
 }
 
 .product-variations-convert-summary {
@@ -248,4 +267,33 @@
 .cm-hide-inputs .product-variations__toolbar-left .object-selector {
     width: auto;
     margin-top: 5px;
+}
+
+.object-picker--product-variations-features {
+    .select2-search__field {
+        margin-bottom: 0;
+        width: 100% !important;
+    }
+}
+.object-picker__select-group--feature-variants {
+    .object-picker__simple {
+        .select2-search__field {
+            width: 100% !important;
+        }
+
+        .select2-selection__choice {
+            margin-top: 5px;
+            margin-left: 5px;
+            margin-right: 0;
+        }
+    }
+}
+
+.combinations-table {
+    &__parent-combination {
+        td {
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+    }
 }

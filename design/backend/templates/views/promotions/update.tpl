@@ -232,6 +232,20 @@ function fn_promotion_rebuild_mixed_data(items, value, id, element_id, condition
                             }
                         {/if}
 
+                        <div class="control-group id="promo_image">
+                            <label class="control-label">{__("image")}</label>
+                            <div class="controls">
+                                {include file="common/attach_images.tpl"
+                                    image_name="promo_main"
+                                    image_object_type="promotion"
+                                    image_pair=$promotion_data.image
+                                    image_object_id=$id
+                                    no_detailed=true
+                                    hide_titles=true
+                                }
+                            </div>
+                        </div>
+
                         <div class="control-group">
                             <label class="control-label" for="elm_use_avail_period">{__("use_avail_period")}:</label>
                             <div class="controls">
@@ -277,11 +291,22 @@ function fn_promotion_rebuild_mixed_data(items, value, id, element_id, condition
                             </div>
                         </div>
 
+                        {if $promotion_data.stop == "YesNo::YES"|enum}
+                            <div class="control-group">
+                                <label class="control-label" for="elm_promotion_stop">{__("stop_following_rules")}</label>
+                                <div class="controls">
+                                    <input type="hidden" name="promotion_data[stop]" value="{"YesNo::NO"|enum}" />
+                                    <input type="checkbox" name="promotion_data[stop]" id="elm_promotion_stop" value="{"YesNo::YES"|enum}" {if $promotion_data.stop == "YesNo::YES"|enum}checked="checked"{/if}/>
+                                </div>
+                            </div>
+                        {/if}
+
                         <div class="control-group">
                             <label class="control-label" for="elm_promotion_stop">{__("stop_other_rules")}</label>
                             <div class="controls">
-                                <input type="hidden" name="promotion_data[stop]" value="N" />
-                                <input type="checkbox" name="promotion_data[stop]" id="elm_promotion_stop" value="Y" {if $promotion_data.stop == "Y"}checked="checked"{/if}/>
+                                <input type="hidden" name="promotion_data[stop_other_rules]" value="{"YesNo::NO"|enum}" />
+                                <input type="checkbox" name="promotion_data[stop_other_rules]" id="elm_promotion_stop_other_rules" value="{"YesNo::YES"|enum}" {if $promotion_data.stop_other_rules == "YesNo::YES"|enum}checked="checked"{/if}/>
+                                <p class="muted description">{__("tt_views_promotions_update_stop_other_rules")}</p>
                             </div>
                         </div>
 
@@ -307,9 +332,6 @@ function fn_promotion_rebuild_mixed_data(items, value, id, element_id, condition
             {if fn_allowed_for("MULTIVENDOR:ULTIMATE")|| $is_sharing_enabled}
                 <div class="hidden" id="content_storefronts">
                     {$add_storefront_text = __("add_storefronts")}
-                    {if fn_allowed_for("ULTIMATE")}
-                        {$add_storefront_text = __("add_companies")}
-                    {/if}
                     {include file="pickers/storefronts/picker.tpl"
                         multiple=true
                         input_name="promotion_data[storefront_ids]"
@@ -352,10 +374,9 @@ function fn_promotion_rebuild_mixed_data(items, value, id, element_id, condition
     {/capture}
 {/capture}
 
-{if !$id}
-    {$title = __("new_promotion")}
-{else}
-    {$title_start = __("editing_promotion")}
-    {$title_end = $promotion_data.name}
-{/if}
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$title content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($id) ? $promotion_data.name : __("new_promotion")
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+}

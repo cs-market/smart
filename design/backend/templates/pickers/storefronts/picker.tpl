@@ -69,8 +69,9 @@
     {/if}
 
     {if $multiple}
-        <div class="table-wrapper">
-            <table width="100%" class="table table-middle table--relative">
+        <div class="clearfix"></div>
+        <div class="table-responsive-wrapper">
+            <table width="100%" class="table table-middle table--relative table-responsive table-responsive-w-titles">
             <thead>
             <tr>
                 <th width="100%">
@@ -90,7 +91,7 @@
 
     {if $multiple}
         <tr class="hidden">
-            <td colspan="2">
+            <td colspan="2" data-th="&nbsp;">
     {/if}
     <input id="a{$data_id}_ids"
            type="hidden"
@@ -146,7 +147,7 @@
                    {if $item_ids}class="hidden"{/if}
             >
             <tr class="no-items">
-                <td colspan="2">
+                <td colspan="2" data-th="&nbsp;">
                     <p>
                         {$no_item_text|default:__("no_items") nofilter}
                     </p>

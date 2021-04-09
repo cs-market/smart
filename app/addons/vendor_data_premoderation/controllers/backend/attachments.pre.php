@@ -14,11 +14,12 @@
 
 use Tygh\Enum\Addons\VendorDataPremoderation\ProductStatuses;
 use Tygh\Enum\NotificationSeverity;
-use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Tools\Url;
 
 defined('BOOTSTRAP') or die('Access denied');
+
+/** @var string $mode Dispatch mode */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $object_id = isset($_REQUEST['object_id'])
@@ -44,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($mode === 'update') {
-        if (fn_vendor_data_premoderation_product_requires_approval($company_data)) {
+        $current_status = fn_vendor_data_premoderation_get_current_product_statuses([$object_id])[$object_id];
+        if (fn_vendor_data_premoderation_product_requires_approval($company_data, false, $current_status)) {
             $is_premoderation_required = fn_vendor_data_premoderation_request_approval_for_products([$object_id]);
         }
     }

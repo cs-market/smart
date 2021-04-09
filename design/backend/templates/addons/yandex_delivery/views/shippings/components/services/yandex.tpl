@@ -89,6 +89,7 @@
                     <option value="{$city}" {if $shipping.service_params.city_from == $city}selected="selected"{/if}>{$city}</option>
                 {/foreach}
             </select>
+            <p class="muted description">{__("ttc_yandex_delivery.city_from")}</p>
         </div>
     </div>
 
@@ -113,6 +114,7 @@
         <label for="logging" class="control-label" >{__("yandex_delivery.logging")}:</label>
         <div class="controls">
             <input type="checkbox" name="shipping_data[service_params][logging]" id="logging" value="Y" {if $shipping.service_params.logging == 'Y'} checked="checked"{/if}/>
+            <p class="muted description">{__("ttc_yandex_delivery.logging")}</p>
         </div>
     </div>
 

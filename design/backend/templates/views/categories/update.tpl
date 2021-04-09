@@ -167,16 +167,21 @@
 
 <div id="content_views">
     <div id="extra">
-        <div class="control-group">
-            <label class="control-label" for="elm_category_product_layout">{__("product_details_view")}:</label>
-            <div class="controls">
-            <select id="elm_category_product_layout" name="category_data[product_details_view]">
-                {foreach from="category"|fn_get_product_details_views key="layout" item="item"}
-                    <option {if $category_data.product_details_view == $layout}selected="selected"{/if} value="{$layout}">{$item}</option>
-                {/foreach}
-            </select>
+        {component
+            name="product.layout_input"
+            object="category"
+            id=$category_data.category_id|default:0
+            value=$category_data.product_details_view|default:"default"
+            input_name="category_data[product_details_view]"
+            company_id=$category_data.company_id
+        }
+            <div class="control-group">
+                <label class="control-label" for="elm_details_layout">{__("product_details_view")}:</label>
+                <div class="controls">
+                    #INPUT#
+                </div>
             </div>
-        </div>
+        {/component}
 
         <div class="control-group">
             <label class="control-label" for="elm_category_use_custom_templates">{__("use_custom_view")}:</label>
@@ -273,27 +278,12 @@
     {/hook}
 {/capture}
 
-{if !$id}
-    {include
-        file="common/mainbox.tpl"
-        title=__("new_category")
-        sidebar=$smarty.capture.sidebar
-        sidebar_position="left"
-        content=$smarty.capture.mainbox
-        buttons=$smarty.capture.buttons
-    }
-{else}
-    {include
-        file="common/mainbox.tpl"
-        sidebar=$smarty.capture.sidebar
-        sidebar_position="left"
-        title_start=__("editing_category")
-        title_end=$category_data.category
-        content=$smarty.capture.mainbox
-        select_languages=true
-        buttons=$smarty.capture.buttons
-        adv_buttons=$smarty.capture.adv_buttons
-    }
-{/if}
-
-
+{include file="common/mainbox.tpl"
+    sidebar=$smarty.capture.sidebar
+    sidebar_position="left"
+    title=($id) ? $category_data.category : __("new_category")
+    content=$smarty.capture.mainbox
+    select_languages=(bool) $id
+    buttons=$smarty.capture.buttons
+    adv_buttons=$smarty.capture.adv_buttons
+}

@@ -13,6 +13,8 @@
  ****************************************************************************/
 
 use Tygh\Enum\OutOfStockActions;
+use Tygh\Http;
+use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -187,4 +189,74 @@ function fn_geo_maps_check_amount_in_stock_before_check($product_id, $amount, $p
     if (!empty($cart['geo_maps_shipping_estimation'])) {
         $product['out_of_stock_actions'] = OutOfStockActions::BUY_IN_ADVANCE;
     }
+}
+
+/**
+ * The 'yandex_delivery_v3_modify_pickup_points' hook handler.
+ *
+ * Actions performed:
+ *      - Sorts pickup points from nearest to furthest to customer location
+ *
+ * @param array<int, array<string, array<string, string>>>    $pickup_points Array of pickup points info.
+ * @param array<string, array<string, array<string, string>>> $shipping_info Information about shipping method.
+ *
+ * @see \Tygh\Shippings\Services\YandexDelivery::processPickupPoints()
+ */
+function fn_geo_maps_yandex_delivery_v3_modify_pickup_points(array &$pickup_points, array $shipping_info)
+{
+    $package_info = $shipping_info['package_info'];
+    $address = empty($package_info['location']['address'])
+        ? ''
+        : $package_info['location']['address'];
+    $city = empty($package_info['location']['city'])
+        ? ''
+        : $package_info['location']['city'];
+    if (empty($city) && empty($address)) {
+        return;
+    }
+    $full_address = $address . '+' . $city;
+    $key = md5($full_address);
+    $response = fn_get_session_data($key);
+    if (empty($response)) {
+        $url = 'https://geocode-maps.yandex.ru/1.x/';
+        $settings = Registry::get('addons.geo_maps');
+        $data = [
+            'geocode' => $full_address,
+            'format' => 'json',
+            'results' => 2,
+            'sco' => 'longlat',
+            'apikey' => isset($settings['yandex_api_key']) ? $settings['yandex_api_key'] : '',
+        ];
+
+        $response = Http::get($url, $data);
+        $response = json_decode($response, true);
+        $response = isset($response['response']['GeoObjectCollection'])
+            ? $response['response']['GeoObjectCollection']
+            : null;
+        if ($response) {
+            fn_set_session_data($key, $response);
+        }
+    }
+    $customer_coords = false;
+    if ($response && $response['metaDataProperty']['GeocoderResponseMetaData']['found'] > 0) {
+        $object = reset($response['featureMember']);
+        $object = $object['GeoObject'];
+
+        $customer_coords = explode(' ', $object['Point']['pos']);
+    }
+    /** @var array{longitude, latitude} $customer_coords */
+    if (!$customer_coords) {
+        return;
+    }
+    foreach ($pickup_points as &$pickup_point) {
+        $pickup_point['distance_to_customer'] = sqrt(
+            (($pickup_point['address']['latitude'] - $customer_coords[1]) ** 2)
+            + (($pickup_point['address']['longitude'] - $customer_coords[0]) ** 2)
+        );
+    }
+    unset($pickup_point);
+    /** @psalm-suppress InvalidScalarArgument */
+    uasort($pickup_points, static function ($first, $second) {
+        return $first['distance_to_customer'] > $second['distance_to_customer'];
+    });
 }

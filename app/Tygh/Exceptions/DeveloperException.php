@@ -16,9 +16,12 @@ namespace Tygh\Exceptions;
 
 class DeveloperException extends AException
 {
-    public static function undefinedCacheLevel()
+    /**
+     * @param string $cache_level Cache level
+     */
+    public static function undefinedCacheLevel($cache_level)
     {
-        self::throwException('Registry: undefined cache level');
+        self::throwException(sprintf('Registry: undefined cache level %s', $cache_level));
     }
 
     public static function hookHandlerIsNotCallable($func)

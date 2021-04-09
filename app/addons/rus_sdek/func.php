@@ -532,7 +532,7 @@ function fn_sdek_calculate_tax_sum($tax_type, $price)
  */
 function fn_rus_sdek_get_cities_post($params, $items_per_page, $lang_code, &$cities)
 {
-    $cities_ids = fn_array_column($cities, 'city_id');
+    $cities_ids = array_column($cities, 'city_id');
 
     if ($cities_ids) {
         $sdek_ids = db_get_hash_multi_array(

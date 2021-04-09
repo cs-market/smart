@@ -14,13 +14,7 @@
         <div class="control-group{if $option.control_group_meta} {$option.control_group_meta}{/if}">
             <label for="{$option_id}" class="control-label">
                 {strip}
-                    {__($option.title)}
-                    {if $option.description}
-                        {include file="common/tooltip.tpl"
-                                 tooltip=__($option.description, $option.description_params|default:[])
-                        }
-                    {/if}
-                    :
+                    {__($option.title)}:
                 {/strip}
             </label>
             <div class="controls">
@@ -34,7 +28,7 @@
                     />
                 {elseif $option.type == "input"}
                     {if $option.option_template}
-                        {include file=$option.option_template option=$option field_name_prefix=$field_name_prefix}
+                        {include file=$option.option_template option=$option field_name_prefix=$field_name_prefix option_id=$option_id}
                     {else}
                         <input id="{$option_id}"
                                class="input-large"
@@ -54,7 +48,11 @@
                 {/if}
 
                 {if $option.notes}
-                    <p class="muted">{$option.notes nofilter}</p>
+                    <p class="muted description">{$option.notes nofilter}</p>
+                {/if}
+
+                {if $option.description}
+                    <p class="muted description">{__($option.description, $option.description_params|default:[])}</p>
                 {/if}
             </div>
         </div>

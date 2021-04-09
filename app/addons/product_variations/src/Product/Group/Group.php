@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************************
  *                                                                          *
  *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
@@ -178,11 +179,45 @@ class Group
     }
 
     /**
+     * @param int $feature_id
+     *
+     * @return \Tygh\Addons\ProductVariations\Product\Group\GroupFeature|null
+     */
+    public function getFeature($feature_id)
+    {
+        return $this->features->getFeature($feature_id);
+    }
+
+    /**
      * @return array
      */
     public function getFeatureIds()
     {
         return $this->features->getFeatureIds();
+    }
+
+    /**
+     * @return array
+     */
+    public function getFeaturesVariantIds()
+    {
+        return $this->products->getFeaturesVariantIds();
+    }
+
+    /**
+     * @return \Tygh\Addons\ProductVariations\Product\Group\GroupFeatureValueCollection
+     */
+    public function getFeatureValues()
+    {
+        $collection = new GroupFeatureValueCollection();
+
+        foreach ($this->products as $group_product) {
+            foreach ($group_product->getFeatureValues() as $feature_value) {
+                $collection->addFeatureValue($feature_value);
+            }
+        }
+
+        return $collection;
     }
 
     /**
@@ -547,6 +582,16 @@ class Group
     public function clearEvents()
     {
         $this->events = [];
+    }
+
+    /**
+     * @param \Tygh\Addons\ProductVariations\Product\Group\GroupFeatureValue $feature_value
+     *
+     * @return bool
+     */
+    public function hasFeatureValue(GroupFeatureValue $feature_value)
+    {
+        return $this->products->hasFeatureValue($feature_value);
     }
 
     /**

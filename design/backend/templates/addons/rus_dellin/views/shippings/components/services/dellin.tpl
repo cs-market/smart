@@ -8,24 +8,27 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="login">{__("shipping.rus_dellin.login")} {include file="common/tooltip.tpl" tooltip=__("shipping.rus_dellin.login.tooltip")}:</label>
+    <label class="control-label" for="login">{__("shipping.rus_dellin.login")}:</label>
     <div class="controls">
         <input id="login" type="text" name="shipping_data[service_params][login]" size="30" value="{$shipping.service_params.login}"/>
+        <p class="muted description">{__("shipping.rus_dellin.login.tooltip")}</p>
     </div>
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="password">{__("shipping.rus_dellin.password")} {include file="common/tooltip.tpl" tooltip=__("shipping.rus_dellin.password.tooltip")}:</label>
+    <label class="control-label" for="password">{__("shipping.rus_dellin.password")}:</label>
     <div class="controls">
         <input id="password" type="text" name="shipping_data[service_params][password]" size="30" value="{$shipping.service_params.password}"/>
+        <p class="muted description">{__("shipping.rus_dellin.password.tooltip")}</p>
     </div>
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="individual_calculator">{__("shipping.rus_dellin.individual_calculator")} {include file="common/tooltip.tpl" tooltip=__("shipping.rus_dellin.individual_calculator.tooltip")}:</label>
+    <label class="control-label" for="individual_calculator">{__("shipping.rus_dellin.individual_calculator")}:</label>
     <div class="controls">
         <input type="hidden" name="shipping_data[service_params][individual_calculator]" value="N" />
         <input type="checkbox" name="shipping_data[service_params][individual_calculator]" value="Y" {if $shipping.service_params.individual_calculator == "Y"}checked="checked"{/if} />
+        <p class="muted description">{__("shipping.rus_dellin.individual_calculator.tooltip")}</p>
     </div>
 </div>
 
@@ -56,22 +59,24 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="small_delivery">{__("shipping.rus_dellin.small_delivery")} {include file="common/tooltip.tpl" tooltip=__("shipping.rus_dellin.small_delivery.tooltip")}:</label>
+    <label class="control-label" for="small_delivery">{__("shipping.rus_dellin.small_delivery")}:</label>
     <div class="controls">
         <select name="shipping_data[service_params][small_delivery]" id="small_delivery">
             <option value="0" {if $shipping.service_params.small_delivery == '0'} selected="selected"{/if}>{__("no")}</option>
             <option value="1" {if $shipping.service_params.small_delivery == '1'} selected="selected"{/if}>{__("yes")}</option>
         </select>
+        <p class="muted description">{__("shipping.rus_dellin.small_delivery.tooltip")}</p>
     </div>
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="express_delivery">{__("shipping.rus_dellin.express_delivery")} {include file="common/tooltip.tpl" tooltip=__("shipping.rus_dellin.express_delivery.tooltip")}:</label>
+    <label class="control-label" for="express_delivery">{__("shipping.rus_dellin.express_delivery")}:</label>
     <div class="controls">
         <select name="shipping_data[service_params][express_delivery]" id="express_delivery">
             <option value="0" {if $shipping.service_params.express_delivery == '0'} selected="selected"{/if}>{__("no")}</option>
             <option value="1" {if $shipping.service_params.express_delivery == '1'} selected="selected"{/if}>{__("yes")}</option>
         </select>
+        <p class="muted description">{__("shipping.rus_dellin.express_delivery.tooltip")}</p>
     </div>
 </div>
 

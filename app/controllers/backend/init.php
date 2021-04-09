@@ -137,6 +137,7 @@ if (fn_allowed_for('ULTIMATE')) {
 
 // Navigation is passed in view->display method to allow its modification in controllers
 Tygh::$app['view']->assign('quick_menu', fn_get_quick_menu_data());
+Tygh::$app['view']->assign('is_bottom_panel_available', fn_is_bottom_panel_available($auth));
 
 
 // update request history
@@ -154,6 +155,7 @@ if (!defined('AJAX_REQUEST')) {
         'dispatch' => $current_dispatch,
         'params' => $_REQUEST
     );
+    Tygh::$app['view']->assign('current_dispatch', $current_dispatch);
 }
 
 // generate breadcrumbs
@@ -276,6 +278,9 @@ Tygh::$app['view']->assign('store_mode', $store_mode);
 Tygh::$app['view']->assign('product_state_suffix', $product_state_suffix);
 Tygh::$app['view']->assign('store_mode_number_of_storefronts', count(fn_get_all_companies_ids()));
 Tygh::$app['view']->assign('store_mode_allowed_number_of_storefronts', fn_get_storage_data('allowed_number_of_stores'));
+Tygh::$app['view']->assign('hash_of_available_countries', fn_get_hash_of_available_countries());
+Tygh::$app['view']->assign('product_version', PRODUCT_VERSION);
+Tygh::$app['view']->assign('product_edition', fn_get_edition_acronym(PRODUCT_EDITION));
 
 if (!Registry::get('runtime.company_id') && Registry::get('runtime.controller') != 'auth' && !empty($license_errors) && empty($store_mode_errors)) {
     Tygh::$app['view']->assign('show_license_errors_dialog', true);

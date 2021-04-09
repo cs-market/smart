@@ -6,9 +6,11 @@ msgstr ""
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.11.3/addons/warehouses.po\n"
-"PO-Revision-Date: 2020-01-29 14:52\n"
+"X-Crowdin-File: /release-4.12.2/addons/warehouses.po\n"
+"X-Crowdin-File-ID: 4180\n"
+"PO-Revision-Date: 2021-02-01 09:11\n"
 
 msgctxt "Addons::name::warehouses"
 msgid "Warehouses [Beta]"
@@ -124,7 +126,7 @@ msgstr ""
 
 msgctxt "Languages::warehouses.product_available_if_ordered"
 msgid "Available if ordered"
-msgstr ""
+msgstr "Disponibil dacă este comandat"
 
 msgctxt "Languages::warehouses.product_in_stock"
 msgid "In stock"
@@ -192,5 +194,29 @@ msgstr ""
 
 msgctxt "Languages::warehouses.add_all"
 msgid "Add all"
+msgstr ""
+
+msgctxt "Languages::warehouses.quantity_tab.no_data"
+msgid "This storefront doesn't have any stores or warehouses. Please <a href=\"[create_url]\">create one</a> or <a href=\"[list_url]\">make an existing one available</a> for this storefront"
+msgstr ""
+
+msgctxt "Languages::warehouses.exim_reset_inventory_tooltip"
+msgid "This won't affect the products that have the quantity specified in the imported file. This also won't affect products at the warehouses that aren't updated in this preset."
+msgstr ""
+
+msgctxt "Languages::commerceml.map.entity_type.warehouse"
+msgid "Warehouses"
+msgstr ""
+
+msgctxt "Languages::commerceml.tab.warehouse"
+msgid "Warehouses"
+msgstr ""
+
+msgctxt "Languages::warehouses.commerceml.import.error.product.warehouse_not_found"
+msgid "Couldn't find warehouse [id]"
+msgstr ""
+
+msgctxt "Languages::warehouses.commerceml.import.message.warehouse.created"
+msgid "Category [id] created; local ID: [local_id]"
 msgstr ""
 

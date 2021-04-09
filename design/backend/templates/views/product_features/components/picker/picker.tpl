@@ -43,6 +43,16 @@
 {$url = "product_features.get_features_list?exclude_empty_groups=1"|fn_url}
 
 {$meta = "cm-object-features-add-container `$meta`"}
+{$predefined_variants = $predefined_variants|default:[]}
+{$predefined_variant_items = []}
+
+{if $show_empty_variant}
+     {$predefined_variants["0"] = $empty_variant_text}
+{/if}
+
+{foreach $predefined_variants as $id => $variant}
+    {$predefined_variant_items[] = ["id" => $id, "text" => $variant]}
+{/foreach}
 
 <div class="object-picker object-picker--features {$meta}" data-object-picker="object_picker_{$picker_id}">
     <div class="object-picker__select-group object-picker__select-group--features {$select_group_class}">
@@ -77,8 +87,9 @@
                     {if $hide_selection}
                         data-ca-object-picker-hide-selection="true"
                     {/if}
-                    {if $show_empty_variant}
-                        data-ca-object-picker-predefined-variants="{[["id" => 0, "text" => {$empty_variant_text}, "data" => ["description" => {$empty_variant_text}]]]|to_json}"
+                    {if $predefined_variant_items}
+                        data-ca-object-picker-predefined-variants="{$predefined_variant_items|array_reverse|to_json}"
+                        data-ca-object-picker-template-result-predefined-selector="#product_features_picker_result_predefined_template_{$picker_id}"
                     {/if}
             >
                 {foreach $item_ids as $item_id}
@@ -97,8 +108,16 @@
     </script>
 {/if}
 
+{if $predefined_variant_items}
+    <script type="text/template" id="product_features_picker_result_predefined_template_{$picker_id}" data-no-defer="true" data-no-execute="§">
+        <div class="object-picker__selection-product-feature">
+            <div class="object-picker__product-feature-label"> {literal}${data.text}{/literal}</div>
+        </div>
+    </script>
+{/if}
+
 <script type="text/template" id="product_features_picker_result_selector_{$picker_id}" data-no-defer="true" data-no-execute="§">
     <div class="object-picker__selection-product-feature">
-        <div class="object-picker__product-feature-label">{literal}${data.description}{/literal}</div>
+        <div class="object-picker__product-feature-label"> {literal}${data.internal_name}{/literal} <span class="object-picker__product-feature-description muted">{literal}${data.description}{/literal}</span></div>
     </div>
 </script>

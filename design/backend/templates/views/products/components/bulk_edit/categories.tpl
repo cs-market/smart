@@ -43,10 +43,11 @@
         >{__("reset")}</button>
         <button class="btn btn-primary bulk-edit-inner__btn"
                 role="button"
+                data-ca-bulkedit-mod-object-type="products"
                 data-ca-bulkedit-mod-cat-update
                 data-ca-bulkedit-mod-target-form="[name=manage_products_form]"
                 data-ca-bulkedit-mod-target-form-active-objects="tr.selected:has(input[type=checkbox].cm-item:checked)"
-                data-ca-bulkedit-mod-dispatch="products.bulk_edit_get_categories_list"
+                data-ca-bulkedit-mod-dispatch="products.m_update_categories"
         >{__("apply")}</button>
     </div>
 </div>

@@ -13,8 +13,8 @@
  ****************************************************************************/
 
 use Tygh\Enum\OutOfStockActions;
-use Tygh\Enum\ProductTracking;
 use Tygh\Tygh;
+use Tygh\Enum\ProductTracking;
 
 defined('BOOTSTRAP') or die('Access denied');
 

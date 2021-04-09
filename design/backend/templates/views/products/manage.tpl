@@ -22,7 +22,7 @@
 
 <div class="table-responsive-wrapper longtap-selection">
     <table width="100%" class="table table-middle table--relative table-responsive products-table" data-ca-main-content>
-    <thead data-ca-bulkedit-default-object="true" data-target=".products-table">
+    <thead data-ca-bulkedit-default-object="true" data-target=".products-table" data-ca-bulkedit-component="defaultObject">
     <tr>
         {hook name="products:manage_head"}
         <th width="6%" class="left mobile-hide">
@@ -109,12 +109,14 @@
                 {include file="views/companies/components/company_name.tpl" object=$product}
             </td>
             <td width="13%" class="{if $no_hide_input_if_shared_product}{$no_hide_input_if_shared_product}{/if}" data-th="{__("price")}">
-                {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="price_`$product.product_id`" name="update_all_vendors[price][`$product.product_id`]"}
-                <input type="text" name="products_data[{$product.product_id}][price]" size="6" value="{$product.price|fn_format_price:$primary_currency:null:false}" class="input-mini input-hidden"/>
+                {hook name="products:list_price"}
+                    {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="price_`$product.product_id`" name="update_all_vendors[price][`$product.product_id`]"}
+                    <input type="text" name="products_data[{$product.product_id}][price]" size="6" value="{$product.price|fn_format_price:$primary_currency:null:false}" class="input-mini input-hidden cm-numeric" data-a-sep/>
+                {/hook}
             </td>
             <td width="12%" class="mobile-hide" data-th="{__("list_price")}">
                 {hook name="products:list_list_price"}
-                    <input type="text" name="products_data[{$product.product_id}][list_price]" size="6" value="{$product.list_price|fn_format_price:$primary_currency:null:false}" class="input-mini input-hidden" />
+                    <input type="text" name="products_data[{$product.product_id}][list_price]" size="6" value="{$product.list_price|fn_format_price:$primary_currency:null:false}" class="input-mini input-hidden cm-numeric" data-a-sep />
                 {/hook}
             </td>
             {if $search.order_ids}
@@ -123,11 +125,7 @@
             {/if}
             <td width="9%" data-th="{__("quantity")}">
                 {hook name="products:list_quantity"}
-                    {if $product.tracking == "ProductTracking::TRACK_WITH_OPTIONS"|enum}
-                        {include file="buttons/button.tpl" but_text=__("edit") but_href="product_options.inventory?product_id=`$product.product_id`" but_role="edit"}
-                    {else}
-                        <input type="text" name="products_data[{$product.product_id}][amount]" size="6" value="{$product.inventory_amount|default:$product.amount}" class="input-full input-hidden" />
-                    {/if}
+                    <input type="text" name="products_data[{$product.product_id}][amount]" size="6" value="{$product.inventory_amount|default:$product.amount}" class="input-full input-hidden" />
                 {/hook}
             </td>
             {/hook}
@@ -137,7 +135,14 @@
                         {hook name="products:list_extra_links"}
                             <li>{btn type="list" text=__("edit") href="products.update?product_id=`$product.product_id`"}</li>
                             {if !$hide_inputs_if_shared_product}
-                                <li>{btn type="list" text=__("delete") class="cm-confirm" href="products.delete?product_id=`$product.product_id`" method="POST"}</li>
+                                <li>{btn
+                                        type="list"
+                                        text=__("delete")
+                                        class="cm-confirm"
+                                        href="products.delete?product_id=`$product.product_id`{if $delete_redirect_url}&redirect_url={$delete_redirect_url}{/if}"
+                                        method="POST"
+                                    }
+                                </li>
                             {/if}
                         {/hook}
                     {/capture}
@@ -152,6 +157,7 @@
                     hidden=true
                     object_id_name="product_id"
                     table="products"
+                    non_editable_status=!fn_check_permissions("tools", "update_status", "admin", "POST", ["table" => "products"])
                 }
             </td>
         </tr>
@@ -172,19 +178,31 @@
 {include file="views/products/components/products_select_fields.tpl"}
 
 <div class="buttons-container">
-    {include file="buttons/save_cancel.tpl" but_text=__("modify_selected") but_name="dispatch[products.store_selection]" cancel_action="close"}
+    <a class="cm-dialog-closer cm-inline-dialog-closer tool-link btn bulkedit-unchanged">{__("cancel")}</a>
+
+    {include file="buttons/button.tpl" 
+        but_text=__("modify_selected") 
+        but_role="submit" 
+        but_name="dispatch[products.store_selection]" 
+        but_meta="btn-primary"
+    }
 </div>
 {/capture}
 
 {capture name="buttons"}
     {capture name="tools_list"}
         {hook name="products:action_buttons"}
+        <li class="bulkedit-action--legacy hide">{btn type="list" text=__("clone_selected") dispatch="dispatch[products.m_clone]" form="manage_products_form" }</li>
+        <li class="bulkedit-action--legacy hide">{btn type="list" text=__("export_selected") dispatch="dispatch[products.export_range]" form="manage_products_form"}</li>
+        <li class="bulkedit-action--legacy hide">{btn type="delete_selected" dispatch="dispatch[products.m_delete]" form="manage_products_form"}</li>
+        <li class="divider bulkedit-action--legacy hide"></li>
         <li>{btn type="list" text=__("global_update") href="products.global_update"}</li>
         <li>{btn type="list" text=__("bulk_product_addition") href="products.m_add"}</li>
         <li>{btn type="list" text=__("product_subscriptions") href="products.p_subscr"}</li>
         {if $products}
             <li>{btn type="list" text=__("export_found_products") href="products.export_found"}</li>
         {/if}
+
         {/hook}
     {/capture}
     {dropdown content=$smarty.capture.tools_list}
@@ -211,8 +229,8 @@
 
 {capture name="sidebar"}
     {hook name="products:manage_sidebar"}
-    {include file="common/saved_search.tpl" dispatch="products.manage" view_type="products"}
-    {include file="views/products/components/products_search_form.tpl" dispatch="products.manage"}
+    {include file="common/saved_search.tpl" dispatch=$dispatch|default: "products.manage" view_type="products"}
+    {include file="views/products/components/products_search_form.tpl" dispatch=$dispatch|default: "products.manage"}
     {/hook}
 {/capture}
 

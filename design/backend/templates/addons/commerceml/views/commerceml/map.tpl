@@ -8,9 +8,9 @@
     {script src="js/addons/commerceml/map.js"}
     {include file="common/pagination.tpl" div_id="pagination_content_`$type`" disable_history=true}
 
-    <div class="table-wrapper">
+    <div class="table-responsive-wrapper">
         {if $records}
-            <table width="100%" class="table table-middle table--relative table-objects table-striped cm-commerceml-map-table">
+            <table width="100%" class="table table-middle table--relative table-responsive cm-commerceml-map-table">
                 <thead>
                 <tr>
                     <th width="30%">{__("commerceml.map.entity_name")}</th>

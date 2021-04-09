@@ -19,19 +19,19 @@
                 <h5 class="ty-company-detail__info-title">{__("contact_information")}</h5>
                 {if $supplier.email}
                     <div class="ty-company-detail__control-group" id="supplier_email">
-                        <label class="ty-company-detail__control-lable">{__("email")}:</label>
+                        <label class="ty-company-detail__control-label">{__("email")}:</label>
                         <span><a href="mailto:{$supplier.email}">{$supplier.email}</a></span>
                     </div>
                 {/if}
                 {if $supplier.phone}
                     <div class="ty-company-detail__control-group" id="supplier_phone">
-                        <label class="ty-company-detail__control-lable">{__("phone")}:</label>
+                        <label class="ty-company-detail__control-label">{__("phone")}:</label>
                         <span>{$supplier.phone}</span>
                     </div>
                 {/if}
                 {if $supplier.fax}
                     <div class="ty-company-detail__control-group" id="supplier_phone">
-                        <label class="ty-company-detail__control-lable">{__("fax")}:</label>
+                        <label class="ty-company-detail__control-label">{__("fax")}:</label>
                         <span>{$supplier.fax}</span>
                     </div>
                 {/if}

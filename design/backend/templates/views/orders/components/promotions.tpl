@@ -17,8 +17,8 @@
     {$promotion.short_description nofilter}
     <p><a href="{"promotions.update?promotion_id=`$promotion_id`"|fn_url}">{__("details")}</a></p>
 {else}
-    <p>{foreach from=$promotion.bonuses item="bonus" key="bonus_name"}
-        {assign var="lvar" value="promotion_bonus_`$bonus_name`"}<span>{__($lvar)}</span>
+    <p>{foreach $promotion.bonuses as $deleted_bonus}
+        <span>{__("promotion_bonus_`$deleted_bonus.bonus`")}</span>
     {/foreach} ({__("deleted")})</p>
 {/if}
 

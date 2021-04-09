@@ -42,7 +42,9 @@
                         <a href="{"attachments.getfile?attachment_id=`$attachment.attachment_id`&object_type=`$object_type`&object_id=`$object_id`"|fn_url}">{$attachment.filename}</a> ({$attachment.filesize|formatfilesize nofilter})
                     </div>
                 {/if}
-                {include file="common/fileuploader.tpl" var_name="attachment_files[`$id`]"}</div>
+                {if !$hide_inputs}
+                    {include file="common/fileuploader.tpl" var_name="attachment_files[`$id`]"}</div>
+                {/if}
         </div>
 
         <div class="control-group">

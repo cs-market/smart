@@ -1,80 +1,22 @@
-<tr class="import-preset" id="preset_{$preset.preset_id}">
+<tr class="import-preset cm-longtap-target" id="preset_{$preset.preset_id}"
+    {if $suffix !== "common"}
+        data-ca-longtap-action="setCheckBox"
+        data-ca-longtap-target="input.cm-item"
+        data-ca-id="{$preset.preset_id}"
+    {/if}
+>
     <td class="left import-preset__checker mobile-hide">
         <input type="checkbox"
                name="preset_ids[]"
                value="{$preset.preset_id}"
-               class="cm-item"
+               {if $suffix}class="cm-item-{$suffix}"{else}class="cm-item hide"{/if}
         />
     </td>
 
     <td class="import-preset__preset" data-th="{__("name")}">
         <a href="{"import_presets.update?preset_id=`$preset.preset_id`"|fn_url}">{$preset.preset}</a>
-        {include file="views/companies/components/company_name.tpl" object=$preset}
-    </td>
-
-    <td class="import-preset__run">
-        {if $preset.file_type == "Addons\\AdvancedImport\\PresetFileTypes::SERVER"|enum && $preset.file_path
-            || $preset.file_type == "Addons\\AdvancedImport\\PresetFileTypes::URL"|enum
-        }
-            <a href="{"advanced_import.import?preset_id=`$preset.preset_id`"|fn_url}"
-               class="btn cm-ajax cm-comet cm-post"
-            >{__("import")}</a>
-        {elseif $preset.file_type == "Addons\\AdvancedImport\\PresetFileTypes::LOCAL"|enum}
-            {btn type="dialog"
-                 text=__("import")
-                 class="btn"
-                 target_id="import_preset_file_upload_{$preset.preset_id}"
-            }
-
-            {capture name="popups"}
-                {$smarty.capture.popups nofilter}
-
-                <div class="hidden" title="{__("advanced_import.uploading_file", ["[preset]" => $preset.preset])}" id="import_preset_file_upload_{$preset.preset_id}">
-                    <form action="{""|fn_url}"
-                          method="post"
-                          enctype="multipart/form-data">
-
-                        <input type="hidden" name="preset_id" value="{$preset.preset_id}">
-                        <div class="form-horizontal form-edit import-preset__fileuploader-form">
-
-                            <div class="control-group">
-                                <label class="control-label">{__("select_file")}:</label>
-                                <div class="controls">
-                                    {include file="addons/advanced_import/views/import_presets/components/fileuploader.tpl"
-                                        var_name="upload[{$preset.preset_id}]"
-                                        prefix=$preset.preset_id
-                                        allowed_ext=["csv", "xml"]
-                                    }
-                                </div>
-                            </div>
-                            <div class="buttons-container">
-                                {include file="buttons/save_cancel.tpl"
-                                    cancel_action="close"
-                                    but_text=__("upload")
-                                    but_meta="cm-ajax cm-comet cm-post"
-                                    but_name="dispatch[import_presets.upload]"
-                                }
-                            </div>
-                        </div>
-                    </form>
-                <!--import_preset_file_upload_{$preset.preset_id}--></div>
-            {/capture}
-        {/if}
-
-        {if $preview_preset_id == $preset.preset_id}
-            {btn type="dialog"
-                text=__("preview")
-                class="cm-dialog-auto-width hidden import-preset__preview-fields-mapping"
-                href="{"import_presets.get_fields.import?preset_id=`$preset.preset_id`"|fn_url}"
-                target_id="import_preset_fields_mapping_{$preset.preset_id}"
-                id="import_preset_preview_fields_mapping_{$preset.preset_id}"
-            }
-
-            <div class="hidden form-horizontal form-edit import-preset__fields-mapping"
-                 title="{__("advanced_import.previewing_fields_mapping", ["[preset]" => $preset.preset])}"
-                 id="import_preset_fields_mapping_{$preset.preset_id}"
-            >
-            <!--import_preset_fields_mapping_{$preset.preset_id}--></div>
+        {if $company_id != $preset.company_id}
+            {include file="views/companies/components/company_name.tpl" object=$preset}
         {/if}
     </td>
 
@@ -87,6 +29,9 @@
     </td>
 
     <td class="import-preset__last-status" data-th="{__("advanced_import.last_status")}">
+        {if !$preset.last_status}
+            {$preset.last_status = 'X'}
+        {/if}
         <span class="status--{$preset.last_status|lower}">
             {__("advanced_import.last_status.`$preset.last_status`")}
             {if $preset.last_status == "Addons\\AdvancedImport\\ImportStatuses::SUCCESS"|enum}
@@ -107,6 +52,9 @@
     </td>
 
     <td class="import-preset__file" data-th="{__("advanced_import.file")}">
+        {if $preset.file}
+            <i class="glyph-cancel cm-adv-import-filename-delete" id="clean_selection" title="{__("remove_this_item")}" onclick="$.ceAdvancedImport('removeFile', {$preset.preset_id});">&nbsp;</i>
+        {/if}
         {if $preset.file_type == "Addons\\AdvancedImport\\PresetFileTypes::URL"|enum}
             <a href="{$preset.file}" target="_blank">{$preset.file}</a>
         {elseif $preset.file_type == "Addons\\AdvancedImport\\PresetFileTypes::SERVER"|enum}
@@ -115,10 +63,49 @@
             {else}
                 <span class="type-error">{__("error_file_not_found", ["[file]" => $preset.file])}</span>
             {/if}
-        {elseif $preset.file}
+        {elseif $preset.file_type === "Addons\\AdvancedImport\\PresetFileTypes::LOCAL"|enum}
             {$preset.file}
         {else}
-            {__("advanced_import.user_upload")}
+            {btn type="dialog"
+                text=__("choose")
+                class="btn cm-dialog-auto-size"
+                target_id="import_preset_file_upload_{$preset.preset_id}"
+            }
+            {capture name="popups"}
+                {$smarty.capture.popups nofilter}
+
+                <div class="hidden" title="{__("advanced_import.uploading_file", ["[preset]" => $preset.preset])}" id="import_preset_file_upload_{$preset.preset_id}">
+                    <form action="{""|fn_url}"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden" name="preset_id" value="{$preset.preset_id}">
+                        <div class="form-horizontal form-edit import-preset__fileuploader-form">
+
+                            <div class="control-group">
+                                <label class="control-label">{__("select_file")}:</label>
+                                <div class="controls">
+                                    {include file="addons/advanced_import/views/import_presets/components/fileuploader.tpl"
+                                        var_name="upload[{$preset.preset_id}]"
+                                        id_var_name="upload_{$preset.preset_id}"
+                                        prefix=$preset.preset_id
+                                        allowed_ext=$allowed_ext
+                                        local_file_ignore=true
+                                    }
+                                </div>
+                            </div>
+                            <div class="buttons-container">
+                                {include file="buttons/save_cancel.tpl"
+                                cancel_action="close"
+                                but_text=__("upload")
+                                but_meta="cm-ajax cm-comet cm-post"
+                                but_name="dispatch[import_presets.upload]"
+                                }
+                            </div>
+                        </div>
+                    </form>
+                    <!--import_preset_file_upload_{$preset.preset_id}--></div>
+            {/capture}
         {/if}
     </td>
 
@@ -130,20 +117,34 @@
         {/if}
     </td>
 
+    <td class="import-preset__run">
+        {if $preset.file_type == "Addons\\AdvancedImport\\PresetFileTypes::SERVER"|enum && $preset.file_path
+        || $preset.file_type == "Addons\\AdvancedImport\\PresetFileTypes::URL"|enum
+        || ($preset.file_type === "Addons\\AdvancedImport\\PresetFileTypes::LOCAL"|enum)
+        }
+            <a href="{"advanced_import.import?preset_id=`$preset.preset_id`"|fn_url}"
+               class="btn btn-primary cm-ajax cm-comet cm-post"
+            >{__("import")}</a>
+        {/if}
+    </td>
+
     <td class="import-preset__tools">
         <div class="hidden-tools">
             {capture name="tools_list"}
                 {hook name="advanced_import:preset_list_extra_links"}
-                    <li>{btn type="list" text=__("edit") href="import_presets.update?preset_id=`$preset.preset_id`"}</li>
-                    <li>
-                        {btn type="list"
-                            text=__("delete")
-                            class="cm-confirm"
-                            href="import_presets.delete?preset_id=`$preset.preset_id`"
-                            method="POST"
-                            data=["data-ca-confirm-text" => "{__("advanced_import.file_will_be_deleted_are_you_sure_to_proceed")}"]
-                        }
-                    </li>
+                    <li>{btn type="list" text=__("clone") method="POST" href="advanced_import.clone?preset_id=`$preset.preset_id`"}</li>
+                    {if !$company_id || $preset.company_id == $company_id}
+                        <li>{btn type="list" text=__("edit") href="import_presets.update?preset_id=`$preset.preset_id`"}</li>
+                        <li>
+                            {btn type="list"
+                                text=__("delete")
+                                class="cm-confirm"
+                                href="import_presets.delete?preset_id=`$preset.preset_id`"
+                                method="POST"
+                                data=["data-ca-confirm-text" => "{__("advanced_import.file_will_be_deleted_are_you_sure_to_proceed")}"]
+                            }
+                        </li>
+                    {/if}
                 {/hook}
             {/capture}
             {dropdown content=$smarty.capture.tools_list}

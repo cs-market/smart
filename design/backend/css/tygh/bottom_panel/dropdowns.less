@@ -47,6 +47,8 @@
         right: -12px;
         padding-top: 6px;
         padding-bottom: 6px;
+        max-height: ~"calc(100vh - 72px)";  // 100vh - (Panel height + 2 * Panel padding + 2 * Dropdown offset)
+        overflow-y: auto;
         border-radius: var(--bp-radius);
         background-color: var(--bp-dropdown-menu-bg);
         -webkit-transition: opacity 0.1s ease-in-out,
@@ -106,6 +108,11 @@
         font-size: 13px;
         font-family: var(--bp-font);
         white-space: nowrap;
+        &--head {
+            padding: 6px 10px;
+            font-weight: bold;
+            opacity: 1;
+        }
     }
 
 }

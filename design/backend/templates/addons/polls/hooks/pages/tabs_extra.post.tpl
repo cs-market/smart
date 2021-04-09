@@ -26,7 +26,7 @@
                             table="poll_questions"
                             href_delete="pages.delete_question?item_id=`$q.item_id`"
                             delete_target_id="content_poll_questions"
-                            header_text="{__("editing_question")}: `$q.description`"
+                            header_text=$q.description
                             no_table="true"
                             nostatus=true
                         }
@@ -37,7 +37,7 @@
                             href="pages.update_question?item_id=`$q.item_id`"
                             object_id_name="item_id"
                             table="poll_questions"
-                            header_text="{__("editing_question")}: `$q.description`"
+                            header_text=$q.description
                             no_table="true"
                             nostatus=true
                         }

@@ -15,12 +15,16 @@
 
 namespace Tygh\Addons\ProductVariations;
 
+use Tygh\Addons\ProductVariations\Commands\ABaseGenerateProductsCommand;
+use Tygh\Addons\ProductVariations\Product\CombinationsGenerator;
 use Tygh\Addons\ProductVariations\Product\FeaturePurposes;
 use Tygh\Addons\ProductVariations\Product\Group\Events\ParentProductChangedEvent;
 use Tygh\Addons\ProductVariations\Product\Group\Events\ProductAddedEvent;
 use Tygh\Addons\ProductVariations\Product\Group\Events\ProductRemovedEvent;
 use Tygh\Addons\ProductVariations\Product\Group\Events\ProductUpdatedEvent;
 use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection;
+use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureValue;
+use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureValueCollection;
 use Tygh\Addons\ProductVariations\Product\Group\GroupProductCollection;
 use Tygh\Addons\ProductVariations\Product\ProductIdMap;
 use Tygh\Addons\ProductVariations\Product\Sync\ProductDataIdentityMapRepository;
@@ -29,7 +33,11 @@ use Tygh\Addons\ProductVariations\Product\Group\GroupCodeGenerator;
 use Tygh\Addons\ProductVariations\Product\Group\Repository as GroupRepository;
 use Tygh\Addons\ProductVariations\Product\Repository as ProductRepository;
 use Tygh\Addons\ProductVariations\Product\Type\Type;
+use Tygh\Addons\ProductVariations\Request\ABaseGenerateProductsRequest;
+use Tygh\Addons\ProductVariations\Request\GenerateProductsAndAttachToGroupRequest;
+use Tygh\Addons\ProductVariations\Request\GenerateProductsAndCreateGroupRequest;
 use Tygh\Common\OperationResult;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Exceptions\DatabaseException;
 use Tygh\Exceptions\DeveloperException;
 use Tygh\Exceptions\InputException;
@@ -59,6 +67,9 @@ class Service
     /** @var \Tygh\Addons\ProductVariations\Product\ProductIdMap */
     protected $product_id_map;
 
+    /** @var \Tygh\Addons\ProductVariations\Product\CombinationsGenerator */
+    protected $combinations_generator;
+
     /** @var bool */
     protected $is_multivendor;
 
@@ -69,7 +80,7 @@ class Service
     protected $auto_change_default_variation_enabled;
 
     /** @var int[] */
-    protected $updated_amount_product_ids = [];
+    protected $updated_state_product_ids = [];
 
     /**
      * Service constructor.
@@ -80,6 +91,7 @@ class Service
      * @param \Tygh\Addons\ProductVariations\Product\Sync\ProductDataIdentityMapRepository $identity_map_repository
      * @param \Tygh\Addons\ProductVariations\SyncService                                   $sync_service
      * @param \Tygh\Addons\ProductVariations\Product\ProductIdMap                          $product_id_map
+     * @param \Tygh\Addons\ProductVariations\Product\CombinationsGenerator                 $combinations_generator
      * @param bool                                                                         $is_multivendor
      * @param bool                                                                         $inventory_tracking_enabled
      * @param bool                                                                         $auto_change_default_variation_enabled
@@ -91,6 +103,7 @@ class Service
         ProductDataIdentityMapRepository $identity_map_repository,
         SyncService $sync_service,
         ProductIdMap $product_id_map,
+        CombinationsGenerator $combinations_generator,
         $is_multivendor,
         $inventory_tracking_enabled,
         $auto_change_default_variation_enabled
@@ -101,6 +114,7 @@ class Service
         $this->identity_map_repository = $identity_map_repository;
         $this->sync_service = $sync_service;
         $this->product_id_map = $product_id_map;
+        $this->combinations_generator = $combinations_generator;
         $this->is_multivendor = $is_multivendor;
         $this->inventory_tracking_enabled = $inventory_tracking_enabled;
         $this->auto_change_default_variation_enabled = $auto_change_default_variation_enabled;
@@ -423,42 +437,47 @@ class Service
     /**
      * Generates products by features variants combinations and add to exists variations group
      *
-     * @param int   $group_id
-     * @param int   $base_product_id
-     * @param array $combination_ids
+     * @param \Tygh\Addons\ProductVariations\Request\GenerateProductsAndAttachToGroupRequest $request
      *
      * @return \Tygh\Common\OperationResult
      */
-    public function generateProductsAndAttachToGroup($group_id, $base_product_id, array $combination_ids)
+    public function generateProductsAndAttachToGroup($request)
     {
+        if (!$request instanceof GenerateProductsAndAttachToGroupRequest) {
+            $request = GenerateProductsAndAttachToGroupRequest::create(...func_get_args());
+        }
+
         $result = new OperationResult(true);
 
-        $group = $this->findGroupById($group_id);
+        $group = $this->findGroupById($request->getGroupId());
 
-        $this->validateGroup($result, $group_id, $group);
+        $this->validateGroup($result, $request->getGroupId(), $group);
 
         if (!$result->isSuccess()) {
             return $result;
         }
 
-        if (empty($combination_ids)) {
+        $combinations = $this->generateCombinations($request, $group->getFeatures(), $group->getProductIds());
+
+        if (empty($combinations)) {
+            $result->setSuccess(false);
             $result->addError('combination_ids', __('product_variations.error.generate_combinations_is_empty'));
             return $result;
         }
 
-        $combinations = $this->getFeaturesVariantsCombinations($group->getFeatures(), $group->getProductIds(), $combination_ids);
-        $product_ids = $this->createProductsByCombinations($base_product_id, $group->getFeatures(), $combinations, $combination_ids);
+        $product_ids = $this->saveProductsByCombinations($combinations);
 
         if (empty($product_ids)) {
+            $result->setSuccess(false);
             $result->addError('product_ids', __('product_variations.error.generate_products_is_empty'));
             return $result;
         }
 
-        if (!$group->getProduct($base_product_id)) {
-            array_unshift($product_ids, $base_product_id);
+        if (!$group->getProduct($request->getBaseProductId())) {
+            array_unshift($product_ids, $request->getBaseProductId());
         }
 
-        $result->merge($this->attachProductsToGroup($group_id, $product_ids), true);
+        $result->merge($this->attachProductsToGroup($request->getGroupId(), $product_ids), true);
         $result->setSuccess(!$result->hasErrors());
 
         return $result;
@@ -467,35 +486,40 @@ class Service
     /**
      * Generates products by features variants combinations and create variations group
      *
-     * @param int                                                                      $base_product_id
-     * @param array                                                                    $combination_ids
-     * @param null|\Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection $group_features
+     * @param \Tygh\Addons\ProductVariations\Request\GenerateProductsAndCreateGroupRequest $request
      *
      * @return \Tygh\Common\OperationResult
      */
-    public function generateProductsAndCreateGroup($base_product_id, array $combination_ids, GroupFeatureCollection $group_features = null)
+    public function generateProductsAndCreateGroup($request)
     {
+        if (!$request instanceof GenerateProductsAndCreateGroupRequest) {
+            $request = GenerateProductsAndCreateGroupRequest::create(...func_get_args());
+        }
+
         $result = new OperationResult(false);
 
-        if (empty($combination_ids)) {
+        if (empty($request->getGroupFeatures())) {
+            $features = $this->product_repository->findAvailableFeatures($request->getBaseProductId());
+            $group_features = GroupFeatureCollection::createFromFeatureList($features);
+        } else {
+            $group_features = $request->getGroupFeatures();
+        }
+
+        $combinations = $this->generateCombinations($request, $group_features);
+
+        if (empty($combinations)) {
             $result->addError('combination_ids', __('product_variations.error.generate_combinations_is_empty'));
             return $result;
         }
 
-        if (empty($group_features)) {
-            $features = $this->product_repository->findAvailableFeatures($base_product_id);
-            $group_features = GroupFeatureCollection::createFromFeatureList($features);
-        }
-
-        $combinations = $this->getFeaturesVariantsCombinations($group_features, [], $combination_ids);
-        $product_ids = $this->createProductsByCombinations($base_product_id, $group_features, $combinations, $combination_ids);
+        $product_ids = $this->saveProductsByCombinations($combinations);
 
         if (empty($product_ids)) {
             $result->addError('product_ids', __('product_variations.error.generate_products_is_empty'));
             return $result;
         }
 
-        array_unshift($product_ids, $base_product_id);
+        array_unshift($product_ids, $request->getBaseProductId());
 
         $result = $this->createGroup($product_ids, null, $group_features);
 
@@ -560,105 +584,7 @@ class Service
      */
     public function getFeaturesVariantsCombinations(GroupFeatureCollection $group_features, array $exists_product_ids = [], array $filter_combination_ids = [])
     {
-        $result = [];
-
-        $features = $this->product_repository->findFeaturesByFeatureCollection($group_features);
-
-        if (empty($features)) {
-            return $result;
-        }
-
-        $features = $this->product_repository->loadFeaturesVariants($features);
-        $stack_features = $features;
-        $exists_combination_ids = $combinations = [];
-        $exists_parent_combination_ids = [];
-
-        $filter_variant_ids = [];
-
-        foreach ($filter_combination_ids as $combination_id) {
-            $filter_variant_ids = array_merge($filter_variant_ids, $this->product_repository->getVariantIdsFromCombinationId($combination_id));
-        }
-
-        $filter_variant_ids = array_unique($filter_variant_ids);
-
-        while ($stack_features) {
-            reset($stack_features);
-            $feature = (array) array_shift($stack_features);
-            $variants = $feature['variants'];
-
-            if (!$combinations) {
-                foreach ($variants as $variant) {
-                    if ($filter_variant_ids && !in_array($variant['variant_id'], $filter_variant_ids)) {
-                        continue;
-                    }
-
-                    $combinations[][$feature['feature_id']] = (int) $variant['variant_id'];
-                }
-            } else {
-                $tmp_combinations = [];
-
-                foreach ($variants as $variant) {
-                    if ($filter_variant_ids && !in_array($variant['variant_id'], $filter_variant_ids)) {
-                        continue;
-                    }
-                    foreach ($combinations as $item) {
-                        $tmp_combinations[] = $item + [$feature['feature_id'] => (int) $variant['variant_id']];
-                    }
-                    unset($item);
-                }
-
-                $combinations = $tmp_combinations;
-            }
-        }
-
-        if ($exists_product_ids) {
-            $products = $this->product_repository->findProducts($exists_product_ids);
-            $products = $this->product_repository->loadProductsFeatures($products, $group_features);
-            $products = $this->product_repository->generateProductsCombinationId($products);
-
-            foreach ($products as $product) {
-                $exists_combination_ids[$product['variation_combination_id']] = $product['product_id'];
-
-                if (empty($product['parent_product_id'])) {
-                    $exists_parent_combination_ids[$product['parent_variation_combination_id']] = $product['product_id'];
-                }
-            }
-        }
-
-        $variation_product_feature_ids = $group_features->getFeatureIdsByPurpose(FeaturePurposes::CREATE_VARIATION_OF_CATALOG_ITEM);
-
-        /** @var array<int, int> $combination */
-        foreach ($combinations as $combination) {
-            $key = $this->product_repository->generateCombinationId(array_values($combination));
-            $name_parts = [];
-
-            $parent_combination_id = $this->product_repository->generateCombinationId(
-                array_diff_key($combination, array_flip($variation_product_feature_ids))
-            );
-
-            $item = [
-                'selected_variants'        => $combination,
-                'name'                     => '',
-                'group_name'               => '',
-                'exists'                   => isset($exists_combination_ids[$key]),
-                'product_id'               => isset($exists_combination_ids[$key]) ? $exists_combination_ids[$key] : null,
-                'parent_product_id'        => isset($exists_parent_combination_ids[$parent_combination_id]) ? $exists_parent_combination_ids[$parent_combination_id] : null
-            ];
-
-            foreach ($combination as $feature_id => $variant_id) {
-                $feature = $features[$feature_id];
-                $variant = $feature['variants'][$variant_id];
-
-                $name_parts[] = sprintf('%s: %s', $feature['description'], $variant['variant']);
-            }
-
-            $item['group_name'] = reset($name_parts);
-            $item['name'] = implode(', ', $name_parts);
-
-            $result[$key] = $item;
-        }
-
-        return $result;
+        return $this->combinations_generator->generate($group_features, $exists_product_ids, $filter_combination_ids);
     }
 
     /**
@@ -677,39 +603,89 @@ class Service
      * Marks product as product with a changed quantity in stock for auto change default product in variation group
      *
      * @param int $product_id
+     *
+     * @deprecated since 4.11.6 use Tygh\Addons\ProductVariations::onChangedProductQuantity()
+     *
+     * @see \Tygh\Addons\ProductVariations\Service::onChangedProductQuantity()
      */
     public function onChangedProductQuantityInZero($product_id)
     {
-        if ($this->inventory_tracking_enabled
-            && $this->auto_change_default_variation_enabled
-            && $this->product_id_map->isParentProduct($product_id)
+        $this->onChangedProductQuantity($product_id);
+    }
+
+    /**
+     * Tries to change default product of variation group
+     *
+     * @param int $product_id Product identifier
+     */
+    public function onChangedProductQuantity($product_id)
+    {
+        if (
+            !$this->inventory_tracking_enabled
+            || !$this->auto_change_default_variation_enabled
+            || !$this->product_id_map->isVariationProduct($product_id)
         ) {
-            if (empty($this->updated_amount_product_ids)) {
-                register_shutdown_function(function () {
-                    $product_ids = $this->updated_amount_product_ids;
-                    $this->updated_amount_product_ids = [];
-
-                    $this->changeDefaultProductsOnAfterAmountChanged($product_ids);
-                });
-            }
-
-            $this->updated_amount_product_ids[$product_id] = $product_id;
+            return;
         }
+
+        $this->onChangedVariationProductState($product_id);
+    }
+
+    /**
+     * Tries to change default product of variation group after variation product state changed (amount or status) if needed.
+     *
+     * @param int  $product_id  Product ID
+     * @param bool $immediately Execute change default product immediately
+     */
+    public function onChangedVariationProductState($product_id, $immediately = false)
+    {
+        if (!$this->auto_change_default_variation_enabled || !$this->product_id_map->isVariationProduct($product_id)) {
+            return;
+        }
+
+        $parent_product_id = $this->product_id_map->isParentProduct($product_id)
+            ? $product_id
+            : $this->product_id_map->getParentProductId($product_id);
+
+        if ($parent_product_id === null) {
+            return;
+        }
+
+        if ($immediately) {
+            $this->changeDefaultProductsOnAfterParentProductChanged([$parent_product_id]);
+            return;
+        }
+
+        if (empty($this->updated_state_product_ids)) {
+            register_shutdown_function(function () {
+                $product_ids = $this->updated_state_product_ids;
+                $this->updated_state_product_ids = [];
+
+                $this->changeDefaultProductsOnAfterParentProductChanged($product_ids);
+            });
+        }
+
+        $this->updated_state_product_ids[$parent_product_id] = $parent_product_id;
     }
 
     /**
      * Sets the most popular child product available as the new parent product
      *
-     * @param array $product_ids
+     * @param array<int> $product_ids Product IDs
      */
-    protected function changeDefaultProductsOnAfterAmountChanged(array $product_ids)
+    protected function changeDefaultProductsOnAfterParentProductChanged(array $product_ids)
     {
-        $product_ids = $this->product_repository->findParentProductIdsWithZeroQuantity($product_ids);
+        $products = $this->product_repository->findProducts($product_ids);
 
-        if (!$product_ids) {
+        $products = array_filter($products, function (array $product) {
+            return ($this->inventory_tracking_enabled && (int) $product['amount'] === 0) || $product['status'] !== ObjectStatuses::ACTIVE;
+        });
+
+        if (!$products) {
             return;
         }
 
+        $product_ids = array_keys($products);
         $this->product_id_map->addProductIdsToPreload($product_ids);
         $product_group_id_map = $this->group_repository->findGroupIdsByProductIds($product_ids);
 
@@ -725,102 +701,56 @@ class Service
                 continue;
             }
 
-            $children_id = $this->product_repository->findActiveAndMorePopularProductId($children_ids);
+            $children_id = $this->product_repository->findActiveAndMorePopularProductId($children_ids, $this->inventory_tracking_enabled);
 
-            if ($children_id) {
-                $this->setDefaultProduct($group_id, $children_id);
+            if (!$children_id) {
+                continue;
             }
+
+            $this->setDefaultProduct($group_id, $children_id);
         }
     }
 
     /**
-     * Creates products by features variants combinations
+     * Creates or updates products by features variants combinations
      *
-     * @param int                                                                 $base_product_id
-     * @param \Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection $features
-     * @param array                                                               $combinations
-     * @param array                                                               $combination_ids
+     * @param array<string, array> $combinations
      *
      * @return int[]
      */
-    protected function createProductsByCombinations($base_product_id, GroupFeatureCollection $features, array $combinations, array $combination_ids)
+    protected function saveProductsByCombinations(array $combinations)
     {
-        if (empty($combination_ids)) {
+        if (empty($combinations)) {
             return [];
         }
 
-        $parent_product_ids = [$base_product_id];
-        $product_ids = $sync_map = [];
+        $product_ids = [];
+        $update_parent_product_ids = [];
+        $sync_map = [];
 
-        foreach ($combination_ids as $combination_id) {
-            if (!isset($combinations[$combination_id])
-                || $combinations[$combination_id]['exists']
-                || empty($combinations[$combination_id]['parent_product_id'])
-            ) {
-                continue;
-            }
+        foreach ($combinations as $combination) {
+            if ($combination['exists']) {
+                $product_id = $combination['product_id'];
 
-            $parent_product_ids[] = $combinations[$combination_id]['parent_product_id'];
-        }
+                if ($combination['updated']) {
+                    $this->updateProductByCombiation($product_id, $combination);
 
-        $parent_products = $this->product_repository->findProducts($parent_product_ids, ['product_name', 'price']);
-        $parent_products = $this->product_repository->loadProductsFeatures($parent_products, $features);
-        $parent_products = $this->product_repository->generateProductsCombinationId($parent_products);
+                    if (empty($combination['parent_product_id']) && $combination['has_children']) {
+                        $update_parent_product_ids[] = $product_id;
+                    }
+                }
 
-        if (!$parent_products) {
-            return [];
-        }
+                if (empty($combination['linked'])) {
+                    $this->product_repository->updateProductFeaturesValues(
+                        $product_id,
+                        $combination['selected_variants']
+                    );
+                }
+            } else {
+                $base_product_id = $combination['base_product_id'];
+                $product_id = $this->createProductByCombination($combination);
 
-        foreach ($parent_products as &$parent_product) {
-            $parent_product['product_code_part'] = array_filter(explode('_', $parent_product['product_code']));;
-        }
-        unset($parent_product);
-
-        foreach ($combination_ids as $combination_id) {
-            if (!isset($combinations[$combination_id]) || $combinations[$combination_id]['exists']) {
-                continue;
-            }
-
-            $combination = $combinations[$combination_id];
-            $parent_product_id = empty($combination['parent_product_id']) ? $base_product_id : $combination['parent_product_id'];
-            $base_product = isset($parent_products[$parent_product_id]) ? $parent_products[$parent_product_id] : reset($parent_products);
-
-            $product_code = $base_product['product_code_part']
-                ? sprintf('%s_%s', reset($base_product['product_code_part']), strtoupper(substr(uniqid(), -4)))
-                : strtoupper(uniqid());
-
-            $product_data = array_merge($base_product, [
-                'parent_product_id' => 0,
-                'timestamp'         => time(),
-                'updated_timestamp' => time(),
-                'product_code'      => $product_code,
-                'product_type'      => Type::PRODUCT_TYPE_SIMPLE
-            ]);
-
-            unset($product_data['product_id']);
-
-            /**
-             * Executes before a new product is created for a combination of features;
-             * allows modifying data before the product is saved.
-             *
-             * @param \Tygh\Addons\ProductVariations\Service $this              Instance of the service
-             * @param int                                    $parent_product_id Indentifier of the parent product
-             * @param string                                 $combination_id    Identifier of the combination
-             * @param array                                  $combination       Combination of features
-             * @param array                                  $product_data      Data of the new product
-             */
-            fn_set_hook('variation_group_create_products_by_combinations_item',
-                $this,
-                $parent_product_id,
-                $combination_id,
-                $combination,
-                $product_data
-            );
-
-            $product_id = $this->product_repository->createProduct($product_data);
-
-            if ($product_id) {
-                $sync_map[$parent_product_id][$product_id] = $combination;
+                $sync_map[$base_product_id][$product_id] = $combination;
                 $product_ids[] = $product_id;
             }
         }
@@ -831,8 +761,14 @@ class Service
             $this->sync_service->copyAll($parent_product_id, $ids);
 
             foreach ($items as $product_id => $combination) {
+                $this->updateProductByCombiation($product_id, $combination);
                 $this->product_repository->updateProductFeaturesValues($product_id, $combination['selected_variants']);
             }
+        }
+
+        foreach ($update_parent_product_ids as $product_id) {
+            $this->sync_service->onTableChanged(ProductRepository::TABLE_PRODUCT_DESCRIPTIONS, $product_id);
+            $this->sync_service->onTableChanged(ProductRepository::TABLE_PRODUCT_ULT_DESCRIPTIONS, $product_id);
         }
 
         return $product_ids;
@@ -1134,5 +1070,104 @@ class Service
             $result->addError('group_id', __('product_variations.error.group_not_found', ['[id]' => $group_id]));
             $result->setSuccess(false);
         }
+    }
+
+    /**
+     * @param \Tygh\Addons\ProductVariations\Request\ABaseGenerateProductsRequest $request
+     * @param \Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection $group_features
+     * @param array                                                               $exists_product_ids
+     *
+     * @return array
+     */
+    protected function generateCombinations(
+        ABaseGenerateProductsRequest $request,
+        GroupFeatureCollection $group_features,
+        array $exists_product_ids = []
+    ) {
+        array_unshift($exists_product_ids, $request->getBaseProductId());
+        $exists_product_ids = array_unique($exists_product_ids);
+
+        if ($request->getFeaturesVariantsMap()) {
+            $feature_variant_collection = new GroupFeatureValueCollection();
+
+            foreach ($request->getFeaturesVariantsMap() as $feature_id => $variant_ids) {
+                foreach ($variant_ids as $variant_id) {
+                    $feature_variant_collection->addFeatureValue(new GroupFeatureValue(
+                        $feature_id,
+                        $group_features->getFeaturePurpose($feature_id),
+                        $variant_id
+                    ));
+                }
+            }
+
+            $combinations = $this->combinations_generator->generateByFeatureVariant(
+                $feature_variant_collection,
+                $exists_product_ids,
+                $request->getCombinationsData()
+            );
+        } else {
+            $combinations = $this->combinations_generator->generate(
+                $group_features,
+                $exists_product_ids,
+                $request->getCombinationIds(),
+                $request->getCombinationsData()
+            );
+        }
+
+        foreach ($combinations as $key => $combination) {
+            if (!$combination['active']) {
+                unset($combinations[$key]);
+            }
+        }
+
+        return $combinations;
+    }
+
+    protected function createProductByCombination(array $combination)
+    {
+        $parent_product_id = $combination['parent_product_id'] ? $combination['parent_product_id'] : $combination['base_product_id'];
+        $combination_id = $combination['combination_id'];
+
+        $product_data = [
+            'parent_product_id' => 0,
+            'timestamp'         => time(),
+            'updated_timestamp' => time(),
+            'product_code'      => $combination['product_code'],
+            'product'           => $combination['product_name'],
+            'price'             => $combination['product_price'],
+            'amount'            => $combination['product_amount'],
+            'product_type'      => Type::PRODUCT_TYPE_SIMPLE
+        ];
+
+        /**
+         * Executes before a new product is created for a combination of features;
+         * allows modifying data before the product is saved.
+         *
+         * @param \Tygh\Addons\ProductVariations\Service $this              Instance of the service
+         * @param int                                    $parent_product_id Indentifier of the parent product
+         * @param string                                 $combination_id    Identifier of the combination
+         * @param array                                  $combination       Combination of features
+         * @param array                                  $product_data      Data of the new product
+         */
+        fn_set_hook('variation_group_create_products_by_combinations_item',
+            $this,
+            $parent_product_id,
+            $combination_id,
+            $combination,
+            $product_data
+        );
+
+        return $this->product_repository->createProduct($product_data);
+    }
+
+    protected function updateProductByCombiation($product_id, array $combination)
+    {
+        $this->product_repository->updateProduct($product_id, [
+            'updated_timestamp' => time(),
+            'product_code'      => $combination['product_code'],
+            'product'           => $combination['product_name'],
+            'price'             => $combination['product_price'],
+            'amount'            => $combination['product_amount']
+        ]);
     }
 }

@@ -16,7 +16,7 @@
     <tr>
         <th>
         {if $display != "radio"}
-            {include file="common/check_items.tpl" class="checkbox--large"}
+            {include file="common/check_items.tpl"}
         {/if}
         </th>
         <th width="84%">
@@ -69,14 +69,14 @@
                        id="input_cat_{$cur_cat.category_id}"
                        name="{$checkbox_name}"
                        value="{$cur_cat.category_id}" 
-                       class="cm-item checkbox--large {$radio_class}"
+                       class="cm-item {$radio_class}"
                 />
                 {else}
                 <input type="checkbox" 
                        id="input_cat_{$cur_cat.category_id}" 
                        name="{$checkbox_name}[{$cur_cat.category_id}]" 
                        value="{$cur_cat.category_id}" 
-                       class="cm-item checkbox--large"
+                       class="cm-item"
                 />
                 {/if}
             {/if}

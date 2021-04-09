@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/store_locator.po\n"
-"X-Crowdin-File-ID: 3692\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/store_locator.po\n"
+"X-Crowdin-File-ID: 4142\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::store_locator"
 msgid "Stores and pickup points"
@@ -270,17 +270,21 @@ msgstr "Δεν υπάρχει περιοχή τιμών"
 
 msgctxt "Languages::store_locator.name"
 msgid "Name"
-msgstr ""
+msgstr "Όνομα"
 
 msgctxt "Languages::store_locator.pickup_locations"
 msgid "Pickup Locations"
-msgstr ""
+msgstr "Τοποθεσίες παραλαβής"
 
 msgctxt "Languages::store_locator.any_rate_area"
 msgid "Any rate area"
-msgstr ""
+msgstr "Οποιαδήποτε περιοχή τιμών"
+
+msgctxt "Languages::store_locator.pickup_from_store"
+msgid "Pickup from store"
+msgstr "Παραλαβή από κατάστημα"
 
 msgctxt "Languages::store_locator.any_vendor"
 msgid "Any vendor"
-msgstr ""
+msgstr "Οποιοσδήποτε πωλητής"
 

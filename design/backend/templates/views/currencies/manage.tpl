@@ -33,7 +33,7 @@
                         href_delete=$_href_delete
                         delete_data=$currency.currency_code
                         delete_target_id="manage_currencies_list"
-                        header_text="{__("editing_currency")}: `$currency.description`"
+                        header_text=$currency.description
                         table="currencies"
                         object_id_name="currency_id"
                         status=$currency.status

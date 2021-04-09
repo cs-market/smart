@@ -2,7 +2,7 @@
     {foreach from=$order_info.shipping item="shipping" key="shipping_id" name="f_shipp"}
         {if "shipments.add"|fn_check_view_permissions}
             {capture name="add_new_picker"}
-                {include file="views/shipments/components/new_shipment.tpl" group_key=$shipping.group_key}
+                {include file="views/shipments/components/new_shipment.tpl" group_key=$shipping.group_key current_shipping_id=$shipping.shipping_id}
             {/capture}
             {include file="common/popupbox.tpl" id="add_shipment_`$shipping.group_key`" content=$smarty.capture.add_new_picker text=__("new_shipment") act="hidden"}
         {/if}
@@ -27,9 +27,9 @@
 <input type="hidden" name="order_id" value="{$smarty.request.order_id}" />
 <input type="hidden" name="order_status" value="{$order_info.status}" />
 <input type="hidden" name="result_ids" value="content_general" />
-<input type="hidden" name="selected_section" value="{$smarty.request.selected_section}" />
+<input type="hidden" name="selected_section" value="{$selected_section}" />
 
-<div id="content_general">
+<div class="{if $selected_section !== "general"}hidden{/if}" id="content_general">
     <div class="row-fluid">
         <div class="span8">
             {* Products info *}
@@ -280,23 +280,10 @@
                         {/if}
 
                         <div class="order-manager">
-                            {$predefined_variants=[]}
-                            {if "MULTIVENDOR"|fn_allowed_for}
-                                {if $order_info.issuer_data.user_type === "UserTypes::ADMIN"|enum 
-                                    && ($auth.user_type === "UserTypes::VENDOR"|enum || $auth.user_id|intval !== $order_info.issuer_data.user_id|intval)}
-                                    {$predefined_variants[]=["id" => $order_info.issuer_data.user_id, "text" => ($order_info.issuer_data.firstname && $order_info.issuer_data.lastname)?"`$order_info.issuer_data.firstname` `$order_info.issuer_data.lastname`" : $order_info.issuer_data.email]}
-                                {/if}
-
-                                {if $auth.user_type === "UserTypes::ADMIN"|enum}
-                                    {$predefined_variants[]=["id" => $user_info.user_id, "text" => ($user_info.firstname && $user_info.lastname)?"`$user_info.firstname` `$user_info.lastname`" : $user_info.email]}
-                                {/if}
-                            {/if}
-
-                            {include file="views/profiles/components/picker/picker.tpl" 
+                            {include file="views/profiles/components/picker/picker.tpl"
                                 input_name="update_order[issuer_id]"
                                 item_ids=[$order_info.issuer_data.user_id]
                                 company_id=$order_info.company_id
-                                predefined_variants=$predefined_variants
                             }
                             {if $auth.user_id != $order_info.issuer_id}
                                 {btn type="text" title=__("assign_to_me") href="orders.assign_manager?order_id=`$order_info.order_id`" class="btn cm-ajax cm-post order-manager-assign-btn" data=["data-ca-target-id"=>"select_manager"] icon="icon-user"}
@@ -359,11 +346,12 @@
                                     </div>
                                     {/hook}
                                 {/foreach}
-                            
+
                             {else}
                                 {* show form for creating new full shipment *}
                                 {$shipment_id = 0}
                                 {$carrier = ""}
+                                {hook name="orders:new_shipment"}
                                 <div class="control-group">
                                     <label class="control-label" for="tracking_number">{__("tracking_number")}</label>
                                     <div class="controls">
@@ -377,6 +365,7 @@
                                         {include file="common/carriers.tpl" id="carrier_key" meta="input-small" name="update_shipping[`$shipping.group_key`][`$shipment_id`][carrier]" carrier=$carrier}
                                     </div>
                                 </div>
+                                {/hook}
                                 <hr>
                             {/if}
                             <div class="clearfix">
@@ -438,7 +427,7 @@
     </div>
 <!--content_general--></div>
 
-<div id="content_addons">
+<div class="{if $selected_section !== "addons"}hidden{/if}" id="content_addons">
 
 {hook name="orders:customer_info"}
 {/hook}
@@ -446,7 +435,7 @@
 <!--content_addons--></div>
 
 {if $downloads_exist}
-<div id="content_downloads">
+<div class="{if $selected_section !== "downloads"}hidden{/if}" id="content_downloads">
     <input type="hidden" name="order_id" value="{$smarty.request.order_id}" />
     <input type="hidden" name="order_status" value="{$order_info.status}" />
     {foreach from=$order_info.products item="oi"}
@@ -498,7 +487,7 @@
 {/if}
 
 {if $order_info.promotions}
-<div id="content_promotions">
+<div class="{if $selected_section !== "promotions"}hidden{/if}" id="content_promotions">
     {include file="views/orders/components/promotions.tpl" promotions=$order_info.promotions}
 <!--content_promotions--></div>
 {/if}
@@ -512,7 +501,7 @@
 {/hook}
 
 {/capture}
-{include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox active_tab=$smarty.request.selected_section track=true}
+{include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox active_tab=$selected_section track=true}
 
 {/capture}
 {capture name="mainbox_title"}
@@ -559,6 +548,14 @@
             <li>{btn type="list" text=__("print_pdf_packing_slip") href="orders.print_packing_slip?order_id=`$order_info.order_id`&format=pdf" class="cm-new-window"}</li>
             <li>{btn type="list" text=__("edit_order") href="order_management.edit?order_id=`$order_info.order_id`"}</li>
             <li>{btn type="list" text=__("copy") href="order_management.edit?order_id=`$order_info.order_id`&copy=1"}</li>
+            <li>
+                {btn type="list"
+                    text=__("delete")
+                    href="orders.delete?order_id={$order_info.order_id}&redirect_url=orders.manage"
+                    class="cm-confirm"
+                    method="POST"
+                }
+            </li>
             {$smarty.capture.adv_tools nofilter}
         {/hook}
     {/capture}

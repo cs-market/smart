@@ -45,8 +45,7 @@ fn_register_hooks(
     'settings_variants_image_verification_use_for',
     'load_products_extra_data_post',
     'get_companies_post',
-    array('add_discussion_post_post', '', 'gdpr'),
+    ['add_discussion_post_post', '', 'gdpr'],
     'check_and_update_product_sharing',
-
     'seo_get_schema_org_markup_items_post'
 );

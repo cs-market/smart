@@ -6,9 +6,11 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.11.3/addons/warehouses.po\n"
-"PO-Revision-Date: 2020-02-04 07:11\n"
+"X-Crowdin-File: /release-4.12.2/addons/warehouses.po\n"
+"X-Crowdin-File-ID: 4180\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::warehouses"
 msgid "Warehouses [Beta]"
@@ -16,7 +18,7 @@ msgstr ""
 
 msgctxt "Addons::description::warehouses"
 msgid "Lets you set product stock separately for each store and warehouse. Shows to customers the availability of a product in stores or in particular rate areas."
-msgstr ""
+msgstr "Umožňuje nastavit skladovost produktu zvlášť pro každý obchod a sklad. Ukazuje zákazníkům dostupnost produktu v obchodech nebo v konkrétních sazebních oblastech."
 
 msgctxt "Languages::warehouses.store_type"
 msgid "Type"
@@ -60,7 +62,7 @@ msgstr ""
 
 msgctxt "Languages::warehouses.main_destination_tooltip"
 msgid "Determines where this place is located. In turn, this determines the shipping rate and delivery time to this place."
-msgstr ""
+msgstr "Určuje, kde je toto místo lokalizováno. To pak zase určuje sazbu za dopravu a čas doručení na toto místo."
 
 msgctxt "Languages::warehouses.show_to"
 msgid "Show to"
@@ -72,7 +74,7 @@ msgstr ""
 
 msgctxt "Languages::warehouses.out_of_stock_products"
 msgid "[product] isn't in stock in the selected region.|The following products aren't in stock in the selected region: [products]"
-msgstr ""
+msgstr "[product] není na skladě ve vybraném regionu. |Následující produkty nejsou skladem ve vybraných regionech: [products]"
 
 msgctxt "Languages::warehouses.warehouse_stock"
 msgid "Quantities"
@@ -100,11 +102,11 @@ msgstr ""
 
 msgctxt "Languages::warehouses.warn_about_delay.tooltip"
 msgid "If a product has to be moved to the rate area from here, show the moving time in the product list and cart."
-msgstr ""
+msgstr "Pokud produkt musí být přesunut odsud do jiného území, tak zobrazit čas přesunu v seznamu produktů a také v košíku."
 
 msgctxt "Languages::warehouses.destinations_configuration.tooltip"
 msgid "Products can be taken from different stores and warehouses first, depending on where your customer is. <a href=\"[destinations_url]\" target=\"_blank\">Configure store and warehouse priority individually for each rate area.</a>"
-msgstr ""
+msgstr "Produkty mohou být vzaty z různých obchodů a skladů jako první, záleží na tom, kde se zákazník nachází. <a href=\"[destinations_url]\" target=\"_blank\"> Nakonfigurujte obchodům a továrnám prioritu individuálně pro každé území."
 
 msgctxt "Languages::warehouses.shipping_delay.description"
 msgid "Product is at a remote warehouse. If you order it, we'll send it [shipping_delay]."
@@ -120,7 +122,7 @@ msgstr ""
 
 msgctxt "Languages::warehouses.shipping_delay_for_products"
 msgid "Some of the products you ordered are at a remote warehouse. Shipping may take slightly longer than stated here."
-msgstr ""
+msgstr "Některé z produktů, které jste si objednali, jsou na externím skladu. Doba dodání může být delší, než je zde uvedeno."
 
 msgctxt "Languages::warehouses.product_available_if_ordered"
 msgid "Available if ordered"
@@ -192,5 +194,29 @@ msgstr ""
 
 msgctxt "Languages::warehouses.add_all"
 msgid "Add all"
+msgstr ""
+
+msgctxt "Languages::warehouses.quantity_tab.no_data"
+msgid "This storefront doesn't have any stores or warehouses. Please <a href=\"[create_url]\">create one</a> or <a href=\"[list_url]\">make an existing one available</a> for this storefront"
+msgstr "Obchod nemá žádné obchody ani sklady. Prosím <a href=\"[create_url]\">vytvořte jedno</a> nebo <a href=\"[list_url]\">zpřístupněte již dostupné</a> ve vašem obchodě."
+
+msgctxt "Languages::warehouses.exim_reset_inventory_tooltip"
+msgid "This won't affect the products that have the quantity specified in the imported file. This also won't affect products at the warehouses that aren't updated in this preset."
+msgstr "Toto nebude mít žádný vliv na produkty, které mají množství specifikováno v importním souboru. Toto také neovlivní produkty ve skladech, které nejsou aktualizovány v presetu."
+
+msgctxt "Languages::commerceml.map.entity_type.warehouse"
+msgid "Warehouses"
+msgstr ""
+
+msgctxt "Languages::commerceml.tab.warehouse"
+msgid "Warehouses"
+msgstr ""
+
+msgctxt "Languages::warehouses.commerceml.import.error.product.warehouse_not_found"
+msgid "Couldn't find warehouse [id]"
+msgstr ""
+
+msgctxt "Languages::warehouses.commerceml.import.message.warehouse.created"
+msgid "Category [id] created; local ID: [local_id]"
 msgstr ""
 

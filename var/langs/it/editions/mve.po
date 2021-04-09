@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: it\n"
-"X-Crowdin-File: /release-4.11.5/editions/mve.po\n"
-"X-Crowdin-File-ID: 3708\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/editions/mve.po\n"
+"X-Crowdin-File-ID: 4194\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Languages::add_companies"
 msgid "Add vendors"
@@ -165,11 +165,11 @@ msgid "Can view"
 msgstr "Può visualizzare"
 
 msgctxt "Languages::privilege_sections.vendors"
-msgid "Store privileges"
+msgid "Vendors privileges"
 msgstr ""
 
 msgctxt "Languages::privilege_groups.vendors"
-msgid "Stores"
+msgid "Vendors"
 msgstr ""
 
 msgctxt "Languages::sales_period"
@@ -364,9 +364,21 @@ msgctxt "SettingsOptions::mailer_send_from_admin"
 msgid "Send vendor emails from marketplace email addresses"
 msgstr ""
 
+msgctxt "SettingsOptions::allow_vendor_manage_features"
+msgid "Allow vendors to manage product features"
+msgstr ""
+
 msgctxt "SettingsTooltips::need_agree_with_terms_n_conditions"
 msgid "The text of terms & conditions will be retrieved from the \"vendor_terms_n_conditions_content\" language variable."
 msgstr "Il testo di termini e condizioni sarà recuperato dalla variabile delle lingua \"vendor_terms_n_conditions_content\"."
+
+msgctxt "SettingsOptions::allow_approve_vendors_in_two_steps"
+msgid "Approve vendors in 2 steps"
+msgstr ""
+
+msgctxt "SettingsTooltips::allow_approve_vendors_in_two_steps"
+msgid "New vendors will get the \"Pending\" status after approval. This will hide them on the storefront."
+msgstr ""
 
 msgctxt "Languages::use_for_apply_for_vendor_account"
 msgid "Apply for a vendor account form"
@@ -892,22 +904,6 @@ msgctxt "Languages::all_companies"
 msgid "All vendors"
 msgstr ""
 
-msgctxt "Languages::storefront_access_key"
-msgid "Access key to temporarily closed storefront"
-msgstr ""
-
-msgctxt "Languages::storefront_status.tooltip"
-msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed storefront</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
-msgstr ""
-
-msgctxt "Languages::storefront_access_key.setting_notice"
-msgid "You can set the access key on the storefront editing page"
-msgstr ""
-
-msgctxt "Languages::close_storefront.setting_notice"
-msgid "You can open or close a storefront on the storefront editing page"
-msgstr ""
-
 msgctxt "Languages::is_default_storefront"
 msgid "Default storefront"
 msgstr ""
@@ -940,6 +936,14 @@ msgctxt "Languages::event.vendor_status_changed.name"
 msgid "Vendor status changed to [status]"
 msgstr ""
 
+msgctxt "Languages::event.vendor_status_changed_from.name"
+msgid "Vendor status changed from [status]"
+msgstr ""
+
+msgctxt "Languages::email_template.company_status_suspended_notification"
+msgid "Company status change to Suspended"
+msgstr ""
+
 msgctxt "Languages::event.vendor_status_changed.title"
 msgid "Your status has been changed to [status]"
 msgstr ""
@@ -960,11 +964,47 @@ msgctxt "Languages::log_in_as_vendor"
 msgid "Log in as vendor"
 msgstr ""
 
+msgctxt "Languages::vendor_owner"
+msgid "Vendor's main administrator"
+msgstr ""
+
+msgctxt "Languages::owner_company"
+msgid "Vendor"
+msgstr ""
+
 msgctxt "Languages::block_manager.dynamic_entity_companies"
 msgid "vendor"
 msgstr ""
 
+msgctxt "Languages::vendor_features_only"
+msgid "Features created by vendors"
+msgstr ""
+
+msgctxt "Languages::any_vendor"
+msgid "Any vendor"
+msgstr ""
+
 msgctxt "Languages::event.apply_for_vendor_notification.name"
 msgid "New vendor account application"
+msgstr ""
+
+msgctxt "Languages::suspend_alert"
+msgid "<p>Your account is suspended. To lift the suspension, please contact us.</p>"
+msgstr ""
+
+msgctxt "Languages::event.vendor_status_changed.suspended.title"
+msgid "Your account is suspended"
+msgstr ""
+
+msgctxt "Languages::event.vendor_status_changed.suspended.message"
+msgid "To lift the suspension, please contact us."
+msgstr ""
+
+msgctxt "Languages::text_company_status_suspended_subj"
+msgid "Your account is suspended"
+msgstr ""
+
+msgctxt "Languages::logo_section.vendor"
+msgid "Default logo for new vendors"
 msgstr ""
 

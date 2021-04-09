@@ -7,15 +7,15 @@
     <status>active</status>
     <default_language>en</default_language>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
-    <settings>
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>
-                    <item id="print_map" edition_type="ROOT,ULT:VENDOR">
+                    <item id="print_map">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>
-                    <item id="show_locations_at_geolocator" edition_type="ROOT,ULT:VENDOR">
+                    <item id="show_locations_at_geolocator">
                         <type>checkbox</type>
                         <default_value>N</default_value>
                     </item>

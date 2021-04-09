@@ -264,163 +264,159 @@ msgctxt "Languages::rus_post_blank.total_cen"
 msgid "Declared value amount"
 msgstr "Declared value amount"
 
-msgctxt "SettingsSections::rus_russianpost::general"
-msgid "Settings"
-msgstr "Settings"
+msgctxt "Languages::rus_russianpost.post_blank_settings"
+msgid "Post blank company info"
+msgstr "Post blank company info"
 
-msgctxt "SettingsOptions::rus_russianpost::header"
-msgid "Company info"
-msgstr "Company info"
-
-msgctxt "SettingsOptions::rus_russianpost::company"
+msgctxt "Languages::rus_russianpost.company"
 msgid "Company"
 msgstr "Company"
 
-msgctxt "SettingsOptions::rus_russianpost::company2"
+msgctxt "Languages::rus_russianpost.company2"
 msgid "Company (line 2)"
 msgstr "Company (line 2)"
 
-msgctxt "SettingsOptions::rus_russianpost::address"
+msgctxt "Languages::rus_russianpost.address"
 msgid "Address"
 msgstr "Address"
 
-msgctxt "SettingsOptions::rus_russianpost::address2"
+msgctxt "Languages::rus_russianpost.address2"
 msgid "Address (line 2)"
 msgstr "Address (line 2)"
 
-msgctxt "SettingsOptions::rus_russianpost::inn"
+msgctxt "Languages::rus_russianpost.inn"
 msgid "INN"
 msgstr "INN"
 
-msgctxt "SettingsOptions::rus_russianpost::bank"
+msgctxt "Languages::rus_russianpost.bank"
 msgid "BANK"
 msgstr "BANK"
 
-msgctxt "SettingsOptions::rus_russianpost::ras"
+msgctxt "Languages::rus_russianpost.ras"
 msgid "Ras/invoice"
 msgstr "Ras/invoice"
 
-msgctxt "SettingsOptions::rus_russianpost::kor"
+msgctxt "Languages::rus_russianpost.kor"
 msgid "Kor/invoice"
 msgstr "Kor/invoice"
 
-msgctxt "SettingsOptions::rus_russianpost::bik"
+msgctxt "Languages::rus_russianpost.bik"
 msgid "BIK"
 msgstr "BIK"
 
-msgctxt "SettingsOptions::rus_russianpost::index"
+msgctxt "Languages::rus_russianpost.index"
 msgid "ZIP code"
 msgstr "ZIP code"
 
-msgctxt "SettingsOptions::rus_russianpost::header_fiz"
-msgid "Sender"
-msgstr "Sender"
+msgctxt "Languages::rus_russianpost.post_blank_sender"
+msgid "Post blank sender"
+msgstr "Post blank sender"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_fio"
+msgctxt "Languages::rus_russianpost.fiz_fio"
 msgid "Full name"
 msgstr "Full name"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_address"
+msgctxt "Languages::rus_russianpost.fiz_address"
 msgid "Address"
 msgstr "Address"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_address2"
+msgctxt "Languages::rus_russianpost.fiz_address2"
 msgid "Address (line 2)"
 msgstr "Address (line 2)"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_index"
+msgctxt "Languages::rus_russianpost.fiz_index"
 msgid "ZIP code"
 msgstr "ZIP code"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_doc"
+msgctxt "Languages::rus_russianpost.fiz_doc"
 msgid "Document"
 msgstr "Document"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_doc_serial"
+msgctxt "Languages::rus_russianpost.fiz_doc_serial"
 msgid "Document serial"
 msgstr "Document serial"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_doc_number"
+msgctxt "Languages::rus_russianpost.fiz_doc_number"
 msgid "Document number"
 msgstr "Document number"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_doc_date"
+msgctxt "Languages::rus_russianpost.fiz_doc_date"
 msgid "Issue date (Day, month. For example: 18.11)"
 msgstr "Issue date (Day, month. For example: 18.11)"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_doc_date2"
+msgctxt "Languages::rus_russianpost.fiz_doc_date2"
 msgid "Issue date (Year. For example: 14)"
 msgstr "Issue date (Year. For example: 14)"
 
-msgctxt "SettingsOptions::rus_russianpost::fiz_doc_creator"
+msgctxt "Languages::rus_russianpost.fiz_doc_creator"
 msgid "Authority that issued the document"
 msgstr "Authority that issued the document"
 
-msgctxt "SettingsSections::rus_russianpost::size"
-msgid "Size and spacing of forms"
-msgstr "Size and spacing of forms"
+msgctxt "Languages::rus_russianpost.size_spacing_forms"
+msgid "Size and spacing of Post blank forms"
+msgstr "Size and spacing of Post blank forms"
 
-msgctxt "SettingsOptions::rus_russianpost::header_107"
+msgctxt "Languages::rus_russianpost.107_list"
 msgid "f. 107 (form size 293mm x 205mm)"
 msgstr "f. 107 (form size 293mm x 205mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::107_list_width"
+msgctxt "Languages::rus_russianpost.107_list_width"
 msgid "Sheet width (mm)"
 msgstr "Sheet width (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::107_list_height"
+msgctxt "Languages::rus_russianpost.107_list_height"
 msgid "Sheet height (mm)"
 msgstr "Sheet height (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::107_top"
+msgctxt "Languages::rus_russianpost.107_top"
 msgid "Top spacing (mm)"
 msgstr "Top spacing (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::107_left"
+msgctxt "Languages::rus_russianpost.107_left"
 msgid "Left spacing (mm)"
 msgstr "Left spacing (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::header_116"
+msgctxt "Languages::rus_russianpost.116_list"
 msgid "f. 116 (form size 293mm x 205mm)"
 msgstr "f. 116 (form size 293mm x 205mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::116_list_width"
+msgctxt "Languages::rus_russianpost.116_list_width"
 msgid "Sheet width (mm)"
 msgstr "Sheet width (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::116_list_height"
+msgctxt "Languages::rus_russianpost.116_list_height"
 msgid "Sheet height (mm)"
 msgstr "Sheet height (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::116_top"
+msgctxt "Languages::rus_russianpost.116_top"
 msgid "Top spacing (mm)"
 msgstr "Top spacing (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::116_left"
+msgctxt "Languages::rus_russianpost.116_left"
 msgid "Left spacing (mm)"
 msgstr "Left spacing (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::header_7p"
+msgctxt "Languages::rus_russianpost.7p_list"
 msgid "f. 7-p"
 msgstr "f. 7-p"
 
-msgctxt "SettingsOptions::rus_russianpost::7p_top"
+msgctxt "Languages::rus_russianpost.7p_top"
 msgid "Top spacing (mm)"
 msgstr "Top spacing (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::7p_left"
+msgctxt "Languages::rus_russianpost.7p_left"
 msgid "Left spacing (mm)"
 msgstr "Left spacing (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::header_7a"
+msgctxt "Languages::rus_russianpost.7a_list"
 msgid "f. 7-a"
 msgstr "f. 7-a"
 
-msgctxt "SettingsOptions::rus_russianpost::7a_top"
+msgctxt "Languages::rus_russianpost.7a_top"
 msgid "Top spacing (mm)"
 msgstr "Top spacing (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::7a_left"
+msgctxt "Languages::rus_russianpost.7a_left"
 msgid "Left spacing (mm)"
 msgstr "Left spacing (mm)"
 
@@ -436,27 +432,27 @@ msgctxt "Languages::rus_post_blank.company_phone"
 msgid "Company phone"
 msgstr "Company phone"
 
-msgctxt "SettingsOptions::rus_russianpost::company_phone"
+msgctxt "Languages::rus_russianpost.company_phone"
 msgid "Company phone"
 msgstr "Company phone"
 
-msgctxt "SettingsOptions::rus_russianpost::header_112"
+msgctxt "Languages::rus_russianpost.112ep_list"
 msgid "f. 112ep (form size 210mm x 293mm)"
 msgstr "f. 112ep (form size 210mm x 293mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::112_list_width"
+msgctxt "Languages::rus_russianpost.112_list_width"
 msgid "Sheet width (mm)"
 msgstr "Sheet width (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::112_list_height"
+msgctxt "Languages::rus_russianpost.112_list_height"
 msgid "Sheet height (mm)"
 msgstr "Sheet height (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::112_top"
+msgctxt "Languages::rus_russianpost.112_top"
 msgid "Top spacing (mm)"
 msgstr "Top spacing (mm)"
 
-msgctxt "SettingsOptions::rus_russianpost::112_left"
+msgctxt "Languages::rus_russianpost.112_left"
 msgid "Left spacing (mm)"
 msgstr "Left spacing (mm)"
 

@@ -383,6 +383,9 @@ export const dispatchEvent = function(e)
         }
 
         if (jelm.hasClass('cm-check-items') || jelm.parents('.cm-check-items').length) {
+            var check_disabled = jelm.hasClass('cm-check-disabled');
+            var disabled_state = check_disabled ? '' : ':disabled';
+
             var form = elm.form;
             if (!form) {
                 form = jelm.parents('form:first');
@@ -392,13 +395,15 @@ export const dispatchEvent = function(e)
 
             if (jelm.data('caStatus')) {
                 // unselect all items
-                var items = $('input' + item_class + '[type=checkbox]:not(:disabled)', form);
-                items.prop('checked', false);
-                items.trigger('change');
+                var items = $('input' + item_class + '[type=checkbox]:not(' + disabled_state + ')', form);
+                if (!jelm.hasClass('cm-skip-unselect-all')) {
+                    items.prop('checked', false);
+                    items.trigger('change');
+                }
                 item_class += '.cm-item-status-' + jelm.data('caStatus');
             }
 
-            var inputs = $('input' + item_class + '[type=checkbox]:not(:disabled)', form);
+            var inputs = $('input' + item_class + '[type=checkbox]:not(' + disabled_state + ')', form);
 
             if (inputs.length) {
                 var flag = true;
@@ -441,14 +446,7 @@ export const dispatchEvent = function(e)
 
         var $ajax_link = jelm.closest('a.cm-ajax[href]');
         if ($ajax_link.length) {
-            return $.ajaxLink(e, undefined, function ajaxLinkCallback (data) {
-                var event_postfix = $ajax_link.data('caEventName') ? '.' + $ajax_link.data('caEventName') : '';
-                $.ceEvent(
-                    'trigger',
-                    'ce.ajaxlink.done' + event_postfix,
-                    [e, data, this]
-                );
-            });
+            return $.ajaxLink(e);
 
         } else if (jelm.parents('.cm-reset-link').length || jelm.hasClass('cm-reset-link')) {
 
@@ -525,6 +523,8 @@ export const dispatchEvent = function(e)
             container.toggleBy(flag);
 
             $.ceEvent('trigger', 'ce.switch_' + id, [flag]);
+
+            p_elm.trigger('ce:combination:switch', [container, flag]);
 
             if (container.is('.cm-smart-position:visible')) {
                 container.position({
@@ -626,10 +626,18 @@ export const dispatchEvent = function(e)
             return false;
 
         } else if (jelm.hasClass('cm-update-for-all-icon')) {
+            var object_ids = jelm.data('caDisableId');
 
             jelm.toggleClass('visible');
             jelm.prop('title', jelm.data('caTitle' + (jelm.hasClass('visible') ? 'Active' : 'Disabled')));
-            $('#hidden_update_all_vendors_' + jelm.data('caDisableId')).prop('disabled', !jelm.hasClass('visible'));
+
+            if (!$.isArray(object_ids)) {
+                object_ids = [object_ids];
+            }
+
+            object_ids.forEach((object_id) => {
+                $('#hidden_update_all_vendors_' + object_id).prop('disabled', !jelm.hasClass('visible'));
+            });
 
             if (jelm.data('caHideId')) {
                 var parent_elm = $('#container_' + jelm.data('caHideId'));
@@ -936,8 +944,15 @@ export const dispatchEvent = function(e)
 
         // switches elements availability
         if (jelm.hasClass('cm-switch-availability')) {
+            var elem_with_link = jelm;
+            var container = jelm.closest('.cm-switch-availability-container');
+            var container_exist = container.length !== 0;
 
-            var linked_elm = jelm.prop('id').replace('sw_', '').replace(/_suffix.*/, '');
+            if (container_exist) {
+                elem_with_link = container;
+            }
+
+            var linked_elm_id = elem_with_link.prop('id').replace('sw_', '').replace(/_suffix.*/, '');
             var state;
             var hide_flag = false;
 
@@ -947,6 +962,11 @@ export const dispatchEvent = function(e)
 
             if (jelm.is('[type=checkbox],[type=radio]')) {
                 state = jelm.hasClass('cm-switch-inverse') ? jelm.prop('checked') : !jelm.prop('checked');
+                if (container_exist) {
+                    state = container.hasClass('cm-switch-inverse')
+                        ? $(container).find('[type=checkbox]:checked').not('#' + linked_elm_id + ' :input').length === 0
+                        : $(container).find('[type=checkbox]:checked').not('#' + linked_elm_id + ' :input').length !== 0;
+                }
             } else {
                 if (jelm.hasClass('cm-switched')) {
                     jelm.removeClass('cm-switched');
@@ -957,7 +977,7 @@ export const dispatchEvent = function(e)
                 }
             }
 
-            $('#' + linked_elm).switchAvailability(state, hide_flag);
+            $('#' + linked_elm_id).switchAvailability(state, hide_flag);
             if (jelm.is('[type=checkbox],[type=radio]')) {
                 $.ceDialog('get_last').ceDialog('resize');
             }
@@ -1141,6 +1161,14 @@ export const runCart = function(area)
             message: _.tr('cookie_is_disabled')
         });
     }
+
+    if (_.area == 'A' && $(this).find('[data-ca-notifications-center-root]').length) {
+        $.getScript('js/tygh/notifications_center.js', function () {
+            if ($('.notifications-center__opener-wrapper').hasClass('open')) {
+                $.ceEvent('trigger', 'ce.notifications_center.enabled');
+            }
+        });
+    }
     
     // Load external blocks on init
     $.ceBlockLoader('load');
@@ -1293,6 +1321,9 @@ export const commonInit = function(context)
 
     $('.cm-object-selector', context).ceObjectSelector();
     $('.cm-object-picker', context).ceObjectPicker();
+    $('.cm-file-uploader', context).ceFileUploader();
+
+    $('.cm-notification-receivers-editor', context).ceNotificationReceiversEditor();
 
     $('.cm-combo-checkbox-group', context).each(function(i, elm) {
         $(elm).find('.cm-combo-checkbox:first').change();
@@ -1323,6 +1354,9 @@ export const commonInit = function(context)
                 $input.trigger('checkvalue');
             }, 100);
         });
+
+    $('.cm-inline-dialog-opener', context).ceInlineDialog('opener');
+    $('.cm-inline-dialog-closer', context).ceInlineDialog('closer');
 
     $.ceEvent('trigger', 'ce.commoninit', [context]);
 }
@@ -1546,33 +1580,41 @@ export const toggleStatusBox = function (toggle, data)
 {
     var loading_box = $('#ajax_loading_box');
     toggle = toggle || 'show';
-    data = data || null;
+    data = data || {};
     if (!loading_box.data('default_class')) {
         loading_box.data('default_class', loading_box.prop('statusClass'));
     }
 
     if (toggle == 'show') {
-        if (data) {
-            if (data.statusContent) {
-                loading_box.html(data.statusContent);
-            }
-            if (data.statusClass) {
-                loading_box.addClass(data.statusClass);
-            }
-            if (data.overlay) {
-                $(data.overlay).addClass('cm-overlay').css('opacity', '0.4');
-            }
+        if (data.statusContent) {
+            loading_box.html(data.statusContent);
         }
+        if (data.statusClass) {
+            loading_box.addClass(data.statusClass);
+        }
+        if (data.overlay) {
+            $(data.overlay).addClass('cm-overlay').css('opacity', '0.4');
+        }
+
         loading_box.show();
-        $('#ajax_overlay').show();
-        $.ceEvent('trigger', 'ce.loadershow', [loading_box]);
+
+        let isOverlayRequired = true;
+        if (typeof data.show_overlay !== 'undefined') {
+            isOverlayRequired = data.show_overlay;
+        }
+
+        if (isOverlayRequired) {
+            $('#ajax_overlay').show();
+        }
+
+        $.ceEvent('trigger', 'ce.loadershow', [loading_box, data]);
     } else {
         loading_box.hide();
         loading_box.empty();
         loading_box.prop('class', loading_box.data('default_class')); // remove custom classes
         $('#ajax_overlay').hide();
         $('.cm-overlay').removeClass('cm-overlay').css('opacity', '1');
-        $.ceEvent('trigger', 'ce.loaderhide', [loading_box]);
+        $.ceEvent('trigger', 'ce.loaderhide', [loading_box, data]);
     }
 }
 
@@ -1798,6 +1840,13 @@ export const ajaxLink = function(event, result_ids, callback)
         var full_render = link_obj.hasClass('cm-ajax-full-render');
         var save_history = link_obj.hasClass('cm-history');
         var formData = link_obj.hasClass('cm-ajax-send-form');
+        var event_name = '';
+
+        if (link_obj.data('caEventName')) {
+            event_name = 'ce.ajaxlink.done.' + link_obj.data('caEventName');
+        } else if (link_obj.data('caEvent')) {
+            event_name = link_obj.data('caEvent');
+        }
 
         var data = {
             method: link_obj.hasClass('cm-post') ? 'post' : 'get',
@@ -1808,7 +1857,7 @@ export const ajaxLink = function(event, result_ids, callback)
             obj: link_obj,
             scroll: link_obj.data('caScroll'),
             overlay: link_obj.data('caOverlay'),
-            callback: callback ? callback : (link_obj.data('caEvent') ? link_obj.data('caEvent') : '')
+            callback: callback || event_name
         };
 
         if (formData) {

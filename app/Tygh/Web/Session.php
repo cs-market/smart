@@ -103,6 +103,13 @@ class Session implements \ArrayAccess, \IteratorAggregate, \Countable
     public $cookie_httponly = true;
 
     /**
+     * @var string
+     *
+     * @see https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite
+     */
+    public $cookie_samesite = 'lax';
+
+    /**
      * @var int
      * @see http://php.net/manual/en/session.configuration.php#ini.session.gc-probability
      */
@@ -399,13 +406,25 @@ class Session implements \ArrayAccess, \IteratorAggregate, \Countable
         session_cache_limiter($this->cache_limiter);
         session_cache_expire($this->cache_expire);
 
-        session_set_cookie_params(
-            $this->cookie_lifetime,
-            $this->cookie_path,
-            $this->cookie_domain,
-            $this->cookie_secure,
-            $this->cookie_httponly
-        );
+        if (PHP_VERSION_ID < 70300) {
+            session_set_cookie_params(
+                $this->cookie_lifetime,
+                $this->cookie_path . '; samesite=' . $this->cookie_samesite,
+                $this->cookie_domain,
+                $this->cookie_secure,
+                $this->cookie_httponly
+            );
+        } else {
+            /** @psalm-suppress InvalidArgument */
+            session_set_cookie_params([
+                'lifetime' => $this->cookie_lifetime,
+                'path'     => $this->cookie_path,
+                'domain'   => $this->cookie_domain,
+                'secure'   => $this->cookie_secure,
+                'httponly' => $this->cookie_httponly,
+                'samesite' => $this->cookie_samesite
+            ]);
+        }
     }
 
     /**

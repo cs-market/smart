@@ -2,7 +2,7 @@
         method="post"
         name="manage_import_presets_form"
         enctype="multipart/form-data"
-        class="cm-skip-check-items import-preset {if $preview_preset_id}cm-ajax cm-comet{/if}"
+        class="cm-skip-check-items import-preset cm-ajax cm-comet"
         data-ca-advanced-import-element="management_form"
         id="manage_import_presets_form{$wrapper_extra_id}"
 >

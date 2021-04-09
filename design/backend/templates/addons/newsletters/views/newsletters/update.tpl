@@ -53,6 +53,7 @@
     <label class="control-label" for="elm_newsletter_subject_multiple">{__("more_subjects")}</label>
     <div class="controls">
         <textarea name="newsletter_data[newsletter_multiple]" id="elm_newsletter_subject_multiple" class="input-large">{$newsletter.newsletter_multiple}</textarea>
+        <p class="muted description">{__("tt_addons_newsletters_views_newsletters_update_more_subjects")}</p>
     </div>
 </div>
 {/if}
@@ -126,6 +127,7 @@
         <label class="control-label">{__("users")}</label>
         <div class="controls">
             {include file="pickers/users/picker.tpl" but_text=__("add_recipients_from_users") data_id="return_users" but_meta="btn" input_name="newsletter_data[users]" item_ids=$newsletter.users placement="right"}
+            <p class="muted description">{__("tt_addons_newsletters_views_newsletters_update_users")}</p>
         </div>
     </div>
 
@@ -219,14 +221,10 @@
     {include file="common/sidebox.tpl" content=$smarty.capture.content_sidebar title=__("menu")}
 {/capture}
 
-{if !$id}
-    {include file="common/mainbox.tpl" title="{__("new")}: `$object_name`" content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons sidebar=$smarty.capture.sidebar}
-{else}
-    {include file="common/mainbox.tpl"
-        title_start=__("editing")
-        title_end=$newsletter.newsletter
-        content=$smarty.capture.mainbox
-        select_languages=true
-        buttons=$smarty.capture.buttons
-        sidebar=$smarty.capture.sidebar}
-{/if}
+{include file="common/mainbox.tpl"
+    title= ($id) ? $newsletter.newsletter : "{__("new")}: `$object_name`"
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+    sidebar=$smarty.capture.sidebar
+}

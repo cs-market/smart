@@ -1,9 +1,5 @@
 {hook name="products:product_data_content"}
-{if $product.tracking == "ProductTracking::TRACK_WITH_OPTIONS"|enum}
-    {assign var="out_of_stock_text" value=__("text_combination_out_of_stock")}
-{else}
-    {assign var="out_of_stock_text" value=__("text_out_of_stock")}
-{/if}
+{$out_of_stock_text = __("text_out_of_stock")}
 
 {if ($product.price|floatval || $product.zero_price_action == "P" || $product.zero_price_action == "A" || (!$product.price|floatval && $product.zero_price_action == "R")) && !($settings.Checkout.allow_anonymous_shopping == "hide_price_and_add_to_cart" && !$auth.user_id)}
     {assign var="show_price_values" value=true}
@@ -113,7 +109,7 @@
             || $product.price != 0
         )
         && (
-            $settings.General.inventory_tracking != "Y"
+            $settings.General.inventory_tracking == "YesNo::NO"|enum
             || $settings.General.allow_negative_amount == "Y"
             || (
                 $product_amount > 0
@@ -136,14 +132,14 @@
             {/if}
         {/if}
 
-    {elseif ($settings.General.inventory_tracking == "Y" && $settings.General.allow_negative_amount != "Y" && (($product_amount <= 0 || $product_amount < $product.min_qty) && $product.tracking != "ProductTracking::DO_NOT_TRACK"|enum) && $product.is_edp != "Y")}
+    {elseif ($settings.General.inventory_tracking !== "YesNo::NO"|enum && $settings.General.allow_negative_amount != "Y" && (($product_amount <= 0 || $product_amount < $product.min_qty) && $product.tracking != "ProductTracking::DO_NOT_TRACK"|enum) && $product.is_edp != "Y")}
         {hook name="products:out_of_stock_block"}
             {assign var="show_qty" value=false}
             {if !$details_page}
                 {if (!$product.hide_stock_info && !(($product_amount <= 0 || $product_amount < $product.min_qty) && ($product.avail_since > $smarty.const.TIME)))}
                     <span class="ty-qty-out-of-stock ty-control-group__item" id="out_of_stock_info_{$obj_prefix}{$obj_id}">{$out_of_stock_text}</span>
                 {/if}
-            {elseif (($product.out_of_stock_actions == "OutOfStockActions::SUBSCRIBE"|enum) && ($product.tracking != "ProductTracking::TRACK_WITH_OPTIONS"|enum))}
+            {elseif ($product.out_of_stock_actions == "OutOfStockActions::SUBSCRIBE"|enum)}
                 {hook name="product_data:back_in_stock_checkbox"}
                 <div class="ty-control-group">
                     <label for="sw_product_notify_{$obj_prefix}{$obj_id}" class="ty-strong" id="label_sw_product_notify_{$obj_prefix}{$obj_id}">
@@ -219,10 +215,10 @@
 {capture name="product_features_`$obj_id`"}
 {hook name="products:product_features"}
     {if $show_features}
-        <div class="cm-reload-{$obj_prefix}{$obj_id}" id="product_features_update_{$obj_prefix}{$obj_id}">
+        <div class="cm-reload-{$obj_prefix}{$obj_id}" id="product_data_features_update_{$obj_prefix}{$obj_id}">
             <input type="hidden" name="appearance[show_features]" value="{$show_features}" />
             {include file="views/products/components/product_features_short_list.tpl" features=$product|fn_get_product_features_list no_container=true}
-        <!--product_features_update_{$obj_prefix}{$obj_id}--></div>
+        <!--product_data_features_update_{$obj_prefix}{$obj_id}--></div>
     {/if}
 {/hook}
 {/capture}
@@ -402,19 +398,19 @@
 
 {capture name="product_amount_`$obj_id`"}
 {hook name="products:product_amount"}
-{if $show_product_amount && $product.is_edp != "Y" && $settings.General.inventory_tracking == "Y"}
+{if $show_product_amount && $product.is_edp != "Y" && $settings.General.inventory_tracking !== "YesNo::NO"|enum}
     <div class="cm-reload-{$obj_prefix}{$obj_id} stock-wrap" id="product_amount_update_{$obj_prefix}{$obj_id}">
         <input type="hidden" name="appearance[show_product_amount]" value="{$show_product_amount}" />
         {if !$product.hide_stock_info}
             {if $settings.Appearance.in_stock_field == "Y"}
                 {if $product.tracking != "ProductTracking::DO_NOT_TRACK"|enum}
-                    {if ($product_amount > 0 && $product_amount >= $product.min_qty) && $settings.General.inventory_tracking == "Y" || $details_page}
+                    {if ($product_amount > 0 && $product_amount >= $product.min_qty) && $settings.General.inventory_tracking !== "YesNo::NO"|enum || $details_page}
                         {if (
                                 $product_amount > 0
                                 && $product_amount >= $product.min_qty
                                 || $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum
                             )
-                            && $settings.General.inventory_tracking == "Y"
+                            && $settings.General.inventory_tracking !== "YesNo::NO"|enum
                         }
                             <div class="ty-control-group product-list-field">
                                 {if $show_amount_label}
@@ -428,7 +424,7 @@
                                     {/if}
                                 </span>
                             </div>
-                        {elseif $settings.General.inventory_tracking == "Y" && $settings.General.allow_negative_amount != "Y"}
+                        {elseif $settings.General.inventory_tracking !== "YesNo::NO"|enum && $settings.General.allow_negative_amount != "Y"}
                             <div class="ty-control-group product-list-field">
                                 {if $show_amount_label}
                                     <label class="ty-control-group__label">{__("in_stock")}:</label>
@@ -444,11 +440,11 @@
                         && $product_amount >= $product.min_qty
                         || $product.tracking == "ProductTracking::DO_NOT_TRACK"|enum
                     )
-                    && $settings.General.inventory_tracking == "Y"
-                    && $settings.General.allow_negative_amount != "Y"
-                    || $settings.General.inventory_tracking == "Y"
+                    && $settings.General.inventory_tracking !== "YesNo::NO"|enum
+                    && $settings.General.allow_negative_amount !== "YesNo::YES"|enum
+                    || $settings.General.inventory_tracking !== "YesNo::NO"|enum
                     && (
-                        $settings.General.allow_negative_amount == "Y"
+                        $settings.General.allow_negative_amount === "YesNo::YES"|enum
                         || $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum
                     )
                 }
@@ -469,7 +465,7 @@
                         $product_amount <= 0
                         || $product_amount < $product.min_qty
                     )
-                    && $settings.General.inventory_tracking == "Y"
+                    && $settings.General.inventory_tracking !== "YesNo::NO"|enum
                     && $settings.General.allow_negative_amount != "Y"
                 }
                     <div class="ty-control-group product-list-field">

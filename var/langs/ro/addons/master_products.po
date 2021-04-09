@@ -6,9 +6,11 @@ msgstr ""
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.11.3/addons/master_products.po\n"
-"PO-Revision-Date: 2020-01-29 14:52\n"
+"X-Crowdin-File: /release-4.12.2/addons/master_products.po\n"
+"X-Crowdin-File-ID: 4090\n"
+"PO-Revision-Date: 2021-02-01 09:11\n"
 
 msgctxt "Addons::name::master_products"
 msgid "Common Products for Vendors"
@@ -112,5 +114,13 @@ msgstr ""
 
 msgctxt "Languages::master_products.product_type.offer_variation"
 msgid "Vendor variation offer"
+msgstr ""
+
+msgctxt "Languages::master_products.resave_after_show_out_of_stock_products_changed"
+msgid "You've changed the <b>Show out of stock products</b> setting. Please export <a href=\"[url]\">all your catalog items</a> (use \"Export found products\" in the gear button) and reimport them. This will ensure that the displayed price of common products will always remain correct until you change the setting again."
+msgstr ""
+
+msgctxt "Languages::master_products.save_up_to"
+msgid "Save up to"
 msgstr ""
 

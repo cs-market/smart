@@ -183,6 +183,37 @@
     }
 }
 
+// On tablets, fix the submenu opening on pages with an active content area.
+html:not(.touchevents) .hover-show .dropdown-submenu .dropdown-submenu__link-overlay {
+    display: none;
+}
+@media (max-width: @TabletBreakpoint) and (min-width: 1367px) {
+    html.touchevents .hover-show .dropdown-submenu .dropdown-submenu__link-overlay {
+        display: none;
+    }
+}
+@media (min-width: @TabletBreakpoint + 1) and (max-width: 1366px) {
+    .touchevents .hover-show .dropdown-submenu {
+        position: relative;
+
+        &__link-overlay {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: width 0s 1s, height 0s 1s;
+            z-index: 1;
+
+            &:hover {
+                width: 0;
+                height: 0;
+            }
+        }
+    }
+}
+
 .search-shop {
     padding: 10px 10px 0px 10px;
     border-bottom: 1px solid #e5e5e5;
@@ -253,9 +284,9 @@
             color: #fff;
         }
     }
-    * {
-        transition: .128s background, color;
-    }
+}
+.nav.navbar-right * {
+    transition: .128s background, color;
 }
 .navbar-admin-top .navbar .navbar-inner--disabled {
     .nav li.dropdown.open>.dropdown-toggle {
@@ -288,8 +319,9 @@
     .title {
         padding: 0px 14px 0px 14px;
         height: 48px;
-        max-width: 80%;
-        
+        max-width: 86%;
+        max-width: ~"calc(100% - 51px)";    // 100% - Mobile menu button
+
         &__heading {
             overflow: hidden;
             margin: 0;
@@ -299,6 +331,24 @@
             font-size: 24px;
             line-height: 40px;
             font-weight: 400;
+
+            &--storefronts {
+                @media (min-width: @TabletBreakpoint) {
+                    max-width: 185px;
+                }
+
+                @media (min-width: @DesktopBreakpoint) {
+                    max-width: 440px;
+                }
+
+                @media (min-width: 1180px) {
+                    max-width: 600px;
+                }
+
+                @media (min-width: @LargeDesktopBreakpoint) {
+                    max-width: 660px;
+                }
+            }
         }
         .f-middle {
             color: #6e6e6e;
@@ -309,6 +359,10 @@
             color: #a5a5a5;
             font-weight: normal;
             font-size: 13px;
+        }
+        &--storefronts {
+            max-width: 71%;
+            max-width: ~"calc(100% - 46px - 61px)"; // 100% - Mobile menu button - Storefront picker button
         }
     }
     .btn {
@@ -477,83 +531,6 @@
     font-size: 13px;
 }
 
-.search {
-    width: 214px;
-    height: 32px;
-    margin-top: 6px;
-    position: relative;
-    >form {
-        position: absolute;
-        top: 0;
-        right: 6px;
-        left: 10px;
-        bottom: 0;
-        margin: 0;
-        label {
-            position: relative;
-            height: 100%;
-            input {
-                width: 100%;
-            }
-        }
-        button {
-            position: absolute;
-            height: 32px;
-            right: 0;
-            width: 34px;
-            z-index: 5;
-            border: 0;
-            background-color: transparent;
-            border-left: 1px solid #d3dbe2;
-            color: @mainColor;
-            border-radius: 0 4px 4px 0;
-        }
-    }
-}
-.search-mobile {
-
-    .btn i&-icon {
-        color: @mainColor;
-    }
-    button&-button {
-        border-color: transparent;
-    }
-    button&-back {
-        right: auto;
-        border-color: transparent;
-    }
-    &-block {
-        position: absolute;
-        z-index: 10;
-        top: 0;
-        left: 0;
-        width: ~"calc(100% - 10px)";
-        margin-top: 7px;
-        margin-left: 5px;
-        margin-right: 5px;
-    }
-    label input&-input {
-        padding-left: 40px;
-        padding-right: 40px;
-    }
-    &-label {
-        height: 100%;
-    }
-    &-back,
-    &-button {
-        position: absolute;
-        height: 32px;
-        right: 0;
-        width: 34px;
-        z-index: 5;
-        border: 0;
-        background-color: transparent;
-        border-left: 1px solid #d3dbe2;
-        color: @mainColor;
-        border-radius: 0 4px 4px 0;
-    }
-}
-
 .dropdown-menu {
     li:not(.disabled) {
         >a:hover,
@@ -677,6 +654,18 @@
                 }
             }
         }
+
+        @media (max-width: @DesktopBreakpoint) {
+            max-width: @mainSidebarWidth;
+            min-width: @mainSidebarWidth;
+        }
+    }
+}
+
+.subnav .nav.nav-pills li > a {
+    @media (max-width: @DesktopBreakpoint + 1) {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 

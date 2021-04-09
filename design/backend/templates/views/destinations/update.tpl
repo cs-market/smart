@@ -43,6 +43,15 @@
                     obj=$destination
                 }
 
+                {if !$id}
+                    <div class="control-group">
+                        <label class="control-label">{__("add_in_all_realtime_shippings")}:</label>
+                        <div class="controls">
+                            <input type="checkbox" name="destination_data[add_in_all_realtime_shippings]" checked>
+                        </div>
+                    </div>
+                {/if}
+
                 {* Countries list *}
                 {include file="common/double_selectboxes.tpl"
                     title=__("countries")
@@ -142,16 +151,8 @@
     }
 {/capture}
 
-{$title = __("new_rate_area")}
-{if $id}
-    {$title_start = __("editing_rate_area")}
-    {$title_end = $destination.destination}
-{/if}
-
 {include file="common/mainbox.tpl"
-    title_start=$title_start
-    title_end=$title_end
-    title=$title
+    title=($id) ? $destination.destination : __("new_rate_area")
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
     select_languages=true

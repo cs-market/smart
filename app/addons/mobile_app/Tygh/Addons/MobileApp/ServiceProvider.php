@@ -17,8 +17,6 @@ namespace Tygh\Addons\MobileApp;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Tygh\Addons\MobileApp\Notifications\Factory;
-use Tygh\Addons\MobileApp\Notifications\Sender;
-use Tygh\Http;
 use Tygh\Languages\Values;
 use Tygh\Tygh;
 
@@ -27,13 +25,6 @@ class ServiceProvider implements ServiceProviderInterface
     /** @inheritdoc */
     public function register(Container $app)
     {
-        $app['addons.mobile_app.notifications.sender'] = function (Container $app) {
-            return new Sender(
-                fn_mobile_app_get_mobile_app_settings(),
-                new Http()
-            );
-        };
-
         $app['addons.mobile_app.notifications.factory'] = function (Container $app) {
             return new Factory();
         };

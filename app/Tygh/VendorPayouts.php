@@ -16,6 +16,7 @@ namespace Tygh;
 
 use Tygh\Enum\VendorPayoutApprovalStatuses;
 use Tygh\Enum\VendorPayoutTypes;
+use Tygh\Enum\YesNo;
 
 class VendorPayouts
 {

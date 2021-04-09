@@ -23,6 +23,9 @@ import { ceBlockManagerInit} from './block_manager';
 import { ceBlockLoaderInit } from './block_loader';
 import { ceObjectPickerInit } from './object_picker';
 import { ceTableSorterInit } from './tablesorter';
+import { ceNotificationReceiversEditorInit } from './notification_receivers_editor';
+import { ceInlineDialogInit } from './inline_dialog';
+import { ceFileUploaderInit } from './file_uploader';
 
 /**
  * @param {JQueryStatic} $ 
@@ -53,4 +56,7 @@ export const registerAllPlugins = function ($) {
     ceBlockLoaderInit($);
     ceObjectPickerInit($);
     ceTableSorterInit($);
+    ceNotificationReceiversEditorInit($);
+    ceInlineDialogInit($);
+    ceFileUploaderInit($);
 }

@@ -1,5 +1,6 @@
 {if $items|default:[]}
 
+    {$show_add_to_wishlist=$_show_add_to_wishlist|default:true}
     {$first_vendor_product = reset($items)}
     <div class="ty-sellers-list js-sellers-list"
          data-ca-seller-list-request-product-id="{$smarty.request.product_id}"
@@ -109,11 +110,13 @@
                         </div>
 
                         <div class="ty-sellers-list__buttons">
-                            {$add_to_cart = "add_to_cart_`$product_id`"}
-                            {$smarty.capture.$add_to_cart nofilter}
+                            {hook name="vendor_products:list_buttons"}
+                                {$add_to_cart = "add_to_cart_`$product_id`"}
+                                {$smarty.capture.$add_to_cart nofilter}
 
-                            {$list_buttons = "list_buttons_`$product_id`"}
-                            {$smarty.capture.$list_buttons nofilter}
+                                {$list_buttons = "list_buttons_`$product_id`"}
+                                {$smarty.capture.$list_buttons nofilter}
+                            {/hook}
                         </div>
 
                     </div>

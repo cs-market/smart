@@ -33,6 +33,7 @@ class SraProducts extends Products
     {
         $result = parent::index($id, $params);
         $lang_code = $this->getLanguageCode($params);
+        $currency = $this->getCurrencyCode($params);
 
         $is_discussion_enabled = SraDiscussion::isAddonEnabled();
 
@@ -56,15 +57,12 @@ class SraProducts extends Products
         }
         unset($product);
 
-        fn_gather_additional_products_data($products, [
-            'get_options'         => true,
-            'get_features'        => true,
-            'get_detailed'        => true,
-            'get_icon'            => true,
-            'get_additional'      => true,
-            'get_discounts'       => true,
-            'features_display_on' => 'A',
-        ]);
+        /**
+         * @psalm-var array<int, array{
+         *   product_id: int,
+         * }> $products
+         */
+        $products = fn_storefront_rest_api_gather_additional_products_data($products, $params);
 
         foreach ($products as &$product) {
             $amount = $this->getRequestedProductAmount($params, $product['product_id']);
@@ -72,7 +70,7 @@ class SraProducts extends Products
                 $product = $this->calculateQuantityPrice($product, $amount);
             }
 
-            $product = fn_storefront_rest_api_format_product_prices($product);
+            $product = fn_storefront_rest_api_format_product_prices($product, $currency);
 
             if ($is_discussion_enabled) {
                 $product = SraDiscussion::setDiscussionType($product, DiscussionObjectTypes::PRODUCT);
@@ -145,7 +143,7 @@ class SraProducts extends Products
 
     protected function getFilters(array $params, $lang_code)
     {
-        list($filters) = fn_get_filters_products_count($params, $lang_code);
+        list($filters) = fn_product_filters_get_filters_products_count($params, $lang_code);
         foreach ($filters as $id => &$filter) {
             $filter['filter_style'] = fn_storefront_rest_api_get_filter_style($filter);
 

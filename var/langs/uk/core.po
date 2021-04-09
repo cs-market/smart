@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.11.5/core.po\n"
-"X-Crowdin-File-ID: 3710\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/core.po\n"
+"X-Crowdin-File-ID: 4196\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "LanguageName"
 msgid "Localized language name"
@@ -300,6 +300,10 @@ msgctxt "Languages::add_feature"
 msgid "Add feature"
 msgstr "Додати характеристику"
 
+msgctxt "Languages::advanced_feature_creation"
+msgid "Advanced feature creation"
+msgstr ""
+
 msgctxt "Languages::add_field"
 msgid "Add field"
 msgstr "Додати поле"
@@ -395,6 +399,10 @@ msgstr "Додати варіант"
 msgctxt "Languages::add_option"
 msgid "Add option"
 msgstr "Додати опцію"
+
+msgctxt "Languages::advanced_option_creation"
+msgid "Advanced option creation"
+msgstr ""
 
 msgctxt "Languages::add_order"
 msgid "Add order"
@@ -856,6 +864,10 @@ msgctxt "Languages::approve_selected"
 msgid "Approve selected"
 msgstr "Затвердити обрані"
 
+msgctxt "Languages::enter_disapproval_reason"
+msgid "Enter the reason for disapproval"
+msgstr ""
+
 msgctxt "Languages::arabic"
 msgid "Arabic"
 msgstr "Арабська"
@@ -1248,6 +1260,10 @@ msgctxt "Languages::block_manager.forbid_changing_layout_in_css_mode"
 msgid "Changing layout when the theme is converted to CSS is not permitted. Please enable LESS mode in the <a target=\"_blank\" class=\"cm-post\" href=\"[url]\">Theme editor</a>."
 msgstr "Нможливо змінити налаштування макета, якщо стилі теми сконвертовано в СSS. Увімкніть режим LESS в <a target=\"_blank\" class=\"cm-post\" href=\"[url]\">Редакторі тем</a>."
 
+msgctxt "Languages::block_manager.can_not_add_product"
+msgid "Sorry, we couldn't take you to the checkout page. It requires at least one product in cart, and we couldn't add any. Please create a product and make it available on the storefront first."
+msgstr "На жаль, ми не змогли відкрити сторінку оформлення замовлення. Для цього потрібен принаймні один товар у кошику, і ми не змогли додати жодного. Спочатку створіть товар і зробіть його доступним на вітрині магазину."
+
 msgctxt "Languages::block_manager.add_layout_page"
 msgid "Add layout page"
 msgstr "Додати сторінку макета"
@@ -1528,9 +1544,9 @@ msgctxt "Languages::broken_po_pack"
 msgid "Incorrect PO-pack structure. The uploaded pack cannot be installed."
 msgstr "Некоректна структура PO-архіва. Завантажений архів не вдалося встановити."
 
-msgctxt "Languages::incorrect_po_pack_structure"
-msgid "The structure of package that contains \".po\" translation files located at <b>\"[pack_path]\"</b> is incorrect."
-msgstr "Некоректна структура пакета, що містить мовні файли \".po\" в <b>\"[pack_path]\"</b>."
+msgctxt "Languages::incorrect_po_pack_structure_file_not_exist"
+msgid "The structure of package that contains \".po\" translation files located at <b>\"[pack_path]\"</b> is incorrect. The file <b>\"[po_file]\"</b> does not exist."
+msgstr ""
 
 msgctxt "Languages::browse"
 msgid "Browse..."
@@ -2531,7 +2547,7 @@ msgstr "Бразильський реал"
 
 msgctxt "Languages::currency_code_byr"
 msgid "BYN"
-msgstr ""
+msgstr "BYN"
 
 msgctxt "Languages::currency_code_cad"
 msgid "Canadian Dollar"
@@ -2819,7 +2835,7 @@ msgstr "Покупці"
 
 msgctxt "Languages::customers_menu_title"
 msgid "Customers"
-msgstr ""
+msgstr "Покупці"
 
 msgctxt "Languages::customers_menu_description"
 msgid "List of store customers, registered users with a customer account."
@@ -2989,9 +3005,17 @@ msgctxt "Languages::dec_sign"
 msgid "Dec sign"
 msgstr "Дробний роздільник"
 
+msgctxt "Languages::select_selectbox_option"
+msgid "Select option"
+msgstr "Виберіть опцю"
+
 msgctxt "Languages::default"
 msgid "Default"
 msgstr "За замовчуванням"
+
+msgctxt "Languages::select_default"
+msgid "Select default"
+msgstr ""
 
 msgctxt "Languages::default_category_view"
 msgid "Default category view"
@@ -3024,6 +3048,58 @@ msgstr "Велике зображення"
 msgctxt "Languages::default_value"
 msgid "Default value"
 msgstr "Значення за замовчуванням"
+
+msgctxt "Languages::default_custom.disabled"
+msgid "Disabled"
+msgstr "Вимк."
+
+msgctxt "Languages::default_custom.custom"
+msgid "Custom..."
+msgstr "Своє..."
+
+msgctxt "Languages::default_custom.custom_value"
+msgid "Custom ([value])"
+msgstr "Своє ([value])"
+
+msgctxt "Languages::default_custom.parent"
+msgid "Parent ([name])"
+msgstr "Батьківський ([name])"
+
+msgctxt "Languages::default_custom.global"
+msgid "Global ([name])"
+msgstr "Глобально ([name])"
+
+msgctxt "Languages::default_custom.edit_parent"
+msgid "Edit parent ([name])..."
+msgstr ""
+
+msgctxt "Languages::default_custom.edit_global"
+msgid "Edit global ([name])..."
+msgstr ""
+
+msgctxt "Languages::global_individual.global"
+msgid "Global"
+msgstr "Глобальний"
+
+msgctxt "Languages::global_individual.individual"
+msgid "Individual"
+msgstr "Своє"
+
+msgctxt "Languages::global_individual.global_value_all_items"
+msgid "Global value for all items"
+msgstr ""
+
+msgctxt "Languages::global_individual.individual_values_each_item"
+msgid "Individual values for each item"
+msgstr ""
+
+msgctxt "Languages::global_individual.individual_tooltip"
+msgid "This setting is currently global. Click here to allow changing its value for individual items."
+msgstr ""
+
+msgctxt "Languages::global_individual.global_tooltip"
+msgid "The value of this setting can be changed for individual items. Click here to make this setting global."
+msgstr ""
 
 msgctxt "Languages::deferred"
 msgid "Deferred"
@@ -4023,7 +4099,7 @@ msgstr "CVV/CVC є занадто коротким."
 
 msgctxt "Languages::error_validator_ccv_long"
 msgid "CVV/CVC is too long."
-msgstr ""
+msgstr "CVV/CVC є занадто довгим."
 
 msgctxt "Languages::error_change_admin_data_in_frontend"
 msgid "It's forbidden to change the admin email or password in the customer area. Please sign in using a customer account."
@@ -4225,6 +4301,10 @@ msgctxt "Languages::feature_comparison"
 msgid "Feature comparison"
 msgstr "Порівняння характеристик"
 
+msgctxt "Languages::feature_category"
+msgid "Feature category"
+msgstr ""
+
 msgctxt "Languages::feature_display_on_catalog"
 msgid "Show in product list"
 msgstr "Показувати в списку товарів"
@@ -4236,6 +4316,18 @@ msgstr "Показувати в заголовку картки товара"
 msgctxt "Languages::feature_display_on_product"
 msgid "Show on the Features tab"
 msgstr "Показувати у вкладці «Характеристики» картки товара"
+
+msgctxt "Languages::feature_hide_on_catalog"
+msgid "Hide in product list"
+msgstr ""
+
+msgctxt "Languages::feature_hide_on_header"
+msgid "Hide in header on the product details page"
+msgstr ""
+
+msgctxt "Languages::feature_hide_on_product"
+msgid "Hide on the Features tab"
+msgstr ""
 
 msgctxt "Languages::feedback_is_sent_successfully"
 msgid "The feedback has been sent successfully."
@@ -4953,6 +5045,14 @@ msgctxt "Languages::inventory"
 msgid "Inventory"
 msgstr "Склад"
 
+msgctxt "Languages::track_inventory"
+msgid "Track inventory"
+msgstr ""
+
+msgctxt "Languages::track_inventory_tooltip"
+msgid "When inventory is tracked, the number of products in stock will decrease after each purchase."
+msgstr ""
+
 msgctxt "Languages::invitees"
 msgid "Invitees"
 msgstr "Запрошені"
@@ -5121,6 +5221,10 @@ msgctxt "Languages::languages"
 msgid "Languages"
 msgstr "Мови"
 
+msgctxt "Languages::texts_languages"
+msgid "Texts & languages"
+msgstr "Тексти та мови"
+
 msgctxt "Languages::language_code"
 msgid "Language code"
 msgstr "Код мови"
@@ -5163,7 +5267,7 @@ msgstr "Останнє замовлення"
 
 msgctxt "Languages::first_order"
 msgid "First order"
-msgstr ""
+msgstr "Перше замовлення"
 
 msgctxt "Languages::registration_date"
 msgid "Registration date"
@@ -5342,8 +5446,8 @@ msgid "List price"
 msgstr "Рекомендована ціна"
 
 msgctxt "Languages::list_quantity_count"
-msgid "List quantity count"
-msgstr "Максимальне число в списку выбора кількості"
+msgid "Number of available quantities"
+msgstr ""
 
 msgctxt "Languages::tmpl_list_without_options"
 msgid "List without options"
@@ -5666,8 +5770,8 @@ msgid "Number of items"
 msgstr "Кількість елементів"
 
 msgctxt "Languages::max_order_qty"
-msgid "Maximum order quantity"
-msgstr "Максимальне замовлення"
+msgid "Maximum quantity to buy per product"
+msgstr ""
 
 msgctxt "Languages::max_uploading_file_size"
 msgid "Max uploading file size"
@@ -5806,8 +5910,8 @@ msgid "minute(s)"
 msgstr "хв"
 
 msgctxt "Languages::min_order_qty"
-msgid "Minimum order quantity"
-msgstr "Мінімальне замовлення"
+msgid "Minimum quantity to buy per product"
+msgstr ""
 
 msgctxt "Languages::missing_variants_handling"
 msgid "Missing variants handling"
@@ -6859,7 +6963,7 @@ msgstr "На жаль, хеш рядок не співпав"
 
 msgctxt "Languages::payments.epdq.instructions"
 msgid "<ol><li><p>Enter the following URL in the \"Technical information\"→\"Transaction feedback\" section in the Barclaycard ePDQ admin area:</p><p>for the \"accepted\" and \"cancelled\" payments: [url]</p></li><li>Make sure that the \"Timing of the request\" is set to \"Always online\", and \"Request method\" is set to \"POST\"</li><li>Define the \"SHA-OUT pass phrase\" value in the ePDQ admin area as you like, then duplicate it in the \"SHA-IN pass phrase\" field in the \"Data and origin verification\" section, and also in the \"Pass-phrase\" field below</li><li>Make sure that the \"Default operation code\" option in the ePDQ admin area has the same value as the \"Transaction type\" option value below</li><li>Set the \"Hash algorithm\" parameter to \"SHA-1\" in the \"Global security parameters\" section in the Barclaycard ePDQ admin area</li></ol>"
-msgstr ""
+msgstr "<ol><li><p> Введіть наступний URL в секції \"Technical information\" → \"Transaction feedback\" в панелі управління Barclaycard  ePDQ:</p><p>для прийнятих (\"accepted\") і відхилених (\"cancelled\") платежів: [url]</p></li><li>Переконайтеся в тому, що параметр \"Timing of the request\" має значення \"Always online\", а \"Request method\" - \"POST\"</li><li>Встановіть значення параметра \"SHA-OUT pass phrase\" в панелі управління ePDQ на свій розсуд, потім продублюйте це значення в поле \"SHA-IN pass phrase\" в секції \"Data and origin verification\", а також у полі \"Pass-phrase\" нижче</li><li> Переконайтеся, що параметр \"Default operation code\" в панелі управління ePDQ має таке ж значення, що і параметр \"Transaction type\" нижче</li><li>Встановіть значення параметра \"Hash algorithm\" рівним \"SHA-1\" в секції \"Global security parameters\" в панелі управління Barclaycard ePDQ</li></ol>"
 
 msgctxt "Languages::payments.epdq.pspid"
 msgid "EPDQ pspid"
@@ -6976,6 +7080,10 @@ msgstr "Електронна адреса продавця"
 msgctxt "Languages::pending"
 msgid "Pending"
 msgstr "Непідтверджені"
+
+msgctxt "Languages::suspended"
+msgid "Suspended"
+msgstr "Призупинено"
 
 msgctxt "Languages::per"
 msgid "Per [object]"
@@ -7310,8 +7418,8 @@ msgid "Can edit"
 msgstr "Можна редагувати"
 
 msgctxt "Languages::privileges.edit_order"
-msgid "Can edit"
-msgstr "Можна редагувати"
+msgid "Can edit entire order (select other products, payment and shipping methods, customers)"
+msgstr ""
 
 msgctxt "Languages::privileges.edit_files"
 msgid "Edit files"
@@ -7412,6 +7520,10 @@ msgstr "Можна редагувати"
 msgctxt "Languages::privileges.update_settings"
 msgid "Can edit"
 msgstr "Можна редагувати"
+
+msgctxt "Languages::privileges.update_order_details"
+msgid "Can edit minor details (select manager; edit shipments, notes, and tracking number)"
+msgstr ""
 
 msgctxt "Languages::privileges.upgrade_store"
 msgid "Can upgrade"
@@ -7563,7 +7675,7 @@ msgstr "Процесор"
 
 msgctxt "Languages::processor_description_cardsave"
 msgid "Merchant Accounts provided by Worldpay Cardsave, <a href=\"http://www.cardsave.net\">www.cardsave.net</a><br/><br/>Email: <a href='mailto:ecomm@cardsave.net'>ecomm@cardsave.net</a>"
-msgstr ""
+msgstr "Акаунти продавців, надані Worldpay Cardsave, <a href=\"http://www.cardsave.net\">www.cardsave.net</a><br/><br/>Email:<a href='mailto:ecomm@cardsave.net'>ecomm@cardsave.net</a>"
 
 msgctxt "Languages::processor_description_p21"
 msgid "<b>P21 Simple API</b> enables you to accept check payments. It offers the industry's most comprehensive suite of check image creation and clearing solutions. With Check 21, you will receive your funds within the same day by check or direct deposit.<br/><br/>To activate the Check 21 option, please contact us via email at: <a href=\"mailto:support@payment21.com\">support@payment21.com</a> or by phone at: 1-888-770-0850 (US Toll Free) or 0041-71-740-1629 (International).<br/><br/><a href=\"http://www.payment21.com\" target=\"_blank\">www.payment21.com</a>"
@@ -7587,7 +7699,7 @@ msgstr "Товари"
 
 msgctxt "Languages::products_menu_title"
 msgid "Products"
-msgstr ""
+msgstr "Товари"
 
 msgctxt "Languages::products_deprecated"
 msgid "Products (Deprecated)"
@@ -7624,6 +7736,10 @@ msgstr "Для поставки не були обрані товари"
 msgctxt "Languages::products_found"
 msgid "Products found"
 msgstr "Знайдено товарів"
+
+msgctxt "Languages::n_products_found"
+msgid "[n] product found|[n] products found"
+msgstr "[n] товар знайдено|[n] товара знайдено|[n] товарів знайдено"
 
 msgctxt "Languages::products_grid"
 msgid "Products grid"
@@ -8071,8 +8187,8 @@ msgid "Quick links"
 msgstr "Швидкі посилання"
 
 msgctxt "Languages::quick_menu"
-msgid "Quick menu"
-msgstr "Меню швидкого доступу"
+msgid "Quick start menu"
+msgstr "Меню швидкого запуску"
 
 msgctxt "Languages::quick_product_viewer"
 msgid "Quick product viewer"
@@ -8106,13 +8222,21 @@ msgctxt "Languages::rate_calculation_manual"
 msgid "Manual (by defined location)"
 msgstr "В ручну (за місцезнаходженням)"
 
-msgctxt "Languages::rate_calculation_by_rate_area"
-msgid "Manual (by defined rate area)"
-msgstr "Вручну (по заданій тарифній зоні)"
+msgctxt "Languages::rate_calculation_manual_by_rate_area"
+msgid "Manual (by rate areas)"
+msgstr ""
+
+msgctxt "Languages::rate_calculation_by_customer_address"
+msgid "By customer's address"
+msgstr ""
 
 msgctxt "Languages::rate_calculation_realtime"
 msgid "Realtime"
 msgstr "У реальному часі"
+
+msgctxt "Languages::rate_calculation_realtime_automatic"
+msgid "Real-time (automatic)"
+msgstr ""
 
 msgctxt "Languages::rate_value"
 msgid "Rate value"
@@ -8730,10 +8854,6 @@ msgctxt "Languages::search_string"
 msgid "Search string"
 msgstr "Рядок пошуку"
 
-msgctxt "Languages::search_tooltip"
-msgid "Search for products, customers, orders and CMS pages"
-msgstr "Шукати товари, користувачів, замовлення, сторінки та новини сайту"
-
 msgctxt "Languages::search_words"
 msgid "Search words"
 msgstr "Пошукові слова"
@@ -9129,6 +9249,98 @@ msgstr "Адреса доставки та адреса платника спі�
 msgctxt "Languages::shipping_service"
 msgid "Shipping service"
 msgstr "Служба доставки"
+
+msgctxt "Languages::shipping_time"
+msgid "Shipping time"
+msgstr "Терміни доставки"
+
+msgctxt "Languages::shipping_rate"
+msgid "Rate"
+msgstr "Курс"
+
+msgctxt "Languages::shipping_price_condition"
+msgid "Price condition"
+msgstr ""
+
+msgctxt "Languages::shipping_weight_condition"
+msgid "Weight condition"
+msgstr ""
+
+msgctxt "Languages::shipping_items_condition"
+msgid "Items condition"
+msgstr ""
+
+msgctxt "Languages::shipping_surcharge_discount"
+msgid "Surcharge / Discount"
+msgstr ""
+
+msgctxt "Languages::shipping_per"
+msgid "per"
+msgstr "за"
+
+msgctxt "Languages::shipping_from_value"
+msgid "From"
+msgstr "Від"
+
+msgctxt "Languages::shipping_to_value"
+msgid "To"
+msgstr "До"
+
+msgctxt "Languages::shipping_and_up"
+msgid "and up"
+msgstr "і вище"
+
+msgctxt "Languages::shipping_item"
+msgid "item"
+msgstr "шт."
+
+msgctxt "Languages::shipping_add_conditions"
+msgid "Add conditions"
+msgstr "Додати умови"
+
+msgctxt "Languages::shipping_hide_conditions"
+msgid "Hide conditions"
+msgstr "Сховати умови"
+
+msgctxt "Languages::shipping_add_price_condition"
+msgid "Add price conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_add_weight_condition"
+msgid "Add weight conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_add_items_condition"
+msgid "Add items conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_remove_price_condition"
+msgid "Remove price conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_remove_weight_condition"
+msgid "Remove weight conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_remove_items_condition"
+msgid "Remove items conditions"
+msgstr ""
+
+msgctxt "Languages::shipping_edit_rate_area"
+msgid "Edit rate area"
+msgstr ""
+
+msgctxt "Languages::shipping_remove_rate_area"
+msgid "Remove rate area from shipping"
+msgstr ""
+
+msgctxt "Languages::shipping_rate_range_overlap_error_message"
+msgid "Condition must not fall within existing range."
+msgstr ""
+
+msgctxt "Languages::shipping_rate_range_limit_error_message"
+msgid "The beginning of the range can't be higher than the end."
+msgstr ""
 
 msgctxt "Languages::ship_dhl_height"
 msgid "Package height"
@@ -9674,10 +9886,6 @@ msgctxt "Languages::show_items_in_line"
 msgid "Show items inline"
 msgstr "Показати вбудовані елементи"
 
-msgctxt "Languages::show_menu_on_mouse_over"
-msgid "Show menu on mouse over"
-msgstr "Показати меню при наведенні"
-
 msgctxt "Languages::show_orders"
 msgid "Show orders"
 msgstr "Показати замовлення"
@@ -9902,9 +10110,17 @@ msgctxt "Languages::type_to_search"
 msgid "Type to search..."
 msgstr "Введіть пошуковий запит..."
 
+msgctxt "Languages::type_to_create"
+msgid "Type to create..."
+msgstr ""
+
 msgctxt "Languages::type_to_search_or_click_button"
 msgid "Type to search, or click the button on the right for advanced search"
 msgstr "Введіть пошуковий запит, або клацніть на кнопці праворуч для розширеного пошуку"
+
+msgctxt "Languages::use_comma_enter_to_separate_variants"
+msgid "Use a comma or Enter to separate variants."
+msgstr "Використовуйте кому або Enter, щоб відокремлювати варіанти."
 
 msgctxt "Languages::enter_color_name_and_code"
 msgid "Enter color name and code. Example, \"Red #ff0000\""
@@ -10726,10 +10942,6 @@ msgctxt "Languages::text_conditions_cleared"
 msgid "Table conditions were cleared"
 msgstr "Умови таблиці було очищено"
 
-msgctxt "Languages::text_confirmation_page_header"
-msgid "This is a confirmation page. You must confirm the operation before it is performed."
-msgstr "Ця сторінка підтвердження. Ви повинні підтвердити операцію перед її виконанням."
-
 msgctxt "Languages::text_confirm_passwd_recovery"
 msgid "Please follow this link to confirm your password recovery procedure"
 msgstr "Будь ласка, перейдітьза цим посиланням, щоб підтвердити відновлення свого паролю"
@@ -10744,7 +10956,7 @@ msgstr "Логотип для <b>вітрини</b>"
 
 msgctxt "Languages::text_datatrans_notice"
 msgid "<b>Note</b>: In order to track your Datatrans orders with the shopping cart software you have to take the following steps:<br /> <br /> -&nbsp;Log in to your Datatrans account<br /> -&nbsp;Click on the <u>'Upp Data'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Set <u>'URL Post data format'</u> to <b>'Data in HTML FORM'</b>.<br /> -&nbsp;Set <u>'URL Post'</u> to:<br /> <b>[post_url]</b><br /> -&nbsp;Click on the <u>'Security'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Select the <b>'An additional merchant identification will be send with payment messages'</b> option.<br /> -&nbsp;Generate new digital signature using the <u>'Generate new sign'</u> button.<br /> -&nbsp;Set generated value to the <u>'Digital signature'</u> field on the Datatrans payment configuration page in your store<br />"
-msgstr ""
+msgstr "<b>Примітка</b>: Для того щоб відстежувати замовлення Datatrans, зробіть наступне: <br /><br />-&nbsp;Авторизуйтесь в Datatrans<br /> -&nbsp;Натисніть на посилання <b>Upp Data</b>  в секції <b>Upp Administration<b><br /> -&nbsp;Встановіть <b>URL Post data format</b> в  <b>Data in Post format</b>.<br />-&nbsp;Встановити  <b>Approved URL</b>:<br /> <b>[post_url]</b><br />-&nbsp;Натисніть на посилання <b>Security</b> в секції  <b>Upp Administration</b>.<br />-&nbsp;Виберіть опцію <b>An additional merchant identification will be send with payment messages</b>.<br /> -&nbsp;Згенеруйте новий цифровий підпис , використовуючи кнопку <b>Generate new sign</b>.<br />-&nbsp;Введіть згенероване значення в поле  <b>Digital signature</b>  на сторінці налаштувань способу оплати Datatrans в своїй панелі адміністратора<br />"
 
 msgctxt "Languages::text_data_changed"
 msgid "Your changes have not been saved.Press OK to continue, or Cancel to stay on the current page."
@@ -11172,7 +11384,7 @@ msgstr "Інструкції для відновлення пароля були
 
 msgctxt "Languages::text_pay4later_notice"
 msgid "<b>Note</b>: In order to track your Deko orders with the shopping cart software, you have to take these steps:<br /><br />-&nbsp;Log in to Deko BackOffice<br />-&nbsp;Click on the <u>'Settings/Installations'</u> link in the <u>'Quick Links'</u> section.<br />-&nbsp;Set <u>'Return URL (Verified)'</u> setting to:<br /><b>[verified_url]</b><br />-&nbsp;Set <u>'Return URL (Decline)'</u> setting to:<br /><b>[decline_url]</b><br />-&nbsp;Set <u>'Return URL (Refer)'</u> setting to:<br /><b>[refer_url]</b><br />-&nbsp;Set <u>'Return URL (Cancel)'</u> setting to:<br /><b>[cancel_url]</b><br />-&nbsp;Set <u>'CSN URL'</u> setting to:<br /><b>[process_url]</b><br />-&nbsp;Click on the <u>'Save Changes'</u> button<br />"
-msgstr ""
+msgstr "<b>Увага</b>: Щоб відстежувати свої замовлення Deko через інтернет-магазин, зробіть наступне:<br /><br />-&nbsp;Увійдіть в Deko BackOffice<br />-&nbsp;Перейдіть по посиланню <u>'Settings/Installations'</u> в розділі <u>'Quick Links'</u>. <br/>- &nbsp;Встановіть значення <u>'Return URL (Verified)'</u>: <br/><b>[verified_url]</b><br/>- &nbsp;Встановіть значення <u>'Return URL (Decline)'</u>:<br/><b>[decline_url]</b><br/>-&nbsp;Встановіть значення <u>'Return URL (Refer)'</u>:<br/><b>[refer_url]</b><br/>-&nbsp;Встановіть значення <u>'Return URL (Cancel)'</u>:<br/><b>[cancel_url]</b><br/>-&nbsp;Встановіть значення<u>'CSN URL'</u>:<br/><b>[process_url]</b><br/>-&nbsp;Натисніть на кнопку<u>'Save Changes'</u><br/>"
 
 msgctxt "Languages::text_paybox_notice"
 msgid "<b>Note:</b> Please download the file modulev2.cgi from the PayBox server, copy it to the <b>[paybox_dir]</b> directory <u>in binary mode</u> and make it executable. <br />Run the following command:<br /><b><i>chmod 755 modulev2.cgi</b></i><br /><br />Also ask &#8220;Paybox&#8221; service to add the following URL to the database as &#8220;Callback URL&#8221;:<br /><b>[callback_url]</b>"
@@ -11228,7 +11440,7 @@ msgstr "Не показувати вибор валюти"
 
 msgctxt "Languages::text_paysitecash_notice"
 msgid "Please add these URL fields in your Paysite-cash configuration:<br/><br/><b>URL:</b><br/>[url]<br/><br/><b>Referer url:</b><br/>[ref_url]<br/><br/><b>after payment return url:</b><br/>[sucess_url]<br/><br/><b>canceled payment url:</b><br/>[cancel_url]<br/><br/><b>Backoffice confirmation url:</b><br/>[confirm_url]"
-msgstr ""
+msgstr "Будь ласка, додайте наступні URL на сторінці конфігурації Paysite-cash: <br/><br/><b>URL: </b><br/>[url]<br/><br/><b>Referer url:</b><br/>[ref_url]<br/><br/><b>after payment return url:</b><br/>[sucess_url]<br/><br/><b>canceled payment url:</b><br/>[cancel_url]<br/><br/><b>Backoffice confirmation url:</b><br/>[confirm_url]"
 
 msgctxt "Languages::text_paysitecash_processor"
 msgid "Processor"
@@ -11372,7 +11584,7 @@ msgstr "Ви дійсно бажаєте відновити шаблон?"
 
 msgctxt "Languages::text_sagepay_dir_notice"
 msgid "<b>Note:</b> In order to track your Sage Pay orders by the shopping cart software, please enable the 3D Secure Fraud Checking Option for your Sage Pay VSP Direct account."
-msgstr ""
+msgstr "<b>Примітка:</b> Щоб магазин міг відстежувати ваші Sage Pay-замовлення, будь ласка, увімкніть опцію 3D Secure Fraud Checking в свого облікового запису Sage Pay VSP Direct."
 
 msgctxt "Languages::text_sagepay_notice"
 msgid "Use <b>testvendor</b> as <b>Vendor Name</b> for the testing purposes<br /><p><b>PAYMENT</b> - transaction type is used to gain an authorisation from the bank, then settle that transaction early the following morning, committing the funds to be taken from your customer's card.<br /></p><p><b>DEFERRED</b> - transactions are NOT sent to the bank for completion until you RELEASE them by logging into the SagePay VSP Admin interface, finding the transaction and clicking the Release button.</p>"
@@ -11528,7 +11740,7 @@ msgstr "Зміни не були збережені. Натисніть OK, що
 
 msgctxt "Languages::text_thaiepay_notice"
 msgid "<p>Please set the following values in the ThaiePay merchant settings:</p><p>Return Url: <b>[return_url]</b></p><p>Status: <b>Yes (it is important!)</b></p><p>Post Back Url: <b>[postback_url]</b></p><p>Main Parameter: <b>\"total\" must be checked</b> - it will increase the security of transactions</p><p>Additional Parameter: it is obligatory for successful processing of transactions. For example, you can set <b>name=completed</b> and <b>value=some_secret_word</b>. Copy these values to these form fields: \"Additional parameter Name\" and \"Additional parameter Value\".</p>"
-msgstr ""
+msgstr "<p>Будь ласка, встановіть наступні значення в ThaiePay налаштуваннях продавця:</p><p>Return Url: <b>[return_url]</b> </p><p>Status: <b>Yes (it is important !)</b></p><p>Post Back Url: <b>[postback_url]</b></p><p>Main Parameter: <b>«total» must be checked</b> - це підвищить безпеку транзакцій </p><p>Additional Parameter: необхідний для успішної обробки транзакцій. Наприклад, Ви можете задати <b>name = completed</b> і <b>value = some_secret_word</b>. Скопіюйте ці значення в дані поля форми: «» Additional parameter Name »і« Additional parameter Value ».</p>"
 
 msgctxt "Languages::text_thumbnail_manual_loading"
 msgid "Thumbnails will be generated from detailed images automatically, but you can also <a id=\"[id]\" class=\"[class]\">upload them manually.</a>"
@@ -11978,6 +12190,10 @@ msgctxt "Languages::theme_editor.mail"
 msgid "Mail"
 msgstr "Mail"
 
+msgctxt "Languages::theme_editor_logo.mail"
+msgid "E-mails"
+msgstr "Електронна пошта"
+
 msgctxt "Languages::theme_editor.main"
 msgid "Main content"
 msgstr "Основний зміст"
@@ -12126,6 +12342,10 @@ msgctxt "Languages::theme_editor.theme"
 msgid "Theme"
 msgstr "Тема"
 
+msgctxt "Languages::theme_editor_logo.theme"
+msgid "Theme"
+msgstr "Оформлення"
+
 msgctxt "Languages::theme_editor.top_panel"
 msgid "Top panel"
 msgstr "Верхня панель"
@@ -12172,7 +12392,7 @@ msgstr "Оформлення замовлення: Межа обраного с�
 
 msgctxt "Languages::theme_editor.checkout_active_selector_border"
 msgid "Checkout: Active selector border"
-msgstr ""
+msgstr "Замовлення: Межа обраного перемикача"
 
 msgctxt "Languages::theme_editor.checkout_control_border"
 msgid "Checkout: Payment / shipping method border"
@@ -12180,7 +12400,7 @@ msgstr "Оформлення замовлення: Межа способу до�
 
 msgctxt "Languages::theme_editor.checkout_selector_border"
 msgid "Checkout: Selector border"
-msgstr ""
+msgstr "Замовлення: Межа перемикача"
 
 msgctxt "Languages::theme_editor.checkout_input_border"
 msgid "Checkout: Field border"
@@ -12208,7 +12428,7 @@ msgstr "Оформлення замовлення: Фон способу дос�
 
 msgctxt "Languages::theme_editor.checkout_selector_background"
 msgid "Checkout: Selector background"
-msgstr ""
+msgstr "Замовлення: Фон перемикача"
 
 msgctxt "Languages::theme_editor.checkout_selected_control_background"
 msgid "Checkout: Selected payment / shipping method background"
@@ -12216,7 +12436,7 @@ msgstr "Оформлення замовлення: Фон обраного сп�
 
 msgctxt "Languages::theme_editor.checkout_active_selector_background"
 msgid "Checkout: Active selector background"
-msgstr ""
+msgstr "Замовлення: Фон обраного перемикача"
 
 msgctxt "Languages::theme_editor.checkout_control_title"
 msgid "Checkout: Payment / shipping method title"
@@ -12224,7 +12444,7 @@ msgstr "Оформлення замовлення: Назва способу д�
 
 msgctxt "Languages::theme_editor.checkout_selector_title"
 msgid "Checkout: Selector title"
-msgstr ""
+msgstr "Замовлення: Заголовок перемикача"
 
 msgctxt "Languages::theme_editor.checkout_control_description"
 msgid "Checkout: Payment / shipping method description"
@@ -12232,7 +12452,7 @@ msgstr "Оформлення замовлення: Опис способу до�
 
 msgctxt "Languages::theme_editor.checkout_selector_tooltip"
 msgid "Checkout: Selector tooltip"
-msgstr ""
+msgstr "Замовлення: Підказка перемикача"
 
 msgctxt "Languages::theme_editor.checkout_control_label"
 msgid "Checkout: Credit card field names"
@@ -12244,7 +12464,7 @@ msgstr "Оформлення замовлення: Фон розділу \"Ум�
 
 msgctxt "Languages::theme_editor.checkout_link"
 msgid "Checkout: Link"
-msgstr ""
+msgstr "Замовлення: Посилання"
 
 msgctxt "Languages::admin_panel.block_manager"
 msgid "Editing layout"
@@ -12522,6 +12742,10 @@ msgctxt "Languages::translations"
 msgid "Translations"
 msgstr "Переклади"
 
+msgctxt "Languages::edit_texts"
+msgid "Edit texts"
+msgstr "Редагувати тексти"
+
 msgctxt "Languages::tree"
 msgid "Tree"
 msgstr "Дерево"
@@ -12587,8 +12811,8 @@ msgid "ON—the storefront is open; everyone will see it. OFF—the storefront i
 msgstr "ON - магазин відкритий; його побачать всі. OFF - магазин закритий; його побачать тільки ті, у кого є код доступу."
 
 msgctxt "Languages::access_for_authorized_customers_only"
-msgid "Access for authorized customers only."
-msgstr "Доступ тільки для авторизованих покупців."
+msgid "Access for authorized customers only"
+msgstr ""
 
 msgctxt "Languages::tts_activate_menu_tab_for"
 msgid "The menu item will be shown activated for the specified dispatch."
@@ -12621,10 +12845,6 @@ msgstr "Одна сторінка повинна бути обрана в яко
 msgctxt "Languages::tt_views_cart_components_carts_search_form_online_only"
 msgid "If enabled, search results include only users who are online at the moment."
 msgstr "Якщо опція включена, результати пошуку будуть містити тільки користувачів в онлайні."
-
-msgctxt "Languages::tt_views_categories_update_product_details_layout"
-msgid "By default, the template that is defined in the appearance settings of the storefront is used"
-msgstr "За замовчуванням використовується шаблон, заданий в налаштуваннях зовнішнього вигляду клієнтської частини"
 
 msgctxt "Languages::tt_views_currencies_update_after_sum"
 msgid "If enabled, the symbol of the currency is shown after the sum."
@@ -12697,10 +12917,6 @@ msgstr "Рекомендована виробником роздрібна ці�
 msgctxt "Languages::tt_views_products_update_out_of_stock_actions"
 msgid "'Buy in advance' lets customers buy out-of-stock products and products that will be available since a specific date. 'Sign up for notification' works only when the product has zero or negative quantity."
 msgstr "\"Передзамовлення\" дозволяє купити товар, навіть якщо його немає в наявності або він доступний тільки з певної дати. \"Підписатися на повідомлення\" працює, тільки якщо товару немає в наявності або у нього від'ємна кількість."
-
-msgctxt "Languages::tt_views_products_update_product_details_layout"
-msgid "By default, the template that is defined in the settings of the main product category is used"
-msgstr "За замовчуванням використовується шаблон, заданий в налаштуваннях основної категорії товару"
 
 msgctxt "Languages::tt_views_product_features_update_feature_display_on_catalog"
 msgid "Show this feature on product list pages along with product description."
@@ -13187,8 +13403,8 @@ msgid "Use Existing Block"
 msgstr "Використовувати наявний блок"
 
 msgctxt "Languages::use_existing_store"
-msgid "Copy existing store configuration"
-msgstr "Копіювати поточну конфігурацію крамниці"
+msgid "Copy existing storefront configuration"
+msgstr "Копіювати дані з вітрини"
 
 msgctxt "Languages::use_negotiated_rates"
 msgid "Use negotiated rates"
@@ -14231,8 +14447,8 @@ msgid "Days before a log entry is removed"
 msgstr "Днів до видалення запису з журналу подій"
 
 msgctxt "SettingsTooltips::log_lifetime"
-msgid "Logs older than the specified number of days will be removed automatically. Enter 0 if you don't want any automatic removal of old logs."
-msgstr "Записи в журналі, що старіше вказаної кількості днів будуть видалені автоматично. Введіть 0, якщо потрібно автоматично видаляти старі журнали."
+msgid "Enter 0 if you don't want any automatic removal of old logs."
+msgstr "Введіть 0, якщо не хочете, щоб старі записи віддалялися автоматично."
 
 msgctxt "SettingsOptions::log_type_orders"
 msgid "Orders"
@@ -14421,10 +14637,6 @@ msgstr "Закрити вітрину"
 msgctxt "SettingsOptions::cron_password"
 msgid "Access key to cron script which sends e-mail notifications of password change. Use: http://www.example.com/admin.php?dispatch=profiles.password_reminder&cron_password=key_value."
 msgstr "Ключ доступу до cron-скрипту, який надсилає повідомлення про зміну пароля ел. поштою. Для виклику скрипта з ключем використовуйте URL: http://example.com/admin.php?dispatch=profiles.password_reminder&cron_password=key_value."
-
-msgctxt "SettingsOptions::store_access_key"
-msgid "Access key to temporarily closed store"
-msgstr "Ключ доступу до тимчасово закритого магазину"
 
 msgctxt "SettingsOptions::store_optimization_dev"
 msgid "Rebuild cache automatically"
@@ -14666,6 +14878,54 @@ msgctxt "SettingsOptions::display_options_modifiers"
 msgid "Display modifiers for product options"
 msgstr "Показувати модифікатори опцій товарів"
 
+msgctxt "SettingsOptions::default_options_type"
+msgid "Options type"
+msgstr "Тип опцій"
+
+msgctxt "SettingsOptions::default_tracking"
+msgid "Track inventory"
+msgstr ""
+
+msgctxt "SettingsOptions::default_exceptions_type"
+msgid "Exceptions type"
+msgstr "Тип винятків"
+
+msgctxt "SettingsOptions::default_zero_price_action"
+msgid "Zero price action"
+msgstr "Дія при нульовій вартості"
+
+msgctxt "SettingsOptions::default_min_qty"
+msgid "Minimum quantity to buy per product"
+msgstr ""
+
+msgctxt "SettingsTooltips::default_min_qty"
+msgid "Sell no less than X units of a product in an order."
+msgstr ""
+
+msgctxt "SettingsOptions::default_max_qty"
+msgid "Maximum quantity to buy per product"
+msgstr ""
+
+msgctxt "SettingsTooltips::default_max_qty"
+msgid "Sell no more than X units of a product in an order."
+msgstr ""
+
+msgctxt "SettingsOptions::default_qty_step"
+msgid "Quantity step"
+msgstr "Крок списку вибору кількості"
+
+msgctxt "SettingsTooltips::default_qty_step"
+msgid "Increase or decrease the number of purchased product units only by X."
+msgstr ""
+
+msgctxt "SettingsOptions::default_list_qty_count"
+msgid "Number of available quantities"
+msgstr ""
+
+msgctxt "SettingsTooltips::default_list_qty_count"
+msgid "Replace product quantity selector with a dropdown list with X variants."
+msgstr ""
+
 msgctxt "SettingsOptions::exception_style"
 msgid "Exception style"
 msgstr "Стиль винятків"
@@ -14835,8 +15095,8 @@ msgid "Disable anonymous checkout"
 msgstr "Покупець повинен зареєструватися або увійти, щоб оформити замовлення"
 
 msgctxt "SettingsOptions::checkout_redirect"
-msgid "Allow checkout only from the Cart content page"
-msgstr "Дозволити оформлення замовлення зі сторінки кошику"
+msgid "Allow checkout only from cart"
+msgstr "Дозволити оформлення замовлення тільки з кошика"
 
 msgctxt "SettingsOptions::allow_usergroup_signup"
 msgid "Allow customer to signup for user group"
@@ -14855,8 +15115,8 @@ msgid "Unsaved changes warning"
 msgstr "Показувати попередження про незбережених змінах"
 
 msgctxt "SettingsOptions::show_menu_descriptions"
-msgid "Show menu description"
-msgstr "Показати опис меню"
+msgid "Show menu description in admin panel"
+msgstr "Показувати опис меню в панелі адміністратора"
 
 msgctxt "SettingsOptions::notice_displaying_time"
 msgid "Notice displaying time (to turn off the autohide function enter 0)"
@@ -14871,7 +15131,7 @@ msgid "Ask customers to agree with terms &amp; conditions during checkout"
 msgstr "Питати покупця про згоду з Умовами при оформленні замовлення"
 
 msgctxt "SettingsTooltips::agree_terms_conditions"
-msgid "The text of terms & conditions will be retrieved from the \"terms_and_conditions_content\" language variable."
+msgid "The text of terms & conditions is in the \"terms_and_conditions_content\" language variable."
 msgstr "Текст Умов угоди буде взято з мовної змінної \"terms_and_conditions_content\"."
 
 msgctxt "SettingsOptions::repay"
@@ -14939,8 +15199,8 @@ msgid "Display \"Shipping method\" step"
 msgstr "Показувати крок \"Спосіб доставки\""
 
 msgctxt "SettingsTooltips::display_shipping_step"
-msgid "If hidden, the first active method will be used by default."
-msgstr "Якщо крок приховано, буде використовуватися перший активний спосіб доставки."
+msgid "If the step is hidden, the first active method will be used by default."
+msgstr "Якщо крок приховано, буде використовуватися перший активний спосіб."
 
 msgctxt "SettingsOptions::email_templates"
 msgid "Email templates mode"
@@ -14950,17 +15210,13 @@ msgctxt "SettingsOptions::phone_validation_mode"
 msgid "Supported phone numbers"
 msgstr "Допустимі номери телефонів"
 
-msgctxt "SettingsTooltips::phone_validation_mode"
-msgid "Determines what users can enter as their phone number."
-msgstr "Визначає, що користувачі можуть вводити в якості номера телефону."
-
 msgctxt "SettingsOptions::display_payment_step"
 msgid "Display \"Payment method\" step"
 msgstr "Показувати крок \"Спосіб сплати\""
 
 msgctxt "SettingsTooltips::display_payment_step"
-msgid "If hidden, the first active method will be used by default."
-msgstr "Якщо крок приховано, буде використовуватися перший активний спосіб оплати."
+msgid "If the step is hidden, the first active method will be used by default."
+msgstr "Якщо крок приховано, буде використовуватися перший активний спосіб."
 
 msgctxt "SettingsOptions::enable_edp"
 msgid "Enable selling downloadable products"
@@ -14971,36 +15227,32 @@ msgid "Allow customers to compare products"
 msgstr "Дозволити покупцям порівнювати товари"
 
 msgctxt "SettingsTooltips::secure_storefront"
-msgid "SSL certificate is required to be installed on your server"
-msgstr "На сервері має бути встановлений SSL-сертифікат"
+msgid "SSL certificate must be installed on your server."
+msgstr "На сервері має бути встановлений SSL-сертифікат."
 
 msgctxt "SettingsTooltips::secure_admin"
-msgid "SSL certificate is required to be installed on your server"
-msgstr "На сервері має бути встановлений SSL-сертифікат"
-
-msgctxt "SettingsTooltips::store_access_key"
-msgid "Use: http://www.example.com/index.php?store_access_key=key_value"
-msgstr "Для доступу до вітрини по ключу використовуйте URL: <em>http://www.example.com/index.php?<strong>store_access_key=my_key</strong></em>, де <em>http://www.example.com</em> - адреса вашої крамниці в інтернеті, <em>my_key</em> - ваш ключ доступу."
+msgid "SSL certificate must be installed on your server."
+msgstr "На сервері має бути встановлений SSL-сертифікат."
 
 msgctxt "SettingsTooltips::order_start_id"
-msgid "Enter a number between 1 and 10,000,000 (use digits only) or leave empty for auto-filling."
-msgstr "Введіть число від 1 до 10 мільйонів (цифрами) або залиште порожнім для автоматичного заповнення."
+msgid "Use a number between 1 and 10000000 or leave empty for auto-filling."
+msgstr "Введіть число від 1 до 10000000 або залиште порожнім для автоматичного заповнення."
 
 msgctxt "SettingsTooltips::user_multiple_profiles"
-msgid "Shipping and billing addresses"
-msgstr "Адреси доставки і платника"
+msgid "A profile is a combination of shipping and billing address."
+msgstr "Профіль - це поєднання адреси доставки і адреси платника."
 
 msgctxt "SettingsTooltips::thumbnail_background_color"
-msgid "Leave empty for transparent background"
-msgstr "Залиште порожнім для прозорого фону"
+msgid "Leave empty for transparent background."
+msgstr "Залиште порожнім для прозорого фону."
 
 msgctxt "SettingsTooltips::secure_auth"
-msgid "SSL certificate is required to be installed on your server"
-msgstr "На сервері має бути встановлений SSL-сертифікат"
+msgid "SSL certificate must be installed on your server."
+msgstr "На сервері має бути встановлений SSL-сертифікат."
 
 msgctxt "SettingsTooltips::checkout_redirect"
-msgid "When the customer clicks on any Checkout button/link in the store"
-msgstr "При натисканні на будь-яке посилання або кнопку оформлення замовлення"
+msgid "Show the Checkout button only on the Cart Content page."
+msgstr "Показувати кнопку \"Оформити замовлення\" на сторінці вмісту кошика."
 
 msgctxt "SettingsTooltips::store_optimization_dev"
 msgid "Track modifications in real-time and automatically re-cache modified files (works with files modified directly on server, too.) May slightly affect store performance. Recommended to disable on production."
@@ -15008,12 +15260,12 @@ msgstr "Автоматично оновлювати кеш для змінени
 "Злегка може вплинути на продуктивність магазину. Рекомендовано відключити після внесення усіх змін до теми."
 
 msgctxt "SettingsTooltips::show_menu_descriptions"
-msgid "If you disable this check box, description of menu items will be hidden"
-msgstr "Якщо вимкнути цей прапорець, опис пунктів меню буде приховано"
+msgid "Affects the menus like Products and Orders in the admin panel."
+msgstr "Впливає на меню \"Товари\", \"Замовлення\" та інші в панелі адміністратора."
 
 msgctxt "SettingsTooltips::quick_registration"
-msgid "Require only contact information on registration"
-msgstr "Для реєстрації потрібно тільки контактна інформація"
+msgid "Require only contact information for registration."
+msgstr "Вимагати для реєстрації лише контактну інформацію."
 
 msgctxt "SettingsVariants::default_products_sorting::position"
 msgid "Default"
@@ -15315,6 +15567,34 @@ msgctxt "SettingsVariants::exception_style::warning"
 msgid "Show warning on exception"
 msgstr "Показати попередження про виключення"
 
+msgctxt "SettingsVariants::default_options_type::P"
+msgid "Simultaneous"
+msgstr "Одночасно"
+
+msgctxt "SettingsVariants::default_options_type::S"
+msgid "Sequential"
+msgstr "Послідовно"
+
+msgctxt "SettingsVariants::default_exceptions_type::F"
+msgid "Forbidden"
+msgstr "Заборонено"
+
+msgctxt "SettingsVariants::default_exceptions_type::A"
+msgid "Allowed"
+msgstr "Дозвіл"
+
+msgctxt "SettingsVariants::default_zero_price_action::R"
+msgid "Do not allow customers to add the product to cart"
+msgstr "Не дозволяти додавати товар в корзину"
+
+msgctxt "SettingsVariants::default_zero_price_action::P"
+msgid "Allow customers to add the product to cart"
+msgstr "Дозволити додати товар у кошик"
+
+msgctxt "SettingsVariants::default_zero_price_action::A"
+msgid "Ask customer to enter the price"
+msgstr "Попросити замовника вказати вартість"
+
 msgctxt "SettingsVariants::alternative_currency::use_selected_and_alternative"
 msgid "Show prices in default and selected currencies"
 msgstr "Показати ціни в валюті за замовчуванням і вибраній валюті"
@@ -15345,7 +15625,7 @@ msgstr "за допомогою php mail функції"
 
 msgctxt "SettingsVariants::timezone::Pacific/Apia"
 msgid "(GMT-11:00) Samoa"
-msgstr ""
+msgstr "(GMT-11:00) Samoa"
 
 msgctxt "SettingsVariants::tax_calculation::subtotal"
 msgid "Subtotal"
@@ -15397,7 +15677,7 @@ msgstr "(GMT-07:00) Гірський час (США & Канади)"
 
 msgctxt "SettingsVariants::timezone::America/Chihuahua"
 msgid "(GMT-07:00) Chihuahua, Mazatlan"
-msgstr ""
+msgstr "(GMT-07:00) Чіуауа, Масатлан"
 
 msgctxt "SettingsVariants::timezone::America/Phoenix"
 msgid "(GMT-07:00) Arizona"
@@ -15465,11 +15745,11 @@ msgstr "(GMT-01:00) Азорські острови"
 
 msgctxt "SettingsVariants::timezone::Atlantic/Reykjavik"
 msgid "(GMT) Reykjavik, Monrovia"
-msgstr ""
+msgstr "(GMT) Reykjavik, Monrovia"
 
 msgctxt "SettingsVariants::timezone::Europe/London"
 msgid "(GMT) Greenwich Mean Time: Edinburgh, Lisbon, London"
-msgstr ""
+msgstr "(GMT) Часу за Гринвічем: Единбург, Лісабон, Лондон"
 
 msgctxt "SettingsVariants::timezone::Europe/Berlin"
 msgid "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna"
@@ -15533,7 +15813,7 @@ msgstr "(GMT + 03:00) Кувейт, Ер-Ріяд"
 
 msgctxt "SettingsVariants::timezone::Europe/Moscow"
 msgid "(GMT+03:00) Moscow, St. Petersburg"
-msgstr ""
+msgstr "(GMT + 03:00) Москва, Санкт-Петербург"
 
 msgctxt "SettingsVariants::timezone::Europe/Minsk"
 msgid "(GMT+03:00) Minsk"
@@ -15577,11 +15857,11 @@ msgstr "(GMT + 05:45) Катманду"
 
 msgctxt "SettingsVariants::timezone::Asia/Novosibirsk"
 msgid "(GMT+07:00) Novosibirsk"
-msgstr ""
+msgstr "(GMT + 07:00)  Новосибірськ"
 
 msgctxt "SettingsVariants::timezone::Asia/Dhaka"
 msgid "(GMT+06:00) Nur-Sultan, Dhaka"
-msgstr ""
+msgstr "(GMT + 06:00) Nur-Sultan, Dhaka"
 
 msgctxt "SettingsVariants::timezone::Asia/Colombo"
 msgid "(GMT+06:00) Sri Jayawardenepura"
@@ -15589,7 +15869,7 @@ msgstr "(GMT + 06:00) Шрі-Джаяварденепура-Котте"
 
 msgctxt "SettingsVariants::timezone::Asia/Yangon"
 msgid "(GMT+06:30) Yangon"
-msgstr ""
+msgstr "(GMT+06:30) Yangon"
 
 msgctxt "SettingsVariants::timezone::Asia/Bangkok"
 msgid "(GMT+07:00) Bangkok, Hanoi, Jakarta"
@@ -15601,11 +15881,11 @@ msgstr "(GMT + 07:00) Красноярськ"
 
 msgctxt "SettingsVariants::timezone::Asia/Shanghai"
 msgid "(GMT+08:00) Beijing, Chongqing, Hong Kong"
-msgstr ""
+msgstr "(GMT + 08:00) Пекін, Чунцин, Гонконг"
 
 msgctxt "SettingsVariants::timezone::Asia/Irkutsk"
 msgid "(GMT+08:00) Irkutsk, Ulaanbaatar"
-msgstr ""
+msgstr "(GMT+08:00) Іркутськ, Уланбатор"
 
 msgctxt "SettingsVariants::timezone::Asia/Singapore"
 msgid "(GMT+08:00) Kuala Lumpur, Singapore"
@@ -15698,10 +15978,6 @@ msgstr "Будь-які цифри і + - ()"
 msgctxt "SettingsVariants::phone_validation_mode::any_symbols"
 msgid "Any symbols"
 msgstr "Будь-які символи"
-
-msgctxt "SettingsTooltips::quick_registration"
-msgid "Require only contact information on registration"
-msgstr "Для реєстрації потрібно тільки контактна інформація"
 
 msgctxt "Languages::views"
 msgid "Views"
@@ -16448,6 +16724,22 @@ msgctxt "Languages::trash_category_description"
 msgid "When a product is deleted from the last category in the store, it will be moved to this category."
 msgstr "Коли товар видаляється з останньої категорії в магазині, він переміщається в цю категорію."
 
+msgctxt "Languages::products_without_category"
+msgid "Products without category"
+msgstr ""
+
+msgctxt "Languages::products_without_category_description"
+msgid "When a product is created without a category during import, it will be placed into this category."
+msgstr ""
+
+msgctxt "Languages::products_without_category_notification_text"
+msgid "Some of your products currently don't have a category. It may be harder for customers to find those products.<br /> <a href=\"[url]\" target=\"_blank\">Please check these products and assign them a category.</a>"
+msgstr ""
+
+msgctxt "Languages::deleting_required_category_notification_text"
+msgid "Category \"[category]\" is required and can't be deleted."
+msgstr ""
+
 msgctxt "Languages::free_shipping_upgrade_notification_title"
 msgid "Free shipping changes"
 msgstr "Зміни бескоштовної доставки"
@@ -16540,9 +16832,9 @@ msgctxt "Languages::tools_addons_disabled_msg"
 msgid "An administrator disabled all add-ons or third-party add-ons.<br> Press the Re-enable add-ons button to initialize the add-ons that were previously active."
 msgstr "Адміністратор відключив усі модулі, або сторонні модулі.<br>Натисніть кнопку Увімкнути модулі для включення відключених адміністратором модулів."
 
-msgctxt "Languages::tools_addons_additional_shipping_methods"
-msgid "There may be more carriers. They'll show up if you activate the corresponding <a href=\"[url]\">shipping add-ons</a>."
-msgstr "Перевізників може бути більше. Вони з'являться, якщо ви включите <a href=\"[url]\">модулі відповідних способів доставки</a>."
+msgctxt "Languages::tools_addons_additional_shipping_methods_msg"
+msgid "There may be more ways to calculate shipping rates. They'll show up if you activate the corresponding <a href=\"[url]\">shipping add-ons</a>."
+msgstr ""
 
 msgctxt "Languages::tools_addons_additional_payment_methods"
 msgid "There may be more payment processors. They'll show up if you activate the corresponding <a href=\"[url]\">payment add-ons</a>."
@@ -17181,7 +17473,7 @@ msgid "<p><b>UPS Canada: Expedited SM</b> and <b>UPS Polish: Today Intercity</b>
 msgstr "<p>Служби доставки <b>UPS Canada: Expedited SM</b> і <b>UPS Polish: Today Intercity</b> не підтримуються, починаючи з цієї версії [product]. Якщо ви використовували ці служби, то:</p> <ul><li>перейдіть на сторінку Адміністрування> Доставка і податки> Способи доставки;</li><li>відкрийте спосіб, де в якості перевізника обраний UPS;</li><li>у вкладці \"Загальні\" виберіть іншу службу доставки</li></ul>"
 
 msgctxt "Languages::warning_default_language_sharing_removed"
-msgid "The default language defined in settings has been removed for the <b>[company]</b> store. Please update the Frontend default language value on the following page: <a href=\"[link]\">Settings :: Appearance</a>"
+msgid "The default language defined in settings has been removed for the <b>[company]</b> storefront. Please update the Frontend default language value on the following page: <a href=\"[link]\">Settings :: Appearance</a>"
 msgstr "Було відключено мову за замовчуванням для магазина <b>[company]</b>. Перейдіть за цим посиланням <a href=\"[link]\">Налаштування :: Зовнішній вигляд</a> і оновіть мову вітрини за замовчуванням"
 
 msgctxt "Languages::page_url"
@@ -18305,6 +18597,10 @@ msgctxt "Languages::sort_by_null_desc"
 msgid "No sorting"
 msgstr "Без сортування"
 
+msgctxt "Languages::storefront_name"
+msgid "Storefront name"
+msgstr "Назва вітрини"
+
 msgctxt "Languages::internal_option_name"
 msgid "Internal name"
 msgstr "Додаткова назва"
@@ -18312,6 +18608,14 @@ msgstr "Додаткова назва"
 msgctxt "Languages::internal_option_name_tooltip"
 msgid "This name is shown only in the Administration panel to help you distinguish between multiple options that have the same displayed name."
 msgstr "Дана назва використовується для розмежування опцій, що мають однакові імена на вітрині, і відображається тільки в панелі адміністратора."
+
+msgctxt "Languages::internal_feature_name_tooltip"
+msgid "This name is shown only in the Administration panel to help you distinguish between multiple features that have the same displayed name."
+msgstr ""
+
+msgctxt "Languages::internal_feature_group_name_tooltip"
+msgid "This name is shown only in the Administration panel to help you distinguish between multiple feature groups that have the same displayed name."
+msgstr "Це ім'я відображається тільки в панелі адміністратора. Воно допомагає відрізняти один від одного ті групи характеристик, у яких на вітрині однакове ім'я."
 
 msgctxt "Languages::edit_corresponding_profile_field"
 msgid "To change the field type or variants, <a href=\"[URL]\">edit the corresponding field in the Shipping Address section</a>."
@@ -19382,15 +19686,15 @@ msgid "Status"
 msgstr "Статус"
 
 msgctxt "Languages::storefront_status.tooltip"
-msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed store</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed storefront</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
 msgstr "Навіть якщо вітрина закрита (статус OFF), ви зможете її відвідати, якщо у вас є ключ доступу. Задайте <i>Ключ доступу до тимчасово закритого магазину</i> нижче. <br/>Щоб відвідати закриту вітрину, використовуйте зразок посилання http://www.example.com/index.php?store_access_key=key_value."
 
 msgctxt "Languages::storefront_access_key"
-msgid "Access key to temporarily closed store"
+msgid "Access key to temporarily closed storefront"
 msgstr "Ключ доступу до тимчасово закритого магазину"
 
 msgctxt "Languages::storefront_access_key.setting_notice"
-msgid "You can set the access key on the store editing page"
+msgid "You can set the access key on the storefront editing page"
 msgstr "Ключ доступу можна задати на сторінці редагування магазину"
 
 msgctxt "Languages::close_storefront"
@@ -19398,7 +19702,7 @@ msgid "Close storefront"
 msgstr "Закрити вітрину"
 
 msgctxt "Languages::close_storefront.setting_notice"
-msgid "You can open or close a store on the store editing page"
+msgid "You can open or close a storefront on the storefront editing page"
 msgstr "Відкрити або закрити магазин можна на сторінці редагування магазину"
 
 msgctxt "Languages::open_selected_storefronts"
@@ -19542,8 +19846,12 @@ msgid "Edit structure"
 msgstr "Редагувати структуру"
 
 msgctxt "Languages::bottom_panel.build_mode.not_available"
-msgid "Available only at the checkout page. Add a product to cart and go to checkout to see how it works."
-msgstr "Доступно тільки на сторінці оформлення замовлення. Додайте товар в кошик і спробуйте оформити замовлення."
+msgid "Available at the following page types: homepage, product, category, checkout."
+msgstr "Доступно на наступних типах сторінок: Домашня сторінка, товар, категорія, замовлення."
+
+msgctxt "Languages::bottom_panel.theme_mode.not_available"
+msgid "Available only in your microstore or on the pages of your products and blog articles."
+msgstr "Доступно тільки в вашому міні-магазині або на сторінках ваших товарів і статей в блозі."
 
 msgctxt "Languages::bottom_panel.text_mode"
 msgid "Edit texts"
@@ -19625,29 +19933,13 @@ msgctxt "Languages::bottom_panel.trial_left"
 msgid "Remaining trial period"
 msgstr "Залишилось пробного періоду"
 
-msgctxt "Languages::administration_panel.live_editor.enable"
-msgid "Edit сontent<br/><br/>Change the texts and other data directly on the storefront, without using the administration panel"
-msgstr "Редагуйте контент<br/><br/>Міняйте тексти та інші дані відразу на вітрині, не використовуючи панель адміністратора"
-
-msgctxt "Languages::demo_panel.live_editor.enable"
-msgid "Edit сontent<br/><br/>Change the texts and other data directly on the storefront, without using the administration panel.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit content on-site\""
-msgstr "Редагуйте контент<br/> <br/>Міняйте тексти та інші дані відразу на вітрині, не використовуючи панель адміністратора.<br/><br/>Щоб скористатися цією функціональністю в вашому магазині на [product], перейдіть в меню \"Дизайн → теми \"і натисніть\" Редагувати контент \""
-
-msgctxt "Languages::administration_panel.theme_editor.enable"
-msgid "Edit style<br/><br/>Change the style of your store (logos, colors, fonts, and so on) and see the changes as you make them"
-msgstr "Редагуйте стиль<br/><br/>Міняйте стиль вашого магазину (логотипи, кольори, шрифти і т. д.) і відразу дивіться на отриманий результат"
-
 msgctxt "Languages::demo_panel.theme_editor.enable"
 msgid "Edit style<br/><br/>Change the style of your store (logos, colors, fonts, and so on) and see the changes as you make them.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Theme editor\""
 msgstr "Редагуйте стиль<br/><br/>Міняйте стиль вашого магазину (логотипи, кольори, шрифти і т. д.) і відразу дивіться на отриманий результат.<br/><br/>Щоб скористатися цією функціональністю в вашому магазині на [product], перейдіть в меню \"Дизайн → Теми \"і натисніть\" Редактор тем \""
 
-msgctxt "Languages::administration_panel.block_manager.enable"
-msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works only at the checkout page. Add a product to cart and proceed to checkout to see the editor"
-msgstr "Редагуйте структуру<br/><br/>Міняйте блоки з інформацією: показуйте і приховуйте переміщайте їх.<br/>Наразі це працює лише на сторінці оплати. Додайте товар до кошика і перейдіть до замовлення, щоб побачити редактор"
-
 msgctxt "Languages::demo_panel.block_manager.enable"
-msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works only at the checkout page. Add a product to cart and proceed to checkout to see the editor.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit layout on-site\""
-msgstr "Редагуйте структуру<br/><br/>Міняйте блоки з інформацією: показуйте і приховуйте переміщайте їх.<br/>Наразі це працює лише на сторінці оплати. Додайте товар до кошика і перейдіть до замовлення, щоб побачити редактор\"<br/><br/>Щоб скористатися цією функцією в магазині [product], перейдіть у розділ Дизайн → Теми та натисніть \"Редагувати макет\""
+msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works at the following page types: homepage, product, category, checkout.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit layout on-site\""
+msgstr "Редагувати структуру <br/> <br/> Міняйте блоки з інформацією: показуйте і приховуйте передавайте їх.<br/> Зараз це працює тільки на сторінці оформлення замовлення. Додайте товар в корзину і перейдіть до оформлення замовлення, щоб побачити редактор.<br/> <br/> Щоб користуватися цією функціональністю в вашому магазині на [product], перейдіть в меню \"Дизайн → Теми\" і натисніть \"Редагувати макет\"."
 
 msgctxt "Languages::individual"
 msgid "Individual"
@@ -19656,6 +19948,10 @@ msgstr "Місцева опція"
 msgctxt "Languages::link_an_existing_option"
 msgid "Link an existing option"
 msgstr "Прив'язати існуючу опцію"
+
+msgctxt "Languages::create_or_link_an_existing_option"
+msgid "Create or link an existing option"
+msgstr "Створіть нову опцію або прив'яжіть існуючу"
 
 msgctxt "Languages::checkout_location_was_rewritten_upgrade_notification_title"
 msgid "Customize your checkout page"
@@ -19782,12 +20078,16 @@ msgid "E-mail"
 msgstr "E-mail"
 
 msgctxt "Languages::event.transport.internal"
-msgid "Notifications Center"
-msgstr "Центр сповіщень"
+msgid "Notifications center"
+msgstr ""
 
 msgctxt "Languages::event.order.edp.name"
 msgid "Access to downloadable products granted"
 msgstr "Доступ до завантажуваних продуктів надано"
+
+msgctxt "Languages::event.notification_type"
+msgid "Notification type"
+msgstr "Тип сповіщень"
 
 msgctxt "Languages::notifications"
 msgid "Notifications"
@@ -19958,10 +20258,20 @@ msgid "Other"
 msgstr "Інші"
 
 msgctxt "Languages::see_full_templates_list"
-msgid "Can't find a notification you're looking for?<br/><a href=\"[email_template_manage]\">See the full list of email templates</a><br/><a href=\"[internal_template_manage]\">See the full list of on-site notification templates</a>"
-msgstr "Не знайшли потрібне повідомлення?<br/>\n"
-"<a href=\"[email_template_manage]\">Подивіться повний список шаблонів email-повідомлень</a><br/>\n"
-"<a href=\"[internal_template_manage]\">Подивіться повний список шаблонів повідомлень на сайті</a>"
+msgid "Can't find a notification you're looking for?<br/><a href=\"[email_template_manage]\"></a><br/><a href=\"[internal_template_manage]\">See the full list of on-site notification templates</a>"
+msgstr "Не можете знайти сповіщення, яке шукаєте?<br/><a href=\"[email_template_manage]\"></a><br/><a href=\"[internal_template_manage]\">Дивіться повний список шаблонів сповіщень</a>"
+
+msgctxt "Languages::other_notifications.title"
+msgid "Can't find a notification you're looking for?"
+msgstr "Не можете знайти сповіщення, яке шукаєте?"
+
+msgctxt "Languages::other_notifications.email_templates"
+msgid "See the full list of email templates"
+msgstr "Дивіться повний список email шаблонів"
+
+msgctxt "Languages::other_notifications.internal_templates"
+msgid "See the full list of on-site notification templates"
+msgstr "Дивіться повний список шаблонів сповіщень"
 
 msgctxt "Languages::internal_templates"
 msgid "On-site notification templates"
@@ -20003,13 +20313,13 @@ msgctxt "Languages::notification_template.tab.internal"
 msgid "On-site"
 msgstr "На сайті"
 
-msgctxt "Languages::notifications_center.section.communication"
-msgid "Communication"
-msgstr "Обговорення"
+msgctxt "Languages::lite_checkout.chosen_shipping_not_avaliable"
+msgid "Sorry, we can't get the rates for your selected shipping method. Please check your address and make sure that it is correct. If this doesn't help, please select another shipping method or contact us."
+msgstr "На жаль, ми не можемо отримати тарифи за вибраний спосіб доставки. Перевірте свою адресу та переконайтесь, що вона правильна. Якщо це не допомагає, виберіть інший спосіб доставки або зв’яжіться з нами."
 
-msgctxt "Languages::notifications_center.tag.messages"
-msgid "Messages"
-msgstr "Повідомлення"
+msgctxt "Languages::lite_checkout.not_available"
+msgid "Not available"
+msgstr "Недоступний"
 
 msgctxt "Languages::last_login"
 msgid "Last login"
@@ -20027,6 +20337,94 @@ msgctxt "Languages::total_spent_money"
 msgid "Total spend"
 msgstr "Всього витрачено"
 
+msgctxt "Languages::notifications_center.section.communication"
+msgid "Communication"
+msgstr "Обговорення"
+
+msgctxt "Languages::notifications_center.tag.messages"
+msgid "Messages"
+msgstr "Повідомлення"
+
+msgctxt "Languages::settled_order_status"
+msgid "Consider order paid"
+msgstr "Вважати замовлення оплаченим"
+
+msgctxt "Languages::edit_on_site"
+msgid "Edit on site"
+msgstr "Редагувати на сайті"
+
+msgctxt "Languages::order_manager"
+msgid "Order manager"
+msgstr "Управління замовленнями"
+
+msgctxt "Languages::privilege_groups.internal_templates"
+msgid "On-site notification templates"
+msgstr "Шаблони повідомлень на сайті"
+
+msgctxt "Languages::privilege_groups.notification_settings"
+msgid "Notifications"
+msgstr "Сповіщення"
+
+msgctxt "Languages::logo_section.theme"
+msgid "Site logo"
+msgstr "Логотип сайту"
+
+msgctxt "Languages::logo_section.favicon"
+msgid "Favicon"
+msgstr "Favicon"
+
+msgctxt "Languages::logo_section.mail"
+msgid "E-mail logo"
+msgstr "E-mail logo"
+
+msgctxt "Languages::show_extra_logos"
+msgid "Show extra logos"
+msgstr "Показати додаткові логотипи"
+
+msgctxt "Languages::hide_extra_logos"
+msgid "Hide extra logos"
+msgstr "Сховати додаткові логотипи"
+
+msgctxt "Languages::test_rate_calculation"
+msgid "Test rate calculation"
+msgstr "Тест розрахунку ставки"
+
+msgctxt "Languages::calculated_rate"
+msgid "Calculated rate"
+msgstr "Розрахунок ставки"
+
+msgctxt "Languages::calculated_automatically"
+msgid "Calculated automatically"
+msgstr "Розраховується автоматично"
+
+msgctxt "Languages::additional_settings"
+msgid "Additional settings"
+msgstr "Додаткові налаштування"
+
+msgctxt "Languages::rates_calculated_info"
+msgid "Rates are calculated for [n] product that costs [price].|Rates are calculated for [n] products that cost [price]."
+msgstr "Ставки розраховуються для [n] товару, який коштує [price]. | Ставки розраховуються для [n] товарів, які коштують [price]."
+
+msgctxt "Languages::base_rate"
+msgid "Base rate"
+msgstr "Базова ставка"
+
+msgctxt "Languages::price_rate_not_set"
+msgid "Price rate was not set."
+msgstr "Цінову ставку не було встановлено."
+
+msgctxt "Languages::receivers"
+msgid "Receivers"
+msgstr "Одержувачі"
+
+msgctxt "Languages::notification"
+msgid "Notification"
+msgstr "Сповіщення"
+
+msgctxt "Languages::owner_company"
+msgid "Storefront"
+msgstr "Вітрина"
+
 msgctxt "Languages::block_manager.brands_per_screen"
 msgid "Brands per screen"
 msgstr ""
@@ -20035,9 +20433,17 @@ msgctxt "Languages::block_manager.total_displayed_brands"
 msgid "Total amount of brands displayed"
 msgstr ""
 
-msgctxt "Languages::privilege_groups.notification_settings"
-msgid "Notifications"
-msgstr "Сповіщення"
+msgctxt "Languages::add_all_destinations"
+msgid "Add all"
+msgstr "Додати всі"
+
+msgctxt "SettingsOptions::show_unavailable_shipping_methods"
+msgid "Show unavailable shippings"
+msgstr ""
+
+msgctxt "SettingsTooltips::show_unavailable_shipping_methods"
+msgid "Show real-time shipping methods even if their servers haven't returned the rates"
+msgstr ""
 
 msgctxt "Languages::block_manager.manage_layout_in_tab_not_exist_location"
 msgid "<p>This [entity] currently doesn't have an associated layout page. That's why it uses blocks from the default layout page.<br> If you'd like to edit blocks specifically for this [entity], then:</p><p><ol><li>Go to <b><a href=\"[link]\">Design → Layouts</a></b></li><li>Add a layout page with <b>Dispatch:</b> <code>[dispatch_value]</code>.</li><li>Switch to the <b>[entity_tab]</b> tab and make sure that the layout page is enabled for this [entity].</li><li>Save your changes and return here.</li></ol></p>"
@@ -20075,17 +20481,69 @@ msgctxt "Languages::payment_processors.category.russian"
 msgid "Russian payment methods"
 msgstr ""
 
+msgctxt "Languages::add_in_all_realtime_shippings"
+msgid "Add in all realtime shipping methods"
+msgstr ""
+
 msgctxt "Languages::event.system.realtime_shipping_error.name"
 msgid "Realtime shipping errors"
 msgstr ""
 
-msgctxt "Language::exim_reset_inventory_tooltip"
+msgctxt "Languages::profile_field_contains_information"
+msgid "Сouldn't change the field type: someone has already submitted data in this field."
+msgstr ""
+
+msgctxt "Languages::text_cannot_create_file_check_file"
+msgid "Сouldn't create the file. Please try again or choose another file."
+msgstr ""
+
+msgctxt "Languages::error_profile_field_code_exists"
+msgid "A profile field with this code already exists. Please choose another code."
+msgstr ""
+
+msgctxt "Languages::can_not_add_file_type_profile_field"
+msgid "Sorry, this page doesn't support fields with the \"File\" type, and they weren't added."
+msgstr ""
+
+msgctxt "Languages::day_or_days"
+msgid "day(s)"
+msgstr ""
+
+msgctxt "Languages::feature_already_in_use"
+msgid "Couldn't delete the feature. It is already used by your or someone else's products."
+msgstr ""
+
+msgctxt "Languages::feature_variants_already_in_use"
+msgid "Couldn't delete some feature variants. They are already used by your or someone else's products."
+msgstr ""
+
+msgctxt "Languages::stop_following_rules"
+msgid "Stop following rules"
+msgstr ""
+
+msgctxt "SettingsOptions::product_variant_mini_icon_width"
+msgid "Product variant selector thumbnail width"
+msgstr ""
+
+msgctxt "SettingsOptions::product_variant_mini_icon_height"
+msgid "Product variant selector thumbnail height"
+msgstr ""
+
+msgctxt "Languages::exim_features"
+msgid "Features (Deprecated)"
+msgstr ""
+
+msgctxt "Languages::exim_storefront_feature_name"
+msgid "Storefront feature name"
+msgstr ""
+
+msgctxt "Languages::exim_reset_inventory_tooltip"
 msgid "This won't affect the products that have the quantity specified in the imported file."
 msgstr ""
 
 msgctxt "Languages::thank_you"
 msgid "Thank you!"
-msgstr ""
+msgstr "Дякуємо!"
 
 msgctxt "Languages::text_review_and_reach_out_request"
 msgid "We'll review your application and reach out to you via email soon."
@@ -20119,69 +20577,81 @@ msgctxt "Languages::invoice_pdf"
 msgid "Invoice (PDF)"
 msgstr ""
 
+msgctxt "Languages::exim_import_detailed_image"
+msgid "Detailed image (Deprecated)"
+msgstr ""
+
 msgctxt "Languages::settings.smtp_error"
 msgid "SMTP Error"
-msgstr ""
+msgstr "SMTP Error"
 
 msgctxt "SettingsVariants::timezone::Atlantic/Bermuda"
 msgid "(GMT-03:00) Bermuda"
-msgstr ""
+msgstr "(GMT-03:00) Bermuda"
 
 msgctxt "SettingsVariants::timezone::Asia/Almaty"
 msgid "(GMT+06:00) Almaty"
-msgstr ""
+msgstr "(GMT+06:00) Almaty"
 
 msgctxt "SettingsVariants::timezone::Indian/Cocos"
 msgid "(GMT+06:30) Cocos"
-msgstr ""
+msgstr "(GMT+06:30) Cocos"
 
 msgctxt "SettingsVariants::timezone::Pacific/Pitcairn"
 msgid "(GMT-08:00) Pitcairn"
-msgstr ""
+msgstr "(GMT-08:00) Pitcairn"
 
 msgctxt "SettingsVariants::timezone::America/Vancouver"
 msgid "(GMT-08:00) Vancouver"
-msgstr ""
+msgstr "(GMT-08:00) Vancouver"
 
 msgctxt "SettingsVariants::timezone::Pacific/Gambier"
 msgid "(GMT-09:00) Gambier"
-msgstr ""
+msgstr "(GMT-09:00) Gambier"
 
 msgctxt "SettingsVariants::timezone::Australia/Lord_Howe"
 msgid "(GMT+10:30) Lord Howe"
-msgstr ""
+msgstr "(GMT+10:30) Lord Howe"
 
 msgctxt "SettingsVariants::timezone::Pacific/Chatham"
 msgid "(GMT+12:45) Chatham"
-msgstr ""
+msgstr "(GMT+12:45) Chatham"
 
 msgctxt "SettingsVariants::timezone::Africa/Casablanca"
 msgid "(GMT+01:00) Casablanca"
-msgstr ""
+msgstr "(GMT+01:00) Casablanca"
 
 msgctxt "SettingsVariants::timezone::Europe/Dublin"
 msgid "(GMT+01:00) Dublin"
-msgstr ""
+msgstr "(GMT+01:00) Dublin"
 
 msgctxt "SettingsVariants::timezone::Pacific/Midway"
 msgid "(GMT-11:00) United States Minor Outlying Islands"
-msgstr ""
+msgstr "(GMT-11:00) United States Minor Outlying Islands"
 
 msgctxt "SettingsVariants::timezone::Asia/Urumqi"
 msgid "(GMT+06:00) Urumqi"
+msgstr "(GMT+06:00) Urumqi"
+
+msgctxt "Languages::update_notification.remove_percentage_surcharges_from_all_shipping_methods_title"
+msgid "Shipping methods: Percent surcharges no longer supported"
+msgstr ""
+
+msgctxt "Languages::update_notification.remove_percentage_surcharges_from_all_shipping_methods_message"
+msgid "<p>Starting with version 4.12.1, shipping methods no longer support \"a percentage of order total\" surcharges. During the upgrade, this type of surcharge has been removed from the following shipping methods:</p><ul>[shipping_methods]</ul><p>Please check these shipping methods and make sure that their rates and surcharges are correct.</p>"
 msgstr ""
 
 msgctxt "Languages::sync_data"
 msgid "Sync data"
-msgstr ""
+msgstr "Синхронізація даних"
 
 msgctxt "Languages::never"
 msgid "Never"
-msgstr ""
+msgstr "Ніколи"
 
 msgctxt "Languages::nothing_sign"
 msgid "&mdash;"
-msgstr ""
+msgstr "&mdash;"
 
 msgctxt "Languages::last_sync"
 msgid "Last sync"
@@ -20189,5 +20659,101 @@ msgstr ""
 
 msgctxt "Languages::log_file"
 msgid "Log file"
+msgstr ""
+
+msgctxt "Languages::select_developer"
+msgid "Select developer"
+msgstr ""
+
+msgctxt "Languages::popular_developer"
+msgid "Popular developer"
+msgstr ""
+
+msgctxt "Languages::developers"
+msgid "Developers"
+msgstr "Розробники"
+
+msgctxt "Languages::storefronts.manage_language_availability"
+msgid "Configure the languages available on this storefront"
+msgstr ""
+
+msgctxt "Languages::storefronts.manage_currency_availability"
+msgid "Configure the currencies available on this storefront"
+msgstr ""
+
+msgctxt "Languages::variant_with_name_already_exist"
+msgid "Couldn't rename feature variant \"[variant]\". Reason: a variant with the new name already exists."
+msgstr ""
+
+msgctxt "Languages::delete_default_destination_notice"
+msgid "Couldn't delete the default rate area. It must always exist."
+msgstr ""
+
+msgctxt "Languages::display"
+msgid "Display"
+msgstr ""
+
+msgctxt "Languages::create_filters"
+msgid "Create filters"
+msgstr ""
+
+msgctxt "Languages::text_n_filters_created"
+msgid "Filters created: [n]."
+msgstr ""
+
+msgctxt "Languages::error_n_filters_already_exists"
+msgid "Some filters ([n]) already exist."
+msgstr ""
+
+msgctxt "Languages::bulk_product_features_warning"
+msgid "This change won't affect some of the selected features, because they belong to a feature group. You can assign categories to an entire feature group."
+msgstr ""
+
+msgctxt "Languages::view_feature_groups"
+msgid "View feature groups"
+msgstr ""
+
+msgctxt "Languages::show_on_storefront"
+msgid "Show on Storefront"
+msgstr ""
+
+msgctxt "Languages::parent"
+msgid "Parent"
+msgstr ""
+
+msgctxt "Languages::attempt_to_set_itself_or_a_own_child_as_its_parent_warning"
+msgid "The parent page wasn't changed. Reason: can't assign child page as a parent for its own parent."
+msgstr ""
+
+msgctxt "Languages::bulk_attempt_to_set_itself_or_a_own_child_as_its_parent_warning"
+msgid "The parent page of some of the selected pages wasn't changed. Reason: can't assign child page as a parent for its own parent."
+msgstr ""
+
+msgctxt "Languages::usergroup_must_have_privileges"
+msgid "Usergroup must have at least one privilege."
+msgstr ""
+
+msgctxt "Languages::saved_search.set_as_default"
+msgid "Set as default"
+msgstr ""
+
+msgctxt "Languages::saved_search.set_as_non_default"
+msgid "Set as non-default"
+msgstr ""
+
+msgctxt "Languages::saved_search.set_as_default_confirm"
+msgid "Saved search \"[name]\" will open by default instead of the full list of objects. Is that what you'd like?"
+msgstr ""
+
+msgctxt "Languages::saved_search.set_as_non_default_confirm"
+msgid "The full list of objects will open by default instead of saved search \"[name]\". Is that what you'd like?"
+msgstr ""
+
+msgctxt "Languages::exim_subtotal_discount"
+msgid "Subtotal discount"
+msgstr ""
+
+msgctxt "Languages::storefront_languages_assigned"
+msgid "The \"<a href=\"[url]\">[name]</a>\" storefront had no available languages configured. All languages has been made available for it."
 msgstr ""
 

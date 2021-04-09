@@ -885,7 +885,7 @@ class Themes
     public function convertToRelativePath($path)
     {
         foreach ($this->content_paths as $content_path) {
-            $abs_paths = fn_array_column($content_path, self::PATH_ABSOLUTE);
+            $abs_paths = array_column($content_path, self::PATH_ABSOLUTE);
             $path = trim(str_replace($abs_paths, '', $path), '/');
         }
 

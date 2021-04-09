@@ -13,7 +13,6 @@
 ****************************************************************************/
 
 use Tygh\BlockManager\Layout;
-use Tygh\Common\Robots;
 use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\ProductTracking;
 use Tygh\Enum\ProfileTypes;
@@ -21,6 +20,7 @@ use Tygh\Enum\StorefrontStatuses;
 use Tygh\Enum\VendorStatuses;
 use Tygh\Enum\YesNo;
 use Tygh\Helpdesk;
+use Tygh\Languages\Languages;
 use Tygh\Navigation\LastView;
 use Tygh\Providers\VendorServicesProvider;
 use Tygh\Registry;
@@ -316,6 +316,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $notification = !empty($_REQUEST['notify_user']) && $_REQUEST['notify_user'] == 'Y';
 
+        if (defined('AJAX_REQUEST') && empty($_REQUEST['show_notifications'])) {
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+        }
+
         if (fn_change_company_status($_REQUEST['id'], $_REQUEST['status'], '', $status_from, false, $notification)) {
             fn_set_notification('N', __('notice'), __('status_changed'));
         } else {
@@ -437,8 +441,7 @@ if ($mode == 'manage') {
             $params = [
                 'amount_to' => 0,
                 'tracking' => [
-                    ProductTracking::TRACK_WITHOUT_OPTIONS,
-                    ProductTracking::TRACK_WITH_OPTIONS,
+                    ProductTracking::TRACK
                 ],
                 'get_conditions' => true,
                 'extend' => ['companies'],
@@ -458,7 +461,7 @@ if ($mode == 'manage') {
             $company_data['sales'] = db_get_field(
                 'SELECT SUM(total) FROM ?:orders'
                 . ' WHERE company_id = ?i AND (timestamp >= ?i AND timestamp <= ?i) AND status IN (?a)',
-                $company_id, $time_from, $time_to, array('P', 'C')
+                $company_id, $time_from, $time_to, fn_get_settled_order_statuses()
             );
 
             $vendor_payouts = \Tygh\VendorPayouts::instance(array('vendor' => $company_id));
@@ -468,6 +471,27 @@ if ($mode == 'manage') {
 
             Tygh::$app['view']->assign('time_from', $time_from);
             Tygh::$app['view']->assign('time_to', $time_to);
+        }
+
+        if ($mode === 'add') {
+            $logos = fn_get_logos();
+
+            if (!empty($logos['vendor']['image']['image_path'])) {
+                $company_data = [
+                    'logos' => [
+                        'theme' => [
+                            'image' => [
+                                'image_path' => $logos['vendor']['image']['image_path']
+                            ]
+                        ],
+                        'mail'  => [
+                            'image' => [
+                                'image_path' => $logos['vendor']['image']['image_path']
+                            ]
+                        ],
+                    ],
+                ];
+            }
         }
 
         Tygh::$app['view']->assign('logo_types', fn_get_logo_types(true));
@@ -482,27 +506,34 @@ if ($mode == 'manage') {
     }
 
     if (fn_allowed_for('ULTIMATE')) {
-
         if ($mode === 'update' || $mode === 'add') {
             $theme = Registry::get('config.base_theme');
             $current_theme = null;
             $current_style = null;
+            $storefront_id = null;
             if ($company_id) {
                 /** @var \Tygh\Storefront\Repository $repository */
                 $repository = Tygh::$app['storefront.repository'];
                 /** @var \Tygh\Storefront\Storefront $storefront */
                 $storefront = $repository->findByCompanyId($company_id);
                 $theme = $storefront->theme_name;
+                $storefront_id = $storefront->storefront_id;
 
                 $layout = Layout::instance(0, [], $storefront->storefront_id)->getDefault($storefront->theme_name);
                 $current_theme = Themes::factory($storefront->theme_name)->getManifest()['title'];
                 $current_style = empty($layout['style_id']) ? '' : Styles::factory($storefront->theme_name)->get($layout['style_id'])['name'];
             }
 
+            $currencies = fn_get_currencies_list();
+            $languages = Languages::getAll();
+
             Tygh::$app['view']->assign([
-                'theme'         => $theme,
-                'current_theme' => $current_theme,
-                'current_style' => $current_style,
+                'storefront_id'  => $storefront_id,
+                'theme'          => $theme,
+                'current_theme'  => $current_theme,
+                'current_style'  => $current_style,
+                'all_currencies' => $currencies,
+                'all_languages'  => $languages,
             ]);
         }
 
@@ -725,6 +756,9 @@ if (fn_allowed_for('MULTIVENDOR')) {
             ),
         ));
     } elseif ($mode == 'invite') {
+        if (isset($_REQUEST['is_ajax'])) {
+            Tygh::$app['view']->assign('is_ajax', $_REQUEST['is_ajax']);
+        }
         return [CONTROLLER_STATUS_OK];
     } elseif ($mode == 'invitations') {
         fn_companies_set_navigation_sections('invitations');

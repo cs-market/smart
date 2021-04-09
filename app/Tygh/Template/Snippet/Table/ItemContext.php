@@ -36,9 +36,9 @@ class ItemContext implements IContext
     /**
      * ItemContext constructor.
      *
-     * @param IContext  $context            Instance of parent context.
-     * @param mixed     $item               Item data.
-     * @param int       $counter            Sequential item counter
+     * @param IContext          $context Instance of parent context.
+     * @param array<string|int> $item    Item data.
+     * @param int               $counter Sequential item counter.
      */
     public function __construct(IContext $context, $item, $counter = 0)
     {
@@ -47,7 +47,7 @@ class ItemContext implements IContext
          *
          * @param self                    $this    Instance of current context
          * @param \Tygh\Template\IContext $context Instance of parent context
-         * @param mixed                   $item    Item data
+         * @param array<string|int>       $item    Item data
          * @param int                     $counter Sequential item counter
          */
         fn_set_hook('template_snippet_table_item_context_init', $this, $context, $item, $counter);
@@ -93,5 +93,13 @@ class ItemContext implements IContext
     public function getCounter()
     {
         return $this->counter;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArea()
+    {
+        return $this->parent_context->getArea();
     }
 }

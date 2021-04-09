@@ -127,6 +127,54 @@ class RepositoryTest extends ATestCase
             '',
             []
         );
+        $storefront_3_1 = new Storefront(
+            1,
+            'example1.com/storefront/substore1',
+            false,
+            false,
+            $status,
+            '',
+            $relations_manager,
+            '',
+            '',
+            []
+        );
+        $storefront_3_2 = new Storefront(
+            2,
+            'example1.com/storefront/substore2',
+            false,
+            false,
+            $status,
+            '',
+            $relations_manager,
+            '',
+            '',
+            []
+        );
+        $storefront_3_3 = new Storefront(
+            3,
+            'example1.com/storefront',
+            true,
+            false,
+            $status,
+            '',
+            $relations_manager,
+            '',
+            '',
+            []
+        );
+        $storefront_3_4 = new Storefront(
+            4,
+            'example1.com/storefront/substore3',
+            false,
+            false,
+            $status,
+            '',
+            $relations_manager,
+            '',
+            '',
+            []
+        );
 
         $storefronts = [
             $storefront,
@@ -136,6 +184,13 @@ class RepositoryTest extends ATestCase
             $storefront_2,
             $storefront_2_1,
             $storefront_2_2,
+        ];
+        $storefronts_2 = [
+            $storefront,
+            $storefront_3_1,
+            $storefront_3_2,
+            $storefront_3_3,
+            $storefront_3_4,
         ];
 
         return [
@@ -178,6 +233,11 @@ class RepositoryTest extends ATestCase
                 '/store1/substore1/electronics/tv/lg.html',
                 $storefronts,
                 $storefront_1_1,
+            ],
+            [
+                '/storefront',
+                $storefronts_2,
+                $storefront_3_3,
             ],
         ];
     }

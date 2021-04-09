@@ -1,6 +1,6 @@
 {assign var="data" value=$product_data}
 
-<div id="content_reward_points" class="hidden">
+<div class="{if $selected_section !== "reward_points"}hidden{/if}" id="content_reward_points">
     {include file="common/subheader.tpl" title=__("price_in_points") target="#reward_points_products_hook"}
     <div id="reward_points_products_hook" class="in collapse">
         <fieldset>

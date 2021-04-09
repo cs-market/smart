@@ -228,4 +228,22 @@ class ProductIdMap
 
         return null;
     }
+
+    /**
+     * Remove product identifiers from $master_product_ids
+     *
+     * @param array<int> $product_ids Product identifiers
+     */
+    public function removeMasterProductsFromMap(array $product_ids)
+    {
+        if (empty($product_ids)) {
+            return;
+        }
+
+        foreach ($product_ids as $product_id) {
+            unset($this->master_product_id_map[(int) $product_id]);
+            unset($this->company_product_id_map[(int) $product_id]);
+            unset($this->master_product_ids[(int) $product_id]);
+        }
+    }
 }

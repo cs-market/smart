@@ -124,7 +124,7 @@
             .border-radius(@baseBorderRadius);
             .box-shadow(0 1px 4px rgba(0, 0, 0, 0.1));
             .muted {
-                word-break: break-all;
+                word-break: break-word;
             }
             .with-menu {
                 .clearfix();
@@ -143,7 +143,8 @@
                     margin-top: 1px;
                     .divider {
                         width: 180px;
-                        margin-left: 0px;
+                        margin-left: 0;
+                        margin-right: 0;
                     }
                     .dropdown-menu {
                         margin-top: -1px;
@@ -158,39 +159,6 @@
                 }
                 >a {
                     padding: 6px 15px;
-                }
-            }
-            .nav-list {
-                .divider {
-                    margin-left: -14px;
-                    width: 229px;
-                    background-color: #d5d5d5;
-                    border-bottom: 1px solid #e5e5e5;
-                }
-                padding-right: 0px;
-                padding-left: 0px;
-                li {
-                    position: relative;
-                }
-                li:hover>.icon-trash {
-                    display: block;
-                }
-                .more i {
-                    margin-top: 4px;
-                    margin-left: 8px;
-                }
-                .icon-trash {
-                    position: absolute;
-                    top: 4px;
-                    right: 0px;
-                    display: none;
-                    padding: 0px;
-                    background-color: transparent;
-                }
-                [class^="icon-"],
-                [class*=" icon-"] {
-                    margin-right: 7px !important;
-                    line-height: 14px;
                 }
             }
             dl dd {
@@ -623,6 +591,14 @@
     margin-bottom: 10px;
 }
 
+.sidebar-field .object-picker {
+    margin-bottom: 10px;
+
+    .select2 {
+        margin-bottom: 0;
+    }
+}
+
 .select2-container .select2-search--inline .select2-search__field {
     min-width: 2em;
     padding-right: 50px;
@@ -715,6 +691,10 @@ li > a[class*="--text-wrap"] {
     white-space: nowrap;
 }
 
+.table-shipping-condition thead{
+    background-color: #ededed;
+}
+
 .order-manager {
     display: flex;
     width: 100%;
@@ -747,3 +727,4 @@ li > a[class*="--text-wrap"] {
         max-width: 150px;
     }
 }
+

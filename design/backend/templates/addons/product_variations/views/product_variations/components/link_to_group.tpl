@@ -11,6 +11,3 @@
         <option value="">-{__("none")}-</option>
     </select>
 </div>
-<div class="product-variations__toolbar-code-link-description">
-    {include file="common/tooltip.tpl" tooltip=__("product_variations.group_code.link.description") params="product-variations__toolbar-code-link-tooltip"}
-</div>

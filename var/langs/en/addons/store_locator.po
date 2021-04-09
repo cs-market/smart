@@ -272,6 +272,10 @@ msgctxt "Languages::store_locator.any_rate_area"
 msgid "Any rate area"
 msgstr "Any rate area"
 
+msgctxt "Languages::store_locator.pickup_from_store"
+msgid "Pickup from store"
+msgstr "Pickup from store"
+
 msgctxt "Languages::store_locator.any_vendor"
 msgid "Any vendor"
 msgstr "Any vendor"

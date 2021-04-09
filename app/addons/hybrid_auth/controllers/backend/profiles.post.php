@@ -12,12 +12,9 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($mode == 'update') {
-
+if ($mode === 'update') {
     $providers_list = fn_hybrid_auth_get_providers_list();
     Tygh::$app['view']->assign('providers_list', $providers_list);
 

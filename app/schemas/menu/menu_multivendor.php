@@ -14,6 +14,7 @@
 
 use Tygh\Registry;
 use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
 
 $customers_items = [
     'vendor_administrators' => [
@@ -60,7 +61,7 @@ $schema['top']['administration']['items']['export_data']['subitems']['vendors'] 
 ];
 
 $schema['top']['settings']['items']['Vendors'] = [
-    'href' => 'settings.manage?section_id=vendors',
+    'href' => 'settings.manage?section_id=Vendors',
     'position' => 950,
     'type' => 'setting',
 ];
@@ -102,7 +103,19 @@ if (Registry::get('runtime.company_id')) {
         'position'          => 1500,
         'depends_on_scheme' => true
     ];
+} else {
+    unset($schema['top']['administration']['items']['sync_data']);
 }
 
+if (Registry::get('settings.Vendors.allow_vendor_manage_features') == YesNo::YES) {
+    $schema['top']['administration']['items']['export_data']['subitems']['features'] = [
+        'href' => 'exim.export?section=features',
+        'position' => 300,
+    ];
+    $schema['top']['administration']['items']['import_data']['subitems']['features'] = [
+        'href' => 'exim.import?section=features',
+        'position' => 800,
+    ];
+}
 
 return $schema;

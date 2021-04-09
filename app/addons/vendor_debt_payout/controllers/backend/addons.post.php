@@ -20,12 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'
     && $_REQUEST['addon'] == 'vendor_debt_payout'
 ) {
     $options = Tygh::$app['view']->getTemplateVars('options');
-
+    $addon_setting_ids = [];
     foreach ($options['general'] as $setting_id => $option_item) {
-        if ($option_item['name'] == 'payout_overdue_limit') {
-            Tygh::$app['view']->assign('payout_overdue_limit_id', $setting_id);
-        } elseif ($option_item['name'] == 'vendor_debt_limit') {
-            Tygh::$app['view']->assign('vendor_debt_limit_id', $setting_id);
-        }
+        $addon_setting_ids[$option_item['name']] = $setting_id;
     }
+
+    Tygh::$app['view']->assign('addon_setting_ids', $addon_setting_ids);
 }

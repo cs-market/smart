@@ -25,4 +25,4 @@
     {/if}
 {/capture}
 
-{include file="common/mainbox.tpl" title=__("sync_data") content=$smarty.capture.mainbox}
+{include file="common/mainbox.tpl" title=__("sync_data") content=$smarty.capture.mainbox show_all_storefront=false}

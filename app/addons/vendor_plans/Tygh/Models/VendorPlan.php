@@ -14,10 +14,31 @@
 
 namespace Tygh\Models;
 
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Models\Components\AModel;
 use Tygh\Models\Components\Relation;
 use Tygh\Registry;
 
+/**
+ * Class VendorPlan
+ *
+ * @property string $plan_id
+ * @property string $lang_code
+ * @property string $plan
+ * @property string $description
+ * @property string $status
+ * @property string $position
+ * @property string $price
+ * @property string $periodicity
+ * @property string $commission
+ * @property string $fixed_commission
+ * @property string $products_limit
+ * @property string $revenue_limit
+ * @property string $is_default
+ * @property null|string $companies_count
+ *
+ * @package Tygh\Models
+ */
 class VendorPlan extends AModel
 {
     public function getTableName()
@@ -350,6 +371,27 @@ class VendorPlan extends AModel
          * @param \Tygh\Models\VendorPlan $this Instance of VendorPlan
          */
         fn_set_hook('vendor_plan_after_delete', $this);
+    }
+
+    /**
+     * Gets vendor plan status text
+     *
+     * @return string
+     */
+    public function getStatusText()
+    {
+        switch ($this->status) {
+            case ObjectStatuses::ACTIVE:
+                return __('active');
+                break;
+            case ObjectStatuses::HIDDEN:
+                return __('hidden');
+                break;
+            default:
+            case ObjectStatuses::DISABLED:
+                return __('disabled');
+                break;
+        }
     }
 
     /**

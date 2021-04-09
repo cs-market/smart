@@ -223,13 +223,19 @@ if ($mode == 'properties') {
 
         Tygh::$app['view']->assign('shipping_info', $shipping_info);
     } else {
-        $total = (float) db_get_field("SELECT SUM(amount*price) FROM ?:rma_return_products WHERE return_id = ?i AND type = ?s", $change_return_status['return_id'], ReturnOperationStatuses::APPROVED);
+        $total = (float) db_get_field(
+            'SELECT SUM(amount*price) FROM ?:rma_return_products WHERE return_id = ?i AND type = ?s',
+            $change_return_status['return_id'],
+            ReturnOperationStatuses::APPROVED
+        );
+        $order_total = 0;
 
         // manually include taxes
         $return_info = fn_get_return_info($change_return_status['return_id']);
-        if (isset($return_info['items'][ReturnOperationStatuses::APPROVED])) {
 
+        if (isset($return_info['items'][ReturnOperationStatuses::APPROVED])) {
             $current_order = $original_order = fn_get_order_info($change_return_status['order_id']);
+            $order_total = $original_order['total'];
 
             foreach ($return_info['items'][ReturnOperationStatuses::APPROVED] as $item_id => $return_item) {
                 fn_rma_update_order_taxes(
@@ -241,15 +247,21 @@ if ($mode == 'properties') {
                     $return_item['price'],
                     $original_order
                 );
+
+                $order_total -= (float) $return_item['price'];
             }
 
-            $total += ((float)$original_order['total']  - (float)$current_order['total']);
+            $total += ((float) $original_order['total'] - (float) $current_order['total']);
         }
 
-        if ($change_return_status['inventory_to'] == InventoryOperations::INCREASED
-            && !($change_return_status['inventory_from'] == InventoryOperations::INCREASED
-                && $change_return_status['status_to'] == ReturnOperationStatuses::REQUESTED)) {
-            $change_return_status['total'] = -$total;
+        if (
+            $change_return_status['inventory_to'] === InventoryOperations::INCREASED
+            && !(
+                $change_return_status['inventory_from'] === InventoryOperations::INCREASED
+                && $change_return_status['status_to'] === ReturnOperationStatuses::REQUESTED
+            )
+        ) {
+            $change_return_status['total'] = $order_total;
         } else {
             $change_return_status['total'] = $total;
         }

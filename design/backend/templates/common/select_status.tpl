@@ -1,4 +1,4 @@
-{if $display == "select" || $display == "popup"}
+{if $display == "select" || $display == "popup" || $display == "text"}
 {assign var="selected_st" value=$obj.status|default:"A"}
 {capture name="status_title"}
     {if $selected_st == "A"}
@@ -7,6 +7,8 @@
         {__("hidden")}
     {elseif $selected_st == "D"}
         {__("disabled")}
+    {elseif $selected_st == "N"}
+        {__("new")}
     {/if}
 {/capture}
 {/if}
@@ -40,9 +42,9 @@
 <div class="control-group">
     <label class="control-label cm-required">{__("status")}:</label>
     <div class="controls">
-    <span>
+    <p>
     {$smarty.capture.status_title nofilter}
-    </span>
+    </p>
     </div>
 </div>
 {else}

@@ -14,9 +14,9 @@
 
 use Tygh\Addons\VendorPlans\PriceFormatter;
 use Tygh\Addons\VendorPlans\ServiceProvider;
+use Tygh\Enum\YesNo;
 use Tygh\Models\VendorPlan;
 use Tygh\Registry;
-use Tygh\Tools\Formatter;
 use Tygh\VendorPayouts;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -182,7 +182,14 @@ function fn_vendor_categories_fee_fill_missing_fee_from_vendor_plans($category_f
             unset($result[$plan_id]['category_id']);
         }
     }
+    
 
+    /**
+     * Allows to correct commission fees percent before calculate fees amount.
+     *
+     * @param array<int, array{percent_fee: float}> $result Commission data
+     */
+    fn_set_hook('vendor_categories_fee_fill_missing_fee_from_vendor_plans_post', $result);
     return $result;
 }
 
@@ -322,7 +329,8 @@ function fn_vendor_categories_fee_get_included_product_taxes_based_on_unit_price
 function fn_vendor_categories_fee_vendor_plans_calculate_commission_for_payout_post($order_info, $company_data, &$payout_data)
 {
     $products = $products_subtotal = $main_category_ids = [];
-    $exclude_taxes_from_calculation = Registry::get('addons.vendor_plans.include_taxes_in_commission') == 'N';
+    $exclude_taxes_from_calculation = !YesNo::toBool(Registry::get('addons.vendor_plans.include_taxes_in_commission'));
+    $profit_delta = $payout_data['commission_amount'] - $payout_data['marketplace_profit'];
 
     $formatter = ServiceProvider::getPriceFormatter();
 
@@ -392,12 +400,13 @@ function fn_vendor_categories_fee_vendor_plans_calculate_commission_for_payout_p
     $payouts_history = fn_vendor_categories_fee_get_order_payouts_history($payout_data['order_id']);
     $payout_data = fn_vendor_categories_fee_calculate_payout($total, $payout_data, $products, $main_categories_fee, $parent_categories_fee, $payouts_history, $formatter);
 
-    if (Registry::get('addons.vendor_plans.include_shipping') == 'Y') {
+    if (YesNo::toBool(Registry::get('addons.vendor_plans.include_shipping'))) {
         $shipping_fee = $shipping_cost * ($payout_data['commission'] / 100);
         $shipping_fee = $formatter->round($shipping_fee);
         $payout_data['extra']['shipping_fee'] = $shipping_fee;
         $payout_data['commission_amount'] += $shipping_fee;
     }
+    $payout_data['marketplace_profit'] = $payout_data['commission_amount'] - $profit_delta;
 }
 
 /**

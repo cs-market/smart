@@ -8,105 +8,105 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: de\n"
-"X-Crowdin-File: /release-4.11.5/addons/paypal_commerce_platform.po\n"
-"X-Crowdin-File-ID: 3620\n"
-"PO-Revision-Date: 2020-08-28 13:34\n"
+"X-Crowdin-File: /release-4.12.2/addons/paypal_commerce_platform.po\n"
+"X-Crowdin-File-ID: 4174\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::paypal_commerce_platform"
 msgid "PayPal Commerce Platform"
-msgstr ""
+msgstr "Paypal Handelsplatform"
 
 msgctxt "Addons::description::paypal_commerce_platform"
 msgid "This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
-msgstr ""
+msgstr "Dieses Add-on hilft Shop Administratoren die Einnahmen automatisch an verschiedene Vendoren über PayPal zu verteilen."
 
 msgctxt "SettingsSections::paypal_commerce_platform::general"
 msgid "General"
-msgstr ""
+msgstr "Allgemein"
 
 msgctxt "SettingsOptions::paypal_commerce_platform::collect_payouts"
 msgid "Commission includes"
-msgstr ""
+msgstr "Gebühren enthalten"
 
 msgctxt "SettingsVariants::paypal_commerce_platform::collect_payouts::N"
 msgid "Order commission"
-msgstr ""
+msgstr "Verkaufsgebühren"
 
 msgctxt "SettingsVariants::paypal_commerce_platform::collect_payouts::Y"
 msgid "Order commission and unpaid payouts"
-msgstr ""
+msgstr "Verkaufsgebühren und unbezahlte Auszahlungen"
 
 msgctxt "SettingsOptions::paypal_commerce_platform::rma_refunded_order_status"
 msgid "Order status on refund"
-msgstr ""
+msgstr "Status der Bestellung bei Rückerstattung"
 
 msgctxt "Languages::paypal_commerce_platform.paypal_commerce_platform"
 msgid "PayPal Commerce Platform"
-msgstr ""
+msgstr "Paypal Handelsplatform"
 
 msgctxt "Languages::paypal_commerce_platform.paypal"
 msgid "PayPal"
-msgstr ""
+msgstr "PayPal"
 
 msgctxt "Languages::paypal_commerce_platform.payer_id"
 msgid "Merchant account ID"
-msgstr ""
+msgstr "Händler-Konto-ID"
 
 msgctxt "Languages::paypal_commerce_platform.client_id"
 msgid "App Client ID"
-msgstr ""
+msgstr "App-Kunden-ID"
 
 msgctxt "Languages::paypal_commerce_platform.secret"
 msgid "App Secret"
-msgstr ""
+msgstr "App Geheimnis "
 
 msgctxt "Languages::paypal_commerce_platform.connect_with_paypal"
 msgid "Connect with PayPal"
-msgstr ""
+msgstr "Mit Paypal verbinden"
 
 msgctxt "Languages::paypal_commerce_platform.disconnect"
 msgid "Disconnect account"
-msgstr ""
+msgstr "Konto trennen"
 
 msgctxt "Languages::paypal_commerce_platform.paypal_account"
 msgid "PayPal account"
-msgstr ""
+msgstr "Paypal Konto"
 
 msgctxt "Languages::paypal_commerce_platform.connected"
 msgid "Connected"
-msgstr ""
+msgstr "Verbunden"
 
 msgctxt "Languages::paypal_commerce_platform.not_connected"
 msgid "Not connected"
-msgstr ""
+msgstr "Nicht verbunden "
 
 msgctxt "Languages::paypal_commerce_platform.account_connected"
 msgid "Your PayPal account has been successfully connected to the store"
-msgstr ""
+msgstr "Ihr Paypal Konto wurde erfolgreich mit dem Store verbunden"
 
 msgctxt "Languages::paypal_commerce_platform.account_connection_failure"
 msgid "Unable to connect your PayPal account to the store"
-msgstr ""
+msgstr "Verbindung des Paypal Kontos mit dem Store konnte nicht hergestellt werden"
 
 msgctxt "Languages::paypal_commerce_platform.account_disconnected"
 msgid "Your PayPal account has been successfully disconnected from the store"
-msgstr ""
+msgstr "Ihr PayPal Account wurde erfolgreich vom Store getrennt"
 
 msgctxt "Languages::paypal_commerce_platform.withdrawal_for_the_order"
 msgid "Withdrawal for the order #[order_id]"
-msgstr ""
+msgstr "Auszahlung für die Bestellung #[order_id]"
 
 msgctxt "Languages::paypal_commerce_platform.refund_id"
 msgid "Refund transaction ID in PayPal"
-msgstr ""
+msgstr "Rückerstattungs-Transaktions-ID in Paypal"
 
 msgctxt "Languages::paypal_commerce_platform.withdrawal"
 msgid "Withdrawal amount"
-msgstr ""
+msgstr "Auszahlungsbetrag"
 
 msgctxt "Languages::paypal_commerce_platform.rma.perform_refund"
 msgid "Give a refund via PayPal Commerce Platform"
-msgstr ""
+msgstr "Eine Rückerstattung via Paypal Handelsplatform geben"
 
 msgctxt "Languages::ttc_paypal_commerce_platform.rma.perform_refund"
 msgid "A refund will be made once an administrator changes the return request status"
@@ -282,5 +282,13 @@ msgstr ""
 
 msgctxt "Languages::paypal_commerce_platform.style.height"
 msgid "Height"
+msgstr ""
+
+msgctxt "Languages::paypal_commerce_platform.bn_code"
+msgid "Partner integration code"
+msgstr ""
+
+msgctxt "Languages::paypal_commerce_platform.debug_id"
+msgid "PayPal Debug ID"
 msgstr ""
 

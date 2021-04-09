@@ -24,143 +24,143 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+(function (_, $) {
+  var locationWrapper = {
+    put: function put(hash, win) {
+      (win || window).location.hash = this.encoder(hash);
+    },
+    get: function get(win) {
+      var hash = (win || window).location.hash.replace(/^#/, '');
 
-(function(_, $) {
-    var locationWrapper = {
-        put: function(hash, win) {
-            (win || window).location.hash = this.encoder(hash);
-        },
-        get: function(win) {
-            var hash = ((win || window).location.hash).replace(/^#/, '');
+      try {
+        return decodeURIComponent(hash);
+      } catch (error) {
+        return hash;
+      }
+    },
+    encoder: encodeURIComponent
+  };
+  var historyState = {
+    storage: null,
+    first: '',
+    put: function put(hash, params) {
+      if (!this.storage) {
+        this.storage = {};
+        this.first = hash;
+      }
 
-            try {
-                return decodeURIComponent(hash);
-            }
-            catch (error) {
-                return hash;
-            }
-        },
-        encoder: encodeURIComponent
-    };
+      this.storage[hash] = params;
+    },
+    get: function get(hash) {
+      if (hash in this.storage) {
+        return this.storage[hash];
+      }
 
-    var historyState = {
-        storage: null,
-        first: '',
-        put: function(hash, params) {
-            if (!this.storage) {
-                this.storage = {};
-                this.first = hash;
-            }
+      return {};
+    }
+  };
 
-            this.storage[hash] = params;
-        },
-        get: function(hash) {
-            if (hash in this.storage) {
-                return this.storage[hash];
-            }
+  function initObjects(options) {
+    options = $.extend({
+      unescape: false
+    }, options || {});
+    locationWrapper.encoder = encoder(options.unescape);
 
-            return {};
-        }
-    };
+    function encoder(unescape_) {
+      if (unescape_ === true) {
+        return function (hash) {
+          return hash;
+        };
+      }
 
-    function initObjects(options) {
-        options = $.extend({
-                unescape: false
-            }, options || {});
+      if (typeof unescape_ == "string" && (unescape_ = partialDecoder(unescape_.split(""))) || typeof unescape_ == "function") {
+        return function (hash) {
+          return unescape_(encodeURIComponent(hash));
+        };
+      }
 
-        locationWrapper.encoder = encoder(options.unescape);
-
-        function encoder(unescape_) {
-            if(unescape_ === true) {
-                return function(hash){ return hash; };
-            }
-            if(typeof unescape_ == "string" &&
-               (unescape_ = partialDecoder(unescape_.split(""))) ||
-                typeof unescape_ == "function") {
-                return function(hash) { return unescape_(encodeURIComponent(hash)); };
-            }
-            return encodeURIComponent;
-        }
-
-        function partialDecoder(chars) {
-            var re = new RegExp($.map(chars, encodeURIComponent).join("|"), "ig");
-            return function(enc) { return enc.replace(re, decodeURIComponent); };
-        }
+      return encodeURIComponent;
     }
 
-    var implementations = {};
-
-    implementations.base = {
-        callback: undefined,
-        type: undefined,
-
-        check: function() {},
-        load:  function(hash) {},
-        init:  function(callback, options) {
-            initObjects(options);
-            self.callback = callback;
-            self._options = options;
-            self._init();
-        },
-
-        _init: function() {},
-        _options: {}
-    };
-
-    implementations.hashchangeEvent = {
-        _skip: false,
-        _init: function() {
-            $(window).bind('hashchange', function() {
-                if (self._skip === true) {
-                    self._skip = false;
-                    return;
-                }
-                self.check();
-            });
-        },
-        check: function() {
-            var hash = locationWrapper.get() ? locationWrapper.get() : historyState.first;
-            self.callback(hash, historyState.get(hash));
-        },
-        load: function(hash, params) {
-            var current_hash = locationWrapper.get() ? locationWrapper.get() : historyState.first;
-            historyState.put(hash, params);
-            if (hash != current_hash) {
-                self._skip = true;
-            }
-            locationWrapper.put(hash);
-        },
-        reload: function(hash, params) {
-            historyState.put(hash, params);
-        }
-    };
-
-    implementations.HTML5 = {
-        _init: function() {
-            $(window).bind('popstate', self.check);
-        },
-        check: function(evt) {
-            var state = evt.originalEvent.state;
-            self.callback(state ? '#!/' + document.location : '', state);
-        },
-        load: function(hash, params) {
-            window.history.pushState(params, null, _.current_location + '/' + hash.replace(/^\!\//, ''));
-        },
-        reload: function(hash, params) {
-            window.history.replaceState(params, null, _.current_location + '/' + hash.replace(/^\!\//, ''));
-        }
-    };
-
-    var self = $.extend({}, implementations.base);
-
-    if (!_.embedded && "pushState" in window.history) {
-        self.type = 'HTML5';
-    } else if("onhashchange" in window) {
-        self.type = 'hashchangeEvent';
+    function partialDecoder(chars) {
+      var re = new RegExp($.map(chars, encodeURIComponent).join("|"), "ig");
+      return function (enc) {
+        return enc.replace(re, decodeURIComponent);
+      };
     }
+  }
 
-    if (self.type) {
-        $.extend(self, implementations[self.type]);
-        $.history = self;
+  var implementations = {};
+  implementations.base = {
+    callback: undefined,
+    type: undefined,
+    check: function check() {},
+    load: function load(hash) {},
+    init: function init(callback, options) {
+      initObjects(options);
+      self.callback = callback;
+      self._options = options;
+
+      self._init();
+    },
+    _init: function _init() {},
+    _options: {}
+  };
+  implementations.hashchangeEvent = {
+    _skip: false,
+    _init: function _init() {
+      $(window).bind('hashchange', function () {
+        if (self._skip === true) {
+          self._skip = false;
+          return;
+        }
+
+        self.check();
+      });
+    },
+    check: function check() {
+      var hash = locationWrapper.get() ? locationWrapper.get() : historyState.first;
+      self.callback(hash, historyState.get(hash));
+    },
+    load: function load(hash, params) {
+      var current_hash = locationWrapper.get() ? locationWrapper.get() : historyState.first;
+      historyState.put(hash, params);
+
+      if (hash != current_hash) {
+        self._skip = true;
+      }
+
+      locationWrapper.put(hash);
+    },
+    reload: function reload(hash, params) {
+      historyState.put(hash, params);
     }
+  };
+  implementations.HTML5 = {
+    _init: function _init() {
+      $(window).bind('popstate', self.check);
+    },
+    check: function check(evt) {
+      var state = evt.originalEvent.state;
+      self.callback(state ? '#!/' + document.location : '', state);
+    },
+    load: function load(hash, params) {
+      window.history.pushState(params, null, _.current_location + '/' + hash.replace(/^\!\//, ''));
+    },
+    reload: function reload(hash, params) {
+      window.history.replaceState(params, null, _.current_location + '/' + hash.replace(/^\!\//, ''));
+    }
+  };
+  var self = $.extend({}, implementations.base);
+
+  if (!_.embedded && "pushState" in window.history) {
+    self.type = 'HTML5';
+  } else if ("onhashchange" in window) {
+    self.type = 'hashchangeEvent';
+  }
+
+  if (self.type) {
+    $.extend(self, implementations[self.type]);
+    $.history = self;
+  }
 })(Tygh, Tygh.$);

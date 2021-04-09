@@ -181,11 +181,9 @@
 {/capture}
 {** /Form submit section **}
 
-{if $supplier}
-    {$title_start = __("editing_supplier")}
-    {$title_end = $supplier.name}
-{else}
-    {$_title=__("add_supplier")}
-{/if}
-
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$_title content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($supplier) ? $supplier.name : __("add_supplier")
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+}

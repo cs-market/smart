@@ -60,10 +60,10 @@ class CategoryImporter
         }
 
         $allow_matching_category_by_name = $import_storage->getSetting('allow_matching_category_by_name', false);
-        $category_id = (int) $import_storage->findEntityLocalId($category);
+        $category_id = $import_storage->findEntityLocalId(CategoryDto::REPRESENT_ENTITY_TYPE, $category->id);
         $result = new OperationResult(true);
 
-        if (!$category_id && $category->name && $allow_matching_category_by_name === true) {
+        if ($category_id->hasNotValue() && $category->name && $allow_matching_category_by_name === true) {
             $category->id->local_id = $this->product_storage->findCategoryIdByName(
                 $category->name->default_value,
                 $import_storage->getImport()->company_id
@@ -78,8 +78,8 @@ class CategoryImporter
             $import_storage->mapEntityId($category);
         }
 
-        if ($category_id) {
-            $result->setData($category_id);
+        if ($category_id->hasValue()) {
+            $result->setData($category_id->asInt());
             $import_storage->removeEntity($category);
 
             return $result;
@@ -121,10 +121,10 @@ class CategoryImporter
             return new OperationResult(true, 0);
         }
 
-        $parent_local_id = $import_storage->findEntityLocalIdByExternalId(CategoryDto::REPRESENT_ENTITY_TYPE, $category->parent_id->getId());
+        $parent_local_id = $import_storage->findEntityLocalId(CategoryDto::REPRESENT_ENTITY_TYPE, $category->parent_id);
 
-        if ($parent_local_id) {
-            $category->parent_id->local_id = (int) $parent_local_id;
+        if ($parent_local_id->hasValue()) {
+            $category->parent_id->local_id = $parent_local_id->asInt();
             return new OperationResult(true, $parent_local_id);
         }
 

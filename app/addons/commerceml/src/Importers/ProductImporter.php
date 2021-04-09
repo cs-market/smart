@@ -19,13 +19,17 @@ namespace Tygh\Addons\CommerceML\Importers;
 use Tygh\Addons\CommerceML\Dto\CategoryDto;
 use Tygh\Addons\CommerceML\Dto\CurrencyDto;
 use Tygh\Addons\CommerceML\Dto\IdDto;
+use Tygh\Addons\CommerceML\Dto\LocalIdDto;
 use Tygh\Addons\CommerceML\Dto\PriceTypeDto;
 use Tygh\Addons\CommerceML\Dto\ProductDto;
 use Tygh\Addons\CommerceML\Dto\TaxDto;
+use Tygh\Addons\CommerceML\Dto\TranslatableValueDto;
 use Tygh\Addons\CommerceML\Storages\ImportStorage;
 use Tygh\Addons\CommerceML\Storages\ProductStorage;
 use Tygh\Common\OperationResult;
+use Tygh\Enum\ImagePairTypes;
 use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\ProductFeatures;
 use Tygh\Enum\YesNo;
 
 /**
@@ -76,11 +80,25 @@ class ProductImporter
      * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
      * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
      *
-     * @return \Tygh\Common\OperationResult
+     * @return \Tygh\Common\OperationResult Result instance
      */
     public function import(ProductDto $product, ImportStorage $import_storage)
     {
         $main_result = new OperationResult(true);
+
+        /**
+         * Executes before CommerceML product data imported
+         * Allows to add additional data to product and import addition entities
+         *
+         * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
+         * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage instance
+         * @param \Tygh\Common\OperationResult                   $main_result    Parent category DTO
+         */
+        fn_set_hook('commerceml_product_importer_import_pre', $product, $import_storage, $main_result);
+
+        if ($main_result->isFailure()) {
+            return $main_result;
+        }
 
         if (!$this->importCategories($main_result, $product, $import_storage)) {
             return $main_result;
@@ -116,22 +134,25 @@ class ProductImporter
             return false;
         }
 
-        $product_data = array_merge($product->properties->getValueMap(), [
-            'product'           => $product->name ? $product->name->default_value : null,
-            'full_description'  => $product->description ? $product->description->default_value : null,
-            'product_code'      => $product->product_code,
-            'amount'            => $product->quantity,
+        $product_data = array_merge($product->properties->getValueMap(['short_description', 'page_title', 'promo_text']), [
+            'amount' => $product->quantity,
         ]);
 
         if (!$product->id->hasLocalId()) {
             $product_data['source_import_key'] = $import_storage->getImport()->import_key;
         }
 
+        $product_data = $this->fillProductCode($product, $import_storage, $product_data);
+        $product_data = $this->fillProductName($product, $import_storage, $product_data);
+        $product_data = $this->fillProductFullDescription($product, $import_storage, $product_data);
+        $product_data = $this->fillProductShortDescription($product, $import_storage, $product_data);
+        $product_data = $this->fillProductPageTitle($product, $import_storage, $product_data);
+        $product_data = $this->fillProductPromoText($product, $import_storage, $product_data);
         $product_data = $this->fillStatus($product, $import_storage, $product_data, $current_product_data);
-        $product_data = $this->fillCategories($product, $product_data, $current_product_data);
+        $product_data = $this->fillCategories($product, $import_storage, $product_data, $current_product_data);
         $product_data = $this->fillTaxes($product, $import_storage, $product_data, $current_product_data);
         $product_data = $this->fillPrices($product, $import_storage, $product_data);
-        $product_data = $this->fillProductFeatures($product, $product_data, $current_product_data);
+        $product_data = $this->fillProductFeatures($product, $import_storage, $product_data, $current_product_data);
 
         $product_data = array_filter($product_data, static function ($val) {
             return $val !== null;
@@ -161,12 +182,12 @@ class ProductImporter
         $lang_codes = (array) $import_storage->getSetting('lang_codes', []);
 
         foreach ($lang_codes as $lang_code) {
-            $description_data = array_merge($product->properties->getTranslatableValueMap($lang_code), [
-                'product'     => $product->name && $product->name->hasTraslate($lang_code) ? $product->name->getTranslate($lang_code) : null,
-                'description' => $product->description && $product->description->hasTraslate($lang_code)
-                    ? $product->description->getTranslate($lang_code)
-                    : null,
-            ]);
+            $description_data = $product->properties->getTranslatableValueMap($lang_code, ['short_description', 'page_title', 'promo_text']);
+            $description_data = $this->fillProductName($product, $import_storage, $description_data, $lang_code);
+            $description_data = $this->fillProductFullDescription($product, $import_storage, $description_data, $lang_code);
+            $description_data = $this->fillProductShortDescription($product, $import_storage, $description_data, $lang_code);
+            $description_data = $this->fillProductPageTitle($product, $import_storage, $description_data, $lang_code);
+            $description_data = $this->fillProductPromoText($product, $import_storage, $description_data, $lang_code);
 
             $description_data = array_filter($description_data);
 
@@ -187,12 +208,18 @@ class ProductImporter
      */
     private function importProductImages(ProductDto $product, ImportStorage $import_storage, array $current_product_data)
     {
+        $strategy = $import_storage->getSetting('catalog_importer.product_image_update_strategy');
+
+        if ($strategy === 'ignore' && !$product->is_new) {
+            return;
+        }
+
         $files_dir = rtrim((string) $import_storage->getSetting('upload_dir_path', '/'), '/');
         $current_pair_ids = [];
         $detailed_image_data_list = [];
         $pair_data_list = [];
 
-        if ($current_product_data) {
+        if ($current_product_data && $strategy === 'append') {
             $current_pair_ids = array_column($current_product_data['images'], 'pair_id', 'image_path');
         }
 
@@ -211,9 +238,9 @@ class ProductImporter
             if (isset($current_image['type'])) {
                 $type = $current_image['type'];
             } elseif (empty($current_pair_ids) && empty($pair_data_list)) {
-                $type = 'M';
+                $type = ImagePairTypes::MAIN;
             } else {
-                $type = 'A';
+                $type = ImagePairTypes::ADDITIONAL;
             }
 
             $pair_data_list[] = [
@@ -238,6 +265,13 @@ class ProductImporter
             $pair_data_list,
             $detailed_image_data_list
         );
+
+        if (empty($current_product_data['images']) || $strategy !== 'replace') {
+            return;
+        }
+
+        $current_pair_ids = array_column($current_product_data['images'], 'pair_id', 'image_path');
+        $this->product_storage->removeImagePairs($current_pair_ids);
     }
 
     /**
@@ -251,47 +285,79 @@ class ProductImporter
      */
     private function importCategories(OperationResult $main_result, ProductDto $product, ImportStorage $import_storage)
     {
-        $allow_import_category = $import_storage->getSetting('allow_import_categories', true);
-        $default_category_id = (int) $import_storage->getSetting('default_category_id', 0);
+        $allow_manage_category = $import_storage->getSetting('allow_manage_categories', true);
+        $default_category_id = (int) $import_storage->getSetting('catalog_importer.default_category_id', 0);
+
+        if (
+            empty($product->categories)
+            && $default_category_id
+            && $product->is_creatable
+        ) {
+            $category_id_dto = IdDto::createByLocalId((string) $default_category_id);
+            $product->categories[] = $category_id_dto;
+
+            $main_result->addMessage('product.default_category_used', __('commerceml.import.message.product.no_categories_default_category_used', [
+                '[product_id]' => $product->id->getId(),
+                '[local_id]'   => $category_id_dto->local_id
+            ]));
+            return true;
+        }
 
         /** @var \Tygh\Addons\CommerceML\Dto\IdDto $category_id_dto */
         foreach ($product->categories as $category_id_dto) {
-            if ($category_id_dto->hasLocalId()) {
+            $category_id = $import_storage->findEntityLocalId(
+                CategoryDto::REPRESENT_ENTITY_TYPE,
+                $category_id_dto,
+                $import_storage->getSetting('mapping.category.default_variant', LocalIdDto::VALUE_CREATE)
+            );
+
+            if ($category_id->hasValue()) {
+                $category_id_dto->local_id = $category_id->asInt();
                 continue;
             }
 
-            $category = $import_storage->findEntity(CategoryDto::REPRESENT_ENTITY_TYPE, $category_id_dto->getId());
+            if ($category_id->isSkipValue()) {
+                $main_result->addError('category.skipped', __('commerceml.import.message.category.skipped', [
+                    '[id]' => $category_id_dto->getId(),
+                ]));
+                continue;
+            }
 
-            if ($category && $category instanceof CategoryDto && $allow_import_category === true) {
-                $result = $this->category_importer->import($category, $import_storage);
+            if ($allow_manage_category && $category_id->isCreateValue()) {
+                $category = $import_storage->findEntity(CategoryDto::REPRESENT_ENTITY_TYPE, $category_id_dto->getId());
 
-                $main_result->merge($result);
+                if ($category && $category instanceof CategoryDto) {
+                    $result = $this->category_importer->import($category, $import_storage);
 
-                if ($result->isFailure()) {
-                    $main_result->setSuccess(false);
-                    return false;
+                    $main_result->merge($result);
+
+                    if ($result->isFailure()) {
+                        $main_result->setSuccess(false);
+                        return false;
+                    }
+
+                    $category_id_dto->local_id = $category->id->local_id;
+                    continue;
                 }
             }
 
-            $category_local_id = $import_storage->findEntityLocalIdByExternalId(CategoryDto::REPRESENT_ENTITY_TYPE, $category_id_dto->getId());
+            if ($default_category_id) {
+                $category_id_dto->local_id = $default_category_id;
 
-            if (!$category_local_id && $allow_import_category === false && $default_category_id) {
-                $category_local_id = $default_category_id;
                 $main_result->addMessage('product.default_category_used', __('commerceml.import.message.product.default_category_used', [
                     '[id]'       => $category_id_dto->getId(),
-                    '[local_id]' => $category_local_id
+                    '[local_id]' => $default_category_id
                 ]));
+
+                continue;
             }
 
-            if (!$category_local_id) {
-                $main_result->setSuccess(false);
-                $main_result->addError('product.caregory_not_found', __('commerceml.import.error.product.caregory_not_found', [
-                    '[id]' => $category_id_dto->getId()
-                ]));
-                return false;
-            }
+            $main_result->setSuccess(false);
+            $main_result->addError('product.caregory_not_found', __('commerceml.import.error.product.caregory_not_found', [
+                '[id]' => $category_id_dto->getId()
+            ]));
 
-            $category_id_dto->local_id = (int) $category_local_id;
+            return false;
         }
 
         return true;
@@ -398,25 +464,17 @@ class ProductImporter
         $product_data['prices'] = [];
 
         foreach ($product->prices as $price) {
-            if ($price->price_type_id->hasLocalId()) {
-                $local_price_type_id = $price->price_type_id->local_id;
-            } else {
-                $local_price_type_id = $import_storage->findEntityLocalIdByExternalId(PriceTypeDto::REPRESENT_ENTITY_TYPE, $price->price_type_id->external_id);
-            }
+            $local_price_type_id = $import_storage->findEntityLocalId(PriceTypeDto::REPRESENT_ENTITY_TYPE, $price->price_type_id);
 
-            if (empty($local_price_type_id)) {
+            if ($local_price_type_id->hasNotValue()) {
                 continue;
             }
 
             if ($price->currency_code) {
-                if ($price->currency_code->hasLocalId()) {
-                    $currency_code = $price->currency_code->local_id;
-                } else {
-                    $currency_code = $import_storage->findEntityLocalIdByExternalId(CurrencyDto::REPRESENT_ENTITY_TYPE, $price->currency_code->getId());
-                }
+                $currency_code = $import_storage->findEntityLocalId(CurrencyDto::REPRESENT_ENTITY_TYPE, $price->currency_code);
 
-                if ($currency_code) {
-                    $currency = $this->product_storage->findCurrency((string) $currency_code);
+                if ($currency_code->hasValue()) {
+                    $currency = $this->product_storage->findCurrency($currency_code->asString());
                 } else {
                     $currency = null;
                 }
@@ -426,7 +484,7 @@ class ProductImporter
                 }
             }
 
-            $local_price_type_id_parts = PriceTypeDto::parseLocalId((string) $local_price_type_id);
+            $local_price_type_id_parts = PriceTypeDto::parseLocalId($local_price_type_id->asString());
             $local_price_type = reset($local_price_type_id_parts);
 
             if ($local_price_type === PriceTypeDto::TYPE_BASE_PRICE) {
@@ -460,13 +518,13 @@ class ProductImporter
         if ($product->status) {
             $product_data['status'] = $product->status;
         } elseif (!$product->id->hasLocalId()) {
-            $product_data['status'] = $import_storage->getSetting('new_product_status', ObjectStatuses::ACTIVE);
+            $product_data['status'] = $import_storage->getSetting('catalog_importer.new_product_status', ObjectStatuses::ACTIVE);
         }
 
         if (
             isset($product_data['amount'])
             && empty($product_data['amount'])
-            && $import_storage->getSetting('hide_out_of_stock_products', false) === true
+            && $import_storage->getSetting('catalog_importer.hide_out_of_stock_products', false) === true
         ) {
             $product_data['status'] = ObjectStatuses::HIDDEN;
         }
@@ -475,15 +533,227 @@ class ProductImporter
     }
 
     /**
-     * Fills product categories
+     * Fills product code
      *
-     * @param \Tygh\Addons\CommerceML\Dto\ProductDto $product              Product DTO
-     * @param array<string, mixed>                   $product_data         Product data
-     * @param array<string, mixed>                   $current_product_data Current product data
+     * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
+     * @param array<string, mixed>                           $product_data   Product data
      *
      * @return array<string, mixed>
      */
-    private function fillCategories(ProductDto $product, array $product_data, array $current_product_data)
+    private function fillProductCode(ProductDto $product, ImportStorage $import_storage, array $product_data)
+    {
+        if ($product->product_code === null) {
+            return $product_data;
+        }
+
+        if ($product->is_new || $import_storage->getSetting('catalog_importer.allow_update_product_code', false)) {
+            $product_data['product_code'] = $product->product_code;
+        }
+
+        return $product_data;
+    }
+
+    /**
+     * Fills product name
+     *
+     * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
+     * @param array<string, mixed>                           $product_data   Product data
+     * @param string|null                                    $lang_code      Language code
+     *
+     * @return array<string, mixed>
+     */
+    private function fillProductName(ProductDto $product, ImportStorage $import_storage, array $product_data, $lang_code = null)
+    {
+        if ($product->name === null) {
+            return $product_data;
+        }
+
+        if ($lang_code) {
+            $product_name = $product->name->hasTraslate($lang_code) ? $product->name->getTranslate($lang_code) : null;
+        } else {
+            $product_name = $product->name->default_value;
+        }
+
+        if ($product_name === null) {
+            return $product_data;
+        }
+
+        if ($product->is_new || $import_storage->getSetting('catalog_importer.allow_update_product_name', false)) {
+            $product_data['product'] = $product_name;
+        }
+
+        return $product_data;
+    }
+
+    /**
+     * Fills product full description
+     *
+     * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
+     * @param array<string, mixed>                           $product_data   Product data
+     * @param string|null                                    $lang_code      Language code
+     *
+     * @return array<string, mixed>
+     */
+    private function fillProductFullDescription(ProductDto $product, ImportStorage $import_storage, array $product_data, $lang_code = null)
+    {
+        if ($product->description === null) {
+            return $product_data;
+        }
+
+        if ($lang_code) {
+            $product_description = $product->description->hasTraslate($lang_code) ? $product->description->getTranslate($lang_code) : null;
+        } else {
+            $product_description = $product->description->default_value;
+        }
+
+        if ($product_description === null) {
+            return $product_data;
+        }
+
+        if ($product->is_new || $import_storage->getSetting('catalog_importer.allow_update_product_full_description', false)) {
+            $product_data['full_description'] = $product_description;
+        }
+
+        return $product_data;
+    }
+
+    /**
+     * Fills product short description
+     *
+     * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
+     * @param array<string, mixed>                           $product_data   Product data
+     * @param string|null                                    $lang_code      Language code
+     *
+     * @return array<string, mixed>
+     */
+    private function fillProductShortDescription(ProductDto $product, ImportStorage $import_storage, array $product_data, $lang_code = null)
+    {
+        if (!$product->properties->has('short_description')) {
+            return $product_data;
+        }
+
+        $short_description_property = $product->properties->get('short_description');
+
+        if ($short_description_property->value === null || !$short_description_property->value instanceof TranslatableValueDto) {
+            return $product_data;
+        }
+
+        if ($lang_code) {
+            $product_short_description = $short_description_property->value->hasTraslate($lang_code)
+                ? $short_description_property->value->getTranslate($lang_code)
+                : null;
+        } else {
+            $product_short_description = $short_description_property->value->default_value;
+        }
+
+        if ($product_short_description === null) {
+            return $product_data;
+        }
+
+        if ($product->is_new || $import_storage->getSetting('catalog_importer.allow_update_product_short_description', false)) {
+            $product_data['short_description'] = $product_short_description;
+        }
+
+        return $product_data;
+    }
+
+    /**
+     * Fills product page title
+     *
+     * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
+     * @param array<string, mixed>                           $product_data   Product data
+     * @param string|null                                    $lang_code      Language code
+     *
+     * @return array<string, mixed>
+     */
+    private function fillProductPageTitle(ProductDto $product, ImportStorage $import_storage, array $product_data, $lang_code = null)
+    {
+        if (!$product->properties->has('page_title')) {
+            return $product_data;
+        }
+
+        $page_title_property = $product->properties->get('page_title');
+
+        if ($page_title_property->value === null || !$page_title_property->value instanceof TranslatableValueDto) {
+            return $product_data;
+        }
+
+        if ($lang_code) {
+            $product_page_title = $page_title_property->value->hasTraslate($lang_code)
+                ? $page_title_property->value->getTranslate($lang_code)
+                : null;
+        } else {
+            $product_page_title = $page_title_property->value->default_value;
+        }
+
+        if ($product_page_title === null) {
+            return $product_data;
+        }
+
+        if ($product->is_new || $import_storage->getSetting('catalog_importer.allow_update_product_page_title', false)) {
+            $product_data['page_title'] = $product_page_title;
+        }
+
+        return $product_data;
+    }
+
+    /**
+     * Fills product promo text
+     *
+     * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product        Product DTO
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage Import storage
+     * @param array<string, mixed>                           $product_data   Product data
+     * @param string|null                                    $lang_code      Language code
+     *
+     * @return array<string, mixed>
+     */
+    private function fillProductPromoText(ProductDto $product, ImportStorage $import_storage, array $product_data, $lang_code = null)
+    {
+        if (!$product->properties->has('promo_text')) {
+            return $product_data;
+        }
+
+        $promo_text_property = $product->properties->get('promo_text');
+
+        if ($promo_text_property->value === null || !$promo_text_property->value instanceof TranslatableValueDto) {
+            return $product_data;
+        }
+
+        if ($lang_code) {
+            $product_promo_text = $promo_text_property->value->hasTraslate($lang_code)
+                ? $promo_text_property->value->getTranslate($lang_code)
+                : null;
+        } else {
+            $product_promo_text = $promo_text_property->value->default_value;
+        }
+
+        if ($product_promo_text === null) {
+            return $product_data;
+        }
+
+        if ($product->is_new || $import_storage->getSetting('catalog_importer.allow_update_product_promotext', false)) {
+            $product_data['promo_text'] = $product_promo_text;
+        }
+
+        return $product_data;
+    }
+
+    /**
+     * Fills product categories
+     *
+     * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product              Product DTO
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage       Import storage
+     * @param array<string, mixed>                           $product_data         Product data
+     * @param array<string, mixed>                           $current_product_data Current product data
+     *
+     * @return array<string, mixed>
+     */
+    private function fillCategories(ProductDto $product, ImportStorage $import_storage, array $product_data, array $current_product_data)
     {
         $category_ids = [];
 
@@ -500,11 +770,40 @@ class ProductImporter
             return $product_data;
         }
 
-        if ($current_product_data) {
-            $product_data['category_ids'] = array_unique(array_merge($current_product_data['category_ids'], $category_ids));
-        } else {
-            $product_data['main_category'] = reset($category_ids);
-            $product_data['category_ids'] = $category_ids;
+        $strategy = $import_storage->getSetting('catalog_importer.product_category_update_strategy', 'append');
+
+        if ($product->is_new) {
+            $strategy = 'replace';
+        }
+
+        switch ($strategy) {
+            case 'append':
+                if ($current_product_data) {
+                    $product_data['category_ids'] = array_unique(array_merge($current_product_data['category_ids'], $category_ids));
+                } else {
+                    $product_data['main_category'] = reset($category_ids);
+                    $product_data['category_ids'] = $category_ids;
+                }
+                break;
+            case 'replace_main':
+                $product_data['main_category'] = reset($category_ids);
+
+                if ($current_product_data) {
+                    $product_data['category_ids'] = array_unique(array_merge(
+                        array_diff($current_product_data['category_ids'], [$current_product_data['main_category']]),
+                        $category_ids
+                    ));
+                } else {
+                    $product_data['category_ids'] = $category_ids;
+                }
+                break;
+            case 'replace':
+                $product_data['main_category'] = reset($category_ids);
+                $product_data['category_ids'] = $category_ids;
+                break;
+            default:
+            case 'ignore':
+                break;
         }
 
         return $product_data;
@@ -526,17 +825,13 @@ class ProductImporter
 
         /** @var \Tygh\Addons\CommerceML\Dto\IdDto $tax_id */
         foreach ($product->taxes as $tax_id) {
-            if ($tax_id->hasLocalId()) {
-                $local_id = $tax_id->local_id;
-            } else {
-                $local_id = $import_storage->findEntityLocalIdByExternalId(TaxDto::REPRESENT_ENTITY_TYPE, $tax_id->external_id);
-            }
+            $local_id = $import_storage->findEntityLocalId(TaxDto::REPRESENT_ENTITY_TYPE, $tax_id);
 
-            if (empty($local_id)) {
+            if ($local_id->hasNotValue()) {
                 continue;
             }
 
-            $tax_ids[] = $local_id;
+            $tax_ids[] = $local_id->asInt();
         }
 
         if ($tax_ids) {
@@ -553,13 +848,14 @@ class ProductImporter
     /**
      * Fills product features
      *
-     * @param \Tygh\Addons\CommerceML\Dto\ProductDto $product              Product DTO
-     * @param array<string, mixed>                   $product_data         Product data
-     * @param array<string, mixed>                   $current_product_data Current product data
+     * @param \Tygh\Addons\CommerceML\Dto\ProductDto         $product              Product DTO
+     * @param \Tygh\Addons\CommerceML\Storages\ImportStorage $import_storage       Import storage
+     * @param array<string, mixed>                           $product_data         Product data
+     * @param array<string, mixed>                           $current_product_data Current product data
      *
      * @return array<string, mixed>
      */
-    private function fillProductFeatures(ProductDto $product, array $product_data, array $current_product_data)
+    private function fillProductFeatures(ProductDto $product, ImportStorage $import_storage, array $product_data, array $current_product_data)
     {
         $product_feature_values = [];
 
@@ -573,7 +869,7 @@ class ProductImporter
                 continue;
             }
 
-            $feature_id = $product_feature_value->feature_id->local_id;
+            $feature_id = (int) $product_feature_value->feature_id->local_id;
 
             if ($product_feature_value->value_id) {
                 $value = $product_feature_value->value_id->local_id;
@@ -604,9 +900,10 @@ class ProductImporter
     {
         $current_product_data = [];
         $import = $import_storage->getImport();
-        $allow_matching_product_by_product_code = $import_storage->getSetting('allow_matching_product_by_product_code', false);
+        $allow_matching_product_by_product_code = $import_storage->getSetting('catalog_importer.allow_matching_product_by_product_code', false);
 
-        $product->id->local_id = (int) $import_storage->findEntityLocalId($product);
+        $product->is_new = true;
+        $product->id->local_id = $import_storage->findEntityLocalId(ProductDto::REPRESENT_ENTITY_TYPE, $product->id)->asInt();
 
         if (!$product->id->local_id && $product->product_code && $allow_matching_product_by_product_code === true) {
             $product->id->local_id = $this->product_storage->findProductIdByProductCode($product->product_code, $import->company_id);
@@ -632,6 +929,8 @@ class ProductImporter
                         '[local_id]'     => $product->id->local_id,
                     ])
                 );
+            } else {
+                $product->is_new = false;
             }
         }
 
@@ -651,7 +950,7 @@ class ProductImporter
     private function validateProduct(OperationResult $main_result, ProductDto $product, ImportStorage $import_storage, array $current_product_data)
     {
         $import = $import_storage->getImport();
-        $import_mode = $import_storage->getSetting('import_mode', 'all');
+        $import_mode = $import_storage->getSetting('catalog_importer.import_mode', 'all');
 
         if ($product->is_removed && $current_product_data) {
             $result = $this->product_storage->removeProduct((int) $product->id->local_id);
@@ -682,7 +981,7 @@ class ProductImporter
 
         if (
             empty($current_product_data)
-            && !$this->isProductCreatable($product)
+            && (!$product->is_creatable || !$this->isProductCreatable($product))
         ) {
             if ($import_storage->isEntityMarkedAsRemoved($product->getEntityType(), $product->id->getId())) {
                 $main_result->addMessage('product.skipped', __('commerceml.import.message.product.marked_as_removed', [

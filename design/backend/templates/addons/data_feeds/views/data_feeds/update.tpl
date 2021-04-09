@@ -79,7 +79,7 @@
     {if !$o.import_only}
     <div class="control-group">
         <label for="elm_datafeed_element_{$p_id}_{$k}" class="control-label">
-            {__($o.title)}{if $o.description}{include file="common/tooltip.tpl" tooltip=__($o.description)}{/if}:
+            {__($o.title)}:
         </label>
         <div class="controls">{if $o.type == "checkbox"}
                 <input type="hidden" name="datafeed_data[export_options][{$k}]" value="N" />
@@ -117,7 +117,11 @@
             {/if}
 
             {if $o.notes}
-                <p class="muted">{$o.notes nofilter}</p>
+                <p class="muted description">{$o.notes nofilter}</p>
+            {/if}
+
+            {if $o.description}
+                <p class="muted description">{__($o.description)}</p>
             {/if}
         </div>
     </div>
@@ -159,7 +163,7 @@
         <label for="elm_datafeed_save_directory" id="label_save_directory" class="control-label">{__("save_directory")}:</label>
         <div class="controls">
             <input type="text" name="datafeed_data[save_dir]" id="elm_datafeed_save_directory" size="55" value="{$datafeed_data.save_dir}" class="input-text-large" />
-            <p class="muted">
+            <p class="muted description">
             {__("text_file_editor_notice", ["[href]" => "file_editor.manage?path=/"|fn_url])}
             </p>
         </div>
@@ -173,7 +177,7 @@
         <label for="elm_datafeed_ftp_url" id="label_ftp_url" class="control-label">{__("ftp_url")}:</label>
         <div class="controls">
             <input type="text" name="datafeed_data[ftp_url]" id="elm_datafeed_ftp_url" size="55" value="{$datafeed_data.ftp_url}" class="input-text-large" />
-            <p><small>{__("ftp_url_hint")}</small></p>
+            <p class="muted description">{__("ftp_url_hint")}</p>
         </div>
     </div>
 
@@ -204,10 +208,16 @@
                 <option value="S" {if $datafeed_data.export_location == "S"}selected="selected"{/if}>{__("server")}</option>
                 <option value="F" {if $datafeed_data.export_location == "F"}selected="selected"{/if}>{__("ftp")}</option>
             </select>
-            <p><small>
-		{__("export_cron_hint")}:<br>
-		{"php /path/to/cart/"|fn_get_console_command:$config.admin_index:["dispatch" => "exim.cron_export","cron_password" => {$addons.data_feeds.cron_password}]}
-	    </small>
+            <p class="muted description">
+            {__("export_cron_hint")}:<br>
+            {if ("ULTIMATE"|fn_allowed_for)}
+                {$switch_key = "switch_company_id"}
+                {$switch_value = $runtime.company_id}
+            {else}
+                {$switch_key = "s_storefront"}
+                {$switch_value = $runtime.layout.storefront_id}
+            {/if}
+            {"php /path/to/cart/"|fn_get_console_command:$config.admin_index:["dispatch" => "exim.cron_export","cron_password" => {$addons.data_feeds.cron_password},$switch_key => $switch_value]}
             </p>
         </div>
     </div>
@@ -258,8 +268,9 @@
 
 {/capture}
 
-{if !$id}
-    {include file="common/mainbox.tpl" title=__("add_new_datafeed") content=$smarty.capture.mainbox buttons=$smarty.capture.buttons}
-{else}
-    {include file="common/mainbox.tpl" title_start=__("update_datafeed") title_end=$datafeed_data.datafeed_name content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
-{/if}
+{include file="common/mainbox.tpl"
+    title=($id) ? $datafeed_data.datafeed_name : __("add_new_datafeed")
+    content=$smarty.capture.mainbox
+    select_languages=(bool) $id
+    buttons=$smarty.capture.buttons
+}

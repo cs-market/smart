@@ -12,15 +12,13 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Registry;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 $cart = &Tygh::$app['session']['cart'];
 
-if ($mode == 'checkout') {
+if ($mode === 'checkout') {
     $providers_list = Tygh::$app['view']->getTemplateVars('providers_list');
     if (!empty($providers_list)) {
-        Tygh::$app['view']->assign('redirect_url', "checkout.checkout");
+        Tygh::$app['view']->assign('redirect_url', 'checkout.checkout');
     }
 }

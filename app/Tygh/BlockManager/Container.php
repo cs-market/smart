@@ -148,7 +148,7 @@ class Container
         $container_ids = array();
 
         if (is_array($containers)) {
-            $container_ids = fn_array_column($containers, 'container_id');
+            $container_ids = array_column($containers, 'container_id');
         }
 
         return $container_ids;

@@ -19,8 +19,8 @@ use Tygh\Enum\ProfileDataTypes;
 use Tygh\Enum\ProfileFieldSections;
 use Tygh\Enum\ProfileFieldTypes;
 use Tygh\Enum\ProfileTypes;
-use Tygh\Enum\SiteArea;
 use Tygh\Enum\UsergroupTypes;
+use Tygh\Enum\UserTypes;
 use Tygh\Enum\YesNo;
 use Tygh\Exceptions\DeveloperException;
 use Tygh\Http;
@@ -28,8 +28,12 @@ use Tygh\Languages\Languages;
 use Tygh\Location\Manager;
 use Tygh\Navigation\LastView;
 use Tygh\Registry;
-use Tygh\Enum\UserTypes;
+use Tygh\Storage;
+use Tygh\Tools\Url;
 use Tygh\Tools\SecurityHelper;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\UsergroupLinkStatuses;
+use Tygh\Enum\UsergroupStatuses;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -98,10 +102,11 @@ function fn_get_user_info($user_id, $get_profile = true, &$profile_id = NULL)
     }
 
     // Get additional fields
-    $prof_cond = ($get_profile && !empty($profile_data['profile_id'])) ? db_quote("OR (object_id = ?i AND object_type = 'P')", $profile_data['profile_id']) : '';
-    $additional_fields = db_get_hash_single_array("SELECT field_id, value FROM ?:profile_fields_data WHERE (object_id = ?i AND object_type = 'U') $prof_cond", array('field_id', 'value'), $user_id);
+    $user_data['fields'] = fn_get_profile_fields_data(ProfileDataTypes::USER, $user_id);
 
-    $user_data['fields'] = $additional_fields;
+    if ($get_profile && !empty($profile_data['profile_id'])) {
+        $user_data['fields'] += fn_get_profile_fields_data(ProfileDataTypes::PROFILE, $profile_data['profile_id']);
+    }
 
     fn_add_user_data_descriptions($user_data);
 
@@ -148,19 +153,62 @@ function fn_get_user_short_info($user_id)
     return db_get_row('SELECT ?p FROM ?:users ?p WHERE ?p ?p', $fields, $join, $condition, $group_by);
 }
 
-//
-// Get user name
-//
-function fn_get_user_name($user_id)
+/**
+ * Gets user's name.
+ *
+ * @param int        $user_id   User identifier
+ * @param array|null $user_info User info to extract data from. When set to null, will be loaded from the database
+ *
+ * @return bool|string Returns false if the user doesn't exist or his name otherwise
+ */
+function fn_get_user_name($user_id, array $user_info = null)
 {
-    if (!empty($user_id)) {
-        $user_data = db_get_row("SELECT firstname, lastname FROM ?:users WHERE user_id = ?i", $user_id);
-        if (!empty($user_data)) {
-            return $user_data['firstname'] . ' ' . $user_data['lastname'];
+    if ($user_info === null && $user_id) {
+        $user_info = db_get_row('SELECT firstname, lastname FROM ?:users WHERE user_id = ?i', $user_id);
+        if (!$user_info) {
+            return false;
         }
     }
 
-    return false;
+    $firstname = $lastname = '';
+    if (isset($user_info['firstname'])) {
+        $firstname = $user_info['firstname'];
+    }
+    if (isset($user_info['lastname'])) {
+        $lastname = $user_info['lastname'];
+    }
+
+    $name_parts = array_filter([
+        trim($firstname),
+        trim($lastname)
+    ]);
+
+    return implode(' ', $name_parts);
+}
+
+/**
+ * Gets user's email.
+ *
+ * @param int        $user_id   User identifier
+ * @param array|null $user_info User info to extract data from. When set to null, will be loaded from the database
+ *
+ * @return bool|string Returns false if the user doesn't exist or his email otherwise
+ */
+function fn_get_user_email($user_id, array $user_info = null)
+{
+    if ($user_info === null && $user_id) {
+        $user_info = db_get_row('SELECT email FROM ?:users WHERE user_id = ?i', $user_id);
+        if (!$user_info) {
+            return false;
+        }
+    }
+
+    $email = '';
+    if (isset($user_info['email'])) {
+        $email = trim($user_info['email']);
+    }
+
+    return $email;
 }
 
 /**
@@ -344,109 +392,110 @@ function fn_get_usergroups($params = array(), $lang_code = CART_LANGUAGE)
 {
     $usergroups = array();
 
-    if (!fn_allowed_for('ULTIMATE:FREE')) {
-        /**
-         * Executes at the beginning of the function, allowing you to modify the arguments passed to the usergrousps-fetching function
-         *
-         * @param array  $params      Query criteria params, for example: array('status'=>'A', 'type'=>'C')
-         * @param string $lang_code   Two-letter language code
-         */
-        fn_set_hook('get_usergroups_pre', $params, $lang_code);
+    /**
+     * Executes at the beginning of the function, allowing you to modify the arguments passed to the usergrousps-fetching function
+     *
+     * @param array  $params      Query criteria params, for example: array('status'=>'A', 'type'=>'C')
+     * @param string $lang_code   Two-letter language code
+     */
+    fn_set_hook('get_usergroups_pre', $params, $lang_code);
 
-        $field_list = "a.usergroup_id, a.status, a.type, b.usergroup";
-        $join = $condition = $group_by = $limit = '';
-        $order_by = 'ORDER BY usergroup';
+    $field_list = "a.usergroup_id, a.status, a.type, b.usergroup";
+    $join = $condition = $group_by = $limit = '';
+    $order_by = 'ORDER BY usergroup';
 
-        if (!empty($params['usergroup_id'])) {
-            $condition .= is_array($params['usergroup_id'])
-                ? db_quote(' AND a.usergroup_id IN (?n)', $params['usergroup_id'])
-                : db_quote(' AND a.usergroup_id = ?i', $params['usergroup_id']);
-        }
-        if (!empty($params['status'])) {
-            $condition .= is_array($params['status'])
-                ? db_quote(' AND a.status IN (?a)', $params['status'])
-                : db_quote(' AND a.status = ?s', $params['status']);
-        }
-        if (!empty($params['exclude_types'])) {
-            $condition .= is_array($params['exclude_types'])
-                ? db_quote(' AND a.type NOT IN (?a)', $params['exclude_types'])
-                : db_quote(' AND a.type != ?s', $params['exclude_types']);
-        }
-        if (!empty($params['type'])) {
-            $condition .= db_quote(' AND a.type IN (?a)', (array) $params['type']);
-        }
+    if (!empty($params['usergroup_id'])) {
+        $condition .= is_array($params['usergroup_id'])
+            ? db_quote(' AND a.usergroup_id IN (?n)', $params['usergroup_id'])
+            : db_quote(' AND a.usergroup_id = ?i', $params['usergroup_id']);
+    }
+    if (!empty($params['status'])) {
+        $condition .= is_array($params['status'])
+            ? db_quote(' AND a.status IN (?a)', $params['status'])
+            : db_quote(' AND a.status = ?s', $params['status']);
+    }
+    if (!empty($params['exclude_types'])) {
+        $condition .= is_array($params['exclude_types'])
+            ? db_quote(' AND a.type NOT IN (?a)', $params['exclude_types'])
+            : db_quote(' AND a.type != ?s', $params['exclude_types']);
+    }
+    if (!empty($params['type'])) {
+        $condition .= db_quote(' AND a.type IN (?a)', (array) $params['type']);
+    }
+    if (!empty($params['q'])) {
+        $condition .= db_quote(' AND b.usergroup LIKE ?l', '%' . $params['q'] . '%');
+    }
 
-        $condition .= db_quote(' AND a.type IN (?a)', UsergroupTypes::getAll());
+    $condition .= db_quote(' AND a.type IN (?a)', UsergroupTypes::getAll());
 
-        /**
-         * Executes right before performing usergroup-fetching query, allowing you to modify the SQL-query
-         *
-         * @param array  $params      Query criteria params, for example: array('status'=>'A', 'type'=>'C')
-         * @param string $lang_code   Two-letter language code
-         * @param string $field_list  String of comma-separated SQL fields to be selected in an SQL-query
-         * @param string $join        String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
-         * @param string $condition   String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
-         * @param string $group_by    String containing the SQL-query GROUP BY field
-         * @param string $order_by    String containing the SQL-query ORDER BY field
-         * @param string $limit       String containing the SQL-query LIMIT field
-         */
-        fn_set_hook('get_usergroups', $params, $lang_code, $field_list, $join, $condition, $group_by, $order_by, $limit);
+    /**
+     * Executes right before performing usergroup-fetching query, allowing you to modify the SQL-query
+     *
+     * @param array  $params      Query criteria params, for example: array('status'=>'A', 'type'=>'C')
+     * @param string $lang_code   Two-letter language code
+     * @param string $field_list  String of comma-separated SQL fields to be selected in an SQL-query
+     * @param string $join        String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
+     * @param string $condition   String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
+     * @param string $group_by    String containing the SQL-query GROUP BY field
+     * @param string $order_by    String containing the SQL-query ORDER BY field
+     * @param string $limit       String containing the SQL-query LIMIT field
+     */
+    fn_set_hook('get_usergroups', $params, $lang_code, $field_list, $join, $condition, $group_by, $order_by, $limit);
 
-        $usergroups += db_get_hash_array(
-            "SELECT ?p"
-            . " FROM ?:usergroups as a"
-            . " LEFT JOIN ?:usergroup_descriptions as b"
-                . " ON b.usergroup_id = a.usergroup_id"
-                . " AND b.lang_code = ?s"
-            . " ?p"
-            . " WHERE 1 ?p"
-            . " ?p ?p ?p",
-            'usergroup_id',
-            $field_list,
-            $lang_code,
-            $join,
-            $condition,
-            $group_by,
-            $order_by,
-            $limit
+    $usergroups += db_get_hash_array(
+        "SELECT ?p"
+        . " FROM ?:usergroups as a"
+        . " LEFT JOIN ?:usergroup_descriptions as b"
+            . " ON b.usergroup_id = a.usergroup_id"
+            . " AND b.lang_code = ?s"
+        . " ?p"
+        . " WHERE 1 ?p"
+        . " ?p ?p ?p",
+        'usergroup_id',
+        $field_list,
+        $lang_code,
+        $join,
+        $condition,
+        $group_by,
+        $order_by,
+        $limit
+    );
+
+    if (!empty($params['with_privileges']) && !empty($usergroups)) {
+        $privileges = db_get_hash_multi_array(
+            'SELECT usergroup_id, privilege FROM ?:usergroup_privileges WHERE usergroup_id IN (?n)',
+            array('usergroup_id','privilege','privilege'),
+            array_keys($usergroups)
         );
 
-        if (!empty($params['with_privileges']) && !empty($usergroups)) {
-            $privileges = db_get_hash_multi_array(
-                'SELECT usergroup_id, privilege FROM ?:usergroup_privileges WHERE usergroup_id IN (?n)',
-                array('usergroup_id','privilege','privilege'),
-                array_keys($usergroups)
-            );
-
-            foreach ($usergroups as $usergroup_id => $usergroup) {
-                if ($usergroup['type'] == 'A') {
-                    $usergroups[$usergroup_id]['privileges'] = isset($privileges[$usergroup_id])
-                        ? array_values($privileges[$usergroup_id])
-                        : array();
-                }
+        foreach ($usergroups as $usergroup_id => $usergroup) {
+            if ($usergroup['type'] == 'A') {
+                $usergroups[$usergroup_id]['privileges'] = isset($privileges[$usergroup_id])
+                    ? array_values($privileges[$usergroup_id])
+                    : array();
             }
         }
-
-        if (!empty($params['include_default'])
-            && (empty($params['type']) || $params['type'] == 'C')      // All default usergroups have type = C
-            && (empty($params['status']) || in_array('A', (array) $params['status']))  // and status = A
-        ) {
-            foreach (fn_get_default_usergroups($lang_code) as $group) {
-                if (empty($params['usergroup_id']) || in_array($group['usergroup_id'], (array) $params['usergroup_id'])) {
-                    $usergroups[$group['usergroup_id']] = $group;
-                }
-            }
-        }
-
-        /**
-         * Executes after all usergroups were fetched from DB and all data post-processing was done.
-         *
-         * @param array  $usergroups  Usergroups list
-         * @param array  $params      Query criteria params, for example: array('status'=>'A', 'type'=>'C')
-         * @param string $lang_code   Two-letter language code
-         */
-        fn_set_hook('get_usergroups_post', $usergroups, $params, $lang_code);
     }
+
+    if (!empty($params['include_default'])
+        && (empty($params['type']) || $params['type'] == 'C')      // All default usergroups have type = C
+        && (empty($params['status']) || in_array('A', (array) $params['status']))  // and status = A
+    ) {
+        foreach (fn_get_default_usergroups($lang_code) as $group) {
+            if (empty($params['usergroup_id']) || in_array($group['usergroup_id'], (array) $params['usergroup_id'])) {
+                $usergroups[$group['usergroup_id']] = $group;
+            }
+        }
+    }
+
+    /**
+     * Executes after all usergroups were fetched from DB and all data post-processing was done.
+     *
+     * @param array  $usergroups  Usergroups list
+     * @param array  $params      Query criteria params, for example: array('status'=>'A', 'type'=>'C')
+     * @param string $lang_code   Two-letter language code
+     */
+    fn_set_hook('get_usergroups_post', $usergroups, $params, $lang_code);
 
     return $usergroups;
 }
@@ -719,11 +768,15 @@ function fn_fill_user_fields(&$user_data)
     if (!fn_is_empty($user_data)) {
         if (empty($user_data['s_country'])) {
             $user_data['s_country'] = Registry::get('settings.General.default_country');
+        }
+        if (empty($user_data['s_state']) && $user_data['s_country'] === Registry::get('settings.General.default_country')) {
             $user_data['s_state'] = Registry::get('settings.General.default_state');
         }
 
         if (empty($user_data['b_country'])) {
             $user_data['b_country'] = Registry::get('settings.General.default_country');
+        }
+        if (empty($user_data['b_state']) && $user_data['s_country'] === Registry::get('settings.General.default_country')) {
             $user_data['b_state'] = Registry::get('settings.General.default_state');
         }
     }
@@ -773,6 +826,9 @@ function fn_get_profile_fields($location = 'C', $_auth = array(), $lang_code = C
     if (!empty($params['include_names'])) {
         $condition .= db_quote('AND ?:profile_fields.field_name IN (?a) ', $params['include_names']);
     }
+    if (!empty($params['exclude_types'])) {
+        $condition .= db_quote('AND ?:profile_fields.field_type NOT IN (?a) ', $params['exclude_types']);
+    }
 
     fn_set_hook('change_location', $location, $select, $condition, $params);
 
@@ -782,6 +838,10 @@ function fn_get_profile_fields($location = 'C', $_auth = array(), $lang_code = C
     } elseif ($location == 'O' || $location == 'I') {
         $select .= ", ?:profile_fields.checkout_required as required";
         $condition .= " AND ?:profile_fields.checkout_show = 'Y'";
+    }
+
+    if (isset($params['storefront_show'])) {
+        $condition .= db_quote(' AND ?:profile_fields.storefront_show = ?s', YesNo::toId($params['storefront_show']));
     }
 
     if (!empty($params['field_id'])) {
@@ -953,35 +1013,95 @@ function fn_sort_profile_fields_by_section_position($profile_fields, $sections)
     return $profile_fields;
 }
 
-function fn_store_profile_fields($profile_data, $object_id, $object_type)
+/**
+ * Saves user profile fields data
+ *
+ * @param array  $profile_data    Values of the profile fields to save
+ * @param int    $object_id       Object identifier
+ * @param string $object_type     Profile data type
+ * @param bool   $ship_to_another Flag to fill shipping/billing info with billing/shipping
+ *
+ * @return bool Always true
+ */
+function fn_store_user_profile_fields(array $profile_data, $object_id, $object_type, $ship_to_another = false)
 {
-    if (!empty($profile_data['fields'])) {
-        // Delete existing fields
-        if ($object_type == ProfileDataTypes::USER_PROFILE) {
-            $user_condition = db_quote('object_id = ?i AND object_type = ?s', $object_id[ProfileDataTypes::USER], ProfileDataTypes::USER);
-            $profile_condition = db_quote('object_id = ?i AND object_type = ?s', $object_id[ProfileDataTypes::PROFILE], ProfileDataTypes::PROFILE);
-            db_query('DELETE FROM ?:profile_fields_data WHERE (?p) OR (?p)', $user_condition, $profile_condition);
-        } else {
-            db_query('DELETE FROM ?:profile_fields_data WHERE object_id = ?i AND object_type = ?s', $object_id, $object_type);
-        }
+    fn_store_profile_fields($profile_data, $object_id, $object_type);
 
-        $fields_info = db_get_hash_array('SELECT field_id, field_type, section FROM ?:profile_fields WHERE field_id IN (?n)', 'field_id', array_keys($profile_data['fields']));
+    if ($ship_to_another === true || ($ship_to_another === false && !isset($profile_data['profile_id']))) {
+        return true;
+    }
 
-        foreach ($profile_data['fields'] as $field_id => $value) {
-            $_data = array();
-            if ($object_type == ProfileDataTypes::USER_PROFILE) {
-                $_data['object_type'] = ($fields_info[$field_id]['section'] == 'C') ? ProfileDataTypes::USER : ProfileDataTypes::PROFILE;
-                $_data['object_id'] = ($fields_info[$field_id]['section'] == 'C') ? $object_id[ProfileDataTypes::USER] : $object_id[ProfileDataTypes::PROFILE];
-            } else {
-                $_data['object_type'] = $object_type;
-                $_data['object_id'] = $object_id;
+    $fields = db_get_hash_array(
+        'SELECT profile_fields_data.* FROM ?:profile_fields_data AS profile_fields_data'
+        . ' LEFT JOIN ?:profile_fields AS profile_fields'
+            . ' ON profile_fields_data.field_id = profile_fields.field_id'
+        . ' WHERE profile_fields_data.object_id = ?i'
+            . ' AND profile_fields_data.object_type = ?s'
+            . ' AND profile_fields.field_type = ?s',
+        'field_id',
+        $profile_data['profile_id'],
+        ProfileDataTypes::PROFILE,
+        ProfileFieldTypes::FILE
+    );
+
+    $fields = array_filter($fields);
+
+    if (empty($fields)) {
+        return true;
+    }
+
+    if (AREA === SiteArea::ADMIN_PANEL || Registry::get('settings.Checkout.address_position') === 'billing_first') {
+        $section = ProfileFieldSections::SHIPPING_ADDRESS;
+    } else {
+        $section = ProfileFieldSections::BILLING_ADDRESS;
+    }
+
+    $matching_fields = db_get_hash_array(
+        'SELECT field_id, matching_id FROM ?:profile_fields'
+        . ' WHERE matching_id IN (?n) AND field_type = ?s AND section = ?s',
+        'matching_id',
+        array_keys($fields),
+        ProfileFieldTypes::FILE,
+        $section
+    );
+
+    if (empty($matching_fields) && !empty($fields)) {
+        db_query(
+            'DELETE profile_fields_data FROM ?:profile_fields_data profile_fields_data'
+            . ' LEFT JOIN ?:profile_fields AS profile_fields'
+                . ' ON profile_fields_data.field_id = profile_fields.field_id'
+            . ' WHERE profile_fields_data.field_id IN (?n)'
+                . ' AND profile_fields_data.object_id = ?i '
+                . ' AND profile_fields_data.object_type = ?s'
+                . ' AND profile_fields.field_type = ?s'
+                . ' AND profile_fields.section = ?s',
+            array_keys($fields),
+            $profile_data['profile_id'],
+            ProfileDataTypes::PROFILE,
+            ProfileFieldTypes::FILE,
+            $section
+        );
+
+        return true;
+    }
+
+    foreach ($matching_fields as $field_id => $matching_field_data) {
+        if (isset($fields[$field_id]['value'])) {
+            $new_profile_data = $fields[$field_id];
+            $new_profile_data['field_id'] = $matching_field_data['field_id'];
+
+            db_replace_into('profile_fields_data', $new_profile_data);
+
+            if (
+                isset($fields[$matching_field_data['field_id']])
+                && isset($fields[$matching_field_data['field_id']]['value'])
+            ) {
+                fn_delete_profile_field_file(
+                    $fields[$matching_field_data['field_id']]['object_type'],
+                    $fields[$matching_field_data['field_id']]['object_id'],
+                    $fields[$matching_field_data['field_id']]['value']
+                );
             }
-            $_data['field_id'] = $field_id;
-            $_data['value'] = ($fields_info[$field_id]['field_type'] == 'D')
-                ? (empty($value) ? '' : fn_parse_date($value))
-                : $value;
-
-            db_query('REPLACE INTO ?:profile_fields_data ?e', $_data);
         }
     }
 
@@ -989,12 +1109,108 @@ function fn_store_profile_fields($profile_data, $object_id, $object_type)
 }
 
 /**
+ * Saves profile fields data
+ *
+ * @param array     $profile_data Values of the profile fields to save
+ * @param int       $object_id    Object identifier
+ * @param string    $object_type  Profile data type
+ *
+ * @return array
+ */
+function fn_store_profile_fields($profile_data, $object_id, $object_type)
+{
+    if (empty($profile_data['fields'])) {
+        $profile_data['fields'] = [];
+    }
+
+    if ($object_type === ProfileDataTypes::USER_PROFILE) {
+        $fields_info = db_get_hash_multi_array(
+            'SELECT field_id, field_type, section FROM ?:profile_fields WHERE field_id IN (?n)',
+            ['section', 'field_id', 'field_id'],
+            array_keys($profile_data['fields'])
+        );
+
+        $fields = $profile_data['fields'];
+
+        if (isset($fields_info[ProfileFieldSections::CONTACT_INFORMATION])) {
+            $profile_data['fields'] = array_intersect_key(
+                $fields,
+                $fields_info[ProfileFieldSections::CONTACT_INFORMATION]
+            );
+        }
+
+        $stored_fields = fn_store_profile_fields(
+            $profile_data,
+            $object_id[ProfileDataTypes::USER],
+            ProfileDataTypes::USER
+        );
+
+        if (isset($fields_info[ProfileFieldSections::CONTACT_INFORMATION])) {
+            $profile_data['fields'] = array_diff_key(
+                $fields,
+                $fields_info[ProfileFieldSections::CONTACT_INFORMATION]
+            );
+        }
+
+        $stored_fields += fn_store_profile_fields(
+            $profile_data,
+            $object_id[ProfileDataTypes::PROFILE],
+            ProfileDataTypes::PROFILE
+        );
+
+        return $stored_fields;
+    }
+
+    $current_fields_values = fn_get_profile_fields_data($object_type, $object_id);
+
+    $fields = fn_validate_profile_fields($object_type, $object_id, $profile_data['fields']);
+
+    foreach ($fields as $field_id => $field_value) {
+        $field_data = [
+            'object_type' => $object_type,
+            'object_id'   => $object_id,
+            'field_id'    => $field_id,
+            'value'       => $field_value
+        ];
+
+        db_replace_into('profile_fields_data', $field_data);
+
+        if (empty($current_fields_values[$field_id])) {
+            continue;
+        }
+
+        $field_type = fn_get_profile_field_type($field_id);
+        $prev_field_value = $current_fields_values[$field_id];
+
+        if ($field_type === ProfileFieldTypes::FILE) {
+            fn_delete_profile_field_file($object_type, $object_id, $prev_field_value['file_name']);
+        }
+    }
+
+    $remove_field_ids = [];
+
+    foreach ($current_fields_values as $field_id => $field_value) {
+        if (isset($profile_data['fields'][$field_id])) {
+            continue;
+        }
+
+        $remove_field_ids[] = $field_id;
+    }
+
+    if ($remove_field_ids) {
+        fn_delete_profile_fields_data($object_type, $object_id, $remove_field_ids);
+    }
+
+    return $fields;
+}
+
+/**
  * Fill the authentication parameters
  *
- * @param array   $user_data     User data are filled into auth
- * @param array   $original_auth Session user data
- * @param boolean $act_as_user   If set to true, other admin user logged in as current user
- * @param string  $area          One-letter site area identifier
+ * @param array  $user_data     User data are filled into auth
+ * @param array  $original_auth Session user data
+ * @param bool   $act_as_user   If set to true, other admin user logged in as current user
+ * @param string $area          One-letter site area identifier
  *
  * @return array  Authentication data
  */
@@ -1421,7 +1637,12 @@ function fn_get_users($params, &$auth, $items_per_page = 0, $custom_view = '')
         $join .= db_quote(' LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != ?s LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id', YesNo::YES);
     }
 
-    if ($auth['user_type'] == UserTypes::ADMIN && isset($params['user_type']) && !fn_check_permission_manage_profiles($params['user_type'])) {
+    if (
+        !empty($auth['user_type'])
+        && $auth['user_type'] === UserTypes::ADMIN
+        && isset($params['user_type'])
+        && !fn_check_permission_manage_profiles($params['user_type'])
+    ) {
         $condition['manage_admins'] = db_quote(' AND (?:users.user_type != ?s OR (?:users.user_type = ?s AND ?:users.user_id = ?i))', $auth['user_type'], $auth['user_type'], $auth['user_id']);
     }
 
@@ -1707,9 +1928,10 @@ function fn_init_user_session_data(&$sess_data, $user_id, $skip_cart_saving = fa
 }
 
 /**
- * Generate a random user password
+ * Generates a random user password
  *
  * @param int $length - supposed lenght of the password
+ *
  * @return string - the password generated
  */
 function fn_generate_password($length = USER_PASSWORD_LENGTH)
@@ -1718,8 +1940,9 @@ function fn_generate_password($length = USER_PASSWORD_LENGTH)
     $nums = '1234567890';
     $i = 0;
     $password = '';
+
     while ($i < $length) {
-        if ($i%2) {
+        if ($i % 2) {
             $password .= $chars[mt_rand(0, strlen($chars) - 1)];
         } else {
             $password .= $nums[mt_rand(0, strlen($nums) - 1)];
@@ -1798,8 +2021,8 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
 
     if (!empty($user_id)) {
         $current_user_data = db_get_row(
-            "SELECT user_id, company_id, is_root, status, user_type, email, user_login, lang_code, password, salt, last_passwords"
-            . " FROM ?:users WHERE user_id = ?i",
+            'SELECT user_id, company_id, is_root, status, user_type, email, user_login, lang_code, password, salt'
+            . ' FROM ?:users WHERE user_id = ?i',
             $user_id
         );
 
@@ -1972,21 +2195,33 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
 
                 // Check last 4 passwords
                 if (!empty($user_id)) {
-                    $prev_passwords = !empty($current_user_data['last_passwords']) ? explode(',', $current_user_data['last_passwords']) : array();
+                    $prev_passwords = fn_get_user_last_passwords($user_id);
 
-                    if (!empty(Tygh::$app['session']['auth']['forced_password_change'])) {
+                    if (empty(Tygh::$app['session']['auth']['forced_password_change'])) {
                         // if forced password change - new password can't be equal to current password.
                         $prev_passwords[] = $current_user_data['password'];
                     }
 
-                    if (in_array(fn_generate_salted_password($user_data['password1'], $current_user_data['salt']), $prev_passwords)) {
-                        $valid_passwords = false;
+                    $password_used = false;
+
+                    foreach ($prev_passwords as $password) {
+                        if (!fn_password_verify($user_data['password1'], $password, $current_user_data['salt'])) {
+                            continue;
+                        }
+
+                        $password_used = true;
+                        break;
+                    }
+
+                    if ($password_used) {
                         fn_set_notification('E', __('error'), __('error_password_was_used'));
+                        $valid_passwords = false;
                     } else {
                         if (count($prev_passwords) >= 5) {
                             array_shift($prev_passwords);
                         }
-                        $user_data['last_passwords'] = implode(',', $prev_passwords);
+
+                        $user_data['last_passwords'] = $prev_passwords;
                     }
                 }
             } // PCI DSS Compliance
@@ -1995,8 +2230,8 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
                 return false;
             }
 
-            $user_data['salt'] = fn_generate_salt();
-            $user_data['password'] = fn_generate_salted_password($user_data['password1'], $user_data['salt']);
+            $user_data['password'] = fn_password_hash($user_data['password1']);
+
             if ($user_data['password'] != $current_user_data['password'] && !empty($user_id)) {
                 // if user set current password - there is no necessity to update password_change_timestamp
                 $user_data['password_change_timestamp'] = Tygh::$app['session']['auth']['password_change_timestamp'] = TIME;
@@ -2045,7 +2280,13 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
     }
 
     if (!empty($user_id)) {
-        db_query("UPDATE ?:users SET ?u WHERE user_id = ?i", $user_data, $user_id);
+        if (!empty($user_data['last_passwords'])) {
+            fn_update_user_last_passwords($user_id, $user_data['last_passwords']);
+
+            unset($user_data['last_passwords']);
+        }
+
+        db_query('UPDATE ?:users SET ?u WHERE user_id = ?i', $user_data, $user_id);
 
         fn_clean_usergroup_links($user_id, $current_user_data['user_type'], $user_data['user_type']);
 
@@ -2089,7 +2330,7 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
         fn_fill_address($user_data, $profile_fields, $use_default);
     }
 
-    $user_data['profile_id'] = fn_update_user_profile($user_id, $user_data, $action);
+    $user_data['profile_id'] = fn_update_user_profile($user_id, $user_data, $action, $ship_to_another);
 
     $updated_user_info = fn_get_user_info($user_id, true, $user_data['profile_id']);
     $user_data = array_merge($user_data, $updated_user_info);
@@ -2139,7 +2380,8 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
         $prefix = ($action === 'add') ? 'create' : 'update';
 
         // Send password to user only if it was created by admin or vendor
-        if ($action === 'add' && !SiteArea::isStorefront(AREA) && $auth['user_id'] !== $user_id) {
+        $auth_user_id = isset($auth['user_id']) ? $auth['user_id'] : null;
+        if ($action === 'add' && !SiteArea::isStorefront(AREA) && $auth_user_id !== $user_id) {
             $password = $original_password;
         } else {
             $password = null;
@@ -2207,6 +2449,38 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
 }
 
 /**
+ * Gets user last passwords
+ *
+ * @param int $user_id User identifier
+ *
+ * @return array<string>
+ */
+function fn_get_user_last_passwords($user_id)
+{
+    return db_get_fields('SELECT last_password FROM ?:user_last_passwords WHERE user_id = ?i', $user_id);
+}
+
+/**
+ * Updates user last passwords
+ *
+ * @param int           $user_id        User identifier
+ * @param array<string> $last_passwords Last passwords
+ */
+function fn_update_user_last_passwords($user_id, array $last_passwords)
+{
+    db_query('DELETE FROM ?:user_last_passwords WHERE user_id = ?i', $user_id);
+
+    foreach ($last_passwords as $password) {
+        $data = [
+            'user_id' => $user_id,
+            'last_password' => $password
+        ];
+
+        db_query('INSERT INTO ?:user_last_passwords ?e', $data);
+    }
+}
+
+/**
  * Cleans usergroup links if usertype was changed
  *
  * @param int $user_id User identifier
@@ -2237,13 +2511,14 @@ function fn_clean_usergroup_links($user_id, $current_user_type, $new_user_type)
 /**
  * Updates profile data of registered user
  *
- * @param int    $user_id   User identifier
- * @param array  $user_data Profile information
- * @param string $action    Current action (Example: 'add')
+ * @param int    $user_id         User identifier
+ * @param array  $user_data       Profile information
+ * @param string $action          Current action (Example: 'add')
+ * @param bool   $ship_to_another Flag to fill shipping/billing info with billing/shipping
  *
  * @return int profile ID
  */
-function fn_update_user_profile($user_id, $user_data, $action = '')
+function fn_update_user_profile($user_id, $user_data, $action = '', $ship_to_another = false)
 {
     /**
      * Modify profile data of registered user
@@ -2283,7 +2558,15 @@ function fn_update_user_profile($user_id, $user_data, $action = '')
     }
 
     // Add/Update additional fields
-    fn_store_profile_fields($user_data, array('U' => $user_id, 'P' => $user_data['profile_id']), 'UP');
+    fn_store_user_profile_fields(
+        $user_data,
+        [
+            ProfileDataTypes::USER    => $user_id,
+            ProfileDataTypes::PROFILE => $user_data['profile_id']
+        ],
+        ProfileDataTypes::USER_PROFILE,
+        $ship_to_another
+    );
 
     /**
      * Perform actions after user profile update
@@ -2317,7 +2600,8 @@ function fn_delete_user_profile($user_id, $profile_id, $allow_delete_main = fals
 
     if (!empty($can_delete)) {
         db_query('DELETE FROM ?:user_profiles WHERE profile_id = ?i', $profile_id);
-        db_query('DELETE FROM ?:profile_fields_data WHERE object_id = ?i AND object_type = ?s', $profile_id, 'P');
+
+        fn_delete_profile_fields_data(ProfileDataTypes::PROFILE, $profile_id);
     }
 
     return !empty($can_delete);
@@ -2485,13 +2769,15 @@ function fn_check_profile_fields_population($user_data, $section, $profile_field
 /**
  * Check if specified user has access to the specified permission
  *
- * @param int $user_id - user id
- * @param string $permission - the permission, should be checked
- * @return boolean true if the user has access, false otherwise
+ * @param int    $user_id    User identifier
+ * @param string $permission The permission, should be checked
+ *
+ * @return bool True if the user has access, false otherwise
  */
 function fn_check_user_access($user_id, $permission)
 {
-    static $user_access = array();
+    static $user_access = [];
+
     $user_id = (int) $user_id;
 
     if ($user_id <= 0) {
@@ -2507,16 +2793,20 @@ function fn_check_user_access($user_id, $permission)
 SELECT ?:usergroup_privileges.privilege
  FROM ?:usergroup_links
  LEFT JOIN ?:usergroup_privileges ON (?:usergroup_privileges.usergroup_id = ?:usergroup_links.usergroup_id)
- WHERE ?:usergroup_links.user_id = ?i AND ?:usergroup_links.status = ?s
+ LEFT JOIN ?:usergroups ON (?:usergroup_privileges.usergroup_id = ?:usergroups.usergroup_id)
+ WHERE ?:usergroup_links.user_id = ?i AND ?:usergroup_links.status = ?s 
+    AND ?:usergroups.status IN (?a) AND ?:usergroups.type IN (?a) 
 SQL;
-        $user_access[$user_id] = db_get_fields($sql, $user_id, 'A');
+        $user_access[$user_id] = db_get_fields(
+            $sql,
+            $user_id,
+            UsergroupLinkStatuses::ACTIVE,
+            [UsergroupStatuses::ACTIVE, UsergroupStatuses::HIDDEN],
+            UsergroupTypes::getAll()
+        );
     }
 
-    if (empty($user_access[$user_id]) || in_array($permission, $user_access[$user_id])) {
-        return true;
-    }
-
-    return false;
+    return empty($user_access[$user_id]) || in_array($permission, $user_access[$user_id]);
 }
 
 /**
@@ -2595,6 +2885,10 @@ function fn_update_usergroup($usergroup_data, $usergroup_id = 0, $lang_code = DE
 
             return false;
         }
+    }
+    if (empty($usergroup_data['privileges']) && $usergroup_data['type'] !== UsergroupTypes::TYPE_CUSTOMER) {
+        fn_set_notification(NotificationSeverity::ERROR, __('error'), __('usergroup_must_have_privileges'));
+        return false;
     }
 
     if (empty($usergroup_id)) {
@@ -2817,7 +3111,9 @@ function fn_delete_user($user_id)
     fn_set_hook('delete_user', $user_id, $user_data);
 
     $result = db_query("DELETE FROM ?:users WHERE user_id = ?i", $user_id);
-    db_query('DELETE FROM ?:profile_fields_data WHERE object_id = ?i AND object_type = ?s', $user_id, 'U');
+
+    fn_delete_profile_fields_data(ProfileDataTypes::USER, $user_id);
+
     db_query('DELETE FROM ?:user_session_products WHERE user_id = ?i', $user_id);
     db_query('DELETE FROM ?:user_data WHERE user_id = ?i', $user_id);
     db_query('UPDATE ?:orders SET user_id = 0 WHERE user_id = ?i', $user_id);
@@ -3010,6 +3306,67 @@ function fn_generate_salted_password($password, $salt)
     }
 
     return $_pass;
+}
+
+/**
+ * Verifies password and update it if needed
+ *
+ * @param int    $user_id       User identifier
+ * @param string $password      Password string
+ * @param string $password_hash Password hash
+ * @param string $salt          Salt
+ *
+ * @return bool
+ */
+function fn_user_password_verify($user_id, $password, $password_hash, $salt)
+{
+    if (!fn_password_verify($password, $password_hash, $salt)) {
+        return false;
+    }
+
+    if (password_needs_rehash($password_hash, PASSWORD_DEFAULT)) {
+        $password_hash = fn_password_hash($password);
+
+        db_query('UPDATE ?:users SET password = ?s, salt = ?s WHERE user_id = ?i', $password_hash, '', $user_id);
+    }
+
+    return true;
+}
+
+/**
+ * Verifies password
+ *
+ * @param string $password      Password string
+ * @param string $password_hash Password hash
+ * @param string $salt          Salt
+ *
+ * @return bool
+ */
+function fn_password_verify($password, $password_hash, $salt)
+{
+    $password_info = password_get_info($password_hash);
+
+    if (empty($password_info['algo'])) {
+        if (fn_generate_salted_password($password, $salt) !== $password_hash) {
+            return false;
+        }
+
+        return true;
+    }
+
+    return password_verify($password, $password_hash);
+}
+
+/**
+ * Generates password hash
+ *
+ * @param string $password Password text
+ *
+ * @return string
+ */
+function fn_password_hash($password)
+{
+    return (string) password_hash($password, PASSWORD_DEFAULT);
 }
 
 function fn_get_my_account_title_class()
@@ -3302,7 +3659,7 @@ function fn_check_profile_fields($user_data, $location = 'C', $auth = array())
 function fn_update_profile_field($field_data, $field_id, $lang_code = DESCR_SL)
 {
     if (empty($field_id)) {
-        $current_field_name = '';
+        $current_field_data = [];
         $add_match = false;
 
         $field_name = $field_data['field_name'];
@@ -3312,10 +3669,14 @@ function fn_update_profile_field($field_data, $field_id, $lang_code = DESCR_SL)
             $add_match = true;
         }
     } else {
-        $current_field_name = db_get_field('SELECT field_name FROM ?:profile_fields WHERE field_id = ?i', $field_id);
+        $current_field_data = db_get_row('SELECT field_name, field_type FROM ?:profile_fields WHERE field_id = ?i', $field_id);
     }
 
-    if (!empty($field_data['field_name']) && $current_field_name != $field_data['field_name']) {
+    if (
+        !empty($field_data['field_name'])
+        && isset($current_field_data['field_name'])
+        && $current_field_data['field_name'] != $field_data['field_name']
+    ) {
         if (preg_match('/[^_a-z0-9]/i', $field_data['field_name'])) {
             fn_set_notification('E', __('error'), __('error_validator_message', array('[field]' => __('profile_field_name'))));
             return false;
@@ -3333,7 +3694,7 @@ function fn_update_profile_field($field_data, $field_id, $lang_code = DESCR_SL)
         $exists = db_get_field('SELECT field_id FROM ?:profile_fields WHERE ?p', implode(' AND ', $conditions));
 
         if ($exists) {
-            fn_set_notification('E', __('error'), __('error_profile_field_name_exists'));
+            fn_set_notification('E', __('error'), __('error_profile_field_code_exists'));
             return false;
         }
     }
@@ -3370,7 +3731,20 @@ function fn_update_profile_field($field_data, $field_id, $lang_code = DESCR_SL)
         }
 
     } else {
-        db_query("UPDATE ?:profile_fields SET ?u WHERE field_id = ?i", $field_data, $field_id);
+        if (
+            isset($current_field_data['field_type'])
+            && $current_field_data['field_type'] === ProfileFieldTypes::FILE
+            && $current_field_data['field_type'] !== $field_data['field_type']
+        ) {
+            $exist = db_get_row('SELECT object_id FROM ?:profile_fields_data WHERE field_id = ?i AND value <> ?s', $field_id, '');
+
+            if ($exist) {
+                fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('profile_field_contains_information'));
+                $field_data['field_type'] = ProfileFieldTypes::FILE;
+            }
+        }
+
+        db_query('UPDATE ?:profile_fields SET ?u WHERE field_id = ?i', $field_data, $field_id);
 
         if (!empty($field_data['matching_id']) && $field_data['section'] == 'S') {
             db_query('UPDATE ?:profile_fields SET field_type = ?s WHERE field_id = ?i', $field_data['field_type'], $field_data['matching_id']);
@@ -3555,7 +3929,7 @@ function fn_user_logout($auth)
         fn_log_user_logout($auth);
     }
 
-    unset(Tygh::$app['session']['auth']);
+    unset(Tygh::$app['session']['auth'], Tygh::$app['session']['customization']);
 
     /**
      * Executes when logging a user out, allows to specify whether the cart content should be cleared.
@@ -3737,15 +4111,22 @@ function fn_delete_field_values($field_id, $value_ids = array())
 
 function fn_delete_profile_field($field_id, $no_match = false)
 {
-    $matching_id = db_get_field("SELECT matching_id FROM ?:profile_fields WHERE field_id = ?i", $field_id);
-    if (!$no_match && !empty($matching_id)) {
-        fn_delete_profile_field($matching_id, true);
+    $field = db_get_row('SELECT matching_id, field_type FROM ?:profile_fields WHERE field_id = ?i', $field_id);
+    if (!$no_match && !empty($field['matching_id'])) {
+        fn_delete_profile_field($field['matching_id'], true);
+    }
+
+    if ($field['field_type'] == ProfileFieldTypes::FILE) {
+        $field_data_list = db_get_array('SELECT object_id, object_type, value FROM ?:profile_fields_data WHERE field_id = ?i', $field_id);
+        foreach ($field_data_list as $field_data) {
+            fn_delete_profile_field_file($field_data['object_type'], $field_data['object_id'], $field_data['value']);
+        }
     }
 
     fn_delete_field_values($field_id);
-    db_query("DELETE FROM ?:profile_fields WHERE field_id = ?i", $field_id);
-    db_query("DELETE FROM ?:profile_fields_data WHERE field_id = ?i", $field_id);
-    db_query("DELETE FROM ?:profile_field_descriptions WHERE object_id = ?i AND object_type = 'F'", $field_id);
+    db_query('DELETE FROM ?:profile_fields WHERE field_id = ?i', $field_id);
+    db_query('DELETE FROM ?:profile_fields_data WHERE field_id = ?i', $field_id);
+    db_query('DELETE FROM ?:profile_field_descriptions WHERE object_id = ?i AND object_type = ?s', $field_id, 'F');
 }
 
 function fn_profile_fields_areas()
@@ -4145,17 +4526,311 @@ function fn_get_user_order_statistics($user_ids)
     $orders_group_by = db_quote(' GROUP BY ?:orders.user_id');
     $total_orders = db_get_hash_array('SELECT COUNT(DISTINCT (?:orders.order_id)) as total_orders, ?:orders.user_id FROM ?:orders ?p WHERE 1 ?p ?p', 'user_id', $orders_join, $orders_condition, $orders_group_by);
 
+    $paid_statuses = fn_get_order_paid_statuses();
+    $orders_data = db_get_hash_array(
+        'SELECT 
+            MIN(order_id) as first_order_id, 
+            MIN(timestamp) as first_order_timestamp, 
+            MAX(order_id) as last_order_id, 
+            MAX(timestamp) as last_order_timestamp, 
+            user_id 
+        FROM ?:orders WHERE status IN (?a) ?p',
+        'user_id',
+        $paid_statuses,
+        $orders_condition
+    );
+
     $paid_statuses = fn_get_settled_order_statuses();
     $orders_condition .= db_quote(' AND ?:orders.status IN (?a)', $paid_statuses);
 
     $total_settled_orders = db_get_hash_array('SELECT COUNT(DISTINCT (?:orders.order_id)) as total_settled_orders, ?:orders.user_id FROM ?:orders ?p WHERE 1 ?p ?p', 'user_id', $orders_join, $orders_condition, $orders_group_by);
     $total_spend = db_get_hash_array('SELECT SUM(total) as total_spend, ?:orders.user_id FROM ?:orders ?p WHERE ?:orders.status IN (?a) ?p ?p', 'user_id', $orders_join, $paid_statuses, $orders_condition, $orders_group_by);
 
-    $paid_statuses = fn_get_order_paid_statuses();
-    $orders_data = db_get_hash_array('SELECT MIN(order_id) as first_order_id, MIN(timestamp) as first_order_timestamp, MAX(order_id) as last_order_id, MAX(timestamp) as last_order_timestamp, user_id FROM ?:orders WHERE user_id IN (?n) AND status IN (?a)', 'user_id', $user_ids, $paid_statuses);
-
     $result = fn_array_merge($total_orders, $total_settled_orders, $total_spend, $orders_data, true);
     return $result;
+}
+
+/**
+ * Validates profile fields user value
+ *
+ * @param string $object_type Object type
+ * @param int    $object_id   Object ID
+ * @param array  $fields      Profile fields data
+ *
+ * @return array Prepared profile fields to save
+ */
+function fn_validate_profile_fields($object_type, $object_id, array $fields)
+{
+    if (empty($fields)) {
+        return [];
+    }
+
+    $uploaded_files = fn_filter_uploaded_data('profile_fields');
+
+    foreach ($fields as $field_id => &$value) {
+        $field_type = fn_get_profile_field_type($field_id);
+
+        if ($field_type === ProfileFieldTypes::FILE) {
+            if (empty($uploaded_files[$field_id])) {
+                unset($fields[$field_id]);
+                continue;
+            }
+
+            $value = fn_store_profile_field_file($object_type, $object_id, $field_id, $uploaded_files[$field_id]);
+
+            if (empty($value)) {
+                fn_set_notification('E', __('error'), __('text_cannot_create_file_check_file'));
+            }
+
+        } elseif ($field_type === ProfileFieldTypes::DATE) {
+            $value = empty($value) ? '' : fn_parse_date($value);
+        }
+    }
+    unset($value);
+
+    return $fields;
+}
+
+/**
+ * Gets profile field type by field ID
+ *
+ * @param int $field_id Field ID
+ *
+ * @return string
+ */
+function fn_get_profile_field_type($field_id)
+{
+    static $field_type_map = [];
+
+    if (isset($field_type_map[$field_id])) {
+        return $field_type_map[$field_id];
+    }
+
+    $field_type_map[$field_id] = db_get_field('SELECT field_type FROM ?:profile_fields WHERE field_id = ?i', $field_id);
+
+    return $field_type_map[$field_id];
+}
+
+/**
+ * Saves file to custom profiles files and modifies file data
+ *
+ * @param string $object_type Profile data type
+ * @param int    $object_id   Object identifier
+ * @param int    $field_id    Field identifier
+ * @param array  $file        Information about file
+ *
+ * @return string File name or empty string if file was not saved
+ */
+function fn_store_profile_field_file($object_type, $object_id, $field_id, array $file)
+{
+    if (empty($object_type) || empty($object_id) || empty($field_id) || empty($file)) {
+        return '';
+    }
+
+    $tmp_file_name = fn_basename($file['path']);
+
+    if (empty($tmp_file_name)) {
+        return '';
+    }
+
+    $file_dir = fn_get_profile_field_dir_path($object_type, $object_id);
+    $file_path = sprintf($file_dir . '/%s', $file['name']);
+
+    if (Storage::instance('custom_files')->isExist($file_path)) {
+        $file_path = Storage::instance('custom_files')->generateName($file_path);
+    }
+
+    if (!Storage::instance('custom_files')->put($file_path, ['file' => $file['path']])) {
+        return '';
+    }
+
+    Storage::instance('custom_files')->delete('sess_data/' . $tmp_file_name);
+
+    return fn_basename($file_path);
+}
+
+/**
+ * Gets prepared profile fields values for specific object
+ *
+ * @param string $object_type Object type
+ * @param int    $object_id   Object ID
+ * @param int[]  $field_ids   Specific field IDs, all data will be got otherwise
+ *
+ * @return array Prepared profile fields values
+ */
+function fn_get_profile_fields_data($object_type, $object_id, array $field_ids = [])
+{
+    if (empty($object_type) || empty($object_id)) {
+        return [];
+    }
+
+    $conditions = [];
+
+    if ($field_ids) {
+        $conditions['field_id'] = db_quote('profile_fields_data.field_id IN (?n)', $field_ids);
+    }
+
+    $fields = db_get_hash_array(
+        'SELECT profile_fields_data.field_id, profile_fields_data.value, profile_fields.field_type'
+        . ' FROM ?:profile_fields_data AS profile_fields_data'
+        . ' LEFT JOIN ?:profile_fields AS profile_fields ON profile_fields_data.field_id = profile_fields.field_id'
+        . ' WHERE object_id = ?i AND object_type = ?s ?p',
+        'field_id',
+        $object_id,
+        $object_type,
+        $conditions ? ' AND ' . implode(' AND ', $conditions) : ''
+    );
+
+    $file_dir = fn_get_profile_field_dir_path($object_type, $object_id);
+    $crypt_key = Registry::get('config.crypt_key');
+
+    foreach ($fields as $field_id => &$field) {
+        if ($field['field_type'] === ProfileFieldTypes::FILE) {
+            if (empty($field['value'])) {
+                $field['value'] = [];
+                continue;
+            }
+
+            $file_name = $field['value'];
+            $file_path = sprintf($file_dir . '/%s', $file_name);
+
+            if (!Storage::instance('custom_files')->isExist($file_path)) {
+                $field['value'] = [];
+                continue;
+            }
+
+            $absolute_file_path = Storage::instance('custom_files')->getAbsolutePath($file_path);
+            $file_info = fn_pathinfo($file_path);
+            $hash = md5($file_name . $crypt_key . $field_id);
+
+            $field['value'] = [
+                'file_type'      => fn_get_mime_content_type($absolute_file_path),
+                'file_extension' => empty($file_info['extension']) ? '' : $file_info['extension'],
+                'file_name'      => $file_name,
+                'file_path'      => $file_path,
+                'hash'           => $hash,
+                'link'           => fn_url(Url::buildUrn(['profiles', 'get_custom_file'], [
+                    'object_type' => $object_type,
+                    'object_id'   => $object_id,
+                    'field_id'    => $field_id,
+                    'hash'        => $hash,
+                ]))
+            ];
+        }
+    }
+    unset($field);
+
+    return array_column($fields, 'value', 'field_id');
+}
+
+/**
+ * Gets prepared profile field value for specific object
+ *
+ * @param string $object_type Object type
+ * @param int    $object_id   Object ID
+ * @param int    $field_id    Specific field ID
+ *
+ * @return array Prepared profile fields values
+ */
+function fn_get_profile_field_data($object_type, $object_id, $field_id)
+{
+    $fields = fn_get_profile_fields_data($object_type, $object_id, [$field_id]);
+
+    return reset($fields);
+}
+
+/**
+ * Generates profile field directory path
+ *
+ * @param string $object_type Profile data type
+ * @param int    $object_id   Object identifier
+ *
+ * @return string
+ */
+function fn_get_profile_field_dir_path($object_type, $object_id)
+{
+    return sprintf('profile_fields/%s/%s', $object_type, $object_id);
+}
+
+/**
+ * Deletes profile field file
+ *
+ * @param string $object_type Profile data type
+ * @param int    $object_id   Object identifier
+ * @param string $file_name   File name
+ *
+ * @return bool True if success, false otherwise
+ */
+function fn_delete_profile_field_file($object_type, $object_id, $file_name)
+{
+    if (empty($object_type) || empty($object_id) || empty($file_name)) {
+        return false;
+    }
+
+    $is_file_in_use = db_get_field(
+        'SELECT profile_fields_data.field_id FROM ?:profile_fields_data as profile_fields_data'
+        . ' LEFT JOIN ?:profile_fields as profile_fields'
+            . ' ON profile_fields.field_id = profile_fields_data.field_id'
+        . ' WHERE profile_fields_data.value = ?s'
+            . ' AND profile_fields_data.object_type = ?s'
+            . ' AND profile_fields_data.object_id = ?i'
+            . ' AND profile_fields.field_type = ?s',
+        $file_name,
+        $object_type,
+        $object_id,
+        ProfileFieldTypes::FILE
+    );
+
+    if ($is_file_in_use) {
+        return false;
+    }
+
+    $dir_path = fn_get_profile_field_dir_path($object_type, $object_id);
+
+    if (Storage::instance('custom_files')->isExist(sprintf($dir_path . '/%s', $file_name))) {
+        return Storage::instance('custom_files')->delete(sprintf($dir_path . '/%s', $file_name));
+    }
+
+    return true;
+}
+
+/**
+ * Deletes specific profile fields data of specific object
+ *
+ * @param string $object_type Object type
+ * @param int    $object_id   Object ID
+ * @param int[]  $field_ids   Field IDs
+ */
+function fn_delete_profile_fields_data($object_type, $object_id, array $field_ids = [])
+{
+    if (!$field_ids) {
+        db_query(
+            'DELETE FROM ?:profile_fields_data WHERE object_id = ?i AND object_type = ?s',
+            $object_id,
+            $object_type
+        );
+
+        Storage::instance('custom_files')->deleteDir(fn_get_profile_field_dir_path($object_type, $object_id));
+
+        return;
+    }
+
+    $fields_values = fn_get_profile_fields_data($object_type, $object_id, $field_ids);
+
+    db_query(
+        'DELETE FROM ?:profile_fields_data WHERE object_id = ?i AND object_type = ?s AND field_id IN (?n)',
+        $object_id,
+        $object_type,
+        $field_ids
+    );
+
+    foreach ($fields_values as $field_id => $field_value) {
+        $field_type = fn_get_profile_field_type($field_id);
+
+        if (isset($field_value['file_name']) && $field_type === ProfileFieldTypes::FILE) {
+            fn_delete_profile_field_file($object_type, $object_id, $field_value['file_name']);
+        }
+    }
 }
 
 /**

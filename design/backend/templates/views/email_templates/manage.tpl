@@ -14,7 +14,7 @@
 
 <div id="content_email_templates_{$group_id}" {if $group_id != "C"}class="hidden"{/if}>
 <div class="items-container">
-    <div class="table-wrapper">
+    <div class="table-responsive-wrapper">
         <table class="table table-middle table--relative table-objects table-responsive table-responsive-w-titles">
             <tbody>
                 {foreach from=$group item="email_template"}
@@ -29,7 +29,7 @@
                         href_delete=""
                         delete_target_id=""
                         skip_delete=true
-                        header_text="{__("editing_email_template")}: `$email_template->getName()`"
+                        header_text=$email_template->getName()
                         no_popup=true
                         no_table=true
                         draggable=false

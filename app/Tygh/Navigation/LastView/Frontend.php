@@ -16,28 +16,38 @@ namespace Tygh\Navigation\LastView;
 
 /**
  * Last view frontend class
+ *
+ * phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
  */
 class Frontend extends ACommon
 {
     protected $_view_controller;
 
     /**
+     * Frontend constructor.
+     *
      * Create new last view instance object
      *
-     * @param  string $area Area identifier
-     * @return void
+     * @param string      $area       Area identifier
+     * @param string|null $controller Controller to init Last view for.
+     *                                If set to null will be detected automatically from the current dispatch
+     * @param string|null $mode       Controller mode to init Last view for.
+     *                                If set to null will be detected automatically from the current dispatch
+     * @param string|null $action     Controller mode action to init Last view for.
+     *                                If set to null will be detected automatically from the current dispatch
      */
-    public function __construct($area = AREA)
+    public function __construct($area = AREA, $controller = null, $mode = null, $action = null)
     {
-        parent::__construct($area);
+        parent::__construct($area, $controller, $mode, $action);
         $this->_view_controller = !empty($this->_schema['view_controller']) ? $this->_schema['view_controller'] : $this->_controller;
     }
 
     /**
      * Prepares params for search
      *
-     * @param array @params Request params
-     * @return boolean Always true
+     * @param array $params Request params
+     *
+     * @return bool Always true
      */
     public function prepare(&$params)
     {

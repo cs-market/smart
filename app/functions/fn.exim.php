@@ -15,6 +15,7 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 use Tygh\Bootstrap;
+use Tygh\Enum\SiteArea;
 use Tygh\Registry;
 use Tygh\Storage;
 use Tygh\Tools\Url;
@@ -191,6 +192,7 @@ function fn_export($pattern, $export_fields, $options)
                 'result' => &$result,
                 'export_fields' => &$export_fields,
                 'multi_lang' => $multi_lang,
+                'main_lang' => $main_lang,
                 'pattern' => $pattern
             );
             fn_exim_processing('export', $pattern['export_processing'], $options, $pre_export_process_data);
@@ -972,6 +974,7 @@ function fn_import($pattern, $import_data, $options)
         fn_set_notification('W', __('important'), __('import_new_vendor', array($processed_data['C'])));
     }
 
+
     fn_set_notification('W', __('important'), $final_import_notification, '', 'exim_import_final_notification');
 
     $result = true;
@@ -1217,14 +1220,14 @@ function fn_exim_import_images($prefix, $image_file, $detailed_file, $position, 
                 $_REQUEST["file_import_image_detailed"] = array();
             }
 
-            $_REQUEST['import_image_data'] = array(
-                array(
-                    'type' => $type,
-                    'image_alt' => empty($image_alt) ? '' : $image_alt,
+            $_REQUEST['import_image_data'] = [
+                [
+                    'type'         => $type,
+                    'image_alt'    => empty($image_alt) ? '' : $image_alt,
                     'detailed_alt' => empty($detailed_alt) ? '' : $detailed_alt,
-                    'position' => empty($position) ? 0 : $position,
-                )
-            );
+                    'position'     => empty($position) ? 0 : $position,
+                ]
+            ];
 
             $result = fn_attach_image_pairs('import', $object, $_id);
         }
@@ -1248,9 +1251,14 @@ function fn_exim_get_image_url($product_id, $object_type, $pair_type, $get_icon,
 {
     $image_pair = fn_get_image_pairs($product_id, $object_type, $pair_type, true, true, $lang_code);
 
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+    $url = $storefront->url;
+
     $image_data = fn_image_to_display($image_pair,
         Registry::get('settings.Thumbnails.product_details_thumbnail_width'),
-        Registry::get('settings.Thumbnails.product_details_thumbnail_height')
+        Registry::get('settings.Thumbnails.product_details_thumbnail_height'),
+        $url
     );
 
     if (!empty($image_data['image_path'])) {
@@ -1511,7 +1519,10 @@ function fn_exim_get_product_url($product_id, $lang_code = '')
         $company_url = '';
     }
 
-    $url = fn_url('products.view?product_id=' . $product_id . $company_url, 'C', fn_get_storefront_protocol(), $lang_code);
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+
+    $url = fn_url('products.view?product_id=' . $product_id . $company_url . '&storefront_id=' . $storefront->storefront_id, SiteArea::STOREFRONT, fn_get_storefront_protocol(), $lang_code);
 
     fn_set_hook('exim_get_product_url', $url, $product_id, $options, $lang_code);
 
@@ -1747,7 +1758,13 @@ function fn_exim_get_values($values, $pattern, $options, $vars = array(), $data 
                 } else {
                     $val[$field] = '';
                 }
-
+            } elseif ($operator === '%') {
+                $opt = str_replace('%', '', $value);
+                if (isset($data['object'][$opt])) {
+                    $val[$field] = $data['object'][$opt];
+                } else {
+                    $val[$field] = '';
+                }
             } else {
                 $val[$field] = $value;
                 fn_exim_quote($val[$field], $quote);
@@ -2009,13 +2026,22 @@ function fn_exim_apply_company($pattern, &$alt_keys, &$object, &$skip_get_primar
  * Gets the translation for the variable.
  *
  * @param string $value The name of variable.
+ * @param string $action Type of the action: import|export
  *
  * @return bool|string The string with the translation.
  */
-function fn_exim_get_field_label($value)
+function fn_exim_get_field_label($value, $action = '')
 {
     $value = str_replace(array(':', '(', ')', '-'), '', $value);
     $value = strtolower(str_replace(' ', '_', $value));
 
-    return fn_is_lang_var_exists($value) ? __($value) : false;
+    if (!empty($action) && fn_is_lang_var_exists('exim_' . $action . '_' . $value)) {
+        $label = __('exim_' . $action . '_' . $value);
+    } elseif (fn_is_lang_var_exists('exim_' . $value)) {
+        $label = __('exim_' . $value);
+    } else {
+        $label = fn_is_lang_var_exists($value) ? __($value) : false;
+    }
+
+    return $label;
 }

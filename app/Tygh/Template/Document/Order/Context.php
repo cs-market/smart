@@ -26,23 +26,29 @@ class Context implements IContext
     /** @var Order */
     protected $order;
 
+    /** @var string */
+    protected $area;
+
     /**
      * Context constructor.
      *
-     * @param Order $order  Instance of order.
+     * @param Order  $order Instance of order.
+     * @param string $area  Area identifier.
      */
-    public function __construct(Order $order)
+    public function __construct(Order $order, $area = AREA)
     {
         /**
          * Allows to change the context of documents of the “order” type.
          *
-         * @param self      $this       Instance of order.
-         * @param int       $order_id   Order identifier.
-         * @param string    $lang_code  Language code.
+         * @param self   $this      Instance of order.
+         * @param int    $order_id  Order identifier.
+         * @param string $lang_code Language code.
+         * @param string $area      Area identifier.
          */
-        fn_set_hook('template_document_order_context_init', $this, $order);
+        fn_set_hook('template_document_order_context_init', $this, $order, $area);
 
         $this->order = $order;
+        $this->area = $area;
     }
 
     /**
@@ -81,5 +87,13 @@ class Context implements IContext
     public function getCurrencyCode()
     {
         return $this->getOrder()->getCurrencyCode();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArea()
+    {
+        return $this->area;
     }
 }

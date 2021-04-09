@@ -5,6 +5,7 @@
         <input type="hidden" name="thread[company_id]" value="{$company_id}" />
         <input type="hidden" name="thread[object_type]" value="{$object_type}" />
         <input type="hidden" name="thread[object_id]" value="{$object_id}" />
+        <input type="hidden" name="thread[communication_type]" value="{"Addons\\VendorCommunication\\CommunicationTypes::VENDOR_TO_CUSTOMER"|enum}" />
 
         {if $product}
             <div class="ty-vendor-communication-product-info-container">

@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (!empty($snapping_data['action'])) {
 
                     if ($snapping_data['action'] == 'update' || $snapping_data['action'] == 'add') {
-                        if (SchemesManager::isWrapperAvailable($snapping_data['grid_data'])) {
+                        if (SchemesManager::isGridWrapperAvailable($snapping_data['grid_data'])) {
                             $result = Grid::update($snapping_data['grid_data']);
                         }
 
@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'update_block') {
         $description = [];
         $block = $_REQUEST['block_data'];
-        
+
         if (!empty($block['description'])) {
             $block['description']['lang_code'] = DESCR_SL;
             $description = $block['description'];
@@ -441,11 +441,15 @@ if ($mode == 'manage' || $mode == 'manage_in_tab') {
     $selected_location = fn_get_selected_location($_REQUEST);
 
     if (empty($selected_location) && !empty($_REQUEST['selected_location'])) {
-        return array(CONTROLLER_STATUS_REDIRECT, 'block_manager.manage');
+        return [CONTROLLER_STATUS_REDIRECT, 'block_manager.manage'];
     }
 
     if (fn_get_blocks_owner() && !in_array($selected_location['dispatch'], fn_get_vendor_dispatches())) {
-        return array(CONTROLLER_STATUS_DENIED);
+        if (!empty($_REQUEST['redirect_to_block_manager'])) {
+            return [CONTROLLER_STATUS_REDIRECT, 'block_manager.manage'];
+        }
+
+        return [CONTROLLER_STATUS_DENIED];
     }
 
     if ($dynamic_object) {

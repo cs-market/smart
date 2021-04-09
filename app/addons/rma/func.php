@@ -12,13 +12,16 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Rma\InventoryOperations;
+use Tygh\Enum\Addons\Rma\RecalculateOperations;
+use Tygh\Enum\Addons\Rma\ReturnOperationStatuses;
+use Tygh\Enum\YesNo;
+use Tygh\Enum\ReceiverSearchMethods;
+use Tygh\Enum\UserTypes;
 use Tygh\Navigation\LastView;
 use Tygh\Registry;
-use Tygh\Enum\Addons\Rma\ReturnOperationStatuses;
-use Tygh\Enum\Addons\Rma\RecalculateOperations;
-use Tygh\Enum\Addons\Rma\InventoryOperations;
-use Tygh\Enum\YesNo;
-
+use Tygh\Notifications\Receivers\SearchCondition;
+use Tygh\Enum\Addons\Rma\RecalculateDataTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -244,90 +247,39 @@ function fn_delete_return($return_id)
     db_query("DELETE FROM ?:rma_return_products WHERE return_id = ?i", $return_id);
 }
 
-function fn_send_return_mail(&$return_info, &$order_info, $force_notification = array(), $area = AREA)
+/**
+ * @deprecated since 4.12.1. Use fn_rma_send_notification instead.
+ */
+function fn_send_return_mail(&$return_info, &$order_info, $force_notification = [], $area = AREA)
 {
-    $return_statuses = fn_get_statuses(STATUSES_RETURN);
-    $status_params = $return_statuses[$return_info['status']]['params'];
+    fn_rma_send_notification($return_info, $order_info, $force_notification);
+}
 
-    $notify_user = isset($force_notification['C']) ? $force_notification['C'] : (!empty($status_params['notify']) && YesNo::toBool($status_params['notify']));
-    $notify_department = isset($force_notification['A']) ? $force_notification['A'] : (!empty($status_params['notify_department']) && YesNo::toBool($status_params['notify_department']));
-    $notify_vendor = isset($force_notification['V']) ? $force_notification['V'] : (!empty($status_params['notify_vendor']) && YesNo::toBool($status_params['notify_vendor']));
+/**
+ * Sends notification about current return request status.
+ *
+ * @param array      $return_info        Return request info
+ * @param array      $order_info         Associated order info
+ * @param array|bool $force_notification Notification rules
+ */
+function fn_rma_send_notification($return_info, $order_info, $force_notification = [])
+{
+    /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
 
-    if ($notify_user || $notify_department || $notify_vendor) {
-        /** @var \Tygh\Mailer\Mailer $mailer */
-        $mailer = Tygh::$app['mailer'];
+    /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+    $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+    $notification_rules = $notification_settings_factory->create($force_notification);
 
-        // Notify customer
-        if ($notify_user) {
+    $data = [
+        'order_info' => $order_info,
+        'return_info' => $return_info,
+    ];
 
-            $rma_reasons = fn_get_rma_properties(RMA_REASON, $order_info['lang_code']);
-            $rma_actions = fn_get_rma_properties(RMA_ACTION, $order_info['lang_code']);
+    $status_id = strtolower($return_info['status']);
+    $event_id = "rma.status_changed.{$status_id}";
 
-            $mailer->send(array(
-                'to' => $order_info['email'],
-                'from' => 'company_orders_department',
-                'data' => array(
-                    'order_info' => $order_info,
-                    'return_info' => $return_info,
-                    'reasons' => $rma_reasons,
-                    'actions' => $rma_actions,
-                    'return_status' => fn_get_status_data($return_info['status'], STATUSES_RETURN, $return_info['return_id'], $order_info['lang_code'])
-                ),
-                'template_code' => 'rma_slip_notification',
-                'tpl' => 'addons/rma/slip_notification.tpl', // this parameter is obsolete and is used for back compatibility
-                'company_id' => $order_info['company_id'],
-            ), 'C', $order_info['lang_code']);
-        }
-
-        if ($notify_vendor) {
-            if (fn_allowed_for('MULTIVENDOR') && !empty($order_info['company_id'])) {
-                $company_language = fn_get_company_language($order_info['company_id']);
-
-                $rma_reasons = fn_get_rma_properties(RMA_REASON, $company_language);
-                $rma_actions = fn_get_rma_properties(RMA_ACTION, $company_language);
-
-                $mailer->send(array(
-                    'to' => 'company_orders_department',
-                    'from' => 'default_company_orders_department',
-                    'data' => array(
-                        'order_info' => $order_info,
-                        'return_info' => $return_info,
-                        'reasons' => $rma_reasons,
-                        'actions' => $rma_actions,
-                        'return_status' => fn_get_status_data($return_info['status'], STATUSES_RETURN, $return_info['return_id'], $company_language)
-                    ),
-                    'template_code' => 'rma_slip_notification',
-                    'tpl' => 'addons/rma/slip_notification.tpl', // this parameter is obsolete and is used for back compatibility
-                    'company_id' => $order_info['company_id'],
-                ), 'A', $company_language);
-            }
-        }
-
-        // Notify administrator (only if the changes performed from the frontend)
-        if ($notify_department) {
-
-            $rma_reasons = fn_get_rma_properties(RMA_REASON, Registry::get('settings.Appearance.backend_default_language'));
-            $rma_actions = fn_get_rma_properties(RMA_ACTION, Registry::get('settings.Appearance.backend_default_language'));
-
-            $mailer->send(array(
-                'to' => 'company_orders_department',
-                'from' => 'default_company_orders_department',
-                'reply_to' => Registry::get('settings.Company.company_orders_department'),
-                'data' => array(
-                    'order_info' => $order_info,
-                    'return_info' => $return_info,
-                    'reasons' => $rma_reasons,
-                    'actions' => $rma_actions,
-                    'return_status' => fn_get_status_data($return_info['status'], STATUSES_RETURN, $return_info['return_id'], Registry::get('settings.Appearance.backend_default_language'))
-                ),
-                'template_code' => 'rma_slip_notification',
-                'tpl' => 'addons/rma/slip_notification.tpl', // this parameter is obsolete and is used for back compatibility
-                'company_id' => $order_info['company_id'],
-            ), 'A', Registry::get('settings.Appearance.backend_default_language'));
-
-        }
-
-    }
+    $event_dispatcher->dispatch($event_id, $data, $notification_rules);
 }
 
 function fn_rma_update_details($data)
@@ -355,6 +307,8 @@ function fn_rma_update_details($data)
     ) {
         $show_confirmation = true;
     }
+
+    $old_order_info = fn_get_order_info($change_return_status['order_id']);
 
     if ($show_confirmation == true) {
         if (YesNo::toBool($confirmed)) {
@@ -387,9 +341,17 @@ function fn_rma_update_details($data)
 
         $return_info = fn_get_return_info($change_return_status['return_id']);
         $order_info = fn_get_order_info($change_return_status['order_id']);
-        fn_send_return_mail($return_info, $order_info, fn_get_notification_rules($change_return_status));
+        fn_rma_send_notification($return_info, $order_info, fn_get_notification_rules($change_return_status));
 
-        if (fn_allowed_for('MULTIVENDOR') && YesNo::toBool($is_refund) && $change_return_status['status_to'] == ReturnOperationStatuses::COMPLETED) {
+        if (
+            fn_allowed_for('MULTIVENDOR')
+            && YesNo::toBool($is_refund)
+            && (
+                $change_return_status['status_to'] === ReturnOperationStatuses::COMPLETED
+                || $change_return_status['status_from'] === ReturnOperationStatuses::COMPLETED
+            )
+        ) {
+            $payout_amount_sign = ($change_return_status['status_to'] === ReturnOperationStatuses::COMPLETED) ? -1 : 1;
             $payout_data = $payout_data = array(
                 'order_id' => $change_return_status['order_id'],
                 'company_id' => $order_info['company_id'],
@@ -398,27 +360,41 @@ function fn_rma_update_details($data)
             );
 
             // create payout
-            if (!\Tygh\VendorPayouts::instance()->getSimple($payout_data)) {
-                $payout_amount = 0;
-                if (!empty($return_info['items']['A'])) {
-                    foreach ($return_info['items']['A'] as $cart_id => $product_info) {
-                        $payout_amount -= $product_info['amount'] * $product_info['price'];
-                    }
+            $payout_amount = 0;
+            if (!empty($return_info['items']['A'])) {
+                foreach ($return_info['items']['A'] as $product_info) {
+                    $payout_amount += $product_info['amount'] * $product_info['price'];
                 }
-                $payout_data['order_amount'] = $payout_amount;
-
-                /**
-                 * Executes before creating a payout based on the return request, allows to modify the payout data.
-                 *
-                 * @param array $data        Request parameters
-                 * @param array $order_info  Order information from ::fn_get_orders()
-                 * @param array $return_info Return request from ::fn_get_return_info()
-                 * @param array $payout_data Payout data to be stored in the DB
-                 */
-                fn_set_hook('rma_update_details_create_payout', $data, $order_info, $return_info, $payout_data);
-
-                \Tygh\VendorPayouts::instance()->update($payout_data);
             }
+
+            $old_taxes_amount = array_sum(array_column(array_filter($old_order_info['taxes'], static function ($tax) {
+                return $tax['price_includes_tax'] === YesNo::NO;
+            }), 'tax_subtotal'));
+
+            $new_taxes_amount = array_sum(array_column(array_filter($order_info['taxes'], static function ($tax) {
+                return $tax['price_includes_tax'] === YesNo::NO;
+            }), 'tax_subtotal'));
+
+            $taxes_amount = $old_taxes_amount - $new_taxes_amount;
+
+            $payout_shipping_cost = (empty($change_return_status['shipping_costs']))
+                ? 0
+                : array_sum($change_return_status['shipping_costs']);
+
+            $payout_data['order_amount'] = ($payout_amount + $taxes_amount + $old_order_info['shipping_cost'] - $payout_shipping_cost) * $payout_amount_sign;
+
+            /**
+             * Executes before creating a payout based on the return request, allows to modify the payout data.
+             *
+             * @param array $data           Request parameters
+             * @param array $order_info     Order information from ::fn_get_orders()
+             * @param array $return_info    Return request from ::fn_get_return_info()
+             * @param array $payout_data    Payout data to be stored in the DB
+             * @param array $old_order_info Order information before refund
+             */
+            fn_set_hook('rma_update_details_create_payout', $data, $order_info, $return_info, $payout_data, $old_order_info);
+
+            \Tygh\VendorPayouts::instance()->update($payout_data);
         }
     }
 
@@ -531,6 +507,8 @@ function fn_rma_update_order_taxes(
         }
         foreach ($taxes_list as $k => &$tax) {
             $tax_changed = false;
+            $old_tax_amount = $new_tax_amount = null;
+
             if (isset($tax['applies']['P_' . $item_id])) {
                 $tax_changed = true;
                 $old_tax_amount = $tax['applies']['P_' . $item_id];
@@ -561,7 +539,6 @@ function fn_rma_update_order_taxes(
                 }
             }
             if ($tax_changed && $tax['price_includes_tax'] == 'N' && isset($new_tax_amount) && isset($old_tax_amount)) {
-                $current_order['subtotal'] -= ($old_tax_amount - $new_tax_amount);
                 $current_order['total'] -= ($old_tax_amount - $new_tax_amount);
             }
         }
@@ -607,11 +584,10 @@ function fn_update_shipping_taxes(&$tax_data, $shipping_cost, &$order)
                         $old_tax_rate = fn_rma_get_recalculated_shipping_tax_rate($tax, $rate['old']);
                         $current_tax_rate = fn_rma_get_recalculated_shipping_tax_rate($tax, $rate['new']);
 
-                        $tax['applies']['S']  += ($current_tax_rate - $old_tax_rate);
-                        $tax['tax_subtotal'] = $tax['applies']['S'];
+                        $tax['applies']['S'] += ($current_tax_rate - $old_tax_rate);
+                        $tax['tax_subtotal'] = array_sum($tax['applies']);
 
                         if ($tax['price_includes_tax'] === YesNo::NO) {
-                            $order['subtotal'] += $current_tax_rate - $old_tax_rate;
                             $order['total'] += $current_tax_rate - $old_tax_rate;
                         }
                     }
@@ -651,50 +627,122 @@ function fn_rma_get_recalculated_shipping_tax_rate(array $tax, $rate)
 }
 
 /**
-* $type values
-*
-* M-O+   change main and optional data
-* O-     change optional data
-* M+     change main data
-*
-*/
-function fn_rma_recalculate_order_routine(&$order, &$item, $mirror_item, $type = '', $ex_data = array())
+ * Recalculates total and subtotal order data and change product amount during processing rma request
+ *
+ * @param array<string, int|float|string|mixed>                           $order       Order data
+ * @param array<string, int|float|string|array<string, int|float|string>> $item        Cloned return item, it was changed during recalculate
+ * @param array<string, int|float|string|array<string, int|float|string>> $mirror_item Original return item, it was changed during recalculate
+ * @param string                                                          $type        Recalculate data type
+ * @param array<string, int|string|array<int, float>>                     $ex_data     Extended return data
+ * @param array<string, int|string|array<int, float>>                     $order_info  Changed order info
+ *
+ * @phpcsSuppress SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
+ *
+ * @psalm-param array{
+ *     item_id: int,
+ *     product_id: int,
+ *     amount: int,
+ *     extra?: array{
+ *         exclude_from_calculate?: bool,
+ *         discount?: float,
+ *         product_options?: array{int, string|int}},
+ *         returns?: array{return_id?: int, array{string, int|string|float}}
+ * } $item Cloned return item, it was changed during recalculate
+ * @psalm-param array{
+ *     item_id: int,
+ *     product_id: int,
+ *     amount: int,
+ *     extra?: array{
+ *         exclude_from_calculate?: bool,
+ *         discount?: float,
+ *         product_options?: array{int, string|int}},
+ *         returns?: array{return_id?: int, array{string, int|string|float}}
+ * } $mirror_item Original return item, it was changed during recalculate
+ */
+function fn_rma_recalculate_order_routine(&$order, &$item, $mirror_item, $type = '', $ex_data = [], $order_info = [])
 {
     $amount = 0;
-    if (!isset($item['extra']['exclude_from_calculate'])) {
-        if (in_array($type, array('M+', 'M-O+'))) {
-            $sign = ($type == 'M+') ? 1 : -1;
 
-            $delta = ($mirror_item['price'] * $mirror_item['extra']['returns'][$ex_data['return_id']]['amount']);
-            $order['subtotal'] = $order['subtotal'] + $sign * $delta;
-            $order['total'] = $order['total'] + $sign * $delta;
-
-            $_discount = isset($mirror_item['extra']['discount']) ? $mirror_item['extra']['discount'] : (isset($item['extra']['discount']) ? $item['extra']['discount'] : 0);
-            $order['discount'] = $order['discount'] + $sign * $_discount * $item['amount'];
-            unset($mirror_item['extra']['discount'], $item['extra']['discount']);
-        }
-        if (in_array($type, array('O-', 'M-O+'))) {
-            $amount = fn_rma_recalculate_product_amount($item['item_id'], $item['product_id'], @$item['extra']['product_options'], $type, $ex_data);
-        }
-    } else {
-        if (in_array($type, array('O-', 'M-O+'))) {
-            fn_rma_recalculate_product_amount($item['item_id'], $item['product_id'], @$item['extra']['product_options'], $type, $ex_data);
-        }
+    if (in_array($type, [RecalculateDataTypes::CHANGE_RELATED_DATA, RecalculateDataTypes::CHANGE_ORDER_AND_RELATED])) {
+        $amount = fn_rma_recalculate_product_amount(
+            (int) $item['item_id'],
+            (int) $item['product_id'],
+            isset($item['extra']['product_options']) ? $item['extra']['product_options'] : [],
+            $type,
+            $ex_data,
+            $order_info
+        );
     }
 
+    if (
+        !isset($item['extra']['exclude_from_calculate'])
+        && in_array($type, [RecalculateDataTypes::CHANGE_ONLY_ORDER_DATA, RecalculateDataTypes::CHANGE_ORDER_AND_RELATED])
+    ) {
+        $sign = ($type === RecalculateDataTypes::CHANGE_ONLY_ORDER_DATA) ? 1 : -1;
+
+        $return_id = (!empty($ex_data['return_id'])) ? (int) $ex_data['return_id'] : 0;
+        if ($return_id && isset($mirror_item['price']) && isset($mirror_item['extra']['returns'][$return_id]['amount'])) {
+            $delta = ($mirror_item['price'] * $mirror_item['extra']['returns'][$return_id]['amount']);
+            $order['subtotal'] = $order['subtotal'] + $sign * $delta;
+            $order['total'] = $order['total'] + $sign * $delta;
+        }
+        $item_discount = isset($item['extra']['discount']) ? $item['extra']['discount'] : 0;
+        $_discount = (float) (isset($mirror_item['extra']['discount']) ? $mirror_item['extra']['discount'] : $item_discount);
+        $order['discount'] = $order['discount'] + $sign * $_discount * (int) $item['amount'];
+        unset($mirror_item['extra']['discount'], $item['extra']['discount']);
+    }
+
+    /**
+     * Allows to modify related data after recalculating order according return data
+     *
+     * @param array<string, int|float|string|array<string, int|float|string>> $item        Cloned return item, it was changed during recalculate
+     * @param array<string, int|float|string|array<string, int|float|string>> $mirror_item Original return item, it was changed during recalculate
+     * @param string                                                          $type        Recalculate data type
+     * @param array<string, int|string|array<int, float>>                     $ex_data     Extended return data
+     * @param int                                                             $amount      Product return amount
+     */
     fn_set_hook('rma_recalculate_order', $item, $mirror_item, $type, $ex_data, $amount);
 }
 
-function fn_rma_recalculate_product_amount($item_id, $product_id, $product_options, $type, $ex_data)
+/**
+ * Recalculates product amount with taking into account specific return data
+ *
+ * @param int                                         $item_id         Return item identifier
+ * @param int                                         $product_id      Product identifier
+ * @param array<int, int|string|float>                $product_options List of product option identifiers with values
+ * @param string                                      $type            Recalculating type
+ * @param array<string, int|string|array<int, float>> $ex_data         Extended return data
+ * @param array<string, int|string|array<int, float>> $order_info      Changed order info
+ *
+ * @return int Returned product amount
+ */
+function fn_rma_recalculate_product_amount($item_id, $product_id, $product_options, $type, $ex_data, $order_info = [])
 {
-
-    $sign = ($type == 'O-') ? '-' : '+';
-    $amount = db_get_field("SELECT amount FROM ?:rma_return_products WHERE return_id = ?i AND item_id = ?i AND type = ?s", $ex_data['return_id'], $item_id, ReturnOperationStatuses::APPROVED);
-    fn_update_product_amount($product_id, $amount, $product_options, $sign);
+    $sign = ($type === RecalculateDataTypes::CHANGE_RELATED_DATA) ? '-' : '+';
+    $amount = (int) db_get_field(
+        'SELECT amount'
+        . ' FROM ?:rma_return_products'
+        . ' WHERE return_id = ?i AND item_id = ?i AND type = ?s',
+        $ex_data['return_id'],
+        $item_id,
+        ReturnOperationStatuses::APPROVED
+    );
+    fn_update_product_amount($product_id, $amount, $product_options, $sign, true, $order_info);
 
     return $amount;
 }
 
+/**
+ * Recalculates data during processing rma request
+ *
+ * @param int                                         $order_id         Order identifier
+ * @param string                                      $recalculate_type Recalculating type
+ * @param int                                         $return_id        Return request identifier
+ * @param bool                                        $is_refund        True if product is refunded, false otherwise
+ * @param array<string, int|string|array<int, float>> $ex_data          Extended return data
+ *
+ * @return bool True if recalculating is successful, false otherwise
+ */
 function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_refund,  $ex_data)
 {
     if (empty($recalculate_type) || empty($return_id) || empty($order_id) || !is_array($ex_data) || ($recalculate_type == RecalculateOperations::MANUALLY && !isset($ex_data['total']))) {
@@ -707,6 +755,7 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
     $order_return_info = @unserialize(@$additional_data[ORDER_DATA_RETURN]);
     $order_tax_info = @unserialize(@$additional_data['T']);
     $status_order = $order['status'];
+    $order_info = fn_get_order_info($order_id) ?: [];
     unset($order['status']);
     if ($recalculate_type == RecalculateOperations::AUTO) {
         $product_groups = @unserialize(@$additional_data['G']);
@@ -719,7 +768,7 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
                         $r_item = $o_item = $item;
                         unset($r_item['extra']['returns'][$return_id]);
                         $r_item['amount'] = $item['amount'] - $item['extra']['returns'][$return_id]['amount'];
-                        fn_rma_recalculate_order_routine($order, $r_item, $item, 'O-', $ex_data);
+                        fn_rma_recalculate_order_routine($order, $r_item, $item, RecalculateDataTypes::CHANGE_RELATED_DATA, $ex_data, $order_info);
                         if (empty($r_item['amount'])) {
                             unset($order_return_info['returned_products'][$item_id]);
                         } else {
@@ -728,7 +777,7 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
 
                         $o_item['primordial_amount'] = (isset($order_items[$item_id]) ? $order_items[$item_id]['amount'] : 0) + $item['extra']['returns'][$return_id]['amount'];
                         $o_item['primordial_discount'] = @$o_item['extra']['discount'];
-                        fn_rma_recalculate_order_routine($order, $o_item, $item, 'M+', $ex_data);
+                        fn_rma_recalculate_order_routine($order, $o_item, $item, RecalculateDataTypes::CHANGE_ONLY_ORDER_DATA, $ex_data, $order_info);
                         $o_item['amount'] = (isset($order_items[$item_id]) ? $order_items[$item_id]['amount'] : 0) + $item['extra']['returns'][$return_id]['amount'];
 
                         if (isset($order_items[$item_id]['extra'])) {
@@ -759,11 +808,11 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
                         unset($o_item['extra']['returns']);
                     }
 
-                    fn_rma_recalculate_order_routine($order, $o_item, $item, '', $ex_data);
+                    fn_rma_recalculate_order_routine($order, $o_item, $item, '', $ex_data, $order_info);
                     if (empty($o_item['amount'])) {
                         db_query("DELETE FROM ?:order_details WHERE item_id = ?i AND order_id = ?i", $item_id, $order_id);
                     } else {
-                        $o_item['extra'] = serialize($o_item['extra']);
+                        $o_item['extra'] = serialize(isset($o_item['extra']) ? $o_item['extra'] : []);
                         db_query("UPDATE ?:order_details SET ?u WHERE item_id = ?i AND order_id = ?i", $o_item, $item_id, $order_id);
                     }
 
@@ -775,7 +824,7 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
                         $r_item = $order_return_info['returned_products'][$item_id];
                         $r_item['amount'] = $r_item['amount'] + $item['extra']['returns'][$return_id]['amount'];
                     }
-                    fn_rma_recalculate_order_routine($order, $r_item, $item, 'M-O+', $ex_data);
+                    fn_rma_recalculate_order_routine($order, $r_item, $item, RecalculateDataTypes::CHANGE_ORDER_AND_RELATED, $ex_data, $order_info);
                     $r_item['extra']['returns'][$return_id] = $item['extra']['returns'][$return_id];
                     $order_return_info['returned_products'][$item_id] = $r_item;
                     fn_rma_update_order_taxes(
@@ -815,7 +864,7 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
                     $shipping_cost = (array) $ex_data['shipping_costs'];
                     foreach ($group['chosen_shippings'] as &$shipping) {
                         $shipping_id = $shipping['shipping_id'];
-                        $cost = $shipping_cost[$shipping_id];
+                        $cost = (float) $shipping_cost[$shipping_id];
                         $old_shipping_rate = $shipping['rate'];
                         $new_shipping_rate = fn_format_price($_total ? (($old_shipping_rate / $_total) * $cost) : ($cost / count($product_groups)));
 
@@ -838,7 +887,9 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
         }
 
         $order['total'] -= $order['shipping_cost'];
-        $order['shipping_cost'] = isset($ex_data['shipping_costs']) ? array_sum($ex_data['shipping_costs']) : $order['shipping_cost'];
+        $order['shipping_cost'] = (isset($ex_data['shipping_costs']) && is_array($ex_data['shipping_costs']))
+            ? array_sum($ex_data['shipping_costs'])
+            : $order['shipping_cost'];
         $order['total'] += $order['shipping_cost'];
 
         $order['total'] = ($order['total'] < 0) ? 0 : $order['total'];
@@ -847,23 +898,31 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
             db_query("UPDATE ?:order_data SET ?u WHERE order_id = ?i AND type = 'T'", array('data' => serialize($order_tax_info)), $order_id);
         }
 
-    } elseif ($recalculate_type == RecalculateOperations::MANUALLY) {
-        $order['total'] = $order['total'] + isset($ex_data['total']) ? $ex_data['total'] : 0;
-        $_ori_data = array(
+    } elseif ($recalculate_type === RecalculateOperations::MANUALLY) {
+        $_total = $order['total'];
+        $_ex_total = isset($ex_data['total']) ? $ex_data['total'] : 0;
+        $_ori_data = [
             'order_id' => $order_id,
-            'type'     =>  ORDER_DATA_RETURN,
-            'data'     => array(
-                'return' 			=> fn_format_price(((isset($order_return_info['return']) ? $order_return_info['return'] : 0) - isset($ex_data['total']) ? $ex_data['total'] : 0)),
+            'type'     => ORDER_DATA_RETURN,
+            'data'     => [
+                'return'            => fn_format_price((float) $_total - (float) $_ex_total),
                 'returned_products' => (isset($order_return_info['returned_products'])) ? $order_return_info['returned_products'] : ''
-            )
+            ]
+        ];
+        $order['total'] = $_ex_total;
+
+        $return_products = db_get_hash_array(
+            'SELECT * FROM ?:rma_return_products WHERE return_id = ?i AND type = ?s',
+            'item_id',
+            $return_id,
+            ReturnOperationStatuses::APPROVED
         );
 
-        $return_products = db_get_hash_array("SELECT * FROM ?:rma_return_products WHERE return_id = ?i AND type = ?s", 'item_id', $return_id, ReturnOperationStatuses::APPROVED);
-        foreach ((array) $return_products as $item_id => $v) {
+        foreach ((array) $return_products as $v) {
             $v['extra']['product_options'] = @unserialize($v['extra']['product_options']);
-            if ($ex_data['inventory_to'] == InventoryOperations::DECREASED || $ex_data['status_to'] == ReturnOperationStatuses::REQUESTED) {
+            if ($ex_data['inventory_to'] === InventoryOperations::DECREASED || $ex_data['status_to'] === ReturnOperationStatuses::REQUESTED) {
                 fn_update_product_amount($v['product_id'], $v['amount'], @$v['extra']['product_options'], '-', true, $order);
-            } elseif ($ex_data['inventory_to'] == InventoryOperations::INCREASED) {
+            } elseif ($ex_data['inventory_to'] === InventoryOperations::INCREASED) {
                 fn_update_product_amount($v['product_id'], $v['amount'], $v['extra']['product_options'], '+', true, $order);
             }
         }
@@ -889,6 +948,8 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
         $order[$k] = fn_format_price($v);
     }
 
+    $order['updated_at'] = TIME;
+
     db_query("UPDATE ?:orders SET ?u WHERE order_id = ?i", $order, $order_id);
 
     if (fn_allowed_for('MULTIVENDOR')) {
@@ -899,6 +960,8 @@ function fn_rma_recalculate_order($order_id, $recalculate_type, $return_id, $is_
         $action = 'save';
         fn_mve_place_order($order_id, $action, $status_order, $cart, $auth);
     }
+
+    return true;
 }
 
 function fn_rma_get_status_params_definition(&$status_params, &$type)
@@ -1204,6 +1267,56 @@ function fn_rma_get_returns($params, $items_per_page = 0, $lang_code = CART_LANG
     LastView::instance()->processResults('rma_returns', $return_requests, $params);
 
     return array($return_requests, $params);
+}
+
+function fn_rma_addon_install()
+{
+    list($root_admins,) = fn_get_users([
+        'is_root' => YesNo::YES,
+        'user_type' => UserTypes::ADMIN,
+    ], Tygh::$app['session']['auth']);
+
+    foreach ($root_admins as $root_admin) {
+        if (!$root_admin['company_id']) {
+            fn_update_notification_receiver_search_conditions(
+                'group',
+                'rma',
+                UserTypes::ADMIN,
+                [
+                    new SearchCondition(ReceiverSearchMethods::USER_ID, $root_admin['user_id']),
+                ]
+            );
+            break;
+        }
+    }
+
+    if (fn_allowed_for('MULTIVENDOR')) {
+        fn_update_notification_receiver_search_conditions(
+            'group',
+            'rma',
+            UserTypes::VENDOR,
+            [
+                new SearchCondition(ReceiverSearchMethods::VENDOR_OWNER, ReceiverSearchMethods::VENDOR_OWNER),
+            ]
+        );
+    }
+}
+
+function fn_rma_addon_uninstall()
+{
+    fn_update_notification_receiver_search_conditions(
+        'group',
+        'rma',
+        UserTypes::ADMIN,
+        []
+    );
+
+    fn_update_notification_receiver_search_conditions(
+        'group',
+        'rma',
+        UserTypes::VENDOR,
+        []
+    );
 }
 
 /**

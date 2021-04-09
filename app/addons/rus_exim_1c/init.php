@@ -16,8 +16,6 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
     'get_orders',
-    'update_product_feature_variant',
-    'look_through_variants_update_combination',
     'before_dispatch',
     'store_locator_delete_store_location_post',
     'store_locator_get_store_location_before_select',

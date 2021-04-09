@@ -75,7 +75,7 @@
             {capture name="tools_items"}
             {hook name="vendor_plans:list_extra_links"}
                 {if $has_management_permissions}
-                    <li>{include file="common/popupbox.tpl" id="plan_`$plan.plan_id`" title_start=__("vendor_plans.editing_vendor_plan") title_end=$plan.plan link_text=__("edit") act="link" href="vendor_plans.update?plan_id=`$plan.plan_id`"}</li>
+                    <li>{include file="common/popupbox.tpl" id="plan_`$plan.plan_id`" text=$plan.plan link_text=__("edit") act="link" href="vendor_plans.update?plan_id=`$plan.plan_id`"}</li>
                     <li>{btn type="list" class="cm-confirm" href="vendor_plans.delete?plan_id=`$plan.plan_id`&redirect_url=`$return_current_url`" text=__("delete") method="POST"}</li>
                 {/if}
             {/hook}

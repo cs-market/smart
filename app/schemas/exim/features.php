@@ -57,7 +57,7 @@ $schema = array(
     'export_fields' => array(
         'Feature name' => array(
             'table' => 'product_features_descriptions',
-            'db_field' => 'description',
+            'db_field' => 'internal_name',
             'multilang' => true,
             'required' => true,
         ),
@@ -76,6 +76,11 @@ $schema = array(
         'Type' => array(
             'db_field' => 'feature_type',
             'required' => true,
+        ),
+        'Storefront feature name' => array(
+            'table' => 'product_features_descriptions',
+            'db_field' => 'description',
+            'multilang' => true,
         ),
         'Purpose' => array(
             'db_field' => 'purpose',

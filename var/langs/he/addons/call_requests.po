@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: he\n"
-"X-Crowdin-File: /release-4.11.5/addons/call_requests.po\n"
-"X-Crowdin-File-ID: 3628\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/call_requests.po\n"
+"X-Crowdin-File-ID: 4044\n"
+"PO-Revision-Date: 2021-02-01 09:06\n"
 
 msgctxt "Addons::name::call_requests"
 msgid "Call requests"
@@ -50,7 +50,7 @@ msgstr "טלפון מסכת [Deprecated]"
 
 msgctxt "SettingsTooltips::call_requests::phone_mask"
 msgid "Leave empty to use automatic country-based phone pattern, or type in a custom pattern. You can use spaces, commas, +, -, and digits. Note that 9 represents any digit; if you need a 9, type \\\\9. Examples: +9 (999) 999 99 99, 99999999, 999 999 99 or +99-99-9999-9999."
-msgstr ""
+msgstr "השאר ריק כדי להשתמש בתבנית טלפון אוטומטית מבוססת ארץ, או הקלד דפוס מותאם אישית. ניתן להשתמש ברווחים, פסיקים, +, - וספרות. שים לב כי 9 מייצג ספרה כלשהי; אם אתה צריך 9, הקלד \\\\ 9. דוגמאות: +9 (999) 999 99 99, 99999999, 999 999 99 או + 99-99-9999-9999."
 
 msgctxt "SettingsTooltips::call_requests::phone_prefix_length"
 msgid "Including parenthesis, spaces, etc. Use to highlight country code, area code, and phone prefix."
@@ -58,11 +58,11 @@ msgstr "כולל סוגריים, רווחים וכו '. השתמש כדי לסמ
 
 msgctxt "SettingsOptions::call_requests::enable_call_requests_for_vendors"
 msgid "Enable call requests for vendors"
-msgstr ""
+msgstr "אפשר בקשות להתקשרות עבור ספקים"
 
 msgctxt "SettingsTooltips::call_requests::enable_call_requests_for_vendors"
 msgid "This will also replace marketplace contact information with vendors' where necessary."
-msgstr ""
+msgstr "זה גם יחליף את פרטי הקשר של השוק עם ספקים במידת הצורך."
 
 msgctxt "Languages::privileges.manage_call_requests"
 msgid "Can edit"

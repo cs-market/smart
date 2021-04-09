@@ -12,12 +12,16 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Navigation\LastView;
-use Tygh\Tools\SecurityHelper;
 use Tygh\Common\OperationResult;
+use Tygh\Enum\ReceiverSearchMethods;
+use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\Addons\VendorCommunication\CommunicationTypes;
+use Tygh\Navigation\LastView;
+use Tygh\Notifications\Receivers\SearchCondition;
+use Tygh\Registry;
+use Tygh\Tools\SecurityHelper;
 use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -34,24 +38,68 @@ function fn_vendor_communication_update_thread(array $thread_data)
     /** @var Tygh\Common\OperationResult $result */
     $result = new OperationResult();
     $result->setSuccess(true);
-    $thread_id = !empty($thread_data['thread_id']) ? (int) $thread_data['thread_id'] : null;
-    $required_fields = array();
 
-    if (!$thread_id) {
-        $required_fields[] = 'company_id';
-        $required_fields[] = 'user_id';
+    if (!isset($thread_data['thread_id'])) {
+        $result = fn_vendor_communication_create_thread($thread_data);
+        return $result;
     }
 
-    foreach ($required_fields as $field) {
+    $thread_id = $thread_data['thread_id'];
 
-        if (empty($thread_data[$field])) {
-            $result->setSuccess(false);
-            $result->addError(
-                'thread_id_field_missing',
-                __('vendor_communication.required_field_is_missing', array('[field_name]' => $field))
-            );
-        }
+    $thread_data['last_updated'] = TIME;
+
+    if (isset($thread_data['last_message'])) {
+        // strip all tags for short message
+        $thread_data['last_message'] = fn_vendor_communication_sanitize_data($thread_data['last_message']);
+        $thread_data['last_message'] = fn_vendor_communication_truncate_message($thread_data['last_message']);
     }
+
+    $update_data = [
+        'status' => isset($thread_data['status']) ? $thread_data['status'] : VC_THREAD_STATUS_HAS_NEW_MESSAGE,
+        'last_updated' => $thread_data['last_updated'],
+    ];
+
+    if (isset($thread_data['last_message'])) {
+        $update_data['last_message'] = isset($thread_data['last_message']) ? $thread_data['last_message'] : '';
+    }
+
+    if (isset($thread_data['last_message_user_id'])) {
+        $update_data['last_message_user_id'] = isset($thread_data['last_message_user_id']) ? $thread_data['last_message_user_id'] : '';
+    }
+
+    if (isset($thread_data['last_message_user_type'])) {
+        $update_data['last_message_user_type'] = isset($thread_data['last_message_user_type']) ? $thread_data['last_message_user_type'] : '';
+    }
+
+    $updated = db_query(
+        'UPDATE ?:vendor_communications SET ?u WHERE thread_id = ?i',
+        $update_data,
+        $thread_id
+    );
+
+    if (!$updated) {
+        $result->setSuccess(false);
+        $result->addError('cannot_update_thread', __('vendor_communication.cannot_update_thread'));
+        return $result;
+    }
+
+    $result->setData($thread_id);
+
+    return $result;
+}
+
+/**
+ * Creates thread based on passed data
+ *
+ * @param array $thread_data Thread data
+ *
+ * @return Tygh\Common\OperationResult
+ */
+function fn_vendor_communication_create_thread(array $thread_data)
+{
+    /** @var Tygh\Common\OperationResult $result */
+    $result = new OperationResult();
+    $result->setSuccess(true);
 
     if (!empty($thread_data['object_type'])
         && !fn_vendor_communication_validate_object_type($thread_data['object_type'])
@@ -64,54 +112,34 @@ function fn_vendor_communication_update_thread(array $thread_data)
     }
 
     if ($result->isSuccess()) {
-        $thread_data['last_updated'] = TIME;
+        $thread_data['created_at'] = $thread_data['last_updated'] = TIME;
 
-        if (isset($thread_data['last_message'])) {
+        if (isset($thread_data['message'])) {
             // strip all tags for short message
-            $thread_data['last_message'] = fn_vendor_communication_sanitize_data($thread_data['last_message']);
+            $thread_data['last_message'] = fn_vendor_communication_sanitize_data($thread_data['message']);
             $thread_data['last_message'] = fn_vendor_communication_truncate_message($thread_data['last_message']);
         }
 
+        $thread_data['last_message_user_id'] = $thread_data['user_id'];
+        $thread_data['last_message_user_type'] = $thread_data['user_type'];
+
+        $thread_id = db_query('INSERT INTO ?:vendor_communications ?e', $thread_data);
+
         if (!$thread_id) {
-            $thread_data['created_at'] = TIME;
-            $thread_id = db_query('INSERT INTO ?:vendor_communications ?e', $thread_data);
-
-            if (!$thread_id) {
-                $result->setSuccess(false);
-                $result->addError('cannot_create_thread', __('vendor_communication.cannot_create_thread'));
-            }
-        } else {
-            $update_data = array(
-                'status' => isset($thread_data['status']) ? $thread_data['status'] : VC_THREAD_STATUS_HAS_NEW_MESSAGE,
-                'last_updated' => $thread_data['last_updated'],
-            );
-
-            if (isset($thread_data['last_message'])) {
-                $update_data['last_message'] = isset($thread_data['last_message']) ? $thread_data['last_message'] : '';
-            }
-
-            if (isset($thread_data['last_message_user_id'])) {
-                $update_data['last_message_user_id'] = isset($thread_data['last_message_user_id']) ? $thread_data['last_message_user_id'] : '';
-            }
-
-            if (isset($thread_data['last_message_user_type'])) {
-                $update_data['last_message_user_type'] = isset($thread_data['last_message_user_type']) ? $thread_data['last_message_user_type'] : '';
-            }
-
-            $updated = db_query(
-                'UPDATE ?:vendor_communications SET ?u WHERE thread_id = ?i',
-                $update_data,
-                $thread_id
-            );
-
-            if (!$updated) {
-                $result->setSuccess(false);
-                $result->addError('cannot_update_thread', __('vendor_communication.cannot_update_thread'));
-            }
+            $result->setSuccess(false);
+            $result->addError('cannot_create_thread', __('vendor_communication.cannot_create_thread'));
         }
-    }
 
-    $result->setData($thread_id);
+        $message = [
+            'user_id'   => $thread_data['user_id'],
+            'user_type' => $thread_data['user_type'],
+            'message'   => $thread_data['message'],
+            'thread_id' => $thread_id,
+        ];
+
+        $result = fn_vendor_communication_add_thread_message($message, true);
+        $result->setData($thread_id);
+    }
 
     return $result;
 }
@@ -125,20 +153,29 @@ function fn_vendor_communication_update_thread(array $thread_data)
  */
 function fn_vendor_communication_validate_object_type($object_type)
 {
-    $available_object_types = array(
+    $available_object_types = [
         VC_OBJECT_TYPE_PRODUCT,
         VC_OBJECT_TYPE_COMPANY,
-    );
+        VC_OBJECT_TYPE_ORDER,
+    ];
+
+    /**
+     * Allows to add available object types
+     *
+     * @param array  $available_object_types Available object types
+     */
+    fn_set_hook('vendor_communication_get_object_type', $available_object_types);
 
     return in_array($object_type, $available_object_types);
 }
 
 /**
- * Add a new message to a thread
+ * Add a new message to a thread.
  *
- * @param array $message_data Message data array
+ * @param array<string, string|int> $message_data    Message data array.
+ * @param bool                      $notify_by_email Flag to create notifications.
  *
- * @return Tygh\Common\OperationResult
+ * @return \Tygh\Common\OperationResult
  */
 function fn_vendor_communication_add_thread_message(array $message_data, $notify_by_email = false)
 {
@@ -183,18 +220,26 @@ function fn_vendor_communication_add_thread_message(array $message_data, $notify
 
                 /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
                 $event_dispatcher = Tygh::$app['event.dispatcher'];
-                if (AREA === 'C') {
-                    $force_notification['C'] = false;
-                    $force_notification['A'] = ($message_data['user_type'] !== 'A');
+                $force_notification = [];
+                if (SiteArea::isStorefront(AREA)) {
+                    $force_notification[UserTypes::CUSTOMER] = false;
+                    $force_notification[UserTypes::ADMIN] = !UserTypes::isAdmin($message_data['user_type']);
                 } else {
                     $force_notification[$message_data['user_type']] = false;
+                }
+
+                if ($thread_full_data['communication_type'] == CommunicationTypes::VENDOR_TO_CUSTOMER) {
+                    $notification_type = 'vendor_communication.message_received';
+                } else {
+                    $notification_type = 'vendor_communication.vendor_to_admin_message_received';
                 }
 
                 /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
                 $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
                 $notification_rules = $notification_settings_factory->create($force_notification);
+                $thread_full_data['to_company_id'] = $thread_full_data['company_id'];
 
-                $event_dispatcher->dispatch('vendor_communication.message_received', $thread_full_data, $notification_rules);
+                $event_dispatcher->dispatch($notification_type, $thread_full_data, $notification_rules);
             }
         } else {
             $result->setSuccess(false);
@@ -418,58 +463,65 @@ function fn_vendor_communication_send_email_notification(array $email_data)
  *
  * @return array
  */
-function fn_vendor_communication_get_threads(array $params = array(), $items_per_page = 10)
+function fn_vendor_communication_get_threads(array $params = [], $items_per_page = 10)
 {
     $params = LastView::instance()->update('vc_threads', $params);
-    $conditions = $joins = array();
 
-    $fields = array(
-        'thread_id' => 'vendor_communications.thread_id',
-        'storefornt_id' => 'vendor_communications.storefront_id',
-        'status' => 'vendor_communications.status',
-        'user_id' => 'vendor_communications.user_id',
-        'company_id' => 'vendor_communications.company_id',
-        'object_id' => 'vendor_communications.object_id',
-        'object_type' => 'vendor_communications.object_type',
-        'last_message' => 'vendor_communications.last_message',
-        'last_message_user_id' => 'vendor_communications.last_message_user_id',
+    $conditions = $joins = [];
+
+    $fields = [
+        'thread_id'              => 'vendor_communications.thread_id',
+        'storefront_id'          => 'vendor_communications.storefront_id',
+        'status'                 => 'vendor_communications.status',
+        'user_id'                => 'vendor_communications.user_id',
+        'company_id'             => 'vendor_communications.company_id',
+        'object_id'              => 'vendor_communications.object_id',
+        'object_type'            => 'vendor_communications.object_type',
+        'last_message'           => 'vendor_communications.last_message',
+        'last_message_user_id'   => 'vendor_communications.last_message_user_id',
         'last_message_user_type' => 'vendor_communications.last_message_user_type',
-        'last_updated' => 'vendor_communications.last_updated',
-        'created_at' => 'vendor_communications.created_at',
-    );
+        'last_updated'           => 'vendor_communications.last_updated',
+        'created_at'             => 'vendor_communications.created_at',
+        'communication_type'     => 'vendor_communications.communication_type',
+        'subject'                => 'vendor_communications.subject',
+    ];
 
-    $default_params = array(
+    $default_params = [
         'get_company_data' => true,
-        'get_user_data' => true,
-        'page' => 1,
-        'items_per_page' => $items_per_page,
-        'exclude_statuses' => array(VC_THREAD_STATUS_DELETED),
-    );
+        'get_user_data'    => true,
+        'page'             => 1,
+        'items_per_page'   => $items_per_page,
+        'exclude_statuses' => [VC_THREAD_STATUS_DELETED],
+    ];
 
     $params = array_merge($default_params, $params);
 
-    $sortings = array(
-        'last_updated' => array('vendor_communications.last_updated', 'vendor_communications.thread_id'),
-        'created_at' => array('vendor_communications.created_at', 'vendor_communications.thread_id'),
+    $sortings = [
+        'last_updated' => ['vendor_communications.last_updated', 'vendor_communications.thread_id'],
+        'created_at' => ['vendor_communications.created_at', 'vendor_communications.thread_id'],
         'thread' => 'vendor_communications.thread_id',
-    );
+    ];
 
     if (!empty($params['user_id'])) {
         $conditions['user_id'] = db_quote(' AND vendor_communications.user_id = ?i', $params['user_id']);
-    }
-
-    if (!empty($params['company_id'])) {
-        $conditions['company_id'] = db_quote(' AND vendor_communications.company_id = ?i', $params['company_id']);
     }
 
     if ($params['get_company_data']) {
         $joins['companies'] = db_quote(' LEFT JOIN ?:companies AS companies ON companies.company_id = vendor_communications.company_id');
         $sortings['company'] = 'companies.company';
         $fields['company'] = 'companies.company';
+    }
 
-        if (!empty($params['company'])) {
-            $conditions['company'] = db_quote(' AND companies.company LIKE ?l', '%' . $params['company'] . '%');
-        }
+    if (isset($params['communication_type'])) {
+        $conditions['communication_type'] = db_quote(' AND vendor_communications.communication_type = ?s', $params['communication_type']);
+    }
+
+    if (isset($params['company_id'])) {
+        $conditions['company_id'] = db_quote(' AND vendor_communications.company_id = ?i', $params['company_id']);
+    }
+
+    if (isset($params['company_ids'])) {
+        $conditions['company_ids'] = db_quote(' AND vendor_communications.company_id IN (?n)', $params['company_ids']);
     }
 
     $period = !empty($params['period']) ? $params['period'] : null;
@@ -477,11 +529,11 @@ function fn_vendor_communication_get_threads(array $params = array(), $items_per
     $time_to = !empty($params['time_to']) ? $params['time_to'] : null;
 
     if ($period || $time_from || $time_to) {
-        list($time_from, $time_to) = fn_create_periods(array(
+        list($time_from, $time_to) = fn_create_periods([
             'period' => $period,
             'time_from' => $time_from,
             'time_to' => $time_to,
-        ));
+        ]);
 
         if ($time_from) {
             $conditions['time_from'] = db_quote(' AND vendor_communications.created_at >= ?i', $time_from);
@@ -584,16 +636,51 @@ function fn_vendor_communication_get_thread($params)
         && !empty($thread['object_id'])
         && !empty($thread['object_type'])
     ) {
-
-        if ($thread['object_type'] == VC_OBJECT_TYPE_PRODUCT) {
-            list($object) = fn_get_products(array('pid' => $thread['object_id']));
-            $thread['object'] = reset($object);
-        } elseif ($thread['object_type'] == VC_OBJECT_TYPE_COMPANY) {
-            $thread['object'] = fn_get_company_data($thread['object_id']);
-        }
+        $thread['object'] = fn_vendor_communication_get_object($thread['object_id'], $thread['object_type']);
     }
 
     return $thread;
+}
+
+/**
+ * Gets object data by Id
+ *
+ * @param $object_id
+ * @param $object_type
+ *
+ * @return array
+ */
+function fn_vendor_communication_get_object($object_id, $object_type)
+{
+    $object = [];
+
+    if ($object_type == VC_OBJECT_TYPE_PRODUCT) {
+        list($object_list) = fn_get_products(['pid' => $object_id]);
+        $object = reset($object_list);
+        fn_gather_additional_products_data($object, ['get_icon' => true, 'get_detailed' => true, 'get_options' => false, 'get_discounts' => false]);
+        $company = fn_get_company_data($object['company_id']);
+        $object['company'] = $company['company'];
+    } elseif ($object_type == VC_OBJECT_TYPE_COMPANY) {
+        $object = fn_get_company_data($object_id);
+    } elseif ($object_type == VC_OBJECT_TYPE_ORDER) {
+        $object = fn_get_order_info($object_id);
+        $company = fn_get_company_data($object['company_id']);
+        $object['company'] = $company['company'];
+    }
+
+    /**
+     * Allows to get data of additional objects
+     *
+     * @param int   $object_id   Object id
+     * @param int   $object_type Object type
+     * @param array $object      Object data
+     */
+    fn_set_hook('vendor_communication_get_object_data', $object_id, $object_type, $object);
+
+    $object['object_id'] = $object_id;
+    $object['object_type'] = $object_type;
+
+    return $object;
 }
 
 /**
@@ -740,24 +827,36 @@ function fn_vendor_communication_is_company_exists($company_id)
  */
 function fn_vendor_communication_get_thread_user_status(array $thread, array $auth)
 {
+    $status = '';
     // it is always "viewed" for admin
-    $status = VC_THREAD_STATUS_VIEWED;
-
-    if (!empty($thread['status'])
-        && !empty($thread['last_message_user_id'])
-        && $thread['status'] == VC_THREAD_STATUS_HAS_NEW_MESSAGE
-        && !empty($auth['user_type'])
-        && !empty($auth['user_id'])
+    if (
+        fn_allowed_for('MULTIVENDOR')
+        && $thread['communication_type'] == CommunicationTypes::VENDOR_TO_CUSTOMER
+        && $auth['user_type'] == UserTypes::ADMIN
     ) {
-        if ($auth['user_type'] == UserTypes::CUSTOMER
-            && $auth['user_id'] != $thread['last_message_user_id']
-        ) {
-            $status = VC_THREAD_STATUS_HAS_NEW_MESSAGE;
-        } elseif ($auth['user_type'] == UserTypes::VENDOR
-            && $thread['user_id'] == $thread['last_message_user_id']
-        ) {
-            $status = VC_THREAD_STATUS_HAS_NEW_MESSAGE;
-        }
+        $status = VC_THREAD_STATUS_VIEWED;
+        return $status;
+    }
+
+    if (
+        !isset($thread['status'])
+        || !isset($thread['last_message_user_id'])
+        || $thread['status'] != VC_THREAD_STATUS_HAS_NEW_MESSAGE
+    ) {
+        return $status;
+    }
+
+    if (
+        $auth['user_type'] != UserTypes::ADMIN
+        && $auth['user_id'] != $thread['last_message_user_id']
+        && $auth['user_type'] != $thread['last_message_user_type']
+    ) {
+        $status = VC_THREAD_STATUS_HAS_NEW_MESSAGE;
+        return $status;
+    }
+
+    if ($auth['user_type'] == UserTypes::ADMIN && $thread['last_message_user_type'] != UserTypes::ADMIN) {
+        $status = VC_THREAD_STATUS_HAS_NEW_MESSAGE;
     }
 
     return $status;
@@ -847,6 +946,70 @@ function fn_vendor_communication_mark_threads_as_deleted_by_ids(array $thread_id
 }
 
 /**
+ * Checks if required fields are filled
+ *
+ * @param array $request Request params
+ *
+ * @return bool
+ */
+function fn_vendor_communication_is_required_fields_filled(array $request)
+{
+    if (!isset($request['thread']) || !isset($request['thread']['communication_type'])) {
+        return false;
+    }
+
+    $required_fields = [];
+    $required_fields[] = 'message';
+    if ($request['thread']['communication_type'] === CommunicationTypes::VENDOR_TO_ADMIN) {
+        $required_fields[] = 'companies';
+    } else {
+        $required_fields[] = 'company_id';
+    }
+
+    foreach ($required_fields as $field) {
+        if (!isset($request['thread'][$field])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Checks if communication type is enabled in addon settings
+ *
+ * @param string $communication_type Communication type
+ *
+ * @return bool
+ */
+function fn_vendor_communication_is_communication_type_active($communication_type)
+{
+    if (fn_allowed_for('ULTIMATE') && $communication_type == CommunicationTypes::VENDOR_TO_CUSTOMER) {
+        return true;
+    }
+
+    return Registry::get('addons.vendor_communication.' . $communication_type . '_communication') === YesNo::YES;
+}
+
+/**
+ * Gets redirect url to the thread with communication type param
+ *
+ * @param int $thread_id Thread id
+ *
+ * @return string|false
+ */
+function fn_vendor_communication_get_redirect_to_communication_type($thread_id)
+{
+    $thread = fn_vendor_communication_get_thread(['thread_id' => $thread_id]);
+
+    if (empty($thread)) {
+        return false;
+    }
+
+    return fn_url('vendor_communication.view?thread_id=' . $thread['thread_id'] . '&communication_type=' . $thread['communication_type']);
+}
+
+/**
  * Hook handler for "delete_company"
  */
 function fn_vendor_communication_delete_company($company_id, $result)
@@ -866,3 +1029,74 @@ function fn_vendor_communication_post_delete_user($user_id, $user_data, $result)
     }
 }
 
+/**
+ * Hook handler: adds object types to available object types of the Message center
+ */
+function fn_advanced_import_vendor_communication_get_object_type(&$object_types)
+{
+    $object_types[] = VC_OBJECT_TYPE_IMPORT_PRESET;
+}
+
+/**
+ * Hook handler: gets data of additional objects
+ */
+function fn_advanced_import_vendor_communication_get_object_data($object_id, $object_type, &$object)
+{
+    if ($object_type == VC_OBJECT_TYPE_IMPORT_PRESET) {
+        list($import_presets) = fn_get_import_presets(['preset_id' => $object_id]);
+        $object = reset($import_presets);
+        $company = fn_get_company_data($object['company_id']);
+        $object['company'] = $company['company'];
+    }
+}
+
+function fn_vendor_communication_install()
+{
+    list($root_admins,) = fn_get_users([
+        'is_root' => YesNo::YES,
+        'user_type' => UserTypes::ADMIN,
+    ], Tygh::$app['session']['auth']);
+
+    foreach ($root_admins as $root_admin) {
+        if (!$root_admin['company_id']) {
+            fn_update_notification_receiver_search_conditions(
+                'group',
+                'vendor_communication',
+                UserTypes::ADMIN,
+                [
+                    new SearchCondition(ReceiverSearchMethods::USER_ID, $root_admin['user_id']),
+                ]
+            );
+
+            break;
+        }
+    }
+
+    if (fn_allowed_for('MULTIVENDOR')) {
+        fn_update_notification_receiver_search_conditions(
+            'group',
+            'vendor_communication',
+            UserTypes::VENDOR,
+            [
+                new SearchCondition(ReceiverSearchMethods::VENDOR_OWNER, ReceiverSearchMethods::VENDOR_OWNER),
+            ]
+        );
+    }
+}
+
+function fn_vendor_communication_uninstall()
+{
+    fn_update_notification_receiver_search_conditions(
+        'group',
+        'vendor_communication',
+        UserTypes::ADMIN,
+        []
+    );
+
+    fn_update_notification_receiver_search_conditions(
+        'group',
+        'vendor_communication',
+        UserTypes::VENDOR,
+        []
+    );
+}

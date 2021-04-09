@@ -6,9 +6,11 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.11.3/addons/data_feeds.po\n"
-"PO-Revision-Date: 2020-02-04 07:11\n"
+"X-Crowdin-File: /release-4.12.2/addons/data_feeds.po\n"
+"X-Crowdin-File-ID: 4052\n"
+"PO-Revision-Date: 2021-02-01 09:01\n"
 
 msgctxt "Addons::name::data_feeds"
 msgid "Data feeds"
@@ -88,7 +90,7 @@ msgstr "Úprava datového zdroje"
 
 msgctxt "Languages::datafeed.description"
 msgid "Only the products that meet <strong>all</strong> of the conditions below will be exported:"
-msgstr ""
+msgstr "Pouze produkty, které splňují <strong>všechny</strong> podmínky níže, budou exportovány:"
 
 msgctxt "Languages::export_cron_hint"
 msgid "Use the following line to run the script according to schedule"
@@ -104,11 +106,11 @@ msgstr "Nelze se připojit k FTP serveru. Zkontrolujte informace o připojení F
 
 msgctxt "Languages::categories_in"
 msgid "Categories in"
-msgstr ""
+msgstr "Kategorie v"
 
 msgctxt "Languages::products_in"
 msgid "Products in"
-msgstr ""
+msgstr "Produkty v"
 
 msgctxt "Languages::local_export"
 msgid "Download"
@@ -168,9 +170,9 @@ msgstr "Žádná data nebyla exportována"
 
 msgctxt "Languages::data_feeds.text_tooltip_field_name"
 msgid "The name of the column in the data feed file."
-msgstr ""
+msgstr "Název sloupce v souboru feedu."
 
 msgctxt "Languages::data_feeds.text_tooltip_field_type"
 msgid "The type of data from your store which will be exported to this column of the data feed file."
-msgstr ""
+msgstr "Typ dat z vašeho obchodu, jenž bude exportován do tohoto sloupku vašeho souboru s feedem."
 

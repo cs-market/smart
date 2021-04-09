@@ -14,7 +14,7 @@
 {/capture}
 
 {if $view == "input"}
-    <input type="text" name="{$input_name}" value="{$value}" class="cm-numeric {$class}" data-a-sign="{$currencies.$primary_currency.symbol|strip_tags nofilter}" {if $currencies.$primary_currency.after == "Y"}data-p-sign="s"{/if} data-a-dec="." data-a-sep="," {if $product_id}data-ct-product="{$product_id}"{/if}>
+    <input type="text" id="{$input_id}" name="{$input_name}" value="{$value}" class="cm-numeric {$class}" placeholder="{$placeholder}" data-a-sign="{$currencies.$primary_currency.symbol|strip_tags nofilter}" {if $currencies.$primary_currency.after == "Y"}data-p-sign="s"{/if} data-a-dec="." data-a-sep="," {if $product_id}data-ct-product="{$product_id}"{/if}>
 {else}
     {$smarty.capture.currencies nofilter}
 {/if}

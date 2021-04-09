@@ -14,9 +14,12 @@
 
 use Tygh\Common\OperationResult;
 use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ProductTracking;
 use Tygh\Helpdesk;
 use Tygh\Http;
 use Tygh\Mailer\Mailer;
+use Tygh\Mailer\Transports\PhpMailerTransport;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Enum\YesNo;
@@ -221,7 +224,7 @@ function fn_validate_stmp_connection_details($host, $username, $password, $encry
     $transport = $mailer->getTransport($transport_settings);
 
     $result = new OperationResult(false);
-    if ($transport instanceof \Tygh\Mailer\Transports\PhpMailerTransport) {
+    if ($transport instanceof PhpMailerTransport) {
         try {
             $debug_output_handler = static function ($error_message) use ($result) {
                 static $i = 0;
@@ -235,7 +238,7 @@ function fn_validate_stmp_connection_details($host, $username, $password, $encry
             $transport->SMTPDebug = 1;
             $transport->Debugoutput = $debug_output_handler;
             $result->setSuccess($transport->smtpConnect());
-        } catch (phpmailerException $e) {
+        } catch (PHPMailerException $e) {
             $result->addError('', $e->getMessage());
         }
     }
@@ -340,4 +343,126 @@ function fn_settings_actions_emails_mailer_smtp_auth($new_value, $old_value)
 {
     Registry::isExist('smtp_settings') or register_shutdown_function('fn_check_smtp_settings_and_restore_on_fail');
     Registry::set('smtp_settings.mailer_smtp_auth', $old_value);
+}
+
+/**
+ * For backward compatibility:
+ *  - Saves inventory_tracking setting
+ *
+ * @param string              $new_value New setting value
+ * @param string              $old_value Old setting value
+ * @param \Tygh\Settings|null $instance  Instance of settings
+ */
+function fn_settings_actions_general_global_tracking($new_value, $old_value, $instance = null)
+{
+    if ($instance === null) {
+        $instance = Settings::instance();
+    }
+
+    if ($new_value === ProductTracking::TRACK || !isset($new_value)) {
+        $instance->updateValue('inventory_tracking', YesNo::YES, 'General', false, null, false);
+        return;
+    }
+
+    $instance->updateValue('inventory_tracking', YesNo::NO, 'General', false, null, false);
+}
+
+/**
+ * For backward compatibility:
+ *  - Saves default_product_details_view setting
+ *
+ * @param string              $new_value New setting value
+ * @param string              $old_value Old setting value
+ * @param \Tygh\Settings|null $instance  Instance of settings
+ */
+function fn_settings_actions_appearance_global_product_details_view($new_value, $old_value, $instance = null)
+{
+    if ($new_value === null) {
+        return;
+    }
+    if ($instance === null) {
+        $instance = Settings::instance();
+    }
+
+    $instance->updateValue('default_product_details_view', $new_value, 'Appearance');
+}
+
+/**
+ * Validates max qty settings with qty step setting
+ *
+ * @param string $new_value New value
+ * @param string $old_value Old value
+ */
+function fn_settings_actions_checkout_global_max_qty($new_value, $old_value)
+{
+    Registry::isExist('qty_settings') or register_shutdown_function('fn_validate_qty_settings');
+    Registry::set('qty_settings.max_qty', $old_value);
+}
+
+/**
+ * Validates min qty settings with qty step setting
+ *
+ * @param string $new_value New value
+ * @param string $old_value Old value
+ */
+function fn_settings_actions_checkout_global_min_qty($new_value, $old_value)
+{
+    Registry::isExist('qty_settings') or register_shutdown_function('fn_validate_qty_settings');
+    Registry::set('qty_settings.min_qty', $old_value);
+}
+
+/**
+ * Validates qty step settings with min/max qty settings
+ *
+ * @param string $new_value New value
+ * @param string $old_value Old value
+ */
+function fn_settings_actions_checkout_global_qty_step($new_value, $old_value)
+{
+    Registry::isExist('qty_settings') or register_shutdown_function('fn_validate_qty_settings');
+    Registry::set('qty_settings.qty_step', $old_value);
+}
+
+/**
+ * Validates setting with quantity step
+ *
+ * @param string|int $value Value
+ * @param string|int $step  Step
+ *
+ * @return bool|int
+ */
+function fn_validate_qty_setting_with_step($value, $step)
+{
+    if (
+        $value === null
+        || $value === ''
+        || (int) $value === 0
+        || $step === null
+        || (int) $step === 0
+    ) {
+        return false;
+    }
+
+    return fn_ceil_to_step(abs((int) $value), (int) $step);
+}
+
+/**
+ * Validates all qty settings with quantity step and updates it if needs
+ */
+function fn_validate_qty_settings()
+{
+    $qty_step = Settings::instance()->getValue('global_qty_step', 'Checkout');
+
+    foreach (['min_qty', 'max_qty'] as $qty_setting) {
+        $old_qty_value = Settings::instance()->getValue('global_' . $qty_setting, 'Checkout');
+        $correct_value = fn_validate_qty_setting_with_step($old_qty_value, $qty_step);
+
+        if (empty($correct_value) || $old_qty_value === $correct_value) {
+            continue;
+        }
+
+        Settings::instance()->updateValue('global_' . $qty_setting, (string) $correct_value, 'Checkout', false, null, false);
+    }
+
+    Registry::del('qty_settings');
 }

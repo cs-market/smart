@@ -27,16 +27,19 @@
                     <option value="1" {if $search.rating_value == "1"}selected="selected"{/if}>{__("poor")}</option>
                 </select>
             </div>
-            
-            <div class="sidebar-field">
-                <label for="discussion_type">{__("discussion")}</label>
-                <select name="type" id="discussion_type">
-                    <option value="">--</option>
-                    <option value="B" {if $search.type == "B"}selected="selected"{/if}>{__("rating")} & {__("communication")}</option>
-                    <option value="R" {if $search.type == "R"}selected="selected"{/if}>{__("rating")}</option>
-                    <option value="C" {if $search.type == "C"}selected="selected"{/if}>{__("communication")}</option>
-                </select>
-            </div>               
+
+            {if !$company_id}
+                <div class="sidebar-field">
+                    <label for="discussion_type">{__("vendor")}</label>
+                    {include file="views/companies/components/picker/picker.tpl"
+                        input_name="company_id"
+                        show_advanced=false
+                        show_empty_variant=true
+                        item_ids=($search.company_id) ? [$search.company_id] : []
+                        empty_variant_text=__("any_vendor")
+                    }
+                </div>
+            {/if}
 {/capture}
 
 {capture name="advanced_search"}

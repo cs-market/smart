@@ -14,17 +14,17 @@
 {script src="js/lib/autonumeric/autoNumeric.js"}
 {script src="js/lib/appear/jquery.appear-1.1.1.js"}
 {script src="js/lib/tools/tooltip.min.js"}
-{script src="js/lib/dropzone/dist/dropzone.js"}
 {script src="js/lib/bootstrap_switch/js/bootstrapSwitch.js"}
 {script src="js/tygh/backend/companies.js"}
 {script src="js/tygh/editors/`$settings.Appearance.default_wysiwyg_editor`.editor.js"}
 
 {script src="js/tygh/ajax.js"}
 
+{script src="js/tygh/backend/heading.js"}
 {script src="js/tygh/quick_menu.js"}
-{script src="js/tygh/file_uploader.js"}
 {script src="js/tygh/backend/storefront_switcher.js"}
 {script src="js/tygh/backend/company_switcher.js"}
+{script src="js/tygh/backend/buttons/update_for_all.js"}
 
 {* Responsive adminpanel helpers scripts *}
 {script src="js/tygh/backend/bulkedit.js"}
@@ -41,6 +41,7 @@
 {script src="js/lib/inputmask-multi/jquery.inputmask-multi.js"}
 
 {script src="js/tygh/phone_mask.js"}
+{script src="js/tygh/backend/autocomplete.js"}
 
 {capture name="promo_data"}
     <div class="commercial-promotion-text">
@@ -87,7 +88,6 @@
         file_browser: '{__("file_browser")|escape:"javascript"}',
         editing_block: '{__("editing_block")|escape:"javascript"}',
         editing_grid: '{__("editing_grid")|escape:"javascript"}',
-        editing_container: '{__("editing_container")|escape:"javascript"}',
         adding_grid: '{__("adding_grid")|escape:"javascript"}',
         adding_block_to_grid: '{__("adding_block_to_grid")|escape:"javascript"}',
         manage_blocks: '{__("manage_blocks")|escape:"javascript"}',
@@ -141,7 +141,11 @@
             title: '{$addon_permissions_text.title|escape:javascript nofilter}',
             text: '{$smarty.capture.promo_data|escape:javascript nofilter}'
         },
-        phone_validation_mode: '{$settings.Appearance.phone_validation_mode}'
+        phone_validation_mode: '{$settings.Appearance.phone_validation_mode}',
+        hash_of_available_countries: '{$hash_of_available_countries}',
+        product_version: '{$product_version}',
+        product_edition: '{$product_edition}',
+        current_dispatch: '{$current_dispatch}'
     });
 
     $.extend(_, {
@@ -150,6 +154,7 @@
             useBrowserHistory: true,
             resizable: false,
             lang: _.cart_language,
+            i18nBaseUrl: 'js/lib/elfinder/js/i18n',
             ui: ['toolbar', 'tree', 'path', 'stat'],
             uiOptions: {
                 toolbar: [

@@ -47,6 +47,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix .= '.manage';
     }
 
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['usergroup_ids'])
+        && is_array($_REQUEST['usergroup_ids'])
+        && !empty($_REQUEST['status'])
+    ) {
+        $status_to = (string) $_REQUEST['status'];
+
+        foreach ($_REQUEST['usergroup_ids'] as $usergroup_id) {
+            fn_tools_update_status([
+                'table'             => 'usergroups',
+                'status'            => $status_to,
+                'id_name'           => 'usergroup_id',
+                'id'                => $usergroup_id,
+                'show_error_notice' => false
+            ]);
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('usergroups.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+    }
+
     if ($mode == 'bulk_update_status') {
         if (!empty($_REQUEST['link_ids'])) {
             $new_status = $action == 'approve' ? 'A' : 'D';
@@ -120,10 +149,13 @@ if ($mode == 'manage') {
     if (fn_allowed_for('ULTIMATE')) {
         $usergroups = array_merge($usergroups, $customer_usergroups);
     }
+    $privileges_data = (array) fn_get_usergroup_privileges(['type' => UsergroupTypes::TYPE_ADMIN]);
+    $grouped_privileges = fn_group_usergroup_privileges($privileges_data);
 
     Tygh::$app['view']->assign(array(
-        'usergroups'      => $usergroups,
-        'usergroup_types' => $usergroup_types,
+        'usergroups'         => $usergroups,
+        'usergroup_types'    => $usergroup_types,
+        'grouped_privileges' => $grouped_privileges,
     ));
 
     Registry::set('navigation.tabs', array (
@@ -179,4 +211,19 @@ if ($mode == 'manage') {
     Tygh::$app['view']->assign('usergroup_requests', $requests);
     Tygh::$app['view']->assign('search', $search);
 }
-
+if ($mode === 'get_privileges') {
+    $usergroup = [
+        'type' => $_REQUEST['type'],
+    ];
+    $show_privileges_tab = fn_check_can_usergroup_have_privileges($usergroup);
+    $grouped_privileges = [];
+    if ($show_privileges_tab) {
+        $privileges_data = (array) fn_get_usergroup_privileges($usergroup);
+        $grouped_privileges = fn_group_usergroup_privileges($privileges_data);
+    }
+    Tygh::$app['view']->assign('grouped_privileges', $grouped_privileges);
+    Tygh::$app['view']->assign('id', 0);
+    Tygh::$app['view']->assign('show_privileges_tab', $usergroup['type'] !== UsergroupTypes::TYPE_CUSTOMER);
+    Tygh::$app['view']->display('views/usergroups/components/get_privileges.tpl');
+    return [CONTROLLER_STATUS_NO_CONTENT];
+}

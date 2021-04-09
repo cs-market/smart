@@ -58,6 +58,7 @@
                     <label class="control-label" for="amount_prepaid_{$id}">{__("yandex_delivery.amount_prepaid")}</label>
                     <div class="controls">
                         <input id="amount_prepaid_{$id}" class="input-small" type="text" name="yandex_order[amount_prepaid]" size="45" value="{$yandex_order_data.amount_prepaid.$id}" />
+                        <p class="muted description">{__("ttc_yandex_delivery.amount_prepaid")}</p>
                     </div>
                 </div>
 
@@ -73,8 +74,8 @@
                         <div class="controls">
                             <label for="shipment_notify_user_{$id}" class="checkbox">
                                 <input type="checkbox" name="yandex_order[notify_user]" id="shipment_notify_user_{$id}" value="Y" />
-                                {include file="common/tooltip.tpl" tooltip={__("yandex_delivery.info_about_of_tracking_number")}}
                                 {__("send_shipment_notification_to_customer")}</label>
+                                <p class="muted description">{__("yandex_delivery.info_about_of_tracking_number")}</p>
                         </div>
                     </div>
                 </div>

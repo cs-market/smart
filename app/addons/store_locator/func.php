@@ -770,21 +770,6 @@ function fn_store_locator_format_pickup_point_address($pickup_data)
 }
 
 /**
- * Hook handler: after fetching shipping data
- */
-function fn_store_locator_get_shipping_info_after_select($shipping_id, $lang_code, &$shipping)
-{
-    if (empty($shipping['service_id'])) {
-        return;
-    }
-
-    $service = fn_get_shipping_service_data($shipping['service_id']);
-    if ($service['code'] === 'pickup' && $service['module'] === 'store_locator') {
-        $shipping['allow_multiple_locations'] = true;
-    }
-}
-
-/**
  * The "calculate_cart_post" hook handler.
  *
  * Actions performed:

@@ -12,14 +12,18 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Addons\VendorDataPremoderation\State;
 use Tygh\Addons\VendorDataPremoderation\ServiceProvider;
+use Tygh\Addons\VendorDataPremoderation\State;
 use Tygh\Enum\Addons\VendorDataPremoderation\PremoderationStatuses;
 use Tygh\Enum\Addons\VendorDataPremoderation\ProductStatuses;
 use Tygh\Enum\ObjectStatuses;
-use Tygh\Enum\YesNo;
-use Tygh\Registry;
+use Tygh\Enum\ProfileFieldTypes;
+use Tygh\Enum\ReceiverSearchMethods;
+use Tygh\Enum\UserTypes;
 use Tygh\Enum\VendorStatuses;
+use Tygh\Enum\YesNo;
+use Tygh\Notifications\Receivers\SearchCondition;
+use Tygh\Registry;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -142,8 +146,9 @@ function fn_vendor_data_premoderation_approve_products(array $product_ids, $upda
         $products_companies = fn_get_company_ids_by_product_ids($updated_product_ids);
         foreach ($products_companies as $company_id => $company_product_ids) {
             $event_dispatcher->dispatch('vendor_data_premoderation.product_status.approved', [
-                'company_id' => $company_id,
-                'product_ids' => $company_product_ids,
+                'company_id'    => $company_id,
+                'to_company_id' => $company_id,
+                'product_ids'   => $company_product_ids,
             ]);
         }
     }
@@ -233,9 +238,10 @@ function fn_vendor_data_premoderation_disapprove_products(array $product_ids, $u
         $products_companies = fn_get_company_ids_by_product_ids($updated_product_ids);
         foreach ($products_companies as $company_id => $company_product_ids) {
             $event_dispatcher->dispatch('vendor_data_premoderation.product_status.disapproved', [
-                'company_id'  => $company_id,
-                'product_ids' => $company_product_ids,
-                'reason'      => $reason
+                'company_id'    => $company_id,
+                'to_company_id' => $company_id,
+                'product_ids'   => $company_product_ids,
+                'reason'        => $reason
             ]);
         }
     }
@@ -404,13 +410,18 @@ function fn_vendor_data_premoderation_delete_premoderation($product_ids)
 /**
  * Checks whether a product changed by a company requires prior approval.
  *
- * @param array $company_data Company data
- * @param bool  $is_created   Whether a product is created
+ * @param array<string, string> $company_data           Company data
+ * @param bool                  $is_created             Whether a product is created
+ * @param null|bool             $current_product_status Current product status
  *
  * @return bool
  */
-function fn_vendor_data_premoderation_product_requires_approval(array $company_data, $is_created = false)
+function fn_vendor_data_premoderation_product_requires_approval(array $company_data, $is_created = false, $current_product_status = null)
 {
+    if ($current_product_status === ProductStatuses::DISAPPROVED) {
+        return true;
+    }
+
     static $create_premoderation_mode = null;
     if ($create_premoderation_mode === null) {
         $create_premoderation_mode = Registry::get('addons.vendor_data_premoderation.products_prior_approval');
@@ -485,6 +496,14 @@ function fn_vendor_data_premoderation_get_approval_info_text()
  * @param array<string, string> $company_data      New company data
  * @param array<string, string> $orig_company_data Original company data
  *
+ * @psalm-param array{
+ *   fields?: array<int, string>
+ * } $company_data
+ *
+ * @psalm-param array{
+ *   fields?: array<int, string>
+ * } $orig_company_data
+ *
  * @return array<string, string>
  */
 function fn_vendor_data_premoderation_diff_company_data(array $company_data, array $orig_company_data)
@@ -495,9 +514,42 @@ function fn_vendor_data_premoderation_diff_company_data(array $company_data, arr
     ];
 
     foreach ($check_fields as $field) {
-        if (isset($company_data[$field]) && isset($orig_company_data[$field])) {
-            $company_data[$field] = preg_replace('/\r\n|\r|\n/', '', $company_data[$field]);
-            $orig_company_data[$field] = preg_replace('/\r\n|\r|\n/', '', $orig_company_data[$field]);
+        if (!isset($company_data[$field], $orig_company_data[$field])) {
+            continue;
+        }
+        $company_data[$field] = preg_replace('/\r\n|\r|\n/', '', $company_data[$field]);
+        $orig_company_data[$field] = preg_replace('/\r\n|\r|\n/', '', $orig_company_data[$field]);
+    }
+
+    if (isset($company_data['fields'])) {
+        foreach ($company_data['fields'] as $field_id => &$field_data) {
+            if (fn_get_profile_field_type($field_id) === ProfileFieldTypes::FILE) {
+                unset($company_data['fields'][$field_id]);
+            } elseif (!empty($field_data) && fn_get_profile_field_type($field_id) === ProfileFieldTypes::DATE) {
+                $field_data = fn_parse_date($field_data);
+            } elseif (
+                !isset($orig_company_data['fields'][$field_id])
+                && (
+                    empty($field_data)
+                    || (fn_get_profile_field_type($field_id) === ProfileFieldTypes::CHECKBOX && $field_data === YesNo::NO)
+                )
+            ) {
+                unset($company_data['fields'][$field_id]);
+            }
+        }
+        unset($field_data);
+
+        $files = fn_filter_uploaded_data('profile_fields'); // FIXME: dirty comparison
+        if (!empty($files)) {
+            return $files;
+        }
+
+        if (isset($orig_company_data['fields'])) {
+            $result = array_diff_assoc($company_data['fields'], $orig_company_data['fields']);
+            if (!empty($result)) {
+                return $result;
+            }
+            unset($company_data['fields'], $orig_company_data['fields']);
         }
     }
 
@@ -514,6 +566,30 @@ function fn_vendor_data_premoderation_diff_company_data(array $company_data, arr
     fn_set_hook('vendor_data_premoderation_diff_company_data_post', $company_data, $orig_company_data, $company_data_diff);
 
     return $company_data_diff;
+}
+
+function fn_vendor_data_premoderation_install()
+{
+    fn_update_notification_receiver_search_conditions(
+        'group',
+        'vendor_data_premoderation',
+        UserTypes::VENDOR,
+        [
+            new SearchCondition(ReceiverSearchMethods::VENDOR_OWNER, ReceiverSearchMethods::VENDOR_OWNER),
+        ]
+    );
+}
+
+function fn_vendor_data_premoderation_uninstall()
+{
+    fn_update_notification_receiver_search_conditions(
+        'group',
+        'vendor_data_premoderation',
+        UserTypes::VENDOR,
+        []
+    );
+
+    fn_vendor_data_premoderation_display_notification_for_deleted_statuses();
 }
 
 /**

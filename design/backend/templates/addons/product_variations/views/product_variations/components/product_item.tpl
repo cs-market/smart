@@ -1,5 +1,5 @@
 <tr>
-    <td width="40">
+    <td>
         {if !$product.parent_product_id && $product.has_children}
             <button alt="{__("expand_collapse_list")}" title="{__("expand_collapse_list")}" id="sw_product_variations_group_{$product.product_id}" aaaid="on_variations" class="cm-combinations cm-product-variations__collapse product-variations__collapse-btn product-variations__collapse-btn--collapsed" type="button">
                 <span class="icon-caret-down" data-ca-switch-id="product_variations_group_{$product.product_id}"> </span>
@@ -23,18 +23,18 @@
         </td>
     {/if}
 
-    <td class="product-variations__table-name">
+    <td class="product-variations__table-name" data-th="{__("name")}">
         <input type="hidden" name="products_data[{$product.product_id}][product]" value="{$product.product}" class="{$no_hide_input_if_shared_product}"/>
 
         {if $product_id == $product.product_id}
-            <strong>{$product.product|truncate:140 nofilter}</strong>
+            <strong class="product-variations__table-name--text">{$product.product|truncate:50 nofilter}</strong>
         {else}
-            <a title="{$product.product|strip_tags}" href="{"products.update?product_id=`$product.product_id`"|fn_url}">{$product.product|truncate:140 nofilter}</a>
+            <a class="product-variations__table-name--link" title="{$product.product|strip_tags}" href="{"products.update?product_id=`$product.product_id`"|fn_url}">{$product.product|truncate:50 nofilter}</a>
         {/if}
         {include file="views/companies/components/company_name.tpl" object=$product}
     </td>
 
-    <td width="13%" data-th="{__("sku")}">
+    <td data-th="{__("sku")}">
         {if $is_form_readonly || !$product.product_type_instance->isFieldAvailable("product_code")}
             <div class="product-variations__table-code">{$product.product_code}</div>
         {else}
@@ -44,9 +44,9 @@
 
     {foreach $selected_features as $feature}
         {if $is_form_readonly || !$product.product_type_instance->isFieldAvailable("variation_features")}
-            <td><span>{$product.variation_features[$feature.feature_id].variant}</span></td>
+            <td data-th="{$feature.description}"><span>{$product.variation_features[$feature.feature_id].variant}</span></td>
         {else}
-            <td><select
+            <td data-th="{$feature.description}"><select
                         name="products_variation_feature_values[{$product.product_id}][{$feature.feature_id}]"
                         class="input-hidden product-variations__table-select js-product-variation-feature-item"
                         data-ca-feature-id="{$feature.feature_id}"
@@ -63,7 +63,7 @@
     <td class="{$no_hide_input_if_shared_product}" width="13%" data-th="{__("price")}">
         <input type="text" name="products_data[{$product.product_id}][price]" value="{$product.price|fn_format_price:$primary_currency:null:false}" class="input-full input-hidden product-variations__table-price"/>
     </td>
-    <td width="9%" data-th="{__("quantity")}">
+    <td data-th="{__("quantity")}">
         {hook name="product_variations:list_quantity"}
             {if $is_form_readonly}
                 <div class="product-variations__table-quantity">{$product.amount}</div>
@@ -72,10 +72,10 @@
             {/if}
         {/hook}
     </td>
-    <td width="6%" class="nowrap mobile-hide">
+    <td class="nowrap mobile-hide">
         <div class="hidden-tools cm-hide-with-inputs">
             {capture name="tools_list"}
-                {if !$is_form_readonly && $product.parent_product_id}
+                {if !$is_form_readonly && $product.parent_product_id && $product.status === "A"}
                     <li>{btn type="list" id="mark_main_product_product_from_group_{$product.product_id}" text=__("product_variations.mark_main_product") class="cm-post cm-confirm" href="product_variations.mark_main_product?product_id={$product.product_id}&redirect_url={$redirect_url|escape:url}" method="POST"}</li>
                 {/if}
                 <li>{btn type="list" text=__("edit") href="{"products.update?product_id=`$product.product_id`"|fn_url}"}</li>
@@ -87,5 +87,17 @@
             {/capture}
             {dropdown content=$smarty.capture.tools_list}
         </div>
+    </td>
+    <td class="right nowrap" data-th="{__("status")}">
+        {include file="views/products/components/status_on_manage.tpl"
+            popup_additional_status_class="dropleft"
+            id=$product.product_id
+            status=$product.status
+            hidden=true
+            object_id_name="product_id"
+            table="products"
+            st_return_url=$config.current_url
+            st_result_ids="content_variations"
+        }
     </td>
 </tr>

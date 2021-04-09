@@ -29,7 +29,7 @@
                                         <option value="feature.{$data.value}" selected="selected">{$data.feature_name}</option>
                                     {/if}
                                 </select>
-                                <div class="right update-for-all">
+                                <div class="right">
                                 </div>
                             </div>
                         </div>

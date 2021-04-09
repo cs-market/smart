@@ -10,6 +10,9 @@ REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`,
 REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(19, 'Gift certificates', 'index.php?dispatch=pages.view&page_id=19', '', 'en');
 REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(6, 'Free shipping', 'index.php?dispatch=pages.view&page_id=22', '', 'en');
 REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(9, 'Discount if select pickup', 'index.php?dispatch=pages.view&page_id=20', '', 'en');
+REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(20, 'X-Box Mobile', 'index.php?dispatch=products.view&product_id=5764', '', 'en');
+REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(21, 'Acme Mobile', 'index.php?dispatch=pages.view&page_id=25', '', 'en');
+REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(22, 'Multivendor demo mobile', 'index.php?dispatch=pages.view&page_id=24', '', 'en');
 
 REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(35, 16, 'en');
 REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(36, 17, 'en');
@@ -17,3 +20,6 @@ REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUE
 REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(38, 19, 'en');
 REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(39, 6, 'en');
 REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(40, 9, 'en');
+REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(41, 20, 'en');
+REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(42, 21, 'en');
+REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(47, 22, 'en');

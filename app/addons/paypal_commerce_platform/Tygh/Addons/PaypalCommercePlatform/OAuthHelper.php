@@ -179,9 +179,6 @@ class OAuthHelper
      *       },
      *       operation: string
      *     },
-     *     array{
-     *       operation: string
-     *     }
      *   },
      *   partner_config_override: array{
      *     action_renewal_url: string,
@@ -262,9 +259,6 @@ class OAuthHelper
                             ],
                         ],
                     ],
-                ],
-                [
-                    'operation' => 'BANK_ADDITION',
                 ],
             ],
             'products'                => [

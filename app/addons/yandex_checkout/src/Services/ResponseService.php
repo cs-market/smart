@@ -15,11 +15,10 @@
 namespace Tygh\Addons\YandexCheckout\Services;
 
 use Tygh\Addons\YandexCheckout\Enum\PaymentStatus;
-use YandexCheckout\Model\Metadata;
-use YandexCheckout\Model\Notification\NotificationCanceled;
-use YandexCheckout\Model\Notification\NotificationRefundSucceeded;
-use YandexCheckout\Model\Notification\NotificationSucceeded;
-use YandexCheckout\Model\NotificationEventType;
+use YooKassa\Model\Metadata;
+use YooKassa\Model\Notification\NotificationCanceled;
+use YooKassa\Model\Notification\NotificationSucceeded;
+use YooKassa\Model\NotificationEventType;
 
 /**
  * Class ResponseService allows to work with responses from Yandex.Checkout API
@@ -31,7 +30,7 @@ class ResponseService
     /**
      * @param $response
      *
-     * @return \YandexCheckout\Model\Metadata
+     * @return \YooKassa\Model\Metadata
      */
     public function getMetadataFromNotification($response)
     {
@@ -46,7 +45,7 @@ class ResponseService
     /**
      * @param $response
      *
-     * @return \YandexCheckout\Model\Notification\NotificationCanceled|\YandexCheckout\Model\Notification\NotificationSucceeded|null
+     * @return \YooKassa\Model\Notification\NotificationCanceled|\YooKassa\Model\Notification\NotificationSucceeded|null
      */
     protected function getNotificationFromResponse($response)
     {

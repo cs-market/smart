@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-ru\n"
 "X-Crowdin-Project-ID: 54044\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.11.5/addons/rus_pickpoint.po\n"
-"X-Crowdin-File-ID: 3768\n"
-"PO-Revision-Date: 2020-08-28 13:38\n"
+"X-Crowdin-File: /release-4.12.2/addons/rus_pickpoint.po\n"
+"X-Crowdin-File-ID: 4234\n"
+"PO-Revision-Date: 2021-01-26 12:32\n"
 
 msgctxt "Addons::name::rus_pickpoint"
 msgid "Pickpoint"
@@ -24,33 +24,9 @@ msgctxt "SettingsOptions::rus_pickpoint::general"
 msgid "General settings"
 msgstr "Общие настройки"
 
-msgctxt "SettingsOptions::rus_pickpoint::login"
-msgid "Login"
-msgstr "Логин"
-
-msgctxt "SettingsOptions::rus_pickpoint::password"
-msgid "Password"
-msgstr "Пароль"
-
-msgctxt "SettingsOptions::rus_pickpoint::ikn"
-msgid "IKN"
-msgstr "ИКН"
-
-msgctxt "SettingsOptions::rus_pickpoint::secure_protocol"
-msgid "Used secure protocol"
-msgstr "Безопасное соединение"
-
-msgctxt "SettingsOptions::rus_pickpoint::server"
-msgid "Type server"
-msgstr "Тип сервера"
-
-msgctxt "SettingsVariants::rus_pickpoint::server::work"
-msgid "Work"
-msgstr "Рабочий"
-
-msgctxt "SettingsVariants::rus_pickpoint::server::test"
-msgid "Test"
-msgstr "Тестовый"
+msgctxt "SettingsOptions::rus_pickpoint::update"
+msgid "Update terminals"
+msgstr "Обновление терминалов"
 
 msgctxt "Languages::addons.rus_pickpoint.error_pickpoint_id"
 msgid "Select terminal"
@@ -79,10 +55,6 @@ msgstr "Для обновления списка терминалов, нажм�
 msgctxt "Languages::addons.rus_pickpoint.postamat_update"
 msgid "Update point of delivery orders"
 msgstr "Обновить ПВЗ"
-
-msgctxt "SettingsOptions::rus_pickpoint::update"
-msgid "Update terminals"
-msgstr "Обновление терминалов"
 
 msgctxt "Languages::addons.rus_pickpoint.delivery_mode"
 msgid "Delivery mode"
@@ -127,4 +99,40 @@ msgstr "Ежедневно: [schedule]"
 msgctxt "Languages::rus_pickpoint.selected_pickpoint_not_working"
 msgid "The pickup point you selected is currently unavailable. We have selected the default pickup point instead. Please choose another pickup point."
 msgstr "Выбранный вами пункт самовывоза сейчас недоступен. Поэтому мы подставили пункт самовывоза, который предлагается по умолчанию. Выберите подходящий пункт самовывоза."
+
+msgctxt "Languages::addons.rus_pickpoint.package_settings"
+msgid "Package settings"
+msgstr "Настройки упаковки"
+
+msgctxt "Languages::addons.rus_pickpoint.server_secure"
+msgid "Used secure protocol"
+msgstr "Безопасное соединение"
+
+msgctxt "Languages::addons.rus_pickpoint.server_type"
+msgid "Server type"
+msgstr "Тип сервера"
+
+msgctxt "Languages::addons.rus_pickpoint.server_type.work"
+msgid "Work"
+msgstr "Рабочий"
+
+msgctxt "Languages::addons.rus_pickpoint.server_type.test"
+msgid "Test"
+msgstr "Тестовый"
+
+msgctxt "Languages::addons.rus_pickpoint.ikn"
+msgid "IKN"
+msgstr "ИКН"
+
+msgctxt "Languages::addons.rus_pickpoint.login"
+msgid "Login"
+msgstr "Логин"
+
+msgctxt "Languages::addons.rus_pickpoint.password"
+msgid "Password"
+msgstr "Пароль"
+
+msgctxt "Languages::addons.rus_pickpoint.account_settings"
+msgid "Account settings"
+msgstr "Настройки учётной записи"
 

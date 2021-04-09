@@ -17,7 +17,8 @@
         {if !$no_container}<div class="buttons-container pull-right">{/if}{if $picker_view}[{/if}
             {$exclude_names = $exclude_names|default:[]}
             {$include_names = $include_names|default:[]}
-            {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_href="profile_fields.picker?section={$section}&exclude_names={","|implode:$exclude_names}&include_names={","|implode:$include_names}&data_id={$data_id}"|fn_url but_text=$but_text|default:__("add_profile_fields") but_role="add" but_target_id="content_`$data_id`" but_meta="btn cm-dialog-opener" but_icon="icon-plus"}
+            {$exclude_types = $exclude_types|default:[]}
+            {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_href="profile_fields.picker?section={$section}&exclude_names={","|implode:$exclude_names}&include_names={","|implode:$include_names}&exclude_types={","|implode:$exclude_types}&data_id={$data_id}"|fn_url but_text=$but_text|default:__("add_profile_fields") but_role="add" but_target_id="content_`$data_id`" but_meta="btn cm-dialog-opener" but_icon="icon-plus"}
         {if $picker_view}]{/if}{if !$no_container}</div>{/if}
         <div class="hidden" id="content_{$data_id}" title="{$but_text|default:__("add_profile_fields")}">
         </div>
@@ -25,8 +26,9 @@
 {/if}
 
 <input id="pf_{$data_id}_ids" type="hidden" name="{$input_name}" value="{if $item_ids}{","|implode:$item_ids}{/if}" />
-<div class="table-wrapper">
-    <table class="table table-middle table--relative">
+<div class="clearfix"></div>
+<div class="table-responsive-wrapper">
+    <table class="table table-middle table--relative table-responsive">
         <thead>
             <tr>
                 <td width="1%"></td>
@@ -45,7 +47,7 @@
         </tbody>
         <tbody id="{$data_id}_no_item"{if $item_ids} class="hidden"{/if}>
         <tr class="no-items">
-            <td colspan="{if !$view_only}5{else}4{/if}"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
+            <td colspan="{if !$view_only}5{else}4{/if}" data-th="&nbsp;"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
         </tr>
         </tbody>
     </table>

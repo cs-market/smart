@@ -14,7 +14,9 @@
 
 namespace Tygh;
 
+use Tygh\Enum\YesNo;
 use Tygh\Languages\Languages;
+use Tygh\Enum\ObjectStatuses;
 
 class RusCurrency
 {
@@ -22,47 +24,27 @@ class RusCurrency
     {
         $currencies = Registry::get('currencies');
         $symbol = SYMBOL_RUBL;
+        $rub = array(
+            'currency_code' => CURRENCY_RUB,
+            'after' => YesNo::YES,
+            'symbol' => $symbol,
+            'coefficient' => 1,
+            'is_primary' => YesNo::YES,
+            'position' => 0,
+            'decimals_separator' => '',
+            'thousands_separator' => '',
+            'decimals' => 2,
+            'status' => ObjectStatuses::ACTIVE,
+            'description' => 'Рубли',
+        );
 
         if (empty($currencies[CURRENCY_RUB])) {
 
-            $rub = array(
-                'currency_code' => CURRENCY_RUB,
-                'after' => 'Y',
-                'symbol' => $symbol,
-                'coefficient' => '1',
-                'is_primary' => 'Y',
-                'position' => '0',
-                'decimals_separator' => '',
-                'thousands_separator' => '',
-                'decimals' => '0',
-                'status' => 'A',
-            );
+            fn_update_currency($rub, 0);
 
-            db_query("UPDATE ?:currencies SET is_primary = 'N' WHERE is_primary = 'Y'");
-
-            $rub_id = db_query('INSERT INTO ?:currencies ?e', $rub);
-            if (!empty($rub_id)) {
-
-                $rub_array = $rub;
-                $rub_array['currency_id'] = $rub_id;
-
-                Registry::set('currencies.RUB', $rub_array) ;
-
-                foreach (Languages::getAll() as $lang_code => $v) {
-                    db_query("REPLACE INTO ?:currency_descriptions (`currency_code`, `description`, `lang_code`) VALUES (?s, 'Рубли', ?s)", CURRENCY_RUB, $lang_code);
-                }
-
-                fn_set_notification('N', __('notice'), __('rus_ruble.symbol_rub_created'));
-            }
         } else {
-            if ($currencies[CURRENCY_RUB]['is_primary'] == 'N') {
-                db_query("UPDATE ?:currencies SET is_primary = 'N' WHERE is_primary = 'Y'");
-                db_query("UPDATE ?:currencies SET is_primary = 'Y', coefficient = 1 WHERE currency_code = ?s", CURRENCY_RUB);
-            }
 
-            if ($currencies[CURRENCY_RUB]['symbol'] != $symbol) {
-                self::symbol_update($symbol);
-            }
+            fn_update_currency($rub, $currencies['RUB']['currency_id']);
         }
 
         return true;
@@ -70,7 +52,7 @@ class RusCurrency
 
     public static function symbol_update($symbol = SYMBOL_RUBL)
     {
-        db_query("UPDATE ?:currencies SET symbol = ?s WHERE currency_code = ?s", $symbol, CURRENCY_RUB);
+        db_query('UPDATE ?:currencies SET symbol = ?s WHERE currency_code = ?s', $symbol, CURRENCY_RUB);
         fn_set_notification('N', __('notice'), __('rus_ruble.symbol_rub_updated'));
 
         return true;
@@ -120,7 +102,7 @@ class RusCurrency
                         'coefficient' => $primary_coefficient / $coefficient_rub,
                     );
 
-                    db_query("UPDATE ?:currencies SET ?u WHERE currency_code = ?s ", $currency_data, $curr_code);
+                    db_query('UPDATE ?:currencies SET ?u WHERE currency_code = ?s', $currency_data, $curr_code);
                 }
             }
 
@@ -132,7 +114,7 @@ class RusCurrency
                         'coefficient' => $sbrf_currencies[$curr_code]['value'] / $sbrf_currencies[$curr_code]['nominal'],
                     );
 
-                    db_query("UPDATE ?:currencies SET ?u WHERE currency_code = ?s ", $currency_data, $curr_code);
+                    db_query('UPDATE ?:currencies SET ?u WHERE currency_code = ?s ', $currency_data, $curr_code);
                 }
             }
         }

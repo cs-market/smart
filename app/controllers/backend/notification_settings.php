@@ -12,17 +12,20 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Notifications\DataValue;
-use Tygh\Notifications\Transports\Mail\MailTransport;
-use Tygh\Enum\YesNo;
+use Tygh\Enum\ReceiverSearchMethods;
 use Tygh\Enum\UserTypes;
-
+use Tygh\Enum\YesNo;
+use Tygh\Notifications\DataValue;
+use Tygh\Notifications\Receivers\SearchCondition;
+use Tygh\Notifications\Transports\Mail\MailTransport;
+use Tygh\Providers\EventDispatcherProvider;
+use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    if ($mode = 'm_update') {
+    if ($mode === 'm_update') {
         if (!isset($_REQUEST['notification_settings']) || !is_array($_REQUEST['notification_settings'])) {
             return array(CONTROLLER_STATUS_OK, 'notification_settings.manage');
         }
@@ -35,7 +38,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
         }
-        return array(CONTROLLER_STATUS_OK, 'notification_settings.manage?receiver_type=' . $_REQUEST['receiver_type']);
+
+        return [CONTROLLER_STATUS_OK, 'notification_settings.manage?receiver_type=' . $_REQUEST['receiver_type']];
+    }
+
+    if ($mode === 'update_receivers') {
+        $params = array_merge([
+            'receiver_type' => UserTypes::ADMIN,
+            'object_type'   => 'group',
+            'object_id'     => null,
+            'conditions'    => [],
+        ], $_REQUEST);
+
+        if ($params['object_id'] === null) {
+            return [CONTROLLER_STATUS_DENIED];
+        }
+
+        fn_update_notification_receiver_search_conditions(
+            $params['object_type'],
+            $params['object_id'],
+            $params['receiver_type'],
+            SearchCondition::makeList($params['conditions'])
+        );
+
+        return [CONTROLLER_STATUS_OK, 'notification_settings.manage?receiver_type=' . $params['receiver_type']];
     }
 
 }
@@ -49,10 +75,9 @@ if ($mode == 'manage') {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
 
-    /** @var \Tygh\Template\Mail\Repository $mail_template_repository */
-    $mail_template_repository = Tygh::$app['template.mail.repository'];
-    $notification_settings = Tygh::$app['event.notification_settings'];
-    $events_schema = Tygh::$app['event.events_schema'];
+    $notification_settings = EventDispatcherProvider::getNotificationSettings(true);
+    $events_schema = EventDispatcherProvider::getEventsSchema();
+    $groups_schema = EventDispatcherProvider::getEventGroupsSchema();
 
     $events = [];
     $transports = [];
@@ -83,10 +108,6 @@ if ($mode == 'manage') {
         }
     }
 
-    Tygh::$app['view']->assign('receiver_type', $receiver_type);
-    Tygh::$app['view']->assign('event_groups', $events);
-    Tygh::$app['view']->assign('transports', $transports);
-
     if ($receiver_type == UserTypes::CUSTOMER) {
         $active_section = 'customer_notifications';
     } elseif ($receiver_type == UserTypes::ADMIN) {
@@ -97,5 +118,173 @@ if ($mode == 'manage') {
         $active_section = '';
     }
 
-    Tygh::$app['view']->assign('active_section', $active_section);
+    Tygh::$app['view']->assign([
+        'receiver_type'  => $receiver_type,
+        'event_groups'   => $events,
+        'group_settings' => $groups_schema,
+        'transports'     => $transports,
+        'active_section' => $active_section,
+    ]);
+}
+
+if ($mode === 'get_usergroups') {
+    $search_query = isset($_REQUEST['q'])
+        ? $_REQUEST['q']
+        : '';
+    $usergroup_type = isset($_REQUEST['type'])
+        ? $_REQUEST['type']
+        : UserTypes::ADMIN;
+    $lang_code = isset($_REQUEST['lang_code'])
+        ? $_REQUEST['lang_code']
+        : CART_LANGUAGE;
+    $usergroup_ids = isset($_REQUEST['ids'])
+        ? array_filter((array) $_REQUEST['ids'])
+        : null;
+    $group = isset($_REQUEST['group'])
+        ? $_REQUEST['group']
+        : null;
+    $objects = [];
+
+    if (!$usergroup_ids) {
+        $params = [
+            'q'    => $search_query,
+            'type' => $usergroup_type,
+        ];
+
+        $usergroups = fn_get_usergroups($params, $lang_code);
+
+        $usergroup_ids = array_keys($usergroups);
+    }
+
+
+    if ($group === 'orders') {
+        $objects[] = [
+            'id' => ReceiverSearchMethods::ORDER_MANAGER,
+            'text' => __('order_manager'),
+            'data' => [
+                'method' => ReceiverSearchMethods::ORDER_MANAGER,
+                'criterion' => ReceiverSearchMethods::ORDER_MANAGER,
+            ]
+        ];
+    }
+
+    if ($usergroup_type === UserTypes::VENDOR && fn_allowed_for('MULTIVENDOR')) {
+        $objects[] = [
+            'id'   => ReceiverSearchMethods::VENDOR_OWNER,
+            'text' => __('vendor_owner'),
+            'data' => [
+                'method'    => ReceiverSearchMethods::VENDOR_OWNER,
+                'criterion' => ReceiverSearchMethods::VENDOR_OWNER,
+            ]
+        ];
+    }
+
+    if ($usergroup_ids) {
+        $usergroups_data = fn_get_usergroups(
+            [
+                'usergroup_id' => $usergroup_ids,
+            ]
+        );
+
+        $usergroups_data = array_values(
+            array_map(
+                function ($usergroup) {
+                    return [
+                        'id'   => $usergroup['usergroup_id'],
+                        'text' => $usergroup['usergroup'],
+                        'data' => [
+                            'method' => ReceiverSearchMethods::USERGROUP_ID,
+                            'criterion' => $usergroup['usergroup_id'],
+                        ]
+                    ];
+                },
+                $usergroups_data
+            )
+        );
+
+        $objects = array_merge($objects, $usergroups_data);
+    }
+
+    /** @var \Tygh\Ajax $ajax */
+    $ajax = Tygh::$app['ajax'];
+    $ajax->assign('objects', $objects);
+    $ajax->assign('total_objects', count($objects));
+
+    return [CONTROLLER_STATUS_NO_CONTENT];
+}
+
+if ($mode === 'get_users') {
+    $search_query = isset($_REQUEST['q'])
+        ? $_REQUEST['q']
+        : '';
+    $items_per_page = (int) (isset($_REQUEST['items_per_page'])
+        ? $_REQUEST['items_per_page']
+        : Registry::get('settings.Appearance.admin_elements_per_page'));
+    $current_page = (int) (isset($_REQUEST['page'])
+        ? $_REQUEST['page']
+        : 1);
+    $user_type = isset($_REQUEST['type'])
+        ? $_REQUEST['type']
+        : UserTypes::ADMIN;
+    $lang_code = isset($_REQUEST['lang_code'])
+        ? $_REQUEST['lang_code']
+        : CART_LANGUAGE;
+    $user_ids = isset($_REQUEST['ids'])
+        ? array_filter((array) $_REQUEST['ids'])
+        : null;
+    $company_id = Registry::get('runtime.company_id');
+    $objects = [];
+
+    if (!$user_ids) {
+        $params = [
+            'page' => $current_page,
+            'user_type' => $user_type,
+            'search_query' => $search_query,
+            'extended_search' => false,
+        ];
+
+        list($users, $params) = fn_get_users($params, Tygh::$app['session']['auth'], $items_per_page);
+
+        $user_ids = array_column($users, 'user_id');
+    }
+
+    if ($user_ids) {
+        list($users_data, $params) = fn_get_users(
+            [
+                'page' => $current_page,
+                'user_id' => $user_ids,
+            ],
+            Tygh::$app['session']['auth'],
+            $items_per_page
+        );
+
+        $objects = array_values(
+            array_map(
+                function ($user_info) use ($company_id) {
+                    $email = fn_get_user_email($user_info['user_id'], $user_info);
+                    $name = fn_get_user_name($user_info['user_id'], $user_info) ?: $email;
+
+                    return [
+                        'id'   => $user_info['user_id'],
+                        'text' => $name,
+                        'data' => [
+                            'name'         => $name,
+                            'email'        => $email,
+                            'company_name' => (string) $user_info['company_name'],
+                            'method'       => ReceiverSearchMethods::USER_ID,
+                            'criterion'    => $user_info['user_id'],
+                        ],
+                    ];
+                },
+                $users_data
+            )
+        );
+    }
+
+    /** @var \Tygh\Ajax $ajax */
+    $ajax = Tygh::$app['ajax'];
+    $ajax->assign('objects', $objects);
+    $ajax->assign('total_objects', isset($params['total_items']) ? $params['total_items'] : count($objects));
+
+    return [CONTROLLER_STATUS_NO_CONTENT];
 }

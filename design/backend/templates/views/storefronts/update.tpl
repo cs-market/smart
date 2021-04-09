@@ -19,8 +19,6 @@
                 {$status = "StorefrontStatuses::OPEN"|enum}
                 {$access_key = ""}
                 {$is_default = false}
-                {$selected_currencies = []}
-                {$selected_languages = []}
                 {$theme = $config.base_theme}
                 {$is_accessible_for_authorized_customers_only = false}
 
@@ -30,8 +28,6 @@
                     {$status = $storefront->status}
                     {$access_key = $storefront->access_key}
                     {$is_default = $storefront->is_default}
-                    {$selected_currencies = $storefront->getCurrencyIds()}
-                    {$selected_languages = $storefront->getLanguageIds()}
                     {$theme = $storefront->theme_name}
                     {$is_accessible_for_authorized_customers_only = $storefront->is_accessible_for_authorized_customers_only}
                 {/if}
@@ -93,25 +89,21 @@
                     </div>
                 {/if}
 
-                {include file="common/subheader.tpl"
-                    title=__("currencies")
-                }
+                {if $id}
+                    {include file="common/subheader.tpl"
+                        title=__("localization")
+                    }
 
-                {include file="views/storefronts/components/currencies.tpl"
-                    id=$id
-                    selected_currencies=$selected_currencies
-                    all_currencies=$all_currencies
-                }
+                    {include file="views/storefronts/components/languages.tpl"
+                        id=$id
+                        all_languages=$all_languages
+                    }
 
-                {include file="common/subheader.tpl"
-                    title=__("languages")
-                }
-
-                {include file="views/storefronts/components/languages.tpl"
-                    id=$id
-                    selected_languages=$selected_languages
-                    all_languages=$all_languages
-                }
+                    {include file="views/storefronts/components/currencies.tpl"
+                        id=$id
+                        all_currencies=$all_currencies
+                    }
+                {/if}
             </div>
 
             <div id="content_regions" class="hidden">
@@ -186,16 +178,8 @@
     {/hook}
 {/capture}
 
-{if $id}
-    {$title_start = __("editing_storefront")}
-    {$title_end = $storefront->name}
-{else}
-    {$title = __("creating_storefront")}
-{/if}
-
 {include file="common/mainbox.tpl"
-    title_start=$title_start
-    title_end=$title_end
+    title = ($id) ? $storefront->name : __("creating_storefront")
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
 }

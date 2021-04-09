@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/stripe_connect.po\n"
-"X-Crowdin-File-ID: 3658\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/stripe_connect.po\n"
+"X-Crowdin-File-ID: 4192\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::stripe_connect"
 msgid "Stripe Connect payments"
@@ -39,6 +39,10 @@ msgstr "Προμήθεια παραγγελίας και μη καταβλημέ
 msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+msgctxt "Languages::stripe_connect.stripe_connect_short"
+msgid "Stripe"
+msgstr "Stripe"
 
 msgctxt "Languages::stripe_connect.redirect_uri_admin"
 msgid "Redirect URI for administrator"
@@ -146,7 +150,7 @@ msgstr "Αναγνωριστικό Μεταφοράς"
 
 msgctxt "Languages::stripe_connect.payment_id"
 msgid "Payment ID"
-msgstr ""
+msgstr "ID πληρωμής"
 
 msgctxt "Languages::stripe_connect.enable_3d_secure"
 msgid "Enable 3-D Secure"
@@ -163,4 +167,48 @@ msgstr "Χρησιμοποιήθηκε μια δωροεπιταγή  για α�
 msgctxt "Languages::stripe_connect.payment_intent_error"
 msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
 msgstr "Παρουσιάστηκε ένα σφάλμα κατά την δημιουργία Πρόθεσης πληρωμής για την πληρωμή [payment_id]: [error]"
+
+msgctxt "Languages::log_type_stripe_connect"
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgctxt "Languages::log_action_sc_failure"
+msgid "Error"
+msgstr "Σφάλμα"
+
+msgctxt "Languages::stripe_connect.log_context"
+msgid "Context"
+msgstr "Context"
+
+msgctxt "Languages::stripe_connect.unexpected_payment_intent_status"
+msgid "Unexpected status \"[status]\" of PaymentIntent"
+msgstr "Μη αναμενόμενη κατάσταση \"[status]\" του PaymentIntent"
+
+msgctxt "Languages::stripe_connect.account_link_error"
+msgid "A vendor with company ID [company_id] is not linked to a Stripe account"
+msgstr "Ένας προμηθευτής με αναγνωριστικό εταιρείας [company_id] δεν είναι συνδεδεμένος με λογαριασμό Stripe"
+
+msgctxt "Languages::stripe_connect.transfer_creating_error"
+msgid "An error occurred during the creation of a Stripe transfer: [error]"
+msgstr "\n"
+"Παρουσιάστηκε σφάλμα κατά τη δημιουργία μιας μεταφοράς Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.charge_creating_error"
+msgid "An error occurred during the creation of a Stripe charge: [error]"
+msgstr "\n"
+"Παρουσιάστηκε σφάλμα κατά τη δημιουργία μιας χρέωσης Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_creating_error"
+msgid "An error occurred during the creation of a Stripe customer: [error]"
+msgstr "\n"
+"Παρουσιάστηκε σφάλμα κατά τη δημιουργία ενός πελάτη Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_sharing_error"
+msgid "An error occurred during the share of a Stripe customer: [error]"
+msgstr "Παρουσιάστηκε σφάλμα κατά την κοινή χρήση ενός πελάτη Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.stripe_processor_params_missing"
+msgid "Stripe processor params missing"
+msgstr "\n"
+"Λείπουν οι παράμετροι επεξεργαστή λωρίδων"
 

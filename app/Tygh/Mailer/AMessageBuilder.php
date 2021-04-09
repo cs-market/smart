@@ -18,6 +18,7 @@ namespace Tygh\Mailer;
 
 use Tygh\Enum\SiteArea;
 use Tygh\Storefront\Repository;
+use Tygh\Storefront\Storefront;
 use Tygh\Tools\Url;
 use Tygh\Tygh;
 
@@ -34,7 +35,7 @@ abstract class AMessageBuilder implements IMessageBuilder
     /** @var null|int Default company identifier */
     protected static $default_company_id;
 
-    /** @var array<array<string|int>> List of storefronts */
+    /** @var array<int, Storefront|null> List of storefronts */
     protected static $storefronts;
 
     /** @var string Current http location (http://example.com) */
@@ -137,9 +138,16 @@ abstract class AMessageBuilder implements IMessageBuilder
             $params['data']['company_name'] = $company['company_name'];
         }
 
+        if (SiteArea::isStorefront($area) && $company_id) {
+            $params['data']['company_data'] = fn_filter_company_data_by_profile_fields(
+                $params['data']['company_data'],
+                ['field_prefix' => 'company_']
+            );
+        }
+
         $storefront = $this->getStorefront($storefront_id);
-        if (empty($params['data']['storefront_data'])) {
-            $params['data']['storefront_data'] = $storefront;
+        if (empty($params['data']['storefront_data']) && $storefront) {
+            $params['data']['storefront_data'] = $storefront->toArray();
         }
 
         $message->setData($params['data']);
@@ -201,7 +209,7 @@ abstract class AMessageBuilder implements IMessageBuilder
         // disable editor mode before fetching email body from template
         fn_disable_live_editor_mode();
         $this->initMessage($message, $params, $area, $lang_code);
-        $this->retrieveEmbeddedImages($message);
+        $this->retrieveEmbeddedImages($message, $storefront);
 
         return $message;
     }
@@ -219,11 +227,12 @@ abstract class AMessageBuilder implements IMessageBuilder
     /**
      * Retrieve embedded images from message body
      *
-     * @param Message $message Instance of message
+     * @param \Tygh\Mailer\Message        $message    Instance of message
+     * @param \Tygh\Storefront\Storefront $storefront Instance of strorefront
      */
-    public function retrieveEmbeddedImages(Message $message)
+    public function retrieveEmbeddedImages(Message $message, Storefront $storefront = null)
     {
-        $files = array();
+        $files = [];
         $body = $message->getBody();
 
         if (preg_match_all("/(?<=\ssrc=|\sbackground=)('|\")(.*)\\1/SsUi", $body, $matches)) {
@@ -234,42 +243,61 @@ abstract class AMessageBuilder implements IMessageBuilder
             $files = array_merge($files, $matches[3]);
         }
 
-        if (!empty($files)) {
-            $files = array_unique($files);
+        if (empty($files)) {
+            return;
+        }
 
-            foreach ($files as $k => $_path) {
-                $cid = 'csimg' . $k;
-                $path = str_replace('&amp;', '&', $_path);
+        if ($storefront) {
+            $strofront_https_url = 'https://' . $storefront->url;
+            $strofront_http_url = 'http://' . $storefront->url;
+        } else {
+            $strofront_https_url = null;
+            $strofront_http_url = null;
+        }
 
-                $real_path = '';
-                // Replace url path with filesystem if this url is NOT dynamic
-                if (strpos($path, '?') === false && strpos($path, '&') === false) {
-                    if (($i = strpos($path, $this->http_location)) !== false) {
-                        $real_path = substr_replace($path, $this->root_directory, $i, strlen($this->http_location));
-                    } elseif (($i = strpos($path, $this->https_location)) !== false) {
-                        $real_path = substr_replace($path, $this->root_directory, $i, strlen($this->https_location));
-                    } elseif (!empty($this->http_path) && ($i = strpos($path, $this->http_path)) !== false) {
-                        $real_path = substr_replace($path, $this->root_directory, $i, strlen($this->http_path));
-                    } elseif (!empty($this->https_path) && ($i = strpos($path, $this->https_path)) !== false) {
-                        $real_path = substr_replace($path, $this->root_directory, $i, strlen($this->https_path));
-                    }
-                }
+        $files = array_unique($files);
 
-                if (empty($real_path)) {
-                    $real_path = (strpos($path, '://') === false) ? $this->http_location .'/'. $path : $path;
-                }
+        foreach ($files as $k => $_path) {
+            $cid = 'csimg' . $k;
+            $path = str_replace('&amp;', '&', $_path);
 
-                list($width, $height, $mime_type) = $this->getImageSize($real_path);
-
-                if (!empty($width)) {
-                    $cid .= '.' . $this->getImageExtension($mime_type);
-                    $message->addEmbeddedImages($real_path, $cid, $mime_type);
-                    $body = preg_replace("/(['\"])" . str_replace("/", "\/", preg_quote($_path)) . "(['\"])/Ss", "\\1cid:" . $cid . "\\2", $body);
+            $real_path = '';
+            // Replace url path with filesystem if this url is NOT dynamic
+            if (strpos($path, '?') === false && strpos($path, '&') === false) {
+                if ($strofront_https_url && ($i = strpos($path, $strofront_https_url)) !== false) {
+                    $real_path = substr_replace($path, $this->root_directory, $i, strlen($strofront_https_url));
+                } elseif ($strofront_http_url && ($i = strpos($path, $strofront_http_url)) !== false) {
+                    $real_path = substr_replace($path, $this->root_directory, $i, strlen($strofront_http_url));
+                } elseif (($i = strpos($path, $this->http_location)) !== false) {
+                    $real_path = substr_replace($path, $this->root_directory, $i, strlen($this->http_location));
+                } elseif (($i = strpos($path, $this->https_location)) !== false) {
+                    $real_path = substr_replace($path, $this->root_directory, $i, strlen($this->https_location));
+                } elseif (!empty($this->http_path) && ($i = strpos($path, $this->http_path)) !== false) {
+                    $real_path = substr_replace($path, $this->root_directory, $i, strlen($this->http_path));
+                } elseif (!empty($this->https_path) && ($i = strpos($path, $this->https_path)) !== false) {
+                    $real_path = substr_replace($path, $this->root_directory, $i, strlen($this->https_path));
                 }
             }
 
-            $message->setBody($body);
+            if (empty($real_path)) {
+                $real_path = (strpos($path, '://') === false) ? $this->http_location . '/' . $path : $path;
+            }
+
+            list($width,, $mime_type) = $this->getImageSize($real_path);
+
+            if (empty($width)) {
+                continue;
+            }
+
+            $cid .= '.' . $this->getImageExtension($mime_type);
+            $message->addEmbeddedImages($real_path, $cid, $mime_type);
+
+            // phpcs:disable CodeSniffer.Strings.UnnecessaryDoubleQuotation.Found
+            $body = preg_replace("/(['\"])" . preg_quote($_path, '/') . "(['\"])/Ss", "\\1cid:" . $cid . "\\2", $body);
+            // phpcs:enable CodeSniffer.Strings.UnnecessaryDoubleQuotation.Found
         }
+
+        $message->setBody($body);
     }
 
     /**
@@ -516,16 +544,18 @@ abstract class AMessageBuilder implements IMessageBuilder
      *
      * @param int $storefront_id Storefront identifier
      *
-     * @return array<string|int>
+     * @return \Tygh\Storefront\Storefront|null
      */
     protected function getStorefront($storefront_id)
     {
         if (!isset(self::$storefronts[$storefront_id])) {
-            $storefront = $this->storefront_repository->findById($storefront_id)
-                ?: $this->storefront_repository->findDefault();
-            self::$storefronts[$storefront_id] = $storefront
-                ? $storefront->toArray()
-                : [];
+            $storefront = $this->storefront_repository->findById($storefront_id);
+
+            if (!$storefront) {
+                $this->storefront_repository->findDefault();
+            }
+
+            self::$storefronts[$storefront_id] = $storefront;
         }
 
         return self::$storefronts[$storefront_id];

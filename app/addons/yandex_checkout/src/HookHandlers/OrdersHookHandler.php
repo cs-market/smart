@@ -24,9 +24,9 @@ class OrdersHookHandler
      * The "change_order_status_post" hook handler.
      *
      * Actions performed:
-     *     - Creates full payment receipt for Yandex Checkout
-     *     - Creates full pre-payment and full payment receipts for Yandex Checkout for Marketplaces
-     *     - Creates withdrawals for Yandex Checkout for Marketplaces
+     *     - Creates full payment receipt for YooKassa
+     *     - Creates full pre-payment and full payment receipts for YooKassa for Marketplaces
+     *     - Creates withdrawals for YooKassa for Marketplaces
      *
      * @see \fn_change_order_status()
      */

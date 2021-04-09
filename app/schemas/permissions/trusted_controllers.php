@@ -18,7 +18,7 @@ return [
     ],
     'image' => [
         'default_allow' => true,
-        'allow' => [
+        'allow'         => [
             'upload' => false
         ],
         'areas' => ['A', 'C'],
@@ -37,5 +37,8 @@ return [
     'robots' => [
         'allow' => true,
         'areas' => ['C']
+    ],
+    'bottom_panel' => [
+        'allow' => true
     ],
 ];

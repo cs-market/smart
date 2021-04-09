@@ -1,6 +1,15 @@
 {$post_max_size = $server_env->getIniVar("post_max_size")}
 {$upload_max_filesize = $server_env->getIniVar("upload_max_filesize")}
 
+{if $max_upload_filesize}
+    {if $post_max_size > $max_upload_filesize}
+        {$post_max_size = $max_upload_filesize}
+    {/if}
+    {if $upload_max_filesize > $max_upload_filesize}
+        {$upload_max_filesize = $max_upload_filesize}
+    {/if}
+{/if}
+
 <script type="text/javascript">
 (function(_, $) {
     $.extend(_, {
@@ -24,7 +33,7 @@
 
 {assign var="id_var_name" value="`$prefix`{$var_name|md5}"}
 
-<div class="fileuploader cm-field-container">
+<div class="fileuploader cm-fileuploader cm-field-container" {if $disabled_param}hidden disabled{/if}>
 <input type="hidden" id="{$label_id}" value="{if $images}{$id_var_name}{/if}" />
 
 {foreach from=$images key="image_id" item="image"}
@@ -39,9 +48,12 @@
             {if $image.is_image}
                 <a href="{$image.detailed|fn_url}"><img src="{$image.thumbnail|fn_url}" border="0" /></a><br />
             {/if}
-            
+
             {hook name="fileuploader:uploaded_files"}
-                {if $delete_link}<a class="cm-ajax cm-post" href="{$delete_link|fn_url}">{/if}{if !($po.required == "Y" && $images|count == 1)}<i id="clean_selection_{$id_var_name}_{$image.file}" alt="{__("remove_this_item")}" title="{__("remove_this_item")}" onclick="Tygh.fileuploader.clean_selection(this.id); {if $multiupload != "Y"}Tygh.fileuploader.toggle_links('{$id_var_name}', 'show');{/if} Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');" class="icon-remove-sign cm-tooltip hand"></i>&nbsp;{/if}{if $delete_link}</a>{/if}<span>{if $download_link}<a href="{$download_link|fn_url}">{/if}{$image.name}{if $download_link}</a>{/if}</span>
+                {if $delete_link}<a class="cm-ajax cm-post" href="{$delete_link|fn_url}">{/if}
+                {if !($po.required == "YesNo::YES"|enum && $images|count == 1)}<i id="clean_selection_{$id_var_name}_{$image.file}" alt="{__("remove_this_item")}" title="{__("remove_this_item")}" onclick="Tygh.fileuploader.clean_selection(this.id); {if $multiupload != "Y"}Tygh.fileuploader.toggle_links('{$id_var_name}', 'show');{/if} Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');" class="icon-remove-sign cm-tooltip hand"></i>&nbsp;{/if}
+                {if $delete_link}</a>{/if}
+                <span>{if $download_link}<a href="{$download_link|fn_url}">{/if}{$image.name}{if $download_link}</a>{/if}</span>
             {/hook}
         </p>
     </div>
@@ -53,10 +65,10 @@
         <p class="cm-fu-file hidden"><i id="clean_selection_{$id_var_name}" alt="{__("remove_this_item")}" title="{__("remove_this_item")}" onclick="Tygh.fileuploader.clean_selection(this.id); {if $multiupload != "Y"}Tygh.fileuploader.toggle_links(this.id, 'show');{/if} Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');" class="icon-remove-sign cm-tooltip hand"></i>&nbsp;<span></span></p>
         {if $multiupload != "Y"}<p class="cm-fu-no-file {if $images}hidden{/if}">{__("text_select_file")}</p>{/if}
     </div>
-    
+
     {strip}
-    <input type="hidden" name="file_{$var_name}" value="{if $image_name}{$image_name}{/if}" id="file_{$id_var_name}" {if $is_image}class="cm-image-field"{/if} />
-    <input type="hidden" name="type_{$var_name}" value="{if $image_name}local{/if}" id="type_{$id_var_name}" {if $is_image}class="cm-image-field"{/if} />
+    <input type="hidden" name="file_{$var_name}" value="{if $image_name}{$image_name}{/if}" id="file_{$id_var_name}" class="cm-fileuploader-field {if $is_image}cm-image-field{/if}" {if $disabled_param}disabled{/if}/>
+    <input type="hidden" name="type_{$var_name}" value="{if $image_name}local{/if}" id="type_{$id_var_name}" class="cm-fileuploader-field {if $is_image}cm-image-field{/if}" {if $disabled_param}disabled{/if}/>
 
     <div class="btn-group {if $multiupload != "Y" && $images}hidden{/if}" id="link_container_{$id_var_name}">
         <div class="upload-file-local">
@@ -67,12 +79,12 @@
                 </label>
             </div>
         </div>
-        {if !($hide_server || "RESTRICTED_ADMIN"|defined)}
+        {if !$hide_server}
             <a class="btn" onclick="Tygh.fileuploader.show_loader(this.id);" id="server_{$id_var_name}">{__("server")}</a>
         {/if}
         <a class="btn" onclick="Tygh.fileuploader.show_loader(this.id);" id="url_{$id_var_name}">{__("url")}</a>
         {if $hidden_name}
-            <input type="hidden" name="{$hidden_name}" value="{$hidden_value}">
+            <input type="hidden" name="{$hidden_name}" id="hidden_input_{$id_var_name}" value="{$hidden_value}">
         {/if}
     </div>
 
@@ -81,7 +93,7 @@
             {__("text_allowed_to_upload_file_extension", ["[ext]" => $allowed_ext])}
         </p>
     {/if}
-    
+
     {/strip}
 </div>
 {/hook}

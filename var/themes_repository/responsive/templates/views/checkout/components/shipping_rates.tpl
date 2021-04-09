@@ -1,3 +1,4 @@
+<label for="shipping_rates_list" class="cm-required cm-multiple-radios cm-shipping-available-label hidden"></label>
 <div class="litecheckout__group litecheckout__shippings"
      data-ca-lite-checkout-overlay-message="{__("lite_checkout.click_here_to_update_shipping")}"
      data-ca-lite-checkout-overlay-class="litecheckout__overlay--active"
@@ -21,12 +22,27 @@
             </div>
         {/if}
 
+        {$group.shipping_disabled = false}
+
         {hook name="checkout:shipping_methods_list"}
         <div class="litecheckout__group">
             {* Shippings list *}
             {if $group.shippings && !$group.all_edp_free_shipping && !$group.shipping_no_required}
 
-                {foreach $group.shippings as $shipping}
+                {foreach $all_shippings.$group_key as $shipping_id => $shipping}
+                    {if $group.shippings.$shipping_id}
+                        {$shipping = $group.shippings.$shipping_id}
+                    {else}
+                        {if $show_unavailable_shippings}
+                            {$shipping.rate_disabled = true}
+                        {else}
+                            {continue}
+                        {/if}
+                    {/if}
+
+                    {if $shipping.rate_disabled && $cart.chosen_shipping.$group_key == $shipping.shipping_id}
+                        {$group.shipping_disabled = true}
+                    {/if}
 
                     {hook name="checkout:shipping_rate"}
                         {$delivery_time = ""}
@@ -45,6 +61,8 @@
                                 {$inc_tax_lang = __('inc_tax')}
                                 {$rate = "`$rate``$inc_tax_lang`)"}
                             {/if}
+                        {elseif $shipping.rate_disabled}
+                            {$rate = __("na")}
                         {elseif fn_is_lang_var_exists("free")}
                             {$rate = __("free")}
                         {else}
@@ -63,11 +81,15 @@
                             data-ca-lite-checkout-element="shipping-method"
                             data-ca-lite-checkout-is-address-required="{if $shipping.is_address_required == "Y"}true{else}false{/if}"
                             {if $cart.chosen_shipping.$group_key == $shipping.shipping_id}checked{/if}
+                            data-ca-lite-checkout-shipping-method-disabled="{if $shipping.rate_disabled}true{else}false{/if}"
                         />
 
                         <label
                             for="sh_{$group_key}_{$shipping.shipping_id}"
-                            class="litecheckout__shipping-method__wrapper js-litecheckout-activate"
+                            class="litecheckout__shipping-method__wrapper
+                                js-litecheckout-activate
+                                {if $shipping.rate_disabled}litecheckout__shipping-method__wrapper--disabled{/if}
+                                {if $shipping_rates_changed}litecheckout__shipping-method__wrapper--highlight{/if}"
                             data-ca-activate="sd_{$group_key}_{$shipping.shipping_id}"
                         >
                             {if $shipping.image}
@@ -75,23 +97,40 @@
                                     {include file="common/image.tpl" obj_id=$shipping_id images=$shipping.image class="shipping-method__logo-image litecheckout__shipping-method__logo-image"}
                                 </div>
                             {/if}
-                            <p class="litecheckout__shipping-method__title">{$shipping.shipping}{if $rate} — {$rate nofilter}{/if}</p>
-                            <p class="litecheckout__shipping-method__delivery-time">{$delivery_time}</p>
+                            <p class="litecheckout__shipping-method__title">
+                                {$shipping.shipping}{if $rate && !$shipping.rate_disabled} — {$rate nofilter}{/if}
+                            </p>
+                            {if $shipping.rate_disabled}
+                                <p class="litecheckout__shipping-method__status litecheckout__shipping-method__status--error">{__("lite_checkout.not_available")}</p>
+                            {else}
+                                <p class="litecheckout__shipping-method__delivery-time">{$delivery_time}</p>
+                            {/if}
                         </label>
                     </div>
                 {/foreach}
             {else}
-                <p class="litecheckout__shipping-method__text">
-                    {if $group.all_free_shipping}
-                        {__("free_shipping")}
-                    {elseif $group.all_edp_free_shipping || $group.shipping_no_required }
-                        {__("no_shipping_required")}
+                <div class="litecheckout__item litecheckout__item--full">
+                    {if $group.all_edp_free_shipping || $group.shipping_no_required}
+                        <p class="litecheckout__shipping-method__text ty-error-text">
+                            {__("no_shipping_required")}
+                        </p>
+                    {elseif $group.all_free_shipping || $group.free_shipping}
+                        <p class="litecheckout__shipping-method__text ty-error-text">
+                            {__("free_shipping")}
+                        </p>
                     {else}
-                        <span class="ty-error-text">
+                        <p class="litecheckout__shipping-method__text ty-error-text">
                             {__("text_no_shipping_methods")}
-                        </span>
+                        </p>
                     {/if}
-                </p>
+                </div>
+            {/if}
+            {if $cart.all_shippings_disabled || $group.shipping_disabled}
+                <div class="litecheckout__item litecheckout__item--full">
+                    <p class="litecheckout__shipping-method__text ty-error-text">
+                        {__("text_no_shipping_methods")}
+                    </p>
+                </div>
             {/if}
         </div>
         {/hook}

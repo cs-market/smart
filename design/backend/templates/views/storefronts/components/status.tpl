@@ -11,9 +11,6 @@ string $input_name Input name
            class="control-label"
     >
         {__("storefront_status")}
-        {include file="common/tooltip.tpl"
-            tooltip=__("ttc_stores_status")
-        }
     </label>
     <div class="controls">
         <input type="hidden"
@@ -31,5 +28,7 @@ string $input_name Input name
         <p>
             {__("storefront_status.tooltip")}
         </p>
+
+        <p class="muted description">{__("ttc_stores_status")}</p>
     </div>
 </div>

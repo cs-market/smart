@@ -61,14 +61,14 @@
             <div class="controls select2-container--mini">
             {if !$id}
                 {* F - feature, R - range field, B - base field *}
-                <select name="filter_data[filter_type]" onchange="fn_check_product_filter_type(this.value, 'tab_variants_{$id}', {$id});" id="elm_filter_filter_by_{$id}" class="cm-object-picker">
+                <select name="filter_data[filter_type]" onchange="fn_check_product_filter_type(this.value, 'tab_feature_variants_{$id}', {$id});" id="elm_filter_filter_by_{$id}" class="cm-object-picker">
                 {if $filter_features}
                     <optgroup label="{__("features")}">
                     {foreach from=$filter_features item=feature}
-                        <option value="{if $feature.feature_type == "ProductFeatures::NUMBER_FIELD"|enum || $feature.feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}R{elseif $feature.feature_type == "ProductFeatures::DATE"|enum}D{else}F{/if}F-{$feature.feature_id}">{$feature.description}</option>
+                        <option value="{if $feature.feature_type == "ProductFeatures::NUMBER_FIELD"|enum || $feature.feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}R{elseif $feature.feature_type == "ProductFeatures::DATE"|enum}D{else}F{/if}F-{$feature.feature_id}">{$feature.internal_name}</option>
                     {if $feature.subfeatures}
                     {foreach from=$feature.subfeatures item=subfeature}
-                        <option value="{if $feature.feature_type == "ProductFeatures::NUMBER_FIELD"|enum || $feature.feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}R{elseif $feature.feature_type == "ProductFeatures::DATE"|enum}D{else}F{/if}F-{$subfeature.feature_id}">{$subfeature.description}</option>
+                        <option value="{if $feature.feature_type == "ProductFeatures::NUMBER_FIELD"|enum || $feature.feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}R{elseif $feature.feature_type == "ProductFeatures::DATE"|enum}D{else}F{/if}F-{$subfeature.feature_id}">{$subfeature.internal_name}</option>
                     {/foreach}
                     {/if}
                     {/foreach}
@@ -151,7 +151,7 @@
 
 {if !$id}
 <script type="text/javascript">
-    fn_check_product_filter_type(Tygh.$('#elm_filter_filter_by_{$id}').val(), 'tab_variants_{$id}', '{$id}');
+    fn_check_product_filter_type(Tygh.$('#elm_filter_filter_by_{$id}').val(), 'tab_feature_variants_{$id}', '{$id}');
 </script>
 {/if}
 {/capture}

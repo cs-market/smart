@@ -90,11 +90,18 @@ class Pdf extends AGenerator {
         $tbl = '<tr>';
         foreach ($this->selected_fields as $field_name => $active) {
             $tbl .= '<td width="' . $this->price_schema['fields'][$field_name]['min_width'] . '%">';
-            if ($field_name == 'image') {
-                if (!empty($product['main_pair']) && $image_data = fn_image_to_display($product['main_pair'], 0, static::IMAGE_HEIGHT)) {
-                    $tbl .= '<img src="' . $image_data['image_path'] . '" width= "' . $image_data['width'] . '" height="' . $image_data['height'] . '" alt="">';
+            if ($field_name === 'image') {
+                if (!empty($product['main_pair'])) {
+                    $image_data = fn_image_to_display($product['main_pair'], 0, static::IMAGE_HEIGHT);
+
+                    if (!empty($image_data['image_path']) && !empty($image_data['width']) && !empty($image_data['height'])) {
+                        $tbl .= '<img src="' . $image_data['image_path']
+                            . '" width= "' . $image_data['width']
+                            . '" height="' . $image_data['height']
+                            . '" alt="">';
+                    }
                 }
-            } elseif ($field_name == 'product' && !empty($options_variants)) {
+            } elseif ($field_name === 'product' && !empty($options_variants)) {
                 $options = array();
 
                 foreach ($options_variants as $option_id => $variant_id) {
@@ -104,7 +111,7 @@ class Pdf extends AGenerator {
                 $options = implode('<br>', $options);
 
                 $tbl .= htmlspecialchars($product[$field_name]) . '<br>' . $options;
-            } elseif ($field_name == 'price') {
+            } elseif ($field_name === 'price') {
                 $tbl .= fn_format_price($product[$field_name], CART_PRIMARY_CURRENCY, null, false);
             } else {
                 $tbl .= htmlspecialchars($product[$field_name]);

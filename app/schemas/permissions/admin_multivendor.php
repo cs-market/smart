@@ -12,47 +12,47 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['companies'] = array (
-    'modes' => array (
-        'manage' => array (
-            'permissions' => array ('GET' => 'view_vendors', 'POST' => 'manage_vendors'),
-        ),
-        'add' => array (
+$schema['companies'] = [
+    'modes' => [
+        'manage' => [
+            'permissions' => ['GET' => 'view_vendors', 'POST' => 'manage_vendors'],
+        ],
+        'add' => [
             'permissions' => 'manage_vendors',
-        ),
-        'invite' => array(
+        ],
+        'invite' => [
             'permissions' => 'manage_vendors',
-        ),
-        'invitations' => array(
+        ],
+        'invitations' => [
             'permissions' => 'manage_vendors',
-        ),
-        'm_delete_invitations' => array(
+        ],
+        'm_delete_invitations' => [
             'permissions' => 'manage_vendors',
-        ),
-        'delete_invitation' => array(
+        ],
+        'delete_invitation' => [
             'permissions' => 'manage_vendors',
-        ),
-        'update' => array (
-            'permissions' => array ('GET' => 'view_vendors', 'POST' => 'manage_vendors'),
-        ),
-        'get_companies_list' => array (
+        ],
+        'update' => [
+            'permissions' => ['GET' => 'view_vendors', 'POST' => 'manage_vendors'],
+        ],
+        'get_companies_list' => [
             'permissions' => 'view_vendors',
-        ),
-        'payouts_m_delete' => array (
+        ],
+        'payouts_m_delete' => [
             'permissions' => 'manage_payouts',
-        ),
-        'payouts_add' => array (
+        ],
+        'payouts_add' => [
             'permissions' => 'manage_payouts',
-        ),
-        'payout_delete' => array (
+        ],
+        'payout_delete' => [
             'permissions' => 'manage_payouts',
-        ),
-        'balance' => array (
+        ],
+        'balance' => [
             'permissions' => 'view_payouts',
-        ),
-    ),
+        ],
+    ],
     'permissions' => 'manage_vendors',
-);
+];
 
 $schema['exim']['modes']['export']['param_permissions']['section']['vendors'] = 'view_vendors';
 $schema['exim']['modes']['import']['param_permissions']['section']['vendors'] = 'manage_vendors';

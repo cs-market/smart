@@ -15,17 +15,19 @@
 defined('BOOTSTRAP') or die('Access denied');
 
 use Tygh\Addons\MasterProducts\ServiceProvider;
-use Tygh\Addons\ProductVariations\Product\Group\Events\ProductAddedEvent;
 use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection;
 use Tygh\Addons\ProductVariations\ServiceProvider as VariationsServiceProvider;
-use Tygh\Enum\NotificationSeverity;
 use Tygh\BlockManager\Block;
 use Tygh\BlockManager\ProductTabs;
+use Tygh\Common\OperationResult;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\VendorStatuses;
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
-use Tygh\Storefront\Storefront;
 use Tygh\Settings;
+use Tygh\Storefront\Storefront;
+
+// phpcs:disable SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
 
 /**
  * Installs the add-on products block and the product tab.
@@ -98,9 +100,17 @@ function fn_master_products_get_products_pre(&$params, $items_per_page, $lang_co
 
     $params['runtime_company_id'] = (int) Registry::ifGet('runtime.vendor_id', Registry::get('runtime.company_id'));
 
-    // vendors must see only active master products
+    // Vendors must see only active master products
     if ($params['show_master_products_only'] && $params['runtime_company_id']) {
-        $params['status'] = 'A';
+        $params['status'] = ObjectStatuses::ACTIVE;
+    }
+
+    // FIXME: Product offers must be displayed only in the blocks with the specific filling
+    if (
+        isset($params['block_data']['content']['items']['filling'])
+        && $params['block_data']['content']['items']['filling'] !== 'master_products.vendor_products_filling'
+    ) {
+        $params['runtime_company_id'] = 0;
     }
 }
 
@@ -123,8 +133,14 @@ function fn_master_products_get_products(
     if ($params['area'] === 'C') {
         $condition .= db_quote(' AND products.master_product_status IN (?a)', ['A']);
 
-        $search = db_quote('AND companies.status = ?s', 'A');
-        $replace = db_quote('AND (companies.status = ?s OR products.company_id = ?i)', 'A', 0);
+        if (isset($params['company_status']) && !empty($params['company_status'])) {
+            $search = db_quote('AND companies.status IN (?a)', $params['company_status']);
+            $replace = db_quote('AND (companies.status IN (?a) OR products.company_id = ?i)', $params['company_status'], 0);
+        } else {
+            $search = db_quote('AND companies.status = ?s', ObjectStatuses::ACTIVE);
+            $replace = db_quote('AND (companies.status = ?s OR products.company_id = ?i)', ObjectStatuses::ACTIVE, 0);
+        }
+
         $condition_replacements[$search] = $replace;
 
         if (!empty($params['vendor_products_by_product_id'])) {
@@ -138,19 +154,27 @@ function fn_master_products_get_products(
 
             $condition .= db_quote(' AND products.master_product_id = ?i', $master_product_id);
         } elseif (empty($params['runtime_company_id']) && empty($params['pid']) && empty($params['only_for_counting'])) {
-            $condition .= db_quote(' AND products.master_product_id = ?i AND (products.company_id > 0 OR products.master_product_offers_count > 0)', 0);
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = $params['storefront'] instanceof Storefront
+                ? $params['storefront']
+                : Tygh::$app['storefront'];
 
-            if (fn_allowed_for('MULTIVENDOR')) {
-                /** @var \Tygh\Storefront\Storefront $storefront */
-                $storefront = $params['storefront'] instanceof Storefront
-                    ? $params['storefront']
-                    : Tygh::$app['storefront'];
+            $join .= db_quote(
+                ' LEFT JOIN ?:master_products_storefront_offers_count AS master_products_storefront_offers_count '
+                . ' ON master_products_storefront_offers_count.product_id = products.product_id'
+                .   ' AND master_products_storefront_offers_count.storefront_id = ?i',
+                $storefront->storefront_id
+            );
 
-                if ($storefront->getCompanyIds()) {
-                    $search = db_quote('companies.company_id IN (?n)', $storefront->getCompanyIds());
-                    $replace = db_quote('(companies.company_id IN (?n) OR products.company_id = ?i)', $storefront->getCompanyIds(), 0);
-                    $condition_replacements[$search] = $replace;
-                }
+            $condition .= db_quote(
+                ' AND products.master_product_id = 0'
+                . ' AND (products.company_id > 0 OR master_products_storefront_offers_count.count > 0)'
+            );
+
+            if ($storefront->getCompanyIds()) {
+                $search = db_quote('companies.company_id IN (?n)', $storefront->getCompanyIds());
+                $replace = db_quote('(companies.company_id IN (?n) OR products.company_id = ?i)', $storefront->getCompanyIds(), 0);
+                $condition_replacements[$search] = $replace;
             }
         }
     }
@@ -427,7 +451,7 @@ function fn_master_products_company_products_check(&$product_ids, $notify, &$com
         ? $_SERVER['REQUEST_METHOD']
         : 'GET';
 
-    if ($controller !== 'products' || $mode !== 'update' || $request_method !== 'GET') {
+    if ($controller !== 'products' || $request_method !== 'GET' || !in_array($mode, ['update', 'update_file', 'update_folder'])) {
         return;
     }
 
@@ -539,6 +563,7 @@ function fn_master_products_delete_product_post($product_id, $is_deleted)
 
     $repository = ServiceProvider::getProductRepository();
     $service = ServiceProvider::getService();
+    $indexer = ServiceProvider::getIndexer();
 
     $vendor_product_ids = $repository->findVendorProductIds($product_id);
 
@@ -552,6 +577,8 @@ function fn_master_products_delete_product_post($product_id, $is_deleted)
         $service->actualizeMasterProductPrice($master_product_id);
         $service->actualizeMasterProductOffersCount($master_product_id);
         $service->actualizeMasterProductQuantity($master_product_id);
+    } else {
+        $indexer->clearStorefrontOffersCountIndexByProductId($product_id);
     }
     Registry::del('master_products.removed_product');
 }
@@ -664,109 +691,6 @@ function fn_master_products_update_product_features_value_post($product_id)
     $sync_service->onTableChanged('product_features_values', $product_id);
 }
 
-/**
- * @param \Tygh\Addons\ProductVariations\Service                       $group_service
- * @param \Tygh\Addons\ProductVariations\Product\Group\Group           $group
- * @param \Tygh\Addons\ProductVariations\Product\Group\Events\AEvent[] $events
- */
-function fn_master_products_variation_group_save_group($group_service, $group, $events)
-{
-    if (Registry::get('runtime.product_variations_converter_mode') !== 'combinations') {
-        return;
-    }
-
-    static $service;
-    static $product_repository;
-    static $query_factory;
-    static $group_repository;
-
-    $product_ids = [];
-    $product_map = [];
-
-    foreach ($events as $event) {
-        if ($event instanceof ProductAddedEvent) {
-            $product_id = $event->getProduct()->getProductId();
-            $parent_product_id = $event->getProduct()->getParentProductId();
-
-            $product_map[$parent_product_id][$product_id] = $product_id;
-
-            if ($parent_product_id) {
-                continue;
-            }
-
-            $product_ids[] = $product_id;
-        }
-    }
-
-    if (!$product_ids) {
-        return;
-    }
-
-    if ($service === null) {
-        $service = ServiceProvider::getService();
-    }
-
-    if ($product_repository === null) {
-        $product_repository = ServiceProvider::getProductRepository();
-    }
-
-    if ($query_factory === null) {
-        $query_factory = VariationsServiceProvider::getQueryFactory();
-    }
-
-    if ($group_repository === null) {
-        $group_repository = VariationsServiceProvider::getGroupRepository();
-    }
-
-    foreach ($product_ids as $product_id) {
-        $vendor_product_ids = $product_repository->findVendorProductIds($product_id);
-
-        if (empty($vendor_product_ids)) {
-            continue;
-        }
-
-        $service->syncAllData($product_id, $vendor_product_ids);
-
-        $query = $query_factory->createQuery(
-            $product_repository::TABLE_PRODUCTS,
-            ['product_id' => $vendor_product_ids],
-            ['product_id', 'company_id']
-        );
-
-        foreach ($query->select() as $item) {
-            $group_product_ids = [$item['product_id']];
-
-            foreach ($product_map[$product_id] as $variation_product_id) {
-                $result = $service->createVendorProduct($variation_product_id, $item['company_id']);
-
-                if ($result->isSuccess()) {
-                    $group_product_ids[] = $result->getData('vendor_product_id');
-                }
-            }
-
-            if (count($group_product_ids) <= 1) {
-                continue;
-            }
-
-            $group_id = $group_repository->findGroupIdByProductId($item['product_id']);
-
-            if ($group_id) {
-                $result = $group_service->attachProductsToGroup($group_id, $group_product_ids);
-            } else {
-                $result = $group_service->createGroup($group_product_ids, null, $group->getFeatures());
-            }
-
-            if (!$result->isSuccess()) {
-                foreach ($group_product_ids as $item_product_id) {
-                    if ($item_product_id != $item['product_id']) {
-                        fn_delete_product($item_product_id);
-                    }
-                }
-            }
-        }
-    }
-}
-
 function fn_master_products_clone_product_data($product_id, &$data, $is_cloning_allowed)
 {
     if (empty($data)) {
@@ -799,10 +723,6 @@ function fn_master_products_variation_group_create_products_by_combinations_item
  */
 function fn_master_products_variation_sync_flush_sync_events($sync_service, $events)
 {
-    if (Registry::get('runtime.product_variations_converter_mode')) {
-        return;
-    }
-
     $product_ids = [];
     $table_product_ids = [];
 
@@ -998,6 +918,20 @@ function fn_product_variations_master_products_create_vendor_product($master_pro
 }
 
 /**
+ * The "master_products_actualize_master_product_quantity" hook handler.
+ *
+ * Actions performed::
+ *  - Change default variation if needed.
+ *
+ * @param int $product_id        Product identifier
+ * @param int $master_product_id Master product identifier
+ */
+function fn_product_variations_master_products_actualize_master_product_quantity($product_id, $master_product_id)
+{
+    VariationsServiceProvider::getService()->onChangedProductQuantity($master_product_id);
+}
+
+/**
  * The "check_add_to_cart_post" hook handler.
  *
  * Actions performed:
@@ -1049,7 +983,8 @@ function fn_master_products_seo_get_schema_org_markup_items_post($product_data, 
     $offer_count = $product_repository->getVendorProductsCount(
         $product_data['product_id'],
         [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN],
-        [VendorStatuses::ACTIVE]
+        [VendorStatuses::ACTIVE],
+        Registry::get('settings.General.show_out_of_stock_products') === YesNo::YES
     );
 
     if ($offer_count === 0) {
@@ -1075,7 +1010,8 @@ function fn_master_products_seo_get_schema_org_markup_items_post($product_data, 
         $vendor_product_ids = $product_repository->findVendorProductIds(
             $product_data['product_id'],
             [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN],
-            [VendorStatuses::ACTIVE]
+            [VendorStatuses::ACTIVE],
+            Registry::get('settings.General.show_out_of_stock_products') === YesNo::YES
         );
         $vendor_products = $product_repository->findProducts($vendor_product_ids);
 
@@ -1092,7 +1028,11 @@ function fn_master_products_seo_get_schema_org_markup_items_post($product_data, 
                 'mpn'           => fn_seo_get_schema_org_product_feature($vendor_product['schema_org_features'], 'mpn'),
                 'availability'  => fn_seo_get_schema_org_product_availability($vendor_product),
                 'url'           => fn_link_attach($base_offer_url, "vendor_id={$vendor_product['company_id']}"),
-                'price'         => fn_format_price($vendor_product['price'], $currency),
+                'price'         => fn_format_price_by_currency(
+                    $vendor_product['price'],
+                    CART_PRIMARY_CURRENCY,
+                    $currency
+                ),
                 'priceCurrency' => $aggregate_offer['priceCurrency'],
             ];
         }
@@ -1186,18 +1126,43 @@ function fn_master_products_discussion_is_user_eligible_to_write_review_for_prod
  * Actions performed:
  * - Updates object name for vendor common product.
  *
+ * @param int    $object_id   Object ID
+ * @param string $object_type Object type
+ * @param string $object_name Object name
+ * @param int    $index       Index
+ *
  * @see fn_create_seo_name
  */
-function fn_master_products_create_seo_name_pre($object_id, $object_type, &$object_name, $index, $dispatch, $company_id, $lang_code, $params)
+function fn_master_products_create_seo_name_pre($object_id, $object_type, &$object_name, $index)
 {
-    if ($object_type === 'p') {
-        $repository = ServiceProvider::getProductRepository();
-        $product = current($repository->findVendorProductsInfo([$object_id]));
-
-        if (!empty($product['master_product_id']) && !empty($product['company_id'])) {
-            $object_name = fn_seo_get_name('p', $product['master_product_id']) . SEO_DELIMITER . fn_seo_get_name('m', $product['company_id']);
-        }
+    if ($object_type !== 'p') {
+        return;
     }
+
+    $repository = ServiceProvider::getProductRepository();
+    $product = current($repository->findVendorProductsInfo([$object_id]));
+
+    if (empty($product['master_product_id']) || empty($product['company_id'])) {
+        return;
+    }
+
+    $master_product_seo_name = fn_seo_get_name('p', $product['master_product_id']);
+    $company_seo_name = fn_seo_get_name('m', $product['company_id']);
+
+    /*
+     * If $index <= 1 - means that seo name ($object_name) is not in use.
+     * if $index > 1 - means that seo name ($object_name) already in use.
+     * For example:
+     *      One of the variations of the vendor product have seo name master-product-company
+     *      Another variation will have the master-product-2-company seo name, 2 - is $index
+     */
+
+    if ($index <= 1) {
+        $object_name = $master_product_seo_name . SEO_DELIMITER . $company_seo_name;
+        return;
+    }
+
+    $object_name = $master_product_seo_name . SEO_DELIMITER . $index . SEO_DELIMITER . $company_seo_name;
 }
 
 /**
@@ -1232,4 +1197,280 @@ function fn_master_products_update_product_popularity($product_id, array $popula
 
     $sync_service = ServiceProvider::getService();
     $sync_service->syncData('product_popularity', $product_id, $product_ids);
+}
+
+/**
+ * phpcs:disable SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint
+ * --------------------------------------------------------------------
+ *
+ * The "attachments_check_permission_post" hook handler.
+ *
+ * Actions performed:
+ * - Checks permission to work with attachment for common products
+ *
+ * @param mixed[] $request    Array of query parameters
+ * @param bool    $permission Permission
+ *
+ * @return void
+ */
+function fn_master_products_attachments_check_permission_post(array $request, &$permission)
+{
+    if ($permission || empty($request['object_id'])) {
+        return;
+    }
+
+    $product_id_map = ServiceProvider::getProductIdMap();
+    $permission = $product_id_map->isMasterProduct($request['object_id']);
+}
+
+/**
+ * The "change_company_status_before_mail" hook handler.
+ *
+ * Actions performed:
+ *  - Marks storefront to reindex the offers count of master products if vendor status changed
+ *
+ * @param int    $company_id  Company ID
+ * @param string $status_to   Status to letter
+ * @param string $reason      Reason text
+ * @param string $status_from Status from letter
+ *
+ * @see \fn_change_company_status()
+ */
+function fn_master_products_change_company_status_before_mail($company_id, $status_to, $reason, $status_from)
+{
+    if ($status_to !== VendorStatuses::ACTIVE && $status_from !== VendorStatuses::ACTIVE) {
+        return;
+    }
+
+    $indexer = ServiceProvider::getIndexer();
+    $indexer->markStorefrontToReindexStorefrontOffersCountByVendorId($company_id);
+}
+
+
+/**
+ * The "storefront_repository_save_post" hook handler.
+ *
+ * Actions performed:
+ *  - Marks storefront to reindex the offers count of master products if storefront was added
+ *  - Marks storefront to reindex the offers count of master products if storefront vendors were changed
+ *
+ * @param \Tygh\Storefront\Storefront  $storefront  Storefront
+ * @param \Tygh\Common\OperationResult $save_result Result of the save process
+ *
+ * @see \Tygh\Storefront\Repository::save()
+ */
+function fn_master_products_storefront_repository_save_post(Storefront $storefront, OperationResult $save_result)
+{
+    if ($save_result->isFailure()) {
+        return;
+    }
+
+    $storefront_id = (int) $save_result->getData();
+
+    if (empty($storefront->storefront_id)) {
+        ServiceProvider::getIndexer()->markStorefrontToReindexStorefrontOffersCount($storefront_id);
+        return;
+    }
+
+    if (!$storefront->isReleationChanged('company_ids')) {
+        return;
+    }
+
+    $company_ids = array_map('intval', $storefront->getCompanyIds());
+    $stored_company_ids = array_map('intval', (array) $storefront->getStoredRelationValue('company_ids'));
+
+    if ($company_ids === $stored_company_ids) {
+        return;
+    }
+
+    ServiceProvider::getIndexer()->markStorefrontToReindexStorefrontOffersCount($storefront_id);
+}
+
+/**
+ * The "settings_update_value_by_id_post" hook handler.
+ *
+ * Actions performed:
+ *  - Marks storefront to reindex the offers count of master products if the "Show out of stock products" setting was changed for storefront
+ *
+ * @param \Tygh\Settings $settings          Settings instance
+ * @param string         $object_id         Setting object ID
+ * @param string|array   $value             New value that was passed to function
+ * @param int            $company_id        Company ID
+ * @param bool           $execute_functions Whether to execute action functions
+ * @param array          $data              Data to be inserted/updated into settings objects table
+ * @param array          $old_data          Previously existed data (if any) of settings object at settings objects table
+ * @param string         $table             Table to save setting object value ("settings_objects" or "settings_vendor_values")
+ * @param int            $storefront_id     Storefront identifier
+ *
+ * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
+ */
+function fn_master_products_settings_update_value_by_id_post(Settings $settings, $object_id, $value, $company_id, $execute_functions, array $data, array $old_data, $table, $storefront_id)
+{
+    if ($old_data['value'] === $value) {
+        return;
+    }
+
+    if ($old_data['section_name'] === 'General' && $old_data['name'] === 'show_out_of_stock_products') {
+        if ($storefront_id) {
+            ServiceProvider::getIndexer()->markStorefrontToReindexStorefrontOffersCount($storefront_id);
+        } else {
+            ServiceProvider::getIndexer()->markAllStorefrontToReindexStorefrontOffersCount();
+        }
+        return;
+    }
+
+    if ($old_data['section_name'] === 'vendor_debt_payout' && $old_data['name'] === 'hide_products') {
+        ServiceProvider::getIndexer()->markAllStorefrontToReindexStorefrontOffersCount();
+        return;
+    }
+}
+
+/**
+ * The "update_product_tab_post" hook handler.
+ *
+ * Actions performed:
+ *  - If master product were removed when the tab settings, this hook handler will launch tab syncing.
+ *      This is necessary because the product page of a offer must not differ from the product page of its master product.
+ *
+ * @param int                       $tab_id   Product tab identifier
+ * @param array<string, string|int> $tab_data Product tab data
+ *
+ * @see \Tygh\BlockManager\ProductTabs::update
+ */
+function fn_master_products_update_product_tab_post($tab_id, $tab_data)
+{
+    if (empty($tab_data['product_ids'])) {
+        return;
+    }
+
+    $current_product_ids = [];
+    $product_ids = fn_explode(',', (string) $tab_data['product_ids']);
+
+    if (!empty($tab_data['current_product_ids'])) {
+        $current_product_ids = fn_explode(',', (string) $tab_data['current_product_ids']);
+    }
+
+    $deleted_product_ids = array_diff($current_product_ids, $product_ids);
+    $added_product_ids = array_diff($product_ids, $current_product_ids);
+    $affected_product_ids = array_merge($deleted_product_ids, $added_product_ids);
+
+    if (empty($affected_product_ids)) {
+        return;
+    }
+
+    $service = ServiceProvider::getService();
+    $product_id_map = ServiceProvider::getProductIdMap();
+    foreach ($affected_product_ids as $product_id) {
+        if (!$product_id_map->isMasterProduct($product_id) && !$product_id_map->isVendorProduct($product_id)) {
+            continue;
+        }
+        $service->onTableChanged('product_tabs', $product_id, ['tab_id' => $tab_id]);
+    }
+}
+
+/**
+ * The "master_products_reindex_storefront_offers_count" hook handler.
+ *
+ * Actions performed:
+ *   - Extends company statuses list with suspended status for update vendor offres count if "Hide products of suspended vendors" (Vendor-to-admin payments) is disabled
+ *
+ * @param array<string, int[]>  $params     Params
+ * @param array<string, string> $conditions Conditions
+ */
+function fn_vendor_debt_payout_master_products_reindex_storefront_offers_count(array $params, array &$conditions)
+{
+    if (YesNo::toBool(Settings::instance(['company_id' => 0])->getValue('hide_products', 'vendor_debt_payout'))) {
+        return;
+    }
+
+    // FIXME Indexer should be use fn_get_products conditions
+    $conditions['companies_status'] = db_quote('companies.status IN (?a)', [VendorStatuses::ACTIVE, VendorStatuses::SUSPENDED]);
+}
+
+/**
+ * Loads seller data for product offers.
+ *
+ * @param array<int, array<string, string|int|bool>> $products Product offers
+ *
+ * @return array<int, array<string, string|int|bool|array<string, string>>> Product offers with loaded seller data
+ */
+function fn_master_products_load_products_seller_data(array $products)
+{
+    list($companies,) = fn_get_companies([
+        'company_id' => array_column($products, 'company_id'),
+        'extend'     => [
+            'product_count'  => YesNo::NO,
+            'logos'          => true,
+            'placement_info' => true,
+        ],
+    ], Tygh::$app['session']['auth']);
+
+    $companies = fn_array_combine(array_column($companies, 'company_id'), $companies);
+
+    foreach ($products as &$product) {
+        $product['company'] = $companies[$product['company_id']];
+        $product['is_vendor_products_list_item'] = true;
+    }
+    unset($product);
+
+    return $products;
+}
+
+/**
+ * The "storefront_rest_api_gather_additional_products_data_pre" hook handler.
+ *
+ * Actions performed:
+ * - Loads sellers data for products when requested via API.
+ *
+ * @param array<int, array<string, string|int|bool>> $products           Products
+ * @param array<string, string>                      $params             Request parameters
+ * @param array<string, string>                      $data_gather_params Product data gather parameters
+ *
+ * @return void
+ *
+ * @param-out array<int, array<string, string|int|bool|array<string, string>>> $products Products
+ *
+ * @see \fn_storefront_rest_api_gather_additional_products_data()
+ */
+function fn_master_products_storefront_rest_api_gather_additional_products_data_pre(
+    array &$products,
+    array $params,
+    array $data_gather_params
+) {
+    if (empty($params['vendor_products_by_product_id'])) {
+        return;
+    }
+
+    $products = fn_master_products_load_products_seller_data($products);
+
+    $public_company_properties = [
+        'email'               => true,
+        'company'             => true,
+        'company_description' => true,
+        'address'             => true,
+        'city'                => true,
+        'state'               => true,
+        'country'             => true,
+        'zipcode'             => true,
+        'phone'               => true,
+        'url'                 => true,
+        'logos'               => true,
+        'average_rating'      => true,
+        'discussion'          => true,
+    ];
+    foreach ($products as &$product) {
+        /**
+         * @psalm-var array{
+         *   company: array<string, string>
+         * } $product
+         */
+        $product['company'] = array_filter(
+            $product['company'],
+            static function ($property) use ($public_company_properties) {
+                return isset($public_company_properties[$property]);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+    }
+    unset($product);
 }

@@ -2,18 +2,23 @@
 
 <form action="{""|fn_url}" method="post" name="countries_form" class="{if ""|fn_check_form_permissions} cm-hide-inputs{/if}">
 
+{$has_permission = fn_check_permissions("countries", "m_activate", "admin", "POST", ["table" => "countries"]) && fn_check_permissions("countries", "m_disable", "admin", "POST", ["table" => "countries"])}
+{$country_statuses=""|fn_get_default_statuses:false}
+
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 
-{hook name="countries:bulk_edit"}
-    {include file="views/countries/components/bulk_edit.tpl"}
-{/hook}
+{if $has_permission}
+    {hook name="countries:bulk_edit"}
+        {include file="views/countries/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
 
 <div class="table-responsive-wrapper longtap-selection">
     <table width="100%" class="table table-middle table--relative table-responsive">
-    <thead data-ca-bulkedit-default-object="true">
+    <thead data-ca-bulkedit-default-object="true" data-ca-bulkedit-component="defaultObject">
         <tr>
             <th width="6%" class="left mobile-hide">
-                {include file="common/check_items.tpl" check_statuses=''|fn_get_default_status_filters:true}
+                {include file="common/check_items.tpl" check_statuses=($has_permission) ? ($country_statuses) : ""}
 
                 <input type="checkbox"
                     class="bulkedit-toggler hide"
@@ -32,9 +37,11 @@
     </thead>
     {foreach from=$countries item=country}
     <tr class="cm-row-status-{$country.status|lower} cm-longtap-target"
-        data-ca-longtap-action="setCheckBox"
-        data-ca-longtap-target="input.cm-item"
-        data-ca-id="{$country.code}"
+        {if $has_permission}
+            data-ca-longtap-action="setCheckBox"
+            data-ca-longtap-target="input.cm-item"
+            data-ca-id="{$country.code}"
+        {/if}
     >
        <td width="6%" class="center">
             {* <input type="checkbox" name="delete[{$country.code}]" id="delete_checkbox" value="Y" class="checkbox cm-item" /> *}
@@ -56,8 +63,8 @@
             {*<input type="text" name="country_data[{$country.code}][region]" size="3" value="{$country.region}" class="input-medium input-hidden" />*}{$country.region}
         </td>
         <td width="10%" class="right" data-th="{__("status")}">
-            {$has_permission = fn_check_permissions("tools", "update_status", "admin", "GET", ["table" => "countries"])}
-            {include file="common/select_popup.tpl" id=$country.code status=$country.status hidden="" object_id_name="code" table="countries" non_editable=!$has_permission}
+            {$has_permission_update_status = fn_check_permissions("tools", "update_status", "admin", "GET", ["table" => "countries"])}
+            {include file="common/select_popup.tpl" id=$country.code status=$country.status hidden="" object_id_name="code" table="countries" non_editable=!$has_permission_update_status}
         </td>
     </tr>
     {/foreach}

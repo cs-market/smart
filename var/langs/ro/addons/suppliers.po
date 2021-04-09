@@ -6,9 +6,11 @@ msgstr ""
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.11.3/addons/suppliers.po\n"
-"PO-Revision-Date: 2020-01-29 14:52\n"
+"X-Crowdin-File: /release-4.12.2/addons/suppliers.po\n"
+"X-Crowdin-File-ID: 4148\n"
+"PO-Revision-Date: 2021-02-01 09:11\n"
 
 msgctxt "Addons::name::suppliers"
 msgid "Suppliers"
@@ -84,6 +86,14 @@ msgstr ""
 
 msgctxt "Languages::email_template.suppliers_notification"
 msgid "Supplier notification"
+msgstr ""
+
+msgctxt "Languages::email_template.supplier_notification_with_status"
+msgid "Supplier notification: [name]"
+msgstr ""
+
+msgctxt "Languages::email_template.suppliers_notification_default"
+msgid "Supplier notification: Default template for a new order status"
 msgstr ""
 
 msgctxt "Languages::template_document_supplier_order_invoice"

@@ -8,7 +8,7 @@
 <div class="control-group">
     <label class="control-label" for="ab_shared_secret">{__("shared_secret")}:</label>
     <div class="controls">
-        <input type="password" name="payment_data[processor_params][shared_secret]" id="ab_shared_secret" value="{$processor_params.shared_secret}"   size="60">
+        <input type="password" name="payment_data[processor_params][shared_secret]" id="ab_shared_secret" value="{$processor_params.shared_secret}" autocomplete="new-password"  size="60">
     </div>
 </div>
 

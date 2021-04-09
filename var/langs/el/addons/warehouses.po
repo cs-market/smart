@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/warehouses.po\n"
-"X-Crowdin-File-ID: 3610\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/warehouses.po\n"
+"X-Crowdin-File-ID: 4180\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::warehouses"
 msgid "Warehouses [Beta]"
@@ -18,7 +18,7 @@ msgstr "Αποθήκες [Beta]"
 
 msgctxt "Addons::description::warehouses"
 msgid "Lets you set product stock separately for each store and warehouse. Shows to customers the availability of a product in stores or in particular rate areas."
-msgstr ""
+msgstr "Σας επιτρέπει να ορίσετε το απόθεμα προϊόντων ξεχωριστά για κάθε κατάστημα και αποθήκη. Δείχνει στους πελάτες τη διαθεσιμότητα ενός προϊόντος σε καταστήματα ή σε συγκεκριμένες περιοχές τιμών."
 
 msgctxt "Languages::warehouses.store_type"
 msgid "Type"
@@ -114,7 +114,7 @@ msgstr "Το προϊόν βρίσκεται σε απομακρυσμένη α�
 
 msgctxt "Languages::warehouses.shipping_delay.description.default"
 msgid "Product is at a remote warehouse. If you order it, shipping may take slightly longer."
-msgstr ""
+msgstr "Το προϊόν βρίσκεται σε απομακρυσμένη αποθήκη. Εάν το παραγγείλετε, η αποστολή ενδέχεται να διαρκέσει λίγο περισσότερο."
 
 msgctxt "Languages::warehouses.shipping_delay.description.short"
 msgid "If ordered: [shipping_delay]"
@@ -190,17 +190,33 @@ msgstr "Πληκτρολογήστε για αναζήτηση, ή κάντε κ
 
 msgctxt "Languages::warehouses.any_store_type"
 msgid "Any type of store"
-msgstr ""
+msgstr "Οποιοδήποτε είδος καταστήματος"
 
 msgctxt "Languages::warehouses.add_all"
 msgid "Add all"
-msgstr ""
+msgstr "Προσθήκη όλων"
 
 msgctxt "Languages::warehouses.quantity_tab.no_data"
 msgid "This storefront doesn't have any stores or warehouses. Please <a href=\"[create_url]\">create one</a> or <a href=\"[list_url]\">make an existing one available</a> for this storefront"
-msgstr ""
+msgstr "Αυτή η βιτρίνα δεν διαθέτει καταστήματα ή αποθήκες. <a href=\"[create_url]\"> Δημιουργήστε ένα </a> ή <a href=\"[list_url]\"> δώστε ένα  διαθέσιμο </a> σ αυτήν τη βιτρίνα"
 
 msgctxt "Languages::warehouses.exim_reset_inventory_tooltip"
 msgid "This won't affect the products that have the quantity specified in the imported file. This also won't affect products at the warehouses that aren't updated in this preset."
-msgstr ""
+msgstr "Αυτό δεν θα επηρεάσει τα προϊόντα που έχουν καθορισμένη ποσότητα στο εισαγόμενο αρχείο. Αυτό επίσης δεν θα επηρεάσει τα προϊόντα στις αποθήκες που δεν ενημερώνονται σε αυτήν την προεπιλογή."
+
+msgctxt "Languages::commerceml.map.entity_type.warehouse"
+msgid "Warehouses"
+msgstr "Αποθήκες"
+
+msgctxt "Languages::commerceml.tab.warehouse"
+msgid "Warehouses"
+msgstr "Αποθήκες"
+
+msgctxt "Languages::warehouses.commerceml.import.error.product.warehouse_not_found"
+msgid "Couldn't find warehouse [id]"
+msgstr "Δεν ήταν δυνατή η εύρεση αποθήκης [id]"
+
+msgctxt "Languages::warehouses.commerceml.import.message.warehouse.created"
+msgid "Category [id] created; local ID: [local_id]"
+msgstr "Δημιουργήθηκε η κατηγορία [id]. τοπικό αναγνωριστικό: [local_id]"
 

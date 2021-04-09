@@ -4,6 +4,7 @@
     $input_name                 string                  Select input name
     $multiple                   bool                    Whether to multiple selection
     $show_advanced              bool                    Show advanced button
+    $show_positions             bool                    Show product position
     $autofocus                  bool                    Whether to auto focus on input
     $autoopen                   bool                    Whether to auto open dropdown
     $allow_clear                bool                    Show clear button
@@ -27,6 +28,7 @@
 {$autofocus = $autofocus|default:false}
 {$autoopen = $autoopen|default:false}
 {$allow_clear = $allow_clear|default:false}
+{$show_positions  = $show_positions|default:false}
 {$item_ids = $item_ids|default:[]|array_filter}
 
 {if $multiple && $show_advanced}
@@ -113,6 +115,9 @@
 {if $view_mode == "external"}
     <script type="text/template" id="object_picker_selection_template_{$picker_id}" data-no-defer="true" data-no-execute="§">
         <div class="cm-object-picker-object object-picker__selection-extended object-picker__selection-extended--products">
+            {if $show_positions}
+                {include file="views/products/components/picker/item_position.tpl"}
+            {/if}
             {include file="views/products/components/picker/item_extended.tpl"
                 type="selection"
                 title_pre={$selection_title_pre}

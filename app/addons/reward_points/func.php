@@ -12,6 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
 
@@ -470,6 +471,10 @@ function fn_reward_points_change_order_status(&$status_to, &$status_from, &$orde
 
     $points_info = (isset($order_info['points_info'])) ? $order_info['points_info'] : array();
     if (!empty($points_info)) {
+        if (!empty($order_info['parent_order_id'])) {
+            $parent_order_info = fn_get_order_info($order_info['parent_order_id']);
+            $parent_order_points_info = isset($parent_order_info['points_info']) ? $parent_order_info['points_info'] : [];
+        }
         $reason = array(
             'order_id' => $order_info['order_id'],
             'to' => $status_to,
@@ -487,11 +492,17 @@ function fn_reward_points_change_order_status(&$status_to, &$status_from, &$orde
             }
         }
 
-        if ($grant_points_to == 'N' && $grant_points_from == 'Y') {
-            if ($points_info['is_gain'] == 'Y' && !empty($points_info['reward'])) {
-                // decrease earned points
-                $log_id = fn_change_user_points( - $points_info['reward'], $order_info['user_id'], serialize($reason), $action);
-                db_query("DELETE FROM ?:order_data WHERE order_id = ?i AND type = ?s", $order_info['order_id'], ORDER_DATA_POINTS_GAIN);
+        if (
+            $grant_points_to === YesNo::NO && $grant_points_from === YesNo::YES
+            && $points_info['is_gain'] === YesNo::YES && !empty($points_info['reward'])
+            && (!isset($parent_order_points_info)
+                || ($parent_order_points_info['is_gain'] === YesNo::YES && !empty($parent_order_points_info['reward'])))
+        ) {
+            // decrease earned points
+            $log_id = fn_change_user_points(-$points_info['reward'], $order_info['user_id'], serialize($reason), $action);
+            db_query('DELETE FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_info['order_id'], ORDER_DATA_POINTS_GAIN);
+            if (isset($parent_order_points_info)) {
+                db_query('DELETE FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_info['parent_order_id'], ORDER_DATA_POINTS_GAIN);
             }
         }
 
@@ -507,15 +518,23 @@ function fn_reward_points_change_order_status(&$status_to, &$status_from, &$orde
             }
         }
 
-        if ($grant_points_to == 'Y' && $points_info['is_gain'] == 'N' && !empty($points_info['reward'])) {
+        if (
+            $grant_points_to === YesNo::YES && $points_info['is_gain'] === YesNo::NO && !empty($points_info['reward'])
+                && (!isset($parent_order_points_info)
+                    || ($parent_order_points_info['is_gain'] === YesNo::NO && !empty($parent_order_points_info['reward'])))
+        ) {
             // increase  rewarded points
             $log_id = fn_change_user_points($points_info['reward'], $order_info['user_id'], serialize($reason), $action);
-            $order_data = array(
+            $order_data = [
                 'order_id' => $order_info['order_id'],
-                'type' => ORDER_DATA_POINTS_GAIN,
-                'data' => 'Y'
-            );
-            db_query("REPLACE INTO ?:order_data ?e", $order_data);
+                'type'     => ORDER_DATA_POINTS_GAIN,
+                'data'     => YesNo::YES,
+            ];
+            db_replace_into('order_data', $order_data);
+            if (isset($parent_order_points_info)) {
+                $order_data['order_id'] = $order_info['parent_order_id'];
+                db_replace_into('order_data', $order_data);
+            }
         }
     }
 }

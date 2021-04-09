@@ -22,8 +22,6 @@
 {script src="js/tygh/fileuploader_scripts.js"}
 {script src="js/tygh/node_cloning.js"}
 
-{assign var="id_var_name" value="`$prefix`{$var_name|md5}"}
-
 <div class="fileuploader cm-field-container">
     <input type="hidden" id="{$label_id}" value="" />
 
@@ -41,9 +39,9 @@
             </p>
             <p class="cm-fu-no-file">
                 {if $preset.file}
-                    <a href="{"import_presets.get_file?preset_id=`$preset.preset_id`&company_id=`$preset.company_id`"|fn_url}">
-                        {$preset.file}
-                    </a>
+                        <a href="{"import_presets.get_file?preset_id=`$preset.preset_id`&company_id=`$runtime.company_id`"|fn_url}">
+                            {$preset.file}
+                        </a>
                 {else}
                     {__("text_select_file")}
                 {/if}
@@ -73,7 +71,7 @@
                         </label>
                     </div>
                 </div>
-                {if !($hide_server || "RESTRICTED_ADMIN"|defined)}
+                {if !$hide_server}
                     <a class="btn" onclick="Tygh.fileuploader.show_loader(this.id);" id="server_{$id_var_name}">
                         {__("server")}
                     </a>

@@ -8,9 +8,9 @@ msgstr ""
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.11.5/addons/product_variations.po\n"
-"X-Crowdin-File-ID: 3686\n"
-"PO-Revision-Date: 2020-09-01 09:18\n"
+"X-Crowdin-File: /release-4.12.2/addons/product_variations.po\n"
+"X-Crowdin-File-ID: 4118\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::product_variations"
 msgid "Product Variations"
@@ -33,8 +33,8 @@ msgid "If child variations aren't allowed to have their own images, they will us
 msgstr "Αν οι παραλλαγές παιδιά δεν επιτρέπεται να έχουν τις δικές τους μοναδικές εικόνες, θα χρησιμοποιήσουν τις εικόνες από την προκαθορισμένη παραλλαγή του αντικειμένου του καταλόγου."
 
 msgctxt "SettingsOptions::product_variations::variations_allow_auto_change_default_variation"
-msgid "Change default variation when it runs out of stock"
-msgstr "Αλλαγή προκαθορισμένης παραλλαγής όταν τελειώνει το απόθεμα"
+msgid "Change default variation when it gets hidden or runs out of stock"
+msgstr "Αλλαγή προκαθορισμένης παραλλαγής όταν γίνεται κρυφό ή τελειώνει το απόθεμα"
 
 msgctxt "SettingsTooltips::product_variations::variations_allow_auto_change_default_variation"
 msgid "Ensure that customers always see the products that are in stock first. We recommend leaving this setting enabled for better filtering of variations."
@@ -47,6 +47,14 @@ msgstr "Επιτρέψτε ξεχωριστές τιμές χαρακτηρισ�
 msgctxt "SettingsTooltips::product_variations::variations_allow_own_features"
 msgid "If child variations aren't allowed to have their own values for features, they will use the values from the default variation of the catalog item."
 msgstr "Αν οι παραλλαγές παιδιά δεν επιτρέπεται να έχουν ξεχωριστές τιμές για τα χαρακτηριστικά τους, θα χρησιμοποιήσουν τις τιμές χαρακτηριστικών από την προκαθορισμένη παραλλαγή του αντικειμένου του καταλόγου."
+
+msgctxt "SettingsOptions::product_variations::variations_show_all_possible_feature_variants"
+msgid "Show all possible feature variants"
+msgstr "Εμφάνιση όλων των πιθανών μεταβλητών τών χαρακτηριστικών"
+
+msgctxt "SettingsTooltips::product_variations::variations_show_all_possible_feature_variants"
+msgid "Show a feature variant even if it is not available for this variation."
+msgstr "Εμφάνιση  μεταβλητής χαρακτηριστικών ακόμα και αν δεν είναι διαθέσιμη για αυτήν την παραλλαγή."
 
 msgctxt "Languages::product_variations.product_type"
 msgid "Product type"
@@ -88,10 +96,6 @@ msgctxt "Languages::product_variations.group_code.link"
 msgid "Add to variation group"
 msgstr "Προσθήκη στην ομάδα παραλλαγών"
 
-msgctxt "Languages::product_variations.group_code.link.description"
-msgid "Select the code of the group to which this product will be added as a variation. If the desired variation group doesn't appear among suggestions, please make sure that you have specified the value for every feature that defines the group."
-msgstr "Επιλέξτε τον κωδικό της ομάδας στην οποία θα προστεθεί αυτό το προϊόν ως παραλλαγή. Εάν η επιθυμητή ομάδα παραλλαγών δεν εμφανίζεται μεταξύ των προτάσεων, βεβαιωθείτε ότι έχετε ορίσει την τιμή για κάθε χαρακτηριστικό που ορίζει την ομάδα."
-
 msgctxt "Languages::product_variations.add_variations"
 msgid "Add variations"
 msgstr "Προσθηκη παραλλαγων"
@@ -105,8 +109,8 @@ msgid "Create new products"
 msgstr "Δημιουργήστε νέα Προϊόντα"
 
 msgctxt "Languages::product_variations.add_variations_description"
-msgid "Allow customers to switch between similar products by selecting the desired value of their common features."
-msgstr "Επιτρέψτε στους πελάτες την εναλλαγή μεταξύ παρόμοιων προϊόντων επιλέγοντας την επιθυμητή τιμή για τα κοινά τους χαρακτηριστικά."
+msgid "Add variations to generate a group of similar products that differ in color, size, etc. Or add this product to an existing group by entering the group code."
+msgstr "Προσθέστε παραλλαγές για να δημιουργήσετε μια ομάδα παρόμοιων προϊόντων που διαφέρουν σε χρώμα, μέγεθος κ.λπ. Ή προσθέστε αυτό το προϊόν σε μια υπάρχουσα ομάδα εισάγοντας τον κωδικό ομάδας."
 
 msgctxt "Languages::product_variations.manage"
 msgid "Manage variations"
@@ -133,8 +137,8 @@ msgid "Set as default variation"
 msgstr "Ορισμός παραλλαγής ως προεπιλογή"
 
 msgctxt "Languages::product_variations.no_available_features"
-msgid "This product doesn't have features that allow grouping products. Please make sure that:<ol><li>You have created at least one feature with <b>Purpose:</b> <i>Variations as separate products</i> or <i>Variations as one product</i>.</li><li>You have specified the value of that feature for the product.</li></ol>"
-msgstr "Αυτό το προϊόν δεν διαθέτει τα χαρακτηριστικά που επιτρέπουν την ομαδοποίηση προϊόντων. Βεβαιωθείτε ότι: <ol><li>Έχετε δημιουργήσει τουλάχιστον ένα χαρακτηριστικό με το πεδίο <b>Σκοπός:</b><i>Παραλλαγή μεταξύ παρόμοιων προϊόντων</i>.</li><li>Έχετε ορίσει την τιμή αυτού του χαρακτηριστικού για το προϊόν</li></ol>"
+msgid "This product doesn't have features that allow grouping products. Please make sure that:<ol><li>You have created at least one feature with <b>Purpose:</b> <i>Variations as separate products</i> or <i>Variations as one product</i>.</li><li>You have specified the value of that feature for the product.</li></ol><a href=[manage_features_href]>Manage features</a>"
+msgstr "Αυτό το προϊόν δεν διαθέτει χαρακτηρηστικά που να επιτρέπουν την ομαδοποίηση προϊόντων. Βεβαιωθείτε ότι: <ol> <li> Έχετε δημιουργήσει τουλάχιστον ένα χαρακτηρηστικό με <b> Σκοπός: </b> <i> Παραλλαγές ως ξεχωριστά προϊόντα </i> ή <i> Παραλλαγές ως ένα προϊόν </ i >. </li> <li> Έχετε καθορίσει την αξία αυτού του χαρακτηριστικού για το προϊόν. </li> </ol> <a href=[manage_features_href]> Διαχείριση χαρακτηρηστικών </a>"
 
 msgctxt "Languages::product_feature.purpose.group_catalog_item"
 msgid "Variations as separate products"
@@ -202,7 +206,7 @@ msgstr "Τα προϊόντα δεν ήταν δυνατόν να βρεθούν
 
 msgctxt "Languages::product_variations.select_variation"
 msgid "Select a Variation"
-msgstr ""
+msgstr "Επιλέξτε μια παραλλαγή"
 
 msgctxt "Languages::product_variations.error.group_code_is_required"
 msgid "Variation group code must be specified"
@@ -305,114 +309,6 @@ msgctxt "Languages::product_variations.variations_naming_strategy.value"
 msgid "Red, Small"
 msgstr "Κόκκινο, Μικρό"
 
-msgctxt "Languages::product_variations.converter.progress.features.title"
-msgid "Creating features"
-msgstr "Δημιουργία χαρακτηριστικών"
-
-msgctxt "Languages::product_variations.converter.progress.features.error"
-msgid "Couldn't create feature \"[feature]\""
-msgstr "Δεν ήταν δυνατή η δημιουργία του χαρακτηριστικού \"[feature]\""
-
-msgctxt "Languages::product_variations.converter.progress.variations.title"
-msgid "Converting variations"
-msgstr "Μετατροπή παραλλαγών"
-
-msgctxt "Languages::product_variations.converter.progress.variations.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr "Δεν ήταν δυνατή η μετατροπή του προϊόντος \"[product]\""
-
-msgctxt "Languages::product_variations.converter.progress.configurable_products.title"
-msgid "Converting configurable products"
-msgstr "Μετατροπή διαμορφώσιμων προϊόντων"
-
-msgctxt "Languages::product_variations.converter.progress.configurable_products.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr "Δεν ήταν δυνατή η μετατροπή του προϊόντος \"[product]\""
-
-msgctxt "Languages::product_variations.converter.progress.result.title"
-msgid "Conversion results"
-msgstr "Αποτελεσματα μετατροπής"
-
-msgctxt "Languages::product_variations.converter.progress.result.configurable_products_count"
-msgid "Number of converted configurable products:"
-msgstr "Αριθμός των διαμορφώσιμων προϊόντων που μετατράπηκαν:"
-
-msgctxt "Languages::product_variations.converter.progress.result.variations_count"
-msgid "Number of converted variations:"
-msgstr "Πλήθος παραλλαγών που έχουν μετατραπεί:"
-
-msgctxt "Languages::product_variations.converter.progress.result.products_with_combinations_count"
-msgid "Number of converted products with option combinations:"
-msgstr "Πλήθος προϊόντων με συνδυασμούς επιλογών που έχουν μετατραπεί:"
-
-msgctxt "Languages::product_variations.converter.progress.result.combinations_count"
-msgid "Number of converted option combinations:"
-msgstr "Πλήθος συνδυασμών επιλογών που έχουν μετατραπεί:"
-
-msgctxt "Languages::product_variations.converter.progress.result.go_on_products"
-msgid "Go to products"
-msgstr "Πηγαινε στα προϊόντα"
-
-msgctxt "Languages::product_variations.converter.view.title"
-msgid "Converting products into variations"
-msgstr "Μετατροπή προϊόντων σε παραλλαγές"
-
-msgctxt "Languages::product_variations.converter.view.no_data"
-msgid "No data for conversion found: it appears that your store doesn't have option combinations or product variations."
-msgstr "Δεν βρέθηκαν δεδομένα προς μετατροπή: φαίνεται ότι το κατάστημα σας δέν έχει συνδυασμούς επιλογών η παραλλαγές προϊόντων."
-
-msgctxt "Languages::product_variations.converter.view.configurable_products_count"
-msgid "Number of configurable products found:"
-msgstr "Πλήθος διαμορφώσιμων προϊόντων που βρέθηκαν:"
-
-msgctxt "Languages::product_variations.converter.view.variations_count"
-msgid "Number of product variations found:"
-msgstr "Πλήθος αριθμού παραλλαγών που βρέθηκαν:"
-
-msgctxt "Languages::product_variations.converter.view.products_with_combinations_count"
-msgid "Number of products with option combinations found:"
-msgstr "Πλήθος προϊόντων μαζί με συνδυασμούς επιλογών που βρέθηκαν:"
-
-msgctxt "Languages::product_variations.converter.view.combinations_count"
-msgid "Number of option combinations found:"
-msgstr "Πλήθος συνδυασμών επιλογών που βρέθηκαν:"
-
-msgctxt "Languages::product_variations.converter.progress.combinations.title"
-msgid "Converting option combinations"
-msgstr "Μετατροπή συνδυασμών επιλογών"
-
-msgctxt "Languages::product_variations.converter.progress.combinations.error"
-msgid "Couldn't convert option combination \"[combination]\" of product \"[product]\""
-msgstr "Δεν ήταν δυνατή η μετατροπή του συνδυασμού επιλογών \"[combination]\" του προϊόντος \"[product]\""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.title"
-msgid "Converting products with option combinations"
-msgstr "Μετατροπή προϊόντων με συνδυασμούς επιλογών"
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.error"
-msgid "Couldn't convert product \"[product]\""
-msgstr "Δεν ήταν δυνατή η μετατροπή του προϊόντος \"[product]\""
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.error_with_reason"
-msgid "Couldn't convert product \"[product]\". Reason: [error]"
-msgstr "Δεν ήταν δυνατή η μετατροπή του προϊόντος \"[product]\". Λόγος: [error]"
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.no_available_combinations"
-msgid "Product doesn't have any option combinations."
-msgstr "To προϊόν δεν έχει συνδυασμούς επιλογών."
-
-msgctxt "Languages::product_variations.converter.progress.products_with_combinations.only_one_combination"
-msgid "A product with only one available option combination can't be converted to a variation. It will work properly even without conversion."
-msgstr "Ένα προϊόν με έναν μόνο διαθέσιμο συνδυασμό επιλογής δεν μπορεί να μετατραπεί σε παραλλαγή. Θα λειτουργήσει όπως πρέπει και χωρίς μετατροπή."
-
-msgctxt "Languages::product_variations.converter.progress.errors"
-msgid "Errors"
-msgstr "Σφάλματα"
-
-msgctxt "Languages::product_variations.converter.progress.wait_another_process"
-msgid "Please wait while another process will be complete"
-msgstr "Παρακαλώ περιμένετε μέχρι μία άλλη διαδικασία να ολοκληρωθεί"
-
 msgctxt "Languages::product_variations.upgrade_notification.convert_variations_title"
 msgid "Convert product variations to use features"
 msgstr "Μετατροπή παραλλαγών προϊόντος για χρήση με χαρακτηριστικά"
@@ -424,10 +320,6 @@ msgstr "<p>Οι παραλλαγές προϊόντων στην έκδοση 4.
 msgctxt "Languages::product_variations.feature_can_be_deleted"
 msgid "Couldn't delete a feature or its variant because at least one variation group is based on it. Please delete <a href=\"[href]\">these products</a> or disband their product groups, and try again."
 msgstr "Δεν ήταν δυνατή η διαγραφή ενός χαρακτηριστικού είτε της παραλλαγής του, καθώς μία η περισσότερες ομάδες παραλλαγής βασίζονται σε αυτό χαρακτηριστικό. Παρακαλώ διαγράψτε<a href=\"[href]\">αυτά τα προϊόντα</a>είτε διαγράψτε τις ομάδες του προϊόντος και προσπαθήστε ξανά."
-
-msgctxt "Languages::product_variations.converter.result.problems_encountered"
-msgid "Some of the products couldn't be converted. This is not a standard situation and wasn't supposed to happen. There are several ways to address it:<ul><li>Check the products that couldn't be converted and configure them manually.</li><li>Contact our technical support via Help Desk, and we'll see why products weren't converted and what can be done about it.</li></ul>"
-msgstr "Δεν ήταν δυνατή η μετατροπή κάποιων προϊόντων. Αυτό δεν είναι μια τυπική κατάσταση και δεν ήταν προγραμματισμένο να προκύψει.Υπάρχουν πολλοί τρόποι να την αντιμετωπίσετε:<ul><li>Κάντε έλεγχο στα προϊόντα τα οποία δεν ήταν δυνατόν να μετατραπούν και ρυθμίστε τα χειροκίνητα.</li><li>Επικοινωνήστε με την τεχνική υποστήριξη μέσω του Help Desk και θα διαπιστώσουμε γιατί δεν ήταν δυνατή η μετατροπή και τι μπορούμε μπορεί να γίνει για αυτό.</li></ul>"
 
 msgctxt "Languages::product_variations.notice.old_product_variations_exists"
 msgid "Your store still has old product variations. They currently appear as separate products, without the ability to switch between them. To make them work as before the upgrade, <a href=\"[convert_url]\">convert old variations to new variations</a>. It's easy and automatic."
@@ -441,22 +333,6 @@ msgctxt "Languages::variation_set_as_default"
 msgid "Variation set as default"
 msgstr "Η παραλλαγή έχει οριστεί ως προεπιλογή"
 
-msgctxt "Languages::product_variations.converter.features.merge"
-msgid "Merge selected"
-msgstr "Συγχώνευση επιλεγμένων"
-
-msgctxt "Languages::product_variations.converter.features.unmerge"
-msgid "Split"
-msgstr "Διαχωρισμός"
-
-msgctxt "Languages::product_variations.converter.features.list.title"
-msgid "Features and feature variants"
-msgstr "Χαρακτηριστικά και παραλλαγές χαρακτηριστικών"
-
-msgctxt "Languages::product_variations.converter.features.list.hint"
-msgid "Below you'll find the list of features and feature variants that will be created during the conversion."
-msgstr "Παρακάτω θα βρείτε την λίστα με τα χαρακτηριστικά και τις πασραλλαγές χαρακτηριστικών τα οποία θα δημιουργηθούν κατά την διάρκεια της μετατροπής."
-
 msgctxt "Languages::product_variations.cant_edit_feature_categories"
 msgid "Couldn't assign feature to categories or a feature group. Some variations use this feature and aren't in the categories you tried to assign. Please delete <a href=\"[href]\">these products</a>, or disband their variation groups, or assign them to the same categories as feature or feature group, and try again."
 msgstr "Δεν ήταν δυνατή η εκχώρηση χαρακτηριστικών στις κατηγορίες ή στις ομάδες χαρακτηριστικών. Κάποιες παραλλαγές χρησιμοποιούν αυτό το χαρακτηριστικό που δεν ανήκει στις κατηγορίες στις οποίες προσπαθείτε να τις καταχωρήσετε. Παρακαλώ διαγράψτε <a href=\"[href]\">αυτά τα προϊόντα </a>, είτε διαγράψτε τις ομάδες παραλλαγών, είτε καταχωρήστε τα προϊόντα στις ίδιες κατηγορίες στις οποίες βρίσκονται ήδη τα χαρακτηριστικά ή οι ομάδες χαρακτηριστικών, έπειτα προσπαθήστε ξανά."
@@ -465,23 +341,51 @@ msgctxt "Languages::product_variations.too_many_combinations"
 msgid "Sorry, there are too many possible variations that can be generated. To prevent heavy load, we won't display them here. Please create the products with the right feature values manually or via import, and add them to the group."
 msgstr "Συγνώμη, υπάρχουν πάρα πολλές δυνατές παραλλαγές που μπορούν να δημιουργηθούν. Για να αποφύγουμε το μεγάλο φόρτο, δεν θα τις απεικονίσουμε εδώ πέρα. Παρακαλώ δημιουργήστε τα προϊόντα με τις σωστές τιμές χαρακτηριστικών χειροκίνητα η μέσω της λειτουργίας της εισαγωγής(import), έπειτα προσθέσετε τα σε ομάδα."
 
+msgctxt "Languages::product_variations.generator.features.placeholder"
+msgid "Search for features that can generate variations"
+msgstr "Αναζητήστε χαρακτηρηστικά που μπορούν να δημιουργήσουν παραλλαγές"
+
+msgctxt "Languages::product_variations.generator.warning.new_features_add"
+msgid "You can add a new feature if you disband the group in the actions menu and create variations again."
+msgstr "Μπορείτε να προσθέσετε ένα νέο χαρακτηρηστικό αν διαλύσετε την ομάδα στο μενού ενεργειών και δημιουργήσετε ξανά παραλλαγές."
+
+msgctxt "Languages::product_variations.generator.feature_variants.placeholder"
+msgid "Type to search"
+msgstr "Πληκτρολογήστε για αναζήτηση ..."
+
+msgctxt "Languages::product_variations.generator.feature_variants.add_all_variants"
+msgid "Add all variants"
+msgstr "Προσθήκη όλων των παραλλαγών"
+
+msgctxt "Languages::product_variations.generator.table.title"
+msgid "Modify the variations to be created:"
+msgstr "Τροποποιήστε τις παραλλαγές που θα δημιουργηθούν:"
+
+msgctxt "Languages::product_variations.generator.create_btn"
+msgid "Create [n] variation|Create [n] variations"
+msgstr "Δημιουργία  [n] παραλλαγής | Δημιουργία  [n] παραλλαγών "
+
 msgctxt "Languages::product_variations.allow_own_features_setting_changing"
 msgid "You've disabled the <b>Allow own feature values for child variations</b> setting. Please export <a href=\"[url]\">all your default variations</a> (use \"Export found products\" in the gear button) and reimport them. This will apply their feature values to existing child variations."
-msgstr ""
+msgstr "Έχετε απενεργοποιήσει τη ρύθμιση <b> Να επιτρέπονται οι τιμές χαρακτηριστικών για παραλλαγές-παιδια  </b>. Εξαγάγετε <a href=\"[url]\"> όλες τις προεπιλεγμένες παραλλαγές σας </a> (χρησιμοποιήστε το \"Εξαγωγή προϊόντων που βρέθηκαν\" στο κουμπί με το γρανάζι) και εισαγάγετέ τα ξανά. Αυτό θα εφαρμόσει τις τιμές χαρακτηριστικών τους σε υπάρχουσες παραλλαγές-παιδια."
 
 msgctxt "Languages::product_variations.allow_own_images_setting_changing"
 msgid "You've disabled the <b>Allow own images for child variations</b> setting. Please export <a href=\"[url]\">all your default variations</a> (use \"Export found products\" in the gear button) and reimport them. This will apply their images to existing child variations."
-msgstr ""
+msgstr "Έχετε απενεργοποιήσει τη ρύθμιση <b> Να επιτρέπονται εικόνες για παραλλαγές-παιδια  </b>. Εξαγάγετε <a href=\"[url]\"> όλες τις προεπιλεγμένες παραλλαγές σας </a> (χρησιμοποιήστε το \"Εξαγωγή προϊόντων που βρέθηκαν\" στο κουμπί με το γρανάζι) και εισαγάγετέ τα ξανά. Αυτό θα εφαρμόσει τις εικόνες τους σε υπάρχουσες παραλλαγές-παιδια."
 
 msgctxt "Languages::product_variations.upgrade_notification.convert_combination_title"
 msgid "Convert option combinations to product variations"
-msgstr ""
+msgstr "Μετατροπή συνδυασμών επιλογών σε παραλλαγές προϊόντος"
 
 msgctxt "Languages::product_variations.upgrade_notification.convert_combination_message"
 msgid "<p>In the upcoming version 4.12.1, product variations will fully replace option combinations. The code that handles option combinations will be removed. Please note that ONLY <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\">option combinations</a> and their code will be removed. <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\">Options</a> themselves will remain exactly as they are now.</p><p>Your store still has option combinations. That's why we ask you to convert option combinations into product variations. The process is mostly automatic. We only ask your input to make sure that everything goes smoothly and according to your expectations.</p><p><a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Convert option combinations</a></p>"
-msgstr ""
+msgstr "<p> Στην επερχόμενη έκδοση 4.12.1, οι παραλλαγές προϊόντων θα αντικαταστήσουν πλήρως τους συνδυασμούς επιλογών. Ο κωδικός που χειρίζεται συνδυασμούς επιλογών θα καταργηθεί. Λάβετε υπόψη ότι ΜΟΝΟ <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\"> συνδυασμοί επιλογών </a> και ο κωδικός τους θα αφαιρεθεί. Οι ίδιες οι <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\"> Επιλογές </a> θα παραμείνουν ακριβώς όπως είναι τώρα . </p> <p> Το κατάστημά σας θα εξακολουθεί να διαθέτει συνδυασμούς επιλογών. Γι 'αυτό σας ζητάμε να μετατρέψετε τους συνδυασμούς επιλογών σε παραλλαγές προϊόντων. Η διαδικασία είναι ως επί το πλείστον αυτόματη. Ζητούμε μονο τη συμβολή σας να βεβαιωθείτε ότι όλα πάνε ομαλά και σύμφωνα με τις προσδοκίες σας. </p> <p> <a href = \"[convert_url]\" target = \"_ blank\" class = \"btn btn-large btn-primer\" > Μετατροπή συνδυασμών επιλογών </a> </p>"
 
 msgctxt "Languages::product_variations.upgrade_notification.convert_combination_message_without_variations"
 msgid "<p>In the upcoming version 4.12.1, product variations will fully replace option combinations. The code that handles option combinations will be removed. Please note that ONLY <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\">option combinations</a> and their code will be removed. <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\">Options</a> themselves will remain exactly as they are now.</p><p>Your store still has option combinations. That's why we ask you to convert option combinations into product variations. The process is mostly automatic. We only ask your input to make sure that everything goes smoothly and according to your expectations.</p><p>However, the Product Variations add-on isn't active in your store yet. You'll need to install or enable it first, and run the conversion.</p><p><a href=\"[search_for_addon]\" target=\"_blank\" class=\"btn btn-large\">1. Activate the add-on</a> <a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large\">2. Convert option combinations</a></p>"
-msgstr ""
+msgstr "<p> Στην επερχόμενη έκδοση 4.12.1, οι παραλλαγές προϊόντων θα αντικαταστήσουν πλήρως τους συνδυασμούς επιλογών. Ο κωδικός που χειρίζεται συνδυασμούς επιλογών θα καταργηθεί. Λάβετε υπόψη ότι ΜΟΝΟ <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\"> συνδυασμοί επιλογών </a> και ο κωδικός τους θα αφαιρεθεί. Οι ίδιες οι <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\"> Επιλογές </a> θα παραμείνουν ακριβώς όπως είναι τώρα . </p> <p> Το κατάστημά σας εξακολουθεί να διαθέτει συνδυασμούς επιλογών. Γι 'αυτό σας ζητάμε να μετατρέψετε τους συνδυασμούς επιλογών σε παραλλαγές προϊόντων. Η διαδικασία είναι ως επί το πλείστον αυτόματη. Ζητάμε μόνο από τη συμβολή σας να βεβαιωθείτε ότι όλα πάνε ομαλά και σύμφωνα με τις προσδοκίες σας. </p> <p> Ωστόσο, το πρόσθετο Παραλλαγές Προϊόντων δεν είναι ακόμη ενεργό στο κατάστημά σας. Θα πρέπει πρώτα να το εγκαταστήσετε ή να το ενεργοποιήσετε και να εκτελέσετε τη μετατροπή. </p> <p> <a href=\"[search_for_addon]\" target=\"_blank\" class=\"btn btn-large\"> 1. Ενεργοποιήστε το πρόσθετο </a> <a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large\"> 2. Μετατροπή συνδυασμών επιλογών </a> </p>"
+
+msgctxt "Languages::product_variations.add_all_variants"
+msgid "Add all variants"
+msgstr "Προσθήκη όλων των παραλλαγών"
 

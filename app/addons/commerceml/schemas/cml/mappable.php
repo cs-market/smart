@@ -22,7 +22,10 @@ use Tygh\Enum\UsergroupTypes;
 
 defined('BOOTSTRAP') or die('Access denied');
 
-return [
+/**
+ * @var array<string, array{is_creatable: array<callable>|bool, items_provider: array<callable>}> $schema Declares mapping for entities sync
+ */
+$schema = [
     PriceTypeDto::REPRESENT_ENTITY_TYPE => [
         'is_creatable' => false,
         'items_provider' => static function () {
@@ -77,3 +80,5 @@ return [
         'parent' => ProductFeatureDto::REPRESENT_ENTITY_TYPE,
     ]
 ];
+
+return $schema;

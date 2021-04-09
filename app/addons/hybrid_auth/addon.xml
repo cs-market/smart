@@ -8,15 +8,15 @@
     <default_language>en</default_language>
 
     <dependencies/>
-    <settings edition_type="ROOT,ULT:VENDOR">
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>
-                    <item id="icons_pack">
+                    <item id="icons_pack" edition_type="ROOT,STOREFRONT">
                         <type>selectbox</type>
                         <default_value>flat_32x32</default_value>
                     </item>
-                    <item id="autogen_email">
+                    <item id="autogen_email" edition_type="ROOT,UTL:VENDOR">
                         <type>checkbox</type>
                         <default_value>N</default_value>
                     </item>
@@ -28,6 +28,7 @@
     <queries>
         <item>DROP TABLE IF EXISTS ?:hybrid_auth_users;</item>
         <item>DROP TABLE IF EXISTS ?:hybrid_auth_providers;</item>
+        <item>DROP TABLE IF EXISTS ?:hybrid_auth_storefronts_providers</item>
         <item>
             CREATE TABLE `?:hybrid_auth_users` (
             `user_id` mediumint(8) unsigned NOT NULL auto_increment,
@@ -40,6 +41,7 @@
         <item>
             CREATE TABLE `?:hybrid_auth_providers` (
             `provider_id` mediumint(8) unsigned NOT NULL auto_increment,
+            `name` varchar(255) NOT NULL DEFAULT '',
             `company_id` int(11) unsigned NOT NULL default '0',
             `provider` varchar(32) NOT NULL,
             `position` smallint NOT NULL default '0',
@@ -51,8 +53,16 @@
             PRIMARY KEY  (`provider_id`)
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>
+        <item>
+            CREATE TABLE `?:hybrid_auth_storefronts_providers` (
+            `storefront_id` int(11) unsigned NOT NULL DEFAULT 0,
+            `provider_id` int(11) unsigned NOT NULL DEFAULT 0,
+            PRIMARY KEY (`storefront_id`, `provider_id`)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:hybrid_auth_users;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:hybrid_auth_providers;</item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:hybrid_auth_storefronts_providers</item>
         <item>REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_providers', 'Y', 'website', 'social_login', 'N')</item>
         <item>REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_providers', 'Y', 'website', 'social_login', 'Y')</item>
         <item for="uninstall">DELETE FROM ?:privileges WHERE privilege = 'manage_providers'</item>

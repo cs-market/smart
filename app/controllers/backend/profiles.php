@@ -24,6 +24,8 @@ use Tygh\Tools\Url;
 
 defined('BOOTSTRAP') or die('Access denied');
 
+$auth = & Tygh::$app['session']['auth'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($mode === 'm_delete') {
         if (!empty($_REQUEST['user_ids'])) {
@@ -81,8 +83,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /**
          * Only admin can set the api key.
          */
-        if (empty($_REQUEST['user_api_status']) || $_REQUEST['user_api_status'] == 'N') {
+        if (empty($_REQUEST['user_api_status']) || !YesNo::toBool($_REQUEST['user_api_status'])) {
             $_REQUEST['user_data']['api_key'] = '';
+        }
+
+        if ($auth['user_type'] !== UserTypes::ADMIN) {
+            unset($_REQUEST['user_data']['api_key']);
+
+            if ($mode === 'add') {
+                unset($_REQUEST['user_data']['raw_api_key']);
+            } else {
+                // Allow vendor admin to generate a new api key
+                $old_api_status = (bool) db_get_field('SELECT api_key FROM ?:users WHERE user_id = ?i', $user_id);
+
+                if (!$old_api_status) {
+                    unset($_REQUEST['user_data']['raw_api_key']);
+                }
+            }
         }
 
         fn_restore_processed_user_password($_REQUEST['user_data'], $_POST['user_data']);
@@ -301,8 +318,6 @@ if ($mode === 'manage') {
             ? $_REQUEST['redirect_url']
             : '';
 
-        $enabled_customization_modes = fn_get_customization_modes();
-
         $areas = [
             'A' => 'admin',
             'V' => 'vendor',
@@ -312,8 +327,9 @@ if ($mode === 'manage') {
         $old_sess_id = Tygh::$app['session']->getID();
 
         Registry::set('runtime.is_restoring_cart_from_backend', true);
+        fn_clear_cart(Tygh::$app['session']['cart'], false, true);
 
-        if ($area === 'C') {
+        if (SiteArea::isStorefront($area)) {
             // Save unique key for session
             $session_key = fn_crc32(microtime()) . fn_crc32(microtime(true) + 1);
 
@@ -358,19 +374,15 @@ if ($mode === 'manage') {
 
             $sess_data['store_access_key'] = $storefront_of_redirect->access_key;
 
-            // enable theme editor
-            if ((!empty($_REQUEST['customize_theme']) || !empty($enabled_customization_modes['theme_editor']['enabled']))
-                && in_array($sess_data['auth']['user_type'], ['A', 'V'])
-                && (empty($sess_data['auth']['company_id']) || $sess_data['auth']['company_id'] == fn_get_styles_owner())
-            ) {
-                $sess_data['customize_theme'] = true;
-                $sess_data['auth']['company_id'] = (int) fn_get_styles_owner();
+            if ($act_as_self && !empty(Tygh::$app['session']['customization'])) {
+                $sess_data['customization'] = Tygh::$app['session']['customization'];
+                unset(Tygh::$app['session']['customization']);
             }
+
             fn_init_user_session_data($sess_data, $user_id, true);
 
             fn_set_storage_data('session_' . $session_key . '_data', serialize($sess_data));
         } else {
-
             fn_init_user_session_data($sess_data, $user_id, true);
 
             // Set flag for backward compatibility
@@ -607,15 +619,22 @@ if ($mode === 'manage') {
     /**
      * Only admin can set the api key.
      */
-    if (fn_check_user_type_admin_area($user_data) && !empty($user_data['user_id']) && ($auth['user_type'] == 'A' || $user_data['api_key'])) {
-        $navigation['api'] = array (
+    if (
+        fn_check_user_type_admin_area($user_data)
+        && !empty($user_data['user_id'])
+        && (
+            $auth['user_type'] === UserTypes::ADMIN
+            || $user_data['api_key']
+        )
+    ) {
+        $navigation['api'] = [
             'title' => __('api_access'),
-            'js' => true
-        );
+            'js'    => true
+        ];
 
         Tygh::$app['view']->assign('show_api_tab', true);
 
-        if ($auth['user_type'] != 'A') {
+        if ($auth['user_type'] !== UserTypes::ADMIN) {
             Tygh::$app['view']->assign('hide_api_checkbox', true);
         }
     }
@@ -658,9 +677,10 @@ if ($mode == 'get_customer_list') {
     list($users, $params) = fn_get_users($params, $auth, $page_size);
 
     $objects = array_values(array_map(function ($customer_list) {
+        $customer_name = trim($customer_list['firstname'] . ' ' . $customer_list['lastname']);
         return array(
             'id' => $customer_list['user_id'],
-            'text' => $customer_list['firstname'] . ' ' . $customer_list['lastname'],
+            'text' => $customer_name ? $customer_name : $customer_list['email'],
             'email' => $customer_list['email'],
             'phone' => $customer_list['phone'],
         );
@@ -686,6 +706,26 @@ if ($mode === 'get_manager_list') {
     }
 
     list($objects, $params) = fn_get_users($params, $auth);
+    $list_of_finded_managers = array_column($objects, 'user_id');
+    if (!in_array($auth['user_id'], $list_of_finded_managers)) {
+        $current_user = fn_get_user_short_info($auth['user_id']);
+        $objects[] = $current_user;
+    }
+    if (
+        isset($_REQUEST['ids'])
+        && is_array($_REQUEST['ids'])
+    ) {
+        $current_issuer_id = reset($_REQUEST['ids']);
+
+        if (
+            $current_issuer_id
+            && $current_issuer_id !== $auth['user_id']
+            && !in_array($current_issuer_id, $list_of_finded_managers)
+        ) {
+            $current_issuer = fn_get_user_short_info($current_issuer_id);
+            $objects[] = $current_issuer;
+        }
+    }
     $objects = array_map(static function ($profile) {
         $name = empty($profile['firstname']) && empty($profile['lastname'])
             ? $profile['email']
