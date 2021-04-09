@@ -65,10 +65,8 @@
                             <object_type><![CDATA[]]></object_type>
                             <content>
                                 <items>
-                                    <filling><![CDATA[newest]]></filling>
-                                    <period><![CDATA[A]]></period>
-                                    <last_days><![CDATA[1]]></last_days>
-                                    <limit><![CDATA[4]]></limit>
+                                    <filling><![CDATA[manually]]></filling>
+                                    <item_ids><![CDATA[17,18,19]]></item_ids>
                                 </items>
                             </content>
                             <object_ids><![CDATA[]]></object_ids>

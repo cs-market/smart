@@ -1,12 +1,12 @@
 {foreach from=$order_info.shipping item="shipping_method"}
 
-	{if $shipping_method.service_params.type_delivery == 'pickup' && $shipping_method.module == 'yandex'}
+    {if $shipping_method.service_params.type_delivery == 'pickup' && $shipping_method.module == 'yandex'}
         {$shipment_id = $shipments[$shipping.group_key].shipment_id}
         {if $yandex_delivery_status[$shipment_id]}
-        <p>{__('yandex_delivery.status_delivery')}: {$yandex_delivery_status[$shipment_id].yd_status_info} ({$yandex_delivery_status[$shipment_id].time})</p>
+    	    <p>{__('yandex_delivery.status_delivery')}: {$yandex_delivery_status[$shipment_id].yd_status_info} ({$yandex_delivery_status[$shipment_id].time})</p>
         {/if}
         <p class="ty-strong">
-            {$shipping_method.pickup_data.name}
+            {__("shipping")}: {$shipping_method.delivery.delivery_name}
         </p>
         <p class="ty-muted">
             {if $shipping_method.pickup_data.full_address} {$shipping_method.pickup_data.full_address}{/if}</br>

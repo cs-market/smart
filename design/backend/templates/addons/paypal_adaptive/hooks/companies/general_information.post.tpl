@@ -2,7 +2,7 @@
 
     {include file="common/subheader.tpl" title=__("pp_adaptive_payments")}
     <div class="control-group">
-        <label for="email" class="control-label cm-email">{__("paypal_adaptive.paypal_email")}:</label>
+        <label for="email" class="control-label cm-email">{__("paypal_adaptive.vendor.paypal_email")}:</label>
         <div class="controls">
             <input type="text" id="email" name="company_data[paypal_email]" class="input-text" size="32" maxlength="128" value="{$company_data.paypal_email}"/>
         </div>

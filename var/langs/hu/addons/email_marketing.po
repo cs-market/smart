@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: hu\n"
-"X-Crowdin-File: /release-4.8.2/addons/email_marketing.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/email_marketing.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"PO-Revision-Date: 2019-02-01 06:05\n"
 
 msgctxt "Addons::name::email_marketing"
 msgid "E-mail marketing"
@@ -186,13 +186,13 @@ msgstr "MadMimi"
 
 msgctxt "Languages::email_template.email_marketing_confirmation"
 msgid "Email marketing: subscription confirmation"
-msgstr ""
+msgstr "E-mail marketing: feliratkozás visszaigazolása"
 
 msgctxt "Languages::email_template.email_marketing_welcome"
 msgid "Email marketing: welcome letter"
-msgstr ""
+msgstr "E-mail marketing: üdvözlő levél"
 
 msgctxt "Languages::email_template.email_marketing_welcome_2optin"
 msgid "Email marketing: welcome letter (2optin)"
-msgstr ""
+msgstr "E-mail marketing: üdvözlő levél (2optin)"
 

@@ -14,6 +14,7 @@
 
 namespace Tygh\Addons\StripeConnect;
 
+use Exception;
 use Stripe\Account;
 use Stripe\OAuth;
 use Stripe\Stripe;
@@ -68,7 +69,7 @@ class OAuthHelper
             $url = OAuth::authorizeUrl($params);
             $result->setSuccess(true);
             $result->setData($url);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result->setSuccess(false);
             $result->addError($e->getCode(), $e->getMessage());
         }
@@ -90,7 +91,12 @@ class OAuthHelper
             'grant_type' => 'authorization_code',
         );
 
-        $decoded_response = Oauth::token($params);
+        try {
+            $decoded_response = Oauth::token($params);
+        } catch (Exception $e) {
+            $decoded_response['error_description'] = $e->getMessage();
+            $decoded_response['error'] = $e->getCode();
+        }
 
         $result = new OperationResult();
 
@@ -130,7 +136,7 @@ class OAuthHelper
         try {
             OAuth::deauthorize($params);
             $result->setSuccess(true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result->setSuccess(false);
             $result->addError($e->getCode(), $e->getMessage());
         }

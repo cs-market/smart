@@ -15,7 +15,7 @@
 defined('BOOTSTRAP') or die('Access denied');
 
 fn_register_hooks(
-    'get_products_pre',
+    'get_products',
     'get_categories_pre',
     'change_order_status',
     'check_company_permissions',
@@ -23,5 +23,7 @@ fn_register_hooks(
     'delete_category_pre',
     'update_product_pre',
     'dispatch_before_display',
-    'get_order_info'
+    'get_order_info',
+    'catalog_mode_pre_add_to_cart',
+    'promotion_apply_pre'
 );

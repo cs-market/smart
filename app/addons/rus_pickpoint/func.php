@@ -12,10 +12,12 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Registry;
 use Tygh\Languages\Languages;
 use Tygh\Shippings\RusPickpoint;
 use Tygh\Http;
+use Tygh\Template\Document\Variables\PickpupPointVariable;
 
 if ( !defined('AREA') ) { die('Access denied'); }
 
@@ -123,22 +125,19 @@ function fn_rus_pickpoint_calculate_cart_taxes_pre(&$cart, $cart_products, &$pro
 function fn_pickpoint_cost_by_shipment(&$cart, $shipping_info, $service_data, $city) 
 {
     if (!empty($service_data['module']) && ($service_data['module'] == 'pickpoint')) {
-        $data = array();
         $pickpoint_info = Registry::get('addons.rus_pickpoint');
         $url = RusPickpoint::Url();
         $data_url = RusPickpoint::$extra_data;
         $login = RusPickpoint::Login();
 
-        $total = $weight =  0;
-        $length = $width = $height = 20;
-
         if ($login) {
             $shipping_settings = $service_data['service_params'];
-            $weight_data = fn_expand_weight($shipping_info['package_info']['W']);
+            $weight_data = fn_convert_weight_to_imperial_units($shipping_info['package_info']['W']);
             $weight = round($weight_data['plain'] * Registry::get('settings.General.weight_symbol_grams') / 1000, 3);
 
-            $packages = !empty($shipping_info['package_info']['packages']) ? $shipping_info['package_info']['packages'] : array();
-            $origination = !empty($shipping_info['package_info']['origination']) ? $shipping_info['package_info']['origination'] : '';
+            $origination = empty($shipping_info['package_info']['origination'])
+                ? ['state' => '', 'country' => '', 'city' => '']
+                : $shipping_info['package_info']['origination'];
 
             $from_state = fn_get_state_name($origination['state'], $origination['country'], 'RU');
 
@@ -155,7 +154,7 @@ function fn_pickpoint_cost_by_shipment(&$cart, $shipping_info, $service_data, $c
                         $package_length = empty($package['shipping_params']['box_length']) ? $length : $package['shipping_params']['box_length'];
                         $package_width = empty($package['shipping_params']['box_width']) ? $width : $package['shipping_params']['box_width'];
                         $package_height = empty($package['shipping_params']['box_height']) ? $height : $package['shipping_params']['box_height'];
-                        $weight_ar = fn_expand_weight($package['weight']);
+                        $weight_ar = fn_convert_weight_to_imperial_units($package['weight']);
                         $package_weight = round($weight_ar['plain'] * Registry::get('settings.General.weight_symbol_grams') / 1000, 3);
 
                         $pickpoint_weight = $pickpoint_weight + $package_weight;
@@ -200,6 +199,7 @@ function fn_pickpoint_cost_by_shipment(&$cart, $shipping_info, $service_data, $c
                     $shipping_id = $shipping_info['keys']['shipping_id'];
                     $cart['pickpoint_office'][$group_key][$shipping_id]['pickpoint_id'] = $pickpoint_id;
                     $cart['pickpoint_office'][$group_key][$shipping_id]['address_pickpoint'] = $address_pickpoint;
+                    $cart['pickpoint_office'][$group_key][$shipping_id]['pickup_data'] = RusPickpoint::getPickpointPostamatById($pickpoint_id);
 
                 } elseif (!empty($shipping_info['shippings'])) {
                     foreach ($shipping_info['shippings'] as $shipping) {
@@ -208,6 +208,7 @@ function fn_pickpoint_cost_by_shipment(&$cart, $shipping_info, $service_data, $c
                             $shipping_id = $shipping['shipping_id'];
                             $cart['pickpoint_office'][$group_key][$shipping_id]['pickpoint_id'] = $pickpoint_id;
                             $cart['pickpoint_office'][$group_key][$shipping_id]['address_pickpoint'] = $address_pickpoint;
+                            $cart['pickpoint_office'][$group_key][$shipping_id]['pickup_data'] = RusPickpoint::getPickpointPostamatById($pickpoint_id);
                         }
                     }
                 }
@@ -248,8 +249,8 @@ function fn_pickpoint_cost_by_shipment(&$cart, $shipping_info, $service_data, $c
             }
 
             RusPickpoint::Logout();
-        } else {
-            fn_set_notification('E', __('notice'), RusPickpoint::$last_error);
+        } elseif (!empty(RusPickpoint::$last_error)) {
+            fn_set_notification(NotificationSeverity::ERROR, __('notice'), RusPickpoint::$last_error);
         }
     }
 }
@@ -257,4 +258,146 @@ function fn_pickpoint_cost_by_shipment(&$cart, $shipping_info, $service_data, $c
 function fn_rus_pickpoint_init_user_session_data(&$sess_data, $user_id)
 {
     $sess_data['cart']['pickpoint_office'] = array();
+}
+
+/**
+ * Hook handler: injects pickup point into order data.
+ */
+function fn_rus_pickpoint_pickup_point_variable_init(
+    PickpupPointVariable $instance,
+    $order,
+    $lang_code,
+    &$is_selected,
+    &$name,
+    &$phone,
+    &$full_address,
+    &$open_hours_raw,
+    &$open_hours,
+    &$description_raw,
+    &$description
+) {
+    if (!empty($order['shipping'])) {
+        if (is_array($order['shipping'])) {
+            $shipping = reset($order['shipping']);
+        } else {
+            $shipping = $order['shipping'];
+        }
+
+        if (!isset($shipping['module']) || $shipping['module'] !== 'pickpoint') {
+            return;
+        }
+
+        if (isset($shipping['data']['pickpoint_postamat']['pickup_data'])) {
+            $pickup_data = $shipping['data']['pickpoint_postamat']['pickup_data'];
+
+            $is_selected = true;
+            $name = $pickup_data['name'];
+            $full_address = fn_rus_pickpoint_format_pickpoint_format_pickup_point_address($pickup_data);
+            $open_hours_raw = fn_rus_pickpoint_format_pickup_point_open_hours($pickup_data['work_time'], $lang_code);
+            $open_hours = implode('<br/>', $open_hours_raw);
+        }
+    }
+
+    return;
+}
+
+/**
+ * Formats Pickpoint pickup point address.
+ *
+ * @param string[] $pickup_point Pickup point data from API.
+ *
+ * @return string Address
+ */
+function fn_rus_pickpoint_format_pickpoint_format_pickup_point_address($pickup_point)
+{
+    $address_parts = array_filter([
+        $pickup_point['post_code'],
+        $pickup_point['region_name'],
+        $pickup_point['city_name'],
+        $pickup_point['address']
+    ], 'fn_string_not_empty');
+
+    $address = implode(', ', $address_parts);
+
+    return $address;
+}
+
+/**
+ * Formats Pickpoint pickup point open hours.
+ *
+ * @param string $work_time Pickup point work time from API response.
+ * @param string $lang_code Two-letter language code
+ *
+ * @return string[] Open hours
+ */
+function fn_rus_pickpoint_format_pickup_point_open_hours($work_time, $lang_code)
+{
+    $open_hours = [];
+    $work_days = explode(',', $work_time);
+    $intervals = [];
+    $interval = ['[first_day]' => null, '[last_day]' => null, '[schedule]' => null];
+    foreach ($work_days as $day => $time) {
+        $day = ++$day=== 7 ? 0 : $day;
+        if ($interval['[schedule]'] === null) {
+            $interval['[first_day]'] = __("weekday_{$day}", [], $lang_code);
+            $interval['[schedule]'] = $time;
+        } elseif ($time === $interval['[schedule]']) {
+            $interval['[last_day]'] = __("weekday_{$day}", [], $lang_code);
+            continue;
+        } else {
+            $intervals[] = $interval;
+            $interval = ['[first_day]' => __("weekday_{$day}", [], $lang_code), '[last_day]' => null, '[schedule]' => $time];
+            continue;
+        }
+    }
+    $intervals[] = $interval;
+
+    foreach ($intervals as $interval) {
+        $schedule_type = 'interval';
+        if ($interval['[schedule]'] === 'NODAY') {
+            $schedule_type = 'closed';
+        }
+
+        $day_type = 'interval';
+        if (count($intervals) === 1) {
+            $day_type = 'every';
+        } elseif ($interval['[last_day]'] === null) {
+            $day_type = 'single';
+        }
+
+        $open_hours[] = __("rus_pickpoint.day_{$day_type}.schedule_{$schedule_type}", $interval, $lang_code);
+    }
+
+    return $open_hours;
+}
+
+/**
+ * The "update_shipping" hook handler.
+ *
+ * Actions performed:
+ *  - Adds service parameters field to pickpoint shipping
+ *
+ * @param array<string, string> $shipping_data Information about examined shipping method
+ * @param int                   $shipping_id   Shipping method identifier
+ * @param string                $lang_code     Selected language code
+ *
+ * @see \fn_update_shipping()
+ */
+function fn_rus_pickpoint_update_shipping(array &$shipping_data, $shipping_id, $lang_code)
+{
+    if (!empty($shipping_data['service_params']) || empty($shipping_data['service_id'])) {
+        return;
+    }
+
+    $service_id = (int) db_get_field('SELECT service_id FROM ?:shipping_services WHERE module = ?s AND code = ?s', 'pickpoint', 'pickpoint');
+    if (empty($service_id) || (int) $shipping_data['service_id'] !== $service_id) {
+        return;
+    }
+
+    $shipping_data['service_params'] = serialize([
+        'pickpoint_width' => '',
+        'pickpoint_height' => '',
+        'pickpoint_length' => '',
+        'delivery_mode' => 'Standard'
+    ]);
 }

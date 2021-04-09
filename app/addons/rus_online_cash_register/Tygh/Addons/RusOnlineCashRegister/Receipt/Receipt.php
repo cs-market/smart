@@ -34,11 +34,19 @@ class Receipt
 
     const TYPE_BUY_REFUND = 4;
 
+    const TYPE_SELL_CORRECTION = 5;
+
+    const TYPE_BUY_CORRECTION = 6;
+
     const STATUS_WAIT = 1;
 
     const STATUS_DONE = 2;
 
     const STATUS_FAIL = 3;
+
+    const PAYMENT_METHOD_FULL_PAYMENT = 'full_payment';
+
+    const PAYMENT_METHOD_FULL_PREPAYMENT = 'full_prepayment';
 
     /** @var int|null */
     protected $id;
@@ -84,6 +92,12 @@ class Receipt
 
     /** @var Requisites|null */
     protected $requisites;
+
+    /** @var string */
+    protected $currency;
+
+    /** @var string receipt payment method ('full_prepayment', 'full_payment') */
+    protected $payment_method;
 
     /**
      * Gets receipt identifier.
@@ -320,6 +334,46 @@ class Receipt
     }
 
     /**
+     * Sets receipt custom currency.
+     *
+     * @param string $currency
+     */
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
+    }
+
+    /**
+     * Gets receipt custom currency.
+     *
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * Sets receipt payment method.
+     *
+     * @param string $payment_method
+     */
+    public function setPaymentMethod($payment_method)
+    {
+        $this->payment_method = $payment_method;
+    }
+
+    /**
+     * Gets receipt payment method.
+     *
+     * @return string
+     */
+    public function getPaymentMethod()
+    {
+        return $this->payment_method;
+    }
+
+    /**
      * Gets receipt requisites.
      *
      * @return Requisites
@@ -544,7 +598,7 @@ class Receipt
      */
     public function toArray()
     {
-        $result = array(
+        $result = [
             'id' => $this->id,
             'object_id' => $this->object_id,
             'object_type' => $this->object_type,
@@ -559,7 +613,8 @@ class Receipt
             'requisites' => $this->requisites ? $this->requisites->toArray() : null,
             'items' => array(),
             'payments' => array(),
-        );
+            'currency' => $this->currency
+        ];
 
         foreach ($this->items as $item) {
             $result['items'][] = $item->toArray();
@@ -633,6 +688,14 @@ class Receipt
 
         if (array_key_exists('status_message', $data)) {
             $this->setStatusMessage($data['status_message']);
+        }
+
+        if (array_key_exists('currency', $data)) {
+            $this->setCurrency($data['currency']);
+        }
+
+        if (array_key_exists('payment_method', $data)) {
+            $this->setPaymentMethod($data['payment_method']);
         }
     }
 

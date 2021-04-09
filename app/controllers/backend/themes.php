@@ -14,10 +14,10 @@
 
 use Tygh\BlockManager\Layout;
 use Tygh\Development;
-use Tygh\Themes\Styles;
-use Tygh\Themes\Themes;
 use Tygh\Registry;
 use Tygh\Settings;
+use Tygh\Themes\Styles;
+use Tygh\Themes\Themes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -162,32 +162,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($mode == 'set') {
-        $is_exist = Layout::instance()->getList(array(
-            'theme_name' => $_REQUEST['theme_name']
-        ));
+        /** @var \Tygh\Storefront\Repository $storefront_repository */
+        $storefront_repository = Tygh::$app['storefront.repository'];
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        $current_theme = $storefront->theme_name;
 
-        $company_id = Registry::get('runtime.company_id');
-
-        $current_theme = Settings::instance()->getValue('theme_name', '', $company_id);
         $theme_settings = Themes::factory($_REQUEST['theme_name'])->getSettingsOverrides();
 
         if ($current_theme != $_REQUEST['theme_name'] && !empty($theme_settings) && !isset($_REQUEST['allow_overwrite'])) {
             return array(CONTROLLER_STATUS_REDIRECT, 'themes.manage?show_conflicts=Y&theme_name=' . $_REQUEST['theme_name'] . '&style=' . $_REQUEST['style']);
         }
 
-        if (empty($is_exist)) {
-            // Create new layout
-            fn_install_theme($_REQUEST['theme_name'], $company_id);
-
-        } else {
-            Settings::instance()->updateValue('theme_name', $_REQUEST['theme_name'], '', true, $company_id);
-        }
+        $storefront->theme_name = $_REQUEST['theme_name'];
+        $storefront_repository->save($storefront);
 
         if (isset($_REQUEST['allow_overwrite']) && !empty($_REQUEST['settings_values'])) {
             Themes::factory($_REQUEST['theme_name'])->overrideSettings($_REQUEST['settings_values']);
         }
 
-        $layout = Layout::instance($company_id)->getDefault($_REQUEST['theme_name']);
+        $layout = Layout::instance(0, [], $storefront->storefront_id)->getDefault($_REQUEST['theme_name']);
 
         if (!empty($_REQUEST['style'])) {
             $theme = Themes::factory(fn_get_theme_path('[theme]', 'C'));
@@ -198,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             } else {
                 fn_set_notification('E', __('error'), __('theme_editor.error_theme_converted_to_css', array(
-                    '[url]' => fn_url("customization.update_mode?type=theme_editor&status=enable&s_layout=$layout[layout_id]")
+                    '[url]' => fn_url("customization.update_mode?type=theme_editor&status=enable&s_layout={$layout['layout_id']}&s_storefront={$storefront->storefront_id}")
                 )));
             }
         }
@@ -208,6 +202,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Delete compiled CSS file
         fn_clear_cache('assets');
+
+        fn_clear_cache('registry');
+
+        fn_clear_template_cache();
     }
 
     if ($mode == 'styles') {
@@ -255,11 +253,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'manage') {
 
-    if (fn_allowed_for('ULTIMATE') && !Registry::get('runtime.company_id')) {
-        return array(CONTROLLER_STATUS_OK);
-    }
+    /** @var \Tygh\Storefront\Repository $storefront_repository */
+    $storefront_repository = Tygh::$app['storefront.repository'];
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
 
-    $available_themes = fn_get_available_themes(Registry::get('settings.theme_name'));
+    $available_themes = fn_get_available_themes($storefront->theme_name);
 
     if (!empty($available_themes['repo']) && !empty($available_themes['installed'])) {
         $available_themes['repo'] = array_diff_key($available_themes['repo'], $available_themes['installed']);
@@ -289,8 +288,6 @@ if ($mode == 'manage') {
     $style = Styles::factory($theme_name)->get($layout['style_id']);
     $layout['style_name'] = empty($style['name']) ? '' : $style['name'];
 
-    Tygh::$app['view']->assign('layout', $layout);
-
     foreach ($available_themes['installed'] as $theme_id => $theme) {
         $layouts_params = array(
             'theme_name' => $theme_id
@@ -306,10 +303,16 @@ if ($mode == 'manage') {
     if (isset($_REQUEST['show_conflicts']) && isset($_REQUEST['theme_name']) && isset($available_themes['installed'][$_REQUEST['theme_name']])) {
         $requested_theme_name = $available_themes['installed'][$_REQUEST['theme_name']]['title'];
         $conflicts = Themes::factory($_REQUEST['theme_name'])->getSettingsOverrides();
-        Tygh::$app['view']->assign('requested_theme_name', $requested_theme_name);
-        Tygh::$app['view']->assign('conflicts', $conflicts);
+        Tygh::$app['view']->assign([
+            'requested_theme_name' => $requested_theme_name,
+            'conflicts'            => $conflicts,
+        ]);
     }
 
-    Tygh::$app['view']->assign('available_themes', $available_themes);
-    Tygh::$app['view']->assign('dev_modes', Development::get());
+    Tygh::$app['view']->assign([
+        'layout'           => $layout,
+        'storefront'       => $storefront,
+        'available_themes' => $available_themes,
+        'dev_modes'        => Development::get(),
+    ]);
 }

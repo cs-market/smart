@@ -16,6 +16,8 @@ use Tygh\Enum\OutOfStockActions;
 use Tygh\Enum\ProductTracking;
 use Tygh\Registry;
 use Tygh\Tools\SecurityHelper;
+use Tygh\Languages\Languages;
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -102,10 +104,11 @@ function fn_buy_together_update_chain($item_id, $product_id, $item_data, $auth, 
         $_data['name'] = !empty($item_data['name']) ? $item_data['name'] : '';
         $_data['description'] = !empty($item_data['description']) ? $item_data['description'] : '';
 
-        foreach (fn_get_translation_languages() as $_data['lang_code'] => $v) {
+        foreach (Languages::getAll() as $_data['lang_code'] => $v) {
             db_query("INSERT INTO ?:buy_together_descriptions ?e", $_data);
         }
 
+        $create = true;
     } else {
         //Update already existing chain
         $_data = array();
@@ -115,6 +118,8 @@ function fn_buy_together_update_chain($item_id, $product_id, $item_data, $auth, 
 
         db_query("UPDATE ?:buy_together SET ?u WHERE chain_id = ?i", $item_data, $item_id);
         db_query("UPDATE ?:buy_together_descriptions SET ?u WHERE chain_id = ?i AND lang_code = ?s", $_data, $item_id, $lang_code);
+
+        $create = false;
     }
 
     /**
@@ -126,7 +131,7 @@ function fn_buy_together_update_chain($item_id, $product_id, $item_data, $auth, 
      * @param array $auth Array of user authentication data
      * @param string $lang_code 2-letter language code (e.g. 'en', 'ru', etc.)
      */
-    fn_set_hook('buy_together_update_chain_post', $item_id, $product_id, $item_data, $auth, $lang_code);
+    fn_set_hook('buy_together_update_chain_post', $item_id, $product_id, $item_data, $auth, $lang_code, $create);
 
     return $item_id;
 }
@@ -304,6 +309,8 @@ function fn_buy_together_get_chains($params = array(), $auth = array(), $lang_co
                 $total_price = $main_product['price'];
                 $chain_price = $chain['discounted_price'];
 
+                $chain['product_data'] = $main_product;
+
                 foreach ($chain['products'] as $hash => &$chain_product) {
                     if (empty($product['product_id'])) {
                         unset($chains[$key]['products'][$hash]);
@@ -398,6 +405,8 @@ function fn_buy_together_get_chains($params = array(), $auth = array(), $lang_co
                         $chain_product['options'] = $product['product_options'];
                     }
 
+                    $chain_product['product_data'] = $product;
+
                     $chains[$key]['products_info'][$hash]['price'] = $chain_product['price'];
                     $chains[$key]['products_info'][$hash]['discount'] = $chain_product['discount'];
                     $chains[$key]['products_info'][$hash]['discounted_price'] = $chain_product['discounted_price'];
@@ -449,6 +458,8 @@ function fn_buy_together_delete_chain($chain_id)
 
     db_query('DELETE FROM ?:buy_together WHERE chain_id = ?i', $chain_id);
     db_query('DELETE FROM ?:buy_together_descriptions WHERE chain_id = ?i', $chain_id);
+
+    fn_set_hook('buy_together_delete_chain_post', $chain_id, $product_id);
 
     return $product_id;
 }
@@ -635,31 +646,41 @@ function fn_buy_together_pre_add_to_cart(&$product_data, &$cart, &$auth, &$updat
     }
 }
 
-function fn_buy_together_add_to_cart(&$cart, &$product_id, &$cart_id)
+function fn_buy_together_add_to_cart(&$cart, $product_id, $cart_id)
 {
-    if (!empty($cart['products'][$cart_id]['extra']['parent']['buy_together']) && !isset($cart['products'][$cart['products'][$cart_id]['extra']['parent']['buy_together']])) {
-        $found = false;
+    if (defined('ORDER_MANAGEMENT')) {
+        return;
+    }
 
-        foreach ($cart['products'] as $_id => $_product) {
-            if (!empty($_product['extra']['buy_id']) && $cart['products'][$cart_id]['extra']['parent']['buy_together'] == $_product['extra']['buy_id']) {
-                $found = true;
-                break;
-            }
-        }
+    $buy_together_cart_id = !empty($cart['products'][$cart_id]['extra']['parent']['buy_together']) ?
+        $cart['products'][$cart_id]['extra']['parent']['buy_together']
+        : null;
+    $already_in_cart = isset($cart['products'][$buy_together_cart_id]);
 
-        if (!$found) {
-            unset($cart['products'][$cart_id]);
-            foreach ($cart['product_groups'] as $key_group => $group) {
-                if (in_array($cart_id, array_keys($group['products']))) {
-                    unset($cart['product_groups'][$key_group]['products'][$cart_id]);
-                }
-            }
+    if (!$buy_together_cart_id || $already_in_cart) {
+        return;
+    }
 
-            fn_set_notification('E', __('error'), __('buy_together_combination_cannot_be_added'));
+    foreach ($cart['products'] as $_id => $_product) {
+        $product_found = !empty($_product['extra']['buy_id'])
+            && $buy_together_cart_id == $_product['extra']['buy_id'];
 
-            $cart['skip_notification'] = true;
+        if ($product_found) {
+            return;
         }
     }
+
+    unset($cart['products'][$cart_id]);
+    if (!empty($cart['product_groups'])) {
+        foreach ($cart['product_groups'] as $key_group => $group) {
+            if (isset($group['products'][$cart_id])) {
+                unset($cart['product_groups'][$key_group]['products'][$cart_id]);
+            }
+        }
+    }
+
+    fn_set_notification('E', __('error'), __('buy_together_combination_cannot_be_added'));
+    $cart['skip_notification'] = true;
 }
 
 function fn_buy_together_generate_cart_id(&$_cid, &$extra, &$only_selectable)
@@ -941,7 +962,7 @@ function fn_buy_together_reorder(&$order_info, &$cart)
 
             $chain = fn_buy_together_get_chains($params, Tygh::$app['session']['auth']);
 
-            if ($chain['date_to'] < time()) {
+            if (empty($chain) || (!empty($chain['date_to']) && $chain['date_to'] < time())) {
                 unset($order_info['products'][$key]['extra']['buy_together'], $order_info['products'][$key]['extra']['buy_id'], $order_info['products'][$key]['extra']['chain'], $order_info['products'][$key]['extra']['parent']);
             }
         }
@@ -1208,4 +1229,25 @@ function fn_buy_together_init_product_tabs_post($product, $tabs)
             Tygh::$app['view']->assign('chains', $chains);
         }
     }
+}
+
+function fn_product_variations_buy_together_update_chain_post($item_id, $product_id, $item_data, $auth, $lang_code, $create)
+{
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+
+    $sync_service->onTableChanged('buy_together', $product_id, ['chain_id' => $item_id]);
+
+    if ($create) {
+        $sync_service->onTableChanged('buy_together_descriptions', $product_id, ['chain_id' => $item_id, 'lang_code' => array_keys(Languages::getAll())]);
+    } else {
+        $sync_service->onTableChanged('buy_together_descriptions', $product_id, ['chain_id' => $item_id, 'lang_code' => $lang_code]);
+    }
+}
+
+function fn_product_variations_buy_together_delete_chain_post($item_id, $product_id)
+{
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+
+    $sync_service->onTableChanged('buy_together', $product_id, ['chain_id' => $item_id]);
+    $sync_service->onTableChanged('buy_together_descriptions', $product_id, ['chain_id' => $item_id, 'lang_code' => array_keys(Languages::getAll())]);
 }

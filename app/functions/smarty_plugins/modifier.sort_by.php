@@ -22,7 +22,7 @@
 //
 function smarty_modifier_sort_by($arrData, $sortfields)
 {
-    array_sort_by_fields($arrData ,$sortfields);
+    array_sort_by_fields($arrData, $sortfields);
 
     return $arrData;
 }

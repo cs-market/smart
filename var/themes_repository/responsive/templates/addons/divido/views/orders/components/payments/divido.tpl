@@ -12,8 +12,7 @@
     </h1>
     <div class="ty-divido-both"></div>
     <dl>
-        <dt><span data-divido-choose-finance data-divido-label="{__("addons.divido.choose_your_plan")}" data-divido-form="divido_finance"></span></dt>
-        <dd class="divido-deposit-holder"><span class="divido-deposit" data-divido-choose-deposit data-divido-label="{__("addons.divido.choose_your_deposit")}" data-divido-form="divido_deposit"></span></dd>
+        <dt><span data-divido-choose-finance data-divido-label="{__("addons.divido.choose_your_plan")}" data-divido-form="divido_finance"></span></dt><dd class="divido-deposit-holder"><span class="divido-deposit" data-divido-choose-deposit data-divido-label="{__("addons.divido.choose_your_deposit")}" data-divido-form="divido_deposit"></span></dd>
     </dl>
     <div class="description">
         <strong>
@@ -22,18 +21,12 @@
     </div>
     <div class="divido-info">
         <dl>
-            <dt>{__("addons.divido.term")}</dt>
-            <dd><span data-divido-agreement-duration></span> {__("months")}</dd><br>
-            <dt>{__("addons.divido.monthly_instalment")}</dt>
-            <dd><span data-divido-monthly-instalment></span></dd><br>
-            <dt>{__("addons.divido.deposit")}</dt>
-            <dd><span data-divido-deposit></span></dd><br>
-            <dt>{__("addons.divido.cost_of_credit")}</dt>
-            <dd><span data-divido-finance-cost-rounded></span></dd><br>
-            <dt>{__("addons.divido.total_payable")}</dt>
-            <dd><span data-divido-total-payable-rounded></span></dd><br>
-            <dt>{__("addons.divido.total_interest_apr")}</dt>
-            <dd><span data-divido-interest-rate></span></dd><br>
+            <dt>{__("addons.divido.term")}</dt><dd><span data-divido-agreement-duration></span> {__("months")}</dd><br>
+            <dt>{__("addons.divido.monthly_instalment")}</dt><dd><span data-divido-monthly-instalment></span></dd><br>
+            <dt>{__("addons.divido.deposit")}</dt><dd><span data-divido-deposit></span></dd><br>
+            <dt>{__("addons.divido.cost_of_credit")}</dt><dd><span data-divido-finance-cost-rounded></span></dd><br>
+            <dt>{__("addons.divido.total_payable")}</dt><dd><span data-divido-total-payable-rounded></span></dd><br>
+            <dt>{__("addons.divido.total_interest_apr")}</dt><dd><span data-divido-interest-rate></span></dd><br>
         </dl>
     </div>
     <div class="clear"></div>

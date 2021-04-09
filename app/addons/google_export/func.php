@@ -15,6 +15,7 @@
 use Tygh\Registry;
 use Tygh\Enum\ProductFeatures;
 use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -67,19 +68,19 @@ function fn_google_export_add_feature($new_features, $parent_feature_id, $show_p
             if (fn_allowed_for('ULTIMATE')) {
                 $f_id = db_query(
                     "INSERT INTO ?:product_features"
-                    . " (feature_type, categories_path, parent_id, display_on_product, display_on_catalog, status, position, comparison, company_id)"
+                    . " (feature_type, categories_path, parent_id, display_on_product, display_on_catalog, status, position, comparison, company_id, feature_code)"
                     . " VALUES"
-                    . " (?s, '', ?i, 0, 0, 'A', 0, 'N', ?i)",
-                    $feature_type, $parent_feature_id, $company_id
+                    . " (?s, '', ?i, 0, 0, 'A', 0, 'N', ?i, ?s)",
+                    $feature_type, $parent_feature_id, $company_id, $feature_name
                 );
                 fn_share_object_to_all('product_features', $f_id);
             } else {
                 $f_id = db_query(
                     "INSERT INTO ?:product_features"
-                    . " (feature_type, categories_path, parent_id, display_on_product, display_on_catalog, status, position, comparison)"
+                    . " (feature_type, categories_path, parent_id, display_on_product, display_on_catalog, status, position, comparison, feature_code)"
                     . " VALUES"
-                    . " (?s, '', ?i, 0, 0, 'A', 0, 'N')",
-                    $feature_type, $parent_feature_id
+                    . " (?s, '', ?i, 0, 0, 'A', 0, 'N', ?s)",
+                    $feature_type, $parent_feature_id, $feature_name
                 );
             }
             db_query(
@@ -172,61 +173,64 @@ function fn_google_export_remove_features()
 
 function fn_google_export_get_new_features_list()
 {
-    return array (
-        'GTIN' => array (
-            'T' => array()
-        ),
-        'MPN' => array (
-            'T' => array()
-        ),
-        'Brand' => array (
-            'T' => array()
-        ),
-        'Availability' => array (
-            'S' => array (
+    return [
+        'ISBN'                         => [
+            ProductFeatures::TEXT_FIELD => [],
+        ],
+        'GTIN'                         => [
+            ProductFeatures::TEXT_FIELD => [],
+        ],
+        'MPN'                          => [
+            ProductFeatures::TEXT_FIELD => [],
+        ],
+        'Brand'                        => [
+            ProductFeatures::TEXT_FIELD => [],
+        ],
+        'Availability'                 => [
+            ProductFeatures::TEXT_SELECTBOX => [
                 'in stock',
                 'available for order',
                 'out of stock',
-                'preorder'
-            )
-        ),
-        'Condition' => array (
-            'S' => array (
+                'preorder',
+            ],
+        ],
+        'Condition'                    => [
+            ProductFeatures::TEXT_SELECTBOX => [
                 'new',
                 'used',
-                'refurbished'
-            )
-        ),
-        'Google product category (US)' => array (
-            'S' => fn_get_google_categories()
-        ),
-        'Age group' => array (
-            'S' => array (
+                'refurbished',
+            ],
+        ],
+        'Google product category (US)' => [
+            ProductFeatures::TEXT_SELECTBOX => fn_get_google_categories(),
+        ],
+        'Age group'                    => [
+            ProductFeatures::TEXT_SELECTBOX => [
                 'newborn',
                 'infant',
                 'toddler',
                 'kids',
-                'adult'
-            )
-        ),
-        'Gender' => array (
-            'S' => array (
+                'adult',
+            ],
+        ],
+        'Gender'                       => [
+            ProductFeatures::TEXT_SELECTBOX => [
                 'male',
                 'female',
-                'unisex'
-            )
-        ),
-        'Size type' => array (
-            'S' => array (
+                'unisex',
+            ],
+        ],
+        'Size type'                    => [
+            ProductFeatures::TEXT_SELECTBOX => [
                 'regular',
                 'petite',
                 'plus',
                 'big and tall',
-                'maternity'
-            )
-        ),
-        'Size system' => array (
-            'S' => array (
+                'maternity',
+            ],
+        ],
+        'Size system'                  => [
+            ProductFeatures::TEXT_SELECTBOX => [
                 'US',
                 'UK',
                 'EU',
@@ -237,10 +241,10 @@ function fn_google_export_get_new_features_list()
                 'IT',
                 'BR',
                 'MEX',
-                'AU'
-            )
-        )
-    );
+                'AU',
+            ],
+        ],
+    ];
 }
 
 function fn_get_google_options()
@@ -433,7 +437,7 @@ function fn_google_export_add_feed()
     );
     $data_feed_id = db_query("INSERT INTO ?:data_feeds ?e", $data);
 
-    foreach (fn_get_translation_languages() as $language) {
+    foreach (Languages::getAll() as $language) {
         db_query(
             "INSERT INTO ?:data_feed_descriptions (datafeed_id, datafeed_name, lang_code) VALUES (?i, 'Google base', ?s);",
             $data_feed_id, $language['lang_code']
@@ -464,7 +468,7 @@ function fn_google_export_remove_feed()
 
 function fn_google_export_update_alt_languages($table, $keys, $show_process = false)
 {
-    $langs = fn_get_translation_languages();
+    $langs = Languages::getAll();
 
     if (empty($langs)) {
         $langs = db_get_fields("SELECT lang_code FROM ?:languages");
@@ -568,7 +572,6 @@ function fn_google_export_available_categories()
 
 function fn_export_get_options_product_google_export($data, &$result, &$export_fields, $multi_lang)
 {
-    $f_option = false;
     $data_products = array();
     $export_options = fn_google_export_get_new_options_list();
     $export_params = array('Age group', 'Gender', 'Size type', 'Size system');
@@ -588,6 +591,10 @@ function fn_export_get_options_product_google_export($data, &$result, &$export_f
         if (!empty($feature_description)) {
             $feature_fields[$feature_description] = $export_field;
         }
+    }
+
+    if (!in_array('item_group_id', $export_fields)) {
+        $export_fields[] = 'item_group_id';
     }
 
     $_id = 1;
@@ -622,31 +629,15 @@ function fn_export_get_options_product_google_export($data, &$result, &$export_f
                 }
             }
 
-            if ($has_product_variation && fn_google_export_configurable_product_has_variations($product)) {
-                continue;
-            }
-
-            if ($has_product_variation && $product['product_type'] == ProductManager::PRODUCT_TYPE_VARIATION && empty($options)) {
-                /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-                $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-
-                $product_options = $product_manager->getProductVariationOptionsValue($product_id);
-                $d_product[$lang_code]['Product id'] = fn_generate_cart_id($product_id, $product_options);
-
-                if (!empty($d_product[$lang_code]['Quantity']) && isset($product['Quantity'])) {
-                    $d_product[$lang_code]['Quantity'] = $product['Quantity'];
-                }
-
-                if (!empty($d_product[$lang_code]['Product URL'])) {
-                    $d_product[$lang_code]['Product URL'] = fn_link_attach($d_product[$lang_code]['Product URL'], 'combination=' . fn_get_options_combination($product_options));
-                }
-            }
-
             $combinations = array();
             $count_combination = 0;
             $count_products = 0;
 
-            if (!empty($options)) {
+            if ($has_product_variation && !empty($product['variation_sub_group_id'])) {
+                $d_product[$lang_code]['item_group_id'] = $product['variation_sub_group_id'];
+                $data_products[][$lang_code] = $d_product[$lang_code];
+                $f_option = true;
+            } elseif (!empty($options)) {
                 $_options = $options;
                 $key_option = key($options);
                 $options = array_shift($_options);
@@ -674,27 +665,13 @@ function fn_export_get_options_product_google_export($data, &$result, &$export_f
 
                     $cart_id = fn_generate_cart_id($product_id, $product_options);
 
-                    if ($has_product_variation && $product['product_type'] == ProductManager::PRODUCT_TYPE_VARIATION) {
-                        $data_product = fn_google_export_get_product_variation_data($product, $product_options['product_options']);
-                        $product_id = empty($product['parent_product_id']) ? $product_id : $product['parent_product_id'];
-
-                        if (!empty($d_combination['Quantity']) && !empty($data_product)) {
-                            $d_combination['Quantity'] = empty($product['Quantity']) ? 0 : $product['Quantity'];
-                        }
-
-                        if (!empty($d_combination['Product URL'])) {
-                            $d_combination['Product URL'] = fn_url('products.view?product_id=' . $product_id . '&combination=' . fn_get_options_combination($product_options['product_options']), 'C');
-                        }
-
-                    } else {
-                        $data_product = db_get_row(
-                            'SELECT combination_hash, product_code'
-                            . ' FROM ?:product_options_inventory'
-                            . ' WHERE product_id = ?i AND combination_hash = ?s',
-                            $product_id,
-                            $cart_id
-                        );
-                    }
+                    $data_product = db_get_row(
+                        'SELECT combination_hash, product_code'
+                        . ' FROM ?:product_options_inventory'
+                        . ' WHERE product_id = ?i AND combination_hash = ?s',
+                        $product_id,
+                        $cart_id
+                    );
 
                     if (!empty($data_product)) {
                         $count_products++;
@@ -752,21 +729,14 @@ function fn_export_get_options_product_google_export($data, &$result, &$export_f
                 }
 
             } else {
-                $d_product[$lang_code]['item_group_id'] = $product_id;
+                $d_product[$lang_code]['item_group_id'] = '';
                 $data_products[][$lang_code] = $d_product[$lang_code];
             }
 
             if (!empty($options) && (!$count_combination || !$count_products)) {
-                $d_product[$lang_code]['item_group_id'] = $d_product[$lang_code]['Product id'];
+                $d_product[$lang_code]['item_group_id'] = '';
                 $data_products[][$lang_code] = $d_product[$lang_code];
             }
-        }
-    }
-
-    if (!empty($data_products)) {
-        $result = $data_products;
-        if (!in_array("item_group_id", $export_fields) && $f_option) {
-            $export_fields[] = "item_group_id";
         }
     }
 }
@@ -801,14 +771,6 @@ function fn_google_get_product_options($product_id, $field, $lang_code, $p_lang_
 {
     if (!empty($p_lang_code)) {
         $lang_code = $p_lang_code;
-    }
-
-    if (Registry::get('addons.product_variations.status') === 'A') {
-        /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-        $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-
-        $parent_product_id = $product_manager->getProductFieldValue($product_id, 'parent_product_id');
-        $product_id = empty($parent_product_id) ? $product_id : $parent_product_id;
     }
 
     $f_options = db_get_row(
@@ -873,46 +835,4 @@ function fn_google_get_product_options($product_id, $field, $lang_code, $p_lang_
     }
 
     return $result;
-}
-
-/**
- * Checks if the configurable product has variations.
- *
- * @param array $product The data of the product
- *
- * @return boolean True - the configurable product has variations
- */
-function fn_google_export_configurable_product_has_variations($product)
-{
-    /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-    $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-
-    return $product['product_type'] == ProductManager::PRODUCT_TYPE_CONFIGURABLE
-        && $product_manager->hasProductVariations($product['product_id']);
-}
-
-/**
- * Gets the product data for the product variations
- *
- * @param array $product          The data of the product
- * @param array $product_options  The options of the product.
- *
- * @return array The product data for the product variations
- */
-function fn_google_export_get_product_variation_data($product, $product_options)
-{
-    $product_data = array();
-
-    /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-    $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-
-    if (!empty($product_options)) {
-        $variation_code = $product_manager->getVariationCode($product['parent_product_id'], $product_options);
-        $product_data = db_get_row(
-            'SELECT product_code FROM ?:products WHERE product_id = ?i AND variation_code = ?s',
-            $product['product_id'], $variation_code
-        );
-    }
-
-    return $product_data;
 }

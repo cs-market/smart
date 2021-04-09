@@ -18,6 +18,8 @@ use Tygh\Exceptions\DeveloperException;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Navigation\LastView;
 use Tygh\Registry;
+use Tygh\Languages\Languages;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -45,7 +47,21 @@ function fn_get_promotions($params, $items_per_page = 0, $lang_code = CART_LANGU
         'get_hidden' => true
     );
 
+    if (AREA == 'C' && !isset($params['storefront_id'])) {
+        $storefront = Tygh::$app['storefront'];
+        $params['storefront_id'] = $storefront->storefront_id;
+    }
+
     $params = array_merge($default_params, $params);
+
+    /**
+     * Executes before fetching promotions, allows you to modify the parameters passed to the function.
+     *
+     * @param array  $params          Array of flags/data which determines which data should be gathered
+     * @param int    $items_per_page  Number of items per page
+     * @param string $lang_code       Language code
+     */
+    fn_set_hook('get_promotions_pre', $params, $items_per_page, $lang_code);
 
     // Define fields that should be retrieved
     $fields = array (
@@ -64,8 +80,6 @@ function fn_get_promotions($params, $items_per_page = 0, $lang_code = CART_LANGU
     );
 
     $condition = $join = $group = '';
-
-    $condition .= fn_get_company_condition('?:promotions.company_id');
 
     $statuses = array('A');
     if (!empty($params['get_hidden'])) {
@@ -115,6 +129,14 @@ function fn_get_promotions($params, $items_per_page = 0, $lang_code = CART_LANGU
         . ' AND ?:promotion_descriptions.lang_code = ?s',
         $lang_code
     );
+
+    if (isset($params['storefront_id']) && $params['storefront_id'] !== null) {
+        $join .= db_quote(
+            ' LEFT JOIN ?:storefronts_promotions AS storefronts_promotions'
+            . ' ON storefronts_promotions.promotion_id = ?:promotions.promotion_id'
+        );
+        $condition .= db_quote(' AND (storefronts_promotions.storefront_id = ?i OR storefronts_promotions.storefront_id IS NULL)', $params['storefront_id']);
+    }
 
     /**
      *  This hook allows you to modify the parameters by which the selection from the database will be performed
@@ -222,6 +244,9 @@ function fn_promotion_apply($zone, &$data, &$auth = NULL, &$cart_products = NULL
             'sort_order' => 'asc'
         );
 
+        $storefront = Tygh::$app['storefront'];
+        $params['storefront_id'] = $storefront->storefront_id;
+
         list($promotions[$zone]) = fn_get_promotions($params);
     }
 
@@ -287,6 +312,9 @@ function fn_promotion_apply($zone, &$data, &$auth = NULL, &$cart_products = NULL
     }
     foreach ($promotions[$zone] as $promotion) {
         // Rule is valid and can be applied
+        if ($zone == 'cart') {
+            $data['has_coupons'] = empty($data['has_coupons']) ? fn_promotion_has_coupon_condition($promotion['conditions']) : $data['has_coupons'];
+        }
         if (fn_check_promotion_conditions($promotion, $data, $auth, $cart_products)) {
             if (fn_promotion_apply_bonuses($promotion, $data, $auth, $cart_products)) {
                 $applied_promotions[$promotion['promotion_id']] = $promotion;
@@ -659,6 +687,32 @@ function fn_check_promotion_conditions($promotion_data, &$context_data, &$auth, 
 }
 
 /**
+ * Checks that promotions have a coupon code condition
+ *
+ * @param array $conditions_group Promotion condition group
+ */
+function fn_promotion_has_coupon_condition($conditions_group)
+{
+    if (empty($conditions_group['conditions'])) {
+        return false;
+    }
+
+    foreach ($conditions_group['conditions'] as $group_item) {
+        if (isset($group_item['conditions'])) {
+            if (fn_promotion_has_coupon_condition($group_item)) {
+                return true;
+            }
+        } elseif (!empty($group_item['condition'])
+            && ($group_item['condition'] == 'coupon_code' || $group_item['condition'] == 'auto_coupons')
+        ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
  * Recursively iterates through promotions condition groups and checks containing conditions.
  *
  * @param array $promotion_data Promotion data fetched with {{fn_get_promotion_data()}} or {{fn_get_promotions()}}
@@ -694,11 +748,6 @@ function fn_check_promotion_condition_groups_recursive($conditions_group, $promo
             $checked_conditions = array_merge($checked_conditions, $nested_checked_conditions);
         } // Or this is an ordinary condition - check it directly
         else {
-            if (!empty($group_item['condition'])
-                && ($group_item['condition'] == 'coupon_code' || $group_item['condition'] == 'auto_coupons')
-            ) {
-                $context_data['has_coupons'] = true;
-            }
             $tmp_result = fn_promotion_validate(
                 $promotion_data['promotion_id'],
                 $group_item,
@@ -727,63 +776,6 @@ function fn_check_promotion_condition_groups_recursive($conditions_group, $promo
     }
 
     return array($result, $checked_conditions);
-}
-
-
-/**
- * Check promotiontion conditions
- *
- * @param int   $promotion_id  promotion ID
- * @param array $condition     conditions set
- * @param array $data          data array
- * @param array $auth          auth array (for cart rules)
- * @param array $cart_products cart products array (for cart rules)
- *
- * @return bool true if promotion can be applied, false - otherwise
- *
- * @deprecated since 4.3.1, use fn_check_promotion_conditions() instead
- * @todo remove in 4.3.2
- */
-function fn_promotion_check($promotion_id, $condition, &$data, &$auth, &$cart_products)
-{
-    // This is unconditional promotiontion
-    if (empty($condition)) {
-        return true;
-    }
-
-    // if this is the conditions group, check each condition in cycle
-    if (!empty($condition['conditions'])) {
-        foreach ($condition['conditions'] as $cond) {
-            if (!empty($cond['condition']) && ($cond['condition'] == 'coupon_code' || $cond['condition'] == 'auto_coupons')) {
-                $data['has_coupons'] = true;
-            }
-
-            if (!empty($cond['conditions'])) {
-                $c_res = fn_promotion_check($promotion_id, $cond, $data, $auth, $cart_products);
-            } else {
-                $c_res = fn_promotion_validate($promotion_id, $cond, $data, $auth, $cart_products);
-            }
-
-            if (!isset($result)) {
-                $result = $c_res;
-            }
-
-            // Check result, if any condition is correct
-            if ($condition['set'] == 'any' && $c_res == $condition['set_value']) {
-               return true;
-
-            // If we need to compare all conditions, summ the result
-            } elseif ($condition['set'] == 'all') {
-                $result = $result & $c_res;
-            }
-        }
-
-        return ($condition['set_value'] == true) ? $result : !$result;
-
-    // If this is the ordinary condition, check it directly
-    } else {
-        return fn_promotion_validate($promotion_id, $condition, $data, $auth, $cart_products);
-    }
 }
 
 /**
@@ -1619,14 +1611,16 @@ function fn_get_promotion_data($promotion_id, $lang_code = DESCR_SL)
         $extra_condition = db_quote(' AND p.zone = ?s', 'catalog');
     }
 
-    // [cs-market]
-    fn_set_hook('get_promotion_data_pre', $promotion_id, $extra_condition, $lang_code);
-
     $promotion_data = db_get_row("SELECT * FROM ?:promotions as p LEFT JOIN ?:promotion_descriptions as d ON p.promotion_id = d.promotion_id AND d.lang_code = ?s WHERE p.promotion_id = ?i ?p", $lang_code, $promotion_id, $extra_condition);
 
     if (!empty($promotion_data)) {
         $promotion_data['conditions'] = !empty($promotion_data['conditions']) ? unserialize($promotion_data['conditions']) : array();
         $promotion_data['bonuses'] = !empty($promotion_data['bonuses']) ? unserialize($promotion_data['bonuses']) : array();
+
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($storefronts,) = $repository->find(['promotion_ids' => $promotion_data['promotion_id']]);
+        $promotion_data['storefront_ids'] = implode(',', array_keys($storefronts));
 
         if (!empty($promotion_data['conditions']['conditions'])) {
             foreach ($promotion_data['conditions']['conditions'] as $key => $condition) {
@@ -1944,8 +1938,8 @@ function fn_display_promotion_input_field($cart)
     /**
      * Modify result of the promotion code input field visibility check.
      *
-     * @param type $cart   Array of cart content and user information necessary for purchase
-     * @param bool $result Checking result
+     * @param array $cart   Array of cart content and user information necessary for purchase
+     * @param bool  $result Checking result
      */
     fn_set_hook('display_promotion_input_field_post', $cart, $result);
 
@@ -2165,8 +2159,24 @@ function fn_update_promotion($data, $promotion_id, $lang_code = DESCR_SL)
     } else {
         $promotion_id = $data['promotion_id'] = db_query('REPLACE INTO ?:promotions ?e', $data);
 
-        foreach (fn_get_translation_languages() as $data['lang_code'] => $_v) {
+        foreach (Languages::getAll() as $data['lang_code'] => $_v) {
             db_query('REPLACE INTO ?:promotion_descriptions ?e', $data);
+        }
+    }
+
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository'];
+    list($previous_storefronts,) = $repository->find(['promotion_ids' => $promotion_id]);
+    if (isset($data['storefront_ids'])) {
+        list($new_storefronts,) = $repository->find(['storefront_id' => $data['storefront_ids']]);
+        $added_storefronts = array_diff_key($new_storefronts, $previous_storefronts);
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        foreach ($added_storefronts as $storefront) {
+            $repository->save($storefront->addPromotionIds($promotion_id));
+        }
+        $removed_storefronts = array_diff_key($previous_storefronts, $new_storefronts);
+        foreach ($removed_storefronts as $storefront) {
+            $repository->save($storefront->removePromotionIds($promotion_id));
         }
     }
 

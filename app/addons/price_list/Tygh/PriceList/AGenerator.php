@@ -106,6 +106,14 @@ abstract class AGenerator {
                 'get_options' => (Registry::get('addons.price_list.include_options') == 'Y')? true : false,
                 'get_discounts' => false,
             );
+
+            /**
+             * @param \Tygh\PriceList\AGenerator $this     AGenerator instance
+             * @param array                      $products List of products
+             * @param array                      $_params  Array of flags which determines which data should be gathered
+             */
+            fn_set_hook('price_list_process_products_before_gather_additional_products_data', $this, $products, $_params);
+
             fn_gather_additional_products_data($products, $_params);
 
             $params['page']++;

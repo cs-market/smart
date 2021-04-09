@@ -216,14 +216,23 @@ function fn_hybrid_auth_create_user($auth_data, $provider)
     $user_data['user_type'] = 'C';
     $user_data['is_root'] = 'N';
     $user_data['password'] = $user_data['password1'] = $user_data['password2'] = fn_generate_password();
-    $user_data[$address_zone . '_firstname'] = (!empty($auth_data->firstName)) ? $auth_data->firstName : '';
-    $user_data[$address_zone . '_lastname'] = (!empty($auth_data->lastName)) ? $auth_data->lastName : '';
-    $user_data[$address_zone . '_phone'] = (!empty($auth_data->phone)) ? $auth_data->phone : '';
+    $user_data[$address_zone . '_firstname'] = $user_data['firstname'] = (!empty($auth_data->firstName)) ? $auth_data->firstName : '';
+    $user_data[$address_zone . '_lastname'] = $user_data['lastname'] = (!empty($auth_data->lastName)) ? $auth_data->lastName : '';
+    $user_data[$address_zone . '_phone'] = $user_data['phone'] = (!empty($auth_data->phone)) ? $auth_data->phone : '';
     $user_data[$address_zone . '_address'] = (!empty($auth_data->address)) ? $auth_data->address : '';
     $user_data[$address_zone . '_country'] = (!empty($auth_data->country)) ? $auth_data->country : '';
     $user_data[$address_zone . '_state'] = (!empty($auth_data->region)) ? $auth_data->region : '';
     $user_data[$address_zone . '_city'] = (!empty($auth_data->city)) ? $auth_data->city : '';
     $user_data[$address_zone . '_zipcode'] = (!empty($auth_data->zip)) ? $auth_data->zip : '';
+
+    /**
+     * Allows to change user data before creating new user account
+     *
+     * @param stdClass $auth_data Profile data gotten from server response
+     * @param string   $provider  Id of social login provider
+     * @param array    $user_data Current user data
+     */
+    fn_set_hook('hybrid_auth_create_user', $auth_data, $provider, $user_data);
 
     list($user_data['user_id'], $profile_id) = fn_update_user('', $user_data, $auth, true, false, false);
 
@@ -301,6 +310,10 @@ function fn_hybrid_auth_process($action, &$redirect_url = '')
 
                 if ($provider == "OpenID") {
                     $params["openid_identifier"] = @ $_REQUEST["openid_identifier"];
+                }
+
+                if ($provider == 'twitter') {
+                    $params['login_done'] = fn_url('/auth/twitter');
                 }
             }
 
@@ -484,4 +497,19 @@ function fn_get_hybrid_auth_provider_icon($provider_id)
     }
 
     return '';
+}
+
+/**
+ * The "url_post" hook handler.
+ *
+ * Actions performed:
+ *  - Change url to removing all query parameters from it.
+ *
+ * @see \fn_url()
+ */
+function fn_hybrid_auth_url_post(&$_url, $area, $url, $protocol, $company_id_in_url, $lang_code, $locations)
+{
+    if ($url === '/auth/twitter') {
+        $_url = $locations[$area][$protocol] . $url;
+    }
 }

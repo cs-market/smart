@@ -8,15 +8,19 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: es-ES\n"
-"X-Crowdin-File: /release-4.8.2/addons/old_adminpanel.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/old_adminpanel.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:11\n"
+"PO-Revision-Date: 2019-02-01 06:00\n"
 
 msgctxt "Addons::name::old_adminpanel"
 msgid "Old Admin Panel [Deprecated]"
-msgstr ""
+msgstr "Antiguo Panel de administración [Deprecated]"
 
 msgctxt "Addons::description::old_adminpanel"
 msgid "We left the old admin panel for backward compatibility. Turn on this module if you need an old admin panel. Or turn it off to use Responsive Admin Panel."
-msgstr ""
+msgstr "Dejamos el antiguo panel de administración para conservar su compatibilidad con versiones anteriores. Active en este módulo si necesita regresar al antiguo panel de administración. O desactívelo el uso del panel de administración adaptativo."
+
+msgctxt "Languages::old_adminpanel.deprecated_addon_notice"
+msgid "The <b>Old Admin Panel</b> add-on is deprecated. Starting with version 4.9.1, we won't maintain this add-on: the old admin panel won't receive any new functionality or bug fixes. In version 4.10.1 we will remove the old admin panel entirely."
+msgstr "El complemento <b> Old Admin Panel </b> está en desuso. A partir de la versión 4.9.1, no mantendremos este complemento: el antiguo panel de administración no recibirá ninguna nueva funcionalidad o corrección de errores. En la versión 4.10.1 eliminaremos por completo el antiguo panel de administración."
 

@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Greek\n"
 "Language: el_GR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.8.2/addons/image_zoom.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.5/addons/image_zoom.po\n"
+"X-Crowdin-File-ID: 3696\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::image_zoom"
 msgid "Image zoom"
@@ -24,69 +24,21 @@ msgctxt "SettingsSections::image_zoom::general"
 msgid "General"
 msgstr "Γενικά"
 
-msgctxt "SettingsOptions::image_zoom::cz_opacity"
-msgid "Opacity"
-msgstr "Διαφάνεια"
-
 msgctxt "SettingsOptions::image_zoom::cz_animation_time"
 msgid "Animation time"
 msgstr "Χρόνο Κίνησης"
-
-msgctxt "SettingsOptions::image_zoom::cz_tint_color_picker"
-msgid "Color"
-msgstr "Χρώμα"
 
 msgctxt "SettingsOptions::image_zoom::cz_zoom_position"
 msgid "Zoom position"
 msgstr "Θέση Μεγέθυνσης"
 
-msgctxt "SettingsOptions::image_zoom::cz_zoom_size_mode"
-msgid "Zoom size mode"
-msgstr "Μέγεθος λειτουργίας Μεγέθυνσης"
-
-msgctxt "SettingsOptions::image_zoom::cz_caption_position"
-msgid "Caption position"
-msgstr "Θέση Λεζάντας"
-
-msgctxt "SettingsOptions::image_zoom::cz_ease_time"
-msgid "Ease time"
-msgstr "Χρόνος ομαλότητας κίνησης"
-
-msgctxt "SettingsOptions::image_zoom::cz_zoom_fly_out"
-msgid "Zoom fly out"
-msgstr "Κίνηση fly out Μεγέθυνσης"
-
-msgctxt "SettingsTooltips::image_zoom::cz_opacity"
-msgid "Opacity of tint 0-1. If zero, no tint will be visible."
-msgstr "Αδιαφάνεια απόχρωσης 0-1. Εάν είναι μηδέν, καμία απόχρωση δεν είναι ορατή."
-
 msgctxt "SettingsTooltips::image_zoom::cz_animation_time"
 msgid "Duration of the animation effects in milliseconds."
 msgstr "Διάρκεια του εφέ κίνησης σε χιλιοστά του δευτερολέπτου."
 
-msgctxt "SettingsTooltips::image_zoom::cz_tint_color_picker"
-msgid "Color to use for the tint effect. Example: #ffffff."
-msgstr "Χρώμα που χρησιμοποιείται για το εφέ χρωματισμού. Παράδειγμα: #ffffff."
-
 msgctxt "SettingsTooltips::image_zoom::cz_zoom_position"
-msgid "Specifies position of zoom window. If numeric (0-15), position is relative to page image as shown by the following key (blue squares represent zoom window). If a string is supplied, value will be used as a selector to pinpoint the exact position and size of an element in the page. If the value \"inside\" is specified, the zoom image will appear inside the page image.<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-msgstr "Καθορίζει τη θέση του το παράθυρο του ζουμ. Εάν ειναι αριθμητικό (0-15), η θέση είναι σχετική με την εικόνα της σελίδας  όπως φαίνεται από το παρακάτω κλειδί (μπλε τετράγωνα αντιπροσωπεύουν το παράθυρο του ζουμ). Εάν ορίζεται μια συμβολοσειρά, μια τιμή θα χρησιμοποιηθεί ως επιλογέας για να εντοπίσει την ακριβή θέση και το μέγεθος ενός στοιχείου στην σελίδα. Εάν καθοριστεί η τιμή \"μέσα\", η εικόνα ζουμ θα εμφανιστεί στο εσωτερικό της εικόνας σελίδας. < br / > < br / > <img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_size_mode"
-msgid "Defines the rule for sizing the zoom window and lens."
-msgstr "Ορίζει τον κανόνα για το μέγεθος, του  παραθύρου του ζουμ και φακού."
-
-msgctxt "SettingsTooltips::image_zoom::cz_caption_position"
-msgid "Position of caption, \"top\" or \"bottom\"."
-msgstr "Θέση της λεζάντας, \"επάνω\" ή \"κάτω\"."
-
-msgctxt "SettingsTooltips::image_zoom::cz_ease_time"
-msgid "Number of milliseconds of mouse easing movement of zoom image. The bigger the number, the more easing. Zero means no easing."
-msgstr "Αριθμός χιλιοστών του δευτερολέπτου της ομαλής κίνησης του ποντικιού της εικόνας ζουμ. Όσο μεγαλύτερος ο αριθμός, τόσο πιο ομαλή κίνηση. Μηδέν σημαίνει χωρίς ομαλή κίνηση."
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_fly_out"
-msgid "Turns 'flying' zoom animation on or off."
-msgstr "Ενεργοποιεί και Απενεργοποιεί τη κίνηση μεγέθυνσης 'Flying'"
+msgid "Specifies position of zoom window. The position is relative to image as shown by the following key (blue squares represent zoom window). <br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
+msgstr "Καθορίζει την θέση του παραθύρου του zoom. Η θέση είναι σχετική με την εικόνα της σελίδας όπως φαίνεται από το παρακάτω κλειδί (μπλε τετράγωνα αντιπροσωπεύουν το παράθυρο του ζουμ).<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::0"
 msgid "Zoom position №0"
@@ -152,31 +104,11 @@ msgctxt "SettingsVariants::image_zoom::cz_zoom_position::15"
 msgid "Zoom position №15"
 msgstr "Ζουμ θέση №15"
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::inside"
-msgid "Inside position"
-msgstr "Εσωτερική Θέση"
+msgctxt "Languages::image_zoom.rework_update_notification.title"
+msgid "Image Zoom add-on reworked"
+msgstr "Επανεπεξεργασμένο Image Zoom add-on"
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::image"
-msgid "Image"
-msgstr "Εικόνα"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::lens"
-msgid "Lens"
-msgstr "Φακός"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::zoom"
-msgid "Zoom"
-msgstr "Μεγέθυνση"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::full"
-msgid "Full"
-msgstr "Πλήρης"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::top"
-msgid "Top"
-msgstr "Κορυφή"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::bottom"
-msgid "Bottom"
-msgstr "Κάτω μέρος"
+msgctxt "Languages::image_zoom.rework_update_notification.message"
+msgid "<p>We reworked the <b>Image zoom</b> add-on, because it used a third-party solution incompatible with modern versions of jQuery. As a result of the rework, some settings of the add-on were removed.</p><p>Please check how the image zoom looks on the product pages now. If you'd like to make any changes to the looks, adjust the settings of the <b>Image zoom</b> add-on.</p><p><a href=\"[image_zoom_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Check Image Zoom settings</a></p>"
+msgstr "<p> Επεξεργαστήκαμε το πρόσθετο <b> Image zoom </ b>, επειδή χρησιμοποιούσε μια λύση τρίτων ασύμβατη με τις σύγχρονες εκδόσεις του jQuery. Ως αποτέλεσμα του επανασχεδιασμού, ορισμένες ρυθμίσεις του πρόσθετου καταργήθηκαν. </p> <p> Ελέγξτε πώς φαιενται το ζουμ εικόνας στις σελίδες προϊόντων τώρα. Αν θέλετε να κάνετε αλλαγές στην εμφάνιση, προσαρμόστε τις ρυθμίσεις του πρόσθετου <b> Σμίκρυνση εικόνας </ b>. </p> <p> <a href = \"[image_zoom_settings]\" target = _blank \"class =\" btn btn-large btn-primary \"> Ελέγξτε τις ρυθμίσεις μεγέθυνσης εικόνας </a> </ p>"
 

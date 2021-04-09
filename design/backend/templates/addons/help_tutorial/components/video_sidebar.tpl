@@ -19,7 +19,7 @@
 <script type="text/javascript">
     (function(_, $) {
         $(function() {
-            $('#help_tutorial_link').on('click', function() {
+            $(_.doc).on('click', '#help_tutorial_link', function() {
                 $(this).toggleClass('open');
                 $('#help_tutorial_content').toggleClass('open');
                 $('#help_tutorial_video').toggleClass('close-content');

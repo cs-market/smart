@@ -69,17 +69,6 @@
     </div>
 </div>
 
-{include file="common/subheader.tpl" title=__("extra") target="#acc_extra" meta="collapsed"}
-<div id="acc_extra" class="collapse">
-
-    <div class="control-group">
-        <label for="elm_cf_cname" class="control-label">{__("cname")}:</label>
-        <div class="controls">
-            <input type="text" name="cdn_data[cname]" id="elm_cf_cname" size="55" value="{$cdn_data.cname}" class="input-large" />
-        </div>
-    </div>
-</div>
-
 
 {capture name="buttons"}
 

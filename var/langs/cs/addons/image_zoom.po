@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.8.2/addons/image_zoom.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"X-Crowdin-File: /release-4.11.3/addons/image_zoom.po\n"
+"PO-Revision-Date: 2020-02-04 07:11\n"
 
 msgctxt "Addons::name::image_zoom"
 msgid "Image zoom"
@@ -24,69 +22,21 @@ msgctxt "SettingsSections::image_zoom::general"
 msgid "General"
 msgstr "Obecné"
 
-msgctxt "SettingsOptions::image_zoom::cz_opacity"
-msgid "Opacity"
-msgstr "Neprůhlednost"
-
 msgctxt "SettingsOptions::image_zoom::cz_animation_time"
 msgid "Animation time"
 msgstr "Čas animace"
-
-msgctxt "SettingsOptions::image_zoom::cz_tint_color_picker"
-msgid "Color"
-msgstr "Barva"
 
 msgctxt "SettingsOptions::image_zoom::cz_zoom_position"
 msgid "Zoom position"
 msgstr "Pozice zoomu"
 
-msgctxt "SettingsOptions::image_zoom::cz_zoom_size_mode"
-msgid "Zoom size mode"
-msgstr "Režim velikosti zoomu"
-
-msgctxt "SettingsOptions::image_zoom::cz_caption_position"
-msgid "Caption position"
-msgstr "Popisek pozice"
-
-msgctxt "SettingsOptions::image_zoom::cz_ease_time"
-msgid "Ease time"
-msgstr "Čas animace"
-
-msgctxt "SettingsOptions::image_zoom::cz_zoom_fly_out"
-msgid "Zoom fly out"
-msgstr "Animace"
-
-msgctxt "SettingsTooltips::image_zoom::cz_opacity"
-msgid "Opacity of tint 0-1. If zero, no tint will be visible."
-msgstr "Průhlednost odstínu 0-1. Pokud je nula, tak žádný odstín nebude viditelný."
-
 msgctxt "SettingsTooltips::image_zoom::cz_animation_time"
 msgid "Duration of the animation effects in milliseconds."
 msgstr "Doba trvání efektů animace v milisekundách."
 
-msgctxt "SettingsTooltips::image_zoom::cz_tint_color_picker"
-msgid "Color to use for the tint effect. Example: #ffffff."
-msgstr "Barva pro použití efektu barevného odstínu. Příklad: #FFFFFF."
-
 msgctxt "SettingsTooltips::image_zoom::cz_zoom_position"
-msgid "Specifies position of zoom window. If numeric (0-15), position is relative to page image as shown by the following key (blue squares represent zoom window). If a string is supplied, value will be used as a selector to pinpoint the exact position and size of an element in the page. If the value \"inside\" is specified, the zoom image will appear inside the page image.<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-msgstr "Určuje pozici zoomu okna. Pokud je číselná (0-15), tak je pozice relativní na stránce obrázku podle následujícího klíče (modré čtverce představují přibližovací okno). Pokud je řetězec, hodnota se použije jako volič určit přesnou polohu a velikost elementu na stránce. Pokud je zadána hodnota \"uvnitř\", zoom obrazu se objeví uvnitř obrazu stránky. <br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_size_mode"
-msgid "Defines the rule for sizing the zoom window and lens."
-msgstr "Definuje pravidlo pro změnu velikosti okna zoomu a lupy."
-
-msgctxt "SettingsTooltips::image_zoom::cz_caption_position"
-msgid "Position of caption, \"top\" or \"bottom\"."
-msgstr "Pozice titulku, \"nahoře\" nebo \"dole\"."
-
-msgctxt "SettingsTooltips::image_zoom::cz_ease_time"
-msgid "Number of milliseconds of mouse easing movement of zoom image. The bigger the number, the more easing. Zero means no easing."
-msgstr "Počet milisekund pro uvolnění pohybu myši zoomu obrazu. Čím větší číslo, tím větší uvolnění. Nula znamená žádné uvolnění."
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_fly_out"
-msgid "Turns 'flying' zoom animation on or off."
-msgstr "Vypnout / zapnout animaci zoomu."
+msgid "Specifies position of zoom window. The position is relative to image as shown by the following key (blue squares represent zoom window). <br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
+msgstr ""
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::0"
 msgid "Zoom position №0"
@@ -152,31 +102,11 @@ msgctxt "SettingsVariants::image_zoom::cz_zoom_position::15"
 msgid "Zoom position №15"
 msgstr "Pozice zoomu №15"
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::inside"
-msgid "Inside position"
-msgstr "Zobrazit uvnitř obrázku"
+msgctxt "Languages::image_zoom.rework_update_notification.title"
+msgid "Image Zoom add-on reworked"
+msgstr ""
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::image"
-msgid "Image"
-msgstr "Obrázek"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::lens"
-msgid "Lens"
-msgstr "Lupa"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::zoom"
-msgid "Zoom"
-msgstr "Zvětšení"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::full"
-msgid "Full"
-msgstr "Plné"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::top"
-msgid "Top"
-msgstr "Nahoru"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::bottom"
-msgid "Bottom"
-msgstr "Dolu"
+msgctxt "Languages::image_zoom.rework_update_notification.message"
+msgid "<p>We reworked the <b>Image zoom</b> add-on, because it used a third-party solution incompatible with modern versions of jQuery. As a result of the rework, some settings of the add-on were removed.</p><p>Please check how the image zoom looks on the product pages now. If you'd like to make any changes to the looks, adjust the settings of the <b>Image zoom</b> add-on.</p><p><a href=\"[image_zoom_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Check Image Zoom settings</a></p>"
+msgstr ""
 

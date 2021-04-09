@@ -45,28 +45,22 @@ function fn_exim_google_export_format_price($product_price, $product_id = 0, $us
     }
 
     $product = fn_get_product_data($product_id, $auth, CART_LANGUAGE, false, false, false, false, false, false, false);
-
+    
     if ($use_discount) {
-        // fn_calculate_cart_content is required to get the correct discounted price
-        // with taxes applied, if necessary
-        $product['amount'] = 1;
-        fn_add_product_to_cart(array(
-            fn_generate_cart_id($product_id, array()) => $product
-        ), $cart, $auth);
-        fn_calculate_cart_content($cart, $auth, 'S', true);
-        $product_price = $cart['total'];
-        unset($cart);
-    } else {
-        fn_get_taxed_and_clean_prices($product, $auth);
+        fn_promotion_apply('catalog', $product, $auth);
+    }
 
-        if ($include_tax) {
-            $product_price = empty($product['taxed_price']) ? $product['price'] : $product['taxed_price'];
-        } else {
-            $product_price = empty($product['clean_price']) ? $product['price'] : $product['clean_price'];
-        }
+    if ($include_tax) {
+        fn_get_taxed_and_clean_prices($product, $auth);
+        $product_price = empty($product['taxed_price'])
+            ? $product['price']
+            : $product['taxed_price'];
+    } else {
+        $product_price = $product['price'];
     }
 
     $price = fn_format_price($product_price, CART_PRIMARY_CURRENCY, null, false);
+
     return $price . ' ' . CART_PRIMARY_CURRENCY;
 }
 

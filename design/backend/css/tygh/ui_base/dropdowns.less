@@ -29,6 +29,9 @@
         left: auto;
     }
 }
+.dropdown--inline {
+    display: inline-block;
+}
 .droptop {
     .dropdown-menu {
         top: auto;
@@ -37,4 +40,32 @@
 }
 .dropdown-opened {
     display: block;
+}
+
+.dropdown-menu > li > a.dropdown--text-wrap {
+    width: 100%;
+    min-width: 200px;
+    max-height: 50px;
+}
+
+.dropdown-toggle--text-wrap {
+    position: relative;
+    padding-right: 23px;
+    text-align: left;
+    margin-left: 0px;
+
+    .caret {
+        position: absolute;
+        right: 6px;
+        margin-right: 5px;
+        top: 0.2em;
+    }
+}
+
+.dropdown-toggle--text-wrap.btn-text {
+    white-space: normal;
+}
+
+.dropdown-toggle--text-wrap.btn-small .caret {
+    top: 0.1em;
 }

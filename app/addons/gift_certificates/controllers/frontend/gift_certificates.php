@@ -129,6 +129,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'verify') {
 
+    if (!defined('AJAX_REQUEST') && empty($_REQUEST['verify_code'])) {
+        return [CONTROLLER_STATUS_REDIRECT, 'gift_certificates.add'];
+    }
+
     fn_add_breadcrumb(__('gift_certificate_verification'));
 
     $verify_id = db_get_field("SELECT gift_cert_id FROM ?:gift_certificates WHERE gift_cert_code = ?s ?p", $_REQUEST['verify_code'], fn_get_gift_certificate_company_condition('?:gift_certificates.company_id'));

@@ -135,11 +135,13 @@ class Embedded
 
     /**
      * Processes payment form to make payment submit via non-embedded mode
-     * @param string $submit_url payment submit URL
-     * @param array $data payment data
-     * @param array $payment_name payment name
+     *
+     * @param string  $submit_url           payment submit URL
+     * @param array   $data                 payment data
+     * @param string  $payment_name         payment name
      * @param boolean $exclude_empty_values flag to exclude empty values
-     * @param string $method submit method
+     * @param string  $method               submit method
+     *
      * @return array data to submit form to host server
      */
     public static function processPaymentForm($submit_url, $data, $payment_name, $exclude_empty_values, $method)

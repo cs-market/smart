@@ -18,7 +18,10 @@ use Tygh\Registry;
 
 class Madmimi extends ABackend
 {
-    private $mc;
+    /** @var \MadMimi $mm */
+    private $mm;
+
+    /** @var int $list_id */
     private $list_id = 0;
 
     protected $support = array(
@@ -65,28 +68,53 @@ class Madmimi extends ABackend
         return false;
     }
 
-    public function processWebHook($data)
+    /**
+     * @param array<array-key, string|array> $data Web hook data
+     *
+     * @psalm-param array{
+     *     type: string,
+     *     data: array{email: string, new_email: string, old_email: string, ip_opt: string, merges: array{FNAME: string}}
+     * } $data Web hook data
+     *
+     * @return array<empty, empty>|bool
+     */
+    public function processWebHook(array $data)
     {
-        return array();
+        return [];
     }
 
-    public function batchSubscribe($data)
+    /**
+     * Batch email subscription
+     *
+     * @param array<array-key, array|string|int> $data Emails (with name, timestamp, etc)
+     *
+     * @return bool
+     */
+    public function batchSubscribe(array $data)
     {
-        $res = array();
+        $res = [];
+        /** @var array<array-key, string> $user */
         foreach ($data as $user) {
-            $res[] = array(
-                'email' => $user['email'],
+            $res[] = [
+                'email'     => $user['email'],
                 'firstName' => $user['name'],
-                'add_list' => $this->list_id
-            );
+                'add_list'  => $this->list_id
+            ];
         }
-        $csv = $this->buildCSV(array('email', 'firstName', 'add_list'), $res);
+        $csv = $this->buildCSV(['email', 'firstName', 'add_list'], $res);
         $this->mm->Import($csv);
 
         return true;
     }
 
-    public function batchUnsubscribe($emails)
+    /**
+     * Batch email unsubscription
+     *
+     * @param array<string> $emails List of emails
+     *
+     * @return bool
+     */
+    public function batchUnsubscribe(array $emails)
     {
         // MadMimi does not support batch unsubscription, so...
         foreach ($emails as $email) {
@@ -96,6 +124,11 @@ class Madmimi extends ABackend
         return true;
     }
 
+    /**
+     * Gets lists
+     *
+     * @return array<string, string>|bool
+     */
     public function getLists()
     {
         $result = array();
@@ -168,7 +201,15 @@ class Madmimi extends ABackend
         return $emails;
     }
 
-    private function buildCSV($keys, $data)
+    /**
+     * Builds CSV
+     *
+     * @param array<string>                       $keys Keys
+     * @param array<array-key, array<string|int>> $data Array of the data to build csv
+     *
+     * @return string
+     */
+    private function buildCSV(array $keys, array $data)
     {
         $csv = '';
         foreach ($keys as $value) {

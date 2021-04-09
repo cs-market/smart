@@ -3,7 +3,7 @@
     <div id="point_payment" class="code-input discount-coupon">
         <form class="cm-ajax" name="point_payment_form" action="{""|fn_url}" method="post">
         <input type="hidden" name="redirect_mode" value="{$location}" />
-        <input type="hidden" name="result_ids" value="checkout_totals,checkout_steps" />
+        <input type="hidden" name="result_ids" value="checkout_totals,checkout_steps,litecheckout_form" />
         
         <div class="ty-discount-coupon__control-group ty-input-append ty-inline-block">
             <input type="text" class="ty-input-text ty-valign cm-hint" name="points_to_use" size="40" value="{__("points_to_use")}" />
@@ -18,7 +18,7 @@
             {if $cart.points_info.in_use.points}
                 {assign var="_redirect_url" value=$config.current_url|escape:url}
                 {if $use_ajax}{assign var="_class" value="cm-ajax"}{/if}
-                <span class="ty-reward-points__points-in-use">{__("points_in_use_lowercase", [$cart.points_info.in_use.points])}.&nbsp;({include file="common/price.tpl" value=$cart.points_info.in_use.cost})&nbsp;{include file="buttons/button.tpl" but_href="checkout.delete_points_in_use?redirect_url=`$_redirect_url`" but_meta="cm-post ty-reward-points__delete-icon" but_role="delete" but_target_id="checkout*,cart_status*,subtotal_price_in_points"}</span>
+                <span class="ty-reward-points__points-in-use">{__("points_in_use_lowercase", [$cart.points_info.in_use.points])}.&nbsp;({include file="common/price.tpl" value=$cart.points_info.in_use.cost})&nbsp;{include file="buttons/button.tpl" but_href="checkout.delete_points_in_use?redirect_url=`$_redirect_url`" but_meta="cm-post ty-reward-points__delete-icon" but_role="delete" but_target_id="checkout*,cart_status*,subtotal_price_in_points,litecheckout_form"}</span>
             {/if}
         </div>
 </div>

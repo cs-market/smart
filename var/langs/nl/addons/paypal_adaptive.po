@@ -5,19 +5,19 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/paypal_adaptive.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.11.5/addons/paypal_adaptive.po\n"
+"X-Crowdin-File-ID: 3540\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::paypal_adaptive"
-msgid "PayPal Adaptive Payments [Deprecated]"
+msgid "PayPal Adaptive Payments"
 msgstr ""
 
 msgctxt "Addons::description::paypal_adaptive"
-msgid "Adaptive Payments can't be used for new integrations. We recommend using the <b>PayPal for Marketplaces</b> add-on instead.<br />This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
+msgid "This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
 msgstr ""
 
 msgctxt "Languages::paypal_api_username"
@@ -36,6 +36,10 @@ msgctxt "Languages::paypal_adaptive.paypal_email"
 msgid "PayPal Business Account email"
 msgstr ""
 
+msgctxt "Languages::paypal_adaptive.vendor.paypal_email"
+msgid "PayPal Account email"
+msgstr ""
+
 msgctxt "Languages::pp_adaptive_payments"
 msgid "PayPal Adaptive Payments"
 msgstr ""
@@ -50,7 +54,7 @@ msgstr ""
 
 msgctxt "Languages::paypal_adaptive_pay_orders"
 msgid "Pay order"
-msgstr ""
+msgstr "Betaal bestelling"
 
 msgctxt "Languages::paypal_adaptive_pay_step"
 msgid "step pay"
@@ -58,7 +62,7 @@ msgstr ""
 
 msgctxt "Languages::paypal_adaptive_pay"
 msgid "Pay"
-msgstr ""
+msgstr "Betalen"
 
 msgctxt "Languages::paypal_adaptive_progress_payment_order"
 msgid "Progress pay orders"
@@ -66,11 +70,11 @@ msgstr ""
 
 msgctxt "Languages::paypal_adaptive_paid"
 msgid "Paid"
-msgstr ""
+msgstr "Betaald"
 
 msgctxt "Languages::paypal_adaptive_cancel"
 msgid "Return to checkout"
-msgstr ""
+msgstr "Terug naar afrekenen"
 
 msgctxt "Languages::paypal_adaptive_type_payments"
 msgid "PayPal payments type"
@@ -78,7 +82,7 @@ msgstr ""
 
 msgctxt "Languages::paypal_adaptive_papallel_payments"
 msgid "Parallel"
-msgstr ""
+msgstr "Parallel"
 
 msgctxt "Languages::paypal_adaptive_chained_payments"
 msgid "Chained"
@@ -114,7 +118,7 @@ msgstr ""
 
 msgctxt "SettingsSections::paypal_adaptive::general"
 msgid "General"
-msgstr ""
+msgstr "Algemeen"
 
 msgctxt "SettingsOptions::paypal_adaptive::count_vendor_commission_on_basis"
 msgid "To calculate commission based on"
@@ -126,11 +130,11 @@ msgstr ""
 
 msgctxt "SettingsVariants::paypal_adaptive::count_vendor_commission_on_basis::O"
 msgid "Order total"
-msgstr ""
+msgstr "Totaal bestelling"
 
 msgctxt "SettingsVariants::paypal_adaptive::count_vendor_commission_on_basis::S"
 msgid "Order subtotal"
-msgstr ""
+msgstr "Subtotaal bestelling"
 
 msgctxt "SettingsOptions::paypal_adaptive::collect_payouts"
 msgid "Collect payouts on vendors"
@@ -182,18 +186,18 @@ msgstr ""
 
 msgctxt "Languages::not_checked"
 msgid "Not checked"
-msgstr ""
+msgstr "Niet gecontroleerd"
 
 msgctxt "Languages::not_verified"
 msgid "Not verified"
-msgstr ""
+msgstr "Niet geverifieerd"
 
 msgctxt "Languages::verified"
 msgid "Verified"
-msgstr ""
+msgstr "Geverifieerd"
 
 msgctxt "Languages::paypal_adaptive_auto_info_data_verification"
-msgid "Use this link to get E-mail verification status of your vendors via CRON:"
+msgid "Use the following line to run the script to get E-mail verification status of your vendors according to schedule:"
 msgstr ""
 
 msgctxt "Languages::paypal_adaptive_statuses_updated_successfully"
@@ -218,15 +222,15 @@ msgstr ""
 
 msgctxt "SettingsOptions::paypal_adaptive::paypal_verified_image_width"
 msgid "Image width"
-msgstr ""
+msgstr "Breedte afbeelding"
 
 msgctxt "SettingsOptions::paypal_adaptive::paypal_verified_image_height"
 msgid "Image height"
-msgstr ""
+msgstr "Hoogte afbeelding"
 
 msgctxt "Languages::verified_by_paypal"
 msgid "Verified by PayPal"
-msgstr ""
+msgstr "Geverifieerd door PayPal"
 
 msgctxt "Languages::paypal_adaptive_error_wrong_cron_key"
 msgid "Error: Wrong cron key."
@@ -234,11 +238,11 @@ msgstr ""
 
 msgctxt "SettingsTooltips::paypal_adaptive::paypal_verified_image_width"
 msgid "The width of the verified image."
-msgstr ""
+msgstr "De breedte van de geverifieerde afbeelding."
 
 msgctxt "SettingsTooltips::paypal_adaptive::paypal_verified_image_height"
 msgid "The height of the verified image."
-msgstr ""
+msgstr "De hoogte van de geverifieerde afbeelding."
 
 msgctxt "Languages::paypal_adaptive.tooltips.paypal_ver_image"
 msgid "The setting allows to display verification image instead of the text status at the product details page on the storefront. If an image is not uploaded, the status will be shown as text."
@@ -262,6 +266,10 @@ msgstr ""
 
 msgctxt "Languages::ttc_paypal_adaptive.paypal_email"
 msgid "The email of your PayPal Business Account. A Personal Account email won't work."
+msgstr ""
+
+msgctxt "Languages::ttc_paypal_adaptive.vendor.paypal_email"
+msgid "The email of your PayPal account."
 msgstr ""
 
 msgctxt "Languages::addons.paypal_adaptive.paypal_workflow"
@@ -292,6 +300,10 @@ msgctxt "Languages::addons.paypal_adaptive.payment_type_notice"
 msgid "Chained payments can't be used if the <a href=\"[url]\" target=\"_blank\">PayPal Adaptive Payments</a> add-on is configured to collect both order commission and unpaid payouts."
 msgstr ""
 
+msgctxt "Languages::addons.paypal_adaptive.primary_email_notice"
+msgid "The email of your PayPal Business Account. A Personal Account email won't work."
+msgstr ""
+
 msgctxt "Languages::addons.paypal_adaptive.commission_includes"
 msgid "Commission includes"
 msgstr ""
@@ -306,11 +318,11 @@ msgstr ""
 
 msgctxt "Languages::addons.paypal_adaptive.first_name"
 msgid "PayPal account holder's first name"
-msgstr ""
+msgstr "Voornaam van PayPal-rekeninghouder"
 
 msgctxt "Languages::addons.paypal_adaptive.last_name"
 msgid "PayPal account holder's last name"
-msgstr ""
+msgstr "Achternaam van PayPal-rekeninghouder"
 
 msgctxt "Languages::ttc_addons.paypal_adaptive.first_name"
 msgid "Please enter the same first name as specified in your PayPal profile."

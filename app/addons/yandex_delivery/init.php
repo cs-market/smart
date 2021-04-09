@@ -20,5 +20,6 @@ fn_register_hooks(
     'delete_shipments',
     'get_shipments',
     'get_order_info',
-    'realtime_services_process_response_post'
+    'realtime_services_process_response_post',
+    'pickup_point_variable_init'
 );

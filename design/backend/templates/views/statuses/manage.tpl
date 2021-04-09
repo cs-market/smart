@@ -49,6 +49,7 @@
             nostatus=true
             tool_items=$smarty.capture.tool_items
             extra_data=$smarty.capture.extra_data
+            text_wrap=true
         }
 
     {/foreach}

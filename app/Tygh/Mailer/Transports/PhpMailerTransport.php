@@ -110,6 +110,15 @@ class PhpMailerTransport extends \PHPMailer implements ITransport
     {
         $result = new SendResult();
         $this->initByMessage($message);
+
+        /**
+         * Executes before actually sending a message via PHPMailer,
+         * allows you to perform low-level manipulations on the PHPMailer itself.
+         *
+         * @param \Tygh\Mailer\Transports\PhpMailerTransport $this PHPMailerTransport instance
+         * @param \Tygh\Mailer\Message $message Sent message
+         */
+        fn_set_hook('phpmailertransport_send_message_before_send', $this, $message);
         
         foreach ($message->getTo() as $address => $name) {
             $this->clearAddresses();

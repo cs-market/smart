@@ -12,7 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use \Tygh\Registry;
+use Tygh\Registry;
 
 $schema =  array(
     'orders' => array (
@@ -40,7 +40,10 @@ $schema =  array(
             ),
             'assign_manager' => array(
                 'permissions' => 'edit_order'
-            )
+            ),
+            'export_range' => array (
+                'permissions' => 'exim_access'
+            ),
         ),
         'permissions' => 'view_orders'
     ),
@@ -61,6 +64,9 @@ $schema =  array(
     'product_options' => array (
         'modes' => array (
             'delete' => array (
+                'permissions' => 'manage_catalog'
+            ),
+            'm_delete' => array (
                 'permissions' => 'manage_catalog'
             )
         ),
@@ -125,6 +131,9 @@ $schema =  array(
             'delete_shipping' => array (
                 'permissions' => 'manage_shipping'
             ),
+            'add' => array(
+                'permissions' => 'manage_shipping'
+            ),
         ),
         'permissions' => array ('GET' => 'view_shipping', 'POST' => 'manage_shipping'),
     ),
@@ -146,19 +155,20 @@ $schema =  array(
         ),
         'permissions' => array ('GET' => 'view_usergroups', 'POST' => 'manage_usergroups'),
     ),
-    'customization' => array (
-        'modes' => array (
-            'update_mode' => array(
-                'param_permissions' => array (
-                    'type' => array (
-                        'live_editor' => 'manage_translation',
-                        'design' => 'manage_design',
-                        'theme_editor' => 'manage_design',
-                    )
-                ),
-            ),
-        ),
-     ),
+    'customization' => [
+        'modes' => [
+            'update_mode' => [
+                'param_permissions' => [
+                    'type' => [
+                        'live_editor'   => 'manage_translation',
+                        'design'        => 'manage_design',
+                        'theme_editor'  => 'manage_design',
+                        'block_manager' => 'edit_blocks',
+                    ],
+                ],
+            ],
+        ],
+    ],
     'profiles' => array (
         'modes' => array (
             'delete' => array (
@@ -183,6 +193,12 @@ $schema =  array(
             'update_status' => array (
                 'permissions' => 'manage_users'
             ),
+            'm_activate' => [
+                'permissions' => 'manage_users',
+            ],
+            'm_disable' => [
+                'permissions' => 'manage_users',
+            ],
             'manage' => array (
                 'permissions' => 'view_users'
             ),
@@ -195,10 +211,31 @@ $schema =  array(
                     'operator' => 'or',
                     'function' => array('fn_check_permission_act_as_user'),
                 )
-            )
+            ),
+            'login_as_vendor' => [
+                'permissions' => 'manage_users',
+                'condition' => [
+                    'operator' => 'or',
+                    'function' => ['fn_check_permission_act_as_user'],
+                ]
+            ]
         ),
     ),
-    'cart' => array (
+    'cart' => array(
+        'modes' => array(
+            'convert_to_order' => array(
+                'permissions' => 'create_order',
+            ),
+            'cart_list' => array(
+                'permissions' => 'view_orders',
+            ),
+            'delete' => array(
+                'permissions' => 'delete_orders',
+            ),
+            'm_delete' => array(
+                'permissions' => 'delete_orders',
+            ),
+        ),
         'permissions' => array ('GET' => 'view_users', 'POST' => 'manage_users'),
     ),
     'pages' => array (
@@ -363,9 +400,17 @@ $schema =  array(
     'order_management' => array(
         'modes' => array(
             'edit' => array(
+                'param_permissions' => array(
+                    'copy' => array(
+                        '1' => 'create_order'
+                    ),
+                ),
                 'permissions' => 'edit_order'
             ),
             'new' => array(
+                'permissions' => 'create_order'
+            ),
+            'add' => array(
                 'permissions' => 'create_order'
             ),
         ),
@@ -470,8 +515,32 @@ $schema =  array(
     ),
     'templates' => array(
         'permissions' => 'edit_files'
-    )
+    ),
+    'storefronts' => [
+        'permissions' => 'update_settings',
+        'modes' => [
+            'picker' => [
+                'permissions' => true,
+            ]
+        ],
+    ],
+    'notification_settings' => [
+        'permissions' => 'manage_notification_settings',
+    ],
+    'sync_data' => [
+        'modes' => [
+            'manage' => [
+                'permissions' => true,
+                'condition'   => [
+                    'operator' => 'and',
+                    'function' => ['fn_check_permission_sync_data'],
+                ],
+            ]
+        ]
+    ]
 );
+
+$schema['root']['sync_data'] = $schema['sync_data'];
 
 if (Registry::get('config.tweaks.disable_localizations') == true || fn_allowed_for('ULTIMATE:FREE')) {
     $schema['localizations'] = $schema['root']['localizations'] = array(

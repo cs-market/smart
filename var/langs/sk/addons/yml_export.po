@@ -333,8 +333,8 @@ msgid "Age"
 msgstr "Age"
 
 msgctxt "Languages::yml2_offer_feature_common_vendor"
-msgid "Vendor"
-msgstr "Vendor"
+msgid "Manufacturer"
+msgstr "Manufacturer"
 
 msgctxt "Languages::yml2_offer_feature_common_description"
 msgid "Description"

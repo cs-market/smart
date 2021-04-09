@@ -69,6 +69,8 @@
                 lang_code = lang_map[lang_code];
             }
 
+            var isBlockManagerEnabled = elm.data('caIsBlockManagerEnabled');
+
             if (typeof($.fn.redactor) == 'undefined') {
                 $.ceEditor('state', 'loading');
                 $.loadCss(['js/lib/redactor2/redactor.min.css']);
@@ -85,9 +87,13 @@
                     'js/lib/redactor2/plugins/imageupload/imageupload.js',
                     'js/lib/redactor2/plugins/source/source.js',
                     'js/lib/redactor2/plugins/alignment/alignment.js',
-                    'js/lib/redactor2/plugins/video/video.js'
+                    'js/lib/redactor2/plugins/video/video.js',
                 ];
-                if (lang_code != 'en') {
+
+                if (isBlockManagerEnabled) {
+                    pluginsQueue.push('js/tygh/wysiwyg_plugins/block_manager/redactor2.js');
+                }
+                if (lang_code !== 'en') {
                     pluginsQueue.push('js/lib/redactor2/lang/' + lang_code + '.js');
                 }
                 var pluginsLoadedCount = 0;
@@ -98,7 +104,7 @@
                         $.getScript(pluginsQueue[i], function() {
                             pluginsLoadedCount++;
                             // initiate only on full load
-                            if (pluginsLoadedCount == pluginsQueue.length) {
+                            if (pluginsLoadedCount === pluginsQueue.length) {
                                 callback();
                             }
                         });
@@ -118,8 +124,10 @@
                     lang: lang_code,
                     removeComments: false,
                     replaceTags: false,
-                    overrideStyles: false
+                    overrideStyles: true
                 };
+
+                this.params.direction = _.language_direction;
             }
 
             if (typeof params !== 'undefined' && params[this.editorName]) {
@@ -154,16 +162,25 @@
             this.params.plugins = ['alignment', 'fontcolor', 'table', 'source'];
             this.params.buttons = ['source', 'format', 'bold', 'italic', 'deleted', 'lists',
                 'video', 'table', 'link', 'alignment', 'horizontalrule'];
-            if (_.area == 'A' || _.live_editor_mode == true) {
+            if (_.area === 'A' || _.live_editor_mode === true) {
                 this.params.plugins.push('imageupload', 'video');
+                if (isBlockManagerEnabled) {
+                    this.params.plugins.push('blockManager');
+                }
             }
 
             this.params.imageResizable = true;
             this.params.imageCaption = false;
             this.params.imagePosition = true;
+            this.params.keepStyleAttr = ['*'];
 
             // Launch Redactor
             elm.redactor(this.params);
+
+            elm.get(0).defaultValue = elm.get(0).value;
+
+            var $parent = elm.parent();
+            $parent.find('textarea:not([name])').addClass("cm-skip-check-item");
 
             if (elm.prop('disabled')) {
                 elm.ceEditor('disable', true);

@@ -12,25 +12,27 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
+use Tygh\Addons\ProductVariations\ServiceProvider;
+use Tygh\Addons\ProductVariations\Product\Group\Repository as GroupRepository;
+use Tygh\Addons\ProductVariations\Product\Repository as ProductRepository;
 
 /** @var array $schema */
 
 $schema['variations'] = function () {
-    $demo_data_conf_product_id = 277; // exclude parent (configurable) product that comes with demo data
-    $demo_data_var_product_ids = array(278, 279, 280, 281, 282, 283); // exclude variations that come with demo data
-
-    $variation_id = db_get_field(
-        'SELECT vp.product_id FROM ?:products AS vp'
-        . ' INNER JOIN ?:products AS pp ON pp.product_id = vp.parent_product_id AND pp.product_type = ?s AND pp.status = ?s'
-        . ' WHERE vp.product_type = ?s AND vp.status = ?s AND pp.product_id <> ?i AND vp.product_id NOT IN (?n) LIMIT 1',
-        ProductManager::PRODUCT_TYPE_CONFIGURABLE, 'A',
-        ProductManager::PRODUCT_TYPE_VARIATION, 'A',
-        $demo_data_conf_product_id,
-        $demo_data_var_product_ids
+    $query = ServiceProvider::getQueryFactory()->createQuery(
+        GroupRepository::TABLE_GROUPS,
+        [],
+        ['g.id'],
+        'g'
     );
 
-    return !empty($variation_id);
+    $query->addCondition('code NOT IN (?a)', [['PV-27186628F']]);
+    $query->addInnerJoin('gp', GroupRepository::TABLE_GROUP_PRODUCTS, ['id' => 'group_id']);
+    $query->addInnerJoin('p', ProductRepository::TABLE_PRODUCTS, ['gp.product_id' => 'product_id']);
+    $query->addConditions(['status' => ['A']], 'p');
+    $query->setLimit(1);
+
+    return (bool) $query->scalar();
 };
 
 return $schema;

@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -140,7 +142,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         unset(Tygh::$app['session']['category_ids']);
 
-        fn_set_notification('N', __('notice'), __('text_categories_have_been_deleted'));
+        if ($deleted_categories) {
+            fn_set_notification('N', __('notice'), __('text_categories_have_been_deleted'));
+        }
         $suffix = ".manage";
     }
 
@@ -189,14 +193,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     );
                 }
             }
-        }
 
-        fn_set_notification('N', __('notice'), __('text_category_has_been_deleted'));
+            if ($deleted_categories) {
+                fn_set_notification('N', __('notice'), __('text_category_has_been_deleted'));
+            }
+        }
 
         $suffix = ".manage";
     }
 
-    return array(CONTROLLER_STATUS_OK, 'categories' . $suffix);
+    if ($mode === 'm_activate' || $mode === 'm_disable' || $mode === 'm_hide') {
+        if (empty($_REQUEST['category_ids'])) {
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('error_status_not_changed'));
+            return [CONTROLLER_STATUS_OK, 'categories.manage'];
+        }
+
+        $category_ids = (array) $_REQUEST['category_ids'];
+        $new_status = '';
+
+        switch ($mode) {
+            case 'm_activate':
+                $new_status = ObjectStatuses::ACTIVE;
+                break;
+            case 'm_disable':
+                $new_status = ObjectStatuses::DISABLED;
+                break;
+            case 'm_hide':
+                $new_status = ObjectStatuses::HIDDEN;
+                break;
+        }
+
+        foreach ($category_ids as $category_id) {
+            fn_change_category_status($category_id, $new_status);
+        }
+
+        return [CONTROLLER_STATUS_OK, 'categories.manage'];
+    }
+
+    return [CONTROLLER_STATUS_OK, 'categories' . $suffix];
 }
 
 //
@@ -215,7 +249,7 @@ if ($mode == 'add') {
             'js' => true
         ),
         'views' => array(
-            'title' => __('views'),
+            'title' => __('appearance'),
             'js' => true
         ),
     ));
@@ -259,7 +293,7 @@ if ($mode == 'add') {
     );
 
     $tabs['views'] = array (
-        'title' => __('views'),
+        'title' => __('appearance'),
         'js' => true
     );
     Registry::set('navigation.tabs', $tabs);
@@ -269,7 +303,9 @@ if ($mode == 'add') {
     $params = array (
         'active_category_id' => $category_id,
     );
-    $category_count = db_get_field("SELECT COUNT(*) FROM ?:categories");
+
+    $condition = fn_get_company_condition('?:categories.company_id');
+    $category_count = db_get_field('SELECT COUNT(*) FROM ?:categories WHERE 1=1 ?p', $condition);
     if ($category_count > CATEGORY_THRESHOLD) {
         $params['current_category_id'] = $category_id;
         $params['visible'] = true;
@@ -421,9 +457,16 @@ if ($mode == 'add') {
     $items_per_page = isset($_REQUEST['page_size']) ? (int) $_REQUEST['page_size'] : 10;
     $search_query = isset($_REQUEST['q']) ? $_REQUEST['q'] : '';
     $lang_code = isset($_REQUEST['lang_code']) ? $_REQUEST['lang_code'] : CART_LANGUAGE;
-    $category_ids = isset($_REQUEST['id']) ? array_filter((array) $_REQUEST['id']) : null;
     $company_id = Registry::get('runtime.company_id');
+    $item_template = empty($_REQUEST['template']) ? 'categories_select2_item' : trim($_REQUEST['template'], '.\\/');
     $objects = array();
+    $category_ids = null;
+    
+    if (isset($_REQUEST['ids'])) {
+        $category_ids = array_filter((array) $_REQUEST['ids']);
+    } elseif (isset($_REQUEST['id'])) {
+        $category_ids = array_filter((array) $_REQUEST['id']);
+    }
 
     if (!$category_ids) {
         $params = array(
@@ -445,15 +488,16 @@ if ($mode == 'add') {
     if ($category_ids) {
         $categories_data = fn_get_categories_list_with_parents($category_ids, $lang_code);
 
-        $objects = array_values(array_map(function ($category) use ($view, $company_id) {
+        $objects = array_values(array_map(function ($category) use ($view, $company_id, $item_template) {
             $view->assign('category', $category);
 
             return array(
                 'id' => $category['category_id'],
                 'text' => $category['category'],
                 'data' => array(
-                    'disabled' => $company_id && isset($category['company_id']) && $company_id != $category['company_id'],
-                    'content' => $view->fetch('views/categories/components/categories_select2_item.tpl')
+                    'name' => $view->fetch("views/categories/components/{$item_template}.tpl"),
+                    'disabled' => $company_id && !empty($category['company_id']) && $company_id != $category['company_id'],
+                    'content' => $view->fetch("views/categories/components/{$item_template}.tpl")
                 )
             );
         }, $categories_data));
@@ -469,6 +513,12 @@ if ($mode == 'add') {
 // Categories picker
 //
 if ($mode == 'picker') {
+    if (isset($_REQUEST['disable_cancel'])) {
+        if ($_REQUEST['disable_cancel']) {
+            Tygh::$app['view']->assign('disable_cancel', $_REQUEST['disable_cancel']);
+        }
+    }
+
     Tygh::$app['view']->display('pickers/categories/picker_contents.tpl');
     exit;
 }

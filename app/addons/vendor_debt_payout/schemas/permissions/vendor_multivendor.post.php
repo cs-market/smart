@@ -22,11 +22,13 @@ if (isset($schema['controllers']['index'])) {
     $schema['controllers']['index']['permissions_blocked'] = true;
 }
 
-$schema['controllers']['notifications']
-    = isset($schema['controllers']['notifications'])
-    ? $schema['controllers']['notifications']
-    : array('permissions' => true);
-$schema['controllers']['notifications']['permissions_blocked'] = true;
+if (isset($schema['controllers']['notifications'])) {
+    $schema['controllers']['notifications']['permissions_blocked'] = true;
+}
+
+if (isset($schema['controllers']['notifications_center'])) {
+    $schema['controllers']['notifications_center']['permissions_blocked'] = true;
+}
 
 if (isset($schema['controllers']['profiles'])) {
     $schema['controllers']['profiles']['permissions_blocked'] = true;
@@ -40,7 +42,7 @@ if (isset($schema['controllers']['companies']['modes'])) {
     $schema['controllers']['companies']['modes']['get_companies_list']
         = isset($schema['controllers']['companies']['modes']['get_companies_list'])
         ? $schema['controllers']['companies']['modes']['get_companies_list']
-        : array('permissions' => true);
+        : ['permissions' => true];
     $schema['controllers']['companies']['modes']['get_companies_list']['permissions_blocked'] = true;
 }
 

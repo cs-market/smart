@@ -168,7 +168,7 @@ class Order
         $lang_code = $lang_code ? $lang_code : $this->data['lang_code'];
 
         if (!isset($this->user[$lang_code])) {
-            $user = array_intersect_key($this->data, array_flip(array('email')));
+            $user = array_intersect_key($this->data, array_flip(array('email', 'firstname', 'lastname', 'phone')));
             $group_fields = fn_get_profile_fields('I', array(), $lang_code);
             $sections = array('C', 'B', 'S');
 

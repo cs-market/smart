@@ -92,7 +92,7 @@
             <div class="controls">
                 {if $o.type == "checkbox"}
                     <input type="hidden" name="export_options[{$k}]" value="N" />
-                    <input id="{$p_id}_{$k}" class="checkbox" type="checkbox" name="export_options[{$k}]" value="Y" {if $o.default_value == "Y"}checked="checked"{/if} />
+                    <input id="{$p_id}_{$k}" type="checkbox" name="export_options[{$k}]" value="Y" {if $o.default_value == "Y"}checked="checked"{/if} />
                 {elseif $o.type == "input"}
                     <input id="{$p_id}_{$k}" class="input-large" type="text" name="export_options[{$k}]" value="{$o.default_value}" />
                 {elseif $o.type == "languages"}
@@ -103,11 +103,11 @@
                     <select id="{$p_id}_{$k}" name="export_options[{$k}]">
                     {if $o.variants_function}
                         {foreach from=$o.variants_function|call_user_func key=vk item=vi}
-                        <option value="{$vk}" {if $vk == $o.default_value}checked="checked"{/if}>{$vi}</option>
+                        <option value="{$vk}" {if $vk == $o.default_value}selected="selected"{/if}>{$vi}</option>
                         {/foreach}
                     {else}
                         {foreach from=$o.variants key=vk item=vi}
-                        <option value="{$vk}" {if $vk == $o.default_value}checked="checked"{/if}>{__($vi)}</option>
+                        <option value="{$vk}" {if $vk == $o.default_value}selected="selected"{/if}>{__($vi)}</option>
                         {/foreach}
                     {/if}
                     </select>
@@ -145,7 +145,7 @@
     <div class="control-group">
         <label for="filename" class="control-label">{__("filename")}:</label>
         <div class="controls">
-            <input type="text" name="export_options[filename]" id="filename" size="50" class="input-large" value="{if $pattern.filename}{$pattern.filename}{else}{$p_id}_{$l.name}_{$smarty.const.TIME|date_format:"%m%d%Y"}.csv{/if}" />
+            <input type="text" name="export_options[filename]" id="filename" size="50" class="input-large" value="{if $pattern.filename}{$pattern.filename}{else}{$p_id}_{$active_layout.name}_{$smarty.const.TIME|date_format:"%m%d%Y"}.csv{/if}" />
             {assign var="filename_description" value=$pattern.filename_description}
             {if $pattern.filename_description}<p><small>{__($filename_description)}</small></p>{/if}
 

@@ -124,7 +124,7 @@ if ($mode == 'manage') {
     }
 
     // Export languages
-    foreach (fn_get_translation_languages() as $lang_code => $lang_data) {
+    foreach (Languages::getAll() as $lang_code => $lang_data) {
         $datafeed_langs[$lang_code] = $lang_data['name'];
     }
     Tygh::$app['view']->assign('datafeed_langs', $datafeed_langs);
@@ -177,7 +177,7 @@ if ($mode == 'manage') {
     Tygh::$app['view']->assign('datafeed_data', $datafeed_data);
 
     // Export languages
-    foreach (fn_get_translation_languages() as $lang_code => $lang_data) {
+    foreach (Languages::getAll() as $lang_code => $lang_data) {
         $datafeed_langs[$lang_code] = $lang_data['name'];
     }
     Tygh::$app['view']->assign('datafeed_langs', $datafeed_langs);
@@ -291,7 +291,7 @@ function fn_data_feeds_update_feed($feed_data, $feed_id = 0, $lang_code = CART_L
             $_data['datafeed_id'] = $feed_id;
             $_data['datafeed_name'] = $feed_data['datafeed_name'];
 
-            foreach (fn_get_translation_languages() as $_data['lang_code'] => $_v) {
+            foreach (Languages::getAll() as $_data['lang_code'] => $_v) {
                 db_query("INSERT INTO ?:data_feed_descriptions ?e", $_data);
             }
         }

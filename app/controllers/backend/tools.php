@@ -15,6 +15,7 @@
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Snapshot;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'object_holder' => 'quick_menu'
             );
 
-            foreach (fn_get_translation_languages() as $_data['lang_code'] => $v) {
+            foreach (Languages::getAll() as $_data['lang_code'] => $v) {
                 db_query("INSERT INTO ?:common_descriptions ?e", $_data);
             }
         } else {

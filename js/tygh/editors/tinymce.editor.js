@@ -92,34 +92,43 @@
             convert_urls: false,
             remove_script_host: false,
             body_class: 'wysiwyg-content',
-            //content_css: $.ceEditor('content_css').join(),
 
             file_picker_callback: function (callback, value, meta) {
+                var options = $.extend(_.fileManagerOptions, {
+                    url: fn_url('elf_connector.images?security_hash=' + _.security_hash),
+                    getFileCallback: function(file) {
+                        var url = file.url + '?' + new Date().getTime();
+                        params.callback(url);
+                        top.tinymce.activeEditor.windowManager.close();
+                    }
+                });
+
                 tinyMCE.activeEditor.windowManager.open({
                     file: _.current_location + '/js/lib/elfinder/elfinder.tinymce.html',
                     title: _.tr('file_browser'),
-                    width: 600,
+                    width: 900,
                     height: 450,
                     resizable: 'yes',
                     inline: 'yes',
                     close_previous: 'no',
                     popup_css: false // Disable TinyMCE's default popup CSS
-                }, {
-                    'connector_url': fn_url('elf_connector.images?security_hash=' + _.security_hash),
-                    'callback': callback
-                });
+                }, options);
             },
             entity_encoding : 'raw',
         },
 
         run: function ($el, params) {
-            
-            editor.params.toolbar = 'formatselect fontselect fontsizeselect bold italic underline forecolor backcolor | link image | numlist bullist indent outdent | alignleft aligncenter alignright | code';
-            if (_.area == 'C') {
-                editor.params.toolbar = 'formatselect fontselect fontsizeselect bold italic underline forecolor backcolor | numlist bullist indent outdent | alignleft aligncenter alignright';
+            params = params || {};
+
+            params.toolbar = 'formatselect fontselect fontsizeselect bold italic underline forecolor backcolor | link image | numlist bullist indent outdent | alignleft aligncenter alignright alignjustify | code';
+            if (_.area === 'C') {
+                params.toolbar = 'formatselect fontselect fontsizeselect bold italic underline forecolor backcolor | numlist bullist indent outdent | alignleft aligncenter alignright';
             }
 
-            if (typeof($.fn.tinymce) == 'undefined') {
+            params.script_url = _.current_location + '/js/lib/tinymce/tinymce.min.js';
+            params.directionality = _.language_direction;
+
+            if (typeof ($.fn.tinymce) == 'undefined') {
                 $.ceEditor('state', 'loading');
                 return $.getScript('js/lib/tinymce/jquery.tinymce.min.js', function () {
                     $.ceEditor('state', 'loaded');
@@ -127,85 +136,37 @@
                 });
             }
 
-            if (!this.params.setup) {
-                this.params.setup = function (editor) {
+            if (!params.setup) {
+                params.setup = function (editor) {
                     editor.on('init', function () {
                         if ($el.prop('disabled')) {
                             $el.ceEditor('disable', true);
                         }
+                        $el.val(editor.getContent());
+                        $el[0].defaultValue = $el.val();
                     });
                     editor.on('change', function () {
                         $el.ceEditor('changed', editor.getContent());
                     });
                 };
             }
-            this.params.script_url = _.current_location + '/js/lib/tinymce/tinymce.min.js';
 
-            if (!this.params) {
-                this.params = {
+            params = $.extend(this.params, params);
 
-                    script_url : _.current_location + '/js/lib/tinymce/tinymce.min.js',
-                    plugins: [
-                        "advlist autolink lists link image charmap print preview anchor",
-                        "searchreplace visualblocks code fullscreen",
-                        "insertdatetime media table contextmenu paste textcolor"
-                    ],
-                    menubar: false,
-                    statusbar: true,
-                    mode : "textareas",
-                    force_p_newlines : true,
-                    extended_valid_elements: "i[*],span[*]",
-                    forced_root_block : '',
-                    media_strict: false,
-
-                    toolbar: 'formatselect fontselect fontsizeselect bold italic underline forecolor backcolor | link image | numlist bullist indent outdent | alignleft aligncenter alignright | code',
-                    resize: true,
-                    theme : 'modern',
-                    language: lang,
-                    strict_loading_mode: true,
-                    convert_urls: false,
-                    remove_script_host: false,
-                    body_class: 'wysiwyg-content',
-                    file_picker_callback : function(callback, value, meta) {
-                        tinyMCE.activeEditor.windowManager.open({
-                            file : _.current_location + '/js/lib/elfinder/elfinder.tinymce.html',
-                            title: _.tr('file_browser'),
-                            width : 600,
-                            height : 450,
-                            resizable : 'yes',
-                            inline : 'yes',
-                            close_previous : 'no',
-                            popup_css : false // Disable TinyMCE's default popup CSS
-                        }, {
-                            'connector_url': fn_url('elf_connector.images?security_hash=' + _.security_hash),
-                            'callback': callback
-                        });
-                    },
-                    setup: function(ed) {
-                        ed.on('init', function(ed) {
-                            if (elm.prop('disabled')) {
-                                elm.ceEditor('disable', true);
-                            }
-                        });
-
-                        ed.on('change', function() {
-                            elm.ceEditor('changed', ed.getContent());
-                        });
-                    },
-                    entity_encoding : 'raw',
-                };
-
-                if (typeof params !== 'undefined' && params[this.editorName]) {
-                    $.extend(this.params, params[this.editorName]);
-                }
-            }
-
-            $el.tinymce(this.params);
+            $el.tinymce(params);
         },
 
         destroy: function ($el) {
             var _this = this;
-            tinymce.remove();
+
+            if (typeof tinymce !== 'undefined' && typeof tinymce.get !== 'undefined') {
+                tinymce.get().forEach(function (editor) {
+                    if (editor.initialized) {
+                        editor.remove();
+                    }
+                });
+            }
+
             this.is_destroying = true;
             setTimeout(function () {
                 // TinyMCE editor disappears by timeout after destroy, even if editor is recovered
@@ -243,7 +204,7 @@
         },
 
         disable: function ($el, value) {
-            var state = (value == true) ? 'Off' : 'On';
+            var state = (value === true) ? 'Off' : 'On';
             $('.mce-toolbar-grp').toggle();
             tinyMCE.editors[0].getBody().setAttribute('contenteditable', !value);
             $el.prop('disabled', value);

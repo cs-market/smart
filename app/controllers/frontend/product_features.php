@@ -134,10 +134,10 @@ if ($mode == 'view_all') {
     $variants = array();
     if (!empty($filters[$filter_id]['variants'])) {
         foreach ($filters[$filter_id]['variants'] as $variant) {
-            $variants[fn_substr($variant['variant'], 0, 1)][] = $variant;
+            $variants[fn_strtoupper(fn_substr($variant['variant'], 0, 1))][] = $variant;
         }
     }
-    ksort($variants);
+    ksort($variants, SORT_STRING);
 
     Tygh::$app['view']->assign('variants', $variants);
 
@@ -174,6 +174,16 @@ if ($mode == 'view_all') {
 
     $params = $_REQUEST;
     $params['extend'] = array('description');
+
+    if ($items_per_page = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'items_per_page')) {
+        $params['items_per_page'] = $items_per_page;
+    }
+    if ($sort_by = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_by')) {
+        $params['sort_by'] = $sort_by;
+    }
+    if ($sort_order = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_order')) {
+        $params['sort_order'] = $sort_order;
+    }
 
     list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'));
 

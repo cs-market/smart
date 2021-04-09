@@ -14,7 +14,6 @@ class GetCountryListTest extends ATestCase
      */
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('CART_LANGUAGE', 'en');
 
         $this->requireCore('functions/fn.locations.php');

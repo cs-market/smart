@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: sk\n"
-"X-Crowdin-File: /release-4.8.2/core.po\n"
+"X-Crowdin-File: /release-4.9.2/core.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:10\n"
+"PO-Revision-Date: 2018-11-16 12:17\n"
 
 msgctxt "LanguageName"
 msgid "Localized language name"
@@ -706,7 +706,7 @@ msgstr "Hociaká kategória"
 
 msgctxt "Languages::any_product"
 msgid "Any product"
-msgstr ""
+msgstr "Akýkoľvek produkt"
 
 msgctxt "Languages::api"
 msgid "API"
@@ -762,7 +762,7 @@ msgstr "API užívateľ"
 
 msgctxt "Languages::api_order_couldnt_be_created"
 msgid "Order couldn't be created"
-msgstr ""
+msgstr "Objednávka nemohla byť vytvorená"
 
 msgctxt "Languages::api_no_shipping_methods_available"
 msgid "No shipping methods are available"
@@ -4712,6 +4712,10 @@ msgctxt "Languages::information"
 msgid "Information"
 msgstr "Informácie"
 
+msgctxt "Languages::tip"
+msgid "Tip"
+msgstr ""
+
 msgctxt "Languages::inner_hint"
 msgid "Inner hint"
 msgstr "Vnútorný tip"
@@ -8564,9 +8568,17 @@ msgctxt "Languages::secure_storefront_url"
 msgid "Secure storefront URL"
 msgstr "Zabezpečenie URL stránky obchodu"
 
+msgctxt "Languages::store_access_key"
+msgid "Access key to temporarily closed store"
+msgstr ""
+
 msgctxt "Languages::secure_storefront_url_already_exists"
 msgid "The value of the <strong>Secure storefront URL</strong> parameter mentioned by you already belongs to another company."
 msgstr "Hodnota parametra <strong>Zabezpečenie URL stránky obchodu</strong> je už uvedená pri inej spoločnosti."
+
+msgctxt "Languages::url_access_storefront"
+msgid "Use the following URL to access the storefront:<br><a href=\"[url]\" target=\"_blank\">[url]</a>"
+msgstr ""
 
 msgctxt "Languages::security_settings"
 msgid "Security settings"
@@ -9787,6 +9799,14 @@ msgstr "Hodnota parametra <strong>Zabezpečenie URL stránky obchodu</strong> je
 msgctxt "Languages::storefront_url_not_defined"
 msgid "Storefront URL not defined"
 msgstr "URL verejnej stránky obchodu nie je definované"
+
+msgctxt "Languages::stores_status"
+msgid "Status"
+msgstr ""
+
+msgctxt "Languages::storefront_status_access_key_hint"
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Go to <a target=\"blank\" href=\"[url]\">Settings → General</a> and specify the <i>Access key to temporarily closed store</i> setting. Please note that a different key can be specified for each storefront, so make sure to select the correct storefront first. Use the key as described in the tooltip of that setting."
+msgstr ""
 
 msgctxt "Languages::stores"
 msgid "Stores"
@@ -12232,9 +12252,17 @@ msgctxt "Languages::ttc_popularity"
 msgid "Product popularity rating based on how many times the storefront has been viewed, number of additions to cart and number of purchases."
 msgstr "Rating popularity tovaru na základe počtu zobrazení, počtu pridaní do košíka a počtu nákupov."
 
+msgctxt "Languages::ttc_search_words"
+msgid "Enter a few words here, and the product will appear in the results of the built-in search for those words, even if the product name or description doesn't have them. Separate different search words by commas."
+msgstr ""
+
 msgctxt "Languages::ttc_storefront_url"
 msgid "All the storefronts domain names must be associated with the same IP-address. Note: Switch to \"All stores\" to edit"
 msgstr "Všetky názvy domén stránok musia byť spojené s rovnakou IP adresou. Poznámka: Prepnite na \"Všetky obchody\" pre úpravu"
+
+msgctxt "Languages::ttc_stores_status"
+msgid "ON—the storefront is open; everyone will see it. OFF—the storefront is closed; only those who have the access code will be able to see it."
+msgstr ""
 
 msgctxt "Languages::tts_activate_menu_tab_for"
 msgid "The menu item will be shown activated for the specified dispatch."
@@ -13732,6 +13760,14 @@ msgctxt "Languages::marketplace_find_more"
 msgid "Find more add-ons and themes in <a href=\"[href]\" target=\"_blank\">Marketplace</a>"
 msgstr "Objavte viac doplnkov a tém na <a href=\"[href]\" target=\"_blank\">Marketplace</a>"
 
+msgctxt "Languages::more_languages"
+msgid "More languages"
+msgstr ""
+
+msgctxt "Languages::languages_find_more"
+msgid "If you haven't found the language you need, check out <a href=\"[href]\" target=\"_blank\">our site with free language packs</a>."
+msgstr ""
+
 msgctxt "Languages::extract_archive"
 msgid "Extract archive"
 msgstr "Rozbaliť archív"
@@ -14159,10 +14195,6 @@ msgstr "Nastavenia Sendmail"
 msgctxt "SettingsOptions::default_zipcode"
 msgid "Default zipcode"
 msgstr "Predvolené poštové smerovacie číslo"
-
-msgctxt "SettingsOptions::company_fax"
-msgid "Company fax"
-msgstr "Fax spoločnosti"
 
 msgctxt "SettingsOptions::frontend_default_language"
 msgid "Frontend default language"
@@ -15452,6 +15484,54 @@ msgctxt "ProfileFields::s_address_type"
 msgid "Address type"
 msgstr "Typ adresy"
 
+msgctxt "ProfileFields::admin_firstname"
+msgid "First name"
+msgstr ""
+
+msgctxt "ProfileFields::admin_lastname"
+msgid "Last name"
+msgstr ""
+
+msgctxt "ProfileFields::company_description"
+msgid "Description"
+msgstr ""
+
+msgctxt "ProfileFields::address"
+msgid "Address"
+msgstr ""
+
+msgctxt "ProfileFields::city"
+msgid "City"
+msgstr ""
+
+msgctxt "ProfileFields::country"
+msgid "Country"
+msgstr ""
+
+msgctxt "ProfileFields::state"
+msgid "State/Province"
+msgstr ""
+
+msgctxt "ProfileFields::zipcode"
+msgid "Zip/postal code"
+msgstr ""
+
+msgctxt "ProfileFields::accept_terms"
+msgid "I accept the Terms and Conditions"
+msgstr ""
+
+msgctxt "Languages::vendor_terms"
+msgid "Vendor terms and conditions"
+msgstr ""
+
+msgctxt "Languages::vendor_terms_field_alert"
+msgid "Vendor terms and conditions alert"
+msgstr ""
+
+msgctxt "Languages::vendor_terms_field_terms_text"
+msgid "Vendor terms and conditions text"
+msgstr ""
+
 msgctxt "Languages::product_must_have_owner_category"
 msgid "Product must belong to some category created by the owner company."
 msgstr "Produkt musí patriť do niektorej z vlastníckou spoločnosťou vytvorených kategórií."
@@ -15858,7 +15938,7 @@ msgid "At least one storefront must remain"
 msgstr ""
 
 msgctxt "Languages::datakeeper.run_backup_via_cron_message"
-msgid "You can run the backup automatically at certain time intervals. To do it, add the following command to CRON:"
+msgid "You can run the backup automatically at certain time intervals. To do it, add the following command to <a href=\"https://en.wikipedia.org/wiki/Cron\" target=\"_blank\">Cron</a>:"
 msgstr ""
 
 msgctxt "Languages::datakeeper.error_unsupported_file_type"
@@ -15875,6 +15955,10 @@ msgstr ""
 
 msgctxt "Languages::uc_backup_info_subj"
 msgid "Upgrade Center: Store has been backed up and closed."
+msgstr ""
+
+msgctxt "Languages::uc_info_subj"
+msgid "Upgrade Center: Store has been closed."
 msgstr ""
 
 msgctxt "Languages::error_features_too_many_variants"
@@ -16075,6 +16159,18 @@ msgstr ""
 
 msgctxt "Languages::tools_addons_disabled_msg"
 msgid "An administrator disabled all add-ons or third-party add-ons.<br> Press the Re-enable add-ons button to initialize the add-ons that were previously active."
+msgstr ""
+
+msgctxt "Languages::tools_addons_additional_shipping_methods"
+msgid "There may be more carriers. They'll show up if you activate the corresponding <a href=\"[url]\">shipping add-ons</a>."
+msgstr ""
+
+msgctxt "Languages::tools_addons_additional_payment_methods"
+msgid "There may be more payment processors. They'll show up if you activate the corresponding <a href=\"[url]\">payment add-ons</a>."
+msgstr ""
+
+msgctxt "Languages::tools_addons_additional_themes"
+msgid "There may be more themes. They'll show up if you activate the corresponding <a href=\"[url]\">theme add-ons</a>."
 msgstr ""
 
 msgctxt "Languages::addons_source"
@@ -16455,6 +16551,10 @@ msgstr ""
 
 msgctxt "Languages::copy"
 msgid "Copy"
+msgstr ""
+
+msgctxt "Languages::copied"
+msgid "Copied"
 msgstr ""
 
 msgctxt "Languages::addon_uninstall_sql_error"
@@ -17239,6 +17339,14 @@ msgstr ""
 
 msgctxt "Languages::licensing.license_error_license_is_disabled"
 msgid "The license is disabled. Please check your license status."
+msgstr ""
+
+msgctxt "Languages::licensing.license_error_license_is_disabled.title"
+msgid "Your [product] license has been disabled"
+msgstr ""
+
+msgctxt "Languages::licensing.license_error_license_is_disabled.text"
+msgid "Please contact us <a href=\"[helpdesk_url]\" target=\"_blank\">via Customer Help Desk</a> to find out why it happened and what can be done about it. To access the admin panel right now, you can enter another valid license number, as long as it isn't used in another store:"
 msgstr ""
 
 msgctxt "Languages::licensing.license_error_license_is_invalid"
@@ -18330,6 +18438,78 @@ msgid "<p>Some countries require that websites notify customers about the use of
 msgstr ""
 
 msgctxt "Languages::file_uploading_in_progress_please_wait"
-msgid "File uploading in progess. Please, wait."
+msgid "File uploading in progress. Please wait."
+msgstr ""
+
+msgctxt "Languages::profile_types_section_user"
+msgid "Customers and admins"
+msgstr ""
+
+msgctxt "Languages::profile_types_section_seller"
+msgid "Vendor information"
+msgstr ""
+
+msgctxt "Languages::profile_type"
+msgid "Profile type"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.example_of_modified_value"
+msgid "Example of the modified value"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.decrease_hint"
+msgid "To decrease the value use the \"-\". Example: -5"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.make_active"
+msgid "Make products active"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.make_disabled"
+msgid "Make products disabled"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.make_hidden"
+msgid "Make products hidden"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.price_and_stock"
+msgid "Price & Stock"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean"
+msgid "What do these checkboxes mean?"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_checked"
+msgid "all the selected products belong to this category or will be assigned to it."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_unchecked"
+msgid "none of the selected products belong to this category, or they will be removed from it."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_indeterminate"
+msgid "some of the selected products belong to this category; no changes will be made."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.unable_to_delete_all_categories"
+msgid "At least one category must be selected"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.some_products_were_omitted"
+msgid "Some products were skipped because the last remaining category can't be removed or added for a product."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.some_products_were_omitted_other_storefront"
+msgid "Couldn't edit selected products. Some of the selected products belong to other storefronts; please deselect those products to be able to edit remaining ones."
+msgstr ""
+
+msgctxt "Languages::custom_search"
+msgid "Custom search"
+msgstr ""
+
+msgctxt "Languages::system_environment"
+msgid "System environment"
 msgstr ""
 

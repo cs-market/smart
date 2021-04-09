@@ -6,7 +6,7 @@
 
 {include file="views/profiles/components/profiles_scripts.tpl"}
 
-<form name="profile_form" enctype="multipart/form-data" action="{""|fn_url}" method="post" class="form-horizontal form-edit form-table {if ($runtime.company_id && $id && $user_data.company_id != $runtime.company_id && $id != $auth.user_id) || $hide_inputs} cm-hide-inputs{/if}">
+<form name="profile_form" enctype="multipart/form-data" action="{""|fn_url}" method="post" class="admin-content-external-form form-horizontal form-edit {if ($runtime.company_id && $id && $user_data.company_id != $runtime.company_id && $id != $auth.user_id) || $hide_inputs} cm-hide-inputs{/if}">
 {capture name="mainbox"}
 
 {capture name="tabsbox"}
@@ -66,40 +66,42 @@
         {else}
             {include file="views/profiles/components/profile_fields.tpl" section="S" title=__("shipping_address") shipping_flag=false}
         {/if}
-        </div>
-    {if !"ULTIMATE:FREE"|fn_allowed_for}
-        {if $id && (((!$user_data|fn_check_user_type_admin_area || !$user_data.user_id) && !$runtime.company_id) || ($user_data|fn_check_user_type_admin_area && $user_data.user_id && $usergroups && !$runtime.company_id && $auth.is_root == 'Y' && ($user_data.company_id != 0 || ($user_data.company_id == 0 && $user_data.is_root != 'Y'))) || ($user_data.user_type == 'V' && $runtime.company_id && $auth.is_root == 'Y' && $user_data.user_id != $auth.user_id && $user_data.company_id == $runtime.company_id))}
+    </div>
 
-            <div id="content_usergroups" class="cm-hide-save-button">
-                {if $usergroups}
-                <div class="table-responsive-wrapper">
-                    <table width="100%" class="table table-middle table-responsive">
-                    <thead>
+    {if $navigation.tabs.usergroups}
+        <div id="content_usergroups" class="cm-hide-save-button">
+            {if $usergroups}
+            <div class="table-responsive-wrapper">
+                <table width="100%" class="table table-middle table-responsive">
+                <thead>
+                <tr>
+                    <th width="50%">{__("usergroup")}</th>
+                    <th class="right" width="10%">{__("status")}</th>
+                </tr>
+                </thead>
+                {foreach from=$usergroups item=usergroup}
                     <tr>
-                        <th width="50%">{__("usergroup")}</th>
-                        <th class="right" width="10%">{__("status")}</th>
+                        <td data-th="{__("usergroup")}"><a href="{"usergroups.manage#group`$usergroup.usergroup_id`"|fn_url}">{$usergroup.usergroup}</a></td>
+                        <td class="right" data-th="{__("status")}">
+                            {$hide_for_vendor=false}
+                            {if !"usergroups.manage"|fn_check_view_permissions:"POST"}
+                                {$hide_for_vendor=true}
+                            {/if}
+                            {if $user_data.usergroups[$usergroup.usergroup_id]}
+                                {assign var="ug_status" value=$user_data.usergroups[$usergroup.usergroup_id].status}
+                            {else}
+                                {assign var="ug_status" value="F"}
+                            {/if}
+                            {include file="common/select_popup.tpl" id=$usergroup.usergroup_id status=$ug_status hidden="" items_status="profiles"|fn_get_predefined_statuses extra="&user_id=`$id`" update_controller="usergroups" notify=true hide_for_vendor=$hide_for_vendor}
+                        </td>
                     </tr>
-                    </thead>
-                    {foreach from=$usergroups item=usergroup}
-                        <tr>
-                            <td data-th="{__("usergroup")}"><a href="{"usergroups.manage#group`$usergroup.usergroup_id`"|fn_url}">{$usergroup.usergroup}</a></td>
-                            <td class="right" data-th="{__("status")}">
-                                {if $user_data.usergroups[$usergroup.usergroup_id]}
-                                    {assign var="ug_status" value=$user_data.usergroups[$usergroup.usergroup_id].status}
-                                {else}
-                                    {assign var="ug_status" value="F"}
-                                {/if}
-                                {include file="common/select_popup.tpl" id=$usergroup.usergroup_id status=$ug_status hidden="" items_status="profiles"|fn_get_predefined_statuses extra="&user_id=`$id`" update_controller="usergroups" notify=true hide_for_vendor=$runtime.company_id}
-                            </td>
-                        </tr>
-                    {/foreach}
-                    </table>
-                </div>
-                {else}
-                    <p class="no-items">{__("no_data")}</p>
-                {/if}
+                {/foreach}
+                </table>
             </div>
-        {/if}
+            {else}
+                <p class="no-items">{__("no_data")}</p>
+            {/if}
+        </div>
     {/if}
 
     <div id="content_addons">
@@ -108,22 +110,40 @@
     </div>
     {if $show_api_tab}
         <div id="content_api">
-            <div class="control-group {if $hide_api_checkbox}hidden{/if}">
-                <div class="controls">
-                    <label class="checkbox" for="sw_api_container">
-                    <input {if $user_data.api_key != ""}checked="checked"{/if} class="cm-combination" type="checkbox" name="user_api_status" value="Y" id="sw_api_container" />{__("allow_api_access")}</label>
+            {if !$hide_api_checkbox}
+                <div class="control-group">
+                    <label for="sw_api_container" class="control-label">{__("api_access_for_user")}</label>
+                    <div class="controls">
+                        {include file="common/switcher.tpl"
+                            checked=$user_data.api_key != ""
+                            input_id="sw_api_container"
+                            input_name="user_api_status"
+                            input_value="Y"
+                            input_attrs=["data-ca-api-key-container-id" => "api_container", "data-ca-show-api-key-warning" => "{if $user_data.api_key}false{else}true{/if}"]
+                        }
+                    </div>
                 </div>
-            </div>
+            {/if}
 
-            <div id="api_container" {if $user_data.api_key == ""}class="hidden"{/if}>
+            <div id="api_container"{if $user_data.api_key == ""} class="hidden"{/if}>
                 <div class="control-group">
                     <label class="control-label">{__("api_key")}</label>
                     <div class="controls">
-                        <input type="text" class="input-large" name="user_data[api_key]" value="{if $user_data.api_key}{$user_data.api_key}{else}{$new_api_key}{/if}" readonly="readonly"/>
+                        {if $user_data.api_key}
+                            {include file="buttons/button.tpl" but_role="action" but_id="refresh_api_key" but_target="api_key_holder" but_text="{__("generate_new_api_key")}" but_meta="btn-indent"}
+                            <input type="text" class="input-large" name="user_data[raw_api_key]" value="*************************" disabled id="api_key_holder"/>
+                        {else}
+                            <input type="text" class="input-large js-new-api-key" name="user_data[raw_api_key]" value="{$new_api_key}" readonly="readonly"  disabled />
+                        {/if}
+                        <div class="well well-small help-block{if $user_data.api_key} hidden{/if}">
+                            {__("please_copy_api_key")}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        {script src="js/tygh/backend/api_access.js"}
     {/if}
 
     {hook name="profiles:tabs_content"}
@@ -160,7 +180,11 @@
 {/if}
 
 {$redirect_url = "profiles.manage%26user_type=`$user_data.user_type`"}
-
+{capture name="sidebar"}
+    {hook name="profile:manage_sidebar"}
+        {include file="views/profiles/components/profile_orders.tpl"}
+    {/hook}
+{/capture}
 {capture name="buttons"}
     {capture name="tools_list"}
         {hook name="profiles:update_tools_list"}
@@ -168,9 +192,11 @@
             <li>{btn type="list" text=__("view_all_orders") href="orders.manage?user_id=`$id`"}</li>
         {/if}
         {if $user_data.user_type|fn_user_need_login && (!$runtime.company_id || $runtime.company_id == $auth.company_id) && $user_data.user_id != $auth.user_id && !($user_data.user_type == 'A' && $user_data.is_root == 'Y' && !$user_data.company_id)}
-            <li>{btn type="list" target="_blank" text=__("act_on_behalf") href="profiles.act_as_user?user_id=`$id`"}</li>
+            <li>{btn type="list" target="_blank" text=__("log_in_as_user") href="profiles.act_as_user?user_id=`$id`"}</li>
             <li class="divider"></li>
-            <li>{btn type="list" text=__("delete") class="cm-confirm" href="profiles.delete?user_id=`$id`&redirect_url=`$redirect_url`" method="POST"}</li>
+            {if !$hide_inputs}
+                <li>{btn type="list" text=__("delete") class="cm-confirm" href="profiles.delete?user_id=`$id`&redirect_url=`$redirect_url`" method="POST"}</li>
+            {/if}
         {/if}
         {/hook}
     {/capture}
@@ -178,15 +204,17 @@
         {dropdown content=$smarty.capture.tools_list}
     {/if}
 <div class="btn-group btn-hover dropleft">
-    {if $id}
-        {include file="buttons/save_changes.tpl" but_meta="dropdown-toggle" but_role="submit-link" but_name="dispatch[profiles.`$runtime.mode`]" but_target_form="profile_form" save=$id}
-    {else}
-        {include file="buttons/button.tpl" but_text=__("create") but_meta="dropdown-toggle" but_role="submit-link" but_name="dispatch[profiles.`$runtime.mode`]" but_target_form="profile_form" save=$id}
-    {/if}
-    <ul class="dropdown-menu">
-        <li><a><input type="checkbox" name="notify_customer" value="Y" checked="checked"  id="notify_customer" />
-            {__("notify_user")}</a></li>
-    </ul>
+    {hook name="profiles:update_buttons"}
+        {if $id}
+            {include file="buttons/save_changes.tpl" but_meta="dropdown-toggle" but_role="submit-link" but_name="dispatch[profiles.`$runtime.mode`]" but_target_form="profile_form" save=$id}
+        {else}
+            {include file="buttons/button.tpl" but_text=__("create") but_meta="dropdown-toggle" but_role="submit-link" but_name="dispatch[profiles.`$runtime.mode`]" but_target_form="profile_form" save=$id}
+        {/if}
+        <ul class="dropdown-menu">
+            <li><a><input type="checkbox" name="notify_customer" value="Y" checked="checked"  id="notify_customer" />
+                {__("notify_user")}</a></li>
+        </ul>
+    {/hook}
 </div>
 
 {/capture}

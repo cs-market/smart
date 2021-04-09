@@ -13,13 +13,15 @@
         <!--list_image_update_{$obj_id}--></span>
     </div>
     <div class="product-description">
-        {include file="blocks/list_templates/simple_list.tpl" product=$product show_name=true show_sku=true show_features=true show_descr=true show_old_price=true show_price=true show_list_discount=true show_discount_label=true show_product_amount=true show_product_options=true show_qty=true min_qty=true show_edp=true show_add_to_cart=true show_list_buttons=true but_role="action"}
+        {include file="blocks/list_templates/simple_list.tpl" product=$product show_name=true show_sku=true show_features=true show_descr=true show_old_price=true show_price=true show_list_discount=true show_product_labels=true show_discount_label=true show_shipping_label=true show_product_amount=true show_product_options=true show_qty=true min_qty=true show_edp=true show_add_to_cart=true show_list_buttons=true but_role="action"}
     </div>
 </div>
 {/hook}
 {else}
 <div class="ty-search-result">
     <a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$product.product nofilter}</a>
+    {hook name="products:product_additional_info"}
+    {/hook}
     {if !$hide_info}
     {if $product.short_description || $product.full_description}
     <p>

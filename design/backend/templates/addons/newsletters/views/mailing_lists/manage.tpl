@@ -3,7 +3,7 @@
 <div class="items-container" id="mailing_lists">
 {if $mailing_lists}
 <div class="table-wrapper">
-    <table width="100%" class="table table-middle">
+    <table width="100%" class="table table-middle table--relative">
         <thead>
             <tr>
                 <th></th>

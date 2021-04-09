@@ -35,6 +35,7 @@ function fn_settings_actions_addons_email_marketing_em_mailchimp_list(&$new_valu
     if (Registry::get('addons.email_marketing.status') != 'A') {
         return false;
     }
+
     // resubscribe web hooks
     if ($new_value != $old_value) {
         $result = true;

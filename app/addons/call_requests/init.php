@@ -20,6 +20,5 @@ fn_register_hooks(
     'place_order',
     'settings_variants_image_verification_use_for',
     'delete_company',
-    'dispatch_before_display',
     array('call_requests_do_call_request_post', '', 'gdpr')
 );

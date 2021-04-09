@@ -22,6 +22,7 @@ use Tygh\Settings;
 use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
 use Tygh\Ym\Offers\ApparelSimple as ApparelSimple;
 use Tygh\Ym\Offers\Apparel as Apparel;
+use Tygh\Enum\YesNo;
 
 class Yml2 implements IYml2
 {
@@ -30,6 +31,7 @@ class Yml2 implements IYml2
     const ITERATION_OFFERS = ITERATION_OFFERS;
     const IMAGES_LIMIT = 10;
     const ARCHIVES_LIMIT = 10;
+    const CATEGORY_DELIMITER = '///';
 
     protected $company_id;
     protected $options = array();
@@ -54,8 +56,6 @@ class Yml2 implements IYml2
     protected $filename = 'ym';
     protected $filepath = '';
     protected $filepath_temp = '';
-
-    protected $are_product_variations_enabled = false;
 
     protected $categories_current_id = 0;
     protected $yml_categories;
@@ -140,8 +140,6 @@ class Yml2 implements IYml2
                 }
             }
         }
-
-        $this->are_product_variations_enabled = Registry::get('addons.product_variations.status') === 'A';
 
         if ($this->debug) {
             fn_yml_stop_generate($this->price_id);
@@ -279,8 +277,12 @@ class Yml2 implements IYml2
 
         if (!$continue) {
             $this->head($file);
-            $this->buildCategories($file_categories);
+            if ($this->options['use_yml_categories']) {
+                $this->buildYmlCategories($file_categories);
+            }
+            $this->available_categories = $this->getAvailableCategories();
         } else {
+            $this->setCategoriesCurrentId(fn_get_storage_data('yml2_categories_current_id'));
             $this->available_categories = $this->getAvailableCategories();
 
             $xml_strings[] = trim(fgets($file_categories));
@@ -289,7 +291,7 @@ class Yml2 implements IYml2
                 $xml_strings[] = trim(fgets($file_categories));
             }
 
-            $this->categories_list = array_merge($this->categories_list, $this->restoreCategoriesList($xml_strings));
+            $this->setCategoriesList(array_merge($this->getCategoriesList(), $this->restoreCategoriesList($xml_strings)));
         }
 
         $this->body($file_body, $file_categories);
@@ -381,11 +383,9 @@ class Yml2 implements IYml2
         $yml2_header = array(
             '<?xml version="1.0" encoding="' . $this->options['export_encoding'] . '"?>',
             '<!DOCTYPE yml2_catalog SYSTEM "shops.dtd">',
-            '<yml_catalog date="' . date('Y-m-d G:i') . '">',
+            '<yml_catalog date="' . date('Y-m-d H:i') . '">',
             '<shop>'
         );
-
-        $secure_storefront = Settings::instance()->getSettingDataByName('secure_storefront');
 
         $yml2_data = $this->generateYml2Data();
 
@@ -523,7 +523,7 @@ class Yml2 implements IYml2
      *
      * @return void
      */
-    protected function buildCategories($file)
+    protected function buildYmlCategories($file)
     {
         $categories_tree = array();
         $yml_categories = fn_get_schema('yml', 'categories');
@@ -534,13 +534,11 @@ class Yml2 implements IYml2
         }
 
         $categories_tree = $this->convertToCategoriesTree($categories_tree);
-        $this->categories_list = $this->flattenTree($categories_tree);
+        $this->setCategoriesList($this->flattenTree($categories_tree));
 
         foreach ($this->categories_list as $category) {
             $this->writeCategoryNode($category, $file);
         }
-
-        $this->available_categories = $this->getAvailableCategories();
     }
 
     /**
@@ -584,8 +582,8 @@ class Yml2 implements IYml2
     public function convertToCategoriesTree(array $categories, &$parent_id = null, &$parent_path = '')
     {
         foreach ($categories as $category_name => $subcategories) {
-            $path = $parent_path . '/' . $category_name;
-            $path = ltrim($path, '/');
+            $path = $parent_path . self::CATEGORY_DELIMITER . $category_name;
+            $path = ltrim($path, self::CATEGORY_DELIMITER);
             $this->categories_current_id++;
             $categories[$category_name] = array(
                 'name'        => $category_name,
@@ -625,12 +623,7 @@ class Yml2 implements IYml2
         $flat_list = array();
 
         foreach ($categories as $category) {
-            $flat_list[$category['path']] = array(
-                'name'      => $category['name'],
-                'path'      => $category['path'],
-                'parent_id' => $category['parent_id'],
-                'id'        => $category['id'],
-            );
+            $flat_list[$category['path']] = $this->formCategoryListItem($category['id'], $category['name'], $category['parent_id'], $category['path']);
             if ($category['children']) {
                 $flat_list = array_merge($flat_list, $this->flattenTree($category['children']));
             }
@@ -651,36 +644,32 @@ class Yml2 implements IYml2
         $result = array();
         $is_categories_tree_changed = false;
 
-        if (!empty($this->categories_list[$category])) {
-            $result[] = $this->categories_list[$category];
+        if (!empty($this->getCategoryFromCategoriesList($category))) {
+            $result[] = $this->getCategoryFromCategoriesList($category);
 
             return array($result, $is_categories_tree_changed);
         }
 
-        $manual_categories = explode('/', $category);
+        $manual_categories = explode(self::CATEGORY_DELIMITER, $category);
         $parent_path = '';
         $parent_id = null;
 
         foreach ($manual_categories as $category_name) {
-            $path = $parent_path . '/' . $category_name;
-            $path = ltrim($path, '/');
+            $path = $parent_path . self::CATEGORY_DELIMITER . $category_name;
+            $path = ltrim($path, self::CATEGORY_DELIMITER);
 
-            if (!empty($this->categories_list[$path])) {
+            $parent_category = $this->getCategoryFromCategoriesList($path);
+            if (!empty($parent_category)) {
                 $parent_path = $path;
-                $parent_id = $this->categories_list[$path]['id'];
+                $parent_id = $parent_category['id'];
 
             } else {
                 $this->categories_current_id++;
 
-                $this->categories_list[$path] = $result[] = array(
-                    'name'      => $category_name,
-                    'path'      => $path,
-                    'parent_id' => $parent_id,
-                    'id'        => $this->categories_current_id
-                );
+                $result[] = $this->setCategoryToCategoriesList($this->categories_current_id, $category_name, $parent_id, $path);
 
                 $parent_path = $path;
-                $parent_id = $this->categories_list[$path]['id'];
+                $parent_id = $this->categories_current_id;
 
                 $is_categories_tree_changed = true;
             }
@@ -881,6 +870,7 @@ class Yml2 implements IYml2
             'p.yml2_purchase_price',
             'p.yml2_description',
             'p.yml2_cpa',
+            'p.yml2_adult',
             'p.product_type'
         );
 
@@ -915,18 +905,6 @@ class Yml2 implements IYml2
             $this->price_id
         );
 
-        if ($this->are_product_variations_enabled) {
-            /** @var ProductManager $product_manager */
-            $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-
-            $product_variations_ids = array();
-            foreach ($exclude_products_ids as $exclude_products_id) {
-                $product_variations_ids = array_merge($product_variations_ids, $product_manager->getProductVariations($exclude_products_id));
-            }
-
-            $exclude_products_ids = array_merge($exclude_products_ids, $product_variations_ids);
-        }
-
         if ($this->options['exclude_categories_not_logging'] == 'Y' && !empty($this->exclude_category_ids)) {
             $join = 'INNER JOIN ?:categories as c ON pc.category_id = c.category_id';
             $condition = db_quote(' AND pc.category_id IN (?a)', $this->exclude_category_ids);
@@ -954,10 +932,14 @@ class Yml2 implements IYml2
         if (isset($this->options['export_shared_products']) && $this->options['export_shared_products'] == 'Y') {
             $categories_join = db_quote('INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id');
             $products_join = db_quote('INNER JOIN ?:products ON ?:products.product_id = ?:products_categories.product_id');
+            $condition = '';
+            if (!empty($exclude_products_ids)) {
+                $condition = db_quote('AND ?:products.product_id NOT IN (?n)', $exclude_products_ids);
+            }
             $shared_product_ids = db_get_fields(
                 "SELECT DISTINCT ?:products_categories.product_id FROM ?:products_categories $categories_join $products_join " .
-                "WHERE ?:categories.company_id = ?i AND link_type = 'A' AND ?:products.status = 'A' ",
-                $this->company_id
+                "WHERE ?:categories.company_id = ?i AND link_type = ?s AND ?:products.status = ?s ?p",
+                $this->company_id, 'A', 'A', $condition
             );
 
             $shared_product_ids = array_diff($shared_product_ids, $product_ids);
@@ -984,46 +966,24 @@ class Yml2 implements IYml2
             $products_images_main = fn_get_image_pairs($ids, 'product', 'M', false, true, $this->lang_code);
             $products_images_additional = fn_get_image_pairs($ids, 'product', 'A', false, true, $this->lang_code);
 
-            $params = array(
-                'get_options' => false,
-                'get_taxed_prices' => false,
-                'detailed_params' => false,
-            );
+            $params = [
+                'get_options'        => false,
+                'get_taxed_prices'   => false,
+                'detailed_params'    => false,
+            ];
+
+            /**
+             * @param \Tygh\Ym\Yml2 $this
+             * @param array         $products
+             * @param array         $params
+             */
+            fn_set_hook('yml_export_generate_offers_before_gather_additional_products_data', $this, $products, $params);
+
             fn_gather_additional_products_data($products, $params);
 
             $products = $this->gatherProductsFeatures($products, $ids);
 
             foreach ($products as $k => &$product) {
-                if ($this->are_product_variations_enabled) {
-                    /** @var ProductManager $product_manager */
-                    $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-                    if ($product['product_type'] == ProductManager::PRODUCT_TYPE_CONFIGURABLE && $this->isApparelProduct($product) && $product_manager->hasProductVariations($product['product_id'])) {
-                        continue;
-                    }
-
-                    if ($product['product_type'] == ProductManager::PRODUCT_TYPE_VARIATION) {
-                        $product_data = fn_get_product_data($product['product_id'], $auth, CART_LANGUAGE, '', true, true, true, false, true);
-
-                        if ($this->isApparelProduct($product_data)) {
-                            $product = fn_array_merge($product_data, array_filter($product));
-
-                            $images = array_merge(
-                                $products_images_main[$product['product_id']],
-                                $products_images_additional[$product['product_id']]
-                            );
-
-                            $product['amount'] = empty($product_data['amount']) ? $product['amount'] : $product_data['amount'];
-                            $product['product_id'] = empty($product_data['product_id']) ? $product['product_id'] : $product_data['product_id'];
-                            $product['product'] = empty($product_data['product']) ? $product['product'] : $product_data['product'];
-                            $product['images'] = array_slice($images, 0, self::IMAGES_LIMIT);
-
-                            $product['product_features'] = isset($product['product_features']) ? $product['product_features'] : array();
-                            if (!empty($products[$product['product_id']]['product_features'])) {
-                                $product['product_features'] = fn_array_merge($products[$product['product_id']]['product_features'], $product['product_features']);
-                            }
-                        }
-                    }
-                }
 
                 $processed++;
                 if (in_array($product['product_id'], $shared_product_ids)) {
@@ -1038,10 +998,11 @@ class Yml2 implements IYml2
 
                 $is_category_found = false;
                 $manually_set_category = '';
-                if ($product['yml2_market_category']) {
-                    $yml_category = $product['yml2_market_category'];
-                    if (!empty($this->categories_list[$yml_category])) {
-                        $product['category_id'] = $this->categories_list[$yml_category]['id'];
+                if ($product['yml2_market_category'] && $this->options['use_yml_categories']) {
+                    $yml_category = $this->normalizeCategoryPath($product['yml2_market_category']);
+                    $category = $this->getCategoryFromCategoriesList($yml_category);
+                    if (!empty($category)) {
+                        $product['category_id'] = $category['id'];
                         $is_category_found = true;
                     } else {
                         $manually_set_category = $yml_category;
@@ -1049,9 +1010,10 @@ class Yml2 implements IYml2
                 }
 
                 if (!$is_category_found && $this->available_categories[$product['category_id']]) {
-                    $yml_category = $this->available_categories[$product['category_id']];
-                    if (!empty($this->categories_list[$yml_category])) {
-                        $product['category_id'] = $this->categories_list[$yml_category]['id'];
+                    $yml_category = $this->normalizeCategoryPath($this->available_categories[$product['category_id']]);
+                    $category = $this->getCategoryFromCategoriesList($yml_category);
+                    if (!empty($category)) {
+                        $product['category_id'] = $category['id'];
                         $is_category_found = true;
                     } else {
                         $manually_set_category = $yml_category;
@@ -1078,7 +1040,7 @@ class Yml2 implements IYml2
                     $product['category_id'] = isset($category_id) ? $category_id : $product['category_id'];
 
                     if (!$is_category_found && !$manually_set_category) {
-                        $manually_set_category = implode('/', $category_name);
+                        $manually_set_category = implode(self::CATEGORY_DELIMITER, $category_name);
                     }
                 }
 
@@ -1117,6 +1079,7 @@ class Yml2 implements IYml2
             $offers_count += count($products);
 
             fn_set_storage_data('yml2_export_offset_' . $this->price_id, $this->offset);
+            fn_set_storage_data('yml2_categories_current_id', $this->categories_current_id);
 
             if (!defined('CONSOLE') && $offers_count >= self::ITERATION_OFFERS) {
                 fn_set_storage_data('yml2_product_export_' . $this->price_id, $this->yml2_product_export);
@@ -1143,6 +1106,7 @@ class Yml2 implements IYml2
         }
 
         $product['category_id'] = $this->getProductCategory($product);
+        $product['yml2_offer_type'] = $this->offer->getOfferType($product);
         if ($product['category_id'] === false) {
             $is_broken = true;
         }
@@ -1178,24 +1142,6 @@ class Yml2 implements IYml2
 
         if ($is_broken) {
             return false;
-        }
-
-        if ($this->are_product_variations_enabled) {
-            /** @var ProductManager $product_manager */
-            $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-
-            if ($product['product_type'] == ProductManager::PRODUCT_TYPE_CONFIGURABLE) {
-                $product_variations_ids = $product_manager->getProductVariations($product['product_id']);
-
-                foreach ($product_variations_ids as $product_variations_id) {
-                    $select_option = $product_manager->getProductVariationOptionsValue($product_variations_id);
-
-                    if (!empty($select_option)) {
-                        $combination_hash = fn_generate_cart_id($product['product_id'], array('product_options' => $select_option));
-                        $product['selected_options'][$combination_hash] = $product_manager->getVariationCode($product['product_id'], $select_option);
-                    }
-                }
-            }
         }
 
         if (!empty($this->options['utm_link'])) {
@@ -1460,7 +1406,7 @@ class Yml2 implements IYml2
         $yml2_data = array(
             'name' => $this->getShopName(),
             'company' => SecurityHelper::escapeHtml(Registry::get('settings.Company.company_name')),
-            'url' => ($secure_storefront['value'] == 'full') ? Registry::get('config.https_location') : Registry::get('config.http_location'),
+            'url' => ($secure_storefront['value'] === YesNo::YES) ? Registry::get('config.https_location') : Registry::get('config.http_location'),
             'platform' => PRODUCT_NAME,
             'version' => PRODUCT_VERSION,
             'agency' => 'Agency',
@@ -1479,7 +1425,10 @@ class Yml2 implements IYml2
      */
     protected function isApparelProduct($product)
     {
-        if (!empty($product['yml2_offer_type']) && ($product['yml2_offer_type'] == ApparelSimple::getOfferType() || $product['yml2_offer_type'] == Apparel::getOfferType())) {
+        $offer = new Offers($this->options, $this->log);
+        $offer = $offer->getOfferType($product);
+
+        if ($offer == 'apparel_simple' || $offer == 'apparel') {
             return true;
         }
 
@@ -1606,15 +1555,10 @@ class Yml2 implements IYml2
                 $path = $category_name = (string) $node;
 
                 if (!empty($parent_id) && !empty($categories_list[$parent_id])) {
-                    $path = $categories_list[$parent_id]['path'] . '/' . $category_name;
+                    $path = $categories_list[$parent_id]['path'] . self::CATEGORY_DELIMITER . $category_name;
                 }
 
-                $categories_list[$category_id] = array(
-                    'name'      => $category_name,
-                    'path'      => $path,
-                    'parent_id' => empty($parent_id) ? null : $parent_id,
-                    'id'        => $category_id
-                );
+                $categories_list[$category_id] = $this->formCategoryListItem($category_id, $category_name, empty($parent_id) ? null : $parent_id, $path);
             }
         }
 
@@ -1659,13 +1603,21 @@ class Yml2 implements IYml2
             $status = array('A');
         }
 
-        return db_get_hash_single_array(
+        $available_categories =  db_get_hash_single_array(
             'SELECT category_id, yml2_market_category'
             . ' FROM ?:categories'
             . ' WHERE status IN (?a)',
             array('category_id', 'yml2_market_category'),
             $status
         );
+
+        if (!$this->options['use_yml_categories']) {
+            array_walk($available_categories, function(&$category) {
+                $category = '';
+            });
+        }
+
+        return $available_categories;
     }
 
     /**
@@ -1685,13 +1637,14 @@ class Yml2 implements IYml2
         array_shift($category_parents);
 
         $category_parents = $this->getYmlMarketCategories($category_parents);
-        foreach ($category_parents as $category_id => $market_category) {
+        foreach ($category_parents as $c_id => $market_category) {
             if (!$market_category) {
                 continue;
             }
-            $yml_category = $this->available_categories[$category_id];
-            if (!empty($this->categories_list[$yml_category])) {
-                $category_id = $this->categories_list[$yml_category]['id'];
+            $yml_category = $this->normalizeCategoryPath($this->available_categories[$c_id]);
+            $category = $this->getCategoryFromCategoriesList($yml_category);
+            if (!empty($category)) {
+                $category_id = $category['id'];
                 $is_category_found = true;
             } else {
                 $manually_set_category = $yml_category;
@@ -1699,5 +1652,69 @@ class Yml2 implements IYml2
         }
 
         return array($is_category_found, $manually_set_category, $category_id);
+    }
+
+    /**
+     * Change '/' category delimiter to '///'.
+     *
+     * @param string   $category_path      Category full path
+     *
+     * @return string category_path with '///' delimiter.
+     */
+    protected function normalizeCategoryPath($category_path)
+    {
+        return str_replace('/', self::CATEGORY_DELIMITER, $category_path);
+    }
+
+    /**
+     * Get category data from Yandex.Maket categories list.
+     *
+     * @param string   $category_path      Category full path
+     *
+     * @return array   categories data.
+     */
+    protected function getCategoryFromCategoriesList($category_path)
+    {
+        $category = [];
+        if (!empty($this->categories_list[$category_path])) {
+            $category = $this->categories_list[$category_path];
+        }
+
+        return $category;
+    }
+
+    /**
+     * Form array for adding to the categories list.
+     *
+     * @param int      $id            Added category id
+     * @param string   $category_name Category name
+     * @param int      $parent_id     Parent category id
+     * @param string   $path          Category full path
+     *
+     * @return array   Element of the list.
+     */
+    protected function formCategoryListItem($id, $category_name, $parent_id, $path)
+    {
+        return [
+            'name'      => $category_name,
+            'path'      => $path,
+            'parent_id' => $parent_id,
+            'id'        => $id
+        ];
+    }
+
+    /**
+     * Set category data to Yandex.Maket categories list.
+     *
+     * @param int      $id            Added category id
+     * @param string   $category_name Category name
+     * @param int      $parent_id     Parent category id
+     * @param string   $path          Category full path
+     *
+     * @return array   Category item which was added to the list.
+     */
+    protected function setCategoryToCategoriesList($id, $category_name, $parent_id, $path)
+    {
+        return $this->categories_list[$path] = $this->formCategoryListItem($id, $category_name, $parent_id, $path);
     }
 }

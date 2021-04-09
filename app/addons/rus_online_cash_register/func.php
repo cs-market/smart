@@ -12,6 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Addons\RusOnlineCashRegister\Service;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Addons\RusOnlineCashRegister\OrderData;
@@ -123,6 +124,7 @@ function fn_rus_online_cash_register_change_order_status($status_to, $status_fro
 
     $statuses_paid = Registry::get('addons.rus_online_cash_register.statuses_paid');
     $statuses_refund = Registry::get('addons.rus_online_cash_register.statuses_refund');
+    $statuses_prepaid = Registry::get('addons.rus_online_cash_register.statuses_prepaid');
     $payment_id = isset($order_info['payment_id']) ? $order_info['payment_id'] : 0;
     $cash_register_payment_id = fn_rus_online_cash_register_get_payment_external_id($payment_id);
 
@@ -132,6 +134,35 @@ function fn_rus_online_cash_register_change_order_status($status_to, $status_fro
 
     /** @var \Tygh\Addons\RusOnlineCashRegister\Service $service */
     $service = Tygh::$app['addons.rus_online_cash_register.service'];
+
+    $payment_data = fn_get_payment_method_data($payment_id);
+    if (!empty($payment_data['processor_params']['atol']['atol_login'])) {
+        /** @var \Tygh\Addons\RusOnlineCashRegister\Factory $factory */
+        $factory = Tygh::$app['addons.rus_online_cash_register.factory'];
+
+        /** @var \Tygh\Addons\RusOnlineCashRegister\CashRegister\Atol\CashRegister $cash_register */
+        $cash_register = $factory->createCashRegister(
+            $payment_data['processor_params']['atol']['atol_inn'],
+            $payment_data['processor_params']['atol']['atol_group_code'],
+            $payment_data['processor_params']['atol']['atol_payment_address'],
+            $payment_data['processor_params']['atol']['atol_login'],
+            $payment_data['processor_params']['atol']['atol_password'],
+            null,
+            $payment_data['processor_params']['atol']['mode'],
+            $payment_data['processor_params']['atol']['api_version'],
+            Registry::get('settings.Company.company_site_administrator')
+        );
+
+        /** @var \Tygh\Addons\RusOnlineCashRegister\Service $service */
+        $service = new Service(
+            $cash_register,
+            Tygh::$app['addons.rus_online_cash_register.receipt_repository'],
+            Tygh::$app['addons.rus_taxes.receipt_factory'],
+            fn_rus_online_cash_register_get_payments_external_ids(),
+            $payment_data['processor_params']['atol']['currency'],
+            $payment_data['processor_params']['atol']['sno']
+        );
+    }
 
     /** @var \Tygh\Addons\RusOnlineCashRegister\OrderDataRepository $order_data_repository */
     $order_data_repository = Tygh::$app['addons.rus_online_cash_register.order_data_repository'];
@@ -151,7 +182,7 @@ function fn_rus_online_cash_register_change_order_status($status_to, $status_fro
         && !isset($statuses_paid[$status_from])
         && !$order_data->isStatusPaid()
     ) {
-        $receipt = $service->getReceiptFromOrder($order_info, Receipt::TYPE_SELL);
+        $receipt = $service->getReceiptFromOrder($order_info, Receipt::TYPE_SELL, Receipt::PAYMENT_METHOD_FULL_PAYMENT);
 
         if ($receipt) {
             $service->sendReceipt($receipt);
@@ -162,14 +193,31 @@ function fn_rus_online_cash_register_change_order_status($status_to, $status_fro
     } elseif (
         isset($statuses_refund[$status_to])
         && !isset($statuses_refund[$status_from])
-        && $order_data->isStatusPaid()
+        && (
+            $order_data->isStatusPaid()
+            || $order_data->isStatusPrepaid()
+        )
     ) {
-        $receipt = $service->getReceiptFromOrder($order_info, Receipt::TYPE_SELL_REFUND);
+        $receipt = $service->getReceiptFromOrder($order_info, Receipt::TYPE_SELL_REFUND, Receipt::PAYMENT_METHOD_FULL_PAYMENT);
 
         if ($receipt) {
             $service->sendReceipt($receipt);
 
             $order_data->setStatus(OrderData::STATUS_REFUND);
+            $order_data_repository->save($order_data);
+        }
+    } elseif (
+        isset($statuses_prepaid[$status_to])
+        && !isset($statuses_prepaid[$status_from])
+        && !$order_data->isStatusPaid()
+        && !$order_data->isStatusPrepaid()
+    ) {
+        $receipt = $service->getReceiptFromOrder($order_info, Receipt::TYPE_SELL, Receipt::PAYMENT_METHOD_FULL_PREPAYMENT);
+
+        if ($receipt) {
+            $service->sendReceipt($receipt);
+
+            $order_data->setStatus(OrderData::STATUS_PREPAID);
             $order_data_repository->save($order_data);
         }
     }
@@ -203,3 +251,14 @@ function fn_rus_online_cash_register_delete_order($order_id)
     $receipt_repository = Tygh::$app['addons.rus_online_cash_register.receipt_repository'];
     $receipt_repository->removeByObject('order', $order_id);
 }
+
+/**
+ * Hook handler: changes can_purge_processor_params flag when creating/updating payment if needed.
+ */
+function fn_rus_online_cash_register_update_payment_pre($payment_data, $payment_id, $lang_code, $certificate_file, $certificates_dir, &$can_purge_processor_params)
+{
+    if (isset($payment_data['processor_params']['atol'])) {
+        $can_purge_processor_params = false;
+    }
+}
+

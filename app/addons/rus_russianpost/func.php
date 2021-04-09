@@ -57,9 +57,9 @@ function fn_rus_russianpost_install()
 
         if ($object['code'] === 'russian_pochta') {
             $unique_params = array(
-                'max_weight' => 30.00,
+                'max_weight' => 20.00,
                 'service_params' => array(
-                    'object_type' => RUSSIANPOST_OBJECT_TYPE_SIMPLE_WRAPPER,
+                    'object_type' => RUSSIANPOST_OBJECT_TYPE_NON_STANDARD_PARCEL,
                     'isavia' => '0',
                     'cash_on_delivery' => '',
                     'average_quantity_in_packet' => '',
@@ -88,18 +88,7 @@ function fn_rus_russianpost_install()
             );
 
             $shipping = array_merge($shipping, $unique_params);
-            $shipping_id = fn_update_shipping($shipping, 0);
-
-            if (fn_allowed_for('ULTIMATE')) {
-                db_query(
-                    'INSERT INTO ?:ult_objects_sharing ?e',
-                    array(
-                        'share_company_id' => $company_id,
-                        'share_object_id' => $shipping_id,
-                        'share_object_type' => 'shippings'
-                    )
-                );
-            }
+            fn_update_shipping($shipping, 0);
         }
     }
 }
@@ -118,10 +107,6 @@ function fn_rus_russianpost_uninstall()
             array_map(function ($service_id) {
                 $shipping_id = db_get_field('SELECT shipping_id FROM ?:shippings WHERE service_id = ?i', $service_id);
                 fn_delete_shipping($shipping_id);
-
-                if (fn_allowed_for('ULTIMATE')) {
-                    db_query('DELETE FROM ?:ult_objects_sharing WHERE share_object_id = ?i', $shipping_id);
-                }
             }, $service_ids);
         }
     }
@@ -137,7 +122,7 @@ function fn_rus_russianpost_schema()
             'module' => 'russian_post',
             'code' => 'russian_post_calc',
             'sp_file' => '',
-            'description' => 'Калькулятор Почты России'
+            'description' => 'Тарифный калькулятор (russianpostcalc.ru)'
         ),
         'pochta' => array(
             'status' => 'A',

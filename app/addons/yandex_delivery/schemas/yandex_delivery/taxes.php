@@ -18,9 +18,9 @@ $taxes = array(
     TaxType::NONE => 6,
     TaxType::VAT_0 => 5,
     TaxType::VAT_10 => 2,
-    TaxType::VAT_18 => 1,
+    TaxType::VAT_20 => 1,
     TaxType::VAT_110 => 2,
-    TaxType::VAT_118 => 1,
+    TaxType::VAT_120 => 1,
 );
 
 return $taxes;

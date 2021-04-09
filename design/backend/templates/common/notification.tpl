@@ -25,7 +25,7 @@
     {$smarty.capture.notification_content nofilter}
 {/if}
 
-<div class="cm-notification-container cm-sticky-scroll alert-wrap {if $view_mode == "simple"}notification-container-top{/if}" data-ce-top="20" data-ce-padding="109">
+<div class="cm-notification-container alert-wrap {if $view_mode == "simple"}notification-container-top{/if}">
     {if $view_mode != "simple"}
         {$smarty.capture.notification_content nofilter}
     {/if}

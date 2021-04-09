@@ -7,7 +7,14 @@
 				{$no_hide_input = true}
 			{/if}
 
-			{include file="addons/discussion/views/discussion_manager/components/allow_discussion.tpl" prefix="product_data" object_id=$product_data.product_id object_type="P" title=__("discussion_title_product") no_hide_input=$no_hide_input}
+            {include file="addons/discussion/views/discussion_manager/components/allow_discussion.tpl"
+                prefix="product_data"
+                object_id=$product_data.product_id
+                object_type="Addons\\Discussion\\DiscussionObjectTypes::PRODUCT"|enum
+                title=__("discussion_title_product")
+                no_hide_input=$no_hide_input
+                discussion_default_type=$addons.discussion.product_discussion_type
+            }
     	</fieldset>
     </div>
 {/if}

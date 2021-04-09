@@ -22,7 +22,7 @@ class Features extends AEntity
 {
     public function index($id = 0, $params = array())
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if ($this->getParentName() == 'products') {
             $parent_product = $this->getParentData();
@@ -122,7 +122,7 @@ class Features extends AEntity
             $params['original_var_ids'] = implode(',', array_keys($variants));
         }
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
         $feature_id = fn_update_product_feature($params, $id, $lang_code);
 
         if ($feature_id) {

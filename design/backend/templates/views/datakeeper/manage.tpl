@@ -14,7 +14,7 @@
                 <input type="hidden" name="result_ids" value="{$result_ids}"/>
             {if $backup_files}
             <div class="table-responsive-wrapper">
-                <table class="table table-middle table-responsive">
+                <table class="table table-middle table--relative table-responsive">
                     <thead>
                     <tr>
                         <th width="1%" class="mobile-hide">
@@ -45,7 +45,7 @@
 
                     {foreach $backup_files as $name => $file}
                         <tr>
-                            <td><input type="checkbox" name="backup_files[]" value="{$file.name}" class="checkbox cm-item mobile-hide"/>
+                            <td><input type="checkbox" name="backup_files[]" value="{$file.name}" class="cm-item mobile-hide"/>
                             </td>
                             <td data-th="{__("filename")}"><a href="{"datakeeper.getfile?file=`$file.name`"|fn_url}"><span>{$file.name}</span></a></td>
                             <td data-th="{__("date")}">{$file.create}</td>
@@ -117,17 +117,20 @@
             {** CREATE BACKUP **}
             <div id="content_backup">
 
-                <p>{__("datakeeper.run_backup_via_cron_message")}</p>
-                <pre><code>{"php /path/to/cart/"|fn_get_console_command:$config.admin_index:[
-			   "dispatch"        => "datakeeper.backup",
-			   "backup_database" => "Y",
-			   "backup_files"    => "Y",
-			   "dbdump_schema"   => "Y",
-			   "dbdump_data"     => "Y",
-			   "dbdump_tables"   => "all",
-			   "extra_folders" => ["var/files", "var/attachments", "var/langs", "images"],
-			   "p"
-			   ]}</code></pre>
+                {include file="common/widget_copy.tpl"
+                    widget_copy_title=__("tip")
+                    widget_copy_text=__("datakeeper.run_backup_via_cron_message")
+                    widget_copy_code_text="php /path/to/cart/"|fn_get_console_command:$config.admin_index:[
+                        "dispatch"        => "datakeeper.backup",
+                        "backup_database" => "Y",
+                        "backup_files"    => "Y",
+                        "dbdump_schema"   => "Y",
+                        "dbdump_data"     => "Y",
+                        "dbdump_tables"   => "all",
+                        "extra_folders" => ["var/files", "var/attachments", "var/langs", "images"],
+                        "p"
+                    ]
+                }
 
                 <form action="{""|fn_url}" method="post" name="backup_form"
                       class="form-horizontal form-edit cm-ajax cm-comet cm-form-dialog-closer">

@@ -37,7 +37,7 @@ class RussianPostPochta implements IService
      *
      * @var string
      */
-    const TARIFF_SERVICE_URL = 'http://tariff.russianpost.ru/tariff/v1/calculate?json';
+    const TARIFF_SERVICE_URL = 'https://tariff.pochta.ru/tariff/v1/calculate?json';
 
     /**
      * Tracking service url
@@ -136,21 +136,21 @@ class RussianPostPochta implements IService
     /**
      * Gets shipping cost and information about possible errors
      *
-     * @param  string $resonse Reponse from Shipping service server
+     * @param  string $response Response from Shipping service server
+     *
      * @return array  Shipping cost and errors
      */
     public function processResponse($response)
     {
-        $return = array(
-            'cost' => false,
+        $return = [
+            'cost'  => false,
             'error' => false,
-        );
+        ];
 
-        $shipping_settings = $this->_shipping_info['service_params'];
         $result = (array) json_decode($response, true);
 
-        if (!empty($result['pay'])) {
-            $return['cost'] = $result['pay'] / self::CENTS_IN_RUBLE;
+        if (!empty($result['paynds'])) {
+            $return['cost'] = $result['paynds'] / self::CENTS_IN_RUBLE;
 
         } elseif (!empty($result['error'])) {
             $error = implode(', ', $result['error']);
@@ -215,11 +215,12 @@ class RussianPostPochta implements IService
             'log_preprocessor' => '\Tygh\Http::unescapeJsonResponse',
         );
 
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
+        $weight_data = fn_convert_weight_to_imperial_units($this->_shipping_info['package_info']['W']);
         $shipping_settings = $this->_shipping_info['service_params'];
         $origination = $this->_shipping_info['package_info']['origination'];
         $location = $this->_shipping_info['package_info']['location'];
 
+        $data_post = [];
         $data_post['errorcode'] = $this->get_error_code_in_response;
         $data_post['closed'] = $this->fetch_tariffs_in_closed_period;
         $data_post['object'] = $shipping_settings['object_type'];
@@ -231,7 +232,11 @@ class RussianPostPochta implements IService
         }
 
         $data_post['from'] = $origination['zipcode'];
-        $data_post['to'] = $location['zipcode'];
+
+        // RussianPost doesn't allow destination index for international shipping
+        if (!empty($location['country']) && $location['country'] === 'RU') {
+            $data_post['to'] = $location['zipcode'];
+        }
 
         if (!empty($location['country'])) {
             $data_post['country'] = $this->getCountryCode($location['country']);
@@ -278,8 +283,9 @@ class RussianPostPochta implements IService
 
             $data_post['service'] = (!empty($services)) ? implode(',', $services) : '';
         }
-
-        $data_post['countinpack'] = $shipping_settings['average_quantity_in_packet'];
+        if (!empty($shipping_settings['average_quantity_in_packet'])) {
+            $data_post['countinpack'] = $shipping_settings['average_quantity_in_packet'];
+        }
 
         $request_data = array(
             'method' => 'get',

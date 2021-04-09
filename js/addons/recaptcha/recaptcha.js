@@ -5,6 +5,7 @@
     };
 
     var pluginName = "ceRecaptcha";
+    var imageVerificationFieldName = 'g-recaptcha-response';
 
     $.extend(_, {
         // A flag indicating the Recaptcha library is ready to use
@@ -50,6 +51,7 @@
     // jQuery plugin constructor
     function ReCaptcha(element, options) {
         this.$el = $(element);
+        this.$input = null;
         this.settings = $.extend({}, _.recaptcha_settings, options);
 
         this.grecaptcha = null;
@@ -70,13 +72,25 @@
                 sitekey: this.settings.site_key,
                 theme: this.settings.theme,
                 size: this.settings.size,
-                callback: function () {
+                callback: function (response) {
                     self.isValidationPassed = true;
+                    $.ceEvent('trigger', 'ce.image_verification.passed', [response, self.$input]);
                 },
                 'expired-callback': function () {
                     self.isValidationPassed = false;
+                    $.ceEvent('trigger', 'ce.image_verification.failed', [self.$input]);
                 }
             });
+
+            this.$input = this.$el.find('[name="' + imageVerificationFieldName + '"]');
+
+            $.ceEvent('trigger', 'ce.image_verification.ready', [imageVerificationFieldName, this.$input]);
+
+            if ($.ceDialog('inside_dialog', {jelm: this.$input})) {
+                $.ceDialog('reload_parent', {
+                    jelm: this.$input
+                });
+            }
         },
         checkIsValidationPassed: function () {
             return this.isValidationPassed;

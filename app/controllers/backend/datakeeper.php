@@ -92,6 +92,8 @@ if ($_SERVER['REQUEST_METHOD']	== 'POST') {
     // Restore
     if ($mode == 'restore') {
         if (!empty($_REQUEST['backup_file'])) {
+            define('DISABLE_HOOK_CACHE', true);
+            Registry::set('hooks', array(), true);
             $restore_result = DataKeeper::restore($_REQUEST['backup_file']);
             if ($restore_result === true) {
                 fn_set_notification('N', __('notice'), __('done'));
@@ -138,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD']	== 'POST') {
                 fn_set_notification('E', __('error'), __('cant_create_backup_file'));
             }
         } else {
-            fn_set_notification('E', __('error'), __('cant_upload_file'));
+            fn_set_notification('E', __('error'), __('cant_upload_file', ['[product]' => PRODUCT_NAME]));
         }
     }
 

@@ -14,11 +14,19 @@
 
 namespace Tygh\BlockManager;
 
+use Tygh\Tygh;
+
 /**
  * Grid class
  */
 class Grid
 {
+    use TDeviceAvailabiltiy;
+
+    const ALIGN_LEFT = 'LEFT';
+    const ALIGN_RIGHT = 'RIGHT';
+    const ALIGN_FULL_WIDTH = 'FULL_WIDTH';
+
     /**
      * Gets list of grids
      * @static
@@ -60,6 +68,13 @@ class Grid
             $condition
         );
 
+        foreach ($grids as &$container) {
+            foreach ($container as &$grid) {
+                $grid['availability'] = static::getAvailabilityInstance()->getAvailability($grid);
+            }
+        }
+        unset($grid, $container);
+
         /**
          * Processes grids list after getting it
          * @param array $grids Array of grids data
@@ -86,6 +101,8 @@ class Grid
         fn_set_hook('get_grid_pre', $grid_id, $lang_code);
 
         $grid = db_get_row('SELECT * FROM ?:bm_grids WHERE grid_id = ?i ORDER BY ?:bm_grids.order', $grid_id);
+
+        $grid['availability'] = static::getAvailabilityInstance()->getAvailability($grid);
 
         /**
          * Processes grid data after getting it
@@ -132,9 +149,12 @@ class Grid
      *  clear - If 1 then after this grid will be clear div on rendered page
      *  user_class
      * )</pre>
+     *
      * @static
-     * @param  array         $grid_data Array of grid data
-     * @return int|db_result Grid id if new grid was created, DB result otherwise
+     *
+     * @param  array $grid_data Array of grid data
+     *
+     * @return int|bool Grid id if new grid was created, DB result otherwise
      */
     public static function update($grid_data)
     {
@@ -197,24 +217,38 @@ class Grid
      */
     public static function copy($container_id, $new_container_id, $replace_block_duplicates = false)
     {
+        // FIXME: #STOREFRONTS: Storefront ID mustn't be obtained directly from the database!
+        $containers_data = db_get_hash_array(
+            'SELECT containers.container_id, layouts.storefront_id, containers.company_id'
+            . ' FROM ?:bm_layouts AS layouts'
+            . ' LEFT JOIN ?:bm_locations  AS locations  ON locations.layout_id    = layouts.layout_id'
+            . ' LEFT JOIN ?:bm_containers AS containers ON containers.location_id = locations.location_id'
+            . ' WHERE containers.container_id IN (?n)',
+            'container_id',
+            [$container_id, $new_container_id]
+        );
+
+        $company_ids = array_column($containers_data, 'company_id', 'container_id');
         if (fn_allowed_for('ULTIMATE')) {
-            $company_ids = db_get_hash_single_array(
-                "SELECT lay.company_id, con.container_id  FROM ?:bm_layouts as lay " .
-                "LEFT JOIN ?:bm_locations as loc ON loc.layout_id = lay.layout_id " .
-                "LEFT JOIN ?:bm_containers as con ON con.location_id = loc.location_id " .
-                "WHERE con.container_id IN (?n)",
-            array('container_id', 'company_id'),
-            array($container_id, $new_container_id));
-        } else {
-            $company_ids = db_get_hash_single_array(
-                "SELECT con.company_id, con.container_id  FROM ?:bm_containers as con"
-                . " WHERE con.container_id IN (?n)",
-                array('container_id', 'company_id'),
-                array($container_id, $new_container_id));
+            /** @var \Tygh\Storefront\Storefront[] $storefronts */
+            static $storefronts = [];
+
+            /** @var \Tygh\Storefront\Repository $storefront_repository */
+            $storefront_repository = Tygh::$app['storefront.repository'];
+
+            foreach ($containers_data as $container) {
+                $storefront_id = $container['storefront_id'];
+                if (!isset($storefronts[$storefront_id])) {
+                    $storefronts[$storefront_id] = $storefront_repository->findById($storefront_id);
+                }
+                $company_ids[$container['container_id']] = $storefronts[$storefront_id]->getCompanyIds()[0];
+            }
         }
 
-        $clone_blocks = isset($company_ids[$container_id], $company_ids[$new_container_id])
-            && $company_ids[$container_id] != $company_ids[$new_container_id];
+        $clone_blocks = isset($containers_data[$container_id], $containers_data[$new_container_id])
+            && ($containers_data[$container_id]['storefront_id'] != $containers_data[$new_container_id]['storefront_id']
+                || $containers_data[$container_id]['company_id'] != $containers_data[$new_container_id]['company_id']
+            );
 
         $links = array();
         $grids = db_get_hash_array("SELECT * FROM ?:bm_grids WHERE container_id = ?i ORDER BY grid_id", 'grid_id', $container_id); //FIXME: order should not be by grid ID
@@ -245,8 +279,15 @@ class Grid
             }
         }
 
+        $new_storefront_id = $containers_data[$new_container_id]['storefront_id'];
+
         if ($clone_blocks) {
-            Block::instance($company_ids[$container_id])->copy($new_snapping_ids, $company_ids[$new_container_id], $replace_block_duplicates);
+            Block::instance($company_ids[$container_id], [], $new_storefront_id)->copy(
+                $new_snapping_ids,
+                $company_ids[$new_container_id],
+                $replace_block_duplicates,
+                $new_storefront_id
+            );
         }
     }
 

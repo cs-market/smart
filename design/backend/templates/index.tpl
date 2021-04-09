@@ -24,12 +24,14 @@ window.jsErrors = [];
 {/if}
 </head>
 {include file="buttons/helpers.tpl"}
-{include file="common/loading_box.tpl"}
 
-<body {if $smarty.cookies.layout_status == 1}class="menu-toggled"{/if}>
+{$class = "{if $smarty.cookies.layout_status == 1}menu-toggled{/if}{if $smarty.const.ACCOUNT_TYPE === "vendor"} vendor-area{/if}"}
+<body {if $class}class="{$class}"{/if} data-ca-scroll-to-elm-offset="120">
+
+    {include file="common/loading_box.tpl"}
 
     {if "THEMES_PANEL"|defined}
-        {include file="demo_theme_selector.tpl"}
+        {include file="components/bottom_panel/bottom_panel.tpl"}
     {/if}
 
     {include file="common/notification.tpl"}
@@ -62,6 +64,7 @@ window.jsErrors = [];
     {if $auth.user_id && 'settings'|fn_check_permissions:'change_store_mode':'admin':'POST'}
         {include file="views/settings/store_mode.tpl" show=$show_sm_dialog}
         {include file="views/settings/trial_expired.tpl" show=$show_trial_dialog}
+        {include file="views/settings/license_errors.tpl" show=$show_license_errors_dialog}
     {/if}
 
     {hook name="index:after_content"}{/hook}

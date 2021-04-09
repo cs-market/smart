@@ -232,4 +232,16 @@ if (fn_allowed_for('MULTIVENDOR')) {
     }
 }
 
+if (fn_allowed_for('MULTIVENDOR:ULTIMATE')) {
+    $schema['export_fields']['Storefront'] = array(
+        'db_field' => 'storefront_id',
+    );
+
+    $schema['import_process_data']['import_check_storefront_id'] = array(
+        'function' => 'fn_import_check_storefront_id',
+        'args' => array('$data'),
+        'import_only' => true,
+    );
+}
+
 return $schema;

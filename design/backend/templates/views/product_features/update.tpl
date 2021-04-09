@@ -1,4 +1,5 @@
 {script src="js/tygh/tabs.js"}
+{script src="js/tygh/backend/product_feature_purpose.js"}
 {script src="js/tygh/product_features.js"}
 
 {$selectable_group = "ProductFeatures::TEXT_SELECTBOX"|enum}
@@ -7,27 +8,33 @@
 {$selectable_group = "ProductFeatures::EXTENDED"|enum|cat:$selectable_group}
 
 {if $feature}
-    {assign var="id" value=$feature.feature_id}
+    {$id = $feature.feature_id}
 {else}
     {if $is_group == true}
-        {assign var="id" value=$smarty.const.NEW_FEATURE_GROUP_ID}
+        {$id = $smarty.const.NEW_FEATURE_GROUP_ID}
     {else}
-        {assign var="id" value=0}
+        {$id = 0}
     {/if}
 {/if}
 
 {if $smarty.request.selected_section}
-    {assign var="active_tab" value=$smarty.request.selected_section}
+    {$active_tab = $smarty.request.selected_section}
 {else}
-    {assign var="active_tab" value='tab_details'}
+    {$active_tab = "tab_details"}
 {/if}
 
-{assign var="allow_save" value=$feature|fn_allow_save_object:"product_features"}
+{$allow_save = true}
+
+{if "ULTIMATE"|fn_allowed_for}
+    {$allow_save = $feature|fn_allow_save_object:"product_features"}
+{/if}
 
 {$hide_inputs_class = ""}
+
 {if ""|fn_check_form_permissions || !$allow_save}
-{$hide_inputs_class = "cm-hide-inputs"}
+    {$hide_inputs_class = "cm-hide-inputs"}
 {/if}
+
 
 {capture name="mainbox"}
 
@@ -66,12 +73,113 @@
             }
         {/if}
 
+        {if $is_group || $feature.feature_type == "ProductFeatures::GROUP"|enum}
+            <input type="hidden" name="feature_data[feature_type]" value="{"ProductFeatures::GROUP"|enum}" />
+        {else}
+            {foreach $purposes as $purpose => $purpose_data}
+                {foreach $purpose_data.styles_map as $key => $item}
+                    {if $item.feature_type === "ProductFeatures::NUMBER_FIELD"|enum && $feature.feature_type != "ProductFeatures::NUMBER_FIELD"|enum}
+                        {$purposes[$purpose].styles_map[$key] = null}
+                        {continue}
+                    {/if}
+                    {if $item.feature_style}
+                        {$purposes[$purpose].styles_map[$key].feature_style_text = __("product_feature.feature_style.{$item.feature_style}")}
+                    {/if}
+                    {if $item.filter_style}
+                        {$purposes[$purpose].styles_map[$key].filter_style_text = __("product_feature.filter_style.{$item.filter_style}")}
+                    {/if}
+                {/foreach}
+            {/foreach}
+
+            <div
+                class="control-group cm-feature-purpose control-group-feature-purpose"
+                data-ca-feature-id="{$id}"
+                data-ca-feature-purpose="{$feature.purpose|default:$default_purpose}"
+                data-ca-feature-purposes="{$purposes|to_json}"
+                data-ca-feature-type="{$feature.feature_type}"
+                data-ca-feature-type-elem-id="elm_feature_feature_type_{$id}"
+                data-ca-feature-style="{$feature.feature_style}"
+                data-ca-feature-style-elem-id="elm_feature_feature_style_{$id}"
+                data-ca-filter-style="{$feature.filter_style}"
+                data-ca-filter-style-elem-id="elm_feature_filter_style_{$id}"
+                data-ca-variants-list-elem-id="content_tab_variants_{$id}"
+                data-ca-variants-remove-warning-elem-id="warning_feature_change_{$id}">
+
+                <label class="control-label cm-required cm-multiple-radios" for="elm_feature_purpose_{$id}">{__("product_feature.purpose")}</label>
+                <div class="controls">
+                    <div class="row-fluid">
+                        <div class="span6">
+                            <ul class="unstyled">
+                                {foreach $purposes as $purpose => $purpose_data}
+                                    <li>
+
+                                        <label for="elm_feature_purpose_{$id}_{$purpose}" class="radio inline">{strip}
+                                            {__("product_feature.purpose.{$purpose}")}
+                                            <input{/strip}
+                                                type="radio"
+                                                name="feature_data[purpose]"
+                                                value="{$purpose}"
+                                                id="elm_feature_purpose_{$id}_{$purpose}"
+                                                data-ca-purpose-description-elem-id="elm_feature_purpose_{$id}_{$purpose}_description"
+                                                {if $feature.purpose|default:$default_purpose == $purpose}checked="checked"{/if}>
+                                        </label>
+                                    </li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                        <div class="span6">
+                            {foreach $purposes as $purpose => $purpose_data}
+                                <div id="elm_feature_purpose_{$id}_{$purpose}_description" class="description cm-feature-purpose-description {if $feature.purpose|default:$default_purpose != $purpose}hidden{/if}"><small>{__("product_feature.purpose.{$purpose}.description")}</small></div>
+                            {/foreach}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label cm-required" for="elm_feature_feature_style_{$id}">{__("product_feature.feature_style")}</label>
+                <div class="controls">
+                    <select name="feature_data[feature_style]" id="elm_feature_feature_style_{$id}"></select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label cm-required" for="elm_feature_filter_style_{$id}">{__("product_feature.filter_style")}</label>
+                <div class="controls">
+                    <input type="hidden" name="feature_data[filter_style]" value="" />
+                    <select name="feature_data[filter_style]" id="elm_feature_filter_style_{$id}"></select>
+
+                    <div class="text-error feature_type_{$id} hidden" id="warning_feature_change_{$id}"><div class="arrow"></div><div class="message"><p>{__("warning_variants_removal")}</p></div></div>
+                </div>
+            </div>
+
+            <input type="hidden" name="feature_data[feature_type]" id="elm_feature_feature_type_{$id}"  class="{if !$id}cm-new-feature{/if}" data-ca-default-value="{$feature.feature_type}" data-ca-feature-id="{$id}" value="{$feature.feature_type}" />
+
+            <div class="control-group">
+                <label class="control-label" for="elm_feature_group_{$id}">{__("group")}</label>
+                <div class="controls">
+                    {if $feature.feature_type == "ProductFeatures::GROUP"|enum}-{else}
+                        <select name="feature_data[parent_id]" id="elm_feature_group_{$id}" data-ca-feature-id="{$id}" class="cm-feature-group">
+                            <option value="0">-{__("none")}-</option>
+                            {foreach $group_features as $group_feature}
+                                {if $group_feature.feature_type == "ProductFeatures::GROUP"|enum}
+                                    <option data-ca-display-on-product="{$group_feature.display_on_product}" data-ca-display-on-catalog="{$group_feature.display_on_catalog}" data-ca-display-on-header="{$group_feature.display_on_header}" value="{$group_feature.feature_id}"{if $group_feature.feature_id == $feature.parent_id}selected="selected"{/if}>{$group_feature.description}</option>
+                                {/if}
+                            {/foreach}
+                        </select>
+                    {/if}
+                </div>
+            </div>
+        {/if}
+
+
         <div class="control-group">
             <label class="control-label" for="elm_feature_code_{$id}">{__("feature_code")}</label>
             <div class="controls">
-                <input type="text" size="3" name="feature_data[feature_code]" value="{$feature.feature_code}" class="input-medium" id="elm_feature_code_{$id}" />
+                {hook name="product_features:feature_code"}
+                    <input type="text" size="3" name="feature_data[feature_code]" value="{$feature.feature_code}" class="input-medium" id="elm_feature_code_{$id}" />
+                {/hook}
             </div>
         </div>
+
 
         <div class="control-group">
             <label class="control-label" for="elm_feature_position_{$id}">{__("position")}</label>
@@ -86,50 +194,6 @@
                 <textarea name="feature_data[full_description]" cols="55" rows="4" class="cm-wysiwyg input-textarea-long" id="elm_feature_description_{$id}">{$feature.full_description}</textarea>
             </div>
         </div>
-
-        {if $is_group || $feature.feature_type == "ProductFeatures::GROUP"|enum}
-            <input type="hidden" name="feature_data[feature_type]" value="{"ProductFeatures::GROUP"|enum}" />
-        {else}
-        <div class="control-group">
-            <label class="control-label cm-required" for="elm_feature_type_{$id}">{__("type")}</label>
-            <div class="controls">
-            {if $feature.feature_type == "ProductFeatures::GROUP"|enum}{__("group")}{else}
-                <select name="feature_data[feature_type]" id="elm_feature_type_{$id}" data-ca-feature-id="{$id}" class="cm-feature-type {if !$id}cm-new-feature{/if}">
-                    <optgroup label="{__("checkbox")}">
-                        <option value="{"ProductFeatures::SINGLE_CHECKBOX"|enum}" {if $feature.feature_type == "ProductFeatures::SINGLE_CHECKBOX"|enum}selected="selected"{/if}>{__("single")}</option>
-                        <option value="{"ProductFeatures::MULTIPLE_CHECKBOX"|enum}" {if $feature.feature_type == "ProductFeatures::MULTIPLE_CHECKBOX"|enum}selected="selected"{/if}>{__("multiple")}</option>
-                    </optgroup>
-                    <optgroup label="{__("selectbox")}">
-                        <option value="{"ProductFeatures::TEXT_SELECTBOX"|enum}" {if $feature.feature_type == "ProductFeatures::TEXT_SELECTBOX"|enum}selected="selected"{/if}>{__("text")}</option>
-                        <option value="{"ProductFeatures::NUMBER_SELECTBOX"|enum}" {if $feature.feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}selected="selected"{/if}>{__("number")}</option>
-                        <option value="{"ProductFeatures::EXTENDED"|enum}" {if $feature.feature_type == "ProductFeatures::EXTENDED"|enum}selected="selected"{/if}>{__("brand_type")}</option>
-                    </optgroup>
-                    <optgroup label="{__("others")}">
-                        <option value="{"ProductFeatures::TEXT_FIELD"|enum}" {if $feature.feature_type == "ProductFeatures::TEXT_FIELD"|enum}selected="selected"{/if}>{__("text")}</option>
-                        <option value="{"ProductFeatures::NUMBER_FIELD"|enum}" {if $feature.feature_type == "ProductFeatures::NUMBER_FIELD"|enum}selected="selected"{/if}>{__("number")}</option>
-                        <option value="{"ProductFeatures::DATE"|enum}" {if $feature.feature_type == "ProductFeatures::DATE"|enum}selected="selected"{/if}>{__("date")}</option>
-                    </optgroup>
-                </select>
-                <div class="error-message feature_type_{$id}" style="display: none" id="warning_feature_change_{$id}"><div class="arrow"></div><div class="message"><p>{__("warning_variants_removal")}</p></div></div>
-            {/if}
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="elm_feature_group_{$id}">{__("group")}</label>
-            <div class="controls">
-            {if $feature.feature_type == "ProductFeatures::GROUP"|enum}-{else}
-                <select name="feature_data[parent_id]" id="elm_feature_group_{$id}" data-ca-feature-id="{$id}" class="cm-feature-group">
-                    <option value="0">-{__("none")}-</option>
-                    {foreach from=$group_features item="group_feature"}
-                        {if $group_feature.feature_type == "ProductFeatures::GROUP"|enum}
-                            <option data-ca-display-on-product="{$group_feature.display_on_product}" data-ca-display-on-catalog="{$group_feature.display_on_catalog}" data-ca-display-on-header="{$group_feature.display_on_header}" value="{$group_feature.feature_id}"{if $group_feature.feature_id == $feature.parent_id}selected="selected"{/if}>{$group_feature.description}</option>
-                        {/if}
-                    {/foreach}
-                </select>
-            {/if}
-            </div>
-        </div>
-        {/if}
 
         {include file="common/select_status.tpl" input_name="feature_data[status]" id="elm_feature_status_{$id}" obj=$feature hidden=true}
 
@@ -181,16 +245,26 @@
     
     <div class="hidden" id="content_tab_categories_{$id}">
     {if $feature.categories_path}
-        {assign var="items" value=","|explode:$feature.categories_path}
+        {$items = ","|explode:$feature.categories_path}
     {/if}
-    {include file="pickers/categories/picker.tpl" company_ids=$picker_selected_companies multiple=true input_name="feature_data[categories_path]" item_ids=$items data_id="category_ids_`$id`" no_item_text=__("text_all_categories_included") use_keys="N" owner_company_id=$feature.company_id but_meta="pull-right"}
-
+    {include
+        file="pickers/categories/picker.tpl"
+        company_ids=$picker_selected_companies
+        multiple=true
+        input_name="feature_data[categories_path]"
+        item_ids=$items
+        data_id="category_ids_`$id`"
+        no_item_text=__("text_all_categories_included")
+        use_keys="N"
+        owner_company_id=$feature.company_id
+        but_meta="pull-right"
+    }
     <!--content_tab_categories_{$id}--></div>
     {/if}
 
     {if ($id && $id != $smarty.const.NEW_FEATURE_GROUP_ID) || !$id}
     <div class="hidden" id="content_tab_variants_{$id}">
-        {include file="views/product_features/components/variants_list.tpl" feature_type=$feature.feature_type}
+        {include file="views/product_features/components/variants_list.tpl" feature_type=$feature.feature_type feature=$feature}
     <!--content_tab_variants_{$id}--></div>
     {/if}
 
@@ -199,7 +273,7 @@
 {if $in_popup}
     <div class="buttons-container">
         {if "ULTIMATE"|fn_allowed_for && !$allow_save}
-            {assign var="hide_first_button" value=true}
+            {$hide_first_button = true}
         {/if}
         {include file="buttons/save_cancel.tpl" but_name="dispatch[product_features.update]" cancel_action="close" hide_first_button=$hide_first_button save=$feature.feature_id}
     </div>

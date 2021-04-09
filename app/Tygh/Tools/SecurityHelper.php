@@ -16,6 +16,9 @@ namespace Tygh\Tools;
 
 use Tygh\Exceptions\DeveloperException;
 use Tygh\Registry;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
+use Tygh\Tygh;
 
 /**
  * SecurityHelper provides a set of static methods used for security purposes.
@@ -37,6 +40,8 @@ class SecurityHelper
 
     const SCHEMA_SECTION_FIELD_RULES = 'SCHEMA_SECTION_FIELD_RULES';
 
+    const ACTION_SET_COMPANY_ID = 'ACTION_SET_COMPANY_ID';
+
     /**
      * @return bool Whether user-inputted HTML should be sanitized (true) or used as-is (false).
      */
@@ -46,8 +51,17 @@ class SecurityHelper
 
         if ($should === null) {
             $should = Registry::get('config.tweaks.sanitize_user_html');
+
             if ($should === 'auto') {
-                $should = fn_allowed_for('MULTIVENDOR');
+                $session = Tygh::$app['session'];
+                $auth = isset($session['auth']) ? $session['auth'] : [];
+
+                $should = fn_allowed_for('MULTIVENDOR')
+                    && (
+                        !isset($auth['user_type'])
+                        || $auth['user_type'] !== UserTypes::ADMIN
+                        || (isset($auth['is_root']) && $auth['is_root'] === YesNo::NO)
+                    );
             }
         }
 
@@ -68,6 +82,11 @@ class SecurityHelper
     {
         $schema = fn_get_schema('security', 'object_sanitization');
         $auth = & \Tygh::$app['session']['auth'];
+
+        if ($auth['user_type'] === UserTypes::VENDOR) {
+            $vendor_schema = fn_get_schema('security', 'object_sanitization_vendor');
+            $schema = array_merge_recursive($schema, $vendor_schema);
+        }
 
         if (isset($schema[$object_type][self::SCHEMA_SECTION_FIELD_RULES])) {
             $object_data = self::sanitizeData(
@@ -97,31 +116,35 @@ class SecurityHelper
     public static function sanitizeData(array $data, array $rules, array $disabled_actions = array(), &$changed = false)
     {
         foreach ($rules as $field_name => $action_type) {
-            if (isset($data[$field_name]) || array_key_exists($field_name, $data)) {
-                // Make it possible to handle nested arrays
-                if (is_array($data[$field_name])) {
-                    if (is_array($action_type)) {
-                        $data[$field_name] = self::sanitizeData($data[$field_name], $action_type, $disabled_actions, $changed);
-                    }
-                } elseif (!in_array($action_type, $disabled_actions)) {
-                    $previous_value = $data[$field_name];
-                    // Perform data transformation
-                    switch ($action_type) {
-                        case self::ACTION_SANITIZE_HTML:
-                            $data[$field_name] = self::sanitizeHtml($data[$field_name]);
-                            break;
-                        case self::ACTION_ESCAPE_HTML:
-                            $data[$field_name] = self::escapeHtml($data[$field_name]);
-                            break;
-                        case self::ACTION_REMOVE_HTML:
-                            $data[$field_name] = strip_tags($data[$field_name]);
-                            break;
-                    }
-                    if (!$changed && self::stringWasChanged($previous_value, $data[$field_name])) {
-                        $changed = true;
-                    }
-                    unset($previous_value);
+            if (!isset($data[$field_name])) {
+                continue;
+            }
+            // Make it possible to handle nested arrays
+            if (is_array($data[$field_name])) {
+                if (is_array($action_type)) {
+                    $data[$field_name] = self::sanitizeData($data[$field_name], $action_type, $disabled_actions, $changed);
                 }
+            } elseif (!in_array($action_type, $disabled_actions)) {
+                $previous_value = $data[$field_name];
+                // Perform data transformation
+                switch ($action_type) {
+                    case self::ACTION_SANITIZE_HTML:
+                        $data[$field_name] = self::sanitizeHtml($data[$field_name]);
+                        break;
+                    case self::ACTION_ESCAPE_HTML:
+                        $data[$field_name] = self::escapeHtml($data[$field_name]);
+                        break;
+                    case self::ACTION_REMOVE_HTML:
+                        $data[$field_name] = strip_tags($data[$field_name]);
+                        break;
+                    case self::ACTION_SET_COMPANY_ID:
+                        $data[$field_name] = self::getCompanyID();
+                        break;
+                }
+                if (!$changed && self::stringWasChanged($previous_value, $data[$field_name])) {
+                    $changed = true;
+                }
+                unset($previous_value);
             }
         }
 
@@ -149,6 +172,23 @@ class SecurityHelper
             $config_instance->set('HTML.DefinitionRev', 1);
             $config_instance->set('Cache.SerializerPath', $cache_dir);
             $config_instance->set('Cache.SerializerPermissions', DEFAULT_DIR_PERMISSIONS);
+            $config_instance->set('HTML.AllowedAttributes', [
+                // general tags
+                '*.class'               => true,
+                '*.id'                  => true,
+                '*.href'                => true,
+                '*.target'              => true,
+                '*.style'               => true,
+                '*.title'               => true,
+                // img tags
+                'img.src'               => true,
+                'img.width'             => true,
+                'img.height'            => true,
+                'img.alt'               => true,
+                // block placeholders in WYSIWYG
+                'hr.data-ca-object-key' => true,
+                'hr.data-ca-block-name' => true,
+            ]);
 
             $config_instance->autoFinalize = false;
 
@@ -167,6 +207,16 @@ class SecurityHelper
                     new \HTMLPurifier_AttrDef_Enum(
                         array('_blank', '_self', '_target', '_top')
                     ));
+
+                $html_definition->addAttribute('hr',
+                    'data-ca-object-key',
+                    new \HTMLPurifier_AttrDef_Text()
+                );
+
+                $html_definition->addAttribute('hr',
+                    'data-ca-block-name',
+                    new \HTMLPurifier_AttrDef_Text()
+                );
             }
 
             $purifier_instance = \HTMLPurifier::instance($config_instance);
@@ -228,6 +278,7 @@ class SecurityHelper
     public static function generateRandomString()
     {
         if (PHP_VERSION_ID >= 70000) {
+            // phpcs:ignore
             $bytes = random_bytes(16);
             $result = bin2hex($bytes);
         } elseif (function_exists('openssl_random_pseudo_bytes')) {
@@ -323,5 +374,15 @@ class SecurityHelper
         }
 
         return $cli;
+    }
+
+    /**
+     * Returns company id.
+     *
+     * @return string|int|null Company id
+     */
+    public static function getCompanyID()
+    {
+        return Registry::get('runtime.company_id');
     }
 }

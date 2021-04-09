@@ -320,7 +320,8 @@ function fn_vendor_locations_get_current_filters_post(array $params, array &$fil
             return;
         }
 
-        $field_variant_values[$filter['filter_id']]['variants'] = $cnt;
+        $field_variant_values[$filter['filter_id']]['variants'] = [];
+        $filter['show_empty_filter'] = true;
 
         list($filter['location'], $filter['location_hash'], $filter['location_place_id']) = fn_vendor_locations_retrieve_location_from_selected_filter(
             $filter, $selected_filters
@@ -338,6 +339,8 @@ function fn_vendor_locations_get_filters_products_count_post(array $params, $lan
         if (!FilterTypes::has($filter['field_type'])) {
             continue;
         }
+        unset($filter['show_empty_filter']);
+
         list($filter['location'], $filter['location_hash'], $filter['location_place_id']) = fn_vendor_locations_retrieve_location_from_selected_filter(
             $filter, $selected_filters
         );
@@ -371,3 +374,23 @@ function fn_vendor_locations_before_dispatch($controller, $mode, $action, $dispa
     ));
 }
 
+/**
+ * The "storefront_rest_api_get_filter_style_post" hook.
+ *
+ *
+ * Performed actions:
+ * - Adds filter style for filters by Distance to vendor and Vendor's city.
+ *
+ * @see \fn_storefront_rest_api_get_filter_style()
+ */
+function fn_vendor_locations_storefront_rest_api_get_filter_style_post($filter, &$filter_style, $field_type)
+{
+    switch ($field_type) {
+        case FilterTypes::ZONE:
+            $filter_style = 'distance_to_vendor';
+            break;
+        case FilterTypes::REGION:
+            $filter_style = 'vendor_city';
+            break;
+    }
+}

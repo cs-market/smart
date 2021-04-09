@@ -14,6 +14,7 @@
 
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -271,17 +272,19 @@ function fn_delete_tags_by_params($params)
 
     // Check if tags have links and delete them if not
     $_tag_ids = db_get_fields("SELECT tag_id FROM ?:tag_links WHERE tag_id IN (?n)", $tag_ids);
-    $diff = array_diff($tag_ids, $_tag_ids);
-    if (!empty($diff)) {
-        db_query("DELETE FROM ?:tags WHERE tag_id IN (?n)", $diff);
+    $deleted_tag_ids = array_diff($tag_ids, $_tag_ids);
+    if (!empty($deleted_tag_ids)) {
+        db_query("DELETE FROM ?:tags WHERE tag_id IN (?n)", $deleted_tag_ids);
     }
 
     /**
      * Actions after deleting the tag data by parameters.
      *
-     * @param array $params This hook is executed after the tags are deleted by the specified parameters
+     * @param array $params          This hook is executed after the tags are deleted by the specified parameters
+     * @param array $tag_ids         List of founded by params tag identifiers
+     * @param array $deleted_tag_ids List of deleted tag identifiers
      */
-    fn_set_hook('delete_tags_by_params_post', $params);
+    fn_set_hook('delete_tags_by_params_post', $params, $tag_ids, $deleted_tag_ids);
 
     return true;
 }
@@ -437,8 +440,9 @@ function fn_update_tags($tags_data, $for_all_companies = true)
      *
      * @param array $tags_data          The data required for updating the tag.
      * @param bool  $for_all_companies  The parameter that determines whether or not to update the tag data for all companies; true - update tag data for all companies.
+     * @param array $tag_ids            List of deleted tag identifiers
      */
-    fn_set_hook('update_tags_post', $tags_data, $for_all_companies);
+    fn_set_hook('update_tags_post', $tags_data, $for_all_companies, $tag_ids);
 
     return true;
 }
@@ -516,4 +520,16 @@ function fn_tags_build_enabled_products_join($params)
     }
 
     return '';
+}
+
+function fn_product_variations_update_tags_post($tags_data, $for_all_companies)
+{
+    $object_id = isset($tags_data['object_id']) ? $tags_data['object_id'] : null;
+    $object_type = isset($tags_data['object_type']) ? $tags_data['object_type'] : null;
+
+    if ($object_id && $object_type === 'P') {
+        $sync_service = ProductVariationsServiceProvider::getSyncService();
+
+        $sync_service->onTableChanged('tag_links', $object_id);
+    }
 }

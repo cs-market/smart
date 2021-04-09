@@ -71,7 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         fn_restore_processed_user_password($_REQUEST['user_data'], $_POST['user_data']);
 
-        $res = fn_update_user($auth['user_id'], $_REQUEST['user_data'], $auth, !empty($_REQUEST['ship_to_another']), true);
+        $user_data = (array) $_REQUEST['user_data'];
+
+        if (empty($auth['user_id']) && !empty(Tygh::$app['session']['cart']['user_data'])) {
+            $user_data += array_filter((array) Tygh::$app['session']['cart']['user_data']);
+        }
+
+        $res = fn_update_user($auth['user_id'], $user_data, $auth, !empty($_REQUEST['ship_to_another']), true);
 
         if ($res) {
             list($user_id, $profile_id) = $res;
@@ -81,16 +87,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 Tygh::$app['session']['cart']['user_data'] = fn_array_merge(Tygh::$app['session']['cart']['user_data'], $_REQUEST['user_data']);
             }
 
+            if (empty(Tygh::$app['session']['cart']['user_data']['profile_id'])) {
+                Tygh::$app['session']['cart']['user_data']['profile_id'] = $profile_id;
+            }
+
             // Delete anonymous authentication
             if ($cu_id = fn_get_session_data('cu_id') && !empty($auth['user_id'])) {
                 fn_delete_session_data('cu_id');
             }
 
             Tygh::$app['session']->regenerateID();
-
-            if (!empty($_REQUEST['return_url'])) {
-                return array(CONTROLLER_STATUS_OK, $_REQUEST['return_url']);
-            }
 
         } else {
             fn_save_post_data('user_data');
@@ -102,6 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($user_id) && !$is_update) {
             fn_login_user($user_id);
 
+            if (!empty($_REQUEST['return_url'])) {
+                return array(CONTROLLER_STATUS_OK, $_REQUEST['return_url']);
+            }
+
             $redirect_dispatch = array('profiles', 'success_add');
         } else {
             $redirect_dispatch = array('profiles', empty($user_id) ? 'add' : 'update', $action);
@@ -110,8 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $redirect_params['profile_id'] = $profile_id;
             }
 
-            if (!empty($_REQUEST['return_url'])) {
-                $redirect_params['return_url'] = $_REQUEST['return_url'];
+            if (!empty($_REQUEST['return_url']) && $res) {
+                return array(CONTROLLER_STATUS_OK, $_REQUEST['return_url']);
             }
         }
 
@@ -233,23 +243,16 @@ if ($mode == 'add') {
             Registry::get('settings.Appearance.backend_default_language')
         );
 
-        /** @var \Tygh\Mailer\Mailer $mailer */
-        $mailer = Tygh::$app['mailer'];
+        $usergroup_id = $_REQUEST['usergroup_id'];
 
-        $mailer->send(array(
-            'to' => 'default_company_users_department',
-            'from' => 'default_company_users_department',
-            'reply_to' => $user_data['email'],
-            'data' => array(
-                'user_data'    => $user_data,
-                'usergroup'    => !empty($usergroups[$_REQUEST['usergroup_id']]['usergroup'])
-                    ? $usergroups[$_REQUEST['usergroup_id']]['usergroup']
-                    : null,
-            ),
-            'template_code' => 'usergroup_request',
-            'tpl' => 'profiles/usergroup_request.tpl', // this parameter is obsolete and is used for back compatibility
-            'company_id' => $user_data['company_id'],
-        ), 'A', Registry::get('settings.Appearance.backend_default_language'));
+        /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+        $event_dispatcher = Tygh::$app['event.dispatcher'];
+
+        $event_dispatcher->dispatch('profile.usergroup_request', [
+            'user_data' => $user_data,
+            'usergroups' => $usergroups,
+            'usergroup_id' => $usergroup_id
+        ]);
     }
 
     return array(CONTROLLER_STATUS_OK, 'profiles.update');

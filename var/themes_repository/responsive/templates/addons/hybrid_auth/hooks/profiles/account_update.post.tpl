@@ -1,4 +1,5 @@
 {if $providers_list}
+    {hook name="hybrid_auth:account_update"}
     {include file="common/subheader.tpl" title=__("hybrid_auth.link_provider")}
     <p>{__("hybrid_auth.text_link_provider")}</p>
 
@@ -24,4 +25,5 @@
         {/if}
         {/foreach}
     <!--hybrid_providers--></div>
+    {/hook}
 {/if}

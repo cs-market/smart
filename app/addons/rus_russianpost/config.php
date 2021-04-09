@@ -17,4 +17,4 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 use Tygh\Registry;
 
 define('RUSSIANPOST_MIN_WEIGHT', 100);
-define('RUSSIANPOST_OBJECT_TYPE_SIMPLE_WRAPPER', 3000);
+define('RUSSIANPOST_OBJECT_TYPE_NON_STANDARD_PARCEL', 4030);

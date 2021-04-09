@@ -16,5 +16,6 @@ $schema['my_account']['content']['providers_list'] = array (
     'type' => 'function',
     'function' => array('fn_hybrid_auth_get_providers_list_content'),
 );
+$schema['main']['cache_overrides_by_dispatch']['products.view']['update_handlers'][] = 'hybrid_auth_providers';
 
 return $schema;

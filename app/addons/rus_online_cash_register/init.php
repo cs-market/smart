@@ -21,5 +21,6 @@ Tygh::$app->register(new ServiceProvider());
 fn_register_hooks(
     'change_order_status',
     'update_payment_post',
-    'delete_order'
+    'delete_order',
+    'update_payment_pre'
 );

@@ -18,6 +18,8 @@ define('ACCOUNT_TYPE', 'vendor');
 try {
     require(dirname(__FILE__) . '/init.php');
     fn_dispatch();
-} catch (Tygh\Exceptions\AException $e) {
-    $e->output();
+} catch (Exception $e) {
+    \Tygh\Tools\ErrorHandler::handleException($e);
+} catch (Throwable $e) {
+    \Tygh\Tools\ErrorHandler::handleException($e);
 }

@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
+use Tygh\Enum\Addons\Discussion\DiscussionTypes;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -31,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        if (!empty($_REQUEST['discussion'])) {
+        if (!empty($_REQUEST['discussion']) && !empty($_REQUEST['discussion']['object_id']) && !empty($_REQUEST['discussion']['object_type'])) {
+
             $discussion = fn_get_discussion($_REQUEST['discussion']['object_id'], $_REQUEST['discussion']['object_type']);
 
             if (!empty($discussion['thread_id']) && $discussion['type'] != $_REQUEST['discussion']['type']) {
@@ -39,8 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($_REQUEST['discussion']['type'] != 'D') {
                     $_REQUEST['selected_section'] = 'discussion';
                 }
-            } elseif (empty($discussion['thread_id'])) {
+            } elseif (empty($discussion['thread_id']) && !empty($_REQUEST['discussion']['type'])) {
                 $data = $_REQUEST['discussion'];
+
                 if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
                     $data['company_id'] = Registry::get('runtime.company_id');
                 } elseif (fn_allowed_for('ULTIMATE') && Registry::get('runtime.simple_ultimate')) {
@@ -58,15 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'details') {
 
-    $discussion = fn_get_discussion($_REQUEST['order_id'], 'O', true, $_REQUEST);
-    if (!empty($discussion) && $discussion['type'] != 'D') {
-        if (fn_allowed_for('MULTIVENDOR') || (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) || Registry::get('runtime.simple_ultimate')) {
-            Registry::set('navigation.tabs.discussion', array (
-                'title' => __('communication'),
-                'js' => true
-            ));
+    $discussion = fn_get_discussion($_REQUEST['order_id'], DiscussionObjectTypes::ORDER, true, $_REQUEST);
+    if (!empty($discussion) &&
+        $discussion['type'] !== DiscussionTypes::TYPE_DISABLED &&
+        fn_check_permissions('discussion', 'view', 'admin')
+    ) {
+        Registry::set('navigation.tabs.discussion', [
+            'title' => __('communication'),
+            'js'    => true,
+        ]);
 
-            Tygh::$app['view']->assign('discussion', $discussion);
-        }
+        Tygh::$app['view']->assign('discussion', $discussion);
     }
 }

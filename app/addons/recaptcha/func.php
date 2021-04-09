@@ -11,15 +11,37 @@
  * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
-use Tygh\Settings;
 
+use Tygh\Settings;
+use Tygh\Registry;
+use Tygh\Addons\Recaptcha\RecaptchaDriver;
+use Tygh\Addons\Recaptcha\NativeCaptchaDriver;
 
 /**
- * @return string Notification text displayed at the add-on settings.
+ * Instantiates captcha driver according to settings and detected country
+ *
+ * @return \Tygh\Addons\Recaptcha\NativeCaptchaDriver|\Tygh\Addons\Recaptcha\RecaptchaDriver
  */
-function fn_recaptcha_settings_notice_handler()
+function fn_recaptcha_get_captcha_driver()
 {
-    return __('recaptcha.text_settings_notice');
+    if (!isset(Tygh::$app['session']['recaptcha']['driver'])) {
+        $ip = fn_get_ip(true);
+        $forbidden_countries = (array) Registry::get('addons.recaptcha.forbidden_countries');
+        $country = fn_get_country_by_ip($ip['host']);
+
+        $is_google_blocked_in_country = array_key_exists($country, $forbidden_countries);
+        if ($is_google_blocked_in_country && extension_loaded('gd')) {
+            Tygh::$app['session']['recaptcha']['driver'] = 'native';
+        } else {
+            Tygh::$app['session']['recaptcha']['driver'] = 'recaptcha';
+        }
+    }
+
+    if (Tygh::$app['session']['recaptcha']['driver'] === 'native') {
+        return new NativeCaptchaDriver(Tygh::$app['session']);
+    }
+
+    return new RecaptchaDriver(Registry::get('addons.recaptcha'));
 }
 
 /**

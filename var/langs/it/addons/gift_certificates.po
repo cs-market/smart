@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Italian\n"
 "Language: it_IT\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: it\n"
-"X-Crowdin-File: /release-4.8.2/addons/gift_certificates.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:06\n"
+"X-Crowdin-File: /release-4.11.5/addons/gift_certificates.po\n"
+"X-Crowdin-File-ID: 3598\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -221,8 +221,12 @@ msgid "Amount should not be higher than [max] and less than [min]"
 msgstr "La quantità non deve essere superiore a [max] e minore di [min]"
 
 msgctxt "Languages::privileges.manage_gift_certificates"
-msgid "Manage gift certificate system"
-msgstr "Gestione sistema buoni regalo"
+msgid "Can edit"
+msgstr "Può modificare"
+
+msgctxt "Languages::privilege_groups.gift_certificates"
+msgid "Gift certificates"
+msgstr ""
 
 msgctxt "Languages::change_gift_certificate_status"
 msgid "Change gift certificate status to"
@@ -278,5 +282,13 @@ msgstr "Non c'e nessuno certificato di dono trovato. La forma di prevista funzio
 
 msgctxt "Languages::gift_certificates.certificate_purchase_form"
 msgid "Gift certificate purchase form"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.status_changed.name"
+msgid "Gift certificate status changed to [status]"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
+msgid "Gift certificate updated"
 msgstr ""
 

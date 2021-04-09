@@ -12,7 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
+use Tygh\Addons\ProductVariations\Product\Type\Type;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -22,47 +22,19 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
  * @var array $auth
  */
 
-if ($mode == 'view' || $mode == 'quick_view') {
-    /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-    $product_manager = Tygh::$app['addons.product_variations.product.manager'];
+if ($mode === 'view' || $mode === 'quick_view') {
     /** @var \Tygh\SmartyEngine\Core $view */
     $view = Tygh::$app['view'];
 
     /** @var array $product */
     $product = $view->getTemplateVars('product');
 
-    if ($product['product_type'] === ProductManager::PRODUCT_TYPE_CONFIGURABLE) {
-        $variation_id = $product['variation_product_id'];
-        $user_id = isset(Tygh::$app['session']['auth']['user_id']) ? Tygh::$app['session']['auth']['user_id'] : 0;
-        $is_subscribed = false;
+    if ($product['product_type'] === Type::PRODUCT_TYPE_VARIATION) {
+        $parent_product_id = $product['parent_product_id'];
 
-        if (
-            isset(Tygh::$app['session']['product_notifications']['product_ids'])
-            && in_array($variation_id, Tygh::$app['session']['product_notifications']['product_ids'])
-        ) {
-            $is_subscribed = true;
-        } elseif (empty($user_id) && !empty(Tygh::$app['session']['product_notifications']['email'])) {
-            $is_subscribed = db_get_field(
-                'SELECT subscription_id FROM ?:product_subscriptions WHERE product_id = ?i AND email = ?s',
-                $variation_id,
-                Tygh::$app['session']['product_notifications']['email']
-            );
-        } elseif (!empty($user_id)) {
-            $is_subscribed = db_get_field(
-                'SELECT subscription_id FROM ?:product_subscriptions WHERE product_id = ?i AND user_id = ?i',
-                $variation_id,
-                $user_id
-            );
-        }
+        $is_exist = array_search($product['product_id'], Tygh::$app['session']['recently_viewed_products']);
+        unset(Tygh::$app['session']['recently_viewed_products'][$is_exist]);
 
-        $view->assign('product_notification_enabled', $is_subscribed ? 'Y' : 'N');
-
-        $params = array (
-            'product_id' => $variation_id,
-            'preview_check' => true
-        );
-        list($files) = fn_get_product_files($params);
-
-        $view->assign('files', $files);
+        fn_add_product_to_recently_viewed($parent_product_id);
     }
 }

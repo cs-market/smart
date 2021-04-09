@@ -3,7 +3,7 @@
 <form action="{""|fn_url}" method="post" name="products_m_addition_form">
 
 <div class="table-responsive-wrapper">
-    <table width="100%"    class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr class="cm-first-sibling">
         <th>{__("main_category")}</th>

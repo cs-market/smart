@@ -14,7 +14,6 @@
 
 namespace Tygh;
 use Tygh\Themes\Styles;
-use Tygh\Registry;
 use Tygh\Themes\Themes;
 
 class Less extends \lessc
@@ -113,14 +112,18 @@ class Less extends \lessc
 
     /**
      * Parses CSS code to make correct relative URLs in case of CSS/LESS files compiled and placed to another directory
-     * @param  string $content   CSS/LESS code
-     * @param  string $from_path path, where original CSS/LESS file is placed
-     * @param  string $to_path   path, where compiled CSS/LESS file is placed
+     *
+     * @param string   $content       CSS/LESS code
+     * @param string   $from_path     path, where original CSS/LESS file is placed
+     * @param string   $to_path       path, where compiled CSS/LESS file is placed
+     * @param string   $area          Site area
+     * @param int|null $storefront_id Storefront to parse URLs for
+     *
      * @return string parsed content
      */
-    public static function parseUrls($content, $from_path, $to_path)
+    public static function parseUrls($content, $from_path, $to_path, $area = AREA, $storefront_id = null)
     {
-        $theme = Themes::areaFactory();
+        $theme = Themes::areaFactory($area, null, $storefront_id);
         $theme_dirs = $theme->getThemeDirs();
 
         if (preg_match_all("/url\((?![\"']?data\:).*?\)/", $content, $m)) {
@@ -448,5 +451,46 @@ class Less extends \lessc
 
         $this->importDir = $oldImport;
         $this->sourceParser = $oldSourceParser;
+    }
+
+    /**
+     * Overrides the default \lessc method to fix priority of the inline variable over imported variables.
+     *
+     * @see https://github.com/leafo/lessphp/pull/433
+     * @see https://github.com/leafo/lessphp/commit/011afcca8e6f1000a6e789921ba805fa578271a3
+     *
+     * @inherit
+     */
+    protected function sortProps($props, $split = false)
+    {
+        $vars = array();
+        $imports = array();
+        $other = array();
+
+        foreach ($props as $prop) {
+            switch ($prop[0]) {
+                case "assign":
+                    if (isset($prop[1][0]) && $prop[1][0] == $this->vPrefix) {
+                        $vars[] = $prop;
+                    } else {
+                        $other[] = $prop;
+                    }
+                    break;
+                case "import":
+                    $id = self::$nextImportId++;
+                    $prop[] = $id;
+                    $imports[] = $prop;
+                    $other[] = array("import_mixin", $id);
+                    break;
+                default:
+                    $other[] = $prop;
+            }
+        }
+
+        if ($split) {
+            return array(array_merge($imports, $vars), $other);
+        } else {
+            return array_merge($imports, $vars, $other);
+        }
     }
 }

@@ -1,6 +1,12 @@
-{if !$runtime.simple_ultimate && $object.company_id}
+{hook name="companies:company_name"}
+{if !$runtime.simple_ultimate && ($object.company_id || $object.company_name)}
     {if !$object.company_name}
         {$_company_name = $object.company_id|fn_get_company_name}
+    {/if}
+
+    {if $show_hidden_input}
+        <input type="hidden" id="company_id_{$object.product_id}" value="{$object.company_id}" />
+        <input type="hidden" id="company_name_{$object.product_id}" value="{$object.company_name|default:$_company_name}" />
     {/if}
 
     {if $simple}
@@ -9,3 +15,4 @@
         <p class="muted"><small>{$object.company_name|default:$_company_name}</small></p>
     {/if}
 {/if}
+{/hook}

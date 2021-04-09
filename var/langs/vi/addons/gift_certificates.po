@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: vi\n"
-"X-Crowdin-File: /release-4.8.2/addons/gift_certificates.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/gift_certificates.po\n"
+"X-Crowdin-File-ID: 3598\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -221,8 +221,12 @@ msgid "Amount should not be higher than [max] and less than [min]"
 msgstr "Số tiền không phải lớn hơn [max] và nhỏ hơn [min]"
 
 msgctxt "Languages::privileges.manage_gift_certificates"
-msgid "Manage gift certificate system"
-msgstr "Quản lý hệ thống thẻ quà tặng"
+msgid "Can edit"
+msgstr "có thể chỉnh sửa"
+
+msgctxt "Languages::privilege_groups.gift_certificates"
+msgid "Gift certificates"
+msgstr ""
 
 msgctxt "Languages::change_gift_certificate_status"
 msgid "Change gift certificate status to"
@@ -278,5 +282,13 @@ msgstr "Không thể tìm thấy một thẻ quà tặng. Xem trước chỉ là
 
 msgctxt "Languages::gift_certificates.certificate_purchase_form"
 msgid "Gift certificate purchase form"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.status_changed.name"
+msgid "Gift certificate status changed to [status]"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
+msgid "Gift certificate updated"
 msgstr ""
 

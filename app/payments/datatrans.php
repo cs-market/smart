@@ -98,8 +98,13 @@ if (defined('PAYMENT_NOTIFICATION')) {
     $pp_response_url = fn_url("payment_notification.result?payment=datatrans&order_id=$order_id", AREA, 'current');
     $pp_cancel_url = fn_url("payment_notification.notify.cancel?payment=datatrans&order_id=$order_id", AREA, 'current');
 
+    /** @var \Tygh\Web\Session $session */
+    $session = Tygh::$app['session'];
+    $pp_response_url = fn_link_attach($pp_response_url, $session->getName() . '='. $session->getID());
+    $pp_cancel_url = fn_link_attach($pp_cancel_url, $session->getName() . '='. $session->getID());
+
     if ($processor_data['processor_params']['mode'] == 'test') {
-        $pp_url = "https://pilot.datatrans.biz/upp/jsp/upStart.jsp";
+        $pp_url = "https://pay.sandbox.datatrans.com/upp/jsp/upStart.jsp";
     } else {
         $pp_url = "https://payment.datatrans.biz/upp/jsp/upStart.jsp";
     }

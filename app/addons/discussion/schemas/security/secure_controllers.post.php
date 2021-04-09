@@ -14,7 +14,6 @@
 
 $schema['discussion'] = array(
     'none' => 'passive',
-    'partial' => 'passive'
 );
 
 return $schema;

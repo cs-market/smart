@@ -14,6 +14,8 @@
 
 namespace Tygh;
 
+use Tygh\Tools\SecurityHelper;
+
 class Ajax
 {
     private $_result = array();
@@ -97,7 +99,7 @@ class Ajax
                 $_chost = $_SERVER['HTTP_HOST'];
             }
 
-            if ($origin_host != $_chost) { // cross-domain request
+            if (strtolower($origin_host) != strtolower($_chost)) { // cross-domain request
 
                 Embedded::enable();
 
@@ -254,7 +256,7 @@ class Ajax
 
             } else {
                 // Return html textarea object
-                $response = '<textarea>' . fn_html_escape($response) . '</textarea>';
+                $response = '<textarea>' . SecurityHelper::escapeHtml($response) . '</textarea>';
             }
 
             fn_echo($response);
@@ -301,6 +303,17 @@ class Ajax
     public function getAssignedVars()
     {
         return $this->_result;
+    }
+
+    /**
+     * Gets assagned variable by key
+     *
+     * @param string     $key
+     * @param mixed|null $default
+     */
+    public function getAssignedVar($key, $default = null)
+    {
+        return array_key_exists($key, $this->_result) ? $this->_result[$key] : $default;
     }
 
     /**

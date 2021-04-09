@@ -12,8 +12,11 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Notifications\EventIdProviders\OrderProvider;
 use Tygh\Registry;
 use Tygh\Storage;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -192,89 +195,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($mode == 'place_order') {
-
-        // Clean up saved shipping rates
-        unset(Tygh::$app['session']['shipping_rates']);
-
-        // update totals and etc.
-        fn_update_cart_by_data($cart, $_REQUEST, $customer_auth);
-
-        if (!empty($_REQUEST['shipping_ids'])) {
-            fn_checkout_update_shipping($cart, $_REQUEST['shipping_ids']);
-        }
-
-        if (empty($cart['stored_shipping'])) {
-            $cart['calculate_shipping'] = true;
-        }
-
-        // recalculate cart content after update
-        list($cart_products, $product_groups) = fn_calculate_cart_content($cart, $customer_auth);
-        fn_update_payment_surcharge($cart, $customer_auth);
-
-        $cart['notes'] = !empty($_REQUEST['customer_notes']) ? $_REQUEST['customer_notes'] : '';
-        $cart['payment_info'] = !empty($_REQUEST['payment_info']) ? $_REQUEST['payment_info'] : array();
-
-        list($order_id, $process_payment) = fn_place_order($cart, $customer_auth, $action, $auth['user_id']);
-
-        if (!empty($order_id)) {
-            if ($action != 'save') {
-                $action = 'route';
-            }
-
-            if ($process_payment == true) {
-                $payment_info = !empty($cart['payment_info']) ? $cart['payment_info'] : array();
-                fn_start_payment($order_id, fn_get_notification_rules($_REQUEST), $payment_info);
-            }
-
-            if (!empty($_REQUEST['update_order']['details'])) {
-                db_query('UPDATE ?:orders SET details = ?s WHERE order_id = ?i', $_REQUEST['update_order']['details'], $order_id);
-            }
-
-            $notification_rules = fn_get_notification_rules($_REQUEST);
-            // change status if it posted
-            if (!empty($_REQUEST['order_status']) && fn_check_permissions('orders', 'update_status', 'admin')) {
-                $order_info = fn_get_order_short_info($order_id);
-
-                if ($order_info['status'] != $_REQUEST['order_status']) {
-                    if ($process_payment == true) {
-                        fn_set_notification('W', __('warning'), __('status_changed_after_process_payment'));
-                    } elseif (fn_change_order_status($order_id, $_REQUEST['order_status'], '', $notification_rules)) {
-                        $order_info = fn_get_order_short_info($order_id);
-                        $new_status = $order_info['status'];
-                        if ($_REQUEST['order_status'] != $new_status) {
-                            fn_set_notification('W', __('warning'), __('status_changed'));
-                        }
-                    } else {
-                        $error = false;
-
-                        if ($order_info['is_parent_order'] == 'Y') {
-                            $suborders = fn_get_suborders_info($order_id);
-
-                            if ($suborders) {
-                                foreach ($suborders as $suborder) {
-                                    if ($suborder['status'] != $_REQUEST['order_status']) {
-                                        $error = true;
-                                        break;
-                                    }
-                                }
-                            } else {
-                                $error = true;
-                            }
-                        } else {
-                            $error = true;
-                        }
-
-                        if ($error) {
-                            fn_set_notification('E', __('error'), __('error_status_not_changed'));
-                        }
-                    }
-                }
-            }
-
-            fn_order_placement_routines($action, $order_id, $notification_rules, true);
-
+        $force_notification = fn_get_notification_rules($_REQUEST);
+        list($order_id, $action) = fn_place_order_manually($cart, $_REQUEST, $customer_auth, $action, $auth['user_id'], $force_notification);
+        if ($order_id) {
+            fn_order_placement_routines($action, $order_id, $force_notification, true);
         } else {
-            return array(CONTROLLER_STATUS_REDIRECT, 'order_management' . $suffix);
+            return [CONTROLLER_STATUS_REDIRECT, 'order_management' . $suffix];
         }
     }
 
@@ -396,6 +322,8 @@ if ($mode == 'edit' && !empty($_REQUEST['order_id'])) {
 
     if (empty($_REQUEST['copy'])) {
         $cart['order_id'] = $_REQUEST['order_id'];
+    } elseif ($_REQUEST['copy'] !== '1') {
+        return array(CONTROLLER_STATUS_DENIED, '');
     }
 
     return array(CONTROLLER_STATUS_REDIRECT, 'order_management.update');
@@ -417,20 +345,15 @@ if ($mode == 'edit' && !empty($_REQUEST['order_id'])) {
     //
     // Prepare order status info
     //
-    $get_additional_statuses = false;
     if (!empty($cart['order_id'])) {
         $order_info = fn_get_order_short_info($cart['order_id']);
         $cart['order_status'] = $order_info['status'];
-
-        if ($cart['order_status'] == STATUS_INCOMPLETED_ORDER) {
-            $get_additional_statuses = true;
-        }
 
         if (!empty($order_info['issuer_id'])) {
             $cart['issuer_data'] = fn_get_user_short_info($order_info['issuer_id']);
         }
     }
-    $order_statuses = fn_get_simple_statuses(STATUSES_ORDER, $get_additional_statuses, true);
+    $order_statuses = fn_get_simple_statuses(STATUSES_ORDER, true, true);
     Tygh::$app['view']->assign('order_statuses', $order_statuses);
 
     //
@@ -485,7 +408,12 @@ if ($mode == 'edit' && !empty($_REQUEST['order_id'])) {
         }
     }
 
-    fn_gather_additional_products_data($cart_products, array('get_icon' => false, 'get_detailed' => false, 'get_options' => true, 'get_discounts' => false));
+    fn_gather_additional_products_data($cart_products, [
+        'get_icon' => true,
+        'get_detailed' => true,
+        'get_active_options' => true,
+        'get_discounts' => false
+    ]);
 
     Tygh::$app['view']->assign('cart_products', $cart_products);
 
@@ -516,8 +444,11 @@ if ($mode == 'edit' && !empty($_REQUEST['order_id'])) {
     }
 
     //Get payment method info
-    if (!empty($cart['payment_id'])) {
+    if (!empty($cart['payment_id']) && isset($payment_methods[$cart['payment_id']])) {
         $payment_data = fn_get_payment_method_data($cart['payment_id']);
+        Tygh::$app['view']->assign('payment_method', $payment_data);
+    } elseif (!empty($payment_methods)) {
+        $payment_data = fn_get_payment_method_data(reset($payment_methods)['payment_id']);
         Tygh::$app['view']->assign('payment_method', $payment_data);
     }
 
@@ -536,6 +467,17 @@ if ($mode == 'edit' && !empty($_REQUEST['order_id'])) {
 
     Tygh::$app['view']->assign('is_order_management', true);
 
+    if (!empty($order_info['storefront_id'])) {
+        Tygh::$app['view']->assign('selected_storefront_id', $order_info['storefront_id']);
+    } elseif (!empty($_REQUEST['storefront_id'])) {
+        Tygh::$app['view']->assign('selected_storefront_id', $_REQUEST['storefront_id']);
+    } else {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+
+        Tygh::$app['view']->assign('selected_storefront_id', $repository->findDefault()->storefront_id);
+    }
+
 } elseif ($mode == 'get_custom_file' && isset($_REQUEST['cart_id']) && isset($_REQUEST['option_id']) && isset($_REQUEST['file'])) {
     if (isset($cart['products'][$_REQUEST['cart_id']]['extra']['custom_files'][$_REQUEST['option_id']][$_REQUEST['file']])) {
         $file = $cart['products'][$_REQUEST['cart_id']]['extra']['custom_files'][$_REQUEST['option_id']][$_REQUEST['file']];
@@ -551,3 +493,182 @@ if (!Tygh::$app['view']->getTemplateVars('user_data') && !empty($cart['user_data
 }
 
 Tygh::$app['view']->assign('customer_auth', $customer_auth);
+
+/**
+ * Places an order from the administration panel.
+ *
+ * @param array  $cart               Order cart contents
+ * @param array  $params             Request parameters
+ * @param array  $customer_auth      Customer authentication data
+ * @param string $action             Order placement action
+ * @param int    $issuer_id          ID of a user who issues the order
+ * @param array  $force_notification Notification rules
+ *
+ * @return array Order ID and the placement action
+ *
+ * @internal
+ */
+function fn_place_order_manually(&$cart, $params, $customer_auth, $action, $issuer_id, $force_notification)
+{
+    // Clean up saved shipping rates
+    unset(Tygh::$app['session']['shipping_rates']);
+
+    // update totals and etc.
+    fn_update_cart_by_data($cart, $params, $customer_auth);
+
+    if (!empty($params['shipping_ids'])) {
+        fn_checkout_update_shipping($cart, $params['shipping_ids']);
+    }
+
+    if (empty($cart['stored_shipping'])) {
+        $cart['calculate_shipping'] = true;
+    }
+
+    // fill out payment method by default if no one was chosen
+    if (empty($cart['payment_id'])) {
+        $cart['payment_id'] = (!empty($params['payment_id'])) ? $params['payment_id'] : 0;
+    }
+
+    if ((float) $cart['total'] == 0) {
+        $cart['payment_id'] = 0;
+    }
+
+    // recalculate cart content after update
+    list($cart_products, $product_groups) = fn_calculate_cart_content($cart, $customer_auth);
+    fn_update_payment_surcharge($cart, $customer_auth);
+
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository'];
+    $default_storefront = $repository->findDefault();
+
+    $cart['storefront_id'] = !empty($params['storefront_id']) ? $params['storefront_id'] : $default_storefront->storefront_id;
+
+    $cart['notes'] = !empty($params['customer_notes']) ? $params['customer_notes'] : '';
+    $cart['payment_info'] = !empty($params['payment_info']) ? $params['payment_info'] : array();
+
+    list($order_id, $process_payment) = fn_place_order($cart, $customer_auth, $action, $issuer_id);
+
+    if ($order_id) {
+        if ($action != 'save') {
+            $action = 'route';
+        }
+
+        $is_status_set_by_payment = false;
+        if ($process_payment) {
+            $payment_info = !empty($cart['payment_info'])
+                ? $cart['payment_info']
+                : [];
+            $is_status_set_by_payment = fn_start_payment($order_id, $force_notification, $payment_info);
+        }
+
+        if (!empty($params['update_order']['details'])) {
+            db_query('UPDATE ?:orders SET details = ?s WHERE order_id = ?i', $params['update_order']['details'],
+                $order_id);
+        }
+
+        $requested_status = isset($params['order_status'])
+            ? $params['order_status']
+            : null;
+
+        $current_status = fn_get_order_short_info($order_id)['status'];
+        $is_status_change_required = $requested_status && $current_status !== $requested_status;
+
+        // order.updated event will be triggered only when order notification wasn't set by any other means
+        $is_order_placed_notification_required = true;
+
+        // change status if it was provided
+        if ($is_status_change_required) {
+            if ($is_status_set_by_payment) {
+                $is_order_placed_notification_required = false;
+                fn_set_notification(
+                    NotificationSeverity::WARNING,
+                    __('warning'),
+                    __('status_changed_after_process_payment')
+                );
+            } elseif (fn_check_permissions('orders', 'update_status', 'admin')) {
+                if (fn_change_order_status($order_id, $requested_status, '', $force_notification)) {
+                    $is_order_placed_notification_required = false;
+                    $actual_status = fn_get_order_short_info($order_id)['status'];
+                    if ($requested_status !== $actual_status) {
+                        fn_set_notification(
+                            NotificationSeverity::WARNING,
+                            __('warning'),
+                            __('status_changed')
+                        );
+                    }
+                } else {
+                    fn_set_notification(
+                        NotificationSeverity::ERROR,
+                        __('error'),
+                        __('error_status_not_changed')
+                    );
+                }
+            }
+        }
+
+        if ($is_order_placed_notification_required) {
+            $order_info = fn_get_order_info($order_id);
+
+            $edp_data = fn_generate_ekeys_for_edp([
+                'status_from' => STATUS_INCOMPLETED_ORDER,
+                'status_to'   => $order_info['status'],
+            ], $order_info);
+
+            /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+            $event_dispatcher = Tygh::$app['event.dispatcher'];
+            /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+            $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+            $notification_rules = $notification_settings_factory->create($force_notification);
+
+            $event_dispatcher->dispatch(
+                'order.updated',
+                ['order_info' => $order_info],
+                $notification_rules,
+                new OrderProvider($order_info)
+            );
+            if ($edp_data) {
+                $notification_rules = fn_get_edp_notification_rules($force_notification, $edp_data);
+                $event_dispatcher->dispatch(
+                    'order.edp',
+                    [
+                        'order_info' => $order_info,
+                        'edp_data' => $edp_data
+                    ],
+                    $notification_rules,
+                    new OrderProvider($order_info, $edp_data)
+                );
+            }
+
+            fn_order_notification($order_info, $edp_data, $force_notification, 'order.updated');
+        }
+
+        /**
+         * Executes after an order was created in the administration panel, allows you to perform additional actions
+         * and modify returned results.
+         *
+         * @param array  $cart                                  Order cart contents
+         * @param array  $params                                Request parameters
+         * @param array  $customer_auth                         Customer authentication data
+         * @param string $action                                Order placement action
+         * @param int    $issuer_id                             ID of a user who issues the order
+         * @param array  $force_notification                    Notification rules
+         * @param array  $order_info                            Order information
+         * @param array  $edp_data                              Downloadable products information
+         * @param bool   $is_order_placed_notification_required Whether a new order notification must be sent
+         */
+        fn_set_hook(
+            'place_order_manually_post',
+            $cart,
+            $params,
+            $customer_auth,
+            $action,
+            $issuer_id,
+            $force_notification,
+            $order_info,
+            $edp_data,
+            $is_order_placed_notification_required
+        );
+    }
+
+    return [$order_id, $action];
+}

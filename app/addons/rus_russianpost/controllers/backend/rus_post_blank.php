@@ -261,9 +261,9 @@ if ($mode == 'edit') {
 
 function fn_rus_russianpost_normalize_phone($data_phone)
 {
-    $array_search = array('+', '7', '8');
+    $array_search = ['+', '7', '8'];
 
-    $data_phone = str_replace('-', '', $data_phone);
+    $data_phone = preg_replace('/[^\d\+]/', '', $data_phone);
     $data_phone = str_replace($array_search, '', substr($data_phone, 0, 2)) . substr($data_phone, 2);
 
     return $data_phone;

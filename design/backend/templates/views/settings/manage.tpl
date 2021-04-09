@@ -12,6 +12,7 @@
     <form action="{""|fn_url}" method="post" name="settings_form" class=" form-horizontal form-edit form-setting">
     <input name="section_id" type="hidden" value="{$section_id}" />
     <input type="hidden" id="selected_section" name="selected_section" value="{$selected_section}" />
+    <input type="text" class="hidden"> {* Prevents submitting form if form containts only one input text. *}
 
     {capture name="tabsbox"}
         {foreach from=$options item=subsection key="ukey"}

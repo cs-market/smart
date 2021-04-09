@@ -6,8 +6,8 @@
 <input type="hidden" name="product_id" value="{$product_id}" />
 
 {if $exceptions}
-<div class="table-wrapper">
-    <table class="table table-middle" width="100%">
+<div class="table-responsive-wrapper">
+    <table class="table table-middle table--relative table-responsive" width="100%">
     <thead>
     <tr>
         <th class="center" width="1%">
@@ -25,9 +25,9 @@
             {if ($product_options.$k.option_type == "ProductOptionTypes::SELECTBOX"|enum)
             || ($product_options.$k.option_type == "ProductOptionTypes::RADIO_GROUP"|enum)
             || ($product_options.$k.option_type == "ProductOptionTypes::CHECKBOX"|enum)}
-            <tr class="no-border">
-                <td>{$product_options.$k.option_name}:</td>
-                <td><span>
+            <tr class="no-border{if ($product_options.$k.status === "ObjectStatuses::DISABLED"|enum)} cm-row-status-d{/if}">
+                <td class="row-status">{$product_options.$k.option_name}:</td>
+                <td class="row-status"><span>
                     {if $product_options.$k.option_type == "ProductOptionTypes::CHECKBOX"|enum}
                         {if ($c == $smarty.const.OPTION_EXCEPTION_VARIANT_NOTHING)}- {__("exception_disabled")} -
                         {elseif ($c == $smarty.const.OPTION_EXCEPTION_VARIANT_ANY)}- {__("exception_disregard")} -
@@ -66,8 +66,8 @@
         <form action="{""|fn_url}" method="post" name="new_exception_form">
         <input type="hidden" name="product_id" value="{$product_id}" />
 
-        <div class="table-wrapper">
-            <table class="table table-middle">
+        <div class="table-responsive-wrapper">
+            <table class="table table-middle table--relative table-responsive">
             <thead>
             <tr class="cm-first-sibling">
                 <th>{__("combination")}</th>

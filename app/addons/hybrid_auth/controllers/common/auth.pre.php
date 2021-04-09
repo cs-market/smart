@@ -22,7 +22,6 @@ if ($mode == 'login_provider' || $mode == 'link_provider') {
 
     if ($status == HYBRID_AUTH_LOADING) {
         Tygh::$app['view']->display('addons/hybrid_auth/views/auth/loading.tpl');
-
     } else {
         unset(Tygh::$app['session']['cart']['edit_step']);
         Tygh::$app['view']->assign('redirect_url', $redirect_url);
@@ -30,9 +29,20 @@ if ($mode == 'login_provider' || $mode == 'link_provider') {
     }
 
     exit;
+} elseif ($mode == 'processlive') { // workaround for Microsoft Redirect URI limitations (see \Hybrid_Provider_Adapter::login line ~ 168)
+    $lib_path = Registry::get('config.dir.addons') . 'hybrid_auth/lib/';
+    $request = $_REQUEST;
+    $request['hauth_done'] = 'Live';
 
+    try {
+        Hybrid_Endpoint::process($request);
+    } catch (Exception $e) {
+        fn_set_notification('E', __('error'), $e->getMessage());
+        Tygh::$app['view']->display('addons/hybrid_auth/views/auth/login_error.tpl');
+
+        exit;
+    }
 } elseif ($mode == 'process') {
-
     $lib_path = Registry::get('config.dir.addons') . 'hybrid_auth/lib/';
 
     try {
@@ -43,13 +53,6 @@ if ($mode == 'login_provider' || $mode == 'link_provider') {
 
         exit;
     }
-} elseif ($mode == 'login_form') {
-
-    $providers_list = fn_hybrid_auth_get_providers_list();
-    if (!empty($providers_list)) {
-        Tygh::$app['view']->assign('providers_list', $providers_list);
-    }
-
 } elseif ($mode == 'logout') {
     // Remove Hybrid auth data
     unset(Tygh::$app['session']['HA::CONFIG'], Tygh::$app['session']['HA::STORE']);

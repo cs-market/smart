@@ -34,7 +34,7 @@ function fn_advanced_import_get_product_features_list(PresetsManager $presets_ma
             'plain'         => true,
             'exclude_group' => true,
         ),
-        $schema['max_items'],
+        0,
         $presets_manager->getLangCode()
     );
 
@@ -42,9 +42,6 @@ function fn_advanced_import_get_product_features_list(PresetsManager $presets_ma
         $feature['show_description'] = true;
         $feature['show_name'] = false;
     }
-
-    $feature['has_more'] = $search['total_items'] > $schema['max_items'];
-
     unset($feature);
 
     return $features;
@@ -223,11 +220,11 @@ function fn_advanced_import_delete_company($company_id, $result)
             false,
             array('ip.company_id' => $company_id),
             false,
-            array('ip.preset_id' => 'preset_id')
+            array('ip.preset_id' => 'preset_id', 'ip.file' => 'file', 'ip.company_id' => 'company_id', 'ip.file_type' => 'file_type')
         );
 
-        foreach ($presets_list as $preset_id => $preset) {
-            $presets_manager->delete($preset_id);
+        foreach ($presets_list as $preset) {
+            $presets_manager->delete($preset['preset_id']);
         }
     }
 }
@@ -374,7 +371,7 @@ function fn_advanced_import_filter_user_path($path)
 function fn_advanced_import_get_companies_import_images_directory($path = '')
 {
     $result = array();
-    $company_ids = fn_get_available_company_ids();
+    $company_ids = fn_get_all_companies_ids();
 
     foreach ($company_ids as $company_id) {
         $result[$company_id] = fn_advanced_import_get_import_images_directory($company_id, $path);
@@ -516,7 +513,7 @@ function fn_advanced_import_get_file_extension_by_mimetype($file_name, $file_typ
 {
     $mime_types_list = fn_get_ext_mime_types('mime');
     $path_info = fn_pathinfo($file_name);
-    $ext = $path_info['extension'];
+    $ext = strtolower($path_info['extension']);
     
     if (!in_array($ext, $mime_types_list)) {
         $ext = isset($mime_types_list[$file_type]) ? $mime_types_list[$file_type] : null;

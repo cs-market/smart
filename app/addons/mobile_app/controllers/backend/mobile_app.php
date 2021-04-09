@@ -16,6 +16,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 use Tygh\Storage;
 use Tygh\Tools\Archivers\ArchiverException;
+use Tygh\Addons\MobileApp\GoogleServicesConfig;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -27,19 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $settings = fn_mobile_app_get_mobile_app_settings();
         $images = fn_mobile_app_get_mobile_app_images();
 
-        $options = 0;
-
-        // Wrapped inside an if statement won't make any harm
-        // phpcs:disable
-        if (defined('JSON_PRETTY_PRINT')) {
-            $options = JSON_PRETTY_PRINT;
-        }
-
-        if (defined('JSON_UNESCAPED_SLASHES')) {
-            $options |= JSON_UNESCAPED_SLASHES;
-        }
-        // phpcs:enable
-
         // prepare settings, for save config first structure
         $new_schema = $settings['app_appearance']['colors'];
         foreach ($new_schema as $type => $variables) {
@@ -48,18 +36,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        $config = json_encode(array('settings' => $settings, 'images' => $images), $options);
+        $config = json_encode(['settings' => $settings, 'images' => $images], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $working_dir = fn_mobile_app_get_working_dir();
 
-        $params = array(
-            'contents'  => $config,
-            'overwrite' => true,
+        Storage::instance('custom_files')->deleteDir($working_dir);
+        Storage::instance('custom_files')->put(
+            implode(DIRECTORY_SEPARATOR, [$working_dir, 'config.json']),
+            [
+                'contents'  => $config,
+                'overwrite' => true,
+            ]
         );
 
-        /** @var \Tygh\Backend\Storage\File $storage */
-        $storage = Storage::instance('custom_files');
-        $storage->deleteDir($working_dir);
-        $data = $storage->put(implode(DIRECTORY_SEPARATOR, array($working_dir, 'config.json')), $params);
+        if (GoogleServicesConfig::isExist()) {
+            $g_config_file_path = GoogleServicesConfig::getFilePath();
+            Storage::instance('custom_files')->put(
+                implode(DIRECTORY_SEPARATOR, [$working_dir, 'android', 'app', 'google-services.json']),
+                [
+                    'file'         => $g_config_file_path,
+                    'keep_origins' => true,
+                    'overwrite'    => true,
+                ]
+            );
+        }
 
         $images = fn_mobile_app_get_mobile_app_images();
         $schema = fn_get_schema('mobile_app', 'app_settings');
@@ -101,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $archive_path = fn_mobile_app_get_archive_full_path();
 
         $working_dir = fn_mobile_app_get_working_dir();
-        $files_to_archive = $storage->getAbsolutePath($working_dir);
+        $files_to_archive = Storage::instance('custom_files')->getAbsolutePath($working_dir);
 
         /** @var \Tygh\Tools\Archiver $archiver */
         $archiver = Tygh::$app['archiver'];
@@ -119,10 +118,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
-        return array(CONTROLLER_STATUS_REDIRECT, 'addons.update&addon=mobile_app');
+        return [CONTROLLER_STATUS_REDIRECT, 'addons.update&addon=mobile_app'];
     }
 
-    return array(CONTROLLER_STATUS_OK);
+    if ($mode == 'delete_google_config_file') {
+        GoogleServicesConfig::deleteFile();
+        return [CONTROLLER_STATUS_REDIRECT, 'addons.update&addon=mobile_app'];
+    }
+
+    return [CONTROLLER_STATUS_OK];
 }
 
 if ($mode == 'get_file') {
@@ -131,4 +135,6 @@ if ($mode == 'get_file') {
     if (file_exists($archive_path)) {
         fn_get_file($archive_path, '', true);
     }
+} elseif ($mode == 'get_google_config_file') {
+    GoogleServicesConfig::getFile();
 }

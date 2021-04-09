@@ -184,25 +184,7 @@ function fn_vendor_debt_payout_get_payout_product()
  */
 function fn_vendor_debt_payout_get_vendor_admin($vendor_id)
 {
-    $query_template = 'SELECT user_id FROM ?:users'
-        . ' WHERE ?w'
-        . ' ORDER BY user_id ASC'
-        . ' LIMIT 1';
-    $search_params = array(
-        'is_root'    => 'Y',
-        'user_type'  => 'V',
-        'company_id' => $vendor_id,
-    );
-
-    $admin_id = db_get_field($query_template, $search_params);
-
-    if (!$admin_id) {
-        unset($search_params['is_root']);
-
-        $admin_id = db_get_field($query_template, $search_params);
-    }
-
-    return (int) $admin_id;
+    return fn_get_company_admin_user_id($vendor_id);
 }
 
 function fn_vendor_debt_payout_is_vendor_plans_addon_active()
@@ -231,13 +213,13 @@ function fn_vendor_debt_payout_get_pay_url($vendor_id, array $auth)
         $user_id = $auth['user_id'];
     }
 
-    $pay_debt_url = Url::buildUrn(array('debt', 'pay'));
+    $pay_debt_url = Url::buildUrn(['debt', 'pay'], ['currency' => CART_SECONDARY_CURRENCY]);
 
-    $pay_debt_url = Url::buildUrn(array('profiles', 'act_as_user'), array(
+    $pay_debt_url = Url::buildUrn(['profiles', 'act_as_user'], [
         'area'         => 'C',
         'user_id'      => $user_id,
         'redirect_url' => $pay_debt_url,
-    ));
+    ]);
 
     return fn_url($pay_debt_url);
 }
@@ -245,21 +227,11 @@ function fn_vendor_debt_payout_get_pay_url($vendor_id, array $auth)
 /**
  * Hook handler: removes payouts from the list of products.
  */
-function fn_vendor_debt_payout_get_products_pre(&$params, $items_per_page, $lang_code)
+function fn_vendor_debt_payout_get_products($params, $fields, $sortings, &$condition)
 {
     if (empty($params['pid'])) {
-        if (!isset($params['product_type'])) {
-            $params['product_type'] = array(ProductTypes::SIMPLE);
-        } else {
-            $params['product_type'] = array_diff($params['product_type'], array(ProductTypes::DEBT_PAYOUT));
-        }
+        $condition .= db_quote(' AND products.product_type != ?s', ProductTypes::DEBT_PAYOUT);
     }
-
-    if (empty($params['product_type'])) {
-        $params['product_type'] = null;
-    }
-
-    $params['product_type'] = (array) $params['product_type'];
 }
 
 /**
@@ -283,10 +255,8 @@ function fn_vendor_debt_payout_change_order_status(
     $order_statuses,
     $place_order
 ) {
-    if ($place_order
-        || $status_from === $status_to
-        || $status_from === STATUS_INCOMPLETED_ORDER
-        || $order_statuses[$status_to]['params']['inventory'] !== 'D'
+    if (
+        !in_array($status_to, ['P', 'C'])
         || !empty($order_info['is_debt_paid'])
     ) {
         return;
@@ -673,5 +643,63 @@ function fn_vendor_debt_payout_get_order_info(&$order, &$additional_data)
 {
     if (!empty($additional_data['D'])) {
         $order['is_debt_paid'] = unserialize($additional_data['D']);
+    }
+}
+/**
+ * Hook handler: allows to skip clearing the cart when the catalog mode is enabled
+ *
+ * @param array $product_data List of products data
+ * @param array $cart         Array of cart content and user information necessary for purchase
+ * @param array $auth         Array of user authentication data (e.g. uid, usergroup_ids, etc.)
+ * @param bool  $update       Flag, if true that is update mode. Usable for order management
+ * @param bool  $can_delete   Flag, if true that is cart cleared. Usable to pay off the vendor debt.
+ */
+function fn_vendor_debt_payout_catalog_mode_pre_add_to_cart(&$product_data, $cart, $auth, $update, &$can_delete)
+{
+    foreach ($product_data as $product) {
+        if (isset($product['extra'])) {
+            foreach ($product['extra'] as $key => $value) {
+                if ($key == 'vendor_debt_payout') {
+                    $can_delete = false;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Hook handler: allows to skip applying cart or catalog promotions if vendor debt in cart
+ *
+ * @param array  $promotions    List of promotions
+ * @param string $zone          Promotion zone (catalog, cart)
+ * @param array  $data          data array (product - for catalog rules, cart - for cart rules)
+ * @param array  $auth          (optional) - auth array (for car rules)
+ * @param array  $cart_products (optional) - cart products array (for car rules)
+ */
+function fn_vendor_debt_payout_promotion_apply_pre(&$promotions, $zone, $data, $auth, $cart_products)
+{
+    static $debt_payout_product_id = null;
+
+    if ($debt_payout_product_id === null) {
+        $debt_payout_product_id = fn_vendor_debt_payout_get_payout_product();
+    }
+
+    if (!isset($data['products'])
+        && (!isset($data['product_id']) || $data['product_id'] !=  $debt_payout_product_id)
+    ) {
+        return;
+    }
+
+    if (isset($data['products'])) {
+        $cart = $data['products'];
+        foreach ($cart as $id => $product) {
+            if (isset($product['extra']['vendor_debt_payout'])) {
+                $promotions = [];
+            }
+        }
+    }
+
+    if (isset($data['product_id']) && $data['product_id'] ==  $debt_payout_product_id) {
+        $promotions = [];
     }
 }

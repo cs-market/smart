@@ -1,57 +1,23 @@
 <tr class="import-field" id="field_{$id}">
     <td class="import-field__name" data-th="{__("advanced_import.column_header")}">
         <input type="hidden"
-               name="fields[{$name}][name]"
+               name="fields[{$name|md5}][name]"
                value="{$name}"
         />
         <span data-ca-advanced-import-element="field">{$name}</span>
     </td>
     <td class="import-field__related_object" data-th="{__("advanced_import.product_property", ["[product]" => $smarty.const.PRODUCT_NAME])}">
         <input type="hidden"
-               name="fields[{$name}][related_object_type]"
+               name="fields[{$name|md5}][related_object_type]"
                id="elm_field_related_object_type_{$id}"
         />
-        <select
-                data-ca-advanced-import-field-related-object-selector="true"
-                data-ca-advanced-import-field-id="{$id}"
-                id="elm_import_field_{$id}"
-                name="fields[{$name}][related_object]"
-                class="input-hidden cm-object-selector import-field__related_object-select"
-                data-width="100%"
-                data-ca-enable-search="true"
-                data-ca-placeholder="-{__("none")}-"
-                data-ca-allow-clear="true">
-            <option
-                data-ca-advanced-import-field-related-object-type="skip">
-            </option>
-            {foreach $relations as $related_object_type => $group_info}
-                <optgroup label="{$group_info.description}">
-                    {foreach $group_info.fields as $object_name => $object}
-                        {if $object.hidden|default:false}{continue}{/if}
-                        <option data-ca-advanced-import-field-related-object-type="{$related_object_type}"
-                                value="{$object_name}"
-                                {if $object.required}class="selectbox-highlighted"{/if}
-                                {if $preset.fields.$name.related_object_type == $related_object_type
-                                    && $preset.fields.$name.related_object == $object_name}
-                                    selected="selected"
-                                {/if}
-                        >{strip}
-                            {if $object.show_name}
-                                {$object_name}
-                            {/if}
-                            {if $object.show_name && $object.show_description} ({/if}
-                            {if $object.show_description}
-                                {$object.description}
-                            {/if}
-                            {if $object.show_name && $object.show_description}){/if}
-                        {/strip}</option>
-                        {if $object.has_more|default:false}
-                            <option disabled="disabled">{__("advanced_import.coming_soon")}</option>
-                        {/if}
-                    {/foreach}
-                </optgroup>
-            {/foreach}
-        </select>
+        <label class="cm-adv-import-placeholder cm-adv-import-placeholder--empty" 
+            data-ca-advanced-import-field-id="{$id}"
+            data-ca-advanced-import-select-name="fields[{$name|md5}][related_object]"
+            data-ca-advanced-import-field-name="{$name}"
+            data-ca-placeholder="-{__("none")}-"
+        >-{__("none")}-</label>
+        <input type="hidden" id="elm_field_related_object_{$id}" name="fields[{$name|md5}][related_object]" value=""/>
     </td>
     <td class="import-field__preview" data-th="{__("advanced_import.first_line_import_value")}">
         {if $preview}
@@ -92,7 +58,7 @@
     <td class="import-field__modifier" data-th="{__("advanced_import.modifier")}">
         <div class="control-group import-field__modifier-input-group">
             <input type="text"
-                   name="fields[{$name}][modifier]"
+                   name="fields[{$name|md5}][modifier]"
                    class="input-text input-hidden import-field__modifier-input"
                    placeholder="{__("advanced_import.modifier")}"
                    value="{$preset.fields.$name.modifier}"

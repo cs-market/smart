@@ -32,6 +32,20 @@ if (AREA == 'C') {
     }
 }
 
+$command = null;
+if (isset($_REQUEST['cmd'])) {
+    $command = $_REQUEST['cmd'];
+}
+
+// only list and view commands can be executed with GET requests
+$safe_commands = ['open', 'file', 'get', 'search', 'parents', 'subdirs', 'ls'];
+if ($_SERVER['REQUEST_METHOD'] === 'GET'
+    && !in_array($command, $safe_commands)
+) {
+    $message = json_encode(['error' => __('access_denied')]);
+    exit($message);
+}
+
 $private_files_path = fn_get_files_dir_path();
 $public_files_path = fn_get_public_files_path();
 
@@ -50,42 +64,62 @@ if (!empty($_REQUEST['init']) && !empty($_REQUEST['start_path'])) {
 
 $extra_path = str_replace(Storage::instance('images')->getAbsolutePath(''), '', $public_files_path);
 
-$opts = array(
-    'roots' => array(
-        array(
-            'driver' => 'Tygh\ElFinder\Volume',
-            'uploadDeny' => Registry::get('config.forbidden_mime_types'),
-            'fileMode' => DEFAULT_FILE_PERMISSIONS,
-            'dirMode' => DEFAULT_DIR_PERMISSIONS,
+$forbidden_file_extensions_pattern = '/\.(' . implode('|', Registry::get('config.forbidden_file_extensions')) . ')$/i';
+
+$opts = [
+    'roots' => [
+        [
+            'driver'        => 'Tygh\ElFinder\Volume',
+            'uploadDeny'    => Registry::get('config.forbidden_mime_types'),
+            'fileMode'      => DEFAULT_FILE_PERMISSIONS,
+            'dirMode'       => DEFAULT_DIR_PERMISSIONS,
             'uploadMaxSize' => Bootstrap::getIniParam('upload_max_filesize', true),
-            'alias' => __('private_files'),
-            'tmbPath' => '',
-            'path' => $private_files_path,
-            'startPath' => $start_path,
-            'mimeDetect' => 'internal',
-            'archiveMimes' => array(
+            'alias'         => __('private_files'),
+            'tmbPath'       => '',
+            'path'          => $private_files_path,
+            'startPath'     => $start_path,
+            'mimeDetect'    => 'internal',
+            'archiveMimes'  => [
                 'application/zip'
-            ),
-            'icon' => Registry::get('config.current_location') .'/js/lib/elfinder/img/volume_icon_local.png'
-        ),
-        array(
-            'driver' => 'Tygh\ElFinder\Volume',
-            'uploadDeny' => Registry::get('config.forbidden_mime_types'),
-            'fileMode' => DEFAULT_FILE_PERMISSIONS,
-            'dirMode' => DEFAULT_DIR_PERMISSIONS,
+            ],
+            'icon'          => Registry::get('config.current_location') . '/js/lib/elfinder/img/volume_icon_local.png',
+            'attributes'    => [
+                [
+                    'pattern' => $forbidden_file_extensions_pattern,
+                    'read'    => false,
+                    'write'   => false,
+                    'locked'  => true,
+                    'hidden'  => true
+                ]
+            ]
+        ],
+        [
+            'driver'        => 'Tygh\ElFinder\Volume',
+            'uploadDeny'    => Registry::get('config.forbidden_mime_types'),
+            'fileMode'      => DEFAULT_FILE_PERMISSIONS,
+            'dirMode'       => DEFAULT_DIR_PERMISSIONS,
             'uploadMaxSize' => Bootstrap::getIniParam('upload_max_filesize', true),
-            'alias' => __('public_files'),
-            'tmbPath' => '',
-            'path' => $public_files_path,
-            'URL' => Storage::instance('images')->getUrl($extra_path),
-            'mimeDetect' => 'internal',
-            'archiveMimes' => array(
+            'alias'         => __('public_files'),
+            'tmbPath'       => '',
+            'path'          => $public_files_path,
+            'URL'           => Storage::instance('images')->getUrl($extra_path),
+            'mimeDetect'    => 'internal',
+            'archiveMimes'  => [
                 'application/zip'
-            ),
-            'icon' => Registry::get('config.current_location') .'/js/lib/elfinder/img/volume_icon_local.png'
-        ),
-    )
-);
+            ],
+            'icon'          => Registry::get('config.current_location') . '/js/lib/elfinder/img/volume_icon_local.png',
+            'attributes'    => [
+                [
+                    'pattern' => $forbidden_file_extensions_pattern,
+                    'read'    => false,
+                    'write'   => false,
+                    'locked'  => true,
+                    'hidden'  => true
+                ]
+            ]
+        ],
+    ]
+];
 
 if ($mode == 'images') {
     unset($opts['roots'][0]);

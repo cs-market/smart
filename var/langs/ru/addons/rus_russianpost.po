@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-ru\n"
+"X-Crowdin-Project-ID: 54044\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/rus_russianpost.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/rus_russianpost.po\n"
+"X-Crowdin-File-ID: 3756\n"
+"PO-Revision-Date: 2020-08-28 13:38\n"
 
 msgctxt "Addons::name::rus_russianpost"
 msgid "Russian localization — Russian post"
@@ -342,7 +342,7 @@ msgstr "Индекс"
 
 msgctxt "SettingsOptions::rus_russianpost::fiz_doc"
 msgid "Document"
-msgstr "Документ"
+msgstr "Докумен"
 
 msgctxt "SettingsOptions::rus_russianpost::fiz_doc_serial"
 msgid "Document serial"
@@ -446,7 +446,7 @@ msgstr "Телефон отправителя"
 
 msgctxt "SettingsOptions::rus_russianpost::company_phone"
 msgid "Company phone"
-msgstr "Телефон компании"
+msgstr "Телефон отправителя"
 
 msgctxt "SettingsOptions::rus_russianpost::header_112"
 msgid "f. 112ep (form size 210mm x 293mm)"
@@ -1163,4 +1163,8 @@ msgstr "Служба доставки EMS Почта России больше �
 msgctxt "Languages::rus_russianpost.russian_ems_upgrade_notification_message"
 msgid "The <b>EMS (Russian Post)</b> shipping service has been discontinued, and therefore it is no longer supported in [product]. All the shipping methods in your store that used this service have been changed to use the <b>Russian Post (pochta.ru)</b> shipping service instead. Please go to <b>Administration → Shipping & taxes → Shipping methods</b> and make sure that all your shipping methods are configured properly."
 msgstr "Работа службы доставки <b>EMS Почта России</b> была прекращена, поэтому она больше не поддерживается в [product]. Все способы доставки в вашем магазине, использовавшие данную службу, были переведены на службу доставки <b>Почта России (pochta.ru)</b>. Зайдите на страницу способов доставки (<b>Администрирование → Доставка и налоги → Способы доставки</b>) и убедитесь, что все способы настроены верно."
+
+msgctxt "Languages::rus_russian_post.delivery_types_that_require_countinpack"
+msgid "This field is required for Postal Item Type: EMS PT"
+msgstr "Обязательно для вида отправления EMS PT"
 

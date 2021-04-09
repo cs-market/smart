@@ -18,7 +18,7 @@
     {if $order_info.use_discount}
     <td>-</td>
     {/if}
-    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
     <td>-</td>
     {/if}
     <td class="right">&nbsp;<span>{if !$gift.extra.exclude_from_calculate}{include file="common/price.tpl" value=$gift.display_subtotal}{else}{__("free")}{/if}</span></td>
@@ -32,7 +32,7 @@
         {assign var="_colspan" value=$_colspan+1}
         <td>&nbsp;</td>
     {/if}
-    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
         {assign var="_colspan" value=$_colspan+1}
         <td>&nbsp;</td>
     {/if}
@@ -73,7 +73,7 @@
             {if $order_info.use_discount}
             <th width="10%">{__("discount")}</th>
             {/if}
-            {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+            {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
             <th width="10%">{__("tax")}</th>
             {/if}
             <th class="right" width="10%">{__("subtotal")}</th>
@@ -102,7 +102,7 @@
             <td>
                 {if $oi.extra.discount|floatval}{include file="common/price.tpl" value=$oi.extra.discount}{else}-{/if}</td>
             {/if}
-            {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+            {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
             <td>
                 {include file="common/price.tpl" value=$oi.tax_value}</td>
             {/if}

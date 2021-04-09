@@ -137,7 +137,8 @@ if (defined('PAYMENT_NOTIFICATION')) {
             Qiwi::writeLog($response, 'qiwi_create_bill.txt');
         }
 
-        $pp_response = '';
+        $pp_response = [];
+
         if (!$qiwi->isError()) {
 
             if ($qiwi->getStatusBill() == QIWI_BILL_STATUS_WAITING) {

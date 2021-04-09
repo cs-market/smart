@@ -12,11 +12,11 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
 fn_register_hooks(
     'update_image',
-    'generate_thumbnail_file_pre',
-    'delete_image',
-    'init_templater_post',
-    'generate_hidpi_name',
-    'generate_absolute_hidpi_name'
+    'get_image_pairs_post',
+    'get_logos_post',
+    'filter_uploaded_data_post'
 );

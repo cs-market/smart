@@ -1,5 +1,5 @@
 {math equation="rand()" assign="rnd"}
-{assign var="data_id" value="`$data_id`_`$rnd`"}
+{$data_id=$picker_id|default:"{$data_id}_{$rnd}"}
 {assign var="view_mode" value=$view_mode|default:"mixed"}
 {assign var="start_pos" value=$start_pos|default:0}
 {assign var="icon" value=$icon|default:"icon-plus"}
@@ -36,7 +36,7 @@
     <input type="hidden" id="p{$data_id}_ids" name="{$input_name}" value="{if $item_ids}{","|implode:$item_ids}{/if}" />
     {capture name="products_list"}
     <div class="table-responsive-wrapper">
-        <table class="table table-middle table-responsive">
+        <table class="table table-middle table--relative table-responsive">
         <thead>
         <tr>
             {if $positions}<th width="5%">{__("position_short")}</th>{/if}
@@ -46,7 +46,7 @@
         </tr>
         </thead>
         <tbody id="{$data_id}" class="{if !$item_ids}hidden{/if} cm-picker-product">
-        {include file="pickers/products/js.tpl" clone=true product="`$ldelim`product`$rdelim`" root_id=$data_id delete_id="`$ldelim`delete_id`$rdelim`" type="product" position_field=$positions position="0"}
+        {include file="pickers/products/js.tpl" clone=true product="`$ldelim`product`$rdelim`" company_id="`$ldelim`company_id`$rdelim`" company_name="`$ldelim`company_name`$rdelim`" root_id=$data_id delete_id="`$ldelim`delete_id`$rdelim`" type="product" position_field=$positions position="0"}
         {if $item_ids}
         {foreach from=$item_ids item="product" name="items"}
             {include file="pickers/products/js.tpl" product_id=$product product=$product|fn_get_product_name|default:__("deleted_product") root_id=$data_id delete_id=$product|escape:javascript type="product" first_item=$smarty.foreach.items.first position_field=$positions position=$smarty.foreach.items.iteration+$start_pos}
@@ -79,7 +79,7 @@
         {assign var="display" value="options"}
     {/if}
     <div class="table-wrapper">
-    <table class="table table-middle">
+    <table class="table table-middle table--relative">
     <thead>
     <tr>
         <th width="80%">{__("name")}</th>
@@ -116,7 +116,7 @@
     {/foreach}
     {/if}
     {/hook}
-    {include file="pickers/products/js.tpl" clone=true product="`$ldelim`product`$rdelim`" root_id=$data_id delete_id="`$ldelim`delete_id`$rdelim`" input_name="`$input_name`[`$ldelim`product_id`$rdelim`]" amount="1" amount_input="text" type="options" options="`$ldelim`options`$rdelim`" product_id=""}
+    {include file="pickers/products/js.tpl" clone=true product="`$ldelim`product`$rdelim`" company_id="`$ldelim`company_id`$rdelim`" company_name="`$ldelim`company_name`$rdelim`" root_id=$data_id delete_id="`$ldelim`delete_id`$rdelim`" input_name="`$input_name`[`$ldelim`product_id`$rdelim`]" amount="1" amount_input="text" type="options" options="`$ldelim`options`$rdelim`" product_id=""}
     </tbody>
     <tbody id="{$data_id}_no_item"{if $item_ids} class="hidden"{/if}>
     <tr class="no-items">
@@ -141,7 +141,7 @@
             {assign var="extra_var" value=$extra_var|escape:url}
         {/if}
         {if !$no_container}<div class="buttons-container">{/if}{if $picker_view}[{/if}
-            {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_href="products.picker?display=`$display`&company_id=`$company_id`&company_ids=`$company_ids`&picker_for=`$picker_for`&extra=`$extra_var`&checkbox_name=`$checkbox_name`&aoc=`$aoc`&data_id=`$data_id`&is_order_management=`$is_order_management`"|fn_url but_text=$but_text|default:__("add_products") but_role="add" but_target_id="content_`$data_id`" but_meta="cm-dialog-opener"}
+            {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_href="products.picker?display=`$display`&company_id=`$company_id`&company_ids=`$company_ids`&picker_for=`$picker_for`&extra=`$extra_var`&checkbox_name=`$checkbox_name`&aoc=`$aoc`&data_id=`$data_id`&is_order_management=`$is_order_management`"|fn_url but_text=$but_text|default:__("add_products") but_role="add" but_target_id="content_`$data_id`" but_meta="cm-dialog-opener `$dialog_opener_meta`"}
         {if $picker_view}]{/if}{if !$no_container}</div>{/if}
         <div class="hidden" id="content_{$data_id}" title="{$but_text|default:__("add_products")}">
         </div>

@@ -3,7 +3,7 @@
 <form action="{""|fn_url}" method="post" name="shippings_form" class="{if ""|fn_check_form_permissions} cm-hide-inputs{/if}">
 {if $shippings}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="1%" class="mobile-hide">

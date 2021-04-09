@@ -17,6 +17,7 @@
         show_list_discount=true
         no_pagination=true
         no_sorting=true
+        show_features=true
         show_add_to_cart=false
         is_wishlist=true}
 {else}

@@ -12,12 +12,16 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Seo\ItemAvailability;
 use Tygh\Enum\ProductFeatures;
+use Tygh\Enum\YesNo;
 use Tygh\Languages\Languages;
 use Tygh\Registry;
-use Tygh\Settings;
 use Tygh\SeoCache;
-use \Tygh\Tools\Url;
+use Tygh\Settings;
+use Tygh\Tools\Url;
+use Tygh\Enum\OutOfStockActions;
+use Tygh\Enum\ProductTracking;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -308,15 +312,23 @@ function fn_create_seo_name(
 
 /**
  * Gets corrected language code
- * @param string $lang_code language code
- * @param array $seo_settings storefront SEO settings
+ *
+ * @param string $lang_code    Language code
+ * @param array  $seo_settings Storefront SEO settings
+ *
  * @return string corrected language code
  */
 function fn_get_corrected_seo_lang_code($lang_code, $seo_settings = array())
 {
-    $single_url = !empty($seo_settings) ? $seo_settings['single_url'] : Registry::get('addons.seo.single_url');
+    if (!empty($seo_settings)) {
+        $single_url = $seo_settings['single_url'];
+        $default_lang_code = $seo_settings['frontend_default_language'];
+    } else {
+        $single_url = Registry::get('addons.seo.single_url');
+        $default_lang_code = Registry::get('settings.Appearance.frontend_default_language');
+    }
 
-    return ($single_url == 'Y') ? Registry::get('settings.Appearance.frontend_default_language') : $lang_code;
+    return $single_url === 'Y' ? $default_lang_code : $lang_code;
 }
 
 /**
@@ -669,7 +681,7 @@ function fn_seo_validate_object($seo, $path, $objects)
     }
 
     if (AREA == 'C') {
-        $avail_langs = fn_get_simple_languages(!empty(Tygh::$app['session']['auth']['area']) && Tygh::$app['session']['auth']['area'] == 'A');
+        $avail_langs = Languages::getSimpleLanguages(!empty(Tygh::$app['session']['auth']['area']) && Tygh::$app['session']['auth']['area'] == 'A');
         $obj_sl = !empty($objects['sl']) ? $objects['sl'] : $seo['lang_code'];
         if (!in_array($obj_sl, array_keys($avail_langs))) {
             return false;
@@ -900,7 +912,8 @@ function fn_seo_get_name($object_type, $object_id = 0, $dispatch = '', $company_
         $company_id = '';
     }
 
-    $lang_code = fn_get_corrected_seo_lang_code($lang_code);
+    $seo_settings = fn_get_seo_settings($company_id);
+    $lang_code = fn_get_corrected_seo_lang_code($lang_code, $seo_settings);
 
     $_object_id = !empty($object_id) ? $object_id : $dispatch;
     $name = SeoCache::get('name', $object_type, $_object_id, $company_id, $lang_code);
@@ -962,21 +975,6 @@ function fn_seo_get_name($object_type, $object_id = 0, $dispatch = '', $company_
     fn_set_hook('seo_get_name_post', $name, $object_type, $object_id, $dispatch, $company_id, $lang_code);
 
     return $name;
-}
-
-/**
- * Cache name for seo object (deprecated)
- * @param string $object_type object type of seo object
- * @param string $object_id object id of seo object
- * @param string $object_data object with SEO name and path
- * @param int $company_id Company identifier
- * @param string $lang_code language code
- * @param string $area current working area
- * @return bool always true
- */
-function fn_seo_cache_name($object_type, $object_id, $object_data, $company_id, $lang_code, $area = AREA)
-{
-    return SeoCache::set($object_type, $object_id, $object_data, $company_id, $lang_code, $area);
 }
 
 /**
@@ -1046,30 +1044,29 @@ function fn_seo_check_dispatch(&$req, $area = AREA, $lang_code = CART_LANGUAGE)
  * @param string $lang_code language code
  * @return string seo url
  */
-function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_in_url, &$lang_code)
+function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_in_url, &$lang_code, $locations)
 {
     if ($area != 'C') {
         return $url;
     }
 
+    $seo_object = [];
     $d = SEO_DELIMITER;
     $parsed_query = array();
     $parsed_url = parse_url($url);
+    $rewritten = false;
 
     $index_script = Registry::get('config.customer_index');
 
     $settings_company_id = empty($company_id_in_url) ? 0 : $company_id_in_url;
 
-    $http_path = Registry::get('config.http_path');
-    $https_path = Registry::get('config.https_path');
+    $http_path = parse_url($locations[$area]['http'], PHP_URL_PATH);
+    $https_path = parse_url($locations[$area]['https'], PHP_URL_PATH);
 
-    if (fn_allowed_for('ULTIMATE')) {
-        $urls = fn_get_storefront_urls($settings_company_id);
-        if (!empty($urls)) {
-            $http_path = $urls['http_path'];
-            $https_path = $urls['https_path'];
-        }
-    }
+    $store_hosts = [
+        parse_url($locations[$area]['http'], PHP_URL_HOST),
+        parse_url($locations[$area]['https'], PHP_URL_HOST)
+    ];
 
     $seo_settings = fn_get_seo_settings($settings_company_id);
     $current_path = '';
@@ -1078,11 +1075,11 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
         $current_path = (defined('HTTPS')) ? $https_path . '/' : $http_path . '/';
     } else {
         // This is not http/https url like mailto:, ftp:
-        if (!in_array($parsed_url['scheme'], array('http', 'https'))) {
+        if (!in_array($parsed_url['scheme'], ['http', 'https'])) {
             return $url;
         }
 
-        if (!empty($parsed_url['host']) && !in_array($parsed_url['host'], array(Registry::get('config.http_host'),  Registry::get('config.https_host')))) {
+        if (!empty($parsed_url['host']) && !in_array($parsed_url['host'], $store_hosts)) {
             if (fn_allowed_for('ULTIMATE') && AREA == 'A') {
                 $storefront_exist = db_get_row('SELECT company_id, storefront FROM ?:companies WHERE storefront = ?s OR secure_storefront = ?s', $parsed_url['host'], $parsed_url['host']);
                 if (empty($storefront_exist)) {
@@ -1096,9 +1093,11 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
             return $url;  // This is external link
 
         } else {
-            if (rtrim($url, '/') == Registry::get('config.http_location') || rtrim($url, '/') == Registry::get('config.https_location')) {
-                $url = rtrim($url, '/') . "/" . $index_script;
-                $parsed_url['path'] = rtrim($parsed_url['path'], '/') . "/" . $index_script;
+            if (rtrim($url, '/') === $locations[$area]['http']
+                || rtrim($url, '/') === $locations[$area]['https']
+            ) {
+                $url = rtrim($url, '/') . '/' . $index_script;
+                $parsed_url['path'] = rtrim($parsed_url['path'], '/') . '/' . $index_script;
             }
         }
     }
@@ -1168,7 +1167,6 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
             }
 
             $seo_vars = fn_get_seo_vars();
-            $rewritten = false;
 
             foreach ($seo_vars as $type => $seo_var) {
                 if (empty($seo_var['dispatch']) || ($seo_var['dispatch'] == $parsed_query['dispatch'] && !empty($parsed_query[$seo_var['item']]))) {
@@ -1211,6 +1209,9 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
                     fn_seo_parsed_query_unset($parsed_query, $seo_var['item']);
 
                     $rewritten = true;
+
+                    $seo_object = $seo_var;
+
                     break;
                 }
             }
@@ -1235,6 +1236,25 @@ function fn_seo_url_post(&$url, &$area, &$original_url, &$prefix, &$company_id_i
             $parsed_query['sl'] = $unset_lang_code;
         }
     }
+
+    /**
+     * Executes before generate seo url; allows modifying seo url.
+     *
+     * @param string $url               URL
+     * @param string $area              Current working area
+     * @param string $original_url      Original url from fn_url
+     * @param string $prefix            Output URL protocol
+     * @param string $company_id_in_url Company identifier
+     * @param string $lang_code         Two-letter language code
+     * @param array  $locations         List of locations data
+     * @param array  $parsed_url        Parsed url
+     * @param array  $parsed_query      Parsed query
+     * @param array  $link_parts        Url link parts
+     * @param bool   $rewritten         Rewritten by seo add-on
+     * @param array  $seo_object        Seo object schema
+     * @param array  $seo_settings      Seo add-on settings
+     */
+    fn_set_hook('seo_url_post', $url, $area, $original_url, $prefix, $company_id_in_url, $lang_code, $locations, $parsed_url, $parsed_query, $link_parts, $rewritten, $seo_object, $seo_settings);
 
     $url = join('', $link_parts);
 
@@ -1320,8 +1340,8 @@ function fn_seo_get_default_object_name($object_id, $object_type, $lang_code)
  */
 function fn_seo_install()
 {
-    $default_lang = DEFAULT_LANGUAGE;
-    if (defined('INSTALLER_INITED')) {
+    $default_lang = Registry::get('settings.Appearance.frontend_default_language');
+    if (defined('INSTALLER_INITED') || empty($default_lang)) {
         $default_lang = CART_LANGUAGE;
     }
 
@@ -1331,7 +1351,7 @@ function fn_seo_install()
     // clone SEO names
     $seo_names = db_get_array("SELECT * FROM ?:seo_names WHERE type = 's' AND lang_code = ?s", $default_lang);
 
-    $languages = fn_get_translation_languages();
+    $languages = Languages::getAll();
     unset($languages[$default_lang]);
 
     foreach ($languages as $lang_code => $lang_data) {
@@ -1451,7 +1471,9 @@ function fn_seo_update_tree_object($object_id, $object_type, $params)
     if (!isset($params['after_deletion']) || !$params['after_deletion']) {
         $lang_codes = array($frontend_default_language);
         $seo_settings = fn_get_seo_settings($params['company_id']);
-        if ($seo_settings['single_url'] != 'Y') {
+
+        $generate_redirects_for_all_languages = $seo_settings['single_url'] != 'Y' || $seo_settings['seo_language'] == 'Y';
+        if ($generate_redirects_for_all_languages) {
             $lang_codes = array_unique(array_merge($lang_codes, array_keys(Languages::getAll())));
         }
 
@@ -1738,7 +1760,9 @@ function fn_seo_get_object_children($object_type)
 
 /**
  * Gets SEO settings
+ *
  * @param int $company_id company ID
+ *
  * @return array SEO settings
  */
 function fn_get_seo_settings($company_id)
@@ -1749,6 +1773,8 @@ function fn_get_seo_settings($company_id)
         $seo_settings = $cache[$company_id];
     } else {
         $seo_settings = Settings::instance()->getValues('seo', Settings::ADDON_SECTION, false, $company_id);
+        $seo_settings['frontend_default_language'] = Settings::instance()->getValue('frontend_default_language', 'Appearance', $company_id);
+
         $cache[$company_id] = $seo_settings;
     }
 
@@ -1776,44 +1802,40 @@ function fn_seo_get_product_data(&$product_id, &$field_list, &$join, &$auth, &$l
 }
 
 /**
- * Hook handler: for changing availability after inventory amount is fetched
- */
-function fn_seo_gather_additional_product_data_post(&$product_data, $auth, $params)
-{
-    if (isset($product_data['seo_snippet'])) {
-
-        if (isset($product_data['inventory_amount'])) {
-            $product_data['seo_snippet']['availability'] = fn_seo_get_availability_for_snippet($product_data['inventory_amount']);
-        }
-
-        if (isset($product_data['price'])) {
-            // Discount might be applied to the original price
-            $price = fn_format_price((float) $product_data['price']);
-            $product_data['seo_snippet']['price'] = $price;
-        }
-
-        if (isset($product_data['product_code'])) {
-            $product_data['seo_snippet']['sku'] = $product_data['product_code'];
-        }
-    }
-}
-
-/**
- * Gets product availability based on it's amount or amount tracking setting *
- *
- * @param int $amount Product amount
+ * @param array $product_data
  *
  * @return string
+ *
+ * @internal
  */
-function fn_seo_get_availability_for_snippet($amount)
+function fn_seo_get_schema_org_product_availability(array $product_data)
 {
-    $availability = 'OutOfStock';
-
-    if ($amount > 0 || Registry::get('settings.General.inventory_tracking') == 'N') {
-        $availability = 'InStock';
+    if (!YesNo::toBool(Registry::get('settings.General.inventory_tracking'))) {
+        return ItemAvailability::IN_STOCK;
     }
 
-    return $availability;
+    $amount = 0;
+    if (isset($product_data['inventory_amount'])) {
+        $amount = $product_data['inventory_amount'];
+    } elseif (isset($product_data['amount'])) {
+        $amount = $product_data['amount'];
+    }
+    if (!empty($product_data['min_qty']) && $amount < $product_data['min_qty']) {
+        $amount = 0;
+    }
+
+    if ($amount > 0) {
+        return ItemAvailability::IN_STOCK;
+    }
+
+    if (
+        $product_data['out_of_stock_actions'] === OutOfStockActions::BUY_IN_ADVANCE
+        || $product_data['tracking'] === ProductTracking::DO_NOT_TRACK
+    ) {
+        return ItemAvailability::PRE_ORDER;
+    }
+
+    return ItemAvailability::OUT_OF_STOCK;
 }
 
 function fn_seo_get_product_data_post(&$product_data, &$auth, &$preview, &$lang_code)
@@ -1833,55 +1855,26 @@ function fn_seo_get_product_data_post(&$product_data, &$auth, &$preview, &$lang_
         $product_data['seo_name'] = fn_seo_get_name('p', $product_data['product_id'], '', null, $lang_code);
     }
 
-    // Prepare data for schema.org product markup
-    $amount = 0;
-    if (isset($product_data['inventory_amount'])) {
-        $amount = $product_data['inventory_amount'];
-    } elseif (isset($product_data['amount'])) {
-        $amount = $product_data['amount'];
-    }
-    if (!empty($product_data['min_qty']) && $amount < $product_data['min_qty']) {
-        $amount = 0;
-    }
-
-    $availability = fn_seo_get_availability_for_snippet($amount);
-
-    $description = '';
-    if (!empty($product_data['full_description'])) {
-        $description = $product_data['full_description'];
-    } elseif (!empty($product_data['short_description'])) {
-        $description = $product_data['short_description'];
-    }
-
-    $price = 0;
-    if (!empty($product_data['price'])) {
-        $price = fn_format_price((float)$product_data['price']);
-    }
-
-    if (!empty($product_data['product'])) {
-        $product_data['seo_snippet'] = array(
-            'sku' => empty($product_data['product_code']) ? '' : $product_data['product_code'],
-            'name' => strip_tags($product_data['product']),
-            'description' => strip_tags($description),
-            'availability' => $availability,
-            'price_currency' => CART_PRIMARY_CURRENCY,
-            'price' => $price,
-            'show_price' => !empty($auth['user_id'])
-                || Registry::get('settings.General.allow_anonymous_shopping') != 'hide_price_and_add_to_cart'
-        );
-    }
-
     return true;
 }
 
-function fn_seo_get_products(&$params, &$fields, &$sortings, &$condition, &$join, &$sorting, &$group_by, &$lang_code)
+/**
+ * The "additional_fields_in_search" hook handler.
+ *
+ * Action performed:
+ *   - If search is processing, string that containing SQL-query search condition by '$piece'
+ *        will be modified with additional fields from SEO add-on.
+ *
+ * @see fn_get_products
+ */
+function fn_seo_additional_fields_in_search($params, &$fields, $sortings, $condition, &$join, $sorting, $group_by, &$tmp, $piece, $having, $lang_code)
 {
-    if (isset($params['compact']) && $params['compact'] == 'Y' && !empty($params['q']) && $params['area'] == 'A') {
-        $condition .= db_quote(' OR (?:seo_names.name LIKE ?s ?p)', '%' . preg_replace('/-[a-zA-Z]{1,3}$/i', '', str_ireplace(SEO_FILENAME_EXTENSION, '', $params['q'])) . '%', fn_get_company_condition('products.company_id'));
+    if (isset($params['compact']) && $params['compact'] === YesNo::YES && !empty($params['q']) && $params['area'] === 'A' && !isset($fields['seo_name'])) {
+        $tmp .= db_quote(' OR (?:seo_names.name LIKE ?s ?p)', '%' . preg_replace('/-[a-zA-Z]{1,3}$/i', '', str_ireplace(SEO_FILENAME_EXTENSION, '', $piece)) . '%', fn_get_company_condition('products.company_id'));
 
         $lang_condition = db_quote(' AND ?:seo_names.lang_code = ?s', $lang_code);
-        $fields[] = '?:seo_names.name as seo_name';
-        $fields[] = '?:seo_names.path as seo_path';
+        $fields['seo_name'] = '?:seo_names.name as seo_name';
+        $fields['seo_path'] = '?:seo_names.path as seo_path';
         $join .= db_quote(
             " LEFT JOIN ?:seo_names ON ?:seo_names.object_id = products.product_id AND ?:seo_names.type = 'p' AND ?:seo_names.dispatch = '' ?p",
             $lang_condition . fn_get_seo_company_condition('?:seo_names.company_id')
@@ -1960,14 +1953,27 @@ function fn_seo_delete_product_post(&$product_id)
     return fn_delete_seo_name($product_id, 'p');
 }
 
-function fn_seo_update_product_categories_post($product_id, $product_data, $existing_categories, $rebuild)
+function fn_seo_update_product_categories_post($product_id, $product_data, $existing_categories, $rebuild, $company_id)
 {
     if ($rebuild == true) {
+        if (fn_allowed_for('ULTIMATE')
+            && $company_id != 0
+            && $company_id != Registry::get('runtime.company_id')
+            && (!Registry::get('runtime.simple_ultimate')
+                || $product_data['company_id'] != $company_id
+            )
+        ) {
+            return true;
+        }
 
         $company_ids = array(!empty($product_data['company_id']) ? $product_data['company_id'] : 0);
 
-        if (fn_allowed_for('ULTIMATE') && !Registry::get('runtime.company_id')) {
-            $company_ids = fn_ult_get_shared_product_companies($product_id);
+        if (fn_allowed_for('ULTIMATE')) {
+            if ($current_company_id = Registry::get('runtime.company_id')) {
+                $company_ids = array($current_company_id);
+            } else {
+                $company_ids = fn_ult_get_shared_product_companies($product_id);
+            }
         }
 
         foreach ($company_ids as $company_id) {
@@ -2102,6 +2108,23 @@ function fn_seo_update_category_parent_post($category_id, $new_parent_id)
         'object_types' => array('c', 'p')
     ));
 }
+
+/**
+ * Hook handler
+ *
+ * @param array  $data
+ * @param int    $company_id
+ */
+function fn_seo_exim_set_product_categories_post($data, $company_id)
+{
+    fn_seo_update_tree_object($data['product_id'], 'p', [
+        'company_id' => $company_id,
+        'object_types' => [
+            'p'
+        ]
+    ]);
+}
+
 /* /Category hooks */
 
 /* Page hooks */
@@ -2360,11 +2383,6 @@ function fn_seo_update_language_post(&$language_data, &$lang_id, &$action)
 }
 /* /Language hooks */
 
-/* Deprecated */
-function fn_seo_parced_query_unset(&$parts_array, $keys = array())
-{
-    return fn_seo_parsed_query_unset($parts_array, $keys);
-}
 
 function fn_seo_link_test()
 {
@@ -2465,8 +2483,12 @@ function fn_seo_get_canonical_links($base_url, $search)
             }
         }
 
-        $seo_canonical['current'] = fn_url($base_url . fn_seo_canonical_url_page($search['page']));
     }
+
+    $current_page = isset($search['page']) ? fn_seo_canonical_url_page($search['page']) : '';
+    Registry::set('runtime.seo.is_creating_canonical_url', true, true);
+    $seo_canonical['current'] = fn_url($base_url . $current_page);
+    Registry::del('runtime.seo.is_creating_canonical_url');
 
     return $seo_canonical;
 }
@@ -2494,7 +2516,11 @@ function fn_seo_dispatch_before_display()
         return;
     }
 
-    $seo_canonical = array();
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+    $auth = Tygh::$app['session']['auth'];
+
+    $seo_canonical = [];
 
     $schema = fn_get_schema('seo', 'canonical_urls');
     $runtime = Registry::get('runtime');
@@ -2538,7 +2564,7 @@ function fn_seo_dispatch_before_display()
                 } elseif (is_array($rule['search'])) {
                     $search = $rule['search'];
                 } else {
-                    $search = Tygh::$app['view']->getTemplateVars('search');
+                    $search = $view->getTemplateVars('search');
                 }
             } else {
                 $search = array();
@@ -2578,8 +2604,25 @@ function fn_seo_dispatch_before_display()
         }
     }
 
-    Tygh::$app['view']->assign('seo_canonical', $seo_canonical);
-    Tygh::$app['view']->assign('seo_alt_hreflangs_list', $seo_alt_hreflangs_list);
+    if ($controller === 'products' && $mode === 'view') {
+        /** @var array $product */
+        $product = $view->getTemplateVars('product');
+
+        if ($product === null) {
+            return;
+        }
+
+        $show_price = !empty($auth['user_id'])
+            || Registry::get('settings.Checkout.allow_anonymous_shopping') !== 'hide_price_and_add_to_cart';
+        $schema_org_markup_items = fn_seo_get_schema_org_markup_items($product, $show_price);
+        $view->assign('schema_org_markup_items', $schema_org_markup_items);
+
+        $product['seo_snippet'] = fn_seo_get_legacy_markup_data($product, $schema_org_markup_items, $show_price);
+        $view->assign('product', $product);
+    }
+
+    $view->assign('seo_canonical', $seo_canonical);
+    $view->assign('seo_alt_hreflangs_list', $seo_alt_hreflangs_list);
 }
 
 /** Full-page cache add-on hooks */
@@ -2623,3 +2666,324 @@ function fn_seo_varnish_generate_vcl_pre($vcl_generator)
 }
 
 /** /Full-page cache add-on hooks */
+
+
+/**
+ * Gets Schema.org markup items for a product.
+ *
+ * @param array  $product_data Product data to get markup items from
+ * @param bool   $show_price   Whether product price must be shown
+ * @param string $currency     Currency to get product price in
+ *
+ * @return array Markup items
+ */
+function fn_seo_get_schema_org_markup_items(array $product_data, $show_price = true, $currency = CART_PRIMARY_CURRENCY)
+{
+    if (!isset($product_data['schema_org_features'])) {
+        $product_data['schema_org_features'] = fn_seo_get_schema_org_product_features($product_data['product_id']);
+    }
+
+    $product_item = [
+        '@context'    => 'http://schema.org/',
+        '@type'       => 'http://schema.org/Product',
+        'name'        => fn_seo_get_schema_org_product_name($product_data),
+        'sku'         => fn_seo_get_schema_org_product_sku($product_data),
+        'gtin'        => fn_seo_get_schema_org_product_feature($product_data['schema_org_features'], 'gtin'),
+        'mpn'         => fn_seo_get_schema_org_product_feature($product_data['schema_org_features'], 'mpn'),
+        'brand'       => fn_seo_get_schema_org_product_brand($product_data),
+        'description' => fn_seo_get_schema_org_product_description($product_data),
+        'image'       => fn_seo_get_schema_org_product_image($product_data),
+        'offers'      => [],
+    ];
+
+    $book_item = [
+        '@context' => 'http://schema.org/',
+        '@type'    => 'http://schema.org/Book',
+        'isbn'     => fn_seo_get_schema_org_product_feature($product_data['schema_org_features'], 'isbn'),
+    ];
+
+    if ($show_price) {
+        $offer = [
+            '@type'         => 'http://schema.org/Offer',
+            'availability'  => fn_seo_get_schema_org_product_availability($product_data),
+            'url'           => fn_url('products.view?product_id=' . $product_data['product_id']),
+            'price'         => 0,
+            'priceCurrency' => $currency,
+        ];
+
+        if (!empty($product_data['price'])) {
+            $offer['price'] = fn_format_price($product_data['price'], $currency);
+        }
+
+        $product_item['offers'][] = $offer;
+    }
+
+    $markup_items['product'] = $product_item;
+    if ($book_item['isbn']) {
+        $markup_items['book'] = $book_item;
+    }
+
+    /**
+     * Executes when getting product Schema.org markup items, right before returning result,
+     * allows you to modify the created markup items.
+     *
+     * @param array  $product_data Product data to get markup items from
+     * @param bool   $show_price   Whether product price must be shown
+     * @param string $currency     Currency to get product price in
+     * @param array  $markup_items Schema.org markup items
+     */
+    fn_set_hook('seo_get_schema_org_markup_items_post', $product_data, $show_price, $currency, $markup_items);
+
+    foreach ($markup_items as &$markup_item) {
+        $markup_item = fn_seo_filter_markup_item($markup_item);
+    }
+    unset($markup_item);
+
+    return $markup_items;
+}
+
+/**
+ * @param array  $schema_org_features
+ * @param string $feature_code
+ *
+ * @return string|null
+ *
+ * @internal
+ */
+function fn_seo_get_schema_org_product_feature(array $schema_org_features, $feature_code)
+{
+    foreach ($schema_org_features as $feature) {
+        $markup_property = strtolower($feature['feature_code']);
+        if ($markup_property !== $feature_code) {
+            continue;
+        }
+        $markup_property_value = null;
+        if (!empty($feature['value'])) {
+            return $feature['value'];
+        } elseif (!empty($feature['variant'])) {
+            return $feature['variant'];
+        }
+    }
+
+    return null;
+}
+
+/**
+ * @param array $markup_item
+ *
+ * @return array
+ *
+ * @internal
+ */
+function fn_seo_filter_markup_item(array $markup_item)
+{
+    $markup_item = array_filter($markup_item, function($item) {
+        return $item !== null;
+    });
+    foreach ($markup_item as $i => &$property) {
+        if (is_array($property)) {
+            $property = fn_seo_filter_markup_item($property);
+            if ($property === []) {
+                unset($markup_item[$i]);
+            }
+        }
+    }
+    unset($property);
+
+    return $markup_item;
+}
+
+/**
+ * @param array $product_data
+ *
+ * @return string
+ *
+ * @internal
+ */
+function fn_seo_get_schema_org_product_name(array $product_data)
+{
+    return strip_tags($product_data['product']);
+}
+
+/**
+ * @param array $product_data
+ *
+ * @return array|null
+ *
+ * @internal
+ */
+function fn_seo_get_schema_org_product_image(array $product_data)
+{
+    $image = [];
+    if (!empty($product_data['main_pair']['detailed']['image_path'])) {
+        $image[] = $product_data['main_pair']['detailed']['image_path'];
+    }
+    if (!empty($product_data['image_pairs'])) {
+        foreach ($product_data['image_pairs'] as $image_pair) {
+            if (!empty($image_pair['detailed']['image_path'])) {
+                $image[] = $image_pair['detailed']['image_path'];
+            }
+        }
+    }
+
+    return $image ?: null;
+}
+
+/**
+ * @param array $product_data
+ *
+ * @return string
+ *
+ * @internal
+ */
+function fn_seo_get_schema_org_product_description(array $product_data)
+{
+    $description = '';
+    if (!empty($product_data['full_description'])) {
+        $description = $product_data['full_description'];
+    } elseif (!empty($product_data['short_description'])) {
+        $description = $product_data['short_description'];
+    }
+
+    return strip_tags($description);
+}
+
+/**
+ * @param array $product_data
+ *
+ * @return string
+ *
+ * @internal
+ */
+function fn_seo_get_schema_org_product_sku(array $product_data)
+{
+    if (!empty($product_data['product_code'])) {
+        return $product_data['product_code'];
+    }
+
+    return '';
+}
+
+/**
+ * @param array $product_data
+ *
+ * @return array
+ *
+ * @internal
+ */
+function fn_seo_gather_product_features(array $product_data)
+{
+    $features = [];
+
+    if (!empty($product_data['header_features'])) {
+        $features += $product_data['header_features'];
+    }
+    if (!empty($product_data['product_features'])) {
+        $features += $product_data['product_features'];
+    }
+    if (!empty($product_data['schema_org_features'])) {
+        $features += $product_data['schema_org_features'];
+    }
+
+    return $features;
+}
+
+/**
+ * @param $product_id
+ *
+ * @return array
+ *
+ * @internal
+ */
+function fn_seo_get_schema_org_product_features($product_id)
+{
+    $markup_feature_codes = array_keys(fn_get_schema('seo', 'feature_codes'));
+    list($schema_org_features, ) = fn_get_product_features([
+        'plain'        => true,
+        'product_id'   => $product_id,
+        'feature_code' => $markup_feature_codes,
+    ]);
+
+    return $schema_org_features;
+}
+
+/**
+ * @param array $product_data
+ *
+ * @return array|null
+ *
+ * @internal
+ */
+function fn_seo_get_schema_org_product_brand(array $product_data)
+{
+    $brand = fn_seo_get_schema_org_product_feature($product_data['schema_org_features'], 'brand');
+
+    // fallback to product features
+    if ($brand === null) {
+        $features = fn_seo_gather_product_features($product_data);
+        foreach ($features as $feature_data) {
+            if ($feature_data['feature_type'] === ProductFeatures::EXTENDED) {
+                if (isset($feature_data['variant'])) {
+                    $brand = $feature_data['variant'];
+                } else {
+                    $brand_feature_data = fn_get_product_feature_variant($feature_data['variant_id']);
+                    $brand = $brand_feature_data['variant'];
+                }
+            }
+        }
+    }
+
+    if ($brand) {
+        return [
+            '@type' => 'Thing',
+            'name'  => $brand,
+        ];
+    }
+
+    return null;
+}
+
+/**
+ * Converts Schema.org product markup data into the legacy format for backwards compatibility.
+ *
+ * @param array $product                 Product data
+ * @param array $schema_org_markup_items Schema.org markup items
+ * @param bool  $show_price              Whether product price should be shown
+ *
+ * @return array
+ *
+ * @deprecated since 4.11.4. Update your themes to use JSON-LD markup.
+ */
+function fn_seo_get_legacy_markup_data(array $product, array $schema_org_markup_items, $show_price)
+{
+    $seo_snippet = isset($product['seo_snippet'])
+        ? $product['seo_snippet']
+        : [];
+
+    $seo_snippet['sku'] = $schema_org_markup_items['product']['sku'];
+    $seo_snippet['name'] = $schema_org_markup_items['product']['name'];
+    $seo_snippet['description'] = $schema_org_markup_items['product']['description'];
+
+    $offer = reset($schema_org_markup_items['product']['offers']);
+    if (isset($offer['offers'])) {
+        $offer = reset($offer['offers']);
+    }
+
+    $seo_snippet['show_price'] = $show_price;
+    if ($offer) {
+        $seo_snippet['availability'] = $offer['availability'];
+        $seo_snippet['price_currency'] = $offer['priceCurrency'];
+        $seo_snippet['price'] = $offer['price'];
+    } else {
+        $seo_snippet['availability'] = 'OutOfStock';
+    }
+
+    if (!empty($schema_org_markup_items['product']['image'])) {
+        $seo_snippet['images'] = $schema_org_markup_items['product']['image'];
+    }
+    if (!empty($schema_org_markup_items['product']['brand'])) {
+        $seo_snippet['brand'] = $schema_org_markup_items['product']['brand']['name'];
+    }
+
+    return $seo_snippet;
+}

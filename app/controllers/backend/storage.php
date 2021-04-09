@@ -153,14 +153,23 @@ if ($mode == 'manage') {
 
 function fn_get_amazon_regions()
 {
-    return array(
-        's3.amazonaws.com' => 'US Standard',
-        's3-us-west-2.amazonaws.com' => 'Oregon',
+    return [
+        's3-us-east-1.amazonaws.com' => 'Northern Virginia',
+        's3-us-east-2.amazonaws.com' => 'Ohio',
         's3-us-west-1.amazonaws.com' => 'Northern California',
-        's3-eu-west-1.amazonaws.com' => 'Ireland',
+        's3-us-west-2.amazonaws.com' => 'Oregon',
+        's3-ap-east-1.amazonaws.com' => 'Hong Kong',
+        's3-ap-south-1.amazonaws.com' => 'Mumbai',
+        's3-ap-northeast-2.amazonaws.com' => 'Seoul',
         's3-ap-southeast-1.amazonaws.com' => 'Singapore',
-        's3-sa-east-1.amazonaws.com' => 'Sao Paulo',
+        's3-ap-southeast-2.amazonaws.com' => 'Sydney',
         's3-ap-northeast-1.amazonaws.com' => 'Tokyo',
-        's3-ap-southeast-2.amazonaws.com' =>'Sydney'
-    );
+        's3-ca-central-1.amazonaws.com' => 'Canada',
+        's3-eu-central-1.amazonaws.com' => 'Frankfurt',
+        's3-eu-west-1.amazonaws.com' => 'Ireland',
+        's3-eu-west-2.amazonaws.com' => 'London',
+        's3-eu-west-3.amazonaws.com' => 'Paris',
+        's3-eu-north-1.amazonaws.com' => 'Stockholm',
+        's3-sa-east-1.amazonaws.com' => 'São Paulo'
+    ];
 }

@@ -154,6 +154,16 @@ a:hover {
     }
 }
 
+/* Product variations */
+.ty-grid-list__item-features {
+
+    &-description,
+    &-variant {
+        color: darken(@font, 35%);
+    }
+}
+/* /Product variations */
+
 @rounded_corners: false;
 @links: #333333;
 @menu_links: #666666;
@@ -168,6 +178,8 @@ a:hover {
 @sidebar: #fff;
 @price: #00a178;
 @discount_label: #ff9900;
+@product_label: @discount_label;
+@shipping_label: @primary_button;
 @in_stock: #ff8a00;
 @out_of_stock: #a80006;
 @top_panel_links: #d8f6e6;
@@ -203,7 +215,7 @@ a:hover {
 @body_font_size: 13px;
 @body_font_style: normal;
 @body_font_weight: normal;
-@headings_font: Open Sans Condensed Bold,sans-serif;
+@headings_font: 'Open Sans Condensed Bold', 'Helvetica Neue', -apple-system, sans-serif;
 @headings_font_size: 20px;
 @headings_font_decoration: none;
 @headings_font_style: normal;

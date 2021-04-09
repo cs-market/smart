@@ -18,7 +18,7 @@ $schema['tags'] = array (
             'remove_indent' => true,
             'hide_label' => true,
             'type' => 'enum',
-            'object' => 'products',
+            'object' => 'tags',
             'items_function' => 'fn_get_tags',
             'fillings' => array (
                 'tag_cloud' => array (
@@ -48,6 +48,7 @@ $schema['tags'] = array (
     'cache' => array (
         'update_handlers' => array('tags', 'tag_links', 'products', 'pages'),
     ),
+    'brief_info_function' => 'fn_block_get_block_with_items_info'
 );
 
 $schema['main']['cache_overrides_by_dispatch']['products.view']['update_handlers'][] = 'tags';

@@ -51,7 +51,7 @@ return array(
 
     'destinations.update' => array(
         array(
-            'title' => 'locations',
+            'title' => 'rate_areas',
             'link' => 'destinations.manage'
         ),
     ),

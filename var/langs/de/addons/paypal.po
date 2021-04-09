@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: German\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: de\n"
-"X-Crowdin-File: /release-4.8.2/addons/paypal.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.5/addons/paypal.po\n"
+"X-Crowdin-File-ID: 3680\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::paypal"
 msgid "PayPal payments"
@@ -94,7 +94,7 @@ msgstr "Verwenden Sie den zugehörigen Checkout"
 
 msgctxt "Languages::ttc_paypal_use_in_context_checkout"
 msgid "In-Context Checkout will not be used when the store is running in Widget mode"
-msgstr ""
+msgstr "In-Context Checkout wird nicht verwendet, wenn der Speicher im Widget-Modus läuft"
 
 msgctxt "Languages::paypal_express_notice"
 msgid "A merchant ID is required for using <a href='https://developer.paypal.com/docs/classic/express-checkout/in-context' target='_blank'>In-Context Checkout feature</a> within this integration. You can look up your merchant ID by logging into <a href='https://www.paypal.com/' target='_blank'>https://www.paypal.com/</a>. Click the profile icon on the top right side of the page and then select <b>Profile and settings</b> in the <b>Business Profile</b> menu. (If you do not see the profile icon at the top of the page, click <b>Profile</b>, which appears in the top menu when the <b>My Account tab</b> is selected.) Click <b>My business info</b> on the left, and the <b>Merchant account ID</b> is displayed in the list of profile items on the right."
@@ -110,31 +110,31 @@ msgstr "Transaktionsstatus"
 
 msgctxt "Languages::paypal.ipn_transaction_status"
 msgid "Transaction status: [status]"
-msgstr ""
+msgstr "Transaktionsstatus: [status]"
 
 msgctxt "Languages::addons.paypal.surcharge_policy_notice"
 msgid "Surcharge has been set for the payment method that uses PayPal Services. Please make sure this complies with the <a href=\"https://www.paypal.com/webapps/mpp/ua/legalhub-full\" target=\"_blank\">User Agreement for PayPal Services</a> for your region."
-msgstr ""
+msgstr "Für die Zahlungsmethode, die PayPal-Dienste nutzt, wurde ein Zuschlag festgelegt. Bitte stellen Sie sicher, dass dies mit der<a href=\"https://www.paypal.com/webapps/mpp/ua/legalhub-full\" target=\"_blank\">Benutzervereinbarung für PayPal-Dienste für Ihre Region übereinstimmt."
 
 msgctxt "Languages::addons.paypal.rma.perform_refund"
 msgid "Give a refund via PayPal"
-msgstr ""
+msgstr "Rückerstattung über PayPal"
 
 msgctxt "Languages::ttc_addons.paypal.rma.perform_refund"
 msgid "A refund will be made once an administrator changes the return request status"
-msgstr ""
+msgstr "Eine Rückerstattung erfolgt, sobald ein Administrator den Status der Rückgabeanforderung ändert"
 
 msgctxt "Languages::addons.paypal.rma.refund_performed"
 msgid "The refund has been made via PayPal"
-msgstr ""
+msgstr "Die Rückerstattung erfolgt über PayPal"
 
 msgctxt "Languages::addons.paypal.refund_message"
 msgid "[amount] [currency] have been refunded in [date] at [time]."
-msgstr ""
+msgstr "[amount] [currency] wurden am [date] um [time] zurückerstattet."
 
 msgctxt "SettingsOptions::paypal::paypal_partial_refund_action"
 msgid "Order status on partial refund"
-msgstr ""
+msgstr "Bestellstatus bei teilweiser Rückerstattung"
 
 msgctxt "Languages::addons.paypal.do_not_change"
 msgid "Do not change"
@@ -142,7 +142,7 @@ msgstr "Nicht ändern"
 
 msgctxt "Languages::tt_addons_paypal_settings_partial_refund_action_order_status"
 msgid "Determines whether or not to change the order status automatically after a partial refund via PayPal."
-msgstr ""
+msgstr "Legt fest, ob der Bestellstatus nach einer teilweisen Rückerstattung über PayPal automatisch geändert werden soll oder nicht."
 
 msgctxt "Languages::addons.paypal.set_status_to"
 msgid "Set to:"
@@ -150,7 +150,7 @@ msgstr "Setzen auf:"
 
 msgctxt "Languages::addons.paypal.ipn_receiving_time"
 msgid "IPN receiving time"
-msgstr ""
+msgstr "IPN-Empfangszeit"
 
 msgctxt "Languages::addons.paypal.status_for_new_orders"
 msgid "Initial order status"
@@ -158,7 +158,7 @@ msgstr ""
 
 msgctxt "Languages::ttc_addons.paypal.status_for_new_orders"
 msgid "All orders with a PayPal payment method get this status until the response from PayPal (an IPN message) arrives or a customer returns to the store via a link on the PayPal site."
-msgstr ""
+msgstr "Alle Bestellungen mit einer PayPal-Zahlungsmethode erhalten diesen Status, bis die Antwort von PayPal (eine IPN-Nachricht) eintrifft oder ein Kunde über einen Link auf der PayPal-Website zum Shop zurückkehrt."
 
 msgctxt "Languages::addons.paypal.status_for_new_orders.open"
 msgid "By default, the <i>Open</i> status decreases the inventory, so two customers won't be able to buy the same product while the payment is being processed by PayPal. But if a customer leaves the PayPal website without paying or returning to the store via a link on the PayPal site, you'll have an abandoned <i>Open</i> order with reserved products."
@@ -210,17 +210,26 @@ msgstr "Beim verbinden des Paypal Accounts ist ein Fehler aufgetreten"
 
 msgctxt "Languages::addons.paypal.signup_errors.merchant_credentials"
 msgid "An error occurred when obtaining the payment method configuration"
-msgstr ""
+msgstr "Es ist ein Fehler beim Abrufen der Zahlwegkonfiguration aufgetreten"
 
 msgctxt "Languages::addons.paypal.signup_messages.finish_signup"
 msgid "You now have a PayPal business account, and you've successfully integrated [product] with PayPal.<br>Don't forget to confirm your email to activate your account so you can access the payments. To do this, follow the instructions PayPal sent to your email."
-msgstr ""
+msgstr "Sie haben jetzt ein PayPal-Geschäftskonto und Sie haben erfolgreich [Produkt] in PayPal integriert.\n"
+"Vergessen Sie nicht, Ihre E-Mail-Adresse zu bestätigen, um Ihr Konto zu aktivieren, damit Sie auf die Zahlungen zugreifen können. Folgen Sie dazu den Anweisungen von PayPal, die Sie per E-Mail erhalten haben."
 
 msgctxt "Languages::addons.paypal.signup_messages.confirmation_needed"
 msgid "To access payments from your customers, please confirm your email address by following the instructions PayPal emailed to you."
-msgstr ""
+msgstr "Um auf die Zahlungen Ihrer Kunden zuzugreifen, bestätigen Sie bitte Ihre E-Mail-Adresse, indem Sie den Anweisungen von PayPal folgen, die Sie per E-Mail erhalten haben."
 
 msgctxt "Languages::paypal.addon_is_disabled_notice"
 msgid "The <b>PayPal payments</b> add-on is disabled so you can't configure this payment method."
 msgstr "Das <b>PayPal Payment</b> Add-on ist deaktiviert, weshalb du diese Zahlungsmethode nicht konfigurieren kannst."
+
+msgctxt "Languages::addons.paypal.3d_secure_mandatory_notice"
+msgid "3-D secure is mandatory in the United Kingdom."
+msgstr ""
+
+msgctxt "Languages::paypal.show_cart_button"
+msgid "Show the \"Checkout with PayPal\" button on the cart contents page"
+msgstr ""
 

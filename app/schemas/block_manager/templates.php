@@ -396,6 +396,15 @@ return array(
             ),
         ),
     ),
+/* Static templates */
+    'blocks/static_templates/logo.tpl' => array (
+        'settings' => array(
+            'enable_link' => array (
+                'type' => 'checkbox',
+                'default_value' => 'Y'
+            ),
+        ),
+    ),
 /* Companies templates */
     'blocks/vendor_list_templates/companies_list.tpl' => array (
         'fillings' => array ('all', 'manually'),
@@ -473,8 +482,14 @@ return array(
             ),
             'item_quantity' =>  array (
                 'type' => 'input',
-                'default_value' => 6
+                'default_value' => 6,
+                'option_name' => 'block_manager.brands_per_screen',
             ),
+            'total_items' => [
+                'type' => 'input',
+                'default_value' => 12,
+                'option_name' => 'block_manager.total_displayed_brands',
+            ],
             'thumbnail_width' =>  array (
                 'type' => 'input',
                 'default_value' => 50

@@ -20,6 +20,7 @@
             <td width="48%">
                 <p>
                     <label for="left_{$id}" class="cm-all hidden"></label>
+                    <input type="hidden" name="{$name}[]" value="" {if $disable_input}disabled="disabled"{/if} />
                     <select class="input-full" id="left_{$id}" name="{$name}[]" multiple="multiple" size="10" {if $disable_input}disabled="disabled"{/if}>
                         {if $selected_fields|is_array}
                             {foreach from=$selected_fields item="active" key="field_id"}

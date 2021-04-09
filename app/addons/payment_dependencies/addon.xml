@@ -5,8 +5,22 @@
     <default_language>en</default_language>
     <priority>100</priority>
     <status>active</status>
+    <compatibility>
+        <conflicts>payments_by_country</conflicts>
+    </compatibility>
     <queries>
-        <item for="install">ALTER TABLE ?:shippings ADD disable_payment_ids varchar(255) NOT NULL DEFAULT ''</item>
-        <item for="uninstall">ALTER TABLE ?:shippings DROP disable_payment_ids</item>
+        <item>
+            DROP TABLE IF EXISTS ?:payment_dependencies;
+        </item>
+        <item for="install">
+            CREATE TABLE ?:payment_dependencies (
+            `shipping_id` mediumint(8) unsigned NOT NULL,
+            `disable_payment_id` mediumint(8) unsigned NOT NULL,
+            PRIMARY KEY (`shipping_id`, `disable_payment_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        </item>
+        <item for="uninstall">
+            DROP TABLE IF EXISTS ?:payment_dependencies;
+        </item>
     </queries>
 </addon>

@@ -15,7 +15,6 @@
 namespace Tygh\Backend\Cache;
 
 use Tygh\Exceptions\ClassNotFoundException;
-use Tygh\Registry;
 
 class Apc extends ABackend
 {
@@ -23,6 +22,13 @@ class Apc extends ABackend
 
     protected $global_ttl = 0;
 
+    /**
+     * Apc constructor.
+     *
+     * @param array $config
+     *
+     * @throws \Tygh\Exceptions\ClassNotFoundException
+     */
     public function __construct($config)
     {
         if (!function_exists('apc_store') || !class_exists('APCIterator')) {
@@ -30,7 +36,7 @@ class Apc extends ABackend
         }
 
         if (isset($config['cache_apc_global_ttl'])) {
-            $this->global_ttl = (int)$config['cache_apc_global_ttl'];
+            $this->global_ttl = (int) $config['cache_apc_global_ttl'];
         }
 
         $this->_config = $config;
@@ -38,33 +44,34 @@ class Apc extends ABackend
         parent::__construct($config);
     }
 
-    public function set($name, $data, $condition, $cache_level = null)
+    /** @inheritDoc */
+    public function set($name, $data, $condition, $cache_level = null, $ttl = null)
     {
         if (!empty($data)) {
             apc_store(
                 $this->_mapTags($name) . '/' . $cache_level,
                 $data,
-                ($cache_level == Registry::cacheLevel('time'))
-                    ? TIME + $condition
-                    : $this->global_ttl
+                $this->getCacheTimeToLive($condition, $cache_level, $ttl ?: $this->global_ttl)
             );
         }
     }
 
+    /** @inheritDoc */
     public function get($name, $cache_level = null)
     {
         $key = $this->_mapTags($name) . '/' . $cache_level;
 
         if (apc_exists($key)) {
-            return array(apc_fetch($key));
+            return [apc_fetch($key)];
         }
 
         return false;
     }
 
+    /** @inheritDoc */
     public function clear($tags)
     {
-        $tags = (array)$this->_mapTags($tags, 0);
+        $tags = (array) $this->_mapTags($tags, 0);
         $success = true;
 
         foreach ($tags as $tag) {
@@ -76,6 +83,7 @@ class Apc extends ABackend
         return $success;
     }
 
+    /** @inheritDoc */
     public function cleanup()
     {
         $regexp = self::CACHE_PREFIX . (empty($this->_config['store_prefix']) ? '' : ($this->_config['store_prefix'] . ':'));
@@ -86,9 +94,15 @@ class Apc extends ABackend
         return apc_delete($to_be_deleted);
     }
 
+    /**
+     * @param      $cache_keys
+     * @param null $company_id
+     *
+     * @return array|mixed
+     */
     private function _mapTags($cache_keys, $company_id = null)
     {
-        $cache_keys = (array)$cache_keys;
+        $cache_keys = (array) $cache_keys;
         $company_id = is_null($company_id) ? $this->_company_id : $company_id;
 
         foreach ($cache_keys as $i => $key_name) {

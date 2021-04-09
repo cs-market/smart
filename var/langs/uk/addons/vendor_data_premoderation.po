@@ -5,20 +5,24 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_data_premoderation.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/vendor_data_premoderation.po\n"
+"X-Crowdin-File-ID: 3666\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::vendor_data_premoderation"
 msgid "Vendor data premoderation"
-msgstr "Премодерація постачальника даних"
+msgstr "Премодерація даних постачальника"
 
 msgctxt "Addons::description::vendor_data_premoderation"
 msgid "Lets you pre-moderate vendors activity"
 msgstr "Премодерація даних, що додаються продавцями"
+
+msgctxt "Languages::vendor_data_premoderation.notification_for_deleted_statuses"
+msgid "Vendor Data Premoderation add-on has been disabled. Products with  the \"Requires approval\" or \"Disapproved\" statuses no longer have any status. These products won't appear to customers until you or your vendors set some other status for them. If you activate the add-on again, the statusless products will get their statuses back. If you uninstall the add-on, all products will get a correct status automatically."
+msgstr "Модуль премодерації даних постачальника вимкнено. Продукти зі статусами \"Потрібно затвердження\" або \"Відхилено\" більше не мають статусу. Ці продукти не з’являться для покупців, поки ви або ваші постачальники не встановлять інший статус для них. Якщо ви знову активуєте надбудову, продукти без статусу повернуть свої статуси. Якщо ви видалите надбудову, всі продукти автоматично отримають правильний статус."
 
 msgctxt "Languages::product_approval_menu_description"
 msgid "Manage individual products or group of products supplied by the store vendors."
@@ -93,78 +97,198 @@ msgid "Are you sure that you want to update the profile? Information about your 
 msgstr "Ви впевнені, що хочете оновити свій обліковий запис? Інформація про вашу компанію не буде відображатися на вітрині магазину до тих пір, поки адміністратор не підтвердить її."
 
 msgctxt "Languages::privileges.manage_product_premoderation"
-msgid "Approve vendor products"
-msgstr "Затвердження товарів, що додаються продавцями"
+msgid "Can manage"
+msgstr "Можна керувати"
+
+msgctxt "Languages::privilege_groups.product_premoderation"
+msgid "Product approval"
+msgstr "Затвердження товарів"
 
 msgctxt "SettingsSections::vendor_data_premoderation::general"
 msgid "General"
 msgstr "Загальні"
 
+msgctxt "SettingsSections::vendor_data_premoderation::products"
+msgid "Products"
+msgstr "Товари"
+
 msgctxt "SettingsOptions::vendor_data_premoderation::products_prior_approval"
-msgid "Approval is required for newly created products"
-msgstr "Потрібно затвердження для новостворених продуктів"
+msgid "Approval of newly-created products"
+msgstr "Перевірка нових товарів"
 
 msgctxt "SettingsOptions::vendor_data_premoderation::products_updates_approval"
-msgid "Approve product info updates"
-msgstr "Затверджувати зміни до інформації про товари"
+msgid "Approval of product info updates"
+msgstr "Перевірка змінених товарів"
 
 msgctxt "SettingsOptions::vendor_data_premoderation::vendor_profile_updates_approval"
-msgid "Approve vendor profile updates"
-msgstr "Затверджувати зміни в облікових записах продавців"
+msgid "Approval of vendor profile updates"
+msgstr "Перевірка змін в облікових записах продавців"
 
-msgctxt "SettingsTooltips::vendor_data_premoderation::products_prior_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "«Жодного» - налаштування вимкнено для всіх продавців; «Вибірково» - налаштування включається на сторінці редагування продавця (у вкладці «Модулі»); «Всі продавці» - налаштування включено для всіх продавців."
+msgctxt "SettingsOptions::vendor_data_premoderation::product_approval_notifications"
+msgid "Notify vendors about product moderation results"
+msgstr "Інформувати продавців про результати модерації товару"
 
-msgctxt "SettingsTooltips::vendor_data_premoderation::products_updates_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "«Жодного» - налаштування вимкнено для всіх продавців; «Вибірково» - налаштування включається на сторінці редагування продавця (у вкладці «Модулі»); «Всі продавці» - налаштування включено для всіх продавців."
-
-msgctxt "SettingsTooltips::vendor_data_premoderation::vendor_profile_updates_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "«Жодного» - налаштування вимкнено для всіх продавців; «Вибірково» - налаштування включається на сторінці редагування продавця (у вкладці «Модулі»); «Всі продавці» - налаштування включено для всіх продавців."
+msgctxt "SettingsOptions::vendor_data_premoderation::product_premoderation_fields"
+msgid "Require approval for updates of"
+msgstr "Потрібна перевірка, якщо зміниться"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::none"
-msgid "None"
-msgstr "Жоден"
+msgid "Isn't required"
+msgstr "Не потрібно"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::custom"
-msgid "Custom"
-msgstr "Вибірково"
+msgid "Required for some vendors"
+msgstr "Потрібна для деяких продавців"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::all"
-msgid "All vendors"
-msgstr "Всі постачальники"
+msgid "Required for all vendors"
+msgstr "Потрібна завжди"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::none"
-msgid "None"
-msgstr "Жодного"
+msgid "Isn't required"
+msgstr "Не потрібно"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::custom"
-msgid "Custom"
-msgstr "Вибірково"
+msgid "Required for some vendors"
+msgstr "Потрібна для деяких продавців"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::all"
-msgid "All vendors"
-msgstr "Всі постачальники"
+msgid "Required for all vendors"
+msgstr "Потрібна завжди"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::none"
-msgid "None"
-msgstr "Жодного"
+msgid "Isn't required"
+msgstr "Не потрібно"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::custom"
-msgid "Custom"
-msgstr "Вибірково"
+msgid "Required for some vendors"
+msgstr "Потрібна для деяких продавців"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::all"
-msgid "All vendors"
-msgstr "Всі постачальники"
+msgid "Required for all vendors"
+msgstr "Потрібна завжди"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::none"
+msgid "Don't notify"
+msgstr "Не інформувати"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::email"
+msgid "Send e-mail"
+msgstr "Відправити лист"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::notifications_center"
+msgid "Display a notification in the Notifications center"
+msgstr "Відображати сповіщення в центрі сповіщень"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::email_notifications_center"
+msgid "Send e-mail and display a notification in the Notifications center"
+msgstr "Надсилати повідомлення та показувати сповіщення в центрі сповіщень"
 
 msgctxt "Languages::email_template.vendor_data_premoderation_notification"
 msgid "Vendor premoderation"
-msgstr ""
+msgstr "Премодерація даних продавція"
 
 msgctxt "Languages::vendor_data_premoderation.exclude_disapproved_products"
 msgid "Exclude disapproved products"
-msgstr ""
+msgstr "Виключити несхвалені товари"
+
+msgctxt "Languages::vendor_data_premoderation.product_status.requires_approval"
+msgid "Requires approval"
+msgstr "Потрібно схвалення"
+
+msgctxt "Languages::vendor_data_premoderation.product_status.disapproved"
+msgid "Disapproved"
+msgstr "Відхилено"
+
+msgctxt "Languages::vendor_data_premoderation.require_approval"
+msgid "Products on moderation"
+msgstr "Товари на перевірці"
+
+msgctxt "Languages::vendor_data_premoderation.require_vendor_action"
+msgid "Disapproved products"
+msgstr "Відхилені товари"
+
+msgctxt "Languages::vendor_data_premoderation.disapproved"
+msgid "Disapproved"
+msgstr "Відхилено"
+
+msgctxt "Languages::vendor_data_premoderation.approve_product_btn"
+msgid "Approve product"
+msgstr "Затвердити товар"
+
+msgctxt "Languages::vendor_data_premoderation.approve_product"
+msgid "Approve \"[product]\""
+msgstr "Затвердити \"[product]\""
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_product_btn"
+msgid "Disapprove product"
+msgstr "Відхилити товар"
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_product"
+msgid "Disapprove \"[product]\""
+msgstr "Відхилити\"[product]\""
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_products"
+msgid "Disapprove products"
+msgstr "Відхилити товари"
+
+msgctxt "Languages::vendor_data_premoderation.disapproval_reason"
+msgid "Disapproval reason"
+msgstr "Причина несхвалення"
+
+msgctxt "Languages::vendor_data_premoderation.enter_disapproval_reason"
+msgid "Enter the reason for disapproval and save the changes."
+msgstr "Введіть причину відхилення та збережіть зміни."
+
+msgctxt "Languages::vendor_data_premoderation.notification.products_require_approval.title"
+msgid "You have [n] product that requires your approval|You have [n] products that require your approval"
+msgstr "[n] товар вимагає перевірки | [n] товарів вимагають перевірки"
+
+msgctxt "Languages::vendor_data_premoderation.notification.products_require_approval.message"
+msgid "This product is pending for your approval since [since]. Click here to view this product.|These products are pending for your approval since [since]. Click here to view these products."
+msgstr "Цей товар очікує перевірки з [since]. Натисніть сюди, щоб подивитися товар. | Ці товари очікують перевірки з [since]. Натисніть сюди, щоб переглянути товари."
+
+msgctxt "Languages::vendor_data_premoderation.notification.approved.title"
+msgid "Your product has been approved|Your products have been approved"
+msgstr "Ваш товар був схвалений | Ваші товари були схвалені"
+
+msgctxt "Languages::vendor_data_premoderation.notification.approved.message"
+msgid "\"[product]\" has been approved by the store administration and added to the product catalog. Click here to view this product.|[n] products have been approved by the store administration and added to the product catalog. Click here to view these products."
+msgstr "Товар \"[product]\" схвалений адміністрацією магазину і доданий в каталог. Натисніть сюди, щоб переглянути товар. |[n] товарів схвалені адміністрацією магазину і додані в каталог. Натисніть сюди, щоб переглянути товари."
+
+msgctxt "Languages::vendor_data_premoderation.notification.disapproved.title"
+msgid "Your product has been disapproved|Your products have been disapproved"
+msgstr "Ваш товар був відхилений|Ваші товари були відхилені"
+
+msgctxt "Languages::vendor_data_premoderation.notification.disapproved.message"
+msgid "\"[product]\" has been disapproved by the store administration. Click here to view this product.|[n] products have been disapproved by the store administration. Click here to view these products."
+msgstr "Товар \"[product]\" відхилений адміністрацією магазину. Натисніть сюди, щоб переглянути товар. |[n] товарів відхилені адміністрацією магазину. Натисніть сюди, щоб переглянути товари."
+
+msgctxt "Languages::vendor_data_premoderation.products_sent_to_premoderation"
+msgid "Your changes have been saved. Before your product is added to the product catalog, it must be approved by the store administration. Follow <a href=\"[product_approval_url]\">this link</a> to view products that require approval.|Your changes have been saved. Before your products are added to the product catalog, they must be approved by the store administration. Follow <a href=\"[product_approval_url]\">this link</a> to view products that require approval."
+msgstr "Зміни збережені. Перед тим, як товар з'явиться у каталозі, його повинна схвалити адміністрація магазину. Ось <a href=\"[product_approval_url]\">список товарів, які очікують схвалення</a>.|Зміни збережені. Перед тим, як товари з'являться в каталозі, їх має схвалити адміністрація магазину. Ось <a href=\"[product_approval_url]\">список товарів, які очікують схвалення</a>."
+
+msgctxt "Languages::vendor_data_premoderation.event.product_status.approved.name"
+msgid "Vendor data premoderation: your product was approved"
+msgstr "Премодерація даних постачальника: ваш товар затверджено"
+
+msgctxt "Languages::vendor_data_premoderation.event.product_status.disapproved.name"
+msgid "Vendor data premoderation: your product was disapproved"
+msgstr "Премодерація даних постачальника: ваш товар відхилено"
+
+msgctxt "Languages::vendor_data_premoderation.approval_info_text"
+msgid "If approval is required only for some vendors, you'll be able to set what vendors need moderation on the Add-ons tab of the vendor editing page."
+msgstr "Якщо перевірка потрібна лише для деяких продавців, то необхідність перевірки для кожного продавця задається на вкладці \"Модулі\" на сторінці редагування продавця."
+
+msgctxt "Languages::internal_template.vendor_data_premoderation_product_approved"
+msgid "Vendor data premoderation: your product was approved"
+msgstr "Премодерація даних продавців: ваш товар затверджено"
+
+msgctxt "Languages::internal_template.vendor_data_premoderation_product_disapproved"
+msgid "Vendor data premoderation: your product was disapproved"
+msgstr "Премодерація даних продавців: ваш товар відхилено"
+
+msgctxt "Languages::vendor_data_premoderation.moderation"
+msgid "Moderation"
+msgstr "Модерація"
 

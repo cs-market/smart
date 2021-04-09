@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/gift_certificates.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/gift_certificates.po\n"
+"X-Crowdin-File-ID: 3598\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -34,7 +34,7 @@ msgstr "Перегляд і редагування придбаних покуп
 
 msgctxt "Languages::gift_certificate_info"
 msgid "Gift certificate info"
-msgstr "Інформація подарункового сертифікату"
+msgstr "Інформація про подарунковий сертифікат"
 
 msgctxt "Languages::gift_certificate_verification"
 msgid "Gift certificate verification"
@@ -46,7 +46,7 @@ msgstr "Код подарункового сертифікату"
 
 msgctxt "Languages::gift_cert_debit"
 msgid "Debit balance"
-msgstr "Дебетовий баланс"
+msgstr "Залишок"
 
 msgctxt "Languages::gift_cert_from"
 msgid "From"
@@ -66,7 +66,7 @@ msgstr "Придбати подарунковий сертифікат"
 
 msgctxt "Languages::text_gift_certificate_logo"
 msgid "Logo for <b>gift certificates</b>"
-msgstr "Логотип для <b>подарункових сертифікатів</b>"
+msgstr "Логотип для <b>подарункового сертифікату</b>"
 
 msgctxt "Languages::text_gift_cert_amount_alert"
 msgid "Amount should be between [min] and [max]"
@@ -146,7 +146,7 @@ msgstr "Створити подарунковий сертифікат для ц
 
 msgctxt "Languages::gift_certificate_created"
 msgid "Gift Certificate has been created"
-msgstr ""
+msgstr "Подарунковий сертифікат було створено"
 
 msgctxt "Languages::related_gift_cert"
 msgid "Related gift certificates"
@@ -221,8 +221,12 @@ msgid "Amount should not be higher than [max] and less than [min]"
 msgstr "Сума не повинна бути вище, ніж [max] і менше, ніж [min]"
 
 msgctxt "Languages::privileges.manage_gift_certificates"
-msgid "Manage gift certificate system"
-msgstr "Керування подарунковими сертифікатами"
+msgid "Can edit"
+msgstr "Можна редагувати"
+
+msgctxt "Languages::privilege_groups.gift_certificates"
+msgid "Gift certificates"
+msgstr "Подарункові сертифікати"
 
 msgctxt "Languages::change_gift_certificate_status"
 msgid "Change gift certificate status to"
@@ -266,17 +270,25 @@ msgstr "Використати і додати безкоштовні товар
 
 msgctxt "Languages::email_template.gift_certificates_notification"
 msgid "Gift certificate"
-msgstr ""
+msgstr "Подарунковий сертифікат"
 
 msgctxt "Languages::template_document_gift_certificate_default"
 msgid "Gift certificates: default"
-msgstr ""
+msgstr "Подарунковий сертифікат: за замовчуванням"
 
 msgctxt "Languages::document_preview_gift_certificate_not_found"
 msgid "Couldn't find a gift certificate. Preview only works with existing data. Please create a gift certificate and use Preview again."
-msgstr ""
+msgstr "Попередній огляд працює тільки при наявності даних. Створіть подарунковий сертифікат, тоді скористайтесь функцією попереднього перегляду."
 
 msgctxt "Languages::gift_certificates.certificate_purchase_form"
 msgid "Gift certificate purchase form"
-msgstr ""
+msgstr "Форма покупки подарункового сертифіката"
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.status_changed.name"
+msgid "Gift certificate status changed to [status]"
+msgstr "Статус подарункового сертифіката змінено на [status]"
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
+msgid "Gift certificate updated"
+msgstr "Подарунковий сертифікат оновлено"
 

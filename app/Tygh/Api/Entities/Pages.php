@@ -22,7 +22,7 @@ class Pages extends AEntity
 {
     public function index($id = 0, $params = array())
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (!empty($id)) {
             $data = fn_get_page_data($id, $lang_code, false, $this->area);
@@ -74,7 +74,7 @@ class Pages extends AEntity
         }
 
         if ($valid_params) {
-            $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+            $lang_code = $this->getLanguageCode($params);
 
             $params['company_id'] = $this->getCompanyId();
             if (empty($params['parent_id'])) {
@@ -102,7 +102,7 @@ class Pages extends AEntity
         $data = array();
         $status = Response::STATUS_BAD_REQUEST;
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         $params['company_id'] = $this->getCompanyId();
         unset($params['page_type'], $params['page_id']);

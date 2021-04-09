@@ -25,6 +25,11 @@ use Tygh\Addons\Retailcrm\Settings;
 class OrderConverter
 {
     /**
+     * Code for initialization surcharge on the crm side.
+     */
+    const SURCHARGE_CODE = 'payment_surcharge';
+
+    /**
      * @var Settings RetailCRM settings instance.
      */
     private $settings;
@@ -176,6 +181,20 @@ class OrderConverter
             $result['items'][] = $item;
         }
 
+        if (!empty($order['payment_surcharge'])) {
+            $item = array(
+                'initialPrice' => (float) $order['payment_surcharge'],
+                'quantity' => (float) 1,
+                'productName' => 'Payment surcharge',
+                'product_id' => self::SURCHARGE_CODE,
+                'offer' => array(
+                    'externalId' => self::SURCHARGE_CODE
+                )
+            );
+
+            $result['items'][] = $item;
+        }
+
         return $result;
     }
 
@@ -304,6 +323,7 @@ class OrderConverter
                     'company_id' => $company_id,
                     'product' => $item['offer']['name'],
                     'amount' => $item['quantity'],
+                    'original_amount' => $item['quantity'],
                     'product_id' => null,
                     'stored_price' => 'Y',
                     'stored_discount' => 'Y',
@@ -316,6 +336,14 @@ class OrderConverter
                 $product['discount'] = ($item['initialPrice'] * $item['discountPercent'] / 100) + $item['discount'];
 
                 if (!empty($item['offer']['externalId'])) {
+
+                    if ($item['offer']['externalId'] == self::SURCHARGE_CODE) {
+                        $result['payment_surcharge'] = $item['initialPrice'];
+                        $result['total'] = $result['total'] - $result['payment_surcharge'];
+
+                        continue;
+                    }
+
                     $parts = explode('_', $item['offer']['externalId']);
                     $product['product_id'] = array_shift($parts);
 

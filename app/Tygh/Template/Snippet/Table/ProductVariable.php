@@ -35,6 +35,7 @@ class ProductVariable implements IVariable, IActiveVariable
     public $price;
     public $amount;
     public $product_status;
+    public $product_url;
     public $deleted_product;
     public $discount;
     public $company_id;
@@ -172,7 +173,7 @@ class ProductVariable implements IVariable, IActiveVariable
     public static function attributes()
     {
         return array(
-            'item_id', 'product_id', 'product_code', 'name', 'price', 'amount', 'product_status', 'deleted_product',
+            'item_id', 'product_id', 'product_code', 'name', 'price', 'amount', 'product_status', 'product_url', 'deleted_product',
             'discount', 'company_id', 'base_price', 'original_price', 'cart_id', 'tax', 'subtotal', 'display_subtotal',
             'shipped_amount', 'shipment_amount', 'is_accessible', 'shared_product', 'unlimited_download',
             'is_edp', 'edp_shipping', 'stored_price', 'counter', 'main_pair', 'image', 'options',

@@ -5,6 +5,7 @@ namespace Tygh\Tests\Unit\Mailer\MessageBuilders;
 
 
 use Tygh\SmartyEngine\Core;
+use Tygh\Storefront\Repository;
 use Tygh\Tests\Unit\ATestCase;
 
 class FileTemplateMessageBuilderTest extends ATestCase
@@ -46,7 +47,7 @@ class FileTemplateMessageBuilderTest extends ATestCase
 
     public function testCreateMessage()
     {
-        $builder = new FileTemplateMessageBuilder($this->smarty, array());
+        $builder = new FileTemplateMessageBuilder($this->smarty, array(), $this->createMock(Repository::class));
 
         $message = $builder->createMessage(
             array(

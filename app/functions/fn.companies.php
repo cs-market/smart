@@ -12,17 +12,22 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Menu;
-use Tygh\Settings;
+use Tygh\BlockManager\Block;
 use Tygh\BlockManager\Layout;
 use Tygh\BlockManager\ProductTabs;
-use Tygh\BlockManager\Block;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Languages\Languages;
+use Tygh\Menu;
 use Tygh\Navigation\LastView;
+use Tygh\Registry;
+use Tygh\Settings;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Tools\Url;
-use Tygh\Development;
-use Tygh\Themes\Themes;
+use Tygh\Tygh;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\VendorStatuses;
+use Tygh\Enum\YesNo;
 
 /**
  * Gets brief company data array: <i>(company_id => company_name)</i>
@@ -130,7 +135,6 @@ function fn_get_company_name($company_id, $zero_company_name_lang_var = '')
  *		  <li>string city - City of company</li>
  *		  <li>string phone - Phone of company</li>
  *		  <li>string url - URL address of company</li>
- *		  <li>string fax - Fax number of company</li>
  *		  <li>mixed company_id - Company ID, array with company IDs or comma-separated list of company IDs.
  * If defined, data will be returned only for companies with such company IDs.</li>
  *		  <li>int exclude_company_id - Company ID, if defined,
@@ -155,22 +159,22 @@ function fn_get_companies($params, &$auth, $items_per_page = 0, $lang_code = CAR
     $params = LastView::instance()->update($_view, $params);
 
     // Set default values to input params
-    $default_params = array (
+    $default_params = [
         'page' => 1,
         'items_per_page' => $items_per_page
-    );
+    ];
 
     $params = array_merge($default_params, $params);
 
     // Define fields that should be retrieved
-    $fields = array (
+    $fields = [
         '?:companies.company_id',
         '?:companies.lang_code',
         '?:companies.email',
         '?:companies.company',
         '?:companies.timestamp',
         '?:companies.status',
-    );
+    ];
 
     if (fn_allowed_for('ULTIMATE')) {
         $fields[] = '?:companies.storefront';
@@ -178,13 +182,13 @@ function fn_get_companies($params, &$auth, $items_per_page = 0, $lang_code = CAR
     }
 
     // Define sort fields
-    $sortings = array (
-        'id' => '?:companies.company_id',
+    $sortings = [
+        'id'      => '?:companies.company_id',
         'company' => '?:companies.company',
-        'email' => '?:companies.email',
-        'date' => '?:companies.timestamp',
-        'status' => '?:companies.status',
-    );
+        'email'   => '?:companies.email',
+        'date'    => '?:companies.timestamp',
+        'status'  => '?:companies.status',
+    ];
 
     if (fn_allowed_for('ULTIMATE')) {
         $sortings['storefront'] = '?:companies.storefront';
@@ -194,54 +198,54 @@ function fn_get_companies($params, &$auth, $items_per_page = 0, $lang_code = CAR
 
     $condition .= fn_get_company_condition('?:companies.company_id');
 
-    $group .= " GROUP BY ?:companies.company_id";
+    $group .= ' GROUP BY ?:companies.company_id';
 
     if (isset($params['company']) && fn_string_not_empty($params['company'])) {
-        $condition .= db_quote(" AND ?:companies.company LIKE ?l", "%".trim($params['company'])."%");
+        $condition .= db_quote(' AND ?:companies.company LIKE ?l', '%' . trim($params['company']) . '%');
     }
 
     if (!empty($params['status'])) {
         if (is_array($params['status'])) {
-            $condition .= db_quote(" AND ?:companies.status IN (?a)", $params['status']);
+            $condition .= db_quote(' AND ?:companies.status IN (?a)', $params['status']);
         } else {
-            $condition .= db_quote(" AND ?:companies.status = ?s", $params['status']);
+            $condition .= db_quote(' AND ?:companies.status = ?s', $params['status']);
         }
     }
 
     if (isset($params['email']) && fn_string_not_empty($params['email'])) {
-        $condition .= db_quote(" AND ?:companies.email LIKE ?l", "%".trim($params['email'])."%");
+        $condition .= db_quote(' AND ?:companies.email LIKE ?l', '%' . trim($params['email']) . '%');
     }
 
     if (isset($params['address']) && fn_string_not_empty($params['address'])) {
-        $condition .= db_quote(" AND ?:companies.address LIKE ?l", "%".trim($params['address'])."%");
+        $condition .= db_quote(' AND ?:companies.address LIKE ?l', '%' . trim($params['address']) . '%');
     }
 
     if (isset($params['zipcode']) && fn_string_not_empty($params['zipcode'])) {
-        $condition .= db_quote(" AND ?:companies.zipcode LIKE ?l", "%".trim($params['zipcode'])."%");
+        $condition .= db_quote(' AND ?:companies.zipcode LIKE ?l', '%' . trim($params['zipcode']) . '%');
     }
 
     if (!empty($params['country'])) {
-        $condition .= db_quote(" AND ?:companies.country = ?s", $params['country']);
+        $condition .= db_quote(' AND ?:companies.country = ?s', $params['country']);
     }
 
     if (isset($params['state']) && fn_string_not_empty($params['state'])) {
-        $condition .= db_quote(" AND ?:companies.state LIKE ?l", "%".trim($params['state'])."%");
+        $condition .= db_quote(' AND ?:companies.state LIKE ?l', '%' . trim($params['state']) . '%');
+    }
+
+    if (isset($params['state_code']) && fn_string_not_empty($params['state_code'])) {
+        $condition .= db_quote(' AND ?:companies.state = ?s', $params['state_code']);
     }
 
     if (isset($params['city']) && fn_string_not_empty($params['city'])) {
-        $condition .= db_quote(" AND ?:companies.city LIKE ?l", "%".trim($params['city'])."%");
+        $condition .= db_quote(' AND ?:companies.city LIKE ?l', '%' . trim($params['city']) . '%');
     }
 
     if (isset($params['phone']) && fn_string_not_empty($params['phone'])) {
-        $condition .= db_quote(" AND ?:companies.phone LIKE ?l", "%".trim($params['phone'])."%");
+        $condition .= db_quote(' AND ?:companies.phone LIKE ?l', '%' . trim($params['phone']) . '%');
     }
 
     if (isset($params['url']) && fn_string_not_empty($params['url'])) {
-        $condition .= db_quote(" AND ?:companies.url LIKE ?l", "%".trim($params['url'])."%");
-    }
-
-    if (isset($params['fax']) && fn_string_not_empty($params['fax'])) {
-        $condition .= db_quote(" AND ?:companies.fax LIKE ?l", "%".trim($params['fax'])."%");
+        $condition .= db_quote(' AND ?:companies.url LIKE ?l', '%' . trim($params['url']) . '%');
     }
 
     if (!empty($params['company_id'])) {
@@ -252,6 +256,55 @@ function fn_get_companies($params, &$auth, $items_per_page = 0, $lang_code = CAR
         $condition .= db_quote(' AND ?:companies.company_id != ?i', $params['exclude_company_id']);
     }
 
+    if (!empty($params['created_from']) && !empty($params['created_to'])) {
+        $condition .= db_quote(' AND ?:companies.timestamp BETWEEN ?i AND ?i', $params['created_from'], $params['created_to']);
+    }
+
+    if (!empty($params['not_login_from']) && !empty($params['not_login_to'])) {
+        $join .= db_quote(' LEFT JOIN ?:users ON ?:users.company_id = ?:companies.company_id');
+        $condition .= db_quote(
+            ' AND ?:users.last_login NOT BETWEEN ?i AND ?i AND ?:companies.timestamp BETWEEN ?i AND ?i'
+            . ' AND ?:users.status = ?s AND ?:users.user_type = ?s',
+            $params['not_login_from'],
+            $params['not_login_to'],
+            $params['not_login_from'],
+            $params['not_login_to'],
+            ObjectStatuses::ACTIVE,
+            UserTypes::VENDOR
+        );
+    }
+
+    if (!empty($params['sales_from']) && !empty($params['sales_to'])) {
+        $join .= db_quote(' LEFT JOIN ?:orders ON ?:orders.company_id = ?:companies.company_id');
+        $condition .= db_quote(
+            ' AND ?:orders.timestamp BETWEEN ?i AND ?i'
+            . ' AND ?:orders.company_id != ?i',
+            $params['sales_from'],
+            $params['sales_to'],
+            0
+        );
+    }
+
+    if (!empty($params['extend']) && in_array('products', $params['extend'], true)) {
+        $join .= db_quote(' LEFT JOIN ?:products ON ?:companies.company_id = ?:products.company_id');
+
+        if (!empty($params['product_status']) && is_array($params['product_status'])) {
+            $condition .= db_quote(' AND ?:products.status IN(?a)', $params['product_status']);
+        }
+
+        if (!empty($params['product_types']) && is_array($params['product_types'])) {
+            $condition .= db_quote(' AND ?:products.product_type IN(?a)', $params['product_types']);
+        }
+
+        if (!empty($params['new_products_from']) && !empty($params['new_products_to'])) {
+            $condition .= db_quote(
+                'AND ?:products.timestamp BETWEEN ?i AND ?i',
+                $params['new_products_from'],
+                $params['new_products_to']
+            );
+        }
+    }
+
     fn_set_hook('get_companies', $params, $fields, $sortings, $condition, $join, $auth, $lang_code, $group);
 
     $sorting = db_sort($params, $sortings, 'company', 'asc');
@@ -259,37 +312,33 @@ function fn_get_companies($params, &$auth, $items_per_page = 0, $lang_code = CAR
     // Paginate search results
     $limit = '';
     if (!empty($params['items_per_page'])) {
-        $params['total_items'] = db_get_field("SELECT COUNT(DISTINCT(?:companies.company_id)) FROM ?:companies $join WHERE 1 $condition");
+        $params['total_items'] = db_get_field('SELECT COUNT(DISTINCT(?:companies.company_id)) FROM ?:companies ?p WHERE 1 ?p', $join, $condition);
         $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
     }
 
-    $companies = db_get_array("SELECT " . implode(', ', $fields) . " FROM ?:companies $join WHERE 1 $condition $group $sorting $limit");
+    if (!empty($params['get_conditions'])) {
+        return [$fields, $join, $condition];
+    }
+
+    $companies = db_get_array('SELECT ' . implode(', ', $fields) . ' FROM ?:companies ?p WHERE 1 ?p ?p ?p ?p', $join, $condition, $group, $sorting, $limit);
 
     if (!empty($params['extend'])) {
-        $products_condition = '';
+        $company_ids = fn_array_column($companies, 'company_id');
 
-        if (!empty($params['company_id'])) {
-            $products_condition = db_quote(' AND company_id IN (?n)', $params['company_id']);
-        }
-
-        if (!empty($params['extend']['products_count'])) {
-            $companies_products_count = db_get_hash_single_array(
-                'SELECT company_id, COUNT(product_id) as products_count FROM ?:products'
-                . ' WHERE status = ?s ?p GROUP BY company_id',
-                array('company_id', 'products_count'),
-                'A',
-                $products_condition
-            );
+        if ($company_ids && !empty($params['extend']['products_count'])) {
+            $companies_products_count = fn_get_companies_active_products_count($company_ids);
         }
 
         foreach ($companies as &$company) {
             $company = empty($params['extend']['placement_info']) ? $company : fn_array_merge($company, fn_get_company_data($company['company_id']));
+
             if (!empty($params['extend']['logos'])) {
                 $company['logos'] = fn_get_logos($company['company_id']);
             }
 
             $company['products_count'] = empty($companies_products_count[$company['company_id']]) ? 0 : $companies_products_count[$company['company_id']];
         }
+        unset($company);
     }
 
     /**
@@ -303,14 +352,42 @@ function fn_get_companies($params, &$auth, $items_per_page = 0, $lang_code = CAR
      * */
     fn_set_hook('get_companies_post', $params, $auth, $items_per_page, $lang_code, $companies);
 
-    return array($companies, $params);
+    return [$companies, $params];
 }
 
+/**
+ * Checks if products belong to the current company.
+ *
+ * @param int|int[]|string|string[] $product_ids Product ID or array of product IDs
+ * @param bool                      $notify      Whether notification must be shown on failed check
+ *
+ * @return bool
+ */
 function fn_company_products_check($product_ids, $notify = false)
 {
     if (!empty($product_ids)) {
-        $c = db_get_field("SELECT count(*) FROM ?:products WHERE product_id IN (?n) ?p", $product_ids, fn_get_company_condition('?:products.company_id'));
-        if (count((array) $product_ids) == $c) {
+
+        $product_ids = (array) $product_ids;
+
+        $company_condition = fn_get_company_condition('?:products.company_id');
+
+        /**
+         * Executes before executing database query when checking product ownership,
+         * allows to modify SQL query parts.
+         *
+         * @param int|int[]|string|string[] $product_ids       Product ID or array of product IDs
+         * @param bool                      $notify            Whether notification must be shown on failed check
+         * @param string                    $company_condition Products filtering condition
+         */
+        fn_set_hook('company_products_check', $product_ids, $notify, $company_condition);
+
+        $company_products_count = (int) db_get_field(
+            'SELECT count(*) FROM ?:products WHERE product_id IN (?n) ?p',
+            $product_ids,
+            $company_condition
+        );
+
+        if (count($product_ids) === $company_products_count) {
             return true;
         } else {
             if ($notify) {
@@ -384,6 +461,8 @@ function fn_get_company_condition($db_field = 'company_id', $add_and = true, $co
         // FIXME 2tl show admin
         if ($show_admin && $company_id) {
             $cond .= db_quote(" $db_field IN (0, ?i)", $company_id);
+        } elseif (is_array($company_id)) {
+            $cond .= db_quote(" $db_field IN (?n)", $company_id);
         } else {
             $cond .= db_quote(" $db_field = ?i", $company_id);
         }
@@ -716,6 +795,8 @@ function fn_update_company($company_data, $company_id = 0, $lang_code = CART_LAN
         return false;
     }
 
+    array_walk($company_data, 'fn_trim_helper');
+
     SecurityHelper::sanitizeObjectData('company', $company_data);
 
     if (Registry::get('runtime.company_id')) {
@@ -818,7 +899,7 @@ function fn_update_company($company_data, $company_id = 0, $lang_code = CART_LAN
 
         $_data['company_id'] = $company_id;
 
-        foreach (fn_get_translation_languages() as $_data['lang_code'] => $_v) {
+        foreach (Languages::getAll() as $_data['lang_code'] => $_v) {
             db_query("INSERT INTO ?:company_descriptions ?e", $_data);
         }
 
@@ -849,6 +930,14 @@ function fn_update_company($company_data, $company_id = 0, $lang_code = CART_LAN
         $action = 'update';
     }
 
+    $logo_ids = [];
+    if ($action === 'add' && fn_allowed_for('MULTIVENDOR')) {
+        /** @var \Tygh\Storefront\Repository $storefront_repository */
+        $storefront_repository = Tygh::$app['storefront.repository'];
+        $storefront = $storefront_repository->findDefault();
+        $logo_ids = fn_create_theme_logos_by_layout_id($storefront->theme_name, 0, $company_id, true);
+    }
+
     /**
      * Update company data (running after fn_update_company() function)
      *
@@ -858,45 +947,6 @@ function fn_update_company($company_data, $company_id = 0, $lang_code = CART_LAN
      * @param string $action       Flag determines if company was created (add) or just updated (update).
      */
     fn_set_hook('update_company', $company_data, $company_id, $lang_code, $action);
-
-    $logo_ids = array();
-
-    if ($action == 'add') {
-        if (fn_allowed_for('MULTIVENDOR')) {
-            // theme is not specified for a vendor
-            $theme_name = fn_get_theme_path('[theme]', 'C');
-        } elseif (!empty($company_data['theme_name'])) {
-            // theme could be specified for a storefront
-            $theme_name =  $company_data['theme_name'];
-        } else {
-            // fallback
-            $theme_name = Registry::get('config.base_theme');
-        }
-
-        $install_layouts = true;
-
-        if (fn_allowed_for('ULTIMATE')) {
-            $clone_from = !empty($company_data['clone_from']) && $company_data['clone_from'] != 'all'
-                ? $company_data['clone_from']
-                : null;
-
-            if (!is_null($clone_from)) {
-                $theme_name = fn_get_theme_path('[theme]', 'C', $clone_from);
-
-                if (!empty($company_data['clone']['layouts']) && $company_data['clone']['layouts'] == 'Y') {
-                    $install_layouts = false;
-                }
-            }
-        }
-
-        if (fn_allowed_for('ULTIMATE')) {
-            $logo_ids = fn_install_theme($theme_name, $company_id, $install_layouts);
-            // Set theme settings
-            Themes::factory($theme_name)->overrideSettings(null, $company_id);
-        } else {
-            $logo_ids = fn_create_theme_logos_by_layout_id($theme_name, 0, $company_id, true);
-        }
-    }
 
     fn_attach_image_pairs('logotypes', 'logos', 0, $lang_code, $logo_ids);
 
@@ -1046,13 +1096,27 @@ function fn_delete_company($company_id)
     $section_ids = fn_get_sitemap_sections($params);
     fn_delete_sitemap_sections(array_keys($section_ids));
 
+    /** @var \Tygh\Storefront\Repository $storefronts_repository */
+    $storefronts_repository = Tygh::$app['storefront.repository'];
+    /** @var \Tygh\Storefront\Storefront[] $storefronts */
+    $storefronts = $storefronts_repository->findByCompanyId($company_id, false);
+    foreach ($storefronts as $storefront) {
+        $storefront_company_ids = $storefront->getCompanyIds();
+        $storefront_company_ids = array_filter($storefront_company_ids, function($storefront_company_id) use ($company_id) {
+            return $storefront_company_id != $company_id;
+        });
+        $storefront->setCompanyIds($storefront_company_ids);
+        $storefronts_repository->save($storefront);
+    }
+
     /**
      * Performs company post-delete actions
      *
-     * @param int     $company_id Company integer identifier
-     * @param boolean $result     Company deletion result
+     * @param int                           $company_id  Company integer identifier
+     * @param bool                          $result      Company deletion result
+     * @param \Tygh\Storefront\Storefront[] $storefronts Storefronts the company belonged to
      */
-    fn_set_hook('delete_company', $company_id, $result);
+    fn_set_hook('delete_company', $company_id, $result, $storefronts);
 
     return $result;
 }
@@ -1080,10 +1144,27 @@ function fn_chown_company($from, $to)
         $config['db_name']
     );
 
+    $excluded_tables = [
+        'companies',
+        'company_descriptions',
+        'cache',
+        'vendor_styles'
+    ];
+
+    /**
+     * Executes before merging the data of companies, allows to excluding tables from merging
+     *
+     * @param int    $from Company identifier from which data merging
+     * @param int    $to   Company identifier into which data merging
+     * @param array  $excluded_tables Array excluded tables
+     * @param array  $tables          Array tables for merge
+     */
+    fn_set_hook('chown_company', $from, $to, $excluded_tables, $tables);
+
     foreach ($tables as $table) {
         $table = str_replace(Registry::get('config.table_prefix'), '', $table);
 
-        if (in_array($table, array('companies', 'company_descriptions', 'cache', 'vendor_styles'))) {
+        if (in_array($table, $excluded_tables)) {
             continue;
         }
 
@@ -1110,8 +1191,9 @@ function fn_chown_company($from, $to)
 /**
  * Function returns address of company and emails of company' departments.
  *
- * @param integer $company_id ID of company
- * @param string $lang_code Language of retrieving data. If null, lang_code of company will be used.
+ * @param int    $company_id ID of company
+ * @param string $lang_code  Language of retrieving data. If null, lang_code of company will be used.
+ *
  * @return array Company address, emails and lang_code.
  */
 function fn_get_company_placement_info($company_id, $lang_code = null)
@@ -1129,24 +1211,23 @@ function fn_get_company_placement_info($company_id, $lang_code = null)
             $default_company_placement_info = $company_placement_info;
             $company_placement_info['lang_code'] = $company['lang_code'];
         } else {
-            $company_placement_info = array(
-                'company_name' => $company['company'],
-                'company_address' => $company['address'],
-                'company_city' => $company['city'],
-                'company_country' => $company['country'],
-                'company_state' => $company['state'],
-                'company_zipcode' => $company['zipcode'],
-                'company_phone' => $company['phone'],
-                'company_phone_2' => '',
-                'company_fax' => $company['fax'],
-                'company_website' => $company['url'],
-                'company_users_department' => $company['email'],
+            $company_placement_info = [
+                'company_name'               => $company['company'],
+                'company_address'            => $company['address'],
+                'company_city'               => $company['city'],
+                'company_country'            => $company['country'],
+                'company_state'              => $company['state'],
+                'company_zipcode'            => $company['zipcode'],
+                'company_phone'              => $company['phone'],
+                'company_phone_2'            => '',
+                'company_website'            => $company['url'],
+                'company_users_department'   => $company['email'],
                 'company_site_administrator' => $company['email'],
-                'company_orders_department' => $company['email'],
+                'company_orders_department'  => $company['email'],
                 'company_support_department' => $company['email'],
-                'company_newsletter_email' => $company['email'],
-                'lang_code' => $company['lang_code'],
-            );
+                'company_newsletter_email'   => $company['email'],
+                'lang_code'                  => $company['lang_code'],
+            ];
         }
     }
 
@@ -1158,7 +1239,21 @@ function fn_get_company_placement_info($company_id, $lang_code = null)
     $lang_code = !empty($lang_code) ? $lang_code : $company_placement_info['lang_code'];
 
     $company_placement_info['company_country_descr'] = fn_get_country_name($company_placement_info['company_country'], $lang_code);
-    $company_placement_info['company_state_descr'] = fn_get_state_name($company_placement_info['company_state'], $company_placement_info['company_country'], $lang_code);
+    $company_placement_info['company_state_descr'] = fn_get_state_name(
+        $company_placement_info['company_state'],
+        $company_placement_info['company_country'],
+        $lang_code
+    );
+
+    /**
+     * Executes after company info was retrieved.
+     * Allows to modify company info.
+     *
+     * @param int    $company_id             ID of company
+     * @param string $lang_code              Language of retrieving data
+     * @param array  $company_placement_info Company info
+     */
+    fn_set_hook('get_company_placement_info_post', $company_id, $lang_code, $company_placement_info);
 
     return $company_placement_info;
 }
@@ -1175,21 +1270,10 @@ function fn_get_company_language($company_id)
 }
 
 /**
- * @deprecated since 4.3.6
- */
-function fn_companies_change_status($company_id, $status_to, $reason = '', &$status_from = '', $skip_query = false, $notify = true)
-{
-    Development::deprecated(
-        "The function fn_companies_change_status() is deprecated. Use fn_change_company_status() instead."
-    );
-    return fn_change_company_status($company_id, $status_to, $reason, $status_from, $skip_query, $notify);
-}
-
-/**
- * Fucntion changes company status. Allowed statuses are A(ctive) and D(isabled)
+ * Changes company status. Allowed statuses are A(ctive), P(ending) and D(isabled)
  *
  * @param int $company_id
- * @param string $status_to A or D
+ * @param string $status_to A or P or D
  * @param string $reason The reason of the change
  * @param string $status_from Previous status
  * @param boolean $skip_query By default false. Update query might be skipped if status is already changed.
@@ -1243,14 +1327,16 @@ function fn_change_company_status($company_id, $status_to, $reason = '', &$statu
                 fn_set_notification('N', __('notice'), $msg, 'K');
 
             } else {
-                $_company_data = $company_data + unserialize($company_data['request_account_data']);
+                $request_account_data = (array) unserialize($company_data['request_account_data']);
+                $_company_data = $company_data + $request_account_data;
                 $_company_data['status'] = 'A';
 
                 if (!empty($_company_data['request_account_name'])) {
                     $_company_data['admin_username'] = $_company_data['request_account_name'];
                 }
 
-                $user_data = fn_create_company_admin($_company_data, $_company_data['fields'], false);
+                $fields = isset($request_account_data['fields']) ? $request_account_data['fields'] : $_company_data['fields'];
+                $user_data = fn_create_company_admin($_company_data, $fields, false);
 
                 if (!empty($user_data['user_id'])) {
                     $username = $user_data['user_login'];
@@ -1281,46 +1367,48 @@ function fn_change_company_status($company_id, $status_to, $reason = '', &$statu
     fn_set_hook('change_company_status_before_mail', $company_id, $status_to, $reason, $status_from, $skip_query, $notify, $company_data, $user_data, $result);
 
     if ($notify && !empty($company_data['email'])) {
-
-        $e_username = '';
-        $e_account = '';
-        $e_password = '';
-
-        if ($status_from == 'N' && ($status_to == 'A' || $status_to == 'P')) {
-            $e_username = $username;
-            $e_account = $account;
+        $e_username = $e_account = $e_password = '';
+        if (
+            $status_from == VendorStatuses::NEW_ACCOUNT
+            && ($status_to == VendorStatuses::ACTIVE || $status_to == VendorStatuses::PENDING)
+        ) {
+            list($e_username, $e_account) = [$user_data['email'], $account];
             if ($account == 'new') {
                 $e_password = $user_data['password1'];
             }
         }
 
-        $mail_template = fn_strtolower($status_from . '_' . $status_to);
         $company_info = fn_get_company_placement_info($company_id);
 
-        /** @var \Tygh\Mailer\Mailer $mailer */
-        $mailer = Tygh::$app['mailer'];
-
-        $mailer->send(array(
-            'to' => $company_data['email'],
-            'from' => 'default_company_support_department',
-            'data' => array(
-                'company' => $company_info,
-                'user_data' => $user_data,
-                'reason' => $reason,
-                'status' => __($status_to == 'A' ? 'active' : 'disabled'),
-                'status_from' => $status_from,
-                'status_to' => $status_to,
-                'e_username' => $e_username,
-                'e_account' => $e_account,
-                'e_password' => $e_password,
-                'vendor_url' => fn_url('', 'V'),
-                'company_data' =>  Registry::get('settings.Appearance.email_templates') !== 'new'
-                    ? $company_info
-                    : null, // backward compatibility for file templates
-            ),
-            'template_code' => 'company_status_notification',
-            'tpl' => 'companies/status_notification.tpl', // this parameter is obsolete and is used for back compatibility
-        ), 'A');
+        $event_dispatcher = Tygh::$app['event.dispatcher'];
+        $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+        $force_notification[UserTypes::VENDOR] = $notify;
+        $notification_rules = $notification_settings_factory->create($force_notification);
+        $data = [
+            'company'       => $company_info,
+            'status_to'     => $status_to,
+            'reason'        => $reason,
+            'status_from'   => $status_from,
+            'user_data'     => $user_data,
+            'e_username'    => $e_username,
+            'e_account'     => $e_account,
+            'e_password'    => $e_password,
+            'vendor_url'    => fn_url('', SiteArea::VENDOR_PANEL),
+        ];
+        switch ($status_to) {
+            case ObjectStatuses::DISABLED:
+                $data['status'] = __('disabled');
+                $event_dispatcher->dispatch('vendor_status_changed_disabled', $data, $notification_rules);
+                break;
+            case ObjectStatuses::PENDING:
+                $data['status'] = __('pending');
+                $event_dispatcher->dispatch('vendor_status_changed_pending', $data, $notification_rules);
+                break;
+            case ObjectStatuses::ACTIVE:
+                $data['status'] = __('active');
+                $event_dispatcher->dispatch('vendor_status_changed_active', $data, $notification_rules);
+                break;
+        }
     }
 
     return $result;
@@ -1329,6 +1417,36 @@ function fn_change_company_status($company_id, $status_to, $reason = '', &$statu
 function fn_get_company_by_product_id($product_id)
 {
     return db_get_row("SELECT * FROM ?:companies AS com LEFT JOIN ?:products AS prod ON com.company_id = prod.company_id WHERE prod.product_id = ?i", $product_id);
+}
+
+/**
+ * Gets IDs of companies that own specified products.
+ *
+ * @param int[] $product_ids
+ *
+ * @return array Returns product IDs groupped by the company ID:
+ *               [
+ *                   (int) company_id => (array) product_ids
+ *               ]
+ */
+function fn_get_company_ids_by_product_ids(array $product_ids)
+{
+    $products_companies = db_get_hash_multi_array(
+        'SELECT product_id, company_id FROM ?:products WHERE ?w',
+        [
+            'company_id',
+            'product_id',
+        ],
+        [
+            'product_id' => $product_ids,
+        ]
+    );
+
+    array_walk($products_companies, function (&$products) {
+        $products = array_keys($products);
+    });
+
+    return $products_companies;
 }
 
 function fn_get_companies_sorting()
@@ -1404,13 +1522,7 @@ function fn_create_company_admin($company_data, $fields = '', $notify = false)
     $user = array(
         'fields' => $fields,
     );
-
-    if (!empty($company_data['admin_username'])) {
-        $user['user_login'] = $company_data['admin_username'];
-    } else {
-        $user['user_login'] = $company_data['email'];
-    }
-
+    
     $password_length = USER_PASSWORD_LENGTH;
     $min_password_length = (int) Registry::get('settings.Security.min_admin_password_length');
     if ($min_password_length > $password_length) {
@@ -1426,23 +1538,36 @@ function fn_create_company_admin($company_data, $fields = '', $notify = false)
     $user['company'] = $company_data['company'];
     $user['last_login'] = 0;
     $user['lang_code'] = $company_data['lang_code'];
-    $user['password_change_timestamp'] = 0;
-    $user['is_root'] = !empty($company_data['is_root']) ? $company_data['is_root'] : 'N';
+    $user['password_change_timestamp'] = 1;
+    $user['is_root'] = !empty($company_data['is_root']) ? $company_data['is_root'] : YesNo::NO;
 
     // Copy vendor admin billing and shipping addresses from the company's credentials
     $user['firstname'] = (!empty($company_data['admin_firstname'])) ? $company_data['admin_firstname'] : '';
     $user['b_firstname'] = $user['s_firstname'] = $user['firstname'];
     $user['lastname'] = (!empty($company_data['admin_lastname'])) ? $company_data['admin_lastname'] : '';
     $user['b_lastname'] = $user['s_lastname'] = $user['lastname'];
-    $user['b_phone'] = $user['s_phone'] = $user['phone'] = $company_data['phone'];
-    $user['fax'] = $company_data['fax'];
-    $user['url'] = $company_data['url'];
 
-    $user['b_address'] = $user['s_address'] = $company_data['address'];
-    $user['b_city'] = $user['s_city'] = $company_data['city'];
-    $user['b_country'] = $user['s_country'] = $company_data['country'];
-    $user['b_state'] = $user['s_state'] = $company_data['state'];
-    $user['b_zipcode'] = $user['s_zipcode'] = $company_data['zipcode'];
+    if (isset($company_data['phone'])) {
+        $user['b_phone'] = $user['s_phone'] = $user['phone'] = $company_data['phone'];
+    }
+    if (isset($company_data['url'])) {
+        $user['url'] = $company_data['url'];
+    }
+    if (isset($company_data['address'])) {
+        $user['b_address'] = $user['s_address'] = $company_data['address'];
+    }
+    if (isset($company_data['city'])) {
+        $user['b_city'] = $user['s_city'] = $company_data['city'];
+    }
+    if (isset($company_data['country'])) {
+        $user['b_country'] = $user['s_country'] = $company_data['country'];
+    }
+    if (isset($company_data['state'])) {
+        $user['b_state'] = $user['s_state'] = $company_data['state'];
+    }
+    if (isset($company_data['zipcode'])) {
+        $user['b_zipcode'] = $user['s_zipcode'] = $company_data['zipcode'];
+    }
 
     /**
      * Actions before directly creating company admin
@@ -1464,6 +1589,7 @@ function fn_create_company_admin($company_data, $fields = '', $notify = false)
         );
         fn_set_notification('N', __('notice'), $msg, 'K');
         $user['user_id'] = $added_user_id;
+        $user['user_login'] = db_get_field('SELECT user_login FROM ?:users WHERE user_id = ?i', $added_user_id);
     }
 
     /**
@@ -1477,4 +1603,195 @@ function fn_create_company_admin($company_data, $fields = '', $notify = false)
     fn_set_hook('create_company_admin_post', $company_data, $fields, $notify, $user);
 
     return $user;
+}
+
+/**
+ * Determines whether company condition must be applied when selecting product data.
+ *
+ * @param int|string $product_id Product ID to get product data
+ *
+ * @return bool
+ */
+function fn_is_product_company_condition_required($product_id)
+{
+    $is_required = true;
+    if (fn_allowed_for('ULTIMATE') && fn_ult_is_shared_product($product_id) == 'Y') {
+        $is_required = false;
+    }
+
+    /**
+     * Executes after company condition requirement is determined when selecting a product data,
+     * allows to modify the requirement.
+     *
+     * @param int|string $product_id  Product ID to get product data
+     * @param bool       $is_required Whether the company_condition is required
+     */
+    fn_set_hook('is_product_company_condition_required_post', $product_id, $is_required);
+
+    return $is_required;
+}
+
+/**
+ * Clones layout
+ *
+ * @param array    $data             This parameter is not used
+ * @param int      $company_id       Source company ID.
+ *                                   This parameter is deprecated and will be removed in v5.0.0.
+ *                                   Use $storefront_id instead.
+ * @param int      $to_company_id    Destination company ID.
+ *                                   This parameter is deprecated and will be removed in v5.0.0.
+ *                                   Use $to_storefront_id instead.
+ * @param int|null $storefront_id    Source storefront ID
+ * @param int|null $to_storefront_id Destination storefront ID
+ *
+ * @return bool
+ */
+function fn_clone_layouts($data, $company_id, $to_company_id, $storefront_id = null, $to_storefront_id = null)
+{
+    // We need to clone logos, not attached to any layout too
+    $logos = fn_get_logos($company_id, 0, null, $storefront_id);
+
+    if (!empty($logos)) {
+        Registry::set('runtime.allow_upload_external_paths', true);
+
+        foreach ($logos as $type => $logo) {
+            fn_update_logo(
+                [
+                    'type'       => $logo['type'],
+                    'layout_id'  => $logo['layout_id'],
+                    'image_path' => empty($logo['image']['absolute_path'])
+                        ? ''
+                        : $logo['image']['absolute_path'],
+                    'style_id' => $logo['style_id']
+                        ? $logo['style_id']
+                        : '',
+                ],
+                $logo['company_id']
+                    ? $to_company_id
+                    : $logo['company_id'],
+                $logo['storefront_id']
+                    ? $to_storefront_id
+                    : $logo['storefront_id']
+            );
+        }
+
+        Registry::set('runtime.allow_upload_external_paths', false);
+    }
+
+    // clean up layouts
+    $layouts = Layout::instance($to_company_id, [], $to_storefront_id)->getList();
+    foreach ($layouts as $layout) {
+        Layout::instance($to_company_id, [], $to_storefront_id)->delete($layout['layout_id']);
+    }
+
+    return Layout::instance($company_id, [], $storefront_id)->copy($to_company_id, $to_storefront_id);
+}
+
+/**
+ * Gets storefront name.
+ * Used for storefronts picker only.
+ *
+ * @param int $storefront_id Storefront idenfitier
+ *
+ * @internal
+ * @return \Tygh\Storefront\Storefront
+ */
+function fn_get_storefront($storefront_id)
+{
+    /** @var \Tygh\Storefront\Repository $storefront_repository */
+    $storefront_repository = \Tygh::$app['storefront.repository'];
+    $storefront = $storefront_repository->findById($storefront_id);
+
+    if (!$storefront) {
+        /** @var \Tygh\Storefront\Factory $storefront_factory */
+        $storefront_factory = Tygh::$app['storefront.factory'];
+        $storefront = $storefront_factory->getBlank();
+    }
+
+    return $storefront;
+}
+
+/**
+ * Gets products count by companies
+ *
+ * @param int[] $company_ids Company IDs, allows to limit query by specified companies, all allowed company will be get by default
+ *
+ * @return array<int, int> Companies and their products count list
+ */
+function fn_get_companies_active_products_count(array $company_ids = [])
+{
+    $company_ids = array_filter($company_ids);
+    $products_condition = (empty($company_ids)) ? '' : db_quote(' AND products.company_id IN (?n)', $company_ids);
+    $params = [
+        'only_short_fields' => true,
+        'extend'            => ['companies', 'sharing'],
+        'status'            => 'A',
+        'get_conditions'    => true,
+        'only_for_counting' => true
+    ];
+
+    list(, $joins, $conditions) = fn_get_products($params);
+
+    $conditions .= $products_condition;
+    $fields = [
+        'company_id'     => 'products.company_id',
+        'products_count' => 'COUNT(DISTINCT products.product_id) as products_count'
+    ];
+
+    $result = db_get_hash_single_array(
+        'SELECT ?p'
+        . ' FROM ?:products as products ?p'
+        . ' WHERE 1=1?p'
+        . ' GROUP BY products.company_id',
+        ['company_id', 'products_count'],
+        implode(', ', $fields),
+        $joins,
+        $conditions
+    );
+
+    foreach ($company_ids as $company_id) {
+        $company_id = (int) $company_id;
+
+        if (isset($result[$company_id])) {
+            continue;
+        }
+
+        $result[$company_id] = 0;
+    }
+
+    return $result;
+}
+
+/**
+ * Gets user with parameter 'is_root' for specified company
+ *
+ * @param int                            $company_id Company identifier
+ * @param array<string, string|int>|null $auth       Auth data
+ *
+ * @return int User with ID is root
+ */
+function fn_get_company_root_admin_user_id($company_id, array $auth = null)
+{
+    if (empty($company_id)) {
+        return 0;
+    }
+
+    if ($auth === null) {
+        $auth = Tygh::$app['session']['auth'];
+    }
+
+    $params = [
+        'company_id' => $company_id,
+        'is_root'    => 'Y'
+    ];
+
+    list($users,) = fn_get_users($params, $auth);
+
+    if (empty($users)) {
+        return 0;
+    }
+
+    $user = reset($users);
+
+    return $user['user_id'];
 }

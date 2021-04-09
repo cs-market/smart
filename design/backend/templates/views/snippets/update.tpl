@@ -1,11 +1,18 @@
-{script src="js/tygh/email_templates.js"}
+{script src="js/tygh/template_editor.js"}
 
 {$id = $snippet->getId()}
+
+{capture name="mainbox"}
 
 {capture name="tabsbox"}
 
     <div id="content_snippet_general">
-        <form action="{""|fn_url}" method="post" enctype="multipart/form-data" name="snippet_form_{$id}" class="cm-ajax cm-form-dialog-closer form-horizontal">
+        <form action="{""|fn_url}"
+              method="post"
+              enctype="multipart/form-data"
+              name="snippet_form_{$id}"
+              class="{if $target == "popup"}cm-ajax cm-form-dialog-closer{/if} form-horizontal"
+        >
 
             <input type="hidden" name="result_ids" value="{$result_ids}" />
             <input type="hidden" name="return_url" value="{$return_url}" />
@@ -44,17 +51,57 @@
                 </fieldset>
             <!--content_tab_snippet_{$id}--></div>
 
-            <div class="buttons-container" id="content_tab_snippet_buttons_{$id}">
+            {capture name="buttons"}
                 {if $id && $snippet->isModified()}
-                    {assign var="r_url" value=$config.current_url|escape:url}
+                    {$r_url = $config.current_url|escape:url}
+                    {if $target == "popup"}
+                        {$restore_btn_class = "cm-confirm cm-ajax"}
+                        {$restore_btn_data = ["data-ca-target-id" => "content_tab_snippet_{$id},content_tab_snippet_buttons_{$id}", "data-ca-confirm-text" => __("text_restore_question")]}
+                        {$restore_btn_dropdown_class = "droptop"}
+                    {else}
+                        {$restore_btn_class = "cm-confirm"}
+                        {$restore_btn_data = ["data-ca-confirm-text" => __("text_restore_question")]}
+                        {$restore_btn_dropdown_class = ""}
+                    {/if}
                     {capture name="tools_list"}
-                        <li>{btn type="text" href="snippets.restore?snippet_id=$id&return_url=$r_url" class="cm-confirm cm-ajax" data=["data-ca-target-id" => "content_tab_snippet_{$id},content_tab_snippet_buttons_{$id}", "data-ca-confirm-text" => "{__("text_restore_question")}"] text=__("restore") method="POST"}</li>
+                        <li>
+                            {btn type="text"
+                                href="snippets.restore?snippet_id={$id}&return_url={$r_url}"
+                                class=$restore_btn_class
+                                data=$restore_btn_data
+                                text=__("restore")
+                                method="POST"
+                            }
+                        </li>
                     {/capture}
-                    {dropdown content=$smarty.capture.tools_list class="cm-tab-tools droptop" id="tools_general"}
+                    {dropdown content=$smarty.capture.tools_list
+                        class="cm-tab-tools {$restore_btn_dropdown_class}"
+                        id="tools_general"
+                    }
                 {/if}
 
-                {include file="buttons/save_cancel.tpl" but_name="dispatch[snippets.update]" cancel_action="close" save=$id}
-            <!--content_tab_snippet_buttons_{$id}--></div>
+                {if $target == "popup"}
+                    {include file="buttons/save_cancel.tpl"
+                        but_name="dispatch[snippets.update]"
+                        cancel_action="close"
+                        save=$id
+                    }
+                {else}
+                    {include file="buttons/save_cancel.tpl"
+                        but_role="submit-link"
+                        but_name="dispatch[snippets.update]"
+                        but_target_form="snippet_form_{$id}"
+                        save=$id
+                    }
+                {/if}
+
+            {/capture}
+
+            {if $target == "popup"}
+                <div class="buttons-container" id="content_tab_snippet_buttons_{$id}">
+                    {$smarty.capture.buttons nofilter}
+                <!--content_tab_snippet_buttons_{$id}--></div>
+            {/if}
         </form>
     </div>
     <script type="text/javascript">
@@ -77,4 +124,15 @@
 
 {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox track=true}
 
+{/capture}
 
+{if $target == "popup"}
+    {$smarty.capture.mainbox nofilter}
+{else}
+    {include file="common/mainbox.tpl"
+        title_start=__("editing_snippet")
+        title_end=$snippet->getName()
+        content=$smarty.capture.mainbox
+        buttons=$smarty.capture.buttons
+    }
+{/if}

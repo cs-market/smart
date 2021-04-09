@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_data_premoderation.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.11.5/addons/vendor_data_premoderation.po\n"
+"X-Crowdin-File-ID: 3666\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::vendor_data_premoderation"
 msgid "Vendor data premoderation"
@@ -19,6 +19,10 @@ msgstr "Verkoper gegevens moderatie"
 msgctxt "Addons::description::vendor_data_premoderation"
 msgid "Lets you pre-moderate vendors activity"
 msgstr "Activiteiten van leveranciers modereren"
+
+msgctxt "Languages::vendor_data_premoderation.notification_for_deleted_statuses"
+msgid "Vendor Data Premoderation add-on has been disabled. Products with  the \"Requires approval\" or \"Disapproved\" statuses no longer have any status. These products won't appear to customers until you or your vendors set some other status for them. If you activate the add-on again, the statusless products will get their statuses back. If you uninstall the add-on, all products will get a correct status automatically."
+msgstr "Add-on voor leveranciersgegevens Premoderatie is uitgeschakeld. Producten met de status 'Vereist goedkeuring' of 'Afgekeurd' hebben geen status meer. Deze producten verschijnen niet voor klanten totdat u of uw leveranciers een andere status voor hen instellen. Als u de add-on opnieuw activeert, krijgen de statusloze producten hun status terug. Als u de add-on verwijdert, krijgen alle producten automatisch de juiste status."
 
 msgctxt "Languages::product_approval_menu_description"
 msgid "Manage individual products or group of products supplied by the store vendors."
@@ -93,78 +97,198 @@ msgid "Are you sure that you want to update the profile? Information about your 
 msgstr "Weet u zeker dat u het profiel wilt bijwerken? Informatie over uw bedrijf zal niet beschikbaar zijn in het klanten gedeelte totdat de beheerder het goedkeurt."
 
 msgctxt "Languages::privileges.manage_product_premoderation"
-msgid "Approve vendor products"
-msgstr "Producten van verkoper goedkeuren"
+msgid "Can manage"
+msgstr "Aankunnen"
+
+msgctxt "Languages::privilege_groups.product_premoderation"
+msgid "Product approval"
+msgstr "Product goedkeuring"
 
 msgctxt "SettingsSections::vendor_data_premoderation::general"
 msgid "General"
 msgstr "Algemeen"
 
+msgctxt "SettingsSections::vendor_data_premoderation::products"
+msgid "Products"
+msgstr ""
+
 msgctxt "SettingsOptions::vendor_data_premoderation::products_prior_approval"
-msgid "Approval is required for newly created products"
-msgstr "Goedkeuring is vereist voor nieuw aangemaakte producten"
+msgid "Approval of newly-created products"
+msgstr ""
 
 msgctxt "SettingsOptions::vendor_data_premoderation::products_updates_approval"
-msgid "Approve product info updates"
-msgstr "Updates van product goedkeuren"
+msgid "Approval of product info updates"
+msgstr ""
 
 msgctxt "SettingsOptions::vendor_data_premoderation::vendor_profile_updates_approval"
-msgid "Approve vendor profile updates"
-msgstr "Updates aan het verkopersprofiel goedkeuren"
+msgid "Approval of vendor profile updates"
+msgstr ""
 
-msgctxt "SettingsTooltips::vendor_data_premoderation::products_prior_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "\"Geen\" - deze optie is uitgeschakeld voor alle verkopers; 'Aangepast' - de optie is ingeschakeld op een verkoper detailpagina (de plug-ins tab); \"Alle verkopers\" - de optie is ingeschakeld voor alle verkopers."
+msgctxt "SettingsOptions::vendor_data_premoderation::product_approval_notifications"
+msgid "Notify vendors about product moderation results"
+msgstr "Informeer leveranciers over resultaten van productmoderatie"
 
-msgctxt "SettingsTooltips::vendor_data_premoderation::products_updates_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "\"Geen\" - deze optie is uitgeschakeld voor alle verkopers; 'Aangepast' - de optie is ingeschakeld op een verkoper detailpagina (de plug-ins tab); \"Alle verkopers\" - de optie is ingeschakeld voor alle verkopers."
-
-msgctxt "SettingsTooltips::vendor_data_premoderation::vendor_profile_updates_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "\"Geen\" - deze optie is uitgeschakeld voor alle verkopers; 'Aangepast' - de optie is ingeschakeld op een verkoper detailpagina (de plug-ins tab); \"Alle verkopers\" - de optie is ingeschakeld voor alle verkopers."
+msgctxt "SettingsOptions::vendor_data_premoderation::product_premoderation_fields"
+msgid "Require approval for updates of"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::none"
-msgid "None"
-msgstr "Geen"
+msgid "Isn't required"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::custom"
-msgid "Custom"
-msgstr "Aangepast"
+msgid "Required for some vendors"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::all"
-msgid "All vendors"
-msgstr "Alle verkopers"
+msgid "Required for all vendors"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::none"
-msgid "None"
-msgstr "Geen"
+msgid "Isn't required"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::custom"
-msgid "Custom"
-msgstr "Aangepast"
+msgid "Required for some vendors"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::all"
-msgid "All vendors"
-msgstr "Alle verkopers"
+msgid "Required for all vendors"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::none"
-msgid "None"
-msgstr "Geen"
+msgid "Isn't required"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::custom"
-msgid "Custom"
-msgstr "Aangepast"
+msgid "Required for some vendors"
+msgstr ""
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::all"
-msgid "All vendors"
-msgstr "Alle verkopers"
+msgid "Required for all vendors"
+msgstr ""
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::none"
+msgid "Don't notify"
+msgstr "Niet op de hoogte brengen"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::email"
+msgid "Send e-mail"
+msgstr "Stuur e-mail"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::notifications_center"
+msgid "Display a notification in the Notifications center"
+msgstr "Geef een melding weer in het Meldingencentrum"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::email_notifications_center"
+msgid "Send e-mail and display a notification in the Notifications center"
+msgstr "Stuur een e-mail en geef een melding weer in het Meldingencentrum"
 
 msgctxt "Languages::email_template.vendor_data_premoderation_notification"
 msgid "Vendor premoderation"
-msgstr ""
+msgstr "Premoderation verkoper"
 
 msgctxt "Languages::vendor_data_premoderation.exclude_disapproved_products"
 msgid "Exclude disapproved products"
+msgstr "Afgekeurde producten uitsluiten"
+
+msgctxt "Languages::vendor_data_premoderation.product_status.requires_approval"
+msgid "Requires approval"
+msgstr "Vereist goedkeuring"
+
+msgctxt "Languages::vendor_data_premoderation.product_status.disapproved"
+msgid "Disapproved"
+msgstr "Afgekeurd"
+
+msgctxt "Languages::vendor_data_premoderation.require_approval"
+msgid "Products on moderation"
+msgstr "Producten op moderatie"
+
+msgctxt "Languages::vendor_data_premoderation.require_vendor_action"
+msgid "Disapproved products"
+msgstr "Afgekeurde producten"
+
+msgctxt "Languages::vendor_data_premoderation.disapproved"
+msgid "Disapproved"
+msgstr "Afgekeurd"
+
+msgctxt "Languages::vendor_data_premoderation.approve_product_btn"
+msgid "Approve product"
+msgstr "Product goedkeuren"
+
+msgctxt "Languages::vendor_data_premoderation.approve_product"
+msgid "Approve \"[product]\""
+msgstr "Goedkeuren “[product]”"
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_product_btn"
+msgid "Disapprove product"
+msgstr "Product afkeuren"
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_product"
+msgid "Disapprove \"[product]\""
+msgstr "Afkeuren “[product]”"
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_products"
+msgid "Disapprove products"
+msgstr "Producten afkeuren"
+
+msgctxt "Languages::vendor_data_premoderation.disapproval_reason"
+msgid "Disapproval reason"
+msgstr "Reden van afkeuring"
+
+msgctxt "Languages::vendor_data_premoderation.enter_disapproval_reason"
+msgid "Enter the reason for disapproval and save the changes."
+msgstr "Voer de reden voor de afkeuring in en sla de wijzigingen op."
+
+msgctxt "Languages::vendor_data_premoderation.notification.products_require_approval.title"
+msgid "You have [n] product that requires your approval|You have [n] products that require your approval"
+msgstr "U hebt [n] product dat uw goedkeuring vereist|U hebt [n] producten die uw goedkeuring vereisen"
+
+msgctxt "Languages::vendor_data_premoderation.notification.products_require_approval.message"
+msgid "This product is pending for your approval since [since]. Click here to view this product.|These products are pending for your approval since [since]. Click here to view these products."
+msgstr "Dit product is in afwachting van uw goedkeuring sinds [since]. Klik hier om dit product te bekijken. |Deze producten zijn in afwachting van uw goedkeuring sinds [since]. Klik hier om deze producten te bekijken."
+
+msgctxt "Languages::vendor_data_premoderation.notification.approved.title"
+msgid "Your product has been approved|Your products have been approved"
+msgstr "Uw product is goedgekeurd|Uw producten zijn goedgekeurd"
+
+msgctxt "Languages::vendor_data_premoderation.notification.approved.message"
+msgid "\"[product]\" has been approved by the store administration and added to the product catalog. Click here to view this product.|[n] products have been approved by the store administration and added to the product catalog. Click here to view these products."
+msgstr "\"[product]\" is goedgekeurd door de winkeladministratie en toegevoegd aan de productcatalogus. Klik hier om dit product te bekijken.|[n] producten zijn goedgekeurd door de winkeladministratie en toegevoegd aan de productcatalogus. Klik hier om deze producten te bekijken."
+
+msgctxt "Languages::vendor_data_premoderation.notification.disapproved.title"
+msgid "Your product has been disapproved|Your products have been disapproved"
+msgstr "Uw product is afgekeurd|Uw producten zijn afgekeurd"
+
+msgctxt "Languages::vendor_data_premoderation.notification.disapproved.message"
+msgid "\"[product]\" has been disapproved by the store administration. Click here to view this product.|[n] products have been disapproved by the store administration. Click here to view these products."
+msgstr "\"[product]\" is afgekeurd door de winkeladministratie. Klik hier om dit product te bekijken.|[n] producten zijn afgekeurd door de winkeladministratie. Klik hier om deze producten te bekijken."
+
+msgctxt "Languages::vendor_data_premoderation.products_sent_to_premoderation"
+msgid "Your changes have been saved. Before your product is added to the product catalog, it must be approved by the store administration. Follow <a href=\"[product_approval_url]\">this link</a> to view products that require approval.|Your changes have been saved. Before your products are added to the product catalog, they must be approved by the store administration. Follow <a href=\"[product_approval_url]\">this link</a> to view products that require approval."
+msgstr "Je veranderingen zijn bewaard. Voordat uw product wordt toegevoegd aan de productcatalogus, moet het worden goedgekeurd door de winkeladministratie. Volg <a href=\"[product_approval_url]\">deze link</a> om producten te bekijken die goedkeuring behoeven.|Uw wijzigingen zijn opgeslagen. Voordat uw producten aan de productcatalogus worden toegevoegd, moeten ze worden goedgekeurd door de winkeladministratie. Volg <a href=\"[product_approval_url]\">deze link</a> om producten te bekijken die goedkeuring behoeven."
+
+msgctxt "Languages::vendor_data_premoderation.event.product_status.approved.name"
+msgid "Vendor data premoderation: your product was approved"
+msgstr "Premoderatie van gegevens van leveranciers: uw product is goedgekeurd"
+
+msgctxt "Languages::vendor_data_premoderation.event.product_status.disapproved.name"
+msgid "Vendor data premoderation: your product was disapproved"
+msgstr "Premodering van leveranciersgegevens: uw product is afgekeurd"
+
+msgctxt "Languages::vendor_data_premoderation.approval_info_text"
+msgid "If approval is required only for some vendors, you'll be able to set what vendors need moderation on the Add-ons tab of the vendor editing page."
+msgstr ""
+
+msgctxt "Languages::internal_template.vendor_data_premoderation_product_approved"
+msgid "Vendor data premoderation: your product was approved"
+msgstr ""
+
+msgctxt "Languages::internal_template.vendor_data_premoderation_product_disapproved"
+msgid "Vendor data premoderation: your product was disapproved"
+msgstr ""
+
+msgctxt "Languages::vendor_data_premoderation.moderation"
+msgid "Moderation"
 msgstr ""
 

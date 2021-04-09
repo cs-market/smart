@@ -1,6 +1,5 @@
 {script src="js/tygh/tabs.js"}
 {script src="js/lib/bootstrap_switch/js/bootstrapSwitch.js"}
-{style src="lib/bootstrap_switch/stylesheets/bootstrapSwitch.css"}
 
 {capture name="sidebar"}
 
@@ -15,7 +14,7 @@
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 {if $subscribers}
 <div class="table-wrapper">
-    <table width="100%" class="table table-middle">
+    <table width="100%" class="table table-middle table--relative">
     <thead>
     <tr>
         <th width="1%">

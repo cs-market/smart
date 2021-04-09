@@ -5,19 +5,17 @@ msgstr ""
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.8.2/addons/paypal_adaptive.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"X-Crowdin-File: /release-4.11.3/addons/paypal_adaptive.po\n"
+"PO-Revision-Date: 2020-02-04 07:11\n"
 
 msgctxt "Addons::name::paypal_adaptive"
-msgid "PayPal Adaptive Payments [Deprecated]"
+msgid "PayPal Adaptive Payments"
 msgstr ""
 
 msgctxt "Addons::description::paypal_adaptive"
-msgid "Adaptive Payments can't be used for new integrations. We recommend using the <b>PayPal for Marketplaces</b> add-on instead.<br />This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
+msgid "This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
 msgstr ""
 
 msgctxt "Languages::paypal_api_username"
@@ -34,6 +32,10 @@ msgstr ""
 
 msgctxt "Languages::paypal_adaptive.paypal_email"
 msgid "PayPal Business Account email"
+msgstr ""
+
+msgctxt "Languages::paypal_adaptive.vendor.paypal_email"
+msgid "PayPal Account email"
 msgstr ""
 
 msgctxt "Languages::pp_adaptive_payments"
@@ -193,7 +195,7 @@ msgid "Verified"
 msgstr ""
 
 msgctxt "Languages::paypal_adaptive_auto_info_data_verification"
-msgid "Use this link to get E-mail verification status of your vendors via CRON:"
+msgid "Use the following line to run the script to get E-mail verification status of your vendors according to schedule:"
 msgstr ""
 
 msgctxt "Languages::paypal_adaptive_statuses_updated_successfully"
@@ -264,6 +266,10 @@ msgctxt "Languages::ttc_paypal_adaptive.paypal_email"
 msgid "The email of your PayPal Business Account. A Personal Account email won't work."
 msgstr ""
 
+msgctxt "Languages::ttc_paypal_adaptive.vendor.paypal_email"
+msgid "The email of your PayPal account."
+msgstr ""
+
 msgctxt "Languages::addons.paypal_adaptive.paypal_workflow"
 msgid "PayPal workflow"
 msgstr ""
@@ -290,6 +296,10 @@ msgstr ""
 
 msgctxt "Languages::addons.paypal_adaptive.payment_type_notice"
 msgid "Chained payments can't be used if the <a href=\"[url]\" target=\"_blank\">PayPal Adaptive Payments</a> add-on is configured to collect both order commission and unpaid payouts."
+msgstr ""
+
+msgctxt "Languages::addons.paypal_adaptive.primary_email_notice"
+msgid "The email of your PayPal Business Account. A Personal Account email won't work."
 msgstr ""
 
 msgctxt "Languages::addons.paypal_adaptive.commission_includes"

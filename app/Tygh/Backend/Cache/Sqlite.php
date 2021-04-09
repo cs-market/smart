@@ -1,21 +1,21 @@
 <?php
 /***************************************************************************
-*                                                                          *
-*   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
-*                                                                          *
-* This  is  commercial  software,  only  users  who have purchased a valid *
-* license  and  accept  to the terms of the  License Agreement can install *
-* and use this program.                                                    *
-*                                                                          *
-****************************************************************************
-* PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
-* "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
-****************************************************************************/
+ *                                                                          *
+ *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
+ *                                                                          *
+ * This  is  commercial  software,  only  users  who have purchased a valid *
+ * license  and  accept  to the terms of the  License Agreement can install *
+ * and use this program.                                                    *
+ *                                                                          *
+ ****************************************************************************
+ * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
+ * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
+ ****************************************************************************/
 
 namespace Tygh\Backend\Cache;
 
 use Tygh\Exceptions\ClassNotFoundException;
-use Tygh\Registry;
+use PDO;
 
 class Sqlite extends ABackend
 {
@@ -28,68 +28,19 @@ class Sqlite extends ABackend
     private $sqlite_text;
     private $sqlite_blob;
 
-
-    public function set($name, $data, $condition, $cache_level = NULL)
-    {
-        $fname = $name . '.' . $cache_level;
-
-        if (!empty($data)) {
-            $serialize_data = serialize($data);
-            $cache = (($cache_level == Registry::cacheLevel('time')) ? TIME + $condition : 0);
-
-            $st = $this->db->prepare("REPLACE INTO cache (name, company_id, data, tags, expiry) VALUES (:name, :company_id, :data, :tags, :expiry)");
-            $st->bindParam(':name', $fname, $this->sqlite_text);
-            $st->bindParam(':company_id', $this->_company_id, $this->sqlite_integer);
-            $st->bindParam(':data', $serialize_data, $this->sqlite_blob);
-            $st->bindParam(':tags', $name, $this->sqlite_text);
-            $st->bindParam(':expiry', $cache, $this->sqlite_integer);
-            $st->execute();
-        }
-    }
-
-    public function get($name, $cache_level = NULL)
-    {
-        $fname = $name . '.' . $cache_level;
-
-        $expiry_condition = ($cache_level == Registry::cacheLevel('time')) ? db_quote(" AND expiry > ?i", TIME) : '';
-        $res = $this->_dbFetch("SELECT data, expiry FROM cache WHERE name = '$fname' AND company_id = " . $this->_company_id . $expiry_condition);
-
-        if (!empty($name) && !empty($res)) {
-            $_cache_data = (!empty($res['data'])) ? @unserialize($res['data']) : false;
-            if ($_cache_data !== false) {
-                return array($_cache_data);
-            }
-
-            // clean up the cache
-            $this->db->query("DELETE FROM cache WHERE name = '$fname' AND company_id = " . $this->_company_id);
-        }
-
-        return false;
-    }
-
-    public function clear($tags)
-    {
-        if (!empty($tags)) {
-            $this->db->query("DELETE FROM cache WHERE tags IN ('" . implode("', '", $tags) . "')");
-        }
-
-        return true;
-    }
-
-    public function cleanup()
-    {
-        // clear all stores cache
-        $this->db->query("DELETE FROM cache");
-
-        return true;
-    }
-
+    /**
+     * Sqlite constructor.
+     *
+     * @param $config
+     *
+     * @throws \Tygh\Exceptions\ClassNotFoundException
+     */
     public function __construct($config)
     {
-        $this->_config = array(
+        $this->_config = [
             'store_prefix' => !empty($config['store_prefix']) ? $config['store_prefix'] : null,
-            'dir_cache' => $config['dir']['cache_registry']
-        );
+            'dir_cache'    => $config['dir']['cache_registry']
+        ];
 
         $init_db = false;
         if (!file_exists($this->_dirCache() . 'cache.db')) {
@@ -111,12 +62,10 @@ class Sqlite extends ABackend
             $this->sqlite_integer = SQLITE3_INTEGER;
             $this->sqlite_text = SQLITE3_TEXT;
             $this->sqlite_blob = SQLITE3_BLOB;
-
         } elseif (class_exists('\\PDO') && $this->pdo_sqlite) {
             $this->sqlite_integer = PDO::PARAM_INT;
             $this->sqlite_text = PDO::PARAM_STR;
             $this->sqlite_blob = PDO::PARAM_LOB;
-
         }
 
         parent::__construct($config);
@@ -124,10 +73,75 @@ class Sqlite extends ABackend
         return true;
     }
 
+    /** @inheritDoc */
+    public function set($name, $data, $condition, $cache_level = null, $ttl = null)
+    {
+        $fname = $name . '.' . $cache_level;
+
+        if (!empty($data)) {
+            $serialize_data = serialize($data);
+            $expiry_time = $this->getCacheExpiryTime($condition, $cache_level, $ttl, 0);
+
+            $st = $this->db->prepare("REPLACE INTO cache (name, company_id, data, tags, expiry) VALUES (:name, :company_id, :data, :tags, :expiry)");
+            $st->bindParam(':name', $fname, $this->sqlite_text);
+            $st->bindParam(':company_id', $this->_company_id, $this->sqlite_integer);
+            $st->bindParam(':data', $serialize_data, $this->sqlite_blob);
+            $st->bindParam(':tags', $name, $this->sqlite_text);
+            $st->bindParam(':expiry', $expiry_time, $this->sqlite_integer);
+            $st->execute();
+        }
+    }
+
+    /** @inheritDoc */
+    public function get($name, $cache_level = null)
+    {
+        $fname = $name . '.' . $cache_level;
+
+        $expiry_condition = sprintf(' AND (expiry = %d OR expiry > %d)', 0, TIME);
+        $res = $this->_dbFetch("SELECT data, expiry FROM cache WHERE name = '$fname' AND company_id = " . $this->_company_id . $expiry_condition);
+
+        if (!empty($name) && !empty($res)) {
+            $_cache_data = (!empty($res['data'])) ? @unserialize($res['data']) : false;
+
+            if ($_cache_data !== false) {
+                return [$_cache_data];
+            }
+
+            // clean up the cache
+            $this->db->query("DELETE FROM cache WHERE name = '$fname' AND company_id = " . $this->_company_id);
+        }
+
+        return false;
+    }
+
+    /** @inheritDoc */
+    public function clear($tags)
+    {
+        if (!empty($tags)) {
+            $this->db->query("DELETE FROM cache WHERE tags IN ('" . implode("', '", $tags) . "')");
+        }
+
+        return true;
+    }
+
+    /** @inheritDoc */
+    public function cleanup()
+    {
+        // clear all stores cache
+        $this->db->query("DELETE FROM cache");
+
+        return true;
+    }
+
+    /**
+     * @param $query
+     *
+     * @return array
+     */
     private function _dbFetch($query)
     {
         $res = $this->db->query($query);
-        $fe = array();
+        $fe = [];
         if (!empty($res)) {
             if (get_class($this->db) == 'SQLite3') {
                 $fe = $res->fetchArray($this->db_fetch);
@@ -139,6 +153,9 @@ class Sqlite extends ABackend
         return $fe;
     }
 
+    /**
+     * @return bool
+     */
     private function _dbClose()
     {
         if (get_class($this->db) == 'SQLite3') {
@@ -152,6 +169,10 @@ class Sqlite extends ABackend
         }
     }
 
+    /**
+     * @return mixed
+     * @throws \Tygh\Exceptions\ClassNotFoundException
+     */
     private function _dbInit()
     {
         $this->pdo_sqlite = false;
@@ -188,7 +209,9 @@ class Sqlite extends ABackend
 
     /**
      * Sets timeout for waiting if SQLite database is busy.
-     * @param  int     $msec Timeout in milliseconds
+     *
+     * @param int $msec Timeout in milliseconds
+     *
      * @return boolean
      */
     private function _setTimeout($msec)
@@ -206,6 +229,7 @@ class Sqlite extends ABackend
 
     /**
      * Gets directory, where cache database is stored
+     *
      * @return string directory prefix
      */
     private function _dirCache()

@@ -89,7 +89,7 @@
     <label class="control-label" for="position">{__("wt_watermark_position")}:</label>
     <div class="select-field wt_position_bg controls">
         <div class="table-wrapper">
-            <table class="table table-middle table-bordered" style="width: 222px;">
+            <table class="table table-middle table--relative table-bordered" style="width: 222px;">
             <tr>
                 <td class="center">
                     <input name="wt_settings[position]" type="radio" value="left_top" {if $wt_settings.position == "left_top"}checked="checked"{/if}>

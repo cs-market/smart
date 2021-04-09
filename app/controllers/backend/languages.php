@@ -12,10 +12,9 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Settings;
 use Tygh\Languages\Languages;
 use Tygh\Languages\Values as LanguageValues;
+use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -29,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //
     if ($mode == 'm_update_variables') {
         if (is_array($_REQUEST['lang_data'])) {
-            fn_update_lang_var($_REQUEST['lang_data']);
+            LanguageValues::updateLangVar($_REQUEST['lang_data']);
         }
 
         $suffix = '.translations';
@@ -52,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'update_variables') {
         if (!empty($_REQUEST['new_lang_data'])) {
             $params = array('clear' => false);
-            foreach (fn_get_translation_languages() as $lc => $_v) {
-                fn_update_lang_var($_REQUEST['new_lang_data'], $lc, $params);
+            foreach (Languages::getAll() as $lc => $_v) {
+                LanguageValues::updateLangVar($_REQUEST['new_lang_data'], $lc, $params);
             }
         }
 
@@ -88,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'm_delete') {
 
         if (!empty($_REQUEST['lang_ids'])) {
-            fn_delete_languages($_REQUEST['lang_ids']);
+            Languages::deleteLanguages($_REQUEST['lang_ids']);
         }
     }
 
@@ -104,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
 
-            fn_save_languages_integrity();
+            Languages::saveLanguagesIntegrity();
         }
     }
 
@@ -136,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if ($lc !== false) {
-                fn_save_languages_integrity();
+                Languages::saveLanguagesIntegrity();
             }
         }
 
@@ -201,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
 
                 fn_tools_update_status($_REQUEST);
-                fn_save_languages_integrity();
+                Languages::saveLanguagesIntegrity();
 
                 if (defined('AJAX_REQUEST')) {
                     Tygh::$app['ajax']->assign('force_redirection', fn_url('languages.manage'));
@@ -210,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         } else {
             fn_tools_update_status($_REQUEST);
-            fn_save_languages_integrity();
+            Languages::saveLanguagesIntegrity();
         }
     }
 
@@ -232,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $lc = Languages::update($new_language, 0);
 
             if ($lc !== false) {
-                fn_save_languages_integrity();
+                Languages::saveLanguagesIntegrity();
             }
         }
     }
@@ -249,15 +248,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'delete_language') {
 
         if (!empty($_REQUEST['lang_id'])) {
-            fn_delete_languages($_REQUEST['lang_id']);
+            Languages::deleteLanguages($_REQUEST['lang_id']);
         }
 
         return array(CONTROLLER_STATUS_REDIRECT, 'languages.manage?selected_section=languages');
     }
 
-    $q = (empty($_REQUEST['q'])) ? '' : $_REQUEST['q'];
+    if (isset($_REQUEST['redirect_url'])) {
+        $redirect_url = $_REQUEST['redirect_url'];
+    } else {
+        $q = empty($_REQUEST['q'])
+            ? ''
+            : $_REQUEST['q'];
+        $redirect_url = 'languages' . $suffix . '?q=' . $q;
+    }
 
-    return array(CONTROLLER_STATUS_OK, 'languages' . $suffix . '?q=' . $q);
+    return [CONTROLLER_STATUS_OK, $redirect_url];
 }
 
 //
@@ -300,7 +306,7 @@ if ($mode == 'manage') {
 
     $view = Tygh::$app['view'];
 
-    $languages = fn_get_translation_languages(true);
+    $languages = Languages::getAll(true);
     $view->assign('langs', $languages);
     $view->assign('countries', fn_get_simple_countries(false, DESCR_SL));
 
@@ -308,7 +314,7 @@ if ($mode == 'manage') {
     $view = Tygh::$app['view'];
     $langs_meta = Languages::getLangPacksMeta();
 
-    $languages = fn_get_translation_languages(true);
+    $languages = Languages::getAll(true);
 
     $view->assign('langs_meta', $langs_meta);
     $view->assign('countries', fn_get_simple_countries(false, DESCR_SL));
@@ -359,39 +365,4 @@ if ($mode == 'manage') {
     }
 
     Tygh::$app['view']->assign('lang_data', $lang_data);
-}
-
-/**
- * @deprecated
- *
- * Updates language
- *
- * @param array $language_data Language data
- * @param string $lang_id language id
- * @return string language id
- */
-function fn_update_language($language_data, $lang_id)
-{
-    return Languages::update($language_data, $lang_id);
-}
-
-/**
- * @deprecated
- *
- * Deletes language variablle
- *
- * @param array $names List of language variables go be deleted
- * @return boolean Always true
- */
-function fn_delete_language_variables($names)
-{
-    return LanguageValues::deleteVariables($names);
-}
-
-/**
- * @deprecated
- */
-function fn_get_language_variables($params, $items_per_page = 0, $lang_code = DESCR_SL)
-{
-    return LanguageValues::getVariables($params, $items_per_page, $lang_code);
 }

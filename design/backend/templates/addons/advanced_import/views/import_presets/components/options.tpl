@@ -7,6 +7,7 @@
             || $tab != $option.tab|default:"general"
             || $section != $option.section|default:"general"
             || $option.hidden
+            || $option.export_only
         }
             {continue}
         {/if}
@@ -26,7 +27,6 @@
                 {if $option.type == "checkbox"}
                     <input type="hidden" name="{$field_name_prefix}[{$option_id}]" value="N"/>
                     <input id="{$option_id}"
-                           class="checkbox"
                            type="checkbox"
                            name="{$field_name_prefix}[{$option_id}]"
                            value="Y"

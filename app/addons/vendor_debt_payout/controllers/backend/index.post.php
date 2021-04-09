@@ -21,7 +21,7 @@ use Tygh\VendorPayouts;
 
 if ($mode == 'index') {
     $vendor_id = Registry::get('runtime.company_id');
-    if (!$vendor_id) {
+    if (!$vendor_id || !defined('AJAX_REQUEST')) {
         return array(CONTROLLER_STATUS_OK);
     }
 

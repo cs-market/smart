@@ -9,7 +9,7 @@
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 
 {if $cities}
-    <table width="100%" class="table table-middle">
+    <table width="100%" class="table table-middle table--relative">
     <thead>
     <tr>
         {if $smarty.request.extended}
@@ -30,7 +30,7 @@
         <tr>
             {if $smarty.request.extended}
             <td>
-                <input type="checkbox" name="city_ids[]" value="{$city.city_id}" class="checkbox cm-item" />
+                <input type="checkbox" name="city_ids[]" value="{$city.city_id}" class="cm-item" />
             </td>
             {/if}
             {hook name="cities:table_content"}
@@ -80,7 +80,7 @@
         {/if}
     {/foreach}
 
-    {assign var="_country" value=$search.country_code|default:$settings.General.default_country}
+    {assign var="_country" value=$search.country_code|default:$settings.Checkout.default_country}
     {foreach from=$states.$_country item="state"}
         {if $state.code == $search.state_code}
             {assign var="title" value="`$title` (`$state.state`)"}
@@ -158,7 +158,7 @@
 <form action="{""|fn_url}" name="cities_filter_form" method="get">
 <div class="sidebar-field">
 
-	{assign var="_country" value=$search.country_code|default:$settings.General.default_country}
+	{assign var="_country" value=$search.country_code|default:$settings.Checkout.default_country}
     <label>{__("country")}:</label>
 		<select name="country_code" class="cm-country cm-location-states" id="elm_countries">
 			<option value="">- {__("select_country")} -</option>

@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: vi\n"
-"X-Crowdin-File: /release-4.8.2/addons/data_feeds.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/data_feeds.po\n"
+"X-Crowdin-File-ID: 3568\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::data_feeds"
 msgid "Data feeds"
@@ -91,7 +91,7 @@ msgstr "Chỉnh sửa nguồn cấp dữ liệu"
 
 msgctxt "Languages::datafeed.description"
 msgid "Only the products that meet <strong>all</strong> of the conditions below will be exported:"
-msgstr ""
+msgstr "Only the products that meet <strong>all</strong> of the conditions below will be exported:"
 
 msgctxt "Languages::export_cron_hint"
 msgid "Use the following line to run the script according to schedule"
@@ -107,11 +107,11 @@ msgstr "Không thể kết nối với máy chủ FTP. Xin vui lòng kiểm tra 
 
 msgctxt "Languages::categories_in"
 msgid "Categories in"
-msgstr ""
+msgstr "Danh mục trong"
 
 msgctxt "Languages::products_in"
 msgid "Products in"
-msgstr ""
+msgstr "Sản phẩm trong"
 
 msgctxt "Languages::local_export"
 msgid "Download"
@@ -147,7 +147,7 @@ msgstr "Bỏ qua sản phẩm không hoạt động"
 
 msgctxt "Languages::data_feeds.exclude_shared_products"
 msgid "Exclude shared products"
-msgstr ""
+msgstr "Exclude shared products"
 
 msgctxt "Languages::general_settings"
 msgid "General settings"
@@ -171,9 +171,9 @@ msgstr "Không có dữ liệu được xuất"
 
 msgctxt "Languages::data_feeds.text_tooltip_field_name"
 msgid "The name of the column in the data feed file."
-msgstr ""
+msgstr "The name of the column in the data feed file."
 
 msgctxt "Languages::data_feeds.text_tooltip_field_type"
 msgid "The type of data from your store which will be exported to this column of the data feed file."
-msgstr ""
+msgstr "The type of data from your store which will be exported to this column of the data feed file."
 

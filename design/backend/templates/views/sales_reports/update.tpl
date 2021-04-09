@@ -27,7 +27,7 @@
 <div id="content_tables">
     {if $report.tables}
     <div class="table-responsive-wrapper">
-        <table class="table table-middle table-responsive">
+        <table class="table table-middle table--relative table-responsive">
         <thead>
             <tr>
                 <th class="center mobile-hide" width="1%">{include file="common/check_items.tpl"}</th>

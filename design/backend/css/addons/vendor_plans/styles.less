@@ -30,7 +30,7 @@
     
     &.active {
         background: #fff;
-        border: 1px solid #0088cc;
+        border: 1px solid @mainColor;
         box-shadow: 0 0 30px #B9B9B9;
     }
 }
@@ -53,7 +53,7 @@
     font-size: 11px;
     font-weight: 400;
     color: #fff;
-    background-color: #0088cc;
+    background-color: @mainColor;
     border-radius: 3px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
@@ -130,4 +130,28 @@
 .dashboard-activity {
     width: 100%;
     margin-top: 18px;
+}
+
+.vendor-plan {
+    &__storefronts-update {
+        &__messages {
+            margin-bottom: 40px;
+        }
+
+        &__message {
+            margin-bottom: 10px;
+        }
+    }
+}
+      
+.vendor-plans--storefront-list {
+    .control-group {
+        .control-label {
+            width: 400px;
+            float: left;
+            text-align: left;
+            margin-bottom: 5px;
+            margin-left: 20px;
+        }
+    }
 }

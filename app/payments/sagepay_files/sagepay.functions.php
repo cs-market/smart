@@ -36,56 +36,34 @@ function encryptAes($string, $key)
     // Add PKCS5 padding to the text to be encypted.
     $string = addPKCS5Padding($string);
 
-    // Perform encryption with PHP's MCRYPT module.
-    $crypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $string, MCRYPT_MODE_CBC, $key);
+    // Perform encryption with PHP's openssl module.
+    $encrypted = openssl_encrypt($string, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $key);
 
     // Perform hex encoding and return.
-    return "@" . strtoupper(bin2hex($crypt));
+    return "@" . strtoupper(bin2hex($encrypted));
 }
 
 function decryptAes($strIn, $password)
 {
-    // HEX decoding then AES decryption, CBC blocking with PKCS5 padding.
-    // Use initialization vector (IV) set from $str_encryption_password.
-    $strInitVector = $password;
-
     // Remove the first char which is @ to flag this is AES encrypted and HEX decoding.
     $hex = substr($strIn, 1);
 
     // Throw exception if string is malformed
     if (!preg_match('/^[0-9a-fA-F]+$/', $hex)) {
-        //invelid key
+        //invalid key
         return false;
     }
     $strIn = pack('H*', $hex);
 
-    // Perform decryption with PHP's MCRYPT module.
-    $string = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $password, $strIn, MCRYPT_MODE_CBC, $strInitVector);
+    // Perform decryption with PHP's openssl module.
+    $decrypted = openssl_decrypt($strIn, 'AES-128-CBC', $password, OPENSSL_RAW_DATA, $password);
 
-    return removePKCS5Padding($string);
-}
-
-function removePKCS5Padding($input)
-{
-    $blockSize = 16;
-    $padChar = ord($input[strlen($input) - 1]);
-
-    /* Check for PadChar is less then Block size */
-    if ($padChar > $blockSize) {
-        return false;
-    }
-    /* Check by padding by character mask */
-    if (strspn($input, chr($padChar), strlen($input) - $padChar) != $padChar) {
+    /* Check result for printable characters */
+    if (preg_match('/[[:^print:]]/', $decrypted)) {
         return false;
     }
 
-    $unpadded = substr($input, 0, (-1) * $padChar);
-    /* Chech result for printable characters */
-    if (preg_match('/[[:^print:]]/', $unpadded)) {
-        return false;
-    }
-
-    return $unpadded;
+    return $decrypted;
 }
 
 /**
@@ -176,7 +154,7 @@ function fn_sagepay_get_basket($order_info, $primary_currency, $pp_currency)
         );
     }
 
-    if (!empty($order_info['taxes']) && Registry::get('settings.General.tax_calculation') == 'subtotal') {
+    if (!empty($order_info['taxes']) && Registry::get('settings.Checkout.tax_calculation') == 'subtotal') {
         foreach ($order_info['taxes'] as $tax_id => $tax) {
             if ($tax['price_includes_tax'] == 'N') {
                 $basket_items[] = strtr($basket_item_template,

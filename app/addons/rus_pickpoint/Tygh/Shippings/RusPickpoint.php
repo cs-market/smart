@@ -158,7 +158,7 @@ class RusPickpoint
             $data_pickpoint = db_get_row("SELECT * FROM ?:rus_pickpoint_postamat WHERE city_name = ?s", $city);
 
         } elseif (!empty($pickpoint_id)) {
-            $data_pickpoint = db_get_row("SELECT * FROM ?:rus_pickpoint_postamat WHERE number = ?s", $pickpoint_id);
+            $data_pickpoint = static::getPickpointPostamatById($pickpoint_id);
         }
 
         if (!empty($data_pickpoint)) {
@@ -169,12 +169,24 @@ class RusPickpoint
         return $_result;
     }
 
+    /**
+     * Gets Pickpoint postamat data from the database.
+     *
+     * @param string $postamat_id Unique postamat identifier
+     *
+     * @return array Postamat data
+     */
+    public static function getPickpointPostamatById($postamat_id)
+    {
+        return db_get_row("SELECT * FROM ?:rus_pickpoint_postamat WHERE number = ?s", $postamat_id);
+    }
+
     public static function postamatPickpoint($url_postamat)
     {
-        $response = Http::get($url_postamat, self::$extra_data);
+        $data_result = Http::get($url_postamat, self::$extra_data);
 
-        $result = json_decode($response);
-        $data_result = json_decode(json_encode($result), true);
+        $data_result = json_decode($data_result);
+        $data_result = json_decode(json_encode($data_result), true);
         if (isset($data_result['Error']) && ($data_result['Error'] == 1) && !empty($data_result['ErrorMessage'])){
            self::$last_error = $data_result['ErrorMessage'];
 

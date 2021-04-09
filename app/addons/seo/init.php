@@ -33,12 +33,11 @@ fn_register_hooks(
     'update_category_parent_post',
 
     'update_product_post',
-    'get_products',
+    'additional_fields_in_search',
     'load_products_extra_data',
     'load_products_extra_data_post',
     'get_product_data',
     'get_product_data_post',
-    'gather_additional_product_data_post',
     'delete_product_post',
     'update_product_categories_post',
 
@@ -61,7 +60,9 @@ fn_register_hooks(
 
     'dispatch_before_display',
 
-    'varnish_generate_vcl_pre'
+    'varnish_generate_vcl_pre',
+
+    'exim_set_product_categories_post'
 );
 
 if (fn_allowed_for('ULTIMATE')) {

@@ -12,9 +12,22 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['top']['addons']['items']['store_locator'] = array(
+$schema['top']['administration']['items']['store_locator'] = [
+    'attrs' => [
+        'class' => 'is-addon'
+    ],
     'href' => 'store_locator.manage',
-    'position' => 500
-);
+    'position' => 400
+];
+
+$schema['top']['administration']['items']['import_data']['subitems']['pickup'] = [
+    'href' => 'exim.import?section=pickup',
+    'position' => 500,
+];
+
+$schema['top']['administration']['items']['export_data']['subitems']['pickup'] = [
+    'href' => 'exim.export?section=pickup',
+    'position' => 500,
+];
 
 return $schema;

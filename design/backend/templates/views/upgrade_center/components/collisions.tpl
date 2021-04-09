@@ -4,7 +4,7 @@
     {$show_more = true}
 {/if}
 <div class="upgrade-center_notice">
-    
+
     <div class="upgrade-center_error">
         <h4>{__("text_uc_local_modification")}</h4>
         <p>{__("text_uc_changed_files_message")}</p>

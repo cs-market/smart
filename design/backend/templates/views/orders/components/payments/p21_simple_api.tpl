@@ -11,9 +11,9 @@
     </div>
 </div>
 <div class="control-group">
-    <label for="phone_number" class="control-label cm-required cm-regexp" data-ca-regexp="{literal}^([0-9]{3}[ ]{1}[0-9]{3}[ ]{1}[0-9]{4})${/literal}" data-ca-message="{__("error_validator_phone_number")}">{__("phone")}:</label>
+    <label for="phone_number" class="control-label cm-required cm-mask-phone-label"">{__("phone")}:</label>
     <div class="controls">
-        <input id="phone_number" size="35" type="text" name="payment_info[phone]" value="{$cart.payment_info.phone|default:$user_data.b_phone|default:$user_data.phone}" class="cm-autocomplete-off" />
+        <input id="phone_number" size="35" type="text" name="payment_info[phone]" value="{$cart.payment_info.phone|default:$user_data.b_phone|default:$user_data.phone}" class="cm-autocomplete-off cm-mask-phone" />
     </div>
 </div>
 <div class="control-group">

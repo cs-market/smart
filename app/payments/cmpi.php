@@ -91,6 +91,10 @@ function fn_cmpi_lookup($processor_data, $order_info, $mode = '')
 
     $session = Tygh::$app['session'];
 
+    $currency_code = isset($processor_data['processor_params']['currency']) && is_numeric($processor_data['processor_params']['currency'])
+        ? $processor_data['processor_params']['currency']
+        : $iso4217[$processor_data['processor_params']['currency']];
+
     $cardinal_request=<<<EOT
 <CardinalMPI>
 <MsgType>cmpi_lookup</MsgType>
@@ -100,7 +104,7 @@ function fn_cmpi_lookup($processor_data, $order_info, $mode = '')
 <TransactionPwd>{$session['cmpi']['transaction_password']}</TransactionPwd>
 <TransactionType>C</TransactionType>
 <Amount>{$amount}</Amount>
-<CurrencyCode>{$iso4217[$processor_data['processor_params']['currency']]}</CurrencyCode>
+<CurrencyCode>{$currency_code}</CurrencyCode>
 <CardNumber>{$order_info['payment_info']['card_number']}</CardNumber>
 <CardExpMonth>{$order_info['payment_info']['expiry_month']}</CardExpMonth>
 <CardExpYear>20{$order_info['payment_info']['expiry_year']}</CardExpYear>

@@ -30,8 +30,8 @@
         <fieldset>
 {elseif $item.type != "D" && $item.type != "B"}
     {* Settings with label*}
-    <div id="container_{$html_id}" class="control-group{if $class} {$class}{/if} {$item.section_name} {if $parent_item && $parent_item.value != "Y"}hidden{/if}">
-        <label for="{$html_id}" class="control-label {if $highlight && $item.name|in_array:$highlight}highlight{/if}" >{$item.description nofilter}{if $item.tooltip}{include file="common/tooltip.tpl" tooltip=$item.tooltip}{/if}:
+    <div id="container_{$html_id}" class="control-group{if $class} {$class}{/if} {$item.section_name}{if $parent_item && $parent_item.value != "Y"} hidden{/if}{if $highlight && $item.name|in_array:$highlight} row-highlight{/if}">
+        <label for="{$html_id}" class="control-label {if $highlight && $item.name|in_array:$highlight}highlight{/if}{if $item.type == "L"} cm-mask-phone-label{/if}" >{$item.description nofilter}{if $item.tooltip}{include file="common/tooltip.tpl" tooltip=$item.tooltip}{/if}:
         </label>
 
         <div class="controls">
@@ -59,6 +59,7 @@
                 {/foreach}
                 </div>
             {elseif $item.type == "M"}
+                <input type="hidden" name="{$html_name}" value="" {if $disable_input}disabled="disabled"{/if} />
                 <select id="{$html_id}" name="{$html_name}[]" multiple="multiple" {if $disable_input}disabled="disabled"{/if}>
                 {foreach from=$item.variants item=v key="k"}
                 <option value="{$k}" {if $item.value && $item.value.$k == "Y"}selected="selected"{/if}>{$v}</option>
@@ -113,7 +114,7 @@
                     {/foreach}
                 </select>
             {else}
-                <input id="{$html_id}" type="text" name="{$html_name}" size="30" value="{$item.value}" class="{if $item.type == "U"} cm-value-integer{/if}" {if $disable_input}disabled="disabled"{/if} />
+                <input id="{$html_id}" type="text" name="{$html_name}" size="30" value="{$item.value}" class="{if $item.type == "U"} cm-value-integer{elseif $item.type == "L"} cm-mask-phone{/if}" {if $disable_input}disabled="disabled"{/if} />
             {/if}
             <div class="right update-for-all">
                 {include file="buttons/update_for_all.tpl" display=$item.update_for_all object_id=$item.object_id name="update_all_vendors[`$item.object_id`]" hide_element=$html_id}

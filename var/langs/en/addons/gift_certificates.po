@@ -213,8 +213,12 @@ msgid "Amount should not be higher than [max] and less than [min]"
 msgstr "Amount should not be higher than [max] and less than [min]"
 
 msgctxt "Languages::privileges.manage_gift_certificates"
-msgid "Manage gift certificate system"
-msgstr "Manage gift certificate system"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privilege_groups.gift_certificates"
+msgid "Gift certificates"
+msgstr "Gift certificates"
 
 msgctxt "Languages::change_gift_certificate_status"
 msgid "Change gift certificate status to"
@@ -271,3 +275,11 @@ msgstr "Couldn't find a gift certificate. Preview only works with existing data.
 msgctxt "Languages::gift_certificates.certificate_purchase_form"
 msgid "Gift certificate purchase form"
 msgstr "Gift certificate purchase form"
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.status_changed.name"
+msgid "Gift certificate status changed to [status]"
+msgstr "Gift certificate status changed to [status]"
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
+msgid "Gift certificate updated"
+msgstr "Gift certificate updated"

@@ -4,21 +4,27 @@
 /*
  * cm-colorpicker fixes
  */
-.sp-input-container {
-    width: auto !important;
+#content_mobile_app_service {
+    .sp-container {
+        top: 30px !important;
+        width: 420px !important;
+    }
+
+    input[type=color] {
+        width: 50px;
+        height: 30px;
+    }
 }
 
-.colorpicker .sp-container {
-    top: 25px !important;
+@media (max-width: @TabletBreakpoint) {
+    #content_mobile_app_service .sp-container {
+        width: auto !important;
+    }
 }
 
 /**
  * Page rules
  */
-input[type=color] {
-    width: 50px;
-    height: 30px;
-}
 #content_mobile_app .buttons-container {
     display: none;
 }

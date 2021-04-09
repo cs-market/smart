@@ -7,13 +7,21 @@
 
 use Tygh\Registry;
 
+/**
+ * @param array  $params
+ * @param string $content
+ * @param \Tygh\SmartyEngine\Core $smarty
+ *
+ * @return string
+ * @throws \Tygh\Exceptions\DeveloperException
+ */
 function smarty_block_hook($params, $content, &$smarty)
 {
     static $overrides = array();
     $hook_content = '';
     $hook_name = 'thooks_' . $smarty->template_area;
 
-    Registry::registerCache($hook_name, array('addons'), Registry::cacheLevel('static'));
+    Registry::registerCache($hook_name, ['addons'], Registry::cacheLevel(['static', 'storefront']));
     $hooks = Registry::ifGet($hook_name, array());
 
     if (!isset($hooks[$params['name']])) {

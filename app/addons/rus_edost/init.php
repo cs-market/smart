@@ -20,5 +20,6 @@ fn_register_hooks(
     'calculate_cart_taxes_pre',
     'update_cart_by_data_post',
     'get_cities_pre',
-    'update_city_post'
+    'update_city_post',
+    'pickup_point_variable_init'
 );

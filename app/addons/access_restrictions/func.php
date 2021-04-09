@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -125,31 +126,34 @@ function fn_access_restrictions_redirect()
     $auth = & Tygh::$app['session']['auth'];
 
     $ip = fn_get_ip(true);
-    $ip = array_filter($ip);
+    $ips = array_filter($ip);
+    $login_interval = (AREA === 'A') ? Registry::get('addons.access_restrictions.login_intervals') : Registry::get('addons.access_restrictions.login_intervals_customer');
+    $is_login_failed = Registry::get('runtime.mode') == 'login' && Registry::get('runtime.controller') == 'auth' && empty($auth['user_id']);
+    $is_login_successful = Registry::get('runtime.mode') == 'login' && Registry::get('runtime.controller') == 'auth' && !empty($auth['user_id']);
 
-    if (Registry::get('runtime.mode') == 'login' && Registry::get('runtime.controller') == 'auth' && empty($auth['user_id'])) {
-        $ip_exist = db_get_row("SELECT * FROM ?:access_restriction_block WHERE ip IN (?n)", $ip);
-        $login_interval = (AREA == 'A') ? Registry::get('addons.access_restrictions.login_intervals') : Registry::get('addons.access_restrictions.login_intervals_customer');
-        if ($ip_exist && $ip_exist['expires'] > TIME) {
-            $ip_exist['tries'] ++;
-            $ip_exist['expires'] += $login_interval;
-            db_query('UPDATE ?:access_restriction_block SET ?u WHERE ip IN (?n)', $ip_exist, $ip);
-        } else {
-            $ip_data = array_map(function($ip_item) use ($login_interval) {
-                return array(
-                    'ip'        => $ip_item,
-                    'tries'     => 1,
-                    'timestamp' => TIME,
-                    'expires'   => (TIME + $login_interval),
-                );
-            }, $ip);
+    foreach ($ips as $ip) {
+        if ($is_login_failed) {
+            $existing_ip_restrictions = db_get_row('SELECT * FROM ?:access_restriction_block WHERE ip = ?i', $ip);
 
-            if (!empty($ip_data)) {
-                db_query('REPLACE INTO ?:access_restriction_block ?m', $ip_data);
+            if ($existing_ip_restrictions && $existing_ip_restrictions['expires'] > TIME) {
+                $tries = ++$existing_ip_restrictions['tries'];
+                $expires = $existing_ip_restrictions['expires'] + $login_interval;
+            } else {
+                $tries = 1;
+                $expires = TIME + $login_interval;
             }
+
+            $ip_data = [
+                'ip' => $ip,
+                'tries' => $tries,
+                'timestamp' => TIME,
+                'expires' => $expires,
+            ];
+            db_replace_into('access_restriction_block', $ip_data);
+
+        } elseif ($is_login_successful) {
+            db_query('DELETE FROM ?:access_restriction_block WHERE ip = ?i', $ip);
         }
-    } elseif (Registry::get('runtime.mode') == 'login' && Registry::get('runtime.controller') == 'auth' && !empty($auth['user_id'])) {
-        db_query("DELETE FROM ?:access_restriction_block WHERE ip IN (?n)", $ip);
     }
 
     return true;
@@ -184,7 +188,7 @@ function fn_access_restrictions_user_init(&$auth, &$user_info)
                 $__data['item_id'] = db_query("REPLACE INTO ?:access_restriction ?e", $restrict_ip);
                 $__data['type'] = ((AREA == 'A') ? 'aab' : 'ipb');
 
-                foreach (fn_get_translation_languages() as $__data['lang_code'] => $v) {
+                foreach (Languages::getAll() as $__data['lang_code'] => $v) {
                     $__data['reason'] = __('text_ip_blocked_failed_login', array("[number]" => $failed_atempts), $__data['lang_code']);
                     db_query("REPLACE INTO ?:access_restriction_reason_descriptions ?e", $__data);
                 }

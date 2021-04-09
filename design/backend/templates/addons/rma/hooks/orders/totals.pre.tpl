@@ -1,6 +1,6 @@
 {if $order_info.returned_products}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-responsive">
+    <table width="100%" class="table table--relative table-responsive">
         <tr>
             <th width="5%">{__("sku")}</th>
             <th>{__("returned_product")}</th>

@@ -5,198 +5,230 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_communication.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/vendor_communication.po\n"
+"X-Crowdin-File-ID: 3682\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::vendor_communication"
-msgid "Customer-to-Vendor Communication"
-msgstr ""
+msgid "Ask seller a question"
+msgstr "Чат с продавцем"
 
 msgctxt "Addons::description::vendor_communication"
-msgid "Allows customers to communicate with vendors directly via the store's interface."
-msgstr ""
+msgid "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
+msgstr "Дозволяє покупцям задавати питання про товар зі сторінки товару. Відповідати на ці питання можна у вбудованому Центрі повідомлень."
 
 msgctxt "SettingsSections::vendor_communication::general"
 msgid "General"
-msgstr ""
-
-msgctxt "SettingsSections::vendor_communication::notifications"
-msgid "Notifications"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_admin"
-msgid "Notify admin"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_vendor"
-msgid "Notify vendor"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_customer"
-msgid "Notify customer"
-msgstr ""
+msgstr "Загальні"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_product"
 msgid "Contact button on product pages"
-msgstr ""
+msgstr "Відображати кнопку чату на сторінці товару"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_vendor"
 msgid "Contact button in vendor microstore"
-msgstr ""
+msgstr "Відображати кнопку чату на сторінці мікромагазіна продавця"
 
-msgctxt "SettingsTooltips::vendor_communication::notify_admin"
-msgid "Send an email to root administrator about every newly-posted message."
-msgstr ""
-
-msgctxt "SettingsTooltips::vendor_communication::notify_vendor"
-msgid "Send emails to vendor's contact email address about newly-posted messages."
-msgstr ""
-
-msgctxt "SettingsTooltips::vendor_communication::notify_customer"
-msgid "Send emails to customers about newly-posted messages in their threads."
-msgstr ""
+msgctxt "SettingsOptions::vendor_communication::show_on_messages"
+msgid "Contact button at \"Messages\" menu"
+msgstr "Відображати кнопку чату в меню \"Повідомлення\""
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_product"
-msgid "Show the \"Contact vendor\" button on product pages."
-msgstr ""
+msgid "Show the \"Ask a question\" button on product pages."
+msgstr "Показувати кнопку \"Задати питання\" на сторінках товарів."
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_vendor"
-msgid "Show the \"Contact vendor\" button in vendors' microstores."
-msgstr ""
+msgid "Show the \"Ask a question\" button in vendors' microstores."
+msgstr "Показувати кнопку \"Задати питання\" на сторінці мікромагазину продавця."
 
 msgctxt "Languages::vendor_communication.messages"
 msgid "Messages"
-msgstr ""
+msgstr "Повідомлення"
 
 msgctxt "Languages::vendor_communication.message_center"
 msgid "Message center"
-msgstr ""
+msgstr "Центр повідомлень"
+
+msgctxt "Languages::vendor_communication.message_center_name"
+msgid "Message center"
+msgstr "Центр повідомлень"
+
+msgctxt "Languages::vendor_communication.message_center_name_menu_description"
+msgid "Messages from customers"
+msgstr "Повідомлення від покупців"
 
 msgctxt "Languages::vendor_communication.message_center_menu_description"
 msgid "Customer-to-vendor messages"
-msgstr ""
+msgstr "Повідомлення від покупців"
 
 msgctxt "Languages::vendor_communication.author"
 msgid "Author"
-msgstr ""
+msgstr "Автор"
 
 msgctxt "Languages::vendor_communication.date"
 msgid "Date"
-msgstr ""
+msgstr "Дата"
 
 msgctxt "Languages::vendor_communication.message"
 msgid "Message"
-msgstr ""
+msgstr "Повідомлення"
 
 msgctxt "Languages::vendor_communication.contact_vendor"
 msgid "Contact vendor"
-msgstr ""
+msgstr "Зв'язатися з постачальником"
+
+msgctxt "Languages::vendor_communication.ask_a_question"
+msgid "Ask a question"
+msgstr "Задати питання"
 
 msgctxt "Languages::vendor_communication.contact_vendor_name"
 msgid "Contact [vendor_name]"
-msgstr ""
+msgstr "Зв'язатись з [vendor_name]"
 
 msgctxt "Languages::vendor_communication.created_at"
 msgid "Created on"
-msgstr ""
+msgstr "Створено"
 
 msgctxt "Languages::vendor_communication.new_thread_created"
 msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>The vendor's reply will be sent to the email address of your account. To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
-msgstr ""
+msgstr "Ваше повідомлення було надіслано <b>[vendor_name]</b>.<br/><br/>Відповідь продавця буде надіслано на електронну адресу вашого облікового запису. Для перегляду історії повідомлень, будь ласка відкрийте <a href=\"[thread_url]\">Центр повідомлень</a>, розташований в розділі \"Повідомлення\" в меню \"Мій обліковий запис\"."
+
+msgctxt "Languages::vendor_communication.message_sent"
+msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>We'll notify you about a reply. To view your message history, please <a href=\"[thread_url]\" target=\"_blank\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
+msgstr "Ваше повідомлення було відправлено <b>[vendor_name]</b>.<br/><br/>Ми повідомимо вам про відповідь. Історія повідомлень зберігається <a href=\"[thread_url]\" target=\"_blank\"> в Центрі повідомлень</a>. Він знаходиться в розділі \"Повідомлення\" в \"Моєму профілі\"."
 
 msgctxt "Languages::vendor_communication.cannot_update_thread"
 msgid "Cannot update thread"
-msgstr ""
+msgstr "Не вдалося оновити дискусію"
 
 msgctxt "Languages::vendor_communication.cannot_create_thread"
 msgid "Cannot create thread"
-msgstr ""
+msgstr "Не вдалося створити дискусію"
 
 msgctxt "Languages::email_template.vendor_communication.notify_admin"
-msgid "Customer-to-Vendor Communication: Admin Notification"
-msgstr ""
+msgid "Ask seller a question: Admin Notification"
+msgstr "Чат з продавцем: повідомлення для адміністратора"
 
 msgctxt "Languages::email_template.vendor_communication.notify_customer"
-msgid "Customer-to-Vendor Communication: Customer Notification"
-msgstr ""
+msgid "Ask seller a question: Customer Notification"
+msgstr "Чат з продавцем: повідомлення для покупця"
 
 msgctxt "Languages::vendor_communication.you_have_new_message"
 msgid "You have a new <a href=\"[thread_url]\">message</a> from [message_from]."
-msgstr ""
+msgstr "У вас є нове <a href=\"[thread_url]\">повідомлення</a> від [message_from]."
 
 msgctxt "Languages::vendor_communication.subject_email"
 msgid "You have a new message from [message_from]"
-msgstr ""
+msgstr "У вас є нове повідомлення від [message_from]"
 
 msgctxt "Languages::vendor_communication.thread"
 msgid "Thread #[thread_id]"
-msgstr ""
+msgstr "Дискусія #[thread_id]"
 
 msgctxt "Languages::vendor_communication.contact_with"
 msgid "#[thread_id]. Communication with [thread_company]"
-msgstr ""
+msgstr "#[thread_id]. Чат з [thread_company]"
 
 msgctxt "Languages::vendor_communication.ticket"
 msgid "Thread"
-msgstr ""
+msgstr "Дискусія"
 
 msgctxt "Languages::vendor_communication.no_messages_found"
 msgid "No messages found"
-msgstr ""
+msgstr "Повідомлення відсутні"
 
 msgctxt "Languages::vendor_communication.customer_name"
 msgid "Customer name"
-msgstr ""
+msgstr "Ім'я покупця"
 
 msgctxt "Languages::vendor_communication.error_message"
 msgid "Please enter your message"
-msgstr ""
+msgstr "Будь ласка, введіть текст повідомлення"
 
 msgctxt "Languages::vendor_communication.type_message"
 msgid "Type a message..."
-msgstr ""
+msgstr "Введіть текст повідомлення..."
 
 msgctxt "Languages::vendor_communication.you"
 msgid "You"
-msgstr ""
+msgstr "Ви"
 
 msgctxt "Languages::vendor_communication.thread_deleted"
 msgid "Thread has been deleted"
-msgstr ""
+msgstr "Дискусію було видалено"
 
 msgctxt "Languages::vendor_communication.threads_deleted"
 msgid "Threads have been deleted"
-msgstr ""
+msgstr "Дискусії було видалено"
 
 msgctxt "Languages::vendor_communication.cannot_delete_thread"
 msgid "Cannot delete thread"
-msgstr ""
+msgstr "Не вдалося видалити дискусію"
 
 msgctxt "Languages::vendor_communication.cannot_delete_threads"
 msgid "Cannot delete threads"
-msgstr ""
+msgstr "Не вдалося видалити дискусії"
 
 msgctxt "Languages::vendor_communication.cannot_post_message"
 msgid "Cannot post message"
-msgstr ""
+msgstr "Не вдалося відправити повідомлення"
 
 msgctxt "Languages::vendor_communication.no_threads_found"
 msgid "No threads found"
-msgstr ""
+msgstr "Дискусії відсутні"
 
 msgctxt "Languages::vendor_communication.required_field_is_missing"
 msgid "The [field_name] field is required"
-msgstr ""
+msgstr "[field_name] поле є обов'язковим"
 
 msgctxt "Languages::vendor_communication.invalid_thread_object_type"
 msgid "Provided thread object type is invalid"
-msgstr ""
+msgstr "Неприпустимий тип об'єкта для дискусії"
 
 msgctxt "Languages::vendor_communication.please_log_in_to_contact_vendor"
 msgid "Please sign in to contact the vendor"
-msgstr ""
+msgstr "Будь ласка, увійдіть в свій обліковий запис, щоб зв'язатися з продавцем"
+
+msgctxt "Languages::privileges.manage_vendor_communication"
+msgid "Can edit"
+msgstr "Можна редагувати"
+
+msgctxt "Languages::privileges.view_vendor_communication"
+msgid "Can view"
+msgstr "Можна переглянути"
+
+msgctxt "Languages::privilege_groups.vendor_communication"
+msgid "Message center"
+msgstr "Центр повідомлень"
+
+msgctxt "Languages::vendor_communication.your_message_to_vendor_name"
+msgid "Your message to [vendor_name]"
+msgstr "Ваше повідомлення для [vendor_name]"
+
+msgctxt "Languages::vendor_communication.please_log_in_to_be_notified"
+msgid "Please sign in so that we can notify you about a reply"
+msgstr "Увійдіть в обліковий запис, щоб ми могли повідомити вам про відповідь"
+
+msgctxt "Languages::vendor_communication"
+msgid "Ask seller a question"
+msgstr "Поставити питання Продавцю"
+
+msgctxt "Languages::vendor_communication.event.message_received.name"
+msgid "New message received"
+msgstr "Ви отримали нове повідомлення"
+
+msgctxt "Languages::internal_template.vendor_communication_message_received"
+msgid "New message received"
+msgstr "Ви отримали нове повідомлення"
+
+msgctxt "Languages::vendor_communication.new_message.title"
+msgid "[company_name] has a new message from [customer]"
+msgstr "Нове повідомлення для [company_name] від [customer]"
+
+msgctxt "Languages::vendor_communication.new_message.message"
+msgid "Click this notification to see the message"
+msgstr "Натисніть на це сповіщення, щоб прочитати повідомлення"
 

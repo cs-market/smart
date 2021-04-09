@@ -1,12 +1,16 @@
 {if $discussion && $discussion.object_type && !$discussion.is_empty}
 
-    {$allow_save = ($discussion.object_type != "M" || !$runtime.company_id) && "discussion.update"|fn_check_view_permissions}
+    {$is_allowed_to_add_posts = "discussion.add"|fn_check_view_permissions}
+    {$is_allowed_to_update_posts = "discussion.update"|fn_check_view_permissions}
+    {$is_owned_object = $runtime.company_id == $object_company_id}
+    {$is_company_reviews = $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::COMPANY"|enum}
+    {$allow_save = $is_allowed_to_update_posts && !($runtime.company_id && (!$is_owned_object || $is_company_reviews))}
 
     <div id="content_discussion">
     <div class="clearfix">
         <div class="buttons-container buttons-bg pull-right">
-            {if "discussion.add"|fn_check_view_permissions && !("MULTIVENDOR"|fn_allowed_for && $runtime.company_id && ($runtime.company_id != $object_company_id || $discussion.object_type == 'M'))}
-                {if $discussion.object_type == "E"}
+            {if $is_allowed_to_add_posts && !($runtime.company_id && (!$is_owned_object || $is_company_reviews))}
+                {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT"|enum}
                     {capture name="adv_buttons"}
                         {include file="common/popupbox.tpl" id="add_new_post" title=__("add_post") icon="icon-plus" act="general" link_class="cm-dialog-switch-avail"}
                     {/capture}
@@ -16,7 +20,7 @@
             {/if}
             {if $discussion.posts && "discussion_manager"|fn_check_view_permissions}
                 {$show_save_btn = true scope = root}
-                {if $discussion.object_type == "E"}
+                {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT"|enum}
                     {capture name="buttons_insert"}
                 {/if}
                 {if "discussion.m_delete"|fn_check_view_permissions}
@@ -25,7 +29,7 @@
                     {/capture}
                     {dropdown content=$smarty.capture.tools_list}
                 {/if}
-                {if $discussion.object_type == "E"}
+                {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT"|enum}
                     {/capture}
                 {/if}
             {/if}
@@ -39,7 +43,7 @@
 
         <div class="posts-container {if $allow_save}cm-no-hide-input{else}cm-hide-inputs{/if}">
             {foreach from=$discussion.posts item="post"}
-                <div class="post-item {if $discussion.object_type == "O"}{if $post.user_id == $user_id}incoming{else}outgoing{/if}{/if}">
+                <div class="post-item {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::ORDER"|enum}{if $post.user_id == $user_id}incoming{else}outgoing{/if}{/if}">
                     {hook name="discussion:items_list_row"}
                         {include file="addons/discussion/views/discussion_manager/components/post.tpl" post=$post type=$discussion.type}
                     {/hook}

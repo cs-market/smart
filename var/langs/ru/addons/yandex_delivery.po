@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-ru\n"
+"X-Crowdin-Project-ID: 54044\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/yandex_delivery.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/yandex_delivery.po\n"
+"X-Crowdin-File-ID: 3760\n"
+"PO-Revision-Date: 2020-08-28 13:38\n"
 
 msgctxt "Addons::name::yandex_delivery"
 msgid "Yandex.Delivery"
@@ -283,4 +283,48 @@ msgstr "В пункт самовывоза"
 msgctxt "Languages::yandex_delivery.courier"
 msgid "Courier"
 msgstr "Курьером"
+
+msgctxt "Languages::yandex_delivery.no_shipping_services_selected"
+msgid "At least one shipping service must be selected on the Configure tab of the shipping method configuration page"
+msgstr "Должна быть выбрана как минимум одна служба доставки. Выбрать их можно на странице редактирования способа доставки, во вкладке \"Настроить\""
+
+msgctxt "Languages::yandex_delivery.day_single.schedule_closed"
+msgid "[day]: Closed"
+msgstr "[day]: Закрыто"
+
+msgctxt "Languages::yandex_delivery.day_single.schedule_single"
+msgid "[day]: [schedule]"
+msgstr "[day]: [schedule]"
+
+msgctxt "Languages::yandex_delivery.day_single.schedule_interval"
+msgid "[day]: [from]&ndash;[to]"
+msgstr "[day]: [from]&ndash;[to]"
+
+msgctxt "Languages::yandex_delivery.day_interval.schedule_closed"
+msgid "[first_day]&ndash;[last_day]: Closed"
+msgstr "[first_day]&ndash;[last_day]: Закрыто"
+
+msgctxt "Languages::yandex_delivery.day_interval.schedule_single"
+msgid "[first_day]&ndash;[last_day]: [schedule]"
+msgstr "[first_day]&ndash;[last_day]: [schedule]"
+
+msgctxt "Languages::yandex_delivery.day_interval.schedule_interval"
+msgid "[first_day]&ndash;[last_day]: [from]&ndash;[to]"
+msgstr "[first_day]&ndash;[last_day]: [from]&ndash;[to]"
+
+msgctxt "Languages::yandex_delivery.day_every.schedule_interval"
+msgid "Daily: [from]&ndash;[to]"
+msgstr "Ежедневно: [from]&ndash;[to]"
+
+msgctxt "Languages::yandex_delivery.day_every.schedule_single"
+msgid "Daily: [schedule]"
+msgstr "Ежедневно: [schedule]"
+
+msgctxt "Languages::yandex_delivery.info_about_of_tracking_number"
+msgid "Due to technical restrictions of Yandex.Delivery, the notification will be sent without a tracking number. You'll be able to send the tracking number after you create the shipment. Just add the tracking number on the order editing page and save your changes with notifying the customer about them."
+msgstr "Из-за технических ограничений на стороне Яндекс.Доставки, уведомление будет отправлено без номера отслеживания. Вы сможете отправить номер отслеживания после создания отгрузки. Для этого добавьте номер отслеживания на странице редактирования заказа, а потом сохраните изменения, уведомив о них покупателя."
+
+msgctxt "Languages::yandex_delivery.inner_order"
+msgid "Order number in Yandex"
+msgstr "Номер заказа в Яндексе"
 

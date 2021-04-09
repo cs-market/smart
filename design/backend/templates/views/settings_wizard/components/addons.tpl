@@ -1,6 +1,6 @@
 {foreach from=$wizard_addons_list item="addon"}
 	<div class="table-wrapper">
-		<table class="table table-addons table-wizard">
+		<table class="table table-addons table-wizard table--relative">
 		    <tr>
 		        <td class="addon-icon">
 		            <div class="bg-icon">

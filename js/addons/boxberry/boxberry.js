@@ -25,7 +25,7 @@
 
                 var data = {};
                 data[callbackInput.getAttribute('name')] = result.id;
-                data['update_step'] = $('.ty-step__container-active').find('input[name="update_step"]').val();
+                data['update_step'] = $('.ty-step__container-active').find('input[name="update_step"]').val() || 'step_three';
 
                 $("input[name='user_data[s_address]']").val(result.address);
                 $.ceAjax('request', fn_url('checkout.update_steps'), {

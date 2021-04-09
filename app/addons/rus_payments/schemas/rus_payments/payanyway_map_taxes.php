@@ -14,13 +14,15 @@
 
 use Tygh\Addons\RusTaxes\TaxType;
 
-$schema = array(
-    TaxType::NONE => 1105,
-    TaxType::VAT_0 => 1104,
-    TaxType::VAT_10 => 1103,
-    TaxType::VAT_18 => 1102,
+$schema = [
+    TaxType::NONE    => 1105,
+    TaxType::VAT_0   => 1104,
+    TaxType::VAT_10  => 1103,
+    TaxType::VAT_18  => 1102,
+    TaxType::VAT_20  => 1102,
     TaxType::VAT_110 => 1107,
-    TaxType::VAT_118 => 1106
-);
+    TaxType::VAT_118 => 1106,
+    TaxType::VAT_120 => 1106,
+];
 
 return $schema;

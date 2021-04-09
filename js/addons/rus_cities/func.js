@@ -1,5 +1,6 @@
 (function(_, $) {
     $.ceEvent('on', 'ce.commoninit', function(context) {
+
         $("[name='user_data[b_city]']").autocomplete({
             source: function( request, response ) {
                 var type = this.element.attr('name').substr(10,1);

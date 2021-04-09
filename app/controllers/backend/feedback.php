@@ -249,6 +249,16 @@ function fn_get_feedback_data($mode)
     $fdata['installed_upgrades'] = db_get_array("SELECT type, name, timestamp FROM ?:installed_upgrades WHERE 1 ORDER BY timestamp DESC LIMIT 50");
     $fdata['local_modifications'] = fn_feedback_get_local_modifications_summary();
 
+    $fdata['system_environment'] = array(
+        'php_version'   => PHP_VERSION,
+        'php_os'        => PHP_OS,
+        'php_sapi'      => PHP_SAPI,
+        'php_int_size'  => PHP_INT_SIZE,
+        'db_version'    => Tygh::$app['db']->getServerVersion(),
+        'db_engine'     => Registry::get('config.database_backend'),
+        'web_server'    => isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : ''
+    );
+
     return $fdata;
 }
 
@@ -334,8 +344,9 @@ function fn_get_settings_feedback($mode, $company_id = null)
 /**
  * Checks and changes setting value for the feedback if necessary
  *
- * @param string/array $value Setting value or settings array
- * @return string/array Checked value
+ * @param string|array $value Setting value or settings array
+ *
+ * @return string|array Checked value
  */
 function fn_check_feedback_value($value)
 {

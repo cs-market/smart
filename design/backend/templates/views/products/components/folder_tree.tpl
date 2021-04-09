@@ -1,6 +1,6 @@
 <tr class="multiple-table-row">
     <td>
-        <div style="padding-left: 5px;">
+        <div style="padding-{$direction}: 5px;">
         <input type="hidden" name="folder_{$folder.folder_id}" value="{$folder.folder_name}" />
         <span id="on_group_folder_{$folder.folder_id}" class="cm-combination {if $expand_all} hidden{/if}"><icon class="icon-folder-close"></span>
         <span id="off_group_folder_{$folder.folder_id}" class="cm-combination {if !$expand_all} hidden{/if}"><icon class="icon-folder-open"></span>

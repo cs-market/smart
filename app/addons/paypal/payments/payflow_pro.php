@@ -23,6 +23,23 @@ use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+include_once(Registry::get('config.dir.payments') . 'cmpi.php');
+
+$use_cardinal = !empty($processor_data['processor_params']['merchant_id'])
+    && !empty($processor_data['processor_params']['processor_id'])
+    && !empty($processor_data['processor_params']['transaction_password'])
+    && !empty($processor_data['processor_params']['transaction_url']);
+
+if ($use_cardinal) {
+    if (!defined('CMPI_PROCESSED')) {
+        fn_cmpi_lookup($processor_data, $order_info, $mode);
+    }
+} else {
+    define('DO_DIRECT_PAYMENT', true);
+}
+
+if (defined('DO_DIRECT_PAYMENT')) {
+
 $currency = fn_paypal_get_valid_currency($processor_data['processor_params']['currency']);
 
 $payflow_username = $processor_data['processor_params']['username'];
@@ -48,7 +65,7 @@ if ($currency['code'] == CART_PRIMARY_CURRENCY) {
         }
     }
 
-    if (!empty($order_info['taxes']) && Registry::get('settings.General.tax_calculation') == 'subtotal') {
+    if (!empty($order_info['taxes']) && Registry::get('settings.Checkout.tax_calculation') == 'subtotal') {
         foreach ($order_info['taxes'] as $tax_id => $tax) {
             if ($tax['price_includes_tax'] == 'Y') {
                 continue;
@@ -80,6 +97,29 @@ if (!empty($order_info['shipping']) && is_array($order_info['shipping'])) {
 } else {
     $shipping_name = array();
     $shipping_name['shipping'] = __('no_shipping_required');
+}
+
+$payflow_3d_secure = '';
+if ($use_cardinal) {
+    $session = & Tygh::$app['session'];
+
+    $fields = array('eci_flag', 'pares', 'xid', 'cavv', 'enrolled');
+    foreach ($fields as $field) {
+        $session['cmpi'][$field] = isset($session['cmpi'][$field])
+            ? $session['cmpi'][$field]
+            : '';
+    }
+
+    $payflow_3d_secure = <<<XML
+<BuyerAuthResult>
+    <Status>{$session['cmpi']['enrolled']}</Status>
+    <AuthenticationId>{$session['cmpi']['pares']}</AuthenticationId>
+    <ECI>{$session['cmpi']['eci_flag']}</ECI>
+    <CAVV>{$session['cmpi']['cavv']}</CAVV>
+    <XID>{$session['cmpi']['xid']}</XID>
+</BuyerAuthResult>
+XML;
+
 }
 
 $post = <<<XML
@@ -127,6 +167,7 @@ $post = <<<XML
                                 <NameOnCard>{$order_info['payment_info']['cardholder_name']}</NameOnCard>
                                 <CVNum>{$order_info['payment_info']['cvv2']}</CVNum>
                             </Card>
+                            {$payflow_3d_secure}
                         </Tender>
                     </PayData>
                 </Sale>
@@ -142,7 +183,7 @@ $post = <<<XML
 </XMLPayRequest>
 XML;
 
-$post_url = "https://".$payflow_url.":443/transaction";
+$post_url = "https://{$payflow_url}:443/transaction";
 
 Registry::set('log_cut_data', array('CardNum', 'ExpDate', 'NameOnCard', 'CVNum'));
 $response_data = Http::post($post_url, $post, array(
@@ -205,4 +246,6 @@ if ($_result[1] === '0') {
     $pp_response['order_status'] = 'P';
 } else {
     $pp_response['order_status'] = 'F';
+}
+
 }

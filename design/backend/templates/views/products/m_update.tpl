@@ -51,7 +51,6 @@
 }(Tygh, Tygh.$));
 </script>
 
-{assign var="all_categories_list" value=0|fn_get_plain_categories_tree:false}
 {capture name="mainbox"}
 
 {capture name="extra_tools"}
@@ -60,16 +59,16 @@
 
 <div id="override_box" class="hidden">
 
-<form action="{""|fn_url}" method="post" name="override_form" class="form-horizontal form-edit" enctype="multipart/form-data">
+<form action="{""|fn_url}" method="post" name="override_form" class="form-horizontal form-edit products-update" enctype="multipart/form-data">
 <input type="hidden" name="fake" value="1" />
 <input type="hidden" name="redirect_url" value="{"products.m_update"|fn_url}" />
 
 <div class="table-wrapper">
-    <table>
+    <table class="products-update__table">
     <tr>
         <td>
             <div class="scroll-x scroll-border">
-            <table class="table-fixed">
+            <table class="table-fixed table--relative">
             <tr>
                 {foreach from=$filled_groups item=v}
                 <th>&nbsp;</th>
@@ -229,19 +228,20 @@
 </div>
 {* ================================ *}
 
-<form action="{""|fn_url}" method="post" name="products_m_update_form" enctype="multipart/form-data">
+<form action="{""|fn_url}" method="post" name="products_m_update_form" class="products-update" enctype="multipart/form-data">
 <input type="hidden" name="fake" value="1" />
 <input type="hidden" name="redirect_url" value="{"products.m_update"|fn_url}" />
 
 <div class="table-wrapper">
-    <table>
+    <table class="products-update__table">
     <tr>
         <td>
 
             <div id="scrolled_div_top" class="scroll-x scroll-top"></div>
             <div id="scrolled_div" class="scroll-x scroll-border">
-            <table class="table-fixed">
+            <table class="table-fixed table--relative">
             <tr>
+                <th>&nbsp;</th>
                 {foreach from=$filled_groups item=v}
                 <th>&nbsp;</th>
                 {/foreach}
@@ -255,6 +255,18 @@
             </tr>
             {foreach from=$products_data item="product"}
             <tr >
+                <td valign="top" class="nowrap pad products-list__image">
+                    {include 
+                            file="common/image.tpl" 
+                            image=$product.main_pair.icon|default:$product.main_pair.detailed 
+                            image_id=$product.main_pair.image_id 
+                            image_width=$settings.Thumbnails.product_admin_mini_icon_width 
+                            image_height=$settings.Thumbnails.product_admin_mini_icon_height 
+                            href="products.update?product_id=`$product.product_id`"|fn_url
+                            image_css_class="products-list__image--img"
+                            link_css_class="products-list__image--link"
+                    }
+                </td>
                 {foreach from=$filled_groups item=v key=type}
                 <td valign="top" class="pad">
                 {if $type != "L" || $type == "L" && $localizations}
@@ -266,7 +278,15 @@
                         <td valign="top" class="nowrap pad {if $field == "product"}strong{/if}">{$v.$field}:&nbsp;</td>
                         <td valign="top" class="pad nowrap">
                             {if $field == "price" || $field == "list_price"}
-                                <input type="text" value="{$product.$field|fn_format_price:$primary_currency:null:false}" class="input-medium" size="5" name="{$name}[{$product.product_id}][{$field}]" />
+                                <input type="text"
+                                       value="{$product.$field|fn_format_price:$primary_currency:null:false}"
+                                       class="input-medium"
+                                       size="5"
+                                       name="{$name}[{$product.product_id}][{$field}]"
+                                       {if $readonly_fields[$product.product_id].$field}
+                                           readonly="readonly"
+                                       {/if}
+                                />
                             {elseif $type == "A"}
                                 <input 
                                     type="text"
@@ -274,16 +294,43 @@
                                     class="input-medium"
                                     name="{$name}[{$product.product_id}][{$field}]"
                                     {if $field == "product_code"}
-                                        maxlength={"ProductFieldsLength::PRODUCT_CODE"|enum}
+                                        maxlength="{"ProductFieldsLength::PRODUCT_CODE"|enum}"
+                                    {/if}
+                                    {if $readonly_fields[$product.product_id].$field}
+                                        readonly="readonly"
                                     {/if}
                                 />
                             {elseif $type == "B"}
-                                <input type="text" value="{$product.$field|default:0}" class="input-medium" size="5" name="{$name}[{$product.product_id}][{$field}]" />
+                                <input type="text"
+                                       value="{$product.$field|default:0}"
+                                       class="input-medium"
+                                       size="5"
+                                       name="{$name}[{$product.product_id}][{$field}]"
+                                       {if $readonly_fields[$product.product_id].$field}
+                                           readonly="readonly"
+                                       {/if}
+                                />
                             {elseif $type == "C"}
                                 <input type="hidden" name="{$name}[{$product.product_id}][{$field}]" value="N" />
-                            <input type="checkbox" name="{$name}[{$product.product_id}][{$field}]" value="Y" {if $product.$field == "Y"}checked="checked"{/if} />
+                                <input type="checkbox"
+                                       name="{$name}[{$product.product_id}][{$field}]"
+                                       value="Y"
+                                       {if $product.$field == "Y"}
+                                           checked="checked"
+                                       {/if}
+                                       {if $readonly_fields[$product.product_id].$field}
+                                           readonly="readonly"
+                                       {/if}
+                                />
                             {elseif $type == "D"}
-                                <textarea class="input-xlarge" name="{$name}[{$product.product_id}][{$field}]" rows="3" cols="40">{$product.$field}</textarea>
+                                <textarea class="input-xlarge"
+                                          name="{$name}[{$product.product_id}][{$field}]"
+                                          rows="3"
+                                          cols="40"
+                                          {if $readonly_fields[$product.product_id].$field}
+                                              readonly="readonly"
+                                          {/if}
+                                >{$product.$field}</textarea>
                             {elseif $type == "S"}
                                 <select name="{$name.name}[{$product.product_id}][{$field}]">
                                     {foreach from=$name.variants key=v_id item=v_name}
@@ -292,7 +339,7 @@
                                         {else}
                                             {assign var="option_name" value=__($v_name)}
                                         {/if}
-                                    <option value="{$v_id}" {if $product.$field == $v_id}selected="selection"{/if}>{$option_name}</option>
+                                    <option value="{$v_id}" {if $product.$field == $v_id}selected="selected"{/if}>{$option_name}</option>
                                     {/foreach}
                                 </select>
                             {elseif $type == "T"}
@@ -306,7 +353,7 @@
                             {elseif $type == "L"}
                                 {include file="views/localizations/components/select.tpl" no_div=true data_from=$product.localization data_name="products_data[`$product.product_id`][localization]"}
                             {elseif $type == "E"} {* Categories *}
-                                {include file="common/select2_categories.tpl"
+                                {include file="common/select2/categories.tpl"
                                     select2_tabindex=$tabindex
                                     select2_multiple=true
                                     select2_name="`$name`[`$product.product_id`][category_ids]"

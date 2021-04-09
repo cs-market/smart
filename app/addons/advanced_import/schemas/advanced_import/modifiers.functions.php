@@ -65,3 +65,19 @@ function fn_advance_import_evaluate_predicate_expression($predicate)
 
     return $result;
 }
+
+/**
+ * Normalizes numeric value before applying math operation
+ *
+ * @param mixed $value Numeric value
+ *
+ * @return float
+ */
+function fn_advance_import_normalize_numeric_value($value)
+{
+    if (is_string($value)) {
+        return (float) str_replace(',', '.', $value);
+    }
+
+    return (float) $value;
+}

@@ -14,9 +14,6 @@
 
 namespace Tygh;
 
-use Tygh\Registry;
-use Tygh\Tools\Backup\Handlers\ADatabaseBackupper;
-
 class DataKeeper
 {
     const BACKUP_TYPE_FULL = 'full';
@@ -29,6 +26,8 @@ class DataKeeper
 
     /**
      * Makes a full backup of store
+     *
+     * @param array $params
      *
      * @return bool true if successfully created
      */
@@ -481,43 +480,6 @@ class DataKeeper
     }
 
     /**
-     * @param string     $archive_file_path
-     * @param string     $root_directory_path
-     * @param null|array $file_list
-     *
-     * @return bool
-     * @deprecated since 4.3.6
-     * @see Archive::compress
-     */
-    public static function createZipArchive($archive_file_path, $root_directory_path, $file_list = null)
-    {
-        try {
-            $zip = new \ZipArchive;
-
-            $create_result = $zip->open($archive_file_path, \ZipArchive::CREATE);
-
-            if (true === $create_result) {
-                foreach (self::revealFilePathsList($root_directory_path, $file_list) as $relative_path) {
-                    $absolute_path = $root_directory_path . DIRECTORY_SEPARATOR . $relative_path;
-                    if (is_dir($absolute_path)) {
-                        $zip->addEmptyDir($relative_path);
-                    } elseif (is_file($absolute_path)) {
-                        $zip->addFile($absolute_path, $relative_path);
-                    }
-                }
-            } else {
-                return false;
-            }
-
-            $zip->close();
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
      * @param string     $root_directory_path
      * @param null|array $file_list
      *
@@ -558,6 +520,7 @@ class DataKeeper
                     $output_structure[$relative_path] = $counter++;
                 }
 
+                /** @var \RecursiveDirectoryIterator|\RecursiveIteratorIterator $directory_iterator */
                 $directory_iterator = new \RecursiveIteratorIterator(
                     new \RecursiveDirectoryIterator($absolute_path,
                         \FilesystemIterator::SKIP_DOTS |
@@ -588,23 +551,6 @@ class DataKeeper
         sort($output_structure, SORT_STRING);
 
         return $output_structure;
-    }
-
-    /**
-     * Gets archive file tree without unpacking
-     *
-     * @param  string      $file_path Path to packed file
-     * @param  bool        $only_root gets only root folders and files
-     * @return array|false List of files in packed archive or false if archive cannot be read or archive does not support
-     * @throws \Exception
-     * @deprecated since 4.3.6
-     * @see Archive::getFiles
-     */
-    public static function getCompressedFilesList($file_path, $only_root = false)
-    {
-        $archiver = static::getArchiver();
-
-        return $archiver->getFiles($file_path, $only_root);
     }
 
     /**

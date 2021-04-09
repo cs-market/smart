@@ -6,16 +6,23 @@
     {$sidebar_icon = "icon-chevron-left"}
 {/if}
 
+{if (fn_allowed_for('MULTIVENDOR:ULTIMATE'))}
+    {$select_storefront = $select_storefront|default:false}
+    {$selected_storefront_id = $selected_storefront_id|default:$app["storefront"]->storefront_id}
+{else}
+    {$select_storefront = true}
+{/if}
+
 {if $anchor}
 <a name="{$anchor}"></a>
 {/if}
 
 {if "THEMES_PANEL"|defined}
     {$sticky_padding_on_actions_panel = 80}
-    {$sticky_top_on_actions_panel = 40}
+    {$sticky_top_on_actions_panel = 80}
 {else}
-    {$sticky_padding_on_actions_panel = 44}
-    {$sticky_top_on_actions_panel = 40}
+    {$sticky_padding_on_actions_panel = 45}
+    {$sticky_top_on_actions_panel = 45}
 {/if}
 
 <script type="text/javascript">
@@ -32,7 +39,9 @@ var menu_content = {$data|unescape|default:"''" nofilter};
                         {if $m.type == "divider"}
                             <li class="divider"></li>
                             {else}
-                            <li class="{if $m.js == true}cm-js{/if}{if $smarty.foreach.first_level.last} last-item{/if}{if $navigation.dynamic.active_section == $s_id} active{/if}"><a href="{$m.href|fn_url}">{$m.title}</a></li>
+                                {if $m.href|fn_check_view_permissions:{$method|default:"GET"}}
+                                    <li class="{if $m.js == true}cm-js{/if}{if $smarty.foreach.first_level.last} last-item{/if}{if $navigation.dynamic.active_section == $s_id} active{/if}"><a href="{$m.href|fn_url}">{$m.title}</a></li>
+                                {/if}
                         {/if}
                     {/hook}
                 {/foreach}
@@ -54,7 +63,12 @@ var menu_content = {$data|unescape|default:"''" nofilter};
 {/capture}
 
 <!-- Actions -->
-<div class="actions cm-sticky-scroll" id="actions_panel" data-ca-stick-on-screens="sm-large,md,md-large,lg,uhd" data-ca-top="{$sticky_top_on_actions_panel}" data-ca-padding="{$sticky_padding_on_actions_panel}">
+<div class="actions cm-sticky-scroll"
+     data-ca-stick-on-screens="sm-large,md,md-large,lg,uhd" 
+     data-ca-top="{$sticky_top_on_actions_panel}" 
+     data-ca-padding="{$sticky_padding_on_actions_panel}"
+     id="actions_panel">
+    <div class="actions__wrapper {if $runtime.is_current_storefront_closed || $runtime.are_all_storefronts_closed}navbar-inner--disabled{/if}">
     {hook name="index:actions"}
     <div class="btn-bar-left pull-left mobile-hidden">
         <div class="pull-left">{include file="common/last_viewed_items.tpl"}</div>
@@ -70,11 +84,27 @@ var menu_content = {$data|unescape|default:"''" nofilter};
                 title="{$title_alt|default:"`$title_start` `$title_end`"|strip_tags|strip|html_entity_decode}"
             >
                 <span class="title__part-start mobile-hidden">{$title_start}: </span>
-                <span class="title__part-end">{$title_end|strip_tags}</span>
+                <span class="title__part-end">{$title_end|strip_tags|html_entity_decode}</span>
             </h2>
         {else}
             <h2 class="title__heading" title="{$title_alt|default:$title|strip_tags|strip|html_entity_decode}">{$title|default:"&nbsp;"|sanitize_html nofilter}</h2>
         {/if}
+
+        <!--mobile quick search-->
+        <div class="mobile-visible pull-right search-mobile-group cm-search-mobile-group" 
+            data-ca-search-mobile-back="search_mobile_back"
+            data-ca-search-mobile-btn="search_mobile_btn"
+            data-ca-search-mobile-block="search_mobile_block"
+            data-ca-search-mobile-input="gs_text_mobile"
+        >
+            <button class="btn search-mobile-btn" id="search_mobile_btn"><i class="icon-search search-mobile-icon"></i></button>
+            <div class="search search-mobile-block cm-search-mobile-search hidden" id="search_mobile_block">
+                <button class="search-mobile-back" type="button" id="search_mobile_back"><i class="icon-remove"></i></button>
+                <button class="search_button search-mobile-button" type="submit" title="{__("search_tooltip")}" id="search_button_mobile" form="global_search"><i class="icon-search"></i></button>
+                <label for="gs_text_mobile" class="search-mobile-label"><input type="text" class="cm-autocomplete-off search-mobile-input" id="gs_text_mobile" name="q" value="{$smarty.request.q}" form="global_search" disabled /></label>
+            </div>
+        </div>
+        <!--mobile end quick search-->
 
         {if $languages|sizeof > 1}
         <!--language-->
@@ -95,29 +125,44 @@ var menu_content = {$data|unescape|default:"''" nofilter};
         <!--end language-->
         {/if}
 
-    </div>
-    <div class="{if isset($main_buttons_meta)}{$main_buttons_meta}{else}btn-bar btn-toolbar{/if} dropleft pull-right" {if $content_id}id="tools_{$content_id}_buttons"{/if}>
-        
-        {if $navigation.dynamic.actions}
-            {capture name="tools_list"}
-                {foreach from=$navigation.dynamic.actions key=title item=m name="actions"}
-                    <li><a href="{$m.href|fn_url}" class="{$m.meta}" target="{$m.target}">{__($title)}</a></li>
-                {/foreach}
-            {/capture}
-            {include file="common/tools.tpl" hide_actions=true tools_list=$smarty.capture.tools_list link_text=__("choose_action")}
+        </div>
+
+        {if $select_storefront}            
+            {include file="views/storefronts/components/picker/presets.tpl"
+                input_name=$storefronts_picker_name
+                item_ids=[$runtime.company_data.company_id]
+                show_empty_variant=$show_empty_variant
+                empty_variant_text=__("all_vendors")
+                select_storefront=$select_storefront
+                show_all_storefront=$show_all_storefront
+            }
         {/if}
 
-        {$buttons nofilter}
-        
-        {if $adv_buttons}
-        <div class="adv-buttons" {if $content_id}id="tools_{$content_id}_adv_buttons"{/if}>
-        {$adv_buttons nofilter}
-        {if $content_id}<!--tools_{$content_id}_adv_buttons-->{/if}</div>
-        {/if}
-        
-    {if $content_id}<!--tools_{$content_id}_buttons-->{/if}</div>
-    {/hook}
+        <div class="{if isset($main_buttons_meta)}{$main_buttons_meta}{else}btn-bar btn-toolbar{/if} dropleft pull-right" {if $content_id}id="tools_{$content_id}_buttons"{/if}>
+            
+            {if $navigation.dynamic.actions}
+                {capture name="tools_list"}
+                    {foreach from=$navigation.dynamic.actions key=title item=m name="actions"}
+                        <li><a href="{$m.href|fn_url}" class="{$m.meta}" target="{$m.target}">{__($title)}</a></li>
+                    {/foreach}
+                {/capture}
+                {include file="common/tools.tpl" hide_actions=true tools_list=$smarty.capture.tools_list link_text=__("choose_action")}
+            {/if}
+
+            {$buttons nofilter}
+            
+            {if $adv_buttons}
+            <div class="adv-buttons" {if $content_id}id="tools_{$content_id}_adv_buttons"{/if}>
+            {$adv_buttons nofilter}
+            {if $content_id}<!--tools_{$content_id}_adv_buttons-->{/if}</div>
+            {/if}
+            
+        {if $content_id}<!--tools_{$content_id}_buttons-->{/if}</div>
+        {/hook}
+    </div>
 <!--actions_panel--></div>
+
+<div class="admin-content-wrapper {$mainbox_content_wrapper_class|default:""}">
 
 <!-- Sidebar left -->
 {if !$no_sidebar && $sidebar_content|trim != "" && $sidebar_position == "left"}
@@ -135,7 +180,7 @@ var menu_content = {$data|unescape|default:"''" nofilter};
     <div class="content-wrap">
     {hook name="index:content_top"}
         {if $select_languages && $languages|sizeof > 1}
-            <div class="language-wrap">
+            <div class="content-variant-wrap content-variant-wrap--language language-wrap">
                 <h6 class="muted">{__("language")}:</h6>
                 {if !"ULTIMATE:FREE"|fn_allowed_for}
                     {include file="common/select_object.tpl" style="graphic" link_tpl=$config.current_url|fn_link_attach:"descr_sl=" items=$languages selected_id=$smarty.const.DESCR_SL key_name="name" suffix="content" display_icons=true}
@@ -175,6 +220,8 @@ var menu_content = {$data|unescape|default:"''" nofilter};
     </div>
 <!--elm_sidebar--></div>
 {/if}
+
+</div>
 
 <script type="text/javascript">
     var ajax_callback_data = menu_content;

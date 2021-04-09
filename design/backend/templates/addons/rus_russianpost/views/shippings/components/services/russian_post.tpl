@@ -50,6 +50,9 @@
             <div class="controls">
                 <input id="ship_russian_post_average_quantity_in_packet" type="text" name="shipping_data[service_params][average_quantity_in_packet]" size="30" value="{$shipping.service_params.average_quantity_in_packet}" />
             </div>
+            <div class="controls">
+                <p class="muted description">{__("rus_russian_post.delivery_types_that_require_countinpack")}</p>
+            </div>
         </div>
 
         {include file="addons/rus_russianpost/views/shippings/components/services/russian_post_services.tpl" sending_services=$sending_services}

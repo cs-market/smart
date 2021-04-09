@@ -44,6 +44,7 @@ $schema['mailing_lists'] = array (
 );
 $schema['tools']['modes']['update_status']['param_permissions']['table']['newsletter_campaigns'] = 'manage_newsletters';
 $schema['tools']['modes']['update_status']['param_permissions']['table']['mailing_lists'] = 'manage_newsletters';
+$schema['tools']['modes']['update_status']['param_permissions']['table']['newsletters'] = 'manage_newsletters';
 
 $schema['exim']['modes']['export']['param_permissions']['section']['subscribers'] = 'view_newsletters';
 $schema['exim']['modes']['import']['param_permissions']['section']['subscribers'] = 'manage_newsletters';

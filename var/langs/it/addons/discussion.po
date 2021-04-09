@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Italian\n"
 "Language: it_IT\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: it\n"
-"X-Crowdin-File: /release-4.8.2/addons/discussion.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"X-Crowdin-File: /release-4.11.5/addons/discussion.po\n"
+"X-Crowdin-File-ID: 3578\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::discussion"
 msgid "Comments and reviews"
@@ -80,6 +80,10 @@ msgctxt "Languages::discussion_title_company"
 msgid "Reviews"
 msgstr "Recensioni"
 
+msgctxt "Languages::communication_and_rating"
+msgid "Communication and Rating"
+msgstr "Comunicazione e valutazione"
+
 msgctxt "Languages::communication"
 msgid "Communication"
 msgstr "Comunicazione"
@@ -145,12 +149,16 @@ msgid "Testimonials"
 msgstr "Testimonial"
 
 msgctxt "Languages::privileges.view_discussions"
-msgid "View comments and reviews"
-msgstr "Mostra recensioni e commenti"
+msgid "Can view"
+msgstr "Può visualizzare"
 
 msgctxt "Languages::privileges.manage_discussions"
-msgid "Manage comments and reviews"
-msgstr "Gestione commenti e recensioni"
+msgid "Can edit"
+msgstr "Può modificare"
+
+msgctxt "Languages::privilege_groups.discussions"
+msgid "Comments and reviews"
+msgstr "Commenti e recensioni"
 
 msgctxt "Languages::block_testimonials"
 msgid "Testimonials"
@@ -187,10 +195,6 @@ msgstr "Categorie"
 msgctxt "SettingsSections::discussion::orders"
 msgid "Orders"
 msgstr "Ordini"
-
-msgctxt "SettingsSections::discussion::gift_registry"
-msgid "Gift registry"
-msgstr "Registro regali"
 
 msgctxt "SettingsSections::discussion::pages"
 msgid "Pages"
@@ -260,14 +264,6 @@ msgctxt "SettingsOptions::discussion::order_notify_vendor"
 msgid "Send notifications to vendor"
 msgstr "Inviare notifiche al fornitore"
 
-msgctxt "SettingsOptions::discussion::giftreg_posts_per_page"
-msgid "Posts per page"
-msgstr "Messaggi per pagina"
-
-msgctxt "SettingsOptions::discussion::giftreg_post_ip_check"
-msgid "Only one post from one IP is allowed"
-msgstr "È consentito un solo messaggio per ogni IP"
-
 msgctxt "SettingsOptions::discussion::page_posts_per_page"
 msgid "Posts per page"
 msgstr "Messaggi per pagina"
@@ -320,16 +316,48 @@ msgctxt "SettingsOptions::discussion::testimonials_from_all_stores"
 msgid "Show testimonials from all stores"
 msgstr "Visualizza testimonial di tutti i negozi"
 
+msgctxt "SettingsOptions::discussion::product_discussion_type"
+msgid "Default value"
+msgstr "Valore predefinito"
+
+msgctxt "SettingsTooltips::discussion::product_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created products. Doesn't affect existing products."
+msgstr ""
+
+msgctxt "SettingsOptions::discussion::product_review_after_purchase"
+msgid "Only buyers can post"
+msgstr "Solo gli acquirenti possono pubblicare"
+
+msgctxt "SettingsTooltips::discussion::product_review_after_purchase"
+msgid "Allow leaving reviews for a product only to those who bought that product."
+msgstr ""
+
+msgctxt "SettingsOptions::discussion::category_discussion_type"
+msgid "Default value"
+msgstr "Valore predefinito"
+
+msgctxt "SettingsTooltips::discussion::category_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created categories. Doesn't affect existing categories."
+msgstr ""
+
+msgctxt "SettingsOptions::discussion::page_discussion_type"
+msgid "Default value"
+msgstr "Valore predefinito"
+
+msgctxt "SettingsTooltips::discussion::page_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created pages. Doesn't affect existing pages."
+msgstr ""
+
 msgctxt "SettingsOptions::discussion::company_discussion_type"
 msgid "Reviews"
 msgstr "Recensioni"
 
 msgctxt "SettingsOptions::discussion::company_only_buyers"
-msgid "Allow to post only for buyers"
-msgstr ""
+msgid "Only buyers can post"
+msgstr "Solo gli acquirenti possono pubblicare"
 
 msgctxt "SettingsTooltips::discussion::company_only_buyers"
-msgid "Only those who purchased something from the vendor can post"
+msgid "Allow leaving reviews for a vendor only to those who bought products from that vendor."
 msgstr ""
 
 msgctxt "SettingsOptions::discussion::company_posts_per_page"
@@ -363,22 +391,6 @@ msgstr "Solo i clienti anonimi"
 msgctxt "SettingsVariants::discussion::company_post_approval::disabled"
 msgid "No approval needed"
 msgstr "Nessuna approvazione necessaria"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::B"
-msgid "Communication and Rating"
-msgstr "Comunicazione e valutazione"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::C"
-msgid "Communication"
-msgstr "Comunicazione"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::R"
-msgid "Rating"
-msgstr "Voto"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::D"
-msgid "Disabled"
-msgstr "Disattivato"
 
 msgctxt "SettingsVariants::discussion::product_post_approval::any"
 msgid "Any customer"
@@ -428,22 +440,6 @@ msgctxt "SettingsVariants::discussion::home_page_post_approval::disabled"
 msgid "No approval needed"
 msgstr "Nessuna approvazione necessaria"
 
-msgctxt "SettingsVariants::discussion::home_page_testimonials::B"
-msgid "Communication and Rating"
-msgstr "Comunicazione e valutazione"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::C"
-msgid "Communication"
-msgstr "Comunicazione"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::R"
-msgid "Rating"
-msgstr "Voto"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::D"
-msgid "Disabled"
-msgstr "Disattivato"
-
 msgctxt "Languages::discussion_tab_products"
 msgid "Product Reviews"
 msgstr "Recensioni Prodotto"
@@ -473,7 +469,7 @@ msgid "Comments and reviews notification"
 msgstr "Informare su commenti e reviste"
 
 msgctxt "Languages::show_rating"
-msgid "Show rating"
+msgid "Show review rating"
 msgstr ""
 
 msgctxt "Languages::gdpr_discussions_data"
@@ -490,5 +486,25 @@ msgstr ""
 
 msgctxt "Languages::discussion.agreement_text_short_add_new_review"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
+msgstr ""
+
+msgctxt "Languages::discussion.please_log_in_to_write_a_review"
+msgid "Please sign in to write a review"
+msgstr ""
+
+msgctxt "Languages::discussion.you_have_to_buy_product_before_writing_review"
+msgid "You can't write a review for this product. Customers can write reviews only for the products they bought. If you actually bought this product from us, but are still seeing this message, please contact us."
+msgstr ""
+
+msgctxt "Languages::discussion.you_have_to_buy_from_vendor_before_writing_review"
+msgid "You can't write a review for this vendor. Customers can write reviews for a vendor only after they buy something from that vendor. If you actually placed an order with this vendor, but are still seeing this message, please contact us."
+msgstr ""
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification_title"
+msgid "Comments and reviews add-on settings were changed"
+msgstr ""
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification"
+msgid "In the 4.9.1 version the <strong>Only anonymous customers</strong> variant of the <strong>Administrator must approve posts submitted by</strong> setting was removed. Now, it is available again, with the ability to leave reviews for nonauthorized customers. Please check if the desirable value of the setting is selected."
 msgstr ""
 

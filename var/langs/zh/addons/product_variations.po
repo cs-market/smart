@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: zh-CN\n"
-"X-Crowdin-File: /release-4.8.2/addons/product_variations.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/product_variations.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"PO-Revision-Date: 2019-02-01 06:13\n"
 
 msgctxt "Addons::name::product_variations"
 msgid "Product Variations [Beta]"
@@ -238,5 +238,61 @@ msgstr ""
 
 msgctxt "Languages::is_default_product_variation"
 msgid "Is default product variation"
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.create"
+msgid "Create product group"
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.create_tooltip"
+msgid "Allow customers to switch between similar products by selecting the desired value of their common features."
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.update"
+msgid "Add products to group"
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.delete"
+msgid "Delete product group"
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.delete_product"
+msgid "Delete product from group"
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.tab"
+msgid "Product group"
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.select_features"
+msgid "Select features"
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.select_features_tooltip"
+msgid "Customers will be able to choose the desired values for the selected features on the product page. This will redirect them to a similar product that has these feature values, but only if the product belongs to the group. A product can be added to the group only if it has a value for each of the selected features."
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.add_product_to_group"
+msgid "Add products to group and close"
+msgstr ""
+
+msgctxt "Languages::product_variants.purpose"
+msgid "Purpose"
+msgstr ""
+
+msgctxt "Languages::ttc_product_variants.purpose"
+msgid "Determines where the feature will appear, how it will look, and what you'll be able to do with it."
+msgstr ""
+
+msgctxt "Languages::product_variants.purpose.general"
+msgid "Show product features to customers"
+msgstr ""
+
+msgctxt "Languages::product_variants.purpose.group_products"
+msgid "Switch between similar products"
+msgstr ""
+
+msgctxt "Languages::product_variations.product_groups.no_available_features"
+msgid "This product doesn't have features that allow grouping products. Please make sure that:<ol><li>You have created at least one feature with <b>Purpose:</b> <i>Switch between similar products</i>.</li><li>You have specified the value of that feature for the product.</li></ol>"
 msgstr ""
 

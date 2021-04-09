@@ -195,7 +195,7 @@ class Xml implements IReader
                                     $this->getAtrributeSelector($element_name, $attr_name) => $attr_value,
                                 );
 
-                                if ($original_value) {
+                                if (isset($element[self::VAL])) {
                                     $attr_paths[$this->getAtrributeSelector($element_name, $attr_name, $attr_value)] = $original_value;
                                 }
 
@@ -356,7 +356,13 @@ class Xml implements IReader
 
             foreach ($target_node_path as $key) {
                 if (isset($node[$key])) {
-                    $node = &$node[$key];
+                    $node = $node[$key];
+                } elseif (isset($node[self::VALS]) && isset($node[self::VALS][0][$key])) {
+                    $node = [
+                        self::VALS => array_map(function ($target_node) use ($key) {
+                            return array_merge($target_node[$key], $target_node[self::ATTS]);
+                        }, $node[self::VALS])
+                    ];
                 } else {
                     $node = false;
                     break;

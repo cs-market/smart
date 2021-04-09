@@ -28,6 +28,7 @@ class OrderData
     const STATUS_NONE = 0;
     const STATUS_PAID = 1;
     const STATUS_REFUND = 2;
+    const STATUS_PREPAID = 3;
 
     /** @var int */
     protected $order_id;
@@ -125,6 +126,14 @@ class OrderData
     public function isStatusPaid()
     {
         return $this->status === self::STATUS_PAID;
+    }
+
+    /**
+     * @return bool Whether to the order status is prepaid.
+     */
+    public function isStatusPrepaid()
+    {
+        return $this->status === self::STATUS_PREPAID;
     }
 
     /**

@@ -15,6 +15,7 @@
 namespace Tygh\Api;
 
 use Tygh\Api;
+use Tygh\Enum\NotificationSeverity;
 
 class Response
 {
@@ -235,51 +236,70 @@ class Response
             $this->status = Response::STATUS_NOT_FOUND;
         }
 
-        if ($this->status == self::STATUS_UNAUTHORIZED) {
+        if ($this->status === self::STATUS_UNAUTHORIZED) {
             header('WWW-Authenticate: Basic realm="User email/API key"');
         }
 
         $this->sendStatusCode($this->status);
 
-        if ($this->status == self::STATUS_NO_CONTENT) {
+        if ($this->status === self::STATUS_NO_CONTENT) {
             exit;
         }
 
         header('Content-type: ' . $this->content_type);
 
         if (!self::isSuccessStatus($this->status)) {
-
-            $messages = array();
+            $errors = [];
+            $messages = [];
             if (is_array($this->body)) {
-                if (!empty($this->body['message'])) {
-                    $messages = array($this->body['message']);
-                } else {
+                if (!empty($this->body['messages'])) {
+                    $messages = $this->body['messages'];
+                } elseif (!empty($this->body['message'])) {
+                    $messages[] = $this->body['message'];
+                }
+
+                if (!empty($this->body['errors'])) {
+                    $errors = $this->body['errors'];
+                } elseif (!empty($this->body['error'])) {
+                    $errors[] = $this->body['error'];
+                }
+
+                if (!$errors && !$messages) {
                     $messages = $this->body;
                 }
             } elseif (!empty($this->body)) {
-                $messages = array($this->body);
+                $messages[] = $this->body;
             }
 
-            $this->body = array();
+            $this->body = [];
             $codes = self::getAvailableCodes();
             $this->body['message'] = $codes[$this->status];
 
-
             $notifications = fn_get_notifications();
             foreach ($notifications as $notice) {
-                if ($notice['type'] == 'E') {
-                    $messages[] = $notice['message'];
+                if ($notice['type'] !== NotificationSeverity::ERROR) {
+                    continue;
                 }
+                $errors[] = $notice['message'];
             }
 
             foreach ($notifications as $notice) {
-                if ($notice['type'] == 'W') {
-                    $messages[] = $notice['message'];
+                if ($notice['type'] !== NotificationSeverity::WARNING) {
+                    continue;
                 }
+                $messages[] = $notice['message'];
+            }
+
+            if (!empty($messages) || !empty($errors)) {
+                $this->body['message'] .= ': ' . implode('. ', array_merge($errors, $messages));
             }
 
             if (!empty($messages)) {
-                $this->body['message'] .= ': ' . implode('. ', $messages);
+                $this->body['messages'] = $messages;
+            }
+
+            if (!empty($errors)) {
+                $this->body['errors'] = $errors;
             }
 
             $this->body['status'] = $this->status;
@@ -366,13 +386,4 @@ class Response
     {
         return $status < 300;
     }
-    
-      public function __get($name) {
-	if(!empty($this->$name)) {
-	    return $this->$name;
-	} else {
-	  return null;
-	}
-      }
-
 }

@@ -13,6 +13,12 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Enum\ProfileTypes;
+use Tygh\Enum\VendorStatuses;
+use Tygh\Providers\VendorServicesProvider;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -24,26 +30,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             return array(CONTROLLER_STATUS_NO_PAGE);
         }
 
-        if (!empty($auth['user_type']) && ($auth['user_type'] == 'A' || $auth['user_type'] == 'V')) {
-            fn_set_notification('E', __('error'), __('error_admin_registers_as_vendor'));
-            return array(CONTROLLER_STATUS_REDIRECT, 'companies.apply_for_vendor');
+        if (
+            !empty($auth['user_type'])
+            && ($auth['user_type'] === UserTypes::ADMIN || $auth['user_type'] === UserTypes::VENDOR)
+        ) {
+            $sign_out_link = fn_url('auth.logout?redirect_url=companies.apply_for_vendor');
+            fn_set_notification(
+                NotificationSeverity::ERROR,
+                __('error'),
+                __('error_admin_registers_as_vendor', ['[sign_out_link]' => $sign_out_link])
+            );
+            return [CONTROLLER_STATUS_REDIRECT, 'companies.apply_for_vendor'];
         }
 
         $data = $_REQUEST['company_data'];
 
         $data['timestamp'] = TIME;
-        $data['status'] = 'N';
+        $data['status'] = VendorStatuses::NEW_ACCOUNT;
         $data['request_user_id'] = !empty($auth['user_id']) ? $auth['user_id'] : 0;
 
-        $account_data = array();
-        $account_data['fields'] = isset($_REQUEST['user_data']['fields']) ? $_REQUEST['user_data']['fields'] : '';
-        $account_data['admin_firstname'] = isset($_REQUEST['company_data']['admin_firstname']) ? $_REQUEST['company_data']['admin_firstname'] : '';
-        $account_data['admin_lastname'] = isset($_REQUEST['company_data']['admin_lastname']) ? $_REQUEST['company_data']['admin_lastname'] : '';
+        $fields = isset($_REQUEST['company_data']['fields']) ? $_REQUEST['company_data']['fields'] : array();
+        $company_data = fn_mve_extract_company_data_from_profile($fields);
+
+        $account_data = array(
+            'company_fields'  => $fields,
+            'admin_firstname' => isset($_REQUEST['company_data']['admin_firstname']) ? $_REQUEST['company_data']['admin_firstname'] : $company_data['admin_firstname'],
+            'admin_lastname'  => isset($_REQUEST['company_data']['admin_lastname']) ? $_REQUEST['company_data']['admin_lastname'] : $company_data['admin_lastname'],
+        );
+
+        $account_data['fields'] = fn_mve_profiles_match_company_and_user_fields($account_data['company_fields']);
         $data['request_account_data'] = serialize($account_data);
 
         if (empty($data['request_user_id'])) {
             $login_condition = empty($data['request_account_name']) ? '' : db_quote(" OR user_login = ?s", $data['request_account_name']);
-            $user_account_exists = db_get_field("SELECT user_id FROM ?:users WHERE email = ?s ?p", $data['email'], $login_condition);
+            $user_account_exists = db_get_field('SELECT user_id FROM ?:users WHERE email = ?s ?p', $data['email'], $login_condition);
 
             if ($user_account_exists) {
                 fn_save_post_data('user_data', 'company_data');
@@ -65,23 +85,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $data = array_merge($data, fn_get_company_data($company_id));
 
         $msg = Tygh::$app['view']->fetch('views/companies/components/apply_for_vendor.tpl');
-        fn_set_notification('I', __('information'), $msg);
+        fn_set_notification(NotificationSeverity::INFO, __('thank_you'), $msg);
 
         // Notify user department on the new vendor application
-        /** @var \Tygh\Mailer\Mailer $mailer */
-        $mailer = Tygh::$app['mailer'];
+        /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+        $event_dispatcher = Tygh::$app['event.dispatcher'];
 
-        $mailer->send(array(
-            'to' => 'default_company_users_department',
-            'from' => 'default_company_users_department',
-            'data' => array(
-                'company_id' => $company_id,
-                'company' => $data,
-                'company_update_url' => fn_url('companies.update?company_id=' . $company_id, 'A', 'http')
-            ),
-            'template_code' => 'apply_for_vendor_notification',
-            'tpl' => 'companies/apply_for_vendor_notification.tpl', // this parameter is obsolete and is used for back compatibility
-        ), 'A', Registry::get('settings.Appearance.backend_default_language'));
+        $event_dispatcher->dispatch('vendors_require_approval', []);
+
+        $notification_data = [
+            'company_id' => $company_id,
+            'company' => $data,
+            'company_update_url' => fn_url('companies.update?company_id=' . $company_id, SiteArea::ADMIN_PANEL, 'http')
+        ];
+
+        $event_dispatcher->dispatch('apply_for_vendor_notification', $notification_data);
 
         $return_url = !empty(Tygh::$app['session']['apply_for_vendor']['return_url']) ? Tygh::$app['session']['apply_for_vendor']['return_url'] : fn_url('');
         unset(Tygh::$app['session']['apply_for_vendor']['return_url']);
@@ -94,6 +112,7 @@ if (fn_allowed_for('ULTIMATE')) {
     if ($mode == 'entry_page') {
         $countries = array();
 
+        // FIXME: #STOREFRONTS: Must be redone to the Storefronts functionality
         $companies_countries = db_get_array('SELECT storefront, countries_list FROM ?:companies');
         foreach ($companies_countries as $data) {
             if (empty($data['countries_list'])) {
@@ -119,7 +138,14 @@ if (fn_allowed_for('ULTIMATE')) {
 
 if ($mode == 'view') {
 
-    $company_data = !empty($_REQUEST['company_id']) ? fn_get_company_data($_REQUEST['company_id']) : array();
+    $company_id = (int) $_REQUEST['company_id'];
+    $company_data = !empty($company_id) ? fn_get_company_data($company_id) : array();
+
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+    if ($storefront->getCompanyIds() && !in_array($company_id, $storefront->getCompanyIds())) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
 
     if (empty($company_data) || empty($company_data['status']) || !empty($company_data['status']) && $company_data['status'] != 'A') {
         return array(CONTROLLER_STATUS_NO_PAGE);
@@ -128,10 +154,8 @@ if ($mode == 'view') {
     fn_add_breadcrumb(__('all_vendors'), 'companies.catalog');
     fn_add_breadcrumb($company_data['company']);
 
-    $company_data['total_products'] = count(db_get_fields(fn_get_products(array(
-        'get_query' => true,
-        'company_id' => $_REQUEST['company_id']
-    ))));
+    $company_products = fn_get_companies_active_products_count([$company_id]);
+    $company_data['total_products'] = $company_products[$company_id];
 
     $company_data['logos'] = fn_get_logos($company_data['company_id']);
 
@@ -143,7 +167,7 @@ if ($mode == 'view') {
     ));
 
     $params = array(
-        'company_id' => $_REQUEST['company_id'],
+        'company_id' => $company_id,
     );
 
     Tygh::$app['view']->assign('company_data', $company_data);
@@ -155,6 +179,12 @@ if ($mode == 'view') {
     $params = $_REQUEST;
     $params['status'] = 'A';
     $params['get_description'] = 'Y';
+
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+    if ($storefront->getCompanyIds()) {
+        $params['company_id'] = $storefront->getCompanyIds();
+    }
 
     $vendors_per_page = Registry::get('settings.Vendors.vendors_per_page');
     list($companies, $search) = fn_get_companies($params, $auth, $vendors_per_page);
@@ -173,6 +203,15 @@ if ($mode == 'view') {
     }
 
     $restored_company_data = fn_restore_post_data('company_data');
+    if (!empty($_REQUEST['invitation_key']) && empty($restored_company_data['email'])) {
+        Tygh::$app['view']->assign('invitation_key', $_REQUEST['invitation_key']);
+
+        $invite = VendorServicesProvider::getInvitationsRepository()->findInvitationByKey($_REQUEST['invitation_key']);
+        if (!empty($invite['email'])) {
+            $restored_company_data['email'] = $invite['email'];
+        }
+    }
+
     if ($restored_company_data) {
         Tygh::$app['view']->assign('company_data', $restored_company_data);
     }
@@ -182,7 +221,11 @@ if ($mode == 'view') {
         Tygh::$app['view']->assign('user_data', $restored_user_data);
     }
 
-    $profile_fields = fn_get_profile_fields('A', array(), CART_LANGUAGE, array('get_custom' => true, 'get_profile_required' => true));
+    $params = array(
+        'profile_type'     => ProfileTypes::CODE_SELLER,
+        'skip_email_field' => false,
+    );
+    $profile_fields = fn_get_profile_fields('A', array(), CART_LANGUAGE, $params);
 
     Tygh::$app['view']->assign('profile_fields', $profile_fields);
     Tygh::$app['view']->assign('countries', fn_get_simple_countries(true, CART_LANGUAGE));
@@ -195,11 +238,17 @@ if ($mode == 'view') {
 } elseif ($mode == 'products') {
     $company_data = !empty($_REQUEST['company_id']) ? fn_get_company_data($_REQUEST['company_id']) : array();
 
-    if (empty($company_data)) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+    if (!$company_data || $company_data['status'] === 'D') {
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
     $company_id = $company_data['company_id'];
+
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+    if ($storefront->getCompanyIds() && !in_array($company_id, $storefront->getCompanyIds())) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
 
     fn_add_breadcrumb(__('all_vendors'), 'companies.catalog');
 

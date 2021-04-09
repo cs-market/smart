@@ -41,6 +41,7 @@ class Apparel extends ApparelSimple
         'country_of_origin',
         'barcode',
         'cpa',
+        'adult',
         'expiry',
         'weight',
         'dimensions',

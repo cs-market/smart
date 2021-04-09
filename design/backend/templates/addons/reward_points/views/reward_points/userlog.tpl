@@ -14,7 +14,7 @@
 
     {if $userlog}
     <div class="table-responsive-wrapper">
-        <table class="table table-middle table-responsive">
+        <table class="table table-middle table--relative table-responsive">
         <thead>
             <tr>
                 <th width="5%" class="left mobile-hide">
@@ -146,7 +146,7 @@
                     <div class="control-group">
                         <label  class="control-label" for="notify_user">{__("notify_customer")}:</label>
                         <div class="controls">
-                            <input type="checkbox" name="notify_user" value="Y" checked="checked" id="notify_user" class="checkbox" />
+                            <input type="checkbox" name="notify_user" value="Y" checked="checked" id="notify_user" />
                         </div>
                     </div>
                 </fieldset>

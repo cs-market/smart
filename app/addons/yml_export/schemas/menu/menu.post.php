@@ -13,6 +13,9 @@
 ****************************************************************************/
 
 $schema['top']['addons']['items']['yml_export'] = array(
+    'attrs' => array(
+        'class' => 'is-addon'
+    ),
     'href' => 'yml.manage',
     'type' => 'title',
     'position' => 1000,

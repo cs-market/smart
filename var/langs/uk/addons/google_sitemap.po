@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/google_sitemap.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/google_sitemap.po\n"
+"X-Crowdin-File-ID: 3590\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::google_sitemap"
 msgid "Google sitemap"
@@ -38,7 +38,7 @@ msgstr "Завжди"
 
 msgctxt "Languages::hourly"
 msgid "Hourly"
-msgstr "Погодинно"
+msgstr "Щогодини"
 
 msgctxt "Languages::daily"
 msgid "Daily"
@@ -46,11 +46,11 @@ msgstr "Щоденно"
 
 msgctxt "Languages::weekly"
 msgid "Weekly"
-msgstr "Щотижнево"
+msgstr "Щотижня"
 
 msgctxt "Languages::monthly"
 msgid "Monthly"
-msgstr "Щомісячно"
+msgstr "Щомісяця"
 
 msgctxt "Languages::yearly"
 msgid "Yearly"
@@ -90,7 +90,7 @@ msgstr "Частота оновлення"
 
 msgctxt "SettingsOptions::google_sitemap::site_priority"
 msgid "Priority"
-msgstr "Приоритет"
+msgstr "Пріоритет"
 
 msgctxt "SettingsOptions::google_sitemap::products_setting"
 msgid "Products settings"
@@ -106,7 +106,7 @@ msgstr "Частота оновлення"
 
 msgctxt "SettingsOptions::google_sitemap::products_priority"
 msgid "Priority"
-msgstr "Приоритет"
+msgstr "Пріоритет"
 
 msgctxt "SettingsOptions::google_sitemap::categories_setting"
 msgid "Categories settings"
@@ -122,7 +122,7 @@ msgstr "Частота оновлення"
 
 msgctxt "SettingsOptions::google_sitemap::categories_priority"
 msgid "Priority"
-msgstr "Приоритет"
+msgstr "Пріоритет"
 
 msgctxt "SettingsOptions::google_sitemap::pages_setting"
 msgid "Pages settings"
@@ -138,7 +138,7 @@ msgstr "Частота оновлення"
 
 msgctxt "SettingsOptions::google_sitemap::pages_priority"
 msgid "Priority"
-msgstr "Приоритет"
+msgstr "Пріоритет"
 
 msgctxt "SettingsOptions::google_sitemap::extended_setting"
 msgid "Brand/Manufacturer feature pages settings"
@@ -154,7 +154,7 @@ msgstr "Частота оновлення"
 
 msgctxt "SettingsOptions::google_sitemap::extended_priority"
 msgid "Priority"
-msgstr "Приоритет"
+msgstr "Пріоритет"
 
 msgctxt "SettingsOptions::google_sitemap::companies_setting"
 msgid "Companies settings"
@@ -170,5 +170,9 @@ msgstr "Частота оновлення"
 
 msgctxt "SettingsOptions::google_sitemap::companies_priority"
 msgid "Priority"
-msgstr "Приоритет"
+msgstr "Пріоритет"
+
+msgctxt "Languages::google_sitemap.export_progress_entry"
+msgid "[storefront]: [object]"
+msgstr "[storefront]: [object]"
 

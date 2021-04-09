@@ -5,21 +5,24 @@
     </li>
     
     {hook name="checkout:checkout_totals"}
-        {if $cart.shipping_required == true && ($location != "cart" || $settings.General.estimate_shipping_cost == "Y")}
-        <li class="ty-cart-statistic__item ty-statistic-list-shipping-method">
-        {if $cart.shipping}
-            <span class="ty-cart-statistic__title">
-                {foreach from=$cart.shipping item="shipping" key="shipping_id" name="f_shipp"}
-                    {$shipping.shipping}{if !$smarty.foreach.f_shipp.last}, {/if}
-                {/foreach}
-                <span class="ty-nowrap">({$smarty.capture.shipping_estimation|trim nofilter})</span>
-            </span>
-            <span class="ty-cart-statistic__value">{include file="common/price.tpl" value=$cart.display_shipping_cost}</span>
-        {else}
-            <span class="ty-cart-statistic__title">{__("shipping_cost")}</span>
-            <span class="ty-cart-statistic__value">{$smarty.capture.shipping_estimation nofilter}</span>
-        {/if}
-        </li>
+        {$show_shipping_estimation = ($location != "cart" || $settings.Checkout.estimate_shipping_cost == "YesNo::YES"|enum)}
+        {if $cart.shipping_required == true}
+            <li class="ty-cart-statistic__item ty-statistic-list-shipping-method">
+            {if $cart.shipping}
+                <span class="ty-cart-statistic__title">
+                    {foreach $cart.shipping as $shipping_id => $shipping name="f_shipp"}
+                        {$shipping.shipping}{if !$smarty.foreach.f_shipp.last}, {/if}
+                    {/foreach}
+                    {if $show_shipping_estimation}
+                        <span class="ty-nowrap">({$smarty.capture.shipping_estimation|trim nofilter})</span>
+                    {/if}
+                </span>
+                <span class="ty-cart-statistic__value">{include file="common/price.tpl" value=$cart.display_shipping_cost}</span>
+            {elseif $show_shipping_estimation}
+                <span class="ty-cart-statistic__title">{__("shipping_cost")}</span>
+                <span class="ty-cart-statistic__value">{$smarty.capture.shipping_estimation nofilter}</span>
+            {/if}
+            </li>
         {/if}
     {/hook}
     
@@ -45,7 +48,7 @@
     </li>
     {foreach from=$cart.taxes item="tax"}
     <li class="ty-cart-statistic__item ty-statistic-list-tax">
-        <span class="ty-cart-statistic__title">{$tax.description}&nbsp;({include file="common/modifier.tpl" mod_value=$tax.rate_value mod_type=$tax.rate_type}{if $tax.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.General.tax_calculation == "subtotal")}&nbsp;{__("included")}{/if})</span>
+        <span class="ty-cart-statistic__title">{$tax.description}&nbsp;({include file="common/modifier.tpl" mod_value=$tax.rate_value mod_type=$tax.rate_type}{if $tax.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.Checkout.tax_calculation == "subtotal")}&nbsp;{__("included")}{/if})</span>
         <span class="ty-cart-statistic__value">{include file="common/price.tpl" value=$tax.tax_subtotal}</span>
     </li>
     {/foreach}

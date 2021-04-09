@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: German\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: de\n"
-"X-Crowdin-File: /release-4.8.2/addons/searchanise.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.5/addons/searchanise.po\n"
+"X-Crowdin-File-ID: 3694\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::searchanise"
 msgid "Searchanise"
@@ -76,6 +76,10 @@ msgctxt "Languages::text_se_connected"
 msgid "You've connected to Searchanise."
 msgstr "Sie sind nun mit Searchanise verbunden."
 
+msgctxt "Languages::text_se_ajax_connecting"
+msgid "Product indexation has started in your store. It may take some time. Wait just a little, we've almost finished."
+msgstr ""
+
 msgctxt "Languages::text_se_database_restore_notice"
 msgid "You've just restored your data from the database dump file. If this dump contains product data, please <a href=\"[link]\">Re-indexation</a> it with Searchanise."
 msgstr "Sie haben Ihre Daten eben aus dem Datenbankpapierkorb wiederhergestellt. Wenn dieser Papierkorb Artikeldaten enthält, bitte <a href=\"[link]\">Re-indexation</a> mit Searchanise."
@@ -110,7 +114,7 @@ msgstr "Preis"
 
 msgctxt "Languages::se_list_price"
 msgid "List Price"
-msgstr ""
+msgstr "Listenpreis"
 
 msgctxt "Languages::se_quantity"
 msgid "Quantity"
@@ -182,6 +186,26 @@ msgstr "Privater Schlüssel (Key)"
 
 msgctxt "Languages::se_options_combinations_codes"
 msgid "Options combinations codes"
+msgstr ""
+
+msgctxt "Languages::se_master_product_status"
+msgid "Common product status"
+msgstr ""
+
+msgctxt "Languages::se_is_vendor_product"
+msgid "Vendor product flag"
+msgstr ""
+
+msgctxt "Languages::se_is_master_product"
+msgid "Сommon product flag"
+msgstr ""
+
+msgctxt "Languages::se_connection_warning"
+msgid "Searchanise: There is no connection to Searchanise server! For Searchanise to work properly, the store server must be able to access www.searchanise.com. Please contact Searchanise <a href=\"mailto: [email]\">[email]</a> technical support or your system administrator."
+msgstr ""
+
+msgctxt "Languages::se_queue_warning"
+msgid "Searchanise: We found an issue with the export of changes in your store catalog. To resolve the issue please contact the Searchanise <a href=\"mailto: [email]\">[email]</a> technical support."
 msgstr ""
 
 msgctxt "SettingsSections::searchanise::configuration"

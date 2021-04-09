@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/data_feeds.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.11.5/addons/data_feeds.po\n"
+"X-Crowdin-File-ID: 3568\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::data_feeds"
 msgid "Data feeds"
@@ -30,11 +30,11 @@ msgstr "مغذي البيانات"
 
 msgctxt "Languages::export_by_cron"
 msgid "Export by cron"
-msgstr ""
+msgstr "تصدير بواسطة cron"
 
 msgctxt "Languages::export_by_cron_to"
 msgid "Export by cron to"
-msgstr ""
+msgstr "تصدير بواسطة cron إلى"
 
 msgctxt "Languages::add_new_datafeed"
 msgid "New data feed"
@@ -50,7 +50,7 @@ msgstr "اسم مغذي البيانات"
 
 msgctxt "Languages::save_directory"
 msgid "Server directory"
-msgstr ""
+msgstr "دليل الخادم"
 
 msgctxt "Languages::ftp_url"
 msgid "FTP server"
@@ -58,7 +58,7 @@ msgstr "خادم FTP"
 
 msgctxt "Languages::ftp_url_hint"
 msgid "The format is: FTPHOST[:PORT][/DIRECTORY]. Example: ftp.yourhost.com:21/home/username/folder"
-msgstr ""
+msgstr "التنسيق هو: FTPHOST [: PORT] [/DIRECTORY]. مثال: ftp.yourhost.com:21/home/username/folder"
 
 msgctxt "Languages::ftp_user"
 msgid "FTP username"
@@ -82,7 +82,7 @@ msgstr "نوع الحقل"
 
 msgctxt "Languages::map_fields"
 msgid "Fields mapping"
-msgstr ""
+msgstr "تعيين الحقول"
 
 msgctxt "Languages::update_datafeed"
 msgid "Editing data feed"
@@ -90,11 +90,11 @@ msgstr "تحرير مغذي البيانات"
 
 msgctxt "Languages::datafeed.description"
 msgid "Only the products that meet <strong>all</strong> of the conditions below will be exported:"
-msgstr ""
+msgstr "سيتم تصدير المنتجات التي تلبي <strong> جميع </strong> الشروط التالية فقط:"
 
 msgctxt "Languages::export_cron_hint"
 msgid "Use the following line to run the script according to schedule"
-msgstr ""
+msgstr "استخدم السطر التالي لتشغيل البرنامج النصي وفقًا للجدول"
 
 msgctxt "Languages::exported_items"
 msgid "Exported items"
@@ -102,7 +102,7 @@ msgstr "الأصناف المصدرة"
 
 msgctxt "Languages::ftp_connection_problem"
 msgid "Unable connect to FTP server. Please, check FTP connection information"
-msgstr ""
+msgstr "غير قادر على الاتصال بخادم FTP. من فضلك ، تحقق من معلومات اتصال FTP"
 
 msgctxt "Languages::categories_in"
 msgid "Categories in"
@@ -110,7 +110,7 @@ msgstr "الفئات"
 
 msgctxt "Languages::products_in"
 msgid "Products in"
-msgstr ""
+msgstr "المنتجات في"
 
 msgctxt "Languages::local_export"
 msgid "Download"
@@ -122,7 +122,7 @@ msgstr "الرفع إلى خادم FTP"
 
 msgctxt "Languages::cron_export"
 msgid "Cron export settings"
-msgstr ""
+msgstr "إعدادات تصدير Cron"
 
 msgctxt "Languages::export_to_server"
 msgid "Export to server"
@@ -138,15 +138,15 @@ msgstr "FTP"
 
 msgctxt "Languages::check_server_export_settings"
 msgid "Check server export settings"
-msgstr ""
+msgstr "تحقق من إعدادات تصدير الخادم"
 
 msgctxt "Languages::exclude_disabled_products"
 msgid "Exclude disabled products"
-msgstr ""
+msgstr "استبعاد المنتجات المعطلة"
 
 msgctxt "Languages::data_feeds.exclude_shared_products"
 msgid "Exclude shared products"
-msgstr ""
+msgstr "استبعاد المنتجات المشتركة"
 
 msgctxt "Languages::general_settings"
 msgid "General settings"
@@ -154,7 +154,7 @@ msgstr "الإعدادات العامة"
 
 msgctxt "Languages::enclosure"
 msgid "Enclosure"
-msgstr ""
+msgstr "Enclosure"
 
 msgctxt "SettingsSections::data_feeds::general"
 msgid "General"
@@ -162,7 +162,7 @@ msgstr "عام"
 
 msgctxt "SettingsOptions::data_feeds::cron_password"
 msgid "Cron password"
-msgstr ""
+msgstr "كلمة مرور Cron"
 
 msgctxt "Languages::data_feed.error_exim_no_data_exported"
 msgid "No data exported"
@@ -170,9 +170,9 @@ msgstr "لا توجد بيانات مصدرة"
 
 msgctxt "Languages::data_feeds.text_tooltip_field_name"
 msgid "The name of the column in the data feed file."
-msgstr ""
+msgstr "اسم العمود في ملف خلاصة البيانات."
 
 msgctxt "Languages::data_feeds.text_tooltip_field_type"
 msgid "The type of data from your store which will be exported to this column of the data feed file."
-msgstr ""
+msgstr "نوع البيانات من متجرك والتي سيتم تصديرها إلى هذا العمود لملف خلاصة البيانات."
 

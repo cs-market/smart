@@ -14,6 +14,7 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Languages\Languages;
@@ -80,6 +81,8 @@ function fn_yml_export_update_product_pre(&$product_data, $product_id, $lang_cod
             );
         }
     }
+
+    fn_set_hook('yml_export_update_product_pre_post', $product_data, $product_id);
 }
 
 function fn_yml_export_update_category_post(&$category_data, &$category_id, &$lang_code)
@@ -159,7 +162,11 @@ function fn_yml_export_get_filters_products_count_post($params, $lang_code, &$fi
         }
     }
 
-    $yml_units = db_get_hash_array('SELECT variant_id, yml2_unit FROM ?:product_feature_variant_descriptions WHERE variant_id IN (?a) AND lang_code = ?s', 'variant_id', $variant_ids, $lang_code);
+    if ($variant_ids) {
+        $yml_units = db_get_hash_array('SELECT variant_id, yml2_unit FROM ?:product_feature_variant_descriptions WHERE variant_id IN (?a) AND lang_code = ?s', 'variant_id', $variant_ids, $lang_code);
+    } else {
+        $yml_units = [];
+    }
 
     foreach ($filters as &$feature) {
         if (!empty($feature['variants'])) {
@@ -477,13 +484,27 @@ function fn_yml_get_price_id($access_key)
     return $price_id;
 }
 
+/**
+ * Gets options for specific price list as merging default options from scheme and overridden options for current price list
+ *
+ * @param int $price_id  Price list identifier
+ *
+ * @return array
+ */
 function fn_yml_get_options($price_id)
 {
+    $price_list = db_get_row("SELECT param_id, param_key, param_data, company_id FROM ?:yml_param WHERE param_id = ?s", $price_id);
+
+    if (empty($price_list)) {
+        return false;
+    }
+
     $schema_price_list = fn_get_schema('yml', 'price_list');
     $schema_price_list = $schema_price_list['default'];
 
     $options = array(
-        'price_id' => $price_id
+        'price_id'           => $price_id,
+        'use_yml_categories' => true
     );
     foreach ($schema_price_list as $tab_code => $params) {
         foreach ($params as $param_code => $param_data) {
@@ -493,13 +514,15 @@ function fn_yml_get_options($price_id)
         }
     }
 
-    $price_list = db_get_row("SELECT param_id, param_key, param_data, company_id FROM ?:yml_param WHERE param_id = ?s", $price_id);
+    $options = array_merge($options, unserialize($price_list['param_data']));
 
-    if (!empty($price_list)) {
-        $options = array_merge($options, unserialize($price_list['param_data']));
-    } else {
-        return false;
-    }
+    /**
+     * Executed after getting specific price list options. Allows to modify getting options.
+     *
+     * @param int   $price_id Price list identifier
+     * @param array $options  Option data
+     */
+    fn_set_hook('yml_export_get_options_post', $price_id, $options);
 
     return $options;
 }
@@ -833,13 +856,7 @@ function fn_yml_get_link($price_list)
 function fn_yml_get_console_cmd($price_list)
 {
     $console_cmd = sprintf('php %s/index.php --dispatch=yml.generate', DIR_ROOT);
-
-    if (!empty($price_list['company_id'])) {
-        $console_cmd .= " --switch_company_id=" . $price_list['company_id'];
-
-    } elseif(Registry::get('runtime.company_id')) {
-        $console_cmd .= " --switch_company_id=" . Registry::get('runtime.company_id');
-    }
+    $console_cmd .= ' --switch_storefront_id=' . $price_list['storefront_id'];
 
     if (isset($price_list['param_data']) && $price_list['param_data']['enable_authorization'] == 'N') {
         $console_cmd .= " --price_id=" . $price_list['param_id'];
@@ -1054,4 +1071,36 @@ function fn_yml_export_get_categories($params, &$join, $condition, &$fields, &$g
         $join .= ' LEFT JOIN ?:products_categories as pc ON ?:categories.category_id = pc.category_id';
         $group_by .= ' GROUP BY ?:categories.category_id';
     }
+}
+
+
+/**
+ * Hook handler: delete vendor-specified settings for offers
+ */
+function fn_yml_export_chown_company($from_company_id, $to_company_id, $excluded_tables, $tables)
+{
+    db_query('DELETE FROM ?:yml_param WHERE param_type = ?s AND company_id = ?i', 'offer', $from_company_id);
+}
+
+/**
+ * Hook handler: removes or adds variation to the exclude yml objects together with their parent.
+ */
+function fn_product_variations_yml_export_update_product_pre_post($product_data, $product_id)
+{
+    if (empty($product_id)) {
+        return;
+    }
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+    $sync_service->onTableChanged('yml_exclude_objects', $product_id);
+}
+
+
+function fn_product_variations_yml_export_generate_offers_before_gather_additional_products_data($yml2, $products, &$params)
+{
+    $params['get_variation_info'] = true;
+}
+
+function fn_warehouses_yml_export_generate_offers_before_gather_additional_products_data($yml2, $products, &$params)
+{
+    $params['get_warehouse_total_amount'] = true;
 }

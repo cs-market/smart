@@ -20,7 +20,7 @@ fn_register_hooks(
     'pre_place_order',
     'place_order',
     'get_order_info',
-    'order_notification',
+    'change_order_status_post',
     'delete_order',
     'delete_cart_product',
     'generate_cart_id',
@@ -56,7 +56,8 @@ fn_register_hooks(
     'change_order_status',
     'paypal_apply_discount_post',
     'template_document_order_context_init',
-    'settings_variants_image_verification_use_for'
+    'settings_variants_image_verification_use_for',
+    'generate_ekeys_for_edp_pre'
 );
 if (fn_allowed_for('ULTIMATE')) {
     fn_register_hooks(

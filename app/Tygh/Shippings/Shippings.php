@@ -1,24 +1,25 @@
 <?php
 /***************************************************************************
-*                                                                          *
-*   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
-*                                                                          *
-* This  is  commercial  software,  only  users  who have purchased a valid *
-* license  and  accept  to the terms of the  License Agreement can install *
-* and use this program.                                                    *
-*                                                                          *
-****************************************************************************
-* PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
-* "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
-****************************************************************************/
+ *                                                                          *
+ *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
+ *                                                                          *
+ * This  is  commercial  software,  only  users  who have purchased a valid *
+ * license  and  accept  to the terms of the  License Agreement can install *
+ * and use this program.                                                    *
+ *                                                                          *
+ ****************************************************************************
+ * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
+ * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
+ ****************************************************************************/
 
 namespace Tygh\Shippings;
 
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
+use Tygh\Tygh;
 
 class Shippings
 {
-
     /**
      * Init shippings
      */
@@ -32,6 +33,7 @@ class Shippings
      *
      * @param  array $products Products list with products data
      * @param  array $location User location
+     *
      * @return array Product groups
      */
     public static function groupProductsList($products, $location)
@@ -48,10 +50,10 @@ class Shippings
             if (empty($groups[$company_id])) {
                 $origination = self::_getOriginationData($company_id);
                 $groups[$company_id] = array(
-                    'name' => $origination['name'],
-                    'company_id' => (int) $company_id,
+                    'name'        => $origination['name'],
+                    'company_id'  => (int) $company_id,
                     'origination' => $origination,
-                    'location' => $location,
+                    'location'    => $location,
                 );
             }
             $groups[$company_id]['products'][$key_product] = $product;
@@ -60,7 +62,7 @@ class Shippings
         fn_set_hook('shippings_group_products_list', $products, $groups);
 
         foreach ($groups as $key_group => $group) {
-            $groups[$key_group]['package_info']      = self::_getPackageInfo($group);
+            $groups[$key_group]['package_info'] = self::_getPackageInfo($group);
             $groups[$key_group]['package_info_full'] = self::_getPackageInfo($group, true);
             unset($groups[$key_group]['origination']);
             unset($groups[$key_group]['location']);
@@ -97,6 +99,7 @@ class Shippings
      * Get origination data
      *
      * @param  array $company_id Company ID
+     *
      * @return array Origination data
      */
     private static function _getOriginationData($company_id)
@@ -105,26 +108,24 @@ class Shippings
 
         if (empty($company_id) || fn_allowed_for('ULTIMATE')) {
             $data = array(
-                'name' => Registry::get('settings.Company.company_name'),
+                'name'    => Registry::get('settings.Company.company_name'),
                 'address' => Registry::get('settings.Company.company_address'),
-                'city' => Registry::get('settings.Company.company_city'),
+                'city'    => Registry::get('settings.Company.company_city'),
                 'country' => Registry::get('settings.Company.company_country'),
-                'state' => Registry::get('settings.Company.company_state'),
+                'state'   => Registry::get('settings.Company.company_state'),
                 'zipcode' => Registry::get('settings.Company.company_zipcode'),
-                'phone' => Registry::get('settings.Company.company_phone'),
-                'fax' => Registry::get('settings.Company.company_fax'),
+                'phone'   => Registry::get('settings.Company.company_phone'),
             );
         } else {
-            $company_data = fn_get_company_data($company_id);
+            $company_data = fn_get_company_data($company_id, DESCR_SL, ['skip_company_condition' => true]);
             $data = array(
-                'name' => $company_data['company'],
+                'name'    => $company_data['company'],
                 'address' => $company_data['address'],
-                'city' => $company_data['city'],
+                'city'    => $company_data['city'],
                 'country' => $company_data['country'],
-                'state' => $company_data['state'],
+                'state'   => $company_data['state'],
                 'zipcode' => $company_data['zipcode'],
-                'phone' => $company_data['phone'],
-                'fax' => $company_data['fax'],
+                'phone'   => $company_data['phone'],
             );
         }
 
@@ -136,6 +137,7 @@ class Shippings
      *
      * @param  array $group                 Group information
      * @param  bool  $include_free_shipping Include free shipped products into calculation
+     *
      * @return array Package information
      */
     private static function _getPackageInfo($group, $include_free_shipping = false)
@@ -164,16 +166,12 @@ class Shippings
 
                 if (!empty($product['exclude_from_calculate'])) {
                     $product_price = 0;
-
                 } elseif (!empty($product['subtotal'])) {
                     $product_price = $product['subtotal'];
-
                 } elseif (!empty($product['price'])) {
                     $product_price = $product['price'];
-
                 } elseif (!empty($product['base_price'])) {
                     $product_price = $product['base_price'];
-
                 } else {
                     $product_price = 0;
                 }
@@ -203,9 +201,9 @@ class Shippings
 
         $package_groups = array(
             'personal' => array(),
-            'global' => array(
+            'global'   => array(
                 'products' => array(),
-                'amount' => 0,
+                'amount'   => 0,
             ),
         );
         foreach ($group['products'] as $cart_id => $product) {
@@ -216,13 +214,12 @@ class Shippings
                     $package_groups['global']['products'][$cart_id] = $product['amount'];
                     $package_groups['global']['amount'] += $product['amount'];
                 }
-
             } else {
                 if (!isset($package_groups['personal'][$product['product_id']])) {
                     $package_groups['personal'][$product['product_id']] = array(
                         'shipping_params' => $product['shipping_params'],
-                        'amount' => 0,
-                        'products' => array(),
+                        'amount'          => 0,
+                        'products'        => array(),
                     );
                 }
 
@@ -263,8 +260,8 @@ class Shippings
 
                             $packages[] = array(
                                 'shipping_params' => $package_products['shipping_params'],
-                                'products' => $package_products_pack,
-                                'amount' => array_sum($package_products_pack),
+                                'products'        => $package_products_pack,
+                                'amount'          => array_sum($package_products_pack),
                             );
 
                             $full_package_size += array_sum($package_products_pack);
@@ -276,7 +273,6 @@ class Shippings
                                     unset($pack_products[$cart_id]);
                                 }
                             }
-
                         } while ($package_size > 0);
 
                         // Re-check package (amount, min_amount, max_amount)
@@ -316,7 +312,6 @@ class Shippings
                     }
                     $package_products['amount'] -= $full_package_size;
                 }
-
             }
         }
 
@@ -368,6 +363,7 @@ class Shippings
      *
      * @param  array $amount   Amount products in package group
      * @param  array $products Products list in package group
+     *
      * @return array Products list and package size
      */
     private static function _getPackageByAmount($amount, $products)
@@ -395,70 +391,94 @@ class Shippings
      * Get shippings list
      *
      * @param  array $group Group products information
+     *
      * @return array Shippings list
      */
 
     /**
      * Gets list of shippings
      *
-     * @param  array  $group     Group products information
-     * @param  string $lang_code 2 letters language code
-     * @param  string $area      Current working area
+     * @param  array  $group  Group products information
+     * @param  string $lang   2 letters language code
+     * @param  string $area   Current working area
+     * @param array   $params Additional shippings obtain params
+     *
      * @return array  Shippings list
      */
-    public static function getShippingsList($group, $lang = CART_LANGUAGE, $area = AREA)
+    public static function getShippingsList($group, $lang = CART_LANGUAGE, $area = AREA, $params = [])
     {
+        $params = array_merge([
+            'get_images' => false,
+            'storefront_id' => null,
+        ], $params);
+
+        if ($area === 'C' && $params['storefront_id'] === null) {
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = Tygh::$app['storefront'];
+            $params['storefront_id'] = $storefront->storefront_id;
+        }
+
         /**
          * Changes params before shipping list selecting
          *
-         * @param array $group Group products information
+         * @param array  $group     Group products information
          * @param string $lang_code 2 letters language code
-         * @param string $area Current working area
+         * @param string $area      Current working area
          */
         fn_set_hook('shippings_get_shippings_list_pre', $group, $lang, $area);
 
         $shippings = self::_getCompanyShippings($group['company_id']);
-
         $condition = '';
 
         /**
          * Changes company shipping list before main selecting
          *
-         * @param array $group Group products information
-         * @param array $shippings List of company shippings
+         * @param array  $group     Group products information
+         * @param array  $shippings List of company shippings
          * @param string $condition WHERE condition
          */
         fn_set_hook('shippings_get_shippings_list', $group, $shippings, $condition);
 
+        $fields = [
+            '?:shippings.shipping_id',
+            '?:shipping_descriptions.shipping',
+            '?:shipping_descriptions.delivery_time',
+            '?:shipping_descriptions.description',
+            '?:shippings.rate_calculation',
+            '?:shippings.service_params',
+            '?:shippings.destination',
+            '?:shippings.min_weight',
+            '?:shippings.max_weight',
+            '?:shippings.service_id',
+            '?:shippings.free_shipping',
+            '?:shipping_services.module',
+            '?:shipping_services.code as service_code',
+            '?:shippings.is_address_required',
+        ];
+
+        $join = 'LEFT JOIN ?:shipping_descriptions ON ?:shippings.shipping_id = ?:shipping_descriptions.shipping_id ';
+        $join .= 'LEFT JOIN ?:shipping_services ON ?:shipping_services.service_id = ?:shippings.service_id ';
+
         $package_weight = $group['package_info_full']['W'];
-
-        $fields = array(
-            "?:shippings.shipping_id",
-            "?:shipping_descriptions.shipping",
-            "?:shipping_descriptions.delivery_time",
-            "?:shipping_descriptions.description",
-            "?:shippings.rate_calculation",
-            "?:shippings.service_params",
-            "?:shippings.destination",
-            "?:shippings.min_weight",
-            "?:shippings.max_weight",
-            "?:shippings.service_id",
-            "?:shippings.free_shipping",
-            "?:shipping_services.module",
-            "?:shipping_services.code as service_code"
-        );
-
-        $join = "LEFT JOIN ?:shipping_descriptions ON ?:shippings.shipping_id = ?:shipping_descriptions.shipping_id ";
-        $join .= "LEFT JOIN ?:shipping_services ON ?:shipping_services.service_id = ?:shippings.service_id ";
-
         $condition .= db_quote('?:shippings.status = ?s', 'A');
         $condition .= db_quote(' AND ?:shippings.shipping_id IN (?n)', $shippings);
         $condition .= db_quote(' AND (?:shippings.min_weight <= ?d', $package_weight);
         $condition .= db_quote(' AND (?:shippings.max_weight >= ?d OR ?:shippings.max_weight = 0.00))', $package_weight);
         $condition .= db_quote(' AND ?:shipping_descriptions.lang_code = ?s', $lang);
 
-        if ($area == 'C') {
+        if ($area === 'C') {
             $condition .= " AND (" . fn_find_array_in_set(\Tygh::$app['session']['auth']['usergroup_ids'], '?:shippings.usergroup_ids', true) . ")";
+        }
+
+        if ($params['storefront_id'] !== null) {
+            $join .= db_quote(
+                ' LEFT JOIN ?:storefronts_shippings AS storefronts_shippings'
+                . ' ON storefronts_shippings.shipping_id = ?:shippings.shipping_id'
+            );
+            $condition .= db_quote(
+                ' AND (storefronts_shippings.storefront_id = ?i OR storefronts_shippings.storefront_id IS NULL)',
+                $params['storefront_id']
+            );
         }
 
         $order_by = '?:shippings.position';
@@ -469,18 +489,24 @@ class Shippings
 
         foreach ($shippings_info as $key => $shipping_info) {
             $shippings_info[$key]['rate_info'] = self::_getRateInfoByLocation($shipping_info['shipping_id'], $group['package_info']['location']);
-            $shippings_info[$key]['service_params'] = !empty($shippings_info[$key]['service_params']) ? unserialize($shippings_info[$key]['service_params']) : array();
+            $shippings_info[$key]['service_params'] = !empty($shippings_info[$key]['service_params']) ? unserialize($shippings_info[$key]['service_params']) : [];
         }
 
         /**
          * Changes shippings data
          *
-         * @param array $group Group products information
-         * @param string $lang_code 2 letters language code
-         * @param string $area Current working area
-         * @param array $shippings_info List of selected shippings
+         * @param array  $group          Group products information
+         * @param string $lang_code      2 letters language code
+         * @param string $area           Current working area
+         * @param array  $shippings_info List of selected shippings
          */
         fn_set_hook('shippings_get_shippings_list_post', $group, $lang, $area, $shippings_info);
+
+        if ($params['get_images']) {
+            array_walk($shippings_info, function(&$shipping) {
+                $shipping['image'] = fn_get_image_pairs($shipping['shipping_id'], 'shipping', 'M');
+            });
+        }
 
         return $shippings_info;
     }
@@ -492,6 +518,7 @@ class Shippings
      * @param  int   $service_id     Service ID
      * @param  array $service_params Service configurations
      * @param  array $package_info   Package info
+     *
      * @return array Shipping
      */
     public static function getShippingForTest($shipping_id, $service_id, $service_params, $package_info, $lang = CART_LANGUAGE)
@@ -510,10 +537,10 @@ class Shippings
                 . "?:shipping_services.module, "
                 . "?:shipping_services.code as service_code "
             . "FROM ?:shippings "
-                . "LEFT JOIN ?:shipping_descriptions "
-                    . "ON ?:shippings.shipping_id = ?:shipping_descriptions.shipping_id "
-                . "LEFT JOIN ?:shipping_services "
-                    . "ON ?:shipping_services.service_id = ?i "
+            . "LEFT JOIN ?:shipping_descriptions "
+                . "ON ?:shippings.shipping_id = ?:shipping_descriptions.shipping_id "
+            . "LEFT JOIN ?:shipping_services "
+                . "ON ?:shipping_services.service_id = ?i "
             . "WHERE ?:shippings.shipping_id = ?i "
                 . "AND ?:shipping_descriptions.lang_code = ?s "
             . "ORDER BY ?:shippings.position ",
@@ -532,62 +559,94 @@ class Shippings
     /**
      * Get shippings list for company
      *
-     * @param  int   $company_id Company ID
-     * @return array Shippings array
+     * @param  int $company_id Company ID
+     *
+     * @return array List of shippings identifiers
      */
     private static function _getCompanyShippings($company_id)
     {
-        if (fn_allowed_for('ULTIMATE')) {
-            $shippings = db_get_fields("SELECT shipping_id FROM ?:shippings WHERE status = ?s", 'A');
-        } else {
-            $shippings = explode(',', db_get_field("SELECT shippings FROM ?:companies WHERE company_id = ?i", $company_id));
-            $shippings = db_get_fields("SELECT shipping_id FROM ?:shippings WHERE (company_id = ?i OR (company_id = ?i AND shipping_id IN (?n))) AND status = ?s", $company_id, 0, $shippings, 'A');
-        }
+        $storefront = Tygh::$app['storefront'];
+        $shippings = fn_get_available_shippings($company_id, false, $storefront->storefront_id);
 
-        return $shippings;
+        $shippings = array_filter($shippings, static function ($shipping) use ($storefront) {
+            return ($shipping['status'] === ObjectStatuses::ACTIVE);
+        });
+        $shipping_ids = array_column($shippings, 'shipping_id');
+
+        /**
+         * Executes after company shipping identifiers are retrieved, allowing to modify them
+         *
+         * @param int   $company_id   Company ID
+         * @param array $shipping_ids List of company shippings identifiers
+         */
+        fn_set_hook('shippings_get_company_shipping_ids', $company_id, $shipping_ids);
+
+        return $shipping_ids;
     }
 
     /**
      * Get rate information by user location
      *
-     * @param  int   $shipping_info Shipping information
-     * @param  int   $location      User location
+     * @param int    $shipping_id Shipping identifier
+     * @param int    $location    User location
+     * @param string $lang_code   Two-letters language code
+     *
      * @return array Rate information
      */
-    private static function _getRateInfoByLocation($shipping_id, $location)
+    private static function _getRateInfoByLocation($shipping_id, $location, $lang_code = CART_LANGUAGE)
     {
-        $rate_info = array();
-
+        $rate_info = [];
         if ($destination_id = fn_get_available_destination($location)) {
-
             $rate_info = db_get_row(
-                "SELECT rate_id, rate_value FROM ?:shipping_rates"
-                . " WHERE shipping_id = ?i AND destination_id = ?i"
-                . " ORDER BY destination_id desc",
+                'SELECT rate_id, shipping_id, rate_value, destination_id FROM ?:shipping_rates'
+                . ' WHERE shipping_id = ?i AND destination_id = ?i'
+                . ' ORDER BY destination_id desc',
                 $shipping_id, $destination_id
             );
+
             if (!empty($rate_info)) {
                 $rate_info['rate_value'] = unserialize($rate_info['rate_value']);
-            }
 
+                $delivery_time = self::getRateDeliveryTime($rate_info, $lang_code);
+                if (!empty($delivery_time)) {
+                    $rate_info['delivery_time'] = $delivery_time;
+                }
+            }
         }
 
         return $rate_info;
     }
 
     /**
+     * Fetches delivery time value for provided rate
+     *
+     * @param array  $rate_info Shipping rate information
+     * @param string $lang_code Two-letters language code
+     *
+     * @return string
+     */
+    protected static function getRateDeliveryTime($rate_info, $lang_code = CART_LANGUAGE)
+    {
+        return db_get_field(
+            'SELECT delivery_time FROM ?:shipping_time_descriptions'
+            . ' WHERE shipping_id = ?i AND destination_id = ?s AND lang_code = ?s',
+            $rate_info['shipping_id'], $rate_info['destination_id'], $lang_code
+        );
+    }
+
+    /**
      * Calculate rates
      *
      * @param  array $shippings List all shippings with information about them
+     *
      * @return array Rates list
      */
     public static function calculateRates($shippings)
     {
-        $mode = array(
-            'real' => array(),
-            'manual' => array(),
-        );
-        $rates = array();
+        $mode = [
+            'real'   => [],
+            'manual' => [],
+        ];
 
         foreach ($shippings as $shipping) {
             if ($shipping['rate_calculation'] == 'R') {
@@ -599,11 +658,15 @@ class Shippings
             }
         }
 
+        $rates = [];
         if (!empty($mode['real'])) {
             $rates = self::_calculateRealTimeRates($mode['real']);
             foreach ($rates as $key_rate => $rate) {
                 if ($rate['price'] !== false) {
-                    $rates[$key_rate]['price'] += self::_calculateManualRealRate($mode['real'][$rate['keys']['mode_key']]);
+                    $rates[$key_rate]['price'] += self::_calculateManualRealRate($mode['real'][$rate['keys']['mode_key']], $rate);
+                }
+                if (isset($rate['pickup_info']['min_cost'])) {
+                    $rates[$key_rate]['pickup_info']['min_cost'] += self::_calculateManualRealRate($mode['real'][$rate['keys']['mode_key']], $rate['pickup_info']);
                 }
                 unset($rates[$key_rate]['keys']['mode_key']);
             }
@@ -613,10 +676,11 @@ class Shippings
             foreach ($mode['manual'] as $shipping) {
                 $rate = self::_calculateManualRate($shipping);
                 unset($shipping['keys']['mode_key']);
-                $rates[] = array(
-                    'price' => $rate,
-                    'keys' => !empty($shipping['keys']) ? $shipping['keys'] : array(),
-                );
+                $rates[] = [
+                    'price'                   => $rate,
+                    'keys'                    => !empty($shipping['keys']) ? $shipping['keys'] : [],
+                    'service_delivery_time'   => isset($shipping['rate_info']['delivery_time']) ? $shipping['rate_info']['delivery_time'] : false,
+                ];
             }
         }
 
@@ -624,7 +688,7 @@ class Shippings
          * Executes after shipping rates are calculated allowing to modify them.
          *
          * @param  array $shippings List all shippings with information about them
-         * @param  array $rates Rates list
+         * @param  array $rates     Rates list
          */
         fn_set_hook('shippings_calculate_rates_post', $shippings, $rates);
 
@@ -668,9 +732,9 @@ class Shippings
     {
         $_new_package = array(
             'products' => array(),
-            'amount' => 0,
-            'weight' => 0,
-            'cost' => 0,
+            'amount'   => 0,
+            'weight'   => 0,
+            'cost'     => 0,
         );
 
         foreach ($package_info['packages'] as $package_id => $package) {
@@ -721,6 +785,7 @@ class Shippings
 
     /**
      * Gets information about all available shipping services
+     *
      * @return array list of all shipping services
      */
     public static function getCarriers()
@@ -737,8 +802,10 @@ class Shippings
 
     /**
      * Gets information about shipping service
+     *
      * @param  string $carrier         shipping service name
      * @param  string $tracking_number tracking number
+     *
      * @return array  shipping service information
      */
     public static function getCarrierInfo($carrier, $tracking_number = '')
@@ -756,8 +823,8 @@ class Shippings
                 }
             } else {
                 $info = array(
-                    'name' => __("carrier_{$carrier}"),
-                    'tracking_url' => ''
+                    'name'         => __("carrier_{$carrier}"),
+                    'tracking_url' => '',
                 );
             }
         }
@@ -769,6 +836,7 @@ class Shippings
      * Calculate realtime rates
      *
      * @param  array $shippings List realtime shippings
+     *
      * @return array Rates list
      */
     private static function _calculateRealTimeRates($shippings)
@@ -787,7 +855,7 @@ class Shippings
             if (!empty($error)) {
                 $_rates[] = array(
                     'price' => false,
-                    'keys' => $shipping['keys'],
+                    'keys'  => $shipping['keys'],
                     'error' => $error,
                 );
             }
@@ -796,13 +864,15 @@ class Shippings
         $rates = RealtimeServices::getRates();
 
         foreach ($rates as $rate) {
-            $_rates[] = array(
-                'price' => $rate['price'],
-                'keys' => $shippings[$rate['shipping_key']]['keys'],
-                'error' => $rate['error'],
+            $_rates[] = [
+                'price'                 => $rate['price'],
+                'keys'                  => $shippings[$rate['shipping_key']]['keys'],
+                'error'                 => $rate['error'],
+                'delivery_time'         => $shippings[$rate['shipping_key']]['delivery_time'],
                 'service_delivery_time' => isset($rate['delivery_time']) ? $rate['delivery_time'] : false,
-                'delivery_time' => $shippings[$rate['shipping_key']]['delivery_time']
-            );
+                'destination_id'        => isset($rate['destination_id']) ? $rate['destination_id'] : null,
+                'pickup_info'           => $rate['pickup_info'],
+            ];
         }
 
         return $_rates;
@@ -812,7 +882,8 @@ class Shippings
      * Calculate manual rate
      *
      * @param  array $shipping Manual shipping
-     * @return float Rate
+     *
+     * @return array Rate
      */
     private static function _calculateManualRate($shipping)
     {
@@ -849,31 +920,28 @@ class Shippings
     }
 
     /**
-     * Calculate manual rate for real rate
+     * Fetches rate amount by provided destination
      *
-     * @param  array $shipping Manual shipping
-     * @return float Rate
+     * @param array $shipping       Shipping data
+     * @param int   $destination_id Destination identifier
+     *
+     * @return float|bool
      */
-    private static function _calculateManualRealRate($shipping)
+    public static function getRateByDestination(array $shipping, $destination_id)
     {
         $rate_info = db_get_row(
-            "SELECT rate_id, rate_value FROM ?:shipping_rates"
-            . " WHERE shipping_id = ?i AND destination_id = 0"
-            . " ORDER BY destination_id desc",
-            $shipping['shipping_id']
+            'SELECT rate_id, rate_value FROM ?:shipping_rates'
+            . ' WHERE shipping_id = ?i AND destination_id = ?i'
+            . ' ORDER BY destination_id desc',
+            $shipping['shipping_id'],
+            $destination_id
         );
-        if (!empty($rate_info)) {
-            $rate_info['rate_value'] = unserialize($rate_info['rate_value']);
-        } else {
-            return 0;
+
+        if (empty($rate_info)) {
+            return false;
         }
 
-        // use free rates for free shipping
-        if (!self::isFreeShipping($shipping)) {
-            $shipping['package_info'] = $shipping['package_info_full'];
-        }
-        unset($shipping['package_info_full']);
-
+        $rate_info['rate_value'] = unserialize($rate_info['rate_value']);
         $base_cost = $shipping['package_info']['C'];
         $rate = 0;
 
@@ -886,7 +954,6 @@ class Shippings
                         $per_unit = (!empty($data['per_unit']) && $data['per_unit'] == 'Y') ? $shipping['package_info'][$type] : 1;
 
                         $rate += $value * $per_unit;
-
                         break;
                     }
                 }
@@ -894,6 +961,25 @@ class Shippings
         }
 
         return fn_format_price($rate);
+    }
+
+    /**
+     * Calculate manual rate for real rate
+     *
+     * @param  array $shipping Manual shipping
+     * @param  array $rate     Rate data
+     *
+     * @return float Rate
+     */
+    private static function _calculateManualRealRate($shipping, $rate)
+    {
+        $destination_id = !empty($rate['destination_id']) ? $rate['destination_id'] : 0;
+        if (!self::isFreeShipping($shipping)) {
+            $shipping['package_info'] = $shipping['package_info_full'];
+        }
+
+        $rate = self::getRateByDestination($shipping, $destination_id);
+        return $rate !== false ? $rate : 0;
     }
 
     /**
@@ -913,6 +999,7 @@ class Shippings
      * Check if shipping is available for usage with "free shipping" product option
      *
      * @param  array $shipping Shipping data
+     *
      * @return bool  Availability of shipping
      */
     public static function isFreeShipping($shipping)

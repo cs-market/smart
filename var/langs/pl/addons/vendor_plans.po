@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: pl\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_plans.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:08\n"
+"X-Crowdin-File: /release-4.11.5/addons/vendor_plans.po\n"
+"X-Crowdin-File-ID: 3640\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -25,8 +25,16 @@ msgid "Commissions"
 msgstr "Prowizje"
 
 msgctxt "SettingsOptions::vendor_plans::include_shipping"
-msgid "Include shipping cost in vendors commission"
-msgstr "Wliczaj koszty wysyłki w prowizję sprzedawców"
+msgid "Include shipping cost in vendor commissions"
+msgstr "Wliczaj koszty wysyłki w prowizję sprzedawcy"
+
+msgctxt "SettingsOptions::vendor_plans::include_taxes_in_commission"
+msgid "Include taxes in vendor commissions"
+msgstr "Wliczaj podatki w prowizję sprzedawcy"
+
+msgctxt "SettingsTooltips::vendor_plans::include_taxes_in_commission"
+msgid "Calculate vendor commissions without subtracting taxes from the order total beforehand."
+msgstr "Oblicz prowizje sprzedawcy bez wcześniejszego odliczenia podatków od sumy zamówienia."
 
 msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
@@ -107,6 +115,10 @@ msgstr "Nie można wyłączyć planu: Niektórzy sprzedawcy go używają"
 msgctxt "Languages::vendor_plans.transaction_fee"
 msgid "Transaction fee"
 msgstr "Opłata za transakcję"
+
+msgctxt "Languages::vendor_plans.fixed_transaction_fee"
+msgid "Transaction fee (abs)"
+msgstr "Opłata za transakcję (abs)"
 
 msgctxt "Languages::vendor_plans.revenue"
 msgid "Revenue"
@@ -189,8 +201,8 @@ msgid "<strong>Unlimited</strong> revenue"
 msgstr "<strong>Nieograniczone</strong> dochody"
 
 msgctxt "Languages::vendor_plans.transaction_fee_value"
-msgid "<strong>[value]</strong> transaction fee"
-msgstr "<strong>[value]</strong> opłaty za transakcję"
+msgid "Transaction fee: <strong>[value]</strong>"
+msgstr "Opłata transakcyjna: <strong>[value]</strong>"
 
 msgctxt "Languages::vendor_plans.vendor_commission"
 msgid "Vendor commission"
@@ -210,7 +222,7 @@ msgstr "Płatności za Plan"
 
 msgctxt "Languages::vendor_plans.plan_payment_text"
 msgid "A sum of [price] has been withdrawn from your account for using the [plan] plan. Follow the link to <a href=\"[href]\">view your account balance</a> or see the details of your plan below."
-msgstr "Suma [price] została wycofana z konta za pomocą planu [plan]. Kliknij w link, aby <a href=\"[href]\"> wyświetlić saldo konta</a> lub zobacz szczegóły planu poniżej."
+msgstr "Twoje konto zostało obciążone kwotą [price], wynikającą z przypisanego planu sprzedawcy [plan]. Kliknij w link, aby <a href=\"[href]\"> wyświetlić saldo konta</a> lub zobacz szczegóły planu poniżej."
 
 msgctxt "Languages::vendor_plans.plan_has_been_changed"
 msgid "Your Plan Has Been Changed"
@@ -265,16 +277,24 @@ msgid "Vendor plans: revenue notification"
 msgstr "Plany sprzedawcy: powiadomienie o dochodach"
 
 msgctxt "Languages::privileges.view_vendor_plans"
-msgid "View vendor plans"
-msgstr "Przeglądaj plany sprzedawców"
+msgid "Can view"
+msgstr "Może przeglądać"
 
 msgctxt "Languages::privileges.manage_vendor_plans"
-msgid "Manage vendor plans"
-msgstr "Zarządzanie planami sprzedawców"
+msgid "Can edit"
+msgstr "Może edytować"
+
+msgctxt "Languages::privilege_groups.vendor_plans"
+msgid "Vendor plans"
+msgstr "Plany sprzedawcy"
 
 msgctxt "Languages::addons.vendor_plans.commission_description_absolute"
 msgid "[amount] out of [sum]"
 msgstr "[amount] z [sum]"
+
+msgctxt "Languages::vendor_plans.out_of_amount"
+msgid "out of [amount]"
+msgstr "z [amount]"
 
 msgctxt "Languages::addons.vendor_plans.commission_description_percent"
 msgid "[amount]% of [sum]"
@@ -295,4 +315,36 @@ msgstr "Ustawienie usunięte z dodatku plany sprzedawców"
 msgctxt "Languages::vendor_plans.upgrade_notification_text"
 msgid "<p>Previously, the <b>Vendor Plans</b> add-on had a setting called <b>Take payment surcharge from vendors</b>. It removed payment surcharge from order total, so that customers wouldn't have to pay it. Instead, the payment surcharge was deducted from the order total in favor of the marketplace. This setting has been removed: if you'd like to take money from vendors per order, please specify commissions for the corresponding vendor plans.</p>"
 msgstr "<p>Poprzednio, dodatek <b>Plany sprzedawcy</b>zawierał opcję <b>Pobierz dopłaty przy płatnościach od sprzedawców</b>. Opcja ta usuwała prowizję z koszyka klienta, więc nie musiał on jej płacić. Zamiast tego, prowizja była odejmowana z sumy zamówienia już po jego złożeniu. Opcja ta została usunięta: jeśli chcesz pobierać prowizję od każdego zamówienia sprzedawcy, należy ustawić odpowiednie wartości prowizji w planach sprzedawcy.</p>"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.title"
+msgid "Storefronts available in the vendor plan got changed"
+msgstr "Zmieniły się storefronty dostępne w planie dostawcy"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.general_message"
+msgid "What should we do about <a href=\"[search_url]\" target=\"_blank\">[n] vendor </a> who is using this plan now?|What should we do about <a href=\"[search_url]\" target=\"_blank\">[n] vendors </a> who are using this plan now?"
+msgstr "Co powinniśmy zrobić z <a href=\"[search_url]\" target=\"_blank\"> [n] sprzedawcą </a>, który korzysta teraz z tego planu? | Co powinniśmy zrobić z <a href = \"[search_url]\" target = \"_ blank\"> [n] sprzedawców </a>, którzy używają tego planu teraz?"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.add_storefronts_message"
+msgid "Add the vendor to the storefronts that got added to the plan|Add the vendors to the storefronts that got added to the plan"
+msgstr "Dodaj sprzedawcę do storefrontów, które zostały dodane do planu | Dodaj sprzedawców do storefrontów, które zostały dodane do planu"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.remove_storefronts_message"
+msgid "Remove the vendor from the storefronts that got removed from this plan|Remove the vendors from the storefronts that got removed from this plan"
+msgstr "Usuń sprzedawcę ze storefrontów, które zostały usunięte z tego planu | Usuń sprzedawców ze storefrontów, które zostały usunięte z tego planu"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.title"
+msgid "The vendor got moved to another plan"
+msgstr "Sprzedawca przeniósł się do innego planu"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.general_message"
+msgid "What should we do about the storefronts that are available to this vendor?"
+msgstr "Co powinniśmy zrobić ze storefrontami dla tego dostawcy?"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.add_storefronts_message"
+msgid "Add the vendor to the storefronts available in the new vendor plan"
+msgstr "Dodaj sprzedawcę do storefrontów dostępnych w nowym planie dostawcy"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
+msgid "Remove the vendor from the storefronts available in his previous plan"
+msgstr "Usuń sprzedawcę z storefronts dostępnych w jego poprzednim planie"
 

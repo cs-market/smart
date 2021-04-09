@@ -15,6 +15,7 @@
 use Tygh\Registry;
 use Tygh\Models\VendorPlan;
 use Tygh\Models\Company;
+use Tygh\Tygh;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return;
@@ -29,6 +30,7 @@ if ($mode == 'apply_for_vendor') {
     $vendor_plans = VendorPlan::model()->findMany(array(
         'allowed_for_company_id' => Registry::get('runtime.company_id'),
     ));
+
     Tygh::$app['view']->assign('vendor_plans', $vendor_plans);
 
 } elseif ($mode == 'vendor_plans') {
@@ -39,6 +41,7 @@ if ($mode == 'apply_for_vendor') {
 
     $vendor_plans = VendorPlan::model()->findMany(array(
         'allowed_for_company_id' => 0,
+        'storefront_id'          => Tygh::$app['storefront']->storefront_id,
     ));
     Tygh::$app['view']->assign('vendor_plans', $vendor_plans);
 

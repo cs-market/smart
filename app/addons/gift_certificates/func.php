@@ -12,12 +12,14 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
+use Tygh\Addons\GiftCertificates\Notifications\EventIdProviders\CertificateProvider;
 use Tygh\Navigation\LastView;
+use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Themes\Themes;
+use Tygh\Tygh;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 function fn_get_gift_certificate_company_condition($field)
 {
@@ -33,7 +35,7 @@ function fn_change_gift_certificate_status($gift_cert_id, $status_to, $status_fr
     if (empty($gift_cert_id)) {
         return false;
     }
-    $gift_cert_data = fn_get_gift_certificate_info($gift_cert_id, 'B');
+    $gift_cert_data = fn_get_gift_certificate_info($gift_cert_id);
 
     if (empty($status_from)) {
         $status_from = $gift_cert_data['status'];
@@ -44,9 +46,23 @@ function fn_change_gift_certificate_status($gift_cert_id, $status_to, $status_fr
     }
     $result = db_query('UPDATE ?:gift_certificates SET ?u WHERE gift_cert_id = ?i', array('status' => $status_to), $gift_cert_id);
 
-    if ($result) {
+    if ($result && $gift_cert_data['send_via'] !== 'P') {
         $gift_cert_data['status'] = $status_to;
-        fn_gift_certificate_notification($gift_cert_data, $force_notification);
+        $status_to = strtolower($gift_cert_data['status']);
+
+        /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+        $event_dispatcher = Tygh::$app['event.dispatcher'];
+
+        /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+        $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+        $notification_rules = $notification_settings_factory->create($force_notification);
+
+        $event_dispatcher->dispatch(
+            "gift_certificates.gift_certificate.status_changed.{$status_to}",
+            ['certificate_data' => $gift_cert_data],
+            $notification_rules,
+            new CertificateProvider($gift_cert_data)
+        );
     }
 
     return $result;
@@ -65,7 +81,7 @@ function fn_add_gift_certificate_log_record($gift_cert_id, $before_info, $after_
         'products' => $before_info['products'],
         'debit' => $after_info['amount'],
         'debit_products' => $after_info['products'],
-        'order_id' => $order_id
+        'order_id' => $order_id,
     );
 
     return db_query("REPLACE INTO ?:gift_certificates_log ?e", $_data);
@@ -101,7 +117,7 @@ function fn_get_gift_certificate_log($params, $items_per_page = 0)
 
     $default_params = array (
         'page' => 1,
-        'items_per_page' => $items_per_page
+        'items_per_page' => $items_per_page,
     );
 
     $params = array_merge($default_params, $params);
@@ -233,7 +249,7 @@ function fn_delete_gift_certificate($gift_cert_id, $extra = array())
         if (!empty($gift_data['order_ids'])) {
             fn_set_notification('W', __('warning'), __('text_gift_cert_cannot_delete', array(
                 '[code]' => $gift_data['gift_cert_code'],
-                '[ids]' => $gift_data['order_ids']
+                '[ids]' => $gift_data['order_ids'],
             )));
 
             return false;
@@ -275,7 +291,7 @@ function fn_correct_gift_certificate(&$gift_cert_data)
 
         fn_set_notification('N', __('notice'), __('gift_cert_amount_changed') . "<br />" . __('text_gift_cert_amount_alert', array(
             '[min]' => $min_amount,
-            '[max]' => $max_amount
+            '[max]' => $max_amount,
         )));
     }
 
@@ -306,7 +322,7 @@ function fn_add_gift_certificate_to_cart($gift_cert_data, &$auth)
                 $product_data[$product_item['product_id']] = array(
                     'product_id' => $product_item['product_id'],
                     'amount' => $product_item['amount'],
-                    'extra' => array('parent' => array('certificate' => $gift_cert_cart_id))
+                    'extra' => array('parent' => array('certificate' => $gift_cert_cart_id)),
                 );
                 if (isset($product_item['product_options'])) {
                     $product_data[$product_item['product_id']]['product_options'] = $product_item['product_options'];
@@ -320,7 +336,7 @@ function fn_add_gift_certificate_to_cart($gift_cert_data, &$auth)
 
         return array (
             $gift_cert_cart_id,
-            $gift_cert_data
+            $gift_cert_data,
         );
 
     } else {
@@ -418,7 +434,7 @@ function fn_get_gift_certificate_templates()
         'dir' => 'mail/templates/addons/gift_certificates/templates',
         'get_dirs' => false,
         'get_files' => true,
-        'extension' => array('.tpl')
+        'extension' => array('.tpl'),
     ), Themes::STR_MERGE, Themes::PATH_ABSOLUTE, Themes::USE_BASE);
 
     foreach ($files as $file => $file_info) {
@@ -673,7 +689,7 @@ function fn_gift_certificates_place_order(&$order_id, &$action, &$order_status, 
                     if (($_data['amount'] - $debit_info['amount'] != 0) || (md5($_data['products']) != md5($debit_info['products']))) {
                         $_info = array(
                             'amount' => $_data['amount'],
-                            'products' => $_data['products']
+                            'products' => $_data['products'],
                         );
                         fn_add_gift_certificate_log_record($gift_cert_id, $debit_info, $_info);
                     }
@@ -683,7 +699,7 @@ function fn_gift_certificates_place_order(&$order_id, &$action, &$order_status, 
             $order_data = array(
                 'order_id' => $order_id,
                 'type' => ORDER_DATA_PURCHASED_GIFT_CERTIFICATES,
-                'data' => serialize($cart['gift_certificates'])
+                'data' => serialize($cart['gift_certificates']),
             );
             db_query("REPLACE INTO ?:order_data ?e", $order_data);
         }
@@ -820,7 +836,8 @@ function fn_gift_certificates_place_order(&$order_id, &$action, &$order_status, 
                                         unset($record['debit_products'][$po_product_id]);
                                     }
                                 }
-                                $record['debit_products'] = serialize($record['debit_products']);														} else {
+                                $record['debit_products'] = serialize($record['debit_products']);
+                            } else {
                                 if ($record['log_id'] != $v['log_id']) {
                                     $record['amount'] += $amount_odds;
                                 }
@@ -832,7 +849,7 @@ function fn_gift_certificates_place_order(&$order_id, &$action, &$order_status, 
                                 'gift_cert_id' => $v['gift_cert_id'],
                                 'amount' 	=> $v['previous_state']['amount'],
                                 'cost' => $v['cost'],
-                                'log_id' => $v['log_id']
+                                'log_id' => $v['log_id'],
                             );
 
                             if (floatval($record['debit']) <= 0 &&  unserialize($record['debit_products']) == array()) {
@@ -852,11 +869,11 @@ function fn_gift_certificates_place_order(&$order_id, &$action, &$order_status, 
 
                     $before_info = array(
                         'amount' 	=> $v['amount'],
-                        'products'  => serialize(!empty($v['products']) ? $v['products'] : array())
+                        'products'  => serialize(!empty($v['products']) ? $v['products'] : array()),
                     );
                     $after_info = array(
                         'amount' 	=> fn_format_price($v['amount'] - $v['cost']),
-                        'products'  => serialize(!empty($debit_products[$k]['products']) ? $debit_products[$k]['products'] : array())
+                        'products'  => serialize(!empty($debit_products[$k]['products']) ? $debit_products[$k]['products'] : array()),
                     );
                     $log_id = fn_add_gift_certificate_log_record($v['gift_cert_id'], $before_info, $after_info, $order_id);
 
@@ -864,7 +881,7 @@ function fn_gift_certificates_place_order(&$order_id, &$action, &$order_status, 
                         'gift_cert_id' => $v['gift_cert_id'],
                         'amount' 	=> $v['amount'],
                         'cost' => $v['cost'],
-                        'log_id' => $log_id
+                        'log_id' => $log_id,
                     );
                     if (floatval($v['amount'] - $v['cost']) <= 0 &&  !isset($debit_products[$k]['products'])) {
                         fn_change_gift_certificate_status($v['gift_cert_id'], 'U');
@@ -876,7 +893,7 @@ function fn_gift_certificates_place_order(&$order_id, &$action, &$order_status, 
             $order_data = array(
                 'order_id' => $order_id,
                 'type' => 'U',
-                'data' => serialize($use_gift_certificates)
+                'data' => serialize($use_gift_certificates),
             );
             db_query("REPLACE INTO ?:order_data ?e", $order_data);
         }
@@ -973,10 +990,20 @@ function fn_gift_certificates_exclude_products_from_calculation(&$cart, &$auth, 
                 if (!$gift_cert_data) {
                     return false;
                 }
-                $gift_cert_data['products'] = empty($gift_cert_data['products']) ? array() : @unserialize($gift_cert_data['products']);
-                $debit_balance = db_get_row("SELECT debit AS amount, debit_products as products FROM ?:gift_certificates_log WHERE gift_cert_id = ?i ORDER BY log_id DESC", $gift_cert_data['gift_cert_id']);
-                if (!empty($debit_balance)) {
-                    $debit_balance['products'] = @unserialize($debit_balance['products']);
+                $gift_cert_data['products'] = empty($gift_cert_data['products'])
+                    ? []
+                    : @unserialize($gift_cert_data['products']);
+                $debit_balance = db_get_row(
+                    'SELECT debit AS amount, debit_products as products'
+                    .' FROM ?:gift_certificates_log'
+                    . ' WHERE gift_cert_id = ?i'
+                    . ' ORDER BY log_id DESC',
+                    $gift_cert_data['gift_cert_id']
+                );
+                if ($debit_balance) {
+                    $debit_balance['products'] = empty($debit_balance['products'])
+                        ? []
+                        : @unserialize($debit_balance['products']);
                     $gift_cert_data  = array_merge($gift_cert_data, $debit_balance);
                 }
             }
@@ -995,8 +1022,8 @@ function fn_gift_certificates_exclude_products_from_calculation(&$cart, &$auth, 
                             'amount' => $product_item['amount'],
                             'extra' => array(
                                 'exclude_from_calculate' => GIFT_CERTIFICATE_EXCLUDE_PRODUCTS,
-                                'in_use_certificate' => array($code => $product_item['amount'])
-                            )
+                                'in_use_certificate' => array($code => $product_item['amount']),
+                            ),
                     );
                     if (isset($product_item['product_options'])) {
                         $product_data[$product_item['product_id']]['product_options'] = $product_item['product_options'];
@@ -1107,18 +1134,46 @@ function fn_gift_certificates_calculate_cart(&$cart, &$cart_products, &$auth)
     $cart['has_coupons'] = true;
 }
 
-function fn_gift_certificates_order_notification(&$order_info, &$order_statuses, &$force_notification)
+function fn_gift_certificates_change_order_status_post($order_id, $status_to, $status_from, $force_notification, $place_order, $order_info, $edp_data)
 {
     if (isset($order_info['gift_certificates'])) {
         foreach ($order_info['gift_certificates'] as $k => $v) {
-            if (!empty($order_statuses[$order_info['status']]['params']['gift_cert_status'])) {
-                $gift_cert_data = fn_get_gift_certificate_info($v['gift_cert_id'], 'B');
-                fn_gift_certificate_notification($gift_cert_data, $force_notification);
+            $gift_cert_data = fn_get_gift_certificate_info($v['gift_cert_id']);
+            if ($gift_cert_data['send_via'] !== 'P') {
+                /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+                $event_dispatcher = Tygh::$app['event.dispatcher'];
+
+                /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+                $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+                $notification_rules = $notification_settings_factory->create($force_notification);
+
+                /** @var \Tygh\Storefront\Storefront $storefront */
+                $storefront = Tygh::$app['storefront'];
+                $storefront_id = $storefront->storefront_id;
+
+                $event_dispatcher->dispatch(
+                    "gift_certificates.gift_certificate.updated",
+                    [
+                        'certificate_data' => $gift_cert_data,
+                        'storefront_id'    => $storefront_id,
+                    ],
+                    $notification_rules,
+                    new CertificateProvider($gift_cert_data)
+                );
             }
         }
     }
 }
 
+/**
+ * @param array      $gift_cert_data
+ * @param array $force_notification
+ *
+ * @return bool
+ *
+ * @deprecated since 4.11.1. Use the Tygh::$app['event.dispatcher'] service to send messages.
+ * @see \Tygh\Notifications\EventDispatcher
+ */
 function fn_gift_certificate_notification(&$gift_cert_data, $force_notification = array())
 {
     static $notified = array();
@@ -1127,32 +1182,24 @@ function fn_gift_certificate_notification(&$gift_cert_data, $force_notification 
         return true;
     }
 
-    $status_params = fn_get_status_params($gift_cert_data['status'], STATUSES_GIFT_CERTIFICATE);
+    $notified[$gift_cert_data['gift_cert_id']] = true;
 
-    $notify_user = isset($force_notification['C']) ? $force_notification['C'] : (!empty($status_params['notify']) && $status_params['notify'] == 'Y' ? true : false);
+    if ($gift_cert_data['send_via'] !== 'P') {
+        $status_id = strtolower($gift_cert_data['status']);
 
-    if ($notify_user == true && $gift_cert_data['email'] && $gift_cert_data['send_via'] == 'E') {
-        $notified[$gift_cert_data['gift_cert_id']] = true;
-        $suffix = '';
-        if (fn_allowed_for('ULTIMATE')) {
-            $suffix = '?company_id=' . $gift_cert_data['company_id'];
-        }
+        /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+        $event_dispatcher = Tygh::$app['event.dispatcher'];
 
-        /** @var \Tygh\Mailer\Mailer $mailer */
-        $mailer = Tygh::$app['mailer'];
+        /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+        $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+        $notification_rules = $notification_settings_factory->create($force_notification);
 
-        $mailer->send(array(
-            'to' => $gift_cert_data['email'],
-            'from' => 'company_orders_department',
-            'data' => array(
-                'gift_cert_data' => $gift_cert_data,
-                'certificate_status' => fn_get_status_data($gift_cert_data['status'], STATUSES_GIFT_CERTIFICATE, $gift_cert_data['gift_cert_id']),
-                'storefront_url' => fn_url($suffix, 'C', 'http')
-            ),
-            'template_code' => 'gift_certificates_notification',
-            'tpl' => 'addons/gift_certificates/gift_certificate.tpl', // this parameter is obsolete and is used for back compatibility
-            'company_id' => $gift_cert_data['company_id']
-        ), 'C');
+        $event_dispatcher->dispatch(
+            "gift_certificate.status_changed.{$status_id}",
+            ['certificate_data' => $gift_cert_data],
+            $notification_rules,
+            new CertificateProvider($gift_cert_data)
+        );
 
         return true;
     }
@@ -1226,7 +1273,7 @@ function fn_create_return_gift_certificate($order_id, $amount)
         'state' 		 => $order_info['s_state'],
         'zipcode' 		 => $order_info['s_zipcode'],
         'phone' 		 => $order_info['phone'],
-        'template'       => key($templates)
+        'template'       => key($templates),
     );
 
     if (fn_allowed_for('ULTIMATE')) {
@@ -1241,7 +1288,7 @@ function fn_create_return_gift_certificate($order_id, $amount)
 
         fn_set_notification('E', __('error'), __('gift_cert_error_amount', array(
             '[min]' => $min,
-            '[max]' => $max
+            '[max]' => $max,
         )));
 
         $result = array();
@@ -1304,11 +1351,12 @@ function fn_gift_certificates_allow_place_order(&$total, &$cart)
     return true;
 }
 
-function fn_gift_certificates_get_orders(&$params, &$fields, &$sortings, &$condition, &$join)
+function fn_gift_certificates_get_orders(&$params, &$fields, &$sortings, &$condition, &$join, &$group)
 {
     if (isset($params['gift_cert_code']) && fn_string_not_empty($params['gift_cert_code'])) {
         $condition .= db_quote(" AND gc_order_data.data LIKE ?l", "%" . trim($params['gift_cert_code']) . "%");
         $join .= db_quote(" LEFT JOIN ?:order_data as gc_order_data ON gc_order_data.order_id = ?:orders.order_id AND gc_order_data.type IN (?a)", explode('|', $params['gift_cert_in']));
+        $group = 'GROUP BY ?:orders.order_id';
     }
 
     return true;
@@ -1322,7 +1370,7 @@ function fn_get_gift_certificates($params, $items_per_page = 0)
     // Set default values to input params
     $default_params = array (
         'page' => 1,
-        'items_per_page' => $items_per_page
+        'items_per_page' => $items_per_page,
     );
 
     $params = array_merge($default_params, $params);
@@ -1448,7 +1496,7 @@ function fn_gift_certificates_delete_cart_products(&$cart, $cart_id)
     if (!empty($product['extra']['exclude_from_calculate']) && $product['extra']['exclude_from_calculate'] == GIFT_CERTIFICATE_EXCLUDE_PRODUCTS) {
         $cart['deleted_exclude_products'][GIFT_CERTIFICATE_EXCLUDE_PRODUCTS][$cart_id] = array(
             'product_id' => $product['product_id'],
-            'in_use_certificate' => $product['extra']['in_use_certificate']
+            'in_use_certificate' => $product['extra']['in_use_certificate'],
         );
     }
 
@@ -1510,7 +1558,7 @@ function fn_gift_certificates_promotion_gift_certificate($bonus, &$cart, &$auth,
                 'extra' => array(
                     'exclude_from_calculate' => 'PR',
                 ),
-                'template' => 'default.tpl'
+                'template' => 'default.tpl',
             );
 
             list($gc_cart_id, $gc) = fn_add_gift_certificate_to_cart($_data, $auth);
@@ -1532,18 +1580,14 @@ function fn_gift_certificates_get_status_params_definition(&$status_params, $typ
         $status_params['gift_cert_status'] = array (
             'type' => 'status',
             'label' => 'change_gift_certificate_status',
-            'status_type' => STATUSES_GIFT_CERTIFICATE
+            'status_type' => STATUSES_GIFT_CERTIFICATE,
         );
 
     } elseif ($type == STATUSES_GIFT_CERTIFICATE) {
         $status_params = array (
-            'color' => array (
-                'type' => 'color',
-                'label' => 'color'
-            ),
             'notify' => array (
                 'type' => 'checkbox',
-                'label' => 'notify_customer'
+                'label' => 'notify_customer',
             ),
         );
     }
@@ -1624,7 +1668,7 @@ function fn_add_gift_certificate_to_wishlist(&$wishlist, $gift_cert_data)
                         'amount' => $_data['amount'],
                         'extra' => array(
                             'parent' => array(
-                                'certificate' => $gift_cert_wishlist_id
+                                'certificate' => $gift_cert_wishlist_id,
                             ),
                         ),
                     );
@@ -1638,7 +1682,7 @@ function fn_add_gift_certificate_to_wishlist(&$wishlist, $gift_cert_data)
 
             return array (
                 $gift_cert_wishlist_id,
-                $gift_cert_data
+                $gift_cert_data,
             );
 
     } else {
@@ -1711,18 +1755,22 @@ function fn_gift_certificates_install($d, $action)
     $captcha_settings = $settings_manager->getValue('use_for', 'Image_verification');
 
     if ($action == 'install') {
-        if (fn_allowed_for('ULTIMATE')) {
-            $company_ids = fn_get_all_companies_ids();
-        } else {
-            $company_ids = array(0);
-        }
-
         Registry::set('runtime.allow_upload_external_paths', true);
-        foreach ($company_ids as $company_id) {
-            fn_update_logo(array(
-                'type' => 'gift_cert',
-                'image_path' => fn_get_theme_path('[themes]/[theme]/media/images/addons/gift_certificates/gift_cert_logo.png', 'A', $company_id, false),
-            ), $company_id);
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($storefronts,) = $repository->find();
+
+        $logo_path = fn_get_theme_path('[themes]/[theme]/media/images/addons/gift_certificates/gift_cert_logo.png');
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        foreach ($storefronts as $storefront) {
+            fn_update_logo(
+                [
+                    'type'       => 'gift_cert',
+                    'image_path' => $logo_path,
+                ],
+                0,
+                $storefront->storefront_id
+            );
         }
 
         if ($captcha_settings !== false) {
@@ -1745,15 +1793,17 @@ function fn_gift_certificates_install($d, $action)
 
 function fn_gift_certificates_logo_types(&$types, $for_company)
 {
-    if ($for_company == true && fn_allowed_for('MULTIVENDOR')) {
+    if ($for_company === true) {
         return false;
     }
 
-    $types['gift_cert'] = array(
-        'text' => 'text_gift_certificate_logo',
-        'image' => fn_get_theme_path('[themes]/[theme]/media/images/addons/gift_certificates/gift_cert_logo.png', 'A', null, false),
+    $image = fn_get_theme_path('[themes]/[theme]/media/images/addons/gift_certificates/gift_cert_logo.png', 'A', null, false);
+
+    $types['gift_cert'] = [
+        'text'        => 'text_gift_certificate_logo',
+        'image'       => $image,
         'single_logo' => true,
-    );
+    ];
 
     return true;
 }
@@ -1848,7 +1898,7 @@ function fn_paypal_express_get_certificate_data($data)
     $options = array(
         __('gift_cert_to') . ': ' . $data['recipient'],
         __('gift_cert_from') . ': ' . $data['sender'],
-        __('send_via') . ': ' . (($data['send_via'] == 'E') ? __('email') : __('postal_mail'))
+        __('send_via') . ': ' . (($data['send_via'] == 'E') ? __('email') : __('postal_mail')),
     );
 
     return implode(', ', $options);
@@ -1925,7 +1975,29 @@ function fn_gift_certificates_quickbooks_export_order($order, $order_products, $
 
         }
     }
+}
 
+/**
+ * Checks if order contains downloadable products that were not added during gift certificate purchase
+ *
+ * @param array $order_info Order information
+ *
+ * @return bool
+ */
+function fn_gift_certificate_has_downloadable_products_in_order($order_info)
+{
+    $has_downloadable = false;
+
+    foreach ($order_info['products'] as $product) {
+        $is_downloadable = !empty($product['extra']['is_edp']) && $product['extra']['is_edp'] == 'Y';
+        $not_from_certificate = empty($product['extra']['parent']['certificate']);
+        if ($is_downloadable && $not_from_certificate) {
+            $has_downloadable = true;
+            break;
+        }
+    }
+
+    return $has_downloadable;
 }
 
 function fn_gift_certificates_quickbooks_export_items($orders, $invitem, &$export)
@@ -2018,4 +2090,102 @@ function fn_gift_certificates_template_document_order_context_init($context, $or
 function fn_gift_certificates_settings_variants_image_verification_use_for(&$objects)
 {
     $objects['gift_certificates'] = __('gift_certificates.certificate_purchase_form');
+}
+
+/**
+ * Hook handler: removes downloadable products that bought only for gift certificate, and does not need to generate
+ * ekey for
+ */
+function fn_gift_certificates_generate_ekeys_for_edp_pre($statuses, &$order_info, $active_files)
+{
+    foreach ($order_info['products'] as $cart_id => $product) {
+        if (empty($product['extra']['parent']['certificate'])) {
+            continue;
+        }
+
+        $certificate = $product['extra']['parent']['certificate'];
+        if (isset($order_info['gift_certificates'][$certificate])) {
+            unset($order_info['products'][$cart_id]);
+        }
+    }
+}
+
+/**
+ * Creates or updates a gift certificate.
+ *
+ * @param array $data   Certificate data
+ * @param int   $id     Certificate ID
+ * @param array $params Notification settings
+ *
+ * @return int Certificate ID
+ */
+function fn_update_gift_certificate($data, $id = 0, $params = [])
+{
+    fn_correct_gift_certificate($data);
+
+    $data['products'] = !empty($data['products']) ? serialize($data['products']) : '';
+
+    if (empty($id)) {
+        do {
+            $code = fn_generate_gift_certificate_code();
+        } while (true == fn_check_gift_certificate_code($code));
+
+        $data = fn_array_merge($data, array(
+                'gift_cert_code' => $code,
+                'timestamp' => TIME)
+        );
+
+        if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
+            $data['company_id'] = Registry::get('runtime.company_id');
+        }
+
+        $id = db_query("INSERT INTO ?:gift_certificates ?e", $data);
+    } else {
+
+        // Change certfificate status
+        fn_change_gift_certificate_status($id, $data['status'], '', fn_get_notification_rules($params, false));
+
+        //if difference then add line in log
+        $debit_info = db_get_row('SELECT debit AS amount, debit_products AS products FROM ?:gift_certificates_log WHERE gift_cert_id = ?i ORDER BY timestamp DESC', $id);
+
+        if (empty($debit_info)) {
+            $debit_info = db_get_row('SELECT amount, products FROM ?:gift_certificates WHERE gift_cert_id = ?i', $id);
+        }
+
+        $is_diff = (($data['amount'] - $debit_info['amount'] != 0) || (md5($data['products']) != md5($debit_info['products'])));
+        if ($is_diff == true) {
+            $_info = array(
+                'amount' => $data['amount'],
+                'products' => $data['products']
+            );
+            fn_add_gift_certificate_log_record($id, $debit_info, $_info);
+        }
+
+        //Update certificate data
+        $_data = $data;
+        db_query('UPDATE ?:gift_certificates SET ?u WHERE gift_cert_id = ?i', $data, $id);
+    }
+
+    $data = fn_get_gift_certificate_info($id);
+
+    // Gift certificates sent via postal mail do not trigger notification events
+    if ($data['send_via'] !== 'P') {
+        $force_notification = fn_get_notification_rules($params);
+
+        /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+        $event_dispatcher = Tygh::$app['event.dispatcher'];
+
+        /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+        $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+        $notification_rules = $notification_settings_factory->create($force_notification);
+
+        $event_dispatcher->dispatch(
+            "gift_certificates.gift_certificate.updated",
+            ['certificate_data' => $data],
+            $notification_rules,
+            new CertificateProvider($data)
+        );
+    }
+
+    return $id;
 }

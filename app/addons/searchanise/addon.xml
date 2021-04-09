@@ -52,6 +52,7 @@
             PRIMARY KEY  (`name`, `company_id`, `lang_code`)
         ) ENGINE=MyISAM DEFAULT CHARSET=UTF8
         </item>
+        <item for="install">DROP TABLE IF EXISTS `?:se_queue`</item>
         <item for="install">
         CREATE TABLE `?:se_queue` (
             `queue_id` mediumint NOT NULL auto_increment,

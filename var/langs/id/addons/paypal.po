@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: id\n"
-"X-Crowdin-File: /release-4.8.2/addons/paypal.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"X-Crowdin-File: /release-4.11.5/addons/paypal.po\n"
+"X-Crowdin-File-ID: 3680\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::paypal"
 msgid "PayPal payments"
@@ -110,7 +110,7 @@ msgstr "Status transaksi"
 
 msgctxt "Languages::paypal.ipn_transaction_status"
 msgid "Transaction status: [status]"
-msgstr ""
+msgstr "Status transaksi: [status]"
 
 msgctxt "Languages::addons.paypal.surcharge_policy_notice"
 msgid "Surcharge has been set for the payment method that uses PayPal Services. Please make sure this complies with the <a href=\"https://www.paypal.com/webapps/mpp/ua/legalhub-full\" target=\"_blank\">User Agreement for PayPal Services</a> for your region."
@@ -222,5 +222,13 @@ msgstr "Untuk mengakses pembayaran dari pelanggan Anda, konfirmasikan alamat ema
 
 msgctxt "Languages::paypal.addon_is_disabled_notice"
 msgid "The <b>PayPal payments</b> add-on is disabled so you can't configure this payment method."
+msgstr "Fitur tambahan<b>Pembayaran PayPal</b> dinonaktifkan sehingga Anda tidak dapat melakukan konfigurasi pada metode pembayaran ini."
+
+msgctxt "Languages::addons.paypal.3d_secure_mandatory_notice"
+msgid "3-D secure is mandatory in the United Kingdom."
+msgstr ""
+
+msgctxt "Languages::paypal.show_cart_button"
+msgid "Show the \"Checkout with PayPal\" button on the cart contents page"
 msgstr ""
 

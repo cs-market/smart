@@ -1,1 +1,0 @@
-{style src="addons/paypal_for_marketplaces/styles.less"}

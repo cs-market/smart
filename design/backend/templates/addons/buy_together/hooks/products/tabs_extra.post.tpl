@@ -8,12 +8,9 @@
     {assign var="hide_controls" value=false}
 {/if}
 
+
 {if "MULTIVENDOR"|fn_allowed_for}
-    {if !$runtime.company_id}
-        {assign var="hide_controls" value=true}
-    {else}
-        {assign var="hide_controls" value=false}
-    {/if}
+    {$hide_controls=($product_data.company_id == 0 || !$runtime.company_id)}
 {/if}
 
 <div id="content_buy_together" class="cm-hide-save-button hidden {if $hide_controls}cm-hide-inputs{/if}">
@@ -32,7 +29,7 @@
     
     <div class="items-container" id="update_chains_list">
         <div class="table-wrapper">
-            <table class="table table-middle table-objects">
+            <table class="table table-middle table--relative table-objects">
             {if $chains}
                 {foreach from=$chains item=chain}
                     {if $hide_controls}

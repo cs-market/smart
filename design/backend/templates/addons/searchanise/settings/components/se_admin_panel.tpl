@@ -1,4 +1,6 @@
 <script type="text/javascript">
+    Tygh.tr('text_se_ajax_connecting', '{__("text_se_ajax_connecting")|escape:"javascript"}');
+
     SearchaniseAdmin = {ldelim}{rdelim};
     SearchaniseAdmin.host = '{$se_service_url}';
     SearchaniseAdmin.PrivateKey = '{$se_parent_private_key}';
@@ -6,7 +8,7 @@
     SearchaniseAdmin.ReSyncLink = '{"searchanise.export"|fn_url:'A':'current'}';
     SearchaniseAdmin.LastRequest = '{"last_request"|fn_se_get_simple_setting|fn_parse_date|date_format:"`$date_format`"}';
     SearchaniseAdmin.LastResync = '{"last_resync"|fn_se_get_simple_setting|fn_parse_date|date_format:"`$date_format`"}';
-    SearchaniseAdmin.ConnectLink = '{"searchanise.signup"|fn_url:'A':'current'}';
+    SearchaniseAdmin.AjaxConnectLink = '{"searchanise.signup"|fn_url:'A':'current'}';
     SearchaniseAdmin.AddonStatus = 'enabled';
     SearchaniseAdmin.AddonVersion = '1.2.1';
 

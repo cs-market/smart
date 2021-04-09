@@ -56,12 +56,6 @@ body, .main-table {
                             <td width="100%">{$company_data.company_phone_2}</td>
                         </tr>                
                         {/if}
-                        {if $company_data.company_fax}
-                        <tr>
-                            <td style="font: 12px verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("fax")}:</td>
-                            <td width="100%">{$company_data.company_fax}</td>
-                        </tr>
-                        {/if}
                         {if $company_data.company_website}
                         <tr>
                             <td style="font: 12px verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("web_site")}:</td>

@@ -13,6 +13,9 @@
 ****************************************************************************/
 
 $schema['central']['vendors']['items']['vendor_plans.vendor_plans'] = array(
+    'attrs' => array(
+        'class' => 'is-addon'
+    ),
     'href' => 'vendor_plans.manage',
     'position' => 300,
 );

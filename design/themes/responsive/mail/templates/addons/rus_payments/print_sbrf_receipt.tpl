@@ -70,7 +70,7 @@
                         <li><strong>{__("sbrf_bik")}: </strong>{$sbrf_settings.sbrf_bik|unescape}&nbsp;<strong>{__("sbrf_cor_account")}: </strong>{$sbrf_settings.sbrf_cor_account|unescape}</li>
                         <li><strong>{__("sbrf_kbk")}: </strong> {$sbrf_settings.sbrf_kbk|unescape}</li>
                         <li><strong>{__("sbrf_payment")}: </strong> {$sbrf_settings.sbrf_prefix|unescape} #{$order_info.order_id}</li>
-                        <li><strong>{__("sbrf_payer")}: </strong>{$order_info.b_firstname}&nbsp;{$order_info.b_lastname}</li>
+                        <li><strong>{__("sbrf_payer")}: </strong>{$order_info.firstname}&nbsp;{$order_info.lastname}</li>
                         <li><strong>{__("sbrf_payer_address")}: </strong> {if $order_info.b_zipcode}{$order_info.b_zipcode},&nbsp;{/if}{if $order_info.b_country_descr}{$order_info.b_country_descr},&nbsp;{/if}{if $order_info.b_state_descr}{$order_info.b_state_descr}, &nbsp;{/if}{if $order_info.b_city}{$order_info.b_city}, &nbsp;{/if}{if $order_info.b_address}{$order_info.b_address}{/if}{if $order_info.b_address_2},&nbsp;{$order_info.b_address_2}{/if}</li>
                         <li><strong>{__("sbrf_payer_inn")}: </strong>____________&nbsp;&nbsp;&nbsp;&nbsp; <strong>{__("sbrf_payer_account_id")}: </strong> ______________</li>
                         <li><strong>{__("sbrf_summ")}: </strong> {$total_print nofilter} &nbsp;&nbsp;&nbsp;&nbsp;<strong>{__("sbrf_bank_summ")}: </strong>_________{__("sbrf_rub")}&nbsp;&nbsp;___&nbsp;&nbsp;{__("sbrf_kop")}</li>
@@ -91,7 +91,7 @@
                         <li><strong>{__("sbrf_bik")}: </strong>{$sbrf_settings.sbrf_bik|unescape}&nbsp;<strong>{__("sbrf_cor_account")}: </strong>{$sbrf_settings.sbrf_cor_account|unescape}</li>
                         <li><strong>{__("sbrf_kbk")}: </strong> {$sbrf_settings.sbrf_kbk|unescape}</li>
                         <li><strong>{__("sbrf_payment")}: </strong> {$sbrf_settings.sbrf_prefix|unescape} #{$order_info.order_id}</li>
-                        <li><strong>{__("sbrf_payer")}: </strong>{$order_info.b_firstname}&nbsp;{$order_info.b_lastname}</li>
+                        <li><strong>{__("sbrf_payer")}: </strong>{$order_info.firstname}&nbsp;{$order_info.lastname}</li>
                         <li><strong>{__("sbrf_payer_address")}: </strong> {if $order_info.b_zipcode}{$order_info.b_zipcode},&nbsp;{/if}{if $order_info.b_country_descr}{$order_info.b_country_descr},&nbsp;{/if}{if $order_info.b_state_descr}{$order_info.b_state_descr}, &nbsp;{/if}{if $order_info.b_city}{$order_info.b_city}, &nbsp;{/if}{if $order_info.b_address}{$order_info.b_address}{/if}{if $order_info.b_address_2},&nbsp;{$order_info.b_address_2}{/if}</li>
                         <li><strong>{__("sbrf_payer_inn")}: </strong>____________&nbsp;&nbsp;&nbsp;&nbsp; <strong>{__("sbrf_payer_account_id")}: </strong> ______________</li>
                         <li><strong>{__("sbrf_summ")}: </strong> {$total_print nofilter} &nbsp;&nbsp;&nbsp;&nbsp;<strong>{__("sbrf_bank_summ")}: </strong>_________{__("sbrf_rub")}&nbsp;&nbsp;___&nbsp;&nbsp;{__("sbrf_kop")}</li>

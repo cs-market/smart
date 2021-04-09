@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/seo.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.11.5/addons/seo.po\n"
+"X-Crowdin-File-ID: 3546\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::seo"
 msgid "SEO"
@@ -61,11 +61,15 @@ msgid "page [n]"
 msgstr "الصفحة [n]"
 
 msgctxt "Languages::privileges.manage_seo_rules"
-msgid "Manage SEO rules and 301 redirects"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.seo"
+msgid "SEO"
 msgstr ""
 
 msgctxt "Languages::privileges.view_seo_rules"
-msgid "View SEO rules and 301 redirects"
+msgid "Can view"
 msgstr ""
 
 msgctxt "Languages::seo.redirects_manager"
@@ -202,5 +206,41 @@ msgstr "/item.html"
 
 msgctxt "Languages::seo.important_language_text"
 msgid "<b>Warning!</b> The <b>SEO</b> add-on is currently configured to use a single URL for all languages. If you hide, disable, or delete a default language of one of the storefronts, the SEO URLs will be changed."
+msgstr ""
+
+msgctxt "Languages::seo.product_feature.feature_code.notice"
+msgid "A suitable code can help this feature appear with the product in search engines. Supported codes:"
+msgstr ""
+
+msgctxt "Languages::seo.brand"
+msgid "Brand"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.brand.description"
+msgid "Name used by an organization or business person for labeling a product"
+msgstr ""
+
+msgctxt "Languages::seo.isbn"
+msgid "ISBN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.isbn.description"
+msgid "International Standard Book Number"
+msgstr ""
+
+msgctxt "Languages::seo.gtin"
+msgid "GTIN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.gtin.description"
+msgid "Global Trade Item Number"
+msgstr ""
+
+msgctxt "Languages::seo.MPN"
+msgid "MPN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.mpn.description"
+msgid "Manufacturer Part Number"
 msgstr ""
 

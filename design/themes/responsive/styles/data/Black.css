@@ -193,6 +193,10 @@ input.ty-search-block__input, input.ty-search-block__input:focus {
     text-align: center;
 }
 
+.ty-grid-list__item .button-container {
+    text-align: center;
+}
+
 .ty-dropdown-box__content .ty-btn__secondary,
 .no-touch .ty-dropdown-box__content .ty-btn__secondary:hover {
     border: 2px solid #fff;
@@ -208,6 +212,7 @@ input.ty-search-block__input, input.ty-search-block__input:focus {
 
 .ty-grid-list__item {
     margin: 10px 10px 35px 10px;
+    padding: 0;
 }
 
 .ty-sidebox__title span {
@@ -306,8 +311,7 @@ h3.ty-social-link__title,
 }
 
 .ty-scroller-list__description .product-title {
-    color: #fff;
-    padding: 13px 0px 10px 0px;
+    padding-top: 13px;
 }
 .ty-sidebox {
     background: black;

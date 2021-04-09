@@ -25,7 +25,15 @@ if (!defined('BOOTSTRAP')) { exit('Access denied'); }
  */
 function fn_vendor_locations_get_block_vendors(array $params = array())
 {
-    $params['company_id'] = empty($params['item_ids']) ? array() : fn_explode(',', $params['item_ids']);
+    if (empty($params['item_ids'])) {
+        $storefront = Tygh::$app['storefront'];
+        if ($storefront->getCompanyIds()) {
+            $params['company_id'] = $storefront->getCompanyIds();
+        }
+    } else {
+        $params['company_id'] = fn_explode(',', $params['item_ids']);
+    }
+
     $params['get_vendor_location'] = true;
     $params['status'] = 'A';
 

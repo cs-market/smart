@@ -220,7 +220,7 @@
         var existing_styles = $('#elm_te_styles li a.cm-te-duplicate-style,#elm_te_presets li a.cm-te-duplicate-preset').each(function() {
             var self = $(this);
             var name = self.hasClass('cm-te-duplicate-style') ? self.data('caStyleId') : self.data('caPresetId');
-            if (name.toString().toLowerCase() == style_name.toString().toLowerCase()) {
+            if (name.toString().toLowerCase() == style_name.toString().toLowerCase().trim()) {
                 style_name = '';
                 $.ceNotification('show', {
                     type: 'E',
@@ -233,7 +233,7 @@
             }
         });
 
-        if (style_name && (!style_name.match(/^[^\\\#\%\/\?\*:;\{\}]+$/) || !style_name.trim())) {
+        if (style_name && (!style_name.match(/^[^\\\#\%\/\?\*:;\{\}\+]+$/) || !style_name.trim())) {
             $.ceNotification('show', {
                 type: 'E',
                 title: _.tr('error'),
@@ -244,7 +244,7 @@
             return false;
         }
 
-        return style_name;
+        return style_name.trim();
     }
 
     function getEditorUrl(css_filename)
@@ -327,6 +327,7 @@
             result_ids: 'theme_editor',
             data: init_data,
             callback: function() {
+                $.ceEvent('trigger', 'ce.themeeditor.loaded');
 
                 // FIXME: Backward compatibility for theme editors that don't define 'query_string' property
                 // Perform request and lock theme editor if location can't be edited
@@ -436,7 +437,7 @@
 
                     if (confirm(langvar)) {
                         var self = $(this);
-                        self.prop('href', $.attachToUrl(self.prop('href'), 'redirect_url=' + escape($('input[name=redirect_url]:first').val())));
+                        self.prop('href', $.attachToUrl(self.prop('href'), 'redirect_url=' + encodeURIComponent(_.current_url)));
                         return true;
                     }
 

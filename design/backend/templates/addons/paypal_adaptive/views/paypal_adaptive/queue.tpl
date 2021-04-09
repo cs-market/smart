@@ -20,7 +20,7 @@
                                     {if $queue.paid}<span class="float-left"><i class="icon-ok"></i></span>{/if}
                                 </h2>
                                 <div id="step_{$index+1}_body" class="{*if !$pay}hidden{/if*} clearfix">
-                                    <table width="100%" class="table table-middle">
+                                    <table width="100%" class="table table-middle table--relative">
                                         <thead>
                                         <tr>
                                             <th width="50%">{__("product")}</th>

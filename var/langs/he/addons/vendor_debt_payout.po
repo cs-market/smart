@@ -1,0 +1,66 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Hebrew\n"
+"Language: he_IL\n"
+"Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3;\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
+"X-Crowdin-Language: he\n"
+"X-Crowdin-File: /release-4.11.5/addons/vendor_debt_payout.po\n"
+"X-Crowdin-File-ID: 3684\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
+
+msgctxt "Addons::name::vendor_debt_payout"
+msgid "Vendor debt payout"
+msgstr "תשלום חוב של ספק"
+
+msgctxt "Addons::description::vendor_debt_payout"
+msgid "Restricts the functionality of vendors' admin panels under certain conditions and enables your vendors to pay their fees and debts from their admin panel dashboards. It is as easy as purchasing a product from the storefront."
+msgstr "מגביל את הפונקציונליות פאנל אדמיניסטרטיבי של ספקים תחת תנאים מסוימים ומאפשר לספקים לשלם עמלות שלהם ואת החובות בפאנל אדמיניסטרטיבי. זה קל כמו רכישת מוצר בחנות."
+
+msgctxt "Languages::vendor_debt_payout.debt_payout"
+msgid "Marketplace fees"
+msgstr "עמלות"
+
+msgctxt "Languages::vendor_debt_payout.debt_payout_w_order"
+msgid "Marketplace fees (order #[id])"
+msgstr "עמלות (order #[id])"
+
+msgctxt "Languages::vendor_debt_payout.pay_fees"
+msgid "Pay the fees"
+msgstr "לשלם את עמלות"
+
+msgctxt "Languages::vendor_debt_payout.vendor_debt_limit"
+msgid "Restrict admin panel functions if vendor's debt reaches"
+msgstr "הגבל פונקציות ניהול פאנל אדמיניסטרטיבי של ספק במידה וקיים חוב של ספק"
+
+msgctxt "Languages::ttc_vendor_debt_payout.vendor_debt_limit"
+msgid "When a vendor's balance is negative and reaches this number, the vendor's administration panel will not allow to perform any actions. When a vendor's negative balance is half this number, the vendor will see the warning specified in the \"vendor_debt_payout.debt_near_limit_message\" language variable."
+msgstr "כאשר היתרה של ספק היא שלילית ומגיעה למספר זה, פאנל אדמיניסטרטיבי של הספק לא יאפשר לבצע פעולות כלשהן. כאשר היתרה השלילית של ספק היא מחצית מהמספר הזה, הספק יראה את האזהרה שצוין במשתנה השפה \"vendor_debt_payout.debt_near_imit_message\"."
+
+msgctxt "Languages::vendor_debt_payout.payout_overdue_limit"
+msgid "Grace period for vendor plan fees"
+msgstr "תקופת גרייס עבור דמי תוכנית הספק"
+
+msgctxt "Languages::ttc_vendor_debt_payout.payout_overdue_limit"
+msgid "Payments for plans are drawn from the vendor's account balance. If the balance gets negative after the fee is taken, and this period expires, the vendor's administration panel will not allow to perform any actions until the vendor pays the debt."
+msgstr "תשלומים עבור תוכניות נלקחים מתוך יתרת החשבון של הספק. אם היתרה נהיית שלילית לאחר תשלום האגרה, ותקופה זו פג, פאנל אדמיניסטרטיבי של הספק לא יאפשר לבצע פעולות כלשהן עד שהספק ישלם את החוב."
+
+msgctxt "Languages::vendor_debt_payout.day_or_days"
+msgid "day(s)"
+msgstr "יום (ימים)"
+
+msgctxt "Languages::vendor_debt_payout.pending_payout_message"
+msgid "You need to pay the fee of [fee_amount] for using the [plan_name] plan. Your current account balance is [current_balance]. If the fee isn't paid until [overdue_date], you won't be able to work with the administration panel until you <a href=\"[pay_url]\" target=\"_blank\">pay all your marketplace fees</a>."
+msgstr "עליך לשלם את עמלות של [fee_amount] עבור משתמש התוכנית [plan_name]. יתרת החשבון הנוכחי שלך הוא [current_balance]. אם התשלום לא ישולם עד [overdue_date], לא תוכלו לעבוד עם הפאנל אדמיניסטרטיבי עד <a href=\"[pay_url]\" target=\"_blank\">לשלם כל העמלות</a>."
+
+msgctxt "Languages::vendor_debt_payout.debt_near_limit_message"
+msgid "Your account balance is currently [current_balance]. If it reaches [minimal_balance], you won't be able to use your administration panel until you <a href=\"[pay_url]\" target=\"_blank\">pay all your marketplace fees</a>."
+msgstr "מצב החשבון שלך הוא כעת [current_balance]. אם זה מגיע [minimal_balance], לא תוכלו להשתמש בפאנל אדמיניסטרטיבי שלך עד <a href=\"[pay_url]\" target=\"_blank\">שתשלמו כל העמלות</a>."
+
+msgctxt "Languages::vendor_debt_payout.block_alert"
+msgid "<p>Your access to the administration panel has been restricted automatically because you have reached the limit of negative account balance or haven't paid a fee for your vendor plan in time.</p><p>Your current account balance is [current_balance].</p><p>Please <a href=\"[pay_url]\">pay the marketplace fees</a> — once the payment is processed, your access to the administration panel will be restored automatically.</p>"
+msgstr "<p> הגישה שלך לפאנל אדמיניסטרטיבי הוגבלה באופן אוטומטי מפני שהגעת למגבלת היתרה בחשבון שלילי או שלא שילמת עמלה בגין תוכנית הספקים שלך בזמן. </p> <p> יתרת החשבון הנוכחית שלך היא [current_balance].</p><p>בבקשה <a href=\"[pay_url]\">לשלם את העמלות</a> - לאחר ביצוע התשלום, הגישה שלך לפאנל אדמיניסטרטיבי תשוחזר באופן אוטומטי. </p>"
+

@@ -10,7 +10,17 @@
 
 {if $addons_list}
 <div class="table-responsive-wrapper">
-    <table class="table table-addons cm-filter-table table-responsive table-responsive-w-titles" data-ca-input-id="elm_addon" data-ca-clear-id="elm_addon_clear" data-ca-empty-id="elm_addon_no_items{$suffix}">
+    <table class="table table-addons cm-filter-table table-responsive table-responsive-w-titles ty-table--sorter" data-ca-sortable="true" data-ca-sort-list="[[1, 0]]" data-ca-input-id="elm_addon" data-ca-clear-id="elm_addon_clear" data-ca-empty-id="elm_addon_no_items{$suffix}">
+        <thead>
+        <tr>
+            <th class="sorter-false"></th>
+            <th class="cm-tablesorter" data-ca-sortable-column="true">{__("name")}</th>
+            <th class="cm-tablesorter sorter-false" data-ca-sortable-column="false">{__("version")}</th>
+            <th class="cm-tablesorter" data-ca-sortable-column="true">{__("developer")}</th>
+            <th class="sorter-false"></th>
+            <th class="cm-tablesorter" data-ca-sortable-column="true">{__("status")}</th>
+        </tr>
+        </thead>
     {foreach from=$addons_list item="a" key="key"}
 
         {assign var="non_editable" value=false}
@@ -40,13 +50,13 @@
         {assign var="addon_classes" value="filter_status_`$a.status`"}
 
         {if ($a.is_core_addon)}
-            {assign var="addon_classes" value="`$addon_classes` filter_source_built_in"}
+            {$addon_classes = "`$addon_classes` filter_source_built_in"}
         {else}
-            {assign var="addon_classes" value="`$addon_classes` filter_source_third_party"}
+            {$addon_classes = "`$addon_classes` filter_source_third_party"}
         {/if}
 
         {capture name="addons_row"}
-            <tr class="cm-row-status-{$a.status|lower} {$additional_class} cm-row-item {$addon_classes}" id="addon_{$key}{$suffix}">
+            <tr class="hidden cm-row-status-{$a.status|lower} {$additional_class} cm-row-item {$addon_classes}" id="addon_{$key}{$suffix}" data-supplier="{$a.supplier}">
                 <td class="addon-icon">
                     <div class="bg-icon" {if $a.status != "N" && $a.install_datetime}title="{$a.install_datetime|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}"{/if}>
                         {if $a.has_icon}
@@ -66,28 +76,29 @@
                         {if $a.separate}
                             <a href="{$href}"{if !$a.snapshot_correct} class="cm-promo-popup"{/if}>{$a.name|default:$key}</a>
                         {else}
-                            <a class="row-status cm-external-click{if $non_editable} no-underline{/if} {if !$a.snapshot_correct}cm-promo-popup{/if}" {if $a.snapshot_correct}data-ca-external-click-id="opener_group{$key}installed"{/if}>{$a.name|default:$key}</a>
+                            <a class="row-status cm-external-click{if $non_editable} no-underline{/if} {if !$a.snapshot_correct}cm-promo-popup{/if}" {if $a.snapshot_correct}data-ca-external-click-id="opener_group{$key}"{/if}>{$a.name|default:$key}</a>
                         {/if}
                     {else}
                         <span class="unedited-element block">{$a.name|default:$key}</span>
                     {/if}
                     <br><span class="row-status object-group-details">{$a.description nofilter}</span>
-                    <div class="addon-info">
-                        <small class="muted addon-version">{__("version")} {$a.version|default:0.1}</small>
-                        {if $a.supplier}
-                            {if $a.supplier_link}
-                                <a href="{$a.supplier_link}" target="_blank" class="muted addon-supplier">{$a.supplier}</a>
-                            {else}
-                                <small class="muted addon-supplier">{$a.supplier}</small>
-                            {/if}
-                        {/if}
-                    </div>
                     </div>
                 </td>
-                <td width="10%" class="right nowrap addon-action">
-
-                    {if $show_installed && $a.status != 'N'}
-                        <div class="pull-right">
+                <td>
+                    <small class="muted addon-version">{$a.version|default:0.1}</small>
+                </td>
+                <td>
+                    {if $a.supplier}
+                        {if $a.supplier_link}
+                            <a href="{$a.supplier_link}" target="_blank" class="muted addon-supplier">{$a.supplier}</a>
+                        {else}
+                            <small class="muted addon-supplier">{$a.supplier}</small>
+                        {/if}
+                    {/if}
+                </td>
+                <td width="10%" class="nowrap addon-action" data-th="Tools">
+                    {if $a.status != 'N'}
+                        <div class="hidden-tools">
                         {capture name="tools_list"}
                             {if $a.separate}
                                 {if !$non_editable}
@@ -117,17 +128,30 @@
                 <td width="15%" class="addon-action">
                     {if $a.status == 'N'}
                         {if !$hide_for_vendor}
-                        <div class="pull-right">
+                        <div>
                             <a
-                                class="btn lowercase cm-post {if $a.snapshot_correct}cm-ajax cm-ajax-full-render{else}cm-dialog-opener cm-dialog-auto-height{/if}"
+                                class="btn lowercase cm-post {if $a.snapshot_correct}cm-ajax cm-ajax-full-render{else}cm-dialog-opener cm-dialog-auto-size{/if}"
                                 {if $a.snapshot_correct}
                                     href="{"addons.install?addon=`$key`&return_url=`$c_url|escape:url`"|fn_url}"
                                     data-ca-target-id="addons_list,header_navbar,header_subnav,addons_counter"
+                                {elseif "MULTIVENDOR"|fn_allowed_for}
+                                    {if $key|fn_check_addon_snapshot:"plus"}
+                                        {$promo_popup_title = __("mve_ultimate_or_plus_license_required", ["[product]" => $smarty.const.PRODUCT_NAME])}
+                                        href="{"functionality_restrictions.mve_ultimate_or_plus_license_required"|fn_url}"
+                                        data-ca-dialog-title="{$promo_popup_title}"
+                                        data-ca-target-id="content_mve_ultimate_or_plus_license_required"
+                                    {else}
+                                        {$promo_popup_title = __("mve_ultimate_license_required", ["[product]" => $smarty.const.PRODUCT_NAME])}
+                                        href="{"functionality_restrictions.mve_ultimate_license_required"|fn_url}"
+                                        data-ca-dialog-title="{$promo_popup_title}"
+                                        data-ca-target-id="content_mve_ultimate_license_required"
+                                    {/if}
                                 {else}
                                     {$promo_popup_title = __("ultimate_license_required", ["[product]" => $smarty.const.PRODUCT_NAME])}
 
                                     href="{"functionality_restrictions.ultimate_license_required"|fn_url}"
                                     data-ca-dialog-title="{$promo_popup_title}"
+                                    data-ca-target-id="content_ultimate_license_required"
                                 {/if}
                             >
                                 {__("install")}
@@ -135,14 +159,20 @@
                         </div>
                         {/if}
                     {else}
-                        {if $show_installed}
-                            <div class="pull-right nowrap">
-                                {if !$a.snapshot_correct}{$status_meta = "cm-promo-popup"}{else}{$status_meta = ""}{/if}
-                                {include file="common/select_popup.tpl" popup_additional_class="dropleft" id=$key status=$a.status st_return_url=$c_url|escape:url hide_for_vendor=$hide_for_vendor non_editable=false status_meta=$status_meta display=$display update_controller="addons" status_target_id="addons_list,header_navbar,header_subnav,addons_counter" ajax_full_render=true}
-                            </div>
-                        {else}
-                            <span class="pull-right label label-info">{__("installed")}</span>
-                        {/if}
+                        <div class="nowrap">
+                            {if !$a.snapshot_correct}{$status_meta = "cm-promo-popup"}{else}{$status_meta = ""}{/if}
+                            {include file="common/select_popup.tpl"
+                            popup_additional_class="dropleft"
+                            id=$key status=$a.status
+                            st_return_url=$c_url
+                            hide_for_vendor=$hide_for_vendor
+                            non_editable=false
+                            status_meta=$status_meta
+                            display=$display
+                            update_controller="addons"
+                            status_target_id="addons_list,header_navbar,header_subnav,addons_counter"
+                            ajax_full_render=true}
+                        </div>
                     {/if}
                 </td>
             <!--addon_{$key}--></tr>

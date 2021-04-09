@@ -24,7 +24,7 @@
 
 {if $attachments}
 <div class="table-responsive-wrapper">
-    <table class="table table-middle table-objects table-responsive table-responsive-w-titles">
+    <table class="table table-middle table--relative table-objects table-responsive table-responsive-w-titles">
     {foreach from=$attachments item="a"}
         {capture name="object_group"}
             {include file="addons/attachments/views/attachments/update.tpl" attachment=$a object_id=$object_id object_type=$object_type hide_inputs=$hide_inputs}

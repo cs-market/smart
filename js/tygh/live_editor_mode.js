@@ -264,7 +264,6 @@
                     str_len = value.length ? value.length : 1;
                 
                 if (elm.is('input')) {
-                    value = $.formatPrice(value.replace(new RegExp(',', 'g'), ''));
                     elm.attr('size', str_len);
                 }
 

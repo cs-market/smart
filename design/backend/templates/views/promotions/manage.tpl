@@ -10,7 +10,7 @@
 
 {if $promotions}
 <div class="table-responsive-wrapper">
-    <table class="table table-middle table-responsive">
+    <table class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th class="mobile-hide" width="1%">

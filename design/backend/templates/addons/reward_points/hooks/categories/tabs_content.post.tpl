@@ -11,7 +11,7 @@
             </label>
         <br>
         <div class="table-responsive-wrapper">
-            <table class="table table-middle table-responsive">
+            <table class="table table-middle table--relative table-responsive">
             <thead class="cm-first-sibling">
             <tr>
                 <th width="20%">{__("usergroup")}</th>

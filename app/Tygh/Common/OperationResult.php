@@ -14,9 +14,17 @@
 
 namespace Tygh\Common;
 
+use Exception;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Exceptions\OperationException;
+use Tygh\Tygh;
+
 /**
  * Class OperationResult
+ *
  * @package Tygh\Common
+ *
+ * phpcs:disable SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint
  */
 class OperationResult
 {
@@ -33,8 +41,8 @@ class OperationResult
     /**
      * OperationResult constructor.
      *
-     * @param bool $success
-     * @param null $data
+     * @param bool       $success Success flag
+     * @param mixed|null $data    Result data
      */
     public function __construct($success = false, $data = null)
     {
@@ -46,20 +54,41 @@ class OperationResult
      * Sets operation data.
      *
      * @param mixed $data
+     * @param null|string $key
+     * @param null|string $sub_key
      */
-    public function setData($data)
+    public function setData($data, $key = null, $sub_key = null)
     {
-        $this->data = $data;
+        if ($key === null) {
+            $this->data = $data;
+        } else {
+            if (is_array($this->data)) {
+                $this->data = (array) $this->data;
+            }
+
+            if ($sub_key === null) {
+                $this->data[$key] = $data;
+            } else {
+                $this->data[$key][$sub_key] = $data;
+            }
+        }
     }
 
     /**
      * Gets operation data.
      *
+     * @param null|string $key
+     * @param null|mixed  $default
+     *
      * @return mixed
      */
-    public function getData()
+    public function getData($key = null, $default = null)
     {
-        return $this->data;
+        if ($key === null) {
+            return $this->data;
+        } else {
+            return is_array($this->data) && array_key_exists($key, $this->data) ? $this->data[$key] : $default;
+        }
     }
 
     /**
@@ -68,6 +97,16 @@ class OperationResult
     public function isSuccess()
     {
         return $this->success;
+    }
+
+    /**
+     * Returns true if operation result is failed.
+     *
+     * @return bool
+     */
+    public function isFailure()
+    {
+        return !$this->isSuccess();
     }
 
     /**
@@ -124,11 +163,11 @@ class OperationResult
     /**
      * Gets first error.
      *
-     * @return string|false
+     * @return string
      */
     public function getFirstError()
     {
-        return reset($this->errors);
+        return (string) reset($this->errors);
     }
 
     /**
@@ -247,20 +286,119 @@ class OperationResult
 
     /**
      * Show notifications.
+     *
+     * @param bool   $translate_messages Whether error messages must be translated before display
+     * @param string $message_state      (S - notification will be displayed unless it's closed, K - only once, I -
+     *                                   will be closed by timer)
+     *
      * Call fn_set_notification for errors, warnings and messages.
      */
-    public function showNotifications()
+    public function showNotifications($translate_messages = false, $message_state = '')
     {
         foreach ($this->errors as $error) {
-            fn_set_notification('E', __('error'), $error);
+            if ($translate_messages) {
+                $error = __($error);
+            }
+            fn_set_notification('E', __('error'), $error, $message_state);
         }
 
         foreach ($this->warnings as $warning) {
-            fn_set_notification('W', __('warning'), $warning);
+            if ($translate_messages) {
+                $warning = __($warning);
+            }
+            fn_set_notification('W', __('warning'), $warning, $message_state);
         }
 
         foreach ($this->messages as $message) {
-            fn_set_notification('N', __('successful'), $message);
+            if ($translate_messages) {
+                $message = __($message);
+            }
+            fn_set_notification('N', __('successful'), $message, $message_state);
         }
+    }
+
+    /**
+     * Throws exception if operation has errors
+     *
+     * @throws \Tygh\Exceptions\OperationException
+     */
+    public function throwIfError()
+    {
+        if ($this->hasErrors()) {
+            throw new OperationException(implode(PHP_EOL, $this->errors));
+        }
+    }
+
+    /**
+     * Merges errors, warnings, messages, data from another OperationResult instance
+     *
+     * @param OperationResult $result
+     * @param bool            $merge_data           Whether to merge data
+     */
+    public function merge(OperationResult $result, $merge_data = false)
+    {
+        foreach ($result->getWarnings() as $code => $message) {
+            $this->addWarning($code, $message);
+        }
+
+        foreach ($result->getErrors() as $code => $message) {
+            $this->addError($code, $message);
+        }
+
+        foreach ($result->getMessages() as $code => $message) {
+            $this->addMessage($code, $message);
+        }
+
+        if ($merge_data && $result->getData()) {
+            $this->setData(array_merge((array) $this->getData(), (array) $result->getData()));
+        }
+    }
+
+    /**
+     * Executes callable function and wrap result to operation result instance
+     *
+     * @param callable    $callable      Callable function
+     * @param string|null $error_message Error message, will be used if function result is empty and no error notifications.
+     *
+     * @return \Tygh\Common\OperationResult
+     */
+    public static function wrap(callable $callable, $error_message = null)
+    {
+        $session = isset(Tygh::$app['session']) ? Tygh::$app['session'] : [];
+
+        $result = new OperationResult();
+        $notifications = isset($session['notifications']) ? $session['notifications'] : [];
+
+        try {
+            $data = $callable();
+
+            if ($data) {
+                $result->setSuccess(true);
+                $result->setData($data);
+            }
+        } catch (Exception $exception) {
+            $result->addError((string) $exception->getCode(), $exception->getMessage());
+        }
+
+        $operation_notification = isset($session['notifications']) ? $session['notifications'] : [];
+
+        /** @var array{type: string, title: string, message: string} $notification */
+        foreach ($operation_notification as $key => $notification) {
+            if ($notification['type'] === NotificationSeverity::ERROR) {
+                $result->addError($key, $notification['message']);
+            } elseif ($notification['type'] === NotificationSeverity::WARNING) {
+                $result->addWarning($key, $notification['message']);
+            } elseif (in_array($notification['type'], [NotificationSeverity::INFO, NotificationSeverity::NOTICE], true)) {
+                $result->addMessage($key, $notification['message']);
+            }
+        }
+
+        if ($error_message && !$result->isSuccess() && !$result->hasErrors()) {
+            $result->addError('system', $error_message);
+        }
+
+        $session['notifications'] = $notifications;
+
+        return $result;
     }
 }

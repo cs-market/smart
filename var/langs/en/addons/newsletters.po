@@ -56,13 +56,25 @@ msgctxt "Languages::block_mailing_lists_description"
 msgid "Email field for newsletter subscription"
 msgstr "Email field for newsletter subscription"
 
+msgctxt "Languages::block_lite_checkout_newsletters"
+msgid "Checkout: Newsletters"
+msgstr "Checkout: Newsletters"
+
+msgctxt "Languages::block_lite_checkout_newsletters_description"
+msgid "Ability to sign up for newsletters"
+msgstr "Ability to sign up for newsletters"
+
 msgctxt "Languages::privileges.view_newsletters"
-msgid "View newsletters"
-msgstr "View newsletters"
+msgid "Can view"
+msgstr "Can view"
 
 msgctxt "Languages::privileges.manage_newsletters"
-msgid "Manage newsletters"
-msgstr "Manage newsletters"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privilege_groups.newsletters"
+msgid "Newsletters"
+msgstr "Newsletters"
 
 msgctxt "Languages::warning_newsletter_no_recipients"
 msgid "Newsletter hasn't been sent because no recipients were found matching the selected criteria."

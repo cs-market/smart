@@ -19,12 +19,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'upload') {
         $rebuilt = fn_rebuild_files('file');
         $file = reset($rebuilt);
+
+        if (empty($file)) {
+            exit;
+        }
+
+        $file_extension = fn_get_file_ext($file['name']);
+
+        if (!fn_is_file_extension_allowed($file_extension)) {
+            exit;
+        }
+
         $file = fn_move_uploaded_file($file);
 
         Tygh::$app['ajax']->assign('local_data', $file);
         exit;
     }
 
-    return array(CONTROLLER_STATUS_OK);
+    return [CONTROLLER_STATUS_OK];
 }
 

@@ -15,7 +15,6 @@ class PaypalExpressGetDetailsTest extends ATestCase
     protected function setUp()
     {
         define('AREA', 'C');
-        define('BOOTSTRAP', true);
         define('TIME', time());
     }
 

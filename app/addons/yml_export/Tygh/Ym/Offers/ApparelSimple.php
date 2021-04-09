@@ -44,6 +44,7 @@ class ApparelSimple extends Simple
         'country_of_origin',
         'barcode',
         'cpa',
+        'adult',
         'expiry',
         'weight',
         'dimensions',
@@ -51,9 +52,17 @@ class ApparelSimple extends Simple
         'param',
     );
 
+    public function gatherAdditional($product)
+    {
+        $this->offer['items']['name'] = $product['product'];
+
+        return true;
+    }
+
     public function xml($product)
     {
         $yml2_product_skip = 0;
+        $xml = '';
         $this->offer = $this->build($product);
         $this->gatherAdditional($product);
         $this->getApparelOffer($product);
@@ -61,47 +70,54 @@ class ApparelSimple extends Simple
         if ($this->options['export_stock'] == 'Y') {
             if ($product['tracking'] == 'B' && $product['amount'] <= 0) {
                 $this->log->write(Logs::SKIP_PRODUCT, $product, __('yml2_log_product_amount_is_empty'));
+                $yml2_product_skip++;
 
-                return '';
+                return array('', $yml2_product_skip);
             }
-        }
-
-        $product['product_options'] = empty($product['product_options']) ? fn_get_product_options($product['product_id'], CART_LANGUAGE) : $product['product_options'];
-        list($product_combinations, ) = fn_get_product_options_inventory(array('product_id' => $product['product_id']));
-
-        if (empty($product_combinations)) {
-            $product_combinations = $this->generateCombinations($product);
-        }
-
-        if (empty($product_combinations)) {
-            $this->log->write(Logs::SKIP_PRODUCT, $product, __('yml2_log_product_combinations_are_empty'));
-            return array('', 1);
         }
 
         if (!empty($this->offer['items']['param'])) {
             $this->params = $this->offer['items']['param'];
         }
 
-        $offer_origin = $this->offer;
-        $xml = '';
-        $count_combination = 0;
-        foreach($product_combinations as $combination) {
-            if (!$this->buildOfferCombination($product, $combination)) {
-                continue;
-            }
-
-            $xml .= $this->offerToXml($this->offer);
-
+        if (!empty($product['variation_group_id'])) {
             if ($this->postBuild($xml, $product, $this->offer)) {
-                $count_combination++;
+                $xml .= $this->offerToXml($this->offer);
+            } else {
+                $yml2_product_skip++;
             }
 
-            $this->offer = $offer_origin;
-        }
+        } else {
+            $product['product_options'] = empty($product['product_options']) ? fn_get_product_options($product['product_id'], CART_LANGUAGE) : $product['product_options'];
+            list($product_combinations,) = fn_get_product_options_inventory(array('product_id' => $product['product_id']));
 
-        if (empty($count_combination)) {
-            $this->log->write(Logs::SKIP_PRODUCT, $product, __('yml2_log_product_amount_is_empty'));
-            $yml2_product_skip++;
+            if (empty($product_combinations)) {
+                $product_combinations = $this->generateCombinations($product);
+            }
+
+            if (empty($product_combinations)) {
+                $this->log->write(Logs::SKIP_PRODUCT, $product, __('yml2_log_product_combinations_are_empty'));
+                return array('', 1);
+            }
+
+            $offer_origin = $this->offer;
+            $count_combination = 0;
+            foreach ($product_combinations as $combination) {
+                if (!$this->buildOfferCombination($product, $combination)) {
+                    continue;
+                }
+
+                if ($this->postBuild($xml, $product, $this->offer)) {
+                    $xml .= $this->offerToXml($this->offer);
+                    $count_combination++;
+                }
+
+                $this->offer = $offer_origin;
+            }
+            if (empty($count_combination)) {
+                $this->log->write(Logs::SKIP_PRODUCT, $product, __('yml2_log_product_amount_is_empty'));
+                $yml2_product_skip++;
+            }
         }
 
         return array($xml, $yml2_product_skip);
@@ -205,8 +221,14 @@ class ApparelSimple extends Simple
 
     protected function getApparelOffer($product)
     {
-        $this->offer['attr']['group_id'] = $product['product_id'];
-
+        if (!empty($product['variation_group_id'])) {
+            $this->offer['attr']['group_id'] = sprintf('%s0%s',
+                $product['variation_group_id'],
+                empty($product['variation_parent_product_id']) ? $product['product_id'] : $product['variation_parent_product_id']
+            );
+        } else {
+            $this->offer['attr']['group_id'] = $product['product_id'];
+        }
     }
 
     protected function setOfferOptions($option)

@@ -14,6 +14,7 @@
 
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -21,8 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($mode == 'update') {
         if (!empty($_REQUEST['rule_data']) && !empty($_REQUEST['rule_data']['name']) && !empty($_REQUEST['rule_data']['rule_params'])) {
-            foreach (fn_get_translation_languages() as $lc => $_v) {
-                fn_create_seo_name(0, 's', $_REQUEST['rule_data']['name'], 0, $_REQUEST['rule_data']['rule_params'], '', $lc);
+            if (Registry::get('addons.seo.single_url') == 'Y') {
+                $lang_codes = [Registry::get('settings.Appearance.frontend_default_language')];
+            } else {
+                $lang_codes = array_keys(Languages::getAll());
+            }
+            foreach ($lang_codes as $lang_code) {
+                fn_create_seo_name(0, 's', $_REQUEST['rule_data']['name'], 0, $_REQUEST['rule_data']['rule_params'], '', $lang_code);
             }
         }
     }

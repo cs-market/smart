@@ -45,7 +45,7 @@
 </script>
 
 {strip}
-    <div class="top-panel">
+    <div class="top-panel demo-panel">
         <div id="minimize_block" class="top-panel__wrapper{if $smarty.cookies.minimize_block} hidden{/if}">
             <div class="top-panel__logo">
                 <a href="https://www.cs-cart.com/compare.html" class="top-panel__logo-link" target="_blank"><i class="top-panel__icon-basket glyph-basket"></i></a>

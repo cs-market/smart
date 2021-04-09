@@ -24,5 +24,6 @@ fn_register_hooks(
     'delete_page',
     'clone_page',
     'sanitize_html',
-    'generate_rss_feed'
+    'generate_rss_feed',
+    'storefront_rest_api_set_page_icons'
 );

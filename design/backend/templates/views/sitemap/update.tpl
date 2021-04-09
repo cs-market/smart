@@ -29,7 +29,7 @@
 
     <div id="content_tab_links_{$id}">
         <div class="table-responsive-wrapper">
-            <table class="table table-middle hidden-inputs table-responsive">
+            <table class="table table-middle table--relative hidden-inputs table-responsive">
             <thead>
                 <tr>
                     <th width="4%">{__("position_short")}</th>

@@ -20,22 +20,37 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
     if ($mode == 'notify') {
 
-        $order_id = (strpos($_REQUEST['MerchantReference'], '_')) ? substr($_REQUEST['MerchantReference'], 0, strpos($_REQUEST['MerchantReference'], '_')) : $_REQUEST['MerchantReference'];
+        $order_id = (strpos($_REQUEST['MerchantReference'], '_'))
+                  ? substr($_REQUEST['MerchantReference'], 0, strpos($_REQUEST['MerchantReference'], '_'))
+                  : $_REQUEST['MerchantReference'];
         $order_info = fn_get_order_info($order_id);
         $processor_data = fn_get_payment_method_data($order_info['payment_id']);
 
-        $pp_response = array();
+        $pp_response = [];
         $pp_response['transaction_id'] = $_REQUEST['TransactionId'];
         $pp_response['transaction_datetime'] = $_REQUEST['TransactionDateTime'];
         $pp_response['reason_text'] = $_REQUEST['ResponseDescription'];
 
         if ($_REQUEST['ResultCode'] == 0) {
-            if ( $_REQUEST['StatusFlag'] == 'Success' && in_array($_REQUEST['ResponseCode'], array('00', '08', '10', '11', '16')) ) {
+            if ( $_REQUEST['StatusFlag'] == 'Success' && in_array($_REQUEST['ResponseCode'], ['00', '08', '10', '11', '16'])) {
 
                 $tran_ticket = db_get_field("SELECT data FROM ?:order_data WHERE type = 'E' AND order_id = ?i", $order_id);
 
-                $cart_hashkey_str = $tran_ticket . $processor_data['processor_params']['posid']. $processor_data['processor_params']['acquirerid'] . $_REQUEST['MerchantReference'] . $_REQUEST['ApprovalCode'] . $_REQUEST['Parameters'] . $_REQUEST['ResponseCode'] . $_REQUEST['SupportReferenceID'] . $_REQUEST['AuthStatus'] . $_REQUEST['PackageNo'] . $_REQUEST['StatusFlag'];
-                $cart_hashkey = strtoupper(hash( 'sha256', $cart_hashkey_str ));
+                $cart_data = [
+                    $tran_ticket,
+                    $processor_data['processor_params']['posid'],
+                    $processor_data['processor_params']['acquirerid'],
+                    $_REQUEST['MerchantReference'],
+                    $_REQUEST['ApprovalCode'],
+                    $_REQUEST['Parameters'],
+                    $_REQUEST['ResponseCode'],
+                    $_REQUEST['SupportReferenceID'],
+                    $_REQUEST['AuthStatus'],
+                    $_REQUEST['PackageNo'],
+                    $_REQUEST['StatusFlag']
+                ];
+
+                $cart_hashkey = strtoupper(hash_hmac('sha256', implode(';', $cart_data), $tran_ticket));
 
                 if ($cart_hashkey == $_REQUEST['HashKey']) {
                     $pp_response['order_status'] = 'P';

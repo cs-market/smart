@@ -31,4 +31,19 @@
             $.ceAjax('request', fn_url('checkout.subscribe_customer?' + params), {method: 'post', result_ids: 'subsciption*'});
         });
     });
+
+    $.ceEvent('on', 'ce.commoninit', function (context) {
+        var $newsletter_togglers = $('[data-ca-lite-checkout-element="newsletter-toggler"]', context);
+
+        $newsletter_togglers.on('change', function () {
+            var $checkbox = $(this);
+
+            $.ceLiteCheckout('updateCustomerInfo', function (data) {
+                if (data.user_data.email) {
+                    var connected_checkbox_id = $checkbox.data('caTargetId');
+                    $('#' + connected_checkbox_id).trigger('click');
+                }
+            }, false)
+        });
+    });
 }(Tygh, Tygh.$));

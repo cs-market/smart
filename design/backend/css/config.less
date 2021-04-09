@@ -1,3 +1,5 @@
+@import "lib/twitterbootstrap/variables.less";
+
 // TYPOGRAPHY
 @sansFontFamily: -apple-system, BlinkMacSystemFont, San Francisco, Roboto, Segoe UI, Ubuntu, Helvetica Neue, sans-serif;
 
@@ -28,6 +30,7 @@
 @topPanelMenuBackgroundHoverEnd: @topPanelMenuBackgroundHoverStart;
 @topPanelMenuBackgroundActiveStart: @mainColor;
 @topPanelMenuBackgroundActiveEnd: @topPanelMenuBackgroundStart;
+@topPanelMenuBackgroundDisabled: @gray;
 @topPanelMenuCaret: white;
 @topPanelMenuDividerLeft: transparent;
 @topPanelMenuDividerRight: transparent;
@@ -46,7 +49,7 @@
 @textButtonCaretColor: #1010107b;
 
 @tabsBackgroundColor: #f4f3f3;
-@tabsActiveBackroundColor: @mainColor;
+@tabsActiveBackgroundColor: @mainColor;
 
 @extraIconsSprite: url(../media/images/exicons.png);
 @extraIconsSpriteWhite: url(../media/images/exicons_white.png);
@@ -55,11 +58,17 @@
 @BlockManagerGrid12Col:  url(../media/images/block_manager/12_col.gif);
 @BlockManagerGrid16Col:  url(../media/images/block_manager/16_col.gif);
 @BlockManagerIconsSprite: url(../media/images/block_manager/block_icons_spr.png);
-@BlockManagerOpenhand: url(../media/images/block_manager/openhand.cur);
-@BlockManagerClosedhand: url(../media/images/block_manager/closedhand.cur);
+@BlockManagerOpenHand: url(../media/images/block_manager/openhand.cur);
+@BlockManagerClosedHand: url(../media/images/block_manager/closedhand.cur);
 
 // ANY FLAGS
 @displayContentLanguage: none; // disabling content-language selector
 
 // Z-INDEX
-@zindexPopup: 1500;
+@zIndexPopup: 1500;
+
+// MEDIA QUERIES BREAKPOINTS
+@LargeDesktopBreakpoint: 1339px;
+@DesktopBreakpoint: 1023px;
+@TabletBreakpoint: 767px;
+@PhoneBreakpoint: 479px;

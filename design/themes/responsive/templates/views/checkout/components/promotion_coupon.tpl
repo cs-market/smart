@@ -1,7 +1,7 @@
 {if $cart|fn_display_promotion_input_field}
 <div>
     <form class="cm-ajax cm-ajax-force cm-ajax-full-render" name="coupon_code_form{$position}" action="{""|fn_url}" method="post">
-        <input type="hidden" name="result_ids" value="checkout*,cart_status*,cart_items,payment-methods" />
+        <input type="hidden" name="result_ids" value="checkout*,cart_status*,cart_items,payment-methods,litecheckout_form" />
         <input type="hidden" name="redirect_url" value="{$config.current_url}" />
 
         {hook name="checkout:discount_coupons"}
@@ -23,7 +23,7 @@
                 {__("coupon")} "{$coupon_code}"
                 {assign var="_redirect_url" value=$config.current_url|escape:url}
                 {assign var="coupon_code" value=$coupon_code|escape:url}
-                {include file="buttons/button.tpl" but_href="checkout.delete_coupon?coupon_code=`$coupon_code`&redirect_url=`$_redirect_url`" but_role="delete" but_meta="ty-coupons__item-delete cm-ajax cm-ajax-full-render" but_target_id="checkout*,cart_status*,cart_items"}
+                {include file="buttons/button.tpl" but_href="checkout.delete_coupon?coupon_code=`$coupon_code`&redirect_url=`$_redirect_url`" but_role="delete" but_meta="ty-coupons__item-delete cm-ajax cm-ajax-full-render" but_target_id="checkout*,cart_status*,cart_items,litecheckout_form"}
             </li>
             {/foreach}
             {if $cart.applied_promotions}

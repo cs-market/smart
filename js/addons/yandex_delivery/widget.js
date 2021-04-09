@@ -66,7 +66,7 @@
                                 url = fn_url('checkout.checkout');
 
                                 for (i in params) {
-                                    url += '&' + params[i]['name'] + '=' + escape(params[i]['value']);
+                                    url += '&' + params[i]['name'] + '=' + encodeURIComponent(params[i]['value']);
                                 }
 
                                 $.ceAjax('request', url, {

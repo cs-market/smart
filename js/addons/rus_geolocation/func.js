@@ -23,6 +23,13 @@ var myMap;
                 if(dialog.length > 0){
                     $('.ui-autocomplete.ui-front').zIndex(dialog.zIndex()+1);
                 }
+            },
+            select: function (e, ui) {
+                // Get selected city
+                var city = ui.item.value;
+
+                fn_get_geolocation_button_city(city);
+                $('#content_geolocation_link').ceDialog('close');
             }
         });
 
@@ -64,6 +71,14 @@ var myMap;
                     response(data.autocomplete);
                 }
             });
+        }
+    });
+
+    // Selecting all text in input when opened geolocation popup
+    $.ceEvent('on', 'ce.dialogshow', function (dialog) {
+
+        if ($(dialog).is('#content_geolocation_link')) {
+            $('#auto_geocity').focus().select();
         }
     });
 
@@ -206,12 +221,7 @@ function fn_get_geolocation_button_city(city)
 {
     var geo_url = $('input[name=url_geolocation]').val();
     var url = $('input[name=pull_url_geolocation]').val();
-    var auto_geocity = $("#auto_geocity").val();
     var result_ids = 'geolocation_city_link';
-
-    if (auto_geocity || !city) {
-        city = auto_geocity;
-    }
 
     $.ceAjax('request', url, {
         result_ids: result_ids,
@@ -233,4 +243,3 @@ function fn_get_geolocation_button_city(city)
         });
     }
 }
-

@@ -145,3 +145,23 @@ function fn_wishlist_get_count()
 
     return empty($result) ? -1 : $result;
 }
+
+/**
+ * The "save_cart_content_pre" hook handler.
+ *
+ * Actions performed:
+ *  - Gets user data info from session and adds them into records with wishlist type
+ *
+ * @see fn_save_cart_content
+ */
+function fn_wishlist_save_cart_content_pre(&$cart, $user_id, $type, $user_type)
+{
+    if ($type == 'W') {
+        if (empty($cart['user_data']) && !empty(Tygh::$app['session']['cart']['user_data'])) {
+            $cart['user_data'] = Tygh::$app['session']['cart']['user_data'];
+        }
+    } elseif (!empty(Tygh::$app['session']['wishlist']) && !empty($cart['user_data'])) {
+        Tygh::$app['session']['wishlist']['user_data'] = $cart['user_data'];
+        fn_save_cart_content(Tygh::$app['session']['wishlist'], $user_id, 'W', $user_type);
+    }
+}

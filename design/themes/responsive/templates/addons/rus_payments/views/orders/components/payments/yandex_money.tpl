@@ -3,9 +3,9 @@
 {/if}
 
 {if $yandex_payments|count > 1}
-    <div class="ty-control-group">
+    <div class="ty-control-group litecheckout__field litecheckout__field--full">
         <label class="ty-control-group__title" for="yandex_payment">{__("select_yandex_payment")}</label>
-        <select name="payment_info[yandex_payment_type]" id="yandex_payment">
+        <select name="payment_info[yandex_payment_type]" id="yandex_payment" class="litecheckout__select">
             {if $payment_method.processor_params.payments.pc}
                 <option value="pc"> {__('yandex_payment_yandex')}</option>
             {/if}

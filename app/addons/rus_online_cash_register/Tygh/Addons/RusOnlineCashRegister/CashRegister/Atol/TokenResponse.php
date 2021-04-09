@@ -43,12 +43,15 @@ class TokenResponse extends Response
         } else {
             if (isset($data['error'])) {
                 $this->setError($data['error']['code'], $data['error']['text']);
+            } elseif (isset($data['code']) && $data['code'] >= 2) {
+                // Backward compatible for API v3
+                // If the error code is 0, then the auth token issued.
+                // If the error code is 1, then the old auth token issued.
+                // If the error code is greater than or equal to 2, the authorization failed.
+
+                $this->setError($data['code'], $data['text']);
             } else {
-                if ($data['code'] >= 2) {
-                    $this->setError($data['code'], $data['text']);
-                } else {
-                    $this->token = $data['token'];
-                }
+                $this->token = $data['token'];
             }
         }
     }

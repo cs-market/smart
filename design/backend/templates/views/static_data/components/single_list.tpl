@@ -1,7 +1,7 @@
 <div class="items-container cm-sortable" data-ca-sortable-table="static_data" data-ca-sortable-id-name="param_id" >
     {if $static_data}
     <div class="table-wrapper">
-        <table class="table table-middle table-objects table-striped">
+        <table class="table table-middle table--relative table-objects table-striped">
             <tbody>
                 {foreach from=$static_data item="s"}
                     {if ""|fn_allow_save_object:"static_data":$section_data.skip_edition_checking}

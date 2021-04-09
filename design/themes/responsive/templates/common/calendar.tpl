@@ -5,10 +5,12 @@
 {/if}
 
 <div class="ty-calendar__block">
-    <input type="text" id="{$date_id}" name="{$date_name}" class="ty-calendar__input{if $date_meta} {$date_meta}{/if} cm-calendar" value="{if $date_val}{$date_val|date_format:"`$date_format`"}{/if}" {$extra} size="10" />
+    <input type="text" id="{$date_id}" name="{$date_name}" class="ty-calendar__input{if $date_meta} {$date_meta}{/if} cm-calendar" value="{if $date_val}{$date_val|date_format:"`$date_format`"}{/if}" {$extra} size="10" autocomplete="disabled" />
     <a class="cm-external-focus ty-calendar__link" data-ca-external-focus-id="{$date_id}">
         <i class="ty-icon-calendar ty-calendar__button" title="{__("calendar")}"></i>
     </a>
+    {* autocomplete="off" for Chrome *}
+    <input type="text" hidden disabled name="fake_mail" aria-hidden="true">
 </div>
 
 <script type="text/javascript">

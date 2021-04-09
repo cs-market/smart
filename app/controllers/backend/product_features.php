@@ -20,33 +20,33 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 fn_define('KEEP_UPLOADED_FILES', true);
 fn_define('NEW_FEATURE_GROUP_ID', 'OG');
 
-$navigation_sections = array(
-    'features' => array(
+$navigation_sections = [
+    'features' => [
         'title' => __('features'),
-        'href' => fn_url('product_features.manage'),
-    ),
-    'groups' => array(
+        'href'  => fn_url('product_features.manage'),
+    ],
+    'groups'   => [
         'title' => __('feature_groups'),
-        'href' => fn_url('product_features.groups'),
-    ),
-);
+        'href'  => fn_url('product_features.groups'),
+    ],
+];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    fn_trusted_vars ('feature_data');
+    fn_trusted_vars('feature_data');
     $return_url = 'product_features.manage';
 
     // Update features
     if ($mode == 'update') {
         $feature_id = fn_update_product_feature($_REQUEST['feature_data'], $_REQUEST['feature_id'], DESCR_SL);
 
-        return array(CONTROLLER_STATUS_OK, 'product_features.update?feature_id=' . $feature_id);
+        return [CONTROLLER_STATUS_OK, 'product_features.update?feature_id=' . $feature_id];
     }
 
     if ($mode == 'update_status') {
 
         fn_tools_update_status($_REQUEST);
 
-        if (!empty($_REQUEST['status']) && in_array($_REQUEST['status'], array('D', 'H'), true)) {
+        if (!empty($_REQUEST['status']) && in_array($_REQUEST['status'], ['D', 'H'], true)) {
             fn_disable_product_feature_filters($_REQUEST['id']);
         }
 
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             fn_delete_feature($_REQUEST['feature_id']);
         }
 
-        if(!empty($_REQUEST['return_url'])) {
+        if (!empty($_REQUEST['return_url'])) {
             $return_url = $_REQUEST['return_url'];
         }
     }
@@ -73,12 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        if(!empty($_REQUEST['return_url'])) {
+        if (!empty($_REQUEST['return_url'])) {
             $return_url = $_REQUEST['return_url'];
         }
     }
 
-    return array(CONTROLLER_STATUS_OK, $return_url);
+    return [CONTROLLER_STATUS_OK, $return_url];
 }
 
 if ($mode == 'update') {
@@ -88,36 +88,39 @@ if ($mode == 'update') {
     $feature = fn_get_product_feature_data($_REQUEST['feature_id'], false, false, DESCR_SL);
 
     if (empty($feature)) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
-    Tygh::$app['view']->assign('feature', $feature);
-    list($group_features) = fn_get_product_features(array('feature_types' => ProductFeatures::GROUP), 0, DESCR_SL);
-    Tygh::$app['view']->assign('group_features', $group_features);
+    $purposes = fn_get_product_feature_purposes();
+
+    if (!empty($feature['feature_type']) && !isset($purposes[$feature['purpose']])) {
+        $feature['purpose'] = (string) fn_get_product_feature_purpose_by_type($feature['feature_type']);
+    }
+
+    list($group_features) = fn_get_product_features(['feature_types' => ProductFeatures::GROUP], 0, DESCR_SL);
+
+    $params = [
+        'feature_id'     => $feature['feature_id'],
+        'feature_type'   => $feature['feature_type'],
+        'get_images'     => true,
+        'page'           => !empty($_REQUEST['page']) ? $_REQUEST['page'] : 1,
+        'items_per_page' => !empty($_REQUEST['items_per_page']) ? $_REQUEST['items_per_page'] : Registry::get('settings.Appearance.admin_elements_per_page'),
+    ];
+
+    list($variants, $search) = fn_get_product_feature_variants($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
+
+    Tygh::$app['view']->assign([
+        'purposes'         => $purposes,
+        'feature'          => $feature,
+        'group_features'   => $group_features,
+        'feature_variants' => $variants,
+        'search'           => $search,
+        'in_popup'         => $feature['feature_type'] != ProductFeatures::EXTENDED && defined('AJAX_REQUEST')
+    ]);
 
     if (fn_allowed_for('ULTIMATE') && !Registry::get('runtime.company_id')) {
         Tygh::$app['view']->assign('picker_selected_companies', fn_ult_get_controller_shared_companies($_REQUEST['feature_id']));
     }
-
-    $params = array(
-        'feature_id' => $feature['feature_id'],
-        'feature_type' => $feature['feature_type'],
-        'get_images' => true,
-        'page' => !empty($_REQUEST['page']) ? $_REQUEST['page'] : 1,
-        'items_per_page' => !empty($_REQUEST['items_per_page']) ? $_REQUEST['items_per_page'] : Registry::get('settings.Appearance.admin_elements_per_page'),
-    );
-
-    list($variants, $search) = fn_get_product_feature_variants($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
-
-    Tygh::$app['view']->assign('feature_variants', $variants);
-    Tygh::$app['view']->assign('search', $search);
-
-    if ($feature['feature_type'] == ProductFeatures::EXTENDED) {
-        Tygh::$app['view']->assign('in_popup', false);
-    } else {
-        Tygh::$app['view']->assign('in_popup', defined('AJAX_REQUEST'));
-    }
-
 } elseif ($mode == 'manage') {
     Registry::set('navigation.dynamic.sections', $navigation_sections);
     Registry::set('navigation.dynamic.active_section', 'features');
@@ -128,11 +131,15 @@ if ($mode == 'update') {
     $params['exclude_group'] = true;
 
     list($features, $search) = fn_get_product_features($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
-    list($group_features) = fn_get_product_features(array('feature_types' => ProductFeatures::GROUP, 'get_descriptions' => true), 0, DESCR_SL);
+    list($group_features) = fn_get_product_features(['feature_types' => ProductFeatures::GROUP, 'get_descriptions' => true], 0, DESCR_SL);
 
-    Tygh::$app['view']->assign('features', $features);
-    Tygh::$app['view']->assign('search', $search);
-    Tygh::$app['view']->assign('group_features', $group_features);
+    Tygh::$app['view']->assign([
+        'purposes'        => fn_get_product_feature_purposes(),
+        'default_purpose' => fn_get_default_product_feature_purpose(),
+        'features'        => $features,
+        'search'          => $search,
+        'group_features'  => $group_features,
+    ]);
 
     if (empty($features) && defined('AJAX_REQUEST')) {
         Tygh::$app['ajax']->assign('force_redirection', fn_url('product_features.manage'));
@@ -148,11 +155,13 @@ if ($mode == 'update') {
     $params['feature_types'] = ProductFeatures::GROUP;
 
     list($features, $search) = fn_get_product_features($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
-    list($group_features) = fn_get_product_features(array('feature_types' => ProductFeatures::GROUP), 0, DESCR_SL);
+    list($group_features) = fn_get_product_features(['feature_types' => ProductFeatures::GROUP], 0, DESCR_SL);
 
-    Tygh::$app['view']->assign('features', $features);
-    Tygh::$app['view']->assign('search', $search);
-    Tygh::$app['view']->assign('group_features', $group_features);
+    Tygh::$app['view']->assign([
+        'features'       => $features,
+        'search'         => $search,
+        'group_features' => $group_features,
+    ]);
 
     if (empty($features) && defined('AJAX_REQUEST')) {
         Tygh::$app['ajax']->assign('force_redirection', fn_url('product_features.manage'));
@@ -184,13 +193,13 @@ if ($mode == 'update') {
         $total = db_get_found_rows();
         if (!Registry::get('runtime.company_id') || (fn_allowed_for('ULTIMATE') && fn_check_company_id('product_features', 'feature_id', $_REQUEST['feature_id']))) {
             if ($start + $limit >= $total + 1) {
-                $objects[] = array('value' => 'disable_select', 'name' => '-' . __('enter_other') . '-');
+                $objects[] = ['value' => 'disable_select', 'name' => '-' . __('enter_other') . '-'];
             }
         }
     }
 
     if (!$start) {
-        array_unshift($objects, array('value' => '', 'name' => '-' . __('none') . '-'));
+        array_unshift($objects, ['value' => '', 'name' => '-' . __('none') . '-']);
     }
 
     Tygh::$app['view']->assign('objects', $objects);
@@ -206,26 +215,30 @@ if ($mode == 'update') {
  * @TODO: Class that implements common methods for Select2 controller modes.
  */
 elseif ($mode == 'get_variants_list') {
-    if (isset($_REQUEST['feature_id'])) {
-        $feature_id = (int) $_REQUEST['feature_id'];
-    } else {
-        exit;
+    if (empty($_REQUEST['feature_id']) && empty($_REQUEST['ids'])) {
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
+    $feature_id = isset($_REQUEST['feature_id']) ? (int) $_REQUEST['feature_id'] : null;
     $page_number = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
     $page_size = isset($_REQUEST['page_size']) ? (int) $_REQUEST['page_size'] : 10;
     $search_query = isset($_REQUEST['q']) ? $_REQUEST['q'] : null;
     $lang_code = isset($_REQUEST['lang_code']) ? $_REQUEST['lang_code'] : CART_LANGUAGE;
 
-    $search = array(
-        'page' => $page_number,
-        'feature_id' => $feature_id,
+    $search = [
+        'page'         => $page_number,
+        'feature_id'   => $feature_id,
         'search_query' => $search_query,
-        'get_images' => true
-    );
+        'get_images'   => true
+    ];
 
     if (isset($_REQUEST['preselected'])) {
         $search['variant_id'] = $_REQUEST['preselected'];
+    }
+
+    if (isset($_REQUEST['ids'])) {
+        $search['variant_id'] = (array) $_REQUEST['ids'];
+        $page_size = 0;
     }
 
     if (isset($_REQUEST['product_id'])) {
@@ -240,8 +253,8 @@ elseif ($mode == 'get_variants_list') {
         if (isset($feature_variant['image_pair'])) {
             $image_data = fn_image_to_display(
                 $feature_variant['image_pair'],
-                isset($_REQUEST['image_width']) ? (int)$_REQUEST['image_width'] : 50,
-                isset($_REQUEST['image_height']) ? (int)$_REQUEST['image_height'] : 50
+                isset($_REQUEST['image_width']) ? (int) $_REQUEST['image_width'] : 50,
+                isset($_REQUEST['image_height']) ? (int) $_REQUEST['image_height'] : 50
             );
             if (!empty($image_data['image_path'])) {
                 $image_url = $image_data['image_path'];
@@ -251,7 +264,12 @@ elseif ($mode == 'get_variants_list') {
         return array(
             'id' => $feature_variant['variant_id'],
             'text' => $feature_variant['variant'],
-            'image_url' => $image_url
+            'image_url' => $image_url,
+            'data' => [
+                'image_url' => $image_url,
+                'name' => $feature_variant['variant'],
+                'color' => $feature_variant['color'],
+            ]
         );
     }, $variants));
 
@@ -271,16 +289,39 @@ elseif ($mode == 'get_features_list') {
     $search_query = isset($_REQUEST['q']) ? $_REQUEST['q'] : null;
     $lang_code = isset($_REQUEST['lang_code']) ? $_REQUEST['lang_code'] : CART_LANGUAGE;
 
-    $search = array(
-        'page' => $page_number,
-        'search_query' => $search_query,
+    $search = [
+        'page'             => $page_number,
+        'description'      => $search_query,
         'get_descriptions' => true,
-    );
+    ];
 
     if (isset($_REQUEST['preselected'])) {
         $search['feature_id'] = $_REQUEST['preselected'];
         $search['plain'] = true;
         $search['exclude_group'] = true;
+    }
+
+    if (isset($_REQUEST['ids'])) {
+        $search['feature_id'] = (array) $_REQUEST['ids'];
+        $search['plain'] = true;
+        $search['exclude_group'] = true;
+        $page_size = 0;
+    }
+
+    if (!empty($_REQUEST['get_only_selectable'])) {
+        $search['feature_types'] = ProductFeatures::getSelectableList();
+    }
+
+    if (isset($_REQUEST['exclude_empty_groups'])) {
+        $search['exclude_empty_groups'] = true;
+    }
+
+    if (isset($_REQUEST['purpose'])) {
+        $search['purpose'] = $_REQUEST['purpose'];
+    }
+
+    if (isset($_REQUEST['exclude_feature_ids'])) {
+        $search['exclude_feature_id'] = $_REQUEST['exclude_feature_ids'];
     }
 
     list($features, $search) = fn_get_product_features($search, $page_size, $lang_code);
@@ -289,18 +330,21 @@ elseif ($mode == 'get_features_list') {
     // It will be refactored along with implementing Select2 controller mode base class.
     $feature_converter = function ($feature_list) use (&$feature_converter, $lang_code) {
         return array_values(array_map(function ($feature) use (&$feature_converter, $lang_code) {
-            $return = array(
-                'id' => (int) $feature['feature_id'],
-                'text' => $feature['description'],
-                'object' => array(
+            $return = [
+                'id'     => (int) $feature['feature_id'],
+                'text'   => $feature['description'],
+                'object' => [
                     'feature_type' => $feature['feature_type'],
-                ),
-            );
+                ],
+                'data'  => [
+                    'description'   => $feature['description']
+                ]
+            ];
             if ($feature['feature_type'] == ProductFeatures::SINGLE_CHECKBOX) {
-                $return['object']['variants'] = array(
-                    array('id' => 'Y', 'text' => __('yes')),
-                    array('id' => 'N', 'text' => __('no')),
-                );
+                $return['object']['variants'] = [
+                    ['id' => 'Y', 'text' => __('yes')],
+                    ['id' => 'N', 'text' => __('no')],
+                ];
             } elseif ($feature['feature_type'] == ProductFeatures::GROUP) {
                 $return['children'] = array();
 
@@ -308,12 +352,12 @@ elseif ($mode == 'get_features_list') {
                     // Recursive call that fills subfeatures list
                     $return['children'] = $feature_converter($feature['subfeatures']);
                 }
-            } elseif (in_array($feature['feature_type'], array(
+            } elseif (in_array($feature['feature_type'], [
                 ProductFeatures::TEXT_SELECTBOX,
                 ProductFeatures::NUMBER_SELECTBOX,
                 ProductFeatures::EXTENDED,
                 ProductFeatures::MULTIPLE_CHECKBOX
-            ))) {
+            ])) {
                 $return['object']['variants'] = fn_url(
                     "product_features.get_variants_list?feature_id={$feature['feature_id']}&lang_code={$lang_code}"
                 );

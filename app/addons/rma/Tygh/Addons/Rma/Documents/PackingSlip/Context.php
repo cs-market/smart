@@ -17,6 +17,7 @@ namespace Tygh\Addons\Rma\Documents\PackingSlip;
 
 use Tygh\Template\Document\Order\Context as OrderContext;
 use Tygh\Template\Document\Order\Order;
+use Tygh\Enum\Addons\Rma\ReturnOperationStatuses;
 
 /**
  * Class Context
@@ -41,8 +42,8 @@ class Context extends OrderContext
         $this->return_info = $return_info;
         $this->order = $order;
 
-        if (!empty($return_info['items'][RETURN_PRODUCT_ACCEPTED])) {
-            foreach ($return_info['items'][RETURN_PRODUCT_ACCEPTED] as $item) {
+        if (!empty($return_info['items'][ReturnOperationStatuses::APPROVED])) {
+            foreach ($return_info['items'][ReturnOperationStatuses::APPROVED] as $item) {
                 if (isset($order->data['products'][$item['item_id']]['product_code'])) {
                     $item['product_code'] = $order->data['products'][$item['item_id']]['product_code'];
                 } else {

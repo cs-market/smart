@@ -33,7 +33,7 @@
     <div class="items-container {if $can_update}cm-sortable{/if}" {if $can_update}data-ca-sortable-table="template_table_columns" data-ca-sortable-id-name="column_id"{/if} id="content_table_column_list_{$snippet->getId()}">
         {if $columns}
             <div class="table-wrapper">
-                <table class="table table-middle table-objects table-striped">
+                <table class="table table-middle table--relative table-objects table-striped">
                     <tbody>
                     {foreach from=$columns item="column"}
                         {include file="common/object_group.tpl"

@@ -1,7 +1,6 @@
 (function(_, $){
 
     $.ceEvent('on', 'ce.commoninit', function(context) {
-
         $('.cm-mask-time').mask('99:99:99');
     });
 

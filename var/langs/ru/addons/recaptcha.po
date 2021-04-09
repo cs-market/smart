@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/recaptcha.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.11.5/addons/recaptcha.po\n"
+"X-Crowdin-File-ID: 3618\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::recaptcha"
 msgid "Google reCAPTCHA"
@@ -64,6 +64,18 @@ msgctxt "SettingsOptions::recaptcha::recaptcha_secret"
 msgid "Secret"
 msgstr "Secret (Секрет)"
 
+msgctxt "SettingsSections::recaptcha::general"
+msgid "General"
+msgstr "Общие"
+
+msgctxt "SettingsSections::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr "Страны-исключения"
+
+msgctxt "SettingsOptions::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr "Страны-исключения"
+
 msgctxt "Languages::error_validator_recaptcha"
 msgid "Please confirm you are not a robot."
 msgstr "Пожалуйста, подтвердите, что вы не робот."
@@ -73,6 +85,10 @@ msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> a
 msgstr "<p>Инструкции для получения <b>ключа сайта</b> и <b>secret</b> доступны <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/docs/start\">здесь</a></b>.</p>"
 
 msgctxt "Languages::recaptcha.text_settings_notice"
-msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.</p>"
-msgstr "<p>Инструкции для получения <b>ключа сайта</b> и <b>secret</b> доступны <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">здесь</a></b>.</p>"
+msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.<br>Please note that the add-on currently supports only <b>reCAPTCHA v2: Checkbox</b></p>"
+msgstr "<p>Инструкции для получения <b>ключа сайта</b> и <b>secret</b> доступны <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">здесь</a></b>.<br>Обратите внимание, что модуль сейчас поддерживает только <b>reCAPTCHA v2: Checkbox</b></p>"
+
+msgctxt "Languages::recaptcha.text_forbidden_countries_notice"
+msgid "<p>Google reCAPTACHA will be disabled for the selected countries. Instead, visitors from those countries will be asked to type a few symbols they see on the screen.</p>"
+msgstr "<p>В выбранных странах не будет использоваться Google reCAPTCHA. Посетителям из этих стран будет предложено ввести символы, которые они видят на экране.</p>"
 

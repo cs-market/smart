@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: pl\n"
-"X-Crowdin-File: /release-4.8.2/addons/social_buttons.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:08\n"
+"X-Crowdin-File: /release-4.11.5/addons/social_buttons.po\n"
+"X-Crowdin-File-ID: 3690\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::social_buttons"
 msgid "Social buttons"
@@ -19,10 +19,6 @@ msgstr "Portale społecznościowe"
 msgctxt "Addons::description::social_buttons"
 msgid "Social media and e-mail share buttons (Twitter, Facebook, etc.)"
 msgstr "Dodatek umieszcza w sklepie odnośniki do portali społecznościowych (Facebook, Twitter etc.)"
-
-msgctxt "Languages::use_for_email_share"
-msgid "Send to friend form"
-msgstr "Formularz wyślij znajomemu"
 
 msgctxt "Languages::facebook"
 msgid "Facebook"
@@ -64,33 +60,9 @@ msgctxt "Languages::fb_websites"
 msgid "Websites"
 msgstr "Strony internetowe"
 
-msgctxt "Languages::error_no_recipient_address"
-msgid "Please enter your friends e-mail address to proceed"
-msgstr "Podaj adres e-mail swoich znajomych, aby kontynuować"
-
-msgctxt "Languages::recommendation_from"
-msgid "Recommendation from"
-msgstr "Rekomendacja z"
-
 msgctxt "Languages::text_recommendation_notes"
 msgid "Your friend has recommended this page to you. Please follow the link:"
 msgstr "Twój przyjaciel zarekomendował tę stronę dla Ciebie. Prosimy kliknąć w ten link:"
-
-msgctxt "Languages::your_email"
-msgid "Your e-mail"
-msgstr "Twój e-mail"
-
-msgctxt "Languages::name_of_friend"
-msgid "Name of your friend"
-msgstr "Imię twojego przyjaciela"
-
-msgctxt "Languages::email_of_friend"
-msgid "E-mail of your friend"
-msgstr "E-mail twojego przyjaciela"
-
-msgctxt "Languages::share_via_email"
-msgid "Share via E-Mail"
-msgstr "Podziel się przez e-maila"
 
 msgctxt "Languages::sb_share"
 msgid "Share"
@@ -111,10 +83,6 @@ msgstr "Facebook"
 msgctxt "SettingsSections::social_buttons::vkontakte"
 msgid "Vkontakte"
 msgstr "VKontakte"
-
-msgctxt "SettingsSections::social_buttons::email"
-msgid "E-mail"
-msgstr "E-mail"
 
 msgctxt "SettingsOptions::social_buttons::yandex_header"
 msgid "Yandex settings"
@@ -252,18 +220,6 @@ msgctxt "SettingsOptions::social_buttons::vkontakte_display_on"
 msgid "Display on"
 msgstr "Wyświetl"
 
-msgctxt "SettingsOptions::social_buttons::email_header"
-msgid "E-mail settings"
-msgstr "Ustawienia poczty e-mail"
-
-msgctxt "SettingsOptions::social_buttons::email_enable"
-msgid "Show E-mail button"
-msgstr "Pokaż przycisk E-mail"
-
-msgctxt "SettingsOptions::social_buttons::email_display_on"
-msgid "Display on"
-msgstr "Wyświetl"
-
 msgctxt "SettingsTooltips::social_buttons::twitter_via"
 msgid "User name to attribute the Tweet to (i.e. 'via @username')"
 msgstr "Nazwa użytkownika do Tweeta (n.p  \"@username\")"
@@ -303,14 +259,6 @@ msgstr "Poziomy"
 msgctxt "SettingsVariants::social_buttons::twitter_display_count::vertical"
 msgid "vertical"
 msgstr "Pionowy"
-
-msgctxt "SettingsVariants::social_buttons::email_display_on::products"
-msgid "Product details pages"
-msgstr "Strona ze szczegółami produktu"
-
-msgctxt "SettingsVariants::social_buttons::email_display_on::pages"
-msgid "Pages"
-msgstr "Strony"
 
 msgctxt "SettingsVariants::social_buttons::twitter_display_on::products"
 msgid "Product details pages"
@@ -720,118 +668,6 @@ msgctxt "SettingsVariants::social_buttons::vkontakte_buttons_name::interesting"
 msgid "It's interesting"
 msgstr "To interesujące"
 
-msgctxt "SettingsSections::social_buttons::gplus"
-msgid "Google plus"
-msgstr "Google plus"
-
-msgctxt "SettingsOptions::social_buttons::gplus_header"
-msgid "Google plus settings"
-msgstr "Google plus ustawienia"
-
-msgctxt "SettingsOptions::social_buttons::gplus_enable"
-msgid "Show Google plus button"
-msgstr "Pokaż przycisk Google plus"
-
-msgctxt "SettingsOptions::social_buttons::gplus_href"
-msgid "Google plus href"
-msgstr "Link do Google plus"
-
-msgctxt "SettingsOptions::social_buttons::gplus_size"
-msgid "Size"
-msgstr "Rozmiar"
-
-msgctxt "SettingsOptions::social_buttons::gplus_annotation"
-msgid "Annotation"
-msgstr "Adnotacja"
-
-msgctxt "SettingsOptions::social_buttons::gplus_width"
-msgid "Width"
-msgstr "Szerokość"
-
-msgctxt "SettingsOptions::social_buttons::gplus_align"
-msgid "Align"
-msgstr "Wyrównanie"
-
-msgctxt "SettingsOptions::social_buttons::gplus_expandto"
-msgid "Expand To"
-msgstr "Rozwiń do"
-
-msgctxt "SettingsOptions::social_buttons::gplus_recommendations"
-msgid "Recomendations"
-msgstr "Rekomendacje"
-
-msgctxt "SettingsOptions::social_buttons::gplus_display_on"
-msgid "Display on"
-msgstr "Wyświetl na"
-
-msgctxt "SettingsVariants::social_buttons::gplus_display_on::products"
-msgid "Product details pages"
-msgstr "Strona ze szczegółami produktu"
-
-msgctxt "SettingsVariants::social_buttons::gplus_display_on::pages"
-msgid "Pages"
-msgstr "Strony statyczne"
-
-msgctxt "SettingsVariants::social_buttons::gplus_size::small"
-msgid "Small"
-msgstr "Mały"
-
-msgctxt "SettingsVariants::social_buttons::gplus_size::medium"
-msgid "Medium"
-msgstr "Średni"
-
-msgctxt "SettingsVariants::social_buttons::gplus_size::standard"
-msgid "Standard"
-msgstr "Standardowy"
-
-msgctxt "SettingsVariants::social_buttons::gplus_size::tall"
-msgid "Tall"
-msgstr "Wysoki"
-
-msgctxt "SettingsVariants::social_buttons::gplus_annotation::none"
-msgid "None"
-msgstr "Brak"
-
-msgctxt "SettingsVariants::social_buttons::gplus_annotation::bubble"
-msgid "Bubble"
-msgstr "Bańka"
-
-msgctxt "SettingsVariants::social_buttons::gplus_annotation::inline"
-msgid "Inline"
-msgstr "Inline"
-
-msgctxt "SettingsVariants::social_buttons::gplus_align::left"
-msgid "Left"
-msgstr "Lewy"
-
-msgctxt "SettingsVariants::social_buttons::gplus_align::right"
-msgid "Right"
-msgstr "Prawo"
-
-msgctxt "SettingsVariants::social_buttons::gplus_expandto::top"
-msgid "Top"
-msgstr "Góra"
-
-msgctxt "SettingsVariants::social_buttons::gplus_expandto::right"
-msgid "Right"
-msgstr "Prawo"
-
-msgctxt "SettingsVariants::social_buttons::gplus_expandto::bottom"
-msgid "Bottom"
-msgstr "Dół"
-
-msgctxt "SettingsVariants::social_buttons::gplus_expandto::left"
-msgid "Left"
-msgstr "Lewy"
-
-msgctxt "SettingsVariants::social_buttons::gplus_recommendations::yes"
-msgid "Yes"
-msgstr "Tak"
-
-msgctxt "SettingsVariants::social_buttons::gplus_recommendations::no"
-msgid "No"
-msgstr "Nie"
-
 msgctxt "SettingsOptions::social_buttons::pinterest_display_on"
 msgid "Display on"
 msgstr "Wyświetl na"
@@ -880,23 +716,11 @@ msgctxt "SettingsVariants::social_buttons::pinterest_shape::round"
 msgid "Circular"
 msgstr "Okrągłe"
 
-msgctxt "SettingsOptions::social_buttons::pinterest_color"
-msgid "Color"
-msgstr "Kolor"
+msgctxt "Languages::addons.social_buttons.yandex_button_update_notice_title"
+msgid "Social buttons: Please update Yandex.Share code if you use Yandex social buttons"
+msgstr "Przyciski społecznościowe: Proszę zaktualizować Yandex. Udostępnij kod, jeśli używasz przycisków społecznościowych Yandex"
 
-msgctxt "SettingsVariants::social_buttons::pinterest_color::gray"
-msgid "Gray"
-msgstr "Szary"
-
-msgctxt "SettingsVariants::social_buttons::pinterest_color::red"
-msgid "Red"
-msgstr "Czerwony"
-
-msgctxt "SettingsVariants::social_buttons::pinterest_color::white"
-msgid "White"
-msgstr "Biały"
-
-msgctxt "Languages::email_template.social_buttons_mail"
-msgid "Email share"
-msgstr "Udostępnij email"
+msgctxt "Languages::addons.social_buttons.yandex_button_update_notice"
+msgid "<p>After some changes on the Yandex end, the Odnoklassniki social button stopped working for some of our clients. To make sure that the button works in your store, copy the up-to-date code from the Yandex website, paste it into the <b>Yandex.Share code</b> field, and save your changes.</p><p><a href=\"[GO_TO_ADDON_SETTING_LINK]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Open add-on settings</a> <a href=\"https://tech.yandex.ru/share/\" target=\"_blank\" class=\"btn btn-large\">Get up-to-date code from Yandex</a></p>"
+msgstr "<p>Po kilku zmianach w Yandex, przycisk społeczności Odnoklassniki przestał działać dla niektórych naszych klientów. Aby upewnić się, że przycisk działa w Twoim sklepie, skopiuj aktualny kod ze strony internetowej Yandex, wklej go w polu <b>Kod Yandex.Share</b> i zapisz zmiany.</p><p><a href=\"[GO_TO_ADDON_SETTING_LINK]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Otwórz ustawienia dodatku</a><a href = \"https://tech.yandex.ru / share / \"target =\" _ blank \"class =\" btn btn-large \">Pobierz aktualny kod z Yandex</a></p>"
 

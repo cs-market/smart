@@ -18,8 +18,14 @@
  *  That's why the schema must include `readonly` methods only.
  */
 
-return array(
-    'pages' => array(
-        'index' => true
-    )
-);
+return [
+    'pages'              => [
+        'index' => true,
+    ],
+    'sra_profile_fields' => [
+        'index' => true,
+    ],
+    'sra_profile'        => [
+        'create' => true,
+    ],
+];

@@ -15,7 +15,8 @@
 
     {if $threads}
         <form action="{""|fn_url}" method="post" name="threads_list_form" id="threads_list_form" class="{if $runtime.company_id}cm-hide-inputs{/if}">
-            <table width="100%" class="table table-middle">
+            <div class="table-responsive-wrapper">
+            <table width="100%" class="table table-middle table--relative table-responsive">
                 <thead>
                 <tr>
                     {if !$runtime.company_id && $auth.user_type == "A"}
@@ -77,8 +78,8 @@
                 {foreach from=$threads item=thread}
                     {$has_new_message = $auth.user_id != $thread.last_message_user_id && $thread.user_status == $smarty.const.VC_THREAD_STATUS_HAS_NEW_MESSAGE}
                     {if !$runtime.compnay_id && $auth.user_type == "A"}
-                        <td class="left">
-                            <input type="checkbox" name="thread_ids[]" value="{$thread.thread_id}" class="checkbox cm-item" />
+                        <td class="left mobile-hide">
+                            <input type="checkbox" name="thread_ids[]" value="{$thread.thread_id}" class="cm-item" />
                         </td>
                     {/if}
                     <td>
@@ -86,13 +87,13 @@
                             <span class="status-new__label"></span>
                         {/if}
                     </td>
-                    <td class="{if $has_new_message}status-new__text{/if}">
+                    <td class="{if $has_new_message}status-new__text{/if}" data-th="{__("id")}">
                         <a href="{"vendor_communication.view?thread_id=`$thread.thread_id`"|fn_url}">
                             {__("vendor_communication.ticket")} <bdi>#{$thread.thread_id}</bdi>
                         </a>
                         {include file="views/companies/components/company_name.tpl" object=$thread}
                     </td>
-                    <td class="{if $has_new_message}status-new__text{/if}">
+                    <td class="{if $has_new_message}status-new__text{/if}" data-th="{__("customer")}">
                         {if $auth.user_type == "A"}
                             {if $thread.customer_email}<a href="mailto:{$thread.customer_email|escape:url}">@</a>{/if}
                             <a href="{"profiles.update&user_id={$thread.user_id}"|fn_url}">
@@ -103,13 +104,13 @@
                         {/if}
                     </td>
                     {if $show_vendor_col}
-                        <td>
+                        <td data-th="{__("vendor")}">
                             <a href="{"vendor_communication.view?thread_id=`$thread.thread_id`"|fn_url}" class="no-link">
                                 {$thread.company}
                             </a>
                         </td>
                     {/if}
-                    <td class="message-title {if $has_new_message}status-new__text{/if}">
+                    <td class="message-title {if $has_new_message}status-new__text{/if}" data-th="{__("message")}">
                         <a href="{"vendor_communication.view?thread_id=`$thread.thread_id`"|fn_url}" class="no-link">
                             <strong>
                                 {if $thread.last_message_user_id == $auth.user_id}
@@ -145,7 +146,7 @@
                             {dropdown content=$smarty.capture.tools_list}
                         </div>
                     </td>
-                    <td class="nowrap {if $has_new_message}status-new__text{/if}">
+                    <td class="nowrap {if $has_new_message}status-new__text{/if}" data-th="{__("date")}">
                         <a href="{"vendor_communication.view?thread_id=`$thread.thread_id`"|fn_url}" class="no-link">
                             {$thread.last_updated|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}
                         </a>
@@ -153,6 +154,7 @@
                     </tr>
                 {/foreach}
             </table>
+            </div>
         </form>
     {else}
         <p class="no-items">{__("no_data")}</p>

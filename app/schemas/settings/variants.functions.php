@@ -14,13 +14,14 @@
 
 use Tygh\Registry;
 use Tygh\Tools\DateTimeHelper;
+use Tygh\Languages\Languages;
 
 /**
  * Get languages list for customer language
  */
 function fn_settings_variants_appearance_frontend_default_language()
 {
-    return fn_get_simple_languages();
+    return Languages::getSimpleLanguages();
 }
 
 /**
@@ -28,7 +29,7 @@ function fn_settings_variants_appearance_frontend_default_language()
  */
 function fn_settings_variants_appearance_backend_default_language()
 {
-    return fn_get_simple_languages(true);
+    return Languages::getSimpleLanguages();
 }
 
 /**

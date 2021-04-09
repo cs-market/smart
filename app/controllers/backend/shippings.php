@@ -33,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ((!empty($_REQUEST['shipping_id']) && fn_check_company_id('shippings', 'shipping_id', $_REQUEST['shipping_id'])) || empty($_REQUEST['shipping_id'])) {
             fn_set_company_id($_REQUEST['shipping_data']);
             $_REQUEST['shipping_id'] = fn_update_shipping($_REQUEST['shipping_data'], $_REQUEST['shipping_id']);
-
         }
 
         $_extra = empty($_REQUEST['destination_id']) ? '' : '&destination_id=' . $_REQUEST['destination_id'];
@@ -108,7 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     'state' => Registry::get('settings.Company.company_state'),
                     'zipcode' => Registry::get('settings.Company.company_zipcode'),
                     'phone' => Registry::get('settings.Company.company_phone'),
-                    'fax' => Registry::get('settings.Company.company_fax'),
                 )
             );
 
@@ -233,15 +231,22 @@ if ($mode == 'configure') {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
 
-    if (Registry::get('runtime.company_id') && !fn_allowed_for('ULTIMATE')) {
+    $company_id = Registry::get('runtime.company_id');
+    if ($company_id && !fn_allowed_for('ULTIMATE')) {
         $company_data = Registry::get('runtime.company_data');
+        $company_shippings = explode(',', $company_data['shippings']);
 
-        if ((!in_array($_REQUEST['shipping_id'], explode(',', $company_data['shippings'])) && $shipping['company_id'] != Registry::get('runtime.company_id')) || ($shipping['company_id'] != Registry::get('runtime.company_id') && $shipping['company_id'] != 0)) {
+        $shipping_of_another_company = $shipping['company_id'] != $company_id;
+        $shipping_not_assigned_to_company = !in_array($_REQUEST['shipping_id'], $company_shippings);
+        $shipping_assigned_to_company = $shipping['company_id'] != 0;
+        if ($shipping_of_another_company
+            && ($shipping_not_assigned_to_company || $shipping_assigned_to_company)
+        ) {
             return array(CONTROLLER_STATUS_DENIED);
         }
     }
 
-    if ($shipping['rate_calculation'] == 'M') {
+    if ($shipping['allow_multiple_locations']) {
         $rates_defined = db_get_hash_array("SELECT destination_id, IF(rate_value = '', 0, 1) as defined FROM ?:shipping_rates WHERE shipping_id = ?i", 'destination_id', $_REQUEST['shipping_id']);
         foreach ($shipping['rates'] as $rate_key => $rate) {
             if (!empty($rates_defined[$rate['destination_id']]['defined'])) {
@@ -249,8 +254,6 @@ if ($mode == 'configure') {
             }
         }
     }
-
-    Tygh::$app['view']->assign('shipping', $shipping);
 
     $tabs = array (
         'general' => array (
@@ -262,7 +265,7 @@ if ($mode == 'configure') {
             'ajax' => true,
         ),
         'shipping_charges' => array (
-            'title' => __('shipping_charges'),
+            'title' => $shipping['allow_multiple_locations'] ? __('shipping_time_and_charges') : __('shipping_charges'),
             'js' => true
         ),
     );
@@ -275,18 +278,46 @@ if ($mode == 'configure') {
         $tabs['configure']['hidden'] = 'Y';
     }
 
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+
     if (Registry::get('runtime.company_id') && Registry::get('runtime.company_id') != $shipping['company_id']) {
         unset($tabs['configure']);
-        Tygh::$app['view']->assign('hide_for_vendor', true);
+        $view->assign('hide_for_vendor', true);
+    }
+
+    if (fn_allowed_for('MULTIVENDOR:ULTIMATE')) {
+        $tabs['storefronts'] = [
+            'title' => __('storefronts'),
+            'js' => true,
+        ];
+    }
+
+    if (fn_allowed_for('ULTIMATE')) {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($is_sharing_enabled, $is_shared) = $repository->getSharingDetails(['shipping_ids' => $shipping['shipping_id']]);
+        if ($is_sharing_enabled) {
+            $tabs['storefronts'] = [
+                'title' => __('share'),
+                'js'    => true,
+            ];
+        }
+        $view->assign([
+            'is_sharing_enabled' => $is_sharing_enabled,
+            'is_shared'          => $is_shared,
+        ]);
     }
 
     Registry::set('navigation.tabs', $tabs);
 
-    Tygh::$app['view']->assign('services', $services);
-    Tygh::$app['view']->assign('carriers', fn_get_carriers_from_services($services));
-    Tygh::$app['view']->assign('taxes', fn_get_taxes());
-    Tygh::$app['view']->assign('usergroups', fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')), DESCR_SL));
-
+    $view->assign([
+        'shipping'   => $shipping,
+        'services'   => $services,
+        'carriers'   => fn_get_carriers_from_services($services),
+        'taxes'      => fn_get_taxes(),
+        'usergroups' => fn_get_usergroups(['type' => 'C', 'status' => ['A', 'H']], DESCR_SL),
+    ]);
 // Show all shipping methods
 } elseif ($mode == 'manage') {
 
@@ -294,6 +325,22 @@ if ($mode == 'configure') {
     Tygh::$app['view']->assign('shippings', fn_get_available_shippings($company_id));
 
     Tygh::$app['view']->assign('usergroups', fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')), DESCR_SL));
+
+}
+
+if (in_array($mode, ['add', 'update', 'manage'])) {
+    $dynamic_sections = Registry::ifGet('navigation.dynamic.sections', []);
+    $dynamic_sections['shippings'] = [
+        'title' => __('shipping_methods'),
+        'href'  => 'shippings.manage',
+    ];
+    $dynamic_sections['destinations'] = [
+        'title' => __('rate_areas'),
+        'href'  => 'destinations.manage',
+    ];
+
+    Registry::set('navigation.dynamic.active_section', 'shippings');
+    Registry::set('navigation.dynamic.sections', $dynamic_sections);
 }
 
 function fn_delete_rate_values($delete_rate_data, $shipping_id, $destination_id)

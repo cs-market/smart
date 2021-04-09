@@ -14,10 +14,12 @@
 
 $schema = array(
     'openid' => array(
-        'provider' => 'OpenID'
+        'provider' => 'OpenID',
+        'enabled'  => false,
     ),
     'aol' => array(
-        'provider' => 'AOL'
+        'provider' => 'AOL',
+        'enabled'  => false,
     ),
     'google' => array(
         'provider' => 'Google',
@@ -103,7 +105,7 @@ $schema = array(
                 'template' => 'addons/hybrid_auth/components/callback_url.tpl',
             )
         ),
-        'instruction' => 'hybrid_auth.instruction_paypal'
+        'instruction' => 'hybrid_auth.instruction_paypal_application',
     ),
     'twitter' => array(
         'provider' => 'Twitter',
@@ -123,6 +125,7 @@ $schema = array(
             'twitter_callback' => array(
                 'type' => 'template',
                 'template' => 'addons/hybrid_auth/components/callback_url.tpl',
+                'callback_url' => '/auth/twitter',
             )
         ),
         'instruction' => 'hybrid_auth.instruction_twitter'
@@ -157,33 +160,60 @@ $schema = array(
                 'required' => true
             )
         ),
+        'params' => array(
+            'redirect_url' => array(
+                'type'     => 'template',
+                'template' => 'addons/hybrid_auth/components/redirect_url.tpl',
+            ),
+        ),
         'instruction' => 'hybrid_auth.instruction_live'
     ),
-    'linkedin' => array(
+    'linkedin' => [
         'provider' => 'LinkedIn',
-        'keys' => array(
-            'id' => array(
+        'keys' => [
+            'id' => [
                 'db_field' => 'app_id',
-                'label' => 'id',
+                'label'    => 'id',
                 'required' => true
-            ),
-            'secret' => array(
+            ],
+            'secret' => [
                 'db_field' => 'app_secret_key',
-                'label' => 'secret_key',
+                'label'    => 'secret_key',
                 'required' => true
-            )
-        ),
-        'params' => array(
-            'linkedin_callback' => array(
-                'type' => 'template',
+            ]
+        ],
+        'params' => [
+            'linkedin_callback' => [
+                'type'     => 'template',
                 'template' => 'addons/hybrid_auth/components/callback_url.tpl',
-            )
-        ),
-        'wrapper' => array(
-            'class' => '\Tygh\HybridProvidersLinkedIn',
-        ),
+            ],
+            'version' => [
+                'type'     => 'select',
+                'required' => true,
+                'label'    => 'hybrid_auth.linkedin_api_version',
+                'tooltip'  => 'ttc_hybrid_auth.linkedin_api_version',
+                'default'  => 'linkedin_api_v2',
+                'options'  => [
+                    'linkedin_api_v1' => 'hybrid_auth.linkedin_api_v1',
+                    'linkedin_api_v2' => 'hybrid_auth.linkedin_api_v2'
+                ]
+            ]
+        ],
+        'versions' => [
+            'linkedin_api_v1' => [
+                'wrapper' => [
+                    'path'  => 'Providers/LinkedInV1.php',
+                    'class' => '\Tygh\HybridProvidersLinkedInV1'
+                ]
+            ],
+            'linkedin_api_v2' => [
+                'wrapper' => [
+                    'class' => '\Tygh\HybridProvidersLinkedIn'
+                ]
+            ]
+        ],
         'instruction' => 'hybrid_auth.instruction_linkedin'
-    ),
+    ],
     'foursquare' => array(
         'provider' => 'Foursquare',
         'keys' => array(
@@ -204,9 +234,5 @@ $schema = array(
         'instruction' => 'hybrid_auth.instruction_foursquare'
     ),
 );
-
-if (version_compare(PHP_VERSION, '5.4.0', '<')) {
-    unset($schema['facebook'], $schema['linkedin'], $schema['paypal'], $schema['yahoo']);
-}
 
 return $schema;

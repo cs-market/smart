@@ -43,7 +43,7 @@
         <td class="right nowrap">
             {include file="common/price.tpl" value=$conf_discount|default:0}</td>
         {/if}
-        {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+        {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
         {assign var="_colspan" value=$_colspan+1}
         <td class="nowrap">
             {include file="common/price.tpl" value=$conf_tax|default:0}</td>
@@ -60,12 +60,12 @@
                     <tr>
                         <td width="50%">
                             <a href="{"products.update?product_id=`$oi.product_id`"|fn_url}">{$oi.product|truncate:50:"...":true}</a>&nbsp;
+                            {hook name="orders:product_info"}
                             {if $oi.product_code}
                                 <p>{__("sku")}:&nbsp;{$oi.product_code}</p>
                             {/if}
-                            {hook name="orders:product_info"}
-                            {if $oi.product_options}<div style="padding-top: 1px; padding-bottom: 2px;">&nbsp;{include file="common/options_info.tpl" product_options=$oi.product_options}</div>{/if}
                             {/hook}
+                            {if $oi.product_options}<div style="padding-top: 1px; padding-bottom: 2px;">&nbsp;{include file="common/options_info.tpl" product_options=$oi.product_options}</div>{/if}
                         </td>
                         <td width="10%" class="center nowrap">
                             {include file="common/price.tpl" value=$oi.price}</td>
@@ -79,7 +79,7 @@
                             <td width="5%" class="right nowrap">
                                 {if $oi.extra.discount|floatval}{include file="common/price.tpl" value=$oi.extra.discount}{else}-{/if}</td>
                         {/if}
-                        {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                        {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                             <td width="10%" class="center nowrap">
                                 {include file="common/price.tpl" value=$oi.tax_value}</td>
                         {/if}

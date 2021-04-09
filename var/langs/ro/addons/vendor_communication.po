@@ -5,96 +5,82 @@ msgstr ""
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_communication.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.11.3/addons/vendor_communication.po\n"
+"PO-Revision-Date: 2020-01-29 14:52\n"
 
 msgctxt "Addons::name::vendor_communication"
-msgid "Customer-to-Vendor Communication"
-msgstr ""
+msgid "Ask seller a question"
+msgstr "Pune o întrebare vânzătorului"
 
 msgctxt "Addons::description::vendor_communication"
-msgid "Allows customers to communicate with vendors directly via the store's interface."
-msgstr ""
+msgid "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
+msgstr "Permite clienților să pună întrebări despre un produs direct de pe pagina produsului. Vânzătorul va răspunde la aceste întrebări în Centru de Mesaje încorporat."
 
 msgctxt "SettingsSections::vendor_communication::general"
 msgid "General"
-msgstr ""
-
-msgctxt "SettingsSections::vendor_communication::notifications"
-msgid "Notifications"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_admin"
-msgid "Notify admin"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_vendor"
-msgid "Notify vendor"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_customer"
-msgid "Notify customer"
-msgstr ""
+msgstr "General"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_product"
 msgid "Contact button on product pages"
-msgstr ""
+msgstr "Butonul contact în paginile produsului"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_vendor"
 msgid "Contact button in vendor microstore"
-msgstr ""
+msgstr "Butonul contact în magazinul vânzătorului"
 
-msgctxt "SettingsTooltips::vendor_communication::notify_admin"
-msgid "Send an email to root administrator about every newly-posted message."
-msgstr ""
-
-msgctxt "SettingsTooltips::vendor_communication::notify_vendor"
-msgid "Send emails to vendor's contact email address about newly-posted messages."
-msgstr ""
-
-msgctxt "SettingsTooltips::vendor_communication::notify_customer"
-msgid "Send emails to customers about newly-posted messages in their threads."
-msgstr ""
+msgctxt "SettingsOptions::vendor_communication::show_on_messages"
+msgid "Contact button at \"Messages\" menu"
+msgstr "Butonul de contact din meniul \"Mesaje\""
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_product"
-msgid "Show the \"Contact vendor\" button on product pages."
-msgstr ""
+msgid "Show the \"Ask a question\" button on product pages."
+msgstr "Arată butonul \"Pune o întrebare\" în paginile produsului."
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_vendor"
-msgid "Show the \"Contact vendor\" button in vendors' microstores."
-msgstr ""
+msgid "Show the \"Ask a question\" button in vendors' microstores."
+msgstr "Arată butonul \"Pune o întrebare\" în magazinele vânzătorilor."
 
 msgctxt "Languages::vendor_communication.messages"
 msgid "Messages"
-msgstr ""
+msgstr "Mesaje"
 
 msgctxt "Languages::vendor_communication.message_center"
 msgid "Message center"
-msgstr ""
+msgstr "Centrul de mesaje"
+
+msgctxt "Languages::vendor_communication.message_center_name"
+msgid "Message center"
+msgstr "Centrul de mesaje"
+
+msgctxt "Languages::vendor_communication.message_center_name_menu_description"
+msgid "Messages from customers"
+msgstr "Mesaje de la clienți"
 
 msgctxt "Languages::vendor_communication.message_center_menu_description"
 msgid "Customer-to-vendor messages"
-msgstr ""
+msgstr "Mesaje client-către-vânzător"
 
 msgctxt "Languages::vendor_communication.author"
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 msgctxt "Languages::vendor_communication.date"
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 msgctxt "Languages::vendor_communication.message"
 msgid "Message"
-msgstr ""
+msgstr "Mesaj"
 
 msgctxt "Languages::vendor_communication.contact_vendor"
 msgid "Contact vendor"
 msgstr ""
+
+msgctxt "Languages::vendor_communication.ask_a_question"
+msgid "Ask a question"
+msgstr "Pune o întrebare"
 
 msgctxt "Languages::vendor_communication.contact_vendor_name"
 msgid "Contact [vendor_name]"
@@ -102,11 +88,15 @@ msgstr ""
 
 msgctxt "Languages::vendor_communication.created_at"
 msgid "Created on"
-msgstr ""
+msgstr "Creat în"
 
 msgctxt "Languages::vendor_communication.new_thread_created"
 msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>The vendor's reply will be sent to the email address of your account. To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
 msgstr ""
+
+msgctxt "Languages::vendor_communication.message_sent"
+msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>We'll notify you about a reply. To view your message history, please <a href=\"[thread_url]\" target=\"_blank\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
+msgstr "Mesajul tău a fost trimis către <b>[vendor_name]</b>.<br/><br/>Te vom notifica când primești un răspuns. Pentru a vizualiza istoricul mesajelor, <a href=\"[thread_url]\" target=\"_blank\">mergi la Centrul de Mesaje</a> situat în secțiunea \"Mesaje\" din meniul \"Contul meu\"."
 
 msgctxt "Languages::vendor_communication.cannot_update_thread"
 msgid "Cannot update thread"
@@ -117,12 +107,12 @@ msgid "Cannot create thread"
 msgstr ""
 
 msgctxt "Languages::email_template.vendor_communication.notify_admin"
-msgid "Customer-to-Vendor Communication: Admin Notification"
-msgstr ""
+msgid "Ask seller a question: Admin Notification"
+msgstr "Puneți o întrebare vânzătorului: Notificare administrativă"
 
 msgctxt "Languages::email_template.vendor_communication.notify_customer"
-msgid "Customer-to-Vendor Communication: Customer Notification"
-msgstr ""
+msgid "Ask seller a question: Customer Notification"
+msgstr "Puneți o întrebare vânzătorului: Notificare administrativă"
 
 msgctxt "Languages::vendor_communication.you_have_new_message"
 msgid "You have a new <a href=\"[thread_url]\">message</a> from [message_from]."
@@ -146,19 +136,19 @@ msgstr ""
 
 msgctxt "Languages::vendor_communication.no_messages_found"
 msgid "No messages found"
-msgstr ""
+msgstr "Nu s-au găsit mesaje"
 
 msgctxt "Languages::vendor_communication.customer_name"
 msgid "Customer name"
-msgstr ""
+msgstr "Nume client"
 
 msgctxt "Languages::vendor_communication.error_message"
 msgid "Please enter your message"
-msgstr ""
+msgstr "Scrie mesajul tău"
 
 msgctxt "Languages::vendor_communication.type_message"
 msgid "Type a message..."
-msgstr ""
+msgstr "Scrie un mesaj..."
 
 msgctxt "Languages::vendor_communication.you"
 msgid "You"
@@ -198,5 +188,41 @@ msgstr ""
 
 msgctxt "Languages::vendor_communication.please_log_in_to_contact_vendor"
 msgid "Please sign in to contact the vendor"
+msgstr ""
+
+msgctxt "Languages::privileges.manage_vendor_communication"
+msgid "Can edit"
+msgstr "Poate edita"
+
+msgctxt "Languages::privileges.view_vendor_communication"
+msgid "Can view"
+msgstr "Poate vizualiza"
+
+msgctxt "Languages::privilege_groups.vendor_communication"
+msgid "Message center"
+msgstr "Centrul de mesaje"
+
+msgctxt "Languages::vendor_communication.your_message_to_vendor_name"
+msgid "Your message to [vendor_name]"
+msgstr "Mesajul tău către [vendor_name]"
+
+msgctxt "Languages::vendor_communication.please_log_in_to_be_notified"
+msgid "Please sign in so that we can notify you about a reply"
+msgstr "Conectează-te ca să te putem notifica când primești un răspuns"
+
+msgctxt "Languages::vendor_communication"
+msgid "Ask seller a question"
+msgstr "Pune o întrebare vânzătorului"
+
+msgctxt "Languages::vendor_communication.event.message_received.name"
+msgid "New message received"
+msgstr "Mesaj nou primit"
+
+msgctxt "Languages::vendor_communication.new_message.title"
+msgid "[company_name] has a new message from [customer]"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.new_message.message"
+msgid "Click this notification to see the message"
 msgstr ""
 

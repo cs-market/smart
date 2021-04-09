@@ -6,7 +6,8 @@
             {foreach from=$scats item="category"}
                 {if $category}
                     <div class="ty-column{$columns} ty-subcategories-block__item">
-                        <a href="{"categories.view?category_id=`$category.category_id`"|fn_url}" class="ty-subcategories-block__a">
+                        {$href=$category|fn_form_dropdown_object_link:$block.type}
+                        <a href="{if $href}{$href}{else}{"categories.view?category_id=`$category.category_id`"|fn_url}{/if}" class="ty-subcategories-block__a">
                             {if $category.main_pair}
                                 {include file="common/image.tpl"
                                     show_detailed_link=false

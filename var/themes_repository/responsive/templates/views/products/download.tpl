@@ -1,3 +1,9 @@
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 <div class="ty-subheader">
     {if $product.ekey && $no_capture}
         <a href="{"orders.download?ekey=`$product.ekey`&product_id=`$product.product_id`"|fn_url}"></a>
@@ -44,7 +50,11 @@
                     <table class="ty-download__table-nomargin">
                     {foreach from=$folder.files item="file"}
                         {hook name="products:folder_files_list_item"}
-                            {include file="views/products/components/file_tree.tpl" product_file=$file level=1}
+                            {include file="views/products/components/file_tree.tpl"
+                                product_file=$file
+                                level=1
+                                direction=$direction
+                            }
                         {/hook}
                     {/foreach}
                     </table>
@@ -61,7 +71,10 @@
         {foreach from=$product.files_tree.files item="file"}
             {hook name="products:files_list_item"}
             <tr>
-                {include file="views/products/components/file_tree.tpl" product_file=$file}
+                {include file="views/products/components/file_tree.tpl"
+                    product_file=$file
+                    direction=$direction
+                }
             </tr>
             {/hook}
         {/foreach}

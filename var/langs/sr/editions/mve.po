@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: sr\n"
-"X-Crowdin-File: /release-4.8.2/editions/mve.po\n"
+"X-Crowdin-File: /release-4.9.2/editions/mve.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:10\n"
+"PO-Revision-Date: 2018-11-16 12:18\n"
 
 msgctxt "Languages::add_companies"
 msgid "Add vendors"
@@ -436,16 +436,32 @@ msgctxt "Languages::vendor_terms_n_conditions_content"
 msgid "<p>Please read these Terms and Conditions (\"Terms\", \"Terms and Conditions\") carefully before using the <a href=\"http://www.mywebsite.com\">http://www.mywebsite.com</a> website and the My Mobile App mobile application (the \"Service\") operated by My Company (\"us\", \"we\", or \"our\").</p><p><strong>By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the Terms then you may not access the Service.</strong></p><p><strong>Purchases</strong></p><p>If you wish to purchase any product or service made available through the Service (\"Purchase\"), you may be asked to supply certain information relevant to your Purchase including, without limitation, your ...</p><p><strong>Content</strong></p><p>Our Service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material (\"Content\"). You are responsible for the ...</p><p><strong>Changes</strong></p><p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material we will try to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.</p><p><strong>Contact Us</strong></p><p>If you have any questions about these Terms, please contact us.</p>"
 msgstr ""
 
+msgctxt "Languages::mve_plus_license_required"
+msgid "[product] Plus is required for this"
+msgstr ""
+
+msgctxt "Languages::text_only_mve_plus_license_required"
+msgid "A special edition called [product] Plus is required to perform this action. If you switch to <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus</a>, you'll get access to all its features and will never see this message again."
+msgstr ""
+
 msgctxt "Languages::product_state_description.mve.new"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
 msgstr ""
 
-msgctxt "Languages::product_state_description.mve.full"
+msgctxt "Languages::product_state_description.mve"
+msgid "<p>You've activated your [product]. You can use it without time restrictions now. To be able to use all advanced eCommerce features (such as separate checkout for each vendor, and vendor-created promotions), get the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus license.</a></p><br>"
+msgstr ""
+
+msgctxt "Languages::product_state_description.mve.plus"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
 msgstr ""
 
-msgctxt "Languages::text_store_mode_changed_to_mve.full"
-msgid "<strong>Full mode</strong> has been activated. In this mode, all the advanced eCommerce features are available."
+msgctxt "Languages::text_store_mode_changed_to_mve"
+msgid "Your store now uses active license. With the [product] edition, you get almost all the features we offer. The additional features (such as separate checkout for each vendor, and vendor-created promotions) are available with the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus edition</a> only."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_mve.plus"
+msgid "<strong>Plus mode</strong> has been activated. In this mode, all the advanced eCommerce features are available."
 msgstr ""
 
 msgctxt "Languages::product_state_description.mve.ru.new"
@@ -456,8 +472,16 @@ msgctxt "Languages::product_state_description.mve.ru.full"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p> <br />"
 msgstr ""
 
-msgctxt "Languages::text_store_mode_changed_to_mve.ru.full"
-msgid "<strong>Full mode</strong> has been activated . In this mode, all the advanced eCommerce features are available."
+msgctxt "Languages::product_state_description.mve.ru"
+msgid "<p>You've activated your [product]. You can use it without time restrictions now. To be able to use all advanced eCommerce features (such as separate checkout for each vendor, and vendor-created promotions), get the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus license.</a></p><br>"
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_mve.ru.plus"
+msgid "<strong>Plus mode</strong> has been activated. In this mode, all the advanced eCommerce features are available."
+msgstr ""
+
+msgctxt "Languages::store_mode.plus"
+msgid "Plus"
 msgstr ""
 
 msgctxt "Languages::vendor_payouts.type"

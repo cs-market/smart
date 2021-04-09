@@ -13,8 +13,8 @@
 ****************************************************************************/
 
 use Tygh\Registry;
-use Tygh\Settings;
 use Tygh\RestClient;
+use Tygh\Settings;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -28,16 +28,21 @@ function fn_yandex_metrika_oauth_info()
         !fn_string_not_empty(Registry::get('addons.rus_yandex_metrika.application_id'))
         || !fn_string_not_empty(Registry::get('addons.rus_yandex_metrika.application_password'))
     ) {
-        return __('yandex_metrika_oauth_info_part1', array(
-            '[callback_uri]' => fn_url('yandex_metrika_tools.oauth')
-        ));
+        /** @var \Tygh\SmartyEngine\Core $view */
+        $view = Tygh::$app['view'];
+        $view->assign([
+            'widget_copy_title' => __('rus_yandex_metrika.oauth_info.register_an_app'),
+            'widget_copy_text' => __('rus_yandex_metrika.oauth_info.callback_uri_description'),
+            'widget_copy_code_text' => fn_url('yandex_metrika_tools.oauth'),
+        ]);
+        return $view->fetch('common/widget_copy.tpl');
     } else {
         $client_id = Registry::get('addons.rus_yandex_metrika.application_id');
 
-        return __('yandex_metrika_oauth_info_part2', array(
-            '[auth_uri]' => "https://oauth.yandex.ru/authorize?response_type=code&client_id=" . $client_id,
-            '[edit_app_uri]' => "https://oauth.yandex.ru/client/edit/" . $client_id,
-        ));
+        return __('yandex_metrika_oauth_info_part2', [
+            '[auth_uri]' => 'https://oauth.yandex.ru/authorize?response_type=code&client_id=' . $client_id,
+            '[edit_app_uri]' => 'https://oauth.yandex.ru/client/edit/' . $client_id,
+        ]);
     }
 }
 
@@ -51,10 +56,9 @@ function fn_yandex_metrika_oauth_info()
 
 function fn_yandex_metrika_sync_goals()
 {
-    $oauth_token = Settings::instance()->getValue('auth_token', 'rus_yandex_metrika');
     $counter_number = Settings::instance()->getValue('counter_number', 'rus_yandex_metrika');
 
-    if (empty($oauth_token) || empty($counter_number)) {
+    if (!$counter_number) {
         return false;
     }
 
@@ -62,7 +66,7 @@ function fn_yandex_metrika_sync_goals()
     $selected_goals = Settings::instance()->getValue('collect_stats_for_goals', 'rus_yandex_metrika');
 
     $ext_goals = array();
-    $res = fn_yandex_metrika_rest_client('get', "/management/v1/counter/$counter_number/goals.json", array('oauth_token' => $oauth_token));
+    $res = fn_yandex_metrika_rest_client('get', "/management/v1/counter/{$counter_number}/goals.json");
 
     if (!empty($res['goals'])) {
         foreach ($res['goals'] as $goal) {
@@ -77,12 +81,12 @@ function fn_yandex_metrika_sync_goals()
         $ext_goal_name = '[auto] ' . $goal['name'];
         if (!empty($ext_goals[$ext_goal_name])) {
             if (empty($selected_goals[$goal_name]) || $selected_goals[$goal_name] == 'N') {
-                fn_yandex_metrika_rest_client('delete', "/management/v1/counter/$counter_number/goal/" . $ext_goals[$ext_goal_name]['id'] . "?oauth_token=$oauth_token");
+                fn_yandex_metrika_rest_client('delete', "/management/v1/counter/{$counter_number}/goal/" . $ext_goals[$ext_goal_name]['id']);
             }
         } else {
             if (!empty($selected_goals[$goal_name]) && $selected_goals[$goal_name] == 'Y') {
                 $goal['name'] = $ext_goal_name;
-                fn_yandex_metrika_rest_client('post', "/management/v1/counter/$counter_number/goals?oauth_token=$oauth_token", array('goal' => $goal));
+                fn_yandex_metrika_rest_client('post', "/management/v1/counter/{$counter_number}/goals", array('goal' => $goal));
             }
         }
     }
@@ -90,25 +94,48 @@ function fn_yandex_metrika_sync_goals()
     return true;
 }
 
-function fn_yandex_metrika_rest_client($type, $url, $data = array())
+/**
+ * Executes Yandex.Metrika API request using the REST client.
+ *
+ * @param string $type    Request method.
+ *                        Allowed values: get, post, delete
+ * @param string $url     API url to send request to
+ * @param array  $data    Data to send within the request
+ * @param array  $headers Request headers
+ *
+ * @return array|false API response of false on error
+ */
+function fn_yandex_metrika_rest_client($type, $url, array $data = [], array $headers = [])
 {
+    static $oauth_token = null;
     static $client = null;
 
-    if (!isset($client)) {
-        $client = new RestClient('https://api-metrika.yandex.ru/');
+    if (!isset($headers['Authorization'])) {
+        if ($oauth_token === null) {
+            $oauth_token = Settings::instance()->getValue('auth_token', 'rus_yandex_metrika');
+        }
+        $headers['Authorization'] = 'OAuth ' . $oauth_token;
+    }
+
+    if ($client === null) {
+        $client = new RestClient('https://api-metrika.yandex.ru/', null, null, 'basic', $headers);
+    }
+
+    if (!$oauth_token) {
+        return false;
     }
 
     $res = false;
 
     try {
-        if ($type == 'get') {
+        if ($type === 'get') {
             $res = $client->get($url, $data);
 
-        } elseif ($type == 'post') {
-            $client->post($url, $data);
+        } elseif ($type === 'post') {
+            $res = $client->post($url, $data);
 
-        } elseif ($type == 'delete') {
-            $client->delete($url);
+        } elseif ($type === 'delete') {
+            $res = $client->delete($url);
         }
     } catch (\Pest_Unauthorized $e) {
         fn_set_notification('E', __('error'), '401 Unauthorized. '. __('yandex_metrika_pest_unauthorized'));
@@ -295,7 +322,9 @@ function fn_rus_yandex_metrika_save_cart_content_post($cart, $user_id, $type, $u
 
     $added = array();
     $deleted = array();
-    $products_old = Tygh::$app['session']['yandex_metrika']['old'];
+    $products_old = empty(Tygh::$app['session']['yandex_metrika']['old'])
+        ? []
+        : Tygh::$app['session']['yandex_metrika']['old'];
 
     if (empty($user_id)) {
         if (fn_get_session_data('cu_id')) {

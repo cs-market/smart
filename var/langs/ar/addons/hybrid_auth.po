@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/hybrid_auth.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.11.5/addons/hybrid_auth.po\n"
+"X-Crowdin-File-ID: 3702\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
@@ -30,19 +30,19 @@ msgstr "حزمة أيقونات"
 
 msgctxt "SettingsTooltips::hybrid_auth::icons_pack"
 msgid "Directory with the social networks icons. A path to the directory: media/images/addons/addons/hybrid_auth/icons/."
-msgstr ""
+msgstr "الدليل مع أيقونات الشبكات الاجتماعية. مسار إلى الدليل: media/images/addons/addons/hybrid_auth/icons/."
 
 msgctxt "SettingsOptions::hybrid_auth::autogen_email"
 msgid "Autogeneration email"
-msgstr ""
+msgstr "مسح ذاكرة التخزين المؤقت"
 
 msgctxt "SettingsTooltips::hybrid_auth::autogen_email"
 msgid "Enables the email auto generation in case that a social network does not pass the address."
-msgstr ""
+msgstr "تمكين إنشاء البريد الإلكتروني تلقائيًا في حالة عدم اجتياز الشبكة الاجتماعية للعنوان."
 
 msgctxt "Languages::hybrid_auth"
 msgid "Social login"
-msgstr ""
+msgstr "تسجيل الدخول عبر التواصل الاجتماعي"
 
 msgctxt "Languages::hybrid_auth.linked_provider"
 msgid "Linked"
@@ -74,7 +74,7 @@ msgstr ""
 
 msgctxt "Languages::hybrid_auth.social_login"
 msgid "Or sign-in with another identity provider"
-msgstr ""
+msgstr "أو تسجيل الدخول مع مزود هوية آخر"
 
 msgctxt "Languages::hybrid_auth.unspecified_error"
 msgid "Unspecified error"
@@ -98,7 +98,7 @@ msgstr ""
 
 msgctxt "Languages::hybrid_auth.failed_auth"
 msgid "Authentication failed. The user has canceled the authentication or the provider refused the connection"
-msgstr ""
+msgstr "المصادقة فشلت. قام المستخدم بإلغاء المصادقة أو رفض الموفر الاتصال"
 
 msgctxt "Languages::hybrid_auth.connecting_provider"
 msgid "Contacting <b>[provider]</b>. Please wait..."
@@ -169,11 +169,15 @@ msgid "Test mode"
 msgstr "الوضع التجريبي"
 
 msgctxt "Languages::privileges.manage_providers"
-msgid "Manage social login providers"
+msgid "Can edit"
 msgstr ""
 
 msgctxt "Languages::privileges.view_providers"
-msgid "View social login providers"
+msgid "Can view"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.social_login"
+msgid "Social login"
 msgstr ""
 
 msgctxt "Languages::hybrid_auth.instruction_facebook"
@@ -222,7 +226,7 @@ msgstr ""
 
 msgctxt "Languages::hybrid_auth.facebook_disabled_upgrade_notification_title"
 msgid "Social Login: Sign-ins via Facebook have been disabled due to an old PHP version"
-msgstr ""
+msgstr "تسجيل الدخول الاجتماعي: تم تعطيل تسجيل الدخول عبر Facebook بسبب إصدار قديم من PHP"
 
 msgctxt "Languages::hybrid_auth.facebook_disabled_upgrade_notification_text"
 msgid "<p>We had to move to a newer version of Facebook API, because the API version that we used previously is no longer supported. However, to work with the new API, [product] requires PHP 5.4. You are seeing this message because your server has an older PHP version.</p><p>The status of the <b>Facebook</b> provider under <b>Website → Social login</b> has been set to <i>Disabled</i>.</p><p>Please update your PHP version to 5.4 or higher before you re-enable Facebook.</p>"
@@ -230,5 +234,29 @@ msgstr ""
 
 msgctxt "Languages::hybrid_auth.facebook_oauth_redirect_uris"
 msgid "Valid OAuth redirect URIs"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.live_redirect_urls"
+msgid "Redirect URLs"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.linkedin_api_version"
+msgid "API version"
+msgstr ""
+
+msgctxt "Languages::ttc_hybrid_auth.linkedin_api_version"
+msgid "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">deprecated API v1</a>, but old apps still use it. If you're configuring LinkedIn app for the first time now, use API v2. Old LinkedIn apps configured some time ago may still be using v1."
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v1"
+msgid "v1"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v2"
+msgid "v2"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.instruction_paypal_application"
+msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
 msgstr ""
 

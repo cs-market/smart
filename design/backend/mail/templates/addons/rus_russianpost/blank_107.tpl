@@ -40,12 +40,20 @@ a:hover {
         {assign var="price_products" value=0}
         {foreach from=$order_info.products item=product}
             <span style="position: absolute; height: 5mm; width: 7mm; top: {$p_size+51.5}mm; left: 20mm; text-align: center; font: 11pt 'Arial';">{$p_number}</span>
-            <span style="position: absolute; height: 5mm; width: 63mm; top: {$p_size+51.5}mm; left: 27mm; font: 6pt 'Arial';">{$product.product}</span>
+            <span style="position: absolute; height: 5mm; width: 63mm; top: {$p_size+51.5}mm; left: 27mm; font: 6pt 'Arial';">
+                {$product.product}
+                {hook name="orders:product_info"}
+                {/hook}
+            </span>
             <span style="position: absolute; height: 5mm; width: 14mm; top: {$p_size+51.5}mm; left: 90mm; text-align: center; font: 11pt 'Arial';">{$product.amount}</span>
             <span style="position: absolute; height: 5mm; width: 25mm; top: {$p_size+51.5}mm; left: 105mm; text-align: center; font: 11pt 'Arial';">{$product.amount * $product.price}</span>
 
             <span style="position: absolute; height: 5mm; width: 7mm; top: {$p_size+51.5}mm; left: 165mm; text-align: center; font: 11pt 'Arial';">{$p_number}</span>
-            <span style="position: absolute; height: 5mm; width: 63mm; top: {$p_size+51.5}mm; left: 172mm; font: 6pt 'Arial';">{$product.product}</span>
+            <span style="position: absolute; height: 5mm; width: 63mm; top: {$p_size+51.5}mm; left: 172mm; font: 6pt 'Arial';">
+                {$product.product}
+                {hook name="orders:product_info"}
+                {/hook}
+            </span>
             <span style="position: absolute; height: 5mm; width: 14mm; top: {$p_size+51.5}mm; left: 235mm; text-align: center; font: 11pt 'Arial';">{$product.amount}</span>
             <span style="position: absolute; height: 5mm; width: 25mm; top: {$p_size+51.5}mm; left: 250mm; text-align: center; font: 11pt 'Arial';">{$product.amount * $product.price}</span>
 

@@ -30,6 +30,15 @@ if ($mode == 'search') {
         $params = $_REQUEST;
         $params['extend'] = array('description');
 
+        if (isset($params['order_ids'])) {
+            $order_ids = is_array($params['order_ids']) ? $params['order_ids'] : explode(',', $params['order_ids']);
+            foreach ($order_ids as $order_id) {
+                if (!fn_is_order_allowed($order_id, $auth)) {
+                    return [CONTROLLER_STATUS_NO_PAGE];
+                }
+            }
+        }
+
         if ($items_per_page = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'items_per_page')) {
             $params['items_per_page'] = $items_per_page;
         }
@@ -74,11 +83,19 @@ if ($mode == 'search') {
 
     if (!empty($_REQUEST['product_id']) && empty($auth['user_id'])) {
 
-        $uids = explode(',', db_get_field("SElECT usergroup_ids FROM ?:products WHERE product_id = ?i", $_REQUEST['product_id']));
+        $uids = explode(',', db_get_field('SELECT usergroup_ids FROM ?:products WHERE product_id = ?i', $_REQUEST['product_id']));
 
         if (!in_array(USERGROUP_ALL, $uids) && !in_array(USERGROUP_GUEST, $uids)) {
             return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
         }
+    }
+
+    $owner_of_product = fn_get_company_by_product_id($_REQUEST['product_id']);
+
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+    if (fn_allowed_for('MULTIVENDOR') && $storefront->getCompanyIds() && isset($owner_of_product['company_id']) && !in_array($owner_of_product['company_id'], $storefront->getCompanyIds())) {
+        return array(CONTROLLER_STATUS_NO_PAGE);
     }
 
     $product = fn_get_product_data(
@@ -266,13 +283,12 @@ function fn_add_product_to_recently_viewed($product_id, $max_list_size = MAX_REC
 function fn_set_product_popularity($product_id, $popularity_view = POPULARITY_VIEW)
 {
     if (empty(Tygh::$app['session']['products_popularity']['viewed'][$product_id])) {
-        $_data = array (
-            'product_id' => $product_id,
+        $popularity = [
             'viewed' => 1,
             'total' => $popularity_view
-        );
+        ];
 
-        db_query("INSERT INTO ?:product_popularity ?e ON DUPLICATE KEY UPDATE viewed = viewed + 1, total = total + ?i", $_data, $popularity_view);
+        fn_update_product_popularity($product_id, $popularity);
 
         Tygh::$app['session']['products_popularity']['viewed'][$product_id] = true;
 

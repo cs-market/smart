@@ -13,14 +13,14 @@
 ****************************************************************************/
 namespace Tygh\Themes;
 
+use Tygh\BlockManager\Layout;
 use Tygh\Languages\Languages;
+use Tygh\Languages\Po;
 use Tygh\Less;
 use Tygh\Registry;
-use Tygh\BlockManager\Layout;
 use Tygh\Settings;
 use Tygh\Storage;
-use Tygh\Themes\Styles;
-use Tygh\Languages\Po;
+use Tygh\Tygh;
 
 class Themes
 {
@@ -112,7 +112,7 @@ class Themes
     /**
      * Convert theme LESS to CSS files
      *
-     * @return boalean Result
+     * @return boolean Result
      */
     public function convertToCss()
     {
@@ -240,7 +240,7 @@ class Themes
     /**
      * Restore LESS files and remove precompiled LESS files
      *
-     * @return bolean Result
+     * @return boolean Result
      */
     public function restoreLess($remove_precompiled_less = true)
     {
@@ -464,18 +464,39 @@ class Themes
     /**
      * Gets theme of specified area and company
      *
-     * @param string   $area       Area (C/A) to get theme for
-     * @param int|null $company_id Company identifier
+     * @param string   $area          Area (C/A) to get theme for
+     * @param int|null $company_id    Company identifier.
+     *                                This parameter is deprecated and will be removed in v5.0.0.
+     *                                Use $storefront_id instead.
+     * @param int|null $storefront_id Storefront ID
      *
      * @return Themes Theme instance
      */
-    public static function areaFactory($area = AREA, $company_id = null)
+    public static function areaFactory($area = AREA, $company_id = null, $storefront_id = null)
     {
-        if (!isset(self::$area_instances[$area . $company_id])) {
-            self::$area_instances[$area . $company_id] = fn_get_theme_path('[theme]', $area, $company_id);
+        /**
+         * Executes before getting a theme factory for the site area,
+         * allows you to modify the parameters passed to the function.
+         *
+         * @param string   $area          Area (C/A) to get theme for
+         * @param int|null $company_id    Company identifier.
+         *                                This parameter is deprecated and will be removed in v5.0.0.
+         *                                Use $storefront_id instead.
+         * @param int|null $storefront_id Storefront ID
+         */
+        fn_set_hook('themes_area_factory_pre', $area, $company_id, $storefront_id);
+
+        if (!$storefront_id) {
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = Tygh::$app['storefront'];
+            $storefront_id = $storefront->storefront_id;
         }
 
-        return self::factory(self::$area_instances[$area . $company_id]);
+        if (!isset(self::$area_instances[$area . $storefront_id])) {
+            self::$area_instances[$area . $storefront_id] = fn_get_theme_path('[theme]', $area, $company_id, true, $storefront_id);
+        }
+
+        return self::factory(self::$area_instances[$area . $storefront_id]);
     }
 
     /**
@@ -1114,5 +1135,21 @@ class Themes
         }
         
         return true;
+    }
+
+    /**
+     * Checks whether the theme is installed for the storefront.
+     *
+     * @param int $storefront_id Storefront ID
+     *
+     * @return bool
+     */
+    public function isInstalled($storefront_id)
+    {
+        $layouts = Layout::instance(0, [], $storefront_id)->getList([
+            'theme_name' => $this->theme_name,
+        ]);
+
+        return (bool) $layouts;
     }
 }

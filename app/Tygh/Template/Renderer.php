@@ -124,6 +124,10 @@ class Renderer
         $variables = array();
 
         foreach ($nodes as $node) {
+            if (!is_object($node)) {
+                continue;
+            }
+
             $node_class = get_class($node);
             if ($node_class == 'Twig_Node_Expression_Name' || $node_class == 'Twig_Node_Expression_TempName') { // TempName - for php 5.3
                 $variables[] = $node->getAttribute('name');

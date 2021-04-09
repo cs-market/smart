@@ -47,7 +47,7 @@ if (!empty($order_info['products'])) {
     }
 }
 
-if (!empty($order_info['taxes']) && Registry::get('settings.General.tax_calculation') == 'subtotal') {
+if (!empty($order_info['taxes']) && Registry::get('settings.Checkout.tax_calculation') == 'subtotal') {
     foreach ($order_info['taxes'] as $tax_id => $tax) {
         if ($tax['price_includes_tax'] == 'N') {
             $ord .= ",prod=" . $tax['description'];

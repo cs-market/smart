@@ -13,7 +13,7 @@
 {if $products}
 <input type="hidden" id="add_product_id" name="product_id" value=""/>
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-responsive">
+    <table width="100%" class="table table--relative table-responsive">
     <thead>
     <tr>
         {hook name="product_list:table_head"}
@@ -45,11 +45,23 @@
         <td data-th="{__("product_name")}">
             {hook name="product_list:product_data"}
             <input type="hidden" id="product_{$product.product_id}" value="{$product.product}" />
+
             {if $hide_amount}
                 <label for="checkbox_id_{$product.product_id}">{$product.product nofilter}</label>
             {else}
-                <span>{$product.product nofilter}</span>
+                <div>{$product.product nofilter}</div>
             {/if}
+            <div class="product-list__labels">
+                {hook name="products:product_additional_info"}
+                    {if $product.product_code}
+                        <div class="product-code">
+                            <span class="product-code__label">{$product.product_code}</span>
+                        </div>
+                    {/if}
+                {/hook}
+                {include file="views/companies/components/company_name.tpl" object=$product show_hidden_input=true}
+            </div>
+            
 
             {if !$hide_options}
                 {include file="views/products/components/select_product_options.tpl" id=$product.product_id product_options=$product.product_options name="product_data" show_aoc=$show_aoc additional_class=$additional_class}

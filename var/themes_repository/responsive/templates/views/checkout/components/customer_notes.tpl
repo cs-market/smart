@@ -1,6 +1,18 @@
-{hook name="checkout:notes"}
-	<div class="ty-customer-notes">
-	    <p class="ty-customer-notes__title">{__("type_comments_here")}</p>
-	    <textarea class="ty-customer-notes__text cm-focus" name="customer_notes" cols="60" rows="3">{$cart.notes}</textarea>
-	</div>
-{/hook}
+<div class="cm-processing-personal-data" data-ca-processing-personal-data-without-click="true">
+    <div class="litecheckout__group">
+        <div class="litecheckout__field">
+                <textarea data-ca-lite-checkout-field="customer_notes"
+                          class="litecheckout__input litecheckout__input--textarea"
+                          id="litecheckout_comment_to_shipping"
+                          autocomplete="disabled"
+                          placeholder=" "
+                          data-ca-lite-checkout-element="customer_notes"
+                          data-ca-lite-checkout-auto-save="true"
+                          aria-label="{__("lite_checkout.delivery_note")}"
+                          title="{__("lite_checkout.delivery_note")}"
+                >{$cart.notes}</textarea>
+            <label class="litecheckout__label" for="litecheckout_comment_to_shipping"
+            >{$field_name|default:__("lite_checkout.delivery_note")} </label>
+        </div>
+    </div>
+</div>

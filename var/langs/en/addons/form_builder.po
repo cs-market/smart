@@ -36,10 +36,6 @@ msgctxt "Languages::email_to"
 msgid "E-mail to"
 msgstr "E-mail to"
 
-msgctxt "Languages::form_is_secure"
-msgid "Form is secure (SSL)"
-msgstr "Form is secure (SSL)"
-
 msgctxt "Languages::add_form"
 msgid "Add form"
 msgstr "Add form"

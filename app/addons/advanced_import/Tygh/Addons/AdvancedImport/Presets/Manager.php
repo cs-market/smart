@@ -16,8 +16,10 @@ namespace Tygh\Addons\AdvancedImport\Presets;
 
 use Tygh\Addons\AdvancedImport\SchemasManager;
 use Tygh\Database\Connection;
+use Tygh\Enum\Addons\AdvancedImport\PresetFileTypes;
 use Tygh\Enum\Addons\AdvancedImport\RelatedObjectTypes;
 use Tygh\Languages\Languages;
+use Tygh\Addons\AdvancedImport\FileManager;
 
 class Manager
 {
@@ -36,6 +38,9 @@ class Manager
     /** @var SchemasManager $schemas_manager */
     protected $schemas_manager;
 
+    /** @var FileManager $schemas_manager */
+    protected $file_manager;
+
     /**
      * Manager constructor.
      *
@@ -44,19 +49,22 @@ class Manager
      * @param int                       $default_limit   Default limit for the pagination
      * @param string                    $lang_code       Two-letter language code
      * @param SchemasManager            $schemas_manager Schemas manager instance
+     * @param FileManager               $file_manager    File manager instance
      */
     public function __construct(
         Connection $db,
         $company_id,
         $default_limit,
         $lang_code,
-        SchemasManager $schemas_manager
+        SchemasManager $schemas_manager,
+        FileManager $file_manager
     ) {
         $this->db = $db;
         $this->company_id = $company_id;
         $this->default_items_per_page = $default_limit;
         $this->lang_code = $lang_code;
         $this->schemas_manager = $schemas_manager;
+        $this->file_manager = $file_manager;
     }
 
     /**
@@ -75,7 +83,7 @@ class Manager
             $data['company_id'] = $this->company_id;
         }
 
-        $data = $this->correctFilePath($data);
+        $data = $this->file_manager->correctFilePath($data);
 
         $id = $this->db->query('INSERT INTO ?:import_presets ?e', $data);
         $data['preset_id'] = $id;
@@ -257,8 +265,8 @@ class Manager
         );
 
         $search = array(
-            'page'           => (int) $limit['page'],
-            'items_per_page' => (int) $limit['items_per_page'],
+            'page'           => is_array($limit) ? (int) $limit['page'] : 0,
+            'items_per_page' => is_array($limit) ? (int) $limit['items_per_page'] : 0,
             'total_items'    => (int) $total_items,
         );
 
@@ -275,6 +283,25 @@ class Manager
         unset($preset);
 
         return array($presets_list, $search);
+    }
+
+    /**
+     * Finds preset by preset Id
+     *
+     * @param int $id Preset id
+     *
+     * @return array Preset data
+     */
+    public function findById($id)
+    {
+        $params = [
+            'ip.object_type' => 'products',
+            'ip.preset_id'   => $id
+        ];
+
+        list($presets, ) = $this->find(false, $params);
+
+        return reset($presets);
     }
 
     /**
@@ -430,10 +457,12 @@ class Manager
     /**
      * Updates preset.
      *
-     * @param int   $id   Preset ID
+     * @param int $id Preset ID
      * @param array $data Preset data
      *
      * @return bool
+     * @throws \Tygh\Exceptions\DatabaseException
+     * @throws \Tygh\Exceptions\DeveloperException
      */
     public function update($id, array $data)
     {
@@ -447,9 +476,13 @@ class Manager
             $data['company_id'] = $this->company_id;
         }
 
-        $data = $this->correctFilePath($data);
+        $old_preset = $this->findById($id);
+
+        $data = $this->file_manager->correctFilePath($data);
 
         $this->db->query('UPDATE ?:import_presets SET ?u WHERE preset_id = ?i', $data, $id);
+
+        $this->checkPresetsAndRemovePresetFile($old_preset);
 
         $this->updateDescription($id, $data, array($this->lang_code));
 
@@ -463,19 +496,47 @@ class Manager
     /**
      * Deletes preset.
      *
-     * @param int $id Preset ID
+     * @param int $id Preset id
      *
      * @return bool
+     * @throws \Tygh\Exceptions\DatabaseException
+     * @throws \Tygh\Exceptions\DeveloperException
      */
     public function delete($id)
     {
         $result = true;
 
-        $this->db->query('DELETE FROM ?:import_presets WHERE preset_id = ?i', $id);
-        $this->db->query('DELETE FROM ?:import_preset_descriptions WHERE preset_id = ?i', $id);
-        $this->db->query('DELETE FROM ?:import_preset_fields WHERE preset_id = ?i', $id);
+        $preset = $this->findById($id);
+
+        if (!$preset) {
+            return $result;
+        }
+
+        $this->db->query('DELETE FROM ?:import_presets WHERE preset_id = ?i', $preset['preset_id']);
+        $this->db->query('DELETE FROM ?:import_preset_descriptions WHERE preset_id = ?i', $preset['preset_id']);
+        $this->db->query('DELETE FROM ?:import_preset_fields WHERE preset_id = ?i', $preset['preset_id']);
+
+        $this->checkPresetsAndRemovePresetFile($preset);
 
         return $result;
+    }
+
+    /**
+     * Checks if exists presets with the same file and remove it if false.
+     *
+     * @param array $preset  Preset
+     *
+     * @return void
+     */
+    protected function checkPresetsAndRemovePresetFile($preset)
+    {
+        if (!isset($preset['file']) || !isset($preset['company_id']) || !isset($preset['file_type'])) {
+            return;
+        }
+
+        if ($preset['file_type'] !== PresetFileTypes::URL && !$this->isExistPresetsWithTheSameFile($preset['file'], $preset['company_id'])) {
+            $this->file_manager->removeFile($preset['file'], $preset['company_id']);
+        }
     }
 
     /**
@@ -677,24 +738,16 @@ class Manager
     }
 
     /**
-     * Corrects path to an imported file for a company.
+     * Finds out if some preset use preset file.
      *
-     * @param array $data Preset data
+     * @param string $preset_file  used preset file.
+     * @param int    $company_id   company id.
      *
-     * @return array Preset data with file path corrected
+     * @return bool  Returns true if some presets use preset file.
      */
-    protected function correctFilePath(array $data)
+    protected function isExistPresetsWithTheSameFile($preset_file, $company_id)
     {
-        if (!isset($data['file'])
-            || !isset($data['company_id'])
-            || !fn_string_not_empty($data['file'])
-            || $this->company_id
-        ) {
-            return $data;
-        }
-
-        $data['file'] = preg_replace("!^{$data['company_id']}/!", '', $data['file']);
-
-        return $data;
+        list($result, ) = $this->find(false, ['ip.file' => $preset_file, 'ip.company_id' => $company_id], false, ['file']);
+        return !empty($result);
     }
 }

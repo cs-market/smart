@@ -95,4 +95,10 @@
 
 {/capture}
 
-{include file="common/mainbox.tpl" title=__("robots_title") content=$smarty.capture.mainbox buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=__("robots_title")
+    content=$smarty.capture.mainbox
+    buttons=$smarty.capture.buttons
+    select_storefront=true
+    show_all_storefront=false
+}

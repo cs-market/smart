@@ -100,14 +100,18 @@
                 </tr>
                 </thead>
                 <tbody>
-                {assign var="id" value=0}
-                {assign var="count_products" value=0}
+                {$id = 0}
+                {$count_products = 0}
                 {foreach from=$order_info.products item=product}
-                {math equation="id + 1" id=$id assign="id"}
-                {math equation="count_products + `$product.amount`" count_products=$count_products assign="count_products"}
+                {$id = $id + 1}
+                {$count_products = $count_products + 1}
                 <tr>
                     <td align="center">{$id}</td>
-                    <td><bdi>{$product.product}</bdi></td>
+                    <td><bdi>
+                        {$product.product}
+                        {hook name="orders:product_info"}
+                        {/hook}
+                    </bdi></td>
                     <td align="center">{$product.amount}</td>
                     <td align="center">{__("items")}</td>
                     <td align="center">

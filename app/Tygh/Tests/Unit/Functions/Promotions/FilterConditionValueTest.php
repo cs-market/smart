@@ -17,8 +17,6 @@ class FilterConditionValueTest extends ATestCase
      */
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
-
         $this->requireCore('functions/fn.common.php');
         $this->requireCore('functions/fn.promotions.php');
     }

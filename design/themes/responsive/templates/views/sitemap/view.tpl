@@ -1,3 +1,9 @@
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 <div class="ty-sitemap">
     <div class="ty-sitemap__section">
         <h2 class="ty-sitemap__section-title">{__("cart_info")}</h2>
@@ -5,7 +11,12 @@
             {if $sitemap_settings.show_site_info == "Y"}
                 <h3 class="ty-sitemap__section-sub-title">{__("information")}</h3>
                 <ul>
-                    {include file="views/pages/components/pages_tree.tpl" tree=$sitemap.pages_tree root=true no_delim=true}
+                    {include file="views/pages/components/pages_tree.tpl"
+                        tree=$sitemap.pages_tree
+                        root=true
+                        no_delim=true
+                        direction=$direction
+                    }
                 </ul>
             {/if}
         </div>
@@ -35,7 +46,11 @@
                     </ul>
                 {/if}
                 {if $sitemap.categories_tree}
-                    {include file="views/sitemap/components/categories_tree.tpl" all_categories_tree=$sitemap.categories_tree background="white"}
+                    {include file="views/sitemap/components/categories_tree.tpl"
+                        all_categories_tree=$sitemap.categories_tree
+                        background="white"
+                        direction=$direction
+                    }
                 {/if}
             {/if}
         </div>

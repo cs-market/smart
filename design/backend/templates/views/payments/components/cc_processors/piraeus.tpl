@@ -1,4 +1,4 @@
-{if $settings.Security.secure_storefront == "full"}
+{if $settings.Security.secure_storefront === "YesNo::YES"|enum}
     {$protocol = "https"}
 {else}
     {$protocol = "http"}

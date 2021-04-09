@@ -179,12 +179,27 @@ input.ty-search-block__input, input.ty-search-block__input:focus {
     text-align: center;
 }
 
+.ty-grid-list__item .button-container {
+    text-align: center;
+}
+
 .ty-product-filters__wrapper {
     background: #fff;
 }
 
 .ty-grid-list__item {
-    margin: 10px 10px 35px 10px;
+    border: 0;
+    padding: 0;
+    transition: all 200ms;
+}
+
+.ty-grid-list__item:hover .ty-grid-list__control {
+    margin-left: -15px;
+    padding: 0px 5px 20px 5px;
+    width: ~"calc(100% - 30px)";
+    border-left: 10px solid #EEE;
+    border-right: 10px solid #EEE;
+    border-bottom: 10px solid #EEE;
 }
 
 .ty-sidebox__title span {

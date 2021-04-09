@@ -73,7 +73,14 @@ function fn_image_zoom_check_image(&$image_data, &$images, $use_original_image_f
             Registry::set('settings.Thumbnails.convert_to', 'original');
         }
 
-        $file_path = fn_generate_thumbnail($images['detailed']['relative_path'], $new_x, $new_y, false, true);
+        $file_path = fn_generate_thumbnail(
+            $images['detailed']['relative_path'],
+            $new_x,
+            $new_y,
+            false,
+            true,
+            $images
+        );
 
         if ($use_original_image_format) {
             Registry::set('settings.Thumbnails.convert_to', $initial_converation_format);

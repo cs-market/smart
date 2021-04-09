@@ -22,18 +22,18 @@
 {/hook}
 
 {assign var="check_disabled" value=false}
-{if $return_info.status != $smarty.const.RMA_DEFAULT_STATUS}
+{if $return_info.status != "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum}
     {assign var="check_disabled" value=true}
 {/if}
 
 {capture name="tabsbox"}
 {** RETURN PRODUCTS SECTION **}
     <div id="content_return_products">
-        {if $return_info.items[$smarty.const.RETURN_PRODUCT_ACCEPTED]}
+        {if $return_info.items["Addons\\Rma\\ReturnOperationStatuses::APPROVED"|enum]}
         <div class="clearfix">
             <div class="buttons-container pull-right">
             {hook name="rma:return_tools"}
-            {if $return_info.status == $smarty.const.RMA_DEFAULT_STATUS}
+            {if $return_info.status == "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum}
                 {include file="buttons/button.tpl" but_text=__("decline_products") but_name="dispatch[rma.decline_products]" but_role="button_main" but_meta="cm-process-items"}
             {/if}
             {/hook}
@@ -41,7 +41,7 @@
         </div>
 
         <div class="table-responsive-wrapper">
-            <table width="100%" class="table table-middle table-responsive">
+            <table width="100%" class="table table-middle table--relative table-responsive">
             <thead>
             <tr>
                 <th width="1%" class="center">
@@ -55,11 +55,11 @@
                 <th>{__("reason")}</th>
             </tr>
             </thead>
-            {foreach from=$return_info.items[$smarty.const.RETURN_PRODUCT_ACCEPTED] item="ri" key="key"}
+            {foreach from=$return_info.items["Addons\\Rma\\ReturnOperationStatuses::APPROVED"|enum] item="ri" key="key"}
             <tr>
                 <td width="1%" class="center" data-th="">
                     {hook name="rma:returned_items_content"}
-                    <input type="checkbox" name="accepted[{$ri.item_id}][chosen]" value="Y"{if $return_info.status != $smarty.const.RMA_DEFAULT_STATUS} disabled="disabled"{/if} class="cm-item" />
+                    <input type="checkbox" name="accepted[{$ri.item_id}][chosen]" value="Y"{if $return_info.status != "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum} disabled="disabled"{/if} class="cm-item" />
                     {/hook}
                 </td>
                 <td data-th="{__("product")}">{if !$ri.deleted_product}<a href="{"products.update?product_id=`$ri.product_id`"|fn_url}">{/if}{$ri.product|default:$ri.product nofilter}{if !$ri.deleted_product}</a>{/if}
@@ -71,7 +71,7 @@
                 <td data-th="{__("quantity")}">
                     <input type="hidden" name="accepted[{$ri.item_id}][previous_amount]" value="{$ri.amount}" />
                     {hook name="rma:returned_items_amount"}
-                    <select name="accepted[{$ri.item_id}][amount]"{if $return_info.status != $smarty.const.RMA_DEFAULT_STATUS} disabled="disabled"{/if} class="input-mini">
+                    <select name="accepted[{$ri.item_id}][amount]"{if $return_info.status != "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum} disabled="disabled"{/if} class="input-mini">
                     {/hook}
                     {section name=$key loop=$ri.amount+1 start="1" step="1"}
                             <option value="{$smarty.section.$key.index}" {if $smarty.section.$key.index == $ri.amount}selected="selected"{/if}>{$smarty.section.$key.index}</option>
@@ -93,7 +93,7 @@
 
 {** DECLINED PRODUCTS SECTION **}
     <div id="content_declined_products" class="hidden">
-       {if $return_info.items[$smarty.const.RETURN_PRODUCT_DECLINED] && $return_info.status == $smarty.const.RMA_DEFAULT_STATUS}
+       {if $return_info.items["Addons\\Rma\\ReturnOperationStatuses::DECLINED"|enum] && $return_info.status == "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum}
         <div class="clearfix">
             <div class="pull-right">
                 {include file="buttons/button.tpl" but_text=__("accept_products") but_name="dispatch[rma.accept_products]" but_role="button_main" but_meta="cm-process-items"}
@@ -101,9 +101,9 @@
         </div>
         {/if}
 
-        {if $return_info.items[$smarty.const.RETURN_PRODUCT_DECLINED]}
+        {if $return_info.items["Addons\\Rma\\ReturnOperationStatuses::DECLINED"|enum]}
         <div class="table-responsive-wrapper">
-            <table width="100%" class="table table-middle table-responsive">
+            <table width="100%" class="table table-middle table--relative table-responsive">
             <thead>
             <tr>
                 <th>
@@ -114,10 +114,10 @@
                 <th>{__("reason")}</th>
             </tr>
             </thead>
-            {foreach from=$return_info.items[$smarty.const.RETURN_PRODUCT_DECLINED] item="ri" key="key"}
+            {foreach from=$return_info.items["Addons\\Rma\\ReturnOperationStatuses::DECLINED"|enum] item="ri" key="key"}
             <tr>
                 <td width="1%" class="center" data-th="">
-                    <input type="checkbox" name="declined[{$ri.item_id}][chosen]" value="Y" {if $return_info.status != $smarty.const.RMA_DEFAULT_STATUS}disabled="disabled"{/if} class="checkbox cm-item" /></td>
+                    <input type="checkbox" name="declined[{$ri.item_id}][chosen]" value="Y" {if $return_info.status != "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum}disabled="disabled"{/if} class="checkbox cm-item" /></td>
                 <td data-th="{__("product")}">{if !$ri.deleted_product}<a href="{"products.update?product_id=`$ri.product_id`"|fn_url}">{/if}{$ri.product nofilter}{if !$ri.deleted_product}</a>{/if}
                 {if $ri.product_options}<div class="options-info">&nbsp;{include file="common/options_info.tpl" product_options=$ri.product_options}</div>{/if}
                 </td>
@@ -126,7 +126,7 @@
                 </td>
                 <td data-th="{__("quantity")}">
                     <input type="hidden" name="declined[{$ri.item_id}][previous_amount]" value="{$ri.amount}" />
-                    <select name="declined[{$ri.item_id}][amount]" {if $return_info.status != $smarty.const.RMA_DEFAULT_STATUS}disabled="disabled"{/if} class="input-mini">
+                    <select name="declined[{$ri.item_id}][amount]" {if $return_info.status != "Addons\\Rma\\ReturnOperationStatuses::REQUESTED"|enum}disabled="disabled"{/if} class="input-mini">
                     {section name=$key loop=$ri.amount+1 start="1" step="1"}
                             <option value="{$smarty.section.$key.index}" {if $smarty.section.$key.index == $ri.amount}selected="selected"{/if}>{$smarty.section.$key.index}</option>
                     {/section}
@@ -191,7 +191,7 @@
     <label for="elm_recalc_order" class="control-label">{__("recalculate_order")}</label>
     <div class="controls">
         <label class="radio">
-            <input id="elm_recalc_order" type="radio" name="change_return_status[recalculate_order]" value="R" />
+            <input id="elm_recalc_order" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::AUTO"|enum} />
         </label>
     </div>
 </div>
@@ -201,7 +201,7 @@
     <label for="elm_recalc_manually" class="control-label">{__("manually_recalculate_order")}</label>
     <div class="controls">
         <label class="radio">
-            <input id="elm_recalc_manually" type="radio" name="change_return_status[recalculate_order]" value="M" />
+            <input id="elm_recalc_manually" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::MANUALLY"|enum} />
         </label>
     </div>
 </div>
@@ -211,7 +211,7 @@
     <label class="control-label" for="elm_recalc_skip">{__("dont_recalculate_order")}</label>
     <div class="controls">
         <label class="radio">
-            <input id="elm_recalc_skip" type="radio" name="change_return_status[recalculate_order]" value="D" checked="checked" />
+            <input id="elm_recalc_skip" type="radio" name="change_return_status[recalculate_order]" value={"Addons\\Rma\\RecalculateOperations::NOT_RECALCULATE"|enum} checked="checked" />
         </label>
     </div>
 </div>

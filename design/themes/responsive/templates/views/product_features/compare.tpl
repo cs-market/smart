@@ -29,6 +29,8 @@
 
                         <div class="ty-compare-products__item">
                             <a href="{"products.view?product_id=`$compare_product_id`"|fn_url}">{$product.product nofilter}</a>
+                            {hook name="products:product_additional_info"}
+                            {/hook}
                         </div>
                         {/hook}
 

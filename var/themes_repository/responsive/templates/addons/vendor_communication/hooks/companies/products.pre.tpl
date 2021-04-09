@@ -1,4 +1,4 @@
-{if "MULTIVENDOR"|fn_allowed_for && $addons.vendor_communication.show_on_vendor == "Y"}
+{if $addons.vendor_communication.show_on_vendor == "Y"}
     {include file="addons/vendor_communication/views/vendor_communication/components/new_thread_button.tpl" object_id=$company_id show_form=true}
 
     {include

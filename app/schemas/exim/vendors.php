@@ -72,7 +72,6 @@ $schema = array(
             'required' => true,
         ),
         'Vendor language' => array(
-            'required' => true,
             'process_get' => array('fn_exim_vendors_export_language', '#key'),
             'process_put' => array('fn_exim_vendors_import_language', '%E-mail%', '#this'),
             'linked' => false
@@ -99,33 +98,24 @@ $schema = array(
         ),
         'Phone' => array(
             'db_field' => 'phone',
-            'required' => true,
         ),
         'Url' => array(
             'db_field' => 'url',
         ),
-        'Fax' => array(
-            'db_field' => 'fax',
-        ),
         'Address' => array(
             'db_field' => 'address',
-            'required' => true,
         ),
         'City' => array(
             'db_field' => 'city',
-            'required' => true,
         ),
         'Country' => array(
             'db_field' => 'country',
-            'required' => true,
         ),
         'State' => array(
             'db_field' => 'state',
-            'required' => true,
         ),
         'Zipcode' => array(
             'db_field' => 'zipcode',
-            'required' => true,
         ),
         'Shippings' => array(
             'db_field' => 'shippings',
@@ -139,6 +129,13 @@ $schema = array(
             'process_get' => array('fn_exim_vendors_export_logo', '#key', 'mail', '@images_path'),
             'process_put' => array('fn_exim_vendors_import_logo', '%E-mail%', 'mail', '#this'),
             'linked' => false,
+        ),
+        'Date added' => array(
+            'db_field' => 'timestamp',
+            'process_get' => array('fn_timestamp_to_date', '#this'),
+            'convert_put' => array('fn_date_to_timestamp', '#this'),
+            'return_result' => true,
+            'default' => array('time')
         ),
     ),
 );

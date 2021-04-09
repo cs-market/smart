@@ -19,6 +19,7 @@ use Tygh\BlockManager\Layout;
 use Tygh\Registry;
 use Tygh\Template\IContext;
 use Tygh\Themes\Styles;
+use Tygh\Tygh;
 
 /**
  * The context class for email notifications.
@@ -58,13 +59,26 @@ class Context implements IContext
             }
         }
 
-        if (empty($data['company_data'])) {
-            $data['company_data'] = fn_get_company_placement_info($company_id);
+        $storefront_id = 0;
+        if (!empty($data['storefront_data']['storefront_id'])) {
+            $storefront_id = $data['storefront_data']['storefront_id'];
+        }
+
+        if (empty($storefront_id) && fn_allowed_for('ULTIMATE')) {
+            fn_ult_bootstrap_company_storefront($company_id, $storefront_id);
+        }
+
+        if (empty($storefront_id)) {
+            $storefront_id = Tygh::$app['storefront.repository']->findDefault()->storefront_id;
+        }
+
+        if (empty($data['company_data']) || !isset($data['company_data'])) {
+            $data['company_data'] = fn_get_company_placement_info((int) $company_id);
             $data['company_name'] = $data['company_data']['company_name'];
         }
 
-        $data['logos'] = $this->getCompanyLogos($company_id);
-        $data['styles'] = $this->getStyles($company_id);
+        $data['logos'] = $this->getCompanyLogos((int) $company_id, $storefront_id);
+        $data['styles'] = $this->getStyles((int) $company_id, $storefront_id);
         $data['lang_code'] = $lang_code;
         $data['language_direction'] = fn_is_rtl_language($lang_code) ? 'rtl' : 'ltr';
 
@@ -75,24 +89,28 @@ class Context implements IContext
     /**
      * Gets company logos by company identifier
      *
-     * @param int $company_id Company identifier
+     * @param int $company_id    Company identifier
+     * @param int $storefront_id Storefront identifier
+     *
      * @return array
      */
-    protected function getCompanyLogos($company_id)
+    protected function getCompanyLogos($company_id, $storefront_id)
     {
-        return fn_get_logos($company_id);
+        return fn_get_logos($company_id, null, null, $storefront_id);
     }
 
     /**
      * Gets company theme styles by company identifier
      *
-     * @param int $company_id Company identifier
+     * @param int $company_id    Company identifier
+     * @param int $storefront_id Storefront identifier
+     *
      * @return array
      */
-    protected function getStyles($company_id)
+    protected function getStyles($company_id, $storefront_id)
     {
-        $theme_name = fn_get_theme_path('[theme]', 'C', $company_id);
-        $layout = Layout::instance($company_id)->getDefault($theme_name);
+        $theme_name = fn_get_theme_path('[theme]', 'C', $company_id, true, $storefront_id);
+        $layout = Layout::instance($company_id, [], $storefront_id)->getDefault($theme_name);
         $styles = Styles::factory($theme_name)->get($layout['style_id'], array(
             'parse' => true,
         ));

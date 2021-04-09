@@ -1,21 +1,4 @@
-{if $product_data.product_type === "\Tygh\Addons\ProductVariations\Product\Manager::PRODUCT_TYPE_VARIATION"|constant}
-    <div class="control-group">
-        <label for="variation_code" class="control-label cm-required">{__("product_variations.variation")}</label>
-        <div class="controls">
-            <select id="variation_code" name="product_data[variation_code]">
-                {foreach from=$combinations item="combination" key="variation_code"}
-                    <option value="{$variation_code}" {if $variation_code == $product_data.variation_code} selected{elseif $combination.exists} disabled{/if}>{$combination.name}</option>
-                {/foreach}
-            </select>
-            <p>
-                {__("product_variations.variation_of_product", [
-                "[url]" => "products.update?product_id=`$product_data.parent_product_id`"|fn_url,
-                "[product]" => $parent_product_data.product
-                ])}
-            </p>
-        </div>
-    </div>
-
+{if $product_data.product_type === "\Tygh\Addons\ProductVariations\Product\Type\Type::PRODUCT_TYPE_VARIATION"|constant}
     {$multiple_categoires = count($product_data.category_ids) > 1}
 
     {capture name="variation_categories"}

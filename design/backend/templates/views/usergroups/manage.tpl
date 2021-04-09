@@ -8,7 +8,7 @@
 {hook name="usergroups:manage"}
 {if $usergroups}
 <div class="table-responsive-wrapper">
-    <table class="table table-middle table-responsive">
+    <table class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="1%" class="mobile-hide">
@@ -23,7 +23,7 @@
     {foreach from=$usergroups item=usergroup}
     <tr class="cm-row-status-{$usergroup.status|lower}">
         <td width="1%" class="mobile-hide">
-            <input type="checkbox" name="usergroup_ids[]" value="{$usergroup.usergroup_id}" class="checkbox cm-item" /></td>
+            <input type="checkbox" name="usergroup_ids[]" value="{$usergroup.usergroup_id}" class="cm-item" /></td>
         <td class="row-status" data-th="{__("usergroup")}">
             {if $hide_inputs}
                 {$usergroup.usergroup}
@@ -32,8 +32,7 @@
             {/if}
         </td>
         <td class="row-status" data-th="{__("type")}">
-            {if $usergroup.type == "C"}{__("customer")}{/if}
-            {if $usergroup.type == "A"}{__("administrator")}{/if}
+            {$usergroup_types[$usergroup.type]}
         </td>
 
         {hook name="usergroups:manage_data"}{/hook}

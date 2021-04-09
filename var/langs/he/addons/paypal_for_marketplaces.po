@@ -1,0 +1,240 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Hebrew\n"
+"Language: he_IL\n"
+"Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3;\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: he\n"
+"X-Crowdin-File: /release-4.11.4/addons/paypal_for_marketplaces.po\n"
+"PO-Revision-Date: 2020-05-18 09:00\n"
+
+msgctxt "Addons::name::paypal_for_marketplaces"
+msgid "PayPal for Marketplaces"
+msgstr "PayPal עבור זירות מסחר"
+
+msgctxt "Addons::description::paypal_for_marketplaces"
+msgid "This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
+msgstr "תוסף זה יסייע למנהלי המערכת root store להחלק את הכספים אוטומטית בין ספקים שונים באמצעות פייפאל"
+
+msgctxt "SettingsSections::paypal_for_marketplaces::general"
+msgid "General"
+msgstr "כלל"
+
+msgctxt "SettingsOptions::paypal_for_marketplaces::collect_payouts"
+msgid "Commission includes"
+msgstr "העמלה כוללת"
+
+msgctxt "SettingsVariants::paypal_for_marketplaces::collect_payouts::N"
+msgid "Order commission"
+msgstr "עמלה על ההזמנה"
+
+msgctxt "SettingsVariants::paypal_for_marketplaces::collect_payouts::Y"
+msgid "Order commission and unpaid payouts"
+msgstr "עמלה על ההזמנה ותשלומים שלא שולמו"
+
+msgctxt "Languages::paypal_for_marketplaces.paypal_for_marketplaces"
+msgid "PayPal for Marketplaces"
+msgstr "PayPal עבור זירות מסחר"
+
+msgctxt "Languages::paypal_for_marketplaces.bn_code"
+msgid "Partner integration code"
+msgstr "קוד שילוב שותף"
+
+msgctxt "Languages::paypal_for_marketplaces.payer_id"
+msgid "Merchant account ID"
+msgstr "ID של חשבון סוחר"
+
+msgctxt "Languages::paypal_for_marketplaces.client_id"
+msgid "Client ID"
+msgstr "ID של לקוח"
+
+msgctxt "Languages::paypal_for_marketplaces.secret"
+msgid "Secret"
+msgstr "סודי"
+
+msgctxt "Languages::paypal_for_marketplaces.connect_with_paypal"
+msgid "Connect with PayPal"
+msgstr "קשר עם PayPal"
+
+msgctxt "Languages::paypal_for_marketplaces.disconnect"
+msgid "Disconnect account"
+msgstr "נתק את החשבון"
+
+msgctxt "Languages::paypal_for_marketplaces.paypal_account"
+msgid "PayPal account"
+msgstr "חשבון PayPal"
+
+msgctxt "Languages::paypal_for_marketplaces.connected"
+msgid "Connected"
+msgstr "מקושר"
+
+msgctxt "Languages::paypal_for_marketplaces.not_connected"
+msgid "Not connected"
+msgstr "לא מקושר"
+
+msgctxt "Languages::paypal_for_marketplaces.account_connected"
+msgid "Your PayPal account has been successfully connected to the store"
+msgstr "חשבון PayPal שלך קושר בהצלחה לחנות"
+
+msgctxt "Languages::paypal_for_marketplaces.account_connection_failure"
+msgid "Unable to connect your PayPal account to the store"
+msgstr "לא מצליח לקשר את חשבון PayPal שלך לחנות"
+
+msgctxt "Languages::paypal_for_marketplaces.account_disconnected"
+msgid "Your PayPal account has been successfully disconnected from the store"
+msgstr "חשבון PayPal שלך נותק בהצלחה מהחנות"
+
+msgctxt "Languages::paypal_for_marketplaces.withdrawal_for_the_order"
+msgid "Withdrawal for the order #[order_id]"
+msgstr "משיכה עבור הזמנה מס'[order_id]"
+
+msgctxt "Languages::paypal_for_marketplaces.refund_id"
+msgid "Refund transaction ID"
+msgstr "של עסקת החזר כספי ID"
+
+msgctxt "Languages::paypal_for_marketplaces.withdrawal"
+msgid "Withdrawal amount"
+msgstr "סכום משיכה"
+
+msgctxt "Languages::paypal_for_marketplaces.rma.perform_refund"
+msgid "Give a refund via PayPal for Marketplaces"
+msgstr "העבר החזר כספי באמצעות PayPal עבור זירות מסחר"
+
+msgctxt "Languages::ttc_paypal_for_marketplaces.rma.perform_refund"
+msgid "A refund will be made once an administrator changes the return request status"
+msgstr "החזר כפסי יתבצע ברגע שמנהל ישנה את סטטוס בקשת החזרה"
+
+msgctxt "Languages::paypal_for_marketplaces.rma.refund_performed"
+msgid "The refund has been made via PayPal for Marketplaces"
+msgstr "ההחזר הכספי התבצע באמצעות PayPal עבור זירות מסחר"
+
+msgctxt "Languages::paypal_for_marketplaces.order_id"
+msgid "Order ID in PayPal"
+msgstr "ID של הזמנה ב PayPal"
+
+msgctxt "Languages::paypal_for_marketplaces.capture_id"
+msgid "Capture ID in PayPal"
+msgstr "לכידת ID ב PayPal"
+
+msgctxt "Languages::paypal_for_marketplaces.payout_id"
+msgid "Payout ID in PayPal"
+msgstr "ID של תשלום ב PayPal"
+
+msgctxt "Languages::paypal_for_marketplaces.payout_failure_reason"
+msgid "Payout failure reason"
+msgstr "סיבה לכך שהתשלום נכשל"
+
+msgctxt "Languages::paypal_for_marketplaces.own_account_cant_be_used_for_vendor"
+msgid "Your own PayPal account can't be used to connect a vendor to the store"
+msgstr "לא ניתן להשתמש בחשבון PayPal שלך כדי לקשר את הספק לחנות"
+
+msgctxt "Languages::paypal_for_marketplaces.rma.order_status_on_refund"
+msgid "Order status on refund"
+msgstr "סטטוס ההזמנה בהחזר כספי"
+
+msgctxt "Languages::ttc_paypal_for_marketplaces.rma.order_status_on_refund"
+msgid "Determines whether or not to change the order status after a refund was performed via the RMA add-on."
+msgstr "קובע האם לשנות או לא את סטטוס ההזמנה לאחר ביצוע החזר כספי באמצעות תוסף RMA."
+
+msgctxt "Languages::paypal_for_marketplaces.do_not_change"
+msgid "Do not change"
+msgstr "אל תשנה"
+
+msgctxt "Languages::paypal_for_marketplaces.set_status_to"
+msgid "Set to:"
+msgstr "הגדר כ"
+
+msgctxt "Languages::paypal_for_marketplaces.webhook_notice"
+msgid "Specify the following URL when configuring a webhook for your REST application: <code>[url]</code>"
+msgstr "ציין את URL הבא בעת הגדרת וובהוק עבור אפליקציית REST שלך <code>[url]</code>"
+
+msgctxt "Languages::paypal_for_marketplaces.payment_notification"
+msgid "PayPal for Marketplaces payment notification: [payload]"
+msgstr "PayPal עבור הודעת תשלום של זירות תשלום [payload]"
+
+msgctxt "Languages::paypal_for_marketplaces.settings.account"
+msgid "Account settings"
+msgstr "הגדרות חשבון"
+
+msgctxt "Languages::paypal_for_markeplaces.settings.funding"
+msgid "Alternative funding sources"
+msgstr "מקורות מימון חליפיים"
+
+msgctxt "Languages::paypal_for_markeplaces.settings.style"
+msgid "Button appearance"
+msgstr "צורת כפתור"
+
+msgctxt "Languages::paypal_for_marketplaces.source.card"
+msgid "Allow buyers to pay with their credit or debit card"
+msgstr "מאפשר לקונים לשלם בכרטיס אשראי או כרטיס חיוב שלהם"
+
+msgctxt "Languages::paypal_for_marketplaces.source.elv"
+msgid "Allow German buyers to pay with their bank account using Elektronisches Lastschriftverfahren"
+msgstr "מאפשר לקונים גרמניים לשלם דררך חשבון הבנק שלהם באמצעות Elektronisches Lastschriftverfahren"
+
+msgctxt "Languages::paypal_for_marketplaces.source.credit"
+msgid "Allow buyers to pay with PayPal Credit"
+msgstr "מאפשר לקונים לשלם באמצעות אשראי PayPal"
+
+msgctxt "Languages::paypal_for_marketplaces.source.venmo"
+msgid "Allow buyers to pay with Venmo digital wallet"
+msgstr "מאפשר לקונים לשלם באמצעות ארנק דיגיטלי Venmo"
+
+msgctxt "Languages::paypal_for_marketplaces.style.shape"
+msgid "Shape"
+msgstr "צורה"
+
+msgctxt "Languages::paypal_for_marketplaces.shape.pill"
+msgid "Pill"
+msgstr "גלולה"
+
+msgctxt "Languages::paypal_for_marketplaces.shape.rect"
+msgid "Rectangular"
+msgstr "מלבני"
+
+msgctxt "Languages::paypal_for_marketplaces.style.color"
+msgid "Color"
+msgstr "צבע"
+
+msgctxt "Languages::paypal_for_marketplaces.color.gold"
+msgid "Gold"
+msgstr "זהב"
+
+msgctxt "Languages::paypal_for_marketplaces.color.blue"
+msgid "Blue"
+msgstr "כחול"
+
+msgctxt "Languages::paypal_for_marketplaces.color.silver"
+msgid "Silver"
+msgstr "כסף"
+
+msgctxt "Languages::paypal_for_marketplaces.color.black"
+msgid "Black"
+msgstr "שחור"
+
+msgctxt "Languages::paypal_for_marketplaces.shape.rect"
+msgid "Rectangular"
+msgstr "מלבני"
+
+msgctxt "Languages::paypal_for_marketplaces.style.size"
+msgid "Size"
+msgstr "גודל"
+
+msgctxt "Languages::paypal_for_marketplaces.size.small"
+msgid "Small (150&times;25px)"
+msgstr "קטן (150&times;25px)"
+
+msgctxt "Languages::paypal_for_marketplaces.size.medium"
+msgid "Medium (250&times;35px)"
+msgstr "בינוני (250&times;35px)"
+
+msgctxt "Languages::paypal_for_marketplaces.size.large"
+msgid "Large (350&times;40px)"
+msgstr "גדול (350&times;40px)"
+
+msgctxt "Languages::paypal_for_marketplaces.size.responsive"
+msgid "Responsive"
+msgstr "רספונסיבי"
+

@@ -62,7 +62,24 @@
                         <p>{__("vendor_plans.vendor_store")}</p>
                     {/if}
                     <p>
-                        {__("vendor_plans.transaction_fee_value", ["[value]" => "{$plan->commissionRound()}%"])}
+
+                        {$commissionRound = $plan->commissionRound()}
+                        {capture name="fee_value"}
+                            {if $commissionRound > 0}
+                                {$commissionRound}%
+                            {/if}
+                            
+                            {if $plan->fixed_commission > 0.0}
+                                {if $commissionRound > 0} + {/if}
+                                {include file="common/price.tpl" value=$plan->fixed_commission}
+                            {/if}
+                        {/capture}
+
+                        {if ($plan->fixed_commission > 0.0) || ($commissionRound > 0)}
+                            {__("vendor_plans.transaction_fee_value", [
+                                "[value]" => "{$smarty.capture.fee_value nofilter}"
+                            ])}
+                        {/if}
                     </p>
                 </div>
                 

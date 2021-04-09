@@ -14,6 +14,8 @@
 
 namespace Tygh;
 
+use Tygh\Languages\Languages;
+
 class RusCurrency
 {
     public static function rub_create()
@@ -46,7 +48,7 @@ class RusCurrency
 
                 Registry::set('currencies.RUB', $rub_array) ;
 
-                foreach (fn_get_translation_languages() as $lang_code => $v) {
+                foreach (Languages::getAll() as $lang_code => $v) {
                     db_query("REPLACE INTO ?:currency_descriptions (`currency_code`, `description`, `lang_code`) VALUES (?s, 'Рубли', ?s)", CURRENCY_RUB, $lang_code);
                 }
 

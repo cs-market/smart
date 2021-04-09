@@ -1,34 +1,80 @@
-{* rus_build_pack dbazhenov *}
+{if $settings.Security.secure_storefront === "YesNo::YES"|enum}
+    {$storefront_url = fn_url('', 'SiteArea::STOREFRONT'|enum, 'https')|replace:$config.customer_index:""|rtrim:"/"}
+{else}
+    {$storefront_url = fn_url('', 'SiteArea::STOREFRONT'|enum, 'http')|replace:$config.customer_index:""|rtrim:"/"}
+{/if}
 
-<script type="text/javascript">
-//<![CDATA[
-(function(_, $) {
-    $(document).ready(function() {
-        fn_get_rbx_currencies();
-        $('#rbx_get_currencies').on('click', fn_get_rbx_currencies);
-    });
+{$result_url = "{$storefront_url}/payment_notification/result/robokassa"}
+{$success_url = "{$storefront_url}/payment_notification/success/robokassa"}
+{$fail_url = "{$storefront_url}/payment_notification/fail/robokassa"}
 
-    function fn_get_rbx_currencies() {
-        var merchantid = $('#rbx_merchantid').val();
-        $.ceAjax('request', '{fn_url("payment_notification.rbx_get_currencies")}', {
-            data: {
-                payment: 'robokassa',
-                merchantid: merchantid,
-                result_ids: 'rbx_currency_div',
-                payment_id: {$smarty.request.payment_id},
-            },
-        });
-    }
-}(Tygh, Tygh.$));
-//]]>
-</script>
-{assign var="r_url" value="payment_notification.result?payment=robokassa"|fn_url:'C':'http'}
-{assign var="p_url" value="payment_notification.return?payment=robokassa"|fn_url:'C':'http'}
-{assign var="f_url" value="payment_notification.cancel?payment=robokassa"|fn_url:'C':'http'}
+{include file = "common/subheader.tpl"
+    title = __("rus_payments.robokassa.technical_preferences")
+}
 
-<div>
-    {__("text_robokassa_notice", ["[r_url]" => $r_url, "[p_url]" => $p_url, "[f_url]" => $f_url])}
-</div> 
+<div class="control-group">
+    <label class="control-label">
+        Result Url
+    </label>
+    <div class="controls">
+        {include file = "common/widget_copy.tpl"
+            widget_copy_code_text = $result_url
+            widget_copy_class = "widget-copy--compact"
+        }
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label">
+        {__("rus_payments.robokassa.notification_url_method", ["[url_type]" => "Result Url"])}
+    </label>
+    <div class="controls">
+        <p class="switch">POST</p>
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label">
+        Success Url
+    </label>
+    <div class="controls">
+        {include file = "common/widget_copy.tpl"
+            widget_copy_code_text = $success_url
+            widget_copy_class = "widget-copy--compact"
+        }
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label">
+        {__("rus_payments.robokassa.notification_url_method", ["[url_type]" => "Success Url"])}
+    </label>
+    <div class="controls">
+        <p class="switch">GET</p>
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label">
+        Fail Url
+    </label>
+    <div class="controls">
+        {include file = "common/widget_copy.tpl"
+            widget_copy_code_text = $fail_url
+            widget_copy_class = "widget-copy--compact"
+        }
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label">
+        {__("rus_payments.robokassa.notification_url_method", ["[url_type]" => "Fail Url"])}
+    </label>
+    <div class="controls">
+        <p class="switch">GET</p>
+    </div>
+</div>
+
 <hr>
 
 <div class="control-group">
@@ -94,6 +140,20 @@
     {include file="addons/rus_payments/views/payments/components/cc_processors/robokassa_cur_selectbox.tpl"}
 </div>
 
+<div class="control-group">
+    <label class="control-label" for="rbx_encoding">{__("rus_payments.encoding_algorithm")}</label>
+    <div class="controls">
+        <select name="payment_data[processor_params][encoding]" id="rbx_encoding">
+            <option value="md5"{if $processor_params.encoding === "md5"} selected="selected"{/if}>{"md5"}</option>
+            <option value="sha1"{if $processor_params.encoding === "sha1"} selected="selected"{/if}>{"sha1"}</option>
+            <option value="sha256"{if $processor_params.encoding === "sha256"} selected="selected"{/if}>{"sha256"}</option>
+            <option value="sha384"{if $processor_params.encoding === "sha384"} selected="selected"{/if}>{"sha384"}</option>
+            <option value="sha512"{if $processor_params.encoding === "sha512"} selected="selected"{/if}>{"sha512"}</option>
+            <option value="ripemd160"{if $processor_params.encoding === "ripemd160"} selected="selected"{/if}>{"ripemd160"}</option>
+        </select>
+    </div>
+</div>
+
 {include file="common/subheader.tpl" title=__("rus_payments.robokassa.text_status_map") target="#text_status_map"}
 
 <div id="text_status_map" class="in collapse">
@@ -103,10 +163,44 @@
         <label class="control-label" for="elm_paid">{__("rus_payments.robokassa.paid")}:</label>
         <div class="controls">
             <select name="payment_data[processor_params][statuses][paid]" id="elm_paid">
-                {foreach from=$statuses item="s" key="k"}
+                {foreach $statuses as $k => $s}
                     <option value="{$k}" {if (isset($processor_params.statuses.paid) && $processor_params.statuses.paid == $k) || (!isset($processor_params.statuses.paid) && $k == 'P')}selected="selected"{/if}>{$s}</option>
                 {/foreach}
             </select>
         </div>
     </div>
+
+    <div class="control-group">
+        <label class="control-label" for="elm_final">{__("rus_payments.robokassa.final_status")}</label>
+        <div class="controls">
+            <select name="payment_data[processor_params][statuses][final]" id="elm_final">
+                {foreach $statuses as $key => $status}
+                    <option value="{$key}" {if $processor_params.statuses.final|default:"C" === $key} selected="selected"{/if}>
+                        {$status}
+                    </option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
 </div>
+
+<script type="text/javascript">
+    (function (_, $) {
+        $(_.doc).ready(function () {
+            fn_get_rbx_currencies();
+            $('#rbx_get_currencies').on('click', fn_get_rbx_currencies);
+        });
+
+        function fn_get_rbx_currencies() {
+            var merchantid = $('#rbx_merchantid').val();
+            $.ceAjax('request', '{fn_url("payment_notification.rbx_get_currencies")}', {
+                data: {
+                    payment: 'robokassa',
+                    merchantid: merchantid,
+                    result_ids: 'rbx_currency_div',
+                    payment_id: {$smarty.request.payment_id},
+                }
+            });
+        }
+    })(Tygh, Tygh.$);
+</script>

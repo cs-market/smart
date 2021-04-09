@@ -11,7 +11,7 @@
 <input type="hidden" id="add_banner_id" name="banner_id" value=""/>
 
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         {hook name="banners_list:table_head"}

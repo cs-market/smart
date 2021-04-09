@@ -19,7 +19,8 @@
     
             var self = $(this);
             $('textarea.cm-wysiwyg', self).ceEditor('destroy');
-           
+            $('.cm-colorpicker', self).ceColorpicker('destroy');
+
             var regex = new RegExp('((?:\\[\\w+\\]){' + (level - 1) + '})\\[(\\d+)\\]');
             var image_regex = new RegExp('((?:\\[\\w+\\]){0})\\[(\\d+)\\]');
     
@@ -177,7 +178,8 @@
             }
 
             $('textarea.cm-wysiwyg', self).ceEditor('recover');
-                        
+            $('.cm-colorpicker', self).add('.cm-colorpicker', new_node).ceColorpicker();
+
             // if node has file uploader, process it
             $('[id^=clean_selection]', new_node).each(function() {
 
@@ -204,7 +206,7 @@
             $('.cm-calendar', new_node).each(function () {
                 $(this).removeClass('hasDatepicker').datepicker(window.calendar_config || {});
             });
-            
+
             $('textarea.cm-wysiwyg', new_node).appear(function() {
                 $(this).ceEditor();
             });

@@ -123,7 +123,7 @@ class SchemesManager
      * @param  bool   $no_cache   Do not get scheme from cache
      * @return array  Array of block scheme data
      */
-    public static function getBlockScheme($block_type, $params, $no_cache = false)
+    public static function getBlockScheme($block_type, $params = [], $no_cache = false)
     {
         $scheme = self::_getScheme('blocks');
 
@@ -351,13 +351,25 @@ class SchemesManager
         foreach ($blocks as $block_key => $block) {
             if (!empty($block['type'])) {
                 $type = $block['type'];
+                $hide_block_and_skip = false;
+
                 if (!empty($scheme[$type]['hide_on_locations'])) {
                     if (array_search($location['dispatch'], $scheme[$type]['hide_on_locations']) !== false) {
-                        unset($blocks[$block_key]);
-                        continue;
+                        $hide_block_and_skip = true;
+                    }
+                } elseif (isset($scheme[$type]['show_on_locations'])) {
+                    if (!in_array($location['dispatch'], $scheme[$type]['show_on_locations'], true)) {
+                        $hide_block_and_skip = true;
                     }
                 }
+
+                if ($hide_block_and_skip) {
+                    unset($blocks[$block_key]);
+                    continue;
+                }
+
                 $blocks[$block_key]['is_manageable'] = self::isManageable($type);
+
                 if (!empty($block['type']) && !empty($scheme[$type]['single_for_location'])) {
                     $blocks[$block_key]['single_for_location'] = true;
                     $block_exists = Block::instance()->getBlocksByTypeForLocation($type, $location['location_id']);
@@ -458,7 +470,7 @@ class SchemesManager
             'prefix' => "{$item}/"
         );
         $tpl_files = $theme->getDirContents($dir_params, Themes::STR_MERGE);
-        foreach (Registry::get('addons') as $addon => $addon_data) {
+        foreach (Registry::ifGet('addons', []) as $addon => $addon_data) {
             if ($addon_data['status'] == 'A') {
                 $dir_params['prefix'] = "addons/{$addon}/{$item}/";
                 $dir_params['dir'] = 'templates/' . $dir_params['prefix'];
@@ -563,5 +575,47 @@ class SchemesManager
         }
 
         return true;
+    }
+
+    /**
+     * Checks selected template for specified block and allows or denies usage of that template.
+     *
+     * @param array $block        Block data
+     * @param array $block_schema Current block schema
+     *
+     * @return bool True if wrapper is allowed, false - if forbidden.
+     */
+    public static function isTemplateAvailable(array $block, array $block_schema = [])
+    {
+        if (empty($block['properties']['template'])) {
+            return true;
+        }
+
+        if (!$block_schema) {
+            $block_schema = SchemesManager::getBlockScheme($block['type'], []);
+        }
+
+        return in_array($block['properties']['template'], array_keys($block_schema['templates']));
+    }
+
+    /**
+     * Checks selected wrapper for specified object and allows or denies usage of that wrapper.
+     *
+     * @param array $object        Object data
+     * @param array $object_schema Current schema of that specified object
+     *
+     * @return bool True if wrapper is allowed, false - if forbidden.
+     */
+    public static function isWrapperAvailable(array $object, array $object_schema = [])
+    {
+        if (empty($object['wrapper'])) {
+            return true;
+        }
+
+        if (!$object_schema) {
+            $object_schema = isset($object['type']) ? SchemesManager::getBlockScheme($object['type'], []) : fn_get_schema('block_manager', 'grids');
+        }
+
+        return in_array($object['wrapper'], array_keys($object_schema['wrappers']));
     }
 }

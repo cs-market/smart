@@ -24,7 +24,7 @@
     <div id="content_tab_general">
 
         <div class="table-responive-wrapper">
-            <table class="table table-middle table-responive">
+            <table class="table table-middle table--relative table-responive">
             <thead>
                 <tr>
                     <th>{__("product")}</th>
@@ -52,9 +52,11 @@
                             </a>
                         {/if}
 
+                        {hook name="shipments:product_info"}
                         {if $product.product_code}
                             <p class="products-hint__code">{__("sku")}:&nbsp;{$product.product_code}</p>
                         {/if}
+                        {/hook}
 
                         {if $product.product_options}
                             <div class="options-info">

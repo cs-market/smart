@@ -18,7 +18,8 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
     'post_delete_user',
-    'delete_company'
+    'delete_company',
+    'url_post'
 );
 
 Registry::get('class_loader')->add('Hybrid', Registry::get('config.dir.addons') . 'hybrid_auth/lib');

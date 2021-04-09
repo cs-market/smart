@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.8.2/addons/gift_certificates.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"X-Crowdin-File: /release-4.11.3/addons/gift_certificates.po\n"
+"PO-Revision-Date: 2020-02-04 07:11\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -221,8 +219,12 @@ msgid "Amount should not be higher than [max] and less than [min]"
 msgstr "Množství by nemělo být vyšší než [max] a menší než [min]"
 
 msgctxt "Languages::privileges.manage_gift_certificates"
-msgid "Manage gift certificate system"
-msgstr "Spravovat systém dárkových poukázek"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.gift_certificates"
+msgid "Gift certificates"
+msgstr ""
 
 msgctxt "Languages::change_gift_certificate_status"
 msgid "Change gift certificate status to"
@@ -278,5 +280,13 @@ msgstr ""
 
 msgctxt "Languages::gift_certificates.certificate_purchase_form"
 msgid "Gift certificate purchase form"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.status_changed.name"
+msgid "Gift certificate status changed to [status]"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
+msgid "Gift certificate updated"
 msgstr ""
 

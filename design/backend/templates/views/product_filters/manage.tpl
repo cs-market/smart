@@ -28,7 +28,7 @@ function fn_check_product_filter_type(value, tab_id, id)
 
 <div class="items-container{if ""|fn_check_form_permissions} cm-hide-inputs{else} cm-sortable{/if}" data-ca-sortable-table="product_filters" data-ca-sortable-id-name="filter_id" id="manage_filters_list">
     <div class="table-wrapper">
-        <table width="100%" class="table table-middle table-objects table-striped">
+        <table width="100%" class="table table-middle table--relative table-objects table-striped">
         <tbody>
 
         {foreach from=$filters item="filter"}

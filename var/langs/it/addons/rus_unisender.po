@@ -128,7 +128,15 @@ msgctxt "SettingsOptions::rus_unisender::send_sms_user"
 msgid "Notify the customer about the order status"
 msgstr "Notify the customer about the order status"
 
+msgctxt "SettingsOptions::rus_unisender::send_sms_user_shipment"
+msgid "Notify the customer about the shipment status"
+msgstr "Notify the customer about the shipment status"
+
 msgctxt "SettingsOptions::rus_unisender::sender"
+msgid "Sender's name"
+msgstr "Sender's name"
+
+msgctxt "SettingsOptions::rus_unisender::sender_shipment"
 msgid "Sender's name"
 msgstr "Sender's name"
 
@@ -136,13 +144,25 @@ msgctxt "SettingsTooltips::rus_unisender::sender"
 msgid "Maximum name length is 11 characters"
 msgstr "Maximum name length is 11 characters"
 
+msgctxt "SettingsTooltips::rus_unisender::sender_shipment"
+msgid "Maximum name length is 11 characters"
+msgstr "Maximum name length is 11 characters"
+
 msgctxt "SettingsOptions::rus_unisender::send_sms_user_text"
+msgid "SMS body"
+msgstr "SMS body"
+
+msgctxt "SettingsOptions::rus_unisender::send_sms_user_text_shipment"
 msgid "SMS body"
 msgstr "SMS body"
 
 msgctxt "SettingsTooltips::rus_unisender::send_sms_user_text"
 msgid "User's message body: №[order_id] - order ID, [status] - order status"
 msgstr "User's message body: №[order_id] - order ID, [status] - order status"
+
+msgctxt "SettingsTooltips::rus_unisender::send_sms_user_text_shipment"
+msgid "User's message body: №[order_id] - order ID, [status] - shipment status"
+msgstr "User's message body: №[order_id] - order ID, [status] - shipment status"
 
 msgctxt "SettingsOptions::rus_unisender::admin_settings"
 msgid "Settings admin"
@@ -185,13 +205,21 @@ msgid "When these order statuses are changed, the user will be notified"
 msgstr "When these order statuses are changed, the user will be notified"
 
 msgctxt "Languages::privileges.manage_unisender"
-msgid "Manage unisender"
-msgstr "Manage unisender"
+msgid "Can manage"
+msgstr "Can manage"
 
 msgctxt "Languages::privileges.send_sms_unisender"
-msgid "Allow sending SMS (Unisender)"
-msgstr "Allow sending SMS (Unisender)"
+msgid "Allow sending SMS"
+msgstr "Allow sending SMS"
+
+msgctxt "Languages::privilege_groups.unisender"
+msgid "Unisender"
+msgstr "Unisender"
 
 msgctxt "Languages::privileges.view_unisender"
-msgid "View unisender"
-msgstr "View unisender"
+msgid "Can view"
+msgstr "Can view"
+
+msgctxt "Languages::addons.rus_unisender.errors_logging"
+msgid "Unisender: api/[api_method]: Error was returned from service: [error]."
+msgstr "Unisender: api/[api_method]: Error was returned from service: [error]."

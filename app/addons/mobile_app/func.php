@@ -12,6 +12,9 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Imagine\Image\Box;
+use Imagine\Image\Palette\RGB;
+use Imagine\Image\Point;
 use Tygh\BlockManager\Exim;
 use Tygh\BlockManager\Layout;
 use Tygh\Exceptions\DeveloperException;
@@ -21,9 +24,6 @@ use Tygh\Less;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Storage;
-use Imagine\Image\Point;
-use Imagine\Image\Box;
-use Imagine\Image\Palette\RGB;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -38,7 +38,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 function fn_mobile_app_update_settings($setting_id, array $settings)
 {
     $setting_id = (int) $setting_id;
-
+    
     // Get addon settings before its updated
     $current_colors = fn_mobile_app_get_mobile_app_settings();
     $current_colors = $current_colors['app_appearance']['colors'];
@@ -93,7 +93,35 @@ function fn_mobile_app_extract_settings_from_options(array $options)
         $settings['app_settings']['utility']['pushNotifications'] = true;
     }
 
+    $settings['app_settings']['apple_pay'] = fn_mobile_app_extract_apple_pay_settings($settings);
+
     return array($setting_id, $settings);
+}
+
+/**
+ * Extracts apple pay settings
+ *
+ * @param array $settings Settings
+ *
+ * @return array
+ */
+function fn_mobile_app_extract_apple_pay_settings(array $settings)
+{
+    $apple_pay_settings = isset($settings['app_settings']['apple_pay']) ? $settings['app_settings']['apple_pay'] : [];
+
+    $enable_apple_pay = false;
+    if (isset($apple_pay_settings['applePay']) && $apple_pay_settings['applePay'] === 'on') {
+        $enable_apple_pay = true;
+    }
+    $apple_pay_settings['applePay'] = $enable_apple_pay;
+
+    $apple_pay_supported_networks = [];
+    if (isset($apple_pay_settings['applePaySupportedNetworks'])) {
+        $apple_pay_supported_networks = (array) $apple_pay_settings['applePaySupportedNetworks'];
+    }
+    $apple_pay_settings['applePaySupportedNetworks'] = $apple_pay_supported_networks;
+
+    return $apple_pay_settings;
 }
 
 /**
@@ -115,50 +143,21 @@ function fn_mobile_app_get_mobile_app_settings()
     $settings['app_settings']['utility']['siteUrl'] = $storefront_url;
     $settings['app_settings']['utility']['baseUrl'] = $api_url;
 
-    $layouts_id = db_get_field('SELECT layout_id FROM ?:bm_layouts WHERE name = ?s', 'MobileAppLayout');
+    $theme_name = fn_get_theme_path('[theme]', 'C');
+    $layouts_id = db_get_field('SELECT layout_id FROM ?:bm_layouts WHERE name = ?s AND theme_name = ?s', 'MobileAppLayout', $theme_name);
     $settings['app_settings']['utility']['layoutId'] = $layouts_id;
 
-    $settings['app_settings']['utility']['version'] = fn_allowed_for('MULTIVENDOR') ? 'MVE' : 'ULT';
-    $settings['app_settings']['utility']['languages'] = fn_mobile_app_get_application_translations();
+    $settings['app_settings']['utility']['version'] = fn_allowed_for('ULTIMATE') ? 'ULT' : 'MVE';
+
+    $settings['app_settings']['apple_pay']['applePayMerchantIdentifier'] = !empty($settings['app_settings']['apple_pay']['applePayMerchantIdentifier'])
+        ? $settings['app_settings']['apple_pay']['applePayMerchantIdentifier']
+        : APPLE_PAY_DEFAULT_MERCHANT_ID;
+
+    $settings['app_settings']['apple_pay']['applePayMerchantName'] = !empty($settings['app_settings']['apple_pay']['applePayMerchantName'])
+        ? $settings['app_settings']['apple_pay']['applePayMerchantName']
+        : APPLE_PAY_DEFAULT_MERCHANT_NAME;
 
     return $settings;
-}
-
-/**
- * Fetches translations that are used in application for all available store front languages
- *
- * @return array
- */
-function fn_mobile_app_get_application_translations()
-{
-    $languages = array();
-    $original_values = null;
-    $avail_languages = Languages::getAvailable('C', true);
-
-    foreach ($avail_languages as $lang) {
-        $code = $lang['lang_code'];
-        $prefix = 'mobile_app.mobile';
-        $translations = Values::getLangVarsByPrefix($prefix, $code);
-
-        if (is_null($original_values) && $translations) {
-            $original_values = db_get_hash_array(
-                'SELECT msgctxt, msgid FROM ?:original_values WHERE msgctxt LIKE ?l',
-                'msgctxt',
-                implode('', array('%', $prefix, '%'))
-            );
-        }
-
-        foreach ($translations as $msgctxt => $translation) {
-            $full_msgctxt = 'Languages::' . $msgctxt;
-
-            if (isset($original_values[$full_msgctxt]['msgid'])) {
-                $msgid = trim($original_values[$full_msgctxt]['msgid'], '"');
-                $languages[$code][$msgid] = $translation;
-            }
-        }
-    }
-
-    return $languages;
 }
 
 /**
@@ -217,35 +216,32 @@ function fn_mobile_app_compile_app_styles(array $styles)
 function fn_mobile_app_install_layout()
 {
     if (fn_allowed_for('MULTIVENDOR')) {
-        $companies_list = array(0);
         $layout_path = Registry::get('config.dir.addons') . 'mobile_app/resources/layouts_mve.xml';
     } else {
-        $companies_list = fn_get_all_companies_ids(true);
         $layout_path = Registry::get('config.dir.addons') . 'mobile_app/resources/layouts.xml';
     }
 
-    foreach ($companies_list as $company_id) {
-        $theme_name = Settings::instance($company_id)->getValue('theme_name', '', $company_id);
-        $company_condition = '';
+    /** @var \Tygh\Storefront\Repository $storefront_repository */
+    $storefront_repository = Tygh::$app['storefront.repository'];
+    list($storefronts) = $storefront_repository->find();
 
-        if (fn_allowed_for('ULTIMATE')) {
-            $company_condition = db_quote(' AND company_id = ?s', $company_id);
-        }
-
-        $company_condition = fn_get_company_condition('company_id', true, $company_id);
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    foreach ($storefronts as $storefront) {
+        $theme_name = $storefront->theme_name;
+        $storefront_id = $storefront->storefront_id;
 
         $layout_exists = db_get_field(
-            'SELECT layout_id FROM ?:bm_layouts WHERE name = ?s AND theme_name = ?s ?p',
+            'SELECT layout_id FROM ?:bm_layouts WHERE name = ?s AND theme_name = ?s AND storefront_id = ?i',
             'MobileAppLayout',
             $theme_name,
-            $company_condition
+            $storefront_id
         );
 
         if ($layout_exists) {
             continue;
         }
 
-        $layout_id = Exim::instance($company_id, 0, $theme_name)->importFromFile($layout_path, array(
+        $layout_id = Exim::instance(0, 0, $theme_name, $storefront_id)->importFromFile($layout_path, array(
             'override_by_dispatch' => true,
             'clean_up' => true,
             'import_style' => 'create',
@@ -257,7 +253,11 @@ function fn_mobile_app_install_layout()
 
         $layout_data = Layout::instance()->get($layout_id);
 
-        fn_create_theme_logos_by_layout_id($theme_name, $layout_id, $company_id, false, $layout_data['style_id']);
+        $company_ids = $storefront->getCompanyIds();
+
+        foreach ($company_ids as $company_id) {
+            fn_create_theme_logos_by_layout_id($theme_name, $layout_id, $company_id, false, $layout_data['style_id']);
+        }
     }
 }
 
@@ -584,18 +584,6 @@ function fn_mobile_app_resize_ios_icons(array $image_types_schema, array $image_
 }
 
 /**
- * Removes mobile app layouts upon add-on removal.
- */
-function fn_mobile_app_uninstall_layout()
-{
-    $layouts_list = db_get_fields('SELECT layout_id FROM ?:bm_layouts WHERE name = ?s', 'MobileAppLayout');
-
-    foreach ($layouts_list as $layout_id) {
-        Layout::instance()->delete($layout_id);
-    }
-}
-
-/**
  * Creates or updates a notification subscription.
  *
  * @param int    $user_id   User identifier
@@ -758,4 +746,46 @@ function fn_mobile_app_get_archive_full_path()
     }
 
     return $archive_path;
+}
+
+/**
+ * Generates bundle ID based on provided URL
+ *
+ * @param string $url URL
+ *
+ * @return string
+ */
+function fn_mobile_app_generate_bundle_id($url)
+{
+    $parsed = parse_url($url);
+    $dashless_host = str_replace('-', '', $parsed['host']);
+    $bundle_id = implode('.', array_reverse(explode('.', $dashless_host)));
+
+    return $bundle_id . '.app';
+}
+
+/**
+ * Returns Apple Pay supported networks
+ *
+ * @return array
+ */
+function fn_mobile_app_get_apple_pay_supported_networks()
+{
+    return [
+        'amex'            => 'American Express',
+        'cartesBancaires' => 'Cartes Bancaires',
+        'chinaUnionPay'   => 'China UnionPay',
+        'discover'        => 'Discover',
+        'eftpos'          => 'EFTPOS',
+        'electron'        => 'Visa Electron',
+        'elo'             => 'EloPar',
+        'interac'         => 'Interac',
+        'jcb'             => 'JCB',
+        'mada'            => 'Mada',
+        'maestro'         => 'Maestro',
+        'masterCard'      => 'MasterCard',
+        'privateLabel'    => 'Private Label',
+        'visa'            => 'Visa',
+        'vPay'            => 'V Pay',
+    ];
 }

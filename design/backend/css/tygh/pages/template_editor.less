@@ -6,6 +6,19 @@
 .te-permissions .checkbox-list label {
     min-width: 126px;
 }
+
+.sidebar-row .te-file-tree {
+    min-height: ~"calc(100vh - 199px)";
+    max-height: ~"calc(100vh - 199px)";
+    top: 0px !important;
+}
+
+.sidebar-open .sidebar-row .te-file-tree {
+    min-height: ~"calc(100vh - 90px)";
+    max-height: ~"calc(100vh - 90px)";
+    top: 0px !important;
+}
+
 .te-content {
     display: block;
     position: absolute;
@@ -16,13 +29,14 @@
     bottom: 0;
     right: 0;
     left: 0;
-    #template_text {
+    
+    .te-ace-editor {
         position: absolute;
         top: 0;
         right: 0;
         bottom: 0;
         left: 0;
-        overflow-y: scroll;
+
         .ace_gutter {
             border-right: 1px solid #f0f0f0;
             background: transparent;

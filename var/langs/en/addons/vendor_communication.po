@@ -5,32 +5,16 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: en_US"
 
 msgctxt "Addons::name::vendor_communication"
-msgid "Customer-to-Vendor Communication"
-msgstr "Customer-to-Vendor Communication"
+msgid "Ask seller a question"
+msgstr "Ask seller a question"
 
 msgctxt "Addons::description::vendor_communication"
-msgid "Allows customers to communicate with vendors directly via the store's interface."
-msgstr "Allows customers to communicate with vendors directly via the store's interface."
+msgid "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
+msgstr "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
 
 msgctxt "SettingsSections::vendor_communication::general"
 msgid "General"
 msgstr "General"
-
-msgctxt "SettingsSections::vendor_communication::notifications"
-msgid "Notifications"
-msgstr "Notifications"
-
-msgctxt "SettingsOptions::vendor_communication::notify_admin"
-msgid "Notify admin"
-msgstr "Notify admin"
-
-msgctxt "SettingsOptions::vendor_communication::notify_vendor"
-msgid "Notify vendor"
-msgstr "Notify vendor"
-
-msgctxt "SettingsOptions::vendor_communication::notify_customer"
-msgid "Notify customer"
-msgstr "Notify customer"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_product"
 msgid "Contact button on product pages"
@@ -40,25 +24,17 @@ msgctxt "SettingsOptions::vendor_communication::show_on_vendor"
 msgid "Contact button in vendor microstore"
 msgstr "Contact button in vendor microstore"
 
-msgctxt "SettingsTooltips::vendor_communication::notify_admin"
-msgid "Send an email to root administrator about every newly-posted message."
-msgstr "Send an email to root administrator about every newly-posted message."
-
-msgctxt "SettingsTooltips::vendor_communication::notify_vendor"
-msgid "Send emails to vendor's contact email address about newly-posted messages."
-msgstr "Send emails to vendor's contact email address about newly-posted messages."
-
-msgctxt "SettingsTooltips::vendor_communication::notify_customer"
-msgid "Send emails to customers about newly-posted messages in their threads."
-msgstr "Send emails to customers about newly-posted messages in their threads."
+msgctxt "SettingsOptions::vendor_communication::show_on_messages"
+msgid "Contact button at \"Messages\" menu"
+msgstr "Contact button at \"Messages\" menu"
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_product"
-msgid "Show the \"Contact vendor\" button on product pages."
-msgstr "Show the \"Contact vendor\" button on product pages."
+msgid "Show the \"Ask a question\" button on product pages."
+msgstr "Show the \"Ask a question\" button on product pages."
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_vendor"
-msgid "Show the \"Contact vendor\" button in vendors' microstores."
-msgstr "Show the \"Contact vendor\" button in vendors' microstores."
+msgid "Show the \"Ask a question\" button in vendors' microstores."
+msgstr "Show the \"Ask a question\" button in vendors' microstores."
 
 msgctxt "Languages::vendor_communication.messages"
 msgid "Messages"
@@ -67,6 +43,14 @@ msgstr "Messages"
 msgctxt "Languages::vendor_communication.message_center"
 msgid "Message center"
 msgstr "Message center"
+
+msgctxt "Languages::vendor_communication.message_center_name"
+msgid "Message center"
+msgstr "Message center"
+
+msgctxt "Languages::vendor_communication.message_center_name_menu_description"
+msgid "Messages from customers"
+msgstr "Messages from customers"
 
 msgctxt "Languages::vendor_communication.message_center_menu_description"
 msgid "Customer-to-vendor messages"
@@ -88,6 +72,10 @@ msgctxt "Languages::vendor_communication.contact_vendor"
 msgid "Contact vendor"
 msgstr "Contact vendor"
 
+msgctxt "Languages::vendor_communication.ask_a_question"
+msgid "Ask a question"
+msgstr "Ask a question"
+
 msgctxt "Languages::vendor_communication.contact_vendor_name"
 msgid "Contact [vendor_name]"
 msgstr "Contact [vendor_name]"
@@ -100,6 +88,10 @@ msgctxt "Languages::vendor_communication.new_thread_created"
 msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>The vendor's reply will be sent to the email address of your account. To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
 msgstr "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>The vendor's reply will be sent to the email address of your account. To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
 
+msgctxt "Languages::vendor_communication.message_sent"
+msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>We'll notify you about a reply. To view your message history, please <a href=\"[thread_url]\" target=\"_blank\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
+msgstr "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>We'll notify you about a reply. To view your message history, please <a href=\"[thread_url]\" target=\"_blank\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
+
 msgctxt "Languages::vendor_communication.cannot_update_thread"
 msgid "Cannot update thread"
 msgstr "Cannot update thread"
@@ -109,12 +101,12 @@ msgid "Cannot create thread"
 msgstr "Cannot create thread"
 
 msgctxt "Languages::email_template.vendor_communication.notify_admin"
-msgid "Customer-to-Vendor Communication: Admin Notification"
-msgstr "Customer-to-Vendor Communication: Admin Notification"
+msgid "Ask seller a question: Admin Notification"
+msgstr "Ask seller a question: Admin Notification"
 
 msgctxt "Languages::email_template.vendor_communication.notify_customer"
-msgid "Customer-to-Vendor Communication: Customer Notification"
-msgstr "Customer-to-Vendor Communication: Customer Notification"
+msgid "Ask seller a question: Customer Notification"
+msgstr "Ask seller a question: Customer Notification"
 
 msgctxt "Languages::vendor_communication.you_have_new_message"
 msgid "You have a new <a href=\"[thread_url]\">message</a> from [message_from]."
@@ -192,3 +184,42 @@ msgctxt "Languages::vendor_communication.please_log_in_to_contact_vendor"
 msgid "Please sign in to contact the vendor"
 msgstr "Please sign in to contact the vendor"
 
+msgctxt "Languages::privileges.manage_vendor_communication"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privileges.view_vendor_communication"
+msgid "Can view"
+msgstr "Can view"
+
+msgctxt "Languages::privilege_groups.vendor_communication"
+msgid "Message center"
+msgstr "Message center"
+
+msgctxt "Languages::vendor_communication.your_message_to_vendor_name"
+msgid "Your message to [vendor_name]"
+msgstr "Your message to [vendor_name]"
+
+msgctxt "Languages::vendor_communication.please_log_in_to_be_notified"
+msgid "Please sign in so that we can notify you about a reply"
+msgstr "Please sign in so that we can notify you about a reply"
+
+msgctxt "Languages::vendor_communication"
+msgid "Ask seller a question"
+msgstr "Ask seller a question"
+
+msgctxt "Languages::vendor_communication.event.message_received.name"
+msgid "New message received"
+msgstr "New message received"
+
+msgctxt "Languages::internal_template.vendor_communication_message_received"
+msgid "New message received"
+msgstr "New message received"
+
+msgctxt "Languages::vendor_communication.new_message.title"
+msgid "[company_name] has a new message from [customer]"
+msgstr "[company_name] has a new message from [customer]"
+
+msgctxt "Languages::vendor_communication.new_message.message"
+msgid "Click this notification to see the message"
+msgstr "Click this notification to see the message"

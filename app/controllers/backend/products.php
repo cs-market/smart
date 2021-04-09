@@ -12,10 +12,12 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\BlockManager\SchemesManager;
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Enum\ProductFeatures;
 use Tygh\Enum\ProductTracking;
 use Tygh\Registry;
-use Tygh\BlockManager\SchemesManager;
+use Tygh\Tools\Url;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -51,15 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($_REQUEST['global_option']['link'] == 'N') {
             fn_clone_product_options(0, $_REQUEST['product_id'], $_REQUEST['global_option']['id']);
         } else {
-            db_query(
-                'REPLACE INTO ?:product_global_option_links (option_id, product_id) VALUES (?i, ?i)',
-                $_REQUEST['global_option']['id'],
-                $_REQUEST['product_id']
-            );
-
-            if (fn_allowed_for('ULTIMATE')) {
-                fn_ult_share_product_option($_REQUEST['global_option']['id'], $_REQUEST['product_id']);
-            }
+            fn_add_global_option_link($_REQUEST['product_id'], $_REQUEST['global_option']['id']);
         }
 
         fn_update_product(array('updated_timestamp' => TIME), $_REQUEST['product_id']);
@@ -71,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
      * Create/update product
      */
     if ($mode == 'update') {
+        $product_id = null;
         if (!empty($_REQUEST['product_data']['product'])) {
             $product_data = $_REQUEST['product_data'];
 
@@ -78,10 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $product_data['category_ids'] = explode(',', $product_data['category_ids']);
             }
 
-            if (!empty($product_data['removed_image_pair_ids'])) {
-                fn_delete_image_pairs($_REQUEST['product_id'], 'product', '', $product_data['removed_image_pair_ids']);
-            }
+            if (!empty($product_data['linked_option_ids'])) {
+                foreach ($product_data['linked_option_ids'] as $linked_option_id) {
+                    fn_add_global_option_link($_REQUEST['product_id'], $linked_option_id);
+                }
 
+            }
             $product_id = fn_update_product($product_data, $_REQUEST['product_id'], DESCR_SL);
 
             if ($product_id === false) {
@@ -91,6 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 return array(CONTROLLER_STATUS_REDIRECT, !empty($_REQUEST['product_id']) ? 'products.update?product_id=' . $_REQUEST['product_id'] : 'products.add');
             }
         }
+
+        Tygh::$app['view']->assign('product_id', $product_id);
 
         if (!empty($_REQUEST['product_id'])) {
             if (!empty($_REQUEST['add_users'])) {
@@ -167,22 +166,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Update images
             fn_attach_image_pairs('product_main', 'product', 0, DESCR_SL);
 
-            foreach ($_REQUEST['products_data'] as $k => $v) {
-                if (!empty($v['product'])) { // Checking for required fields for new product
+            foreach ($_REQUEST['products_data'] as $product_id => $product) {
+                if (!empty($product['product'])) { // Checking for required fields for new product
 
                     if (fn_allowed_for('ULTIMATE,MULTIVENDOR') && Registry::get('runtime.company_id')) {
-                        unset($v['company_id']);
+                        unset($product['company_id']);
                     }
 
-                    if (!empty($v['category_ids']) && !is_array($v['category_ids'])) {
-                        $v['category_ids'] = explode(',', $v['category_ids']);
+                    if (!empty($product['category_ids']) && !is_array($product['category_ids'])) {
+                        $product['category_ids'] = explode(',', $product['category_ids']);
                     }
 
-                    fn_update_product($v, $k, DESCR_SL);
+                    fn_update_product($product, $product_id, DESCR_SL);
 
                     // Updating products position in category
-                    if (isset($v['position']) && !empty($_REQUEST['category_id'])) {
-                        db_query("UPDATE ?:products_categories SET position = ?i WHERE category_id = ?i AND product_id = ?i", $v['position'], $_REQUEST['category_id'], $k);
+                    if (isset($product['position']) && !empty($_REQUEST['category_id'])) {
+                        fn_update_product_position_in_category($product_id, $_REQUEST['category_id'], $product['position']);
                     }
                 }
             }
@@ -267,6 +266,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     //
+    // Processing new prices from bulk editor
+    //
+    if ($mode == 'm_update_prices') {
+
+        if (!empty($_REQUEST['new_values'])) {
+            foreach ($_REQUEST['new_values'] as $product_data) {
+                if (!empty($product_data['values'])) {
+                    fn_update_product(
+                        $product_data['values'],
+                        $product_data['id']
+                    );
+                }
+            }
+        }
+
+        return array(CONTROLLER_STATUS_REDIRECT, $_REQUEST['redirect_url']);
+    }
+
+    //
+    // Processing hiding or activating or disabling of multiple product elements
+    //
+    if ($mode == 'm_hide' || $mode == 'm_activate' || $mode == 'm_disable') {
+        if (isset($_REQUEST['product_ids'])) {
+            $status = 'H';
+            $status = ($mode == 'm_activate')  ? 'A' : $status;
+            $status = ($mode == 'm_disable')   ? 'D' : $status;
+
+            foreach ($_REQUEST['product_ids'] as $v) {
+                fn_tools_update_status(array(
+                    'table' => 'products',
+                    'status' => $status,
+                    'id_name' => 'product_id',
+                    'id' => $v,
+                    'show_error_notice' => false
+                ));
+            }
+        }
+
+        unset(Tygh::$app['session']['product_ids']);
+        $suffix = ".manage";
+    }
+
+    //
     // Processing clonning of multiple product elements
     //
     if ($mode == 'm_clone') {
@@ -299,6 +341,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $suffix = ".m_update";
         } else {
+            fn_set_notification('W', __('warning'), __('bulk_edit.some_products_were_omitted_other_storefront'));
             $suffix = ".manage";
         }
     }
@@ -330,21 +373,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix = ".update?product_id=$_REQUEST[product_id]";
     }
 
-    if ($mode == 'export_range') {
+    if ($mode === 'export_range') {
         if (!empty($_REQUEST['product_ids'])) {
+            $product_ids = (array) $_REQUEST['product_ids'];
+        } elseif (!empty($_REQUEST['category_ids'])) {
+            list($products, ) = fn_get_products(['cid' => (array) $_REQUEST['category_ids'], 'load_products_extra_data' => false]);
+            $product_ids = array_keys($products);
+
+            if (empty($product_ids)) {
+                fn_set_notification(NotificationSeverity::ERROR, __('error'), __('text_no_products_found'));
+                return [CONTROLLER_STATUS_OK, 'categories.manage'];
+            }
+        } else {
+            $product_ids = null;
+        }
+
+        if (!empty($product_ids)) {
             if (empty(Tygh::$app['session']['export_ranges'])) {
-                Tygh::$app['session']['export_ranges'] = array();
+                Tygh::$app['session']['export_ranges'] = [];
             }
 
-            if (empty(Tygh::$app['session']['export_ranges']['products'])) {
-                Tygh::$app['session']['export_ranges']['products'] = array('pattern_id' => 'products');
+            if (empty(Tygh::$app['session']['export_ranges']['products']['pattern_id'])) {
+                Tygh::$app['session']['export_ranges']['products'] = ['pattern_id' => 'products'];
             }
 
-            Tygh::$app['session']['export_ranges']['products']['data'] = array('product_id' => $_REQUEST['product_ids']);
+            Tygh::$app['session']['export_ranges']['products']['data'] = ['product_id' => $product_ids];
 
-            unset($_REQUEST['redirect_url']);
+            unset($_REQUEST['redirect_url'], Tygh::$app['session']['export_ranges']['products']['data_provider']);
 
-            return array(CONTROLLER_STATUS_REDIRECT, 'exim.export?section=products&pattern_id=' . Tygh::$app['session']['export_ranges']['products']['pattern_id']);
+            return [
+                CONTROLLER_STATUS_REDIRECT,
+                'exim.export?section=products&pattern_id=' . Tygh::$app['session']['export_ranges']['products']['pattern_id'],
+            ];
         }
     }
 
@@ -430,8 +490,59 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         return array(CONTROLLER_STATUS_OK, fn_url('products.update?product_id=' . $_REQUEST['product_id'] . '&selected_section=files'));
     }
 
+    if ($mode == 'm_update_categories') {
+        $product_ids = isset($_REQUEST['products_ids']) ? (array) $_REQUEST['products_ids'] : [];
+        $categories_map = isset($_REQUEST['categories_map']) ? (array) $_REQUEST['categories_map'] : [];
 
-    return array(CONTROLLER_STATUS_OK, 'products' . $suffix);
+        if (empty($product_ids)) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        list($products) = fn_get_products([
+            'pid'     => $product_ids,
+            'sort_by' => null,
+        ]);
+
+        foreach ($products as $product) {
+            $category_ids = $product['category_ids'];
+
+            if (!empty($categories_map['A'])) {
+                $category_ids = array_merge($category_ids, $categories_map['A']);
+                $category_ids = array_unique($category_ids);
+            }
+
+            if (!empty($categories_map['D'])) {
+                $category_ids = array_diff($category_ids, $categories_map['D']);
+            }
+
+            if (empty($category_ids)) {
+                fn_set_notification('W', __('warning'), __('bulk_edit.some_products_were_omitted'));
+                continue;
+            }
+
+            if ($category_ids == $product['category_ids']) {
+                continue;
+            }
+
+            $product['category_ids'] = $category_ids;
+            fn_update_product_categories($product['product_id'], $product);
+        }
+    }
+
+    if ($mode === 'manage') {
+        $params = [];
+        if (!empty($_REQUEST['company_ids'])) {
+            $params['company_ids'] = (array) $_REQUEST['company_ids'];
+        }
+
+        if (!empty($params)) {
+            unset($_REQUEST['redirect_url'], $_REQUEST['page']);
+
+            return [CONTROLLER_STATUS_REDIRECT, Url::buildUrn(['products', 'manage'], $params)];
+        }
+    }
+
+    return [CONTROLLER_STATUS_OK, 'products' . $suffix];
 }
 
 //
@@ -478,10 +589,15 @@ if ($mode == 'manage' || $mode == 'p_subscr') {
     Tygh::$app['view']->assign('selected_fields', $selected_fields);
     if (!fn_allowed_for('ULTIMATE:FREE')) {
         $filter_params = array(
-            'get_variants' => true,
+            'get_product_features' => true,
             'short' => true,
             'feature_type' => str_split(ProductFeatures::getAllTypes())
         );
+
+        if (!empty($_REQUEST['filter_variants'])) {
+            $filter_params['variants_only'] = $_REQUEST['filter_variants'];
+        }
+
         list($filters) = fn_get_product_filters($filter_params);
         Tygh::$app['view']->assign('filter_items', $filters);
         unset($filters);
@@ -538,6 +654,10 @@ if ($mode == 'add') {
 
     $product_data = (array) fn_restore_post_data('product_data');
 
+    if (isset($_REQUEST['product_data']['company_id']) && !Registry::get('runtime.company_id')) {
+        $product_data['company_id'] = $_REQUEST['product_data']['company_id'];
+    }
+
     if (isset($_REQUEST['category_id'])) {
         $product_data['category_ids'] = (array) $_REQUEST['category_id'];
     }
@@ -547,6 +667,12 @@ if ($mode == 'add') {
         && is_array($product_data['category_ids'])
     ) {
         $product_data['main_category'] = reset($product_data['category_ids']);
+    }
+
+    if (fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id')) {
+        Tygh::$app['view']->assign('disable_edit_popularity', true);
+    } else {
+        Tygh::$app['view']->assign('disable_edit_popularity', false);
     }
 
     Tygh::$app['view']->assign('product_data', $product_data);
@@ -563,10 +689,7 @@ if ($mode == 'add') {
     $selected_section = (empty($_REQUEST['selected_section']) ? 'detailed' : $_REQUEST['selected_section']);
 
     // Get current product data
-    $skip_company_condition = false;
-    if (fn_allowed_for('ULTIMATE') && fn_ult_is_shared_product($_REQUEST['product_id']) == 'Y') {
-        $skip_company_condition = true;
-    }
+    $skip_company_condition = !fn_is_product_company_condition_required($_REQUEST['product_id']);
 
     $product_data = fn_get_product_data($_REQUEST['product_id'], $auth, DESCR_SL, '', true, true, true, true, false, false, $skip_company_condition);
 
@@ -586,32 +709,14 @@ if ($mode == 'add') {
         DESCR_SL
     );
 
-    Tygh::$app['view']->assign(array(
+    $taxes = fn_get_taxes();
+
+    Tygh::$app['view']->assign([
         'product_features' => $product_features,
         'features_search'  => $features_search,
-    ));
-
-    $taxes = fn_get_taxes();
-    arsort($product_data['category_ids']);
-
-    if (fn_allowed_for('MULTIVENDOR') && defined('AJAX_REQUEST')) {
-        // reload form (refresh categories list if vendor was changed)
-        $company_id = isset($_REQUEST['product_data']['company_id']) ? $_REQUEST['product_data']['company_id'] : 0;
-        $company_data = fn_get_company_data($company_id);
-        if (!empty($company_data['categories'])) {
-            $cat_ids = explode(',', $company_data['categories']);
-            //Assign available category ids to be displayed after admin changes product owner.
-            $product_data['category_ids'] = array_intersect($product_data['category_ids'], $cat_ids);
-        }
-        //Assign received company_id to product data for the correct company categories to be displayed in the picker.
-        $product_data['company_id'] = $company_id;
-        Tygh::$app['view']->assign('product_data', $product_data);
-        Tygh::$app['view']->display('views/products/update.tpl');
-        exit;
-    }
-
-    Tygh::$app['view']->assign('product_data', $product_data);
-    Tygh::$app['view']->assign('taxes', $taxes);
+        'product_data'     => $product_data,
+        'taxes'            => $taxes,
+    ]);
 
     $product_options = fn_get_product_options($_REQUEST['product_id'], DESCR_SL);
 
@@ -625,9 +730,12 @@ if ($mode == 'add') {
         }
         Tygh::$app['view']->assign('has_inventory', $has_inventory);
     }
-    Tygh::$app['view']->assign('product_options', $product_options);
+
     list($global_options) = fn_get_product_global_options();
-    Tygh::$app['view']->assign('global_options', $global_options);
+    Tygh::$app['view']->assign([
+        'product_options' => $product_options,
+        'global_options'  => $global_options,
+    ]);
 
     // If the product is electronnicaly distributed, get the assigned files
     list($product_files) = fn_get_product_files(array('product_id' => $_REQUEST['product_id']));
@@ -643,12 +751,32 @@ if ($mode == 'add') {
     ) {
         $preview_url = null;
     } else {
-        $preview_url = fn_get_preview_url(
-            "products.view?product_id={$_REQUEST['product_id']}",
-            $product_data,
-            $auth['user_id']
-        );
+        if (fn_allowed_for('MULTIVENDOR')) {
+            /** @var \Tygh\Storefront\Repository $storefront_repository */
+            $storefront_repository = Tygh::$app['storefront.repository'];
+            $storefront = $storefront_repository->findByCompanyId($product_data['company_id']);
+            $storefront = empty($storefront) ? $storefront_repository->findDefault() : $storefront;
+
+            $preview_url = fn_get_preview_url(
+                "products.view?product_id={$_REQUEST['product_id']}&storefront_id={$storefront->storefront_id}",
+                $product_data,
+                $auth['user_id']
+            );
+        } else {
+            $preview_url = fn_get_preview_url(
+                "products.view?product_id={$_REQUEST['product_id']}",
+                $product_data,
+                $auth['user_id']
+            );
+        }
     }
+
+    if (fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id')) {
+        Tygh::$app['view']->assign('disable_edit_popularity', true);
+    } else {
+        Tygh::$app['view']->assign('disable_edit_popularity', false);
+    }
+
     Tygh::$app['view']->assign('view_uri', $preview_url);
 
     Tygh::$app['view']->assign('product_file_folders', $product_file_folders);
@@ -855,7 +983,6 @@ if ($mode == 'add') {
     }
 
     $data = array_keys($selected_fields['data']);
-    $get_main_pair = false;
     $get_taxes = false;
     $get_features = false;
 
@@ -873,29 +1000,28 @@ if ($mode == 'add') {
         ));
     }
 
-    $product_features = array();
-    $features_search = array();
-    foreach ($product_ids as $value) {
-        $products_data[$value] = fn_get_product_data($value, $auth, DESCR_SL, '?:products.*, ?:product_descriptions.*', false, $get_main_pair, $get_taxes, false, false, false, true);
-        $products_data[$value]['price'] = fn_format_price($products_data[$value]['price'], CART_PRIMARY_CURRENCY, 2, false);
-        $products_data[$value]['base_price'] = $products_data[$value]['price'];
-        if ($get_features) {
-            list($product_features[$value], $features_search[$value]) = fn_get_paginated_product_features(array('product_id' => $value), $auth, $products_data[$value], DESCR_SL);
-        }
-    }
-
     // Process fields that are not in products or product_descriptions tables
     if (!empty($selected_fields['categories']) && $selected_fields['categories'] == 'Y') {
         $fields2update[] = 'categories';
     }
     if (!empty($selected_fields['main_pair']) && $selected_fields['main_pair'] == 'Y') {
-        $get_main_pair = true;
         $fields2update[] = 'main_pair';
     }
     if (!empty($selected_fields['data']['taxes']) && $selected_fields['data']['taxes'] == 'Y') {
         Tygh::$app['view']->assign('taxes', fn_get_taxes());
         $fields2update[] = 'taxes';
         $get_taxes = true;
+    }
+
+    $product_features = array();
+    $features_search = array();
+    foreach ($product_ids as $value) {
+        $products_data[$value] = fn_get_product_data($value, $auth, DESCR_SL, '?:products.*, ?:product_descriptions.*', false, true, $get_taxes, false, false, false, true);
+        $products_data[$value]['price'] = fn_format_price($products_data[$value]['price'], CART_PRIMARY_CURRENCY, 2, false);
+        $products_data[$value]['base_price'] = $products_data[$value]['price'];
+        if ($get_features) {
+            list($product_features[$value], $features_search[$value]) = fn_get_paginated_product_features(array('product_id' => $value), $auth, $products_data[$value], DESCR_SL);
+        }
     }
 
     Tygh::$app['view']->assign(array(
@@ -1003,6 +1129,10 @@ if ($mode == 'add') {
             );
 
             list($product_files) = fn_get_product_files($params);
+            if (!$product_files) {
+                return [CONTROLLER_STATUS_NO_PAGE];
+            }
+
             $product_file = reset($product_files);
             $product_file['company_id'] = db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $_REQUEST['product_id']);
 
@@ -1026,6 +1156,10 @@ if ($mode == 'add') {
             );
 
             list($product_file_folders) = fn_get_product_file_folders($params);
+            if (!$product_file_folders) {
+                return [CONTROLLER_STATUS_NO_PAGE];
+            }
+
             $product_file_folder = reset($product_file_folders);
             $product_file_folder['company_id'] = db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $_REQUEST['product_id']);
 
@@ -1055,59 +1189,103 @@ if ($mode == 'add') {
         Tygh::$app['view']->display('views/products/components/products_update_features.tpl');
     }
     exit;
-}
+} elseif ($mode == 'get_products_list') {
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
 
-if ($mode == 'get_products_list') {
+    /** @var \Tygh\Ajax $ajax */
+    $ajax = Tygh::$app['ajax'];
+
+    /** @var \Tygh\Tools\Formatter $formatter */
+    $formatter = Tygh::$app['formatter'];
+
     $page_number = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
     $page_size = isset($_REQUEST['page_size']) ? (int) $_REQUEST['page_size'] : 10;
     $lang_code = isset($_REQUEST['lang_code']) ? $_REQUEST['lang_code'] : CART_LANGUAGE;
     $search_query = isset($_REQUEST['q']) ? $_REQUEST['q'] : null;
 
-    $params = array(
-        'area' => 'A',
-        'page' => $page_number,
-        'q' => $search_query,
+    $image_width = Registry::get('settings.Thumbnails.product_admin_mini_icon_width');
+    $image_height = Registry::get('settings.Thumbnails.product_admin_mini_icon_height');
+
+    $image_width = $image_width ?: $image_height;
+    $image_height = $image_height ?: $image_width;
+
+    $params = [
+        'area'           => 'A',
+        'page'           => $page_number,
+        'q'              => $search_query,
         'items_per_page' => $page_size,
-        'pcode_from_q' => 'Y',
-    );
+        'pcode_from_q'   => 'Y',
+    ];
 
     if (isset($_REQUEST['preselected'])) {
-        $params['product_id'] = $_REQUEST['preselected'];
+        $params['pid'] = $_REQUEST['preselected'];
+    }
+
+    if (isset($_REQUEST['ids'])) {
+        $params['pid'] = $_REQUEST['ids'];
+        $params['items_per_page'] = 0;
+        $page_size = 0;
     }
 
     list($products, $params) = fn_get_products($params, $page_size, $lang_code);
-    fn_gather_additional_products_data($products, array('get_icon' => true, 'get_detailed' => true, 'get_options' => false, 'get_discounts' => false));
 
-    $objects = array_values(array_map(function ($products_list) {
-        $image_url = null;
+    if (!empty($params['pid'])) {
+        $products = fn_sort_by_ids($products, $params['pid']);
+    }
 
-        if (isset($products_list['main_pair'])) {
-            $image_data = fn_image_to_display(
-                $products_list['main_pair'],
-                isset($_REQUEST['image_width']) ? (int)$_REQUEST['image_width'] : 50,
-                isset($_REQUEST['image_height']) ? (int)$_REQUEST['image_height'] : 50
-            );
-            if (!empty($image_data['image_path'])) {
-                $image_url = $image_data['image_path'];
-            }
-        }
+    fn_gather_additional_products_data($products, [
+        'get_icon'      => true,
+        'get_detailed'  => true,
+        'get_options'   => false,
+        'get_discounts' => false
+    ]);
 
-        $price = fn_format_price($products_list['price'], CART_PRIMARY_CURRENCY, 2, false);
-
-        Tygh::$app['view']->assign('value', $price);
-        $products_price = Tygh::$app['view']->fetch('common/price.tpl');
-
-        return array(
-            'id' => $products_list['product_id'],
-            'text' => $products_list['product'],
-            'image_url' => $image_url,
-            'price' => $products_price,
-            'code' => __('code') . ': ' . $products_list['product_code'],
-        );
+    $objects = array_values(array_map(function ($product) use ($formatter, $image_width, $image_height) {
+        return [
+            'id'              => $product['product_id'],
+            'text'            => $product['product'],
+            'price'           => $product['price'],
+            'code'            => $product['product_code'],
+            'data'            => [
+                'product_id'      => $product['product_id'],
+                'product'         => $product['product'],
+                'price'           => $product['price'],
+                'price_formatted' => $formatter->asPrice($product['price']),
+                'product_code'    => $product['product_code'],
+                'image_width'     => $image_width,
+                'image_height'    => $image_height,
+                'image'           => empty($product['main_pair']) ? array() : fn_image_to_display($product['main_pair'], $image_width, $image_height),
+                'url'             => fn_url('products.update?product_id=' . $product['product_id'])
+            ]
+        ];
     }, $products));
 
-    Tygh::$app['ajax']->assign('objects', $objects);
-    Tygh::$app['ajax']->assign('total_objects', isset($params['total_items']) ? $params['total_items'] : count($objects));
+    $ajax->assign('objects', $objects);
+    $ajax->assign('total_objects', isset($params['total_items']) ? $params['total_items'] : count($objects));
 
-    exit;
+    Registry::set('runtime.get_products_list.products', $products);
+
+    return [CONTROLLER_STATUS_NO_CONTENT];
+} elseif ($mode === 'export_found') {
+    if (empty(Tygh::$app['session']['export_ranges'])) {
+        Tygh::$app['session']['export_ranges'] = [];
+    }
+
+    if (empty(Tygh::$app['session']['export_ranges']['products']['pattern_id'])) {
+        Tygh::$app['session']['export_ranges']['products'] = ['pattern_id' => 'products'];
+    }
+
+    Tygh::$app['session']['export_ranges']['products']['data_provider'] = [
+        'count_function' => 'fn_exim_get_last_view_products_count',
+        'function'       => 'fn_exim_get_last_view_product_ids_condition',
+    ];
+
+    unset($_REQUEST['redirect_url'], Tygh::$app['session']['export_ranges']['products']['data']);
+
+    return [
+        CONTROLLER_STATUS_OK,
+        'exim.export?section=products&pattern_id=' . Tygh::$app['session']['export_ranges']['products']['pattern_id'],
+    ];
 }

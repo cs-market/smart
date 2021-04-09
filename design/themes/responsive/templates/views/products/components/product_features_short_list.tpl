@@ -4,7 +4,7 @@
         {if $feature.features_hash && $feature.feature_type == "ProductFeatures::EXTENDED"|enum}
             <a href="{"categories.view?category_id=`$product.main_category`&features_hash=`$feature.features_hash`"|fn_url}">
         {/if}
-        {if $feature.prefix}{$feature.prefix}{/if}
+        {if $feature.prefix}<span class="ty-features-list__item-prefix">{$feature.prefix}</span>{/if}
         {if $feature.feature_type == "ProductFeatures::DATE"|enum}
             {$feature.value_int|date_format:"`$settings.Appearance.date_format`"}
         {elseif $feature.feature_type == "ProductFeatures::MULTIPLE_CHECKBOX"|enum}
@@ -20,7 +20,7 @@
         {else}
             {$feature.value}
         {/if}
-        {if $feature.suffix}{$feature.suffix}{/if}
+        {if $feature.suffix}<span class="ty-features-list__item-suffix">{$feature.suffix}</span>{/if}
         {if $feature.feature_type == "ProductFeatures::EXTENDED"|enum && $feature.features_hash}
             </a>
         {/if}

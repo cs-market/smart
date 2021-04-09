@@ -2,7 +2,7 @@
 <form action="{""|fn_url}" method="post" name="categories_m_addition_form">
 
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr class="cm-first-sibling">
         <th width="15%">{__("category_location")}</th>

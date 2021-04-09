@@ -27,9 +27,12 @@
             var autoclicked = isHideLoader || false;
             var autoclickedClassName = 'ty-footer-form-block-policy__input--autoclicked';
 
-            var allowRequest = (!$subscribePolicyBlock.length) && ($subscribePersonalDataBlock.length < 1);
+            var allowRequest = !$subscribePolicyBlock.length
+                && $subscribePersonalDataBlock.length < 1
+                && !$elm.data('caIsLoadingPolicy');
 
             if (allowRequest) {
+                $elm.data('caIsLoadingPolicy', true);
                 $.ceAjax('request', fn_url('personal_data.subscribe_policy'), {
                     method: 'get',
                     callback: pdpSuccessHandler,
@@ -41,6 +44,7 @@
             }
 
             function pdpSuccessHandler(data, params, text) {
+                $elm.data('caIsLoadingPolicy', false);
                 var response = $(text);
 
                 if (event === null) {

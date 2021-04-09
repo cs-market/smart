@@ -7,7 +7,6 @@
         // Select2 settings for parent items select
         parent: {
             loadViaAjax: true,
-            enableSearch: false,
             dataUrl: '',
             enableImages: true
         },
@@ -87,7 +86,7 @@
                 self.initChildSelect(self.$parentSelect.select2('data')[0]);
             });
 
-            this.$childSelect.on('select2:select', function (e) {
+            this.$childSelect.on('select2:select select2:unselect', function (e) {
                 self.onChildSelect(e.params.data);
             });
         },
@@ -115,13 +114,15 @@
                 this.$childInput.addClass('hidden');
                 this.$childSelect.prop('disabled', false);
 
-                if (loadViaAjax && this.$childSelect.val()) {
+                var value = $.makeArray(this.$childSelect.val()).filter(function (val) { return Boolean(val); } );
+
+                if (loadViaAjax && value.length) {
                     var self = this;
                     $.ceAjax('request', childSelect2Settings.dataUrl, {
                         hidden: true,
                         caching: false,
                         data: {
-                            preselected: this.$childSelect.val(),
+                            preselected: value,
                             page_size: 0
                         },
                         callback: function (data) {

@@ -7,18 +7,18 @@
         <a id="sw_ret_{$key}" class="cm-combination">{__("returns_info")}</a>
     </p>
     <div class="table-responsive-wrapper">
-        <table width="100%" class="table table-condensed table-no-bg table-responsive hidden" id="ret_{$key}">
+        <table width="100%" class="table table-condensed table-no-bg table--relative table-responsive hidden" id="ret_{$key}">
         <thead>
         <tr>
             <th>&nbsp;{__("status")}</th>
-            <th>{__("amount")}</th>
+            <th>{__("quantity")}</th>
         </tr>
         </thead>
         <tbody>
             {foreach from=$oi.returns_info item="amount" key="status" name="f_rinfo"}
             <tr>
                 <td data-th="{__("status")}">{$return_statuses.$status|default:""}</td>
-                <td data-th="{__("amount")}">{$amount}</td>
+                <td data-th="{__("quantity")}">{$amount}</td>
             </tr>
             {/foreach}
         </tbody>

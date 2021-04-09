@@ -15,6 +15,9 @@
 use \Tygh\Registry;
 
 $schema['top']['addons']['items']['commerceml'] = array(
+    'attrs' => array(
+        'class' => 'is-addon'
+    ),
     'position' => 310,
     'href' => 'commerceml.currencies',
     'subitems' => array(

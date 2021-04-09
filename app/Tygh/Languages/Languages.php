@@ -14,12 +14,13 @@
 
 namespace Tygh\Languages;
 
+use Tygh\Addons\SchemesManager;
+use Tygh\Languages\Helper as LanguageHelper;
+use Tygh\Languages\Values as LanguageValues;
 use Tygh\Registry;
 use Tygh\Settings;
-use Tygh\Languages\Values as LanguageValues;
-use Tygh\Languages\Po;
-use Tygh\Addons\SchemesManager;
 use Tygh\Themes\Themes;
+use Tygh\Tygh;
 
 class Languages
 {
@@ -185,7 +186,7 @@ class Languages
                 $lang_id = db_query("INSERT INTO ?:languages ?e", $language_data);
                 $clone_from =  !empty($language_data['from_lang_code']) ? $language_data['from_lang_code'] : CART_LANGUAGE;
 
-                fn_clone_language($language_data['lang_code'], $clone_from);
+                LanguageHelper::cloneLanguage($language_data['lang_code'], $clone_from);
 
                 $action = 'add';
             }
@@ -260,6 +261,16 @@ class Languages
 
         self::saveLanguagesIntegrity();
         self::$cache_available_languages = array();
+
+        /** @var \Tygh\Storefront\Repository $storefronts_repository */
+        $storefronts_repository = Tygh::$app['storefront.repository'];
+        /** @var \Tygh\Storefront\Storefront[] $storefronts */
+        list($storefronts,) = $storefronts_repository->find(['language_ids' => $lang_ids]);
+        foreach ($storefronts as $storefront) {
+            $storefront_language_ids = array_diff($storefront->getLanguageIds(), $lang_ids);
+            $storefront->setLanguageIds($storefront_language_ids);
+            $storefronts_repository->save($storefront);
+        }
 
         /**
          * Adds additional actions after languages deleting
@@ -404,35 +415,44 @@ class Languages
     /**
      * Returns active and hidden languages list (as lang_code => array(name, lang_code, status, country_code)
      *
-     * @param  string $area           Area ('A' for admin or 'C' for customer)
-     * @param  bool   $include_hidden if true get hidden languages too
+     * @param array $params
+     *
      * @return array  Languages list
      */
-    public static function getAvailable($area = AREA, $include_hidden = false)
+    public static function getAvailable($params = [])
     {
-        $cache_key = $area . $include_hidden;
+        // FIXME: #STOREFRONTS: Backward compatibility
+        if (!is_array($params) || $params === []) {
+            $legacy_params = $params === []
+                ? []
+                : func_get_args();
+            $params = static::convertLegacyGetAvailableParams($legacy_params);
+        }
+
+        $params = array_merge([
+            'area'           => null,
+            'include_hidden' => false,
+            'language_ids'   => null,
+        ], $params);
+
+        $area = (string) $params['area'];
+        $include_hidden = $params['include_hidden'];
+
+        $cache_key = serialize($params);
 
         if (!isset(self::$cache_available_languages[$cache_key])) {
             $field_list = db_quote("?:languages.*");
             $join = $order_by = $group_by = $limit = "";
             $condition = $include_hidden ? db_quote("AND ?:languages.status <> 'D'") : db_quote("AND ?:languages.status = 'A'");
-            $default_language = Registry::get('settings.Appearance.' . fn_get_area_name($area) . '_default_language');
 
-            if ($area == 'C') {
-                if (!fn_allowed_for('ULTIMATE:FREE')) {
-                    if (defined('CART_LOCALIZATION')) {
-                        $join .= db_quote(" LEFT JOIN ?:localization_elements ON ?:localization_elements.element = ?:languages.lang_code AND ?:localization_elements.element_type = 'L'");
-                        $condition .= db_quote(' AND ?:localization_elements.localization_id = ?i', CART_LOCALIZATION);
-                        $order_by .= db_quote(" ORDER BY ?:localization_elements.position ASC");
-                    }
-
-                } elseif (fn_allowed_for('ULTIMATE:FREE')) {
-                    $condition .= db_quote(' AND ?:languages.lang_code = ?s', $default_language);
-                }
+            if ($area == 'C' && defined('CART_LOCALIZATION')) {
+                $join .= db_quote(" LEFT JOIN ?:localization_elements ON ?:localization_elements.element = ?:languages.lang_code AND ?:localization_elements.element_type = 'L'");
+                $condition .= db_quote(' AND ?:localization_elements.localization_id = ?i', CART_LOCALIZATION);
+                $order_by .= db_quote(" ORDER BY ?:localization_elements.position ASC");
             }
 
-            if (fn_allowed_for('ULTIMATE:FREE')) {
-                $condition .= db_quote(' OR ?:languages.lang_code = ?s', $default_language);
+            if ($params['language_ids'] !== null) {
+                $condition .= db_quote(' AND ?:languages.lang_id IN (?n)', (array) $params['language_ids']);
             }
 
             /**
@@ -447,7 +467,7 @@ class Languages
              * @param string  $order_by       String containing the SQL-query ORDER BY field
              * @oaram string  $limit          String containing the SQL-query LIMIT field
              */
-            fn_set_hook('get_available_languages', $area, $include_hidden, $field_list, $join, $condition, $group_by, $order_by, $limit);
+            fn_set_hook('get_available_languages', $area, $include_hidden, $field_list, $join, $condition, $group_by, $order_by, $limit, $params);
 
             $languages = db_get_hash_array("SELECT ?p FROM ?:languages ?p WHERE 1 ?p ?p ?p ?p", 'lang_code', $field_list, $join, $condition, $group_by, $order_by, $limit);
 
@@ -986,7 +1006,7 @@ class Languages
         $values = fn_array_value_to_key($values, 'msgctxt');
 
         $addons_lang_vars = array();
-        list($addons) = fn_get_addons(array('type' => 'installed'), 0, $lang_code);
+        list($addons) = fn_get_addons(array('type' => 'active'), 0, $lang_code);
         foreach ($addons as $addon_id => $addon) {
             $addons_lang_vars = array_merge($addons_lang_vars, self::exportAddonsPo($addon_id, $pack_path . 'addons/' . $addon_id . '.po', $lang_code, $values));
         }
@@ -1510,5 +1530,40 @@ class Languages
         }
 
         return $languages;
+    }
+
+    /**
+     * Converts legacy params for the \Tygh\Languages\Languages::getAvailable function.
+     *
+     * @param array $legacy_params
+     *
+     * @internal
+     *
+     * @return array
+     */
+    protected static function convertLegacyGetAvailableParams(array $legacy_params)
+    {
+        $params = [
+            'area'           => null,
+            'include_hidden' => false,
+            'language_ids'   => null,
+        ];
+
+        $params['area'] = array_shift($legacy_params);
+        if ($params['area'] === null) {
+            $params['area'] = AREA;
+        }
+
+        if ($legacy_params) {
+            $params['include_hidden'] = array_shift($legacy_params);
+        }
+
+        if ($params['area'] === 'C') {
+            /** @var \Tygh\Storefront\Storefront $current_storefront */
+            $current_storefront = Tygh::$app['storefront'];
+            $params['language_ids'] = $current_storefront->getLanguageIds();
+        }
+
+        return $params;
     }
 }

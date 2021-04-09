@@ -1,3 +1,13 @@
+@import "../../config.less";
+
+html.dialog-is-open {
+    body {
+        @media (max-width: @TabletBreakpoint) {
+            overflow: hidden;
+        }
+    }
+}
+
 // Popup dialog styles
 .object-container {
     overflow-x: auto;
@@ -51,6 +61,7 @@
 
 .ui-dialog {
     padding: 0;
+    max-width: 90%;
     position: fixed !important;
     .ui-dialog-content {
         overflow: hidden;
@@ -72,6 +83,11 @@
     .setting-wide .input-large {
         width: 520px !important;
     }
+
+    // Elfinder popup fix
+    &.ui-front {
+        z-index: 1050;
+    }
 }
 
 .ui-dialog .dropdown-menu {
@@ -87,7 +103,7 @@
 
 .ui-widget-content {
     a {
-        color: #0088CC;
+        color: @mainColor;
     }
     a:hover {
         text-decoration: underline;
@@ -114,14 +130,7 @@
     }
 }
 
-// Prevent scrolling page while popup is open.
-html.dialog-is-open {
-    body {
-        overflow-y: hidden !important;
-    }
-}
-
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     // New bigger close button
     .ui-button.ui-dialog-titlebar-close {
         transform: scale(2);
@@ -144,6 +153,28 @@ html.dialog-is-open {
     // Strictly set popup width on mobiles
     .ui-dialog {
         width: 100vw !important;
+        
+    }
+
+    [role="dialog"].ui-dialog.ui-widget {
+        height: 100% !important;
+    }
+
+    .hidden.ui-dialog-content.ui-widget-content {
+        min-height: unset !important;
+        max-height: unset !important;
+
+        position: absolute;
+        bottom: 0;
+        top: 51px;
+        left: 0;
+        right: 0;
+    }
+
+    .ui-dialog-content.ui-widget-content {
+        @media (max-width: @TabletBreakpoint) {
+            height: auto !important;
+        }
     }
 
     [aria-describedby="content_select_fields_to_edit"].ui-dialog {
@@ -190,7 +221,7 @@ html.dialog-is-open {
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: @DesktopBreakpoint) {
     .buttons-container.buttons-container-picker {
         background-color: #fff;
         z-index: 1000;

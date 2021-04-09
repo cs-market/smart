@@ -12,6 +12,8 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+defined('BOOTSTRAP') or die('Access denied');
+
 /**
  * Describes the behavior of controllers depending on whether secure connection is enabled or not.
  *
@@ -20,35 +22,20 @@
  *      'secure_mode' => 'active'/'passive'
  * ]
  *
- * secure_mode - value of the "Enable secure connection for the storefront" setting. Available values: none, partial, full.
+ * secure_mode - value of the "Enable secure connection for the storefront" setting. Available values: none, full.
  * active - the controller can be processed only via HTTPS.
  * passive -  the controller can be processed both via HTTP and HTTPS.
  */
 
-return array(
-    'auth' => array(
-        'partial' => 'active',
-    ),
-    'orders' => array(
-        'partial' => 'active',
-    ),
-    'profiles' => array(
-        'partial' => 'active',
-    ),
-    'checkout' => array(
-        'partial' => 'active',
-    ),
-    'payment_notification' => array(
+return [
+    'payment_notification' => [
         'none' => 'passive',
-        'partial' => 'passive',
-    ),
-    'image' => array(
+    ],
+    'image' => [
         'none' => 'passive',
-        'partial' => 'passive',
-    ),
-    'robots' => array(
+    ],
+    'robots' => [
         'none' => 'passive',
-        'partial' => 'passive',
         'full' => 'passive'
-    ),
-);
+    ],
+];

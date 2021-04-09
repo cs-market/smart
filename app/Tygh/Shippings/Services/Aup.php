@@ -211,27 +211,32 @@ class Aup implements IService
     {
         $box = $this->prepareDimensions();
 
-        $request = array(
+        $request = [
             'country_code'  => $this->package['location']['country'],
             'service_code'  => $this->_shipping_info['service_code'],
             'weight'        => $this->prepareWeight(),
-            'length'        => $box['length'],
-            'width'         => $box['width'],
-            'height'        => $box['height'],
             'from_postcode' => $this->package['origination']['zipcode'],
             'to_postcode'   => $this->package['location']['zipcode'],
-        );
+        ];
 
-        $request_data = array(
+        if (!empty($box['length'])) {
+            $request['length'] = $box['length'];
+        }
+        if (!empty($box['width'])) {
+            $request['width'] = $box['width'];
+        }
+        if (!empty($box['height'])) {
+            $request['height'] = $box['height'];
+        }
+
+        return [
             'method'  => 'get',
             'url'     => $this->getEndpointUrl('/calculate.json'),
             'data'    => $request,
-            'headers' => array(
+            'headers' => [
                 'Auth-Key: ' . $this->getAuthHeader()
-            )
-        );
-
-        return $request_data;
+            ]
+        ];
     }
 
     /**

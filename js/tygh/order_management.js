@@ -1,39 +1,20 @@
 (function(_, $) {
 
     $.ceEvent('on', 'ce.change_select_list', function(object, elm) {
-        var contextTemplate = '';
-        var contextData = [];
 
-        if (elm.hasClass('cm-object-product-add')) {
-
-            if (object.image_url) {
-                contextTemplate = '<table class="table-select2"><tr><td class="table-select2-column-image"><img src="??" alt="??" /></td><td class="table-select2-column-name table-select2-column-name--truncate">??</td><td class="table-select2-column-product-code table-select2-column-product-code--truncate">??</td><td class="table-select2-column-price">??</td></tr></table>';
-
-                contextData = [
-                    object.image_url, object.text, object.text, object.code, object.price
-                ];
-            } else {
-                contextTemplate = '<table class="table-select2"><tr><td class="no-image table-select2-no-images"><i class="glyph-image"></i></td><td class="table-select2-column-name table-select2-column-name--truncate">??</td><td class="table-select2-column-product-code table-select2-column-product-code--truncate">??</td><td class="table-select2-column-price">??</td></tr></table>';
-
-                contextData = [
-                    object.text, object.code, object.price
-                ];
-            }
-
-            if (object.image_url) {
-                delete object.image_url;
-            }
+        if (elm.hasClass('cm-object-product-add') && object.data) {
+            object.context = object.data.content;
         }
 
         if (elm.hasClass('cm-object-customer-add')) {
-            contextTemplate = '<table class="table-select2-customer"><tr><td class="table-select2-column-firstname-lastname">??</td></tr><tr><td class="table-select2-column-email">??</td></tr><tr><td class="table-select2-column-phone">??</td></tr></table>';
+            var contextTemplate = '<table class="table-select2-customer"><tr><td class="table-select2-column-firstname-lastname">??</td></tr><tr><td class="table-select2-column-email">??</td></tr><tr><td class="table-select2-column-phone">??</td></tr></table>';
 
-            contextData = [
+            var contextData = [
                 object.text, object.email, object.phone
             ];
+            object.context = $.sprintf(contextTemplate, contextData, '??');
         }
 
-        object.context = $.sprintf(contextTemplate, contextData, '??');
     });
 
     $(document).ready(function(){

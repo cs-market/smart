@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.8.2/addons/blog.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.11.3/addons/blog.po\n"
+"PO-Revision-Date: 2020-01-29 14:52\n"
 
 msgctxt "Addons::name::blog"
 msgid "Blog"
@@ -87,4 +85,8 @@ msgstr "Utilizarea &lt;!--tăiat--&gt; tag-ul (trecerea la codul sursă pentru a
 msgctxt "Languages::blog_functionality_notes"
 msgid "<p>Use this page to manage your blog. This is how you should organize your blog posts:</p><ul><li>Blog is a usual post that has the <b>Root level page</b> as the Parent page.</li><li>Choose <b>Blog</b> as the Parent page for your blog posts.</li></ul>"
 msgstr "<p>Utilizează aceasta pagina pentru a gestiona blog-ul dvs. Acest lucru este cum să organizați mesajele dumneavoastră blog:</p> <ul><li>Blog este un post de obicei care are <b>nivelul pagina rădăcină</b> ca pagina părinte.</li> <li>Alege <b>blog-ul</b> ca pagina părinte pentru mesajele dumneavoastră blog.</li></ul>"
+
+msgctxt "Languages::n_posts"
+msgid "[n] post|[n] posts"
+msgstr ""
 

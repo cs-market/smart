@@ -8,7 +8,7 @@
     <default_language>en</default_language>
     <compatibility>
         <dependencies>vendor_plans</dependencies>
-        <conflicts>paypal_for_marketplaces</conflicts>
+        <conflicts>paypal_commerce_platform</conflicts>
         <core_version>
             <min>4.5.1</min>
         </core_version>

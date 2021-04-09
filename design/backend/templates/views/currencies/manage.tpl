@@ -7,7 +7,7 @@
          data-ca-sortable-table="currencies" data-ca-sortable-id-name="currency_id" id="manage_currencies_list">
         {if $currencies_data}
         <div class="table-responsive-wrapper">
-            <table class="table table-middle table-objects table-striped table-responsive table-responsive-w-titles">
+            <table class="table table-middle table--relative table-objects table-striped table-responsive table-responsive-w-titles">
                 <tbody>
                 {foreach from=$currencies_data item="currency"}
                     {if $currency.is_primary == "Y"}

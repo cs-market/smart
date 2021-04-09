@@ -61,7 +61,11 @@ if ($mode == 'update' && !empty($_REQUEST['provider'])) {
 } elseif ($mode == 'manage') {
 
     $providers_schema = fn_get_schema('hybrid_auth', 'providers');
-    $available_providers = array_keys($providers_schema);
+    $available_providers = array_keys(
+        array_filter($providers_schema, function ($provider) {
+            return !isset($provider['enabled']) || $provider['enabled'] !== false;
+        })
+    );
     $providers_list = fn_hybrid_auth_get_providers_list(false);
 
     $available_providers = array_diff($available_providers, array_keys($providers_list));

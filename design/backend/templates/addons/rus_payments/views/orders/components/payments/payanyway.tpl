@@ -18,8 +18,8 @@
     </div>
 {elseif $payment_method.processor_params.payment_system == 'euroset'}
     <div class="control-group">
-        <label class="cm-required cm-regexp" for="rapida_phone">{__("text_payanyway_rapidaphone")}</label>
-        <input class="input-text cm-autocomplete-off" type="text" id="rapida_phone" name="payment_info[rapidaPhone]" value="" size="35" />
+        <label class="cm-required cm-regexp cm-mask-phone-label" for="rapida_phone">{__("text_payanyway_rapidaphone")}</label>
+        <input class="input-text cm-autocomplete-off cm-mask-phone" type="text" id="rapida_phone" name="payment_info[rapidaPhone]" value="" size="35" />
     </div>
     <script type="text/javascript">
         //<![CDATA[

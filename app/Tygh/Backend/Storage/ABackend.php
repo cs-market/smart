@@ -117,9 +117,11 @@ abstract class ABackend
      * Get file URL
      *
      * @param  string $file file to get URL
+     * @param  string $protocol
+     *
      * @return string file URL
      */
-    public function getUrl($file, $protocol = '')
+    public function getUrl($file = '', $protocol = '')
     {
         return false;
     }

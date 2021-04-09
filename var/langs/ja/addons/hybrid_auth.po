@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /release-4.8.2/addons/hybrid_auth.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:06\n"
+"X-Crowdin-File: /release-4.11.5/addons/hybrid_auth.po\n"
+"X-Crowdin-File-ID: 3702\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
@@ -46,11 +46,11 @@ msgstr "ソーシャルログイン"
 
 msgctxt "Languages::hybrid_auth.linked_provider"
 msgid "Linked"
-msgstr "リンクされた"
+msgstr "接続済み"
 
 msgctxt "Languages::hybrid_auth.not_linked_provider"
 msgid "Not linked"
-msgstr "リンクなし"
+msgstr "未接続"
 
 msgctxt "Languages::hybrid_auth.providers"
 msgid "Providers"
@@ -169,12 +169,16 @@ msgid "Test mode"
 msgstr "テストモード"
 
 msgctxt "Languages::privileges.manage_providers"
-msgid "Manage social login providers"
-msgstr "SNSプロバイダの管理"
+msgid "Can edit"
+msgstr "編集"
 
 msgctxt "Languages::privileges.view_providers"
-msgid "View social login providers"
-msgstr "SNSプロバイダの閲覧"
+msgid "Can view"
+msgstr "閲覧"
+
+msgctxt "Languages::privilege_groups.social_login"
+msgid "Social login"
+msgstr "ソーシャルログイン"
 
 msgctxt "Languages::hybrid_auth.instruction_facebook"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developers.facebook.com/apps' target='_blank'>Facebook Developers</a>."
@@ -182,7 +186,7 @@ msgstr "<a href='https://developers.facebook.com/apps' target='_blank'>Facebook 
 
 msgctxt "Languages::hybrid_auth.instruction_facebook_login"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href=\"https://developers.facebook.com/apps\" target=\"_blank\">Facebook Developers</a>. After that copy the value of the <b>Valid OAuth redirect URIs</b> field to the corresponding setting of the <b>Facebook Login</b> product in your Facebook application."
-msgstr "<a href=\"https://developers.facebook.com/apps\" target=\"_blank\"> Facebookデベロッパー</a>でアプリケーションを作成した後に受け取ったアプリケーションIDとシークレットキーを使用します。その後、<b>有効なOAuthリダイレクトURI </ b>フィールドの値をFacebookアプリケーションの<b> Facebookログイン</ b>に該当する設定にコピーします。"
+msgstr "<a href=\"https://developers.facebook.com/apps\" target=\"_blank\">Facebook Developers</a> 上でアプリ作成後に発行されるIDとシークレットキーを登録してください。 <b>有効なOAuthリダイレクトURI</b> を Facebook アプリの <b>Facebookログイン</b>の設定にある同名のテキストボックスにコピーしてください。"
 
 msgctxt "Languages::hybrid_auth.instruction_google"
 msgid "Use ID and Secret key that you've received after creating a project on <a href='https://code.google.com/apis/console/?pli=1' target='_blank'>Google</a>."
@@ -198,7 +202,7 @@ msgstr "<a href='https://apps.twitter.com/' target='_blank'>Twitter</a> でア�
 
 msgctxt "Languages::hybrid_auth.instruction_yahoo"
 msgid "Use ID (Identificator) and Secret key that you've received after creating an application on <a href='https://developer.yahoo.com/apps/create/' target='_blank'>Yahoo</a>."
-msgstr "<a href='https://developer.yahoo.com/apps/create/' target='_blank'>Yahoo</a> でアプリ作成後に発行されるIDとシークレットキーを登録してください。"
+msgstr "<a href='https://developer.yahoo.com/apps/create/' target='_blank'>Yahoo</a> でアプリケーション作成後に発行されるアプリケーションID とシークレットキーを登録してください。"
 
 msgctxt "Languages::hybrid_auth.instruction_live"
 msgid "Use the application ID and Secret key that you've received after adding an application on <a href='https://account.live.com/developers/applications/create' target='_blank'>Live</a>."
@@ -214,21 +218,45 @@ msgstr "<a href='https://foursquare.com/developers/apps' target='_blank'>Fousqua
 
 msgctxt "Languages::email_template.hybrid_auth_create_profile"
 msgid "Create user profile via social login"
-msgstr ""
+msgstr "ソーシャルログイン経由での会員登録"
 
 msgctxt "Languages::hybrid_auth.provider_not_found"
 msgid "Provider [provider] not found"
-msgstr ""
+msgstr "[provider] プロバイダが見つかりませんでした"
 
 msgctxt "Languages::hybrid_auth.facebook_disabled_upgrade_notification_title"
 msgid "Social Login: Sign-ins via Facebook have been disabled due to an old PHP version"
-msgstr ""
+msgstr "ソーシャルログイン: PHPのバージョンが古いため Facebook のログインが無効化されました"
 
 msgctxt "Languages::hybrid_auth.facebook_disabled_upgrade_notification_text"
 msgid "<p>We had to move to a newer version of Facebook API, because the API version that we used previously is no longer supported. However, to work with the new API, [product] requires PHP 5.4. You are seeing this message because your server has an older PHP version.</p><p>The status of the <b>Facebook</b> provider under <b>Website → Social login</b> has been set to <i>Disabled</i>.</p><p>Please update your PHP version to 5.4 or higher before you re-enable Facebook.</p>"
-msgstr ""
+msgstr "<p>これまで使用していた Facebook API のバージョンはもうサポートされていないため、新しい Facebook API のバージョンに移行する必要がありました。しかし、新しい API を使用するためには、[product] は PHP 5.4 を必要とします。 ご利用のサーバーが古いバージョンの PHP を使用しているため、このメッセージが表示されています。</p><p><b>ウェブサイト → ソーシャルログイン</b>にある <b>Facebook</b> プロバイダのステータスは<i>無効</i>に設定されています。</p><p>再度 <b>Facebook</b> プロバイダのステータスを有効にする前に、ご利用のサーバーの PHP のバージョンを 5.4 あるいはそれ以上に更新してください。</p>"
 
 msgctxt "Languages::hybrid_auth.facebook_oauth_redirect_uris"
 msgid "Valid OAuth redirect URIs"
+msgstr "有効なOAuthリダイレクトURI"
+
+msgctxt "Languages::hybrid_auth.live_redirect_urls"
+msgid "Redirect URLs"
+msgstr "リダイレクトURL"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_version"
+msgid "API version"
+msgstr "API バージョン"
+
+msgctxt "Languages::ttc_hybrid_auth.linkedin_api_version"
+msgid "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">deprecated API v1</a>, but old apps still use it. If you're configuring LinkedIn app for the first time now, use API v2. Old LinkedIn apps configured some time ago may still be using v1."
+msgstr "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">API v1</a> は古いアプリでまだ使用されています。はじめて LinkedIn アプリを設定する場合は API v2 を使用してください。"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v1"
+msgid "v1"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v2"
+msgid "v2"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.instruction_paypal_application"
+msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
 msgstr ""
 

@@ -171,7 +171,7 @@ if (floatval($order_info['subtotal_discount'])) {
     $post[] = "</freeform_purchase>";
 }
 
-if (!empty($order_info['taxes']) && Registry::get('settings.General.tax_calculation') == 'subtotal') {
+if (!empty($order_info['taxes']) && Registry::get('settings.Checkout.tax_calculation') == 'subtotal') {
     foreach ($order_info['taxes'] as $tax_id => $tax) {
         if ($tax['price_includes_tax'] == 'Y') {
             continue;
@@ -230,7 +230,7 @@ function fn_get_pay_read_tax($order_taxes, $item_id, $type = 'P')
 {
     $tax = 0;
     $tax_percent = 0;
-    if (!empty($order_taxes) && Registry::get('settings.General.tax_calculation') != 'subtotal') {
+    if (!empty($order_taxes) && Registry::get('settings.Checkout.tax_calculation') != 'subtotal') {
         foreach ($order_taxes as $tax_id => $tax_data) {
             $tax_percent += (($tax_data['rate_type'] == 'P') ? $tax_data['rate_value'] : '0');
             if (isset($tax_data['applies'][$type . '_' . $item_id]) && $tax_data['applies'][$type . '_' . $item_id] && $tax_data['price_includes_tax'] != 'Y') {

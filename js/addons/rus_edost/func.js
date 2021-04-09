@@ -15,6 +15,7 @@
 
                     $('#pickpoint_name_terminal').text(result.name);
                     $('#pickpoint_address_terminal').text(result.address);
+                    fn_calculate_total_shipping_cost(true);
                 },
                 {
                     fromcity: pickpoint_select_state,

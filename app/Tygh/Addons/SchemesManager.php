@@ -13,7 +13,9 @@
 ****************************************************************************/
 
 namespace Tygh\Addons;
+
 use Tygh\Registry;
+use Tygh\Tygh;
 
 class SchemesManager
 {
@@ -34,23 +36,26 @@ class SchemesManager
 
         libxml_use_internal_errors(true);
 
-        if (!isset (self::$schemas[$addon_id])) {
+        if (!isset(self::$schemas[$addon_id])) {
+            libxml_clear_errors();
+
             $_xml = self::readXml($path . $addon_id . '/addon.xml');
-            if ($_xml !== FALSE) {
+
+            if ($_xml !== false) {
                 $versions = self::getVersionDefinition();
                 $version = (isset($_xml['scheme'])) ? (string) $_xml['scheme'] : '1.0';
-                self::$schemas[$addon_id] = new $versions[$version]($_xml);
+                self::$schemas[$addon_id] = new $versions[$version]($_xml, Tygh::$app);
             } else {
                 $errors = libxml_get_errors();
 
-                $text_errors = array();
+                $text_errors = [];
                 foreach ($errors as $error) {
                     $text_errors[] = self::displayXmlError($error, $_xml);
                 }
 
                 libxml_clear_errors();
                 if (!empty($text_errors)) {
-                    fn_set_notification('E', __('xml_error'), '<br/>' . implode('<br/>' , $text_errors));
+                    fn_set_notification('E', __('xml_error'), '<br/>' . implode('<br/>', $text_errors));
                 }
 
                 return false;
@@ -85,6 +90,7 @@ class SchemesManager
             '1.0' => 'Tygh\\Addons\\XmlScheme1',
             '2.0' => 'Tygh\\Addons\\XmlScheme2',
             '3.0' => 'Tygh\\Addons\\XmlScheme3',
+            '4.0' => 'Tygh\\Addons\\XmlScheme4',
         );
     }
 
@@ -124,8 +130,14 @@ class SchemesManager
      */
     public static function getUninstallDependencies($addon_id, $lang_code = CART_LANGUAGE)
     {
-        $addons = db_get_fields('SELECT addon FROM ?:addons WHERE dependencies LIKE ?l', '%' . $addon_id . '%');
-        $dependencies = self::getNames($addons, true, $lang_code);
+        $addons = db_get_array('SELECT addon, dependencies FROM ?:addons WHERE dependencies LIKE ?l', '%' . $addon_id . '%');
+        $addons = array_filter($addons, function($addon_data) use ($addon_id) {
+            $dependencies = explode(',', $addon_data['dependencies']);
+
+            return array_search($addon_id, $dependencies, true) !== false;
+        });
+
+        $dependencies = self::getNames(array_column($addons, 'addon'), true, $lang_code);
 
         return $dependencies;
     }
@@ -203,7 +215,6 @@ class SchemesManager
     public static function clearInternalCache($addon_id)
     {
         unset(self::$schemas[$addon_id]);
-
         if (function_exists('opcache_invalidate')) {
             opcache_invalidate(Registry::get('config.dir.addons') . $addon_id . '/addon.xml');
         }

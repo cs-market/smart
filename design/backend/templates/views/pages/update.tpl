@@ -60,9 +60,17 @@
 
         {if $page_type != $smarty.const.PAGE_TYPE_LINK}
         <div class="control-group">
-            <label class="control-label" for="elm_page_descr">{__("description")}:</label>
+            {hook name="pages:detailed_description_label"}
+                <label class="control-label" for="elm_page_descr">{__("description")}:</label>
+            {/hook}
             <div class="controls">
-                <textarea id="elm_page_descr" name="page_data[description]" cols="55" rows="8" class="cm-wysiwyg input-large">{$page_data.description}</textarea>
+                <textarea id="elm_page_descr"
+                          name="page_data[description]"
+                          cols="55"
+                          rows="8"
+                          class="cm-wysiwyg input-large"
+                          data-ca-is-block-manager-enabled="{fn_check_view_permissions("block_manager.block_selection", "GET")|intval}"
+                >{$page_data.description}</textarea>
 
                 {if $view_uri}
                     {include
@@ -144,7 +152,7 @@
               <div class="controls">
                   <input type="hidden" name="page_data[use_avail_period]" value="N">
                     <span class="checkbox">
-                        <input type="checkbox" name="page_data[use_avail_period]" id="elm_page_use_avail_period" {if $page_data.use_avail_period == "Y"}checked="checked"{/if} value="Y"  onclick="fn_activate_calendar(this);">
+                        <input type="checkbox" name="page_data[use_avail_period]" id="elm_page_use_avail_period" {if $page_data.use_avail_period == "Y"}checked="checked"{/if} value="Y" onclick="fn_activate_calendar(this);">
                     </span>
               </div>
           </div>
@@ -179,10 +187,8 @@
     </div>
 
     <div id="content_addons">
-        {if $page_type != $smarty.const.PAGE_TYPE_LINK}
             {hook name="pages:detailed_content"}
             {/hook}
-        {/if}
     </div>
 
     {hook name="pages:tabs_content"}

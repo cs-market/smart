@@ -20,6 +20,18 @@ $schema['companies'] = array (
         'add' => array (
             'permissions' => 'manage_vendors',
         ),
+        'invite' => array(
+            'permissions' => 'manage_vendors',
+        ),
+        'invitations' => array(
+            'permissions' => 'manage_vendors',
+        ),
+        'm_delete_invitations' => array(
+            'permissions' => 'manage_vendors',
+        ),
+        'delete_invitation' => array(
+            'permissions' => 'manage_vendors',
+        ),
         'update' => array (
             'permissions' => array ('GET' => 'view_vendors', 'POST' => 'manage_vendors'),
         ),

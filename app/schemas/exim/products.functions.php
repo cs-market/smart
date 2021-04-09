@@ -14,17 +14,19 @@
 
 use Tygh\Enum\ProductFeatures;
 use Tygh\Enum\ProductFieldsLength;
+use Tygh\Enum\YesNo;
+use Tygh\Navigation\LastView\Backend;
 use Tygh\Registry;
 use Tygh\Storage;
 
 /**
  * Changes company_id for options in the table product options
  *
- * @param integer  $product_id      Product identifier
- * @param string   $company_name    Company name
- * @param array    $processed_data  Quantity of the loaded objects. Objects:
- *                                  'E' - quantity existent products, 'N' - quantity new products,
- *                                  'S' - quantity skipped products, 'C' - quantity vendors
+ * @param int                $product_id     Product identifier
+ * @param string             $company_name   Company name
+ * @param array<string, int> $processed_data Quantity of the loaded objects. Objects:
+ *                                           'E' - quantity existent products, 'N' - quantity new products,
+ *                                           'S' - quantity skipped products, 'C' - quantity vendors
  *
  * @return integer $company_id Company identifier
  */
@@ -157,7 +159,6 @@ function fn_exim_set_product_categories($product_id, $link_type, $categories_dat
 
                 if (!empty($category_id)) {
                     $parent_id = $category_id;
-                    fn_set_hook('set_product_categories_exist', $category_id);
                 } else {
 
                     $category_data = array(
@@ -206,6 +207,13 @@ function fn_exim_set_product_categories($product_id, $link_type, $categories_dat
             }
 
             db_query("REPLACE INTO ?:products_categories ?e", $data);
+
+            /**
+             * Executes after the data about product categories is imported to the database, allows changing the categories associated with the product, and how they relate to the product (primary or additional category)
+             * @param array  $data       Category data
+             * @param int    $company_id Company identifier
+             */
+            fn_set_hook('exim_set_product_categories_post', $data, $company_id);
 
             $updated_categories[] = $category_id;
         }
@@ -633,8 +641,10 @@ function fn_exim_set_product_options($product_id, $data, $lang_code, $features_d
                 unset($_REQUEST['file_variant_image_image_icon'], $_REQUEST['variant_image_image_data']);
                 $global_option = (isset($option['global'])) ? $option['global'] : false;
 
-                if (!empty($option['group_name'])) {
-                    $company_id = fn_get_company_id_by_name($option['group_name']);
+                if (!empty($option['group_name']) || !empty(Registry::get('runtime.company_id'))) {
+                    $company_id = empty(Registry::get('runtime.company_id'))
+                        ? fn_get_company_id_by_name($option['group_name'])
+                        : Registry::get('runtime.company_id');
                 }
 
                 if ($lang_code == $main_lang) {
@@ -974,25 +984,33 @@ function fn_exim_export_file($product_id, $path)
     return '';
 }
 
-//
-// Import product files
-// @product_id 0- product ID
-// @filename - file name
-// @path - path to search files in
-// @delete_files - flag - delete all product files before import
+/**
+ * Import product files
+ *
+ * @param int    $product_id   Product identifier
+ * @param string $filename     File name
+ * @param string $path         File patch
+ * @param string $delete_files Flag that deletes all current product files (if set to "Y")
+ *
+ * @return bool
+ */
 function fn_exim_import_file($product_id, $filename, $path, $delete_files = 'N')
 {
     $path = fn_get_files_dir_path() . fn_normalize_path($path);
 
     // Clean up the directory above if flag is set
+    $product_files = [];
     if ($delete_files == 'Y') {
         fn_delete_product_file_folders(0, $product_id);
         fn_delete_product_files(0, $product_id);
+    } else {
+        list($product_files) = fn_get_product_files(['product_id' => $product_id]);
+        $product_files = array_combine(array_column($product_files, 'file_path'), $product_files);
     }
 
     // Check if we have several files
     $files = fn_explode(',', $filename);
-    $folders = array();
+    $folders = [];
 
     // Create folders
     foreach ($files as $file) {
@@ -1000,10 +1018,10 @@ function fn_exim_import_file($product_id, $filename, $path, $delete_files = 'N')
             list($folder) = fn_explode('/', $file);
 
             if (!isset($folders[$folder])) {
-                $folder_data = array(
+                $folder_data = [
                     'product_id' => $product_id,
                     'folder_name' => $folder,
-                );
+                ];
                 $folders[$folder] = fn_update_product_file_folder($folder_data, 0);
             }
         }
@@ -1011,52 +1029,46 @@ function fn_exim_import_file($product_id, $filename, $path, $delete_files = 'N')
 
     // Copy files
     foreach ($files as $file) {
-
+        $folder_name = '';
         if (strpos($file, '/') !== false) {
             list($folder_name, $file) = fn_explode('/', $file);
-        } else {
-            $folder_name = '';
         }
 
+        $f = $file;
+        $pr = '';
         if (strpos($file, '#') !== false) {
             list($f, $pr) = fn_explode('#', $file);
-        } else {
-            $f = $file;
-            $pr = '';
         }
 
         $file = fn_find_file($path, $f);
-
+        $file_id = isset($product_files[$f]['file_id']) ? $product_files[$f]['file_id'] : 0;
         if (!empty($file)) {
-
-            $uploads = array(
-                'file_base_file' => array($file),
-                'type_base_file' => array('server')
-            );
+            $uploads = [
+                'file_base_file'    => [$file_id => $file],
+                'type_base_file'    => [$file_id => 'server'],
+                'file_file_preview' => [],
+                'type_file_preview' => [],
+            ];
 
             if (!empty($pr)) {
-
                 $preview = fn_find_file($path, $pr);
                 if (!empty($preview)) {
-                    $uploads['file_file_preview'] = array($preview);
-                    $uploads['type_file_preview'] = array('server');
+                    $uploads['file_file_preview'] = [$file_id => $preview];
+                    $uploads['type_file_preview'] = [$file_id => 'server'];
                 }
-            } else {
-                $uploads['file_file_preview'] = "";
-                $uploads['type_file_preview'] = "";
             }
 
-            $_REQUEST = fn_array_merge($_REQUEST, $uploads); // not good to add data to $_REQUEST
+            $_REQUEST = fn_array_merge($_REQUEST, $uploads);
 
-            $file_data = array(
-                'product_id' => $product_id,
-            );
-
+            $file_data = ['product_id' => $product_id];
             if (!empty($folder_name)) {
                $file_data['folder_id'] = $folders[$folder_name];
             }
 
-            if (fn_update_product_file($file_data, 0) == false) {
+            if (isset($product_files[$f]['file_name'])) {
+                $file_data['file_name'] = $product_files[$f]['file_name'];
+            }
+            if (fn_update_product_file($file_data, $file_id) == false) {
                 return false;
             }
         }
@@ -1220,7 +1232,7 @@ function fn_exim_put_box_size($product_id, $data)
     }
 
     $length = $width = $height = 0;
-    $params = explode(';', $data);
+    $params = explode(';', strtolower($data));
     foreach ($params as $param) {
         $elm = explode(':', $param);
         if ($elm[0] == 'length') {
@@ -1235,6 +1247,8 @@ function fn_exim_put_box_size($product_id, $data)
     $shipping_params = db_get_field('SELECT shipping_params FROM ?:products WHERE product_id = ?i', $product_id);
     if (!empty($shipping_params)) {
         $shipping_params = unserialize($shipping_params);
+    } else {
+        $shipping_params = [];
     }
 
     $shipping_params['box_length'] = $length;
@@ -1358,9 +1372,10 @@ function fn_export_product_descr($product_id, $value, $lang_code, $field)
 
 /**
  * Update product description for necessary store.
- * @param Array $data Product data
+ *
+ * @param array   $data       Product data
  * @param integer $product_id Product id
- * @param string $lang_code Lang code
+ * @param string  $field      Field
  */
 function fn_import_product_descr($data, $product_id, $field)
 {
@@ -1534,6 +1549,13 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
             continue;
         }
 
+        // normalize checkbox feature value
+        if ($feature['type'] === ProductFeatures::SINGLE_CHECKBOX) {
+            $variant = reset($feature['variants']);
+            $variant['name'] = YesNo::toId($variant['name']);
+            $feature['variants'] = [$variant];
+        }
+
         if ($feature['type'] != ProductFeatures::MULTIPLE_CHECKBOX) {
             $feature['variants'] = array_slice($feature['variants'], 0, 1);
         }
@@ -1636,6 +1658,8 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
             fn_update_product_features_value($product_id, $features, array(), $feature_lang_code);
         }
     }
+
+    return $product_features;
 }
 
 /**
@@ -1781,4 +1805,84 @@ function fn_exim_set_product_updated_timestamp(&$import_data)
     }
 
     return true;
+}
+
+/**
+ * Gets found products count for export.
+ *
+ * @return int
+ */
+function fn_exim_get_last_view_products_count()
+{
+    $last_view = new Backend(AREA, 'products', 'index');
+    $view_id = $last_view->getCurrentViewId();
+    $last_view_results = $last_view->getViewParams($view_id);
+
+    if (!$last_view_results) {
+        return 0;
+    }
+
+    return $last_view_results['total_items'];
+}
+
+/**
+ * Gets found products to export.
+ *
+ * @return int[]
+ */
+function fn_exim_get_last_view_product_ids_condition()
+{
+    $last_view = new Backend(AREA, 'products', 'index');
+    $view_id = $last_view->getCurrentViewId();
+    $last_view_results = $last_view->getViewParams($view_id);
+
+    $data_function_params = [];
+    if ($last_view_results) {
+        unset(
+            $last_view_results['total_items'],
+            $last_view_results['sort_by'],
+            $last_view_results['sort_order'],
+            $last_view_results['sort_order_rev'],
+            $last_view_results['page'],
+            $last_view_results['items_per_page']
+        );
+        $data_function_params = $last_view_results;
+    }
+
+    $data_function_params['get_conditions'] = true;
+    $data_function_params['load_products_extra_data'] = false;
+
+    list($fields, $join, $condition) = fn_get_products($data_function_params, 0, CART_LANGUAGE);
+    $product_ids = db_get_fields(
+        'SELECT DISTINCT ?p' .
+        ' FROM ?:products AS products' .
+        ' ?p' .
+        ' WHERE 1 = 1' .
+        ' ?p',
+        $fields['product_id'],
+        $join,
+        $condition
+    );
+
+    return [
+        'product_id' => $product_ids
+    ];
+}
+
+/**
+ * Sets company for a product in the import after process.
+ *
+ * @param array<string, int>    $primary_object_id Product ID
+ * @param array<string, string> $object            Product data
+ * @param array<string, int>    $processed_data    Quantity of the loaded objects. Objects:
+ *                                                 'E' - quantity existent products, 'N' - quantity new products,
+ *                                                 'S' - quantity skipped products, 'C' - quantity vendors
+ */
+function fn_exim_set_product_company_after_process_data(array $primary_object_id, array $object, array &$processed_data)
+{
+    if (!isset($primary_object_id['product_id']) || !isset($object['company'])) {
+        return;
+    }
+
+    fn_exim_set_product_company($primary_object_id['product_id'], $object['company'], $processed_data);
 }

@@ -197,6 +197,13 @@ if ($mode == 'offers_params') {
             return array(CONTROLLER_STATUS_OK, 'yml.manage');
         }
 
+        $price_list['company_id'] = empty($price_list['company_id']) ? Registry::get('runtime.company_id') : $price_list['company_id'];
+
+        $repository = Tygh::$app['storefront.repository'];
+        $storefront = $repository->findByCompanyId($price_list['company_id']) ?: $repository->findDefault();
+
+        $price_list['storefront_id'] = $storefront->storefront_id;
+
         Tygh::$app['view']->assign('price', $price_list);
     }
 

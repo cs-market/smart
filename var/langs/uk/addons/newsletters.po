@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/newsletters.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/newsletters.po\n"
+"X-Crowdin-File-ID: 3700\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::newsletters"
 msgid "Newsletters"
@@ -64,13 +64,25 @@ msgctxt "Languages::block_mailing_lists_description"
 msgid "Email field for newsletter subscription"
 msgstr "Поле для введення email для підписки на розсилку"
 
+msgctxt "Languages::block_lite_checkout_newsletters"
+msgid "Checkout: Newsletters"
+msgstr "Оформлення замовлення: Розсилка"
+
+msgctxt "Languages::block_lite_checkout_newsletters_description"
+msgid "Ability to sign up for newsletters"
+msgstr "Можливість підписатися на розсилку"
+
 msgctxt "Languages::privileges.view_newsletters"
-msgid "View newsletters"
-msgstr "Перегляд розсилок"
+msgid "Can view"
+msgstr "Можна переглянути"
 
 msgctxt "Languages::privileges.manage_newsletters"
-msgid "Manage newsletters"
-msgstr "Керування розсилками"
+msgid "Can edit"
+msgstr "Можна редагувати"
+
+msgctxt "Languages::privilege_groups.newsletters"
+msgid "Newsletters"
+msgstr "Розсилки"
 
 msgctxt "Languages::warning_newsletter_no_recipients"
 msgid "Newsletter hasn't been sent because no recipients were found matching the selected criteria."
@@ -158,7 +170,7 @@ msgstr "Показувати на сторінці оформлення замо
 
 msgctxt "Languages::addons.newsletters.show_on_registration_and_profile"
 msgid "Show on the Registration and Profile Details pages"
-msgstr ""
+msgstr "Відображати на сторінках реєстрації та профіля користувача"
 
 msgctxt "Languages::show_on_separate_page"
 msgid "Show on separate page"
@@ -330,7 +342,7 @@ msgstr "Новий список розсилки"
 
 msgctxt "Languages::newsletters.new_subscribers"
 msgid "New subscribers"
-msgstr ""
+msgstr "Нові підписники"
 
 msgctxt "SettingsSections::newsletters::general"
 msgid "General"
@@ -418,45 +430,45 @@ msgstr "Покупець підписаний"
 
 msgctxt "Languages::addons.newsletters.email_exists_in_list"
 msgid "<b>[email]</b> is already in the mailing list"
-msgstr ""
+msgstr "Адреса <b>[email]</b> вже є в списку підписників"
 
 msgctxt "Languages::email_template.newsletters_newsletter"
 msgid "Newsletter"
-msgstr ""
+msgstr "Розсилка"
 
 msgctxt "Languages::email_template.newsletters_promotion"
 msgid "Newsletters: promotion"
-msgstr ""
+msgstr "Розсилки: промо-акція"
 
 msgctxt "Languages::activation_key"
 msgid "Activation key"
-msgstr ""
+msgstr "Ключ активації"
 
 msgctxt "Languages::unsubscribe_key"
 msgid "Unsubscribe key"
-msgstr ""
+msgstr "Ключ відміни підписки"
 
 msgctxt "Languages::subscribers_date"
 msgid "Subscribers date"
-msgstr ""
+msgstr "Дата додання підписників"
 
 msgctxt "Languages::mailing_list_date"
 msgid "Mailing list date"
-msgstr ""
+msgstr "Дата створення списка розсилок"
 
 msgctxt "Languages::gdpr_newsletters"
 msgid "Personal data from newsletters"
-msgstr ""
+msgstr "Особисті дані з розсилок"
 
 msgctxt "Languages::newsletters.subscribe_to_newsletters"
 msgid "Newsletters: Subscribe to newsletters"
-msgstr ""
+msgstr "Розсилки: Підписатися на розсилку"
 
 msgctxt "Languages::newsletters.agreement_text_short_subscribe_to_newsletters"
 msgid "I agree to have my personal data <u>processed as follows</u> and I want to subscribe for the following newsletters:"
-msgstr ""
+msgstr "Я згоден/згодна на <u>обробку своїх персональних даних</u> зазначеним чином і хочу підписатися на наступні розсилки:"
 
 msgctxt "Languages::newsletters.agreement_text_full_subscribe_to_newsletters"
 msgid "<p>When you sign up for a specific newsletter, we ([company]) add your email address to a corresponding mailing list. While it is there, we know that we can contact you by email regarding that topic.</p> <p>You can always have your email address removed from our mailing lists. There are multiple ways to do it:</p><ul> <li>Once your account is registered, just sign in and unsubscribe from newsletters in profile settings.</li> <li>Use the “Unsubscribe” link in our newsletters that you receive.</li> <li>Send an email to [email].</li> </ul> <p>We may use a third-party email service (MailChimp and/or Mad Mimi) to send newsletters. Some members of our staff can view mailing lists with email addresses. That way they’ll be able to remove your email address from the mailing list, should you request us to do so.</p> <p>Please note that mailing lists are independent from each other. If you decide not to receive newsletters at all, you’ll have to unsubscribe from all the mailing lists. Even if you do that, you’ll still receive account-related emails (such as order status notifications, password reset emails, and more). It is essential for operating an online store.</p> <p>If you decide that you no longer want to use our store and would like to have your personal data removed from our database (or if you’d like to get all the personal data associated with your account that we have), please send an email to [email].</p> <p>If you believe that your personal data has been misused, you have the right to lodge a complaint with a supervisory authority. We’re obliged by EU General Data Protection Regulation to let you know about this right; we don’t actually intend to misuse your data.</p>"
-msgstr ""
+msgstr "<p>Коли Ви підписуєтеся на розсилку, ми ([company]) додаємо вашу адресу email в відповідний список розсилки. Поки він зберігається там, ми знаємо, що зможемо зв'язатися з вами при нагоді.</p><p>Ви завжди можете попросити нас видалити Вашу електронну адресу зі списку. Є кілька способів зробити це:</p><ul><li>Після реєстрації облікового запису, увійдіть в неї і скасуйте підписку в налаштуваннях вашого профілю.</li><li>Скористайтеся посиланням \"Скасувати підписку\" в листах, які Ви отримуєте.</li><li>Написати листа за адресою [email].</li></ul><p>Ми можемо використовувати інші поштові сервіси (MailChimp і / або Mad Mimi) для відправки розсилок. Деякі співробітники нашого магазину можуть переглядати списки розсилок з адресами. Таким чином вони зможуть видалити Вашу адресу електронної пошти зі списку, якщо Ви зажадаєте зробити це.</p><p>Якщо ви вирішите відмовитися від всіх розсилок, вам доведеться видалити себе з кожного списку. Однак, навіть, якщо ви зробите це, ви все одно будете отримувати листи з інформацією про дії в Вашого облікового запису (наприклад, повідомлення про статус замовлень, повідомлення про зміну пароля та інші). Це необхідно для роботи з інтернет-магазином.</p><p>Якщо Ви вирішите, що більше не хочете користуватися послугами нашого магазину і хочете, щоб Ваші дані були видалені з нашої бази даних (або хочете отримати всі персональні дані, пов'язані з вашого облікового запису кимось), будь ласка, відправте лист на [email].</p><p>Якщо Ви вважаєте, що Ваші персональні дані використовуються не за призначенням, Ви маєте право звернутися зі скаргою в наглядовий орган. Згідно \"Загального регламенту щодо захисту даних\" в ЄС ми зобов'язані повідомити Вам про це право, однак ми не плануємо використовувати Ваші дані не за призначенням.</p>"
 

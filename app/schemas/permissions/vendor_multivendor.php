@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\UserTypes;
+
 $schema = array(
     'default_permission' => false,
     'controllers' => array (
@@ -23,6 +25,14 @@ $schema = array(
         ),
         'elf_connector' => array (
             'permissions' => true,
+        ),
+
+        'order_management' => array (
+            'modes' => array (
+                'options' => array (
+                  'permissions' => true,
+                ),
+            ),
         ),
 
         'profiles' => array (
@@ -68,7 +78,18 @@ $schema = array(
                         'operator' => 'or',
                         'function' => array('fn_check_permission_act_as_user'),
                     ),
-                )
+                ),
+                'login_as_vendor' => [
+                    'permissions' => false
+                ],
+                'm_delete' => [
+                    'param_permissions' => [
+                        'user_type' => [
+                            UserTypes::CUSTOMER => false,
+                        ],
+                    ],
+                    'default_permission' => true,
+                ]
             ),
             'permissions' => true,
         ),
@@ -76,6 +97,18 @@ $schema = array(
             'modes' => array (
                 'add' => array (
                     'permissions' => false
+                ),
+                'invite' => array(
+                    'permissions' => false
+                ),
+                'invitations' => array(
+                    'permissions' => false
+                ),
+                'm_delete_invitations' => array(
+                    'permissions' => false,
+                ),
+                'delete_invitation' => array(
+                    'permissions' => false,
                 ),
                 'delete' => array (
                     'permissions' => false
@@ -94,6 +127,9 @@ $schema = array(
                 ),
                 'export_range' => array(
                     'permissions' => false,
+                ),
+                'update' => array(
+                    'permissions' => array('GET' => true, 'POST' => true),
                 ),
             ),
             'permissions' => true,
@@ -256,6 +292,9 @@ $schema = array(
                 'groups' => array(
                     'permissions' => array ('GET' => true, 'POST' => false),
                 ),
+                'get_features_list' => [
+                    'permissions' => true,
+                ],
                 'get_feature_variants_list' => array(
                     'permissions' => true,
                 ),
@@ -295,10 +334,26 @@ $schema = array(
         'exim' => array (
             'modes' => array(
                 'export' => array(
-                    'permissions' => true,
+                    'param_permissions' => array(
+                        'section' => array(
+                            'features' => false,
+                            'orders' => true,
+                            'products' => true,
+                            'translations' => false,
+                            'users' => false,
+                        ),
+                    ),
                 ),
                 'import' => array(
-                    'permissions' => true,
+                    'param_permissions' => array(
+                        'section' => array(
+                            'features' => false,
+                            'orders' => false,
+                            'products' => true,
+                            'translations' => false,
+                            'users' => false,
+                        ),
+                    )
                 ),
             ),
             'permissions' => true,
@@ -331,6 +386,9 @@ $schema = array(
                     'permissions' => false,
                 ),
                 'manage' => array(
+                    'permissions' => true,
+                ),
+                'export_range' => array(
                     'permissions' => true,
                 ),
             ),
@@ -441,7 +499,7 @@ $schema = array(
                 )
             )
         ),
-        'logs' => array (
+        'logs' => array(
             'permissions' => true,
         ),
         'debugger' => array(
@@ -474,6 +532,31 @@ $schema = array(
         'notifications' => array(
             'permissions' => true,
         ),
+
+        'notifications_center' => [
+            'permissions' => true,
+        ],
+        'bottom_panel' => array(
+            'permissions' => true
+        ),
+        'storefronts' => [
+            'modes' => [
+                'picker' => [
+                    'permissions' => true,
+                ],
+            ],
+        ],
+        'sync_data' => [
+            'modes' => [
+                'manage' => [
+                    'permissions' => false,
+                    'condition'   => [
+                        'operator' => 'or',
+                        'function' => ['fn_check_permission_sync_data'],
+                    ],
+                ]
+            ]
+        ]
     ),
     'export' => array(
         'sections' => array(

@@ -1,6 +1,15 @@
+<script>
+    Tygh.advanced_import = {
+        relations: {$relations|json_encode nofilter},
+        fields: {$fields|json_encode nofilter},
+        preset_fields: {$preset.fields|default:[]|json_encode nofilter}
+    };
+</script>
+
 <div data-ca-advanced-import-preset-file-extension="{$preset['file_extension']|default:""}"
      class="preview-fields-mapping__wrapper clearfix"
 >
+
     <p class="pull-left p-notice">{__("advanced_import.fields_mapping.description", ["[product]" => $smarty.const.PRODUCT_NAME])}</p>
     <div class="btn-bar btn-toolbar pull-right">
         {include file="buttons/button.tpl" but_role="action1" but_target_id="advanced_import_modifiers_list_popup" but_text=__("advanced_import.modifiers_list") but_href="advanced_import.modifiers_list" but_meta="btn adv-buttons pull-right cm-dialog-opener"}
@@ -10,7 +19,7 @@
     <div class="clearfix"></div>
 
     <div class="span16 table-responsive-wrapper">
-        <table width="100%" class="table table-responsive">
+        <table width="100%" class="table table--relative table-responsive">
             <thead>
             <tr>
                 <th class="import-field__name">

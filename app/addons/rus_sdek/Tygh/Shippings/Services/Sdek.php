@@ -14,16 +14,17 @@
 
 namespace Tygh\Shippings\Services;
 
-use Tygh\Shippings\IService;
-use Tygh\Registry;
-use Tygh\Http;
-use Tygh\Shippings\RusSdek;
 use Tygh\Tygh;
+use Tygh\Http;
+use Tygh\Registry;
+use Tygh\Shippings\RusSdek;
+use Tygh\Shippings\IService;
+use Tygh\Shippings\IPickupService;
 
 /**
  * Sdek shipping service
  */
-class Sdek implements IService
+class Sdek implements IService, IPickupService
 {
     /**
      * Abailability multithreading in this module
@@ -38,6 +39,9 @@ class Sdek implements IService
      * @var string $calculation_currency
      */
     public $calculation_currency = 'RUB';
+
+    /** @var array $shipping_info Shipping data */
+    protected $shipping_info;
 
     private $version = "1.0";
 
@@ -77,14 +81,47 @@ class Sdek implements IService
 
     public $city_id;
 
+
     /**
-     * Collects errors during preparing and processing request
-     *
-     * @param string $error
+     * Returns shipping service information
+     * @return array information
      */
-    private function _internalError($error)
+    public static function getInfo()
     {
-        $this->_error_stack[] = $error;
+        return [
+            'name'         => __('carrier_sdek'),
+            'tracking_url' => 'https://new.cdek.ru/tracking?order_id=%s',
+        ];
+    }
+
+    public function prepareAddress($address)
+    {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupMinCost()
+    {
+        $shipping_data = $this->getStoredShippingData();
+        return isset($shipping_data['cost']) ? $shipping_data['cost'] : false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupPoints()
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupPointsQuantity()
+    {
+        $shipping_data = $this->getStoredShippingData();
+        return isset($shipping_data['offices']) ? count($shipping_data['offices']) : false;
     }
 
     /**
@@ -104,7 +141,7 @@ class Sdek implements IService
      */
     public function prepareData($shipping_info)
     {
-        $this->_shipping_info = $shipping_info;
+        $this->shipping_info = $shipping_info;
         $this->company_id = Registry::get('runtime.company_id');
     }
 
@@ -119,14 +156,14 @@ class Sdek implements IService
 
         $symbol_grams = Registry::get('settings.General.weight_symbol_grams');
 
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
-        $shipping_settings = $this->_shipping_info['service_params'];
-        $origination = $this->_shipping_info['package_info']['origination'];
-        $location = $this->_shipping_info['package_info']['location'];
+        $weight_data = fn_convert_weight_to_imperial_units($this->shipping_info['package_info']['W']);
+        $shipping_settings = $this->shipping_info['service_params'];
+        $origination = $this->shipping_info['package_info']['origination'];
+        $location = $this->shipping_info['package_info']['location'];
 
-        $module = $this->_shipping_info['module'];
-        if (!empty($this->_shipping_info['shipping_id'])) {
-            $data_shipping = fn_get_shipping_info($this->_shipping_info['shipping_id'], DESCR_SL);
+        $module = $this->shipping_info['module'];
+        if (!empty($this->shipping_info['shipping_id'])) {
+            $data_shipping = fn_get_shipping_info($this->shipping_info['shipping_id'], DESCR_SL);
             $module = db_get_field("SELECT module FROM ?:shipping_services WHERE service_id = ?i", $data_shipping['service_id']);
         }
 
@@ -141,7 +178,7 @@ class Sdek implements IService
         $this->city_id = $_code = RusSdek::cityId($location);
         $_code_sender = $shipping_settings['from_city_id'];
 
-        $url = 'http://api.edostavka.ru/calculator/calculate_price_by_json.php';
+        $url = 'https://api.cdek.ru/calculator/calculate_price_by_json.php';
         $r_url = 'http://lk.cdek.ru:8080/calculator/calculate_price_by_json.php';
 
         $post['version'] = isset($this->version) ? $this->version : '';
@@ -174,13 +211,13 @@ class Sdek implements IService
         }
 
         $params_product = array();
-        if (!empty($this->_shipping_info['package_info']['packages'])) {
-            $packages = $this->_shipping_info['package_info']['packages'];
+        if (!empty($this->shipping_info['package_info']['packages'])) {
+            $packages = $this->shipping_info['package_info']['packages'];
             $packages_count = count($packages);
 
             if ($packages_count > 0) {
                 foreach ($packages as $id => $package) {
-                    $weight_ar = fn_expand_weight($package['weight']);
+                    $weight_ar = fn_convert_weight_to_imperial_units($package['weight']);
 
                     if (!empty($_REQUEST['order_id'])) {
                         $weight_kg = 0;
@@ -268,7 +305,6 @@ class Sdek implements IService
         if (!empty($data)) {
             $key = md5($data['data']);
             $sdek_data = fn_get_session_data($key);
-            $data_string = json_encode($data['data']);
 
             $extra = array(
                 'headers' => array(
@@ -313,7 +349,7 @@ class Sdek implements IService
 
                 $rates = $this->_getRates($result_array);
 
-                $this->_fillSessionData($rates);
+                $this->storeShippingData($rates);
 
                 if (empty($this->_error_stack) && !empty($rates['price'])) {
                     $return['cost'] = $rates['price'];
@@ -324,7 +360,7 @@ class Sdek implements IService
 
             } else {
                 $return['error'] = $this->processErrors($result_array);
-                $this->_fillSessionData(array('clear' => true));
+                $this->storeShippingData(array('clear' => true));
             }
         }
 
@@ -338,7 +374,7 @@ class Sdek implements IService
         if (!empty($response['result']['price'])) {
             $rates['price'] = $response['result']['price'];
             if (!empty($response['result']['deliveryPeriodMin']) && !empty($response['result']['deliveryPeriodMax'])) {
-                $plus = $this->_shipping_info['service_params']['dateexecute'];
+                $plus = $this->shipping_info['service_params']['dateexecute'];
                 $min_time = $plus + $response['result']['deliveryPeriodMin'];
                 $max_time = $plus + $response['result']['deliveryPeriodMax'];
                 if ($min_time == $max_time) {
@@ -352,7 +388,7 @@ class Sdek implements IService
             }
 
             $rec_city_code = $this->city_id;
-            $tarif_id = $this->_shipping_info['service_params']['tariffid'];
+            $tarif_id = $this->shipping_info['service_params']['tariffid'];
             if (!empty($rec_city_code) && (!empty($sdek_delivery[$tarif_id]['terminals']) && $sdek_delivery[$tarif_id]['terminals'] == 'Y') && $tarif_id == $response['result']['tariffId']) {
                 $params = array(
                     'cityid' => $rec_city_code
@@ -375,11 +411,18 @@ class Sdek implements IService
         return $rates;
     }
 
-    private function _fillSessionData($rates = array())
+    /**
+     * Saves shipping data to session
+     *
+     * @param array $rates Rates data
+     *
+     * @return bool
+     */
+    protected function storeShippingData($rates = [])
     {
-        $offices = array();
+        $offices = [];
         $select_office = '';
-        $shipping_info = $this->_shipping_info;
+        $shipping_info = $this->shipping_info;
 
         if (isset($shipping_info['keys']['group_key']) && !empty($shipping_info['keys']['shipping_id'])) {
             $group_key = $shipping_info['keys']['group_key'];
@@ -399,8 +442,6 @@ class Sdek implements IService
                         }
                     }
                 } else {
-                    $select_office = reset($rates['offices']);
-                    Tygh::$app['session']['cart']['select_office'][$group_key][$shipping_id] = $select_office['Code'];
                     $offices = $rates['offices'];
                 }
 
@@ -411,7 +452,9 @@ class Sdek implements IService
             if (!empty($rates['date'])) {
                 Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id]['delivery_time'] = $rates['date'];
             }
-
+            if (!empty($rates['price'])) {
+                Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id]['cost'] = $rates['price'];
+            }
             if (!empty($rates['clear'])) {
                 unset(Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id]['offices']);
             }
@@ -451,20 +494,29 @@ class Sdek implements IService
         return $return;
     }
 
-    public function prepareAddress($address)
+    /**
+     * Fetches stored data from session
+     *
+     * @return array
+     */
+    protected function getStoredShippingData()
     {
-        
+        $group_key = isset($this->shipping_info['keys']['group_key']) ? $this->shipping_info['keys']['group_key'] : 0;
+        $shipping_id = isset($this->shipping_info['keys']['shipping_id']) ? $this->shipping_info['keys']['shipping_id'] : 0;
+        if (isset(Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id])) {
+            return Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id];
+        }
+
+        return [];
     }
 
     /**
-     * Returns shipping service information
-     * @return array information
+     * Collects errors during preparing and processing request
+     *
+     * @param string $error
      */
-    public static function getInfo()
+    private function _internalError($error)
     {
-        return array(
-            'name' => __('carrier_sdek'),
-            'tracking_url' => 'http://www.edostavka.ru/track.html?order_id=%s'
-        );
+        $this->_error_stack[] = $error;
     }
 }

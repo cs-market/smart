@@ -172,16 +172,23 @@ Responsive: Tablet and phone
 /* Footer
    ========================================================================== */
     .ty-payment-icons .ty-payment-icons__item {
-        margin-left: 5px;
+        margin-left: 2px;
+        margin-right: 2px;
     }
 
+    .ty-footer-form-block__title {
+        padding-left: 10px;
+    }
+    .ty-footer-form-block__title,
+    .ty-footer-form-block__form-container,
     .ty-footer-form-block__form {
-        width: 80%;
+        width: 100%;
     }
     h3.ty-social-link__title {
         display: block;
         margin-top: 21px;
         margin-bottom: 10px;
+        margin-right: 0;
     }
 
 
@@ -258,9 +265,6 @@ Responsive: Tablet to desktop
     }
     .ty-social-link__title {
         margin-right: 70px;
-    }
-    .ty-social-link {
-        margin-right: 60px;
     }
     .ty-footer-menu__items,
     .ty-footer-general__body {
@@ -350,8 +354,7 @@ Responsive: Tablet to desktop
         border: 0;
     }
 
-    .ty-menu__item,
-    .ty-text-links_show_inline {
+    .ty-menu__item {
         display: block !important;
     }
 
@@ -664,11 +667,6 @@ Responsive: Landscape phone to desktop/tablet
    .tygh-header > div,
    .tygh-top-panel > div {
         padding: 0px 10px;
-   }
-   .tygh-top-panel {
-        .ty-text-links-wrapper {
-            border: none;
-        }
    }
 
 /* Mainbox
@@ -1350,72 +1348,6 @@ Responsive: Landscape phone to desktop/tablet
     .vendor-search-grid {
         margin-bottom: 20px;
     }
-
-    .ty-vendor-information {
-        text-align: center;
-    }
-
-
-/* Text links menu
-========================================================================== */
-    .ty-text-links-wrapper {
-        border-bottom: 1px solid @base;
-    }
-    .ty-text-links-btn {
-        display: inline-block;
-        padding: 9px 10px 7px 10px;
-        color: darken(@base, 40%);
-        cursor: pointer;
-    }
-    .ty-text-links-btn.open {
-        z-index: 650;
-        background: darken(@base, 40%);
-        color: #fff;
-    }
-    .ty-text-links-btn__arrow {
-        font-size: 20px;
-        line-height: 0;
-        position: relative;
-        top: 5px;
-        width: 7px;
-        vertical-align: super;
-    }
-    .top-links-grid .ty-text-links-btn {
-        margin-top: -7px;
-    }
-    .ty-text-links_show_inline {
-        position: absolute;
-        min-width: 170px;
-        left: 15px;
-        right: 15px;
-        display: none;
-        background: #fff;
-        border: 1px solid darken(@base, 34%);
-        padding: 7px 14px;
-        z-index: 5;
-        margin: 0;
-
-    }
-    .ty-text-links_show_inline .ty-level-0 > .ty-text-links {
-        display: block;
-        background: none;
-        border: 0 none;
-        padding: 0;
-        position: relative;
-    }
-    .ty-text-links_show_inline .ty-text-links__item {
-        margin-right: 0;
-        display: block;
-    }
-    .ty-text-links_show_inline .ty-text-links {
-        margin: 0;
-    }
-
-    .ty-text-links_show_inline .ty-text-links__item .ty-text-links__a {
-        display: block;
-    }
-
-
 
 /* Product filter tooltip
    ========================================================================== */

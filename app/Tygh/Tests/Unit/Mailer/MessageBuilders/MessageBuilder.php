@@ -105,4 +105,9 @@ class MessageBuilder extends AMessageBuilder
     {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
+
+    public function getStorefrontId()
+    {
+        return 1;
+    }
 }

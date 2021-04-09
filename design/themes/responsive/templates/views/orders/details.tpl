@@ -62,7 +62,7 @@
                             {if $order_info.use_discount}
                                 <th class="ty-orders-detail__table-discount">{__("discount")}</th>
                             {/if}
-                            {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                            {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                                 <th class="ty-orders-detail__table-tax">{__("tax")}</th>
                             {/if}
                             <th class="ty-orders-detail__table-subtotal">{__("subtotal")}</th>
@@ -88,9 +88,10 @@
                                                 {if $product.is_accessible}<a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{/if}
                                                     {$product.product nofilter}
                                                 {if $product.is_accessible}</a>{/if}
-
                                                 {if $product.extra.is_edp == "Y"}
-                                                    <div class="ty-right"><a href="{"orders.order_downloads?order_id=`$order_info.order_id`"|fn_url}">[{__("download")}]</a></div>
+                                                    <div class="ty-right">
+                                                        <a href="{"orders.order_downloads?order_id=`$order_info.order_id`"|fn_url}">[{__("download")}]</a>
+                                                    </div>
                                                 {/if}
                                                 {if $product.product_code}
                                                     <div class="ty-orders-detail__table-code">{__("sku")}:&nbsp;{$product.product_code}</div>
@@ -111,7 +112,7 @@
                                         {if $product.extra.discount|floatval}{include file="common/price.tpl" value=$product.extra.discount}{else}-{/if}
                                     </td>
                                 {/if}
-                                {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                                {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                                     <td class="ty-center">
                                         {if $product.tax_value|floatval}{include file="common/price.tpl" value=$product.tax_value}{else}-{/if}
                                     </td>
@@ -127,7 +128,7 @@
                 {hook name="orders:extra_list"}
                     {assign var="colsp" value=5}
                     {if $order_info.use_discount}{assign var="colsp" value=$colsp+1}{/if}
-                    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}{assign var="colsp" value=$colsp+1}{/if}
+                    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}{assign var="colsp" value=$colsp+1}{/if}
                 {/hook}
 
             </table>
@@ -179,7 +180,7 @@
                                     {else}
                                         {foreach from=$order_info.shipping item="shipping" name="f_shipp"}
 
-                                            {if $shipments[$shipping.group_key].carrier && $shipments[$shipping.group_key].tracking_number}
+                                            {if $shipments[$shipping.group_key].carrier_info.tracking_url && $shipments[$shipping.group_key].tracking_number}
                                                 {$shipping.shipping}&nbsp;({__("tracking_number")}: <a target="_blank" href="{$shipments[$shipping.group_key].carrier_info.tracking_url nofilter}">{$shipments[$shipping.group_key].tracking_number}</a>)
                                                 {$shipment.carrier_info.info nofilter}
                                             {elseif $shipments[$shipping.group_key].tracking_number}
@@ -247,7 +248,7 @@
                                         <td class="ty-orders-summary__taxes-description">
                                             {$tax_data.description}
                                             {include file="common/modifier.tpl" mod_value=$tax_data.rate_value mod_type=$tax_data.rate_type}
-                                            {if $tax_data.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.General.tax_calculation == "subtotal")}
+                                            {if $tax_data.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.Checkout.tax_calculation == "subtotal")}
                                                 {__("included")}
                                             {/if}
                                             {if $tax_data.regnumber}
@@ -287,9 +288,9 @@
             {/if}
 
             {if $view_only != "Y"}
-                <div class="ty-orders-repay">
+                <div class="ty-orders-repay litecheckout">
                     {hook name="orders:repay"}
-                        {if $settings.Checkout.repay == "Y" && $payment_methods}
+                        {if $status_settings.repay == "YesNo::YES"|enum && $payment_methods}
                             {include file="views/orders/components/order_repay.tpl"}
                         {/if}
                     {/hook}
@@ -331,7 +332,9 @@
                                 <tr style="vertical-align: top;">
                                     <td>{if $product.is_accessible}<a href="{"products.view?product_id=`$product.product_id`"|fn_url}" class="product-title">{/if}{$product.product nofilter}{if $product.is_accessible}</a>{/if}
                                         {if $product.extra.is_edp == "Y"}
-                                        <div class="ty-right"><a href="{"orders.order_downloads?order_id=`$order_info.order_id`"|fn_url}">[{__("download")}]</a></div>
+                                            <div class="ty-right">
+                                                <a href="{"orders.order_downloads?order_id=`$order_info.order_id`"|fn_url}">[{__("download")}]</a>
+                                            </div>
                                         {/if}
                                         {if $product.product_code}
                                         <p>{__("sku")}: {$product.product_code}</p>

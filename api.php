@@ -13,7 +13,6 @@
 ****************************************************************************/
 
 use Tygh\Api;
-use Tygh\Registry;
 
 // Area will be defined in Api::defineArea.
 define('API', true);
@@ -29,7 +28,8 @@ try {
     if ($api instanceof Api) {
         $api->handleRequest();
     }
-
-} catch (Tygh\Exceptions\AException $e) {
-    $e->output();
+} catch (Exception $e) {
+    \Tygh\Tools\ErrorHandler::handleException($e);
+} catch (Throwable $e) {
+    \Tygh\Tools\ErrorHandler::handleException($e);
 }

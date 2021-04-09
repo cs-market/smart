@@ -157,6 +157,7 @@ class Backend extends ACommon
             $data = $this->getViewParams($params['view_id']);
             if (!empty($data)) {
                 $result['view_id'] = $params['view_id'];
+                $result['temp_view'] = false;
                 $result = fn_array_merge($data, $params);
 
                 if (!empty($params['sort_by'])) {
@@ -171,6 +172,8 @@ class Backend extends ACommon
 
                 return $result;
             }
+        } elseif (isset($params['is_search']) && $params['is_search'] == 'Y') {
+            $params['temp_view'] = true;
         }
 
         return $params;
@@ -283,4 +286,19 @@ class Backend extends ACommon
         return true;
     }
 
+    /**
+     * Gets currently selected view identifier.
+     *
+     * @return int|null
+     */
+    public function getCurrentViewId()
+    {
+        $view_data = $this->_getCurrentView();
+
+        if (!empty($view_data)) {
+            return $view_data['view_id'];
+        }
+
+        return null;
+    }
 }

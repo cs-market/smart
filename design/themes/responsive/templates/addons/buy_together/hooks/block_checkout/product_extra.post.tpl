@@ -10,9 +10,13 @@
             <span class="ty-caret-info"><span class="ty-caret-outer"></span><span class="ty-caret-inner"></span></span>
             <h4 class="ty-buy-together-info__product">{__("buy_together")}</h4>
             <ul class="ty-buy-together-info__items">
-                {foreach from=$cart_products item="_product" key="key_conf"}
+                {foreach from=$cart_products item="product" key="key_conf"}
                     {if $cart.products.$key_conf.extra.parent.buy_together == $key}
-                        <li class="ty-buy-together-info__item">{$_product.product nofilter}</li>
+                        <li class="ty-buy-together-info__item">
+                            {$product.product nofilter}
+                            {hook name="products:product_additional_info"}
+                            {/hook}
+                        </li>
                     {/if}
                 {/foreach}
             </ul>

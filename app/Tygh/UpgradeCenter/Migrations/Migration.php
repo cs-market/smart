@@ -22,6 +22,8 @@ use PDOException;
 
 /**
  * Migration class that allows to use Phinx migrations not via console
+ *
+ * @method migrate(int $minimal_date)
  */
 class Migration
 {

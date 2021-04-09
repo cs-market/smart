@@ -83,6 +83,10 @@
         .input-hidden {
             border: 1px solid @inputBorder;
             background-color: @inputBackground;
+
+            &:disabled {
+                background-color: @inputDisabledBackground;
+            }
         }
         .cm-no-hide-input .icon-calendar {
             display: inline-block;
@@ -112,7 +116,23 @@
         border-top-width: 1px;
     }
 
-    .input-hidden {
+    .input-hidden,
+    textarea.input-hidden:disabled,
+    input[type="text"].input-hidden:disabled,
+    input[type="password"].input-hidden:disabled,
+    input[type="datetime"].input-hidden:disabled,
+    input[type="datetime-loca.input-hiddenl"]:disabled,
+    input[type="date"].input-hidden:disabled,
+    input[type="month"].input-hidden:disabled,
+    input[type="time"].input-hidden:disabled,
+    input[type="week"].input-hidden:disabled,
+    input[type="number"].input-hidden:disabled,
+    input[type="email"].input-hidden:disabled,
+    input[type="url"].input-hidden:disabled,
+    input[type="search"].input-hidden:disabled,
+    input[type="tel"].input-hidden:disabled,
+    input[type="color"].input-hidden:disabled,
+    .uneditable-input.input-hidden:disabled {
         .box-shadow(none);
         border-color: transparent;
         background-color: transparent;
@@ -134,6 +154,9 @@
     }
     td.center {
         text-align: center;
+    }
+    &--relative {
+        position: relative;
     }
 }
 .table-fixed {
@@ -203,9 +226,6 @@
         .opacity(100);
         color: #333;
     }
-    & tr:first-child td {
-        border-top: 0px;
-    }
 }
 .handler {
     display: block;
@@ -268,6 +288,12 @@
             .clearfix;
             margin-bottom: 8px;
             padding-left: 194px;
+        }
+
+        &--not-title:before {
+            @media (max-width: 767px) {
+                display: none;
+            }
         }
     }
     tr:hover td {

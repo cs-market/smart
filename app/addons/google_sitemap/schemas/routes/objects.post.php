@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+defined('BOOTSTRAP') or die('Access denied');
+
 $schema['/sitemap[i:page]?.xml'] = array(
     'dispatch' => 'xmlsitemap.view'
 );

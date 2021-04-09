@@ -5,16 +5,16 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/discussion.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/discussion.po\n"
+"X-Crowdin-File-ID: 3578\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::discussion"
 msgid "Comments and reviews"
-msgstr "Коментарі та огляди"
+msgstr "Коментарі та відгуки"
 
 msgctxt "Addons::description::discussion"
 msgid "Lets customers leave comments to products, categories, orders, etc., review products and write testimonials"
@@ -22,15 +22,15 @@ msgstr "Дає змогу клієнтам залишати коментарі �
 
 msgctxt "Languages::use_for_discussion"
 msgid "Comments and reviews forms"
-msgstr "Коментарі та форми оглядів"
+msgstr "Форми \"Відгуки та коментарі\""
 
 msgctxt "Languages::comments_and_reviews_menu_description"
 msgid "Customer comments and reviews on products, categories, orders, etc."
-msgstr "Коментарі клієнта і Відгуки про продукти, категорії, замовлення та ін."
+msgstr "Коментарі клієнта та відгуки про продукти, категорії, замовлення та ін."
 
 msgctxt "Languages::discussion_title_category"
 msgid "Reviews"
-msgstr "Огляди"
+msgstr "Відгуки"
 
 msgctxt "Languages::discussion_title_giftreg"
 msgid "Guestbook"
@@ -50,7 +50,7 @@ msgstr "Коментарі"
 
 msgctxt "Languages::discussion_title_product"
 msgid "Reviews"
-msgstr "Огляди"
+msgstr "Відгуки"
 
 msgctxt "Languages::discussion_title_return"
 msgid "Communication"
@@ -62,11 +62,11 @@ msgstr "Не знайдено дописів"
 
 msgctxt "Languages::your_rating"
 msgid "Your rating"
-msgstr "Ваш рейтинг"
+msgstr "Ваша оцінка"
 
 msgctxt "Languages::comments_and_reviews"
 msgid "Comments and reviews"
-msgstr "Коментарі та огляди"
+msgstr "Коментарі та відгуки"
 
 msgctxt "Languages::discussion_title_home_page"
 msgid "Testimonials"
@@ -74,11 +74,15 @@ msgstr "Відгуки"
 
 msgctxt "Languages::text_enabled_testimonials_notice"
 msgid "Testimonials are disabled. To enable, please go to <a href=\"[link]\">Comments and reviews: options</a> and select the \"Communication\", \"Rating\" or \"Communication and Rating\" value in \"Testimonials\" field."
-msgstr "Відгуки вимкнено. Щоб увімкнути, будь ласка, перейдіть на <a href=\"[link]\"> коментарі і огляди: параметри</a> та виберіть значення  «Спілкування», «Рейтинг» або «спілкування та рейтинг» в поле \"Відгуки\"."
+msgstr "Відгуки вимкнено. Щоб увімкнути, будь ласка, перейдіть до <a href=\"[link]\">коментарі і огляди: параметри</a> та виберіть значення «Спілкування», «Оцінка» або «спілкування та оцінка» в поле \"Відгуки\"."
 
 msgctxt "Languages::discussion_title_company"
 msgid "Reviews"
-msgstr "Огляди"
+msgstr "Відгуки"
+
+msgctxt "Languages::communication_and_rating"
+msgid "Communication and Rating"
+msgstr "Спілкування та рейтинг"
 
 msgctxt "Languages::communication"
 msgid "Communication"
@@ -86,15 +90,15 @@ msgstr "Спілкування"
 
 msgctxt "Languages::rating"
 msgid "Rating"
-msgstr "Рейтинг"
+msgstr "Оцінка"
 
 msgctxt "Languages::cant_find_thread"
 msgid "Thread can not be found."
-msgstr "Огляд не знайдено."
+msgstr "Тему не знайдено."
 
 msgctxt "Languages::error_already_posted"
 msgid "You have posted in this discussion already"
-msgstr "Ви вже публікували у цій дискусії"
+msgstr "Ви вже писали повыдомлення у цій дискусії"
 
 msgctxt "Languages::text_thank_you_for_post"
 msgid "Thank you for your post"
@@ -106,23 +110,23 @@ msgstr "Ваше повідомлення буде перевірятися, п�
 
 msgctxt "Languages::discussion"
 msgid "Comments and reviews"
-msgstr "Коментарі та огляди"
+msgstr "Коментарі та відгуки"
 
 msgctxt "Languages::text_new_post_notification"
 msgid "This is a notification of a new post to"
-msgstr "Це повідомлення про нове повідомлення до"
+msgstr "Сповіщення про нове повідомлення"
 
 msgctxt "Languages::text_approval_notice"
 msgid "This post needs approving"
-msgstr "Цей пост потребує затвердження"
+msgstr "Це повідомлення очікує на затвердження"
 
 msgctxt "Languages::latest_reviews"
 msgid "Latest comments & reviews"
-msgstr "Останні коментарі & огляди"
+msgstr "Останні коментарі та відгуки"
 
 msgctxt "Languages::comment_by"
 msgid "Comment by"
-msgstr "Коментарі"
+msgstr "Коментар"
 
 msgctxt "Languages::and"
 msgid "and"
@@ -138,19 +142,23 @@ msgstr "Не затверджено"
 
 msgctxt "Languages::discussion_manager"
 msgid "Comments and reviews"
-msgstr "Коментарі та огляди"
+msgstr "Коментарі та відгуки"
 
 msgctxt "Languages::testimonials"
 msgid "Testimonials"
 msgstr "Відгуки"
 
 msgctxt "Languages::privileges.view_discussions"
-msgid "View comments and reviews"
-msgstr "Перегляд коментарів та оглядів"
+msgid "Can view"
+msgstr "Можна переглянути"
 
 msgctxt "Languages::privileges.manage_discussions"
-msgid "Manage comments and reviews"
-msgstr "Керувати коментарями та оглядами"
+msgid "Can edit"
+msgstr "Можна редагувати"
+
+msgctxt "Languages::privilege_groups.discussions"
+msgid "Comments and reviews"
+msgstr "Коментарі та відгуки"
 
 msgctxt "Languages::block_testimonials"
 msgid "Testimonials"
@@ -158,7 +166,7 @@ msgstr "Відгуки"
 
 msgctxt "Languages::block_testimonials_description"
 msgid "User testimonials"
-msgstr "Ваші враження"
+msgstr "Ваші відгуки"
 
 msgctxt "Languages::sort_by_rating_asc"
 msgid "Sort by rating: Low to High"
@@ -188,10 +196,6 @@ msgctxt "SettingsSections::discussion::orders"
 msgid "Orders"
 msgstr "Замовлення"
 
-msgctxt "SettingsSections::discussion::gift_registry"
-msgid "Gift registry"
-msgstr "Події"
-
 msgctxt "SettingsSections::discussion::pages"
 msgid "Pages"
 msgstr "Сторінки"
@@ -202,7 +206,7 @@ msgstr "Відгуки"
 
 msgctxt "SettingsSections::discussion::companies"
 msgid "Vendors"
-msgstr "Постачальники"
+msgstr "Продавці"
 
 msgctxt "SettingsOptions::discussion::product_posts_per_page"
 msgid "Posts per page"
@@ -218,19 +222,19 @@ msgstr "Дозволено лише один пост з однієї IP-адр�
 
 msgctxt "SettingsOptions::discussion::product_notification_email"
 msgid "Send notifications to this E-mail"
-msgstr "Надіслати сповіщення на електронну пошту"
+msgstr "Надіслати сповіщення на цей E-mail"
 
 msgctxt "SettingsOptions::discussion::product_notify_vendor"
 msgid "Send notifications to vendor"
-msgstr "Надсилати сповіщення постачальнику"
+msgstr "Надсилати сповіщення продавцю"
 
 msgctxt "SettingsOptions::discussion::product_share_discussion"
 msgid "Share discussions with all stores"
-msgstr "Поширити обговерення на всі магазини"
+msgstr "Поширити обговерення на всі вітрини"
 
 msgctxt "SettingsTooltips::discussion::product_share_discussion"
 msgid "Show all comments and reviews of a product on all storefronts that the product is shared with"
-msgstr "Показати всі коментарі та відгуки про продукт в усіх вітринах, на які поширений продукт"
+msgstr "Показати всі коментарі та відгуки про товар в усіх вітринах, на які поширено продукт"
 
 msgctxt "SettingsOptions::discussion::category_posts_per_page"
 msgid "Posts per page"
@@ -259,14 +263,6 @@ msgstr "Дозволити замовнику ініціювати обгово�
 msgctxt "SettingsOptions::discussion::order_notify_vendor"
 msgid "Send notifications to vendor"
 msgstr "Надсилати сповіщення постачальнику"
-
-msgctxt "SettingsOptions::discussion::giftreg_posts_per_page"
-msgid "Posts per page"
-msgstr "Записів на сторінці"
-
-msgctxt "SettingsOptions::discussion::giftreg_post_ip_check"
-msgid "Only one post from one IP is allowed"
-msgstr "Дозволено лише один пост з однієї IP-адреси"
 
 msgctxt "SettingsOptions::discussion::page_posts_per_page"
 msgid "Posts per page"
@@ -320,17 +316,49 @@ msgctxt "SettingsOptions::discussion::testimonials_from_all_stores"
 msgid "Show testimonials from all stores"
 msgstr "Показати Відгуки від всіх магазинів"
 
+msgctxt "SettingsOptions::discussion::product_discussion_type"
+msgid "Default value"
+msgstr "Значення за замовчуванням"
+
+msgctxt "SettingsTooltips::discussion::product_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created products. Doesn't affect existing products."
+msgstr "Визначає, чи дозволяти коментарі або відгуки для створюваних товарів. Не впливає на вже створені товари."
+
+msgctxt "SettingsOptions::discussion::product_review_after_purchase"
+msgid "Only buyers can post"
+msgstr "Відгуки тільки від покупців"
+
+msgctxt "SettingsTooltips::discussion::product_review_after_purchase"
+msgid "Allow leaving reviews for a product only to those who bought that product."
+msgstr "Дозволяє залишати відгуки на продукт тільки тим, хто купив цей продукт."
+
+msgctxt "SettingsOptions::discussion::category_discussion_type"
+msgid "Default value"
+msgstr "Значення за замовчуванням"
+
+msgctxt "SettingsTooltips::discussion::category_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created categories. Doesn't affect existing categories."
+msgstr "Визначає, чи дозволяти коментарі або відгуки для створюваних категорій. Не впливає на вже створені категорії."
+
+msgctxt "SettingsOptions::discussion::page_discussion_type"
+msgid "Default value"
+msgstr "Значення за замовчуванням"
+
+msgctxt "SettingsTooltips::discussion::page_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created pages. Doesn't affect existing pages."
+msgstr "Визначає, чи дозволяти коментарі або відгуки для створюваних сторінок. Не впливає на вже створені сторінки."
+
 msgctxt "SettingsOptions::discussion::company_discussion_type"
 msgid "Reviews"
 msgstr "Огляди"
 
 msgctxt "SettingsOptions::discussion::company_only_buyers"
-msgid "Allow to post only for buyers"
-msgstr "Дозволити розміщувати тільки для покупців"
+msgid "Only buyers can post"
+msgstr "Відгуки тільки від покупців"
 
 msgctxt "SettingsTooltips::discussion::company_only_buyers"
-msgid "Only those who purchased something from the vendor can post"
-msgstr "Тільки ті, що придбали щось від виробника можуть розміщувати"
+msgid "Allow leaving reviews for a vendor only to those who bought products from that vendor."
+msgstr "Залишати відгуки про продавця лише особам, які купили продукти в цього продавця."
 
 msgctxt "SettingsOptions::discussion::company_posts_per_page"
 msgid "Posts per page"
@@ -363,22 +391,6 @@ msgstr "Тільки анонімні користувачі"
 msgctxt "SettingsVariants::discussion::company_post_approval::disabled"
 msgid "No approval needed"
 msgstr "Не потрібні затвердження"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::B"
-msgid "Communication and Rating"
-msgstr "Спілкування та рейтинг"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::C"
-msgid "Communication"
-msgstr "Спілкування"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::R"
-msgid "Rating"
-msgstr "Рейтинг"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::D"
-msgid "Disabled"
-msgstr "Вимкнені"
 
 msgctxt "SettingsVariants::discussion::product_post_approval::any"
 msgid "Any customer"
@@ -428,22 +440,6 @@ msgctxt "SettingsVariants::discussion::home_page_post_approval::disabled"
 msgid "No approval needed"
 msgstr "Не потрібні затвердження"
 
-msgctxt "SettingsVariants::discussion::home_page_testimonials::B"
-msgid "Communication and Rating"
-msgstr "Спілкування та рейтинг"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::C"
-msgid "Communication"
-msgstr "Спілкування"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::R"
-msgid "Rating"
-msgstr "Рейтинг"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::D"
-msgid "Disabled"
-msgstr "Вимкнені"
-
 msgctxt "Languages::discussion_tab_products"
 msgid "Product Reviews"
 msgstr "Відгуки про продукт"
@@ -473,22 +469,42 @@ msgid "Comments and reviews notification"
 msgstr "Сповіщення про коментарі та відгуки"
 
 msgctxt "Languages::show_rating"
-msgid "Show rating"
-msgstr ""
+msgid "Show review rating"
+msgstr "Показувати оцінку з відгуків"
 
 msgctxt "Languages::gdpr_discussions_data"
 msgid "Personal data from discussions"
-msgstr ""
+msgstr "Персональні дані із відгуків та коментарів"
 
 msgctxt "Languages::discussion.add_new_review"
 msgid "Discussion: new review"
-msgstr ""
+msgstr "Відгуки та коментарі: новий відгук"
 
 msgctxt "Languages::discussion.agreement_text_full_add_new_review"
 msgid "<p>Your name will appear next to your review or comment, visible to everyone. We ([company]) also save your IP address as a security precaution, but in can only be viewed by our staff. It will remain in our system until you withdraw your consent. If you’d like to have your personal data removed, send an email to [email].</p> <p>If you believe that your personal data has been misused, you have the right to lodge a complaint with a supervisory authority. We’re obliged by EU General Data Protection Regulation to let you know about this right; we don’t actually intend to misuse your data.</p>"
-msgstr ""
+msgstr "<p>Ваше ім'я з'явиться поруч з вашим відгуком або коментарем, і його зможуть побачити всі. З метою безпеки ми ([company]) також зберігаємо ваш IP-адресу, але побачити його зможуть тільки наші співробітники. Ці дані будуть зберігатися у нас в системі, поки ви не відкличе свою згоду на обробку даних. Якщо ви хочете, щоб ваші персональні дані були видалені, відправте повідомлення на електронну адресу [email]. </p> <p> Якщо Ви вважаєте, що Ваші персональні дані використовуються не за призначенням, Ви маєте право звернутися зі скаргою в наглядовий орган. Згідно \"Загального регламенту щодо захисту даних\" в ЄС ми зобов'язані повідомити Вам про це право, ми не плануємо використовувати Ваші дані не за призначенням.</p>"
 
 msgctxt "Languages::discussion.agreement_text_short_add_new_review"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
-msgstr ""
+msgstr "Я даю згоду на <u>обработку моїх персональних даних.</u>"
+
+msgctxt "Languages::discussion.please_log_in_to_write_a_review"
+msgid "Please sign in to write a review"
+msgstr "Увійдіть в обліковий запис, щоб залишити відгук"
+
+msgctxt "Languages::discussion.you_have_to_buy_product_before_writing_review"
+msgid "You can't write a review for this product. Customers can write reviews only for the products they bought. If you actually bought this product from us, but are still seeing this message, please contact us."
+msgstr "Ви не можете написати відгук про цей товар. Покупці можуть писати відгуки тільки про придбані товари. Якщо ви придбали товар, але як і раніше бачите дане повідомлення, зв'яжіться з нами."
+
+msgctxt "Languages::discussion.you_have_to_buy_from_vendor_before_writing_review"
+msgid "You can't write a review for this vendor. Customers can write reviews for a vendor only after they buy something from that vendor. If you actually placed an order with this vendor, but are still seeing this message, please contact us."
+msgstr "Ви не можете залишити відгук про цього продавця. Покупці можуть залишити відгук про продавця тільки після того, як вони щось у нього купили. Якщо ви щось купували у цього продавця, але все одно бачите це повідомлення, зв'яжіться з нами."
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification_title"
+msgid "Comments and reviews add-on settings were changed"
+msgstr "Налаштування модуля коментарів та відгуків було зміненл"
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification"
+msgid "In the 4.9.1 version the <strong>Only anonymous customers</strong> variant of the <strong>Administrator must approve posts submitted by</strong> setting was removed. Now, it is available again, with the ability to leave reviews for nonauthorized customers. Please check if the desirable value of the setting is selected."
+msgstr "У версії 4.9.1 варіант <strong>Тільки анонімні клієнти</strong> параметра <strong>Адміністратор повинен підтверджувати відправлені повідомлення</strong> в налаштуваннях було видалено. Тепер він доступний знову, з можливістю залишити відгуки для неавторизованих клієнтів. Перевірте, чи вибрано бажане значення параметра."
 

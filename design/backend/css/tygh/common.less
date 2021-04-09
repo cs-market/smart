@@ -59,12 +59,29 @@ a {
     background-image: none;
 }
 
+a,
 a:hover {
     cursor: pointer;
 }
 .label, .badge {
     text-shadow: none;
     background-color: @mainColor;
+
+    &-important {
+        background-color: @errorText;
+    }
+
+    &-warning {
+        background-color: @orange;
+    }
+
+    &-success {
+        background-color: @successText;
+    }
+
+    &-info {
+        background-color: @infoText;
+    }
 }
 select {
     border-color: #d3dbe2;
@@ -109,7 +126,7 @@ input[type="checkbox"] {
     display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     .mobile-visible-inline {
         display: inline-block;
     }
@@ -127,13 +144,7 @@ input[type="checkbox"] {
 }
 
 // Order statuses styles resets
-.o-status-b,
-.o-status-c,
-.o-status-d,
-.o-status-f,
-.o-status-i,
-.o-status-o,
-.o-status-p {
+[class^="o-status-"], [class*=" o-status-"] {
     background-image: none !important;
     text-shadow: none !important;
 }
@@ -179,7 +190,8 @@ input[type="checkbox"] {
     background: #fff;
     cursor: not-allowed;
 }
-.disable-overlay-wrap {
+.disable-overlay-wrap,
+.disable-overlay-wrap.collapse {
     position: relative !important;
 }
 .cke_dialog input {
@@ -216,13 +228,16 @@ input[type="checkbox"] {
     overflow: hidden;
     word-break: break-all;
 }
-.language-wrap {
+
+.content-variant-wrap {
     margin: 10px 0px;
 
     .muted {
         display: inline-block;
         text-transform: uppercase;
-        margin-right: 10px;
+        margin: 0 10px 0 0;
+        line-height: 32px;
+        min-width: 100px;
     }
 }
 

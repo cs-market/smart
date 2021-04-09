@@ -9,7 +9,6 @@
     <default_language>en</default_language>
     <compatibility>
         <core_edition>MULTIVENDOR</core_edition>
-        <conflicts>paypal_for_marketplaces</conflicts>
     </compatibility>
     <queries>
         <item for="install">ALTER TABLE ?:categories ADD COLUMN category_type CHAR(1) NOT NULL DEFAULT 'C';</item>

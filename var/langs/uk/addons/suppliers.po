@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/suppliers.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/suppliers.po\n"
+"X-Crowdin-File-ID: 3642\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::suppliers"
 msgid "Suppliers"
@@ -65,8 +65,12 @@ msgid "Supplier has been deleted successfully."
 msgstr "Успішно вилучено постачальника."
 
 msgctxt "Languages::privileges.manage_suppliers"
-msgid "Manage suppliers"
-msgstr "Керувати постачальників"
+msgid "Can edit"
+msgstr "Можна редагувати"
+
+msgctxt "Languages::privilege_groups.suppliers"
+msgid "Suppliers"
+msgstr "Постачальники"
 
 msgctxt "SettingsSections::suppliers::general"
 msgid "General"
@@ -82,13 +86,33 @@ msgstr "Відображати способи доставки окремо дл
 
 msgctxt "Languages::email_template.suppliers_notification"
 msgid "Supplier notification"
-msgstr ""
+msgstr "Повідомлення від постачальника"
+
+msgctxt "Languages::email_template.supplier_notification_with_status"
+msgid "Supplier notification: [name]"
+msgstr "Повідомлення для постачальника: [name]"
+
+msgctxt "Languages::email_template.suppliers_notification_default"
+msgid "Supplier notification: Default template for a new order status"
+msgstr "Повідомлення для постачальника: шаблон за замовчуванням для нового статусу замовлення"
 
 msgctxt "Languages::template_document_supplier_order_invoice"
 msgid "Suppliers: invoice"
-msgstr ""
+msgstr "Постачальники: рахунок"
 
 msgctxt "Languages::document_preview_suppliers_not_found"
 msgid "Couldn't find a supplier. Preview only works with existing data. Please create a supplier and use Preview again."
-msgstr ""
+msgstr "Немає зареєстрованих постачальників. Попередній перегляд працює тільки при наявності доступних даних. Будь ласка, додайте постачальників і знову скористайтеся функцією попереднього перегляду."
+
+msgctxt "Languages::suppliers.event.order.supplier_notified.name"
+msgid "Suppliers: order status changed to [status]"
+msgstr "Постачальники: статус замовлення змінено на [status]"
+
+msgctxt "Languages::event.receiver.s"
+msgid "Supplier"
+msgstr "Постачальник"
+
+msgctxt "Languages::suppliers.supplier_notifications"
+msgid "Supplier notifications"
+msgstr "Сповіщення постачальника"
 

@@ -15,6 +15,8 @@
 
 /**
  * Gets statuses list for statuses_paid setting.
+ *
+ * @return array Statuses
  */
 function fn_settings_variants_addons_rus_online_cash_register_statuses_paid()
 {
@@ -23,8 +25,20 @@ function fn_settings_variants_addons_rus_online_cash_register_statuses_paid()
 
 /**
  * Gets statuses list for statuses_refund setting.
+ *
+ * @return array Statuses
  */
 function fn_settings_variants_addons_rus_online_cash_register_statuses_refund()
+{
+    return fn_get_simple_statuses(STATUSES_ORDER);
+}
+
+/**
+ * Gets statuses list for statuses_prepaid setting.
+ *
+ * @return array Statuses
+ */
+function fn_settings_variants_addons_rus_online_cash_register_statuses_prepaid()
 {
     return fn_get_simple_statuses(STATUSES_ORDER);
 }

@@ -81,6 +81,17 @@ class Fedex implements IService
      */
     private $_shipping_info = array();
 
+    public $calculation_currency;
+
+    public function __construct($calculation_currency = null)
+    {
+        if ($calculation_currency === null) {
+            $calculation_currency = CART_PRIMARY_CURRENCY;
+        }
+
+        $this->calculation_currency = $calculation_currency;
+    }
+
     /**
      * Currency of rates that are present in the service response
      *
@@ -516,7 +527,7 @@ class Fedex implements IService
             $package_length = empty($package['shipping_params']['box_length']) ? $length : $package['shipping_params']['box_length'];
             $package_width = empty($package['shipping_params']['box_width']) ? $width : $package['shipping_params']['box_width'];
             $package_height = empty($package['shipping_params']['box_height']) ? $height : $package['shipping_params']['box_height'];
-            $package_weight = fn_expand_weight($package['weight']);
+            $package_weight = fn_convert_weight_to_imperial_units($package['weight']);
 
             $line_item = array();
             foreach ($line_item_fields as $field) {

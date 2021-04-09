@@ -16,11 +16,9 @@
         start_server_browser: function() {
 
             var minZ = $.ceDialog('get_last').zIndex();
-            var dlg = $('<div id="server_file_browser"></div>').elfinder({
+            var options = $.extend(_.fileManagerOptions, {
                 url: fn_url('elf_connector.files?security_hash=' + _.security_hash),
-                lang: 'en',
                 cutURL: _.allowed_file_path,
-                resizable: false,
                 getFileCallback: function(file) {
                     $('#server_file_browser').dialog('close');
                     var parts = file.path.split('/');
@@ -28,42 +26,9 @@
                     var path = parts.join('/');
 
                     fileuploader.display_filename(fileuploader.result_id, 'server', path);
-                },
-                uiOptions: {
-                    toolbar : [
-                        ['back', 'forward'],
-                        ['mkdir', 'mkfile', 'upload'],
-                        ['download'],
-                        ['info'],
-                        ['quicklook'],
-                        ['copy', 'cut', 'paste'],
-                        ['rm', 'rename'],
-                        ['edit'],
-                        ['extract', 'archive'],
-                        ['search'],
-                        ['view']
-                    ]
-                },
-                contextmenu: {
-                    files: [
-                        'getfile',
-                        '|',
-                        'open', 'quicklook',
-                        '|',
-                        'download',
-                        '|',
-                        'copy', 'cut', 'paste', 'duplicate',
-                        '|',
-                        'rm',
-                        '|',
-                        'edit', 'rename',
-                        '|',
-                        'archive', 'extract',
-                        '|',
-                        'info'
-                    ]
                 }
-            }).dialog({
+            });
+            var dlg = $('<div id="server_file_browser"></div>').elfinder(options).dialog({
                 width: 900,
                 modal: true,
                 title: _.tr('file_browser'),

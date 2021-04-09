@@ -68,7 +68,8 @@ $schema['banners'] = array (
         'update_handlers' => array(
             'banners', 'banner_descriptions', 'banner_images'
         )
-    )
+    ),
+    'brief_info_function' => 'fn_block_get_block_with_items_info'
 );
 
 return $schema;

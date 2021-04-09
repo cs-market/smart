@@ -181,7 +181,7 @@ $cities = array(
             'owner_id' => '0'
         )
     ),
-    'KIA' => array(
+    'KYA' => array(
         'Красноярск' => array(
             'id' => '785',
             'state' => 'Красноярский край',

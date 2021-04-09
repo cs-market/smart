@@ -11,10 +11,11 @@
 
                 <input type="hidden" name="data_geolocation[geocity]" id="geocity" value="{$smarty.session.geocity}" />
                 <div class="ty-control-group ty-geolocation-city">
-                    <label  class="ty-control-group__label">{__("addon.rus_geolocation.find_city")}</label>
-                    <input type="text" id="auto_geocity" class="ty-search-block__input" name="data_geolocation[geocity]" {if $smarty.session.geocity}value="{$smarty.session.geocity}"{else}value="{$geocity}"{/if} x-autocomplete="auto_geocity" autocomplete="on" onkeypress="if(event.keyCode == 13) return false;" />
+                    <input type="text" id="auto_geocity" class="ty-search-block__input ty-geolocation-city__search-input" name="data_geolocation[geocity]" {if $smarty.session.geocity}value="{$smarty.session.geocity}"{else}value="{$geocity}"{/if} x-autocomplete="auto_geocity" autocomplete="on" onkeypress="if(event.keyCode == 13) return false;" />
+                    <div class="ty-geolocation-city__search-icon">
+                        <i class="ty-icon-search"></i>
+                    </div>
                 </div>
-                <hr />
 
                 {if is_array($data_cities) && !empty($data_cities)}
                     <div class="ty-geolocation_list_cities" data-ce-top="100" data-ce-padding="20" >
@@ -40,5 +41,5 @@
 </div>
 
 <div class="buttons-container clearfix buttons-container-picker">
-    <a class="ty-btn__primary ty-btn__big ty-btn cm-dialog-closer" onclick="fn_get_geolocation_button_city('{$smarty.session.geocity}')" id="select_city1">{__("addon.rus_geolocation.choose_cities")}</a>
+    <a class="ty-btn__primary ty-btn__big ty-btn cm-dialog-closer" onclick="fn_get_geolocation_button_city('{$smarty.session.geocity}')" id="select_city1">{__("addon.rus_geolocation.choose_city")}</a>
 </div>

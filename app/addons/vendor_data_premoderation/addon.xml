@@ -13,7 +13,7 @@
                 <items>
                     <item id="products_prior_approval">
                         <type>selectbox</type>
-                        <default_value>none</default_value>
+                        <default_value>all</default_value>
                         <variants>
                             <item id="none">
                             </item>
@@ -25,7 +25,7 @@
                     </item>
                     <item id="products_updates_approval">
                         <type>selectbox</type>
-                        <default_value>none</default_value>
+                        <default_value>all</default_value>
                         <variants>
                             <item id="none">
                             </item>
@@ -37,7 +37,7 @@
                     </item>
                     <item id="vendor_profile_updates_approval">
                         <type>selectbox</type>
-                        <default_value>none</default_value>
+                        <default_value>all</default_value>
                         <variants>
                             <item id="none">
                             </item>
@@ -47,21 +47,49 @@
                             </item>
                         </variants>
                     </item>
+                    <item id="approval_info">
+                        <type>info</type>
+                        <handler>fn_vendor_data_premoderation_get_approval_info_text</handler>
+                    </item>
+                </items>
+            </section>
+            <section id="products">
+                <items>
+                    <item id="product_premoderation_fields">
+                        <type>multiple checkboxes</type>
+                        <default_value><![CDATA[#M#product_prices:*=Y&products:list_price=Y]]></default_value>
+                    </item>
                 </items>
             </section>
         </sections>
     </settings>
     <queries>
-        <item>ALTER TABLE ?:products ADD `approved` char(1) NOT NULL DEFAULT 'Y' AFTER `company_id`</item>
-        <item for="uninstall">ALTER TABLE ?:products DROP `approved`</item>
-        <item>ALTER TABLE ?:companies ADD `pre_moderation` char(1) NOT NULL DEFAULT 'N'</item>
+        <item for="install">ALTER TABLE ?:companies ADD `pre_moderation` char(1) NOT NULL DEFAULT 'N'</item>
         <item for="uninstall">ALTER TABLE ?:companies DROP `pre_moderation`</item>
-        <item>ALTER TABLE ?:companies ADD `pre_moderation_edit` char(1) NOT NULL DEFAULT 'N'</item>
+        <item for="install">ALTER TABLE ?:companies ADD `pre_moderation_edit` char(1) NOT NULL DEFAULT 'N'</item>
         <item for="uninstall">ALTER TABLE ?:companies DROP `pre_moderation_edit`</item>
-        <item>ALTER TABLE ?:companies ADD `pre_moderation_edit_vendors` char(1) NOT NULL DEFAULT 'N'</item>
+        <item for="install">ALTER TABLE ?:companies ADD `pre_moderation_edit_vendors` char(1) NOT NULL DEFAULT 'N'</item>
         <item for="uninstall">ALTER TABLE ?:companies DROP `pre_moderation_edit_vendors`</item>
-        <item >REPLACE INTO  ?:privileges (privilege, is_default, section_id) VALUES ('manage_product_premoderation', 'Y', 'vendors');</item>
+        <item for="install">REPLACE INTO  ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_product_premoderation', 'Y', 'vendors', 'product_premoderation', 'N');</item>
         <item for="uninstall">DELETE FROM ?:privileges WHERE privilege = 'manage_product_premoderation'</item>
+        <item for="install">DROP TABLE IF EXISTS ?:premoderation_products;</item>
+        <item for="install">
+            CREATE TABLE ?:premoderation_products (
+                product_id mediumint(8) unsigned NOT NULL COMMENT 'Moderated product ID',
+                original_status char(1) NOT NULL default 'A' COMMENT 'Status of the product before it was sent to moderation',
+                updated_timestamp int(11) unsigned NOT NULL default 0 COMMENT 'Last moderation action timestamp',
+                reason text NOT NULL default '' COMMENT 'Last moderation reason',
+                PRIMARY KEY (product_id)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">
+            UPDATE ?:products AS products SET status = (
+                SELECT original_status
+                FROM ?:premoderation_products AS premoderation
+                WHERE products.product_id = premoderation.product_id
+            ) WHERE products.status IN ('R', 'X')
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:premoderation_products;</item>
     </queries>
     <email_templates>
         <templates>
@@ -102,4 +130,8 @@
             </item>
         </templates>
     </email_templates>
+    <internal_templates type="file">resources/internal_templates.xml</internal_templates>
+    <functions>
+        <item for="uninstall">fn_vendor_data_premoderation_display_notification_for_deleted_statuses</item>
+    </functions>
 </addon>

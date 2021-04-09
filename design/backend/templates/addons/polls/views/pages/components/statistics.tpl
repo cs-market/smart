@@ -1,7 +1,7 @@
 {include file="common/subheader.tpl" title=__("summary")}
 
 <div class="table-wrapper">
-    <table class="table table-striped">
+    <table class="table table-striped table--relative">
     <tr>
         <td width="300">{__("polls_total_submited")}:</td>
         <td>
@@ -40,7 +40,7 @@
                 <div class="controls">
                     {if $question.type == "T"}
                         <div class="table-wrapper">
-                            <table class="table table-middle table-bordered">
+                            <table class="table table-middle table--relative table-bordered">
                             <tr>
                                 <td width="200">{__("polls_answers_with_comments")}</td>
                                 <td>
@@ -64,7 +64,7 @@
                     {else}
                         {foreach from=$question.answers item="answer"}
                             <div class="table-wrapper">
-                                <table class="table table-middle table-bordered">
+                                <table class="table table-middle table--relative table-bordered">
                                 <tr>
                                     <td width="200">{$answer.description}</td>
                                     <td>{include file="addons/polls/views/pages/components/graph_bar.tpl" value_width=$answer.results.ratio bar_width="400"}

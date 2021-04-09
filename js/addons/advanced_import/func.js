@@ -3,6 +3,8 @@
     var preset_id, object_type,
         company_selector, file_type_selector,
         file_selector, preset_name_selector,
+        preset_file,
+        preset_file_type,
         xml_target_node_wrapper,
         nesting_padding_size = 20;
 
@@ -25,6 +27,9 @@
                 if (!preset_name_selector.val()) {
                     preset_name_selector.val(file)
                 }
+
+                preset_file.val(file);
+                preset_file_type.val(file_type);
             });
 
             if (xml_target_node_wrapper.data('caDefaultHidden')) {
@@ -61,7 +66,7 @@
                 }
             });
         },
-        
+
         toggleXmlTargetNode: function (file_extension) {
             if (!file_extension || file_extension !== 'xml') {
                 xml_target_node_wrapper.hide();
@@ -71,15 +76,19 @@
         },
 
         initRelatedObjectSelectors: function (selectors) {
-            selectors.change(function () {
-                var type_holder = $('#elm_field_related_object_type_' + $(this).data('caAdvancedImportFieldId'));
-                var type = $('option:selected', $(this)).data('caAdvancedImportFieldRelatedObjectType');
-                type_holder.val(type);
-            });
+            selectors
+                .on('change', function () {
+                    var $this = $(this),
+                        selected = $this.select2('data');
 
-            selectors.each(function () {
-                $(this).trigger('change');
-            });
+                    if (!selected || !selected[0]) {
+                        return;
+                    }
+
+                    $this.data('caObjectTypeHolderElem').val(selected[0].objectType);
+                    $this.data('caObjectIdHolderElem').val(selected[0].objectId);
+                })
+                .trigger('change');
         },
 
         showFieldsPreview: function (opener) {
@@ -225,6 +234,153 @@
     });
 
     $.ceEvent('on', 'ce.commoninit', function (context) {
+        if (typeof _.advanced_import == 'undefined') {
+            return;
+        }
+
+        $('.cm-adv-import-placeholder', context).each(function (index, elm) {
+            try {
+                var data = $(elm).data();
+                var typeHolder = $('#elm_field_related_object_type_' + data.caAdvancedImportFieldId);
+                var presetField = _.advanced_import.preset_fields[data.caAdvancedImportFieldName];
+
+                typeHolder.val('skip');
+
+                if (presetField) {
+                    var relatedObjectType = presetField.related_object_type;
+                    var relatedObject = presetField.related_object;
+
+                    if (relatedObjectType && relatedObject) {
+                        var object = _.advanced_import.relations[relatedObjectType].fields[relatedObject];
+                        var optionText = getOptionText(object, relatedObject);
+
+                        $(elm).text(optionText);
+                        $(elm).removeClass('cm-adv-import-placeholder--empty');
+                        $('#elm_field_related_object_' + data.caAdvancedImportFieldId).val(relatedObject);
+                        typeHolder.val(relatedObjectType);
+                    }
+                }
+            } catch (Error) {
+                $.ceNotification('show', {
+                    title: _.tr('error'),
+                    message: Error.toString(),
+                    type: 'E'
+                });
+            }
+        });
+
+        $('.cm-adv-import-placeholder').one('click', function (e) {
+            var elm = $(e.currentTarget)
+            var data = $(elm).data();
+            var $select;
+
+            try {
+                $select = createSelector(data);     
+            } catch (Error) {
+                $.ceNotification('show', {
+                    title: _.tr('error'),
+                    message: Error.toString(),
+                    type: 'E'
+                });
+            }
+
+            $(elm).addClass('hidden');
+            $(elm).after($select);
+
+            $($select, $('.preview-fields-mapping__wrapper', context)).ceObjectSelector({
+                data: getOptions(data)
+            }); 
+      
+            $('select[name="' + data.caAdvancedImportSelectName + '"] option:first')
+                .attr('data-ca-advanced-import-field-related-object-type', 'skip');
+
+            for (var relatedObjType in _.advanced_import.relations) {
+                $('select[name="' + data.caAdvancedImportSelectName + '"] optgroup[label="' + _.advanced_import.relations[relatedObjType].description + '"] option')
+                    .attr('data-ca-advanced-import-field-related-object-type', relatedObjType);
+            }
+            
+            $.ceAdvancedImport('initRelatedObjectSelectors', $($select, context));
+            $($select).select2('open');
+        });
+
+        function createSelector(data) {
+            var $selectElm = $('<select></select>');
+            $selectElm.attr({
+                'class': 'input-hidden cm-object-selector import-field__related_object-select',
+                'id': 'elm_import_field_' + data.caAdvancedImportFieldId,
+                'data-ca-advanced-import-field-related-object-selector': 'true',
+                'data-ca-advanced-import-field-id': data.caAdvancedImportFieldId,
+                'data-ca-enable-search': 'true',
+                'data-ca-placeholder': data.caPlaceholder,
+                'data-ca-allow-clear': 'true'
+            });
+            $selectElm.data('caObjectTypeHolderElem', $('#elm_field_related_object_type_' + data.caAdvancedImportFieldId));
+            $selectElm.data('caObjectIdHolderElem', $('#elm_field_related_object_' + data.caAdvancedImportFieldId));
+
+            return $selectElm;
+        }
+
+        function getOptions(data) {
+            var options = [
+                {
+                    id: '', 
+                    text: '', 
+                    selected:'false', 
+                    element: HTMLOptionElement
+                }
+            ];
+
+            var name = data.caAdvancedImportFieldName;
+            var presetFields = _.advanced_import.preset_fields;
+
+            for (var relatedObjectType in _.advanced_import.relations) {
+                if (!_.advanced_import.relations.hasOwnProperty(relatedObjectType)) {
+                    continue;
+                }
+
+                var groupInfo = _.advanced_import.relations[relatedObjectType];
+
+                var optionGroup = {
+                    text: groupInfo.description || '-----',
+                    children: [],
+                    element: HTMLOptGroupElement
+                };
+
+                for (var objectName in groupInfo.fields) {
+                    if (!groupInfo.fields.hasOwnProperty(objectName) || groupInfo.fields[objectName].hidden) {
+                        continue;
+                    }
+
+                    optionGroup.children.push(
+                        {
+                            id: relatedObjectType + '_' + objectName,
+                            text: getOptionText(groupInfo.fields[objectName], objectName),
+                            selected: !!presetFields[name] 
+                                        && presetFields[name].related_object_type === relatedObjectType 
+                                        && presetFields[name].related_object === objectName,
+                            objectId: objectName,
+                            objectType: relatedObjectType
+                        }
+                    );
+                }
+
+                options.push(optionGroup);
+            }
+            return options;
+        }
+
+        function getOptionText(object, objectName){
+            var optionText = object.show_name? objectName : '';
+
+            if(object.show_description){
+                optionText += object.show_name? ' (' + object.description + ')' : object.description;
+            }
+
+            return optionText;
+        }
+    });
+
+    $.ceEvent('on', 'ce.commoninit', function (context) {
         var preset = $('[data-ca-advanced-import-element="editor"]', context);
         if (preset.length) {
             preset_id = preset.data('caAdvancedImportPresetId');
@@ -233,14 +389,11 @@
             file_type_selector = $('[name="type_upload[]"]');
             file_selector = $('[name="file_upload[]"]');
             preset_name_selector = $('#elm_preset', context);
+            preset_file = $('[data-ca-advanced-import-element="file"]', context);
+            preset_file_type = $('[data-ca-advanced-import-element="file_type"]', context);
             xml_target_node_wrapper = $('#target_node').closest('.control-group');
 
             $.ceAdvancedImport('initPresetEditor');
-        }
-
-        var related_object_selectors = $('[data-ca-advanced-import-field-related-object-selector]', context);
-        if (related_object_selectors.length) {
-            $.ceAdvancedImport('initRelatedObjectSelectors', related_object_selectors);
         }
 
         var fields_preview_opener = $('.import-preset__preview-fields-mapping', context);

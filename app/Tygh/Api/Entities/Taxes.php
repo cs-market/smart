@@ -21,9 +21,9 @@ use Tygh\Registry;
 class Taxes extends AEntity
 {
 
-    public function index($id = 0, $params = array())
+    public function index($id = 0, $params = [])
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (!empty($id)) {
             $data = fn_get_tax($id, $lang_code);
@@ -40,39 +40,39 @@ class Taxes extends AEntity
 
             $data = fn_get_taxes($lang_code);
             $data = array_values($data);
+            $total_items_count = count($data);
 
             if ($items_per_page) {
                 $data = array_slice($data, ($page - 1) * $items_per_page, $items_per_page);
             }
 
-            $data = array(
-                'taxes' => $data,
-                'params' => array(
+            $data = [
+                'taxes'  => $data,
+                'params' => [
                     'items_per_page' => $items_per_page,
-                    'page' => $page,
-                    'total_items' => count($data),
-                ),
-            );
+                    'page'           => $page,
+                    'total_items'    => $total_items_count,
+                ],
+            ];
             $status = Response::STATUS_OK;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function create($params)
     {
-
         $status = Response::STATUS_BAD_REQUEST;
-        $data = array();
+        $data = [];
         $valid_params = true;
 
         if (empty($params['tax'])) {
-            $data['message'] = __('api_required_field', array(
+            $data['message'] = __('api_required_field', [
                 '[field]' => 'tax'
-            ));
+            ]);
             $valid_params = false;
         }
 
@@ -81,62 +81,61 @@ class Taxes extends AEntity
 
             if ($tax_id) {
                 $status = Response::STATUS_CREATED;
-                $data = array(
+                $data = [
                     'tax_id' => $tax_id,
-                );
+                ];
             }
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function update($id, $params)
     {
         $status = Response::STATUS_BAD_REQUEST;
-        $data = array();
+        $data = [];
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
         $tax_id = fn_update_tax($params, $id, $lang_code);
 
         if ($tax_id) {
             $status = Response::STATUS_OK;
-            $data = array(
+            $data = [
                 'tax_id' => $tax_id
-            );
+            ];
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function delete($id)
     {
-        $data = array();
+        $data = [];
         $status = Response::STATUS_NOT_FOUND;
 
         if (fn_delete_tax($id)) {
             $status = Response::STATUS_NO_CONTENT;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function privileges()
     {
-        return array(
+        return [
             'create' => 'manage_taxes',
             'update' => 'manage_taxes',
             'delete' => 'manage_taxes',
             'index'  => 'view_taxes'
-        );
+        ];
     }
-
 }

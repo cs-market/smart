@@ -6,13 +6,6 @@
     {assign var="edit_link_text" value=__("view")}
 {/if}
 
-{capture name="toolbar"}
-    {include file="views/snippets/components/adv_buttons.tpl" result_ids=$result_ids return_url=$return_url type=$type addon=$addon|default:""}
-{/capture}
-<div class="btn-toolbar clearfix cm-toggle-button">
-    {$smarty.capture.toolbar nofilter}
-</div>
-
 <div id="snippet_list">
     <form action="{""|fn_url}" method="post" name="snippets_form" class="form-horizontal">
         <input type="hidden" name="return_url" value="{$return_url}" />
@@ -20,7 +13,7 @@
 
         {if $snippets}
             <div class="table-responsive-wrapper">
-            <table class="table table-middle table-responsive" width="100%">
+            <table class="table table-middle table--relative table-responsive" width="100%">
                 <thead>
                     <tr>
                         {if $can_update}
@@ -49,7 +42,7 @@
                     <tr class="cm-row-status-{$snippet->getStatus()|lower} row-snippet" data-snippet-id="{$snippet->getId()}">
                         {if $can_update}
                             <td class="center mobile-hide">
-                                <input type="checkbox" name="snippet_ids[]" value="{$snippet->getId()}" class="checkbox cm-item" />
+                                <input type="checkbox" name="snippet_ids[]" value="{$snippet->getId()}" class="cm-item" />
                             </td>
                         {/if}
                         <td class="row-status" data-th="{__("name")}">

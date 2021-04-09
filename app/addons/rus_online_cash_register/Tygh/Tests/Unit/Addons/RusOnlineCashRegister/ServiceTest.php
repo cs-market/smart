@@ -53,7 +53,7 @@ class ServiceTest extends PHPUnit_Framework_TestCase
             'Osn'
         );
 
-        $receipt = $service->getReceiptFromOrder($order, $type);
+        $receipt = $service->getReceiptFromOrder($order, $type, Receipt::PAYMENT_METHOD_FULL_PAYMENT);
         $this->assertEquals($expected, $receipt->toArray());
     }
 
@@ -168,6 +168,7 @@ class ServiceTest extends PHPUnit_Framework_TestCase
                             'sum' => 666.09
                         )
                     ),
+                    'currency' => 'RUB',
                 ),
             )
         );

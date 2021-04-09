@@ -20,6 +20,7 @@
  */
 
 use Tygh\Registry;
+use Tygh\Enum\ProfileFieldLocations;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -29,12 +30,36 @@ if (!defined('PAYMENT_NOTIFICATION')) {
         $currency_settings = Registry::get('currencies.' . CART_PRIMARY_CURRENCY);
     }
     $timestamp = date('Ymdhis');
-    $billing_zipcode = preg_replace("/[^0-9]/", '', $order_info['b_zipcode']);
-    $billing_address = preg_replace("/[^0-9]/", '', $order_info['b_address']);
-    $shipping_zipcode = preg_replace("/[^0-9]/", '', $order_info['s_zipcode']);
-    $shipping_address = preg_replace("/[^0-9]/", '', $order_info['s_address']);
 
-    $post_data = array(
+    $location_manager = Tygh::$app['location'];
+    $billing_country = $location_manager->getLocationField($order_info, 'country', '', BILLING_ADDRESS_PREFIX);
+    $phone_masks = fn_get_phone_masks(false);
+    $local_number = preg_replace('/[^\d]/', '', $location_manager->getLocationField($order_info, 'phone', '', BILLING_ADDRESS_PREFIX));
+
+    foreach ($phone_masks as $key => $country_data) {
+        if ($country_data['cc'] === $billing_country || (is_array($country_data['cc']) && array_search($billing_country, $country_data['cc']) !== false)) {
+            $country_code = preg_replace('/[^\d]/', '', $country_data['mask']);
+            break;
+        }
+    }
+
+    if (isset($country_code) && substr($local_number, 0, strlen($country_code)) === $country_code) {
+        $format_phone_number = $country_code . '|' . substr($local_number, strlen($country_code));
+    } else {
+        $format_phone_number = substr($local_number, 0, 1) . '|' . substr($local_number, 1);
+    }
+
+    // The payment requires ISO 3166-1 numeric three-digit country code
+    $billing_country_num = db_get_field('SELECT code_N3 FROM ?:countries WHERE code = ?s', $billing_country);
+    $shipping_country_num = db_get_field('SELECT code_N3 FROM ?:countries WHERE code = ?s', $location_manager->getLocationField($order_info, 'country', '', SHIPPING_ADDRESS_PREFIX));
+
+    $filter = '/[^\p{L}\p{M}[:blank:]\p{N}\/\.\-\_\'\,]*/uim';
+    $billing_street_1 = fn_substr(preg_replace($filter, '', $location_manager->getLocationField($order_info, 'address', '', BILLING_ADDRESS_PREFIX)), 0, 50);
+    $billing_street_2 = fn_substr(preg_replace($filter, '', $location_manager->getLocationField($order_info, 'address_2', '', BILLING_ADDRESS_PREFIX)), 0, 50);
+    $shipping_street_1 = fn_substr(preg_replace($filter, '', $location_manager->getLocationField($order_info, 'address', '', SHIPPING_ADDRESS_PREFIX)), 0, 50);
+    $shipping_street_2 = fn_substr(preg_replace($filter, '', $location_manager->getLocationField($order_info, 'address_2', '', SHIPPING_ADDRESS_PREFIX)), 0, 50);
+
+    $post_data = [
         'ORDER_ID'              => $order_id . $timestamp,
         'MERCHANT_ID'           => $processor_data['processor_params']['merchant_id'],
         'ACCOUNT'               => $processor_data['processor_params']['account'],
@@ -47,15 +72,29 @@ if (!defined('PAYMENT_NOTIFICATION')) {
         'AUTO_SETTLE_FLAG'      => (int)($processor_data['processor_params']['settlement'] == 'auto'),
         'RETURN_TSS'            => '1',
         'MERCHANT_RESPONSE_URL' => fn_url(
-            "payment_notification.process&payment=realex_redirect&order_id=$order_id",
+            "payment_notification.process&payment=realex_redirect&order_id={$order_id}",
             AREA,
             'current'
         ),
-        'SHIPPING_CO'           => $order_info['s_country'],
-        'SHIPPING_CODE'         => substr($shipping_zipcode, 0, 5) . '|' . substr($shipping_address, 0, 5),
-        'BILLING_CO'            => $order_info['b_country'],
-        'BILLING_CODE'          => substr($billing_zipcode, 0, 5) . '|' . substr($billing_address, 0, 5)
-    );
+        'HPP_VERSION' => 2, // This must be set to 2.
+        'HPP_CUSTOMER_EMAIL' => $order_info['email'],
+        'HPP_CUSTOMER_PHONENUMBER_MOBILE' => $format_phone_number,
+        'HPP_BILLING_STREET1' => $billing_street_1,
+        'HPP_BILLING_STREET2' => $billing_street_2, // Second line of the customer's billing address. Can be submitted as blank if not relevant for the particular customer.
+        'HPP_BILLING_STREET3' => '', // Third line of the customer's billing address. Can be submitted as blank if not relevant for the particular customer.
+        'HPP_BILLING_CITY' => $location_manager->getLocationField($order_info, 'city', '', BILLING_ADDRESS_PREFIX),
+        'HPP_BILLING_POSTALCODE' => $location_manager->getLocationField($order_info, 'zipcode', '', BILLING_ADDRESS_PREFIX),
+        'HPP_BILLING_COUNTRY' => $billing_country_num,
+        'HPP_SHIPPING_STREET1' => $shipping_street_1,
+        'HPP_SHIPPING_STREET2' => $shipping_street_2,
+        'HPP_SHIPPING_STREET3' => '',
+        'HPP_SHIPPING_CITY' => $location_manager->getLocationField($order_info, 'city', '', SHIPPING_ADDRESS_PREFIX),
+        'HPP_SHIPPING_STATE' => $location_manager->getLocationField($order_info, 'state', '', SHIPPING_ADDRESS_PREFIX),
+        'HPP_SHIPPING_POSTALCODE' => $location_manager->getLocationField($order_info, 'zipcode', '', SHIPPING_ADDRESS_PREFIX),
+        'HPP_SHIPPING_COUNTRY' => $shipping_country_num,
+        'HPP_ADDRESS_MATCH_INDICATOR' => fn_check_shipping_billing($order_info, fn_get_profile_fields(ProfileFieldLocations::CHECKOUT_FIELDS)) ? 'FALSE' : 'TRUE', // Indicates whether the shipping address matches the billing address.
+        'HPP_CHALLENGE_REQUEST_INDICATOR' => 'NO_PREFERENCE' // Indicates whether a challenge is requested for this transaction. NO_PREFERENCE - No preference as to whether the customer is challenged.
+    ];
 
     $post_data['SHA1HASH'] = sha1(
         strtolower(

@@ -12,9 +12,9 @@
         <label class="ty-geolocation-head-city">{__("addon.rus_geolocation.find_city")}: 
 
         {if !$smarty.session.geocity}
-            {include file="common/popupbox.tpl" href="geolocation.popup_geo" link_text=__("addon.rus_geolocation.select_geocities") text=__("addon.rus_geolocation.select_city") id="geolocation_link" content="" but_meta="cm-dialog-opener hidden cm-dialog-auto-size"}
+            {include file="common/popupbox.tpl" href="geolocation.popup_geo" link_text=__("addon.rus_geolocation.select_city") text=__("addon.rus_geolocation.choose_city") id="geolocation_link" content="" but_meta="cm-dialog-opener hidden cm-dialog-auto-size"}
         {else}
-            {include file="common/popupbox.tpl" href="geolocation.popup_geo" link_text=$smarty.session.geocity text=__("addon.rus_geolocation.select_city") content="" id="geolocation_link" but_meta="cm-dialog-opener hidden cm-dialog-auto-size"}
+            {include file="common/popupbox.tpl" href="geolocation.popup_geo" link_text=$smarty.session.geocity text=__("addon.rus_geolocation.choose_city") content="" id="geolocation_link" but_meta="cm-dialog-opener hidden cm-dialog-auto-size"}
         {/if}
         </label>
     </div>

@@ -139,7 +139,7 @@ if (!empty($_payment_id) && (!empty(Tygh::$app['session']['cart']['products']) |
     }
 }
 
-function fn_paypal_set_bml_checkout($payment_id, $order_id = 0, $order_info = array(), $cart = array(), $area = AREA)
+function fn_paypal_set_bml_checkout($payment_id, $order_id = 0, $order_info = [], $cart = [], $area = AREA)
 {
     $processor_data = fn_get_payment_method_data($payment_id);
 
@@ -151,17 +151,17 @@ function fn_paypal_set_bml_checkout($payment_id, $order_id = 0, $order_info = ar
         $cancel_url = fn_url("checkout.cart", $area, 'current');
     }
 
-    $request = array(
+    $request = [
         'PAYMENTREQUEST_0_PAYMENTACTION' => 'SALE',
-        'PAYMENTREQUEST_0_SOLUTIONTYPE' => 'SOLE',
-        'PAYMENTREQUEST_0_CURRENCYCODE' => $processor_data['processor_params']['currency'],
-        'LOCALECODE' => CART_LANGUAGE,
-        'RETURNURL' => $return_url,
-        'CANCELURL' => $cancel_url,
-        'METHOD' => 'SetExpressCheckout',
-        'LANDINGPAGE' => 'Billing',
-        'UserSelectedFundingSource' => 'BML'
-    );
+        'PAYMENTREQUEST_0_SOLUTIONTYPE'  => 'SOLE',
+        'PAYMENTREQUEST_0_CURRENCYCODE'  => $processor_data['processor_params']['currency'],
+        'LOCALECODE'                     => CART_LANGUAGE,
+        'RETURNURL'                      => $return_url,
+        'CANCELURL'                      => $cancel_url,
+        'METHOD'                         => 'SetExpressCheckout',
+        'LANDINGPAGE'                    => 'Billing',
+        'UserSelectedFundingSource'      => 'BML'
+    ];
 
     fn_paypal_build_request($processor_data, $request, $post_url, $cert_file);
 

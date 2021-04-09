@@ -10,7 +10,7 @@
 
 {if $return_requests}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th class="left mobile-hide">

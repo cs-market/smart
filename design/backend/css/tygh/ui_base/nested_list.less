@@ -39,9 +39,11 @@
         .overlay {
             position: absolute;
             z-index: 1;
-            width: 250px;
-            height: 26px;
-            background: #0088cc;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: @mainColor;
         }
     }
 }
@@ -106,10 +108,10 @@
                 padding-left: 16px;
             }
             margin-left: -16px;
-            background: #0088cc;
+            background: @mainColor;
             padding-left: 16px;
             a {
-                background: #0088cc;
+                background: @mainColor;
                 color: white;
             }
         }

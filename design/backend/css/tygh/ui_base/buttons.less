@@ -34,6 +34,12 @@
         .box-shadow(none);
     }
 }
+.btn-link--contents {
+    padding: 0;
+    margin: 0;
+    display: inline;
+    padding-bottom: 5px;
+}
 .btn.active,
 .btn:active {
     background-color: #f5f6f7;
@@ -68,8 +74,8 @@
     border: 0px !important;
     display: inline-block;
     margin-top: -2px;
-    padding-right: 0px !important;
-    padding-left: 0px !important;
+    padding-right: 0px;
+    padding-left: 0px;
     //.box-shadow(none !important);
     color: @textButtonColor;
     text-decoration: none !important;
@@ -180,8 +186,11 @@
         }
     }
 }
+.btn-indent {
+    margin-bottom: 10px;
+}
 // .btn-group must open at all width on mobile devices
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     .btn-group,
     .dropdown {
         &.open {
@@ -205,7 +214,7 @@
         }
     }
 }
-@media (width: 768px) {
+@media (width: @TabletBreakpoint) {
     .controls {
         .btn-group,
         .dropdown {
@@ -295,4 +304,28 @@ textarea {
 
 .form-edit.form-horizontal .controls .btn-group {
     margin-top: 2px;
+}
+
+.btn-expand {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    &--header {
+        height: 16px;
+    }
+
+    .icon-caret-right {
+        margin-top: 0;
+    }
+
+    &-wrapper {
+        display: inline-block;
+        width: 32px;
+        height: 20px;
+        text-align: center;
+    }
 }

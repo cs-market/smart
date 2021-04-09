@@ -1,4 +1,7 @@
 <?php
+
+use Tygh\Tygh;
+
 /***************************************************************************
 *                                                                          *
 *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
@@ -160,4 +163,21 @@ function fn_exim_orders_set_docs($order_id, $data, $type)
     }
 
     return true;
+}
+
+function fn_import_check_storefront_id(&$data)
+{
+    foreach ($data as $lang_code => $order_data) {
+
+        if (empty($order_data['storefront_id'])) {
+
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+
+            $default_storefront = $repository->findDefault();
+
+            $data[$lang_code]['storefront_id'] = $default_storefront->storefront_id;
+
+        }
+    }
 }

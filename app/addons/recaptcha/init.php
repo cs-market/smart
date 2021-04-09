@@ -12,16 +12,17 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Addons\Recaptcha\RecaptchaDriver;
 use Tygh\Application;
 use Tygh\Registry;
 use Tygh\Web\Antibot;
 
-Tygh::$app->extend('antibot', function(Antibot $antibot, Application $app) {
-    $recaptcha_antibot_driver = new RecaptchaDriver(Registry::get('addons.recaptcha'));
+$addons_dir = Registry::get('config.dir.addons');
+Tygh::$app['class_loader']->add('Gregwar\\', $addons_dir . '/recaptcha/lib');
 
-    if ($recaptcha_antibot_driver->isSetUp()) {
-        $antibot->setDriver($recaptcha_antibot_driver);
+Tygh::$app->extend('antibot', function(Antibot $antibot, Application $app) {
+    $driver = fn_recaptcha_get_captcha_driver();
+    if ($driver->isSetUp()) {
+        $antibot->setDriver($driver);
     }
 
     return $antibot;

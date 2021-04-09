@@ -65,10 +65,8 @@
                             <object_type><![CDATA[]]></object_type>
                             <content>
                                 <items>
-                                    <filling><![CDATA[newest]]></filling>
-                                    <period><![CDATA[A]]></period>
-                                    <last_days><![CDATA[1]]></last_days>
-                                    <limit><![CDATA[4]]></limit>
+                                    <filling><![CDATA[manually]]></filling>
+                                    <item_ids><![CDATA[6,16,17,19]]></item_ids>
                                 </items>
                             </content>
                             <object_ids><![CDATA[]]></object_ids>
@@ -100,6 +98,7 @@
                                 <number_of_columns><![CDATA[5]]></number_of_columns>
                                 <show_location><![CDATA[Y]]></show_location>
                                 <show_rating><![CDATA[Y]]></show_rating>
+                                <show_vendor_rating><![CDATA[Y]]></show_vendor_rating>
                                 <show_products_count><![CDATA[Y]]></show_products_count>
                                 <displayed_vendors><![CDATA[5]]></displayed_vendors>
                             </properties>

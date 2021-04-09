@@ -1,25 +1,30 @@
 {if !$no_table}
 <div class="table-wrapper">
-    <table width="100%" class="table table-middle table-objects{if $table_striped} table-striped{/if}">
+    <table width="100%" class="table table-middle table--relative table-objects{if $table_striped} table-striped{/if}">
         <tbody>
     {/if}
-            <tr class="cm-row-status-{$status|lower} {$additional_class} cm-row-item" {if $row_id}id="{$row_id}"{/if} data-ct-{$table}="{$id}">
-                {if $checkbox_name}
+            <tr class="cm-row-status-{$status|lower} {$additional_class} cm-row-item" 
+                {if $row_id}id="{$row_id}"{/if}
+                data-ct-{$table}="{$id}"
+            >
+                {if $checkbox_name && $show_checkboxes}
                 <td>
-                    <input type="checkbox" name="{$checkbox_name}" value="{$checkbox_value|default:$id}"{if $checked} checked="checked"{/if} class="cm-item" />
+                    <input type="checkbox" name="{$checkbox_name}" value="{$checkbox_value|default:$id}"{if $checked} checked="checked"{/if} class="cm-item{if $hidden_checkbox} hidden{/if} cm-item-status-{$status|lower}" />
                 </td>
                 {/if}
 
+                {if !$no_padding}
                 <td width="1%" class="no-padding-td">
                     {if $draggable}
                         <span class="handler cm-sortable-handle"></span>
                     {/if}
                 </td>
+                {/if}
 
-                <td width="{if $href_desc}77{else}28{/if}%">
+                <td width="{if $href_desc}77{else}28{/if}%" {if $href_desc_row_hint}data-th="{$href_desc_row_hint}"{/if}>
                     <div class="object-group-link-wrap">
                     {if !$non_editable}
-                        <a {if $no_popup}href="{$href|fn_url}"{/if} class="row-status {if !$main_link}cm-external-click{/if}{if $non_editable} no-underline{/if}{if $main_link} link{/if} {$link_meta}{if $is_promo}cm-promo-popup{/if}"{if !$non_editable && !$not_clickable} data-ca-external-click-id="opener_group{$id_prefix}{$id}"{/if}{if $main_link} {if !$is_promo}href="{$main_link|fn_url}{/if}"{/if}>{$text}</a>
+                        <a {if $no_popup}href="{$href|fn_url}"{/if} title="{$text}" class="row-status {if !$main_link}cm-external-click{/if}{if $non_editable} no-underline{/if}{if $main_link} link{/if} {$link_meta}{if $is_promo}cm-promo-popup{/if} {if $text_wrap}row-status--text-wrap{/if}"{if !$non_editable && !$not_clickable} data-ca-external-click-id="opener_group{$id_prefix}{$id}"{/if}{if $main_link} {if !$is_promo}href="{$main_link|fn_url}{/if}"{/if}>{$text}</a>
                     {else}
                         <span class="unedited-element block {$link_meta}">{$text|default:__("view")}</span>
                     {/if}
@@ -72,7 +77,7 @@
                     {$links nofilter}
                 </td>
                 {if !$nostatus}
-                    <td width="12%">
+                    <td width="12%" {if $status_row_hint}data-th="{$status_row_hint}"{/if}>
                         <div class="pull-right nowrap">
                             {if $non_editable == true || $is_promo}
                                 {assign var="display" value="text"}

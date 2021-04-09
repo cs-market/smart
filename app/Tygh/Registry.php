@@ -15,6 +15,7 @@
 namespace Tygh;
 
 use Tygh\Exceptions\DeveloperException;
+use Tygh\Providers\StorefrontProvider;
 
 class Registry
 {
@@ -193,7 +194,7 @@ class Registry
                 $piece = & $piece[$part];
                 $parent_key .= $i === 0 ? $part : '.' . $part;
 
-                self::$_storage_cache_children_keys[$parent_key][] = $key;
+                self::$_storage_cache_children_keys[$parent_key][$key] = $key;
             }
 
             // cache complex keys only
@@ -289,14 +290,15 @@ class Registry
     /**
      * Registers variable in the cache
      *
-     * @param mixed $key         key name. Array with 2 values can be passed: first - key name, second - key alias
+     * @param mixed  $key         key name. Array with 2 values can be passed: first - key name, second - key alias
      * @param mixed  $condition   cache reset condition - array with table names of expiration time (int)
      * @param string $cache_level indicates the cache dependencies on controller, language, user group, etc
-     * @param bool   $track       if set to true, cache data will be collection during script execution and saved when it finished
+     * @param bool   $track       if set to true, cache data will be collection during script execution and saved when
+     *                            it finished
      *
      * @return boolean true if data is cached and valid, false - otherwise
      */
-    public static function registerCache($key, $condition, $cache_level = NULL, $track = false)
+    public static function registerCache($key, $condition, $cache_level = null, $track = false)
     {
         if (empty(self::$_cache)) {
             self::cacheInit();
@@ -310,24 +312,51 @@ class Registry
         }
 
         if (empty(self::$_cached_keys[$alias])) {
-            self::$_cached_keys[$alias] = array(
-                'condition' => $condition,
-                'cache_level' => $cache_level . (!empty($tag) ? $alias : ''),
-                'track' => $track,
-                'hash' => '',
-                'tag' => $tag
-            );
+            self::$_cached_keys[$alias] = [
+                'condition'       => $condition,
+                'cache_level'     => $cache_level . (!empty($tag) ? $alias : ''),
+                'track'           => $track,
+                'hash'            => '',
+                'tag'             => $tag,
+                'cache_ttl'       => null,
+            ];
 
-            if (!self::isExist($alias) && ($val = self::_getCache(!empty($tag) ? $tag : $alias, self::$_cached_keys[$alias]['cache_level'])) !== NULL) {
-                self::set($alias, $val, true);
-
-                // Get hash of original value for tracked data
-                if ($track == true) {
-                    self::$_cached_keys[$alias]['hash'] = md5(serialize($val));
-                }
-
-                return true;
+            if (is_array($condition) && array_key_exists('update_handlers', $condition) && array_key_exists('ttl', $condition)) {
+                self::$_cached_keys[$alias]['condition'] = $condition['update_handlers'];
+                self::$_cached_keys[$alias]['cache_ttl'] = $condition['ttl'];
             }
+
+            return !self::isExist($alias) && self::loadFromCache($alias);
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieves a value from cache with a specified key.
+     *
+     * @param array|string $key Key name
+     *
+     * @return bool
+     */
+    public static function loadFromCache($key)
+    {
+        if (!isset(self::$_cached_keys[$key])) {
+            return false;
+        }
+
+        $tag = self::$_cached_keys[$key]['tag'];
+        $val = self::_getCache(!empty($tag) ? $tag : $key, self::$_cached_keys[$key]['cache_level']);
+
+        if ($val !== null) {
+            self::set($key, $val, true);
+
+            // Get hash of original value for tracked data
+            if (self::$_cached_keys[$key]['track'] == true) {
+                self::$_cached_keys[$key]['hash'] = md5(serialize($val));
+            }
+
+            return true;
         }
 
         return false;
@@ -395,10 +424,16 @@ class Registry
     private static function _saveCache($key, $val)
     {
         if (empty(self::$_cached_keys[$key]['hash']) || self::$_cached_keys[$key]['hash'] != md5(serialize(self::$_storage[$key]))) {
-
             $_key = !empty(self::$_cached_keys[$key]['tag']) ? self::$_cached_keys[$key]['tag'] : $key;
 
-            self::$_cache->set($_key, $val, self::$_cached_keys[$key]['condition'], self::$_cached_keys[$key]['cache_level']);
+            self::$_cache->set(
+                $_key,
+                $val,
+                self::$_cached_keys[$key]['condition'],
+                self::$_cached_keys[$key]['cache_level'],
+                self::$_cached_keys[$key]['cache_ttl']
+            );
+
             self::_updateHandlers($_key, self::$_cached_keys[$key]['condition'], self::$_cached_keys[$key]['cache_level']);
         }
     }
@@ -485,42 +520,53 @@ class Registry
     /**
      * Generates cache level value for key
      *
-     * @param string $id Cache level name
+     * @param string|string[] $id Cache level name
      *
      * @return string Cache level value
      */
     public static function cacheLevel($id)
     {
+        if (is_array($id)) {
+            return implode('__', array_map(function ($id) {
+                return self::cacheLevel($id);
+            }, $id));
+        }
+
         if (!isset(self::$_cache_levels[$id])) {
             $usergroups_condition = '';
             if (!empty(\Tygh::$app['session']['auth']['usergroup_ids'])) {
                 $usergroups_condition = implode('_', \Tygh::$app['session']['auth']['usergroup_ids']);
             }
 
-            if ($id == 'time') {
+            if ($id === 'time') {
                 $key = 'time';
-            } elseif ($id == 'static') {
+            } elseif ($id === 'static') {
                 $key = 'cache_' . ACCOUNT_TYPE;
-            } elseif ($id == 'day') {
+            } elseif ($id === 'day') {
                 $key = date('z', TIME);
-            } elseif ($id == 'locale') {
+            } elseif ($id === 'company') {
+                $key = fn_get_runtime_company_id();
+            } elseif ($id === 'storefront') {
+                $storefront = StorefrontProvider::getStorefront();
+                $key = $storefront->storefront_id;
+            } elseif ($id === 'locale') {
                 $key = (defined('CART_LOCALIZATION') ? (CART_LOCALIZATION . '_') : '')
                     . CART_LANGUAGE . '_' . CART_SECONDARY_CURRENCY;
-            } elseif ($id == 'dispatch') {
+            } elseif ($id === 'dispatch') {
                 $key = AREA . '_' . $_SERVER['REQUEST_METHOD'] . '_' . str_replace('.', '_', $_REQUEST['dispatch'])
                     . '_' . (defined('CART_LOCALIZATION') ? (CART_LOCALIZATION . '_') : '')
                     . CART_LANGUAGE . '_' . CART_SECONDARY_CURRENCY;
-            } elseif ($id == 'user') {
+            } elseif ($id === 'user') {
                 $key = AREA . '_' . $_SERVER['REQUEST_METHOD'] . '_' . str_replace('.', '_', $_REQUEST['dispatch'])
                     . '.' . $usergroups_condition
                     . '.' . (defined('CART_LOCALIZATION') ? (CART_LOCALIZATION . '_') : '')
                     . CART_LANGUAGE . '.' . CART_SECONDARY_CURRENCY;
-            } elseif ($id == 'locale_auth') {
+            } elseif ($id === 'locale_auth') {
                 $key = AREA . '_' . $_SERVER['REQUEST_METHOD'] . '_' . (!empty(\Tygh::$app['session']['auth']['user_id']) ? 1 : 0)
                     . '.' . $usergroups_condition
                     . (defined('CART_LOCALIZATION') ? (CART_LOCALIZATION . '_') : '')
                     . CART_LANGUAGE . '.' . CART_SECONDARY_CURRENCY;
-            } elseif ($id == 'html_blocks') {
+            } elseif ($id === 'html_blocks') {
                 $promotion_condition = '';
                 if (!empty(\Tygh::$app['session']['auth']['user_id'])) {
                     $active_promotions = db_get_fields(
@@ -542,7 +588,7 @@ class Registry
             }
 
             if (!isset($key)) {
-                throw new DeveloperException('Registry: undefined cache level');
+                DeveloperException::undefinedCacheLevel();
             }
 
             self::$_cache_levels[$id] = $key;

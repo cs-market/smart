@@ -12,16 +12,28 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
+use Tygh\Enum\Addons\Discussion\DiscussionTypes;
 use Tygh\Enum\ProductTracking;
+use Tygh\Enum\YesNo;
 use Tygh\Navigation\LastView;
 use Tygh\Registry;
+use Tygh\Settings;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-function fn_get_discussion_company_condition($field)
+/**
+ * Checks the edition and builds the company condition for discussion tables if necessary
+ *
+ * @param string     $field      Name of the table company field
+ * @param int|string $company_id Company identifier if empty then will be defined by runtime
+ *
+ * @return string Part of sql query which is checked company condition.
+ */
+function fn_get_discussion_company_condition($field, $company_id = '')
 {
     if (fn_allowed_for('ULTIMATE')) {
-        return fn_get_company_condition($field);
+        return fn_get_company_condition($field, true, $company_id);
     }
 
     return '';
@@ -174,17 +186,17 @@ function fn_get_discussions($params, $items_per_page = 0)
 /**
  * Fetches discussion related to specified object.
  *
- * @param int $object_id Object identifier
- * @param string $object_type One-letter object type identifier
- * @param bool $get_posts If true, posts in discussion will be fetched
- * @param array $params Extra parameteres
+ * @param int        $object_id   Object identifier
+ * @param string     $object_type One-letter object type identifier
+ * @param bool       $get_posts   If true, posts in discussion will be fetched
+ * @param array      $params      Extra parameteres
+ * @param int|string $company_id  Additional condition for searching discussion by company identifier
  *
  * @return array|bool Array containing discussion object, false if none found
  */
-function fn_get_discussion($object_id, $object_type, $get_posts = false, $params = array())
+function fn_get_discussion($object_id, $object_type, $get_posts = false, $params = array(), $company_id = '')
 {
     static $cache = array();
-    static $customer_companies = null;
 
     /**
      * Executes at the beginning of the function, allowing you to modify the arguments passed to the function.
@@ -199,9 +211,19 @@ function fn_get_discussion($object_id, $object_type, $get_posts = false, $params
     $_cache_key = $object_id . '_' . $object_type;
 
     if (empty($cache[$_cache_key])) {
-        $field_list = 'thread_id, type, object_type';
+        $field_list = [
+            'object_id',
+            'thread_id',
+            'type',
+            'object_type'
+        ];
+        if (!fn_allowed_for('MULTIVENDOR')) {
+            $field_list[] = 'company_id';
+        }
         $join = $order_by = $limit = '';
-        $condition = db_quote(" AND object_id = ?i AND object_type = ?s ?p", $object_id, $object_type, fn_get_discussion_company_condition('?:discussion.company_id'));
+        $condition = db_quote(" AND object_id = ?i AND object_type = ?s ?p", $object_id, $object_type, fn_get_discussion_company_condition('?:discussion.company_id', $company_id));
+
+        $field_list = implode(', ', $field_list);
 
         /**
          * Executes right before performing discussion-fetching query, allowing you to modify the SQL-query.
@@ -235,19 +257,14 @@ function fn_get_discussion($object_id, $object_type, $get_posts = false, $params
             }
         }
 
-        if (!empty($discussion) && AREA == 'C' && $object_type == 'M' && Registry::ifGet('addons.discussion.company_only_buyers', 'Y') == 'Y') {
-            if (empty(Tygh::$app['session']['auth']['user_id'])) {
+        if (!empty($discussion) && AREA == 'C' && $object_type == DiscussionObjectTypes::COMPANY) {
+            $cannot_detect_if_user_bought_from_vendor = Tygh::$app['session']['auth']['user_id']
+                && Registry::ifGet('addons.discussion.company_only_buyers', 'Y') === 'Y';
+
+            if ($cannot_detect_if_user_bought_from_vendor
+                || !fn_discussion_is_user_eligible_to_write_review_for_company(Tygh::$app['session']['auth']['user_id'], $object_id)
+            ) {
                 $discussion['disable_adding'] = true;
-            } else {
-                if ($customer_companies === null) {
-                    $customer_companies = db_get_hash_single_array(
-                        'SELECT company_id FROM ?:orders WHERE user_id = ?i',
-                        array('company_id', 'company_id'), Tygh::$app['session']['auth']['user_id']
-                    );
-                }
-                if (empty($customer_companies[$object_id])) {
-                    $discussion['disable_adding'] = true;
-                }
             }
         }
 
@@ -504,25 +521,22 @@ function fn_add_discussion_post($post_data, $send_notifications = true)
     $post_data['thread_id'] = $object['thread_id'];
     $object_data = fn_get_discussion_object_data($object['object_id'], $object['object_type']);
     $object_name = $discussion_object_types[$object['object_type']];
-    $ip = fn_get_ip();
-    $post_data['ip_address'] = fn_ip_to_db($ip['host']);
     $post_data['status'] = 'A';
 
-    // Check if post is permitted from this IP address
-    if (
-        AREA != 'A'
-        && !empty($discussion_settings[$object_name . '_post_ip_check'])
-        && $discussion_settings[$object_name . '_post_ip_check'] == 'Y'
-    ) {
-        $is_exists = db_get_field(
-            "SELECT COUNT(*) FROM ?:discussion_posts WHERE thread_id = ?i AND ip_address = ?s",
-            $post_data['thread_id'], $post_data['ip_address']
-        );
-        if (!empty($is_exists)) {
-            fn_set_notification('E', __('error'), __('error_already_posted'));
-            return false;
-        }
+    if (!empty($auth['ip'])) {
+        $post_data['ip_address'] = $auth['ip'];
+    } else {
+        $ip = fn_get_ip();
+        $post_data['ip_address'] = $ip['host'];
     }
+
+    // Check if post is permitted from this IP address
+    if (AREA === 'C' && !fn_discussion_is_user_can_leave_review_from_ip($post_data['ip_address'], $object['object_type'], $object['thread_id'])) {
+        fn_set_notification('E', __('error'), __('error_already_posted'));
+        return false;
+    }
+
+    $post_data['ip_address'] = fn_ip_to_db($post_data['ip_address']);
 
     // Check if post needs to be approved
     if (AREA != 'A' && !empty($discussion_settings[$object_name . '_post_approval'])) {
@@ -716,28 +730,46 @@ function fn_add_discussion_post($post_data, $send_notifications = true)
     return $post_data['post_id'];
 }
 
-function fn_discussion_update_product_post(&$product_data, &$product_id)
+/**
+ * The "update_product_post" hook handler.
+ *
+ * Actions performed:
+ *  - Update discussion data
+ *
+ * @see fn_update_product
+ */
+function fn_discussion_update_product_post(&$product_data, &$product_id, $lang_code, $create)
 {
-    if (empty($product_data['discussion_type'])) {
+    if (empty($product_data['discussion_type']) && !$create) {
         return false;
     }
+
     if (empty($product_data['company_id'])) {
         $product_company_id = db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id);
         if (!empty($product_company_id)) {
             $product_data['company_id'] = $product_company_id;
         } else {
             if (Registry::get('runtime.company_id')) {
-                $product_company_id = $product_data['company_id'] = Registry::get('runtime.company_id');
+                $product_data['company_id'] = Registry::get('runtime.company_id');
             }
         }
     }
 
-    $discussion = array(
+    if (empty($product_data['discussion_type'])) {
+        $discussion_settings = Settings::instance()->getValues('discussion', Settings::ADDON_SECTION, false, $product_data['company_id']);
+        if (empty($discussion_settings['product_discussion_type'])) {
+            return false;
+        }
+
+        $product_data['discussion_type'] = $discussion_settings['product_discussion_type'];
+    }
+
+    $discussion = [
         'object_type' => 'P',
-        'object_id' => $product_id,
-        'type' => $product_data['discussion_type'],
-        'company_id' => $product_data['company_id']
-    );
+        'object_id'   => $product_id,
+        'type'        => $product_data['discussion_type'],
+        'company_id'  => $product_data['company_id']
+    ];
 
     fn_update_discussion($discussion);
 }
@@ -1006,44 +1038,29 @@ function fn_discussion_get_object($params)
     );
 }
 
-//
-// Clone discussion
-//
+/**
+ * Clones discussion
+ *
+ * @param int    $object_id     Object id to clone from
+ * @param int    $new_object_id Object id to clone to
+ * @param string $object_type   One-letter object type
+ *
+ * @return mixed
+ */
 function fn_clone_discussion($object_id, $new_object_id, $object_type)
 {
-
     // Clone attachment
-    $data = db_get_row("SELECT * FROM ?:discussion WHERE object_id = ?i AND object_type = ?s", $object_id, $object_type);
+    $data = db_get_row('SELECT * FROM ?:discussion WHERE object_id = ?i AND object_type = ?s', $object_id, $object_type);
 
     if (empty($data)) {
         return false;
     }
 
-    $old_thread_id = $data['thread_id'];
     $data['object_id'] = $new_object_id;
     unset($data['thread_id']);
-    $thread_id = db_query("REPLACE INTO ?:discussion ?e", $data);
+    $thread_id = db_query('REPLACE INTO ?:discussion ?e', $data);
 
-    // Clone posts
-    $data = db_get_array("SELECT * FROM ?:discussion_posts WHERE thread_id = ?i", $old_thread_id);
-    foreach ($data as $v) {
-        $old_post_id = $v['post_id'];
-        $v['thread_id'] = $thread_id;
-        unset($v['post_id']);
-        $post_id = db_query("INSERT INTO ?:discussion_posts ?e", $v);
-
-        $message = db_get_row("SELECT * FROM ?:discussion_messages WHERE post_id = ?i", $old_post_id);
-        $message['post_id'] = $post_id;
-        $message['thread_id'] = $thread_id;
-        db_query("INSERT INTO ?:discussion_messages ?e", $message);
-
-        $rating = db_get_row("SELECT * FROM ?:discussion_rating WHERE post_id = ?i", $old_post_id);
-        $rating['post_id'] = $post_id;
-        $rating['thread_id'] = $thread_id;
-        db_query("INSERT INTO ?:discussion_rating ?e", $rating);
-    }
-
-    return true;
+    return $thread_id;
 }
 
 function fn_discussion_clone_product(&$product_id, &$to_product_id)
@@ -1190,6 +1207,10 @@ function fn_discussion_get_products(&$params, &$fields, &$sortings, &$condition,
         }
 
         $join .= db_quote(" LEFT JOIN ?:discussion_posts ON ?:discussion_posts.thread_id = ?:discussion.thread_id AND ?:discussion_posts.status = 'A'");
+        if (!empty($params['start_rating_period'])) {
+            $join .= db_quote(' AND ?:discussion_posts.timestamp > ?i', $params['start_rating_period']);
+        }
+
         $join .= db_quote(" LEFT JOIN ?:discussion_rating ON ?:discussion.thread_id = ?:discussion_rating.thread_id AND ?:discussion_rating.post_id = ?:discussion_posts.post_id AND ?:discussion_rating.rating_value != 0");
 
         $having[] = db_quote("average_rating > 0");
@@ -1306,13 +1327,19 @@ function fn_discussion_get_companies(&$params, &$fields, &$sortings, &$condition
 {
     $fields[] = 'AVG(?:discussion_rating.rating_value) AS average_rating';
     $fields[] = "CONCAT(?:companies.company_id, '_', IF (?:discussion_rating.thread_id, ?:discussion_rating.thread_id, '0')) AS company_thread_ids";
-    $join .= db_quote(" LEFT JOIN ?:discussion ON ?:discussion.object_id = ?:companies.company_id AND ?:discussion.object_type = 'M'");
-    $join .= db_quote(" LEFT JOIN ?:discussion_posts ON ?:discussion_posts.thread_id = ?:discussion.thread_id AND ?:discussion_posts.status = 'A'");
-    $join .= db_quote(" LEFT JOIN ?:discussion_rating ON ?:discussion.thread_id = ?:discussion_rating.thread_id AND ?:discussion_rating.post_id = ?:discussion_posts.post_id");
+
+    $join .= db_quote(' LEFT JOIN ?:discussion ON ?:discussion.object_id = ?:companies.company_id AND ?:discussion.object_type = ?s', DISCUSSION_OBJECT_TYPE_COMPANY);
+
+    $join .= db_quote(' LEFT JOIN ?:discussion_posts ON ?:discussion_posts.thread_id = ?:discussion.thread_id AND ?:discussion_posts.status = ?s', 'A');
+    if (!empty($params['start_rating_period'])) {
+        $join .= db_quote(' AND ?:discussion_posts.timestamp > ?i', $params['start_rating_period']);
+    }
+
+    $join .= db_quote(' LEFT JOIN ?:discussion_rating ON ?:discussion.thread_id = ?:discussion_rating.thread_id AND ?:discussion_rating.post_id = ?:discussion_posts.post_id');
+
     $group_by = 'GROUP BY company_thread_ids';
 
     if (!empty($params['sort_by']) && $params['sort_by'] == 'rating') {
-        $group_by .= ' HAVING average_rating > 0';
         $sortings['rating'] = 'average_rating';
     }
 }
@@ -1499,14 +1526,6 @@ function fn_create_empty_thread($type, $company_id = null)
     return true;
 }
 
-/**
- * @deprecated
- */
-function fn_discussion_parse_datetime($datetime)
-{
-    return fn_parse_datetime($datetime);
-}
-
 function fn_discussion_update_company(&$company_data, &$company_id, &$lang_code, &$action)
 {
     if ($action == 'add') {
@@ -1629,4 +1648,202 @@ function fn_gdpr_add_discussion_post_post($post_data, $send_notifications)
     );
 
     return fn_gdpr_save_user_agreement($params, 'discussions_add_review');
+}
+
+/**
+ * Fetches all available discussion types list
+ *
+ * @return array
+ */
+function fn_discussion_get_discussion_types()
+{
+    return DiscussionTypes::getAll();
+}
+
+/**
+ * Checks if user can leave review for specific product
+ *
+ * @param int $user_id    User identifier
+ * @param int $product_id Product identifier
+ *
+ * @return bool
+ */
+function fn_discussion_is_user_eligible_to_write_review_for_product($user_id, $product_id)
+{
+    $result = true;
+    $need_to_buy_first = Registry::get('addons.discussion.product_review_after_purchase') == YesNo::YES;
+
+    if ($need_to_buy_first) {
+        $result = $user_id && (bool) db_get_field(
+            'SELECT orders.order_id FROM ?:orders AS orders '
+            . 'LEFT JOIN ?:order_details AS details ON orders.order_id = details.order_id '
+            . 'WHERE orders.user_id = ?i AND details.product_id = ?i LIMIT 1',
+            $user_id,
+            $product_id
+        );
+    }
+
+    /**
+     * Executes at the ending of the function, allows to modify result of function.
+     *
+     * @param int  $user_id           User identifier
+     * @param int  $product_id        Product identifier
+     * @param bool $result            Availability to post a review for product by this user
+     * @param bool $need_to_buy_first State of the product_review_after_purchase setting
+     */
+    fn_set_hook('discussion_is_user_eligible_to_write_review_for_product_post', $user_id, $product_id, $result, $need_to_buy_first);
+
+
+    return $result;
+}
+
+/**
+ * Checks if user can leave review for specific company
+ *
+ * @param int $user_id    User identifier
+ * @param int $company_id Company identifier
+ *
+ * @return bool
+ */
+function fn_discussion_is_user_eligible_to_write_review_for_company($user_id, $company_id)
+{
+    static $customer_companies = [];
+    $need_to_buy_first = Registry::ifGet('addons.discussion.company_only_buyers', 'Y') === 'Y';
+
+    if (!$need_to_buy_first) {
+        return true;
+    }
+
+    if (!isset($customer_companies[$user_id])) {
+        $customer_companies[$user_id] = db_get_hash_single_array(
+            'SELECT company_id FROM ?:orders WHERE user_id = ?i',
+            ['company_id', 'company_id'],
+            $user_id
+        );
+    }
+
+    return !empty($customer_companies[$user_id][$company_id]);
+}
+
+/**
+ * Checks if the customer can leave review from this IP.
+ *
+ * @param string $ip          Customer ip address
+ * @param string $object_type Thread object type
+ * @param int    $thread_id   Thread identifier
+ *
+ * @return bool
+ */
+function fn_discussion_is_user_can_leave_review_from_ip($ip, $object_type, $thread_id)
+{
+    $can_post = true;
+
+    $discussion_settings = Registry::get('addons.discussion');
+
+    $discussion_object_types = fn_get_discussion_objects();
+    $object_type = $discussion_object_types[$object_type];
+
+    if (
+        $ip
+        && !empty($discussion_settings[$object_type . '_post_ip_check'])
+        && $discussion_settings[$object_type . '_post_ip_check'] === YesNo::YES
+    ) {
+        $is_exists = Tygh::$app['db']->getField(
+            'SELECT COUNT(*) FROM ?:discussion_posts WHERE thread_id = ?i AND ip_address = ?s',
+            $thread_id, fn_ip_to_db($ip)
+        );
+
+        $can_post = empty($is_exists);
+    }
+
+    return $can_post;
+}
+
+
+/**
+ * The "check_and_update_product_sharing" hook handler.
+ *
+ * Actions performed:
+ *  - Sets default review option value for new company which is added to product sharing
+ *
+ * @see fn_check_and_update_product_sharing
+ */
+function fn_discussion_check_and_update_product_sharing($product_id, $shared, $existing_company_ids, $product_categories_company_ids, $added_company_ids)
+{
+    if (empty($product_id) || empty($added_company_ids)) {
+        return;
+    }
+
+    foreach ($added_company_ids as $added_company_id) {
+        $existing_discussion = fn_get_discussion($product_id, DiscussionObjectTypes::PRODUCT, false, [], $added_company_id);
+        if (!empty($existing_discussion)) {
+            continue;
+        }
+
+        $discussion_settings = Settings::instance()->getValues('discussion', Settings::ADDON_SECTION, false, $added_company_id);
+        if (empty($discussion_settings['product_discussion_type'])) {
+            continue;
+        }
+
+        $discussion_type = $discussion_settings['product_discussion_type'];
+
+        $discussion = [
+            'object_type' => DiscussionObjectTypes::PRODUCT,
+            'object_id'   => $product_id,
+            'type'        => $discussion_type,
+            'company_id'  => $added_company_id
+        ];
+
+        fn_update_discussion($discussion);
+    }
+}
+
+/**
+ * The "seo_get_schema_org_markup_items_post" hook handler.
+ *
+ * Actions performed:
+ *     - Adds aggregate rating for the Product markup item.
+ *     - Adds reviews for the Product markup item.
+ *
+ * @see \fn_seo_get_schema_org_markup_items()
+ */
+function fn_discussion_seo_get_schema_org_markup_items_post($product_data, $show_price, $currency, &$markup_items)
+{
+    if (empty($markup_items['product'])) {
+        return;
+    }
+
+    if (empty($product_data['discussion']['search']['total_items'])
+        || empty($product_data['discussion']['average_rating'])
+    ) {
+        return;
+    }
+
+    $product_item = $markup_items['product'];
+
+    $product_item['aggregateRating'] = [
+        '@type'       => 'http://schema.org/AggregateRating',
+        'reviewCount' => (int) $product_data['discussion']['search']['total_items'],
+        'ratingValue' => (float) $product_data['discussion']['average_rating'],
+        'review'      => [],
+    ];
+
+    if (!empty($product_data['discussion']['posts'])) {
+        foreach ($product_data['discussion']['posts'] as $post) {
+            $product_item['review'][] = [
+                '@type'        => 'http://schema.org/Review',
+                'author'       => [
+                    '@type' => 'http://schema.org/Person',
+                    'name'  => $post['name'],
+                ],
+                'reviewRating' => [
+                    '@type'       => 'http://schema.org/Rating',
+                    'ratingValue' => (float) $post['rating_value'],
+                    'bestRating'  => 5,
+                ],
+            ];
+        }
+    }
+
+    $markup_items['product'] = $product_item;
 }

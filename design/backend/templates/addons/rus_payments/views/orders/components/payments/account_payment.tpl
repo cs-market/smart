@@ -10,8 +10,8 @@
 </div>
 
 <div class="ty-control-group">
-    <label for="phone_customer" class="ty-control-group__title">{__("phone")}</label>
-    <input type="text" name="payment_info[phone]" id="phone_customer" value="{$cart.payment_info.phone}" size="20">
+    <label for="phone_customer" class="ty-control-group__title cm-mask-phone-label">{__("phone")}</label>
+    <input type="text" class="cm-mask-phone" name="payment_info[phone]" id="phone_customer" value="{$cart.payment_info.phone}" size="20">
 </div>
 
 <div class="ty-control-group">

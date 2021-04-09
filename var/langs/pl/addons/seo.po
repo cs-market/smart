@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: pl\n"
-"X-Crowdin-File: /release-4.8.2/addons/seo.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:08\n"
+"X-Crowdin-File: /release-4.11.5/addons/seo.po\n"
+"X-Crowdin-File-ID: 3546\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::seo"
 msgid "SEO"
@@ -61,12 +61,16 @@ msgid "page [n]"
 msgstr "Strona [n]"
 
 msgctxt "Languages::privileges.manage_seo_rules"
-msgid "Manage SEO rules and 301 redirects"
-msgstr "Zarządzanie regułami SEO"
+msgid "Can edit"
+msgstr "Można edytować"
+
+msgctxt "Languages::privilege_groups.seo"
+msgid "SEO"
+msgstr "SEO"
 
 msgctxt "Languages::privileges.view_seo_rules"
-msgid "View SEO rules and 301 redirects"
-msgstr "Przeglądanie reguł SEO"
+msgid "Can view"
+msgstr "Można przeglądać"
 
 msgctxt "Languages::seo.redirects_manager"
 msgid "301 redirects"
@@ -203,4 +207,40 @@ msgstr "/item.html"
 msgctxt "Languages::seo.important_language_text"
 msgid "<b>Warning!</b> The <b>SEO</b> add-on is currently configured to use a single URL for all languages. If you hide, disable, or delete a default language of one of the storefronts, the SEO URLs will be changed."
 msgstr "<b>Ostrzeżenie!</b> Dodatek <b>SEO</b> jest obecnie skonfigurowany tak, żeby używać pojedynczego adresu URL dla wszystkich języków. Jeśli zostanie ukryty, wyłączony lub usuniety domyślny język jednego ze sklepów, adresy URL zostaną zmienione."
+
+msgctxt "Languages::seo.product_feature.feature_code.notice"
+msgid "A suitable code can help this feature appear with the product in search engines. Supported codes:"
+msgstr "Odpowiedni kod może pomóc w wyświetleniu tej cechy w produkcie w wyszukiwarkach. Obsługiwane kody:"
+
+msgctxt "Languages::seo.brand"
+msgid "Brand"
+msgstr "Brand"
+
+msgctxt "Languages::seo.feature_code.brand.description"
+msgid "Name used by an organization or business person for labeling a product"
+msgstr "Nazwa używana przez organizację lub osobę biznesową do oznaczania produktu"
+
+msgctxt "Languages::seo.isbn"
+msgid "ISBN"
+msgstr "ISBN"
+
+msgctxt "Languages::seo.feature_code.isbn.description"
+msgid "International Standard Book Number"
+msgstr "Międzynarodowy Standardowy Numer Książki"
+
+msgctxt "Languages::seo.gtin"
+msgid "GTIN"
+msgstr "GTIN"
+
+msgctxt "Languages::seo.feature_code.gtin.description"
+msgid "Global Trade Item Number"
+msgstr "Globalny numer handlowy (EAN)"
+
+msgctxt "Languages::seo.MPN"
+msgid "MPN"
+msgstr "MPN"
+
+msgctxt "Languages::seo.feature_code.mpn.description"
+msgid "Manufacturer Part Number"
+msgstr "Numer części producenta"
 

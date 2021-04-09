@@ -12,18 +12,18 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-// rus_build_edost dbazhenov
-
 namespace Tygh\Shippings\Services;
 
-use Tygh\Shippings\IService;
-use Tygh\Registry;
+use Tygh\Tygh;
 use Tygh\Http;
+use Tygh\Registry;
+use Tygh\Shippings\IService;
+use Tygh\Shippings\IPickupService;
 
 /**
  * Edost shipping service
  */
-class Edost implements IService
+class Edost implements IService, IPickupService
 {
     /**
      * Abailability multithreading in this module
@@ -45,6 +45,9 @@ class Edost implements IService
      * @var integer $_timeout
      */
     private $_timeout = 5;
+
+    /** @var array $shipping_info Shipping data */
+    protected $shipping_info;
 
     /**
      * Stack for errors occured during the preparing rates process
@@ -77,69 +80,46 @@ class Edost implements IService
     public $company_id = 0;
 
     /**
-     * Collects errors during preparing and processing request
+     * Returns shipping service information
      *
-     * @param string $error
+     * @return array
      */
-    private function _internalError($error)
+    public static function getInfo()
     {
-        $this->_error_stack[] = $error;
+        return [
+            'name'         => __('carrier_edost'),
+            'tracking_url' => 'http://www.edost.ru/tracking.php?n=%s',
+        ];
+    }
+
+    public function prepareAddress($address)
+    {
     }
 
     /**
-     * Gets numeric representation of Country/Region/City
-     *
-     * @param  array $destination Country, Region, City of geographic place
-     * @return int   Numeric representation
+     * @inheritdoc
      */
-    private function _getDestinationCode($destination)
+    public function getPickupMinCost()
     {
-        $state = $country = '';
+        $shipping_data = $this->getStoredShippingData();
+        return isset($shipping_data['price']) ? $shipping_data['price'] : false;
+    }
 
-        $origination = strtolower($this->_shipping_info['package_info']['origination']['country']);
+    /**
+     * @inheritdoc
+     */
+    public function getPickupPoints()
+    {
+        return [];
+    }
 
-        foreach ($destination as $destination_id => $value) {
-            $destination[$destination_id] = strtolower($value);
-        }
-
-        $result = false;
-
-        if (!empty($destination['state'])) {
-            $state = $destination['state'];
-        }
-
-        if (!empty($destination['country'])) {
-            $country = $destination['country'];
-        }
-
-        $cities_ids = fn_rus_cities_get_city_ids($destination['city'], $state, $country);
-        if (empty($cities_ids)) {
-            return '';
-        }
-
-        $cities = fn_rus_edost_get_codes($cities_ids);
-
-        if (count($cities) == 1) {
-            $result = reset($cities);
-
-        } elseif (count($cities) < 1) {
-            if (AREA != 'C') {
-                fn_set_notification('E', __('notice'), __('shippings.edost.admin_city_not_served'));
-            }
-
-            return '';
-
-        } else {
-            if (AREA != 'C') {
-                fn_set_notification('E', __('notice'), __('shippings.edost.admin_city_select_error'));
-            } else {
-                fn_set_notification('E', __('notice'), __('shippings.edost.city_select_error'));
-            }
-
-            return '';
-        }
-
-        return $result;
+    /**
+     * @inheritdoc
+     */
+    public function getPickupPointsQuantity()
+    {
+        $shipping_data = $this->getStoredShippingData();
+        return isset($shipping_data['office']) ? count($shipping_data['office']) : false;
     }
 
     /**
@@ -192,7 +172,7 @@ class Edost implements IService
      */
     public function prepareData($shipping_info)
     {
-        $this->_shipping_info = $shipping_info;
+        $this->shipping_info = $shipping_info;
         $this->company_id = Registry::get('runtime.company_id');
     }
 
@@ -203,11 +183,11 @@ class Edost implements IService
      */
     public function getRequestData()
     {
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
-        $shipping_settings = $this->_shipping_info['service_params'];
-        $origination = $this->_shipping_info['package_info']['origination'];
-        $location = $this->_shipping_info['package_info']['location'];
-        $code = $this->_shipping_info['service_code'];
+        $weight_data = fn_convert_weight_to_imperial_units($this->shipping_info['package_info']['W']);
+        $shipping_settings = $this->shipping_info['service_params'];
+        $origination = $this->shipping_info['package_info']['origination'];
+        $location = $this->shipping_info['package_info']['location'];
+        $code = $this->shipping_info['service_code'];
 
         if ($origination['country'] != 'RU') {
             $this->_internalError(__('edost_country_error'));
@@ -236,7 +216,7 @@ class Edost implements IService
         );
 
         $post['weight'] = $weight_data['plain'] * Registry::get('settings.General.weight_symbol_grams') / 1000;
-        $post['strah'] = $this->_shipping_info['package_info']['C'];
+        $post['strah'] = $this->shipping_info['package_info']['C'];
 
         list($length, $width, $height) = $this->getPackageValues();
 
@@ -260,7 +240,7 @@ class Edost implements IService
      */
     public function getPackageValues()
     {
-        $packages = $this->_shipping_info['package_info']['packages'];
+        $packages = $this->shipping_info['package_info']['packages'];
 
         foreach ($packages as $key => $pack) {
             if (!isset($pack['shipping_params'])) {
@@ -348,10 +328,10 @@ class Edost implements IService
         );
 
         $rates = $this->_getRates($response);
-        if (empty($this->_error_stack) && !empty($rates[$this->_shipping_info['service_code']])) {
-            $this->_fillSessionData($this->_shipping_info, $this->company_id, $rates);
-            $return['cost'] = $rates[$this->_shipping_info['service_code']]['price'];
-            $return['delivery_time'] = $rates[$this->_shipping_info['service_code']]['day'];
+        if (empty($this->_error_stack) && !empty($rates[$this->shipping_info['service_code']])) {
+            $this->storeShippingData($this->shipping_info, $this->company_id, $rates);
+            $return['cost'] = $rates[$this->shipping_info['service_code']]['price'];
+            $return['delivery_time'] = $rates[$this->shipping_info['service_code']]['day'];
         } else {
             $return['error'] = $this->processErrors($response);
         }
@@ -424,14 +404,15 @@ class Edost implements IService
     }
 
     /**
-     * Fills edost_cod array in session cart variable
+     * Saves shipping data to session
      *
-     * @param  string $code       Shipping service code
-     * @param  int    $company_id Selected company identifier
-     * @param  array  $rates      Previously calculated rates
-     * @return bool   true Always true
+     * @param  array $shipping_info Shipping data
+     * @param  int   $company_id    Selected company identifier
+     * @param  array $rates         Previously calculated rates
+     *
+     * @return bool
      */
-    private function _fillSessionData($shipping_info, $company_id, $rates = array())
+    protected function storeShippingData($shipping_info, $company_id, $rates = array())
     {
         if (isset($shipping_info['keys']['group_key']) && !empty($shipping_info['keys']['shipping_id'])) {
             $group_key = $shipping_info['keys']['group_key'];
@@ -453,27 +434,88 @@ class Edost implements IService
                 'day' => !empty($rates[$code]['day']) ? $rates[$code]['day'] : 0,
             );
 
-            \Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id] = $rates[$code];
-            \Tygh::$app['session']['cart']['shippings_extra']['rates'][$group_key][$shipping_id] = $shipping_data;
+            Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id] = $rates[$code];
+            Tygh::$app['session']['cart']['shippings_extra']['rates'][$group_key][$shipping_id] = $shipping_data;
         }
 
         return true;
     }
 
-    public function prepareAddress($address)
+    /**
+     * Fetches stored data from session
+     *
+     * @return array
+     */
+    protected function getStoredShippingData()
     {
-        
+        $group_id = isset($this->shipping_info['keys']['group_key']) ? $this->shipping_info['keys']['group_key'] : 0;
+        $shipping_id = isset($this->shipping_info['keys']['shipping_id']) ? $this->shipping_info['keys']['shipping_id'] : 0;
+        if (isset(Tygh::$app['session']['cart']['shippings_extra']['data'][$group_id][$shipping_id])) {
+            return Tygh::$app['session']['cart']['shippings_extra']['data'][$group_id][$shipping_id];
+        }
+
+        return [];
     }
 
     /**
-     * Returns shipping service information
-     * @return array information
+     * Collects errors during preparing and processing request
+     *
+     * @param string $error
      */
-    public static function getInfo()
+    private function _internalError($error)
     {
-        return array(
-            'name' => __('carrier_edost'),
-            'tracking_url' => 'http://www.edost.ru/tracking.php?n=%s'
-        );
+        $this->_error_stack[] = $error;
+    }
+
+    /**
+     * Gets numeric representation of Country/Region/City
+     *
+     * @param  array $destination Country, Region, City of geographic place
+     * @return int   Numeric representation
+     */
+    private function _getDestinationCode($destination)
+    {
+        $state = $country = '';
+
+        foreach ($destination as $destination_id => $value) {
+            $destination[$destination_id] = strtolower($value);
+        }
+
+        if (!empty($destination['state'])) {
+            $state = $destination['state'];
+        }
+
+        if (!empty($destination['country'])) {
+            $country = $destination['country'];
+        }
+
+        $cities_ids = fn_rus_cities_get_city_ids($destination['city'], $state, $country);
+        if (empty($cities_ids)) {
+            return '';
+        }
+
+        $cities = fn_rus_edost_get_codes($cities_ids);
+
+        if (count($cities) == 1) {
+            $result = reset($cities);
+
+        } elseif (count($cities) < 1) {
+            if (AREA != 'C') {
+                fn_set_notification('E', __('notice'), __('shippings.edost.admin_city_not_served'));
+            }
+
+            return '';
+
+        } else {
+            if (AREA != 'C') {
+                fn_set_notification('E', __('notice'), __('shippings.edost.admin_city_select_error'));
+            } else {
+                fn_set_notification('E', __('notice'), __('shippings.edost.city_select_error'));
+            }
+
+            return '';
+        }
+
+        return $result;
     }
 }

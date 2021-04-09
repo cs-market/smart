@@ -46,12 +46,6 @@
                         <td width="100%" style="font-size: 12px; font-family: Arial;"><bdi>{$company_data.company_phone_2}</bdi></td>
                     </tr>
                     {/if}
-                    {if $company_data.company_fax}
-                    <tr valign="top">
-                        <td style="font-size: 12px; font-family: verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("fax")}:</td>
-                        <td width="100%" style="font-size: 12px; font-family: Arial;">{$company_data.company_fax}</td>
-                    </tr>
-                    {/if}
                     {if $company_data.company_website}
                     <tr valign="top">
                         <td style="font-size: 12px; font-family: verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("web_site")}:</td>
@@ -142,13 +136,13 @@
                     {include file="profiles/profiles_extra_fields.tpl" fields=$profile_fields.C}
                 </td>
                 {/if}
-                {if $profile_fields.B}
+                {if $profile_fields.B && ($order_info.b_firstname || $order_info.b_lastname || $order_info.b_address || $order_info.b_address_2 || $order_info.b_city || $order_info.b_state_descr || $order_info.b_zipcode)}
                 {assign var="profields_b" value=$profile_fields.B|fn_fields_from_multi_level:"field_name":"field_id"}
                 <td width="34%" style="font-size: 12px; font-family: Arial; {if $profile_fields.S}padding-right: 10px;{/if} {if $profile_fields.C}padding-left: 10px;{/if}">
                     <h3 style="font: bold 17px Tahoma; padding: 0px 0px 3px 1px; margin: 0px;">{__("bill_to")}:</h3>
-                    {if $order_info.b_firstname && $profields_b.b_firstname || $order_info.b_lastname && $profields_b.b_lastname}
+                    {if $order_info.firstname && $profields_b.firstname || $order_info.lastname && $profields_b.lastname}
                     <p style="margin: 2px 0px 3px 0px;">
-                        {if $profields_b.b_firstname}{$order_info.b_firstname} {/if}{if $profields_b.b_lastname}{$order_info.b_lastname}{/if}
+                        {if $profields_b.firstname}{$order_info.firstname} {/if}{if $profields_b.lastname}{$order_info.lastname}{/if}
                     </p>
                     {/if}
                     {if $order_info.b_address && $profields_b.b_address || $order_info.b_address_2 && $profields_b.b_address_2}
@@ -178,9 +172,9 @@
                 {assign var="profields_s" value=$profile_fields.S|fn_fields_from_multi_level:"field_name":"field_id"}
                 <td width="33%" style="font-size: 12px; font-family: Arial;">
                     <h3 style="font: bold 17px Tahoma; padding: 0px 0px 3px 1px; margin: 0px;">{__("ship_to")}:</h3>
-                    {if $order_info.s_firstname && $profields_s.s_firstname || $order_info.s_lastname && $profields_s.s_lastname}
+                    {if $order_info.firstname && $profields_s.firstname || $order_info.lastname && $profields_s.lastname}
                     <p style="margin: 2px 0px 3px 0px;">
-                        {if $profields_s.s_firstname}{$order_info.s_firstname} {/if}{if $profields_s.s_lastname}{$order_info.s_lastname}{/if}
+                        {if $profields_s.firstname}{$order_info.firstname} {/if}{if $profields_s.lastname}{$order_info.lastname}{/if}
                     </p>
                     {/if}
                     {if $order_info.s_address && $profields_s.s_address || $order_info.s_address_2 && $profields_s.s_address_2}
@@ -223,7 +217,7 @@
                 {if $order_info.use_discount}
                     <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap; font-size: 12px; font-family: Arial;">{__("discount")}</th>
                 {/if}
-                {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                     <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap; font-size: 12px; font-family: Arial;">{__("tax")}</th>
                 {/if}
                 <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap; font-size: 12px; font-family: Arial;">{__("subtotal")}</th>
@@ -244,7 +238,7 @@
                     {if $order_info.use_discount}
                     <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{if $oi.extra.discount|floatval}{include file="common/price.tpl" value=$oi.extra.discount}{else}&nbsp;-&nbsp;{/if}</td>
                     {/if}
-                    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                         <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{if $oi.tax_value}{include file="common/price.tpl" value=$oi.tax_value}{else}&nbsp;-&nbsp;{/if}</td>
                     {/if}
         
@@ -303,7 +297,7 @@
                 </tr>
                 {foreach from=$order_info.taxes item=tax_data}
                 <tr>
-                    <td style="text-align: right; white-space: nowrap; font-size: 12px; font-family: Arial;">{$tax_data.description}&nbsp;{include file="common/modifier.tpl" mod_value=$tax_data.rate_value mod_type=$tax_data.rate_type}{if $tax_data.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.General.tax_calculation == "subtotal")}&nbsp;{__("included")}{/if}{if $tax_data.regnumber}&nbsp;({$tax_data.regnumber}){/if}:&nbsp;</td>
+                    <td style="text-align: right; white-space: nowrap; font-size: 12px; font-family: Arial;">{$tax_data.description}&nbsp;{include file="common/modifier.tpl" mod_value=$tax_data.rate_value mod_type=$tax_data.rate_type}{if $tax_data.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.Checkout.tax_calculation == "subtotal")}&nbsp;{__("included")}{/if}{if $tax_data.regnumber}&nbsp;({$tax_data.regnumber}){/if}:&nbsp;</td>
                     <td style="text-align: right; white-space: nowrap; font-size: 12px; font-family: Arial;">{include file="common/price.tpl" value=$tax_data.tax_subtotal}</td>
                 </tr>
                 {/foreach}

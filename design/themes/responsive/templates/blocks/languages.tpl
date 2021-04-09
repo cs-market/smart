@@ -1,4 +1,5 @@
 <div id="languages_{$block.block_id}">
+{$uid = uniqid()}
     {if $languages && $languages|count > 1}
     {if $dropdown_limit > 0 && $languages|count <= $dropdown_limit}
         <div class="ty-select-wrapper ty-languages">
@@ -12,7 +13,7 @@
         {else}
             {assign var="key_name" value=""}
         {/if}
-        <div class="ty-select-wrapper{if $format == "icon"} ty-languages__icon-link{/if}">{include file="common/select_object.tpl" style="graphic" suffix="language" link_tpl=$config.current_url|fn_link_attach:"sl=" items=$languages selected_id=$smarty.const.CART_LANGUAGE display_icons=true key_name=$key_name language_var_name="sl" link_class="hidden-phone hidden-tablet"}</div>
+        <div class="ty-select-wrapper{if $format == "icon"} ty-languages__icon-link{/if}">{include file="common/select_object.tpl" style="graphic" suffix="language_{$uid}" link_tpl=$config.current_url|fn_link_attach:"sl=" items=$languages selected_id=$smarty.const.CART_LANGUAGE display_icons=true key_name=$key_name language_var_name="sl" link_class="hidden-phone hidden-tablet"}</div>
     {/if}
 {/if}
 

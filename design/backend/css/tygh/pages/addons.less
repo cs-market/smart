@@ -109,6 +109,10 @@ td.addon-action {
 
 .admin-content-wrap .sidebar .sidebar-row.marketplace {
     background: #E2F3FE;
+
+    @media (max-width: @wide-width + @mainSidebarThinWidth + 50px) {
+        padding-top: 15px;
+    }
 }
 .marketplace-link {
     margin-top: 20px;
@@ -134,3 +138,36 @@ td.addon-action {
         margin-left: 10px;
     }
 }
+
+.tablesorter-header-inner::after {
+    display: block;
+    width: 15px;
+    height: 4px;
+    position: absolute;
+    right: -20px;
+    opacity: 0.3;
+
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+
+    .tablesorter-headerAsc & {
+        top: 1px;
+        content: '\f0d8';
+    }
+
+    .tablesorter-headerDesc & {
+        content: '\f0d7';
+        top: 3px;
+    }
+}
+
+.tablesorter-header[data-ca-sortable-column="true"] {
+    cursor: pointer;
+
+    .tablesorter-header-inner {
+        position: relative;
+        display: inline-block;
+    }
+}
+

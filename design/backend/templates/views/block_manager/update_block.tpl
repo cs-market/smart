@@ -51,7 +51,7 @@
     {if $smarty.request.assign_to}
         <input type="hidden" name="assign_to" value="{$smarty.request.assign_to}" class="cm-no-hide-input"/>
     {/if}
-    <input type="hidden" name="result_ids" value="block_properties_{$html_id}" class="cm-no-hide-input"/>
+    <input type="hidden" name="result_ids" value="{if $smarty.request.r_result_ids}{$smarty.request.r_result_ids},{/if}block_properties_{$html_id}" class="cm-no-hide-input"/>
 
     
     {* Redirect to product tabs *}
@@ -130,6 +130,38 @@
                     <label class="control-label" for="block_{$html_id}_user_class">{__("user_class")}</label>
                     <div class="controls">
                     <input type="text" name="snapping_data[user_class]" id="block_{$html_id}_user_class" size="25" value="{$block.user_class}"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label cm-required cm-multiple-checkboxes"
+                           for="block_{$html_id}_availability"
+                    >{__("block_manager.availability.show_on")}</label>
+                    <div class="controls" id="block_{$html_id}_availability">
+                        <div class="btn-group btn-group-checkbox">
+                            {foreach $block.availability as $device => $is_available}
+                            
+                                {if $device == "phone"}
+                                    {$devices_icon = "icon-mobile-phone"}
+                                {elseif $device == "tablet"}
+                                    {$devices_icon = "icon-tablet"}
+                                {elseif $device == "desktop"}
+                                    {$devices_icon = "icon-desktop"}
+                                {/if}
+
+                                <input type="checkbox"
+                                    id="block_{$html_id}_show_on_{$device}"
+                                    class="cm-text-toggle btn-group-checkbox__checkbox"
+                                    {if $is_available}checked="checked"{/if}
+                                    data-ca-toggle-text="{$block_availability_instance->getHiddenClass($device)}"
+                                    data-ca-toggle-text-mode="onDisable"
+                                    data-ca-toggle-text-target-elem-id="block_{$html_id}_user_class"
+                                />
+                                <label class="btn btn-group-checkbox__label" for="block_{$html_id}_show_on_{$device}">
+                                    <i class="{$devices_icon}"></i>
+                                    {__("block_manager.availability.{$device}")}
+                                </label>
+                            {/foreach}
+                        </div>
                     </div>
                 </div>
             {/if}            
@@ -236,4 +268,11 @@
             {include file="buttons/save_cancel.tpl" but_name="dispatch[block_manager.update_block]" cancel_action="close" save=$id}
         {/if}
     </div>
+    {if "ULTIMATE"|fn_allowed_for}
+        <input type="hidden" name="switch_company_id" value="{$runtime.company_id}" class="cm-no-hide-input" />
+    {/if}
+    {if "MULTIVENDOR"|fn_allowed_for}
+        <input type="hidden" name="s_storefront" value="{$app['storefront']->storefront_id}" class="cm-no-hide-input" />
+    {/if}
+    <input type="hidden" name="descr_sl" value="{$smarty.const.DESCR_SL}" class="cm-no-hide-input" />
 </form>

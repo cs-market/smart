@@ -60,24 +60,7 @@ $schema = array(
                 CONTROLLER_STATUS_REDIRECT,
                 'checkout.checkout?login_type=register',
             ),
-        ),
-
-        'customer_info' => array(
-            'request_method' => 'POST',
-            'verification_scenario' => 'checkout',
-            'condition' => function($request_data) {
-                return \Tygh\Registry::get('settings.Checkout.disable_anonymous_checkout') != 'Y'
-                    && empty(Tygh::$app['session']['cart']['user_data']['email']);
-            },
-            'save_post_data' => array(
-                'user_data',
-            ),
-            'rewrite_controller_status' => array(
-                CONTROLLER_STATUS_REDIRECT,
-                'checkout.checkout?login_type=guest',
-            ),
-        ),
-
+        )
     ),
 );
 

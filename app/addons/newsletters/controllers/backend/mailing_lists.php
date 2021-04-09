@@ -12,7 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -72,7 +72,7 @@ function fn_update_mailing_list($mailing_list_data, $list_id, $lang_code = DESCR
         $_data['object_holder'] = 'mailing_lists';
         $_data['object'] = $_data['name'];
 
-        foreach (fn_get_translation_languages() as $_data['lang_code'] => $v) {
+        foreach (Languages::getAll() as $_data['lang_code'] => $v) {
             db_query("REPLACE INTO ?:common_descriptions ?e", $_data);
         }
     } else {

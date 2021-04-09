@@ -1,7 +1,7 @@
 {if $cp.extra.buy_together}
 <tr {if $cp.product_options}class="no-border"{/if}>
     <td class="center">
-        <input type="checkbox" name="cart_ids[]" value="{$key}" class="checkbox cm-item" /></td>
+        <input type="checkbox" name="cart_ids[]" value="{$key}" class="cm-item" /></td>
     <td>
         <a href="{"products.update?product_id=`$cp.product_id`"|fn_url}">{$cp.product nofilter}</a></td>
     <td class="no-padding">
@@ -14,7 +14,7 @@
         <tr>
             <td>
             <input type="hidden" name="cart_products[{$key}][stored_price]" value="N" />
-            <input type="checkbox" name="cart_products[{$key}][stored_price]" value="Y" {if $cp.stored_price == "Y"}checked="checked"{/if} onclick="Tygh.$('#db_price_{$key},#manual_price_{$key}').toggle();" class="checkbox" />
+            <input type="checkbox" name="cart_products[{$key}][stored_price]" value="Y" {if $cp.stored_price == "Y"}checked="checked"{/if} onclick="Tygh.$('#db_price_{$key},#manual_price_{$key}').toggle();" />
             </td>
             <td class="data-block" valign="middle">
             <span {if $cp.stored_price == "Y"}class="hidden"{/if} id="db_price_{$key}">{include file="common/price.tpl" value=$cp.original_price}</span>
@@ -90,7 +90,7 @@
                 <tr>
                     <td>
                     <input type="hidden" name="cart_products[{$k}][stored_price]" value="N" />
-                    <input type="checkbox" name="cart_products[{$k}][stored_price]" value="Y" {if $_product.stored_price == "Y"}checked="checked"{/if} onclick="Tygh.$('#db_price_{$k},#manual_price_{$k}').toggle();" class="checkbox" />
+                    <input type="checkbox" name="cart_products[{$k}][stored_price]" value="Y" {if $_product.stored_price == "Y"}checked="checked"{/if} onclick="Tygh.$('#db_price_{$k},#manual_price_{$k}').toggle();" />
                     </td>
                     <td class="data-block" valign="middle">
                     <span {if $_product.stored_price == "Y"}class="hidden"{/if} id="db_price_{$k}">{include file="common/price.tpl" value=$_product.original_price}</span>

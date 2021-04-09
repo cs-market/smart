@@ -1,6 +1,5 @@
 (function(_, $) {
-
-    $.ceMap('handlers', {
+    var handlers = {
         showObjects: function(request, limit) {
             var $self = this;
 
@@ -23,7 +22,7 @@
 
             settings = $.extend(default_settings, settings);
 
-            var url = '//api-maps.yandex.ru/2.1/?ns=csymaps&lang=' + settings.lang;
+            var url = 'https://api-maps.yandex.ru/2.1/?ns=csymaps&lang=ru_RU';
 
             if (settings.key) {
                 url += '&key=' + settings.key;
@@ -37,51 +36,83 @@
         },
 
         getUserLocation: function(callback) {
-            csymaps.geolocation.get({provider: 'yandex'}).then(function(res) {
-                var geocoder_meta_data = res.geoObjects.get(0).properties.get('metaDataProperty.GeocoderMetaData'), 
-                    kind = geocoder_meta_data.kind, prop, nested = false ;
+            var options = {provider: location.protocol === 'https' ? 'auto' : 'yandex'}
+            csymaps.geolocation.get(options)
+                .then(handlers.extractUserLocation)
+                .then(handlers.getLocationStateCode)
+                .then(callback);
+        },
 
-                var location = {
-                    counry: '',
-                    country_code: '',
+        extractUserLocation: function (result) {
+            var geo_object = result.geoObjects.get(0),
+                meta = geo_object.properties.get('metaDataProperty').GeocoderMetaData.Address,
+                coords = geo_object.geometry.getCoordinates(),
+                location = {
+                    lat: coords[0],
+                    lng: coords[1],
+                    counry: '', // mistyped kept for backward compatibility
+                    country: '',
+                    country_code: meta.country_code,
                     state: '',
                     state_code: '',
                     city: '',
-                    address: '',
+                    address: meta.formatted || '',
                 };
 
-                do {
-                    geocoder_meta_data = nested || geocoder_meta_data;
-                    nested = false;
-                    for (prop in geocoder_meta_data) {
-                        if (geocoder_meta_data.hasOwnProperty(prop)) {
-                            if (typeof(geocoder_meta_data[prop]) === 'object') {
-                                nested = geocoder_meta_data[prop];
-                            } else if (prop == 'CountryName') {
-                                location.country = geocoder_meta_data[prop];
-                            } else if (prop == 'CountryNameCode') {
-                                location.country_code = geocoder_meta_data[prop];
-                            } else if (prop == 'AdministrativeAreaName') {
-                                location.state = geocoder_meta_data[prop];
-                            } else if (prop == 'AdministrativeAreaNameCode') {
-                                location.state_code = geocoder_meta_data[prop];
-                            } else if (prop == 'LocalityName') {
-                                location.city = geocoder_meta_data[prop];
-                            } else if (prop == 'DependentLocalityName' || prop == 'ThoroughfareName' || prop == 'PremiseNumber') {
-                                location.address += geocoder_meta_data[prop] + ' ';
-                            }
-
-                        }
+            for (var i = 0; i < meta.Components.length; i++) {
+                var component = meta.Components[i];
+                switch (component.kind) {
+                    case 'country': {
+                        location.country = location.counry = component.name;
+                        break;
                     }
-                } while (nested);
+                    case 'province': {
+                        location.state = component.name;
+                        break;
+                    }
+                    case 'locality': {
+                        location.city = component.name;
+                        break;
+                    }
+                }
+            }
 
-                callback(location);
-
-            }, function() {
-                console.log('error');
-            });
+            return location;
         },
 
-    });
+        getLocationStateCode: function (location) {
+            var d = $.Deferred();
+
+            csymaps.borders.load(location.country_code, {
+                quality: 0
+            }).then(function (geojson) {
+                location.state_code = handlers.extractStateCode(geojson, location);
+                d.resolve(location);
+            }, function () {
+                d.resolve(location);
+            });
+
+            return d.promise();
+        },
+
+        extractStateCode: function (geojson, location) {
+            var state_code = '';
+            for (var i = 0; i < geojson.features.length; i++) {
+                var region = geojson.features[i].properties;
+
+                // HOTFIX: YMaps JS API bug fix, remove this when borders.load starts returning name-field such as location stateName-field
+                var stateNameEquals = (('Республика ' + region.name) === location.state);
+
+                if ((region.name === location.state) || stateNameEquals) {
+                    state_code = region.iso3166.split('-').pop();
+                    break;
+                }
+            }
+
+            return state_code;
+        },
+    };
+
+    $.ceMap('handlers', handlers);
 
 }(Tygh, Tygh.$));

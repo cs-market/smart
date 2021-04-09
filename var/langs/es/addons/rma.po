@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: es-ES\n"
-"X-Crowdin-File: /release-4.8.2/addons/rma.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:11\n"
+"X-Crowdin-File: /release-4.11.5/addons/rma.po\n"
+"X-Crowdin-File-ID: 3688\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::rma"
 msgid "RMA"
@@ -62,7 +62,7 @@ msgstr "Peticiones de Devolución"
 
 msgctxt "Languages::return_requests_menu_description"
 msgid "View and process return requests from orders placed on your web site."
-msgstr "Vista y proceso regresan las solicitudes de pedidos en su sitio web."
+msgstr "Ver y procesar solicitudes de devolución de pedidos realizados en su sitio web."
 
 msgctxt "Languages::return_status"
 msgid "Return status"
@@ -90,15 +90,19 @@ msgstr "Añadir nuevos reasons"
 
 msgctxt "Languages::type_comment"
 msgid "Type comments here"
-msgstr "Tipo de comentarios aquí"
+msgstr "Escribe los comentarios aquí"
 
 msgctxt "Languages::return_requests_note"
 msgid "Go to the list of your return requests"
 msgstr "Ir a la lista de sus solicitudes de devolución"
 
 msgctxt "Languages::privileges.manage_rma"
-msgid "Manage RMA system"
-msgstr "Administrar sistema de RMA"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.rma"
+msgid "Return merchandise authorization (RMA)"
+msgstr ""
 
 msgctxt "Languages::text_return_change_warning"
 msgid "The status of return #[return_id] will be changed"
@@ -106,7 +110,7 @@ msgstr "El estado de la devolución #[return_id] será  cambiado"
 
 msgctxt "Languages::returnable"
 msgid "Returnable"
-msgstr "Retornables"
+msgstr "Reembolsable"
 
 msgctxt "Languages::returnable_product"
 msgid "Returnable product"
@@ -202,13 +206,13 @@ msgstr "No tener en cuenta los fines de semana para calcular el tiempo de devolu
 
 msgctxt "Languages::email_template.rma_slip_notification"
 msgid "RMA slip"
-msgstr ""
+msgstr "Comprobante RMA"
 
 msgctxt "Languages::template_document_rma_packing_slip_default"
 msgid "Return request: packing slip"
-msgstr ""
+msgstr "Solicitud de devolución: comprobante de embalaje"
 
 msgctxt "Languages::document_preview_return_request_not_found"
 msgid "Couldn't find a return request. Preview only works with existing data. Please create a return request and use Preview again."
-msgstr ""
+msgstr "No se pudo encontrar la solicitud de devolución. La vista previa solo funciona con los datos existentes. Por favor crea un solicitud de devolución y usa Vista previa de nuevo."
 

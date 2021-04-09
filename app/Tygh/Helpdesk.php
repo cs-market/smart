@@ -16,7 +16,12 @@
 
 namespace Tygh;
 
-use Tygh\Http;
+use Tygh\Tygh;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
+use Tygh\NotificationsCenter\NotificationsCenter;
+
 /**
  *
  * Helpdesk connector class
@@ -26,9 +31,11 @@ class Helpdesk
 {
     /**
      * Returns current license status
-     * @param  string $license_key
-     * @param  string $host_name   If host_name was specified, license will be checked
-     * @return bool
+     *
+     * @param  string $license_number
+     * @param  array $extra_fields
+     *
+     * @return string
      */
     public static function getLicenseInformation($license_number = '', $extra_fields = array())
     {
@@ -39,27 +46,34 @@ class Helpdesk
 
         $store_mode = fn_get_storage_data('store_mode');
 
-        if (empty($license_number) && $store_mode != 'trial') {
+        if (empty($license_number) && $store_mode !== 'trial') {
             return 'LICENSE_IS_INVALID';
         }
 
         $store_ip = fn_get_ip();
         $store_ip = $store_ip['host'];
 
-        $request = array(
-            'license_number' => $license_number,
-            'ver' => PRODUCT_VERSION,
-            'product_status' => PRODUCT_STATUS,
-            'product_build' => strtoupper(PRODUCT_BUILD),
-            'edition' => isset($extra_fields['edition']) ? $extra_fields['edition'] : PRODUCT_EDITION,
-            'lang' => strtoupper(CART_LANGUAGE),
-            'store_uri' => fn_url('', 'C', 'http'),
+        $request = [
+            'license_number'   => $license_number,
+            'ver'              => PRODUCT_VERSION,
+            'product_status'   => PRODUCT_STATUS,
+            'product_build'    => strtoupper(PRODUCT_BUILD),
+            'edition'          => isset($extra_fields['edition'])
+                ? $extra_fields['edition']
+                : PRODUCT_EDITION,
+            'lang'             => strtoupper(CART_LANGUAGE),
+            'store_uri'        => fn_url('', 'C', 'http'),
             'secure_store_uri' => fn_url('', 'C', 'https'),
-            'https_enabled' => (Registry::get('settings.Security.secure_storefront') != 'none' || Registry::get('settings.Security.secure_admin') == 'Y') ? 'Y' : 'N',
-            'admin_uri' => str_replace(fn_get_index_script('A'), '',fn_url('', 'A', 'http')),
-            'store_ip' => $store_ip,
-            'store_mode' => strtoupper(isset($extra_fields['store_mode']) ? $extra_fields['store_mode'] : $store_mode)
-        );
+            'https_enabled'    => (Registry::get('settings.Security.secure_storefront') === YesNo::YES || Registry::get('settings.Security.secure_admin') === YesNo::YES)
+                ? 'Y'
+                : 'N',
+            'admin_uri'        => str_replace(fn_get_index_script('A'), '', fn_url('', 'A', 'http')),
+            'store_ip'         => $store_ip,
+            'store_mode'       => strtoupper(isset($extra_fields['store_mode'])
+                ? $extra_fields['store_mode']
+                : $store_mode
+            ),
+        ];
 
         $request = array(
             'Request@action=check_license@api=3' => array_merge($extra_fields, $request),
@@ -188,14 +202,24 @@ class Helpdesk
         }
 
         if (!empty($auth)) {
-            if (Registry::get('settings.General.auto_check_updates') == 'Y' && fn_check_user_access($auth['user_id'], 'upgrade_store')) {
-                // If upgrades are available
-                if ($updates == 'AVAILABLE') {
-                    fn_set_notification('W', __('notice'), __('text_upgrade_available', array(
+            if (Registry::get('settings.General.auto_check_updates') === YesNo::YES &&
+                fn_check_user_access($auth['user_id'], 'upgrade_store') &&
+                $updates == 'AVAILABLE'
+            ) {
+                /** @var \Tygh\NotificationsCenter\NotificationsCenter $notifications_center */
+                $notifications_center = Tygh::$app['notifications_center'];
+                $notifications_center->add([
+                    'user_id'    => $auth['user_id'],
+                    'title'      => __('notification.upgrade_available.title'),
+                    'message'    => __('notification.upgrade_available.message', [
                         '[product]' => PRODUCT_NAME,
-                        '[link]' => fn_url('upgrade_center.manage')
-                    )), 'S', 'upgrade_center:core');
-                }
+                    ]),
+                    'area'       => 'A',
+                    'section'    => NotificationsCenter::SECTION_ADMINISTRATION,
+                    'tag'        => NotificationsCenter::TAG_UPDATE,
+                    'action_url' => fn_url('upgrade_center.manage'),
+                    'language_code' => Registry::get('settings.Appearance.backend_default_language'),
+                ]);
             }
 
             if (!empty($data)) {
@@ -210,77 +234,108 @@ class Helpdesk
 
     public static function processMessages($messages, $process_messages = true, $license_status = '')
     {
-        $messages_queue = array();
+        $new_messages = [];
 
         if (!empty($messages)) {
-            if ($process_messages) {
-                $messages_queue = fn_get_storage_data('hd_messages');
-            }
-
-            if (empty($messages_queue)) {
-                $messages_queue = array();
-            } else {
-                $messages_queue = unserialize($messages_queue);
-            }
-
-            $new_messages = array();
 
             foreach ($messages->Message as $message) {
-                $message_id = empty($message->Id) ? intval(fn_crc32(microtime()) / 2) : (string) $message->Id;
-                $message = array(
-                    'type' => empty($message->Type) ? 'W' : (string) $message->Type,
-                    'title' => empty($message->Title) ? __('notice') : (string) $message->Title,
-                    'text' => (string) $message->Text,
-                    'state' => empty($message->State) ? null : (string) $message->State,
-                );
+                $message_id = empty($message->Id)
+                    ? intval(fn_crc32(microtime()) / 2)
+                    : (string) $message->Id;
 
-                $new_messages[$message_id] = $message;
+                $new_messages[$message_id] = [
+                    'text'  => (string) $message->Text,
+                    'type'  => empty($message->Type)
+                        ? NotificationSeverity::WARNING
+                        : (string) $message->Type,
+                    'title' => empty($message->Title)
+                        ? __('notice')
+                        : (string) $message->Title,
+                    'state' => empty($message->State)
+                        ? null
+                        : (string) $message->State,
+                    'action_url' => empty($message->ActionUrl)
+                        ? ''
+                        : (string) $message->ActionUrl,
+                ];
             }
 
             // check new messages for 'special' messages
-            if (!empty($license_status)) {
-
-                $special_errors = fn_get_schema('settings', 'licensing');
-                foreach ($special_errors as $error_id => $type) {
-                    if (isset($new_messages[$error_id])) {
-                        $new_messages[$error_id] = array(
-                            'type' => 'E',
-                            'title' => __('error'),
-                            'text' => $type == 'local' ? __('licensing.' . $error_id) : $new_messages[$error_id]['text']
-                        );
-                    }
-                }
-
-                if (!$new_messages) {
-                    switch ($license_status) {
-                        case 'PENDING':
-                        case 'SUSPENDED':
-                        case 'DISABLED':
-                            $new_messages['license_error_license_is_disabled'] = array(
-                                'type' => 'E',
-                                'title' => __('error'),
-                                'text' => __('licensing.license_error_license_is_disabled')
-                            );
-                            break;
-                        case 'LICENSE_IS_INVALID':
-                            $new_messages['license_error_license_is_invalid'] = array(
-                                'type' => 'E',
-                                'title' => __('error'),
-                                'text' => __('licensing.license_error_license_is_invalid')
-                            );
-                            break;
-                    }
+            $special_messages = fn_get_schema('settings', 'licensing');
+            foreach ($special_messages as $special_message_id => $message_info) {
+                if (isset($new_messages[$special_message_id])) {
+                    $new_messages[$special_message_id] = [
+                        'type'       => $message_info['severity']   ?: $new_messages[$special_message_id]['type'],
+                        'title'      => $message_info['title']      ?: $new_messages[$special_message_id]['title'],
+                        'text'       => $message_info['message']    ?: $new_messages[$special_message_id]['text'],
+                        'state'      => $message_info['state']      ?: $new_messages[$special_message_id]['state'],
+                        'action_url' => $message_info['action_url'] ?: $new_messages[$special_message_id]['action_url'],
+                        'section'    => $message_info['section']    ?: NotificationsCenter::SECTION_ADMINISTRATION,
+                        'tag'        => $message_info['tag']        ?: NotificationsCenter::TAG_OTHER,
+                    ];
                 }
             }
 
-            $messages_queue = array_merge($messages_queue, $new_messages);
+            if (!empty($license_status) && !$new_messages) {
+                switch ($license_status) {
+                    case 'PENDING':
+                    case 'SUSPENDED':
+                    case 'DISABLED':
+                        $new_messages['license_error_license_is_disabled'] = [
+                            'type'       => NotificationSeverity::ERROR,
+                            'title'      => __('error'),
+                            'text'       => __('licensing.license_error_license_is_disabled'),
+                            'action_url' => '',
+                            'section'    => NotificationsCenter::SECTION_ADMINISTRATION,
+                            'tag'        => NotificationsCenter::TAG_LICENSE,
+                        ];
+                        break;
+                    case 'LICENSE_IS_INVALID':
+                        $new_messages['license_error_license_is_invalid'] = [
+                            'type'       => NotificationSeverity::ERROR,
+                            'title'      => __('error'),
+                            'text'       => __('licensing.license_error_license_is_invalid'),
+                            'action_url' => '',
+                            'section'    => NotificationsCenter::SECTION_ADMINISTRATION,
+                            'tag'        => NotificationsCenter::TAG_LICENSE,
+                        ];
+                        break;
+                }
+            }
 
             if ($process_messages) {
-                fn_set_storage_data('hd_messages', serialize($messages_queue));
+                /** @var \Tygh\NotificationsCenter\NotificationsCenter $notifications_center */
+                $notifications_center = Tygh::$app['notifications_center'];
+                /** @var \Tygh\Database\Connection $db */
+                $db = Tygh::$app['db'];
+                $root_admin_user_id = (int) $db->getField(
+                    'SELECT user_id FROM ?:users WHERE user_type = ?s AND is_root = ?s AND company_id = ?i',
+                    UserTypes::ADMIN,
+                    YesNo::YES,
+                    0
+                );
+
+                foreach ($new_messages as $msg) {
+                    $notifications_center->add([
+                        'user_id'    => $root_admin_user_id,
+                        'title'      => $msg['title'],
+                        'message'    => $msg['text'],
+                        'severity'   => $msg['type'],
+                        'area'       => 'A',
+                        'action_url' => $msg['action_url'],
+                        'section'    => isset($msg['section'])
+                            ? $msg['section']
+                            : NotificationsCenter::SECTION_OTHER,
+                        'tag'        => isset($msg['tag'])
+                            ? $msg['tag']
+                            : NotificationsCenter::TAG_OTHER,
+                        'language_code' => Registry::get('settings.Appearance.backend_default_language'),
+                    ]);
+                }
             }
         }
 
-        return $messages_queue;
+        return $new_messages;
     }
 
     public static function registerLicense($license_data)
@@ -382,12 +437,12 @@ class Helpdesk
     {
         $license_status = 'LICENSE_IS_INVALID';
         $store_mode = '';
-        $messages = array();
+        $messages = [];
 
         if (fn_allowed_for('MULTIVENDOR')) {
-            $store_modes_list = array('full');
+            $store_modes_list = ['', 'plus', 'ultimate'];
         } else {
-            $store_modes_list = array('', 'ultimate');
+            $store_modes_list = ['', 'ultimate'];
         }
 
         foreach ($store_modes_list as $store_mode) {
@@ -399,20 +454,35 @@ class Helpdesk
             }
         }
 
-        return array($license_status, $messages, $store_mode);
+        return [$license_status, $messages, $store_mode];
     }
 
     /**
      * Checks if companies limitations have been reached.
      *
-     * @return bool True if there are too many companies
+     * @deprecated since 4.10.1.
+     * Use \Tygh\Helpdesk::isStorefrontsLimitReached instead
+     *
+     * @return bool
      */
     public static function isCompaniesLimitReached()
     {
-        if (fn_allowed_for('ULTIMATE')) {
-            if ($storefronts_limit = fn_get_storage_data('allowed_number_of_stores')) {
-                return count(fn_get_all_companies_ids()) >= $storefronts_limit;
-            }
+        return static::isStorefrontsLimitReached();
+    }
+
+    /**
+     * Checks if storefronts limitations have been reached.
+     *
+     * @return bool True if there are too many storefronts
+     */
+    public static function isStorefrontsLimitReached()
+    {
+        if ($storefronts_limit = fn_get_storage_data('allowed_number_of_stores')) {
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+            $storefronts_count = $repository->getCount();
+
+            return $storefronts_count >= $storefronts_limit;
         }
 
         return false;
@@ -452,5 +522,61 @@ class Helpdesk
 
             Http::$logging = $logging;
         }
+    }
+
+    public static function isValidRequest(array $request, array $additional_validation_params = [])
+    {
+        if (!isset($request['token'])) {
+            return false;
+        }
+
+        $validation_params = array_merge([
+            'dispatch' => 'validators.validate_request',
+            'token'    => $request['token'],
+        ], $additional_validation_params);
+
+        $validator_url = Registry::get('config.resources.updates_server') . '/index.php';
+
+        $log_cut = Registry::ifGet('log_cut', false);
+
+        Registry::set('log_cut', true);
+        $validator_response = Http::get($validator_url, $validation_params);
+        Registry::set('log_cut', $log_cut);
+
+        $validator_response = strtolower(trim($validator_response));
+
+        return $validator_response === 'valid';
+    }
+
+    public static function getSoftwareInformation($stop_execution = true, $format = 'html')
+    {
+        /** @var \Tygh\SoftwareProductEnvironment $software */
+        $software = Tygh::$app['product.env'];
+
+        if ($format === 'json') {
+            $version_string = json_encode([
+                'product_name'   => $software->getProductName(),
+                'version'        => $software->getProductVersion(),
+                'product_status' => $software->getProductStatus(),
+                'product_build'  => $software->getProductBuild(),
+                'store_mode'     => $software->getStoreMode(),
+            ]);
+        } else {
+            $version_string = $software->getProductName() . ' <b>' . $software->getProductVersion() . ' ';
+            if ($software->getProductStatus() !== '') {
+                $version_string .= ' (' . $software->getProductStatus() . ')';
+            }
+            if ($software->getProductBuild()) {
+                $version_string .= ' ' . $software->getProductBuild();
+            }
+            $version_string .= '</b>';
+        }
+
+        if ($stop_execution) {
+            echo $version_string;
+            exit(0);
+        }
+
+        return $version_string;
     }
 }

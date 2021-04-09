@@ -60,7 +60,7 @@ class Audio extends Base
     public function gatherAdditional($product)
     {
         $this->offer['attr']['type'] = "artist.title";
-        $this->offer['items']['title'] = $product['product'];
+        $this->offer['items']['title'] = $this->getOfferName($product);
 
         return true;
     }

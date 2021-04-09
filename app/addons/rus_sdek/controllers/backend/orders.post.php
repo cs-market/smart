@@ -12,12 +12,15 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Shippings\RusSdek;
-use Tygh\Mailer;
-use Tygh\Shippings\Shippings;
 use Tygh\Addons\RusTaxes\Receipt\Item as ReceiptItem;
 use Tygh\Addons\RusTaxes\TaxType;
+use Tygh\Common\OperationResult;
+use Tygh\Exceptions\InputException;
+use Tygh\ExSimpleXmlElement;
+use Tygh\Registry;
+use Tygh\Shippings\RusSdek;
+use Tygh\Shippings\Shippings;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -301,33 +304,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (!empty($result['number'])) {
                     db_query('UPDATE ?:shipments SET tracking_number = ?s WHERE shipment_id = ?i', $result['number'], $shipment_id);
 
-                    if (!empty($params['notify_user']) && $params['notify_user'] == 'Y') {
-                        //$order_info = fn_get_order_info($params['order_id'], false, true, true, true);
-                        //fn_order_notification($order_info);
-                        $mailer = Tygh::$app['mailer'];
+                    $force_notification = fn_get_notification_rules($params);
 
-                        $shipment = array(
-                            'shipment_id' => $shipment_id,
-                            'timestamp' => $shipment['shipment_timestamp'],
-                            'shipping' => db_get_field('SELECT shipping FROM ?:shipping_descriptions WHERE shipping_id = ?i AND lang_code = ?s', $shipment['shipping_id'], $order_info['lang_code']),
-                            'tracking_number' => $result['number'],
-                            'carrier_info' => Shippings::getCarrierInfo($shipment['carrier'], $result['number']),
-                            'comments' => $shipment['comments'],
-                            'products' => $shipment['products'],
-                        );
+                    $shipment = [
+                        'shipment_id'     => $shipment_id,
+                        'timestamp'       => $shipment['shipment_timestamp'],
+                        'shipping'        => db_get_field('SELECT shipping FROM ?:shipping_descriptions WHERE shipping_id = ?i AND lang_code = ?s', $shipment['shipping_id'], $order_info['lang_code']),
+                        'tracking_number' => $result['number'],
+                        'carrier_info'    => Shippings::getCarrierInfo($shipment['carrier'], $result['number']),
+                        'comments'        => $shipment['comments'],
+                        'products'        => $shipment['products'],
+                    ];
 
-                        $mailer->send(array(
-                            'to' => $order_info['email'],
-                            'from' => 'company_orders_department',
-                            'data' => array(
-                                'shipment' => $shipment,
-                                'order_info' => $order_info,
-                            ),
-                            'template_code' => 'shipment_products',
-                            'tpl' => 'shipments/shipment_products.tpl', // this parameter is obsolete and is used for back compatibility
-                            'company_id' => $order_info['company_id'],
-                        ), 'C', $order_info['lang_code']);
-                    }
+                    /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+                    $event_dispatcher = Tygh::$app['event.dispatcher'];
+
+                    /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+                    $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+                    $notification_rules = $notification_settings_factory->create($force_notification);
+
+                    $event_dispatcher->dispatch('order.shipment_updated', ['shipment' => $shipment, 'order_info' => $order_info], $notification_rules);
                 }
 
                 if (!empty($sdek_delivery[$sdek_info['Order']['TariffTypeCode']]['terminals']) && ($sdek_delivery[$sdek_info['Order']['TariffTypeCode']]['terminals'] == 'N')) {
@@ -372,8 +368,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (!empty($call_courier)) {
                     db_query('INSERT INTO ?:rus_sdek_call_courier ?e', $call_courier);
                 }
-
-                fn_sdek_get_ticket_order($data_auth, $params['order_id'], $shipment_id);
             }
 
             $date_status = RusSdek::orderStatusXml($data_auth, $params['order_id'], $shipment_id);
@@ -466,8 +460,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     } else {
                         db_query('INSERT INTO ?:rus_sdek_call_recipient ?e', $call_recipient);
                     }
-
-                    fn_sdek_get_ticket_order($data_auth, $params['order_id'], $shipment_id);
                 }
 
                 $date_status = RusSdek::orderStatusXml($data_auth, $params['order_id'], $shipment_id);
@@ -549,7 +541,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $order_info = fn_get_order_info($params['order_id'], false, true, true);
         $force_notification = fn_get_notification_rules($params);
 
-        if (!empty($force_notification['C']) && !empty($params['update_shipping'])) {
+        if (!empty($params['update_shipping'])) {
             foreach ($params['update_shipping'] as $shipping) {
                 foreach ($shipping as $shipment_id => $shipment_data) {
                     if ($shipment_data['carrier'] == 'sdek' && !empty($shipment_id)) {
@@ -560,26 +552,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $shipment_data['products'][$item_id] = $product['amount'];
                         }
 
-                        $shipment = array(
-                            'shipment_id' => $shipment_id,
-                            'timestamp' => $d_shipment['timestamp'],
-                            'shipping' => db_get_field('SELECT shipping FROM ?:shipping_descriptions WHERE shipping_id = ?i AND lang_code = ?s', $d_shipment['shipping_id'], $order_info['lang_code']),
+                        $shipment = [
+                            'shipment_id'     => $shipment_id,
+                            'timestamp'       => $d_shipment['timestamp'],
+                            'shipping'        => db_get_field('SELECT shipping FROM ?:shipping_descriptions WHERE shipping_id = ?i AND lang_code = ?s', $d_shipment['shipping_id'], $order_info['lang_code']),
                             'tracking_number' => $shipment_data['tracking_number'],
-                            'carrier' => $shipment_data['carrier'],
-                            'comments' => $d_shipment['comments'],
-                            'items' => $shipment_data['products'],
-                        );
+                            'carrier'         => $shipment_data['carrier'],
+                            'comments'        => $d_shipment['comments'],
+                            'items'           => $shipment_data['products'],
+                        ];
 
-                        Mailer::sendMail(array(
-                            'to' => $order_info['email'],
-                            'from' => 'company_orders_department',
-                            'data' => array(
-                                'shipment' => $shipment,
-                                'order_info' => $order_info,
-                            ),
-                            'tpl' => 'shipments/shipment_products.tpl',
-                            'company_id' => $order_info['company_id'],
-                        ), 'C', $order_info['lang_code']);
+                        /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+                        $event_dispatcher = Tygh::$app['event.dispatcher'];
+
+                        /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+                        $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+                        $notification_rules = $notification_settings_factory->create($force_notification);
+
+                        $event_dispatcher->dispatch('order.shipment_updated', ['shipment' => $shipment, 'order_info' => $order_info], $notification_rules);
                     }
                 }
             }
@@ -811,42 +801,93 @@ if ($mode == 'details') {
     $order_id = (int) $_REQUEST['order_id'];
     $shipment_id = (int) $_REQUEST['shipment_id'];
 
-    $file = $order_id . '.pdf';
+    list($shipments,) = fn_get_shipments_info(array('order_id' => $order_id, 'advanced_info' => true, 'shipment_id' => $shipment_id));
 
-    $path = fn_get_files_dir_path() . 'sdek/' . $shipment_id . '/';
+    $shipment = reset($shipments);
 
-    fn_get_file($path . $file);
+    $params_shipping = array(
+        'shipping_id' => $shipment['shipping_id'],
+        'Date' => date('Y-m-d', $shipment['shipment_timestamp'])
+    );
 
-    if (defined('AJAX_REQUEST') && !empty($url)) {
-        Registry::get('ajax')->assign('force_redirection', $url);
+    $data_auth = RusSdek::dataAuth($params_shipping);
+    $data_auth['OrderCount'] = 1;
+
+    $ticket_result = fn_sdek_get_ticket_order($data_auth, $order_id, $shipment_id);
+
+    if ($ticket_result->isSuccess()) {
+        fn_get_file($ticket_result->getData());
+    } else {
+        $ticket_result->showNotifications();
+    }
+
+    $url = fn_url('shipments.details?shipment_id=' . $shipment_id);
+
+    if (defined('AJAX_REQUEST')) {
+        Tygh::$app['ajax']->assign('force_redirection', $url);
         exit;
     }
 
-    return array(CONTROLLER_STATUS_OK);
+    return array(CONTROLLER_STATUS_OK, $url);
 }
 
-function fn_sdek_get_ticket_order($data_auth, $order_id, $chek_id)
+/**
+ * Requests shipment receipt creation.
+ *
+ * @param array $data_auth   Authentication data for an API request
+ * @param int   $order_id    Order identifier
+ * @param int   $shipment_id Shipment identifier
+ *
+ * @return \Tygh\Common\OperationResult Receipt creation result.
+ *                                      Contains file path in its data
+ */
+function fn_sdek_get_ticket_order($data_auth, $order_id, $shipment_id)
 {
-    unset($data_auth['Number']);
-    $xml = '            ' . RusSdek::arraySimpleXml('OrdersPrint', $data_auth, 'open');
-    $order_sdek = array (
-        'Number' => $order_id . '_' . $chek_id,
-        'Date' => $data_auth['Date']
-    );
-    $xml .= '            ' . RusSdek::arraySimpleXml('Order', $order_sdek);
-    $xml .= '            ' . '</OrdersPrint>';
+    $result = new OperationResult(true);
+
+    $download_file_dir = fn_get_files_dir_path() . '/sdek' . '/' . $shipment_id . '/';
+    $download_file_path = $download_file_dir . $order_id . '.pdf';
+
+    if (is_file($download_file_path)) {
+        $result->setData($download_file_path);
+        return $result;
+    }
+
+    $xml =  RusSdek::arraySimpleXml('OrdersPrint', $data_auth, 'open');
+    $order_sdek = [
+        'Number'     => $order_id . '_' . $shipment_id,
+        'Date'       => $data_auth['Date'],
+    ];
+    $xml .= RusSdek::arraySimpleXml('Order', $order_sdek);
+    $xml .= '</OrdersPrint>';
 
     $response = RusSdek::xmlRequest(SDEK_URL_INTEGRATION . 'orders_print.php', $xml, $data_auth);
 
-    $download_file_dir = fn_get_files_dir_path() . '/sdek' . '/' . $chek_id . '/';
-
-    fn_rm($download_file_dir);
-    fn_mkdir($download_file_dir);
-
-    $name = $order_id . '.pdf';
-
-    $download_file_path = $download_file_dir . $name;
-    if (!fn_is_empty($response)) {
-        fn_put_contents($download_file_path, $response);
+    try {
+        ExSimpleXmlElement::loadFromString($response);
+        $parsed_response = RusSdek::resultXml($response);
+        // SDEK returns an XML document when an error occurs
+        $result->setSuccess(false);
+        if ($parsed_response['error_code'] === 'ERR_INVALID_NUMBER') {
+            fn_delete_notification($parsed_response['error_code']);
+            $result->addError(0, __('rus_sdek.order_not_synced', ['[error]' => $parsed_response['msg']]));
+        }
+    } catch (InputException $e) {
+        // SDEK returns a PDF, thus XML parsing fails
     }
+
+    if ($result->isSuccess()) {
+        fn_rm($download_file_dir);
+        fn_mkdir($download_file_dir);
+
+        if (fn_is_empty($response)) {
+            $result->setSuccess(false);
+            $result->addError(0, __('rus_sdek.empty_receipt_print_response'));
+        } else {
+            fn_put_contents($download_file_path, $response);
+            $result->setData($download_file_path);
+        }
+    }
+
+    return $result;
 }

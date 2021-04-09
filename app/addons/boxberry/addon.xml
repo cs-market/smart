@@ -1,12 +1,17 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <addon scheme="3.0">
     <id>boxberry</id>
     <version>1.1</version>
+    <supplier>Boxberry</supplier>
+    <supplier_link>https://boxberry.ru</supplier_link>
     <priority>100</priority>
     <position>0</position>
     <status>active</status>
     <default_language>en</default_language>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <compatibility>
+      <conflicts>rus_boxberry</conflicts>
+    </compatibility>
     <functions>
         <item for="install">fn_boxberry_install</item>
         <item for="uninstall">fn_boxberry_uninstall</item>

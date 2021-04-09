@@ -14,6 +14,7 @@
 
 use Tygh\Registry;
 use Tygh\Common\Robots;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -37,20 +38,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($mode == 'update') {
         if (!empty($_REQUEST['robots_data']) && isset($_REQUEST['robots_data']['content'])) {
-            $company_ids[] = Registry::get('runtime.company_id');
+            if (fn_allowed_for("ULTIMATE") && isset($_REQUEST['robots_data']['update_content'])) {
+                /** @var \Tygh\Storefront\repository $repository */
+                $repository = Tygh::$app['storefront.repository'];
+                list($all_storefronts,) = $repository->find();
+                foreach ($all_storefronts as $storefront) {
+                    $robots->setRobotsDataForStorefrontId($storefront->storefront_id, $_REQUEST['robots_data']['content']);
+                }
+            } else {
+                /** @var \Tygh\Storefront\Storefront $storefront */
+                $storefront = Tygh::$app['storefront'];
+                $storefront_id = $storefront->storefront_id;
 
-            if (fn_allowed_for('ULTIMATE') && isset($_REQUEST['robots_data']['update_content'])) {
-                $company_ids = fn_get_all_companies_ids();
-
-            } elseif (fn_allowed_for('ULTIMATE') && !Registry::get('runtime.company_id') && !Registry::get('runtime.simple_ultimate')) {
-                $company_ids = array();
-            }
-
-            foreach ($company_ids as $company_id) {
-                $robots->setRobotsDataForCompanyId($company_id, $_REQUEST['robots_data']['content']);
+                $robots->setRobotsDataForStorefrontId($storefront_id, $_REQUEST['robots_data']['content']);
             }
         }
     }
+
 
     if ($mode == 'update_via_ftp') {
         if (
@@ -92,13 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 if ($mode == 'manage') {
-    $company_id = Registry::get('runtime.company_id');
-    if (fn_allowed_for('ULTIMATE') && empty($company_id)) {
-        $company_id = fn_get_default_company_id();
-    }
+    
+    $storefront = Tygh::$app['storefront'];
+    $storefront_id = $storefront->storefront_id;
 
     $robots = new Robots;
-    $robots_data = $robots->getRobotsDataByCompanyId($company_id);
+    $robots_data = $robots->getRobotsDataByStorefrontId($storefront_id);
 
     $robots_data_content = isset($robots_data['data']) ? $robots_data['data'] : '';
 
@@ -106,7 +109,7 @@ if ($mode == 'manage') {
 
     if (isset($content)) {
         if (!isset($robots_data['robots_id'])) {
-            $robots->setRobotsDataForCompanyId($company_id, $content);
+            $robots->setRobotsDataForStorefrontId($storefront_id, $content);
         } else {
             $content = $robots_data_content;
         }

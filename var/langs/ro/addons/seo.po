@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.8.2/addons/seo.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.11.3/addons/seo.po\n"
+"PO-Revision-Date: 2020-01-29 14:52\n"
 
 msgctxt "Addons::name::seo"
 msgid "SEO"
@@ -42,7 +40,7 @@ msgstr "URL-urile SEO URLs nu pot funcționa acum - au fost dezactivate. Vă rug
 
 msgctxt "Languages::dispatch_value"
 msgid "Dispatch value"
-msgstr ""
+msgstr "Valoare trimitere"
 
 msgctxt "Languages::url_dispatch_part"
 msgid "The value of the \"dispatch\" parameter from the URL"
@@ -61,12 +59,16 @@ msgid "page [n]"
 msgstr "pagina [n]"
 
 msgctxt "Languages::privileges.manage_seo_rules"
-msgid "Manage SEO rules and 301 redirects"
-msgstr ""
+msgid "Can edit"
+msgstr "Poate edita"
+
+msgctxt "Languages::privilege_groups.seo"
+msgid "SEO"
+msgstr "SEO"
 
 msgctxt "Languages::privileges.view_seo_rules"
-msgid "View SEO rules and 301 redirects"
-msgstr ""
+msgid "Can view"
+msgstr "Poate vizualiza"
 
 msgctxt "Languages::seo.redirects_manager"
 msgid "301 redirects"
@@ -94,7 +96,7 @@ msgstr ""
 
 msgctxt "Languages::seo.rich_snippets_rating"
 msgid "Rating"
-msgstr ""
+msgstr "Evaluare"
 
 msgctxt "Languages::seo.rich_snippets_reviews"
 msgid "[n] review|[n] reviews"
@@ -114,7 +116,7 @@ msgstr ""
 
 msgctxt "SettingsSections::seo::general"
 msgid "General"
-msgstr ""
+msgstr "General"
 
 msgctxt "SettingsOptions::seo::seo_product_type"
 msgid "Product SEO URL format"

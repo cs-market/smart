@@ -23,7 +23,8 @@ class Cdn
     /**
      * Gets CDN object instance
      *
-     * @return Cdn CDN object instance
+     * @return \Tygh\Backend\Cdn\ABackend CDN object instance
+     * @throws \Tygh\Exceptions\DeveloperException
      */
     public static function instance()
     {

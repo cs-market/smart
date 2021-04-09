@@ -1,5 +1,7 @@
 (function (_, $) {
     var methods = {
+        defaultLangCode: null,
+        apiInstancesByLangCode: {},
         apiUrl: 'https://maps.googleapis.com/maps/api/geocode/json',
 
         identifyCurrentLocation: function () {
@@ -136,29 +138,19 @@
         },
 
         loadLocationDataByLatLng: function (lat, lng) {
-            return $.get(methods.apiUrl, {
-                key: _.vendor_locations.api_key,
-                latlng: lat.toString() + ',' + lng.toString(),
-                result_type: 'street_address|postal_code|locality|administrative_area_level_1|country'
-            }).then(function (data) {
-                return methods._mergeLocationResults(data.results);
+            return methods.geocode({location: {lat: parseFloat(lat), lng: parseFloat(lng)}}).then(function (results) {
+                return methods._mergeLocationResults(results);
             });
         },
 
         loadLocationDataByPlaceId: function (place_id) {
-            return $.get(methods.apiUrl, {
-                key: _.vendor_locations.api_key,
-                place_id: place_id
-            }).then(function (data) {
-                return methods._mergeLocationResults(data.results);
+            return methods.geocode({placeId: place_id}).then(function (results) {
+                return methods._mergeLocationResults(results);
             });
         },
 
         loadNormalizedLocationData: function (location) {
-            var params = {
-                    key: _.vendor_locations.api_key,
-                    language: 'en'
-                },
+            var params = {},
                 types = null;
 
             if (location.type === 'country') {
@@ -169,23 +161,30 @@
                 types = ['country', 'state', 'locality'];
             }
 
-            if ($.inArray(location.type, ['country', 'locality', 'administrative_area_level_1']) !== -1) {
-                params.place_id = location.place_id;
-            } else {
-                params.latlng = location.lat.toString() + ',' + location.lng.toString();
-                params.result_type = 'street_address|postal_code|locality|administrative_area_level_1|country';
+            if (typeof location.lat === 'function') {
+                location.lat = location.lat();
             }
 
-            return  $.get(methods.apiUrl, params).then(function (data) {
-                var result = methods._normalizeLocation(methods._mergeLocationResults(data.results, types), location);
+            if (typeof location.lng === 'function') {
+                location.lng = location.lng();
+            }
+
+            if ($.inArray(location.type, ['country', 'locality', 'administrative_area_level_1']) !== -1) {
+                params.placeId = location.place_id;
+            } else {
+                params.location = {lat: parseFloat(location.lat), lng: parseFloat(location.lng)};
+            }
+
+            return methods.geocode(params, 'en').then(function (results) {
+                var result = methods._normalizeLocation(methods._mergeLocationResults(results, types), location);
 
                 if (result.type !== 'locality') {
-                    var locality = methods._extractByType(data.results, 'locality');
+                    var locality = methods._extractByType(results, 'locality');
                     result.locality_place_id = locality.place_id;
                 }
 
                 if (result.type !== 'country') {
-                    var country = methods._extractByType(data.results, 'country');
+                    var country = methods._extractByType(results, 'country');
                     result.country_place_id = country.place_id;
                 }
 
@@ -194,18 +193,59 @@
         },
 
         base64encode: function (string) {
-            return window.btoa(unescape(encodeURIComponent(string)));
+            return window.btoa(decodeURIComponent(encodeURIComponent(string)));
         },
 
-        loadMapApi: function () {
-            if (!methods.map_api) {
-                methods.map_api = $.ajax({
-                    url: 'https://maps.googleapis.com/maps/api/js?key=' + _.vendor_locations.api_key + '&libraries=places',
-                    dataType: "script"
+        loadMapApi: function (lang_code) {
+            lang_code = lang_code || methods.defaultLangCode;
+
+            var url = 'https://maps.googleapis.com/maps/api/js?key=' + _.vendor_locations.api_key + '&libraries=places',
+                key = lang_code || 'default',
+                d = $.Deferred();
+
+            if (methods.apiInstancesByLangCode[key]) {
+                window.google = methods.apiInstancesByLangCode[key];
+
+                d.resolve();
+            } else {
+                delete window.google;
+
+                if (lang_code) {
+                    url += "&language=" + lang_code;
+                }
+
+                $.getScript(url).then(function () {
+                    methods.apiInstancesByLangCode[key] = window.google;
+                    d.resolve();
                 });
             }
 
-            return methods.map_api;
+            return d.promise();
+        },
+
+        geocode: function (params, lang_code) {
+            var d = $.Deferred();
+            lang_code = lang_code || methods.defaultLangCode;
+
+            methods.loadMapApi(lang_code).then(function () {
+                var geocoder = new google.maps.Geocoder();
+
+                geocoder.geocode(params, function (results, status) {
+                    if (status === 'OK') {
+                        d.resolve(results);
+                    } else {
+                        d.reject();
+                    }
+                });
+            });
+
+            d.done(function () {
+                if (lang_code !== methods.defaultLangCode) {
+                    methods.loadMapApi(methods.defaultLangCode);
+                }
+            });
+
+            return d.promise();
         },
 
         _extractByType: function (locations, type) {
@@ -222,12 +262,12 @@
 
         _mergeLocationResults: function (results, types) {
             var result = {
-                    place_id: null,
-                    lat: null,
-                    lng: null,
-                    formatted_address: null,
-                    type: null
-                };
+                place_id: null,
+                lat: null,
+                lng: null,
+                formatted_address: null,
+                type: null
+            };
 
             types = types || ['country', 'state', 'locality', 'route', 'postal_code', 'street_number'];
 

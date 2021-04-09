@@ -43,11 +43,13 @@
 
                     <div class="control-group">
                         <input type="hidden"
+                               data-ca-advanced-import-element="file_type"
                                name="file_type"
                                value="{$preset.file_type|default:("Addons\\AdvancedImport\\PresetFileTypes::LOCAL"|enum)}"
                         />
                         <input type="hidden"
                                name="file"
+                               data-ca-advanced-import-element="file"
                                value="{$preset.file|default:""}"
                         />
                         <label class="control-label">{__("file")}:</label>
@@ -123,6 +125,8 @@
                              id="elm_company_id"
                              selected=$preset.company_id
                              js_action="$.ceAdvancedImport('changeCompanyId');"
+                             required=true
+                             zero_company_id_name_lang_var="none"
                     }
                 </div>
 

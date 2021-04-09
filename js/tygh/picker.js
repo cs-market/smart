@@ -112,7 +112,13 @@
 
                         if (prefix == 'p') {
                             if (jroot.hasClass('cm-picker-product')) {
-                                append_obj_content = unescape(append_obj_content.str_replace('{delete_id}', id).str_replace('{product}', js_items[id]));
+                                append_obj_content = unescape(append_obj_content.str_replace('{delete_id}', id).str_replace('{product}', js_items[id].value));
+
+                                if (js_items[id].companyId && js_items[id].companyName) {
+                                    append_obj_content = append_obj_content.
+                                        str_replace('{company_id}', js_items[id].companyId).
+                                        str_replace('{company_name}', js_items[id].companyName);
+                                }
                             } else {
                                 var options_combination = id;
                                 var options = jroot.hasClass('cm-picker-options');
@@ -144,13 +150,20 @@
                                             str_replace('{root_id}', root_id).
                                             str_replace('{delete_id}', product_id).
                                             str_replace('{product_id}', product_id);
+
                                     } else {
                                         append_obj_content = unescape(append_obj.html()).
-                                            str_replace('{product}', js_items[id]).
+                                            str_replace('{product}', js_items[id].value).
                                             str_replace('{options}', inputs).
                                             str_replace('{root_id}', root_id).
                                             str_replace('{delete_id}', product_id).
                                             str_replace('{product_id}', product_id);
+                                    }
+
+                                    if (js_items[id].companyId && js_items[id].companyName) {
+                                        append_obj_content = append_obj_content.
+                                            str_replace('{company_id}', js_items[id].companyId).
+                                            str_replace('{company_name}', js_items[id].companyName);
                                     }
                                 } else {
                                     append_obj_content = '';

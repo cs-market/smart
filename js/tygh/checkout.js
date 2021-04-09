@@ -112,6 +112,8 @@
             elm.ceCheckoutRecalculateForm();
         }
 
+        restoreCustomerNote($('.ty-customer-notes__text'));
+
     });
 
     $(_.doc).on('click', '.cm-checkout-place-order', function() {
@@ -160,6 +162,23 @@
         forms.find('button[type="submit"]').off('click.checkout_lock');
     });
 
+    $.ceEvent('on', 'ce.ajaxlink.done.payments_tab_switch', function () {
+        restoreCustomerNote($('.ty-customer-notes__text'));
+    })
+
+    var customerNote = '';
+
+    function saveCustomerNote ($textarea) {
+        customerNote = $textarea.val();
+    }
+
+    function restoreCustomerNote ($textarea) {
+        $textarea.val(customerNote);
+    }
+
+    $(_.doc).on('input', '.ty-customer-notes__text', function() {
+        saveCustomerNote($(this));
+    });
 })(Tygh, Tygh.$);
 
 function fn_switch_checkout_type()
@@ -222,25 +241,41 @@ if (window.fn_calculate_total_shipping === undefined) {
     }
 }
 
-function fn_calculate_total_shipping_cost()
+function fn_calculate_total_shipping_cost(is_hidden)
 {
-    params = [];
-    parents = Tygh.$('#shipping_rates_list');
-    radio = Tygh.$('input[type=radio]:checked', parents);
+    is_hidden = is_hidden || false;
 
-    Tygh.$.each(radio, function(id, elm) {
+    var params = [],
+        $parents = Tygh.$('#shipping_rates_list'),
+        $radio = Tygh.$('input[type=radio]:checked', $parents),
+        $shippingInfo = Tygh.$('[data-ca-shipping-field]'),
+        url = fn_url('checkout.checkout'),
+        result_ids = 'shipping_rates_list,checkout_info_summary_*,checkout_info_order_info_*',
+        $additional_result_ids = Tygh.$('input[name="additional_result_ids[]"]', $parents);
+
+    Tygh.$.each($radio, function (id, elm) {
         params.push({name: elm.name, value: elm.value});
     });
 
-    url = fn_url('checkout.checkout');
+    Tygh.$.each($shippingInfo, function (id, elm) {
+        params.push({name: elm.name, value: elm.value});
+    });
+
+    Tygh.$.each($additional_result_ids, function (id, elm) {
+        result_ids += ',' + $(elm).val();
+    });
 
     for (var i in params) {
-        url += '&' + params[i]['name'] + '=' + escape(params[i]['value']);
+        url += '&' + params[i]['name'] + '=' + encodeURIComponent(params[i]['value']);
     }
 
     Tygh.$.ceAjax('request', url, {
-        result_ids: 'shipping_rates_list,checkout_info_summary_*,checkout_info_order_info_*',
+        result_ids: result_ids,
         method: 'get',
-        full_render: true
+        full_render: true,
+        hidden: is_hidden,
+        callback: function (response) {
+            $.ceEvent('trigger', 'ce.total-shipping-cost.calculated', [response]);
+        }
     });
 }

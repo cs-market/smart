@@ -62,7 +62,7 @@
                     {/if}
                     <div class="ty-buy-together__product-price cm-reload-{$obj_prefix}{$chain.product_id}_{$chain.chain_id}" id="bt_product_price_{$obj_prefix}{$chain.product_id}_{$chain.chain_id}_main">
                         {$chain.min_qty}&nbsp;x
-                        {if !(!$auth.user_id && $settings.General.allow_anonymous_shopping == "hide_price_and_add_to_cart")}
+                        {if !(!$auth.user_id && $settings.Checkout.allow_anonymous_shopping == "hide_price_and_add_to_cart")}
                             {if $chain.price != $chain.discounted_price}
                                 <span class="ty-strike">{include file="common/price.tpl" value=$chain.price}</span>
                             {/if}
@@ -73,6 +73,7 @@
             {/if}
             
             {foreach from=$chain.products key="_id" item="_product"}
+                {$product = $_product.product_data}
                 <span class="ty-buy-together__plus chain-plus">+</span>
                 
                 <div class="ty-buy-together__product">
@@ -84,6 +85,8 @@
 
                     <div class="ty-buy-together__product-name">
                         <a href="{"products.view?product_id=`$_product.product_id`"|fn_url}">{$_product.product_name}</a>
+                        {hook name="products:product_additional_info"}
+                        {/hook}
                     </div>
 
                     {if $_product.product_options}
@@ -111,7 +114,7 @@
                     {/if}
                     <div class="ty-buy-together__product-price cm-reload-{$obj_prefix}{$_product.product_id}" id="bt_product_price_{$chain.chain_id}_{$_product.product_id}">
                         {$_product.amount}&nbsp;x
-                        {if !(!$auth.user_id && $settings.General.allow_anonymous_shopping == "hide_price_and_add_to_cart")}
+                        {if !(!$auth.user_id && $settings.Checkout.allow_anonymous_shopping == "hide_price_and_add_to_cart")}
                             {if $_product.price != $_product.discounted_price}
                                 <span class="ty-strike">{include file="common/price.tpl" value=$_product.price}</span>
                             {/if}
@@ -128,7 +131,7 @@
                 </div>
             {/if}
             
-            {if !(!$auth.user_id && $settings.General.allow_anonymous_shopping == "hide_price_and_add_to_cart")}
+            {if !(!$auth.user_id && $settings.Checkout.allow_anonymous_shopping == "hide_price_and_add_to_cart")}
                 <div class="ty-buy-together-price {$buy_together_options_class}" id="bt_total_price_{$obj_prefix}{$chain.product_id}_{$chain.chain_id}">
                     <div class="ty-buy-together-price__old">
                         <span class="ty-buy-together-price__title">{__("total_list_price")}</span>
@@ -139,7 +142,7 @@
                         {include file="common/price.tpl" value=$chain.chain_price}
                     </div>
                 <!--bt_total_price_{$obj_prefix}{$chain.product_id}_{$chain.chain_id}--></div>
-                {if !(!$auth.user_id && $settings.General.allow_anonymous_shopping == "hide_add_to_cart_button")}
+                {if !(!$auth.user_id && $settings.Checkout.allow_anonymous_shopping == "hide_add_to_cart_button")}
                     <div width="100%" class="buttons-container cm-ty-buy-together-submit" id="wrap_chain_button_{$chain.chain_id}">
                             {include file="buttons/button.tpl" but_text=__("add_all_to_cart") but_id="chain_button_`$chain.chain_id`" but_meta="ty-btn__secondary" but_name="dispatch[checkout.add]" but_role="action" obj_id=$obj_id}
                     </div>

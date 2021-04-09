@@ -12,19 +12,19 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['central']['marketing']['items']['gift_certificates'] = array(
-    'attrs' => array(
-        'class'=>'is-addon'
-    ),
-    'href' => 'gift_certificates.manage',
+$schema['central']['marketing']['items']['gift_certificates'] = [
+    'href'     => 'gift_certificates.manage',
     'position' => 500,
-);
-$schema['top']['administration']['items']['gift_certificate_statuses'] = array(
-    'attrs' => array(
-        'class'=>'is-addon'
-    ),
-    'href' => 'statuses.manage?type=' . STATUSES_GIFT_CERTIFICATE,
-    'position' => 405
-);
+    'attrs'    => [
+        'class' => 'is-addon',
+    ],
+];
+$schema['top']['administration']['items']['statuses_management']['subitems']['gift_certificate_statuses'] = [
+    'href'     => 'statuses.manage?type=' . STATUSES_GIFT_CERTIFICATE,
+    'position' => 300,
+    'attrs'    => [
+        'class' => 'is-addon',
+    ],
+];
 
 return $schema;

@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/paypal_for_marketplaces.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.11.4/addons/paypal_for_marketplaces.po\n"
+"PO-Revision-Date: 2020-05-18 09:00\n"
 
 msgctxt "Addons::name::paypal_for_marketplaces"
 msgid "PayPal for Marketplaces"
@@ -22,7 +20,7 @@ msgstr ""
 
 msgctxt "SettingsSections::paypal_for_marketplaces::general"
 msgid "General"
-msgstr ""
+msgstr "Algemeen"
 
 msgctxt "SettingsOptions::paypal_for_marketplaces::collect_payouts"
 msgid "Commission includes"
@@ -66,7 +64,7 @@ msgstr ""
 
 msgctxt "Languages::paypal_for_marketplaces.paypal_account"
 msgid "PayPal account"
-msgstr ""
+msgstr "PayPal account"
 
 msgctxt "Languages::paypal_for_marketplaces.connected"
 msgid "Connected"
@@ -142,7 +140,7 @@ msgstr ""
 
 msgctxt "Languages::paypal_for_marketplaces.do_not_change"
 msgid "Do not change"
-msgstr ""
+msgstr "Niet wijzigen"
 
 msgctxt "Languages::paypal_for_marketplaces.set_status_to"
 msgid "Set to:"
@@ -158,7 +156,7 @@ msgstr ""
 
 msgctxt "Languages::paypal_for_marketplaces.settings.account"
 msgid "Account settings"
-msgstr ""
+msgstr "Account instellingen"
 
 msgctxt "Languages::paypal_for_markeplaces.settings.funding"
 msgid "Alternative funding sources"
@@ -186,7 +184,7 @@ msgstr ""
 
 msgctxt "Languages::paypal_for_marketplaces.style.shape"
 msgid "Shape"
-msgstr ""
+msgstr "Vorm"
 
 msgctxt "Languages::paypal_for_marketplaces.shape.pill"
 msgid "Pill"
@@ -194,35 +192,35 @@ msgstr ""
 
 msgctxt "Languages::paypal_for_marketplaces.shape.rect"
 msgid "Rectangular"
-msgstr ""
+msgstr "Rechthoekig"
 
 msgctxt "Languages::paypal_for_marketplaces.style.color"
 msgid "Color"
-msgstr ""
+msgstr "Kleur"
 
 msgctxt "Languages::paypal_for_marketplaces.color.gold"
 msgid "Gold"
-msgstr ""
+msgstr "Goud"
 
 msgctxt "Languages::paypal_for_marketplaces.color.blue"
 msgid "Blue"
-msgstr ""
+msgstr "Blauw"
 
 msgctxt "Languages::paypal_for_marketplaces.color.silver"
 msgid "Silver"
-msgstr ""
+msgstr "Zilver"
 
 msgctxt "Languages::paypal_for_marketplaces.color.black"
 msgid "Black"
-msgstr ""
+msgstr "Zwart"
 
 msgctxt "Languages::paypal_for_marketplaces.shape.rect"
 msgid "Rectangular"
-msgstr ""
+msgstr "Rechthoekig"
 
 msgctxt "Languages::paypal_for_marketplaces.style.size"
 msgid "Size"
-msgstr ""
+msgstr "Afmeting"
 
 msgctxt "Languages::paypal_for_marketplaces.size.small"
 msgid "Small (150&times;25px)"

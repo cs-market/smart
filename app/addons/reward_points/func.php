@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -92,7 +93,11 @@ function fn_add_reward_points($object_data, $object_id = 0, $object_type = GLOBA
         }
     }
 
-    return db_query("REPLACE INTO ?:reward_points ?e", $object_data);
+    $reward_point_id = db_query("REPLACE INTO ?:reward_points ?e", $object_data);
+
+    fn_set_hook('reward_points_add_points_post', $object_data, $object_id, $object_type, $company_id, $reward_point_id);
+
+    return $reward_point_id;
 }
 
 /**
@@ -549,7 +554,9 @@ function fn_add_price_in_points($price, $product_id)
     $price['usergroup_id'] = isset($price['usergroup_id']) ? intval($price['usergroup_id']) : USERGROUP_ALL;
     $price['product_id'] =	$product_id;
 
-    return db_query("REPLACE INTO ?:product_point_prices ?e", $price);
+    $point_price_id = db_query("REPLACE INTO ?:product_point_prices ?e", $price);
+
+    fn_set_hook('reward_points_add_product_point_prices_post', $price, $product_id, $point_price_id);
 }
 
 function fn_get_price_in_points($product_id, &$auth)
@@ -561,6 +568,10 @@ function fn_get_price_in_points($product_id, &$auth)
 
 function fn_reward_points_gather_additional_product_data_post(&$product, &$auth, &$params)
 {
+    if (empty($params['get_for_one_product'])) {
+        return;
+    }
+
     $get_point_info = false;
     if (Registry::get('runtime.controller') == 'products' &&
         in_array(Registry::get('runtime.mode'), array('view', 'quick_view', 'options'))
@@ -687,7 +698,7 @@ function fn_gather_reward_points_data(&$product, &$auth, $get_point_info = true)
         $reward_points['coefficient'] = 1;
         if ((defined('ORDER_MANAGEMENT') || Registry::get('runtime.controller') == 'checkout') && isset($product['subtotal']) && isset($product['original_price'])) {
             if (Registry::get('addons.reward_points.points_with_discounts') == 'Y' && $reward_points['amount_type'] == 'P' && !empty($product['discount'])) {
-                $reward_points['coefficient'] = (floatval($product['original_price'])) ? (($product['original_price'] * $product['amount'] - $product['discount']) / $product['original_price'] * $product['amount']) / pow($product['amount'], 2) : 0;
+                $reward_points['coefficient'] = (floatval($product['original_price'])) ? ($product['original_price'] - $product['discount']) / $product['original_price'] : 0;
             }
         } else {
             if (Registry::get('addons.reward_points.points_with_discounts') == 'Y' && $reward_points['amount_type'] == 'P' && isset($product['discount'])) {
@@ -924,12 +935,14 @@ function fn_reward_points_get_users(&$params, &$fields, &$sortings, &$condition,
 
 function fn_reward_points_get_orders(&$params, &$fields, &$sortings, &$condition, &$join)
 {
+    if (empty($params['extra'])) {
+        return;
+    }
+
     $sortings['points'] = '?:order_data.data';
 
     $join .= db_quote(" LEFT JOIN ?:order_data ON ?:order_data.order_id = ?:orders.order_id AND ?:order_data.type = ?s", POINTS);
     $fields[] = "?:order_data.data as points";
-
-    return true;
 }
 
 function fn_reward_points_get_product_data(&$product_id, &$field_list, &$join, &$auth)
@@ -1008,7 +1021,8 @@ function fn_reward_points_buy_together_calculate_cart_post(&$cart, &$cart_produc
                 foreach ($cart_products as $k => $v) {
                     if (!empty($cart['products'][$k]['extra']['parent']['buy_together'])
                         && $cart['products'][$k]['extra']['parent']['buy_together'] == $key
-                        && !empty($cart['products'][$k]['extra']['points_info'])
+                        && isset($cart['products'][$k]['extra']['points_info']['display_price'])
+                        && isset($cart['products'][$key]['extra']['points_info']['display_price'])
                     ) {
                         $cart['products'][$key]['extra']['points_info']['display_price'] += $cart['products'][$k]['extra']['points_info']['display_price'];
                     }
@@ -1115,5 +1129,85 @@ function fn_reward_points_override_points($product_id, $override_points, $compan
 
             fn_add_reward_points($reward_point, $product_id, PRODUCT_REWARD_POINTS);
         }
+    }
+}
+
+/**
+ * Hook handler: adds Reward points management fields into the list of product fields that can be bulk edited.
+ */
+function fn_reward_points_get_product_fields(&$fields)
+{
+    $fields[] = [
+        'name' => '[data][is_pbp]',
+        'text' => __('pay_by_points')
+    ];
+
+    if (Registry::get('addons.reward_points.auto_price_in_points') === 'Y') {
+        $fields[] = [
+            'name' => '[data][is_oper]',
+            'text' => __('override_per')
+        ];
+    }
+
+    $fields[] = [
+        'name' => '[product_point_prices][point_price]',
+        'text' => __('price_in_points')
+    ];
+
+    $fields[] = [
+        'name' => '[data][is_op]',
+        'text' => __('override_gc_points_brief')
+    ];
+}
+
+function fn_product_variations_reward_points_add_points_post($object_data, $object_id, $object_type, $company_id, $reward_point_id)
+{
+    if ($object_type !== PRODUCT_REWARD_POINTS) {
+        return;
+    }
+
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+
+    $sync_service->onTableChanged('reward_points', $object_id, [
+        'object_type'  => $object_data['object_type'],
+        'usergroup_id' => $object_data['usergroup_id'],
+        'company_id'   => $company_id
+    ]);
+}
+
+function fn_product_variations_reward_points_add_product_point_prices_post($price, $product_id, $point_price_id)
+{
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+
+    $sync_service->onTableChanged('product_point_prices', $product_id, [
+        'lower_limit'  => $price['lower_limit'],
+        'usergroup_id' => $price['usergroup_id']
+    ]);
+}
+
+/**
+ * The "load_products_extra_data" hook handler.
+ *
+ * Actions performed:
+ *  - Loads point_price products value.
+ *
+ * @see fn_load_products_extra_data
+ */
+function fn_reward_points_load_products_extra_data(&$extra_fields, $products, $product_ids, $params, $lang_code)
+{
+    if (in_array('point_price', $params['extend'])) {
+        $auth_usergroup_ids = !empty(Tygh::$app['session']['auth']['usergroup_ids']) ? Tygh::$app['session']['auth']['usergroup_ids'] : [];
+        $usergroup_ids = (AREA == 'C') ? array_merge(array(USERGROUP_ALL), $auth_usergroup_ids) : USERGROUP_ALL;
+
+        $extra_fields['?:product_point_prices'] = [
+            'primary_key' => 'product_id',
+            'fields' => [
+                'point_price' => 'MIN(?:product_point_prices.point_price)'
+            ],
+            'condition'   => db_quote(
+                ' AND ?:product_point_prices.lower_limit = 1 AND ?:product_point_prices.usergroup_id IN (?n)',
+                $usergroup_ids
+            )
+        ];
     }
 }

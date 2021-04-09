@@ -37,16 +37,17 @@
                             {assign var="obj_id" value=$product.product_id}
                             {assign var="obj_id_prefix" value="`$obj_prefix``$product.product_id`"}
                             {include file="common/product_data.tpl" product=$product}
-
-                            <div class="ty-grid-list__item ty-quick-view-button__wrapper">
+                            
+                            <div class="ty-grid-list__item ty-quick-view-button__wrapper 
+                                {if $settings.Appearance.enable_quick_view == 'Y' || $show_features} ty-grid-list__item--overlay{/if}">
                                 {assign var="form_open" value="form_open_`$obj_id`"}
                                 {$smarty.capture.$form_open nofilter}
                                 {hook name="products:product_multicolumns_list"}
                                         <div class="ty-grid-list__image">
                                             {include file="views/products/components/product_icon.tpl" product=$product show_gallery=true}
 
-                                            {assign var="discount_label" value="discount_label_`$obj_prefix``$obj_id`"}
-                                            {$smarty.capture.$discount_label nofilter}
+                                            {assign var="product_labels" value="product_labels_`$obj_prefix``$obj_id`"}
+                                            {$smarty.capture.$product_labels nofilter}
                                         </div>
 
                                         <div class="ty-grid-list__item-name">
@@ -80,18 +81,29 @@
                                             {$smarty.capture.$list_discount nofilter}
                                         </div>
 
-                                        <div class="ty-grid-list__control">
-                                            {if $settings.Appearance.enable_quick_view == 'Y'}
-                                                {include file="views/products/components/quick_view_link.tpl" quick_nav_ids=$quick_nav_ids}
-                                            {/if}
+                                        {capture name="product_multicolumns_list_control_data_wrapper"}
+                                            <div class="ty-grid-list__control">
+                                                {capture name="product_multicolumns_list_control_data"}
+                                                    {hook name="products:product_multicolumns_list_control"}
+                                                        {if $settings.Appearance.enable_quick_view == 'Y'}
+                                                            {include file="views/products/components/quick_view_link.tpl" quick_nav_ids=$quick_nav_ids}
+                                                        {/if}
 
-                                            {if $show_add_to_cart}
-                                                <div class="button-container">
-                                                    {assign var="add_to_cart" value="add_to_cart_`$obj_id`"}
-                                                    {$smarty.capture.$add_to_cart nofilter}
-                                                </div>
-                                            {/if}
-                                        </div>
+                                                        {if $show_add_to_cart}
+                                                            <div class="button-container">
+                                                                {$add_to_cart = "add_to_cart_`$obj_id`"}
+                                                                {$smarty.capture.$add_to_cart nofilter}
+                                                            </div>
+                                                        {/if}
+                                                    {/hook}
+                                                {/capture}
+                                                {$smarty.capture.product_multicolumns_list_control_data nofilter}
+                                            </div>
+                                        {/capture}
+
+                                        {if $smarty.capture.product_multicolumns_list_control_data|trim}
+                                            {$smarty.capture.product_multicolumns_list_control_data_wrapper nofilter}
+                                        {/if}
                                 {/hook}
                                 {assign var="form_close" value="form_close_`$obj_id`"}
                                 {$smarty.capture.$form_close nofilter}

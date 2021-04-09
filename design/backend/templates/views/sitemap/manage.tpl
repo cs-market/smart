@@ -5,7 +5,7 @@
 <div class="items-container cm-sortable" data-ca-sortable-table="sitemap_sections" data-ca-sortable-id-name="section_id" id="manage_sitemap_list">
 {if $sitemap_sections}
     <div class="table-responsive-wrapper">
-        <table class="table table-middle table-objects table-striped table-responsive table-responsive-w-titles">
+        <table class="table table-middle table--relative table-objects table-striped table-responsive table-responsive-w-titles">
         {foreach from=$sitemap_sections item=section}
             {include file="common/object_group.tpl"
                 id=$section.section_id

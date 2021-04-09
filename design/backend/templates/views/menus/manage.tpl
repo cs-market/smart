@@ -8,7 +8,7 @@
 
 {if $menus}
 <div class="table-responsive-wrapper">
-    <table class="table table-middle table-objects table-responsive table-responsive-w-titles">
+    <table class="table table-middle table--relative table-objects table-responsive table-responsive-w-titles">
         {foreach from=$menus item="menu"}
             {assign var="_href_delete" value="menus.delete?menu_id=`$menu.menu_id`"}        
             {assign var="dialog_name" value="{__("editing_menu")}: `$menu.name`"}

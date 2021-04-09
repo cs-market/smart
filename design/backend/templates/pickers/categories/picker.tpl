@@ -2,7 +2,7 @@
 {if !$rnd}{math equation="rand()" assign="rnd"}{/if}
 
 {$data_id = $data_id|default:"categories_list"}
-{$data_id = "`$data_id`_`$rnd`"}
+{$data_id = $picker_id|default:"`$data_id`_`$rnd`"}
 {$view_mode = $view_mode|default:"mixed"}
 {$start_pos = $start_pos|default:0}
 {$default_name = $default_name|escape:"url"}
@@ -39,6 +39,10 @@
                 {assign var="extra_url" value="&get_tree=multi_level"}
             {/if}
 
+            {if $disable_cancel}
+                {$extra_url = "`$extra_url`&disable_cancel=true"}
+            {/if}
+
             {if $extra_var}
                 {assign var="extra_var" value=$extra_var|escape:url}
             {/if}
@@ -48,7 +52,7 @@
                 {if $multiple}
                     {assign var="_but_text" value=$but_text|default:__("add_categories")}
                     {assign var="_but_role" value="add"}
-                    {assign var="_but_icon" value=$but_icon|default:__("icon-plus")}
+                    {assign var="_but_icon" value=$but_icon|default:"icon-plus"}
                     {else}
                     {assign var="_but_text" value="<i class='icon-plus'></i>"}
                     {assign var="_but_role" value="icon"}
@@ -85,7 +89,21 @@
                 {assign var="_but_text" value=$but_text|default:__("add_categories")}
                 {assign var="_but_role" value="add"}
                 {assign var="_but_icon" value="icon-plus"}
-            {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_href="categories.picker?display=`$display`&data_id=`$data_id`&company_ids=`$company_ids``$extra_url`"|fn_url but_text=$_but_text but_role=$_but_role but_icon=$_but_icon but_meta=$but_ but_target_id="content_`$data_id`" but_meta="`$but_meta` cm-dialog-opener"}
+
+            {if $disable_cancel}
+                {$extra_url = "`$extra_url`&disable_cancel=true"}
+            {/if}
+
+            {include file="buttons/button.tpl" 
+                     but_id="opener_picker_`$data_id`" 
+                     but_href="categories.picker?display=`$display`&data_id=`$data_id`&company_ids=`$company_ids``$extra_url`"|fn_url 
+                     but_text=$_but_text 
+                     but_role=$_but_role 
+                     but_icon=$_but_icon 
+                     but_meta=$but_ 
+                     but_target_id="content_`$data_id`" 
+                     but_meta="`$but_meta` cm-dialog-opener"
+            }
 
             {/if}
             <div class="hidden" id="content_{$data_id}" title="{$_but_title}"></div>
@@ -102,7 +120,7 @@
 {if !$extra_var && $view_mode != "button"}
     {if $multiple}
     <div class="table-wrapper">
-        <table  width="100%" class="table table-middle">
+        <table width="100%" class="table table-middle table--relative">
         <thead>
         <tr>
             {if $positions}<th width="5%">{__("position_short")}</th>{/if}

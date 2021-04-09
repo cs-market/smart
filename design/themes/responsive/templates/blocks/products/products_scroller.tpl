@@ -32,6 +32,7 @@
     {foreach from=$items item="product" name="for_products"}
         {hook name="products:product_scroller_list"}
         <div class="ty-scroller-list__item">
+            {hook name="products:product_scroller_list_item"}
             {assign var="obj_id" value="scr_`$block.block_id`000`$product.product_id`"}
             <div class="ty-scroller-list__img-block">
                 {include file="common/image.tpl" assign="object_img" images=$product.main_pair image_width=$block.properties.thumbnail_width image_height=$block.properties.thumbnail_width no_ids=true lazy_load=true}
@@ -42,9 +43,10 @@
             </div>
             <div class="ty-scroller-list__description">
                 {strip}
-                    {include file="blocks/list_templates/simple_list.tpl" product=$product show_name=true show_price=true show_add_to_cart=$_show_add_to_cart but_role="action" hide_price=$_hide_price hide_qty=true show_discount_label=true}
+                    {include file="blocks/list_templates/simple_list.tpl" product=$product show_name=true show_price=true show_add_to_cart=$_show_add_to_cart but_role="action" hide_price=$_hide_price hide_qty=true show_product_labels=true show_discount_label=true show_shipping_label=true}
                 {/strip}
             </div>
+            {/hook}
         </div>
         {/hook}
     {/foreach}

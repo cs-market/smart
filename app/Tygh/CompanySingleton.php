@@ -55,13 +55,17 @@ class CompanySingleton
      * @static
      * @param  int              $company_id Company identifier
      * @param  array            $params     additional params
-     * @return CompanySingleton
+     *
+     * @return static
      */
     public static function instance($company_id = 0, $params = array())
     {
         $class_name = get_called_class();
         $company_id = self::getCompany($company_id);
-        $instance_key = $class_name . $company_id;
+        $instance_key = $class_name . '_' . $company_id;
+        if (isset($params['instance_key_extra'])) {
+            $instance_key .= '_' . $params['instance_key_extra'];
+        }
 
         if (empty(self::$_instance[$instance_key])) {
             self::$_instance[$instance_key] = new $class_name();
@@ -84,7 +88,7 @@ class CompanySingleton
             $company_id = Registry::get('runtime.company_id');
         }
 
-        return intval($company_id);
+        return (int) $company_id;
     }
 
     /**

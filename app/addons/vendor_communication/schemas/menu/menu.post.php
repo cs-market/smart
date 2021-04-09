@@ -12,7 +12,10 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-$schema['central']['customers']['items']['vendor_communication.message_center'] = array(
+$schema['central']['customers']['items']['vendor_communication.message_center_name'] = array(
+    'attrs' => array(
+        'class' => 'is-addon'
+    ),
     'href' => 'vendor_communication.threads',
     'alt' => 'vendor_communication.threads',
     'position' => 900,

@@ -50,6 +50,9 @@ class SinglePassModifierParser implements IModifierParser
     /** @var null|string the function's parameter wrapper that is expecting to be at the end of parameter */
     protected $expectedParameterCloserWrapper = null;
 
+    /** @var null|string wrapper parameter that is expecting to be at the end of the value parameter */
+    protected $expectedInnerParameterCloserWrapper = null;
+    
     /**
      * @inheritdoc
      */
@@ -57,7 +60,7 @@ class SinglePassModifierParser implements IModifierParser
     {
         $this->resetParser();
         $modifier = trim($modifier);
-        $safe_threshold = 1000;
+        $safe_threshold = 50000;
 
         $chars = str_split($modifier);
 
@@ -175,7 +178,6 @@ class SinglePassModifierParser implements IModifierParser
         } else {
             $this->parameter[] = $char;
         }
-
     }
 
     /**
@@ -185,7 +187,7 @@ class SinglePassModifierParser implements IModifierParser
      */
     protected function parseParameter($char)
     {
-        if ($char === self::PARAMETER_DELIMITER || $char === self::PARAMETER_LIST_CLOSER) {
+        if (($char === self::PARAMETER_DELIMITER || $char === self::PARAMETER_LIST_CLOSER) && empty($this->expectedInnerParameterCloserWrapper)) {
             $this->addParsedParameter('trim');
             $this->parsingState = ModifierParsingState::STARTING_PARSING_PARAMETER;
 
@@ -194,6 +196,12 @@ class SinglePassModifierParser implements IModifierParser
             }
         } else {
             $this->parameter[] = $char;
+        }
+
+        if (empty($this->expectedInnerParameterCloserWrapper) && in_array($char, $this->parameterWrapperVariants)) {
+            $this->expectedInnerParameterCloserWrapper = $char;
+        } elseif ($char === $this->expectedInnerParameterCloserWrapper) {
+            $this->expectedInnerParameterCloserWrapper = null;
         }
     }
 

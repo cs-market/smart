@@ -14,6 +14,7 @@
 
 use Tygh\Registry;
 use Tygh\Languages\Languages;
+use Tygh\Template\Document\Variables\PickpupPointVariable;
 
 if ( !defined('AREA') ) { die('Access denied'); }
 
@@ -190,4 +191,43 @@ function fn_rus_dellin_get_code_city($params, $lang_code = CART_LANGUAGE)
     );
 
     return $code_kladr;
+}
+
+/**
+ * Hook handler: injects pickup point into order data.
+ */
+function fn_rus_dellin_pickup_point_variable_init(
+    PickpupPointVariable $instance,
+    $order,
+    $lang_code,
+    &$is_selected,
+    &$name,
+    &$phone,
+    &$full_address,
+    &$open_hours_raw,
+    &$open_hours,
+    &$description_raw,
+    &$description
+) {
+    if (!empty($order['shipping'])) {
+        if (is_array($order['shipping'])) {
+            $shipping = reset($order['shipping']);
+        } else {
+            $shipping = $order['shipping'];
+        }
+
+        if (!isset($shipping['module']) || $shipping['module'] !== 'dellin') {
+            return;
+        }
+
+        if (isset($shipping['terminal_data'])) {
+            $pickup_data = $shipping['terminal_data'];
+
+            $is_selected = true;
+            $name = $pickup_data['name'];
+            $full_address = $pickup_data['address'];
+        }
+    }
+
+    return;
 }

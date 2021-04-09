@@ -6,7 +6,7 @@
 {if $providers_list}
 
 <div class="table-wrapper">
-    <table class="table table-middle table-objects table-striped">
+    <table class="table table-middle table--relative table-objects table-striped">
     {foreach from=$providers_list item=provider_data}
         {include file="common/object_group.tpl"
             id=$provider_data.provider_id

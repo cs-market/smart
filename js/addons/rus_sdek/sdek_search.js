@@ -21,9 +21,11 @@
             }
         });
 
-        $('#sdek_show_all').on('click', function() {
-            getSdekOffices($(this).attr('href'));
-        });
+    });
+
+    $(_.doc).on('click', '.cm-show-all-point', function () {
+        getSdekOffices($(this).attr('href'));
+        $(this).toggleClass('hidden', true);
     });
 
     function getSdekOffices(url) {
@@ -33,6 +35,9 @@
             append: false,
             caching: false,
             callback: function (data) {
+                $('.ty-sdek-office-search').show();
+                $('.ty-sdek-checkout-select-office').addClass('ty-sdek-list-office');
+
                 $('#sdek_office_search').focus();
             }
         });

@@ -250,8 +250,9 @@ function fn_log_event($type, $action, $data = array())
 /**
  * Returns store logs
  *
- * @param array $params Search parameters
- * @param int $items_per_page Logs limit
+ * @param array $params         Search parameters
+ * @param int   $items_per_page Items per page
+ *
  * @return array Logs with search parameters
  */
 function fn_get_logs($params, $items_per_page = 0)
@@ -259,23 +260,24 @@ function fn_get_logs($params, $items_per_page = 0)
     // Init filter
     $params = LastView::instance()->update('logs', $params);
 
-    $default_params = array (
-        'page' => 1,
-        'items_per_page' => $items_per_page
-    );
+    $default_params = [
+        'page'           => 1,
+        'items_per_page' => $items_per_page,
+        'limit'          => 0
+    ];
 
     $params = array_merge($default_params, $params);
 
-    $sortings = array (
-        'timestamp' => array ('?:logs.timestamp', '?:logs.log_id'),
-        'user' => array ('?:users.lastname', '?:users.firstname'),
-    );
+    $sortings = [
+        'timestamp' => ['?:logs.timestamp', '?:logs.log_id'],
+        'user'      => ['?:users.lastname', '?:users.firstname'],
+    ];
 
-    $fields = array (
+    $fields = [
         '?:logs.*',
         '?:users.firstname',
         '?:users.lastname'
-    );
+    ];
 
     $sorting = db_sort($params, $sortings, 'timestamp', 'desc');
 
@@ -298,7 +300,7 @@ function fn_get_logs($params, $items_per_page = 0)
                 "%{$user_name}%"
             );
         };
-        $condition = implode(array($condition, implode(array_map($get_search_condition_user, $user_names))));
+        $condition = implode([$condition, implode(array_map($get_search_condition_user, $user_names))]);
     }
 
     if (!empty($params['q_type'])) {
@@ -311,12 +313,17 @@ function fn_get_logs($params, $items_per_page = 0)
 
     if (Registry::get('runtime.company_id')) {
         $condition .= db_quote(" AND ?:logs.company_id = ?i", Registry::get('runtime.company_id'));
+    } elseif (!empty($params['company_ids'])) {
+        $condition .= fn_get_company_condition('?:logs.company_id', true, $params['company_ids']);
     }
 
     fn_set_hook('admin_get_logs', $params, $condition, $join, $sorting);
 
     $limit = '';
-    if (!empty($params['items_per_page'])) {
+
+    if (!empty($params['limit'])) {
+        $limit = db_quote('LIMIT 0, ?i', $params['limit']);
+    } elseif (!empty($params['items_per_page'])) {
         $params['total_items'] = db_get_field("SELECT COUNT(DISTINCT(?:logs.log_id)) FROM ?:logs ?p WHERE 1 ?p", $join, $condition);
         $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
     }
@@ -324,11 +331,11 @@ function fn_get_logs($params, $items_per_page = 0)
     $data = db_get_array("SELECT " . join(', ', $fields) . " FROM ?:logs ?p WHERE 1 ?p $sorting $limit", $join, $condition);
 
     foreach ($data as $k => $v) {
-        $data[$k]['backtrace'] = !empty($v['backtrace']) ? unserialize($v['backtrace']) : array();
-        $data[$k]['content'] = !empty($v['content']) ? unserialize($v['content']) : array();
+        $data[$k]['backtrace'] = !empty($v['backtrace']) ? unserialize($v['backtrace']) : [];
+        $data[$k]['content'] = !empty($v['content']) ? unserialize($v['content']) : [];
     }
 
-    return array($data, $params);
+    return [$data, $params];
 }
 
 /**
@@ -350,4 +357,42 @@ function fn_get_log_types()
     }
 
     return $types;
+}
+
+/**
+ * Cleanups all logs
+ *
+ * @param int|null $company_id Company identifier
+ */
+function fn_cleanup_all_logs($company_id = null)
+{
+    if ($company_id) {
+        db_query('DELETE FROM ?:logs WHERE company_id = ?i', $company_id);
+    } else {
+        db_query('TRUNCATE TABLE ?:logs');
+    }
+}
+
+/**
+ * Cleanups old logs
+ *
+ * @param int|null $company_id Company identifier
+ */
+function fn_cleanup_old_logs($company_id = null)
+{
+    $log_life_time = (int) Registry::get('settings.Logging.log_lifetime');
+
+    if (!$log_life_time) {
+        return;
+    }
+
+    $conditions = [
+        ['timestamp', '<=', strtotime(sprintf('-%d days', $log_life_time))]
+    ];
+
+    if ($company_id) {
+        $conditions['company_id'] = (int) $company_id;
+    }
+
+    db_query('DELETE FROM ?:logs WHERE ?w', $conditions);
 }

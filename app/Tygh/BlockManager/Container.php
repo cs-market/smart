@@ -13,6 +13,7 @@
  ****************************************************************************/
 
 namespace Tygh\BlockManager;
+
 use Tygh\Enum\ContainerPositions;
 use Tygh\Registry;
 
@@ -21,6 +22,8 @@ use Tygh\Registry;
  */
 class Container
 {
+    use TDeviceAvailabiltiy;
+
     /**
      * Gets list of containers
      *
@@ -71,6 +74,11 @@ class Container
             $join,
             $condition
         );
+
+        foreach ($containers as &$container) {
+            $container['availability'] = static::getAvailabilityInstance()->getAvailability($container);
+        }
+        unset($container);
 
         return $containers;
     }
@@ -156,8 +164,9 @@ class Container
      *  width (12 | 16)
      * )</pre>
      *
-     * @param  array         $container_data array of container data
-     * @return int|db_result Container id if new grid was created, DB result otherwise
+     * @param  array $container_data array of container data
+     *
+     * @return int|bool Container id if new grid was created, DB result otherwise
      */
     public static function update($container_data)
     {
@@ -508,6 +517,7 @@ class Container
             $container['set_custom_config_url'] = self::getConfigurationUrl($company_id, $container, $dynamic_object, $dynamic_object_scheme, false);
             $container['set_default_config_url'] = self::getConfigurationUrl($company_id, $container, $dynamic_object, $dynamic_object_scheme, true);
         }
+        unset($container);
 
         return $containers;
     }

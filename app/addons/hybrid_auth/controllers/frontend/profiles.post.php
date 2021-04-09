@@ -17,8 +17,6 @@ use Tygh\Registry;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($mode == 'update' || $mode == 'add') {
-    $providers_list = fn_hybrid_auth_get_providers_list();
-    Tygh::$app['view']->assign('providers_list', $providers_list);
     $linked_providers = array();
     if (!empty($auth['user_id'])) {
         $linked_providers = fn_hybrid_auth_get_link_provider($auth['user_id']);
@@ -32,9 +30,6 @@ if ($mode == 'update' || $mode == 'add') {
         if (!empty($auth['user_id']) && !empty($_REQUEST['provider'])) {
             fn_hybrid_auth_get_unlink_provider($auth['user_id'], $_REQUEST['provider']);
         }
-
-        $providers_list = fn_hybrid_auth_get_providers_list();
-        Tygh::$app['view']->assign('providers_list', $providers_list);
 
         if (!empty($auth['user_id'])) {
             $linked_providers = fn_hybrid_auth_get_link_provider($auth['user_id']);

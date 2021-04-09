@@ -127,7 +127,7 @@ class Combinations extends AEntity
 {
     public function index($id = 0, $params = array())
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (empty($id) && empty($params['product_id'])) {
             $status = Response::STATUS_BAD_REQUEST;

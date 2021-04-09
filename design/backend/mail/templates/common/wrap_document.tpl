@@ -22,6 +22,7 @@ a:hover {
 	margin: 0px auto;
 	text-align: initial;
 }
+
 </style>
 {/literal}
 </head>

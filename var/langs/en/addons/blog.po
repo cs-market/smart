@@ -79,3 +79,7 @@ msgstr "Use the &lt;!--CUT--&gt; tag (switch to source code to insert it) to hid
 msgctxt "Languages::blog_functionality_notes"
 msgid "<p>Use this page to manage your blog. This is how you should organize your blog posts:</p><ul><li>Blog is a usual post that has the <b>Root level page</b> as the Parent page.</li><li>Choose <b>Blog</b> as the Parent page for your blog posts.</li></ul>"
 msgstr "<p>Use this page to manage your blog. This is how you should organize your blog posts:</p><ul><li>Blog is a usual post that has the <b>Root level page</b> as the Parent page.</li><li>Choose <b>Blog</b> as the Parent page for your blog posts.</li></ul>"
+
+msgctxt "Languages::n_posts"
+msgid "[n] post|[n] posts"
+msgstr "[n] post|[n] posts"

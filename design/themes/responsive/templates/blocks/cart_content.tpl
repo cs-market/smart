@@ -36,7 +36,7 @@
                                                         </div>
                                                     {/if}
                                                     <div class="ty-cart-items__list-item-desc">
-                                                        <a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$product.product_id|fn_get_product_name nofilter}</a>
+                                                        <a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$product.product|default:fn_get_product_name($product.product_id) nofilter}</a>
                                                     <p>
                                                         <span>{$product.amount}</span><span>&nbsp;x&nbsp;</span>{include file="common/price.tpl" value=$product.display_price span_id="price_`$key`_`$dropdown_id`" class="none"}
                                                     </p>
@@ -65,9 +65,9 @@
                             <div class="ty-float-left">
                                 <a href="{"checkout.cart"|fn_url}" rel="nofollow" class="ty-btn ty-btn__secondary">{__("view_cart")}</a>
                             </div>
-                            {if $settings.General.checkout_redirect != "Y"}
+                            {if $settings.Checkout.checkout_redirect != "Y"}
                             <div class="ty-float-right">
-                                <a href="{"checkout.checkout"|fn_url}" rel="nofollow" class="ty-btn ty-btn__primary">{__("checkout")}</a>
+                                {include file="buttons/proceed_to_checkout.tpl" but_text=__("checkout")}
                             </div>
                             {/if}
                         </div>

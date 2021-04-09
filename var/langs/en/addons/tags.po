@@ -63,3 +63,7 @@ msgstr "Tags for products"
 msgctxt "SettingsOptions::tags::tags_for_pages"
 msgid "Tags for pages"
 msgstr "Tags for pages"
+
+msgctxt "Languages::n_tags"
+msgid "[n] tag|[n] tags"
+msgstr "[n] tag|[n] tags"

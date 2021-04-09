@@ -50,14 +50,22 @@ class MessageBuilderFactory implements IMessageBuilderFactory
                     $this->app['template.renderer'],
                     $this->app['template.mail.repository'],
                     $this->app['mailer.message_style_formatter'],
-                    Registry::get('config')
+                    Registry::get('config'),
+                    $this->app['storefront.repository']
                 );
                 break;
             case 'file_template':
-                return new FileTemplateMessageBuilder($this->app['view'], Registry::get('config'));
+                return new FileTemplateMessageBuilder(
+                    $this->app['view'],
+                    Registry::get('config'),
+                    $this->app['storefront.repository']
+                );
                 break;
             case 'default':
-                return new DefaultMessageBuilder(Registry::get('config'));
+                return new DefaultMessageBuilder(
+                    Registry::get('config'),
+                    $this->app['storefront.repository']
+                );
                 break;
             default:
                 throw new MailerException("Undefined message builder: {$type}");

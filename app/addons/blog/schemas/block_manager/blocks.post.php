@@ -12,6 +12,10 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Registry;
+
+require_once Registry::get('config.dir.addons') . 'blog/schemas/block_manager/blocks.functions.php';
+
 $schema['blog'] = array(
     'content' => array(
         'items' => array(
@@ -75,7 +79,8 @@ $schema['blog'] = array(
     'cache' => array(
         'update_handlers' => array('pages', 'page_descriptions'),
         'request_handlers' => array('%PAGE_ID%', '%COMPANY_ID%')
-    )
+    ),
+    'brief_info_function' => 'fn_block_get_blog_info'
 );
 
 if (!empty($schema['rss_feed'])) {

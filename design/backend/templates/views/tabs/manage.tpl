@@ -11,7 +11,7 @@
 <div class="items-container {if !$dynamic_object}cm-sortable{/if}" data-ca-sortable-table="product_tabs" data-ca-sortable-id-name="tab_id"  id="manage_tabs_list">
 
     <div class="table-responsive-wrapper">
-        <table width="100%" class="table table-middle table-objects table-responsive table-responsive-w-titles">
+        <table width="100%" class="table table-middle table--relative table-objects table-responsive table-responsive-w-titles">
             <tbody>
         {foreach from=$product_tabs item="tab"}
             {if $tab.is_primary == "Y" || $dynamic_object || $non_editable}

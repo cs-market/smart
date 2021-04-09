@@ -12,6 +12,8 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+defined('BOOTSTRAP') or die('Access denied');
+
 /**
  * Describes anti-CSRF validation requirements (see ::fn_csrf_validate_request()).
  *
@@ -33,30 +35,35 @@
  * 2. General controller validation rule (if the previous one is not found)
  * 3. General area validation rule (if the previous ones are not found)
  */
-$schema = array(
-    'A' => array(
-        'validate' => true,
-    ),
-    'C' => array(
-        'validate' => false,
-        'controllers' => array(
-            'payment_notification' => array(
+$schema = [
+    'A' => [
+        'validate'    => true,
+        'controllers' => [
+            'payment_notification' => [
                 'validate' => false,
-            ),
-            'auth' => array(
+            ],
+        ],
+    ],
+    'C' => [
+        'validate'    => false,
+        'controllers' => [
+            'payment_notification' => [
+                'validate' => false,
+            ],
+            'auth'                 => [
                 'validate' => true,
-            ),
-            'profiles' => array(
+            ],
+            'profiles'             => [
                 'validate' => true,
-            ),
-            'checkout' => array(
+            ],
+            'checkout'             => [
                 'validate' => true,
-            ),
-            'orders' => array(
+            ],
+            'orders'               => [
                 'validate' => true,
-            ),
-        ),
-    ),
-);
+            ],
+        ],
+    ],
+];
 
 return $schema;

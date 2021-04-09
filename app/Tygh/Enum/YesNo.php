@@ -41,7 +41,7 @@ class YesNo
     /**
      * Converts value to the boolean representation.
      *
-     * @param bool|string $val
+     * @param bool|string|int|null $val Value
      *
      * @return bool
      */

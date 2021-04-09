@@ -145,7 +145,7 @@ function fn_get_data_of_changed_product(&$params, $auth, $mode)
 
     $data = isset($product_data) ? $product_data : $cart_products;
 
-    fn_set_hook('after_options_calculation', $mode, $data);
+    fn_set_hook('after_options_calculation', $mode, $data, $auth);
 
     Tygh::$app['view']->display($display_tpl);
 
@@ -266,7 +266,12 @@ function fn_get_product_options_data($cart_products, &$cart, $params)
             $amount = isset($item['amount']) ? $item['amount'] : 1;
             $product_data = fn_get_product_data($item['product_id'], $auth, CART_LANGUAGE, '', false, false, false, false, false, false, false);
 
-            if ($product_data['options_type'] == 'S' && isset($item['product_options']) && isset($params['changed_option'][$cart_id])) {
+            if (
+                isset($product_data['options_type'])
+                && $product_data['options_type'] === 'S'
+                && isset($item['product_options'])
+                && isset($params['changed_option'][$cart_id])
+            ) {
                 $item['product_options'] = fn_fill_sequential_options($item, $params['changed_option'][$cart_id]);
                 unset($params['changed_option']);
             }
@@ -328,7 +333,13 @@ function fn_change_product_data_in_cart(&$cart_products, &$cart, $params)
                 $k = $product['object_id'];
             }
 
-            $cart_products[$k]['changed_option'] = isset($product['object_id']) ? isset($params['changed_option'][$product['object_id']]) ? $params['changed_option'][$product['object_id']] : '' : isset($params['changed_option'][$k]) ? $params['changed_option'][$k] : '' ;
+            if (isset($product['object_id'], $params['changed_option'][$product['object_id']])) {
+                $cart_products[$k]['changed_option'] = $params['changed_option'][$product['object_id']];
+            } elseif (isset($params['changed_option'][$k])) {
+                $cart_products[$k]['changed_option'] = $params['changed_option'][$k];
+            } else {
+                $cart_products[$k]['changed_option'] = '';
+            }
         }
     }
 }

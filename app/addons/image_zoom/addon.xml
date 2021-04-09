@@ -12,17 +12,9 @@
             <sections>
                 <section id="general">
                     <items>
-                        <item id="cz_opacity">
-                            <type>input</type>
-                            <default_value>0.6</default_value>
-                        </item>
                         <item id="cz_animation_time">
                             <type>input</type>
                             <default_value>200</default_value>
-                        </item>
-                        <item id="cz_tint_color_picker">
-                            <type>input</type>
-                            <default_value>#ffffff</default_value>
                         </item>
                         <item id="cz_zoom_position">
                             <type>selectbox</type>
@@ -60,42 +52,7 @@
                                 </item>
                                 <item id="15">
                                 </item>
-                                <item id="inside">
-                                </item>
                             </variants>
-                        </item>
-                        <item id="cz_zoom_size_mode">
-                            <type>selectbox</type>
-                            <default_value>zoom</default_value>
-                            <variants>
-                                <item id="image">
-                                </item>
-                                <item id="lens">
-                                </item>
-                                <item id="zoom">
-                                </item>
-                                <item id="full">
-                                </item>
-                            </variants>
-                            
-                        </item>
-                        <item id="cz_caption_position">
-                            <type>selectbox</type>
-                            <default_value>bottom</default_value>
-                            <variants>
-                                <item id="top">
-                                </item>
-                                <item id="bottom">
-                                </item>
-                            </variants>
-                        </item>
-                        <item id="cz_ease_time">
-                            <type>input</type>
-                            <default_value>200</default_value>
-                        </item>
-                        <item id="cz_zoom_fly_out">
-                            <type>checkbox</type>
-                            <default_value>Y</default_value>
                         </item>
                     </items>
                 </section>

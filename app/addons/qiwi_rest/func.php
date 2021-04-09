@@ -19,7 +19,7 @@ function fn_qiwi_rest_install()
     fn_qiwi_rest_uninstall();
 
     $_data = array(
-        'processor' => 'Qiwi REST',
+        'processor' => 'Qiwi Кошелёк',
         'processor_script' => 'qiwi_rest.php',
         'processor_template' => 'addons/qiwi_rest/views/orders/components/payments/qiwi_rest.tpl',
         'admin_template' => 'qiwi_rest.tpl',
@@ -62,4 +62,23 @@ function fn_qiwi_rest_get_bill_status($status)
     );
 
     return isset($statuses[$status]) ? $statuses[$status] : __('addons.qiwi_rest.bill_status_unknown');
+}
+
+/**
+ * The "get_payment_processors_post" hook handler.
+ *
+ * Actions performed:
+ *     - Adds specific 'russian' attribute to some payment processors for categorization.
+ *
+ * @see \fn_get_payment_processors()
+ */
+function fn_qiwi_rest_get_payment_processors_post($lang_code, &$processors)
+{
+    foreach ($processors as &$processor) {
+        if ($processor['addon'] === 'qiwi_rest') {
+            $processor['russian'] = true;
+        }
+    }
+    unset($processor);
+
 }

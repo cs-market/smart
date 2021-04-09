@@ -59,7 +59,7 @@ function fn_click_pickpoint_terminal (group_key)
 
         url = fn_url('checkout.checkout');
         for (var i in params) {
-            url += '&' + params[i]['name'] + '=' + escape(params[i]['value']);
+            url += '&' + params[i]['name'] + '=' + encodeURIComponent(params[i]['value']);
         }
 
         $.ceAjax('request', url, {
@@ -69,6 +69,7 @@ function fn_click_pickpoint_terminal (group_key)
             data: {
                 group_key: group_key,
                 pickpoint_id: result['id'],
+                city: result['cityname'],
                 address_pickpoint: result['name'] + ', ' + result['address']
             }
         });
@@ -103,7 +104,7 @@ function fn_click_pickpoint_terminal (group_key)
         }
 
         for (i in params) {
-            url += '&' + params[i]['name'] + '=' + escape(params[i]['value']);
+            url += '&' + params[i]['name'] + '=' + encodeURIComponent(params[i]['value']);
         }
 
         $.ceAjax('request', url, {
@@ -133,7 +134,7 @@ function fn_click_pickpoint_terminal (group_key)
 
         url = fn_url('order_management.update_shipping');
         for (var i in params) {
-            url += '&' + params[i]['name'] + '=' + escape(params[i]['value']);
+            url += '&' + params[i]['name'] + '=' + encodeURIComponent(params[i]['value']);
         }
 
         $.ceAjax('request', url, {

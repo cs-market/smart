@@ -7,7 +7,7 @@
 
 {if $states}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="1%" class="mobile-hide">{include file="common/check_items.tpl"}</th>
@@ -20,7 +20,7 @@
     {foreach from=$states item=state}
     <tr class="cm-row-status-{$state.status|lower}">
         <td class="mobile-hide">
-            <input type="checkbox" name="state_ids[]" value="{$state.state_id}" class="checkbox cm-item" /></td>
+            <input type="checkbox" name="state_ids[]" value="{$state.state_id}" class="cm-item" /></td>
         <td class="left nowrap row-status" data-th="{__("code")}">
             <span>{$state.code}</span>
             {*<input type="text" name="states[{$state.state_id}][code]" size="8" value="{$state.code}" class="input-text" />*}</td>

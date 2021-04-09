@@ -84,6 +84,7 @@
                         maps[index].destroy();
                     }
                 });
+                maps = [];
             },
 
             show: function(options)
@@ -96,12 +97,13 @@
 
                 if (!map_params[group_key]) {
                     return $.ceYdPickup('init', options, function() {
+
                         $.ceYdPickup('show', options);
                     });
                 }
 
-                if (maps[group_key] && $('ymaps').length) {
-                    maps[group_key].destroy();
+                if (maps[group_key]) {
+                    $.ceYdPickup('destroyMaps');
                 }
 
                 if (!maps[group_key] || typeof maps[group_key].layers == "undefined" || !$('ymaps').length) {
@@ -202,8 +204,13 @@
                 if (maps[group_key]) {
                     maps[group_key].destroy();
                 }
-                
-                $('#store_' + group_key + '_' + shipping_id + '_' + location).prop("checked", true);
+
+                $('[data-ca-pickup-select-store]' +
+                    '[data-ca-shipping-id="' + shipping_id + '"]' +
+                    '[data-ca-group-key="' + group_key + '"]' +
+                    '[data-ca-location-id="' + location + '"]').each(function () {
+                    $(this).prop('checked', true);
+                });
         
                 fn_calculate_total_shipping_cost();
             },

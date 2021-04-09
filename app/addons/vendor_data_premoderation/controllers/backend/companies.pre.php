@@ -13,6 +13,8 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
+use Tygh\Enum\VendorStatuses;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -27,11 +29,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 if ($mode == 'update') {
-	if (Registry::get('runtime.company_id')) {
-		$company_data = fn_get_company_data(Registry::get('runtime.company_id'));
-		$vendor_profile_updates_approval = Registry::get('addons.vendor_data_premoderation.vendor_profile_updates_approval');
-		if ($company_data['status'] == 'A' && ($vendor_profile_updates_approval == 'all' || ($vendor_profile_updates_approval == 'custom' && !empty($company_data['pre_moderation_edit_vendors']) && $company_data['pre_moderation_edit_vendors'] == 'Y'))) {
-			Tygh::$app['view']->assign('vendor_pre', 'Y');
-		}
-	}
- }
+    if (Registry::get('runtime.company_id')) {
+        $company_data = fn_get_company_data(Registry::get('runtime.company_id'));
+        $vendor_profile_updates_approval = Registry::get('addons.vendor_data_premoderation.vendor_profile_updates_approval');
+        if (
+            $company_data['status'] == VendorStatuses::ACTIVE
+            && ($vendor_profile_updates_approval == 'all'
+                || ($vendor_profile_updates_approval == 'custom'
+                    && !empty($company_data['pre_moderation_edit_vendors'])
+                    && $company_data['pre_moderation_edit_vendors'] == YesNo::YES
+                )
+            )
+        ) {
+            Tygh::$app['view']->assign('vendor_pre', YesNo::YES);
+        }
+    }
+}

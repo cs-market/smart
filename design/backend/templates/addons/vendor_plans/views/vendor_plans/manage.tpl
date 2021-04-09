@@ -15,7 +15,7 @@
 
 {if $plans}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle{if !$has_management_permissions} cm-hide-inputs{/if}">
+    <table width="100%" class="table table-middle table--relative{if !$has_management_permissions} cm-hide-inputs{/if} table-responsive">
     <thead>
     <tr>
         <th width="1%" class="left mobile-hide">
@@ -27,7 +27,7 @@
             <a class="cm-ajax" href="{"`$c_url`&sort_by=plan&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("name")}{if $search.sort_by == "plan"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
         </th>
         <th width="22%" class="center">
-            <a class="cm-ajax" href="{"`$c_url`&sort_by=price&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("price")} ({$currencies[$smarty.const.CART_PRIMARY_CURRENCY].symbol}){if $search.sort_by == "price"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
+            <a class="cm-ajax" href="{"`$c_url`&sort_by=price&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("price")} ({$currencies.$primary_currency.symbol nofilter}){if $search.sort_by == "price"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
         </th>
         <th width="10%" class="center nowrap">{__("vendor_plans.best_choise_short")}</th>
         <th width="12%" class="center">{__("vendors")}</th>

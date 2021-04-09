@@ -16,6 +16,7 @@ $schema['products']['content']['items']['fillings']['also_bought'] = array (
     'params' => array (
         'sort_by' => 'amnt',
         'sort_order' => 'desc',
+        'include_child_variations' => true,
         'request' => array(
             'also_bought_for_product_id' => '%PRODUCT_ID%'
         ),

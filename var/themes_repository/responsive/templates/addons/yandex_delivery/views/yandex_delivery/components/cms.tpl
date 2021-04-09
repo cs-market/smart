@@ -19,7 +19,16 @@
         {foreach from=$courier_locations item=store name=st key=store_id}
 
             <div class="ty-yd-store {if $courier_count == 1}ty-yd-store__selected{/if}" {if !empty($shipping.service_params.count_points) && $smarty.foreach.st.iteration > $shipping.service_params.count_points}style="display: none;"{/if}>
-                <input type="radio" name="select_yd_courier[{$group_key}][{$shipping.shipping_id}]" value="{$store_id}" {if $old_store_id == $store_id || $courier_count == 1}checked="checked"{/if} id="store_{$group_key}_{$shipping.shipping_id}_{$store_id}" class="ty-yd-store__radio-{$group_key}  ty-valign cm-yd-select-store">
+                <input type="radio"
+                    name="select_yd_courier[{$group_key}][{$shipping.shipping_id}]"
+                    value="{$store_id}"
+                    {if $old_store_id == $store_id || $courier_count == 1}checked="checked"{/if}
+                    id="store_{$group_key}_{$shipping.shipping_id}_{$store_id}"
+                    class="ty-yd-store__radio-{$group_key} ty-valign cm-yd-select-store"
+                    data-ca-pickup-select-store="true"
+                    data-ca-shipping-id="{$shipping.shipping_id}"
+                    data-ca-group-key="{$group_key}"
+                    data-ca-location-id="{$store_id}">
 
                 <div class="ty-yd-store__label">
                     <label for="store_{$group_key}_{$shipping.shipping_id}_{$store_id}" class="ty-valign ty-yd-store__name">
@@ -53,14 +62,23 @@
     </div>
 
     <div class="ty-yd-select-store">
-        {foreach from=$store_locations item=store name=st}
+        {foreach from=$store_locations item=store name=st key=store_id}
 
             <div class="ty-yd-store{if $store_count == 1} ty-yd-store__selected{/if}"{if !empty($shipping.service_params.count_points) && $smarty.foreach.st.iteration > $shipping.service_params.count_points} style="display: none;"{/if}>
-                <input type="radio" name="select_yd_store[{$group_key}][{$shipping.shipping_id}]" value="{$store.id}" {if $old_store_id == $store.id || $store_count == 1}checked="checked"{/if} id="store_{$group_key}_{$shipping.shipping_id}_{$store.id}" class="ty-yd-store__radio-{$group_key}  ty-valign cm-yd-select-store">
+                <input type="radio"
+                    name="select_yd_store[{$group_key}][{$shipping.shipping_id}]"
+                    value="{$store_id}"
+                    {if $old_store_id == $store_id || $store_count == 1}checked="checked"{/if}
+                    id="store_{$group_key}_{$shipping.shipping_id}_{$store_id}"
+                    class="ty-yd-store__radio-{$group_key} ty-valign cm-yd-select-store"
+                    data-ca-pickup-select-store="true"
+                    data-ca-shipping-id="{$shipping.shipping_id}"
+                    data-ca-group-key="{$group_key}"
+                    data-ca-location-id="{$store_id}">
 
                 <div class="ty-yd-store__label">
                     <a data-ca-scroll="yd_map_{$group_key}" data-ca-latitude="{$store.lat}" data-ca-longitude="{$store.lng}" data-ca-group-key="{$group_key}" class="cm-yd-view-location ty-yd-icon-location"></a>
-                    <label for="store_{$group_key}_{$shipping.shipping_id}_{$store.id}" class="ty-valign ty-yd-store__name">
+                    <label for="store_{$group_key}_{$shipping.shipping_id}_{$store_id}" class="ty-valign ty-yd-store__name">
                         {$store.name}
 
                         <div class="ty-yd-store__description">
@@ -68,8 +86,8 @@
                             <br/>
                             {if $store.phone}{__("phone")}: {$store.phone.number}</br>{/if}
                             {if $store.address.comment}
-                                <a id="sw_store_description_{$store.id}" class="cm-combination ty-cart-content__detailed-link detailed-link ty-yd-store__detailed-link">{__("description")}</a>
-                                <div id="store_description_{$store.id}" class="hidden ty-yd-store__comment">
+                                <a id="sw_store_description_{$store_id}" class="cm-combination ty-cart-content__detailed-link detailed-link ty-yd-store__detailed-link">{__("description")}</a>
+                                <div id="store_description_{$store_id}" class="hidden ty-yd-store__comment">
                                     {if $store.full_address}{$store.full_address}. {/if}
                                     {$store.address.comment nofilter}
                                 </div>

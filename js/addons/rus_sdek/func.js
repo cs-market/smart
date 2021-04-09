@@ -40,7 +40,7 @@
         });
     }
 
-    $(document).ready(function(){
+    $(_.doc).ready(function(){
         $(_.doc).on('click', '#sdek_get_city_link', function(event) {
             fn_get_sdek_city();
 

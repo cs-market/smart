@@ -12,9 +12,10 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Models\VendorPlan;
 use Tygh\Models\Company;
+use Tygh\Models\VendorPlan;
+use Tygh\Registry;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -24,11 +25,14 @@ if (!fn_allowed_for('MULTIVENDOR')) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
+    // Define trusted variables that shouldn't be stripped
+    fn_trusted_vars ('plan_data');
+
     $suffix = 'manage';
 
     if ($mode == 'update') {
         if (!empty($_REQUEST['plan_id'])) {
-            $plan = VendorPlan::model()->find($_REQUEST['plan_id']);
+            $plan = VendorPlan::model(['storefront_repository' => Tygh::$app['storefront.repository']])->find($_REQUEST['plan_id']);
         } else {
             $plan = new VendorPlan;
         }
@@ -104,15 +108,17 @@ if ($mode == 'manage') {
     Tygh::$app['view']->assign('preview_uri', fn_url('companies.vendor_plans', 'C'));
 
 } elseif ($mode == 'update' || $mode == 'add') {
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
 
     $id = 0;
     if ($mode == 'update') {
-        $plan = VendorPlan::model()->find($_REQUEST['plan_id']);
+        $plan = VendorPlan::model()->find($_REQUEST['plan_id'], ['get_companies_count' => true]);
         if (!$plan) {
             return array(CONTROLLER_STATUS_NO_PAGE);
         }
 
-        Tygh::$app['view']->assign('plan', $plan);
+        $view->assign('plan', $plan);
         $id = $plan->plan_id;
     }
 
@@ -134,6 +140,22 @@ if ($mode == 'manage') {
             'js' => true,
         ),
     );
+
+    if (fn_allowed_for('MULTIVENDOR:ULTIMATE')) {
+        $tabs['storefronts_' . $id] = [
+            'title' => __('storefronts'),
+            'js' => true,
+        ];
+
+        if ($id) {
+            $affected_vendors = Company::model()->findAll(['plan_id' => $id]);
+            $affected_vendors = array_map(function(Company $company) {
+                return $company->company_id;
+            }, $affected_vendors);
+            $view->assign('affected_vendors', $affected_vendors);
+        }
+
+    }
 
     Registry::set('navigation.tabs', $tabs);
 

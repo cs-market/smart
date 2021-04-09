@@ -15,7 +15,7 @@
 <input type="hidden" name="selected_section" value="">
 
 {notes}
-{__("check_items_text")}
+{__("sales_reports_side_bar_notes")}
 {/notes}
 
 {capture name="tabsbox"}
@@ -128,7 +128,7 @@
     <input name="table_data[conditions][payment]" value="" type="hidden">
     {if $payments}
     <div class="table-wrapper">
-        <table class="table table-middle">
+        <table class="table table-middle table--relative">
         <thead>
             <tr>
                 <th width="1%">{include file="common/check_items.tpl" check_target="payment"}</th>
@@ -168,7 +168,7 @@
     <input name="table_data[conditions][location]" value="" type="hidden">
     {if $destinations}
     <div class="table-wrapper">
-        <table class="table table-middle">
+        <table class="table table-middle table--relative">
         <thead>
             <tr>
                 <th width="1%">{include file="common/check_items.tpl" check_target="location"}</th>
@@ -179,7 +179,7 @@
             {foreach from=$destinations item=destination}
             <tr>
                 <td class="center">
-                    <input name="table_data[conditions][location][]" value="{$destination.destination_id}" type="checkbox" {if $conditions.location[$destination.destination_id]}checked="checked"{/if} class="checkbox cm-item-location"></td>
+                    <input name="table_data[conditions][location][]" value="{$destination.destination_id}" type="checkbox" {if $conditions.location[$destination.destination_id]}checked="checked"{/if} class="cm-item-location"></td>
                 <td>
                     {$destination.destination}</td>
             </tr>
@@ -197,7 +197,7 @@
     <input name="table_data[conditions][status]" value="" type="hidden">
     {if $order_status_descr}
     <div class="table-wrapper">
-        <table class="table table-middle">
+        <table class="table table-middle table--relative">
         <thead>
             <tr>
                 <th width="1%">{include file="common/check_items.tpl" check_target="status"}</th>

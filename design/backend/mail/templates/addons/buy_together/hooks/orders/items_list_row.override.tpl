@@ -12,7 +12,7 @@
                     {if $order_info.use_discount}
                     <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{if $oi.extra.discount|floatval}{include file="common/price.tpl" value=$oi.extra.discount}{else}&nbsp;-&nbsp;{/if}</td>
                     {/if}
-                    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                         <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{if $oi.tax_value}{include file="common/price.tpl" value=$oi.tax_value}{else}&nbsp;-&nbsp;{/if}</td>
                     {/if}
         

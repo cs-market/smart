@@ -21,6 +21,8 @@ fn_register_hooks(
     'get_products_before_select',
     'get_products',
     'products_sorting',
+    'update_product_pre',
     'update_product_post',
-    'get_product_data'
+    'get_product_data',
+    'load_products_extra_data'
 );

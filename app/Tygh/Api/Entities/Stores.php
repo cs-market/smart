@@ -14,10 +14,10 @@
 
 namespace Tygh\Api\Entities;
 
-use Tygh\Registry;
-use Tygh\Settings;
 use Tygh\Api\AEntity;
 use Tygh\Api\Response;
+use Tygh\Registry;
+use Tygh\Settings;
 
 class Stores extends AEntity
 {
@@ -31,7 +31,6 @@ class Stores extends AEntity
         'company_zipcode',
         'company_phone',
         'company_phone_2',
-        'company_fax',
         'company_website',
         'company_start_year',
         'company_users_department',
@@ -79,28 +78,24 @@ class Stores extends AEntity
         return array($result['valid_params'], $result['message']);
     }
 
-    public function index($id = 0, $params = array())
+    /** @inheritDoc */
+    public function index($id = 0, $params = [])
     {
-        $status = Response::STATUS_BAD_REQUEST;
-
-        if (!empty($this->auth['company_id'])) {
+        if (!$this->canViewOtherCompanies()) {
             $params['company_id'] = $this->auth['company_id'];
         }
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (!empty($id)) {
-
-            if (!empty($this->auth['company_id']) && $this->auth['company_id'] != $id) {
+            if (!$this->canViewOtherCompanies() && (int) $this->auth['company_id'] !== (int) $id) {
                 $status = Response::STATUS_FORBIDDEN;
-                $data = array();
-
+                $data = [];
             } else {
-
-                $params = array(
-                    'company_id' => $id
-                );
-                list($data) = fn_get_companies($params, $this->auth, 0, $lang_code);
+                $params = [
+                    'company_id' => $id,
+                ];
+                list($data,) = fn_get_companies($params, $this->auth, 0, $lang_code);
 
                 if (empty($data)) {
                     $status = Response::STATUS_NOT_FOUND;
@@ -111,23 +106,26 @@ class Stores extends AEntity
                 $data = reset($data);
                 Registry::set('runtime.company_id', $id);
             }
-
         } else {
-            $items_per_page = $this->safeGet($params, 'items_per_page', Registry::get('settings.Appearance.admin_elements_per_page'));
-            list($data, ) = fn_get_companies($params, $this->auth, $items_per_page, $lang_code);
-            $pathes = explode('\\', get_class($this));
-            $key = strtolower(array_pop($pathes));
-            $data = array(
-                $key => $data,
-                'params' => $params,
+            $items_per_page = $this->safeGet(
+                $params,
+                'items_per_page',
+                Registry::get('settings.Appearance.admin_elements_per_page')
             );
+            list($data, $search) = fn_get_companies($params, $this->auth, $items_per_page, $lang_code);
+            $pathes = explode('\\', static::class);
+            $key = strtolower(array_pop($pathes));
+            $data = [
+                $key => $data,
+                'params' => $search,
+            ];
             $status = Response::STATUS_OK;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data,
+        ];
     }
 
     public function create($params)
@@ -182,7 +180,7 @@ class Stores extends AEntity
                 $status = Response::STATUS_FORBIDDEN;
                 $data = array();
             } else {
-                $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+                $lang_code = $this->getLanguageCode($params);
 
                 $company_id = fn_update_company($params, $id, $lang_code);
 
@@ -241,5 +239,15 @@ class Stores extends AEntity
             'categories',
             'languages',
         );
+    }
+
+    /**
+     * Whether current API user can view other companies.
+     *
+     * @return bool
+     */
+    protected function canViewOtherCompanies()
+    {
+        return !empty($this->auth['company_id']);
     }
 }

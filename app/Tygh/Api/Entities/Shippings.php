@@ -21,9 +21,9 @@ use Tygh\Api\Response;
 class Shippings extends AEntity
 {
 
-    public function index($id = 0, $params = array())
+    public function index($id = 0, $params = [])
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (!empty($id)) {
             $data = fn_get_shipping_info($id, $lang_code);
@@ -39,32 +39,33 @@ class Shippings extends AEntity
             $page = $this->safeGet($params, 'page', 1);
 
             $data = fn_get_shippings(false, $lang_code);
+            $total_items_count = count($data);
 
             if ($items_per_page) {
                 $data = array_slice($data, ($page - 1) * $items_per_page, $items_per_page);
             }
 
-            $data = array(
+            $data = [
                 'shippings' => $data,
-                'params' => array(
+                'params'    => [
                     'items_per_page' => $items_per_page,
-                    'page' => $page,
-                    'total_items' => count($data),
-                ),
-            );
+                    'page'           => $page,
+                    'total_items'    => $total_items_count,
+                ],
+            ];
             $status = Response::STATUS_OK;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function create($params)
     {
         $status = Response::STATUS_BAD_REQUEST;
-        $data = array();
+        $data = [];
 
         $this->correctCompanyID($params);
 
@@ -76,28 +77,28 @@ class Shippings extends AEntity
 
             if ($shipping_id) {
                 $status = Response::STATUS_CREATED;
-                $data = array(
+                $data = [
                     'shipping_id' => $shipping_id,
-                );
+                ];
             }
         } else {
-            $data['message'] = __('api_required_field', array(
+            $data['message'] = __('api_required_field', [
                 '[field]' => 'shipping'
-            ));
+            ]);
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function update($id, $params)
     {
         $status = Response::STATUS_BAD_REQUEST;
-        $data = array();
+        $data = [];
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         $this->correctCompanyID($params);
         unset($params['shipping_id']);
@@ -107,21 +108,21 @@ class Shippings extends AEntity
 
             if ($shipping_id) {
                 $status = Response::STATUS_OK;
-                $data = array(
+                $data = [
                     'shipping_id' => $shipping_id
-                );
+                ];
             }
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function delete($id)
     {
-        $data = array();
+        $data = [];
         $status = Response::STATUS_NOT_FOUND;
 
         if (fn_check_company_id('shippings', 'shipping_id', $id)) {
@@ -130,20 +131,20 @@ class Shippings extends AEntity
             }
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function privileges()
     {
-        return array(
+        return [
             'create' => 'manage_shipping',
             'update' => 'manage_shipping',
             'delete' => 'manage_shipping',
             'index'  => 'view_shipping'
-        );
+        ];
     }
 
     public function correctCompanyID(&$params)

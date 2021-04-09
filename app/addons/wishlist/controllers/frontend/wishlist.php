@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 Tygh::$app['view']->assign('added_products', $added_products);
 
-                if (Registry::get('settings.General.allow_anonymous_shopping') == 'hide_price_and_add_to_cart') {
+                if (Registry::get('settings.Checkout.allow_anonymous_shopping') == 'hide_price_and_add_to_cart') {
                     Tygh::$app['view']->assign('hide_amount', true);
                 }
 

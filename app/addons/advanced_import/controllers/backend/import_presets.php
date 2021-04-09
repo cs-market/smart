@@ -14,10 +14,10 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
+use Tygh\Addons\AdvancedImport\Exceptions\DownloadException;
 use Tygh\Addons\AdvancedImport\Exceptions\FileNotFoundException;
 use Tygh\Addons\AdvancedImport\Exceptions\ReaderNotFoundException;
 use Tygh\Enum\Addons\AdvancedImport\PresetFileTypes;
-use Tygh\Enum\Addons\AdvancedImport\CsvDelimiters;
 use Tygh\Exceptions\PermissionsException;
 use Tygh\Registry;
 use Tygh\Tools\Url;
@@ -28,6 +28,10 @@ use Tygh\Tools\Url;
 $presets_manager = Tygh::$app['addons.advanced_import.presets.manager'];
 /** @var \Tygh\Addons\AdvancedImport\Presets\Importer $presets_importer */
 $presets_importer = Tygh::$app['addons.advanced_import.presets.importer'];
+/** @var \Tygh\Addons\AdvancedImport\FileManager $file_manager */
+$file_manager = Tygh::$app['addons.advanced_import.file_manager'];
+
+ini_set('auto_detect_line_endings', true);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -35,36 +39,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $file_uploader = Tygh::$app['addons.advanced_import.readers.factory'];
 
     if ($mode == 'upload') {
-        $preset = array_merge(array(
-            'preset_id'      => 0,
-            'file_type'      => PresetFileTypes::LOCAL,
-            'file'           => '',
-        ), $_REQUEST);
+        $file_types = !empty($_REQUEST['type_' . $file_manager::UPLOADED_FILE_NAME]) ? $_REQUEST['type_' . $file_manager::UPLOADED_FILE_NAME] : [];
+        $files = !empty($_REQUEST['file_' . $file_manager::UPLOADED_FILE_NAME]) ? $_REQUEST['file_' . $file_manager::UPLOADED_FILE_NAME] : [];
+        $preset_id = isset($_REQUEST['preset_id']) ? (int) $_REQUEST['preset_id'] : 0;
 
-        $file = fn_filter_uploaded_data('upload');
+        $preset = [
+            'preset_id' => $preset_id,
+            'file_type' => isset($file_types[$preset_id]) ? $file_types[$preset_id] : PresetFileTypes::LOCAL,
+            'file'      => isset($files[$preset_id]) ? $files[$preset_id] : ''
+        ];
+
+        if ($preset['preset_id']) {
+            $old_preset = $presets_manager->findById($preset['preset_id']);
+        } else {
+            $old_preset = null;
+        }
+
+        if (empty($old_preset)) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        $file = $file_manager->uploadPresetFile($preset);
 
         if ($file) {
-            $preset['preset_id'] = key($file);
             $file = reset($file);
 
-            $preset['file'] = $file['name'];
+            if ($preset['file_type'] !== PresetFileTypes::URL) {
+                $preset['file'] = $file['name'];
+            }
             $preset['file_extension'] = fn_advanced_import_get_file_extension_by_mimetype($file['name'], $file['type']);
-            unset($preset['type_upload'], $preset['file_upload']);
         } else {
             fn_set_notification('E', __('error'), __('error_exim_no_file_uploaded'));
             exit;
         }
 
+        if ($preset['file_type'] == PresetFileTypes::LOCAL) {
+            $preset['file'] = $file_manager->moveUpload($file['name'], $file['path'], $old_preset['company_id']);
+        }
+
         $presets_manager->update($preset['preset_id'], $preset);
 
-        list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $preset['preset_id']), false);
-        $preset = reset($presets);
-
-        $file_uploader->moveUpload($preset['file'], $file['path'], $preset['company_id']);
-
         $redirect_url = Url::buildUrn(array('import_presets', 'manage'), array(
-            'object_type'       => $preset['object_type'],
-            'preview_preset_id' => $preset['preset_id'],
+            'object_type'       => $old_preset['object_type'],
+            'preview_preset_id' => $old_preset['preset_id'],
         ));
 
         Tygh::$app['ajax']->assign('force_redirection', fn_url($redirect_url));
@@ -79,15 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'file'           => '',
         ), $_REQUEST);
 
-        $file = fn_filter_uploaded_data('upload');
+        $file = $file_manager->uploadPresetFile($preset);
 
         if ($file) {
             $file = reset($file);
-
-            $preset['file_type'] = reset($preset['type_upload']);
-            $preset['file'] = reset($preset['file_upload']);
             $preset['file_extension'] = fn_advanced_import_get_file_extension_by_mimetype($file['name'], $file['type']);
-            unset($preset['type_upload'], $preset['file_upload']);            
+            unset($preset['type_upload'], $preset['file_upload']);
         }
 
         if (isset($preset['options']['images_path'])) {
@@ -95,20 +109,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $preset['options']['images_path'] = $images_directories['exim_path'];
         }
 
+        if ($file && $preset['file_type'] == PresetFileTypes::LOCAL) {
+            // rename temporary file for a preset if exists
+            $preset['file'] = $file_manager->moveUpload($file['name'], $file['path'], $preset['company_id']);
+        }
+
         if ($preset['preset_id']) {
             $presets_manager->update($preset['preset_id'], $preset);
         } else {
             $preset['preset_id'] = $presets_manager->add($preset);
-        }
-
-        list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $preset['preset_id']), false);
-        $preset = reset($presets);
-
-        if ($file && $preset['file_type'] == PresetFileTypes::LOCAL) {
-            // rename temporary file for a preset
-            $preset['file'] = $file['name'];
-            $file_uploader->moveUpload($preset['file'], $file['path'], $preset['company_id']);
-            $presets_manager->update($preset['preset_id'], $preset);
         }
 
         $redirect_url = 'import_presets.update?preset_id=' . $preset['preset_id'];
@@ -119,38 +128,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         return array(CONTROLLER_STATUS_OK, $redirect_url);
     } elseif ($mode == 'm_delete') {
-
-        $_REQUEST = array_merge(array(
-            'preset_ids'   => array(),
-            'object_type'  => 'products',
-            'redirect_url' => 'import_presets.manage',
-        ), $_REQUEST);
+        $_REQUEST = array_merge(
+            [
+                'preset_ids'   => [],
+                'object_type'  => 'products',
+                'redirect_url' => 'import_presets.manage',
+            ],
+            $_REQUEST
+        );
 
         foreach ($_REQUEST['preset_ids'] as $preset_id) {
             $presets_manager->delete($preset_id);
         }
 
-        return array(CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']);
+        return [CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']];
     } elseif ($mode == 'delete') {
-
-        $_REQUEST = array_merge(array(
-            'preset_id' => 0,
-        ), $_REQUEST);
-
-        list($presets,) = $presets_manager->find(
-            false,
-            array('ip.preset_id' => $_REQUEST['preset_id'])
+        $_REQUEST = array_merge(
+            [
+                'preset_id' => 0,
+                'object_type' => 'products',
+            ],
+            $_REQUEST
         );
-
-        if (!$presets) {
-            return array(CONTROLLER_STATUS_NO_PAGE);
-        }
-
-        $preset = reset($presets);
 
         $presets_manager->delete($_REQUEST['preset_id']);
 
-        return array(CONTROLLER_STATUS_OK, 'import_presets.manage?object_type=' . $preset['object_type']);
+        return [CONTROLLER_STATUS_OK, 'import_presets.manage?object_type=' . $_REQUEST['object_type']];
+
     } elseif ($mode == 'validate_modifier') {
 
         $params = array_merge(array(
@@ -175,10 +179,10 @@ if ($mode == 'update'
     || $mode == 'add'
     || $mode == 'get_fields'
 ) {
-    /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
-    $file_uploader = Tygh::$app['addons.advanced_import.readers.factory'];
+    /** @var \Tygh\Addons\AdvancedImport\FileManager $file_manager */
+    $file_manager = Tygh::$app['addons.advanced_import.file_manager'];
     foreach (fn_get_short_companies() as $company_id => $company_name) {
-        $file_uploader->initFilesDirectories($company_id);
+        $file_manager->initFilesDirectories($company_id);
     }
 }
 
@@ -217,11 +221,11 @@ if ($mode == 'manage') {
         $presets = fn_array_merge($presets, $modifiers_presense);
 
         /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
-        $reader_factory = Tygh::$app['addons.advanced_import.readers.factory'];
+        $file_manager = Tygh::$app['addons.advanced_import.file_manager'];
 
         foreach ($presets as &$preset) {
             if ($preset['file_type'] == PresetFileTypes::SERVER) {
-                $preset['file_path'] = $reader_factory->getFilePath($preset['file'], $preset['company_id']);
+                $preset['file_path'] = $file_manager->getFilePath($preset['file'], $preset['company_id']);
             }
         }
         unset($preset);
@@ -325,8 +329,7 @@ if ($mode == 'manage') {
     ), $_REQUEST);
 
     if ($preset['preset_id']) {
-        list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $preset['preset_id']), false);
-        $preset = reset($presets);
+        $preset = $presets_manager->findById($preset['preset_id']);
         $preset['fields'] = $presets_manager->getFieldsMapping($preset['preset_id']);
         if (isset($_REQUEST['file'])) {
             $preset['file'] = $_REQUEST['file'];
@@ -390,6 +393,9 @@ if ($mode == 'manage') {
         } catch (FileNotFoundException $e) {
             fn_set_notification('E', __('error'), __('advanced_import.cant_load_file_for_company'));
             exit;
+        } catch (DownloadException $e) {
+            fn_set_notification('E', __('error'), __('advanced_import.cant_load_file'));
+            exit;
         }
     }
 
@@ -409,13 +415,13 @@ if ($mode == 'manage') {
     }
 
     /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
-    $reader_factory = Tygh::$app['addons.advanced_import.readers.factory'];
+    $file_manager = Tygh::$app['addons.advanced_import.file_manager'];
 
     if ($preset['file'] && $preset['file_type'] == PresetFileTypes::URL) {
         fn_redirect($preset['file'], true);
     }
 
-    $file_path = $reader_factory->getFilePath($preset['file']);
+    $file_path = $file_manager->getFilePath($preset['file']);
 
     if ($file_path) {
         fn_get_file($file_path);

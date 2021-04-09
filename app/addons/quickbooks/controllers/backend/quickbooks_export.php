@@ -32,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             foreach ($v['products'] as $key => $value) {
                 $order_products[$value['cart_id']] = $value;
                 if (!empty($value['product_options'])) {
-                    $selected_options = '; ' . __('product_options') . ': ';
+                    $selected_options = ', ' . __('product_options') . ': ';
                     foreach ($value['product_options'] as $option) {
-                        $selected_options .= "$option[option_name]: $option[variant_name];";
+                        $selected_options .= "$option[option_name]: $option[variant_name],";
                     }
                     $order_products[$value['cart_id']]['selected_options'] = $selected_options;
                 }
@@ -63,6 +63,7 @@ function fn_quickbooks_export_customers($order_users, &$export)
 {
     $export[] = "!CUST\tNAME\tBADDR1\tBADDR2\tBADDR3\tBADDR4\tBADDR5\tSADDR1\tSADDR2\tSADDR3\tSADDR4\tSADDR5\tPHONE1\tFAXNUM\tEMAIL\tCONT1\tSALUTATION\tCOMPANYNAME\tFIRSTNAME\tLASTNAME";
 
+    $location_manager = Tygh::$app['location'];
     $cust = "CUST\t\"%s, %s\"\t%s %s\t%s %s\t%s\t\"%s, %s\"\t%s\t%s %s\t%s %s\t%s\t\"%s, %s\"\t%s\t%s\t%s\t%s\t\"%s, %s\"\t%s\t%s\t%s\t%s";
     foreach ($order_users as $order) {
         $order['title'] = !empty($order['title']) ? $order['title'] : '';
@@ -71,25 +72,25 @@ function fn_quickbooks_export_customers($order_users, &$export)
             // NAME
             fn_quickbooks_escape_field($order['lastname']), fn_quickbooks_escape_field($order['firstname']),
             // BADDR1
-            $order['b_firstname'], $order['b_lastname'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)),
             // BADDR2
-            $order['b_address'], $order['b_address_2'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'address', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'address_2', '', BILLING_ADDRESS_PREFIX)),
             // BADDR3
-            $order['b_city'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'city', '', BILLING_ADDRESS_PREFIX)),
             // BADDR4
-            $order['b_state'], $order['b_zipcode'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'state', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'zipcode', '', BILLING_ADDRESS_PREFIX)),
             // BADDR5
-            $order['b_country_descr'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'country_descr', '', BILLING_ADDRESS_PREFIX)),
             // SADDR1
-            $order['s_firstname'], $order['s_lastname'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', SHIPPING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', SHIPPING_ADDRESS_PREFIX)),
             // SADDR2
-            $order['s_address'], $order['s_address_2'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'address', '', SHIPPING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'address_2', '', SHIPPING_ADDRESS_PREFIX)),
             // SADDR3
-            $order['s_city'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'city', '', SHIPPING_ADDRESS_PREFIX)),
             // SADDR4
-            $order['s_state'], $order['s_zipcode'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'state', '', SHIPPING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'zipcode', '', SHIPPING_ADDRESS_PREFIX)),
             // SADDR5
-            $order['s_country_descr'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'country_descr', '', SHIPPING_ADDRESS_PREFIX)),
             // PHONE
             $order['phone'],
             // FAXNUM
@@ -97,15 +98,15 @@ function fn_quickbooks_export_customers($order_users, &$export)
             // EMAIL
             $order['email'],
             // CONT1
-            $order['lastname'], $order['b_firstname'],
+            fn_quickbooks_escape_field($order['lastname']), fn_quickbooks_escape_field($order['firstname']),
             // SALUTATION
-            $order['title'],
+            fn_quickbooks_escape_field($order['title']),
             // COMPANYNAME
-            $order['company'],
+            fn_quickbooks_escape_field($order['company']),
             // FIRSTNAME
-            $order['firstname'],
+            fn_quickbooks_escape_field($order['firstname']),
             // LASTNAME
-            $order['lastname']
+            fn_quickbooks_escape_field($order['lastname'])
         );
     }
     $export[] = '';
@@ -129,14 +130,15 @@ function fn_quickbooks_export_products($orders, $order_products, &$export)
 
         $product_name = fn_quickbooks_escape_field($product_name);
         $product_select_options = fn_quickbooks_escape_field($product_select_options);
+        $product_desc = fn_quickbooks_escape_field($product['product']);
 
         $export[] = sprintf($invitem,
             // NAME
             $product_name,
             // DESC
-            $product['product'], $product_select_options,
+            $product_desc, $product_select_options,
             // PURCHASEDESC
-            $product['product'], $product_select_options,
+            $product_desc, $product_select_options,
             // ACCNT
             $accnt_product,
             // ASSETACCNT
@@ -157,6 +159,8 @@ function fn_quickbooks_export_products($orders, $order_products, &$export)
 
 function fn_quickbooks_export_orders($orders, $order_products, &$export)
 {
+    $location_manager = Tygh::$app['location'];
+
     $export[] = "!TRNS\tTRNSTYPE\tDATE\tACCNT\tNAME\tCLASS\tAMOUNT\tDOCNUM\tMEMO\tADDR1\tADDR2\tADDR3\tADDR4\tADDR5\tPAID\tSHIPVIA\tSADDR1\tSADDR2\tSADDR3\tSADDR4\tSADDR5\tTOPRINT";
     $export[] = "!SPL\tTRNSTYPE\tDATE\tACCNT\tNAME\tCLASS\tAMOUNT\tDOCNUM\tMEMO\tPRICE\tQNTY\tINVITEM\tTAXABLE\tEXTRA";
     $export[] = "!ENDTRNS\t";
@@ -189,7 +193,7 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
             // DATE
             $order_date,
             // NAME
-            fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
             // CLASS
             $trns_class,
             // AMOUNT
@@ -199,23 +203,31 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
             // MEMO
             $order_details,
             // ADDR1
-            $order['b_firstname'], $order['b_lastname'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)),
             // ADDR2
-            $order['b_address'], $order['b_address_2'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'address', '', BILLING_ADDRESS_PREFIX)),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'address_2', '', BILLING_ADDRESS_PREFIX)),
             // ADDR3
-            $order['b_city'], $order['b_state'], $order['b_zipcode'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'city', '', BILLING_ADDRESS_PREFIX)),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'state', '', BILLING_ADDRESS_PREFIX)),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'zipcode', '', BILLING_ADDRESS_PREFIX)),
             // ADDR4
-            $order['b_country_descr'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'country_descr', '', BILLING_ADDRESS_PREFIX)),
             // PAID
             $order_paid,
             // SADDR1
-            $order['s_firstname'], $order['s_lastname'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', SHIPPING_ADDRESS_PREFIX)),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', SHIPPING_ADDRESS_PREFIX)),
             // SADDR2
-            $order['s_address'], $order['s_address_2'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'address', '', SHIPPING_ADDRESS_PREFIX)),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'address_2', '', SHIPPING_ADDRESS_PREFIX)),
             // SADDR3
-            $order['s_city'], $order['s_state'], $order['s_zipcode'],
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'city', '', SHIPPING_ADDRESS_PREFIX)),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'state', '', SHIPPING_ADDRESS_PREFIX)),
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'zipcode', '', SHIPPING_ADDRESS_PREFIX)),
             // SADDR4
-            $order['s_country_descr']
+            fn_quickbooks_escape_field($location_manager->getLocationField($order, 'country_descr', '', SHIPPING_ADDRESS_PREFIX))
         );
 
         // PRODUCTS
@@ -252,7 +264,7 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
                 // ACCNT
                 $accnt_product,
                 // NAME
-                fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+                fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
                 // CLASS
                 $trns_class,
                 // AMOUNT
@@ -301,7 +313,7 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
                 // ACCNT
                 $accnt_shipping,
                 // NAME
-                fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+                fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
                 // CLASS
                 $trns_class,
                 // AMOUNT
@@ -309,7 +321,7 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
                 // DOCNUM
                 $order['order_id'],
                 // MEMO
-                fn_quickbooks_escape_field(implode('; ', $shipping_names)), '',
+                fn_quickbooks_escape_field(implode(', ', $shipping_names)), '',
                 // PRICE
                 $shipping_cost,
                 // QNTY
@@ -332,7 +344,7 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
                     // ACCNT
                     $accnt_tax,
                     // NAME
-                    fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+                    fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
                     // CLASS
                     $trns_class,
                     // AMOUNT
@@ -363,7 +375,7 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
                 // ACCNT
                 $accnt_discount,
                 // NAME
-                fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+                fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
                 // CLASS
                 $trns_class,
                 // AMOUNT
@@ -393,7 +405,7 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
                 // ACCNT
                 $accnt_surcharge,
                 // NAME
-                fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+                fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
                 // CLASS
                 $trns_class,
                 // AMOUNT
@@ -423,7 +435,7 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
                 // ACCNT
                 $accnt_tax,
                 // NAME
-                fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+                fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
                 // CLASS
                 $trns_class,
                 // AMOUNT
@@ -455,6 +467,8 @@ function fn_quickbooks_export_orders($orders, $order_products, &$export)
 
 function fn_quickbooks_export_payments($orders, &$export)
 {
+    $location_manager = Tygh::$app['location'];
+
     $exists_order_complete = false;
     $payments = array();
     $payments[] = "!TRNS\tTRNSTYPE\tDATE\tACCNT\tNAME\tAMOUNT\tPAYMETH\tDOCNUM";
@@ -468,12 +482,13 @@ function fn_quickbooks_export_payments($orders, &$export)
 
         if (in_array($order['status'], fn_get_order_paid_statuses())) {
             $order_date = fn_date_format($order['timestamp'], "%m/%d/%Y");
+            $order['payment_method']['payment'] = isset($order['payment_method']['payment']) ? $order['payment_method']['payment'] : '';
 
             $payments[] = sprintf($trns,
                 // DATE
                 $order_date,
                 // NAME
-                fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+                fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
                 // AMOUNT
                 $order['total'],
                 // PAYMETH
@@ -485,7 +500,7 @@ function fn_quickbooks_export_payments($orders, &$export)
                 // DATE
                 $order_date,
                 // NAME
-                fn_quickbooks_escape_field($order['b_lastname']), fn_quickbooks_escape_field($order['b_firstname']),
+                fn_quickbooks_escape_field($location_manager->getLocationField($order, 'lastname', '', BILLING_ADDRESS_PREFIX)), fn_quickbooks_escape_field($location_manager->getLocationField($order, 'firstname', '', BILLING_ADDRESS_PREFIX)),
                 // AMOUNT
                 -$order['total'],
                 // DOCNUM

@@ -9,7 +9,8 @@
             <div class="control-group">
                 <label for="eway_cc_number_{$id_suffix}" class="control-label cm-cc-number cm-required cm-autocomplete-off">{__("card_number")}</label>
                 <div class="controls">
-                    <input size="35" type="text" id="eway_cc_number_{$id_suffix}" name="payment_info[card_number]" value="{$card_item.card_number}" class="input-big"/>
+                    <input size="35" type="text" id="eway_cc_number_{$id_suffix}" value="{$card_item.card_number}" class="input-big"/>
+                    <input size="35" type="hidden" id="eway_cc_number_enc_{$id_suffix}" name="payment_info_enc[card_number]" value="" class="input-big"/>
                 </div>
                 <ul class="cc-icons-wrap cc-icons unstyled" id="cc_icons{$id_suffix}">
                     <li class="cc-icon cm-cc-default"><span class="default">&nbsp;</span></li>
@@ -42,7 +43,8 @@
     <div class="control-group cvv-field">
         <label for="eway_cvv2_{$id_suffix}" class="control-label cm-cc-cvv2 cm-required cm-autocomplete-off">{__("cvv2")}</label>
         <div class="controls">
-            <input type="text" id="eway_cvv2_{$id_suffix}" name="payment_info[cvv2]" value="{$card_item.cvv2}" size="4" maxlength="4" class="cm-autocomplete-off" />
+            <input type="text" id="eway_cvv2_{$id_suffix}" value="{$card_item.cvv2}" size="4" maxlength="4" class="cm-autocomplete-off" />
+            <input type="hidden" id="eway_cvv2_enc_{$id_suffix}" name="payment_info_enc[cvv2]" value="" size="4" maxlength="4" class="cm-autocomplete-off" />
 
             <div class="cvv2">
                 <a>{__("what_is_cvv2")}</a>
@@ -125,18 +127,17 @@
         $.getScript("https://secure.ewaypayments.com/scripts/eCrypt.js");
         $('#order_update input[type="submit"]').on('click', function() {
             var elm_num = $("#eway_cc_number_{$id_suffix}");
+            var elm_num_enc = $("#eway_cc_number_enc_{$id_suffix}");
             if (elm_num.length > 0 && elm_num.attr('data-eway-encrypted') != 'yes') {
                 var elm_cvv = $("#eway_cvv2_{$id_suffix}");
+                var elm_cvv_enc = $("#eway_cvv2_enc_{$id_suffix}");
                 var cvv_val = elm_cvv.val();
                 var num_val = elm_num.val().replace(/\s/g, '');
                 if (num_val.indexOf('eCrypted') == -1) {
                     var enc_cvv = eCrypt.encryptValue(cvv_val, eway_enc_key);
                     var enc_num = eCrypt.encryptValue(num_val, eway_enc_key);
-                    elm_cvv.inputmask('remove');
-                    elm_num.inputmask('remove');
-                    elm_cvv.val(enc_cvv);
-                    elm_num.val(enc_num);
-                    elm_cvv.prop('maxlength', enc_cvv.length);
+                    elm_cvv_enc.val(enc_cvv);
+                    elm_num_enc.val(enc_num);
                     elm_num.attr('data-eway-encrypted', 'yes');
                 }
             }

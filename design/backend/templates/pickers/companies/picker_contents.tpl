@@ -44,7 +44,7 @@
 {include file="common/pagination.tpl" div_id="pagination_`$smarty.request.data_id`"}
 
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="1%" class="center">
@@ -68,7 +68,7 @@
             {if $smarty.request.display == "radio"}
             <input type="radio" name="{$smarty.request.checkbox_name|default:"companies_ids"}" value="{$company.company_id}" class="radio" />
             {else}
-            <input type="checkbox" name="{$smarty.request.checkbox_name|default:"companies_ids"}[{$company.company_id}]" value="{$company.company_id}" class="checkbox cm-item" />
+            <input type="checkbox" name="{$smarty.request.checkbox_name|default:"companies_ids"}[{$company.company_id}]" value="{$company.company_id}" class="cm-item" />
             {/if}
         </td>
         <td data-th="{__("id")}"><a href="{"companies.update?company_id=`$company.company_id`"|fn_url}">&nbsp;<span>{$company.company_id}</span>&nbsp;</a></td>

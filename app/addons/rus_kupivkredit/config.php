@@ -16,6 +16,6 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-fn_define('KVK_API_URL', 'loans-qa.tcsbank.ru');
+fn_define('KVK_API_URL', 'loans.tinkoff.ru');
 fn_define('KVK_API_TEST_URL', 'loans-qa.tcsbank.ru');
 fn_define('KVK_INSTRUCTION_URL', 'https://www.tinkoff.ru/business/loans/');

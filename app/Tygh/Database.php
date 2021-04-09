@@ -17,7 +17,7 @@ namespace Tygh;
 /**
  * Database connection static deprecated class
  *
- * @deprecated since 4.3.6
+ * @deprecated since 4.3.6, will be removed in 5.0.1
  */
 class Database
 {
@@ -141,13 +141,13 @@ class Database
     }
 
     /**
-     *
      * Prepare data and execute REPLACE INTO query to DB
      * If one of $data element is null function unsets it before querry
      *
-     * @param  string    $table Name of table that condition generated. Must be in SQL notation without placeholder.
-     * @param  array     $data  Array of key=>value data of fields need to insert/update
-     * @return db_result
+     * @param  string $table Name of table that condition generated. Must be in SQL notation without placeholder.
+     * @param  array  $data  Array of key=>value data of fields need to insert/update
+     *
+     * @return int
      */
     public static function replaceInto($table, $data)
     {

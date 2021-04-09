@@ -2,6 +2,8 @@
 <div class="ty-product-list">
 
     <a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$product.product nofilter}</a>
+    {hook name="products:product_additional_info"}
+    {/hook}
 
     <div class="ty-mt-m">
         <div class="ty-age-verification__txt">{__("product_need_age_verification")}</div>

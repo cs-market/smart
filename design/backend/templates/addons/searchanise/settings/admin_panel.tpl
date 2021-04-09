@@ -36,10 +36,12 @@
     {if !$runtime.company_id} {* Is root admin. *}
         {if ""|fn_se_is_registered == false} {* Only root admin can register. *}
             <script type="text/javascript">
+                Tygh.tr('text_se_ajax_connecting', '{__("text_se_ajax_connecting")|escape:"javascript"}');
+
                 SearchaniseAdmin = {ldelim}{rdelim};
                 SearchaniseAdmin.host = '{$se_service_url}';
                 SearchaniseAdmin.PrivateKey = '';
-                SearchaniseAdmin.ConnectLink = '{"searchanise.signup"|fn_url:'A':'current'}';
+                SearchaniseAdmin.AjaxConnectLink = '{"searchanise.signup"|fn_url:'A':'current'}';
                 SearchaniseAdmin.AddonStatus = 'enabled';
                 SearchaniseAdmin.AddonVersion = '1.2.1';
 

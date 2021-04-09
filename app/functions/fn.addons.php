@@ -12,17 +12,18 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Settings;
-use Tygh\Debugger;
-use Tygh\Languages\Languages;
-use Tygh\Navigation\LastView;
-use Tygh\Addons\SchemesManager;
 use Tygh\Addons\AXmlScheme;
+use Tygh\Addons\SchemesManager;
 use Tygh\BlockManager\Exim;
 use Tygh\BlockManager\Layout;
 use Tygh\BlockManager\Location;
 use Tygh\BlockManager\ProductTabs;
+use Tygh\Debugger;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Languages\Languages;
+use Tygh\Navigation\LastView;
+use Tygh\Registry;
+use Tygh\Settings;
 use Tygh\Themes\Themes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -31,6 +32,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
  * Updates addon settings
  *
  * @param string $settings Array of add-on's settings to be updated
+ *
  * @return bool Always true
  */
 function fn_update_addon($settings)
@@ -54,10 +56,11 @@ function fn_update_addon($settings)
  * @param string $addon_name      Addon name to be uninstalled
  * @param bool   $show_message    If defined as true, additionally show notification
  * @param bool   $allow_unmanaged Whether to allow uninstall unmanaged addons in non-console environment
+ * @param bool   $execute_schema_queries Allow execute queries from addon schema on important data
  *
  * @return bool True if addons uninstalled successfully, false otherwise
  */
-function fn_uninstall_addon($addon_name, $show_message = true, $allow_unmanaged = false)
+function fn_uninstall_addon($addon_name, $show_message = true, $allow_unmanaged = false, $execute_schema_queries = true)
 {
     $addon_scheme = SchemesManager::getScheme($addon_name);
     if ($addon_scheme != false) {
@@ -66,7 +69,7 @@ function fn_uninstall_addon($addon_name, $show_message = true, $allow_unmanaged 
             return false;
         }
         // Register custom classes
-        \Tygh\Tygh::$app['class_loader']->add('', Registry::get('config.dir.addons') . $addon_name);
+        $addon_scheme->registerAutoloadEntries();
 
         // Check dependencies
         $dependencies = SchemesManager::getUninstallDependencies($addon_name);
@@ -91,11 +94,15 @@ function fn_uninstall_addon($addon_name, $show_message = true, $allow_unmanaged 
             Settings::instance()->removeSection($section['section_id']);
         }
 
-        // Delete language variables
-        $addon_scheme->uninstallLanguageValues();
+        //Ignore schema queries if needed
+        if ($execute_schema_queries) {
 
-        // Revert database structure
-        $addon_scheme->processQueries('uninstall', Registry::get('config.dir.addons') . $addon_name);
+            // Delete language variables
+            $addon_scheme->uninstallLanguageValues();
+
+            // Revert database structure
+            $addon_scheme->processQueries('uninstall', Registry::get('config.dir.addons') . $addon_name);
+        }
 
         // Remove product tabs
         ProductTabs::instance()->deleteAddonTabs($addon_name);
@@ -137,10 +144,13 @@ function fn_uninstall_addon($addon_name, $show_message = true, $allow_unmanaged 
         $snippet_service = Tygh::$app['template.snippet.service'];
         /** @var \Tygh\Template\Mail\Service $mail_service */
         $mail_service = Tygh::$app['template.mail.service'];
+        /** @var \Tygh\Template\Internal\Service $internal_service */
+        $internal_service = Tygh::$app['template.internal.service'];
 
         $document_service->removeDocumentByAddon($addon_name);
         $snippet_service->removeSnippetByAddon($addon_name);
         $mail_service->removeTemplateByAddon($addon_name);
+        $internal_service->removeTemplateByAddon($addon_name);
 
         //Clean Registry
         Registry::del('addons.' . $addon_name);
@@ -160,7 +170,9 @@ function fn_uninstall_addon($addon_name, $show_message = true, $allow_unmanaged 
         Registry::set('hooks', $hooks);
 
         // Clean cache
-        fn_clear_cache();
+        fn_clear_cache('assets');
+        fn_clear_cache('registry');
+        fn_clear_cache('static');
 
         return true;
     } else {
@@ -171,9 +183,10 @@ function fn_uninstall_addon($addon_name, $show_message = true, $allow_unmanaged 
 /**
  * Disables addon
  *
- * @param string $addon_name Addons name to be disabled
+ * @param string $addon_name        Addons name to be disabled
  * @param string $caller_addon_name TODO: NOT USED. Must be refactored.
- * @param bool $show_notification
+ * @param bool   $show_notification
+ *
  * @return bool Always true
  */
 function fn_disable_addon($addon_name, $caller_addon_name, $show_notification = true)
@@ -229,7 +242,7 @@ function fn_install_addon($addon, $show_notification = true, $install_demo = fal
 
     if ($addon_scheme != false) {
         // Register custom classes
-        Tygh::$app['class_loader']->add('', Registry::get('config.dir.addons') . $addon);
+        $addon_scheme->registerAutoloadEntries();
 
         if ($addon_scheme->isPromo()) {
 
@@ -239,21 +252,21 @@ function fn_install_addon($addon, $show_notification = true, $install_demo = fal
             return false;
         }
 
-        $_data = array (
-            'addon' => $addon_scheme->getId(),
-            'priority' =>  $addon_scheme->getPriority(),
-            'dependencies' => implode(',', $addon_scheme->getDependencies()),
-            'conflicts' => implode(',', $addon_scheme->getConflicts()),
-            'requirements' => $addon_scheme->getRequirements(),
-            'version' => $addon_scheme->getVersion(),
-            'separate' => ($addon_scheme->getSettingsLayout() == 'separate') ? 1 : 0,
-            'has_icon' => $addon_scheme->hasIcon(),
-            'unmanaged' => $addon_scheme->getUnmanaged(),
-            'status' => 'D', // addon is disabled by default when installing
-            'install_datetime' => time(),
-            'marketplace_id' => null,
+        $_data = [
+            'addon'                   => $addon_scheme->getId(),
+            'priority'                => $addon_scheme->getPriority(),
+            'dependencies'            => implode(',', $addon_scheme->getDependencies()),
+            'conflicts'               => implode(',', $addon_scheme->getConflicts()),
+            'requirements'            => $addon_scheme->getRequirements(),
+            'version'                 => $addon_scheme->getVersion(),
+            'separate'                => ($addon_scheme->getSettingsLayout() == 'separate') ? 1 : 0,
+            'has_icon'                => $addon_scheme->hasIcon(),
+            'unmanaged'               => $addon_scheme->getUnmanaged(),
+            'status'                  => 'D', // addon is disabled by default when installing
+            'install_datetime'        => time(),
+            'marketplace_id'          => null,
             'marketplace_license_key' => null,
-        );
+        ];
 
         if ($addon_scheme instanceof \Tygh\Addons\XmlScheme3) {
             $_data['marketplace_id'] = $addon_scheme->getMarketplaceProductID();
@@ -287,7 +300,7 @@ function fn_install_addon($addon, $show_notification = true, $install_demo = fal
 
         // Execute optional queries
         if ($addon_scheme->processQueries('install', Registry::get('config.dir.addons') . $addon) == false) {
-            fn_uninstall_addon($addon, false, $allow_unmanaged);
+            fn_uninstall_addon($addon, false, $allow_unmanaged, false);
 
             return false;
         }
@@ -342,6 +355,7 @@ function fn_install_addon($addon, $show_notification = true, $install_demo = fal
         }
 
         $email_templates = $addon_scheme->getEmailTemplates();
+        $internal_templates = $addon_scheme->getInternalTemplates();
         $document_templates = $addon_scheme->getDocumentTemplates();
         $snippet_templates = $addon_scheme->getSnippetTemplates();
 
@@ -349,6 +363,12 @@ function fn_install_addon($addon, $show_notification = true, $install_demo = fal
             /** @var \Tygh\Template\Mail\Exim $email_exim */
             $email_exim = \Tygh::$app['template.mail.exim'];
             $email_exim->import($email_templates);
+        }
+
+        if ($internal_templates) {
+            /** @var \Tygh\Template\Internal\Exim $internal_exim */
+            $internal_exim = \Tygh::$app['template.internal.exim'];
+            $internal_exim->import($internal_templates);
         }
 
         if ($document_templates) {
@@ -382,24 +402,7 @@ function fn_install_addon($addon, $show_notification = true, $install_demo = fal
         }
 
         // Install layouts individually for each theme
-        foreach (fn_get_installed_themes() as $theme_name) {
-            $addon_layouts_path = fn_get_addon_layouts_path($addon, $theme_name);
-            if ($addon_layouts_path) {
-                if (fn_allowed_for('ULTIMATE')) {
-                    foreach (fn_get_all_companies_ids() as $company) {
-                        $layouts = Layout::instance($company)->getList(array('theme_name' => $theme_name));
-                        foreach ($layouts as $layout_id => $layout) {
-                            Exim::instance($company, $layout_id)->importFromFile($addon_layouts_path);
-                        }
-                    }
-                } else {
-                    $layouts = Layout::instance()->getList(array('theme_name' => $theme_name));
-                    foreach ($layouts as $layout_id => $layout) {
-                        Exim::instance(0, $layout_id)->importFromFile($addon_layouts_path);
-                    }
-                }
-            }
-        }
+        fn_install_addon_layouts($addon);
 
         // Clean cache
         fn_clear_cache();
@@ -425,8 +428,8 @@ function fn_install_addon($addon, $show_notification = true, $install_demo = fal
 /**
  * Copies addon templates from repository
  *
- * @param string $addon_name Addons name to copy templates for
- * @param array $target_themes Theme names to copy add-on templates for
+ * @param string $addon_name    Addons name to copy templates for
+ * @param array  $target_themes Theme names to copy add-on templates for
  *
  * @return bool Always true
  */
@@ -447,7 +450,7 @@ function fn_install_addon_templates($addon_name, $target_themes = array())
 /**
  * Copies files from base repository to store folder
  *
- * @param string $repo_dir Path to the repository
+ * @param string $repo_dir   Path to the repository
  * @param string $design_dir Path to store design folder
  * @param string $addon_name Name of installing add-on
  * @param string $theme_name Using theme name
@@ -479,6 +482,7 @@ function fn_copy_addon_templates_from_repo($repo_dir, $design_dir, $addon_name, 
  * Removes addon's templates from theme folder
  *
  * @param string $addon Addon name to remove templates for
+ *
  * @return bool Always true
  */
 function fn_uninstall_addon_templates($addon)
@@ -638,9 +642,11 @@ function fn_update_addon_settings($addon_scheme, $execute_functions = true, $val
 /**
  * Updates addon settings descriptions
  *
- * @param int $object_id Descriptions identifier
- * @param string $object_type Descriptions type (Settings::VARIANT_DESCRIPTION | Settings::SETTING_DESCRIPTION | Settings::SECTION_DESCRIPTION)
- * @param array $translations List of descriptions @see Settings::updateDescription()
+ * @param int    $object_id    Descriptions identifier
+ * @param string $object_type  Descriptions type (Settings::VARIANT_DESCRIPTION | Settings::SETTING_DESCRIPTION |
+ *                             Settings::SECTION_DESCRIPTION)
+ * @param array  $translations List of descriptions @see Settings::updateDescription()
+ *
  * @return bool Always true
  */
 function fn_update_addon_settings_descriptions($object_id, $object_type, $translations)
@@ -660,9 +666,10 @@ function fn_update_addon_settings_descriptions($object_id, $object_type, $transl
  * Updates settings original values
  *
  * @param string $addon_id Addon ID (discussions, gift_certificates, etc)
- * @param string $name Text settings ID (use_search_on_page, gift_certificate_code, etc)
- * @param string $type Setting type. Enum: section, option, variant
- * @param string $value Setting description
+ * @param string $name     Text settings ID (use_search_on_page, gift_certificate_code, etc)
+ * @param string $type     Setting type. Enum: section, option, variant
+ * @param string $value    Setting description
+ *
  * @return bool True if updated
  */
 function fn_update_addon_settings_originals($addon_id, $name, $type, $value)
@@ -696,14 +703,16 @@ function fn_update_addon_settings_originals($addon_id, $name, $type, $value)
 /**
  * Checks if addon has correct snapshot
  *
- * @param string $addon Addon name (ID)
+ * @param string      $addon Addon name (ID)
+ * @param string|null $mode  Store mode
+ *
  * @return bool true if correct
  */
-function fn_check_addon_snapshot($addon)
+function fn_check_addon_snapshot($addon, $mode = null)
 {
     static $addons_snapshots = null;
 
-    $mode = fn_get_storage_data('store_mode');
+    $mode = isset($mode) ? $mode : fn_get_storage_data('store_mode');
     $status = true;
 
     if ($addons_snapshots === null) {
@@ -721,7 +730,7 @@ function fn_check_addon_snapshot($addon)
 }
 
 /**
- * Cleans up addons with incorrect snaphost
+ * Cleans up addons with incorrect snapshot
  *
  * @return bool Always true
  */
@@ -937,7 +946,9 @@ function fn_update_addon_status($addon, $status, $show_notification = true, $on_
 
 /**
  * Returns addon's version
+ *
  * @param string $addon Addon name to return version for
+ *
  * @return string Addon's version
  */
 function fn_get_addon_version($addon)
@@ -948,9 +959,10 @@ function fn_get_addon_version($addon)
 /**
  * Gets addons list
  *
- * @param array $params search params
- * @param int $items_per_page items per page for pagination
- * @param string $lang_code language code
+ * @param array  $params         search params
+ * @param int    $items_per_page items per page for pagination
+ * @param string $lang_code      language code
+ *
  * @return array addons list and filtered search params
  */
 function fn_get_addons($params, $items_per_page = 0, $lang_code = CART_LANGUAGE)
@@ -1113,9 +1125,16 @@ function fn_get_addons($params, $items_per_page = 0, $lang_code = CART_LANGUAGE)
 
     if (!empty($params['source'])) {
         $is_core_addon = $params['source'] == 'core';
-
         foreach ($addons as $addon => $addon_data) {
             if ($is_core_addon != $addon_data['is_core_addon']) {
+                unset($addons[$addon]);
+            }
+        }
+    }
+
+    if (!empty($params['supplier'])) {
+        foreach ($addons as $addon => $addon_data) {
+            if ($addon_data['supplier'] != $params['supplier']) {
                 unset($addons[$addon]);
             }
         }
@@ -1127,11 +1146,12 @@ function fn_get_addons($params, $items_per_page = 0, $lang_code = CART_LANGUAGE)
 }
 
 /**
- * Move addon pack from temporarily folder to specified place and install it if possible
+ * Move addon pack from temporarily folder to specified place and install it if possible.
  *
- * @param string $from Source path
- * @param string $to Destination path
- * @return bool true if installed, false otherwise
+ * @param string $from Source path.
+ * @param string $to   Destination path.
+ *
+ * @return bool true if installed, false otherwise.
  */
 function fn_addons_move_and_install($from, $to)
 {
@@ -1154,20 +1174,46 @@ function fn_addons_move_and_install($from, $to)
     $relative_addon_path = str_replace(Registry::get('config.dir.root') . '/', '', Registry::get('config.dir.addons'));
 
     if (!file_exists($from . $relative_addon_path . $addon_name . '/addon.xml')) {
-        fn_set_notification('E', __('error'), __('broken_addon_pack'));
+        fn_set_notification(
+            NotificationSeverity::ERROR,
+            __('error'),
+            __('broken_addon_pack')
+        );
+
+        return false;
+    }
+
+    if (!fn_remove_addon_files($addon_name)) {
+        fn_set_notification(
+            NotificationSeverity::ERROR,
+            __('error'),
+            __('cant_remove_addon_files')
+        );
 
         return false;
     }
 
     fn_copy($from, $to);
 
-    fn_install_addon($addon_name);
+    if (fn_check_addon_exists($addon_name)) {
+        $result = fn_reinstall_addon_files($addon_name);
+        if ($result) {
+            fn_set_notification('N', __('notice'), __('addon_files_was_copied', [
+                '[addon]' => $addon_name
+            ]));
+        }
+    } else {
+        fn_install_addon($addon_name);
+    }
 
     fn_rm($from);
 
     return true;
 }
 
+/**
+ * @return array
+ */
 function fn_get_addon_permissions_text()
 {
     $messages = array(
@@ -1183,44 +1229,32 @@ function fn_get_addon_permissions_text()
 /**
  * Load addon
  *
+ * @TODO move to add-on initialization service
+ *
  * @param string $addon_name addon name
+ *
  * @return boolean true if addon loaded, false otherwise
  */
 function fn_load_addon($addon_name)
 {
-    static $cache = array(); // FIXME: duplicate with fn_set_hook
-    static $addon_dir;
-    static $class_loader;
-
-    if ($addon_dir === null) {
-        $addon_dir = Registry::get('config.dir.addons');
-    }
-
-    if ($class_loader === null) {
-        $class_loader = Tygh::$app['class_loader'];
-    }
+    static $cache = [];
 
     if (!isset($cache[$addon_name])) {
-        $class_loader->add('', $addon_dir . $addon_name);
+        /** @var \Tygh\Addons\AXmlScheme $addon_schema */
+        $addon_schema = SchemesManager::getScheme($addon_name);
 
-        if (file_exists($addon_dir . $addon_name . '/init.php')) {
-            include_once $addon_dir . $addon_name . '/init.php';
+        if ($addon_schema) {
+            $addon_schema->loadAddon();
+            $cache[$addon_name] = true;
         }
-        if (file_exists($addon_dir . $addon_name . '/func.php')) {
-            include_once $addon_dir . $addon_name . '/func.php';
-        }
-        if (file_exists($addon_dir . $addon_name . '/config.php')) {
-            include_once $addon_dir . $addon_name . '/config.php';
-        }
-
-        $cache[$addon_name] = true;
     }
 
-    return $cache[$addon_name];
+    return isset($cache[$addon_name]) ? $cache[$addon_name] : false;
 }
 
 /**
  * Update addon version
+ *
  * @param string $addon
  * @param string $version
  */
@@ -1234,7 +1268,8 @@ function fn_update_addon_version($addon, $version)
  *
  * @param string $addon_name Addon identifier
  * @param string $theme_name Theme name to search layout in
- * @return string Path to layouts file, null othervise
+ *
+ * @return string Path to layouts file, null otherwise
  */
 function fn_get_addon_layouts_path($addon_name, $theme_name = '[theme]')
 {
@@ -1263,7 +1298,8 @@ function fn_get_addon_layouts_path($addon_name, $theme_name = '[theme]')
  * Validate addon package structure.
  *
  * @param string $addon_name Addon name
- * @param string $path Path to extracted addon package
+ * @param string $path       Path to extracted addon package
+ *
  * @return bool
  */
 function fn_validate_addon_structure($addon_name, $path)
@@ -1301,24 +1337,27 @@ function fn_validate_addon_structure($addon_name, $path)
 /**
  * Extract addon package to temporary directory.
  *
- * @param string $file_name Path to addon archive file
+ * @param string $addon_archive_path Path to addon archive file
+ *
  * @return array|bool
  * Return false if package broken.
  * Return array(addon_name, path/to/extracted/package/)
  */
-function fn_extract_addon_package($file_name)
+function fn_extract_addon_package($addon_archive_path)
 {
-    if (!file_exists($file_name)) {
+    if (!file_exists($addon_archive_path)) {
         return false;
     }
 
-    $extract_path = fn_get_cache_path(false) . 'tmp/addon_pack/';
+    $addon_archive_name = pathinfo($addon_archive_path, PATHINFO_FILENAME);
+
+    $extract_path = fn_get_cache_path(false) . 'tmp/' . $addon_archive_name . '/';
 
     // Re-create source folder
     fn_rm($extract_path);
     fn_mkdir($extract_path);
 
-    if (fn_decompress_files($file_name, $extract_path)) {
+    if (fn_decompress_files($addon_archive_path, $extract_path)) {
         $addon_name = '';
         $package_path = $extract_path;
         $files = fn_get_dir_contents($extract_path, false, true, 'xml', '', true);
@@ -1366,7 +1405,8 @@ function fn_update_addon_language_variables(AXmlScheme $addon_scheme)
 /**
  * Gets vendor values of particular addon
  *
- * @param  string $addon_name Addon name
+ * @param  string $addon Addon name
+ *
  * @return array Array of vendor values
  * @internal
  */
@@ -1395,7 +1435,8 @@ function fn_get_addon_settings_vendor_values($addon)
 /**
  * Gets setting values of particular addon
  *
- * @param  string $addon_name Addon name
+ * @param  string $addon Addon name
+ *
  * @return array Array of setting values
  * @internal
  */
@@ -1417,4 +1458,132 @@ function fn_get_addon_settings_values($addon)
     }
 
     return $setting_values;
+}
+
+/**
+ * Removes add-on files.
+ *
+ * @param string     $addon      Add-on ID
+ * @param array|null $ftp_access Connection details to remove files by FTP
+ *
+ * @return bool Whether all add-on files and directories were removed
+ */
+function fn_remove_addon_files($addon, $ftp_access = null)
+{
+    $config_dirs = Registry::get('config.dir');
+
+    $addon_files_list = [
+        $config_dirs['addons'] . $addon,
+        $config_dirs['design_backend'] . 'css/addons/' . $addon,
+        $config_dirs['design_backend'] . 'mail/templates/addons/' . $addon,
+        $config_dirs['design_backend'] . 'media/fonts/addons/' . $addon,
+        $config_dirs['design_backend'] . 'media/images/addons/' . $addon,
+        $config_dirs['design_backend'] . 'templates/addons/' . $addon,
+        'js/addons/' . $addon,
+    ];
+
+    $themes_dirs_list = fn_get_dir_contents($config_dirs['design_frontend']);
+    foreach ($themes_dirs_list as $theme) {
+        $addon_files_list[] = $config_dirs['design_frontend'] . $theme . '/css/addons/' . $addon;
+        $addon_files_list[] = $config_dirs['design_frontend'] . $theme . '/mail/templates/addons/' . $addon;
+        $addon_files_list[] = $config_dirs['design_frontend'] . $theme . '/media/fonts/addons/' . $addon;
+        $addon_files_list[] = $config_dirs['design_frontend'] . $theme . '/media/images/addons/' . $addon;
+        $addon_files_list[] = $config_dirs['design_frontend'] . $theme . '/templates/addons/' . $addon;
+    }
+
+    $lang_dirs_list = fn_get_dir_contents($config_dirs['lang_packs']);
+    foreach ($lang_dirs_list as $lang_code) {
+        $addon_files_list[] = $config_dirs['lang_packs'] . $lang_code . '/addons/' . $addon . '.po';
+    }
+
+    foreach ($addon_files_list as $addon_file) {
+        if (!file_exists($addon_file)) {
+            continue;
+        }
+
+        if ($ftp_access !== null) {
+            $result = fn_rm_by_ftp($addon_file, $ftp_access);
+        } else {
+            $result = fn_rm($addon_file);
+        }
+
+        if (!$result) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Installs add-on templates from repository to add-on directories.
+ * Installs add-on language variables.
+ * Reinstalls the add-on settings schema with preserve current settings.
+ *
+ * @param string $addon  Add-ons name that files must be copied into add-on's directory.
+ *
+ * @return bool  Returns true if add-on's files was movied successfully or false otherwise.
+ */
+function fn_reinstall_addon_files($addon)
+{
+    SchemesManager::clearInternalCache($addon);
+    $addon_scheme = SchemesManager::getScheme($addon);
+
+    if (empty($addon_scheme)) {
+        return false;
+    }
+
+    fn_install_addon_templates($addon_scheme->getId());
+
+    fn_update_addon_language_variables($addon_scheme);
+
+    fn_update_addon_settings(
+        $addon_scheme,
+        true,
+        fn_get_addon_settings_values($addon),
+        fn_get_addon_settings_vendor_values($addon)
+    );
+
+    fn_clear_cache();
+
+    return true;
+}
+
+/**
+ * Install add-on layouts for each themes.
+ *
+ * @param string $addon Add-onn's name.
+ */
+function fn_install_addon_layouts($addon)
+{
+    foreach (fn_get_installed_themes() as $theme_name) {
+        $addon_layouts_path = fn_get_addon_layouts_path($addon, $theme_name);
+        if ($addon_layouts_path) {
+            if (fn_allowed_for('ULTIMATE')) {
+                foreach (fn_get_all_companies_ids() as $company) {
+                    $layouts = Layout::instance($company)->getList(array('theme_name' => $theme_name));
+                    foreach ($layouts as $layout_id => $layout) {
+                        Exim::instance($company, $layout_id)->importFromFile($addon_layouts_path);
+                    }
+                }
+            } else {
+                $layouts = Layout::instance()->getList(array('theme_name' => $theme_name));
+                foreach ($layouts as $layout_id => $layout) {
+                    Exim::instance(0, $layout_id)->importFromFile($addon_layouts_path);
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Checks if add-on exists.
+ *
+ * @param string $addon_name add-on name.
+ *
+ * @return bool Returns true if add-on exists or false otherwise.
+ */
+function fn_check_addon_exists($addon_name)
+{
+    return (bool) db_get_field('SELECT addon FROM ?:addons WHERE addon = ?s', $addon_name);
 }

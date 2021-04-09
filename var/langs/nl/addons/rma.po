@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/rma.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.11.5/addons/rma.po\n"
+"X-Crowdin-File-ID: 3688\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::rma"
 msgid "RMA"
@@ -97,8 +97,12 @@ msgid "Go to the list of your return requests"
 msgstr "Ga naar de lijst met retour verzoeken"
 
 msgctxt "Languages::privileges.manage_rma"
-msgid "Manage RMA system"
-msgstr "Retour systeem beheren"
+msgid "Can edit"
+msgstr "Kan bewerken"
+
+msgctxt "Languages::privilege_groups.rma"
+msgid "Return merchandise authorization (RMA)"
+msgstr "Retour merchandise autorisatie (RMA)"
 
 msgctxt "Languages::text_return_change_warning"
 msgid "The status of return #[return_id] will be changed"
@@ -202,13 +206,13 @@ msgstr "Geen weekends meerekenen bij het berekenen van de retourperiode van het 
 
 msgctxt "Languages::email_template.rma_slip_notification"
 msgid "RMA slip"
-msgstr ""
+msgstr "RMA pakbon"
 
 msgctxt "Languages::template_document_rma_packing_slip_default"
 msgid "Return request: packing slip"
-msgstr ""
+msgstr "Retouraanvraag: pakbon"
 
 msgctxt "Languages::document_preview_return_request_not_found"
 msgid "Couldn't find a return request. Preview only works with existing data. Please create a return request and use Preview again."
-msgstr ""
+msgstr "Kan geen retourverzoek vinden. Preview werkt alleen met bestaande gegevens. Maak een retourverzoek aan en gebruik Preview opnieuw."
 

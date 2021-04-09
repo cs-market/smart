@@ -3,7 +3,7 @@
 
     <div class="ty-scroller-list__description">
         {strip}
-            {include file="blocks/list_templates/simple_list.tpl" product=$product show_name=true show_price=false show_add_to_cart=false but_role="action" hide_price=true hide_qty=true show_discount_label=false}
+            {include file="blocks/list_templates/simple_list.tpl" product=$product show_name=true show_price=false show_add_to_cart=false but_role="action" hide_price=true hide_qty=true show_product_labels=false show_discount_label=false show_shipping_label=false}
         {/strip}
     </div>
 

@@ -39,8 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $currency_code = db_get_field("SELECT currency_code FROM ?:currencies WHERE currency_id = ?i", $_REQUEST['currency_id']);
 
             if ($currency_code != CART_PRIMARY_CURRENCY) {
-                db_query("DELETE FROM ?:currencies WHERE currency_code = ?s", $currency_code);
-                db_query("DELETE FROM ?:currency_descriptions WHERE currency_code = ?s", $currency_code);
+                fn_delete_currency($_REQUEST['currency_id']);
                 fn_set_notification('N', __('notice'), __('currency_deleted'));
             } else {
                 fn_set_notification('W', __('warning'), __('base_currency_not_deleted'));

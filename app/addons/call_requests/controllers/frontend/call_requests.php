@@ -21,10 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'request') {
 
         if (!empty($_REQUEST['call_data'])) {
+            $call_data = $_REQUEST['call_data'];
 
             $product_data = !empty($_REQUEST['product_data']) ? $_REQUEST['product_data'] : array();
 
-            if ($res = fn_do_call_request($_REQUEST['call_data'], $product_data, Tygh::$app['session']['cart'], Tygh::$app['session']['auth'])) {
+            if (!empty($_REQUEST['company_id'])) {
+                $call_data['company_id'] = $_REQUEST['company_id'];
+            }
+
+            if ($res = fn_do_call_request($call_data, $product_data, Tygh::$app['session']['cart'], Tygh::$app['session']['auth'])) {
                 if (!empty($res['error'])) {
                     fn_set_notification('E', __('error'), $res['error']);
                 } elseif (!empty($res['notice'])) {
@@ -40,13 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 if ($mode == 'request') {
-
     if (!empty($_REQUEST['product_id'])) {
         $product = fn_get_product_data($_REQUEST['product_id'], $auth, DESCR_SL);
         Tygh::$app['view']->assign('product', $product);
         $_REQUEST['obj_id'] = $product['product_id'];
     }
+
     Tygh::$app['view']->assign('obj_prefix', !empty($_REQUEST['obj_prefix']) ? $_REQUEST['obj_prefix'] : '');
     Tygh::$app['view']->assign('obj_id', !empty($_REQUEST['obj_id']) ? $_REQUEST['obj_id'] : '');
-
+    Tygh::$app['view']->assign('company_id', !empty($_REQUEST['company_id']) ? $_REQUEST['company_id'] : 0);
 }

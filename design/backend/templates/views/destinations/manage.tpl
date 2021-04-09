@@ -4,23 +4,35 @@
 
 {if $destinations}
 <div class="table-wrapper">
-    <table width="100%" class="table table-middle">
+    <table width="100%" class="table table-middle table--relative">
     <thead>
     <tr>
-        <th width="1%">
-            {include file="common/check_items.tpl"}</th>
-        <th width="80%">{__("name")}</th>
+        {hook name="destinations:destinations_list_header"}
+            <th width="1%">
+                {include file="common/check_items.tpl"}</th>
+            <th>{__("name")}</th>
+        {/hook}
         <th width="5%">&nbsp;</th>
         <th class="right" width="10%">{__("status")}</th>
     </tr>
     </thead>
     {foreach from=$destinations item=destination}
     <tr class="cm-row-status-{$destination.status|lower}" data-ct-destination-id="{$destination.destination_id}">
-        <td class="left">
-            <input name="destination_ids[]" type="checkbox" value="{$destination.destination_id}" {if $destination.destination_id == 1}disabled="disabled"{/if} class=" cm-item" /></td>
-        <td data-ct-destination-name="{$destination.destination}">
-           <a class="row-status" href="{"destinations.update?destination_id=`$destination.destination_id`"|fn_url}">{$destination.destination}</a>
-        </td>
+        {hook name="destinations:destinations_list"}
+            <td class="left">
+                <input name="destination_ids[]"
+                       type="checkbox"
+                       value="{$destination.destination_id}"
+                       {if $destination.destination_id == 1}disabled="disabled"{/if}
+                       class="cm-item"
+                />
+            </td>
+            <td data-ct-destination-name="{$destination.destination}">
+               <a class="row-status"
+                  href="{"destinations.update?destination_id=`$destination.destination_id`"|fn_url}"
+               >{$destination.destination}</a>
+            </td>
+        {/hook}
         <td class="nowrap" >
             {capture name="tools_list"}
                 {hook name="destinations:manage_tools_list"}
@@ -59,7 +71,7 @@
 {/capture}
 
 {capture name="adv_buttons"}
-    {include file="common/tools.tpl" tool_href="destinations.add" prefix="top" hide_tools="true" title=__("add_location") icon="icon-plus"}
+    {include file="common/tools.tpl" tool_href="destinations.add" prefix="top" hide_tools="true" title=__("add_rate_area") icon="icon-plus"}
 {/capture}
 
-{include file="common/mainbox.tpl" title=__("locations") content=$smarty.capture.mainbox adv_buttons=$smarty.capture.adv_buttons buttons=$smarty.capture.buttons select_languages=true}
+{include file="common/mainbox.tpl" title=__("rate_areas") content=$smarty.capture.mainbox adv_buttons=$smarty.capture.adv_buttons buttons=$smarty.capture.buttons select_languages=true}

@@ -50,7 +50,7 @@
         {else}
             <div class="cm-field-container">
                 <label>
-            <input id="option_{$id}_{$po.option_id}" type="checkbox" name="{$name}[{$id}][product_options][{$po.option_id}]" value="{$vr.variant_id}" {if $po.value == $vr.variant_id}checked="checked"{/if} {if $product.options_update || $update_options}onclick="fn_change_options('{$c_obj|default:$id}', {$id}, '{$po.option_id}');"{/if} {if $cp.exclude_from_calculate && !$product.aoc || $po.disabled}disabled="disabled"{/if} class="checkbox{if $po.disabled} cm-skip-avail-switch{/if}" />
+            <input id="option_{$id}_{$po.option_id}" type="checkbox" name="{$name}[{$id}][product_options][{$po.option_id}]" value="{$vr.variant_id}" {if $po.value == $vr.variant_id}checked="checked"{/if} {if $product.options_update || $update_options}onclick="fn_change_options('{$c_obj|default:$id}', {$id}, '{$po.option_id}');"{/if} {if $cp.exclude_from_calculate && !$product.aoc || $po.disabled}disabled="disabled"{/if} class="{if $po.disabled} cm-skip-avail-switch{/if}" />
 
             {if $settings.General.display_options_modifiers == "Y"}{if $vr.modifier|floatval}&nbsp;({include file="common/modifier.tpl" mod_type=$vr.modifier_type mod_value=$vr.modifier display_sign=true}){/if}{hook name="products:select_options"}{/hook}{/if}
                 </label>

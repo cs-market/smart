@@ -28,8 +28,6 @@ class GetDispatchRoutingTest extends ATestCase
      */
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
-
         $this->requireCore('functions/fn.control.php');
     }
 

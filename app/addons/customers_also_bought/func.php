@@ -49,14 +49,20 @@ function fn_customers_also_bought_delete_product_post(&$product_id)
 
 function fn_customers_also_bought_get_products(&$params, &$fields, &$sortings, &$condition, &$join, &$sorting, &$group_by)
 {
-    if (!empty($params['also_bought_for_product_id'])) {
+    if (!empty($params['also_bought_for_product_id']) || !empty($params['also_bought_for_product_ids'])) {
         if (!empty($params['sort_by']) && ($params['sort_by'] == 'amnt')) {
             $sortings['amnt'] = 'SUM(?:also_bought_products.amount)';
         }
 
         $fields[] = 'SUM(?:also_bought_products.amount) amnt';
         $join .= ' LEFT JOIN ?:also_bought_products ON ?:also_bought_products.related_id = products.product_id ';
-        $condition .= db_quote(' AND ?:also_bought_products.product_id = ?i', $params['also_bought_for_product_id']);
+
+        if (isset($params['also_bought_for_product_id'])) {
+            $condition .= db_quote(' AND ?:also_bought_products.product_id = ?i', $params['also_bought_for_product_id']);
+        } else {
+            $condition .= db_quote(' AND ?:also_bought_products.product_id IN (?n)', $params['also_bought_for_product_ids']);
+        }
+
         $group_by = '?:also_bought_products.related_id';
     }
 

@@ -12,6 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Storage;
 
@@ -264,7 +265,7 @@ if ($mode == 'invoice') {
     // Repay functionality
     $statuses = fn_get_statuses(STATUSES_ORDER, array(), true);
 
-    if (Registry::get('settings.Checkout.repay') == 'Y' && (!empty($statuses[$order_info['status']]['params']['repay']) && $statuses[$order_info['status']]['params']['repay'] == 'Y')) {
+    if (!empty($statuses[$order_info['status']]['params']['repay']) && $statuses[$order_info['status']]['params']['repay'] == 'Y') {
         fn_prepare_repay_data(empty($_REQUEST['payment_id']) ? 0 : $_REQUEST['payment_id'], $order_info, $auth);
     }
 
@@ -289,6 +290,10 @@ if ($mode == 'invoice') {
         }
     }
 
+    if (fn_checkout_is_email_address_fake($order_info['email'])) {
+        $order_info['email'] = '';
+    }
+
     Tygh::$app['view']->assign('shipments', $shipments);
     Tygh::$app['view']->assign('use_shipments', $use_shipments);
 
@@ -309,23 +314,40 @@ if ($mode == 'invoice') {
 //
 } elseif ($mode == 'search') {
 
+    $orders = $search = null;
     $params = $_REQUEST;
+
     if (!empty($auth['user_id'])) {
         $params['user_id'] = $auth['user_id'];
-
-    } elseif (!empty($auth['order_ids'])) {
-        if (empty($params['order_id'])) {
-            $params['order_id'] = $auth['order_ids'];
-        } else {
-            $ord_ids = is_array($params['order_id']) ? $params['order_id'] : explode(',', $params['order_id']);
-            $params['order_id'] = array_intersect($ord_ids, $auth['order_ids']);
+    } elseif (isset($params['order_id'])) {
+        $order_ids = is_array($params['order_id'])
+            ? $params['order_id']
+            : explode(',', $params['order_id']);
+        foreach ($order_ids as $order_id) {
+            if (!fn_is_order_allowed($order_id, $auth)) {
+                return [
+                    CONTROLLER_STATUS_REDIRECT,
+                    'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url'))
+                ];
+            }
         }
-
+        $params['order_id'] = array_intersect($order_ids, $auth['order_ids']);
+    } elseif (!empty($auth['order_ids'])) {
+        $params['order_id'] = $auth['order_ids'];
     } else {
-        return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+        $orders = [];
+        $search = $params;
     }
 
-    list($orders, $search) = fn_get_orders($params, Registry::get('settings.Appearance.orders_per_page'));
+    if ($orders === null && $search === null) {
+        list($orders, $search) = fn_get_orders($params, Registry::get('settings.Appearance.orders_per_page'));
+    }
+
+    array_walk($orders, function(&$order_info) {
+        if (fn_checkout_is_email_address_fake($order_info['email'])) {
+            $order_info['email'] = '';
+        }
+    });
 
     Tygh::$app['view']->assign('orders', $orders);
     Tygh::$app['view']->assign('search', $search);
@@ -507,8 +529,9 @@ function fn_reorder($order_id, &$cart, &$auth)
              * @param int       $amount             Product quantity
              * @param float     $price              Product price
              * @param string    $zero_price_action  Flag, determines the action when the price of the product is 0
+             * @param string    $k                  Product cart ID
              */
-            fn_set_hook('reorder_product', $order_info, $cart, $auth, $product, $amount, $price, $zero_price_action);
+            fn_set_hook('reorder_product', $order_info, $cart, $auth, $product, $amount, $price, $zero_price_action, $k);
 
             if (!floatval($price) && $zero_price_action == 'A') {
                 if (isset($product['custom_user_price'])) {
@@ -577,13 +600,22 @@ function fn_prepare_repay_data($payment_id, $order_info, $auth)
     }
 
     //Get payment methods
-    $payment_methods = fn_get_payments(array('usergroup_ids' => $auth['usergroup_ids']));
+    $payment_methods = fn_get_payments([
+        'usergroup_ids' => $auth['usergroup_ids'],
+        'extend' => ['images']
+    ]);
 
     fn_set_hook('prepare_repay_data', $payment_id, $order_info, $auth, $payment_methods);
 
     if (!empty($payment_methods)) {
         // Get payment method info
         $payment_groups = fn_prepare_checkout_payment_methods($order_info, $auth);
+
+        $payment_methods_list = [];
+        foreach ($payment_groups as $payment_group_items) {
+            $payment_methods_list += (array) $payment_group_items;
+        }
+
         if (!empty($payment_id)) {
             $order_payment_id = $payment_id;
         } else {
@@ -606,8 +638,9 @@ function fn_prepare_repay_data($payment_id, $order_info, $auth)
             }
         }
 
-        Tygh::$app['view']->assign('payment_methods', $payment_groups);
-        Tygh::$app['view']->assign('order_payment_id', $order_payment_id);
+        Tygh::$app['view']->assign('payment_methods', $payment_groups); // TODO: saved for backward compatibility, change $payment_group to $payment_methods in future
         Tygh::$app['view']->assign('payment_method', $payment_data);
+        Tygh::$app['view']->assign('payment_methods_list', $payment_methods_list);
+        Tygh::$app['view']->assign('order_payment_id', $order_payment_id);
     }
 }

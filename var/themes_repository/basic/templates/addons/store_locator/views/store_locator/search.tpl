@@ -16,7 +16,7 @@
                     <h2>{$loc.name}</h2>
                     {$loc.description nofilter}
                     {if $loc.city || $loc.country_title}{if $loc.city}{$loc.city}, {/if}{$loc.country_title}{/if}
-                    <div>{include file="buttons/button.tpl" but_role="text" but_meta="cm-map-view-location" but_text=__("view_on_map") but_extra="data-ca-latitude={$loc.latitude} data-ca-longitude={$loc.longitude}"}</div>
+                    <div>{include file="buttons/button.tpl" but_role="text" but_meta="cm-sl-map-view-location" but_text=__("view_on_map") but_extra="data-ca-latitude={$loc.latitude} data-ca-longitude={$loc.longitude}"}</div>
                 </div>
                 {if $store_locations|count > 1}
                     <hr />
@@ -26,7 +26,7 @@
             {if $store_locations|count > 1}
                 <div class="store-location-item">
                     <h2>{__("all_stores")}</h2>
-                    <div>{include file="buttons/button.tpl" but_role="text" but_meta="cm-map-view-locations" but_text=__("view_on_map")}</div>
+                    <div>{include file="buttons/button.tpl" but_role="text" but_meta="cm-sl-map-view-locations" but_text=__("view_on_map")}</div>
                 </div>
             {/if}
         </div>

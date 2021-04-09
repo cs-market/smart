@@ -13,7 +13,7 @@
     {if $order_info.use_discount}
     <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">-</td>
     {/if}
-    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
     <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">-</td>
     {/if}
 
@@ -23,7 +23,7 @@
 <tr>
     {assign var="_colspan" value="4"}
     {if $order_info.use_discount}{assign var="_colspan" value=$_colspan+1}{/if}
-    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}{assign var="_colspan" value=$_colspan+1}{/if}
+    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}{assign var="_colspan" value=$_colspan+1}{/if}
     <td style="padding: 5px 10px; background-color: #ffffff; font-size: 12px; font-family: Arial;" colspan="{$_colspan}">
         <p>{__("free_products")} ({$gift.gift_cert_code|default:"&nbsp;"}):</p>
 
@@ -35,7 +35,7 @@
             {if $order_info.use_discount}
             <th style="background-color: #eeeeee; padding: 6px 10px; font-size: 12px; font-family: Arial;">{__("discount")}</th>
             {/if}
-            {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+            {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
             <th style="background-color: #eeeeee; padding: 6px 10px; font-size: 12px; font-family: Arial;">{__("tax")}</th>
             {/if}
             <th style="background-color: #eeeeee; padding: 6px 10px; font-size: 12px; font-family: Arial;">{__("subtotal")}</th>
@@ -54,7 +54,7 @@
             {if $order_info.use_discount}
             <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{if $oi.extra.discount|floatval}{include file="common/price.tpl" value=$oi.extra.discount}{else}&nbsp;-&nbsp;{/if}</td>
             {/if}
-            {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+            {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
             <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{if $oi.tax_value}{include file="common/price.tpl" value=$oi.tax_value}{else}&nbsp;-&nbsp;{/if}</td>
             {/if}
             <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{include file="common/price.tpl" value=$oi.display_subtotal}&nbsp;</td>

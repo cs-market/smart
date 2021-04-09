@@ -13,6 +13,9 @@
 ****************************************************************************/
 
 $schema['top']['addons']['items']['access_restrictions'] = array(
+    'attrs' => array(
+        'class' => 'is-addon'
+    ),
     'href' => 'access_restrictions.manage',
     'position' => 100
 );

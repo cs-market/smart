@@ -1,3 +1,5 @@
+{$default_minimal_qty = 1}
+
 {capture name="cartbox"}
 {if $runtime.mode == "checkout"}
     {if $cart.coupons|floatval}<input type="hidden" name="c_id" value="" />{/if}
@@ -49,14 +51,19 @@
                                     </a>
                                 {/if}
                             {/strip}
-                            <div class="ty-cart-content__sku ty-sku cm-hidden-wrapper{if !$product.product_code} hidden{/if}" id="sku_{$key}">
-                                {__("sku")}: <span class="cm-reload-{$obj_id}" id="product_code_update_{$obj_id}">{$product.product_code}<!--product_code_update_{$obj_id}--></span>
-                            </div>
-                            {if $product.product_options}
-                                <div class="cm-reload-{$obj_id} ty-cart-content__options" id="options_update_{$obj_id}">
-                                {include file="views/products/components/product_options.tpl" product_options=$product.product_options product=$product name="cart_products" id=$key location="cart" disable_ids=$disable_ids form_name="checkout_form"}
-                                <!--options_update_{$obj_id}--></div>
-                            {/if}
+                            {hook name="products:product_additional_info"}
+                                <div class="ty-cart-content__sku ty-sku cm-hidden-wrapper{if !$product.product_code} hidden{/if}" id="sku_{$key}">
+                                    {__("sku")}: <span class="cm-reload-{$obj_id}" id="product_code_update_{$obj_id}">{$product.product_code}<!--product_code_update_{$obj_id}--></span>
+                                </div>
+                                {hook name="checkout:product_options"}
+                                    {if $product.product_options}
+                                        <div class="cm-reload-{$obj_id} ty-cart-content__options" id="options_update_{$obj_id}">
+                                            <input type="hidden" name="no_cache" value="no_cache" />
+                                            {include file="views/products/components/product_options.tpl" product_options=$product.product_options product=$product name="cart_products" id=$key location="cart" disable_ids=$disable_ids form_name="checkout_form"}
+                                        <!--options_update_{$obj_id}--></div>
+                                    {/if}
+                                {/hook}
+                            {/hook}
 
                             {assign var="name" value="product_options_$key"}
                             {capture name=$name}
@@ -65,7 +72,7 @@
                                 {hook name="checkout:product_info"}
                                     {if $product.exclude_from_calculate}
                                         <strong><span class="price">{__("free")}</span></strong>
-                                    {elseif $product.discount|floatval || ($product.taxes && $settings.General.tax_calculation != "subtotal")}
+                                    {elseif $product.discount|floatval || ($product.taxes && $settings.Checkout.tax_calculation != "subtotal")}
                                         {if $product.discount|floatval}
                                             {assign var="price_info_title" value=__("discount")}
                                         {else}
@@ -80,7 +87,7 @@
                                                         <th class="ty-cart-content__more-info-title">{__("price")}</th>
                                                         <th class="ty-cart-content__more-info-title">{__("quantity")}</th>
                                                         {if $product.discount|floatval}<th class="ty-cart-content__more-info-title">{__("discount")}</th>{/if}
-                                                        {if $product.taxes && $settings.General.tax_calculation != "subtotal"}<th>{__("tax")}</th>{/if}
+                                                        {if $product.taxes && $settings.Checkout.tax_calculation != "subtotal"}<th>{__("tax")}</th>{/if}
                                                         <th class="ty-cart-content__more-info-title">{__("subtotal")}</th>
                                                     </tr>
                                                 </thead>
@@ -89,7 +96,7 @@
                                                         <td>{include file="common/price.tpl" value=$product.original_price span_id="original_price_`$key`" class="none"}</td>
                                                         <td class="ty-center">{$product.amount}</td>
                                                         {if $product.discount|floatval}<td>{include file="common/price.tpl" value=$product.discount span_id="discount_subtotal_`$key`" class="none"}</td>{/if}
-                                                        {if $product.taxes && $settings.General.tax_calculation != "subtotal"}<td>{include file="common/price.tpl" value=$product.tax_summary.total span_id="tax_subtotal_`$key`" class="none"}</td>{/if}
+                                                        {if $product.taxes && $settings.Checkout.tax_calculation != "subtotal"}<td>{include file="common/price.tpl" value=$product.tax_summary.total span_id="tax_subtotal_`$key`" class="none"}</td>{/if}
                                                         <td>{include file="common/price.tpl" span_id="product_subtotal_2_`$key`" value=$product.display_subtotal class="none"}</td>
                                                     </tr>
                                                 </tbody>
@@ -137,7 +144,7 @@
                                         <div class="ty-center ty-value-changer cm-value-changer">
                                         <a class="cm-increase ty-value-changer__increase">&#43;</a>
                                     {/if}
-                                    <input type="text" size="3" id="amount_{$key}" name="cart_products[{$key}][amount]" value="{$product.amount}" class="ty-value-changer__input cm-amount"{if $product.qty_step > 1} data-ca-step="{$product.qty_step}"{/if} />
+                                    <input type="text" size="3" id="amount_{$key}" name="cart_products[{$key}][amount]" value="{$product.amount}" class="ty-value-changer__input cm-amount"{if $product.qty_step > 1} data-ca-step="{$product.qty_step}"{/if} data-ca-min-qty="{if !$product.min_qty}{$default_minimal_qty}{else}{$product.min_qty}{/if}" />
                                     {if $settings.Appearance.quantity_changer == "Y"}
                                         <a class="cm-decrease ty-value-changer__decrease">&minus;</a>
                                         </div>

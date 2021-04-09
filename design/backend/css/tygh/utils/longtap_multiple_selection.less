@@ -12,16 +12,48 @@
               user-select: none;
 }
 
-.selected {
-    background-color: #d9ebfc !important;
-    outline: 1px solid rgb(137, 191, 252) !important;
-}
-
 @keyframes long-tap-animation {
     0% {
         background-color: #fff !important;
     }
     100% {
         background-color: rgb(137, 191, 252) !important;
+    }
+}
+
+.longtap-selection {
+    .table tr.cm-longtap-target {
+        
+        border-top: 1px solid rgba(102, 102, 102, 0.11);
+    }
+
+    .selected {
+        background-color: #d9ebfc !important;
+        box-shadow: inset 0 0 0px 1px rgb(78, 153, 236);
+
+        td {
+            border: 0;
+            background-color: transparent !important;
+        }
+    
+        &:hover {
+            background-color: #d9ebfc !important;
+    
+            > td {
+                background-color: transparent !important;
+            }
+        }
+    }
+}
+
+@media (max-width: @TabletBreakpoint) {
+    .longtap-selection {
+        .selected {
+            &:hover {
+                > td {
+                    background-color: transparent !important;
+                }
+            }
+        }
     }
 }

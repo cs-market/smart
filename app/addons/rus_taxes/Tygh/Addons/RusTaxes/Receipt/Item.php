@@ -90,7 +90,7 @@ class Item
      */
     public function getTotal()
     {
-        return $this->price * $this->quantity - $this->total_discount;
+        return Receipt::roundPrice($this->price * $this->quantity - $this->total_discount);
     }
 
     /**

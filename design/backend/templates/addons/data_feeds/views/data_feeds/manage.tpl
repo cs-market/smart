@@ -12,7 +12,7 @@
 
 {if $datafeeds}
 <div class="table-responsive-wrapper">
-    <table class="table sortable table-middle table-responsive">
+    <table class="table sortable table-middle table--relative table-responsive">
     <thead>
         <tr>
             <th width="5%" class="left mobile-hide">{include file="common/check_items.tpl"}</th>

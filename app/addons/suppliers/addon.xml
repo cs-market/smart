@@ -56,7 +56,7 @@
         </item>
         <item for="uninstall">DROP TABLE IF EXISTS `?:suppliers`</item>
         <item for="uninstall">DROP TABLE IF EXISTS `?:supplier_links`</item>
-        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_suppliers', 'Y', 'addons')</item>
+        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_suppliers', 'Y', 'users', 'suppliers', 'N')</item>
         <item for="uninstall">DELETE FROM ?:privileges WHERE privilege = 'manage_suppliers'</item>
     </queries>
     <email_templates type="file">resources/email_templates.xml</email_templates>

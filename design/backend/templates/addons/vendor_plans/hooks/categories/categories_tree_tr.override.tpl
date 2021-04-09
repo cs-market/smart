@@ -6,7 +6,7 @@
         <td width="8%">&nbsp;</td>
         <td width="54%">
             {strip}
-                <span style="padding-left: {$shift}px;">
+                <span style="padding-{$direction}: {$shift}px;">
                 {if $category.has_children || $category.subcategories}
                     {if $show_all}
                         <span alt="{__("expand_sublist_of_items")}" title="{__("expand_sublist_of_items")}" id="on_{$comb_id}" class="cm-combination {if $expand_all}hidden{/if}" /><span class="icon-caret-right"> </span></span>

@@ -64,21 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //
 // 'Management' page
 //
-if ($mode == 'manage') {
-
-    $selected_fields = Tygh::$app['view']->getTemplateVars('selected_fields');
-
-    $selected_fields[] = array('name' => '[data][is_pbp]', 'text' => __('pay_by_points'));
-    if (Registry::get('addons.reward_points.auto_price_in_points') == 'Y') {
-        $selected_fields[] = array('name' => '[data][is_oper]', 'text' => __('override_per'));
-    }
-    $selected_fields[] = array('name' => '[product_point_prices][point_price]', 'text' => __('price_in_points'));
-    $selected_fields[] = array('name' => '[data][is_op]', 'text' => __('override_gc_points_brief'));
-    //$selected_fields[] = array('name' => '[reward_points][amount]',	'text' => __('reward_points'));
-
-    Tygh::$app['view']->assign('selected_fields', $selected_fields);
-
-} elseif ($mode == 'm_update') {
+if ($mode == 'm_update') {
 
     $selected_fields = Tygh::$app['session']['selected_fields'];
 
@@ -105,23 +91,6 @@ if ($mode == 'manage') {
         $field_groups['C']['is_op'] = 'products_data';
         $filled_groups['C']['is_op'] = __('override_gc_points_brief');
     }
-
-    /*if (!empty($selected_fields['reward_points'])) {
-        $usergroups = fn_get_usergroups('C', DESCR_SL);
-
-        foreach ($usergroups as $usergroup_id => $v) {
-            $field_names['reward_points'][$usergroup_id] = $v['usergroup'];
-        }
-
-        $products_data = \Tygh::$app['view']->getTemplateVars('products_data');
-
-        foreach ($products_data as $key => $value) {
-            $products_data[$key]['reward_points'] = fn_get_reward_points($key, 'P');
-        }
-
-        \Tygh::$app['view']->assign('products_data', $products_data);
-
-    }*/
 
     if (isset($field_names['is_pbp'])) {
         unset($field_names['is_pbp']);

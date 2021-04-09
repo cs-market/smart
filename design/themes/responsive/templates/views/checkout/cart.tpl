@@ -1,5 +1,6 @@
 {script src="js/tygh/exceptions.js"}
 {script src="js/tygh/checkout.js"}
+{script src="js/tygh/cart_content.js"}
 
 {if !$cart|fn_cart_is_empty}
     {include file="views/checkout/components/cart_content.tpl"}

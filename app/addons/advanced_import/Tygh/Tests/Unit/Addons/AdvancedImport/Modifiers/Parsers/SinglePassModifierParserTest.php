@@ -110,6 +110,13 @@ class SinglePassModifierParserTest extends ATestCase
                     'parameters' => array('$value=*', '10', '$value="**"', '20', '$value=\'***\'', '100', '$value=-', '0'),
                 )
             ),
+            array(
+                'case($value="test \'sub\' (test)", "newcat", $value="test (sub (test))", "newcat1", $value="test, test", "newcat2")',
+                array(
+                    'function' => 'case',
+                    'parameters' => array('$value="test \'sub\' (test)"', 'newcat', '$value="test (sub (test))"', 'newcat1', '$value="test, test"', 'newcat2'),
+                )
+            ),
         );
     }
 

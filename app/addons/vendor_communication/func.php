@@ -16,6 +16,9 @@ use Tygh\Registry;
 use Tygh\Navigation\LastView;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Common\OperationResult;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -176,27 +179,27 @@ function fn_vendor_communication_add_thread_message(array $message_data, $notify
             fn_vendor_communication_update_thread($thread_data);
 
             if ($notify_by_email && Registry::get('settings.Appearance.email_templates') == 'new') {
-                $thread_full_data = fn_vendor_communication_get_thread(array('thread_id' => $message_data['thread_id']));
+                $thread_full_data = fn_vendor_communication_get_thread(['thread_id' => $message_data['thread_id']]);
 
-                if ($message_data['user_type'] != 'A') {
-                    fn_vendor_communication_send_admin_email_notification($thread_full_data);
+                /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+                $event_dispatcher = Tygh::$app['event.dispatcher'];
+                if (AREA === 'C') {
+                    $force_notification['C'] = false;
+                    $force_notification['A'] = ($message_data['user_type'] !== 'A');
+                } else {
+                    $force_notification[$message_data['user_type']] = false;
                 }
 
-                if ($message_data['user_type'] != 'V') {
-                    fn_vendor_communication_send_vendor_email_notification($thread_full_data);
-                }
+                /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+                $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+                $notification_rules = $notification_settings_factory->create($force_notification);
 
-                if ($message_data['user_type'] != 'C') {
-                    fn_vendor_communication_send_customer_email_notification($thread_full_data);
-                }
+                $event_dispatcher->dispatch('vendor_communication.message_received', $thread_full_data, $notification_rules);
             }
         } else {
             $result->setSuccess(false);
         }
     }
-
-    // [cs-market]
-    fn_set_hook('vendor_communication_add_thread_message_post', $thread_full_data, $result);
 
     return $result;
 }
@@ -242,6 +245,15 @@ function fn_vendor_communication_get_user_name($user_id)
     if (!empty($user_id)) {
         $user_data = fn_get_user_short_info($user_id);
 
+        if ($user_data['user_type'] === UserTypes::ADMIN) {
+            $company_name = Registry::get('settings.Company.company_name');
+            $user_name = $company_name !== '' ? $company_name : __('administrator');
+            return $user_name;
+        } elseif ($user_data['user_type'] === UserTypes::VENDOR) {
+            $user_name = fn_get_company_name($user_data['company_id']);
+            return $user_name;
+        }
+
         if (!empty($user_data['firstname'])) {
             $user_name .= $user_data['firstname'] . ' ';
         }
@@ -266,9 +278,13 @@ function fn_vendor_communication_send_admin_email_notification(array $thread_dat
     $result = false;
 
     if (!empty($thread_data['thread_id'])
-        && Registry::get('addons.vendor_communication.notify_admin') == 'Y'
+        && Registry::get('addons.vendor_communication.notify_admin') == YesNo::YES
     ) {
-        $root_admin_email = db_get_field('SELECT email FROM ?:users WHERE user_type = ?s AND is_root = ?s LIMIT 1', 'A', 'Y');
+        $root_admin_email = db_get_field(
+            'SELECT email FROM ?:users WHERE user_type = ?s AND is_root = ?s LIMIT 1',
+            UserTypes::ADMIN,
+            YesNo::YES
+        );
         $thread_url = fn_url("vendor_communication.view&thread_id={$thread_data['thread_id']}", 'A');
 
         // cannot generate url for admin from vendor area
@@ -307,7 +323,7 @@ function fn_vendor_communication_send_vendor_email_notification(array $thread_da
 
     if (!empty($thread_data['thread_id'])
         && !empty($thread_data['company_id'])
-        && Registry::get('addons.vendor_communication.notify_vendor') == 'Y'
+        && Registry::get('addons.vendor_communication.notify_vendor') == YesNo::YES
     ) {
         $vendor_email = db_get_field('SELECT email FROM ?:companies WHERE company_id = ?i', $thread_data['company_id']);
 
@@ -345,7 +361,7 @@ function fn_vendor_communication_send_customer_email_notification(array $thread_
 
     if (!empty($thread_data['thread_id'])
         && !empty($thread_data['user_id'])
-        && Registry::get('addons.vendor_communication.notify_customer') == 'Y'
+        && Registry::get('addons.vendor_communication.notify_customer') == YesNo::YES
     ) {
         $user_data = fn_get_user_short_info($thread_data['user_id']);
 
@@ -409,6 +425,7 @@ function fn_vendor_communication_get_threads(array $params = array(), $items_per
 
     $fields = array(
         'thread_id' => 'vendor_communications.thread_id',
+        'storefornt_id' => 'vendor_communications.storefront_id',
         'status' => 'vendor_communications.status',
         'user_id' => 'vendor_communications.user_id',
         'company_id' => 'vendor_communications.company_id',
@@ -632,7 +649,7 @@ function fn_vendor_communication_get_thread_messages(array $params)
 
             foreach ($messages as $key => $message) {
 
-                if ($message['user_type'] == 'V') {
+                if ($message['user_type'] == UserTypes::VENDOR) {
                     $messages[$key]['vendor_info']['logos'] = fn_vendor_communication_get_vendor_logos($message['company_id']);
                 }
             }
@@ -676,15 +693,15 @@ function fn_vendor_communication_can_user_access_thread($thread_id, array $auth)
         return $can_access;
     }
 
-    if ($auth['user_type'] == 'A') {
+    if ($auth['user_type'] == UserTypes::ADMIN) {
         $can_access = true;
-    } elseif ($auth['user_type'] == 'V' && !empty($auth['company_id'])) {
+    } elseif ($auth['user_type'] == UserTypes::VENDOR && !empty($auth['company_id']) && AREA == 'A') {
         $can_access = (bool) db_get_field(
             'SELECT thread_id FROM ?:vendor_communications WHERE company_id = ?i AND thread_id = ?i',
             $auth['company_id'],
             $thread_id
         );
-    } elseif ($auth['user_type'] == 'C') {
+    } elseif (AREA === 'C') {
         $can_access = (bool) db_get_field(
             'SELECT thread_id FROM ?:vendor_communications WHERE user_id = ?i AND thread_id = ?i',
             $auth['user_id'],
@@ -732,11 +749,11 @@ function fn_vendor_communication_get_thread_user_status(array $thread, array $au
         && !empty($auth['user_type'])
         && !empty($auth['user_id'])
     ) {
-        if ($auth['user_type'] == 'C'
+        if ($auth['user_type'] == UserTypes::CUSTOMER
             && $auth['user_id'] != $thread['last_message_user_id']
         ) {
             $status = VC_THREAD_STATUS_HAS_NEW_MESSAGE;
-        } elseif ($auth['user_type'] == 'V'
+        } elseif ($auth['user_type'] == UserTypes::VENDOR
             && $thread['user_id'] == $thread['last_message_user_id']
         ) {
             $status = VC_THREAD_STATUS_HAS_NEW_MESSAGE;

@@ -16,10 +16,6 @@ msgctxt "Languages::price_list"
 msgid "Price list"
 msgstr "Price list"
 
-msgctxt "Languages::selected_fields"
-msgid "Selected fields"
-msgstr "Selected fields"
-
 msgctxt "Languages::generating_pdf"
 msgid "Generating PDF. Please, be patient..."
 msgstr "Generating PDF. Please, be patient..."

@@ -6,7 +6,7 @@
         <input type="hidden" name="page" value="{$smarty.request.page}" />
         {assign var="c_url" value=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
         {assign var="rev" value=$smarty.request.content_id|default:"pagination_contents"}
-        <table width="100%" class="table table-middle" >
+        <table width="100%" class="table table-middle table--relative" >
             <thead>
             <tr>
                 <th class="center" width="5%">

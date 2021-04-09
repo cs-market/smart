@@ -201,6 +201,14 @@ function fn_rus_geolocation_calculate_rate_shipping_product($cart, $data_product
     }
 
     $location = fn_get_customer_location($auth, $cart);
+    if (empty($location['zipcode']) && Registry::get('addons.rus_sdek.status') === 'A') {
+        $city_ids = fn_rus_cities_get_city_ids($location['city'], $location['state'], $location['country']);
+        $city = fn_rus_sdek_get_sdek_data($city_ids);
+        if ($city) {
+            $city = reset($city);
+            list($location['zipcode'],) = explode(',', $city['zipcode'], 2);
+        }
+    }
     $product_groups = Shippings::groupProductsList($data_product, $location);
 
     $group = reset($product_groups);

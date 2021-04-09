@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.8.2/addons/recaptcha.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"X-Crowdin-File: /release-4.11.3/addons/recaptcha.po\n"
+"PO-Revision-Date: 2020-02-04 07:11\n"
 
 msgctxt "Addons::name::recaptcha"
 msgid "Google reCAPTCHA"
@@ -64,6 +62,18 @@ msgctxt "SettingsOptions::recaptcha::recaptcha_secret"
 msgid "Secret"
 msgstr "Secret"
 
+msgctxt "SettingsSections::recaptcha::general"
+msgid "General"
+msgstr ""
+
+msgctxt "SettingsSections::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr ""
+
+msgctxt "SettingsOptions::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr ""
+
 msgctxt "Languages::error_validator_recaptcha"
 msgid "Please confirm you are not a robot."
 msgstr "Prosím potvrďte, že nejste robot."
@@ -73,6 +83,10 @@ msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> a
 msgstr "<p>Pokyny, jak získat <b>site key</b> a <b>secret</b> jsou dostupné <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/docs/start\">zde</a></b>.</p>"
 
 msgctxt "Languages::recaptcha.text_settings_notice"
-msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.</p>"
-msgstr "<p>Pokyny, jak získat <b>site key</b> a <b>secret</b> jsou dostupné <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">zde</a></b>.</p>"
+msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.<br>Please note that the add-on currently supports only <b>reCAPTCHA v2: Checkbox</b></p>"
+msgstr ""
+
+msgctxt "Languages::recaptcha.text_forbidden_countries_notice"
+msgid "<p>Google reCAPTACHA will be disabled for the selected countries. Instead, visitors from those countries will be asked to type a few symbols they see on the screen.</p>"
+msgstr ""
 

@@ -348,6 +348,10 @@ msgctxt "Languages::addons.rus_sdek.show_all"
 msgid "Show all items"
 msgstr "Show all items"
 
+msgctxt "Languages::addons.rus_sdek.show_all_on_map"
+msgid "Show all items on map"
+msgstr "Show all items on map"
+
 msgctxt "Languages::addons.rus_sdek.search_string"
 msgid "Search"
 msgstr "Search"

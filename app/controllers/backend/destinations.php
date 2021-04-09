@@ -21,20 +21,13 @@ $_REQUEST['destination_id'] = empty($_REQUEST['destination_id']) ? 0 : $_REQUEST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $suffix = '';
-    //
-    // Update destination elements
-    //
-    if ($mode == 'update') {
 
+    if ($mode === 'update') {
         $destination_id = fn_update_destination($_REQUEST['destination_data'], $_REQUEST['destination_id'], DESCR_SL);
-
         $suffix = ".update?destination_id=$destination_id";
     }
 
-    //
-    // Delete selected destinations
-    //
-    if ($mode == 'm_delete') {
+    if ($mode === 'm_delete') {
 
         if (!empty($_REQUEST['destination_ids'])) {
             fn_delete_destinations($_REQUEST['destination_ids']);
@@ -43,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix = ".manage";
     }
 
-    if ($mode == 'delete') {
+    if ($mode === 'delete') {
 
         if (!empty($_REQUEST['destination_id'])) {
             fn_delete_destinations((array) $_REQUEST['destination_id']);
@@ -55,10 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return array(CONTROLLER_STATUS_OK, 'destinations' . $suffix);
 }
 
-// ----------------------------- GET routines -------------------------------------------------
-
-// Destiantion data
-if ($mode == 'update') {
+if ($mode === 'update') {
 
     $destination = db_get_row("SELECT a.destination_id, a.status, destination, a.localization FROM ?:destinations as a LEFT JOIN ?:destination_descriptions as b ON b.destination_id = a.destination_id AND b.lang_code = ?s WHERE a.destination_id = ?i", DESCR_SL, $_REQUEST['destination_id']);
 
@@ -81,10 +71,10 @@ if ($mode == 'update') {
     $destination_data['addresses'] = db_get_hash_single_array("SELECT element_id, element FROM ?:destination_elements WHERE element_type = 'A' AND destination_id = ?i", array('element_id', 'element'), $_REQUEST['destination_id']);
     $destination_data['addresses'] = implode("\n", $destination_data['addresses']);
 
-    $all_countries = fn_get_simple_countries(true, CART_LANGUAGE);
+    $all_countries = fn_get_simple_countries(true, DESCR_SL);
     $all_countries = array_diff_assoc($all_countries, $destination_data['countries']);
 
-    $all_states = fn_destination_get_states(CART_LANGUAGE);
+    $all_states = fn_destination_get_states(DESCR_SL);
     $all_states = array_diff_assoc($all_states, $destination_data['states']);
 
     Tygh::$app['view']->assign('destination_data', $destination_data);
@@ -93,15 +83,41 @@ if ($mode == 'update') {
     Tygh::$app['view']->assign('states', $all_states);
     Tygh::$app['view']->assign('countries', $all_countries);
 
-// Add destination
-} elseif ($mode == 'add') {
+    $tabs = Registry::ifGet('navigation.tabs', []);
+    $tabs['detailed'] = [
+        'title' => __('general'),
+        'js'    => true,
+    ];
+    Registry::set('navigation.tabs', $tabs);
 
-    Tygh::$app['view']->assign('states', fn_destination_get_states(CART_LANGUAGE));
-    Tygh::$app['view']->assign('countries', fn_get_simple_countries(true, CART_LANGUAGE));
+} elseif ($mode === 'add') {
 
-// Destinations list
-} elseif ($mode == 'manage') {
+    Tygh::$app['view']->assign('states', fn_destination_get_states(DESCR_SL));
+    Tygh::$app['view']->assign('countries', fn_get_simple_countries(true, DESCR_SL));
+
+    Registry::set('navigation.tabs', [
+        'detailed' => [
+            'title' => __('general'),
+            'js' => true
+        ]
+    ]);
+} elseif ($mode === 'manage') {
 
     $destinations = fn_get_destinations(DESCR_SL);
     Tygh::$app['view']->assign('destinations', $destinations);
+}
+
+if (in_array($mode, ['add', 'update', 'manage'])) {
+    $dynamic_sections = Registry::ifGet('navigation.dynamic.sections', []);
+    $dynamic_sections['shippings'] = [
+        'title' => __('shipping_methods'),
+        'href'  => 'shippings.manage',
+    ];
+    $dynamic_sections['destinations'] = [
+        'title' => __('rate_areas'),
+        'href'  => 'destinations.manage',
+    ];
+
+    Registry::set('navigation.dynamic.active_section', 'destinations');
+    Registry::set('navigation.dynamic.sections', $dynamic_sections);
 }

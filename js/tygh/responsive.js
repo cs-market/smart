@@ -9,17 +9,32 @@
             },
 
             responsiveScroll: function() {
-                $.ceEvent('on', 'ce.needScroll', function(opt) {
+                this.needScrollInited = this.needScrollInited || false;
+                
+                if (this.needScrollInited) {
+                    return;
+                }
+                this.needScrollInited = true;
 
-                    opt.need_scroll = false;
-                    setTimeout(function() {
-                        $.scrollToElm(opt.jelm.data('caScroll'));
-                    }, 310);
+                $.ceEvent('on', 'ce.needScroll', function(opt) {
+                    opt.timeout = 310;
                 });
             },
 
             responsiveTabs: function() {
-                if(this.winWidth() <= 480) {           
+                if (this.winWidth() <= 480) {
+                    var accordionOptions = {
+                        animate: $(_.body).data('caAccordionAnimateDelay') || 300,
+                        heightStyle: "content",
+                        activate: function (event, ui) {
+                            var selectedItem = $(ui.newHeader);
+
+                            if (!selectedItem.length) return;
+
+                            $.scrollToElm(selectedItem)
+                        }
+                    };
+
                     // conver tabs to accordion
                     $('.cm-j-tabs:not(.cm-j-tabs-disable-convertation)').each(function(index) {
                         var accordion = $('<div class="ty-accordion cm-accordion" id="accordion_id_' + index + '">');
@@ -32,8 +47,13 @@
 
                         if(!$('#accordion_id_' + index).length) {
 
-                            $(this).find('>ul>li').each(function() {
+                            $(this).find('>ul>li').each(function(indexTab) {
                                 var id = $(this).attr('id');
+
+                                if ($(this).hasClass('active')) {
+                                    accordionOptions.active = indexTab;
+                                }
+
                                 var content = $('.cm-tabs-content > #content_' + id).show();
 
                                 // rename tab id
@@ -48,26 +68,7 @@
                         }
                     });
 
-                    $('.cm-accordion').ceAccordion('reinit', {
-                        animate: 300,
-                        heightStyle : "content",
-                        activate: function(event, ui) {
-                            var accordionTop = $(this).scrollTop(),
-                                headerOffset  = $(ui.newHeader);
-
-                            if (headerOffset.length > 0) {
-                                if ("-ms-user-select" in document.documentElement.style && navigator.userAgent.match(/IEMobile\/10\.0/)) {
-                                    setTimeout(function() {
-                                        $('html, body').scrollTop(accordionTop + headerOffset.offset().top  - 10);
-                                    }, 300);
-                                } else {
-                                    $('html, body').animate({
-                                        scrollTop: accordionTop + headerOffset.offset().top - 10
-                                    }, 300);
-                                }
-                            }
-                        }
-                    });
+                    $('.cm-accordion').ceAccordion('reinit', accordionOptions);
 
                     var active = _.anchor;
                     if(typeof active !== 'undefined' && $(active).length > 0) {
@@ -97,8 +98,7 @@
                 }
             },
 
-            responsiveMenu: function() {
-
+            responsiveMenu: function(elms) {
                 var whichEvent = ('ontouch' in document.documentElement ? "touch" : "click");
 
                 // FIXME Windows IE 8 doesn't have touch event
@@ -106,21 +106,13 @@
                     whichEvent = 'click';
                 }
 
-                if($('.ty-menu__menu-btn').data('ca-responsive-menu') !== true) {
-
-                    $('.ty-menu__menu-btn').on(whichEvent, function(e) {
-                        var menu_elm = $('.cm-responsive-menu');
-                        $(this).parent(menu_elm).find('.ty-menu__item').toggle();
+                if (elms) {
+                    $(elms).each(function () {
+                        _addResponsiveMenuOpenEvent(whichEvent, this);
                     });
-
-                    $('.cm-responsive-menu-toggle').on(whichEvent,function (e) {
-                        $(this).toggleClass('ty-menu__item-toggle-active');
-                        $('.icon-down-open', this).toggleClass('icon-up-open');
-                        $(this).parent().find('.cm-responsive-menu-submenu').first().toggleClass('ty-menu__items-show');
-                    });
-
-                    $('.ty-menu__menu-btn').data('ca-responsive-menu', true);
-                }
+                } else {
+                    _addResponsiveMenuOpenEvent(whichEvent);
+                };
 
                 if(_.isTouch == false && ui.winWidth() >= 767) {
                     $('.cm-responsive-menu').on('mouseover mouseout', function(e) {
@@ -128,20 +120,43 @@
                     });
                 }
 
+                function _addResponsiveMenuOpenEvent(whichEvent, elm) {
+                    var responsiveMenu = elm || document;
+
+                    if ($(responsiveMenu).find('.ty-menu__menu-btn').data('ca-responsive-menu') !== true) {
+
+                        $(responsiveMenu).find('.ty-menu__menu-btn').on(whichEvent, function (e) {
+                            var menu_elm = $('.cm-responsive-menu');
+                            $(this).parent(menu_elm).find('.ty-menu__item').toggle();
+                        });
+
+                        $(responsiveMenu).find('.cm-responsive-menu-toggle').on(whichEvent, function (e) {
+
+                            $(this).toggleClass('ty-menu__item-toggle-active');
+                            $('.icon-down-open', this).toggleClass('icon-up-open');
+                            $(this).parent().find('.cm-responsive-menu-submenu').first().toggleClass('ty-menu__items-show');
+                        });
+
+                        $(responsiveMenu).find('.ty-menu__menu-btn').data('ca-responsive-menu', true);
+                    }
+                }
             },
 
             responsiveMenuLargeTouch: function(e) {
                 var elm = $(e.target);
                 var menuWidth = $('.cm-responsive-menu').width();
-                if (ui.winWidth() >= 767 && e.type == 'touchstart') {                    
-                    
+                if (ui.winWidth() >= 767 && e.type == 'touchstart') {
+                    if (elm.is('.ty-menu__submenu-link')) {
+                        elm.click();
+                    }
+
                     var menuItem = elm.hasClass('cm-menu-item-responsive') ? elm : elm.closest('.cm-menu-item-responsive');
                     if (!menuItem.hasClass('is-hover-menu') && menuItem.find('.ty-menu__submenu-items').length > 0) {
                         e.preventDefault();
                         menuItem.siblings('.cm-menu-item-responsive').removeClass('is-hover-menu');
                         menuItem.addClass('is-hover-menu');
                     }
-                    
+
                     var subMenu = $('.ty-menu__submenu-items');
                     if (subMenu.is(':visible') && !elm.closest('.cm-menu-item-responsive').length) {
                         $('.cm-menu-item-responsive').removeClass('is-hover-menu');
@@ -155,34 +170,57 @@
             },
 
             detectMenuWidth: function(e) {
-                var elm = $(e.target);
-                var menuElm = elm.parents(".cm-responsive-menu");
-                var isHorisontalMenu = menuElm.parent().hasClass("ty-menu-vertical") ? false : true;
+                var $self            = $(e.target),
+                    $menuItem        = $self.closest('.cm-menu-item-responsive'),
+                    $menuItemSubmenu = $('.cm-responsive-menu-submenu', $menuItem).first(),
+                    $menu            = $self.parents('.cm-responsive-menu');
 
-                if(isHorisontalMenu) {
-                    var menuWidth = menuElm.outerWidth();
-                    var menuOffset = menuElm.offset();
-                    var menuItemElm = elm.closest('.cm-menu-item-responsive');
-                    $('.ty-menu__submenu-to-right').removeClass('ty-menu__submenu-to-right');
-                    var submenu, position;
+                var verticalMenuClassName     = 'ty-menu-vertical',
+                    reverseDirectionClassName = 'ty-menu__submenu-reverse-direction',
+                    isHorizontal              = !$menu.parent().hasClass(verticalMenuClassName);
 
-                    // Detect menu collisions
-                    if(menuItemElm) {
-                        if(typeof menuItemElm.offset()  !== "undefined") {
-                            menuWidth = menuWidth - (menuItemElm.offset().left - menuOffset.left)
-                        }
-                        submenu = $('.cm-responsive-menu-submenu', menuItemElm).first();
-                        
-                        if(submenu.length) {
-                            submenu.css({visibility: "hidden", left: 0});
-                            position = submenu.outerWidth();
-                            if(position > menuWidth) {
-                                submenu.parent().addClass('ty-menu__submenu-to-right');
-                            }
-                            submenu.css({visibility: "", left: "auto"});
-                        }
+                if (!isHorizontal || !$menuItemSubmenu.length || !$menuItem.length) { 
+                    return false;
+                }
 
-                    }
+                var menuWidth            = $menu.outerWidth(),
+                    itemWidth            = $menuItem.outerWidth(),
+                    menuItemSubmenuWidth = _getSubmenuOriginWidth($menuItemSubmenu);
+
+                $('.' + reverseDirectionClassName).removeClass(reverseDirectionClassName); // disable toggled (always clear state)
+
+                // apply only to second half of elements in menu
+                if ($menuItem.index() / $menu.children().length > 0.5) {
+                    var _offset = Math.abs(
+                        (_.language_direction == "rtl" 
+                            ? ($menuItem.offset().left + itemWidth) - ($menu.offset().left + menuWidth)
+                            : $menuItem.offset().left - $menu.offset().left
+                        )
+                    );
+
+                    $menuItemSubmenu.toggleClass(
+                        reverseDirectionClassName,
+                        (
+                            (menuWidth - (itemWidth * 2) < (menuItemSubmenuWidth + itemWidth))
+                            ||
+                            (_offset + menuItemSubmenuWidth > menuWidth)
+                        )
+                    );
+                }
+
+                /**
+                 * Returns origins submenu width.
+                 * FIXME: using dirty hack.
+                 * @param {jQueryHTMLElement} $submenu 
+                 */
+                function _getSubmenuOriginWidth ($submenu) {
+                    $submenu.css('left', 0);
+                    var _width = $submenu.outerWidth() || 0;
+
+                    // remove inline style perfectly
+                    $submenu.get(0).style.left = '';
+
+                    return _width;
                 }
             },
 
@@ -238,6 +276,14 @@
             resizeDialog: function() {
                 var self = this;
                 var dlg = $('.ui-dialog');
+                var $contentElem = $(dlg).find('.ui-dialog-content');
+                
+                if (self.winWidth() > 767) {
+                    $contentElem.data('caDialogAutoHeight', false);
+                    return;
+                }
+
+                $contentElem.data('caDialogAutoHeight', true);
 
                 $('.ui-widget-overlay').css({
                     'min-height': $(window).height()
@@ -258,7 +304,7 @@
                     'width': $(window).width() - 80
                 });
 
-                $(dlg).find('.ui-dialog-content').css({
+                $contentElem.css({
                     'height': 'auto',
                     'max-height': 'none'
                 });
@@ -292,8 +338,14 @@
                 var self = this;
                 $.ceEvent('on', 'ce.dialogshow', function() {
                     if(self.winWidth() <= 767) {
+                        var currentScrollPosition = $(document).scrollTop();
+
                         self.resizeDialog();
                         $('body,html').scrollTop(0);
+
+                        $.ceEvent('on', 'ce.dialogclose', function () {
+                            $('body,html').scrollTop(currentScrollPosition);
+                        });
                     }
                 });
             },
@@ -346,16 +398,12 @@
             ui.winWidth();
             ui.responsiveTables();
             ui.responsiveFilters();
-            if(ui.winWidth() <= 767) {
-                ui.resizeDialog();
-            }
+            ui.resizeDialog();
         });
 
         if (window.addEventListener) {
             window.addEventListener('orientationchange', function() {
-                if(ui.winWidth() <= 767) {
-                    ui.resizeDialog();
-                }
+                ui.resizeDialog();
                 $.ceDialog('get_last').ceDialog('reload');
             }, false);
         }
@@ -368,14 +416,11 @@
         // responsive filters
         ui.responsiveFilters();
 
-        $.ceEvent('on', 'ce.ajaxdone', function() {
+        $.ceEvent('on', 'ce.ajaxdone', function(elms) {
             ui.responsiveTables();
-            ui.responsiveMenu();
+            ui.responsiveMenu(elms);
             ui.responsiveFilters();
-
-            if(ui.winWidth() <= 767) {
-                ui.resizeDialog();
-            }
+            ui.resizeDialog();
         });
 
         // Menu and Inline text links init

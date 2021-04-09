@@ -12,13 +12,13 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Languages\Languages;
-use Tygh\Shippings\Shippings;
-use Tygh\Bootstrap;
-use Tygh\Navigation\LastView;
 use Tygh\Addons\RusTaxes\Receipt\Item as ReceiptItem;
 use Tygh\Addons\RusTaxes\TaxType;
+use Tygh\Languages\Languages;
+use Tygh\Navigation\LastView;
+use Tygh\Registry;
+use Tygh\Shippings\Shippings;
+use Tygh\Template\Document\Variables\PickpupPointVariable;
 
 if ( !defined('AREA') ) { die('Access denied'); }
 
@@ -162,7 +162,7 @@ function fn_sdek_calculate_cost_by_shipment($order_info, $shipping_info, $shipme
         $package_length = empty($p_ship_params['box_length']) ? $length : $p_ship_params['box_length'];
         $package_width = empty($p_ship_params['box_width']) ? $width : $p_ship_params['box_width'];
         $package_height = empty($p_ship_params['box_height']) ? $height : $p_ship_params['box_height'];
-        $weight_ar = fn_expand_weight($product_weight);
+        $weight_ar = fn_convert_weight_to_imperial_units($product_weight);
         $weight = $weight_ar['plain'];
 
         $params_product['weight'] = $weight;
@@ -485,11 +485,12 @@ function fn_sdek_check_weight($weight, $symbol_grams)
  */
 function fn_sdek_normalize_tax_type($tax_type)
 {
-    $map = array(
-        'none' => 'vatx',
-        'vat110' => 'vat10',
-        'vat118' => 'vat18'
-    );
+    $map = [
+        TaxType::NONE    => 'vatx',
+        TaxType::VAT_110 => 'vat10',
+        TaxType::VAT_118 => 'vat18',
+        TaxType::VAT_120 => 'vat20',
+    ];
 
     $tax_type = isset($map[$tax_type]) ? $map[$tax_type] : $tax_type;
 
@@ -514,6 +515,9 @@ function fn_sdek_calculate_tax_sum($tax_type, $price)
             break;
         case TaxType::VAT_18:
             $result = $price * 18 / 118;
+            break;
+        case TaxType::VAT_20:
+            $result = $price * 20 / 120;
             break;
         default:
             $result = 0;
@@ -675,3 +679,47 @@ function fn_rus_sdek_delete_city_post($city_id)
 {
     db_query('DELETE FROM ?:rus_sdek_cities_link WHERE city_id = ?i', $city_id);
 }
+
+/**
+ * Hook handler: sets pickup point data.
+ */
+function fn_rus_sdek_pickup_point_variable_init(
+    PickpupPointVariable $instance,
+    $order,
+    $lang_code,
+    &$is_selected,
+    &$name,
+    &$phone,
+    &$full_address,
+    &$open_hours_raw,
+    &$open_hours,
+    &$description_raw,
+    &$description
+) {
+    if (!empty($order['shipping'])) {
+        if (is_array($order['shipping'])) {
+            $shipping = reset($order['shipping']);
+        } else {
+            $shipping = $order['shipping'];
+        }
+
+        if (!isset($shipping['module']) || $shipping['module'] !== 'sdek') {
+            return;
+        }
+
+        if (isset($shipping['office_data'])) {
+            $pickup_data = $shipping['office_data'];
+            
+            $is_selected = true;
+            $name = $pickup_data['Name'];
+            $full_address = $pickup_data['FullAddress'];
+            $phone = $pickup_data['Phone'];
+            $open_hours = $pickup_data['WorkTime'];
+            $open_hours_raw = [$open_hours];
+            $description_raw = $description = $pickup_data['AddressComment'];
+        }
+    }
+
+    return;
+}
+

@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: no\n"
-"X-Crowdin-File: /release-4.8.2/editions/mve.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:08\n"
+"X-Crowdin-File: /release-4.11.5/editions/mve.po\n"
+"X-Crowdin-File-ID: 3708\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Languages::add_companies"
 msgid "Add vendors"
@@ -145,24 +145,32 @@ msgid "Notify vendors by e-mail"
 msgstr "Varsle forhandlere via e-post"
 
 msgctxt "Languages::privileges.manage_payouts"
-msgid "Manage payouts"
-msgstr "Administrer utbetalinger"
+msgid "Can edit"
+msgstr ""
 
 msgctxt "Languages::privileges.manage_vendors"
-msgid "Manage vendors"
-msgstr "Administrer forhandlere"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.vendor_payouts"
+msgid "Accounting"
+msgstr ""
 
 msgctxt "Languages::privileges.view_payouts"
-msgid "View payouts"
-msgstr "Vis utbetalinger"
+msgid "Can view"
+msgstr ""
 
 msgctxt "Languages::privileges.view_vendors"
-msgid "View vendors"
-msgstr "Vis forhandlere"
+msgid "Can view"
+msgstr ""
 
 msgctxt "Languages::privilege_sections.vendors"
-msgid "Vendors"
-msgstr "Forhandlere"
+msgid "Store privileges"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.vendors"
+msgid "Stores"
+msgstr ""
 
 msgctxt "Languages::sales_period"
 msgid "Sales period"
@@ -276,6 +284,10 @@ msgctxt "Languages::vendors"
 msgid "Vendors"
 msgstr "Forhandlere"
 
+msgctxt "Languages::vendors_menu_title"
+msgid "Vendors"
+msgstr ""
+
 msgctxt "Languages::vendors_menu_description"
 msgid "Sorted list of vendor accounts registered in the store."
 msgstr "Sortert liste over forhandler kontoer registrert i butikken."
@@ -315,6 +327,10 @@ msgstr "Vis forhandlers produkter"
 msgctxt "Languages::view_vendor_users"
 msgid "View vendor users"
 msgstr "Vis forhandlers brukere"
+
+msgctxt "Languages::view_vendor_admins"
+msgid "View vendor admins"
+msgstr ""
 
 msgctxt "Languages::you_can_edit_account_details"
 msgid "You can edit the account details now."
@@ -420,6 +436,18 @@ msgctxt "Languages::email_template.company_payment_notification"
 msgid "Company payment"
 msgstr "Firma betaling"
 
+msgctxt "Languages::email_template.vendor_invitation"
+msgid "Vendor invitation"
+msgstr ""
+
+msgctxt "Languages::vendor_invitation_email_subject"
+msgid "Come Sell With [default_company_name]"
+msgstr ""
+
+msgctxt "Languages::vendor_invitation_email_body"
+msgid "<p>Hello,</p><br/><p>We'd like to invite you to <a href=\"[create_account_url]\">create an account</a> with [default_company_name].  You'll be able to expand your client base by listing your products on our platform and selling them to our visitors.</p><br/><p>Best regards,</p><p>[default_company_name] team</p>"
+msgstr ""
+
 msgctxt "Languages::vendor_terms_n_conditions"
 msgid "I accept the [terms_href]"
 msgstr "Jeg aksepterer [terms_href]"
@@ -436,28 +464,100 @@ msgctxt "Languages::vendor_terms_n_conditions_content"
 msgid "<p>Please read these Terms and Conditions (\"Terms\", \"Terms and Conditions\") carefully before using the <a href=\"http://www.mywebsite.com\">http://www.mywebsite.com</a> website and the My Mobile App mobile application (the \"Service\") operated by My Company (\"us\", \"we\", or \"our\").</p><p><strong>By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the Terms then you may not access the Service.</strong></p><p><strong>Purchases</strong></p><p>If you wish to purchase any product or service made available through the Service (\"Purchase\"), you may be asked to supply certain information relevant to your Purchase including, without limitation, your ...</p><p><strong>Content</strong></p><p>Our Service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material (\"Content\"). You are responsible for the ...</p><p><strong>Changes</strong></p><p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material we will try to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.</p><p><strong>Contact Us</strong></p><p>If you have any questions about these Terms, please contact us.</p>"
 msgstr "<p>Vennligst les gjennom våre vilkår og betingelser før du kjøper produkter fra denne leverandøren via nettstedet http://www.mywebsite.com eller vår mobilapplikasjon.</p><p><strong>Ved å sende ordren godtar du disse vilkåre og betingelser. Hvis du er uenig med vilkårene skal du ikke benytte deg av tjenesten.</strong></p><p><strong>Kjøp</strong></p><p>Hvis du ønsker å kjøpe et produkt eller en tjeneste som gjøres tilgjengelig gjennom oss, kan du bli bedt om å oppgi informasjon som er relevant til kjøpet inkludert...</p><p><strong>Innhold</strong></p><p>Vår tjeneste lar deg legge inn, linke, lagre, dele og ellers gjøre tilgjengelig visse opplysninger, tekst, grafikk, videoer eller annet materiale. Du er ansvarlig for...</p><p><strong>Endringer</strong></p><p>Vi forbeholder oss retten til, etter eget skjønn, å endre eller erstatte disse vilkårene når som helst. Hvis en endring er viktig vil vi forsøke å gi minst 30 dagers varsel før eventuelle nye vilkår trer i kraft. Hva som er en vesentlig endring vil bli fastsatt etter eget skjønn.</p><p><strong>Kontakt oss</strong></p><p>Hvis du har spørsmål om disse vilkårene, kan du ta kontakt med oss.</p>"
 
+msgctxt "Languages::mve_ultimate_or_plus_license_required"
+msgid "This action requires [product] Ultimate or [product] Plus"
+msgstr ""
+
+msgctxt "Languages::mve_ultimate_license_required"
+msgid "[product] Ultimate is required for this"
+msgstr ""
+
+msgctxt "Languages::text_mve_ultimate_or_plus_license_required"
+msgid "This action requires [product] Ultimate or [product] Plus. If you switch to <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a> or <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus</a>, you'll get access to all their features."
+msgstr ""
+
+msgctxt "Languages::max_storefronts_reached"
+msgid "<p>You have reached the limit of storefronts available for your license. Adding another storefront requires buying a <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, an edition with an unlimited number of storefronts.</p>"
+msgstr ""
+
+msgctxt "Languages::mve_plus_license"
+msgid "[product] Plus"
+msgstr ""
+
+msgctxt "Languages::mve_ultimate_license"
+msgid "[product] Ultimate"
+msgstr ""
+
+msgctxt "Languages::text_mve_plus_license_required"
+msgid "<p>Let your vendors receive money from customers directly via your marketplace.</p><p>Manage vendors' abilities via user groups, and allow your vendors to change the looks of their stores.</p><p>Create a unified catalog, where vendors can start selling any product in a matter of minutes.</p>"
+msgstr ""
+
+msgctxt "Languages::text_mve_ultimate_license_required"
+msgid "<p>Branch out: get an unlimited number of storefronts for your marketplace.</p><p>A storefront is another domain created either for a specific country or city, or for a specific part of your product catalog.</p><p>Get all the other functionality of [product] Plus.</p>"
+msgstr ""
+
+msgctxt "Languages::text_mve_ultimate_license"
+msgid "A special edition of [product] that offers all the features of [product] Plus and an unlimited number of storefronts. If you switch to <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, you'll never see the message about the storefront limit again."
+msgstr ""
+
 msgctxt "Languages::product_state_description.mve.new"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
 msgstr "<p>Full ubegrenset tilgang til alle funksjoner. Skriv inn et gyldig lisensnummer for å aktivere.</p><p>Denne modusen kan aktiveres når som helst.</p><br />"
 
-msgctxt "Languages::product_state_description.mve.full"
-msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
-msgstr "<p>Full ubegrenset tilgang til alle funksjoner. Skriv inn et gyldig lisensnummer for å aktivere.</p><p>Denne modusen kan aktiveres når som helst.</p><br />"
+msgctxt "Languages::product_state_description.mve"
+msgid "<p>You've activated your [product]. You can use it without time restrictions now. For advanced features (such as separate checkout for each vendor, and vendor-created promotions), get the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus license.</a> To use multiple domains for your marketplace, get the <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br>"
+msgstr ""
 
-msgctxt "Languages::text_store_mode_changed_to_mve.full"
-msgid "<strong>Full mode</strong> has been activated. In this mode, all the advanced eCommerce features are available."
-msgstr "<strong>Full modus</strong> har blitt aktivert. I denne modusen, er alle de avanserte nettbutikk-funksjonene tilgjengelige."
+msgctxt "Languages::product_state_description.mve.plus"
+msgid "<p>Access to all the functionality, except for multiple storefronts. To have domains for specific audiences, get the <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br />"
+msgstr ""
+
+msgctxt "Languages::product_state_description.mve.ultimate"
+msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
+msgstr ""
 
 msgctxt "Languages::product_state_description.mve.ru.new"
 msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p> <br />"
 msgstr ""
 
-msgctxt "Languages::product_state_description.mve.ru.full"
-msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p> <br />"
+msgctxt "Languages::product_state_description.mve.ru"
+msgid "<p>You've activated your [product]. You can use it without time restrictions now. For advanced features (such as separate checkout for each vendor, and vendor-created promotions), get the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus license.</a> To use multiple domains for your marketplace, get the <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br>"
 msgstr ""
 
-msgctxt "Languages::text_store_mode_changed_to_mve.ru.full"
-msgid "<strong>Full mode</strong> has been activated . In this mode, all the advanced eCommerce features are available."
+msgctxt "Languages::product_state_description.mve.ru.plus"
+msgid "<p>Access to all the functionality, except for multiple storefronts. To have domains for specific audiences, get the <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br />"
+msgstr ""
+
+msgctxt "Languages::product_state_description.mve.ru.ultimate"
+msgid "<p>Full unrestricted access to all features. Enter a valid license number to activate.</p><p>This mode can be activated at any time.</p><br />"
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_mve"
+msgid "Your store now uses active license. With the [product] edition, you get almost all the features we offer. The additional features (such as separate checkout for each vendor, and vendor-created promotions) are available with the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus edition</a>. There is an even more advanced edition, <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, that lets you use multiple storefronts for different audiences."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_mve.plus"
+msgid "<strong>Plus mode</strong> has been activated. This mode offers all the advanced eCommerce features, except for multiple storefronts. If your marketplace ever needs separate domains for different audiences, upgrade your license to <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_mve.ultimate"
+msgid "<strong>Ultimate mode</strong> has been activated. In this mode, all the advanced eCommerce features are available."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_mve.ru"
+msgid "Your store now uses active license. With the [product] edition, you get almost all the features we offer. The additional features (such as separate checkout for each vendor, and vendor-created promotions) are available with the <a href=\"[mve_plus_license_url]\" target=\"_blank\">[product] Plus edition</a>. There is an even more advanced edition, <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, that lets you use multiple storefronts for different audiences."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_mve.ru.plus"
+msgid "<strong>Plus mode</strong> has been activated. This mode offers all the advanced eCommerce features, except for multiple storefronts. If your marketplace ever needs separate domains for different audiences, upgrade your license to <a href=\"[mve_ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_mve.ru.ultimate"
+msgid "<strong>Ultimate mode</strong> has been activated. In this mode, all the advanced eCommerce features are available."
+msgstr ""
+
+msgctxt "Languages::store_mode.plus"
+msgid "Plus"
 msgstr ""
 
 msgctxt "Languages::vendor_payouts.type"
@@ -685,8 +785,8 @@ msgid "The appearance of this page can't be configured with the Theme editor."
 msgstr "Utseendet på denne siden kan ikke konfigureres med mal-redigereren."
 
 msgctxt "Languages::error_admin_registers_as_vendor"
-msgid "You can't become a vendor because you are currently signed in as an administrator. Please sign out and resubmit the form."
-msgstr "Du kan ikke bli leverandør fordi du for øyeblikket er logget på som administrator. Vennligst logg ut og send inn skjemaet på nytt."
+msgid "You can't become a vendor because you are currently signed in as an administrator. Please sign out and resubmit the form. <p><a class=\"ty-btn ty-btn__secondary\" href=\"[sign_out_link]\">Sign out</a></p>"
+msgstr ""
 
 msgctxt "Languages::logo_for_the_customer_area"
 msgid "Logo for the customer area"
@@ -708,6 +808,34 @@ msgctxt "Languages::vendors_statistics"
 msgid "Vendor's statistics"
 msgstr "Forhandlerens statistikk"
 
+msgctxt "Languages::vendors_activity"
+msgid "Vendor activity in the selected period"
+msgstr ""
+
+msgctxt "Languages::vendors_activity.vendors_with_sales"
+msgid "Vendors with sales"
+msgstr ""
+
+msgctxt "Languages::vendors_activity.new_vendors"
+msgid "New vendors"
+msgstr ""
+
+msgctxt "Languages::vendors_activity.vendors_with_new_products"
+msgid "Vendors with new products"
+msgstr ""
+
+msgctxt "Languages::vendors_activity.not_logged_in_vendors"
+msgid "Vendors who haven't signed in"
+msgstr ""
+
+msgctxt "Languages::vendors_activity.new_products"
+msgid "New products"
+msgstr ""
+
+msgctxt "Languages::vendors_activity.orders_created"
+msgid "Orders created"
+msgstr ""
+
 msgctxt "Languages::vendor_names"
 msgid "Vendor names"
 msgstr "Forhandler navn"
@@ -715,4 +843,128 @@ msgstr "Forhandler navn"
 msgctxt "Languages::vendor_logos_and_product_count"
 msgid "Vendor logos and product count"
 msgstr "Forhandler logoer og produkt antalll"
+
+msgctxt "Languages::invite_vendors"
+msgid "Invite vendors"
+msgstr ""
+
+msgctxt "Languages::invite_vendors_title"
+msgid "Invite people to register as vendors in your marketplace"
+msgstr ""
+
+msgctxt "Languages::invite_vendors_enter_emails"
+msgid "Emails where to send invitations"
+msgstr ""
+
+msgctxt "Languages::separate_multiple_email_addresses"
+msgid "If you enter multiple emails, write each of them in a new line."
+msgstr ""
+
+msgctxt "Languages::send_invitations"
+msgid "Invite"
+msgstr ""
+
+msgctxt "Languages::pending_vendor_invitations"
+msgid "Pending vendor invitations"
+msgstr ""
+
+msgctxt "Languages::pending_vendor_invitations_menu_description"
+msgid "Manage invitations to your marketplace for potential vendors."
+msgstr ""
+
+msgctxt "Languages::vendor_invited_at"
+msgid "Date sent"
+msgstr ""
+
+msgctxt "Languages::vendor_invitations_sent_notification"
+msgid "Invitations sent: [sent_quantity]"
+msgstr ""
+
+msgctxt "Languages::vendor_invitations_fail_notification"
+msgid "Invitations not sent: [failed_quantity]<br/><b>[emails_list]</b><br/>An invitation won't be sent if it has already been sent to that email address before. But if none of your invitations are being sent, and you haven't sent invitations to those addresses before, please make sure that [product] can send any emails at all. If it can't, then the problem is related to [product] or server configuration. In that case, please contact your server administrator, hosting provider, or <a href=\"https://helpdesk.cs-cart.com/\" target=\"_blank\">our technical support</a> to investigate."
+msgstr ""
+
+msgctxt "Languages::vendor_edit_invitation_email_template"
+msgid "<a href=\"[url]\">Edit vendor invitation email template</a>"
+msgstr ""
+
+msgctxt "Languages::all_companies"
+msgid "All vendors"
+msgstr ""
+
+msgctxt "Languages::storefront_access_key"
+msgid "Access key to temporarily closed storefront"
+msgstr ""
+
+msgctxt "Languages::storefront_status.tooltip"
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed storefront</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
+msgstr ""
+
+msgctxt "Languages::storefront_access_key.setting_notice"
+msgid "You can set the access key on the storefront editing page"
+msgstr ""
+
+msgctxt "Languages::close_storefront.setting_notice"
+msgid "You can open or close a storefront on the storefront editing page"
+msgstr ""
+
+msgctxt "Languages::is_default_storefront"
+msgid "Default storefront"
+msgstr ""
+
+msgctxt "Languages::default_storefront_must_exist"
+msgid "Default storefront must exist in the store"
+msgstr ""
+
+msgctxt "Languages::cant_remove_default_storefront"
+msgid "Default storefront <b>[url]</b> can't be removed"
+msgstr ""
+
+msgctxt "Languages::copy_theme_from_another_storefront"
+msgid "Copy theme and its layouts from another storefront"
+msgstr ""
+
+msgctxt "Languages::n_vendors"
+msgid "[n] vendor|[n] vendors"
+msgstr ""
+
+msgctxt "Languages::event.vendors_require_approval.name"
+msgid "Vendors require approval"
+msgstr ""
+
+msgctxt "Languages::event.vendors_require_approval.title"
+msgid "Some vendors are pending approval"
+msgstr ""
+
+msgctxt "Languages::event.vendor_status_changed.name"
+msgid "Vendor status changed to [status]"
+msgstr ""
+
+msgctxt "Languages::event.vendor_status_changed.title"
+msgid "Your status has been changed to [status]"
+msgstr ""
+
+msgctxt "Languages::event.vendor_status_changed.active.message"
+msgid "All your active products will now appear in the store"
+msgstr ""
+
+msgctxt "Languages::event.vendor_status_changed.pending.message"
+msgid "You can work with the admin panel and manage your products, but they won't appear to customers until your status changes to Active."
+msgstr ""
+
+msgctxt "Languages::vendor_notifications"
+msgid "Vendor notifications"
+msgstr ""
+
+msgctxt "Languages::log_in_as_vendor"
+msgid "Log in as vendor"
+msgstr ""
+
+msgctxt "Languages::block_manager.dynamic_entity_companies"
+msgid "vendor"
+msgstr ""
+
+msgctxt "Languages::event.apply_for_vendor_notification.name"
+msgid "New vendor account application"
+msgstr ""
 

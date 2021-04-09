@@ -31,14 +31,14 @@ function fn_rus_taxes_install()
 
     $taxes = array(
         array(
-            'tax' => __('rus_taxes.tax.vat18'),
+            'tax' => __('rus_taxes.tax.vat20'),
             'regnumber' => '',
             'priority' => 0,
             'address_type' => 'S',
             'status' => 'A',
             'price_includes_tax' => 'Y',
-            'tax_type' => TaxType::VAT_18,
-            'rate_value' => 18,
+            'tax_type' => TaxType::VAT_20,
+            'rate_value' => 20,
             'rate_type' => 'P'
         ),
         array(

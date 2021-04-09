@@ -12,7 +12,9 @@
                     atol_group_code: $('#addon_option_rus_online_cash_register_atol_group_code').val(),
                     atol_payment_address: $('#addon_option_rus_online_cash_register_atol_payment_address').val(),
                     atol_login: $('#addon_option_rus_online_cash_register_atol_login').val(),
-                    atol_password: $('#addon_option_rus_online_cash_register_atol_password').val()
+                    atol_password: $('#addon_option_rus_online_cash_register_atol_password').val(),
+                    mode: $('#addon_option_rus_online_cash_register_mode').val(),
+                    api_version: $('#addon_option_rus_online_cash_register_api_version').val()
                 }
             });
 

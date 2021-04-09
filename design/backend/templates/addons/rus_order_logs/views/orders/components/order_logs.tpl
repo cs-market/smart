@@ -1,7 +1,7 @@
 <div id="order_logs">
     {if $logs}
         {assign var="order_statuses" value=$smarty.const.STATUSES_ORDER|fn_get_simple_statuses:true} 
-        <table width="100%" class="table table-middle">
+        <table width="100%" class="table table-middle table--relative">
         <thead>
         <tr>
             <th width="5%" class="center">{__("id")}</th>

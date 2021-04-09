@@ -278,6 +278,19 @@ if ($mode == 'refresh') {
     $timeout_check_failed = fn_get_storage_data('timeout_check_failed');
     fn_set_storage_data('timeout_check_failed', false);
 
+    if (!empty(Tygh::$app['session']['upgrade_notification']['custom']) && Tygh::$app['session']['upgrade_notification']['custom'] == true) {
+        if (!empty(Tygh::$app['session']['upgrade_notification']['title']) && !empty(Tygh::$app['session']['upgrade_notification']['extra'])) {
+            $default_title = Tygh::$app['session']['upgrade_notification']['title'];
+            $extra = Tygh::$app['session']['upgrade_notification']['extra'];
+            foreach (Tygh::$app['session']['notifications'] as $key => $notification) {
+                if ($notification['type'] == 'I' && $notification['title'] == $default_title && $notification['extra'] != $extra) {
+                    unset(Tygh::$app['session']['notifications'][$key]);
+                }
+            }
+        }
+        unset(Tygh::$app['session']['upgrade_notification']);
+    }
+
     Tygh::$app['view']->assign('timeout_check_failed', $timeout_check_failed);
     Tygh::$app['view']->assign('show_pre_upgrade_notice', true);
     Tygh::$app['view']->assign('upgrade_packages', $upgrade_packages);

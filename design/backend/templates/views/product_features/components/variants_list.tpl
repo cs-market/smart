@@ -4,7 +4,7 @@
     {/if}
     <input type="hidden" value="{if $variants_ids}{","|implode:$variants_ids}{/if}" name="feature_data[original_var_ids]">
     <div class="table-wrapper">
-        <table class="table table-middle" width="100%">
+        <table class="table table-middle table--relative" width="100%">
         <thead>
         <tr class="cm-first-sibling">
             {hook name="product_features:variants_list_head"}
@@ -30,7 +30,20 @@
                     <input type="hidden" name="feature_data[variants][{$num}][variant_id]" value="{$var.variant_id}">
                     <input type="text" name="feature_data[variants][{$num}][position]" value="{$var.position}" size="4" class="input-micro input-hidden"/></td>
                 <td>
-                    <input type="text" name="feature_data[variants][{$num}][variant]" value="{$var.variant}" class="span6 input-hidden cm-feature-value {if $feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}cm-value-decimal{/if}"></td>
+                    <div class="input-prepend input-prepend--full">
+                        <div class="colorpicker--wrapper">
+                        {include file="common/colorpicker.tpl"
+                            cp_name="feature_data[variants][{$num}][color]"
+                            cp_id="feature_value_color_picker_{$num}"
+                            cp_value=$var.color
+                            show_picker=true
+                            cp_meta="js-feature-variant-conditional-column colorpicker--hidden"
+                            cp_attrs=["data-ca-column-for-feature-style" => "ProductFeatureStyles::COLOR"|enum, "data-ca-column-for-filter-style" => "ProductFilterStyles::COLOR"|enum]
+                        }
+                        </div>
+                        <input type="text" name="feature_data[variants][{$num}][variant]" value="{$var.variant}" class="input-full input-hidden cm-feature-value {if $feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}cm-value-decimal{/if}">
+                    </div>
+                </td>
             {/hook}
             <td>&nbsp;</td>
             <td class="right nowrap">
@@ -96,7 +109,20 @@
                 <td>
                     <input type="text" name="feature_data[variants][{$num}][position]" value="" size="4" class="input-micro" /></td>
                 <td>
-                    <input type="text" name="feature_data[variants][{$num}][variant]" value="" class="span6 cm-feature-value {if $feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}cm-value-decimal{/if}" /></td>
+                    <div class="input-prepend input-prepend--full">
+                        <div class="colorpicker--wrapper">
+                        {include file="common/colorpicker.tpl"
+                            cp_name="feature_data[variants][{$num}][color]"
+                            cp_id="feature_value_color_picker_{$num}"
+                            cp_value="#ffffff"
+                            show_picker=true
+                            cp_meta="js-feature-variant-conditional-column"
+                            cp_attrs=["data-ca-column-for-feature-style" => "ProductFeatureStyles::COLOR"|enum, "data-ca-column-for-filter-style" => "ProductFilterStyles::COLOR"|enum]
+                        }
+                        </div>
+                        <input type="text" name="feature_data[variants][{$num}][variant]" value="" class="input-full cm-feature-value {if $feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}cm-value-decimal{/if}">
+                    </div>
+                </td>
             {/hook}
             <td>&nbsp;</td>
             <td class="right">

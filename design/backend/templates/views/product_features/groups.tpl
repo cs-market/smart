@@ -12,7 +12,7 @@
     <div class="items-container{if ""|fn_check_form_permissions} cm-hide-inputs{/if}" id="update_features_list">
         {if $features}
             <div class="table-wrapper">
-                <table width="100%" class="table table-middle table-objects">
+                <table width="100%" class="table table-middle table--relative table-objects">
                     <thead>
                     <tr>
                         <th class="left">
@@ -33,7 +33,7 @@
 
                         <tr class="cm-row-item cm-row-status-{$p_feature.status|lower}" data-ct-product_features="{$p_feature.feature_id}">
                             <td class="left">
-                                <input type="checkbox" name="feature_ids[]" value="{$p_feature.feature_id}" class="checkbox cm-item cm-item-status-{$p_feature.status|lower}" />
+                                <input type="checkbox" name="feature_ids[]" value="{$p_feature.feature_id}" class="cm-item cm-item-status-{$p_feature.status|lower}" />
                             </td>
                             <td>
                                 <div class="object-group-link-wrap">

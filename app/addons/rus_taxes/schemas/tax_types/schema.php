@@ -14,25 +14,33 @@
 
 use Tygh\Addons\RusTaxes\TaxType;
 
-$schema = array(
-    TaxType::NONE => array(
+$schema = [
+    TaxType::NONE    => [
         'name' => __('rus_taxes.tax.none'),
-    ),
-    TaxType::VAT_0 => array(
+    ],
+    TaxType::VAT_0   => [
         'name' => __('rus_taxes.tax.vat0'),
-    ),
-    TaxType::VAT_10 => array(
+    ],
+    TaxType::VAT_10  => [
         'name' => __('rus_taxes.tax.vat10'),
-    ),
-    TaxType::VAT_18 => array(
-        'name' => __('rus_taxes.tax.vat18'),
-    ),
-    TaxType::VAT_110 => array(
+    ],
+    TaxType::VAT_18  => [
+        'name'      => __('rus_taxes.tax.vat18'),
+        'is_legacy' => true,
+    ],
+    TaxType::VAT_20  => [
+        'name' => __('rus_taxes.tax.vat20'),
+    ],
+    TaxType::VAT_110 => [
         'name' => __('rus_taxes.tax.vat110'),
-    ),
-    TaxType::VAT_118 => array(
-        'name' => __('rus_taxes.tax.vat118'),
-    ),
-);
+    ],
+    TaxType::VAT_118 => [
+        'name'      => __('rus_taxes.tax.vat118'),
+        'is_legacy' => true,
+    ],
+    TaxType::VAT_120 => [
+        'name' => __('rus_taxes.tax.vat120'),
+    ],
+];
 
 return $schema;

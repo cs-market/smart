@@ -1,5 +1,5 @@
-{assign var="first_id" value=$first_name|md5}
-{assign var="second_id" value=$second_name|md5}
+{$first_id=""|uniqid}
+{$second_id=""|uniqid}
 
 {include file="common/subheader.tpl" title=$title}
 <div class="table-wrapper">

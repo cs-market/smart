@@ -12,14 +12,23 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Registry;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     return ;
 }
 
-if ($mode == 'update' || $mode == 'add') {
+if ($mode === 'update' || $mode === 'add') {
+    $params = [];
 
-    Tygh::$app['view']->assign('payments', fn_get_payments());
+    if (fn_allowed_for('MULTIVENDOR')) {
+        $params = [
+            'company_ids' => [0, (int) Registry::get('runtime.company_id')],
+        ];
+    }
+
+    Tygh::$app['view']->assign('payments', fn_get_payments($params));
 
 }

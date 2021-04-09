@@ -8,7 +8,7 @@
 {if $runtime.mode == "checkout" && $cart_products && $cart.points_info.total_price && $user_info.points > 0}
     <form class="cm-ajax cm-ajax-full-render" name="point_payment_form" action="{""|fn_url}" method="post">
         <input type="hidden" name="redirect_mode" value="{$location}" />
-        <input type="hidden" name="result_ids" value="checkout*,cart_status*" />
+        <input type="hidden" name="result_ids" value="checkout*,cart_status*,litecheckout_form" />
 
         <div class="ty-discount-coupon__control-group ty-reward-points__coupon ty-input-append ty-inline-block">
             <input type="text" class="ty-input-text ty-valign cm-hint" name="points_to_use" size="40" value="{__("points_to_use")}" />
@@ -28,7 +28,7 @@
                 <span class="ty-reward-points__points-in-use">
                         {__("points_in_use_lowercase", [$cart.points_info.in_use.points])}.
                         ({include file="common/price.tpl" value=$cart.points_info.in_use.cost})
-                        {include file="buttons/button.tpl" but_href="checkout.delete_points_in_use?redirect_url=`$_redirect_url`" but_meta="cm-post ty-reward-points__delete-icon" but_role="delete" but_target_id="checkout*,cart_status*,subtotal_price_in_points"}
+                        {include file="buttons/button.tpl" but_href="checkout.delete_points_in_use?redirect_url=`$_redirect_url`" but_meta="cm-post ty-reward-points__delete-icon" but_role="delete" but_target_id="checkout*,cart_status*,subtotal_price_in_points,litecheckout_form"}
                 </span>
             {/if}
         </div>

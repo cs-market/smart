@@ -46,11 +46,13 @@
     {/if}
 
     {if $schema.conditions[$condition_data.condition].type == "chained"}
-        <select name="{$prefix}[condition_element]" id="promotion_chained_condition_parent_{$p_md}">
-            {if $condition_data.condition_element}
-                <option value="{$condition_data.condition_element}" selected></option>
-            {/if}
-        </select>
+        <div class="select2-wrapper--width-auto">
+            <select name="{$prefix}[condition_element]" id="promotion_chained_condition_parent_{$p_md}">
+                {if $condition_data.condition_element}
+                    <option value="{$condition_data.condition_element}" selected></option>
+                {/if}
+            </select>
+        </div>
     {/if}
 
     {if $schema.conditions[$condition_data.condition].type != "list" && $schema.conditions[$condition_data.condition].type != "statement"}
@@ -95,11 +97,15 @@
         {__("yes")}
 
     {elseif $schema.conditions[$condition_data.condition].type == "chained"}
-        <select name="{$prefix}[value]" {if $condition_data.operator == 'in' || $condition_data.operator == 'nin'}multiple{/if} class="hidden" id="promotion_chained_condition_child_{$p_md}">
-            {foreach from=","|explode:$condition_data.value item="preselected_child"}
-                <option value="{$preselected_child}" selected></option>
-            {/foreach}
-        </select>
+        <div class="select2-wrapper--width-auto">
+            <select name="{$prefix}[value]" {if $condition_data.operator == 'in' || $condition_data.operator == 'nin'}multiple{/if} class="hidden" id="promotion_chained_condition_child_{$p_md}">
+                {foreach from=","|explode:$condition_data.value item="preselected_child"}
+                    {if $preselected_child}
+                        <option value="{$preselected_child}" selected></option>
+                    {/if}
+                {/foreach}
+            </select>
+        </div>
         <input id="promotion_chained_condition_child_input_{$p_md}" type="text" name="{$prefix}[value]" value="{$condition_data.value}"
                class="hidden input-long"/>
         <input id="promotion_chained_condition_child_input_name_{$p_md}" type="text" name="{$prefix}[value_name]"

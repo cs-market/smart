@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: es-ES\n"
-"X-Crowdin-File: /release-4.8.2/addons/polls.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:11\n"
+"X-Crowdin-File: /release-4.11.5/addons/polls.po\n"
+"X-Crowdin-File-ID: 3624\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::polls"
 msgid "Polls"
@@ -38,7 +38,7 @@ msgstr "Respuestas con comentarios"
 
 msgctxt "Languages::polls_have_completed"
 msgid "You have already completed this poll."
-msgstr "Ya ha completado esta encuesta."
+msgstr "Usted ya ha completado esta encuesta."
 
 msgctxt "Languages::polls_total_votes"
 msgid "Total votes"
@@ -62,7 +62,7 @@ msgstr "Encuestas"
 
 msgctxt "Languages::text_you_have_already_filled_this_poll"
 msgid "You have already completed this poll"
-msgstr "Ya ha completado esta encuesta"
+msgstr "Usted ya ha completado esta encuesta"
 
 msgctxt "Languages::block_polls"
 msgid "Polls"
@@ -98,7 +98,7 @@ msgstr "Gracias por tomarse el tiempo para completar esta encuesta."
 
 msgctxt "Languages::poll_show_results"
 msgid "Poll results visible to"
-msgstr "Resultados visibles a"
+msgstr "Resultados de la encuesta visibles a"
 
 msgctxt "Languages::poll_results_nobody"
 msgid "nobody"
@@ -118,7 +118,7 @@ msgstr "Encabezado de la encuesta"
 
 msgctxt "Languages::poll_footer"
 msgid "Poll footer"
-msgstr "Pie de página de encuesta"
+msgstr "Pie de página de la encuesta"
 
 msgctxt "Languages::poll_results"
 msgid "Poll message"
@@ -142,19 +142,19 @@ msgstr "Agregar Encuesta"
 
 msgctxt "Languages::polls_total_submited"
 msgid "Total number of submitted poll forms"
-msgstr "Número total de formularios de la encuesta presentada"
+msgstr "Número total de encuestas respondidas"
 
 msgctxt "Languages::polls_total_completed"
 msgid "Number of poll forms completed in full"
-msgstr "Número de encuesta formularios completados en su totalidad"
+msgstr "Número de encuestas respondidas completamente"
 
 msgctxt "Languages::polls_first_submited"
 msgid "First poll form submitted"
-msgstr "Primer formulario de la encuesta presentada"
+msgstr "Primera encuesta respondida"
 
 msgctxt "Languages::polls_last_submited"
 msgid "Last poll form submitted"
-msgstr "Última encuesta formulario presentado"
+msgstr "Última encuesta respondida"
 
 msgctxt "Languages::statistics_by_questions"
 msgid "Statistics by questions"
@@ -162,7 +162,7 @@ msgstr "Estadísticas de preguntas"
 
 msgctxt "Languages::view_answers"
 msgid "View answers"
-msgstr "Ver respuestas"
+msgstr "Ver las respuestas"
 
 msgctxt "Languages::polls_votes"
 msgid "Votes"
@@ -174,11 +174,11 @@ msgstr "Respuestas"
 
 msgctxt "Languages::question_text"
 msgid "Question text"
-msgstr "Texto de pregunta"
+msgstr "Texto de la pregunta"
 
 msgctxt "Languages::select_single_type"
 msgid "Select single option"
-msgstr "Seleccione la opción sola"
+msgstr "Seleccione una sola opción"
 
 msgctxt "Languages::select_one_or_more_type"
 msgid "Select one or more options"
@@ -186,7 +186,7 @@ msgstr "Seleccione una o más opciones"
 
 msgctxt "Languages::text_answer_type"
 msgid "Provide a textual answer"
-msgstr "Proporcionar una respuesta textual"
+msgstr "Proporcionar una respuesta de texto"
 
 msgctxt "Languages::answer_text"
 msgid "Answer text"
@@ -211,4 +211,8 @@ msgstr "Votos en la página"
 msgctxt "SettingsOptions::polls::polls_comments_on_page"
 msgid "Answers on page"
 msgstr "Respuestas en la página"
+
+msgctxt "Languages::n_polls"
+msgid "[n] poll|[n] polls"
+msgstr ""
 

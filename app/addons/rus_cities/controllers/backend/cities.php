@@ -17,7 +17,7 @@ use Tygh\Registry;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if (empty($_REQUEST['country_code'])) {
-    $_REQUEST['country_code'] = Registry::get('settings.General.default_country');
+    $_REQUEST['country_code'] = Registry::get('settings.Checkout.default_country');
 }
 
 $params = $_REQUEST;
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'manage') {
     if (empty($_REQUEST['country_code'])) {
-        $params['country_code'] = Registry::get('settings.General.default_country');
+        $params['country_code'] = Registry::get('settings.Checkout.default_country');
     }
 
     list($cities, $search) = fn_get_cities($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);

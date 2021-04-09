@@ -17,7 +17,7 @@ namespace Tygh;
 /**
  * Class Mailer
  * @package Tygh
- * @deprecated since 4.4.1 use Tygh::$app['mailer'] 
+ * @deprecated since 4.4.1 use Tygh::$app['mailer']. Will be removed in 5.0.1
  */
 class Mailer extends \PHPMailer
 {

@@ -14,10 +14,11 @@
 
 namespace Tygh\SmartyEngine;
 
+use Tygh\Enum\SiteArea;
 use Tygh\Exceptions\PermissionsException;
 use Tygh\Registry;
-use Tygh\Settings;
 use Tygh\Themes\Themes;
+use Tygh\Tygh;
 
 class Core extends \Smarty
 {
@@ -109,23 +110,30 @@ class Core extends \Smarty
 
     /**
      * Sets area to display templates from
-     * @param string  $area       area name (C,A)
-     * @param string  $area_type  area type (can be mail of empty)
-     * @param integer $company_id company ID
+     *
+     * @param string $area          area name (C,A)
+     * @param string $area_type     area type (can be mail of empty)
+     * @param int    $company_id    company ID
+     * @param int    $storefront_id Storefront ID
      */
-    public function setArea($area, $area_type = '', $company_id = null)
+    public function setArea($area, $area_type = '', $company_id = null, $storefront_id = null)
     {
         if (fn_allowed_for('MULTIVENDOR') && is_null($company_id) && !Registry::get('runtime.company_id')) {
             $company_id = 0;
         }
 
         $area_type_suffix = $area_type == 'mail' ? '/mail': '';
-        $path = fn_get_theme_path("[themes]/[theme]{$area_type_suffix}", $area, $company_id);
-        $path_rel = fn_get_theme_path("[relative]/[theme]{$area_type_suffix}", $area, $company_id);
+        $path = fn_get_theme_path("[themes]/[theme]{$area_type_suffix}", $area, $company_id, true, $storefront_id);
+        $path_rel = fn_get_theme_path("[relative]/[theme]{$area_type_suffix}", $area, $company_id, true, $storefront_id);
         if ($area == 'A') {
             $c_prefix = "backend{$area_type_suffix}";
         } else {
-            $c_prefix = fn_get_theme_path("[theme]{$area_type_suffix}", $area, $company_id);
+            if (!$storefront_id) {
+                /** @var \Tygh\Storefront\Storefront $storefront */
+                $storefront = Tygh::$app['storefront'];
+                $storefront_id = $storefront->storefront_id;
+            }
+            $c_prefix = fn_get_theme_path("[theme]{$area_type_suffix}", $area, $company_id, true, $storefront_id);
         }
 
         $suffix = '/templates';
@@ -136,20 +144,19 @@ class Core extends \Smarty
         $this->_area = $area;
         $this->_area_type = $area_type;
 
-        $this->theme = Themes::areaFactory($area, $company_id);
-        if ($area == 'C') {
-            Registry::registerCache('theme_dirs', array(), Registry::cacheLevel('static'));
-            $this->theme_dirs = Registry::ifGet('theme_dirs', array());
-            $id = (int) $company_id;
-            if (!isset($this->theme_dirs[$id])) {
+        $this->theme = Themes::areaFactory($area, $company_id, $storefront_id);
+        if ($area === SiteArea::STOREFRONT) {
+            Registry::registerCache('theme_dirs', [], Registry::cacheLevel(['static', 'storefront']));
+            $this->theme_dirs = Registry::ifGet('theme_dirs', []);
+            if (!$this->theme_dirs) {
                 // all theme directories have to be fetched to use add-on templates from base theme
-                $this->theme_dirs[$id] = $this->theme->getThemeDirs(Themes::USE_BASE);
+                $this->theme_dirs = $this->theme->getThemeDirs(Themes::USE_BASE);
                 Registry::set('theme_dirs', $this->theme_dirs);
             }
 
             // add template directories of the theme and the parent theme
-            foreach ($this->theme_dirs[$id] as $theme_name => $path_info) {
-                if ($theme_name != $this->theme->getThemeName()) {
+            foreach ($this->theme_dirs as $theme_name => $path_info) {
+                if ($theme_name !== $this->theme->getThemeName()) {
                     $this->addTemplateDir($path_info[Themes::PATH_ABSOLUTE] . ltrim($area_type_suffix, "/") . $suffix);
                 }
             }
@@ -186,12 +193,14 @@ class Core extends \Smarty
 
     /**
      * Displays templates from mail area
-     * @param  string   $template   template name
-     * @param  boolean  $to_screen  outputs if true, returns contents if false
-     * @param  string   $area       template area
-     * @param  integer  $company_id company ID
-     * @param  string   $lang_code  language code
-     * @return template contents or true
+     *
+     * @param  string  $template   template name
+     * @param  boolean $to_screen  outputs if true, returns contents if false
+     * @param  string  $area       template area
+     * @param  integer $company_id company ID
+     * @param  string  $lang_code  language code
+     *
+     * @return string template contents or true
      */
     public function displayMail($template, $to_screen, $area, $company_id = null, $lang_code = CART_LANGUAGE)
     {

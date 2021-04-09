@@ -56,8 +56,10 @@
             data.items.show();
 
             if (data.items.length === 0) {
+                container.addClass('hidden');
                 data.empty_elm.removeClass('hidden');
             } else {
+                container.removeClass('hidden');
                 data.empty_elm.addClass('hidden');
             }
         }
@@ -76,7 +78,7 @@
                 empty_elm = data.empty_elm;
 
             var found_items;
-            var items = container.is('table') ? container.find('tr') : container.find('li');
+            var items = container.is('table') ? container.find('tbody > tr') : container.find('li');
 
             items.hide();
 

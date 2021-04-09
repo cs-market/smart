@@ -75,7 +75,9 @@ Tygh.$(document).ready(function() {
         </div>
         {if $filling == 'manually'}
             <div class="control-group {if $editable}cm-no-hide-input{/if}">
-                {include_ext file=$option.fillings.manually.picker checkbox_name="block_items"
+                {include_ext
+                    file=$option.fillings.manually.picker
+                    checkbox_name="block_items"
                     data_id="objects_`$item.chain_id`_"
                     input_name="`$html_name`[item_ids]"
                     item_ids=$block.content.$name.item_ids

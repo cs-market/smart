@@ -11,7 +11,8 @@
     <div class="ty-credit-card">
             <div class="ty-credit-card__control-group ty-control-group">
                 <label for="eway_cc_number_{$id_suffix}" class="cm-cc-number ty-control-group__title cm-required">{__("card_number")}</label>
-                <input size="35" type="text" id="eway_cc_number_{$id_suffix}" name="payment_info[card_number]" value="" class="ty-credit-card__input cm-focus cm-autocomplete-off" />
+                <input size="35" type="text" id="eway_cc_number_{$id_suffix}" value="" class="ty-credit-card__input cm-focus cm-autocomplete-off" />
+                <input size="35" type="hidden" id="eway_cc_number_enc_{$id_suffix}" name="payment_info_enc[card_number]" value="" class="ty-credit-card__input cm-focus cm-autocomplete-off" />
                 <ul class="ty-cc-icons cm-cc-icons">
                     <li class="ty-cc-icons__item cc-default cm-cc-default"><span class="ty-cc-icons__icon default">&nbsp;</span></li>
                     <li class="ty-cc-icons__item cm-cc-visa"><span class="ty-cc-icons__icon visa">&nbsp;</span></li>
@@ -26,7 +27,7 @@
             <div class="ty-credit-card__control-group ty-control-group">
                 <label for="credit_card_month_{$id_suffix}" class="ty-control-group__title cm-cc-date cm-cc-exp-month cm-required">{__("valid_thru")}</label>
                 <label for="credit_card_year_{$id_suffix}" class="cm-required cm-cc-date cm-cc-exp-year hidden"></label>
-                <input type="text" id="credit_card_month_{$id_suffix}" name="payment_info[expiry_month]" value="" size="2" maxlength="2" class="ty-credit-card__input-short " />&nbsp;&nbsp;/&nbsp;&nbsp;<input type="text" id="credit_card_year_{$id_suffix}"  name="payment_info[expiry_year]" value="" size="2" maxlength="2" class="ty-credit-card__input-short" />&nbsp;
+                <input type="number" id="credit_card_month_{$id_suffix}" name="payment_info[expiry_month]" value="" size="2" maxlength="2" class="ty-credit-card__input-short " />&nbsp;&nbsp;/&nbsp;&nbsp;<input type="number" id="credit_card_year_{$id_suffix}"  name="payment_info[expiry_year]" value="" size="2" maxlength="2" class="ty-credit-card__input-short" />&nbsp;
             </div>
     
             <div class="ty-credit-card__control-group ty-control-group">
@@ -37,7 +38,8 @@
     
     <div class="ty-control-group ty-credit-card__cvv-field">
         <label for="eway_cvv2_{$id_suffix}" class="cm-cc-cvv2 ty-control-group__title cm-required cm-autocomplete-off">{__("cvv2")}</label>
-        <input type="text" id="eway_cvv2_{$id_suffix}" name="payment_info[cvv2]" value="" size="4" maxlength="4" class="cm-autocomplete-off" />
+        <input type="text" id="eway_cvv2_{$id_suffix}" value="" size="4" maxlength="4" class="cm-autocomplete-off" />
+        <input type="hidden" id="eway_cvv2_enc_{$id_suffix}" name="payment_info_enc[cvv2]" value="" size="4" maxlength="4" class="cm-autocomplete-off" />
     </div>
 </div>
 <script class="cm-ajax-force">
@@ -55,7 +57,6 @@
         var ccYearInput = $("#" + ccYear.attr("for"));
 
         if(_.isTouch === false && jQuery.isEmptyObject(ccNumberInput.data("_inputmask")) == true) {
-
             ccNumberInput.inputmask("9999 9999 9999 9[9][9][9]", {
                 placeholder: ' '
             });
@@ -120,19 +121,20 @@
         window.tygh_eway_ready = true;
 
         $.getScript("https://secure.ewaypayments.com/scripts/eCrypt.js");
-        $.ceEvent('on', 'ce.formpost_payments_form_{$tab_id}', function(form, clicked_elm) {
-            var elm_num = $("#eway_cc_number_{$id_suffix}");
+        var elm_num = $("#eway_cc_number_{$id_suffix}");
+        var form = elm_num.closest('form');
+        var form_name = form.prop('name');
+        $.ceEvent('on', 'ce.formpost_' + form_name, function(form, clicked_elm) {
+            var elm_num_enc = $("#eway_cc_number_enc_{$id_suffix}");
             if (elm_num.length > 0 && elm_num.attr('data-eway-encrypted') != 'yes') {
                 var elm_cvv = $("#eway_cvv2_{$id_suffix}");
+                var elm_cvv_enc = $("#eway_cvv2_enc_{$id_suffix}");
                 var cvv_val = elm_cvv.val();
                 var num_val = elm_num.val().replace(/\s/g, '');
                 var enc_cvv = eCrypt.encryptValue(cvv_val, eway_enc_key);
                 var enc_num = eCrypt.encryptValue(num_val, eway_enc_key);
-                elm_cvv.inputmask('remove');
-                elm_num.inputmask('remove');
-                elm_cvv.val(enc_cvv);
-                elm_num.val(enc_num);
-                elm_cvv.prop('maxlength', enc_cvv.length);
+                elm_cvv_enc.val(enc_cvv);
+                elm_num_enc.val(enc_num);
                 elm_num.attr('data-eway-encrypted', 'yes');
             }
         });

@@ -28,7 +28,7 @@
                 <th class="ty-rma-detail__table-reason">{__("reason")}</th>
             </tr>
         </thead>
-        {foreach from=$return_info.items[$smarty.const.RETURN_PRODUCT_ACCEPTED] item="ri" key="key"}
+        {foreach from=$return_info.items["Addons\\Rma\\ReturnOperationStatuses::APPROVED"|enum] item="ri" key="key"}
         <tr>
             <td>{if !$ri.deleted_product}<a href="{"products.view?product_id=`$ri.product_id`"|fn_url}">{/if}{$ri.product nofilter}{if !$ri.deleted_product}</a>{/if}
                 {if $ri.product_options}
@@ -61,7 +61,7 @@
                 <th class="ty-rma-detail__table-reason">{__("reason")}</th>
             </tr>
         </thead>
-        {foreach from=$return_info.items[$smarty.const.RETURN_PRODUCT_DECLINED] item="ri" key="key"}
+        {foreach from=$return_info.items["Addons\\Rma\\ReturnOperationStatuses::DECLINED"|enum] item="ri" key="key"}
         <tr>
             <td>
                 {if !$ri.deleted_product}<a href="{"products.view?product_id=`$ri.product_id`"|fn_url}">{/if}{$ri.product nofilter}{if !$ri.deleted_product}</a>{/if}

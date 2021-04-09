@@ -12,11 +12,17 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Addons\VendorPlans\ServiceProvider;
+use Tygh\Enum\ProfileTypes;
 use Tygh\Enum\VendorPayoutTypes;
-use Tygh\Registry;
-use Tygh\Models\VendorPlan;
+use Tygh\Enum\VendorStatuses;
+use Tygh\Languages\Languages;
 use Tygh\Models\Company;
+use Tygh\Models\VendorPlan;
+use Tygh\Registry;
+use Tygh\Tygh;
 use Tygh\VendorPayouts;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -41,13 +47,56 @@ function fn_vendor_plans_install()
         fn_rm($vendors_demo);
     }
 
-    db_query("REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('view_vendor_plans', 'Y', 'vendors')");
-    db_query("REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_vendor_plans', 'Y', 'vendors')");
+    db_query("REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_vendor_plans', 'Y', 'vendors', 'vendor_plans', 'Y')");
+    db_query("REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_vendor_plans', 'Y', 'vendors', 'vendor_plans', 'N')");
+
+    // create new profile field type
+    $field = array(
+        'field_name'        => 'plan_id',
+        'profile_show'      => 'Y',
+        'profile_required'  => 'N',
+        'checkout_show'     => 'N',
+        'checkout_required' => 'N',
+        'partner_show'      => 'N',
+        'partner_required'  => 'N',
+        'field_type'        => PROFILE_FIELD_TYPE_VENDOR_PLAN,
+        'profile_type'      => ProfileTypes::CODE_SELLER,
+        'position'          => 15,
+        'is_default'        => 'Y',
+        'section'           => 'C',
+        'matching_id'       => 0,
+        'class'             => 'plan-id',
+        'autocomplete_type' => '',
+        'description'       => __('vendor_plans.plan'),
+    );
+
+    $field_id = fn_update_profile_field($field, 0);
+
+    if ($field_id) {
+        $languages = Languages::getAvailable([
+            'area'           => 'A',
+            'include_hidden' => true,
+        ]);
+
+        foreach ($languages as $code => $lang) {
+            fn_update_profile_field(array(
+                'description' => __('vendor_plans.plan', array(), $code),
+            ), $field_id, $code);
+        }
+    }
 }
 
 function fn_vendor_plans_uninstall()
 {
     db_query("DELETE FROM ?:privileges WHERE privilege IN (?a)", array('view_vendor_plans', 'manage_vendor_plans'));
+    $plan_field_id = db_get_field('SELECT field_id FROM ?:profile_fields WHERE profile_type = ?s AND field_name = ?s',
+        ProfileTypes::CODE_SELLER,
+        'plan_id'
+    );
+
+    if ($plan_field_id) {
+        fn_delete_profile_field($plan_field_id);
+    }
 }
 
 function fn_vendor_plans_get_companies(&$params, &$fields, &$sortings, &$condition, &$join, &$auth, &$lang_code, &$group)
@@ -127,6 +176,10 @@ function fn_vendor_plans_update_company_pre(&$company_data, &$company_id, &$lang
             $can_update = false;
         }
     }
+
+    if (!empty($company_data['plan_id']) && $company_data['plan_id'] == $company_data['current_plan']) {
+        unset($company_data['current_plan']);
+    }
 }
 
 function fn_vendor_plans_update_company(&$company_data, &$company_id, &$lang_code, &$action)
@@ -135,7 +188,7 @@ function fn_vendor_plans_update_company(&$company_data, &$company_id, &$lang_cod
         isset($company_data['plan_id'])
         && isset($company_data['current_plan'])
         && $company_data['plan_id'] != $company_data['current_plan']
-        && $company_data['status'] != 'N'
+        && $company_data['status'] != VendorStatuses::NEW_ACCOUNT
     ) {
         $company = Company::model()->find($company_id);
         /** @var \Tygh\Mailer\Mailer $mailer */
@@ -152,7 +205,22 @@ function fn_vendor_plans_update_company(&$company_data, &$company_id, &$lang_cod
             'tpl' => 'addons/vendor_plans/companies/plan_changed.tpl',
         ), 'A', $company->lang_code);
 
-        if ($company_data['status'] == 'A') {
+        $current_plan = VendorPlan::model()->find($company_data['current_plan']);
+        $new_plan = VendorPlan::model()->find($company_data['plan_id']);
+
+        if (!empty($company_data['remove_vendor_from_old_storefronts'])) {
+            /** @var \Tygh\Storefront\Repository $storefront_repository */
+            $storefront_repository = Tygh::$app['storefront.repository'];
+            $storefront_repository->removeCompaniesFromStorefronts($company_id, $current_plan->storefront_ids);
+        }
+
+        if (!empty($company_data['add_vendor_to_new_storefronts'])) {
+            /** @var \Tygh\Storefront\Repository $storefront_repository */
+            $storefront_repository = Tygh::$app['storefront.repository'];
+            $storefront_repository->addCompaniesToStorefronts($company_id, $new_plan->storefront_ids);
+        }
+
+        if ($company_data['status'] == VendorStatuses::ACTIVE) {
             $company->payment();
         }
     }
@@ -162,14 +230,24 @@ function fn_vendor_plans_change_company_status_before_mail(&$company_id, &$statu
 {
     $company = Company::model()->find($company_id);
     $user_data['plan'] = $company->plan; // Need for email notifications
-    if ($status_from != 'A' && $status_to == 'A') {
-        $company->payment();
+    if ($status_from != VendorStatuses::ACTIVE && $status_to == VendorStatuses::ACTIVE) {
+        $company->initialPayment();
+    }
+    if ($status_from == VendorStatuses::NEW_ACCOUNT && ($status_to == VendorStatuses::ACTIVE || $status_to == VendorStatuses::PENDING)) {
+        /** @var \Tygh\Storefront\Repository $storefront_repository */
+        $storefront_repository = Tygh::$app['storefront.repository'];
+        $storefront_repository->addCompaniesToStorefronts($company_id, $company->storefront_ids);
     }
 }
 
 function fn_vendor_plans_delete_category_after(&$category_id)
 {
     db_query("UPDATE ?:vendor_plans SET categories = ?p", fn_remove_from_set('categories', $category_id));
+}
+
+function fn_vendor_plans_storefront_repository_delete_post($storefront, $operation_result)
+{
+    db_query("UPDATE ?:vendor_plans SET storefronts = ?p", fn_remove_from_set('storefronts', $storefront->storefront_id));
 }
 
 /**
@@ -199,15 +277,38 @@ function fn_vendor_plans_mve_place_order(&$order_info, &$company_data, &$action,
  * @param int   $payout_id      Existing payout ID
  * @param array $payout_data    Payout data to be stored in the DB
  */
-function fn_vendor_plans_mve_update_order(&$new_order_info, &$order_id, &$old_order_info, &$company_data, &$payout_id, &$payout_data)
+function fn_vendor_plans_mve_update_order($new_order_info, $order_id, $old_order_info, $company_data, $payout_id, &$payout_data)
 {
-    if (Registry::get('addons.vendor_plans.include_shipping') == 'N') {
-        $payout_data['order_amount'] =
-            ($new_order_info['total'] - $new_order_info['shipping_cost']) -
-            ($old_order_info['total'] - $old_order_info['shipping_cost']);
+    if (empty($payout_data)) {
+        return;
     }
 
+    $new_order_tax_amount = $old_order_tax_amount = 0;
+    $new_order_tax_amount_included_to_shipping = $old_order_tax_amount_included_to_shipping = 0;
+    $new_order_shipping_cost = $old_order_shipping_cost = 0;
+    $shipping_cost_difference_not_included_to_commission = 0;
+
+    if (Registry::get('addons.vendor_plans.include_taxes_in_commission') == 'N') {
+        $new_order_tax_amount = array_sum(array_column($new_order_info['taxes'], 'tax_subtotal'));
+        $old_order_tax_amount = array_sum(array_column($old_order_info['taxes'], 'tax_subtotal'));
+        $new_order_tax_amount_included_to_shipping = fn_vendor_plans_get_tax_amount_included_to_shipping($new_order_info['taxes']);
+        $old_order_tax_amount_included_to_shipping = fn_vendor_plans_get_tax_amount_included_to_shipping($old_order_info['taxes']);
+    }
+    if (Registry::get('addons.vendor_plans.include_shipping') == 'N') {
+        $new_order_shipping_cost = $new_order_info['shipping_cost'] - $new_order_tax_amount_included_to_shipping;
+        $old_order_shipping_cost = $old_order_info['shipping_cost'] - $old_order_tax_amount_included_to_shipping;
+        $shipping_cost_difference_not_included_to_commission = $new_order_shipping_cost - $old_order_shipping_cost;
+    }
+
+    $payout_data['order_amount'] =
+        ($new_order_info['total'] - ($new_order_shipping_cost + $new_order_tax_amount)) -
+        ($old_order_info['total'] - ($old_order_shipping_cost + $old_order_tax_amount));
+
     $payout_data = fn_calculate_commission_for_payout($new_order_info, $company_data, $payout_data);
+    if (!isset($payout_data['order_amount'])) {
+        return;
+    }
+    $payout_data['order_amount'] += $shipping_cost_difference_not_included_to_commission;
 }
 
 function fn_vendor_plans_mve_place_order_post(&$order_id, &$action, &$order_status, &$cart, &$auth, &$order_info, &$company_data, &$data, &$payout_id)
@@ -236,9 +337,9 @@ function fn_vendor_plans_mve_place_order_post(&$order_id, &$action, &$order_stat
 function fn_vendor_plans_vendor_payouts_get_list(&$instance, &$params, &$items_per_page, &$fields, &$join, &$condition, &$date_condition, &$sorting, &$limit)
 {
     if ($instance->getVendor()) {
-        $fields['payout_amount'] = 'IF(payouts.order_id <> 0, payouts.order_amount - payouts.commission_amount, payouts.payout_amount)';
+        $fields['payout_amount'] = 'CASE WHEN payouts.order_id <> 0 THEN payouts.order_amount - payouts.commission_amount ELSE payouts.payout_amount END';
     } else {
-        $fields['payout_amount'] = 'IF(payouts.order_id <> 0, payouts.commission_amount, payouts.payout_amount)';
+        $fields['payout_amount'] = 'CASE WHEN payouts.order_id <> 0 THEN payouts.commission_amount                        ELSE payouts.payout_amount END';
     }
 }
 
@@ -403,9 +504,6 @@ function fn_vendor_plans_update_product_pre(&$product_data, &$product_id, &$lang
                     fn_set_notification('E', __('error'), __('vendor_plans.category_is_empty'));
                 }
             }
-
-        } else {
-            $can_update = false;
         }
 
     }
@@ -439,19 +537,30 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
         && ($plan = VendorPlan::model()->find($company_data['plan_id']))
     ) {
         $commission = $order_info['total'] > 0 ? $plan->commission : 0;
+        $fixed_commission = $order_info['total'] > 0 ? $plan->fixed_commission : 0;
         $total = $order_info['total'];
         $shipping_cost = 0;
+        $taxes = 0;
 
         if ($payout_data['payout_type'] == VendorPayoutTypes::ORDER_CHANGED
             || $payout_data['payout_type'] == VendorPayoutTypes::ORDER_REFUNDED
         ) {
             // Commission is calculated as the difference between orders
-            $total = $payout_data['order_amount'];
-        } elseif (Registry::get('addons.vendor_plans.include_shipping') == 'N') {
-            // Calculate commission amount and check if we need to include shipping cost
-            $shipping_cost = $order_info['shipping_cost'];
-        }
+            $total = $payout_data['order_amount']; // When order was refunded - $total always has to be a negative value or 0.
+            $commission = $total == 0 ? 0 : $plan->commission;
+            $fixed_commission = $total == 0 ? 0 : $plan->fixed_commission;
+        } else {
+            $tax_amount_included_to_shipping = fn_vendor_plans_get_tax_amount_included_to_shipping($order_info['taxes']);
 
+            if (Registry::get('addons.vendor_plans.include_taxes_in_commission') === YesNo::NO) {
+                $taxes = array_sum(array_column($order_info['taxes'], 'tax_subtotal'));
+            }
+
+            if (Registry::get('addons.vendor_plans.include_shipping') === YesNo::NO) {
+                // Calculate commission amount and check if we need to include shipping cost
+                $shipping_cost = ($order_info['shipping_cost'] - $tax_amount_included_to_shipping);
+            }
+        }
         $surcharge_from_total = $surcharge_to_commission = $order_info['payment_surcharge'];
 
         /**
@@ -469,8 +578,19 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
          */
         fn_set_hook('vendor_plans_calculate_commission_for_payout_before', $order_info, $company_data, $payout_data, $total, $shipping_cost, $surcharge_from_total, $surcharge_to_commission, $commission);
 
-        $commission_amount = ($total - $shipping_cost - $surcharge_from_total) * $commission / 100; // Calculate commission excluding payment surcharge
-        $commission_amount += $surcharge_to_commission; // Payment surcharge has always go to the admin
+        $formatter = ServiceProvider::getPriceFormatter();
+
+        // Calculate commission excluding payment surcharge
+        $percent_commission = ($total - $shipping_cost - $surcharge_from_total - $taxes) * $commission / 100;
+        $percent_commission = $formatter->round($percent_commission);
+
+        if ($percent_commission >= 0) {
+            $commission_amount = $percent_commission + $fixed_commission + $surcharge_to_commission; // Payment surcharge has always go to the admin
+        } else {
+            $commission_amount = $percent_commission - $fixed_commission - $surcharge_to_commission; // Refund situation
+        }
+
+        $commission_amount = $formatter->round($commission_amount);
 
         if (abs($commission_amount) > abs($total)) {
             $commission_amount = $total;
@@ -479,6 +599,17 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
         $payout_data['commission'] = $commission;
         $payout_data['commission_amount'] = $commission_amount;
         $payout_data['commission_type'] = 'P'; // Backward compatibility
+        $payout_data['plan_id'] = $company_data['plan_id'];
+        $payout_data['extra'] = [
+            'commission_amount'       => $commission_amount,
+            'percent_commission'      => $percent_commission,
+            'surcharge_to_commission' => $surcharge_to_commission,
+            'shipping_cost'           => $shipping_cost,
+            'taxes'                   => $taxes,
+            'fixed_commission'        => $fixed_commission,
+            'total'                   => $total,
+            'commission'              => $commission,
+        ];
 
         /**
          * This hook is executed after the commission amount was calculated for a payout.
@@ -492,6 +623,74 @@ function fn_calculate_commission_for_payout($order_info, $company_data, $payout_
     }
 
     return $payout_data;
+}
+
+/**
+ * Calculates tax amount that already included to shipping price
+ *
+ * @param array $taxes Order taxes
+ *
+ * @return mixed
+ */
+function fn_vendor_plans_get_tax_amount_included_to_shipping($taxes)
+{
+    $calculate_by_subtotal = Registry::get('settings.Checkout.tax_calculation') === 'subtotal';
+    return array_reduce($taxes, function ($tax_amount, $tax) use ($calculate_by_subtotal) {
+        if (!fn_vendor_plans_is_need_tax_amount_included_to_shipping($tax)) {
+            return $tax_amount;
+        }
+
+        $coef = YesNo::toBool($tax['price_includes_tax']) ? 1 : (-1);
+
+        if ($calculate_by_subtotal) {
+            $amount = isset($tax['applies']['S']) ? $tax['applies']['S'] : 0;
+
+            return $tax_amount + $amount * $coef;
+        }
+
+        $amount = 0;
+
+        foreach ($tax['applies'] as $hash => $amt) {
+            list($code) = explode('_', $hash);
+            $is_shipping_tax = $code === 'S';
+            if ($is_shipping_tax) {
+                $amount = $amt;
+                break;
+            }
+        }
+
+        return $tax_amount + $amount * $coef;
+    }, 0);
+}
+
+/**
+ * Checks if it needs to gets tax amount from shipping
+ *
+ * @param array<string, string> $tax Array of the tax data
+ *
+ * @return bool
+ */
+function fn_vendor_plans_is_need_tax_amount_included_to_shipping(array $tax)
+{
+    if (
+        (
+            Registry::get('addons.vendor_plans.include_taxes_in_commission') === YesNo::NO
+            && Registry::get('addons.vendor_plans.include_shipping') === YesNo::YES
+        )
+        || (
+            Registry::get('addons.vendor_plans.include_taxes_in_commission') === YesNo::NO
+            && !YesNo::toBool($tax['price_includes_tax'])
+        )
+        || (
+            Registry::get('addons.vendor_plans.include_taxes_in_commission') === YesNo::YES
+            && Registry::get('addons.vendor_plans.include_shipping') === YesNo::NO
+            && YesNo::toBool($tax['price_includes_tax'])
+        )
+    ) {
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -523,3 +722,53 @@ function fn_vendor_plans_process_paypal_ipn_create_payout(&$order_id, &$data, &$
 
     $payout_data = fn_calculate_commission_for_payout($order_info, $company_data, $payout_data);
 }
+
+/**
+ * Hook handler: to add vendor plans data to corresponding profile field
+ *
+ * @param $location
+ * @param $_auth
+ * @param $lang_code
+ * @param $params
+ * @param $profile_fields
+ * @param $sections
+ */
+function fn_vendor_plans_get_profile_fields_post($location, $_auth, $lang_code, $params, &$profile_fields, $sections)
+{
+    static $vendor_plans = null;
+
+    foreach ($profile_fields as $section => &$fields) {
+
+        foreach ($fields as &$field) {
+
+            if ($field['field_type'] != PROFILE_FIELD_TYPE_VENDOR_PLAN) {
+                continue;
+            }
+
+            if ($vendor_plans === null) {
+                $vendor_plans = VendorPlan::model()->findMany(array(
+                    'allowed_for_company_id' => Registry::get('runtime.company_id'),
+                    'storefront_id'          => Tygh::$app['storefront']->storefront_id,
+                ));
+            }
+
+            $field['plans'] = $vendor_plans;
+        }
+    }
+}
+
+/**
+ * Hook handler: prepares extra data before saving to the database
+ *
+ * @param VendorPayouts $vendor_payouts Class instance
+ * @param array         $data           Payout data
+ * @param int           $payout_id      Payout identifier
+ * @param string        $action         Current action (create or update)
+ */
+function fn_vendor_plans_vendor_payouts_update($vendor_payouts, &$data, $payout_id, $action)
+{
+    if (isset($data['extra']) && is_array($data['extra'])) {
+        $data['extra'] = json_encode($data['extra']);
+    }
+}
+

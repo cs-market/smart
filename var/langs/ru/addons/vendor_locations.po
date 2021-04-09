@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_locations.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.11.5/addons/vendor_locations.po\n"
+"X-Crowdin-File-ID: 3670\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::vendor_locations"
 msgid "Vendor locations [Beta]"
@@ -34,7 +34,7 @@ msgstr "Радиус по умолчанию в фильтре по рассто
 
 msgctxt "SettingsTooltips::vendor_locations::start_search_radius"
 msgid "You can manually add a product filter that allows customers to search for products within a certain distance if they enter their location. This setting determines the default search radius for that filter. If you don't create a filter, products will be shown regardless of distance, and this setting won't have any effect."
-msgstr ""
+msgstr "Вы можете вручную добавить фильтр, который позволит покупателям искать товары на определённом расстоянии, если они укажут своё местоположение. Эта настройка определяет радиус по умолчанию для этого фильтра. Если вы не создадите фильтр, то товары всегда будут показываться независимо от расстояния, и настройка ни на что не повлияет."
 
 msgctxt "SettingsOptions::vendor_locations::max_search_radius"
 msgid "Maximum radius in distance filter"
@@ -42,7 +42,7 @@ msgstr "Максимальный радиус в фильтре по расст�
 
 msgctxt "SettingsTooltips::vendor_locations::max_search_radius"
 msgid "You can manually add a product filter that allows customers to search for products within a certain distance if they enter their location. This setting determines the maximum search radius possible for that filter. If you don't create a filter, products will be shown regardless of distance, and this setting won't have any effect."
-msgstr ""
+msgstr "Вы можете вручную добавить фильтр, который позволит покупателям искать товары на определённом расстоянии, если они укажут своё местоположение. Эта настройка определяет максимальный радиус для этого фильтра. Если вы не создадите фильтр, то товары всегда будут показываться независимо от расстояния, и настройка ни на что не повлияет."
 
 msgctxt "SettingsOptions::vendor_locations::distance_unit"
 msgid "Distance measurement unit"

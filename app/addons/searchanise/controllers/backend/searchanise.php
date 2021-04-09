@@ -14,26 +14,51 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($mode == 'export') {
+use Tygh\Enum\YesNo;
+use Tygh\Enum\Addons\Searchanise\SignupStatuses;
 
+if ($mode == 'export') {
     fn_se_signup(fn_se_get_company_id(), NULL, true);
     fn_se_queue_import(fn_se_get_company_id(), NULL, true);
 
-    return array(CONTROLLER_STATUS_OK, 'addons.update?addon=searchanise');
+    return [CONTROLLER_STATUS_OK, 'addons.update?addon=searchanise'];
 
 } elseif ($mode == 'options') {
     if (isset($_REQUEST['snize_use_navigation'])) {
-        $is_navigation = ($_REQUEST['snize_use_navigation'] == 'true') ? 'Y' : 'N';
+        $is_navigation = ($_REQUEST['snize_use_navigation'] == 'true') ? YesNo::YES : YesNo::NO;
         fn_se_set_simple_setting('use_navigation', $is_navigation);
     }
 
     exit;
 
 } elseif ($mode == 'signup') {
+    if (defined('AJAX_REQUEST')) {
+        Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+        $data = [
+            'result' => false,
+            'errors' => [],
+        ];
 
-    if (fn_se_signup() == true) {
-        fn_se_queue_import();
+        if (!empty($_REQUEST['get_status'])) {
+            $data['result'] = fn_se_get_signup_status();
+
+            if ($data['result'] == SignupStatuses::DONE) {
+                return [CONTROLLER_STATUS_OK, 'addons.update?addon=searchanise'];
+            } else {
+                $data['errors'] = fn_get_notifications();
+            }
+
+        } else {
+            if (fn_se_signup() == true) {
+                fn_se_queue_import();
+                $data['result'] = true;
+            }
+        }
+
+        Tygh::$app['ajax']->assign('data', $data);
+
+        exit();
     }
 
-    return array(CONTROLLER_STATUS_OK, 'addons.update?addon=searchanise');
+    return [CONTROLLER_STATUS_OK, 'addons.update?addon=searchanise'];
 }

@@ -92,3 +92,30 @@ msgctxt "Languages::addons.rus_pickpoint.priority"
 msgid "Priority"
 msgstr "Priority"
 
+msgctxt "Languages::rus_pickpoint.day_single.schedule_closed"
+msgid "[first_day]: Closed"
+msgstr "[first_day]: Closed"
+
+msgctxt "Languages::rus_pickpoint.day_single.schedule_interval"
+msgid "[first_day]: [schedule]"
+msgstr "[first_day]: [schedule]"
+
+msgctxt "Languages::rus_pickpoint.day_interval.schedule_closed"
+msgid "[first_day]&ndash;[last_day]: Closed"
+msgstr "[first_day]&ndash;[last_day]: Closed"
+
+msgctxt "Languages::rus_pickpoint.day_interval.schedule_interval"
+msgid "[first_day]&ndash;[last_day]: [schedule]"
+msgstr "[first_day]&ndash;[last_day]: [schedule]"
+
+msgctxt "Languages::rus_pickpoint.day_every.schedule_closed"
+msgid "Daily: Closed"
+msgstr "Daily: Closed"
+
+msgctxt "Languages::rus_pickpoint.day_every.schedule_interval"
+msgid "Daily: [schedule]"
+msgstr "Daily: [schedule]"
+
+msgctxt "Languages::rus_pickpoint.selected_pickpoint_not_working"
+msgid "The pickup point you selected is currently unavailable. We have selected the default pickup point instead. Please choose another pickup point."
+msgstr "The pickup point you selected is currently unavailable. We have selected the default pickup point instead. Please choose another pickup point."

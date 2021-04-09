@@ -8,7 +8,7 @@
             {else}
                 {math equation="x+21" x=$shift assign="_shift"}
             {/if}
-            <span class="nowrap" style="padding-left: {$_shift}px;">
+            <span class="nowrap" style="padding-{$direction}: {$_shift}px;">
             {if $cur_cat.has_children || $cur_cat.subcategories}
                 {if $show_all}
                     <span title="{__("expand_sublist_of_items")}" id="on_{$comb_id}" class="hand cm-combination-cat cm-uncheck {if isset($path.$cat_id) || $expand_all}hidden{/if}"><span class="icon-caret-right"></span></span>

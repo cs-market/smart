@@ -376,7 +376,8 @@ class Settings
      * If some parameter will be skipped and function not update it field.
      * If section_id skipped function adds new variant and retuns id of new record.
      *
-     * @param  string   $section_data Aray of section data
+     * @param  array   $section_data Array of section data
+     *
      * @return bool|int Section identifier if section was created, true un success update, false otherwise
      */
     public function updateSection($section_data)
@@ -748,25 +749,29 @@ class Settings
                 $section_condition = '';
             }
 
-            return db_get_field(
+            $object_id = db_get_field(
                 "SELECT object_id FROM ?:settings_objects "
                 . "LEFT JOIN ?:settings_sections ON ?:settings_objects.section_id = ?:settings_sections.section_id "
                 . "WHERE ?:settings_objects.name = ?s ?p",
                 $setting_name,
                 $section_condition
             );
+            
+            return empty($object_id) ? false : (int) $object_id;
+
         } else {
             return false;
         }
     }
 
     /**
-     * Updates all setting paramentrs include descriptions and variants.
+     * Updates all setting parameters include descriptions and variants.
      *
      * @param  array $setting_data        List of setting data @see CSettings::_update
      * @param  array $variants            List of variants data to update with seting @see CSettings::updateVariant
      * @param  array $descriptions        List of descriptions data to update with seting @see CSettings::updateDescription description type will be setted automaticly
      * @param  bool  $force_cache_cleanup Force registry cleanup after setting was updated
+     *
      * @return int   Setting identifier if it was created, true un success update, false otherwise
      */
     public function update($setting_data, $variants = null, $descriptions = null, $force_cache_cleanup = false)
@@ -984,7 +989,7 @@ class Settings
      */
     public function isExists($setting_name, $section_name = '')
     {
-        return ($this->getId($setting_name, $section_name) === null) ? false : true;
+        return (bool) $this->getId($setting_name, $section_name);
     }
 
     /**
@@ -1205,12 +1210,13 @@ class Settings
      * If some parameter will be skipped and function not update it field.
      * If variant_id skipped function adds new variant and retuns id of new record.
      *
-     * @param  string   $variant_data Aray of variant data
+     * @param  array   $variant_data Array of variant data
+     *
      * @return bool|int Variant identifier if variant was created, true un success update, false otherwise
      */
     public function updateVariant($variant_data)
     {
-        return db_replace_into ('settings_variants', $variant_data);
+        return db_replace_into('settings_variants', $variant_data);
     }
 
     /**

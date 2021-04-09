@@ -15,7 +15,7 @@
 $schema['rma'] = array (
     'list_mode' => 'returns',
     'update_mode' => 'details',
-    'func' => 'fn_get_rma_returns',
+    'func' => 'fn_rma_get_returns',
     'item_id' => 'return_id'
 );
 

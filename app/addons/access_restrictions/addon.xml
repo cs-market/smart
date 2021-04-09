@@ -111,7 +111,7 @@
                 PRIMARY KEY  (`item_id`,`type`,`lang_code`)
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_access_restrictions', 'Y', 'addons');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_access_restrictions', 'Y', 'addons', 'access_restrictions', 'N');</item>
         <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">DELETE FROM ?:privileges WHERE privilege LIKE 'manage_access_restrictions'</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:access_restriction_block;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:access_restriction;</item>

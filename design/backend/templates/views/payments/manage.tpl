@@ -4,8 +4,10 @@
 
 <script type="text/javascript">
 var processor_descriptions = [];
-{foreach from=$payment_processors item="p"}
-processor_descriptions[{$p.processor_id}] = '{$p.description|escape:javascript nofilter}';
+{foreach $payment_processors as $payment_category}
+    {foreach $payment_category as $p}
+        processor_descriptions[{$p.processor_id}] = '{$p.description|escape:javascript nofilter}';
+    {/foreach}
 {/foreach}
 function fn_switch_processor(payment_id, processor_id)
 {
@@ -34,21 +36,25 @@ function fn_switch_processor(payment_id, processor_id)
 }
 </script>
 
-<div class="items-container cm-sortable" data-ca-sortable-table="payments" data-ca-sortable-id-name="payment_id" id="payments_list">
-{assign var="skip_delete" value=false}
+{$skip_delete=false}
+{$draggable = $draggable|default:true}
+{hook name="payments:list"}
 {if $payments}
+<div class="items-container payment-methods {if $draggable}cm-sortable{/if}"
+     {if $draggable}data-ca-sortable-table="payments" data-ca-sortable-id-name="payment_id"{/if}
+     id="payments_list">
 <div class="table-wrapper">
-    <table class="table table-middle table-objects table-striped">
+    <table class="table table-middle table--relative table-objects table-striped payment-methods__list">
         <tbody>
-            {foreach from=$payments item=payment name="pf"}
+            {foreach $payments as $pf => $payment}
                 {if "ULTIMATE"|fn_allowed_for}
                     {if $runtime.company_id && $runtime.company_id != $payment.company_id}
-                        {assign var="skip_delete" value=true}
-                        {assign var="hide_for_vendor" value=true}
+                        {$skip_delete=true}
+                        {$hide_for_vendor=true}
 
                     {else}
-                        {assign var="skip_delete" value=false}
-                        {assign var="hide_for_vendor" value=false}
+                        {$skip_delete=false}
+                        {$hide_for_vendor=false}
                     {/if}
                 {/if}
 
@@ -83,7 +89,7 @@ function fn_switch_processor(payment_id, processor_id)
                     header_text="{__("editing_payment")}: `$payment.payment`"
                     additional_class="cm-sortable-row cm-sortable-id-`$payment.payment_id`"
                     no_table=true
-                    draggable=true
+                    draggable=$draggable
                     can_change_status=$can_change_status
                     display=$display
                     tool_items=$smarty.capture.tool_items
@@ -96,6 +102,7 @@ function fn_switch_processor(payment_id, processor_id)
 {else}
     <p class="no-items">{__("no_data")}</p>
 {/if}
+{/hook}
 <!--payments_list--></div>
 {/capture}
 
@@ -109,9 +116,25 @@ function fn_switch_processor(payment_id, processor_id)
 
 {capture name="adv_buttons"}
     {capture name="add_new_picker"}
-        {include file="views/payments/update.tpl" payment=[] hide_for_vendor=false}
+        {include file="views/payments/update.tpl"
+            payment=[]
+            hide_for_vendor=false
+        }
     {/capture}
-    {include file="common/popupbox.tpl" id="add_new_payments" text=__("new_payments") content=$smarty.capture.add_new_picker title=__("add_payment") act="general" icon="icon-plus"}
+    {include file="common/popupbox.tpl"
+        id="add_new_payments"
+        text=__("new_payments")
+        content=$smarty.capture.add_new_picker
+        title=__("add_payment")
+        act="general"
+        icon="icon-plus"
+    }
 {/capture}
 
-{include file="common/mainbox.tpl" title=__("payment_methods") content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons}
+{include file="common/mainbox.tpl"
+        title=__("payment_methods")
+        content=$smarty.capture.mainbox
+        select_languages=true
+        buttons=$smarty.capture.buttons
+        adv_buttons=$smarty.capture.adv_buttons
+}

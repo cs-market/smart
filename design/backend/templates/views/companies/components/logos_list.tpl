@@ -30,7 +30,7 @@
         </div>
 
         <div class="image-upload">
-            {include file="common/fileuploader.tpl" var_name="logotypes_image_icon[`$type`]"}
+            {include file="common/fileuploader.tpl" var_name="logotypes_image_icon[`$type`]" is_image=true}
 
             {hook name="logos:upload_options"}
             {/hook}

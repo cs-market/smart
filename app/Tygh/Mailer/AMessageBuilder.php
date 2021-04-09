@@ -16,7 +16,10 @@
 namespace Tygh\Mailer;
 
 
+use Tygh\Enum\SiteArea;
+use Tygh\Storefront\Repository;
 use Tygh\Tools\Url;
+use Tygh\Tygh;
 
 /**
  * The base abstract class of the message builder.
@@ -30,6 +33,9 @@ abstract class AMessageBuilder implements IMessageBuilder
 
     /** @var null|int Default company identifier */
     protected static $default_company_id;
+
+    /** @var array<array<string|int>> List of storefronts */
+    protected static $storefronts;
 
     /** @var string Current http location (http://example.com) */
     protected $http_location;
@@ -45,6 +51,11 @@ abstract class AMessageBuilder implements IMessageBuilder
 
     /** @var string Absolute path of root directory  */
     protected $root_directory;
+
+    /**
+     * @var \Tygh\Storefront\Repository
+     */
+    protected $storefront_repository;
 
     /**
      * AMessageBuilder constructor.
@@ -70,7 +81,7 @@ abstract class AMessageBuilder implements IMessageBuilder
      *  }
      * }
      */
-    public function __construct(array $config)
+    public function __construct(array $config, Repository $storefront_repository)
     {
         if (isset($config['http_location'])) {
             $this->http_location = $config['http_location'];
@@ -91,6 +102,8 @@ abstract class AMessageBuilder implements IMessageBuilder
         if (isset($config['dir']['root'])) {
             $this->root_directory = $config['dir']['root'];
         }
+
+        $this->storefront_repository = $storefront_repository;
     }
 
     /** @inheritdoc */
@@ -105,6 +118,16 @@ abstract class AMessageBuilder implements IMessageBuilder
 
         $message->setCompanyId($company_id);
 
+        if (SiteArea::isStorefront($area) && empty($params['storefront_id'])) {
+            $params['storefront_id'] = $this->getStorefrontId();
+        } elseif (empty($params['storefront_id'])) {
+            $params['storefront_id'] = 0;
+        }
+
+        $storefront_id = $params['storefront_id'];
+
+        $message->setStorefrontId($storefront_id);
+
         if (!isset($params['data'])) {
             $params['data'] = array();
         }
@@ -112,6 +135,11 @@ abstract class AMessageBuilder implements IMessageBuilder
         if (empty($params['data']['company_data'])) {
             $params['data']['company_data'] = $company;
             $params['data']['company_name'] = $company['company_name'];
+        }
+
+        $storefront = $this->getStorefront($storefront_id);
+        if (empty($params['data']['storefront_data'])) {
+            $params['data']['storefront_data'] = $storefront;
         }
 
         $message->setData($params['data']);
@@ -481,5 +509,37 @@ abstract class AMessageBuilder implements IMessageBuilder
     protected function allowedFor($edition)
     {
         return fn_allowed_for($edition);
+    }
+
+    /**
+     * Gets storefront by storefront identifier
+     *
+     * @param int $storefront_id Storefront identifier
+     *
+     * @return array<string|int>
+     */
+    protected function getStorefront($storefront_id)
+    {
+        if (!isset(self::$storefronts[$storefront_id])) {
+            $storefront = $this->storefront_repository->findById($storefront_id)
+                ?: $this->storefront_repository->findDefault();
+            self::$storefronts[$storefront_id] = $storefront
+                ? $storefront->toArray()
+                : [];
+        }
+
+        return self::$storefronts[$storefront_id];
+    }
+
+    /**
+     * Gets current storefront identifier
+     *
+     * @return int
+     */
+    protected function getStorefrontId()
+    {
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        return $storefront->storefront_id;
     }
 }

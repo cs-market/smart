@@ -63,6 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     ))));
 
                 } else {
+                    $current_license_status = Tygh::$app['session']['last_status'];
+
                     list($license_status, $server_messages, $store_mode) = Helpdesk::getStoreMode($license_number, $auth, array('store_mode_selector' => 'Y'));
 
                     if ($license_status == 'ACTIVE') {
@@ -72,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         fn_set_storage_data('store_mode_trial', null);
 
                     } else {
+
                         $messages = $server_messages;
 
                         if (empty($messages)) {
@@ -84,6 +87,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                         fn_set_storage_data('store_mode_errors', serialize($messages));
                         fn_set_storage_data('store_mode_license', $license_number);
+
+                        if (fn_get_storage_data('store_mode') !== 'new' && $license_status !== 'LICENSE_IS_INVALID') {
+                            Tygh::$app['session']['last_status'] = $license_status;
+                        } else {
+                            Tygh::$app['session']['last_status'] = $current_license_status;
+                        }
+                    }
+
+                    if ($current_license_status === 'ACTIVE' || $license_status === 'ACTIVE') {
+                        unset(Tygh::$app['session']['last_status']);
                     }
 
                     Tygh::$app['session']['mode_recheck'] = true;
@@ -161,3 +174,4 @@ if ($mode == 'manage') {
     Tygh::$app['view']->assign('section_id', Settings::instance()->getSectionTextId($section_id));
     Tygh::$app['view']->assign('settings_title', Settings::instance()->getSectionName($section_id));
 }
+

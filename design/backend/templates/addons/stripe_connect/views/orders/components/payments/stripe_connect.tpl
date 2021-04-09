@@ -1,65 +1,74 @@
-{$payment_info = $cart.payment_id|fn_get_payment_method_data}
-{if $card_id}
-    {assign var="id_suffix" value="`$card_id`"}
+{*
+Payment form.
+*}
+
+{if $payment_method.processor_params|default:[]}
+    {$processor_params = $payment_method.processor_params}
 {else}
-    {assign var="id_suffix" value=""}
+    {$processor_params = $payment_info.processor_params|default:[]}
 {/if}
 
-<div class="clearfix"
-     data-ca-stripe-connect-element="form"
-     data-ca-stripe-connect-publishable-key="{$payment_info.processor_params.publishable_key}"
->
-    <input type="hidden"
-           name="payment_info[stripe_connect.token]"
-           data-ca-stripe-connect-element="token"
-    />
+{if $processor_params.is_stripe_connect|default:false}
+    {$payment_type = $processor_params.payment_type|default:"card_simple"}
+    {script src="js/addons/stripe_connect/views/{$payment_type}.js"}
 
-    <div class="credit-card">
-        <div class="control-group ty-control-group">
-            <label for="credit_card_number_{$id_suffix}"
-                   class="control-label cm-cc-number cm-required"
-            >{__("card_number")}</label>
-            <div class="controls">
-                <div class="stripe-connect-payment-form__card"
-                     data-ca-stripe-connect-element="card"
-                >{* Card number field *}</div>
+    <div class="clearfix"
+         data-ca-stripe-element="form"
+         data-ca-stripe-publishable-key="{$processor_params.publishable_key}"
+    >
+        <input type="hidden"
+               name="payment_info[stripe_connect.payment_intent_id]"
+               data-ca-stripe-element="paymentIntentId"
+               data-ca-stripe-payment-id="{$cart.payment_id}"
+               data-ca-stripe-confirmation-url="{fn_url("stripe_connect.check_confirmation")}"
+               data-ca-stripe-process-payment-name="dispatch[order_management.place_order]"
+        />
+
+        <input type="hidden"
+               name="payment_info[stripe_connect.token]"
+               data-ca-stripe-element="token"
+        />
+
+        <div class="stripe-payment-form__section stripe-payment-form__section--card">
+            <div class="ty-credit-card cm-cc_form">
+                <div class="ty-credit-card__control-group control-group ty-control-group">
+                    <label for="credit_card_number"
+                           class="control-group ty-control-group__title cm-cc-number cc-number cm-required"
+                    >{__("card_number")}</label>
+                    <div class="stripe-payment-form__card"
+                         data-ca-stripe-element="card"
+                    >{* Card number field *}</div>
+                </div>
+
+                <div class="ty-credit-card__control-group control-group ty-control-group">
+                    <label for="credit_card_month"
+                           class="control-group ty-control-group__title cm-cc-date cc-date cm-cc-exp-month cm-required"
+                    >{__("valid_thru")}</label>
+                    <div class="stripe-payment-form__expiry"
+                         data-ca-stripe-element="expiry"
+                    >{* Expriry field *}</div>
+                </div>
+
+                <div class="ty-credit-card__control-group control-group ty-control-group">
+                    <label for="credit_card_name"
+                           class="control-group ty-control-group__title cm-required"
+                    >{__("cardholder_name")}</label>
+                    <input size="35"
+                           type="text"
+                           id="credit_card_name"
+                           value=""
+                           class="cm-cc-name ty-credit-card__input ty-uppercase"
+                           data-ca-stripe-element="name"
+                    />
+                </div>
             </div>
-        </div>
 
-        <div class="control-group ty-control-group">
-            <label for="credit_card_month_{$id_suffix}"
-                   class="control-label cm-required"
-            >{__("valid_thru")}</label>
-            <div class="controls">
-                <div class="stripe-connect-payment-form__expiry"
-                     data-ca-stripe-connect-element="expiry"
-                >{* Expriry field *}</div>
-            </div>
-        </div>
-
-        <div class="control-group ty-control-group">
-            <label for="credit_card_name_{$id_suffix}"
-                   class="control-label cm-required"
-            >{__("cardholder_name")}</label>
-            <div class="controls">
-                <input size="35"
-                       type="text"
-                       id="credit_card_name_{$id_suffix}"
-                       value=""
-                       class="input-text uppercase"
-                       data-ca-stripe-connect-element="name"
-                />
-            </div>
-        </div>
-
-        <div class="control-group ty-control-group">
-            <label for="credit_card_cvv2_{$id_suffix}"
-                   class="control-label cm-required"
-            >{__("cvv2")}</label>
-            <div class="controls">
-                <div class="stripe-connect-payment-form__cvc"
-                     data-ca-stripe-connect-element="cvc"
+            <div class="control-group ty-control-group ty-credit-card__cvv-field cvv-field">
+                <label for="credit_card_cvv2" class="control-group ty-control-group__title cm-required cm-cc-cvv2  cc-cvv2 cm-autocomplete-off">{__("cvv2")}</label>
+                <div class="stripe-payment-form__cvc"
+                     data-ca-stripe-element="cvc"
                 >{* CVC field *}</div>
+
                 <div class="cvv2">
                     <a>{__("what_is_cvv2")}</a>
                     <div class="popover fade bottom in">
@@ -93,4 +102,4 @@
             </div>
         </div>
     </div>
-</div>
+{/if}

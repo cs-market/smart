@@ -36,7 +36,9 @@
             value: function () {
                 for (var i = 0; i < this.length; i++) {
                     if (this[i].image_type === 'M') {
-                        return this[i]; } }
+                        return this[i];
+                    }
+                }
 
                 return false;
             },
@@ -391,8 +393,8 @@
                             };
                             addedFile.dynamicData['alt-text-detailed'] = {
                                 name: 'detailed_alt',
-                                value: sourceImage.alt,
-                                defaultValue: sourceImage.alt,
+                                value: sourceImage.alt ? sourceImage.alt : "",
+                                defaultValue: sourceImage.alt ? sourceImage.alt : "",
                                 postfix: '_data'
                             };
                             addedFile.dynamicData['is-new-file'] = {
@@ -453,6 +455,7 @@
                 }
                 self.refreshPreview(addedFile);
                 self.registerCustomRemoveEvent(addedFile);
+                self.registerCustomAltUpdateEvent(addedFile);
                 self.expandAltTextarea(addedFile);
             });
         },
@@ -472,10 +475,20 @@
         registerExistingFiles: function () {
             var self = this;
 
+            this.options.existingFiles.forEach(function (item, index) {
+                item.index = index;
+            });
+
             // Although the files list is passed already ordered by file position,
             // jQuery.data() method may weirdly reorder them
             this.options.existingFiles.sort(function (a, b) {
-                return Number(a.position) - Number(b.position);
+                var result = Number(a.position) - Number(b.position);
+
+                if (result === 0) {
+                    result = a.index - b.index;
+                }
+
+                return result;
             });
 
             $.each(this.options.existingFiles, function () {
@@ -598,6 +611,15 @@
             });
         },
 
+        registerCustomAltUpdateEvent: function (file) {
+            var self = this;
+
+            $(file.previewElement).find('.file-uploader__file-description-input').on('keyup', function () {
+                file.dynamicData['alt-text-detailed'].value = $(this).val();
+                self.refreshPreview(file);
+            });
+        },
+
         refreshPreview: function (previewFile) {
             if ('dynamicData' in previewFile) {
                 var self = this;
@@ -661,16 +683,15 @@
             var minZedIndex = $.ceDialog('get_last').zIndex();
             var $tempElfinderDialogWrapper = $('<div id="server_file_browser"></div>');
 
-            var $elfinderDialog = $tempElfinderDialogWrapper.elfinder({
+            var options = $.extend(_.fileManagerOptions, {
                 url: fn_url('elf_connector.files?security_hash=' + _.security_hash),
-                lang: 'en',
                 cutURL: _.allowed_file_path,
-                resizable: false,
                 getFileCallback: function (file) {
                     $tempElfinderDialogWrapper.dialog('close');
                     self.registerFileFromElfinder(file);
                 }
-            }).dialog({
+            });
+            var $elfinderDialog = $tempElfinderDialogWrapper.elfinder(options).dialog({
                 width: 900,
                 modal: true,
                 title: _.tr('file_browser'),

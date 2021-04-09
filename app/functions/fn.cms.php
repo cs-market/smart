@@ -12,11 +12,11 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Menu;
 use Tygh\BlockManager\Block;
+use Tygh\Languages\Languages;
+use Tygh\Menu;
 use Tygh\Navigation\LastView;
-use \Tygh\Languages\Languages;
+use Tygh\Registry;
 use Tygh\Tools\SecurityHelper;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -204,10 +204,26 @@ function fn_get_pages($params = array(), $items_per_page = 0, $lang_code = CART_
         $condition .= db_quote(" AND ?:pages.status IN (?a)", $params['status']);
     }
 
+    if (AREA === 'C' && empty($params['vendor_pages'])) {
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        $params['company_id'] = isset($params['company_id'])
+            ? (array) $params['company_id']
+            : [];
+
+        if (fn_allowed_for('MULTIVENDOR') && $storefront->getCompanyIds()) {
+            if ($params['company_id']) {
+                $params['company_id'] = array_intersect($storefront->getCompanyIds(), $params['company_id']);
+            } else {
+                $params['company_id'] = array_merge([0], $storefront->getCompanyIds());
+            }
+        }
+    }
+
     if (!empty($params['vendor_pages']) && empty($params['company_id'])) {
         return array(array(), $params);
     } elseif (!empty($params['company_id'])) {
-        $condition .= db_quote(" AND ?:pages.company_id = ?i", $params['company_id']);
+        $condition .= db_quote(" AND ?:pages.company_id IN (?n)", $params['company_id']);
     }
 
     if (empty($params['full_search'])) {
@@ -497,7 +513,7 @@ function fn_update_page($page_data, $page_id = 0, $lang_code = CART_LANGUAGE)
             $create = true;
             $page_data['page_id'] = $page_id = db_query('INSERT INTO ?:pages ?e', $page_data);
 
-            foreach (fn_get_translation_languages() as $page_data['lang_code'] => $v) {
+            foreach (Languages::getAll() as $page_data['lang_code'] => $v) {
                 db_query('INSERT INTO ?:page_descriptions ?e', $page_data);
             }
         } else {
@@ -1001,7 +1017,7 @@ function fn_delete_page($page_id, $recurse = true)
 /** Block manager **/
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Returns only active languages list for block (as lang_code => array(name, lang_code, status, country_code)
  *
@@ -1016,13 +1032,17 @@ function fn_delete_page($page_id, $recurse = true)
 function fn_get_languages($default_value = '', $block = array(), $block_scheme = array(), $include_hidden = false, $params = array())
 {
     $area = isset($params['area']) ? $params['area'] : AREA;
-    $languages = Languages::getAvailable($area, $include_hidden);
+
+    $languages = Languages::getAvailable([
+        'area'           => $area,
+        'include_hidden' => $include_hidden,
+    ]);
 
     return $languages;
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Returns active and hidden languages list (as lang_code => array(name, lang_code, status, country_code)
  *
@@ -1032,7 +1052,10 @@ function fn_get_languages($default_value = '', $block = array(), $block_scheme =
  */
 function fn_get_avail_languages($area = AREA, $include_hidden = false)
 {
-    return Languages::getAvailable($area, $include_hidden);
+    return Languages::getAvailable([
+        'area'           => $area,
+        'include_hidden' => $include_hidden,
+    ]);
 }
 
 /**
@@ -1049,7 +1072,7 @@ function fn_get_simple_currencies($only_avail = true)
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Gets only active languages list (as lang_code => name)
  *
@@ -1304,8 +1327,10 @@ function fn_top_menu_standardize($items, $id_name, $name, $children_name, $href_
 
 /**
  * Checks if menu item url is the same with current url
- * @param type $url - menu item url
- * @param type $active_for - menu item active_for parameter (dispatch/mode list)
+ *
+ * @param string $url - menu item url
+ * @param string $active_for - menu item active_for parameter (dispatch/mode list)
+ *
  * @return boolean - true if item can be marked as active, false - otherwise
  */
 function fn_top_menu_is_current_url($url, $active_for = '')
@@ -1341,10 +1366,11 @@ function fn_top_menu_is_current_url($url, $active_for = '')
                 (!isset($params['path']) && !isset($current_params['path']))
                 || $params['path'] == $current_params['path'])
                 && ((!isset($params['query']))
-                || strpos($current_params['query'], $params['query']) !== false)
+                || preg_match('/\b' . preg_quote($params['query']) . '\b/i', $current_params['query']))
             ) {
                 $active = true;
             }
+
         }
     }
 
@@ -1491,7 +1517,7 @@ function fn_update_sitemap($section_data, $section_id = 0)
         if (!empty($section_id)) {
 
             $_data = array();
-            foreach (fn_get_translation_languages() as $lang_code => $_lang_data) {
+            foreach (Languages::getAll() as $lang_code => $_lang_data) {
                 $_data[] = array(
                     'object'        => $section_data['section'],
                     'object_id'     => $section_id,
@@ -1535,7 +1561,7 @@ function fn_update_sitemap_links($links_data, $section_id)
 
                 if (!empty($link_id)) {
                     $_data = array();
-                    foreach (fn_get_translation_languages() as $lang_code => $_lang_data) {
+                    foreach (Languages::getAll() as $lang_code => $_lang_data) {
                         $_data[] = array(
                             'object'        => $link_data['link'],
                             'object_id'     => $link_id,

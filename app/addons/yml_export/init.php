@@ -32,5 +32,9 @@ fn_register_hooks(
     'update_product_feature_variant',
     'get_filters_products_count_before_select_filters',
     'get_filters_products_count_post',
-    'get_categories'
+    'get_categories',
+    'chown_company',
+    ['yml_export_update_product_pre_post', '', 'product_variations'],
+    ['yml_export_generate_offers_before_gather_additional_products_data', '', 'product_variations'],
+    ['yml_export_generate_offers_before_gather_additional_products_data', '', 'warehouses']
 );

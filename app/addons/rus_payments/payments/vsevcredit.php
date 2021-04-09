@@ -73,7 +73,10 @@ if (defined('PAYMENT_NOTIFICATION')) {
     $shop_id = (!empty($processor_data['processor_params']['vvc_shop_id'])) ? $processor_data['processor_params']['vvc_shop_id'] : 0;
     $user_id = (!empty($order_info['user_id'])) ? $order_info['user_id'] : 0;
     $order_id = (!empty($order_id)) ? $order_id : 0;
-    $url = ($processor_data['processor_params']['test_mode']) ? 'http://test.vsevcredit.ru/js/widget.js' : 'http://vsevcredit.ru/js/widget.js';
+
+    $url = ($processor_data['processor_params']['test_mode']) ?
+         "//test.vkredit24.ru/js/widget.js" :
+         "//vkredit24.ru/js/widget.js";
 
     if (!empty($order_id)) {
         fn_update_order_payment_info($order_id, array('awaiting_callback' => true));

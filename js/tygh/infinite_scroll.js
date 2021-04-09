@@ -21,7 +21,7 @@
                 }
 
                 if ($('.cm-table-tbody').css('height')) {
-                    var height = $('.cm-table-tbody').height();
+                    var height = Math.round($('.cm-table-tbody').height());
                     res = height - 50;
                     $('.cm-table-tbody').css('height', res + "px");
                 }
@@ -52,13 +52,30 @@
                         count = $('#count_scroll_' + scroll_id).val();
                         begin = parseInt($('#begin_scroll_' + scroll_id).val()) + 1;
 
-                        var currentHeight = $('[id=' + scroll_id + ']' + '.cm-scroll-content').get(0).scrollHeight;
-                        if($('#' + scroll_id).scrollTop() >= (currentHeight - $('#' + scroll_id).height())){
+                        var currentHeight = $('[id=' + scroll_id + ']' + '.cm-scroll-content').get(0).scrollHeight,
+                            scrollTop = $('[id=' + scroll_id + ']' + '.cm-scroll-content').get(0).scrollTop,
+                            offsetHeight = $('[id=' + scroll_id + ']' + '.cm-scroll-content').get(0).offsetHeight;
+
+                        if (scrollTop > 0 && scrollTop >= (currentHeight - offsetHeight)) {
                             loader();
                         }
                     }, 200);
                 });
             });
+        });
+
+        $.ceEvent('on', 'ce.ajaxdone', function (elms, inline_scripts, params) {
+            var tbody = $(this).find('.cm-scroll-data tbody'),
+                trCount = tbody.find('tr').length;
+                tbodyClientHeight = tbody.get(0).clientHeight;
+                tbodyScrollHeight = tbody.get(0).scrollHeight;
+
+            if (tbodyClientHeight > 0 && tbodyScrollHeight > 0 && tbodyClientHeight >= tbodyScrollHeight && trCount >= count) {
+                count = $('#count_scroll_' + scroll_id).val();
+                begin = parseInt($('#begin_scroll_' + scroll_id).val()) + 1;
+
+                loader();
+            }
         });
 
         function disabledBlock(elm_start, elm_head_scroll) {

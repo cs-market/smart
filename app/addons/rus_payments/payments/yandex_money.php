@@ -207,6 +207,8 @@ if (defined('PAYMENT_NOTIFICATION')) {
             fn_yandex_money_log_write($dom->saveXML(), 'ym_payment_aviso.log');
         }
 
+        db_query('DELETE FROM ?:user_session_products WHERE order_id = ?i AND type = ?s', $order_id, 'C');
+        fn_clear_cart(Tygh::$app['session']['cart']);
         exit;
     }
 

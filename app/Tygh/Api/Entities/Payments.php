@@ -21,9 +21,9 @@ use Tygh\Api\Response;
 class Payments extends AEntity
 {
 
-    public function index($id = 0, $params = array())
+    public function index($id = 0, $params = [])
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (!empty($id)) {
             $data = fn_get_payment_method_data($id, $lang_code);
@@ -39,27 +39,28 @@ class Payments extends AEntity
             $page = $this->safeGet($params, 'page', 1);
 
             $data = fn_get_payments($lang_code);
+            $total_items_count = count($data);
 
             if ($items_per_page) {
                 $data = array_slice($data, ($page - 1) * $items_per_page, $items_per_page);
             }
 
-            $data = array(
+            $data = [
                 'payments' => $data,
-                'params' => array(
+                'params'   => [
                     'items_per_page' => $items_per_page,
-                    'page' => $page,
-                    'total_items' => count($data),
-                ),
-            );
+                    'page'           => $page,
+                    'total_items'    => $total_items_count,
+                ],
+            ];
 
             $status = Response::STATUS_OK;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function create($params)
@@ -98,7 +99,7 @@ class Payments extends AEntity
         $status = Response::STATUS_BAD_REQUEST;
         $data = array();
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (isset($params['processor_params']['certificate_filename']) && !$params['processor_params']['certificate_filename']) {
             fn_rm(Registry::get('config.dir.certificates') . $id);

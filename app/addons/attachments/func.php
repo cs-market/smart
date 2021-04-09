@@ -13,11 +13,22 @@
 ****************************************************************************/
 
 use Tygh\Storage;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_get_attachments($object_type, $object_id, $type = 'M', $lang_code = CART_LANGUAGE)
 {
+    /**
+     *  Executes at the beginning of the function, allowing you to modify the arguments passed to the function.
+     *
+     * @param string $object_type Object type
+     * @param string $object_id   Object identifier
+     * @param string $type        Attachment type
+     * @param string $lang_code   Language code
+     */
+    fn_set_hook('get_attachments_pre', $object_type, $object_id, $type, $lang_code);
+
     $condition = '';
     if (AREA != 'A') {
         $auth = Tygh::$app['session']['auth'];
@@ -67,7 +78,7 @@ function fn_update_attachments($attachment_data, $attachment_id, $object_type, $
 
         if ($attachment_id) {
             // Add file description
-            foreach (fn_get_translation_languages() as $lang_code => $v) {
+            foreach (Languages::getAll() as $lang_code => $v) {
                 $rec = array (
                     'attachment_id' => $attachment_id,
                     'lang_code' => $lang_code,

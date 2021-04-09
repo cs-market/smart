@@ -25,21 +25,23 @@
         {foreach $config_data.app_appearance.colors.navbar as $col_name => $color}
         <div class="control-group">
             <label class="control-label" for="">{$color.name} {include file="common/tooltip.tpl" tooltip=$color.description}: </label>
-            <div class="controls colorpicker">
-                <input {if $color.type != "number"}type="text"{else}type="number"{/if} 
-                    data-target="{$col_name}" 
-                    {if $color.type == "color" || $color.type == "rgba"}
-                        data-ca-spectrum-show-alpha="true"
-                    {/if}
-                    name="m_settings[app_appearance][colors][navbar][{$col_name}]"
-                    id="{$col_name}" 
-                    value="{$color.value}" 
-                    {if $color.type == "color" || $color.type == "rgba"}
-                        class="js-mobile-app-input cm-colorpicker"
-                    {else}
-                        class="js-mobile-app-input"
-                    {/if}
-                />
+            <div class="controls">
+                <div class="colorpicker">
+                    <input {if $color.type != "number"}type="text"{else}type="number"{/if} 
+                        data-target="{$col_name}" 
+                        {if $color.type == "color" || $color.type == "rgba"}
+                            data-ca-spectrum-show-alpha="true"
+                        {/if}
+                        name="m_settings[app_appearance][colors][navbar][{$col_name}]"
+                        id="{$col_name}" 
+                        value="{$color.value}" 
+                        {if $color.type == "color" || $color.type == "rgba"}
+                            class="js-mobile-app-input cm-colorpicker"
+                        {else}
+                            class="js-mobile-app-input"
+                        {/if}
+                    />
+                </div>
             </div>
         </div>
         {/foreach}

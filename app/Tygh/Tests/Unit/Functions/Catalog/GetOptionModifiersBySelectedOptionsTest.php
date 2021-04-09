@@ -33,8 +33,6 @@ class GetOptionModifiersBySelectedOptionsTest extends ATestCase
      */
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
-
         $this->requireCore('functions/fn.catalog.php');
         $this->requireMockFunction('fn_set_hook');
 

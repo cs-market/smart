@@ -34,33 +34,34 @@ class SraBmLocations extends ASraEntity
     {
         $status = Response::STATUS_OK;
         $layout_id = 0;
+        $lang_code = $this->getLanguageCode($params);
 
         if ($this->getParentName() === 'sra_bm_layouts') {
             $layout = $this->getParentData();
             $layout_id = $layout['layout_id'];
         }
 
+        $location = Location::instance($layout_id);
+
         if ($id) {
             if (is_numeric($id)) {
-                $data = Location::instance($layout_id)->getById($id);
+                $data = $location->getById($id, $lang_code);
             } else {
-                $data = Location::instance($layout_id)->getList(array(
+                $data = $location->getList([
                     'dispatch' => $id,
                     'sort_by' => 'object_ids',
                     'sort_order' => 'desc',
                     'limit' => 1
-                ));
+                ], $lang_code);
 
-                if (!empty($data)) {
-                    $data = reset($data);
-                }
+                $data = $data ? reset($data) : $location->getDefault($lang_code);
             }
 
             if (empty($data)) {
                 $status = Response::STATUS_NOT_FOUND;
             }
         } else {
-            $data = Location::instance($layout_id)->getList($params);
+            $data = $location->getList($params, $lang_code);
         }
 
         return array(
@@ -74,37 +75,8 @@ class SraBmLocations extends ASraEntity
      */
     public function create($params)
     {
-        if ($this->getParentName() !== 'sra_bm_layouts') {
-            return array(
-                'status' => Response::STATUS_BAD_REQUEST
-            );
-        }
-
-        $data = array();
-        $status = Response::STATUS_BAD_REQUEST;
-        $layout = $this->getParentData();
-        $layout_id = $layout['layout_id'];
-
-        if (empty($params['dispatch'])) {
-            $data['message'] = __('api_required_field', array(
-                '[field]' => 'dispatch'
-            ));
-        } elseif (empty($params['name'])) {
-            $data['message'] = __('api_required_field', array(
-                '[field]' => 'name'
-            ));
-        } else {
-            $location_id = Location::instance($layout_id)->update($params);
-
-            if ($location_id) {
-                $status = Response::STATUS_OK;
-                $data = array('location_id' => $location_id);
-            }
-        }
-
         return array(
-            'status' => $status,
-            'data' => $data
+            'status' => Response::STATUS_METHOD_NOT_ALLOWED,
         );
     }
 

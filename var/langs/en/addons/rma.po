@@ -89,8 +89,12 @@ msgid "Go to the list of your return requests"
 msgstr "Go to the list of your return requests"
 
 msgctxt "Languages::privileges.manage_rma"
-msgid "Manage RMA system"
-msgstr "Manage RMA system"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privilege_groups.rma"
+msgid "Return merchandise authorization (RMA)"
+msgstr "Return merchandise authorization (RMA)"
 
 msgctxt "Languages::text_return_change_warning"
 msgid "The status of return #[return_id] will be changed"

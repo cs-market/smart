@@ -62,15 +62,6 @@ html[dir="rtl"] {
         }
     }
 
-    @media (max-width: 767px) {
-        .ty-icon-right-circle:before {
-            content: "\e00f";
-        }
-        .ty-icon-left-circle:before {
-            content: "\e00e";
-        }
-    }
-    
     .ty-order-info__profile-field-item {
         &.b-phone,
         &.s-phone {
@@ -106,60 +97,28 @@ html[dir="rtl"] {
     }
 
     /** Fix old-owlcarousel non-adaptive for RTL **/
-    .owl-wrapper-outer {
-        direction: rtl !important;
-    }
-
-    .ty-scroller-list.grid-list.ty-scroller-advanced.owl-theme {
-        .owl-controls {
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-
-            -webkit-box-orient: horizontal;
-
-            -webkit-box-direction: reverse;
-               -ms-flex-direction: row-reverse;
-                   flex-direction: row-reverse;
-
-            -webkit-box-pack: center;
-             justify-content: center;
-               -ms-flex-pack: center;
-
+    .owl-carousel.owl-theme .owl-controls .owl-buttons {
+        .owl-next:before,
+        .owl-prev:after {
+            transform: scaleX(-1);
         }
     }
-
-    .owl-controls > .owl-buttons {
-        direction: ltr;
-        
+    .owl-theme .owl-controls-outside .owl-buttons {
+        .owl-next,
         .owl-prev {
-            float: right;
-        }
-        .owl-next {
-            float: left;
+            transform: scaleX(-1);
         }
     }
-
-    .ty-thumbs-wrapper {
-        .ty-icon-left-circle {
-            right: 3px;
-            left: auto;
-            left: unset;
-
-            &::before {
-                content: "\e00e";
-            }
-        }
-        .ty-icon-right-circle {
-            left: 3px;
-            right: auto;
-            right: unset;
-
-            &::before {
-                content: "\e00f";
-            }
-        }
+    .owl-stage-outer {
+        direction: ltr !important;
     }
     /** /Fix old-owlcarousel non-adaptive for RTL **/
-    
+
+    .ty-social-buttons__inline {
+        .pinterest__wrapper a {
+            background-position-x: ~"calc(100% - 4px)";
+            padding: 0;
+            padding-right: 4px;
+        }
+    }
 }

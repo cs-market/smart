@@ -60,6 +60,10 @@
     display: none;
 }
 
+.visibility-hidden {
+    visibility: hidden;
+}
+
 input.hidden {
     display: none !important;
 }
@@ -204,6 +208,7 @@ strong {
         margin-bottom: 8px;
     }
     .cancelBtn {
+        float: left;
         width: 100%;
     }
 }
@@ -223,6 +228,10 @@ strong {
 .cm-scroll-data {
     overflow-y: auto;
     width: 960px;
+}
+
+.scroll-data--fullwidth {
+    width: 100%;
 }
 
 .cm-scroll-horizontal {
@@ -305,5 +314,33 @@ strong {
 
 .vendor-statistics a {
     float: right;
+    clear: right;
     display: block;
+}
+
+.flex-vertical-centered {
+    display: flex;
+    align-items: center;
+
+    &--on-mobile {
+        @media (max-width: @TabletBreakpoint) {
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
+.row-actionable {
+    cursor: pointer !important;
+}
+
+.row-actionable:hover td {
+    background-color: @mainColor !important;
+    color: white;
+}
+
+@media (max-width: @TabletBreakpoint) {
+    .noborder--mobile {
+        border: 0 !important;
+    }
 }

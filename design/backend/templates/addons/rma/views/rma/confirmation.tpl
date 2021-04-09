@@ -14,24 +14,24 @@
     {assign var="status_from" value=$change_return_status.status_from}
     {__("text_return_change_warning", ["[return_id]" => $change_return_status.return_id])}&nbsp;<span>{$status_descr.$status_from}&nbsp;&rarr;&nbsp;{$status_descr.$status_to}</span>.
 </div>
-{if $change_return_status.recalculate_order == "M"}
+{if $change_return_status.recalculate_order == "Addons\\Rma\\RecalculateOperations::MANUALLY"|enum}
 <div class="control-group">
     <label for="total" class="cm-required control-label">{__("order_total_will_changed")}:</label>
     <div class="controls">
         <input id="total" type="text" name="change_return_status[total]" value="{$change_return_status.total}" size="5" class="input-text cm-numeric" />
     </div>
 </div>
-{elseif $change_return_status.recalculate_order == "R"}
+{elseif $change_return_status.recalculate_order == "Addons\\Rma\\RecalculateOperations::AUTO"|enum}
 
 {if $shipping_info}
 <div>
     {__("shipping_costs_will_changed")}:
 </div>
-{foreach from=$shipping_info item="shipping" key="shipping_id"}
+{foreach from=$shipping_info item="shipping"}
 <div class="control-group">
-    <label for="sh_{$shipping_id}" class="control-label cm-required">{$shipping.shipping}:</label>
+    <label for="sh_{$shipping.shipping_id}" class="control-label cm-required">{$shipping.shipping}:</label>
     <div class="controls">
-        <input id="sh_{$shipping_id}" type="text" name="change_return_status[shipping_costs][{$shipping_id}]" value="{$shipping.cost|default:0}" size="5" class="input-text cm-numeric" />
+        <input id="sh_{$shipping.shipping_id}" type="text" name="change_return_status[shipping_costs][{$shipping.shipping_id}]" value="{$shipping.rate|default:0}" size="5" class="input-text cm-numeric" />
     </div>
 </div>
 {/foreach}

@@ -1,45 +1,58 @@
-{assign var="map_provider" value=$addons.store_locator.map_provider}
-{assign var="map_provider_api" value="`$map_provider`_map_api"}
-{assign var="map_customer_templates" value="C"|fn_get_store_locator_map_templates}
-{assign var="map_container" value="map_canvas"}
-
-{if $store_locations}
-    {if $map_customer_templates && $map_customer_templates.$map_provider}
-        {include file=$map_customer_templates.$map_provider}
+{if $addons.geo_maps && $addons.geo_maps.status == "A"}
+    {if $shipping.service_params.display}
+        {$display_type = $shipping.service_params.display}
+    {else}
+        {$display_type = "ML"}
     {/if}
-
-    <div class="ty-store-location">
-        <div class="ty-store-location__map-wrapper" id="{$map_container}"></div>
-        <div class="ty-wysiwyg-content ty-store-location__locations-wrapper" id="stores_list_box">
-            {foreach from=$store_locations item=loc key=num}
-                <div class="ty-store-location__item" id="loc_{$loc.store_location_id}">
-                    <h3 class="ty-store-location__item-title">{$loc.name}</h3>
-                    
-                    <span class="ty-store-location__item-desc">{$loc.description nofilter}</span>
-
-                    {if $loc.city || $loc.country_title}
-                        <span class="ty-store-location__item-country">{if $loc.city}{$loc.city}, {/if}{$loc.country_title}</span>
-                    {/if}
-                    
-                    <div class="ty-store-location__item-view">
-                        {include file="buttons/button.tpl" but_role="text" but_meta="cm-map-view-location ty-btn__tertiary" but_scroll="#map_canvas" but_text=__("view_on_map") but_extra="data-ca-latitude={$loc.latitude} data-ca-longitude={$loc.longitude}"}
-                    </div>
-                </div>
-                {if $store_locations|count > 1}
-                    <hr />
-                {/if}
-            {/foreach}
-
-            {if $store_locations|count > 1}
-                <div class="ty-store-location__item ty-store-location__item-all_stores">
-                    <h3 class="ty-store-location__item-title">{__("all_stores")}</h3>
-                    <div class="ty-store-location__item-view">{include file="buttons/button.tpl" but_scroll="#map_canvas" but_role="text" but_meta="cm-map-view-locations ty-btn__tertiary" but_text=__("view_on_map")}</div>
-                </div>
-            {/if}
-        </div>
-    </div>
 {else}
-    <p class="ty-no-items">{__("no_data")}</p>
+    {$display_type = "L"}
 {/if}
 
-{capture name="mainbox_title"}{__("store_locator")}{/capture}
+{if $display_type != "L"}
+    {$display_pickup_map = true}
+{/if}
+
+<form action="{"store_locator.search"|fn_url}" id="store_locator_search_form">
+    <input type="hidden" name="result_ids" value="store_location_search_city,store_locator_location,store_locator_search_block_*" />
+    <input type="hidden" name="full_render" value="Y" />
+
+    <div id="store_locator_search_controls" class="store-locator__location--wrapper">
+        <h2 class="store-locator__step-title">{__("store_locator.stores_and_pickup_points")}</h2>
+
+        {if $is_vendors_picker_enabled}
+            <div class="store-locator__location store-locator__location--vendor sl-search-control">
+                <label class="store-locator__select-label" for="store_locator_search_vendor">{__("vendor")}:</label>
+                {include file="addons/store_locator/components/picker/vendors.tpl"
+                    input_name="sl_search[company_id]"
+                    show_advanced=false
+                    show_empty_variant=true
+                    empty_variant_text=__("all")
+                }
+            </div>
+        {/if}
+
+        <div class="store-locator__location store-locator__location--city sl-search-control" id="store_location_search_city">
+            <label class="store-locator__select-label" for="store_locator_search_city">{__("city")}:</label>
+            {include file="addons/store_locator/components/picker/cities.tpl"
+                input_name="sl_search[city]"
+                show_advanced=false
+                show_empty_variant=true
+                item_ids=($sl_search.city) ? [$sl_search.city] : []
+                empty_variant_text=__("all")
+            }
+        <!--store_location_search_city--></div>
+    </div>
+
+<div id="store_locator_location">
+
+    {if $store_locations}
+        <div class="store-locator">
+            {include file="addons/store_locator/components/map_and_list_store.tpl" store_locations=$store_locations group_key=0 store_locations_count=$store_locations_count}
+        </div>
+    {else}
+        <p class="ty-no-items">{__("no_data")}</p>
+    {/if}
+<!--store_locator_location--></div>
+{script src="js/addons/store_locator/pickup_search.js"}
+{script src="js/addons/store_locator/map.js"}
+</form>

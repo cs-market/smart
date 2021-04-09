@@ -26,12 +26,13 @@ class Settings extends AEntity
      *
      * @param  int   $id     Settings identifier
      * @param  array $params Filter params
+     *
      * @return array
      */
-    public function index($id = 0, $params = array())
+    public function index($id = 0, $params = [])
     {
         $company_id = $this->safeGet($params, 'company_id', null);
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (!empty($id)) {
             $data = CartSettings::instance()->getData($id, $company_id);
@@ -49,40 +50,41 @@ class Settings extends AEntity
             $page = $this->safeGet($params, 'page', 1);
 
             $data = CartSettings::instance()->getList($section_id, $section_tab_id, true, $company_id, $lang_code);
+            $total_items_count = count($data);
 
             if ($items_per_page) {
                 $data = array_slice($data, ($page - 1) * $items_per_page, $items_per_page);
             }
 
-            $data = array(
+            $data = [
                 'settings' => $data,
-                'params' => array(
-                    'section_id' => $section_id,
+                'params'   => [
+                    'section_id'     => $section_id,
                     'section_tab_id' => $section_tab_id,
                     'items_per_page' => $items_per_page,
-                    'page' => $page,
-                    'total_items' => count($data),
-                ),
-            );
+                    'page'           => $page,
+                    'total_items'    => $total_items_count,
+                ],
+            ];
             $status = Response::STATUS_OK;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data,
-        );
+            'data'   => $data,
+        ];
     }
 
     public function create($params)
     {
-        return array(
+        return [
             'status' => Response::STATUS_METHOD_NOT_ALLOWED,
-        );
+        ];
     }
 
     public function update($id, $params)
     {
-        $data = array();
+        $data = [];
         $status = Response::STATUS_BAD_REQUEST;
 
         if (!empty($id) && array_key_exists('value', $params)) {
@@ -92,32 +94,32 @@ class Settings extends AEntity
 
             if ($result) {
                 $status = Response::STATUS_OK;
-                $data = array(
+                $data = [
                     'setting_id' => $id
-                );
+                ];
             }
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function delete($id)
     {
-        return array(
+        return [
             'status' => Response::STATUS_METHOD_NOT_ALLOWED,
-        );
+        ];
     }
 
     public function privileges()
     {
-        return array(
+        return [
             'create' => 'update_settings',
             'update' => 'update_settings',
             'delete' => 'update_settings',
             'index'  => 'view_settings'
-        );
+        ];
     }
 }

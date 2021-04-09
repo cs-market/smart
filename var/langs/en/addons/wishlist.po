@@ -32,6 +32,10 @@ msgctxt "Languages::wishlist"
 msgid "Wish list"
 msgstr "Wish list"
 
+msgctxt "Languages::wishlist_short"
+msgid "Wish list"
+msgstr "Wish list"
+
 msgctxt "Languages::wishlist_note"
 msgid "Go to your wishlist"
 msgstr "Go to your wishlist"

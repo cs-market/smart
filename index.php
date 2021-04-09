@@ -13,8 +13,8 @@
 ****************************************************************************/
 
 $php_value = phpversion();
-if (version_compare($php_value, '5.3.6') == -1) {
-    echo 'Currently installed PHP version (' . $php_value . ') is not supported. Minimal required PHP version is 5.3.6.';
+if (version_compare($php_value, '5.6.0') == -1) {
+    echo 'Currently installed PHP version (' . $php_value . ') is not supported. Minimal required PHP version is 5.6.0.';
     die();
 }
 
@@ -23,6 +23,8 @@ define('AREA', 'C');
 try {
     require(dirname(__FILE__) . '/init.php');
     fn_dispatch();
-} catch (Tygh\Exceptions\AException $e) {
-    $e->output();
+} catch (Exception $e) {
+    \Tygh\Tools\ErrorHandler::handleException($e);
+} catch (Throwable $e) {
+    \Tygh\Tools\ErrorHandler::handleException($e);
 }

@@ -58,7 +58,7 @@
 {if $view_mode != "button"}
     {if $multiple}
     <div class="table-wrapper">
-        <table width="100%" class="table table-middle">
+        <table width="100%" class="table table-middle table--relative">
         <thead>
         <tr>
             {if $positions}<th>{__("position_short")}</th>{/if}

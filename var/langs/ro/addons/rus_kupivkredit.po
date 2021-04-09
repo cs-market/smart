@@ -20,6 +20,10 @@ msgctxt "Languages::kupivkredit_shop_id"
 msgid "Store ID"
 msgstr "Store ID"
 
+msgctxt "Languages::rus_kupivkredit.show_case_id"
+msgid "Showcase ID"
+msgstr "Showcase ID"
+
 msgctxt "Languages::kupivkredit_api_key"
 msgid "API Key"
 msgstr "API Key"

@@ -56,6 +56,18 @@
                     </item>
                 </items>
             </section>
+            <section id="forbidden_countries">
+                <items>
+                    <item id="forbidden_countries_notice" edition_type="ROOT">
+                        <type>info</type>
+                        <handler>fn_recaptcha_forbidden_countries_notice_handler</handler>
+                    </item>
+                    <item id="forbidden_countries" edition_type="ROOT">
+                        <type>selectable_box</type>
+                        <default_value><![CDATA[#M#CN=Y&CG=Y&IR=Y]]></default_value>
+                    </item>
+                </items>
+            </section>
         </sections>
     </settings>
 </addon>

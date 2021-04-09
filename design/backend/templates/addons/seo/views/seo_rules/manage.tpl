@@ -33,7 +33,7 @@
 {if $seo_data}
 <input type="hidden" name="page" value="{$smarty.request.page}" />
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="1%" class="mobile-hide">

@@ -156,7 +156,7 @@
     <label class="control-label">{__("clicks")}</label>
     <div class="controls">
     <div class="table-responsive-wrapper">
-        <table class="table table-responsive">
+        <table class="table table--relative table-responsive">
             <tr>
                 <th>{__("url")}</th>
                 <th>{__("campaign")}</th>

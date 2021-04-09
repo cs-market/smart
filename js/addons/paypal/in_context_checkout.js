@@ -1,8 +1,8 @@
-(function(_, $) {
+(function (_, $) {
     var is_paypal_script_loaded;
 
     var methods = {
-        set_submit_button_id: function(button_id) {
+        set_submit_button_id: function (button_id) {
             var button_id_new = button_id + '_' + Date.now();
             var button = $('#' + button_id);
             button.attr('id', button_id_new);
@@ -10,7 +10,7 @@
             return button_id_new;
         },
 
-        get_token_request: function(payment_form) {
+        get_token_request: function (payment_form) {
             var form_data = {
                 in_context_order: 1
             };
@@ -23,13 +23,13 @@
             return form_data;
         },
 
-        set_window_close_error_handler: function() {
-            window.onerror = function(e) {
+        set_window_close_error_handler: function () {
+            window.onerror = function (e) {
                 $.redirect(_.current_url);
             };
         },
 
-        setup_payment_form: function(params) {
+        setup_payment_form: function (params) {
             params = params || {};
             params.merchat_id = params.merchat_id || '';
             params.environment = params.environment || 'sandbox';
@@ -42,50 +42,52 @@
                     environment: params.environment,
                     buttons: [{
                         button: params.submit_button_id,
-                        condition: function() {
-                            return $.ceFormValidator('check', {
-                                form: params.payment_form
+                        condition: function () {
+                            return $.ceLiteCheckout('check', function(result) {
+                                return result;
                             });
                         },
-                        click: function(e) {
+                        click: function (e) {
                             e.preventDefault();
-
-                            var form_data = methods.get_token_request(params.payment_form);
 
                             // window has to be inited in 'click' handler to prevent browser pop-up blocking
                             paypal.checkout.initXO();
 
-                            $.ceAjax(
-                                'request',
-                                fn_url('checkout.place_order'),
-                                {
-                                    method: 'post',
-                                    data: form_data,
-                                    callback: function(response) {
-                                        try {
-                                            var data = JSON.parse(response.text);
-                                            if (data.token) {
-                                                var url = paypal.checkout.urlPrefix + data.token + '&useraction=commit';
-                                                paypal.checkout.startFlow(url);
+                            $.ceLiteCheckout('updateCustomerInfo', function() {
+                                var formSelector = $('input[name="selected_payment_method"]:checked').data('caTargetForm');
+                                var form_data = methods.get_token_request($('#' + formSelector));
+
+                                $.ceAjax(
+                                    'request',
+                                    fn_url('checkout.place_order'),
+                                        {
+                                        method: 'post',
+                                        caching: false,
+                                        hidden: true,
+                                        data: form_data,
+                                        callback: function(response) {
+                                            try {
+                                                if (response.token) {
+                                                    var url = paypal.checkout.urlPrefix + response.token + '&useraction=commit';
+                                                    paypal.checkout.startFlow(url);
+                                                }
+                                                if (response.error) {
+                                                    paypal.checkout.closeFlow();
+                                                }
+                                            } catch (ex) {
+                                                paypal.checkout.initXO();
                                             }
-                                            if (data.error) {
-                                                paypal.checkout.closeFlow();
-                                            }
-                                        } catch (ex) {
-                                            paypal.checkout.initXO();
                                         }
-                                    },
-                                    hidden: true,
-                                    cache: false
-                                }
-                            );
+                                    }
+                                );
+                            }, false);
                         }
                     }]
                 }
             );
         },
 
-        init: function(jelm) {
+        init: function (jelm) {
             var payment_form = jelm.closest('form');
 
             // submit button id must be altered to prevent 'button_already_has_paypal_click_listener' warning
@@ -94,11 +96,11 @@
             // workaround for https://github.com/paypal/paypal-checkout/issues/469
             methods.set_window_close_error_handler();
 
-            var paypal_script_load_callback = function() {
+            var paypal_script_load_callback = function () {
 
                 is_paypal_script_loaded = true;
 
-                var paypal_presence_checker = setInterval(function() {
+                var paypal_presence_checker = setInterval(function () {
                     if (typeof paypal !== 'undefined') {
                         clearInterval(paypal_presence_checker);
                         methods.setup_payment_form({
@@ -120,7 +122,7 @@
     };
 
     $.extend({
-        cePaypalInContextCheckout: function(method) {
+        cePaypalInContextCheckout: function (method) {
             if (methods[method]) {
                 return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
             } else {
@@ -129,7 +131,7 @@
         }
     });
 
-    $.ceEvent('on', 'ce.commoninit', function() {
+    $.ceEvent('on', 'ce.commoninit', function () {
         if (_.embedded) {
             return;
         }

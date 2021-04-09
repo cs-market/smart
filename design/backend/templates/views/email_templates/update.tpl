@@ -1,4 +1,4 @@
-{script src="js/tygh/email_templates.js"}
+{script src="js/tygh/template_editor.js"}
 
 {assign var="c_url" value=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
 {assign var="return_url" value=$config.current_url}
@@ -17,6 +17,7 @@
     <input type="hidden" name="selected_section" id="selected_section" value="{$smarty.request.selected_section}" />
     <input type="hidden" name="result_ids" value="preview_dialog" />
     <input type="hidden" name="template_id" value="{$id}" />
+    <input type="hidden" name="redirect_url" value="{$config.current_url}" />
 
     <fieldset>
         <div class="control-group">
@@ -85,23 +86,47 @@
 {capture name="sidebar"}
     <div class="sidebar-row">
         <h6>{__("variables")}</h6>
-        <ul class="nav nav-list">
-            {foreach from=$variables item="variable"}
-                <li><span class="cm-emltpl-insert-variable label hand" data-ca-template-value="{$variable}">{$variable}</span></li>
+        <ul class="nav nav-list variables-list variables-list--variables">
+            {foreach $variables as $variable}
+                <li class="variables-list__item">
+                    <span class="cm-emltpl-insert-variable label hand"
+                          data-ca-template-value="{$variable}"
+                    >{$variable}</span>
+                </li>
             {/foreach}
         </ul>
     </div>
     
     <div class="sidebar-row" id="sidebar_snippets">
         <h6>{__("snippets")}</h6>
-        <ul class="nav nav-list">
-            {foreach from=$snippets item="snippet"}
+        <ul class="nav nav-list variables-list variables-list--snippets">
+            {foreach $snippets as $snippet}
                 {if $snippet->getStatus() == "A"}
-                    <li><span class="cm-emltpl-insert-variable label label-info hand" data-ca-template-value="{$snippet->getCallTag()}">{$snippet->getCode()}</span></li>
+                    <li class="variables-list__item">
+                        <span class="cm-emltpl-insert-variable label label-info hand"
+                              data-ca-template-value="{$snippet->getCallTag()}"
+                        >{$snippet->getCode()}
+                        </span>
+                        <a class="variables-list__item__edit" href="{"snippets.update&snippet_id=`$snippet->getId()`"|fn_url}" title="{__("edit")}"><i class="icon icon-edit"></i></a>
+                    </li>
                 {/if}
             {/foreach}
         </ul>
     <!--sidebar_snippets--></div>
+
+    <div class="sidebar-row" id="sidebar_documents">
+        <h6>{__("documents")}</h6>
+        <ul class="nav nav-list variables-list variables-list--documents">
+            {foreach $documents as $document}
+                <li class="variables-list__item">
+                    <span class="cm-emltpl-insert-variable label label-info hand"
+                          data-ca-template-value="{$document->getCallTag()}"
+                    >{$document->getFullCode()}</span>
+                    <a class="variables-list__item__edit" href="{"documents.update&document_id=`$document->getId()`"|fn_url}" title="{__("edit")}"><i class="icon icon-edit"></i></a>
+                </li>
+            {/foreach}
+        </ul>
+        <!--sidebar_documents--></div>
 {/capture}
 
 {capture name="buttons"}

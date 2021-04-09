@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-ru\n"
+"X-Crowdin-Project-ID: 54044\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/rus_unisender.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/rus_unisender.po\n"
+"X-Crowdin-File-ID: 3754\n"
+"PO-Revision-Date: 2020-08-28 13:38\n"
 
 msgctxt "Addons::name::rus_unisender"
 msgid "Russian localization — Unisender"
@@ -136,7 +136,15 @@ msgctxt "SettingsOptions::rus_unisender::send_sms_user"
 msgid "Notify the customer about the order status"
 msgstr "Уведомлять покупателя о статусе заказа"
 
+msgctxt "SettingsOptions::rus_unisender::send_sms_user_shipment"
+msgid "Notify the customer about the shipment status"
+msgstr "Уведомлять покупателя о статусе отгрузки"
+
 msgctxt "SettingsOptions::rus_unisender::sender"
+msgid "Sender's name"
+msgstr "Имя отправителя"
+
+msgctxt "SettingsOptions::rus_unisender::sender_shipment"
 msgid "Sender's name"
 msgstr "Имя отправителя"
 
@@ -144,13 +152,25 @@ msgctxt "SettingsTooltips::rus_unisender::sender"
 msgid "Maximum name length is 11 characters"
 msgstr "Максимальная длина имени — 11 символов"
 
+msgctxt "SettingsTooltips::rus_unisender::sender_shipment"
+msgid "Maximum name length is 11 characters"
+msgstr "Максимальная длина имени — 11 символов"
+
 msgctxt "SettingsOptions::rus_unisender::send_sms_user_text"
+msgid "SMS body"
+msgstr "Текст SMS"
+
+msgctxt "SettingsOptions::rus_unisender::send_sms_user_text_shipment"
 msgid "SMS body"
 msgstr "Текст SMS"
 
 msgctxt "SettingsTooltips::rus_unisender::send_sms_user_text"
 msgid "User's message body: №[order_id] - order ID, [status] - order status"
 msgstr "Текст сообщения пользователю: №[order_id] — код заказа, [status] — статус заказа"
+
+msgctxt "SettingsTooltips::rus_unisender::send_sms_user_text_shipment"
+msgid "User's message body: №[order_id] - order ID, [status] - shipment status"
+msgstr "Текст сообщения пользователю: №[order_id] — код заказа, [status] — статус отгрузки"
 
 msgctxt "SettingsOptions::rus_unisender::admin_settings"
 msgid "Settings admin"
@@ -193,14 +213,22 @@ msgid "When these order statuses are changed, the user will be notified"
 msgstr "Статусы заказов, об изменении которых будет сообщаться пользователю"
 
 msgctxt "Languages::privileges.manage_unisender"
-msgid "Manage unisender"
-msgstr "Управление Unisender"
+msgid "Can manage"
+msgstr "Управление"
 
 msgctxt "Languages::privileges.send_sms_unisender"
-msgid "Allow sending SMS (Unisender)"
-msgstr "Разрешить отправку SMS (Unisender)"
+msgid "Allow sending SMS"
+msgstr "Разрешить отправку SMS"
+
+msgctxt "Languages::privilege_groups.unisender"
+msgid "Unisender"
+msgstr "Unisender"
 
 msgctxt "Languages::privileges.view_unisender"
-msgid "View unisender"
-msgstr "Просмотр Unisender"
+msgid "Can view"
+msgstr "Просмотр"
+
+msgctxt "Languages::addons.rus_unisender.errors_logging"
+msgid "Unisender: api/[api_method]: Error was returned from service: [error]."
+msgstr "Unisender: api/[api_method]: Сервис сообщил об ошибке: [error]."
 

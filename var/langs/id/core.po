@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: id\n"
-"X-Crowdin-File: /release-4.8.2/core.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"X-Crowdin-File: /release-4.11.5/core.po\n"
+"X-Crowdin-File-ID: 3710\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "LanguageName"
 msgid "Localized language name"
@@ -55,6 +55,10 @@ msgstr "Setujui"
 msgctxt "Languages::access_denied"
 msgid "Access denied"
 msgstr "Akses ditolak"
+
+msgctxt "Languages::event.order.status_changed.name"
+msgid "Order status changed to [status]"
+msgstr ""
 
 msgctxt "Languages::access_denied_text"
 msgid "You don't have permission to access the page."
@@ -131,6 +135,10 @@ msgstr "promosi aktif"
 msgctxt "Languages::act_on_behalf"
 msgid "Act on behalf of"
 msgstr "Bertindak sebagai"
+
+msgctxt "Languages::log_in_as_user"
+msgid "Log in as user"
+msgstr ""
 
 msgctxt "Languages::add"
 msgid "Add"
@@ -222,11 +230,11 @@ msgstr "Buat Block"
 
 msgctxt "Languages::add_image_from_server"
 msgid "Add image from server"
-msgstr ""
+msgstr "Menambahkan gambar dari server"
 
 msgctxt "Languages::add_image_from_url"
 msgid "Add image from URL"
-msgstr ""
+msgstr "Menambahkan gambar dari URL"
 
 msgctxt "Languages::add_bonus"
 msgid "Add bonus"
@@ -359,6 +367,10 @@ msgstr "Buat lokalisasi"
 msgctxt "Languages::add_location"
 msgid "Add location"
 msgstr "Buat location"
+
+msgctxt "Languages::add_rate_area"
+msgid "Add rate area"
+msgstr ""
 
 msgctxt "Languages::add_menu"
 msgid "Add menu"
@@ -604,6 +616,18 @@ msgctxt "Languages::allow_api_access"
 msgid "Yes, allow this user to use the API"
 msgstr "Ya, perbolehkan user ini menggunakan API"
 
+msgctxt "Languages::api_access_for_user"
+msgid "API access for this user"
+msgstr ""
+
+msgctxt "Languages::generate_new_api_key"
+msgid "Generate new API key"
+msgstr ""
+
+msgctxt "Languages::please_copy_api_key"
+msgid "Please copy the API key now and keep it somewhere. Once you save the changes, this key won't appear here again. If the key is lost, the only way to regain API access will be be to generate a new key on this page."
+msgstr ""
+
 msgctxt "Languages::allow_return_registration"
 msgid "Allow return registration"
 msgstr "Perbolehkan mendaftar retur"
@@ -636,6 +660,18 @@ msgctxt "Languages::all_vendors"
 msgid "All stores"
 msgstr "Semua toko"
 
+msgctxt "Languages::all_storefronts_short"
+msgid "All"
+msgstr ""
+
+msgctxt "Languages::show_all_storefronts"
+msgid "Show all storefronts"
+msgstr ""
+
+msgctxt "Languages::show_all_storefronts_with_count"
+msgid "Show all [count] storefronts"
+msgstr ""
+
 msgctxt "Languages::all_words"
 msgid "All of these words"
 msgstr "Keseluruhan kata"
@@ -650,7 +686,7 @@ msgstr "Alternatif teks / judul"
 
 msgctxt "Languages::alternative_text"
 msgid "Alt text"
-msgstr ""
+msgstr "Teks Alt"
 
 msgctxt "Languages::american_express"
 msgid "American Express"
@@ -702,11 +738,11 @@ msgstr "Setiap kata"
 
 msgctxt "Languages::any_category"
 msgid "Any category"
-msgstr ""
+msgstr "Setiap kategori"
 
 msgctxt "Languages::any_product"
 msgid "Any product"
-msgstr ""
+msgstr "Setiap Produk"
 
 msgctxt "Languages::api"
 msgid "API"
@@ -762,11 +798,11 @@ msgstr "Pengguna API"
 
 msgctxt "Languages::api_order_couldnt_be_created"
 msgid "Order couldn't be created"
-msgstr ""
+msgstr "Pemesanan tidak dapat dibuat"
 
 msgctxt "Languages::api_no_shipping_methods_available"
 msgid "No shipping methods are available"
-msgstr ""
+msgstr "Metode pengiriman tidak tersedia"
 
 msgctxt "Languages::appearance"
 msgid "Appearance"
@@ -1228,6 +1264,94 @@ msgctxt "Languages::block_manager.layout_pages"
 msgid "Layout pages"
 msgstr "Tata letak halaman"
 
+msgctxt "Languages::block_manager.wrappers.lite_checkout"
+msgid "Lite checkout"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_location"
+msgid "Checkout: Location"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_location_description"
+msgid "Customer's city, state, and country"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_sign_in"
+msgid "Checkout: Sign-In"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_sign_in_description"
+msgid "Sign-in button"
+msgstr ""
+
+msgctxt "Languages::customer_sign_in"
+msgid "Customer Sign-In"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_information"
+msgid "Checkout: Customer Information"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_information_description"
+msgid "Profile fields for customer information"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_address"
+msgid "Checkout: Address"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_address_description"
+msgid "Profile fields for customer address"
+msgstr ""
+
+msgctxt "Languages::customer_address"
+msgid "Customer address"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_shipping_methods"
+msgid "Checkout: Shipping methods"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_shipping_methods_description"
+msgid "Shipping method selection"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_payment_methods"
+msgid "Checkout: Payment methods"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_payment_methods_description"
+msgid "Payment method selection"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_billing"
+msgid "Checkout: Billing address"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_billing_description"
+msgid "Profile fields for billing address"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_notes"
+msgid "Checkout: Notes"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_customer_notes_description"
+msgid "Customer's notes about the order"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_terms_and_conditions"
+msgid "Checkout: Terms and conditions"
+msgstr ""
+
+msgctxt "Languages::block_lite_checkout_terms_and_conditions_description"
+msgid "Checkbox for accepting terms and conditions"
+msgstr ""
+
+msgctxt "Languages::terms_and_conditions"
+msgid "Terms and conditions"
+msgstr ""
+
 msgctxt "Languages::block_menu"
 msgid "Menu"
 msgstr "Menu"
@@ -1553,8 +1677,8 @@ msgid "You can not use percentage value for base price."
 msgstr "Anda tidak dapat menggunakan nilai persentase untuk hargadasar."
 
 msgctxt "Languages::cant_upload_file"
-msgid "File could not be uploaded"
-msgstr "File tidak dapat di unggah"
+msgid "Couldn't upload the file. The problem isn't necessarily on the [product] end. If it occurs regularly, please contact your server administrator or our technical support."
+msgstr ""
 
 msgctxt "Languages::capture"
 msgid "Capture"
@@ -1824,6 +1948,10 @@ msgctxt "Languages::check_items_text"
 msgid "To include Order statuses, Payment methods and Locations in the conditions list, check the necessary item and click on the \"Save\" button."
 msgstr "Untuk menyertakan status Pesanan, metode pembayaran danLokasi di daftar kondisi, periksa item yang diperlukan danklik pada tombol \"Simpan\"."
 
+msgctxt "Languages::sales_reports_side_bar_notes"
+msgid "To include Order statuses, Payment methods and Rate areas in the conditions list, check the necessary item and click on the \"Save\" button."
+msgstr ""
+
 msgctxt "Languages::check_none"
 msgid "None"
 msgstr "Tidak ada"
@@ -1903,6 +2031,10 @@ msgstr "Hapus riwayat"
 msgctxt "Languages::clean_logs"
 msgid "Clear logs"
 msgstr "Hapus log"
+
+msgctxt "Languages::clean_old_logs"
+msgid "Clear logs older than [n] day|Clear logs older than [n] days"
+msgstr "Hapus log yang lebih dari [n] hari | Hapus log yang lebih dari [n] hari"
 
 msgctxt "Languages::clean_up_all_locations_on_import"
 msgid "Clean up locations before import"
@@ -2397,8 +2529,8 @@ msgid "Brazilian Real"
 msgstr "Real Brazil"
 
 msgctxt "Languages::currency_code_byr"
-msgid "BYR"
-msgstr "BYR"
+msgid "BYN"
+msgstr ""
 
 msgctxt "Languages::currency_code_cad"
 msgid "Canadian Dollar"
@@ -2494,7 +2626,7 @@ msgstr "Dinar Kuwait"
 
 msgctxt "Languages::currency_code_kzt"
 msgid "Kazakhstani tenge"
-msgstr ""
+msgstr "Kazakhstani tenge"
 
 msgctxt "Languages::currency_code_ltl"
 msgid "Lithuanian Litas"
@@ -2658,6 +2790,10 @@ msgstr "Anda dapat meng-upload dan download file melalui <a href=\"[href]\"> Fil
 
 msgctxt "Languages::text_file_editor_notice_full_link"
 msgid "You can upload and download files via [link]"
+msgstr "Anda dapat meng-upload dan men-download file melalui [link]"
+
+msgctxt "Languages::current_previous_period"
+msgid "'Current ('[date]') and previous period'"
 msgstr ""
 
 msgctxt "Languages::current_period"
@@ -2679,6 +2815,10 @@ msgstr "Pelanggan"
 msgctxt "Languages::customers"
 msgid "Customers"
 msgstr "Pelanggan"
+
+msgctxt "Languages::customers_menu_title"
+msgid "Customers"
+msgstr ""
 
 msgctxt "Languages::customers_menu_description"
 msgid "List of store customers, registered users with a customer account."
@@ -2915,10 +3055,6 @@ msgstr "Dihapus"
 msgctxt "Languages::deleted_product"
 msgid "DELETED PRODUCT"
 msgstr "PRODUK YANG DIHAPUS"
-
-msgctxt "Languages::delete_all_found"
-msgid "Delete all found"
-msgstr "Hapus semua yang ditemukan"
 
 msgctxt "Languages::delete_block"
 msgid "Delete block"
@@ -3246,11 +3382,11 @@ msgstr "Hapus semua file produk sebelum di-impor"
 
 msgctxt "Languages::delete_downloadable_product_files"
 msgid "Delete existing files of downloadable products"
-msgstr ""
+msgstr "Menghapus file dari produk-produk yang dapat di download"
 
 msgctxt "Languages::delete_downloadable_product_files_tooltip"
 msgid "If you enable this setting, then importing downloadable products will delete their existing files. If the setting is disabled, the new files of downloadable products will simply be added to existing files."
-msgstr ""
+msgstr "Jika anda mengkatifkan pengaturan ini, maka mengimpor produk-produk yang dapat di download akan menghapus file yang telah ada. Jika pengaturan ini dinonaktifkan, file baru dari produkproduk yang dapat di download akan ditambahkan ke file yang sudah ada."
 
 msgctxt "Languages::cant_create_backup_file"
 msgid "Cannot upload backup file. Please check permissions for the \"var/backups\" directory of your installation."
@@ -3364,6 +3500,10 @@ msgctxt "Languages::editing_location"
 msgid "Editing location"
 msgstr "Penyuntingan location"
 
+msgctxt "Languages::editing_rate_area"
+msgid "Editing rate area"
+msgstr ""
+
 msgctxt "Languages::editing_menu"
 msgid "Editing menus"
 msgstr "Penyuntingan menu"
@@ -3449,8 +3589,8 @@ msgid "Edit content on-site"
 msgstr "Edit konten pada website"
 
 msgctxt "Languages::edit_files"
-msgid "Edit files"
-msgstr "Edit file"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::edit_layout"
 msgid "Edit layout"
@@ -3678,7 +3818,7 @@ msgstr "Nama perusahaan tidak boleh kosong"
 
 msgctxt "Languages::error_exim_get_images_for_products"
 msgid "Could not import images for some of the products. Either those images don't exist (or can't be accessed), or the paths to those images in the imported file are incorrect."
-msgstr ""
+msgstr "Tidak bisa mengimpor gambar untuk beberapa produk. Kemungkinan karena gambar-gambar tersebut tidak ada (atau tidak dapat diakses) atau jalur menuju gambar-gambar yang ada didalam file yang telah diimpor tidak sesuai."
 
 msgctxt "Languages::error_exim_cant_open_file"
 msgid "Cannot open uploaded file"
@@ -3856,6 +3996,10 @@ msgctxt "Languages::error_validator_phone"
 msgid "The phone number in the <b>[field]</b> field is invalid. The correct format is (555) 555-55-55 or 55 55 555 5555."
 msgstr "Nomor telepon di field <b> [field] </b> tidak valid.Format yang benar adalah (555) 555-55-55 atau 55 55 5555555."
 
+msgctxt "Languages::error_validator_phone_mask"
+msgid "The phone number in the <b>[field]</b> field is invalid."
+msgstr ""
+
 msgctxt "Languages::error_validator_phone_number"
 msgid "It is required to use the following format for this payment method: 555 555 5555."
 msgstr "Gunakan format berikut untuk metode pembayaran: 555 5555555."
@@ -3875,6 +4019,10 @@ msgstr "Perusahaan dengan e-mail yang Anda maksudkan sudah ada,silahkan coba lag
 msgctxt "Languages::error_validator_ccv"
 msgid "CVV/CVC is too short."
 msgstr "CVV/CVC terlalu pendek."
+
+msgctxt "Languages::error_validator_ccv_long"
+msgid "CVV/CVC is too long."
+msgstr ""
 
 msgctxt "Languages::error_change_admin_data_in_frontend"
 msgid "It's forbidden to change the admin email or password in the customer area. Please sign in using a customer account."
@@ -4004,6 +4152,10 @@ msgctxt "Languages::export_selected"
 msgid "Export selected"
 msgstr "Ekspor pilihan"
 
+msgctxt "Languages::export_products"
+msgid "Export products"
+msgstr ""
+
 msgctxt "Languages::extended"
 msgid "Extended"
 msgstr "Diperluas"
@@ -4130,7 +4282,7 @@ msgstr "Direktori file"
 
 msgctxt "Languages::downloadable_product_files_directory"
 msgid "Directory for the files of downloadable products"
-msgstr ""
+msgstr "Daftar berkas produk yang dapat diunduh"
 
 msgctxt "Languages::file_avail_after_payment"
 msgid "This file will be available after the order is paid in full."
@@ -4538,7 +4690,7 @@ msgstr "Sembunyikan opsi"
 
 msgctxt "Languages::show_options"
 msgid "Show options"
-msgstr ""
+msgstr "Perlihatkan pilihan"
 
 msgctxt "Languages::hide_option_completely"
 msgid "Hide option completely"
@@ -4712,6 +4864,10 @@ msgctxt "Languages::information"
 msgid "Information"
 msgstr "Informasi"
 
+msgctxt "Languages::tip"
+msgid "Tip"
+msgstr "Tip"
+
 msgctxt "Languages::inner_hint"
 msgid "Inner hint"
 msgstr "Petunjuk bagian dalam"
@@ -4868,13 +5024,17 @@ msgctxt "Languages::items_in_cart"
 msgid "You have [n] item in your cart|You have [n] items in your cart"
 msgstr "Anda memiliki  [n] item di keranjang belanja|Andamemiliki [n] items idi keranjang belanja"
 
+msgctxt "Languages::n_products"
+msgid "[n] product|[n] products"
+msgstr ""
+
 msgctxt "Languages::items_per_page"
 msgid "Items per page"
 msgstr "Item per halaman"
 
 msgctxt "Languages::objects_per_page"
 msgid "[n] per page"
-msgstr ""
+msgstr "[n] per halaman"
 
 msgctxt "Languages::items_title"
 msgid "Items"
@@ -4999,6 +5159,14 @@ msgstr "[N] hari terakhir"
 msgctxt "Languages::last_order"
 msgid "Last order"
 msgstr "Pesanan terakhir"
+
+msgctxt "Languages::first_order"
+msgid "First order"
+msgstr ""
+
+msgctxt "Languages::registration_date"
+msgid "Registration date"
+msgstr "Tanggal registrasi"
 
 msgctxt "Languages::latitude"
 msgid "Latitude"
@@ -5212,13 +5380,25 @@ msgctxt "Languages::location"
 msgid "Location"
 msgstr "Lokasi"
 
+msgctxt "Languages::rate_area"
+msgid "Rate area"
+msgstr ""
+
 msgctxt "Languages::locations"
 msgid "Locations"
 msgstr "Location"
 
+msgctxt "Languages::rate_areas"
+msgid "Rate areas"
+msgstr ""
+
+msgctxt "Languages::statuses_management"
+msgid "Statuses"
+msgstr ""
+
 msgctxt "Languages::locations_menu_description"
-msgid "Manage the set of locations that are supported in your store."
-msgstr "Kelola pilihan wilayah yang dapat dilayani toko Anda."
+msgid "Manage the set of rate areas that are supported in your store."
+msgstr ""
 
 msgctxt "Languages::loggedin_time"
 msgid "Logged in time"
@@ -5421,8 +5601,8 @@ msgid "Manage menus"
 msgstr "Kelola menu"
 
 msgctxt "Languages::manage_pages"
-msgid "Manage pages"
-msgstr "Kelola halaman"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::manage_products"
 msgid "Manage products"
@@ -5924,6 +6104,10 @@ msgctxt "Languages::new_location"
 msgid "New location"
 msgstr "Location Baru"
 
+msgctxt "Languages::new_rate_area"
+msgid "New rate area"
+msgstr ""
+
 msgctxt "Languages::new_menu"
 msgid "New menu"
 msgstr "Menu baru"
@@ -5931,10 +6115,6 @@ msgstr "Menu baru"
 msgctxt "Languages::new_option"
 msgid "New option"
 msgstr "Opsi baru"
-
-msgctxt "Languages::new_orders"
-msgid "New orders"
-msgstr "Pesanan baru"
 
 msgctxt "Languages::new_page"
 msgid "New page"
@@ -6135,6 +6315,10 @@ msgstr "Tidak terpasang"
 msgctxt "Languages::not_scroll_automatically"
 msgid "Do not scroll automatically"
 msgstr "Jangan gulir otomatis"
+
+msgctxt "Languages::enable_link"
+msgid "Enable link"
+msgstr ""
 
 msgctxt "Languages::no_categories_available"
 msgid "No categories available"
@@ -6673,8 +6857,8 @@ msgid "Sorry, the hash string does not match"
 msgstr "Maaf, hash string tidak cocok"
 
 msgctxt "Languages::payments.epdq.instructions"
-msgid "<ol><li><p>Enter the following URL in the \"Technical information\"→\"Transaction feedback\" section in the ePDQ admin area:</p><p>for the \"accepted\" and \"cancelled\" payments: [url]</p></li><li>Make sure that the \"Timing of the request\" is set to \"Always online\", and \"Request method\" is set to \"POST\"</li><li>Define the \"SHA-OUT pass phrase\" value in the ePDQ admin area as you like, then duplicate it in the \"SHA-IN pass phrase\" field in the \"Data and origin verification\" section, and also in the \"Pass-phrase\" field below</li><li>Make sure that the \"Default operation code\" option in the ePDQ admin area has the same value as the \"Transaction type\" option value below</li><li>Set the \"Hash algorithm\" parameter to \"SHA-1\" in the \"Global security parameters\" section in the ePDQ admin area</li></ol>"
-msgstr "<ol><li><p>Masukkan URL berikut di bagian \"informasi teknis\"→\"umpan balik transaksi\" dalam ePDQ admin area:</p> <p>untuk \"menerima\" dan \"membatalkan\" pembayaran: [url]</p></li> <li>pastikan bahwa \"Waktu permintaan\" diatur  \"Selalu online\", dan \"Metode permintaan\" diatur ke \"POST\"</li> <li>menentukan nilai \"SHA-OUT pass frase\" dalam ePDQ admin area yang Anda inginkan , kemudian menduplikasi di bidang \"SHA-IN pass frase\" di bagian \"Data dan asal verifikasi\", dan juga di bidang \"Pass-frase\" di bawah ini</li> <li>pastikan bahwa opsi \"Kode operasi default\" di ePDQ admin area memiliki nilai yang sama sebagai \"Tipe transaksi\" pilihan nilai di bawah ini</li> <li>menetapkan parameter \"Hash algorithm\" untuk \"SHA-1\" di bagian \"parameter keamanan Global\" dalam ePDQ admin area</li></ol>"
+msgid "<ol><li><p>Enter the following URL in the \"Technical information\"→\"Transaction feedback\" section in the Barclaycard ePDQ admin area:</p><p>for the \"accepted\" and \"cancelled\" payments: [url]</p></li><li>Make sure that the \"Timing of the request\" is set to \"Always online\", and \"Request method\" is set to \"POST\"</li><li>Define the \"SHA-OUT pass phrase\" value in the ePDQ admin area as you like, then duplicate it in the \"SHA-IN pass phrase\" field in the \"Data and origin verification\" section, and also in the \"Pass-phrase\" field below</li><li>Make sure that the \"Default operation code\" option in the ePDQ admin area has the same value as the \"Transaction type\" option value below</li><li>Set the \"Hash algorithm\" parameter to \"SHA-1\" in the \"Global security parameters\" section in the Barclaycard ePDQ admin area</li></ol>"
+msgstr ""
 
 msgctxt "Languages::payments.epdq.pspid"
 msgid "EPDQ pspid"
@@ -7101,212 +7285,220 @@ msgid "Privileges"
 msgstr "Hak-hak istimewa"
 
 msgctxt "Languages::privileges.change_order_status"
-msgid "Change order status"
-msgstr "Ubah status pesanan"
+msgid "Can change statuses"
+msgstr "Dapat mengubah status"
 
 msgctxt "Languages::privileges.create_order"
-msgid "Create order"
-msgstr "Buat pesanan"
+msgid "Can create"
+msgstr "Dapat membuat"
 
 msgctxt "Languages::privileges.backup_restore"
-msgid "Backup/Restore"
-msgstr "Backup/Restore"
+msgid "Can manage"
+msgstr "Dapat mengelola"
 
 msgctxt "Languages::privileges.delete_logs"
-msgid "Delete logs"
-msgstr "Hapus log"
+msgid "Can delete"
+msgstr "Dapat menghapus"
 
 msgctxt "Languages::privileges.delete_orders"
-msgid "Delete orders"
-msgstr "Hapus pesanan"
+msgid "Can delete"
+msgstr "Dapat menghapus"
 
 msgctxt "Languages::privileges.edit_blocks"
-msgid "Edit blocks"
-msgstr "Edit blok"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.edit_order"
-msgid "Edit order"
-msgstr "Edit pesanan"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.edit_files"
 msgid "Edit files"
 msgstr "Edit file"
 
 msgctxt "Languages::privileges.exim_access"
-msgid "Import and export data"
-msgstr "Impor dan ekspor data"
+msgid "Can manage"
+msgstr "Dapat mengelola"
 
 msgctxt "Languages::privileges.manage_catalog"
-msgid "Manage catalog"
-msgstr "Kelola Katalog"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_currencies"
-msgid "Manage currencies"
-msgstr "Kelola mata uang"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_design"
-msgid "Manage design"
-msgstr "Kelola desain"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_languages"
-msgid "Manage languages"
-msgstr "Kelola bahasa"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_locations"
-msgid "Manage locations"
-msgstr "Kelola lokasi"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_order_statuses"
-msgid "Manage order statuses"
-msgstr "Kelola keseluruhan pesanan"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_pages"
 msgid "Manage pages"
 msgstr "Kelola halaman"
 
 msgctxt "Languages::privileges.manage_payments"
-msgid "Manage payments"
-msgstr "Kelola pembayaran"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_promotions"
-msgid "Manage promotion system"
-msgstr "Kelola sistem promosi"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_reports"
-msgid "Manage reports"
-msgstr "Kelola laporan"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_shipping"
-msgid "Manage shipping"
-msgstr "Kelola pengiriman"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_sitemap"
-msgid "Manage sitemap"
-msgstr "Kelola sitemap"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_static_data"
-msgid "Manage static data"
-msgstr "Kelola data statis"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_storage"
-msgid "Manage storage"
-msgstr "Kelola media penyimpanan"
+msgid "Can manage"
+msgstr "Dapat mengelola"
 
 msgctxt "Languages::privileges.manage_stores"
 msgid "Manage stores"
 msgstr "Kelola toko"
 
 msgctxt "Languages::privileges.manage_taxes"
-msgid "Manage taxes"
-msgstr "Kelola pajak"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_themes"
-msgid "Manage themes"
-msgstr "Kelola tema"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_translation"
-msgid "On-site live editing"
-msgstr "Edit langsung pada website"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_usergroups"
-msgid "Manage user groups"
-msgstr "Kelola kelompok pengguna"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_users"
-msgid "Manage users"
-msgstr "Kelola pengguna"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_email_templates"
-msgid "Manage email templates"
-msgstr "Kelola Template Email"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.manage_document_templates"
-msgid "Manage document templates"
-msgstr "Kelola template dokumen"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.update_settings"
-msgid "Update settings"
-msgstr "Pengaturan update"
+msgid "Can edit"
+msgstr "Dapat mengedit"
 
 msgctxt "Languages::privileges.upgrade_store"
-msgid "Upgrade store"
-msgstr "Upgrade Toko"
+msgid "Can upgrade"
+msgstr "Dapat melakukan peningkatan"
 
 msgctxt "Languages::privileges.view_catalog"
-msgid "View catalog"
-msgstr "Lihat Katalog"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_currencies"
-msgid "View currencies"
-msgstr "Lihat mata uang"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_languages"
-msgid "View languages"
-msgstr "View Languagess"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_locations"
-msgid "View locations"
-msgstr "Lihat lokasi"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_logs"
-msgid "View logs"
-msgstr "Lihat log"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_orders"
-msgid "View orders"
-msgstr "Lihat keseluruhan pesanan"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_pages"
-msgid "View pages"
-msgstr "Lihat keseluruhan halaman"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_payments"
-msgid "View payments"
-msgstr "Lihat keseluruhan pembayaran"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_reports"
-msgid "View reports"
-msgstr "Lihat keseluruhan laporan"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_settings"
-msgid "View settings"
-msgstr "Lihat keseluruhan pengaturan"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_shipping"
-msgid "View shipping"
-msgstr "Lihat data pengiriman"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_static_data"
-msgid "View static data"
-msgstr "Lihat data statis"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_stores"
 msgid "View stores"
 msgstr "Lihat keseluruhan Toko"
 
 msgctxt "Languages::privileges.view_taxes"
-msgid "View taxes"
-msgstr "Lihat keseluruhan pajak"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_usergroups"
-msgid "View user groups"
-msgstr "Lihat keseluruhan kelompok pengguna"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privileges.view_users"
-msgid "View users"
-msgstr "Lihat keseluruhan pengguna"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::privilege_sections.addons"
-msgid "Add-ons"
-msgstr "Keseluruhan Add-ons"
+msgid "Add-on privileges"
+msgstr "Hak istimewa tombol tambahan"
 
 msgctxt "Languages::privilege_sections.administration"
-msgid "Administration"
-msgstr "Administrasi"
+msgid "Administration privileges"
+msgstr "Hak istimewa administrasi"
 
 msgctxt "Languages::privilege_sections.cart"
 msgid "Cart"
 msgstr "Keranjang"
+
+msgctxt "Languages::privilege_sections.products"
+msgid "Product privileges"
+msgstr "Hak istimewa produk"
+
+msgctxt "Languages::privilege_sections.settings"
+msgid "Settings privileges"
+msgstr "Hak istimewa pengaturan"
 
 msgctxt "Languages::privilege_sections.catalog"
 msgid "Catalog"
@@ -7317,20 +7509,28 @@ msgid "CMS"
 msgstr "CMS"
 
 msgctxt "Languages::privilege_sections.design"
-msgid "Look and Feel"
-msgstr "Tampilan dan nuansa"
+msgid "Design privileges"
+msgstr "Hak istimewa desain"
 
 msgctxt "Languages::privilege_sections.orders"
-msgid "Orders"
-msgstr "Pesanan"
+msgid "Order privileges"
+msgstr "Hak istimewa pesanan"
+
+msgctxt "Languages::privilege_sections.marketing"
+msgid "Marketing privileges"
+msgstr "Hak istimewa pemasaran"
+
+msgctxt "Languages::privilege_sections.website"
+msgid "Website privileges"
+msgstr "Hak istimewa situs web"
 
 msgctxt "Languages::privilege_sections.users"
-msgid "Users"
-msgstr "Keseluruhan pengguna"
+msgid "Customer privileges"
+msgstr "Hak istimewa pelanggan"
 
 msgctxt "Languages::privilege_sections.vendors"
-msgid "Stores"
-msgstr "Toko"
+msgid "Store privileges"
+msgstr "Hak istimewa toko"
 
 msgctxt "Languages::proceed"
 msgid "Proceed"
@@ -7361,8 +7561,8 @@ msgid "Processor"
 msgstr "Pengelola"
 
 msgctxt "Languages::processor_description_cardsave"
-msgid "Merchant Accounts provided by Cardsave, <a href=\"http://www.cardsave.net\">www.cardsave.net</a><br/><br/>Email: <a href='mailto:ecomm@cardsave.net'>ecomm@cardsave.net</a>"
-msgstr "Merchant account yang disediakan oleh Cardsave, <a href=\"http://www.cardsave.net\"> www.cardsave.net</a> <br/> <br/> Email: <a href='mailto:ecomm@cardsave.net'> ecomm@cardsave.net</a>"
+msgid "Merchant Accounts provided by Worldpay Cardsave, <a href=\"http://www.cardsave.net\">www.cardsave.net</a><br/><br/>Email: <a href='mailto:ecomm@cardsave.net'>ecomm@cardsave.net</a>"
+msgstr ""
 
 msgctxt "Languages::processor_description_p21"
 msgid "<b>P21 Simple API</b> enables you to accept check payments. It offers the industry's most comprehensive suite of check image creation and clearing solutions. With Check 21, you will receive your funds within the same day by check or direct deposit.<br/><br/>To activate the Check 21 option, please contact us via email at: <a href=\"mailto:support@payment21.com\">support@payment21.com</a> or by phone at: 1-888-770-0850 (US Toll Free) or 0041-71-740-1629 (International).<br/><br/><a href=\"http://www.payment21.com\" target=\"_blank\">www.payment21.com</a>"
@@ -7384,9 +7584,13 @@ msgctxt "Languages::products"
 msgid "Products"
 msgstr "Produk"
 
+msgctxt "Languages::products_menu_title"
+msgid "Products"
+msgstr ""
+
 msgctxt "Languages::products_deprecated"
 msgid "Products (Deprecated)"
-msgstr ""
+msgstr "Produk (yang tidak digunakan lagi)"
 
 msgctxt "Languages::products2"
 msgid "Products2"
@@ -7395,6 +7599,10 @@ msgstr "Produk2"
 msgctxt "Languages::products_added_to_cart"
 msgid "The products were added to your cart"
 msgstr "Produk ditambahkan ke belanjaan"
+
+msgctxt "Languages::products_number_added_to_cart"
+msgid "<b>[number]</b> products were added to your cart"
+msgstr ""
 
 msgctxt "Languages::products_amount"
 msgid "Product quantity"
@@ -7455,6 +7663,10 @@ msgstr "Produk pesanan Anda telah kami kirimkan kepada Jasa KurirPengiriman kami
 msgctxt "Languages::product_added_to_cart"
 msgid "The product was added to your cart"
 msgstr "Produk ini sudah diitambahkan ke keranjang belanja Anda"
+
+msgctxt "Languages::product_name_added_to_cart"
+msgid "<b>[product]</b> was added to your cart"
+msgstr ""
 
 msgctxt "Languages::product_added_to_cl"
 msgid "The product was added to your Comparison list"
@@ -7892,6 +8104,10 @@ msgctxt "Languages::rate_calculation_manual"
 msgid "Manual (by defined location)"
 msgstr "Manual (berdasar lokasi tertentu)"
 
+msgctxt "Languages::rate_calculation_by_rate_area"
+msgid "Manual (by defined rate area)"
+msgstr ""
+
 msgctxt "Languages::rate_calculation_realtime"
 msgid "Realtime"
 msgstr "Realtime"
@@ -8177,8 +8393,8 @@ msgid "Payment methods"
 msgstr "Metode pembayran"
 
 msgctxt "Languages::reports_parameter_6"
-msgid "Locations"
-msgstr "Lokasi"
+msgid "Rate areas"
+msgstr ""
 
 msgctxt "Languages::reports_parameter_7"
 msgid "Users"
@@ -8226,11 +8442,11 @@ msgstr "Reset persediaan"
 
 msgctxt "Languages::reset_quantity_to_zero"
 msgid "Set quantity of all products to zero"
-msgstr ""
+msgstr "Atur seluruh jumlah produk menjadi nol"
 
 msgctxt "Languages::reset_quantity_to_zero_tooltip"
 msgid "If you enable this setting, all the products in your store will have their quantity set to 0, except for the products that have the quantity specified in the imported file."
-msgstr ""
+msgstr "Jika pengaturan ini diaktifkan, semua jumlah produk di toko Anda akan diatur ke 0, kecuali produk dengan jumlah yang ditentukan pada berkas yang diimpor."
 
 msgctxt "Languages::reset_password"
 msgid "Reset password"
@@ -8564,9 +8780,17 @@ msgctxt "Languages::secure_storefront_url"
 msgid "Secure storefront URL"
 msgstr "URL aman tampilan toko"
 
+msgctxt "Languages::store_access_key"
+msgid "Access key to temporarily closed store"
+msgstr "Kunci akses ke toko yang tutup sementara"
+
 msgctxt "Languages::secure_storefront_url_already_exists"
 msgid "The value of the <strong>Secure storefront URL</strong> parameter mentioned by you already belongs to another company."
 msgstr "Nilai parameter  <strong>URL aman tampilan toko</strong>yang Anda maksudkan sudah dimiliki pihak lain."
+
+msgctxt "Languages::url_access_storefront"
+msgid "Use the following URL to access the storefront:<br><a href=\"[url]\" target=\"_blank\">[url]</a>"
+msgstr "Gunakan URL ini untuk mengakses etalase:<br><a href=\"[url]\" target=\"_blank\">[url]</a>"
 
 msgctxt "Languages::security_settings"
 msgid "Security settings"
@@ -8587,6 +8811,10 @@ msgstr "Kotak pilihan"
 msgctxt "Languages::selected"
 msgid "Selected"
 msgstr "Terpilih"
+
+msgctxt "Languages::selected_fields"
+msgid "Selected fields"
+msgstr "Bidang yang dipilih"
 
 msgctxt "Languages::selected_items"
 msgid "Selected items"
@@ -8630,7 +8858,7 @@ msgstr "Pilih file"
 
 msgctxt "Languages::select_image"
 msgid "Select image"
-msgstr ""
+msgstr "Pilih gambar"
 
 msgctxt "Languages::select_options"
 msgid "Select options"
@@ -8663,6 +8891,10 @@ msgstr "Pilih provinsi/kota"
 msgctxt "Languages::select_tables"
 msgid "Select tables"
 msgstr "Pilih tabel"
+
+msgctxt "Languages::select_storefront"
+msgid "Select [store] storefront"
+msgstr ""
 
 msgctxt "Languages::semicolon"
 msgid "Semicolon"
@@ -8840,6 +9072,10 @@ msgctxt "Languages::shipping_charges"
 msgid "Shipping charges"
 msgstr "Biaya pengiriman"
 
+msgctxt "Languages::shipping_time_and_charges"
+msgid "Shipping time and rates"
+msgstr ""
+
 msgctxt "Languages::shipping_cost"
 msgid "Shipping cost"
 msgstr "Biaya kirim"
@@ -8877,8 +9113,8 @@ msgid "Shipping Options"
 msgstr "Pilihan pengiriman"
 
 msgctxt "Languages::shipping_properties"
-msgid "Shipping Properties"
-msgstr "Properti pengiriman"
+msgid "Shipping properties"
+msgstr ""
 
 msgctxt "Languages::shipping_rates"
 msgid "Shipping rates"
@@ -8893,20 +9129,20 @@ msgid "Shipping service"
 msgstr "Jasa pengiriman"
 
 msgctxt "Languages::ship_dhl_height"
-msgid "Package height (inches)"
-msgstr "Tinggi paket (inci)"
+msgid "Package height"
+msgstr ""
 
 msgctxt "Languages::ship_dhl_length"
-msgid "Package length (inches)"
-msgstr "Panjang paket (inci)"
+msgid "Package length"
+msgstr ""
 
 msgctxt "Languages::ship_dhl_site_id"
 msgid "Site ID"
 msgstr "ID situs"
 
 msgctxt "Languages::ship_dhl_width"
-msgid "Package width (inches)"
-msgstr "Lebar paket (inci)"
+msgid "Package width"
+msgstr ""
 
 msgctxt "Languages::ship_fedex_ancillary_endorsement"
 msgid "Ancillary Endorsements"
@@ -9452,6 +9688,10 @@ msgctxt "Languages::show_rate_for_destination"
 msgid "Show rates for location"
 msgstr "Tampilkan harga untuk lokasi"
 
+msgctxt "Languages::show_rate_for_rate_area"
+msgid "Show rates for rate area"
+msgstr ""
+
 msgctxt "Languages::show_tab_in_popup"
 msgid "Show this tab in a popup window"
 msgstr "Tampilkan tab di jendela popup"
@@ -9664,6 +9904,14 @@ msgctxt "Languages::type_to_search_or_click_button"
 msgid "Type to search, or click the button on the right for advanced search"
 msgstr "Type untuk mencari, atau klik tombol di sebelah kanan untuk pencarian lanjutan"
 
+msgctxt "Languages::enter_color_name_and_code"
+msgid "Enter color name and code. Example, \"Red #ff0000\""
+msgstr ""
+
+msgctxt "Languages::enter_category_name_and_path"
+msgid "Enter path and category name. Example, \"Electronics/Computers/Laptops\""
+msgstr ""
+
 msgctxt "Languages::ssl_certificate"
 msgid "SSL certificate"
 msgstr "Sertifikat SSL"
@@ -9732,6 +9980,10 @@ msgctxt "Languages::status_changed"
 msgid "Status has been changed"
 msgstr "Status telah diubah"
 
+msgctxt "Languages::no_active_storefronts"
+msgid "No active storefronts"
+msgstr ""
+
 msgctxt "Languages::status_changed_after_process_payment"
 msgid "Order status was set according to the payment processing result"
 msgstr "Status pesanan ditetapkan sesuai dengan hasil pemrosesan pembayaran"
@@ -9788,13 +10040,17 @@ msgctxt "Languages::storefront_url_not_defined"
 msgid "Storefront URL not defined"
 msgstr "URL tampilan toko tidak terdifinisi"
 
+msgctxt "Languages::stores_status"
+msgid "Status"
+msgstr "Status"
+
+msgctxt "Languages::storefront_status_access_key_hint"
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Go to <a target=\"blank\" href=\"[url]\">Settings → General</a> and specify the <i>Access key to temporarily closed store</i> setting. Please note that a different key can be specified for each storefront, so make sure to select the correct storefront first. Use the key as described in the tooltip of that setting."
+msgstr ""
+
 msgctxt "Languages::stores"
 msgid "Stores"
 msgstr "Toko"
-
-msgctxt "Languages::store_locator"
-msgid "Store locator"
-msgstr "Penunjuk lokasi toko"
 
 msgctxt "Languages::store_mode"
 msgid "Licensing mode"
@@ -10180,6 +10436,10 @@ msgctxt "Languages::text_additional_thumbnail"
 msgid "(displayed on product details page in \"Additional images\")"
 msgstr "(ditampilkan pada halaman detail produk dalam \"gambar tambahan\")"
 
+msgctxt "Languages::addon_files_was_copied"
+msgid "The <b>\"[addon]\"</b> add-on files has been copied successfully"
+msgstr ""
+
 msgctxt "Languages::text_addon_cannot_enable"
 msgid "Add-on \"[addon_name]\" is incompatible with the following add-ons: [addons]. It cannot be enabled"
 msgstr "Add-ons \"[addon_name]\" tidak kompatibel dengan Add-onsberikut:[addons]. Tidak dapat diaktifkan"
@@ -10287,6 +10547,10 @@ msgstr "Di bagian ini memungkinkan Anda untuk mengelola file cadangan (backup) <
 msgctxt "Languages::text_billing_same_with_shipping"
 msgid "Billing and shipping addresses are the same"
 msgstr "Alamat Penagihan dan alamat pengiriman sama"
+
+msgctxt "Languages::text_billing_address_is_different_from_shipping"
+msgid "My billing address is different from shipping address"
+msgstr ""
 
 msgctxt "Languages::text_block_trial_notice"
 msgid "Your 30-day evaluation period has expired. Please, buy a license ([href]) or remove the software from your server."
@@ -10477,8 +10741,8 @@ msgid "Logo for the <b>customer</b> area"
 msgstr "Logo untuk area <b>pelanggan</b>"
 
 msgctxt "Languages::text_datatrans_notice"
-msgid "<b>Note</b>: In order to track your DataTrans orders with the shopping cart software you have to take the following steps:<br /> <br /> -&nbsp;Log in to your DataTrans account<br /> -&nbsp;Click on the <u>'Upp Data'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Set <u>'URL Post data format'</u> to <b>'Data in HTML FORM'</b>.<br /> -&nbsp;Set <u>'URL Post'</u> to:<br /> <b>[post_url]</b><br /> -&nbsp;Click on the <u>'Security'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Select the <b>'An additional merchant identification will be send with payment messages'</b> option.<br /> -&nbsp;Generate new digital signature using the <u>'Generate new sign'</u> button.<br /> -&nbsp;Set generated value to the <u>'Digital signature'</u> field on the DataTrans payment configuration page in your store<br />"
-msgstr "<b>Catatan</b>: Untuk melacak pesanan DataTrans anda dengan software keranjang belanjaan anda harus mengambil langkah-langkah ini:<br /> <br /> -&nbsp;Login ke akun DataTrans anda<br /> -&nbsp;Klik pada <u>'Upp Data'</u> pada link <u>'Upp Administrasi'</u> bagian.<br /> -&nbsp;Set <u>'format data postingan URL'</u> ke <b>'Data dalam HTML FORM'</b>.<br /> -&nbsp;Set <u>'Postingan URL'</u> to:<br /> <b>[post_url]</b><br /> -&nbsp;Klik pada <u>'Security'</u> pada link <u>'Upp Administrasi'</u> bagian.<br /> -&nbsp;Pilih pada <b>'Identifikasi pedagang tambahan akan dikirim menggunakan pesan pembayaran'</b> pilihan.<br /> -&nbsp;Membuat digital signature baru menggunakan<u>'Membuat penandaan baru'</u> button.<br /> -&nbsp;Mengatur nilai yang dihasilkan ke <u>'Digital signature'</u> bidang pada halaman konfigurasi pembayaran DataTrans di toko Anda<br />"
+msgid "<b>Note</b>: In order to track your Datatrans orders with the shopping cart software you have to take the following steps:<br /> <br /> -&nbsp;Log in to your Datatrans account<br /> -&nbsp;Click on the <u>'Upp Data'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Set <u>'URL Post data format'</u> to <b>'Data in HTML FORM'</b>.<br /> -&nbsp;Set <u>'URL Post'</u> to:<br /> <b>[post_url]</b><br /> -&nbsp;Click on the <u>'Security'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Select the <b>'An additional merchant identification will be send with payment messages'</b> option.<br /> -&nbsp;Generate new digital signature using the <u>'Generate new sign'</u> button.<br /> -&nbsp;Set generated value to the <u>'Digital signature'</u> field on the Datatrans payment configuration page in your store<br />"
+msgstr ""
 
 msgctxt "Languages::text_data_changed"
 msgid "Your changes have not been saved.Press OK to continue, or Cancel to stay on the current page."
@@ -10588,10 +10852,6 @@ msgctxt "Languages::text_expired_license"
 msgid "Unfortunately, your subscription for [product] software is over. Please renew it as soon as possible to avoid the program suspending."
 msgstr "Sayangnya, langganan Anda sudah berakhir. Silakanmemperbaharui secepat mungkin untuk menghindaripenangguhan program."
 
-msgctxt "Languages::tmpl_text_fancybox"
-msgid "FancyBox"
-msgstr "Kotak mewah"
-
 msgctxt "Languages::text_features_delimiter"
 msgid "Delimiter between variant values of a product feature."
 msgstr "Pembatas antara nilai varian dari fitur produk."
@@ -10642,7 +10902,7 @@ msgstr "<p>Untuk menggunakan fitur ini, Anda membutuhkan [product] lisensi.</p>"
 
 msgctxt "Languages::upgrade_license"
 msgid "Upgrade my license"
-msgstr ""
+msgstr "Tingkatkan lisensi saya"
 
 msgctxt "Languages::text_forbidden_uploaded_file_extension"
 msgid "It is not allowed to upload files with the <b>.[ext]</b> extension. Allowed extensions are: <b>[exts]</b>"
@@ -10653,8 +10913,8 @@ msgid "It is not allowed to upload files with size more than <b>[size]</b>"
 msgstr "Tidak diperbolehkan untuk mengunggah file dengan ukuranlebih dari <b>[size]</b>"
 
 msgctxt "Languages::text_license_required_full"
-msgid "Your current CS-Cart edition is Professional. We also offer another one, a more advanced edition—<b>Ultimate</b>. With CS-Cart Ultimate, you'll be able to use unlimited number of storefronts and the mobile commerce app as well as the eBay Synchronization add-on and the Facebook app without additional fees. To unlock unlimited storefonts and mobile commerce, get the Ultimate license."
-msgstr "Edisi CS-Cart saat ini adalah Professional. Kami juga menawarkan yang lain, edisi yang lebih maju-<b>Ultimate</b>. Dengan CS-Cart Ultimate, Anda dapat menggunakan jumlah etalase dan aplikasi mobile commerce yang tidak terbatas serta add-on Sinkronisasi eBay dan aplikasi Facebook tanpa biaya tambahan. Untuk membuka storefonts dan mobile commerce tak terbatas, dapatkan lisensi Ultimate."
+msgid "Your current CS-Cart edition is Professional. We also offer another one, a more advanced edition—<b>Ultimate</b>. With CS-Cart Ultimate, you'll be able to use unlimited number of storefronts and the mobile commerce app as well as the eBay Synchronization add-on and the Facebook app without additional fees. To unlock unlimited storefronts and mobile commerce, get the Ultimate license."
+msgstr ""
 
 msgctxt "Languages::text_license_required_storefronts"
 msgid "Add as many storefronts as you want and manage them via a single admin panel."
@@ -10719,10 +10979,6 @@ msgstr "Anda telah memasukkan URL yang tidak valid"
 msgctxt "Languages::text_items_added"
 msgid "The items were added successfully"
 msgstr "Item telah berhasil ditambahkan"
-
-msgctxt "Languages::text_light_box"
-msgid "Lightbox"
-msgstr "Lightbox"
 
 msgctxt "Languages::text_payment_first_data_notice"
 msgid "Please log in to FirstData Connect 2.0 Admin, open the \"Administration\" tab, click on the \"Connect 2.0 Setup\" link.<br /> Set the following URL in the \"Order Submission Form\", \"Confirmation Page\", \"Failure Page\" sections: [return_url]<br />"
@@ -10811,6 +11067,10 @@ msgstr "Tidak ada pesanan"
 msgctxt "Languages::text_no_payments_needed"
 msgid "No payment information required"
 msgstr "Tidak ada informasi pembayaran yang diperlukan"
+
+msgctxt "Languages::text_no_payments_required"
+msgid "No payment required"
+msgstr ""
 
 msgctxt "Languages::text_no_products"
 msgid "There are no products in this section"
@@ -10905,12 +11165,12 @@ msgid "Loading... Your request is being processed, please wait."
 msgstr "Loading ... Permintaan Anda sedang diproses, silakantunggu."
 
 msgctxt "Languages::text_password_recovery_instructions_sent"
-msgid "Password recovery instructions have been sent to your email."
-msgstr "Instruksi pemulihan password telah dikirim ke email Anda."
+msgid "Password recovery instructions have been sent to [email] address."
+msgstr ""
 
 msgctxt "Languages::text_pay4later_notice"
-msgid "<b>Note</b>: In order to track your Pay4Later orders with the shopping cart software, you have to take these steps:<br /><br />-&nbsp;Log in to Pay4Later BackOffice<br />-&nbsp;Click on the <u>'Settings/Installations'</u> link in the <u>'Quick Links'</u> section.<br />-&nbsp;Set <u>'Return URL (Verified)'</u> setting to:<br /><b>[verified_url]</b><br />-&nbsp;Set <u>'Return URL (Decline)'</u> setting to:<br /><b>[decline_url]</b><br />-&nbsp;Set <u>'Return URL (Refer)'</u> setting to:<br /><b>[refer_url]</b><br />-&nbsp;Set <u>'Return URL (Cancel)'</u> setting to:<br /><b>[cancel_url]</b><br />-&nbsp;Set <u>'CSN URL'</u> setting to:<br /><b>[process_url]</b><br />-&nbsp;Click on the <u>'Save Changes'</u> button<br />"
-msgstr "<b>Note</b>: In order to track your Pay4Later orders with the shopping cart software, you have to take these steps:<br /><br />-&nbsp;Log in to Pay4Later BackOffice<br/>-&nbsp;Click on the <u>'Settings/Installations'</u> link in the <u>'Quick Links'</u>"
+msgid "<b>Note</b>: In order to track your Deko orders with the shopping cart software, you have to take these steps:<br /><br />-&nbsp;Log in to Deko BackOffice<br />-&nbsp;Click on the <u>'Settings/Installations'</u> link in the <u>'Quick Links'</u> section.<br />-&nbsp;Set <u>'Return URL (Verified)'</u> setting to:<br /><b>[verified_url]</b><br />-&nbsp;Set <u>'Return URL (Decline)'</u> setting to:<br /><b>[decline_url]</b><br />-&nbsp;Set <u>'Return URL (Refer)'</u> setting to:<br /><b>[refer_url]</b><br />-&nbsp;Set <u>'Return URL (Cancel)'</u> setting to:<br /><b>[cancel_url]</b><br />-&nbsp;Set <u>'CSN URL'</u> setting to:<br /><b>[process_url]</b><br />-&nbsp;Click on the <u>'Save Changes'</u> button<br />"
+msgstr ""
 
 msgctxt "Languages::text_paybox_notice"
 msgid "<b>Note:</b> Please download the file modulev2.cgi from the PayBox server, copy it to the <b>[paybox_dir]</b> directory <u>in binary mode</u> and make it executable. <br />Run the following command:<br /><b><i>chmod 755 modulev2.cgi</b></i><br /><br />Also ask &#8220;Paybox&#8221; service to add the following URL to the database as &#8220;Callback URL&#8221;:<br /><b>[callback_url]</b>"
@@ -10965,8 +11225,8 @@ msgid "Do not show currency selection at all"
 msgstr "Tidak menunjukkan pilihan mata uang sama sekali"
 
 msgctxt "Languages::text_paysitecash_notice"
-msgid "Please add these URL fields in your Paysite Cash configuration:<br/><br/><b>URL:</b><br/>[url]<br/><br/><b>Referer url:</b><br/>[ref_url]<br/><br/><b>after payment return url:</b><br/>[sucess_url]<br/><br/><b>canceled payment url:</b><br/>[cancel_url]<br/><br/><b>Backoffice confirmation url:</b><br/>[confirm_url]"
-msgstr "Silakan menambahkan bidang URL ini di konfigurasi Paysite Cash: <br/> <br/> <b>URL:</b> <br/>[url] <br/> <br/> <b>Referer url:</b> <br/>[ref_url] <br/> <br/> <b>url kembali setelah pembayaran:</b> <br/>[sucess_url] <br/> <br/> <b>url membatalkan pembayaran:</b> <br/>[cancel_url] <br/> <br/> <b>Backoffice konfirmasi url:</b> <br/>[confirm_url]"
+msgid "Please add these URL fields in your Paysite-cash configuration:<br/><br/><b>URL:</b><br/>[url]<br/><br/><b>Referer url:</b><br/>[ref_url]<br/><br/><b>after payment return url:</b><br/>[sucess_url]<br/><br/><b>canceled payment url:</b><br/>[cancel_url]<br/><br/><b>Backoffice confirmation url:</b><br/>[confirm_url]"
+msgstr ""
 
 msgctxt "Languages::text_paysitecash_processor"
 msgid "Processor"
@@ -10991,10 +11251,6 @@ msgstr "<b>Catatan:</b> Silahkan Kirim informasi berikut untuk dukungan pembayar
 msgctxt "Languages::text_position_updating"
 msgid "Loading... Positions are being updated, please wait."
 msgstr "Loading ... Position sedang diperbarui, silakan tunggu."
-
-msgctxt "Languages::text_prettyphoto"
-msgid "prettyPhoto"
-msgstr "prettyPhoto"
 
 msgctxt "Languages::text_price_dec_sign_delimiter"
 msgid "Decimal separator for product prices."
@@ -11092,10 +11348,6 @@ msgctxt "Languages::text_recover_password_title"
 msgid "Reset password"
 msgstr "Membuat ulang sandi"
 
-msgctxt "Languages::text_redactor"
-msgid "Redactor"
-msgstr "Redaksi"
-
 msgctxt "Languages::text_remove_additional_images"
 msgid "When importing additional images of an updated product, existing images of this product will be deleted before import"
 msgstr "Ketika mengimpor gambar tambahan dari produk yangdiperbarui, gambar yang ada untuk produk ini akan dihapussebelum dilakukan impor"
@@ -11117,8 +11369,8 @@ msgid "Are you sure that you want to restore the template?"
 msgstr "Apakah Anda yakin bahwa Anda ingin mengembalikan template?"
 
 msgctxt "Languages::text_sagepay_dir_notice"
-msgid "<b>Note:</b> In order to track your SagePay orders by the shopping cart software, please enable the 3D Secure Fraud Checking Option for your SagePay VSP Direct account."
-msgstr "<b>Catatan:</b> Untuk melacak pesanan SagePay Anda, silakan mengaktifkan opsi 3D Secure Fraud Checking untuk SagePay VSP Direct akun Anda."
+msgid "<b>Note:</b> In order to track your Sage Pay orders by the shopping cart software, please enable the 3D Secure Fraud Checking Option for your Sage Pay VSP Direct account."
+msgstr ""
 
 msgctxt "Languages::text_sagepay_notice"
 msgid "Use <b>testvendor</b> as <b>Vendor Name</b> for the testing purposes<br /><p><b>PAYMENT</b> - transaction type is used to gain an authorisation from the bank, then settle that transaction early the following morning, committing the funds to be taken from your customer's card.<br /></p><p><b>DEFERRED</b> - transactions are NOT sent to the bank for completion until you RELEASE them by logging into the SagePay VSP Admin interface, finding the transaction and clicking the Release button.</p>"
@@ -11249,6 +11501,10 @@ msgctxt "Languages::text_store_mode_opened"
 msgid "The store was <b>opened</b>"
 msgstr "Toko Online Anda <b>beroperasi</b>"
 
+msgctxt "Languages::text_store_mode_open"
+msgid "The store was <b>opened</b>"
+msgstr ""
+
 msgctxt "Languages::text_store_mode_trial"
 msgid "<p>Full access to all features during the 30-day trial period, starting from the time of activation.</p><p>Once the 30-day trial period expires, you'll have to <a href=\"[product_buy_url]\" target=\"_blank\">purchase a license</a> or enter a valid license number to be able to manage your store.</p>"
 msgstr "<p> Akses penuh ke semua fitur selama masa uji coba 30 hari, dimulai dari saat aktivasi. </p> <p> Setelah masa percobaan 30 hari berakhir, Anda harus <a href=\" [product_buy_url] \"target=\"_blank\"> membeli lisensi </a> atau memasukkan nomor lisensi yang valid untuk bisa mengelola toko anda </p>"
@@ -11270,8 +11526,8 @@ msgid "Your changes have not been saved.Press OK to save changes or Cancel to di
 msgstr "Perubahan Anda belum disimpan.Tekan OK untuk menyimpan perubahan atau Batal untuk membuangnya"
 
 msgctxt "Languages::text_thaiepay_notice"
-msgid "<p>Please set the following values in the Thaiepay merchant settings:</p><p>Return Url: <b>[return_url]</b></p><p>Status: <b>Yes (it is important!)</b></p><p>Post Back Url: <b>[postback_url]</b></p><p>Main Parameter: <b>\"total\" must be checked</b> - it will increase the security of transactions</p><p>Additional Parameter: it is obligatory for successful processing of transactions. For example, you can set <b>name=completed</b> and <b>value=some_secret_word</b>. Copy these values to these form fields: \"Additional parameter Name\" and \"Additional parameter Value\".</p>"
-msgstr "<p> Silakan set nilai berikut dalam pengaturan pedagang Thaiepay: </p><p> Kembali Url: <b> [return_url]</b></p><p>Status: <b>Ya (itu adalah penting!)</b></p><p>Post Kembali Url: <b> [postback_url] </b></p><p>Parameter Utama: <b>\"total\" harus diperiksa /b >- akan meningkatkan keamanan transaksi</p><p>Parameter Tambahan: wajib memproses transaksi yang berhasil. Misalnya, Anda bisa mengatur <b>name = completed</b>dan <b>nilai = some_secret_word</b>. Salin nilai-nilai ini ke kolom formulir berikut: \"Nama parameter tambahan\" dan \"Nilai parameter tambahan\".</p>"
+msgid "<p>Please set the following values in the ThaiePay merchant settings:</p><p>Return Url: <b>[return_url]</b></p><p>Status: <b>Yes (it is important!)</b></p><p>Post Back Url: <b>[postback_url]</b></p><p>Main Parameter: <b>\"total\" must be checked</b> - it will increase the security of transactions</p><p>Additional Parameter: it is obligatory for successful processing of transactions. For example, you can set <b>name=completed</b> and <b>value=some_secret_word</b>. Copy these values to these form fields: \"Additional parameter Name\" and \"Additional parameter Value\".</p>"
+msgstr ""
 
 msgctxt "Languages::text_thumbnail_manual_loading"
 msgid "Thumbnails will be generated from detailed images automatically, but you can also <a id=\"[id]\" class=\"[class]\">upload them manually.</a>"
@@ -11498,8 +11754,8 @@ msgid "The <b>[usergroup]</b> group was requested by [name] ([email])."
 msgstr "The <b>[usergroup]</b> kelompok diminta oleh [nama] ([email])."
 
 msgctxt "Languages::text_worldpay_notice"
-msgid "Configure your WorldPay account before using the payment.<br /><br />Go to the WorldPay administration page and switch to the Installation section.<br /><br />Fill the fields as follows:<br /><br />Payment Response URL: <b>[return_url]</b><br />Payment Response Password: <b>Make up a secret word.</b> The same word must be entered in the respective field below<br />MD5 secret for transactions: <b>Make up a secret word.</b> The same word must be entered in the respective field below<br />SignatureFields: <b>instId:amount:currency:cartId</b>"
-msgstr "Mengkonfigurasi account WorldPay Anda sebelum menggunakan pembayaran. <br/> <br/> Pergi ke halaman administrasi WorldPay dan beralih ke bagian Instalasi. <br /> <br /> Isi bidang sebagai berikut: <br/> <br/> URL Respon Pembayaran: <b>[return_url]</b><br /> Pembayaran Response Password: <b> Membuat sebuah kata rahasia. </b> Kata yang sama harus dimasukkan di bidang masing-masing di bawah ini <br/> MD5 rahasia untuk transaksi: <b> Membuat sebuah kata rahasia. </b><b>instId:amount:currency:cartId</b>"
+msgid "Configure your Worldpay account before using the payment.<br /><br />Go to the Worldpay administration page and switch to the Installation section.<br /><br />Fill the fields as follows:<br /><br />Payment Response URL: <b>[return_url]</b><br />Payment Response Password: <b>Make up a secret word.</b> The same word must be entered in the respective field below<br />MD5 secret for transactions: <b>Make up a secret word.</b> The same word must be entered in the respective field below<br />SignatureFields: <b>instId:amount:currency:cartId</b>"
+msgstr ""
 
 msgctxt "Languages::text_zipcodes_wildcards"
 msgid "You are able to use wildcards in this field:<br /><b>'?'</b> - any single character;<b>'*'</b> - any number of characters.<br /><br /><u>Example:</u><br /><b>98?78</b> &nbsp;&nbsp;(corresponds to 98878, 98378, 98978, etc)<br /><b>12*</b>&nbsp;&nbsp; (corresponds to 12345, 12876, 12098, etc..)"
@@ -11698,7 +11954,7 @@ msgid "Hide/show theme editor panel"
 msgstr "Menyembunyikan/menampilkan panel tema editor "
 
 msgctxt "Languages::theme_editor.incorrect_style_name"
-msgid "Style name can not contain the following characters: \"/ # % ? * : ; { } \\ \""
+msgid "Style name can not contain the following characters: \"/ # % ? * : ; { } \\ + \""
 msgstr ""
 
 msgctxt "Languages::theme_editor.in_stock"
@@ -11908,6 +12164,90 @@ msgstr "Font lain"
 msgctxt "Languages::theme_editor_mode"
 msgid "Theme editor mode"
 msgstr "Modus editor tema"
+
+msgctxt "Languages::theme_editor.checkout_selected_control_border"
+msgid "Checkout: Selected payment / shipping method border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_active_selector_border"
+msgid "Checkout: Active selector border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_border"
+msgid "Checkout: Payment / shipping method border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selector_border"
+msgid "Checkout: Selector border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_input_border"
+msgid "Checkout: Field border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selected_input_border"
+msgid "Checkout: Selected field border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_step_title"
+msgid "Checkout: Step title"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_input_text"
+msgid "Checkout: Text in fields"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_input_label"
+msgid "Checkout: Field label"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_background"
+msgid "Checkout: Payment / shipping method background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selector_background"
+msgid "Checkout: Selector background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selected_control_background"
+msgid "Checkout: Selected payment / shipping method background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_active_selector_background"
+msgid "Checkout: Active selector background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_title"
+msgid "Checkout: Payment / shipping method title"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selector_title"
+msgid "Checkout: Selector title"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_description"
+msgid "Checkout: Payment / shipping method description"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selector_tooltip"
+msgid "Checkout: Selector tooltip"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_label"
+msgid "Checkout: Credit card field names"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_terms_background"
+msgid "Checkout: \"Terms and conditions\" section background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_link"
+msgid "Checkout: Link"
+msgstr ""
+
+msgctxt "Languages::admin_panel.block_manager"
+msgid "Editing layout"
+msgstr ""
 
 msgctxt "Languages::theme_editor.create_style_first"
 msgid "You cannot modify this parameter for default styles. Create a new one first"
@@ -12233,9 +12573,21 @@ msgctxt "Languages::ttc_popularity"
 msgid "Product popularity rating based on how many times the storefront has been viewed, number of additions to cart and number of purchases."
 msgstr "Peringkat popularitas produk didasarkan pada berapa kali tampilan di toko telah dilihat, jumlah penambahan pada belanjaan dan jumlah pembelian."
 
+msgctxt "Languages::ttc_search_words"
+msgid "Enter a few words here, and the product will appear in the results of the built-in search for those words, even if the product name or description doesn't have them. Separate different search words by commas."
+msgstr "Masukkan beberapa kata di sini, dan produk akan muncul pada hasil pencarian kata-kata, bahkan jika nama produk atau keterangannya tidak mengandung kata-kata tersebut. Pisahkan kata-kata pencarian yang berbeda dengan tanda koma."
+
 msgctxt "Languages::ttc_storefront_url"
 msgid "All the storefronts domain names must be associated with the same IP-address. Note: Switch to \"All stores\" to edit"
 msgstr "Semua domain tampilan toko harus terasosiasi dengan alamat IP yang sama. Catatan: Ganti ke \"Semua toko\" untuk mengubah."
+
+msgctxt "Languages::ttc_stores_status"
+msgid "ON—the storefront is open; everyone will see it. OFF—the storefront is closed; only those who have the access key will be able to see it."
+msgstr ""
+
+msgctxt "Languages::access_for_authorized_customers_only"
+msgid "Access for authorized customers only."
+msgstr ""
 
 msgctxt "Languages::tts_activate_menu_tab_for"
 msgid "The menu item will be shown activated for the specified dispatch."
@@ -12335,15 +12687,15 @@ msgstr "Kategori yang akan ditampilkan dalam remah roti navigasi."
 
 msgctxt "Languages::tt_views_products_update_inventory"
 msgid "Track in stock product quantity. Enable the \"Enable inventory tracking\" option (Settings -> General) to modify."
-msgstr ""
+msgstr "Mengecek jumlah produk yang tersedia. Aktifkan pilihan \"Aktifkan pengecekan persediaan\" (Pengaturan -> Umum) untuk melakukan modifikasi."
 
 msgctxt "Languages::tt_views_products_update_list_price"
 msgid "Manufacturer suggested retail price."
 msgstr "Harga eceran usulan produsen"
 
 msgctxt "Languages::tt_views_products_update_out_of_stock_actions"
-msgid "Note that the 'Buy in advance' option requires a positive product amount while the 'Sign up for notification' option requires a non-positive amount. Also note that the 'Sign up for notification' option is not applied to products tracked with options."
-msgstr "Perhatikan bahwa pilihan 'Pembelian di muka' membutuhkan jumlah produk positif sedangkan pilihan 'Mendaftar untuk pemberitahuan' membutuhkan jumlah bukan-positif.Perhatikan juga bahwa opsi 'Mendaftar untuk pemberitahuan'tidak diterapkan untuk produk di"
+msgid "'Buy in advance' lets customers buy out-of-stock products and products that will be available since a specific date. 'Sign up for notification' works only when the product has zero or negative quantity."
+msgstr ""
 
 msgctxt "Languages::tt_views_products_update_product_details_layout"
 msgid "By default, the template that is defined in the settings of the main product category is used"
@@ -12513,6 +12865,10 @@ msgctxt "Languages::unregistered_customer"
 msgid "Unregistered customer"
 msgstr "Pelanggan tidak terdaftar"
 
+msgctxt "Languages::unregistered_customer_short"
+msgid "Unregistered"
+msgstr ""
+
 msgctxt "Languages::unselect_all"
 msgid "Unselect all"
 msgstr "Batalkan pilihan"
@@ -12666,8 +13022,8 @@ msgid "Your server has wrong PHP script timeout settings. This could be due to r
 msgstr "Server Anda memiliki kesalahan pengaturan PHP script timeout. Ini bisa jadi karena pembatasan pada fungsi PHP <a href=\"http://php.net/manual/en/function.set-time-limit.php\" target=\"_blank\"> set_time_limit</a> atau FastCGI opsi \"Timeout\". Sebaiknya Anda menghubungi penyedia hosting Anda untuk mengatasi masalah ini atau hubungi tim dukungan teknis kami untuk melakukan upgrade untuk Anda."
 
 msgctxt "Languages::upgrade_center.warning_msg_executed_php"
-msgid "<p class=\"text-error\">We have started a dummy PHP script. It will be working during 6 minutes. When the check is finished, we'll tell you if the PHP script's timeouts can be set correctly. If yes, than you are good to go with the upgrade. Please wait until the check is finished to be sure that your server has correct PHP timeout configuration.</p>"
-msgstr "<p class=\"text-error\"> kami telah memulai sebuah dummy PHP script. Itu akan bekerja selama 6 menit. Ketika pemeriksaan selesai, kami akan memberitahu Anda jika PHP script's timeouts dapat diatur dengan benar. Jika ya, maka Anda bisa melakukan upgrade. Silahkan tunggu hingga pengecekan selesai untuk memastikan bahwa server Anda memiliki konfigurasi PHP timeout yang benar.</p>"
+msgid "<p class=\"text-error\">We have started a dummy PHP script. It will be working during 6 minutes. When the check is finished, we'll tell you if the PHP script's timeouts can be set correctly. If yes, then you are good to go with the upgrade. Please wait until the check is finished to be sure that your server has correct PHP timeout configuration.</p>"
+msgstr ""
 
 msgctxt "Languages::upload"
 msgid "Upload"
@@ -12762,8 +13118,12 @@ msgid "Sorry, user with id [user_id] can not be deleted."
 msgstr "Maaf, user dengan ID [user_id] tidak dapat dihapus."
 
 msgctxt "Languages::user_class"
-msgid "User-defined CSS-class"
-msgstr "CSS-class yang digunakan"
+msgid "User-defined CSS class"
+msgstr ""
+
+msgctxt "Languages::wrapper_class"
+msgid "User-defined wrapper CSS class"
+msgstr ""
 
 msgctxt "Languages::user_data_required"
 msgid "Please select a customer or enter data"
@@ -13074,8 +13434,8 @@ msgid "View results"
 msgstr "Lihat hasil"
 
 msgctxt "Languages::view_storefront"
-msgid "View STOREFRONT"
-msgstr "Lihat storefront"
+msgid "View storefront"
+msgstr ""
 
 msgctxt "Languages::view_vendor_categories"
 msgid "View store categories"
@@ -13565,34 +13925,6 @@ msgctxt "Languages::payments.eway_rapidapi_rsp.header_text"
 msgid "Header text"
 msgstr "Teks judul"
 
-msgctxt "Languages::payments.futurepay.zipcode_combination_error"
-msgid "The Zip code does not match the state entered. Please re-enter and try your purchase again."
-msgstr "The Zip code does not match the state entered. Pleasere-enter and try your purchase again."
-
-msgctxt "Languages::payments.futurepay.amount_error"
-msgid "FuturePay can only be used on orders under $500"
-msgstr "FuturePay hanya bisa digunakan atas perintah di bawah $ 500"
-
-msgctxt "Languages::payments.futurepay.country_error"
-msgid "FuturePay is currently unavailable outside of America"
-msgstr "FuturePay saat ini tidak tersedia di luar Amerika"
-
-msgctxt "Languages::payments.futurepay.customer_error"
-msgid "You currently have an outstanding application with FuturePay which needs resolving"
-msgstr "You currently have an outstanding application withFuturePay which needs resolving"
-
-msgctxt "Languages::payments.futurepay.phone_error"
-msgid "There was no phone number entered for your billing address. Please enter a phone number and try again"
-msgstr "There was no phone number entered for your billingaddress. Please enter a phone number and try again"
-
-msgctxt "Languages::payments.futurepay.zipcode_error"
-msgid "The Zip code you entered for your billing address corresponds to a Military (APO/FPO/DPO), PO Box or other non-physical address. To approve your application we require a Zip code associated with a physical address in the U.S."
-msgstr "The Zip code you entered for your billing addresscorresponds to a Military (APO/FPO/DPO), PO Box or othernon-physical address. To approve your application werequire a Zip code associated with a physical address inthe U.S."
-
-msgctxt "Languages::payments.futurepay.order_exists"
-msgid "The reference exists with an order that has completed sales attached"
-msgstr "The reference exists with an order that has completedsales attached"
-
 msgctxt "Languages::filter_by_categories"
 msgid "Filter by categories"
 msgstr "Filter berdasarkan kategori"
@@ -13733,6 +14065,14 @@ msgctxt "Languages::marketplace_find_more"
 msgid "Find more add-ons and themes in <a href=\"[href]\" target=\"_blank\">Marketplace</a>"
 msgstr "Menemukan lebih banyak Pengaya dan tema di <a href=\"[href]\" target=\"_blank\"> pasar</a>"
 
+msgctxt "Languages::more_languages"
+msgid "More languages"
+msgstr "Bahasa lainnya"
+
+msgctxt "Languages::languages_find_more"
+msgid "If you haven't found the language you need, check out <a href=\"[href]\" target=\"_blank\">our site with free language packs</a>."
+msgstr "Jika Anda belum menemukan bahasa yang Anda butuhkan, silakan cek <a href=\"[href]\" target=\"_blank\">situs kami dengan pilihan bahasa bebas</a>."
+
 msgctxt "Languages::extract_archive"
 msgid "Extract archive"
 msgstr "Extract archive"
@@ -13741,9 +14081,13 @@ msgctxt "Languages::seo"
 msgid "SEO"
 msgstr "SEO"
 
-msgctxt "Languages::text_magnific"
-msgid "MagnificPopup"
-msgstr "MagnificPopup"
+msgctxt "Languages::text_owl"
+msgid "OwlCarousel"
+msgstr ""
+
+msgctxt "Languages::carousel_swiper"
+msgid "Swiper"
+msgstr ""
 
 msgctxt "Languages::bulk_print_packing_slip"
 msgid "Packing slip bulk print"
@@ -13841,6 +14185,10 @@ msgctxt "SettingsSections::Upgrade_center"
 msgid "Upgrade center"
 msgstr "Pusat peningkatan versi"
 
+msgctxt "SettingsSections::Notifications"
+msgid "Notifications"
+msgstr ""
+
 msgctxt "SettingsOptions::company_name"
 msgid "Company name"
 msgstr "Nama perusahaan"
@@ -13852,10 +14200,6 @@ msgstr "Aktifkan koneksi yang aman di panel administrasi"
 msgctxt "SettingsOptions::secure_storefront"
 msgid "Enable secure connection for the storefront"
 msgstr "Aktifkan koneksi aman untuk etalase"
-
-msgctxt "SettingsOptions::keep_https"
-msgid "Keep HTTPS connection once a secure page is visited"
-msgstr "Menjaga hubungan HTTPS sekali halaman aman dikunjungi"
 
 msgctxt "SettingsOptions::license_number"
 msgid "License number"
@@ -13880,6 +14224,14 @@ msgstr "Metode pengiriman e-mail"
 msgctxt "SettingsOptions::width"
 msgid "Image width"
 msgstr "Lebar gambar"
+
+msgctxt "SettingsOptions::log_lifetime"
+msgid "Days before a log entry is removed"
+msgstr "Hari sebelum masukan log dihapus"
+
+msgctxt "SettingsTooltips::log_lifetime"
+msgid "Logs older than the specified number of days will be removed automatically. Enter 0 if you don't want any automatic removal of old logs."
+msgstr "Log lebih lama dari jumlah hari yang ditentukan akan dihapus secara otomatis. Masukkan 0 jika Anda tidak menginginkan penghapusan log lama secara otomatis."
 
 msgctxt "SettingsOptions::log_type_orders"
 msgid "Orders"
@@ -14071,7 +14423,7 @@ msgstr "Kunci akses ke skrip cron yang mengirim pemberitahuan e-mail tentang per
 
 msgctxt "SettingsOptions::store_access_key"
 msgid "Access key to temporarily closed store"
-msgstr "Kunci akses ke toko yang sementara ditutup"
+msgstr "Kunci akses ke toko yang tutup sementara"
 
 msgctxt "SettingsOptions::store_optimization_dev"
 msgid "Rebuild cache automatically"
@@ -14126,8 +14478,8 @@ msgid "String type"
 msgstr "Tipe String"
 
 msgctxt "SettingsOptions::header_7003"
-msgid "Default location"
-msgstr "Lokasi standar"
+msgid "Default customer location"
+msgstr ""
 
 msgctxt "SettingsOptions::char_shadow"
 msgid "Character shadows"
@@ -14160,10 +14512,6 @@ msgstr "Pengaturan sendmail"
 msgctxt "SettingsOptions::default_zipcode"
 msgid "Default zipcode"
 msgstr "Standar kodepos"
-
-msgctxt "SettingsOptions::company_fax"
-msgid "Company fax"
-msgstr "Fax perusahaan"
 
 msgctxt "SettingsOptions::frontend_default_language"
 msgid "Frontend default language"
@@ -14458,8 +14806,8 @@ msgid "Detailed category image height"
 msgstr "Tinggi gambar di halaman Rincian Kategori (Detailed Category)"
 
 msgctxt "SettingsOptions::header_7005"
-msgid "Users/cart"
-msgstr "Pengguna/cart"
+msgid "Users"
+msgstr ""
 
 msgctxt "SettingsOptions::user_multiple_profiles"
 msgid "Allow users to create multiple profiles for one account"
@@ -14538,8 +14886,8 @@ msgid "Offer guest to create an account after successful order"
 msgstr "Tawarkan tamu untuk membuat akun setelah pesanan berhasil"
 
 msgctxt "SettingsOptions::disregard_options_for_discounts"
-msgid "Disregard product options when calculating quantity discounts"
-msgstr "Abaikan opsi produk saat menghitung diskon kuantitas"
+msgid "Disregard product options when calculating quantity discounts [Deprecated]"
+msgstr ""
 
 msgctxt "SettingsOptions::header_8057"
 msgid "Proxy server for outgoing connections"
@@ -14589,13 +14937,21 @@ msgctxt "SettingsOptions::display_shipping_step"
 msgid "Display \"Shipping method\" step"
 msgstr "Tampilkan \"Metode Pengiriman\""
 
+msgctxt "SettingsTooltips::display_shipping_step"
+msgid "If hidden, the first active method will be used by default."
+msgstr "Jika disembunyikan, metode aktif pertama akan digunakan secara default."
+
 msgctxt "SettingsOptions::email_templates"
 msgid "Email templates mode"
 msgstr "Mode template email"
 
-msgctxt "SettingsTooltips::display_shipping_step"
-msgid "If hidden, the first active method will be used by default."
-msgstr "Jika disembunyikan, metode aktif pertama akan digunakan secara default."
+msgctxt "SettingsOptions::phone_validation_mode"
+msgid "Supported phone numbers"
+msgstr ""
+
+msgctxt "SettingsTooltips::phone_validation_mode"
+msgid "Determines what users can enter as their phone number."
+msgstr ""
 
 msgctxt "SettingsOptions::display_payment_step"
 msgid "Display \"Payment method\" step"
@@ -14933,10 +15289,6 @@ msgctxt "SettingsVariants::mailer_send_method::smtp"
 msgid "via SMTP server"
 msgstr "via server SMTP"
 
-msgctxt "SettingsVariants::timezone::Etc/GMT+12"
-msgid "(GMT-12:00) International Date Line West"
-msgstr "(GMT-12.00) Tanggal Internasional Baris Barat"
-
 msgctxt "SettingsVariants::tax_calculation::unit_price"
 msgid "Unit price"
 msgstr "Harga unit"
@@ -14990,8 +15342,8 @@ msgid "via php mail function"
 msgstr "via fungsi php mail"
 
 msgctxt "SettingsVariants::timezone::Pacific/Apia"
-msgid "(GMT-11:00) Midway Island, Samoa"
-msgstr "(GMT-11.00) Midway Island, Samoa"
+msgid "(GMT-11:00) Samoa"
+msgstr ""
 
 msgctxt "SettingsVariants::tax_calculation::subtotal"
 msgid "Subtotal"
@@ -15042,8 +15394,8 @@ msgid "(GMT-07:00) Mountain Time (US & Canada)"
 msgstr "(GMT-07.00) Waktu Pegunungan (AS & Kanada)"
 
 msgctxt "SettingsVariants::timezone::America/Chihuahua"
-msgid "(GMT-07:00) Chihuahua, La Paz, Mazatlan"
-msgstr "(GMT-07.00) Chihuahua, La Paz, Mazatlan"
+msgid "(GMT-07:00) Chihuahua, Mazatlan"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::America/Phoenix"
 msgid "(GMT-07:00) Arizona"
@@ -15064,10 +15416,6 @@ msgstr "(GMT-06.00) Waktu Tengah (AS & Kanada)"
 msgctxt "SettingsVariants::timezone::America/Guatemala"
 msgid "(GMT-06:00) Central America"
 msgstr "(GMT-06.00) Amerika Tengah"
-
-msgctxt "SettingsVariants::timezone::Etc/GMT+5"
-msgid "(GMT-05:00) Indiana (East)"
-msgstr "(GMT-05.00) Indiana (Timur)"
 
 msgctxt "SettingsVariants::timezone::America/New_York"
 msgid "(GMT-05:00) Eastern Time (US & Canada)"
@@ -15093,13 +15441,9 @@ msgctxt "SettingsVariants::timezone::America/St_Johns"
 msgid "(GMT-03:30) Newfoundland"
 msgstr "(GMT-03.30) Newfoundland"
 
-msgctxt "SettingsVariants::timezone::America/Godthab"
+msgctxt "SettingsVariants::timezone::America/Nuuk"
 msgid "(GMT-03:00) Greenland"
 msgstr "(GMT-03.00) Greenland"
-
-msgctxt "SettingsVariants::timezone::Etc/GMT+3"
-msgid "(GMT-03:00) Buenos Aires, Georgetown"
-msgstr "(GMT-03.00) Buenos Aires, Georgetown"
 
 msgctxt "SettingsVariants::timezone::America/Sao_Paulo"
 msgid "(GMT-03:00) Brasilia"
@@ -15118,12 +15462,12 @@ msgid "(GMT-01:00) Azores"
 msgstr "(GMT-01.00) Azores"
 
 msgctxt "SettingsVariants::timezone::Atlantic/Reykjavik"
-msgid "(GMT) Casablanca, Monrovia"
-msgstr "(GMT) Casablanca, Monrovia"
+msgid "(GMT) Reykjavik, Monrovia"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Europe/London"
-msgid "(GMT) Greenwich Mean Time : Dublin, Edinburgh, Lisbon, London"
-msgstr "(GMT) Greenwich Mean Time: Dublin, Edinburgh, Lisbon, London"
+msgid "(GMT) Greenwich Mean Time: Edinburgh, Lisbon, London"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Europe/Berlin"
 msgid "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna"
@@ -15186,8 +15530,8 @@ msgid "(GMT+03:00) Kuwait, Riyadh"
 msgstr "(GMT + 03.00) Kuwait, Riyadh"
 
 msgctxt "SettingsVariants::timezone::Europe/Moscow"
-msgid "(GMT+03:00) Moscow, St. Petersburg, Volgograd"
-msgstr "(GMT + 03.00) Moskow, St. Petersburg, Volgograd"
+msgid "(GMT+03:00) Moscow, St. Petersburg"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Europe/Minsk"
 msgid "(GMT+03:00) Minsk"
@@ -15230,20 +15574,20 @@ msgid "(GMT+05:45) Kathmandu"
 msgstr "(GMT+05:45) Kathmandu"
 
 msgctxt "SettingsVariants::timezone::Asia/Novosibirsk"
-msgid "(GMT+06:00) Almaty, Novosibirsk"
-msgstr "(GMT+06:00) Almaty, Novosibirsk"
+msgid "(GMT+07:00) Novosibirsk"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Dhaka"
-msgid "(GMT+06:00) Astana, Dhaka"
-msgstr "(GMT+06:00) Astana, Dhaka"
+msgid "(GMT+06:00) Nur-Sultan, Dhaka"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Colombo"
 msgid "(GMT+06:00) Sri Jayawardenepura"
 msgstr "(GMT+06:00) Sri Jayawardenepura"
 
-msgctxt "SettingsVariants::timezone::Asia/Rangoon"
-msgid "(GMT+06:30) Rangoon"
-msgstr "(GMT+06:30) Rangoon"
+msgctxt "SettingsVariants::timezone::Asia/Yangon"
+msgid "(GMT+06:30) Yangon"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Bangkok"
 msgid "(GMT+07:00) Bangkok, Hanoi, Jakarta"
@@ -15254,12 +15598,12 @@ msgid "(GMT+07:00) Krasnoyarsk"
 msgstr "(GMT+07:00) Krasnoyarsk"
 
 msgctxt "SettingsVariants::timezone::Asia/Shanghai"
-msgid "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi"
-msgstr "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi"
+msgid "(GMT+08:00) Beijing, Chongqing, Hong Kong"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Irkutsk"
-msgid "(GMT+08:00) Irkutsk, Ulaan Bataar"
-msgstr "(GMT+08:00) Irkutsk, Ulaan Bataar"
+msgid "(GMT+08:00) Irkutsk, Ulaanbaatar"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Singapore"
 msgid "(GMT+08:00) Kuala Lumpur, Singapore"
@@ -15341,6 +15685,18 @@ msgctxt "SettingsVariants::email_templates::new"
 msgid "New (nice and editable via admin panel)"
 msgstr "Baru (bagus dan bisa diedit via panel admin)"
 
+msgctxt "SettingsVariants::phone_validation_mode::international_format"
+msgid "International phone number"
+msgstr ""
+
+msgctxt "SettingsVariants::phone_validation_mode::any_digits"
+msgid "Any digits and +-()"
+msgstr ""
+
+msgctxt "SettingsVariants::phone_validation_mode::any_symbols"
+msgid "Any symbols"
+msgstr ""
+
 msgctxt "SettingsTooltips::quick_registration"
 msgid "Require only contact information on registration"
 msgstr "Hanya memerlukan informasi kontak saat registrasi"
@@ -15357,9 +15713,53 @@ msgctxt "ProfileFields::lastname"
 msgid "Last name"
 msgstr "Nama belakang"
 
+msgctxt "Languages::first_name_and_last_name"
+msgid "First name and last name"
+msgstr ""
+
+msgctxt "Languages::s_first_name_and_last_name"
+msgid "First name and last name (for shipping)"
+msgstr ""
+
+msgctxt "Languages::b_first_name_and_last_name"
+msgid "First name and last name (for billing)"
+msgstr ""
+
+msgctxt "Languages::last_name_and_first_name"
+msgid "Last name and first name"
+msgstr ""
+
+msgctxt "Languages::s_last_name_and_first_name"
+msgid "Last name and first name (for shipping)"
+msgstr ""
+
+msgctxt "Languages::b_last_name_and_first_name"
+msgid "Last name and first name (for billing)"
+msgstr ""
+
+msgctxt "Languages::fullname"
+msgid "Full name"
+msgstr ""
+
+msgctxt "Languages::s_fullname"
+msgid "Full name (for shipping)"
+msgstr ""
+
+msgctxt "Languages::b_fullname"
+msgid "Full name (for billing)"
+msgstr ""
+
+msgctxt "ProfileFields::customer_notes"
+msgid "Customer's notes"
+msgstr ""
+
 msgctxt "ProfileFields::company"
 msgid "Company"
 msgstr "Perusahaan"
+
+msgctxt "ProfileFields::email"
+msgid "Phone"
+msgstr ""
 
 msgctxt "ProfileFields::phone"
 msgid "Phone"
@@ -15453,6 +15853,54 @@ msgctxt "ProfileFields::s_address_type"
 msgid "Address type"
 msgstr "Tipe alamat"
 
+msgctxt "ProfileFields::admin_firstname"
+msgid "First name"
+msgstr "Nama depan"
+
+msgctxt "ProfileFields::admin_lastname"
+msgid "Last name"
+msgstr "Nama belakang"
+
+msgctxt "ProfileFields::company_description"
+msgid "Description"
+msgstr "Deskripsi"
+
+msgctxt "ProfileFields::address"
+msgid "Address"
+msgstr "Alamat"
+
+msgctxt "ProfileFields::city"
+msgid "City"
+msgstr "Kota"
+
+msgctxt "ProfileFields::country"
+msgid "Country"
+msgstr "Negara"
+
+msgctxt "ProfileFields::state"
+msgid "State/Province"
+msgstr "Negara Bagian / Provinsi"
+
+msgctxt "ProfileFields::zipcode"
+msgid "Zip/postal code"
+msgstr "Kode Pos"
+
+msgctxt "ProfileFields::accept_terms"
+msgid "I accept the Terms and Conditions"
+msgstr "Saya menerima Syarat dan Ketentuan"
+
+msgctxt "Languages::vendor_terms"
+msgid "Vendor terms and conditions"
+msgstr "Syarat dan ketentuan vendor"
+
+msgctxt "Languages::vendor_terms_field_alert"
+msgid "Vendor terms and conditions alert"
+msgstr "Peringatan syarat dan ketentuan vendor"
+
+msgctxt "Languages::vendor_terms_field_terms_text"
+msgid "Vendor terms and conditions text"
+msgstr "Teks syarat dan ketentuan vendor"
+
 msgctxt "Languages::product_must_have_owner_category"
 msgid "Product must belong to some category created by the owner company."
 msgstr "Produk harus termasuk dalam beberapa kategori yang dibuat oleh perusahaan pemilik."
@@ -15488,18 +15936,6 @@ msgstr "Daftar"
 msgctxt "SettingsVariants::sign_in_default_action::checkout_as_guest"
 msgid "Checkout as guest"
 msgstr "Checkout sebagai tamu"
-
-msgctxt "SettingsVariants::secure_storefront::none"
-msgid "Disable"
-msgstr "Menonaktifkan"
-
-msgctxt "SettingsVariants::secure_storefront::partial"
-msgid "Secure profile, checkout and order pages"
-msgstr "Amankan profil, halaman checkout dan pesan"
-
-msgctxt "SettingsVariants::secure_storefront::full"
-msgid "Secure full site"
-msgstr "Amankan situs penuh"
 
 msgctxt "Languages::last_year"
 msgid "Last year"
@@ -15561,9 +15997,17 @@ msgctxt "Languages::payments.realex.referring_url"
 msgid "Please supply this URL to your Realex Payments account manager"
 msgstr "Berikan URL ini ke pengelola akun Realex Payments Anda"
 
+msgctxt "Languages::payments.globalpayments.referring_url"
+msgid "Please supply this URL to your Global Payments account manager"
+msgstr ""
+
 msgctxt "Languages::payments.realex.referring_ip"
 msgid "Please supply the IP address of your server to your Realex Payments account manager"
 msgstr "Tolong berikan alamat IP server Anda ke pengelola akun Realex Payments Anda"
+
+msgctxt "Languages::payments.globalpayments.referring_ip"
+msgid "Please supply the IP address of your server to your Global Payments account manager"
+msgstr ""
 
 msgctxt "Languages::payments.realex.settlement"
 msgid "Settlement"
@@ -15580,6 +16024,10 @@ msgstr "Dilengkapi secara otomatis"
 msgctxt "Languages::payments.realex.text_status_map"
 msgid "Realex to CS-Cart order status conversion map"
 msgstr "Peta konversi status Realex ke CS-Cart"
+
+msgctxt "Languages::payments.globalpayments.text_status_map"
+msgid "Global Payments to [product] order status conversion map"
+msgstr ""
 
 msgctxt "Languages::payments.realex.subaccount"
 msgid "Subaccount"
@@ -15601,6 +16049,10 @@ msgctxt "Languages::payments.realex.connector_error"
 msgid "Your Realex account has been suspended. Contact Realex support for further information."
 msgstr "Akun Realex Anda telah ditangguhkan. Hubungi dukungan Realex untuk informasi lebih lanjut."
 
+msgctxt "Languages::payments.globalpayments.connector_error"
+msgid "Your Global Payments account has been suspended. Contact Global Payments support for further information."
+msgstr ""
+
 msgctxt "Languages::payments.realex.incorrect_request"
 msgid "Incorrect XML message formation or content"
 msgstr "Pembatalan atau konten pesan XML yang salah"
@@ -15608,6 +16060,10 @@ msgstr "Pembatalan atau konten pesan XML yang salah"
 msgctxt "Languages::payments.realex.realex_error"
 msgid "Error with Realex systems"
 msgstr "Kesalahan dengan sistem Realex"
+
+msgctxt "Languages::payments.globalpayments.globalpayments_error"
+msgid "Error with Global Payments systems"
+msgstr ""
 
 msgctxt "Languages::payments.realex.bank_error"
 msgid "Error with bank systems"
@@ -15859,8 +16315,8 @@ msgid "At least one storefront must remain"
 msgstr "Setidaknya satu etalase harus tetap ada"
 
 msgctxt "Languages::datakeeper.run_backup_via_cron_message"
-msgid "You can run the backup automatically at certain time intervals. To do it, add the following command to CRON:"
-msgstr ""
+msgid "You can run the backup automatically at certain time intervals. To do it, add the following command to <a href=\"https://en.wikipedia.org/wiki/Cron\" target=\"_blank\">Cron</a>:"
+msgstr "Anda dapat melakukan pencadangan secara otomatis pada jarak waktu tertentu. Untuk melakukannya, tambahkan perintah berikut ke <a href=\"https://en.wikipedia.org/wiki/Cron\" target=\"_blank\">Cron</a>:"
 
 msgctxt "Languages::datakeeper.error_unsupported_file_type"
 msgid "File cannot be restored. Only .sql, .zip and .tgz files are allowed."
@@ -15877,6 +16333,10 @@ msgstr "<p>Toko Anda database dan file telah back up sebelum upgrade. Arsip cada
 msgctxt "Languages::uc_backup_info_subj"
 msgid "Upgrade Center: Store has been backed up and closed."
 msgstr "Pusat Peningkatan Upgrade: Store telah dicadangkan dan ditutup."
+
+msgctxt "Languages::uc_info_subj"
+msgid "Upgrade Center: Store has been closed."
+msgstr "Pusat Peningkatan: Toko telah ditutup."
 
 msgctxt "Languages::error_features_too_many_variants"
 msgid "Search by features is not available due to the excessive number of variants."
@@ -16078,6 +16538,18 @@ msgctxt "Languages::tools_addons_disabled_msg"
 msgid "An administrator disabled all add-ons or third-party add-ons.<br> Press the Re-enable add-ons button to initialize the add-ons that were previously active."
 msgstr "Administrator menonaktifkan semua add-on atau add-on pihak ketiga.<br> Tekan tombol Aktifkan kembali pengaya untuk menginisialisasi add-on yang sebelumnya aktif."
 
+msgctxt "Languages::tools_addons_additional_shipping_methods"
+msgid "There may be more carriers. They'll show up if you activate the corresponding <a href=\"[url]\">shipping add-ons</a>."
+msgstr "Kemungkinan ada operator lain. Operator lain ini akan muncul jika Anda mengaktifkan <a href=\"[url]\">fitur tambahan pengiriman</a>bersamaan."
+
+msgctxt "Languages::tools_addons_additional_payment_methods"
+msgid "There may be more payment processors. They'll show up if you activate the corresponding <a href=\"[url]\">payment add-ons</a>."
+msgstr "Kemungkinan ada prosesor pembayaran lain. Prosesor pembayaran lain ini akan muncul jika Anda mengaktifkan <a href=\"[url]\">fitur tambahan pengiriman</a>bersamaan."
+
+msgctxt "Languages::tools_addons_additional_themes"
+msgid "There may be more themes. They'll show up if you activate the corresponding <a href=\"[url]\">theme add-ons</a>."
+msgstr "Kemungkinan ada tema lain. Tema lain ini akan muncul jika Anda mengaktifkan <a href=\"[url]\">fitur tambahan pengiriman</a>bersamaan."
+
 msgctxt "Languages::addons_source"
 msgid "Source"
 msgstr "Sumber"
@@ -16111,8 +16583,8 @@ msgid "Skip files and database backup"
 msgstr "Lewati file dan backup database"
 
 msgctxt "Languages::uc_open_store_email_body"
-msgid "<p>Before the upgrade, your store was closed. Check if it's running fine after the upgrade and <a href=\"[settings_section]\">open it</a>.</p></p>"
-msgstr "<p>Sebelum upgrade, toko Anda ditutup. Periksa apakah itu berjalan dengan baik setelah upgrade dan <a href=\"[settings_section]\">buka itu</a>.</p></p>"
+msgid "<p>Before the upgrade, your store was closed. Check if it's running fine after the upgrade and <a href=\"[settings_section]\">open it</a>.</p>"
+msgstr ""
 
 msgctxt "Languages::upgrade_notification_message"
 msgid "<p class='upgrade-center_notice-msg'>Copy of this message was sent to administrator's email.</p><hr>"
@@ -16458,6 +16930,10 @@ msgctxt "Languages::copy"
 msgid "Copy"
 msgstr "Salinan"
 
+msgctxt "Languages::copied"
+msgid "Copied"
+msgstr "Disalin"
+
 msgctxt "Languages::addon_uninstall_sql_error"
 msgid "An error in an SQL query occurred during the add-on uninstallation."
 msgstr "Kesalahan dalam kueri SQL terjadi saat penginstalan add-on."
@@ -16482,6 +16958,14 @@ msgctxt "Languages::payments.qbms.oauth_consumer_secret"
 msgid "OAuth Consumer Secret"
 msgstr "Rahasia Konsumen OAuth"
 
+msgctxt "Languages::payments.qbms.oauth_client_id"
+msgid "OAuth Client Id"
+msgstr ""
+
+msgctxt "Languages::payments.qbms.oauth_client_secret"
+msgid "OAuth Client Secret"
+msgstr ""
+
 msgctxt "Languages::payments.qbms.token_expires"
 msgid "The token expires on <b>[date]</b> at <b>[time]</b>."
 msgstr "Token kedaluwarsa pada <b>[date]</b>di<b>[time]</b>."
@@ -16494,6 +16978,14 @@ msgctxt "Languages::payments.qbms.renew_token"
 msgid "Press \"Connect to QuickBooks\" to renew the token."
 msgstr "Tekan \"Sambungkan ke QuickBooks\" untuk memperbarui token."
 
+msgctxt "Languages::payments.qbms.tip_fill_redirect"
+msgid "<p>- In the QuickBooks application, copy the following value into the Redirect URI field:</p><p>[url]</p><p>- Click the \"Connect to QuickBooks\" button.</p>"
+msgstr ""
+
+msgctxt "Languages::payments.qbms.configure_payment_method"
+msgid "<p>How to configure the payment method:</p><p>1. <a target=\"_blank\" href=\"https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0#obtain-oauth2-credentials-for-your-app\">Obtain OAuth 2.0 credentials</a> from QuickBooks Online application and copy them to the payment method settings in [product].</p><p>2. Click \"Create\", then open the settings of this payment method again to finish its configuration.</p>"
+msgstr ""
+
 msgctxt "Languages::payments.qbms.upgrade_notification_title"
 msgid "QB Merchant Service payment processor changes"
 msgstr "Prosesor pembayaran layanan Merchant QB berubah"
@@ -16501,6 +16993,14 @@ msgstr "Prosesor pembayaran layanan Merchant QB berubah"
 msgctxt "Languages::payments.qbms.upgrade_notification_text"
 msgid "<p>The latest version of [product] has different settings for payment methods if you use QB Merchant Service as a Processor.</p><p>If you want to use the payment methods, do this:</p><ul><li>go to Administration > Payment methods</li><li>choose the payment method that uses QB Merchant Service as a Processor</li><li>switch to the Configure tab</li><li>enter the proper App Token, OAuth Consumer Key and OAuth Consumer Secret</li><li>perform connection to QuickBooks</li></ul>"
 msgstr "<p>Versi terbaru [product] memiliki setelan yang berbeda untuk metode pembayaran jika Anda menggunakan Layanan Merchant QB sebagai Prosesor.</p><p>Jika Anda ingin menggunakan metode pembayaran, lakukan ini:</p><ul><li>masuk ke Administrasi> Metode pembayaran</li><li>pilih metode pembayaran yang menggunakan QB Merchant Service as the Processor</li><li>beralih ke tab Configure</li><li>masukkan Token Aplikasi yang benar, Kunci Konsumen OAuth dan Rahasia Konsumen OAuth</li><li>melakukan koneksi ke QuickBooks</li></ul>"
+
+msgctxt "Languages::payments.qbms.upgrade_oauth20_notification_title"
+msgid "Payment methods: Change QB Merchant Services settings"
+msgstr ""
+
+msgctxt "Languages::payments.qbms.upgrade_oauth20_notification_text"
+msgid "<p>Online stores now connect to QuickBooks Merchant Services differently. Your payment methods that use QB Merchant Services as a processor need to be reconfigured, or else they will no longer work. To make them work:</p><p>1. Switch your Quickbooks app to OAuth 2.0.</p><p>2. Copy <i>OAuth Client ID</i> and <i>OAuth Client Secret</i> from the app to the payment method settings in [product].</p><p>3. Change the status of the payment method to <i>Active</i></p><p>4. Save your changes and use the <i>Connect to QuickBooks</i> button to finish payment configuration.</p><p><a href=\"[payments_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">View my payment methods</a></p>"
+msgstr ""
 
 msgctxt "Languages::text_money_back_guarantee"
 msgid "We offer 30-day money-back guarantee. If you don't like our product, we'll return you the money, no needless questions asked."
@@ -17007,8 +17507,8 @@ msgid "File changes detector"
 msgstr "Detektor perubahan file"
 
 msgctxt "Languages::privileges.view_file_changes"
-msgid "View file changes"
-msgstr "Melihat perubahan file"
+msgid "Can view"
+msgstr "Dapat melihat"
 
 msgctxt "Languages::vendor_commission_changes_upgrade_notification_title"
 msgid "Vendor commission changes"
@@ -17135,52 +17635,72 @@ msgid "<p>You can use one of these licenses: <a href=\"[standard_license_url]\" 
 msgstr "<p>Anda dapat menggunakan salah satu dari lisensi ini: <a href=\"[standard_license_url]\" target=\"_blank\">[product]</a> atau <a href=\"[ultimate_license_url]\"target=\"_blank\">[product] Ultimate</a>. Kedua lisensi tersebut memungkinkan Anda untuk menggunakan [product] tanpa batasan waktu.</p><br>"
 
 msgctxt "Languages::product_state_description.ult"
-msgid "<p>You've activated your [product]. You can use it without time restrictions now. To be able to add an unlimited number of extra storefronts and manage your store via a mobile app, get the <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br>"
-msgstr "<p>Anda telah mengaktifkan [product] Anda. Anda bisa menggunakannya tanpa batasan waktu sekarang. Untuk dapat menambahkan jumlah etalase tambahan yang tidak terbatas dan mengelola toko Anda melalui aplikasi seluler, dapatkan lisensi akhir <a href=\"[ultimate_license_url]] target=\"_blank\">[product].</a></p><br>"
+msgid "<p>You can use the software without time restrictions now. Please note that some advanced features are available only in <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate.</a></p><br>"
+msgstr ""
 
 msgctxt "Languages::product_state_description.ult.ultimate"
-msgid "<p>You've activated your [product] Ultimate. You can use it without time restrictions now. With [product] Ultimate, you get all the advanced eCommerce features including an unlimited number of extra storefronts and the ability to manage your store via a mobile app.</p><br>"
-msgstr "<p>Anda telah mengaktifkan [product] Ultimate Anda. Anda bisa menggunakannya tanpa batasan waktu sekarang. Dengan [product] Ultimate, Anda mendapatkan semua fitur eCommerce canggih termasuk jumlah etalase barang tak terbatas dan kemampuan untuk mengelola toko Anda melalui aplikasi seluler.</p><br>"
+msgid "<p>You can use the software without time restrictions now.</p><br>"
+msgstr ""
 
 msgctxt "Languages::product_state_description.ult.ru.new"
 msgid "<p>You can use one of these licenses: <a href=\"[standard_license_url]\" target=\"_blank\">[product]</a> or <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>. Both licenses allow you to use [product] without time restrictions.</p><br>"
 msgstr "<p>Anda dapat menggunakan salah satu dari lisensi ini: <a href=\"[standard_license_url] \"target=\"_blank\">[product]</a> atau <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>. Kedua lisensi tersebut memungkinkan Anda untuk menggunakan [product] tanpa batasan waktu.</p><br>"
 
 msgctxt "Languages::product_state_description.ult.ru"
-msgid "<p>You've activated your [product]. You can use it without time restrictions now. To be able to use an unlimited number of storefronts, get the <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br>"
-msgstr "<p>Anda telah mengaktifkan [product] Anda. Anda bisa menggunakannya tanpa batasan waktu sekarang. Untuk dapat menggunakan jumlah etalase yang tidak terbatas, dapatkan lisensi akhir <a href=\"[ultimate_license_url]] target=\"_blank\">[product].</a></p><br>"
+msgid "<p>You can use the software without time restrictions now. Please note that some advanced features are available only in <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate.</a></p><br>"
+msgstr ""
 
 msgctxt "Languages::product_state_description.ult.ru.ultimate"
-msgid "<p>You've activated your [product] Ultimate. You can use it without time restrictions now. With [product] Ultimate, you get the ability to use an unlimited number of storefronts.</p><br>"
-msgstr "<p>Anda telah mengaktifkan [product] Ultimate Anda. Anda bisa menggunakannya tanpa batasan waktu sekarang. Dengan [product] Ultimate, Anda mendapatkan kemampuan untuk menggunakan jumlah etalase yang tidak terbatas.</p><br>"
+msgid "<p>You can use the software without time restrictions now.</p><br>"
+msgstr ""
+
+msgctxt "Languages::product_state_description.ult.b2b.new"
+msgid "<p>You can use one of these licenses: <a href=\"[standard_license_url]\" target=\"_blank\">[product]</a> or <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>. Both licenses allow you to use [product] without time restrictions.</p><br>"
+msgstr ""
+
+msgctxt "Languages::product_state_description.ult.b2b"
+msgid "<p>You can use the software without time restrictions now. Please note that some advanced features are available only in <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate.</a></p><br>"
+msgstr ""
+
+msgctxt "Languages::product_state_description.ult.b2b.ultimate"
+msgid "<p>You can use the software without time restrictions now.</p><br>"
+msgstr ""
 
 msgctxt "Languages::text_store_mode_changed_to_ult"
-msgid "Your store now uses active license. With the [product] edition, you get almost all the features we offer except for an unlimited number of storefronts and the ability to manage your store via a mobile app. These two additional features are available with the <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate edition</a> only."
-msgstr "Toko Anda sekarang menggunakan lisensi aktif. Dengan edisi [product], Anda mendapatkan hampir semua fitur yang kami tawarkan kecuali jumlah etalase yang tidak terbatas dan kemampuan untuk mengelola toko Anda melalui aplikasi seluler. Dua fitur tambahan ini tersedia hanya dengan <a href=\"[ultimate_license_url]] target=\"_blank\">[product] Ultimate edition</a> saja."
+msgid "Your store now uses an active license of [product]."
+msgstr ""
 
 msgctxt "Languages::text_store_mode_changed_to_ult.ultimate"
-msgid "Your store now uses active license. With the [product] Ultimate edition, you get all the advanced eCommerce features including an unlimited number of extra storefronts and the ability to manage your store via a mobile app."
-msgstr "Toko Anda sekarang menggunakan lisensi aktif. Dengan edisi utama [product], Anda mendapatkan semua fitur eCommerce lanjutan termasuk jumlah etalase tambahan yang tidak terbatas dan kemampuan untuk mengelola toko Anda melalui aplikasi seluler."
+msgid "Your store now uses an active license of [product]."
+msgstr ""
 
 msgctxt "Languages::text_store_mode_changed_to_ult.ru"
-msgid "Your store now uses an active license. With the [product] edition, you get almost all the features we offer, except for an unlimited number of storefronts. This feature is available with the <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate edition</a> only."
-msgstr "Toko Anda sekarang menggunakan lisensi aktif. Dengan edisi [product], Anda mendapatkan hampir semua fitur yang kami tawarkan, kecuali untuk jumlah etalase yang tidak terbatas. Fitur ini tersedia hanya dengan <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate edition</a> saja."
+msgid "Your store now uses an active license of [product]."
+msgstr ""
 
 msgctxt "Languages::text_store_mode_changed_to_ult.ru.ultimate"
-msgid "Your store now uses an active license. With the [product] Ultimate edition, you get the ability to use an unlimited number of storefronts."
-msgstr "Toko Anda sekarang menggunakan lisensi aktif. Dengan edisi utama [product], Anda bisa menggunakan jumlah etalase yang tidak terbatas."
+msgid "Your store now uses an active license of [product]."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_ult.b2b"
+msgid "Your store now uses an active license of [product]."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_ult.b2b.ultimate"
+msgid "Your store now uses an active license of [product]."
+msgstr ""
 
 msgctxt "Languages::ultimate_license"
 msgid "[product] Ultimate"
-msgstr ""
+msgstr "[product] Ultima"
 
 msgctxt "Languages::ultimate_license_required"
 msgid "[product] Ultimate is required for this"
-msgstr ""
+msgstr "[product] Ultima diperlukan untuk ini"
 
 msgctxt "Languages::ultimate_or_storefront_license_required"
 msgid "This action requires [product] Ultimate or an additional Storefront License"
-msgstr ""
+msgstr "Tindakan ini membutuhkan [product] Ultima atau Lisensi Etalase tambahan"
 
 msgctxt "Languages::max_storefronts_reached"
 msgid "<p>You have reached the limit of storefronts available for your license. Adding another storefront requires buying a <a href=\"[storefront_license_url]\" target=\"_blank\">Storefront License</a>. We also offer <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>, an edition with an unlimited number of storefronts.</p>"
@@ -17212,7 +17732,7 @@ msgstr "<p>Anda tidak dapat menambahkan etalase baru. Jumlah maksimum etalase ya
 
 msgctxt "Languages::storefront_license"
 msgid "Storefront License"
-msgstr ""
+msgstr "Lisensi Etalase"
 
 msgctxt "Languages::buy_new_storefront_license"
 msgid "Buy [product] Storefront License"
@@ -17241,6 +17761,14 @@ msgstr "Dihapus"
 msgctxt "Languages::licensing.license_error_license_is_disabled"
 msgid "The license is disabled. Please check your license status."
 msgstr "Lisensi dinonaktifkan. Harap periksa status lisensi Anda."
+
+msgctxt "Languages::licensing.license_error_license_is_disabled.title"
+msgid "Your [product] license has been disabled"
+msgstr "Lisensi [product] Anda telah dinonaktifkan"
+
+msgctxt "Languages::licensing.license_error_license_is_disabled.text"
+msgid "Please contact us <a href=\"[helpdesk_url]\" target=\"_blank\">via Customer Help Desk</a> to find out why it happened and what can be done about it. To access the admin panel right now, you can enter another valid license number, as long as it isn't used in another store:"
+msgstr ""
 
 msgctxt "Languages::licensing.license_error_license_is_invalid"
 msgid "Invalid license number. Please enter a valid license number."
@@ -17409,6 +17937,14 @@ msgstr "File robots.txt terdeteksi. Perubahan yang Anda buat di sini tidak akan 
 msgctxt "Languages::advanced_products_search"
 msgid "Advanced products search"
 msgstr "Pencarian produk lanjutan"
+
+msgctxt "Languages::advanced_companies_search"
+msgid "Advanced companies search"
+msgstr ""
+
+msgctxt "Languages::advanced_storefronts_search"
+msgid "Advanced storefronts search"
+msgstr ""
 
 msgctxt "Languages::upgrade_fl54_atol_boxberry_title"
 msgid "New features of Russian version of CS-Cart 4.6.1: compliance with Federal Law 54, add-ons for retailCRM and Boxberry"
@@ -17696,11 +18232,11 @@ msgstr "Jika Anda mengaktifkan pengaturan ini, maka hanya produk yang sudah ada 
 
 msgctxt "Languages::update_existing_products_only"
 msgid "Update existing products only"
-msgstr ""
+msgstr "Hanya perbarui produk yang sudah ada"
 
 msgctxt "Languages::update_existing_products_only_tooltip"
 msgid "If you enable this setting, products that don't exist in the database of your store will be skipped during import."
-msgstr ""
+msgstr "Jika pengaturan ini diaktifkan, produk yang tidak ada di basis data toko Anda akan dilewatkan selama impor."
 
 msgctxt "Languages::updated_last"
 msgid "Updated in the last"
@@ -17724,31 +18260,31 @@ msgstr "Nilai tidak valid `[value]` ditentukan untuk [field]. Nilai yang valid a
 
 msgctxt "Languages::recover"
 msgid "Recover"
-msgstr ""
+msgstr "Pulihkan"
 
 msgctxt "Languages::image_has_been_deleted"
 msgid "This image has been deleted"
-msgstr ""
+msgstr "Gambar telah dihapus"
 
 msgctxt "Languages::delete_all_images"
 msgid "Delete all images"
-msgstr ""
+msgstr "Hapus semua gambar"
 
 msgctxt "Languages::cannot_upload_file"
 msgid "Cannot upload file"
-msgstr ""
+msgstr "Tidak dapat mengunggah berkas"
 
 msgctxt "Languages::ogone.sha_in"
 msgid "SHA-IN pass phrase"
-msgstr ""
+msgstr "Frasa sandi SHA-IN"
 
 msgctxt "Languages::ttc_ogone.sha_in"
 msgid "The SHA-IN pass phrase is set on the Ingenico administration panel on the <b>Data and origin verification</b> tab."
-msgstr ""
+msgstr "Frasa sandi SHA-IN diatur pada panel administrasi Ingenico pada tab <b>Data dan asal verifikasi</b>."
 
 msgctxt "Languages::ogone_web.sha_out"
 msgid "SHA-OUT pass phrase"
-msgstr ""
+msgstr "Frasa sandi SHA-OUT"
 
 msgctxt "Languages::ttc_ogone_web.sha_out"
 msgid "The SHA-OUT pass phrase is set on the Ingenico administration panel on the <b>Transaction feedback</b> tab."
@@ -17764,11 +18300,11 @@ msgstr ""
 
 msgctxt "Languages::sort_by_null_desc"
 msgid "No sorting"
-msgstr ""
+msgstr "Tidak ada penyortiran"
 
 msgctxt "Languages::internal_option_name"
 msgid "Internal name"
-msgstr ""
+msgstr "Nama internal"
 
 msgctxt "Languages::internal_option_name_tooltip"
 msgid "This name is shown only in the Administration panel to help you distinguish between multiple options that have the same displayed name."
@@ -17796,15 +18332,15 @@ msgstr ""
 
 msgctxt "Languages::log_action_shipping"
 msgid "Shipping request"
-msgstr ""
+msgstr "Permintaan pengiriman"
 
 msgctxt "Languages::email_template.shipping_error"
 msgid "Shipping: request error"
-msgstr ""
+msgstr "Pengiriman: permintaan bermasalah"
 
 msgctxt "Languages::request_error_information_title"
 msgid "Shipping error"
-msgstr ""
+msgstr "Pengiriman bermasalah"
 
 msgctxt "Languages::request_error_information"
 msgid "Customers have experienced issues with receiving rates from <b>the [shipping]</b> shipping method. Please make sure that is configured properly and that the shipping rate calculation is correct"
@@ -17816,521 +18352,1837 @@ msgstr ""
 
 msgctxt "Languages::drop_images_to_upload"
 msgid "Drop images here"
-msgstr ""
+msgstr "Letakkan gambar di sini"
 
 msgctxt "Languages::drop_images_select_short"
 msgid "Select"
-msgstr ""
+msgstr "Pilih"
 
 msgctxt "Languages::drop_images_select"
 msgid "Select images"
-msgstr ""
+msgstr "Pilih gambar"
 
 msgctxt "Languages::currency_code_afn"
 msgid "Afghan Afghani"
-msgstr ""
+msgstr "Afghani Afghanistan"
 
 msgctxt "Languages::currency_code_dzd"
 msgid "Algerian Dinar"
-msgstr ""
+msgstr "Dinar Aljazair"
 
 msgctxt "Languages::currency_code_aoa"
 msgid "Angolan Kwanza"
-msgstr ""
+msgstr "Kwanza Angola"
 
 msgctxt "Languages::currency_code_aon"
 msgid "Angolan New Kwanza"
-msgstr ""
+msgstr "Kwanza Baru Angola"
 
 msgctxt "Languages::currency_code_ats"
 msgid "Antillian Guilder"
-msgstr ""
+msgstr "Guilder Antillian"
 
 msgctxt "Languages::currency_code_azn"
 msgid "Azerbaijanian Manat"
-msgstr ""
+msgstr "Manat Azerbaijan"
 
 msgctxt "Languages::currency_code_bsd"
 msgid "Bahamian Dollar"
-msgstr ""
+msgstr "Dolar Bahama"
 
 msgctxt "Languages::currency_code_bhd"
 msgid "Bahraini Dinar"
-msgstr ""
+msgstr "Dinar Bahrain"
 
 msgctxt "Languages::currency_code_bdt"
 msgid "Bangladesh Taka"
-msgstr ""
+msgstr "Taka Bangladesh"
 
 msgctxt "Languages::currency_code_bbd"
 msgid "Barbados Dollar"
-msgstr ""
+msgstr "Dolar Barbados"
 
 msgctxt "Languages::currency_code_byn"
 msgid "Belarussian Ruble"
-msgstr ""
+msgstr "Ruble Belarusia"
 
 msgctxt "Languages::currency_code_bef"
 msgid "Belgian Franc"
-msgstr ""
+msgstr "Franc Belgia"
 
 msgctxt "Languages::currency_code_bzd"
 msgid "Belize Dollar"
-msgstr ""
+msgstr "Dolar Belize"
 
 msgctxt "Languages::currency_code_bmd"
 msgid "Bermudian Dollar"
-msgstr ""
+msgstr "Dolar Bermuda"
 
 msgctxt "Languages::currency_code_btn"
 msgid "Bhutan Ngultrum"
-msgstr ""
+msgstr "Nguitrum Bhutan"
 
 msgctxt "Languages::currency_code_bob"
 msgid "Bolivian Boliviano"
-msgstr ""
+msgstr "Boliviano Bolivia"
 
 msgctxt "Languages::currency_code_bam"
 msgid "Bosnia and Herzegovina Convertible Marks"
-msgstr ""
+msgstr "Bosnia-Herzegovina Konversi Mark"
 
 msgctxt "Languages::currency_code_bwp"
 msgid "Botswana Pula"
-msgstr ""
+msgstr "Pula Botswana"
 
 msgctxt "Languages::currency_code_bnd"
 msgid "Brunei Dollar"
-msgstr ""
+msgstr "Dolar Brunei"
 
 msgctxt "Languages::currency_code_bgl"
 msgid "Bulgaria Lev"
-msgstr ""
+msgstr "Lev Bulgaria"
 
 msgctxt "Languages::currency_code_bif"
 msgid "Burundi Franc"
-msgstr ""
+msgstr "Franc Burundi"
 
 msgctxt "Languages::currency_code_khr"
 msgid "Cambodian Riel"
-msgstr ""
+msgstr "Riel Kamboja"
 
 msgctxt "Languages::currency_code_cve"
 msgid "Cape Verde Escudo"
-msgstr ""
+msgstr "Tanjung Verde Escudo"
 
 msgctxt "Languages::currency_code_kyd"
 msgid "Cayman Islands Dollar"
-msgstr ""
+msgstr "Dolar Kepulauan Cayman"
 
 msgctxt "Languages::currency_code_clp"
 msgid "Chilean Peso"
-msgstr ""
+msgstr "Peso Cile"
 
 msgctxt "Languages::currency_code_cop"
 msgid "Colombian Peso"
-msgstr ""
+msgstr "Peso Kolombia"
 
 msgctxt "Languages::currency_code_kmf"
 msgid "Congolese Franc"
-msgstr ""
+msgstr "Franc Kongo"
 
 msgctxt "Languages::currency_code_crc"
 msgid "Costa Rican Colon"
-msgstr ""
+msgstr "Colon Kosta Rika"
 
 msgctxt "Languages::currency_code_cyp"
 msgid "Cyprus Pound"
-msgstr ""
+msgstr "Pound Siprus"
 
 msgctxt "Languages::currency_code_dem"
 msgid "Deutsche Mark"
-msgstr ""
+msgstr "Mark Jerman"
 
 msgctxt "Languages::currency_code_djf"
 msgid "Djibouti Franc"
-msgstr ""
+msgstr "Franc Djibouti"
 
 msgctxt "Languages::currency_code_std"
 msgid "Dobra"
-msgstr ""
+msgstr "Dobra"
 
 msgctxt "Languages::currency_code_dop"
 msgid "Dominican Peso"
-msgstr ""
+msgstr "Peso Dominika"
 
 msgctxt "Languages::currency_code_nlg"
 msgid "Dutch Guilder"
-msgstr ""
+msgstr "Guilder Belanda"
 
 msgctxt "Languages::currency_code_xcd"
 msgid "East Caribbean Dollar"
-msgstr ""
+msgstr "Dolar Karibia Timur"
 
 msgctxt "Languages::currency_code_ecs"
 msgid "Ecuador Sucre"
-msgstr ""
+msgstr "Sucre Ekuador"
 
 msgctxt "Languages::currency_code_cdf"
 msgid "Congolese Franc"
-msgstr ""
+msgstr "Franc Ekuador"
 
 msgctxt "Languages::currency_code_svc"
 msgid "El Salvador Colon"
-msgstr ""
+msgstr "Colon El Salvador"
 
 msgctxt "Languages::currency_code_ern"
 msgid "Eritrean Nafka"
-msgstr ""
+msgstr "Nafka Eritrea"
 
 msgctxt "Languages::currency_code_etb"
 msgid "Ethiopian Birr"
-msgstr ""
+msgstr "Birr Ethiopia"
 
 msgctxt "Languages::currency_code_fkp"
 msgid "Falkland Islands Pound"
-msgstr ""
+msgstr "Pound Kepulauan Falkland"
 
 msgctxt "Languages::currency_code_fim"
 msgid "Finnish Markka"
-msgstr ""
+msgstr "Markka Finlandia"
 
 msgctxt "Languages::currency_code_gmd"
 msgid "Gambian Dalasi"
-msgstr ""
+msgstr "Dalasi Gambia"
 
 msgctxt "Languages::currency_code_ghs"
 msgid "Ghana Cedi"
-msgstr ""
+msgstr "Cedi Ghana"
 
 msgctxt "Languages::currency_code_gip"
 msgid "Gibraltar Pound"
-msgstr ""
+msgstr "Pound Gibraltar"
 
 msgctxt "Languages::currency_code_grd"
 msgid "Greek Drachma"
-msgstr ""
+msgstr "Drachma Yunani"
 
 msgctxt "Languages::currency_code_gtq"
 msgid "Guatemalan Quetzal"
-msgstr ""
+msgstr "Quetzal Guatemala"
 
 msgctxt "Languages::currency_code_gnf"
 msgid "Guinea Franc"
-msgstr ""
+msgstr "Franc Guinea"
 
 msgctxt "Languages::currency_code_gyd"
 msgid "Guyana Dollar"
-msgstr ""
+msgstr "Dolar Guyana"
 
 msgctxt "Languages::currency_code_htg"
 msgid "Haiti Gourde"
-msgstr ""
+msgstr "Gourde Haiti"
 
 msgctxt "Languages::currency_code_hnl"
 msgid "Honduran Lempira"
-msgstr ""
+msgstr "Lempira Honduras"
 
 msgctxt "Languages::currency_code_idr"
 msgid "Indonesian Rupiah"
-msgstr ""
+msgstr "Rupiah Indonesia"
 
 msgctxt "Languages::currency_code_irr"
 msgid "Iranian Rial"
-msgstr ""
+msgstr "Rial Iran"
 
 msgctxt "Languages::currency_code_iqd"
 msgid "Iraqi Dinar"
-msgstr ""
+msgstr "Dinar Iraq"
 
 msgctxt "Languages::currency_code_iep"
 msgid "Irish Pound"
-msgstr ""
+msgstr "Pound Irlandia"
 
 msgctxt "Languages::currency_code_itl"
 msgid "Italian Lira"
-msgstr ""
+msgstr "Lira Italia"
 
 msgctxt "Languages::currency_code_jmd"
 msgid "Jamaican Dollar"
-msgstr ""
+msgstr "Dolar Jamaika"
 
 msgctxt "Languages::currency_code_jod"
 msgid "Jordanian Dinar"
-msgstr ""
+msgstr "Dinar Yordania"
 
 msgctxt "Languages::currency_code_kes"
 msgid "Kenyan Shilling"
-msgstr ""
+msgstr "Shilling Kenya"
 
 msgctxt "Languages::currency_code_lak"
 msgid "Laos Kip"
-msgstr ""
+msgstr "Kip Laos"
 
 msgctxt "Languages::currency_code_lbp"
 msgid "Lebanese Pound"
-msgstr ""
+msgstr "Pound Lebanon"
 
 msgctxt "Languages::currency_code_lsl"
 msgid "Lesotho Loti (Maloti)"
-msgstr ""
+msgstr "Loti (Maloti) Lesotho"
 
 msgctxt "Languages::currency_code_lrd"
 msgid "Liberian Dollar"
-msgstr ""
+msgstr "Dolar Liberia"
 
 msgctxt "Languages::currency_code_lyd"
 msgid "Libyan Dinar"
-msgstr ""
+msgstr "Dinar Libya"
 
 msgctxt "Languages::currency_code_luf"
 msgid "Luxembourg Franc"
-msgstr ""
+msgstr "Franc Luksemburg"
 
 msgctxt "Languages::currency_code_mop"
 msgid "Macau Pataca"
-msgstr ""
+msgstr "Pataca Makau"
 
 msgctxt "Languages::currency_code_mkd"
 msgid "Macedonian (FYR) Denar"
-msgstr ""
+msgstr "Denar Masedonia"
 
 msgctxt "Languages::currency_code_mga"
 msgid "Malagasy Ariary"
-msgstr ""
+msgstr "Ariary Madagaskar"
 
 msgctxt "Languages::currency_code_mgf"
 msgid "Malagasy Franc"
-msgstr ""
+msgstr "Franc Madagaskar"
 
 msgctxt "Languages::currency_code_mwk"
 msgid "Malawi Kwacha"
-msgstr ""
+msgstr "Kwacha Malawi"
 
 msgctxt "Languages::currency_code_mvr"
 msgid "Maldives Rufiyaa"
-msgstr ""
+msgstr "Rufiyaa Maladewa"
 
 msgctxt "Languages::currency_code_mtl"
 msgid "Maltese Lira"
-msgstr ""
+msgstr "Lira Malta"
 
 msgctxt "Languages::currency_code_mro"
 msgid "Mauritania Ouguiya"
-msgstr ""
+msgstr "Ouguiya Mauritania"
 
 msgctxt "Languages::currency_code_mur"
 msgid "Mauritius Rupee"
-msgstr ""
+msgstr "Rupee Mauritius"
 
 msgctxt "Languages::currency_code_mdl"
 msgid "Moldovan Leu"
-msgstr ""
+msgstr "Leu Moldova"
 
 msgctxt "Languages::currency_code_mnt"
 msgid "Mongolian Tugrik"
-msgstr ""
+msgstr "Tugrik Mongolia"
 
 msgctxt "Languages::currency_code_mzn"
 msgid "Mozambique Metical"
-msgstr ""
+msgstr "Metical Mozambik"
 
 msgctxt "Languages::currency_code_mmk"
 msgid "Myanmar Kyat"
-msgstr ""
+msgstr "Kyat Myanmar"
 
 msgctxt "Languages::currency_code_nad"
 msgid "Namibian Dollar"
-msgstr ""
+msgstr "Dolar Namibia"
 
 msgctxt "Languages::currency_code_npr"
 msgid "Nepalese Rupee"
-msgstr ""
+msgstr "Rupee Nepal"
 
 msgctxt "Languages::currency_code_rsd"
 msgid "New Serbian Dinar"
-msgstr ""
+msgstr "Dinar Serbia Baru"
 
 msgctxt "Languages::currency_code_nio"
 msgid "Nicaraguan Cordoba Oro"
-msgstr ""
+msgstr "Cordoba Oro Nikaragua "
 
 msgctxt "Languages::currency_code_ngn"
 msgid "Nigerian Naira"
-msgstr ""
+msgstr "Naira Nigeria"
 
 msgctxt "Languages::currency_code_pkr"
 msgid "Pakistan Rupee"
-msgstr ""
+msgstr "Rupee Pakistan"
 
 msgctxt "Languages::currency_code_pab"
 msgid "Panamanian Balboa"
-msgstr ""
+msgstr "Balboa Panama"
 
 msgctxt "Languages::currency_code_pgk"
 msgid "Papua New Guinea Kina"
-msgstr ""
+msgstr "Kina Papua Nugini"
 
 msgctxt "Languages::currency_code_pyg"
 msgid "Paraguayan Guarani"
-msgstr ""
+msgstr "Guarani Paraguay"
 
 msgctxt "Languages::currency_code_pen"
 msgid "Peruvian Nuevo Sol"
-msgstr ""
+msgstr "Nuevo Sol Peru"
 
 msgctxt "Languages::currency_code_uyu"
 msgid "Peso Uruguayo"
-msgstr ""
+msgstr "Peso Uruguay"
 
 msgctxt "Languages::currency_code_pte"
 msgid "Portugese Escudo"
-msgstr ""
+msgstr "Escudo Portugis"
 
 msgctxt "Languages::currency_code_qar"
 msgid "Qatari Rial"
-msgstr ""
+msgstr "Riyal Qatar"
 
 msgctxt "Languages::currency_code_omr"
 msgid "Rial Omani"
-msgstr ""
+msgstr "Riyal Oman"
 
 msgctxt "Languages::currency_code_rol"
 msgid "Romanian Lei"
-msgstr ""
+msgstr "Lei Rumania"
 
 msgctxt "Languages::currency_code_rwf"
 msgid "Rwanda Franc"
-msgstr ""
+msgstr "Franc Rwanda"
 
 msgctxt "Languages::currency_code_csd"
 msgid "Serbian Dinar"
-msgstr ""
+msgstr "Dinar Serbia"
 
 msgctxt "Languages::currency_code_scr"
 msgid "Seychelles Rupee"
-msgstr ""
+msgstr "Rupee Seychelles"
 
 msgctxt "Languages::currency_code_sll"
 msgid "Sierra Leone Leone"
-msgstr ""
+msgstr "Leone Sierra Leone"
 
 msgctxt "Languages::currency_code_sos"
 msgid "Somalia Shilling"
-msgstr ""
+msgstr "Shilling Somalia"
 
 msgctxt "Languages::currency_code_esp"
 msgid "Spanish Peseta"
-msgstr ""
+msgstr "Peseta Spanyol"
 
 msgctxt "Languages::currency_code_lkr"
 msgid "Sri Lanka Rupee"
-msgstr ""
+msgstr "Rupee Sri Lanka"
 
 msgctxt "Languages::currency_code_shp"
 msgid "St Helena Pound"
-msgstr ""
+msgstr "Pound Saint Helena"
 
 msgctxt "Languages::currency_code_sdp"
 msgid "Sudanese Pound"
-msgstr ""
+msgstr "Pound Sudan"
 
 msgctxt "Languages::currency_code_srd"
 msgid "Suriname Dollar"
-msgstr ""
+msgstr "Dolar Suriname"
 
 msgctxt "Languages::currency_code_srg"
 msgid "Suriname Guilder"
-msgstr ""
+msgstr "Guilder Suriname"
 
 msgctxt "Languages::currency_code_szl"
 msgid "Swaziland Lilangeni"
-msgstr ""
+msgstr "Lilangeni Swaziland"
 
 msgctxt "Languages::currency_code_syp"
 msgid "Syrian Pound"
-msgstr ""
+msgstr "Pound Suriah"
 
 msgctxt "Languages::currency_code_tjs"
 msgid "Tajikistan Somoni"
-msgstr ""
+msgstr "Somoni Tajikistan"
 
 msgctxt "Languages::currency_code_tzs"
 msgid "Tanzanian Shilling"
-msgstr ""
+msgstr "Shilling Tanzania"
 
 msgctxt "Languages::currency_code_ttd"
 msgid "Trinidad and Tobago Dollar"
-msgstr ""
+msgstr "Dolar Trinidad dan Tobago"
 
 msgctxt "Languages::currency_code_tnd"
 msgid "Tunisian Dinar"
-msgstr ""
+msgstr "Dinar Tunisia"
 
 msgctxt "Languages::currency_code_trl"
 msgid "Turkish Lira"
-msgstr ""
+msgstr "Lira Turki"
 
 msgctxt "Languages::currency_code_tmt"
 msgid "Turkmenistan Manat"
-msgstr ""
+msgstr "Manat Turkmenistan"
 
 msgctxt "Languages::currency_code_ugx"
 msgid "Uganda Shilling"
-msgstr ""
+msgstr "Shilling Uganda"
 
 msgctxt "Languages::currency_code_uzs"
 msgid "Uzbekistan Sum"
-msgstr ""
+msgstr "Sum Uzbekistan"
 
 msgctxt "Languages::currency_code_veb"
 msgid "Venezuela Bolivar"
-msgstr ""
+msgstr "Bolivar Venezuela"
 
 msgctxt "Languages::currency_code_vef"
 msgid "Venezuela Bolivar Fuerte"
-msgstr ""
+msgstr "Bolivar Fuerte Venezuela"
 
 msgctxt "Languages::currency_code_vnd"
 msgid "Vietnamese New Dong"
-msgstr ""
+msgstr "Dong Vietnam "
 
 msgctxt "Languages::currency_code_yer"
 msgid "Yemeni Rial"
-msgstr ""
+msgstr "Riyal Yaman"
 
 msgctxt "Languages::currency_code_yum"
 msgid "Yugoslavian New Dinar"
-msgstr ""
+msgstr "Dinar Yugoslavia"
 
 msgctxt "Languages::currency_code_zmw"
 msgid "Zambian Kwacha"
-msgstr ""
+msgstr "Kwacha Zambia"
 
 msgctxt "Languages::currency_code_zwd"
 msgid "Zimbabwe Dollar"
-msgstr ""
+msgstr "Dolar Zimbabwe"
 
 msgctxt "Languages::editing_order_invoice_responsive"
 msgid "Editing invoice for order"
-msgstr ""
+msgstr "Mengedit invois untuk order"
 
 msgctxt "Languages::responsive_admin.email_order_invoice_subject"
 msgid "[company_name]: Invoice for order"
-msgstr ""
+msgstr "[nama_perusahaan]: invois untuk order"
 
 msgctxt "Languages::easter_coming_soon_message"
 msgid "Uh-oh, it looks like this feature doesn't work yet! But we're on the job and will try to get it working soon."
-msgstr ""
+msgstr "Maaf, sepertinya fitur ini belum berfungsi. Kami akan memperbaikinya segera."
 
 msgctxt "Languages::cookie_policy_upgrade_notification_title"
 msgid "Cookie notification settings moved to GDPR add-on"
-msgstr ""
+msgstr "Pengaturan notifikasi cookie dipindahkan ke add-on GDPR"
 
 msgctxt "Languages::cookie_policy_upgrade_notification_text"
 msgid "<p>Some countries require that websites notify customers about the use of cookies. Previously you could do that under <b>Settings → Security</b>. That setting has now been moved to the <b>GDPR Compliance (EU)</b> add-on. Here's what we advise doing:</p><ol><li>Go to <b>Add-ons → Manage add-ons</b>.</li><li>Switch to the <b>Browse all available add-ons</b> tab.</li><li>Make sure that the <b>GDPR Compliance (EU)</b> add-on is installed and active.</li><li>Click on the add-on name to open the its settings.</li><li>If the <b>Cookie consent</b> setting is set to <i>Implicit</i>, then your store behaves as before the upgrade.</li><li>Switch to the GDPR tab and make sure that the notifications about personal data processing are configured as you want them to.</li><li>Click <b>Save</b>.</li></ol><p>If you'd like, you can set the consent mode to <i>Explicit</i>; that way customers will need to explicitly agree to the use of cookies before they can access your store.</p>"
 msgstr ""
 
 msgctxt "Languages::file_uploading_in_progress_please_wait"
-msgid "File uploading in progess. Please, wait."
+msgid "File uploading in progress. Please wait."
+msgstr "Sedang mengunggah dokumen. Mohon tunggu."
+
+msgctxt "Languages::profile_types_section_user"
+msgid "Customers and admins"
+msgstr "Pelanggan dan admin"
+
+msgctxt "Languages::profile_types_section_seller"
+msgid "Vendor information"
+msgstr "Informasi vendor"
+
+msgctxt "Languages::profile_type"
+msgid "Profile type"
+msgstr "Jenis profil"
+
+msgctxt "Languages::bulk_edit.example_of_modified_value"
+msgid "Example of the modified value"
+msgstr "Contoh nilai yang dimodifikasi"
+
+msgctxt "Languages::bulk_edit.decrease_hint"
+msgid "To decrease the value use the \"-\". Example: -5"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.make_active"
+msgid "Make products active"
+msgstr "Aktifkan produk"
+
+msgctxt "Languages::bulk_edit.make_disabled"
+msgid "Make products disabled"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.make_hidden"
+msgid "Make products hidden"
+msgstr "Sembunyikan produk"
+
+msgctxt "Languages::bulk_edit.price_and_stock"
+msgid "Price & Stock"
+msgstr "Harga dan Stok"
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean"
+msgid "What do these checkboxes mean?"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_checked"
+msgid "all the selected products belong to this category or will be assigned to it."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_unchecked"
+msgid "none of the selected products belong to this category, or they will be removed from it."
+msgstr "produk-produk yang dipilih tidak termasuk ke dalam kategori ini, atau akan dihapus dari kategori ini. "
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_indeterminate"
+msgid "some of the selected products belong to this category; no changes will be made."
+msgstr "beberapa produk yang dipilih termasuk ke dalam kategori ini; tidak akan ada perubahan. "
+
+msgctxt "Languages::bulk_edit.unable_to_delete_all_categories"
+msgid "At least one category must be selected"
+msgstr "Pilih minimal satu kategori"
+
+msgctxt "Languages::bulk_edit.some_products_were_omitted"
+msgid "Some products were skipped because the last remaining category can't be removed or added for a product."
+msgstr "Beberapa produk dilewatkan sebab sisa kategori terakhir tidak dapat dihapus atau ditambahkan produk."
+
+msgctxt "Languages::bulk_edit.some_products_were_omitted_other_storefront"
+msgid "Couldn't edit selected products. Some of the selected products belong to other storefronts; please deselect those products to be able to edit remaining ones."
+msgstr "Tidak dapat mengedit produk yang dipilih. Beberapa diantaranya termasuk ke etalase lain; silakan hapus dari daftar agar dapat mengedit sisa produk lainnya."
+
+msgctxt "Languages::custom_search"
+msgid "Custom search"
+msgstr "Pencarian khusus"
+
+msgctxt "Languages::system_environment"
+msgid "System environment"
+msgstr ""
+
+msgctxt "Languages::product_feature.purpose"
+msgid "Purpose"
+msgstr ""
+
+msgctxt "Languages::ttc_product_feature.purpose"
+msgid "Determines how you and your customers will be able to use this feature."
+msgstr ""
+
+msgctxt "Languages::product_feature.purpose.organize_catalog"
+msgid "Brand, author, etc."
+msgstr ""
+
+msgctxt "Languages::product_feature.purpose.organize_catalog.description"
+msgid "For features like \"Brand\" or \"Manufacturer\" (for most products), \"Performer\" or \"Label\" (for music), \"Author\" or \"Publisher\" (for books), and so on. Every variant of this feature gets its own page with an image, description, and the list of products."
+msgstr ""
+
+msgctxt "Languages::product_feature.purpose.find_products"
+msgid "Product search via filters"
+msgstr ""
+
+msgctxt "Languages::product_feature.purpose.find_products.description"
+msgid "For a feature that just allows you to specify an additional property of a product (for example, \"Fabric\" for T-shirts). If you create a filter by that feature, customers will see that such a property exists, and will be able to search products by it."
+msgstr ""
+
+msgctxt "Languages::product_feature.purpose.describe_product"
+msgid "Additional information"
+msgstr ""
+
+msgctxt "Languages::product_feature.purpose.describe_product.description"
+msgid "For cases when you just need to show some information on a product page. There are no filters for this kind of features."
+msgstr ""
+
+msgctxt "Languages::product_feature.feature_style"
+msgid "Feature style"
+msgstr ""
+
+msgctxt "Languages::ttc_product_feature.feature_style"
+msgid "Determines the look of this feature on the product page."
+msgstr ""
+
+msgctxt "Languages::product_feature.feature_style.checkbox"
+msgid "Checkbox"
+msgstr ""
+
+msgctxt "Languages::product_feature.feature_style.color"
+msgid "Color"
+msgstr ""
+
+msgctxt "Languages::product_feature.filter_style.color"
+msgid "Color"
+msgstr ""
+
+msgctxt "Languages::product_feature.feature_style.checkbox"
+msgid "Checkbox"
+msgstr ""
+
+msgctxt "Languages::product_feature.feature_style.multiple_checkbox"
+msgid "Multiple checkboxes"
+msgstr ""
+
+msgctxt "Languages::product_feature.feature_style.text"
+msgid "Text or number"
+msgstr ""
+
+msgctxt "Languages::product_feature.feature_style.number"
+msgid "Number"
+msgstr ""
+
+msgctxt "Languages::product_feature.feature_style.brand"
+msgid "Brand"
+msgstr ""
+
+msgctxt "Languages::product_feature.filter_style"
+msgid "Filter type"
+msgstr ""
+
+msgctxt "Languages::ttc_product_feature.filter_style"
+msgid "Determines the look of a filter by this feature on the product list. Filters make it easier for customers to find a product with the desired feature value. You'll be able to create a filter after you create a feature."
+msgstr ""
+
+msgctxt "Languages::product_feature.filter_style.checkbox"
+msgid "Checkbox"
+msgstr ""
+
+msgctxt "Languages::product_feature.filter_style.slider"
+msgid "Number slider"
+msgstr ""
+
+msgctxt "Languages::product_feature.filter_style.date"
+msgid "Date selector"
+msgstr ""
+
+msgctxt "Languages::rus_geolocation_upgrade_notification_title"
+msgid "Geolocation: Add-ons deprecated in favor of [geo_maps_addon]"
+msgstr ""
+
+msgctxt "Languages::rus_geolocation_upgrade_notification_text"
+msgid "<p>The <b>[rus_geolocation_addon]</b> add-on allowed your customers to select their city and see estimated shipping rates on a product page. That functionality is now a part of a new add-on called <b>[geo_maps_addon]</b>. It is already installed and active.</p><p>Two geolocation add-ons shouldn’t be active at the same time. Please make sure that the old <b>[rus_geolocation_addon]</b> add-on is disabled.</p><p><a href=\"[disable_geolocation]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Disable deprecated add-on here</a></p>"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.blog_and_pages"
+msgid "Blog & Pages"
+msgstr "Blog & Halaman"
+
+msgctxt "Languages::privilege_groups.orders"
+msgid "Orders"
+msgstr "Pesanan"
+
+msgctxt "Languages::privilege_groups.order_statuses"
+msgid "Order statuses"
+msgstr "Status Pesanan"
+
+msgctxt "Languages::privilege_groups.other"
+msgid "Other"
+msgstr "Lainnya"
+
+msgctxt "Languages::privilege_groups.backup_restore"
+msgid "Backup/Restore"
+msgstr "Cadangkan/Kembalikan"
+
+msgctxt "Languages::privilege_groups.blocks"
+msgid "Blocks"
+msgstr "Blok"
+
+msgctxt "Languages::privilege_groups.currencies"
+msgid "Currencies"
+msgstr "Mata uang"
+
+msgctxt "Languages::privilege_groups.design"
+msgid "Design"
+msgstr "Desain"
+
+msgctxt "Languages::privilege_groups.documents"
+msgid "Documents"
+msgstr "Dokumen"
+
+msgctxt "Languages::privilege_groups.file_changes"
+msgid "File changes detector"
+msgstr "Pendeteksi perubahan berkas"
+
+msgctxt "Languages::privilege_groups.files"
+msgid "Files"
+msgstr "Berkas"
+
+msgctxt "Languages::privilege_groups.edit_on_site"
+msgid "Edit content on-site"
+msgstr "Edit konten pada situs web"
+
+msgctxt "Languages::privilege_groups.email_templates"
+msgid "Email templates"
+msgstr "Contoh e-mail"
+
+msgctxt "Languages::privilege_groups.exim"
+msgid "Import and export data"
+msgstr "Impor dan ekspor data"
+
+msgctxt "Languages::privilege_groups.languages"
+msgid "Languages"
+msgstr "Bahasa"
+
+msgctxt "Languages::privilege_groups.locations"
+msgid "Rate areas"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.logs"
+msgid "Logs"
+msgstr "Log"
+
+msgctxt "Languages::privilege_groups.sales_reports"
+msgid "Sales reports"
+msgstr "Laporan penjualan"
+
+msgctxt "Languages::privilege_groups.sitemap"
+msgid "Sitemap"
+msgstr "Peta situs"
+
+msgctxt "Languages::privilege_groups.shipping"
+msgid "Shipping methods"
+msgstr "Metode pengiriman"
+
+msgctxt "Languages::privilege_groups.payments"
+msgid "Payment methods"
+msgstr "Metode pembayaran"
+
+msgctxt "Languages::privilege_groups.products"
+msgid "Categories, Products, Features, Filters, Options"
+msgstr "Kategori, Produk, Fitur, Penyaring, dan Pilihan"
+
+msgctxt "Languages::privilege_groups.promotions"
+msgid "Promotions"
+msgstr "Promosi"
+
+msgctxt "Languages::privilege_groups.static_data"
+msgid "Static data"
+msgstr "Data statis"
+
+msgctxt "Languages::privilege_groups.stores"
+msgid "Stores"
+msgstr "Toko"
+
+msgctxt "Languages::privilege_groups.storage"
+msgid "Storage"
+msgstr "Penyimpanan"
+
+msgctxt "Languages::privilege_groups.settings"
+msgid "Settings"
+msgstr "Pengaturan"
+
+msgctxt "Languages::privilege_groups.taxes"
+msgid "Taxes"
+msgstr "Pajak"
+
+msgctxt "Languages::privilege_groups.themes"
+msgid "Themes"
+msgstr "Tema"
+
+msgctxt "Languages::privilege_groups.users"
+msgid "Users"
+msgstr "Pengguna"
+
+msgctxt "Languages::privilege_groups.user_groups"
+msgid "User groups"
+msgstr "Kelompok pengguna"
+
+msgctxt "Languages::privilege_groups.upgrade_center"
+msgid "Upgrade center"
+msgstr "Pusat peningkatan"
+
+msgctxt "Languages::privilege.full_access"
+msgid "Full access"
+msgstr "Akses penuh"
+
+msgctxt "Languages::privilege.view_access"
+msgid "Can view only"
+msgstr "Hanya dapat melihat"
+
+msgctxt "Languages::privilege.no_access"
+msgid "No access"
+msgstr "TIdak ada akses"
+
+msgctxt "Languages::privilege.custom_access"
+msgid "Custom access"
+msgstr "Sesuaikan akses"
+
+msgctxt "Languages::privilege.apply_to_all"
+msgid "Apply value to all"
+msgstr "Masukkan nilai pada semua"
+
+msgctxt "Languages::open_hours"
+msgid "Open hours"
+msgstr "Jam buka"
+
+msgctxt "Languages::affected_email_templates"
+msgid "Email templates using this document"
+msgstr "Contoh e-mail menggunakan dokumen ini"
+
+msgctxt "Languages::pickup_point_not_selected"
+msgid "Sorry, we couldn't determine your pickup point. Please choose a pickup point, so that we know where to deliver your order."
+msgstr ""
+
+msgctxt "Languages::no_manager_assigned"
+msgid "No manager assigned"
+msgstr ""
+
+msgctxt "Languages::remove_new_orders_filter_upgrade_notification_title"
+msgid "Search for \"New orders\" removed"
+msgstr ""
+
+msgctxt "Languages::remove_new_orders_filter_upgrade_notification_text"
+msgid "<p>In previous versions, every administrator could search for orders that he or she hadn't viewed yet (\"New orders\"). Because not every administrator views every order, the list of \"new orders\" only kept growing, which could affect the database negatively in a very long run.</p><p>The \"New orders\" condition in the advanced search has been removed. Please take that into account if you have any saved searches with that condition.</p><p><a href=\"[saved_searches]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Check saved searches</a></p>"
+msgstr ""
+
+msgctxt "Languages::ru.tax_and_payments.upgrade_message.title"
+msgid "Russian Legislation: Preparing for January 1, 2019"
+msgstr ""
+
+msgctxt "Languages::ru.tax_and_payments.upgrade_message.message"
+msgid "<p>You have upgraded to [product] [version]. This version is prepared for the recent changes in Russian legislation (the increase of VAT to 20% and the support of Fiscal Data Format 1.05 for online cash registers). You'll only need to do this:</p><p>— If you use ATOL Online, switch to Fiscal Data Format 1.05 as described <a href=\"https://www.cs-cart.ru/blog/vyishel-cs-cart-4-9-2-c-podderzhkoy-ffd-1-05-v-atol-onlayn/\" target=\"_blank\">in our Russian blog</a>. You may have done it already after the release of version 4.9.2.</p>[tax_conversion][failing_services]"
+msgstr ""
+
+msgctxt "Languages::block_manager.view_layout.reset_filter"
+msgid "Edit layouts"
+msgstr ""
+
+msgctxt "Languages::block_manager.view_layout.phone"
+msgid "Phone preview"
+msgstr ""
+
+msgctxt "Languages::block_manager.view_layout.tablet"
+msgid "Tablet preview"
+msgstr ""
+
+msgctxt "Languages::block_manager.view_layout.desktop"
+msgid "Desktop preview"
+msgstr ""
+
+msgctxt "Languages::block_manager.availability.show_on"
+msgid "Show on"
+msgstr ""
+
+msgctxt "Languages::block_manager.availability.phone"
+msgid "Phone"
+msgstr ""
+
+msgctxt "Languages::block_manager.availability.tablet"
+msgid "Tablet"
+msgstr ""
+
+msgctxt "Languages::block_manager.availability.desktop"
+msgid "Desktop"
+msgstr ""
+
+msgctxt "Languages::administration_menu_structure_changed_upgrade_notification_title"
+msgid "Administration menu changed"
+msgstr ""
+
+msgctxt "Languages::administration_menu_structure_changed_upgrade_notification_text"
+msgid "<p><b>Locations</b> in <i>Administration → Shipping & taxes</i> renamed to <b>Rate areas</b>. That's because the purpose of locations is to set different shipping rates and tax rates.</p><p>Order statuses, shipment statuses, and gift certificate statuses are now located in their own sub-menu: <b>Administration → Statuses.</b></p>"
+msgstr ""
+
+msgctxt "Languages::add_as_order"
+msgid "Add as order"
+msgstr ""
+
+msgctxt "Languages::is_address_required"
+msgid "Customer must specify his/her address"
+msgstr ""
+
+msgctxt "Languages::go_to_admin_panel"
+msgid "Admin panel"
+msgstr ""
+
+msgctxt "Languages::checkout.min_cart_subtotal_required"
+msgid "To continue checkout process your order subtotal must exceed [amount]"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.customer_information"
+msgid "Customer"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.personal_name"
+msgid "Full name"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.city_and_state"
+msgid "City, state"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.place_an_order_for"
+msgid "Place order ([amount])"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.delivery_note"
+msgid "Customer's notes"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.shippings.show_all_on_map"
+msgid "Show all on map"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.nearest_station"
+msgid "Nearest station"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.select_pickup_item"
+msgid "Select a pickup point"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.choose_from_list"
+msgid "Choose from list"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.use_two_fingers_for_move_map"
+msgid "Use two fingers to move the map"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.select_your_city"
+msgid "Specify your city"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.deliver_to"
+msgid "Deliver to:"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.click_here_to_update_shipping"
+msgid "Enter city and state and click here to update shipping rates"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.shipping_method_for"
+msgid "Shipping method for [group_name]"
+msgstr ""
+
+msgctxt "Languages::deprecated"
+msgid "Deprecated"
+msgstr ""
+
+msgctxt "Languages::collapse_section"
+msgid "Collapse section"
+msgstr ""
+
+msgctxt "Languages::expand_section"
+msgid "Expand section"
+msgstr ""
+
+msgctxt "Languages::companies"
+msgid "Stores"
+msgstr ""
+
+msgctxt "Languages::storefronts"
+msgid "Storefronts"
+msgstr ""
+
+msgctxt "Languages::editing_storefront"
+msgid "Editing storefront"
+msgstr ""
+
+msgctxt "Languages::creating_storefront"
+msgid "Creating storefront"
+msgstr ""
+
+msgctxt "Languages::all_languages"
+msgid "All languages"
+msgstr ""
+
+msgctxt "Languages::all_currencies"
+msgid "All currencies"
+msgstr ""
+
+msgctxt "Languages::all_companies"
+msgid "All stores"
+msgstr ""
+
+msgctxt "Languages::storefront_status"
+msgid "Status"
+msgstr ""
+
+msgctxt "Languages::storefront_status.tooltip"
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed store</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
+msgstr ""
+
+msgctxt "Languages::storefront_access_key"
+msgid "Access key to temporarily closed store"
+msgstr "Kunci akses ke toko yang tutup sementara"
+
+msgctxt "Languages::storefront_access_key.setting_notice"
+msgid "You can set the access key on the store editing page"
+msgstr ""
+
+msgctxt "Languages::close_storefront"
+msgid "Close storefront"
+msgstr ""
+
+msgctxt "Languages::close_storefront.setting_notice"
+msgid "You can open or close a store on the store editing page"
+msgstr ""
+
+msgctxt "Languages::open_selected_storefronts"
+msgid "Open selected"
+msgstr ""
+
+msgctxt "Languages::close_selected_storefronts"
+msgid "Close selected"
+msgstr ""
+
+msgctxt "Languages::add_storefront"
+msgid "Add storefront"
+msgstr ""
+
+msgctxt "Languages::storefront_status_changed.Y"
+msgid "The storefront was <b>closed</b>|The storefronts were <b>closed</b>"
+msgstr ""
+
+msgctxt "Languages::storefront_status_changed.N"
+msgid "The storefront was <b>opened</b>|The storefronts were <b>opened</b>"
+msgstr ""
+
+msgctxt "Languages::default_storefront"
+msgid "Default"
+msgstr ""
+
+msgctxt "Languages::setting_min_order_amount_type_was_hidden_upgrade_notification_title"
+msgid "Setting \"Define minimum order amount by\" removed"
+msgstr ""
+
+msgctxt "Languages::setting_min_order_amount_type_was_hidden_upgrade_notification_text"
+msgid "<p>Previously, the <b>Minimum order amount</b> in your store included the shipping costs. If the minimum order amount was $50, and a customer bought 2 products at $20 each, and the shipping cost was $12, then it would be possible to place an order. But now this behavior has changed: only the total price of all products in the cart will determine whether the minimum order amount has been reached.</p><p>Please go to <b>Settings → Checkout</b> and adjust your <b>Minimum order amount</b> to reflect this change.</p><p><a href=\"[checkout_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Open checkout settings</a></p>"
+msgstr ""
+
+msgctxt "Languages::add_profile_fields"
+msgid "Add profile fields"
+msgstr ""
+
+msgctxt "Languages::add_profile_fields_and_close"
+msgid "Add profile fields and close"
+msgstr ""
+
+msgctxt "Languages::checkout_block_with_heading"
+msgid "Checkout block (H2 heading)"
+msgstr ""
+
+msgctxt "Languages::notifications_center.no_notifications"
+msgid "No notifications"
+msgstr ""
+
+msgctxt "Languages::notifications_center.notifications"
+msgid "Notifications"
+msgstr ""
+
+msgctxt "Languages::notifications_center.section.all"
+msgid "All"
+msgstr ""
+
+msgctxt "Languages::notifications_center.section.administration"
+msgid "Administration"
+msgstr ""
+
+msgctxt "Languages::notifications_center.section.products"
+msgid "Products"
+msgstr ""
+
+msgctxt "Languages::notifications_center.section.other"
+msgid "Other"
+msgstr ""
+
+msgctxt "Languages::notifications_center.tag.administration.update"
+msgid "Update"
+msgstr ""
+
+msgctxt "Languages::notifications_center.tag.administration.license"
+msgid "Licence"
+msgstr ""
+
+msgctxt "Languages::notifications_center.tag.other"
+msgid "Other"
+msgstr ""
+
+msgctxt "Languages::notification.upgrade_available.title"
+msgid "Upgrade available"
+msgstr ""
+
+msgctxt "Languages::notification.upgrade_available.message"
+msgid "A new version of [product] is available. If you want to upgrade to the latest version now, click here."
+msgstr ""
+
+msgctxt "Languages::authorize_before_order"
+msgid "Only registered customers can place an order. Please sign in to your account or register a new one."
+msgstr ""
+
+msgctxt "Languages::storefront_with_same_url_exists"
+msgid "A storefront with the specified URL already exists"
+msgstr ""
+
+msgctxt "Languages::edit_layout_on_site"
+msgid "Edit layout on-site"
+msgstr ""
+
+msgctxt "Languages::on_site_layout_editing"
+msgid "Editing layout page: [page]"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.go_to_home_page"
+msgid "Go to home page"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.go_to_dashboard"
+msgid "Go to Dashboard"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.show_bottom_admin_panel"
+msgid "Show admin toolbar"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.hide_bottom_admin_panel"
+msgid "Hide admin toolbar"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.storefront"
+msgid "Storefront"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.admin_panel"
+msgid "Admin panel"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.vendor_panel"
+msgid "Vendor panel"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.preview_mode"
+msgid "Preview"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.build_mode"
+msgid "Edit structure"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.build_mode.not_available"
+msgid "Available only at the checkout page. Add a product to cart and go to checkout to see how it works."
+msgstr ""
+
+msgctxt "Languages::bottom_panel.text_mode"
+msgid "Edit texts"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.theme_mode"
+msgid "Edit style"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.settings"
+msgid "Settings"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.change_theme"
+msgid "Change theme"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.edit_layout"
+msgid "Edit layout"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.edit_template"
+msgid "Edit template"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.edit_translations"
+msgid "Edit translations"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.edit_menus"
+msgid "Edit menus"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.edit_product_tabs"
+msgid "Edit product tabs"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.restore_demo"
+msgid "Restore demo"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.documentation"
+msgid "Documentation"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.help"
+msgid "Help"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.community_forums"
+msgid "Community forums"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.video_tutorials"
+msgid "Video tutorials"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.faq"
+msgid "FAQ"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.customer_help_desk"
+msgid "Contact support"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.hire_a_developers"
+msgid "Hire a developer"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.download"
+msgid "Download"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.buy_license"
+msgid "Buy license"
+msgstr ""
+
+msgctxt "Languages::bottom_panel.trial_left"
+msgid "Remaining trial period"
+msgstr ""
+
+msgctxt "Languages::administration_panel.live_editor.enable"
+msgid "Edit сontent<br/><br/>Change the texts and other data directly on the storefront, without using the administration panel"
+msgstr ""
+
+msgctxt "Languages::demo_panel.live_editor.enable"
+msgid "Edit сontent<br/><br/>Change the texts and other data directly on the storefront, without using the administration panel.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit content on-site\""
+msgstr ""
+
+msgctxt "Languages::administration_panel.theme_editor.enable"
+msgid "Edit style<br/><br/>Change the style of your store (logos, colors, fonts, and so on) and see the changes as you make them"
+msgstr ""
+
+msgctxt "Languages::demo_panel.theme_editor.enable"
+msgid "Edit style<br/><br/>Change the style of your store (logos, colors, fonts, and so on) and see the changes as you make them.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Theme editor\""
+msgstr ""
+
+msgctxt "Languages::administration_panel.block_manager.enable"
+msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works only at the checkout page. Add a product to cart and proceed to checkout to see the editor"
+msgstr ""
+
+msgctxt "Languages::demo_panel.block_manager.enable"
+msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works only at the checkout page. Add a product to cart and proceed to checkout to see the editor.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit layout on-site\""
+msgstr ""
+
+msgctxt "Languages::individual"
+msgid "Individual"
+msgstr ""
+
+msgctxt "Languages::link_an_existing_option"
+msgid "Link an existing option"
+msgstr ""
+
+msgctxt "Languages::checkout_location_was_rewritten_upgrade_notification_title"
+msgid "Customize your checkout page"
+msgstr ""
+
+msgctxt "Languages::tip.quick_select_and_close_category_selector"
+msgid "Tip: Hold 'Ctrl' (or \"⌘\" on Mac) while clicking on a category name. This will add one category and close the window."
+msgstr ""
+
+msgctxt "Languages::checkout_select_profile_before_order"
+msgid "Please select a profile before you place the order."
+msgstr ""
+
+msgctxt "Languages::editing_profile_name"
+msgid "Editing profile: [name]"
+msgstr ""
+
+msgctxt "Languages::bm.customer_information_block.warning.email_or_phome_must_be_required"
+msgid "Contact information must always have either email, or phone as a required field."
+msgstr ""
+
+msgctxt "Languages::bm.customer_information_block.warning.field_automaticly_added"
+msgid "\"[field_name]\" has been added as a required field automatically."
+msgstr ""
+
+msgctxt "Languages::bm.customer_information_block.warning.field_marked_as_required"
+msgid "The \"[field_name]\" field has been marked as required."
+msgstr ""
+
+msgctxt "Languages::checkout_location_was_rewritten_upgrade_notification_text"
+msgid "<p>You can now move parts of the new checkout page around, or hide the parts you don't need. To do this, go to <b>Design → Layouts</b> and switch to the <i>Checkout</i> tab. For your convenience, we have updated your checkout page: it now has all the new blocks that a clean [product] installation has. Please check your checkout page and modify it as you see fit.</p><p>We also made a back-up of your previous checkout page. If you need to revert our changes, just import the layout from <b>[file_paths]</b></p><p><a href=\"[layout_page]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Configure checkout here</a></p>"
+msgstr ""
+
+msgctxt "Languages::upgrade_notification_welcome_title"
+msgid "Welcome to [product] [version]!"
+msgstr ""
+
+msgctxt "Languages::upgrade_notification_welcome_text"
+msgid "<p class=\"lead\">To help you get started, we’ve compiled the list of what you should check after the upgrade. The full list of changes is in the changelog.</p><p class=\"lead\">If you ever need to check this message later, we’ve also sent a copy to [email].</p>"
+msgstr ""
+
+msgctxt "Languages::view_changelog"
+msgid "View changelog"
+msgstr ""
+
+msgctxt "Languages::upgrade_notification_what_check_first"
+msgid "What to check first?"
+msgstr ""
+
+msgctxt "Languages::upgrade_notification_what_else_to_check"
+msgid "What else is there to check?"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.change_in_geolocation_cities_upgrade_notification_title"
+msgid "List of geolocation cities is now generated automatically"
+msgstr ""
+
+msgctxt "Languages::lite_checkout.change_in_geolocation_cities_upgrade_notification_text"
+msgid "<p>Previously, you could create a list of cities that would be available to customers for selection in the geolocation block on the storefront. That had to be done in <b>Administration → Shipping &amp; taxes → Geolocation cities.</b></p><p>That page was removed, and the list of cities is now generated automatically from your pickup points. It works only if the corresponding setting in the [stores_pickups_addon] add-on is enabled, and only for pickup points that have a country, state, and city specified.</p><p>For your convenience, here is the list of cities that you previously had on the <b>Geolocation cities</b> page. It may help with configuring pickup points:<p><p>[locations_table]</p><p><a href=\"[stores_pickups_search]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Edit add-on settings</a></p>"
+msgstr ""
+
+msgctxt "Languages::cant_remove_addon_files"
+msgid "Add-on files couldn't be removed"
+msgstr ""
+
+msgctxt "Languages::addon_reinstall.intro"
+msgid "Looks like you are trying to install an add-on that is already installed. We can do it for you in two ways; we recommend the safe way."
+msgstr ""
+
+msgctxt "Languages::addon_reinstall.safe_way"
+msgid "<strong>The safe way:</strong> we'll uninstall the old add-on first, and then install the new one. The drawback is that any data and settings related to the add-on will be lost."
+msgstr ""
+
+msgctxt "Languages::addon_reinstall.dangerous_way"
+msgid "<strong>The dangerous way:</strong> we'll replace all the files of the add-on with new ones, but keep all the add-on's data in the database intact. This can break the add-on, or might even break your store. Please don't use the dangerous way, unless you absolutely know what you're doing."
+msgstr ""
+
+msgctxt "Languages::addon_reinstall.dangerous_way.confirm"
+msgid "I know the risks and want to use the dangerous way."
+msgstr ""
+
+msgctxt "Languages::addon_reinstall.dangerous_way.action"
+msgid "Use the dangerous way"
+msgstr ""
+
+msgctxt "Languages::addon_reinstall.safe_way.action"
+msgid "Use the safe way"
+msgstr ""
+
+msgctxt "Languages::storefronts_themes_upgrade_notification.title"
+msgid "Storefronts can now differ from each other significantly"
+msgstr ""
+
+msgctxt "Languages::storefronts_themes_upgrade_notification.message"
+msgid "<p>Previously, all storefronts looked the same. They differed only in currencies, languages, and vendors. But now storefronts can have their own themes and layouts. This allows you to customize their look and structure.</p><ul><li>Themes let you give each storefront its own set colors, fonts, logos, backgrounds, and styles. Match the appearance of a storefronts to its products or the preference of its audience.</li><li>Layouts and blocks let you create storefronts with entirely different structure and content. Show different banners, change the positions of elements on the pages, and so on. Everything in [product] is displayed via blocks, so you have many ways to customize your storefronts.</li></ul><p><a href=\"[themes_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Manage themes</a> <a href=\"[layouts_url]\" target=\"_blank\" class=\"btn btn-large\">Manage layouts</a></p>"
+msgstr ""
+
+msgctxt "Languages::all_storefronts"
+msgid "All storefronts"
+msgstr ""
+
+msgctxt "Languages::add_storefronts"
+msgid "Add storefronts"
+msgstr ""
+
+msgctxt "Languages::add_storefronts_and_close"
+msgid "Add storefronts and close"
+msgstr ""
+
+msgctxt "Languages::event.receiver.c"
+msgid "Customer"
+msgstr ""
+
+msgctxt "Languages::event.receiver.a"
+msgid "Administrator"
+msgstr ""
+
+msgctxt "Languages::event.receiver.v"
+msgid "Vendor"
+msgstr ""
+
+msgctxt "Languages::event.transport.mail"
+msgid "E-mail"
+msgstr ""
+
+msgctxt "Languages::event.transport.internal"
+msgid "Notifications Center"
+msgstr ""
+
+msgctxt "Languages::event.order.edp.name"
+msgid "Access to downloadable products granted"
+msgstr ""
+
+msgctxt "Languages::notifications"
+msgid "Notifications"
+msgstr ""
+
+msgctxt "Languages::event.order.updated.name"
+msgid "Order was updated"
+msgstr ""
+
+msgctxt "Languages::event.order.shipment_updated.name"
+msgid "Products were shipped"
+msgstr ""
+
+msgctxt "Languages::purpose"
+msgid "Purpose"
+msgstr ""
+
+msgctxt "Languages::feature_style"
+msgid "Feature style"
+msgstr ""
+
+msgctxt "Languages::filter_style"
+msgid "Filter type"
+msgstr ""
+
+msgctxt "Languages::all_block_types"
+msgid "All block types"
+msgstr ""
+
+msgctxt "Languages::all_layouts"
+msgid "All layouts"
+msgstr ""
+
+msgctxt "Languages::all_locations"
+msgid "All locations"
+msgstr ""
+
+msgctxt "Languages::n_categories"
+msgid "[n] category|[n] categories"
+msgstr ""
+
+msgctxt "Languages::n_pages"
+msgid "[n] page|[n] pages"
+msgstr ""
+
+msgctxt "Languages::n_filters"
+msgid "[n] filter|[n] filters"
+msgstr ""
+
+msgctxt "Languages::n_profile_fields"
+msgid "[n] profile field|[n] profile fields"
+msgstr ""
+
+msgctxt "Languages::event.profile.activated.name"
+msgid "Profile was activated"
+msgstr ""
+
+msgctxt "Languages::event.profile.deactivated.name"
+msgid "Profile was deactivated"
+msgstr ""
+
+msgctxt "Languages::event.profile.password_reminder.name"
+msgid "Reminder about necessary password change"
+msgstr ""
+
+msgctxt "Languages::event.profile.usergroup_request.name"
+msgid "Membership in user group was requested"
+msgstr ""
+
+msgctxt "Languages::event.profile.updated.name"
+msgid "Profile was updated"
+msgstr ""
+
+msgctxt "Languages::event.profile.added.name"
+msgid "Profile requires activation"
+msgstr ""
+
+msgctxt "Languages::event.profile.created.name"
+msgid "Profile was created"
+msgstr ""
+
+msgctxt "Languages::event.profile.usergroup_activation.name"
+msgid "User group activation"
+msgstr ""
+
+msgctxt "Languages::event.profile.usergroup_disactivation.name"
+msgid "User group disactivation"
+msgstr ""
+
+msgctxt "Languages::event.profile.usergroup_updated.name"
+msgid "Membership in user group was changed"
+msgstr ""
+
+msgctxt "Languages::event.profile.password_recovery.name"
+msgid "Password recovery"
+msgstr ""
+
+msgctxt "Languages::export_found_products"
+msgid "Export found products"
+msgstr ""
+
+msgctxt "Languages::hello_name"
+msgid "Hello [name],"
+msgstr ""
+
+msgctxt "Languages::checkout.email_exists.popup.title"
+msgid "You may have bought from us before"
+msgstr ""
+
+msgctxt "Languages::checkout.email_exists.popup.message"
+msgid "An account with your email already exists. We can sign you in (password won't be needed), or you can use another email if you'd like."
+msgstr ""
+
+msgctxt "Languages::checkout.email_exists.popup.cancel_btn"
+msgid "Use another email"
+msgstr ""
+
+msgctxt "Languages::checkout.email_exists.popup.sign_in_btn"
+msgid "Sign me in"
+msgstr ""
+
+msgctxt "Languages::auth.one_time_password.popup.title"
+msgid "Password-free sign-in"
+msgstr ""
+
+msgctxt "Languages::auth.one_time_password.popup.message"
+msgid "We've sent a one-time code to <strong>[email]</strong>. Please enter it below, and we'll sign you in without a password."
+msgstr ""
+
+msgctxt "Languages::auth.one_time_password.popup.input_placeholder"
+msgid "Enter the code here"
+msgstr ""
+
+msgctxt "Languages::auth.one_time_password.popup.resend_btn"
+msgid "Resend the code"
+msgstr ""
+
+msgctxt "Languages::auth.one_time_password.popup.sign_in_btn"
+msgid "Sign me in"
+msgstr ""
+
+msgctxt "Languages::auth.one_time_password.notification.info_password_sent"
+msgid "We've sent a one-time code to [email]."
+msgstr ""
+
+msgctxt "Languages::auth.one_time_password.notification.error_password_invalid"
+msgid "Sorry, it seems that the code you've entered is incorrect. It may have expired or been used already. Please check the code you're entering or request a new code."
+msgstr ""
+
+msgctxt "Languages::auth.one_time_password.notification.error_password_required"
+msgid "Please enter the code to sign in."
+msgstr ""
+
+msgctxt "Languages::email.one_time_password.title"
+msgid "Sign in without password"
+msgstr ""
+
+msgctxt "Languages::email.one_time_password.message"
+msgid "<p>You've requested a one-time code to sign in to <a href=\"[storefront_url]\">[storefront_url]</a>. Here it is:</p><p><strong><code>[password]</code></strong></p><p>Please don't tell this code to anyone else. If you haven't requested the code, then you can safely ignore this message. Nobody will be able to sign in to your account, unless they know your password or can view your inbox.</p>"
+msgstr ""
+
+msgctxt "Languages::email_template.one_time_password_request"
+msgid "One-time code for password-free sign-in"
+msgstr ""
+
+msgctxt "Languages::other_notification"
+msgid "Other"
+msgstr ""
+
+msgctxt "Languages::see_full_templates_list"
+msgid "Can't find a notification you're looking for?<br/><a href=\"[email_template_manage]\">See the full list of email templates</a><br/><a href=\"[internal_template_manage]\">See the full list of on-site notification templates</a>"
+msgstr ""
+
+msgctxt "Languages::internal_templates"
+msgid "On-site notification templates"
+msgstr ""
+
+msgctxt "Languages::editing_internal_template"
+msgid "Editing on-site notification template"
+msgstr ""
+
+msgctxt "Languages::send_test_notification"
+msgid "Send test notification"
+msgstr ""
+
+msgctxt "Languages::count_internal_template_successfully_imported"
+msgid "On-site notification templates successfully imported:"
+msgstr ""
+
+msgctxt "Languages::count_internal_template_fail_imported"
+msgid "On-site notification templates import failed:"
+msgstr ""
+
+msgctxt "Languages::internal_template_import_success_msg"
+msgid "All the on-site notification templates have been imported without errors."
+msgstr ""
+
+msgctxt "Languages::count_internal_template_fail_imported"
+msgid "On-site notification templates import failed:"
+msgstr ""
+
+msgctxt "Languages::internal_template_exists"
+msgid "The on-site notification template with the chosen code already exists, please try another."
+msgstr ""
+
+msgctxt "Languages::notification_template.tab.email"
+msgid "Email"
+msgstr ""
+
+msgctxt "Languages::notification_template.tab.internal"
+msgid "On-site"
+msgstr ""
+
+msgctxt "Languages::notifications_center.section.communication"
+msgid "Communication"
+msgstr ""
+
+msgctxt "Languages::notifications_center.tag.messages"
+msgid "Messages"
+msgstr ""
+
+msgctxt "Languages::last_login"
+msgid "Last login"
+msgstr ""
+
+msgctxt "Languages::total_orders"
+msgid "Created orders"
+msgstr ""
+
+msgctxt "Languages::total_paid_orders"
+msgid "Paid orders"
+msgstr ""
+
+msgctxt "Languages::total_spent_money"
+msgid "Total spend"
+msgstr ""
+
+msgctxt "Languages::block_manager.brands_per_screen"
+msgid "Brands per screen"
+msgstr ""
+
+msgctxt "Languages::block_manager.total_displayed_brands"
+msgid "Total amount of brands displayed"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.notification_settings"
+msgid "Notifications"
+msgstr ""
+
+msgctxt "Languages::block_manager.manage_layout_in_tab_not_exist_location"
+msgid "<p>This [entity] currently doesn't have an associated layout page. That's why it uses blocks from the default layout page.<br> If you'd like to edit blocks specifically for this [entity], then:</p><p><ol><li>Go to <b><a href=\"[link]\">Design → Layouts</a></b></li><li>Add a layout page with <b>Dispatch:</b> <code>[dispatch_value]</code>.</li><li>Switch to the <b>[entity_tab]</b> tab and make sure that the layout page is enabled for this [entity].</li><li>Save your changes and return here.</li></ol></p>"
+msgstr ""
+
+msgctxt "Languages::block_manager.manage_layout_in_tab_unavailable_by_object_id"
+msgid "<p>This [entity] currently doesn't have an associated layout page. That's why it uses blocks from the default layout page.<br> If you'd like to edit blocks specifically for this [entity], then:</p><p><ol><li>Edit the <b><a href=\"[link]\">[location_name]</a></b> layout page.</li><li>Switch to the [entity_tab] tab and make sure that the layout page is enabled for this [entity].</li><li>Save your changes and return here.</li></ol></p>"
+msgstr ""
+
+msgctxt "Languages::block_manager.manage_layout_in_tab_unavailable"
+msgid "Sorry, you can't edit blocks for this [entity]. If you'd like to do this, please contact the main administrator. Ask him or her to check the <b>Layouts</b> tab of this [entity] in their admin panel. That will give the main admin all the necessary information."
+msgstr ""
+
+msgctxt "Languages::block_manager.dynamic_entity_products"
+msgid "product"
+msgstr ""
+
+msgctxt "Languages::block_manager.dynamic_entity_categories"
+msgid "category"
+msgstr ""
+
+msgctxt "Languages::block_manager.dynamic_entity_pages"
+msgid "page"
+msgstr ""
+
+msgctxt "Languages::payment_processors.category.checkout"
+msgid "Checkout"
+msgstr ""
+
+msgctxt "Languages::payment_processors.category.gateway"
+msgid "Gateways"
+msgstr ""
+
+msgctxt "Languages::payment_processors.category.russian"
+msgid "Russian payment methods"
+msgstr ""
+
+msgctxt "Languages::event.system.realtime_shipping_error.name"
+msgid "Realtime shipping errors"
+msgstr ""
+
+msgctxt "Language::exim_reset_inventory_tooltip"
+msgid "This won't affect the products that have the quantity specified in the imported file."
+msgstr ""
+
+msgctxt "Languages::thank_you"
+msgid "Thank you!"
+msgstr ""
+
+msgctxt "Languages::text_review_and_reach_out_request"
+msgid "We'll review your application and reach out to you via email soon."
+msgstr ""
+
+msgctxt "Languages::system_of_measurement"
+msgid "System of measurement"
+msgstr ""
+
+msgctxt "Languages::imperial_units"
+msgid "Imperial (in, lb)"
+msgstr ""
+
+msgctxt "Languages::metric_units"
+msgid "Metric (cm, kg)"
+msgstr ""
+
+msgctxt "Languages::ship_dhl_account_country"
+msgid "Account country"
+msgstr ""
+
+msgctxt "Languages::print_documents"
+msgid "Print documents"
+msgstr ""
+
+msgctxt "Languages::change_to_status"
+msgid "Change to [status]"
+msgstr ""
+
+msgctxt "Languages::invoice_pdf"
+msgid "Invoice (PDF)"
+msgstr ""
+
+msgctxt "Languages::settings.smtp_error"
+msgid "SMTP Error"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Atlantic/Bermuda"
+msgid "(GMT-03:00) Bermuda"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Asia/Almaty"
+msgid "(GMT+06:00) Almaty"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Indian/Cocos"
+msgid "(GMT+06:30) Cocos"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Pacific/Pitcairn"
+msgid "(GMT-08:00) Pitcairn"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::America/Vancouver"
+msgid "(GMT-08:00) Vancouver"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Pacific/Gambier"
+msgid "(GMT-09:00) Gambier"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Australia/Lord_Howe"
+msgid "(GMT+10:30) Lord Howe"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Pacific/Chatham"
+msgid "(GMT+12:45) Chatham"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Africa/Casablanca"
+msgid "(GMT+01:00) Casablanca"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Europe/Dublin"
+msgid "(GMT+01:00) Dublin"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Pacific/Midway"
+msgid "(GMT-11:00) United States Minor Outlying Islands"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Asia/Urumqi"
+msgid "(GMT+06:00) Urumqi"
+msgstr ""
+
+msgctxt "Languages::sync_data"
+msgid "Sync data"
+msgstr ""
+
+msgctxt "Languages::never"
+msgid "Never"
+msgstr ""
+
+msgctxt "Languages::nothing_sign"
+msgid "&mdash;"
+msgstr ""
+
+msgctxt "Languages::last_sync"
+msgid "Last sync"
+msgstr ""
+
+msgctxt "Languages::log_file"
+msgid "Log file"
 msgstr ""
 

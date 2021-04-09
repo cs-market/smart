@@ -14,6 +14,7 @@
 
 use Tygh\Tools\SecurityHelper;
 use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -64,7 +65,7 @@ function fn_form_builder_update_page_post(&$page_data, &$page_id, &$lang_code)
                     db_query('UPDATE ?:form_descriptions SET ?u WHERE object_id = ?i AND lang_code = ?s', $data, $element_id, $lang_code);
                 } else {
                     $data['object_id'] = $element_id = db_query('INSERT INTO ?:form_options ?e', $data);
-                    foreach (fn_get_translation_languages() as $data['lang_code'] => $_v) {
+                    foreach (Languages::getAll() as $data['lang_code'] => $_v) {
                         db_query('INSERT INTO ?:form_descriptions ?e', $data);
                     }
                 }
@@ -89,7 +90,7 @@ function fn_form_builder_update_page_post(&$page_data, &$page_id, &$lang_code)
                             db_query('UPDATE ?:form_descriptions SET ?u WHERE object_id = ?i AND lang_code = ?s', $v, $v['element_id'], $lang_code);
                         } else {
                             $v['object_id'] = $v['element_id'] = db_query('INSERT INTO ?:form_options ?e', $v);
-                            foreach (fn_get_translation_languages() as $v['lang_code'] => $_v) {
+                            foreach (Languages::getAll() as $v['lang_code'] => $_v) {
                                 db_query('INSERT INTO ?:form_descriptions ?e', $v);
                             }
                         }
@@ -115,7 +116,7 @@ function fn_form_builder_update_page_post(&$page_data, &$page_id, &$lang_code)
                     'status' => 'A',
                 );
 
-                if (in_array($type, array(FORM_RECIPIENT, FORM_IS_SECURE, FORM_SUBJECT))) {
+                if (in_array($type, [FORM_RECIPIENT, FORM_SUBJECT])) {
                     $_data['value'] = $data;
                     if ($type == FORM_SUBJECT && !empty($_data['value']) && !in_array($_data['value'], $elm_ids)) {
                         // reset value to Form name if field specified as Subject was deleted
@@ -129,7 +130,7 @@ function fn_form_builder_update_page_post(&$page_data, &$page_id, &$lang_code)
 
                 if (empty($elm_id)) {
                     $_description['object_id'] = $elm_id = db_query('INSERT INTO ?:form_options ?e', $_data);
-                    foreach (fn_get_translation_languages() as $_description['lang_code'] => $_v) {
+                    foreach (Languages::getAll() as $_description['lang_code'] => $_v) {
                         db_query('INSERT INTO ?:form_descriptions ?e', $_description);
                     }
                 } else {
@@ -180,13 +181,13 @@ function fn_get_form_elements($page_id, $avail_only = false, $lang = CART_LANGUA
         }
 
         // Get general form options
-        if (strpos(FORM_SUBMIT . FORM_SUBJECT_TEXT, $data['element_type']) !== false) {
+        if (in_array($data['element_type'], [FORM_SUBMIT, FORM_SUBJECT_TEXT])) {
             $general_data[$data['element_type']] = $data['description'];
             unset($elms[$elm_id]);
             continue;
         }
 
-        if (strpos(FORM_IS_SECURE . FORM_RECIPIENT . FORM_SUBJECT, $data['element_type']) !== false) {
+        if (in_array($data['element_type'], [FORM_RECIPIENT, FORM_SUBJECT])) {
             $general_data[$data['element_type']] = $data['value'];
             unset($elms[$elm_id]);
             continue;
@@ -223,7 +224,7 @@ function fn_send_form($page_id, $form_values)
             $max_length = 0;
 
             $sender = '';
-            $country_code = Registry::get('settings.General.default_country');
+            $country_code = Registry::get('settings.Checkout.default_country');
 
             foreach ($page_data['form']['elements'] as $k => $v) {
                 if (array_key_exists($k, $form_values)) {

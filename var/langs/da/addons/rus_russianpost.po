@@ -1155,3 +1155,7 @@ msgstr "EMS Russian Post is no longer available"
 msgctxt "Languages::rus_russianpost.russian_ems_upgrade_notification_message"
 msgid "The <b>EMS (Russian Post)</b> shipping service has been discontinued, and therefore it is no longer supported in [product]. All the shipping methods in your store that used this service have been changed to use the <b>Russian Post (pochta.ru)</b> shipping service instead. Please go to <b>Administration → Shipping & taxes → Shipping methods</b> and make sure that all your shipping methods are configured properly."
 msgstr "The <b>EMS (Russian Post)</b> shipping service has been discontinued, and therefore it is no longer supported in [product]. All the shipping methods in your store that used this service have been changed to use the <b>Russian Post (pochta.ru)</b> shipping service instead. Please go to <b>Administration → Shipping & taxes → Shipping methods</b> and make sure that all your shipping methods are configured properly."
+
+msgctxt "Languages::rus_russian_post.delivery_types_that_require_countinpack"
+msgid "This field is required for Postal Item Type: EMS PT"
+msgstr "This field is required for Postal Item Type: EMS PT"

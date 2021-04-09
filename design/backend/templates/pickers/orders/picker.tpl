@@ -56,7 +56,7 @@
 
     <input id="o{$data_id}_ids" type="hidden" name="{$input_name}" value="{if $item_ids}{","|implode:$item_ids}{/if}" />
     <div class="table-wrapper">
-        <table class="table table-middle">
+        <table class="table table-middle table--relative">
             <thead>
                 <tr>
                     <th width="10%">{__("id")}</th>

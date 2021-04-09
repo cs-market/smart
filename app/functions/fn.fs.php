@@ -488,6 +488,7 @@ function fn_rebuild_files($name)
 
 /**
  * Recursively copy directory (or just a file)
+ * Return false if destination or source paths were not exists.
  *
  * @param string $source
  * @param string $dest
@@ -539,12 +540,13 @@ function fn_copy($source, $dest, $silent = true, $exclude_files = array())
         fn_set_progress('echo', $_dir . '<br/>');
     }
 
-    if (!fn_mkdir($dest)) {
-        return false;
-    }
-
     // Loop through the folder
     if (@is_dir($source)) {
+
+        if (!fn_mkdir($dest)) {
+            return false;
+        }
+        
         $dir = dir($source);
         while (false !== $entry = $dir->read()) {
             // Skip pointers
@@ -687,11 +689,13 @@ function fn_get_dir_contents($dir, $get_dirs = true, $get_files = false, $extens
 /**
  * Get file contents from local or remote filesystem
  *
- * @param string $location file location
- * @param string $base_dir
+ * @param string   $location file location
+ * @param string   $base_dir
+ * @param int|null $timeout  Execution timeout in seconds
+ *
  * @return string $result
  */
-function fn_get_contents($location, $base_dir = '')
+function fn_get_contents($location, $base_dir = '', $timeout = null)
 {
     $result = '';
     $path = $base_dir . $location;
@@ -712,10 +716,22 @@ function fn_get_contents($location, $base_dir = '')
             ->punyEncode()
             ->build($url->getIsEncoded());
 
-        if (Bootstrap::getIniParam('allow_url_fopen') == true) {
-            $result = @file_get_contents($path);
-        } else {
-            $result = Http::get($path);
+        $logging = Http::$logging;
+        Http::$logging = false;
+
+        $extra = [];
+
+        if ($timeout) {
+            $extra['execution_timeout'] = $timeout;
+        }
+
+        $result = Http::get($path, [], $extra);
+
+        $status = Http::getStatus();
+        Http::$logging = $logging;
+
+        if ($status >= 300 || $status < 200) {
+            return false;
         }
     }
 
@@ -867,9 +883,11 @@ function fn_get_last_key(&$arr, $fn = '', $is_first = false)
 
 /**
  * Filters data from instant file uploader
- * @param string $name name of uploaded data
- * @param array $filter_by_ext allow file extensions
- * @return mixed filtered file data on success, false otherwise
+ *
+ * @param string $name          name of uploaded data
+ * @param array  $filter_by_ext allow file extensions
+ *
+ * @return array filtered file data
  */
 function fn_filter_uploaded_data($name, $filter_by_ext = array())
 {
@@ -904,7 +922,7 @@ function fn_filter_uploaded_data($name, $filter_by_ext = array())
 
         if (isset($filtered[$id]) && $filtered[$id] === false) {
             unset($filtered[$id]);
-            fn_set_notification('E', __('error'), __('cant_upload_file'));
+            fn_set_notification('E', __('error'), __('cant_upload_file', ['[product]' => PRODUCT_NAME]));
             continue;
         }
 
@@ -923,6 +941,19 @@ function fn_filter_uploaded_data($name, $filter_by_ext = array())
         $shutdown_inited = true;
         register_shutdown_function('fn_remove_temp_data');
     }
+
+    /**
+     * Executed after filtering uploaded files.
+     * It allows to change or extend the filtered files.
+     *
+     * @param string $name          name of uploaded data
+     * @param array  $filter_by_ext allow file extensions
+     * @param array  $filtered      filtered file data
+     * @param array  $udata_local   List of uploaded files
+     * @param array  $udata_other   List of files object types
+     * @param array  $utype         List of files sources
+     */
+    fn_set_hook('filter_uploaded_data_post', $name, $filter_by_ext, $filtered, $udata_local, $udata_other, $utype);
 
     return $filtered;
 }
@@ -1057,7 +1088,8 @@ function fn_create_temp_file()
  * Returns correct path from url "path" component
  *
  * @param string $path
- * @return correct path
+ *
+ * @return string Correct path
  */
 function fn_get_url_path($path)
 {
@@ -1808,4 +1840,60 @@ function fn_find_file($prefix, $file, $company_id = null)
     }
 
     return false;
+}
+
+/**
+ * Removes files by FTP.
+ *
+ * @param string $target     File or directory path to remove
+ * @param array  $ftp_access Connection details
+ *
+ * @return bool
+ * @throws \Exception
+ */
+function fn_rm_by_ftp($target, array $ftp_access)
+{
+    try {
+        $ftp = new Ftp;
+
+        $ftp->connect($ftp_access['hostname']);
+        $ftp->login($ftp_access['username'], $ftp_access['password']);
+        $ftp->chdir($ftp_access['directory']);
+
+        $files = $ftp->nlist('');
+        if (!empty($files) && in_array('config.php', $files)) {
+            $ftp_target = str_replace(
+                Registry::get('config.dir.root'),
+                '',
+                $target
+            );
+
+            $ftp_target = ltrim($ftp_target, '/');
+
+            $ftp->deleteRecursive($ftp_target);
+
+            return true;
+        }
+
+        return false;
+    } catch (FtpException $e) {
+    }
+
+    return false;
+}
+
+/**
+ * Checks if file extension is allowed
+ *
+ * @param string $file_extension Extension of the file
+ *
+ * @return bool
+ */
+function fn_is_file_extension_allowed($file_extension)
+{
+    if (in_array(fn_strtolower($file_extension), Registry::get('config.forbidden_file_extensions'))) {
+        return false;
+    }
+
+    return true;
 }

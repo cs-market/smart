@@ -2,7 +2,7 @@
 <email_templates scheme="1.0">
     <templates>
         <item>
-            <code><![CDATA[suppliers_notification]]></code>
+            <code><![CDATA[suppliers_notification_default]]></code>
             <area><![CDATA[A]]></area>
             <status><![CDATA[A]]></status>
             <subject/>

@@ -14,6 +14,7 @@
 
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
+use Tygh\Enum\Addons\Rma\ReturnOperationStatuses;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -52,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'user_id' => $user_id,
                 'action' => $action,
                 'timestamp' => TIME,
-                'status' => RMA_DEFAULT_STATUS,
+                'status' => ReturnOperationStatuses::REQUESTED,
                 'total_amount' => $total_amount,
                 'comment' => $comment
             );
@@ -82,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         }
                         $extra['returns'][$return_id] = array(
                             'amount' => $v['amount'],
-                            'status' => RMA_DEFAULT_STATUS
+                            'status' => ReturnOperationStatuses::REQUESTED
                         );
                         db_query('UPDATE ?:order_details SET ?u WHERE item_id = ?i AND order_id = ?i', array('extra' => serialize($extra)), $item_id, $order_id);
                     }
@@ -178,7 +179,7 @@ if ($mode == 'details' && !empty($_REQUEST['return_id'])) {
         }
     }
 
-    list($return_requests, $search) = fn_get_rma_returns($params, Registry::get('settings.Appearance.' . (AREA == 'A' ? 'admin_' : '') . 'elements_per_page'));
+    list($return_requests, $search) = fn_rma_get_returns($params, Registry::get('settings.Appearance.' . (AREA == 'A' ? 'admin_' : '') . 'elements_per_page'));
     Tygh::$app['view']->assign('return_requests', $return_requests);
     Tygh::$app['view']->assign('search', $search);
 
@@ -211,127 +212,4 @@ if ($mode == 'details' && !empty($_REQUEST['return_id'])) {
     Tygh::$app['view']->assign('order_info', $order_info);
     Tygh::$app['view']->assign('reasons', fn_get_rma_properties( RMA_REASON ));
     Tygh::$app['view']->assign('actions', fn_get_rma_properties( RMA_ACTION ));
-}
-
-function fn_get_rma_returns($params, $items_per_page = 0, $lang_code = CART_LANGUAGE)
-{
-    // Init filter
-    $params = LastView::instance()->update('rma', $params);
-
-    // Set default values to input params
-    $default_params = array (
-        'page' => 1,
-        'items_per_page' => $items_per_page
-    );
-
-    $params = array_merge($default_params, $params);
-
-    // Define fields that should be retrieved
-    $fields = array (
-        'DISTINCT ?:rma_returns.return_id',
-        '?:rma_returns.order_id',
-        '?:rma_returns.timestamp',
-        '?:rma_returns.status',
-        '?:rma_returns.total_amount',
-        '?:rma_property_descriptions.property AS action',
-        '?:users.firstname',
-        '?:users.lastname'
-    );
-
-    // Define sort fields
-    $sortings = array (
-        'return_id' => "?:rma_returns.return_id",
-        'timestamp' => "?:rma_returns.timestamp",
-        'order_id' => "?:rma_returns.order_id",
-        'status' => "?:rma_returns.status",
-        'amount' => "?:rma_returns.total_amount",
-        'action' => "?:rma_returns.action",
-        'customer' => "?:users.lastname"
-    );
-
-    $sorting = db_sort($params, $sortings, 'timestamp', 'desc');
-
-    $join = $condition = $group = '';
-
-    if (isset($params['cname']) && fn_string_not_empty($params['cname'])) {
-        $arr = fn_explode(' ', $params['cname']);
-        foreach ($arr as $k => $v) {
-            if (!fn_string_not_empty($v)) {
-                unset($arr[$k]);
-            }
-        }
-        if (sizeof($arr) == 2) {
-            $condition .= db_quote(" AND ?:users.firstname LIKE ?l AND ?:users.lastname LIKE ?l", "%".array_shift($arr)."%", "%".array_shift($arr)."%");
-        } else {
-            $condition .= db_quote(" AND (?:users.firstname LIKE ?l OR ?:users.lastname LIKE ?l)", "%".trim($params['cname'])."%", "%".trim($params['cname'])."%");
-        }
-    }
-
-    if (isset($params['email']) && fn_string_not_empty($params['email'])) {
-        $condition .= db_quote(" AND ?:users.email LIKE ?l", "%".trim($params['email'])."%");
-    }
-
-    if (isset($params['rma_amount_from']) && fn_is_numeric($params['rma_amount_from'])) {
-        $condition .= db_quote("AND ?:rma_returns.total_amount >= ?d", $params['rma_amount_from']);
-    }
-
-    if (isset($params['rma_amount_to']) && fn_is_numeric($params['rma_amount_to'])) {
-        $condition .= db_quote("AND ?:rma_returns.total_amount <= ?d", $params['rma_amount_to']);
-    }
-
-    if (!empty($params['action'])) {
-        $condition .= db_quote(" AND ?:rma_returns.action = ?s", $params['action']);
-    }
-
-    if (!empty($params['return_id'])) {
-        $condition .= db_quote(" AND ?:rma_returns.return_id = ?i", $params['return_id']);
-    }
-
-    if (!empty($params['request_status'])) {
-        $condition .= db_quote(" AND ?:rma_returns.status IN (?a)", $params['request_status']);
-    }
-
-    if (!empty($params['period']) && $params['period'] != 'A') {
-        list($params['time_from'], $params['time_to']) = fn_create_periods($params);
-        $condition .= db_quote(" AND (?:rma_returns.timestamp >= ?i AND ?:rma_returns.timestamp <= ?i)", $params['time_from'], $params['time_to']);
-    }
-
-    if (!empty($params['order_id'])) {
-        $condition .= db_quote(" AND ?:rma_returns.order_id = ?i", $params['order_id']);
-
-    } elseif (!empty($params['order_ids'])) {
-        $condition .= db_quote(" AND ?:rma_returns.order_id IN (?a)", $params['order_ids']);
-    }
-
-    if (isset($params['user_id'])) {
-        $condition .= db_quote(" AND ?:rma_returns.user_id = ?i", $params['user_id']);
-    }
-
-    if (!empty($params['order_status'])) {
-        $condition .= db_quote(" AND ?:orders.status IN (?a)", $params['order_status']);
-    }
-
-    if (!empty($params['p_ids']) || !empty($params['product_view_id'])) {
-        $arr = (strpos($params['p_ids'], ',') !== false || !is_array($params['p_ids'])) ? explode(',', $params['p_ids']) : $params['p_ids'];
-        if (empty($params['product_view_id'])) {
-            $condition .= db_quote(" AND ?:order_details.product_id IN (?n)", $arr);
-        } else {
-            $condition .= db_quote(" AND ?:order_details.product_id IN (?n)", db_get_fields(fn_get_products(array('view_id' => $params['product_view_id'], 'get_query' => true))));
-        }
-
-        $join .= " LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id";
-        $group .=  db_quote(" GROUP BY ?:rma_returns.return_id HAVING COUNT(?:orders.order_id) >= ?i", count($arr));
-    }
-
-    $limit = '';
-    if (!empty($params['items_per_page'])) {
-        $params['total_items'] = db_get_field("SELECT COUNT(DISTINCT ?:rma_returns.return_id) FROM ?:rma_returns LEFT JOIN ?:rma_return_products ON ?:rma_return_products.return_id = ?:rma_returns.return_id LEFT JOIN ?:rma_property_descriptions ON ?:rma_property_descriptions.property_id = ?:rma_returns.action LEFT JOIN ?:users ON ?:rma_returns.user_id = ?:users.user_id LEFT JOIN ?:orders ON ?:rma_returns.order_id = ?:orders.order_id $join WHERE 1 $condition $group");
-        $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
-    }
-
-    $return_requests = db_get_array("SELECT " . implode(', ', $fields) . " FROM ?:rma_returns LEFT JOIN ?:rma_return_products ON ?:rma_return_products.return_id = ?:rma_returns.return_id LEFT JOIN ?:rma_property_descriptions ON (?:rma_property_descriptions.property_id = ?:rma_returns.action AND ?:rma_property_descriptions.lang_code = ?s) LEFT JOIN ?:users ON ?:rma_returns.user_id = ?:users.user_id LEFT JOIN ?:orders ON ?:rma_returns.order_id = ?:orders.order_id $join WHERE 1 $condition $group $sorting $limit", $lang_code);
-
-    LastView::instance()->processResults('rma_returns', $return_requests, $params);
-
-    return array($return_requests, $params);
 }

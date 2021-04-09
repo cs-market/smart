@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_plans.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.11.3/addons/vendor_plans.po\n"
+"PO-Revision-Date: 2020-01-29 14:52\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -25,7 +23,15 @@ msgid "Commissions"
 msgstr ""
 
 msgctxt "SettingsOptions::vendor_plans::include_shipping"
-msgid "Include shipping cost in vendors commission"
+msgid "Include shipping cost in vendor commissions"
+msgstr ""
+
+msgctxt "SettingsOptions::vendor_plans::include_taxes_in_commission"
+msgid "Include taxes in vendor commissions"
+msgstr ""
+
+msgctxt "SettingsTooltips::vendor_plans::include_taxes_in_commission"
+msgid "Calculate vendor commissions without subtracting taxes from the order total beforehand."
 msgstr ""
 
 msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
@@ -106,6 +112,10 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.transaction_fee"
 msgid "Transaction fee"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.fixed_transaction_fee"
+msgid "Transaction fee (abs)"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.revenue"
@@ -189,7 +199,7 @@ msgid "<strong>Unlimited</strong> revenue"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.transaction_fee_value"
-msgid "<strong>[value]</strong> transaction fee"
+msgid "Transaction fee: <strong>[value]</strong>"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.vendor_commission"
@@ -265,15 +275,23 @@ msgid "Vendor plans: revenue notification"
 msgstr ""
 
 msgctxt "Languages::privileges.view_vendor_plans"
-msgid "View vendor plans"
-msgstr ""
+msgid "Can view"
+msgstr "Poate vizualiza"
 
 msgctxt "Languages::privileges.manage_vendor_plans"
-msgid "Manage vendor plans"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.vendor_plans"
+msgid "Vendor plans"
 msgstr ""
 
 msgctxt "Languages::addons.vendor_plans.commission_description_absolute"
 msgid "[amount] out of [sum]"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.out_of_amount"
+msgid "out of [amount]"
 msgstr ""
 
 msgctxt "Languages::addons.vendor_plans.commission_description_percent"
@@ -294,5 +312,37 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.upgrade_notification_text"
 msgid "<p>Previously, the <b>Vendor Plans</b> add-on had a setting called <b>Take payment surcharge from vendors</b>. It removed payment surcharge from order total, so that customers wouldn't have to pay it. Instead, the payment surcharge was deducted from the order total in favor of the marketplace. This setting has been removed: if you'd like to take money from vendors per order, please specify commissions for the corresponding vendor plans.</p>"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.title"
+msgid "Storefronts available in the vendor plan got changed"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.general_message"
+msgid "What should we do about <a href=\"[search_url]\" target=\"_blank\">[n] vendor </a> who is using this plan now?|What should we do about <a href=\"[search_url]\" target=\"_blank\">[n] vendors </a> who are using this plan now?"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.add_storefronts_message"
+msgid "Add the vendor to the storefronts that got added to the plan|Add the vendors to the storefronts that got added to the plan"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.remove_storefronts_message"
+msgid "Remove the vendor from the storefronts that got removed from this plan|Remove the vendors from the storefronts that got removed from this plan"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.title"
+msgid "The vendor got moved to another plan"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.general_message"
+msgid "What should we do about the storefronts that are available to this vendor?"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.add_storefronts_message"
+msgid "Add the vendor to the storefronts available in the new vendor plan"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
+msgid "Remove the vendor from the storefronts available in his previous plan"
 msgstr ""
 

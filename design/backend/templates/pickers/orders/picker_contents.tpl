@@ -54,7 +54,7 @@
 
 {if $orders}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-responsive">
+    <table width="100%" class="table table--relative table-responsive">
     <tr>
         <th class="center" width="1%">
             {include file="common/check_items.tpl" class="mrg-check"}</th>

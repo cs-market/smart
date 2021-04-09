@@ -1,6 +1,7 @@
 (function(_, $) {
 
     var loadedScripts = {};
+    var loadedScriptPromises = {};
     var sessionData = {};
 
     (function($) {
@@ -36,6 +37,7 @@
                 params.append = params.append || null;
                 params.scroll = params.scroll || null;
                 params.overlay = params.overlay || null;
+                params.original_url = _.current_url || null;
 
                 if (_.embedded) {
                     params.full_render = true;
@@ -163,19 +165,20 @@
                                             message: err_msg
                                         });
                                     }
+
+                                    if (params.error_callback && typeof(params.error_callback) == 'function') {
+                                        params.error_callback(XMLHttpRequest, textStatus, errorThrown);
+                                    }
                                 },
                                 complete: function(XMLHttpRequest, textStatus) {
-                                    activeQueries--;
-                                    if (queryStack.length) {
-                                        var f = queryStack.shift();
-                                        f();
-                                    }
+                                    methods.executeNext();
                                 }
                             });
                         }
                     }
                 } else if (hash && responseCache[hash]) {
                     _response(responseCache[hash], params);
+                    methods.executeNext();
                 }
 
                 return false;
@@ -253,8 +256,16 @@
 
             response: function(response, params) {
                 return _response(response, params);
-            }
+            },
 
+            executeNext: function () {
+                activeQueries--;
+
+                if (queryStack.length) {
+                    var f = queryStack.shift();
+                    f();
+                }
+            }
         };
 
         /*
@@ -266,7 +277,7 @@
              * Transport for file uploads or COMET requests
              */
             iframe: function(form, params, options) {
-                var iframe = $('<iframe name="upload_iframe" src="javascript: false;" class="hidden"></iframe>').appendTo(_.body);
+                var iframe = $('<iframe name="upload_iframe" src="about:blank" class="hidden"></iframe>').appendTo(_.body);
 
                 activeQueries++;
                 if (options.is_comet && $('#comet_control:visible').length === 0) {
@@ -283,7 +294,7 @@
 
                     response = response || {};
                     _response(response, params);
-                    
+
                     if (options.is_comet && jQuery.isEmptyObject(response) == false) {
                         if (typeof response.comet_is_finished === 'undefined') {
                             response.comet_is_finished = true;
@@ -352,7 +363,7 @@
                     activeQueries--;
                 });
 
-                var iframe = $('<iframe name="upload_iframe" src="javascript: false;" class="hidden"></iframe>').appendTo(_.body);
+                var iframe = $('<iframe name="upload_iframe" src="about:blank" class="hidden"></iframe>').appendTo(_.body);
                 activeQueries++;
                 if (options.is_comet) {
                     $('#comet_container_controller').ceProgress('init');
@@ -409,7 +420,8 @@
             params.force_exec = params.force_exec || false;
             params.pre_processing = params.pre_processing || {};
 
-            var regex_all = new RegExp('<script[^>]*>([\u0001-\uFFFF]*?)</script>', 'img');
+            // Use parameter 'data-no-execute="§"' to prevent the script from executing.
+            var regex_all = new RegExp('<script[^>§]*>([\u0001-\uFFFF]*?)</script>', 'img');
             var matches = [];
             var match = '';
             var elm;
@@ -497,7 +509,7 @@
                     }
 
                     // Display/hide hidden block wrappers
-                    if ($.trim(elm.html())) {
+                    if (elm.html().trim()) {
                         elm.parents('.hidden.cm-hidden-wrapper').removeClass('hidden');
                     } else {
                         elm.parents('.cm-hidden-wrapper').addClass('hidden');
@@ -563,13 +575,25 @@
         // Override default ajax method to get count of loaded scripts
         var ajax = $.ajax;
         $.ajax = function(origSettings) {
-            if (origSettings.dataType && origSettings.dataType == 'script') {
-                var _src = origSettings.url;
+            if (origSettings.dataType && origSettings.dataType === 'script') {
+                var _src = origSettings.url,
+                    promise;
+
                 if (loadedScripts[_src]) {
-                    return false;
+                    promise = _src in loadedScriptPromises
+                        ? loadedScriptPromises[_src]
+                        : $.Deferred().resolve().promise();
+
+                    if ('success' in origSettings) {
+                        promise.done(origSettings.success);
+                    }
+                } else {
+                    promise = ajax(origSettings);
+                    loadedScripts[_src] = true;
+                    loadedScriptPromises[_src] = promise;
                 }
 
-                loadedScripts[origSettings.url] = true;
+                return promise;
             }
 
             return ajax(origSettings);

@@ -56,17 +56,6 @@
         </div>
     </div>
 
-    <div class="control-group">
-        <label for="form_is_secure" class="control-label">{__("form_is_secure")}:</label>
-        {assign var="form_secure_const" value=$smarty.const.FORM_IS_SECURE}
-        <div class="controls">
-                <input type="hidden" name="page_data[form][general][{$smarty.const.FORM_IS_SECURE}]" value="N">
-                <span class="checkbox">
-                    <input type="checkbox" id="form_is_secure" value="Y" {if $form.$form_secure_const == "Y"}checked="checked"{/if} name="page_data[form][general][{$form_secure_const}]">
-                </span>
-        </div>
-    </div>
-
     {include file="addons/form_builder/views/pages/components/pages_form_elements.tpl"}
 
 </div>

@@ -29,7 +29,6 @@ class ParseDatetimeTest extends ATestCase
      */
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('SECONDS_IN_HOUR', 60 * 60);
 
         Registry::set('settings.Appearance.calendar_date_format', 'day_first');

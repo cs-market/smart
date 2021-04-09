@@ -2,6 +2,7 @@
 
 {$show_location = $block.properties.show_location|default:"N" == "Y"}
 {$show_rating = $block.properties.show_rating|default:"N" == "Y"}
+{$show_vendor_rating = $block.properties.show_vendor_rating|default:"N" == "Y"}
 {$show_products_count = $block.properties.show_products_count|default:"N" == "Y"}
 
 {$columns=$block.properties.number_of_columns}
@@ -25,22 +26,21 @@
 
                             {$obj_id=$company.company_id}
                             {$obj_id_prefix="`$obj_prefix``$company.company_id`"}
-                            {include file="common/company_data.tpl" company=$company show_links=true show_logo=$show_logo show_city=true show_country=true}
+                            {include file="common/company_data.tpl" company=$company show_links=true show_logo=$show_logo show_location=$show_location}
 
                             <div class="ty-grid-list__item">
-                                {$form_open="form_open_`$obj_id`"}
-                                {$smarty.capture.$form_open nofilter}
                                 {hook name="companies:featured_vendors"}
                                         <div class="ty-grid-list__company-logo">
                                             {$logo="logo_`$obj_id`"}
                                             {$smarty.capture.$logo nofilter}
                                         </div>
 
-                                        {if $show_location}
+                                        {$location="location_`$obj_id`"}
+                                        {if $show_location && $smarty.capture.$location|trim}
                                             <div class="ty-grid-list__item-location">
-                                                {$city="city_`$obj_id`"}
-                                                {$country="country_`$obj_id`"}
-                                                <a href="{"companies.products?company_id=`$company.company_id`"|fn_url}" class="company-location"><bdi>{$smarty.capture.$city nofilter}, {$smarty.capture.$country nofilter}</bdi></a>
+                                                <a href="{"companies.products?company_id=`$company.company_id`"|fn_url}" class="company-location"><bdi>
+                                                {$smarty.capture.$location nofilter}
+                                                </bdi></a>
                                             </div>
                                         {/if}
 
@@ -50,13 +50,22 @@
                                                 {$smarty.capture.$rating nofilter}
                                             </div>
                                         {/if}
-
-                                        <div class="ty-grid-list__total-products">
-                                            {$products_count="products_count_`$obj_id`"}
-                                            {if $smarty.capture.$products_count && $show_products_count}
-                                                {$smarty.capture.$products_count nofilter}
+                                       
+                                        <div class="ty-grid-list__group">
+                                            {$vendor_rating="vendor_rating_`$obj_id`"}
+                                            {if $smarty.capture.$vendor_rating && $show_vendor_rating}
+                                                <div class="ty-grid-list__vendor_rating">
+                                                    {$smarty.capture.$vendor_rating nofilter}
+                                                </div>
                                             {/if}
-                                        </div>
+
+                                            <div class="ty-grid-list__total-products">
+                                                {$products_count="products_count_`$obj_id`"}
+                                                {if $smarty.capture.$products_count && $show_products_count}
+                                                    {$smarty.capture.$products_count nofilter}
+                                                {/if}
+                                            </div>
+                                        </div>                                      
                                 {/hook}
                             </div>
                         {/if}

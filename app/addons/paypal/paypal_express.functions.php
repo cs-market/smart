@@ -15,6 +15,7 @@
 use Tygh\Http;
 use Tygh\Languages\Languages;
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 function fn_paypal_complete_checkout($token, $processor_data, $order_info)
 {
@@ -181,27 +182,27 @@ function fn_paypal_do_express_checkout($processor_data, $paypal_checkout_details
         $total = fn_format_price_by_currency($total, CART_PRIMARY_CURRENCY, $currency['code']);
     }
 
-    $request = array(
-        'PAYERID' => $paypal_checkout_details['PAYERID'],
-        'TOKEN' => $paypal_checkout_details['TOKEN'],
+    $request = [
+        'PAYERID'                        => $paypal_checkout_details['PAYERID'],
+        'TOKEN'                          => $paypal_checkout_details['TOKEN'],
         'PAYMENTREQUEST_0_PAYMENTACTION' => 'SALE',
-        'PAYMENTREQUEST_0_CURRENCYCODE' => $currency['code'],
-        'PAYMENTREQUEST_0_AMT' => $total,
-        'METHOD' => 'DoExpressCheckoutPayment',
-        'PAYMENTREQUEST_0_INVNUM' => $pp_order_id,
-        'BUTTONSOURCE' => 'ST_ShoppingCart_EC_US',
-        'PAYMENTREQUEST_0_CUSTOM' => $order_info['order_id'],
-        'PAYMENTREQUEST_0_NOTIFYURL' => fn_url("payment_notification.paypal_ipn", AREA, 'current')
-    );
+        'PAYMENTREQUEST_0_CURRENCYCODE'  => $currency['code'],
+        'PAYMENTREQUEST_0_AMT'           => $total,
+        'METHOD'                         => 'DoExpressCheckoutPayment',
+        'PAYMENTREQUEST_0_INVNUM'        => $pp_order_id,
+        'BUTTONSOURCE'                   => 'ST_ShoppingCart_EC_US',
+        'PAYMENTREQUEST_0_CUSTOM'        => $order_info['order_id'],
+        'PAYMENTREQUEST_0_NOTIFYURL'     => fn_url("payment_notification.paypal_ipn", AREA, 'current')
+    ];
 
     fn_paypal_build_request($processor_data, $request, $post_url, $cert_file);
 
-    $order_details = (!empty($order_info)) ? fn_paypal_build_details($order_info, $processor_data, false) : fn_paypal_build_details($cart, $processor_data);
+    $order_details = fn_paypal_build_details($order_info, $processor_data, false);
     $request = array_merge($request, $order_details);
 
     if ($currency['code'] == CART_PRIMARY_CURRENCY && !empty($order_info)) {
         //We need to minus taxes when it based on unit price because product subtotal already include this tax.
-        if (Registry::get('settings.General.tax_calculation') == 'unit_price') {
+        if (Registry::get('settings.Checkout.tax_calculation') == 'unit_price') {
             $sum_taxes = fn_paypal_sum_taxes($order_info);
             $request['PAYMENTREQUEST_0_ITEMAMT'] -= $sum_taxes['P'];
             $request['PAYMENTREQUEST_0_SHIPPINGAMT'] -= $sum_taxes['S'];
@@ -280,8 +281,8 @@ function fn_paypal_build_details($data, $processor_data, $express = true)
     $currency = fn_paypal_get_valid_currency($processor_data['processor_params']['currency']);
 
     if ($currency['code'] == CART_PRIMARY_CURRENCY) {
-        $details = array();
-        $shipping_data = array();
+        $details = [];
+        $shipping_data = [];
 
         if (!empty($processor_data['processor_params']['send_adress']) && $processor_data['processor_params']['send_adress'] == 'Y') {
             if ($express) {
@@ -296,17 +297,17 @@ function fn_paypal_build_details($data, $processor_data, $express = true)
     } else {
         $total = fn_format_price_by_currency($data['total'], CART_PRIMARY_CURRENCY, $currency['code']);
 
-        return array(
-            'L_PAYMENTREQUEST_0_NAME0' => __('total_product_cost'),
-            'L_PAYMENTREQUEST_0_NUMBER0' => 'ORDER_ID_' . (isset($data['order_id']) ? $data['order_id'] : 'NEW'),
-            'L_PAYMENTREQUEST_0_DESC0' => '',
-            'L_PAYMENTREQUEST_0_QTY0' => 1,
-            'L_PAYMENTREQUEST_0_AMT0' => $total,
-            'PAYMENTREQUEST_0_ITEMAMT' => $total,
-            'PAYMENTREQUEST_0_TAXAMT' => 0,
+        return [
+            'L_PAYMENTREQUEST_0_NAME0'     => __('total_product_cost'),
+            'L_PAYMENTREQUEST_0_NUMBER0'   => 'ORDER_ID_' . (isset($data['order_id']) ? $data['order_id'] : 'NEW'),
+            'L_PAYMENTREQUEST_0_DESC0'     => '',
+            'L_PAYMENTREQUEST_0_QTY0'      => 1,
+            'L_PAYMENTREQUEST_0_AMT0'      => $total,
+            'PAYMENTREQUEST_0_ITEMAMT'     => $total,
+            'PAYMENTREQUEST_0_TAXAMT'      => 0,
             'PAYMENTREQUEST_0_SHIPPINGAMT' => 0,
-            'PAYMENTREQUEST_0_AMT' => $total
-        );
+            'PAYMENTREQUEST_0_AMT'         => $total
+        ];
     }
 }
 
@@ -345,7 +346,7 @@ function fn_paypal_get_shipping_data($data)
 
 function fn_paypal_get_order_data($data)
 {
-    $order_data = array();
+    $order_data = [];
     $product_index = 0;
 
     foreach ($data['products'] as $product) {
@@ -365,6 +366,8 @@ function fn_paypal_get_order_data($data)
         $order_data['L_PAYMENTREQUEST_0_QTY' . $product_index] = 1;
         $order_data['L_PAYMENTREQUEST_0_AMT' . $product_index] = $data['payment_surcharge'];
         $data['subtotal'] += $data['payment_surcharge'];
+
+        $product_index++;
     }
 
     $sum_taxes = fn_paypal_sum_taxes($data);
@@ -374,6 +377,7 @@ function fn_paypal_get_order_data($data)
     $order_data['PAYMENTREQUEST_0_AMT'] = $data['total'];
 
     fn_paypal_apply_discount($data, $order_data, $product_index);
+
     fn_set_hook('paypal_express_get_order_data', $data, $order_data, $product_index);
 
     return $order_data;
@@ -411,7 +415,7 @@ function fn_paypal_sum_taxes($order_info)
     return $sum_taxes;
 }
 
-function fn_paypal_apply_discount($data, &$order_data, $product_index)
+function fn_paypal_apply_discount($data, &$order_data, &$product_index)
 {
     $discount_applied = false;
     if (!fn_is_empty(floatval($data['subtotal_discount']))) {
@@ -420,6 +424,8 @@ function fn_paypal_apply_discount($data, &$order_data, $product_index)
         $order_data['L_PAYMENTREQUEST_0_AMT' . $product_index] = -$data['subtotal_discount'];
         $discount_applied = true;
     }
+
+    $product_index++;
 
     fn_set_hook('paypal_apply_discount_post', $data, $order_data, $product_index, $discount_applied);
 }
@@ -520,15 +526,15 @@ function fn_paypal_get_error($result, $show_notification = true, $return_type = 
 /**
  * Set details of Paypal Express Checkout action
  *
- * @param int $payment_id Payment identifier
- * @param int $order_id Order identifier
- * @param array $order_info Order data
- * @param array $cart Cart data
- * @param string $area One-letter area code
+ * @param int    $payment_id Payment identifier
+ * @param int    $order_id   Order identifier
+ * @param array  $order_info Order data
+ * @param array  $cart       Cart data
+ * @param string $area       One-letter area code
  *
  * @return array Paypal response
  */
-function fn_paypal_set_express_checkout($payment_id, $order_id = 0, $order_info = array(), $cart = array(), $area = AREA)
+function fn_paypal_set_express_checkout($payment_id, $order_id = 0, $order_info = [], $cart = [], $area = AREA)
 {
     $processor_data = fn_get_payment_method_data($payment_id);
     $currency = fn_paypal_get_valid_currency($processor_data['processor_params']['currency']);
@@ -541,26 +547,29 @@ function fn_paypal_set_express_checkout($payment_id, $order_id = 0, $order_info 
         $cancel_url = fn_url("checkout.cart", $area, 'current');
     }
 
-    $request = array(
+    $request = [
         'PAYMENTREQUEST_0_PAYMENTACTION' => 'SALE',
-        'PAYMENTREQUEST_0_CURRENCYCODE' => $currency['code'],
-        'LOCALECODE' => Languages::getLocaleByLanguageCode(CART_LANGUAGE),
-        'RETURNURL' => $return_url,
-        'CANCELURL' => $cancel_url,
-        'METHOD' => 'SetExpressCheckout',
-        'SOLUTIONTYPE' => 'Sole',
+        'PAYMENTREQUEST_0_CURRENCYCODE'  => $currency['code'],
+        'LOCALECODE'                     => Languages::getLocaleByLanguageCode(CART_LANGUAGE),
+        'RETURNURL'                      => $return_url,
+        'CANCELURL'                      => $cancel_url,
+        'METHOD'                         => 'SetExpressCheckout',
+        'SOLUTIONTYPE'                   => 'Sole',
+    ];
 
-    );
     if (isset(Tygh::$app['session']['paypal_token'])) {
         $request['IDENTITYACCESSTOKEN'] = Tygh::$app['session']['paypal_token'];
     }
+
     $paypal_settings = fn_get_paypal_settings();
+
     if (!empty($paypal_settings) && !empty($paypal_settings['main_pair']['detailed'])) {
-        $image_path_type = Registry::get('settings.Security.secure_storefront') == 'none' ? 'http_image_path' : 'https_image_path';
+        $image_path_type = Registry::get('settings.Security.secure_storefront') === YesNo::YES ? 'https_image_path' : 'http_image_path';
         $request['LOGOIMG'] = !empty($paypal_settings['main_pair']['detailed'][$image_path_type]) ? $paypal_settings['main_pair']['detailed'][$image_path_type] : $paypal_settings['main_pair']['detailed']['image_path'];
         $exploded_logo = explode('?', $request['LOGOIMG']);
         $request['LOGOIMG'] = $exploded_logo[0];
     }
+
     fn_paypal_build_request($processor_data, $request, $post_url, $cert_file);
 
     $order_details = (!empty($order_info)) ? fn_paypal_build_details($order_info, $processor_data, false) : fn_paypal_build_details($cart, $processor_data);
@@ -568,7 +577,7 @@ function fn_paypal_set_express_checkout($payment_id, $order_id = 0, $order_info 
 
     if ($currency['code'] == CART_PRIMARY_CURRENCY && !empty($order_info)) {
         //We need to minus taxes when it based on unit price because product subtotal already include this tax.
-        if (Registry::get('settings.General.tax_calculation') == 'unit_price') {
+        if (Registry::get('settings.Checkout.tax_calculation') == 'unit_price') {
             $sum_taxes = fn_paypal_sum_taxes($order_info);
             $request['PAYMENTREQUEST_0_ITEMAMT'] -= $sum_taxes['P'];
             $request['PAYMENTREQUEST_0_SHIPPINGAMT'] -= $sum_taxes['S'];

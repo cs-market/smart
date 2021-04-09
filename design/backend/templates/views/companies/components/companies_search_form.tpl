@@ -86,7 +86,7 @@
     <div class="control-group">
         <label for="srch_state" class="control-label">{__("state")}</label>
         <div class="controls">
-            <select id="srch_state" class="cm-state cm-location-search hidden" name="state">
+            <select id="srch_state" class="cm-state cm-location-search hidden" name="state_code">
                 <option value="">- {__("select_state")} -</option>
             </select>
             <input class="cm-state cm-location-search" type="text" id="srch_state_d" name="state" maxlength="64" value="{$search.state}" disabled="disabled"/>
@@ -130,12 +130,6 @@
         </div>
     </div>
 
-    <div class="control-group">
-        <label class="control-label" for="elm_fax">{__("fax")}</label>
-        <div class="controls">
-            <input type="text" name="fax" id="elm_fax" value="{$search.fax}" />
-        </div>
-    </div>
     {/if}
     {$smarty.capture.extra_advanced_search nofilter}
 </div>

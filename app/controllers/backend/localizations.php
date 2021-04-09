@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -68,7 +69,7 @@ if ($mode == 'update') {
     Tygh::$app['view']->assign('localization' , $localizaton);
     Tygh::$app['view']->assign('localization_countries', array_diff(fn_get_simple_countries() , $localizaton['countries']));
     Tygh::$app['view']->assign('localization_currencies' , array_diff(fn_get_simple_currencies() , $localizaton['currencies']));
-    Tygh::$app['view']->assign('localization_languages' , array_diff(fn_get_simple_languages(true) , $localizaton['languages']));
+    Tygh::$app['view']->assign('localization_languages' , array_diff(Languages::getSimpleLanguages(true) , $localizaton['languages']));
     Tygh::$app['view']->assign('default_localization' , fn_get_default_localization(DESCR_SL));
 
     Registry::set('navigation.tabs', array (
@@ -86,7 +87,7 @@ if ($mode == 'update') {
 
     Tygh::$app['view']->assign('localization_countries', fn_get_simple_countries());
     Tygh::$app['view']->assign('localization_currencies' , fn_get_simple_currencies());
-    Tygh::$app['view']->assign('localization_languages' , fn_get_simple_languages(true));
+    Tygh::$app['view']->assign('localization_languages' , Languages::getSimpleLanguages(true));
     Tygh::$app['view']->assign('default_localization' , fn_get_default_localization(DESCR_SL));
 
     Registry::set('navigation.tabs', array (
@@ -162,7 +163,7 @@ function fn_update_localization($data, $localization_id = 0, $lang_code = DESCR_
         }
         $localization_id = $data['localization_id'] = db_query("REPLACE INTO ?:localizations ?e", $data);
 
-        foreach (fn_get_translation_languages() as $data['lang_code'] => $_v) {
+        foreach (Languages::getAll() as $data['lang_code'] => $_v) {
             db_query("REPLACE INTO ?:localization_descriptions ?e", $data);
         }
     }

@@ -16,5 +16,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
     'calculate_cart_taxes_pre',
-    'init_user_session_data'
+    'init_user_session_data',
+    'pickup_point_variable_init',
+    'update_shipping'
 );

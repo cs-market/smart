@@ -8,7 +8,7 @@
             'longitude': {$smarty.const.STORE_LOCATOR_DEFAULT_LONGITUDE|doubleval},
             'map_container': '{$map_container}',
             'group_key': {$group_key},
-            'zoom': {if !empty($sl_settings.yandex_zoom)} {$sl_settings.yandex_zoom} {else} 16 {/if},
+            'zoom': 16,
             'controls': [ 
                 'zoomControl',
                 'typeSelector',

@@ -14,7 +14,7 @@
 
 $schema = array(
     'yandex_money' => array(
-        'processor' => 'Яндекс.Касса',
+        'processor' => 'Яндекс.Касса [Устарел]',
         'processor_script' => 'yandex_money.php',
         'processor_template' => 'addons/rus_payments/views/orders/components/payments/yandex_money.tpl',
         'admin_template' => 'yandex_money.tpl',
@@ -24,7 +24,7 @@ $schema = array(
         'addon' => 'rus_payments',
     ),
     'yandex_p2p' => array(
-        'processor' => 'Yandex p2p',
+        'processor' => 'Яндекс.Деньги: Перевод на счёт',
         'processor_script' => 'yandex_p2p.php',
         'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
         'admin_template' => 'yandex_p2p.tpl',
@@ -34,7 +34,7 @@ $schema = array(
         'addon' => 'rus_payments',
     ),
     'sbrf' => array(
-        'processor' => 'Cбербанк России',
+        'processor' => 'Сбербанк: QR-код',
         'processor_script' => 'sbrf.php',
         'processor_template' => '',
         'admin_template' => 'sbrf_receipt.tpl',
@@ -73,18 +73,8 @@ $schema = array(
         'position' => 45,
         'addon' => 'rus_payments',
     ),
-    'pay_at_home' => array(
-        'processor' => 'Plati Doma',
-        'processor_script' => 'pay_at_home.php',
-        'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
-        'admin_template' => 'pay_at_home.tpl',
-        'callback' => 'Y',
-        'type' => 'P',
-        'position' => 50,
-        'addon' => 'rus_payments',
-    ),
     'rbk' => array(
-        'processor' => 'RBK Money',
+        'processor' => 'RBK.money',
         'processor_script' => 'rbk.php',
         'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
         'admin_template' => 'rbk.tpl',
@@ -94,7 +84,7 @@ $schema = array(
         'addon' => 'rus_payments',
     ),
     'vsevcredit' => array(
-        'processor' => 'Vsevcredit',
+        'processor' => 'Вкредит24.ру',
         'processor_script' => 'vsevcredit.php',
         'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
         'admin_template' => 'vsevcredit.tpl',
@@ -104,7 +94,7 @@ $schema = array(
         'addon' => 'rus_payments',
     ),
     'paymaster' => array(
-        'processor' => 'Paymaster',
+        'processor' => 'PayMaster',
         'processor_script' => 'paymaster.php',
         'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
         'admin_template' => 'paymaster.tpl',

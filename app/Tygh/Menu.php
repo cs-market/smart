@@ -14,7 +14,7 @@
 
 namespace Tygh;
 
-use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 class Menu
 {
@@ -156,7 +156,7 @@ class Menu
             $menu_id = (int) $db_result;
 
             if (!empty($menu_data['name']) && !empty($menu_data['lang_code'])) {
-                foreach (fn_get_translation_languages() as $menu_data['lang_code'] => $v) {
+                foreach (Languages::getAll() as $menu_data['lang_code'] => $v) {
                     self::updateDescription($menu_id, array(
                         'lang_code' => $menu_data['lang_code'],
                         'name' => $menu_data['name'],

@@ -15,7 +15,7 @@
 namespace Tygh\Shippings;
 
 use Tygh\Http;
-use Tygh\Registry;
+use Tygh\Tools\SecurityHelper;
 
 class RusSdek
 {
@@ -26,7 +26,7 @@ class RusSdek
         $xml = '<'.$name.' ';
         foreach ($data as $key => $value) {
             if (!empty($value)) {
-                $value = fn_html_escape($value);
+                $value = SecurityHelper::escapeHtml($value);
                 $xml .= $key .'="' . $value .'" ';
             }
         }
@@ -42,11 +42,12 @@ class RusSdek
 
     public static function resultXml($response)
     {
-        $result = array(
-            'error' => false,
-            'msg' => false,
-            'number' => false,
-        );
+        $result = [
+            'error'      => false,
+            'error_code' => false,
+            'msg'        => false,
+            'number'     => false,
+        ];
 
         if (!empty($response)) {
             $xml_result = simplexml_load_string($response);
@@ -60,13 +61,21 @@ class RusSdek
 
                 if (!empty($data['Msg'])) {
                     if (!empty($data['ErrorCode'])) {
+                        $result['error_code'] = $data['ErrorCode'];
                         $result['msg'] = $data['Msg'];
-                        fn_set_notification('E', __('notice'), $data['Msg']);
+                        fn_set_notification(
+                            'E',
+                            __('notice'),
+                            $data['Msg'],
+                            '',
+                            $data['ErrorCode']
+                        );
                         if ($data['ErrorCode'] == 'ERR_ORDER_NOTFIND' || $data['ErrorCode'] == 'ERR_ORDER_DUBL_EXISTS') {
                             $result['error'] = false;
                         } else {
                             $result['error'] = true;
                         }
+
                     } else {
                         $result['msg'] = $data['Msg'];
                         fn_set_notification('N', __('notice'), $data['Msg']);
@@ -121,7 +130,7 @@ class RusSdek
         if (!empty($response)) {
             $_result = json_decode(json_encode((array) @simplexml_load_string($response)), true);
 
-            if (!empty($_result['Order'])) {
+            if (!empty($_result['Order']) && !isset($_result['Order']['@attributes']['ErrorCode'])) {
                 $_result = empty($_result['Order']['@attributes']) ? $_result['Order'] : array($_result['Order']);
                 foreach ($_result as $data_order) {
                     $order = explode('_', $data_order['@attributes']['Number']);
@@ -156,6 +165,14 @@ class RusSdek
                         }
                     }
                 }
+            }
+
+            if (isset($_result['Order']['@attributes']['ErrorCode'])) {
+                fn_set_notification(
+                    'E',
+                    __('error'),
+                    __('rus_sdek.error_get_order_status', ['[error]' => $_result['Order']['@attributes']['Msg']])
+                );
             }
         }
 
@@ -294,6 +311,11 @@ class RusSdek
 
     public static function addStatusOrders($date_status)
     {
+
+        if (empty($date_status)) {
+            return false;
+        }
+
         $sdek_history = array();
         $n_status = array();
         $_data_status = db_get_array('SELECT * FROM ?:rus_sdek_status');

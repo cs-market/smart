@@ -1,4 +1,4 @@
-<div id="content_tags">
+<div class="hidden" id="content_tags">
 
 {script src="js/addons/tags/tags_autocomplete.js"}
 

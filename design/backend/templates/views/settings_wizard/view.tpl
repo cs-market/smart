@@ -22,7 +22,7 @@
                 
                 {elseif $item.type == "addon"}
                     {assign var="addon" value=$wizard_addons[$item.addon_name]}
-                    <table class="table table-addons table-wizard">
+                    <table class="table table-addons table-wizard table--relative">
                         <tr>
                             <td class="addon-icon">
                                 <div class="bg-icon">

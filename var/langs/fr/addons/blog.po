@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: French\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /release-4.8.2/addons/blog.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.4/addons/blog.po\n"
+"PO-Revision-Date: 2020-05-18 08:59\n"
 
 msgctxt "Addons::name::blog"
 msgid "Blog"
@@ -87,4 +85,8 @@ msgstr "Utilisation du &lt;!--coupe--&gt; balise (commutateur de code source à 
 msgctxt "Languages::blog_functionality_notes"
 msgid "<p>Use this page to manage your blog. This is how you should organize your blog posts:</p><ul><li>Blog is a usual post that has the <b>Root level page</b> as the Parent page.</li><li>Choose <b>Blog</b> as the Parent page for your blog posts.</li></ul>"
 msgstr "<p>Utilisez cette page pour gérer votre blog. C’est comment vous devriez organiser vos messages de blog :</p> <ul><li>Blog est un poste habituel qui a la <b>page de niveau racine</b>, comme la page parente.</li> <li>Choisir <b>Blog</b> comme la page parente pour vos messages blog.</li></ul>"
+
+msgctxt "Languages::n_posts"
+msgid "[n] post|[n] posts"
+msgstr "[n] article|[n] articles"
 

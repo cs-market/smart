@@ -3,7 +3,15 @@
  * @author Sergio Jovani <lesergi@gmail.com>
  * @version 2014-12-19
  */
-if (elFinder && elFinder.prototype && typeof(elFinder.prototype.i18) == 'object') {
+(function(root, factory) {
+	if (typeof define === 'function' && define.noamd) {
+		define(['elfinder'], factory);
+	} else if (typeof exports !== 'undefined') {
+		module.exports = factory(require('elfinder'));
+	} else {
+		factory(root.elFinder);
+	}
+}(this, function(elFinder) {
 	elFinder.prototype.i18.ca = {
 		translator : 'Sergio Jovani &lt;lesergi@gmail.com&gt;',
 		language   : 'Català',
@@ -75,7 +83,7 @@ if (elFinder && elFinder.prototype && typeof(elFinder.prototype.i18) == 'object'
 			'errArcMaxSize'        : 'Els fitxers de l\'arxiu excedeixen la mida màxima permesa.',
 			'errResize'            : 'No s\'ha pogut redimensionar "$1".',
 			'errResizeDegree' : 'Invalid rotate degree.',
-			'errResizeRotate' : 'Image dose not rotated.',
+			'errResizeRotate' : 'Unable to rotate image.',
 			'errResizeSize' : 'Invalid image size.',
 			'errResizeNoChange' : 'Image size not changed.',
 			'errUsupportType'      : 'El tipus de fitxer no està suportat.',
@@ -107,7 +115,7 @@ if (elFinder && elFinder.prototype && typeof(elFinder.prototype.i18) == 'object'
 			'cmdhome'      : 'Inici',
 			'cmdinfo'      : 'Obté informació',
 			'cmdmkdir'     : 'Nova carpeta',
-			'cmdmkfile'    : 'Nou fitxer de text',
+			'cmdmkfile'    : 'Nou fitxer',
 			'cmdopen'      : 'Obre',
 			'cmdpaste'     : 'Enganxa',
 			'cmdquicklook' : 'Previsualitza',
@@ -363,5 +371,5 @@ if (elFinder && elFinder.prototype && typeof(elFinder.prototype.i18) == 'object'
 			'kindVideoOGG'    : 'Fitxer de vídeo Ogg'
 		}
 	};
-}
+}));
 

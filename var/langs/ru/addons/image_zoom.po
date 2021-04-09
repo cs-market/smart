@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/image_zoom.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.11.5/addons/image_zoom.po\n"
+"X-Crowdin-File-ID: 3696\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::image_zoom"
 msgid "Image zoom"
@@ -24,69 +24,21 @@ msgctxt "SettingsSections::image_zoom::general"
 msgid "General"
 msgstr "Общие"
 
-msgctxt "SettingsOptions::image_zoom::cz_opacity"
-msgid "Opacity"
-msgstr "Непрозрачность"
-
 msgctxt "SettingsOptions::image_zoom::cz_animation_time"
 msgid "Animation time"
 msgstr "Длительность анимации"
-
-msgctxt "SettingsOptions::image_zoom::cz_tint_color_picker"
-msgid "Color"
-msgstr "Цвет"
 
 msgctxt "SettingsOptions::image_zoom::cz_zoom_position"
 msgid "Zoom position"
 msgstr "Позиция зума"
 
-msgctxt "SettingsOptions::image_zoom::cz_zoom_size_mode"
-msgid "Zoom size mode"
-msgstr "Режим масштабирования"
-
-msgctxt "SettingsOptions::image_zoom::cz_caption_position"
-msgid "Caption position"
-msgstr "Расположение подписи"
-
-msgctxt "SettingsOptions::image_zoom::cz_ease_time"
-msgid "Ease time"
-msgstr "Задержка между движением мыши и линзы"
-
-msgctxt "SettingsOptions::image_zoom::cz_zoom_fly_out"
-msgid "Zoom fly out"
-msgstr "Анимированный «вылет»"
-
-msgctxt "SettingsTooltips::image_zoom::cz_opacity"
-msgid "Opacity of tint 0-1. If zero, no tint will be visible."
-msgstr "Непрозрачность оттенка, 0—1. Ноль означает невидимый оттенок."
-
 msgctxt "SettingsTooltips::image_zoom::cz_animation_time"
 msgid "Duration of the animation effects in milliseconds."
 msgstr "Длительность анимационных эффектов в миллисекундах."
 
-msgctxt "SettingsTooltips::image_zoom::cz_tint_color_picker"
-msgid "Color to use for the tint effect. Example: #ffffff."
-msgstr "Цвет для эффекта оттенка. Например, #ffffff."
-
 msgctxt "SettingsTooltips::image_zoom::cz_zoom_position"
-msgid "Specifies position of zoom window. If numeric (0-15), position is relative to page image as shown by the following key (blue squares represent zoom window). If a string is supplied, value will be used as a selector to pinpoint the exact position and size of an element in the page. If the value \"inside\" is specified, the zoom image will appear inside the page image.<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-msgstr "Позиция панели масштабирования. Если задано число (0—15), то позиция установится согласно схеме ниже. Если введена строка, ее значение будет использовано как селектор элемента, к которому будет привязана панель зума. Если введено значение «inside», то значок зума будет показан поверх изображения.<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_size_mode"
-msgid "Defines the rule for sizing the zoom window and lens."
-msgstr "Правило масштабирования панели зума и линзы."
-
-msgctxt "SettingsTooltips::image_zoom::cz_caption_position"
-msgid "Position of caption, \"top\" or \"bottom\"."
-msgstr "Позиция подписи, «top» (сверху) или «bottom» (снизу)."
-
-msgctxt "SettingsTooltips::image_zoom::cz_ease_time"
-msgid "Number of milliseconds of mouse easing movement of zoom image. The bigger the number, the more easing. Zero means no easing."
-msgstr "Задержка между движением курсора мыши по изображению и соответствующим движением линзы, в миллисекундах. Ноль означает отсутствие задержки."
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_fly_out"
-msgid "Turns 'flying' zoom animation on or off."
-msgstr "Включить/выключить анимацию «вылета» линзы при наведении курсора на изображение."
+msgid "Specifies position of zoom window. The position is relative to image as shown by the following key (blue squares represent zoom window). <br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
+msgstr "Задаёт позицию окна с увеличенным изображением относительно основного изображения. На подсказке ниже синие квадраты показывают позиции.<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::0"
 msgid "Zoom position №0"
@@ -152,31 +104,11 @@ msgctxt "SettingsVariants::image_zoom::cz_zoom_position::15"
 msgid "Zoom position №15"
 msgstr "Позиция №15"
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::inside"
-msgid "Inside position"
-msgstr "Внутренняя позиция"
+msgctxt "Languages::image_zoom.rework_update_notification.title"
+msgid "Image Zoom add-on reworked"
+msgstr "Переработан модуль \"Увеличенные изображения товаров\""
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::image"
-msgid "Image"
-msgstr "Изображение"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::lens"
-msgid "Lens"
-msgstr "Линза"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::zoom"
-msgid "Zoom"
-msgstr "Зум"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::full"
-msgid "Full"
-msgstr "Полный"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::top"
-msgid "Top"
-msgstr "Верх"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::bottom"
-msgid "Bottom"
-msgstr "Низ"
+msgctxt "Languages::image_zoom.rework_update_notification.message"
+msgid "<p>We reworked the <b>Image zoom</b> add-on, because it used a third-party solution incompatible with modern versions of jQuery. As a result of the rework, some settings of the add-on were removed.</p><p>Please check how the image zoom looks on the product pages now. If you'd like to make any changes to the looks, adjust the settings of the <b>Image zoom</b> add-on.</p><p><a href=\"[image_zoom_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Check Image Zoom settings</a></p>"
+msgstr "<p>Мы переработали модуль <b>Увеличенные изображения товаров</b>, так как он зависел от стороннего решения, несовместимого с последними версиями jQuery. Из-за этого пришлось удалить несколько настроек модуля.</p><p>Проверьте, как на странице товара выглядит и работает увеличение изображения при наведении. Поменять внешний вид можно в настройках модуля <b>Увеличенные изображения товаров</b>.</p><p><a href=\"[image_zoom_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Проверить настройки модуля</a></p>"
 

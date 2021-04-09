@@ -1,26 +1,24 @@
-{if $settings.Checkout.agree_terms_conditions == "Y"}
-    <div class="ty-control-group ty-checkout__terms">
-        {hook name="checkout:terms_and_conditions"}
-        <div class="cm-field-container">
-            {strip}
-            <label for="id_accept_terms{$suffix}" class="cm-check-agreement">
-                <input type="checkbox" id="id_accept_terms{$suffix}" name="accept_terms" value="Y" class="cm-agreement checkbox" {if $iframe_mode}onclick="fn_check_agreements('{$suffix}');"{/if} />
-                {capture name="terms_link"}
-                    <a id="sw_terms_and_conditions_{$suffix}" class="cm-combination ty-dashed-link">
-                        {__("checkout_terms_n_conditions_name")}
-                    </a>
-                {/capture}
-                {__("checkout_terms_n_conditions", ["[terms_href]" => $smarty.capture.terms_link])}
-            </label>
-            {/strip}
+<div class="ty-control-group ty-checkout__terms">
+    {hook name="checkout:terms_and_conditions"}
+    <div class="cm-field-container">
+        {strip}
+        <label for="id_accept_terms{$suffix}" class="cm-check-agreement">
+            <input type="checkbox" id="id_accept_terms{$suffix}" name="accept_terms" value="Y" class="cm-agreement checkbox" {if $iframe_mode}onclick="fn_check_agreements();"{/if}/>
+            {capture name="terms_link"}
+                <a id="sw_terms_and_conditions_{$suffix}" class="cm-combination ty-dashed-link">
+                    {__("checkout_terms_n_conditions_name")}
+                </a>
+            {/capture}
+            {__("checkout_terms_n_conditions", ["[terms_href]" => $smarty.capture.terms_link])}
+        </label>
+        {/strip}
 
-            <div class="hidden" id="terms_and_conditions_{$suffix}">
-                {__("terms_and_conditions_content") nofilter}
-            </div>
+        <div class="hidden" id="terms_and_conditions_{$suffix}">
+            {__("terms_and_conditions_content") nofilter}
         </div>
-        {/hook}
     </div>
-{/if}
+    {/hook}
+</div>
 
 {hook name="checkout:terms_and_conditions_extra"}{/hook}
 
@@ -30,7 +28,7 @@
         <div class="cm-field-container">
             {strip}
             <label for="product_agreements_{$suffix}" class="cm-check-agreement ty-license-agreement__checkbox__checkbox">
-                <input type="checkbox" id="product_agreements_{$suffix}" name="agreements[]" value="Y" class="cm-agreement checkbox"  {if $iframe_mode}onclick="fn_check_agreements('{$suffix}');"{/if}/>
+                <input type="checkbox" id="product_agreements_{$suffix}" name="agreements[]" value="Y" class="cm-agreement checkbox" {if $iframe_mode}onclick="fn_check_agreements();"{/if}/>
                 <span>{__("checkout_edp_terms_n_conditions")}</span>&nbsp;
                 <a id="sw_elm_agreements_{$suffix}" class="cm-combination ty-dashed-link">{__("license_agreement")}</a>
             </label>
@@ -59,16 +57,26 @@
     }(Tygh, Tygh.$));
 
     {if $iframe_mode}
-        function fn_check_agreements(suffix) {
-            var checked = true;
+        function fn_check_agreements() {
+            var $blockingBlock = $('.ty-payment-method-iframe');
 
-            $('form[name=payments_form_' + suffix + '] input[type=checkbox].cm-agreement').each(function(index, value) {
-                if($(value).prop('checked') === false) {
-                    checked = false;
-                }
-            });
+            if ($blockingBlock.length > 0) {
+                var agreementCount = $('input[type=checkbox].cm-agreement').length,
+                    acceptedAgreementCount = $('input[type=checkbox].cm-agreement:checkbox:checked').length,
+                    checked = agreementCount === acceptedAgreementCount;
 
-            $('#payment_method_iframe_' + suffix).toggleClass('hidden', checked);
+                $blockingBlock.toggleClass('hidden', checked);
+            }
         }
+
+        $.ceEvent('on', 'ce.ajaxdone', function (elms, inline_scripts, params, data) {
+            if (data && data.html && data.html.litecheckout_step_payment) {
+                var $elm = $(data.html.litecheckout_step_payment).find('.ty-payment-method-iframe');
+
+                if ($elm.length > 0) {
+                    fn_check_agreements();
+                }
+            }
+        });
     {/if}
 </script>

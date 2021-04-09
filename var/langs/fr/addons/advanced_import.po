@@ -5,20 +5,18 @@ msgstr ""
 "Language-Team: French\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /release-4.8.2/addons/advanced_import.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.4/addons/advanced_import.po\n"
+"PO-Revision-Date: 2020-05-18 08:59\n"
 
 msgctxt "Addons::name::advanced_import"
-msgid "Advanced products import [Beta]"
-msgstr "Importer des produits avancés [Beta]"
+msgid "Advanced products import"
+msgstr "Import de produits avancés"
 
 msgctxt "Addons::description::advanced_import"
 msgid "Allows you to match the fields in the imported file with the product properties. These matchings and other import settings can also be saved as presets for later use."
-msgstr ""
+msgstr "Vous permet de faire correspondre les champs du fichier importé avec les propriétés du produit. Ces correspondances et d'autres paramètres d'importation peuvent également être enregistrés en tant que préréglages pour une utilisation ultérieure."
 
 msgctxt "Languages::advanced_import.never"
 msgid "Never"
@@ -26,7 +24,7 @@ msgstr "Jamais"
 
 msgctxt "Languages::advanced_import.last_status.X"
 msgid "&mdash;"
-msgstr ""
+msgstr "&mdash;"
 
 msgctxt "Languages::advanced_import.last_status.S"
 msgid "Success"
@@ -42,7 +40,7 @@ msgstr "Échec"
 
 msgctxt "Languages::advanced_import.user_upload"
 msgid "User upload"
-msgstr ""
+msgstr "Téléchargement de l’utilisateur"
 
 msgctxt "Languages::advanced_import.last_launch"
 msgid "Last import"
@@ -50,11 +48,11 @@ msgstr "Der des der import ;p"
 
 msgctxt "Languages::advanced_import.last_status"
 msgid "Status"
-msgstr ""
+msgstr "Statut"
 
 msgctxt "Languages::advanced_import.file"
 msgid "File"
-msgstr ""
+msgstr "Fichier"
 
 msgctxt "Languages::advanced_import.has_modifiers"
 msgid "Has modifiers"
@@ -66,47 +64,47 @@ msgstr "Produits importé"
 
 msgctxt "Languages::advanced_import.import_products_w_preset"
 msgid "Import products: [preset]"
-msgstr ""
+msgstr "Importation de produits : [preset]"
 
 msgctxt "Languages::advanced_import.import_file"
 msgid "Import file"
-msgstr ""
+msgstr "Importer fichier"
 
 msgctxt "Languages::advanced_import.fields_mapping"
 msgid "Fields mapping"
-msgstr ""
+msgstr "Mapping des champs"
 
 msgctxt "Languages::advanced_import.fields_mapping.description"
 msgid "This table contains the list of columns from the imported file. For each column you'd like to import, select a corresponding product property in [product]. Then check what sort of data will be imported from that column, and use modifiers to change that data, if necessary. Remember to save your changes."
-msgstr ""
+msgstr "Cette table contient la liste des colonnes du fichier importé. Pour chaque colonne que vous souhaitez importer, sélectionnez une propriété de produit correspondant à [product]. Vérifiez quel type de données va être importés à partir de cette colonne et utilisez les modificateurs pour modifier ces données, si nécessaire. N’oubliez pas d’enregistrer vos modifications."
 
 msgctxt "Languages::advanced_import.column_header"
 msgid "Column name in the imported file"
-msgstr ""
+msgstr "Nom de la colonne dans le fichier importé"
 
 msgctxt "Languages::advanced_import.product_property"
 msgid "Product property in [product]"
-msgstr ""
+msgstr "Propriété du produit dans [product]"
 
 msgctxt "Languages::advanced_import.first_line_import_value"
 msgid "Example of the imported value"
-msgstr ""
+msgstr "Exemple de la valeur importée"
 
 msgctxt "Languages::advanced_import.editing_preset"
 msgid "Editing preset: [preset]"
-msgstr ""
+msgstr "Édition de préréglage : [preset]"
 
 msgctxt "Languages::advanced_import.add_preset"
 msgid "Add preset"
-msgstr ""
+msgstr "Ajouter un préréglage"
 
 msgctxt "Languages::advanced_import.new_preset"
 msgid "New preset"
-msgstr ""
+msgstr "Nouveau préréglage"
 
 msgctxt "Languages::advanced_import.properties"
 msgid "Properties"
-msgstr ""
+msgstr "Propriétés"
 
 msgctxt "Languages::advanced_import.modifier"
 msgid "Modifier"
@@ -118,15 +116,15 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.example_imported_title"
 msgid "For example, here's a value in the first line of your file:"
-msgstr ""
+msgstr "Par exemple, voici une valeur dans la première ligne de votre fichier :"
 
 msgctxt "Languages::advanced_import.example_modified_title"
 msgid "And here is how this value will be imported:"
-msgstr ""
+msgstr "Et voici comment cette valeur est importée :"
 
 msgctxt "Languages::advanced_import.options"
 msgid "Options"
-msgstr ""
+msgstr "Options"
 
 msgctxt "Languages::advanced_import.images_delimiter"
 msgid "Images delimiter"
@@ -134,39 +132,43 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.images_delimiter.description"
 msgid "Delimiter between images of a product."
-msgstr ""
+msgstr "Délimiteur entre les images d’un produit."
 
 msgctxt "Languages::advanced_import_images"
 msgid "Product images"
-msgstr ""
+msgstr "Images de produits"
 
 msgctxt "Languages::advanced_import.remove_images"
 msgid "Remove additional images"
-msgstr ""
+msgstr "Supprimer les images additionnelles"
 
 msgctxt "Languages::advanced_import.remove_images"
 msgid "Remove additional images"
-msgstr ""
+msgstr "Supprimer les images additionnelles"
 
 msgctxt "Languages::advanced_import.import_fields"
 msgid "Import fields"
-msgstr ""
+msgstr "Importer des champs"
 
 msgctxt "Languages::advanced_import.advanced_products_import"
 msgid "Products"
-msgstr ""
+msgstr "Produits"
 
 msgctxt "Languages::advanced_import.coming_soon"
 msgid "... coming soon"
-msgstr ""
+msgstr "... À venir"
 
 msgctxt "Languages::advanced_import.cant_load_file_for_company"
 msgid "File can't be loaded for the specified company"
-msgstr ""
+msgstr "Fichier ne peut pas être chargé pour la société spécifiée"
+
+msgctxt "Languages::advanced_import.cant_load_file"
+msgid "File can't be loaded"
+msgstr "Impossible de charger fichier"
 
 msgctxt "Languages::advanced_import.uploading_file"
 msgid "Uploading file for the preset: [preset]"
-msgstr ""
+msgstr "Téléchargement de fichier pour le préréglage : [preset]"
 
 msgctxt "Languages::advanced_import.previewing_fields_mapping"
 msgid "Previewing fields mapping for the preset: [preset]"
@@ -174,7 +176,7 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.preset_not_found"
 msgid "Preset not found"
-msgstr ""
+msgstr "Préréglage introuvable"
 
 msgctxt "Languages::advanced_import.modifiers_list"
 msgid "Modifiers list"
@@ -202,7 +204,7 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.modifier_number_of_parameters"
 msgid "Number of parameters"
-msgstr ""
+msgstr "Nombre de paramètres"
 
 msgctxt "Languages::advanced_import.modifiers_description"
 msgid "Use these functions in the <b>Modifier</b> column to alter the values in the fields from the imported file. Enter the functions as follows: <b>function(parameter, parameter)</b>. Please note that nesting of functions isn't supported."
@@ -258,7 +260,7 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.preset_last_view"
 msgid "Preset"
-msgstr ""
+msgstr "Préréglage"
 
 msgctxt "Languages::advanced_import.show_more"
 msgid "Show more"
@@ -342,5 +344,9 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.incorrect_delimiter"
 msgid "Specified (or auto detected) delimiter seems to be incorrect. Please specify the correct delimiter manually in the additional settings on the \"File\" tab."
+msgstr ""
+
+msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
+msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
 msgstr ""
 

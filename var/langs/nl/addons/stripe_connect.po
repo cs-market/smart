@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/stripe_connect.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.11.5/addons/stripe_connect.po\n"
+"X-Crowdin-File-ID: 3658\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::stripe_connect"
 msgid "Stripe Connect payments"
@@ -22,7 +22,7 @@ msgstr ""
 
 msgctxt "SettingsSections::stripe_connect::general"
 msgid "General"
-msgstr ""
+msgstr "Algemeen"
 
 msgctxt "SettingsOptions::stripe_connect::collect_payouts"
 msgid "Commission includes"
@@ -40,8 +40,16 @@ msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
 msgstr ""
 
-msgctxt "Languages::stripe_connect.redirect_uris"
-msgid "Redirect URIs"
+msgctxt "Languages::stripe_connect.redirect_uri_admin"
+msgid "Redirect URI for administrator"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.redirect_uris.description"
+msgid "Copy and paste this address into your Stripe Connect app settings"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.redirect_uri_vendor"
+msgid "Redirect URI for vendor"
 msgstr ""
 
 msgctxt "Languages::stripe_connect.client_id"
@@ -70,11 +78,11 @@ msgstr ""
 
 msgctxt "Languages::stripe_connect.connected"
 msgid "Connected"
-msgstr ""
+msgstr "Verbonden"
 
 msgctxt "Languages::stripe_connect.not_connected"
 msgid "Not connected"
-msgstr ""
+msgstr "Niet verbonden"
 
 msgctxt "Languages::stripe_connect.account_connected"
 msgid "Your Stripe account has been successfully connected to the store"
@@ -126,5 +134,33 @@ msgstr ""
 
 msgctxt "Languages::stripe_connect.set_status_to"
 msgid "Set to:"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.charge_id"
+msgid "Charge ID"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.transfer_id"
+msgid "Transfer ID"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.payment_id"
+msgid "Payment ID"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.enable_3d_secure"
+msgid "Enable 3-D Secure"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.enable_3d_secure.description"
+msgid "<p>When 3-D Secure is <b>disabled</b>, money will go straight to the connected Stripe accounts of vendors. Commissions and payouts will be taken from vendors as <a href=\"https://stripe.com/docs/connect/direct-charges#collecting-fees\" target=\"_blank\">application fees</a>.</p><p>When 3-D Secure is <b>enabled</b>, money will first go to the marketplace owner's Stripe account. Then it will be automatically distributed between the connected Stripe accounts via transfers. Transfers require that the marketplace owner and vendors have their accounts in the same region: either all in Europe, or all in the U.S. If a vendor's account is in a different region from the marketplace owner's, the money won't be transferred to that vendor automatically.</p>"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.gift_certificate_used"
+msgid "A gift certificate was used in this order. [product] doesn't know which of the vendors should get the money, and how much. Please transfer money from this order to each vendor manually."
+msgstr ""
+
+msgctxt "Languages::stripe_connect.payment_intent_error"
+msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
 msgstr ""
 

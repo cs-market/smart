@@ -1,3 +1,7 @@
+{capture name="sidebar"}
+    {include file="views/notification_settings/components/navigation_section.tpl" active_section=$active_section}
+{/capture}
+
 {capture name="mainbox"}
 
 {assign var="r_url" value=$config.current_url|escape:url}
@@ -12,7 +16,7 @@
     <input type="hidden" name="return_url" value="{$config.current_url}">
     <div class="items-container" id="documents_list">
         {if $documents}
-            <table width="100%" class="table table-middle table-objects">
+            <table width="100%" class="table table-middle table--relative table-objects">
                 <thead>
                 <tr>
                     {if $can_update}
@@ -32,7 +36,7 @@
                     <tr class="cm-row-item">
                         {if $can_update}
                             <td class="left">
-                                <input type="checkbox" name="document_id[]" value="{$document->getId()}" class="checkbox cm-item" />
+                                <input type="checkbox" name="document_id[]" value="{$document->getId()}" class="cm-item" />
                             </td>
                         {/if}
                         <td>
@@ -41,7 +45,7 @@
                             </div>
                         </td>
                         <td>
-                            <span class="block">{$document->getType()}.{$document->getCode()}</span>
+                            <span class="block">{$document->getFullCode()}</span>
                         </td>
                         <td class="nowrap">
                             <div class="hidden-tools">

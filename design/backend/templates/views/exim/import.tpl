@@ -18,7 +18,7 @@
     <div id="import_fields_{$p_id}" class="in collapse">
         <p class="p-notice">{__("text_exim_import_notice")}</p>
         {split data=$pattern.export_fields size=5 assign="splitted_fields" simple=true size_is_horizontal=true}
-        <table class="table table-striped table-exim">
+        <table class="table table-striped table--relative table-exim">
             <tr>
             {foreach from=$splitted_fields item="fields"}
                 <td>
@@ -43,6 +43,7 @@
 
     {if $pattern.options}
     {foreach from=$pattern.options key=k item=o}
+    {if !$o.export_only}
     <div class="control-group">
         <label for="{$k}" class="control-label">
             {__($o.title)}{if $o.description}{include file="common/tooltip.tpl" tooltip=__($o.description)}{/if}:
@@ -66,6 +67,7 @@
             {/if}
         </div>
     </div>
+    {/if}
     {/foreach}
     {/if}
 

@@ -14,8 +14,7 @@
 
 namespace Tygh;
 
-use Tygh\Registry;
-use Tygh\Settings;
+use Tygh\Languages\Helper as LanguageHelper;
 
 class BackendMenu
 {
@@ -67,7 +66,7 @@ class BackendMenu
         $menu['central'] = $this->_sort($menu['central']);
         $menu = $this->_getSettingsSections($menu);
 
-        fn_preload_lang_vars($this->_lang_cache);
+        LanguageHelper::preloadLangVars($this->_lang_cache);
 
         $selected = $this->_selected;
 
@@ -110,6 +109,8 @@ class BackendMenu
      */
     private function _processItems($items, $section, $parent, $is_root = true)
     {
+        $previous_active = null;
+
         foreach ($items as $item_title => &$it) {
 
             if (empty($it['href'])) {
@@ -149,14 +150,22 @@ class BackendMenu
 
             if ($status = $this->_compareUrl($hrefs, $this->_controller, $this->_mode, !$is_root)) {
 
-                $it['active'] = true;
-                if ($status > $this->_selected_priority) {
+                if ($status >= $this->_selected_priority) {
+
+                    $it['active'] = true;
+
+                    if ($previous_active !== null) {
+                        $previous_active['active'] = false;
+                    }
+
                     $this->_selected = array(
                         'item' => empty($parent) ? $item_title : $parent,
                         'section' => $section
                     );
 
                     $this->_selected_priority = $status;
+
+                    $previous_active = &$it;
                 }
             }
 
@@ -265,10 +274,19 @@ class BackendMenu
             }
             parse_str($params_list, $params);
 
-            if ($dispatch == ($controller . '.' . $mode) && sizeof(array_intersect_assoc($this->_request, $params)) == sizeof($params)) {
-                $match = self::URL_EXACT_MATCH  + self::EXACT_COEFFICIENT - sizeof(array_diff_assoc($this->_request, $params));
-            } elseif ($match < self::URL_EXACT_MATCH && $strict == false && strpos($dispatch, $controller . '.') === 0) {
-                $match = self::URL_PARTIAL_MATCH + self::PARTIAL_COEFFICIENT - sizeof(array_diff_assoc($this->_request, $params));;
+            if ($dispatch === $controller . '.' . $mode
+                && $has_matches = $this->hasMatchingRequestParameters($this->_request, $params)
+            ) {
+                $match = self::URL_EXACT_MATCH
+                    + self::EXACT_COEFFICIENT
+                    - $this->getDifferingParametersCount($this->_request, $params);
+            } elseif ($match < self::URL_EXACT_MATCH
+                && $strict == false
+                && strpos($dispatch, $controller . '.') === 0
+            ) {
+                $match = self::URL_PARTIAL_MATCH
+                    + self::PARTIAL_COEFFICIENT
+                    - $this->getDifferingParametersCount($this->_request, $params);
             }
         }
 
@@ -277,8 +295,10 @@ class BackendMenu
 
     /**
      * Replaces placeholders with request vars
+     *
      * @param  string $href URL with placeholders
-     * @return sting  processed URL
+     *
+     * @return string  processed URL
      */
     private function _substituteVars($href)
     {
@@ -304,5 +324,63 @@ class BackendMenu
         }
 
         return true;
+    }
+
+    /**
+     * @param array $request
+     * @param array $params
+     *
+     * @return bool
+     */
+    protected function hasMatchingRequestParameters(array $request, array $params)
+    {
+        $request = $this->flattenRequest($request);
+        $params = $this->flattenRequest($params);
+
+        $matching_params = array_intersect_assoc($request, $params);
+
+        return sizeof($matching_params) === sizeof($params);
+    }
+
+    /**
+     * @param array $request
+     * @param array $params
+     *
+     * @return int
+     */
+    protected function getDifferingParametersCount(array $request, array $params)
+    {
+        $request = $this->flattenRequest($request);
+        $params = $this->flattenRequest($params);
+
+        $diff = sizeof(array_diff_assoc($request, $params));
+
+        return $diff;
+    }
+
+    /**
+     * Flattens request parameters for precise URL matching.
+     *
+     * @param array  $request
+     * @param string $prefix
+     *
+     * @return array
+     */
+    public function flattenRequest(array $request, $prefix = '')
+    {
+        $flat_request = [];
+
+        foreach ($request as $param_name => $param_value) {
+            $param_name = $prefix !== ''
+                ? $prefix . '[' . (string) $param_name . ']'
+                : $param_name;
+            if (is_array($param_value)) {
+                $flat_request = fn_array_merge($flat_request, $this->flattenRequest($param_value, $param_name), true);
+            } else {
+                $flat_request[$param_name] = $param_value;
+            }
+        }
+
+        return $flat_request;
     }
 }

@@ -31,12 +31,18 @@
         <input type="text" name="name" id="elm_name" value="{$search.name}" />
     </div>
 </div>
-<div class="sidebar-field">
-    <label for="elm_company">{__("company")}</label>
-    <div class="break">
-        <input type="text" name="company" id="elm_company" value="{$search.company}" />
+{if $auth.user_type == "UserTypes::ADMIN"|enum && $search.user_type == "UserTypes::VENDOR"|enum}
+    <div class="sidebar-field">
+    {include file="common/select_vendor.tpl"}
     </div>
-</div>
+{else}
+    <div class="sidebar-field">
+        <label for="elm_phone">{__("phone")}</label>
+        <div class="break">
+            <input type="text" name="phone" id="elm_phone" value="{$search.phone}" />
+        </div>
+    </div>
+{/if}
 <div class="sidebar-field">
     <label for="elm_email">{__("email")}</label>
     <div class="break">
@@ -67,23 +73,24 @@
                 <div class="controls">
                 <select name="tax_exempt" id="elm_tax_exempt">
                     <option value="">--</option>
-                    <option value="Y" {if $search.tax_exempt == "Y"}selected="selected"{/if}>{__("yes")}</option>
-                    <option value="N" {if $search.tax_exempt == "N"}selected="selected"{/if}>{__("no")}</option>
+                    <option value="{"YesNo::YES"|enum}" {if $search.tax_exempt == "YesNo::YES"|enum}selected="selected"{/if}>{__("yes")}</option>
+                    <option value="{"YesNo::NO"|enum}" {if $search.tax_exempt == "YesNO::NO"|enum}selected="selected"{/if}>{__("no")}</option>
                 </select>
                 </div>
             </div>
 
-            {include file="common/select_vendor.tpl"}
             {hook name="profiles:search_form"}{/hook}
     </div>
 
     <div class="group span6 form-horizontal">
+        {if $auth.user_type == "UserTypes::ADMIN"|enum && $search.user_type == "UserTypes::VENDOR"|enum}
         <div class="control-group">
             <label class="control-label" for="elm_phone">{__("phone")}</label>
             <div class="controls">
                 <input type="text" name="phone" id="elm_phone" value="{$search.phone}" />
             </div>
         </div>
+        {/if}
         <div class="control-group">
             <label class="control-label" for="elm_city">{__("city")}</label>
             <div class="controls">
@@ -102,9 +109,15 @@
             </div>
         </div>
         <div class="control-group">
+            <label class="control-label" for="elm_company">{__("company")}</label>
+            <div class="controls">
+                <input type="text" name="company" id="elm_company" value="{$search.company}" />
+            </div>
+        </div>
+        <div class="control-group">
             <label for="srch_state" class="control-label">{__("state")}</label>
             <div class="controls">
-                <select id="srch_state" class="cm-state cm-location-search hidden" name="state">
+                <select id="srch_state" class="cm-state cm-location-search hidden" name="state_code">
                     <option value="">- {__("select_state")} -</option>
                 </select>
                 <input class="cm-state cm-location-search" type="text" id="srch_state_d" name="state" maxlength="64" value="{$search.state}" disabled="disabled" />

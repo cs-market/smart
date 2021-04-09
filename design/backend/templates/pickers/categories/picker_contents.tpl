@@ -1,3 +1,11 @@
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
+{$form_id = "cat_form_{0|rand:1024}"}
+
 {if !$smarty.request.extra}
 <script type="text/javascript">
 (function(_, $) {
@@ -62,15 +70,81 @@
 
         return false;
     });
+
+    $('#{$form_id}').on('click', '.cm-click-and-close', function (e) {
+        // skip, if event path contains 'hide'-button
+        let flag = false;
+        $(e.originalEvent.path).each((i, elm) => {
+            flag = flag || $(elm).is('[data-ca-categories-hide-target]');
+        });
+        if (flag) {
+            return;
+        }
+
+        // skip, if content hidden or not loaded
+        if ($(this).hasClass('cm-click-and-close-forced')) {
+            let {
+                caTargetCombinationContainer,
+                caTargetCombinationExpander,
+                caTargetCombinationFetchUrl,
+                caTargetCombinationFetchId
+            } = $(this).data();
+
+            if (caTargetCombinationContainer) {
+                // if content is not loaded
+                if (!$(caTargetCombinationContainer).children().length) {
+                    $.ceAjax(
+                        'request',
+                        caTargetCombinationFetchUrl,
+                        { result_ids: caTargetCombinationFetchId }
+                    );
+                    return;
+                } else {
+                    // if content loaded, but container with content is hidden
+                    if (!$(caTargetCombinationContainer).is(':visible')) {
+                        return;
+                    }
+                }
+            }
+        }
+
+        // process, if got metakeys or got forced flag
+        if ((e.metaKey || e.ctrlKey) || $(this).hasClass('cm-click-and-close-forced')) {
+            let { caTargetCheckbox } = $(this).data();
+
+            if (caTargetCheckbox && !$(caTargetCheckbox).is(e.target)) {
+                let _target = $(caTargetCheckbox);
+                _target.prop('checked', !_target.prop('checked'));
+            }
+
+            setTimeout(() => $('#{$form_id} .cm-process-items.cm-dialog-closer').click(), 100);
+
+            if (caTargetCheckbox && !$(caTargetCheckbox).is(e.target)) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
 }(Tygh, Tygh.$));
 </script>
 {/if}
 
-<form action="{$smarty.request.extra|fn_url}" data-ca-result-id="{$smarty.request.data_id}" method="post" name="categories_form">
+<form id="{$form_id}" action="{$smarty.request.extra|fn_url}" data-ca-result-id="{$smarty.request.data_id}" method="post" name="categories_form">
 
 <div class="items-container multi-level">
     {if $categories_tree}
-        {include file="views/categories/components/categories_tree_simple.tpl" header=true checkbox_name=$smarty.request.checkbox_name|default:"categories_ids" parent_id=$category_id display=$smarty.request.display}
+        {include file="views/categories/components/categories_tree_simple.tpl"
+            header=true
+            checkbox_name=$smarty.request.checkbox_name|default:"categories_ids"
+            parent_id=$category_id display=$smarty.request.display
+            direction=$direction
+            radio_class="hidden"
+        }
+        
+        {if $smarty.request.display != "radio"}
+            <br />
+            <p class="text-center mobile-hide quick-select-protip">{__("tip.quick_select_and_close_category_selector")}</p>
+        {/if}
     {else}
         <p class="no-items center">
             {__("no_categories_available")}
@@ -81,12 +155,11 @@
     {/if}
 </div>
 
-<div class="buttons-container">
+<div class="buttons-container buttons-container--hidden-cancel">
     {if $smarty.request.display == "radio"}
-        {assign var="but_close_text" value=__("choose")}
+        {$but_close_text = __("choose")}
     {else}
-        {assign var="but_close_text" value=__("add_categories_and_close")}
-        {assign var="but_text" value=__("add_categories")}
+        {$but_close_text = __("add_categories")}
     {/if}
     {include file="buttons/add_close.tpl" is_js=$smarty.request.extra|fn_is_empty}
 </div>

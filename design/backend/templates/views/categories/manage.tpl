@@ -1,10 +1,28 @@
+{script src="js/tygh/backend/categories_bulk_edit.js"}
+
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 {capture name="mainbox"}
 {$hide_inputs = ""|fn_check_form_permissions}
 <form action="{""|fn_url}" method="post" name="category_tree_form" id="category_tree_form" class="{if $hide_inputs}cm-hide-inputs{/if}">
+    {hook name="categories:bulk_edit"}
+        {include file="views/categories/components/bulk_edit.tpl"}
+    {/hook}
+
     <div class="items-container">
     {if $categories_tree}
         <div class="table-wrapper">
-            {include file="views/categories/components/categories_tree.tpl" header="1" parent_id=$category_id st_result_ids="categories_stats" st_return_url=$config.current_url}
+            {include file="views/categories/components/categories_tree.tpl"
+                header="1"
+                parent_id=$category_id
+                st_result_ids="categories_stats"
+                st_return_url=$config.current_url
+                direction=$direction
+            }
         </div>
     {else}
         <p class="no-items">{__("no_items")}</p>
@@ -26,13 +44,6 @@
 {capture name="buttons"}
     {capture name="tools_list"}
         <li>{btn type="list" text=__("bulk_category_addition") href="categories.m_add"}</li>
-        {if $categories_tree}
-            {if !$hide_inputs}
-            <li class="divider"></li>
-            <li>{btn type="dialog" class="cm-process-items" text=__("edit_selected") target_id="content_select_fields_to_edit" form="category_tree_form"}</li>
-            {/if}
-            <li>{btn type="delete_selected" dispatch="dispatch[categories.m_delete]" form="category_tree_form" data=["data-ca-confirm-text" => "{__("bulk_category_deletion_side_effects")}"]}</li>
-        {/if}
     {/capture}
     {dropdown content=$smarty.capture.tools_list}
 

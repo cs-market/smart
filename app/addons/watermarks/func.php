@@ -274,14 +274,9 @@ function fn_is_watermarks_enabled($company_id = null)
     return $enabled;
 }
 
-function fn_watermarks_generate_thumbnail_post(&$relative_path, &$lazy, $source_relative_path)
+function fn_watermarks_generate_thumbnail_post(&$relative_path, &$lazy, $source_relative_path, $width = 0, $height = 0, array $image = [])
 {
     static $init_cache = false;
-
-    $image_path_info = fn_pathinfo($relative_path);
-    $image_name = $image_path_info['filename'];
-
-    $key = 'wt_data_' . fn_crc32($image_name);
 
     $condition = array('images', 'images_links');
     if (fn_allowed_for('ULTIMATE')) {
@@ -296,7 +291,16 @@ function fn_watermarks_generate_thumbnail_post(&$relative_path, &$lazy, $source_
         $init_cache = true;
     }
 
-    $image_data = Registry::get($cache_name . '.' . $key);
+    $key = '';
+    if (!empty($image)) {
+        $image_data = $image;
+    } else {
+        $image_path_info = fn_pathinfo($relative_path);
+        $image_name = $image_path_info['filename'];
+
+        $key = 'wt_data_' . fn_crc32($image_name);
+        $image_data = Registry::get($cache_name . '.' . $key);
+    }
 
     if (empty($image_data)) {
         $source_path_info = fn_pathinfo($source_relative_path);
@@ -637,27 +641,6 @@ function fn_watermark_create(
     }
 }
 
-/**
- * @deprecated
- * @since 4.3.1
- */
-function fn_create_image_from_file($path, $mime_type)
-{
-    $ext = fn_get_image_extension($mime_type);
-
-    if ($ext == 'gif') {
-        $image = imagecreatefromgif($path);
-    } elseif ($ext == 'jpg') {
-        $image = imagecreatefromjpeg($path);
-    } elseif ($ext == 'png') {
-        $image = imagecreatefrompng($path);
-    } else {
-        return false;
-    }
-
-    return $image;
-}
-
 function fn_watermarks_images_access_info()
 {
     $is_applied = false;
@@ -677,7 +660,7 @@ function fn_watermarks_images_access_info()
             $img_instr = "# Rewrite watermarks rules\n" .
                 "<IfModule mod_rewrite.c>\n" .
                 "RewriteEngine on\n" .
-                "RewriteCond %{REQUEST_URI} \/images\/(product|category|detailed|thumbnails)\/*\n" .
+                "RewriteCond %{REQUEST_URI} \/images\/+(product|category|detailed|thumbnails)\/*\n" .
                 "RewriteCond %{REQUEST_FILENAME} -f\n" .
                 "RewriteRule .(gif|jpeg|jpg|png)$ " . DIR_ROOT . fn_url('watermark.create', 'C', 'rel') . " [NC]\n" .
                 "</IfModule>\n" .
@@ -686,7 +669,7 @@ function fn_watermarks_images_access_info()
             $img_instr = "# Rewrite watermarks rules\n" .
                 "<IfModule mod_rewrite.c>\n" .
                 "RewriteEngine on\n" .
-                "RewriteCond %{REQUEST_URI} \/images\/(product|category|detailed|thumbnails)\/*\n" .
+                "RewriteCond %{REQUEST_URI} \/images\/+(product|category|detailed|thumbnails)\/*\n" .
                 "RewriteCond %{REQUEST_FILENAME} -f\n" .
                 "RewriteRule (.*)$ ./watermarked/$1 [NC]\n" .
                 "</IfModule>\n" .

@@ -8,7 +8,7 @@
 
 {if $tags}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-sort table-middle table-responsive">
+    <table width="100%" class="table table-sort table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th class="left mobile-hide" width="1%">{include file="common/check_items.tpl"}</th>

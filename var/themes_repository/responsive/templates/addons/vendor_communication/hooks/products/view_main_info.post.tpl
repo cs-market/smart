@@ -1,4 +1,4 @@
-{if "MULTIVENDOR"|fn_allowed_for && $addons.vendor_communication.show_on_product == "Y"}
+{if $addons.vendor_communication.show_on_product == "Y"}
     {if $auth.user_id}
         {include
             file="addons/vendor_communication/views/vendor_communication/components/new_thread_form.tpl"
@@ -8,8 +8,6 @@
             vendor_name=$product.company_name
         }
     {else}
-        {if $settings.Security.secure_storefront != "partial"}
-            {include file="addons/vendor_communication/views/vendor_communication/components/login_form.tpl"}
-        {/if}
+        {include file="addons/vendor_communication/views/vendor_communication/components/login_form.tpl"}
     {/if}
 {/if}

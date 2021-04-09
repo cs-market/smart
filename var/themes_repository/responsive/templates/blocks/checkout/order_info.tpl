@@ -1,5 +1,5 @@
 {if $completed_steps.step_two}
-    <div class="ty-order-info">
+    <div class="ty-order-info" id="checkout_order_info_{$block.snapping_id}">
         {assign var="profile_fields" value="I"|fn_get_profile_fields}
         
         {if $profile_fields.B}
@@ -42,6 +42,6 @@
                 {/foreach}
             </ul>
         {/if}
-    </div>
+    <!--checkout_order_info_{$block.snapping_id}--></div>
 {/if}
 {assign var="block_wrap" value="checkout_order_info_`$block.snapping_id`_wrap" scope="parent"}

@@ -25,14 +25,21 @@
                 });
                 return false;
             }
+
+            if (!$self.length || $self.data('daterangepicker')) {
+                return;
+            }
+
             moment.locale(_.tr("default_lang"), {
                 monthsShort: [_.tr("month_name_abr_1"), _.tr("month_name_abr_2"), _.tr("month_name_abr_3"), _.tr("month_name_abr_4"), _.tr("month_name_abr_5"), _.tr("month_name_abr_6"), _.tr("month_name_abr_7"), _.tr("month_name_abr_8"), _.tr("month_name_abr_9"), _.tr("month_name_abr_10"), _.tr("month_name_abr_11"), _.tr("month_name_abr_12")]
             });
             moment.locale(_.tr("default_lang"));
             var default_params = {
-                ranges: {},
-                startDate: createMoment(_.time_from),
-                endDate: createMoment(_.time_to),
+                ranges: ($self.data('caShowRanges') === undefined || $self.data('caShowRanges')) ?
+                    {} :
+                    $self.data('caShowRanges'),
+                startDate: createMoment($self.data('caTimeFrom') || _.time_from),
+                endDate: createMoment($self.data('caTimeTo') || _.time_to),
                 locale: {
                     applyLabel: _.tr("apply"),
                     cancelLabel: _.tr("cancel"),
@@ -43,7 +50,7 @@
                     monthNames: [_.tr("month_name_abr_1"), _.tr("month_name_abr_2"), _.tr("month_name_abr_3"), _.tr("month_name_abr_4"), _.tr("month_name_abr_5"), _.tr("month_name_abr_6"), _.tr("month_name_abr_7"), _.tr("month_name_abr_8"), _.tr("month_name_abr_9"), _.tr("month_name_abr_10"), _.tr("month_name_abr_11"), _.tr("month_name_abr_12")],
                     daysOfWeek: [_.tr("weekday_abr_0"), _.tr("weekday_abr_1"), _.tr("weekday_abr_2"), _.tr("weekday_abr_3"), _.tr("weekday_abr_4"), _.tr("weekday_abr_5"), _.tr("weekday_abr_6")]
                 },
-                format: _.daterangepicker.customRangeFormat
+                format: $self.data('caDateFormat') || _.daterangepicker.customRangeFormat
             };
 
             // but, if we had .admin-content and RTL enabled, place picker in this wrapper
@@ -51,11 +58,11 @@
                 default_params.parentEl = '.admin-content';
             }
 
-            if (_.daterangepicker.minDate) {
-                default_params.minDate = createMoment(_.daterangepicker.minDate);
+            if ($self.data('minDate') || _.daterangepicker.minDate) {
+                default_params.minDate = createMoment($self.data('minDate') || _.daterangepicker.minDate);
             }
-            if (_.daterangepicker.maxDate) {
-                default_params.maxDate = createMoment(_.daterangepicker.maxDate);
+            if ($self.data('maxDate') || _.daterangepicker.maxDate) {
+                default_params.maxDate = createMoment($self.data('maxDate') || _.daterangepicker.maxDate);
             }
 
             default_params['ranges'][_.tr('today')] = [moment().startOf('day'), moment().endOf('day')];
@@ -87,16 +94,16 @@
                         var selected_to = parseInt(end.valueOf() / 1000, 10);
 
 
-                        if (_.daterangepicker.usePredefinedPeriods && periods[label] != undefined) {
+                        if (($self.data('caUsePredefinedPeriods') || _.daterangepicker.usePredefinedPeriods) && periods[label] != undefined) {
                             query_params = 'time_period=' + periods[label];
                         } else {
                             query_params = 'time_from=' + selected_from + '&time_to=' + selected_to;
                         }
 
                         $('span', $el).html(
-                            start.format(_.daterangepicker.displayedFormat)
+                            start.format($self.data('caDateFormat') || _.daterangepicker.displayedFormat)
                             + ' — '
-                            + end.format(_.daterangepicker.displayedFormat)
+                            + end.format($self.data('caDateFormat') || _.daterangepicker.displayedFormat)
                         );
 
                         if ($el.data('ca-target-url') && $el.data('ca-target-id')) {
@@ -108,7 +115,7 @@
                         }
 
                         if ($el.data('caEvent')) {
-                            $.ceEvent('trigger', $el.data('caEvent'), [$el, selected_from, selected_to]);
+                            $.ceEvent('trigger', $el.data('caEvent'), [$el, selected_from, selected_to, start, end]);
                         }
                     }
                 );
@@ -125,9 +132,7 @@
         }
     };
 
-    //<![CDATA[
-    $(document).ready(function () {
-        $('.cm-date-range').ceDateRangePicker();
+    $.ceEvent('on', 'ce.commoninit', function(context) {
+        $('.cm-date-range', context).ceDateRangePicker();
     });
-//]]>
 }(Tygh, Tygh.$));

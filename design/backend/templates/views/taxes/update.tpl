@@ -63,11 +63,11 @@
 <div id="content_tax_rates">
 
 <div class="table-responsive-wrapper">
-    <table class="table table-middle table-responsive">
+    <table class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         {hook name="taxes:rates_header"}
-        <th>{__("location")}</th>
+        <th>{__("rate_area")}</th>
         <th>{__("rate_value")}</th>
         <th>{__("type")}</th>
         {/hook}
@@ -77,7 +77,7 @@
     {assign var="d_id" value=$destination.destination_id}
     <tr>
         {hook name="taxes:rates_item"}
-        <td data-th="{__("location")}">{$destination.destination}</td>
+        <td data-th="{__("rate_area")}">{$destination.destination}</td>
         <td data-th="{__("rate_value")}"><input type="hidden" name="tax_data[rates][{$d_id}][rate_id]" value="{$rates.$d_id.rate_id}" />
             <input type="text" name="tax_data[rates][{$d_id}][rate_value]" value="{$rates.$d_id.rate_value}" class="input-text" /></td>
         <td data-th="{__("type")}">

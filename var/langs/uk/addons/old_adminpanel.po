@@ -8,15 +8,19 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/old_adminpanel.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/old_adminpanel.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"PO-Revision-Date: 2019-02-01 06:13\n"
 
 msgctxt "Addons::name::old_adminpanel"
 msgid "Old Admin Panel [Deprecated]"
-msgstr ""
+msgstr "Стара панель адміністратора [Deprecated]"
 
 msgctxt "Addons::description::old_adminpanel"
 msgid "We left the old admin panel for backward compatibility. Turn on this module if you need an old admin panel. Or turn it off to use Responsive Admin Panel."
-msgstr ""
+msgstr "Щоб зберегти зворотну сумісність, ми залишили стару панель адміністратора у вигляді модуля. Якщо модуль включити, то панель адміністратора стане неадаптивною. Якщо ж модуль вимкнути, то панель адміністратора знову стане адаптивною."
+
+msgctxt "Languages::old_adminpanel.deprecated_addon_notice"
+msgid "The <b>Old Admin Panel</b> add-on is deprecated. Starting with version 4.9.1, we won't maintain this add-on: the old admin panel won't receive any new functionality or bug fixes. In version 4.10.1 we will remove the old admin panel entirely."
+msgstr "Модуль <b>Стара панель адміністратора</b> тепер не подтримується. Починаючи з версії 4.9.1, ми не будемо додавати туди нові функції і виправляти помилки. У версії 4.10.1 ми повністю видалимо стару панель адміністратора."
 

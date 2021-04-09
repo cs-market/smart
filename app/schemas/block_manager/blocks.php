@@ -12,11 +12,55 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
 use Tygh\Enum\ProductFeatures;
+use Tygh\Enum\ProfileFieldSections;
+use Tygh\Registry;
 
 require_once Registry::get('config.dir.schemas') . 'block_manager/blocks.functions.php';
 
+/**
+ * TODO: feel free to modify the description below any time you found new information about available parameters
+ */
+
+/**
+ * Describes a way to describe blocks
+ *
+ * Structure:
+ *
+ * 'block type' => array(
+ *     'hide_on_locations' => array('product_tabs', 'companies.view'), // array of locations that corresponds to $location['dispatch'] parameter, on which the block will be hidden on blocks selection page (block_manager.block_selection)
+ *     'show_on_locations' => array('product_tabs', 'companies.view'), // array of locations that corresponds to $location['dispatch'] parameter, on which the block can legally be shown (it will be available on the section page + prevented from displaying, if added to wrong location)
+ * )
+ * 'templates' => 'blocks/lite_checkout/customer_address.tpl',                      // template that will be used to render the block
+ * 'content' => [
+ *     'items' => [
+ *         'type'           => 'enum',
+ *         'object'         => 'profile_fields',
+ *         'items_function' => 'fn_blocks_get_lite_checkout_profile_fields',
+ *         'remove_indent'  => true,
+ *         'hide_label'     => true,
+ *         'fillings' => [
+ *             'manually' => [                                                      // manual selection of block content trough picker
+ *                 'picker'        => 'pickers/profile_fields/picker.tpl',          // picker template that will be used to select objects
+ *                 'picker_params' => [                                             // parameters that will be available inside picker template
+ *                     'section' => ProfileFieldSections::SHIPPING_ADDRESS,         // each one as separate variable e.g. {$section}
+ *                     'exclude' => ['s_country', 's_city', 's_state'],
+ *                 ],
+ *                 'before_save_handlers'    => [                                    // before save block routines
+ *                     'handler_name' => 'handler_function_name',                   // callback that will be called after block saved e.g. callback($block_data)
+ *                     'one_more_handler_name' => 'one_more_handler_function_name',
+ *                 ],
+ *                 'after_save_handlers'    => [                                    // after save block routines
+ *                     'handler_name' => 'handler_function_name',                   // callback that will be called after block saved e.g. callback($block_data)
+ *                     'one_more_handler_name' => 'one_more_handler_function_name',
+ *                 ],
+ *             ],
+ *         ],
+ *     ],
+ * ],
+ * 'brief_info_function' => 'fn_block_get_block_with_items_info' //callback that will be called for getting short info about block (like: content, image...) it will be used on block list
+ *
+ */
 $schema = array(
     'menu' => array(
         'templates' => 'blocks/menu',
@@ -36,7 +80,8 @@ $schema = array(
         'cache' => array(
             'update_handlers' => array('menus', 'menus_descriptions', 'static_data'),
             'request_handlers' => array('*')
-        )
+        ),
+        'brief_info_function' => 'fn_block_get_menu_info'
     ),
     'my_account' => array(
         'templates' => array(
@@ -59,8 +104,9 @@ $schema = array(
         'content' => array(
             'brands' => array(
                 'type' => 'function',
-                'function' => array('fn_get_all_brands'),
-            )
+                /** @see \fn_blocks_get_brands() */
+                'function' => array('fn_blocks_get_brands'),
+            ),
         ),
         'cache' => array(
             'update_handlers' => array(
@@ -111,7 +157,6 @@ $schema = array(
         'wrappers' => 'blocks/wrappers',
         'cache_overrides_by_dispatch' => array(
             'categories.view' => array(
-                'ttl' => SECONDS_IN_HOUR,
                 'request_handlers' => array('category_id'),
                 'disable_cache_when' => array(
                     'request_handlers' => array('price_to', 'price_from', 'features_hash', 'subcats'),
@@ -122,7 +167,6 @@ $schema = array(
                 ),
             ),
             'products.view' => array(
-                'ttl' => SECONDS_IN_HOUR,
                 'request_handlers' => array('product_id'),
                 'session_handlers' => array(
                     'last_view.lv_products.view_results'
@@ -136,7 +180,6 @@ $schema = array(
                 ),
             ),
             'pages.view' => array(
-                'ttl' => SECONDS_IN_HOUR,
                 'request_handlers' => array('page_id'),
                 'update_handlers' => array(
                     'pages',
@@ -149,6 +192,7 @@ $schema = array(
         'templates' => 'blocks/static_templates',
         'wrappers' => 'blocks/wrappers',
         'cache' => false,
+        'brief_info_function' => 'fn_block_get_template_info'
     ),
     'main' => array(
         'hide_on_locations' => array(
@@ -158,7 +202,6 @@ $schema = array(
         'wrappers' => 'blocks/wrappers',
         'cache_overrides_by_dispatch' => array(
             'categories.view' => array(
-                'ttl' => SECONDS_IN_HOUR,
                 'request_handlers' => array('category_id', 'sort_by', 'sort_order', 'page'),
                 'session_handlers' => array('items_per_page', 'sort_by', 'sort_order'),
                 'cookie_handlers' => array('%ALL%'),
@@ -199,7 +242,6 @@ $schema = array(
                 )
             ),
             'products.view' => array(
-                'ttl' => SECONDS_IN_HOUR,
                 'request_handlers' => array('product_id', 'selected_section', 'combination'),
                 'update_handlers' => array(
                     'products_categories',
@@ -311,6 +353,7 @@ $schema = array(
                                 'cid' => '%CATEGORY_ID'
                             )
                         ),
+                        'cache_ttl' => SECONDS_IN_DAY
                     ),
                 ),
             ),
@@ -329,24 +372,26 @@ $schema = array(
                 'product_descriptions',
                 'product_prices',
                 'products_categories',
-                'product_popularity',
                 'product_options',
                 'product_options_descriptions',
                 'product_option_variants',
                 'product_option_variants_descriptions',
                 'product_global_option_links',
+                'storefronts_companies',
             ),
             'request_handlers' => array('current_category_id' => '%CATEGORY_ID%'),
             'cookie_handlers' => array('%ALL%'),
             'callable_handlers' => array(
-                'currency' => array('fn_get_secondary_currency')
+                'currency' => array('fn_get_secondary_currency'),
+                'storefront' => ['fn_blocks_get_current_storefront_id'],
             ),
             'disable_cache_when' => array(
                 'callable_handlers' => array(
                     array('fn_block_products_disable_cache', array('$block_data'))
                 ),
             )
-        )
+        ),
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
     ),
     'categories' => array(
         'content' => array(
@@ -395,40 +440,6 @@ $schema = array(
                             'default_value' => 3
                         )
                     ),
-                    /*
-                    * @deprecated deprecated since version 4.3.4
-                    'dynamic_tree_cat' => array(
-                        'params' => array(
-                            'visible' => true,
-                            'plain' => true,
-                            'request' => array(
-                                'current_category_id' => '%CATEGORY_ID%',
-                            ),
-                            'session' => array(
-                                'product_category_id' => '%CURRENT_CATEGORY_ID%'
-                            )
-                        ),
-                        'settings' => array(
-                            'parent_category_id' => array(
-                                'type' => 'picker',
-                                'default_value' => '0',
-                                'picker' => 'pickers/categories/picker.tpl',
-                                'picker_params' => array(
-                                    'multiple' => false,
-                                    'use_keys' => 'N',
-                                    'default_name' => __('root_level'),
-                                ),
-                            ),
-                            'sort_by' => array(
-                                'type' => 'selectbox',
-                                'values' => array(
-                                    'position' => 'position',
-                                    'name' => 'name',
-                                ),
-                                'default_value' => 'position'
-                            ),
-                        ),
-                    ),*/
                     'full_tree_cat' => array(
                         'params' => array(
                             'plain' => true
@@ -485,6 +496,7 @@ $schema = array(
             'session_handlers' => array('%CURRENT_CATEGORY_ID%'),
             'request_handlers' => array('%CATEGORY_ID%')
         ),
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
     ),
     'pages' => array(
         'content' => array(
@@ -573,6 +585,7 @@ $schema = array(
             'session_handlers' => array('%CURRENT_CATEGORY_ID%'),
             'request_handlers' => array('%PAGE_ID%')
         ),
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
     ),
     'payment_methods' => array(
         'content' => array(
@@ -634,7 +647,7 @@ $schema = array(
         'content' => array(
             'languages' => array(
                 'type' => 'function',
-                'function' => array('fn_get_languages', false, array('area' => 'C')),
+                'function' => array('fn_blocks_get_languages'),
             ),
         ),
         'settings' => array(
@@ -682,7 +695,10 @@ $schema = array(
                                 'pshort' => '%PSHORT%',
                                 'pfull' => '%PFULL%',
                                 'pname' => '%PNAME%',
-                                'pkeywords' => '%PKEYWORDS%'
+                                'pcode_from_q' => '%PCODE_FROM_Q%',
+                                'pkeywords' => '%PKEYWORDS%',
+                                'pid' => '%PID%',
+                                'order_ids' => '%ORDER_IDS%',
                             ),
                             'process_empty_items' => true
                         ),
@@ -720,8 +736,8 @@ $schema = array(
                 'currency' => array('fn_get_secondary_currency')
             )
         ),
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
     ),
-
     'product_filters_home' => array(
         'content' => array(
             'items' => array(
@@ -764,8 +780,147 @@ $schema = array(
             'callable_handlers' => array(
                 'currency' => array('fn_get_secondary_currency')
             )
-        )
-    )
+        ),
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
+    ),
+    'lite_checkout_location' => [
+        'show_on_locations' => ['checkout'],
+        'templates'         => 'blocks/lite_checkout/location.tpl',
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+        'content'           => [
+            'items' => [
+                'type'           => 'enum',
+                'object'         => 'profile_fields',
+                'items_function' => 'fn_blocks_get_lite_checkout_profile_fields',
+                'remove_indent'  => true,
+                'hide_label'     => true,
+                'fillings'       => [
+                    'manually' => [
+                        'picker'              => 'pickers/profile_fields/picker.tpl',
+                        'picker_params'       => [
+                            'sortable'              => true,
+                            'adjust_requireability' => true,
+                            'section'               => ProfileFieldSections::SHIPPING_ADDRESS,
+                        ],
+                        'after_save_handlers' => [
+                            'checkout_visibility' => 'fn_blocks_update_customer_location_profile_fields_visibility',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
+    ],
+    'lite_checkout_shipping_methods' => [
+        'show_on_locations' => ['checkout'],
+        'templates'         => 'blocks/lite_checkout/shipping_methods.tpl',
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+    ],
+    'lite_checkout_customer_sign_in'     => [
+        'show_on_locations' => ['checkout'],
+        'templates'         => 'blocks/lite_checkout/customer_sign_in.tpl',
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+    ],
+    'lite_checkout_customer_address'     => [
+        'show_on_locations' => ['checkout'],
+        'templates'         => 'blocks/lite_checkout/customer_address.tpl',
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+        'content'           => [
+            'items' => [
+                'type'           => 'enum',
+                'object'         => 'profile_fields',
+                'items_function' => 'fn_blocks_get_lite_checkout_profile_fields',
+                'remove_indent'  => true,
+                'hide_label'     => true,
+                'fillings'       => [
+                    'manually' => [
+                        'picker'        => 'pickers/profile_fields/picker.tpl',
+                        'picker_params' => [
+                            'sortable'      => true,
+                            'section'       => ProfileFieldSections::SHIPPING_ADDRESS,
+                            'exclude_names' => ['s_country', 's_city', 's_state'],
+                        ],
+                        'after_save_handlers' => [
+                            'checkout_visibility' => 'fn_blocks_update_shipping_address_profile_fields_visibility',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
+    ],
+    'lite_checkout_customer_information' => [
+        'show_on_locations' => ['checkout'],
+        'templates'         => 'blocks/lite_checkout/customer_information.tpl',
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+        'content'           => [
+            'items' => [
+                'type'           => 'enum',
+                'object'         => 'profile_fields',
+                'items_function' => 'fn_blocks_get_lite_checkout_profile_fields',
+                'remove_indent'  => true,
+                'hide_label'     => true,
+                'fillings'       => [
+                    'manually' => [
+                        'picker'        => 'pickers/profile_fields/picker.tpl',
+                        'picker_params' => [
+                            'sortable' => true,
+                            'section'  => ProfileFieldSections::CONTACT_INFORMATION,
+                        ],
+                        'before_save_handlers' => [
+                            'checkout_required_fields' => 'fn_blocks_update_contact_information_check_required_fields',
+                        ],
+                        'after_save_handlers' => [
+                            'checkout_visibility' => 'fn_blocks_update_contact_information_profile_fields_visibility',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
+    ],
+    'lite_checkout_customer_billing' => [
+        'show_on_locations' => ['checkout'],
+        'templates'         => 'blocks/lite_checkout/customer_billing.tpl',
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+        'content'           => [
+            'items' => [
+                'type'           => 'enum',
+                'object'         => 'profile_fields',
+                'items_function' => 'fn_blocks_get_lite_checkout_profile_fields',
+                'remove_indent'  => true,
+                'hide_label'     => true,
+                'fillings'       => [
+                    'manually' => [
+                        'picker'        => 'pickers/profile_fields/picker.tpl',
+                        'picker_params' => [
+                            'sortable' => true,
+                            'section'  => ProfileFieldSections::BILLING_ADDRESS,
+                        ],
+                        'after_save_handlers' => [
+                            'checkout_visibility' => 'fn_blocks_update_billing_address_profile_fields_visibility',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
+    ],
+    'lite_checkout_payment_methods'      => [
+        'show_on_locations' => ['checkout'],
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+        'templates'         => 'blocks/lite_checkout/payment_methods.tpl',
+    ],
+    'lite_checkout_customer_notes'       => [
+        'show_on_locations' => ['checkout'],
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+        'templates'         => 'blocks/lite_checkout/customer_notes.tpl',
+    ],
+    'lite_checkout_terms_and_conditions' => [
+        'show_on_locations' => ['checkout'],
+        'wrappers'          => 'blocks/lite_checkout/wrappers',
+        'templates'         => 'blocks/lite_checkout/terms_and_conditions.tpl',
+    ],
 );
 
 if (fn_allowed_for('MULTIVENDOR')) {
@@ -785,7 +940,6 @@ if (fn_allowed_for('MULTIVENDOR')) {
 
     // Main block at "companies.products" page
     $schema['main']['cache_overrides_by_dispatch']['companies.products'] = array(
-        'ttl' => SECONDS_IN_HOUR,
         'request_handlers' => array('company_id', 'category_id', 'sort_by', 'sort_order', 'page'),
         'session_handlers' => array('items_per_page'),
         'cookie_handlers' => array('%ALL%'),
@@ -852,9 +1006,13 @@ if (fn_allowed_for('MULTIVENDOR')) {
         ),
         'templates' => 'blocks/vendor_list_templates',
         'wrappers' => 'blocks/wrappers',
-        'cache' => array(
-            'update_handlers' => array('companies', 'company_descriptions', 'products'),
-        ),
+        'cache' => [
+            'update_handlers'   => ['companies', 'company_descriptions', 'products', 'storefronts_companies'],
+            'callable_handlers' => [
+                'storefront' => ['fn_blocks_get_current_storefront_id'],
+            ],
+        ],
+        'brief_info_function' => 'fn_block_get_vendors_info'
     );
 
     $schema['pages']['content']['items']['fillings']['vendor_pages'] = array(
@@ -881,7 +1039,7 @@ if (fn_allowed_for('MULTIVENDOR')) {
         'cache' => array(
             'update_handlers' => array('companies', 'company_descriptions', 'logos', 'images_links', 'images'),
             'request_handlers' => array('company_id')
-        )
+        ),
     );
 
     $schema['vendor_logo'] = array(
@@ -898,7 +1056,7 @@ if (fn_allowed_for('MULTIVENDOR')) {
         'cache' => array(
             'update_handlers' => array('companies', 'company_descriptions', 'logos', 'images_links', 'images'),
             'request_handlers' => array('company_id')
-        )
+        ),
     );
 
     $schema['vendor_categories'] = array(
@@ -954,41 +1112,6 @@ if (fn_allowed_for('MULTIVENDOR')) {
                             'default_value' => 3
                         )
                     ),
-                    /*
-                    * @deprecated deprecated since version 4.3.4
-                    'dynamic_tree_cat' => array(
-                        'params' => array(
-                            'visible' => true,
-                            'plain' => true,
-                            'request' => array(
-                                'current_category_id' => '%CATEGORY_ID%',
-                                'company_ids' => '%COMPANY_ID%',
-                            ),
-                            'session' => array(
-                                'product_category_id' => '%CURRENT_CATEGORY_ID%'
-                            )
-                        ),
-                        'settings' => array(
-                            'parent_category_id' => array(
-                                'type' => 'picker',
-                                'default_value' => '0',
-                                'picker' => 'pickers/categories/picker.tpl',
-                                'picker_params' => array(
-                                    'multiple' => false,
-                                    'use_keys' => 'N',
-                                    'default_name' => __('root_level'),
-                                ),
-                            ),
-                            'sort_by' => array(
-                                'type' => 'selectbox',
-                                'values' => array(
-                                    'position' => 'position',
-                                    'name' => 'name',
-                                ),
-                                'default_value' => 'position'
-                            ),
-                        ),
-                    ),*/
                     'full_tree_cat' => array(
                         'params' => array(
                             'plain' => true,
@@ -1040,7 +1163,7 @@ if (fn_allowed_for('MULTIVENDOR')) {
                         ),
                     ),
                 ),
-            )
+            ),
         ),
         'templates' =>  'blocks/categories',
         'wrappers' => 'blocks/wrappers',
@@ -1049,6 +1172,7 @@ if (fn_allowed_for('MULTIVENDOR')) {
             'session_handlers' => array('current_category_id'),
             'request_handlers' => array('category_id', 'company_id'),
         ),
+        'brief_info_function' => 'fn_block_get_block_with_items_info'
     );
 
     $schema['vendor_search'] = array(
@@ -1063,10 +1187,17 @@ if (fn_allowed_for('MULTIVENDOR')) {
     $product_filters_cache['request_handlers'][] = 'company_id';
     $schema['product_filters']['cache_overrides_by_dispatch']['companies.products'] = $product_filters_cache;
 
-    $schema['main']['cache_overrides_by_dispatch']['categories.view']['update_handlers'][] = 'companies';
-    $schema['products']['cache']['update_handlers'][] = 'companies';
-    $schema['product_filters']['cache']['update_handlers'][] = 'companies';
-    $schema['product_filters_home']['cache']['update_handlers'][] = 'companies';
+    $schema['main']['cache_overrides_by_dispatch']['categories.view']['update_handlers'][]
+        = $schema['products']['cache']['update_handlers'][]
+        = $schema['product_filters']['cache']['update_handlers'][]
+        = $schema['product_filters_home']['cache']['update_handlers'][]
+        = 'companies';
+
+    $schema['main']['cache_overrides_by_dispatch']['categories.view']['update_handlers'][]
+        = $schema['products']['cache']['update_handlers'][]
+        = $schema['product_filters']['cache']['update_handlers'][]
+        = $schema['product_filters_home']['cache']['update_handlers'][]
+        = 'storefronts_companies';
 }
 
 if (fn_allowed_for('ULTIMATE')) {

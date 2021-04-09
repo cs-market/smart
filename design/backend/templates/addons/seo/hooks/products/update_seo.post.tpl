@@ -1,5 +1,5 @@
 {if $view_uri && $runtime.company_id && "ULTIMATE"|fn_allowed_for || "MULTIVENDOR"|fn_allowed_for}
-{$protocol = ($settings.Security.secure_storefront == "full") ? "https" : "http"}
+{$protocol = ($settings.Security.secure_storefront === "YesNo::YES"|enum) ? "https" : "http"}
 {include file="common/subheader.tpl" title=__("seo.rich_snippets") target="#acc_addon_seo_richsnippets" meta="mobile-hidden"}
 <div id="acc_addon_seo_richsnippets" class="collapsed in mobile-hidden">
 

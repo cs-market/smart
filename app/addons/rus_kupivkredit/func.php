@@ -38,9 +38,19 @@ function fn_settings_actions_addons_rus_kupivkredit($new_status, $old_status, $o
 function fn_rus_kupivkredit_pre_add_to_cart(&$product_data, &$cart, &$auth, &$update)
 {
     if (Registry::ifGet('addons.rus_kupivkredit.status', 'D') == 'A' && Registry::get('runtime.action') == 'kvk_activate') {
-        $payment_methods = fn_get_payment_methods($auth);
+        $params = [
+            'lang_code' => CART_LANGUAGE,
+        ];
+
+        if (AREA == 'C') {
+            $params['status'] = 'A';
+            $params['usergroup_ids'] = $auth['usergroup_ids'];
+        }
+
+        $payment_methods = fn_get_payments($params);
+
         foreach ($payment_methods as $p => $data) {
-            if (!(empty($data['processor'])) && stristr($data['processor'], 'Kupivkredit')) {
+            if (!(empty($data['processor'])) && stristr($data['processor'], 'Тинькофф: Кредитование покупателей (КупиВкредит)')) {
                 $cart['payment_id'] = $data['payment_id'];
             }
         }
@@ -52,13 +62,30 @@ function fn_rus_kupivkredit_get_payments($params, &$fields, $join, $order, $cond
     $fields[] = '?:payment_processors.processor AS processor';
 }
 
+/**
+ * The "get_payment_processors_post" hook handler.
+ *
+ * Actions performed:
+ *     - Adds specific 'russian' attribute to some payment processors for categorization.
+ *
+ * @see \fn_get_payment_processors()
+ */
+function fn_rus_kupivkredit_get_payment_processors_post($lang_code, &$processors)
+{
+    foreach ($processors as &$processor) {
+        if ($processor['addon'] === 'rus_kupivkredit') {
+            $processor['russian'] = true;
+        }
+    }
+}
+
 function fn_rus_kupivkredit_install_payment()
 {
     $processor_id = fn_rus_kupivkredit_get_processor_id();
 
     if (empty($processor_id)) {
         $payment_data = array(
-            'processor' => 'Kupivkredit',
+            'processor' => 'Тинькофф: Кредитование покупателей (КупиВкредит)',
             'processor_script' => 'kupivkredit.php',
             'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
             'admin_template' => 'kupivkredit.tpl',

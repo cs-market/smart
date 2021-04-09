@@ -17,24 +17,31 @@ namespace Tygh\Api\Entities;
 use Tygh\Api\AEntity;
 use Tygh\Api\Response;
 use Tygh\Registry;
+use Tygh\Tygh;
 
 class Orders extends AEntity
 {
+    /** @var string[] Request parameters that will not trigger full order recalculation when updating an order */
+    protected $status_update_parameters = [
+        'status',
+        'notify_user',
+        'notify_department',
+        'notify_vendor',
+    ];
+
+
     public function index($id = 0, $params = array())
     {
         if (!empty($id)) {
             $status = Response::STATUS_NOT_FOUND;
 
-            $data = fn_get_order_info($id, false, false);
+            $data = $this->getOrderData($id);
 
             if ($data) {
                 // check if order is owned by authenticated user
                 if (!empty($this->auth['is_token_auth']) && $data['user_id'] != $this->auth['user_id']) {
                     $data = array();
                 } else {
-                    //The processor_params removed by security reason.
-                    unset($data['payment_method']['processor_params']);
-
                     $status = Response::STATUS_OK;
                 }
             }
@@ -47,6 +54,13 @@ class Orders extends AEntity
             }
 
             list($data, $params) =  fn_get_orders($params, $items_per_page);
+
+            if ($this->safeGet($params, 'get_orders_data', false)) {
+                foreach ($data as &$order_data) {
+                    $order_data = $this->getOrderData($order_data['order_id']);
+                }
+            }
+
             $data = array(
                 'orders' => $data,
                 'params' => $params,
@@ -90,7 +104,7 @@ class Orders extends AEntity
         }
 
         if (!empty($params['user_id']) && is_numeric($params['user_id'])) {
-            $cart['user_data'] = fn_get_user_info($params['user_id'], isset($params['profile_id']), $params['profile_id']);
+            $cart['user_data'] = fn_get_user_info($params['user_id']);
             if (empty($cart['user_data'])) {
                 $status = Response::STATUS_BAD_REQUEST;
                 $data['message'] = __('object_not_found', array('[object]' => __('user')));
@@ -168,7 +182,7 @@ class Orders extends AEntity
 
             if ($coupon_codes) {
                 $do_recalc = false;
-                foreach($coupon_codes as $code) {
+                foreach ($coupon_codes as $code) {
                     if ($do_recalc) {
                         fn_calculate_cart_content($cart, $customer_auth, 'S', false, 'S', true);
                     }
@@ -182,35 +196,66 @@ class Orders extends AEntity
 
             if (empty($cart['shipping_failed']) || empty($shipping_ids)) {
                 fn_update_payment_surcharge($cart, $customer_auth);
-                $cart = $this->mergeOrderData($cart, $params); // backward compatibility
+                // FIXME: Backward compatibility
+                $cart = $this->mergeOrderData($cart, $params);
+            } else {
+                $status = Response::STATUS_FORBIDDEN;
+                $data['message'] = __('api_no_shipping_methods_available');
+                $valid_params = false;
+            }
+        }
 
-                list($order_id, ) = fn_place_order(
-                    $cart,
-                    $customer_auth,
-                    'save',
-                    empty($this->auth['is_token_auth']) ? $this->auth['user_id'] : null
+        if ($valid_params &&
+            !fn_allow_place_order($cart, $this->auth)
+        ) {
+            $status = Response::STATUS_FORBIDDEN;
+            $valid_params = false;
+
+            if (!empty($cart['amount_failed'])) {
+                /** @var \Tygh\Tools\Formatter $formatter */
+                $formatter = Tygh::$app['formatter'];
+                $min_amount = $formatter->asPrice(
+                    $cart['min_order_amount'],
+                    $this->safeGet($params, 'currency', CART_PRIMARY_CURRENCY)
                 );
 
-                if (!empty($order_id)) {
-                    $status = Response::STATUS_CREATED;
-                    $data = array(
-                        'order_id' => $order_id,
-                    );
-                    if (fn_allowed_for('MULTIVENDOR')) {
-                        $data['suborder_ids'] = array_map('intval', db_get_fields(
-                            'SELECT order_id'
-                            . ' FROM ?:orders'
-                            . ' WHERE parent_order_id = ?i',
-                            $order_id
-                        ));
+                $data['message'] = __('checkout.min_cart_subtotal_required', [
+                    '[amount]' => $min_amount,
+                ]);
+            }
+        }
+
+        if ($valid_params) {
+            $order_placement_action = $this->safeGet($params, 'action', 'save');
+
+            list($order_id, ) = fn_place_order(
+                $cart,
+                $customer_auth,
+                $order_placement_action,
+                empty($this->auth['is_token_auth']) ? $this->auth['user_id'] : null
+            );
+
+            if (!empty($order_id)) {
+                $status = Response::STATUS_CREATED;
+                $data = [
+                    'order_id'   => $order_id,
+                    'order_data' => $this->getOrderData($order_id)
+                ];
+                if (fn_allowed_for('MULTIVENDOR')) {
+                    $data['suborder_ids'] = array_map('intval', db_get_fields(
+                        'SELECT order_id'
+                        . ' FROM ?:orders'
+                        . ' WHERE parent_order_id = ?i',
+                        $order_id
+                    ));
+
+                    $data['suborders_data'] = [];
+                    foreach ($data['suborder_ids'] as $suborder_id) {
+                        $data['suborders_data'][] = $this->getOrderData($suborder_id);
                     }
-
-                } else {
-                    $data['message'] = __('api_order_couldnt_be_created');
                 }
-
             } else {
-                $data['message'] = __('api_no_shipping_methods_available');
+                $data['message'] = __('api_order_couldnt_be_created');
             }
         }
 
@@ -234,6 +279,20 @@ class Orders extends AEntity
         }
 
         if ($valid_params) {
+
+            // FIXME: Dirty hack to prevent full order recalculation when simply updating its status
+            if ($this->isStatusUpdateRequest($params)
+                && fn_check_permissions('orders', 'update_status', 'admin')
+            ) {
+                fn_change_order_status($id, $params['status'], '', fn_get_notification_rules($params, false));
+
+                return [
+                    'status' => Response::STATUS_OK,
+                    'data'   => [
+                        'order_id' => $id,
+                    ],
+                ];
+            }
 
             fn_clear_cart($cart, true);
             $customer_auth = fn_fill_auth(array(), array(), false, 'C');
@@ -425,5 +484,45 @@ class Orders extends AEntity
     protected function checkUserCompanyRelation($company_id)
     {
         return fn_allowed_for('MULTIVENDOR') || !$this->getCompanyId() || $company_id == $this->getCompanyId();
+    }
+
+    /**
+     * Checks if an API request will lead to order status update only.
+     *
+     * @param array $params
+     *
+     * @return bool
+     */
+    protected function isStatusUpdateRequest(array $params)
+    {
+        $is_status_param_present = isset($params['status']);
+        $are_update_params_present = false;
+
+        foreach ($params as $param_name => $value) {
+            if (!in_array($param_name, $this->status_update_parameters)) {
+                $are_update_params_present = true;
+                break;
+            }
+        }
+
+        return $is_status_param_present
+            && !$are_update_params_present;
+    }
+
+    /**
+     * Gets order data
+     *
+     * @param int $order_id Order identifier
+     *
+     * @return array
+     */
+    protected function getOrderData($order_id)
+    {
+        $order_data = fn_get_order_info($order_id, false, false);
+
+        //The processor_params removed by security reason.
+        unset($order_data['payment_method']['processor_params']);
+
+        return $order_data;
     }
 }

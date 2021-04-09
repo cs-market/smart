@@ -1,4 +1,9 @@
-{if !$hide_form && $addons.call_requests.buy_now_with_one_click == "Y" && ($auth.user_id || $settings.General.allow_anonymous_shopping == "allow_shopping")}
+{if !$hide_form 
+    && $addons.call_requests.buy_now_with_one_click == "Y" 
+    && ($auth.user_id 
+        || $settings.Checkout.allow_anonymous_shopping == "allow_shopping"
+    ) && $show_buy_now|default:true
+}
 
     {include file="common/popupbox.tpl"
         href="call_requests.request?product_id={$product.product_id}&obj_prefix={$obj_prefix}"

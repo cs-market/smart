@@ -1,6 +1,6 @@
 
 <div class="control-group setting-wide disable-overlay-wrap" id="select_default_category">
-    {if !$runtime.company_id && !$runtime.simple_ultimate}
+    {if fn_allowed_for("ULTIMATE") && !$runtime.company_id && !$runtime.simple_ultimate}
     <div class="disable-overlay" id="category_logo_disable_overlay"></div>
     {/if}
     <div class="control-group">

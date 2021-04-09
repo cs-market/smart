@@ -12,10 +12,12 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Navigation\LastView;
-use Tygh\Settings;
 use Tygh\Pdf;
+use Tygh\Registry;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -62,25 +64,42 @@ function fn_update_supplier($supplier_id, $supplier_data)
 /**
  * Update supplier shippings links
  *
- * @param int $supplier_id
- * @param array $shippings
+ * @param int   $supplier_id Supplier ID
+ * @param int[] $shippings   Shipping method IDs
+ *
  * @return bool Always true
  */
 function fn_update_supplier_shippings($supplier_id, $shippings)
 {
-    db_query('DELETE FROM ?:supplier_links WHERE object_type = ?s AND supplier_id = ?i', 'S', $supplier_id);
+    $current_supplier_data = fn_get_supplier_data($supplier_id);
+    $deleted_shippings = array_diff($current_supplier_data['shippings'], $shippings);
 
-    if (!empty($shippings)) {
-        $parts = array();
+    /**
+     * Executes when updating a supplier's shipping methods, before removing shipping methods links.
+     * Allows you to modify the list of shipping methods that would be removed
+     *
+     * @param int   $supplier_id           Supplier ID
+     * @param int[] $shippings             Shipping method IDs
+     * @param array $current_supplier_data Current supplier data
+     * @param int[] $deleted_shippings     Deleted shipping method IDs
+     */
+    fn_set_hook('suppliers_update_supplier_shippings_before_delete_shippings', $supplier_id, $shippings, $current_supplier_data, $deleted_shippings);
 
-        foreach ($shippings as $shipping_id) {
-            $parts[] = db_quote('(?i, ?i, ?s)', $supplier_id, $shipping_id, 'S');
-        }
+    if ($deleted_shippings) {
+        db_query(
+            'DELETE FROM ?:supplier_links WHERE object_type = ?s AND supplier_id = ?i AND object_id IN (?n)',
+            'S',
+            $supplier_id,
+            $deleted_shippings
+        );
+    }
 
-        if (!empty($parts)) {
-            $query = 'INSERT INTO ?:supplier_links (supplier_id, object_id, object_type) VALUES ' . implode(',', $parts);
-            db_query($query);
-        }
+    foreach ($shippings as $shipping_id) {
+        db_replace_into('supplier_links', [
+            'supplier_id' => $supplier_id,
+            'object_id'   => $shipping_id,
+            'object_type' => 'S',
+        ]);
     }
 
     return true;
@@ -91,6 +110,7 @@ function fn_update_supplier_shippings($supplier_id, $shippings)
  *
  * @param int $supplier_id
  * @param array $products
+ *
  * @return bool Always true
  */
 function fn_update_supplier_products($supplier_id, $products)
@@ -98,17 +118,18 @@ function fn_update_supplier_products($supplier_id, $products)
     db_query('DELETE FROM ?:supplier_links WHERE object_type = ?s AND supplier_id = ?i', 'P', $supplier_id);
 
     if (!empty($products)) {
-        $parts = array();
 
         foreach ($products as $product_id) {
-            $parts[] = db_quote('(?i, ?i, ?s)', $supplier_id, $product_id, 'P');
-        }
-
-        if (!empty($parts)) {
-            $query = 'INSERT INTO ?:supplier_links (supplier_id, object_id, object_type) VALUES ' . implode(',', $parts);
-            db_query($query);
+            fn_suppliers_link_product($supplier_id, $product_id);
         }
     }
+    /**
+     * Action after updating supplier
+     *
+     * @param int $supplier_id
+     * @param array $products
+     */
+    fn_set_hook('update_supplier_products_post', $supplier_id, $products);
 
     return true;
 }
@@ -417,10 +438,7 @@ function fn_if_get_supplier($supplier_id, $company_id)
 function fn_suppliers_update_product_post(&$product_data, &$product_id, &$lang_code, &$create)
 {
     if (isset($product_data['supplier_id']) && $product_data['supplier_id'] >= 0) {
-        db_query("DELETE FROM ?:supplier_links WHERE object_type = ?s AND object_id = ?i", 'P', $product_id);
-        if (!empty($product_data['supplier_id'])) {
-            db_query("INSERT INTO ?:supplier_links (supplier_id, object_id, object_type) VALUES (?i, ?i, ?s)", $product_data['supplier_id'], $product_id, 'P');
-        }
+        fn_suppliers_link_product($product_data['supplier_id'], $product_id);
     }
 }
 
@@ -444,8 +462,11 @@ function fn_suppliers_get_product_data(&$product_id, &$field_list, &$join, &$aut
 function fn_suppliers_clone_product(&$product_id, &$pid)
 {
     $clone_supplier = db_get_row('SELECT * FROM ?:supplier_links WHERE object_id = ?i', $product_id);
+
     $clone_supplier['object_id'] = $pid;
-    db_query('INSERT INTO ?:supplier_links ?e', $clone_supplier);
+    if (!empty($clone_supplier['supplier_id'])) {
+        fn_suppliers_link_product($clone_supplier['supplier_id'], $clone_supplier['object_id']);
+    }
 }
 
 /**
@@ -746,105 +767,138 @@ function fn_suppliers_get_shipments_info_post(&$shipments, $params)
 }
 
 /**
- * Hook for modify shippings groups
- *
- * @param array $cart Cart array
- * @param array $allow
- * @param array $product_groups Products groups from cart
+ * Hook handler: sends supplier notification when changing an order status.
  */
-function fn_suppliers_order_notification(&$order_info, &$order_statuses, &$force_notification)
+function fn_suppliers_change_order_status_post(
+    $order_id,
+    $status_to,
+    $status_from,
+    $force_notification,
+    $place_order,
+    $order_info,
+    $edp_data
+) {
+    fn_suppliers_order_notification($order_info, $force_notification);
+}
+
+/**
+ * Hook handler: sends supplier notification when creating an order in the administration panel.
+ */
+function fn_suppliers_place_order_manually_post(
+    $cart,
+    $params,
+    $customer_auth,
+    $action,
+    $issuer_id,
+    $force_notification,
+    $order_info,
+    $edp_data,
+    $is_order_placed_notification_required
+) {
+    if (!$is_order_placed_notification_required) {
+        return;
+    }
+
+    fn_suppliers_order_notification($order_info, $force_notification);
+}
+
+/**
+ * Hook handler: sends supplier notification when updating order details in the administration panel.
+ */
+function fn_suppliers_update_order_details_post($params, $order_info, $edp_data, $force_notification)
 {
-    $status_params = $order_statuses[$order_info['status']]['params'];
-    $notify_supplier = isset($force_notification['S']) ? $force_notification['S'] : (!empty($status_params['notify_supplier']) && $status_params['notify_supplier'] == 'Y' ? true : false);
+    fn_suppliers_order_notification($order_info, $force_notification);
+}
 
-    if ($notify_supplier == true) {
+/**
+ * Sends supplier notification when creating or updating an order or changing its status.
+ *
+ * @param array $order_info         Order information
+ * @param array $force_notification Notification rules
+ *
+ * @internal
+ */
+function fn_suppliers_order_notification(array $order_info, $force_notification)
+{
+    $suppliers = array();
 
-        $suppliers = array();
+    if (!is_array($force_notification)) {
+        $force_notification = fn_get_notification_rules($force_notification, !$force_notification);
+    }
 
-        if (!empty($order_info['product_groups'])) {
-            foreach ($order_info['product_groups'] as $key_group => $group) {
-                foreach ($group['products'] as $cart_id => $product) {
-                    $supplier_id = fn_get_product_supplier_id($product['product_id']);
-                    if (!empty($supplier_id) && empty($suppliers[$supplier_id])) {
-                        $rate = 0;
-                        foreach ($group['chosen_shippings'] as $shipping) {
-                            $rate += $shipping['rate'];
-                        }
-                        $suppliers[$supplier_id] = array(
-                            'name' => fn_get_supplier_name($supplier_id),
-                            'company_id' => $group['company_id'],
-                            'cost' => $rate,
-                            'shippings' => $group['chosen_shippings'],
-                            'supplier_id' => $supplier_id
-                        );
+    if (!empty($order_info['product_groups'])) {
+        foreach ($order_info['product_groups'] as $key_group => $group) {
+            foreach ($group['products'] as $cart_id => $product) {
+                $supplier_id = fn_get_product_supplier_id($product['product_id']);
+                if (!empty($supplier_id) && empty($suppliers[$supplier_id])) {
+                    $rate = 0;
+                    foreach ($group['chosen_shippings'] as $shipping) {
+                        $rate += $shipping['rate'];
                     }
-                    if (!empty($supplier_id)) {
-                        $suppliers[$supplier_id]['products'][$cart_id] = $product;
-                    }
+                    $suppliers[$supplier_id] = array(
+                        'name' => fn_get_supplier_name($supplier_id),
+                        'company_id' => $group['company_id'],
+                        'cost' => $rate,
+                        'shippings' => $group['chosen_shippings'],
+                        'supplier_id' => $supplier_id
+                    );
+                }
+                if (!empty($supplier_id)) {
+                    $suppliers[$supplier_id]['products'][$cart_id] = $product;
                 }
             }
         }
+    }
 
-        foreach ($suppliers as $supplier_id => $supplier) {
+    $status_id = strtolower($order_info['status']);
 
-            $lang = fn_get_company_language($supplier['company_id']);
-            $order = $order_info;
-            $order['products'] = $supplier['products'];
+    /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
 
-            $supplier['data'] = fn_get_supplier_data($supplier_id);
+    /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+    $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+    $notification_rules = $notification_settings_factory->create($force_notification);
 
-            if (!empty($supplier['shippings'])) {
-                if (!empty($supplier['data']['shippings'])) {
-                    $shippings = array();
-                    foreach ($supplier['shippings'] as $shipping) {
-                        if (!isset($shippings[$shipping['group_name']])) {
-                            $shippings[$shipping['group_name']] = $shipping;
-                        }
-                    }
+    foreach ($suppliers as $supplier_id => $supplier) {
 
-                    foreach ($shippings as $key => $shipping) {
-                        if ($key != $supplier['name']) {
-                            unset($shippings[$key]);
-                            if ($supplier['cost'] > $shipping['rate']) {
-                                $supplier['cost'] -= $shipping['rate'];
-                            } else {
-                                $supplier['cost'] = 0;
-                            }
-                        }
-                    }
+        $order = $order_info;
+        $order['products'] = $supplier['products'];
 
-                    $supplier['shippings'] = array_values($shippings);
-                } else {
-                    $supplier['shippings'] = array();
-                }
-            }
-
-            $profile_fields = fn_get_profile_fields('I', '', $lang);
-            $profields = array();
-            foreach ($profile_fields as $section => $fields) {
-                $profields[$section] = fn_fields_from_multi_level($fields, 'field_name', 'field_id');
-            }
-
-            /** @var \Tygh\Mailer\Mailer $mailer */
-            $mailer = Tygh::$app['mailer'];
-
-            $mailer->send(array(
-                'to' => $supplier['data']['email'],
-                'from' => 'company_orders_department',
-                'reply_to' => 'company_orders_department',
-                'data' => array(
-                    'order_info' => $order,
-                    'status_inventory' => $status_params['inventory'],
-                    'supplier_id' => $supplier_id,
-                    'supplier' => $supplier,
-                    'order_status' => fn_get_status_data($order_info['status'], STATUSES_ORDER, $order_info['order_id'], $lang),
-                    'profile_fields' => $profile_fields,
-                    'profields' => $profields
-                ),
-                'template_code' => 'suppliers_notification',
-                'tpl' => 'addons/suppliers/notification.tpl', // this parameter is obsolete and is used for back compatibility
-            ), 'A', $lang);
+        $supplier['data'] = fn_get_supplier_data($supplier_id);
+        if ($supplier['data']['status'] !== ObjectStatuses::ACTIVE) {
+            continue;
         }
+
+        if (!empty($supplier['shippings'])) {
+            if (!empty($supplier['data']['shippings'])) {
+                $shippings = array();
+                foreach ($supplier['shippings'] as $shipping) {
+                    if (!isset($shippings[$shipping['group_name']])) {
+                        $shippings[$shipping['group_name']] = $shipping;
+                    }
+                }
+
+                foreach ($shippings as $key => $shipping) {
+                    if ($key != $supplier['name']) {
+                        unset($shippings[$key]);
+                        if ($supplier['cost'] > $shipping['rate']) {
+                            $supplier['cost'] -= $shipping['rate'];
+                        } else {
+                            $supplier['cost'] = 0;
+                        }
+                    }
+                }
+
+                $supplier['shippings'] = array_values($shippings);
+            } else {
+                $supplier['shippings'] = array();
+            }
+        }
+        $event_dispatcher->dispatch(
+            "suppliers.order.supplier_notified.{$status_id}",
+            ['order_info' => $order, 'supplier_id' => $supplier_id, 'supplier' => $supplier],
+            $notification_rules
+        );
     }
 }
 
@@ -936,6 +990,29 @@ function fn_suppliers_install()
     if (!empty($query_parts)) {
         db_query('INSERT INTO ?:supplier_links VALUES ' . implode(', ', $query_parts));
     }
+
+
+    /** @var \Tygh\Template\Mail\Repository $repository */
+    $repository = Tygh::$app['template.mail.repository'];
+    /** @var \Tygh\Template\Mail\Service $service */
+    $service = Tygh::$app['template.mail.service'];
+
+    $email_template = $repository->findByCodeAndArea('suppliers_notification_default', 'A');
+
+    if (!$email_template) {
+        return;
+    }
+
+    $statuses = array_keys(fn_get_simple_statuses());
+    foreach ($statuses as $status_to) {
+        $service->cloneTemplate(
+            $email_template,
+            [
+                'code' => 'suppliers_notification.' . strtolower($status_to),
+                'area' => 'A'
+            ]
+        );
+    }
 }
 
 /**
@@ -948,7 +1025,18 @@ function fn_suppliers_install()
 function fn_suppliers_link_product($supplier_id, $product_id)
 {
     db_query('DELETE FROM ?:supplier_links WHERE object_type = ?s AND object_id = ?i', 'P', $product_id);
-    db_query('INSERT INTO ?:supplier_links (supplier_id, object_id, object_type) VALUES (?i, ?i, ?s)', $supplier_id, $product_id, 'P');
+
+    if (!empty($supplier_id)) {
+        db_query('INSERT INTO ?:supplier_links (supplier_id, object_id, object_type) VALUES (?i, ?i, ?s)', $supplier_id, $product_id, 'P');
+    }
+
+    /**
+     * Action after linking supplier to product
+     *
+     * @param int $supplier_id Supplier ID
+     * @param int $product_id Product ID
+     */
+    fn_set_hook('suppliers_link_product_post', $supplier_id, $product_id);
 
     return true;
 }
@@ -994,14 +1082,14 @@ function fn_suppliers_store_shipping_rates_pre($order_id, &$cart, $customer_auth
 }
 
 /**
- * Generate order invoice for supplier. 
+ * Generate order invoice for supplier.
  *
  * @param array     $order_ids  List of order identifiers
  * @param array     $supplier   Supplier data
  * @param bool      $pdf        Whether to create pdf, default false
  * @param string    $lang_code  Language code
  *
- * @return false|string 
+ * @return false|string
  */
 function fn_print_supplier_invoices($order_ids, $supplier, $pdf = false, $lang_code = CART_LANGUAGE)
 {
@@ -1013,7 +1101,7 @@ function fn_print_supplier_invoices($order_ids, $supplier, $pdf = false, $lang_c
         $view->assign('profile_fields', fn_get_profile_fields('I'));
         $view->assign('supplier', $supplier);
     }
-    
+
     if (!is_array($order_ids)) {
         $order_ids = array($order_ids);
     }
@@ -1066,4 +1154,275 @@ function fn_suppliers_delete_product_post($product_id, $product_deleted)
     if ($product_deleted) {
         db_query('DELETE FROM ?:supplier_links WHERE object_type = ?s AND object_id = ?i', 'P', $product_id);
     }
+}
+
+/**
+ * Hook handler: removes or adds variation to the supplier together with their parent on supplier details.
+ */
+function fn_product_variations_update_supplier_products_post($supplier_id, $product_ids)
+{
+    if (empty($supplier_id) || empty($product_ids)) {
+        return;
+    }
+
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+    $sync_service->onTableChanged('supplier_links', $product_ids, ['supplier_id' => $supplier_id]);
+}
+
+/**
+ * Hook handler: removes or adds variation to the supplier together with their parent on product details.
+ */
+function fn_product_variations_suppliers_link_product_post($supplier_id, $product_id)
+{
+    if (empty($product_id)) {
+        return;
+    }
+
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+    $sync_service->onTableChanged('supplier_links', $product_id, ['supplier_id' => $supplier_id]);
+}
+
+/**
+ * Hook handler: prevents removal of shared shipping methods from supplier when editing a supplier in the shared store.
+ */
+function fn_ult_suppliers_update_supplier_shippings_before_delete_shippings($supplier_id, $shippings, $current_supplier_data, &$deleted_shippings)
+{
+    $runtime_company_id = fn_get_runtime_company_id();
+    if (!$runtime_company_id) {
+        return;
+    }
+
+    $sharing_backup = Registry::get('runtime.skip_sharing_selection');
+    Registry::set('runtime.skip_sharing_selection', true);
+
+    $deleted_shippings_owners = db_get_hash_single_array(
+        'SELECT shipping_id, company_id FROM ?:shippings WHERE shipping_id IN (?n)',
+        ['shipping_id', 'company_id'],
+        $deleted_shippings
+    );
+
+    Registry::set('runtime.skip_sharing_selection', $sharing_backup);
+
+    $deleted_shippings = array_filter(
+        $deleted_shippings,
+        function ($shipping_id) use ($runtime_company_id, $deleted_shippings_owners) {
+            return isset($deleted_shippings_owners[$shipping_id])
+                && $deleted_shippings_owners[$shipping_id] == $runtime_company_id;
+        }
+    );
+}
+
+/**
+ * Filters source entities list by its availability for the shared entitiy's companies.
+ *
+ * @param array  $objects_list     Source entities list
+ * @param string $source_type      Source entities' sharing object_type
+ * @param string $source_id_field  Field of source entity which stores its ID
+ * @param string $shared_type      Shared entity's sharing object_type
+ * @param int    $shared_object_id Shared entity ID
+ *
+ * @return array
+ */
+function fn_suppliers_filter_objects_by_sharing(
+    array $objects_list,
+    $source_type,
+    $source_id_field,
+    $shared_type,
+    $shared_object_id
+) {
+    if ($shared_type === 'shippings') {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($shipping_storefronts, ) = $repository->find(['shipping_ids' => $shared_object_id]);
+        $shared_object_storefront_ids = array_keys($shipping_storefronts);
+    } else {
+        $shared_object_storefront_ids = fn_suppliers_get_object_storefront_ids($shared_type, $shared_object_id);
+    }
+
+    if (!$shared_object_storefront_ids) {
+        return [];
+    }
+
+    if ($source_type === 'shippings') {
+        $shippings_ids = array_column($objects_list, 'shipping_id');
+
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($available_storefronts, ) = $repository->find(['shipping_ids' => $shippings_ids]);
+        foreach ($available_storefronts as $storefront_id => $storefront) {
+            foreach ($objects_list as &$object) {
+                if (in_array($object['shipping_id'], $storefront->getShippingIds())) {
+                        $object['storefront_ids'][] = $storefront_id;
+                }
+            }
+            unset($object);
+        }
+    } else {
+        $object_company_ids = [];
+        foreach ($objects_list as $object) {
+            $object_company_ids = array_merge(
+                $object_company_ids,
+                fn_ult_get_object_shared_companies($source_type, $object[$source_id_field])
+            );
+        }
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($available_storefronts, ) = $repository->find(['company_ids' => $object_company_ids]);
+        foreach ($available_storefronts as $storefront_id => $storefront) {
+            foreach ($objects_list as &$object) {
+                if (in_array($object['company_id'], $storefront->getCompanyIds())) {
+                    $object['storefront_ids'][] = $storefront_id;
+                }
+            }
+            unset($object);
+        }
+    }
+
+    $filtered_list = fn_suppliers_filter_objects_by_storefronts($objects_list, $shared_object_storefront_ids);
+
+    return $filtered_list;
+}
+
+/**
+ * Gets object shared companies and searches storefronts based on them
+ *
+ * @param string $object_type Type for searching shared companies
+ * @param int    $object_id   Object identifier
+ *
+ * @return array Storefronts identifies
+ */
+function fn_suppliers_get_object_storefront_ids($object_type, $object_id)
+{
+    $shared_companies = fn_ult_get_object_shared_companies($object_type, $object_id);
+    if (empty($shared_companies)) {
+        return [];
+    }
+
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository'];
+    list($storefronts, ) = $repository->find(['company_ids' => $shared_companies]);
+
+    return array_keys($storefronts);
+};
+
+/**
+ * Filters objects list by its availability for getting storefronts.
+ *
+ * @param array $objects        List of prepared objects each of them contains 'storefront_ids' key for filtering
+ * @param array $storefront_ids List of storefronts identifiers
+ *
+ * @return array List of objects with are fit the condition
+ */
+function fn_suppliers_filter_objects_by_storefronts($objects, $storefront_ids)
+{
+    return array_filter($objects, function($object) use ($storefront_ids) {
+        if (empty($object['storefront_ids'])) {
+            return false;
+        }
+        foreach ($object['storefront_ids'] as $object_storefront_id) {
+            if (in_array($object_storefront_id, $storefront_ids)) {
+                return true;
+            }
+        }
+
+        return false;
+    });
+}
+
+/**
+ * The "template_email_get_name" hook handler.
+ *
+ * Actions performed:
+ *  - Forms template name for different order statuses
+ *
+ * @param \Tygh\Template\Mail\Template $template Instance of email template.
+ * @param string                       $name     Current template name.
+ *
+ * @see \Tygh\Template\Mail\Template::getName()
+ */
+function fn_suppliers_template_email_get_name($template, &$name)
+{
+    static $statuses = null;
+
+    if (strpos($template->getCode(), 'suppliers_notification.') === false) {
+        return;
+    }
+
+    if ($statuses === null) {
+        $statuses = fn_get_statuses(STATUSES_ORDER, [], true, true);
+    }
+
+    list(, $status) = explode('.', $template->getCode());
+    $status = strtoupper($status);
+
+    if (!isset($statuses[$status])) {
+        return;
+    }
+    $name = __('email_template.supplier_notification_with_status', ['[name]' => $statuses[$status]['description']]);
+}
+
+
+/**
+ * The "update_status_pre" hook handler.
+ *
+ * Actions performed:
+ *  - Creates supplier notification template for new order status
+ *
+ * @param string $status       One-letter status code
+ * @param array  $status_data  Status description and properties
+ * @param string $type         One-letter status type
+ * @param string $lang_code    Two-letter language code
+ * @param bool   $can_continue If true, status description and data will be updated
+ *
+ * @see fn_update_status()
+ */
+function fn_suppliers_update_status_pre($status, $status_data, $type, $lang_code, $can_continue)
+{
+    if (!$can_continue || ($type !== STATUSES_ORDER) || empty($status_data['status_id']) || empty($status_data['status'])) {
+        return;
+    }
+
+    /** @var \Tygh\Template\Mail\Repository $repository */
+    $repository = Tygh::$app['template.mail.repository'];
+    /** @var \Tygh\Template\Mail\Service $service */
+    $service = Tygh::$app['template.mail.service'];
+
+    $email_template = $repository->findByCodeAndArea('suppliers_notification_default', 'A');
+
+    if (!$email_template) {
+        return;
+    }
+
+    $service->cloneTemplate(
+        $email_template,
+        [
+            'code' => 'suppliers_notification.' . strtolower($status_data['status']),
+            'area' => 'A'
+        ]
+    );
+}
+
+/**
+ * The "delete_status_post" hook handler.
+ *
+ * Actions performed:
+ *  - Deletes supplier notification template when order status is deleting
+ *
+ * @param string    $status     One-letter status code
+ * @param string    $type       One-letter status type
+ * @param string    $can_delete One-letter status code if status can be deleted
+ * @param bool|null $is_default True if status is default, false if status is not default, null otherwise
+ * @param int|null  $status_id  Status identifier
+ *
+ * @see fn_delete_status()
+ */
+function fn_suppliers_delete_status_post($status, $type, $can_delete, $is_default, $status_id)
+{
+    if (!$can_delete || ($type !== STATUSES_ORDER)) {
+        return;
+    }
+
+    /** @var \Tygh\Template\Mail\Service $service */
+    $service = Tygh::$app['template.mail.service'];
+    $service->removeTemplateByCode('suppliers_notification.' . strtolower($status));
 }

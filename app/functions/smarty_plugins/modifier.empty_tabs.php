@@ -18,7 +18,7 @@
 function smarty_modifier_empty_tabs($content)
 {
     if (!empty($content)) {
-        preg_match_all('/\<div id="([\w]*)"( class="[\w- ]*")*>[\n\r\t ]*(\<\!--([\w]*)--\>)?[\n\r\t ]*\<\/div>/is', $content, $matches);
+        preg_match_all('/\<div id="([\w]*)"( class="[\w\- ]*")*>[\n\r\t ]*(\<\!--([\w]*)--\>)?[\n\r\t ]*\<\/div>/is', $content, $matches);
 
         if (!empty($matches[1])) {
             return array_map('smarty_change_tab_id', $matches[1]);

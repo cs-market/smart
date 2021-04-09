@@ -18,7 +18,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($mode == 'index') {
 
-    if ($company = Company::current()) {
+    if (defined('AJAX_REQUEST') && $company = Company::current()) {
         $usage = array(
             'products'   => array(
                 'title'      => __('products'),
@@ -37,5 +37,4 @@ if ($mode == 'index') {
         Tygh::$app['view']->assign('plan_usage', $usage);
         Tygh::$app['view']->assign('plan_data', $company->plan);
     }
-
 }

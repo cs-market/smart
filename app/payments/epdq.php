@@ -151,7 +151,9 @@ if (defined('PAYMENT_NOTIFICATION')) {
             $post["ITEMNAME$key"] = fn_format_long_string($order_product['product'], 40);
             $post["ITEMPRICE$key"] = $order_product['price'];
             $post["ITEMQUANT$key"] = $order_product['amount'];
-            $post["ITEMDISCOUNT$key"] = $discount;
+            if ($discount) {
+                $post["ITEMDISCOUNT$key"] = $discount;
+            }
             $key ++;
         }
     }

@@ -166,7 +166,7 @@ abstract class AModel implements IModel, \IteratorAggregate, \ArrayAccess
     public static function model($params = array())
     {
         $class = get_called_class();
-        $hash = md5(serialize($params));
+        $hash = md5(json_encode($params));
 
         if (!isset(static::$models[$class][$hash])) {
             static::$models[$class][$hash] = new static($params);

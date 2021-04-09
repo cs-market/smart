@@ -15,6 +15,7 @@
 namespace Tygh\Api\Entities\v40;
 
 use Tygh\Api\Entities\Products;
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
 
 /**
  * Class SraProducts implements API entity to provide products data.
@@ -74,7 +75,7 @@ class SraProducts extends Products
             $product = fn_storefront_rest_api_format_product_prices($product);
 
             if ($is_discussion_enabled) {
-                $product = SraDiscussion::setDiscussionType($product, DISCUSSION_OBJECT_TYPE_PRODUCT);
+                $product = SraDiscussion::setDiscussionType($product, DiscussionObjectTypes::PRODUCT);
             }
 
             $product = fn_storefront_rest_api_set_product_icons($product, $params['icon_sizes']);

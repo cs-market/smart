@@ -13,7 +13,7 @@
 ****************************************************************************/
 
 $rule = array(
-    'base_url' => array('fn_seo_filter_current_url' => array("result_ids", "full_render", "filter_id", "view_all", "req_range_id", "features_hash", "subcats", "page", "total", "hint_q")),
+    'base_url' => array('fn_seo_filter_current_url' => array('result_ids', 'full_render', 'filter_id', 'view_all', 'req_range_id', 'features_hash', 'subcats', 'page', 'total', 'hint_q', 'sort_by', 'sort_order', 'items_per_page', 'on_sale_from', 'layout')),
     'search' => true
 );
 

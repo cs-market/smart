@@ -4,7 +4,7 @@
 <div class="cm-sortable" data-ca-sortable-table="sales_reports" data-ca-sortable-id-name="report_id" id="manage_reports_list">
     {if $reports}
     <div class="table-wrapper">
-        <table class="table table-middle table-objects">
+        <table class="table table-middle table--relative table-objects">
         {foreach from=$reports item=section}
             {include file="common/object_group.tpl"
             id=$section.report_id

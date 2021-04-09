@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/gdpr.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.11.5/addons/gdpr.po\n"
+"X-Crowdin-File-ID: 3582\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::gdpr"
 msgid "GDPR Compliance (EU)"
@@ -22,15 +22,15 @@ msgstr ""
 
 msgctxt "SettingsSections::gdpr::general"
 msgid "General"
-msgstr ""
+msgstr "Algemeen"
 
 msgctxt "SettingsSections::gdpr::gdpr"
 msgid "GDPR"
-msgstr ""
+msgstr "AVG"
 
 msgctxt "SettingsOptions::gdpr::gdpr_cookie_consent"
 msgid "Cookie consent"
-msgstr ""
+msgstr "Toestemming voor cookies"
 
 msgctxt "SettingsTooltips::gdpr::gdpr_cookie_consent"
 msgid "Implicit consent means an unobtrusive pop-up in the corner.<br/>Explicit consent means asking to agree to cookies before allowing customers to access the website for the first time."
@@ -38,23 +38,23 @@ msgstr ""
 
 msgctxt "SettingsVariants::gdpr::gdpr_cookie_consent::none"
 msgid "None"
-msgstr ""
+msgstr "Geen"
 
 msgctxt "SettingsVariants::gdpr::gdpr_cookie_consent::implicit"
 msgid "Implicit"
-msgstr ""
+msgstr "Stilzwijgend"
 
 msgctxt "SettingsVariants::gdpr::gdpr_cookie_consent::explicit"
 msgid "Explicit"
-msgstr ""
+msgstr "Uitdrukkelijk"
 
 msgctxt "Languages::gdpr.gdpr_user_data"
 msgid "GDPR user data"
-msgstr ""
+msgstr "AVG gebruikersgegevens"
 
 msgctxt "Languages::gdpr_user_data"
 msgid "User personal data"
-msgstr ""
+msgstr "Persoonlijke gegevens van de gebruiker"
 
 msgctxt "Languages::gdpr_user_profiles"
 msgid "Personal data from user profiles"
@@ -70,7 +70,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.anonymize"
 msgid "Anonymize"
-msgstr ""
+msgstr "Anonimiseren"
 
 msgctxt "Languages::gdpr.text_anonymize_question"
 msgid "Once you anonymize someone, all their personal information will be replaced with randomly-generated data. This action can not be undone, unless you restore the database from a backup. Are you sure you want to proceed?"
@@ -78,7 +78,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.view_and_edit"
 msgid "View and edit"
-msgstr ""
+msgstr "Bekijken en bewerken"
 
 msgctxt "Languages::gdpr_orders_data"
 msgid "Personal data from orders"
@@ -86,11 +86,11 @@ msgstr ""
 
 msgctxt "Languages::gdpr.full_agreement"
 msgid "Full agreement text"
-msgstr ""
+msgstr "Volledige overeenkomsttekst"
 
 msgctxt "Languages::gdpr.short_agreement"
 msgid "Short agreement text"
-msgstr ""
+msgstr "Korte overeenkomsttekst"
 
 msgctxt "Languages::gdpr.checkout.place_order.personal_data_processing"
 msgid "Checkout: Place order: Personal data processing"
@@ -102,7 +102,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.checkout.place_order.agreement_text_short_personal_data_processing"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
-msgstr ""
+msgstr "Ik ga ermee akkoord dat mijn persoonlijke gegevens <u>als volgt worden verwerkt.</u>"
 
 msgctxt "Languages::gdpr.user.registration.personal_data_processing"
 msgid "Customer: registration"
@@ -114,7 +114,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.user.registration.agreement_text_short_personal_data_processing"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
-msgstr ""
+msgstr "Ik ga ermee akkoord dat mijn persoonlijke gegevens <u>als volgt worden verwerkt.</u>"
 
 msgctxt "Languages::gdpr.profiles.update.personal_data_processing"
 msgid "Profiles: update"
@@ -126,7 +126,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.profiles.update.agreement_text_short_personal_data_processing"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
-msgstr ""
+msgstr "Ik ga ermee akkoord dat mijn persoonlijke gegevens <u>als volgt worden verwerkt.</u>"
 
 msgctxt "Languages::gdpr.vendor.apply.personal_data_processing"
 msgid "Vendor: apply for vendor"
@@ -138,7 +138,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.vendor.apply.agreement_text_short_personal_data_processing"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
-msgstr ""
+msgstr "Ik ga ermee akkoord dat mijn persoonlijke gegevens <u>als volgt worden verwerkt.</u>"
 
 msgctxt "Languages::gdpr.products.subscribe.personal_data_processing"
 msgid "Products: subscribe"
@@ -150,7 +150,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.products.subscribe.agreement_text_short_personal_data_processing"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
-msgstr ""
+msgstr "Ik ga ermee akkoord dat mijn persoonlijke gegevens <u>als volgt worden verwerkt.</u>"
 
 msgctxt "Languages::gdpr.checkout.profiles_update.personal_data_processing"
 msgid "Checkout: profiles update"
@@ -166,15 +166,15 @@ msgstr ""
 
 msgctxt "Languages::gdpr.export_to_xml"
 msgid "Export to XML"
-msgstr ""
+msgstr "Exporteren naar XML"
 
 msgctxt "Languages::gdpr.agreement_required_error"
 msgid "Your agreement is required to proceed."
-msgstr ""
+msgstr "Uw toestemming is vereist om door te gaan."
 
 msgctxt "Languages::gdpr.user_anonymized"
 msgid "User has been anonymized."
-msgstr ""
+msgstr "Gebruiker is geanonimiseerd."
 
 msgctxt "Languages::gdpr.check_other_sources_for_personal_data"
 msgid "<p>Please note that anonymization doesn't affect any backups and logs that you might have. If necessary, please do the following:</p><ol><li>Clear the logs under <b>Administration → Logs</b>.</li><li>Secure and delete the backups you might have under <b>Administration → Backup/Restore</b>.</li></ol>"
@@ -182,7 +182,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.cookie_consent"
 msgid "Cookie consent"
-msgstr ""
+msgstr "Toestemming voor cookies"
 
 msgctxt "Languages::gdpr.cookie_consent_message"
 msgid "<p>This website uses cookies (small pieces of data saved on your computer). Some cookies are added by the website itself: they help to show you the content of your cart, keep you signed in once you enter your email and password, preserve your preferences, and do a lot of other useful things. We use these cookies only to make the site work properly for you. Even your agreement to our use of cookies is stored as a cookie.</p><p>Other cookies may be used by third-party services (such as PayPal, YouTube, Google Maps, Facebook, etc.) to store the data about how you use those third-party services on the website. We have no control over how third parties use cookies, but those cookies are also important for proper functioning of the website. For example, some of the PayPal functionality may not work without PayPal cookies.</p><p>Without cookies, many things can go wrong. That's why we ask that you agree to cookies being used before you proceed. If you don't want any cookies but would like to continue using the website, please configure your browser to block cookies, and then you'll be able to \"agree\" to their use, while we won't treat that as your consent.</p>"
@@ -190,11 +190,11 @@ msgstr ""
 
 msgctxt "Languages::gdpr.cookie_consent_accept"
 msgid "I agree"
-msgstr ""
+msgstr "Ik ga akkoord"
 
 msgctxt "Languages::gdpr.cookie_consent_decline"
 msgid "No, take me out of here"
-msgstr ""
+msgstr "Nee, haal me hier weg"
 
 msgctxt "Languages::gdpr.uk_cookies_law"
 msgid "Cookies are used on this site to provide the best user experience. If you continue, we assume that you agree to receive cookies from this site. <span class=\"button button-wrap-left\"><span class=\"button button-wrap-right\"><a rel=\"nofollow\" href=\"[url]\">OK</a></span></span>"
@@ -202,11 +202,11 @@ msgstr ""
 
 msgctxt "Languages::block_gdpr"
 msgid "GDPR"
-msgstr ""
+msgstr "AVG"
 
 msgctxt "Languages::gdpr"
 msgid "GDPR"
-msgstr ""
+msgstr "AVG"
 
 msgctxt "Languages::block_gdpr_description"
 msgid "Allows registered users to request their personal data or anonymization"

@@ -6,7 +6,7 @@
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 {if $subscribers}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th class="mobile-hide" width="1%">
@@ -52,7 +52,7 @@
         <td class="mobile-hide">&nbsp;</td>
         <td colspan="5" class="row-more-body row-gray" data-th="">
             {if $mailing_lists}
-            <table class="table table-condensed table-responsive">
+            <table class="table table-condensed table--relative table-responsive">
             <thead>
             <tr>
                 <th>{__("mailing_list")}</th>
@@ -64,10 +64,10 @@
                 <tr>
                     <td data-th="{__("mailing_list")}">{$list.object}</td>
                     <td class="center" data-th="{__("subscribed")}">
-                        <input type="checkbox" name="subscribers[{$s.subscriber_id}][list_ids][]" value="{$list_id}" {if $s.mailing_lists[$list_id]}checked="checked"{/if} class="checkbox cm-item-{$id}"></td>
+                        <input type="checkbox" name="subscribers[{$s.subscriber_id}][list_ids][]" value="{$list_id}" {if $s.mailing_lists[$list_id]}checked="checked"{/if} class="cm-item-{$id}"></td>
                     <td class="center" data-th="{__("confirmed")}">
                         <input type="hidden" name="subscribers[{$s.subscriber_id}][mailing_lists][{$list_id}][confirmed]" value="{if $list.register_autoresponder}0{else}1{/if}" />
-                        <input type="checkbox" name="subscribers[{$s.subscriber_id}][mailing_lists][{$list_id}][confirmed]" value="1" {if $s.mailing_lists[$list_id].confirmed || !$list.register_autoresponder}checked="checked"{/if} class="checkbox" {if !$list.register_autoresponder}disabled="disabled"{/if} />
+                        <input type="checkbox" name="subscribers[{$s.subscriber_id}][mailing_lists][{$list_id}][confirmed]" value="1" {if $s.mailing_lists[$list_id].confirmed || !$list.register_autoresponder}checked="checked"{/if}  {if !$list.register_autoresponder}disabled="disabled"{/if} />
                     </td>
                 </tr>
             {/foreach}

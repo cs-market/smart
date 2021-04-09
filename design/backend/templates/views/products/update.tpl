@@ -1,3 +1,11 @@
+{script src="js/tygh/backend/categories.js"}
+
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 {capture name="mainbox"}
 
     {capture name="tabsbox"}
@@ -23,14 +31,17 @@
         {else}
             {assign var="id" value=0}
         {/if}
-        <form id="form" action="{""|fn_url}" method="post" name="product_update_form" class="form-horizontal form-edit  cm-disable-empty-files {if ""|fn_check_form_permissions || ($runtime.company_id && $product_data.shared_product == "Y" && $product_data.company_id != $runtime.company_id)} cm-hide-inputs{/if}" enctype="multipart/form-data"> {* product update form *}
+
+        {$is_form_readonly = fn_check_form_permissions("") || ($id && $runtime.company_id && (fn_allowed_for("MULTIVENDOR") || $product_data.shared_product == "Y") && $product_data.company_id != $runtime.company_id)}
+
+        <form id="form" action="{""|fn_url}" method="post" name="product_update_form" class="form-horizontal form-edit  cm-disable-empty-files {if $is_form_readonly}cm-hide-inputs{/if}" enctype="multipart/form-data"> {* product update form *}
             <input type="hidden" name="fake" value="1" />
             <input type="hidden" class="{$no_hide_input_if_shared_product}" name="selected_section" id="selected_section" value="{$smarty.request.selected_section}" />
             <input type="hidden" class="{$no_hide_input_if_shared_product}" name="product_id" value="{$id}" />
 
             {** Product description section **}
 
-            <div class="product-manage" id="content_detailed"> {* content detailed *}
+            <div class="product-manage hidden" id="content_detailed"> {* content detailed *}
 
                 {** General info section **}
                 {include file="common/subheader.tpl" title=__("information") target="#acc_information"}
@@ -43,8 +54,8 @@
                         <div class="controls">
                             <input class="input-large" form="form" type="text" name="product_data[product]" id="product_description_product" size="55" value="{$product_data.product}" />
                             {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="product" name="update_all_vendors[product]"}
-                            </div>
                         </div>
+                    </div>
                     {/hook}
 
                     {hook name="products:categories_section"}
@@ -78,22 +89,27 @@
                             {else}
                                 {assign var="request_category_id" value=""}
                             {/if}
-                            <label for="product_categories_add_{$rnd}" class="control-label cm-required">{__("categories")}</label>
+                            <label for="product_categories_add_{$rnd}" class="control-label cm-required control-label--product-categories">{__("categories")}</label>
                             <div class="controls">
-                                {include file="common/select2_categories.tpl"
-                                select2_tabindex=$tabindex
-                                select2_multiple=true
-                                select2_select_id="product_categories_add_`$rnd`"
-                                select2_name="product_data[category_ids]"
-                                select2_allow_sorting=!$product_data.shared_product || $product_data.shared_product === 'N'
-                                select2_category_ids=$product_data.category_ids
-                                select2_main_category=$product_data.main_category
-                                categories_data=$categories_data
-                                disable_categories=true
-                                select2_wrapper_meta="cm-field-container"
-                                select2_select_meta="input-large"
-                                select2_required="true"
-                            }
+                                <input type="hidden" name="product_data[add_new_category][]" value=""/>
+                                {include file="views/categories/components/picker/picker.tpl"
+                                    input_name="product_data[category_ids][]"
+                                    simple_class="cm-field-container"
+                                    multiple=true
+                                    id="product_categories_add_{$rnd}"
+                                    tabindex=$tabindex
+                                    item_ids=$product_data.category_ids
+                                    meta="input-large object-categories-add"
+                                    show_advanced=true
+                                    allow_add=fn_check_permissions("categories", "update", "admin", "POST")
+                                    allow_sorting=true
+                                    result_class="object-picker__result--product-categories"
+                                    selection_class="object-picker__selection--product-categories"
+                                    required=true
+                                    close_on_select=false
+                                    allow_multiple_created_objects=true
+                                    created_object_holder_selector="[name='product_data[add_new_category][]']"
+                                }
                         </div>
                     <!--product_categories--></div>
                     {/hook}
@@ -113,7 +129,13 @@
                         <label class="control-label" for="elm_product_full_descr">{__("full_description")}:</label>
                         <div class="controls">
                             {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="full_description" name="update_all_vendors[full_description]"}
-                            <textarea id="elm_product_full_descr" name="product_data[full_description]" cols="55" rows="8" class="cm-wysiwyg input-large">{$product_data.full_description}</textarea>
+                            <textarea id="elm_product_full_descr"
+                                      name="product_data[full_description]"
+                                      cols="55"
+                                      rows="8"
+                                      class="cm-wysiwyg input-large"
+                                      data-ca-is-block-manager-enabled="{fn_check_view_permissions("block_manager.block_selection", "GET")|intval}"
+                            >{$product_data.full_description}</textarea>
 
                             {if $view_uri}
                                 {include
@@ -129,7 +151,14 @@
                     {/hook}
                     {** /General info section **}
 
-                    {include file="common/select_status.tpl" input_name="product_data[status]" id="elm_product_status" obj=$product_data hidden=true}
+                    {hook name="products:update_product_status"}
+                    {include file = "views/products/components/status_on_update.tpl"
+                        input_name = "product_data[status]"
+                        id = "elm_product_status"
+                        obj = $product_data
+                        hidden = true
+                    }
+                    {/hook}
 
                     {hook name="products:update_detailed_images"}
                     <div class="control-group">
@@ -140,7 +169,7 @@
                                 existing_pairs=(($product_data.main_pair) ? [$product_data.main_pair] : []) + $product_data.image_pairs|default:[]
                                 file_name="file"
                                 image_pair_types=['N' => 'product_add_additional_image', 'M' => 'product_main_image', 'A' => 'product_additional_image']
-                                allow_update_files=!$is_shared_product
+                                allow_update_files=!$is_shared_product && $allow_update_files|default:true
                             }
                         </div>
                     </div>
@@ -182,7 +211,7 @@
                 <hr>
 
                 {include file="common/subheader.tpl" title=__("pricing_inventory") target="#acc_pricing_inventory"}
-                <div id="acc_pricing_inventory" class="collapse in">
+                <div class="collapse in" id="acc_pricing_inventory">
                     {hook name="products:update_product_code"}
                     <div class="control-group">
                         <label class="control-label" for="elm_product_code">{__("sku")}:</label>
@@ -201,18 +230,20 @@
                         </div>
                     {/hook}
 
+                    <div id="product_amount">
                     {hook name="products:update_product_amount"}
                     <div class="control-group">
                         <label class="control-label" for="elm_in_stock">{__("in_stock")}:</label>
                         <div class="controls">
-                            {if $product_data.tracking == "ProductTracking::TRACK_WITH_OPTIONS"|enum}
-                                {include file="buttons/button.tpl" but_text=__("edit") but_href="product_options.inventory?product_id=`$id`" but_role="edit"}
-                            {else}
-                                <input type="text" name="product_data[amount]" id="elm_in_stock" size="10" value="{$product_data.amount|default:"1"}" class="input-small" />
-                            {/if}
-                            </div>
+                        {if $product_data.tracking == "ProductTracking::TRACK_WITH_OPTIONS"|enum}
+                            {include file="buttons/button.tpl" but_text=__("edit") but_href="product_options.inventory?product_id=`$id`" but_role="edit"}
+                        {else}
+                            <input type="text" name="product_data[amount]" id="elm_in_stock" size="10" value="{$product_data.amount|default:"1"}" class="input-small" />
+                        {/if}
                         </div>
+                    </div>
                     {/hook}
+                    <!--product_amount--></div>
 
                     {hook name="products:update_product_zero_price_action"}
                     <div class="control-group">
@@ -264,7 +295,7 @@
                     <div class="control-group">
                         <label class="control-label" for="elm_qty_step">{__("quantity_step")}:</label>
                         <div class="controls">
-                            <input type="text" name="product_data[qty_step]" id="elm_qty_step" size="10" value="{$product_data.qty_step|default:"0"}" class="input-small" />
+                            <input type="text" data-v-min="0" data-m-dec="0" data-a-sep="" name="product_data[qty_step]" id="elm_qty_step" value="{$product_data.qty_step|default:"0"}" class="input-small cm-numeric" />
                         </div>
                     </div>
                     {/hook}
@@ -364,7 +395,7 @@
                         <div class="controls">
                             <label class="checkbox">
                                 <input type="hidden" name="product_data[is_edp]" value="N" />
-                                <input type="checkbox" name="product_data[is_edp]" id="elm_product_is_edp" value="Y" {if $product_data.is_edp == "Y"}checked="checked"{/if} onclick="Tygh.$("#edp_shipping").toggleBy(); Tygh.$("#edp_unlimited").toggleBy();"/>
+                                <input type="checkbox" name="product_data[is_edp]" id="elm_product_is_edp" value="Y" {if $product_data.is_edp == "Y"}checked="checked"{/if} onclick="Tygh.$('#edp_shipping').toggleBy(); Tygh.$('#edp_unlimited').toggleBy();"/>
                             </label>
                         </div>
                     </div>
@@ -397,7 +428,12 @@
                     <div class="control-group {$no_hide_input_if_shared_product}">
                         <label class="control-label" for="elm_product_short_descr">{__("short_description")}:</label>
                         <div class="controls">
-                            <textarea id="elm_product_short_descr" name="product_data[short_description]" cols="55" rows="2" class="cm-wysiwyg input-large">{$product_data.short_description}</textarea>
+                            <textarea id="elm_product_short_descr"
+                                      name="product_data[short_description]"
+                                      cols="55"
+                                      rows="2"
+                                      class="cm-wysiwyg input-large"
+                            >{$product_data.short_description}</textarea>
                             {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="short_description" name="update_all_vendors[short_description]"}
                         </div>
                     </div>
@@ -407,7 +443,7 @@
                     <div class="control-group">
                         <label class="control-label" for="elm_product_popularity">{__("popularity")}:</label>
                         <div class="controls">
-                            <input type="text" name="product_data[popularity]" id="elm_product_popularity" size="55" value="{$product_data.popularity|default:0}" class="input-long" />
+                            <input type="text" {if $disable_edit_popularity}disabled="disabled"{/if} name="product_data[popularity]" id="elm_product_popularity" size="55" value="{$product_data.popularity|default:0}" class="input-long" />
                         </div>
                     </div>
                     {/hook}
@@ -501,7 +537,7 @@
             {/hook}
 
             {hook name="products:update_addons_section"}
-            <div id="content_addons">
+            <div id="content_addons" class="hidden">
                 {hook name="products:detailed_content"}
                 {/hook}
             </div>
@@ -533,11 +569,17 @@
                     {/capture}
                     {dropdown content=$smarty.capture.tools_list}
                 {/if}
+                <!-- the button goes here -->
                 {include file="buttons/save_cancel.tpl" but_meta="cm-product-save-buttons" but_role="submit-link" but_name="dispatch[products.update]" but_target_form="product_update_form" save=$id}
+                <!-- the button goes there -->
             {/hook}
             {/capture}
             {** /Form submit section **}
 
+            {if "ULTIMATE"|fn_allowed_for}
+                <input type="hidden" name="switch_company_id" class="{$no_hide_input_if_shared_product}" value="{$runtime.company_id}" />
+            {/if}
+            <input type="hidden" name="descr_sl" class="{$no_hide_input_if_shared_product}" value="{$smarty.const.DESCR_SL}" />
         </form> {* /product update form *}
 
         {hook name="products:tabs_extra"}{/hook}
@@ -604,7 +646,7 @@
           category_ids: $('[name="product_data[category_ids]"]').val()
         }
       },
-      result_ids: 'product_categories'
+      result_ids: 'product_amount,product_categories'
     });
   };
 </script>

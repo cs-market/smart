@@ -1,2 +1,0 @@
-REPLACE INTO ?:product_options_descriptions (`option_id`, `lang_code`, `option_name`, `option_text`, `description`, `comment`, `inner_hint`, `incorrect_message`) VALUES (27, 'en', 'Color', '', '', '', '', '');
-REPLACE INTO ?:product_options_descriptions (`option_id`, `lang_code`, `option_name`, `option_text`, `description`, `comment`, `inner_hint`, `incorrect_message`) VALUES (28, 'en', 'Size', '', '', '', '', '');

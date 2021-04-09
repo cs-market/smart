@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: hu\n"
-"X-Crowdin-File: /release-4.8.2/addons/discussion.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/discussion.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"PO-Revision-Date: 2019-02-01 06:05\n"
 
 msgctxt "Addons::name::discussion"
 msgid "Comments and reviews"
@@ -79,6 +79,10 @@ msgstr "Észrevételek írása le van tiltva. A <a href=\"[link]\">Hozzászólá
 msgctxt "Languages::discussion_title_company"
 msgid "Reviews"
 msgstr "Értékelések"
+
+msgctxt "Languages::communication_and_rating"
+msgid "Communication and Rating"
+msgstr "Kommunikáció és Értékelés"
 
 msgctxt "Languages::communication"
 msgid "Communication"
@@ -320,16 +324,48 @@ msgctxt "SettingsOptions::discussion::testimonials_from_all_stores"
 msgid "Show testimonials from all stores"
 msgstr "Az összes bolt értékelésének megjelenítése"
 
+msgctxt "SettingsOptions::discussion::product_discussion_type"
+msgid "Default value"
+msgstr ""
+
+msgctxt "SettingsTooltips::discussion::product_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created products. Doesn't affect existing products."
+msgstr ""
+
+msgctxt "SettingsOptions::discussion::product_review_after_purchase"
+msgid "Only buyers can post"
+msgstr ""
+
+msgctxt "SettingsTooltips::discussion::product_review_after_purchase"
+msgid "Allow leaving reviews for a product only to those who bought that product."
+msgstr ""
+
+msgctxt "SettingsOptions::discussion::category_discussion_type"
+msgid "Default value"
+msgstr ""
+
+msgctxt "SettingsTooltips::discussion::category_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created categories. Doesn't affect existing categories."
+msgstr ""
+
+msgctxt "SettingsOptions::discussion::page_discussion_type"
+msgid "Default value"
+msgstr ""
+
+msgctxt "SettingsTooltips::discussion::page_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created pages. Doesn't affect existing pages."
+msgstr ""
+
 msgctxt "SettingsOptions::discussion::company_discussion_type"
 msgid "Reviews"
 msgstr "Értékelések"
 
 msgctxt "SettingsOptions::discussion::company_only_buyers"
-msgid "Allow to post only for buyers"
+msgid "Only buyers can post"
 msgstr ""
 
 msgctxt "SettingsTooltips::discussion::company_only_buyers"
-msgid "Only those who purchased something from the vendor can post"
+msgid "Allow leaving reviews for a vendor only to those who bought products from that vendor."
 msgstr ""
 
 msgctxt "SettingsOptions::discussion::company_posts_per_page"
@@ -363,22 +399,6 @@ msgstr "Csak névtelen vevők"
 msgctxt "SettingsVariants::discussion::company_post_approval::disabled"
 msgid "No approval needed"
 msgstr "Jóváhagyás nem szükséges"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::B"
-msgid "Communication and Rating"
-msgstr "Kommunikáció és Értékelés"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::C"
-msgid "Communication"
-msgstr "Kommunikáció"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::R"
-msgid "Rating"
-msgstr "Értékelés"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::D"
-msgid "Disabled"
-msgstr "Letiltott"
 
 msgctxt "SettingsVariants::discussion::product_post_approval::any"
 msgid "Any customer"
@@ -428,22 +448,6 @@ msgctxt "SettingsVariants::discussion::home_page_post_approval::disabled"
 msgid "No approval needed"
 msgstr "Jóváhagyás nem szükséges"
 
-msgctxt "SettingsVariants::discussion::home_page_testimonials::B"
-msgid "Communication and Rating"
-msgstr "Kommunikáció és Értékelés"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::C"
-msgid "Communication"
-msgstr "Kommunikáció"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::R"
-msgid "Rating"
-msgstr "Értékelés"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::D"
-msgid "Disabled"
-msgstr "Letiltott"
-
 msgctxt "Languages::discussion_tab_products"
 msgid "Product Reviews"
 msgstr "Termék értékelések"
@@ -490,5 +494,21 @@ msgstr ""
 
 msgctxt "Languages::discussion.agreement_text_short_add_new_review"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
+msgstr ""
+
+msgctxt "Languages::discussion.please_log_in_to_write_a_review"
+msgid "Please sign in to write a review"
+msgstr ""
+
+msgctxt "Languages::discussion.you_have_to_buy_product_before_writing_review"
+msgid "You can't write a review for this product. Customers can write reviews only for the products they bought. If you actually bought this product from us, but are still seeing this message, please contact us."
+msgstr ""
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification_title"
+msgid "Comments and reviews add-on settings were changed"
+msgstr ""
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification"
+msgid "In the 4.9.1 version the <strong>Only anonymous customers</strong> variant of the <strong>Administrator must approve posts submitted by</strong> setting was removed. Now, it is available again, with the ability to leave reviews for nonauthorized customers. Please check if the desirable value of the setting is selected."
 msgstr ""
 

@@ -1,3 +1,11 @@
+.block-manager-location-wrapper {
+    overflow-y: auto;
+}
+
+.block-manager-location {
+    overflow: hidden;
+}
+
 .add-block:hover {
     .add-block-menu {
         display: block;
@@ -20,6 +28,7 @@
     min-height: 40px;
     height: 40px;
     background-color: #fff;
+
     .block-header-title {
         color: #636363;
         font: 400 13px sans-serif;
@@ -70,14 +79,17 @@
     min-height: 82px;
     .border-radius(0 0 6px 6px);
     position: relative;
-    padding-bottom: 25px;
+    padding-bottom: 50px;
+
     .grid-control-menu {
         padding-left: 13px;
-        cursor: @BlockManagerOpenhand , move;
+        cursor: @BlockManagerOpenHand, move;
     }
+
     &:hover > .grid-control-menu .grid-control-menu-actions {
         visibility: visible;
     }
+
     .grid-control-menu-actions.open {
         opacity: 1;
         visibility: visible;
@@ -87,6 +99,7 @@
 .grid.level-1.alpha {
     margin-left: 10px;
 }
+
 .grid.level-1.alpha {
     margin-right: 10px;
 }
@@ -95,32 +108,42 @@
     .block .icon-off, .grid .icon-trash, .grid .icon-cog, .grid .icon-plus {
         opacity: 0.2 !important;
     }
+
     .block-off .icon-off, .grid .icon-off {
         display: none;
     }
+
     background: #e7e7e7;
+
     .grid-control-menu {
         background-color: #fafafa;
     }
+
     .grid-control-title {
         color: #dcdcdc;
     }
+
     .grid-control-menu-actions {
         visibility: visible !important;
     }
+
     .level-2 {
         background: #dfdfdf;
     }
+
     .level-3 {
         background: #d0d0d0;
     }
+
     .level-4 {
         background: #b8b8b8;
     }
+
     .level-5 {
         background: #8c8c8c;
     }
 }
+
 .container-off {
     .grid .icon-off, .grid .icon-trash, .grid .icon-cog, .grid .icon-plus {
         display: none;
@@ -161,6 +184,7 @@
     font-weight: 700;
     padding: 3px;
     text-align: center;
+
     .add-block-menu {
         display: none;
     }
@@ -187,7 +211,7 @@
     font: 600 13px sans-serif;
     text-align: center;
     text-transform: uppercase;
-    margin: 5px 44px;
+    margin: 5px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -198,7 +222,7 @@
     font: 400 13px sans-serif;
     text-align: center;
     text-transform: none;
-    margin: 5px 44px;
+    margin: 5px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -222,6 +246,7 @@
     padding-right: 18px;
     position: absolute;
     top: 500px;
+
     div {
         background: #FFF;
         border: 1px dotted #000;
@@ -243,8 +268,10 @@
     margin: 0 0 0 2px;
     position: relative;
     width: 20px;
+
     .action {
         visibility: visible;
+
         > a, > a:hover {
             color: #fff;
             visibility: visible;
@@ -292,8 +319,10 @@
     margin-bottom: -3px;
     position: absolute;
     right: 0;
+
     .action {
         color: #000;
+
         a {
             color: #000;
         }
@@ -343,6 +372,7 @@
     margin-top: -18px;
     position: absolute;
     width: 300px;
+
     div {
         border: 1px dashed #000;
         border-radius: 5px;
@@ -389,63 +419,82 @@
     margin-bottom: 15px;
     margin-top: 0px;
     min-height: 150px;
-    padding-bottom: 30px;
+    padding-bottom: 50px;
     position: relative;
+
     .droptop {
         top: 20px;
     }
+
     &:hover > .grid-control-menu .grid-control-menu-actions {
         visibility: visible;
     }
+
     .block {
         -moz-border-radius: 5px;
         -webkit-border-radius: 5px;
         background-color: #fff;
         border: 1px solid #aeaeae;
         border-radius: 5px;
-        cursor: @BlockManagerOpenhand , move;
+        cursor: @BlockManagerOpenHand, move;
         height: 68px;
         margin: 5px 3px 5px 3px;
         min-height: 50px;
         min-width: 30px;
         max-width: 145px;
+
         .btn-group {
             visibility: hidden;
         }
+
         &:hover .btn-group {
             visibility: visible;
         }
+
         &:hover .block-header {
             background: #fafafa;
         }
+
         .block-control-menu {
             .border-radius(0 0 3px 3px);
         }
     }
+
     .block.block-off {
         border: 1px solid #dfdfdf;
+
         .block-header {
+            .block-header-devices {
+                color: #ccc;
+            }
+
             .block-header-title {
                 color: #e2e2e2 !important;
             }
+
             .block-header-icon {
                 opacity: 0.2;
             }
+
             background: #ffffff !important;
         }
+
         .block-control-menu {
             background-color: #fafafa !important;
             border-top: 1px solid #f2f2f2 !important;
         }
+
         .action {
             color: #000;
         }
+
         .icon-cog, .icon-trash {
             opacity: 0.2;
         }
     }
+
     .ui-draggable-block {
-        cursor: @BlockManagerClosedhand , auto;
+        cursor: @BlockManagerClosedHand, auto;
         opacity: 0.8 !important;
         border: 1px dotted #949494 !important;
         .box-shadow(0px 0px 13px #696969);
@@ -461,9 +510,11 @@
     top: 260px;
     width: 250px;
     z-index: 1;
+
     .hover-element {
         background: none;
     }
+
     .block {
         height: auto;
         width: auto;
@@ -473,13 +524,15 @@
 .container-lock {
     height: auto !important;
     min-height: auto !important;
-    padding-bottom: 23px;
+    padding-bottom: 50px;
+
     p {
         color: #717171;
         background: #fcfcfc;
         margin: 14px 14px;
         padding: 10px;
     }
+
     h4.grid-control-title a {
         display: none;
     }
@@ -495,11 +548,13 @@
 
 .select-block:hover {
     strong {
-        color: #0088cc;
+        color: @mainColor;
     }
+
     p {
-        color: #0088cc;
+        color: @mainColor;
     }
+
     .icon-remove-circle {
         visibility: visible;
     }
@@ -511,13 +566,16 @@
     height: 26px;
     .border-radius(0 0 1px 1px);
     padding: 0px 5px 0px 8px;
+
     .btn-group.action {
         float: left;
         margin-top: 0;
+
         .dropdown-menu {
             margin: 16px 0 0;
         }
     }
+
     .action {
         width: auto;
         height: auto;
@@ -526,14 +584,17 @@
         opacity: 0.6;
         float: left;
         text-align: center;
+
         &:hover {
             opacity: 1;
         }
     }
+
     .btn-group.action.open {
         opacity: 1;
         visibility: visible;
     }
+
     .icon-trash {
         float: right !important;
     }
@@ -541,19 +602,23 @@
 
 .block-control-menu {
     background-color: #08c;
+
     .action, .action-properties {
         color: #fff;
         width: auto;
         height: auto;
+
         &.pull-right {
             margin-left: 0;
         }
     }
+
     .action-properties,
     .action-control-menu {
         .icon-cog,
         .icon-align-justify {
             opacity: 0.6;
+
             &:hover {
                 opacity: 1;
             }
@@ -668,4 +733,92 @@
 
 .bmicon-checkout {
     background-position: 0 -90px;
+}
+
+.device-specific-block {
+
+    &.hidden {
+        display: none;
+    }
+
+    &__devices {
+
+        .block & {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+            width: 32px;
+            text-align: right;
+        }
+
+        &__device {;
+            color: @mainColor;
+            z-index: 1;
+            visibility: visible !important;
+            text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff,
+            -2px 0 rgba(255, 255, 255, 0.5), 0 2px rgba(255, 255, 255, 0.5), 2px 0 rgba(255, 255, 255, 0.5), 0 -2px rgba(255, 255, 255, 0.5),
+            -3px 0 rgba(255, 255, 255, 0.2), 0 3px rgba(255, 255, 255, 0.2), 3px 0 rgba(255, 255, 255, 0.2), 0 -3px rgba(255, 255, 255, 0.2),
+            -3px 0 rgba(255, 255, 255, 0.1), 0 3px rgba(255, 255, 255, 0.1), 3px 0 rgba(255, 255, 255, 0.1), 0 -3px rgba(255, 255, 255, 0.1);
+
+            &.icon-phone::before {
+                content: "\f10b";
+            }
+        }
+    }
+}
+
+.grid-control-menu {
+    height: 52px;
+}
+
+.device-switch-wrap {
+    margin: 10px 0;
+    text-align: center;
+
+    .muted {
+        display: inline-block;
+        text-transform: uppercase;
+        margin-right: 10px;
+    }
+
+    .device-switch {
+        display: inline-block;
+    }
+}
+
+.btn-group-checkbox {
+
+    > .btn-group-checkbox__label {
+        margin-left: -1px;
+    }
+
+    input&__checkbox {
+        display: none;
+    }
+
+    &__checkbox:checked + &__label {
+        color: #fff;
+        background: @mainColor;
+        border-color: @mainColor;
+
+        i {
+            color: #fff;
+        }
+    }
+
+    &__checkbox:first-child + &__label {
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+    }
+}
+.block-type {
+    display: inline-block;
+    margin: 0;
+    max-width: 250px;
+
+    &__label {
+        display: block;
+        font-size: 11px;
+        .word-break();
+    }
 }

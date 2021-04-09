@@ -163,3 +163,7 @@ msgstr "Update frequency"
 msgctxt "SettingsOptions::google_sitemap::companies_priority"
 msgid "Priority"
 msgstr "Priority"
+
+msgctxt "Languages::google_sitemap.export_progress_entry"
+msgid "[storefront]: [object]"
+msgstr "[storefront]: [object]"

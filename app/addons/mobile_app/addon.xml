@@ -238,6 +238,11 @@
             "appFullDescription": "",
             "supportEmail": "",
             "privacyPolicyUrl": ""
+        },
+        "apple_pay":{
+            "applePay":"off",
+            "applePayMerchantIdentifier":"",
+            "applePayMerchantName":""
         }
     }
 }]]>
@@ -249,7 +254,6 @@
     </settings>
     <functions>
         <item for="install">fn_mobile_app_install_layout</item>
-        <item for="uninstall">fn_mobile_app_uninstall_layout</item>
     </functions>
     <queries>
         <item for="install">

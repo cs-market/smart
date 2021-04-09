@@ -262,7 +262,7 @@ class Base
         }
 
         if ($this->options['weight'] == "Y") {
-            $offer['items']['weight'] = (fn_is_not_empty((float) $product['weight'])) ? $product['weight'] : '0.01';
+            $offer['items']['weight'] = $this->calculateWeight($product);
         }
 
         if ($this->options['dimensions'] == "Y") {
@@ -279,6 +279,10 @@ class Base
 
         if (!empty($product['yml2_cpa']) && $product['yml2_cpa'] == 'N') {
             $offer['items']['cpa'] = '0';
+        }
+
+        if (!empty($product['yml2_adult']) && $product['yml2_adult'] == 'Y') {
+            $offer['items']['adult'] = 'true';
         }
 
         if ($this->options['not_downloadable'] == 'N' && !empty($product['is_edp']) && $product['is_edp'] == 'Y') {
@@ -313,7 +317,8 @@ class Base
                     $image_data['image_path'] = fn_generate_thumbnail(
                         $image_data['detailed_image_path'],
                         $image_data['width'],
-                        $image_data['height']
+                        $image_data['height'],
+                        $image_pair
                     );
                 }
 
@@ -469,7 +474,11 @@ class Base
                     }
                 }
 
-                if (!$found && $feature['is_visible']) {
+                if (!$found &&
+                    ($feature['is_visible'] ||
+                        (isset($product['variation_feature_ids']) && in_array($feature['feature_id'], $product['variation_feature_ids']))
+                    )
+                ) {
                      $param = array(
                         'attr' => array(
                             'name' => $feature['description']
@@ -525,5 +534,37 @@ class Base
         $self = new static;
 
         return $self->offer_type;
+    }
+
+    /**
+     * Returns variation name of product if it exists else return product name.
+     *
+     * @param array $product Current product
+     *
+     * @return string Offer name for product
+     */
+    public function getOfferName(array $product)
+    {
+        if (!empty($product['variation_name'])) {
+            return $product['variation_name'];
+        } else {
+            return $product['product'];
+        }
+    }
+
+    /**
+     * Returns weight of product grams.
+     *
+     * @param array<float|int|string> $product Current product
+     *
+     * @return float|int|string Weight of product
+     */
+    protected function calculateWeight(array $product)
+    {
+        if (fn_is_not_empty((float) $product['weight'])) {
+            return $product['weight'] * Registry::get('settings.General.weight_symbol_grams') / 1000;
+        }
+
+        return '0.01';
     }
 }

@@ -13,8 +13,9 @@
 ****************************************************************************/
 
 use Tygh\Registry;
-use Tygh\Template\Snippet\Snippet;
 use Tygh\Template\Document\IPreviewableType;
+use Tygh\Template\Snippet\Snippet;
+use Tygh\Enum\UserTypes;
 
 /** @var string $mode */
 
@@ -256,7 +257,7 @@ if ($mode == 'update') {
         'snippets' => array(
             'title' => __('code_snippets'),
             'js' => true,
-        )
+        ),
     );
 
     $tables = array();
@@ -267,12 +268,12 @@ if ($mode == 'update') {
         if (!empty($params['used_table'])) {
             $tables[] = array(
                 'snippet' => $snippet,
-                'columns' => $table_column_repository->findBySnippet($snippet->getType(), $snippet->getCode())
+                'columns' => $table_column_repository->findBySnippet($snippet->getType(), $snippet->getCode()),
             );
 
             $tab = array(
                 'title' => $snippet->getName(),
-                'js' => true
+                'js' => true,
             );
 
             if ($snippet->getStatus() == Snippet::STATUS_DISABLE) {
@@ -281,6 +282,24 @@ if ($mode == 'update') {
 
             $tabs['snippet_content_' . $snippet->getId() . '_table_columns'] = $tab;
         }
+    }
+
+    if ($document) {
+        /** @var \Tygh\Template\Mail\Repository $email_templates_repository */
+        $email_templates_repository = Tygh::$app['template.mail.repository'];
+
+        $document_usage_criteria = '%{{ include_doc("' . $document->getFullCode() . '"%';
+        $templates_list = $email_templates_repository->findByContent($document_usage_criteria);
+
+        $email_templates = [];
+        foreach ($templates_list as $id => $template) {
+            if (!isset($email_templates[$template->getArea()])) {
+                $email_templates[$template->getArea()] = [];
+            }
+            $email_templates[$template->getArea()][$id] = $template;
+        }
+
+        $view->assign('email_templates', $email_templates);
     }
 
     $view->assign('snippets_tables', $tables);
@@ -296,4 +315,5 @@ if ($mode == 'update') {
     $documents = $service->getDocuments();
 
     $view->assign('documents', $documents);
+    $view->assign('active_section', 'documents');
 }

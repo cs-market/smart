@@ -17,6 +17,7 @@ namespace Tygh\SmartyEngine;
 use Tygh\Registry;
 use Tygh\Embedded;
 use Tygh\Tools\Url;
+use Tygh\Languages\Values as LanguageValues;
 
 class Filters
 {
@@ -129,7 +130,7 @@ class Filters
             }
 
             $template_pref = 'tt_' . $template_name;
-            $template_tooltips = fn_get_lang_vars_by_prefix($template_pref);
+            $template_tooltips = LanguageValues::getLangVarsByPrefix($template_pref);
 
             foreach ($matches[0] as $k => $m) {
                 $field_name = $matches[2][$k];
@@ -226,7 +227,7 @@ class Filters
         $content = str_replace('__(', '$_smarty_tpl->__(', $content);
 
         if (preg_match_all('/__\(\"([\w\.]*?)\"/i', $content, $matches)) {
-            return "<?php\nfn_preload_lang_vars(array('" . implode("','", $matches[1]) . "'));\n?>\n" . $content;
+            return "<?php\n\Tygh\Languages\Helper::preloadLangVars(array('" . implode("','", $matches[1]) . "'));\n?>\n" . $content;
         }
 
         return $content;
@@ -240,7 +241,7 @@ class Filters
      */
     public static function outputLiveEditorWrapper($content, \Smarty_Internal_Template $template)
     {
-        $pattern = '/\<(input|img|div)[^>]*?(\[lang name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/lang\])[^>]*?\>/';
+        $pattern = '/\<(input|img|div)[^>]*?(\[lang name\=([\w\-\.]+?)\](.*?)\[\/lang\])[^>]*?\>/';
         if (preg_match_all($pattern, $content, $matches)) {
             foreach ($matches[0] as $k => $m) {
                 $phrase_replaced = str_replace($matches[2][$k], $matches[5][$k], $matches[0][$k]);
@@ -258,7 +259,7 @@ class Filters
             }
         }
 
-        $pattern = '/(\<(textarea|option)[^<]*?)\>(\[lang name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/lang\])[^>]*?\>/is';
+        $pattern = '/(\<(textarea|option)[^<]*?)\>(\[lang name\=([\w\-\.]+?)\](.*?)\[\/lang\])[^>]*?\>/is';
         if (preg_match_all($pattern, $content, $matches)) {
             foreach ($matches[0] as $k => $m) {
                 $phrase_replaced = str_replace($matches[3][$k], $matches[6][$k], $matches[0][$k]);
@@ -272,22 +273,22 @@ class Filters
         }
 
         $pattern = '/<title>(.*?)<\/title>/is';
-        $pattern_inner = '/\[(lang) name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/\1\]/is';
+        $pattern_inner = '/\[(lang) name\=([\w\-\.]+?)\](.*?)\[\/\1\]/is';
         preg_match($pattern, $content, $matches);
         $phrase_replaced = $matches[0];
-        $phrase_replaced = preg_replace($pattern_inner, '$4', $phrase_replaced);
+        $phrase_replaced = preg_replace($pattern_inner, '$3', $phrase_replaced);
         $content = str_replace($matches[0], $phrase_replaced, $content);
 
         // remove translation tags from elements attributes
-        $pattern = '/(\<[^<>]*\=[^<>]*)(\[lang name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/lang\])[^<>]*?\>/is';
+        $pattern = '/(\<[^<>]*\=[^<>]*)(\[lang name\=([\w\-\.]+?)\](.*?)\[\/lang\])[^<>]*?\>/is';
         while (preg_match($pattern, $content, $matches)) {
-            $phrase_replaced = preg_replace($pattern_inner, '$4', $matches[0]);
+            $phrase_replaced = preg_replace($pattern_inner, '$3', $matches[0]);
             $content = str_replace($matches[0], $phrase_replaced, $content);
         }
 
-        $pattern = '/(?<=>)[^<]*?\[(lang) name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/\1\]/is';
-        $pattern_inner = '/\[(lang) name\=([\w-\.]+?)( cm\-pre\-ajax)?\]((?:(?>[^\[]+)|\[(?!\1[^\]]*\]))*?)\[\/\1\]/is';
-        $replacement = '<var class="live-edit-wrap"><i class="cm-icon-live-edit icon-live-edit ty-icon-live-edit"></i><var data-ca-live-edit="langvar::$2$3" class="cm-live-edit live-edit-item">$4</var></var>';
+        $pattern = '/(?<=>)[^<]*?\[(lang) name\=([\w\-\.]+?)\](.*?)\[\/\1\]/is';
+        $pattern_inner = '/\[(lang) name\=([\w\-\.]+?)\]((?:(?>[^\[]+)|\[(?!\1[^\]]*\]))*?)\[\/\1\]/is';
+        $replacement = '<var class="live-edit-wrap"><i class="cm-icon-live-edit icon-live-edit ty-icon-live-edit"></i><var data-ca-live-edit="langvar::$2" class="cm-live-edit live-edit-item">$3</var></var>';
         while (preg_match($pattern, $content, $matches)) {
             $phrase_replaced = $matches[0];
             while (preg_match($pattern_inner, $phrase_replaced)) {
@@ -296,10 +297,9 @@ class Filters
             $content = str_replace($matches[0], $phrase_replaced, $content);
         }
 
-        $pattern = '/\[(lang) name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/\1\]/';
-        $replacement = '$4';
+        $pattern = '/\[(lang) name\=([\w\-\.]+?)\](.*?)\[\/\1\]/';
+        $replacement = '$3';
         $content = preg_replace($pattern, $replacement, $content);
-
         return $content;
     }
 

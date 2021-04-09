@@ -96,21 +96,21 @@
                     {/if}
 
                     {foreach from=$datafeed_langs key=k_lang item=lang}
-                        <lable class="radio inline-block" for="elm_lang">
+                        <label class="radio inline-block" for="elm_lang">
                             <input id="elm_lang" type="radio" value="{$k_lang}" {if $default_lang == $k_lang}checked="checked"{/if} name="datafeed_data[export_options][lang_code][]" />
                             {$lang}
-                        </lable>
+                        </label>
                     {/foreach}
                 </div>
             {elseif $o.type == "select"}
                 <select id="elm_datafeed_element_{$p_id}_{$k}" name="datafeed_data[export_options][{$k}]">
                 {if $o.variants_function}
                     {foreach from=$o.variants_function|call_user_func key=vk item=vi}
-                    <option value="{$vk}" {if $vk == $datafeed_data.export_options.$k|default:$o.default_value}checked="checked"{/if}>{$vi}</option>
+                    <option value="{$vk}" {if $vk == $datafeed_data.export_options.$k|default:$o.default_value}selected="selected"{/if}>{$vi}</option>
                     {/foreach}
                 {else}
                     {foreach from=$o.variants key=vk item=vi}
-                    <option value="{$vk}" {if $vk == $datafeed_data.export_options.$k|default:$o.default_value}checked="checked"{/if}>{__($vi)}</option>
+                    <option value="{$vk}" {if $vk == $datafeed_data.export_options.$k|default:$o.default_value}selected="selected"{/if}>{__($vi)}</option>
                     {/foreach}
                 {/if}
                 </select>

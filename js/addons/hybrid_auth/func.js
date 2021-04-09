@@ -66,9 +66,9 @@
             }
 
             if (login_provider) {
-                url = 'auth.login_provider?provider=OpenID&_ts=' + (new Date()).getTime() + '&openid_identifier=' + escape(oi);
+                url = 'auth.login_provider?provider=OpenID&_ts=' + (new Date()).getTime() + '&openid_identifier=' + encodeURIComponent(oi);
             } else {
-                url = 'profiles.link_provider?provider=OpenID&_ts=' + (new Date()).getTime() + '&openid_identifier=' + escape(oi);
+                url = 'profiles.link_provider?provider=OpenID&_ts=' + (new Date()).getTime() + '&openid_identifier=' + encodeURIComponent(oi);
             }
         }
 

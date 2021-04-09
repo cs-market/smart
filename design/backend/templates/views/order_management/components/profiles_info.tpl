@@ -200,24 +200,28 @@
         </div>
     </div>
     <hr class="profile-info-delim" />
-    <div class="sidebar-row">
-        {profile_edit_link scroll_to="profile_fields_b"}
-        <h6>{__("billing_address")}</h6>
-        <div class="profile-info">
-            <i class="icon-tag"></i>
-            {$smarty.capture.billing_address nofilter}
+    {if $profile_fields.B}
+        <div class="sidebar-row">
+            {profile_edit_link scroll_to="profile_fields_b"}
+            <h6>{__("billing_address")}</h6>
+            <div class="profile-info">
+                <i class="icon-tag"></i>
+                {$smarty.capture.billing_address nofilter}
+            </div>
         </div>
-    </div>
-    <hr class="profile-info-delim" />
+        <hr class="profile-info-delim" />
+    {/if}
 {else}
-    <div class="sidebar-row">
-        {profile_edit_link scroll_to="profile_fields_b"}
-        <h6>{__("billing_address")}</h6>
-        <div class="profile-info">
-            <i class="icon-tag"></i>
-            {$smarty.capture.billing_address nofilter}
+    {if $profile_fields.B}
+        <div class="sidebar-row">
+            {profile_edit_link scroll_to="profile_fields_b"}
+            <h6>{__("billing_address")}</h6>
+            <div class="profile-info">
+                <i class="icon-tag"></i>
+                {$smarty.capture.billing_address nofilter}
+            </div>
         </div>
-    </div>
+    {/if}
     <hr class="profile-info-delim" />
     <div class="sidebar-row">
         {profile_edit_link scroll_to="profile_fields_s"}

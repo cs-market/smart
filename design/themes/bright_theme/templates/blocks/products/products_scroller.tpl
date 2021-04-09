@@ -1,51 +1,57 @@
 {** block-description:tmpl_scroller **}
 
 {if $settings.Appearance.enable_quick_view == "Y" && $block.properties.enable_quick_view == "Y"}
-    {$quick_nav_ids = $items|fn_fields_from_multi_level:"product_id":"product_id"}
+    {$quick_nav_ids = $items|fn_fields_from_multi_level:"product_id":"product_id"}    
+    {$show_quick_view = true}
 {/if}
 
 {if $block.properties.hide_add_to_cart_button == "Y"}
-    {assign var="show_add_to_cart" value=false}
+    {$show_add_to_cart=false}
 {else}
-    {assign var="show_add_to_cart" value=true}
+    {$show_add_to_cart=true}
 {/if}
 {if $block.properties.show_price == "Y"}
-    {assign var="hide_price" value=false}
+    {$hide_price=false}
 {else}
-    {assign var="hide_price" value=true}
+    {$hide_price=true}
 {/if}
 
-{assign var="show_trunc_name" value=true}
-{assign var="show_old_price" value=true}
-{assign var="show_price" value=true}
-{assign var="show_rating" value=true}
-{assign var="show_clean_price" value=true}
-{assign var="show_list_discount" value=true}
-{assign var="but_role" value="action"}
-{assign var="show_discount_label" value=true}
+{$show_trunc_name=true}
+{$show_old_price=true}
+{$show_price=true}
+{$show_rating=true}
+{$show_clean_price=true}
+{$show_list_discount=true}
+{$but_role="action"}
+{$show_product_labels=true}
+{$show_discount_label=true}
+{$show_shipping_label=true}
 
 {* FIXME: Don't move this file *}
 {script src="js/tygh/product_image_gallery.js"}
 
-{assign var="obj_prefix" value="`$block.block_id`000"}
+{$obj_prefix="`$block.block_id`000"}
 {$block.properties.outside_navigation = "N"}
+{$block.block_id = "{$block.block_id}_{uniqid()}"}
 
 <div id="scroll_list_{$block.block_id}" class="owl-carousel ty-scroller-list grid-list ty-scroller-advanced">
     {foreach from=$items item="product" name="for_products"}
         {hook name="products:product_scroller_advanced_list"}
         <div class="ty-scroller-list__item">
+            {hook name="products:product_scroller_advanced_list_item"}
             {if $product}
-                {assign var="obj_id" value=$product.product_id}
-                {assign var="obj_id_prefix" value="`$obj_prefix``$product.product_id`"}
+                {$obj_id=$product.product_id}
+                {$obj_id_prefix="`$obj_prefix``$product.product_id`"}
                 {include file="common/product_data.tpl" product=$product}
 
-                <div class="ty-grid-list__item ty-quick-view-button__wrapper ty-left">
-                    {assign var="form_open" value="form_open_`$obj_id`"}
+                <div class="ty-grid-list__item ty-quick-view-button__wrapper ty-left
+                {if $show_quick_view} ty-grid-list__item--overlay{/if}">
+                    {$form_open="form_open_`$obj_id`"}
                     {$smarty.capture.$form_open nofilter}
 
                     <div class="ty-grid-list__image">
-                        {assign var="discount_label" value="discount_label_`$obj_prefix``$obj_id`"}
-                        {$smarty.capture.$discount_label nofilter}
+                        {$product_labels="product_labels_`$obj_prefix``$obj_id`"}
+                        {$smarty.capture.$product_labels nofilter}
 
                         {include file="views/products/components/product_icon.tpl" product=$product show_gallery=true}
                     </div>
@@ -56,50 +62,61 @@
                             {math equation="num + 1" num=$cur_number assign="cur_number"}
                         {/if}
 
-                        {assign var="name" value="name_$obj_id"}
+                        {$name="name_$obj_id"}
                         <bdi>{$smarty.capture.$name nofilter}</bdi>
                     </div>
 
                     {if !$hide_price}
                         <div class="ty-grid-list__price {if $product.price == 0}ty-grid-list__no-price{/if}">
-                            {assign var="old_price" value="old_price_`$obj_id`"}
+                            {$old_price="old_price_`$obj_id`"}
                             {if $smarty.capture.$old_price|trim}{$smarty.capture.$old_price nofilter}{/if}
 
-                            {assign var="price" value="price_`$obj_id`"}
+                            {$price="price_`$obj_id`"}
                             {$smarty.capture.$price nofilter}
 
-                            {assign var="clean_price" value="clean_price_`$obj_id`"}
+                            {$clean_price="clean_price_`$obj_id`"}
                             {$smarty.capture.$clean_price nofilter}
 
-                            {assign var="list_discount" value="list_discount_`$obj_id`"}
+                            {$list_discount="list_discount_`$obj_id`"}
                             {$smarty.capture.$list_discount nofilter}
                         </div>
                     {/if}
 
-                    {assign var="rating" value="rating_$obj_id"}
+                    {$rating="rating_$obj_id"}
                     {if $smarty.capture.$rating}
                         <div class="grid-list__rating">
                             {$smarty.capture.$rating nofilter}
                         </div>
                     {/if}
 
-                    <div class="ty-grid-list__control">
-                        {if $settings.Appearance.enable_quick_view == "Y" && $block.properties.enable_quick_view == "Y"}
-                            {include file="views/products/components/quick_view_link.tpl" quick_nav_ids=$quick_nav_ids}
-                        {/if}
+                    {capture name="product_multicolumns_list_control_data_wrapper"}
+                        <div class="ty-grid-list__control">
+                            {capture name="product_multicolumns_list_control_data"}
+                                {if $show_quick_view}
+                                    {include file="views/products/components/quick_view_link.tpl" quick_nav_ids=$quick_nav_ids}
+                                {/if}
 
-                        {if $show_add_to_cart}
-                            <div class="button-container">
-                                {assign var="add_to_cart" value="add_to_cart_`$obj_id`"}
-                                {$smarty.capture.$add_to_cart nofilter}
-                            </div>
-                        {/if}
-                    </div>
+                                {if $show_add_to_cart}
+                                    <div class="button-container">
+                                        {$add_to_cart = "add_to_cart_`$obj_id`"}
+                                        {$smarty.capture.$add_to_cart nofilter}
+                                    </div>
+                                {/if}
+                            {/capture}
+                            {$smarty.capture.product_multicolumns_list_control_data nofilter}
+                        </div>
+                    {/capture}
 
-                    {assign var="form_close" value="form_close_`$obj_id`"}
+
+                    {if $smarty.capture.product_multicolumns_list_control_data|trim}
+                        {$smarty.capture.product_multicolumns_list_control_data_wrapper nofilter}
+                    {/if}
+
+                    {$form_close="form_close_`$obj_id`"}
                     {$smarty.capture.$form_close nofilter}
                 </div>
             {/if}
+            {/hook}
         </div>
         {/hook}
     {/foreach}

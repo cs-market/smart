@@ -40,7 +40,7 @@ if (!empty($_REQUEST['boxberry_selected_point'])) {
             $old_ship_data = unserialize($old_ship_data);
 
             foreach ($old_ship_data as $shipping) {
-                if (empty($shipping['point_id'])) {
+                if (empty($shipping['point_id']) || $shipping['module'] !== 'boxberry') {
                     continue;
                 }
 

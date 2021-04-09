@@ -158,8 +158,8 @@
     <div class="ty-gift-certificate__block{if $runtime.mode == "add" || $gift_cert_data.send_via == "E"} hidden{/if}" id="post_block">
 
         <div class="ty-control-group">
-            <label for="gift_cert_phone" class="ty-control-group__title">{__("phone")}</label>
-            <input type="text" id="gift_cert_phone" name="gift_cert_data[phone]" class="ty-input-text-full" size="50" value="{$gift_cert_data.phone}" />
+            <label for="gift_cert_phone" class="ty-control-group__title cm-mask-phone-label">{__("phone")}</label>
+            <input type="text" id="gift_cert_phone" class="ty-input-text-full cm-mask-phone" name="gift_cert_data[phone]" class="ty-input-text-full" size="50" value="{$gift_cert_data.phone}" />
         </div>
 
         <div class="ty-control-group">
@@ -176,7 +176,7 @@
             <input type="text" id="gift_cert_city" name="gift_cert_data[city]" class="ty-input-text-full" size="50" value="{$gift_cert_data.city}" />
         </div>
 
-        {$_country = $gift_cert_data.country|default:$settings.General.default_country}
+        {$_country = $gift_cert_data.country|default:$settings.Checkout.default_country}
         <div class="ty-control-group ty-float-left ty-gift-certificate__country country">
             <label for="gift_cert_country" class="ty-control-group__title cm-required">{__("country")}</label>
             <select id="gift_cert_country" name="gift_cert_data[country]" class="ty-gift-certificate__select cm-country cm-location-billing" >
@@ -187,7 +187,7 @@
             </select>
         </div>
 
-        {$_state = $gift_cert_data.state|default:$settings.General.default_state}
+        {$_state = $gift_cert_data.state|default:$settings.Checkout.default_state}
         <div class="ty-control-group ty-float-right ty-gift-certificate__state state">
             <label for="gift_cert_state" class="ty-control-group__title cm-required">{__("state")}</label>
             <select class="ty-gift-certificate__select cm-state cm-location-billing" id="gift_cert_state" name="gift_cert_data[state]">

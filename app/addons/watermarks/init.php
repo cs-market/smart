@@ -30,7 +30,7 @@ fn_register_hooks(
     'init_company_data',
     'generate_thumbnail_file_pre',
     'generate_thumbnail_post',
-    'get_route',
+    ['get_route', 1],
     'update_company',
     'image_zoom_check_image_post'
 );

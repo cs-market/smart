@@ -16,4 +16,28 @@ namespace Tygh\Exceptions;
 
 class DeveloperException extends AException
 {
+    public static function undefinedCacheLevel()
+    {
+        self::throwException('Registry: undefined cache level');
+    }
+
+    public static function hookHandlerIsNotCallable($func)
+    {
+        self::throwException(sprintf('Hook %s is not callable', $func));
+    }
+
+    public static function undefinedStorageDriver()
+    {
+        self::throwException('Storage: undefined storage backend');
+    }
+
+    public static function undefinedStorageType($type)
+    {
+        self::throwException('Storage: undefined storage type - ' . $type);
+    }
+
+    public static function throwException($message)
+    {
+        throw new DeveloperException($message);
+    }
 }

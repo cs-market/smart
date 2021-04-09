@@ -5,8 +5,8 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: en_US"
 
 msgctxt "Addons::name::rus_geolocation"
-msgid "Geolocation"
-msgstr "Geolocation"
+msgid "Geolocation [Deprecated]"
+msgstr "Geolocation [Deprecated]"
 
 msgctxt "Addons::description::rus_geolocation"
 msgid "Use Yandex Geolocation to determine a customer's city"
@@ -83,6 +83,10 @@ msgstr "Choose your city"
 msgctxt "Languages::addon.rus_geolocation.choose_cities"
 msgid "Yes, this is my city"
 msgstr "Yes, this is my city"
+
+msgctxt "Languages::addon.rus_geolocation.choose_city"
+msgid "Choose city"
+msgstr "Choose city"
 
 msgctxt "Languages::addon.rus_geolocation.selected_fields"
 msgid "Selected cities"

@@ -13,6 +13,9 @@
 ****************************************************************************/
 
 $schema['top']['addons']['items']['data_feeds'] = array(
+    'attrs' => array(
+        'class' => 'is-addon'
+    ),
     'href' => 'data_feeds.manage',
     'position' => 200
 );

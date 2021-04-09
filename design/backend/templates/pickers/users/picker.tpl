@@ -1,32 +1,32 @@
 {math equation="rand()" assign="rnd"}
-{assign var="data_id" value="`$data_id`_`$rnd`"}
-{assign var="view_mode" value=$view_mode|default:"mixed"}
-{assign var="show_but_text" value=$show_but_text|default:"true"}
+{$data_id=$picker_id|default:"{$data_id}_{$rnd}"}
+{$view_mode=$view_mode|default:"mixed"}
+{$show_but_text=$show_but_text|default:"true"}
 
 {script src="js/tygh/picker.js"}
 
 {if $item_ids && !$item_ids|is_array}
-    {assign var="item_ids" value=","|explode:$item_ids}
+    {$item_ids=","|explode:$item_ids}
 {/if}
 
-{assign var="display" value=$display|default:"checkbox"}
+{$display=$display|default:"checkbox"}
 
 {if $view_mode != "list" && $view_mode != "single_button"}
 
     {include file="views/profiles/components/profiles_scripts.tpl"}
 
     {if $extra_var}
-        {assign var="extra_var" value=$extra_var|escape:url}
+        {$extra_var=$extra_var|escape:url}
     {/if}
 
     {if $display == "checkbox"}
-        {assign var="_but_text" value=__("add_users")}
+        {$_but_text=__("add_users")}
     {elseif $display == "radio"}
-        {assign var="_but_text" value=__("choose")}
+        {$_but_text=__("choose")}
     {/if}
 
     {if $but_text}
-        {assign var="_but_text" value=$but_text}
+        {$_but_text=$but_text}
     {/if}
 
     {if $placement == 'right'}
@@ -35,9 +35,9 @@
     {/if}
 
     {if $show_but_text}
-        {assign var="but_text" value=$_but_text}
+        {$but_text=$_but_text}
     {else}
-        {assign var="but_text" value=""}
+        {$but_text=""}
     {/if}
 
     {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_href="profiles.picker?display=`$display`&extra=`$extra_var`&picker_for=`$picker_for`&data_id=`$data_id`&shared_force=`$shared_force``$extra_url`"|fn_url but_role="add" but_target_id="content_`$data_id`" but_meta="cm-dialog-opener `$but_meta`" but_icon=$but_icon}
@@ -75,7 +75,7 @@
         <input id="u{$data_id}_ids" type="hidden" name="{$input_name}" value="{if $item_ids}{","|implode:$item_ids}{/if}" />
 
         <div class="table-wrapper">
-            <table width="100%" class="table table-middle">
+            <table width="100%" class="table table-middle table--relative">
             <thead>
             <tr>
                 <th width="100%">{__("person_name")}</th>
@@ -86,7 +86,7 @@
             {include file="pickers/users/js.tpl" user_id="`$ldelim`user_id`$rdelim`" email="`$ldelim`email`$rdelim`" user_name="`$ldelim`user_name`$rdelim`" holder=$data_id clone=true}
             {if $item_ids}
             {foreach from=$item_ids item="user" name="items"}
-                {assign var="user_info" value=$user|fn_get_user_short_info}
+                {$user_info=$user|fn_get_user_short_info}
                 {include file="pickers/users/js.tpl" user_id=$user email=$user_info.email user_name="`$user_info.firstname` `$user_info.lastname`" holder=$data_id first_item=$smarty.foreach.items.first}
             {/foreach}
             {/if}

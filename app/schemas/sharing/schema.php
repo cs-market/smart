@@ -150,60 +150,6 @@ return array(
         'have_owner' => true,
     ),
 
-    'shippings' => array(
-        'controller' => 'shippings',
-        'api' => 'shippings',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@shipping_id',
-            'object' => 'shippings'
-        ),
-        'table' => array(
-            'name' => 'shippings',
-            'key_field' => 'shipping_id',
-        ),
-        'buttons' => array(
-            'type' => 'save_cancel',
-            'but_name' => 'dispatch[shippings.update_shipping]',
-        ),
-        'request_object' => 'shipping_data',
-        'have_owner' => true,
-    ),
-
-    'payments' => array(
-        'controller' => 'payments',
-        'api' => 'payments',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@payment_id',
-            'object' => 'payments'
-        ),
-        'table' => array(
-            'name' => 'payments',
-            'key_field' => 'payment_id',
-        ),
-        'request_object' => 'payment_data',
-        'have_owner' => true,
-    ),
-
-    'promotions' => array(
-        'controller' => 'promotions',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@promotion_id',
-            'object' => 'promotions'
-        ),
-        'table' => array(
-            'name' => 'promotions',
-            'key_field' => 'promotion_id',
-        ),
-        'request_object' => 'promotion_data',
-        'have_owner' => true,
-    ),
-
     'product_filters' => array(
         'controller' => 'product_filters',
         'mode' => 'update',

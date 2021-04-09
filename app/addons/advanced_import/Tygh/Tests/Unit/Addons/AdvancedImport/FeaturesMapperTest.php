@@ -28,7 +28,6 @@ class FeaturesMapperTest extends ATestCase
 
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('AREA', 'A');
 
         $this->mapper = new FeaturesMapper();

@@ -13,7 +13,13 @@
     <input type="hidden" name="{$name}" id="{$id}" value="{$search.company_id|default:''}" />
     <label class="control-label">{$lang_search_by_vendor}</label>
     <div class="controls">
-    {include file="common/ajax_select_object.tpl" data_url="companies.get_companies_list?show_all=Y&search=Y" text=$search.company_id|fn_get_company_name|default:__("all_vendors") result_elm=$id id="`$id`_selector"}
+    {include file="common/ajax_select_object.tpl"
+        data_url="companies.get_companies_list?show_all=Y&search=Y"
+        text=$search.company_id|fn_get_company_name|default:__("all_vendors")
+        result_elm=$id
+        id="`$id`_selector"
+        relative_dropdown=$relative_dropdown
+    }
     </div>
 </div>
 

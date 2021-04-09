@@ -14,8 +14,10 @@
 
 namespace Tygh\Backend\Storage;
 
-use Tygh\Exceptions\ClassNotFoundException;
-use Tygh\Exceptions\ExternalException;
+use Aws\Credentials\Credentials;
+use Aws\S3\S3Client;
+use Aws\Exception\AwsException;
+use Aws\S3\S3UriParser;
 use Tygh\Storage;
 use Tygh\Registry;
 
@@ -24,7 +26,7 @@ class Amazon extends ABackend
     const LOCATION = 'remote';
 
     /**
-     * @var \AmazonS3
+     * @var S3Client
      */
     private $_s3;
     private $_buckets;
@@ -34,7 +36,7 @@ class Amazon extends ABackend
      *
      * @param  string $src  file path in storage
      * @param  string $dest path to local file
-     * @return int    number of bytes copied
+     * @return bool
      */
     public function export($src, $dest)
     {
@@ -42,11 +44,17 @@ class Amazon extends ABackend
             return false;
         }
 
-        $res = $this->s3()->get_object($this->getOption('bucket'), $this->prefix($src), array(
-            'fileDownload' => $dest
-        ));
+        try {
+            $object_result = $this->s3()->getObject([
+                'Bucket' => $this->getOption('bucket'),
+                'Key' => $this->prefix($src),
+                'SaveAs' => $dest
+            ]);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
+        }
 
-        if ($res->isOK()) {
+        if (!empty($object_result)) {
             return true;
         }
 
@@ -58,7 +66,7 @@ class Amazon extends ABackend
      *
      * @param  string $file   file path in storage
      * @param  array  $params uploaded data and options
-     * @return array  file size and file name
+     * @return array  file size and file name, boolean false otherwise
      */
     public function put($file, $params)
     {
@@ -69,15 +77,14 @@ class Amazon extends ABackend
 
         $s3 = $this->s3(); // get object to initialize class and get access to contstants below
 
-        $data = array(
-            'acl' => \AmazonS3::ACL_PUBLIC,
-            'headers' => array()
-        );
+        $data = []; // params to put object
+
+        $data['acl'] = 'public-read';
 
         if (!empty($params['compress'])) {
 
-            $data['headers']['Content-Encoding'] = 'gzip';
-            $data['headers']['Cache-control'] = 'private';
+            $data['content_encoding'] = 'gzip';
+            $data['cache_control'] = 'private';
 
             if (!empty($params['contents'])) {
                 $params['contents'] = gzencode($params['contents']);
@@ -86,11 +93,11 @@ class Amazon extends ABackend
 
         // File can not be accessible via direct link
         if ($this->getOption('secured')) {
-            $data['headers']['Content-disposition'] = 'attachment; filename="' . fn_basename($file) . '"';
-            $data['acl'] = \AmazonS3::ACL_PRIVATE;
+            $data['content_disposition'] = 'attachment';
+            $data['acl'] = 'private';
         }
 
-        $data['contentType'] = fn_get_file_type($file);
+        $data['content_type'] = fn_get_file_type($file);
 
         if (!empty($params['contents'])) {
             $data['body'] = $params['contents'];
@@ -98,9 +105,24 @@ class Amazon extends ABackend
             $data['fileUpload'] = $params['file'];
         }
 
-        $res = $s3->create_object($this->getOption('bucket'), $file, $data);
+        try {
+            $put_object_result = $s3->putObject([
+                'Bucket' => $this->getOption('bucket'),
+                'Key' => $file,
+                'SourceFile' => $params['file'],
+                'ACL' => $data['acl'],
+                'Body' => !empty($data['body']) ? $data['body'] : '',
+                'CacheControl' => !empty($data['cache_control']) ? $data['cache_control'] : '',
+                'ContentDisposition' => !empty($data['content_disposition']) ? $data['content_disposition'] : '',
+                'ContentEncoding' => !empty($data['content_encoding']) ? $data['content_encoding'] : '',
+                'ContentType' => $data['content_type']
+            ]);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
+        }
 
-        if ($res->isOK()) {
+        if (!empty($put_object_result)) {
+
             if (!empty($params['caching'])) {
                 Registry::set('s3_' . $this->getOption('bucket') . '.' . md5($file), true);
             }
@@ -132,40 +154,41 @@ class Amazon extends ABackend
     {
         $s3 = $this->s3(); // get object to initialize class and get access to contstants below
 
-        $i = 0;
-        $max_batch = 10;
-
         $files = fn_get_dir_contents($dir, false, true, '', '', true);
         fn_set_progress('step_scale', sizeof($files));
+
+        $data = []; // params to put object
 
         foreach ($files as $source_file) {
             fn_set_progress('echo', '.');
 
-            $i++;
-            $data = array(
-                'acl' => \AmazonS3::ACL_PUBLIC,
-                'headers' => array()
-            );
+            $data['acl'] = 'public-read';
 
             // File can not be accessible via direct link
             if ($this->getOption('secured')) {
-                $data['headers']['Content-disposition'] = 'attachment; filename="' . fn_basename($source_file) . '"';
-                $data['acl'] = \AmazonS3::ACL_PRIVATE;
+                $data['content_disposition'] = 'attachment';
+                $data['acl'] = 'private';
             }
 
             $data['contentType'] = fn_get_file_type($source_file);
             $data['fileUpload'] = $dir . '/' . $source_file;
 
-            $res = $s3->batch()->create_object($this->getOption('bucket'), $this->prefix($source_file), $data);
-
-            if ($i == $max_batch) {
-                $s3->batch()->send();
-                $i = 0;
+            try {
+                $put_object_result = $s3->putObject([
+                    'Bucket' => $this->getOption('bucket'),
+                    'Key' => fn_basename($dir) . '/' . $source_file,
+                    'SourceFile' => $data['fileUpload'],
+                    'ACL' => $data['acl'],
+                    'Body' => !empty($data['body']) ? $data['body'] : '',
+                    'CacheControl' => !empty($data['cache_control']) ? $data['cache_control'] : '',
+                    'ContentDisposition' => !empty($data['content_disposition']) ? $data['content_disposition'] : '',
+                    'ContentEncoding' => !empty($data['content_encoding']) ? $data['content_encoding'] : '',
+                    'ContentType' => $data['content_type']
+                ]);
+            } catch (AwsException $e) {
+                fn_set_notification('E', __('error'), (string) $e->getMessage());
             }
-        }
 
-        if (!empty($i)) {
-            $s3->batch()->send(); // send the rest of the batch
         }
 
         return true;
@@ -222,7 +245,7 @@ class Amazon extends ABackend
      */
     public function get($file, $filename = '')
     {
-        header('Location: ' . $this->s3()->get_object_url($this->getOption('bucket'), $this->prefix($file), TIME + SECONDS_IN_HOUR));
+        header('Location: ' . $this->s3()->getObjectUrl($this->getOption('bucket'), $this->prefix($file)));
     }
 
     /**
@@ -234,7 +257,17 @@ class Amazon extends ABackend
     public function delete($file)
     {
         $file = $this->prefix($file);
-        if ($this->s3()->delete_object($this->getOption('bucket'), $file)) {
+
+        try {
+            $delete_result = $this->s3()->deleteObject([
+                'Bucket' => $this->getOption('bucket'),
+                'Key' => $file
+            ]);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
+        }
+
+        if (!empty($delete_result)) {
             $cache_name = 's3_' . $this->getOption('bucket');
             Registry::registerCache($cache_name, array(), Registry::cacheLevel('static'), true);
             Registry::del($cache_name . '.' . md5($file));
@@ -249,35 +282,41 @@ class Amazon extends ABackend
      * Deletes directory and all it files
      *
      * @param  string  $dir directory to delete
-     * @return boolean true if deleted successfully, false - otherwise
+     * @return boolean true if deleted successfully
      */
     public function deleteDir($dir = '')
     {
         $dir = rtrim($this->prefix($dir), '/') . '/';
-        if ($this->s3()->delete_all_objects($this->getOption('bucket'), '/^' . preg_quote($dir, '/') . '/i')) {
-            return true;
+
+        try {
+            $this->s3()->deleteMatchingObjects($this->getOption('bucket'), $dir);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
         }
 
-        return false;
+        return true;
     }
 
     /**
      * Deletes files using glob pattern
      *
      * @param  string  $pattern glob-compatible pattern
-     * @return boolean true if deleted successfully, false - otherwise
+     * @return boolean true if deleted successfully
      */
     public function deleteByPattern($pattern)
     {
         $p = preg_quote($this->prefix($pattern), '/');
+        $p = preg_quote($pattern, '/');
         $p = str_replace('\*', '[^\/]*', $p);
         $p = str_replace('\?', '.', $p);
 
-        if ($this->s3()->delete_all_objects($this->getOption('bucket'), '/' . $p . '/i')) {
-            return true;
+        try {
+            $this->s3()->deleteMatchingObjects($this->getOption('bucket'), null, sprintf('/%s/i', $p));
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -295,7 +334,7 @@ class Amazon extends ABackend
         Registry::registerCache($cache_name, array(), Registry::cacheLevel('static'), true);
         $is_exist = Registry::get($cache_name . '.' . md5($file));
 
-        if ($in_cache == false && $is_exist == false && $is_exist = $this->s3()->if_object_exists($this->getOption('bucket'), $file)) {
+        if ($in_cache == false && $is_exist == false && $is_exist = $this->s3()->doesObjectExist($this->getOption('bucket'), $file)) {
             Registry::set($cache_name . '.' . md5($file), true);
         }
 
@@ -314,31 +353,17 @@ class Amazon extends ABackend
         $src = $this->prefix($src);
         $dest = $this->prefix($dest);
 
-        $items = $this->s3()->get_object_list($this->getOption('bucket'), array(
-            'prefix' => $src
-        ));
+        try {
+            $result_copy_objects = $this->s3()->copyObject([
+                'Bucket' => $this->getOption('bucket'),
+                'Key' => $dest,
+                'CopySource' => $this->getOption('bucket') . '/' .$src
+            ]);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
+        }
 
-        if (!empty($items)) {
-            foreach ($items as $item) {
-
-                $_dest = substr_replace($item, $dest, strlen($src));
-                $this->s3()->batch()->copy_object(
-                    array(
-                        'bucket' => $this->getOption('bucket'),
-                        'filename' => $item
-                    ),
-                    array(
-                        'bucket' => $this->getOption('bucket'),
-                        'filename' => $_dest
-                    ),
-                    array(
-                        'acl' => \AmazonS3::ACL_PUBLIC
-                    )
-                );
-            }
-
-            $res = $this->s3()->batch()->send();
-
+        if (!empty($result_copy_objects)) {
             return true;
         }
 
@@ -353,18 +378,31 @@ class Amazon extends ABackend
     public function getList($prefix = '')
     {
         $prefix = $this->prefix($prefix);
-        $items = $this->s3()->get_object_list($this->getOption('bucket'), array(
-            'prefix' => $prefix
-        ));
 
-        if (!empty($items)) {
-            $prefix_len = strlen($prefix);
-            foreach ($items as $item_key => $item) {
-                $items[$item_key] = substr_replace($item, '', 0, $prefix_len);
+        try {
+            $result_list_objects = $this->s3()->listObjects([
+                'Bucket' => $this->getOption('bucket'),
+                'Prefix' => $prefix
+            ]);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
+        }
+
+        $object_list = [];
+        if (!empty($result_list_objects)) {
+            foreach ($result_list_objects->toArray()['Contents'] as $key => $value) {
+                $object_list[] = $value['Key'];
             }
         }
 
-        return $items;
+        if (!empty($object_list)) {
+            $prefix_len = strlen($prefix);
+            foreach ($object_list as $item_key => $item) {
+                $object_list[$item_key] = substr_replace($item, '', 0, $prefix_len);
+            }
+        }
+
+        return $object_list;
     }
 
     /**
@@ -395,7 +433,7 @@ class Amazon extends ABackend
         $this->options = fn_array_merge($this->options, $settings);
         $this->_s3 = null;
 
-        $result = $this->s3(true);
+        $result = $this->s3();
 
         $this->_s3 = null;
         $this->options = $old_options;
@@ -404,66 +442,68 @@ class Amazon extends ABackend
             return true;
         }
 
-        return $result;
+        return false;
     }
 
     /**
      * Gets s3 object
      *
-     * @param  boolean   $debug return error message instead of script stop
-     * @return \AmazonS3 s3 object
+     * @return S3Client s3 object
      */
-    public function s3($debug = false)
+    public function s3()
     {
-        // This is workaround to composer autoloader
-        if (!class_exists('CFLoader')) {
-            throw new ClassNotFoundException('Amazon: autoload failed');
-        }
-
         if (empty($this->_s3)) {
-            \CFCredentials::set(array(
-                '@default' => array(
-                    'key' => $this->getOption('key'),
-                    'secret' => $this->getOption('secret')
-                )
-            ));
 
-            $this->_s3 = new \AmazonS3();
-            $this->_s3->use_ssl = false;
-            $this->_buckets = fn_array_combine($this->_s3->get_bucket_list(), true);
+            $credentials = new Credentials($this->getOption('key'), $this->getOption('secret'));
+
+            $parse_uri = (new S3UriParser())->parse('http://' . $this->getOption('region'));
+
+            $this->_s3 = new S3Client([
+                'region' => $parse_uri['region'],
+                'version' => 'latest',
+                'credentials' => $credentials
+            ]);
+
+            $bucket_list = [];
+            foreach ($this->_s3->listBuckets()->toArray()['Buckets'] as $key => $value) {
+                $bucket_list[] = $value['Name'];
+            }
+            $this->_buckets = fn_array_combine($bucket_list, true);
         }
 
-        $message = '';
         $bucket = $this->getOption('bucket');
+
         if (empty($this->_buckets[$bucket])) {
-            $res = $this->_s3->create_bucket($bucket, $this->getOption('region'));
 
-            if ($res->isOK()) {
-                $res = $this->_s3->create_cors_config($bucket, array(
-                    'cors_rule' => array(
-                        array(
-                            'allowed_origin' => '*',
-                            'allowed_method' => 'GET'
-                        )
-                    )
-                ));
+            try {
+                $create_result = $this->_s3->createBucket([
+                    'Bucket' => $bucket,
+                ]);
+            } catch (AwsException $e) {
+                fn_set_notification('E', __('error'), (string) $e->getMessage());
+            }
 
-                if ($res->isOK()) {
-                    $this->_buckets[$bucket] = true;
-                } else {
-                    $message = (string) $res->body->Message;
+            if (!empty($create_result)) {
+                try {
+                    $result_put_bucket_cors = $this->_s3->putBucketCors([
+                        'Bucket' => $bucket, // REQUIRED
+                        'CORSConfiguration' => [ // REQUIRED
+                            'CORSRules' => [ // REQUIRED
+                                [
+                                    'AllowedMethods' => ['GET'], // REQUIRED
+                                    'AllowedOrigins' => ['*'] // REQUIRED
+                                ],
+                            ],
+                        ]
+                    ]);
+                } catch (AwsException $e) {
+                    fn_set_notification('E', __('error'), (string) $e->getMessage());
                 }
-            } else {
-                $message = (string) $res->body->Message;
-            }
-        }
 
-        if (!empty($message)) {
-            if ($debug == true) {
-                return $message;
+                if (!empty($result_put_bucket_cors)) {
+                    $this->_buckets[$bucket] = true;
+                }
             }
-
-            throw new ExternalException('Amazon: ' . $message);
         }
 
         return $this->_s3;

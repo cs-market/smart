@@ -14,14 +14,14 @@
 
 namespace Tygh\Backend\Cdn;
 
-use AmazonCloudFront;
-use CFCredentials;
-use Tygh\Exceptions\ClassNotFoundException;
+use Aws\CloudFront\CloudFrontClient;
+use Aws\Credentials\Credentials;
+use Aws\Exception\AwsException;
 
 class Cloudfront extends ABackend
 {
     /**
-     * @var AmazonCloudFront
+     * @var CloudFrontClient
      */
     private $_cf;
 
@@ -29,74 +29,124 @@ class Cloudfront extends ABackend
      * Creates distribution
      * @param  string $host    host name for origin pull requests
      * @param  array  $options connection/authentication options
-     * @return mixed  array with Id, host, CNAME and status when success, boolean false otherwise
+     * @return mixed  array with Id, host and status when success, boolean false otherwise
      */
     public function createDistribution($host, $options = array())
     {
-        $params = array(
+        $origin_url = $host;
+        $caller_reference = $origin_url . uniqid();
+
+        $cacheBehavior = [
+            'AllowedMethods' => [
+                'CachedMethods' => [
+                    'Items' => ['HEAD', 'GET'],
+                    'Quantity' => 2,
+                ],
+                'Items' => ['HEAD', 'GET'],
+                'Quantity' => 2,
+            ],
+            'Compress' => false,
+            'DefaultTTL' => 86400,
+            'FieldLevelEncryptionId' => '',
+            'ForwardedValues' => [
+                'Cookies' => [
+                    'Forward' => 'none',
+                ],
+                'Headers' => [
+                    'Quantity' => 0,
+                ],
+                'QueryString' => false,
+                'QueryStringCacheKeys' => [
+                    'Quantity' => 0,
+                ],
+            ],
+            'LambdaFunctionAssociations' => ['Quantity' => 0],
+            'MaxTTL' => 31536000,
+            'MinTTL' => 0,
+            'SmoothStreaming' => false,
+            'TargetOriginId' => $origin_url,
+            'TrustedSigners' => [
+                'Enabled' => false,
+                'Quantity' => 0,
+            ],
+            'ViewerProtocolPolicy' => 'allow-all',
+        ];
+
+        $origin = [
+            'Items' => [
+                [
+                    'DomainName' => $origin_url,
+                    'Id' => $origin_url,
+                    'OriginPath' => '',
+                    'CustomHeaders' => ['Quantity' => 0],
+                    'CustomOriginConfig' => [
+                        'HTTPPort' => 80,
+                        'HTTPSPort' => 443,
+                        'OriginProtocolPolicy' => 'http-only'
+                    ]
+                ],
+            ],
+            'Quantity' => 1,
+        ];
+
+        $distribution = [
+            'CallerReference' => $caller_reference,
+            'Comment' => '',
+            'DefaultCacheBehavior' => $cacheBehavior,
             'Enabled' => true,
-            'OriginProtocolPolicy' => 'http-only'
-        );
+            'Origins' => $origin,
+        ];
 
-        if (!empty($options['cname'])) {
-            $params['CNAME'] = $options['cname'];
+        try {
+            $create_result = $this->_cf($options)->createDistribution([
+                'DistributionConfig' => $distribution,
+            ]);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
         }
 
-        $res = $this->_cf($options)->create_distribution('http://' . $host, 'TYGHCDN-' . $host . '-' . time(), $params);
-
-        if ($res->isOk()) {
-
-            $cname = !empty($res->body->DistributionConfig->CNAME) ? (string) $res->body->DistributionConfig->CNAME : '';
-
-            return array(
-                'host' => (string) $res->body->DomainName,
-                'id' => (string) $res->body->Id,
-                'cname' => $cname,
-                'is_active' => $this->_isActive($res)
-            );
-        } else {
-            fn_set_notification('E', __('error'), (string) $res->body->Error->Message);
+        if (!empty($create_result)) {
+            return [
+                'host' => $create_result['Distribution']['DomainName'],
+                'id' => $create_result['Distribution']['Id'],
+                'is_active' => $this->isDeployed($create_result['Distribution']['Status'])
+            ];
         }
 
-        return false;
     }
 
     /**
-     * Updates distribution config
+     * Updates distribution
      * @param  string $host    host name for origin pull requests
      * @param  array  $options connection/authentication options
-     * @return mixed  array with Id, host, CNAME and status when new distribution is created or array with cname field is updated, boolean false on error
+     * @return mixed  array with Id, host and status when new distribution is created or status when update distribution, boolean false on error
      */
     public function updateDistribution($host, $options)
     {
-        if ($this->getOption('key') != $options['key'] || $this->getOption('secret') != $options['secret']) {
-            $this->deleteDistribution();
+        if ($this->getOption('key') !== $options['key'] || $this->getOption('secret') !== $options['secret']) {
+            $this->disableDistribution();
 
             return $this->createDistribution($host, $options);
         }
 
-        $updated = $this->updateConfig(array(
-            'CNAME' => $options['cname']
-        ));
-
-        if ($updated) {
-            return array(
-                'cname' => $options['cname']
-            );
+        if ($this->isActive()) {
+            return [
+                'is_enabled' => $options['is_enabled']
+            ];
         }
 
         return false;
     }
 
     /**
-     * Deletes distribution
+     * Disables distribution
      * @return boolean true on success, false otherwise
      */
-    public function deleteDistribution()
+    public function disableDistribution()
     {
-        return $this->updateConfig(array(
+        return $this->updateConfig([
             'Enabled' => false
-        ));
+        ]);
     }
 
     /**
@@ -105,9 +155,16 @@ class Cloudfront extends ABackend
      */
     public function isActive()
     {
-        $res = $this->_cf()->get_distribution_info($this->getOption('id'));
-        if ($res->isOk()) {
-            return $this->_isActive($res);
+        try {
+            $distribution_result = $this->_cf()->getDistribution([
+                'Id' => $this->getOption('id')
+            ]);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
+        }
+
+        if (!empty($distribution_result)) {
+            return $this->isDeployed($distribution_result['Distribution']['Status']);
         }
 
         return false;
@@ -116,61 +173,90 @@ class Cloudfront extends ABackend
     /**
      * Updates distribution config
      * @param  array   $data data to update
-     * @return boolean true
+     * @return boolean true on success, false otherwise
      */
     private function updateConfig($data)
     {
-        $existing_xml = $this->_cf()->get_distribution_config($this->getOption('id'));
-
-        if ($existing_xml->isOK()) {
-
-            $updated_xml = $this->_cf()->update_config_xml($existing_xml, $data);
-
-            $etag = $this->_cf()->get_distribution_config($this->getOption('id'))->header['etag'];
-
-            $response = $this->_cf()->set_distribution_config($this->getOption('id'), $updated_xml, $etag);
+        try {
+            $distribution_result = $this->_cf()->getDistribution([
+                'Id' => $this->getOption('id')
+            ]);
+        } catch (AwsException $e) {
+            fn_set_notification('E', __('error'), (string) $e->getMessage());
         }
 
-        return true;
+        if (!empty($distribution_result)) {
+
+            $current_config = $distribution_result['Distribution']['DistributionConfig'];
+            $e_tag = $distribution_result['ETag'];
+            $enabled = $data['Enabled'];
+
+            $distribution = [
+                'CallerReference' => $current_config['CallerReference'], // REQUIRED
+                'Comment' => $current_config['Comment'], // REQUIRED
+                'DefaultCacheBehavior' => $current_config['DefaultCacheBehavior'], // REQUIRED
+                'DefaultRootObject' => $current_config['DefaultRootObject'],
+                'Enabled' => $enabled, // REQUIRED
+                'Origins' => $current_config['Origins'], // REQUIRED
+                'Aliases' => $current_config['Aliases'],
+                'CustomErrorResponses' => $current_config['CustomErrorResponses'],
+                'HttpVersion' => $current_config['HttpVersion'],
+                'CacheBehaviors' => $current_config['CacheBehaviors'],
+                'Logging' => $current_config['Logging'],
+                'PriceClass' => $current_config['PriceClass'],
+                'Restrictions' => $current_config['Restrictions'],
+                'ViewerCertificate' => $current_config['ViewerCertificate'],
+                'WebACLId' => $current_config['WebACLId'],
+            ];
+
+            try {
+                $update_result = $this->_cf()->updateDistribution([
+                    'DistributionConfig' => $distribution,
+                    'Id' => $distribution_result['Distribution']['Id'],
+                    'IfMatch' => $e_tag
+                ]);
+            } catch (AwsException $e) {
+                fn_set_notification('E', __('error'), (string)$e->getMessage());
+            }
+
+            if (!empty($update_result)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Gets status from response and checks if distribution is deployed
-     * @param  type $res
-     * @return type
+     * @param  string $result
+     * @return boolean true on status is deployed, false otherwise
      */
-    private function _isActive($res)
+    private function isDeployed($result)
     {
-        return (string) $res->body->Status == AmazonCloudFront::STATE_DEPLOYED;
+        return (string) $result === 'Deployed';
     }
 
     /**
      * Gets CloudFront object
      *
      * @param  array     $options connection options
-     * @return AmazonCloudFront CloudFront object
+     * @return CloudFrontClient CloudFront object
      */
     private function _cf($options = array())
     {
         if (empty($this->_cf) || !empty($options)) {
 
-            // This is workaround to composer autoloader
-            if (!class_exists('CFLoader')) {
-                throw new ClassNotFoundException('CloudFront: autoload failed');
-            }
-
             $key = !empty($options['key']) ? $options['key'] : $this->getOption('key');
             $secret = !empty($options['secret']) ? $options['secret'] : $this->getOption('secret');
 
-            CFCredentials::set(array(
-                '@default' => array(
-                    'key' => $key,
-                    'secret' => $secret
-                )
-            ));
+            $credentials = new Credentials($key, $secret);
 
-            $this->_cf = new AmazonCloudFront();
-            $this->_cf->use_ssl = false;
+            $this->_cf = new CloudFrontClient([
+                'region' => 'eu-west-1',
+                'version' => 'latest',
+                'credentials' => $credentials
+            ]);
         }
 
         return $this->_cf;

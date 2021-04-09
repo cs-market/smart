@@ -14,6 +14,7 @@
 
 use Tygh\Bootstrap;
 use Tygh\Debugger;
+use Tygh\Helpdesk;
 use Tygh\Registry;
 
 // Register autoloader
@@ -27,10 +28,6 @@ list($_REQUEST, $_SERVER, $_GET, $_POST) = Bootstrap::initEnv($_GET, $_POST, $_S
 
 // Get config data
 $config = require(DIR_ROOT . '/config.php');
-
-if (isset($_REQUEST['version'])) {
-    die(PRODUCT_NAME . ' <b>' . PRODUCT_VERSION . ' ' . (PRODUCT_STATUS != '' ? (' (' . PRODUCT_STATUS . ')') : '') . (PRODUCT_BUILD != '' ? (' ' . PRODUCT_BUILD) : '') . '</b>');
-}
 
 Debugger::init(false, $config);
 
@@ -84,22 +81,41 @@ $application['class_loader'] = $classLoader;
 // Register service providers
 $application->register(new Tygh\Providers\DatabaseProvider());
 $application->register(new Tygh\Providers\SessionProvider());
+$application->register(new Tygh\Providers\AddonLoaderProvider());
 $application->register(new Tygh\Providers\MailerProvider());
 $application->register(new Tygh\Providers\TwigProvider());
 $application->register(new Tygh\Providers\EnvironmentProvider());
 $application->register(new Tygh\Providers\TemplateProvider());
 $application->register(new Tygh\Providers\CommonProvider());
-$application->register(new Tygh\Providers\ServerEnvironmentProvider(), array(
-    'server.env.ini_vars' => array(
-        'post_max_size' => Bootstrap::getIniParam('post_max_size', true),
+$application->register(new Tygh\Providers\ServerEnvironmentProvider(), [
+    'server.env.ini_vars' => [
+        'post_max_size'       => Bootstrap::getIniParam('post_max_size', true),
         'upload_max_filesize' => Bootstrap::getIniParam('upload_max_filesize', true),
-        'disable_functions' => Bootstrap::getIniParam('disable_functions', true),
-        'safe_mode' => Bootstrap::getIniParam('safe_mode'),
-    ),
-));
+        'disable_functions'   => Bootstrap::getIniParam('disable_functions', true),
+        'safe_mode'           => Bootstrap::getIniParam('safe_mode'),
+    ],
+]);
 $application->register(new Tygh\Providers\BackupperProvider());
+$application->register(new Tygh\Providers\LockProvider());
+$application->register(new Tygh\Providers\NotificationsCenterProvider());
+$application->register(new Tygh\Providers\EventDispatcherProvider());
+$application->register(new Tygh\Providers\VendorServicesProvider());
+$application->register(new Tygh\Providers\LocationProvider());
+$path = isset($_SERVER['REQUEST_URI'])
+    ? $_SERVER['REQUEST_URI']
+    : '';
+$requested_url = REAL_HOST . $path;
+$application->register(new Tygh\Providers\StorefrontProvider($requested_url, $_REQUEST));
 
-register_shutdown_function(array('\\Tygh\\Registry', 'save'));
+if (isset($_REQUEST['version'])
+    && AREA === 'A'
+    && defined('ACCOUNT_TYPE')
+    && ACCOUNT_TYPE === 'admin'
+) {
+    Helpdesk::getSoftwareInformation();
+}
+
+register_shutdown_function(['\\Tygh\\Registry', 'save']);
 
 fn_init_stack(
     array('fn_init_error_handler'),
@@ -113,35 +129,34 @@ if (defined('API')) {
 }
 
 fn_init_stack(
-    array('fn_init_crypt'),
-    array('fn_init_imagine'),
-    array('fn_init_archiver'),
-    array('fn_init_storage'),
-    array('fn_init_ua')
+    ['fn_init_crypt'],
+    ['fn_init_imagine'],
+    ['fn_init_archiver'],
+    ['fn_init_storage'],
+    ['fn_init_ua'],
+    ['fn_init_redirect_to_regional_storefront', &$_REQUEST, $requested_url],
+    ['fn_init_http_params_by_storefront', &$_REQUEST, $requested_url]
 );
 
-if (fn_allowed_for('ULTIMATE')) {
-    fn_init_stack(array('fn_init_store_params_by_host', &$_REQUEST));
-}
-
 fn_init_stack(
-    array(function() use ($application) {
+    [function() use ($application) {
         $application['session']->init();
-    }),
-    array('fn_init_ajax'),
-    array('fn_init_company_id', &$_REQUEST),
-    array('fn_check_cache', $_REQUEST),
-    array('fn_init_settings'),
-    array('fn_init_addons'),
-    array('fn_get_route', &$_REQUEST),
-    array('fn_simple_ultimate', &$_REQUEST)
+    }],
+    ['fn_init_ajax'],
+    ['fn_init_company_id', &$_REQUEST],
+    ['fn_check_cache', $_REQUEST],
+    ['fn_init_settings'],
+    ['fn_init_addons'],
+    ['fn_get_route', &$_REQUEST],
+    ['fn_simple_ultimate', &$_REQUEST]
 );
 
 if (!Registry::get('config.tweaks.disable_localizations') && !fn_allowed_for('ULTIMATE:FREE')) {
     fn_init_stack(array('fn_init_localization', &$_REQUEST));
 }
 
-fn_init_stack(array('fn_init_language', &$_REQUEST),
+fn_init_stack(
+    array('fn_init_language', &$_REQUEST),
     array('fn_init_currency', &$_REQUEST),
     array('fn_init_company_data', $_REQUEST),
     array('fn_init_full_path', $_REQUEST),

@@ -93,11 +93,16 @@
     </div>
 
     <div class="control-group">
-        <label for="ship_yandex_delivery_delivery" class="control-label">{__("yandex_delivery.shipping_services")}:</label>
-        <div class="controls">
+        <label for="ship_yandex_delivery_delivery" class="control-label cm-required cm-multiple-checkboxes">{__("yandex_delivery.shipping_services")}:</label>
+        <div class="controls" id="ship_yandex_delivery_delivery">
             {foreach from=$deliveries item="delivery" key="id"}
             <label class="checkbox inline" for="delivery_{$id}">
-                <input type="checkbox" name="shipping_data[service_params][deliveries][]" id="delivery_{$id}"{if array_key_exists($id, $deliveries_select)} checked="checked"{/if} value="{$id}"/>
+                <input type="checkbox"
+                       name="shipping_data[service_params][deliveries][]"
+                       id="delivery_{$id}"
+                       {if array_key_exists($id, $deliveries_select)}checked="checked"{/if}
+                       value="{$id}"
+                />
                 {$delivery}
             </label>
             {/foreach}

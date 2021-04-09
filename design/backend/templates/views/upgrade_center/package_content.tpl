@@ -20,7 +20,7 @@
 	    {if $content.files}
 		    <div id="content_tab_files">
 		    	<div class="table-responsive-wrapper">
-					<table class="table table-condensed table-responsive">
+					<table class="table table-condensed table--relative table-responsive">
 					    <thead>
 					        <tr>
 					            <th>{__("files")}</th>
@@ -54,7 +54,7 @@
 	    {if $content.migrations}
 		    <div class="hidden" id="content_tab_migrations">
 		    	<div class="table-responsive-wrapper">
-					<table class="table table-condensed table-responsive">
+					<table class="table table-condensed table--relative table-responsive">
 					    <thead>
 					        <tr>
 					            <th>{__("migrations")}</th>
@@ -77,7 +77,7 @@
 	    {if $content.languages}
 		    <div id="content_tab_languages" class="hidden">
 		    	<div class="table-responsive-wrapper">
-					<table class="table table-condensed table-responsive">
+					<table class="table table-condensed table--relative table-responsive">
 					    <thead>
 					        <tr>
 					            <th>{__("languages")}</th>

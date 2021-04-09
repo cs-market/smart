@@ -21,6 +21,9 @@
                         <type>selectbox</type>
                         <default_value>RUB</default_value>
                     </item>
+                    <item id="statuses_prepaid">
+                        <type>multiple select</type>
+                    </item>
                     <item id="statuses_paid">
                         <type>multiple select</type>
                     </item>
@@ -37,6 +40,21 @@
             </section>
             <section id="atol">
                 <items>
+                    <item id="api_version">
+                      <type>selectbox</type>
+                      <default_value>4</default_value>
+                      <variants>
+                        <item id="3"></item>
+                        <item id="4"></item>
+                      </variants>
+                    </item>
+                    <item id="mode">
+                      <type>selectbox</type>
+                      <variants>
+                        <item id="live"></item>
+                        <item id="test"></item>
+                      </variants>
+                    </item>
                     <item id="atol_inn">
                         <type>text</type>
                     </item>
@@ -62,6 +80,9 @@
     </settings>
 
     <queries>
+        <item>DROP TABLE IF EXISTS `?:rus_online_cash_register_request_logs`;</item>
+        <item>DROP TABLE IF EXISTS `?:rus_online_cash_register_receipts`;</item>
+        <item>DROP TABLE IF EXISTS `?:rus_online_cash_register_order_data`;</item>
         <item>
             CREATE TABLE `?:rus_online_cash_register_request_logs` (
             `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -99,6 +120,7 @@
             `fiscal_document_attribute` varchar(32) DEFAULT NULL,
             `created_timestamp` int(11) DEFAULT NULL,
             `updated_timestamp` int(11) DEFAULT NULL,
+            `currency` varchar(16) DEFAULT '',
             PRIMARY KEY (`id`),
             UNIQUE KEY (`uuid`),
             KEY `object_idx` (`object_type`,`object_id`)

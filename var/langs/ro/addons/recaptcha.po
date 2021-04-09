@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.8.2/addons/recaptcha.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.11.3/addons/recaptcha.po\n"
+"PO-Revision-Date: 2020-01-29 14:52\n"
 
 msgctxt "Addons::name::recaptcha"
 msgid "Google reCAPTCHA"
@@ -64,6 +62,18 @@ msgctxt "SettingsOptions::recaptcha::recaptcha_secret"
 msgid "Secret"
 msgstr ""
 
+msgctxt "SettingsSections::recaptcha::general"
+msgid "General"
+msgstr ""
+
+msgctxt "SettingsSections::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr "Țările excluse"
+
+msgctxt "SettingsOptions::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr "Țările excluse"
+
 msgctxt "Languages::error_validator_recaptcha"
 msgid "Please confirm you are not a robot."
 msgstr ""
@@ -73,6 +83,10 @@ msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> a
 msgstr ""
 
 msgctxt "Languages::recaptcha.text_settings_notice"
-msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.</p>"
+msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.<br>Please note that the add-on currently supports only <b>reCAPTCHA v2: Checkbox</b></p>"
+msgstr "<p>Instrucțiunile despre cum să obții <b>site key</b> și <b>secret key</b> sunt disponibile <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">aici</a></b>.<br>Reține că add-on-ul suportă momentan doar <b>reCAPTCHA v2: Checkbox</b></p>"
+
+msgctxt "Languages::recaptcha.text_forbidden_countries_notice"
+msgid "<p>Google reCAPTACHA will be disabled for the selected countries. Instead, visitors from those countries will be asked to type a few symbols they see on the screen.</p>"
 msgstr ""
 

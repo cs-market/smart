@@ -16,6 +16,7 @@
 namespace Tygh\Template\Document\Variables;
 
 
+use Tygh\Enum\ProfileTypes;
 use Tygh\Template\IActiveVariable;
 
 /**
@@ -55,6 +56,23 @@ class CompanyVariable implements IActiveVariable, \ArrayAccess
             $this->storefront_url = fn_url('?company_id=' . $company_id, 'C', 'http');
         } else {
             $this->storefront_url = fn_url('', 'C', 'http');
+        }
+
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $company = fn_get_company_data($company_id, $lang_code);
+
+            $fields = self::getProfileFields();
+
+            foreach ($fields as $field) {
+                $value = fn_get_profile_field_value($company, $field);
+
+                if (in_array($field['field_type'], ['A', 'O'])) {
+                    $this->data['company_' . $field['field_name'] . '_descr'] = $value;
+                    $this->data['company_' . $field['field_name']] = isset($company[$field['field_name']]) ? $company[$field['field_name']] : $value;
+                } else {
+                    $this->data['company_' . $field['field_name']] = $value;
+                }
+            }
         }
 
         if (!empty($this->logos['mail']['image'])) {
@@ -137,40 +155,70 @@ class CompanyVariable implements IActiveVariable, \ArrayAccess
      */
     public static function attributes()
     {
-        return array(
+        $attributes = [
             'name', 'address', 'city', 'country', 'country_descr', 'state', 'state_descr', 'zipcode', 'phone', 'phone_2',
-            'fax', 'website', 'storefront_url', 'start_year', 'users_department', 'site_administrator', 'orders_department',
+            'website', 'storefront_url', 'start_year', 'users_department', 'site_administrator', 'orders_department',
             'support_department', 'newsletter_email', 'users_department_display', 'site_administrator_display', 'orders_department_display',
             'support_department_display', 'newsletter_email_display',
-            'logo_mail' => array(
+            'logo_mail' => [
                 'path', 'alt', 'width', 'height'
-            ),
-            'logos' => array(
-                'theme' => array(
+            ],
+            'logos' => [
+                'theme' => [
                     'logo_id', 'layout_id', 'style_id', 'type',
-                    'image' => array(
+                    'image' => [
                         'image_path', 'alt', 'image_x', 'image_y',
                         'http_image_path', 'https_image_path', 'absolute_path',
                         'relative_path'
-                    )
-                ),
-                'mail' => array(
+                    ]
+                ],
+                'mail' => [
                     'logo_id', 'layout_id', 'style_id', 'type',
-                    'image' => array(
+                    'image' => [
                         'image_path', 'alt', 'image_x', 'image_y',
                         'http_image_path', 'https_image_path', 'absolute_path',
                         'relative_path'
-                    )
-                ),
-                'favicon' => array(
+                    ]
+                ],
+                'favicon' => [
                     'logo_id', 'layout_id', 'style_id', 'type',
-                    'image' => array(
+                    'image' => [
                         'image_path', 'alt', 'image_x', 'image_y',
                         'http_image_path', 'https_image_path', 'absolute_path',
                         'relative_path'
-                    )
-                )
-            ),
-        );
+                    ]
+                ]
+            ]
+        ];
+
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $fields = self::getProfileFields();
+
+            foreach ($fields as $field) {
+                if (!empty($field['field_name'])) {
+                    $attributes[] = $field['field_name'];
+
+                    if (in_array($field['field_type'], array('A', 'O'))) {
+                        $attributes[] = $field['field_name'] . '_descr';
+                    }
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @return array
+     */
+    protected static function getProfileFields()
+    {
+        $group_fields = fn_get_profile_fields('A', [], CART_LANGUAGE, [
+            'profile_type' => ProfileTypes::CODE_SELLER,
+            'get_custom'   => true
+        ]);
+        $section = 'C';
+
+        return isset($group_fields[$section]) ? $group_fields[$section] : [];
     }
 }

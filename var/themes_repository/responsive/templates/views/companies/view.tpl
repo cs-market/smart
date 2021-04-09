@@ -2,7 +2,7 @@
 
 {assign var="obj_id" value=$company_data.company_id}
 {assign var="obj_id_prefix" value="`$obj_prefix``$obj_id`"}
-    {include file="common/company_data.tpl" company=$company_data show_name=true show_descr=true show_rating=true show_logo=true show_links=true}
+    {include file="common/company_data.tpl" company=$company_data show_name=true show_descr=true show_rating=true show_logo=true show_links=true show_address=true show_location_full=true}
     <div class="ty-company-detail clearfix">
 
         <div id="block_company_{$company_data.company_id}" class="clearfix">
@@ -30,10 +30,12 @@
                         </div>
                     {/if}
                     {if $company_data.phone}
-                        <div class="ty-company-detail__control-group">
-                            <label class="ty-company-detail__control-lable">{__("phone")}:</label>
-                            <span>{$company_data.phone}</span>
-                        </div>
+                        {hook name="companies:phone_field"}
+                            <div class="ty-company-detail__control-group">
+                                <label class="ty-company-detail__control-lable">{__("phone")}:</label>
+                                <span>{$company_data.phone}</span>
+                            </div>
+                        {/hook}
                     {/if}
                     {if $company_data.fax}
                         <div class="ty-company-detail__control-group">
@@ -51,13 +53,20 @@
                 <div class="ty-company-detail__info-list">
                     <h5 class="ty-company-detail__info-title">{__("shipping_address")}</h5>
 
-                    <div class="ty-company-detail__control-group">
-                        <span>{$company_data.address}</span>
-                    </div>
-                    <div class="ty-company-detail__control-group">
-                        <span>{$company_data.city}
-                            , {$company_data.state|fn_get_state_name:$company_data.country} {$company_data.zipcode}</span>
-                    </div>
+                    {$address="address_`$obj_id`"}
+                    {if $smarty.capture.$address|trim}
+                        <div class="ty-company-detail__control-group">
+                            <span>{$smarty.capture.$address nofilter}</span>
+                        </div>
+                    {/if}
+
+                    {$location_full="location_full_`$obj_id`"}
+                    {if $smarty.capture.$location_full|trim}
+                        <div class="ty-company-detail__control-group">
+                            <span>{$smarty.capture.$location_full nofilter}</span>
+                        </div>
+                    {/if}
+
                     <div class="ty-company-detail__control-group">
                         <span>{$company_data.country|fn_get_country_name}</span>
                     </div>

@@ -12,11 +12,13 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Addons\AdvancedImport\Exceptions\DownloadException;
 use Tygh\Addons\AdvancedImport\Exceptions\FileNotFoundException;
 use Tygh\Addons\AdvancedImport\Exceptions\ReaderNotFoundException;
 use Tygh\Enum\Addons\AdvancedImport\ImportStatuses;
 use Tygh\Exceptions\PermissionsException;
 use Tygh\Registry;
+use Tygh\Http;
 
 defined('BOOTSTRAP') or die('Access denied');
 
@@ -26,6 +28,8 @@ defined('BOOTSTRAP') or die('Access denied');
 $presets_manager = Tygh::$app['addons.advanced_import.presets.manager'];
 /** @var \Tygh\Addons\AdvancedImport\Presets\Importer $presets_importer */
 $presets_importer = Tygh::$app['addons.advanced_import.presets.importer'];
+
+ini_set('auto_detect_line_endings', true);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -38,13 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($mode == 'import') {
 
-        list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $_REQUEST['preset_id']), false);
+        $preset = $presets_manager->findById($_REQUEST['preset_id']);
 
-        if ($presets) {
-
+        if (!empty($preset)) {
             Registry::set('runtime.advanced_import.in_progress', true, true);
-
-            $preset = reset($presets);
 
             /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
             $reader_factory = Tygh::$app['addons.advanced_import.readers.factory'];
@@ -52,8 +53,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $is_success = false;
             try {
                 $reader = $reader_factory->get($preset);
-
-                $fields_mapping = $_REQUEST['fields'] ?: $presets_manager->getFieldsMapping($preset['preset_id']);
+                if (!empty($_REQUEST['fields'])) {
+                    $fields_mapping = array_combine(
+                        array_column($_REQUEST['fields'], 'name'),
+                        $_REQUEST['fields']
+                    );
+                } else {
+                    $fields_mapping = $presets_manager->getFieldsMapping($preset['preset_id']);
+                }
 
                 $pattern = $presets_manager->getPattern($preset['object_type']);
                 $schema = $reader->getSchema();
@@ -86,6 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     $preset['options']['preset'] = $preset;
                     unset($preset['options']['preset']['options']);
+
+                    // Sets execution timeout for files getting from remote server
+                    Http::setDefaultTimeout(ADVANCED_IMPORT_HTTP_EXECUTION_TIMEOUT);
+
                     $is_success = fn_import($pattern, $import_items, $preset['options']);
                 }
             } catch (ReaderNotFoundException $e) {
@@ -94,6 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 fn_set_notification('E', __('error'), __('advanced_import.cant_load_file_for_company'));
             } catch (FileNotFoundException $e) {
                 fn_set_notification('E', __('error'), __('advanced_import.cant_load_file_for_company'));
+            } catch (DownloadException $e) {
+                fn_set_notification('E', __('error'), __('advanced_import.cant_load_file'));
             }
 
             $presets_manager->update($preset['preset_id'], array(

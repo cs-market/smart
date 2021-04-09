@@ -161,24 +161,7 @@
                         image_box = (jc_box.length) ? jc_box.parents(':first') : $(this).parents(':first');
                     }
 
-                    $('.cm-image-previewer', image_box).each(function() {
-                        if ($(this).hasClass('cm-thumbnails-mini')) {
-                            return;
-                        }
-                        var id = $(this).prop('id');
-
-                        if (id == c_id) {
-                            $('.cm-thumbnails-mini', container).removeClass('active');
-                            jelm.addClass('active');
-                            $(this).removeClass('hidden');
-                            $('div', $(this)).removeClass('hidden');// Special for Flash containers
-                            $('#box_' + id).removeClass('hidden');
-                        } else {
-                            $(this).addClass('hidden');
-                            $('div', $(this)).addClass('hidden');// Special for Flash containers
-                            $('#box_' + id).addClass('hidden');
-                        }
-                    });
+                    $(image_box).trigger('owl.goTo', $(jelm).data('caImageOrder') || 0);
                 }
             });
         },
@@ -226,4 +209,67 @@
             }
         });
     };
+})(Tygh, Tygh.$);
+
+
+(function(_, $) {
+    $.ceEvent('on', 'ce.commoninit', function (context) {
+        $('.cm-preview-wrapper', context).owlCarousel({
+            direction: _.language_direction,
+            pagination: false,
+            singleItem: true,
+            addClassActive: true,
+            afterInit: function (item) {
+                var thumbnails = $('.cm-thumbnails-mini', item.parents('[data-ca-previewer]')),
+                    previewers = $('.cm-image-previewer', item.parents('[data-ca-previewer]')),
+                    previousScreenX = 0,
+                    newScreenX = 0,
+                    swipeThreshold = 7;
+
+                previewers.each(function (index, elm) {
+                    $(elm).data('caImageOrder', index);
+                });
+
+                thumbnails.on('click', function () {
+                    item.trigger('owl.goTo', $(this).data('caImageOrder') ? $(this).data('caImageOrder') : 0);
+                });
+                
+                item.on('touchstart', function (e) {
+                    previousScreenX = e.changedTouches[0].screenX;
+                })
+                
+                item.on('touchmove', function (e) {
+                    newScreenX = e.changedTouches[0].screenX;
+
+                    if (Math.abs(newScreenX - previousScreenX) > swipeThreshold && e.cancelable) {
+                        e.preventDefault();
+                    }
+
+                    previousScreenX = newScreenX;
+                })
+
+                $('.cm-image-previewer.hidden', item).toggleClass('hidden', false);
+
+                $.ceEvent('trigger', 'ce.product_image_gallery.ready');
+            },
+            afterMove: function (item) {
+                var _parent = item.parent();
+
+                // inactive all thumbnails
+                $('.cm-thumbnails-mini', _parent)
+                    .toggleClass('active', false);
+
+                // active only current thumbnail
+                var elmOrderInGallery = $('.active', item).index(); // order of active image in carousel
+                $('[data-ca-image-order=' + elmOrderInGallery + ']', _parent)
+                    .toggleClass('active', true);
+
+                // move mini-thumbnail-gallery
+                $('.owl-carousel.cm-image-gallery', _parent)
+                    .trigger('owl.goTo', elmOrderInGallery);
+
+                $.ceEvent('trigger', 'ce.product_image_gallery.image_changed');
+            }
+        });
+    });
 })(Tygh, Tygh.$);

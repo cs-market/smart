@@ -49,7 +49,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
         $pp_response['descr_avs'] = $avs[1];
     }
 
-    fn_finish_payment($_REQUEST['order_id'], $pp_response, false);
+    fn_finish_payment($_REQUEST['order_id'], $pp_response);
     fn_order_placement_routines('route', $_REQUEST['order_id']);
 
 } else {
@@ -80,18 +80,24 @@ if (defined('PAYMENT_NOTIFICATION')) {
     $post_encrypted .= 'ContactFax=' . $order_info['fax'] . '&';
 
     // Billing address
-    $post_encrypted .= 'BillingAddress1=' . $order_info['b_address'] . '&';
+    $post_encrypted .= !empty($order_info['b_address']) ? 'BillingAddress1=' . $order_info['b_address'] . '&' : 'BillingAddress1=' . $order_info['s_address'] . '&';
     if (!empty($order_info['b_address_2'])) {
         $post_encrypted .= 'BillingAddress2=' . $order_info['b_address_2'] . '&';
+    } elseif (!empty($order_info['s_address_2'])) {
+        $post_encrypted .= 'BillingAddress2=' . $order_info['s_address_2'] . '&';
     }
-    $post_encrypted .= 'BillingPostCode=' . $order_info['b_zipcode'] . '&';
-    $post_encrypted .= 'BillingCountry=' . $order_info['b_country'] . '&';
+    $post_encrypted .= !empty($order_info['b_zipcode']) ? 'BillingPostCode=' . $order_info['b_zipcode'] . '&' : 'BillingPostCode=' . $order_info['s_zipcode'] . '&';
+    $post_encrypted .= !empty($order_info['b_country']) ? 'BillingCountry=' . $order_info['b_country'] . '&' : 'BillingCountry=' . $order_info['s_country'] . '&';
     if ($order_info['b_country'] == 'US') {
-        $post_encrypted .= 'BillingState=' . $order_info['b_state'] . '&';
+        if (!empty($order_info['b_state'])) {
+            $post_encrypted .= 'BillingState=' . $order_info['b_state'] . '&';
+        } else {
+            $post_encrypted .= 'BillingState=' . $order_info['s_state'] . '&';
+        }
     }
-    $post_encrypted .= 'BillingCity=' . $order_info['b_city'] . '&';
-    $post_encrypted .= 'BillingFirstnames=' . $order_info['b_firstname'] . '&';
-    $post_encrypted .= 'BillingSurname=' . $order_info['b_lastname'] . '&';
+    $post_encrypted .= !empty($order_info['b_city']) ? 'BillingCity=' . $order_info['b_city'] . '&' : 'BillingCity=' . $order_info['s_city'] . '&';
+    $post_encrypted .= !empty($order_info['b_firstname']) ? 'BillingFirstnames=' . $order_info['b_firstname'] . '&' : 'BillingFirstnames=' . $order_info['s_firstname'] . '&';
+    $post_encrypted .= !empty($order_info['b_lastname']) ? 'BillingSurname=' . $order_info['b_lastname'] . '&' : 'BillingSurname=' . $order_info['s_lastname'] . '&';
 
     // Shipping Address
     $post_encrypted .= 'DeliveryAddress1=' . $order_info['s_address'] . '&';

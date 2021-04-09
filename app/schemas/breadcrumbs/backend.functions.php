@@ -88,7 +88,8 @@ function fn_br_get_static_data_owner_link($section)
 /**
  * Checks if users link should be added
  *
- * @param string $request Previous request params
+ * @param array $request Previous request params
+ *
  * @return boolean Flag that determines if link should be added
  */
 function fn_br_check_users_link($request)

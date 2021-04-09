@@ -32,7 +32,7 @@
 {/if}
 
 <div class="table-wrapper">
-    <table class="table hidden-inputs table-middle">
+    <table class="table hidden-inputs table-middle table--relative">
     <thead>
         <tr>
             <th width="5%">{__("position_short")}</th>
@@ -59,7 +59,7 @@
             {include file="addons/form_builder/views/pages/components/element_types.tpl" element_type=$element.element_type elm_id=$element.element_id}</td>
         <td class="center">
             <input type="hidden" name="page_data[form][elements_data][{$num}][required]" value="N" />
-            <input id="req_elm_{$element.element_id}" type="checkbox" {if "HD"|strstr:$element.element_type}disabled="disabled"{/if} name="page_data[form][elements_data][{$num}][required]" value="Y" {if $element.required == "Y"}checked="checked"{/if} class="checkbox" /></td>
+            <input id="req_elm_{$element.element_id}" type="checkbox" {if "HD"|strstr:$element.element_type}disabled="disabled"{/if} name="page_data[form][elements_data][{$num}][required]" value="Y" {if $element.required == "Y"}checked="checked"{/if} /></td>
         <td>
             <div class="hidden-tools">
                 {include file="buttons/multiple_buttons.tpl" only_delete="Y"}
@@ -72,11 +72,11 @@
     <tr id="box_element_variants_{$element.element_id}" class="{if !$selectable_elements|substr_count:$element.element_type}hidden{/if} row-more row-gray hidden">
         <td>&nbsp;</td>
         <td colspan="4">
-            <table class="table table-middle">
+            <table class="table table-middle table--relative">
             <thead>
                 <tr class="cm-first-sibling">
                     <th width="5%" class="left">{__("position_short")}</th>
-                    <th>{__("description")}</th>
+                    <th>{__("variant")}</th>
                     <th>&nbsp;</th>
                 </tr>
             </thead>
@@ -122,7 +122,7 @@
             {include file="addons/form_builder/views/pages/components/element_types.tpl" element_type="" elm_id="add_variants"}</td>
         <td class="center">
             <input type="hidden" name="page_data[form][elements_data][{$num}][required]" value="N" />
-            <input id="req_elm_add_variants" type="checkbox" name="page_data[form][elements_data][{$num}][required]" value="Y" checked="checked" class="checkbox" /></td>
+            <input id="req_elm_add_variants" type="checkbox" name="page_data[form][elements_data][{$num}][required]" value="Y" checked="checked" /></td>
         <td class="left">
             <div class="hidden-tools">
                 {include file="buttons/multiple_buttons.tpl" item_id="add_elements" on_add="fn_go_check_element_type();"}
@@ -135,7 +135,7 @@
     <tr id="box_element_variants_add_variants" class="row-more row-gray">
         <td>&nbsp;</td>
         <td colspan="4">
-            <table class="table table-middle">
+            <table class="table table-middle table--relative">
             <thead>
                 <tr class="cm-first-sibling">
                     <th width="5%" class="left">{__("position_short")}</th>

@@ -4,7 +4,7 @@
 
 {if $taxes}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th class="mobile-hide">{include file="common/check_items.tpl"}</th>
@@ -39,7 +39,7 @@
         </td>
         <td class="center" data-th="{__("price_includes_tax")}">
             <input type="hidden" name="tax_data[{$tax.tax_id}][price_includes_tax]" value="N" />
-            <input type="checkbox" name="tax_data[{$tax.tax_id}][price_includes_tax]" value="Y" {if $tax.price_includes_tax == "Y"}checked="checked"{/if} class="checkbox" />
+            <input type="checkbox" name="tax_data[{$tax.tax_id}][price_includes_tax]" value="Y" {if $tax.price_includes_tax == "Y"}checked="checked"{/if} />
         </td>
 
         {hook name="taxes:manage_data"}

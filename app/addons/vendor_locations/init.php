@@ -24,5 +24,6 @@ fn_register_hooks(
     'get_product_filter_fields',
     'get_products',
     'update_company',
-    'before_dispatch'
+    'before_dispatch',
+    'storefront_rest_api_get_filter_style_by_product_field_type_post'
 );

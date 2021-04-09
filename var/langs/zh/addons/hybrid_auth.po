@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: zh-CN\n"
-"X-Crowdin-File: /release-4.8.2/addons/hybrid_auth.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/hybrid_auth.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"PO-Revision-Date: 2019-02-01 06:13\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
@@ -231,4 +231,8 @@ msgstr "<p> 由于我们以前使用的 API 版本不再受支持，我们不得
 msgctxt "Languages::hybrid_auth.facebook_oauth_redirect_uris"
 msgid "Valid OAuth redirect URIs"
 msgstr "有效的 OAuth 重定向 URLs"
+
+msgctxt "Languages::hybrid_auth.live_redirect_urls"
+msgid "Redirect URLs"
+msgstr ""
 

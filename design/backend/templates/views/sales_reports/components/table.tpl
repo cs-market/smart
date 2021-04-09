@@ -19,11 +19,11 @@
 
 {if $table.interval_id != 1}
 
-<div class="cm-scroll-data" id="scroll_content_{$table_id}" data-ca-target-id="{$ajax_div_ids}">
+<div class="cm-scroll-data scroll-data--fullwidth" id="scroll_content_{$table_id}" data-ca-target-id="{$ajax_div_ids}">
     <input type="hidden" id="count_scroll_{$table_id}" value="{$count_limit}" />
     <input type="hidden" id="begin_scroll_{$table_id}" value="{$count_part}" />
     <div class="table-wrapper">
-    <table width="100%" class="table cm-table-list-orders">
+    <table width="100%" class="table table--relative cm-table-list-orders">
         <thead class="cm-table-thead">
         <tr valign="top">
             <th style="padding: 1px;" >{$table.parameter}</th>
@@ -65,11 +65,11 @@
     </div>
 </div>
 {else}
-<div class="cm-scroll-data" id="scroll_content_{$table_id}" data-ca-target-id="{$ajax_div_ids}">
+<div class="cm-scroll-data scroll-data--fullwidth" id="scroll_content_{$table_id}" data-ca-target-id="{$ajax_div_ids}">
 <input type="hidden" id="count_scroll_{$table_id}" value="{$count_limit}" />
 <input type="hidden" id="begin_scroll_{$table_id}" value="{$count_part}" />
     <div class="table-responsive-wrapper">
-    <table class="table table-middle">
+    <table class="table table-middle table--relative">
         <thead id="elm_head_scroll_{$table_id}_{$count_part}" class="cm-table-thead">
             <tr valign="top">
                 <th style="padding: 1px;">{$table.parameter}</th>

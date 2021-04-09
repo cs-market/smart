@@ -153,7 +153,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
         $i++;
     }
 
-    if (!empty($order_info['taxes']) && Registry::get('settings.General.tax_calculation') == 'subtotal') {
+    if (!empty($order_info['taxes']) && Registry::get('settings.Checkout.tax_calculation') == 'subtotal') {
         foreach ($order_info['taxes'] as $tax_id => $tax) {
             if ($tax['price_includes_tax'] == 'N') {
                 continue;

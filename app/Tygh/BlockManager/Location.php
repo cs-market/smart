@@ -14,8 +14,9 @@
 
 namespace Tygh\BlockManager;
 
-use Tygh\Registry;
 use Tygh\Enum\ContainerPositions;
+use Tygh\Languages\Languages;
+use Tygh\Registry;
 
 /**
  * Location class
@@ -27,6 +28,9 @@ class Location
 
     /** @var array Locations cached by dispatch */
     private static $dispatch_cache;
+
+    /** @var array Editable locations */
+    protected static $editable_locations_schema;
 
     /**
      * Gets list of locations
@@ -98,6 +102,10 @@ class Location
             $condition
         );
 
+        array_walk($locations, function(&$location) {
+            $location['is_frontend_editing_allowed'] = $this->isFrontendEditingAllowed($location);
+        });
+
         /**
          * Processes locations list after getting it
          * @param array $locations Array of locations data
@@ -125,7 +133,7 @@ class Location
          */
         fn_set_hook('get_location_pre', $dispatch, $lang_code);
 
-        $cache_key = $dispatch;
+        $cache_key = $this->_layout_id . '_' . $dispatch;
         if (!empty($dynamic_object)) {
             $cache_key .= "_{$dynamic_object['object_type']}";
             if (!empty($dynamic_object['object_id'])) {
@@ -244,6 +252,7 @@ class Location
      *
      * @param  array  $location_data Array of location data
      * @param  string $lang_code     language code
+     *
      * @return int    Location id if new location was created, DB result otherwise
      */
     public function update($location_data, $lang_code = DESCR_SL)
@@ -269,7 +278,8 @@ class Location
 
         /**
          * Processes location data before updating it
-         * @param int $location_data Array of location data
+         *
+         * @param array $location_data Array of location data
          */
         fn_set_hook('update_location', $location_data);
 
@@ -294,6 +304,7 @@ class Location
 
             /**
              * Actions to be performed after the location is updated
+             *
              * @param int $location_id Location identifier
              */
             fn_set_hook('location_updated', $location_id);
@@ -306,13 +317,14 @@ class Location
 
             db_query('INSERT INTO ?:bm_containers (`location_id`, `position`, `width`) VALUES ' . implode(', ', $containers));
 
-            foreach (fn_get_translation_languages() as $location_data['lang_code'] => $v) {
+            foreach (Languages::getAll() as $location_data['lang_code'] => $v) {
                 $this->_updateDescription($location_id, $location_data);
             }
 
             /**
              * Actions to be performed after the location is created
-             * @param array $location_id Location identifier
+             *
+             * @param int $location_id Location identifier
              */
             fn_set_hook('location_created', $location_id);
         }
@@ -320,6 +332,15 @@ class Location
         if ($default) {
             $this->setDefault($location_id);
         }
+
+        /**
+         * Processes location data after updating it
+         *
+         * @param array   $location_data Array of location data
+         * @param string  $lang_code     Language code
+         * @param int     $location_id   Location identifier
+         */
+        fn_set_hook('update_location_post', $location_data, $lang_code, $location_id);
 
         // Clear dispatch cache when location created or updated
         self::$dispatch_cache = array();
@@ -420,9 +441,9 @@ class Location
 
     /**
      * Returns object instance if Location class or create it if not exists
-     * @static
-     * @param  int      $company_id Company identifier
-     * @param  string   $class_name ClassName
+     *
+     * @param int $layout_id Layout ID
+     *
      * @return Location
      */
     public static function instance($layout_id = 0)
@@ -478,5 +499,21 @@ class Location
         } else {
             return false;
         }
+    }
+
+    protected function isFrontendEditingAllowed(array $location)
+    {
+        $editable_locations = $this->getFrontendEditableLocations();
+
+        return !empty($editable_locations[$location['dispatch']]);
+    }
+
+    protected function getFrontendEditableLocations()
+    {
+        if (static::$editable_locations_schema === null) {
+            static::$editable_locations_schema = fn_get_schema('block_manager', 'frontend_editable_locations');
+        }
+
+        return static::$editable_locations_schema;
     }
 }

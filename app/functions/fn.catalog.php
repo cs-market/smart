@@ -12,19 +12,24 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Enum\OutOfStockActions;
-use Tygh\Enum\ProductTracking;
-use Tygh\Enum\ProductFeatures;
-use Tygh\Registry;
-use Tygh\Storage;
 use Tygh\BlockManager\Block;
 use Tygh\BlockManager\ProductTabs;
-use Tygh\Navigation\LastView;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\OutOfStockActions;
+use Tygh\Enum\ProductFeatures;
+use Tygh\Enum\ProductFilterProductFieldTypes;
+use Tygh\Enum\ProductOptionTypes;
+use Tygh\Enum\ProductTracking;
+use Tygh\Enum\YesNo;
 use Tygh\Languages\Languages;
+use Tygh\Navigation\LastView;
+use Tygh\Registry;
+use Tygh\Storage;
+use Tygh\Storefront\Storefront;
 use Tygh\Themes\Themes;
 use Tygh\Tools\Math;
 use Tygh\Tools\SecurityHelper;
-use Tygh\Enum\ProductOptionTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -38,17 +43,18 @@ const OPTION_EXCEPTION_VARIANT_NOTHING = -2;
 /**
  * Gets full product data by its id
  *
- * @param int $product_id Product ID
- * @param mixed $auth Array with authorization data
- * @param string $lang_code 2 letters language code
- * @param string $field_list List of fields for retrieving
- * @param boolean $get_add_pairs Get additional images
- * @param boolean $get_main_pair Get main images
- * @param boolean $get_taxes Get taxes
- * @param boolean $get_qty_discounts Get quantity discounts
- * @param boolean $preview Is product previewed by admin
- * @param boolean $features Get product features
+ * @param int     $product_id             Product ID
+ * @param mixed   $auth                   Array with authorization data
+ * @param string  $lang_code              2 letters language code
+ * @param string  $field_list             List of fields for retrieving
+ * @param boolean $get_add_pairs          Get additional images
+ * @param boolean $get_main_pair          Get main images
+ * @param boolean $get_taxes              Get taxes
+ * @param boolean $get_qty_discounts      Get quantity discounts
+ * @param boolean $preview                Is product previewed by admin
+ * @param boolean $features               Get product features
  * @param boolean $skip_company_condition Skip company condition and retrieve product data for displayin on other store page. (Works only in ULT)
+ *
  * @return mixed Array with product data
  */
 function fn_get_product_data($product_id, &$auth, $lang_code = CART_LANGUAGE, $field_list = '', $get_add_pairs = true, $get_main_pair = true, $get_taxes = true, $get_qty_discounts = false, $preview = false, $features = true, $skip_company_condition = false, $feature_variants_selected_only = false)
@@ -74,27 +80,60 @@ function fn_get_product_data($product_id, &$auth, $lang_code = CART_LANGUAGE, $f
 
     $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
 
+    $runtime_company_id = Registry::get('runtime.company_id');
+
     if (!empty($product_id)) {
 
         if (empty($field_list)) {
-            $descriptions_list = "?:product_descriptions.*";
-            $field_list = "?:products.*, $descriptions_list";
+            $descriptions_list = '?:product_descriptions.*';
+            $field_list = db_quote('?:products.*, ?p', $descriptions_list);
         }
-        $field_list .= ", MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, ?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) as price";
-        $field_list .= ", GROUP_CONCAT(IF(?:products_categories.link_type = 'M', CONCAT(?:products_categories.category_id, 'M'), ?:products_categories.category_id)) as category_ids";
-        $field_list .= ", popularity.total as popularity";
+        $field_list .= ', MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, ?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) as price';
 
-        $price_usergroup = db_quote(" AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'A' && !defined('ORDER_MANAGEMENT')) ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $usergroup_ids)));
+        $company_ordering = '';
+        if (fn_allowed_for('ULTIMATE')) {
+            $company_ordering = db_quote('?:categories.company_id = ?i DESC,', $runtime_company_id);
+        }
+        $field_list .= db_quote(
+            ', GROUP_CONCAT('
+            . ' CASE'
+            . '   WHEN (?:products_categories.link_type = ?s) THEN CONCAT(?:products_categories.category_id, ?s)'
+            . '   ELSE ?:products_categories.category_id'
+            . ' END'
+            . ' ORDER BY ?p (?:products_categories.link_type = ?s) DESC,'
+            . ' ?:products_categories.category_position ASC,'
+            . ' ?:products_categories.category_id ASC) as category_ids',
+            'M',
+            'M',
+            $company_ordering,
+            'M'
+        );
+        $field_list .= ', popularity.total as popularity';
 
-        $_p_statuses = array('A', 'H');
-        $_c_statuses = array('A', 'H');
+        $price_usergroup = db_quote(
+            ' AND ?:product_prices.usergroup_id IN (?n)',
+            AREA == 'A' && !defined('ORDER_MANAGEMENT')
+            ? USERGROUP_ALL
+            : array_merge([USERGROUP_ALL], $usergroup_ids)
+        );
 
-        $condition = $join = $avail_cond = '';
+        $_p_statuses = ['A', 'H'];
+        $_c_statuses = ['A', 'H'];
+
+        $condition = $avail_cond = '';
+        $join = db_quote(
+            ' LEFT JOIN ?:product_descriptions'
+            . ' ON ?:product_descriptions.product_id = ?:products.product_id'
+            . ' AND ?:product_descriptions.lang_code = ?s',
+            $lang_code
+        );
 
         if (!fn_allowed_for('ULTIMATE')) {
-            $avail_cond .= fn_get_company_condition('?:products.company_id');
+            if (!$skip_company_condition) {
+                $avail_cond .= fn_get_company_condition('?:products.company_id');
+            }
         } else {
-            if (!$skip_company_condition && Registry::get('runtime.company_id')) {
+            if (!$skip_company_condition && $runtime_company_id) {
                 if (AREA == 'C') {
                     $avail_cond .= fn_get_company_condition('?:categories.company_id');
                 } else {
@@ -102,7 +141,7 @@ function fn_get_product_data($product_id, &$auth, $lang_code = CART_LANGUAGE, $f
                 }
             }
 
-            if (Registry::get('runtime.company_id')) {
+            if ($runtime_company_id) {
                 $field_list .= ', IF('
                         . 'shared_prices.product_id IS NOT NULL,'
                         . 'MIN(IF(shared_prices.percentage_discount = 0, shared_prices.price, shared_prices.price - (shared_prices.price * shared_prices.percentage_discount)/100)),'
@@ -110,7 +149,7 @@ function fn_get_product_data($product_id, &$auth, $lang_code = CART_LANGUAGE, $f
                     . ') as price'
                 ;
                 $shared_prices_usergroup = db_quote(" AND shared_prices.usergroup_id IN (?n)", ((AREA == 'A' && !defined('ORDER_MANAGEMENT')) ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $usergroup_ids)));
-                $join .= db_quote(' LEFT JOIN ?:ult_product_prices shared_prices ON shared_prices.product_id = ?:products.product_id AND shared_prices.company_id = ?i AND shared_prices.lower_limit = 1 ?p', Registry::get('runtime.company_id'), $shared_prices_usergroup);
+                $join .= db_quote(' LEFT JOIN ?:ult_product_prices shared_prices ON shared_prices.product_id = ?:products.product_id AND shared_prices.company_id = ?i AND shared_prices.lower_limit = 1 ?p', $runtime_company_id, $shared_prices_usergroup);
             }
         }
 
@@ -123,26 +162,41 @@ function fn_get_product_data($product_id, &$auth, $lang_code = CART_LANGUAGE, $f
 
         if (AREA == 'C' && !$preview) {
             $field_list .= ', companies.company as company_name';
-            $condition .= " AND (companies.status = 'A' OR ?:products.company_id = 0) ";
-            $join .= " LEFT JOIN ?:companies as companies ON companies.company_id = ?:products.company_id";
+            $condition .= db_quote(' AND (companies.status = ?s OR ?:products.company_id = ?i)', 'A', 0);
+            $join .= ' LEFT JOIN ?:companies as companies ON companies.company_id = ?:products.company_id';
         }
 
-        $join .= " INNER JOIN ?:products_categories ON ?:products_categories.product_id = ?:products.product_id INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id $avail_cond";
-        $join .= " LEFT JOIN ?:product_popularity as popularity ON popularity.product_id = ?:products.product_id";
+        $join .= db_quote(' INNER JOIN ?:products_categories ON ?:products_categories.product_id = ?:products.product_id INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id ?p', $avail_cond);
+        $join .= ' LEFT JOIN ?:product_popularity as popularity ON popularity.product_id = ?:products.product_id';
 
         /**
          * Change SQL parameters for product data select
          *
-         * @param int $product_id Product ID
-         * @param string $field_list List of fields for retrieving
-         * @param string $join String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
-         * @param mixed $auth Array with authorization data
-         * @param string $lang_code Two-letter language code (e.g. 'en', 'ru', etc.)
-         * @param string $condition Condition for selecting product data
+         * @param int    $product_id      Product ID
+         * @param string $field_list      List of fields for retrieving
+         * @param string $join            String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
+         * @param mixed  $auth            Array with authorization data
+         * @param string $lang_code       Two-letter language code (e.g. 'en', 'ru', etc.)
+         * @param string $condition       Condition for selecting product data
+         * @param string $price_usergroup Condition for usergroup prices
          */
         fn_set_hook('get_product_data', $product_id, $field_list, $join, $auth, $lang_code, $condition, $price_usergroup);
 
-        $product_data = db_get_row("SELECT $field_list FROM ?:products LEFT JOIN ?:product_prices ON ?:product_prices.product_id = ?:products.product_id AND ?:product_prices.lower_limit = 1 ?p LEFT JOIN ?:product_descriptions ON ?:product_descriptions.product_id = ?:products.product_id AND ?:product_descriptions.lang_code = ?s ?p WHERE ?:products.product_id = ?i ?p GROUP BY ?:products.product_id", $price_usergroup, $lang_code, $join, $product_id, $condition);
+        $product_data = db_get_row(
+            'SELECT ?p FROM ?:products'
+            . ' LEFT JOIN ?:product_prices'
+                . ' ON ?:product_prices.product_id = ?:products.product_id'
+                . ' AND ?:product_prices.lower_limit = 1 ?p'
+            . ' ?p'
+            . ' WHERE ?:products.product_id = ?i'
+                . ' ?p'
+            . ' GROUP BY ?:products.product_id',
+            $field_list,
+            $price_usergroup,
+            $join,
+            $product_id,
+            $condition
+        );
 
         if (empty($product_data)) {
             return false;
@@ -151,6 +205,39 @@ function fn_get_product_data($product_id, &$auth, $lang_code = CART_LANGUAGE, $f
         $product_data['base_price'] = $product_data['price']; // save base price (without discounts, etc...)
 
         list($product_data['category_ids'], $product_data['main_category']) = fn_convert_categories($product_data['category_ids']);
+
+        // manually regroup categories
+        if (fn_allowed_for('ULTIMATE') && !$runtime_company_id) {
+
+            list($categories_data,) = fn_get_categories(array(
+                'simple'                   => false,
+                'group_by_level'           => false,
+                'limit'                    => 0,
+                'items_per_page'           => 0,
+                'category_ids'             => $product_data['category_ids'],
+                'item_ids'                 => implode(',', $product_data['category_ids']),
+            ));
+            $categories_groups = array();
+
+            foreach ($categories_data as $category) {
+                if ($category['category_id'] == $product_data['main_category']) {
+                    $main_category_owner = $category['company_id'];
+                }
+                if (!isset($categories_groups[$category['company_id']])) {
+                    $categories_groups[$category['company_id']] = array();
+                }
+                $categories_groups[$category['company_id']][] = $category['category_id'];
+            }
+
+            $categories_groups = array(
+                $main_category_owner => $categories_groups[$main_category_owner]
+            ) + $categories_groups;
+
+            $product_data['category_ids'] = array();
+            foreach ($categories_groups as $company_id => $category_ids) {
+                $product_data['category_ids'] = array_merge($product_data['category_ids'], $category_ids);
+            }
+        }
 
         // Generate meta description automatically
         if (!empty($product_data['full_description']) && empty($product_data['meta_description']) && defined('AUTO_META_DESCRIPTION') && AREA != 'A') {
@@ -243,9 +330,10 @@ function fn_get_product_data($product_id, &$auth, $lang_code = CART_LANGUAGE, $f
 /**
  * Gets feature name by id
  *
- * @param mixed $feature_id Integer feature id, or array of feature ids
- * @param string $lang_code 2-letter language code
- * @param boolean $as_array Flag: if set, result will be returned as array <i>(feature_id => feature)</i>; otherwise only feature name will be returned
+ * @param mixed   $feature_id Integer feature id, or array of feature ids
+ * @param string  $lang_code  2-letter language code
+ * @param boolean $as_array   Flag: if set, result will be returned as array <i>(feature_id => feature)</i>; otherwise only feature name will be returned
+ *
  * @return mixed In case 1 <i>feature_id</i> is passed and <i>as_array</i> is not set, a feature name string is returned;
  * Array <i>(feature_id => feature)</i> for all given <i>feature_ids</i>;
  * <i>False</i> if <i>$feature_id</i> is not defined
@@ -486,26 +574,29 @@ function fn_translate_products(&$products, $fields = '',$lang_code = '', $transl
 /**
  * Gets additional products data
  *
- * @param array $products Array with products
- * @param array $params Array of flags which determines which data should be gathered
- * @return array Array of products with additional information
+ * @param array  $products  List of products
+ * @param array  $params    Array of flags which determines which data should be gathered
+ * @param string $lang_code Two-letter language code
+ *
+ * @return void
  */
-function fn_gather_additional_products_data(&$products, $params)
+function fn_gather_additional_products_data(&$products, $params, $lang_code = CART_LANGUAGE)
 {
     /**
      * Change parameters for gathering additional products data
      *
-     * @param array $products List of products
-     * @param array $params   Parameters for gathering data
+     * @param array  $products  List of products
+     * @param array  $params    Array of flags which determines which data should be gathered
+     * @param string $lang_code Two-letter language code
      */
-    fn_set_hook('gather_additional_products_data_pre', $products, $params);
+    fn_set_hook('gather_additional_products_data_pre', $products, $params, $lang_code);
 
     if (empty($products)) {
         return;
     }
 
     // Set default values to input params
-    $default_params = array (
+    $default_params = [
         'get_icon' => false,
         'get_detailed' => false,
         'get_additional' => false,
@@ -516,8 +607,9 @@ function fn_gather_additional_products_data(&$products, $params)
         'get_taxed_prices' => true,
         'get_for_one_product' => (!is_array(reset($products)))? true : false,
         'detailed_params' => true,
-        'features_display_on' => 'C'
-    );
+        'features_display_on' => 'C',
+        'get_active_options' => false
+    ];
 
     $params = array_merge($default_params, $params);
 
@@ -532,15 +624,21 @@ function fn_gather_additional_products_data(&$products, $params)
     $product_ids = fn_array_column($products, 'product_id');
 
     if ($params['get_icon'] || $params['get_detailed']) {
-        $products_images = fn_get_image_pairs($product_ids, 'product', 'M', $params['get_icon'], $params['get_detailed'], CART_LANGUAGE);
+        $products_images = fn_get_image_pairs($product_ids, 'product', 'M', $params['get_icon'], $params['get_detailed'], $lang_code);
     }
 
     if ($params['get_additional']) {
-        $additional_images = fn_get_image_pairs($product_ids, 'product', 'A', true, true, CART_LANGUAGE);
+        $additional_images = fn_get_image_pairs($product_ids, 'product', 'A', true, true, $lang_code);
     }
 
-    if ($params['get_options']) {
-        $product_options = fn_get_product_options($product_ids, CART_LANGUAGE);
+    if ($params['get_options'] || $params['get_active_options']) {
+        $product_options = fn_get_product_options(
+            $product_ids,
+            $lang_code,
+            false,
+            false,
+            $params['get_active_options']
+        );
     } else {
         $has_product_options = db_get_hash_array("SELECT a.option_id, a.product_id FROM ?:product_options AS a WHERE a.product_id IN (?n) AND a.status = 'A'", 'product_id', $product_ids);
         $has_product_options_links = db_get_hash_array("SELECT c.option_id, c.product_id FROM ?:product_global_option_links AS c LEFT JOIN ?:product_options AS a ON a.option_id = c.option_id WHERE a.status = 'A' AND c.product_id IN (?n)", 'product_id', $product_ids);
@@ -550,7 +648,7 @@ function fn_gather_additional_products_data(&$products, $params)
      * Changes before gathering additional products data
      *
      * @param array $product_ids               Array of product identifiers
-     * @param array $params                    Parameteres for gathering data
+     * @param array $params                    Parameters for gathering data
      * @param array $products                  Array of products
      * @param mixed $auth                      Array of user authentication data
      * @param array $products_images           Array with product main images
@@ -630,7 +728,7 @@ function fn_gather_additional_products_data(&$products, $params)
             if (!empty($params['get_icon']) || !empty($params['get_detailed'])) {
                 // Get product options images
                 if (!empty($product['combination_hash']) && !empty($product['product_options'])) {
-                    $image = fn_get_image_pairs($product['combination_hash'], 'product_option', 'M', $params['get_icon'], $params['get_detailed'], CART_LANGUAGE);
+                    $image = fn_get_image_pairs($product['combination_hash'], 'product_option', 'M', $params['get_icon'], $params['get_detailed'], $lang_code);
                     if (!empty($image)) {
                         $product['main_pair'] = $image;
                     }
@@ -665,7 +763,7 @@ function fn_gather_additional_products_data(&$products, $params)
                 $product['modifiers_price'] = $product['price'] - $old_price;
             }
 
-            if (!empty($product['list_price'])) {
+            if (isset($product['list_price']) && (float) $product['list_price']) {
                 $product['list_price'] = fn_apply_options_modifiers($selected_options, $product['list_price'], 'P', array(), array('product_data' => $product));
             }
 
@@ -759,12 +857,13 @@ function fn_gather_additional_products_data(&$products, $params)
     /**
      * Add additional data to products after gathering additional products data
      *
-     * @param array $product_ids Array of product identifiers
-     * @param array $params      Parameteres for gathering data
-     * @param array $products    Array of products
-     * @param mixed $auth        Array of user authentication data
+     * @param array  $product_ids Array of product identifiers
+     * @param array  $params      Parameteres for gathering data
+     * @param array  $products    Array of products
+     * @param array  $auth        Array of user authentication data
+     * @param string $lang_code   Two-letter language code
      */
-    fn_set_hook('gather_additional_products_data_post', $product_ids, $params, $products, $auth);
+    fn_set_hook('gather_additional_products_data_post', $product_ids, $params, $products, $auth, $lang_code);
 
     if ($params['get_for_one_product'] == true) {
         $products = array_shift($products);
@@ -774,9 +873,10 @@ function fn_gather_additional_products_data(&$products, $params)
 /**
  * Forms a drop-down list of possible product quantity values with the given quantity step
  *
- * @param array $product Product data
- * @param char $allow_negative_amount Flag: allow or disallow negative product quantity(Y - allow, N - disallow)
- * @param char $inventory_tracking Flag: track product qiantity or not (Y - track, N - do not track)
+ * @param array  $product               Product data
+ * @param string $allow_negative_amount Flag: allow or disallow negative product quantity(Y - allow, N - disallow)
+ * @param string $inventory_tracking    Flag: track product qiantity or not (Y - track, N - do not track)
+ *
  * @return array qty_content List of available quantity values with the given step
  */
 function fn_get_product_qty_content($product, $allow_negative_amount, $inventory_tracking)
@@ -805,7 +905,8 @@ function fn_get_product_qty_content($product, $allow_negative_amount, $inventory
     if ($product['tracking'] != ProductTracking::DO_NOT_TRACK
         && $allow_negative_amount != 'Y'
         && $inventory_tracking == 'Y'
-) {
+        && !(isset($product['out_of_stock_actions']) && ($product['out_of_stock_actions'] === OutOfStockActions::BUY_IN_ADVANCE) && $product['amount'] <= 0)
+    ) {
         if (isset($product['in_stock'])) {
             $max_qty = fn_floor_to_step($product['in_stock'], $product['qty_step']);
 
@@ -846,13 +947,14 @@ function fn_get_product_qty_content($product, $allow_negative_amount, $inventory
 /**
  * Gets additional data for a single product
  *
- * @param array $product Product data
- * @param boolean $get_icon Flag that define if product icon should be gathered
- * @param boolean $get_detailed Flag determines if detailed image should be gathered
- * @param boolean $get_options Flag that define if product options should be gathered
+ * @param array   $product       Product data
+ * @param boolean $get_icon      Flag that define if product icon should be gathered
+ * @param boolean $get_detailed  Flag determines if detailed image should be gathered
+ * @param boolean $get_options   Flag that define if product options should be gathered
  * @param boolean $get_discounts Flag that define if product discounts should be gathered
- * @param boolean $get_features Flag that define if product features should be gathered
- * @return array Product data with the additional information
+ * @param boolean $get_features  Flag that define if product features should be gathered
+ *
+ * @return void
  */
 function fn_gather_additional_product_data(&$product, $get_icon = false, $get_detailed = false, $get_options = true, $get_discounts = true, $get_features = false)
 {
@@ -879,62 +981,79 @@ function fn_gather_additional_product_data(&$product, $get_icon = false, $get_de
 /**
  * Returns product folders
  *
- * @param array $params
+ * @param array  $params
  *        int product_id     - ID of product
  *        string folder_ids  - get folders by ids
  *        string order_by
+ * @param string $lang_code
+ *
  * @return array folders, params
  */
 function fn_get_product_file_folders($params, $lang_code = DESCR_SL)
 {
     $params['product_id'] = !empty($params['product_id'])? $params['product_id'] : 0;
-    $fields = array(
+    $fields = [
         'SUM(?:product_files.file_size) as folder_size',
         '?:product_file_folders.*',
-        '?:product_file_folder_descriptions.folder_name'
-    );
-    $default_params = array(
+        '?:product_file_folder_descriptions.folder_name',
+    ];
+    $default_params = [
         'product_id' => 0,
         'folder_ids' => '',
-        'order_by' => 'position, folder_name',
-    );
+        'order_by'   => 'position, folder_name',
+    ];
     $params = array_merge($default_params, $params);
 
-    $join = db_quote(" LEFT JOIN ?:product_files ON ?:product_file_folders.folder_id = ?:product_files.folder_id LEFT JOIN ?:product_file_folder_descriptions ON ?:product_file_folder_descriptions.folder_id = ?:product_file_folders.folder_id AND ?:product_file_folder_descriptions.lang_code = ?s", $lang_code);
+    $join = db_quote(
+        ' LEFT JOIN ?:product_files ON ?:product_file_folders.folder_id = ?:product_files.folder_id'
+        . ' LEFT JOIN ?:product_file_folder_descriptions ON ?:product_file_folder_descriptions.folder_id = ?:product_file_folders.folder_id AND ?:product_file_folder_descriptions.lang_code = ?s',
+        $lang_code
+    );
     $order = $params['order_by'];
 
+    $condition = '';
     if (!empty($params['folder_ids'])) {
-        $condition = db_quote("WHERE ?:product_file_folders.folder_id IN (?n)", $params['folder_ids']);
-    } else {
-        $condition = db_quote("WHERE ?:product_file_folders.product_id = ?i", $params['product_id']);
+        $condition .= db_quote(' AND ?:product_file_folders.folder_id IN (?n)', $params['folder_ids']);
+    }
+
+    if (!empty($params['product_id'])) {
+        $condition .= db_quote(' AND ?:product_file_folders.product_id = ?i', $params['product_id']);
     }
 
     if (AREA == 'C') {
-        $condition .= " AND ?:product_file_folders.status = 'A'";
+        $condition .= db_quote(' AND ?:product_file_folders.status = ?s', ObjectStatuses::ACTIVE);
     }
 
-    $folders = db_get_array("SELECT " . implode(', ', $fields) . " FROM ?:product_file_folders ?p ?p GROUP BY folder_id ORDER BY ?p", $join, $condition, $order);
+    $folders = db_get_array(
+        'SELECT ?p FROM ?:product_file_folders ?p WHERE 1 = 1 ?p GROUP BY folder_id ORDER BY ?p',
+        implode(', ', $fields),
+        $join,
+        $condition,
+        $order
+    );
 
     return array($folders, $params);
 }
 
 /**
  * Returns product files
+ *
  * @param array $params
  *        int product_id     - ID of product
  *        bool preview_check - get files only with preview
  *        int order_id       - get order ekeys for the files
  *        string file_ids    - get files by ids
+ *
  * @return array files, params
  */
 function fn_get_product_files($params, $lang_code = DESCR_SL)
 {
-    $default_params = array (
+    $default_params = [
         'product_id'    => 0,
         'preview_check' => false,
         'order_id'      => 0,
         'file_ids'      => '',
-    );
+    ];
     $params = array_merge($default_params, $params);
 
     /**
@@ -944,28 +1063,39 @@ function fn_get_product_files($params, $lang_code = DESCR_SL)
      * @param string $lang_code 2-letters language code
      */
     fn_set_hook('get_product_files_pre', $params, $lang_code);
-    $fields = array(
+
+    $sortings = [
+        'position' => [
+            '?:product_files.position',
+            '?:product_file_descriptions.file_name',
+        ]
+    ];
+
+    $fields = [
         '?:product_files.*',
         '?:product_file_descriptions.file_name',
         '?:product_file_descriptions.license',
         '?:product_file_descriptions.readme'
-    );
+    ];
 
-    $join = db_quote(" LEFT JOIN ?:product_file_descriptions ON ?:product_file_descriptions.file_id = ?:product_files.file_id AND ?:product_file_descriptions.lang_code = ?s", $lang_code);
+    $join = db_quote(' LEFT JOIN ?:product_file_descriptions ON ?:product_file_descriptions.file_id = ?:product_files.file_id AND ?:product_file_descriptions.lang_code = ?s', $lang_code);
 
     if (!empty($params['order_id'])) {
         $fields[] = '?:product_file_ekeys.active';
         $fields[] = '?:product_file_ekeys.downloads';
         $fields[] = '?:product_file_ekeys.ekey';
 
-        $join .= db_quote(" LEFT JOIN ?:product_file_ekeys ON ?:product_file_ekeys.file_id = ?:product_files.file_id AND ?:product_file_ekeys.order_id = ?i", $params['order_id']);
+        $join .= db_quote(' LEFT JOIN ?:product_file_ekeys ON ?:product_file_ekeys.file_id = ?:product_files.file_id AND ?:product_file_ekeys.order_id = ?i', $params['order_id']);
         $join .= (AREA == 'C') ? " AND ?:product_file_ekeys.active = 'Y'" : '';
     }
 
+    $condition = '';
     if (!empty($params['file_ids'])) {
-        $condition = db_quote("WHERE ?:product_files.file_id IN (?n)", $params['file_ids']);
-    } else {
-        $condition = db_quote("WHERE ?:product_files.product_id = ?i", $params['product_id']);
+        $condition .= db_quote(' AND ?:product_files.file_id IN (?n)', $params['file_ids']);
+    }
+
+    if (!empty($params['product_id'])) {
+        $condition .= db_quote(' AND ?:product_files.product_id = ?i', $params['product_id']);
     }
 
     if ($params['preview_check'] == true) {
@@ -973,7 +1103,7 @@ function fn_get_product_files($params, $lang_code = DESCR_SL)
     }
 
     if (AREA == 'C') {
-        $condition .= " AND ?:product_files.status = 'A'";
+        $condition .= db_quote(' AND ?:product_files.status = ?s', ObjectStatuses::ACTIVE);
     }
 
     /**
@@ -983,15 +1113,26 @@ function fn_get_product_files($params, $lang_code = DESCR_SL)
      * @param array  $fields    List of fields for retrieving
      * @param string $join      String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
      * @param string $condition String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
+     * @param array  $sortings  Sorting fields
+     * @param string $lang_code Language code
      */
-    fn_set_hook('get_product_files_before_select', $params, $fields, $join, $condition);
+    fn_set_hook('get_product_files_before_select', $params, $fields, $join, $condition, $sortings, $lang_code);
 
-    $files = db_get_array("SELECT " . implode(', ', $fields) . " FROM ?:product_files ?p ?p ORDER BY position, file_name", $join, $condition);
+    $sorting = db_sort($params, $sortings, 'position', 'asc');
+
+    $files = db_get_array(
+        'SELECT ?p FROM ?:product_files ?p'
+        . ' WHERE 1=1 ?p ?p',
+        implode(', ', $fields),
+        $join,
+        $condition,
+        $sorting
+    );
 
     if (!empty($files)) {
         foreach ($files as $k => $file) {
             if (!empty($file['license']) && $file['agreement'] == 'Y') {
-                $files[$k]['agreements'] = array($file);
+                $files[$k]['agreements'] = [$file];
             }
             if (!empty($file['product_id']) && !empty($file['ekey'])) {
                 $files[$k]['edp_info'] = fn_get_product_edp_info($file['product_id'], $file['ekey']);
@@ -1007,7 +1148,7 @@ function fn_get_product_files($params, $lang_code = DESCR_SL)
      */
     fn_set_hook('get_product_files_post', $params, $files);
 
-    return array($files, $params);
+    return [$files, $params];
 }
 
 /**
@@ -1415,7 +1556,8 @@ function fn_get_categories($params = array(), $lang_code = CART_LANGUAGE)
         '?:categories.id_path',
         '?:category_descriptions.category',
         '?:categories.position',
-        '?:categories.status'
+        '?:categories.status',
+        '?:categories.company_id'
     );
 
     if (!$params['simple']) {
@@ -1488,6 +1630,10 @@ function fn_get_categories($params = array(), $lang_code = CART_LANGUAGE)
 
     if (isset($params['search_query']) && !fn_is_empty($params['search_query'])) {
         $condition .= db_quote(' AND ?:category_descriptions.category LIKE ?l', '%' . trim($params['search_query']) . '%');
+    }
+
+    if (!empty($params['company_ids']) && is_array($params['company_ids'])) {
+        $condition .= fn_get_company_condition('?:categories.company_id', true, $params['company_ids']);
     }
 
     $limit = $join = $group_by = '';
@@ -1584,26 +1730,48 @@ function fn_get_categories($params = array(), $lang_code = CART_LANGUAGE)
 
     $category_ids = array();
     // Group categories by the level (simple)
-    if ($params['simple'] == true) {
+    if ($params['simple']) {
         foreach ($categories as $k => $v) {
             $v['level'] = substr_count($v['id_path'], '/');
-            if ((!empty($params['current_category_id']) || $v['level'] == 0) && isset($has_children[$k])) {
+            if (isset($has_children[$k])) {
                 $v['has_children'] = $has_children[$k]['category_id'];
             }
             $categories_list[$v['level']][$v['category_id']] = $v;
             $category_ids[] = $v['category_id'];
         }
-    } elseif ($params['group_by_level'] == true) {
+    } elseif ($params['group_by_level']) {
+        $categories_for_parents = $categories;
+        /**
+         * When searching categories by parent product ID, parent categories are not present in the resulting
+         * $categories array and must be fetched to get the full category path.
+         */
+        if ($params['plain']
+            && (!empty($params['parent_category_id'])
+                || !empty($params['item_ids'])
+            )
+        ) {
+            $categories_for_parents = fn_get_categories_list_with_parents(
+                array_column($categories, 'category_id'),
+                $lang_code
+            );
+
+            foreach ($categories_for_parents as $category_for_parents) {
+                if (!empty($category_for_parents['parents'])) {
+                    $categories_for_parents += $category_for_parents['parents'];
+                }
+            }
+        }
+
         // Group categories by the level (simple) and literalize path
         foreach ($categories as $k => $v) {
             $path = explode('/', $v['id_path']);
             $category_path = array();
             foreach ($path as $__k => $__v) {
-                $category_path[$__v] = @$categories[$__v]['category'];
+                $category_path[$__v] = @$categories_for_parents[$__v]['category'];
             }
             $v['category_path'] = implode($params['category_delimiter'], $category_path);
             $v['level'] = substr_count($v['id_path'], "/");
-            if ((!empty($params['current_category_id']) || $v['level'] == 0) && isset($has_children[$k])) {
+            if (isset($has_children[$k])) {
                 $v['has_children'] = $has_children[$k]['category_id'];
             }
             $categories_list[$v['level']][$v['category_id']] = $v;
@@ -2449,7 +2617,7 @@ function fn_update_product($product_data, $product_id = 0, $lang_code = CART_LAN
             $product_company_id = $product_data['company_id'];
         }
 
-        if (!empty($product_data['category_ids']) && !fn_check_owner_categories($product_company_id, $product_data['category_ids'])) {
+        if (!empty($product_data['category_ids']) && !fn_check_owner_categories($product_company_id, $product_data['category_ids']) && empty($product_data['add_new_category'])) {
             fn_set_notification('E', __('error'), __('product_must_have_owner_category'));
 
             return false;
@@ -2573,7 +2741,7 @@ function fn_update_product($product_data, $product_id = 0, $lang_code = CART_LAN
             $_data['product_id'] =  $product_id;
             $_data['product'] = trim($_data['product'], " -");
 
-            foreach (fn_get_translation_languages() as $_data['lang_code'] => $_v) {
+            foreach (Languages::getAll() as $_data['lang_code'] => $_v) {
                 db_query("INSERT INTO ?:product_descriptions ?e", $_data);
             }
 
@@ -2634,22 +2802,55 @@ function fn_update_product($product_data, $product_id = 0, $lang_code = CART_LAN
             $product_data = fn_update_product_prices($product_id, $product_data);
 
             if (isset($product_data['popularity'])) {
-                $_data = array (
-                    'product_id' => $product_id,
-                    'total' => intval($product_data['popularity'])
-                );
+                if (fn_allowed_for('ULTIMATE') || (fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id') == 0)) {
+                    $_data = array (
+                        'product_id' => $product_id,
+                        'total' => (int) $product_data['popularity']
+                    );
 
-                db_query("INSERT INTO ?:product_popularity ?e ON DUPLICATE KEY UPDATE total = ?i", $_data, $product_data['popularity']);
+                    db_query("INSERT INTO ?:product_popularity ?e ON DUPLICATE KEY UPDATE total = ?i", $_data, $product_data['popularity']);
+                }
             }
 
-            // Update main images pair
+            // Update main image
             fn_attach_image_pairs('product_main', 'product', $product_id, $lang_code);
 
             // Update additional images
             fn_attach_image_pairs('product_additional', 'product', $product_id, $lang_code);
 
-            // Adding new additional images
+            // Add new additional images
             fn_attach_image_pairs('product_add_additional', 'product', $product_id, $lang_code);
+
+            // Remove images
+            if (isset($product_data['removed_image_pair_ids'])) {
+                $product_data['removed_image_pair_ids'] = array_filter($product_data['removed_image_pair_ids']);
+            }
+            if (!empty($product_data['removed_image_pair_ids'])) {
+                fn_delete_image_pairs($product_id, 'product', '', $product_data['removed_image_pair_ids']);
+            }
+
+            /**
+             * Re-attach one of the additional product images as the main one when product has no main image.
+             * This case can occur when creating or updating a product programmatically via API.
+             */
+            $main_image = fn_get_image_pairs($product_id, 'product', 'M', true, true, $lang_code);
+            $additional_images = fn_get_image_pairs($product_id, 'product', 'A', true, true, $lang_code);
+            $main_image_candidate = reset($additional_images);
+
+            if (!$main_image && $main_image_candidate) {
+                $pairs_data = [
+                    $main_image_candidate['pair_id'] => [
+                        'detailed_alt' => '',
+                        'type'         => 'M',
+                        'object_id'    => 0,
+                        'pair_id'      => $main_image_candidate['pair_id'],
+                        'position'     => 0,
+                        'is_new'       => YesNo::NO,
+                    ],
+                ];
+
+                fn_update_image_pairs([], [], $pairs_data, $product_id, 'product', [], true, $lang_code);
+            }
 
             if (fn_allowed_for('ULTIMATE')) {
                 fn_check_and_update_product_sharing($product_id);
@@ -2764,7 +2965,7 @@ function fn_update_product_features_value($product_id, $product_features, $add_n
             }
             if (!empty($value)) {
                 foreach ($value as $variant_id) {
-                    foreach (fn_get_translation_languages() as $i_data['lang_code'] => $_d) { // insert for all languages
+                    foreach (Languages::getAll() as $i_data['lang_code'] => $_d) { // insert for all languages
                         $i_data['variant_id'] = $variant_id;
                         db_query("REPLACE INTO ?:product_features_values ?e", $i_data);
                     }
@@ -2796,7 +2997,7 @@ function fn_update_product_features_value($product_id, $product_features, $add_n
         }
 
         if ($feature_type != ProductFeatures::TEXT_FIELD) { // feature values are common for all languages, except text (T)
-            foreach (fn_get_translation_languages() as $i_data['lang_code'] => $_d) {
+            foreach (Languages::getAll() as $i_data['lang_code'] => $_d) {
                 db_query("REPLACE INTO ?:product_features_values ?e", $i_data);
             }
         } else { // for text feature, update current language only
@@ -2804,6 +3005,18 @@ function fn_update_product_features_value($product_id, $product_features, $add_n
             db_query("INSERT INTO ?:product_features_values ?e", $i_data);
         }
     }
+
+    /**
+     * Executed after saving the values of the features of a product.
+     *
+     * @param int       $product_id         Product identifier
+     * @param array     $product_features   List of feature values
+     * @param array     $add_new_variant    List of new variants that will be added when the features of a product are saved
+     * @param string    $lang_code          Two-letter language code (e.g. 'en', 'ru', etc.)
+     * @param array     $params             List of additional parameters
+     * @param array     $category_ids       List of the category identifiers
+     */
+    fn_set_hook('update_product_features_value_post', $product_id, $product_features, $add_new_variant, $lang_code, $params, $category_ids);
 
     return true;
 }
@@ -2957,7 +3170,7 @@ function fn_update_product_filter($filter_data, $filter_id, $lang_code = DESCR_S
         );
     } else {
         $filter_data['filter_id'] = $filter_id = db_query('INSERT INTO ?:product_filters ?e', $filter_data);
-        foreach (fn_get_translation_languages() as $filter_data['lang_code'] => $_d) {
+        foreach (Languages::getAll() as $filter_data['lang_code'] => $_d) {
             db_query('INSERT INTO ?:product_filter_descriptions ?e', $filter_data);
         }
     }
@@ -3033,7 +3246,7 @@ function fn_update_category($category_data, $category_id = 0, $lang_code = CART_
     }
 
     if (isset($_data['position']) && empty($_data['position']) && $_data['position'] != '0' && isset($category_data['parent_id'])) {
-        $_data['position'] = db_get_field("SELECT max(position) FROM ?:categories WHERE parent_id = ?i", $category_data['parent_id']);
+        $_data['position'] = (int) db_get_field("SELECT max(position) FROM ?:categories WHERE parent_id = ?i", $category_data['parent_id']);
         $_data['position'] = $_data['position'] + 10;
     }
 
@@ -3060,7 +3273,7 @@ function fn_update_category($category_data, $category_id = 0, $lang_code = CART_
         $category_id = db_query("INSERT INTO ?:categories ?e", $_data);
         $_data['category_id'] = $category_id;
 
-        foreach (fn_get_translation_languages() as $_data['lang_code'] => $v) {
+        foreach (Languages::getAll() as $_data['lang_code'] => $v) {
             db_query("INSERT INTO ?:category_descriptions ?e", $_data);
         }
 
@@ -3232,8 +3445,13 @@ function fn_delete_product_option($option_id, $pid = 0)
     $product_id = 0;
 
     if (!empty($option_id)) {
-        $condition = fn_get_company_condition('?:product_options.company_id');
-        $_otps = db_get_row('SELECT product_id, inventory FROM ?:product_options WHERE option_id = ?i ?p', $option_id, $condition);
+        $product_link = db_get_fields('SELECT product_id FROM ?:product_global_option_links WHERE option_id = ?i AND product_id = ?i', $option_id, $pid);
+        if (!empty($product_link)) {
+            $_otps = db_get_row('SELECT product_id, inventory FROM ?:product_options WHERE option_id = ?i', $option_id);
+        } else {
+            $condition = fn_get_company_condition('?:product_options.company_id');
+            $_otps = db_get_row('SELECT product_id, inventory FROM ?:product_options WHERE option_id = ?i ?p', $option_id, $condition);
+        }
 
         if (empty($_otps)) {
             return false;
@@ -3241,7 +3459,6 @@ function fn_delete_product_option($option_id, $pid = 0)
 
         $product_id = (int) $_otps['product_id'];
         $option_inventory = $_otps['inventory'];
-        $product_link = db_get_fields('SELECT product_id FROM ?:product_global_option_links WHERE option_id = ?i AND product_id = ?i', $option_id, $pid);
 
         /**
          * Adds additional actions before executing delete queries
@@ -3258,10 +3475,33 @@ function fn_delete_product_option($option_id, $pid = 0)
             return false;
         }
 
+        if ($pid) {
+            $exceptions = db_get_hash_array('SELECT exception_id, combination FROM ?:product_options_exceptions WHERE product_id = ?i', 'exception_id', $pid);
+        } else {
+            $exceptions = db_get_hash_array(
+                'SELECT exception_id, combination FROM ?:product_options_exceptions'
+                . ' LEFT JOIN ?:product_global_option_links'
+                . ' ON ?:product_options_exceptions.product_id = ?:product_global_option_links.product_id'
+                . ' WHERE option_id = ?i',
+                'exception_id',
+                $option_id
+            );
+        }
+
+        foreach ($exceptions as $exception_id => $exception) {
+            $combination = unserialize($exception['combination']);
+
+            if (isset($combination[$option_id])) {
+                db_query('DELETE FROM ?:product_options_exceptions WHERE exception_id = ?i', $exception_id);
+            }
+        }
+
         if (empty($product_id) && !empty($product_link)) {
             // Linked option
-            $option_description = db_get_field('SELECT option_name FROM ?:product_options_descriptions WHERE option_id = ?i AND lang_code = ?s', $option_id, CART_LANGUAGE );
-            db_query('DELETE FROM ?:product_global_option_links WHERE product_id = ?i AND option_id = ?i', $pid, $option_id);
+            $option_description = db_get_field('SELECT option_name FROM ?:product_options_descriptions WHERE option_id = ?i AND lang_code = ?s', $option_id, CART_LANGUAGE);
+
+            fn_delete_global_option_link($pid, $option_id);
+
             fn_set_notification('W', __('warning'), __('option_unlinked', array(
                 '[option_name]' => $option_description
             )));
@@ -3269,6 +3509,7 @@ function fn_delete_product_option($option_id, $pid = 0)
             // Product option
             db_query('DELETE FROM ?:product_options_descriptions WHERE option_id = ?i', $option_id);
             db_query('DELETE FROM ?:product_options WHERE option_id = ?i', $option_id);
+            db_query('DELETE FROM ?:product_global_option_links WHERE option_id = ?i', $option_id);
             fn_delete_product_option_variants($option_id);
         }
 
@@ -3362,31 +3603,36 @@ function fn_delete_product_option_variants($option_id = 0, $variant_ids = array(
 /**
  * Gets product options
  *
- * @param array $product_ids Product identifiers
- * @param string $lang_code 2-letters language code
- * @param bool $only_selectable Flag that forces to retreive the options with certain types (default: select, radio or checkbox)
- * @param bool $inventory Get only options with the inventory tracking
- * @param bool $only_avail Get only available options
- * @param bool $skip_global Get only general options, not global options, applied as link
+ * @param array|int $product_ids     Product ID or Product IDs
+ * @param string    $lang_code       2-letters language code
+ * @param bool      $only_selectable Flag that forces to retreive the options with certain types (default: select, radio or checkbox)
+ * @param bool      $inventory       Get only options with the inventory tracking
+ * @param bool      $only_avail      Get only available options
+ * @param bool      $skip_global     Get only general options, not global options, applied as link
+ *
  * @return array List of product options data
  */
 function fn_get_product_options($product_ids, $lang_code = CART_LANGUAGE, $only_selectable = false, $inventory = false, $only_avail = false, $skip_global = false)
 {
     $condition = $_status = $join = '';
     $extra_variant_fields = '';
-    $option_ids = $variants_ids = $options = array();
-    $selectable_option_types = array('S', 'R', 'C');
+    $option_ids = $variants_ids = $options = [];
+    $selectable_option_types = [
+        ProductOptionTypes::SELECTBOX,
+        ProductOptionTypes::RADIO_GROUP,
+        ProductOptionTypes::CHECKBOX
+    ];
 
     /**
      * Get product options ( at the beggining of fn_get_product_options() )
      *
-     * @param array  $product_ids             Product identifiers
-     * @param string $lang_code               2-letters language code
-     * @param bool   $only_selectable         This flag forces to retreive the options with the certain types (default: select, radio or checkbox)
-     * @param bool   $inventory               Get only options with the inventory tracking
-     * @param bool   $only_avail              Get only available options
-     * @param array  $selectable_option_types Selectable option types
-     * @param bool   $skip_global             Get only general options, not global options, applied as link
+     * @param array|int $product_ids             Product ID or Product IDs
+     * @param string    $lang_code               2-letters language code
+     * @param bool      $only_selectable         This flag forces to retreive the options with the certain types (default: select, radio or checkbox)
+     * @param bool      $inventory               Get only options with the inventory tracking
+     * @param bool      $only_avail              Get only available options
+     * @param array     $selectable_option_types Selectable option types
+     * @param bool      $skip_global             Get only general options, not global options, applied as link
      */
     fn_set_hook('get_product_options_pre', $product_ids, $lang_code, $only_selectable, $inventory, $only_avail, $selectable_option_types, $skip_global);
 
@@ -3401,19 +3647,20 @@ function fn_get_product_options($product_ids, $lang_code = CART_LANGUAGE, $only_
     }
 
     $join = db_quote(" LEFT JOIN ?:product_options_descriptions as b ON a.option_id = b.option_id AND b.lang_code = ?s ", $lang_code);
-    $fields = "a.*, b.option_name, b.option_text, b.description, b.inner_hint, b.incorrect_message, b.comment";
+    $fields = "a.*, b.option_name, b.internal_option_name, b.option_text, b.description, b.inner_hint, b.incorrect_message, b.comment";
 
     /**
      * Changes request params before product options selecting
      *
-     * @param string $fields               Fields to be selected
-     * @param string $condition            String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
-     * @param string $join                 String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
-     * @param string $extra_variant_fields Additional variant fields to be selected
-     * @param array  $product_ids          Product identifiers
-     * @param string $lang_code            2-letters language code
+     * @param string    $fields               Fields to be selected
+     * @param string    $condition            String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
+     * @param string    $join                 String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
+     * @param string    $extra_variant_fields Additional variant fields to be selected
+     * @param array|int $product_ids          Product ID or Product IDs
+     * @param string    $lang_code            2-letters language code
      */
     fn_set_hook('get_product_options', $fields, $condition, $join, $extra_variant_fields, $product_ids, $lang_code);
+
     if (!empty($product_ids)) {
         $_options = db_get_hash_multi_array(
             "SELECT " . $fields
@@ -3421,8 +3668,9 @@ function fn_get_product_options($product_ids, $lang_code = CART_LANGUAGE, $only_
             . $join
             . " WHERE a.product_id IN (?n)" . $condition . $_status
             . " ORDER BY a.position",
-            array('product_id', 'option_id'), $product_ids
+            ['product_id', 'option_id'], $product_ids
         );
+
         if (!$skip_global) {
             $global_options = db_get_hash_multi_array(
                 "SELECT c.product_id AS cur_product_id, a.*, b.option_name, b.internal_option_name, b.option_text, b.description, b.inner_hint, b.incorrect_message, b.comment"
@@ -3431,22 +3679,22 @@ function fn_get_product_options($product_ids, $lang_code = CART_LANGUAGE, $only_
                 . " LEFT JOIN ?:product_global_option_links as c ON c.option_id = a.option_id"
                 . " WHERE c.product_id IN (?n) AND a.product_id = 0" . $condition . $_status
                 . " ORDER BY a.position",
-                array('cur_product_id', 'option_id'), $lang_code, $product_ids
+                ['cur_product_id', 'option_id'], $lang_code, $product_ids
             );
         }
         foreach ((array) $product_ids as $product_id) {
-            $_opts = (empty($_options[$product_id]) ? array() : $_options[$product_id]) + (empty($global_options[$product_id]) ? array() : $global_options[$product_id]);
+            $_opts = (empty($_options[$product_id]) ? [] : $_options[$product_id]) + (empty($global_options[$product_id]) ? [] : $global_options[$product_id]);
             $options[$product_id] = fn_sort_array_by_key($_opts, 'position');
         }
     } else {
         //we need a separate query for global options
         $options = db_get_hash_multi_array(
-            "SELECT a.*, b.option_name, b.option_text, b.description, b.inner_hint, b.incorrect_message, b.comment"
+            "SELECT a.*, b.option_name, b.internal_option_name, b.option_text, b.description, b.inner_hint, b.incorrect_message, b.comment"
             . " FROM ?:product_options as a"
             . $join
             . " WHERE a.product_id = 0" . $condition . $_status
             . " ORDER BY a.position",
-            array('product_id', 'option_id')
+            ['product_id', 'option_id']
         );
     }
 
@@ -3458,7 +3706,7 @@ function fn_get_product_options($product_ids, $lang_code = CART_LANGUAGE, $only_
         if (is_array($product_ids)) {
             return $options;
         } else {
-            return !empty($options[$product_ids]) ? $options[$product_ids] : array();
+            return !empty($options[$product_ids]) ? $options[$product_ids] : [];
         }
     }
 
@@ -3468,6 +3716,7 @@ function fn_get_product_options($product_ids, $lang_code = CART_LANGUAGE, $only_
     $v_join = db_quote("LEFT JOIN ?:product_option_variants_descriptions as b ON a.variant_id = b.variant_id AND b.lang_code = ?s", $lang_code);
     $v_condition = db_quote("a.option_id IN (?n) $_status", array_unique($option_ids));
     $v_sorting = "a.position, a.variant_id";
+
     /**
      * Changes request params before product option variants selecting
      *
@@ -3494,7 +3743,7 @@ function fn_get_product_options($product_ids, $lang_code = CART_LANGUAGE, $only_
 
     foreach ($variants as $option_id => &$_variants) {
         foreach ($_variants as $variant_id => &$_variant) {
-            $_variant['image_pair'] = !empty($image_pairs[$variant_id])? reset($image_pairs[$variant_id]) : array();
+            $_variant['image_pair'] = !empty($image_pairs[$variant_id]) ? reset($image_pairs[$variant_id]) : [];
         }
     }
 
@@ -3507,23 +3756,23 @@ function fn_get_product_options($product_ids, $lang_code = CART_LANGUAGE, $only_
                 }
             }
 
-            $_option['variants'] = !empty($variants[$option_id])? $variants[$option_id] : array();
+            $_option['variants'] = !empty($variants[$option_id]) ? $variants[$option_id] : [];
         }
     }
 
     /**
      * Get product options ( at the end of fn_get_product_options() )
      *
-     * @param array  $product_ids     Product ids
-     * @param string $lang_code       Language code
-     * @param bool   $only_selectable This flag forces to retreive the options with the certain types (default: select, radio or checkbox)
-     * @param bool   $inventory       Get only options with the inventory tracking
-     * @param bool   $only_avail      Get only available options
-     * @param array  $options         The resulting array of the retrieved options
+     * @param array|int $product_ids     Product ID or Product IDs
+     * @param string    $lang_code       Language code
+     * @param bool      $only_selectable This flag forces to retreive the options with the certain types (default: select, radio or checkbox)
+     * @param bool      $inventory       Get only options with the inventory tracking
+     * @param bool      $only_avail      Get only available options
+     * @param array     $options         The resulting array of the retrieved options
      */
     fn_set_hook('get_product_options_post', $product_ids, $lang_code, $only_selectable, $inventory, $only_avail, $options);
 
-    return is_array($product_ids)? $options: $options[$product_ids];
+    return is_array($product_ids) ? $options : $options[$product_ids];
 }
 
 /**
@@ -3548,39 +3797,51 @@ function fn_get_product_global_options($params = array(), $items_per_page = 0, $
 
     $params = LastView::instance()->update('product_global_options', $params);
 
-    $default_params = array(
-        'product_id' => 0,
-        'page' => 1,
-        'items_per_page' => $items_per_page
-    );
+    $default_params = [
+        'product_id'     => 0,
+        'page'           => 1,
+        'items_per_page' => $items_per_page,
+        'q'              => null,
+        'excluded_ids'   => null,
+    ];
 
     $params = array_merge($default_params, $params);
 
-    $fields = array (
+    $fields = [
         '?:product_options.*',
         '?:product_options_descriptions.*',
-    );
+    ];
 
     $condition = $join = '';
 
-    $join .= db_quote("LEFT JOIN ?:product_options_descriptions ON ?:product_options_descriptions.option_id = ?:product_options.option_id AND ?:product_options_descriptions.lang_code = ?s ", $lang_code);
+    $join .= db_quote('LEFT JOIN ?:product_options_descriptions ON ?:product_options_descriptions.option_id = ?:product_options.option_id AND ?:product_options_descriptions.lang_code = ?s ', $lang_code);
 
-    $sortings = array (
-        'option_name' => 'option_name',
+    $sortings = [
+        'option_name'          => 'option_name',
         'internal_option_name' => 'internal_option_name',
-        'position' => 'position',
-        'null' => 'NULL'
-    );
+        'position'             => 'position',
+        'status'               => 'status',
+        'null'                 => 'NULL',
+    ];
 
-    $order = db_sort($params, $sortings, 'position', 'asc');
+    $order = db_sort($params, $sortings, 'option_name', 'asc');
 
     $params['product_id'] = !empty($params['product_id']) ? $params['product_id'] : 0;
-    $condition .= db_quote(" AND ?:product_options.product_id = ?i", $params['product_id']);
+    $condition .= db_quote(' AND ?:product_options.product_id = ?i', $params['product_id']);
 
-    $limit = '';
-    if (!empty($params['items_per_page'])) {
-        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:product_options $join WHERE 1 $condition");
-        $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
+    if (!empty($params['q'])) {
+        $condition .= db_quote(' AND (?:product_options_descriptions.option_name LIKE ?l OR ?:product_options_descriptions.internal_option_name LIKE ?l)',
+            '%' . trim($params['q']) . '%',
+            '%' . trim($params['q']) . '%'
+        );
+    }
+
+    if (!empty($params['excluded_ids'])) {
+        $condition .= db_quote(' AND ?:product_options.option_id NOT IN (?n)', $params['excluded_ids']);
+    }
+
+    if (!empty($params['company_ids'])) {
+        $condition .= db_quote(' AND ?:product_options.company_id IN (?n)', (array) $params['company_ids']);
     }
 
     /**
@@ -3592,6 +3853,13 @@ function fn_get_product_global_options($params = array(), $items_per_page = 0, $
      * @param string $join      String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
      */
     fn_set_hook('get_product_global_options_before_select', $params, $fields, $condition, $join);
+
+    $limit = '';
+
+    if (!empty($params['items_per_page'])) {
+        $params['total_items'] = db_get_field("SELECT COUNT(*) FROM ?:product_options $join WHERE 1 $condition");
+        $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
+    }
 
     $data = db_get_array("SELECT " . implode(', ', $fields) . " FROM ?:product_options $join WHERE 1 $condition $order $limit ");
 
@@ -3862,7 +4130,7 @@ function fn_get_selected_product_options_info($selected_options, $lang_code = CA
     $result = array();
     foreach ($selected_options as $option_id => $variant_id) {
         $_opts = db_get_row(
-            "SELECT a.*, b.option_name, b.option_text, b.description, b.inner_hint, b.incorrect_message " .
+            "SELECT a.*, b.option_name, b.option_text, b.description, b.inner_hint, b.incorrect_message, b.internal_option_name " .
             "FROM ?:product_options as a LEFT JOIN ?:product_options_descriptions as b ON a.option_id = b.option_id AND b.lang_code = ?s " .
             "WHERE a.option_id = ?i ORDER BY a.position",
             $lang_code, $option_id
@@ -3929,10 +4197,8 @@ function fn_get_default_product_options($product_id, $get_all = false, $product 
     */
     fn_set_hook('get_default_product_options_pre', $product_id, $get_all, $product, $selectable_option_types);
 
-    if (!fn_allowed_for('ULTIMATE:FREE')) {
-        $exceptions = fn_get_product_exceptions($product_id, true);
-        $exceptions_type = (empty($product['exceptions_type']))? db_get_field('SELECT exceptions_type FROM ?:products WHERE product_id = ?i', $product_id) : $product['exceptions_type'];
-    }
+    $exceptions = fn_get_product_exceptions($product_id, true);
+    $exceptions_type = (empty($product['exceptions_type']))? db_get_field('SELECT exceptions_type FROM ?:products WHERE product_id = ?i', $product_id) : $product['exceptions_type'];
 
     $track_with_options = (empty($product['tracking']))? db_get_field("SELECT tracking FROM ?:products WHERE product_id = ?i", $product_id) : $product['tracking'];
 
@@ -3961,10 +4227,9 @@ function fn_get_default_product_options($product_id, $get_all = false, $product 
     }
 
     unset($product_options);
-    if (!fn_allowed_for('ULTIMATE:FREE')) {
-        if (empty($exceptions)) {
-            return $default;
-        }
+
+    if (empty($exceptions)) {
+        return $default;
     }
 
     $inventory_combinations = array();
@@ -3980,8 +4245,8 @@ function fn_get_default_product_options($product_id, $get_all = false, $product 
         }
     }
 
-    if (!fn_allowed_for('ULTIMATE:FREE')) {
-        if ($exceptions_type == 'F') {
+    if ($exceptions_type == 'F') {
+        if (!empty($options)) {
             // Forbidden combinations
             $_options = array_keys($options);
             $_variants = array_values($options);
@@ -3991,20 +4256,21 @@ function fn_get_default_product_options($product_id, $get_all = false, $product 
                 }
             }
 
-            list($result) = fn_get_allowed_options_combination($_options, $_variants, array(), 0, $exceptions, $inventory_combinations);
-
-        } else {
-            // Allowed combinations
-            $result = array();
-            $exception = reset($exceptions);
-            foreach ($exception as $option_id => $variant_id) {
-                if (isset($options[$option_id][$variant_id])) {
-                    $result[$option_id] = $variant_id;
-                } elseif ($variant_id == OPTION_EXCEPTION_VARIANT_ANY) {
-                    $result[$option_id] = isset($options[$option_id]) ? key($options[$option_id]) : '';
-                }
+            list($result) = fn_get_allowed_options_combination($_options, $_variants, [],0, $exceptions, $inventory_combinations);
+        }
+    } else {
+        // Allowed combinations
+        $result = array();
+        $exception = reset($exceptions);
+        foreach ($exception as $option_id => $variant_id) {
+            if (isset($options, $options[$option_id][$variant_id])) {
+                $result[$option_id] = $variant_id;
+            } elseif ($variant_id == OPTION_EXCEPTION_VARIANT_ANY) {
+                $result[$option_id] = isset($options, $options[$option_id]) ? key($options[$option_id]) : '';
             }
+        }
 
+        if (isset($options)) {
             $_opt = array_diff_key($options, $result);
             foreach ($_opt as $option_id => $variants) {
                 $result[$option_id] = key($variants);
@@ -4110,12 +4376,12 @@ function fn_look_through_variants($product_id, $amount, $options, $variants)
                 $_data['position'] = $position++;
 
                 $old_data = db_get_row(
-                    "SELECT combination_hash, amount, product_code "
+                    "SELECT combination_hash, amount, product_code, position "
                     . "FROM ?:product_options_inventory "
-                    . "WHERE product_id = ?i AND combination_hash = ?s AND temp = 'Y'",
+                    . "WHERE product_id = ?i AND combination_hash = ?s",
                     $product_id, $_data['combination_hash']
                 );
-
+                $_data['position'] = isset($old_data['position']) ? $old_data['position'] : $_data['position'];
                 $_data['amount'] = isset($old_data['amount']) ? $old_data['amount'] : $amount;
                 $_data['product_code'] = isset($old_data['product_code']) ? $old_data['product_code'] : '';
 
@@ -4153,6 +4419,27 @@ function fn_look_through_variants($product_id, $amount, $options, $variants)
 }
 
 /**
+ * Delete combinations with disabled options
+ *
+ * @param int $product_id Product identifier
+ *
+ * @return boolean Always true
+ */
+function fn_delete_outdated_combinations($product_id)
+{
+    $combinations_list = db_get_array("SELECT combination_hash, combination FROM ?:product_options_inventory WHERE product_id = ?i", $product_id);
+
+    foreach ($combinations_list as $key => $combination) {
+        $options_list = fn_get_product_options_by_combination($combination['combination']);
+        $is_disabled = db_get_array("SELECT status FROM ?:product_options WHERE option_id IN(?a) AND status = ?s", array_keys($options_list), 'D');
+        if ($is_disabled) {
+            db_query("UPDATE ?:product_options_inventory SET temp = ?s WHERE combination_hash = ?s", 'Y', $combination['combination_hash']);
+        }
+    }
+    return true;
+}
+
+/**
  * Checks and rebuilds product options inventory if necessary
  *
  * @param int $product_id Product identifier
@@ -4169,8 +4456,7 @@ function fn_rebuild_product_options_inventory($product_id, $amount = 50)
      */
     fn_set_hook('rebuild_product_options_inventory_pre', $product_id, $amount);
 
-    // Assign old combinations to delete
-    db_query("UPDATE ?:product_options_inventory SET temp = 'Y' WHERE product_id = ?i", $product_id);
+    fn_delete_outdated_combinations($product_id);
 
     // Delete image pairs assigned to old combinations
     $hashes = db_get_fields("SELECT combination_hash FROM ?:product_options_inventory WHERE product_id = ?i AND temp = 'Y'", $product_id);
@@ -4264,6 +4550,8 @@ function fn_get_product_features($params = array(), $items_per_page = 0, $lang_c
         // Whether to load variants for loaded features.
         'variants' => false,
         'variant_images' => true,
+        'variants_items_per_page' => null,
+        'variants_page' => null,
 
         // Whether to load only variants that are assigned for given product.
         // Parameter is only used if "product_id" is given and "variants" is set to true.
@@ -4279,6 +4567,9 @@ function fn_get_product_features($params = array(), $items_per_page = 0, $lang_c
     );
 
     $params = array_merge($default_params, $params);
+    $params['feature_types'] = $params['feature_types'] ?
+        (array) $params['feature_types']
+        : [];
 
     $base_fields = $fields = array (
         'pf.feature_id',
@@ -4296,7 +4587,11 @@ function fn_get_product_features($params = array(), $items_per_page = 0, $lang_c
         '?:product_features_descriptions.full_description',
         'pf.status',
         'pf.comparison',
-        'pf.position'
+        'pf.position',
+        'pf.purpose',
+        'pf.feature_style',
+        'pf.filter_style',
+        'pf.feature_code'
     );
 
     $condition = $join = $group = '';
@@ -4304,9 +4599,10 @@ function fn_get_product_features($params = array(), $items_per_page = 0, $lang_c
 
     $fields[] = 'pf_groups.position AS group_position';
     $join .= db_quote(" LEFT JOIN ?:product_features AS pf_groups ON pf.parent_id = pf_groups.feature_id");
+    $join .= db_quote(" LEFT JOIN ?:product_features_descriptions AS pf_groups_description ON pf_groups_description.feature_id = pf.parent_id AND pf_groups_description.lang_code = ?s", $lang_code);
     $join .= db_quote(" LEFT JOIN ?:product_features_descriptions ON ?:product_features_descriptions.feature_id = pf.feature_id AND ?:product_features_descriptions.lang_code = ?s", $lang_code);
 
-    if (empty($params['feature_types']) || $params['feature_types'] != ProductFeatures::GROUP) {
+    if (!$params['feature_id'] && !in_array(ProductFeatures::GROUP, $params['feature_types'])) {
         $condition .= db_quote(" AND pf.feature_type != ?s", ProductFeatures::GROUP);
     }
 
@@ -4337,7 +4633,7 @@ function fn_get_product_features($params = array(), $items_per_page = 0, $lang_c
     }
 
     if (!empty($params['statuses'])) {
-        $condition .= db_quote(" AND pf.status IN (?a)", $params['statuses']);
+        $condition .= db_quote(" AND pf.status IN (?a) AND (pf_groups.status IN (?a) OR pf_groups.status IS NULL)", $params['statuses'], $params['statuses']);
     }
 
     if (isset($params['parent_id']) && $params['parent_id'] !== '') {
@@ -4352,6 +4648,18 @@ function fn_get_product_features($params = array(), $items_per_page = 0, $lang_c
 
     if (!empty($params['feature_types'])) {
         $condition .= db_quote(" AND pf.feature_type IN (?a)", $params['feature_types']);
+    }
+
+    if (!empty($params['feature_code'])) {
+        $condition .= db_quote(' AND pf.feature_code IN (?a)', $params['feature_code']);
+    }
+
+    if (!empty($params['purpose'])) {
+        if (is_array($params['purpose'])) {
+            $condition .= db_quote(' AND pf.purpose IN (?a)', $params['purpose']);
+        } else {
+            $condition .= db_quote(' AND pf.purpose = ?s', $params['purpose']);
+        }
     }
 
     if (!empty($params['category_ids'])) {
@@ -4411,7 +4719,7 @@ function fn_get_product_features($params = array(), $items_per_page = 0, $lang_c
         "SELECT " . implode(', ', $fields)
         . " FROM ?:product_features AS pf"
         . " $join WHERE 1 $condition $group"
-        . " ORDER BY group_position, pf.position, ?:product_features_descriptions.description $limit",
+        . " ORDER BY group_position, pf_groups_description.description, pf_groups.feature_id, pf.position, ?:product_features_descriptions.description, pf.feature_id $limit",
         'feature_id'
     );
 
@@ -4438,7 +4746,9 @@ function fn_get_product_features($params = array(), $items_per_page = 0, $lang_c
                 'feature_id' => $feature_id,
                 'product_id' => $params['product_id'],
                 'get_images' => $params['variant_images'],
-                'selected_only' => $params['variants_selected_only']
+                'selected_only' => $params['variants_selected_only'],
+                'page' => $params['variants_page'],
+                'items_per_page' => $params['variants_items_per_page'],
             );
 
             if (AREA == 'A' && empty($params['skip_variants_threshould'])) {
@@ -4579,7 +4889,10 @@ function fn_get_product_feature_data($feature_id, $get_variants = false, $get_va
         '?:product_features_descriptions.full_description',
         '?:product_features.status',
         '?:product_features.comparison',
-        '?:product_features.position'
+        '?:product_features.position',
+        '?:product_features.purpose',
+        '?:product_features.feature_style',
+        '?:product_features.filter_style'
     );
 
     $join = db_quote("LEFT JOIN ?:product_features_descriptions ON ?:product_features_descriptions.feature_id = ?:product_features.feature_id AND ?:product_features_descriptions.lang_code = ?s", $lang_code);
@@ -4678,7 +4991,7 @@ function fn_get_product_features_list($product, $display_on = 'C', $lang_code = 
     $find_in_set = db_quote(" AND (?p)", implode('OR', $find_set));
     $condition .= $find_in_set;
 
-    $fields = db_quote("v.feature_id, v.value, v.value_int, v.variant_id, f.feature_type, fd.description, fd.prefix, fd.suffix, vd.variant, f.parent_id, f.position, gf.position as gposition, f.display_on_header, f.display_on_catalog, f.display_on_product");
+    $fields = db_quote("v.feature_id, v.value, v.value_int, v.variant_id, f.feature_type, fd.description, fd.prefix, fd.suffix, vd.variant, f.parent_id, f.position, gf.position as gposition, f.display_on_header, f.display_on_catalog, f.display_on_product, f.feature_code");
     $join = db_quote(
         "LEFT JOIN ?:product_features_values as v ON v.feature_id = f.feature_id "
         . " LEFT JOIN ?:product_features_descriptions as fd ON fd.feature_id = v.feature_id AND fd.lang_code = ?s"
@@ -4934,10 +5247,13 @@ function fn_get_product_feature_variants($params, $items_per_page = 0, $lang_cod
     }
 
     $condition = $group_by = $sorting = '';
-    $feature_id = is_array($params['feature_id']) ? $params['feature_id'] : array($params['feature_id']);
+
+    if (isset($params['feature_id'])) {
+        $feature_id = is_array($params['feature_id']) ? $params['feature_id'] : [$params['feature_id']];
+        $condition .= db_quote(' AND ?:product_feature_variants.feature_id IN (?n)', $feature_id);
+    }
 
     $join = db_quote(" LEFT JOIN ?:product_feature_variant_descriptions ON ?:product_feature_variant_descriptions.variant_id = ?:product_feature_variants.variant_id AND ?:product_feature_variant_descriptions.lang_code = ?s", $lang_code);
-    $condition .= db_quote(" AND ?:product_feature_variants.feature_id IN (?n)", $feature_id);
     $sorting = db_quote("?:product_feature_variants.position, ?:product_feature_variant_descriptions.variant");
 
     if (!empty($params['variant_id'])) {
@@ -4986,8 +5302,9 @@ function fn_get_product_feature_variants($params, $items_per_page = 0, $lang_cod
      * @param string $sorting   String containing the SQL-query ORDER BY clause
      * @param string $lang_code 2-letters language code
      * @param string $limit     String containing the SQL-query LIMIT clause
+     * @param array  $params    Array with search parameters
      */
-    fn_set_hook('get_product_feature_variants', $fields, $join, $condition, $group_by, $sorting, $lang_code, $limit);
+    fn_set_hook('get_product_feature_variants', $fields, $join, $condition, $group_by, $sorting, $lang_code, $limit, $params);
 
     $vars = db_get_hash_array('SELECT ' . implode(', ', $fields) . " FROM ?:product_feature_variants $join WHERE 1 $condition $group_by ORDER BY $sorting $limit", 'variant_id');
 
@@ -5085,7 +5402,8 @@ function fn_filter_feature_group_data($group_data)
  * @param array $feature_data Feature data
  * @param int $feature_id Feature identifier
  * @param string $lang_code 2-letters language code
- * @return int/boolean Feature identifier if product feature was updated, false otherwise
+ *
+ * @return int|boolean Feature identifier if product feature was updated, false otherwise
  */
 function fn_update_product_feature($feature_data, $feature_id, $lang_code = DESCR_SL)
 {
@@ -5111,121 +5429,247 @@ function fn_update_product_feature($feature_data, $feature_id, $lang_code = DESC
         }
     }
 
-    $deleted_variants = array();
-    $old_feature_data = array();
+    $deleted_variants = [];
+    $old_feature_data = [];
+    $selectable_types = ProductFeatures::getSelectable();
 
     // If this feature belongs to the group, get categories assignment from this group
     if (!empty($feature_data['parent_id'])) {
-        $gdata = db_get_row("SELECT categories_path, display_on_product, display_on_catalog, display_on_header FROM ?:product_features WHERE feature_id = ?i", $feature_data['parent_id']);
-        if (!empty($gdata)) {
-            $gdata = fn_filter_feature_group_data($gdata);
-            $feature_data = fn_array_merge($feature_data, $gdata);
+        $feature_group_data = db_get_row(
+            'SELECT categories_path, display_on_product, display_on_catalog, display_on_header FROM ?:product_features WHERE feature_id = ?i',
+            $feature_data['parent_id']
+        );
+        if ($feature_group_data) {
+            $feature_group_data = fn_filter_feature_group_data($feature_group_data);
+            $feature_data = fn_array_merge($feature_data, $feature_group_data);
         }
     }
 
+    $action = null;
     if (!intval($feature_id)) { // check for intval as we use "0G" for new group
-        $feature_data['feature_id'] = $feature_id = db_query("INSERT INTO ?:product_features ?e", $feature_data);
-        foreach (fn_get_translation_languages() as $feature_data['lang_code'] => $_d) {
-            db_query("INSERT INTO ?:product_features_descriptions ?e", $feature_data);
-        }
-    } else {
-        $old_feature_data = fn_get_product_feature_data($feature_id, false, false, DESCR_SL);
+        $action = 'create';
 
-        if (!isset($feature_data['categories_path']) && empty($old_feature_data['categories_path'])) {
+        if (!empty($feature_data['feature_type']) && empty($feature_data['purpose'])) {
+            $feature_data['purpose'] = (string) fn_get_product_feature_purpose_by_type($feature_data['feature_type']);
+            $feature_data['feature_style'] = '';
+            $feature_data['filter_style'] = '';
+        }
+
+        if (empty($feature_data['feature_style'])) {
+            $feature_data['feature_style'] = (string) fn_get_product_feature_style($feature_data['feature_type'], $feature_data['purpose']);
+            $feature_data['filter_style'] = '';
+        }
+
+        if (empty($feature_data['filter_style'])) {
+            $feature_data['filter_style'] = (string) fn_get_product_feature_filter_style($feature_data['feature_type'], $feature_data['feature_style'], $feature_data['purpose']);
+        }
+
+        $feature_data['feature_id'] = $feature_id = db_query('INSERT INTO ?:product_features ?e', $feature_data);
+        foreach (array_keys(Languages::getAll()) as $feature_data['lang_code']) {
+            db_query('INSERT INTO ?:product_features_descriptions ?e', $feature_data);
+        }
+
+    } else {
+        $action = 'update';
+
+        $old_feature_data = fn_get_feature_data_with_subfeatures($feature_id, $lang_code, ['statuses' => []]);
+
+        if (!$old_feature_data) {
+            fn_set_notification(
+                NotificationSeverity::ERROR,
+                __('error'),
+                __('object_not_found', [
+                    '[object]' => __('feature'),
+                ]),
+                '',
+                '404'
+            );
+            $feature_id = false;
+        }
+
+        if (!isset($feature_data['categories_path'])
+            && empty($old_feature_data['categories_path'])
+        ) {
             $feature_data['categories_path'] = '';
         }
 
-        $arow = db_query("UPDATE ?:product_features SET ?u WHERE feature_id = ?i", $feature_data, $feature_id);
-        db_query('UPDATE ?:product_features_descriptions SET ?u WHERE feature_id = ?i AND lang_code = ?s', $feature_data, $feature_id, $lang_code);
+        if (!empty($feature_data['feature_type']) && empty($feature_data['purpose'])) {
+            if (!empty($old_feature_data['feature_type']) && $old_feature_data['feature_type'] === $feature_data['feature_type'] && !empty($old_feature_data['purpose'])) {
+                $feature_data['purpose'] = $old_feature_data['purpose'];
+            } else {
+                $feature_data['purpose'] = (string) fn_get_product_feature_purpose_by_type($feature_data['feature_type']);
+            }
+        }
 
-        if (!$old_feature_data) {
-            fn_set_notification('E', __('error'), __('object_not_found', array('[object]' => __('feature'))),'','404');
-            $feature_id = false;
+        if (empty($feature_data['feature_style']) && !empty($old_feature_data['feature_style'])) {
+            $feature_data['feature_style'] = $old_feature_data['feature_style'];
+        } elseif (empty($feature_data['feature_style'])) {
+            $feature_data['feature_style'] = (string) fn_get_product_feature_style($feature_data['feature_type'], $feature_data['purpose']);
+        }
+
+        if (empty($feature_data['filter_style']) && !empty($old_feature_data['filter_style'])) {
+            $feature_data['filter_style'] = $old_feature_data['filter_style'];
+        } elseif (empty($feature_data['filter_style'])) {
+            $feature_data['filter_style'] = (string) fn_get_product_feature_filter_style($feature_data['feature_type'], $feature_data['feature_style'], $feature_data['purpose']);
         }
     }
 
-    if ($feature_id) {
+    if ($feature_id && strpos($selectable_types, $feature_data['feature_type']) !== false) {
+        fn_update_product_feature_variants($feature_id, $feature_data, $lang_code);
+    }
 
-        // If this feature is group, set its categories to all children
-        if ($feature_data['feature_type'] == ProductFeatures::GROUP) {
-            $u = array(
-                'categories_path' => !empty($feature_data['categories_path']) ? $feature_data['categories_path'] : '',
-                'display_on_product' => !empty($feature_data['display_on_product']) ? $feature_data['display_on_product'] : '',
-                'display_on_catalog' => !empty($feature_data['display_on_catalog']) ? $feature_data['display_on_catalog'] : '',
-                'display_on_header' => !empty($feature_data['display_on_header']) ? $feature_data['display_on_header'] : '',
+    if ($action === 'create' || !$feature_id) {
+        return $feature_id;
+    }
+
+    // Delete variants for simple features
+    $old_categories = $old_feature_data
+        ? fn_explode(',', $old_feature_data['categories_path'])
+        : [];
+
+    // Get sub-categories for OLD categories
+    if ($old_categories) {
+        $subcategories_condition = array_map(function($category_id) {
+            return db_quote(
+                'id_path LIKE ?l OR id_path LIKE ?l',
+                $category_id . '/%',
+                '%/' . $category_id . '/%'
             );
-            $u = fn_filter_feature_group_data($u);
-            db_query("UPDATE ?:product_features SET ?u WHERE parent_id = ?i", $u, $feature_id);
-        }
+        }, $old_categories);
 
-        // Delete variants for simple features
-        $old_categories = $old_feature_data ? fn_explode(',', $old_feature_data['categories_path']) : array();
-
-        // Get sub-categories for OLD categories
-        if (!empty($old_categories)) {
-            $_condition = array();
-            foreach ($old_categories as $category_id) {
-                $_condition[] = db_quote('id_path LIKE ?l OR id_path LIKE ?l', $category_id . '/%', '%/' . $category_id . '/%');
-            }
-
-            $sub_cat_ids = db_get_fields('SELECT category_id FROM ?:categories WHERE ' . implode(' OR ', $_condition));
-            $old_categories = array_merge($old_categories, $sub_cat_ids);
-        }
-
-        $new_categories = isset($feature_data['categories_path']) ? fn_explode(',', $feature_data['categories_path']) : array();
-
-        // Get sub-categories for NEW categories
-        if (!empty($new_categories)) {
-            $_condition = array();
-            foreach ($new_categories as $category_id) {
-                $_condition[] = db_quote('id_path LIKE ?l OR id_path LIKE ?l', $category_id . '/%', '%/' . $category_id . '/%');
-            }
-
-            $sub_cat_ids = db_get_fields('SELECT category_id FROM ?:categories WHERE ' . implode(' OR ', $_condition));
-            $new_categories = array_merge($new_categories, $sub_cat_ids);
-        }
-
-        $checked_types = ProductFeatures::getSelectable();
-
-        if (($old_feature_data && $feature_data['feature_type'] != $old_feature_data['feature_type'])) {
-            if (strpos($checked_types, $feature_data['feature_type']) === false) {
-                fn_delete_product_feature_variants($feature_id);
-            }
-        }
-
-        // Remove features values/variants if we changed categories list
-        sort($old_categories);
-        sort($new_categories);
-
-        if (!fn_is_empty($new_categories)
-            && (fn_is_empty($old_categories) || $old_categories != $new_categories)
-        ) {
-            db_query('DELETE FROM ?:product_features_values WHERE feature_id = ?i AND product_id NOT IN (SELECT product_id FROM ?:products_categories WHERE category_id IN (?n))', $feature_id, $new_categories);
-        }
-
-        if (strpos($checked_types, $feature_data['feature_type']) !== false) {
-            fn_update_product_feature_variants($feature_id, $feature_data, $lang_code);
-        }
-
-        // Disable related filters if feature status not active
-        if (
-            $feature_data['feature_type'] != ProductFeatures::GROUP
-            && isset($feature_data['status'])
-            && $feature_data['status'] != 'A'
-        ) {
-            fn_disable_product_feature_filters($feature_id);
-        }
-
-        /**
-         * Adds additional actions after product feature updating
-         *
-         * @param array  $feature_data     Feature data
-         * @param int    $feature_id       Feature identifier
-         * @param array  $deleted_variants Deleted product feature variants identifiers
-         * @param string $lang_code        2-letters language code
-         */
-        fn_set_hook('update_product_feature_post', $feature_data, $feature_id, $deleted_variants, $lang_code);
+        $sub_cat_ids = db_get_fields(
+            'SELECT category_id FROM ?:categories WHERE ?p',
+            implode(' OR ', $subcategories_condition)
+        );
+        $old_categories = array_merge($old_categories, $sub_cat_ids);
     }
+
+    $new_categories = isset($feature_data['categories_path'])
+        ? fn_explode(',', $feature_data['categories_path'])
+        : [];
+
+    // Get sub-categories for NEW categories
+    if ($new_categories) {
+        $subcategories_condition = array_map(function($category_id) {
+            return db_quote(
+                'id_path LIKE ?l OR id_path LIKE ?l',
+                $category_id . '/%',
+                '%/' . $category_id . '/%'
+            );
+        }, $new_categories);
+
+        $sub_cat_ids = db_get_fields(
+            'SELECT category_id FROM ?:categories WHERE ?p',
+            implode(' OR ', $subcategories_condition)
+        );
+        $new_categories = array_merge($new_categories, $sub_cat_ids);
+    }
+
+    if ($old_feature_data
+        && $feature_data['feature_type'] !== $old_feature_data['feature_type']
+        && (strpos($selectable_types, $feature_data['feature_type']) === false
+            || strpos($selectable_types, $old_feature_data['feature_type']) === false
+        )
+    ) {
+        $deleted_variants = fn_delete_product_feature_variants($feature_id);
+    }
+
+    // Remove features values/variants if we changed categories list
+    $old_categories = array_filter($old_categories);
+    sort($old_categories);
+    $new_categories = array_filter($new_categories);
+    sort($new_categories);
+
+    /**
+     * Executes before updating product feature right before removing feature values from products that are not present in
+     * the new feature categories.
+     * Allows you to prevent product feature values removal or to modify the feature data stored in the database
+     *
+     * @param array  $feature_data     Feature data
+     * @param int    $feature_id       Feature identifier
+     * @param string $lang_code        2-letters language code
+     * @param array  $old_feature_data Current feature data
+     * @param int[]  $old_categories   Old feature categories with all their subcategories
+     * @param int[]  $new_categories   New feature categories with all their subcategories
+     */
+    fn_set_hook(
+        'update_product_feature',
+        $feature_data,
+        $feature_id,
+        $lang_code,
+        $old_feature_data,
+        $old_categories,
+        $new_categories
+    );
+
+    db_query(
+        'UPDATE ?:product_features SET ?u WHERE feature_id = ?i',
+        $feature_data,
+        $feature_id
+    );
+    db_query(
+        'UPDATE ?:product_features_descriptions SET ?u WHERE feature_id = ?i AND lang_code = ?s',
+        $feature_data,
+        $feature_id,
+        $lang_code
+    );
+
+    // If this feature is group, set its categories to all children
+    if ($feature_data['feature_type'] === ProductFeatures::GROUP) {
+        $feature_group_data = [
+            'categories_path'    => !empty($feature_data['categories_path'])
+                ? $feature_data['categories_path']
+                : '',
+            'display_on_product' => !empty($feature_data['display_on_product'])
+                ? $feature_data['display_on_product']
+                : '',
+            'display_on_catalog' => !empty($feature_data['display_on_catalog'])
+                ? $feature_data['display_on_catalog']
+                : '',
+            'display_on_header'  => !empty($feature_data['display_on_header'])
+                ? $feature_data['display_on_header']
+                : '',
+        ];
+        $feature_group_data = fn_filter_feature_group_data($feature_group_data);
+
+        db_query(
+            'UPDATE ?:product_features SET ?u WHERE parent_id = ?i',
+            $feature_group_data,
+            $feature_id
+        );
+    }
+
+    if ($new_categories && $old_categories != $new_categories) {
+        db_query(
+            'DELETE FROM ?:product_features_values'
+            . ' WHERE feature_id = ?i'
+            . ' AND product_id NOT IN ('
+                . 'SELECT product_id'
+                . ' FROM ?:products_categories'
+                . ' WHERE category_id IN (?n)'
+            . ')',
+            $feature_id,
+            $new_categories
+        );
+    }
+
+    // Disable related filters if feature status not active
+    if ($feature_data['feature_type'] !== ProductFeatures::GROUP
+        && isset($feature_data['status'])
+        && $feature_data['status'] !== 'A'
+    ) {
+        fn_disable_product_feature_filters($feature_id);
+    }
+
+    /**
+     * Adds additional actions after product feature updating
+     *
+     * @param array  $feature_data     Feature data
+     * @param int    $feature_id       Feature identifier
+     * @param array  $deleted_variants Deleted product feature variants identifiers
+     * @param string $lang_code        2-letters language code
+     */
+    fn_set_hook('update_product_feature_post', $feature_data, $feature_id, $deleted_variants, $lang_code);
 
     return $feature_id;
 }
@@ -5269,10 +5713,10 @@ function fn_update_product_feature_variants($feature_id, &$feature_data, $lang_c
 /**
  * Updates product feature variant
  *
- * @param int       $feature_id     Feature identifier
- * @param array     $feature_type   Feature type
- * @param array     $variant        Feature variant data
- * @param string    $lang_code      2-letters language code
+ * @param int    $feature_id   Feature identifier
+ * @param string $feature_type Feature type
+ * @param array  $variant      Feature variant data
+ * @param string $lang_code    2-letters language code
  *
  * @return int $variant_id Feature variant identifier
  */
@@ -5293,6 +5737,15 @@ function fn_update_product_feature_variant($feature_id, $feature_type, $variant,
      * @param string    $lang_code      2-letters language code
      */
     fn_set_hook('update_product_feature_variant_pre', $feature_id, $feature_type, $variant, $lang_code);
+
+    $feature_style = db_get_field('SELECT filter_style FROM ?:product_features WHERE feature_id = ?i', $feature_id);
+    if ($feature_style === 'color' && !isset($variant['color']) && strpos($variant['variant'], '#') !== false) {
+        $variant = [
+            'variant' => trim(substr($variant['variant'], 0, strpos($variant['variant'], '#'))),
+            'color' => substr($variant['variant'], strpos($variant['variant'], '#')),
+            'feature_id' => $feature_id
+        ];
+    }
 
     if (isset($variant['variant_id'])) {
         $variant_id = db_get_field('SELECT variant_id FROM ?:product_feature_variants WHERE variant_id = ?i', $variant['variant_id']);
@@ -5384,11 +5837,13 @@ function fn_add_feature_variant($feature_id, $variant)
  * Removes product feature
  *
  * @param int $feature_id Feature identifier
- * @return boolean Always true
+ *
+ * @return boolean True if feature was successfully deleted, otherwise false
  */
 function fn_delete_feature($feature_id)
 {
     $feature_deleted = true;
+    $can_delete = true;
 
     if (fn_allowed_for('ULTIMATE')) {
         if (!fn_check_company_id('product_features', 'feature_id', $feature_id)) {
@@ -5407,15 +5862,28 @@ function fn_delete_feature($feature_id)
 
     $feature_type = db_get_field("SELECT feature_type FROM ?:product_features WHERE feature_id = ?i", $feature_id);
 
-    fn_set_hook('delete_product_feature', $feature_id, $feature_type);
+    /**
+     * Adds additional actions before product feature deleting
+     *
+     * @param int    $feature_id   Feature identifier
+     * @param string $feature_type One letter feature type
+     * @param bool   $can_delete   Check permissions
+     */
+    fn_set_hook('delete_product_feature', $feature_id, $feature_type, $can_delete);
 
     if ($feature_type == ProductFeatures::GROUP) {
         $fids = db_get_fields("SELECT feature_id FROM ?:product_features WHERE parent_id = ?i", $feature_id);
         if (!empty($fids)) {
             foreach ($fids as $fid) {
-                fn_delete_feature($fid);
+                if (!fn_delete_feature($fid)) {
+                    $can_delete = false;
+                };
             }
         }
+    }
+
+    if (!$can_delete) {
+        return false;
     }
 
     $affected_rows = db_query("DELETE FROM ?:product_features WHERE feature_id = ?i", $feature_id);
@@ -5455,6 +5923,14 @@ function fn_delete_feature($feature_id)
  */
 function fn_delete_product_feature_variants($feature_id = 0, $variant_ids = array())
 {
+    /**
+     * Adds additional actions before product feature variants deleting
+     *
+     * @param int   $feature_id  Deleted feature identifier
+     * @param array $variant_ids Deleted feature variants
+     */
+    fn_set_hook('delete_product_feature_variants_pre', $feature_id, $variant_ids);
+
     if (!empty($feature_id)) {
         $variant_ids = db_get_fields("SELECT variant_id FROM ?:product_feature_variants WHERE feature_id = ?i", $feature_id);
         db_query("DELETE FROM ?:product_features_values WHERE feature_id = ?i", $feature_id);
@@ -5560,6 +6036,10 @@ function fn_get_product_filters($params = array(), $items_per_page = 0, $lang_co
         $condition .= db_quote(" AND ?:product_features_descriptions.description LIKE ?l", "%".trim($params['feature_name'])."%");
     }
 
+    if (isset($params['feature_id'])) {
+        $condition .= db_quote(' AND ?:product_features.feature_id IN (?n)', (array) $params['feature_id']);
+    }
+
     if (!empty($params['category_ids'])) {
         $c_ids = is_array($params['category_ids']) ? $params['category_ids'] : fn_explode(',', $params['category_ids']);
         $find_set = array(
@@ -5645,7 +6125,9 @@ function fn_get_product_filters($params = array(), $items_per_page = 0, $lang_co
                 $filters[$k]['filter_description'] .= ' | ' . __('display_on') . ': <span>' . implode(', ', $d) . '</span>';
             }
 
-            $_ids[$filter['filter_id']] = $filter['feature_type'] != ProductFeatures::NUMBER_SELECTBOX ? $filter['feature_id'] : null;
+            if ($filter['feature_type'] != ProductFeatures::NUMBER_SELECTBOX) {
+                $_ids[$filter['filter_id']] = $filter['feature_id'];
+            }
         }
 
         if (!empty($params['get_variants']) && !empty($_ids)) {
@@ -5675,6 +6157,42 @@ function fn_get_product_filters($params = array(), $items_per_page = 0, $lang_co
             }
 
             unset($variants);
+        }
+
+        if (!empty($params['get_product_features']) && !empty($_ids)) {
+
+            $variants_ids_to_load = [];
+            if (isset($params['variants_only'])) {
+                foreach ($params['variants_only'] as $filter_id => $feature_variants) {
+                    if (!empty($_ids[$filter_id])) {
+                        $variants_ids_to_load[$_ids[$filter_id]] = $feature_variants;
+                    }
+                }
+            }
+
+            $features_params = [
+                'variants'      => true,
+                'plain'         => true,
+                'feature_id'    => array_values($_ids),
+                'variants_only' => !empty($variants_ids_to_load) ? (array) $variants_ids_to_load : null
+            ];
+
+            list($features) = fn_get_product_features($features_params);
+
+            foreach ($_ids as $filter_id => $feature_id) {
+                if (!empty($features[$feature_id]['use_variant_picker'])) {
+                    $filters[$filter_id]['use_variant_picker'] = true;
+                }
+                if (!empty($features[$feature_id]['variants'])) {
+                    foreach ($features[$feature_id]['variants'] as $variant_id => $variant) {
+                        if (!empty($params['short'])) {
+                            $filters[$filter_id]['variants'][$variant_id] = ['variant_id' => $variant_id, 'variant' => $variant['variant']];
+                        } else {
+                            $filters[$filter_id]['variants'][$variant_id] = $variant;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -6368,29 +6886,33 @@ function fn_get_products($params, $items_per_page = 0, $lang_code = CART_LANGUAG
     $params = LastView::instance()->update('products', $params);
 
     // Set default values to input params
-    $default_params = array (
-        'area' => AREA,
-        'use_caching' => true,
-        'extend' => array('product_name', 'prices', 'categories'),
-        'custom_extend' => array(),
-        'pname' => '',
-        'pshort' => '',
-        'pfull' => '',
-        'pkeywords' => '',
-        'feature' => array(),
-        'type' => 'simple',
-        'page' => 1,
-        'action' => '',
-        'filter_variants' => array(),
-        'features_hash' => '',
-        'limit' => 0,
-        'bid' => 0,
-        'match' => '',
-        'tracking' => array(),
-        'get_frontend_urls' => false,
-        'items_per_page' => $items_per_page,
-        'apply_disabled_filters' => ''
-    );
+    $default_params = [
+        'area'                     => AREA,
+        'use_caching'              => true,
+        'extend'                   => ['product_name', 'prices', 'categories'],
+        'custom_extend'            => [],
+        'pname'                    => '',
+        'pshort'                   => '',
+        'pfull'                    => '',
+        'pkeywords'                => '',
+        'feature'                  => [],
+        'type'                     => 'simple',
+        'page'                     => 1,
+        'action'                   => '',
+        'filter_variants'          => [],
+        'features_hash'            => '',
+        'limit'                    => 0,
+        'bid'                      => 0,
+        'match'                    => '',
+        'tracking'                 => [],
+        'get_frontend_urls'        => false,
+        'items_per_page'           => $items_per_page,
+        'apply_disabled_filters'   => '',
+        'load_products_extra_data' => true,
+        'storefront'               => null,
+        'company_ids'              => '',
+    ];
+
     if (empty($params['custom_extend'])) {
         $params['extend'] = !empty($params['extend']) ? array_merge($default_params['extend'], $params['extend']) : $default_params['extend'];
     } else {
@@ -6532,8 +7054,9 @@ function fn_get_products($params, $items_per_page = 0, $lang_code = CART_LANGUAG
              * @param string $tmp           String containing SQL-query search condition by piece
              * @param string $piece         Part of the search query
              * @param array  $having        HAVING condition
+             * @param string $lang_code     Two-letter language code (e.g. 'en', 'ru', etc.)
              */
-            fn_set_hook('additional_fields_in_search', $params, $fields, $sortings, $condition, $join, $sorting, $group_by, $tmp, $piece, $having);
+            fn_set_hook('additional_fields_in_search', $params, $fields, $sortings, $condition, $join, $sorting, $group_by, $tmp, $piece, $having, $lang_code);
 
             $search_conditions[] = '(' . $tmp . ')';
         }
@@ -6618,7 +7141,19 @@ function fn_get_products($params, $items_per_page = 0, $lang_code = CART_LANGUAG
         $condition .= db_quote(' AND products.updated_timestamp >= ?i', $hours_ago);
     }
 
-    fn_set_hook('get_products_before_select', $params, $join, $condition, $u_condition, $inventory_join_cond, $sortings, $total, $items_per_page, $lang_code, $having);
+    fn_set_hook(
+        'get_products_before_select',
+        $params,
+        $join,
+        $condition,
+        $u_condition,
+        $inventory_join_cond,
+        $sortings,
+        $total,
+        $items_per_page,
+        $lang_code,
+        $having
+    );
 
     //
     // [/Advanced filters]
@@ -6687,11 +7222,24 @@ function fn_get_products($params, $items_per_page = 0, $lang_code = CART_LANGUAG
     $company_condition = '';
 
     if (fn_allowed_for('MULTIVENDOR')) {
-        if ($params['area'] == 'C') {
-            $company_condition .= " AND companies.status = 'A' ";
+        if ($params['area'] === 'C') {
+            $company_condition .= db_quote(' AND companies.status = ?s', 'A');
+
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = $params['storefront'] instanceof Storefront
+                ? $params['storefront']
+                : Tygh::$app['storefront'];
+            if ($storefront->getCompanyIds()) {
+                $company_condition .= db_quote(' AND companies.company_id IN (?n)', $storefront->getCompanyIds());
+            }
+
             $params['extend'][] = 'companies';
         } else {
             $company_condition .= fn_get_company_condition('products.company_id');
+
+            if (isset($params['company_status']) && !empty($params['company_status'])) {
+                $company_condition .= db_quote(' AND companies.status IN(?a)', $params['company_status']);
+            }
         }
     } else {
         $cat_company_condition = '';
@@ -6712,6 +7260,10 @@ function fn_get_products($params, $items_per_page = 0, $lang_code = CART_LANGUAG
     }
     if (isset($params['company_id']) && $params['company_id'] != '') {
         $condition .= db_quote(' AND products.company_id = ?i ', $params['company_id']);
+    }
+
+    if (!empty($params['company_ids']) && is_array($params['company_ids'])) {
+        $condition .= db_quote(' AND products.company_id IN (?n)', $params['company_ids']);
     }
 
     if (!empty($params['filter_params'])) {
@@ -7002,7 +7554,7 @@ function fn_get_products($params, $items_per_page = 0, $lang_code = CART_LANGUAG
     $sorting = db_sort($params, $sortings);
 
     if (!empty($sorting) && $params['sort_by'] !== 'null') {
-        $sorting .= ', product_id ASC'; // workaround for bug https://bugs.mysql.com/bug.php?id=69732
+        $sorting .= ', products.product_id ASC'; // workaround for bug https://bugs.mysql.com/bug.php?id=69732
     }
 
     if (fn_allowed_for('ULTIMATE')) {
@@ -7146,7 +7698,11 @@ function fn_get_products($params, $items_per_page = 0, $lang_code = CART_LANGUAG
         $products = fn_sort_by_ids($products, $params['pid']);
     }
 
-    $products = fn_load_products_extra_data($products, $params, $lang_code);
+    if ($params['load_products_extra_data']) {
+        $products = fn_load_products_extra_data($products, $params, $lang_code);
+    } else {
+        $products = fn_array_elements_to_keys($products, 'product_id');
+    }
 
     /**
      * Changes selected products
@@ -7196,9 +7752,20 @@ function fn_load_products_extra_data($products, $params, $lang_code)
         return $products;
     }
 
+    $extra_fields = array();
+
+    /**
+     * Loads products extra data
+     *
+     * @param array  $products     Array of products
+     * @param array  $params       Product search params
+     * @param string $lang_code    Language code
+     * @param array  $extra_fields Extra fields list
+     */
+    fn_set_hook('load_products_extra_data_pre', $products, $params, $lang_code, $extra_fields);
+
     $products = fn_array_elements_to_keys($products, 'product_id');
     $product_ids = array_keys($products);
-    $extra_fields = array();
 
     // Fields from "products" table
     $extra_fields['?:products'] = array(
@@ -7315,6 +7882,19 @@ function fn_load_products_extra_data($products, $params, $lang_code)
                 );
             }
         }
+    }
+
+    if (in_array('meta_data', $params['extend'])) {
+        $extra_fields['?:product_descriptions']['fields'][] = 'meta_description';
+        $extra_fields['?:product_descriptions']['fields'][] = 'meta_keywords';
+    }
+
+    if (in_array('page_title', $params['extend'])) {
+        $extra_fields['?:product_descriptions']['fields'][] = 'page_title';
+    }
+
+    if (in_array('promo_text', $params['extend'])) {
+        $extra_fields['?:product_descriptions']['fields'][] = 'promo_text';
     }
 
     /**
@@ -7486,19 +8066,26 @@ function fn_update_product_option($option_data, $option_id = 0, $lang_code = DES
     SecurityHelper::sanitizeObjectData('product_option', $option_data);
 
     // Add option
+    if (empty($option_data['internal_option_name']) && !empty($option_data['option_name'])) {
+        $option_data['internal_option_name'] = $option_data['option_name'];
+    }
+
     if (empty($option_id)) {
         $action = 'create';
-        if (empty($option_data['product_id'])) {
+        if (!empty($option_data['is_global'])) {
+            $product_id = $option_data['product_id'];
             $option_data['product_id'] = 0;
         }
-
         $option_data['option_id'] = $option_id = db_query('INSERT INTO ?:product_options ?e', $option_data);
 
-        foreach (fn_get_translation_languages() as $option_data['lang_code'] => $_v) {
+        foreach (Languages::getAll() as $option_data['lang_code'] => $_v) {
             db_query("INSERT INTO ?:product_options_descriptions ?e", $option_data);
         }
 
         $create = true;
+        if (!empty($option_data['is_global']) && !empty($product_id)) {
+            fn_add_global_option_link($product_id, $option_data['option_id']);
+        }
     // Update option
     } else {
         $action = 'update';
@@ -7525,7 +8112,6 @@ function fn_update_product_option($option_data, $option_id = 0, $lang_code = DES
                 return $option_id;
             }
         }
-
         db_query("UPDATE ?:product_options SET ?u WHERE option_id = ?i", $option_data, $option_id);
         db_query("UPDATE ?:product_options_descriptions SET ?u WHERE option_id = ?i AND lang_code = ?s", $option_data, $option_id, $lang_code);
     }
@@ -7586,7 +8172,7 @@ function fn_update_product_option($option_data, $option_id = 0, $lang_code = DES
 
             if (empty($v['variant_id']) || (!empty($v['variant_id']) && !db_get_field("SELECT variant_id FROM ?:product_option_variants WHERE variant_id = ?i", $v['variant_id']))) {
                 $v['variant_id'] = db_query("INSERT INTO ?:product_option_variants ?e", $v);
-                foreach (fn_get_translation_languages() as $v['lang_code'] => $_v) {
+                foreach (Languages::getAll() as $v['lang_code'] => $_v) {
                     db_query("INSERT INTO ?:product_option_variants_descriptions ?e", $v);
                 }
             } else {
@@ -7670,8 +8256,9 @@ function fn_convert_weight($weight)
 /**
  * Convert price from particular currency to base currency
  *
- * @param  float $price         Currency
- * @param  str   $currency_code Currency code
+ * @param  float    $price         Currency
+ * @param  string   $currency_code Currency code
+ *
  * @return float Converted currencty
  */
 function fn_convert_price($price, $currency_code = CART_PRIMARY_CURRENCY)
@@ -7679,8 +8266,8 @@ function fn_convert_price($price, $currency_code = CART_PRIMARY_CURRENCY)
     /**
      * Change price before converting
      *
-     * @param float $price         Price for converting
-     * @param str   $currency_code Price currency code
+     * @param float     $price         Price for converting
+     * @param string    $currency_code Price currency code
      */
     fn_set_hook('convert_price_pre', $price, $currency_code);
 
@@ -7690,9 +8277,9 @@ function fn_convert_price($price, $currency_code = CART_PRIMARY_CURRENCY)
     /**
      * Change the converted price
      *
-     * @param float $result        Converted price
-     * @param float $price         Price for converting
-     * @param str   $currency_code Price currency code
+     * @param float     $result        Converted price
+     * @param float     $price         Price for converting
+     * @param string    $currency_code Price currency code
      */
     fn_set_hook('convert_price_post', $result, $price, $currency_code);
 
@@ -8218,26 +8805,6 @@ function fn_apply_options_rules($product)
                 break;
             }
         }
-
-        if (!$product['hide_stock_info']) {
-            $combination = db_get_row("SELECT product_code, amount FROM ?:product_options_inventory WHERE combination_hash = ?s", $combination_hash);
-
-            if (!empty($combination['product_code'])) {
-                $product['product_code'] = $combination['product_code'];
-            }
-
-            if (Registry::get('settings.General.inventory_tracking') == 'Y') {
-                if (isset($combination['amount'])) {
-                        $product['inventory_amount'] = $combination['amount'];
-                } else {
-                        $product['inventory_amount'] = $product['amount'] = 0;
-                }
-            }
-        }
-    }
-
-    if (!$product['options_update']) {
-        $product['options_update'] = db_get_field('SELECT COUNT(*) FROM ?:product_options_inventory WHERE product_id = ?i', $product['product_id']);
     }
 
     // Enable AJAX form for product with required options
@@ -8506,17 +9073,25 @@ function fn_apply_exceptions_rules($product, $exceptions = array())
         }
 
         // Exclude checkboxes
-        if (!empty($option['variants']) && $option['option_type'] != 'C') {
+        if (!empty($option['variants'])) {
             foreach ($option['variants'] as $variant_id => $variant) {
                 if ($product['exceptions_type'] == 'A') {
                     // Allowed combinations
                     if (empty($options[$option_id][$variant_id]) && !isset($options[$option_id]['any'])) {
-                        unset($option['variants'][$variant_id]);
+                        if ($option['option_type'] != 'C') {
+                            unset($option['variants'][$variant_id]);
+                        } else {
+                            $option['variants'][$variant_id]['disabled'] = true;
+                        }
                     }
                 } else {
                     // Forbidden combinations
                     if (!empty($options[$option_id][$variant_id]) || isset($options[$option_id]['any'])) {
-                        unset($option['variants'][$variant_id]);
+                        if ($option['option_type'] != 'C') {
+                            unset($option['variants'][$variant_id]);
+                        } else {
+                            $option['variants'][$variant_id]['disabled'] = true;
+                        }
                     }
                 }
             }
@@ -8738,16 +9313,6 @@ function fn_get_customer_layout_theme_path()
     return array($theme_path, $theme_name);
 }
 
-/**
- * @deprecated In favour of use fn_get_product_details_view function.
- * @since 4.3.1
- * @TODO: remove in 4.3.2
- */
-function fn_get_product_details_layout($product_id)
-{
-    return fn_get_product_details_view($product_id);
-}
-
 function fn_get_product_details_view($product_id)
 {
     /**
@@ -8929,10 +9494,11 @@ function fn_clone_product($product_id)
 /**
  * Updates product prices.
  *
- * @param int $product_id Product identifier.
+ * @param int   $product_id   Product identifier.
  * @param array $product_data Array of product data.
- * @param int $company_id Company identifier.
- * @return array Modified <i>$product_data</i> array.
+ * @param int   $company_id   Company identifier.
+ *
+ * @return array Modified $product_data array.
  */
 function fn_update_product_prices($product_id, $product_data, $company_id = 0)
 {
@@ -8963,6 +9529,18 @@ function fn_update_product_prices($product_id, $product_data, $company_id = 0)
             $table_name = '?:product_prices';
             $condition = '';
         }
+
+        /**
+         * Allows to influence the process of updating the prices of a product.
+         *
+         * @param int    $product_id        Product identifier.
+         * @param array  $_product_data     Array of product data.
+         * @param int    $company_id        Company identifier.
+         * @param bool   $skip_price_delete Whether to delete the old prices of a product.
+         * @param bool   $table_name        Database table name where the price data is stored.
+         * @param string $condition         SQL conditions for deleting the old prices of a product.
+         */
+        fn_set_hook('update_product_prices', $product_id, $_product_data, $company_id, $skip_price_delete, $table_name, $condition);
 
         if (!$skip_price_delete) {
             db_query("DELETE FROM $table_name WHERE product_id = ?i $condition", $product_id);
@@ -9005,12 +9583,13 @@ function fn_update_product_prices($product_id, $product_data, $company_id = 0)
 /**
  * Gets product prices.
  *
- * @param int $product_id Product identifier
+ * @param int   $product_id   Product identifier
  * @param array $product_data Array of product data. Result data will be saved in this variable.
- * @param array $auth Array of user authentication data (e.g. uid, usergroup_ids, etc.)
- * @param int $company_id Company identifier.
+ * @param array $auth         Array of user authentication data (e.g. uid, usergroup_ids, etc.)
+ * @param int   $company_id   Company identifier.
+ * @param bool  $get_all      Gets all prices if true
  */
-function fn_get_product_prices($product_id, &$product_data, $auth, $company_id = 0)
+function fn_get_product_prices($product_id, &$product_data, $auth, $company_id = 0, $get_all = false)
 {
     if (fn_allowed_for('ULTIMATE') && $company_id) {
         $table_name = '?:ult_product_prices';
@@ -9020,52 +9599,55 @@ function fn_get_product_prices($product_id, &$product_data, $auth, $company_id =
         $condition = '';
     }
 
-    // For customer
-    if (AREA == 'C') {
+    if ($get_all || AREA !== 'C') {
+        $product_data['prices'] = db_get_array("SELECT prices.product_id, prices.lower_limit, usergroup_id, prices.percentage_discount, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM $table_name prices WHERE product_id = ?i $condition ORDER BY usergroup_id, lower_limit", $product_id);
+    } else {
         $_prices = db_get_hash_multi_array("SELECT prices.product_id, prices.lower_limit, usergroup_id, prices.percentage_discount, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM $table_name prices WHERE prices.product_id = ?i $condition AND lower_limit > 1 AND prices.usergroup_id IN (?n) ORDER BY lower_limit", array('usergroup_id'), $product_id, array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']));
-        if (!fn_allowed_for('ULTIMATE:FREE')) {
-            // If customer has usergroup and prices defined for this usergroup, get them
-            if (!empty($auth['usergroup_ids'])) {
-                foreach ($auth['usergroup_ids'] as $ug_id) {
-                    if (!empty($_prices[$ug_id]) && sizeof($_prices[$ug_id]) > 0) {
-                        if (empty($product_data['prices'])) {
-                            $product_data['prices'] = $_prices[$ug_id];
-                        } else {
-                            foreach ($_prices[$ug_id] as $comp_data) {
-                                $add_elm = true;
-                                foreach ($product_data['prices'] as $price_id => $price_data) {
-                                    if ($price_data['lower_limit'] == $comp_data['lower_limit']) {
-                                        $add_elm = false;
-                                        if ($price_data['price'] > $comp_data['price']) {
-                                            $product_data['prices'][$price_id] = $comp_data;
-                                        }
-                                        break;
-                                    }
-                                }
-                                if ($add_elm) {
-                                    $product_data['prices'][] = $comp_data;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!empty($product_data['prices'])) {
-                    $tmp = array();
+
+        if (empty($auth['usergroup_ids'])) {
+            return;
+        }
+
+        foreach ($auth['usergroup_ids'] as $usergroup_id) {
+            if (empty($_prices[$usergroup_id])) {
+                continue;
+            }
+
+            if (empty($product_data['prices'])) {
+                $product_data['prices'] = $_prices[$usergroup_id];
+            } else {
+                foreach ($_prices[$usergroup_id] as $comp_data) {
+                    $add_elm = true;
                     foreach ($product_data['prices'] as $price_id => $price_data) {
-                        $tmp[$price_id] = $price_data['lower_limit'];
+                        if ($price_data['lower_limit'] != $comp_data['lower_limit']) {
+                            continue;
+                        }
+
+                        $add_elm = false;
+                        if ($price_data['price'] > $comp_data['price']) {
+                            $product_data['prices'][$price_id] = $comp_data;
+                        }
+                        break;
                     }
-                    array_multisort($tmp, SORT_ASC, $product_data['prices']);
+                    if ($add_elm) {
+                        $product_data['prices'][] = $comp_data;
+                    }
                 }
             }
+        }
+
+        if (!empty($product_data['prices'])) {
+            $tmp = [];
+            foreach ($product_data['prices'] as $price_id => $price_data) {
+                $tmp[$price_id] = $price_data['lower_limit'];
+            }
+            array_multisort($tmp, SORT_ASC, $product_data['prices']);
         }
 
         // else, get prices for not members
         if (empty($product_data['prices']) && !empty($_prices[0]) && sizeof($_prices[0]) > 0) {
             $product_data['prices'] = $_prices[0];
         }
-    // Other - get all
-    } else {
-        $product_data['prices'] = db_get_array("SELECT prices.product_id, prices.lower_limit, usergroup_id, prices.percentage_discount, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM $table_name prices WHERE product_id = ?i $condition ORDER BY usergroup_id, lower_limit", $product_id);
     }
 }
 
@@ -9276,7 +9858,7 @@ function fn_delete_product_files_path($file_ids)
 function fn_delete_product_file_folders($folder_id, $product_id = 0)
 {
     if (empty($product_id) && !empty($folder_id)) {
-        $product_id = db_get_field("SELECT product_id FROM ?:product_file_folders WHERE folder_id = ?i", $folder_id);
+        $product_id = db_get_field('SELECT product_id FROM ?:product_file_folders WHERE folder_id = ?i', $folder_id);
     } elseif (empty($folder_id) && empty($product_id)) {
         return false;
     }
@@ -9286,22 +9868,31 @@ function fn_delete_product_file_folders($folder_id, $product_id = 0)
     }
 
     if (!empty($folder_id)) {
-        $folder_ids = array($folder_id);
-        $file_ids = db_get_fields("SELECT file_id FROM ?:product_files WHERE product_id = ?i AND folder_id = ?i", $product_id, $folder_id);
+        $folder_ids = [$folder_id];
+        $file_ids = db_get_fields('SELECT file_id FROM ?:product_files WHERE product_id = ?i AND folder_id = ?i', $product_id, $folder_id);
     } else {
-        $folder_ids = db_get_fields("SELECT folder_id FROM ?:product_file_folders WHERE product_id = ?i", $product_id);
-        $file_ids = db_get_fields("SELECT file_id FROM ?:product_files WHERE product_id = ?i AND folder_id IN (?n)", $product_id, $folder_ids);
+        $folder_ids = db_get_fields('SELECT folder_id FROM ?:product_file_folders WHERE product_id = ?i', $product_id);
+        $file_ids = db_get_fields('SELECT file_id FROM ?:product_files WHERE product_id = ?i AND folder_id IN (?n)', $product_id, $folder_ids);
     }
+
+    /**
+     * Executes before product file folders are deleted, allows to check product folders and files before deletion
+     *
+     * @param array $folder_ids File folder identifiers
+     * @param array $file_ids   File identifiers
+     * @param int   $product_id Product identifier
+     */
+    fn_set_hook('delete_product_file_folders_before_delete', $folder_ids, $file_ids, $product_id);
 
     if (!empty($file_ids) && fn_delete_product_files_path($file_ids) == false) {
         return false;
     }
 
-    db_query("DELETE FROM ?:product_file_folders WHERE folder_id IN (?n)", $folder_ids);
-    db_query("DELETE FROM ?:product_file_folder_descriptions WHERE folder_id IN (?n)", $folder_ids);
+    db_query('DELETE FROM ?:product_file_folders WHERE folder_id IN (?n)', $folder_ids);
+    db_query('DELETE FROM ?:product_file_folder_descriptions WHERE folder_id IN (?n)', $folder_ids);
 
-    db_query("DELETE FROM ?:product_files WHERE file_id IN (?n)", $file_ids);
-    db_query("DELETE FROM ?:product_file_descriptions WHERE file_id IN (?n)", $file_ids);
+    db_query('DELETE FROM ?:product_files WHERE file_id IN (?n)', $file_ids);
+    db_query('DELETE FROM ?:product_file_descriptions WHERE file_id IN (?n)', $file_ids);
 
     return true;
 }
@@ -9311,12 +9902,13 @@ function fn_delete_product_file_folders($folder_id, $product_id = 0)
  *
  * @param int $file_id file ID to delete
  * @param int $product_id product ID to delete all files from it. Ignored if $file_id is passed
+ *
  * @return boolean true on success, false - otherwise
  */
 function fn_delete_product_files($file_id, $product_id = 0)
 {
     if (empty($product_id) && !empty($file_id)) {
-        $product_id = db_get_field("SELECT product_id FROM ?:product_files WHERE file_id = ?i", $file_id);
+        $product_id = db_get_field('SELECT product_id FROM ?:product_files WHERE file_id = ?i', $file_id);
     } elseif (empty($folder_id) && empty($product_id)) {
         return false;
     }
@@ -9326,17 +9918,25 @@ function fn_delete_product_files($file_id, $product_id = 0)
     }
 
     if (!empty($file_id)) {
-        $file_ids = array($file_id);
+        $file_ids = [$file_id];
     } else {
-        $file_ids = db_get_fields("SELECT file_id FROM ?:product_files WHERE product_id = ?i", $product_id);
+        $file_ids = db_get_fields('SELECT file_id FROM ?:product_files WHERE product_id = ?i', $product_id);
     }
+
+    /**
+     * Executes before product files are deleted, allows to check product files before deletion
+     *
+     * @param array $file_ids   File identifiers
+     * @param int   $product_id Product identifier
+     */
+    fn_set_hook('delete_product_files_before_delete', $file_ids, $product_id);
 
     if (fn_delete_product_files_path($file_ids) == false) {
         return false;
     }
 
-    db_query("DELETE FROM ?:product_files WHERE file_id IN (?n)", $file_ids);
-    db_query("DELETE FROM ?:product_file_descriptions WHERE file_id IN (?n)", $file_ids);
+    db_query('DELETE FROM ?:product_files WHERE file_id IN (?n)', $file_ids);
+    db_query('DELETE FROM ?:product_file_descriptions WHERE file_id IN (?n)', $file_ids);
 
     return true;
 }
@@ -9356,11 +9956,21 @@ function fn_update_product_file_folder($product_file_folder, $folder_id, $lang_c
         return false;
     }
 
+    if ($folder_id && !empty($product_file_folder['product_id'])) {
+        list($previous_folder,) = fn_get_product_file_folders([
+            'folder_ids' => $folder_id,
+            'product_id' => $product_file_folder['product_id']
+        ]);
+        if (!$previous_folder) {
+            return false;
+        }
+    }
+
     if (empty($folder_id)) {
 
         $product_file_folder['folder_id'] = $folder_id = db_query('INSERT INTO ?:product_file_folders ?e', $product_file_folder);
 
-        foreach (fn_get_translation_languages() as $product_file_folder['lang_code'] => $v) {
+        foreach (Languages::getAll() as $product_file_folder['lang_code'] => $v) {
             db_query('INSERT INTO ?:product_file_folder_descriptions ?e', $product_file_folder);
         }
 
@@ -9383,8 +9993,27 @@ function fn_update_product_file_folder($product_file_folder, $folder_id, $lang_c
  */
 function fn_update_product_file($product_file, $file_id, $lang_code = DESCR_SL)
 {
+    /**
+     * Executes before product file is updated, allows to change product file data
+     *
+     * @param array   $product_data File data
+     * @param int     $product_id   File identifier
+     * @param string  $lang_code    Two-letter language code (e.g. 'en', 'ru', etc.)
+     */
+    fn_set_hook('update_product_file_pre', $product_file, $file_id, $lang_code);
+
     if (!fn_company_products_check($product_file['product_id'], true)) {
         return false;
+    }
+
+    if ($file_id && !empty($product_file['product_id'])) {
+        list($previous_file,) = fn_get_product_files([
+            'file_ids'   => $file_id,
+            'product_id' => $product_file['product_id'],
+        ]);
+        if (!$previous_file) {
+            return false;
+        }
     }
 
     $uploaded_data = fn_filter_uploaded_data('base_file');
@@ -9431,7 +10060,7 @@ function fn_update_product_file($product_file, $file_id, $lang_code = DESCR_SL)
         if (empty($file_id)) {
             $product_file['file_id'] = $file_id = db_query('INSERT INTO ?:product_files ?e', $product_file);
 
-            foreach (fn_get_translation_languages() as $product_file['lang_code'] => $v) {
+            foreach (Languages::getAll() as $product_file['lang_code'] => $v) {
                 db_query('INSERT INTO ?:product_file_descriptions ?e', $product_file);
             }
 
@@ -9474,7 +10103,8 @@ function fn_update_product_file($product_file, $file_id, $lang_code = DESCR_SL)
  *
  * @param int $source_id source product ID
  * @param int $target_id target product ID
- * @return associative array with the old folder IDs as keys and the new folder IDs as values
+ *
+ * @return array Associative array with the old folder IDs as keys and the new folder IDs as values
  */
 function fn_clone_product_file_folders($source_id, $target_id)
 {
@@ -9505,6 +10135,7 @@ function fn_clone_product_file_folders($source_id, $target_id)
  *
  * @param int $source_id source product ID
  * @param int $target_id target product ID
+ *
  * @return boolean true on success, false - otherwise
  */
 function fn_clone_product_files($source_id, $target_id)
@@ -9545,11 +10176,12 @@ function fn_clone_product_files($source_id, $target_id)
 /**
  * Download product file
  *
- * @param int $file_id file ID
+ * @param int     $file_id    file ID
  * @param boolean $is_preview flag indicates that we download file itself or just preview
- * @param string $ekey temporary key to download file from customer area
- * @param string $area current working area
- * @return file starts to download on success, boolean false in case of fail
+ * @param string  $ekey       temporary key to download file from customer area
+ * @param string  $area       current working area
+ *
+ * @return bool file starts to download on success, boolean false in case of fail
  */
 function fn_get_product_file($file_id, $is_preview = false, $ekey = '', $area = AREA)
 {
@@ -9570,8 +10202,8 @@ function fn_get_product_file($file_id, $is_preview = false, $ekey = '', $area = 
             }
 
             // Increase downloads for this file
-            $max_downloads = db_get_field("SELECT max_downloads FROM ?:product_files WHERE file_id = ?i", $file_id);
-            $file_downloads = db_get_field("SELECT downloads FROM ?:product_file_ekeys WHERE ekey = ?s AND file_id = ?i", $ekey, $file_id);
+            $max_downloads = (int) db_get_field("SELECT max_downloads FROM ?:product_files WHERE file_id = ?i", $file_id);
+            $file_downloads = (int) db_get_field("SELECT downloads FROM ?:product_file_ekeys WHERE ekey = ?s AND file_id = ?i", $ekey, $file_id);
 
             if (!empty($max_downloads)) {
                 if ($file_downloads >= $max_downloads) {
@@ -9698,10 +10330,6 @@ function fn_get_product_option_data($option_id, $product_id, $lang_code = DESCR_
 function fn_get_product_fields()
 {
     $fields = array(
-        array(
-            'name' => '[data][popularity]',
-            'text' => __('popularity')
-        ),
         array(
             'name' => '[data][status]',
             'text' => __('status'),
@@ -9881,6 +10509,13 @@ function fn_get_product_fields()
         );
     }
 
+    if (fn_allowed_for('ULTIMATE') || (fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id') == 0)) {
+        $fields[] = array(
+            'name' => '[data][popularity]',
+            'text' => __('popularity')
+        );
+    }
+
     /**
      * Hook for change fields array
      *
@@ -9971,43 +10606,36 @@ function fn_get_product_counts_by_category($params, $lang_code = CART_LANGUAGE)
  */
 function fn_get_categories_stats()
 {
-    $stats = array();
-    $params = array(
-        'only_short_fields' => true, // NOT NEEDED AT ALL BECAUSE WE DONT USE RESULTING $FIELDS
-        'extend' => array('companies', 'sharing'),
-        'get_conditions' => true,
-    );
+    $stats = [];
+    $params = [];
 
-    list($fields, $join, $condition) = fn_get_products($params);
+    $stats['products_total'] = fn_get_products_count($params);
 
-    db_query('SELECT SQL_CALC_FOUND_ROWS 1 FROM ?:products AS products' . $join . ' WHERE 1 ' . $condition . 'GROUP BY products.product_id');
-    $stats['products_total'] = db_get_found_rows();
-
-    $params = array(
+    $params = [
         'get_conditions' => true
-    );
-    list($fields, $join, $condition, $group_by, $sorting, $limit) = fn_get_categories($params);
+    ];
+    list(, , $condition) = fn_get_categories($params);
     $stats['categories_total'] = db_get_field('SELECT COUNT(*) FROM ?:categories WHERE 1 ?p', $condition);
 
-    $params = array(
+    $params = [
         'get_conditions' => true,
         'status' => 'A'
-    );
-    list($fields, $join, $condition, $group_by, $sorting, $limit) = fn_get_categories($params);
+    ];
+    list(, , $condition) = fn_get_categories($params);
     $stats['categories_active'] = db_get_field('SELECT COUNT(*) FROM ?:categories WHERE 1 ?p', $condition);
 
-    $params = array(
+    $params = [
         'get_conditions' => true,
         'status' => 'H'
-    );
-    list($fields, $join, $condition, $group_by, $sorting, $limit) = fn_get_categories($params);
+    ];
+    list(, , $condition) = fn_get_categories($params);
     $stats['categories_hidden'] = db_get_field('SELECT COUNT(*) FROM ?:categories WHERE 1 ?p', $condition);
 
-    $params = array(
+    $params = [
         'get_conditions' => true,
         'status' => 'D'
-    );
-    list($fields, $join, $condition, $group_by, $sorting, $limit) = fn_get_categories($params);
+    ];
+    list(, , $condition) = fn_get_categories($params);
     $stats['categories_disabled'] = db_get_field('SELECT COUNT(*) FROM ?:categories WHERE 1 ?p', $condition);
 
     return $stats;
@@ -10049,6 +10677,7 @@ function fn_get_all_brands()
  * @param bool  $rebuild      Determines whether or not the tree of categories must be rebuilt
  * @param int   $company_id   The identifier of the company. If an identifier is passed to the function,
  *                            then the changes will affect only those categories that belong to the specified company.
+ * @return array $product data List with product fields
  */
 function fn_update_product_categories($product_id, $product_data, $rebuild = false, $company_id = 0)
 {
@@ -10064,6 +10693,52 @@ function fn_update_product_categories($product_id, $product_data, $rebuild = fal
      */
     fn_set_hook('update_product_categories_pre', $product_id, $product_data, $rebuild, $company_id);
 
+    // Save new product categories which was added by select2
+    if (isset($product_data['add_new_category'])) {
+        $filtered_category_list = array_filter($product_data['add_new_category'], 'fn_string_not_empty');
+        foreach ($filtered_category_list as $key => $value) {
+            $parent_id = 0;
+            $category_parts = explode('/', $value);
+            array_walk($category_parts, 'fn_trim_helper');
+            if (fn_allowed_for('ULTIMATE')) {
+                if (empty($company_id) && !empty($product_data['company_id'])) {
+                    $company_id = $product_data['company_id'];
+                } elseif (empty($company_id)) {
+                    $company_id = Registry::ifGet('runtime.company_id', fn_get_default_company_id());
+                }
+            }
+            $category_parts = fn_get_categories_from_path(array_values(array_filter($category_parts, 'fn_string_not_empty')), $company_id);
+            foreach ($category_parts as $category_part_key => $category_part) {
+                if (isset($category_parts[$category_part['parent']]['id'])) {
+                    $parent_id = $category_parts[$category_part['parent']]['id'];
+                }
+
+                if (!$category_part['id']) {
+                    $category_data = [
+                        'category' => $category_part['name'],
+                        'parent_id' => $parent_id,
+                        'status' => 'A',
+                        'position' => '',
+                        'timestamp' => TIME
+                    ];
+
+                    if (fn_allowed_for('ULTIMATE')) {
+                        $category_data['company_id'] = $company_id;
+                    }
+
+                    $category_id = fn_update_category($category_data);
+
+                    $category_parts[$category_part_key]['id'] = $category_id;
+                }
+            }
+
+            if (isset($category_id)) {
+                $insert_category_key = array_search($value, $product_data['category_ids']);
+                $product_data['category_ids'][$insert_category_key] = $category_id;
+            }
+        }
+    }
+
     $fields = array(
         '?:products_categories.category_id',
         '?:products_categories.link_type',
@@ -10075,11 +10750,16 @@ function fn_update_product_categories($product_id, $product_data, $rebuild = fal
     $condition = db_quote('WHERE product_id = ?i', $product_id);
 
     if ($company_id && !empty($product_data['category_ids'])) {
-        $product_data['category_ids'] = db_get_fields(
+        $category_ids = db_get_hash_array(
             'SELECT category_id FROM ?:categories WHERE category_id IN (?n) ?p',
+            'category_id',
             $product_data['category_ids'],
             fn_get_company_condition('?:categories.company_id', true, $company_id)
         );
+
+        $category_ids = fn_sort_by_ids($category_ids, $product_data['category_ids'], 'category_id');
+        $saved_category_ids = $product_data['category_ids'];
+        $product_data['category_ids'] = fn_array_column($category_ids, 'category_id');
 
         $fields[] = '?:categories.company_id';
         $join = ' LEFT JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id';
@@ -10101,7 +10781,7 @@ function fn_update_product_categories($product_id, $product_data, $rebuild = fal
 
         $product_data['category_ids'] = array_unique($product_data['category_ids']);
 
-        if (empty($product_data['main_category'])) {
+        if (empty($product_data['main_category']) || !in_array($product_data['main_category'], $product_data['category_ids'])) {
             $product_data['main_category'] = reset($product_data['category_ids']);
         }
 
@@ -10135,7 +10815,7 @@ function fn_update_product_categories($product_id, $product_data, $rebuild = fal
             }
 
             foreach ($product_data['category_ids'] as $cid) {
-                $_data = array(
+                $_data = [
                     'product_id'  => $product_id,
                     'category_id' => $cid,
                     'position'    => isset($existing_categories[$cid])
@@ -10144,8 +10824,8 @@ function fn_update_product_categories($product_id, $product_data, $rebuild = fal
                             ? (int) $product_data['position']
                             : 0
                         ),
-                    'link_type' => $product_data['main_category'] == $cid ? 'M' : 'A'
-                );
+                    'link_type' => $product_data['main_category'] == $cid ? 'M' : 'A',
+                ];
 
                 if ($company_id && $company_id != $product_data['company_id']) {
                     $_data['link_type'] = 'A';
@@ -10168,6 +10848,7 @@ function fn_update_product_categories($product_id, $product_data, $rebuild = fal
      * @param int   $company_id          The identifier of the company. If an identifier is passed to the function,
      *                                   then the changes will affect only those categories that belong to the
      *                                   specified company.
+     * @param array $saved_category_ids  Saved product category ids belonging to companies
      */
     fn_set_hook(
         'update_product_categories_post',
@@ -10175,8 +10856,37 @@ function fn_update_product_categories($product_id, $product_data, $rebuild = fal
         $product_data,
         $existing_categories,
         $rebuild,
-        $company_id
+        $company_id,
+        $saved_category_ids
     );
+
+    return $product_data;
+}
+
+/**
+ * Updates product position in the chosen category
+ *
+ * @param int $product_id  Product id
+ * @param int $category_id Category id where the product position will be updated
+ * @param int $position    New product position in the category
+ */
+function fn_update_product_position_in_category($product_id, $category_id, $position)
+{
+    db_query(
+        'UPDATE ?:products_categories SET position = ?i WHERE category_id = ?i AND product_id = ?i',
+        $position,
+        $category_id,
+        $product_id
+    );
+
+    /**
+     * Post processing after updating product position in category
+     *
+     * @param int $product_id  Product data
+     * @param int $category_id Category id where the product position was updated
+     * @param int $position    New product position in the category
+     */
+    fn_set_hook('update_product_position_in_category_post', $product_id, $category_id, $position);
 }
 
 /**
@@ -10202,19 +10912,13 @@ function fn_check_owner_categories($company_id, $category_ids)
 /**
  * Filters: gets available filters according to current products set
  *
- * @param array $params request params
+ * @param array  $params    request params
  * @param string $lang_code language code
+ *
  * @return array available filters list
  */
 function fn_get_filters_products_count($params = array(), $lang_code = CART_LANGUAGE)
 {
-    /**
-     * Change parameters for getting product filters count
-     *
-     * @param array $params Products filter search params
-     */
-    fn_set_hook('get_filters_products_count_pre', $params);
-
     $cache_params = array(
         'category_id',
         'company_id',
@@ -10224,16 +10928,13 @@ function fn_get_filters_products_count($params = array(), $lang_code = CART_LANG
         'filter_id',
         'item_ids',
         'variant_id',
+        'cid',
+        'subcats',
+        'pid',
+        'order_ids',
+        'block_data.storefront_id',
     );
 
-    $key = array();
-    foreach ($cache_params as $prop) {
-        if (isset($params[$prop])) {
-            $key[] = $params[$prop];
-        }
-    }
-
-    $key = 'pfilters_' . md5(implode('|', $key));
     $cache_tables = array(
         'products',
         'product_descriptions',
@@ -10244,12 +10945,34 @@ function fn_get_filters_products_count($params = array(), $lang_code = CART_LANG
         'categories',
         'product_filter_descriptions',
         'product_features_descriptions',
+        'product_feature_variants',
         'product_feature_variant_descriptions',
         'ult_objects_sharing' // FIXME: this should not be here
     );
     if (fn_allowed_for('MULTIVENDOR')) {
         $cache_tables[] = 'companies';
+        $cache_tables[] = 'storefronts_companies';
     }
+
+    /**
+     * Change parameters for getting product filters count
+     *
+     * @param array $params       Products filter search params
+     * @param array $cache_params Parameters that affect the cache
+     * @param array $cache_tables Tables that affect cache
+     */
+    fn_set_hook('get_filters_products_count_pre', $params, $cache_params, $cache_tables);
+
+    $key = array();
+    foreach ($cache_params as $prop) {
+        $prop_value = fn_dot_syntax_get($prop, $params);
+        if ($prop_value !== null) {
+            $key[] = $prop_value;
+        }
+    }
+
+    $key = 'pfilters_' . md5(implode('|', $key));
+
     Registry::registerCache(array('pfilters', $key), $cache_tables, Registry::cacheLevel('user'));
 
     $selected_filters = array();
@@ -10315,6 +11038,7 @@ function fn_get_filters_products_count($params = array(), $lang_code = CART_LANG
             "?:product_filters.display_count," .
             "?:product_filter_descriptions.filter," .
             "?:product_features.feature_type," .
+            "?:product_features.filter_style," .
             "?:product_features_descriptions.prefix," .
             "?:product_features_descriptions.suffix"
         );
@@ -10329,11 +11053,11 @@ function fn_get_filters_products_count($params = array(), $lang_code = CART_LANG
         /**
          * Change SQL parameters before select product filters
          *
-         * @param array $sf_fields String of comma-separated SQL fields to be selected in an SQL-query
-         * @param string $sf_join String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
-         * @param string $condition String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
+         * @param array  $sf_fields  String of comma-separated SQL fields to be selected in an SQL-query
+         * @param string $sf_join    String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
+         * @param string $condition  String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
          * @param string $sf_sorting String containing the SQL-query ORDER BY clause
-         * @param array $params Products filter search params
+         * @param array  $params     Products filter search params
          */
         fn_set_hook('get_filters_products_count_before_select_filters', $sf_fields, $sf_join, $condition, $sf_sorting, $params);
 
@@ -10379,9 +11103,12 @@ function fn_get_filters_products_count($params = array(), $lang_code = CART_LANG
     }
 
     foreach ($filters as $filter_id => $filter) {
-        if (empty($merged[$filter_id]) || (
-            !empty($filter['feature_type']) &&
-            empty($available_variants[$filter_id]))
+        if (empty($merged[$filter_id])
+            || (
+                !empty($filter['feature_type'])
+                && empty($available_variants[$filter_id])
+                && empty($filter['show_empty_filter'])
+            )
         ) {
             unset($filters[$filter_id]);
             continue;
@@ -10437,9 +11164,10 @@ function fn_get_filters_products_count($params = array(), $lang_code = CART_LANG
 /**
  * Filters: removes variant or filter from selected filters list
  *
- * @param string $features_hash selected filters list
- * @param integer $filter_id filter ID
- * @param mixed $variant filter variant
+ * @param string  $features_hash selected filters list
+ * @param integer $filter_id     filter ID
+ * @param mixed   $variant       filter variant
+ *
  * @return string updated filters list
  */
 function fn_delete_filter_from_hash($features_hash, $filter_id, $variant = '')
@@ -10764,13 +11492,21 @@ function fn_get_current_filters($params, $filters, $selected_filters, $area = AR
     $_params['custom_extend'] = array('categories');
     if (!empty($params['category_id'])) {
         $_params['cid'] = $params['category_id'];
-        $_params['subcats'] = '';
-        if (Registry::get('settings.General.show_products_from_subcategories') == 'Y') {
-            $_params['subcats'] = 'Y';
+
+        if (!isset($_params['subcats'])) {
+            $_params['subcats'] = Registry::get('settings.General.show_products_from_subcategories') === YesNo::YES ? YesNo::YES : '';
+        } elseif ($_params['subcats'] !== YesNo::YES) {
+            $_params['subcats'] = '';
         }
     }
 
-    list(, $join, $where) = fn_get_products($_params, 0, $lang_code);
+    if (!empty($params['pid'])) {
+        $_params['pid'] = $params['pid'];
+    }
+
+    if (!empty($params['order_ids'])) {
+        $_params['order_ids'] = $params['order_ids'];
+    }
 
     if (!empty($_params['split_filters'])) {
         list($variant_features, $value_features, $valueint_features) = fn_split_selected_feature_variants($filters, $selected_filters, false);
@@ -10810,7 +11546,7 @@ function fn_get_current_filters($params, $filters, $selected_filters, $area = AR
         // Get descriptions and position
         if (!empty($variant_values)) {
             $variant_descriptions = db_get_hash_array(
-                "SELECT ?:product_feature_variants.variant_id, ?:product_feature_variants.position, ?:product_feature_variant_descriptions.variant FROM ?:product_feature_variants " .
+                "SELECT ?:product_feature_variants.variant_id, ?:product_feature_variants.position, ?:product_feature_variants.color, ?:product_feature_variant_descriptions.variant FROM ?:product_feature_variants " .
                 "LEFT JOIN ?:product_feature_variant_descriptions ON ?:product_feature_variants.variant_id = ?:product_feature_variant_descriptions.variant_id AND ?:product_feature_variant_descriptions.lang_code = ?s " .
                 "WHERE ?:product_feature_variants.variant_id IN (?n) " .
                 "ORDER BY ?:product_feature_variants.position ASC, ?:product_feature_variant_descriptions.variant ASC",
@@ -10827,6 +11563,7 @@ function fn_get_current_filters($params, $filters, $selected_filters, $area = AR
                 'variant_id' => $variant_id,
                 'variant' => $variant_data['variant'],
                 'position' => $variant_data['position'],
+                'color' => $variant_data['color'],
             );
         }
 
@@ -11075,7 +11812,7 @@ function fn_get_product_filter_fields()
 {
     $filters = array (
         // price filter
-        'P' => array (
+        ProductFilterProductFieldTypes::PRICE => array (
             'db_field' => 'price',
             'table' => 'product_prices',
             'description' => 'price',
@@ -11127,7 +11864,7 @@ function fn_get_product_filter_fields()
             'suffix' => (Registry::get('currencies.' . CART_SECONDARY_CURRENCY . '.after') != 'Y' ? '' : Registry::get('currencies.' . CART_SECONDARY_CURRENCY . '.symbol'))
         ),
         // amount filter
-        'A' => array (
+        ProductFilterProductFieldTypes::IN_STOCK => array (
             'db_field' => 'amount',
             'table' => 'products',
             'description' => 'in_stock',
@@ -11137,7 +11874,7 @@ function fn_get_product_filter_fields()
             )
         ),
         // filter by free shipping
-        'F' => array (
+        ProductFilterProductFieldTypes::FREE_SHIPPING => array (
             'db_field' => 'free_shipping',
             'table' => 'products',
             'description' => 'free_shipping',
@@ -11712,7 +12449,7 @@ function fn_get_option_modifiers_by_selected_options(array $selected_options, $t
     $db = Tygh::$app['db'];
 
     $modifiers = array();
-    $cache_key = md5($fields);
+    $cache_key = Registry::get('runtime.company_id') . md5($fields);
 
     if (!isset($variants[$cache_key])) {
         $variants[$cache_key] = array();
@@ -11749,13 +12486,14 @@ function fn_get_option_modifiers_by_selected_options(array $selected_options, $t
             /**
              * Changes SQL-query params before option modifiers selecting
              *
-             * @param string $type          Calculation type (price or weight)
-             * @param string $fields        Fields to be selected
-             * @param string $om_condition  String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
-             * @param string $om_join       String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
-             * @param array  $variant_ids   Variant identifiers
+             * @param string $type              Calculation type (price or weight)
+             * @param string $fields            Fields to be selected
+             * @param string $om_condition      String containing SQL-query condition possibly prepended with a logical operator (AND or OR)
+             * @param string $om_join           String with the complete JOIN information (JOIN type, tables and fields) for an SQL-query
+             * @param array  $variant_ids       Variant identifiers
+             * @param array  $selected_options  The list of selected option variants as option_id => variant_id
              */
-            fn_set_hook('apply_option_modifiers_get_option_modifiers', $type, $fields, $om_join, $om_condition, $variant_ids);
+            fn_set_hook('apply_option_modifiers_get_option_modifiers', $type, $fields, $om_join, $om_condition, $variant_ids, $selected_options);
 
             $items = $db->getHash(
                 'SELECT ?p, a.variant_id FROM ?:product_option_variants a ?p WHERE 1 AND ?p',
@@ -11835,3 +12573,386 @@ function fn_init_product_tabs(array $product)
     return true;
 }
 
+/**
+ * Reorders product categories sequentially in the database.
+ *
+ * @param int   $product_id   Product identifier
+ * @param array $category_ids Category identifiers
+ *
+ * @return bool Whether at lest one product category position was updated
+ */
+function fn_sort_product_categories($product_id, array $category_ids)
+{
+    $position = 0;
+    $is_position_updated = false;
+
+    foreach ($category_ids as $category_id) {
+        $is_single_position_updated = db_query(
+            'UPDATE ?:products_categories SET category_position = ?i WHERE product_id = ?i AND category_id = ?i',
+            $position,
+            $product_id,
+            $category_id
+        );
+        $position += 10;
+
+        $is_position_updated = $is_position_updated || $is_single_position_updated;
+    }
+
+    return $is_position_updated;
+}
+
+/**
+ *  Gets product feature purposes sorted by position
+ *
+ * @return array
+ */
+function fn_get_product_feature_purposes()
+{
+    static $purposes = null;
+
+    if ($purposes === null) {
+        $purposes = (array) fn_get_schema('product_features', 'purposes');
+        $purposes = fn_sort_array_by_key($purposes, 'position');
+
+        foreach ($purposes as &$purpose) {
+            $purpose['types'] = [];
+
+            foreach ($purpose['styles_map'] as $key => $item) {
+                $purpose['types'][$item['feature_type']][$key] = $item;
+            }
+        }
+        unset($purpose);
+    }
+
+    return $purposes;
+}
+
+/**
+ * Gets product feature purpose by feature type
+ *
+ * @param string $feature_type
+ *
+ * @return string|null
+ */
+function fn_get_product_feature_purpose_by_type($feature_type)
+{
+    $purposes = fn_get_product_feature_purposes();
+
+    foreach ($purposes as $purpose => $data) {
+        if (empty($data['is_core'])) {
+            continue;
+        }
+
+        if (isset($data['types'][$feature_type])) {
+            return $purpose;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Gets default product feature purpose
+ *
+ * @return string
+ */
+function fn_get_default_product_feature_purpose()
+{
+    $purposes = fn_get_product_feature_purposes();
+
+    foreach ($purposes as $purpose => $data) {
+        if (!empty($data['is_default'])) {
+            return $purpose;
+        }
+    }
+
+    $keys = array_keys($purposes);
+
+    return reset($keys);
+}
+
+/**
+ * Adds global option link for product
+ *
+ * @param int $product_id   Product identifier
+ * @param int $option_id    Option identifier
+ */
+function fn_add_global_option_link($product_id, $option_id)
+{
+    $product_company_id = fn_get_company_id('products', 'product_id', $product_id);
+    $option_company_id = fn_get_company_id('product_options', 'option_id', $option_id);
+
+    if ($product_company_id !== $option_company_id && $option_company_id) {
+        return;
+    }
+
+    db_replace_into('product_global_option_links', [
+        'product_id' => $product_id,
+        'option_id' => $option_id,
+    ]);
+
+    if (fn_allowed_for('ULTIMATE')) {
+        fn_ult_share_product_option($option_id, $product_id);
+    }
+
+    /**
+     * Executes after a global option has been linked to a product
+     *
+     * @param int $product_id Product identifier
+     * @param int $option_id  Option identifier
+     */
+    fn_set_hook('add_global_option_link_post', $product_id, $option_id);
+}
+
+/**
+ * Deletes global option link for product
+ *
+ * @param int $product_id   Product identifier
+ * @param int $option_id    Option identifier
+ */
+function fn_delete_global_option_link($product_id, $option_id)
+{
+    db_query('DELETE FROM ?:product_global_option_links WHERE product_id = ?i AND option_id = ?i', $product_id, $option_id);
+
+    /**
+     * Executes after a global option has been unlinked from a product
+     *
+     * @param int $product_id Product identifier
+     * @param int $option_id  Option identifier
+     */
+    fn_set_hook('delete_global_option_link_post', $product_id, $option_id);
+}
+
+/**
+ * Gets current feature data when updating it.
+ *
+ * @param int    $feature_id Feature identifier
+ * @param string $lang_code  Two-letter language code
+ * @param array  $params     Additional param for searching features
+ *
+ * @return array|null
+ *
+ * @internal
+ */
+function fn_get_feature_data_with_subfeatures($feature_id, $lang_code, array $params = [])
+{
+    list($feature_data,) = fn_get_product_features(array_merge($params, [
+        'feature_id'    => $feature_id,
+        'plain'         => true,
+        'exclude_group' => true,
+    ]), 0, $lang_code);
+
+    if (!$feature_data) {
+        return null;
+    }
+
+    $feature_data = reset($feature_data);
+
+    if ($feature_data['feature_type'] === ProductFeatures::GROUP) {
+        list($feature_data,) = fn_get_product_features(array_merge($params, [
+            'parent_id' => $feature_id,
+        ]), 0, $lang_code);
+        $feature_data = reset($feature_data);
+    }
+
+    $feature_data['subfeatures'] = isset($feature_data['subfeatures'])
+        ? $feature_data['subfeatures']
+        : [];
+
+    return $feature_data;
+}
+
+/**
+ * Gets array of object with categories data from category path
+ *
+ * @param array $category_names Parts of fully qualified category name
+ * @param int   $company_id Id of company which owns searchiable categories
+ * @param string $lang_code Current language of searching categories
+ *
+ * @return array Each element contains category name, category id in database (empty string if not exists) and index of parent category in this array (null of not exists)
+ */
+function fn_get_categories_from_path($category_names = [], $company_id = 0, $lang_code = CART_LANGUAGE)
+{
+    $categories = [];
+    if (empty($category_names)) {
+        return $categories;
+    }
+
+    foreach ($category_names as $index => $category_name) {
+        $current_category = [];
+        $current_category['name'] = $category_name;
+
+        $current_category['parent'] = $index <= 0
+            ? null
+            : $index - 1;
+
+        $parent_id = isset($current_category['parent'])
+            ? $categories[$current_category['parent']]['id']
+            : 0;
+
+        $current_category['id'] = db_get_field(
+            'SELECT ?:category_descriptions.category_id FROM ?:category_descriptions'
+            . ' LEFT JOIN ?:categories ON ?:category_descriptions.category_id = ?:categories.category_id'
+            . ' WHERE ?:category_descriptions.category = ?s AND ?:category_descriptions.lang_code = ?s'
+            . ' AND ?:categories.parent_id = ?i AND ?:categories.company_id = ?i',
+            $category_name,
+            $lang_code,
+            $parent_id,
+            $company_id
+        );
+
+        $categories[] = $current_category;
+    }
+
+    return $categories;
+}
+
+/**
+ * Returns feature style by feature's purpose.
+ *
+ * @param string $feature_type    Feature type of current feature.
+ * @param string $feature_purpose Feature purpose of current feature.
+ *
+ * @return string|null Feature style or null.
+ */
+function fn_get_product_feature_style($feature_type, $feature_purpose)
+{
+    $feature_style = '';
+    $purposes = (array) fn_get_schema('product_features', 'purposes');
+
+    if (empty($feature_purpose) || !isset($purposes[$feature_purpose])) {
+        return $feature_style;
+    }
+
+    $styles_map = $purposes[$feature_purpose]['styles_map'];
+
+    foreach ($styles_map as $style) {
+        if ($feature_type == $style['feature_type']) {
+            $feature_style = $style['feature_style'];
+            break;
+        }
+    }
+
+    return $feature_style;
+}
+
+/**
+ * Return feature filter style by feature's purpose and feature style.
+ *
+ * @param string $feature_type    Feature type of current feature.
+ * @param string $feature_style   Feature style of current feature.
+ * @param string $feature_purpose Feature purpose of current feature.
+ *
+ * @return string|null Feature filter style or null.
+ */
+function fn_get_product_feature_filter_style($feature_type, $feature_style, $feature_purpose)
+{
+    $filter_style = '';
+    $purposes = (array) fn_get_schema('product_features', 'purposes');
+
+    if (empty($feature_purpose) || !isset($purposes[$feature_purpose])) {
+        return $filter_style;
+    }
+
+    $styles_map = $purposes[$feature_purpose]['styles_map'];
+
+    foreach ($styles_map as $style) {
+        if ($feature_type == $style['feature_type'] && $feature_style == $style['feature_style']) {
+            $filter_style = $style['filter_style'];
+            break;
+        }
+    }
+    return $filter_style;
+}
+
+/**
+ * Updates product popularity (updates, if product popularity exist and inserts, if it is not).
+ *
+ * @param int   $product_id Product id
+ * @param array $popularity Popularity data
+ *
+ * @return void
+ */
+function fn_update_product_popularity($product_id, array $popularity)
+{
+    $default_popularity = [
+        'viewed' => 0,
+        'added' => 0,
+        'deleted' => 0,
+        'bought' => 0,
+        'total' => 0,
+    ];
+
+    $popularity = array_merge($default_popularity, $popularity);
+
+    $popularity['product_id'] = (int) $product_id;
+
+    $update_data = [
+        'viewed'  => db_quote('viewed = viewed + ?i', $popularity['viewed']),
+        'added'   => db_quote('added = added + ?i', $popularity['added']),
+        'deleted' => db_quote('deleted = deleted + ?i', $popularity['deleted']),
+        'bought'  => db_quote('bought = bought + ?i', $popularity['bought']),
+        'total'   => db_quote('total = total + ?i', $popularity['total'])
+    ];
+
+    $insert_data = $popularity;
+    $insert_data['total'] = ($popularity['deleted'] > 0) ? 0 : $popularity['total'];
+
+    db_query(
+        'INSERT INTO ?:product_popularity ?e ON DUPLICATE KEY UPDATE ?p',
+        $insert_data,
+        implode(', ', $update_data)
+    );
+
+    /**
+     * Executes after updating product popularity.
+     *
+     * @param int   $product_id  Product if
+     * @param array $popularity  Popularity data which was updated
+     */
+    fn_set_hook('update_product_popularity', $product_id, $popularity);
+}
+
+/**
+ * Gets number of products by the params
+ *
+ * @param array $params Params to count products
+ *
+ * @return int
+ */
+function fn_get_products_count(array $params)
+{
+    $params['get_conditions'] = true;
+    $params['custom_extend'] = ['sharing'];
+
+    list(, $join, $condition) = fn_get_products($params);
+
+    $count = db_get_field('SELECT COUNT(DISTINCT products.product_id) FROM ?:products AS products' . $join . ' WHERE 1=1 ' . $condition);
+
+    return (int) $count;
+}
+
+/**
+ * Changes status of the specified category.
+ *
+ * @param int    $category_id Category ID.
+ * @param string $status_to   New status for category.
+ *
+ * @return bool
+ */
+function fn_change_category_status($category_id, $status_to)
+{
+    if (empty($category_id) || empty($status_to)) {
+        return false;
+    }
+
+    return fn_tools_update_status(
+        [
+            'table'             => 'categories',
+            'status'            => $status_to,
+            'id_name'           => 'category_id',
+            'id'                => $category_id,
+            'show_error_notice' => false
+        ]
+    );
+}

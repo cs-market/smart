@@ -1,4 +1,5 @@
 {if is_array($providers_list)}
+    {hook name="hybrid_auth:login_buttons"}
     {if !isset($redirect_url)}
         {assign value= $config.current_url var="redirect_url"}
     {/if}
@@ -13,4 +14,5 @@
     {/foreach}
     {/strip}
     </p>
+    {/hook}
 {/if}

@@ -22,8 +22,18 @@ if ($mode == 'final_sale' || $mode == 'on_sale' || $mode == 'bestsellers' || $mo
 
     $params['extend'] = array('description');
 
+    if ($items_per_page = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'items_per_page')) {
+        $params['items_per_page'] = $items_per_page;
+    }
+    if ($sort_by = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_by')) {
+        $params['sort_by'] = $sort_by;
+    }
+    if ($sort_order = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_order')) {
+        $params['sort_order'] = $sort_order;
+    }
+
     if ($mode == 'final_sale') {
-        $title = __("final_sale");
+        $title = __('final_sale');
         $params['on_sale'] = true;
 
         if (empty($params['on_sale_from'])) {
@@ -31,17 +41,17 @@ if ($mode == 'final_sale' || $mode == 'on_sale' || $mode == 'bestsellers' || $mo
         }
 
     } elseif ($mode == 'on_sale') {
-        $title = __("on_sale");
+        $title = __('on_sale');
         $params['on_sale'] = true;
 
     } elseif ($mode == 'bestsellers') {
-        $title = __("bestsellers");
+        $title = __('bestsellers');
         
         $params['bestsellers'] = true;
         $params['sales_amount_from'] = Registry::get('addons.bestsellers.sales_amount_from');
 
     } elseif ($mode == 'newest') {
-        $title = __("newest");
+        $title = __('newest');
 
         $params['sort_by'] = empty($params['sort_by']) ? 'timestamp' : $params['sort_by'];
         $params['plain'] = true;

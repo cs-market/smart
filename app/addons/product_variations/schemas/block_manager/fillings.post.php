@@ -14,15 +14,15 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-$schema['product_variations.variations_filling'] = array(
-    'limit' => array(
-        'type' => 'input',
+$schema['product_variations.variations_filling'] = [
+    'limit'               => [
+        'type'          => 'input',
         'default_value' => 10,
-    ),
-    'variations_in_stock' => array(
-        'type' => 'checkbox',
+    ],
+    'variations_in_stock' => [
+        'type'          => 'checkbox',
         'default_value' => 'Y'
-    ),
-);
+    ],
+];
 
 return $schema;

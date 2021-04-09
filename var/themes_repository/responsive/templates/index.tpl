@@ -37,9 +37,11 @@
     {$page_title}
 {else}
     {if $language_direction == "rtl"}
-        {foreach from=$breadcrumbs|@array_reverse item=i name="bkt"}
-            {if !$smarty.foreach.bkt.last}{if !$smarty.foreach.bkt.last && !$smarty.foreach.bkt.first} :: {/if}{$i.title|strip_tags}{/if}
-        {/foreach}
+        {if $breadcrumbs}
+            {foreach from=$breadcrumbs|array_reverse item=i name="bkt"}
+                {if !$smarty.foreach.bkt.last}{if !$smarty.foreach.bkt.last && !$smarty.foreach.bkt.first} :: {/if}{$i.title|strip_tags}{/if}
+            {/foreach}
+        {/if}
     {else}
         {foreach from=$breadcrumbs item=i name="bkt"}
             {if !$smarty.foreach.bkt.first}{$i.title|strip_tags}{if !$smarty.foreach.bkt.last} :: {/if}{/if}
@@ -58,8 +60,23 @@
 {if "DEVELOPMENT"|defined && $smarty.const.DEVELOPMENT == true}
 <script type="text/javascript" data-no-defer>
 window.jsErrors = [];
-window.onerror = function(errorMessage) {
-    document.write('<div data-ca-debug="1" style="border: 2px solid red; margin: 2px;">' + errorMessage + '</div>');
+window.onerror = function(message, source, lineno, colno, error) {
+    var verboseMessage = message;
+    if (source) {
+        verboseMessage = source + '@' + lineno + ':' + colno + "\n\n" + message;
+    }
+
+    console.error(verboseMessage);
+
+    if (error && error.stack) {
+        console.log(error.stack);
+    }
+
+    document.write('<pre data-ca-debug="1" style="border: 2px solid red; margin: 2px;">'
+        + verboseMessage + "\n\n"
+        + (error && error.stack ? error.stack : '')
+        + '</pre>'
+    );
 };
 </script>
 <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.9/es5-shim.min.js"></script><![endif]-->
@@ -70,21 +87,20 @@ window.onerror = function(errorMessage) {
 <body>
     {hook name="index:body"}
         {if $runtime.customization_mode.design}
-            {include file="common/toolbar.tpl" title=__("on_site_template_editing") href="customization.disable_mode?type=design"}
-        {/if}
-        {if $runtime.customization_mode.live_editor}
-            {include file="common/toolbar.tpl" title=__("on_site_live_editing") href="customization.disable_mode?type=live_editor"}
-        {/if}
-        {if "THEMES_PANEL"|defined && !$runtime.customization_mode.live_editor}
-            {include file="demo_theme_selector.tpl"}
+            {include file="common/toolbar.tpl"
+                title=__("on_site_template_editing")
+                href="customization.disable_mode?type=design&return_url={$config.current_url|urlencode}"
+            }
+        {elseif "THEMES_PANEL"|defined || $auth.user_type === "UserTypes::ADMIN"|enum}
+            {include file="backend:components/bottom_panel/bottom_panel.tpl"}
         {/if}
 
-        <div class="ty-tygh {if $runtime.customization_mode.theme_editor}te-mode{/if} {if $runtime.customization_mode.live_editor || $runtime.customization_mode.design || $smarty.const.THEMES_PANEL}ty-top-panel-padding{/if}" id="tygh_container">
+        <div class="ty-tygh {if $runtime.customization_mode.theme_editor}te-mode{/if} {if $runtime.customization_mode.live_editor || $runtime.customization_mode.design || $runtime.customization_mode.block_manager || $smarty.const.THEMES_PANEL}ty-top-panel-padding{/if} bp-tygh-container" id="tygh_container">
 
         {include file="common/loading_box.tpl"}
         {include file="common/notification.tpl"}
 
-        <div class="ty-helper-container" id="tygh_main_container">
+        <div class="ty-helper-container {if $smarty.cookies.pb_is_bottom_panel_open === "true"}bp-tygh-main-container--padding{/if}" id="tygh_main_container">
             {hook name="index:content"}
                  {* NOTE:
                     render_location - call a Smarty function that builds a page structure according to the layout (see Design->Layouts).

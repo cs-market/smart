@@ -12,11 +12,11 @@
             {if "MULTIVENDOR"|fn_allowed_for && $category.disabled}
                 {$category.category}
             {else}
-                <a class="row-status {if $category.status == "N"} manage-root-item-disabled{/if}{if !$category.subcategories} normal{/if}" href="{"categories.update?category_id=`$category.category_id`"|fn_url}"{if !$category.subcategories} style="padding-left: 14px;"{/if} >{$category.category}</a>
+                <a class="row-status {if $category.status == "N"} manage-root-item-disabled{/if}{if !$category.subcategories} normal{/if}" href="{"categories.update?category_id=`$category.category_id`"|fn_url}"{if !$category.subcategories} style="padding-{$direction}: 14px;"{/if} >{$category.category}</a>
             {/if}
         {/if}
     {/capture}
-    <li {if $category.active}class="active"{/if} style="padding-left: {$shift}px;">
+    <li {if $category.active}class="active"{/if} style="padding-{$direction}: {$shift}px;">
     {strip}
         <div class="link">
             {if $category.subcategories}
@@ -30,7 +30,10 @@
     {if $category.subcategories}
         <li class="{if !$expanded} hidden{/if}" id="{$comb_id}">
             {if $category.subcategories}
-            {include file="views/categories/components/categories_links_tree.tpl" categories_tree=$category.subcategories}
+            {include file="views/categories/components/categories_links_tree.tpl"
+                categories_tree=$category.subcategories
+                direction=$direction
+            }
             {/if}
         <!--{$comb_id}--></li>
     {/if}

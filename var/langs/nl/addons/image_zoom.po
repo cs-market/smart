@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/image_zoom.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.11.5/addons/image_zoom.po\n"
+"X-Crowdin-File-ID: 3696\n"
+"PO-Revision-Date: 2020-08-28 13:35\n"
 
 msgctxt "Addons::name::image_zoom"
 msgid "Image zoom"
@@ -24,69 +24,21 @@ msgctxt "SettingsSections::image_zoom::general"
 msgid "General"
 msgstr "Algemeen"
 
-msgctxt "SettingsOptions::image_zoom::cz_opacity"
-msgid "Opacity"
-msgstr "Dekking"
-
 msgctxt "SettingsOptions::image_zoom::cz_animation_time"
 msgid "Animation time"
 msgstr "Animatie tijd"
-
-msgctxt "SettingsOptions::image_zoom::cz_tint_color_picker"
-msgid "Color"
-msgstr "Kleur"
 
 msgctxt "SettingsOptions::image_zoom::cz_zoom_position"
 msgid "Zoom position"
 msgstr "Positie zoom"
 
-msgctxt "SettingsOptions::image_zoom::cz_zoom_size_mode"
-msgid "Zoom size mode"
-msgstr "Zoom grootte"
-
-msgctxt "SettingsOptions::image_zoom::cz_caption_position"
-msgid "Caption position"
-msgstr "Positie onderschrift"
-
-msgctxt "SettingsOptions::image_zoom::cz_ease_time"
-msgid "Ease time"
-msgstr "Versneltijd"
-
-msgctxt "SettingsOptions::image_zoom::cz_zoom_fly_out"
-msgid "Zoom fly out"
-msgstr "Zoom laten uitvliegen"
-
-msgctxt "SettingsTooltips::image_zoom::cz_opacity"
-msgid "Opacity of tint 0-1. If zero, no tint will be visible."
-msgstr "Dekking van tint 0 tot 1. Indien 0 zal er geen tint zichtbaar zijn."
-
 msgctxt "SettingsTooltips::image_zoom::cz_animation_time"
 msgid "Duration of the animation effects in milliseconds."
 msgstr "Duur van animatie-effecten in milliseconden."
 
-msgctxt "SettingsTooltips::image_zoom::cz_tint_color_picker"
-msgid "Color to use for the tint effect. Example: #ffffff."
-msgstr "Te gebruiken kleur voor het tint effect. Bijvoorbeeld: #ffffff."
-
 msgctxt "SettingsTooltips::image_zoom::cz_zoom_position"
-msgid "Specifies position of zoom window. If numeric (0-15), position is relative to page image as shown by the following key (blue squares represent zoom window). If a string is supplied, value will be used as a selector to pinpoint the exact position and size of an element in the page. If the value \"inside\" is specified, the zoom image will appear inside the page image.<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-msgstr "Specificeert de positie van een zoom venster. Als numeriek (0-15), de positie is ten opzichte van de pagina zoals blijkt uit de volgende belangrijke (blauwe vierkanten vertegenwoordigen zoom venster). Indien een tekenreeks wordt toegevoegd, zal de waarde gebruikt worden van selector om de exacte positie en grootte in een pagina kan worden bepaald. Als de waarde \"binnenin\" is gespecificeerd, de zoom afbeelding zal verschijnen binnenin de afbeelding pagina.<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_size_mode"
-msgid "Defines the rule for sizing the zoom window and lens."
-msgstr "Hiermee definieert u de grootte van het zoom-venster en de lens."
-
-msgctxt "SettingsTooltips::image_zoom::cz_caption_position"
-msgid "Position of caption, \"top\" or \"bottom\"."
-msgstr "De positie van onderschrift, boven of onder."
-
-msgctxt "SettingsTooltips::image_zoom::cz_ease_time"
-msgid "Number of milliseconds of mouse easing movement of zoom image. The bigger the number, the more easing. Zero means no easing."
-msgstr "Aantal milliseconden van de muis beweging voor versoepeling zoom afbeelding . Hoe groter het getal, hoe meer versoepeling. Nul betekent geen versoepeling."
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_fly_out"
-msgid "Turns 'flying' zoom animation on or off."
-msgstr "Schakel de animatie 'zoom laten uitvliegen' in of uit."
+msgid "Specifies position of zoom window. The position is relative to image as shown by the following key (blue squares represent zoom window). <br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
+msgstr "Specificeert positie van zoomvenster. De positie is relatief ten opzichte van de afbeelding zoals weergegeven door de volgende toets (blauwe vierkantjes vertegenwoordigen zoomvenster). <br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\"/>"
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::0"
 msgid "Zoom position №0"
@@ -152,31 +104,11 @@ msgctxt "SettingsVariants::image_zoom::cz_zoom_position::15"
 msgid "Zoom position №15"
 msgstr "Zoom positie nr 15"
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::inside"
-msgid "Inside position"
-msgstr "Positie binnen"
+msgctxt "Languages::image_zoom.rework_update_notification.title"
+msgid "Image Zoom add-on reworked"
+msgstr "Image Zoom add-on herwerkt"
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::image"
-msgid "Image"
-msgstr "Even groot als miniatuur"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::lens"
-msgid "Lens"
-msgstr "Middel"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::zoom"
-msgid "Zoom"
-msgstr "Groot"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::full"
-msgid "Full"
-msgstr "Volledig"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::top"
-msgid "Top"
-msgstr "Boven"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::bottom"
-msgid "Bottom"
-msgstr "Onder"
+msgctxt "Languages::image_zoom.rework_update_notification.message"
+msgid "<p>We reworked the <b>Image zoom</b> add-on, because it used a third-party solution incompatible with modern versions of jQuery. As a result of the rework, some settings of the add-on were removed.</p><p>Please check how the image zoom looks on the product pages now. If you'd like to make any changes to the looks, adjust the settings of the <b>Image zoom</b> add-on.</p><p><a href=\"[image_zoom_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Check Image Zoom settings</a></p>"
+msgstr "<p>We hebben de invoegtoepassing <b>Afbeeldingszoom</b> opnieuw bewerkt, omdat deze een oplossing van derden gebruikte die niet compatibel is met moderne versies van jQuery. Als gevolg van het herwerken zijn enkele instellingen van de add-on verwijderd. </p><p>Controleer nu hoe de afbeeldingzoom er op de productpagina's uitziet. Als u het uiterlijk wilt wijzigen, past u de instellingen van de invoegtoepassing <b> Afbeeldingszoom </b> aan. </p><p><a href=\"[image_zoom_settings]\" target=\"_blank\"class=\"btn btn-large btn-primary\">Controleer de instellingen voor Beeldzoomen</a></p>"
 

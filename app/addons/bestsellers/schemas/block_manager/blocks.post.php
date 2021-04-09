@@ -16,6 +16,7 @@ $schema['products']['content']['items']['fillings']['bestsellers'] = array (
     'params' => array (
         'bestsellers' => true,
         'sales_amount_from' => 1,
+        'include_child_variations' => true,
         'sort_by' => 'sales_amount',
         'sort_order' => 'desc',
         'request' => array (

@@ -76,7 +76,7 @@
         }
 
         function setHandler() {
-            $(_.doc).on('change', '.cm-product-filters-checkbox', function () {
+            $(_.doc).on('change', '.cm-product-filters-checkbox:enabled', function () {
                 if (no_trigger) {
                     return false;
                 }
@@ -101,6 +101,19 @@
                 });
 
                 initSlider(context);
+
+                var $color_filter_selectors = context.find('[data-cm-product-color-filter="true"]:has(.cm-product-filters-checkbox:enabled)');
+                if ($color_filter_selectors.length) {
+                    $color_filter_selectors.on('click touch', function (e) {
+                        var $color_filter_selector = $(this),
+                            dependent_checkbox_id = $color_filter_selector.data('caProductColorFilterCheckboxId'),
+                            $dependent_checkbox = $('#' + dependent_checkbox_id);
+
+                        $color_filter_selector.toggleClass('selected');
+                        $dependent_checkbox.prop('checked', !$dependent_checkbox.prop('checked'));
+                        $dependent_checkbox.trigger('change');
+                    });
+                }
             });
 
             $.ceEvent('on', 'ce.filterdate', function (elm, time_from, time_to) {

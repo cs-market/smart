@@ -65,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $thread_data = array(
                 'user_id'                => $auth['user_id'],
+                'storefront_id'          => Tygh::$app['storefront']->storefront_id,
                 'last_message_user_id'   => $auth['user_id'],
                 'last_message_user_type' => $auth['user_type'],
                 'company_id'             => (int) $_REQUEST['thread']['company_id'],
@@ -89,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     fn_vendor_communication_add_thread_message($message, true);
 
                     $success_message = __(
-                        'vendor_communication.new_thread_created',
+                        'vendor_communication.message_sent',
                         array(
                             '[vendor_name]' => fn_get_company_name($thread_data['company_id']),
                             '[thread_url]' => fn_url("vendor_communication.view&thread_id={$thread_id}"),
@@ -136,6 +137,7 @@ if ($mode == 'threads') {
     $view->assign(array(
         'threads' => $threads,
         'search' => $search,
+        'company_id' => Registry::get('runtime.company_id'),
     ));
 
     if (AREA == 'C' && !empty($_REQUEST['active_thread'])) {

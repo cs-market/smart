@@ -1,3 +1,9 @@
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 {if $category_data.category_id}
     {assign var="id" value=$category_data.category_id}
     {assign var="is_trash" value=$category_data.is_trash == 'Y'}
@@ -13,7 +19,9 @@
 
 {capture name="tabsbox"}
 
-<form action="{""|fn_url}" method="post" name="category_update_form" class="form-horizontal form-edit {if ""|fn_check_form_permissions} cm-hide-inputs{/if}" enctype="multipart/form-data">
+{$hide_inputs = ""|fn_check_form_permissions}
+
+<form action="{""|fn_url}" method="post" name="category_update_form" class="form-horizontal form-edit{if $hide_inputs} cm-hide-inputs{/if}" enctype="multipart/form-data">
 <input type="hidden" name="fake" value="1" />
 <input type="hidden" name="category_id" value="{$id}" />
 <input type="hidden" name="selected_section" value="{$smarty.request.selected_section}" />
@@ -254,7 +262,11 @@
     <div class="sidebar-row">
         <h6>{__("categories")}</h6>
         <div class="nested-tree">
-            {include file="views/categories/components/categories_links_tree.tpl" show_all=false categories_tree=$categories_tree}
+            {include file="views/categories/components/categories_links_tree.tpl"
+                show_all=false
+                categories_tree=$categories_tree
+                direction=$direction
+            }
         </div>
     </div>
 {/if}

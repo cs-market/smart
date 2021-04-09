@@ -44,10 +44,10 @@
                         {if !("MULTIVENDOR"|fn_allowed_for && $runtime.company_id && $_u_type != "A") || $hide_inputs}
                             <option value="C" {if $_u_type == "C"}selected="selected"{/if}>{__("customer")}</option>
                         {/if}
+                        {if "MULTIVENDOR"|fn_allowed_for && "profiles.add"|fn_check_view_permissions}
+                            <option value="V" {if $_u_type == "V"}selected="selected"{/if}>{__("vendor_administrator")}</option>
+                        {/if}
                         {if $smarty.const.RESTRICTED_ADMIN != 1 || $user_data.user_id == $auth.user_id}
-                            {if "MULTIVENDOR"|fn_allowed_for}
-                                <option value="V" {if $_u_type == "V"}selected="selected"{/if}>{__("vendor_administrator")}</option>
-                            {/if}
                             {if "ULTIMATE"|fn_allowed_for || $_u_type == "A"}
                                 <option value="A" {if $_u_type == "A"}selected="selected"{/if}>{__("administrator")}</option>
                             {/if}

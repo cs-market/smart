@@ -48,28 +48,42 @@
 
 {strip}
     <div class="ty-top-panel">
-        <div id="minimize_block" class="ty-top-panel__wrapper{if $smarty.cookies.minimize_block} hidden{/if}">
-            <div class="ty-top-panel__logo">
-                <a href="https://www.cs-cart.com/compare.html" class="ty-top-panel__logo-link" target="_blank"><i class="ty-top-panel__icon-basket ty-icon-basket"></i></a>
+        <div id="minimize_block" class="ty-top-panel__wrapper {if $smarty.cookies.minimize_block}hidden{/if}">
+            <div class="ty-top-panel__header">
+                <div class="ty-top-panel__logo">
+                    <a href="https://www.cs-cart.com/compare.html" class="ty-top-panel__logo-link" target="_blank"><i class="ty-top-panel__icon-basket ty-icon-basket"></i></a>
+                </div>
+                <h4 class="ty-top-panel__title">
+                    {__("demo_panel.demo_store_panel")}
+                </h4>
             </div>
-            <h4 class="ty-top-panel__title">
-                {__("demo_panel.demo_store_panel")}
-            </h4>
             <div class="ty-top-panel-action">
                 <span class="ty-top-panel-action_item">
                     <span class="ty-top-panel__timer"> {__("demo_panel.demo_will_be_reset_in")} <strong id="timer"></strong> {__("minutes")}</span>
-                    <a href="{if "ULTIMATE"|fn_allowed_for}{$config.origin_http_location}/{/if}{$config.admin_index}" class="ty-top-panel-btn cm-no-ajax">
+                    <a href="{fn_url("", "A")}" class="ty-top-panel-btn cm-no-ajax">
                         {__("demo_panel.go_admin_panel")}
                     </a>
                     {if "MULTIVENDOR"|fn_allowed_for}
-                        <a href="{$config.vendor_index}" class="ty-top-panel-btn cm-no-ajax">
+                        <a href="{fn_url("", "V")}" class="ty-top-panel-btn cm-no-ajax">
                             {__("demo_panel.go_vendor_panel")}
                         </a>
                     {/if}
                 </span>
 
-                <a href="{$c_url|fn_link_attach:"demo_customize_theme=Y"}" id="setting_customize" class="ty-top-panel-action__setting ty-top-panel-action_item{if $runtime.customization_mode.theme_editor} active{/if}" title="{__("theme_editor.enable")}">
+                <a href="{$c_url|fn_link_attach:"demo_customize_theme=Y"}"
+                   id="settings_theme_editor"
+                   class="ty-top-panel-action__setting ty-top-panel-action_item cm-tooltip {if $runtime.customization_mode.theme_editor}active{/if}"
+                   title="{__("demo_panel.theme_editor.enable", ["[product]" => $smarty.const.PRODUCT_NAME])|escape:html}"
+                >
                     <i class="ty-top-panel-action__icon-setting ty-icon-wrench"></i>
+                </a>
+
+                <a href="{$c_url|fn_link_attach:"demo_block_manager=Y"}"
+                   id="setting_block_manager"
+                   class="ty-top-panel-action__setting ty-top-panel-action_item cm-tooltip {if $runtime.customization_mode.block_manager}active{/if}"
+                   title="{__("demo_panel.block_manager.enable", ["[product]" => $smarty.const.PRODUCT_NAME])|escape:html}"
+                >
+                    <i class="ty-top-panel-action__icon-setting ty-icon-products-without-options ty-top-panel-action__icon-setting--block-manager"></i>
                 </a>
 
                 <a id="off_minimize_block" class="ty-top-panel__close ty-top-panel-action_item cm-combination-panel cm-save-state cm-ss-reverse"><i class="ty-icon-cancel"></i></a>

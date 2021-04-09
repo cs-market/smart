@@ -18,6 +18,7 @@ use Tygh\Registry;
 use Tygh\CompanySingleton;
 use Tygh\Addons\SchemesManager as AddonSchemesManager;
 use Tygh\Themes\Themes;
+use Tygh\Languages\Languages;
 
 /**
  * ProductTabs class
@@ -161,15 +162,16 @@ class ProductTabs extends CompanySingleton
      *   block_id - id of block from Block Manager if tab_type = 'B' @see Bm_Block for additiona information
      *   addon - addon name that created this tab
      *   position - position
-     * 	 status - 'A' (active) or 'D' (disabled)
+     *   status - 'A' (active) or 'D' (disabled)
      *   company_id
      *   name
      *   lang_code
      * )
      *
      *
-     * @param  array         $tab_data Array of product tab data
-     * @return int|db_result Product tab id if new tab was created, DB result otherwise
+     * @param  array $tab_data Array of product tab data
+     *
+     * @return int|bool Product tab id if new tab was created, DB result otherwise
      */
     public function update($tab_data)
     {
@@ -183,9 +185,11 @@ class ProductTabs extends CompanySingleton
 
         /**
          * Actions before update product tab
-         * @param int $tab_id Id of product tab for delete
+         *
+         * @param int   $tab_id   Id of product tab for updated
+         * @param array $tab_data Tab data
          */
-        fn_set_hook('update_product_tab_pre', $tab_id);
+        fn_set_hook('update_product_tab_pre', $tab_id, $tab_data);
 
         $db_result = db_replace_into('product_tabs', $tab_data);
 
@@ -202,6 +206,7 @@ class ProductTabs extends CompanySingleton
 
             /**
              * Actions after product tab was updated
+             *
              * @param int $tab_id Identifier of tab
              */
             fn_set_hook('product_tab_updated', $tab_id);
@@ -210,20 +215,29 @@ class ProductTabs extends CompanySingleton
             $tab_id = $db_result;
 
             if (!empty($tab_data['name']) && !empty($tab_data['lang_code'])) {
-                foreach (fn_get_translation_languages() as $tab_data['lang_code'] => $v) {
+                foreach (Languages::getAll() as $lang_code => $code_description) {
                     $this->_updateDescription($tab_id, array(
-                        'lang_code' => $tab_data['lang_code'],
-                        'name' => $tab_data['name'],
+                        'lang_code' => $lang_code,
+                        'name' => empty($tab_data['lang_var']) ? $tab_data['name'] : __($tab_data['lang_var'], [], $lang_code),
                     ));
                 }
             }
 
             /**
              * Actions after new product tab was created
+             *
              * @param int $tab_id Identifier of new tab
              */
             fn_set_hook('product_tab_created', $tab_id);
         }
+
+        /**
+         * Actions after update product tab
+         *
+         * @param int   $tab_id     Id of product tab for updated
+         * @param array $tab_data   Tab data
+         */
+        fn_set_hook('update_product_tab_post', $tab_id, $tab_data);
 
         return $tab_id;
     }
@@ -236,9 +250,10 @@ class ProductTabs extends CompanySingleton
      *   name (required)
      * )
      *
-     * @param  int           $tab_id      Product tab identifier
-     * @param  array         $description Array of product tab description data
-     * @return int|db_result Product tab id if new tab was created, DB result otherwise
+     * @param  int   $tab_id      Product tab identifier
+     * @param  array $description Array of product tab description data
+     *
+     * @return bool
      */
     private function _updateDescription($tab_id, $description)
     {
@@ -409,7 +424,7 @@ class ProductTabs extends CompanySingleton
 
                         $tab_id = $this->update($tab_data);
 
-                        foreach (fn_get_translation_languages() as $lang_code => $v) {
+                        foreach (Languages::getAll() as $lang_code => $v) {
                             $this->_updateDescription($tab_id, array(
                                 'lang_code' => $lang_code,
                                 'name' => __($name, array(), $lang_code),

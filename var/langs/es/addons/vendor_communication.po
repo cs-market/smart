@@ -5,198 +5,230 @@ msgstr ""
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: es-ES\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_communication.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:11\n"
+"X-Crowdin-File: /release-4.11.5/addons/vendor_communication.po\n"
+"X-Crowdin-File-ID: 3682\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::vendor_communication"
-msgid "Customer-to-Vendor Communication"
+msgid "Ask seller a question"
 msgstr ""
 
 msgctxt "Addons::description::vendor_communication"
-msgid "Allows customers to communicate with vendors directly via the store's interface."
+msgid "Allows customers to ask questions about a product directly from the product page. Seller replies to these questions in the built-in Message Center."
 msgstr ""
 
 msgctxt "SettingsSections::vendor_communication::general"
 msgid "General"
-msgstr ""
-
-msgctxt "SettingsSections::vendor_communication::notifications"
-msgid "Notifications"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_admin"
-msgid "Notify admin"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_vendor"
-msgid "Notify vendor"
-msgstr ""
-
-msgctxt "SettingsOptions::vendor_communication::notify_customer"
-msgid "Notify customer"
-msgstr ""
+msgstr "General"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_product"
 msgid "Contact button on product pages"
-msgstr ""
+msgstr "Botón de contacto en las páginas de productos"
 
 msgctxt "SettingsOptions::vendor_communication::show_on_vendor"
 msgid "Contact button in vendor microstore"
-msgstr ""
+msgstr "Botón de contacto en el proveedor de la microtienda"
 
-msgctxt "SettingsTooltips::vendor_communication::notify_admin"
-msgid "Send an email to root administrator about every newly-posted message."
-msgstr ""
-
-msgctxt "SettingsTooltips::vendor_communication::notify_vendor"
-msgid "Send emails to vendor's contact email address about newly-posted messages."
-msgstr ""
-
-msgctxt "SettingsTooltips::vendor_communication::notify_customer"
-msgid "Send emails to customers about newly-posted messages in their threads."
+msgctxt "SettingsOptions::vendor_communication::show_on_messages"
+msgid "Contact button at \"Messages\" menu"
 msgstr ""
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_product"
-msgid "Show the \"Contact vendor\" button on product pages."
+msgid "Show the \"Ask a question\" button on product pages."
 msgstr ""
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_vendor"
-msgid "Show the \"Contact vendor\" button in vendors' microstores."
+msgid "Show the \"Ask a question\" button in vendors' microstores."
 msgstr ""
 
 msgctxt "Languages::vendor_communication.messages"
 msgid "Messages"
-msgstr ""
+msgstr "Mensajes"
 
 msgctxt "Languages::vendor_communication.message_center"
 msgid "Message center"
+msgstr "Centro de mensajes"
+
+msgctxt "Languages::vendor_communication.message_center_name"
+msgid "Message center"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.message_center_name_menu_description"
+msgid "Messages from customers"
 msgstr ""
 
 msgctxt "Languages::vendor_communication.message_center_menu_description"
 msgid "Customer-to-vendor messages"
-msgstr ""
+msgstr "Mensajes de cliente a vendedor"
 
 msgctxt "Languages::vendor_communication.author"
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 msgctxt "Languages::vendor_communication.date"
 msgid "Date"
-msgstr ""
+msgstr "Fecha"
 
 msgctxt "Languages::vendor_communication.message"
 msgid "Message"
-msgstr ""
+msgstr "Mensaje"
 
 msgctxt "Languages::vendor_communication.contact_vendor"
 msgid "Contact vendor"
+msgstr "Comuníquese con el proveedor"
+
+msgctxt "Languages::vendor_communication.ask_a_question"
+msgid "Ask a question"
 msgstr ""
 
 msgctxt "Languages::vendor_communication.contact_vendor_name"
 msgid "Contact [vendor_name]"
-msgstr ""
+msgstr "Contacto [vendor_name]"
 
 msgctxt "Languages::vendor_communication.created_at"
 msgid "Created on"
-msgstr ""
+msgstr "Creado en"
 
 msgctxt "Languages::vendor_communication.new_thread_created"
 msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>The vendor's reply will be sent to the email address of your account. To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
+msgstr "Su mensaje ha sido enviado a<b>[vendor_name]</b><br/><br/>La respuesta del vendedor se enviará a la dirección de correo electrónico de su cuenta. Para ver el historial de su mensaje, por favor <a href=\"[thread_url]\">vaya al Centro de Mensajes</a>ubicado en la sección de \"Mensajes\" del menú de \"Mi cuenta\"."
+
+msgctxt "Languages::vendor_communication.message_sent"
+msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>We'll notify you about a reply. To view your message history, please <a href=\"[thread_url]\" target=\"_blank\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
 msgstr ""
 
 msgctxt "Languages::vendor_communication.cannot_update_thread"
 msgid "Cannot update thread"
-msgstr ""
+msgstr "No puede actualizarse el hilo de la discusión"
 
 msgctxt "Languages::vendor_communication.cannot_create_thread"
 msgid "Cannot create thread"
-msgstr ""
+msgstr "No se puede generar un hilo de discusión"
 
 msgctxt "Languages::email_template.vendor_communication.notify_admin"
-msgid "Customer-to-Vendor Communication: Admin Notification"
+msgid "Ask seller a question: Admin Notification"
 msgstr ""
 
 msgctxt "Languages::email_template.vendor_communication.notify_customer"
-msgid "Customer-to-Vendor Communication: Customer Notification"
+msgid "Ask seller a question: Customer Notification"
 msgstr ""
 
 msgctxt "Languages::vendor_communication.you_have_new_message"
 msgid "You have a new <a href=\"[thread_url]\">message</a> from [message_from]."
-msgstr ""
+msgstr "Tiene un nuevo<a href=\"[thread_url]\">mensaje</a>de[message_from]."
 
 msgctxt "Languages::vendor_communication.subject_email"
 msgid "You have a new message from [message_from]"
-msgstr ""
+msgstr "Tiene un nuevo mensaje de[message_from]"
 
 msgctxt "Languages::vendor_communication.thread"
 msgid "Thread #[thread_id]"
-msgstr ""
+msgstr "Hilo de discusión #[thread_id]"
 
 msgctxt "Languages::vendor_communication.contact_with"
 msgid "#[thread_id]. Communication with [thread_company]"
-msgstr ""
+msgstr "#[thread_id]. Comunicación con [thread_company]"
 
 msgctxt "Languages::vendor_communication.ticket"
 msgid "Thread"
-msgstr ""
+msgstr "Hilo de discusión"
 
 msgctxt "Languages::vendor_communication.no_messages_found"
 msgid "No messages found"
-msgstr ""
+msgstr "No se encontraron mensajes"
 
 msgctxt "Languages::vendor_communication.customer_name"
 msgid "Customer name"
-msgstr ""
+msgstr "Nombre del cliente"
 
 msgctxt "Languages::vendor_communication.error_message"
 msgid "Please enter your message"
-msgstr ""
+msgstr "Por favor ingrese su mensaje"
 
 msgctxt "Languages::vendor_communication.type_message"
 msgid "Type a message..."
-msgstr ""
+msgstr "Escriba un mensaje..."
 
 msgctxt "Languages::vendor_communication.you"
 msgid "You"
-msgstr ""
+msgstr "Tú"
 
 msgctxt "Languages::vendor_communication.thread_deleted"
 msgid "Thread has been deleted"
-msgstr ""
+msgstr "El hilo de la discusión ha sido eliminado"
 
 msgctxt "Languages::vendor_communication.threads_deleted"
 msgid "Threads have been deleted"
-msgstr ""
+msgstr "El hilo de la discusión ha sido eliminado"
 
 msgctxt "Languages::vendor_communication.cannot_delete_thread"
 msgid "Cannot delete thread"
-msgstr ""
+msgstr "No se puede eliminar el hilo de discusión"
 
 msgctxt "Languages::vendor_communication.cannot_delete_threads"
 msgid "Cannot delete threads"
-msgstr ""
+msgstr "No se pueden eliminar los hilos de discusión"
 
 msgctxt "Languages::vendor_communication.cannot_post_message"
 msgid "Cannot post message"
-msgstr ""
+msgstr "No se puede enviar el mensaje"
 
 msgctxt "Languages::vendor_communication.no_threads_found"
 msgid "No threads found"
-msgstr ""
+msgstr "No se encontraron hilos de discusión"
 
 msgctxt "Languages::vendor_communication.required_field_is_missing"
 msgid "The [field_name] field is required"
-msgstr ""
+msgstr "El campo [field_name] es requerido"
 
 msgctxt "Languages::vendor_communication.invalid_thread_object_type"
 msgid "Provided thread object type is invalid"
-msgstr ""
+msgstr "El tipo de objeto del hilo de discusión proporcionado es invalido"
 
 msgctxt "Languages::vendor_communication.please_log_in_to_contact_vendor"
 msgid "Please sign in to contact the vendor"
+msgstr "Por favor inicie su sesión para contactar al vendedor"
+
+msgctxt "Languages::privileges.manage_vendor_communication"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privileges.view_vendor_communication"
+msgid "Can view"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.vendor_communication"
+msgid "Message center"
+msgstr "Centro de mensajes"
+
+msgctxt "Languages::vendor_communication.your_message_to_vendor_name"
+msgid "Your message to [vendor_name]"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.please_log_in_to_be_notified"
+msgid "Please sign in so that we can notify you about a reply"
+msgstr ""
+
+msgctxt "Languages::vendor_communication"
+msgid "Ask seller a question"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.event.message_received.name"
+msgid "New message received"
+msgstr ""
+
+msgctxt "Languages::internal_template.vendor_communication_message_received"
+msgid "New message received"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.new_message.title"
+msgid "[company_name] has a new message from [customer]"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.new_message.message"
+msgid "Click this notification to see the message"
 msgstr ""
 

@@ -1,1 +1,0 @@
-{script src="js/addons/rus_pickup/yandex.js"}

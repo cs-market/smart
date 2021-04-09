@@ -22,5 +22,6 @@ fn_register_hooks(
     'pre_add_to_cart',
     'get_carts',
     'get_additional_information',
-    'sucess_user_login'
+    'sucess_user_login',
+    'save_cart_content_pre'
 );

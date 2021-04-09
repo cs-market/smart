@@ -275,3 +275,7 @@ msgstr "Pickup"
 msgctxt "Languages::yandex_delivery.courier"
 msgid "Courier"
 msgstr "Courier"
+
+msgctxt "Languages::yandex_delivery.no_shipping_services_selected"
+msgid "At least one shipping service must be selected on the Configure tab of the shipping method configuration page"
+msgstr "At least one shipping service must be selected on the Configure tab of the shipping method configuration page"

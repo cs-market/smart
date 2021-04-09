@@ -13,13 +13,13 @@
     {$_come_from = $come_from}
 {/if}
 
-{if $language_direction == 'rtl'}
-    {$direction = 'right'}
+{if $language_direction == "rtl"}
+    {$direction = "right"}
 {else}
-    {$direction = 'left'}
+    {$direction = "left"}
 {/if}
 
-<table width="100%" class="table table-tree table-middle table-nobg table-responsive">
+<table width="100%" class="table table-tree table-middle table--relative table-nobg table-responsive">
 {if $header && !$hide_header}
 {assign var="header" value=""}
 <thead>
@@ -46,7 +46,7 @@
 </tr>
 </thead>
 {/if}
-<tr class="cm-row-status-{$page.status|lower}" {if $page.level > 0 && $search.get_tree == "multi_level"}class="multiple-table-row"{/if}>
+<tr class="cm-row-status-{$page.status|lower}{if $page.level > 0 && $search.get_tree == "multi_level"} multiple-table-row{/if}">
     <td class="left mobile-hide" width="3%">
         {if $display == "radio"}
         <input type="radio" name="{$checkbox_name}" id="radio_{$page.page_id}" value="{$page.page_id}" class="cm-item" />

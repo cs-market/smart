@@ -12,9 +12,11 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Addons\GiftCertificates\Notifications\EventIdProviders\CertificateProvider;
 use Tygh\Registry;
+use Tygh\Tygh;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 if ($_SERVER['REQUEST_METHOD']	== 'POST') {
 
@@ -168,58 +170,4 @@ if ($mode == 'add') {
 
     Tygh::$app['view']->assign('gift_certificates', $gift_certificates);
     Tygh::$app['view']->assign('search', $search);
-}
-
-
-function fn_update_gift_certificate($gift_cert_data, $gift_cert_id = 0, $params = array())
-{
-    fn_correct_gift_certificate($gift_cert_data);
-
-    $gift_cert_data['products'] = !empty($gift_cert_data['products']) ? serialize($gift_cert_data['products']) : '';
-
-    if (empty($gift_cert_id)) {
-        do {
-            $code = fn_generate_gift_certificate_code();
-        } while (true == fn_check_gift_certificate_code($code));
-
-        $gift_cert_data = fn_array_merge($gift_cert_data, array(
-            'gift_cert_code' => $code,
-            'timestamp' => TIME)
-        );
-
-        if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
-            $gift_cert_data['company_id'] = Registry::get('runtime.company_id');
-        }
-
-        $gift_cert_id = db_query("INSERT INTO ?:gift_certificates ?e", $gift_cert_data);
-    } else {
-
-        // Change certfificate status
-        fn_change_gift_certificate_status($gift_cert_id, $gift_cert_data['status'], '', fn_get_notification_rules(array(), false));
-
-        //if difference then add line in log
-        $debit_info = db_get_row("SELECT debit AS amount, debit_products AS products FROM ?:gift_certificates_log WHERE gift_cert_id = ?i ORDER BY timestamp DESC", $gift_cert_id);
-
-        if (empty($debit_info)) {
-            $debit_info = db_get_row("SELECT amount, products FROM ?:gift_certificates WHERE gift_cert_id = ?i", $gift_cert_id);
-        }
-
-        $is_diff = (($gift_cert_data['amount'] - $debit_info['amount'] != 0) || (md5($gift_cert_data['products']) != md5($debit_info['products'])));
-        if ($is_diff == true) {
-            $_info = array(
-                'amount' => $gift_cert_data['amount'],
-                'products' => $gift_cert_data['products']
-            );
-            fn_add_gift_certificate_log_record($gift_cert_id, $debit_info, $_info);
-        }
-
-        //Update certificate data
-        $_data = $gift_cert_data;
-        db_query("UPDATE ?:gift_certificates SET ?u WHERE gift_cert_id = ?i", $gift_cert_data, $gift_cert_id);
-    }
-
-    $gc_data = fn_get_gift_certificate_info($gift_cert_id);
-    fn_gift_certificate_notification($gc_data, fn_get_notification_rules($params));
-
-    return $gift_cert_id;
 }

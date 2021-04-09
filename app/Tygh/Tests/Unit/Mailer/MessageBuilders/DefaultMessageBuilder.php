@@ -34,4 +34,9 @@ class DefaultMessageBuilder extends \Tygh\Mailer\MessageBuilders\DefaultMessageB
     {
         return MessageBuilder::validateAddressTest($email);
     }
+
+    public function getStorefrontId()
+    {
+        return 1;
+    }
 }

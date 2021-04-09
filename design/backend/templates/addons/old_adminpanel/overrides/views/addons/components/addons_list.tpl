@@ -122,6 +122,11 @@
                             {if $a.snapshot_correct}
                                 href="{"addons.install?addon=`$key`&redirect_url=`$c_url|escape:url`"|fn_url}"
                                 data-ca-target-id="addons_list,header_navbar,header_subnav,addons_counter"
+                            {elseif "MULTIVENDOR"|fn_allowed_for}
+                                {$promo_popup_title = __("mve_plus_license_required", ["[product]" => $smarty.const.PRODUCT_NAME])}
+
+                                href="{"functionality_restrictions.mve_plus_license_required"|fn_url}"
+                                data-ca-dialog-title="{$promo_popup_title}"
                             {else}
                                 {$promo_popup_title = __("ultimate_license_required", ["[product]" => $smarty.const.PRODUCT_NAME])}
 

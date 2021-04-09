@@ -15,7 +15,7 @@
 
         <div class="clearfix"><br><br>
             <div class="table-responsive-wrapper">
-                <table class="table table-middle table-responsive table-responsive-w-titles">
+                <table class="table table-middle table--relative table-responsive table-responsive-w-titles">
                 {foreach from=$questions key="k" item="q"}
                     {if !"ULTIMATE"|fn_allowed_for || $page_data|fn_allow_save_object:"pages"}
                         {include file="common/object_group.tpl"

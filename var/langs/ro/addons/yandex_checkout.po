@@ -1,0 +1,73 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Romanian\n"
+"Language: ro_RO\n"
+
+msgctxt "Addons::name::yandex_checkout"
+msgid "Yandex.Checkout"
+msgstr "Yandex.Checkout"
+
+msgctxt "Addons::description::yandex_checkout"
+msgid "Allows you to accept payments via Yandex.Checkout"
+msgstr "Allows you to accept payments via Yandex.Checkout"
+
+msgctxt "Languages::yandex_checkout.url_for_payment_notifications"
+msgid "URL for payment notifications"
+msgstr "URL for payment notifications"
+
+msgctxt "Languages::yandex_checkout.server_https"
+msgid "<b>SSL certificate is necessary to receive payments. Self-signed SSL certificate is allowed (<a target=\"_blank\" href=\"http://en.wikipedia.org/wiki/Self-signed_certificate\">Self-signed certificate</a>)</b>"
+msgstr "<b>SSL certificate is necessary to receive payments. Self-signed SSL certificate is allowed (<a target=\"_blank\" href=\"http://en.wikipedia.org/wiki/Self-signed_certificate\">Self-signed certificate</a>)</b>"
+
+msgctxt "Languages::yandex_checkout.send_receipt_to_yandex"
+msgid "Send receipt data to Yandex.Checkout (Federal Law 54)"
+msgstr "Send receipt data to Yandex.Checkout (Federal Law 54)"
+
+msgctxt "Languages::yandex_checkout.available_only_for_rub"
+msgid "Available only when Russian Ruble is selected for the сurrency"
+msgstr "Available only when Russian Ruble is selected for the сurrency"
+
+msgctxt "Languages::yandex_checkout.shop_id"
+msgid "shopId"
+msgstr "shopId"
+
+msgctxt "Languages::yandex_checkout.shop_id_notice"
+msgid "Copy shopId from your Yandex.Checkout account"
+msgstr "Copy shopId from your Yandex.Checkout account"
+
+msgctxt "Languages::yandex_checkout.secret_key_api"
+msgid "Secret API key"
+msgstr "Secret API key"
+
+msgctxt "Languages::yandex_checkout.secret_key_api_notice"
+msgid "Copy secret API key from your Yandex.Checkout account"
+msgstr "Copy secret API key from your Yandex.Checkout account"
+
+msgctxt "Languages::yandex_checkout.confirmed_order_status"
+msgid "Order status for forming final receipt"
+msgstr "Order status for forming final receipt"
+
+msgctxt "Languages::yandex_checkout.yandex_checkout"
+msgid "Yandex.Checkout"
+msgstr "Yandex.Checkout"
+
+msgctxt "Languages::yandex_checkout.check_payment_status"
+msgid "Checking payment status, please wait"
+msgstr "Checking payment status, please wait"
+
+msgctxt "Languages::yandex_checkout.payment_processing"
+msgid "Payment processing"
+msgstr "Payment processing"
+
+msgctxt "Languages::yandex_checkout.payment_status_not_final"
+msgid "Sorry, we couldn't confirm the status of your payment with Yandex.Checkout. Please try again later, use another payment method, or contact us about this problem."
+msgstr "Sorry, we couldn't confirm the status of your payment with Yandex.Checkout. Please try again later, use another payment method, or contact us about this problem."
+
+msgctxt "Languages::yandex_checkout.notification_received"
+msgid "Notification received"
+msgstr "Notification received"
+
+msgctxt "Languages::yandex.checkout.confirmed_order_status.notice"
+msgid "This status means that the product has been delivered, or that the service has been rendered in full."
+msgstr "This status means that the product has been delivered, or that the service has been rendered in full."

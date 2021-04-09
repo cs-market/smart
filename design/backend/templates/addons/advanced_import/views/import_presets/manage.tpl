@@ -9,7 +9,7 @@
             {include file="common/pagination.tpl"}
 
             <div class="table-responsive-wrapper">
-                <table width="100%" class="table table-middle table-responsive">
+                <table width="100%" class="table table-middle table--relative table-responsive">
                     <thead>
                     <tr>
                         <th class="left import-preset__checker mobile-hide">{include file="common/check_items.tpl"}</th>
@@ -50,8 +50,9 @@
             {if $presets}
                 <li>
                     {btn type="delete_selected"
-                         dispatch="dispatch[import_presets.m_delete]"
-                         form="manage_import_presets_form"
+                        dispatch="dispatch[import_presets.m_delete]"
+                        form="manage_import_presets_form"
+                        data=["data-ca-confirm-text" => "{__("advanced_import.file_will_be_deleted_are_you_sure_to_proceed")}"]
                     }
                 </li>
             {/if}
@@ -77,11 +78,4 @@
          adv_buttons=$smarty.capture.adv_buttons
 }
 
-{capture name="popups_content"}
-    {$smarty.capture.popups nofilter}
-{/capture}
-
-{include file="addons/advanced_import/views/import_presets/components/form.tpl"
-         wrapper_content=$smarty.capture.popups_content
-         wrapper_extra_id="_popups"
-}
+{$smarty.capture.popups nofilter}

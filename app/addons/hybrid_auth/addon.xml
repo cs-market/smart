@@ -53,8 +53,8 @@
         </item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:hybrid_auth_users;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:hybrid_auth_providers;</item>
-        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_providers', 'Y', 'addons')</item>
-        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('view_providers', 'Y', 'addons')</item>
+        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_providers', 'Y', 'website', 'social_login', 'N')</item>
+        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_providers', 'Y', 'website', 'social_login', 'Y')</item>
         <item for="uninstall">DELETE FROM ?:privileges WHERE privilege = 'manage_providers'</item>
         <item for="uninstall">DELETE FROM ?:privileges WHERE privilege = 'view_providers'</item>
     </queries>
@@ -68,7 +68,7 @@
                 <default_template><![CDATA[{{ snippet("header") }}
 
 {% if user_data.firstname %}
-{{ __("dear") }} {{ user_data.firstname }},
+{{__("hello_name", {"[name]" : user_data.firstname})}}
 {% else %}
 {{ __("hello") }},
 {% endif %}

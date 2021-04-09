@@ -1,8 +1,13 @@
 (function($, _) {
-    $(_.doc).on('keyup', '.cm-seo-check-changed', function(){
+    $( $('.cm-seo-check-changed-block-container', _.doc) ).on('keyup', '.cm-seo-check-changed', function(){
         var self = $(this);
         if (self.prop('defaultValue') !== '') {
-            self.parent().find('.cm-seo-check-changed-block').switchAvailability(self.val() == self.prop('defaultValue'), true);
+            self.parents('.cm-seo-check-changed-block-container')
+                .find('.cm-seo-check-changed-block')
+                .switchAvailability(
+                    self.val() == self.prop('defaultValue'), 
+                    true
+                );
         }
     });
 

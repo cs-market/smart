@@ -1,10 +1,10 @@
 {assign var="discussion" value=$object_id|fn_get_discussion:$object_type:true:$smarty.request}
-{if $object_type == "P"}
-{$new_post_title = __("write_review")}
+{if $object_type == "Addons\\Discussion\\DiscussionObjectTypes::ORDER"|enum}
+    {$new_post_title = __("new_post")}
 {else}
-{$new_post_title = __("new_post")}
+    {$new_post_title = __("write_review")}
 {/if}
-{if $discussion && $discussion.type != "D"}
+{if $discussion && $discussion.type != "Addons\\Discussion\\DiscussionTypes::TYPE_DISABLED"|enum}
     <div class="discussion-block" id="{if $container_id}{$container_id}{else}content_discussion{/if}">
         {if $wrap == true}
             {capture name="content"}
@@ -23,7 +23,9 @@
                         {hook name="discussion:items_list_row"}
                         <div class="ty-discussion-post {cycle values=", ty-discussion-post_even"}" id="post_{$post.post_id}">
 
-                            {if $discussion.type == "C" || $discussion.type == "B"}
+                            {if $discussion.type == "Addons\\Discussion\\DiscussionTypes::TYPE_COMMUNICATION"|enum
+                                || $discussion.type == "Addons\\Discussion\\DiscussionTypes::TYPE_COMMUNICATION_AND_RATING"|enum
+                            }
                                 <div class="ty-discussion-post__message">{$post.message|escape|nl2br nofilter}</div>
                             {/if}
 
@@ -32,7 +34,10 @@
                         </div>
                         <span class="ty-discussion-post__author">{$post.name}</span>
                         <span class="ty-discussion-post__date">{$post.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</span>
-                        {if $discussion.type == "R" || $discussion.type == "B" && $post.rating_value > 0}
+                        {if $discussion.type == "Addons\\Discussion\\DiscussionTypes::TYPE_RATING"|enum
+                            || $discussion.type == "Addons\\Discussion\\DiscussionTypes::TYPE_COMMUNICATION_AND_RATING"|enum
+                            && $post.rating_value > 0
+                        }
                             <div class="clearfix ty-discussion-post__rating">
                                 {include file="addons/discussion/views/discussion/components/stars.tpl" stars=$post.rating_value|fn_get_discussion_rating}
                             </div>
@@ -41,20 +46,20 @@
                     </div>
                 {/foreach}
 
-
                 {include file="common/pagination.tpl" id="pagination_contents_comments_`$object_id`" extra_url="&selected_section=discussion" search=$discussion.search}
             {else}
                 <p class="ty-no-items">{__("no_posts_found")}</p>
             {/if}
         <!--posts_list_{$object_id}--></div>
 
-        {if "CRB"|strpos:$discussion.type !== false && !$discussion.disable_adding}
-            <div class="ty-discussion-post__buttons buttons-container">
-                {include file="buttons/button.tpl" but_id="opener_new_post" but_text=$new_post_title but_role="submit" but_target_id="new_post_dialog_`$obj_id`" but_meta="cm-dialog-opener cm-dialog-auto-size ty-btn__primary" but_rel="nofollow"}
-            </div>
-            {if $object_type != "P"}
-                {include file="addons/discussion/views/discussion/components/new_post.tpl" new_post_title=$new_post_title}
-            {/if}
+        {if $discussion.type !== "Addons\\Discussion\\DiscussionTypes::TYPE_DISABLED"|enum}
+            {include
+                file="addons/discussion/views/discussion/components/new_post_button.tpl"
+                name=$new_post_title
+                obj_id=$object_id
+                object_type=$discussion.object_type
+                locate_to_review_tab=$locate_to_review_tab
+            }
         {/if}
 
         {if $wrap == true}

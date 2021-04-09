@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/rma.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.11.5/addons/rma.po\n"
+"X-Crowdin-File-ID: 3688\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "Addons::name::rma"
 msgid "RMA"
@@ -34,11 +34,11 @@ msgstr "Запити на повернення не знайдені"
 
 msgctxt "Languages::returned_product"
 msgid "Returned product"
-msgstr "Повернуті товари"
+msgstr "Повернутий товар"
 
 msgctxt "Languages::returns"
 msgid "Returns"
-msgstr "Повернуті"
+msgstr "Повернення"
 
 msgctxt "Languages::returns_info"
 msgid "Returns info"
@@ -97,8 +97,12 @@ msgid "Go to the list of your return requests"
 msgstr "Перейти до списку запитів на повернення товарів"
 
 msgctxt "Languages::privileges.manage_rma"
-msgid "Manage RMA system"
-msgstr "Управління системою повернення товарів"
+msgid "Can edit"
+msgstr "Можна редагувати"
+
+msgctxt "Languages::privilege_groups.rma"
+msgid "Return merchandise authorization (RMA)"
+msgstr "Дозвіл на повернення товару (RMA)"
 
 msgctxt "Languages::text_return_change_warning"
 msgid "The status of return #[return_id] will be changed"
@@ -202,13 +206,13 @@ msgstr "Не враховувати вихідні при підрахунку �
 
 msgctxt "Languages::email_template.rma_slip_notification"
 msgid "RMA slip"
-msgstr ""
+msgstr "Повернення товарів: упаковочний реєстр"
 
 msgctxt "Languages::template_document_rma_packing_slip_default"
 msgid "Return request: packing slip"
-msgstr ""
+msgstr "Повернення товарів: упаковочний лист"
 
 msgctxt "Languages::document_preview_return_request_not_found"
 msgid "Couldn't find a return request. Preview only works with existing data. Please create a return request and use Preview again."
-msgstr ""
+msgstr "Немає створених запитів на повернення. Попередній перегляд працює тільки при наявності доступних даних. Будь ласка, створіть запит і знову скористайтеся функцією попереднього перегляду."
 

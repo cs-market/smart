@@ -27,7 +27,7 @@
     <input id="b{$data_id}_ids" type="hidden" name="{$input_name}" value="{if $item_ids}{","|implode:$item_ids}{/if}" class="input-micro" />
     {/if}
     <div class="table-wrapper">
-        <table width="100%" class="table table-middle">
+        <table width="100%" class="table table-middle table--relative">
         <thead>
             <tr>
                 {if $positions}<th>{__("position_short")}</th>{/if}

@@ -1,5 +1,5 @@
 {hook name="order_management:payment_method"}
-    {if $settings.General.min_order_amount <= $cart.total}
+    {if $settings.Checkout.min_order_amount <= $cart.total}
         {if $cart.total != 0}
         <div class="control-group">
             <div class="control-label">
@@ -25,9 +25,9 @@
             {/if}
         {/if}
         {/if}
-    {elseif $settings.General.min_order_amount > $cart.total}
+    {elseif $settings.Checkout.min_order_amount > $cart.total}
         <label class="text-error">
-            {__("text_min_order_amount_required")}&nbsp;<span>{include file="common/price.tpl" value=$settings.General.min_order_amount}</span>
+            {__("text_min_order_amount_required")}&nbsp;<span>{include file="common/price.tpl" value=$settings.Checkout.min_order_amount}</span>
         </label>
     {/if}
 {/hook}

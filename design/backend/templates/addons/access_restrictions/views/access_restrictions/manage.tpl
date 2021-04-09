@@ -20,7 +20,7 @@
 {include file="common/pagination.tpl" save_current_url=true}
 {if $rules}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         {hook name="access_restrictions:item_fields_header"}
@@ -77,7 +77,7 @@
 
 {if $rules}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="1%" class="mobile-hide">

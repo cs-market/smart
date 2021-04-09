@@ -32,7 +32,7 @@
                     </item>
                     <item id="gdpr_settings_data">
                         <type>hidden</type>
-                        <default_value><![CDATA[{"checkout_place_order":{"enable":"Y"},"checkout_profiles_update":{"enable":"Y"},"user_registration":{"enable":"Y"},"profiles_update":{"enable":"Y"},"product_subscription":{"enable":"Y"},"apply_for_vendor":{"enable":"Y"},"newsletters_subscribe":{"enable":"Y"},"call_requests":{"enable":"Y"},"discussions_add_review":{"enable":"Y"}}]]></default_value>
+                        <default_value><![CDATA[{"checkout_place_order":{"enable":"Y"},"checkout_profiles_update":{"enable":"N"},"user_registration":{"enable":"Y"},"profiles_update":{"enable":"Y"},"product_subscription":{"enable":"Y"},"apply_for_vendor":{"enable":"Y"},"newsletters_subscribe":{"enable":"Y"},"call_requests":{"enable":"Y"},"discussions_add_review":{"enable":"Y"}}]]></default_value>
                     </item>
                 </items>
             </section>

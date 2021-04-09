@@ -6,7 +6,7 @@
             {foreach from=$found_objects key="object" item="data"}
                 {capture name="buttons"}
                     {$smarty.capture.buttons nofilter}
-                    <div class="cm-tab-tools btn-bar btn-toolbar" id="tools_manage_{$object}_buttons">
+                    <div class="cm-tab-tools btn-bar btn-toolbar dropleft" id="tools_manage_{$object}_buttons">
                     <!--tools_{$object}_buttons--></div>
                 {/capture}
             {/foreach}

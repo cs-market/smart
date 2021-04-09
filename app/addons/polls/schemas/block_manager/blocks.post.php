@@ -36,6 +36,7 @@ $schema['polls'] = array (
     'cache' => array (
         'update_handlers' => array ('polls', 'polls_answers', 'polls_votes', 'poll_descriptions', 'poll_items'),
     ),
+    'brief_info_function' => 'fn_block_get_block_with_items_info'
 );
 
 return $schema;

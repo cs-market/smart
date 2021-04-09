@@ -215,3 +215,11 @@ msgstr "To access payments from your customers, please confirm your email addres
 msgctxt "Languages::paypal.addon_is_disabled_notice"
 msgid "The <b>PayPal payments</b> add-on is disabled so you can't configure this payment method."
 msgstr "The <b>PayPal payments</b> add-on is disabled so you can't configure this payment method."
+
+msgctxt "Languages::addons.paypal.3d_secure_mandatory_notice"
+msgid "3-D secure is mandatory in the United Kingdom."
+msgstr "3-D secure is mandatory in the United Kingdom."
+
+msgctxt "Languages::paypal.show_cart_button"
+msgid "Show the \"Checkout with PayPal\" button on the cart contents page"
+msgstr "Show the \"Checkout with PayPal\" button on the cart contents page"

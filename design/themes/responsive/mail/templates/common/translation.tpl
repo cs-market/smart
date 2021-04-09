@@ -44,7 +44,6 @@
         cart_language: '{$smarty.const.CART_LANGUAGE}',
         default_language: '{$smarty.const.DEFAULT_LANGUAGE}',
         cart_prices_w_taxes: {if ($settings.Appearance.cart_prices_w_taxes == 'Y')}true{else}false{/if},
-        theme_name: '{$settings.theme_name|escape:javascript nofilter}',
         current_url: '{$config.current_url|escape:javascript nofilter}'
     });
 

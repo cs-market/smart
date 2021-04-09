@@ -8,7 +8,7 @@
             checkType: function() {
                 var feature_id = $(this).data('caFeatureId');
                 var value = $(this).prop('value');
-                var default_value = $('option', $(this)).map(function() {
+                var default_value = $(this).data('caDefaultValue') || $('option', $(this)).map(function() {
                     if (this.defaultSelected == true) {
                         return this;
                     }

@@ -4,10 +4,11 @@
         {if $request_active_consent}
             {$checkbox_uniq_id = "accept_subscribe_policy_"|uniqid}
 
-            <input id="{$checkbox_uniq_id}" type="checkbox"/>
+            <input id="{$checkbox_uniq_id}" type="checkbox" data-ca-error-message-target-node="#{$checkbox_uniq_id}_error_message_target" />
             <label for="{$checkbox_uniq_id}" class="cm-required control-label ty-lable-subscribe-policy">
                 {$subscribe_text_policy nofilter}
             </label>
+            <span id="{$checkbox_uniq_id}_error_message_target"></span>
         {else}
             {if $autoclicked}
                 <label for="elm_personal_data" class="control-label ty-lable-subscribe-policy">{$subscribe_text_policy nofilter}</label>

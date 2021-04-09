@@ -7,7 +7,7 @@
 {capture name="general"}
 <div class="clearfix">
     <div class="span6">
-        {include file="common/subheader.tpl" title="{__(app_params)}"}
+        {include file="common/subheader.tpl" title=__("app_params")}
 
         <div class="control-group">
             <label class="control-label" for="m_settings_app_settings_utility_shopName">{__("mobile_app.shopName")}:</label>
@@ -35,12 +35,25 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="m_settings_app_settings_utility_fcmApiKey">{__("mobile_app.fcmApiKey")}:</label>
+            <label class="control-label" for="m_settings_app_settings_utility_fcm_api_key">{__("mobile_app.fcm_api_key")} {include file="common/tooltip.tpl" tooltip=__("mobile_app.fcm_api_key_tooltip", ["[bundle_id]" => $config_data.bundle_id|default:""])}:</label>
             <div class="controls">
                 <input type="text" name="m_settings[app_settings][utility][fcmApiKey]"
                     value="{$config_data.app_settings.utility.fcmApiKey}"
-                    id="m_settings_app_settings_utility_fcmApiKey"
+                    id="m_settings_app_settings_utility_fcm_api_key"
                 />
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="m_settings_app_settings_utility_services_config">{__("mobile_app.services_config")} {include file="common/tooltip.tpl" tooltip=__("tt_mobile_app.services_config")}:</label>
+            <div class="controls">
+                {if $config_data.google_config_file_uploaded}
+                    <a href="{"mobile_app.get_google_config_file"|fn_url}">google-services.json</a>
+                        <a class="cm-post" href="{"mobile_app.delete_google_config_file"|fn_url}">
+                            <i alt="{__("remove_this_item")}" title="{__("remove_this_item")}" class="icon-remove-sign cm-tooltip hand"></i>
+                        </a>
+                {/if}
+                {include file="common/fileuploader.tpl" var_name="mobile_app[google_services_config_file]" hide_server=true}
             </div>
         </div>
 
@@ -111,7 +124,7 @@
     </div>
 
     <div class="span9 mobile-app__images-container">
-        {include file="common/subheader.tpl" title="{__(images_params)}"}
+        {include file="common/subheader.tpl" title=__("images_params")}
         <div class="control-group">
             <label class="control-label" for="config_data_app_settings_build_crop_when_resize">{__("mobile_app.crop_when_resize")}{include file="common/tooltip.tpl" tooltip=__("tt_mobile_app.crop_when_resize")}:</label>
             <div class="controls">
@@ -154,25 +167,105 @@
 </div>
 {/capture}
 
+{capture name="apple_pay"}
+    <div class="clearfix">
+        <div class="span6">
+            <div class="control-group">
+                <label class="control-label" for="m_settings_app_settings_apple_pay">{__("mobile_app.apple_pay")}:</label>
+                <input type="hidden" name="m_settings[app_settings][apple_pay][applePay]" value="off"/>
+                <div class="controls">
+                    {include file="common/switcher.tpl"
+                        id="m_settings_app_settings_apple_pay"
+                        checked=$config_data.app_settings.apple_pay.applePay == "on"
+                        input_name="m_settings[app_settings][apple_pay][applePay]"
+                    }
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="m_settings_app_settings_apple_pay_merchant_identifier">{__("mobile_app.apple_pay_merchant_identifier")} {include file="common/tooltip.tpl" tooltip=__("mobile_app.apple_pay_merchant_identifier_tooltip")}:</label>
+                <div class="controls">
+                    <input type="text" name="m_settings[app_settings][apple_pay][applePayMerchantIdentifier]" value="{$config_data.app_settings.apple_pay.applePayMerchantIdentifier}"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="m_settings_app_settings_apple_pay_merchant_name">{__("mobile_app.apple_pay_merchant_name")} {include file="common/tooltip.tpl" tooltip=__("mobile_app.apple_pay_merchant_name_tooltip")}:</label>
+                <div class="controls">
+                    <input type="text" name="m_settings[app_settings][apple_pay][applePayMerchantName]" value="{$config_data.app_settings.apple_pay.applePayMerchantName}"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="m_settings_app_settings_apple_pay_supported_networks">{__("mobile_app.apple_pay_supported_networks")}:</label>
+                <div class="controls">
+                    <select class="input-full" name="m_settings[app_settings][apple_pay][applePaySupportedNetworks][]" id="m_settings_app_settings_apple_pay_supported_networks" multiple="multiple" size="15">
+                        {foreach $apple_pay_supported_networks as $code => $name}
+                            <option value="{$code}" {if in_array($code, $config_data.app_settings.apple_pay.applePaySupportedNetworks|default:[])}selected{/if}>{$name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+{/capture}
+
+{capture name="translations"}
+    <div class="clearfix">
+        {include file="common/subheader.tpl" title=__("translations")}
+        <div class="control-group">
+            <a href="{fn_url("languages.translations?name=mobile_app.mobile_")}"
+               target="_blank"
+            >{__("mobile_app.edit_app_translations")}</a>
+        </div>
+
+        {include file="common/subheader.tpl" title=__("mobile_app.upload_existing_translations")}
+        {foreach $languages as $language}
+            <div class="control-group">
+                <label class="control-label">
+                    {$language.name}
+                </label>
+                <div class="controls">
+                    {include file="common/fileuploader.tpl"
+                        var_name="mobile_app_translations[{$language.lang_code}]"
+                        allowed_ext="json"
+                        hide_server=true
+                    }
+                </div>
+            </div>
+        {/foreach}
+    </div>
+{/capture}
+
 <div id="content_mobile_app_configurator">
+
+    {$active_tab = $smarty.request.selected_section|default:"mobile_app_tab_general"}
 
     <form action="{""|fn_url}" method="post" name="app_config">
         <input type="hidden" name="setting_id" value="{$setting_id}" />
 
         <div class="cm-j-tabs cm-track tabs">
             <ul class="nav nav-tabs">
-                <li id="mobile_app_tab_general" class="cm-js active">
+                <li id="mobile_app_tab_general" class="cm-js {if $active_tab === "mobile_app_tab_general"}active{/if}">
                     <a>{__("general")}</a>
                 </li>
-                <li id="mobile_app_tab_colors" class="cm-js">
+                <li id="mobile_app_tab_translations" class="cm-js {if $active_tab === "mobile_app_tab_translations"}active{/if}">
+                    <a>{__("translations")}</a>
+                </li>
+                <li id="mobile_app_tab_colors" class="cm-js {if $active_tab === "mobile_app_tab_colors"}active{/if}">
                     <a>{__("mobile_app.configure_colors")}</a>
+                </li>
+                <li id="mobile_app_tab_apple_pay" class="cm-js {if $active_tab === "mobile_app_tab_apple_pay"}active{/if}">
+                    <a>{__("mobile_app.apple_pay")}</a>
                 </li>
             </ul>
         </div>
 
         <div class="cm-tabs-content">
             <div id="content_mobile_app_tab_general" class="hidden">{$smarty.capture.general nofilter}</div>
+            <div id="content_mobile_app_tab_translations" class="hidden">{$smarty.capture.translations nofilter}</div>
             <div id="content_mobile_app_tab_colors" class="hidden">{$smarty.capture.colors nofilter}</div>
+            <div id="content_mobile_app_tab_apple_pay" class="hidden">{$smarty.capture.apple_pay nofilter}</div>
         </div>
 
     </form>

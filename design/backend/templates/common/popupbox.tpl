@@ -4,8 +4,8 @@
     {$t_first=$title_start|strip_tags}
     {$t_second=$title_end|strip_tags}
     {$responsive_dialog_params="data-ca-dialog-template=\"<span class='title__part-start mobile-hidden'>?: </span><span class='title__part-end'>?</span>\""}
-    {$responsive_dialog_params="`$responsive_dialog_params` data-ca-dialog-text-first=\"`$t_first`\""}
-    {$responsive_dialog_params="`$responsive_dialog_params` data-ca-dialog-text-second=\"`$t_second`\""}
+    {$responsive_dialog_params="`$responsive_dialog_params` data-ca-dialog-text-first=\"`$t_first|escape`\""}
+    {$responsive_dialog_params="`$responsive_dialog_params` data-ca-dialog-text-second=\"`$t_second|escape`\""}
 {/if}
 {$popup_params = " id=\"opener_`$id`\" data-ca-target-id=\"content_`$id`\""}
 {if !$content}

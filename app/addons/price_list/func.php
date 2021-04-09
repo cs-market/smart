@@ -230,3 +230,21 @@ function fn_price_list_build_category_name($id_path)
 
     return implode(' - ', $result);
 }
+
+
+/**
+ * The "price_list_process_products_before_gather_additional_products_data" hook handler.
+ *
+ * Actions performed:
+ *  - Adds flag to get warehouse total amount for products from list.
+ *
+ * @param \Tygh\PriceList\AGenerator $generator AGenerator instance
+ * @param array                      $products  List of products
+ * @param array                      $params    Array of flags which determines which data should be gathered
+ *
+ * @see \Tygh\PriceList\AGenerator::processProducts()
+ */
+function fn_warehouses_price_list_process_products_before_gather_additional_products_data($generator, $products, &$params)
+{
+    $params['get_warehouse_total_amount'] = true;
+}

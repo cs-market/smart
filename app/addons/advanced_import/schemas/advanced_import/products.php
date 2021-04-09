@@ -41,11 +41,13 @@ $schema = array(
     ),
     'export_fields' => array(
         'Advanced Import: Features' => array(
-            'process_put' => array('fn_advanced_import_set_product_features', '#key', '#this', '@features_delimiter'),
-            'linked'      => false,
-            'multilang'   => true,
-            'import_only' => true,
-            'hidden'      => true,
+            'process_put'   => array('fn_advanced_import_set_product_features', '#key', '#this', '@features_delimiter'),
+            'linked'        => false,
+            'multilang'     => true,
+            'import_only'   => true,
+            'hidden'        => true,
+            'return_result' => true,
+            'return_field'  => 'product_features',
         ),
         'Advanced Import: Images' => array(
             'process_put' => array(

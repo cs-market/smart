@@ -29,6 +29,7 @@
 
 {if $smarty.request.product_id}
     <input class="cm-no-hide-input" type="hidden" name="option_data[product_id]" value="{$smarty.request.product_id}" />
+    <input class="cm-no-hide-input" type="hidden" name="option_data[is_global]" value="1">
     {if "ULTIMATE"|fn_allowed_for}
         {assign var="disable_company_picker" value=true}
         {if !$company_id}
@@ -56,29 +57,27 @@
             <input class="cm-no-hide-input" type="hidden" value="{$object}" name="object">
             <label for="elm_option_name_{$id}" class="control-label cm-required">{__("name")}</label>
             <div class="controls">
-            <input class="input-large" type="text" name="option_data[option_name]" id="elm_option_name_{$id}" value="{$option_data.option_name}"/>
+                <input class="input-large" type="text" name="option_data[option_name]" id="elm_option_name_{$id}" value="{$option_data.option_name}"/>
             </div>
         </div>
 
-        {if !$smarty.request.product_id}
         <div class="control-group">
-            <label for="elm_internal_option_name_{$id}" class="control-label">{__("internal_option_name")} {include file="common/tooltip.tpl" tooltip={__("internal_option_name_tooltip")}}</label>
+            <label for="elm_internal_option_name_{$id}" class="control-label">{__("code")} {include file="common/tooltip.tpl" tooltip={__("internal_option_name_tooltip")}}</label>
             <div class="controls">
                 <input class="input-large" type="text" name="option_data[internal_option_name]" id="elm_internal_option_name_{$id}" value="{$option_data.internal_option_name}"/>
             </div>
         </div>
-        {/if}
 
         <div class="control-group">
             <label class="control-label" for="elm_position_{$id}">{__("position")}</label>
             <div class="controls">
-            <input type="text" name="option_data[position]" id="elm_position_{$id}" value="{$option_data.position}" size="3" class="input-small" />
+                <input type="text" name="option_data[position]" id="elm_position_{$id}" value="{$option_data.position}" size="3" class="input-small" />
             </div>
         </div>
 
         <div class="control-group">
             <label class="control-label" for="elm_inventory_{$id}">{__("inventory")}</label>
-            <input type="hidden" name="option_data[inventory]" value="N" />
+                <input type="hidden" name="option_data[inventory]" value="N" />
             <div class="controls">
 		<label class="checkbox">
                     <input type="checkbox" name="option_data[inventory]" id="elm_inventory_{$id}" value="Y" {if $option_data.inventory == "Y"}checked="checked"{/if}/>
@@ -106,14 +105,14 @@
             {include file="views/product_options/components/option_types.tpl"  name="option_data[option_type]" value=$option_data.option_type display="select" tag_id="elm_option_type_`$id`" check=true}
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label" for="elm_option_description_{$id}">{__("description")}</label>
             <div class="controls">
             <textarea id="elm_option_description_{$id}" name="option_data[description]" cols="55" rows="8" class="cm-wysiwyg input-textarea-long">{$option_data.description}</textarea>
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label" for="elm_option_comment_{$id}">{__("comment")}</label>
             <div class="controls">
@@ -121,7 +120,7 @@
             <p class="description">{__("comment_hint")}</p>
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label" for="elm_option_file_required_{$id}">{__("required")}</label>
             <div class="controls">
@@ -163,14 +162,14 @@
                 <p class="description">{__("regexp_hint")}</p>
                 </div>
             </div>
-            
+
             <div class="control-group">
                 <label class="control-label" for="elm_option_inner_hint_{$id}">{__("inner_hint")}</label>
                 <div class="controls">
                 <input type="text" name="option_data[inner_hint]" id="elm_option_inner_hint_{$id}" value="{$option_data.inner_hint}" class="input-large" />
                 </div>
             </div>
-            
+
             <div class="control-group">
                 <label class="control-label" for="elm_option_incorrect_message_{$id}">{__("incorrect_filling_message")}</label>
                 <div class="controls">
@@ -203,7 +202,7 @@
                 </div>
             </div>
         </div>
-        
+
         {hook name="product_options:properties"}
         {/hook}
     </fieldset>
@@ -211,8 +210,8 @@
 
      <div class="hidden" id="content_tab_option_variants_{$id}">
      <fieldset>
-        <div class="table-wrapper">
-            <table class="table table-middle">
+        <div class="table-responsive-wrapper">
+            <table class="table table-middle table--relative table-responsive">
             <thead>
             <tr class="first-sibling">
                 <th class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}">{__("position_short")}</th>
@@ -230,24 +229,24 @@
             {assign var="num" value=$smarty.foreach.fe_v.iteration}
             <tbody class="hover cm-row-item" id="option_variants_{$id}_{$num}">
             <tr>
-                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}">
+                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}" data-th="{__("position_short")}">
                     <input type="text" name="option_data[variants][{$num}][position]" value="{$vr.position}" size="3" class="input-micro" /></td>
-                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}">
+                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}" data-th="{__("name")}">
                     <input type="text" name="option_data[variants][{$num}][variant_name]" value="{$vr.variant_name}" class="input-medium" /></td>
-                <td class="nowrap {if $runtime.company_id && $shared_product == "Y"} cm-no-hide-input{/if}">
+                <td class="nowrap {if $runtime.company_id && $shared_product == "Y"} cm-no-hide-input{/if}" data-th="{__("modifier")}&nbsp;/&nbsp;{__("type")}">
                     <input type="text" name="option_data[variants][{$num}][modifier]" value="{$vr.modifier}" size="5" class="input-mini" />&nbsp;/&nbsp;<select class="input-mini" name="option_data[variants][{$num}][modifier_type]">
                         <option value="A" {if $vr.modifier_type == "A"}selected="selected"{/if}>{$currencies.$primary_currency.symbol nofilter}</option>
                         <option value="P" {if $vr.modifier_type == "P"}selected="selected"{/if}>%</option>
                     </select>
                     {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id=$vr.variant_id name="update_all_vendors[`$num`]"}
                 </td>
-                <td class="nowrap">
+                <td class="nowrap" data-th="{__("weight_modifier")}&nbsp;/&nbsp;{__("type")}">
                     <input type="text" name="option_data[variants][{$num}][weight_modifier]" value="{$vr.weight_modifier}" size="5" class="input-mini" />&nbsp;/&nbsp;<select class="input-mini" name="option_data[variants][{$num}][weight_modifier_type]">
                         <option value="A" {if $vr.weight_modifier_type == "A"}selected="selected"{/if}>{$settings.General.weight_symbol}</option>
                         <option value="P" {if $vr.weight_modifier_type == "P"}selected="selected"{/if}>%</option>
                     </select>
                 </td>
-                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}">
+                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}" data-th="{__("status")}">
                     {include file="common/select_status.tpl" input_name="option_data[variants][`$num`][status]" display="select" obj=$vr meta="input-small"}</td>
                 <td class="nowrap">
                     <span id="on_extra_option_variants_{$id}_{$num}" alt="{__("expand_collapse_list")}" title="{__("expand_collapse_list")}" class="hand cm-combination-options-{$id}"><span class="icon-caret-right"></span></span>
@@ -278,24 +277,24 @@
             {math equation="x + 1" assign="num" x=$num|default:0}{assign var="vr" value=""}
             <tbody class="hover cm-row-item {if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum}hidden{/if}" id="box_add_variant_{$id}">
             <tr>
-                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}">
+                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}" data-th="{__("position")}">
                     <input type="text" name="option_data[variants][{$num}][position]" value="" size="3" class="input-micro" /></td>
-                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}">
+                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}" data-th="{__("name")}">
                     <input type="text" name="option_data[variants][{$num}][variant_name]" value="" class="input-medium" /></td>
-                <td>
+                <td data-th="{__("modifier")}&nbsp;/&nbsp;{__("type")}">
                     <input type="text" name="option_data[variants][{$num}][modifier]" value="" size="5" class="input-mini" />&nbsp;/
                     <select class="input-mini" name="option_data[variants][{$num}][modifier_type]">
                         <option value="A">{$currencies.$primary_currency.symbol nofilter}</option>
                         <option value="P">%</option>
                     </select>
                 </td>
-                <td>
+                <td data-th="{__("weight_modifier")}&nbsp;/&nbsp;{__("type")}">
                     <input type="text" name="option_data[variants][{$num}][weight_modifier]" value="" size="5" class="input-mini" />&nbsp;/&nbsp;<select class='input-mini' name="option_data[variants][{$num}][weight_modifier_type]">
                         <option value="A">{$settings.General.weight_symbol}</option>
                         <option value="P">%</option>
                     </select>
                 </td>
-                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}">
+                <td class="cm-non-cb{if $option_data.option_type == "ProductOptionTypes::CHECKBOX"|enum} hidden{/if}" data-th="{__("status")}">
                     {include file="common/select_status.tpl" input_name="option_data[variants][`$num`][status]" display="select" meta="input-small"}</td>
                 <td>
                     <span id="on_extra_option_variants_{$id}_{$num}" alt="{__("expand_collapse_list")}" title="{__("expand_collapse_list")}" class="hand cm-combination-options-{$id}"><span class="icon-caret-right"></span></span>
@@ -307,7 +306,7 @@
                 </td>
             </tr>
             <tr id="extra_option_variants_{$id}_{$num}" class="cm-ex-op hidden">
-                <td colspan="7">
+                <td colspan="7" data-th="{__("extra")}">
                     {hook name="product_options:edit_product_options"}
                     <div class="control-group cm-non-cb">
                         <label class="control-label">{__("icon")}</label>

@@ -22,11 +22,12 @@
             </select>
         </div>
         <div class="sidebar-field">
-            <label for="elm_addon_source">{__("addons_source")}</label>
-            <select id="elm_addon_source" name="source">
-                <option value="" {if empty($search.source)} selected="selected"{/if}>{__("any")}</option>
-                <option value="core" {if $search.source == 'core'} selected="selected"{/if}>{__("addon_built_in")}</option>
-                <option value="third_party" {if $search.source == 'third_party'} selected="selected"{/if}>{__("addon_third_party")}</option>
+            <label for="elm_addon_source">{__("developer")}</label>
+            <select id="elm_addon_source" name="supplier">
+                <option value="" {if empty($search.supplier)} selected="selected"{/if}>{__("any")}</option>
+                {foreach $developers as $developer}
+                    <option value="{$developer}" {if $search.supplier == $developer} selected="selected"{/if}>{$developer}</option>
+                {/foreach}
             </select>
         </div>
         {/if}

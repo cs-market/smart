@@ -59,16 +59,17 @@
                     <a class="btn"><span data-ca-multi="N">{$upload_file_text|default:__("local")}</span></a>
                     <div class="image-selector">
                         <label for="">
+                            {/strip}
                             <input type="file"
                                    name="file_{$var_name}"
                                    id="local_{$id_var_name}"
-                                   onchange="Tygh.fileuploader.show_loader(this.id);
-                                           Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');"
+                                   onchange="Tygh.fileuploader.show_loader(this.id);Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');"
                                    class="file"
                                    data-ca-empty-file=""
                                    onclick="Tygh.$(this).removeAttr('data-ca-empty-file');"
-                                   accept=".{$allowed_ext|implode:",."}"
+                                   accept=".{",."|implode:$allowed_ext}"
                             />
+                            {strip}
                         </label>
                     </div>
                 </div>
@@ -85,7 +86,7 @@
 
             {if $allowed_ext}
                 <p class="mute micro-note">
-                    {__("text_allowed_to_upload_file_extension", ["[ext]" => $allowed_ext|implode:", "])}
+                    {__("text_allowed_to_upload_file_extension", ["[ext]" => ", "|implode:$allowed_ext])}
                 </p>
             {/if}
 

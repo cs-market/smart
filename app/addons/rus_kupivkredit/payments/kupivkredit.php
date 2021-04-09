@@ -25,6 +25,11 @@ $request_data   = array();
 $request_data['shopId']        = ($processor_data['processor_params']['test'] == 'Y') ? 'test_shop' : $processor_data['processor_params']['kvk_shop_id'];
 $request_data['customerEmail'] = $order_info['email'] ? $order_info['email'] : '';
 $request_data['customerPhone'] = $order_info['b_phone'] ? $order_info['b_phone'] : '';
+$request_data['integrationType'] = 'CSCart';
+
+if(isset($processor_data['processor_params']['kvk_show_case_id'])){
+    $request_data['showcaseId'] = $processor_data['processor_params']['kvk_show_case_id'];
+}
 
 $count = 0;
 foreach ($order_info['products'] as $k => $item) {
@@ -103,6 +108,6 @@ $request_data['sum'] = $order_total;
 
 fn_change_order_status($order_id, 'O');
 fn_clear_cart(Tygh::$app['session']['cart']);
-fn_create_payment_form($request_url, $request_data, 'KupivKredit', true, $method = 'post', $parse_url = false, $target = 'form', $connection_message = __('rus_kupivkredit.redirect_to_create_order'));
+fn_create_payment_form($request_url, $request_data, 'Тинькофф: Кредитование покупателей (КупиВкредит)', true, $method = 'post', $parse_url = false, $target = 'form', $connection_message = __('rus_kupivkredit.redirect_to_create_order'));
 
 exit;

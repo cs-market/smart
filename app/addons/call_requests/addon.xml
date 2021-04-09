@@ -35,6 +35,10 @@
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>
+                    <item id="enable_call_requests_for_vendors" edition_type="MVE:ROOT">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item>
                     <item id="order_status">
                         <type>selectbox</type>
                         <default_value>Y</default_value>
@@ -45,6 +49,9 @@
     </settings>
 
     <queries>
+        <item for="install">
+            DROP TABLE IF EXISTS ?:call_requests;
+        </item>
         <item for="install">
             CREATE TABLE `?:call_requests` (
                 `request_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
@@ -70,10 +77,10 @@
             DROP TABLE IF EXISTS ?:call_requests;
         </item>
         <item for="install" editions="MULTIVENDOR,ULTIMATE">
-            REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_call_requests', 'Y', 'addons');
+            REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_call_requests', 'Y', 'orders', 'call_requests', 'N');
         </item>
         <item for="install" editions="MULTIVENDOR,ULTIMATE">
-            REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('view_call_requests', 'Y', 'addons');
+            REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_call_requests', 'Y', 'orders', 'call_requests', 'Y');
         </item>
         <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">
             DELETE FROM ?:privileges WHERE privilege IN ('manage_call_requests', 'view_call_requests');

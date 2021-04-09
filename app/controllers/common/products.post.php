@@ -43,26 +43,17 @@ if ($mode == 'picker') {
     $params = $_REQUEST;
     $params['extend'] = array('description');
     $params['skip_view'] = 'Y';
+    $params['is_picker'] = true;
 
     list($products, $search) = fn_get_products($params, AREA == 'C' ? Registry::get('settings.Appearance.products_per_page') : Registry::get('settings.Appearance.admin_elements_per_page'));
 
-    if (!empty($_REQUEST['display']) || (AREA == 'C' && !defined('EVENT_OWNER'))) {
-        fn_gather_additional_products_data($products, array('get_icon' => true, 'get_detailed' => true, 'get_options' => true, 'get_discounts' => true));
-    }
-
-    if (!empty($products)) {
-        foreach ($products as $product_id => $product_data) {
-            $products[$product_id]['options'] = fn_get_product_options($product_data['product_id'], DESCR_SL, true, false, true);
-            if (!fn_allowed_for('ULTIMATE:FREE')) {
-                $products[$product_id]['exceptions'] = fn_get_product_exceptions($product_data['product_id']);
-                if (!empty($products[$product_id]['exceptions'])) {
-                    foreach ($products[$product_id]['exceptions'] as $exceptions_data) {
-                        $products[$product_id]['exception_combinations'][fn_get_options_combination($exceptions_data['combination'])] = '';
-                    }
-                }
-            }
-        }
-    }
+    fn_gather_additional_products_data($products, [
+        'get_icon'      => true,
+        'get_detailed'  => true,
+        'get_discounts' => true,
+        'get_options'   => !empty($_REQUEST['display']) || AREA === 'C',
+        'get_active_options' => !empty($params['is_order_management'])
+    ]);
 
     if (!empty($params['is_order_management'])) {
         Tygh::$app['view']->assign(array(

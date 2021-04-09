@@ -13,16 +13,29 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $discussion_settings = Registry::get('addons.discussion');
-    $discussion_object_types = fn_get_discussion_objects();
-
     $suffix = '';
     if ($mode == 'add') {
+        $post_data = isset($_REQUEST['post_data']) ? $_REQUEST['post_data'] : array();
+        $discussion_object = fn_discussion_get_object($post_data);
+
+        if (!isset($discussion_object['object_id'])) {
+            fn_set_notification('E', __('error'), __('error_occured'));
+            return array(CONTROLLER_STATUS_NO_PAGE);
+
+        } elseif (AREA == 'C'
+            && $discussion_object['object_type'] === DiscussionObjectTypes::PRODUCT
+            && !fn_discussion_is_user_eligible_to_write_review_for_product($auth['user_id'], $discussion_object['object_id'])
+        ) {
+            fn_set_notification('E', __('error'), __('discussion.you_have_to_buy_product_before_writing_review'));
+            return array(CONTROLLER_STATUS_DENIED);
+        }
+
         $suffix = '&selected_section=discussion';
 
         fn_add_discussion_post($_REQUEST['post_data']);

@@ -1,7 +1,7 @@
 <div id="content_campaign_stats_{$campaign.campaign_id}">
 {if $campaign_stats}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
         <tr>
             <th>{__("title")}</th>

@@ -5,96 +5,94 @@ msgstr ""
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: cs\n"
-"X-Crowdin-File: /release-4.8.2/addons/mobile_app.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"X-Crowdin-File: /release-4.11.3/addons/mobile_app.po\n"
+"PO-Revision-Date: 2020-02-04 07:11\n"
 
 msgctxt "Addons::name::mobile_app"
 msgid "Mobile application"
-msgstr ""
+msgstr "Mobilní aplikace"
 
 msgctxt "Addons::description::mobile_app"
 msgid "Mobile application"
-msgstr ""
+msgstr "Mobilní aplikace"
 
 msgctxt "Languages::app_params"
 msgid "Application"
-msgstr ""
+msgstr "Aplikace"
 
 msgctxt "Languages::mobile_app.section.category"
 msgid "Categories"
-msgstr ""
+msgstr "Kategorie"
 
 msgctxt "Languages::mobile_app.section.drawer"
 msgid "Drawer (sidebar menu)"
-msgstr ""
+msgstr "Šuplík (postranní menu)"
 
 msgctxt "Languages::mobile_app.section.navbar"
 msgid "Navigation bar"
-msgstr ""
+msgstr "Navigační lišta"
 
 msgctxt "Languages::mobile_app.section.product_screen"
 msgid "Product screen"
-msgstr ""
+msgstr "Obrazovka zboží"
 
 msgctxt "Languages::mobile_app.section.main"
 msgid "Main screen"
-msgstr ""
+msgstr "Hlavní obrazovka"
 
 msgctxt "Languages::mobile_app.settings.access_key"
 msgid "Access key:"
-msgstr ""
+msgstr "Přístupový klíč:"
 
 msgctxt "Languages::mobile_app.appname"
 msgid "App Name"
-msgstr ""
+msgstr "Název aplikace"
 
 msgctxt "Languages::mobile_app.appshortdescription"
 msgid "Short description"
-msgstr ""
+msgstr "Stručný popis"
 
 msgctxt "Languages::mobile_app.appfulldescription"
 msgid "Full description"
-msgstr ""
+msgstr "Podrobný popis"
 
 msgctxt "Languages::mobile_app.supportemail"
 msgid "Support email"
-msgstr ""
+msgstr "E-mail podpory"
 
 msgctxt "Languages::mobile_app.privacypolicyurl"
 msgid "Privacy Policy URL"
-msgstr ""
+msgstr "URL zásad ochrany soukromí"
 
 msgctxt "Languages::ttc_mobile_app.appname"
 msgid "Application name (up to 30 symbols)"
-msgstr ""
+msgstr "Název aplikace (až 30 znaků)"
 
 msgctxt "Languages::ttc_mobile_app.appshortdescription"
 msgid "Application short description (up to 80 symbols)"
-msgstr ""
+msgstr "Stručný popis aplikace (maximálně 80 znaků)"
 
 msgctxt "Languages::ttc_mobile_app.appfulldescription"
 msgid "Application full description (up to 4000 symbols)"
-msgstr ""
+msgstr "Podrobný popis aplikace (maximálně 4000 znaků)"
 
 msgctxt "Languages::ttc_mobile_app.supportemail"
 msgid "Will be displayed in 'about app' section"
-msgstr ""
+msgstr "Zobrazí se v části 'o aplikaci'"
 
 msgctxt "Languages::ttc_mobile_app.privacypolicyurl"
 msgid "URL of the Privacy Policy page of your store"
-msgstr ""
+msgstr "URL adresa stránky zásad ochrany osobních údajů vašeho obchodu"
 
 msgctxt "Languages::mobile_app.pushnotifications"
 msgid "Push notifications"
-msgstr ""
+msgstr "Push oznámení"
 
 msgctxt "Languages::ttc_mobile_app.pushnotifications"
 msgid "Push notifications"
-msgstr ""
+msgstr "Push oznámení"
 
 msgctxt "Languages::bundleid"
 msgid "Bundle Id"
@@ -200,12 +198,20 @@ msgctxt "Languages::mobile_app.configure_colors"
 msgid "Configure Colors"
 msgstr ""
 
-msgctxt "Languages::mobile_app.fcmapikey"
+msgctxt "Languages::mobile_app.fcm_api_key"
 msgid "API key for push notifications"
 msgstr ""
 
-msgctxt "Languages::ttc_mobile_app.fcmapikey"
-msgid "Obtain the Cloud Messaging <b>Legacy server key</b> from the <a href=\"https://console.firebase.google.com\" target=\"_blank\">Firebase console</a>"
+msgctxt "Languages::mobile_app.fcm_api_key_tooltip"
+msgid "Obtain the Cloud Messaging <b>Legacy server key</b> from the <a href=\"https://console.firebase.google.com\" target=\"_blank\">Firebase console</a> using your bundle ID: [bundle_id]"
+msgstr ""
+
+msgctxt "Languages::mobile_app.services_config"
+msgid "Firebase config file (Android)"
+msgstr ""
+
+msgctxt "Languages::tt_mobile_app.services_config"
+msgid "Upload the google-services.json file that was generated when you added an Android application in Firebase."
 msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_registration"
@@ -670,5 +676,37 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_no_products_in_this_section"
 msgid "There are no products in this section"
+msgstr ""
+
+msgctxt "Languages::mobile_app.crop_when_resize"
+msgid "Crop image"
+msgstr ""
+
+msgctxt "Languages::tt_mobile_app.crop_when_resize"
+msgid "If ticked, some part of an image might be lost (cut out) when it's resized, otherwise transparent borders might be added."
+msgstr ""
+
+msgctxt "Languages::mobile_app.apple_pay"
+msgid "Apple Pay"
+msgstr ""
+
+msgctxt "Languages::mobile_app.apple_pay_merchant_identifier"
+msgid "Merchant identifier"
+msgstr ""
+
+msgctxt "Languages::mobile_app.apple_pay_merchant_identifier_tooltip"
+msgid "Obtain the <b>Merchant Identifier</b> as described in <a href=\"https://help.apple.com/developer-account/#/devb2e62b839?sub=dev103e030bb\" target=\"_blank\">Developer Account Help</a>"
+msgstr ""
+
+msgctxt "Languages::mobile_app.apple_pay_merchant_name"
+msgid "Merchant name"
+msgstr ""
+
+msgctxt "Languages::mobile_app.apple_pay_merchant_name_tooltip"
+msgid "Enter the Merchant ID Description that you used when registering your Merchant ID at the Apple Developer website."
+msgstr ""
+
+msgctxt "Languages::mobile_app.apple_pay_supported_networks"
+msgid "Payment networks"
 msgstr ""
 

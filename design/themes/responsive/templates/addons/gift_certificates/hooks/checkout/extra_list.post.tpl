@@ -67,6 +67,11 @@
                             {assign var="ajax_class" value="cm-ajax"}
                         {/if}
                         <a class="{$ajax_class} ty-delete-big" href="{"checkout.delete?cart_id=`$key`&redirect_url=`$c_url`"|fn_url}" data-ca-target-id="cart_items,checkout_totals,cart_status*,checkout_steps" title="{__("remove")}"><i class="ty-delete-big__icon ty-icon-cancel-circle"></i></a>
+                        {hook name="products:product_additional_info"}
+                            <div class="ty-cart-content__sku ty-sku">
+                                {__("sku")}: {$product.product_code}
+                            </div>
+                        {/hook}
                         {include file="common/options_info.tpl" product_options=$cart.products.$key.product_options|fn_get_selected_product_options_info fields_prefix="cart_products[`$key`][product_options]"}
                         {hook name="checkout:product_info"}{/hook}
                         <input type="hidden" name="cart_products[{$key}][extra][parent][certificate]" value="{$gift_key}" />
@@ -90,7 +95,7 @@
                         </span>
                     </div>
                     {/if}
-                    {if $cart.taxes && $settings.General.tax_calculation != "subtotal"}
+                    {if $cart.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                     <div class="ty-control-group">
                         <strong class="ty-control-group__label">{__("tax")}</strong>
                         <span class="ty-control-group__item">

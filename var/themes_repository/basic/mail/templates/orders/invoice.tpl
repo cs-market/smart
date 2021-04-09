@@ -45,12 +45,6 @@
                         <td width="100%" style="font-size: 12px; font-family: Arial;">{$company_data.company_phone_2}</td>
                     </tr>
                     {/if}
-                    {if $company_data.company_fax}
-                    <tr valign="top">
-                        <td style="font-size: 12px; font-family: verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("fax")}:</td>
-                        <td width="100%" style="font-size: 12px; font-family: Arial;">{$company_data.company_fax}</td>
-                    </tr>
-                    {/if}
                     {if $company_data.company_website}
                     <tr valign="top">
                         <td style="font-size: 12px; font-family: verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("web_site")}:</td>

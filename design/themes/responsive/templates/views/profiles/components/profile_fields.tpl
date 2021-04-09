@@ -5,7 +5,25 @@
     </div>
 {else}
 
-{if $profile_fields.$section}
+{$fields = []}
+
+{if !$exclude && !$include}
+    {$fields = $profile_fields.$section}
+{else}
+    {foreach $profile_fields.$section as $key => $field}
+        {if $include}
+            {if in_array($field.field_name, $include)}
+                {$fields[$key] = $field}
+            {/if}
+        {elseif $exclude}
+            {if !in_array($field.field_name, $exclude)}
+                {$fields[$key] = $field}
+            {/if}
+        {/if}
+    {/foreach}
+{/if}
+
+{if $fields}
 
 {if $address_flag}
     <div class="ty-profile-field__switch ty-address-switch clearfix">
@@ -38,16 +56,19 @@
     {include file="common/subheader.tpl" title=$title}
 {/if}
 
-{foreach from=$profile_fields.$section item=field name="profile_fields"}
-    
+{$default_data_name = $default_data_name|default:"user_data"}
+{$user_data = $user_data|default:[]}
+{$profile_data = $profile_data|default:$user_data}
+{$fields = fn_fill_profile_fields_value($fields, $profile_data)}
+
+{foreach from=$fields item=field name="profile_fields"}
+{$value = $field.value}
 {if $field.field_name && $field.is_default == 'Y'}
-    {assign var="data_name" value="user_data"}
+    {assign var="data_name" value=$default_data_name}
     {assign var="data_id" value=$field.field_name}
-    {assign var="value" value=$user_data.$data_id}
 {else}
-    {assign var="data_name" value="user_data[fields]"}
+    {assign var="data_name" value="`$default_data_name`[fields]"}
     {assign var="data_id" value=$field.field_id}
-    {assign var="value" value=$user_data.fields.$data_id}
 {/if}
 
 {assign var="skip_field" value=false}
@@ -64,49 +85,58 @@
 
 {hook name="profiles:profile_fields"}
 <div class="ty-control-group ty-profile-field__item ty-{$field.class}">
-    {if $pref_field_name != $field.description || $field.required == "Y"}
-        <label for="{$id_prefix}elm_{$field.field_id}" class="ty-control-group__title cm-profile-field {if $field.required == "Y"}cm-required{/if}{if $field.field_type == "P"} cm-phone{/if}{if $field.field_type == "Z"} cm-zipcode{/if}{if $field.field_type == "E"} cm-email{/if} {if $field.field_type == "Z"}{if $section == "S"}cm-location-shipping{else}cm-location-billing{/if}{/if}">{$field.description}</label>
-    {/if}
+{if ($pref_field_name != $field.description || $field.required == "Y") && $field.field_type != "ProfileFieldTypes::VENDOR_TERMS"|enum}
+    <label
+        for="{$id_prefix}elm_{$field.field_id}"
+        class="ty-control-group__title cm-profile-field {if $field.autocomplete_type == "phone-full" || $field.field_type == "ProfileFieldTypes::PHONE"|enum}cm-mask-phone-label{/if} {if $field.required == "Y"}cm-required{/if}{if $field.field_type == "Z"} cm-zipcode{/if}{if $field.field_type == "E"} cm-email{/if} {if $field.field_type == "Z"}{if $section == "S"}cm-location-shipping{else}cm-location-billing{/if}{/if}"
+    >{$field.description}</label>
+{/if}
 
-    {if $field.field_type == "A"}  {* State selectbox *}
-        {$_country = $settings.General.default_country}
-        {$_state = $value|default:$settings.General.default_state}
+    {if $field.field_type == "ProfileFieldTypes::STATE"|enum}
+        {$_country = $settings.Checkout.default_country}
+        {$_state = $value}
 
         <select {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} id="{$id_prefix}elm_{$field.field_id}" class="ty-profile-field__select-state cm-state {if $section == "S"}cm-location-shipping{else}cm-location-billing{/if} {if !$skip_field}{$_class}{/if}" name="{$data_name}[{$data_id}]" {if !$skip_field}{$disabled_param nofilter}{/if}>
-            <option value="">- {__("select_state")} -</option>
+            {if $field.required !== "Y"}
+                <option value="">- {__("select_state")} -</option>
+            {/if}
             {if $states && $states.$_country}
                 {foreach from=$states.$_country item=state}
                     <option {if $_state == $state.code}selected="selected"{/if} value="{$state.code}">{$state.state}</option>
                 {/foreach}
             {/if}
-        </select><input {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} type="text" id="elm_{$field.field_id}_d" name="{$data_name}[{$data_id}]" size="32" maxlength="64" value="{$_state}" disabled="disabled" class="cm-state {if $section == "S"}cm-location-shipping{else}cm-location-billing{/if} ty-input-text hidden {if $_class}disabled{/if}"/>
+        </select>
 
-    {elseif $field.field_type == "O"}  {* Countries selectbox *}
-        {assign var="_country" value=$value|default:$settings.General.default_country}
+        <input {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} type="text" id="elm_{$field.field_id}_d" name="{$data_name}[{$data_id}]" size="32" maxlength="64" value="{$_state}" disabled="disabled" class="cm-state {if $section == "S"}cm-location-shipping{else}cm-location-billing{/if} ty-input-text hidden {if $_class}disabled{/if}"/>
+
+    {elseif $field.field_type == "ProfileFieldTypes::COUNTRY"|enum}
+        {assign var="_country" value=$value|default:$settings.Checkout.default_country}
         <select {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} id="{$id_prefix}elm_{$field.field_id}" class="ty-profile-field__select-country cm-country {if $section == "S"}cm-location-shipping{else}cm-location-billing{/if} {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if}" name="{$data_name}[{$data_id}]" {if !$skip_field}{$disabled_param nofilter}{/if}>
             {hook name="profiles:country_selectbox_items"}
-            <option value="">- {__("select_country")} -</option>
+            {if $field.required !== "Y"}
+                <option value="">- {__("select_country")} -</option>
+            {/if}
             {foreach from=$countries item="country" key="code"}
             <option {if $_country == $code}selected="selected"{/if} value="{$code}">{$country}</option>
             {/foreach}
             {/hook}
         </select>
-    
-    {elseif $field.field_type == "C"}  {* Checkbox *}
+
+    {elseif $field.field_type == "ProfileFieldTypes::CHECKBOX"|enum}
         <input type="hidden" name="{$data_name}[{$data_id}]" value="N" {if !$skip_field}{$disabled_param nofilter}{/if} />
         <input type="checkbox" id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" value="Y" {if $value == "Y"}checked="checked"{/if} class="checkbox {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if}" {if !$skip_field}{$disabled_param nofilter}{/if} />
 
-    {elseif $field.field_type == "T"}  {* Textarea *}
+    {elseif $field.field_type == "ProfileFieldTypes::TEXT_AREA"|enum}
         <textarea {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} class="ty-input-textarea {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if}" id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" cols="32" rows="3" {if !$skip_field}{$disabled_param nofilter}{/if}>{$value}</textarea>
-    
-    {elseif $field.field_type == "D"}  {* Date *}
+
+    {elseif $field.field_type == "ProfileFieldTypes::DATE"|enum}
         {if !$skip_field}
             {include file="common/calendar.tpl" date_id="`$id_prefix`elm_`$field.field_id`" date_name="`$data_name`[`$data_id`]" date_val=$value extra=$disabled_param}
         {else}
             {include file="common/calendar.tpl" date_id="`$id_prefix`elm_`$field.field_id`" date_name="`$data_name`[`$data_id`]" date_val=$value}
         {/if}
 
-    {elseif $field.field_type == "S"}  {* Selectbox *}
+    {elseif $field.field_type == "ProfileFieldTypes::SELECT_BOX"|enum}
         <select {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} id="{$id_prefix}elm_{$field.field_id}" class="ty-profile-field__select {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if}" name="{$data_name}[{$data_id}]" {if !$skip_field}{$disabled_param nofilter}{/if}>
             {if $field.required != "Y"}
             <option value="">--</option>
@@ -115,23 +145,35 @@
             <option {if $value == $k}selected="selected"{/if} value="{$k}">{$v}</option>
             {/foreach}
         </select>
-    
-    {elseif $field.field_type == "R"}  {* Radiogroup *}
+
+    {elseif $field.field_type == "ProfileFieldTypes::RADIO"|enum}
         <div id="{$id_prefix}elm_{$field.field_id}">
             {foreach from=$field.values key=k item=v name="rfe"}
             <input class="radio {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if} {$id_prefix}elm_{$field.field_id}" type="radio" id="{$id_prefix}elm_{$field.field_id}_{$k}" name="{$data_name}[{$data_id}]" value="{$k}" {if (!$value && $smarty.foreach.rfe.first) || $value == $k}checked="checked"{/if} {if !$skip_field}{$disabled_param nofilter}{/if} /><span class="radio">{$v}</span>
             {/foreach}
         </div>
 
-    {elseif $field.field_type == "N"}  {* Address type *}
+    {elseif $field.field_type == "ProfileFieldTypes::ADDRESS_TYPE"|enum}
         <input class="radio {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if} {$id_prefix}elm_{$field.field_id}" type="radio" id="{$id_prefix}elm_{$field.field_id}_residential" name="{$data_name}[{$data_id}]" value="residential" {if !$value || $value == "residential"}checked="checked"{/if} {if !$skip_field}{$disabled_param nofilter}{/if} /><span class="radio">{__("address_residential")}</span>
         <input class="radio {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if} {$id_prefix}elm_{$field.field_id}" type="radio" id="{$id_prefix}elm_{$field.field_id}_commercial" name="{$data_name}[{$data_id}]" value="commercial" {if $value == "commercial"}checked="checked"{/if} {if !$skip_field}{$disabled_param nofilter}{/if} /><span class="radio">{__("address_commercial")}</span>
 
+    {elseif $field.field_type == "ProfileFieldTypes::VENDOR_TERMS"|enum}
+
+        {include file="views/profiles/components/vendor_terms.tpl"}
+
     {else}  {* Simple input *}
-        <input {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if} type="text" id="{$id_prefix}elm_{$field.field_id}" name="{$data_name}[{$data_id}]" size="32" value="{$value}" class="ty-input-text {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if} {if $smarty.foreach.profile_fields.index == 0} cm-focus{/if}" {if !$skip_field}{$disabled_param nofilter}{/if} />
+        <input
+            {if $field.autocomplete_type}x-autocompletetype="{$field.autocomplete_type}"{/if}
+            type="text"
+            id="{$id_prefix}elm_{$field.field_id}"
+            name="{$data_name}[{$data_id}]"
+            size="32"
+            value="{$value}"
+            class="ty-input-text{if ($field.autocomplete_type == "phone-full") || ($field.field_type == "ProfileFieldTypes::PHONE"|enum)} cm-mask-phone{/if} {if !$skip_field}{$_class}{else}cm-skip-avail-switch{/if} {if $smarty.foreach.profile_fields.index == 0} cm-focus{/if}" {if !$skip_field}{$disabled_param nofilter}{/if}
+        />
     {/if}
 
-    {assign var="pref_field_name" value=$field.description}
+{assign var="pref_field_name" value=$field.description}
 </div>
 {/hook}
 {/foreach}

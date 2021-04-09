@@ -98,7 +98,7 @@
 {function name="dropdown" text="" title="" class="" content="" icon="" no_caret=false placement="left"}
     {if $content|strip_tags:false|replace:"&nbsp;":""|trim != ""}
         <div class="btn-group{if $placement == "left"} dropleft{/if} {$class}" {if $id}id="{$id}"{/if}>
-            <a class="btn dropdown-toggle" data-toggle="dropdown" {if $title}title="{$title}"{/if}>
+            <a href="#" class="btn dropdown-toggle" data-toggle="dropdown" {if $title}title="{$title}"{/if}>
                 <i class="{$icon|default:"icon-cog"}"></i>
                 {if $text}
                     {$text|default:__("tools") nofilter}

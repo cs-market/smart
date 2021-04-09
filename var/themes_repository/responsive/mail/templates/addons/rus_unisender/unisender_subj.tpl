@@ -1,1 +1,1 @@
-{__("error")} {__("unisender")}
+{__("error")} {__("addons.rus_unisender.unisender")}

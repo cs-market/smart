@@ -56,12 +56,12 @@
             </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group object-picker__simple">
             <label class="control-label cm-required" for="elm_filter_filter_by_{$id}">{__("filter_by")}</label>
-            <div class="controls">
+            <div class="controls select2-container--mini">
             {if !$id}
                 {* F - feature, R - range field, B - base field *}
-                <select name="filter_data[filter_type]" onchange="fn_check_product_filter_type(this.value, 'tab_variants_{$id}', {$id});" id="elm_filter_filter_by_{$id}" >
+                <select name="filter_data[filter_type]" onchange="fn_check_product_filter_type(this.value, 'tab_variants_{$id}', {$id});" id="elm_filter_filter_by_{$id}" class="cm-object-picker">
                 {if $filter_features}
                     <optgroup label="{__("features")}">
                     {foreach from=$filter_features item=feature}

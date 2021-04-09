@@ -51,20 +51,15 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
             } elseif ($response['orderStatus'] == 2) {
 
-                if ($response['amount'] == round($order_info['total'] * 100)) {
-                    $pp_response = array(
-                        'order_status' => 'P',
-                        'card_number' => $response['cardAuthInfo']['pan'],
-                        'cardholder_name' => $response['cardAuthInfo']['cardholderName'],
-                        'expiry_month' => substr($response['cardAuthInfo']['expiration'], 0, 4),
-                        'expiry_year' => substr($response['cardAuthInfo']['expiration'], 0, -2),
-                        'bank' => $response['bankInfo']['bankName'],
-                        'ip_address' => $response['ip'],
-                    );
-                } else {
-                    $pp_response['reason_text'] = __("addons.rus_sberbank.wrong_amount");
-                }
-
+                $pp_response = [
+                    'order_status'    => 'P',
+                    'card_number'     => $response['cardAuthInfo']['pan'],
+                    'cardholder_name' => $response['cardAuthInfo']['cardholderName'],
+                    'expiry_month'    => substr($response['cardAuthInfo']['expiration'], 0, 4),
+                    'expiry_year'     => substr($response['cardAuthInfo']['expiration'], 0, -2),
+                    'bank'            => $response['bankInfo']['bankName'],
+                    'ip_address'      => $response['ip'],
+                ];
             } else {
                 $pp_response = array(
                     'order_status' => 'F',
@@ -96,7 +91,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
         );
 
         fn_update_order_payment_info($order_id, $pp_response);
-        fn_create_payment_form($response['formUrl'], array(), 'SberBank Online', true, 'GET');
+        fn_create_payment_form($response['formUrl'], array(), 'Сбербанк Онлайн', true, 'GET');
 
     } else {
         $pp_response['order_status'] = 'F';

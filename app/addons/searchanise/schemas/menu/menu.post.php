@@ -13,6 +13,9 @@
 ****************************************************************************/
 
 $schema['top']['addons']['items']['searchanise'] = array(
+    'attrs' => array(
+        'class' => 'is-addon'
+    ),
     'href' => 'addons.update?addon=searchanise',
     'position' => 1000
 );

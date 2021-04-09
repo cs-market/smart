@@ -1,1 +1,0 @@
-<th width="5%">{__("paypal_for_marketplaces.paypal_account")}</th>

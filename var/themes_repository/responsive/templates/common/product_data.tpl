@@ -1,10 +1,11 @@
+{hook name="products:product_data_content"}
 {if $product.tracking == "ProductTracking::TRACK_WITH_OPTIONS"|enum}
     {assign var="out_of_stock_text" value=__("text_combination_out_of_stock")}
 {else}
     {assign var="out_of_stock_text" value=__("text_out_of_stock")}
 {/if}
 
-{if ($product.price|floatval || $product.zero_price_action == "P" || $product.zero_price_action == "A" || (!$product.price|floatval && $product.zero_price_action == "R")) && !($settings.General.allow_anonymous_shopping == "hide_price_and_add_to_cart" && !$auth.user_id)}
+{if ($product.price|floatval || $product.zero_price_action == "P" || $product.zero_price_action == "A" || (!$product.price|floatval && $product.zero_price_action == "R")) && !($settings.Checkout.allow_anonymous_shopping == "hide_price_and_add_to_cart" && !$auth.user_id)}
     {assign var="show_price_values" value=true}
 {else}
     {assign var="show_price_values" value=false}
@@ -52,13 +53,13 @@
 
 {capture name="sku_`$obj_id`"}
     {if $show_sku}
-        <div class="ty-control-group ty-sku-item cm-hidden-wrapper{if !$product.product_code} hidden{/if} cm-reload-{$obj_prefix}{$obj_id}" id="sku_update_{$obj_prefix}{$obj_id}">
+        <div class="ty-control-group ty-sku-item cm-hidden-wrapper{if !$product.product_code} hidden{/if}" id="sku_update_{$obj_prefix}{$obj_id}">
             <input type="hidden" name="appearance[show_sku]" value="{$show_sku}" />
             {if $show_sku_label}
                 <label class="ty-control-group__label" id="sku_{$obj_prefix}{$obj_id}">{__("sku")}:</label>
             {/if}
-            <span class="ty-control-group__item">{$product.product_code}</span>
-        <!--sku_update_{$obj_prefix}{$obj_id}--></div>
+            <span class="ty-control-group__item cm-reload-{$obj_prefix}{$obj_id}" id="product_code_{$obj_prefix}{$obj_id}">{$product.product_code}<!--product_code_{$obj_prefix}{$obj_id}--></span>
+        </div>
     {/if}
 {/capture}
 {if $no_capture}
@@ -100,7 +101,7 @@
             {/hook}
 
             {if $extra_button}{$extra_button nofilter}&nbsp;{/if}
-                {include file="buttons/add_to_cart.tpl" but_id=$_but_id but_name="dispatch[checkout.add..`$obj_id`]" but_role=$but_role block_width=$block_width obj_id=$obj_id product=$product but_meta=$add_to_cart_meta}
+            {include file="buttons/add_to_cart.tpl" but_id=$_but_id but_name="dispatch[checkout.add..`$obj_id`]" but_role=$but_role block_width=$block_width obj_id=$obj_id product=$product but_meta=$add_to_cart_meta}
 
             {assign var="cart_button_exists" value=true}
         {/if}
@@ -265,7 +266,7 @@
 
 {********************** Price *********************}
 {capture name="price_`$obj_id`"}
-    <span class="cm-reload-{$obj_prefix}{$obj_id} ty-price-update" id="price_update_{$obj_prefix}{$obj_id}">
+    <span class="{if $product.zero_price_action !== "A"}cm-reload-{$obj_prefix}{$obj_id}{/if} ty-price-update" id="price_update_{$obj_prefix}{$obj_id}">
         <input type="hidden" name="appearance[show_price_values]" value="{$show_price_values}" />
         <input type="hidden" name="appearance[show_price]" value="{$show_price}" />
         {if $show_price_values}
@@ -289,7 +290,7 @@
                 {/if}
             {/hook}
             {/if}
-        {elseif $settings.General.allow_anonymous_shopping == "hide_price_and_add_to_cart" && !$auth.user_id}
+        {elseif $settings.Checkout.allow_anonymous_shopping == "hide_price_and_add_to_cart" && !$auth.user_id}
             <span class="ty-price">{__("sign_in_to_view_price")}</span>
         {/if}
     <!--price_update_{$obj_prefix}{$obj_id}--></span>
@@ -325,9 +326,9 @@
             <input type="hidden" name="appearance[show_price_values]" value="{$show_price_values}" />
             <input type="hidden" name="appearance[show_list_discount]" value="{$show_list_discount}" />
             {if $product.discount}
-                <span class="ty-list-price ty-save-price ty-nowrap" id="line_discount_value_{$obj_prefix}{$obj_id}">{__("you_save")}: {include file="common/price.tpl" value=$product.discount span_id="discount_value_`$obj_prefix``$obj_id`" class="ty-list-price ty-nowrap"}&nbsp;(<span id="prc_discount_value_{$obj_prefix}{$obj_id}" class="ty-list-price ty-nowrap">{$product.discount_prc}</span>%)</span>
+                <span class="ty-list-price ty-save-price ty-nowrap" id="line_discount_value_{$obj_prefix}{$obj_id}">{__("you_save")}: {include file="common/price.tpl" value=$product.discount span_id="discount_value_`$obj_prefix``$obj_id`" class="ty-list-price ty-nowrap"}<span class="ty-save-price__percent">&nbsp;(<span id="prc_discount_value_{$obj_prefix}{$obj_id}" class="ty-list-price ty-nowrap">{$product.discount_prc}</span>%)</span></span>
             {elseif $product.list_discount}
-                <span class="ty-list-price ty-save-price ty-nowrap" id="line_discount_value_{$obj_prefix}{$obj_id}"> {__("you_save")}: {include file="common/price.tpl" value=$product.list_discount span_id="discount_value_`$obj_prefix``$obj_id`"}&nbsp;(<span id="prc_discount_value_{$obj_prefix}{$obj_id}">{$product.list_discount_prc}</span>%)</span>
+                <span class="ty-list-price ty-save-price ty-nowrap" id="line_discount_value_{$obj_prefix}{$obj_id}"> {__("you_save")}: {include file="common/price.tpl" value=$product.list_discount span_id="discount_value_`$obj_prefix``$obj_id`"}<span class="ty-save-price__percent">&nbsp;(<span id="prc_discount_value_{$obj_prefix}{$obj_id}">{$product.list_discount_prc}</span>%)</span></span>
             {/if}
         <!--line_discount_update_{$obj_prefix}{$obj_id}--></span>
     {/if}
@@ -347,6 +348,55 @@
 {/capture}
 {if $no_capture}
     {assign var="capture_name" value="discount_label_`$obj_prefix``$obj_id`"}
+    {$smarty.capture.$capture_name nofilter}
+{/if}
+
+{************************************ Product labels ****************************}
+{$product_labels_position = $product_labels_position|default:"top-right"}
+
+{capture name="product_labels_`$obj_prefix``$obj_id`"}
+    {if $show_product_labels}
+        {capture name="capture_product_labels_`$obj_prefix``$obj_id`"}
+            {hook name="products:product_labels"}
+            {if $show_shipping_label && $product.free_shipping == "Y"}
+                {include
+                    file="views/products/components/product_label.tpl"
+                    label_meta="ty-product-labels__item--shipping"
+                    label_text=__("free_shipping")
+                    label_mini=$product_labels_mini
+                    label_static=$product_labels_static
+                    label_rounded=$product_labels_rounded
+                }
+            {/if}
+            {if $show_discount_label && ($product.discount_prc || $product.list_discount_prc) && $show_price_values}
+                {if $product.discount}
+                    {$label_text = "{__("save_discount")} {$product.discount_prc}%"}
+                {else}
+                    {$label_text = "{__("save_discount")} {$product.list_discount_prc}%"}
+                {/if}
+
+                {include
+                    file="views/products/components/product_label.tpl"
+                    label_meta="ty-product-labels__item--discount"
+                    label_text=$label_text
+                    label_mini=$product_labels_mini
+                    label_static=$product_labels_static
+                    label_rounded=$product_labels_rounded
+                }
+            {/if}
+            {/hook}
+        {/capture}
+        {$capture_product_labels = "capture_product_labels_`$obj_prefix``$obj_id`"}
+
+        {if $smarty.capture.$capture_product_labels|trim}
+            <div class="ty-product-labels ty-product-labels--{$product_labels_position} {if $product_labels_mini}ty-product-labels--mini{/if} {if $product_labels_static}ty-product-labels--static{/if} cm-reload-{$obj_prefix}{$obj_id}" id="product_labels_update_{$obj_prefix}{$obj_id}">
+                {$smarty.capture.$capture_product_labels nofilter}
+            <!--product_labels_update_{$obj_prefix}{$obj_id}--></div>
+        {/if}
+    {/if}
+{/capture}
+{if $no_capture}
+    {$capture_name = "product_labels_`$obj_prefix``$obj_id`"}
     {$smarty.capture.$capture_name nofilter}
 {/if}
 
@@ -442,7 +492,7 @@
 
 {capture name="product_options_`$obj_id`"}
     {if $show_product_options}
-    <div class="cm-reload-{$obj_prefix}{$obj_id}" id="product_options_update_{$obj_prefix}{$obj_id}">
+    <div class="cm-reload-{$obj_prefix}{$obj_id} js-product-options-{$obj_prefix}{$obj_id}" id="product_options_update_{$obj_prefix}{$obj_id}">
         <input type="hidden" name="appearance[show_product_options]" value="{$show_product_options}" />
         {hook name="products:product_option_content"}
             {if $disable_ids}
@@ -489,16 +539,16 @@
             {assign var="default_amount" value="1"}
         {/if}
 
-        {if $show_qty && $product.is_edp !== "Y" && $cart_button_exists == true && ($settings.General.allow_anonymous_shopping == "allow_shopping" || $auth.user_id) && $product.avail_since <= $smarty.const.TIME || ($product.avail_since > $smarty.const.TIME && $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum)}
+        {if $show_qty && $product.is_edp !== "Y" && $cart_button_exists == true && ($settings.Checkout.allow_anonymous_shopping == "allow_shopping" || $auth.user_id) && $product.avail_since <= $smarty.const.TIME || ($product.avail_since > $smarty.const.TIME && $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum)}
             <div class="ty-qty clearfix{if $settings.Appearance.quantity_changer == "Y"} changer{/if}" id="qty_{$obj_prefix}{$obj_id}">
                 {if !$hide_qty_label}<label class="ty-control-group__label" for="qty_count_{$obj_prefix}{$obj_id}">{$quantity_text|default:__("quantity")}:</label>{/if}
                 {if $product.qty_content}
                 <select name="product_data[{$obj_id}][amount]" id="qty_count_{$obj_prefix}{$obj_id}">
-                {assign var="a_name" value="product_amount_`$obj_prefix``$obj_id`"}
-                {assign var="selected_amount" value=false}
-                {foreach name="`$a_name`" from=$product.qty_content item="var"}
-                    <option value="{$var}" {if $product.selected_amount && ($product.selected_amount == $var || ($smarty.foreach.$a_name.last && !$selected_amount))}{assign var="selected_amount" value=true}selected="selected"{/if}>{$var}</option>
-                {/foreach}
+                    {assign var="a_name" value="product_amount_`$obj_prefix``$obj_id`"}
+                    {assign var="selected_amount" value=false}
+                    {foreach name="`$a_name`" from=$product.qty_content item="var"}
+                        <option value="{$var}" {if $product.selected_amount && ($product.selected_amount == $var || ($smarty.foreach.$a_name.last && !$selected_amount))}{assign var="selected_amount" value=true}selected="selected"{/if}>{$var}</option>
+                    {/foreach}
                 </select>
                 {else}
                 <div class="ty-center ty-value-changer cm-value-changer">
@@ -575,5 +625,6 @@
     <!--{$object_id}--></div>
 {/hook}
 {/foreach}
+{/hook}
 
 {hook name="products:product_data"}{/hook}

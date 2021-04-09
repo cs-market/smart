@@ -192,139 +192,164 @@ function fn_promotion_rebuild_mixed_data(items, value, id, element_id, condition
 
 {capture name="mainbox"}
 
-<form action="{""|fn_url}" enctype="multipart/form-data" method="post" name="promotion_form" class="conditions-tree form-horizontal form-edit  {if !$allow_save}cm-hide-inputs{/if}" >
-<input type="hidden" class="cm-no-hide-input" name="promotion_id" value="{$id}" />
-<input type="hidden" class="cm-no-hide-input" name="selected_section" value="{$smarty.request.selected_section}" />
-<input type="hidden" class="cm-no-hide-input" name="promotion_data[zone]" value="{$promotion_data.zone|default:$zone}" />
+    {capture name="tabsbox"}
+        <form action="{""|fn_url}" enctype="multipart/form-data" method="post" name="promotion_form" class="conditions-tree form-horizontal form-edit  {if !$allow_save}cm-hide-inputs{/if}" >
+            <input type="hidden" class="cm-no-hide-input" name="promotion_id" value="{$id}" />
+            <input type="hidden" class="cm-no-hide-input" name="selected_section" value="{$smarty.request.selected_section}" />
+            <input type="hidden" class="cm-no-hide-input" name="promotion_data[zone]" value="{$promotion_data.zone|default:$zone}" />
 
-{capture name="tabsbox"}
-<div id="content_details">
-<fieldset>
-{hook name="promotions:general_content"}
-    <div class="control-group">
-        <label for="elm_promotion_name" class="control-label cm-required">{__("name")}:</label>
-        <div class="controls">
-            <input type="text" name="promotion_data[name]" id="elm_promotion_name" size="25" value="{$promotion_data.name}" class="input-large" />
-        </div>
-    </div>
+            <div id="content_details">
+                <fieldset>
 
-    <div class="control-group">
-        <label class="control-label" for="elm_promotion_det_descr">{__("detailed_description")}:</label>
-        <div class="controls">
-        <textarea id="elm_promotion_det_descr" name="promotion_data[detailed_description]" cols="55" rows="8" class="cm-wysiwyg input-large">{$promotion_data.detailed_description}</textarea>
-        </div>
-    </div>
+                    {hook name="promotions:general_content"}
 
-    <div class="control-group">
-        <label class="control-label" for="elm_promotion_sht_descr">{__("short_description")}:</label>
-        <div class="controls">
-            <textarea id="elm_promotion_sht_descr" name="promotion_data[short_description]" cols="55" rows="8" class="cm-wysiwyg input-large">{$promotion_data.short_description}</textarea>
-        </div>
-    </div>
+                        <div class="control-group">
+                            <label for="elm_promotion_name" class="control-label cm-required">{__("name")}:</label>
+                            <div class="controls">
+                                <input type="text" name="promotion_data[name]" id="elm_promotion_name" size="25" value="{$promotion_data.name}" class="input-large" />
+                            </div>
+                        </div>
 
-    {if "ULTIMATE"|fn_allowed_for}
-        {include file="views/companies/components/company_field.tpl"
-            name="promotion_data[company_id]"
-            id="elm_promotion_data_`$id`"
-            selected=$promotion_data.company_id
-        }
-    {/if}
+                        <div class="control-group">
+                            <label class="control-label" for="elm_promotion_det_descr">{__("detailed_description")}:</label>
+                            <div class="controls">
+                                <textarea id="elm_promotion_det_descr" name="promotion_data[detailed_description]" cols="55" rows="8" class="cm-wysiwyg input-large">{$promotion_data.detailed_description}</textarea>
+                            </div>
+                        </div>
 
-    <div class="control-group">
-        <label class="control-label" for="elm_use_avail_period">{__("use_avail_period")}:</label>
-        <div class="controls">
-            <input type="checkbox" name="avail_period" id="elm_use_avail_period" {if $promotion_data.from_date || $promotion_data.to_date}checked="checked"{/if} value="Y" onclick="fn_activate_calendar(this);"/>
-        </div>
-    </div>
+                        <div class="control-group">
+                            <label class="control-label" for="elm_promotion_sht_descr">{__("short_description")}:</label>
+                            <div class="controls">
+                                <textarea id="elm_promotion_sht_descr" name="promotion_data[short_description]" cols="55" rows="8" class="cm-wysiwyg input-large">{$promotion_data.short_description}</textarea>
+                            </div>
+                        </div>
 
-    {capture name="calendar_disable"}{if !$promotion_data.from_date && !$promotion_data.to_date}disabled="disabled"{/if}{/capture}
+                        {if "ULTIMATE"|fn_allowed_for}
+                            {include file="views/companies/components/company_field.tpl"
+                                name="promotion_data[company_id]"
+                                id="elm_promotion_data_`$id`"
+                                selected=$promotion_data.company_id
+                            }
+                        {/if}
 
-    <div class="control-group">
-        <label class="control-label" for="elm_date_holder_from">{__("avail_from")}:</label>
-        <div class="controls">
-        <input type="hidden" name="promotion_data[from_date]" value="0" />
-        {include file="common/calendar.tpl" date_id="elm_date_holder_from" date_name="promotion_data[from_date]" date_val=$promotion_data.from_date|default:$smarty.const.TIME start_year=$settings.Company.company_start_year extra=$smarty.capture.calendar_disable}
-        </div>
-    </div>
+                        <div class="control-group">
+                            <label class="control-label" for="elm_use_avail_period">{__("use_avail_period")}:</label>
+                            <div class="controls">
+                                <input type="checkbox" name="avail_period" id="elm_use_avail_period" {if $promotion_data.from_date || $promotion_data.to_date}checked="checked"{/if} value="Y" onclick="fn_activate_calendar(this);"/>
+                            </div>
+                        </div>
 
-    <div class="control-group">
-        <label class="control-label" for="elm_date_holder_to">{__("avail_till")}:</label>
-        <div class="controls">
-        <input type="hidden" name="promotion_data[to_date]" value="0" />
-        {include file="common/calendar.tpl" date_id="elm_date_holder_to" date_name="promotion_data[to_date]" date_val=$promotion_data.to_date|default:$smarty.const.TIME start_year=$settings.Company.company_start_year extra=$smarty.capture.calendar_disable}
-        </div>
-    </div>
+                        {capture name="calendar_disable"}{if !$promotion_data.from_date && !$promotion_data.to_date}disabled="disabled"{/if}{/capture}
 
-    <script language="javascript">
-    function fn_activate_calendar(el)
-    {
-        var $ = Tygh.$;
-        var jelm = $(el);
-        var checked = jelm.prop('checked');
+                        <div class="control-group">
+                            <label class="control-label" for="elm_date_holder_from">{__("avail_from")}:</label>
+                            <div class="controls">
+                                <input type="hidden" name="promotion_data[from_date]" value="0" />
+                                {include file="common/calendar.tpl" date_id="elm_date_holder_from" date_name="promotion_data[from_date]" date_val=$promotion_data.from_date|default:$smarty.const.TIME start_year=$settings.Company.company_start_year extra=$smarty.capture.calendar_disable}
+                            </div>
+                        </div>
 
-        $('#elm_date_holder_from,#elm_date_holder_to').prop('disabled', !checked);
-    }
+                        <div class="control-group">
+                            <label class="control-label" for="elm_date_holder_to">{__("avail_till")}:</label>
+                            <div class="controls">
+                                <input type="hidden" name="promotion_data[to_date]" value="0" />
+                                {include file="common/calendar.tpl" date_id="elm_date_holder_to" date_name="promotion_data[to_date]" date_val=$promotion_data.to_date|default:$smarty.const.TIME start_year=$settings.Company.company_start_year extra=$smarty.capture.calendar_disable}
+                            </div>
+                        </div>
 
-    fn_activate_calendar(Tygh.$('#elm_use_avail_period'));
-    </script>
+                        <script language="javascript">
+                            function fn_activate_calendar(el)
+                            {
+                                var $ = Tygh.$;
+                                var jelm = $(el);
+                                var checked = jelm.prop('checked');
 
-    <div class="control-group">
-        <label class="control-label" for="elm_promotion_priority">{__("priority")}</label>
-        <div class="controls">
-        <input type="text" name="promotion_data[priority]" id="elm_promotion_priority" size="25" value="{$promotion_data.priority}" />
-        </div>
-    </div>
+                                $('#elm_date_holder_from,#elm_date_holder_to').prop('disabled', !checked);
+                            }
 
-    <div class="control-group">
-        <label class="control-label" for="elm_promotion_stop">{__("stop_other_rules")}</label>
-        <div class="controls">
-        <input type="hidden" name="promotion_data[stop]" value="N" />
-        <input type="checkbox" name="promotion_data[stop]" id="elm_promotion_stop" value="Y" {if $promotion_data.stop == "Y"}checked="checked"{/if}/>
-        </div>
-    </div>
+                            fn_activate_calendar(Tygh.$('#elm_use_avail_period'));
+                        </script>
 
-    {include file="common/select_status.tpl" input_name="promotion_data[status]" id="elm_promotion_status" obj=$promotion_data hidden=true}
+                        <div class="control-group">
+                            <label class="control-label" for="elm_promotion_priority">{__("priority")}</label>
+                            <div class="controls">
+                                <input type="text" name="promotion_data[priority]" id="elm_promotion_priority" size="25" value="{$promotion_data.priority}" />
+                            </div>
+                        </div>
 
-{/hook}
-</fieldset>
-<!--content_details--></div>
+                        <div class="control-group">
+                            <label class="control-label" for="elm_promotion_stop">{__("stop_other_rules")}</label>
+                            <div class="controls">
+                                <input type="hidden" name="promotion_data[stop]" value="N" />
+                                <input type="checkbox" name="promotion_data[stop]" id="elm_promotion_stop" value="Y" {if $promotion_data.stop == "Y"}checked="checked"{/if}/>
+                            </div>
+                        </div>
 
-<div id="content_conditions">
+                        {include file="common/select_status.tpl" input_name="promotion_data[status]" id="elm_promotion_status" obj=$promotion_data hidden=true}
 
-{include file="views/promotions/components/group.tpl" prefix="promotion_data[conditions]" group=$promotion_data.conditions root=true no_ids=true zone=$promotion_data.zone|default:$zone hide_add_buttons=!$allow_save}
+                    {/hook}
 
-<!--content_conditions--></div>
+                </fieldset>
+            <!--content_details--></div>
 
-<div id="content_bonuses">
+            <div id="content_conditions">
 
-{include file="views/promotions/components/bonuses_group.tpl" prefix="promotion_data[bonuses]" group=$promotion_data.bonuses zone=$promotion_data.zone|default:$zone hide_add_buttons=!$allow_save}
+                {include file="views/promotions/components/group.tpl" prefix="promotion_data[conditions]" group=$promotion_data.conditions root=true no_ids=true zone=$promotion_data.zone|default:$zone hide_add_buttons=!$allow_save}
 
-<!--content_bonuses--></div>
+            <!--content_conditions--></div>
 
-{hook name="promotions:tabs_content"}{/hook}
+            <div id="content_bonuses">
 
-{/capture}
-{include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox active_tab=$smarty.request.selected_section track=true}
+                {include file="views/promotions/components/bonuses_group.tpl" prefix="promotion_data[bonuses]" group=$promotion_data.bonuses zone=$promotion_data.zone|default:$zone hide_add_buttons=!$allow_save}
 
-{capture name="buttons"}
+            <!--content_bonuses--></div>
 
-{if "ULTIMATE"|fn_allowed_for && !$allow_save}
-    {assign var="hide_first_button" value=true}
-    {assign var="hide_second_button" value=true}
-{/if}
+            {if fn_allowed_for("MULTIVENDOR:ULTIMATE")|| $is_sharing_enabled}
+                <div class="hidden" id="content_storefronts">
+                    {$add_storefront_text = __("add_storefronts")}
+                    {if fn_allowed_for("ULTIMATE")}
+                        {$add_storefront_text = __("add_companies")}
+                    {/if}
+                    {include file="pickers/storefronts/picker.tpl"
+                        multiple=true
+                        input_name="promotion_data[storefront_ids]"
+                        item_ids=$promotion_data.storefront_ids
+                        data_id="storefront_ids"
+                        but_meta="pull-right"
+                        no_item_text=__("all_storefronts")
+                        but_text=$add_storefront_text
+                        view_only=($is_sharing_enabled && $runtime.company_id)
+                    }
+                <!--content_storefronts--></div>
+            {/if}
 
-{if $id}
-    {capture name="tools_list"}
-        <li>{btn type="list" text=__("delete") class="cm-confirm" href="promotions.delete?promotion_id=`$id`" method="POST"}</li>
+            {hook name="promotions:tabs_content"}{/hook}
+
+        </form>
+
+        {hook name="promotions:tabs_extra"}{/hook}
+
     {/capture}
-    {dropdown content=$smarty.capture.tools_list}
-{/if}
 
-{include file="buttons/save_cancel.tpl" but_name="dispatch[promotions.update]" hide_first_button=$hide_first_button hide_second_button=$hide_second_button but_target_form="promotion_form" save=$id}
+    {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox active_tab=$smarty.request.selected_section track=true}
 
-{/capture}
+    {capture name="buttons"}
 
-</form>
+        {if "ULTIMATE"|fn_allowed_for && !$allow_save}
+            {assign var="hide_first_button" value=true}
+            {assign var="hide_second_button" value=true}
+        {/if}
+
+        {if $id}
+            {capture name="tools_list"}
+                <li>{btn type="list" text=__("delete") class="cm-confirm" href="promotions.delete?promotion_id=`$id`" method="POST"}</li>
+            {/capture}
+            {dropdown content=$smarty.capture.tools_list}
+        {/if}
+
+        {include file="buttons/save_cancel.tpl" but_name="dispatch[promotions.update]" hide_first_button=$hide_first_button hide_second_button=$hide_second_button but_target_form="promotion_form" save=$id}
+
+    {/capture}
 {/capture}
 
 {if !$id}

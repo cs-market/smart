@@ -186,3 +186,34 @@ function fn_blog_generate_rss_feed(&$items_data, &$additional_data, &$block_data
         }
     }
 }
+
+/**
+ * Returns page_id of the first root blog entry.
+ *
+ * @return int
+ */
+function fn_blog_get_first_blog_page_id()
+{
+    return db_get_field(
+        'SELECT page_id FROM ?:pages WHERE parent_id = 0 AND page_type = ?s AND page_id = id_path ORDER BY position ASC LIMIT 1',
+        PAGE_TYPE_BLOG
+    );
+}
+
+/**
+ * The "storefront_rest_api_set_page_icons" hook handler.
+ *
+ * Actions performed:
+ *  - Sets page icons.
+ *
+ * @see fn_storefront_rest_api_set_page_icons
+ */
+function fn_blog_storefront_rest_api_set_page_icons(&$page, $sizes)
+{
+    if (!empty($page['main_pair'])) {
+        $page['main_pair']['icons'] = fn_storefront_rest_api_generate_icons(
+            $page['main_pair']['icon'],
+            $sizes['main_pair']
+        );
+    }
+}

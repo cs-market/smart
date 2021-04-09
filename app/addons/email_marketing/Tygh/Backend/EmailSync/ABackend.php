@@ -28,69 +28,94 @@ abstract class ABackend
 
     /**
      * Subscribes email
-     * @param array $data subscriber data
+     *
+     * @param array<string, string> $data Subscriber data
+     *
+     * @return bool
      */
-    public function subscribe($data)
+    public function subscribe(array $data)
     {
         return true;
     }
 
     /**
      * Unsubscribes email
-     * @param string $email 
+     *
+     * @param string $email Email
+     *
+     * @return bool
      */
     public function unsubscribe($email)
     {
         return true;
-    }    
+    }
 
     /**
      * Adds callback url when user subscribes using service form (webhook)
-     * @param mixed $list_id list ID
-     * @param string $url callback url
+     *
+     * @param string $list_id List ID
+     * @param string $url     Callback url
+     *
+     * @return bool
      */
     public function subscribeCallback($list_id, $url)
     {
         return true;
-    }    
+    }
 
     /**
      * Adds callback url when user unsubscribes using service form (webhook)
-     * @param mixed $list_id list ID
-     * @param string $url callback url
+     *
+     * @param string $list_id List ID
+     * @param string $url     Callback url
+     *
+     * @return bool
      */
     public function unsubscribeCallback($list_id, $url)
     {
         return true;
-    }    
+    }
 
     /**
      * Processes webhook data
-     * @param array $data webhook data
+     *
+     * @param array<array-key, string|array> $data Web hook data
+     *
+     * @psalm-param array{
+     *     type: string,
+     *     data: array{email: string, new_email: string, old_email: string, ip_opt: string, merges: array{FNAME: string}}
+     * } $data Web hook data
+     *
+     * @return bool|array<string, string|int>
      */
-    public function processWebHook($data)
+    public function processWebHook(array $data)
     {
         return true;
-    }    
+    }
 
     /**
      * Batch email subscription
-     * @param array $data emails (with name, timestamp, etc)
+     *
+     * @param array<array-key, array|string|int> $data Emails (with name, timestamp, etc)
+     *
+     * @return bool
      */
-    public function batchSubscribe($data)
+    public function batchSubscribe(array $data)
     {
         return true;
-    }    
+    }
 
     /**
      * Batch email unsubscription
-     * @param array $emails emails
-     * @return type
+     *
+     * @param array<string> $emails Emails
+     *
+     * @return bool
      */
-    public function batchUnsubscribe($emails)
+    public function batchUnsubscribe(array $emails)
     {
         return true;
-    }    
+    }
 
     /**
      * Syncs unsubscribed users
@@ -102,12 +127,13 @@ abstract class ABackend
 
     /**
      * Gets subscription lists
-     * @return array lists
+     *
+     * @return bool|array<string, string>
      */
     public function getLists()
     {
-        return array();
-    }    
+        return [];
+    }
 
     /**
      * Gets service options

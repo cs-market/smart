@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 fn_set_notification('E', __('error'), $message);
             }
 
-        } elseif ($pdata['processor_script'] == 'avangard.php' && $pdata['processor_params']['returns_enabled'] == 'Y' && !empty($payment_info['avangard_ticket'])) {
+        } elseif (fn_check_payment_script('avangard.php', $order_id) && $pdata['processor_params']['returns_enabled'] == 'Y' && !empty($payment_info['avangard_ticket'])) {
 
             $url = "https://www.avangard.ru/iacq/h2h/reverse_order";
 

@@ -15,5 +15,6 @@
 if ( !defined('AREA') ) { die('Access denied'); }
 
 fn_register_hooks(
-
+    'geo_maps_set_customer_location_pre',
+    'location_manager_detect_zipcode_post'
 );

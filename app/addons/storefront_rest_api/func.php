@@ -12,16 +12,16 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Addons\StorefrontRestApi\ProfileFields\Manager as ProfileFieldsManager;
 use Tygh\Enum\ProductFilterProductFieldTypes;
 use Tygh\Enum\ProductFilterStyles;
-use Tygh\Registry;
-use Tygh\Settings;
-use Tygh\Tools\SecurityHelper;
-use Tygh\Languages\Languages;
 use Tygh\Enum\ProfileFieldAreas;
 use Tygh\Enum\ProfileFieldSections;
 use Tygh\Enum\ProfileFieldTypes;
-use Tygh\Addons\StorefrontRestApi\ProfileFields\Manager as ProfileFieldsManager;
+use Tygh\Languages\Languages;
+use Tygh\Registry;
+use Tygh\Settings;
+use Tygh\Tools\SecurityHelper;
 
 if (!defined('BOOTSTRAP')) {
     die('Access denied');
@@ -83,16 +83,26 @@ function fn_storefront_rest_api_format_product_prices($product, $currency = CART
 }
 
 /**
- * Formats the prices of a order for their further usage in REST API.
+ * Formats the prices of an order for their further usage in REST API.
  *
- * @param array  $order    Order data
- * @param string $currency Currency code
+ * @param array<string, int|float|string|array> $order    Order data
+ * @param string                                $currency Currency code
  *
- * @return array
+ * @psalm-param array{
+ *   tax_summary?: array<string, float>,
+ *   products?: array<
+ *     int, array{
+ *       price: float,
+ *       list_price: float
+ *     }
+ *   >
+ * } $order
+ *
+ * @return array<string, float|string>
  */
-function fn_storefront_rest_api_format_order_prices($order, $currency = CART_PRIMARY_CURRENCY)
+function fn_storefront_rest_api_format_order_prices(array $order, $currency = CART_PRIMARY_CURRENCY)
 {
-    $fields = array(
+    $fields = [
         'total',
         'subtotal',
         'discount',
@@ -102,16 +112,20 @@ function fn_storefront_rest_api_format_order_prices($order, $currency = CART_PRI
         'tax_subtotal',
         'display_subtotal',
         'display_shipping_cost',
-    );
+    ];
 
     foreach ($fields as $field) {
-        if (isset($order[$field])) {
-            $order[$field . '_formatted'] = fn_storefront_rest_api_format_price($order[$field], $currency);
+        if (!isset($order[$field])) {
+            continue;
         }
+        /** @var float $value */
+        $value = $order[$field];
+        $order[$field . '_formatted'] = fn_storefront_rest_api_format_price($value, $currency);
     }
 
     if (isset($order['tax_summary'])) {
         foreach ($order['tax_summary'] as $key => $value) {
+            /** @var float $value */
             $order['tax_summary'][$key . '_formatted'] = fn_storefront_rest_api_format_price($value, $currency);
         }
     }
@@ -126,14 +140,26 @@ function fn_storefront_rest_api_format_order_prices($order, $currency = CART_PRI
             foreach ($group['shippings'] as &$shipping) {
                 $shipping['rate_formatted'] = fn_storefront_rest_api_format_price($shipping['rate'], $currency);
             }
-            if (isset($group['chosen_shippings'])) {
-                foreach ($group['chosen_shippings'] as &$chosen_shipping) {
-                    $chosen_shipping['rate_formatted'] = fn_storefront_rest_api_format_price($chosen_shipping['rate'], $currency);
-                }
+            unset($shipping);
+            if (!isset($group['chosen_shippings'])) {
+                continue;
             }
+            foreach ($group['chosen_shippings'] as &$chosen_shipping) {
+                $chosen_shipping['rate_formatted'] = fn_storefront_rest_api_format_price($chosen_shipping['rate'], $currency);
+            }
+            unset($chosen_shipping);
         }
         unset($group);
     }
+
+    /**
+     * Executes after prices for an order were formatted,
+     * allows you to format additional prices.
+     *
+     * @param array<string, float|string> $order    Order data
+     * @param string                      $currency Currency code
+     */
+    fn_set_hook('storefront_rest_api_format_order_prices_post', $order, $currency);
 
     return $order;
 }
@@ -666,4 +692,213 @@ function fn_storefront_rest_api_fill_auth(&$auth, $user_data, $area, $original_a
             $auth['ip'] = $headers['Storefront-Api-User-Ip'];
         }
     }
+}
+
+/**
+ * Initializes empty cart for Storefront REST API requests.
+ *
+ * @param int   $cart_service_id Cart service ID to get empty cart for
+ * @param array $auth            Authentication data
+ *
+ * @return array Empty cart
+ */
+function fn_storefront_rest_api_get_empty_cart($cart_service_id, array $auth)
+{
+    $cart = [];
+
+    fn_clear_cart($cart);
+
+    /**
+     * Executes after empty cart is initialized for the Storefront REST API request,
+     * allows you to modify the initialized cart.
+     *
+     * @param int   $cart_service_id Cart service ID to get empty cart for
+     * @param array $auth            Authentication data
+     * @param array $cart            Empty cart
+     */
+    fn_set_hook('storefront_rest_api_get_empty_cart_post', $cart_service_id, $auth, $cart);
+
+    return $cart;
+}
+
+/**
+ * Gets IDs of cart services.
+ *
+ * @param array $auth Authentication data
+ *
+ * @return array
+ */
+function fn_storefront_rest_api_get_cart_service_ids(array $auth)
+{
+    $cart_service_ids = [
+        0
+    ];
+
+    /**
+     * Executes after list of available cart service IDs is initialized for the Storefront REST API request,
+     * allows you to modify the cart services list.
+     *
+     * @param array $auth             Authentication data
+     * @param int[] $cart_service_ids Cart service IDs list
+     */
+    fn_set_hook('storefront_rest_api_get_cart_service_ids_post', $auth, $cart_service_ids);
+
+    return $cart_service_ids;
+}
+
+/**
+ * Groups cart products by cart services.
+ *
+ * @param array $cart_products Cart products data
+ *
+ * @return array[]
+ */
+function fn_storefront_rest_api_group_cart_products(array $cart_products)
+{
+    $groups = [
+        [
+            'cart_service_id' => 0,
+            'products'        => $cart_products,
+        ],
+    ];
+
+    /**
+     * Executes after products are organized into groups for the Storefront REST API request,
+     * allows you to modify the initialized groups.
+     *
+     * @param array $cart_products Cart products data
+     * @param array $groups        Product groups
+     */
+    fn_set_hook('storefront_rest_api_group_cart_products_post', $cart_products, $groups);
+
+    return $groups;
+}
+
+/**
+ * Strips configuration data and redundant information from cart data.
+ *
+ * @param array<string, int|string|array> $cart Cart content
+ *
+ * @psalm-param array{
+ *   products: array<
+ *     int, array{
+ *       user_id: int,
+ *       timestamp: int,
+ *       type: string,
+ *       user_type: string,
+ *       item_id: int,
+ *       item_type: string,
+ *       session_id: string,
+ *       ip_address: string,
+ *       order_id: int
+ *     }
+ *   >,
+ *   product_groups: array<
+ *     int, array{
+ *       products: array<
+ *         int, array{
+ *           user_id: int,
+ *           timestamp: int,
+ *           type: string,
+ *           user_type: string,
+ *           item_id: int,
+ *           item_type: string,
+ *           session_id: string,
+ *           ip_address: string,
+ *           order_id: int
+ *         }
+ *       >,
+ *       shippings: array<
+ *         int, array{
+ *           service_params: array<string, string>,
+ *           rate_info: array<string, string>
+ *         }
+ *       >,
+ *       package_info: array<string, float|string>,
+ *       package_info_full: array<string, float|string>,
+ *       chosen_shippings: array<int>
+ *     }
+ *   >,
+ *   shipping: array<
+ *     int, array{
+ *       service_params: array<string, string>,
+ *       rate_info: array<string, string>,
+ *     }
+ *   >,
+ *   user_data: array<string, int|string>,
+ *   applied_promotions: array<
+ *     int, array{
+ *       promotion_id: int
+ *     }
+ *   >
+ * } $cart
+ *
+ * @return array<string, int|string|array>
+ */
+function fn_storefront_rest_api_strip_service_data(array $cart)
+{
+    foreach ($cart['product_groups'] as $group_id => $group) {
+        // remove session product data
+        foreach (array_keys($cart['products']) as $cart_id) {
+            unset(
+                $cart['products'][$cart_id]['user_id'],
+                $cart['products'][$cart_id]['timestamp'],
+                $cart['products'][$cart_id]['type'],
+                $cart['products'][$cart_id]['user_type'],
+                $cart['products'][$cart_id]['item_id'],
+                $cart['products'][$cart_id]['item_type'],
+                $cart['products'][$cart_id]['session_id'],
+                $cart['products'][$cart_id]['ip_address'],
+                $cart['products'][$cart_id]['order_id'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['user_id'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['timestamp'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['type'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['user_type'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['item_id'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['item_type'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['session_id'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['ip_address'],
+                $cart['product_groups'][$group_id]['products'][$cart_id]['order_id']
+            );
+        }
+
+        // remove shipping config
+        foreach (array_keys($group['shippings']) as $shipping_id) {
+            unset(
+                $cart['product_groups'][$group_id]['shippings'][$shipping_id]['service_params'],
+                $cart['product_groups'][$group_id]['shippings'][$shipping_id]['rate_info'],
+                $cart['shipping'][$shipping_id]['service_params'],
+                $cart['shipping'][$shipping_id]['rate_info']
+            );
+        }
+
+        // all required data is stored in $cart['chosen_shipping']
+        unset(
+            $cart['product_groups'][$group_id]['chosen_shippings'],
+            $cart['product_groups'][$group_id]['package_info'],
+            $cart['product_groups'][$group_id]['package_info_full']
+        );
+    }
+
+    // remove promotions config
+    unset($cart['applied_promotions']);
+
+    // remove passwords and access keys
+    unset(
+        $cart['user_data']['password'],
+        $cart['user_data']['salt'],
+        $cart['user_data']['last_passwords'],
+        $cart['user_data']['password_change_timestamp'],
+        $cart['user_data']['api_key']
+    );
+
+    /**
+     * Executes after configuration data and redundant information were stripped from cart data,
+     * allows you to remove additional data.
+     *
+     * @param array<string, int|string|array> $cart Cart content
+     */
+    fn_set_hook('storefront_rest_api_strip_service_data_post', $cart);
+
+    return $cart;
 }

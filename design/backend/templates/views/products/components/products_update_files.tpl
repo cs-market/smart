@@ -26,7 +26,7 @@
 {/if}
     {if $files_tree}
         <div class="table-wrapper">
-            <table width="100%" class="table table-middle table-tree">
+            <table width="100%" class="table table-middle table--relative table-tree">
                 <thead>
                 <tr>
                     <th>
@@ -45,18 +45,29 @@
 
         {foreach from=$files_tree.folders item="folder"}
         <div class="table-wrapper">
-            <table width="100%" class="table table-middle table-tree cm-row-status-{$folder.status|lower}">
+            <table width="100%" class="table table-middle table--relative table-tree cm-row-status-{$folder.status|lower}">
                 <tbody>
-                {include file="views/products/components/folder_tree.tpl" folder=$folder id=$folder.folder_id href="products.update_folder?product_id=`$product_id`&folder_id=`$folder.folder_id`"}
+                {include file="views/products/components/folder_tree.tpl"
+                    folder=$folder
+                    id=$folder.folder_id
+                    href="products.update_folder?product_id=`$product_id`&folder_id=`$folder.folder_id`"
+                    direction=$direction
+                }
                 </tbody>
 
                 <tbody id="group_folder_{$folder.folder_id}" class="{if !$expand_all} hidden{/if}">
                     {foreach from=$folder.files item="file"}
-                        {include file="views/products/components/file_tree.tpl" product_file=$file level=1 id=$file.file_id href="products.update_file?product_id=`$product_id`&file_id=`$file.file_id`"}
+                        {include file="views/products/components/file_tree.tpl"
+                            product_file=$file
+                            level=1
+                            id=$file.file_id
+                            href="products.update_file?product_id=`$product_id`&file_id=`$file.file_id`"
+                            direction=$direction
+                        }
                     {foreachelse}
                         <tr class="multiple-table-row cm-row-status-d">
                             <td colspan="3">
-                                <div class="row-status" style="padding-left: 35px;">
+                                <div class="row-status" style="padding-{$direction}: 35px;">
                                     {__("no_files")}
                                 </div>
                             </td>
@@ -68,10 +79,15 @@
         {/foreach}
 
         <div class="table-wrapper">
-            <table width="100%" class="table table-middle table-tree">
+            <table width="100%" class="table table-middle table--relative table-tree">
                 <tbody>
                     {foreach from=$files_tree.files item="file"}
-                    {include file="views/products/components/file_tree.tpl" product_file=$file id=$file.file_id href="products.update_file?product_id=`$product_id`&file_id=`$file.file_id`"}
+                        {include file="views/products/components/file_tree.tpl"
+                            product_file=$file
+                            id=$file.file_id
+                            href="products.update_file?product_id=`$product_id`&file_id=`$file.file_id`"
+                            direction=$direction
+                        }
                     {/foreach}
                 </tbody>
             </table>

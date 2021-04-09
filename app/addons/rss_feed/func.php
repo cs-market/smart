@@ -183,7 +183,7 @@ EOT;
 
     if (!empty($params['rss_display_add_to_cart']) && $params['rss_display_add_to_cart'] == 'Y') {
         //hide add to cart button if anonymous shopping disabled
-        if (Registry::get('settings.General.allow_anonymous_shopping') == 'allow_shopping') {
+        if (Registry::get('settings.Checkout.allow_anonymous_shopping') == 'allow_shopping') {
             $add_to_cart_url = fn_url('rss.add_to_cart?product_id=' . $product_data['product_id'] . '&lang=' . $lang_code, 'C', 'current', $lang_code);
             $add_to_cart = '<a href="' . $add_to_cart_url . '" rel="nofollow">' . __('add_to_cart') . '</a>';
             $description .= <<<EOT

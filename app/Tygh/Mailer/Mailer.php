@@ -79,18 +79,37 @@ class Mailer
     /**
      * Gets company identifier from message.
      *
-     * @param  array|Message   $message   Array of E-mail message params or Message object.
+     * @param array<string,string>|Message $message Array of E-mail message params or Message object.
      *
-     * @return int|null Сompany identifier
+     * @return int|null Company identifier
      */
     protected function getCompanyIdFromMessage($message)
     {
         if ($message instanceof Message) {
             return $message->getCompanyId();
-        } else {
-            $company_id = isset($message['company_id']) ? $message['company_id'] : null;
-            return $company_id;
         }
+
+        return isset($message['company_id'])
+            ? (int) $message['company_id']
+            : null;
+    }
+
+    /**
+     * Gets storefront identifier from message.
+     *
+     * @param array<string,string>|Message $message Array of E-mail message params or Message object.
+     *
+     * @return int|null Storefront identifier
+     */
+    protected function getStorefrontIdFromMessage($message)
+    {
+        if ($message instanceof Message) {
+            return $message->getStorefrontId();
+        }
+
+        return isset($message['storefront_id'])
+            ? (int) $message['storefront_id']
+            : null;
     }
 
     /**
@@ -157,9 +176,9 @@ class Mailer
         $lang_code = empty($lang_code) ? $this->default_language_code : $lang_code;
 
         if (empty($transport_settings)) {
-            $company_id = $this->getCompanyIdFromMessage($message);    
+            $company_id = $this->getCompanyIdFromMessage($message);
 
-            if ($company_id !== null) {
+            if ($company_id) {
                 $transport = $this->getTransportByCompanyId($company_id);
             } else {
                 $transport = $this->default_transport;

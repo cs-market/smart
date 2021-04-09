@@ -1,4 +1,4 @@
-{if $settings.Security.secure_checkout == 'Y'}
+{if $settings.Security.secure_storefront === "YesNo::YES"|enum}
     {assign var="redirect_url" value="payment_notification.process?payment=yandex_p2p"|fn_url:'C':'https'}
 {else}
     {assign var="redirect_url" value="payment_notification.process?payment=yandex_p2p"|fn_url:'C':'http'}
@@ -12,19 +12,19 @@
 <hr>
 
 <div class="control-group">
-    <label class="control-label" for="payee_id">{__("rus_payments.yandex_money_payee_id")}:</label>
+    <label class="control-label cm-required" for="payee_id">{__("rus_payments.yandex_money_payee_id")}:</label>
     <div class="controls">
         <input type="text" name="payment_data[processor_params][payee_id]" id="payee_id" value="{$processor_params.payee_id}" size="60" />
     </div>
 </div>
 <div class="control-group">
-    <label class="control-label" for="client_id">{__("addons.rus_payments.app_id")}:</label>
+    <label class="control-label cm-required" for="client_id">{__("addons.rus_payments.app_id")}:</label>
     <div class="controls">
         <input type="text" name="payment_data[processor_params][client_id]" id="client_id" value="{$processor_params.client_id}" class="span7" size="60" />
     </div>
 </div>
 <div class="control-group">
-    <label class="control-label" for="secret_key">{__("addons.rus_payments.oauth2_client_secret")}:</label>
+    <label class="control-label cm-required" for="secret_key">{__("addons.rus_payments.oauth2_client_secret")}:</label>
     <div class="controls">
         <textarea class="span7" name="payment_data[processor_params][secret_key]" id="secret_key">{$processor_params.secret_key}</textarea>
     </div>

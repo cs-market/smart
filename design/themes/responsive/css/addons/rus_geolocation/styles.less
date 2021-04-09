@@ -14,6 +14,7 @@
 }
 
 .ty-geolocation-city {
+    position: relative;
     color: darken(@base, 40%);
     font-weight: bold;
     font-size: 18px;
@@ -22,6 +23,23 @@
     label {
         margin-bottom: 10px;
     }
+}
+
+input.ty-search-block__input.ty-geolocation-city__search-input {
+    padding-right: 35px;
+}
+
+.ty-geolocation-city__search-icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 35px;
+    text-align: center;
+    line-height: 2;
+    font-size: 100%;
+    color: darken(@base, 15%);
+    pointer-events: none;
 }
 
 .ty-table-cities {
@@ -55,6 +73,7 @@
             border: none;
             background: transparent;
             background-color: lighten(@base, 40%);
+            color: @secondary_button;
         }
     }
 }
@@ -67,7 +86,7 @@
 
 .ty-geo_map {
     height: 360px;
-    margin-top: 40px;
+    margin-bottom: 20px;
 }
 
 .ty-table_geolocation {
@@ -79,22 +98,11 @@
 }
 
 .ty-block-geolocation {
-    margin: 5px 0 30px 0;
-    margin-top: 5px;
-    position: relative;
-    display: inline-flex;
-}
+    min-width: 500px;
 
-.ty-block-geolocation_list {
-    position: relative;
-    float: left;
-    margin-right: 20px;
-    min-height: 300px;
-}
-
-.ty-block-geolocation_map {
-    min-height: 300px;
-    min-width: 300px;
+    @media (max-width: 767px) {
+        min-width: 260px;
+    }
 }
 
 .ty-geolocation_list_cities {

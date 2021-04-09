@@ -32,7 +32,7 @@
 {if $posts}
 {capture name="adv_buttons"}
     {if $discussion_object_type == 'E'}
-        {if $addons.discussion.home_page_testimonials != 'D'}
+        {if $addons.discussion.home_page_testimonials != 'D' && "discussion.add"|fn_check_view_permissions}
             {include file="buttons/button.tpl" title=__("add_post") but_icon="icon-plus" but_role="action" but_href="discussion.update?discussion_type=E#add_new_post"}
         {/if}
     {/if}

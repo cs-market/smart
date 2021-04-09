@@ -12,16 +12,17 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Exceptions\DeveloperException;
-use Tygh\Registry;
-use Tygh\Settings;
-use Tygh\Debugger;
 use Tygh\BlockManager\Location;
 use Tygh\BlockManager\SchemesManager;
-use Tygh\Navigation\LastView;
-use Tygh\Router;
 use Tygh\Bootstrap;
+use Tygh\Debugger;
+use Tygh\Exceptions\DeveloperException;
+use Tygh\Navigation\LastView;
+use Tygh\Registry;
+use Tygh\Router;
+use Tygh\Settings;
 use Tygh\Themes\Themes;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -32,10 +33,12 @@ define('GET_POST_CONTROLLERS', 3);
 /**
  * Set hook to use by addons
  *
- * @param mixed $argN argument, passed to addon
- * @return boolean always true
+ * @param string $hook_name Hook name
+ * @param mixed  ...$args   Arguments passed to the add-on, can be passed by reference
+ *
+ * @return bool always true
  */
-function fn_set_hook($hook_name = NULL, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = NULL, &$arg4 = NULL, &$arg5 = NULL, &$arg6 = NULL, &$arg7 = NULL, &$arg8 = NULL, &$arg9 = NULL, &$arg10 = NULL, &$arg11 = NULL, &$arg12 = NULL, &$arg13 = NULL, &$arg14 = NULL, &$arg15 = NULL)
+function fn_set_hook($hook_name = null, &...$args)
 {
     /**
      * @var bool[]|null $callable_functions Cache of validations that hook's function is callable groupped by func name.
@@ -89,41 +92,6 @@ function fn_set_hook($hook_name = NULL, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = N
         $hooks_already_sorted = array();
     }
 
-    $arg_count = func_num_args();
-    if ($arg_count === 1) {
-        $args = array();
-    } elseif ($arg_count === 2) {
-        $args = array(&$arg1);
-    } elseif ($arg_count === 3) {
-        $args = array(&$arg1, &$arg2);
-    } elseif ($arg_count === 4) {
-        $args = array(&$arg1, &$arg2, &$arg3);
-    } elseif ($arg_count === 5) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4);
-    } elseif ($arg_count === 6) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5);
-    } elseif ($arg_count === 7) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
-    } elseif ($arg_count === 8) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7);
-    } elseif ($arg_count === 9) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8);
-    } elseif ($arg_count === 10) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8, &$arg9);
-    } elseif ($arg_count === 11) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8, &$arg9, &$arg10);
-    } elseif ($arg_count === 12) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8, &$arg9, &$arg10, &$arg11);
-    } elseif ($arg_count === 13) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8, &$arg9, &$arg10, &$arg11, &$arg12);
-    } elseif ($arg_count === 14) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8, &$arg9, &$arg10, &$arg11, &$arg12, &$arg13);
-    } elseif ($arg_count === 15) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8, &$arg9, &$arg10, &$arg11, &$arg12, &$arg13, &$arg14);
-    } elseif ($arg_count === 16) {
-        $args = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, &$arg7, &$arg8, &$arg9, &$arg10, &$arg11, &$arg12, &$arg13, &$arg14, &$arg15);
-    }
-
     // Check for the core functions
     if (is_callable('fn_core_' . $hook_name)) {
         call_user_func_array('fn_core_' . $hook_name, $args);
@@ -143,9 +111,9 @@ function fn_set_hook($hook_name = NULL, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = N
 
         foreach ($hooks[$hook_name] as $callback) {
             // cache if hook function callable
-            if (!isset($callable_functions[$callback['func']])) {
+            if (is_string($callback['func']) && !isset($callable_functions[$callback['func']])) {
                 if (!is_callable($callback['func'])) {
-                    throw new DeveloperException("Hook {$callback['func']} is not callable");
+                    DeveloperException::hookHandlerIsNotCallable($callback['func']);
                 }
                 $callable_functions[$callback['func']] = true;
             }
@@ -222,7 +190,11 @@ function fn_register_hooks()
 function fn_get_secure_controllers()
 {
     $secure_controllers = array();
-    $secure_storefront_mode = Registry::get('settings.Security.secure_storefront');
+    if (Registry::get('settings.Security.secure_storefront') === YesNo::YES) {
+        $secure_storefront_mode = 'full';
+    } else {
+        $secure_storefront_mode = 'none';
+    }
     $controllers = fn_get_schema('security', 'secure_controllers');
 
     foreach ($controllers as $controller => $item) {
@@ -235,7 +207,7 @@ function fn_get_secure_controllers()
      * Allows to set list of secure controllers which use https connection.
      *
      * @param array   $secure_controllers       List of controllers.
-     * @param string  $secure_storefront_mode   Secure storefront mode (none, full, partial).
+     * @param string  $secure_storefront_mode   Secure storefront mode (Y|N).
      */
     fn_set_hook('init_secure_controllers', $secure_controllers, $secure_storefront_mode);
 
@@ -245,7 +217,7 @@ function fn_get_secure_controllers()
 /**
  * Dispathes the execution control to correct controller
  *
- * @return nothing
+ * @return void
  */
 function fn_dispatch($controller = '', $mode = '', $action = '', $dispatch_extra = '', $area = AREA)
 {
@@ -286,20 +258,18 @@ function fn_dispatch($controller = '', $mode = '', $action = '', $dispatch_extra
         && $_SERVER['REQUEST_METHOD'] == 'GET'
         && !defined('CONSOLE')
     ) {
-        if (!empty($_SERVER['REDIRECT_URL'])) {
-            $qstring = $_SERVER['REDIRECT_URL'];
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $qstring = $_SERVER['REQUEST_URI'];
         } else {
-            if (!empty($_SERVER['REQUEST_URI'])) {
-                $qstring = $_SERVER['REQUEST_URI'];
-            } else {
-                $qstring = Registry::get('config.current_url');
-            }
+            $qstring = Registry::get('config.current_url');
         }
 
         $curent_path = Registry::get('config.current_path');
         if (!empty($curent_path) && strpos($qstring, $curent_path) === 0) {
             $qstring = substr_replace($qstring, '', 0, fn_strlen($curent_path));
         }
+
+        $qstring = fn_query_remove($qstring, 's_storefront');
 
         fn_redirect(Registry::get('config.current_location') . $qstring, false, true);
     }
@@ -358,16 +328,16 @@ function fn_dispatch($controller = '', $mode = '', $action = '', $dispatch_extra
 
     if ($_SERVER['REQUEST_METHOD'] != 'POST' && !defined('AJAX_REQUEST') && !defined('CONSOLE')) {
         if ($area == 'A' && empty($_REQUEST['keep_location'])) {
-            if (!defined('HTTPS') && Registry::get('settings.Security.secure_admin') == 'Y') {
+            if (!defined('HTTPS') && Registry::get('settings.Security.secure_admin') === YesNo::YES) {
                 fn_redirect(Registry::get('config.https_location') . '/' . Registry::get('config.current_url'));
-            } elseif (defined('HTTPS') && Registry::get('settings.Security.secure_admin') != 'Y') {
+            } elseif (defined('HTTPS') && Registry::get('settings.Security.secure_admin') === YesNo::NO) {
                 fn_redirect(Registry::get('config.http_location') . '/' . Registry::get('config.current_url'));
             }
         } elseif ($area == 'C') {
             $secure_controllers = fn_get_secure_controllers();
             $controller_secure_status = isset($secure_controllers[$controller]) ? $secure_controllers[$controller] : null;
 
-            if (Registry::get('settings.Security.secure_storefront') === 'full' && $controller_secure_status === null) {
+            if (Registry::get('settings.Security.secure_storefront') === YesNo::YES && $controller_secure_status === null) {
                 $controller_secure_status = 'active';
             }
 
@@ -377,7 +347,7 @@ function fn_dispatch($controller = '', $mode = '', $action = '', $dispatch_extra
             }
 
             // if we are on https and the controller is insecure, redirect to http
-            if (defined('HTTPS') && $controller_secure_status === null && Registry::get('settings.Security.keep_https') != 'Y') {
+            if (defined('HTTPS') && $controller_secure_status === null) {
                 fn_redirect(Registry::get('config.http_location') . '/' . Registry::get('config.current_url'), false, true);
             }
         }
@@ -459,13 +429,16 @@ function fn_dispatch($controller = '', $mode = '', $action = '', $dispatch_extra
     foreach ($controllers_cascade as $item) {
         $_res = fn_run_controller($item, $controller, $mode, $action, $dispatch_extra); // 0 - status, 1 - url
 
+        $cntr_status = !empty($_res[0]) ? $_res[0] : CONTROLLER_STATUS_OK;
         $url = !empty($_res[1]) ? $_res[1] : '';
         $external = !empty($_res[2]) ? $_res[2] : false;
         $permanent = !empty($_res[3]) ? $_res[3] : false;
 
         // Status could be changed only if we allow to run controllers despite of init controller
-        if ($run_controllers == true) {
-            $status = !empty($_res[0]) ? $_res[0] : CONTROLLER_STATUS_OK;
+        if ($run_controllers == true
+            && ($status !== CONTROLLER_STATUS_NO_CONTENT || $cntr_status !== CONTROLLER_STATUS_OK)
+        ) {
+            $status = $cntr_status;
         }
 
         if ($status == CONTROLLER_STATUS_OK && !empty($url)) {
@@ -476,6 +449,10 @@ function fn_dispatch($controller = '', $mode = '', $action = '', $dispatch_extra
         } elseif ($status == CONTROLLER_STATUS_DENIED || $status == CONTROLLER_STATUS_NO_PAGE) {
             break;
         }
+    }
+
+    if ($status === CONTROLLER_STATUS_NO_CONTENT) {
+        exit();
     }
 
     LastView::instance()->init($_REQUEST);
@@ -884,8 +861,8 @@ function fn_parse_addon_options($options)
 /**
  * Get list of templates that should be overridden by addons
  *
- * @param  string $resource_name    Base template name
- * @param  Smarty $view             Templater object
+ * @param  string                  $resource_name Base template name
+ * @param  \Tygh\SmartyEngine\Core $view          Templater object
  *
  * @return string Overridden template name
  */
@@ -960,41 +937,29 @@ function fn_allowed_for($editions)
     $_mode = fn_get_storage_data('store_mode');
 
     switch ($_mode) {
-        case 'free': {
-            $store_mode = array(':FREE');
+        case '':
+        case 'plus':
+        case 'ultimate':
+            $store_modes = [':' . strtoupper($_mode)];
             $extra = '';
             break;
-        }
-        case 'full': {
-            $store_mode = ':FULL';
-            $extra = '';
-            break;
-        }
-        case '': {
-            $store_mode = ':';
-            $extra = '';
-            break;
-        }
-        case 'ultimate': {
-            $store_mode = ':ULTIMATE';
-            $extra = '';
-            break;
-        }
-        default: {
-            $store_mode = PRODUCT_EDITION == 'MULTIVENDOR' ? ':FULL' : ':ULTIMATE';
+        default:
+            $store_modes = PRODUCT_EDITION == 'MULTIVENDOR'
+                ? [':PLUS', ':ULTIMATE']
+                : [':ULTIMATE'];
             $extra = ':TRIAL';
-        }
     }
 
     foreach (explode(',', $editions) as $edition) {
         if (strpos($edition, ':') !== false) {
-
-            if ($edition == PRODUCT_EDITION . $store_mode || $edition == PRODUCT_EDITION . $store_mode . $extra) {
-                $is_allowed = true;
-                break;
+            foreach ($store_modes as $store_mode) {
+                if ($edition == PRODUCT_EDITION . $store_mode || $edition == PRODUCT_EDITION . $store_mode . $extra) {
+                    $is_allowed = true;
+                    break 2;
+                }
             }
 
-        } elseif ($edition == PRODUCT_EDITION) {
+        } elseif ($edition === PRODUCT_EDITION) {
             $is_allowed = true;
             break;
         }
@@ -1167,7 +1132,7 @@ function fn_get_storefront_protocol($company_id = null)
     }
 
     if (empty($protocols[$company_id])) {
-        $protocols[$company_id] = Settings::instance($company_id)->getValue('secure_storefront', 'Security') == 'full' ? 'https' : 'http';
+        $protocols[$company_id] = Settings::instance($company_id)->getValue('secure_storefront', 'Security') === YesNo::YES ? 'https' : 'http';
     }
 
     return $protocols[$company_id];

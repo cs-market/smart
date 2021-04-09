@@ -14,7 +14,7 @@
 
 use Tygh\Languages\Languages;
 use Tygh\Registry;
-use Tygh\Bootstrap;
+use Tygh\Template\Document\Variables\PickpupPointVariable;
 
 if ( !defined('AREA') ) { die('Access denied'); }
 
@@ -301,4 +301,69 @@ function fn_rus_edost_add_cities_in_table($rows)
 function fn_rus_edost_delete_city_post($city_id)
 {
     db_query('DELETE FROM ?:rus_edost_cities_link WHERE city_id = ?i', $city_id);
+}
+
+/**
+ * Hook handler: sets pickup point data.
+ */
+function fn_rus_edost_pickup_point_variable_init(
+    PickpupPointVariable $instance,
+    $order,
+    $lang_code,
+    &$is_selected,
+    &$name,
+    &$phone,
+    &$full_address,
+    &$open_hours_raw,
+    &$open_hours,
+    &$description_raw,
+    &$description
+) {
+    if (!empty($order['shipping'])) {
+        if (is_array($order['shipping'])) {
+            $shipping = reset($order['shipping']);
+        } else {
+            $shipping = $order['shipping'];
+        }
+
+        if (!isset($shipping['module']) || $shipping['module'] !== 'edost') {
+            return;
+        }
+
+        if (isset($shipping['office_data'])) {
+            $pickup_data = $shipping['office_data'];
+
+            $is_selected = true;
+            $name = $pickup_data['name'];
+            $phone = $pickup_data['tel'];
+            $full_address = fn_rus_edost_format_pickup_point_address($order, $pickup_data['address'], $lang_code);
+            $open_hours = $pickup_data['schedule'];
+            $open_hours_raw = [$pickup_data['schedule']];
+        }
+    }
+
+    return;
+}
+
+/**
+ * Formats eDost pickup point address.
+ *
+ * @param array  $order_info           Order data
+ * @param string $pickup_point_address Pickup point address from API response
+ * @param string $lang_code            Two-letter language code
+ *
+ * @return string Address
+ */
+function fn_rus_edost_format_pickup_point_address($order_info, $pickup_point_address, $lang_code)
+{
+    $address_parts = array_filter([
+        fn_get_country_name($order_info['s_country'], $lang_code),
+        fn_get_state_name($order_info['s_state'], $order_info['s_country'], $lang_code) ?: $order_info['s_state'],
+        $order_info['s_city'],
+        $pickup_point_address,
+    ], 'fn_string_not_empty');
+
+    $address = implode(', ', $address_parts);
+
+    return $address;
 }

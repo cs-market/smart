@@ -16,7 +16,7 @@
 }
 
 // Unable to fit email preview by email-size (on PC and big tablets)
-@media (min-width: 768px) {
+@media (min-width: @TabletBreakpoint + 1px) {
     div[aria-describedby="preview_dialog"] {
         height: auto !important;
         width: auto !important;
@@ -32,15 +32,47 @@
     }
 }
 
-.document-editor__list {
-    top: 110px;
-    position: -webkit-sticky;
-    position: sticky;
-    height: ~"calc(100vh - 165px)";
-    overflow-y: auto;
-    margin-top: 20px;
+.document-editor {
 
-    .sidebar-row:first-child {
-        margin-top: 0;
+    &__email-templates {
+        &__header {
+            margin-bottom: 5px;
+        }
+
+        &__list {
+            margin-bottom: 10px;
+            overflow-x: hidden;
+        }
     }
+
+    &__list {
+        top: 110px;
+        position: -webkit-sticky;
+        position: sticky;
+        height: ~"calc(100vh - 165px)";
+        overflow-y: auto;
+        margin-top: 20px;
+
+        .sidebar-row:first-child {
+            margin-top: 0;
+        }
+    }
+}
+
+.variables-list {
+    &__item {
+        &__edit {
+            padding: 0 !important;
+            margin: 0 0 0 4px !important;
+            display: inline-block !important;
+
+            &&:hover {
+                background: none;
+            }
+        }
+    }
+}
+
+.admin-content-wrap .sidebar .sidebar-row .nav-list.variables-list .variables-list__item__edit [class*=" icon-"] {
+    margin-right: 0 !important;
 }

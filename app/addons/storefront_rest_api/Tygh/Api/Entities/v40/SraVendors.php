@@ -4,6 +4,8 @@ namespace Tygh\Api\Entities\v40;
 
 use Tygh\Api\Entities\Vendors;
 use Tygh\Api\Response;
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
 
 class SraVendors extends Vendors
@@ -44,45 +46,51 @@ class SraVendors extends Vendors
         'contact_information',
         'shipping_address',
         'products_count',
+        'seo_name',
+        'average_rating'
     );
 
     /** @inheritdoc */
-    public function index($id = 0, $params = array())
+    public function index($id = 0, $params = [])
     {
         $params['status'] = 'A';
 
         $response = parent::index($id, $params);
 
         // do not process response when the parent entity request resulted in failure
-        if ($response['status'] != Response::STATUS_OK) {
+        if ($response['status'] !== Response::STATUS_OK) {
             return $response;
         }
 
         // do not process disabled vendor data
-        if ($id && $response['data']['status'] !== 'A') {
-            return array(
+        if ($id && $response['data']['status'] !== ObjectStatuses::ACTIVE) {
+            return [
                 'status' => Response::STATUS_NOT_FOUND,
-                'data'   => array()
-            );
+                'data'   => []
+            ];
         }
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         $is_discussion_enabled = SraDiscussion::isAddonEnabled();
 
         if ($id) {
             $response['data'] = $this->stripServiceData($response['data']);
-            $response['data'] = $this->getAdditionalData($response['data'], $lang_code);
+            $response['data'] = $this->getAdditionalData($response['data'], $lang_code, $params);
             if ($is_discussion_enabled) {
-                $response['data'] = SraDiscussion::setDiscussionType($response['data'], DISCUSSION_OBJECT_TYPE_COMPANY);
+                $response['data'] = SraDiscussion::setDiscussionType($response['data'], DiscussionObjectTypes::COMPANY);
+                $response['data']['average_rating'] = fn_discussion_round_rating($response['data']['average_rating']);
             }
         } else {
             foreach ($response['data']['sravendors'] as &$company_data) {
                 $company_data = $this->stripServiceData($company_data);
-                $company_data = $this->getAdditionalData($company_data, $lang_code);
-                if ($is_discussion_enabled) {
-                    $company_data = SraDiscussion::setDiscussionType($company_data, DISCUSSION_OBJECT_TYPE_COMPANY);
+                $company_data = $this->getAdditionalData($company_data, $lang_code, $params);
+                if (!$is_discussion_enabled) {
+                    continue;
                 }
+
+                $company_data = SraDiscussion::setDiscussionType($company_data, DiscussionObjectTypes::COMPANY);
+                $company_data['average_rating'] = fn_discussion_round_rating($company_data['average_rating']);
             }
             unset($company_data);
         }
@@ -113,10 +121,11 @@ class SraVendors extends Vendors
      *
      * @param array  $company_data Company data to gather additional data for
      * @param string $lang_code    Two-letter language code
+     * @param array  $params       An array of parameters
      *
      * @return array Company data with additional data appended
      */
-    protected function getAdditionalData(array $company_data, $lang_code = DEFAULT_LANGUAGE)
+    protected function getAdditionalData(array $company_data, $lang_code = DEFAULT_LANGUAGE, array $params = [])
     {
         $company_data['logo_url'] = $this->getLogoUrl($company_data['company_id']);
 
@@ -126,7 +135,9 @@ class SraVendors extends Vendors
 
         $company_data['shipping_address'] = $this->getShippingAddress($company_data['company_id'], $lang_code);
 
-        $company_data['products_count'] = $this->getProductsCount($company_data['company_id']);
+        if ($this->safeGet($params, 'get_products_count', true)) {
+            $company_data['products_count'] = $this->getProductsCount($company_data['company_id']);
+        }
 
         return $company_data;
     }
@@ -170,7 +181,10 @@ class SraVendors extends Vendors
     {
         $company_logos = fn_get_logos($company_id);
 
-        $theme_logo = fn_image_to_display($company_logos['theme']['image']);
+        $theme_logo = array();
+        if (!empty($company_logos['theme']['image'])) {
+            $theme_logo = fn_image_to_display($company_logos['theme']['image']);
+        }
 
         $logo_url = empty($theme_logo['image_path'])
             ? (Registry::get('config.http_location') . '/images/no_image.png')
@@ -266,10 +280,14 @@ class SraVendors extends Vendors
     /** @inheritdoc */
     public function privilegesCustomer()
     {
-        $privileges = array(
+        return [
             'index' => fn_allowed_for('MULTIVENDOR'),
-        );
+        ];
+    }
 
-        return $privileges;
+    /** @inheritDoc */
+    protected function canViewOtherCompanies()
+    {
+        return true;
     }
 }

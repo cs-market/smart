@@ -46,6 +46,16 @@
 
             var self = $(this);
             var option = self.find('option:selected');
+            var tabReload = {
+                isRequired: true,
+            };
+
+            $.ceEvent('trigger', 'ce.shippings.service_changed', [self, option, tabReload]);
+
+            if (tabReload.isRequired === false) {
+                return;
+            }
+
             var href = fn_url('shippings.configure?shipping_id={$id}&module=' + option.data('caShippingModule') + '&code=' + option.data('caShippingCode'));
             var tab = $('#configure');
 
@@ -80,7 +90,7 @@
 
 {if $id}
 {capture name="tabsbox"}
-<div id="content_general">
+<div class="hidden" id="content_general">
 {/if}
 
 {include file="common/subheader.tpl" title=__("information") target="#acc_information"}
@@ -103,12 +113,36 @@
     <label class="control-label">{__("rate_calculation")}:</label>
     <div class="controls">
         <label class="radio">
-            <input type="radio" name="shipping_data[rate_calculation]" id="sw_elm_rate_calculation_suffix_manual" value="M" {if $shipping.rate_calculation == "M" || ! $shipping.rate_calculation}checked="checked"{/if} class="cm-switch-availability cm-switch-visibility cm-switch-inverse" />
-        {__("rate_calculation_manual")}</label>
+            <input
+                type="radio"
+                name="shipping_data[rate_calculation]"
+                id="sw_elm_rate_calculation_suffix_manual"
+                value="M"
+                {if $shipping.rate_calculation == "M" || ! $shipping.rate_calculation}
+                    checked="checked"
+                {/if}
+                class="cm-switch-availability cm-switch-visibility cm-switch-inverse cm-enable-class"
+                data-ca-enable-class-target="#content_configure"
+                data-ca-enable-class-name="cm-skip-validation"
+            />
+            {__("rate_calculation_by_rate_area")}
+        </label>
 
         <label class="radio">
-            <input type="radio" name="shipping_data[rate_calculation]" id="sw_elm_rate_calculation_suffix_realtime" value="R" {if $shipping.rate_calculation == "R"}checked="checked"{/if} class="cm-switch-availability cm-switch-visibility" />
-        {__("rate_calculation_realtime")}</label>
+            <input
+                type="radio"
+                name="shipping_data[rate_calculation]"
+                id="sw_elm_rate_calculation_suffix_realtime"
+                value="R"
+                {if $shipping.rate_calculation == "R"}
+                    checked="checked"
+                {/if}
+                class="cm-switch-availability cm-switch-visibility cm-disable-class"
+                data-ca-disable-class-target="#content_configure"
+                data-ca-disable-class-name="cm-skip-validation"
+            />
+            {__("rate_calculation_realtime")}
+        </label>
     </div>
 </div>
 
@@ -122,6 +156,11 @@
                 <option data-ca-shipping-module="{$module}" {if $id && $services[$shipping.service_id].module == $module}selected="selected"{/if}>{$carrier}</option>
             {/foreach}
         </select>
+        {if fn_check_permissions("addons", "manage", "admin")}
+            <div class="well well-small help-block">
+                {__("tools_addons_additional_shipping_methods", ["[url]" => "addons.manage?type=not_installed"|fn_url])}
+            </div>
+        {/if}
         </div>
     </div>
 
@@ -163,7 +202,7 @@
     </div>
 </div>
 
-
+{hook name="shippings:update_shipping_vendor"}
 {if $allow_save}
     {if "MULTIVENDOR"|fn_allowed_for}
         {assign var="zero_company_id_name_lang_var" value="none"}
@@ -175,6 +214,7 @@
         zero_company_id_name_lang_var=$zero_company_id_name_lang_var
     }
 {/if}
+{/hook}
 
 {include file="common/select_status.tpl" input_name="shipping_data[status]" id="elm_shipping_status" obj=$shipping}
 
@@ -199,6 +239,23 @@
         {foreachelse}
             &ndash;
         {/foreach}
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label" for="elm_is_address_required"
+    >{__("is_address_required")}:</label>
+    <div class="controls">
+        <input type="hidden"
+               name="shipping_data[is_address_required]"
+               value="N"
+        />
+        <input type="checkbox"
+               name="shipping_data[is_address_required]"
+               id="is_address_required"
+               {if $shipping.is_address_required|default:"Y" == "Y"}checked="checked"{/if}
+               value="Y"
+        />
     </div>
 </div>
 
@@ -229,10 +286,10 @@
             {hook name="shippings:update_tools_list"}
                 <li>{btn type="list" text=__("add_shipping_method") href="shippings.add"}</li>
                 <li>{btn type="list" text=__("shipping_methods") href="shippings.manage"}</li>
-                {if "MULTIVENDOR"|fn_allowed_for && !$runtime.company_id}
-                    <li>{btn type="list" text=__("apply_shipping_for_all_vendors") href="shippings.apply_to_vendors?shipping_id={$id}" class="cm-confirm cm-post" data=['data-ca-confirm-text' => __("apply_shipping_for_all_vendors_confirm")]}</li>
-                {/if}
                 {if $allow_save}
+                    {if "MULTIVENDOR"|fn_allowed_for && !$runtime.company_id}
+                        <li>{btn type="list" text=__("apply_shipping_for_all_vendors") href="shippings.apply_to_vendors?shipping_id={$id}" class="cm-confirm cm-post" data=['data-ca-confirm-text' => __("apply_shipping_for_all_vendors_confirm")]}</li>
+                    {/if}
                     <li class="divider"></li>
                     <li>{btn type="list" text=__("delete") class="cm-confirm" href="shippings.delete?shipping_id=$id" method="POST"}</li>
                 {/if}
@@ -252,12 +309,31 @@
     <input type="hidden" name="selected_section" value="general" />
     <!--content_general--></div>
 
-    <div id="content_configure">
+    <div class="hidden" id="content_configure">
     <!--content_configure--></div>
 
-    <div id="content_shipping_charges">
+    <div class="hidden" id="content_shipping_charges">
     {include file="views/shippings/components/rates.tpl" id=$id shipping=$shipping}
     <!--content_shipping_charges--></div>
+
+    {if fn_allowed_for("MULTIVENDOR:ULTIMATE")|| $is_sharing_enabled}
+        <div class="hidden" id="content_storefronts">
+            {$add_storefront_text = __("add_storefronts")}
+            {if fn_allowed_for("ULTIMATE")}
+                {$add_storefront_text = __("add_companies")}
+            {/if}
+            {include file="pickers/storefronts/picker.tpl"
+                multiple=true
+                input_name="shipping_data[storefront_ids]"
+                item_ids=$shipping.storefront_ids
+                data_id="storefront_ids"
+                but_meta="pull-right"
+                no_item_text=__("all_storefronts")
+                but_text=$add_storefront_text
+                view_only=($is_sharing_enabled && $runtime.company_id)
+            }
+        <!--content_storefronts--></div>
+    {/if}
 
     {hook name="shippings:tabs_content"}
     {/hook}

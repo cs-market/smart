@@ -42,6 +42,16 @@ class ItemContext implements IContext
      */
     public function __construct(IContext $context, $item, $counter = 0)
     {
+        /**
+         * Allows to change the table item context for the render of the data table snippet.
+         *
+         * @param self                    $this    Instance of current context
+         * @param \Tygh\Template\IContext $context Instance of parent context
+         * @param mixed                   $item    Item data
+         * @param int                     $counter Sequential item counter
+         */
+        fn_set_hook('template_snippet_table_item_context_init', $this, $context, $item, $counter);
+
         $this->parent_context = $context;
         $this->counter = $counter;
         $this->item = $item;

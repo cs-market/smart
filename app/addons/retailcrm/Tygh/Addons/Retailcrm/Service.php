@@ -106,6 +106,14 @@ class Service
         $customer_data = $this->customer_converter->convertToCrmCustomer($order);
         $order_data = $this->order_converter->convertToCrmOrder($order, $customer_data['externalId']);
 
+        if (!$order_data['status'] || $order['status'] == STATUS_INCOMPLETED_ORDER) {
+            $this->logger->info(
+                sprintf('Order #%d skipped, storefront not configured.', $order['order_id']),
+                __METHOD__
+            );
+            return false;
+        }
+
         try {
             $customer = $this->api_client->customersGet($customer_data['externalId'], 'externalId', $site);
 
@@ -349,17 +357,29 @@ class Service
             return false;
         }
 
+        $shippings = isset($cart['shipping']) ? $cart['shipping'] : array();
+        $chosen_shipping_ids = isset($cart['chosen_shipping']) ? $cart['chosen_shipping'] : array();
+
         $cart = array_merge($cart, $order);
 
         $cart['calculate_shipping'] = false;
         $cart['shipping_required'] = false;
         $cart['product_groups'] = array();
 
-        if ($order['shipping_ids']) {
+        if (!empty($order['shipping_ids'])) {
             $cart['chosen_shipping'] = array($order['shipping_ids']);
         }
 
         fn_calculate_cart_content($cart, $auth, 'S', false, 'F', false);
+
+        if (!isset($order['shipping_ids']) || $order['shipping_ids'] == reset($chosen_shipping_ids)) {
+            $cart['shipping'] = $shippings;
+
+            foreach ($cart['product_groups'] as &$product_group) {
+                $product_group['chosen_shippings'] = $shippings;
+            }
+            unset($product_group);
+        }
 
         $cart['shipping_failed'] = false;
         $cart['company_shipping_failed'] = false;
@@ -369,6 +389,7 @@ class Service
         foreach ($cart['shipping'] as &$shipping) {
             $shipping['rates'] = array($order['shipping_cost']);
         }
+        unset($shipping);
 
         foreach ($cart['product_groups'] as &$product_group) {
             if (empty($product_group['chosen_shippings'])) {
@@ -378,23 +399,26 @@ class Service
             foreach ($product_group['chosen_shippings'] as &$shipping) {
                 $shipping['rate'] = $order['shipping_cost'];
             }
+            unset($shipping);
         }
+        unset($product_group);
 
         Registry::set('runtime.company_id', $order['company_id']);
 
+        //update order and change status to incomplete like changing during order management
         list($order_id, $order_status) = fn_update_order($cart, $order['order_id']);
 
         if ($order_id) {
-            $status_from = null;
             $force_notification = fn_get_notification_rules(array(), true);
 
-            if (isset($order['status']) && $order_status != $order['status']) {
-                $status_from = $order_status;
-                $force_notification['C'] = true;
-                $order_status = $order['status'];
-            }
+            //change order status to status_from for substracting reward points
+            fn_change_order_status($order_id, $order_status, '', $force_notification);
 
-            fn_change_order_status($order_id, $order_status, $status_from, $force_notification);
+            if (isset($order['status']) && $order_status != $order['status']) {
+                $force_notification['C'] = true;
+                //change order status to status_to for getting promo and orders notification
+                fn_change_order_status($order_id, $order['status'], $order_status, $force_notification);
+            }
 
             if (empty($order['order_id'])) {
                 $this->logger->info(
@@ -438,15 +462,44 @@ class Service
         $errors = array();
 
         if (!$response->isSuccessful()) {
-            if (isset($result['errors'])) {
-                $errors = $result['errors'];
-            } elseif (isset($result['errorMsg'])) {
-                $errors[] = $result['errorMsg'];
+            if (isset($response['errors'])) {
+                $errors = $response['errors'];
+            } elseif (isset($response['errorMsg'])) {
+                $errors[] = $response['errorMsg'];
             } else {
                 $errors[] = 'Response status code: ' . $response->getStatusCode();
             }
         }
 
         return $errors;
+    }
+
+    /**
+     * Check if order is exist on RetailCRM by id.
+     *
+     * @param int $order_id   Order identifier
+     * @param int $company_id Company identifier.
+     *
+     * @return bool
+     */
+    public function isRetailCrmOrderExists($order_id, $company_id)
+    {
+        $site = $this->settings->getExternalSite($company_id);
+
+        if (!$site) {
+            $this->logger->info(
+                sprintf('Order #%d skipped, storefront not configured.', $order_id),
+                __METHOD__
+            );
+
+            return false;
+        }
+
+        $order_data = $this->api_client->ordersGet($order_id, 'externalId', $site);
+        if ($order_data->isSuccessful()) {
+            return true;
+        }
+
+        return false;
     }
 }

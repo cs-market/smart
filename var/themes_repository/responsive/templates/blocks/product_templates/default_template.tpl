@@ -1,17 +1,18 @@
 {script src="js/tygh/exceptions.js"}
+
 <div class="ty-product-block ty-product-detail">
     <div class="ty-product-block__wrapper clearfix">
     {hook name="products:view_main_info"}
         {if $product}
             {assign var="obj_id" value=$product.product_id}
             {include file="common/product_data.tpl" product=$product but_role="big" but_text=__("add_to_cart")}
-            <div class="ty-product-block__img-wrapper">
+            <div class="ty-product-block__img-wrapper" style="width: {$settings.Thumbnails.product_details_thumbnail_width}px">
                 {hook name="products:image_wrap"}
                     {if !$no_images}
-                        <div class="ty-product-block__img cm-reload-{$product.product_id}" id="product_images_{$product.product_id}_update">
+                        <div class="ty-product-block__img cm-reload-{$product.product_id}" data-ca-previewer="true" id="product_images_{$product.product_id}_update">
 
-                            {assign var="discount_label" value="discount_label_`$obj_prefix``$obj_id`"}
-                            {$smarty.capture.$discount_label nofilter}
+                            {assign var="product_labels" value="product_labels_`$obj_prefix``$obj_id`"}
+                            {$smarty.capture.$product_labels nofilter}
 
                             {include file="views/products/components/product_images.tpl" product=$product show_detailed_link="Y" image_width=$settings.Thumbnails.product_details_thumbnail_width image_height=$settings.Thumbnails.product_details_thumbnail_height}
                         <!--product_images_{$product.product_id}_update--></div>

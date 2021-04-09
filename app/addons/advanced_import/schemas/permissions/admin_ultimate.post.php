@@ -14,8 +14,7 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
-$schema['import_presets'] = $schema['advanced_import'] = array(
-    'use_company' => true,
-);
+$schema['import_presets']['use_company'] = true;
+$schema['advanced_import']['use_company'] = true;
 
 return $schema;

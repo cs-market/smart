@@ -13,7 +13,7 @@
 
 {if $products}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="5%" class="center mobile-hide">
@@ -41,6 +41,13 @@
         <td class="row-status" data-th="{__("name")}">
             <input type="hidden" name="products_data[{$product.product_id}][product]" value="{$product.product}" />
             <a href="{"products.update?product_id=`$product.product_id`&selected_section=subscribers"|fn_url}" {if $product.status == "N"}class="manage-root-item-disabled"{/if}>{$product.product nofilter}</a>
+            <div class="product-list__labels">
+                {hook name="products:product_additional_info"}
+                    <div class="product-code">
+                        <span class="product-code__label">{$product.product_code}</span>
+                    </div>
+                {/hook}
+            </div>
             {include file="views/companies/components/company_name.tpl" object=$product}
         </td>
         <td>{hook name="products:p_subscr_body"}{/hook}</td>

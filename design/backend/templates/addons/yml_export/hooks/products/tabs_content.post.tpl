@@ -1,4 +1,4 @@
-<div id="content_yml">
+<div class="hidden" id="content_yml">
 
     {script src="js/addons/yml_export/yml_tab_products.js"}
 

@@ -44,13 +44,15 @@
         {$class = "location-selected"}
         {$locality = $location.locality_text}
     {/if}
-    <span class="cm-geolocation-current-location {$class}">{$locality|default:__("vendor_locations.customer_geolocation")}</span>
+    <span class="cm-geolocation-current-location ty-geolocation-current-location {$class}">{$locality|default:__("vendor_locations.customer_geolocation")}</span>
 {/capture}
 
 {include file="common/popupbox.tpl"
     href=""
     link_text=$smarty.capture.geolocation_label
+    link_text_meta="ty-geo-maps__geolocation__opener-text"
     link_icon="ty-icon-location-arrow ty-filter-products-by-geolocation-popup__icon"
+    link_icon_first=true
     link_meta="ty-filter-products-by-geolocation-popup__item"
     text=__("vendor_locations.select_city")
     id="customer_geolocation_dialog"

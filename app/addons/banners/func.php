@@ -433,7 +433,11 @@ function fn_banners_install()
     if (!empty($need_clone_langs)) {
         $clone_lang = DEFAULT_LANGUAGE;
 
-        if (in_array(DEFAULT_LANGUAGE, $need_clone_langs)) {
+        if (defined('INSTALLER_INITED')) {
+            $clone_lang = CART_LANGUAGE;
+        }
+
+        if (in_array($clone_lang, $need_clone_langs)) {
             $clone_lang = 'en';
         }
 

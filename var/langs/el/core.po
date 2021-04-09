@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Greek\n"
 "Language: el_GR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.8.2/core.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.5/core.po\n"
+"X-Crowdin-File-ID: 3710\n"
+"PO-Revision-Date: 2020-09-01 09:18\n"
 
 msgctxt "LanguageName"
 msgid "Localized language name"
@@ -55,6 +55,10 @@ msgstr "Αποδοχή"
 msgctxt "Languages::access_denied"
 msgid "Access denied"
 msgstr "Μη επιτρεπόμενη είσοδος"
+
+msgctxt "Languages::event.order.status_changed.name"
+msgid "Order status changed to [status]"
+msgstr "Κατάστασης παραγγελίας αλλαξε σε [status]"
 
 msgctxt "Languages::access_denied_text"
 msgid "You don't have permission to access the page."
@@ -131,6 +135,10 @@ msgstr "Ενεργές προσφορές"
 msgctxt "Languages::act_on_behalf"
 msgid "Act on behalf of"
 msgstr "Ενέργειες εξ ονόματος"
+
+msgctxt "Languages::log_in_as_user"
+msgid "Log in as user"
+msgstr ""
 
 msgctxt "Languages::add"
 msgid "Add"
@@ -359,6 +367,10 @@ msgstr "Προσθήκη Εντοπισμού"
 msgctxt "Languages::add_location"
 msgid "Add location"
 msgstr "Προσθήκη Τόπου"
+
+msgctxt "Languages::add_rate_area"
+msgid "Add rate area"
+msgstr "Προσθέστε την περιοχή τιμών"
 
 msgctxt "Languages::add_menu"
 msgid "Add menu"
@@ -604,6 +616,18 @@ msgctxt "Languages::allow_api_access"
 msgid "Yes, allow this user to use the API"
 msgstr "Ναι, επιτρέψτε σ' αυτό το χρήστη να χρησιμοποιεί το API"
 
+msgctxt "Languages::api_access_for_user"
+msgid "API access for this user"
+msgstr "API πρόσβαση γι αυτο το χρήστη"
+
+msgctxt "Languages::generate_new_api_key"
+msgid "Generate new API key"
+msgstr "Δημιουργία νεου κλειδιου  API"
+
+msgctxt "Languages::please_copy_api_key"
+msgid "Please copy the API key now and keep it somewhere. Once you save the changes, this key won't appear here again. If the key is lost, the only way to regain API access will be be to generate a new key on this page."
+msgstr "Αντιγράψτε τώρα το κλειδί API και κρατήστε το κάπου. Αφού αποθηκεύσετε τις αλλαγές, αυτό το κλειδί δεν θα εμφανιστεί ξανά εδώ. Εάν το κλειδί χαθει, ο μόνος τρόπος για να επανακτησετε πρόσβαση στο API θα είναι να δημιουργήσετε ένα νέο κλειδί σε αυτή τη σελίδα."
+
 msgctxt "Languages::allow_return_registration"
 msgid "Allow return registration"
 msgstr "Επιτρέψτε την επιστροφή από την εγγραφή"
@@ -635,6 +659,18 @@ msgstr "Όλα τα προϊόντα έχουν ενημερωθεί επιτυ�
 msgctxt "Languages::all_vendors"
 msgid "All stores"
 msgstr "Όλα τα καταστήματα"
+
+msgctxt "Languages::all_storefronts_short"
+msgid "All"
+msgstr ""
+
+msgctxt "Languages::show_all_storefronts"
+msgid "Show all storefronts"
+msgstr ""
+
+msgctxt "Languages::show_all_storefronts_with_count"
+msgid "Show all [count] storefronts"
+msgstr ""
 
 msgctxt "Languages::all_words"
 msgid "All of these words"
@@ -1228,6 +1264,94 @@ msgctxt "Languages::block_manager.layout_pages"
 msgid "Layout pages"
 msgstr "Διάταξη σελίδων"
 
+msgctxt "Languages::block_manager.wrappers.lite_checkout"
+msgid "Lite checkout"
+msgstr "Lite checkout"
+
+msgctxt "Languages::block_lite_checkout_location"
+msgid "Checkout: Location"
+msgstr "Ταμειο: Τοποθεσία"
+
+msgctxt "Languages::block_lite_checkout_location_description"
+msgid "Customer's city, state, and country"
+msgstr "Πόλη, Νόμος και Χώρα Πελάτη"
+
+msgctxt "Languages::block_lite_checkout_customer_sign_in"
+msgid "Checkout: Sign-In"
+msgstr "Ταμείο: Σύνδεση"
+
+msgctxt "Languages::block_lite_checkout_customer_sign_in_description"
+msgid "Sign-in button"
+msgstr "Κουμπί Σύνδεσης"
+
+msgctxt "Languages::customer_sign_in"
+msgid "Customer Sign-In"
+msgstr "Σύνδεση Πελάτη"
+
+msgctxt "Languages::block_lite_checkout_customer_information"
+msgid "Checkout: Customer Information"
+msgstr "Ταμείο: Πληροφορίες Πελάτη"
+
+msgctxt "Languages::block_lite_checkout_customer_information_description"
+msgid "Profile fields for customer information"
+msgstr "Πεδία προφίλ για Πληροφορίες Πελάτη"
+
+msgctxt "Languages::block_lite_checkout_customer_address"
+msgid "Checkout: Address"
+msgstr "Ταμείο: Διεύθυνση"
+
+msgctxt "Languages::block_lite_checkout_customer_address_description"
+msgid "Profile fields for customer address"
+msgstr "Πεδία Προφίλ για Διεύθυνση Πελάτη"
+
+msgctxt "Languages::customer_address"
+msgid "Customer address"
+msgstr "Διεύθυνση Πελάτη"
+
+msgctxt "Languages::block_lite_checkout_shipping_methods"
+msgid "Checkout: Shipping methods"
+msgstr "Ταμείο: Τρόποι Αποστολής"
+
+msgctxt "Languages::block_lite_checkout_shipping_methods_description"
+msgid "Shipping method selection"
+msgstr "Επιλογή Τρόπου Αποστολής"
+
+msgctxt "Languages::block_lite_checkout_payment_methods"
+msgid "Checkout: Payment methods"
+msgstr "Ταμείο: Τρόποι Πληρωμής"
+
+msgctxt "Languages::block_lite_checkout_payment_methods_description"
+msgid "Payment method selection"
+msgstr "Επιλογή Τρόπου Πληρωμής"
+
+msgctxt "Languages::block_lite_checkout_customer_billing"
+msgid "Checkout: Billing address"
+msgstr "Ταμείο: Διεύθυνση Χρέωσης"
+
+msgctxt "Languages::block_lite_checkout_customer_billing_description"
+msgid "Profile fields for billing address"
+msgstr "Πεδία για Διεύθυνση Χρέωσης"
+
+msgctxt "Languages::block_lite_checkout_customer_notes"
+msgid "Checkout: Notes"
+msgstr "Ταμείο: Σημειώσεις"
+
+msgctxt "Languages::block_lite_checkout_customer_notes_description"
+msgid "Customer's notes about the order"
+msgstr "Σημειώσεις Πελάτη για την Παραγγελία"
+
+msgctxt "Languages::block_lite_checkout_terms_and_conditions"
+msgid "Checkout: Terms and conditions"
+msgstr "Ταμείο: Όροι Χρήσης"
+
+msgctxt "Languages::block_lite_checkout_terms_and_conditions_description"
+msgid "Checkbox for accepting terms and conditions"
+msgstr "Πεδίο επιλογής για Αποδοχή Όρων Χρήσης"
+
+msgctxt "Languages::terms_and_conditions"
+msgid "Terms and conditions"
+msgstr "Όροι Χρήσης"
+
 msgctxt "Languages::block_menu"
 msgid "Menu"
 msgstr "Μενού"
@@ -1553,8 +1677,8 @@ msgid "You can not use percentage value for base price."
 msgstr "Δεν μπορείτε να χρησιμοποιήσετε ποσοστό για την τιμή βάσης."
 
 msgctxt "Languages::cant_upload_file"
-msgid "File could not be uploaded"
-msgstr "Το αρχείο δεν ήταν δυνατό να φορτωθεί"
+msgid "Couldn't upload the file. The problem isn't necessarily on the [product] end. If it occurs regularly, please contact your server administrator or our technical support."
+msgstr "Δεν ήταν δυνατή η μεταφόρτωση του αρχείου. Το πρόβλημα δεν είναι αναγκαστικά στο [product]. Εάν εμφανίζεται τακτικά, επικοινωνήστε με το διαχειριστή του διακομιστή ή την τεχνική υποστήριξη."
 
 msgctxt "Languages::capture"
 msgid "Capture"
@@ -1824,6 +1948,10 @@ msgctxt "Languages::check_items_text"
 msgid "To include Order statuses, Payment methods and Locations in the conditions list, check the necessary item and click on the \"Save\" button."
 msgstr "Για να συμπεριλάβετε τις καταστάσεις παραγγελίας, τους τρόπους αποστολής και τις τοποθεσίες στην λίστα προϋποθέσεων, ελέγξτε το απαραίτητο στοιχείο και κάντε κλικ στο κουμπί  \"Save\""
 
+msgctxt "Languages::sales_reports_side_bar_notes"
+msgid "To include Order statuses, Payment methods and Rate areas in the conditions list, check the necessary item and click on the \"Save\" button."
+msgstr "Για να συμπεριλάβετε τις καταστάσεις παραγγελίας, τις μεθόδους πληρωμής και τις τιμές στο πεδίο των συνθηκών, ελέγξτε το απαραίτητο στοιχείο και κάντε κλικ στο κουμπί \"Αποθήκευση\"."
+
 msgctxt "Languages::check_none"
 msgid "None"
 msgstr "Κανένα"
@@ -1903,6 +2031,10 @@ msgstr "Εκκαθάριση ιστορικού"
 msgctxt "Languages::clean_logs"
 msgid "Clear logs"
 msgstr "Καθαρισμός Αρχείου Καταγραφής"
+
+msgctxt "Languages::clean_old_logs"
+msgid "Clear logs older than [n] day|Clear logs older than [n] days"
+msgstr "Διαγραφή αρχείων καταγραφής μεγαλύτερων από [n] ημέρα | Διαγραφή αρχείων καταγραφής μεγαλύτερων από [n] ημερών"
 
 msgctxt "Languages::clean_up_all_locations_on_import"
 msgid "Clean up locations before import"
@@ -2397,8 +2529,8 @@ msgid "Brazilian Real"
 msgstr "Βραζιλιάνικο Real"
 
 msgctxt "Languages::currency_code_byr"
-msgid "BYR"
-msgstr "BYR"
+msgid "BYN"
+msgstr ""
 
 msgctxt "Languages::currency_code_cad"
 msgid "Canadian Dollar"
@@ -2660,6 +2792,10 @@ msgctxt "Languages::text_file_editor_notice_full_link"
 msgid "You can upload and download files via [link]"
 msgstr "Μπορείτε να ανεβάζετε και να κατεβάζετε αρχεία μέσω του [link]"
 
+msgctxt "Languages::current_previous_period"
+msgid "'Current ('[date]') and previous period'"
+msgstr ""
+
 msgctxt "Languages::current_period"
 msgid "Current Period"
 msgstr "Τρέχουσα Περίοδος"
@@ -2677,6 +2813,10 @@ msgid "Customer"
 msgstr "Πελάτης"
 
 msgctxt "Languages::customers"
+msgid "Customers"
+msgstr "Πελάτες"
+
+msgctxt "Languages::customers_menu_title"
 msgid "Customers"
 msgstr "Πελάτες"
 
@@ -2915,10 +3055,6 @@ msgstr "Διαγραμμένος"
 msgctxt "Languages::deleted_product"
 msgid "DELETED PRODUCT"
 msgstr "Διεγραμμένο προϊόν"
-
-msgctxt "Languages::delete_all_found"
-msgid "Delete all found"
-msgstr "Διαγραφή όλων που βρέθηκαν"
 
 msgctxt "Languages::delete_block"
 msgid "Delete block"
@@ -3364,6 +3500,10 @@ msgctxt "Languages::editing_location"
 msgid "Editing location"
 msgstr "Επεξεργασία τοποθεσίας"
 
+msgctxt "Languages::editing_rate_area"
+msgid "Editing rate area"
+msgstr "Επεξεργασία περιοχής τιμών"
+
 msgctxt "Languages::editing_menu"
 msgid "Editing menus"
 msgstr "Επεξεργασία menu"
@@ -3449,8 +3589,8 @@ msgid "Edit content on-site"
 msgstr "Επεξεργαστείτε περιεχόμενο on-site"
 
 msgctxt "Languages::edit_files"
-msgid "Edit files"
-msgstr "Επεξεργασία Αρχείων"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::edit_layout"
 msgid "Edit layout"
@@ -3856,6 +3996,10 @@ msgctxt "Languages::error_validator_phone"
 msgid "The phone number in the <b>[field]</b> field is invalid. The correct format is (555) 555-55-55 or 55 55 555 5555."
 msgstr "Ο αριθμός τηλεφώνου στο <b>[field]</b>πεδίο δεν είναι έγκυρο.Η σωστή μορφή είναι (555) 555-55-55 ή 55 55 555 5555."
 
+msgctxt "Languages::error_validator_phone_mask"
+msgid "The phone number in the <b>[field]</b> field is invalid."
+msgstr "Ο αριθμός τηλεφώνου στο πεδίο <b>[field]</b> δεν είναι έγκυρος."
+
 msgctxt "Languages::error_validator_phone_number"
 msgid "It is required to use the following format for this payment method: 555 555 5555."
 msgstr "Απαιτείται να χρησιμοποιήσετε την παρακάτω μορφή για τις μεθόδους πληρωμής: 555 555 5555."
@@ -3875,6 +4019,10 @@ msgstr "Η εταιρεία με το e-mail που έχετε επιλέξει 
 msgctxt "Languages::error_validator_ccv"
 msgid "CVV/CVC is too short."
 msgstr "Ο Αριθμός CVV/CVC ειναι ελειπης"
+
+msgctxt "Languages::error_validator_ccv_long"
+msgid "CVV/CVC is too long."
+msgstr ""
 
 msgctxt "Languages::error_change_admin_data_in_frontend"
 msgid "It's forbidden to change the admin email or password in the customer area. Please sign in using a customer account."
@@ -4003,6 +4151,10 @@ msgstr "Εξαγωγή επιλογών"
 msgctxt "Languages::export_selected"
 msgid "Export selected"
 msgstr "Εξαγωγή επιλεγμένων"
+
+msgctxt "Languages::export_products"
+msgid "Export products"
+msgstr ""
 
 msgctxt "Languages::extended"
 msgid "Extended"
@@ -4570,7 +4722,7 @@ msgstr "Ώρα"
 
 msgctxt "Languages::how_to_send"
 msgid "How to send?"
-msgstr "Πως να στείλω?"
+msgstr "Με ποιο τρόπο Αποστολης?"
 
 msgctxt "Languages::html_block"
 msgid "HTML block"
@@ -4711,6 +4863,10 @@ msgstr "Αρχική σελίδα"
 msgctxt "Languages::information"
 msgid "Information"
 msgstr "Πληροφορίες"
+
+msgctxt "Languages::tip"
+msgid "Tip"
+msgstr "Υπόδειξη"
 
 msgctxt "Languages::inner_hint"
 msgid "Inner hint"
@@ -4868,6 +5024,10 @@ msgctxt "Languages::items_in_cart"
 msgid "You have [n] item in your cart|You have [n] items in your cart"
 msgstr "Έχετε [n] προϊόν στο Καλάθι|Έχετε [n] προϊόντα στο Καλάθι"
 
+msgctxt "Languages::n_products"
+msgid "[n] product|[n] products"
+msgstr "[n] προϊόν |[n] προϊόντα"
+
 msgctxt "Languages::items_per_page"
 msgid "Items per page"
 msgstr "Στοιχεία ανά σελίδα"
@@ -4999,6 +5159,14 @@ msgstr "Τελευταίες [N] ημέρες"
 msgctxt "Languages::last_order"
 msgid "Last order"
 msgstr "Τελευταία Παραγγελία"
+
+msgctxt "Languages::first_order"
+msgid "First order"
+msgstr ""
+
+msgctxt "Languages::registration_date"
+msgid "Registration date"
+msgstr "Ημερομηνία εγγραφής"
 
 msgctxt "Languages::latitude"
 msgid "Latitude"
@@ -5212,13 +5380,25 @@ msgctxt "Languages::location"
 msgid "Location"
 msgstr "Τοποθεσία"
 
+msgctxt "Languages::rate_area"
+msgid "Rate area"
+msgstr "Περιοχή τιμής"
+
 msgctxt "Languages::locations"
 msgid "Locations"
 msgstr "Τοποθεσίες"
 
+msgctxt "Languages::rate_areas"
+msgid "Rate areas"
+msgstr "Περιοχες Τιμων"
+
+msgctxt "Languages::statuses_management"
+msgid "Statuses"
+msgstr "Καταστάσεις"
+
 msgctxt "Languages::locations_menu_description"
-msgid "Manage the set of locations that are supported in your store."
-msgstr "Διαχείριση του συνόλου των τοπικών προσαρμογών που υποστηρίζει το κατάστημά σας."
+msgid "Manage the set of rate areas that are supported in your store."
+msgstr "Διαχείριση των συνόλων των περιοων τιμων που υποστηρίζει το κατάστημά σας."
 
 msgctxt "Languages::loggedin_time"
 msgid "Logged in time"
@@ -5421,8 +5601,8 @@ msgid "Manage menus"
 msgstr "Διαχείρηση menu"
 
 msgctxt "Languages::manage_pages"
-msgid "Manage pages"
-msgstr "Διαχείριση Σελίδων"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::manage_products"
 msgid "Manage products"
@@ -5924,6 +6104,10 @@ msgctxt "Languages::new_location"
 msgid "New location"
 msgstr "Νέα τοποθεσία"
 
+msgctxt "Languages::new_rate_area"
+msgid "New rate area"
+msgstr "Νεα Περιοχη Τιμων"
+
 msgctxt "Languages::new_menu"
 msgid "New menu"
 msgstr "Νέο Μενου"
@@ -5931,10 +6115,6 @@ msgstr "Νέο Μενου"
 msgctxt "Languages::new_option"
 msgid "New option"
 msgstr "Νέα επιλογή"
-
-msgctxt "Languages::new_orders"
-msgid "New orders"
-msgstr "Νέες Παραγγελίες"
 
 msgctxt "Languages::new_page"
 msgid "New page"
@@ -6135,6 +6315,10 @@ msgstr "δεν είναι εγκατεστημένο"
 msgctxt "Languages::not_scroll_automatically"
 msgid "Do not scroll automatically"
 msgstr "Μη αυτόματη κύλιση"
+
+msgctxt "Languages::enable_link"
+msgid "Enable link"
+msgstr "Ενεργοποίηση συνδέσμου"
 
 msgctxt "Languages::no_categories_available"
 msgid "No categories available"
@@ -6673,8 +6857,8 @@ msgid "Sorry, the hash string does not match"
 msgstr "Λυπούμαστε, δεν ταιριάζει με τη συμβολοσειρά hash"
 
 msgctxt "Languages::payments.epdq.instructions"
-msgid "<ol><li><p>Enter the following URL in the \"Technical information\"→\"Transaction feedback\" section in the ePDQ admin area:</p><p>for the \"accepted\" and \"cancelled\" payments: [url]</p></li><li>Make sure that the \"Timing of the request\" is set to \"Always online\", and \"Request method\" is set to \"POST\"</li><li>Define the \"SHA-OUT pass phrase\" value in the ePDQ admin area as you like, then duplicate it in the \"SHA-IN pass phrase\" field in the \"Data and origin verification\" section, and also in the \"Pass-phrase\" field below</li><li>Make sure that the \"Default operation code\" option in the ePDQ admin area has the same value as the \"Transaction type\" option value below</li><li>Set the \"Hash algorithm\" parameter to \"SHA-1\" in the \"Global security parameters\" section in the ePDQ admin area</li></ol>"
-msgstr "<ol><li><p>Enter the following URL in the \"Technical information\"?\"Transaction feedback\" section in the ePDQ admin area:</p><p>for the \"accepted\" and \"cancelled\" payments: [url]</p></li><li>Make sure that the \"Timing of the request\" is set to \"Always online\", and \"Request method\" is set to \"POST\"</li><li>Define the \"SHA-OUT pass phrase\" value in the ePDQ admin area as you like, then duplicate it in the \"SHA-IN pass phrase\" field in the \"Data and origin verification\" section, and also in the \"Pass-phrase\" field below</li><li>Make sure that the \"Default operation code\" option in the ePDQ admin area has the same value as the \"Transaction type\" option value below</li><li>Set the \"Hash algorithm\" parameter to \"SHA-1\" in the \"Global security parameters\" section in the ePDQ admin area</li></ol>"
+msgid "<ol><li><p>Enter the following URL in the \"Technical information\"→\"Transaction feedback\" section in the Barclaycard ePDQ admin area:</p><p>for the \"accepted\" and \"cancelled\" payments: [url]</p></li><li>Make sure that the \"Timing of the request\" is set to \"Always online\", and \"Request method\" is set to \"POST\"</li><li>Define the \"SHA-OUT pass phrase\" value in the ePDQ admin area as you like, then duplicate it in the \"SHA-IN pass phrase\" field in the \"Data and origin verification\" section, and also in the \"Pass-phrase\" field below</li><li>Make sure that the \"Default operation code\" option in the ePDQ admin area has the same value as the \"Transaction type\" option value below</li><li>Set the \"Hash algorithm\" parameter to \"SHA-1\" in the \"Global security parameters\" section in the Barclaycard ePDQ admin area</li></ol>"
+msgstr ""
 
 msgctxt "Languages::payments.epdq.pspid"
 msgid "EPDQ pspid"
@@ -7101,212 +7285,220 @@ msgid "Privileges"
 msgstr "Προνόμια"
 
 msgctxt "Languages::privileges.change_order_status"
-msgid "Change order status"
-msgstr "Αλλαγή κατάστασης παραγγελίας"
+msgid "Can change statuses"
+msgstr "Μπορεί να αλλάξει τις καταστάσεις"
 
 msgctxt "Languages::privileges.create_order"
-msgid "Create order"
-msgstr "Δημιουργία παραγγελίας"
+msgid "Can create"
+msgstr "Δυνατότητα Δημιουργίας"
 
 msgctxt "Languages::privileges.backup_restore"
-msgid "Backup/Restore"
-msgstr "Δημιουργία αντιγράφων ασφαλείας/επαναφορά"
+msgid "Can manage"
+msgstr "Δυνατότητα Διαχείρισης"
 
 msgctxt "Languages::privileges.delete_logs"
-msgid "Delete logs"
-msgstr "Διαγραφή αρχείων καταγραφής"
+msgid "Can delete"
+msgstr "Δυνατότητα Διαγραφής"
 
 msgctxt "Languages::privileges.delete_orders"
-msgid "Delete orders"
-msgstr "Διαγραφή παραγγελιών"
+msgid "Can delete"
+msgstr "Δυνατότητα Διαγραφής"
 
 msgctxt "Languages::privileges.edit_blocks"
-msgid "Edit blocks"
-msgstr "Επεξεργασια blocks"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.edit_order"
-msgid "Edit order"
-msgstr "Επεξεργασία παραγγελίας"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.edit_files"
 msgid "Edit files"
 msgstr "Επεξεργασία Αρχείων"
 
 msgctxt "Languages::privileges.exim_access"
-msgid "Import and export data"
-msgstr "Εισαγωγή και εξαγωγή δεδομένων"
+msgid "Can manage"
+msgstr "Δυνατότητα Διαχείρισης"
 
 msgctxt "Languages::privileges.manage_catalog"
-msgid "Manage catalog"
-msgstr "Διαχείριση καταλόγου"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_currencies"
-msgid "Manage currencies"
-msgstr "Διαχείριση νομίσματος"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_design"
-msgid "Manage design"
-msgstr "Διαχείρηση Design"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_languages"
-msgid "Manage languages"
-msgstr "Διαχείριση γλώσσας"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_locations"
-msgid "Manage locations"
-msgstr "Διαχείριση τοποθεσιών"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_order_statuses"
-msgid "Manage order statuses"
-msgstr "Διαχείριση  κατάστασης παραγγελίας"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_pages"
 msgid "Manage pages"
 msgstr "Διαχείριση σελίδων"
 
 msgctxt "Languages::privileges.manage_payments"
-msgid "Manage payments"
-msgstr "Διαχείριση πληρωμών"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_promotions"
-msgid "Manage promotion system"
-msgstr "Διαχείριση συστήματος επιβράβευσης"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_reports"
-msgid "Manage reports"
-msgstr "Διαχείριση αναφορών"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_shipping"
-msgid "Manage shipping"
-msgstr "Διαχείριση αποστολής"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_sitemap"
-msgid "Manage sitemap"
-msgstr "Διαχείριση χάρτη ιστοσελίδας"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_static_data"
-msgid "Manage static data"
-msgstr "Διαχείριση στατικών δεδομένων"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_storage"
-msgid "Manage storage"
-msgstr "Διαχείριση Aποθήκευσης"
+msgid "Can manage"
+msgstr "Δυνατότητα Διαχείρισης"
 
 msgctxt "Languages::privileges.manage_stores"
 msgid "Manage stores"
 msgstr "Διαχείρηση Καταστημάτων"
 
 msgctxt "Languages::privileges.manage_taxes"
-msgid "Manage taxes"
-msgstr "Διαχείριση φόρου"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_themes"
-msgid "Manage themes"
-msgstr "Διαχείρηση themes"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_translation"
-msgid "On-site live editing"
-msgstr "On-site live επεξεργασια"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_usergroups"
-msgid "Manage user groups"
-msgstr "Διαχείριση ομάδων χρήστη"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_users"
-msgid "Manage users"
-msgstr "Διαχείριση χρηστών"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_email_templates"
-msgid "Manage email templates"
-msgstr "Διαχειριστείτε email Templates"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.manage_document_templates"
-msgid "Manage document templates"
-msgstr "Διαχειριστείτε Templates εγγράφων"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.update_settings"
-msgid "Update settings"
-msgstr "Ενημέρωση ρυθμίσεων"
+msgid "Can edit"
+msgstr "Δυνατότητα Επεξεργασίας"
 
 msgctxt "Languages::privileges.upgrade_store"
-msgid "Upgrade store"
-msgstr "Αναβάθμιση καταστήματος"
+msgid "Can upgrade"
+msgstr "Δυνατότητα Αναβάθμισης"
 
 msgctxt "Languages::privileges.view_catalog"
-msgid "View catalog"
-msgstr "Προβολή καταλόγου"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_currencies"
-msgid "View currencies"
-msgstr "Προβολή νομίσματος"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_languages"
-msgid "View languages"
-msgstr "Προβολή ρυθμίσεων"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_locations"
-msgid "View locations"
-msgstr "Προβολή τοποθεσιών"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_logs"
-msgid "View logs"
-msgstr "Προβολή αρχείων καταγραφής"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_orders"
-msgid "View orders"
-msgstr "Προβολή παραγγελιών"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_pages"
-msgid "View pages"
-msgstr "Προβολή σελίδων"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_payments"
-msgid "View payments"
-msgstr "Προβολή πληρωμών"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_reports"
-msgid "View reports"
-msgstr "Προβολή αναφορών"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_settings"
-msgid "View settings"
-msgstr "Προβολή ρυθμίσεων"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_shipping"
-msgid "View shipping"
-msgstr "Προβολή αποστολής"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_static_data"
-msgid "View static data"
-msgstr "Προβολή στατικών δεδομένων"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_stores"
 msgid "View stores"
 msgstr "Προβολη καταστημάτων"
 
 msgctxt "Languages::privileges.view_taxes"
-msgid "View taxes"
-msgstr "Προβολή φόρου"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_usergroups"
-msgid "View user groups"
-msgstr "Προβολή ομάδων χρήστη"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privileges.view_users"
-msgid "View users"
-msgstr "Προβολή χρηστών"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::privilege_sections.addons"
-msgid "Add-ons"
-msgstr "Πρόσθετες Μονάδες"
+msgid "Add-on privileges"
+msgstr "Δικαιώματα Add-on"
 
 msgctxt "Languages::privilege_sections.administration"
-msgid "Administration"
-msgstr "Διοίκηση"
+msgid "Administration privileges"
+msgstr "Δικαιώματα Διαχειριστή"
 
 msgctxt "Languages::privilege_sections.cart"
 msgid "Cart"
 msgstr "Καλάθι"
+
+msgctxt "Languages::privilege_sections.products"
+msgid "Product privileges"
+msgstr "Δικαιώματα προϊόντος"
+
+msgctxt "Languages::privilege_sections.settings"
+msgid "Settings privileges"
+msgstr "Δικαιώματα ρυθμίσεων"
 
 msgctxt "Languages::privilege_sections.catalog"
 msgid "Catalog"
@@ -7317,20 +7509,28 @@ msgid "CMS"
 msgstr "ΣΔΠ (σύστηματα διαχείρησης περιεχομένου)"
 
 msgctxt "Languages::privilege_sections.design"
-msgid "Look and Feel"
-msgstr "Εμφάνιση και αίσθηση"
+msgid "Design privileges"
+msgstr "Δικαιώματα σχεδίασης"
 
 msgctxt "Languages::privilege_sections.orders"
-msgid "Orders"
-msgstr "Παραγγελίες"
+msgid "Order privileges"
+msgstr "Άλλα δικαιώματα"
+
+msgctxt "Languages::privilege_sections.marketing"
+msgid "Marketing privileges"
+msgstr "Δικαιώματα Marketing"
+
+msgctxt "Languages::privilege_sections.website"
+msgid "Website privileges"
+msgstr "Δικαιώματα Website"
 
 msgctxt "Languages::privilege_sections.users"
-msgid "Users"
-msgstr "Χρήστες"
+msgid "Customer privileges"
+msgstr "Δικαιώματα Πελάτη"
 
 msgctxt "Languages::privilege_sections.vendors"
-msgid "Stores"
-msgstr "Πωλητής"
+msgid "Store privileges"
+msgstr "Δικαιώματα Καταστήματος"
 
 msgctxt "Languages::proceed"
 msgid "Proceed"
@@ -7361,8 +7561,8 @@ msgid "Processor"
 msgstr "Εκκαθάριση"
 
 msgctxt "Languages::processor_description_cardsave"
-msgid "Merchant Accounts provided by Cardsave, <a href=\"http://www.cardsave.net\">www.cardsave.net</a><br/><br/>Email: <a href='mailto:ecomm@cardsave.net'>ecomm@cardsave.net</a>"
-msgstr "Οι εμπορικοί λογαριασμοί παρέχονται από το Cardsave, <a href=\"http://www.cardsave.net\">www.cardsave.net</a><br/><br/>Email: <a href=mailto:ecomm@cardsave.net>ecomm@cardsave.net</a>"
+msgid "Merchant Accounts provided by Worldpay Cardsave, <a href=\"http://www.cardsave.net\">www.cardsave.net</a><br/><br/>Email: <a href='mailto:ecomm@cardsave.net'>ecomm@cardsave.net</a>"
+msgstr ""
 
 msgctxt "Languages::processor_description_p21"
 msgid "<b>P21 Simple API</b> enables you to accept check payments. It offers the industry's most comprehensive suite of check image creation and clearing solutions. With Check 21, you will receive your funds within the same day by check or direct deposit.<br/><br/>To activate the Check 21 option, please contact us via email at: <a href=\"mailto:support@payment21.com\">support@payment21.com</a> or by phone at: 1-888-770-0850 (US Toll Free) or 0041-71-740-1629 (International).<br/><br/><a href=\"http://www.payment21.com\" target=\"_blank\">www.payment21.com</a>"
@@ -7384,6 +7584,10 @@ msgctxt "Languages::products"
 msgid "Products"
 msgstr "Προϊόντα"
 
+msgctxt "Languages::products_menu_title"
+msgid "Products"
+msgstr "Προϊόντα"
+
 msgctxt "Languages::products_deprecated"
 msgid "Products (Deprecated)"
 msgstr "Προϊόντα (υπο καταργηση)"
@@ -7395,6 +7599,10 @@ msgstr "Προϊόντα2"
 msgctxt "Languages::products_added_to_cart"
 msgid "The products were added to your cart"
 msgstr "Τα προϊόντα προστέθηκαν στο καλάθι σας"
+
+msgctxt "Languages::products_number_added_to_cart"
+msgid "<b>[number]</b> products were added to your cart"
+msgstr ""
 
 msgctxt "Languages::products_amount"
 msgid "Product quantity"
@@ -7455,6 +7663,10 @@ msgstr "Τα προϊόντα που έχουν σταλεί σε εσάς. Οι
 msgctxt "Languages::product_added_to_cart"
 msgid "The product was added to your cart"
 msgstr "Το προϊόν προστέθηκε στο καλάθι σας"
+
+msgctxt "Languages::product_name_added_to_cart"
+msgid "<b>[product]</b> was added to your cart"
+msgstr ""
 
 msgctxt "Languages::product_added_to_cl"
 msgid "The product was added to your Comparison list"
@@ -7892,6 +8104,10 @@ msgctxt "Languages::rate_calculation_manual"
 msgid "Manual (by defined location)"
 msgstr "Εγχειρίδιο (βάσει περιοχής)"
 
+msgctxt "Languages::rate_calculation_by_rate_area"
+msgid "Manual (by defined rate area)"
+msgstr "Χειροκίνητα (βάσει περιοχής τιμών)"
+
 msgctxt "Languages::rate_calculation_realtime"
 msgid "Realtime"
 msgstr "Σε πραγματικό χρόνο"
@@ -8177,8 +8393,8 @@ msgid "Payment methods"
 msgstr "Τρόποι πληρωμής"
 
 msgctxt "Languages::reports_parameter_6"
-msgid "Locations"
-msgstr "Τοποθεσίες"
+msgid "Rate areas"
+msgstr "Περιοχές Τιμών"
 
 msgctxt "Languages::reports_parameter_7"
 msgid "Users"
@@ -8564,9 +8780,17 @@ msgctxt "Languages::secure_storefront_url"
 msgid "Secure storefront URL"
 msgstr "Ασφαλές URL καταστήματος"
 
+msgctxt "Languages::store_access_key"
+msgid "Access key to temporarily closed store"
+msgstr "Κλειδί για πρόσβαση σε προσωρινά κλειστό κατάστημα"
+
 msgctxt "Languages::secure_storefront_url_already_exists"
 msgid "The value of the <strong>Secure storefront URL</strong> parameter mentioned by you already belongs to another company."
 msgstr "Η τιμή της παραμέτρου του <strong>ασφαλούς URL καταστήματος</strong> που προαναφέρατε ήδη ανήκει σε άλλη εταιρεία."
+
+msgctxt "Languages::url_access_storefront"
+msgid "Use the following URL to access the storefront:<br><a href=\"[url]\" target=\"_blank\">[url]</a>"
+msgstr "Χρησιμοποιήστε την ακόλουθη διεύθυνση URL για να αποκτήσετε πρόσβαση στο κατάστημα:<br><a href=\"[url]\" target=\"_blank\">[url]</a>"
 
 msgctxt "Languages::security_settings"
 msgid "Security settings"
@@ -8587,6 +8811,10 @@ msgstr "Επιλογή"
 msgctxt "Languages::selected"
 msgid "Selected"
 msgstr "Επιλεγμένο"
+
+msgctxt "Languages::selected_fields"
+msgid "Selected fields"
+msgstr "Επιλεγμένα πεδία"
 
 msgctxt "Languages::selected_items"
 msgid "Selected items"
@@ -8663,6 +8891,10 @@ msgstr "Επιλογή Νομού"
 msgctxt "Languages::select_tables"
 msgid "Select tables"
 msgstr "Επιλογή Πίνακα"
+
+msgctxt "Languages::select_storefront"
+msgid "Select [store] storefront"
+msgstr ""
 
 msgctxt "Languages::semicolon"
 msgid "Semicolon"
@@ -8840,6 +9072,10 @@ msgctxt "Languages::shipping_charges"
 msgid "Shipping charges"
 msgstr "Έξοδα αποστολής"
 
+msgctxt "Languages::shipping_time_and_charges"
+msgid "Shipping time and rates"
+msgstr "Χρόνος Αποστολής και τα τιμές"
+
 msgctxt "Languages::shipping_cost"
 msgid "Shipping cost"
 msgstr "Κόστος Αποστολής"
@@ -8877,7 +9113,7 @@ msgid "Shipping Options"
 msgstr "Τρόπος Αποστολής"
 
 msgctxt "Languages::shipping_properties"
-msgid "Shipping Properties"
+msgid "Shipping properties"
 msgstr "Ιδιότητες αποστολής"
 
 msgctxt "Languages::shipping_rates"
@@ -8893,20 +9129,20 @@ msgid "Shipping service"
 msgstr "Υπηρεσία αποστολής"
 
 msgctxt "Languages::ship_dhl_height"
-msgid "Package height (inches)"
-msgstr "Ύψος πακέτου(ίντσες)"
+msgid "Package height"
+msgstr ""
 
 msgctxt "Languages::ship_dhl_length"
-msgid "Package length (inches)"
-msgstr "Μήκος πακέτου (cm)"
+msgid "Package length"
+msgstr ""
 
 msgctxt "Languages::ship_dhl_site_id"
 msgid "Site ID"
 msgstr "Αναγνωριστικό Site"
 
 msgctxt "Languages::ship_dhl_width"
-msgid "Package width (inches)"
-msgstr "Πλάτος πακέτου (cm)"
+msgid "Package width"
+msgstr ""
 
 msgctxt "Languages::ship_fedex_ancillary_endorsement"
 msgid "Ancillary Endorsements"
@@ -9452,6 +9688,10 @@ msgctxt "Languages::show_rate_for_destination"
 msgid "Show rates for location"
 msgstr "Εφαρμογή του ΦΠΑ για τον Παρακάτω Προορισμό"
 
+msgctxt "Languages::show_rate_for_rate_area"
+msgid "Show rates for rate area"
+msgstr "Προβολή τιμών από περιοχή τιμών"
+
 msgctxt "Languages::show_tab_in_popup"
 msgid "Show this tab in a popup window"
 msgstr "Εμφάνιση της καρτέλας σε αναδυόμενο παράθυρο"
@@ -9664,6 +9904,14 @@ msgctxt "Languages::type_to_search_or_click_button"
 msgid "Type to search, or click the button on the right for advanced search"
 msgstr "Πληκτρολογήστε για αναζήτηση ή κάντε κλικ στο κουμπί στα δεξιά για σύνθετη αναζήτηση"
 
+msgctxt "Languages::enter_color_name_and_code"
+msgid "Enter color name and code. Example, \"Red #ff0000\""
+msgstr "Εισάγετε όνομα και κωδικό χρώματος. Παράδειγμα, \"Red #ff0000\""
+
+msgctxt "Languages::enter_category_name_and_path"
+msgid "Enter path and category name. Example, \"Electronics/Computers/Laptops\""
+msgstr "Εισάγετε την διαδρομή και το όνομα της κατηγορίας. Παράδειγμα, \"Ηλεκτρικά/Υπολογιστές/Φορητοί\""
+
 msgctxt "Languages::ssl_certificate"
 msgid "SSL certificate"
 msgstr "Πιστοποιητικό SSL"
@@ -9732,6 +9980,10 @@ msgctxt "Languages::status_changed"
 msgid "Status has been changed"
 msgstr "Η κατάσταση άλλαξε"
 
+msgctxt "Languages::no_active_storefronts"
+msgid "No active storefronts"
+msgstr ""
+
 msgctxt "Languages::status_changed_after_process_payment"
 msgid "Order status was set according to the payment processing result"
 msgstr "Η κατάσταση παραγγελίας ορίστηκε σύμφωνα με το αποτέλεσμα της επεξεργασίας πληρωμής"
@@ -9788,13 +10040,17 @@ msgctxt "Languages::storefront_url_not_defined"
 msgid "Storefront URL not defined"
 msgstr "Δεν ορίστηκε το URL καταστηματος"
 
+msgctxt "Languages::stores_status"
+msgid "Status"
+msgstr "Κατάσταση"
+
+msgctxt "Languages::storefront_status_access_key_hint"
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Go to <a target=\"blank\" href=\"[url]\">Settings → General</a> and specify the <i>Access key to temporarily closed store</i> setting. Please note that a different key can be specified for each storefront, so make sure to select the correct storefront first. Use the key as described in the tooltip of that setting."
+msgstr "Ακόμη και αν το καταστημα είναι κλειστο (η κατάσταση είναι απενεργοποιημένη), θα μπορείτε να τοδείτε αν έχετε κλειδί πρόσβασης. Μεταβείτε στην επιλογή <a target=\"blank\" href=\"[url]\"> Ρυθμίσεις → Γενικά </a> και καθορίστε τη ρύθμιση <i> Κλειδί πρόσβασης σε προσωρινά κλειστό κατάστημα </ i>. Λάβετε υπόψη ότι μπορεί να οριστεί διαφορετικό κλειδί για κάθε κατάστημα, επομένως βεβαιωθείτε ότι έχετε επιλέξει πρώτα το σωστό κατάστημα. Χρησιμοποιήστε το κλειδί όπως περιγράφεται στην επεξήγηση της συγκεκριμένης ρύθμισης."
+
 msgctxt "Languages::stores"
 msgid "Stores"
 msgstr "Καταστήματα"
-
-msgctxt "Languages::store_locator"
-msgid "Store locator"
-msgstr "Εντοπιστής καταστήματος"
 
 msgctxt "Languages::store_mode"
 msgid "Licensing mode"
@@ -10180,6 +10436,10 @@ msgctxt "Languages::text_additional_thumbnail"
 msgid "(displayed on product details page in \"Additional images\")"
 msgstr "(εμφανίζονται στη σελίδα λεπτομερειων προϊόντος στις \"Επιπλεον Φωτογραφίες\")"
 
+msgctxt "Languages::addon_files_was_copied"
+msgid "The <b>\"[addon]\"</b> add-on files has been copied successfully"
+msgstr ""
+
 msgctxt "Languages::text_addon_cannot_enable"
 msgid "Add-on \"[addon_name]\" is incompatible with the following add-ons: [addons]. It cannot be enabled"
 msgstr "Το πρόσθετο \"[addon_name]\" δεν είναι συμβατο με τα παρακατω προσθετα: [addons]. Δε μπορει να ενεργοποιηθει"
@@ -10287,6 +10547,10 @@ msgstr "Αυτή η ενότητα σας επιτρέπει να διαχειρ
 msgctxt "Languages::text_billing_same_with_shipping"
 msgid "Billing and shipping addresses are the same"
 msgstr "Η Διεύθυνση Τιμολόγησης και Αποστολής είναι ίδιες"
+
+msgctxt "Languages::text_billing_address_is_different_from_shipping"
+msgid "My billing address is different from shipping address"
+msgstr "Η Διεύθυνση Χρέωσης είναι Διαφορετική από την Διεύθυνση Αποστολής"
 
 msgctxt "Languages::text_block_trial_notice"
 msgid "Your 30-day evaluation period has expired. Please, buy a license ([href]) or remove the software from your server."
@@ -10477,8 +10741,8 @@ msgid "Logo for the <b>customer</b> area"
 msgstr "Λογότυπο για την  περιοχή <b> πελάτη </ b> ."
 
 msgctxt "Languages::text_datatrans_notice"
-msgid "<b>Note</b>: In order to track your DataTrans orders with the shopping cart software you have to take the following steps:<br /> <br /> -&nbsp;Log in to your DataTrans account<br /> -&nbsp;Click on the <u>'Upp Data'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Set <u>'URL Post data format'</u> to <b>'Data in HTML FORM'</b>.<br /> -&nbsp;Set <u>'URL Post'</u> to:<br /> <b>[post_url]</b><br /> -&nbsp;Click on the <u>'Security'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Select the <b>'An additional merchant identification will be send with payment messages'</b> option.<br /> -&nbsp;Generate new digital signature using the <u>'Generate new sign'</u> button.<br /> -&nbsp;Set generated value to the <u>'Digital signature'</u> field on the DataTrans payment configuration page in your store<br />"
-msgstr "<b> Σημείωση </ b>: Για να παρακολουθήσετε τις παραγγελίες σας με το λογισμικό Data Trans  θα πρέπει να ληφθούν τα ακόλουθα βήματα: <br /> <br /> -&nbsp Συνδεθείτε στο λογαριασμο σας στο DataTrans<br /> -&nbsp Πατηστε στο συνδεσμο <u>Upp Data</u> στον τομεα <u>Upp Administration</u>.<br /> -&nbsp Ορίστε <u>URL Post data format</u> στο <b>Data in Post format</b>.<br /> -&nbsp Ορίστε <u>Approved URL</u> στο:<br /> <b>[post_url]</b><br /> -&nbsp Πατηστε στο συνδεσμο <u>Security</u> στον τομεα <u>Upp Administration</u>.<br /> -&nbsp Επιλέξτε την επιλογή <b>An additional merchant identification will be send with payment messages</b.<br /> -&nbsp Δημιουργήστε νεα ψηφιακη υπογραφηχρησιμοποιώντας το κουμπι <u>Generate new sign</u>.<br /> -&nbsp Οριστε τη δημιουργημενη αξια στο πεδιο <u>Digital signature</u> στη σελιδα ρυθμισεων πληρωμων DataTrans στο καταστημα σας στο CS-Cart<br />"
+msgid "<b>Note</b>: In order to track your Datatrans orders with the shopping cart software you have to take the following steps:<br /> <br /> -&nbsp;Log in to your Datatrans account<br /> -&nbsp;Click on the <u>'Upp Data'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Set <u>'URL Post data format'</u> to <b>'Data in HTML FORM'</b>.<br /> -&nbsp;Set <u>'URL Post'</u> to:<br /> <b>[post_url]</b><br /> -&nbsp;Click on the <u>'Security'</u> link in the <u>'Upp Administration'</u> section.<br /> -&nbsp;Select the <b>'An additional merchant identification will be send with payment messages'</b> option.<br /> -&nbsp;Generate new digital signature using the <u>'Generate new sign'</u> button.<br /> -&nbsp;Set generated value to the <u>'Digital signature'</u> field on the Datatrans payment configuration page in your store<br />"
+msgstr ""
 
 msgctxt "Languages::text_data_changed"
 msgid "Your changes have not been saved.Press OK to continue, or Cancel to stay on the current page."
@@ -10588,10 +10852,6 @@ msgctxt "Languages::text_expired_license"
 msgid "Unfortunately, your subscription for [product] software is over. Please renew it as soon as possible to avoid the program suspending."
 msgstr "Δυστυχώς, η συνδρομή σας για το λογισμικό CS-Cart τελειωσε. Παρακαλούμε ανανεώστε την το συντομότερο δυνατό για να αποφευχθεί η αναστολή του προγράμματος."
 
-msgctxt "Languages::tmpl_text_fancybox"
-msgid "FancyBox"
-msgstr "FancyBox"
-
 msgctxt "Languages::text_features_delimiter"
 msgid "Delimiter between variant values of a product feature."
 msgstr "Οριοθέτης των τιμων των παραλλαγων ενός χαρακτηριστικού σε προϊόν."
@@ -10653,8 +10913,8 @@ msgid "It is not allowed to upload files with size more than <b>[size]</b>"
 msgstr "Δεν επιτρέπεται να ανεβάσετε αρχεία με μέγεθος πάνω από <b>[size]</b>"
 
 msgctxt "Languages::text_license_required_full"
-msgid "Your current CS-Cart edition is Professional. We also offer another one, a more advanced edition—<b>Ultimate</b>. With CS-Cart Ultimate, you'll be able to use unlimited number of storefronts and the mobile commerce app as well as the eBay Synchronization add-on and the Facebook app without additional fees. To unlock unlimited storefonts and mobile commerce, get the Ultimate license."
-msgstr "Την τρέχουσα έκδοση του CS-Cart είναι Professional. Προσφέρουμε επίσης μια ακόμη πιο προηγμένη έκδοση — <b>Ultimate</b>. Με το CS-Cart Ultimate, θα είστε σε θέση να χρησιμοποιήσετε απεριόριστο αριθμό καταστημάτων αλλά και το mobile commerce app, καθώς και το  πρόσθετου συγχρονισμού  eBay και την εφαρμογή του Facebook χωρίς πρόσθετα κόστη. Για να ξεκλειδώσετε τα απεριόριστα storefronts και το mobile commerce app, αγοράστε την άδεια για Ultimate."
+msgid "Your current CS-Cart edition is Professional. We also offer another one, a more advanced edition—<b>Ultimate</b>. With CS-Cart Ultimate, you'll be able to use unlimited number of storefronts and the mobile commerce app as well as the eBay Synchronization add-on and the Facebook app without additional fees. To unlock unlimited storefronts and mobile commerce, get the Ultimate license."
+msgstr "Η τρέχουσα έκδοση του CS-Cart είναι Professional. Προσφέρουμε επίσης μια ακόμη πιο προηγμένη έκδοση — <b>Ultimate</b>. Με το CS-Cart Ultimate, θα είστε σε θέση να χρησιμοποιήσετε απεριόριστο αριθμό καταστημάτων αλλά και το mobile commerce app, καθώς και το eBay Synchronization app και το Facebook app χωρίς πρόσθετα κόστη. Για να ξεκλειδώσετε την δυνατότητα απεριόριστων καταστημάτων και το mobile commerce app, αποκτήστε την άδεια Ultimate."
 
 msgctxt "Languages::text_license_required_storefronts"
 msgid "Add as many storefronts as you want and manage them via a single admin panel."
@@ -10719,10 +10979,6 @@ msgstr "Έχετε εισάγει μια άκυρη διεύθυνση URL"
 msgctxt "Languages::text_items_added"
 msgid "The items were added successfully"
 msgstr "Τα στοιχεία που προστέθηκαν με επιτυχία"
-
-msgctxt "Languages::text_light_box"
-msgid "Lightbox"
-msgstr "Lightbox"
 
 msgctxt "Languages::text_payment_first_data_notice"
 msgid "Please log in to FirstData Connect 2.0 Admin, open the \"Administration\" tab, click on the \"Connect 2.0 Setup\" link.<br /> Set the following URL in the \"Order Submission Form\", \"Confirmation Page\", \"Failure Page\" sections: [return_url]<br />"
@@ -10811,6 +11067,10 @@ msgstr "Δεν βρέθηκαν παραγγελίες"
 msgctxt "Languages::text_no_payments_needed"
 msgid "No payment information required"
 msgstr "Δεν υπάρχουν  απαιτούμενες πληροφορίες πληρωμής"
+
+msgctxt "Languages::text_no_payments_required"
+msgid "No payment required"
+msgstr "Δεν απαιτείται πληρωμή"
 
 msgctxt "Languages::text_no_products"
 msgid "There are no products in this section"
@@ -10905,12 +11165,12 @@ msgid "Loading... Your request is being processed, please wait."
 msgstr "Φόρτωση ... Η αίτησή σας είναι υπό επεξεργασία, παρακαλώ περιμένετε."
 
 msgctxt "Languages::text_password_recovery_instructions_sent"
-msgid "Password recovery instructions have been sent to your email."
-msgstr "Οδηγίες για την ανάκτηση του Κωδικού Πρόσβασης αποστάλθηκαν στο e-mail σας."
+msgid "Password recovery instructions have been sent to [email] address."
+msgstr ""
 
 msgctxt "Languages::text_pay4later_notice"
-msgid "<b>Note</b>: In order to track your Pay4Later orders with the shopping cart software, you have to take these steps:<br /><br />-&nbsp;Log in to Pay4Later BackOffice<br />-&nbsp;Click on the <u>'Settings/Installations'</u> link in the <u>'Quick Links'</u> section.<br />-&nbsp;Set <u>'Return URL (Verified)'</u> setting to:<br /><b>[verified_url]</b><br />-&nbsp;Set <u>'Return URL (Decline)'</u> setting to:<br /><b>[decline_url]</b><br />-&nbsp;Set <u>'Return URL (Refer)'</u> setting to:<br /><b>[refer_url]</b><br />-&nbsp;Set <u>'Return URL (Cancel)'</u> setting to:<br /><b>[cancel_url]</b><br />-&nbsp;Set <u>'CSN URL'</u> setting to:<br /><b>[process_url]</b><br />-&nbsp;Click on the <u>'Save Changes'</u> button<br />"
-msgstr "<b>Note</b>: In order to track your Pay4Later orders with the shopping cart software, you have to take these steps:<br /><br />-&nbsp;Log in to Pay4Later BackOffice<br />-&nbsp;Click on the <u>'Settings/Installations'</u> link in the <u>'Quick Links'</u> section.<br />-&nbsp;Set <u>'Return URL (Verified)'</u> setting to:<br /><b>[verified_url]</b><br />-&nbsp;Set <u>'Return URL (Decline)'</u> setting to:<br /><b>[decline_url]</b><br />-&nbsp;Set <u>'Return URL (Refer)'</u> setting to:<br /><b>[refer_url]</b><br />-&nbsp;Set <u>'Return URL (Cancel)'</u> setting to:<br /><b>[cancel_url]</b><br />-&nbsp;Set <u>'CSN URL'</u> setting to:<br /><b>[process_url]</b><br />-&nbsp;Click on the <u>'Save Changes'</u> button<br />"
+msgid "<b>Note</b>: In order to track your Deko orders with the shopping cart software, you have to take these steps:<br /><br />-&nbsp;Log in to Deko BackOffice<br />-&nbsp;Click on the <u>'Settings/Installations'</u> link in the <u>'Quick Links'</u> section.<br />-&nbsp;Set <u>'Return URL (Verified)'</u> setting to:<br /><b>[verified_url]</b><br />-&nbsp;Set <u>'Return URL (Decline)'</u> setting to:<br /><b>[decline_url]</b><br />-&nbsp;Set <u>'Return URL (Refer)'</u> setting to:<br /><b>[refer_url]</b><br />-&nbsp;Set <u>'Return URL (Cancel)'</u> setting to:<br /><b>[cancel_url]</b><br />-&nbsp;Set <u>'CSN URL'</u> setting to:<br /><b>[process_url]</b><br />-&nbsp;Click on the <u>'Save Changes'</u> button<br />"
+msgstr ""
 
 msgctxt "Languages::text_paybox_notice"
 msgid "<b>Note:</b> Please download the file modulev2.cgi from the PayBox server, copy it to the <b>[paybox_dir]</b> directory <u>in binary mode</u> and make it executable. <br />Run the following command:<br /><b><i>chmod 755 modulev2.cgi</b></i><br /><br />Also ask &#8220;Paybox&#8221; service to add the following URL to the database as &#8220;Callback URL&#8221;:<br /><b>[callback_url]</b>"
@@ -10965,8 +11225,8 @@ msgid "Do not show currency selection at all"
 msgstr "Να μην εμφανίζεται η επιλογή νόμισματος καθόλου"
 
 msgctxt "Languages::text_paysitecash_notice"
-msgid "Please add these URL fields in your Paysite Cash configuration:<br/><br/><b>URL:</b><br/>[url]<br/><br/><b>Referer url:</b><br/>[ref_url]<br/><br/><b>after payment return url:</b><br/>[sucess_url]<br/><br/><b>canceled payment url:</b><br/>[cancel_url]<br/><br/><b>Backoffice confirmation url:</b><br/>[confirm_url]"
-msgstr "Please add these URL fields in your Paysite Cash configuration:<br/><br/><b>URL:</b><br/>[url]<br/><br/><b>Referer url:</b><br/>[ref_url]<br/><br/><b>after payment return url:</b><br/>[sucess_url]<br/><br/><b>canceled payment url:</b><br/>[cancel_url]<br/><br/><b>Backoffice confirmation url:</b><br/>[confirm_url]"
+msgid "Please add these URL fields in your Paysite-cash configuration:<br/><br/><b>URL:</b><br/>[url]<br/><br/><b>Referer url:</b><br/>[ref_url]<br/><br/><b>after payment return url:</b><br/>[sucess_url]<br/><br/><b>canceled payment url:</b><br/>[cancel_url]<br/><br/><b>Backoffice confirmation url:</b><br/>[confirm_url]"
+msgstr ""
 
 msgctxt "Languages::text_paysitecash_processor"
 msgid "Processor"
@@ -10991,10 +11251,6 @@ msgstr "<b>Σημείωση:</b> Παρακαλώ στείλτε αυτές τι
 msgctxt "Languages::text_position_updating"
 msgid "Loading... Positions are being updated, please wait."
 msgstr "Φόρτωση ... Οι θέσεις είναι υπό ενημέρωση, παρακαλώ περιμένετε."
-
-msgctxt "Languages::text_prettyphoto"
-msgid "prettyPhoto"
-msgstr "prettyPhoto"
 
 msgctxt "Languages::text_price_dec_sign_delimiter"
 msgid "Decimal separator for product prices."
@@ -11092,10 +11348,6 @@ msgctxt "Languages::text_recover_password_title"
 msgid "Reset password"
 msgstr "Επαναφορά κωδικού πρόσβασης"
 
-msgctxt "Languages::text_redactor"
-msgid "Redactor"
-msgstr "Redactor"
-
 msgctxt "Languages::text_remove_additional_images"
 msgid "When importing additional images of an updated product, existing images of this product will be deleted before import"
 msgstr "Όταν προστίθετε επιπλέον εικόνες για ένα ανανεωμένο προϊόν, οι υπάρχουσες εικόνες του προϊόντος θα διαγραφούν"
@@ -11117,8 +11369,8 @@ msgid "Are you sure that you want to restore the template?"
 msgstr "Είστε σίγουροι ότι θέλετε να επαναφέρετε το πρότυπο(template)"
 
 msgctxt "Languages::text_sagepay_dir_notice"
-msgid "<b>Note:</b> In order to track your SagePay orders by the shopping cart software, please enable the 3D Secure Fraud Checking Option for your SagePay VSP Direct account."
-msgstr "<b>Σημείωση:</b> Για να να τραβήξετε τις παραγγελίες του SagePay από το λογισμικό του ηλεκτρονικού κατάστηματος, παρακαλώ ενεργοποιήστε το σύστμα 3D Secure Fraud Checking Option από τον λογαριασμό SagePay VSP Direct."
+msgid "<b>Note:</b> In order to track your Sage Pay orders by the shopping cart software, please enable the 3D Secure Fraud Checking Option for your Sage Pay VSP Direct account."
+msgstr ""
 
 msgctxt "Languages::text_sagepay_notice"
 msgid "Use <b>testvendor</b> as <b>Vendor Name</b> for the testing purposes<br /><p><b>PAYMENT</b> - transaction type is used to gain an authorisation from the bank, then settle that transaction early the following morning, committing the funds to be taken from your customer's card.<br /></p><p><b>DEFERRED</b> - transactions are NOT sent to the bank for completion until you RELEASE them by logging into the SagePay VSP Admin interface, finding the transaction and clicking the Release button.</p>"
@@ -11248,6 +11500,10 @@ msgctxt "Languages::text_store_mode_opened"
 msgid "The store was <b>opened</b>"
 msgstr "Το κατάστημα  <b>άνοιξε</b>"
 
+msgctxt "Languages::text_store_mode_open"
+msgid "The store was <b>opened</b>"
+msgstr "Το Κατάστημα <b>άνοιξε</b>"
+
 msgctxt "Languages::text_store_mode_trial"
 msgid "<p>Full access to all features during the 30-day trial period, starting from the time of activation.</p><p>Once the 30-day trial period expires, you'll have to <a href=\"[product_buy_url]\" target=\"_blank\">purchase a license</a> or enter a valid license number to be able to manage your store.</p>"
 msgstr "<p>Πλήρη πρόσβαση σε όλες τις δυνατότητες κατά τη διάρκεια της δοκιμαστικής περιόδου 30 ημερών, ξεκινώντας από την ώρα της ενεργοποίησης.</p> <p>Μόλις λήξει η δοκιμαστική περίοδος των 30 ημερών, θα πρέπει να <a href=\"[product_buy_url]\" target=\"_blank\"> αγοράσετε μια άδεια χρήσης</a> ή να πληκτρολογήστε έναν έγκυρο αριθμό άδειας ώστε να είστε σε θέση να διαχειριστείτε το κατάστημα σας.</p>"
@@ -11269,8 +11525,8 @@ msgid "Your changes have not been saved.Press OK to save changes or Cancel to di
 msgstr "Οι αλλαγές σας δεν έχουν αποθηκευτεί. Πατήστε ΟΚ για να αποθηκεύσετε τις αλλαγές ή Ακύρωση για να τις απορρίψετε."
 
 msgctxt "Languages::text_thaiepay_notice"
-msgid "<p>Please set the following values in the Thaiepay merchant settings:</p><p>Return Url: <b>[return_url]</b></p><p>Status: <b>Yes (it is important!)</b></p><p>Post Back Url: <b>[postback_url]</b></p><p>Main Parameter: <b>\"total\" must be checked</b> - it will increase the security of transactions</p><p>Additional Parameter: it is obligatory for successful processing of transactions. For example, you can set <b>name=completed</b> and <b>value=some_secret_word</b>. Copy these values to these form fields: \"Additional parameter Name\" and \"Additional parameter Value\".</p>"
-msgstr "<p>Παρακαλώ εισάγετε τις ακόλουθες ΤΙΜΕΣ στις ρυθμίσεις του Thaiepay:</p><p>Return Url: <b>[return_url]</b></p><p>Status: <b>Yes (it is important!)</b></p><p>Post Back Url: <b>[postback_url]</b></p><p>Main Parameter: <b>\"total\" must be checked</b> - it will increase the security of transactions</p><p>Additional Parameter: it is obligatory for successful processing of transactions. For example, you can set <b>name=completed</b> and <b>value=some_secret_word</b>. Copy these VALUES to these form fields: \"Additional parameter Name\" and \"Additional parameter Value\".</p>"
+msgid "<p>Please set the following values in the ThaiePay merchant settings:</p><p>Return Url: <b>[return_url]</b></p><p>Status: <b>Yes (it is important!)</b></p><p>Post Back Url: <b>[postback_url]</b></p><p>Main Parameter: <b>\"total\" must be checked</b> - it will increase the security of transactions</p><p>Additional Parameter: it is obligatory for successful processing of transactions. For example, you can set <b>name=completed</b> and <b>value=some_secret_word</b>. Copy these values to these form fields: \"Additional parameter Name\" and \"Additional parameter Value\".</p>"
+msgstr ""
 
 msgctxt "Languages::text_thumbnail_manual_loading"
 msgid "Thumbnails will be generated from detailed images automatically, but you can also <a id=\"[id]\" class=\"[class]\">upload them manually.</a>"
@@ -11497,8 +11753,8 @@ msgid "The <b>[usergroup]</b> group was requested by [name] ([email])."
 msgstr "Η ομάδα <b>[usergroup]</b> ζητήθηκε από [name] ([email])."
 
 msgctxt "Languages::text_worldpay_notice"
-msgid "Configure your WorldPay account before using the payment.<br /><br />Go to the WorldPay administration page and switch to the Installation section.<br /><br />Fill the fields as follows:<br /><br />Payment Response URL: <b>[return_url]</b><br />Payment Response Password: <b>Make up a secret word.</b> The same word must be entered in the respective field below<br />MD5 secret for transactions: <b>Make up a secret word.</b> The same word must be entered in the respective field below<br />SignatureFields: <b>instId:amount:currency:cartId</b>"
-msgstr "Παρακαλούμε χρησιμοποιήστε την παρακάτω διεύθυνση URL, όπως την callback URL: <br /><b>[return_url]</b>"
+msgid "Configure your Worldpay account before using the payment.<br /><br />Go to the Worldpay administration page and switch to the Installation section.<br /><br />Fill the fields as follows:<br /><br />Payment Response URL: <b>[return_url]</b><br />Payment Response Password: <b>Make up a secret word.</b> The same word must be entered in the respective field below<br />MD5 secret for transactions: <b>Make up a secret word.</b> The same word must be entered in the respective field below<br />SignatureFields: <b>instId:amount:currency:cartId</b>"
+msgstr ""
 
 msgctxt "Languages::text_zipcodes_wildcards"
 msgid "You are able to use wildcards in this field:<br /><b>'?'</b> - any single character;<b>'*'</b> - any number of characters.<br /><br /><u>Example:</u><br /><b>98?78</b> &nbsp;&nbsp;(corresponds to 98878, 98378, 98978, etc)<br /><b>12*</b>&nbsp;&nbsp; (corresponds to 12345, 12876, 12098, etc..)"
@@ -11697,8 +11953,8 @@ msgid "Hide/show theme editor panel"
 msgstr "Απόκρυψη/Εμφάνιση πίνακα επεξεργασίας θέματος"
 
 msgctxt "Languages::theme_editor.incorrect_style_name"
-msgid "Style name can not contain the following characters: \"/ # % ? * : ; { } \\ \""
-msgstr "Το όνομα του στυλ δεν μπορεί να περιέχει τους ακόλουθους χαρακτήρες: \"/ # % ? * : ; { } \""
+msgid "Style name can not contain the following characters: \"/ # % ? * : ; { } \\ + \""
+msgstr "Το όνομα στυλ δε μπορεί να περιέχει τους χαρακτήρες: \"/ # % ? * : ; { } \\ + \""
 
 msgctxt "Languages::theme_editor.in_stock"
 msgid "In stock"
@@ -11907,6 +12163,90 @@ msgstr "Άλλες Γραμματοσειρές"
 msgctxt "Languages::theme_editor_mode"
 msgid "Theme editor mode"
 msgstr "Λειτουργία επεξεργαστη θεματος"
+
+msgctxt "Languages::theme_editor.checkout_selected_control_border"
+msgid "Checkout: Selected payment / shipping method border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_active_selector_border"
+msgid "Checkout: Active selector border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_border"
+msgid "Checkout: Payment / shipping method border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selector_border"
+msgid "Checkout: Selector border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_input_border"
+msgid "Checkout: Field border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selected_input_border"
+msgid "Checkout: Selected field border"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_step_title"
+msgid "Checkout: Step title"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_input_text"
+msgid "Checkout: Text in fields"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_input_label"
+msgid "Checkout: Field label"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_background"
+msgid "Checkout: Payment / shipping method background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selector_background"
+msgid "Checkout: Selector background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selected_control_background"
+msgid "Checkout: Selected payment / shipping method background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_active_selector_background"
+msgid "Checkout: Active selector background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_title"
+msgid "Checkout: Payment / shipping method title"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selector_title"
+msgid "Checkout: Selector title"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_description"
+msgid "Checkout: Payment / shipping method description"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_selector_tooltip"
+msgid "Checkout: Selector tooltip"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_control_label"
+msgid "Checkout: Credit card field names"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_terms_background"
+msgid "Checkout: \"Terms and conditions\" section background"
+msgstr ""
+
+msgctxt "Languages::theme_editor.checkout_link"
+msgid "Checkout: Link"
+msgstr ""
+
+msgctxt "Languages::admin_panel.block_manager"
+msgid "Editing layout"
+msgstr "Επεξεργασία layout"
 
 msgctxt "Languages::theme_editor.create_style_first"
 msgid "You cannot modify this parameter for default styles. Create a new one first"
@@ -12232,9 +12572,21 @@ msgctxt "Languages::ttc_popularity"
 msgid "Product popularity rating based on how many times the storefront has been viewed, number of additions to cart and number of purchases."
 msgstr "Η βαθμολόγηση της δημοτικότητας του προϊόντος βασίζεται στον αριθμό των προβολών της κεντρικής σελίδας , των προσθηκών στο καλάθι και τον αριθμό των αγορών."
 
+msgctxt "Languages::ttc_search_words"
+msgid "Enter a few words here, and the product will appear in the results of the built-in search for those words, even if the product name or description doesn't have them. Separate different search words by commas."
+msgstr "Πληκτρολογήστε μερικές λέξεις εδώ και το προϊόν θα εμφανιστεί στα αποτελέσματα της ενσωματωμένης αναζήτησης για αυτές τις λέξεις, ακόμα και αν το όνομα ή η περιγραφή του προϊόντος δεν τις έχει. Διαχωρίστε διαφορετικές λέξεις αναζήτησης με κόμματα."
+
 msgctxt "Languages::ttc_storefront_url"
 msgid "All the storefronts domain names must be associated with the same IP-address. Note: Switch to \"All stores\" to edit"
 msgstr "Όλα τα domain name κατστηματων πρέπει να συσχετίζονται με την ίδια διεύθυνση IP. Σημείωση: Μεταβείτε σε \"Όλα τα καταστήματα\" για να τα επεξεργαστείτε"
+
+msgctxt "Languages::ttc_stores_status"
+msgid "ON—the storefront is open; everyone will see it. OFF—the storefront is closed; only those who have the access key will be able to see it."
+msgstr "ON - το κατάστημα είναι ανοιχτο. όλοι θα το δουν. OFF - το κατάστημα είναι κλειστο. μόνο όσοι έχουν τον κωδικό πρόσβασης θα μπορούν να το δουν."
+
+msgctxt "Languages::access_for_authorized_customers_only"
+msgid "Access for authorized customers only."
+msgstr ""
 
 msgctxt "Languages::tts_activate_menu_tab_for"
 msgid "The menu item will be shown activated for the specified dispatch."
@@ -12341,8 +12693,8 @@ msgid "Manufacturer suggested retail price."
 msgstr "Προτεινόμενη λιανική τιμή του κατασκευαστή"
 
 msgctxt "Languages::tt_views_products_update_out_of_stock_actions"
-msgid "Note that the 'Buy in advance' option requires a positive product amount while the 'Sign up for notification' option requires a non-positive amount. Also note that the 'Sign up for notification' option is not applied to products tracked with options."
-msgstr "Σημειώστε ότι η επιλογή 'Προαγορά' προϋποθέτει θετικό απόθεμα προϊόντων ενώ η επιλογή 'Εγγραφή για ενημερώσεις' προϋποθέτει αρνητικό απόθεμα. Επίσης σημειώστε ότι η επιλογή 'Εγγραφή για ενημερώσεις' δεν εφαρμόζεται στα προϊόντα με παρακολούθηση αποθέματος των επιλογών."
+msgid "'Buy in advance' lets customers buy out-of-stock products and products that will be available since a specific date. 'Sign up for notification' works only when the product has zero or negative quantity."
+msgstr "Η 'Προαγορά' επιτρέπει στους πελάτες να παραγγείλουν προϊόντα τα οποία έχουν εξαντληθεί και προϊόντα τα οποία θα είναι διαθέσιμα μετά από μία συγκεκριμένη ημερομηνία, Η επιλογή 'Εγγραφή για ειδοποίηση' είναι διαθέσιμη μόνο όταν ένα προϊόν έχει μηδενική η αρνητική ποσότητα."
 
 msgctxt "Languages::tt_views_products_update_product_details_layout"
 msgid "By default, the template that is defined in the settings of the main product category is used"
@@ -12512,6 +12864,10 @@ msgctxt "Languages::unregistered_customer"
 msgid "Unregistered customer"
 msgstr "Μη εγγεγραμμένος πελάτης"
 
+msgctxt "Languages::unregistered_customer_short"
+msgid "Unregistered"
+msgstr "Μη εγγεγραμμένος"
+
 msgctxt "Languages::unselect_all"
 msgid "Unselect all"
 msgstr "Αποεπιλογή όλων"
@@ -12665,8 +13021,8 @@ msgid "Your server has wrong PHP script timeout settings. This could be due to r
 msgstr "Διακομιστής σας έχει λάθος PHP ρυθμίσεις χρονικού ορίου. Αυτό θα μπορούσε να είναι εξαιτίας των περιορισμών στην PHP λειτουργία <a href=\"http://php.net/manual/en/function.set-time-limit.php\" target=\"_blank\"> set_time_limit</a> ή στις επιλογες \"Timeout\" της FastCGI. Σας προτείνουμε να επικοινωνήσετε με τον πάροχο φιλοξενίας σας, για να επιλύσετε αυτό το ζήτημα ή επικοινωνήστε με την δική μας ομάδα υποστήριξης, για να εκτελέσει την αναβάθμιση για σας."
 
 msgctxt "Languages::upgrade_center.warning_msg_executed_php"
-msgid "<p class=\"text-error\">We have started a dummy PHP script. It will be working during 6 minutes. When the check is finished, we'll tell you if the PHP script's timeouts can be set correctly. If yes, than you are good to go with the upgrade. Please wait until the check is finished to be sure that your server has correct PHP timeout configuration.</p>"
-msgstr "<p class=\"text-error\"> έχουμε ξεκινήσει ένα εικονικό PHP script. Θα εργαστεί για 6 λεπτά. Όταν ολοκληρωθεί ο έλεγχος, θα σας πουμε αν τα χρονικά όρια της PHP script έχουν ρυθμιστεί σωστά. Αν ναι, τότε μπορείτε να προχωρήσετε με την αναβάθμιση. Παρακαλούμε περιμένετε έως ότου ολοκληρωθεί ο έλεγχος για να βεβαιωθείτε ότι ο διακομιστής σας έχει σωστή διαμόρφωση timeout PHP.</p>"
+msgid "<p class=\"text-error\">We have started a dummy PHP script. It will be working during 6 minutes. When the check is finished, we'll tell you if the PHP script's timeouts can be set correctly. If yes, then you are good to go with the upgrade. Please wait until the check is finished to be sure that your server has correct PHP timeout configuration.</p>"
+msgstr "<p class=\"text-error\">We have started a dummy PHP script. It will be working during 6 minutes. When the check is finished, we'll tell you if the PHP script's timeouts can be set correctly. If yes, then you are good to go with the upgrade. Please wait until the check is finished to be sure that your server has correct PHP timeout configuration.</p>"
 
 msgctxt "Languages::upload"
 msgid "Upload"
@@ -12761,8 +13117,12 @@ msgid "Sorry, user with id [user_id] can not be deleted."
 msgstr "Sorry, user with id [user_id] can not be deleted."
 
 msgctxt "Languages::user_class"
-msgid "User-defined CSS-class"
+msgid "User-defined CSS class"
 msgstr "CSS-κλάση Προσδιοριζόμενη από τον χρήστη"
+
+msgctxt "Languages::wrapper_class"
+msgid "User-defined wrapper CSS class"
+msgstr "Wrapper CSS-κλάση Προσδιοριζόμενη από τον χρήστη"
 
 msgctxt "Languages::user_data_required"
 msgid "Please select a customer or enter data"
@@ -13073,8 +13433,8 @@ msgid "View results"
 msgstr "Προβολή αποτελεσμάτων"
 
 msgctxt "Languages::view_storefront"
-msgid "View STOREFRONT"
-msgstr "Προβολή Καταστήματος"
+msgid "View storefront"
+msgstr "Προβολη Κεντρικής Σελίδας Καταστήματος"
 
 msgctxt "Languages::view_vendor_categories"
 msgid "View store categories"
@@ -13564,34 +13924,6 @@ msgctxt "Languages::payments.eway_rapidapi_rsp.header_text"
 msgid "Header text"
 msgstr "Κειμενο Header"
 
-msgctxt "Languages::payments.futurepay.zipcode_combination_error"
-msgid "The Zip code does not match the state entered. Please re-enter and try your purchase again."
-msgstr "Ο ταχυδρομικός κώδικας δεν ταιριάζει με τον επιλεγμένο Νομο. Παρακαλώ πληκτρολογήστε ξανά και επαναλάβετε την αγορά σας."
-
-msgctxt "Languages::payments.futurepay.amount_error"
-msgid "FuturePay can only be used on orders under $500"
-msgstr "Το FuturePay μπορεί να χρησιμοποιηθεί μόνο για παραγγελίες κάτω από $ 500"
-
-msgctxt "Languages::payments.futurepay.country_error"
-msgid "FuturePay is currently unavailable outside of America"
-msgstr "Το FuturePay δεν είναι διαθέσιμο προς το παρόν έξω από την Αμερική"
-
-msgctxt "Languages::payments.futurepay.customer_error"
-msgid "You currently have an outstanding application with FuturePay which needs resolving"
-msgstr "Αυτήν τη στιγμή έχετε μια εξαιρετική εφαρμογή με FuturePay που χρειάζεται επίλυση"
-
-msgctxt "Languages::payments.futurepay.phone_error"
-msgid "There was no phone number entered for your billing address. Please enter a phone number and try again"
-msgstr "Δεν υπαρχει αριθμός τηλεφώνου  για τη διεύθυνση χρέωσής σας. Παρακαλώ εισάγετε έναν αριθμό τηλεφώνου και προσπαθήστε ξανά"
-
-msgctxt "Languages::payments.futurepay.zipcode_error"
-msgid "The Zip code you entered for your billing address corresponds to a Military (APO/FPO/DPO), PO Box or other non-physical address. To approve your application we require a Zip code associated with a physical address in the U.S."
-msgstr "Ο ΤΚ που έχετε εισάγει στη διεύθυνση χρέωσής σας αντιστοιχεί σε ένα στρατιωτικό (APO / FPO / ΥΠΔ), PO Box ή άλλη μη-φυσική διεύθυνση. Για να εγκριθεί η αίτησή σας, χρειαζόμαστε ένα Ταχυδρομικό κώδικα που να συνδέεται με μια φυσική διεύθυνση στις ΗΠΑ"
-
-msgctxt "Languages::payments.futurepay.order_exists"
-msgid "The reference exists with an order that has completed sales attached"
-msgstr "Υπάρχει η αναφορά με μια σειρά που έχει ολοκληρώσει τις πωλήσεις που επισυνάπτεται"
-
 msgctxt "Languages::filter_by_categories"
 msgid "Filter by categories"
 msgstr "Φίλτρο ανά κατηγορία"
@@ -13732,6 +14064,14 @@ msgctxt "Languages::marketplace_find_more"
 msgid "Find more add-ons and themes in <a href=\"[href]\" target=\"_blank\">Marketplace</a>"
 msgstr "Βρείτε περισσότερα Πρόσθετα και Θέματα στο <a href=\"http://marketplace.cs-cart.com/\" target=\"_blank\"> CS-Cart Marketplace </ a>"
 
+msgctxt "Languages::more_languages"
+msgid "More languages"
+msgstr "Περισσότερες γλώσσες"
+
+msgctxt "Languages::languages_find_more"
+msgid "If you haven't found the language you need, check out <a href=\"[href]\" target=\"_blank\">our site with free language packs</a>."
+msgstr "Εάν δεν έχετε βρει τη γλώσσα που χρειάζεστε, ελέγξτε <a href=\"[href]\" target=\"_blank\">τον ιστότοπό μας με τα δωρεάν γλωσσικά πακέτα</a>."
+
 msgctxt "Languages::extract_archive"
 msgid "Extract archive"
 msgstr "εξαγάγετε αρχείο"
@@ -13740,9 +14080,13 @@ msgctxt "Languages::seo"
 msgid "SEO"
 msgstr "SEO"
 
-msgctxt "Languages::text_magnific"
-msgid "MagnificPopup"
-msgstr "MagnificPopup"
+msgctxt "Languages::text_owl"
+msgid "OwlCarousel"
+msgstr "OwlCarousel"
+
+msgctxt "Languages::carousel_swiper"
+msgid "Swiper"
+msgstr ""
 
 msgctxt "Languages::bulk_print_packing_slip"
 msgid "Packing slip bulk print"
@@ -13840,6 +14184,10 @@ msgctxt "SettingsSections::Upgrade_center"
 msgid "Upgrade center"
 msgstr "Κέντρο Αναβάθμισης"
 
+msgctxt "SettingsSections::Notifications"
+msgid "Notifications"
+msgstr "Ειδοποιήσεις"
+
 msgctxt "SettingsOptions::company_name"
 msgid "Company name"
 msgstr "Όνομα Εταιρείας"
@@ -13851,10 +14199,6 @@ msgstr "Ενεργοποίηση ασφαλης συνδεσης στο πανε
 msgctxt "SettingsOptions::secure_storefront"
 msgid "Enable secure connection for the storefront"
 msgstr "Ενεργοποίηση ασφαλούς σύνδεσης για τη βιτρίνα του καταστήματος"
-
-msgctxt "SettingsOptions::keep_https"
-msgid "Keep HTTPS connection once a secure page is visited"
-msgstr "Διατήρηση της HTTPS σύνδεσης ,όταν επισκεπτεί μια ασφαλής σελίδα"
 
 msgctxt "SettingsOptions::license_number"
 msgid "License number"
@@ -13879,6 +14223,14 @@ msgstr "Τρόπος αποστολής e-mails"
 msgctxt "SettingsOptions::width"
 msgid "Image width"
 msgstr "Πλάτος εικόνας"
+
+msgctxt "SettingsOptions::log_lifetime"
+msgid "Days before a log entry is removed"
+msgstr "Ημέρες πριν από την διαγραφή ενός αρχείου καταγραφής"
+
+msgctxt "SettingsTooltips::log_lifetime"
+msgid "Logs older than the specified number of days will be removed automatically. Enter 0 if you don't want any automatic removal of old logs."
+msgstr "Αρχεία καταγραφής που είναι παλαιότερα από τον καθορισμένο αριθμό ημερών θα καταργηθουν αυτόματα. Εισάγετε 0 Εάν δεν θέλετε οποιαδήποτε αυτόματη απομάκρυνση των παλιών αρχείων καταγραφής."
 
 msgctxt "SettingsOptions::log_type_orders"
 msgid "Orders"
@@ -14070,7 +14422,7 @@ msgstr "Πλήκτρο πρόσβασης στο cron script που στέλνε
 
 msgctxt "SettingsOptions::store_access_key"
 msgid "Access key to temporarily closed store"
-msgstr "Κλειδί για πρόσβαση σε προσωρινα κλειστό κατάστημα"
+msgstr "Κλειδί για πρόσβαση σε προσωρινά κλειστό κατάστημα"
 
 msgctxt "SettingsOptions::store_optimization_dev"
 msgid "Rebuild cache automatically"
@@ -14125,8 +14477,8 @@ msgid "String type"
 msgstr "Τύπος συμβλοσειράς"
 
 msgctxt "SettingsOptions::header_7003"
-msgid "Default location"
-msgstr "Προεπιλεγμένη Περιοχή"
+msgid "Default customer location"
+msgstr "Προεπιλεγμενη Τοποθεσία Πελάτη"
 
 msgctxt "SettingsOptions::char_shadow"
 msgid "Character shadows"
@@ -14159,10 +14511,6 @@ msgstr "Ρυθμίσεις Sendmail"
 msgctxt "SettingsOptions::default_zipcode"
 msgid "Default zipcode"
 msgstr "Τ.Κ."
-
-msgctxt "SettingsOptions::company_fax"
-msgid "Company fax"
-msgstr "FAX Εταιρείας"
 
 msgctxt "SettingsOptions::frontend_default_language"
 msgid "Frontend default language"
@@ -14457,8 +14805,8 @@ msgid "Detailed category image height"
 msgstr "Υψος εικόνας λεπτομεριών κατηγορίας"
 
 msgctxt "SettingsOptions::header_7005"
-msgid "Users/cart"
-msgstr "Χρήστες/καλάθι"
+msgid "Users"
+msgstr "Χρήστες"
 
 msgctxt "SettingsOptions::user_multiple_profiles"
 msgid "Allow users to create multiple profiles for one account"
@@ -14537,8 +14885,8 @@ msgid "Offer guest to create an account after successful order"
 msgstr "Προσφέρετε τη δυνατότητα στους επισκεπτες να δημιουργήσουν εναν λογαριασμό, μετά την παραγγελία"
 
 msgctxt "SettingsOptions::disregard_options_for_discounts"
-msgid "Disregard product options when calculating quantity discounts"
-msgstr "Αγνοήστε τις επιλογές του προϊόντος κατά τον υπολογισμό των εκπτώσεων ποσότητας"
+msgid "Disregard product options when calculating quantity discounts [Deprecated]"
+msgstr "Αγνοήστε τις επιλογές του προϊόντος κατά τον υπολογισμό των εκπτώσεων ποσότητας [Υπο Καταργηση]"
 
 msgctxt "SettingsOptions::header_8057"
 msgid "Proxy server for outgoing connections"
@@ -14588,13 +14936,21 @@ msgctxt "SettingsOptions::display_shipping_step"
 msgid "Display \"Shipping method\" step"
 msgstr "Εμφανίσετε το βήμα \"Μέθοδος αποστολής\""
 
+msgctxt "SettingsTooltips::display_shipping_step"
+msgid "If hidden, the first active method will be used by default."
+msgstr "Αν ειναι κρυφό, η πρώτη ενεργή μέθοδος θα χρησιμοποιηθεί ως προεπιλογή."
+
 msgctxt "SettingsOptions::email_templates"
 msgid "Email templates mode"
 msgstr "Λειτουργία Email templates"
 
-msgctxt "SettingsTooltips::display_shipping_step"
-msgid "If hidden, the first active method will be used by default."
-msgstr "Αν ειναι κρυφό, η πρώτη ενεργή μέθοδος θα χρησιμοποιηθεί ως προεπιλογή."
+msgctxt "SettingsOptions::phone_validation_mode"
+msgid "Supported phone numbers"
+msgstr "Υποστηριζομενοι αριθμοί τηλεφώνου"
+
+msgctxt "SettingsTooltips::phone_validation_mode"
+msgid "Determines what users can enter as their phone number."
+msgstr "Καθορίζει τι μπορούν να εισαγουν οι χρήστες ως τον τηλεφωνικό αριθμό τους."
 
 msgctxt "SettingsOptions::display_payment_step"
 msgid "Display \"Payment method\" step"
@@ -14932,10 +15288,6 @@ msgctxt "SettingsVariants::mailer_send_method::smtp"
 msgid "via SMTP server"
 msgstr "μέσω SMTP διακομιστή"
 
-msgctxt "SettingsVariants::timezone::Etc/GMT+12"
-msgid "(GMT-12:00) International Date Line West"
-msgstr "(GMT-12:00) International Date Line West"
-
 msgctxt "SettingsVariants::tax_calculation::unit_price"
 msgid "Unit price"
 msgstr "Τιμή Μονάδας"
@@ -14989,8 +15341,8 @@ msgid "via php mail function"
 msgstr "μεσω php mail function"
 
 msgctxt "SettingsVariants::timezone::Pacific/Apia"
-msgid "(GMT-11:00) Midway Island, Samoa"
-msgstr "(GMT-11:00) Midway Island, Samoa"
+msgid "(GMT-11:00) Samoa"
+msgstr ""
 
 msgctxt "SettingsVariants::tax_calculation::subtotal"
 msgid "Subtotal"
@@ -15041,8 +15393,8 @@ msgid "(GMT-07:00) Mountain Time (US & Canada)"
 msgstr "(GMT-07:00) Mountain Time (US & Canada)"
 
 msgctxt "SettingsVariants::timezone::America/Chihuahua"
-msgid "(GMT-07:00) Chihuahua, La Paz, Mazatlan"
-msgstr "(GMT-07:00) Chihuahua, La Paz, Mazatlan"
+msgid "(GMT-07:00) Chihuahua, Mazatlan"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::America/Phoenix"
 msgid "(GMT-07:00) Arizona"
@@ -15063,10 +15415,6 @@ msgstr "(GMT-06:00) Central Time (US & Canada)"
 msgctxt "SettingsVariants::timezone::America/Guatemala"
 msgid "(GMT-06:00) Central America"
 msgstr "(GMT-06:00) Central America"
-
-msgctxt "SettingsVariants::timezone::Etc/GMT+5"
-msgid "(GMT-05:00) Indiana (East)"
-msgstr "(GMT-05:00) Indiana (East)"
 
 msgctxt "SettingsVariants::timezone::America/New_York"
 msgid "(GMT-05:00) Eastern Time (US & Canada)"
@@ -15092,13 +15440,9 @@ msgctxt "SettingsVariants::timezone::America/St_Johns"
 msgid "(GMT-03:30) Newfoundland"
 msgstr "(GMT-03:30) Newfoundland"
 
-msgctxt "SettingsVariants::timezone::America/Godthab"
+msgctxt "SettingsVariants::timezone::America/Nuuk"
 msgid "(GMT-03:00) Greenland"
 msgstr "(GMT-03:00) Greenland"
-
-msgctxt "SettingsVariants::timezone::Etc/GMT+3"
-msgid "(GMT-03:00) Buenos Aires, Georgetown"
-msgstr "(GMT-03:00) Buenos Aires, Georgetown"
 
 msgctxt "SettingsVariants::timezone::America/Sao_Paulo"
 msgid "(GMT-03:00) Brasilia"
@@ -15117,12 +15461,12 @@ msgid "(GMT-01:00) Azores"
 msgstr "(GMT-01:00) Azores"
 
 msgctxt "SettingsVariants::timezone::Atlantic/Reykjavik"
-msgid "(GMT) Casablanca, Monrovia"
-msgstr "(GMT) Casablanca, Monrovia"
+msgid "(GMT) Reykjavik, Monrovia"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Europe/London"
-msgid "(GMT) Greenwich Mean Time : Dublin, Edinburgh, Lisbon, London"
-msgstr "(GMT) Greenwich Mean Time : Dublin, Edinburgh, Lisbon, London"
+msgid "(GMT) Greenwich Mean Time: Edinburgh, Lisbon, London"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Europe/Berlin"
 msgid "(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna"
@@ -15185,8 +15529,8 @@ msgid "(GMT+03:00) Kuwait, Riyadh"
 msgstr "(GMT+03:00) Kuwait, Riyadh"
 
 msgctxt "SettingsVariants::timezone::Europe/Moscow"
-msgid "(GMT+03:00) Moscow, St. Petersburg, Volgograd"
-msgstr "(GMT+03:00) Moscow, St. Petersburg, Volgograd"
+msgid "(GMT+03:00) Moscow, St. Petersburg"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Europe/Minsk"
 msgid "(GMT+03:00) Minsk"
@@ -15229,20 +15573,20 @@ msgid "(GMT+05:45) Kathmandu"
 msgstr "(GMT+05:45) Kathmandu"
 
 msgctxt "SettingsVariants::timezone::Asia/Novosibirsk"
-msgid "(GMT+06:00) Almaty, Novosibirsk"
-msgstr "(GMT+06:00) Almaty, Novosibirsk"
+msgid "(GMT+07:00) Novosibirsk"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Dhaka"
-msgid "(GMT+06:00) Astana, Dhaka"
-msgstr "(GMT+06:00) Astana, Dhaka"
+msgid "(GMT+06:00) Nur-Sultan, Dhaka"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Colombo"
 msgid "(GMT+06:00) Sri Jayawardenepura"
 msgstr "(GMT+06:00) Sri Jayawardenepura"
 
-msgctxt "SettingsVariants::timezone::Asia/Rangoon"
-msgid "(GMT+06:30) Rangoon"
-msgstr "(GMT+06:30) Rangoon"
+msgctxt "SettingsVariants::timezone::Asia/Yangon"
+msgid "(GMT+06:30) Yangon"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Bangkok"
 msgid "(GMT+07:00) Bangkok, Hanoi, Jakarta"
@@ -15253,12 +15597,12 @@ msgid "(GMT+07:00) Krasnoyarsk"
 msgstr "(GMT+07:00) Krasnoyarsk"
 
 msgctxt "SettingsVariants::timezone::Asia/Shanghai"
-msgid "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi"
-msgstr "(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi"
+msgid "(GMT+08:00) Beijing, Chongqing, Hong Kong"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Irkutsk"
-msgid "(GMT+08:00) Irkutsk, Ulaan Bataar"
-msgstr "(GMT+08:00) Irkutsk, Ulaan Bataar"
+msgid "(GMT+08:00) Irkutsk, Ulaanbaatar"
+msgstr ""
 
 msgctxt "SettingsVariants::timezone::Asia/Singapore"
 msgid "(GMT+08:00) Kuala Lumpur, Singapore"
@@ -15340,6 +15684,18 @@ msgctxt "SettingsVariants::email_templates::new"
 msgid "New (nice and editable via admin panel)"
 msgstr "Νέο (ωραίο και επεξεργάσιμο μέσω admin panel)"
 
+msgctxt "SettingsVariants::phone_validation_mode::international_format"
+msgid "International phone number"
+msgstr "Διεθνής Τηλεφωνικός Αριθμός"
+
+msgctxt "SettingsVariants::phone_validation_mode::any_digits"
+msgid "Any digits and +-()"
+msgstr "Οποιοδήποτε ψηφίο και +-()"
+
+msgctxt "SettingsVariants::phone_validation_mode::any_symbols"
+msgid "Any symbols"
+msgstr "Οποιοδήποτε σύμβολο"
+
 msgctxt "SettingsTooltips::quick_registration"
 msgid "Require only contact information on registration"
 msgstr "Απαιτούνται μόνο τα στοιχεία επικοινωνίας σχετικά με την εγγραφή"
@@ -15356,9 +15712,53 @@ msgctxt "ProfileFields::lastname"
 msgid "Last name"
 msgstr "Επίθετο"
 
+msgctxt "Languages::first_name_and_last_name"
+msgid "First name and last name"
+msgstr "Όνομα και Επίθετο"
+
+msgctxt "Languages::s_first_name_and_last_name"
+msgid "First name and last name (for shipping)"
+msgstr "Όνομα και Επίθετο (για αποστολή)"
+
+msgctxt "Languages::b_first_name_and_last_name"
+msgid "First name and last name (for billing)"
+msgstr "Όνομαι και Επίθετο (για χρέωση)"
+
+msgctxt "Languages::last_name_and_first_name"
+msgid "Last name and first name"
+msgstr "Επίθετο και Όνομα"
+
+msgctxt "Languages::s_last_name_and_first_name"
+msgid "Last name and first name (for shipping)"
+msgstr "Επίθετο και Όνομα (για αποστολή)"
+
+msgctxt "Languages::b_last_name_and_first_name"
+msgid "Last name and first name (for billing)"
+msgstr "Επίθετο και Όνομα (για χρέωση)"
+
+msgctxt "Languages::fullname"
+msgid "Full name"
+msgstr "Ονοματεπώνυμο"
+
+msgctxt "Languages::s_fullname"
+msgid "Full name (for shipping)"
+msgstr "Ονοματεπώνυμο (για αποστολή)"
+
+msgctxt "Languages::b_fullname"
+msgid "Full name (for billing)"
+msgstr "Ονοματεπώνυμο (για χρέωση)"
+
+msgctxt "ProfileFields::customer_notes"
+msgid "Customer's notes"
+msgstr "Σημειώσεις Πελάτη"
+
 msgctxt "ProfileFields::company"
 msgid "Company"
 msgstr "Εταιρία"
+
+msgctxt "ProfileFields::email"
+msgid "Phone"
+msgstr "Αριθμός τηλεφώνου"
 
 msgctxt "ProfileFields::phone"
 msgid "Phone"
@@ -15452,6 +15852,54 @@ msgctxt "ProfileFields::s_address_type"
 msgid "Address type"
 msgstr "Tύπος διεύθυνσης"
 
+msgctxt "ProfileFields::admin_firstname"
+msgid "First name"
+msgstr "Ονομα"
+
+msgctxt "ProfileFields::admin_lastname"
+msgid "Last name"
+msgstr "Επίθετο"
+
+msgctxt "ProfileFields::company_description"
+msgid "Description"
+msgstr "Περιγραφή"
+
+msgctxt "ProfileFields::address"
+msgid "Address"
+msgstr "Διευθυνση"
+
+msgctxt "ProfileFields::city"
+msgid "City"
+msgstr "Πόλη"
+
+msgctxt "ProfileFields::country"
+msgid "Country"
+msgstr "Χώρα"
+
+msgctxt "ProfileFields::state"
+msgid "State/Province"
+msgstr "Νομός"
+
+msgctxt "ProfileFields::zipcode"
+msgid "Zip/postal code"
+msgstr "T.K (ταχυδρομικός κώδικας)"
+
+msgctxt "ProfileFields::accept_terms"
+msgid "I accept the Terms and Conditions"
+msgstr "Αποδεχομαι τους όρους και προϋποθέσεις"
+
+msgctxt "Languages::vendor_terms"
+msgid "Vendor terms and conditions"
+msgstr "Όρους και τις προϋποθέσεις του πωλητή"
+
+msgctxt "Languages::vendor_terms_field_alert"
+msgid "Vendor terms and conditions alert"
+msgstr "Όροι και τις προϋποθέσεις πωλητή Συναγερμος"
+
+msgctxt "Languages::vendor_terms_field_terms_text"
+msgid "Vendor terms and conditions text"
+msgstr "Όροι και τις προϋποθέσεις πωλητή Κειμενο"
+
 msgctxt "Languages::product_must_have_owner_category"
 msgid "Product must belong to some category created by the owner company."
 msgstr "Το Προϊόν πρέπει να ανήκει σε κάποια κατηγορία που δημιουργήθηκε από την εταιρεία του ιδιοκτήτη."
@@ -15487,18 +15935,6 @@ msgstr "Εγγραφή"
 msgctxt "SettingsVariants::sign_in_default_action::checkout_as_guest"
 msgid "Checkout as guest"
 msgstr "Πληρωμή ως επισκέπτης"
-
-msgctxt "SettingsVariants::secure_storefront::none"
-msgid "Disable"
-msgstr "Απενεργοποίηση"
-
-msgctxt "SettingsVariants::secure_storefront::partial"
-msgid "Secure profile, checkout and order pages"
-msgstr "Ασφαλείς σελίδα προφίλ, ταμείου και παραγγελίας"
-
-msgctxt "SettingsVariants::secure_storefront::full"
-msgid "Secure full site"
-msgstr "Ασφάλιση όλου του Site"
 
 msgctxt "Languages::last_year"
 msgid "Last year"
@@ -15560,9 +15996,17 @@ msgctxt "Languages::payments.realex.referring_url"
 msgid "Please supply this URL to your Realex Payments account manager"
 msgstr "Please supply this URL to your Realex Payments account manager"
 
+msgctxt "Languages::payments.globalpayments.referring_url"
+msgid "Please supply this URL to your Global Payments account manager"
+msgstr "Παρακαλώ εισάγετε αυτό το URL στην διαχείριση του λογαριασμού σας Global Payments"
+
 msgctxt "Languages::payments.realex.referring_ip"
 msgid "Please supply the IP address of your server to your Realex Payments account manager"
 msgstr "Please supply the IP address of your server to your Realex Payments account manager"
+
+msgctxt "Languages::payments.globalpayments.referring_ip"
+msgid "Please supply the IP address of your server to your Global Payments account manager"
+msgstr "Παρακαλώ εισάγετε την ip του διακομιστή σας στην διαχείριση του λογαριασμού Global Payments "
 
 msgctxt "Languages::payments.realex.settlement"
 msgid "Settlement"
@@ -15579,6 +16023,10 @@ msgstr "Autoματος διακανονισμός"
 msgctxt "Languages::payments.realex.text_status_map"
 msgid "Realex to CS-Cart order status conversion map"
 msgstr "Realex to CS-Cart order status conversion map"
+
+msgctxt "Languages::payments.globalpayments.text_status_map"
+msgid "Global Payments to [product] order status conversion map"
+msgstr "Χάρτης μετατροπής Κατάστασης Παραγγελίας Global Payments στο [product]"
 
 msgctxt "Languages::payments.realex.subaccount"
 msgid "Subaccount"
@@ -15600,6 +16048,10 @@ msgctxt "Languages::payments.realex.connector_error"
 msgid "Your Realex account has been suspended. Contact Realex support for further information."
 msgstr "Your Realex account has been suspended. Contact Realex support for further information."
 
+msgctxt "Languages::payments.globalpayments.connector_error"
+msgid "Your Global Payments account has been suspended. Contact Global Payments support for further information."
+msgstr "O λογαριασμός σας Global Payments έχει ανασταλεί. Παρακαλώ επικοινωνήστε με το τμήμα υποστήριξης της Global Payments για περισσότερες πληροφορίες."
+
 msgctxt "Languages::payments.realex.incorrect_request"
 msgid "Incorrect XML message formation or content"
 msgstr "Εσφαλμένο σχημα μηνυματος ή περιεχόμενου XML"
@@ -15607,6 +16059,10 @@ msgstr "Εσφαλμένο σχημα μηνυματος ή περιεχόμεν
 msgctxt "Languages::payments.realex.realex_error"
 msgid "Error with Realex systems"
 msgstr "Error with Realex systems"
+
+msgctxt "Languages::payments.globalpayments.globalpayments_error"
+msgid "Error with Global Payments systems"
+msgstr "Σφάλμα με το σύστημα Global Payments"
 
 msgctxt "Languages::payments.realex.bank_error"
 msgid "Error with bank systems"
@@ -15858,8 +16314,8 @@ msgid "At least one storefront must remain"
 msgstr "Πρέπει να παραμείνει τουλάχιστον μία βιτρίνα"
 
 msgctxt "Languages::datakeeper.run_backup_via_cron_message"
-msgid "You can run the backup automatically at certain time intervals. To do it, add the following command to CRON:"
-msgstr ""
+msgid "You can run the backup automatically at certain time intervals. To do it, add the following command to <a href=\"https://en.wikipedia.org/wiki/Cron\" target=\"_blank\">Cron</a>:"
+msgstr "Μπορείτε να εκτελέσετε τη δημιουργια αντίγραφου ασφαλείας αυτόματα σε συγκεκριμένα χρονικά διαστήματα. Για να το κάνετε αυτό, προσθέστε την ακόλουθη εντολή <a href=\"https://en.wikipedia.org/wiki/Cron\" target=\"_blank\">Cron</a>:"
 
 msgctxt "Languages::datakeeper.error_unsupported_file_type"
 msgid "File cannot be restored. Only .sql, .zip and .tgz files are allowed."
@@ -15876,6 +16332,10 @@ msgstr "<p> Η βάση δεδομένων του καταστήματός σα�
 msgctxt "Languages::uc_backup_info_subj"
 msgid "Upgrade Center: Store has been backed up and closed."
 msgstr "Κέντρο Αναβάθμισης: Εγινε αντιγραφο ασφαλειας του καταστήματος και έκλεισε."
+
+msgctxt "Languages::uc_info_subj"
+msgid "Upgrade Center: Store has been closed."
+msgstr "Κέντρο Αναβάθμισης: Το Κατάστημα έχει κλείσει."
 
 msgctxt "Languages::error_features_too_many_variants"
 msgid "Search by features is not available due to the excessive number of variants."
@@ -16077,6 +16537,18 @@ msgctxt "Languages::tools_addons_disabled_msg"
 msgid "An administrator disabled all add-ons or third-party add-ons.<br> Press the Re-enable add-ons button to initialize the add-ons that were previously active."
 msgstr "Ένας διαχειριστής απενεργοποιήσε όλα τα πρόσθετα ή τα πρόσθετα τρίτων κατασκευαστών. <br>Πιέστε το Επαν-Ενεργοποίηση πρόσθετων για να ενεργοποιηθού τα πρόσθετα που λειτουργουσαν στο παρελθόν."
 
+msgctxt "Languages::tools_addons_additional_shipping_methods"
+msgid "There may be more carriers. They'll show up if you activate the corresponding <a href=\"[url]\">shipping add-ons</a>."
+msgstr "Μπορεί να υπάρχουν περισσότεροι μεταφορείς. Θα εμφανιστούν αν ενεργοποιήσετε τα αντίστοιχα <a href=\"[url]\">shipping add-ons</a>."
+
+msgctxt "Languages::tools_addons_additional_payment_methods"
+msgid "There may be more payment processors. They'll show up if you activate the corresponding <a href=\"[url]\">payment add-ons</a>."
+msgstr "Μπορεί να υπάρχουν περισσότεροι επεξεργαστές πληρωμών. Θα εμφανιστούν αν ενεργοποιήσετε τα αντίστοιχα <a href=\"[url]\">payment add-ons</a>."
+
+msgctxt "Languages::tools_addons_additional_themes"
+msgid "There may be more themes. They'll show up if you activate the corresponding <a href=\"[url]\">theme add-ons</a>."
+msgstr "Μπορεί να υπάρχουν περισσότερα θέματα. Θα εμφανιστούν αν ενεργοποιήσετε τα αντίστοιχα <a href=\"[url]\">theme add-ons</a>."
+
 msgctxt "Languages::addons_source"
 msgid "Source"
 msgstr "Πηγή"
@@ -16110,8 +16582,8 @@ msgid "Skip files and database backup"
 msgstr "Παράληψη Δημιουργιας Αντιγραφου Αρχειων και Βασης Δεδομενων"
 
 msgctxt "Languages::uc_open_store_email_body"
-msgid "<p>Before the upgrade, your store was closed. Check if it's running fine after the upgrade and <a href=\"[settings_section]\">open it</a>.</p></p>"
-msgstr "<p>Πριν από την αναβάθμιση, το κατάστημα ήταν κλειστό. Ελέγξτε αν λειτουργεί σωστα μετά την αναβάθμιση και <a href=\"[settings_section]\"> ανοίξετε το</a>.</p></p>"
+msgid "<p>Before the upgrade, your store was closed. Check if it's running fine after the upgrade and <a href=\"[settings_section]\">open it</a>.</p>"
+msgstr "<p>Πριν από την αναβάθμιση, το κατάστημα έκλεισε. Ελέγξτε αν λειτουργεί σωστά μετά την αναβάθμιση και <a href=\"[settings_section]\"> ανοίξτε το</a>.</p>"
 
 msgctxt "Languages::upgrade_notification_message"
 msgid "<p class='upgrade-center_notice-msg'>Copy of this message was sent to administrator's email.</p><hr>"
@@ -16457,6 +16929,10 @@ msgctxt "Languages::copy"
 msgid "Copy"
 msgstr "Αντίγραφο"
 
+msgctxt "Languages::copied"
+msgid "Copied"
+msgstr "Αντιγράφηκε"
+
 msgctxt "Languages::addon_uninstall_sql_error"
 msgid "An error in an SQL query occurred during the add-on uninstallation."
 msgstr "Παρουσιάστηκε ένα σφάλμα στο ερώτημα SQL κατά την απεγκατάσταση του πρόσθετου."
@@ -16481,6 +16957,14 @@ msgctxt "Languages::payments.qbms.oauth_consumer_secret"
 msgid "OAuth Consumer Secret"
 msgstr "OAuth Consumer Secret"
 
+msgctxt "Languages::payments.qbms.oauth_client_id"
+msgid "OAuth Client Id"
+msgstr "OAuth Client Id"
+
+msgctxt "Languages::payments.qbms.oauth_client_secret"
+msgid "OAuth Client Secret"
+msgstr "OAuth Client Secret"
+
 msgctxt "Languages::payments.qbms.token_expires"
 msgid "The token expires on <b>[date]</b> at <b>[time]</b>."
 msgstr "Το Token  λήγει στις <b>[date]</b> στο <b>[time]</b>."
@@ -16493,6 +16977,14 @@ msgctxt "Languages::payments.qbms.renew_token"
 msgid "Press \"Connect to QuickBooks\" to renew the token."
 msgstr "Πιέστε το πλήκτρο \"Συνδεθείτε σε QuickBooks» για να να ανανεωθει το Token"
 
+msgctxt "Languages::payments.qbms.tip_fill_redirect"
+msgid "<p>- In the QuickBooks application, copy the following value into the Redirect URI field:</p><p>[url]</p><p>- Click the \"Connect to QuickBooks\" button.</p>"
+msgstr "<p>Στην εφαρμογή QuickBooks, αντιγράψτε την ακόλουθη τιμή μέσα στο πεδίο ανακατεύθυνσης URI :</p><p>[url]</p><p>-Κάντε κλίκ κουμπί \"Σύνδεση με QuickBooks\".</p>"
+
+msgctxt "Languages::payments.qbms.configure_payment_method"
+msgid "<p>How to configure the payment method:</p><p>1. <a target=\"_blank\" href=\"https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0#obtain-oauth2-credentials-for-your-app\">Obtain OAuth 2.0 credentials</a> from QuickBooks Online application and copy them to the payment method settings in [product].</p><p>2. Click \"Create\", then open the settings of this payment method again to finish its configuration.</p>"
+msgstr "<p>Πώς να ρυθμίσετε την μέθοδο πληρωμής:</p><p>1.<a target=\"_blank\" href=\"https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0#obtain-oauth2-credentials-for-your-app\">Αποκτήστε τα διαπιστευτήρια OAuth 2.0</a> από την online εφαρμογή QuickBooks και αντιγράψτε τα μέσα στις ρυθμίσεις μεθόδων στο [product].</p><p>2. Κάντε κλίκ στο κουμπί \"Δημιουργία\", έπειτα ανοίξτε τις ρυθμίσεις αυτής της μεθόδου πληρωμής πάλι για ολοκληρώστε την ρύθμιση της.</p>"
+
 msgctxt "Languages::payments.qbms.upgrade_notification_title"
 msgid "QB Merchant Service payment processor changes"
 msgstr "QB Merchant Service payment processor changes"
@@ -16500,6 +16992,14 @@ msgstr "QB Merchant Service payment processor changes"
 msgctxt "Languages::payments.qbms.upgrade_notification_text"
 msgid "<p>The latest version of [product] has different settings for payment methods if you use QB Merchant Service as a Processor.</p><p>If you want to use the payment methods, do this:</p><ul><li>go to Administration > Payment methods</li><li>choose the payment method that uses QB Merchant Service as a Processor</li><li>switch to the Configure tab</li><li>enter the proper App Token, OAuth Consumer Key and OAuth Consumer Secret</li><li>perform connection to QuickBooks</li></ul>"
 msgstr "<p>Την τελευταία έκδοση του [product] έχει διαφορετικές ρυθμίσεις για τις μεθόδους πληρωμής, αν χρησιμοποιείτε υπηρεσία έμπορος QB μεταποιητής.</p> <p>Αν θέλετε να χρησιμοποιήσετε τις μεθόδους πληρωμής, κάνετε αυτό:</p> <ul><li>πηγαίνετε στο Διαχείριση > μεθόδους πληρωμής</li> <li>Επιλέξτε τη μέθοδο πληρωμής που χρησιμοποιεί υπηρεσία έμπορος QB μεταποιητής</li> <li>μεταβείτε στην καρτέλα ρύθμιση παραμέτρων</li> <li>Πληκτρολογήστε τη σωστή App διακριτικό, OAuth των καταναλωτών κλειδί και OAuth των καταναλωτών μυστικό</li> <li>εκτελέσετε σύνδεση σε QuickBooks</li></ul>"
+
+msgctxt "Languages::payments.qbms.upgrade_oauth20_notification_title"
+msgid "Payment methods: Change QB Merchant Services settings"
+msgstr "Τρόποι πληρωμής: Αλλάξτε τις ρυθμίσεις της QB Merchant Services"
+
+msgctxt "Languages::payments.qbms.upgrade_oauth20_notification_text"
+msgid "<p>Online stores now connect to QuickBooks Merchant Services differently. Your payment methods that use QB Merchant Services as a processor need to be reconfigured, or else they will no longer work. To make them work:</p><p>1. Switch your Quickbooks app to OAuth 2.0.</p><p>2. Copy <i>OAuth Client ID</i> and <i>OAuth Client Secret</i> from the app to the payment method settings in [product].</p><p>3. Change the status of the payment method to <i>Active</i></p><p>4. Save your changes and use the <i>Connect to QuickBooks</i> button to finish payment configuration.</p><p><a href=\"[payments_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">View my payment methods</a></p>"
+msgstr "<p>Τα online καταστήματα πλέον συνδέονται στις υπηρεσίες QuickBooks Merchant με διαφορετικό τρόπο. Οι μέθοδοι πληρωμής που χρησιμοποιούν υπηρεσίες της QB Merchant για τον υπολογισμό χρειάζεται να ρυθμιστούν ξανά, διαφορετικά δεν θα μπορούν να λειτουργήσουν. Για να μπορούν να λειτουργήσουν κάντε το εξής:</p><p>1. Αλλάξτε την εφαρμογή Quickbooks σε OAuth 2.0.</p><p>2. Αντιγράψτε το <i>OAuth Client ID</i> και το <i>OAuth Client Secret</i> από την εφαρμογή στις ρυθμίσεις της μεθόδου πληρωμής στο [product].</p><p>3. Αλλάξτε την κατάσταση της μεθόδου πληρωμής σε <i>Ενεργή</i></p><p>4. Αποθηκεύστε τις αλλαγές και χρησιμοποιήστε το κουμπί<i>Connect to QuickBooks</i> για να ολοκληρωθεί η ρύθμιση της πληρωμής.</p><p><a href=\"[payments_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Εμφάνιση των μεθόδων πληρωμής μου</a></p>"
 
 msgctxt "Languages::text_money_back_guarantee"
 msgid "We offer 30-day money-back guarantee. If you don't like our product, we'll return you the money, no needless questions asked."
@@ -17006,8 +17506,8 @@ msgid "File changes detector"
 msgstr "Ανιχνευτής αλλαγών  Αρχείων"
 
 msgctxt "Languages::privileges.view_file_changes"
-msgid "View file changes"
-msgstr "Προβολή αλλαγμένων αρχείων"
+msgid "Can view"
+msgstr "Δυνατότητα Προβολής"
 
 msgctxt "Languages::vendor_commission_changes_upgrade_notification_title"
 msgid "Vendor commission changes"
@@ -17134,40 +17634,60 @@ msgid "<p>You can use one of these licenses: <a href=\"[standard_license_url]\" 
 msgstr "<p>Μπορείτε να χρησιμοποιήσετε μία από αυτές τις άδειες: <a href=\"[standard_license_url]\" target=\"_blank\">[product]</a> ή <a href=\"[ultimate_license_url]\" target=\"_blank\"> [product] Ultimate</a>. Και οι δύο άδειες επιτρέπουν να χρησιμοποιείτε το [product] χωρίς χρονικούς περιορισμούς.</p> <br>"
 
 msgctxt "Languages::product_state_description.ult"
-msgid "<p>You've activated your [product]. You can use it without time restrictions now. To be able to add an unlimited number of extra storefronts and manage your store via a mobile app, get the <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br>"
-msgstr "<p>Ενεργοποίησατε το [product] σας. Μπορείτε να το χρησιμοποιήσετε χωρίς χρονικους περιορισμούς πλεον. Για να μπορέσετε να προσθέσετε έναν απεριόριστο αριθμό επιπλέον καταστημάτων και να τα διαχειριστείτε μέσω μιας εφαρμογής για κινητά, αγοράστε μια <a href=\"[ultimate_license_url]\" target=\"_blank\">άδεια [product] Ultimate.</a></p> <br>"
+msgid "<p>You can use the software without time restrictions now. Please note that some advanced features are available only in <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate.</a></p><br>"
+msgstr ""
 
 msgctxt "Languages::product_state_description.ult.ultimate"
-msgid "<p>You've activated your [product] Ultimate. You can use it without time restrictions now. With [product] Ultimate, you get all the advanced eCommerce features including an unlimited number of extra storefronts and the ability to manage your store via a mobile app.</p><br>"
-msgstr "<p>Έχετε ενεργοποιήσει το [product] Ultimate. Μπορείτε να το χρησιμοποιήσετε χωρίς χρονικους περιορισμούς πλεον. Με το [product] Ultimate, μπορείτε να έχετε όλα τα χαρακτηριστικά του προηγμένου ηλεκτρονικού εμποριου συμπεριλαμβανομένων και απεριόριστων αριθμών καταστημάτων αλλά και την ικανότητα να διαχειριστείτε το κατάστημα σας μέσω μιας κινητής εφαρμογής.</p> <br>"
+msgid "<p>You can use the software without time restrictions now.</p><br>"
+msgstr ""
 
 msgctxt "Languages::product_state_description.ult.ru.new"
 msgid "<p>You can use one of these licenses: <a href=\"[standard_license_url]\" target=\"_blank\">[product]</a> or <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>. Both licenses allow you to use [product] without time restrictions.</p><br>"
 msgstr "<p>Μπορείτε να χρησιμοποιήσετε μία από αυτές τις άδειες: <a href=\"[standard_license_url]\" target=\"_blank\">[product]</a> ή <a href=\"[ultimate_license_url]\" target=\"_blank\"> [product] Ultimate</a>. Και οι δύο άδειες επιτρέπουν να χρησιμοποιείτε το [product] χωρίς χρονικούς περιορισμούς.</p> <br>"
 
 msgctxt "Languages::product_state_description.ult.ru"
-msgid "<p>You've activated your [product]. You can use it without time restrictions now. To be able to use an unlimited number of storefronts, get the <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate license.</a></p><br>"
-msgstr "<p>Ενεργοποίησατε το [product] σας. Μπορείτε να το χρησιμοποιήσετε χωρίς χρονικους περιορισμούς πλεον. Για να μπορέσετε να προσθέσετε έναν απεριόριστο αριθμό επιπλέον καταστημάτων και να τα διαχειριστείτε μέσω μιας εφαρμογής για κινητά, αγοράστε μια <a href=\"[ultimate_license_url]\" target=\"_blank\">άδεια [product] Ultimate.</a></p> <br>"
+msgid "<p>You can use the software without time restrictions now. Please note that some advanced features are available only in <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate.</a></p><br>"
+msgstr ""
 
 msgctxt "Languages::product_state_description.ult.ru.ultimate"
-msgid "<p>You've activated your [product] Ultimate. You can use it without time restrictions now. With [product] Ultimate, you get the ability to use an unlimited number of storefronts.</p><br>"
-msgstr "<p>Έχετε ενεργοποιήσει το [product] Ultimate. Μπορείτε να το χρησιμοποιήσετε χωρίς χρονικους περιορισμούς πλεον. Με το [product] Ultimate, μπορείτε να έχετε όλα τα χαρακτηριστικά του προηγμένου ηλεκτρονικού εμποριου συμπεριλαμβανομένων και απεριόριστων αριθμών καταστημάτων αλλά και την ικανότητα να διαχειριστείτε το κατάστημα σας μέσω μιας κινητής εφαρμογής.</p> <br>"
+msgid "<p>You can use the software without time restrictions now.</p><br>"
+msgstr ""
+
+msgctxt "Languages::product_state_description.ult.b2b.new"
+msgid "<p>You can use one of these licenses: <a href=\"[standard_license_url]\" target=\"_blank\">[product]</a> or <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate</a>. Both licenses allow you to use [product] without time restrictions.</p><br>"
+msgstr ""
+
+msgctxt "Languages::product_state_description.ult.b2b"
+msgid "<p>You can use the software without time restrictions now. Please note that some advanced features are available only in <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate.</a></p><br>"
+msgstr ""
+
+msgctxt "Languages::product_state_description.ult.b2b.ultimate"
+msgid "<p>You can use the software without time restrictions now.</p><br>"
+msgstr ""
 
 msgctxt "Languages::text_store_mode_changed_to_ult"
-msgid "Your store now uses active license. With the [product] edition, you get almost all the features we offer except for an unlimited number of storefronts and the ability to manage your store via a mobile app. These two additional features are available with the <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate edition</a> only."
-msgstr "Το κατάστημά σας χρησιμοποιεί τώρα ενεργή άδεια. Με την έκδοση [product], μπορείτε να πάρετε σχεδόν όλα τα χαρακτηριστικά που μπορούμε να προσφέρουμε εκτός από απεριόριστο αριθμό καταστηματων και την ικανότητα να διαχειριστείτε το κατάστημα σας μέσω μιας εφαρμογής για κινητά. Αυτές οι δύο πρόσθετες δυνατότητες είναι διαθέσιμες με το <a href=\"[ultimate_license_url]\" target=\"_blank\"> [product] Ultimate edition</a> μόνο."
+msgid "Your store now uses an active license of [product]."
+msgstr ""
 
 msgctxt "Languages::text_store_mode_changed_to_ult.ultimate"
-msgid "Your store now uses active license. With the [product] Ultimate edition, you get all the advanced eCommerce features including an unlimited number of extra storefronts and the ability to manage your store via a mobile app."
-msgstr "Το κατάστημά σας χρησιμοποιεί τώρα ενεργή άδεια. Με το [product] Ultimate edition, μπορείτε να πάρετε όλα τα χαρακτηριστικά γνωρίσματα του συγχρονου ηλεκτρονικου εμποριου συμπεριλαμβανομένων και απεριόριστων αριθμό καταστημάτων αλλά και την ικανότητα να διαχειριστείτε το κατάστημα σας μέσω μιας εφαρμογής για κινητά."
+msgid "Your store now uses an active license of [product]."
+msgstr ""
 
 msgctxt "Languages::text_store_mode_changed_to_ult.ru"
-msgid "Your store now uses an active license. With the [product] edition, you get almost all the features we offer, except for an unlimited number of storefronts. This feature is available with the <a href=\"[ultimate_license_url]\" target=\"_blank\">[product] Ultimate edition</a> only."
-msgstr "Το κατάστημά σας χρησιμοποιεί τώρα μια ενεργή άδεια. Με την έκδοση [product], μπορείτε να πάρετε σχεδόν όλα τα χαρακτηριστικά που προσφέρουμε εκτός από απεριόριστο αριθμό καταστηματων και την ικανότητα να διαχειριστείτε το κατάστημα σας μέσω μιας εφαρμογής για κινητά. Αυτές οι δύο πρόσθετες δυνατότητες είναι διαθέσιμες με το <a href=\"[ultimate_license_url]\" target=\"_blank\"> [product] Ultimate edition</a> μόνο."
+msgid "Your store now uses an active license of [product]."
+msgstr ""
 
 msgctxt "Languages::text_store_mode_changed_to_ult.ru.ultimate"
-msgid "Your store now uses an active license. With the [product] Ultimate edition, you get the ability to use an unlimited number of storefronts."
-msgstr "Το κατάστημά σας χρησιμοποιεί τώρα μια ενεργή άδεια. Με το [product] Ultimate edition, έχετε τη δυνατότητα να χρησιμοποιήσετε έναν απεριόριστο αριθμό από βιτρίνες."
+msgid "Your store now uses an active license of [product]."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_ult.b2b"
+msgid "Your store now uses an active license of [product]."
+msgstr ""
+
+msgctxt "Languages::text_store_mode_changed_to_ult.b2b.ultimate"
+msgid "Your store now uses an active license of [product]."
+msgstr ""
 
 msgctxt "Languages::ultimate_license"
 msgid "[product] Ultimate"
@@ -17240,6 +17760,14 @@ msgstr "διαγραφηκε"
 msgctxt "Languages::licensing.license_error_license_is_disabled"
 msgid "The license is disabled. Please check your license status."
 msgstr "Η άδεια είναι απενεργοποιημένη. Παρακαλούμε να ελέγξετε την κατάσταση της άδειας χρήσης σας."
+
+msgctxt "Languages::licensing.license_error_license_is_disabled.title"
+msgid "Your [product] license has been disabled"
+msgstr "Η άδεια σας για το προϊόν [product] απενεργοποιήθηκε"
+
+msgctxt "Languages::licensing.license_error_license_is_disabled.text"
+msgid "Please contact us <a href=\"[helpdesk_url]\" target=\"_blank\">via Customer Help Desk</a> to find out why it happened and what can be done about it. To access the admin panel right now, you can enter another valid license number, as long as it isn't used in another store:"
+msgstr "Παρακαλώ επικοινωνήστε μαζί μας <a href=\"[helpdesk_url]\" target=\"_blank\">μεσω Customer Help Desk</a> για να μάθετε γιατί συνέβη και τι μπορεί να γίνει γι 'αυτό. Για να αποκτήσετε πρόσβαση στον πίνακα διαχείρισης αυτή τη στιγμή, μπορείτε να εισάγετε έναν άλλο έγκυρο αριθμό άδειας, εφόσον δεν χρησιμοποιείται σε άλλο κατάστημα:"
 
 msgctxt "Languages::licensing.license_error_license_is_invalid"
 msgid "Invalid license number. Please enter a valid license number."
@@ -17408,6 +17936,14 @@ msgstr "Εντοπίστηκε ένα αρχείο robots.txt. Οι αλλαγέ
 msgctxt "Languages::advanced_products_search"
 msgid "Advanced products search"
 msgstr "Προηγμένη Αναζήτηση προϊόντα"
+
+msgctxt "Languages::advanced_companies_search"
+msgid "Advanced companies search"
+msgstr ""
+
+msgctxt "Languages::advanced_storefronts_search"
+msgid "Advanced storefronts search"
+msgstr ""
 
 msgctxt "Languages::upgrade_fl54_atol_boxberry_title"
 msgid "New features of Russian version of CS-Cart 4.6.1: compliance with Federal Law 54, add-ons for retailCRM and Boxberry"
@@ -18330,6 +18866,1324 @@ msgid "<p>Some countries require that websites notify customers about the use of
 msgstr "<p>ορισμένες χώρες απαιτούν ότι ιστοσελίδες ενημερώνει τους πελάτες σχετικά με τη χρήση των cookies. Προηγουμένως, θα μπορούσατε να κάνετε ότι υπό <b>→ ρυθμίσεις ασφαλείας</b>. Αυτή η ρύθμιση έχει μετακινηθεί για το πρόσθετο <b>ΑΕΓΧΠΠ συμμόρφωση (ΕΕ)</b> . Εδώ είναι τι σας συμβουλεύουμε κάνει:</p><ol><li>πάει <b>πρόσθετα → Διαχείριση πρόσθετων</b>.</li><li>διακόπτη στους <b>αναζήτηση όλα τα διαθέσιμα πρόσθετα</b> tab.</li><li>να βεβαιωθείτε ότι το πρόσθετο ΑΕΓΧΠΠ συμμόρφωση (ΕΕ) με</b> <b>είναι εγκατεστημένο και ενεργό.</li>,<li>, κάντε κλικ στο όνομα του πρόσθετου, να ανοίξετε τις ρυθμίσεις του.</li><li>εάν συναινείτε <b>Cookie</b> ρύθμιση έχει οριστεί σε <i>πεπλεγμένες</i>, τότε το κατάστημά σας συμπεριφέρεται όπως πριν από την αναβάθμιση.</li><li>μεταβείτε στην καρτέλα ΑΕΓΧΠΠ και βεβαιωθείτε ότι έχουν ρυθμιστεί τις ειδοποιήσεις σχετικά με την επεξεργασία δεδομένων προσωπικού χαρακτήρα, όπως θέλετε να. Κάντε κλικ στο κουμπί</li><li> <b>Αποθήκευση</b>.</li></ol><p>αν θέλετε, μπορείτε να ορίσετε τη λειτουργία συγκατάθεση σε <i>ρητή</i>? με αυτόν τον τρόπο οι πελάτες θα πρέπει να συμφωνήσουν ρητά τη χρήση των cookies πριν μπορούν να έχουν πρόσβαση στο κατάστημα σας.</p>"
 
 msgctxt "Languages::file_uploading_in_progress_please_wait"
-msgid "File uploading in progess. Please, wait."
+msgid "File uploading in progress. Please wait."
 msgstr "Η μεταφόρτωση αρχείου βρίσκεται σε εξέλιξη. Παρακαλώ περιμένετε."
+
+msgctxt "Languages::profile_types_section_user"
+msgid "Customers and admins"
+msgstr "Πελάτες και Διαχειριστές"
+
+msgctxt "Languages::profile_types_section_seller"
+msgid "Vendor information"
+msgstr "Πληροφορίες πωλητή"
+
+msgctxt "Languages::profile_type"
+msgid "Profile type"
+msgstr "Τυπος Προφίλ"
+
+msgctxt "Languages::bulk_edit.example_of_modified_value"
+msgid "Example of the modified value"
+msgstr "Παράδειγμα τροποποιημένης τιμής"
+
+msgctxt "Languages::bulk_edit.decrease_hint"
+msgid "To decrease the value use the \"-\". Example: -5"
+msgstr "Για να μειώσετε μια αξία καντε χρηση του «-». Παράδειγμα: -5"
+
+msgctxt "Languages::bulk_edit.make_active"
+msgid "Make products active"
+msgstr "Ενεργοποίηση Προϊόντων"
+
+msgctxt "Languages::bulk_edit.make_disabled"
+msgid "Make products disabled"
+msgstr "Απενεργοποίηση Προϊόντων"
+
+msgctxt "Languages::bulk_edit.make_hidden"
+msgid "Make products hidden"
+msgstr "Απόκρυψη Προϊόντων"
+
+msgctxt "Languages::bulk_edit.price_and_stock"
+msgid "Price & Stock"
+msgstr "Τιμή και Απόθεμα"
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean"
+msgid "What do these checkboxes mean?"
+msgstr "Τι σημαίνουν αυτά τα πλαίσια ελέγχου;"
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_checked"
+msgid "all the selected products belong to this category or will be assigned to it."
+msgstr "όλα τα επιλεγμένα προϊόντα ανήκουν στην κατηγορία αυτή ή θα ανατεθουν σε αυτή."
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_unchecked"
+msgid "none of the selected products belong to this category, or they will be removed from it."
+msgstr "κανένα από τα επιλεγμένα προϊόντα δεν ανήκει σε αυτήν την κατηγορία ή θα αφαιρεθεί από αυτήν."
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_indeterminate"
+msgid "some of the selected products belong to this category; no changes will be made."
+msgstr "ορισμένα από τα επιλεγμένα προϊόντα ανήκουν σε αυτήν την κατηγορία. δεν θα γίνουν αλλαγές."
+
+msgctxt "Languages::bulk_edit.unable_to_delete_all_categories"
+msgid "At least one category must be selected"
+msgstr "Πρέπει να επιλεγεί τουλάχιστον μία κατηγορία"
+
+msgctxt "Languages::bulk_edit.some_products_were_omitted"
+msgid "Some products were skipped because the last remaining category can't be removed or added for a product."
+msgstr "Ορισμένα προϊόντα παραβλέφθηκαν επειδή η τελευταία εναπομείναντα κατηγορία δεν μπορεί να αφαιρεθεί ή να προστεθεί για ένα προϊόν."
+
+msgctxt "Languages::bulk_edit.some_products_were_omitted_other_storefront"
+msgid "Couldn't edit selected products. Some of the selected products belong to other storefronts; please deselect those products to be able to edit remaining ones."
+msgstr "Δεν ήταν δυνατή η επεξεργασία επιλεγμένων προϊόντων. Μερικά από τα επιλεγμένα προϊόντα ανήκουν σε άλλα καταστηματα. Αποεπιλέξτε αυτά τα προϊόντα για να μπορέσετε να επεξεργαστείτε τα υπόλοιπα προϊόντα."
+
+msgctxt "Languages::custom_search"
+msgid "Custom search"
+msgstr "Προσαρμοσμένη αναζήτηση"
+
+msgctxt "Languages::system_environment"
+msgid "System environment"
+msgstr "Περιβάλλον συστήματος"
+
+msgctxt "Languages::product_feature.purpose"
+msgid "Purpose"
+msgstr "Σκοπός"
+
+msgctxt "Languages::ttc_product_feature.purpose"
+msgid "Determines how you and your customers will be able to use this feature."
+msgstr "Καθορίζει πώς εσείς και οι πελάτες σας θα μπορείτε να χρησιμοποιήσετε αυτό το χαρακτηριστικό."
+
+msgctxt "Languages::product_feature.purpose.organize_catalog"
+msgid "Brand, author, etc."
+msgstr "Brand, author, etc."
+
+msgctxt "Languages::product_feature.purpose.organize_catalog.description"
+msgid "For features like \"Brand\" or \"Manufacturer\" (for most products), \"Performer\" or \"Label\" (for music), \"Author\" or \"Publisher\" (for books), and so on. Every variant of this feature gets its own page with an image, description, and the list of products."
+msgstr "Για χαρακτηριστικά όπως \"Μάρκα\" ή \"Κατασκευαστής\" (για τα περισσότερα προϊόντα), \"Καλλιτέχνης\" ή \"Δίσκος\" (για μουσική), \"Συγγραφέας\" ή \"Εκδότης\" (για βιβλία) και ούτως καθεξής. Κάθε παραλλαγή αυτού του χαρακτηριστικού έχει την δική της σελίδα με μία εικόνα, περιγραφή, και την λίστα των προϊόντων."
+
+msgctxt "Languages::product_feature.purpose.find_products"
+msgid "Product search via filters"
+msgstr "Αναζητηση Προϊόντος με Φιλτρα"
+
+msgctxt "Languages::product_feature.purpose.find_products.description"
+msgid "For a feature that just allows you to specify an additional property of a product (for example, \"Fabric\" for T-shirts). If you create a filter by that feature, customers will see that such a property exists, and will be able to search products by it."
+msgstr "Για ένα χαρακτηριστικό το οποίο σας επιτρέπει να ορίσετε μία έξτρα ιδιότητα ενός προϊόντος (για παράδειγμα, \"Ύφασμα\" για ένα T-shirt). Αν δημιουργήσετε ένα φίλτρο με αυτό το χαρακτηριστικό, οι πελάτες θα έχουν την δυνατότητα να δουν ότι υπάρχει ένα τέτοιο χαρακτηριστικό  και θα έχουν την δυνατότητα να αναζητήσουν προϊόντα βάση αυτού."
+
+msgctxt "Languages::product_feature.purpose.describe_product"
+msgid "Additional information"
+msgstr "Επιπλεον Πληροφοριες"
+
+msgctxt "Languages::product_feature.purpose.describe_product.description"
+msgid "For cases when you just need to show some information on a product page. There are no filters for this kind of features."
+msgstr "Για περιπτώσεις που θέλετε να εμφανίσετε επιπλέον πληροφορίες σε μία σελίδα προϊόντος. Δεν υπάρχουν φίλτρα για τέτοιου είδους χαρακτηριστικά."
+
+msgctxt "Languages::product_feature.feature_style"
+msgid "Feature style"
+msgstr "Στυλ χαρακτηριστικών"
+
+msgctxt "Languages::ttc_product_feature.feature_style"
+msgid "Determines the look of this feature on the product page."
+msgstr "Καθορίζει την όψη αυτού του χαρακτηριστικού στην σελίδα προϊόντος."
+
+msgctxt "Languages::product_feature.feature_style.checkbox"
+msgid "Checkbox"
+msgstr "Πλαίσιο ελέγχου"
+
+msgctxt "Languages::product_feature.feature_style.color"
+msgid "Color"
+msgstr "Χρώμα"
+
+msgctxt "Languages::product_feature.filter_style.color"
+msgid "Color"
+msgstr "Χρώμα"
+
+msgctxt "Languages::product_feature.feature_style.checkbox"
+msgid "Checkbox"
+msgstr "Πλαίσιο ελέγχου"
+
+msgctxt "Languages::product_feature.feature_style.multiple_checkbox"
+msgid "Multiple checkboxes"
+msgstr "Πολλαπλά πλαισια ελεγχου"
+
+msgctxt "Languages::product_feature.feature_style.text"
+msgid "Text or number"
+msgstr "Κειμενο ή Αριθμος"
+
+msgctxt "Languages::product_feature.feature_style.number"
+msgid "Number"
+msgstr "Αριθμός"
+
+msgctxt "Languages::product_feature.feature_style.brand"
+msgid "Brand"
+msgstr "Μάρκα"
+
+msgctxt "Languages::product_feature.filter_style"
+msgid "Filter type"
+msgstr "Τύπος φίλτρου"
+
+msgctxt "Languages::ttc_product_feature.filter_style"
+msgid "Determines the look of a filter by this feature on the product list. Filters make it easier for customers to find a product with the desired feature value. You'll be able to create a filter after you create a feature."
+msgstr "Καθορίζει την όψη ενός φίλτρου που δημιουργείται από αυτό το χαρακτηριστικό στην λίστα προϊόντων. Τα φίλτρα κάνουν πιο εύκολο για τους πελάτες να βρουν ένα προϊόν με μία επιθυμητή τιμή του χαρακτηριστικού βάση του οποίου δημιουργείται το φίλτρο. Μπορείτε να δημιουργήσετε ένα φίλτρο αφού έχετε δημιουργήσει πρώτα το χαρακτηριστικό."
+
+msgctxt "Languages::product_feature.filter_style.checkbox"
+msgid "Checkbox"
+msgstr "Πλαίσιο ελέγχου"
+
+msgctxt "Languages::product_feature.filter_style.slider"
+msgid "Number slider"
+msgstr "Slider με αριθμούς"
+
+msgctxt "Languages::product_feature.filter_style.date"
+msgid "Date selector"
+msgstr "Επιλογέας Ημερομηνίας"
+
+msgctxt "Languages::rus_geolocation_upgrade_notification_title"
+msgid "Geolocation: Add-ons deprecated in favor of [geo_maps_addon]"
+msgstr "Γεωλογικός εντοπισμός: Τα πρόσθετα καταργηθηκαν υπέρ του [geo_maps_addon]"
+
+msgctxt "Languages::rus_geolocation_upgrade_notification_text"
+msgid "<p>The <b>[rus_geolocation_addon]</b> add-on allowed your customers to select their city and see estimated shipping rates on a product page. That functionality is now a part of a new add-on called <b>[geo_maps_addon]</b>. It is already installed and active.</p><p>Two geolocation add-ons shouldn’t be active at the same time. Please make sure that the old <b>[rus_geolocation_addon]</b> add-on is disabled.</p><p><a href=\"[disable_geolocation]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Disable deprecated add-on here</a></p>"
+msgstr "<p>To πρόσθετο<b>[rus_geolocation_addon]</b> επέτρεπε στους πελάτες να επιλέξουν την πόλη τους και να βλέπουν τις εκτιμώμενα έξοδα αποστολής απο την σελίδα του προϊόντος. Αυτή η λειτουργικότητα είναι τώρα μέρος ενός νέου πρόσθετου που ονομάζεται<b>[geo_maps_addon]</b>. Είναι ήδη εγκατεστημένο και ενεργό.</p><p>Δύο πρόσθετα που αφορούν την γεωγραφική θέση δέν θα έπρεπε να είναι ανοιχτά την ίδια στιγμή. Παρακαλώ να είστε σίγουροι ότι το παλιό <b>[rus_geolocation_addon]</b> πρόσθετο είναι απενεργοποιημένο </p><p><a href=\"[disable_geolocation]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Απενεργοποιήστε το παρωχημένο πρόσθετω εδώ</a></p>"
+
+msgctxt "Languages::privilege_groups.blog_and_pages"
+msgid "Blog & Pages"
+msgstr "Blog & Σελίδες"
+
+msgctxt "Languages::privilege_groups.orders"
+msgid "Orders"
+msgstr "Παραγγελίες"
+
+msgctxt "Languages::privilege_groups.order_statuses"
+msgid "Order statuses"
+msgstr "Καταστάσεις παραγγελίας"
+
+msgctxt "Languages::privilege_groups.other"
+msgid "Other"
+msgstr "Άλλα"
+
+msgctxt "Languages::privilege_groups.backup_restore"
+msgid "Backup/Restore"
+msgstr "Δημιουργία αντιγράφου ασφαλείας/επαναφορά"
+
+msgctxt "Languages::privilege_groups.blocks"
+msgid "Blocks"
+msgstr "Μπλοκς"
+
+msgctxt "Languages::privilege_groups.currencies"
+msgid "Currencies"
+msgstr "Νομίσματα"
+
+msgctxt "Languages::privilege_groups.design"
+msgid "Design"
+msgstr "Σχεδιασμός"
+
+msgctxt "Languages::privilege_groups.documents"
+msgid "Documents"
+msgstr "Έγγραφα"
+
+msgctxt "Languages::privilege_groups.file_changes"
+msgid "File changes detector"
+msgstr "Ανιχνευτής αλλαγών Αρχείων"
+
+msgctxt "Languages::privilege_groups.files"
+msgid "Files"
+msgstr "Αρχεία"
+
+msgctxt "Languages::privilege_groups.edit_on_site"
+msgid "Edit content on-site"
+msgstr "Επεξεργαστείτε περιεχόμενο on-site"
+
+msgctxt "Languages::privilege_groups.email_templates"
+msgid "Email templates"
+msgstr "Email templates"
+
+msgctxt "Languages::privilege_groups.exim"
+msgid "Import and export data"
+msgstr "Εισαγωγή και εξαγωγή δεδομένων"
+
+msgctxt "Languages::privilege_groups.languages"
+msgid "Languages"
+msgstr "Ξένες Γλώσσες"
+
+msgctxt "Languages::privilege_groups.locations"
+msgid "Rate areas"
+msgstr "Περιοχες Τιμων"
+
+msgctxt "Languages::privilege_groups.logs"
+msgid "Logs"
+msgstr "Αρχεία Καταγραφής"
+
+msgctxt "Languages::privilege_groups.sales_reports"
+msgid "Sales reports"
+msgstr "Αναφορές πωλήσεων"
+
+msgctxt "Languages::privilege_groups.sitemap"
+msgid "Sitemap"
+msgstr "Χαρτης Site"
+
+msgctxt "Languages::privilege_groups.shipping"
+msgid "Shipping methods"
+msgstr "Τρόποι Αποστολής"
+
+msgctxt "Languages::privilege_groups.payments"
+msgid "Payment methods"
+msgstr "Τρόποι πληρωμής"
+
+msgctxt "Languages::privilege_groups.products"
+msgid "Categories, Products, Features, Filters, Options"
+msgstr "Κατηγορίες, Προϊόντα, Χαρακτηριστικά, Φίλτρα, Επιλογές"
+
+msgctxt "Languages::privilege_groups.promotions"
+msgid "Promotions"
+msgstr "Προσφορές"
+
+msgctxt "Languages::privilege_groups.static_data"
+msgid "Static data"
+msgstr "Στατικά δεδομένα"
+
+msgctxt "Languages::privilege_groups.stores"
+msgid "Stores"
+msgstr "Καταστήματα"
+
+msgctxt "Languages::privilege_groups.storage"
+msgid "Storage"
+msgstr "Αποθήκευση"
+
+msgctxt "Languages::privilege_groups.settings"
+msgid "Settings"
+msgstr "Βασικές Ρυθμίσεις"
+
+msgctxt "Languages::privilege_groups.taxes"
+msgid "Taxes"
+msgstr "Φόροι"
+
+msgctxt "Languages::privilege_groups.themes"
+msgid "Themes"
+msgstr "Θέματα"
+
+msgctxt "Languages::privilege_groups.users"
+msgid "Users"
+msgstr "Χρήστες"
+
+msgctxt "Languages::privilege_groups.user_groups"
+msgid "User groups"
+msgstr "Ομάδες χρήστη"
+
+msgctxt "Languages::privilege_groups.upgrade_center"
+msgid "Upgrade center"
+msgstr "Κέντρο Αναβάθμισης"
+
+msgctxt "Languages::privilege.full_access"
+msgid "Full access"
+msgstr "Πληρης Προσβαση"
+
+msgctxt "Languages::privilege.view_access"
+msgid "Can view only"
+msgstr "Δυνατότητα μονο προβολής"
+
+msgctxt "Languages::privilege.no_access"
+msgid "No access"
+msgstr "Χωρις Προσβαση"
+
+msgctxt "Languages::privilege.custom_access"
+msgid "Custom access"
+msgstr "Προσαρμοσμένη Πρόσβαση"
+
+msgctxt "Languages::privilege.apply_to_all"
+msgid "Apply value to all"
+msgstr "Εφαρμογη αξίας σε όλους"
+
+msgctxt "Languages::open_hours"
+msgid "Open hours"
+msgstr "Ωραριο Λειτουργίας"
+
+msgctxt "Languages::affected_email_templates"
+msgid "Email templates using this document"
+msgstr "Email templates που κάνουν χρηση αυτου του document"
+
+msgctxt "Languages::pickup_point_not_selected"
+msgid "Sorry, we couldn't determine your pickup point. Please choose a pickup point, so that we know where to deliver your order."
+msgstr "Δυστυχώς, δεν μπορέσαμε να προσδιορίσουμε το σημείο παραλαβής σας. Επιλέξτε ένα σημείο παραλαβής, ώστε να γνωρίζουμε πού να παραδώσουμε την παραγγελία σας."
+
+msgctxt "Languages::no_manager_assigned"
+msgid "No manager assigned"
+msgstr "Δεν έχει οριστεί διαχειριστής"
+
+msgctxt "Languages::remove_new_orders_filter_upgrade_notification_title"
+msgid "Search for \"New orders\" removed"
+msgstr "H αναζήτηση για \"Νέες Παραγγελίες\" καταργήθηκε"
+
+msgctxt "Languages::remove_new_orders_filter_upgrade_notification_text"
+msgid "<p>In previous versions, every administrator could search for orders that he or she hadn't viewed yet (\"New orders\"). Because not every administrator views every order, the list of \"new orders\" only kept growing, which could affect the database negatively in a very long run.</p><p>The \"New orders\" condition in the advanced search has been removed. Please take that into account if you have any saved searches with that condition.</p><p><a href=\"[saved_searches]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Check saved searches</a></p>"
+msgstr "<p>Σε προηγούμενες εκδόσεις, όλοι οι διαχειριστές μπορούσαν να ψάξουν για παραγγελίες που  δεν είχα δει ακόμα (\"Νέες Παραγγελίες\"). Επειδή δεν βλέπουν όλοι οι διαχειριστές όλες τις παραγγελίες, η λίστα με τις \"νέες παραγγελίες\" ολοένα και συνέχιζε να μεγαλώνει, γεγονός το οποίο μπορούσε να επηρεάσει την βάση με αρνητικό τρόπο πολύ μακροπρόθεσμα.</p><p>Η συνθήκη \"Νέες παραγγελίες\" στην σύνθετη αναζήτηση έχει καταργηθεί. Παρακαλώ λάβετε υπόψιν σας αν έχετε αποθηκευμένες αναζητήσεις με αυτόν το περιορισμό.<a href=\"[saved_searches]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Ελέγξτε αποθηκευμένες σας αναζητήσεις</a></p>"
+
+msgctxt "Languages::ru.tax_and_payments.upgrade_message.title"
+msgid "Russian Legislation: Preparing for January 1, 2019"
+msgstr "Ρωσική νομοθεσία: Προετοιμασία για την 1η Ιανουαρίου 2019,"
+
+msgctxt "Languages::ru.tax_and_payments.upgrade_message.message"
+msgid "<p>You have upgraded to [product] [version]. This version is prepared for the recent changes in Russian legislation (the increase of VAT to 20% and the support of Fiscal Data Format 1.05 for online cash registers). You'll only need to do this:</p><p>— If you use ATOL Online, switch to Fiscal Data Format 1.05 as described <a href=\"https://www.cs-cart.ru/blog/vyishel-cs-cart-4-9-2-c-podderzhkoy-ffd-1-05-v-atol-onlayn/\" target=\"_blank\">in our Russian blog</a>. You may have done it already after the release of version 4.9.2.</p>[tax_conversion][failing_services]"
+msgstr "<p> Έχετε αναβαθμίσει σε [product] [Version]. Αυτή η έκδοση προετοιμάζεται για τις πρόσφατες αλλαγές στη ρωσική νομοθεσία (αύξηση του ΦΠΑ στο 20% και υποστήριξη του Φορολογικού Μορφότυπου Δεδομένων 1.05 για ηλεκτρονικά ταμειακές μηχανές). Θα χρειαστεί να το κάνετε μόνο: </ p> <p> - Εάν χρησιμοποιείτε το ATOL Online, μεταβείτε στη φόρμα δεδομένων φόρου 1.05 όπως περιγράφεται <a href = \"https://www.cs-cart.ru/blog/ vyishel-cs-cart-4-9-2-c-podderzhkoy-ffd-1-05-v-atol-onlayn / \"target =\" _ blank \"> στο ρωσικό ιστολόγιo μας </a>. Ίσως το έχετε κάνει ήδη μετά την έκδοση της έκδοσης 4.9.2. </ P> [tax_conversion] [failing_services]"
+
+msgctxt "Languages::block_manager.view_layout.reset_filter"
+msgid "Edit layouts"
+msgstr "Επεξεργασία layout"
+
+msgctxt "Languages::block_manager.view_layout.phone"
+msgid "Phone preview"
+msgstr "Προεπισκόπιση τηλεφώνου"
+
+msgctxt "Languages::block_manager.view_layout.tablet"
+msgid "Tablet preview"
+msgstr "Προεπισκόπιση Tablet"
+
+msgctxt "Languages::block_manager.view_layout.desktop"
+msgid "Desktop preview"
+msgstr "Προεπισκόπιση Desktop"
+
+msgctxt "Languages::block_manager.availability.show_on"
+msgid "Show on"
+msgstr "Προβολη σε"
+
+msgctxt "Languages::block_manager.availability.phone"
+msgid "Phone"
+msgstr "Τηλέφωνο"
+
+msgctxt "Languages::block_manager.availability.tablet"
+msgid "Tablet"
+msgstr "Tablet"
+
+msgctxt "Languages::block_manager.availability.desktop"
+msgid "Desktop"
+msgstr "Desktop"
+
+msgctxt "Languages::administration_menu_structure_changed_upgrade_notification_title"
+msgid "Administration menu changed"
+msgstr "Το μενού Διαχείρισης άλλαχθηκε"
+
+msgctxt "Languages::administration_menu_structure_changed_upgrade_notification_text"
+msgid "<p><b>Locations</b> in <i>Administration → Shipping & taxes</i> renamed to <b>Rate areas</b>. That's because the purpose of locations is to set different shipping rates and tax rates.</p><p>Order statuses, shipment statuses, and gift certificate statuses are now located in their own sub-menu: <b>Administration → Statuses.</b></p>"
+msgstr "<p> <b>Οι Τοποθεσίες </ b> στο <i> Διαχείριση → Απσοστολή & φόροι </ i> μετονομάστηκε σε <b> Αξιολόγηση περιοχών </ b>. Αυτό συμβαίνει επειδή ο σκοπός των τοποθεσιών είναι να ορίσετε διαφορετικούς συντελεστές αποστολήε και φορολογικούς συντελεστές. </p> <p> Οι καταστάσεις παραγγελιών, οι καταστάσεις αποστολής και οι καταστάσεις Δωροεπιταγών βρίσκονται τώρα στο δικό τους υπο-μενού: <b> Διαχείριση → Κατάσταση. </ b> </ p>"
+
+msgctxt "Languages::add_as_order"
+msgid "Add as order"
+msgstr "Προσθήκη ως Παραγγελία"
+
+msgctxt "Languages::is_address_required"
+msgid "Customer must specify his/her address"
+msgstr "Ο πελάτης πρέπει να προσδιορίσει τη διεύθυνση του"
+
+msgctxt "Languages::go_to_admin_panel"
+msgid "Admin panel"
+msgstr "Admin panel"
+
+msgctxt "Languages::checkout.min_cart_subtotal_required"
+msgid "To continue checkout process your order subtotal must exceed [amount]"
+msgstr "Για να συνεχίσετε την διαδικασία πληρωμής, το υποσύνολο παραγγελία σας πρέπει να υπερβαίνει το ποσό [amount]"
+
+msgctxt "Languages::lite_checkout.customer_information"
+msgid "Customer"
+msgstr "Πελάτης"
+
+msgctxt "Languages::lite_checkout.personal_name"
+msgid "Full name"
+msgstr "Ονοματεπώνυμο"
+
+msgctxt "Languages::lite_checkout.city_and_state"
+msgid "City, state"
+msgstr "Πολη, νομός"
+
+msgctxt "Languages::lite_checkout.place_an_order_for"
+msgid "Place order ([amount])"
+msgstr "Αποστολή Παραγγελίας ([amount])"
+
+msgctxt "Languages::lite_checkout.delivery_note"
+msgid "Customer's notes"
+msgstr "Σημειώσεις Πελάτη"
+
+msgctxt "Languages::lite_checkout.shippings.show_all_on_map"
+msgid "Show all on map"
+msgstr "Προβολή Ολων στο Χαρτη"
+
+msgctxt "Languages::lite_checkout.nearest_station"
+msgid "Nearest station"
+msgstr "Κοντινοτερος Σταθμος"
+
+msgctxt "Languages::lite_checkout.select_pickup_item"
+msgid "Select a pickup point"
+msgstr "Επιλέξτε σημείο παραλαβής"
+
+msgctxt "Languages::lite_checkout.choose_from_list"
+msgid "Choose from list"
+msgstr "Επιλέξετε απο τη Λίστα"
+
+msgctxt "Languages::lite_checkout.use_two_fingers_for_move_map"
+msgid "Use two fingers to move the map"
+msgstr "Χρησιμοποιήστε δύο δάχτυλα για μετακίνηση του χάρτη"
+
+msgctxt "Languages::lite_checkout.select_your_city"
+msgid "Specify your city"
+msgstr "Επιλέξτε την πόλη σας"
+
+msgctxt "Languages::lite_checkout.deliver_to"
+msgid "Deliver to:"
+msgstr "Αποστολή σε:"
+
+msgctxt "Languages::lite_checkout.click_here_to_update_shipping"
+msgid "Enter city and state and click here to update shipping rates"
+msgstr "Πληκτρολογήστε την πόλη και το Νομ και κάντε κλικ εδώ για να ενημερώσετε τις τιμές αποστολής"
+
+msgctxt "Languages::lite_checkout.shipping_method_for"
+msgid "Shipping method for [group_name]"
+msgstr "Τρόπος αποστολής για [group_name]"
+
+msgctxt "Languages::deprecated"
+msgid "Deprecated"
+msgstr "Υπο Καταργηση"
+
+msgctxt "Languages::collapse_section"
+msgid "Collapse section"
+msgstr "Σύμπτυξη Ενότητας"
+
+msgctxt "Languages::expand_section"
+msgid "Expand section"
+msgstr "Επέκταση Ενότητας"
+
+msgctxt "Languages::companies"
+msgid "Stores"
+msgstr "Καταστήματα"
+
+msgctxt "Languages::storefronts"
+msgid "Storefronts"
+msgstr "Βιτρίνες"
+
+msgctxt "Languages::editing_storefront"
+msgid "Editing storefront"
+msgstr "Επεξεργασία Βιτρίνας"
+
+msgctxt "Languages::creating_storefront"
+msgid "Creating storefront"
+msgstr "Δημιουργία Βιτρίνας"
+
+msgctxt "Languages::all_languages"
+msgid "All languages"
+msgstr "Όλες οι Γλωσσες"
+
+msgctxt "Languages::all_currencies"
+msgid "All currencies"
+msgstr "Όλα τα Νομίσματα"
+
+msgctxt "Languages::all_companies"
+msgid "All stores"
+msgstr "Όλα τα Καταστήματα"
+
+msgctxt "Languages::storefront_status"
+msgid "Status"
+msgstr "Κατάσταση"
+
+msgctxt "Languages::storefront_status.tooltip"
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Specify the <i>Access key to temporarily closed store</i> below.<br/>Use http://www.example.com/index.php?store_access_key=key_value to access a closed storefront."
+msgstr "Ακόμη και όταν το κατάστημα είναι κλειστό (η κατάσταση είναι στο OFF), θα μπορείτε να το δείτε αν έχετε ένα κλειδί πρόσβασης. Ορίστε το <i>κλειδί πρόσβασης για το προσωρινά κλειστό κατάστημα</i> πιο κάτω.<br/> Χρησιμοποιήστε τη διεύθυνση http://www.example.com/index.php?store_access_key=key_value για να δείτε το κατάστημα."
+
+msgctxt "Languages::storefront_access_key"
+msgid "Access key to temporarily closed store"
+msgstr "Κλειδί για πρόσβαση σε προσωρινά κλειστό κατάστημα"
+
+msgctxt "Languages::storefront_access_key.setting_notice"
+msgid "You can set the access key on the store editing page"
+msgstr "Μπορείτε να ορίσετε το κλειδί πρόσβασης στη σελίδα επεξεργασίας του καταστήματος"
+
+msgctxt "Languages::close_storefront"
+msgid "Close storefront"
+msgstr "Κλείσιμο Καταστήματος"
+
+msgctxt "Languages::close_storefront.setting_notice"
+msgid "You can open or close a store on the store editing page"
+msgstr "Μπορείτε να ανοίξετε ή να κλείσετε ένα κατάστημα στη σελίδα επεξεργασίας καταστήματος"
+
+msgctxt "Languages::open_selected_storefronts"
+msgid "Open selected"
+msgstr "Ανοιξτε επιλεγμενο"
+
+msgctxt "Languages::close_selected_storefronts"
+msgid "Close selected"
+msgstr "Κλειστε επιλεγμένο"
+
+msgctxt "Languages::add_storefront"
+msgid "Add storefront"
+msgstr "Προσθήκη καταστήματος"
+
+msgctxt "Languages::storefront_status_changed.Y"
+msgid "The storefront was <b>closed</b>|The storefronts were <b>closed</b>"
+msgstr "Το κατάστημα <b>έκλεισε</b>|Τα καταστήματα ήταν <b>έκλεισαν</b>"
+
+msgctxt "Languages::storefront_status_changed.N"
+msgid "The storefront was <b>opened</b>|The storefronts were <b>opened</b>"
+msgstr "Το κατάστημα <b>άνοιξε</b>|Τα καταστήματα <b>άνοιξαν</b>"
+
+msgctxt "Languages::default_storefront"
+msgid "Default"
+msgstr "Προεπιλεγμένο"
+
+msgctxt "Languages::setting_min_order_amount_type_was_hidden_upgrade_notification_title"
+msgid "Setting \"Define minimum order amount by\" removed"
+msgstr "Η ρύθμιση \"Καθορισμός ελάχιστου ποσού παραγγελίας από\" αφαιρέθηκε"
+
+msgctxt "Languages::setting_min_order_amount_type_was_hidden_upgrade_notification_text"
+msgid "<p>Previously, the <b>Minimum order amount</b> in your store included the shipping costs. If the minimum order amount was $50, and a customer bought 2 products at $20 each, and the shipping cost was $12, then it would be possible to place an order. But now this behavior has changed: only the total price of all products in the cart will determine whether the minimum order amount has been reached.</p><p>Please go to <b>Settings → Checkout</b> and adjust your <b>Minimum order amount</b> to reflect this change.</p><p><a href=\"[checkout_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Open checkout settings</a></p>"
+msgstr "<p>Προηγουμένως, το <b>Ελάχιστο ποσό παραγγελίας</b> στο κατάστημα συμπεριλάμβανε το κόστος αποστολής. Αν το ελάχιστο ποσό παραγγελίας ήταν $50, ο πελάτης αγόραζε 2 προϊόντα από $20 το καθένα και το κόστος αποστολής ήταν $12, τότε ήταν δυνατό να τοποθετήσει μία παραγγελία. Αλλά τώρα η συμπεριφορά αυτή έχει αλλάξει: μόνο η συνολική τιμή όλων των προϊόντων στο καλάθι θα καθορίζει πότε το ποσό της ελάχιστης παραγγελίας έχει ξεπεραστεί.\n"
+"</p><p>Παρακαλώ επιλέξτε<b> Ρυθμίσεις→ Ταμείο</b> και προσαρμόστε <b>Το ελάχιστο ποσό παραγγελίας</b>ώστε να αντανακλά αυτήν την αλλαγή.</p><p><a href=\"[checkout_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Άνοιγμα ρυθμίσεων ταμείου</a></p>"
+
+msgctxt "Languages::add_profile_fields"
+msgid "Add profile fields"
+msgstr "Προσθηκη Πεδίων προφίλ"
+
+msgctxt "Languages::add_profile_fields_and_close"
+msgid "Add profile fields and close"
+msgstr "Προσθηκη Πεδίων προφίλ και κλεισιμο"
+
+msgctxt "Languages::checkout_block_with_heading"
+msgid "Checkout block (H2 heading)"
+msgstr "Μπλοκ Ταμειου (επικεφαλίδα H2)"
+
+msgctxt "Languages::notifications_center.no_notifications"
+msgid "No notifications"
+msgstr "Δεν υπάρχουν ειδοποιήσεις"
+
+msgctxt "Languages::notifications_center.notifications"
+msgid "Notifications"
+msgstr "Ειδοποιήσεις"
+
+msgctxt "Languages::notifications_center.section.all"
+msgid "All"
+msgstr "Όλα"
+
+msgctxt "Languages::notifications_center.section.administration"
+msgid "Administration"
+msgstr "Διαχείριση"
+
+msgctxt "Languages::notifications_center.section.products"
+msgid "Products"
+msgstr "Προϊόντα"
+
+msgctxt "Languages::notifications_center.section.other"
+msgid "Other"
+msgstr "Άλλα"
+
+msgctxt "Languages::notifications_center.tag.administration.update"
+msgid "Update"
+msgstr "Ενημέρωση"
+
+msgctxt "Languages::notifications_center.tag.administration.license"
+msgid "Licence"
+msgstr "Αδεια"
+
+msgctxt "Languages::notifications_center.tag.other"
+msgid "Other"
+msgstr "Άλλα"
+
+msgctxt "Languages::notification.upgrade_available.title"
+msgid "Upgrade available"
+msgstr "Διαθεσιμη Αναβαθμιση"
+
+msgctxt "Languages::notification.upgrade_available.message"
+msgid "A new version of [product] is available. If you want to upgrade to the latest version now, click here."
+msgstr "Μια νέα έκδοση του [product] είναι διαθέσιμη. Αν θέλετε να αναβαθμίσετε στην τελευταία έκδοση τώρα, κάντε κλικ εδώ."
+
+msgctxt "Languages::authorize_before_order"
+msgid "Only registered customers can place an order. Please sign in to your account or register a new one."
+msgstr "Μόνο οι εγγεγραμμένοι πελάτες μπορούν να τοποθετήσουν παραγγελία. Παρακαλώ συνδεθείτε στον λογαριασμό σας ή δημιουργήστε έναν καινούργιο."
+
+msgctxt "Languages::storefront_with_same_url_exists"
+msgid "A storefront with the specified URL already exists"
+msgstr "Ένα κατάστημα με το συγκεκριμένο URL υπάρχει ήδη"
+
+msgctxt "Languages::edit_layout_on_site"
+msgid "Edit layout on-site"
+msgstr "Επεξεργαστείτε περιεχόμενο on-site"
+
+msgctxt "Languages::on_site_layout_editing"
+msgid "Editing layout page: [page]"
+msgstr "Επεξεργασία διάταξης σελίδας: [page]"
+
+msgctxt "Languages::bottom_panel.go_to_home_page"
+msgid "Go to home page"
+msgstr "Πήγαινε στην αρχική σελίδα"
+
+msgctxt "Languages::bottom_panel.go_to_dashboard"
+msgid "Go to Dashboard"
+msgstr "Πηγαινετε στο Πινακα Ελεγχου"
+
+msgctxt "Languages::bottom_panel.show_bottom_admin_panel"
+msgid "Show admin toolbar"
+msgstr "Προβολή της γραμμής εργαλείων admin"
+
+msgctxt "Languages::bottom_panel.hide_bottom_admin_panel"
+msgid "Hide admin toolbar"
+msgstr "Απόκρυψη της γραμμής εργαλείων admin"
+
+msgctxt "Languages::bottom_panel.storefront"
+msgid "Storefront"
+msgstr "Βιτρίνα"
+
+msgctxt "Languages::bottom_panel.admin_panel"
+msgid "Admin panel"
+msgstr "Πίνακας Διαχειριστή"
+
+msgctxt "Languages::bottom_panel.vendor_panel"
+msgid "Vendor panel"
+msgstr "Πίνακας Πωλητή"
+
+msgctxt "Languages::bottom_panel.preview_mode"
+msgid "Preview"
+msgstr "Προεπισκόπηση"
+
+msgctxt "Languages::bottom_panel.build_mode"
+msgid "Edit structure"
+msgstr "Επεξεργασία δομής"
+
+msgctxt "Languages::bottom_panel.build_mode.not_available"
+msgid "Available only at the checkout page. Add a product to cart and go to checkout to see how it works."
+msgstr "Διατίθεται μόνο στη σελίδα Ταμειου. Προσθέστε ένα προϊόν στο καλάθι και μεταβείτε στο ταμείο για να δείτε πώς λειτουργεί."
+
+msgctxt "Languages::bottom_panel.text_mode"
+msgid "Edit texts"
+msgstr "Επεξεργασία κειμένων"
+
+msgctxt "Languages::bottom_panel.theme_mode"
+msgid "Edit style"
+msgstr "Επεξεργασία Στυλ"
+
+msgctxt "Languages::bottom_panel.settings"
+msgid "Settings"
+msgstr "Ρυθμίσεις"
+
+msgctxt "Languages::bottom_panel.change_theme"
+msgid "Change theme"
+msgstr "Αλλαγη theme"
+
+msgctxt "Languages::bottom_panel.edit_layout"
+msgid "Edit layout"
+msgstr "Επεξεργασία layout"
+
+msgctxt "Languages::bottom_panel.edit_template"
+msgid "Edit template"
+msgstr "Επεξεργασια template"
+
+msgctxt "Languages::bottom_panel.edit_translations"
+msgid "Edit translations"
+msgstr "Ενημέρωση μεταφράσεων"
+
+msgctxt "Languages::bottom_panel.edit_menus"
+msgid "Edit menus"
+msgstr "Επεξεργασία menu"
+
+msgctxt "Languages::bottom_panel.edit_product_tabs"
+msgid "Edit product tabs"
+msgstr "Επεξεργασία Tab Προϊόντoς"
+
+msgctxt "Languages::bottom_panel.restore_demo"
+msgid "Restore demo"
+msgstr "Αποκατασταση Demo"
+
+msgctxt "Languages::bottom_panel.documentation"
+msgid "Documentation"
+msgstr "Τεκμηρίωση"
+
+msgctxt "Languages::bottom_panel.help"
+msgid "Help"
+msgstr "Βοήθεια"
+
+msgctxt "Languages::bottom_panel.community_forums"
+msgid "Community forums"
+msgstr "Community forums"
+
+msgctxt "Languages::bottom_panel.video_tutorials"
+msgid "Video tutorials"
+msgstr "Video tutorials"
+
+msgctxt "Languages::bottom_panel.faq"
+msgid "FAQ"
+msgstr "FAQ"
+
+msgctxt "Languages::bottom_panel.customer_help_desk"
+msgid "Contact support"
+msgstr "Επικοινωνήστε με την υποστήριξη"
+
+msgctxt "Languages::bottom_panel.hire_a_developers"
+msgid "Hire a developer"
+msgstr "Προσλάβετε έναν προγραμματιστή"
+
+msgctxt "Languages::bottom_panel.download"
+msgid "Download"
+msgstr "Λήψη"
+
+msgctxt "Languages::bottom_panel.buy_license"
+msgid "Buy license"
+msgstr "Αγοράστε Άδεια"
+
+msgctxt "Languages::bottom_panel.trial_left"
+msgid "Remaining trial period"
+msgstr "Υπόλοιπη περίοδο δοκιμής"
+
+msgctxt "Languages::administration_panel.live_editor.enable"
+msgid "Edit сontent<br/><br/>Change the texts and other data directly on the storefront, without using the administration panel"
+msgstr "Επεξεργασία περιεχομένου<br/><br/>Αλλάξτε τα κείμενα και άλλα δεδομένα απευθείας στο κατάστημα, χωρίς να χρησιμοποιήσετε το panel διαχείρισης"
+
+msgctxt "Languages::demo_panel.live_editor.enable"
+msgid "Edit сontent<br/><br/>Change the texts and other data directly on the storefront, without using the administration panel.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit content on-site\""
+msgstr "Επεξεργασία περιεχομένου<br/><br/>Αλλάξτε τα κείμενα και άλλα δεδομένα απευθείας στο κατάστημα, χωρίς να χρησιμοποιήσετε το panel διαχείρισης.<br/><br/>Για να χρησιμοποιήσετε αυτήν την λειτουργικότητα στο [product] κατάστημα, επιλέξτε Σχεδίαση→ Θέματα και κάντε κλικ στο \"Επεξεργαστείτε περιεχόμενο on-site\""
+
+msgctxt "Languages::administration_panel.theme_editor.enable"
+msgid "Edit style<br/><br/>Change the style of your store (logos, colors, fonts, and so on) and see the changes as you make them"
+msgstr "Επεξεργασία στύλ<br/><br/>Αλλάξτε το στυλ του καταστήματος (λογότυπο, χρώμα, γραμματοσειρά και ούτως καθεξής) και δείτε τις αλλαγές την ώρα που τις κάνετε"
+
+msgctxt "Languages::demo_panel.theme_editor.enable"
+msgid "Edit style<br/><br/>Change the style of your store (logos, colors, fonts, and so on) and see the changes as you make them.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Theme editor\""
+msgstr "Επεξεργασία στύλ<br/><br/>Αλλάξτε το στυλ του καταστήματος (λογότυπο, χρώμα, γραμματοσειρά και ούτως καθεξής) και δείτε τις αλλαγές την ώρα που τις κάνετε. Για να χρησιμοποιήσετε αυτήν την λειτουργικότητα στο [product] κατάστημα, επιλέξτε Σχεδίαση→ Θέματα και κάντε κλίκ στο \"Επεξεργαστής θέματος\""
+
+msgctxt "Languages::administration_panel.block_manager.enable"
+msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works only at the checkout page. Add a product to cart and proceed to checkout to see the editor"
+msgstr "Επεξεργασία δομής<br/><br/>Αλλάξτε διάφορα blocks με πληροφορίες: εμφανίστε τα, κρύψτε τα, ή μετακινήστε τα όπως κρίνετε κατάλληλα.<br/>Αυτή η λειτουργία είναι διαθέσιμη μόνο για την σελίδα πληρωμής. Προσθέστε ένα προϊόν στο καλάθι και προχωρήστε στην πληρωμή για να δείτε τον editor"
+
+msgctxt "Languages::demo_panel.block_manager.enable"
+msgid "Edit structure<br/><br/>Change various blocks with information: show them, hide them, or move them as you see fit.<br/>This currently works only at the checkout page. Add a product to cart and proceed to checkout to see the editor.<br/><br/>To use this functionality in your [product] store, go to Design → Themes and click \"Edit layout on-site\""
+msgstr "Επεξεργασία δομής<br/><br/>Αλλάξτε διάφορα blocks με πληροφορίες: εμφανίστε τα, κρύψτε τα, ή μετακινήστε τα όπως κρίνετε κατάλληλα.<br/>Αυτή η λειτουργία είναι διαθέσιμη μόνο για την σελίδα πληρωμής. Προσθέστε ένα προϊόν στο καλάθι και προχωρήστε στην πληρωμή για να δείτε τον editor.<br/><br/> Για να έχετε πρόσβαση σε αυτή την λειτουργικότητα στο [product] του καταστήματος σας, επιλέξτε Σχεδιασμός→ Θέματα και κάντε κλικ στην επιλογή \"Επεξεργαστείτε περιεχόμενο on-site\""
+
+msgctxt "Languages::individual"
+msgid "Individual"
+msgstr "Μεμονωμενο"
+
+msgctxt "Languages::link_an_existing_option"
+msgid "Link an existing option"
+msgstr "Συνδέστε μία υπάρχουσα επιλογή"
+
+msgctxt "Languages::checkout_location_was_rewritten_upgrade_notification_title"
+msgid "Customize your checkout page"
+msgstr "Προσαρμόστε την σελίδα ολοκλήρωσης της παραγγελίας"
+
+msgctxt "Languages::tip.quick_select_and_close_category_selector"
+msgid "Tip: Hold 'Ctrl' (or \"⌘\" on Mac) while clicking on a category name. This will add one category and close the window."
+msgstr "Υπόδειξη: Kρατήστε πατημένο το πλήκτρο CTRL( η το πλήκτρο με το σήμα \"⌘\" αν έχετε Mac) την ώρα που κάνετε κλίκ σε ένα όνομα κατηγορίας. Η κίνηση αυτή θα προσθέσει μία κατηγορία και θα κλείσει το παράθυρο."
+
+msgctxt "Languages::checkout_select_profile_before_order"
+msgid "Please select a profile before you place the order."
+msgstr "Παρακαλούμε επιλέξτε ένα προφίλ πριν τοποθετήσετε την παραγγελία."
+
+msgctxt "Languages::editing_profile_name"
+msgid "Editing profile: [name]"
+msgstr "Επεξεργασία προφίλ: [name]"
+
+msgctxt "Languages::bm.customer_information_block.warning.email_or_phome_must_be_required"
+msgid "Contact information must always have either email, or phone as a required field."
+msgstr "Οι πληροφορίες επικοινωνίας πρέπει πάντα να περιέχουν είτε την διεύθυνση ηλεκτρονικού ταχυδρομείου (email) είτε το τηλέφωνο σαν απαιτούμενο πεδίο."
+
+msgctxt "Languages::bm.customer_information_block.warning.field_automaticly_added"
+msgid "\"[field_name]\" has been added as a required field automatically."
+msgstr "Το \"[field_name]\" έχει προστεθεί σαν απαιτούμενο πεδίο με αυτόματο τρόπο."
+
+msgctxt "Languages::bm.customer_information_block.warning.field_marked_as_required"
+msgid "The \"[field_name]\" field has been marked as required."
+msgstr "Το πεδίο \"[field_name]\" έχει επισημανθεί ως απαραίτητο"
+
+msgctxt "Languages::checkout_location_was_rewritten_upgrade_notification_text"
+msgid "<p>You can now move parts of the new checkout page around, or hide the parts you don't need. To do this, go to <b>Design → Layouts</b> and switch to the <i>Checkout</i> tab. For your convenience, we have updated your checkout page: it now has all the new blocks that a clean [product] installation has. Please check your checkout page and modify it as you see fit.</p><p>We also made a back-up of your previous checkout page. If you need to revert our changes, just import the layout from <b>[file_paths]</b></p><p><a href=\"[layout_page]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Configure checkout here</a></p>"
+msgstr "<p>Μπορείτε πλέον να μετακινήσετε τμήματα της σελίδας ταμείου, είτε να κρύψετε όσα δεν χρειάζεστε. Για να γίνει αυτό, επιλέγετε <b>Σχεδίαση→ Διατάξεις</b>και πηγαίνετε στην καρτέλα <i> Ταμείο</i>. Για την άνεση σας, έχουμε αναβαθμίσει την σελίδα του ταμείου: πλέον συμπεριλαμβάνει όλα τα νέα μπλόκ όπου μια καθαρή εγκατάσταση [product] έχει. Παρακαλώ κάντε έλεγχο στην σελίδα πληρωμής και τροποποιήστε την όπως εσείς επιθυμείτε.</p><p>Έχουμε επιπλέον κάνει\n"
+"αντίγραφα ασφαλείας των προηγούμενων σελίδων πληρωμής. Αν χρειάζεται να επαναφέρετε τις αλλαγές, απλά εισάγετε το πρότυπο από <b>[file_paths]</b></p><p><a href=\"[layout_page]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Ρυθμίστε την σελίδα πληρωμής εδώ</a></p>"
+
+msgctxt "Languages::upgrade_notification_welcome_title"
+msgid "Welcome to [product] [version]!"
+msgstr "Καλωσήρθατε στο [product] [version]!"
+
+msgctxt "Languages::upgrade_notification_welcome_text"
+msgid "<p class=\"lead\">To help you get started, we’ve compiled the list of what you should check after the upgrade. The full list of changes is in the changelog.</p><p class=\"lead\">If you ever need to check this message later, we’ve also sent a copy to [email].</p>"
+msgstr "<p class=\"lead\">Για να σας βοηθήσουμε να ξεκινήσετε, έχουμε φτιάξει μια λίστα με το τι ελέγχους πρέπει να κάνετε μετά την αναβάθμιση. Η πλήρης λίστα με τις αλλαγές βρίσκεται στο αρχείο αλλαγών.</p><p class=\"lead\">Αν ποτέ χρειαστεί να δείτε αυτό το μήνυμα αργότερα, έχουμε στείλει ένα αντίγραφο στο [email]</p>"
+
+msgctxt "Languages::view_changelog"
+msgid "View changelog"
+msgstr "Προβολή αρχείου αλλαγών"
+
+msgctxt "Languages::upgrade_notification_what_check_first"
+msgid "What to check first?"
+msgstr "Τι να ελέγξετε πρώτα;"
+
+msgctxt "Languages::upgrade_notification_what_else_to_check"
+msgid "What else is there to check?"
+msgstr "Τι άλλο υπάρχει για να ελέγξετε;"
+
+msgctxt "Languages::lite_checkout.change_in_geolocation_cities_upgrade_notification_title"
+msgid "List of geolocation cities is now generated automatically"
+msgstr "Ο κατάλογος των γεωγραφικών τοποθεσιών δημιουργείται τώρα αυτόματα"
+
+msgctxt "Languages::lite_checkout.change_in_geolocation_cities_upgrade_notification_text"
+msgid "<p>Previously, you could create a list of cities that would be available to customers for selection in the geolocation block on the storefront. That had to be done in <b>Administration → Shipping &amp; taxes → Geolocation cities.</b></p><p>That page was removed, and the list of cities is now generated automatically from your pickup points. It works only if the corresponding setting in the [stores_pickups_addon] add-on is enabled, and only for pickup points that have a country, state, and city specified.</p><p>For your convenience, here is the list of cities that you previously had on the <b>Geolocation cities</b> page. It may help with configuring pickup points:<p><p>[locations_table]</p><p><a href=\"[stores_pickups_search]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Edit add-on settings</a></p>"
+msgstr "<p>Σε προηγούμενη έκδοση, μπορούσε κάποιος να δημιουργήσει μία λίστα από πόλεις οι οποίες θα ήταν διαθέσιμες στους πελάτες προς επιλογή από το μπλοκ γεωγραφικών θέσεων του καταστήματος. Η επιλογή αυτή γινόταν ως εξής<b>Διαχείριση→ Μεταφορικά&amp; φόροι→ Γεωγραφικές θέσεις πόλεων.</b></p><p>Η σελίδα αυτή έχει αφαιρεθεί, η δημιουργία της λίστας με τις πόλεις πλέον γίνετε αυτόματα από τα σημεία παραλαβής σας. Η λειτουργία αυτή είναι διαθέσιμη μόνο αν η αντίστοιχη ρύθμιση στο [stores_pickups_addon] πρόσθετο έχει ενεργοποιηθεί και μόνο για σημεία παραλαβής για τα οποία έχει οριστεί χώρα, πολιτεία (νομος) και πόλη</p><p>Για την άνεση σας, εδώ υπάρχει μία λίστα με πόλεις όπου πρόσφατα είχατε στην σελίδα<b>Γεωγραφικές θέσεις πόλεων</b> Όσον αφορά την ρύθμιση των σημείων παραλαβής μπορεί να βοηθήσει το εξής:<p><p>[locations_table]</p><p><a href=\"[stores_pickups_search]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Τροποποιήστε τις ρυθμίσεις του πρόσθετου</a></p>"
+
+msgctxt "Languages::cant_remove_addon_files"
+msgid "Add-on files couldn't be removed"
+msgstr "Δεν ήταν δυνατή η κατάργηση των αρχείων του πρόσθετου"
+
+msgctxt "Languages::addon_reinstall.intro"
+msgid "Looks like you are trying to install an add-on that is already installed. We can do it for you in two ways; we recommend the safe way."
+msgstr "Φαίνεται ότι προσπαθείτε να εγκαταστήσετε ένα πρόσθετο το οποίο έχει ήδη εγκατασταθεί. Μπορούμε να κάνουμε για εσάς με δύο τρόπους; Συνιστούμε τον ασφαλή τρόπο."
+
+msgctxt "Languages::addon_reinstall.safe_way"
+msgid "<strong>The safe way:</strong> we'll uninstall the old add-on first, and then install the new one. The drawback is that any data and settings related to the add-on will be lost."
+msgstr "<strong>Ο ασφαλής τρόπος:</strong> θα απεγκαταστήσουμε το παλιό πρόσθετο πρώτα, και μετά θα εγκαταστήσουμε το νέο. Το μειονέκτημα είναι ότι όλες οι ρυθμίσεις που σχετίζονται με το πρόσθετο θα χαθούν."
+
+msgctxt "Languages::addon_reinstall.dangerous_way"
+msgid "<strong>The dangerous way:</strong> we'll replace all the files of the add-on with new ones, but keep all the add-on's data in the database intact. This can break the add-on, or might even break your store. Please don't use the dangerous way, unless you absolutely know what you're doing."
+msgstr ""
+
+msgctxt "Languages::addon_reinstall.dangerous_way.confirm"
+msgid "I know the risks and want to use the dangerous way."
+msgstr ""
+
+msgctxt "Languages::addon_reinstall.dangerous_way.action"
+msgid "Use the dangerous way"
+msgstr "Χρησιμοποιήστε τον επικίνδυνο τρόπο"
+
+msgctxt "Languages::addon_reinstall.safe_way.action"
+msgid "Use the safe way"
+msgstr "Χρησιμοποιήστε τον ασφαλή τρόπο"
+
+msgctxt "Languages::storefronts_themes_upgrade_notification.title"
+msgid "Storefronts can now differ from each other significantly"
+msgstr "Οι βιτρινες μπορούν πλέον να διαφέρουν σημαντικά μεταξύ τους"
+
+msgctxt "Languages::storefronts_themes_upgrade_notification.message"
+msgid "<p>Previously, all storefronts looked the same. They differed only in currencies, languages, and vendors. But now storefronts can have their own themes and layouts. This allows you to customize their look and structure.</p><ul><li>Themes let you give each storefront its own set colors, fonts, logos, backgrounds, and styles. Match the appearance of a storefronts to its products or the preference of its audience.</li><li>Layouts and blocks let you create storefronts with entirely different structure and content. Show different banners, change the positions of elements on the pages, and so on. Everything in [product] is displayed via blocks, so you have many ways to customize your storefronts.</li></ul><p><a href=\"[themes_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Manage themes</a> <a href=\"[layouts_url]\" target=\"_blank\" class=\"btn btn-large\">Manage layouts</a></p>"
+msgstr ""
+
+msgctxt "Languages::all_storefronts"
+msgid "All storefronts"
+msgstr "Όλες οι βιτρίνες"
+
+msgctxt "Languages::add_storefronts"
+msgid "Add storefronts"
+msgstr "Προσθηκη βιτρίνων"
+
+msgctxt "Languages::add_storefronts_and_close"
+msgid "Add storefronts and close"
+msgstr "Προσθηκη βιτρίνων και κλεισιμο"
+
+msgctxt "Languages::event.receiver.c"
+msgid "Customer"
+msgstr "Πελάτης"
+
+msgctxt "Languages::event.receiver.a"
+msgid "Administrator"
+msgstr "Διαχειριστής"
+
+msgctxt "Languages::event.receiver.v"
+msgid "Vendor"
+msgstr "Πωλητής"
+
+msgctxt "Languages::event.transport.mail"
+msgid "E-mail"
+msgstr "E-mail"
+
+msgctxt "Languages::event.transport.internal"
+msgid "Notifications Center"
+msgstr "Κεντρο Ειδοποιησεων"
+
+msgctxt "Languages::event.order.edp.name"
+msgid "Access to downloadable products granted"
+msgstr "Εγκριθηκε πρόσβαση στα προϊόντα με δυνατότητα λήψης"
+
+msgctxt "Languages::notifications"
+msgid "Notifications"
+msgstr "Ειδοποιήσεις"
+
+msgctxt "Languages::event.order.updated.name"
+msgid "Order was updated"
+msgstr "Η παραγγελία ενημερωθηκε"
+
+msgctxt "Languages::event.order.shipment_updated.name"
+msgid "Products were shipped"
+msgstr "Τα προϊόντα αποστέλλονται"
+
+msgctxt "Languages::purpose"
+msgid "Purpose"
+msgstr "Σκοπός"
+
+msgctxt "Languages::feature_style"
+msgid "Feature style"
+msgstr "Στυλ χαρακτηριστικών"
+
+msgctxt "Languages::filter_style"
+msgid "Filter type"
+msgstr "Τύπος φίλτρου"
+
+msgctxt "Languages::all_block_types"
+msgid "All block types"
+msgstr "Ολοι οι Τυποι Μπλοκς"
+
+msgctxt "Languages::all_layouts"
+msgid "All layouts"
+msgstr "Ολες οι Διαταξεις"
+
+msgctxt "Languages::all_locations"
+msgid "All locations"
+msgstr "Όλες οι Τοποθεσιες"
+
+msgctxt "Languages::n_categories"
+msgid "[n] category|[n] categories"
+msgstr "[n] κατηγορια|[n] κατηγοριες"
+
+msgctxt "Languages::n_pages"
+msgid "[n] page|[n] pages"
+msgstr "[n] σελιδα|[n] σελιδες"
+
+msgctxt "Languages::n_filters"
+msgid "[n] filter|[n] filters"
+msgstr "[n] φιλτρο|[n] φιλτρα"
+
+msgctxt "Languages::n_profile_fields"
+msgid "[n] profile field|[n] profile fields"
+msgstr "[n] πεδιο προφιλ|[n] πεδια προφιλ"
+
+msgctxt "Languages::event.profile.activated.name"
+msgid "Profile was activated"
+msgstr "Το προφίλ ενεργοποιήθηκε"
+
+msgctxt "Languages::event.profile.deactivated.name"
+msgid "Profile was deactivated"
+msgstr "Το προφίλ απενεργοποιήθηκε"
+
+msgctxt "Languages::event.profile.password_reminder.name"
+msgid "Reminder about necessary password change"
+msgstr ""
+
+msgctxt "Languages::event.profile.usergroup_request.name"
+msgid "Membership in user group was requested"
+msgstr ""
+
+msgctxt "Languages::event.profile.updated.name"
+msgid "Profile was updated"
+msgstr "To προφίλ ενημερώθηκε"
+
+msgctxt "Languages::event.profile.added.name"
+msgid "Profile requires activation"
+msgstr ""
+
+msgctxt "Languages::event.profile.created.name"
+msgid "Profile was created"
+msgstr ""
+
+msgctxt "Languages::event.profile.usergroup_activation.name"
+msgid "User group activation"
+msgstr ""
+
+msgctxt "Languages::event.profile.usergroup_disactivation.name"
+msgid "User group disactivation"
+msgstr ""
+
+msgctxt "Languages::event.profile.usergroup_updated.name"
+msgid "Membership in user group was changed"
+msgstr ""
+
+msgctxt "Languages::event.profile.password_recovery.name"
+msgid "Password recovery"
+msgstr "Ανάκτηση Κωδικού Πρόσβασης"
+
+msgctxt "Languages::export_found_products"
+msgid "Export found products"
+msgstr ""
+
+msgctxt "Languages::hello_name"
+msgid "Hello [name],"
+msgstr "Χαίρετε [name]"
+
+msgctxt "Languages::checkout.email_exists.popup.title"
+msgid "You may have bought from us before"
+msgstr "Πιθανώς να είστε ήδη εγγεγραμμένος πελάτης"
+
+msgctxt "Languages::checkout.email_exists.popup.message"
+msgid "An account with your email already exists. We can sign you in (password won't be needed), or you can use another email if you'd like."
+msgstr "Το email σας χρησιμοποιείτε ήδη σε κάποιον εγγεγραμμένο λογαριασμό. Μπορούμε να σας συνδέσουμε, χωρίς να σας ζητηθεί κωδικός, ή χρησιμοποιείστε κάποιο άλλο email."
+
+msgctxt "Languages::checkout.email_exists.popup.cancel_btn"
+msgid "Use another email"
+msgstr "Χρήση διαφορετικού email"
+
+msgctxt "Languages::checkout.email_exists.popup.sign_in_btn"
+msgid "Sign me in"
+msgstr "Σύνδεση"
+
+msgctxt "Languages::auth.one_time_password.popup.title"
+msgid "Password-free sign-in"
+msgstr "Σύνδεση χωρίς κωδικό"
+
+msgctxt "Languages::auth.one_time_password.popup.message"
+msgid "We've sent a one-time code to <strong>[email]</strong>. Please enter it below, and we'll sign you in without a password."
+msgstr "Σας έχει αποσταλεί ένας κωδικός μιας χρήσης στο <strong>[email]</strong>. Εισάγετε τον κωδικό μιας χρήσης στο παρακάτω πεδίο για να συνδεθείτε."
+
+msgctxt "Languages::auth.one_time_password.popup.input_placeholder"
+msgid "Enter the code here"
+msgstr "Εισαγάγετε τον κωδικό εδώ"
+
+msgctxt "Languages::auth.one_time_password.popup.resend_btn"
+msgid "Resend the code"
+msgstr "Αποστόλη νέου κωδικού"
+
+msgctxt "Languages::auth.one_time_password.popup.sign_in_btn"
+msgid "Sign me in"
+msgstr "Σύνδεση"
+
+msgctxt "Languages::auth.one_time_password.notification.info_password_sent"
+msgid "We've sent a one-time code to [email]."
+msgstr "Ο κωδικός μιας χρήσης έχει αποσταλεί στο [email]"
+
+msgctxt "Languages::auth.one_time_password.notification.error_password_invalid"
+msgid "Sorry, it seems that the code you've entered is incorrect. It may have expired or been used already. Please check the code you're entering or request a new code."
+msgstr "Φαίνεται πως ο κωδικός μιας χρήσης που εισάγατε δεν είναι σωστός. Ίσως να έχει λήξει ή να τον έχετε ήδη χρησιμοποιήσει. Ελέγξτε το κωδικό που εισάγατε ή ζητήστε να σας σταλεί νέος κωδικός μιας χρήσης."
+
+msgctxt "Languages::auth.one_time_password.notification.error_password_required"
+msgid "Please enter the code to sign in."
+msgstr "Εισάγετε το κωδικό μιας χρήσης για να συνδεθείτε"
+
+msgctxt "Languages::email.one_time_password.title"
+msgid "Sign in without password"
+msgstr "Σύνδεση με κωδικό μιας χρήσης"
+
+msgctxt "Languages::email.one_time_password.message"
+msgid "<p>You've requested a one-time code to sign in to <a href=\"[storefront_url]\">[storefront_url]</a>. Here it is:</p><p><strong><code>[password]</code></strong></p><p>Please don't tell this code to anyone else. If you haven't requested the code, then you can safely ignore this message. Nobody will be able to sign in to your account, unless they know your password or can view your inbox.</p>"
+msgstr "<p>Έχετε αιτηθεί κωδικό μιας χρήσης για το κατάστημα  <a href=\"[storefront_url]\">[storefront_url]</a>. Ο κωδικός είναι:</p><p><strong><code>[password]</code></strong></p><p>Μην κοινοποιήσετε αυτό το κωδικό σε άλλα άτομα. Αν δεν είστε εσείς που έχετε αιτηθεί αυτό το κωδικό, τότε μπορείτε να αγνοήσετε το παρόν email. Κάνεις δεν μπορεί να συνδεθεί στο λογαριασμό σας, εκτός αν ξέρουν το κωδικό σας ή έχουν πρόσβαση στο email σας.</p>"
+
+msgctxt "Languages::email_template.one_time_password_request"
+msgid "One-time code for password-free sign-in"
+msgstr ""
+
+msgctxt "Languages::other_notification"
+msgid "Other"
+msgstr ""
+
+msgctxt "Languages::see_full_templates_list"
+msgid "Can't find a notification you're looking for?<br/><a href=\"[email_template_manage]\">See the full list of email templates</a><br/><a href=\"[internal_template_manage]\">See the full list of on-site notification templates</a>"
+msgstr ""
+
+msgctxt "Languages::internal_templates"
+msgid "On-site notification templates"
+msgstr ""
+
+msgctxt "Languages::editing_internal_template"
+msgid "Editing on-site notification template"
+msgstr ""
+
+msgctxt "Languages::send_test_notification"
+msgid "Send test notification"
+msgstr ""
+
+msgctxt "Languages::count_internal_template_successfully_imported"
+msgid "On-site notification templates successfully imported:"
+msgstr ""
+
+msgctxt "Languages::count_internal_template_fail_imported"
+msgid "On-site notification templates import failed:"
+msgstr ""
+
+msgctxt "Languages::internal_template_import_success_msg"
+msgid "All the on-site notification templates have been imported without errors."
+msgstr ""
+
+msgctxt "Languages::count_internal_template_fail_imported"
+msgid "On-site notification templates import failed:"
+msgstr ""
+
+msgctxt "Languages::internal_template_exists"
+msgid "The on-site notification template with the chosen code already exists, please try another."
+msgstr ""
+
+msgctxt "Languages::notification_template.tab.email"
+msgid "Email"
+msgstr ""
+
+msgctxt "Languages::notification_template.tab.internal"
+msgid "On-site"
+msgstr ""
+
+msgctxt "Languages::notifications_center.section.communication"
+msgid "Communication"
+msgstr ""
+
+msgctxt "Languages::notifications_center.tag.messages"
+msgid "Messages"
+msgstr ""
+
+msgctxt "Languages::last_login"
+msgid "Last login"
+msgstr ""
+
+msgctxt "Languages::total_orders"
+msgid "Created orders"
+msgstr ""
+
+msgctxt "Languages::total_paid_orders"
+msgid "Paid orders"
+msgstr ""
+
+msgctxt "Languages::total_spent_money"
+msgid "Total spend"
+msgstr ""
+
+msgctxt "Languages::block_manager.brands_per_screen"
+msgid "Brands per screen"
+msgstr ""
+
+msgctxt "Languages::block_manager.total_displayed_brands"
+msgid "Total amount of brands displayed"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.notification_settings"
+msgid "Notifications"
+msgstr ""
+
+msgctxt "Languages::block_manager.manage_layout_in_tab_not_exist_location"
+msgid "<p>This [entity] currently doesn't have an associated layout page. That's why it uses blocks from the default layout page.<br> If you'd like to edit blocks specifically for this [entity], then:</p><p><ol><li>Go to <b><a href=\"[link]\">Design → Layouts</a></b></li><li>Add a layout page with <b>Dispatch:</b> <code>[dispatch_value]</code>.</li><li>Switch to the <b>[entity_tab]</b> tab and make sure that the layout page is enabled for this [entity].</li><li>Save your changes and return here.</li></ol></p>"
+msgstr ""
+
+msgctxt "Languages::block_manager.manage_layout_in_tab_unavailable_by_object_id"
+msgid "<p>This [entity] currently doesn't have an associated layout page. That's why it uses blocks from the default layout page.<br> If you'd like to edit blocks specifically for this [entity], then:</p><p><ol><li>Edit the <b><a href=\"[link]\">[location_name]</a></b> layout page.</li><li>Switch to the [entity_tab] tab and make sure that the layout page is enabled for this [entity].</li><li>Save your changes and return here.</li></ol></p>"
+msgstr ""
+
+msgctxt "Languages::block_manager.manage_layout_in_tab_unavailable"
+msgid "Sorry, you can't edit blocks for this [entity]. If you'd like to do this, please contact the main administrator. Ask him or her to check the <b>Layouts</b> tab of this [entity] in their admin panel. That will give the main admin all the necessary information."
+msgstr ""
+
+msgctxt "Languages::block_manager.dynamic_entity_products"
+msgid "product"
+msgstr ""
+
+msgctxt "Languages::block_manager.dynamic_entity_categories"
+msgid "category"
+msgstr ""
+
+msgctxt "Languages::block_manager.dynamic_entity_pages"
+msgid "page"
+msgstr ""
+
+msgctxt "Languages::payment_processors.category.checkout"
+msgid "Checkout"
+msgstr ""
+
+msgctxt "Languages::payment_processors.category.gateway"
+msgid "Gateways"
+msgstr ""
+
+msgctxt "Languages::payment_processors.category.russian"
+msgid "Russian payment methods"
+msgstr ""
+
+msgctxt "Languages::event.system.realtime_shipping_error.name"
+msgid "Realtime shipping errors"
+msgstr ""
+
+msgctxt "Language::exim_reset_inventory_tooltip"
+msgid "This won't affect the products that have the quantity specified in the imported file."
+msgstr ""
+
+msgctxt "Languages::thank_you"
+msgid "Thank you!"
+msgstr ""
+
+msgctxt "Languages::text_review_and_reach_out_request"
+msgid "We'll review your application and reach out to you via email soon."
+msgstr ""
+
+msgctxt "Languages::system_of_measurement"
+msgid "System of measurement"
+msgstr ""
+
+msgctxt "Languages::imperial_units"
+msgid "Imperial (in, lb)"
+msgstr ""
+
+msgctxt "Languages::metric_units"
+msgid "Metric (cm, kg)"
+msgstr ""
+
+msgctxt "Languages::ship_dhl_account_country"
+msgid "Account country"
+msgstr ""
+
+msgctxt "Languages::print_documents"
+msgid "Print documents"
+msgstr ""
+
+msgctxt "Languages::change_to_status"
+msgid "Change to [status]"
+msgstr ""
+
+msgctxt "Languages::invoice_pdf"
+msgid "Invoice (PDF)"
+msgstr ""
+
+msgctxt "Languages::settings.smtp_error"
+msgid "SMTP Error"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Atlantic/Bermuda"
+msgid "(GMT-03:00) Bermuda"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Asia/Almaty"
+msgid "(GMT+06:00) Almaty"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Indian/Cocos"
+msgid "(GMT+06:30) Cocos"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Pacific/Pitcairn"
+msgid "(GMT-08:00) Pitcairn"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::America/Vancouver"
+msgid "(GMT-08:00) Vancouver"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Pacific/Gambier"
+msgid "(GMT-09:00) Gambier"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Australia/Lord_Howe"
+msgid "(GMT+10:30) Lord Howe"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Pacific/Chatham"
+msgid "(GMT+12:45) Chatham"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Africa/Casablanca"
+msgid "(GMT+01:00) Casablanca"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Europe/Dublin"
+msgid "(GMT+01:00) Dublin"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Pacific/Midway"
+msgid "(GMT-11:00) United States Minor Outlying Islands"
+msgstr ""
+
+msgctxt "SettingsVariants::timezone::Asia/Urumqi"
+msgid "(GMT+06:00) Urumqi"
+msgstr ""
+
+msgctxt "Languages::sync_data"
+msgid "Sync data"
+msgstr ""
+
+msgctxt "Languages::never"
+msgid "Never"
+msgstr ""
+
+msgctxt "Languages::nothing_sign"
+msgid "&mdash;"
+msgstr ""
+
+msgctxt "Languages::last_sync"
+msgid "Last sync"
+msgstr ""
+
+msgctxt "Languages::log_file"
+msgid "Log file"
+msgstr ""
 

@@ -10,7 +10,7 @@
             </select>
         {else}
             <input type="hidden" name="payment_data[cash_register_payment_id]" value="">
-            <input type="checkbox" name="payment_data[cash_register_payment_id]" {if $cash_register_payment_id == $cash_register_payments|key}checked="checked"{/if} id="elm_payment_rus_online_cash_register_{$id}" value="{$cash_register_payments|key}">
+            <input type="checkbox" name="payment_data[cash_register_payment_id]" {if $cash_register_payment_id == $cash_register_payments|key}checked="checked"{/if} id="elm_payment_rus_online_cash_register_{$id}" value="{$cash_register_payments|key}" onclick="Tygh.$('#tab_atol_{$id}').toggleBy();">
         {/if}
     </div>
 </div>

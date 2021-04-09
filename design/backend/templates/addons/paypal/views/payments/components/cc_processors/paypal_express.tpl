@@ -7,8 +7,6 @@
 {include file="addons/paypal/common/connect_to_paypal.tpl"}
 {$suffix = $payment_id|default:0}
 
-<hr>
-
 <div class="control-group">
     <label class="control-label" for="currency{$suffix}">{__("currency")}:</label>
     <div class="controls">
@@ -111,9 +109,27 @@
         <label class="control-label" for="mode{$suffix}">{__("test_live_mode")}:</label>
         <div class="controls">
             <select name="payment_data[processor_params][mode]" id="mode{$suffix}">
-                <option value="test" {if $processor_params.mode eq "test"} selected="selected"{/if}>{__("test")}</option>
-                <option value="live" {if $processor_params.mode eq "live"} selected="selected"{/if}>{__("live")}</option>
+                <option value="test" {if $processor_params.mode === "test"} selected="selected"{/if}>{__("test")}</option>
+                <option value="live" {if $processor_params.mode === "live"} selected="selected"{/if}>{__("live")}</option>
             </select>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="elm_show_cart_button{$suffix}">{__("paypal.show_cart_button")}:</label>
+        <div class="controls">
+            <input type="hidden"
+                   name="payment_data[processor_params][show_cart_button]"
+                   value="{"YesNo::NO"|enum}"
+            />
+            <input type="checkbox"
+                   name="payment_data[processor_params][show_cart_button]"
+                   {if $processor_params.show_cart_button|default:("YesNo::NO"|enum) === "YesNo::YES"|enum}
+                       checked="checked"
+                   {/if}
+                   id="elm_show_cart_button{$suffix}"
+                   value="{"YesNo::YES"|enum}"
+            />
         </div>
     </div>
 </div>

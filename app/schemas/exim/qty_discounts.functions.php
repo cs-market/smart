@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 /**
  * The function checks if an entered percentage discount for the lower limit value equal to 1 to be greater than 0
@@ -139,7 +140,7 @@ function fn_exim_put_usergroup($usergroup, $lang_code)
             'usergroup' => $usergroup,
         );
 
-        foreach (fn_get_translation_languages() as $_data['lang_code'] => $v) {
+        foreach (Languages::getAll() as $_data['lang_code'] => $v) {
             db_query("INSERT INTO ?:usergroup_descriptions ?e", $_data);
         }
     }

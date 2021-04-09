@@ -170,8 +170,8 @@
             DELETE FROM `?:exim_layouts` WHERE pattern_id = 'product_yml_options'
         </item>
 
-        <item editions="ULTIMATE">REPLACE INTO  ?:privileges (privilege, is_default, section_id) VALUES ('view_yml', 'Y', 'addons');</item>
-        <item editions="ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_yml', 'Y', 'addons');</item>
+        <item editions="ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_yml', 'Y', 'addons', 'yml_export', 'Y');</item>
+        <item editions="ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_yml', 'Y', 'addons', 'yml_export', 'N');</item>
         <item for="uninstall">DELETE FROM ?:privileges WHERE privilege = 'view_yml' OR privilege = 'manage_yml'</item>
 
     </queries>

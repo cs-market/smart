@@ -1,7 +1,7 @@
 {math equation="x*30+5" x=$level|default:"0" assign="shift"}
 <tr class="multiple-table-row cm-row-status-{$product_file.status|lower} ">
     <td>
-        <div style="padding-left: {$shift}px;">
+        <div style="padding-{$direction}: {$shift}px;">
             <a class="row-status cm-external-click{if $non_editable} no-underline{/if}" data-ca-external-click-id="opener_group{$id_prefix}{$id}">{$product_file.file_name}</a>
         </div></td>
 

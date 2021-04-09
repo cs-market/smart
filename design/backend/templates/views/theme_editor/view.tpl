@@ -30,7 +30,7 @@ Tygh.te_custom_fonts = {$current_style.custom_fonts|to_json nofilter};
         </span>
 </span>
 
-<div class="theme-editor {if $theme_manifest.converted_to_css} te-converted-to-css{/if}" data-ca-te-use-dynamic-style="{if $runtime.vendor_id}true{else}false{/if}" id="theme_editor_container">
+<div class="theme-editor {if $theme_manifest.converted_to_css} te-converted-to-css{/if}" data-ca-te-use-dynamic-style="{if $runtime.vendor_id}true{else}false{/if}" id="theme_editor_container" data-bp-sidebar="true">
     <div class="te-overlay{if $is_theme_editor_allowed|default:true} hidden{/if}">
         <div class="te-notification-wrapper">
             <p class="notification-content alert-warning">{__("theme_editor.page_cant_be_configured")}</p>
@@ -254,7 +254,7 @@ Tygh.te_custom_fonts = {$current_style.custom_fonts|to_json nofilter};
         <div class="te-colors clearfix">
             <label for="elm_te_{$name}">{__($field.description)}</label>
 
-            {$cp_value = ($current_style.data.$name)|default:"#ffffff"}
+            {$cp_value = ($current_style.data.$name)|default:(($field.default)|default:"#ffffff")}
 
             {include file="backend:views/theme_editor/components/colorpicker.tpl" cp_name="style[data][`$name`]" cp_id="storage_elm_te_`$name`" cp_value=$cp_value cp_class="cm-te-value-changer" cp_storage="theme_editor"}
         </div>

@@ -22,7 +22,7 @@
 {assign var="popup_additional_class" value=$popup_additional_class}
 <div class="cm-popup-box {if !$hide_for_vendor}dropdown{/if} {$popup_additional_class}">
     {if !$hide_for_vendor}
-        <a {if $id}id="sw_{$prefix}_{$id}_wrap"{/if} class="{if $btn_meta}{$btn_meta}{/if} btn dropdown-toggle{if $id} cm-combination{/if}" data-toggle="dropdown">
+        <a href="#" {if $id}id="sw_{$prefix}_{$id}_wrap"{/if} class="{if $btn_meta}{$btn_meta}{/if} btn dropdown-toggle{if $id} cm-combination{/if} {if $text_wrap}dropdown-toggle--text-wrap{/if}" data-toggle="dropdown">
     {/if}
         {if $items_status}
             {$items_status.$status|default:$default_status_text}
@@ -59,31 +59,11 @@
             {/if}
             {if $items_status}
                 {foreach from=$items_status item="val" key="st"}
-                <li {if $status == $st}class="disabled"{/if}><a class="{if $confirm}cm-confirm {/if}status-link-{$st|lower} {if $status == $st}active{else}cm-ajax cm-post{if $ajax_full_render} cm-ajax-full-render{/if}{/if} {if $status_meta}{$status_meta}{/if}"{if $status_target_id} data-ca-target-id="{$status_target_id}"{/if} href="{"`$_update_controller`.update_status?id=`$id`&status=`$st``$extra_params``$dynamic_object`"|fn_url}" onclick="return fn_check_object_status(this, '{$st|lower}', '{if $statuses}{$statuses[$st].params.color|default:''}{/if}');" {if $st_result_ids}data-ca-target-id="{$st_result_ids}"{/if} data-ca-event="ce.update_object_status_callback">{$val}</a></li>
+                <li {if $status == $st}class="disabled"{/if}><a class="{if $text_wrap}dropdown--text-wrap{/if} {if $confirm}cm-confirm {/if}status-link-{$st|lower} {if $status == $st}active{else}cm-ajax cm-post{if $ajax_full_render} cm-ajax-full-render{/if}{/if} {if $status_meta}{$status_meta}{/if}"{if $status_target_id} data-ca-target-id="{$status_target_id}"{/if} href="{"`$_update_controller`.update_status?id=`$id`&status=`$st``$extra_params``$dynamic_object`"|fn_url}" onclick="return fn_check_object_status(this, '{$st|lower}', '{if $statuses}{$statuses[$st].params.color|default:''}{/if}');" {if $st_result_ids}data-ca-target-id="{$st_result_ids}"{/if} data-ca-event="ce.update_object_status_callback" title="{$val}">{$val}</a></li>
                 {/foreach}
             {/if}
             {capture name="list_items"}
-            {hook name="select_popup:notify_checkboxes"}
-                {if $notify}
-                    <li class="divider"></li>
-                    <li><a><label for="{$prefix}_{$id}_notify">
-                        <input type="checkbox" name="__notify_user" id="{$prefix}_{$id}_notify" value="Y" {if $notify_customer_status == true} checked="checked" {/if} onclick="Tygh.$('input[name=__notify_user]').prop('checked', this.checked);" />
-                        {$notify_text|default:__("notify_customer")}</label></a>
-                    </li>
-                {/if}
-                {if $notify_department}
-                    <li><a><label for="{$prefix}_{$id}_notify_department">
-                        <input type="checkbox" name="__notify_department" id="{$prefix}_{$id}_notify_department" value="Y" {if $notify_department_status == true} checked="checked" {/if} onclick="Tygh.$('input[name=__notify_department]').prop('checked', this.checked);" />
-                        {__("notify_orders_department")}</label></a>
-                    </li>
-                {/if}
-                {if "MULTIVENDOR"|fn_allowed_for && $notify_vendor}
-                    <li><a><label for="{$prefix}_{$id}_notify_vendor">
-                        <input type="checkbox" name="__notify_vendor" id="{$prefix}_{$id}_notify_vendor" value="Y" {if $notify_vendor_status == true} checked="checked" {/if} onclick="Tygh.$('input[name=__notify_vendor]').prop('checked', this.checked);" />
-                        {__("notify_vendor")}</label></a>
-                    </li>
-                {/if}            
-            {/hook}
+                {include file="common/notify_checkboxes.tpl" }
 
             {/capture}
 

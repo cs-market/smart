@@ -9,7 +9,7 @@
     <label class="control-label" for="psc_processor">{__("text_paysitecash_processor")}:</label>
     <div class="controls">
         <select name="payment_data[processor_params][processor]" id="psc_processor">
-            <option value="psc" {if $processor_params.processor == "psc"}selected="selected"{/if}>Paysite Cash</option>
+            <option value="psc" {if $processor_params.processor == "psc"}selected="selected"{/if}>Paysite-cash</option>
             <option value="ep" {if $processor_params.processor == "ep"}selected="selected"{/if}>Easy Pay</option>
         </select>
     </div>

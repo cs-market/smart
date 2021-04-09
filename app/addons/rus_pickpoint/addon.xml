@@ -9,9 +9,6 @@
         <core_version>
             <min>4.2.1</min>
         </core_version>
-        <core_edition>
-            ULTIMATE
-        </core_edition>
     </compatibility>
     <settings layout="separate" edition_type="ROOT,ULT:VENDOR">
         <sections>

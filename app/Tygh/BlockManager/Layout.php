@@ -16,24 +16,36 @@ namespace Tygh\BlockManager;
 
 use Tygh\CompanySingleton;
 use Tygh\Themes\Styles;
+use Tygh\Tygh;
 
 class Layout extends CompanySingleton
 {
-    /** @var array Internal cache for layouts list */
-    protected $cache_layouts = array();
+    /**
+     * @var array Internal cache for layouts list
+     */
+    protected $cache_layouts = [];
+
+    /**
+     * @var array Internal cache for default layout
+     */
+    protected $cache_defaults = [];
+
+    /**
+     * @var int|null
+     */
+    protected $storefront_id;
 
     /**
      * Gets layout by ID
-     * @param  int   $layout_id layout ID
+     *
+     * @param int $layout_id layout ID
+     *
      * @return array layout data
      */
     public function get($layout_id = 0)
     {
         if (!isset($this->cache_layouts[$layout_id])) {
-            $condition = "";
-            if (fn_allowed_for('ULTIMATE')) {
-                $condition = $this->getCompanyCondition('?:bm_layouts.company_id');
-            }
+            $condition = db_quote(' AND storefront_id = ?i', $this->storefront_id);
 
             if (!empty($layout_id)) {
                 $condition .= db_quote(" AND layout_id = ?i", $layout_id);
@@ -51,15 +63,15 @@ class Layout extends CompanySingleton
     {
         $condition = '';
 
-        if (empty($theme_name)) {
-            $theme_name = fn_get_theme_path('[theme]', 'C', $this->_company_id);
+        if (!$theme_name) {
+            $theme_name = fn_get_theme_path('[theme]', 'C', $this->_company_id, true, $this->storefront_id);
         }
 
-        if (fn_allowed_for('ULTIMATE')) {
-            $condition = $this->getCompanyCondition('?:bm_layouts.company_id');
+        if (isset($this->cache_defaults[$theme_name])) {
+            return $this->cache_defaults[$theme_name];
         }
 
-        $condition .= db_quote(" AND is_default = 1 AND theme_name = ?s", $theme_name);
+        $condition .= db_quote(" AND is_default = 1 AND theme_name = ?s AND storefront_id = ?i", $theme_name, $this->storefront_id);
         $fields = array('?:bm_layouts.*');
         $join = '';
 
@@ -83,22 +95,19 @@ class Layout extends CompanySingleton
             $condition
         );
 
-        return $layout;
+        return $this->cache_defaults[$theme_name] = $layout;
     }
 
     /**
      * Changes default layout for the theme
      *
-     * @param  int  $layout_id Layout identifier
+     * @param int $layout_id Layout identifier
+     *
      * @return bool true
      */
     public function setDefault($layout_id)
     {
-        $condition = '';
-
-        if (fn_allowed_for('ULTIMATE')) {
-            $condition .= db_quote(" AND company_id = ?i", $this->_company_id);
-        }
+        $condition = db_quote(' AND storefront_id = ?i', $this->storefront_id);
 
         /**
          * Changes the way how layout is set as default
@@ -118,15 +127,13 @@ class Layout extends CompanySingleton
     /**
      * Gets layouts list
      *
-     * @param $array input params
+     * @param array $params input params
+     *
      * @return array layouts list
      */
     public function getList($params = array())
     {
-        $condition = '';
-        if (fn_allowed_for('ULTIMATE')) {
-            $condition = $this->getCompanyCondition('?:bm_layouts.company_id');
-        }
+        $condition = db_quote(' AND storefront_id = ?i', $this->storefront_id);
 
         if (!empty($params['theme_name'])) {
             $condition .= db_quote(" AND theme_name = ?s", $params['theme_name']);
@@ -163,21 +170,21 @@ class Layout extends CompanySingleton
 
     /**
      * Updates or creates layout
-     * @param  array $layout_data layout data
-     * @param  int   $layout_id   layout ID to update, zero to create
+     *
+     * @param array $layout_data layout data
+     * @param int   $layout_id   layout ID to update, zero to create
+     *
      * @return int   ID of updated/created layout
      */
     public function update($layout_data, $layout_id = 0)
     {
         $create = empty($layout_id);
 
-        if (fn_allowed_for('ULTIMATE')) {
-            if (empty($layout_data['company_id'])) {
-                $layout_data['company_id'] = $this->_company_id;
-            }
-        }
+        $layout_data['storefront_id'] = $this->storefront_id;
 
-        $theme_name = empty($layout_data['theme_name']) ? fn_get_theme_path('[theme]', 'C', $this->_company_id, false) : $layout_data['theme_name'];
+        $theme_name = empty($layout_data['theme_name'])
+            ? fn_get_theme_path('[theme]', 'C', $this->_company_id, false, $this->storefront_id)
+            : $layout_data['theme_name'];
 
         $available_styles = Styles::factory($theme_name)->getList(array(
             'short_info' => true
@@ -186,17 +193,15 @@ class Layout extends CompanySingleton
         /**
          * Performs actions before updating layout
          *
-         * @param object  $this Layout object
-         * @param integer $layout_id layout ID
+         * @param object  $this        Layout object
+         * @param integer $layout_id   layout ID
          * @param array   $layout_data layout data
-         * @param boolean $create create/update flag
+         * @param boolean $create      create/update flag
          */
         fn_set_hook('layout_update_pre', $this, $layout_id, $layout_data, $create);
 
-        // Create layout
         if (empty($layout_id)) {
-            $company_id = !empty($layout_data['company_id']) ? $layout_data['company_id'] : 0;
-
+            // Create layout
             if (!empty($layout_data['from_layout_id'])) {
                 $layout_data['style_id'] = Styles::factory($theme_name)->getStyle($layout_data['from_layout_id']);
             }
@@ -214,9 +219,8 @@ class Layout extends CompanySingleton
             }
 
             $layout_id = db_query("INSERT INTO ?:bm_layouts ?e", $layout_data);
-        }
-        // Update existing layout
-        else {
+        } else {
+            // Update existing layout
             if (isset($layout_data['style_id']) && !isset($available_styles[$layout_data['style_id']])) {
                 $layout_data['style_id'] = Styles::factory($theme_name)->getDefault();
             }
@@ -243,14 +247,16 @@ class Layout extends CompanySingleton
             $this->setLayoutElementsWidth($layout_id, $layout_width);
         }
 
-        unset($this->cache_layouts[$layout_id]);
+        $this->clearInnerCache($layout_id);
 
         return $layout_id;
     }
 
     /**
      * Deletes layout and assigned data (logos)
-     * @param  int     $layout_id layout ID
+     *
+     * @param int $layout_id layout ID
+     *
      * @return boolean always true
      */
     public function delete($layout_id)
@@ -275,31 +281,36 @@ class Layout extends CompanySingleton
             db_query("DELETE FROM ?:logos WHERE logo_id IN (?n)", $logo_ids);
         }
 
-        unset($this->cache_layouts[$layout_id]);
+        $this->clearInnerCache($layout_id);
 
         return true;
     }
 
     /**
-     * Copy all layouts from one company to another
-     * @param  integer $to_company_id target company ID
-     * @return mixed   true on success, false - otherwise
+     * Copies all layouts from one storefront to another.
+     *
+     * @param int $to_company_id    Target company ID.
+     *                              This parameter is deprecated and will be removed in v5.0.0.
+     *                              Use $to_storefront_id instead.
+     * @param int $to_storefront_id Storefront to copy layout to
+     *
+     * @return bool true on success, false - otherwise
      */
-    public function copy($to_company_id)
+    public function copy($to_company_id, $to_storefront_id = null)
     {
-        $from_layout = $this->getList();
-        if (empty($from_layout)) {
+        $source_layouts = $this->getList();
+        if (empty($source_layouts)) {
             return false;
         }
 
-        foreach ($from_layout as $layout) {
+        foreach ($source_layouts as $layout) {
             $original_layout_id = $layout['layout_id'];
-            unset($layout['layout_id'], $layout['company_id']);
             $layout['name'] .= ' (' . __('clone') . ')';
-            $layout['company_id'] = $to_company_id;
             $layout['from_layout_id'] = $original_layout_id;
 
-            $new_layout_id = Layout::instance($to_company_id)->update($layout, 0);
+            unset($layout['layout_id'], $layout['company_id'], $layout['storefront_id']);
+
+            $new_layout_id = static::instance($to_company_id, [], $to_storefront_id)->update($layout, 0);
 
             $this->copyById($original_layout_id, $new_layout_id);
         }
@@ -327,10 +338,14 @@ class Layout extends CompanySingleton
 
         $source_layout_company_id = 0;
         $target_layout_company_id = 0;
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        /** @var \Tygh\Storefront\Storefront[] $storefronts */
+        $storefronts = $repository->findByLayoutId([$source_layout_id, $target_layout_id], false);
 
         if (fn_allowed_for('ULTIMATE')) {
-            $source_layout_company_id = $source_layout['company_id'];
-            $target_layout_company_id = db_get_field("SELECT company_id FROM ?:bm_layouts WHERE layout_id = ?i", $target_layout_id);
+            list($source_layout_company_id,) = $storefronts[$source_layout_id]->getCompanyIds();
+            list($target_layout_company_id,) = $storefronts[$target_layout_id]->getCompanyIds();
         }
 
         // Copy logos
@@ -363,11 +378,11 @@ class Layout extends CompanySingleton
 
             foreach ($source_layout_logos[$logo_type] as $source_layout_style_id => $source_layout_logo_id) {
 
-                $created_target_layout_logo_id = fn_update_logo(array(
-                    'type' => $logo_type,
+                $created_target_layout_logo_id = fn_update_logo([
+                    'type'      => $logo_type,
                     'layout_id' => $target_layout_id,
-                    'style_id' => $source_layout_style_id,
-                ), $target_layout_company_id);
+                    'style_id'  => $source_layout_style_id,
+                ], $target_layout_company_id);
 
                 fn_clone_image_pairs($created_target_layout_logo_id, $source_layout_logo_id, 'logos');
             }
@@ -382,10 +397,10 @@ class Layout extends CompanySingleton
      * The widths of grids are changed only if the grids are wider than the layout itself.
      * Mainly, this function is used to change the default widths of the layout elements when creating a layout
      *
-     * @param  int $layout_id The identifier of layout
-     * @param  int $layout_width The width of layout
+     * @param int $layout_id    The identifier of layout
+     * @param int $layout_width The width of layout
      *
-     * @return void 
+     * @return void
      */
     public function setLayoutElementsWidth($layout_id, $layout_width)
     {
@@ -411,5 +426,63 @@ class Layout extends CompanySingleton
                 }
             }
         }
+    }
+
+    /**
+     * Clears inner cache
+     *
+     * @param int|null $layout_id
+     */
+    protected function clearInnerCache($layout_id = null)
+    {
+        if (isset($layout_id)) {
+            unset($this->cache_layouts[$layout_id]);
+        } else {
+            $this->cache_layouts = [];
+        }
+
+        $this->cache_defaults = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     * Creates layout manager instance.
+     *
+     * @param int      $company_id    Company identifier.
+     *                                This parameter is deprecated and will be removed in v5.0.0.
+     *                                Use $storefront_id instead.
+     * @param array    $params        Instance parameters
+     * @param int|null $storefront_id Storefront ID
+     *
+     * @return \Tygh\BlockManager\Layout
+     */
+    public static function instance($company_id = 0, $params = [], $storefront_id = null)
+    {
+        /**
+         * Executes before getting an instance of a layout manager,
+         * allows you to modify the parameters passed to the function.
+         *
+         * @param int      $company_id    Company identifier.
+         *                                This parameter is deprecated and will be removed in v5.0.0.
+         *                                Use $storefront_id instead.
+         * @param array    $params        Instance parameters
+         * @param int|null $storefront_id Storefront ID
+         */
+        fn_set_hook('layout_instance_pre', $company_id, $params, $storefront_id);
+
+        $params['instance_key_extra'] = $storefront_id;
+
+        /** @var \Tygh\BlockManager\Layout $instance */
+        $instance = parent::instance($company_id, $params);
+
+        if (!$storefront_id) {
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = Tygh::$app['storefront'];
+            $storefront_id = $storefront->storefront_id;
+        }
+
+        $instance->storefront_id = $storefront_id;
+
+        return $instance;
     }
 }

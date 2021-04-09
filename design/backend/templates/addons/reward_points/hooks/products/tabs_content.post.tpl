@@ -20,7 +20,7 @@
                     {math equation="x*y" x=$data.price|default:"0" y=$addons.reward_points.point_rate assign="rate_pip"}
                     <input type="hidden" id="price_in_points_exchange" value="{$rate_pip|ceil}" />
                     <input type="hidden" name="product_data[is_oper]" value="N" />
-                    <input type="checkbox" id="is_oper" name="product_data[is_oper]" value="Y" {if $data.is_oper == "Y"}checked="checked"{/if} onclick="Tygh.$.disable_elms(['price_in_points'], !this.checked);" {if $data.is_pbp != "Y"} disabled="disabled"{/if}>
+                    <input type="checkbox" id="is_oper" name="product_data[is_oper]" value="Y" {if $data.is_oper == "Y"}checked="checked"{/if} onclick="Tygh.$.disable_elms(['price_in_points'], !this.checked);" {if isset($data.is_pbp) && $data.is_pbp != "Y"} disabled="disabled"{/if}>
                 </div>
             </div>
             {/if}
@@ -46,7 +46,7 @@
             </label>
             
             <div class="table-responsive-wrapper">
-                <table class="table table-middle table-responsive">
+                <table class="table table-middle table--relative table-responsive">
                 <thead class="cm-first-sibling">
                     <tr>
                         <th width="20%">{__("usergroup")}</th>

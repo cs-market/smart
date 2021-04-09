@@ -1,6 +1,6 @@
 /*  Responsive navigation menu */
 
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     .admin-content-wrap {
         float: right;
     }
@@ -10,8 +10,8 @@
     .noscrolling {
         overflow-y: hidden !important;
     }
-    .overlay-navbar-open {
-        color: darken(rgb(100, 140, 181), 10%) !important;
+    .btn .overlay-navbar-open {
+        color: @mainColor;
     }
     .overlay-navbar-close {
         color: black;
@@ -68,12 +68,15 @@
                 z-index: 0;
                 overflow-x: hidden;
                 li.active>a {
-                    background-color: rgb(192, 213, 234) !important;
+                    background-color: @mainColor !important;
                 }
                 li>a {
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
+                    font-size: 15px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
                 }
                 .hint {
                     display: none;
@@ -169,10 +172,11 @@
         }
         li>a {
             color: black;
+            font-size: 15px;
         }
         .dropdown-toggle {
-            padding-top: 10px !important;
-            padding-bottom: 10px !important;
+            padding-top: 13px !important;
+            padding-bottom: 13px !important;
         }
     }
     // endof Resets styles for mobile
@@ -183,7 +187,7 @@
 
         .title {
             width: 100% !important;
-            max-width: ~"calc(100% - 60px)" !important;
+            max-width: ~"calc(100% - 51px)" !important;
 
             padding: 0px !important;
             padding-top: 7px !important;
@@ -195,11 +199,12 @@
                 font-size: 18px !important;
 
                 padding: 7px 10px !important;
-                max-width: ~"calc(100% - 70px)" !important;
+                max-width: ~"calc(100% - 100px)" !important;
             }
 
             &__lang-selector {
                 float: right;
+                margin-right: 5px;
 
                 .dropdown {
                     display: inline-block;
@@ -369,9 +374,15 @@
     }
 }
 
-@media (min-width: 768px) {
+@media (min-width: @TabletBreakpoint + 1px) {
     #actions_panel .btn-bar {
         background-color: rgb(255, 255, 255);
+    }
+}
+
+@media (max-width: @TabletBreakpoint) {
+    .navbar-admin-top.open {
+        top: 0px !important;
     }
 }
 

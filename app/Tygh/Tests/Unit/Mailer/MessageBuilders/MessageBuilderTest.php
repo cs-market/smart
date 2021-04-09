@@ -6,6 +6,7 @@ namespace Tygh\Tests\Unit\Mailer\MessageBuilders;
 
 use Tygh\Mailer\AMessageBuilder;
 use Tygh\Mailer\Message;
+use Tygh\Storefront\Repository;
 use Tygh\Tests\Unit\ATestCase;
 
 class MessageBuilderTest extends ATestCase
@@ -25,7 +26,7 @@ class MessageBuilderTest extends ATestCase
      */
     public function getMessageBuilder($data = array())
     {
-        return new MessageBuilder($data);
+        return new MessageBuilder($data, $this->createMock(Repository::class));
     }
 
     public function testGetMessageFrom()
@@ -250,7 +251,7 @@ class MessageBuilderTest extends ATestCase
      */
     public function testCreateMessage($params, $expected)
     {
-        $builder = new MessageBuilder(array());
+        $builder = new MessageBuilder(array(), $this->createMock(Repository::class));
         $message = $builder->createMessage($params, 'C', 'en');
 
         foreach ($expected as $key => $value) {

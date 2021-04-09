@@ -70,15 +70,20 @@ abstract class ACommon
     /**
      * Create new last view instance object
      *
-     * @param  string $area Area identifier
-     * @return void
+     * @param string      $area       Area identifier
+     * @param string|null $controller Controller to init Last view for.
+     *                                If set to null will be detected automatically from the current dispatch
+     * @param string|null $mode       Controller mode to init Last view for.
+     *                                If set to null will be detected automatically from the current dispatch
+     * @param string|null $action     Controller mode action to init Last view for.
+     *                                If set to null will be detected automatically from the current dispatch
      */
-    public function __construct($area = AREA)
+    public function __construct($area = AREA, $controller = null, $mode = null, $action = null)
     {
         $schema_name = fn_get_area_name($area);
-        $this->_controller = Registry::get('runtime.controller');
-        $this->_mode = Registry::get('runtime.mode');
-        $this->_action = Registry::get('runtime.action');
+        $this->_controller = $controller ?: Registry::get('runtime.controller');
+        $this->_mode = $mode ?: Registry::get('runtime.mode');
+        $this->_action = $action ?: Registry::get('runtime.action');
 
         $common_schema = fn_get_schema('last_view', $schema_name);
         $this->_schema = !empty($common_schema[$this->_controller]) ? $common_schema[$this->_controller] : array();
@@ -89,11 +94,18 @@ abstract class ACommon
     /**
      * Inits Last View
      *
-     * @param array @params Request params
-     * @return boolean Flag that determines if view tools inited
+     * @param array Request params
      */
     public function init(&$params)
     {
+        /**
+         * Executes before Last View initialized. Allows to modify request params.
+         *
+         * @param \Tygh\Navigation\LastView\ACommon $this
+         * @param array                             $params Request params
+         */
+        fn_set_hook('last_view_init_pre', $this, $params);
+
         $this->_saveViewResults($params);
 
         if (($this->_isNeedViewTools($params)) && !$this->_initViewTools($params)) {
@@ -121,6 +133,14 @@ abstract class ACommon
      */
     public function _initViewTools($params)
     {
+        /**
+         * Executes before Last View Tools initialized. Allows to modify request params.
+         *
+         * @param \Tygh\Navigation\LastView\ACommon $this
+         * @param array                             $params Request params
+         */
+        fn_set_hook('last_view_init_view_tools_pre', $this, $params);
+
         $data = $this->_getCurrentView();
 
         if (empty($data)) {
@@ -177,10 +197,14 @@ abstract class ACommon
 
         if (empty($prev_id) && ($prev_page > 0)) {
             if (!empty($items_ids[$prev_page])) {
-                $prev_id = !empty($items_ids[$prev_page][count($items_ids[$prev_page]) - 1]) ? $items_ids[$prev_page][count($items_ids[$prev_page]) - 1] : 0;//last on previus page
+                $prev_id = !empty($items_ids[$prev_page][count($items_ids[$prev_page]) - 1])
+                    ? $items_ids[$prev_page][count($items_ids[$prev_page]) - 1]
+                    : 0; //last on previus page
             } else {
                 $prev_items_ids = $this->_getAnotherPageIds($data['params'], $view_results['items_per_page'], $prev_page);
-                $prev_id = !empty($prev_items_ids[$prev_page][count($prev_items_ids[$prev_page])-1]) ? $prev_items_ids[$prev_page][count($prev_items_ids[$prev_page])-1] : 0;
+                $prev_id = !empty($prev_items_ids[$prev_page]) && !empty($prev_items_ids[$prev_page][count($prev_items_ids[$prev_page]) - 1])
+                    ? $prev_items_ids[$prev_page][count($prev_items_ids[$prev_page]) - 1]
+                    : 0;
 
                 //store new ids
                 foreach ($prev_items_ids as $page => $items) {
@@ -221,6 +245,8 @@ abstract class ACommon
      */
     protected function _setViewTools($current_pos, $next_id, $prev_id, $total_items, array $url_params = array())
     {
+        fn_set_hook('view_set_view_tools_pre', $this, $current_pos, $next_id, $prev_id, $total_items, $url_params);
+
         $dispatch = $this->_controller . '.' . $this->_mode;
 
         $view_tools = array(
@@ -322,14 +348,36 @@ abstract class ACommon
                 'params' => $params,
             );
 
-            $items_ids = array();
             foreach ($items as $item) {
                 $view_results['items_ids'][$current_page][] = $item[$id];
             }
 
             Registry::set('view_results.fn_get_' . $func, $view_results);
         }
+    }
 
+    /**
+     * @return string
+     */
+    public function getController()
+    {
+        return $this->_controller;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMode()
+    {
+        return $this->_mode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->_action;
     }
 
     /**
@@ -361,7 +409,6 @@ abstract class ACommon
             $_ids[$page][] = $v[$this->_schema['item_id']];
         }
 
-//         \Tygh::$app['view']->assign('pagination', array()); //Unset pagination
         return $_ids;
     }
 }

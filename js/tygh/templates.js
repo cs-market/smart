@@ -167,9 +167,14 @@
             }
 
             // set overlay margin
-            var overlayMargin = $(context).parents("ul").length * 15;
-            var overlaySide = (Tygh.language_direction == 'rtl') ? 'right' : 'left';
-            $(context).find('.overlay').css(overlaySide, '-'+overlayMargin+'px');
+            var overlayLeftMargin  = $(context).parents("ul").length * 15;
+            var overlayRightMargin = $(context).parents("ul").length * 20;
+
+            var overlayLeftSide = (Tygh.language_direction == 'rtl') ? 'right' : 'left';
+            var overlayRightSide = (Tygh.language_direction == 'rtl') ? 'left' : 'right';
+
+            $(context).find('.overlay').css(overlayLeftSide, '-' + overlayLeftMargin + 'px');
+            $(context).find('.overlay').css(overlayRightSide, '-' + overlayRightMargin + 'px');
 
             $('.cm-te-delete').removeClass('disabled').prop('disabled', false);
 

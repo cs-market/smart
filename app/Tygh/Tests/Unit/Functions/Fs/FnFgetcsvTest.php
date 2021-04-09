@@ -40,8 +40,6 @@ class FnFgetcsvTest extends ATestCase
 
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
-
         $this->requireCore('functions/fn.fs.php');
     }
 

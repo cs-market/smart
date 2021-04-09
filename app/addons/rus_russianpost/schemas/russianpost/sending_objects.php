@@ -13,21 +13,10 @@
 ****************************************************************************/
 
 $sending_object = array(
-    'wrapper' => array(
-        'title' => __('addons.rus_russianpost.wrapper'),
-        'variants' => array(
-            '3000' => __('addons.rus_russianpost.simple_wrapper'),
-            '3010' => __('addons.rus_russianpost.registered_wrapper'),
-            '3020' => __('addons.rus_russianpost.wrapper_with_declared_value'),
-            '3040' => __('addons.rus_russianpost.wrapper_with_declared_value_and_cash_on_delivery'),
-            '16010' => __('addons.rus_russianpost.registered_1st_class_wrapper'),
-            '16020' => __('addons.rus_russianpost.wrapper_1st_class_parcel_with_declared_value'),
-            '16040' => __('addons.rus_russianpost.wrapper_1st_class_with_declared_value_and_cash_on_delivery'),
-        ),
-    ),
     'parcel' => array(
         'title' => __('addons.rus_russianpost.parcel'),
         'variants' => array(
+            '4030' => __('addons.rus_russianpost.non_standard_parcel'),
             '27030' => __('addons.rus_russianpost.simple_parcel'),
             '27020' => __('addons.rus_russianpost.parcel_with_declared_value'),
             '27040' => __('addons.rus_russianpost.parcel_with_declared_value_and_cash_on_delivery'),
@@ -37,7 +26,6 @@ $sending_object = array(
             '28030' => __('addons.rus_russianpost.courier_ems_parcel'),
             '28020' => __('addons.rus_russianpost.courier_ems_parcel_with_declared_value'),
             '28040' => __('addons.rus_russianpost.courier_ems_parcel_with_declared_value_and_cash_on_delivery'),
-            '4030' => __('addons.rus_russianpost.non_standard_parcel'),
             '4020' => __('addons.rus_russianpost.non_standard_parcel_with_declared_value'),
             '4040' => __('addons.rus_russianpost.non_standard_parcel_with_declared_value_and_cash_on_delivery'),
             '47030' => __('addons.rus_russianpost.1st_class_parcel'),
@@ -53,6 +41,18 @@ $sending_object = array(
             '30020' => __('addons.rus_russianpost.business_courier_with_declared_value'),
             '31030' => __('addons.rus_russianpost.business_courier_express'),
             '31020' => __('addons.rus_russianpost.business_courier_express_with_declared_value'),
+        ),
+    ),
+    'wrapper' => array(
+        'title' => __('addons.rus_russianpost.wrapper'),
+        'variants' => array(
+            '3000' => __('addons.rus_russianpost.simple_wrapper'),
+            '3010' => __('addons.rus_russianpost.registered_wrapper'),
+            '3020' => __('addons.rus_russianpost.wrapper_with_declared_value'),
+            '3040' => __('addons.rus_russianpost.wrapper_with_declared_value_and_cash_on_delivery'),
+            '16010' => __('addons.rus_russianpost.registered_1st_class_wrapper'),
+            '16020' => __('addons.rus_russianpost.wrapper_1st_class_parcel_with_declared_value'),
+            '16040' => __('addons.rus_russianpost.wrapper_1st_class_with_declared_value_and_cash_on_delivery'),
         ),
     ),
     'ems' => array(

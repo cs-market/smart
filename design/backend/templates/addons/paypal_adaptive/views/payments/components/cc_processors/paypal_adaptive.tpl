@@ -38,7 +38,7 @@
     </div>
 
     <div class="control-group">
-        <label class="control-label cm-required" for="primary_email">{__("primary_email")}:</label>
+        <label class="control-label cm-required" for="primary_email">{__("primary_email")}{include file="common/tooltip.tpl" tooltip=__("addons.paypal_adaptive.primary_email_notice")}:</label>
         <div class="controls">
             <input type="text" name="payment_data[processor_params][primary_email]" id="primary_email" value="{$processor_params.primary_email}" class="input-text" />
         </div>

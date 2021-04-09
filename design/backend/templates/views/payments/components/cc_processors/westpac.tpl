@@ -1,4 +1,4 @@
-{$protocol = ($settings.Security.secure_storefront == "full") ? "https" : "http"}
+{$protocol = ($settings.Security.secure_storefront === "YesNo::YES"|enum) ? "https" : "http"}
 {assign var="prepayment" value=""|fn_url:"C":$protocol}
 {assign var="return" value="http"|fn_payment_url:"westpac.php"}
 {assign var="notify" value="https"|fn_payment_url:"westpac.php"}

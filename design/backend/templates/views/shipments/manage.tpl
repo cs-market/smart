@@ -10,7 +10,7 @@
 
 {if $shipments}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th class="center mobile-hide" width="5%">

@@ -36,7 +36,8 @@ class ServiceProvider implements ServiceProviderInterface
                 $company_id,
                 (int) Registry::get('settings.Appearance.admin_elements_per_page'),
                 DESCR_SL,
-                $app['addons.advanced_import.schemas_manager']
+                $app['addons.advanced_import.schemas_manager'],
+                $app['addons.advanced_import.file_manager']
             );
 
             return $presets_manager;
@@ -64,20 +65,30 @@ class ServiceProvider implements ServiceProviderInterface
         };
 
         $app['addons.advanced_import.schemas_manager'] = function (Container $app) {
-
             return new SchemasManager();
         };
 
         $app['addons.advanced_import.readers.factory'] = function (Container $app) {
-
             $company_id = fn_get_runtime_company_id();
 
-            return new ReadersFactory($company_id);
+            return new ReadersFactory(
+                $company_id,
+                $app['addons.advanced_import.file_manager']
+            );
         };
 
         $app['addons.advanced_import.features_mapper'] = function (Container $app) {
-
             return new FeaturesMapper();
+        };
+
+        $app['addons.advanced_import.file_manager'] = function (Container $app) {
+            $company_id = fn_get_runtime_company_id();
+            $allowed_ext = ['xml', 'csv'];
+
+            return new FileManager(
+                $company_id,
+                $allowed_ext
+            );
         };
     }
 }

@@ -42,6 +42,7 @@ class MessageStyleFormatter
                 $ci->setCSS($m[2]);
 
                 $message->setBody($ci->convert());
+                libxml_clear_errors();
             } catch (\TijsVerkoyen\CssToInlineStyles\Exception $e) {
 
             }

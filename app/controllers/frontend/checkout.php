@@ -1,21 +1,30 @@
 <?php
 /***************************************************************************
-*                                                                          *
-*   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
-*                                                                          *
-* This  is  commercial  software,  only  users  who have purchased a valid *
-* license  and  accept  to the terms of the  License Agreement can install *
-* and use this program.                                                    *
-*                                                                          *
-****************************************************************************
-* PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
-* "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
-****************************************************************************/
+ *                                                                          *
+ *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
+ *                                                                          *
+ * This  is  commercial  software,  only  users  who have purchased a valid *
+ * license  and  accept  to the terms of the  License Agreement can install *
+ * and use this program.                                                    *
+ *                                                                          *
+ ****************************************************************************
+ * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
+ * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
+ ****************************************************************************/
 
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\OrderDataTypes;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Storage;
+use Tygh\Tygh;
+use Tygh\Enum\ProfileFieldSections;
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
+
+/** @var string $controller */
+/** @var string $mode */
 
 fn_enable_checkout_mode();
 
@@ -26,7 +35,11 @@ if (empty(Tygh::$app['session']['cart'])) {
     fn_clear_cart(Tygh::$app['session']['cart']);
 }
 
-$cart = & Tygh::$app['session']['cart'];
+/** @var array $cart */
+$cart = &Tygh::$app['session']['cart'];
+
+/** @var \Tygh\SmartyEngine\Core $view */
+$view = Tygh::$app['view'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -36,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Add product to cart
     //
     if ($mode == 'add') {
-        if (empty($auth['user_id']) && Registry::get('settings.General.allow_anonymous_shopping') != 'allow_shopping') {
-            return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode($_REQUEST['return_url']));
+        if (empty($auth['user_id']) && Registry::get('settings.Checkout.allow_anonymous_shopping') != 'allow_shopping') {
+            return [CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode($_REQUEST['return_url'])];
         }
 
         // Add to cart button was pressed for single product on advanced list
@@ -52,18 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        $prev_cart_products = empty($cart['products']) ? array() : $cart['products'];
+        $prev_cart_products = empty($cart['products']) ? [] : $cart['products'];
 
         fn_add_product_to_cart($_REQUEST['product_data'], $cart, $auth);
-        fn_save_cart_content($cart, $auth['user_id']);
 
         $previous_state = md5(serialize($cart['products']));
         $cart['change_cart_products'] = true;
-        fn_calculate_cart_content($cart, $auth, 'S', true, 'F', true);
+        fn_calculate_cart_content($cart, $auth, 'E', true, 'F', true);
+        fn_save_cart_content($cart, $auth['user_id']);
 
         if (md5(serialize($cart['products'])) != $previous_state && empty($cart['skip_notification'])) {
             $product_cnt = 0;
-            $added_products = array();
+            $added_products = [];
             foreach ($cart['products'] as $key => $data) {
                 if (empty($prev_cart_products[$key]) || !empty($prev_cart_products[$key]) && $prev_cart_products[$key]['amount'] != $data['amount']) {
                     $added_products[$key] = $data;
@@ -76,13 +89,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if (!empty($added_products)) {
-                Tygh::$app['view']->assign('added_products', $added_products);
+                $view->assign('added_products', $added_products);
                 if (Registry::get('config.tweaks.disable_dhtml') && Registry::get('config.tweaks.redirect_to_cart')) {
-                    Tygh::$app['view']->assign('continue_url', (!empty($_REQUEST['redirect_url']) && empty($_REQUEST['appearance']['details_page'])) ? $_REQUEST['redirect_url'] : Tygh::$app['session']['continue_url']);
+                    $view->assign('continue_url', (!empty($_REQUEST['redirect_url']) && empty($_REQUEST['appearance']['details_page'])) ? $_REQUEST['redirect_url'] : Tygh::$app['session']['continue_url']);
                 }
 
-                $msg = Tygh::$app['view']->fetch('views/checkout/components/product_notification.tpl');
-                fn_set_notification('I', __($product_cnt > 1 ? 'products_added_to_cart' : 'product_added_to_cart'), $msg, 'I');
+                if (!empty($_REQUEST['notification_products_simple'])) {
+
+                    $msg = '';
+                    if ($product_cnt > 1) {
+                        $msg = __('products_number_added_to_cart', ['[number]' => $product_cnt]);
+                    } else {
+                        $msg = __('product_name_added_to_cart', [
+                            '[product]' => implode('',
+                                array_map(function($added_product) {
+                                    return $added_product['product'];},
+                                    $added_products
+                                )
+                            )
+                        ]);
+                    }
+                    fn_set_notification('N', __('notice'), $msg, 'I');
+                } else {
+                    $msg = $view->fetch('views/checkout/components/product_notification.tpl');
+                    fn_set_notification('I',
+                        __($product_cnt > 1 ? 'products_added_to_cart' : 'product_added_to_cart'),
+                        $msg,
+                        'I'
+                    );
+                }
                 $cart['recalculate'] = true;
             } else {
                 fn_set_notification('N', __('notice'), __('product_in_cart'));
@@ -98,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_REQUEST['redirect_url']);
         }
 
-        return array(CONTROLLER_STATUS_OK, 'checkout.cart');
+        return [CONTROLLER_STATUS_OK, 'checkout.cart'];
     }
 
     //
@@ -126,8 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $cart['recalculate'] = true;
 
-        return array(CONTROLLER_STATUS_OK, 'checkout.' . $_REQUEST['redirect_mode']);
-
+        return [CONTROLLER_STATUS_OK, 'checkout.' . $_REQUEST['redirect_mode']];
     }
 
     //
@@ -141,15 +175,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $action = empty($action) ? 'get_rates' : $action; // backward compatibility
 
-        $customer_location = array();
+        $customer_location = [];
         if ($action == 'get_rates') {
             $customer_location = !empty($_REQUEST['customer_location'])
                 ? array_map('trim', $_REQUEST['customer_location'])
-                : array();
+                : [];
             Tygh::$app['session']['stored_location'] = $customer_location;
-
+            $shipping_calculation_type = 'A';
         } elseif ($action == 'get_total') {
             $customer_location = Tygh::$app['session']['stored_location'];
+            $shipping_calculation_type = 'S';
         }
         foreach ($customer_location as $k => $v) {
             $cart['user_data']['s_' . $k] = $v;
@@ -157,23 +192,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $cart['recalculate'] = true;
 
-        $cart['chosen_shipping'] = array();
+        $cart['chosen_shipping'] = [];
 
         if (!empty($_REQUEST['shipping_ids'])) {
             fn_checkout_update_shipping($cart, $_REQUEST['shipping_ids']);
+            $shipping_calculation_type = 'A';
         }
 
-        $cart['calculate_shipping'] = true;
-        list ($cart_products, $product_groups) = fn_calculate_cart_content($cart, $auth, 'A', true, 'F', true);
+        list ($cart_products, $product_groups) = fn_calculate_cart_content($cart, $auth, $shipping_calculation_type, true, 'F', true);
         if (Registry::get('settings.Checkout.display_shipping_step') != 'Y' && fn_allowed_for('ULTIMATE')) {
-            Tygh::$app['view']->assign('show_only_first_shipping', true);
+            $view->assign('show_only_first_shipping', true);
         }
 
-        Tygh::$app['view']->assign('product_groups', $cart['product_groups']);
-        Tygh::$app['view']->assign('cart', $cart);
-        Tygh::$app['view']->assign('cart_products', array_reverse($cart_products, true));
-        Tygh::$app['view']->assign('location', empty($_REQUEST['location']) ? 'cart' : $_REQUEST['location']);
-        Tygh::$app['view']->assign('additional_id', empty($_REQUEST['additional_id']) ? '' : $_REQUEST['additional_id']);
+        $view->assign('product_groups', $cart['product_groups']);
+        $view->assign('cart', $cart);
+        $view->assign('cart_products', array_reverse($cart_products, true));
+        $view->assign('location', empty($_REQUEST['location']) ? 'cart' : $_REQUEST['location']);
+        $view->assign('additional_id', empty($_REQUEST['additional_id']) ? '' : $_REQUEST['additional_id']);
 
         if (defined('AJAX_REQUEST')) {
 
@@ -183,7 +218,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 fn_set_notification('W', __('warning'), __('no_rates_for_empty_cart_warning'));
             } else {
-                Tygh::$app['view']->display(empty($_REQUEST['location']) ? 'views/checkout/components/checkout_totals.tpl' : 'views/checkout/components/shipping_estimation.tpl');
+                $view->display(
+                    empty($_REQUEST['location'])
+                        ? 'views/checkout/components/checkout_totals.tpl'
+                        : 'views/checkout/components/shipping_estimation.tpl'
+                );
             }
 
             $cart = $stored_cart;
@@ -193,7 +232,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $cart = $stored_cart;
         $redirect_mode = !empty($_REQUEST['current_mode']) ? $_REQUEST['current_mode'] : 'cart';
 
-        return array(CONTROLLER_STATUS_OK, 'checkout.' . $redirect_mode . '?show_shippings=Y');
+        return [CONTROLLER_STATUS_OK, 'checkout.' . $redirect_mode . '?show_shippings=Y'];
     }
 
     if ($mode == 'update_shipping') {
@@ -211,10 +250,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (!empty($_REQUEST['shipping_ids'])) {
             fn_checkout_update_shipping($cart, $_REQUEST['shipping_ids']);
-
-            $cart['calculate_shipping'] = true;
             fn_calculate_cart_content($cart, $auth, 'A', true, 'F', true);
-            fn_delete_notification(__('text_shipping_rates_changed'));
+            fn_delete_notification('shipping_rates_changed');
         }
 
         // notify guest users about changed address
@@ -225,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($cart['edit_step']);
         }
 
-        return array(CONTROLLER_STATUS_OK, 'checkout.' . $_REQUEST['redirect_mode']);
+        return [CONTROLLER_STATUS_OK, 'checkout.' . $_REQUEST['redirect_mode']];
     }
 
     // Apply Discount Coupon
@@ -236,16 +273,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $cart['pending_coupon'] = fn_strtolower(trim($_REQUEST['coupon_code']));
         $cart['recalculate'] = true;
 
-        if (!empty($cart['chosen_shipping'])) {
-            $cart['calculate_shipping'] = true;
-        }
-
-        return array(CONTROLLER_STATUS_OK);
+        return [CONTROLLER_STATUS_OK];
     }
 
     if ($mode == 'add_profile') {
+        $user_data = (array) $_REQUEST['user_data'];
 
-        if (list($user_id, $profile_id) = fn_update_user(0, $_REQUEST['user_data'], $auth, false, true)) {
+        if (!empty($cart['user_data'])) {
+            $user_data += array_filter((array) $cart['user_data']);
+        }
+
+        $registration_result = fn_update_user(0, $user_data, $auth, false, true);
+
+        if ($registration_result !== false) {
+            list($user_id, $profile_id) = $registration_result;
+
             $profile_fields = fn_get_profile_fields('O');
 
             db_query(
@@ -268,131 +310,84 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $suffix = '?login_type=register';
         }
 
-        return array(CONTROLLER_STATUS_OK, 'checkout.checkout' .  $suffix);
+        return [CONTROLLER_STATUS_OK, 'checkout.checkout' . $suffix];
     }
 
     if ($mode == 'customer_info') {
-        $redirect_params = array();
-        $cart['guest_checkout'] = !empty($_REQUEST['guest_checkout']);
 
-        if (Registry::get('settings.Checkout.disable_anonymous_checkout') == 'Y' && empty($cart['user_data']['email']) && fn_image_verification('checkout', $_REQUEST) == false) {
+        $is_anonymous_checkout_disabled = Registry::get('settings.Checkout.disable_anonymous_checkout') === YesNo::YES;
+
+        if ($is_anonymous_checkout_disabled && empty($auth['user_id'])) {
             fn_save_post_data('user_data');
+            $redirect_params = ['login_type' => 'guest'];
+        } else {
+            $switch_profile = !empty($_REQUEST['profile_id']) && fn_checkout_is_multiple_profiles_allowed($auth);
+            if ($switch_profile) {
+                $profile_id = $_REQUEST['profile_id'];
+                list(, $selectable_profiles) = fn_checkout_get_user_profiles($auth);
 
-            return array(CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?login_type=guest');
+                if (empty($selectable_profiles[$profile_id])) {
+                    $first_selectable_profile = reset($selectable_profiles);
+                    $profile_id = isset($first_selectable_profile['profile_id']) ? $first_selectable_profile['profile_id'] : null;
+                }
+
+                fn_checkout_set_cart_profile_id($cart, $auth, $profile_id);
+            }
+
+            list(, $redirect_params) = fn_checkout_update_steps($cart, $auth, $_REQUEST);
+
+            if (!empty($cart['user_data']['user_exists'])) {
+                if (defined('AJAX_REQUEST')) {
+                    /** @var \Tygh\Ajax $ajax */
+                    $ajax = Tygh::$app['ajax'];
+                    $ajax->assign('has_errors', true);
+                }
+
+                $view->assign('email', $cart['user_data']['found_user_email']);
+
+                fn_set_notification(
+                    'I',
+                    __('checkout.email_exists.popup.title'),
+                    $view->fetch('views/checkout/components/user_exists.tpl')
+                );
+                fn_delete_notification('error_checkout_user_exists');
+            }
+
+            fn_save_cart_content($cart, $auth['user_id']);
         }
 
-        $profile_fields = fn_get_profile_fields('O');
-        $user_profile = array();
-
-        if (!empty($_REQUEST['user_data'])) {
-            if (empty($auth['user_id']) && !empty($_REQUEST['user_data']['email'])) {
-                $email_exists = fn_is_user_exists(0, $_REQUEST['user_data']);
-
-                if (!empty($email_exists)) {
-                    fn_set_notification('E', __('error'), __('error_user_exists'));
-                    fn_save_post_data('user_data');
-
-                    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.checkout');
-                }
-            }
-
-            $user_data = $_REQUEST['user_data'];
-
-            unset($user_data['user_type']);
-            if (!empty($cart['user_data'])) {
-                $cart['user_data'] = fn_array_merge($cart['user_data'], $user_data);
-            } else {
-                $cart['user_data'] = $user_data;
-            }
-
-            // Fill shipping info with billing if needed
-            if (empty($_REQUEST['ship_to_another'])) {
-                fn_fill_address($cart['user_data'], $profile_fields);
-            }
-
-            // Add descriptions for countries and states
-            fn_add_user_data_descriptions($cart['user_data']);
-
-            // Update profile info (if user is logged in)
-            $cart['profile_registration_attempt'] = false;
-            $cart['ship_to_another'] = !empty($_REQUEST['ship_to_another']);
-
-            if (!empty($auth['user_id'])) {
-                // Check email
-                $email_exists = fn_is_user_exists($auth['user_id'], $cart['user_data']);
-
-                if (!empty($email_exists)) {
-                    fn_set_notification('E', __('error'), __('error_user_exists'));
-                    $cart['user_data']['email'] = '';
-                } else {
-                    fn_update_user($auth['user_id'], $cart['user_data'], $auth, !empty($_REQUEST['ship_to_another']), false);
-                }
-
-            } elseif (Registry::get('settings.Checkout.disable_anonymous_checkout') == 'Y' || !empty($user_data['password1'])) {
-                $cart['profile_registration_attempt'] = true;
-                $user_profile = fn_update_user(0, $cart['user_data'], $auth, $cart['ship_to_another'], true);
-                if ($user_profile === false) {
-                    unset($cart['user_data']['email'], $cart['user_data']['user_login']);
-                } else {
-                    list($user_id, $cart['profile_id']) = $user_profile;
-                    fn_login_user($user_id, true);
-                }
-            } else {
-                $profile_fields = fn_get_profile_fields('O', $auth);
-                if (isset($profile_fields['C']) && count($profile_fields['C']) > 1) {
-                    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?edit_step=step_one');
-                }
-            }
-        }
-
-        $cart['recalculate'] = true;
-
-        fn_save_cart_content($cart, $auth['user_id']);
-
-        $redirect_params['edit_step'] = 'step_two';
-        if (empty($profile_fields['B']) && empty($profile_fields['S'])) {
-            $redirect_params['edit_step'] = 'step_three';
-        }
-
-        return array(CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?' . http_build_query($redirect_params));
+        return [CONTROLLER_STATUS_OK, 'checkout.checkout?' . http_build_query($redirect_params)];
     }
 
     if ($mode == 'place_order') {
 
-        if (!empty($_REQUEST['update_steps'])) {
-            $_REQUEST['update_step'] = 'step_four';
-            list($status, $redirect_params) = fn_checkout_update_steps($cart, $auth, $_REQUEST);
-            if (!$status) {
-                if (!empty($redirect_params['edit_step'])) {
-                    $display_steps = fn_checkout_get_display_steps();
-                    if ($redirect_params['edit_step'] == 'step_four' && !$display_steps['step_four']) {
-                        $redirect_params['edit_step'] = 'step_three';
-                    }
-                    if ($redirect_params['edit_step'] == 'step_three' && !$display_steps['step_three']) {
-                        $redirect_params['edit_step'] = 'step_two';
-                    }
-                }
+        list($success, $redirect_params) = fn_checkout_update_steps($cart, $auth, $_REQUEST);
+        if (!$success) {
+            return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?' . http_build_query($redirect_params)];
+        }
 
-                return array(CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?' . http_build_query($redirect_params));
+        if (empty($cart['user_data']['email'])) {
+            if (empty($auth['user_id'])) {
+                $cart['user_data']['email'] = fn_checkout_generate_fake_email_address($cart['user_data'], TIME);
+            } else {
+                $user_data = fn_get_user_info($auth['user_id'], false);
+                $cart['user_data']['email'] =  $user_data['email'];
             }
         }
 
         $status = fn_checkout_place_order($cart, $auth, $_REQUEST);
 
         if ($status == PLACE_ORDER_STATUS_TO_CART) {
-            return array(CONTROLLER_STATUS_REDIRECT, 'checkout.cart');
+            return [CONTROLLER_STATUS_REDIRECT, 'checkout.cart'];
         } elseif ($status == PLACE_ORDER_STATUS_DENIED) {
-            return array(CONTROLLER_STATUS_DENIED);
+            return [CONTROLLER_STATUS_DENIED];
         }
-
     }
 
     if ($mode == 'update_steps') {
+        list(, $redirect_params) = fn_checkout_update_steps($cart, $auth, $_REQUEST);
 
-        list($status, $redirect_params) = fn_checkout_update_steps($cart, $auth, $_REQUEST);
-
-        return array(CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?' . http_build_query($redirect_params));
-
+        return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?' . http_build_query($redirect_params)];
     }
 
     if ($mode == 'create_profile') {
@@ -411,7 +406,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if (!empty($order_info['fields'])) {
-                $user_data['fields'] = isset($user_data['fields']) ? $user_data['fields'] : array();
+                $user_data['fields'] = isset($user_data['fields']) ? $user_data['fields'] : [];
 
                 foreach ($order_info['fields'] as $field_id => $field_value) {
                     $user_data['fields'][$field_id] = $field_value;
@@ -422,16 +417,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 list($user_id) = $res;
                 fn_login_user($user_id, true);
 
-                return array(CONTROLLER_STATUS_REDIRECT, 'profiles.success_add');
+                return [CONTROLLER_STATUS_REDIRECT, 'profiles.success_add'];
             } else {
-                return array(CONTROLLER_STATUS_REDIRECT, 'checkout.complete?order_id=' . $_REQUEST['order_id']);
+                return [CONTROLLER_STATUS_REDIRECT, 'checkout.complete?order_id=' . $_REQUEST['order_id']];
             }
         } else {
-            return array(CONTROLLER_STATUS_DENIED);
+            return [CONTROLLER_STATUS_DENIED];
         }
     }
 
-    return array(CONTROLLER_STATUS_OK, 'checkout.cart');
+    if ($mode == 'update_profile') {
+        if (empty($auth['user_id']) || empty($_REQUEST['user_data'])) {
+            return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout'];
+        }
+
+        $user_data = $_REQUEST['user_data'];
+        $is_creating_new_profile = empty($user_data['profile_id']);
+        if ($is_creating_new_profile) {
+            $user_data['profile_id'] = 0;
+        }
+
+        $profile_id = fn_update_user_profile($auth['user_id'], $user_data);
+
+        if ($is_creating_new_profile || !empty($_REQUEST['switch_after_update'])) {
+            fn_checkout_set_cart_profile_id($cart, $auth, $profile_id);
+        }
+
+        list(, $redirect_params) = fn_checkout_update_steps($cart, $auth, []);
+
+        return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?' . http_build_query($redirect_params)];
+    }
+
+    return [CONTROLLER_STATUS_OK, 'checkout.cart'];
 }
 
 //
@@ -446,428 +463,285 @@ if ($mode == 'delete_coupon') {
         $cart['calculate_shipping'] = true;
     }
 
-    return array(CONTROLLER_STATUS_OK);
+    return [CONTROLLER_STATUS_OK];
 }
 
 if (empty($mode)) {
     $redirect_mode = empty($_REQUEST['redirect_mode']) ? 'checkout' : $_REQUEST['redirect_mode'];
 
-    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.' . $redirect_mode);
+    return [CONTROLLER_STATUS_REDIRECT, 'checkout.' . $redirect_mode];
 }
 
+// FIXME: This section is confusing. It should be wrapped in $mode check
 $payment_methods = fn_prepare_checkout_payment_methods($cart, $auth);
-if (((fn_cart_is_empty($cart) && !isset($force_redirection)) || empty($payment_methods)) && !in_array($mode, array('clear', 'delete', 'cart', 'update', 'apply_coupon', 'shipping_estimation', 'update_shipping', 'complete'))) {
+if (
+    (fn_cart_is_empty($cart) || empty($payment_methods))
+    && !in_array(
+        $mode,
+        ['clear', 'delete', 'cart', 'update', 'apply_coupon', 'shipping_estimation', 'update_shipping', 'complete']
+    )
+) {
     if (empty($payment_methods)) {
-        fn_set_notification('W', __('notice'),  __('cannot_proccess_checkout_without_payment_methods'), 'K', 'no_payment_notification');
+        fn_set_notification('W', __('notice'), __('cannot_proccess_checkout_without_payment_methods'), 'K', 'no_payment_notification');
     } else {
-        fn_set_notification('W', __('cart_is_empty'),  __('cannot_proccess_checkout'), 'K', 'cannot_proccess_checkout');
+        fn_set_notification('W', __('cart_is_empty'), __('cannot_proccess_checkout'), 'K', 'cannot_proccess_checkout');
     }
     $force_redirection = 'checkout.cart';
     if (defined('AJAX_REQUEST')) {
         Tygh::$app['ajax']->assign('force_redirection', fn_url($force_redirection));
         exit;
     } else {
-        return array(CONTROLLER_STATUS_REDIRECT, $force_redirection);
+        return [CONTROLLER_STATUS_REDIRECT, $force_redirection];
     }
 }
+// FIXME: Backward compatibility: $payment_methods were assigned in the end of the controller
+$view->assign('payment_methods', $payment_methods);
 
 // Cart Items
-if ($mode == 'cart') {
-
-    list ($cart_products, $product_groups) = fn_calculate_cart_content($cart, $auth, Registry::get('settings.General.estimate_shipping_cost') == 'Y' ? 'A' : 'S', true, 'F', true);
-
-    fn_gather_additional_products_data($cart_products, array('get_icon' => true, 'get_detailed' => true, 'get_options' => true, 'get_discounts' => false));
+if ($mode === 'cart') {
 
     fn_add_breadcrumb(__('cart_contents'));
+
+    list($cart_products, $product_groups) = fn_calculate_cart_content($cart, $auth, 'E', true, 'F', true);
+
+    fn_gather_additional_products_data($cart_products, ['get_icon' => true, 'get_detailed' => true, 'get_options' => true, 'get_discounts' => false]);
 
     fn_update_payment_surcharge($cart, $auth);
 
     $cart_products = array_reverse($cart_products, true);
-    Tygh::$app['view']->assign('cart_products', $cart_products);
-    Tygh::$app['view']->assign('product_groups', $cart['product_groups']);
+    $view->assign('cart_products', $cart_products);
+    $view->assign('product_groups', $cart['product_groups']);
 
     if (fn_allowed_for('MULTIVENDOR')) {
-        Tygh::$app['view']->assign('take_surcharge_from_vendor', fn_take_payment_surcharge_from_vendor($cart['products']));
+        $view->assign('take_surcharge_from_vendor', fn_take_payment_surcharge_from_vendor($cart['products']));
     }
 
     // Check if any outside checkout is enbaled
     if (fn_cart_is_empty($cart) != true) {
         $checkout_buttons = fn_get_checkout_payment_buttons($cart, $cart_products, $auth);
         if (!empty($checkout_buttons)) {
-            Tygh::$app['view']->assign('checkout_add_buttons', $checkout_buttons, false);
+            $view->assign('checkout_add_buttons', $checkout_buttons, false);
         } elseif (empty($payment_methods) && !fn_notification_exists('extra', 'no_payment_notification')) {
-            fn_set_notification('W', __('notice'),  __('cannot_proccess_checkout_without_payment_methods'));
+            fn_set_notification('W', __('notice'), __('cannot_proccess_checkout_without_payment_methods'));
         }
     }
-
 // All checkout steps
-} elseif ($mode == 'checkout') {
+} elseif ($mode === 'checkout') {
 
-    if (
-        Registry::get('settings.General.min_order_amount_type') == 'only_products'
-        && Registry::get('settings.General.min_order_amount') > $cart['subtotal']
+    $is_anonymous_checkout_disabled = Registry::get('settings.Checkout.disable_anonymous_checkout') === YesNo::YES;
+    if ($is_anonymous_checkout_disabled && empty($auth['user_id'])) {
+        return [CONTROLLER_STATUS_REDIRECT, 'checkout.login_form'];
+    }
+
+    $checkout_settings = Registry::get('settings.Checkout');
+
+    if (Registry::get('settings.General.min_order_amount_type') == 'only_products'
+        && $checkout_settings['min_order_amount'] > $cart['subtotal']
     ) {
-        Tygh::$app['view']->assign('value', Registry::get('settings.General.min_order_amount'));
-        $min_amount = Tygh::$app['view']->fetch('common/price.tpl');
-        fn_set_notification('W', __('notice'), __('text_min_products_amount_required') . ' ' . $min_amount);
+        /** @var \Tygh\Tools\Formatter $formatter */
+        $formatter = Tygh::$app['formatter'];
+        $min_amount = $formatter->asPrice($checkout_settings['min_order_amount']);
 
-        return array(CONTROLLER_STATUS_REDIRECT, 'checkout.cart');
+        fn_set_notification(
+            'W',
+            __('notice'),
+            __('checkout.min_cart_subtotal_required', [
+                '[amount]' => $min_amount,
+            ])
+        );
+
+        return [CONTROLLER_STATUS_REDIRECT, 'checkout.cart'];
     }
 
     fn_add_breadcrumb(__('checkout'));
 
     $profile_fields = fn_get_profile_fields('O');
 
-    $display_steps = fn_checkout_get_display_steps($profile_fields);
-    Tygh::$app['view']->assign('display_steps', $display_steps);
-
-    // Array notifying that one or another step is completed.
-    $completed_steps = array(
-        'step_one'   => false,
-        'step_two'   => false,
-        'step_three' => false,
-        'step_four'  => false,
-    );
-
-    // Set edit step
-    $recheck_edit_step = false;
-    if (!empty($_REQUEST['edit_step']) && !empty($display_steps[$_REQUEST['edit_step']])) {
-        $cart['edit_step'] = $_REQUEST['edit_step'];
-    } elseif (empty($cart['edit_step'])) {
-        $recheck_edit_step = true;
-        $cart['edit_step'] = 'step_one';
-        if (!$display_steps['step_one']) {
-            $cart['edit_step'] = 'step_two';
-        }
-    } else {
-        if ($cart['edit_step'] == 'step_one' && !$display_steps['step_one']) {
-            $cart['edit_step'] = 'step_two';
-        } elseif ($cart['edit_step'] == 'step_three' && !$display_steps['step_three']) {
-            $cart['edit_step'] = 'step_four';
-            if (!$display_steps['step_four']) {
-                $cart['edit_step'] = 'step_two';
-            }
-        } elseif ($cart['edit_step'] == 'step_four' && !$display_steps['step_four']) {
-            $cart['edit_step'] = 'step_three';
-            if (!$display_steps['step_three']) {
-                $cart['edit_step'] = 'step_two';
-            }
-        }
-    }
-
-    // Final step
-    $final_step = 'step_four';
-    if (!$display_steps['step_four']) {
-        $final_step = 'step_three';
-        if (!$display_steps['step_three']) {
-            $final_step = 'step_two';
-        }
-    }
-    Tygh::$app['view']->assign('final_step', $final_step);
-
-    $cart['user_data'] = !empty($cart['user_data']) ? $cart['user_data'] : array();
-
-    $billing_population = fn_check_profile_fields_population($cart['user_data'], 'B', $profile_fields);
-    $shipping_population = fn_check_profile_fields_population($cart['user_data'], 'S', $profile_fields);
-    if ($cart['edit_step'] != 'step_one' && (!$billing_population || !$shipping_population)) {
-        $cart['edit_step'] = 'step_two';
-    }
-
     if (!empty($_REQUEST['shipping_ids'])) {
         fn_checkout_update_shipping($cart, $_REQUEST['shipping_ids']);
     }
 
     if (!empty($_REQUEST['payment_id'])) {
-        $cart['payment_id'] = $_REQUEST['payment_id'];
-    } elseif (empty($cart['payment_id'])) {
-        $params = array(
-            'usergroup_ids' => $auth['usergroup_ids'],
-        );
-        $payments = fn_get_payments($params);
-        $first_method = reset($payments);
-        $cart['payment_id'] = $first_method['payment_id'];
+        $cart = fn_checkout_update_payment($cart, $auth, $_REQUEST['payment_id']);
     }
 
-    if (isset($cart['payment_id'])) {
-        $cart['payment_method_data'] = fn_get_payment_method_data($cart['payment_id']);
+    $profile_id = $old_profile_id = isset($cart['user_data']['profile_id']) ? $cart['user_data']['profile_id'] : null;
+    $allow_multiple_profiles = fn_checkout_is_multiple_profiles_allowed($auth);
+    $view->assign('allow_multiple_profiles', $allow_multiple_profiles);
+
+    if ($allow_multiple_profiles) {
+        list($user_profiles, $selectable_profiles, $show_profiles_on_checkout) = fn_checkout_get_user_profiles($auth);
+
+        $view->assign([
+            'user_profiles'             => $user_profiles,
+            'show_profiles_on_checkout' => $show_profiles_on_checkout,
+        ]);
+
+        if (empty($selectable_profiles[$profile_id]) && $selectable_profiles) {
+            $first_selectable_profile = reset($selectable_profiles);
+            $profile_id = isset($first_selectable_profile['profile_id']) ? $first_selectable_profile['profile_id'] : null;
+        }
+
+        if ((int) $old_profile_id !== (int) $profile_id) {
+            fn_checkout_set_cart_profile_id($cart, $auth, $profile_id);
+        }
+
+        list(, $redirect_params) = fn_checkout_update_steps($cart, $auth, []);
     }
 
-    if (!empty($auth['user_id'])) {
-
-        //if the error occurred during registration, but despite this, the registration was performed, then the variable should be cleared.
-        unset(Tygh::$app['session']['failed_registration']);
-
-        if (!empty($_REQUEST['profile_id'])) {
-            $cart['profile_id'] = $_REQUEST['profile_id'];
-
-        } elseif (!empty($_REQUEST['profile']) && $_REQUEST['profile'] == 'new') {
-            $cart['profile_id'] = 0;
-
-        } elseif (empty($cart['profile_id'])) {
-            $cart['profile_id'] = db_get_field("SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i AND profile_type='P'", $auth['user_id']);
-        }
-
-        // Here check the previous and the current checksum of user_data - if they are different, recalculate the cart.
-        $current_state = fn_crc32(serialize($cart['user_data']));
-
-        $cart['user_data'] = fn_get_user_info($auth['user_id'], empty($_REQUEST['profile']), $cart['profile_id']);
-        fn_filter_hidden_profile_fields($cart['user_data'], 'O');
-
-        if ($current_state != fn_crc32(serialize($cart['user_data']))) {
-            $cart['recalculate'] = true;
-        }
-
+    if (!empty($auth['user_id'])
+        || (empty($user_data) && isset($cart['user_data']))
+    ) {
+        $user_data = $cart['user_data'];
     } else {
-
-        $_user_data = fn_restore_post_data('user_data');
-        if (!empty($_user_data)) {
-            Tygh::$app['session']['failed_registration'] = true;
-        } else {
-            unset(Tygh::$app['session']['failed_registration']);
-        }
-
-        fn_add_user_data_descriptions($cart['user_data']);
-
-        if (!empty($_REQUEST['action'])) {
-            Tygh::$app['view']->assign('checkout_type', $_REQUEST['action']);
-        }
+        $user_data = [];
     }
 
-    fn_get_default_credit_card($cart, !empty($_user_data) ? $_user_data : $cart['user_data']);
-
-    if (!empty($cart['extra_payment_info'])) {
-        $cart['payment_info'] = empty($cart['payment_info']) ? array() : $cart['payment_info'];
-        $cart['payment_info'] = array_merge($cart['payment_info'], $cart['extra_payment_info']);
+    // FIXME: #CHECKOUT Backward compatibility
+    if (Registry::ifGet('checkout.prefill_address', YesNo::YES) === YesNo::YES) {
+        /** @var \Tygh\Location\Manager $manager */
+        $manager = Tygh::$app['location'];
+        // prefill some address fields from default settings when it's necessary
+        list($cart['user_data'],) = $manager->setLocationFromUserData($user_data);
+    } else {
+        $cart['user_data'] = $user_data;
     }
 
-    Tygh::$app['view']->assign('user_data', !empty($_user_data) ? $_user_data : $cart['user_data']);
-    $contact_info_population = fn_check_profile_fields_population($cart['user_data'], 'E', $profile_fields);
-    Tygh::$app['view']->assign('contact_info_population', $contact_info_population);
+    $location_hash = fn_checkout_get_location_hash($cart['user_data'] ?: []);
+    $is_location_changed = isset($cart['location_hash']) && $cart['location_hash'] !== $location_hash;
 
-    $contact_fields_filled = fn_check_profile_fields_population($cart['user_data'], 'C', $profile_fields);
-    Tygh::$app['view']->assign('contact_fields_filled', $contact_fields_filled);
-
-    $guest_checkout = !empty($cart['guest_checkout']) || !$display_steps['step_one'];
-
-    // Check fields population on first and second steps
-    if (($contact_info_population || $guest_checkout) && empty(Tygh::$app['session']['failed_registration'])) {
-        if (!fn_check_profile_fields_population($cart['user_data'], 'C', $profile_fields)) {
-            $recheck_edit_step = false;
-            if ($cart['edit_step'] != 'step_one') {
-                fn_set_notification('W', __('notice'), __('text_fill_the_mandatory_fields'));
-
-                return array(CONTROLLER_STATUS_REDIRECT, "checkout.checkout?edit_step=step_one");
-            }
-        }
-
-        $completed_steps['step_one'] = true;
-
-        // All mandatory Billing address data exist.
-        $billing_population = fn_check_profile_fields_population($cart['user_data'], 'B', $profile_fields);
-        Tygh::$app['view']->assign('billing_population', $billing_population);
-
-        if ($billing_population == true || empty($profile_fields['B'])) {
-            // All mandatory Shipping address data exist.
-            $shipping_population = fn_check_profile_fields_population($cart['user_data'], 'S', $profile_fields);
-            Tygh::$app['view']->assign('shipping_population', $shipping_population);
-
-            if ($shipping_population == true || empty($profile_fields['S'])) {
-                $completed_steps['step_two'] = true;
-            }
-        }
-    } elseif ($guest_checkout && !empty(Tygh::$app['session']['failed_registration'])) {
-        $completed_steps['step_one'] = true;
-    }
-
-    // Define the variable only if the profiles have not been changed and settings.General.user_multiple_profiles == Y.
-    if (fn_need_shipping_recalculation($cart) == false && (!empty($cart['product_groups']) && (Registry::get('settings.General.user_multiple_profiles') != "Y" || (Registry::get('settings.General.user_multiple_profiles') == "Y" && ((isset($user_data['profile_id']) && empty($user_data['profile_id'])) || (!empty($user_data['profile_id']) && $user_data['profile_id'] == $cart['profile_id'])))) || (empty($cart['product_groups']) && Registry::get('settings.General.user_multiple_profiles') == "Y" && isset($user_data['profile_id']) && empty($user_data['profile_id'])))) {
-        define('CACHED_SHIPPING_RATES', true);
-    }
-
-    if ($cart['edit_step'] == 'step_three' || $cart['edit_step'] == 'step_four' || $completed_steps['step_two']) {
-        $cart['calculate_shipping'] = true;
-    }
-
-    if (!empty($_REQUEST['active_tab'])) {
-        $active_tab = $_REQUEST['active_tab'];
-        Tygh::$app['view']->assign('active_tab', $active_tab);
-    }
-
-    if (floatval($cart['total']) == 0 || !isset($cart['payment_id'])) {
-        $cart['payment_id'] = 0;
-    }
-
-    $shipping_calculation_type = (Registry::get('settings.General.estimate_shipping_cost') == 'Y' || $completed_steps['step_two']) ? 'A' : 'S';
+    $shipping_calculation_type = fn_checkout_get_shippping_calculation_type($cart, $is_location_changed);
 
     list($cart_products, $product_groups) = fn_calculate_cart_content($cart, $auth, $shipping_calculation_type, true, 'F');
 
-    $payment_methods = fn_prepare_checkout_payment_methods($cart, $auth);
-    if (!empty($payment_methods)) {
-        $first_methods_group = reset($payment_methods);
-        $first_method = reset($first_methods_group);
-
-        $checkout_buttons = fn_get_checkout_payment_buttons($cart, $cart_products, $auth);
-
-        if (!empty($checkout_buttons)) {
-            Tygh::$app['view']->assign('checkout_buttons', $checkout_buttons, false);
-        }
-    } else {
-        $first_method = false;
+    if (!empty($_REQUEST['shipping_ids'])) {
+        fn_save_cart_content($cart, $auth['user_id']);
     }
 
-    // Edit step postprocessing
-    if ($recheck_edit_step) {
-        if ($cart['edit_step'] == 'step_one' && $completed_steps['step_one']) {
-            $cart['edit_step'] = 'step_two';
-        }
-    }
-    if ($cart['edit_step'] == 'step_two' && $completed_steps['step_two'] && empty($_REQUEST['from_step'])) {
-        if ($display_steps['step_three']) {
-            $cart['edit_step'] = 'step_three';
-        } elseif ($display_steps['step_four']) {
-            $cart['edit_step'] = 'step_four';
+    $payment_methods = fn_prepare_checkout_payment_methods($cart, $auth, CART_LANGUAGE);
+    if ($payment_methods) {
+        $checkout_buttons = fn_get_checkout_payment_buttons($cart, $cart_products, $auth, $payment_methods);
+        if ($checkout_buttons) {
+            $view->assign('checkout_buttons', $checkout_buttons);
         }
     }
 
-    // Backward compatibility
-    Tygh::$app['session']['edit_step'] = $cart['edit_step'];
-    // \Backward compatibility
-
-    // Next step
-    $next_step = !empty($_REQUEST['next_step']) ? $_REQUEST['next_step'] : '';
-    if (empty($next_step)) {
-        if (!empty($_REQUEST['from_step']) && in_array($cart['edit_step'], array('step_one', 'step_two'))) {
-            $next_step = $_REQUEST['from_step'];
-        } elseif ($cart['edit_step'] == 'step_one') {
-            $next_step = 'step_two';
-        } elseif ($cart['edit_step'] == 'step_two') {
-            $next_step = 'step_three';
-            if (fn_allowed_for('ULTIMATE') && !$display_steps['step_three']) {
-                $next_step = 'step_four';
-            }
-        } elseif ($cart['edit_step'] == 'step_three') {
-            $next_step = 'step_four';
-        }
+    if ((float) $cart['total'] == 0) {
+        $cart['payment_id'] = 0;
     }
-    Tygh::$app['view']->assign('next_step', $next_step);
 
-    if ($cart['edit_step'] == $final_step && $first_method && empty($cart['payment_id']) && floatval($cart['total']) != 0) {
-        $cart['payment_id'] = $first_method['payment_id'];
+    if (empty($cart['payment_id']) && $payment_methods && (float) $cart['total'] != 0) {
+        $payment_list = fn_checkout_flatten_payments_list($payment_methods);
+        $cart['payment_id'] = reset($payment_list)['payment_id'];
         // recalculate cart after payment method update
         list($cart_products, $product_groups) = fn_calculate_cart_content($cart, $auth, $shipping_calculation_type, true, 'F');
     }
-
-    // if address step is completed, check if shipping step is completed
-    if ($completed_steps['step_two']) {
-        $completed_steps['step_three'] = true;
-    }
-
-    // If shipping step is completed, assume that payment step is completed too
-    if ($completed_steps['step_three']) {
-        $completed_steps['step_four'] = true;
-    }
-
-    if ((!empty($cart['shipping_failed']) || !empty($cart['company_shipping_failed'])) && $completed_steps['step_three']) {
-        $completed_steps['step_four'] = false;
-
-        if (defined('AJAX_REQUEST')) {
-            fn_set_notification('W', __('warning'), __('text_no_shipping_methods'));
-        }
-    }
-
     // If shipping methods changed and shipping step is completed, display notification
     $shipping_hash = fn_get_shipping_hash($cart['product_groups']);
 
-    if (
-        Registry::get('settings.Checkout.display_shipping_step') == 'Y'
+    if (Registry::get('settings.Checkout.display_shipping_step') !== YesNo::NO
         && !empty(Tygh::$app['session']['shipping_hash'])
-        && Tygh::$app['session']['shipping_hash'] != $shipping_hash
-        && $completed_steps['step_three']
+        && Tygh::$app['session']['shipping_hash'] !== $shipping_hash
         && $cart['shipping_required']
     ) {
-        Tygh::$app['session']['chosen_shipping'] = array();
-        fn_set_notification('W', __('important'), __('text_shipping_rates_changed'));
-
-        if ($cart['edit_step'] == 'step_four') {
-            return array(CONTROLLER_STATUS_REDIRECT, 'checkout.checkout?edit_step=step_three');
-        }
+        fn_set_notification('W', __('important'), __('text_shipping_rates_changed'), '', 'shipping_rates_changed');
     }
 
     Tygh::$app['session']['shipping_hash'] = $shipping_hash;
 
-    fn_gather_additional_products_data($cart_products, array('get_icon' => true, 'get_detailed' => true, 'get_options' => true, 'get_discounts' => false));
+    fn_gather_additional_products_data($cart_products, ['get_icon' => true, 'get_detailed' => true, 'get_options' => true, 'get_discounts' => false]);
 
-    if (floatval($cart['total']) == 0) {
-        $cart['payment_id'] = 0;
-    }
+    // FIXME: #CHECKOUT: backward compatibility
+    $completed_steps_legacy = ['step_one' => true, 'step_two' => true, 'step_three' => false, 'step_four' => false];
+    fn_set_hook('checkout_select_default_payment_method', $cart, $payment_methods, $completed_steps_legacy, $auth);
 
-    fn_set_hook('checkout_select_default_payment_method', $cart, $payment_methods, $completed_steps);
-
-    if (!empty($cart['payment_id'])) {
+    $payment_info = [];
+    if ($cart['payment_id']) {
         $payment_info = fn_get_payment_method_data($cart['payment_id']);
-        Tygh::$app['view']->assign('payment_info', $payment_info);
+        $cart['payment_method_data'] = $payment_info;
 
         if (!empty($payment_info['processor_params']['iframe_mode']) && $payment_info['processor_params']['iframe_mode'] == 'Y') {
-            Tygh::$app['view']->assign('iframe_mode', true);
+            $view->assign('iframe_mode', true);
         }
     }
 
-    Tygh::$app['view']->assign('payment_methods', $payment_methods);
-
     $cart['payment_surcharge'] = 0;
-    if (!empty($cart['payment_id']) && !empty($payment_info)) {
+    if ($cart['payment_id'] && $payment_info) {
         fn_update_payment_surcharge($cart, $auth);
     }
 
     if (fn_allowed_for('MULTIVENDOR')) {
-        Tygh::$app['view']->assign('take_surcharge_from_vendor', fn_take_payment_surcharge_from_vendor($cart['products']));
+        $view->assign('take_surcharge_from_vendor', fn_take_payment_surcharge_from_vendor($cart['products']));
     }
 
-    Tygh::$app['view']->assign('usergroups', fn_get_usergroups(array('type' => 'C', 'status' => 'A'), CART_LANGUAGE));
-    Tygh::$app['view']->assign('countries', fn_get_simple_countries(true, CART_LANGUAGE));
-    Tygh::$app['view']->assign('states', fn_get_all_states());
-
-    $cart['ship_to_another'] = fn_check_shipping_billing($cart['user_data'], $profile_fields);
-
-    Tygh::$app['view']->assign('profile_fields', $profile_fields);
-
-    if (Registry::get('settings.General.user_multiple_profiles') == 'Y') {
-        $user_profiles = fn_get_user_profiles($auth['user_id']);
-        Tygh::$app['view']->assign('user_profiles', $user_profiles);
-    }
+    $cart['ship_to_another'] = !empty($auth['user_id'])
+        && fn_check_shipping_billing($cart['user_data'], $profile_fields);
 
     fn_checkout_summary($cart);
 
-    Tygh::$app['view']->assign('use_ajax', 'true');
-    Tygh::$app['view']->assign('completed_steps', $completed_steps);
-    Tygh::$app['view']->assign('location', 'checkout');
-
-    Tygh::$app['view']->assign('cart', $cart);
-    Tygh::$app['view']->assign('cart_products', array_reverse($cart_products, true));
-    Tygh::$app['view']->assign('product_groups', $cart['product_groups']);
-
     if (!empty($cart['failed_order_id']) || !empty($cart['processed_order_id'])) {
-        $_ids = !empty($cart['failed_order_id']) ? $cart['failed_order_id'] : $cart['processed_order_id'];
-        $_order_id = reset($_ids);
+        $last_orders = empty($cart['failed_order_id'])
+            ? $cart['processed_order_id']
+            : $cart['failed_order_id'];
+        $last_order_id = reset($last_orders);
 
-        $_payment_info = db_get_field("SELECT data FROM ?:order_data WHERE order_id = ?i AND type = 'P'", $_order_id);
-        $_payment_info = !empty($_payment_info) ? unserialize(fn_decrypt_text($_payment_info)) : array();
+        $last_order_payment_info = db_get_field(
+            'SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s',
+            $last_order_id,
+            OrderDataTypes::PAYMENT
+        );
+        $last_order_payment_info = $last_order_payment_info
+            ? unserialize(fn_decrypt_text($last_order_payment_info))
+            : [];
 
         if (!empty($cart['failed_order_id'])) {
-            $_msg = !empty($_payment_info['reason_text']) ? $_payment_info['reason_text'] : '';
-            $_msg .= empty($_msg) ? __('text_order_placed_error') : '';
-            fn_set_notification('O', '', $_msg);
+            $order_placement_error_message = empty($last_order_payment_info['reason_text'])
+                ? __('text_order_placed_error')
+                : $last_order_payment_info['reason_text'];
+            fn_set_notification('O', '', $order_placement_error_message);
             $cart['processed_order_id'] = $cart['failed_order_id'];
-            unset($cart['failed_order_id']);
         }
 
-        unset($_payment_info['card_number'], $_payment_info['cvv2']);
-        $cart['payment_info'] = $_payment_info;
-        if (!empty($cart['extra_payment_info'])) {
-            $cart['payment_info'] = array_merge($cart['payment_info'], $cart['extra_payment_info']);
-        }
+        unset(
+            $last_order_payment_info['card_number'],
+            $last_order_payment_info['cvv2'],
+            $cart['failed_order_id']
+        );
+
+        $cart['payment_info'] = $last_order_payment_info;
     }
 
+    if (!empty($cart['extra_payment_info'])) {
+        $cart['payment_info'] = empty($cart['payment_info'])
+            ? []
+            : $cart['payment_info'];
+        $cart['payment_info'] = array_merge($cart['payment_info'], $cart['extra_payment_info']);
+    }
+
+    fn_add_user_data_descriptions($cart['user_data']);
+
+    if ($payment_methods) {
+        $payment_methods = fn_checkout_flatten_payments_list($payment_methods);
+    }
+
+    $profile_field_sections = fn_get_profile_fields_sections();
+
+    $view->assign([
+        'user_data'                                  => $cart['user_data'],
+        'profile_fields'                             => $profile_fields,
+        'profile_field_sections'                     => $profile_field_sections,
+        'payment_info'                               => $payment_info,
+        'usergroups'                                 => fn_get_usergroups(['type' => UserTypes::CUSTOMER, 'status' => ObjectStatuses::ACTIVE]),
+        'countries'                                  => fn_get_simple_countries(true),
+        'states'                                     => fn_get_all_states(true),
+        'payment_methods'                            => $payment_methods,
+        'use_ajax'                                   => 'true',
+        'location'                                   => 'checkout',
+        'cart'                                       => $cart,
+        'cart_products'                              => array_reverse($cart_products, true),
+        'product_groups'                             => $cart['product_groups'],
+        'is_terms_and_conditions_agreement_required' => fn_checkout_is_terms_and_conditions_agreement_required(),
+    ]);
 // Delete product from the cart
 } elseif ($mode == 'delete' && isset($_REQUEST['cart_id'])) {
 
@@ -888,15 +762,13 @@ if ($mode == 'cart') {
 
     $redirect_mode = empty($_REQUEST['redirect_mode']) ? 'cart' : $_REQUEST['redirect_mode'];
 
-    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.' . $redirect_mode);
-
+    return [CONTROLLER_STATUS_REDIRECT, 'checkout.' . $redirect_mode];
 } elseif ($mode == 'get_custom_file' && isset($_REQUEST['cart_id']) && isset($_REQUEST['option_id']) && isset($_REQUEST['file'])) {
     if (isset($cart['products'][$_REQUEST['cart_id']]['extra']['custom_files'][$_REQUEST['option_id']][$_REQUEST['file']])) {
         $file = $cart['products'][$_REQUEST['cart_id']]['extra']['custom_files'][$_REQUEST['option_id']][$_REQUEST['file']];
 
         Storage::instance('custom_files')->get($file['path'], $file['name']);
     }
-
 } elseif ($mode == 'delete_file' && isset($_REQUEST['cart_id'])) {
 
     if (isset($cart['products'][$_REQUEST['cart_id']]['extra']['custom_files'][$_REQUEST['option_id']][$_REQUEST['file']])) {
@@ -917,7 +789,7 @@ if ($mode == 'cart') {
         } else {
             unset($product['product_options'][$option_id]);
         }
-        $product['extra']['product_options'] = empty($product['product_options']) ? array() : $product['product_options'];
+        $product['extra']['product_options'] = empty($product['product_options']) ? [] : $product['product_options'];
 
         $cart['products'][$_REQUEST['cart_id']] = $product;
     }
@@ -933,36 +805,33 @@ if ($mode == 'cart') {
         }
     }
 
-    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.' . $_REQUEST['redirect_mode']);
-
+    return [CONTROLLER_STATUS_REDIRECT, 'checkout.' . $_REQUEST['redirect_mode']];
 //Clear cart
 } elseif ($mode == 'clear') {
 
     fn_clear_cart($cart);
     fn_save_cart_content($cart, $auth['user_id']);
 
-    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.cart');
-
+    return [CONTROLLER_STATUS_REDIRECT, 'checkout.cart'];
 //Purge undeliverable products
 } elseif ($mode == 'purge_undeliverable') {
 
     fn_purge_undeliverable_products($cart);
     fn_set_notification('N', __('notice'), __('notice_undeliverable_products_removed'));
 
-    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.checkout');
-
+    return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout'];
 } elseif ($mode == 'complete') {
 
     if (!empty($_REQUEST['order_id'])) {
         if (empty($auth['user_id']) && empty($auth['order_ids'])) {
-            return array(
+            return [
                 CONTROLLER_STATUS_REDIRECT,
-                'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url'))
-            );
+                'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')),
+            ];
         }
 
         if (!fn_is_order_allowed($_REQUEST['order_id'], $auth)) {
-            return array(CONTROLLER_STATUS_DENIED);
+            return [CONTROLLER_STATUS_DENIED];
         }
 
         $order_info = fn_get_order_info($_REQUEST['order_id']);
@@ -974,11 +843,10 @@ if ($mode == 'cart') {
             $order_info['child_ids'] = implode(',', $child_ids);
         }
         if (!empty($order_info)) {
-            Tygh::$app['view']->assign('order_info', $order_info);
+            $view->assign('order_info', $order_info);
         }
     }
     fn_add_breadcrumb(__('landing_header'));
-
 } elseif ($mode == 'process_payment') {
     if (fn_allow_place_order($cart, $auth) == true) {
         $order_info = $cart;
@@ -996,34 +864,66 @@ if ($mode == 'cart') {
                 include($script_path);
             }
 
-            fn_finish_payment($order_id, $pp_response, array());
+            fn_finish_payment($order_id, $pp_response, []);
             fn_order_placement_routines('route', $order_id);
         }
     }
+} elseif ($mode == 'login_form') {
+    if (defined('AJAX_REQUEST') && empty($auth['user_id'])) {
+        Tygh::$app['view']->assign([
+            'return_url'   => isset($_REQUEST['return_url']) ? $_REQUEST['return_url'] : null,
+            'redirect_url' => isset($_REQUEST['redirect_url']) ? $_REQUEST['redirect_url'] : null,
+            'title'        => __('authorize_before_order'),
+        ]);
+
+        Tygh::$app['view']->display('views/auth/popup_login_form.tpl');
+        exit;
+    }
+
+    fn_set_notification('W', __('warning'), __('authorize_before_order'));
+
+    return [CONTROLLER_STATUS_REDIRECT, 'auth.login_form'];
+} elseif ($mode == 'update_profile') {
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout'];
+    }
+
+    if (!empty($_REQUEST['profile_id'])) {
+        $user_profile = fn_get_user_info($auth['user_id'], true, $_REQUEST['profile_id']);
+        Tygh::$app['view']->assign([
+            'user_profile'        => $user_profile,
+            'profile_id'          => $_REQUEST['profile_id'],
+            'switch_after_update' => !empty($_REQUEST['switch_after_update']),
+        ]);
+    }
+
+    $profile_fields = fn_get_profile_fields('O', $auth, CART_LANGUAGE, ['section' => ProfileFieldSections::SHIPPING_ADDRESS]);
+    $countries = fn_get_simple_countries(true, CART_LANGUAGE);
+    $states = fn_get_all_states();
+
+    Tygh::$app['view']->assign([
+        'countries'      => $countries,
+        'states'         => $states,
+        'profile_fields' => $profile_fields,
+    ]);
+
+    Tygh::$app['view']->display('views/checkout/components/profile.tpl');
+    exit;
 }
 
-if (
-    fn_cart_is_empty($cart)
-    && !isset($force_redirection)
-    && !in_array($mode, array(
-        'clear', 'delete', 'cart', 'update', 'apply_coupon', 'shipping_estimation', 'update_shipping', 'complete'
-    ))
-) {
-    fn_set_notification('W', __('cart_is_empty'),  __('cannot_proccess_checkout'), 'K', 'cannot_proccess_checkout');
-
-    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.cart');
-}
-
+// FIXME: #CHECKOUT: Are $profile_fields required anywhere but on 'checkout.checkout'?
 if (!empty($profile_fields)) {
-    Tygh::$app['view']->assign('profile_fields', $profile_fields);
+    $view->assign('profile_fields', $profile_fields);
 }
 
-Tygh::$app['view']->assign('cart', $cart);
-Tygh::$app['view']->assign(
-    'continue_url', empty(Tygh::$app['session']['continue_url']) ? '' : Tygh::$app['session']['continue_url']
+$view->assign('cart', $cart);
+$view->assign(
+    'continue_url',
+    empty(Tygh::$app['session']['continue_url'])
+        ? ''
+        : Tygh::$app['session']['continue_url']
 );
-Tygh::$app['view']->assign('mode', $mode);
-Tygh::$app['view']->assign('payment_methods', $payment_methods);
+$view->assign('mode', $mode);
 
 // Remember mode for the check shipping rates
 Tygh::$app['session']['checkout_mode'] = $mode;

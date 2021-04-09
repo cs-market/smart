@@ -16,6 +16,7 @@ namespace Tygh\Api\Entities;
 
 use Tygh\Api\Entities\v40\SraCartContent;
 use Tygh\Api\Response;
+use Tygh\Common\OperationResult;
 
 class SraWishList extends SraCartContent
 {
@@ -39,33 +40,42 @@ class SraWishList extends SraCartContent
     }
 
     /** @inheritdoc */
-    public function addProducts($cart_products = array(), $update = false)
+    public function addProducts(array $cart, array $cart_products, $is_update = false)
     {
-        $this->get();
+        if ($is_update) {
+            return parent::addProducts($cart, $cart_products, $is_update);
+        }
 
-        if (!$update) {
-            foreach ($cart_products as $id => $product) {
-                $product_id = isset($product['product_id']) ? (int) $product['product_id'] : (int) $id;
+        foreach ($cart_products as $product_cart_id => $product) {
+            $product_id = isset($product['product_id'])
+                ? (int) $product['product_id']
+                : (int) $product_cart_id;
 
-                $extra = array(
-                    'product_options' => isset($product['product_options'])
-                        ? $product['product_options']
-                        : array(),
-                );
+            $extra = [
+                'product_options' => isset($product['product_options'])
+                    ? $product['product_options']
+                    : [],
+            ];
 
-                $cart_id = fn_generate_cart_id($product_id, $extra);
+            $cart_id = fn_generate_cart_id($product_id, $extra);
 
-                if (isset($this->cart['products'][$cart_id])) {
-                    return array(
-                        Response::STATUS_CONFLICT,
-                        array(
-                            'message' => __('product_in_wishlist'),
-                        ),
-                    );
-                }
+            if (isset($cart['products'][$cart_id])) {
+                $result = new OperationResult(false);
+                $result->addError(0, __('product_in_wishlist'));
+                return $result;
             }
         }
 
-        return parent::addProducts($cart_products, $update);
+        return parent::addProducts($cart, $cart_products, $is_update);
+    }
+
+    public function privilegesCustomer()
+    {
+        return [
+            'index'  => $this->auth['is_token_auth'],
+            'create' => $this->auth['is_token_auth'],
+            'update' => $this->auth['is_token_auth'],
+            'delete' => $this->auth['is_token_auth'],
+        ];
     }
 }

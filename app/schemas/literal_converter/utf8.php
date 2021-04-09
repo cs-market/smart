@@ -16,7 +16,6 @@
 
 use Tygh\Registry;
 use Tygh\Settings;
-use Tygh\Mailer;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -24,6 +23,7 @@ include_once(Registry::get('config.dir.schemas') . 'literal_converter/utf8.funct
 
 fn_define('LIC_STAT_TR', 0xF17);
 fn_define('LIC_STAT_FL', 0xBB1);
+fn_define('LIC_STAT_PL', 0x79B);
 fn_define('LIC_STAT_UE', 0xC42);
 fn_define('LIC_STAT_ST', 0xDD3);
 
@@ -37,6 +37,7 @@ if (!empty($_SESSION[fn_simple_decode_str('npef`sfdifdl')])) {
 
     $mode = fn_get_storage_data(fn_simple_decode_str('tupsf`npef'));
     $suffix = call_user_func(fn_simple_decode_str('go`hfu`qspevdu`tubuf`tvggjy'), $mode);
+    $errors = fn_get_storage_data(fn_simple_decode_str('tupsf`npef`fsspst'));
 
     switch ($mode) {
         case fn_simple_decode_str('usjbm'): {
@@ -44,36 +45,42 @@ if (!empty($_SESSION[fn_simple_decode_str('npef`sfdifdl')])) {
             $_SESSION[$description] = LIC_STAT_TR;
             break;
         }
-        case fn_simple_decode_str('gvmm'):
+        case fn_simple_decode_str('qmvt'):
         case fn_simple_decode_str('vmujnbuf'):
         case '': {
-            $_SESSION[$prefix . '_' . $description] = fn_simple_decode_str('BDUJWF');
-
-            $subj = __(fn_simple_decode_str('tupsf`npef`dibohfe'));
-            $body = __(
-                fn_simple_decode_str('ufyu`tupsf`npef`dibohfe`up`') . $suffix,
-                array(
-                    fn_simple_decode_str('\qspevdu^') => call_user_func(
-                        fn_simple_decode_str('dpotubou'),
-                        fn_simple_decode_str('QSPEVDU`OBNF')
-                    ),
-                    fn_simple_decode_str('\vmujnbuf`mjdfotf`vsm^') => Registry::get(fn_simple_decode_str('dpogjh/sftpvsdft/vmujnbuf`mjdfotf`vsm'))
-                )
-            );
-
-            fn_set_notification('I', $subj, $body);
-
             fn_clean_up_addons();
             fn_clear_cache();
 
-            Mailer::sendMail(array(
-                'to' => Registry::get(fn_simple_decode_str('tfuujoht/Dpnqboz/dpnqboz`tjuf`benjojtusbups')),
-                'from' => Registry::get(fn_simple_decode_str('tfuujoht/Dpnqboz/dpnqboz`tjuf`benjojtusbups')),
-                'subj' => $subj,
-                'body' => $body,
-                'data' => array(),
-                'company_id' => Registry::get('runtime.company_id'),
-            ), 'A', CART_LANGUAGE);
+            if (!$errors) {
+                $_SESSION[$prefix . '_' . $description] = fn_simple_decode_str('BDUJWF');
+
+                $subj = __(fn_simple_decode_str('tupsf`npef`dibohfe'));
+                $body = __(
+                    fn_simple_decode_str('ufyu`tupsf`npef`dibohfe`up`') . $suffix,
+                    [
+                        fn_simple_decode_str('\qspevdu^')                  => call_user_func(
+                            fn_simple_decode_str('dpotubou'),
+                            fn_simple_decode_str('QSPEVDU`OBNF')
+                        ),
+                        fn_simple_decode_str('\vmujnbuf`mjdfotf`vsm^')     => Registry::get(fn_simple_decode_str('dpogjh/sftpvsdft/vmujnbuf`mjdfotf`vsm')),
+                        fn_simple_decode_str('\nwf`qmvt`mjdfotf`vsm^')     => Registry::get(fn_simple_decode_str('dpogjh/sftpvsdft/nwf`qmvt`mjdfotf`vsm')),
+                        fn_simple_decode_str('\nwf`vmujnbuf`mjdfotf`vsm^') => Registry::get(fn_simple_decode_str('dpogjh/sftpvsdft/nwf`vmujnbuf`mjdfotf`vsm')),
+                    ]
+                );
+
+                fn_set_notification('I', $subj, $body);
+
+                /** @var \Tygh\Mailer\Mailer $mailer */
+                $mailer = Tygh::$app['mailer'];
+                $mailer->send([
+                    'to'         => Registry::get(fn_simple_decode_str('tfuujoht/Dpnqboz/dpnqboz`tjuf`benjojtusbups')),
+                    'from'       => Registry::get(fn_simple_decode_str('tfuujoht/Dpnqboz/dpnqboz`tjuf`benjojtusbups')),
+                    'subj'       => $subj,
+                    'body'       => $body,
+                    'data'       => [],
+                    'company_id' => Registry::get('runtime.company_id'),
+                ], 'A', CART_LANGUAGE);
+            }
 
             fn_redirect(Registry::get('config.current_url'));
         }
@@ -91,8 +98,8 @@ if (!isset($_SESSION[$description])) {
             $_SESSION[$description] = LIC_STAT_TR;
             break;
         }
-        case fn_simple_decode_str('gvmm'): {
-            $_SESSION[$description] = LIC_STAT_FL;
+        case fn_simple_decode_str('qmvt'): {
+            $_SESSION[$description] = LIC_STAT_PL;
             break;
         }
         case fn_simple_decode_str('vmujnbuf'): {
@@ -100,7 +107,7 @@ if (!isset($_SESSION[$description])) {
             break;
         }
         case '': {
-            $_SESSION[$description] = LIC_STAT_ST;
+            $_SESSION[$description] = call_user_func(fn_simple_decode_str('go`hfu`qspevdu`tubuf`tvggjy'), $mode) == fn_simple_decode_str('nwf') ? LIC_STAT_FL : LIC_STAT_ST;
             break;
         }
     }
@@ -112,8 +119,26 @@ if (isset($_SESSION[$prefix . '_' . $description])) {
     $data = '';
 }
 
-if ($data == fn_simple_decode_str('MJDFOTF`JT`JOWBMJE')) {
-    if (isset($_SESSION[$description]) && in_array($_SESSION[$description], array(LIC_STAT_FL, LIC_STAT_UE, LIC_STAT_ST))) {
+if ($data == fn_simple_decode_str('EJTBCMFE')) {
+    call_user_func(
+        fn_simple_decode_str('go`tfu`tupsbhf`ebub'),
+        fn_simple_decode_str('mjdfotf`fsspst'),
+        call_user_func(
+            fn_simple_decode_str('tfsjbmj{f'),
+            array(
+                fn_simple_decode_str('tubuvt') => $data,
+            )
+        )
+    );
+
+    if (!in_array(Registry::get('runtime.controller'), array('index', 'auth'))) {
+        fn_clean_up_addons();
+        fn_clear_cache();
+        call_user_func(fn_simple_decode_str('go`sfejsfdu'), false);
+    }
+
+} elseif ($data == fn_simple_decode_str('MJDFOTF`JT`JOWBMJE')) {
+    if (isset($_SESSION[$description]) && in_array($_SESSION[$description], array(LIC_STAT_FL, LIC_STAT_PL, LIC_STAT_UE, LIC_STAT_ST))) {
         $_SESSION[$description] = LIC_STAT_TR;
         fn_set_storage_data(fn_simple_decode_str('tupsf`npef'), fn_simple_decode_str('usjbm'));
         fn_clear_cache();

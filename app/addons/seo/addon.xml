@@ -120,8 +120,8 @@
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>
 
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_seo_rules', 'Y', 'addons');</item>
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO  ?:privileges (privilege, is_default, section_id) VALUES ('view_seo_rules', 'Y', 'addons');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_seo_rules', 'Y', 'website', 'seo', 'N');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO  ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_seo_rules', 'Y', 'website', 'seo', 'Y');</item>
         <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">DELETE FROM ?:privileges WHERE privilege LIKE 'view_seo_rules' OR privilege LIKE 'manage_seo_rules'</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:seo_names;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:seo_redirects;</item>

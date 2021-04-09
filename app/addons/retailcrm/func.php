@@ -15,6 +15,7 @@
 
 use Tygh\Common\OperationResult;
 use Tygh\Addons\Retailcrm\Service as RetailcrmService;
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
 
 /**
@@ -173,5 +174,29 @@ function fn_retailcrm_change_order_status($status_to, $status_from, $order_info,
     /** @var \Tygh\Addons\Retailcrm\Service $service */
     $service = Tygh::$app['addons.retailcrm.service'];
 
-    $service->updateRetailCrmOrderStatus($order_info['order_id'], $status_to, $order_info['company_id']);
+    if ($status_from == STATUS_INCOMPLETED_ORDER && $status_to != STATUS_INCOMPLETED_ORDER && !$service->isRetailCrmOrderExists($order_info['order_id'], $order_info['company_id'])) {
+        $order = fn_get_order_info($order_info['order_id']);
+        $order['status'] = $status_to;
+
+        if ($order['is_parent_order'] === 'Y') {
+            return;
+        }
+
+        $service->createRetailCrmOrder($order);
+    } else {
+        $service->updateRetailCrmOrderStatus($order_info['order_id'], $status_to, $order_info['company_id']);
+    }
+}
+
+/**
+ * The "yml_export_get_options_post" hook handler.
+ *
+ * Actions performed:
+ *  - Adds to $options (properties of price list) new option which forbid using external yml categories.
+ *
+ * @see fn_yml_get_options
+ */
+function fn_retailcrm_yml_export_get_options_post($price_list_id, &$options)
+{
+    $options['use_yml_categories'] = $options['used_for_retailcrm'] === YesNo::NO;
 }

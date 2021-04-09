@@ -14,7 +14,7 @@
                 <input type="hidden" name="selected_section" value="{$smarty.request.selected_section}" />
                 
                 <div class="table-responsive-wrapper">
-                    <table class="table table-middle table-responsive">
+                    <table class="table table-middle table--relative table-responsive">
                     <thead>
                         <tr class="cm-first-sibling">
                             <th width="3" class="left" data-th="">
@@ -36,7 +36,7 @@
                     {foreach from=$langs item="language"}
                     <tr class="cm-row-status-{$language.status|lower}">
                         <td class="left" data-th="">
-                            <input type="checkbox" name="lang_ids[]" value="{$language.lang_id}" {if $language.lang_code == $smarty.const.DEFAULT_LANGUAGE}disabled="disabled"{/if} class="checkbox cm-item"></td>
+                            <input type="checkbox" name="lang_ids[]" value="{$language.lang_id}" {if $language.lang_code == $smarty.const.DEFAULT_LANGUAGE}disabled="disabled"{/if} class="cm-item"></td>
                         <td data-th="{__("language_code")}">
                             <input type="hidden" name="update_language[{$language.lang_id}][lang_code]" value="{$language.lang_code}">
                             {btn type="dialog" text=$language.lang_code href="languages.update?lang_id=`$language.lang_id`" target_id="content_group`$language.lang_id`" prefix=$language.lang_id}
@@ -136,6 +136,10 @@
         {/hook}
     {/capture}
     {include file="common/sidebox.tpl" content=$smarty.capture.important title=__('important')}
+    <div class="sidebar-row marketplace">
+        <h6>{__("more_languages")}</h6>
+        <p>{__("languages_find_more", ["[href]" => $config.resources.translate])}</p>
+    </div>
 {/capture}
 
 {include file="common/mainbox.tpl" title=__("languages") content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons sidebar=$smarty.capture.sidebar}

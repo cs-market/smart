@@ -5,11 +5,13 @@
 {/if}
 
 <div class="calendar">
-    <input type="text" id="{$date_id}" name="{$date_name}" class="{if $date_meta}{$date_meta}{/if} cm-calendar" value="{if $date_val}{$date_val|fn_parse_date|date_format:"`$date_format`"}{/if}" {$extra nofilter} size="10" />
+    <input type="text" id="{$date_id}" name="{$date_name}" class="{if $date_meta}{$date_meta}{/if} cm-calendar" value="{if $date_val}{$date_val|fn_parse_date|date_format:"`$date_format`"}{/if}" {$extra nofilter} size="10" autocomplete="disabled" />
     {if $show_time}
     <input class="input-time" size="5" maxlength="5" type="text" name="{$time_name}" value="{if $date_val}{$date_val|fn_parse_date|date_format:"%H:%M"}{/if}" placeholder="00:00" />
     {/if}
     <span data-ca-external-focus-id="{$date_id}" class="icon-calendar cm-external-focus"></span>
+    {* autocomplete="off" for Chrome *}
+    <input type="text" hidden disabled name="fake_mail" aria-hidden="true">
 </div>
 
 <script type="text/javascript">

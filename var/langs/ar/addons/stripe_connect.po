@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/stripe_connect.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.11.5/addons/stripe_connect.po\n"
+"X-Crowdin-File-ID: 3658\n"
+"PO-Revision-Date: 2020-08-28 13:34\n"
 
 msgctxt "Addons::name::stripe_connect"
 msgid "Stripe Connect payments"
@@ -40,8 +40,16 @@ msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
 msgstr ""
 
-msgctxt "Languages::stripe_connect.redirect_uris"
-msgid "Redirect URIs"
+msgctxt "Languages::stripe_connect.redirect_uri_admin"
+msgid "Redirect URI for administrator"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.redirect_uris.description"
+msgid "Copy and paste this address into your Stripe Connect app settings"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.redirect_uri_vendor"
+msgid "Redirect URI for vendor"
 msgstr ""
 
 msgctxt "Languages::stripe_connect.client_id"
@@ -78,15 +86,15 @@ msgstr ""
 
 msgctxt "Languages::stripe_connect.account_connected"
 msgid "Your Stripe account has been successfully connected to the store"
-msgstr ""
+msgstr "تم ربط حسابك في Stripe بنجاح بالمتجر"
 
 msgctxt "Languages::stripe_connect.account_disconnected"
 msgid "Your Stripe account has been successfully disconnected from the store"
-msgstr ""
+msgstr "تم قطع اتصالك بحساب Stripe الخاص بك بنجاح من المتجر"
 
 msgctxt "Languages::stripe_connect.withdrawal_for_the_order"
 msgid "Withdrawal for the order #[order_id]"
-msgstr ""
+msgstr "سحب الطلب # [order_id]"
 
 msgctxt "Languages::stripe_connect.refund_id"
 msgid "Refund transaction ID"
@@ -110,7 +118,7 @@ msgstr ""
 
 msgctxt "Languages::stripe_connect.own_account_cant_be_used_for_vendor"
 msgid "Your own Stripe account can't be used to connect a vendor to the store"
-msgstr ""
+msgstr "لا يمكن استخدام حساب Stripe الخاص بك لربط أحد البائعين بالمتجر"
 
 msgctxt "Languages::stripe_connect.rma.order_status_on_refund"
 msgid "Order status on refund"
@@ -126,5 +134,33 @@ msgstr ""
 
 msgctxt "Languages::stripe_connect.set_status_to"
 msgid "Set to:"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.charge_id"
+msgid "Charge ID"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.transfer_id"
+msgid "Transfer ID"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.payment_id"
+msgid "Payment ID"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.enable_3d_secure"
+msgid "Enable 3-D Secure"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.enable_3d_secure.description"
+msgid "<p>When 3-D Secure is <b>disabled</b>, money will go straight to the connected Stripe accounts of vendors. Commissions and payouts will be taken from vendors as <a href=\"https://stripe.com/docs/connect/direct-charges#collecting-fees\" target=\"_blank\">application fees</a>.</p><p>When 3-D Secure is <b>enabled</b>, money will first go to the marketplace owner's Stripe account. Then it will be automatically distributed between the connected Stripe accounts via transfers. Transfers require that the marketplace owner and vendors have their accounts in the same region: either all in Europe, or all in the U.S. If a vendor's account is in a different region from the marketplace owner's, the money won't be transferred to that vendor automatically.</p>"
+msgstr ""
+
+msgctxt "Languages::stripe_connect.gift_certificate_used"
+msgid "A gift certificate was used in this order. [product] doesn't know which of the vendors should get the money, and how much. Please transfer money from this order to each vendor manually."
+msgstr ""
+
+msgctxt "Languages::stripe_connect.payment_intent_error"
+msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
 msgstr ""
 

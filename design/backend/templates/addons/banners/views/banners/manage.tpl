@@ -14,7 +14,7 @@
 
 {if $banners}
 <div class="table-responsive-wrapper">
-    <table class="table table-middle table-responsive">
+    <table class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         <th width="1%" class="left mobile-hide">
@@ -45,7 +45,11 @@
             <a class="row-status" href="{"banners.update?banner_id=`$banner.banner_id`"|fn_url}">{$banner.banner}</a>
             {include file="views/companies/components/company_name.tpl" object=$banner}
         </td>
-        <td class="nowrap row-status {$no_hide_input} mobile-hide">{if $banner.type == "G"}{__("graphic_banner")}{else}{__("text_banner")}{/if}</td>
+        <td class="nowrap row-status {$no_hide_input} mobile-hide">
+            {hook name="banners:manage_banner_type"}
+            {if $banner.type == "G"}{__("graphic_banner")}{else}{__("text_banner")}{/if}
+            {/hook}
+        </td>
 
         {hook name="banners:manage_data"}
         {/hook}
@@ -83,7 +87,9 @@
     {dropdown content=$smarty.capture.tools_list class="mobile-hide"}
 {/capture}
 {capture name="adv_buttons"}
+    {hook name="banners:adv_buttons"}
     {include file="common/tools.tpl" tool_href="banners.add" prefix="top" hide_tools="true" title=__("add_banner") icon="icon-plus"}
+    {/hook}
 {/capture}
 
 </form>
@@ -97,6 +103,11 @@
     {/hook}
 {/capture}
 
-{include file="common/mainbox.tpl" title=__("banners") content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons select_languages=true sidebar=$smarty.capture.sidebar}
+{hook name="banners:manage_mainbox_params"}
+    {$page_title = __("banners")}
+    {$select_languages = true}
+{/hook}
+
+{include file="common/mainbox.tpl" title=$page_title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons select_languages=$select_languages sidebar=$smarty.capture.sidebar}
 
 {** ad section **}

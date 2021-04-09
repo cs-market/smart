@@ -137,7 +137,7 @@
     <label class="control-label" for="do_not_pass_logo">{__("do_not_pass_logo")}:</label>
     <div class="controls">
         <input type="hidden" name="payment_data[processor_params][do_not_pass_logo]" value="N">
-        <input type="checkbox" name="payment_data[processor_params][do_not_pass_logo]" value="Y" id="do_not_pass_logo" class="checkbox" {if $processor_params.do_not_pass_logo == "Y"}checked="checked"{/if}>
+        <input type="checkbox" name="payment_data[processor_params][do_not_pass_logo]" value="Y" id="do_not_pass_logo" {if $processor_params.do_not_pass_logo == "Y"}checked="checked"{/if}>
         <p><small>{__("text_skrill_logo_notice")}</small></p>
     </div>
 </div>

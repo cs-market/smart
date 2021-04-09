@@ -1,5 +1,6 @@
 <div class="ty-search-block">
     <form action="{""|fn_url}" name="search_form" method="get">
+        <input type="hidden" name="match" value="all" />
         <input type="hidden" name="subcats" value="Y" />
         <input type="hidden" name="pcode_from_q" value="Y" />
         <input type="hidden" name="pshort" value="Y" />

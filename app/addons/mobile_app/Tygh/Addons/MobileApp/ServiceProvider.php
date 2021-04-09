@@ -19,7 +19,8 @@ use Pimple\ServiceProviderInterface;
 use Tygh\Addons\MobileApp\Notifications\Factory;
 use Tygh\Addons\MobileApp\Notifications\Sender;
 use Tygh\Http;
-use Tygh\Registry;
+use Tygh\Languages\Values;
+use Tygh\Tygh;
 
 class ServiceProvider implements ServiceProviderInterface
 {
@@ -36,5 +37,17 @@ class ServiceProvider implements ServiceProviderInterface
         $app['addons.mobile_app.notifications.factory'] = function (Container $app) {
             return new Factory();
         };
+
+        $app['addons.mobile_app.translation_manager'] = function (Container $app) {
+            return new TranslationManager(new Values(), DEFAULT_LANGUAGE);
+        };
+    }
+
+    /**
+     * @return \Tygh\Addons\MobileApp\TranslationManager
+     */
+    public static function getTranslationManager()
+    {
+        return Tygh::$app['addons.mobile_app.translation_manager'];
     }
 }

@@ -1,21 +1,23 @@
 <?php
 /***************************************************************************
-*                                                                          *
-*   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
-*                                                                          *
-* This  is  commercial  software,  only  users  who have purchased a valid *
-* license  and  accept  to the terms of the  License Agreement can install *
-* and use this program.                                                    *
-*                                                                          *
-****************************************************************************
-* PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
-* "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
-****************************************************************************/
+ *                                                                          *
+ *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
+ *                                                                          *
+ * This  is  commercial  software,  only  users  who have purchased a valid *
+ * license  and  accept  to the terms of the  License Agreement can install *
+ * and use this program.                                                    *
+ *                                                                          *
+ ****************************************************************************
+ * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
+ * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
+ ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
+use Tygh\Enum\YesNo;
+use Tygh\Enum\UserTypes;
 
 function fn_call_requests_info()
 {
@@ -29,19 +31,58 @@ function fn_call_requests_get_phone()
     return Registry::ifGet('addons.call_requests.phone', Registry::get('settings.Company.company_phone'));
 }
 
-function fn_call_requests_get_splited_phone()
+/**
+ * Gets split phone
+ *
+ * @param int $vendor_id Vendor identifier
+ *
+ * @return array{prefix: string, postfix: string}
+ */
+function fn_call_requests_get_splited_phone($vendor_id = 0)
 {
-    $phone_number = fn_call_requests_get_phone();
+    $result = [
+        'prefix'  => '',
+        'postfix' => ''
+    ];
+
+    if ($vendor_id !== 0 && YesNo::toBool(Registry::get('addons.call_requests.enable_call_requests_for_vendors'))) {
+        $phone_number = fn_call_requests_get_vendor_phone($vendor_id);
+    } else {
+        $phone_number = fn_call_requests_get_phone();
+    }
+
     $length = Registry::get('addons.call_requests.phone_prefix_length');
 
-    if (empty($length) || intval($length) == 0) {
+    if (empty($length) || (int) $length === 0) {
         $length = 0;
     }
 
-    return array(
-        'prefix' => substr($phone_number, 0, $length),
-        'postfix' => substr($phone_number, $length)
-    );
+    if (empty($phone_number)) {
+        return $result;
+    }
+
+    $result['prefix'] = substr($phone_number, 0, $length);
+    $result['postfix'] = substr($phone_number, $length);
+
+    return $result;
+}
+
+/**
+ * Gets vendor phone number
+ *
+ * @param int $vendor_id Vendor identifier
+ *
+ * @return string|false
+ */
+function fn_call_requests_get_vendor_phone($vendor_id)
+{
+    $vendor_data = fn_get_company_data($vendor_id);
+
+    if (empty($vendor_data['phone'])) {
+        return false;
+    }
+
+    return $vendor_data['phone'];
 }
 
 function fn_get_call_requests($params = array(), $lang_code = CART_LANGUAGE)
@@ -142,34 +183,56 @@ function fn_get_call_requests($params = array(), $lang_code = CART_LANGUAGE)
         . $limit
     );
 
+    $company_id = fn_get_runtime_company_id();
+
     if (!empty($items)) {
-        $cart_product_ids = array();
+        $cart_product_ids = [];
+
         foreach ($items as &$item) {
-            if (!empty($item['cart_products'])) {
-                $item['cart_products'] = unserialize($item['cart_products']);
-                foreach ($item['cart_products'] as $cart_product) {
-                    $cart_product_ids[] = $cart_product['product_id'];
-                }
+            if (empty($item['cart_products'])) {
+                continue;
+            }
+
+            $item['cart_products'] = unserialize($item['cart_products']);
+
+            foreach ($item['cart_products'] as $cart_product) {
+                $cart_product_ids[] = $cart_product['product_id'];
             }
         }
+
         $cart_product_names = db_get_hash_single_array(
-            "SELECT product_id, product FROM ?:product_descriptions WHERE product_id IN(?n) AND lang_code = ?s",
-            array('product_id', 'product'), array_unique($cart_product_ids), $lang_code
+            'SELECT product_id, product FROM ?:product_descriptions WHERE product_id IN(?n) AND lang_code = ?s',
+            ['product_id', 'product'],
+            array_unique($cart_product_ids),
+            $lang_code
         );
+
         foreach ($items as &$item) {
-            if (!empty($item['cart_products'])) {
-                foreach ($item['cart_products'] as &$cart_product) {
-                    if (!empty($cart_product_names[$cart_product['product_id']])) {
-                        $cart_product['product'] = $cart_product_names[$cart_product['product_id']];
-                    }
+            if (empty($item['cart_products'])) {
+                continue;
+            }
+
+            foreach ($item['cart_products'] as $key => $cart_product) {
+                if (!empty($cart_product_names[$cart_product['product_id']])) {
+                    $item['cart_products'][$key]['product'] = $cart_product_names[$cart_product['product_id']];
                 }
+
+                if (
+                    $company_id === 0
+                    || !isset($cart_product['company_id'])
+                    || $cart_product['company_id'] === $company_id
+                ) {
+                    continue;
+                }
+
+                unset($item['cart_products'][$key]);
             }
         }
     }
 
     LastView::instance()->processResults('call_requests', $items, $params);
 
-    return array($items, $params);
+    return [$items, $params];
 }
 
 function fn_update_call_request($data, $request_id = 0)
@@ -207,9 +270,21 @@ function fn_delete_call_request($request_id)
     return db_query("DELETE FROM ?:call_requests WHERE request_id = ?i", $request_id);
 }
 
+/**
+ * Creates call request
+ *
+ * @param array $params         Call request parameters
+ * @param array $product_data   Product data
+ * @param array $cart           Array of cart content and user information necessary for purchase
+ * @param array $auth           Array of user authentication data (e.g. uid, usergroup_ids, etc.)
+ *
+ * @return array
+ *
+ * @throws \Tygh\Exceptions\DeveloperException If notification receiver and transport was not found.
+ */
 function fn_do_call_request($params, $product_data, &$cart, &$auth)
 {
-    $result = array();
+    $result = [];
 
     $params['cart_products'] = fn_call_request_get_cart_products($cart);
 
@@ -223,54 +298,54 @@ function fn_do_call_request($params, $product_data, &$cart, &$auth)
         $company_id = db_get_field('SELECT company_id FROM ?:orders WHERE order_id = ?i', $params['order_id']);
     } elseif (!empty($params['product_id'])) {
         $company_id = db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $params['product_id']);
+    } elseif (!empty($params['company_id'])) {
+        $company_id = $params['company_id'];
     } else {
         $company_id = 0;
     }
 
     $params['company_id'] = $company_id;
 
+    /**
+     * Allows to perform some actions before call request is processed
+     *
+     * @param array $params         Call request parameters
+     * @param array $product_data   Product data
+     * @param array $cart           Array of cart content and user information necessary for purchase
+     * @param array $auth           Array of user authentication data (e.g. uid, usergroup_ids, etc.)
+     * @param int   $company_id     Company identifier
+     */
+    fn_set_hook('do_call_request', $params, $product_data, $cart, $auth, $company_id);
+
     $request_id = fn_update_call_request($params);
 
-    $lang_code = fn_get_company_language($company_id);
-    if (empty($lang_code)) {
-        $lang_code = CART_LANGUAGE;
+    $params['request_id'] = $request_id;
+
+    $force_notification = [];
+
+    if (!empty($company_id)) {
+        $force_notification[UserTypes::ADMIN] = false;
+    } else {
+        $force_notification[UserTypes::VENDOR] = false;
     }
-    $url = fn_url('call_requests.manage?id=' . $request_id, 'A', 'current', $lang_code, true);
 
-    /** @var \Tygh\Mailer\Mailer $mailer */
-    $mailer = Tygh::$app['mailer'];
+    /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+    $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+    $notification_rules = $notification_settings_factory->create($force_notification);
 
-    if (empty($params['product_id'])) { // Call request
-        $mailer->send(array(
-            'to' => 'company_orders_department',
-            'from' => 'default_company_orders_department',
-            'data' => array(
-                'url' => $url,
-                'customer' => $params['name'],
-                'phone_number' => $params['phone'],
-                'time_from' => $params['time_from'] ?: CALL_REQUESTS_DEFAULT_TIME_FROM,
-                'time_to' => $params['time_to'] ?: CALL_REQUESTS_DEFAULT_TIME_TO,
-            ),
-            'template_code' => 'call_requests_call_request',
-            'tpl' => 'addons/call_requests/call_request.tpl',
-            'company_id' => $company_id,
-        ), 'A', $lang_code);
+    /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
 
-    } elseif (empty($params['order_id'])) { // Buy with one click without order
-        $mailer->send(array(
-            'to' => 'company_orders_department',
-            'from' => 'default_company_orders_department',
-            'data' => array(
-                'url' => $url,
-                'customer' => $params['name'],
-                'phone_number' => $params['phone'],
-                'product_url' => fn_url('products.view?product_id=' . $params['product_id'], 'C'),
-                'product_name' => fn_get_product_name($params['product_id'], $lang_code),
-            ),
-            'template_code' => 'call_requests_buy_with_one_click',
-            'tpl' => 'addons/call_requests/buy_with_one_click.tpl',
-            'company_id' => $company_id,
-        ), 'A', $lang_code);
+    if (empty($params['product_id'])) {
+        $event_dispatcher->dispatch(
+            'call_requests.request_created',
+            ['call_request_data' => $params],
+            $notification_rules
+        );
+    } elseif (empty($params['order_id'])) { // Buy with one click when user didn't fill out the email field.
+        $event_dispatcher->dispatch('call_requests.request_about_product_created', [
+            'call_request_data' => $params
+        ]);
     }
 
     if (!empty($params['order_id'])) {
@@ -293,18 +368,29 @@ function fn_do_call_request($params, $product_data, &$cart, &$auth)
     return $result;
 }
 
-function fn_call_request_get_cart_products(&$cart)
+/**
+ * Get list of products from cart
+ *
+ * @param array<string, array|string|int> $cart Cart array
+ *
+ * @return array<empty>|list<array{amount: float, company_id: int, price: float, product_id: int}>
+ */
+function fn_call_request_get_cart_products(array &$cart)
 {
-    $products = array();
+    $products = [];
 
-    if (!empty($cart['products'])) {
-        foreach ($cart['products'] as $product) {
-            $products[] = array(
-                'product_id' => $product['product_id'],
-                'amount'     => $product['amount'],
-                'price'      => $product['price'],
-            );
-        }
+    if (empty($cart['products'])) {
+        return $products;
+    }
+
+    /** @var array $cart['products'] */
+    foreach ($cart['products'] as $product) {
+        $products[] = [
+            'product_id' => (int) $product['product_id'],
+            'amount'     => (float) $product['amount'],
+            'price'      => (float) $product['price'],
+            'company_id' => (int) $product['company_id'],
+        ];
     }
 
     return $products;
@@ -342,6 +428,11 @@ function fn_call_requests_placing_order($params, $product_data, &$cart, &$auth)
         if (!isset($cart['user_data'][$key])) {
             $cart['user_data'][$key] = ' ';
         }
+    }
+
+    if (!isset($cart['storefront_id'])) {
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $cart['storefront_id'] = Tygh::$app['storefront']->storefront_id;
     }
 
     if (empty($product_data[$params['product_id']]['amount'])) {
@@ -448,42 +539,6 @@ function fn_call_requests_place_order(&$order_id, &$action, &$order_status, &$ca
 function fn_call_requests_delete_company(&$company_id, &$result)
 {
     return db_query("DELETE FROM ?:call_requests WHERE company_id = ?i", $company_id);
-}
-
-/**
- * Hook handler. Add json phone masks.
- */
-function fn_call_requests_dispatch_before_display()
-{
-    if (AREA != 'C') {
-        return;
-    }
-
-    $countries_list = fn_get_simple_countries(true);
-
-    $phone_masks = array();
-    $phone_masks_file_path = Registry::get('config.dir.root') . '/js/lib/inputmask-multi/phone-codes.json';
-
-    if (file_exists($phone_masks_file_path)) {
-        $phone_masks = json_decode(file_get_contents($phone_masks_file_path), true);
-        $phone_masks = array_filter($phone_masks, function ($mask_data) use ($countries_list) {
-            if (!is_array($mask_data['cc'])) {
-                return isset($countries_list[$mask_data['cc']]);
-            }
-
-            foreach ($mask_data['cc'] as $country_code) {
-                if (isset($countries_list[$country_code])) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-    }
-
-    $phone_masks_encoded = json_encode(array_values($phone_masks));
-
-    Tygh::$app['view']->assign('call_requests_phone_mask_codes', $phone_masks_encoded);
 }
 
 /**

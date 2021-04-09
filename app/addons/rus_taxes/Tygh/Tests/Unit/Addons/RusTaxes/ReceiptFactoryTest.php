@@ -28,10 +28,11 @@ class ReceiptFactoryTest extends ATestCase
      * @param bool $allocate_discount_by_unit
      * @param $prices_with_taxes
      * @param $total_discount_item_types_filter
+     * @param  $priority_item_type
      * @param $expected
      * @dataProvider dpCreateReceiptFromOrder
      */
-    public function testCreateReceiptFromOrder(array $order, $currency, $allocate_discount_by_unit, $prices_with_taxes, $total_discount_item_types_filter, $expected)
+    public function testCreateReceiptFromOrder(array $order, $currency, $allocate_discount_by_unit, $prices_with_taxes, $total_discount_item_types_filter, $priority_item_type, $expected)
     {
         $service = new ReceiptFactory(
             'RUB',
@@ -47,7 +48,7 @@ class ReceiptFactoryTest extends ATestCase
             }
         );
 
-        $receipt = $service->createReceiptFromOrder($order, $currency, $allocate_discount_by_unit, $total_discount_item_types_filter);
+        $receipt = $service->createReceiptFromOrder($order, $currency, $allocate_discount_by_unit, $total_discount_item_types_filter, $priority_item_type);
 
         $this->assertEquals($expected, $receipt->toArray());
 
@@ -113,7 +114,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(),
+                'RUB', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -209,7 +210,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(),
+                'RUB', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -309,7 +310,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(),
+                'RUB', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -434,7 +435,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', true, false, array(),
+                'RUB', true, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -552,7 +553,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(),
+                'RUB', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -664,7 +665,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, true, array(),
+                'RUB', false, true, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -781,7 +782,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(),
+                'RUB', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -870,7 +871,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', true, false, array(),
+                'RUB', true, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -970,7 +971,7 @@ class ReceiptFactoryTest extends ATestCase
                         ),
                     )
                 ),
-                'RUB', true, false, array(),
+                'RUB', true, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -1058,7 +1059,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'USD', false, false, array(),
+                'USD', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -1158,7 +1159,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(),
+                'RUB', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -1261,7 +1262,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(),
+                'RUB', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -1345,7 +1346,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(),
+                'RUB', false, false, [], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -1424,7 +1425,7 @@ class ReceiptFactoryTest extends ATestCase
                         )
                     )
                 ),
-                'RUB', false, false, array(Item::TYPE_PRODUCT),
+                'RUB', false, false, [Item::TYPE_PRODUCT], '',
                 array(
                     'email' => 'customer@example.com',
                     'phone' => '+79021114567',
@@ -1485,6 +1486,383 @@ class ReceiptFactoryTest extends ATestCase
                             'tax_sum' => 2.8,
                             'tax_type' => TaxType::VAT_18,
                             'total_discount' => 0
+                        ),
+                    )
+                )
+            ),
+            array(
+                /**
+                 * Calculation tax by subtotal, tax not included to price, discount divided only on products
+                 * Shipping
+                 * Payment surcharge
+                 * Order discount
+                 * Product discount
+                 * allocate_discount_by_unit = false
+                 * total_discount_item_types_filter = [],
+                 * priority_item_type = product
+                 */
+                array(
+                    'total' => 257.27,
+                    'subtotal_discount' => 19.8,
+                    'payment_surcharge' => 27.68,
+                    'shipping_cost' => 28.0,
+                    'email' => 'customer@example.com',
+                    'phone' => '+79021114567',
+                    'products' => array(
+                        822274303 => array(
+                            'product' => '100g Pants',
+                            'product_code' => 'U0012O5AF0',
+                            'price' => 27.00,
+                            'amount' => 3
+                        ),
+                        1237327324 => array(
+                            'price' => 117.00,
+                            'amount' => 1,
+                            'product' => '16GB A Series Walkman Video MP3',
+                            'product_code' => 'U0012O5AF1',
+                        )
+                    ),
+                    'taxes' => array(
+                        6 => array(
+                            'price_includes_tax' => 'N',
+                            'tax_subtotal' => 23.39,
+                            'applies' => array(
+                                'P' => 17.82,
+                                'S' => 2.8,
+                                'PS' => 2.77,
+                                'items' => array(
+                                    'S' => array(
+                                        array(
+                                            1 => true,
+                                        )
+                                    ),
+                                    'P' => array(
+                                        822274303 => true,
+                                        1237327324 => true,
+                                    ),
+                                    'PS' => array(
+                                        2 => true
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                'RUB', false, false, [], Item::TYPE_PRODUCT,
+                array(
+                    'email' => 'customer@example.com',
+                    'phone' => '+79021114567',
+                    'items' => array(
+                        array(
+                            /**
+                             * tax_sum = 17.82 * 27.00 / (27.00 * 3 + 117.00) = 2.43
+                             * price = 27.00 + 2.43 = 29.43
+                             * total_discount = 29.43 * 3 / (29.43 * 3 + 127.53) * 19.8 = 8.1
+                             */
+                            'id' => 822274303,
+                            'type' => Item::TYPE_PRODUCT,
+                            'price' => 29.43,
+                            'quantity' => 3.0,
+                            'name' => '100g Pants',
+                            'code' => 'U0012O5AF0',
+                            'tax_sum' => 2.43,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 8.1
+                        ),
+                        array(
+                            /**
+                             * tax_sum = 17.82 * 117.00 / (27.00 * 3 + 117.00) = 10.53
+                             * price = 117.00 + 17.82 * 117.00 / (27.00 * 3 + 117.00) = 127.53
+                             * total_discount = 127.53 / (127.53) * (19.8 - 8.1) = 11.7
+                             */
+                            'id' => 1237327324,
+                            'type' => Item::TYPE_PRODUCT,
+                            'price' => 127.53,
+                            'quantity' => 1.0,
+                            'name' => '16GB A Series Walkman Video MP3',
+                            'code' => 'U0012O5AF1',
+                            'tax_sum' => 10.53,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 11.7
+                        ),
+                        array(
+                            /**
+                             * price = 27.68 + 2.77
+                             */
+                            'id' => 0,
+                            'type' => Item::TYPE_SURCHARGE,
+                            'price' => 30.45,
+                            'quantity' => 1.0,
+                            'name' => 'payment_surcharge',
+                            'code' => 'PS',
+                            'tax_sum' => 2.77,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 0
+                        ),
+                        array(
+                            'id' => 0,
+                            'type' => Item::TYPE_SHIPPING,
+                            'price' => 30.8,
+                            'quantity' => 1.0,
+                            'name' => 'shipping',
+                            'code' => 'SHIPPING',
+                            'tax_sum' => 2.8,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 0
+                        ),
+                    )
+                )
+            ),
+            array(
+                /**
+                 * Calculation tax by subtotal, tax not included to price, discount divided only on shipping
+                 * Shipping
+                 * Payment surcharge
+                 * Order discount
+                 * Product discount
+                 * allocate_discount_by_unit = true
+                 * total_discount_item_types_filter = [],
+                 * priority_item_type = shipping
+                 *
+                 */
+                array(
+                    'total' => 257.27,
+                    'subtotal_discount' => 19.8,
+                    'payment_surcharge' => 27.68,
+                    'shipping_cost' => 28.0,
+                    'email' => 'customer@example.com',
+                    'phone' => '+79021114567',
+                    'products' => array(
+                        822274303 => array(
+                            'product' => '100g Pants',
+                            'product_code' => 'U0012O5AF0',
+                            'price' => 27.00,
+                            'amount' => 3
+                        ),
+                        1237327324 => array(
+                            'price' => 117.00,
+                            'amount' => 1,
+                            'product' => '16GB A Series Walkman Video MP3',
+                            'product_code' => 'U0012O5AF1',
+                        )
+                    ),
+                    'taxes' => array(
+                        6 => array(
+                            'price_includes_tax' => 'N',
+                            'tax_subtotal' => 23.39,
+                            'applies' => array(
+                                'P' => 17.82,
+                                'S' => 2.8,
+                                'PS' => 2.77,
+                                'items' => array(
+                                    'S' => array(
+                                        array(
+                                            1 => true,
+                                        )
+                                    ),
+                                    'P' => array(
+                                        822274303 => true,
+                                        1237327324 => true,
+                                    ),
+                                    'PS' => array(
+                                        2 => true
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                'RUB', false, true, [], Item::TYPE_SHIPPING,
+                array(
+                    'email' => 'customer@example.com',
+                    'phone' => '+79021114567',
+                    'items' => array(
+                        array(
+                            /**
+                             * tax_sum = 17.82 * 27.00 / (27.00 * 3 + 117.00) = 2.43
+                             * price = 27.00 + 2.43 = 29.43
+                             */
+                            'id' => 822274303,
+                            'type' => Item::TYPE_PRODUCT,
+                            'price' => 29.43,
+                            'quantity' => 3.0,
+                            'name' => '100g Pants',
+                            'code' => 'U0012O5AF0',
+                            'tax_sum' => 2.43,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 0.0
+                        ),
+                        array(
+                            /**
+                             * tax_sum = 17.82 * 117.00 / (27.00 * 3 + 117.00) = 10.53
+                             * price = 117.00 + 17.82 * 117.00 / (27.00 * 3 + 117.00) = 127.53
+                             */
+                            'id' => 1237327324,
+                            'type' => Item::TYPE_PRODUCT,
+                            'price' => 127.53,
+                            'quantity' => 1.0,
+                            'name' => '16GB A Series Walkman Video MP3',
+                            'code' => 'U0012O5AF1',
+                            'tax_sum' => 10.53,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 0.0
+                        ),
+                        array(
+                            /**
+                             * price = 27.68 + 2.77
+                             */
+                            'id' => 0,
+                            'type' => Item::TYPE_SURCHARGE,
+                            'price' => 30.45,
+                            'quantity' => 1.0,
+                            'name' => 'payment_surcharge',
+                            'code' => 'PS',
+                            'tax_sum' => 2.77,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 0
+                        ),
+                        array(
+                            /**
+                             * price = 28.0 + 2.8 = 30.8
+                             * total_discount = 19.8
+                             */
+                            'id' => 0,
+                            'type' => Item::TYPE_SHIPPING,
+                            'price' => 30.8,
+                            'quantity' => 1.0,
+                            'name' => 'shipping',
+                            'code' => 'SHIPPING',
+                            'tax_sum' => 2.8,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 19.8
+                        ),
+                    )
+                )
+            ),
+            array(
+                /**
+                 * Calculation tax by subtotal, tax not included to price, discount is more than priority items total
+                 * Shipping
+                 * Payment surcharge
+                 * Order discount
+                 * Product discount
+                 * allocate_discount_by_unit = false
+                 * total_discount_item_types_filter = [],
+                 * priority_item_type = product
+                 */
+                array(
+                    'total' => 27.07,
+                    'subtotal_discount' => 250,
+                    'payment_surcharge' => 27.68,
+                    'shipping_cost' => 28.0,
+                    'email' => 'customer@example.com',
+                    'phone' => '+79021114567',
+                    'products' => array(
+                        822274303 => array(
+                            'product' => '100g Pants',
+                            'product_code' => 'U0012O5AF0',
+                            'price' => 27.00,
+                            'amount' => 3
+                        ),
+                        1237327324 => array(
+                            'price' => 117.00,
+                            'amount' => 1,
+                            'product' => '16GB A Series Walkman Video MP3',
+                            'product_code' => 'U0012O5AF1',
+                        )
+                    ),
+                    'taxes' => array(
+                        6 => array(
+                            'price_includes_tax' => 'N',
+                            'tax_subtotal' => 23.39,
+                            'applies' => array(
+                                'P' => 17.82,
+                                'S' => 2.8,
+                                'PS' => 2.77,
+                                'items' => array(
+                                    'S' => array(
+                                        array(
+                                            1 => true,
+                                        )
+                                    ),
+                                    'P' => array(
+                                        822274303 => true,
+                                        1237327324 => true,
+                                    ),
+                                    'PS' => array(
+                                        2 => true
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                'RUB', false, false, [], Item::TYPE_PRODUCT,
+                array(
+                    'email' => 'customer@example.com',
+                    'phone' => '+79021114567',
+                    'items' => array(
+                        array(
+                            /**
+                             * tax_sum = 17.82 * 27.00 / (27.00 * 3 + 117.00) = 2.43
+                             * price = 27.00 + 2.43 = 29.43
+                             * total_discount = 29.43 * 3 / (29.43 * 3 + 127.53 + 30.45 + 30.8) * 250 = 29.43 * 3 / 277.07 * 250 = 79.66
+                             */
+                            'id' => 822274303,
+                            'type' => Item::TYPE_PRODUCT,
+                            'price' => 29.43,
+                            'quantity' => 3.0,
+                            'name' => '100g Pants',
+                            'code' => 'U0012O5AF0',
+                            'tax_sum' => 2.43,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 79.66
+                        ),
+                        array(
+                            /**
+                             * tax_sum = 17.82 * 117.00 / (27.00 * 3 + 117.00) = 10.53
+                             * price = 117.00 + 17.82 * 117.00 / (27.00 * 3 + 117.00) = 127.53
+                             * total_discount = 127.53 / (127.53 + 30.45 + 30.8) * (250 - 79.66) = 115.07
+                             */
+                            'id' => 1237327324,
+                            'type' => Item::TYPE_PRODUCT,
+                            'price' => 127.53,
+                            'quantity' => 1.0,
+                            'name' => '16GB A Series Walkman Video MP3',
+                            'code' => 'U0012O5AF1',
+                            'tax_sum' => 10.53,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 115.07
+                        ),
+                        array(
+                            /**
+                             * price = 27.68 + 2.77
+                             * total_discount = 30.45 / (30.45 + 30.8) * (250 - 79.66 - 115.07) = 30.45 / 61.25 * 55.27 = 27.04
+                             */
+                            'id' => 0,
+                            'type' => Item::TYPE_SURCHARGE,
+                            'price' => 30.45,
+                            'quantity' => 1.0,
+                            'name' => 'payment_surcharge',
+                            'code' => 'PS',
+                            'tax_sum' => 2.77,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 27.47
+                        ),
+                        array(
+                            /**
+                             * price = 28.0 + 2.8 = 30.8
+                             * total_discount = 30.8 / 30.8 * (55.27 - 27.47) = 115.07
+                             */
+                            'id' => 0,
+                            'type' => Item::TYPE_SHIPPING,
+                            'price' => 30.8,
+                            'quantity' => 1.0,
+                            'name' => 'shipping',
+                            'code' => 'SHIPPING',
+                            'tax_sum' => 2.8,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 27.8
                         ),
                     )
                 )

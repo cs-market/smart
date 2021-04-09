@@ -3,7 +3,7 @@
         <input type="checkbox"
                name="preset_ids[]"
                value="{$preset.preset_id}"
-               class="checkbox cm-item"
+               class="cm-item"
         />
     </td>
 
@@ -25,49 +25,56 @@
                  class="btn"
                  target_id="import_preset_file_upload_{$preset.preset_id}"
             }
-            {if $preview_preset_id == $preset.preset_id}
-                {btn type="dialog"
-                     text=__("preview")
-                     class="cm-dialog-auto-width hidden import-preset__preview-fields-mapping"
-                     href="{"import_presets.get_fields.import?preset_id=`$preset.preset_id`"|fn_url}"
-                     target_id="import_preset_fields_mapping_{$preset.preset_id}"
-                     id="import_preset_preview_fields_mapping_{$preset.preset_id}"
-                }
-            {/if}
+
             {capture name="popups"}
                 {$smarty.capture.popups nofilter}
 
-                <div class="hidden form-horizontal form-edit import-preset__fileuploader-form"
-                     title="{__("advanced_import.uploading_file", ["[preset]" => $preset.preset])}"
-                     id="import_preset_file_upload_{$preset.preset_id}"
-                >
-                    <div class="control-group">
-                        <label class="control-label">{__("select_file")}:</label>
-                        <div class="controls">
-                            {include file="common/fileuploader.tpl"
-                                     hide_server=true
-                                     var_name="upload[{$preset.preset_id}]"
-                                     prefix=$preset.preset_id
-                                     allowed_ext="csv, xml"
-                            }
-                        </div>
-                    </div>
-                    <div class="buttons-container">
-                        {include file="buttons/save_cancel.tpl"
-                                 cancel_action="close"
-                                 but_text=__("upload")
-                                 but_meta="cm-ajax cm-comet cm-post"
-                                 but_name="dispatch[import_presets.upload]"
-                        }
-                    </div>
-                <!--import_preset_file_upload_{$preset.preset_id}--></div>
+                <div class="hidden" title="{__("advanced_import.uploading_file", ["[preset]" => $preset.preset])}" id="import_preset_file_upload_{$preset.preset_id}">
+                    <form action="{""|fn_url}"
+                          method="post"
+                          enctype="multipart/form-data">
 
-                <div class="hidden form-horizontal form-edit import-preset__fields-mapping"
-                     title="{__("advanced_import.previewing_fields_mapping", ["[preset]" => $preset.preset])}"
-                     id="import_preset_fields_mapping_{$preset.preset_id}"
-                >
-                <!--import_preset_fields_mapping_{$preset.preset_id}--></div>
+                        <input type="hidden" name="preset_id" value="{$preset.preset_id}">
+                        <div class="form-horizontal form-edit import-preset__fileuploader-form">
+
+                            <div class="control-group">
+                                <label class="control-label">{__("select_file")}:</label>
+                                <div class="controls">
+                                    {include file="addons/advanced_import/views/import_presets/components/fileuploader.tpl"
+                                        var_name="upload[{$preset.preset_id}]"
+                                        prefix=$preset.preset_id
+                                        allowed_ext=["csv", "xml"]
+                                    }
+                                </div>
+                            </div>
+                            <div class="buttons-container">
+                                {include file="buttons/save_cancel.tpl"
+                                    cancel_action="close"
+                                    but_text=__("upload")
+                                    but_meta="cm-ajax cm-comet cm-post"
+                                    but_name="dispatch[import_presets.upload]"
+                                }
+                            </div>
+                        </div>
+                    </form>
+                <!--import_preset_file_upload_{$preset.preset_id}--></div>
             {/capture}
+        {/if}
+
+        {if $preview_preset_id == $preset.preset_id}
+            {btn type="dialog"
+                text=__("preview")
+                class="cm-dialog-auto-width hidden import-preset__preview-fields-mapping"
+                href="{"import_presets.get_fields.import?preset_id=`$preset.preset_id`"|fn_url}"
+                target_id="import_preset_fields_mapping_{$preset.preset_id}"
+                id="import_preset_preview_fields_mapping_{$preset.preset_id}"
+            }
+
+            <div class="hidden form-horizontal form-edit import-preset__fields-mapping"
+                 title="{__("advanced_import.previewing_fields_mapping", ["[preset]" => $preset.preset])}"
+                 id="import_preset_fields_mapping_{$preset.preset_id}"
+            >
+            <!--import_preset_fields_mapping_{$preset.preset_id}--></div>
         {/if}
     </td>
 
@@ -93,7 +100,7 @@
                 }
             {elseif $preset.last_status == "Addons\\AdvancedImport\\ImportStatuses::FAIL"|enum && is_array($preset.last_result.msg)}
                 {include file="common/tooltip.tpl"
-                         tooltip=$preset.last_result.msg|implode:"<br>"
+                         tooltip="<br>"|implode:$preset.last_result.msg
                 }
             {/if}
         </span>
@@ -128,7 +135,15 @@
             {capture name="tools_list"}
                 {hook name="advanced_import:preset_list_extra_links"}
                     <li>{btn type="list" text=__("edit") href="import_presets.update?preset_id=`$preset.preset_id`"}</li>
-                    <li>{btn type="list" text=__("delete") class="cm-confirm" href="import_presets.delete?preset_id=`$preset.preset_id`" method="POST"}</li>
+                    <li>
+                        {btn type="list"
+                            text=__("delete")
+                            class="cm-confirm"
+                            href="import_presets.delete?preset_id=`$preset.preset_id`"
+                            method="POST"
+                            data=["data-ca-confirm-text" => "{__("advanced_import.file_will_be_deleted_are_you_sure_to_proceed")}"]
+                        }
+                    </li>
                 {/hook}
             {/capture}
             {dropdown content=$smarty.capture.tools_list}

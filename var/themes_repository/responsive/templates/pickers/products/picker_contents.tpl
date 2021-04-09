@@ -66,14 +66,16 @@
 
         if ($('input.cm-item:checked', frm).length > 0) {
             $('input.cm-item:checked', frm).each( function() {
-                var id = $(this).val();
+                var id = $(this).val(),
+                    value = $('#product_' + id + '_alt').length ? $('#product_' + id + '_alt').val() : $('#product_' + id).val();
+
                 {if $smarty.request.display == "options" || $smarty.request.display == "options_amount" || $smarty.request.display == "options_price"}
                     products[id] = {
                         option: _getDescription(frm, id),
-                        value: $('#product_' + id).val()
+                        value: value
                     };
                 {else}
-                    products[id] = $('#product_' + id).val();
+                    products[id] = value;
                 {/if}
             });
             
@@ -111,7 +113,10 @@ show_old_price=true
 show_price=true 
 show_clean_price=true 
 show_list_discount=true 
-show_discount_label=true 
+show_product_labels=true
+product_labels_mini=true
+show_discount_label=true
+show_shipping_label=true
 show_product_amount=true 
 show_product_options=true 
 show_qty=true 

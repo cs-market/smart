@@ -14,28 +14,32 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+use Tygh\BlockManager\Block;
+use Tygh\BlockManager\Exim;
+use Tygh\BlockManager\Layout;
+use Tygh\BlockManager\RenderManager;
 use Tygh\Bootstrap;
 use Tygh\Debugger;
 use Tygh\Development;
 use Tygh\Embedded;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\StorefrontStatuses;
+use Tygh\Enum\YesNo;
+use Tygh\Exceptions\DeveloperException;
+use Tygh\Languages\Helper as LanguageHelper;
+use Tygh\Languages\Languages;
+use Tygh\Languages\Values as LanguageValues;
+use Tygh\Less;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Storage;
-use Tygh\BlockManager\Block;
-use Tygh\BlockManager\Layout;
-use Tygh\BlockManager\Exim;
-use Tygh\BlockManager\RenderManager;
-use Tygh\Less;
-use Tygh\Languages\Languages;
-use Tygh\Languages\Values as LanguageValues;
-use Tygh\Languages\Helper as LanguageHelper;
+use Tygh\Themes\Styles;
+use Tygh\Themes\Themes;
 use Tygh\Tools\DateTimeHelper;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Tools\Url;
-use Tygh\Themes\Styles;
-use Tygh\Themes\Themes;
 use Tygh\Web\Antibot;
-use Tygh\Exceptions\DeveloperException;
+use Tygh\Enum\SiteArea;
 
 /**
  * Returns True if the object can be saved, otherwise False.
@@ -100,17 +104,22 @@ function fn_allow_save_object($object_data, $object_type, $skip_edition_checking
  * [themes] will be replaced by real path of actual themes folder
  * [relative] will be replaced by path of actual themes folder relative root directory
  *
- * @param $path string Format string.
- * @param $area string Area (C/A) to get setting for
- * @param $company_id int Company identifier
- * @param $use_cache bool Value will be get from the DB directly if use_cache is equal to false or from already generated cache otherwise
+ * @param string   $path          Format string.
+ * @param string   $area          Area (C/A) to get setting for
+ * @param int|null $company_id    Company identifier.
+ *                                This parameter is deprecated and will be removed in v5.0.0.
+ *                                Use $storefront_id instead.
+ * @param bool     $use_cache     Value will be get from the DB directly if use_cache is equal to false or from already
+ *                                generated cache otherwise
+ * @param int|null $storefront_id Storefront ID
+ *
  * @return string Path to theme
  */
-function fn_get_theme_path($path = '[theme]/', $area = AREA, $company_id = null, $use_cache = true)
+function fn_get_theme_path($path = '[theme]/', $area = AREA, $company_id = null, $use_cache = true, $storefront_id = null)
 {
     static $theme_names = array();
 
-    fn_set_hook('get_theme_path_pre', $path, $area, $company_id, $theme_names);
+    fn_set_hook('get_theme_path_pre', $path, $area, $company_id, $theme_names, $use_cache, $storefront_id);
 
     if ($area == 'A') {
         $theme_name = '';
@@ -124,12 +133,21 @@ function fn_get_theme_path($path = '[theme]/', $area = AREA, $company_id = null,
             $path = str_replace('[theme]/', '', $path);
         }
     } else {
-        $company_id = (int) $company_id;
-        if (empty($theme_names['c_' . $company_id]) || !$use_cache) {
-            $theme_names['c_' . $company_id] = Settings::instance()->getValue('theme_name', '', $company_id);
+        if (!$storefront_id) {
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = Tygh::$app['storefront'];
+            $storefront_id = $storefront->storefront_id;
+        }
+        $storefront_id = (int) $storefront_id;
+
+        if (empty($theme_names['c_' . $storefront_id]) || !$use_cache) {
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+            $storefront = $repository->findById($storefront_id);
+            $theme_names['c_' . $storefront_id] = $storefront->theme_name;
         }
 
-        $theme_name = $theme_names['c_' . $company_id];
+        $theme_name = $theme_names['c_' . $storefront_id];
         $dir_design = rtrim(Registry::get('config.dir.design_frontend'), '/');
     }
 
@@ -380,7 +398,7 @@ function fn_redirect($location, $allow_external_redirect = false, $is_permanent 
     } else {
         $delay = ((Debugger::isActive() || fn_is_development()) && !Registry::get('runtime.comet')) ? 10 : 0;
         if ($delay != 0) {
-            fn_echo('<a href="' . htmlspecialchars($location) . '" style="text-transform: lowercase;">' . __('continue') . '</a>');
+            fn_echo('<a href="' . htmlspecialchars($location) . '" style="text-transform: lowercase;">continue</a>');
         }
         fn_echo('<meta http-equiv="Refresh" content="' . $delay . ';URL=' . htmlspecialchars($location) . '" />');
     }
@@ -410,13 +428,16 @@ function fn_check_second_level_child_array($data, $childs_name)
 /**
  * Sets notification message
  *
- * @param string $type notification type (E - error, W - warning, N - notice, O - order error on checkout, I - information)
- * @param string $title notification title
- * @param string $message notification message
- * @param string $message_state (S - notification will be displayed unless it's closed, K - only once, I - will be closed by timer)
- * @param mixed $extra extra data to save with notification
- * @param bool $init_message $title and $message will be processed by __ function if true
- * @return boolean always true
+ * @param string $type          notification type (E - error, W - warning, N - notice, O - order error on checkout, I -
+ *                              information)
+ * @param string $title         notification title
+ * @param string $message       notification message
+ * @param string $message_state (S - notification will be displayed unless it's closed, K - only once, I - will be
+ *                              closed by timer)
+ * @param mixed  $extra         extra data to save with notification
+ * @param bool   $init_message  $title and $message will be processed by __ function if true
+ *
+ * @return bool always true
  */
 function fn_set_notification($type, $title, $message, $message_state = '', $extra = '', $init_message = false)
 {
@@ -432,12 +453,12 @@ function fn_set_notification($type, $title, $message, $message_state = '', $extr
     /**
      * Сhanges the parameters of the notification
      *
-     * @param string $type notification type (E - error, W - warning, N - notice, O - order error on checkout, I - information)
-     * @param string $title notification title
-     * @param string $message notification message
+     * @param string $type          notification type (E - error, W - warning, N - notice, O - order error on checkout, I - information)
+     * @param string $title         notification title
+     * @param string $message       notification message
      * @param string $message_state (S - notification will be displayed unless it's closed, K - only once, I - will be closed by timer)
-     * @param mixed  $extra extra data to save with notification
-     * @param bool   $init_message $title and $message will be processed by __ function if true
+     * @param mixed  $extra         extra data to save with notification
+     * @param bool   $init_message  $title and $message will be processed by __ function if true
      */
     fn_set_hook('set_notification_pre', $type, $title, $message, $message_state, $extra, $init_message);
 
@@ -449,20 +470,20 @@ function fn_set_notification($type, $title, $message, $message_state = '', $extr
     }
 
     if (empty(Tygh::$app['session']['notifications'])) {
-        Tygh::$app['session']['notifications'] = array();
+        Tygh::$app['session']['notifications'] = [];
     }
 
     $key = md5($type . $title . $message . $extra);
 
-    Tygh::$app['session']['notifications'][$key] = array(
-        'type' => $type,
-        'title' => $title,
-        'message' => $message,
+    Tygh::$app['session']['notifications'][$key] = [
+        'type'          => $type,
+        'title'         => $title,
+        'message'       => $message,
         'message_state' => $message_state,
-        'new' => true,
-        'extra' => $extra,
-        'init_message' => $init_message,
-    );
+        'new'           => true,
+        'extra'         => $extra,
+        'init_message'  => $init_message,
+    ];
 
     return true;
 }
@@ -573,9 +594,9 @@ function fn_process_cache_notifications($notification)
     fn_set_notification('W', 'warning', str_rot13($notification), 'K', serialize(array(
         'placeholders' => array(
             'message' => array(
-                '[href]' => Registry::get('config.resources.helpdesk_url')
-            )
-        )
+                '[href]' => Registry::get('config.resources.helpdesk_url'),
+            ),
+        ),
     )), true);
 }
 
@@ -592,7 +613,7 @@ function fn_save_post_data()
 
     foreach ($args as $key) {
         if (isset($_POST[$key])) {
-            Tygh::$app['session']['saved_post_data'][$key] = defined('QUOTES_ENABLED') ? Bootstrap::stripSlashes($_POST[$key]) : $_POST[$key];
+            Tygh::$app['session']['saved_post_data'][$key] = $_POST[$key];
         }
     }
 
@@ -619,14 +640,15 @@ function fn_restore_post_data($key)
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Gets language variable by name
  *
  * @param string $var_name Language variable name
  * @param string $lang_code 2-letter language code
  *
- * @return string Language variable value; in case the value is absent, language variable name with "_" prefix is returned
+ * @return string Language variable value; in case the value is absent, language variable name with "_" prefix is
+ *                returned
  */
 function fn_get_lang_var($var_name, $lang_code = CART_LANGUAGE)
 {
@@ -634,14 +656,14 @@ function fn_get_lang_var($var_name, $lang_code = CART_LANGUAGE)
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Gets language variables by prefix
  *
  * @param string $prefix Language variable prefix
  * @param $lang_code 2-letter language code
  *
- * @return Array of language variables
+ * @return array of language variables
  */
 function fn_get_lang_vars_by_prefix($prefix, $lang_code = CART_LANGUAGE)
 {
@@ -649,7 +671,7 @@ function fn_get_lang_vars_by_prefix($prefix, $lang_code = CART_LANGUAGE)
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Loads received language variables into language cache
  *
@@ -674,22 +696,6 @@ function fn_update_lang_objects($tpl_var, &$value)
 }
 
 /**
- * @deprecated
- */
-function fn_is_allow_to_translate_language_object($language_object)
-{
-    return LanguageHelper::isAllowToTranslateLanguageObject($language_object);
-}
-
-/**
- * @deprecated
- */
-function fn_prepare_lang_objects(&$destination, $dimension, $fields, $table, $field_id, $inner = '', $unescape = '')
-{
-    return LanguageHelper::prepareLangObjects($destination, $dimension, $fields, $table, $field_id, $inner, $unescape);
-}
-
-/**
  * Function defines and assigns pages
  *
  * @param array $params params to generate pagination from
@@ -703,6 +709,15 @@ function fn_generate_pagination($params, $area = AREA)
     }
 
     $deviation = ($area == 'A') ? 5 : 7;
+
+    /**
+     * This hook allows you to change the pagination data
+     *
+     * @param array  $params    Pagination data
+     * @param string $area      One-letter area code
+     * @param int    $deviation Number of pages to display before and after selected page
+     */
+    fn_set_hook('generate_pagination_pre', $params, $area, $deviation);
 
     $total_pages = ceil((int) $params['total_items'] / $params['items_per_page']);
 
@@ -722,7 +737,7 @@ function fn_generate_pagination($params, $area = AREA)
         'items_per_page' => $params['items_per_page'],
         'per_page_range' => array(10, 25, 50, 100, 250),
         'range_from' => (($params['page'] - 1) * $params['items_per_page']) + 1,
-        'range_to' => (($params['page'] * $params['items_per_page']) > $params['total_items']) ? $params['total_items'] : $params['page'] * $params['items_per_page']
+        'range_to' => (($params['page'] * $params['items_per_page']) > $params['total_items']) ? $params['total_items'] : $params['page'] * $params['items_per_page'],
     );
 
     if ($pagination['prev_range']) {
@@ -908,7 +923,7 @@ function fn_send_product_notifications($product_id)
                 'data' => array(
                     'product' => $product,
                     'product_id' => $product_id,
-                    'url' => fn_url("products.view?product_id=$product_id" . $suffix, 'C', 'http')
+                    'url' => fn_url("products.view?product_id=$product_id" . $suffix, 'C', 'http'),
                 ),
                 'template_code' => 'back_in_stock_notification',
                 'tpl' => 'product/back_in_stock_notification.tpl', // this parameter is obsolete and is used for back compatibility
@@ -949,7 +964,7 @@ function fn_add_breadcrumb($lang_value, $link = '', $nofollow = false)
     if (AREA == 'C' && empty($bc)) {
         $bc[] = array(
             'title' => __('home'),
-            'link' => fn_url('')
+            'link' => fn_url(''),
         );
     }
 
@@ -993,24 +1008,61 @@ function fn_array_merge()
     return $result;
 }
 
-//
-// Restore original variable content (unstripped)
-// Parameters should be the variables names
-// E.g. fn_trusted_vars("product_data","big_text","etcetc")
+/**
+ * Filters array recursively
+ *
+ * @param array    $array Data to be filtered
+ * @param callable $fn    Predicate callback
+ * @param int      $flag  Flag modifier
+ *
+ * @return array
+ */
+function fn_array_filter_recursive($array, $fn = null, $flag = 0)
+{
+    $fn = $fn ?: function($item) {
+        return (bool) $item;
+    };
+
+    foreach ($array as &$item) {
+        if (is_array($item)) {
+            $item = fn_array_filter_recursive($item, $fn, $flag);
+        }
+    }
+    unset($item);
+
+    return array_filter($array, $fn, $flag);
+}
+
+/**
+ * Restore original variable content (unstripped)
+ * Parameters should be the variables names
+ * E.g. fn_trusted_vars('product_data','big_text','etcetc', 'style.custom_css')
+ *
+ * @return void
+ */
 function fn_trusted_vars()
 {
-    $args = func_get_args();
-    if (sizeof($args) > 0) {
-        foreach ($args as $k => $v) {
-            if (isset($_POST[$v])) {
-                $_REQUEST[$v] = (!defined('QUOTES_ENABLED')) ? $_POST[$v] : Bootstrap::stripSlashes($_POST[$v]);
-            } elseif (isset($_GET[$v])) {
-                $_REQUEST[$v] = (!defined('QUOTES_ENABLED')) ? $_GET[$v] : Bootstrap::stripSlashes($_GET[$v]);
+    $var_list = func_get_args();
+
+    if (empty($var_list)) {
+        return;
+    }
+
+    foreach ($var_list as $k => $var) {
+        if (isset($_POST[$var])) {
+            $_REQUEST[$var] = $_POST[$var];
+        } elseif (isset($_GET[$var])) {
+            $_REQUEST[$var] = $_GET[$var];
+        } elseif (strpos($var, '.')) {
+            $keys = explode('.', $var, 2);
+
+            if (isset($_POST[$keys[0]][$keys[1]])) {
+                $_REQUEST[$keys[0]][$keys[1]] = $_POST[$keys[0]][$keys[1]];
+            } elseif (isset($_GET[$keys[0]][$keys[1]])) {
+                $_REQUEST[$keys[0]][$keys[1]] = $_GET[$keys[0]][$keys[1]];
             }
         }
     }
-
-    return true;
 }
 
 // EnCrypt text wrapper function
@@ -1186,7 +1238,7 @@ function fn_get_static_data($params, $lang_code = DESCR_SL)
     $fields = array(
         'sd.param_id',
         'sd.param',
-        '?:static_data_descriptions.descr'
+        '?:static_data_descriptions.descr',
     );
 
     $condition = '';
@@ -1432,7 +1484,7 @@ function fn_validate_email($email, $show_error = false)
         return true;
     } elseif ($show_error) {
         fn_set_notification('E', __('error'), __('text_not_valid_email', array(
-            '[email]' => $email
+            '[email]' => $email,
         )));
     }
 
@@ -1441,20 +1493,20 @@ function fn_validate_email($email, $show_error = false)
 
 /**
  * Gets all available themes: from repo and installed one
+ *
  * @param string $theme_name current theme
- * @return type
+ *
+ * @return array
  */
 function fn_get_available_themes($theme_name)
 {
-    $default_theme = Registry::get('config.base_theme');
-
     $repo_path = fn_get_theme_path('[repo]', 'C');
 
     $installed_path = fn_get_theme_path('[themes]', 'C');
 
     $themes = array(
         'repo' => fn_get_dir_contents($repo_path, true),
-        'installed' => fn_get_dir_contents($installed_path, true)
+        'installed' => fn_get_dir_contents($installed_path, true),
     );
 
     sort($themes['repo']);
@@ -1637,7 +1689,7 @@ function fn_create_description($table_name, $id_name = '', $field_id = '', $data
 
     $data[$id_name] = $field_id;
 
-    foreach (fn_get_translation_languages() as $data['lang_code'] => $v) {
+    foreach (Languages::getAll() as $data['lang_code'] => $v) {
         db_query("REPLACE INTO ?:$table_name ?e", $data);
     }
 
@@ -1668,9 +1720,30 @@ function fn_define($const, $value)
     }
 }
 
-function fn_create_periods($params)
+/**
+ * Gets value if constant defined.
+ *
+ * @param string $const         Constant name
+ * @param mixed  $default_value Default value will be returned if constant not defined
+ *
+ * @return mixed|null Mixed value if constant defined, default value if constant not defined
+ */
+function fn_constant($const, $default_value = null)
 {
-    $period_name = empty($params['period']) ? null : $params['period'];
+    return defined($const) ? constant($const) : $default_value;
+}
+
+/**
+ * Calculates date range depending on the period
+ *
+ * @param  array  $params An array of parameters
+ * @param  string $prefix Prefix for period selector parameters
+ *
+ * @return array Date range
+ */
+function fn_create_periods($params, $prefix = '')
+{
+    $period_name = empty($params[$prefix . 'period']) ? null : $params[$prefix . 'period'];
 
     $available_periods = array(
         DateTimeHelper::PERIOD_TODAY,
@@ -1702,12 +1775,14 @@ function fn_create_periods($params)
         $time_from = $period['from']->getTimestamp();
         $time_to = $period['to']->getTimestamp();
     } else {
-        $time_from = empty($params['time_from']) ? 0 : fn_parse_date($params['time_from']);
-        $time_to = empty($params['time_to']) ? TIME : fn_parse_date($params['time_to'], true);
+        $time_from = empty($params[$prefix . 'time_from']) ? 0 : fn_parse_date($params[$prefix . 'time_from']);
+        $time_to = empty($params[$prefix . 'time_to']) ? TIME : fn_parse_date($params[$prefix . 'time_to'], true);
     }
 
-    Tygh::$app['view']->assign('time_from', $time_from);
-    Tygh::$app['view']->assign('time_to', $time_to);
+    if (Tygh::$app->has('view')) {
+        Tygh::$app['view']->assign($prefix . 'time_from', $time_from);
+        Tygh::$app['view']->assign($prefix . 'time_to', $time_to);
+    }
 
     return array($time_from, $time_to);
 }
@@ -1780,7 +1855,7 @@ function fn_set_session_data($var, $value, $expiry = 0)
     }
 
     Tygh::$app['session']['settings'][$var] = array (
-        'value' => $value
+        'value' => $value,
     );
 
     if (!empty($expiry)) {
@@ -1951,19 +2026,6 @@ function fn_is_inet_ip($ip, $is_int = false)
         ? false : true;
 }
 
-// Workaround for PHP < 5.4
-if (!function_exists('hex2bin')) {
-    /**
-     * Convert hex to binary
-     * @param  string $hex
-     * @return string Returns the binary representation of the given data.
-     */
-    function hex2bin($hex)
-    {
-        return pack("H*", $hex);
-    }
-}
-
 /**
  * Converts given IP address to value that can be stored at MySQL as varbinary(32)
  *
@@ -2029,7 +2091,8 @@ function fn_unicode_to_utf8($str)
 
 /**
  * @deprecated 4.5.1 All user request validation routines were moved to the "recaptcha" add-on.
- *                   This function will only work as intended when that add-on is installed, enabled and configured properly.
+ *                   This function will only work as intended when that add-on is installed, enabled and configured
+ *                   properly.
  */
 function fn_image_verification($scenario, $http_request_data)
 {
@@ -2047,7 +2110,8 @@ function fn_image_verification($scenario, $http_request_data)
 
 /**
  * @deprecated 4.5.1 All user request validation routines were moved to the "recaptcha" add-on.
- *                   This function will only work as intended when that add-on is installed, enabled and configured properly.
+ *                   This function will only work as intended when that add-on is installed, enabled and configured
+ *                   properly.
  */
 function fn_needs_image_verification($scenario)
 {
@@ -2117,7 +2181,7 @@ function fn_compact_value($value, $max_width)
     $escaped = false;
     $length = strlen($value);
 
-    $new_value = $value = fn_html_escape($value, true);
+    $new_value = $value = SecurityHelper::escapeHtml($value, true);
     if (strlen($new_value) != $length) {
         $escaped = true;
     }
@@ -2128,16 +2192,26 @@ function fn_compact_value($value, $max_width)
         $new_value = substr($value, 0, $center_pos - ($len_to_strip / 2)) . '...' . substr($value, $center_pos + ($len_to_strip / 2));
     }
 
-    return ($escaped == true) ? fn_html_escape($new_value) : $new_value;
+    return ($escaped == true) ? SecurityHelper::escapeHtml($new_value) : $new_value;
 }
 
+/**
+ * Truncates the text to defined limit of chars and add the ending.
+ *
+ * @param string $text     String for truncating
+ * @param int    $limit    Limit of the chars
+ * @param string $ellipsis String is added to the ending
+ *
+ * @return string Truncated string
+ */
 function fn_truncate_chars($text, $limit, $ellipsis = '...')
 {
     if (strlen($text) > $limit) {
-        $pos_end = strpos(str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $text), ' ', $limit);
+        $pos_end = strpos(str_replace(["\r", "\n", "\t"], ' ', $text), ' ', $limit);
 
-        if($pos_end !== false)
+        if ($pos_end !== false) {
             $text = trim(substr($text, 0, $pos_end)) . $ellipsis;
+        }
     }
 
     return $text;
@@ -2304,7 +2378,7 @@ function fn_get_schema($schema_dir, $name, $type = 'php', $force_addon_init = fa
  *
  * @return boolean true if access granted, false otherwise
  */
-function fn_check_permissions($controller, $mode, $schema_name, $request_method = '', $request_variables = array(), $area = AREA)
+function fn_check_permissions($controller, $mode, $schema_name, $request_method = '', $request_variables = array(), $area = AREA, $user_id = null)
 {
     $request_method = empty($request_method) ? $_SERVER['REQUEST_METHOD'] : $request_method;
 
@@ -2318,7 +2392,7 @@ function fn_check_permissions($controller, $mode, $schema_name, $request_method 
             }
         }
 
-        return fn_check_admin_permissions($schema, $controller, $mode, $request_method, $request_variables);
+        return fn_check_admin_permissions($schema, $controller, $mode, $request_method, $request_variables, $user_id);
     }
 
     if ($schema_name == 'demo') {
@@ -2341,8 +2415,14 @@ function fn_check_permissions($controller, $mode, $schema_name, $request_method 
         if (!is_array($allow)) {
             return $allow && $area_allow;
         } else {
-            return (!empty($allow[$mode]) ? $allow[$mode] : false) && $area_allow;
+            $default_allow = isset($schema[$controller]['default_allow']) ? $schema[$controller]['default_allow'] : false;
+
+            return (isset($allow[$mode]) ? $allow[$mode] : $default_allow) && $area_allow;
         }
+    }
+
+    if ($schema_name === 'trusted_customer_controllers') {
+        return !empty($schema[$controller][$mode]);
     }
 
     return true;
@@ -2399,6 +2479,10 @@ function fn_check_company_permissions($controller, $mode, $request_method = '', 
         // Check common permissions
         if (!isset($permission) && isset($schema[$controller]['permissions'])) {
             $permission = is_array($schema[$controller]['permissions']) ? $schema[$controller]['permissions'][$request_method] : $schema[$controller]['permissions'];
+
+            if (isset($schema[$controller]['condition'])) {
+                $condition = $schema[$controller]['condition'];
+            }
         }
     }
 
@@ -2417,11 +2501,43 @@ function fn_check_company_permissions($controller, $mode, $request_method = '', 
     return $permission;
 }
 
-function fn_check_admin_permissions(&$schema, $controller, $mode, $request_method = '', $request_variables = array())
-{
+/**
+ * Checks whether an administrator has sufficient permissions to perform a specific action.
+ *
+ * @param array    $schema            Permissions schema
+ * @param string   $controller        Requested dispatch controller
+ * @param string   $mode              Requested dispatch mode
+ * @param string   $request_method    HTTP request method
+ * @param array    $request_variables Request parameters
+ * @param int|null $user_id           User ID to check permissions for.
+ *                                    When set to null, privileges of usergroups currently stored in the session
+ *                                    will be used for check.
+ *                                    When set to a specific user ID, privileges of his/her active usergroups
+ *                                    will be used for check
+ *
+ * @return bool
+ */
+function fn_check_admin_permissions(
+    &$schema,
+    $controller,
+    $mode,
+    $request_method = '',
+    $request_variables = [],
+    $user_id = null
+) {
     static $usergroup_privileges;
+    static $usergroup_ids;
 
-    if (empty(Tygh::$app['session']['auth']['usergroup_ids'])) {
+    $user_id = (int) $user_id;
+    if (!isset($usergroup_ids[$user_id])) {
+        if (!$user_id) {
+            $usergroup_ids[$user_id] = Tygh::$app['session']['auth']['usergroup_ids'];
+        } else {
+            $usergroup_ids[$user_id] = array_keys(fn_get_user_usergroup_links($user_id, ['status' => 'A']));
+        }
+    }
+
+    if (empty($usergroup_ids[$user_id])) {
         $_schema = isset($schema['root']) ? $schema['root'] : array();
     } else {
         $_schema = $schema;
@@ -2430,14 +2546,13 @@ function fn_check_admin_permissions(&$schema, $controller, $mode, $request_metho
     if (isset($_schema[$controller])) {
         // Check if permissions set for certain mode
         if (isset($_schema[$controller]['modes']) && isset($_schema[$controller]['modes'][$mode])) {
-            if (isset($_schema[$controller]['modes'][$mode]['permissions'])) {
+            if (!empty($request_variables) & !empty($_schema[$controller]['modes'][$mode]['param_permissions'])) {
+                $permission = fn_get_request_param_permissions($_schema[$controller]['modes'][$mode]['param_permissions'], $request_variables);
+             } elseif (isset($_schema[$controller]['modes'][$mode]['permissions'])) {
                 $permission = is_array($_schema[$controller]['modes'][$mode]['permissions']) ? $_schema[$controller]['modes'][$mode]['permissions'][$request_method] : $_schema[$controller]['modes'][$mode]['permissions'];
                 if (isset($_schema[$controller]['modes'][$mode]['condition'])) {
                     $condition = $_schema[$controller]['modes'][$mode]['condition'];
                 }
-
-             } elseif (!empty($request_variables) & !empty($_schema[$controller]['modes'][$mode]['param_permissions'])) {
-                $permission = fn_get_request_param_permissions($_schema[$controller]['modes'][$mode]['param_permissions'], $request_variables);
             }
         }
 
@@ -2453,12 +2568,14 @@ function fn_check_admin_permissions(&$schema, $controller, $mode, $request_metho
 
             return true;
         } else {
-            if (empty($usergroup_privileges)) {
-                $usergroup_privileges = db_get_fields("SELECT privilege FROM ?:usergroup_privileges WHERE usergroup_id IN(?n)", Tygh::$app['session']['auth']['usergroup_ids']);
-                $usergroup_privileges = (!empty($usergroup_privileges)) ? array_unique($usergroup_privileges) : array('__EMPTY__');
+            if (!isset($usergroup_privileges[$user_id])) {
+                $usergroup_privileges[$user_id] = db_get_fields('SELECT privilege FROM ?:usergroup_privileges WHERE usergroup_id IN (?n)', $usergroup_ids[$user_id]);
+                $usergroup_privileges[$user_id] = empty($usergroup_privileges[$user_id])
+                    ? ['__EMPTY__']
+                    : array_unique($usergroup_privileges[$user_id]);
             }
 
-            $result = in_array($permission, $usergroup_privileges);
+            $result = in_array($permission, $usergroup_privileges[$user_id]);
 
             if (isset($condition)) {
                 if ($condition['operator'] == 'or') {
@@ -2609,16 +2726,29 @@ function fn_check_change_store_mode_permission()
 }
 
 /**
+ * Checks permission for changing storefront in admin area
+ *
+ * @return bool
+ */
+function fn_check_change_storefront_permission()
+{
+    $auth = Tygh::$app['session']['auth'];
+
+    return isset($auth['user_type']) && $auth['user_type'] === 'A' && empty($auth['company_id']);
+}
+
+/**
  * This function searches placeholders in the text and converts the found data.
  *
  * @param string $text
- * @return changed text
+ *
+ * @return string changed text
  */
 function fn_text_placeholders($text)
 {
     static $placeholders = array(
         'price',
-        'weight'
+        'weight',
     );
 
     $pattern = '/%([,\.\w]+):(' . implode('|', $placeholders) . ')%/U';
@@ -2806,7 +2936,7 @@ function fn_date_format($timestamp, $format = '%b %e, %Y')
         $preload[] = 'month_name_' . $m;
     }
 
-    fn_preload_lang_vars($preload);
+    LanguageHelper::preloadLangVars($preload);
 
     $s['%a'] = __('weekday_abr_'. $w); // abbreviated weekday name
     $s['%A'] = __('weekday_'. $w); // full weekday name
@@ -2886,34 +3016,62 @@ function fn_text_diff($source, $dest, $side_by_side = false)
 }
 
 /**
- * Set store mode
+ * Sets storefront status (opened/closed)
  *
- * @param string $store_mode store operation mode: opened/closed
+ * @param string $store_mode Store operation mode: open/closed
+ * @param int    $company_id Company id
+ *
  * @return boolean always true
  */
 function fn_set_store_mode($store_mode, $company_id = null)
 {
-    if (!fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
+    // FIXME: Backward compatibility
+    $store_mode = $store_mode === 'opened'
+        ? 'open'
+        : $store_mode;
+
+    $is_mve_and_vendor_selected = !fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id');
+    if ($is_mve_and_vendor_selected) {
         return false;
     }
 
-    if ($store_mode == 'opened' || $store_mode == 'closed') {
-        $mode = ($store_mode == 'opened') ? 'N' : 'Y';
-        if (Settings::instance()->getValue('store_mode', 'General', $company_id) != $mode) {
-            Settings::instance()->updateValue('store_mode', $mode, 'General', true, $company_id);
-            fn_set_notification('W', __('information'), __('text_store_mode_' . $store_mode));
+    $result = true;
+    $allowed_modes = [
+        'open',
+        'closed',
+    ];
+
+    if (in_array($store_mode, $allowed_modes)) {
+        $mode = $store_mode == 'open'
+            ? StorefrontStatuses::OPEN
+            : StorefrontStatuses::CLOSED;
+        
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+
+        if ($company_id) {
+            $storefront = $repository->findByCompanyId($company_id);
+        } else {
+            $storefront = $repository->findDefault();
         }
 
+        $storefront->status = $mode;
+        $result = $repository->save($storefront);
+
+        if ($result->isSuccess()) {
+            fn_set_notification('W', __('information'), __('text_store_mode_' . $store_mode));
+        }
     }
 
-    return true;
+    return $result;
 }
 
 /**
  * Create array using $keys for keys and $value for values
  *
  * @param array $keys array keys
- * @param mixed $values if string/boolean, values array will be recreated with this value (e.g. $keys = array(1,2,3), $values = true => $values = array(0=>true,1=>true,2=>true))
+ * @param mixed $values if string/boolean, values array will be recreated with this value (e.g. $keys = array(1,2,3),
+ *                      $values = true => $values = array(0=>true,1=>true,2=>true))
  * @return array combined array
  */
 function fn_array_combine($keys, $values)
@@ -2934,6 +3092,7 @@ function fn_array_combine($keys, $values)
  *
  * @param string $html - html code to generate description from
  * @param int $max_letters - maximum letters in description
+ *
  * @return string - cleaned text
  */
 function fn_generate_meta_description($html, $max_letters = 250)
@@ -2966,6 +3125,7 @@ function fn_generate_meta_description($html, $max_letters = 250)
  * Calculate unsigned crc32 sum
  *
  * @param string $key - key to calculate sum for
+ *
  * @return int - crc32 sum
  */
 function fn_crc32($key)
@@ -2974,9 +3134,10 @@ function fn_crc32($key)
 }
 
 /**
- * Check whether string is UTF-8 encoded
+ * Checks whether string is UTF-8 encoded.
  *
- * @param string $str
+ * @param string $str String to check encoding for
+ *
  * @return boolean
  */
 function fn_is_utf8($str)
@@ -3022,9 +3183,40 @@ function fn_is_utf8($str)
 }
 
 /**
- * Detect the cyrillic encoding of string
+ * Checks whether string is UTF-16BE encoded.
+ *
+ * @param string $str String to check encoding for
+ *
+ * @return boolean
+ */
+function fn_is_utf16be($str)
+{
+    $utf16_big_endian_bom = chr(0xFE) . chr(0xFF);
+    $first = substr($str, 0, 2);
+
+    return $first == $utf16_big_endian_bom;
+}
+
+/**
+ * Checks whether string is UTF-16LE encoded.
+ *
+ * @param string $str String to check encoding for
+ *
+ * @return boolean
+ */
+function fn_is_utf16le($str)
+{
+    $utf16_little_endian_bom = chr(0xFF) . chr(0xFE);
+    $first = substr($str, 0, 2);
+
+    return $first == $utf16_little_endian_bom;
+}
+
+/**
+ * Detect the cyrillic encoding of string.
  *
  * @param string $str
+ *
  * @return string cyrillic encoding
  */
 function fn_detect_cyrillic_charset($str)
@@ -3037,7 +3229,7 @@ function fn_detect_cyrillic_charset($str)
         'CP1251' => 0,
         'CP866' => 0,
         'ISO-8859-5' => 0,
-        'MAC-CYRILLIC' => 0
+        'MAC-CYRILLIC' => 0,
     );
 
     for ($i = 0, $length = strlen($str); $i < $length; $i++) {
@@ -3116,7 +3308,11 @@ function fn_detect_encoding($resource, $resource_type = 'S', $lang_code = CART_L
     }
 
     if (!fn_is_utf8($str)) {
-        if (in_array($lang_code, array('en', 'fr', 'es', 'it', 'nl', 'da', 'fi', 'sv', 'pt', 'nn', 'no'))) {
+        if (fn_is_utf16be($str)) {
+            $enc = 'UTF-16BE';
+        } elseif (fn_is_utf16le($str)) {
+            $enc = 'UTF-16LE';
+        } elseif (in_array($lang_code, array('en', 'fr', 'es', 'it', 'nl', 'da', 'fi', 'sv', 'pt', 'nn', 'no'))) {
             $enc = 'ISO-8859-1';
         } elseif (in_array($lang_code, array('hu', 'cs', 'pl', 'bg', 'ro'))) {
             $enc = 'ISO-8859-2';
@@ -3143,13 +3339,13 @@ function fn_detect_encoding($resource, $resource_type = 'S', $lang_code = CART_L
 /**
  * Convert encoding of string or file
  *
- * @param string $from_enc  the encoding of the initial string/file
- * @param string $to_enc  the encoding of the result string/file
- * @param string $resource string or file path
+ * @param string $from_enc      the encoding of the initial string/file
+ * @param string $to_enc        the encoding of the result string/file
+ * @param string $resource      string or file path
  * @param string $resource_type 'S' (string) or 'F' (file)
+ *
  * @return string  string or file path
  */
-
 function fn_convert_encoding($from_enc, $to_enc, $resource, $resource_type = 'S')
 {
     if (empty($from_enc) || empty($to_enc) || ($resource_type == 'F' && empty($resource))) {
@@ -3267,9 +3463,16 @@ function fn_generate_security_hash()
  * substr() with full UTF-8 support
  *
  * @param string $string The input string.
- * @param integer $start If start  is non-negative, the returned string will start at the start 'th position in string , counting from zero. If start is negative, the returned string will start at the start 'th character from the end of string.
- * @param integer $length  If length  is given and is positive, the string returned will contain at most length  characters beginning from start  (depending on the length of string ). If length is given and is negative, then that many characters will be omitted from the end of string (after the start position has been calculated when a start is negative). If start denotes a position beyond this truncation, an empty string will be returned.
- * @param integer $encoding The encoding parameter is the character encoding. If it is omitted, UTF-8 character encoding value will be used.
+ * @param integer $start If start  is non-negative, the returned string will start at the start 'th position in string
+ *                       , counting from zero. If start is negative, the returned string will start at the start 'th
+ *                       character from the end of string.
+ * @param integer $length  If length  is given and is positive, the string returned will contain at most length
+ *                         characters beginning from start  (depending on the length of string ). If length is given
+ *                         and is negative, then that many characters will be omitted from the end of string (after the
+ *                         start position has been calculated when a start is negative). If start denotes a position
+ *                         beyond this truncation, an empty string will be returned.
+ * @param integer $encoding The encoding parameter is the character encoding. If it is omitted, UTF-8 character
+ *                          encoding value will be used.
  * @return mixed Returns the extracted part of string or false if string is less than or equal to start characters long
  */
 function fn_substr($string, $start, $length = null, $encoding = 'UTF-8')
@@ -3308,7 +3511,8 @@ function fn_substr($string, $start, $length = null, $encoding = 'UTF-8')
  * strlen() with full UTF-8 support
  *
  * @param string $string The string being measured for length.
- * @param string $encoding The encoding parameter is the character encoding. If it is omitted, UTF-8 character encoding value will be used.
+ * @param string $encoding The encoding parameter is the character encoding. If it is omitted, UTF-8 character encoding
+ *                         value will be used.
  * @return integer The length of the string on success, and 0 if the string is empty.
  */
 function fn_strlen($string, $encoding = 'UTF-8')
@@ -3340,7 +3544,19 @@ function fn_strlen($string, $encoding = 'UTF-8')
 function fn_url($url = '', $area = AREA, $protocol = 'current', $lang_code = CART_LANGUAGE)
 {
     static $init_vars = false;
-    static $indexes, $_admin_index, $vendor_index, $customer_index, $locations;
+    static $indexes, $_admin_index, $vendor_index, $customer_index, $locations, $storefront_locations;
+    static $undefined_storefront_id = 0;
+
+    $admin_index_area = null;
+    if ($area === SiteArea::ADMIN_PANEL) {
+        if (strpos($url, 'admin:') === 0) {
+            $admin_index_area = SiteArea::ADMIN_PANEL;
+            $url = str_replace('admin:', '', $url);
+        } elseif (strpos($url, 'vendor:') === 0) {
+            $admin_index_area = SiteArea::VENDOR_PANEL;
+            $url = str_replace('vendor:', '', $url);
+        }
+    }
 
     /**
      * Prepares parameters before building URL
@@ -3354,17 +3570,53 @@ function fn_url($url = '', $area = AREA, $protocol = 'current', $lang_code = CAR
     fn_set_hook('url_pre', $url, $area, $protocol, $lang_code);
 
     if (!$init_vars) {
-        $vendor_index = Registry::get('config.vendor_index');
-        $_admin_index = Registry::get('config.admin_index');
-        $customer_index = Registry::get('config.customer_index');
+        $conf = Registry::get('config');
+        $vendor_index = isset($conf['vendor_index'])
+            ? $conf['vendor_index']
+            : '';
+        $_admin_index = $conf['admin_index'];
+        $customer_index = $conf['customer_index'];
 
-        $locations = array();
-        $locations['A'] = $locations['C'] = array(
-            'http'    => Registry::get('config.http_location'),
-            'https'   => Registry::get('config.https_location'),
-            'current' => Registry::get('config.current_location'),
-            'rel'     => Registry::get('config.current_location'),
-        );
+        $locations = [];
+        $locations['C'] = [
+            'http'    => $conf['http_location'],
+            'https'   => $conf['https_location'],
+            'current' => $conf['current_location'],
+            'rel'     => $conf['current_location'],
+        ];
+        if (AREA !== 'C') {
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+            $default_storefront = $repository->findDefault();
+            $locations['C'] = [
+                'http'    => 'http://' . $default_storefront->url,
+                'https'   => 'https://' . $default_storefront->url,
+                'current' => defined('HTTPS')
+                    ? 'https://' . $default_storefront->url
+                    : 'http://' . $default_storefront->url,
+                'rel'     => defined('HTTPS')
+                    ? 'https://' . $default_storefront->url
+                    : 'http://' . $default_storefront->url,
+            ];
+        }
+        
+        $admin_http_location = empty($conf['origin_http_location'])
+            ? $conf['http_location']
+            : $conf['origin_http_location'];
+        $admin_https_location = empty($conf['origin_https_location'])
+            ? $conf['https_location']
+            : $conf['origin_https_location'];
+
+        $locations['A'] = [
+            'http'    => $admin_http_location,
+            'https'   => $admin_https_location,
+            'current' => defined('HTTPS')
+                ? $admin_https_location
+                : $admin_http_location,
+            'rel'     => defined('HTTPS')
+                ? $admin_https_location
+                : $admin_http_location,
+        ];
 
         /**
          * Allows to modify locations used for the store's area with the specified protocols
@@ -3377,14 +3629,60 @@ function fn_url($url = '', $area = AREA, $protocol = 'current', $lang_code = CAR
          */
         fn_set_hook('url_set_locations', $url, $area, $protocol, $lang_code, $locations);
 
+        $storefront_locations[$undefined_storefront_id] = $locations['C'];
+
         $init_vars = true;
     }
 
-    $admin_index_area = 'A';
-    if ($area == 'A' && ACCOUNT_TYPE != 'customer') {
-        $admin_index_area = '';
-    } elseif ($area != 'A' && $area != 'C') {
-        $admin_index_area = $area;
+    $storefront_id = (int) fn_get_storefront_id_from_uri($url);
+    $company_id_in_url = (int) fn_get_company_id_from_uri($url);
+
+    if ($area === 'C') {
+        /**
+         * Executes when generating a URL to the storefront from the administation panel or from the vendor panel.
+         * Allows you to modify the storefront detection parameters
+         *
+         * @param string $url               URL
+         * @param string $area              URL's area
+         * @param string $protocol          URL's protocol
+         * @param int    $company_id_in_url Company identifier passed in the URL
+         * @param int    $storefront_id     Storefront identifier passed in the URL
+         */
+        fn_set_hook('url_before_get_storefront_location', $url, $area, $protocol, $lang_code, $company_id_in_url, $storefront_id);
+
+        if (!isset($storefront_locations[$storefront_id])) {
+            $storefront = null;
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+            if ($storefront_id) {
+                $storefront = $repository->findById($storefront_id);
+                if ($storefront) {
+                    $storefront_locations[$storefront_id] = [
+                        'http'    => 'http://' . $storefront->url,
+                        'https'   => 'https://' . $storefront->url,
+                        'current' => defined('HTTPS')
+                            ? 'https://' . $storefront->url
+                            : 'http://' . $storefront->url,
+                        'rel'     => defined('HTTPS')
+                            ? 'https://' . $storefront->url
+                            : 'http://' . $storefront->url,
+                    ];
+                } else {
+                    $storefront_id = $undefined_storefront_id;
+                }
+            }
+        }
+
+        $locations['C'] = $storefront_locations[$storefront_id];
+    }
+
+    if ($admin_index_area === null) {
+        $admin_index_area = SiteArea::ADMIN_PANEL;
+        if ($area == SiteArea::ADMIN_PANEL && ACCOUNT_TYPE != 'customer') {
+            $admin_index_area = '';
+        } elseif ($area != SiteArea::ADMIN_PANEL && $area != SiteArea::STOREFRONT) {
+            $admin_index_area = $area;
+        }
     }
 
     if (isset($indexes[$admin_index_area])) {
@@ -3429,7 +3727,6 @@ function fn_url($url = '', $area = AREA, $protocol = 'current', $lang_code = CAR
 
     $index_script = ($area == 'C') ? $customer_index : $admin_index;
 
-    $_url = '';
     if ($no_shorted) {
         // full url passed
         $_url = $url;
@@ -3450,7 +3747,9 @@ function fn_url($url = '', $area = AREA, $protocol = 'current', $lang_code = CAR
         $_url = $locations[$area][$target_protocol] . '/' . $_url;
     }
 
-    $company_id_in_url = fn_get_company_id_from_uri($url);
+    if ($area === 'C') {
+        $_url = fn_query_remove($_url, 'storefront_id');
+    }
 
     /**
      * Prepares parameters before building URL
@@ -3462,7 +3761,7 @@ function fn_url($url = '', $area = AREA, $protocol = 'current', $lang_code = CAR
      * @param string $protocol          Output URL protocol (protocol://). If equals 'rel', no protocol will be included
      * @param int    $company_id_in_url Equals company_id if it is present in $url, otherwise false
      */
-    fn_set_hook('url_post', $_url, $area, $url, $protocol, $company_id_in_url, $lang_code);
+    fn_set_hook('url_post', $_url, $area, $url, $protocol, $company_id_in_url, $lang_code, $locations);
 
     return $_url;
 }
@@ -3487,10 +3786,31 @@ function fn_get_company_id_from_uri($uri)
 }
 
 /**
+ * Returns storefront ID if it is present in $uri, otherwise false.
+ *
+ * @param string $uri URI | URN
+ *
+ * @return int|bool Storefront ID if it is present in $uri, otherwise false
+ */
+function fn_get_storefront_id_from_uri($uri)
+{
+    $storefront_id = false;
+
+    if (preg_match('%(\?|&|&amp;)storefront_id=(\d+)%', $uri, $match)) {
+        if (!empty($match[2])) {
+            $storefront_id = $match[2];
+        }
+    }
+
+    return $storefront_id;
+}
+
+/**
  * Checks can user get access to the some area or not.
  *
- * @param $user_data Array with user data
- * @param $account_type string First char of account type (Customer, Vendor, Admin)
+ * @param array  $user_data    Array with user data
+ * @param string $account_type string First char of account type (Customer, Vendor, Admin)
+ *
  * @return bool True, if user can access area, defined in the const ACCOUNT_TYPE, false otherwise
  */
 function fn_check_user_type_access_rules($user_data, $account_type = ACCOUNT_TYPE)
@@ -3504,9 +3824,9 @@ function fn_check_user_type_access_rules($user_data, $account_type = ACCOUNT_TYP
     /**
      * Hook for changing incoming parameters and access rules.
      *
-     * @param $user_data Array with user data
-     * @param $account_type string First char of account type (Customer, Vendor, Admin)
-     * @param $rules Array with access rules, key is user_type, value is array(list) of available areas
+     * @param array  $user_data    Array with user data
+     * @param string $account_type String First char of account type (Customer, Vendor, Admin)
+     * @param array  $rules        Array with access rules, key is user_type, value is array(list) of available areas
      */
     fn_set_hook('check_user_type_access_rules_pre', $user_data, $account_type, $rules);
 
@@ -3515,10 +3835,10 @@ function fn_check_user_type_access_rules($user_data, $account_type = ACCOUNT_TYP
     /**
      * Hook for changing the result of checking.
      *
-     * @param $user_data Array with user data
-     * @param $account_type string First char of account type (Customer, Vendor, Admin)
-     * @param $rules Array with access rules, key is user_type, value is array(list) of available areas
-     * @param $result bool Result of the check
+     * @param array  $user_data    Array with user data
+     * @param string $account_type String First char of account type (Customer, Vendor, Admin)
+     * @param array  $rules        Array with access rules, key is user_type, value is array(list) of available areas
+     * @param bool   $result       bool Result of the check
      */
     fn_set_hook('check_user_type_access_rules_pre_post', $user_data, $account_type, $rules, $result);
 
@@ -3726,6 +4046,18 @@ function fn_update_status($status, $status_data, $type, $lang_code = DESCR_SL)
         $existing_codes[] = 'T'; // STATUS_PARENT_ORDER
         $codes = array_diff(range('A', 'Z'), $existing_codes);
         $status_data['status'] = reset($codes);
+
+        /**
+         * Allows to change status code for added status
+         *
+         * @param string $status         One-letter status code
+         * @param array  $status_data    Status description and properties
+         * @param string $type           One-letter status type
+         * @param string $lang_code      Two-letter language code
+         * @param array  $existing_codes List of one-letter existing in db status code
+         */
+        fn_set_hook('update_status_new_status_code', $status, $status_data, $type, $lang_code, $existing_codes);
+
     } else {
         $is_default = !empty($status_data['is_default']) && $status_data['is_default'] == 'Y';
         $status_data['status_id'] = !empty($status_data['status_id']) ? $status_data['status_id'] : fn_get_status_id($status_data['status'], $type, $is_default);
@@ -3752,7 +4084,7 @@ function fn_update_status($status, $status_data, $type, $lang_code = DESCR_SL)
                         $email_template,
                         array(
                             'code' => 'order_notification.' . strtolower($status_data['status']),
-                            'area' => $email_templates_area
+                            'area' => $email_templates_area,
                         )
                     );
                 }
@@ -3776,7 +4108,7 @@ function fn_update_status($status, $status_data, $type, $lang_code = DESCR_SL)
     if ($can_continue) {
         if (empty($status)) {
             $status = $status_data['status'];
-            foreach (fn_get_translation_languages() as $status_data['lang_code'] => $_v) {
+            foreach (Languages::getAll() as $status_data['lang_code'] => $_v) {
                 db_query('REPLACE INTO ?:status_descriptions ?e', $status_data);
             }
         } else {
@@ -3789,7 +4121,7 @@ function fn_update_status($status, $status_data, $type, $lang_code = DESCR_SL)
                 $_data = array(
                     'status_id' => $status_data['status_id'],
                     'param' => $param_name,
-                    'value' => $param_value
+                    'value' => $param_value,
                 );
                 db_query("REPLACE INTO ?:status_data ?e", $_data);
             }
@@ -4086,7 +4418,7 @@ function fn_delete_status($status, $type, $is_default = false)
 function fn_array_to_xml($data)
 {
     if (!is_array($data)) {
-        return fn_html_escape($data);
+        return SecurityHelper::escapeHtml($data);
     }
 
     $return = '';
@@ -4095,7 +4427,7 @@ function fn_array_to_xml($data)
         if (is_array($value) && is_numeric(key($value))) {
             foreach ($value as $k => $v) {
                 $arr = array(
-                    $key => $v
+                    $key => $v,
                 );
                 $return .= fn_array_to_xml($arr);
                 unset($value[$k]);
@@ -4134,7 +4466,7 @@ function fn_generate_deprecated_function_notice($old_function, $new_function)
 {
     $message = __('function_deprecated', array(
         '[old_function]' => $old_function,
-        '[new_function]' => $new_function
+        '[new_function]' => $new_function,
     ));
 
     if (Debugger::isActive()) {
@@ -4144,7 +4476,7 @@ function fn_generate_deprecated_function_notice($old_function, $new_function)
     fn_log_event('general', 'deprecated', array(
         'function' => $old_function,
         'message' => $message,
-        'backtrace' => debug_backtrace()
+        'backtrace' => debug_backtrace(),
     ));
 }
 
@@ -4244,48 +4576,71 @@ function fn_array2code_string($object, $indent = 0, $type = '')
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  */
 function fn_update_lang_var($lang_data, $lang_code = DESCR_SL, $params = array())
 {
     return LanguageValues::updateLangVar($lang_data, $lang_code, $params);
 }
 
-function fn_tools_update_status($params)
+/**
+ * Updates object status.
+ *
+ * @param array $params Object search parameters.
+ *                      Must contain the following fields:
+ *                      'table': the table an oject is stored in
+ *                      'id_name': column of the table that contains object ID
+ *                      'id': object ID
+ *                      'status': new object status
+ *                      May also contain:
+ *                      'show_error_notice': whether an error notice should be displayed when status is not updated
+ *
+ * @return bool
+ */
+function fn_tools_update_status(array $params)
 {
-    if (!preg_match("/^[a-z_]+$/", $params['table'])) {
+    if (!preg_match("/^[a-z0-9_]+$/", $params['table'])) {
         return false;
     }
 
-    $old_status = db_get_field("SELECT status FROM ?:$params[table] WHERE ?w", array($params['id_name'] => $params['id']));
+    $old_status = db_get_field(
+        'SELECT status FROM ?:?f WHERE ?w',
+        $params['table'],
+        [$params['id_name'] => $params['id']]
+    );
 
     $permission = true;
     if (Registry::get('runtime.company_id')) {
-        $cols = db_get_fields("SHOW COLUMNS FROM ?:$params[table]");
+        $cols = fn_get_table_fields($params['table']);
         if (in_array('company_id', $cols)) {
+
+            $disable_sharing = false;
+
             if (fn_allowed_for('ULTIMATE')) {
-                $disable_sharing = false;
+                $sharing_scheme = fn_get_schema('sharing', 'schema');
+                $disable_sharing = !empty($sharing_scheme[$params['table']]['skip_checking_status']);
 
-                if (fn_allowed_for('ULTIMATE')) {
-                    $sharing_scheme = fn_get_schema('sharing', 'schema');
-                    $disable_sharing = !empty($sharing_scheme[$params['table']]['skip_checking_status']);
-
-                    if ($disable_sharing) {
-                        Registry::set('runtime.skip_sharing_selection', true);
-                    }
+                if ($disable_sharing) {
+                    Registry::set('runtime.skip_sharing_selection', true);
                 }
             }
 
-            $condition = fn_get_company_condition('?:' . $params['table'] . '.company_id');
-            $permission = db_get_field("SELECT company_id FROM ?:$params[table] WHERE ?w $condition", array($params['id_name'] => $params['id']));
+            $condition = fn_get_company_condition("?:{$params['table']}.company_id");
+            $permission = db_get_field(
+                'SELECT company_id FROM ?:?f WHERE ?w ?p',
+                $params['table'],
+                [
+                    $params['id_name'] => $params['id'],
+                ],
+                $condition
+            );
 
-            if (fn_allowed_for('ULTIMATE')) {
-                if ($disable_sharing) {
-                    Registry::set('runtime.skip_sharing_selection', false);
-                }
+            if (fn_allowed_for('ULTIMATE') && $disable_sharing) {
+                Registry::set('runtime.skip_sharing_selection', false);
             }
         }
     }
+
     if (empty($permission)) {
         fn_set_notification('W',  __('warning'), __('access_denied'));
 
@@ -4296,11 +4651,29 @@ function fn_tools_update_status($params)
         return false;
     }
 
+    $status_data = [
+        'status' => $params['status'],
+    ];
+    $condition = [
+        $params['id_name'] => $params['id'],
+    ];
+
+    /**
+     * Executes when changing an object status right before updating status in the database,
+     * allows you to change the saved data.
+     *
+     * @param array  $params      Object search parameters
+     * @param string $old_status  Old object status
+     * @param array  $status_data Updated object data
+     * @param array  $condition   Update condition
+     */
+    fn_set_hook('tools_update_status_before_query', $params, $old_status, $status_data, $condition);
+
     $result = db_query(
         'UPDATE ?:?f SET ?u WHERE ?w',
         $params['table'],
-        array('status' => $params['status']),
-        array($params['id_name'] => $params['id'])
+        $status_data,
+        $condition
     );
 
     /**
@@ -4316,6 +4689,11 @@ function fn_tools_update_status($params)
     if ($result) {
         fn_set_notification('N', __('notice'), __('status_changed'));
     } else {
+
+        if (isset($params['show_error_notice']) && !$params['show_error_notice']) {
+            return true;
+        }
+
         fn_set_notification('E', __('error'), __('error_status_not_changed'));
         Tygh::$app['ajax']->assign('return_status', $old_status);
     }
@@ -4335,34 +4713,39 @@ function fn_userdir_prefix($path, $fs = true, $current_location = true)
 /**
  * Make a string lowercase
  *
- * @param string $string - the string being lowercased
- * @param string $charset - charset being used
+ * @param string $string  The string being lowercased
+ * @param string $charset Charset being used
+ *
  * @return string
  */
 function fn_strtolower($string, $charset = CHARSET)
 {
     if (function_exists('mb_strtolower')) {
         return mb_strtolower($string, $charset);
-    } else {
-        return strtolower($string);
     }
+
+    return strtolower($string);
 }
 
 /**
- * @deprecated
+ * Make a string uppercase
  *
- * Removes traling slash in a path if it present
+ * @param string $string  The string being uppercase
+ * @param string $charset Charset being used
  *
- * @param string $path
  * @return string
  */
-function fn_remove_trailing_slash($path)
+function fn_strtoupper($string, $charset = CHARSET)
 {
-    return preg_replace('/\/$/', '', $path);
+    if (function_exists('mb_strtoupper')) {
+        return mb_strtoupper($string, $charset);
+    }
+
+    return strtoupper($string);
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Removes languages
  *
@@ -4385,7 +4768,7 @@ function fn_delete_languages($lang_ids, $default_lang = DEFAULT_LANGUAGE)
  */
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * @param string $default_lang
  * @return bool
@@ -4412,7 +4795,7 @@ function fn_get_description_tables()
     }
 
     foreach ($description_tables as $key => $table) {
-        $description_tables[$key] = str_replace(Registry::get('config.table_prefix'), '', $table);
+        $description_tables[$key] = preg_replace('/^' . preg_quote(Registry::get('config.table_prefix')) . '/', '', $table);
     }
 
     /**
@@ -4426,7 +4809,7 @@ function fn_get_description_tables()
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Clones language depended data from one language to other for all tables in cart
  *
@@ -4440,7 +4823,7 @@ function fn_clone_language($to_lang, $from_lang = CART_LANGUAGE)
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Clones language depended data from one language to other for $table
  *
@@ -4452,19 +4835,6 @@ function fn_clone_language($to_lang, $from_lang = CART_LANGUAGE)
 function fn_clone_language_values($table, $to_lang, $from_lang = CART_LANGUAGE)
 {
     return LanguageHelper::cloneLanguageValues($table, $to_lang, $from_lang);
-}
-
-/**
- * @deprecated
- *
- * Cleans storefront URL removing scheme, trailing slash and etc.
- *
- * @param string $url URL for cleaning
- * @return string cleaned URL
- */
-function fn_clean_url($url)
-{
-    return Url::clean($url);
 }
 
 /**
@@ -4519,6 +4889,14 @@ function fn_delete_payment($payment_id)
     db_query("DELETE FROM ?:payment_descriptions WHERE payment_id = ?i", $payment_id);
 
     fn_delete_image_pairs($payment_id, 'payment');
+
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository'];
+    list($storefronts,) = $repository->find(['payment_ids' => $payment_id]);
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    foreach ($storefronts as $storefront) {
+        $repository->save($storefront->removePaymentIds($payment_id));
+    }
 
     $result = $result && $res;
     fn_set_hook('delete_payment_post', $payment_id, $result);
@@ -4585,17 +4963,43 @@ function fn_is_theme_installed($theme_name)
 /**
  * Installs theme
  *
- * @param int $layout_id layout ID to create logo for
- * @param string $theme_name theme name
- * @param int $company_id company ID
- * @return boolean always true
+ * @param string   $theme_name      Theme name
+ * @param int|null $company_id      Company identifier.
+ *                                  This parameter is deprecated and will be removed in v5.0.0.
+ *                                  Use $storefront_id instead.
+ * @param boolean  $install_layouts Whether to install layouts
+ * @param int|null $storefront_id   Storefront ID
+ *
+ * @return int[] Created theme logo IDs
  */
-function fn_install_theme($theme_name, $company_id = null, $install_layouts = true)
+function fn_install_theme($theme_name, $company_id = null, $install_layouts = true, $storefront_id = null)
 {
+    /**
+     * Executes before installing theme, allows you to modify parameters passed to the function.
+     *
+     * @param string   $theme_name      Theme name
+     * @param int|null $company_id      Company identifier.
+     *                                  This parameter is deprecated and will be removed in v5.0.0.
+     *                                  Use $storefront_id instead.
+     * @param boolean  $install_layouts Whether to install layouts
+     * @param int|null $storefront_id   Storefront ID
+     */
+    fn_set_hook('install_theme_pre', $theme_name, $company_id, $install_layouts, $storefront_id);
+
     // Copy files
     fn_install_theme_files($theme_name, $theme_name, true);
 
-    Settings::instance()->updateValue('theme_name', $theme_name, '', true, $company_id);
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository'];
+
+    if (!$storefront_id) {
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        $storefront_id = $storefront->storefront_id;
+    }
+
+    // Save theme in storefronts settings
+    $repository->setTheme($storefront_id, $theme_name);
 
     $logo_ids = array();
 
@@ -4605,7 +5009,7 @@ function fn_install_theme($theme_name, $company_id = null, $install_layouts = tr
         'dir' => 'layouts',
         'get_dirs' => false,
         'get_files' => true,
-        'extension' => '.xml'
+        'extension' => '.xml',
     ), Themes::STR_SINGLE);
 
     // FIXME: Backward compability for layouts
@@ -4621,11 +5025,11 @@ function fn_install_theme($theme_name, $company_id = null, $install_layouts = tr
             $layout_path = fn_get_dev_files($layout_path, true);
 
             if (file_exists($layout_path)) {
-                $layout_id = Exim::instance($company_id, 0, $theme_name)->importFromFile($layout_path, array(
+                $layout_id = Exim::instance($company_id, 0, $theme_name, $storefront_id)->importFromFile($layout_path, [
                     'override_by_dispatch' => true,
-                    'clean_up' => true,
-                    'import_style' => 'create',
-                ));
+                    'clean_up'             => true,
+                    'import_style'         => 'create',
+                ]);
 
                 if (empty($layout_id)) {
                     continue;
@@ -4633,7 +5037,7 @@ function fn_install_theme($theme_name, $company_id = null, $install_layouts = tr
 
                 $created_layouts[] = $layout_id;
 
-                $layout_data = Layout::instance()->get($layout_id);
+                $layout_data = Layout::instance($company_id, [], $storefront_id)->get($layout_id);
 
                 $_o_ids = fn_create_theme_logos_by_layout_id($theme_name, $layout_id, $company_id, false, $layout_data['style_id']);
                 $logo_ids = array_merge($logo_ids, $_o_ids);
@@ -4650,24 +5054,26 @@ function fn_install_theme($theme_name, $company_id = null, $install_layouts = tr
             $layout_id = Layout::instance($company_id)->update(array(
                 'name' => __('main'),
                 'theme_name' => $theme_name,
-                'is_default' => 1
+                'is_default' => 1,
             ));
 
             $created_layouts[] = $layout_id;
 
-            $layout_data = Layout::instance()->get($layout_id);
+            $layout_data = Layout::instance($company_id)->get($layout_id);
 
             $logo_ids = fn_create_theme_logos_by_layout_id($theme_name, $layout_id, $company_id, false, $layout_data['style_id']);
         }
     }
 
     // Import addons layouts for all theme layouts
-    list($addons) = fn_get_addons(array('type' => 'installed'));
-    foreach($addons as $addon_name => $addon) {
-        $addon_layouts_path = fn_get_addon_layouts_path($addon_name, $theme_name);
-        if ($addon_layouts_path) {
-            foreach($created_layouts as $layout_id) {
-                Exim::instance($company_id, $layout_id)->importFromFile($addon_layouts_path);
+    if ($install_layouts) {
+        list($addons) = fn_get_addons(array('type' => 'installed'));
+        foreach($addons as $addon_name => $addon) {
+            $addon_layouts_path = fn_get_addon_layouts_path($addon_name, $theme_name);
+            if ($addon_layouts_path) {
+                foreach($created_layouts as $layout_id) {
+                    Exim::instance($company_id, $layout_id)->importFromFile($addon_layouts_path);
+                }
             }
         }
     }
@@ -4681,9 +5087,13 @@ function fn_install_theme($theme_name, $company_id = null, $install_layouts = tr
 /**
  * Creates logotypes for companies and assign it to the layout
  *
- * @param int $layout_id Layout ID
- * @param int $company_id Company ID
- * @param bool $for_company Get logos only for companies
+ * @param string     $theme_name              Theme name
+ * @param int        $layout_id               Layout ID
+ * @param int        $company_id              Company ID
+ * @param bool       $for_company             Get logos only for companies
+ * @param string     $style_id                Style ID
+ * @param null|array $whitelist_of_logo_types Filter by logo types
+ *
  * @return array created logo IDs
  */
 function fn_create_theme_logos_by_layout_id(
@@ -4694,48 +5104,77 @@ function fn_create_theme_logos_by_layout_id(
     $style_id = '',
     $whitelist_of_logo_types = null
 ) {
-    $repo_dest = fn_get_theme_path('[themes]/' . $theme_name, 'C', $company_id, false);
+    $storefront_id = 0;
 
-    $manifest = Themes::factory($theme_name)->getManifest();
-    $logo_ids = array();
+    if ($layout_id) {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        $storefront = $repository->findByLayoutId($layout_id);
+        $storefront_id = $storefront ? $storefront->storefront_id : 0;
+    }
+
+    $logo_ids = [];
     $logo_types = fn_get_logo_types($for_company);
 
     Registry::set('runtime.allow_upload_external_paths', true);
 
-    foreach ($logo_types as $type => $logo) {
+    if ($for_company) {
+        $logos = fn_get_logos(0, $layout_id ?: null, $style_id ?: null, $storefront_id);
 
+        foreach ($logos as $logo) {
+            if (!isset($logo_types[$logo['type']]) || empty($logo['image'])) {
+                continue;
+            }
+
+            $logo_types[$logo['type']]['image_path'] = $logo['image']['absolute_path'];
+        }
+    }
+
+    foreach ($logo_types as $type => $logo) {
         // Whitelist of logo types was specified, but it doesn't contain current logo type
-        if (is_array($whitelist_of_logo_types)
+        if (
+            is_array($whitelist_of_logo_types)
             && !empty($whitelist_of_logo_types)
             && !in_array($type, $whitelist_of_logo_types)
         ) {
             continue;
         }
 
-        if ($for_company) {
-            $image_path = !empty($manifest['theme']) ? $repo_dest . '/' . $manifest['theme'] : '';
-        } else {
-            $logo['image'] = isset($logo['image']) ? $logo['image'] : '';
+        $logo['image'] = isset($logo['image']) ? $logo['image'] : '';
+
+        if (empty($logo['image_path'])) {
             $image_path = fn_get_logo_image_path($logo['image'], $type, $style_id, $theme_name);
+        } else {
+            $image_path = $logo['image_path'];
         }
 
         if (empty($image_path)) {
             continue;
         }
 
-        $logo_data = array(
-            'type' => $type,
-            'layout_id' => !empty($logo['for_layout']) ? $layout_id : 0,
+        $logo_data = [
+            'type'       => $type,
+            'layout_id'  => empty($logo['for_layout']) ? 0 : $layout_id,
             'image_path' => $image_path,
-            'style_id' => !empty($logo['single_logo']) ? '' : $style_id,
-        );
+            'style_id'   => empty($logo['single_logo']) ? $style_id : '',
+        ];
 
         if (fn_allowed_for('MULTIVENDOR') && !empty($company_id)) {
             // Vendors have only one global logo
             unset($logo_data['style_id'], $logo_data['layout_id']);
         }
 
-        $logo_ids[$type] = fn_update_logo($logo_data, $company_id);
+        /**
+         * FIXME: #STOREFRONTS:
+         * In Multi-Vendor storefront logos are not attached to any vendor, while vendor logos are.
+         * In CS-Cart storefront logos do not exist, and only company logos do.
+         */
+        $company_id_for_logo = $company_id;
+        if (fn_allowed_for('MULTIVENDOR') && !$for_company) {
+            $company_id_for_logo = 0;
+        }
+
+        $logo_ids[$type] = fn_update_logo($logo_data, $company_id_for_logo, $storefront_id);
     }
 
     Registry::set('runtime.allow_upload_external_paths', false);
@@ -4759,7 +5198,7 @@ function fn_install_theme_files($source_theme, $dest_theme, $from_repo = true)
     if (!fn_is_theme_installed($dest_theme)) {
         if (!fn_mkdir($path_dest)) {
             fn_set_notification('E', __('error'), __('text_cannot_create_directory', array(
-                '[directory]' => fn_get_rel_dir($path_dest)
+                '[directory]' => fn_get_rel_dir($path_dest),
             )));
 
             return false;
@@ -4788,7 +5227,7 @@ function fn_install_theme_files($source_theme, $dest_theme, $from_repo = true)
                 $status = $parent->getContentPath('', Themes::CONTENT_DIR, Themes::PATH_REPO);
                 if ($status) {
                     fn_set_progress('echo', __('text_installing_theme_dependencies', array(
-                        '[dependencies]' => $parent->getThemeName()
+                        '[dependencies]' => $parent->getThemeName(),
                     )));
                     $status = fn_install_theme_files($parent->getThemeName(), $parent->getThemeName(), true);
                 }
@@ -4797,7 +5236,7 @@ function fn_install_theme_files($source_theme, $dest_theme, $from_repo = true)
                 fn_rm($path_dest);
 
                 fn_set_notification('E', __('error'), __('text_unable_to_install_theme_dependencies', array(
-                    '[dependencies]' => $parent->getThemeName()
+                    '[dependencies]' => $parent->getThemeName(),
                 )));
 
                 return false;
@@ -4822,39 +5261,55 @@ function fn_install_theme_files($source_theme, $dest_theme, $from_repo = true)
 }
 
 /**
- * Deletes theme
+ * Deletes theme, if it is not active
+ *
  * @param string $theme_name theme name to delete. If empty - deletes all themes
+ *
  * @return boolean true if deleted, false if not
  */
 function fn_delete_theme($theme_name)
 {
     $themes_dest = fn_get_theme_path('[themes]/' . $theme_name, 'C');
-    $can_delete = true;
+    $can_delete = !fn_is_theme_active($theme_name);
 
-    if (fn_allowed_for('ULTIMATE')) {
-        $company_themes = Settings::instance()->getAllVendorsValues('theme_name');
-        if (in_array($theme_name, $company_themes)) {
-            fn_set_notification('E', __('error'), __('error_delete_theme_company'));
-            $can_delete = false;
+    if ($can_delete) {
+        $layouts = db_get_array('SELECT layout_id, is_default FROM ?:bm_layouts WHERE theme_name = ?s', $theme_name);
+        if (fn_rm($themes_dest)) {
+            // Delete layout
+            foreach ($layouts as $layout) {
+                Layout::instance()->delete($layout['layout_id']);
+            }
+
+            return true;
         }
     } else {
-        if ($theme_name == Registry::get('runtime.layout.theme_name')) {
-            $can_delete = false;
-            fn_set_notification('E', __('error'), __('cannot_remove_active_theme'));
-        }
+        $error_text = (fn_allowed_for('ULTIMATE') || fn_allowed_for('MULTIVENDOR:ULTIMATE'))
+            ? __('error_delete_theme_company')
+            : __('cannot_remove_active_theme');
+        fn_set_notification('E', __('error'), $error_text);
+
+        return false;
+    }
+}
+
+/**
+ * Checks if theme is active at least on one of storefronts
+ *
+ * @param string $theme_name Name of the theme for checking
+ *
+ * @return bool State of the theme
+ */
+function fn_is_theme_active($theme_name)
+{
+    /** @var \Tygh\Storefront\Repository $repository */
+    $storefronts_repo = Tygh::$app['storefront.repository'];
+
+    list($storefronts, ) = $storefronts_repo->find(['theme_name' => $theme_name]);
+    if (empty($storefronts)) {
+        return false;
     }
 
-    $layouts = db_get_array('SELECT layout_id, is_default FROM ?:bm_layouts WHERE theme_name = ?s', $theme_name);
-    if ($can_delete && fn_rm($themes_dest)) {
-        // Delete layout
-        foreach ($layouts as $layout) {
-            Layout::instance()->delete($layout['layout_id']);
-        }
-
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 /**
@@ -4907,30 +5362,32 @@ function fn_get_logo_image_path($logo_image, $type, $style_id, $theme_name = '')
     return $logo_filepath;
 }
 
-
 /**
  * Gets all logos
  *
- * @param int $company_id company ID
- * @param int $layout_id layout ID
- * @param string $style_id Style ID
- * @return array logos list
+ * @param int      $company_id    Company ID
+ * @param int      $layout_id     Layout ID
+ * @param string   $style_id      Style ID
+ * @param int|null $storefront_id Storefront ID
+ *
+ * @return array Logos list
  */
-function fn_get_logos($company_id = null, $layout_id = null, $style_id = null)
+function fn_get_logos($company_id = null, $layout_id = null, $style_id = null, $storefront_id = null)
 {
     /**
      * Changes params before selecting logo
      *
-     * @param int    $company_id company ID
-     * @param int    $layout_id  layout ID
-     * @param string $style_id   Style ID
+     * @param int      $company_id    company ID
+     * @param int      $layout_id     layout ID
+     * @param string   $style_id      Style ID
+     * @param int|null $storefront_id Storefront ID
      */
-    fn_set_hook('get_logos_pre', $company_id, $layout_id, $style_id);
+    fn_set_hook('get_logos_pre', $company_id, $layout_id, $style_id, $storefront_id);
 
     $condition = array();
     $company_condition = '';
 
-    if (is_null($company_id)) {
+    if ($company_id === null) {
         if (Registry::get('runtime.company_id')) {
             $company_id = Registry::get('runtime.company_id');
         } elseif (fn_allowed_for('MULTIVENDOR')) {
@@ -4938,23 +5395,41 @@ function fn_get_logos($company_id = null, $layout_id = null, $style_id = null)
         }
     }
 
-    if (!is_null($company_id)) {
+    if ($company_id !== null) {
         $company_condition = db_quote(' AND company_id = ?i', $company_id);
     }
 
-    if ($layout_id === null || $style_id === null) {
+    if ($layout_id === null || $style_id === null || $storefront_id === null) {
         if (!empty($company_id) && fn_allowed_for('ULTIMATE')) {
             $layout_data = Layout::instance($company_id)->getDefault();
         } else {
-            $layout_data = Registry::get('runtime.layout');
+            if (SiteArea::isStorefront(AREA)) {
+                $layout_data = Registry::get('runtime.layout');
+            } else {
+                /** @var \Tygh\Storefront\Repository $storefront_repository */
+                $storefront_repository = Tygh::$app['storefront.repository'];
+                /** @var \Tygh\Storefront\Storefront $storefront */
+                $storefront = $storefront_repository->findDefault();
+                $layout_data = Layout::instance(0, [], $storefront->storefront_id)->getDefault();
+            }
         }
-        $layout_id = ($layout_id !== null) ? $layout_id : $layout_data['layout_id'];
-        $style_id = ($style_id !== null) ? $style_id : $layout_data['style_id'];
+        $layout_id = $layout_id !== null
+            ? $layout_id
+            : $layout_data['layout_id'];
+        $style_id = $style_id !== null
+            ? $style_id
+            : $layout_data['style_id'];
+        $storefront_id = $storefront_id !== null
+            ? $storefront_id
+            : $layout_data['storefront_id'];
     }
 
-    $condition[] = db_quote('IF(layout_id = 0, 1, IF(layout_id = ?i, 1, 0))', $layout_id);
-    if (!empty($style_id)) {
-        $condition[] = db_quote('IF(style_id = \'\', 1, IF(style_id = ?s, 1, 0))', $style_id);
+    $condition[] = db_quote('layout_id IN (?n)', [$layout_id, 0]);
+    if ($style_id) {
+        $condition[] = db_quote('style_id IN (?a)', [$style_id, '']);
+    }
+    if ($storefront_id) {
+        $condition[] = db_quote('storefront_id IN (?n)', [$storefront_id, 0]);
     }
 
     /**
@@ -4968,7 +5443,12 @@ function fn_get_logos($company_id = null, $layout_id = null, $style_id = null)
      */
     fn_set_hook('get_logos', $company_id, $layout_id, $style_id, $condition, $company_condition);
 
-    $logos = db_get_hash_array("SELECT * FROM ?:logos WHERE ?p ?p", 'type', implode(' AND ', $condition), $company_condition);
+    $logos = db_get_hash_array(
+        'SELECT * FROM ?:logos WHERE ?p ?p',
+        'type',
+        implode(' AND ', $condition),
+        $company_condition
+    );
 
     $logo_ids = array();
     foreach ($logos as $l) {
@@ -5001,61 +5481,71 @@ function fn_get_logos($company_id = null, $layout_id = null, $style_id = null)
     return $logos;
 }
 
-
-/**
- * @deprecated
- *
- * Adds logo
- *
- * @param array $logo_data logo data (layout_id, image path, type)
- * @param integer $company_id company ID
- * @return integer ID of created logo
- */
-function fn_create_logo($logo_data, $company_id = null)
-{
-    fn_update_logo($logo_data, $company_id);
-}
-
 /**
  * Adds logo
- * @param array $logo_data logo data (layout_id, image path, type)
- * @param integer $company_id company ID
+ *
+ * @param array $logo_data     Logo data (layout_id, image path, type)
+ * @param int   $company_id    Company ID
+ * @param int   $storefront_id Storefront ID
+ *
  * @return integer ID of created logo
  */
-function fn_update_logo($logo_data, $company_id = null)
+function fn_update_logo($logo_data, $company_id = null, $storefront_id = null)
 {
     $condition = '';
     $logo_data['style_id'] = empty($logo_data['style_id']) ? '' : $logo_data['style_id'];
 
     if (!empty($logo_data['layout_id'])) {
-        $condition .= db_quote(" AND layout_id = ?i", $logo_data['layout_id']);
+        $condition .= db_quote(' AND layout_id = ?i', $logo_data['layout_id']);
+        if (empty($storefront_id)) {
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+            $storefront = $repository->findByLayoutId($logo_data['layout_id']);
+            $storefront_id = $storefront->storefront_id;
+        }
     }
 
-    if (!empty($company_id)) {
-        $condition .= db_quote(" AND company_id = ?i", $company_id);
+    if ($company_id) {
+        $condition .= db_quote(' AND company_id = ?i', $company_id);
+    }
+
+    if ($storefront_id) {
+        $condition .= db_quote(' AND storefront_id = ?i', $storefront_id);
     }
 
     $logo_id = db_get_field("SELECT logo_id FROM ?:logos WHERE type = ?s AND style_id = ?s ?p", $logo_data['type'], $logo_data['style_id'], $condition);
 
+    $storefront_id = (int) $storefront_id;
+
     if (empty($logo_id)) {
-        if (is_null($company_id)) {
+        if ($company_id === null) {
             // We cannot insert new record with null company_id
             return false;
         }
 
-        $logo_id = db_query("INSERT INTO ?:logos ?e", array(
-            'type' => $logo_data['type'],
-            'layout_id' => !empty($logo_data['layout_id']) ? $logo_data['layout_id'] : 0,
-            'style_id' => !empty($logo_data['style_id']) ? $logo_data['style_id'] : '',
-            'company_id' => $company_id
-        ));
+        $logo_id = db_query('INSERT INTO ?:logos ?e', [
+            'type'          => $logo_data['type'],
+            'layout_id'     => !empty($logo_data['layout_id'])
+                ? $logo_data['layout_id']
+                : 0,
+            'style_id'      => !empty($logo_data['style_id'])
+                ? $logo_data['style_id']
+                : '',
+            'company_id'    => $company_id,
+            'storefront_id' => $storefront_id,
+        ]);
     } else {
-        db_query("UPDATE ?:logos SET ?u WHERE logo_id = ?i", array(
-            'type' => $logo_data['type'],
-            'layout_id' => !empty($logo_data['layout_id']) ? $logo_data['layout_id'] : 0,
-            'style_id' => !empty($logo_data['style_id']) ? $logo_data['style_id'] : '',
-            'company_id' => $company_id
-        ), $logo_id);
+        db_query('UPDATE ?:logos SET ?u WHERE logo_id = ?i', [
+            'type'          => $logo_data['type'],
+            'layout_id'     => !empty($logo_data['layout_id'])
+                ? $logo_data['layout_id']
+                : 0,
+            'style_id'      => !empty($logo_data['style_id'])
+                ? $logo_data['style_id']
+                : '',
+            'company_id'    => $company_id,
+            'storefront_id' => $storefront_id,
+        ], $logo_id);
     }
 
     if (!empty($logo_data['image_path'])) {
@@ -5068,8 +5558,8 @@ function fn_update_logo($logo_data, $company_id = null)
             $_REQUEST['logotypes_image_data'] = array(
                 array(
                     'type' => 'M',
-                    'object_id' => $logo_id
-                )
+                    'object_id' => $logo_id,
+                ),
             );
             $_REQUEST['type_logotypes_image_icon'] = array('server');
             $_REQUEST['file_logotypes_image_icon'] = array($logo_data['image_path']);
@@ -5137,7 +5627,7 @@ function fn_get_logo_types($for_company = false)
             'for_layout' => true,
             'text' => 'text_mail_area_logo',
             'image' => 'mail.png',
-        )
+        ),
     );
 
     fn_set_hook('logo_types', $types, $for_company);
@@ -5158,7 +5648,7 @@ function fn_get_area_name($area = AREA)
 /**
  * Add/remove html special chars
  *
- * @deprecated In favour of use Tygh\Tools\SecurityHelper::encodeHtml()
+ * @deprecated will be removed in 5.0.1. In favour of use Tygh\Tools\SecurityHelper::encodeHtml()
  * @since 4.3.1
  *
  * @param mixed $data data to filter
@@ -5219,17 +5709,20 @@ function fn_get_permissions_schema($name)
  */
 function fn_get_customization_modes()
 {
-    $modes = array(
-        'live_editor' => array(
-            'title' => 'live_editor_mode'
-        ),
-        'design' => array(
-            'title' => 'design_mode'
-        ),
-        'theme_editor' => array(
-            'title' => 'theme_editor_mode'
-        ),
-    );
+    $modes = [
+        'live_editor'   => [
+            'title' => 'live_editor_mode',
+        ],
+        'design'        => [
+            'title' => 'design_mode',
+        ],
+        'theme_editor'  => [
+            'title' => 'theme_editor_mode',
+        ],
+        'block_manager' => [
+            'title' => 'block_manager_mode',
+        ],
+    ];
 
     $enabled_modes = explode(',', Registry::get('settings.customization_mode'));
     foreach ($enabled_modes as $e_mode) {
@@ -5268,6 +5761,10 @@ function fn_update_customization_mode($modes)
             unset($enabled_modes[$c_mode]);
         }
     }
+
+    $enabled_modes = array_filter($enabled_modes, function($key) {
+        return (bool) $key;
+    }, ARRAY_FILTER_USE_KEY);
 
     /**
      * Hook is executed before saving enabled customization modes to DB.
@@ -5356,7 +5853,7 @@ function fn_get_phpinfo($type = -1)
  */
 function __($var, $params = array(), $lang_code = CART_LANGUAGE)
 {
-    $var = fn_get_lang_var($var, $lang_code);
+    $var = LanguageValues::getLangVar($var, $lang_code);
 
     if (!empty($params) && is_array($params)) {
 
@@ -5364,7 +5861,7 @@ function __($var, $params = array(), $lang_code = CART_LANGUAGE)
         if (key($params) === 0) { // if first parameter has number key, we need to get plural form
 
             if (Registry::get('runtime.customization_mode.live_editor')) {
-                if (preg_match('/\[(lang) name\=([\w-]+?)( cm\-pre\-ajax)?\](.*?)\[\/\1\]/is', $var, $matches)) {
+                if (preg_match('/\[(lang) name\=([\w-]+?)\](.*?)\[\/\1\]/is', $var, $matches)) {
                     $var = $matches[4];
                 }
             }
@@ -5404,63 +5901,6 @@ function fn_get_edition_acronym($edition)
     );
 
     return !empty($edition_acronyms[$edition]) ? $edition_acronyms[$edition] : false;
-}
-
-/**
- * Parse the URN query part
- *
- * @param string $urn URN (Uniform Resource Name or Query String)
- *
- * @deprecated Use \Tygh\Tools\Url instead
- * @todo remove in 5.0.1
- *
- * @return string parse query
- */
-function fn_parse_urn($urn)
-{
-    $escaped = false;
-    $path = '';
-    if (($i = strpos($urn, '?')) !== false) { // full url with query string
-        $qs = substr($urn, $i + 1);
-        $path = str_replace('?' . $qs, '', $urn);
-    } elseif (strpos($urn, '&') !== false || strpos($urn, '=') !== false) { // just query string
-        $qs = $urn;
-    } else { // no query string
-        $qs = '';
-        $path = $urn;
-    }
-
-    if (strpos($qs, '&amp;') !== false) {
-        $escaped = true;
-        $qs = str_replace('&amp;', '&', $qs);
-    }
-
-    parse_str($qs, $params);
-
-    return array($path, $params, $escaped);
-}
-
-/**
- * Build the URN
- *
- * @param string $path
- * @param string $params
- * @param bool $escaped
- *
- * @deprecated Use \Tygh\Tools\Url instead
- * @todo remove in 5.0.1
- *
- * @return string $urn URN (Uniform Resource Name or Query String)
- */
-function fn_build_urn($path, $params, $escaped)
-{
-    $urn = $path;
-    if (!empty($params)) {
-        $res = http_build_query($params, '', ($escaped ? '&amp;' : '&'));
-        $urn .= (!empty($path)) ? ('?' . $res) : $res;
-    }
-
-    return $urn;
 }
 
 /**
@@ -5562,8 +6002,10 @@ function fn_ceil_to_step($value, $step)
 
 /**
  * Gets plural rules for language (code got from Zend Framework)
- * @param type $number number to get plural for
- * @param type $lang_code language code
+ *
+ * @param int    $number    Number to get plural for
+ * @param string $lang_code Language code
+ *
  * @return int plural form as number
  */
 function fn_get_plural_rule($number, $lang_code)
@@ -5823,7 +6265,20 @@ function fn_merge_styles($files, $styles='', $prepend_prefix = '', $params = arr
 
     $filename = $prefix . '.' . $hash . '.css';
 
-    if (!Storage::instance('assets')->isExist($relative_path . $filename)) {
+    $file_exists = Storage::instance('assets')->isExist($relative_path . $filename);
+
+    if (!$file_exists) {
+        /** @var \Tygh\Lock\Factory $lock_factory */
+        $lock_factory = Tygh::$app['lock.factory'];
+
+        $lock = $lock_factory->createLock($filename);
+
+        if (!$lock->acquire() && $lock->wait()) {
+            $file_exists = Storage::instance('assets')->isExist($relative_path . $filename);
+        }
+    }
+
+    if (!$file_exists) {
         Debugger::checkpoint('Before styles compilation');
         foreach ($files as $src) {
             $m_prefix = '';
@@ -5945,7 +6400,7 @@ function fn_merge_styles($files, $styles='', $prepend_prefix = '', $params = arr
             Storage::instance('assets')->put($relative_path . $filename, array(
                 'contents' => $header . $compiled_content,
                 'compress' => false,
-                'caching' => true
+                'caching' => true,
             ));
 
             if (!empty($params['use_scheme'])) {
@@ -5958,6 +6413,10 @@ function fn_merge_styles($files, $styles='', $prepend_prefix = '', $params = arr
             }
         }
         Debugger::checkpoint('After styles compilation');
+
+        if (isset($lock)) {
+            $lock->release();
+        }
     }
 
     $url = Storage::instance('assets')->getUrl($relative_path . $filename);
@@ -5966,7 +6425,7 @@ function fn_merge_styles($files, $styles='', $prepend_prefix = '', $params = arr
 }
 
 /**
- * @deprecated
+ * @deprecated will be removed in 5.0.1
  *
  * Gets list of all languages defined in store
  * used for adding desciptions and etc.
@@ -5986,17 +6445,9 @@ function fn_get_translation_languages($edit = false)
  */
 function fn_block_manager_get_currencies()
 {
-    if (fn_allowed_for('ULTIMATE:FREE')) {
-        $params = array(
-            'only_primary' => 'Y',
-        );
-    } else {
-        $params = array(
-            'status' => array('A'),
-        );
-    }
-
-    $currencies = fn_get_currencies_list($params, AREA, CART_LANGUAGE);
+    $currencies = array_filter(Registry::get('currencies'), function($currency) {
+        return $currency['status'] === 'A';
+    });
 
     return $currencies;
 }
@@ -6062,7 +6513,7 @@ function fn_get_currencies_list($params = array(), $area = AREA, $lang_code = CA
     }
 
     if (!empty($params['currency_id'])) {
-        $cond .= db_quote(' AND currency_id = ?i', $params['currency_id']);
+        $cond .= db_quote(' AND currency_id IN (?n)', (array) $params['currency_id']);
     }
 
     if (!empty($params['currency_code'])) {
@@ -6243,17 +6694,17 @@ function fn_get_preview_url($uri, $object_data, $user_id)
  */
 function fn_get_default_statuses($status, $add_hidden, $lang_code = CART_LANGUAGE)
 {
-    $statuses = array(
-        'A' => __('active', '', $lang_code),
-        'D' => __('disabled', '', $lang_code),
-    );
+    $statuses = [
+        ObjectStatuses::ACTIVE   => __('active', '', $lang_code),
+        ObjectStatuses::DISABLED => __('disabled', '', $lang_code),
+    ];
 
     if ($add_hidden) {
-        $statuses['H'] = __('hidden', '', $lang_code);
+        $statuses[ObjectStatuses::HIDDEN] = __('hidden', '', $lang_code);
     }
 
-    if ($status == 'N') {
-        $statuses['P'] = __('pending', '', $lang_code);
+    if ($status === ObjectStatuses::NEW_OBJECT) {
+        $statuses[ObjectStatuses::PENDING] = __('pending', '', $lang_code);
     }
 
     return $statuses;
@@ -6269,17 +6720,17 @@ function fn_get_default_statuses($status, $add_hidden, $lang_code = CART_LANGUAG
  */
 function fn_get_default_status_filters($filter, $add_hidden, $lang_code = CART_LANGUAGE)
 {
-    $filters = array (
-        'A' => __('check_active', '', $lang_code),
-        'D' => __('check_disabled', '', $lang_code),
-    );
+    $filters = [
+        ObjectStatuses::ACTIVE   => __('check_active', '', $lang_code),
+        ObjectStatuses::DISABLED => __('check_disabled', '', $lang_code),
+    ];
 
     if ($add_hidden) {
-        $filters['H'] = __('check_hidden', '', $lang_code);
+        $filters[ObjectStatuses::HIDDEN] = __('check_hidden', '', $lang_code);
     }
 
-    if ($filter == 'N') {
-        $filters['P'] = __('check_pending', '', $lang_code);
+    if ($filter === ObjectStatuses::NEW_OBJECT) {
+        $filters[ObjectStatuses::PENDING] = __('check_pending', '', $lang_code);
     }
 
     return $filters;
@@ -6299,7 +6750,7 @@ function fn_get_predefined_statuses($type, $status = '')
             'A' => __('active'),
             'P' => __('pending'),
             'F' => __('available'),
-            'D' => __('declined')
+            'D' => __('declined'),
         ),
         'usergroups' => array(
             'A' => __('active'),
@@ -6323,13 +6774,16 @@ function fn_get_predefined_statuses($type, $status = '')
 
 /**
  * Generates ekey for access to object
- * @param mixed $object_id object ID
- * @param string $type object type
- * @param int $ttl ekey TTL (from the current time)
- * @param string $ekey ekey ID if you generated it yourselves
+ *
+ * @param int|string $object_id object ID
+ * @param string     $type      object type
+ * @param int        $ttl       ekey TTL (from the current time)
+ * @param string     $ekey      ekey ID if you generated it yourselves
+ * @param array      $data      ekey data
+ *
  * @return string ekey ID
  */
-function fn_generate_ekey($object_id, $type, $ttl = 0, $ekey = '')
+function fn_generate_ekey($object_id, $type, $ttl = 0, $ekey = '', array $data = [])
 {
     $key = !empty($ekey) ? $ekey : SecurityHelper::generateRandomString();
 
@@ -6339,32 +6793,35 @@ function fn_generate_ekey($object_id, $type, $ttl = 0, $ekey = '')
         $field_name = 'object_string';
     }
 
-    $_data = array (
+    $_data = [
         'object_type' => $type,
-        'ekey' => $key,
-        'ttl' => time() + $ttl
-    );
+        'ekey'        => $key,
+        'ttl'         => time() + $ttl,
+        'data'        => json_encode($data)
+    ];
 
     $_data[$field_name] = $object_id;
 
-    db_query("REPLACE INTO ?:ekeys ?e", $_data);
+    db_query('REPLACE INTO ?:ekeys ?e', $_data);
 
     return $key;
 }
 
 /**
  * Gets object by ekey
+ *
  * @param string $ekey ekey
  * @param string $type object type
+ *
  * @return mixed object ID
  */
 function fn_get_object_by_ekey($ekey, $type)
 {
-    $key_data = fn_get_ekeys(array(
-        'ekey' => $ekey,
+    $key_data = fn_get_ekeys([
+        'ekey'        => $ekey,
         'object_type' => $type,
-        'ttl' => TIME
-    ));
+        'ttl'         => TIME,
+    ]);
 
     $return = false;
 
@@ -6372,12 +6829,40 @@ function fn_get_object_by_ekey($ekey, $type)
         $key_data = reset($key_data);
 
         // Delete current key
-        db_query("DELETE FROM ?:ekeys WHERE ekey = ?s", $ekey);
+        fn_delete_ekey($ekey, $type);
 
         $return = !empty($key_data['object_string']) ? $key_data['object_string'] : $key_data['object_id'];
     }
 
     return $return;
+}
+
+/**
+ * Deletes ekey by params
+ *
+ * @param string          $ekey
+ * @param string|null     $object_type
+ * @param int|string|null $object_id
+ */
+function fn_delete_ekey($ekey, $object_type = null, $object_id = null)
+{
+    $condition = db_quote('ekey = ?s', $ekey);
+
+    if ($object_id) {
+        if (is_numeric($object_id)) {
+            $field_name = 'object_id';
+        } else {
+            $field_name = 'object_string';
+        }
+
+        $condition .= db_quote(' AND ?f = ?i', $field_name, $object_id);
+    }
+
+    if ($object_type) {
+        $condition .= db_quote(' AND object_type = ?s', $object_type);
+    }
+
+    db_query('DELETE FROM ?:ekeys WHERE ?p', $condition);
 }
 
 /**
@@ -6418,13 +6903,25 @@ function fn_get_ekeys($params = array())
         $condition .= db_quote(' AND ttl > ?s', $params['ttl']);
     }
 
-    return db_get_array('SELECT * FROM ?:ekeys WHERE ?p', $condition);
+    $result = db_get_array('SELECT * FROM ?:ekeys WHERE ?p', $condition);
+
+    foreach ($result as &$item) {
+        if (!empty($item['data'])) {
+            $item['data'] = @json_decode($item['data'], true);
+        }
+
+        $item['data'] = (array) $item['data'];
+    }
+    unset($item);
+
+    return $result;
 }
 
 /**
  * Updates object data in live content editing mode.
  *
- * @param string $params Params to be updated; array with keys name, value, lang_code, and need_render
+ * @param array $params Params to be updated; array with keys name, value, lang_code, and need_render
+ *
  * @return bool
  */
 function fn_live_editor_update_object($params)
@@ -6476,10 +6973,10 @@ function fn_live_editor_update_object($params)
                 /**
                  * Prepares data for the live editor object update request
                  *
-                 * @param array $params    Params
-                 * @param array $rule      Rule
-                 * @param array $condition Conditions
-                 * @param str   $table     Table name
+                 * @param array  $params    Params
+                 * @param array  $rule      Rule
+                 * @param array  $condition Conditions
+                 * @param string $table     Table name
                  */
                 fn_set_hook('live_editor_update_object_table', $params, $rule, $condition, $table);
 
@@ -6853,7 +7350,7 @@ function fn_is_rtl_language($lang_code = CART_LANGUAGE)
         'yi',
         'ar',
         'fa',
-        'ku'
+        'ku',
     );
 
     return in_array($lang_code, $languages);
@@ -6976,7 +7473,7 @@ function fn_core_mailer_send_pre($mailer, $transport, $message, $area, $lang_cod
                 'save' => true,
                 'lang_code' => $lang_code,
                 'template_code' => $params['attach_order_document'],
-                'secondary_currency' => $secondary_currency
+                'secondary_currency' => $secondary_currency,
             ));
 
             $message->addAttachment($invoice_path, fn_basename($invoice_path));
@@ -7194,7 +7691,7 @@ function fn_get_paginated_product_features($request, $auth, $product_data = arra
         'plain' => false,
         'display_on' => '',
         'existent_only' => false,
-        'variants_selected_only' => false
+        'variants_selected_only' => false,
     ));
 
     return fn_get_product_features($_params, PRODUCT_FEATURES_THRESHOLD, $lang_code);
@@ -7273,7 +7770,7 @@ function fn_get_scrolling_parameters($params = array())
     $scroll_params = array (
         'start_limit' => $params['start_limit'],
         'count_limit' => $params['count_limit'],
-        'count_part' => 0
+        'count_part' => 0,
     );
 
     $scroll_params['scroll_id'] = (!empty($params['scroll_id'])) ? $params['scroll_id'] : 0;
@@ -7345,8 +7842,8 @@ function fn_get_console_protocol($area)
         throw new DeveloperException('The console setting was used outside the console mode.');
     }
 
-    if (($area == 'C' && Registry::get('settings.Security.secure_storefront') == 'full')
-        || ($area == 'A' && Registry::get('settings.Security.secure_admin') == 'Y')
+    if (($area == 'C' && Registry::get('settings.Security.secure_storefront') === YesNo::YES)
+        || ($area == 'A' && Registry::get('settings.Security.secure_admin') === YesNo::YES)
     ) {
         return 'https';
     }
@@ -7397,7 +7894,8 @@ function fn_get_stats_tables()
         $database_size += $v['Data_length'] + $v['Index_length'];
         $all_tables[] = $v['Name'];
     }
-    return array($database_size, $all_tables);
+
+    return [$database_size, $all_tables];
 }
 
 /**
@@ -7437,42 +7935,294 @@ function fn_get_console_command($prefix, $script, $args)
     return $cmd;
 }
 
-// FIXME: Workaround for PHP < 5.5
-if (!function_exists('json_last_error_msg')) {
+/**
+ * Returns a filtered list of phone masks in international format.
+ *
+ * @param boolean $encode_to_json Flag responsible for post-encoding the list into JSON
+ *
+ * @return array|string List of phone masks
+ */
+function fn_get_phone_masks($encode_to_json)
+{
+    $countries_list = fn_get_simple_countries(true);
+
+    $phone_masks = array();
+    $phone_masks_file_path = Registry::get('config.dir.root') . '/js/lib/inputmask-multi/phone-codes.json';
+
+    if (file_exists($phone_masks_file_path)) {
+        $phone_masks = json_decode(file_get_contents($phone_masks_file_path), true);
+        $phone_masks = array_filter($phone_masks, function ($mask_data) use ($countries_list) {
+            if (!is_array($mask_data['cc'])) {
+                return isset($countries_list[$mask_data['cc']]);
+            }
+
+            foreach ($mask_data['cc'] as $country_code) {
+                if (isset($countries_list[$country_code])) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    return $encode_to_json ? json_encode(array_values($phone_masks)) : $phone_masks;
+}
+
+/**
+ * @internal
+ * @return string
+ */
+function fn_get_store_mode_notice()
+{
+    // FIXME: Bad style
+    $highlight = isset($_REQUEST['highlight'])
+        ? explode(',', $_REQUEST['highlight'])
+        : [];
+
+    $tpl = <<<HTML
+<div class="control-group %s">
+    <label class="control-label">%s:</label>
+    <div class="controls">
+        <p>
+            <a href="%s">%s</a>
+        </p>
+    </div>
+</div>
+HTML;
+
+    $label = __('close_storefront');
+    $class = in_array('store_mode', $highlight) ? 'row-highlight' : '';
+    $url = fn_get_storefront_status_manage_url();
+    $text = __('close_storefront.setting_notice');
+
+    return sprintf($tpl, $class, $label, $url, $text);
+}
+
+/**
+ * @internal
+ * @return string
+ */
+function fn_get_store_access_key_notice()
+{
+    // FIXME: Bad style
+    $highlight = isset($_REQUEST['highlight'])
+        ? explode(',', $_REQUEST['highlight'])
+        : [];
+
+    $tpl = <<<HTML
+<div class="control-group %s">
+    <label class="control-label">%s:</label>
+    <div class="controls">
+        <p>
+            <a href="%s">%s</a>
+        </p>
+    </div>
+</div>
+HTML;
+
+    $label = __('storefront_access_key');
+    $class = in_array('store_access_key', $highlight) ? 'row-highlight' : '';
+    $url = fn_get_storefront_status_manage_url();
+    $text = __('storefront_access_key.setting_notice');
+
+    return sprintf($tpl, $class, $label, $url, $text);
+}
+
+/**
+ * @param \Tygh\Storefront\Repository $repository
+ * @param int                         $company_id
+ *
+ * @internal
+ * @return string
+ */
+function fn_get_storefront_status_manage_url($repository = null, $company_id = null)
+{
+    if (fn_allowed_for('ULTIMATE')) {
+        $url = Url::buildUrn(['companies', 'manage']);
+        if ($company_id === null) {
+            $company_id = (int) Registry::get('runtime.company_id');
+        }
+        $companies = fn_get_all_companies_ids();
+        if (!$company_id && count($companies) === 1) {
+            $company_id = reset($companies);
+        }
+        if ($company_id) {
+            $url = Url::buildUrn(['companies', 'update'], ['company_id' => $company_id]);
+        }
+    } else {
+        if ($repository === null) {
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+        }
+        $url = Url::buildUrn(['storefronts', 'manage']);
+        $storefront = null;
+        if ($repository->getCount() === 1) {
+            /** @var \Tygh\Storefront\Storefront[] $storefronts */
+            list($storefronts,) = $repository->find();
+            $storefront = reset($storefronts);
+        }
+        if ($storefront) {
+            $url = Url::buildUrn(['storefronts', 'update'], ['storefront_id' => $storefront->storefront_id]);
+        }
+    }
+
+    return fn_url($url);
+}
+
+/**
+ * Gets product statuses to display in the status picker on the product management pages.
+ *
+ * @param string $status     Current product status
+ * @param bool   $add_hidden Whether to add the Hidden status
+ * @param string $lang_code  Two-letter language code
+ *
+ * @return string[]
+ */
+function fn_get_product_statuses($status, $add_hidden = false, $lang_code = CART_LANGUAGE)
+{
+    $statuses = fn_get_default_statuses($status, $add_hidden, $lang_code);
 
     /**
-     * Returns the error string of the last json_encode() or json_decode() call
+     * Executes after product statuses list is obtained, allows you to add or remove product statuses from it
      *
-     * @return string the error message on success or <b>NULL</b> with wrong parameters.
+     * @param string   $status     Current product status
+     * @param bool     $add_hidden Whether to add the Hidden status
+     * @param string   $lang_code  Two-letter language code
+     * @param string[] $statuses   Product statuses
      */
-    function json_last_error_msg()
-    {
-        // phpcs:disable
-        static $errors = array(
-            JSON_ERROR_NONE           => 'No error',
-            JSON_ERROR_DEPTH          => 'The maximum stack depth has been exceeded',
-            JSON_ERROR_STATE_MISMATCH => 'Invalid or malformed JSON',
-            JSON_ERROR_CTRL_CHAR      => 'Control character error, possibly incorrectly encoded',
-            JSON_ERROR_SYNTAX         => 'Syntax error',
-            JSON_ERROR_UTF8           => 'Malformed UTF-8 characters, possibly incorrectly encoded',
-        );
+    fn_set_hook('get_product_statuses_post', $status, $add_hidden, $lang_code, $statuses);
 
-        if (PHP_VERSION_ID >= 505000) {
-            $errors[JSON_ERROR_RECURSION] = 'One or more recursive references in the value to be encoded';
-            $errors[JSON_ERROR_INF_OR_NAN] = 'One or more NAN or INF values in the value to be encoded';
-            $errors[JSON_ERROR_UNSUPPORTED_TYPE] = 'A value of a type that cannot be encoded was given';
-        }
+    return $statuses;
+}
 
-        if (PHP_VERSION_ID >= 700000) {
-            $errors[JSON_ERROR_INVALID_PROPERTY_NAME] = 'A property name that cannot be encoded was given';
-            $errors[JSON_ERROR_UTF16] = 'Malformed UTF-16 characters, possibly incorrectly encoded';
-        }
+/**
+ * Gets product statuses to display in the status picker on the product search form.
+ *
+ * @param string $lang_code Two-letter language code
+ *
+ * @return string[]
+ */
+function fn_get_all_product_statuses($lang_code = CART_LANGUAGE)
+{
+    $statuses = fn_get_default_statuses('', true, $lang_code);
 
-        $error_code = json_last_error();
+    /**
+     * Executes after product statuses list is obtained, allows you to add or remove product statuses from it
+     *
+     * @param string   $lang_code Two-letter language code
+     * @param string[] $statuses  Product statuses
+     */
+    fn_set_hook('get_all_product_statuses_post', $lang_code, $statuses);
 
-        return isset($errors[$error_code])
-            ? $errors[$error_code]
-            : null;
-        // phpcs:enable
+    return $statuses;
+}
+
+/**
+ * Gets all rules about notifications
+ *
+ * @return array Rules for notifications about all events to all receivers by all transports
+ */
+function fn_get_notification_settings()
+{
+    $table = db_get_array('SELECT * FROM ?:notification_settings');
+    $result = [];
+    foreach ($table as $events) {
+        $result[$events['event_id']][$events['receiver']][$events['transport_id']] = ($events['is_allowed'] !== '0');
     }
+
+    return $result;
+}
+
+/**
+ * Set a rule that allow/disallow send notification by specified transport to specified receiver about specified event
+ *
+ * @param string $event_id     Specified identifier of event
+ * @param string $transport_id Specified identifier of transport for sending notifications
+ * @param string $receiver     Specified receiver of notifications
+ * @param int    $allowed      Represent allowing (1) or disallowing (0) of sending notification
+ */
+function fn_set_notification_settings($event_id, $transport_id, $receiver, $allowed = 1)
+{
+    if (empty($event_id) || empty($transport_id) || empty($receiver)) {
+        return;
+    }
+    $data = [
+        'is_allowed'   => $allowed,
+        'event_id'     => $event_id,
+        'transport_id' => $transport_id,
+        'receiver'     => $receiver,
+    ];
+    db_query('REPLACE INTO ?:notification_settings ?e', $data);
+}
+
+/**
+ * Checks if a user is an administrator.
+ *
+ * @return bool Returns true if area is "A" and ACCOUNT_TYPE is "admin" or false otherwise.
+ */
+function fn_is_admin_account_type()
+{
+    return AREA === 'A' && ACCOUNT_TYPE === 'admin';
+}
+
+/**
+ * Saves synchronization settings
+ *
+ * @param string $provider_id Provider identifier
+ * @param int    $company_id  Company identifier
+ * @param array  $data        Data to save
+ */
+function fn_save_sync_data_settings($provider_id, $company_id, array $data)
+{
+    $data = [
+        'provider_id'   => $provider_id,
+        'settings_data' => json_encode($data),
+        'company_id'    => $company_id
+    ];
+
+    db_replace_into('sync_data_settings', $data);
+}
+
+/**
+ * Gets sync data settings by provider and company identifiers
+ *
+ * @param string $provider_id Provider identifier
+ * @param int    $company_id  Company identifier
+ *
+ * @return array
+ */
+function fn_get_sync_data_settings($provider_id, $company_id)
+{
+    $provider_settings = [];
+
+    $settings = db_get_row('SELECT * FROM ?:sync_data_settings WHERE provider_id = ?s AND company_id = ?i', $provider_id, $company_id);
+
+    if (isset($settings['settings_data'])) {
+        $provider_settings = json_decode($settings['settings_data'], true);
+    }
+
+    return $provider_settings;
+}
+
+/**
+ * Checks the permissions to sync data page
+ *
+ * @return bool
+ */
+function fn_check_permission_sync_data()
+{
+    $schema = fn_get_schema('sync_data', 'sync_data');
+
+    if (empty($schema)) {
+        return false;
+    }
+
+    foreach (array_keys($schema) as $provider_id) {
+        if (!fn_check_permissions('sync_data', 'update', 'admin', 'GET', ['sync_provider_id' => $provider_id])) {
+            return false;
+        }
+    }
+
+    return true;
 }

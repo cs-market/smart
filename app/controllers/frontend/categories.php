@@ -31,6 +31,17 @@ if ($mode == 'catalog') {
 
 } elseif ($mode == 'view') {
 
+    $_REQUEST['category_id'] = empty($_REQUEST['category_id']) ? 0 : $_REQUEST['category_id'];
+
+    if (!empty($_REQUEST['category_id']) && empty($auth['user_id'])) {
+
+        $uids = explode(',', db_get_field('SELECT usergroup_ids FROM ?:categories WHERE category_id = ?i', $_REQUEST['category_id']));
+
+        if (!in_array(USERGROUP_ALL, $uids) && !in_array(USERGROUP_GUEST, $uids)) {
+            return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+        }
+    }
+
     $_statuses = array('A', 'H');
     $_condition = fn_get_localizations_condition('localization', true);
     $preview = fn_is_preview_action($auth, $_REQUEST);

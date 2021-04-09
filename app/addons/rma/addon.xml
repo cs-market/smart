@@ -125,7 +125,7 @@
         <item type="file" lang="ro" table="status_descriptions">database/status_descriptions/lang_ro.sql</item>
         <item type="file" lang="sl" table="status_descriptions">database/status_descriptions/lang_sl.sql</item>
 
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO  ?:privileges (privilege, is_default, section_id) VALUES ('manage_rma', 'Y', 'addons');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO  ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_rma', 'Y', 'orders', 'rma', 'N');</item>
         <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">DELETE FROM ?:privileges WHERE privilege LIKE 'manage_rma'</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:rma_property_descriptions;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:rma_properties;</item>

@@ -52,7 +52,13 @@ $schema = array(
         'tree' => true,
         'path_function' => function ($object_id, $company_id = 0) {
             $path = db_get_hash_single_array(
-                "SELECT c.id_path, p.link_type FROM ?:categories as c LEFT JOIN ?:products_categories as p ON p.category_id = c.category_id WHERE p.product_id = ?i ?p",
+                'SELECT c.id_path, p.link_type'
+                . ' FROM ?:categories as c'
+                . ' LEFT JOIN ?:products_categories as p'
+                    . ' ON p.category_id = c.category_id'
+                . ' WHERE p.product_id = ?i'
+                    . ' ?p'
+                . ' ORDER BY p.category_position DESC, p.category_id DESC',
                 array('link_type', 'id_path'),
                 $object_id,
                 fn_get_seo_company_condition('c.company_id', '', $company_id)

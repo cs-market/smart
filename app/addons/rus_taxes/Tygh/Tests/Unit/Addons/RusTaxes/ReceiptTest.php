@@ -18,14 +18,16 @@ class ReceiptTest extends PHPUnit_Framework_TestCase
     /**
      * @param $items
      * @param $total_discount
+     * @param $item_types
+     * @param $priority_item_type
      * @param $expected
      *
      * @dataProvider dpSetTotalDiscount
      */
-    public function testSetTotalDiscount($items, $total_discount, $item_types, $expected)
+    public function testSetTotalDiscount($items, $total_discount, $item_types, $priority_item_type, $expected)
     {
         $receipt = new Receipt('email@example.com', '+79021111111', $items);
-        $receipt->setTotalDiscount($total_discount, $item_types);
+        $receipt->setTotalDiscount($total_discount, $item_types, $priority_item_type);
 
         $this->assertEquals($expected, $receipt->toArray());
     }
@@ -39,7 +41,7 @@ class ReceiptTest extends PHPUnit_Framework_TestCase
                     new Item(2, Item::TYPE_PRODUCT, 'Product 2', 'PRODUCT2', 200, 2, TaxType::VAT_18, 0),
                     new Item(3, Item::TYPE_SHIPPING, 'Shipping', 'SHIPPING', 300, 1, TaxType::NONE, 0),
                 ),
-                150.33, array(),
+                150.33, [], '',
                 array(
                     'email' => 'email@example.com',
                     'phone' => '+79021111111',
@@ -95,7 +97,7 @@ class ReceiptTest extends PHPUnit_Framework_TestCase
                     new Item(2, Item::TYPE_PRODUCT, 'Product 2', 'PRODUCT2', 200, 2, TaxType::VAT_18, 0),
                     new Item(3, Item::TYPE_SHIPPING, 'Shipping', 'SHIPPING', 300, 1, TaxType::NONE, 0),
                 ),
-                150.33, array(Item::TYPE_PRODUCT),
+                150.33, [Item::TYPE_PRODUCT], '',
                 array(
                     'email' => 'email@example.com',
                     'phone' => '+79021111111',
@@ -141,7 +143,69 @@ class ReceiptTest extends PHPUnit_Framework_TestCase
                         ),
                     )
                 )
-            )
+            ),
+            array(
+                array(
+                    new Item(1, Item::TYPE_PRODUCT, 'Product 1', 'PRODUCT1', 100, 1, TaxType::VAT_18, 1.8),
+                    new Item(2, Item::TYPE_PRODUCT, 'Product 2', 'PRODUCT2', 200, 2, TaxType::VAT_18, 0),
+                    new Item(3, Item::TYPE_SHIPPING, 'Shipping', 'SHIPPING', 300, 1, TaxType::NONE, 0),
+                    new Item(3, Item::TYPE_SURCHARGE, 'Payment surcharge', 'SURCHARGE', 54, 1, TaxType::NONE, 0),
+                ),
+                45.68, [], Item::TYPE_SURCHARGE,
+                array(
+                    'email' => 'email@example.com',
+                    'phone' => '+79021111111',
+                    'items' => array(
+                        array(
+                            'id' => 1,
+                            'type' => Item::TYPE_PRODUCT,
+                            'name' => 'Product 1',
+                            'code' => 'PRODUCT1',
+                            'price' => 100,
+                            'quantity' => 1,
+                            'tax_sum' => 1.8,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 0.0
+                        ),
+                        array(
+                            'id' => 2,
+                            'type' => Item::TYPE_PRODUCT,
+                            'name' => 'Product 2',
+                            'code' => 'PRODUCT2',
+                            'price' => 200,
+                            'quantity' => 2,
+                            'tax_sum' => 0,
+                            'tax_type' => TaxType::VAT_18,
+                            'total_discount' => 0.0
+                        ),
+                        array(
+                            'id' => 3,
+                            'type' => Item::TYPE_SHIPPING,
+                            'name' => 'Shipping',
+                            'code' => 'SHIPPING',
+                            'price' => 300,
+                            'quantity' => 1,
+                            'tax_sum' => 0,
+                            'tax_type' => TaxType::NONE,
+                            'total_discount' => 0.0
+                        ),
+                        array(
+                            /**
+                             * total_discount = 45.68
+                             */
+                            'id' => 3,
+                            'type' => Item::TYPE_SURCHARGE,
+                            'name' => 'Payment surcharge',
+                            'code' => 'SURCHARGE',
+                            'price' => 54,
+                            'quantity' => 1,
+                            'tax_sum' => 0,
+                            'tax_type' => TaxType::NONE,
+                            'total_discount' => 45.68
+                        ),
+                    )
+                )
+            ),
         );
     }
 

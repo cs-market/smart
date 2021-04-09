@@ -1,5 +1,4 @@
 {script src="js/lib/bootstrap_switch/js/bootstrapSwitch.js"}
-{style src="lib/bootstrap_switch/stylesheets/bootstrapSwitch.css"}
 
 {include file="common/previewer.tpl"}
 
@@ -20,7 +19,7 @@
             <input type="hidden" name="theme_name" value="{$smarty.get.theme_name}">
             <input type="hidden" name="style" value="{$smarty.get.style}">
             <div class="table-wrapper">
-                <table class="table table-condensed">
+                <table class="table table-condensed table--relative">
                     <thead>
                         <tr>
                             <th width="1">{include file="common/check_items.tpl"}</th>
@@ -124,7 +123,7 @@
     {hook name="themes:current_theme_options"}
     <span class="muted">{__("theme_styles_and_layouts")}</span>
         <div class="table-wrapper">
-            <table class="table table-middle">
+            <table class="table table-middle table--relative">
                 <thead>
                     <tr>
                         <th>{__("layout")}</th>
@@ -149,18 +148,42 @@
                                     <span class="muted">{__("theme_no_styles_text")}</span>
                                 {/if}
                             </td>
-                            <td class="right btn-toolbar">
+                            <td class="right btn-toolbar btn-toolbar--theme-editor">
                                 {if $available_layout.is_default}
                                     {$but_meta = "btn-small btn-primary cm-post"}
                                 {else}
                                     {$but_meta = "btn-small cm-post"}
                                 {/if}
                                 {if $has_styles}
-                                    {include file="buttons/button.tpl" but_href="customization.update_mode?type=theme_editor&status=enable&s_layout=`$available_layout.layout_id`" but_text=__("theme_editor") but_role="action" but_meta=$but_meta but_target="_blank"}
+                                    {include file="buttons/button.tpl"
+                                        but_href="customization.update_mode?type=theme_editor&status=enable&s_layout={$available_layout.layout_id}&s_storefront={$storefront->storefront_id}"
+                                        but_text=__("theme_editor")
+                                        but_role="action"
+                                        but_meta=$but_meta
+                                        but_target="_blank"
+                                    }
                                 {else}
-                                    {include file="buttons/button.tpl" title=__("theme_editor_not_supported") but_text=__("theme_editor") but_role="btn" but_meta="btn btn-small disabled cm-tooltip"}
+                                    {include file="buttons/button.tpl"
+                                        title=__("theme_editor_not_supported")
+                                        but_text=__("theme_editor")
+                                        but_role="btn"
+                                        but_meta="btn btn-small disabled cm-tooltip"
+                                    }
                                 {/if}
-                                {include file="buttons/button.tpl" but_href="customization.update_mode?type=live_editor&status=enable&s_layout=`$available_layout.layout_id`" but_text=__("edit_content_on_site") but_role="action" but_meta=$but_meta but_target="_blank"}
+                                {include file="buttons/button.tpl"
+                                    but_href="customization.update_mode?type=block_manager&status=enable&s_layout={$available_layout.layout_id}&s_storefront={$storefront->storefront_id}"
+                                    but_text=__("edit_layout_on_site")
+                                    but_role="action"
+                                    but_meta=$but_meta
+                                    but_target="_blank"
+                                }
+                                {include file="buttons/button.tpl"
+                                    but_href="customization.update_mode?type=live_editor&status=enable&s_layout={$available_layout.layout_id}&s_storefront={$storefront->storefront_id}"
+                                    but_text=__("edit_content_on_site")
+                                    but_role="action"
+                                    but_meta=$but_meta
+                                    but_target="_blank"
+                                }
                             </td>
                         <tr>
                     {/foreach}
@@ -382,8 +405,8 @@
                 <div class="controls right">{$theme.title}</div>
             </div>
             <div class="control-group">
-                <div class="control-label muted" title="/{$settings.theme_name}">{__("directory")}</div>
-                <div class="controls right"><a class="pull-right" href="{"templates.manage?selected_path=`$settings.theme_name`"|fn_url}">/{$settings.theme_name}</a></div>
+                <div class="control-label muted" title="/{$storefront->theme_name}">{__("directory")}</div>
+                <div class="controls right"><a class="pull-right" href="{"templates.manage?selected_path={$storefront->theme_name}"|fn_url}">/{$storefront->theme_name}</a></div>
             </div>
             <div class="control-group">
                 <div class="control-label muted">{__("layouts")}</div>
@@ -430,4 +453,12 @@
 {/capture}
 
 {/capture}
-{include file="common/mainbox.tpl" title={__("themes")} content=$smarty.capture.mainbox sidebar=$smarty.capture.sidebar adv_buttons=$smarty.capture.adv_buttons buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=__("themes")
+    content=$smarty.capture.mainbox
+    sidebar=$smarty.capture.sidebar
+    adv_buttons=$smarty.capture.adv_buttons
+    buttons=$smarty.capture.buttons
+    select_storefront=true
+    show_all_storefront=false
+}

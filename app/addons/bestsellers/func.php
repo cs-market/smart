@@ -13,8 +13,10 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Enum\UserTypes;
 use Tygh\Enum\ProductTracking;
-use Tygh\Settings;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -172,32 +174,45 @@ function fn_bestsellers_get_products(&$params, &$fields, &$sortings, &$condition
             $auth = Tygh::$app['session']['auth'];
             $ult_prices_table_alias = 'bs_shared_prices';
 
-            $fields['bs_sales_discount'] = db_quote('100 - ((?p * 100) / list_price) AS sales_discount', fn_ult_build_sql_product_price_field($ult_prices_table_alias));
+            $fields['bs_sales_discount'] = db_quote('100 - ((?p * 100) / products.list_price) AS sales_discount', fn_ult_build_sql_product_price_field($ult_prices_table_alias));
 
             $price_usergroup_cond = db_quote(
-                " AND {$ult_prices_table_alias}.usergroup_id IN (?n)",
+                ' AND ?p.usergroup_id IN (?n)',
+                $ult_prices_table_alias,
                 ($params['area'] == 'A')
                     ? USERGROUP_ALL
-                    : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])
+                    : array_merge([USERGROUP_ALL], $auth['usergroup_ids'])
             );
-            $join .= db_quote(" LEFT JOIN ?:ult_product_prices as {$ult_prices_table_alias} ON {$ult_prices_table_alias}.product_id = products.product_id AND {$ult_prices_table_alias}.lower_limit = 1 ?p AND {$ult_prices_table_alias}.company_id = ?i", $price_usergroup_cond, Registry::get('runtime.company_id'));
+            $join .= db_quote(
+                ' LEFT JOIN ?:ult_product_prices as ?p'
+                . ' ON ?p.product_id = products.product_id'
+                    . ' AND ?p.lower_limit = 1 ?p'
+                    . ' AND ?p.company_id = ?i',
+                $ult_prices_table_alias,
+                $ult_prices_table_alias,
+                $ult_prices_table_alias,
+                $price_usergroup_cond,
+                $ult_prices_table_alias,
+                Registry::get('runtime.company_id')
+            );
         } else {
-            $fields[] = '100 - ((prices.price * 100) / list_price) AS sales_discount';
+            $fields[] = 'MAX(100 - ((prices.price * 100) / products.list_price)) AS sales_discount';
         }
     }
 
     // in stock conditions are applied if out of stock products are not cut-off in ::fn_get_products
     if (
         !empty($params['similar_in_stock'])
-        && $params['similar_in_stock'] == 'Y'
+        && $params['similar_in_stock'] == YesNo::YES
         && !(
-            Registry::get('settings.General.inventory_tracking') == 'Y'
-            && Registry::get('settings.General.show_out_of_stock_products') == 'N'
+            Registry::get('settings.General.inventory_tracking') == YesNo::YES
+            && Registry::get('settings.General.show_out_of_stock_products') == YesNo::NO
         )
     ) {
         $condition .= db_quote(
-            " AND (IF(products.tracking = ?s, inventory_b.amount >= 1, products.amount >= 1) OR (products.tracking = 'D'))",
-            ProductTracking::TRACK_WITH_OPTIONS
+            ' AND (IF(products.tracking = ?s, inventory_b.amount >= 1, products.amount >= 1) OR (products.tracking = ?s))',
+            ProductTracking::TRACK_WITH_OPTIONS,
+            ObjectStatuses::DISABLED
         );
 
         $join .= " LEFT JOIN ?:product_options_inventory as inventory_b ON inventory_b.product_id = products.product_id AND inventory_b.amount >= 1";
@@ -254,4 +269,65 @@ function fn_bestsellers_delete_category_after(&$category_id)
     db_query("DELETE FROM ?:product_sales WHERE category_id = ?i", $category_id);
 
     return true;
+}
+
+/**
+ * Check if user has rights to edit sales amount value
+ *
+ * @param null|array $auth User authorization data
+ *
+ * @return bool
+ */
+function fn_bestsellers_is_eligible_to_edit_sales_amount($auth = null)
+{
+    if (fn_allowed_for('ULTIMATE')) {
+        return true;
+    }
+
+    $auth = $auth ?: Tygh::$app['session']['auth'];
+    $can_edit = true;
+    if ($auth['user_type'] == UserTypes::VENDOR) {
+        $can_edit = false;
+    }
+
+    return $can_edit;
+}
+
+/**
+ * Hook handler: removes sales_amount value if current user has no rights to modify it
+ */
+function fn_bestsellers_update_product_pre(&$product_data, $product_id, $lang_code, $can_update)
+{
+    if (fn_bestsellers_is_eligible_to_edit_sales_amount()) {
+        return;
+    }
+
+    unset($product_data['sales_amount']);
+}
+
+/**
+ * The "load_products_extra_data" hook handler.
+ *
+ * Actions performed:
+ *  - Loads sales_amount products value.
+ *
+ * @see fn_load_products_extra_data
+ */
+function fn_bestsellers_load_products_extra_data(&$extra_fields, $products, $product_ids, $params, $lang_code)
+{
+    if (in_array('sales_amount', $params['extend'])) {
+        $extra_fields['?:product_sales'] = [
+            'primary_key' => 'product_id',
+            'fields' => [
+                'sales_amount' => 'amount'
+            ],
+            'join'        => db_quote(
+                ' LEFT JOIN ?:products_categories ON ?:products_categories.product_id = ?:product_sales.product_id AND ?:products_categories.category_id = ?:product_sales.category_id'
+            ),
+            'condition'   => db_quote(
+                ' AND ?:products_categories.link_type = ?s',
+                'M'
+            )
+        ];
+    }
 }

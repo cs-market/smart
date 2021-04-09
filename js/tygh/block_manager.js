@@ -41,20 +41,44 @@ function BlockManager_Class()
         return {type: type, id: element.prop('id')};
     };
 
+    this.setAvailability = function (availability) {
+        availability = availability || [];
+
+        $.each(availability, function(i, container) {
+            var all_available = true;
+
+            $.each(container.availability, function(device, is_availabe) {
+                all_available = all_available && is_availabe;
+            });
+
+            $.each(container.availability, function(device, is_available) {
+                $('#' + container.type + '_' + container.id + ' > .grid-control-menu .device-specific-block__devices__device--' + device).toggleClass('hidden', all_available || !is_available);
+            });
+        });
+
+        this.calculateLevels();
+    };
+
     var _parseResponse = function(data, params)
     {
         // If we received "id" - apply this id to new element
-        if (typeof(data.id) != 'undefined') {
+        if (typeof(data.id) !== 'undefined') {
             var new_id = '';
-            if (data.mode == 'grid') {
+            if (data.mode === 'grid') {
                 new_id = 'grid_' + data.id;
-            } else if (data.mode == 'snapping') {
+            } else if (data.mode === 'snapping') {
                 new_id = 'snapping_' + data.id;
             }
 
             var elm = $('#new_element').prop('id', new_id);
 
             _self.setBlockManagerActions(elm, data);
+
+            if (data.availability) {
+                _self.setAvailability(data.availability);
+            }
+
+
         }
 
         _self.calculateLevels();
@@ -160,7 +184,14 @@ function BlockManager_Class()
                     }
                 }
 
+                var currentScrollPosition = $(document).scrollTop();
+
                 $('#' + prop_container).ceDialog('open', {href: fn_url(href)});
+
+                $.ceEvent('on', 'ce.dialogclose', function () {
+                    $('body,html').scrollTop(currentScrollPosition);
+                });
+
                 break;
 
             case 'add-grid':
@@ -363,8 +394,7 @@ function BlockManager_Class()
     
     var _escape = function(str)
     {
-        return str
-            .replace(/&/g, "&amp;")
+        return str.replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
@@ -385,6 +415,8 @@ function BlockManager_Class()
         params.tolerance = 'pointer';
         // revert block animation
         params.revert = 100;
+
+        params.device_availability_switcher = params.device_availability_switcher || null;
 
         params.update = function(event, ui)
         {
@@ -597,8 +629,6 @@ function BlockManager_Class()
                     }
                 }
             }
-
-            
         });
 
         // Init sortable zones
@@ -615,7 +645,89 @@ function BlockManager_Class()
         $('.grid-off, .container-off    ').each(function(){
             _self.recheckBlockStatuses($(this));
         });
-        
+
+        if (params.device_availability_switcher) {
+            _self.initDeviceAvailabilitySwitcher(params.device_availability_switcher);
+        }
+
+        if (params.edit_object_id && params.edit_object_type) {
+            _self.openObjectPropertiesForm(params.edit_object_id, params.edit_object_type);
+        }
+    };
+
+    this.hideControls = function () {
+        // hide menus
+        this.toggleMenus(false);
+
+        // disable drag'n'drop
+        this.toggleDragNDrop(false);
+    };
+
+    this.toggleMenus = function (flag) {
+        if (flag) {
+            $(_init_params.controls_selector).each(function(i, menu) {
+                var $menu = $(menu);
+                if (!$menu.hasClass('keep-hidden')) {
+                    $menu.removeClass('hidden');
+                }
+            });
+        } else {
+            $(_init_params.controls_selector).addClass('hidden');
+        }
+    }
+
+    this.toggleDragNDrop = function (flag) {
+        $(_init_params.sortable_selector).sortable(flag ? 'enable' : 'disable');
+    }
+
+    this.initDeviceAvailabilitySwitcher = function (params)
+    {
+        var that = this;
+
+        $(params.switch_selector).each(function(i, elm) {
+            var $switcher = $(elm);
+
+            $switcher.on('click', function(e) {
+                var device = $(this).attr(params.device_attribute);
+
+                // toggle blocks
+                $(params.block_selector + '[' + params.block_availability_prefix + device + '="true"]').removeClass('hidden');
+                $(params.block_selector + '[' + params.block_availability_prefix + device + '="false"]').addClass('hidden');
+
+                // toggle active class
+                $(params.switch_selector).removeClass(params.switcher_active_class);
+                $(this).addClass(params.switcher_active_class);
+
+                // show filter reset
+                $(params.reset_selector).removeClass(params.switcher_active_class);
+
+                // save filter
+                $.cookie.set(params.storage_cookie, device);
+
+                that.hideControls();
+            });
+        });
+
+        $(params.reset_selector).on('click', function(e) {
+            // reset active class
+            $(params.block_selector).removeClass('hidden');
+            $(params.switch_selector).removeClass(params.switcher_active_class);
+            $(this).addClass(params.switcher_active_class);
+
+            // reset saved filter
+            $.cookie.set(params.storage_cookie, null);
+
+            // show menus
+            that.toggleMenus(true);
+
+            // enable drag'n'drop
+            that.toggleDragNDrop(true);
+        });
+
+        var device = $.cookie.get(params.storage_cookie);
+        if (device) {
+            $(params.switch_selector + '[' + params.device_attribute + '="' + device + '"]').trigger('click');
+        }
     };
     
     this.recalculateClearLines = function(parent)
@@ -793,7 +905,7 @@ function BlockManager_Class()
 
     this.setBlockManagerActions = function(elm, response)
     {
-        if (response.mode == 'snapping') {
+        if (response.mode === 'snapping') {
             response.bm_actions = response.bm_actions || {};
             for (var action in response.bm_actions) {
                 var control_class = '.bm-action-' + action;
@@ -1129,7 +1241,6 @@ function BlockManager_Class()
         return width;
     }
 
-
     this.snapGrid = function(grid)
     {
         if (parseInt(grid.grid_id)) {
@@ -1241,6 +1352,14 @@ function BlockManager_Class()
             $('.block-header-title', block).css('width', block.width() - 55 + 'px');
         }
     };
+
+    this.openObjectPropertiesForm = function(objectId, objectType)
+    {
+        var $objectMenu = $('#' + objectType + '_' + objectId + ' > .bm-control-menu');
+        if ($objectMenu.length) {
+            $('.bm-action-properties', $objectMenu).trigger('click');
+        }
+    }
 }
 
 

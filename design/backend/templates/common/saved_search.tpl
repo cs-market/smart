@@ -7,7 +7,7 @@
             <h6>{__("saved_search")}</h6>
                 <ul class="nav nav-list saved-search">
                     {if $views}
-                    <li {if !$search.view_id}class="active"{/if}>
+                    <li {if !$search.view_id && !$search.temp_view}class="active"{/if}>
                         <a href="{"`$dispatch`.reset_view?`$view_suffix`"|fn_url}">{__("all")}</a>
                     </li>
                     {foreach from=$views item=view name=views}
@@ -29,6 +29,13 @@
                             <a class="cm-view-name" data-ca-view-id="{$view.view_id}" href="{"`$dispatch`?view_id=`$view.view_id`&`$view_suffix`"|fn_url}">{$view.name}</a>
                         </li>
                     {/foreach}
+
+                    {if $search.temp_view}
+                         <li class="active">
+                             <a href="#">{__("custom_search")}</a>
+                         </li>
+                    {/if}
+
                     {if $smarty.foreach.views.total > $max_items}
                             </ul>
                         </li>

@@ -113,7 +113,8 @@ class Breadcrumbs
      *
      * @param  string $controller Controller
      * @param  string $mode       Mode
-     * @return array  Parsed items
+     *
+     * @return bool
      */
     private function _initSchema($controller, $mode)
     {
@@ -181,7 +182,8 @@ class Breadcrumbs
      * Gets breadcrumb item from schema
      *
      * @param  array $schema_item Item schema
-     * @return array Parsed item
+     *
+     * @return array|bool Parsed item
      */
     private function _parseSchemaItem($schema_item)
     {

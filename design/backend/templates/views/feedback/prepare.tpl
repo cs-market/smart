@@ -22,7 +22,7 @@
         <td>&nbsp;</td>
         <td colspan="2">
             <div id="parameters_{$section}">
-            <table width="80%" class="table table-condensed">
+            <table width="80%" class="table table-condensed table--relative">
             {foreach from=$data key="key" item="value" name="section"}
                 {if $smarty.foreach.section.first}
                 <thead><tr>

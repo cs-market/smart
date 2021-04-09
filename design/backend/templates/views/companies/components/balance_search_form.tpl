@@ -12,13 +12,23 @@
 {/if}
 
 <div class="sidebar-field ajax-select">
-    <label>{__("vendor")}</label>
-    {if !$runtime.company_id}
-        <input type="hidden" name="vendor" id="search_hidden_vendor" value="{$search.vendor|default:'all'}" />
-    {include file="common/ajax_select_object.tpl" data_url="companies.get_companies_list?show_all=Y" text=$search.vendor|fn_get_company_name|default:__("all_vendors") result_elm="search_hidden_vendor" id="company_search"}
-        {else}
-        {$search.vendor|fn_get_company_name}
-    {/if}
+    <div class="control-group">
+        <label class="control-label">{__("vendor")}</label>
+        <div class="controls">
+            {if !$runtime.company_id}
+                <input type="hidden" name="vendor" id="search_hidden_vendor" value="{$search.vendor|default:'all'}" />
+                {include file="common/ajax_select_object.tpl"
+                    data_url="companies.get_companies_list?show_all=Y"
+                    text=$search.vendor|fn_get_company_name|default:__("all_vendors")
+                    result_elm="search_hidden_vendor"
+                    id="company_search"
+                    relative_dropdown=false
+                }
+                {else}
+                {$search.vendor|fn_get_company_name}
+            {/if}
+        </div>
+    </div>
 </div>
 
 {if $payout_types}

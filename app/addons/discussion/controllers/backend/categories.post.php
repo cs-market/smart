@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
+use Tygh\Enum\Addons\Discussion\DiscussionTypes;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -28,16 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'update') {
 
-    $discussion = fn_get_discussion($_REQUEST['category_id'], 'C', true, $_REQUEST);
-    if (!empty($discussion) && $discussion['type'] != 'D') {
-        if (fn_allowed_for('MULTIVENDOR') || fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
-            Registry::set('navigation.tabs.discussion', array (
-                'title' => __('discussion_title_category'),
-                'js' => true
-            ));
+    $discussion = fn_get_discussion($_REQUEST['category_id'], DiscussionObjectTypes::CATEGORY, true, $_REQUEST);
 
-            Tygh::$app['view']->assign('discussion', $discussion);
-        }
+    if (!empty($discussion) &&
+        $discussion['type'] !== DiscussionTypes::TYPE_DISABLED &&
+        fn_check_permissions('discussion', 'view', 'admin')
+    ) {
+        Registry::set('navigation.tabs.discussion', [
+            'title' => __('discussion_title_category'),
+            'js'    => true,
+        ]);
+
+        Tygh::$app['view']->assign('discussion', $discussion);
     }
 
 } elseif ($mode == 'm_update') {

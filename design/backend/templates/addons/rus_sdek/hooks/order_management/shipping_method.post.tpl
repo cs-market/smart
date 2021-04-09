@@ -16,7 +16,15 @@
                                 {if $office_count == 1}
                                     {foreach from=$shipping.data.offices item=office}
                                     <div class="sidebar-row">
-                                        <input type="hidden" name="select_office[{$group_key}][{$shipping_id}]" value="{$office.Code}" id="office_{$group_key}_{$shipping_id}_{$office.Code}" checked="checked"> 
+                                        <input type="hidden"
+                                        name="select_office[{$group_key}][{$shipping_id}]"
+                                        value="{$office.Code}"
+                                        id="office_{$group_key}_{$shipping_id}_{$office.Code}"
+                                        checked="checked"
+                                        data-ca-pickup-select-office="true"
+                                        data-ca-shipping-id="{$shipping_id}"
+                                        data-ca-group-key="{$group_key}"
+                                        data-ca-location-id="{$office.Code}">
                                         {$office.Name} 
                                         <p class="muted">
                                             {$office.Address}<br />
@@ -31,7 +39,15 @@
                                     <div class="sidebar-row">
                                         <div class="control-group">
                                             <div class="controls">
-                                                <input type="radio" name="select_office[{$group_key}][{$shipping_id}]" value="{$office.Code}" {if $select_id == $office.Code || $old_office_id == $office.Code}checked="checked"{/if} id="office_{$group_key}_{$shipping_id}_{$office.Code}" >
+                                                <input type="radio"
+                                                    name="select_office[{$group_key}][{$shipping_id}]"
+                                                    value="{$office.Code}"
+                                                    {if $select_id == $office.Code || $old_office_id == $office.Code}checked="checked"{/if}
+                                                    id="office_{$group_key}_{$shipping_id}_{$office.Code}"
+                                                    data-ca-pickup-select-office="true"
+                                                    data-ca-shipping-id="{$shipping_id}"
+                                                    data-ca-group-key="{$group_key}"
+                                                    data-ca-location-id="{$office.Code}">
                                                 {$office.Name} {include file="common/tooltip.tpl" tooltip=$office.Note}
                                                 <p class="muted">
                                                     {$office.Address}<br />
