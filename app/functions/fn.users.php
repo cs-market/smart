@@ -559,6 +559,10 @@ function fn_get_simple_usergroups($type, $get_default = false, $lang_code = CART
         } elseif ($type == 'A') {
             $where .= " AND a.type = 'A'";
         }
+
+        // [csmarket] add condition to receive correct usergroups
+        fn_set_hook('get_simple_usergroups_pre', $where);
+
         $_usergroups = db_get_hash_single_array(
             'SELECT a.usergroup_id, b.usergroup'
                 . ' FROM ?:usergroups as a'
@@ -2103,6 +2107,9 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
 
                 return false;
             }
+        // [cs-market] allow vendors to create users
+        } else {
+                $user_data['company_id'] = ($user_data['company_id']) ? $user_data['company_id'] : Registry::get('runtime.company_id');
         }
 
         $action = 'add';
@@ -2118,7 +2125,8 @@ function fn_update_user($user_id, $user_data, &$auth, $ship_to_another, $notify_
     // Set the user type
     $user_data['user_type'] = fn_check_user_type($user_data, $current_user_data);
 
-    if (
+    // [cs-market] allow vendors to create users
+    if ( 0 &&
         Registry::get('runtime.company_id')
         && !fn_allowed_for('ULTIMATE')
         && (

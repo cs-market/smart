@@ -58,4 +58,7 @@ $schema['import_process_data']['get_salts'] = array(
     'import_only' => true,
 );
 
+if (isset($schema['export_fields']['User group IDs']['process_put'])) {
+    $schema['export_fields']['User group IDs']['process_put'][0] = 'fn_smart_distribution_exim_set_usergroups';
+}
 return $schema;

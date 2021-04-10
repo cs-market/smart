@@ -21,8 +21,6 @@ fn_register_hooks(
 	'sales_reports_table_condition',
 	'sales_reports_change_table',
 	'get_default_usergroups',
-	'api_handle_request',
-	'api_send_response',
 	'update_category_pre',
 	'update_category_post',
 	'set_product_categories_exist',

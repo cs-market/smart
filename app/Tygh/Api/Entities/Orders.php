@@ -105,7 +105,7 @@ class Orders extends AEntity
         }
 
         if (!empty($params['user_id']) && is_numeric($params['user_id'])) {
-            $cart['user_data'] = fn_get_user_info($params['user_id']);
+            $cart['user_data'] = fn_get_user_info($params['user_id'], isset($params['profile_id']), $params['profile_id']);
             if (empty($cart['user_data'])) {
                 $status = Response::STATUS_BAD_REQUEST;
                 $data['message'] = __('object_not_found', array('[object]' => __('user')));

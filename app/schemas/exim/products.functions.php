@@ -214,6 +214,8 @@ function fn_exim_set_product_categories(
 
                 if (!empty($category_id)) {
                     $parent_id = $category_id;
+                    // [cs-market]
+                    fn_set_hook('set_product_categories_exist', $category_id);
                 } else {
 
                     $category_data = array(

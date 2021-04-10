@@ -1664,6 +1664,9 @@ function fn_get_promotion_data($promotion_id, $lang_code = DESCR_SL)
         )
     ];
 
+    // [cs-market]
+    fn_set_hook('get_promotion_data_pre', $promotion_id, $extra_condition, $lang_code);
+
     $promotion_data = db_get_row('SELECT ?p FROM ?:promotions as p ?p WHERE p.promotion_id = ?i ?p',
         implode(', ', $fields),
         implode(' ', $joins),

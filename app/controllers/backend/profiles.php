@@ -506,7 +506,8 @@ if ($mode === 'manage') {
                     return array(CONTROLLER_STATUS_REDIRECT, 'profiles.add?user_type=' . fn_get_request_user_type($_REQUEST));
 
                 } elseif ($_REQUEST['user_type'] == 'C') {
-                    return array(CONTROLLER_STATUS_DENIED);
+                    // [csmarket] allow vendors to manage customers
+                    //return array(CONTROLLER_STATUS_DENIED);
 
                 } elseif ($_REQUEST['user_type'] == 'A') {
                     $_GET['user_type'] = 'V';

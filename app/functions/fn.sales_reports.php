@@ -67,6 +67,9 @@ function fn_get_order_reports($view = false, $report_id = 0, $table_id = 0, $par
     }
 
     foreach ($data[$k]['tables'] as $key => $value) {
+        // [cs-market]
+        fn_set_hook('sales_reports_change_table', $value, $key);
+
         $limit = $data_limit;
 
         if ($value['type'] != 'T') {
@@ -246,6 +249,10 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
             $new_element = $v;
             unset($elements[$k]);
             $table_condition = fn_get_table_condition($table['table_id'], true);
+
+            // [cs-market]
+            fn_set_hook('sales_reports_table_condition', $table_condition, $k, $v, $table);
+
             $order_ids = fn_proceed_table_conditions($table_condition, "a");
 
             $l_l = $table['type'] == 'T' ? null : 50; // Legend length - limited for charts
@@ -885,6 +892,10 @@ function fn_proceed_table_conditions($table_condition, $alias = false)
 function fn_get_report_statistics(&$table)
 {
     $table_condition = fn_get_table_condition($table['table_id'], true);
+
+    // [cs-market]
+    fn_set_hook('sales_reports_table_condition', $table_condition, $k, $v, $table);
+
     $order_ids = fn_proceed_table_conditions($table_condition, '?:orders');
 
     $last_elm = end($table['intervals']);
@@ -1413,6 +1424,10 @@ function fn_sales_repors_format_description($value, $limit, $id)
 function fn_get_order_totals($table)
 {
     $table_condition = fn_get_table_condition($table['table_id'], true);
+
+    // [cs-market]
+    fn_set_hook('sales_reports_table_condition', $table_condition, $k, $v, $table);
+
     $order_ids = fn_proceed_table_conditions($table_condition, '?:orders');
 
     $last_elm = end($table['intervals']);

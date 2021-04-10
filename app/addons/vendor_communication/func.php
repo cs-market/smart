@@ -246,6 +246,9 @@ function fn_vendor_communication_add_thread_message(array $message_data, $notify
         }
     }
 
+    // [cs-market]
+    fn_set_hook('vendor_communication_add_thread_message_post', $thread_full_data, $result);
+
     return $result;
 }
 

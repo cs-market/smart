@@ -426,64 +426,6 @@ function fn_smart_distribution_get_default_usergroups(&$default_usergroups, $lan
     }
 }
 
-function fn_smart_distribution_api_handle_request($_this, $authorized) {
-    //if ($_SESSION['auth']['user_id'] == '2425' && $_this->getRequest()->getMethod() == 'PUT')
-    //fn_write_r(date('H:m:s d/m/Y') . ' ' . $_this->getRequest()->getResource() . ' ' . $_this->getRequest()->getMethod(), $_this->getRequest()->getData());
-}
-
-function fn_smart_distribution_api_send_response($_this, $response, $authorized) {
-    //fn_write_r($response->body);
-}
-
-function fn_write_r() {
-  static $count = 0;
-  $args = func_get_args();
-  $fp = fopen('api_requests.html', 'w+');
-  if (!empty($args)) {
-    fwrite($fp, '<ol style="font-family: Courier; font-size: 12px; border: 1px solid #dedede; background-color: #efefef; float: left; padding-right: 20px;">');
-    foreach ($args as $k => $v) {
-      $v = htmlspecialchars(print_r($v, true));
-      if ($v == '') { $v = ' '; }
-      fwrite($fp, '<li><pre>' . $v . "\n" . '</pre></li>');
-    }
-    fwrite($fp, '</ol><div style="clear:left;"></div>');
-  }
-  $count++;
-}
-
-
-// temp function
-function fn_import_bering_usergroups() {
-    $file = 'users.csv';
-    $ugroups = fn_exim_get_csv(array(), $file );
-    foreach ($ugroups as &$group) {
-        $group = array_merge($group, array(
-            'type' => "C",
-            'status' => 'A'
-        ));
-        $group['usergroup_id'] = fn_update_usergroup($group);
-    }
-    $new_groups = implode(',', fn_array_column($ugroups, 'usergroup_id'));
-
-    $res = db_query("UPDATE ?:vendor_plans SET `usergroup_ids`= IF(usergroup_ids = '0', ?s, CONCAT(usergroup_ids, ?s)) WHERE plan_id = 16;", $new_groups, ',' . $new_groups);
-
-
-    $categories = db_get_field('select categories from ?:vendor_plans WHERE plan_id = ?i', 16);
-    $categories = explode(',', $categories);
-    $res1 = db_query("UPDATE ?:categories SET `usergroup_ids`= IF(usergroup_ids = '0', ?s, CONCAT(usergroup_ids, ?s)) WHERE category_id in (?a)", $new_groups, ',' . $new_groups,  $categories);
-    $res2 = db_query("UPDATE ?:products SET `usergroup_ids`= IF(usergroup_ids = '0', ?s, CONCAT(usergroup_ids, ?s)) WHERE company_id = ?i", $new_groups, ',' . $new_groups,  29);
-    fn_print_die($res, $res1, $res2);
-}
-
-// $obj = db_get_array('select profile_id, object_id, value FROM ?:user_profiles LEFT JOIN ?:profile_fields_data ON user_id = object_id WHERE ?:profile_fields_data.FIELD_ID = ?i and ?:profile_fields_data.value != ?s AND object_type = ?s', 36, '', 'U');
-
-// $obj1 = db_get_array('select object_id, object_type, value from ?:profile_fields_data WHERE FIELD_ID = ?i and value = ?s AND object_id IN (?a)  AND object_type = ?s', 39, '', array_column($obj, 'profile_id'), 'P');
-// fn_print_die($obj1);
-
-// fn_print_die($obj1);
-// $obj2 = db_get_array('select object_id, value, object_type from ?:profile_fields_data WHERE FIELD_ID = ?i and value != ?s AND object_id IN (?a) AND object_type = ?s', 36, '', array_column($obj, 'object_id'), 'U');
-// fn_print_die($obj2);
-// fn_print_die($obj1);
 function fn_smart_distribution_update_category_pre(&$category_data, $category_id, $lang_code) {
     if (isset($_REQUEST['preset_id']) && !$category_id) {
         list($presets) = fn_get_import_presets(array(
