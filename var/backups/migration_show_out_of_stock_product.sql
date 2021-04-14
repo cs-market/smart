@@ -1,1 +1,0 @@
-ALTER TABLE `cscart_products` ADD `show_out_of_stock_product` VARCHAR(1) NOT NULL DEFAULT 'Y';
