@@ -979,7 +979,8 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
         $join = implode(' JOIN ', $join);
     }
 
-    $price_usergroup = db_quote(" AND ?:product_prices.usergroup_id = ?i", USERGROUP_ALL);
+    $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
+    $price_usergroup = db_quote(" AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'A' && !defined('ORDER_MANAGEMENT')) ? USERGROUP_ALL : array_diff($usergroup_ids, [USERGROUP_ALL])));
 
     // Cut off out of stock products
     if (AREA == 'C') {
