@@ -219,7 +219,7 @@ return [
     '84' => [
         'page_id' => 84,
         'company_id' => 1815,
-        'usergroup_id' => [649],
+        // 'usergroup_id' => [649],
         'fields_map' => [
             'firstname' => '262',
             'phone' => '265',
@@ -228,8 +228,8 @@ return [
             'password' => '264',
             's_phone' => '265',
             's_address' => '266',
-            's_client_code' => '9999',
-            'b_client_code' => '9999',
+            // 's_client_code' => '9999',
+            // 'b_client_code' => '9999',
             'b_firstname' => '262',
         ],
     ],
