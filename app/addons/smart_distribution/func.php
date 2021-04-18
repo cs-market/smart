@@ -8,9 +8,9 @@ use Tygh\Enum\ObjectStatuses;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_smart_distribution_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
-    $auth = $_SESSION['auth'];
+    $auth = Tygh::$app['session']['auth'];
     if (!empty($params['usergroup_id'])) {
-        list($users, ) = fn_get_users(array('usergroup_id' => $params['usergroup_id']), $_SESSION['auth']);
+        list($users, ) = fn_get_users(array('usergroup_id' => $params['usergroup_id']), $auth);
         $condition .= db_quote(' AND ?:orders.user_id IN (?a)', fn_array_column($users, 'user_id'));
     }
 
@@ -24,7 +24,7 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
         $params['managers'] = $auth['user_id'];
     }
     if (!empty($params['managers'])) {
-        list($users, ) = fn_get_users(array('managers' => $params['managers']), $_SESSION['auth']);
+        list($users, ) = fn_get_users(array('managers' => $params['managers']), $auth);
 
         if ($users) {
             $condition .= db_quote(' AND ?:orders.user_id IN (?a)', fn_array_column($users, 'user_id'));
@@ -40,7 +40,7 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
 }
 
 function fn_smart_distribution_get_order_info(&$order, $additional_data) {
-    $auth = $_SESSION['auth'];
+    $auth = Tygh::$app['session']['auth'];
     if (AREA == 'A') {
         if (fn_smart_distribution_is_manager($auth['user_id'])) {
             $customer_ids = db_get_fields('SELECT customer_id FROM ?:vendors_customers WHERE vendor_manager = ?i', $auth['user_id']);
