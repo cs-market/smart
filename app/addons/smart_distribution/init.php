@@ -57,5 +57,6 @@ fn_register_hooks(
 
     'calculate_cart_items',
     'promotion_apply_pre',
-    'add_product_to_cart_get_price'
+    'add_product_to_cart_get_price',
+    'pre_get_cart_product_data'
 );

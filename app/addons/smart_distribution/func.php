@@ -3,6 +3,7 @@
 use Tygh\Registry;
 use Tygh\Models\Company;
 use Tygh\Enum\ProductTracking;
+use Tygh\Enum\ObjectStatuses;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -1125,4 +1126,30 @@ function fn_smart_distribution_add_product_to_cart_get_price($product_data, $car
         . "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) LIMIT 1 ",
         $amount, $product_id, $usergroup_condition
     );
+}
+
+function fn_smart_distribution_pre_get_cart_product_data($hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, $fields, &$join, $params) {
+    $join  = db_quote("LEFT JOIN ?:product_descriptions ON ?:product_descriptions.product_id = ?:products.product_id AND ?:product_descriptions.lang_code = ?s", DESCR_SL);
+
+    $_p_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
+    $_c_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
+
+    $avail_cond = '';
+
+    if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
+        if (AREA == 'C') {
+            $avail_cond .= fn_get_company_condition('?:categories.company_id');
+        } else {
+            $avail_cond .= ' AND (' . fn_get_company_condition('?:categories.company_id', false)
+                           . ' OR ' . fn_get_company_condition('?:products.company_id', false) . ')';
+        }
+    }
+
+    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? " AND (" . fn_find_array_in_set($auth['usergroup_ids'], '?:categories.usergroup_ids', true) . ")" : '';
+    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? " AND (" . fn_find_array_in_set($auth['usergroup_ids'], '?:products.usergroup_ids', true) . ")" : '';
+    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? db_quote(' AND ?:categories.status IN (?a) AND ?:products.status IN (?a)', $_c_statuses, $_p_statuses) : '';
+    $avail_cond .= (AREA == 'C') ? fn_get_localizations_condition('?:products.localization') : '';
+
+    $join .= " INNER JOIN ?:products_categories ON ?:products_categories.product_id = ?:products.product_id INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id $avail_cond";
+    $join .= " LEFT JOIN ?:companies ON ?:companies.company_id = ?:products.company_id";
 }
