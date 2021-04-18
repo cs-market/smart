@@ -1,1 +1,0 @@
-{style src="addons/rus_geolocation/styles.css"}
