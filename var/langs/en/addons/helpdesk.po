@@ -1,0 +1,202 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::helpdesk"
+msgid "Helpdesk"
+msgstr "Helpdesk"
+
+msgctxt "Addons::description::helpdesk"
+msgid "Adds communication system"
+msgstr "Adds communication system"
+
+
+msgctxt "SettingsSections::helpdesk::general"
+msgid "General"
+msgstr "General"
+
+msgctxt "SettingsOptions::helpdesk::days_threshold"
+msgid "Waiting time (days)"
+msgstr "Waiting time (days)"
+
+msgctxt "SettingsOptions::helpdesk::service_words"
+msgid "Service words"
+msgstr "Service words"
+
+msgctxt "SettingsOptions::helpdesk::storefront_mailbox_id"
+msgid "Storefront mailbox ID"
+msgstr "Storefront mailbox ID"
+
+msgctxt "SettingsOptions::helpdesk::create_users_for_anonymous"
+msgid "Create user for unauthorized appeal"
+msgstr "Create user for unauthorized appeal"
+
+msgctxt "Languages::helpdesk"
+msgid "Helpdesk"
+msgstr "Helpdesk"
+
+msgctxt "Languages::tickets"
+msgid "Tickets"
+msgstr "Tickets"
+
+msgctxt "Languages::tickets_menu_description"
+msgid "View all tickets"
+msgstr "View all tickets"
+
+msgctxt "Languages::open_tickets"
+msgid "Open tickets"
+msgstr "Open tickets"
+
+msgctxt "Languages::open_tickets_menu_description"
+msgid "View only open tickets"
+msgstr "View only open tickets"
+
+msgctxt "Languages::waiting_tickets"
+msgid "Waiting tickets"
+msgstr "Waiting tickets"
+
+msgctxt "Languages::waiting_tickets_menu_description"
+msgid "View only waiting tickets"
+msgstr "View only waiting tickets"
+
+msgctxt "Languages::mailboxes"
+msgid "Mailboxes"
+msgstr "Mailboxes"
+
+msgctxt "Languages::mailboxes_menu_description"
+msgid "Manage mailboxes"
+msgstr "Manage mailboxes"
+
+msgctxt "Languages::message_templates"
+msgid "Message templates"
+msgstr "Message templates"
+
+msgctxt "Languages::message_templates_menu_description"
+msgid "Manage your message templates"
+msgstr "Manage your message templates"
+
+msgctxt "Languages::new_message"
+msgid "New message"
+msgstr "New message"
+
+msgctxt "Languages::post_message"
+msgid "Post message"
+msgstr "Post message"
+
+msgctxt "Languages::ticket_log"
+msgid "Ticket log"
+msgstr "Ticket log"
+
+msgctxt "Languages::update_message"
+msgid "Update message"
+msgstr "Update message"
+
+msgctxt "Languages::ticket_id"
+msgid "Ticket #"
+msgstr "Ticket #"
+
+msgctxt "Languages::move_to_another_ticket"
+msgid "Move to another ticket"
+msgstr "Move to another ticket"
+
+msgctxt "Languages::closed"
+msgid "Closed"
+msgstr "Closed"
+
+msgctxt "Languages::waiting"
+msgid "Waiting"
+msgstr "Waiting"
+
+msgctxt "Languages::editing_message"
+msgid "Editing message"
+msgstr "Editing message"
+
+msgctxt "Languages::users_list"
+msgid "Users list"
+msgstr "Users list"
+
+msgctxt "Languages::open_messages"
+msgid "Open messages"
+msgstr "Open messages"
+
+msgctxt "Languages::last_message_date"
+msgid "Last message date"
+msgstr "Last message date"
+
+msgctxt "Languages::close_ticket"
+msgid "Close ticket"
+msgstr "Close ticket"
+
+msgctxt "Languages::delete_spam"
+msgid "Delete to spam"
+msgstr "Delete to spam"
+
+msgctxt "Languages::mailbox_name"
+msgid "Mailbox name"
+msgstr "Mailbox name"
+
+msgctxt "Languages::ticket_prefix"
+msgid "Ticket prefix"
+msgstr "Ticket prefix"
+
+msgctxt "Languages::smtp_server"
+msgid "SMTP server"
+msgstr "SMTP server"
+
+msgctxt "Languages::domain"
+msgid "Domain"
+msgstr "Domain"
+
+msgctxt "Languages::selector"
+msgid "Selector"
+msgstr "Selector"
+
+msgctxt "Languages::new_mailbox"
+msgid "New mailbox"
+msgstr "New mailbox"
+
+msgctxt "Languages::add_mailbox"
+msgid "Add mailbox"
+msgstr "Add mailbox"
+
+msgctxt "Languages::editing_mailbox"
+msgid "Editing mailbox"
+msgstr "Editing mailbox"
+
+msgctxt "Languages::editing_template"
+msgid "Editing template"
+msgstr "Editing template"
+
+msgctxt "Languages::new_template"
+msgid "New template"
+msgstr "New template"
+
+msgctxt "Languages::new_ticket"
+msgid "New ticket"
+msgstr "New ticket"
+
+msgctxt "Languages::editing_ticket"
+msgid "Editing ticket"
+msgstr "Editing ticket"
+
+msgctxt "Languages::text_no_tickets"
+msgid "No tickets"
+msgstr "No tickets"
+
+msgctxt "Languages::posted_by"
+msgid "Posted by"
+msgstr "Posted by"
+
+msgctxt "Languages::helpdesk_notification"
+msgid "Helpdesk notification"
+msgstr "Helpdesk notification"
+
+msgctxt "Languages::helpdesk_user_not_found"
+msgid "User with this email not found"
+msgstr "User with this email not found"
+
+msgctxt "Languages::message_sent_successfully"
+msgid "Your message has been successfully sent"
+msgstr "Your message has been successfully sent"

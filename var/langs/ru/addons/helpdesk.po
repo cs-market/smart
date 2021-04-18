@@ -1,0 +1,209 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cscart-helpdesk\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Crowdin-Project: cscart-helpdesk\n"
+"X-Crowdin-Project-ID: 432034\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: helpdesk.po\n"
+"X-Crowdin-File-ID: 4\n"
+"PO-Revision-Date: 2020-12-06 13:08\n"
+
+msgctxt "Addons::name::helpdesk"
+msgid "Helpdesk"
+msgstr "Служба поддержки"
+
+msgctxt "Addons::description::helpdesk"
+msgid "Adds communication system"
+msgstr "Добавляет коммуникационную систему"
+
+msgctxt "SettingsSections::helpdesk::general"
+msgid "General"
+msgstr "Общие"
+
+msgctxt "SettingsOptions::helpdesk::days_threshold"
+msgid "Waiting time (days)"
+msgstr "Время ожидания (дней)"
+
+msgctxt "SettingsOptions::helpdesk::service_words"
+msgid "Service words"
+msgstr "Служебные слова"
+
+msgctxt "SettingsOptions::helpdesk::storefront_mailbox_id"
+msgid "Storefront mailbox ID"
+msgstr "Почтовый ящик по умолчанию"
+
+msgctxt "SettingsOptions::helpdesk::create_users_for_anonymous"
+msgid "Create user for unauthorized appeal"
+msgstr "Создавать пользователя для неавторизированного обращения"
+
+msgctxt "Languages::helpdesk"
+msgid "Helpdesk"
+msgstr "Служба поддержки"
+
+msgctxt "Languages::tickets"
+msgid "Tickets"
+msgstr "Тикеты"
+
+msgctxt "Languages::tickets_menu_description"
+msgid "View all tickets"
+msgstr "Посмотреть все тикеты"
+
+msgctxt "Languages::open_tickets"
+msgid "Open tickets"
+msgstr "Открытые тикеты"
+
+msgctxt "Languages::open_tickets_menu_description"
+msgid "View only open tickets"
+msgstr "Просмотр только открытых тикетов"
+
+msgctxt "Languages::waiting_tickets"
+msgid "Waiting tickets"
+msgstr "Ожидающие ответа"
+
+msgctxt "Languages::waiting_tickets_menu_description"
+msgid "View only waiting tickets"
+msgstr "Просмотр тикетов, ожидающих ответа"
+
+msgctxt "Languages::mailboxes"
+msgid "Mailboxes"
+msgstr "Почтовые ящики"
+
+msgctxt "Languages::mailboxes_menu_description"
+msgid "Manage mailboxes"
+msgstr "Управление почтовыми ящиками"
+
+msgctxt "Languages::message_templates"
+msgid "Message templates"
+msgstr "Шаблоны сообщений"
+
+msgctxt "Languages::message_templates_menu_description"
+msgid "Manage your message templates"
+msgstr "Управление шаблонами сообщений"
+
+msgctxt "Languages::new_message"
+msgid "New message"
+msgstr "Новое сообщение"
+
+msgctxt "Languages::post_message"
+msgid "Post message"
+msgstr "Отправить сообщение"
+
+msgctxt "Languages::ticket_log"
+msgid "Ticket log"
+msgstr "История сообщений"
+
+msgctxt "Languages::update_message"
+msgid "Update message"
+msgstr "Обновить сообщение"
+
+msgctxt "Languages::ticket_id"
+msgid "Ticket #"
+msgstr "#"
+
+msgctxt "Languages::move_to_another_ticket"
+msgid "Move to another ticket"
+msgstr "Переместить в другой тикет"
+
+msgctxt "Languages::closed"
+msgid "Closed"
+msgstr "Закрыто"
+
+msgctxt "Languages::waiting"
+msgid "Waiting"
+msgstr "В ожидании"
+
+msgctxt "Languages::editing_message"
+msgid "Editing message"
+msgstr "Редактирование сообщения"
+
+msgctxt "Languages::users_list"
+msgid "Users list"
+msgstr "Список пользователей"
+
+msgctxt "Languages::open_messages"
+msgid "Open messages"
+msgstr "Открытые сообщения"
+
+msgctxt "Languages::last_message_date"
+msgid "Last message date"
+msgstr "Дата последнего сообщения"
+
+msgctxt "Languages::close_ticket"
+msgid "Close ticket"
+msgstr "Закрыть тикет"
+
+msgctxt "Languages::delete_spam"
+msgid "Delete to spam"
+msgstr "Удалить в спам"
+
+msgctxt "Languages::mailbox_name"
+msgid "Mailbox name"
+msgstr "Имя почтового ящика"
+
+msgctxt "Languages::ticket_prefix"
+msgid "Ticket prefix"
+msgstr "Префикс тикета"
+
+msgctxt "Languages::smtp_server"
+msgid "SMTP server"
+msgstr "SMTP сервер"
+
+msgctxt "Languages::domain"
+msgid "Domain"
+msgstr "Домен"
+
+msgctxt "Languages::selector"
+msgid "Selector"
+msgstr "Селектор"
+
+msgctxt "Languages::new_mailbox"
+msgid "New mailbox"
+msgstr "Новый почтовый ящик"
+
+msgctxt "Languages::add_mailbox"
+msgid "Add mailbox"
+msgstr "Добавить почтовый ящик"
+
+msgctxt "Languages::editing_mailbox"
+msgid "Editing mailbox"
+msgstr "Редактирование почтового ящика"
+
+msgctxt "Languages::editing_template"
+msgid "Editing template"
+msgstr "Изменение шаблона"
+
+msgctxt "Languages::new_template"
+msgid "New template"
+msgstr "Новый шаблон"
+
+msgctxt "Languages::new_ticket"
+msgid "New ticket"
+msgstr "Новый тикет"
+
+msgctxt "Languages::editing_ticket"
+msgid "Editing ticket"
+msgstr "Редактирование тикета"
+
+msgctxt "Languages::text_no_tickets"
+msgid "No tickets"
+msgstr "Нет обращений"
+
+msgctxt "Languages::posted_by"
+msgid "Posted by"
+msgstr "Отправлено"
+
+msgctxt "Languages::helpdesk_notification"
+msgid "Helpdesk notification"
+msgstr "Уведомления от Службы поддержки"
+
+msgctxt "Languages::helpdesk_user_not_found"
+msgid "User with this email not found"
+msgstr "Пользователь с этим email не найден"
+
+msgctxt "Languages::message_sent_successfully"
+msgid "Your message has been successfully sent"
+msgstr "Ваше сообщение успешно отправлено"

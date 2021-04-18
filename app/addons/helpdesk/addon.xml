@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>helpdesk</id>
+    <version>2.0.2</version>
+    <priority>423190</priority>
+    <position>0</position>
+    <status>active</status>
+    <has_icon>Y</has_icon>
+    <default_language>en</default_language>
+    <supplier>CS-Market</supplier>
+    <settings>
+        <sections>
+            <section id="general">
+                <name>General</name>
+                <items>
+                    <item id="days_threshold">
+                        <type>input</type>
+                        <default_value/>
+                    </item>
+                    <item id="service_words">
+                        <type>input</type>
+                        <default_value/>
+                    </item>
+                    <item id="storefront_mailbox_id">
+                        <type>input</type>
+                    </item>
+                    <item id="mail_reader">
+                        <type>hidden</type>
+                        <default_value>ImapReader</default_value>
+                    </item>
+                    <item id="create_users_for_anonymous">
+                        <type>checkbox</type>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+
+    <queries>
+    <item>DROP TABLE IF EXISTS `?:helpdesk_mailboxes`</item>
+    <item>
+        CREATE TABLE `?:helpdesk_mailboxes` (
+          `mailbox_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+          `mailbox_name` varchar(128) NOT NULL DEFAULT '',
+          `host` varchar(128) NOT NULL DEFAULT '',
+          `email` varchar(128) NOT NULL DEFAULT '',
+          `password` varchar(32) NOT NULL DEFAULT '',
+          `ticket_prefix` varchar(10) NOT NULL DEFAULT '',
+          `smtp_server` varchar(128) NOT NULL DEFAULT '',
+          `domain` varchar(32) NOT NULL DEFAULT '',
+          `private` varchar(128) NOT NULL DEFAULT '',
+          `selector` varchar(32) NOT NULL DEFAULT 'phpmailer',
+          `responsible_admin` mediumint(8) unsigned NOT NULL DEFAULT '0',
+          PRIMARY KEY (`mailbox_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8
+    </item>
+    <item for="uninstall">DROP TABLE IF EXISTS `?:helpdesk_mailboxes`</item>
+
+    <item>DROP TABLE IF EXISTS `?:helpdesk_tickets`</item>
+    <item>
+        CREATE TABLE `?:helpdesk_tickets` (
+          `ticket_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+          `subject` varchar(255) NOT NULL,
+          `mailbox_id` mediumint(8) NOT NULL DEFAULT '1',
+          PRIMARY KEY (`ticket_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+    </item>
+    <item for="uninstall">DROP TABLE IF EXISTS `?:helpdesk_tickets`</item>
+
+    <!-- for extra access -->
+    <item>DROP TABLE IF EXISTS `?:helpdesk_ticket_users`</item>
+    <item>
+        CREATE TABLE `?:helpdesk_ticket_users` (
+          `ticket_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+          `user_id` varchar(255) NOT NULL,
+          PRIMARY KEY (`ticket_id`,`user_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+    </item>
+    <item for="uninstall">DROP TABLE IF EXISTS `?:helpdesk_ticket_users`</item>
+
+    <item>DROP TABLE IF EXISTS `?:helpdesk_messages`</item>
+    <item>
+        CREATE TABLE `?:helpdesk_messages` (
+          `message_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+          `ticket_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+          `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+          `message` mediumtext,
+          `notified` char(1) NOT NULL DEFAULT 'N',
+          `timestamp` int(11) unsigned NOT NULL DEFAULT '0',
+          `status` char(1) NOT NULL DEFAULT 'O',
+          PRIMARY KEY (`message_id`),
+          KEY `ticket_id` (`ticket_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+    </item>
+    <item for="uninstall">DROP TABLE IF EXISTS `?:helpdesk_messages`</item>
+
+    <item>DROP TABLE IF EXISTS `?:helpdesk_message_files`</item>
+    <item>CREATE TABLE `?:helpdesk_message_files` (
+      `file_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+      `message_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+      `file_size` int(11) NOT NULL DEFAULT '0',
+      `filename` varchar(255) NOT NULL,
+      PRIMARY KEY (`file_id`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+    </item>
+    <item for="uninstall">DROP TABLE IF EXISTS `?:helpdesk_message_files`</item>
+
+    <item>DROP TABLE IF EXISTS `?:helpdesk_templates`</item>
+    <item for="install">CREATE TABLE IF NOT EXISTS `?:helpdesk_templates` (
+        `template_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+        `name` varchar(255) NOT NULL,
+        `template` mediumtext NOT NULL,
+        `user_id` mediumint(8) NOT NULL DEFAULT '0',
+        `position` smallint(5) NOT NULL DEFAULT '0',
+        `is_global` char(1) NOT NULL DEFAULT 'N',
+        PRIMARY KEY (`template_id`)) 
+        ENGINE=MyISAM DEFAULT CHARSET=utf8
+    </item>
+    <item for="uninstall">DROP TABLE IF EXISTS `?:helpdesk_templates`</item>
+
+    <item for="install">ALTER TABLE  `?:users` ADD  `helpdesk_notification` char(1) NOT NULL DEFAULT 'Y'</item>
+    <item for="uninstall">ALTER TABLE `?:users` DROP `helpdesk_notification`</item>
+<!-- 
+    <item>REPLACE INTO `?:privileges` (`privilege`, `is_default`, `section_id`) VALUES ('view_all_tickets', 'Y', 'Helpdesk');</item>
+    <item for="uninstall">DELETE FROM `?:privileges` WHERE `privilege` = 'view_all_tickets';</item>
+
+    <item>REPLACE INTO `?:privileges` (`privilege`, `is_default`, `section_id`) VALUES ('view_tickets', 'Y', 'Helpdesk');</item>
+    <item for="uninstall">DELETE FROM `?:privileges` WHERE `privilege` = 'view_tickets';</item>
+
+    <item>REPLACE INTO `?:privileges` (`privilege`, `is_default`, `section_id`) VALUES ('update_message', 'Y', 'Helpdesk');</item>
+    <item for="uninstall">DELETE FROM `?:privileges` WHERE `privilege` = 'update_message';</item>
+
+    <item>REPLACE INTO `?:privileges` (`privilege`, `is_default`, `section_id`) VALUES ('update_ticket', 'Y', 'Helpdesk');</item>
+    <item for="uninstall">DELETE FROM `?:privileges` WHERE `privilege` = 'update_ticket';</item>
+
+    <item>REPLACE INTO `?:privileges` (`privilege`, `is_default`, `section_id`) VALUES ('delete_ticket', 'Y', 'Helpdesk');</item>
+    <item for="uninstall">DELETE FROM `?:privileges` WHERE `privilege` = 'delete_ticket';</item>
+
+    <item>REPLACE INTO `?:privileges` (`privilege`, `is_default`, `section_id`) VALUES ('delete_message', 'Y', 'Helpdesk');</item>
+    <item for="uninstall">DELETE FROM `?:privileges` WHERE `privilege` = 'delete_message';</item>
+
+    <item>REPLACE INTO `?:privileges` (`privilege`, `is_default`, `section_id`) VALUES ('add_ticket', 'Y', 'Helpdesk');</item>
+    <item for="uninstall">DELETE FROM `?:privileges` WHERE `privilege` = 'add_ticket';</item>
+
+    <item>REPLACE INTO `?:privileges` (`privilege`, `is_default`, `section_id`) VALUES ('check_message', 'Y', 'Helpdesk');</item>
+    <item for="uninstall">DELETE FROM `?:privileges` WHERE `privilege` = 'check_message';</item>   -->
+    </queries>
+</addon>
