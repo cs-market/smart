@@ -962,7 +962,7 @@ function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fie
 }
 
 function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
-    if (Tygh::$app['session']['auth']['area'] == 'A') {
+    if ($auth['area'] == 'A') {
         $join = explode(' JOIN ', $join);
         foreach($join as &$j) {
             $j = explode(' AND ', $j);
@@ -980,7 +980,11 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
     }
 
     $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
-    $price_usergroup = db_quote(" AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'A' && !defined('ORDER_MANAGEMENT')) ? USERGROUP_ALL : array_diff($usergroup_ids, [USERGROUP_ALL])));
+    $condition .= db_quote(' 
+        AND CASE WHEN 
+        (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
+        THEN ?:product_prices.usergroup_id IN (?a) 
+        ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_diff($usergroup_ids, [USERGROUP_ALL]), array_diff($usergroup_ids, [USERGROUP_ALL]), USERGROUP_ALL);
 
     // Cut off out of stock products
     if (AREA == 'C') {
