@@ -26,6 +26,13 @@ class ProductAvailTill extends AbstractMigration
 	$pr = $options['prefix'];
 	$sql = "DROP TABLE {$pr}new_orders";
 	$this->execute($sql);
+	$this->execute("UPDATE {$pr}products SET min_qty = 0 WHERE min_qty IS NULL; ");
+	$this->execute("UPDATE {$pr}products SET max_qty = 0 WHERE max_qty IS NULL; ");
+	$this->execute("UPDATE {$pr}products SET amount = 0 WHERE amount IS NULL; ");
+	$this->execute("UPDATE {$pr}products SET qty_step = 0 WHERE qty_step IS NULL; ");
+
+	$sql = "ALTER TABLE `{$pr}products` CHANGE `amount` `amount` FLOAT NOT NULL DEFAULT '0', CHANGE `qty_step` `qty_step` FLOAT NOT NULL DEFAULT '0', CHANGE `max_qty` `max_qty` FLOAT NOT NULL DEFAULT '0', CHANGE `min_qty` `min_qty` FLOAT NOT NULL DEFAULT '0'";
+	$this->execute($sql);
     }
 
     /**
