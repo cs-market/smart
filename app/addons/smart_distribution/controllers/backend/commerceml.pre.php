@@ -77,7 +77,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		return array(CONTROLLER_STATUS_REDIRECT, 'commerceml.offers');
 	}
 }
-
+if ($mode == 'backup_qty') {
+    $data = db_get_array('SELECT product_id, min_qty, max_qty, qty_step FROM ?:products');
+    $params['filename'] = 'products.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($data, $params, '"');
+    fn_print_die($export);
+}
 if ($mode =='monolith' && !empty($action)) {
 	fn_print_die(fn_monolith_generate_xml($action));
 }
