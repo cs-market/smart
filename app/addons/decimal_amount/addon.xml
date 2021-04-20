@@ -1,44 +1,36 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
-	<id>decimal_amount</id>
-	<name>Decimal amount</name>
-	<description><![CDATA[Allows to use fractional quantity. © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
-	<version>1.0.1</version>
-	<priority>4100</priority>
-	<status>active</status>
-	<default_language>en</default_language>
-	<supplier>CS-Market</supplier>
-	<supplier_link>http://cs-market.com/</supplier_link>
-	<has_icon>Y</has_icon>
-	<language_variables>
-		<item lang="en" id="activation_label">This add-on requires activation on your domain</item>
-		<item lang="en" id="activation_fault">This add-on has not been activated on your domain. <![CDATA[<a href="//cs-market.com/contact-us.html" target="_blank">Contact us</a>]]> to resolve this issue.</item>
-	</language_variables>
-	<settings>
-		<sections>
-			<section id="general">
-				<items>
-					<item id="general_header">
-						<name>General settings</name>
-						<type>header</type>
-					</item>
-					<item id="license_key">
-						<type>input</type>
-						<name>License key</name>
-					</item>
-					<item id="activate">
-						<type>template</type>
-						<default_value>activate.tpl</default_value>
-					</item>
-				</items>
-			</section>
-		</sections>
-	</settings>
-	
-	<queries>
-		<item>ALTER TABLE `?:products` CHANGE `amount` `amount` FLOAT NOT NULL DEFAULT '0', CHANGE `qty_step` `qty_step` FLOAT NOT NULL DEFAULT '0', CHANGE `max_qty` `max_qty` FLOAT NOT NULL DEFAULT '0', CHANGE `min_qty` `min_qty` FLOAT NOT NULL DEFAULT '0'</item>
-		<item>ALTER TABLE `?:order_details` CHANGE `amount` `amount` FLOAT UNSIGNED NOT NULL DEFAULT '0'</item>
-		<item for="uninstall">ALTER TABLE `?:products` CHANGE `amount` `amount` mediumint(8) NOT NULL DEFAULT '0', CHANGE `qty_step` `qty_step` smallint(5) NOT NULL DEFAULT '0', CHANGE `max_qty` `max_qty` smallint(5) NOT NULL DEFAULT '0', CHANGE `min_qty` `min_qty` smallint(5) NOT NULL DEFAULT '0'</item>
-		<item for="uninstall">ALTER TABLE `?:order_details` CHANGE `amount` `amount` mediumint(8) UNSIGNED NOT NULL DEFAULT '0'</item>
-	</queries>
+    <id>decimal_amount</id>
+    <name>Decimal amount</name>
+    <description><![CDATA[Allows to use fractional quantity. © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <version>1.0.1</version>
+    <priority>4100</priority>
+    <status>active</status>
+    <default_language>en</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="general_header">
+                        <name>General settings</name>
+                        <type>header</type>
+                    </item>
+                    <item id="license_key">
+                        <type>input</type>
+                        <name>License key</name>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+    
+    <queries>
+        <item>ALTER TABLE `?:products` CHANGE `amount` `amount` FLOAT NOT NULL DEFAULT '0', CHANGE `qty_step` `qty_step` FLOAT NOT NULL DEFAULT '0', CHANGE `max_qty` `max_qty` FLOAT NOT NULL DEFAULT '0', CHANGE `min_qty` `min_qty` FLOAT NOT NULL DEFAULT '0'</item>
+        <item>ALTER TABLE `?:order_details` CHANGE `amount` `amount` FLOAT UNSIGNED NOT NULL DEFAULT '0'</item>
+        <item for="uninstall">ALTER TABLE `?:products` CHANGE `amount` `amount` mediumint(8) NOT NULL DEFAULT '0', CHANGE `qty_step` `qty_step` smallint(5) NOT NULL DEFAULT '0', CHANGE `max_qty` `max_qty` smallint(5) NOT NULL DEFAULT '0', CHANGE `min_qty` `min_qty` smallint(5) NOT NULL DEFAULT '0'</item>
+        <item for="uninstall">ALTER TABLE `?:order_details` CHANGE `amount` `amount` mediumint(8) UNSIGNED NOT NULL DEFAULT '0'</item>
+    </queries>
 </addon>
