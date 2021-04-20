@@ -16,6 +16,6 @@
             {assign var="phone" value=""}
         {/if}
     {/if}
-    <label for="customer_phone" class="ty-control-group__title">{__("phone")}</label>
-    <input id="customer_phone" size="35" type="text" name="payment_info[customer_phone]" value="{$phone}" class="ty-input-text cm-autocomplete-off cm-required" />
+    <label for="customer_phone" class="ty-control-group__title cm-required">{__("phone")}</label>
+    <input id="customer_phone" size="35" type="text" name="payment_info[customer_phone]" value="{$phone}" class="ty-input-text cm-autocomplete-off" />
 </div>
