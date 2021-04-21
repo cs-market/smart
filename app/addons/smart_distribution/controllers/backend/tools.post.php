@@ -3,51 +3,6 @@
 
 if ($mode =='monolith' && !empty($action)) {
     fn_print_die(fn_monolith_generate_xml($action));
-}
-if ($mode == 'sync') {
-    $params = $_REQUEST;
-
-    $manual = true;
-    //unset($_SESSION['exim_1c']);
-    $lang_code = (!empty($s_commerceml['exim_1c_lang'])) ? $s_commerceml['exim_1c_lang'] : CART_LANGUAGE;
-
-    $exim_commerceml->getDirCommerceML();
-    $exim_commerceml->import_params['lang_code'] = $lang_code;
-    $exim_commerceml->import_params['manual'] = true;
-    $exim_commerceml->company_id = Registry::get('runtime.company_id');
-    if ($action == 'import') {
-        $filename = (!empty($params['filename'])) ? fn_basename($params['filename']) : 'import.xml';
-        $fileinfo = pathinfo($filename);
-        list($xml, $d_status, $text_message) = $exim_commerceml->getFileCommerceml($filename);
-        $exim_commerceml->addMessageLog($text_message);
-
-        if ($d_status === false) {
-            fn_echo("failure");
-            exit;
-        }
-
-        if ($s_commerceml['exim_1c_import_products'] != 'not_import') {
-            $exim_commerceml->importDataProductFile($xml);
-        } else {
-            fn_echo("success\n");
-        }
-    }
-    if ($action == 'offers') {
-        $filename = (!empty($params['filename'])) ? fn_basename($params['filename']) : 'offers.xml';
-        $fileinfo = pathinfo($filename);
-        list($xml, $d_status, $text_message) = $exim_commerceml->getFileCommerceml($filename);
-        $exim_commerceml->addMessageLog($text_message);
-        if ($d_status === false) {
-            fn_echo("failure");
-            exit;
-        }
-        if ($s_commerceml['exim_1c_only_import_offers'] == 'Y') {
-            $exim_commerceml->importDataOffersFile($xml, $service_exchange, $lang_code, $manual);
-        } else {
-            fn_echo("success\n");
-        }
-    }
-    fn_print_die('done');
 } elseif ($mode == 'base_price' && $action) {
     list($products,) = fn_get_products(['company_id' => $action]);
     $auth = $_SESSION['auth'];
@@ -1227,8 +1182,14 @@ fn_print_r($fantoms);
         }
     }
     fn_print_die(count($profile_ids), $failure);
+} elseif ($mode == 'restore_decimal') {
+    $file = 'var/files/products.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    foreach ($content as $data) {
+        db_query('UPDATE ?:products SET ?u WHERE product_id = ?i', $data, $data['product_id']);
+    }
+    fn_print_die(count($content));
 }
-
 
 function fn_merge_product_features($target_feature, $group) {
     $target_feature_data = fn_get_product_feature_data($target_feature, true, true);
