@@ -14,10 +14,15 @@
 
 namespace Tygh\SmartyEngine;
 
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use Tygh\Enum\SiteArea;
 use Tygh\Exceptions\PermissionsException;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
-use Tygh\Settings;
 use Tygh\Themes\Themes;
+use Tygh\Tygh;
 
 class Core extends \Smarty
 {
@@ -109,23 +114,30 @@ class Core extends \Smarty
 
     /**
      * Sets area to display templates from
-     * @param string  $area       area name (C,A)
-     * @param string  $area_type  area type (can be mail of empty)
-     * @param integer $company_id company ID
+     *
+     * @param string $area          area name (C,A)
+     * @param string $area_type     area type (can be mail of empty)
+     * @param int    $company_id    company ID
+     * @param int    $storefront_id Storefront ID
      */
-    public function setArea($area, $area_type = '', $company_id = null)
+    public function setArea($area, $area_type = '', $company_id = null, $storefront_id = null)
     {
         if (fn_allowed_for('MULTIVENDOR') && is_null($company_id) && !Registry::get('runtime.company_id')) {
             $company_id = 0;
         }
 
         $area_type_suffix = $area_type == 'mail' ? '/mail': '';
-        $path = fn_get_theme_path("[themes]/[theme]{$area_type_suffix}", $area, $company_id);
-        $path_rel = fn_get_theme_path("[relative]/[theme]{$area_type_suffix}", $area, $company_id);
+        $path = fn_get_theme_path("[themes]/[theme]{$area_type_suffix}", $area, $company_id, true, $storefront_id);
+        $path_rel = fn_get_theme_path("[relative]/[theme]{$area_type_suffix}", $area, $company_id, true, $storefront_id);
         if ($area == 'A') {
             $c_prefix = "backend{$area_type_suffix}";
         } else {
-            $c_prefix = fn_get_theme_path("[theme]{$area_type_suffix}", $area, $company_id);
+            if (!$storefront_id) {
+                /** @var \Tygh\Storefront\Storefront $storefront */
+                $storefront = Tygh::$app['storefront'];
+                $storefront_id = $storefront->storefront_id;
+            }
+            $c_prefix = fn_get_theme_path("[theme]{$area_type_suffix}", $area, $company_id, true, $storefront_id);
         }
 
         $suffix = '/templates';
@@ -136,20 +148,19 @@ class Core extends \Smarty
         $this->_area = $area;
         $this->_area_type = $area_type;
 
-        $this->theme = Themes::areaFactory($area, $company_id);
-        if ($area == 'C') {
-            Registry::registerCache('theme_dirs', array(), Registry::cacheLevel('static'));
-            $this->theme_dirs = Registry::ifGet('theme_dirs', array());
-            $id = (int) $company_id;
-            if (!isset($this->theme_dirs[$id])) {
+        $this->theme = Themes::areaFactory($area, $company_id, $storefront_id);
+        if ($area === SiteArea::STOREFRONT) {
+            Registry::registerCache('theme_dirs', [], Registry::cacheLevel(['static', 'storefront']));
+            $this->theme_dirs = Registry::ifGet('theme_dirs', []);
+            if (!$this->theme_dirs) {
                 // all theme directories have to be fetched to use add-on templates from base theme
-                $this->theme_dirs[$id] = $this->theme->getThemeDirs(Themes::USE_BASE);
+                $this->theme_dirs = $this->theme->getThemeDirs(Themes::USE_BASE);
                 Registry::set('theme_dirs', $this->theme_dirs);
             }
 
             // add template directories of the theme and the parent theme
-            foreach ($this->theme_dirs[$id] as $theme_name => $path_info) {
-                if ($theme_name != $this->theme->getThemeName()) {
+            foreach ($this->theme_dirs as $theme_name => $path_info) {
+                if ($theme_name !== $this->theme->getThemeName()) {
                     $this->addTemplateDir($path_info[Themes::PATH_ABSOLUTE] . ltrim($area_type_suffix, "/") . $suffix);
                 }
             }
@@ -173,25 +184,19 @@ class Core extends \Smarty
         }
         $this->assign('self_images_dir', Registry::get('config.current_location') . '/' . $path_rel . '/media/images');
 
-        if ($this->use_runtime_layout_for_logos) {
-            $this->assign('logos', fn_get_logos(
-                $company_id,
-                Registry::get('runtime.layout.layout_id'),
-                Registry::get('runtime.layout.style_id')
-            ));
-        } else {
-            $this->assign('logos', fn_get_logos($company_id));
-        }
+        $this->initLogos($company_id);
     }
 
     /**
      * Displays templates from mail area
-     * @param  string   $template   template name
-     * @param  boolean  $to_screen  outputs if true, returns contents if false
-     * @param  string   $area       template area
-     * @param  integer  $company_id company ID
-     * @param  string   $lang_code  language code
-     * @return template contents or true
+     *
+     * @param  string  $template   template name
+     * @param  boolean $to_screen  outputs if true, returns contents if false
+     * @param  string  $area       template area
+     * @param  integer $company_id company ID
+     * @param  string  $lang_code  language code
+     *
+     * @return string template contents or true
      */
     public function displayMail($template, $to_screen, $area, $company_id = null, $lang_code = CART_LANGUAGE)
     {
@@ -297,13 +302,44 @@ class Core extends \Smarty
     }
 
     /**
-     * This realisation much faster and has less memory consumption than default, but does not support storages except file system.
-     * @param  string  $resource_name relative template path
-     * @return boolean true if exists, false - otherwise
+     * Checks if template file exists.
+     * Tip: this realisation much faster and has less memory consumption than default, but does not support storages except file system.
+     *
+     * @param string $resource_name Relative template path
+     *
+     * @return bool true if exists, false - otherwise
      */
     public function templateExists($resource_name)
     {
+        $exists = $this->templateExistsViaSnapshot($resource_name);
+
+        if ($exists !== null) {
+            return $exists;
+        }
+
+        /** @var array<string> $dirs */
         $dirs = $this->getTemplateDir();
+
+        foreach ($dirs as $dir) {
+            if (file_exists($dir . trim($resource_name, '/'))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if template dir exists.
+     *
+     * @param string $resource_name Relative template dir path
+     *
+     * @return bool
+     */
+    public function templateDirExists($resource_name)
+    {
+        /** @var array<string> $dirs */
+        $dirs = $this->getTemplateDir();
+
         foreach ($dirs as $dir) {
             if (file_exists($dir . trim($resource_name, '/'))) {
                 return true;
@@ -311,5 +347,97 @@ class Core extends \Smarty
         }
 
         return false;
+    }
+
+    /**
+     * Checks if template file exists via snapshot
+     *
+     * @param string $resource_name Relative template dir path
+     *
+     * @return bool|null
+     */
+    private function templateExistsViaSnapshot($resource_name)
+    {
+        static $snapshot = null;
+        static $use_snapshot = null;
+
+        if ($use_snapshot === null && SiteArea::isStorefront(AREA)) {
+            $key = __FUNCTION__;
+            Registry::registerCache($key, ['addons'], Registry::cacheLevel('static'));
+
+            if (Registry::isExist($key)) {
+                $use_snapshot = false;
+            } else {
+                Registry::set($key, 1);
+                $use_snapshot = true;
+            }
+        }
+
+        if (!$use_snapshot) {
+            return null;
+        }
+
+        if ($snapshot === null) {
+            $snapshot = [];
+            $dirs = $this->getTemplateDir();
+
+            foreach ($dirs as $dir) {
+                $directory_iterator = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator(
+                        $dir,
+                        FilesystemIterator::SKIP_DOTS |
+                        FilesystemIterator::CURRENT_AS_FILEINFO
+                    ),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
+
+                foreach ($directory_iterator as $spl_file_info) {
+                    /** @var \SplFileInfo $spl_file_info */
+                    if (!$spl_file_info->isFile() && !$spl_file_info->isLink()) {
+                        continue;
+                    }
+                    $snapshot[str_replace($dir, '', $spl_file_info->getPathname())] = true;
+                }
+            }
+        }
+
+        return
+            isset($snapshot[$resource_name])
+            || ('\\' === DIRECTORY_SEPARATOR && isset($snapshot[str_replace('/', '\\', $resource_name)]));
+    }
+
+    /**
+     * Inits logos
+     *
+     * @param int|null $company_id Company ID
+     */
+    private function initLogos($company_id)
+    {
+        $key = sprintf(
+            'init_logos_%s_%s_%s',
+            $company_id === null ? '_' : (int) $company_id,
+            Registry::get('runtime.layout.layout_id'),
+            Registry::get('runtime.layout.style_id')
+        );
+
+        $logos = Registry::getOrSetCache(
+            ['template_logos', $key],
+            ['logos', 'images', 'images_links'],
+            ['static', 'storefront'],
+            function () use ($company_id) {
+                $layout_id = $this->use_runtime_layout_for_logos ? (int) Registry::get('runtime.layout.layout_id') : null;
+                $style_id = $this->use_runtime_layout_for_logos ? (string) Registry::get('runtime.layout.style_id') : null;
+                $storefront_id = $company_id ? null : StorefrontProvider::getStorefront()->storefront_id;
+
+                return fn_get_logos(
+                    $company_id,
+                    $layout_id,
+                    $style_id,
+                    $storefront_id
+                );
+            }
+        );
+
+        $this->assign('logos', $logos);
     }
 }

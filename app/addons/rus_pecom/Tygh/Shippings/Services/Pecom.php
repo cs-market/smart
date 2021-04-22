@@ -96,7 +96,7 @@ class Pecom implements IService
     public function getPackageValues()
     {
 
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
+        $weight_data = fn_convert_weight_to_imperial_units($this->_shipping_info['package_info']['W']);
         $weight = $weight_data['plain'] * Registry::get('settings.General.weight_symbol_grams') / 1000;
 
         $packages = $this->_shipping_info['package_info']['packages'];
@@ -233,7 +233,6 @@ class Pecom implements IService
      */
     public function getRequestData()
     {
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
         $shipping_settings = $this->_shipping_info['service_params'];
         $packages = $this->_shipping_info['package_info']['packages'];
 
@@ -265,7 +264,7 @@ class Pecom implements IService
             $data['strah'] = $this->_shipping_info['package_info']['C'];
         }
 
-        $url = 'http://pecom.ru/bitrix/components/pecom/calc/ajax.php';
+        $url = 'http://calc.pecom.ru/bitrix/components/pecom/calc/ajax.php';
         $request_data = array(
             'method' => 'get',
             'url' => $url,

@@ -352,4 +352,24 @@ class Document implements ITemplate
     {
         return $this->type . '_' . $this->code;
     }
+
+    /**
+     * Gets document call tag.
+     *
+     * @return string
+     */
+    public function getCallTag()
+    {
+        return 'include_doc("' . $this->getFullCode() . '")';
+    }
+
+    /**
+     * Provides template code unique for the specific document.
+     *
+     * @return string
+     */
+    public function getFullCode()
+    {
+        return $this->type . '.' . $this->code;
+    }
 }

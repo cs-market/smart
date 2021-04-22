@@ -114,12 +114,16 @@ Blog
 }
 
 .ty-blog-text-links__date {
+    display: inline-block;
     color: #adadad;
     border: 1px solid @base;
     padding: 3px 8px;
     margin-right: 9px;
-    float: left;
     font-size: 12px;
+    
+    @media (min-width: 980px) {
+        float: left;
+    }
 }
 
 .ty-blog-text-links__a {

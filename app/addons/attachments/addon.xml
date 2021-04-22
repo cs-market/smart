@@ -8,6 +8,18 @@
     <has_icon>Y</has_icon>
     <default_language>en</default_language>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="allow_save_attachments_to_server">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
     <queries>
         <item>DROP TABLE IF EXISTS ?:attachments;</item>
         <item>DROP TABLE IF EXISTS ?:attachment_descriptions;</item>
@@ -22,6 +34,8 @@
                 `filesize` int(11) unsigned NOT NULL default '0',
                 `usergroup_ids` varchar(255) NOT NULL default '0',
                 `status` char(1) NOT NULL default 'A',
+                `on_server` char(1) NOT NULL default 'Y',
+                `url` varchar(255) NOT NULL default '',
                 PRIMARY KEY  (`attachment_id`),
                 KEY `object_type` (`object_type`,`object_id`),
                 KEY `type` (`type`)

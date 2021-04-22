@@ -15,3 +15,5 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_define('SETTINGS_ARCHIVE_FILE_NAME', 'app_settings.zip');
+fn_define('APPLE_PAY_DEFAULT_MERCHANT_ID', 'merchant.com.cscart');
+fn_define('APPLE_PAY_DEFAULT_MERCHANT_NAME', 'CSCartmultivendor');

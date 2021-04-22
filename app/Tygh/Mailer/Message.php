@@ -97,6 +97,11 @@ class Message
     protected $company_id;
 
     /**
+     * @var int Storfront identifier
+     */
+    protected $storefront_id;
+
+    /**
      * Mail constructor.
      */
     public function __construct()
@@ -415,12 +420,32 @@ class Message
     }
 
     /**
+     * Gets company identifier
+     *
+     * @return int
+     */
+    public function getStorefrontId()
+    {
+        return $this->storefront_id;
+    }
+
+    /**
      * Sets company identifier
      *
-     * @param int
+     * @param int $company_id Company identifier
      */
     public function setCompanyId($company_id)
     {
         $this->company_id = $company_id;
+    }
+
+    /**
+     * Sets storefront identifier
+     *
+     * @param int $storefront_id Storefront identifier
+     */
+    public function setStorefrontId($storefront_id)
+    {
+        $this->storefront_id = $storefront_id;
     }
 }

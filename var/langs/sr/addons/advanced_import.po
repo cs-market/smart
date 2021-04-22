@@ -8,12 +8,12 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: sr\n"
-"X-Crowdin-File: /release-4.8.2/addons/advanced_import.po\n"
+"X-Crowdin-File: /release-4.9.2/addons/advanced_import.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:10\n"
+"PO-Revision-Date: 2018-11-16 12:18\n"
 
 msgctxt "Addons::name::advanced_import"
-msgid "Advanced products import [Beta]"
+msgid "Advanced products import"
 msgstr ""
 
 msgctxt "Addons::description::advanced_import"
@@ -162,6 +162,10 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.cant_load_file_for_company"
 msgid "File can't be loaded for the specified company"
+msgstr ""
+
+msgctxt "Languages::advanced_import.cant_load_file"
+msgid "File can't be loaded"
 msgstr ""
 
 msgctxt "Languages::advanced_import.uploading_file"

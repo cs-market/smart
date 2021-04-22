@@ -60,6 +60,9 @@ $schema = array(
         'Discount' => array(
             'db_field' => 'discount'
         ),
+        'Subtotal discount' => [
+            'db_field' => 'subtotal_discount'
+        ],
         'Payment surcharge' => array(
             'db_field' => 'payment_surcharge'
         ),
@@ -230,6 +233,18 @@ if (fn_allowed_for('MULTIVENDOR')) {
     if (!Registry::get('runtime.company_id')) {
         $schema['export_fields']['Vendor']['required'] = true;
     }
+}
+
+if (fn_allowed_for('MULTIVENDOR:ULTIMATE')) {
+    $schema['export_fields']['Storefront'] = array(
+        'db_field' => 'storefront_id',
+    );
+
+    $schema['import_process_data']['import_check_storefront_id'] = array(
+        'function' => 'fn_import_check_storefront_id',
+        'args' => array('$data'),
+        'import_only' => true,
+    );
 }
 
 return $schema;

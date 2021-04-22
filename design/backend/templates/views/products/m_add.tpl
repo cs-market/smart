@@ -3,7 +3,7 @@
 <form action="{""|fn_url}" method="post" name="products_m_addition_form">
 
 <div class="table-responsive-wrapper">
-    <table width="100%"    class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr class="cm-first-sibling">
         <th>{__("main_category")}</th>
@@ -44,9 +44,7 @@
             </select>
         </td>
         <td class="nowrap" data-th="">
-            <div class="hidden-tools">
-                {include file="buttons/multiple_buttons.tpl" item_id="new_product"}
-            </div>
+            {include file="buttons/multiple_buttons.tpl" item_id="new_product"}
         </td>
     </tr>
     </table>

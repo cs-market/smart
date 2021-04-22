@@ -14,11 +14,12 @@
         {else}
         <a {if $use_ajax}class="cm-ajax"{/if} href="{$config.current_url|fn_query_remove:"profile":"selected_section"|fn_link_attach:"profile_id=`$up.profile_id`"|fn_url}" data-ca-target-id="checkout_steps,cart_items,checkout_totals">{$up.profile_name}</a>
         {/if}
-        {if !$smarty.foreach.pfe.last}&nbsp;|&nbsp;{/if}
 
         {if $up.profile_type != "P" && !$hide_profile_delete}
             {include file="buttons/button.tpl" but_meta="cm-confirm" but_target_id="checkout_steps,cart_items,checkout_totals" but_role="delete" but_text="&nbsp;" but_href="profiles.delete_profile?profile_id=`$up.profile_id`"}
         {/if}
+
+        {if !$smarty.foreach.pfe.last}&nbsp;|&nbsp;{/if}
     {/foreach}
     {if !$skip_create}
         &nbsp;&nbsp;{__("or")}&nbsp;&nbsp;&nbsp;{if $smarty.request.profile == "new"}<strong>{__("create_profile")}</strong>{else}<a class="{if $use_ajax} cm-ajax{/if}" href="{if $create_href}{$create_href|fn_url}{else}{$config.current_url|fn_query_remove:"profile_id":"selected_section"|fn_link_attach:"profile=new"|fn_url}{/if}" data-ca-target-id="checkout_steps,cart_items,checkout_totals">{__("create_profile")}</a>{/if}

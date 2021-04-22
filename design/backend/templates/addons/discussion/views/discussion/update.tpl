@@ -2,7 +2,7 @@
     <form action="{""|fn_url}" method="POST" enctype="multipart/form-data" class=" form-horizontal {if $discussion.object_type == "M" && $runtime.company_id}cm-hide-inputs{/if}" name="update_posts_form">
     <input type="hidden" name="redirect_url" value="{$config.current_url}&amp;selected_section=discussion" />
     <input type="hidden" name="selected_section" value="" />
-        {include file="addons/discussion/views/discussion_manager/components/discussion.tpl"}
+        {include file="addons/discussion/views/discussion_manager/components/discussion.tpl" object_company_id=$discussion.company_id}
     </form>
     {include file="addons/discussion/views/discussion_manager/components/new_discussion_popup.tpl"}
 {/capture}

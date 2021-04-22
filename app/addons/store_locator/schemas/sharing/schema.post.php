@@ -12,20 +12,20 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['store_locations'] = array(
-    'controller' => 'store_locator',
-    'mode' => 'update',
-    'type' => 'tpl_tabs',
-    'params' => array(
+$schema['store_locations'] = [
+    'controller'     => 'store_locator',
+    'mode'           => 'update',
+    'type'           => 'tpl_tabs',
+    'params'         => [
         'object_id' => '@store_location_id',
-        'object' => 'store_locations'
-    ),
-    'table' => array(
-        'name' => 'store_locations',
+        'object'    => 'store_locations',
+    ],
+    'table'          => [
+        'name'      => 'store_locations',
         'key_field' => 'store_location_id',
-    ),
+    ],
     'request_object' => 'store_location_data',
-    'have_owner' => true,
-);
+    'have_owner'     => true,
+];
 
 return $schema;

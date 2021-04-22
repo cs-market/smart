@@ -110,19 +110,19 @@
     {/if}
 {/capture}
 
-<div class="table-wrapper">
-    <table width="100%" class="profile-info">
+<div class="table-responsive-wrapper">
+    <table width="100%" class="table table-middle table--relative table-responsive table-responsive-w-titles profile-info">
     <tr valign="top">
-        <td width="{if $payment_info}34%{else}50%{/if}">
+        <td width="{if $payment_info}34%{else}50%{/if}" data-th="&nbsp;">
             {$smarty.capture.billing_address nofilter}
         </td>
-        <td width="{if $payment_info}34%{else}50%{/if}">
+        <td width="{if $payment_info}34%{else}50%{/if}" data-th="&nbsp;">
             {$smarty.capture.shipping_address nofilter}
         </td>
     </tr>
     {if $user_data.email || $user_data.phone || $user_data.fax || $user_data.company || $user_data.url}
     <tr>
-        <td colspan="2">
+        <td colspan="2" data-th="&nbsp;">
             {$smarty.capture.customer_information nofilter}
         </td>
     </tr>

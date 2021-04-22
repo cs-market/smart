@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/searchanise.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.12.1/addons/searchanise.po\n"
+"X-Crowdin-File-ID: 3890\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::searchanise"
 msgid "Searchanise"
@@ -22,7 +22,7 @@ msgstr "يقوم بتشغيل خدمة البحث السريع <a target=\"_blan
 
 msgctxt "Languages::searchanise_menu_description"
 msgid "Manage search settings, customize view and merchandise products."
-msgstr ""
+msgstr "إدارة إعدادات البحث وتخصيص العرض ومنتجات البضائع."
 
 msgctxt "Languages::searchanise"
 msgid "Searchanise"
@@ -76,6 +76,10 @@ msgctxt "Languages::text_se_connected"
 msgid "You've connected to Searchanise."
 msgstr ""
 
+msgctxt "Languages::text_se_ajax_connecting"
+msgid "Product indexation has started in your store. It may take some time. Wait just a little, we've almost finished."
+msgstr ""
+
 msgctxt "Languages::text_se_database_restore_notice"
 msgid "You've just restored your data from the database dump file. If this dump contains product data, please <a href=\"[link]\">Re-indexation</a> it with Searchanise."
 msgstr ""
@@ -94,7 +98,7 @@ msgstr ""
 
 msgctxt "Languages::se_title"
 msgid "Title"
-msgstr ""
+msgstr "العنوان"
 
 msgctxt "Languages::se_summary"
 msgid "Description"
@@ -106,11 +110,11 @@ msgstr ""
 
 msgctxt "Languages::se_price"
 msgid "Price"
-msgstr ""
+msgstr "الأسعار"
 
 msgctxt "Languages::se_list_price"
 msgid "List Price"
-msgstr ""
+msgstr "قائمة الأسعار"
 
 msgctxt "Languages::se_quantity"
 msgid "Quantity"
@@ -118,11 +122,11 @@ msgstr ""
 
 msgctxt "Languages::se_product_code"
 msgid "Product Code"
-msgstr ""
+msgstr "رمز المنتج"
 
 msgctxt "Languages::se_image_link"
 msgid "Image Url"
-msgstr ""
+msgstr "عنوان Url للصورة"
 
 msgctxt "Languages::se_category_Id"
 msgid "Category Id"
@@ -182,6 +186,26 @@ msgstr ""
 
 msgctxt "Languages::se_options_combinations_codes"
 msgid "Options combinations codes"
+msgstr ""
+
+msgctxt "Languages::se_master_product_status"
+msgid "Common product status"
+msgstr ""
+
+msgctxt "Languages::se_is_vendor_product"
+msgid "Vendor product flag"
+msgstr ""
+
+msgctxt "Languages::se_is_master_product"
+msgid "Сommon product flag"
+msgstr ""
+
+msgctxt "Languages::se_connection_warning"
+msgid "Searchanise: There is no connection to Searchanise server! For Searchanise to work properly, the store server must be able to access www.searchanise.com. Please contact Searchanise <a href=\"mailto: [email]\">[email]</a> technical support or your system administrator."
+msgstr ""
+
+msgctxt "Languages::se_queue_warning"
+msgid "Searchanise: We found an issue with the export of changes in your store catalog. To resolve the issue please contact the Searchanise <a href=\"mailto: [email]\">[email]</a> technical support."
 msgstr ""
 
 msgctxt "SettingsSections::searchanise::configuration"

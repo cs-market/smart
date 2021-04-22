@@ -1,5 +1,5 @@
 <div class="control-group">
-    <label class="control-label">{__("pd_allowed_payment_methods")} {include file="common/tooltip.tpl" tooltip=__("pd_allowed_payment_methods_text")}:</label>
+    <label class="control-label">{__("pd_allowed_payment_methods")}:</label>
     <div class="controls">
         <input type="hidden" name="shipping_data[enable_payment_ids]" value="" />
         {foreach from=$payments item="payment"}
@@ -9,5 +9,6 @@
         {foreachelse}
             &ndash;
         {/foreach}
+        <p class="muted description">{__("pd_allowed_payment_methods_text")}</p>
     </div>
 </div>

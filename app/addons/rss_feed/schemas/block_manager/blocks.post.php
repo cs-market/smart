@@ -14,6 +14,8 @@
 
 use Tygh\Registry;
 
+require_once Registry::get('config.dir.addons') . 'rss_feed/schemas/block_manager/blocks.functions.php';
+
 $schema['rss_feed'] = array (
     'content' => array (
         'filling' => array(
@@ -71,6 +73,7 @@ $schema['rss_feed'] = array (
         ),
     ),
     'cache' => true,
+    'brief_info_function' => 'fn_block_get_rss_object_info'
 );
 
 return $schema;

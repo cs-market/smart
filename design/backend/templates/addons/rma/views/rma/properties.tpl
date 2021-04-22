@@ -5,7 +5,7 @@
 
 {if $properties}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr>
         {if $smarty.request.property_type == $smarty.const.RMA_REASON}
@@ -25,7 +25,7 @@
     <tr class="cm-row-status-{$property.status|lower}">
         {if $smarty.request.property_type == $smarty.const.RMA_REASON}
         <td class="center mobile-hide">
-            <input type="checkbox" name="property_ids[]" value="{$property.property_id}" class="checkbox cm-item" />
+            <input type="checkbox" name="property_ids[]" value="{$property.property_id}" class="cm-item" />
         </td>
         {/if}
         <td data-th="{__("position")}">
@@ -36,7 +36,7 @@
         </td>
         {if $smarty.request.property_type != $smarty.const.RMA_REASON}
         <td class="center" data-th="{__("update_totals_and_inventory")}">
-            <input type="checkbox" value="{$property.update_totals_and_inventory}" {if $property.update_totals_and_inventory == "Y"}checked="checked"{/if} disabled="disabled" class="checkbox" />
+            <input type="checkbox" value="{$property.update_totals_and_inventory}" {if $property.update_totals_and_inventory == "Y"}checked="checked"{/if} disabled="disabled" />
         </td>
         {/if}
         <td class="nowrap right" data-th="{__("tools")}">

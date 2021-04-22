@@ -27,8 +27,8 @@ function fn_check_product_filter_type(value, tab_id, id)
 {assign var="r_url" value=$config.current_url|escape:url}
 
 <div class="items-container{if ""|fn_check_form_permissions} cm-hide-inputs{else} cm-sortable{/if}" data-ca-sortable-table="product_filters" data-ca-sortable-id-name="filter_id" id="manage_filters_list">
-    <div class="table-wrapper">
-        <table width="100%" class="table table-middle table-objects table-striped">
+    <div class="table-responsive-wrapper">
+        <table width="100%" class="table table-middle table--relative table-objects table-striped table-responsive table-responsive-w-titles">
         <tbody>
 
         {foreach from=$filters item="filter"}
@@ -48,9 +48,10 @@ function fn_check_product_filter_type(value, tab_id, id)
                     no_table=true
                     draggable=true
                     additional_class="cm-no-hide-input cm-sortable-row cm-sortable-id-`$filter.filter_id`"
-                    header_text="{__("editing_filter")}: `$filter.filter`"
+                    header_text=$filter.filter
                     link_text=__("edit")
                     company_object=$filter
+                    is_responsive_table=true
                 }
             {else}
                 {include file="common/object_group.tpl"

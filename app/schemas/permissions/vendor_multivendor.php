@@ -12,531 +12,674 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema = array(
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
+use Tygh\Registry;
+
+$schema = [
     'default_permission' => false,
-    'controllers' => array (
-        'auth' => array (
+    'controllers' => [
+        'auth' => [
             'permissions' => true,
-        ),
-        'index' => array (
+        ],
+        'index' => [
             'permissions' => true,
-        ),
-        'elf_connector' => array (
+        ],
+        'elf_connector' => [
             'permissions' => true,
-        ),
+        ],
 
-        'profiles' => array (
-            'modes' => array (
-                'update_cards' => array (
+        'order_management' => [
+            'modes' => [
+                'options' => [
+                  'permissions' => true,
+                ]
+            ]
+        ],
+
+        'profiles' => [
+            'modes' => [
+                'update_cards' => [
                     'permissions' => false
-                ),
-                'delete_profile' => array (
+                ],
+                'delete_profile' => [
                     'permissions' => false
-                ),
-                'delete_card' => array (
+                ],
+                'delete_card' => [
                     'permissions' => false
-                ),
-                'request_usergroup' => array (
+                ],
+                'request_usergroup' => [
                     'permissions' => false
-                ),
-                'manage' => array (
-                    'param_permissions' => array(
-                        'user_type' => array(
+                ],
+                'manage' => [
+                    'param_permissions' => [
+                        'user_type' => [
                             'P' => false,
-                        ),
+                        ],
                         'default_permission' => true,
-                    ),
-                    'condition' => array(
-                        'user_type' => array(
-                            'A' => array(
+                    ],
+                    'condition' => [
+                        'user_type' => [
+                            UserTypes::ADMIN  => [
                                 'operator' => 'and',
-                                'function' => array('fn_check_permission_manage_profiles', 'A'),
-                            ),
-                            'V' => array(
+                                'function' => ['fn_check_permission_manage_profiles', UserTypes::ADMIN],
+                            ],
+                            UserTypes::VENDOR => [
                                 'operator' => 'and',
-                                'function' => array('fn_check_permission_manage_profiles', 'V'),
-                            ),
-                        )
-                    ),
-                ),
-                'view_product_as_user' => array(
+                                'function' => ['fn_check_permission_manage_profiles', UserTypes::VENDOR],
+                            ],
+                        ]
+                    ],
+                ],
+                'view_product_as_user' => [
                     'permissions' => true,
-                ),
-                'act_as_user' => array (
+                ],
+                'act_as_user' => [
                     'permissions' => false,
-                    'condition' => array(
+                    'condition' => [
                         'operator' => 'or',
-                        'function' => array('fn_check_permission_act_as_user'),
-                    ),
-                )
-            ),
+                        'function' => ['fn_check_permission_act_as_user'],
+                    ],
+                ],
+                'login_as_vendor' => [
+                    'permissions' => false
+                ],
+                'm_delete' => [
+                    'param_permissions' => [
+                        'user_type' => [
+                            UserTypes::CUSTOMER => false,
+                        ],
+                    ],
+                    'default_permission' => true,
+                ]
+            ],
             'permissions' => true,
-        ),
-        'companies' => array (
-            'modes' => array (
-                'add' => array (
+        ],
+        'companies' => [
+            'modes' => [
+                'add' => [
                     'permissions' => false
-                ),
-                'delete' => array (
+                ],
+                'invite' => [
                     'permissions' => false
-                ),
-                'update_status' => array (
+                ],
+                'invitations' => [
                     'permissions' => false
-                ),
-                'm_activate' => array (
-                    'permissions' => false
-                ),
-                'm_disable' => array (
-                    'permissions' => false
-                ),
-                'm_delete' => array (
-                    'permissions' => false
-                ),
-                'export_range' => array(
+                ],
+                'm_delete_invitations' => [
                     'permissions' => false,
-                ),
-            ),
-            'permissions' => true,
-        ),
-        'profile_fields' => array (
-            /*'modes' => array (
-                'manage' => array (
-                    'permissions' => true
-                ),
-            ),*/
-            'permissions' => false,
-        ),
-        'usergroups' => array (
-            /*'modes' => array (
-                'manage' => array (
-                    'permissions' => true
-                ),
-                'assign_privileges' => array (
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'update_status' => array (
-                    'permissions' => true,
-                ),
-            ),*/
-            'permissions' => false,
-        ),
-
-        'sales_reports' => array (
-            'modes' => array(
-                'view' => array (
-                    'permissions' => true,
-                ),
-                'set_report_view' => array (
-                    'permissions' => true,
-                ),
-            ),
-            'permissions' => false,
-        ),
-
-        'categories' => array (
-            'modes' => array (
-                'delete' => array (
+                ],
+                'delete_invitation' => [
+                    'permissions' => false,
+                ],
+                'delete' => [
                     'permissions' => false
-                ),
+                ],
+                'update_status' => [
+                    'permissions' => false
+                ],
+                'm_activate' => [
+                    'permissions' => false
+                ],
+                'm_disable' => [
+                    'permissions' => false
+                ],
+                'm_delete' => [
+                    'permissions' => false
+                ],
+                'export_range' => [
+                    'permissions' => false,
+                ],
+                'update' => [
+                    'permissions' => ['GET' => true, 'POST' => true],
+                ],
+                'm_update_statuses' => [
+                    'permissions' => false,
+                ],
+            ],
+            'permissions' => true,
+        ],
+        'profile_fields' => [
+            /*'modes' => [
+                'manage' => [
+                    'permissions' => true
+                ],
+            ],*/
+            'permissions' => false,
+        ],
+        'usergroups' => [
+            /*'modes' => [
+                'manage' => [
+                    'permissions' => true
+                ],
+                'assign_privileges' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'update_status' => [
+                    'permissions' => true,
+                ],
+            ],*/
+            'permissions' => false,
+        ],
+
+        'sales_reports' => [
+            'modes' => [
+                'view' => [
+                    'permissions' => true,
+                ],
+                'set_report_view' => [
+                    'permissions' => true,
+                ],
+            ],
+            'permissions' => false,
+        ],
+
+        'categories' => [
+            'modes' => [
+                'delete' => [
+                    'permissions' => false
+                ],
                 // Why .add was true ???
-                'add' => array (
+                'add' => [
                     'permissions' => false
-                ),
-                'm_add' => array (
+                ],
+                'm_add' => [
                     'permissions' => false
-                ),
-                'm_update' => array (
+                ],
+                'm_update' => [
                     'permissions' => false
-                ),
-                'picker' => array (
+                ],
+                'picker' => [
                     'permissions' => true
-                ),
-            ),
-            'permissions' => array ('GET' => true, 'POST' => false),
-        ),
+                ],
+            ],
+            'permissions' => ['GET' => true, 'POST' => false],
+        ],
 
-        'taxes' => array (
-            'modes' => array(
-                'update' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'manage' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-            ),
+        'taxes' => [
+            'modes' => [
+                'update' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'manage' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+            ],
             'permissions' => false,
-        ),
+        ],
 
-        'image' => array (
-            'modes' => array(
-                'barcode' => array(
+        'image' => [
+            'modes' => [
+                'barcode' => [
                     'permissions' => true,
-                ),
-                'delete_image' => array(
+                ],
+                'delete_image' => [
                     'permissions' => true,
-                ),
-                'thumbnail' => array(
+                ],
+                'thumbnail' => [
                     'permissions' => true,
-                ),
-                'upload' => array(
+                ],
+                'upload' => [
                     'permissions' => true,
-                ),
-            ),
+                ],
+            ],
             'permissions' => false,
-        ),
+        ],
 
-        'search' => array (
-            'modes' => array(
-                'results' => array(
+        'search' => [
+            'modes' => [
+                'results' => [
                     'permissions' => true,
-                ),
-            ),
+                ],
+            ],
             'permissions' => false,
-        ),
+        ],
 
-        'states' => array (
-            'modes' => array(
-                'manage' => array(
+        'states' => [
+            'modes' => [
+                'manage' => [
                     'permissions' => true,
-                ),
-            ),
+                ],
+            ],
             'permissions' => false,
-        ),
+        ],
 
-        'countries' => array (
-            'modes' => array(
-                'manage' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-            ),
+        'countries' => [
+            'modes' => [
+                'manage' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+            ],
             'permissions' => false,
-        ),
+        ],
 
-        'destinations' => array (
-            'modes' => array(
-                'update' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'manage' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-            ),
+        'destinations' => [
+            'modes' => [
+                'update' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'manage' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'selector' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+            ],
             'permissions' => false,
-        ),
+        ],
 
-        'localizations' => array (
-            /*'modes' => array(
-                'update' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'manage' => array(
+        'localizations' => [
+            /*'modes' => [
+                'update' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'manage' => [
                     'permissions' => true,
-                ),
-            ),*/
+                ],
+            ],*/
             'permissions' => false,
-        ),
+        ],
 
-        'languages' => array (
-            /*'modes' => array(
-                'manage' => array(
+        'languages' => [
+            /*'modes' => [
+                'manage' => [
                     'permissions' => true,
-                ),
-            ),*/
+                ],
+            ],*/
             'permissions' => false,
-        ),
+        ],
 
-        'product_features' => array (
-            'modes' => array(
-                'update' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'manage' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'groups' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'get_feature_variants_list' => array(
+        'product_features' => [
+            'modes' => [
+                'update' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'manage' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'groups' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'get_features_list' => [
                     'permissions' => true,
-                ),
-                'get_variants_list' => array(
+                ],
+                'get_feature_variants_list' => [
                     'permissions' => true,
-                ),
-                'get_variants' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                )
-            ),
+                ],
+                'get_variants_list' => [
+                    'permissions' => true,
+                ],
+                'get_variants' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ]
+            ],
             'permissions' => false,
-        ),
+        ],
 
-        'statuses' => array (
-            /*'modes' => array(
-                'update' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'manage' => array(
+        'statuses' => [
+            /*'modes' => [
+                'update' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'manage' => [
                     'permissions' => true,
-                ),
-            ),*/
+                ],
+            ],*/
             'permissions' => false,
-        ),
+        ],
 
-        'currencies' => array (
-            'modes' => array(
-                'update' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'manage' => array(
+        'currencies' => [
+            'modes' => [
+                'update' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'manage' => [
                     'permissions' => true,
-                ),
-            ),
+                ],
+            ],
             'permissions' => false,
-        ),
-        'exim' => array (
-            'modes' => array(
-                'export' => array(
-                    'permissions' => true,
-                ),
-                'import' => array(
-                    'permissions' => true,
-                ),
-            ),
+        ],
+        'exim' => [
+            'modes' => [
+                'export' => [
+                    'param_permissions' => [
+                        'section' => [
+                            'features'     => false,
+                            'orders'       => true,
+                            'products'     => true,
+                            'translations' => false,
+                            'users'        => false,
+                        ],
+                    ],
+                ],
+                'import' => [
+                    'param_permissions' => [
+                        'section' => [
+                            'features'     => false,
+                            'orders'       => false,
+                            'products'     => true,
+                            'translations' => false,
+                            'users'        => false,
+                        ],
+                    ]
+                ],
+            ],
             'permissions' => true,
-        ),
+        ],
 
-        'product_filters' => array (
-            'modes' => array(
-                'update' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'manage' => array(
-                    'permissions' => array ('GET' => true, 'POST' => false),
-                ),
-                'delete' => array(
+        'product_filters' => [
+            'modes' => [
+                'update' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'manage' => [
+                    'permissions' => ['GET' => true, 'POST' => false],
+                ],
+                'delete' => [
                     'permissions' => false,
-                ),
-            ),
-            'permissions' => true,
-        ),
-
-        'orders' => array (
-            'modes' => array(
-                'details' => array(
-                    'permissions' => true,
-                ),
-                'delete' => array(
+                ],
+                'm_create_by_features' => [
                     'permissions' => false,
-                ),
-                'delete_orders' => array(
+                ],
+            ],
+            'permissions' => true,
+        ],
+
+        'orders' => [
+            'modes' => [
+                'details' => [
+                    'permissions' => true,
+                ],
+                'delete' => [
                     'permissions' => false,
-                ),
-                'manage' => array(
+                ],
+                'delete_orders' => [
+                    'permissions' => false,
+                ],
+                'manage' => [
                     'permissions' => true,
-                ),
-            ),
-            'permissions' => true,
-        ),
-
-        'shippings' => array (
-            'permissions' => true,
-        ),
-
-        'tags' => array (
-            'modes' => array(
-                'list' => array(
+                ],
+                'export_range' => [
                     'permissions' => true,
-                ),
-            ),
+                ],
+            ],
+            'permissions' => true,
+        ],
+
+        'shippings' => [
+            'permissions' => true,
+        ],
+
+        'tags' => [
+            'modes' => [
+                'list' => [
+                    'permissions' => true,
+                ],
+            ],
             'permissions' => false,
-        ),
+        ],
 
-        'pages' => array (
-            'modes' => array(
-                /*'m_add' => array(
+        'pages' => [
+            'modes' => [
+                /*'m_add' => [
                     'permissions' => false,
-                ),
-                'm_update' => array(
+                ],
+                'm_update' => [
                     'permissions' => false,
-                ),*/
-            ),
+                ],*/
+            ],
             'permissions' => true,
-        ),
+        ],
 
-        'products' => array (
-            'modes' => array(
-            ),
+        'products' => [
+            'modes' => [
+            ],
             'permissions' => true,
-        ),
+        ],
 
-        'product_options' => array (
+        'product_options' => [
             'permissions' => true,
-        ),
+        ],
 
-        'promotions' => array (
+        'promotions' => [
             'permissions' => false,
-        ),
+        ],
 
-        'shipments' => array (
+        'shipments' => [
             'permissions' => true,
-        ),
+        ],
 
-        'attachments' => array (
+        'attachments' => [
             'permissions' => true,
-        ),
+        ],
 
-        'block_manager' => array (
-            'modes' => array()
-        ),
+        'block_manager' => [
+            'modes' => []
+        ],
 
-        'tools' => array (
-            'modes' => array (
-                'update_position' => array(
-                    'param_permissions' => array (
-                        'table' => array (
+        'tools' => [
+            'modes' => [
+                'update_position' => [
+                    'param_permissions' => [
+                        'table' => [
                             'images_links' => true,
-                        )
-                    )
-                ),
-                'update_status' => array (
-                    'param_permissions' => array (
-                        'table' => array (
-                            'shippings' => true,
-                            'products' => true,
-                            'product_options' => true,
-                            'attachments' => true,
-                            'product_files' => true,
-                            'pages' => true,
-                            'shipments' => true,
-                            //'users' => true,
-                            /*'categories' => 'manage_catalog',
-                            'states' => 'manage_locations',
-                            'usergroups' => 'manage_usergroups',
-                            'currencies' => 'manage_currencies',
-                            'blocks' => 'edit_files',
-                            'taxes' => 'manage_taxes',
-                            'promotions' => 'manage_promotions',
-                            'static_data' => 'manage_static_data',
+                        ]
+                    ]
+                ],
+                'update_status' => [
+                    'param_permissions' => [
+                        'table' => [
+                            'shippings'          => true,
+                            'products'           => true,
+                            'product_options'    => true,
+                            'attachments'        => true,
+                            'product_files'      => true,
+                            'pages'              => true,
+                            'shipments'          => true,
+                            //'users'            => true,
+                            /*'categories'       => 'manage_catalog',
+                            'states'             => 'manage_locations',
+                            'usergroups'         => 'manage_usergroups',
+                            'currencies'         => 'manage_currencies',
+                            'blocks'             => 'edit_files',
+                            'taxes'              => 'manage_taxes',
+                            'promotions'         => 'manage_promotions',
+                            'static_data'        => 'manage_static_data',
                             'statistics_reports' => 'manage_reports',
-                            'countries' => 'manage_locations',
+                            'countries'          => 'manage_locations',
 
-                            'languages' => 'manage_languages',
-                            'sitemap_sections' => 'manage_sitemap',
-                            'localizations' => 'manage_locations',
-                            'products' => 'manage_catalog',
-                            'destinations' => 'manage_locations',
-                            'product_options' => 'manage_catalog',
-                            'product_features' => 'manage_catalog',
-                            'payments' => 'manage_payments',
-                            'product_filters' => 'manage_catalog',
-                            'product_files' => 'manage_catalog'
+                            'languages'          => 'manage_languages',
+                            'sitemap_sections'   => 'manage_sitemap',
+                            'localizations'      => 'manage_locations',
+                            'products'           => 'manage_catalog',
+                            'destinations'       => 'manage_locations',
+                            'product_options'    => 'manage_catalog',
+                            'product_features'   => 'manage_catalog',
+                            'payments'           => 'manage_payments',
+                            'product_filters'    => 'manage_catalog',
+                            'product_files'      => 'manage_catalog'
                             */
-                        )
-                    )
-                ),
-                'cleanup_history' => array(
+                        ]
+                    ]
+                ],
+                'cleanup_history' => [
                     'permissions' => true
-                ),
-                'view_changes' => array(
+                ],
+                'view_changes' => [
                     'permissions' => false
-                )
-            )
-        ),
-        'logs' => array (
+                ]
+            ]
+        ],
+        'logs' => [
             'permissions' => true,
-        ),
-        'debugger' => array(
+        ],
+        'debugger' => [
             'permissions' => true,
-        ),
-        'file_editor' => array(
+        ],
+        'file_editor' => [
             'permissions' => true
-        ),
-        'themes' => array(
-            'modes' => array(),
-        ),
-        'customization' => array(
-            'modes' => array(
-                'update_mode' => array(
-                    'param_permissions' => array(
-                        'type' => array(
-                            'theme_editor' => array(
-                                'permissions' => false,
-                                'condition' => array(
-                                    'operator' => 'or',
-                                    'function' => array('fn_get_styles_owner'),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
+        ],
+        'themes' => [
+            'modes' => [
+                'update_logos' => [
+                    'permissions' => true
+                ]
+            ],
+        ],
+        'customization' => [
+            'modes' => [
+                'update_mode' => [
+                    'param_permissions' => [
+                        'type' => [
+                            'theme_editor'  => true,
+                        ]
+                    ],
+                    'condition' => [
+                        'type' => [
+                            'theme_editor' => [
+                                'operator' => 'and',
+                                'function' => ['fn_get_styles_owner'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
 
-        'notifications' => array(
+        'notifications' => [
             'permissions' => true,
-        ),
-    ),
-    'export' => array(
-        'sections' => array(
-            'translations' => array(
-                'permission' => false,
-            ),
-            'users' => array(
-                'permission' => false,
-            ),
-            'features' => array(
-                'permission' => false,
-            ),
-            'vendors' => array(
-                'permission' => false,
-            ),
-        ),
-        'patterns' => array(
-            'google' => array(
-                'permission' => false,
-            ),
-        ),
-    ),
-    'import' => array(
-        'sections' => array(
-            'translations' => array(
-                'permission' => false,
-            ),
-            'orders' => array(
-                'permission' => false,
-            ),
-            'users' => array(
-                'permission' => false,
-            ),
-            'features' => array(
-                'permission' => false,
-            ),
-            'vendors' => array(
-                'permission' => false,
-            ),
-        ),
-        'patterns' => array(),
-    ),
-);
+        ],
 
-foreach (array('manage', 'update_block', 'update_status', 'snapping', 'grid', 'block_selection',
-             'manage_in_tab', 'set_custom_container', 'update_grid') as $mode) {
-    $schema['controllers']['block_manager']['modes'][$mode] = array(
-        'permissions' => false,
-        'condition' => array(
-            'operator' => 'or',
-            'function' => array('fn_get_blocks_owner'),
-        ),
-    );
+        'notifications_center' => [
+            'permissions' => true,
+        ],
+        'bottom_panel' => [
+            'permissions' => true
+        ],
+        'storefronts' => [
+            'modes' => [
+                'picker' => [
+                    'permissions' => true,
+                ],
+            ],
+        ],
+        'sync_data' => [
+            'modes' => [
+                'manage' => [
+                    'permissions' => false,
+                    'condition'   => [
+                        'operator' => 'or',
+                        'function' => ['fn_check_permission_sync_data'],
+                    ],
+                ]
+            ]
+        ],
+        'phone_masks' => [
+            'permissions' => true,
+        ],
+    ],
+    'export' => [
+        'sections' => [
+            'translations' => [
+                'permission' => false,
+            ],
+            'users' => [
+                'permission' => false,
+            ],
+            'features' => [
+                'permission' => false,
+            ],
+            'vendors' => [
+                'permission' => false,
+            ],
+        ],
+        'patterns' => [
+            'google' => [
+                'permission' => false,
+            ],
+        ],
+    ],
+    'import' => [
+        'sections' => [
+            'translations' => [
+                'permission' => false,
+            ],
+            'orders' => [
+                'permission' => false,
+            ],
+            'users' => [
+                'permission' => false,
+            ],
+            'features' => [
+                'permission' => false,
+            ],
+            'vendors' => [
+                'permission' => false,
+            ],
+        ],
+        'patterns' => [],
+    ],
+];
+
+if (YesNo::toBool(Registry::get('settings.Vendors.allow_vendor_manage_features'))) {
+    $product_features_management_modes = [
+        'update_status',
+        'update',
+        'add',
+        'quick_add',
+        'manage',
+        'groups',
+        'get_variants',
+        'delete',
+        'm_update_statuses',
+        'm_set_group',
+        'm_set_categories',
+        'm_set_display',
+        'm_delete',
+    ];
+    foreach ($product_features_management_modes as $mode) {
+        $schema['controllers']['product_features']['modes'][$mode]['permissions']['POST'] = true;
+    }
+
+    $schema['controllers']['product_features']['modes']['add']['permissions']['GET'] = true;
+    $schema['controllers']['product_features']['modes']['quick_add']['permissions']['GET'] = true;
+
+    foreach (['export', 'import'] as $mode) {
+        $schema['controllers']['exim']['modes'][$mode]['param_permissions']['section']['features'] = true;
+        $schema[$mode]['sections']['features']['permission'] = true;
+    }
 }
 
-foreach (array('manage', 'styles') as $mode) {
-    $schema['controllers']['themes']['modes'][$mode] = array(
+foreach (
+    [
+        'manage',
+        'update_block',
+        'update_status',
+        'snapping',
+        'grid',
+        'block_selection',
+        'manage_in_tab',
+        'set_custom_container',
+        'update_grid'
+    ] as $mode
+) {
+    $schema['controllers']['block_manager']['modes'][$mode] = [
         'permissions' => false,
-        'condition' => array(
+        'condition'   => [
             'operator' => 'or',
-            'function' => array('fn_get_styles_owner'),
-        ),
-    );
+            'function' => ['fn_get_blocks_owner'],
+        ],
+    ];
+}
+
+foreach (['manage', 'styles'] as $mode) {
+    $schema['controllers']['themes']['modes'][$mode] = [
+        'permissions' => false,
+        'condition'   => [
+            'operator' => 'or',
+            'function' => ['fn_get_styles_owner'],
+        ],
+    ];
 }
 
 return $schema;

@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ro\n"
-"X-Crowdin-File: /release-4.8.2/addons/hybrid_auth.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.12.2/addons/hybrid_auth.po\n"
+"X-Crowdin-File-ID: 4084\n"
+"PO-Revision-Date: 2021-02-01 09:11\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
@@ -78,7 +78,7 @@ msgstr ""
 
 msgctxt "Languages::hybrid_auth.unspecified_error"
 msgid "Unspecified error"
-msgstr ""
+msgstr "Eroare nespecificată"
 
 msgctxt "Languages::hybrid_auth.configuration_error"
 msgid "Hybriauth configuration error"
@@ -98,35 +98,35 @@ msgstr ""
 
 msgctxt "Languages::hybrid_auth.failed_auth"
 msgid "Authentication failed. The user has canceled the authentication or the provider refused the connection"
-msgstr ""
+msgstr "Autentificare a eşuat. Utilizatorul a anulat autentificarea sau furnizorul a refuzat conexiunea"
 
 msgctxt "Languages::hybrid_auth.connecting_provider"
 msgid "Contacting <b>[provider]</b>. Please wait..."
-msgstr ""
+msgstr "Realizam conexiunea cu <b>[provider]</b>. Te rog să aştepţi..."
 
 msgctxt "Languages::hybrid_auth.cant_create_profile"
 msgid "Unfortunately, we failed to create a customer and log in to the store due to one of the following reasons:<br />- You logged in to our store earlier using some other OpenID provider in which the same email is used.<br />- You have already registered in our store using your email.<br />Please contact the store owner to resolve the problems."
-msgstr ""
+msgstr "Din păcate, nu am reuşit să creem un client şi autentificarea la magazin a esuat din cauza la unul din următoarele motive:<br />- sunteţi logat în magazinul nostru mai devreme folosind un alt furnizor de OpenID în care aceeaşi adresă de email este utilizat.<br />- au deja înregistrat în magazinul nostru folosind adresa de email.<br />vă rugăm să contactaţi proprietarul de magazin pentru a rezolva problemele."
 
 msgctxt "Languages::hybrid_auth.password_generated"
 msgid "We are glad to inform you that you have been successfully registered in the store. A password was generated for you"
-msgstr ""
+msgstr "Suntem bucuroși să vă informăm că ați fost înregistrat cu succes în magazin. A fost generată o parolă pentru dvs"
 
 msgctxt "Languages::hybrid_auth.change_password"
 msgid "You can change your password here"
-msgstr ""
+msgstr "Puteți schimba parola aici"
 
 msgctxt "Languages::hybrid_auth.link_provider"
 msgid "Social network accounts"
-msgstr ""
+msgstr "Conturi de rețea socială"
 
 msgctxt "Languages::hybrid_auth.text_link_provider"
 msgid "Assign your social network account to this one and use it to log in"
-msgstr ""
+msgstr "Atribuiți contul dvs. de rețea socială la acesta și îl utilizați pentru a vă conecta"
 
 msgctxt "Languages::hybrid_auth.text_user_is_already_link"
 msgid "This social network account is already being used"
-msgstr ""
+msgstr "Acest cont de rețea socială este deja utilizat"
 
 msgctxt "Languages::hybrid_auth.connect_social"
 msgid "Connect social account"
@@ -169,11 +169,15 @@ msgid "Test mode"
 msgstr ""
 
 msgctxt "Languages::privileges.manage_providers"
-msgid "Manage social login providers"
-msgstr ""
+msgid "Can edit"
+msgstr "Poate edita"
 
 msgctxt "Languages::privileges.view_providers"
-msgid "View social login providers"
+msgid "Can view"
+msgstr "Poate vizualiza"
+
+msgctxt "Languages::privilege_groups.social_login"
+msgid "Social login"
 msgstr ""
 
 msgctxt "Languages::hybrid_auth.instruction_facebook"
@@ -230,5 +234,29 @@ msgstr ""
 
 msgctxt "Languages::hybrid_auth.facebook_oauth_redirect_uris"
 msgid "Valid OAuth redirect URIs"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.live_redirect_urls"
+msgid "Redirect URLs"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.linkedin_api_version"
+msgid "API version"
+msgstr ""
+
+msgctxt "Languages::ttc_hybrid_auth.linkedin_api_version"
+msgid "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">deprecated API v1</a>, but old apps still use it. If you're configuring LinkedIn app for the first time now, use API v2. Old LinkedIn apps configured some time ago may still be using v1."
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v1"
+msgid "v1"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v2"
+msgid "v2"
+msgstr ""
+
+msgctxt "Languages::hybrid_auth.instruction_paypal_application"
+msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
 msgstr ""
 

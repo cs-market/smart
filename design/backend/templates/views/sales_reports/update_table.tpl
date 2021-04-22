@@ -15,7 +15,7 @@
 <input type="hidden" name="selected_section" value="">
 
 {notes}
-{__("check_items_text")}
+{__("sales_reports_side_bar_notes")}
 {/notes}
 
 {capture name="tabsbox"}
@@ -97,6 +97,7 @@
                 <option value="{$interval.interval_id}" {if $table.interval_id==$interval.interval_id}selected="selected"{/if}>{__($interval_name)}</option>
             {/foreach}
         </select>
+        <p class="muted description">{__("tt_views_sales_reports_table_time_interval")}</p>
     </div>
 </div>
 {/if}
@@ -106,6 +107,7 @@
     <label class="control-label" for="elm_limit_auto">{__("limit")}:</label>
     <div class="controls">
         <input type="text" name="table_data[elements]{if $table_id}[{$element.element_hash}]{/if}[limit_auto]" value="{if $table_id}{$element.limit_auto}{else}5{/if}" size="3" id="elm_limit_auto">
+        <p class="muted description">{__("tt_views_sales_reports_update_table_limit")}</p>
     </div>
 </div>
 
@@ -116,6 +118,7 @@
             <option value="max_n" {if $element.dependence == "max_n"}selected="selected"{/if}>{__("max_item")}</option>
             <option value="max_p" {if $element.dependence == "max_p"}selected="selected"{/if}>{__("max_amount")}</option>
         </select>
+        <p class="muted description">{__("tt_views_sales_reports_update_table_dependence")}</p>
     </div>
 </div>
 {/foreach}
@@ -127,8 +130,8 @@
 
     <input name="table_data[conditions][payment]" value="" type="hidden">
     {if $payments}
-    <div class="table-wrapper">
-        <table class="table table-middle">
+    <div class="table-responsive-wrapper">
+        <table class="table table-middle table--relative table-responsive">
         <thead>
             <tr>
                 <th width="1%">{include file="common/check_items.tpl" check_target="payment"}</th>
@@ -140,16 +143,16 @@
         <tbody>
             {foreach from=$payments item=payment name="pf"}
             <tr>
-                <td>
+                <td data-th="&nbsp;">
                     <input type="checkbox" name="table_data[conditions][payment][]" value="{$payment.payment_id}" {if $conditions.payment[$payment.payment_id]}checked="checked"{/if} class="cm-item-payment"></td>
-                <td>
+                <td data-th="{__("payment")}">
                     {$payment.payment}</td>
-                <td>
+                <td data-th="{__("processor")}">
                         {foreach from=$payment_processors item="processor"}
                             {if $payment.processor_id == $processor.processor_id}{$processor.processor}{/if}
                         {/foreach}
                 </td>
-                <td class="center">
+                <td class="center" data-th="{__("usergroup")}">
                     {if $payment.usergroup}{$payment.usergroup}{else}-{__("all")}-{/if}
                 </td>
             </tr>
@@ -168,7 +171,7 @@
     <input name="table_data[conditions][location]" value="" type="hidden">
     {if $destinations}
     <div class="table-wrapper">
-        <table class="table table-middle">
+        <table class="table table-middle table--relative">
         <thead>
             <tr>
                 <th width="1%">{include file="common/check_items.tpl" check_target="location"}</th>
@@ -179,7 +182,7 @@
             {foreach from=$destinations item=destination}
             <tr>
                 <td class="center">
-                    <input name="table_data[conditions][location][]" value="{$destination.destination_id}" type="checkbox" {if $conditions.location[$destination.destination_id]}checked="checked"{/if} class="checkbox cm-item-location"></td>
+                    <input name="table_data[conditions][location][]" value="{$destination.destination_id}" type="checkbox" {if $conditions.location[$destination.destination_id]}checked="checked"{/if} class="cm-item-location"></td>
                 <td>
                     {$destination.destination}</td>
             </tr>
@@ -197,7 +200,7 @@
     <input name="table_data[conditions][status]" value="" type="hidden">
     {if $order_status_descr}
     <div class="table-wrapper">
-        <table class="table table-middle">
+        <table class="table table-middle table--relative">
         <thead>
             <tr>
                 <th width="1%">{include file="common/check_items.tpl" check_target="status"}</th>
@@ -277,10 +280,9 @@
 </form>
 {/capture}
 
-{if $table_id}
-    {$title_start = __("editing_chart")}
-    {$title_end = $table.description}
-{else}
-    {$_title = __("new_chart")}
-{/if}
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$_title content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($table_id) ? $table.description : __("new_chart")
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+}

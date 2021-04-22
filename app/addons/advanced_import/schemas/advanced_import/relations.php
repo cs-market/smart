@@ -23,7 +23,6 @@ $schema = array(
             'items_function'     => 'fn_advanced_import_get_product_features_list',
             'aggregate_field'    => 'Advanced Import: Features',
             'aggregate_function' => 'fn_advanced_import_aggregate_features',
-            'max_items'          => 150,
         ),
     ),
 );

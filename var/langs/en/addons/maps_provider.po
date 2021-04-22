@@ -5,8 +5,8 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: en_US"
 
 msgctxt "Addons::name::maps_provider"
-msgid "Maps provider"
-msgstr "Maps provider"
+msgid "Maps provider [Deprecated]"
+msgstr "Maps provider [Deprecated]"
 
 msgctxt "Addons::description::maps_provider"
 msgid "Provides polymorphic API for mapping"

@@ -14,6 +14,7 @@
 
 use Tygh\Enum\ProductFeatures;
 use Tygh\Registry;
+use Tygh\Enum\NotificationSeverity;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -109,8 +110,6 @@ function fn_data_feeds_get_data($params = array(), $lang_code = CART_LANGUAGE)
 
 function fn_data_feeds_export($datafeed_id, $options = array(), $pattern = '')
 {
-    static $pattern;
-
     if (empty($pattern)) {
         $layout_id = db_get_field("SELECT layout_id FROM ?:data_feeds WHERE datafeed_id = ?i", $datafeed_id);
         $name_layout = db_get_field("SELECT name FROM ?:exim_layouts WHERE layout_id = ?i", $layout_id);
@@ -128,8 +127,19 @@ function fn_data_feeds_export($datafeed_id, $options = array(), $pattern = '')
 
     $datafeed_data = fn_data_feeds_get_data($params, DESCR_SL);
 
+    $file_extension = fn_get_file_ext($datafeed_data['file_name']);
+
+    if (!fn_is_file_extension_allowed($file_extension)) {
+        fn_set_notification(
+            NotificationSeverity::ERROR,
+            __('error'),
+            __('text_forbidden_file_extension', ['[ext]' => $file_extension])
+        );
+        return false;
+    }
+
     if (empty($pattern) || empty($params['datafeed_id'])) {
-        fn_set_notification('E', __('error'), __('data_feed.error_exim_no_data_exported'));
+        fn_set_notification(NotificationSeverity::ERROR, __('error'), __('data_feed.error_exim_no_data_exported'));
 
         return false;
     }
@@ -172,10 +182,10 @@ function fn_data_feeds_export($datafeed_id, $options = array(), $pattern = '')
     fn_set_hook('data_feeds_export_before_get_products', $datafeed_data, $pattern, $params);
 
     list($products, $search) = fn_get_products($params);
-    $pids = fn_array_column($products, 'product_id');
+    $pids = array_column($products, 'product_id');
 
     if (empty($pids)) {
-        fn_set_notification('E', __('error'), __('data_feed.error_exim_no_data_exported'));
+        fn_set_notification(NotificationSeverity::ERROR, __('error'), __('data_feed.error_exim_no_data_exported'));
 
         return false;
     }
@@ -270,14 +280,14 @@ function fn_data_feeds_export($datafeed_id, $options = array(), $pattern = '')
                 } else {
                     $errors = true;
 
-                    fn_set_notification('E', __('error'), __('check_server_export_settings'));
+                    fn_set_notification(NotificationSeverity::ERROR, __('error'), __('check_server_export_settings'));
                 }
 
             } elseif ($export_location == 'F') {
                 if (empty($datafeed_data['ftp_url'])) {
                     $errors = true;
 
-                    fn_set_notification('E', __('error'), __('ftp_connection_problem'));
+                    fn_set_notification(NotificationSeverity::ERROR, __('error'), __('ftp_connection_problem'));
 
                 } else {
                     preg_match("/[^\/^\\^:]+/", $datafeed_data['ftp_url'], $matches);
@@ -303,12 +313,12 @@ function fn_data_feeds_export($datafeed_id, $options = array(), $pattern = '')
                         } else {
                             $errors = true;
 
-                            fn_set_notification('E', __('error'), __('ftp_connection_problem'));
+                            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('ftp_connection_problem'));
                         }
                     } else {
                         $errors = true;
 
-                        fn_set_notification('E', __('error'), __('ftp_connection_problem'));
+                        fn_set_notification(NotificationSeverity::ERROR, __('error'), __('ftp_connection_problem'));
                     }
 
                     @ftp_close($conn_id);
@@ -316,7 +326,7 @@ function fn_data_feeds_export($datafeed_id, $options = array(), $pattern = '')
             }
 
             if (!$errors) {
-                fn_set_notification('N', __('notice'), __('text_exim_data_exported'));
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_exim_data_exported'));
 
             } else {
                 unlink(fn_get_files_dir_path() . $datafeed_data['file_name']);
@@ -324,12 +334,12 @@ function fn_data_feeds_export($datafeed_id, $options = array(), $pattern = '')
             }
 
         } else {
-            fn_set_notification('E', __('error'), __('data_feed.error_exim_no_data_exported'));
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('data_feed.error_exim_no_data_exported'));
             $errors = true;
         }
 
     } else {
-        fn_set_notification('E', __('error'), __('error_exim_fields_not_selected'));
+        fn_set_notification(NotificationSeverity::ERROR, __('error'), __('error_exim_fields_not_selected'));
         $errors = true;
     }
 

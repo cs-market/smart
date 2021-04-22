@@ -52,12 +52,23 @@ if ($mode == 'subscribe_policy') {
 if ($mode == 'manage') {
     fn_add_breadcrumb(__('addons.rus_personal_data_processing.title_personal_data'));
 
-    $company_id = fn_get_runtime_company_id();
-    $company_data = fn_get_company_data($company_id);
+    if (fn_allowed_for('MULTIVENDOR')) {
+        $company_data = [
+            'company' => Registry::get('settings.Company.company_name')
+        ];
+    } else {
+        $company_id = fn_get_runtime_company_id();
+        $company_data = fn_get_company_data($company_id);
+    }
 
-    $company_name = $company_data['company'];
-    $company_storefront = $company_data['storefront'];
     $company_url = fn_url();
+    $company_name = $company_data['company'];
+    $company_storefront = parse_url($company_url);
+    if (isset($company_storefront['path']) && strlen($company_storefront['path']) > 1) {
+        $company_storefront = $company_storefront['host'] . $company_storefront['path'];
+    } else {
+        $company_storefront = $company_storefront['host'];
+    }
 
     $policy_description = __('addons.rus_personal_data_processing.confidentiality_policy_description', array('[company_name]' => $company_name, '[company_url]' => $company_url, '[company_storefront]' => $company_storefront));
 

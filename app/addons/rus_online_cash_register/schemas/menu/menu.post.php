@@ -12,22 +12,24 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['top']['addons']['items']['online_cash_register'] = array(
-    'attrs' => array(
+defined('BOOTSTRAP') or die('Access denied');
+
+$schema['top']['administration']['items']['online_cash_register'] = [
+    'attrs' => [
         'class'=>'is-addon'
-    ),
+    ],
     'href' => 'online_cash_register.receipts',
-    'position' => 600,
-    'subitems' => array(
-        'online_cash_register.receipts' => array(
+    'position' => 800,
+    'subitems' => [
+        'online_cash_register.receipts' => [
             'href' => 'online_cash_register.receipts',
             'position' => 100,
-        ),
-        'online_cash_register.logs' => array(
+        ],
+        'online_cash_register.logs' => [
             'href' => 'online_cash_register.logs',
             'position' => 200,
-        )
-    ),
-);
+        ],
+    ],
+];
 
 return $schema;

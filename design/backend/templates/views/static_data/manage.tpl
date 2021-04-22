@@ -1,3 +1,9 @@
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 {script src="js/tygh/tabs.js"}
 
 {capture name="mainbox"}
@@ -17,7 +23,11 @@
 
         <div class="items-container multi-level">
             {if $static_data}
-                {include file="views/static_data/components/multi_list.tpl" items=$static_data header=true}
+                {include file="views/static_data/components/multi_list.tpl"
+                    items=$static_data
+                    header=true
+                    direction=$direction
+                }
             {else}
                 <p class="no-items">{__("no_data")}</p>
             {/if}

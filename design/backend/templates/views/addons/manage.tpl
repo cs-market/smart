@@ -15,18 +15,20 @@
 
 {capture name="sidebar"}
     {hook name="addons:manage_sidebar"}
+    {include file="views/addons/components/addons_developers.tpl"}
     {include file="views/addons/components/addons_search_form.tpl" dispatch="addons.manage"}
-    <div class="sidebar-row marketplace">
-        <h6>{__("marketplace")}</h6>
-        <p class="marketplace-link">{__("marketplace_find_more", ["[href]" => $config.resources.marketplace_url])}</p>
-    </div>
+    {hook name="addons:manage_sidebar_marketplace"}
+        <div class="sidebar-row marketplace">
+            <h6>{__("marketplace")}</h6>
+            <p class="marketplace-link">{__("marketplace_find_more", ["[href]" => $config.resources.marketplace_url])}</p>
+        </div>
+    {/hook}
     {if $snapshot_exist && !$hide_for_vendor}
         <div class="sidebar-row">
             <h6>{__("change_addons_initialization")}</h6>
             <ul class="unstyled sidebar-stat" id="addons_counter">
                 <li>{__("tools_addons_installed_count")} <span><a href="{"addons.manage&type=installed"|fn_url}">{$addons_counter.installed}</a></span></li>
                 <li>{__("tools_addons_activated_count")} <span><a href="{"addons.manage&type=active"|fn_url}">{$addons_counter.activated}</a></span></li>
-                {*<li>{__("tools_addons_core_addons_count")} <span><a href="{"addons.manage&source=core"|fn_url}">{$addons_counter.core}</a></span></li>*}
                 <li>{__("tools_addons_other_addons_count")} <span><a href="{"addons.manage&source=third_party"|fn_url}">{$addons_counter.other}</a></span></li>
             <!--addons_counter--></ul>
         </div>
@@ -53,21 +55,6 @@
 <div class="items-container" id="addons_list">
 {hook name="addons:manage"}
 
-{if (in_array($search.type, ['installed', 'active', 'disabled']))}
-    {$preset_tab="tab_installed_addons"}
-{elseif in_array($search.type, ['not_installed'])}
-    {$preset_tab="tab_browse_all_available_addons"}
-{else}
-    {$preset_tab=""}
-{/if}
-
-<div id="addons_nav_tabs" class="tabs cm-j-tabs clear" data-ca-preset-tab-id="{$preset_tab}">
-    <ul class="nav nav-tabs">
-        <li id="tab_installed_addons" class="cm-js"><a>{__("installed_addons")}</a></li>
-        <li id="tab_browse_all_available_addons" class="cm-js"><a>{__("browse_all_available_addons")}</a></li>
-    </ul>
-</div>
-
 <div class="cm-tabs-content">
     {if $settings.init_addons}
         <div class="alert alert-block addon-info-msg">
@@ -78,12 +65,7 @@
             </form>
         </div>
     {/if}
-    <div id="content_tab_installed_addons" class="hidden">
-        {include file="views/addons/components/addons_list.tpl" show_installed=true}
-    </div>
-    <div id="content_tab_browse_all_available_addons" class="hidden">
-        {include file="views/addons/components/addons_list.tpl"}
-    </div>
+    {include file="views/addons/components/addons_list.tpl"}
 </div>
 
 {/hook}
@@ -98,4 +80,12 @@
 {/capture}
 
 {/capture}
-{include file="common/mainbox.tpl" title=__("addons") content=$smarty.capture.mainbox sidebar=$smarty.capture.sidebar adv_buttons=$smarty.capture.adv_buttons}
+{include file="common/mainbox.tpl"
+    title=__("addons")
+    content=$smarty.capture.mainbox
+    sidebar=$smarty.capture.sidebar
+    adv_buttons=$smarty.capture.adv_buttons
+    select_storefront=true
+    show_all_storefront=true
+    storefront_switcher_param_name="storefront_id"
+}

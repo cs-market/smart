@@ -25,7 +25,7 @@ if ($mode == 'view') {
     exit;
 
 } elseif ($mode == 'add_to_cart') {
-    if (empty($auth['user_id']) && Registry::get('settings.General.allow_anonymous_shopping') != 'allow_shopping') {
+    if (empty($auth['user_id']) && Registry::get('settings.Checkout.allow_anonymous_shopping') != 'allow_shopping') {
         return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode($_SERVER['HTTP_REFERER']));
     }
 

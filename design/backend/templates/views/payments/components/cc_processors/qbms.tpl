@@ -1,10 +1,12 @@
 <div id="qb_token_section">
-<input type="hidden" name="payment_data[processor_params][oauth_token]"        value="{$processor_params.oauth_token}" />
-<input type="hidden" name="payment_data[processor_params][oauth_token_secret]" value="{$processor_params.oauth_token_secret}" />
-<input type="hidden" name="payment_data[processor_params][realm_id]"           value="{$processor_params.realm_id}" />
-<input type="hidden" name="payment_data[processor_params][token_expire_time]"  value="{$processor_params.token_expire_time}" />
+<input type="hidden" name="payment_data[processor_params][oauth_client_id]"     value="{$processor_params.oauth_client_id}" />
+<input type="hidden" name="payment_data[processor_params][oauth_client_secret]" value="{$processor_params.oauth_client_secret}" />
+<input type="hidden" name="payment_data[processor_params][realm_id]"            value="{$processor_params.realm_id}" />
+<input type="hidden" name="payment_data[processor_params][token_expire_time]"   value="{$processor_params.token_expire_time}" />
+<input type="hidden" name="payment_data[processor_params][refresh_token]"   value="{$processor_params.refresh_token}" />
+<input type="hidden" name="payment_data[processor_params][access_token]"   value="{$processor_params.access_token}" />
 
-{if $processor_params.app_token && $processor_params.oauth_consumer_key && $processor_params.oauth_consumer_secret}
+{if $processor_params.oauth_client_id && $processor_params.oauth_client_secret}
     <div class="control-group">
         <label class="control-label" for="elm_oauth_token">{__("payments.qbms.quickbooks_connection")}:</label>
         <div class="controls">
@@ -23,52 +25,67 @@
                 {__("payments.qbms.renew_token")}
             {/if}
             </div>
-            <script type="text/javascript" src="https://appcenter.intuit.com/Content/IA/intuit.ipp.anywhere.js"></script>
-            <script>
+            <script type="application/javascript">
                 (function(_, $) {
-                    intuit.ipp.anywhere.setup({
-                        menuProxy: '',
-                        datasources: {
-                            quickbooks: true,
-                            payments: true
-                        },
-                        grantUrl: "{"current"|fn_payment_url:"qbms.php"}?qb_action=auth_start&payment_id={$payment_id}"
-                    });
+                    $.ceEvent('on', 'ce.commoninit', function() {
+                        if (window.isQuickbooksSdkLoaded) {
+                            return;
+                        }
+                        window.isQuickbooksSdkLoaded = true;
+                        var quickbooksSdk = 'https://appcenter.intuit.com/Content/IA/intuit.ipp.anywhere.js?v=' + Math.random();
+                        var sdkScript = document.createElement('script');
+                        sdkScript.type = 'application/javascript';
+                        sdkScript.src = quickbooksSdk;
 
-                    $(document).on('click', '.intuitPlatformConnectButton', function(e) {
-                        // destroy and remove pop-up
-                        var dialog = $.ceDialog('get_last');
-                        dialog.ceDialog('destroy');
-                        dialog.remove();
+                        var sdkLoadCallback = function() {
+                            intuit.ipp.anywhere.setup({
+                                menuProxy: '',
+                                datasources: {
+                                    quickbooks: true,
+                                    payments: true
+                                },
+                                grantUrl: "{"current"|fn_payment_url:"qbms.php"}?qb_action=auth_start&payment_id={$payment_id}"
+                            });
+
+                            $(document).on('click', '.intuitPlatformConnectButton', function (e) {
+                                // destroy and remove pop-up
+                                var dialog = $.ceDialog('get_last');
+                                dialog.ceDialog('destroy');
+                                dialog.remove();
+                            });
+                        };
+
+                        sdkScript.onreadystatechange = function() {
+                            if (this.readyState === 'complete') {
+                                sdkLoadCallback();
+                            }
+                        };
+                        sdkScript.onload = sdkLoadCallback;
+
+                        document.getElementsByTagName('head')[0].appendChild(sdkScript);
                     });
                 })(Tygh, Tygh.$);
             </script>
         </div>
     </div>
+    {__("payments.qbms.tip_fill_redirect", ["[url]" => "{"current"|fn_payment_url:"qbms.php"}?qb_action=auth_callback&payment_id={$payment_id}"])}
 {else}
-    {__("payments.qbms.configuration_required")}
+    {__("payments.qbms.configure_payment_method", ["[product]" => $smarty.const.PRODUCT_NAME])}
 {/if}
 <!--qb_token_section--></div>
 <hr>
 
 <div class="control-group">
-    <label class="control-label" for="elm_app_token">{__("payments.qbms.app_token")}:</label>
+    <label class="control-label" for="elm_oauth_client_id">{__("payments.qbms.oauth_client_id")}:</label>
     <div class="controls">
-        <input type="text" name="payment_data[processor_params][app_token]" id="elm_app_token" value="{$processor_params.app_token}" />
+        <input type="text" name="payment_data[processor_params][oauth_client_id]" id="elm_oauth_client_id" value="{$processor_params.oauth_client_id}" />
     </div>
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="elm_oauth_consumer_key">{__("payments.qbms.oauth_consumer_key")}:</label>
+    <label class="control-label" for="elm_oauth_client_secret">{__("payments.qbms.oauth_client_secret")}:</label>
     <div class="controls">
-        <input type="text" name="payment_data[processor_params][oauth_consumer_key]" id="elm_oauth_consumer_key" value="{$processor_params.oauth_consumer_key}" />
-    </div>
-</div>
-
-<div class="control-group">
-    <label class="control-label" for="elm_oauth_consumer_secret">{__("payments.qbms.oauth_consumer_secret")}:</label>
-    <div class="controls">
-        <input type="text" name="payment_data[processor_params][oauth_consumer_secret]" id="elm_oauth_consumer_secret" value="{$processor_params.oauth_consumer_secret}" />
+        <input type="text" name="payment_data[processor_params][oauth_client_secret]" id="elm_oauth_client_secret" value="{$processor_params.oauth_client_secret}" />
     </div>
 </div>
 

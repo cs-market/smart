@@ -35,6 +35,9 @@ use Tygh\Template\Snippet\Service as SnippetService;
 use Tygh\Template\Document\Service as DocumentService;
 use Tygh\Template\Mail\Repository as MailRepository;
 use Tygh\Template\Mail\Service as MailService;
+use Tygh\Template\Internal\Repository as InterlaRepository;
+use Tygh\Template\Internal\Service as InternalService;
+use Tygh\Template\Internal\Exim as InternalExim;
 
 /**
  * The provider class that registers components for working with the templates of documents, email notifications, and snippets.
@@ -116,6 +119,18 @@ class TemplateProvider implements ServiceProviderInterface
 
         $app['template.mail.exim'] = function ($app) {
             return new MailExim($app['template.mail.service'], $app['template.snippet.repository'], $app['template.snippet.exim'], array_keys($app['languages']), new Values());
+        };
+
+        $app['template.internal.repository'] = function ($app) {
+            return new InterlaRepository($app['db']);
+        };
+
+        $app['template.internal.service'] = function ($app) {
+            return new InternalService($app['template.internal.repository'], $app['template.renderer']);
+        };
+
+        $app['template.internal.exim'] = function ($app) {
+            return new InternalExim($app['template.internal.service'], $app['template.snippet.repository'], $app['template.snippet.exim'], array_keys($app['languages']), new Values());
         };
     }
 }

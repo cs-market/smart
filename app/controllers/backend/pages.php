@@ -12,6 +12,9 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Common\OperationResult;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
 
@@ -71,16 +74,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //
     // Processing deleting of multiple page elements
     //
-    if ($mode == 'm_delete') {
+    if ($mode === 'm_delete') {
+        $result = false;
         if (isset($_REQUEST['page_ids'])) {
-            foreach ($_REQUEST['page_ids'] as $v) {
-                fn_delete_page($v);
+            foreach ($_REQUEST['page_ids'] as $page_id) {
+                if (!fn_check_company_id('pages', 'page_id', $page_id)) {
+                    fn_company_access_denied_notification();
+                    continue;
+                }
+
+                $result = fn_delete_page($page_id) ?: $result;
             }
         }
         unset(Tygh::$app['session']['page_ids']);
-        fn_set_notification('N', __('notice'), __('text_pages_have_been_deleted'));
+        if ($result) {
+            fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_pages_have_been_deleted'));
+        }
 
-        $suffix = ".manage?" . (empty($_REQUEST['page_type']) ? "" : ("page_type=" . $_REQUEST['page_type']));
+        $suffix = '.manage?' . (empty($_REQUEST['page_type']) ? '' : ('page_type=' . $_REQUEST['page_type']));
     }
 
     //
@@ -105,6 +116,72 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         unset($_REQUEST['redirect_url'], $_REQUEST['page']); // force redirection
+    }
+
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['page_ids'])
+        && is_array($_REQUEST['page_ids'])
+        && !empty($_REQUEST['status'])
+        && in_array($_REQUEST['status'], [ObjectStatuses::ACTIVE, ObjectStatuses::DISABLED, ObjectStatuses::HIDDEN], true)
+    ) {
+        $status_to = $_REQUEST['status'];
+
+        foreach ($_REQUEST['page_ids'] as $_page_id) {
+            if (!fn_check_company_id('pages', 'page_id', $_page_id)) {
+                continue;
+            }
+
+            fn_tools_update_status(
+                [
+                    'table'             => 'pages',
+                    'status'            => $status_to,
+                    'id_name'           => 'page_id',
+                    'id'                => $_page_id,
+                    'show_error_notice' => false,
+                ]
+            );
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('pages.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+    }
+
+    if (
+        $mode === 'm_update_parent_page'
+        && !empty($_REQUEST['page_ids'])
+        && is_array($_REQUEST['page_ids'])
+        && isset($_REQUEST['selected_parent'])
+    ) {
+        $parent_id = (int) $_REQUEST['selected_parent'];
+
+        foreach ($_REQUEST['page_ids'] as $_page_id) {
+            $result = OperationResult::wrap(
+                static function () use ($_page_id, $parent_id) {
+                    fn_update_page(['parent_id' => $parent_id], $_page_id);
+                }
+            );
+
+            if (
+                in_array(
+                    __('attempt_to_set_itself_or_a_own_child_as_its_parent_warning'),
+                    $result->getWarnings()
+                )
+            ) {
+                fn_set_notification(
+                    NotificationSeverity::WARNING,
+                    __('warning'),
+                    __('bulk_attempt_to_set_itself_or_a_own_child_as_its_parent_warning')
+                );
+            }
+        }
     }
 
     //

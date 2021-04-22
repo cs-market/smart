@@ -24,11 +24,17 @@ $schema['location_selector'] = array(
 $schema['search_vendors'] = array(
     'templates' => 'addons/vendor_locations/blocks/companies_catalog/search_vendors_by_address.tpl',
     'wrappers' => 'blocks/wrappers',
+    'show_on_locations' => array(
+        'vendors' => 'companies.catalog',
+    ),
 );
 
 $schema['vendors_map'] = array(
     'templates' => 'addons/vendor_locations/blocks/companies_catalog/vendors_map.tpl',
     'wrappers' => 'blocks/wrappers',
+    'show_on_locations' => array(
+        'vendors' => 'companies.catalog',
+    ),
     'content' => array(
         'items' => array(
             'type' => 'enum',
@@ -77,7 +83,8 @@ $schema['closest_vendors'] = array(
     ),
     'templates' => 'addons/vendor_locations/blocks/closest_vendors.tpl',
     'wrappers' => 'blocks/wrappers',
-    'cache' => false
+    'cache' => false,
+    'brief_info_function' => 'fn_block_get_vendors_info'
 );
 
 return $schema;

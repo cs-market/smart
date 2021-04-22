@@ -63,14 +63,14 @@ function fn_anti_fraud_place_order(&$order_id, &$action, &$order_status)
 
         if (!empty($order_info['user_id'])) {
             // Check if this customer has processed orders
-            $amount = db_get_field("SELECT COUNT(*) FROM ?:orders WHERE status IN ('P','C') AND user_id = ?i", $order_info['user_id']);
+            $amount = db_get_field('SELECT COUNT(*) FROM ?:orders WHERE status IN (?a) AND user_id = ?i', fn_get_settled_order_statuses(), $order_info['user_id']);
             if (!empty($amount)) {
                 $risk_factor /= AF_COMPLETED_ORDERS_FACTOR;
                 $return['G'][] = 'af_has_successfull_orders';
             }
 
             // Check if this customer has failed orders
-            $amount = db_get_field("SELECT COUNT(*) FROM ?:orders WHERE status IN ('D','F') AND user_id = ?i", $order_info['user_id']);
+            $amount = db_get_field('SELECT COUNT(*) FROM ?:orders WHERE status IN (?a) AND user_id = ?i', ['D','F'], $order_info['user_id']);
             if (!empty($amount)) {
                 $risk_factor *= AF_FAILED_ORDERS_FACTOR;
                 $return['B'][] = 'af_has_failed_orders';
@@ -157,9 +157,9 @@ function fn_anti_fraud_add_status()
 
 function fn_anti_fraud_remove_status()
 {
-    $settings = Registry::get('addons.anti_fraud');
+    $status_code = Settings::instance()->getValue('antifraud_order_status', 'anti_fraud');
 
-    $o_ids = db_get_fields('SELECT order_id FROM ?:orders WHERE status = ?s', $settings['antifraud_order_status']);
+    $o_ids = db_get_fields('SELECT order_id FROM ?:orders WHERE status = ?s', $status_code);
 
     if (!empty($o_ids)) {
         foreach ($o_ids as $order_id) {
@@ -167,7 +167,7 @@ function fn_anti_fraud_remove_status()
         }
     }
 
-    fn_delete_status($settings['antifraud_order_status'], STATUSES_ORDER);
+    fn_delete_status($status_code, STATUSES_ORDER);
 }
 
 function fn_anti_fraud_placement_routines(&$order_id, &$order_info, &$force_notification, &$clear_cart, &$action, &$display_notification)

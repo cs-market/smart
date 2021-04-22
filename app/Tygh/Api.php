@@ -14,10 +14,10 @@
 
 namespace Tygh;
 
+use Tygh\Api\AEntity;
+use Tygh\Api\FormatManager;
 use Tygh\Api\Request;
 use Tygh\Api\Response;
-use Tygh\Api\FormatManager;
-use Tygh\Api\AEntity;
 
 class Api
 {
@@ -102,7 +102,7 @@ class Api
      *
      * @param  array $formats
      */
-    public function __construct($formats = array('json', 'text'))
+    public function __construct($formats = array('json', 'text', 'form'))
     {
         FormatManager::initiate($formats);
         $this->request = new Request();
@@ -143,7 +143,9 @@ class Api
             $accept_type = $this->request->getAcceptType();
             $method = $this->request->getMethod();
 
-            if (($method == "PUT" || $method == "POST") && !FormatManager::instance()->isMimeTypeSupported($content_type)) {
+            if ($method == "OPTIONS") {
+                $response = new Response(Response::STATUS_OK);
+            } elseif (($method == "PUT" || $method == "POST") && !FormatManager::instance()->isMimeTypeSupported($content_type)) {
                 $response = new Response(Response::STATUS_UNSUPPORTED_MEDIA_TYPE);
             } elseif (($method == "GET" || $method == "HEAD") && !FormatManager::instance()->isMimeTypeSupported($accept_type)) {
                 $response = new Response(Response::STATUS_METHOD_NOT_ACCEPTABLE);
@@ -161,8 +163,6 @@ class Api
         } else {
             $response = new Response(Response::STATUS_UNAUTHORIZED);
         }
-        
-        fn_set_hook('api_send_response', $this, $response, $authorized);
 
         $response->send();
     }
@@ -186,12 +186,22 @@ class Api
         fn_set_hook('api_get_user_data_pre', $this, $this->user_data);
 
         if (!$this->user_data) {
-            $authData = $this->request->getAuthData();
-            if ($authData) {
+            $auth = $this->request->getAuthData();
+
+            /**
+             * Executes right after obtaining user authentication data from API request headers.
+             * Allows to modify data that is used to identify the user who accesses API.
+             *
+             * @param \Tygh\Api $this API instance
+             * @param string[]  $auth Authetication data from request headers
+             */
+            fn_set_hook('api_get_user_data', $this, $auth);
+
+            if ($auth) {
                 $this->user_data = fn_get_api_user(
-                    isset($authData['user'])    ? $authData['user']    : null,
-                    isset($authData['api_key']) ? $authData['api_key'] : null,
-                    isset($authData['token'])   ? $authData['token']   : null
+                    isset($auth['user'])    ? $auth['user']    : null,
+                    isset($auth['api_key']) ? $auth['api_key'] : null,
+                    isset($auth['token'])   ? $auth['token']   : null
                 );
 
                 // Disabled users can't use the API
@@ -200,7 +210,7 @@ class Api
                     $response->send();
                 }
 
-                $this->user_data['is_token_auth'] = isset($authData['token']);
+                $this->user_data['is_token_auth'] = isset($auth['token']);
             }
         }
 

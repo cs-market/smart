@@ -14,7 +14,6 @@
 
 use Tygh\Registry;
 use Tygh\Pdf;
-use Tygh\Mailer;
 use Tygh\Payments\RusInvoicePayment;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -56,7 +55,7 @@ if ($mode == 'print_sbrf_receipt' || $mode == "send_sbrf_receipt") {
     fn_mkdir($temp_dir);
 
     $path = fn_qr_generate($order_info, '|', $temp_dir);
-    $url_qr_code = Registry::get('config.http_location') . '/' . fn_get_rel_dir($path);
+    $url_qr_code = Registry::get('config.current_location') . '/' . fn_get_rel_dir($path);
     $view->assign('url_qr_code', $url_qr_code);
 
     if ($mode == "send_sbrf_receipt") {
@@ -79,7 +78,10 @@ if ($mode == 'print_sbrf_receipt' || $mode == "send_sbrf_receipt") {
                     'email_subj' => __("sbrf_receipt_for_payment", array('[order_id]' => $order_info['order_id']))
                 );
 
-                Mailer::sendMail(array(
+                /** @var Tygh\Mailer\Mailer $mailer */
+                $mailer = Tygh::$app['mailer'];
+
+                $mailer->send(array(
                     'to' => $order_info['email'],
                     'from' => 'default_company_orders_department',
                     'data' => $data,
@@ -247,7 +249,10 @@ if ($mode == 'print_sbrf_receipt' || $mode == "send_sbrf_receipt") {
                     'fonts_path' => fn_get_theme_path('[relative]/[theme]/media/fonts'),
                 );
 
-                Mailer::sendMail(array(
+                /** @var \Tygh\Mailer\Mailer $mailer */
+                $mailer = Tygh::$app['mailer'];
+
+                $mailer->send(array(
                     'to' => $order_info['email'],
                     'from' => 'default_company_orders_department',
                     'data' => $data,

@@ -8,9 +8,9 @@
     <compatibility>
         <dependencies>storefront_rest_api</dependencies>
     </compatibility>
-    <settings layout="separate">
+    <settings layout="separate" edition_type="ROOT,STOREFRONT">
         <sections>
-            <section id="service" edition_type="ROOT">
+            <section id="service">
                 <items>
                     <item id="config">
                         <type>template</type>
@@ -238,7 +238,16 @@
             "appFullDescription": "",
             "supportEmail": "",
             "privacyPolicyUrl": ""
+        },
+        "apple_pay":{
+            "applePay":"off",
+            "applePayMerchantIdentifier":"",
+            "applePayMerchantName":""
         }
+    },
+    "promotion": {
+        "app_store_app_id": "",
+        "google_play_app_id": ""
     }
 }]]>
                     </default_value>
@@ -249,7 +258,6 @@
     </settings>
     <functions>
         <item for="install">fn_mobile_app_install_layout</item>
-        <item for="uninstall">fn_mobile_app_uninstall_layout</item>
     </functions>
     <queries>
         <item for="install">
@@ -263,6 +271,7 @@
                 platform varchar(32) NOT NULL DEFAULT '',
                 token varchar(256) NOT NULL DEFAULT '',
                 locale varchar(10) NOT NULL DEFAULT '',
+                storefront_id int(11) NOT NULL DEFAULT 0,
                 PRIMARY KEY (subscription_id),
                 UNIQUE KEY token (token),
                 UNIQUE KEY device (platform, device_id),

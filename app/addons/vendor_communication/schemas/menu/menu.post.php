@@ -12,10 +12,19 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-$schema['central']['customers']['items']['vendor_communication.message_center'] = array(
-    'href' => 'vendor_communication.threads',
-    'alt' => 'vendor_communication.threads',
-    'position' => 900,
-);
+use Tygh\Enum\Addons\VendorCommunication\CommunicationTypes;
+use Tygh\Registry;
+use Tygh\Enum\YesNo;
+
+if (fn_vendor_communication_is_communication_type_active(CommunicationTypes::VENDOR_TO_CUSTOMER)) {
+    $schema['central']['customers']['items']['vendor_communication.message_center_name'] = [
+        'attrs' => [
+            'class' => 'is-addon'
+        ],
+        'href' => 'vendor_communication.threads?communication_type=' . CommunicationTypes::VENDOR_TO_CUSTOMER,
+        'alt' => 'vendor_communication.threads?communication_type=' . CommunicationTypes::VENDOR_TO_CUSTOMER,
+        'position' => 900,
+    ];
+}
 
 return $schema;

@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: hu\n"
-"X-Crowdin-File: /release-4.8.2/addons/call_requests.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/call_requests.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"PO-Revision-Date: 2019-02-01 06:05\n"
 
 msgctxt "Addons::name::call_requests"
 msgid "Call requests"
@@ -130,7 +130,7 @@ msgstr "A kiválasztott termék"
 
 msgctxt "Languages::call_requests.convenient_time"
 msgid "Convenient time"
-msgstr ""
+msgstr "Alkalmas időpont"
 
 msgctxt "Languages::call_requests.awaiting_call"
 msgid "Awaiting call"
@@ -166,7 +166,7 @@ msgstr "Visszahívás kérése űrlap"
 
 msgctxt "Languages::call_requests.text_call_request"
 msgid "Customer [customer] is <a href=\"[href]\">awaiting your call</a> on [phone_number]."
-msgstr ""
+msgstr "A következő ügyfél ([customer]) várja a <a href=\"[href]\">visszahívást</a> a következő telefonszámon: [phone_number]"
 
 msgctxt "Languages::call_requests.text_call_request_call_time"
 msgid "The convenient call time is between [time_from] and [time_to]."
@@ -190,7 +190,7 @@ msgstr ""
 
 msgctxt "Languages::call_request.work_time"
 msgid "Mon-Fr 9a.m.-6p.m."
-msgstr ""
+msgstr "Hétfőtől-péntekig 9-18 óráig"
 
 msgctxt "Languages::call_requests.request_call_request_form"
 msgid "Call requests: request form"

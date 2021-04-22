@@ -20,6 +20,7 @@
             <td width="48%">
                 <p>
                     <label for="left_{$id}" class="cm-all hidden"></label>
+                    <input type="hidden" name="{$name}[]" value="" {if $disable_input}disabled="disabled"{/if} />
                     <select class="input-full" id="left_{$id}" name="{$name}[]" multiple="multiple" size="10" {if $disable_input}disabled="disabled"{/if}>
                         {if $selected_fields|is_array}
                             {foreach from=$selected_fields item="active" key="field_id"}
@@ -47,7 +48,7 @@
                     {/foreach}
                 </select>
                 <div class="controls">
-                    <div class="right update-for-all">
+                    <div class="right">
                         {include file="buttons/update_for_all.tpl" display=$item.update_for_all object_id=$item.object_id name="update_all_vendors[`$item.object_id`]" hide_element=$html_id}
                     </div>
                 </div>

@@ -24,6 +24,7 @@ $schema = array(
 
         // Store settings were changed
         'settings_objects',
+        'settings_vendor_values',
 
         // Blocks were modified
         'bm_blocks',

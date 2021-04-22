@@ -42,7 +42,7 @@ class Usergroups extends AEntity
 
     public function index($id = '', $params = array())
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
         if (isset($params['lang_code'])) {
             unset($params['lang_code']);
         }
@@ -116,7 +116,7 @@ class Usergroups extends AEntity
     {
         $data = array();
         $status = Response::STATUS_BAD_REQUEST;
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
         unset($params['lang_code']);
 
         if ($this->getParentName() == 'users') {

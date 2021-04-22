@@ -1,7 +1,7 @@
 {* --------- CATEGORY TREE --------------*}
 {if $header}
 <div class="table-responsive-wrapper">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="table table-responsive">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="table table--relative table-responsive">
     <tr>
         <th class="center">
         {include file="common/check_items.tpl"}</th>

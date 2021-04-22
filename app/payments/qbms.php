@@ -27,46 +27,34 @@ use Tygh\Registry;
 class QuickbooksAuth
 {
     /**
-     * Signing method constants
-     */
-    const REQUEST_GET_REQUEST_TOKEN  = 1;
-    const REQUEST_GET_ACCESS_TOKEN   = 2;
-    const REQUEST_CHARGE             = 4;
-
-    /**
-     * OAuth Request Token URL
-     */
-    const OAUTH_REQUEST_URL = 'https://oauth.intuit.com/oauth/v1/get_request_token';
-
-    /**
-     * OAuth Access Token URL
-     */
-    const OAUTH_ACCESS_URL = 'https://oauth.intuit.com/oauth/v1/get_access_token';
-
-    /**
      * OAuth Authorize URL
      */
-    const OAUTH_AUTHORIZE_URL = 'https://appcenter.intuit.com/Connect/Begin';
+    const OAUTH_AUTHORIZE_URL = 'https://appcenter.intuit.com/connect/oauth2';
 
     /**
-     * OAuth Token Renewal URL
+     * OAuth Scope that identifies the QuickBooks Online API/Payments
      */
-    const OAUTH_RENEWAL_URL = 'https://appcenter.intuit.com/api/v1/connection/reconnect';
+    const OAUTH_SCOPE = 'com.intuit.quickbooks.payment';
 
     /**
-     * @var string App Token - obtained from Qucikbooks Dashboard
+     * OAuth Token Endpoint URL
      */
-    public $app_token;
+    const OAUTH_TOKEN_ENDPOINT_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
 
     /**
-     * @var string OAuth Consumer Key  - obtained from Qucikbooks Dashboard
+     * @var string OAuth Client ID  - obtained from Qucikbooks Dashboard
      */
-    public $consumer_key;
+    public $client_id;
 
     /**
-     * @var string OAuth Token
+     * @var string OAuth Access Token
      */
     public $token;
+
+    /**
+     * @var string OAuth Refresh Token
+     */
+    public $refresh_token;
 
     /**
      * @var string Realm ID (ex-Customer ID)
@@ -79,14 +67,9 @@ class QuickbooksAuth
     private $payment_id;
 
     /**
-     * @var string OAuth consumer secret - obtained from Qucikbooks Dashboard
+     * @var string OAuth Client Secret - obtained from Qucikbooks Dashboard
      */
-    private $consumer_secret;
-
-    /**
-     * @var string OAuth access token secret
-     */
-    private $token_secret;
+    private $client_secret;
 
     /**
      * QuickbooksAuth constructor
@@ -96,108 +79,30 @@ class QuickbooksAuth
      */
     public function __construct($payment_id = 0, $auth_data = array())
     {
-        $this->app_token       = empty($auth_data['app_token'])             ? '' : $auth_data['app_token'];
-        $this->consumer_key    = empty($auth_data['oauth_consumer_key'])    ? '' : $auth_data['oauth_consumer_key'];
-        $this->consumer_secret = empty($auth_data['oauth_consumer_secret']) ? '' : $auth_data['oauth_consumer_secret'];
-        $this->token           = empty($auth_data['oauth_token'])           ? '' : $auth_data['oauth_token'];
-        $this->token_secret    = empty($auth_data['oauth_token_secret'])    ? '' : $auth_data['oauth_token_secret'];
+        $this->client_id       = empty($auth_data['oauth_client_id'])       ? '' : $auth_data['oauth_client_id'];
+        $this->client_secret   = empty($auth_data['oauth_client_secret'])   ? '' : $auth_data['oauth_client_secret'];
+        $this->token           = empty($auth_data['access_token'])          ? '' : $auth_data['access_token'];
+        $this->refresh_token   = empty($auth_data['refresh_token'])         ? '' : $auth_data['refresh_token'];
         $this->realm_id        = empty($auth_data['realm_id'])              ? '' : $auth_data['realm_id'];
         $this->payment_id      = empty($payment_id)                         ?  0 : $payment_id;
     }
 
     /**
-     * Prepare data for OAuth-based request
+     * Get OAuth Authorization URL
      *
-     * @param int    $type   Request type
-     * @param string $method Request method (GET/POST)
-     * @param string $url    Request URL
-     * @param array  $data   Request data
-     *
-     * @return array Pair of request fields and authentication header
+     * @return string URL with build parameters
      */
-    public function signRequest($type = self::REQUEST_GET_REQUEST_TOKEN, $method = Http::POST, $url = '', $data = array())
+    public function getAuthorizationURL($state)
     {
-        $fields = array(
-            'oauth_consumer_key' => $this->consumer_key,
-            'oauth_nonce' => TIME,
-            'oauth_signature_method' => 'HMAC-SHA1',
-            'oauth_timestamp' => TIME,
-            'oauth_version' => '1.0',
-        );
+        $parameters = [
+            'client_id' => $this->client_id,
+            'scope' => self::OAUTH_SCOPE,
+            'redirect_uri' => self::getCallbackUrl($this->payment_id),
+            'response_type' => 'code',
+            'state' => $state,
+        ];
 
-        switch ($type) {
-            case self::REQUEST_CHARGE:
-                $fields['oauth_token'] = $this->token;
-                break;
-            case self::REQUEST_GET_REQUEST_TOKEN:
-                $fields['oauth_callback'] = self::getCallbackUrl($this->payment_id);
-                break;
-            case self::REQUEST_GET_ACCESS_TOKEN:
-                $fields['oauth_callback'] = self::getCallbackUrl($this->payment_id);
-                $fields['oauth_verifier'] = $data['oauth_verifier'];
-                $fields['oauth_token']    = $data['oauth_token'];
-                break;
-        }
-
-        ksort($fields);
-
-        $encodedFields = array();
-        foreach ($fields as $key => $value) {
-            $encodedFields[] = rawurlencode($key) . '=' . rawurlencode($value);
-        }
-
-        $signatureData = strtoupper($method) . '&'
-            . rawurlencode($url) . '&'
-            . rawurlencode(implode('&', $encodedFields));
-
-        $key = rawurlencode($this->consumer_secret) . '&';
-        if ($type != self::REQUEST_GET_REQUEST_TOKEN) {
-            $key .= rawurlencode($this->token_secret);
-        }
-
-        $fields['oauth_signature'] = base64_encode(hash_hmac('SHA1', $signatureData, $key, 1));
-
-        $auth_header = '';
-        switch ($type) {
-            case self::REQUEST_CHARGE:
-                // for some reason, signature has to be urlencoded for charges
-                $fields['oauth_signature'] = rawurlencode($fields['oauth_signature']);
-            case self::REQUEST_GET_ACCESS_TOKEN:
-                $auth_header = 'Authorization: OAuth '
-                    . 'oauth_token="' . $fields['oauth_token'] . '",'
-                    . 'oauth_nonce="' . $fields['oauth_nonce'] . '",'
-                    . 'oauth_consumer_key="' . $fields['oauth_consumer_key'] . '",'
-                    . 'oauth_signature_method="' . $fields['oauth_signature_method'] . '",'
-                    . 'oauth_timestamp="' . $fields['oauth_timestamp'] . '",'
-                    . 'oauth_version="' . $fields['oauth_version'] . '",'
-                    . 'oauth_signature="' . $fields['oauth_signature'] . '"';
-                break;
-        }
-
-        return array(
-            $fields,
-            $auth_header
-        );
-    }
-
-    /**
-     * Get OAuth Request token data
-     *
-     * @return array Pair of request token data and authentication URL
-     */
-    public function getRequestToken()
-    {
-        list($request_data) = $this->signRequest(self::REQUEST_GET_REQUEST_TOKEN, Http::POST, self::OAUTH_REQUEST_URL);
-
-        $request_token = Http::post(self::OAUTH_REQUEST_URL, $request_data);
-        parse_str($request_token, $request_token);
-
-        return array(
-            $request_token,
-            isset($request_token['oauth_token']) ?
-                self::OAUTH_AUTHORIZE_URL . '?oauth_token=' . $request_token['oauth_token'] :
-                ''
-        );
+        return self::OAUTH_AUTHORIZE_URL . '?' . http_build_query($parameters, null, '&', PHP_QUERY_RFC1738);
     }
 
     /**
@@ -214,23 +119,66 @@ class QuickbooksAuth
     /**
      * Get OAuth Access token data
      *
-     * @param string $token    OAuth token
-     * @param string $verifier OAuth token verifier
-     * @param int    $realm_id Realm ID
+     * @param string $code OAuth authorization code
      *
      * @return array OAuth access token data
      */
-    public function getAccessToken($token = '', $verifier = '', $realm_id = 0)
+    public function getAccessToken($code)
     {
-        list($request_data) = $this->signRequest(self::REQUEST_GET_ACCESS_TOKEN, Http::POST, self::OAUTH_ACCESS_URL, array(
-            'oauth_verifier' => $verifier,
-            'oauth_token' => $token,
-        ));
+        $parameters = [
+            'grant_type' => 'authorization_code',
+            'code' => $code,
+            'redirect_uri' => self::getCallbackUrl($this->payment_id)
+        ];
 
-        $access_token = Http::post(self::OAUTH_ACCESS_URL, $request_data);
-        parse_str($access_token, $access_token);
-        $access_token['realm_id'] = $realm_id;
-        $access_token['token_expire_time'] = TIME + 180 * SECONDS_IN_DAY;
+        $authorization_header_info = $this->generateAuthorizationHeader();
+
+        $access_token = Http::post(
+            self::OAUTH_TOKEN_ENDPOINT_URL,
+            $parameters,
+            [
+                'headers' => [
+                    'Accept: application/json',
+                    'Authorization: ' . $authorization_header_info,
+                    'Content-Type: application/x-www-form-urlencoded'
+                ]
+            ]
+            );
+
+        $access_token = json_decode($access_token, 1);
+
+        $access_token['token_expire_time'] = TIME + $access_token['x_refresh_token_expires_in'];
+
+        return $this->setAccessToken($access_token);
+    }
+
+    /**
+     * Refresh OAuth Access token data
+     *
+     * @return array OAuth access token data
+     */
+    public function refreshAccessToken()
+    {
+        $parameters = [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $this->refresh_token
+        ];
+
+        $authorization_header_info = $this->generateAuthorizationHeader();
+
+        $refresh_token = Http::post(
+            self::OAUTH_TOKEN_ENDPOINT_URL,
+            $parameters,
+            [
+                'headers' => [
+                    'Accept: application/json',
+                    'Authorization: ' . $authorization_header_info,
+                    'Content-Type: application/x-www-form-urlencoded'
+                ]
+            ]
+        );
+
+        $access_token = json_decode($refresh_token, 1);
 
         return $this->setAccessToken($access_token);
     }
@@ -244,11 +192,22 @@ class QuickbooksAuth
      */
     private function setAccessToken($access_token = array())
     {
-        $this->token        = empty($access_token['oauth_token'])        ? '' : $access_token['oauth_token'];
-        $this->token_secret = empty($access_token['oauth_token_secret']) ? '' : $access_token['oauth_token_secret'];
-        $this->realm_id     = empty($access_token['realm_id'])           ? '' : $access_token['realm_id'];
+        $this->token         = empty($access_token['access_token'])  ? '' : $access_token['access_token'];
+        $this->refresh_token = empty($access_token['refresh_token']) ? '' : $access_token['refresh_token'];
 
         return $access_token;
+    }
+
+    /**
+     * Generate OAuth Authorization Header
+     *
+     * @return string OAuth generated authorization header
+     */
+    private function generateAuthorizationHeader()
+    {
+        $encoded_client_id_client_secrets = base64_encode($this->client_id . ':' . $this->client_secret);
+        $authorization_header = 'Basic ' . $encoded_client_id_client_secrets;
+        return $authorization_header;
     }
 }
 
@@ -348,11 +307,11 @@ class QuickbooksPaymentMethod
         $order_info = array_merge($address_fields, $order_info);
 
         return array(
-            'region' => $order_info['b_state'],
-            'postalCode' => $order_info['b_zipcode'],
-            'streetAddress' => $order_info['b_address'],
-            'country' => $order_info['b_country'],
-            'city' => $order_info['b_city'],
+            'region' => !empty($order_info['b_state']) ? $order_info['b_state'] : $order_info['s_state'],
+            'postalCode' => !empty($order_info['b_zipcode']) ? $order_info['b_zipcode'] : $order_info['s_zipcode'],
+            'streetAddress' => !empty($order_info['b_address']) ? $order_info['b_address'] : $order_info['s_address'],
+            'country' => !empty($order_info['b_country']) ? $order_info['b_country'] : $order_info['s_country'],
+            'city' => !empty($order_info['b_city']) ? $order_info['b_city'] : $order_info['s_city'],
         );
     }
 
@@ -367,9 +326,14 @@ class QuickbooksPaymentMethod
     {
         return json_encode(array(
             'amount' => $order_info['total'],
-            'card' => $this->prepareCardData($order_info),
             'currency' => CART_SECONDARY_CURRENCY,
+            'card' => $this->prepareCardData($order_info),
+            'context' => [
+                'mobile' => false,
+                'isEcommerce' => true
+            ]
         ));
+
     }
 
     /**
@@ -385,7 +349,6 @@ class QuickbooksPaymentMethod
         $request_data = $this->prepareRequestData($order_info);
 
         $qa = new QuickbooksAuth($this->payment_id, $this->processor_params);
-        list($fields, $auth_header) = $qa->signRequest(QuickbooksAuth::REQUEST_CHARGE, Http::POST, $this->gateway_url);
 
         // do not log request to hide card data
         Registry::set('log_cut', true);
@@ -393,15 +356,14 @@ class QuickbooksPaymentMethod
         $response = Http::post(
             $this->gateway_url,
             $request_data,
-            array(
-                'headers' => array(
-                    'Content-Type: application/json',
-                    'Content-Length: ' . strlen($request_data),
+            [
+                'headers' => [
+                    'Authorization: Bearer ' . $qa->token,
                     'Accept: application/json',
-                    'Request-ID: ' . $request_id,
-                    $auth_header
-                )
-            )
+                    'Content-Type: application/json',
+                    'Request-Id: ' . $request_id
+                ]
+            ]
         );
 
         return $this->processPaymentResponse($response);
@@ -446,8 +408,8 @@ class QuickbooksPaymentMethod
     private function paymentResponseHasErrors($response)
     {
         return
-            empty($response) || !empty($response['errors']) ||
-            isset($response['status']) && $response['status'] == self::PAYMENT_STATUS_DECLINED;
+            empty($response) || !empty($response['errors']) || empty($response['id']) ||
+            (isset($response['status']) && $response['status'] == self::PAYMENT_STATUS_DECLINED);
     }
 
     /**
@@ -486,43 +448,59 @@ switch ($qb_action) {
         $payment_data = fn_get_processor_data($payment_id);
 
         $auth_provider = new QuickbooksAuth($payment_id, $payment_data['processor_params']);
-        list($request_token, $auth_url) = $auth_provider->getRequestToken();
+
+        $state = sha1(openssl_random_pseudo_bytes(1024));
+        $auth_url = $auth_provider->getAuthorizationURL($state);
 
         if ($auth_url) {
-            Tygh::$app['session']['qb_request_token'] = $request_token;
+            Tygh::$app['session']['quickbooks_auth_state'] = $state;
             fn_redirect($auth_url, true);
-        } else {
-            foreach ($request_token as $key => $value) {
-                echo "<p>{$key}: {$value}</p>";
-            }
         }
+
         exit;
 
     case 'auth_callback':
         $payment_id = $_REQUEST['payment_id'];
         $payment_data = fn_get_payment_method_data($payment_id);
 
-        $processor_params = array_merge(
-            $payment_data['processor_params'],
-            Tygh::$app['session']['qb_request_token']
-        );
-        unset(Tygh::$app['session']['qb_request_token']);
+        if (isset($_REQUEST['code'])) {
+            $code = $_REQUEST['code'];
+            $response_state = $_REQUEST['state'];
+            if (strcmp(Tygh::$app['session']['quickbooks_auth_state'], $response_state) !== 0) {
+                throw new Exception('The state is not correct from Intuit Server');
+            }
 
-        $auth_provider = new QuickbooksAuth($payment_id, $processor_params);
-        $access_token = $auth_provider->getAccessToken($_REQUEST['oauth_token'], $_REQUEST['oauth_verifier'], $_REQUEST['realmId']);
+            $auth_provider = new QuickbooksAuth($payment_id, $payment_data['processor_params']);
+            $access_token = $auth_provider->getAccessToken($code);
 
-        foreach ($access_token as $field => $value) {
-            $payment_data['processor_params'][$field] = $value;
+            foreach ($access_token as $field => $value) {
+                $payment_data['processor_params'][$field] = $value;
+            }
+            fn_update_payment($payment_data, $payment_id);
+
+            // close auth pop-up
+            echo '<script>window.open("", "_parent", ""); window.close();</script>';
         }
-        fn_update_payment($payment_data, $payment_id);
 
-        // close auth pop-up
-        echo '<script>window.open("", "_parent", ""); window.close();</script>';
         exit;
 
     default:
     case 'pay':
-        $qb = new QuickbooksPaymentMethod($order_info['payment_id'], $processor_data);
+        $payment_id = $_REQUEST['payment_id'];
+        $payment_data = fn_get_payment_method_data($payment_id);
+
+        $qa = new QuickbooksAuth($payment_id, $payment_data['processor_params']);
+
+        if (!empty($qa->refresh_token)) {
+            $refresh_token = $qa->refreshAccessToken();
+
+            foreach ($refresh_token as $field => $value) {
+                $payment_data['processor_params'][$field] = $value;
+            }
+            fn_update_payment($payment_data, $payment_id);
+        }
+
+        $qb = new QuickbooksPaymentMethod($order_info['payment_id']);
         $pp_response = $qb->charge($order_info);
         break;
 }

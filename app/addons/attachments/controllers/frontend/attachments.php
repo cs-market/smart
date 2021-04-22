@@ -18,9 +18,8 @@ if ($mode == 'getfile') {
     if (!empty($_REQUEST['attachment_id'])) {
 
         if (fn_get_attachment($_REQUEST['attachment_id']) === false) {
-            return array(CONTROLLER_STATUS_NO_PAGE);
+            return [CONTROLLER_STATUS_NO_PAGE];
         }
-
     }
     exit;
 }

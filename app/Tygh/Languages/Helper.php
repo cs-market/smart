@@ -183,7 +183,7 @@ class Helper
                         $destination[$v] = htmlspecialchars_decode($destination[$v]);
                     }
 
-                    $pattern = '/\[(lang) name\=([\w-]+?)( [cm\-pre\-ajx]*)?\](.*?)\[\/\1\]/is';
+                    $pattern = '/\[(lang) name\=([\w-]+?)\](.*?)\[\/\1\]/is';
                     if (!preg_match($pattern, $destination[$v])) {
                         $destination[$v] = "[lang name=$table-$what$where_fields]$destination[$v][/lang]";
                     }

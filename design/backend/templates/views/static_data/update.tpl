@@ -13,10 +13,12 @@
 <div class="tabs cm-j-tabs">
     <ul class="nav nav-tabs">
         <li id="tab_general_{$id}" class="cm-js active"><a>{__("general")}</a></li>
+        {hook name="static_data:tabs_list"}{/hook}
     </ul>
 </div>
 
-<div class="cm-tabs-content" id="content_tab_general_{$id}">
+<div class="cm-tabs-content" id="tabs_general_{$id}">
+<div id="content_tab_general_{$id}">
 <fieldset>
 
     {if $section_data.owner_object}
@@ -63,9 +65,12 @@
     </div>
     {/if}
     <div class="control-group">
-        <label for="param_{$id}" class="control-label">{__($section_data.param)}{if $section_data.tooltip}{include file="common/tooltip.tpl" tooltip=__($section_data.tooltip)}{/if}:</label>
+        <label for="param_{$id}" class="control-label">{__($section_data.param)}:</label>
         <div class="controls">
             <input type="text" size="40" id="param_{$id}" name="static_data[param]" value="{$static_data.param}" class="input-text-large">
+            {if $section_data.tooltip}
+                <p class="muted description">{__($section_data.tooltip)}</p>
+            {/if}
         </div>
     </div>
 
@@ -84,11 +89,11 @@
             <input type="hidden" id="param_{$k}_{$id}" name="static_data[{$p.name}]" value="{$static_data[$p.name]}" class="input-text-large" />
         {else}
             <div class="control-group">
-                <label for="param_{$k}_{$id}" class="control-label">{__($p.title)}{if $p.tooltip}{include file="common/tooltip.tpl" tooltip=__($p.tooltip)}{/if}:</label>
+                <label for="param_{$k}_{$id}" class="control-label">{__($p.title)}:</label>
                 <div class="controls mixed-controls cm-bs-group">
                     {if $p.type == "checkbox"}
                         <input type="hidden" name="static_data[{$p.name}]" value="N" />
-                        <input type="checkbox" id="param_{$k}_{$id}" name="static_data[{$p.name}]" value="Y" {if $static_data[$p.name] == "Y"}checked="checked"{/if} class="checkbox" />
+                        <input type="checkbox" id="param_{$k}_{$id}" name="static_data[{$p.name}]" value="Y" {if $static_data[$p.name] == "Y"}checked="checked"{/if} />
                     {elseif $p.type == "megabox"}
                         {assign var="_megabox_values" value=$static_data[$p.name]|fn_static_data_megabox}
                         <div class="cm-bs-container form-inline clearfix">
@@ -134,6 +139,10 @@
                     {elseif $p.type == "input"}
                         <input type="text" id="param_{$k}_{$id}" name="static_data[{$p.name}]" value="{$static_data[$p.name]}" class="input-text-large" />
                     {/if}
+
+                    {if $p.tooltip}
+                        <p class="muted description">{__($p.tooltip)}</p>
+                    {/if}
                 </div>
             </div>        
         {/if}
@@ -145,6 +154,8 @@
     {/if}
 </fieldset>
 <!--content_tab_general_{$id}--></div>
+{hook name="static_data:tabs_content"}{/hook}
+</div>
 
 {if ""|fn_allow_save_object:"static_data":$section_data.skip_edition_checking}
     <div class="buttons-container">

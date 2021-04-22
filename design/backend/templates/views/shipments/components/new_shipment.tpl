@@ -24,7 +24,7 @@
     <div id="content_tab_general">
 
         <div class="table-responive-wrapper">
-            <table class="table table-middle table-responive">
+            <table class="table table-middle table--relative table-responive">
             <thead>
                 <tr>
                     <th>{__("product")}</th>
@@ -52,9 +52,11 @@
                             </a>
                         {/if}
 
+                        {hook name="shipments:product_info"}
                         {if $product.product_code}
                             <p class="products-hint__code">{__("sku")}:&nbsp;{$product.product_code}</p>
                         {/if}
+                        {/hook}
 
                         {if $product.product_options}
                             <div class="options-info">
@@ -96,7 +98,7 @@
                 <div class="controls">
                     <select name="shipment_data[shipping_id]" id="shipping_name">
                         {foreach from=$shippings item="shipping"}
-                            <option    value="{$shipping.shipping_id}">{$shipping.shipping}</option>
+                            <option value="{$shipping.shipping_id}" {if $current_shipping_id === $shipping.shipping_id}selected{/if}>{$shipping.shipping}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -133,7 +135,7 @@
                             <option value="{$key}">{$status}</option>
                         {/foreach}
                     </select>
-                    <p class="description">
+                    <p class="muted description">
                         {__("text_order_status_notification")}
                     </p>
                 </div>

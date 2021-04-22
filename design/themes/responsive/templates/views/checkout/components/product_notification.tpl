@@ -1,13 +1,18 @@
+{hook name="product_notification:scripts"}
 {capture name="buttons"}
     <div class="ty-float-left">
         {include file="buttons/button.tpl" but_text=__("continue_shopping") but_meta="ty-btn__secondary cm-notification-close"}
     </div>
 
     <div class="ty-float-right">
-    {if $settings.General.checkout_redirect == "Y"}
+    {if $settings.Checkout.checkout_redirect == "Y"}
         {include file="buttons/button.tpl" but_meta="ty-btn__primary" but_text=__("view_cart") but_href="checkout.cart"}
     {else}
-        {include file="buttons/checkout.tpl" but_href="checkout.checkout"}
+        {include
+            file="buttons/proceed_to_checkout.tpl"
+            but_text=__("checkout")
+            but_meta="ty-btn__primary cm-notification-close"
+        }
     {/if}
     </div>
 
@@ -24,3 +29,4 @@
     </div>
 {/capture}
 {include file="views/products/components/notification.tpl" product_buttons=$smarty.capture.buttons product_info=$smarty.capture.info}
+{/hook}

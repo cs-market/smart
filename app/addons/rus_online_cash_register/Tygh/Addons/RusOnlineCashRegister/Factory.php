@@ -49,10 +49,11 @@ class Factory
      * @param string        $login              ATOL login
      * @param string        $password           ATOL password
      * @param RequestLogger $request_logger     Instance of the RequestLogger
+     * @param string        $mode               ATOL mode
      *
      * @return ICashRegister
      */
-    public function createCashRegister($inn, $group_code, $payment_address, $login, $password, $request_logger = null)
+    public function createCashRegister($inn, $group_code, $payment_address, $login, $password, $request_logger = null, $mode = 'live', $api_version = '4', $company_email = 'admin@example.com')
     {
         return new CashRegister(
             $inn,
@@ -62,7 +63,10 @@ class Factory
             $password,
             fn_url('online_cash_register.callback_atol', 'C'),
             new Http(),
-            $request_logger ? $request_logger : $this->container['addons.rus_online_cash_register.request_logger']
+            $request_logger ? $request_logger : $this->container['addons.rus_online_cash_register.request_logger'],
+            $mode,
+            $api_version,
+            $company_email
         );
     }
 
@@ -80,7 +84,10 @@ class Factory
             isset($params['atol_group_code']) ? $params['atol_group_code'] : null,
             isset($params['atol_payment_address']) ? $params['atol_payment_address'] : null,
             isset($params['atol_login']) ? $params['atol_login'] : null,
-            isset($params['atol_password']) ? $params['atol_password'] : null
+            isset($params['atol_password']) ? $params['atol_password'] : null,
+            null,
+            isset($params['mode']) ? $params['mode'] : 'live',
+            isset($params['api_version']) ? $params['api_version'] : '4'
         );
     }
 }

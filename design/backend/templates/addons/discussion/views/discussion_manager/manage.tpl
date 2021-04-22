@@ -6,8 +6,9 @@
 {if $discussion_object_type == 'E' && $addons.discussion.home_page_testimonials == 'D'}
     {__("text_enabled_testimonials_notice")}
 {/if}
-
-<form action="{""|fn_url}" method="POST" name="update_posts_form_{$discussion_object_type|lower}">
+{$is_allowed_to_update_reviews = fn_check_permissions("discussion", "update", "admin")}
+{$is_allowed_to_add_reviews = fn_check_permissions("discussion", "add", "admin")}
+<form action="{""|fn_url}" method="POST" {if !$is_allowed_to_update_reviews}class="cm-hide-inputs"{/if} name="update_posts_form_{$discussion_object_type|lower}">
 <input type="hidden" name="redirect_url" value="{"discussion_manager.manage?selected_section=`$discussion_object_types.$discussion_object_type`"|fn_url}">
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true div_id="pagination_contents_`$discussion_object_type`"}
 
@@ -18,7 +19,7 @@
 {foreach from=$posts item=post}
     <div class="post-item">
         {hook name="discussion_manager:items_list_row"}
-            {include file="addons/discussion/views/discussion_manager/components/post.tpl" post=$post type=$post.type show_object_link=true allow_save=true}
+            {include file="addons/discussion/views/discussion_manager/components/post.tpl" post=$post type=$post.type show_object_link=true allow_save=$is_allowed_to_update_reviews}
         {/hook}
     </div>
 {/foreach}
@@ -32,7 +33,7 @@
 {if $posts}
 {capture name="adv_buttons"}
     {if $discussion_object_type == 'E'}
-        {if $addons.discussion.home_page_testimonials != 'D'}
+        {if $addons.discussion.home_page_testimonials != 'D' && $is_allowed_to_add_reviews}
             {include file="buttons/button.tpl" title=__("add_post") but_icon="icon-plus" but_role="action" but_href="discussion.update?discussion_type=E#add_new_post"}
         {/if}
     {/if}

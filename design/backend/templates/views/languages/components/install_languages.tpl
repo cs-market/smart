@@ -6,7 +6,7 @@
             <input type="hidden" name="selected_section" value="{$smarty.request.selected_section}" />
 
             <div class="table-responsive-wrapper">
-                <table class="table table-middle table-responsive">
+                <table class="table table-middle table--relative table-responsive">
                 <thead>
                     <tr class="cm-first-sibling">
                         <th>{__("language_code")}</th>

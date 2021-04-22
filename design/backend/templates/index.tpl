@@ -12,7 +12,16 @@
 </title>
 {/strip}
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-<link href="{$images_dir}/favicon.ico" rel="shortcut icon" type="image/x-icon" >
+
+{* Favicons *}
+<link rel="apple-touch-icon" sizes="180x180" href="{$images_dir}/favicons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="{$images_dir}/favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="{$images_dir}/favicons/favicon-16x16.png">
+<link rel="manifest" href="{$images_dir}/favicons/site.webmanifest">
+<link rel="mask-icon" href="{$images_dir}/favicons/safari-pinned-tab.svg" color="#0fa4d6">
+<meta name="msapplication-TileColor" content="#2b5797">
+<meta name="theme-color" content="#ffffff">
+
 {include file="common/styles.tpl"}
 {if "DEVELOPMENT"|defined && $smarty.const.DEVELOPMENT == true}
 <script type="text/javascript" data-no-defer>
@@ -24,14 +33,15 @@ window.jsErrors = [];
 {/if}
 </head>
 {include file="buttons/helpers.tpl"}
-{include file="common/loading_box.tpl"}
 
-<body {if $smarty.cookies.layout_status == 1}class="menu-toggled"{/if}>
+{$class = "{if $smarty.cookies.layout_status == 1}menu-toggled{/if}{if $smarty.const.ACCOUNT_TYPE === "vendor"} vendor-area{/if}"}
+<body {if $class}class="{$class}"{/if} data-ca-scroll-to-elm-offset="120">
 
-    {if "THEMES_PANEL"|defined}
-        {include file="demo_theme_selector.tpl"}
+    {include file="common/loading_box.tpl"}
+
+    {if $is_bottom_panel_available}
+        {include file="components/bottom_panel/bottom_panel.tpl" logo = $logos.theme.image}
     {/if}
-
     {include file="common/notification.tpl"}
     {include file=$content_tpl assign="content"}
 
@@ -62,6 +72,7 @@ window.jsErrors = [];
     {if $auth.user_id && 'settings'|fn_check_permissions:'change_store_mode':'admin':'POST'}
         {include file="views/settings/store_mode.tpl" show=$show_sm_dialog}
         {include file="views/settings/trial_expired.tpl" show=$show_trial_dialog}
+        {include file="views/settings/license_errors.tpl" show=$show_license_errors_dialog}
     {/if}
 
     {hook name="index:after_content"}{/hook}

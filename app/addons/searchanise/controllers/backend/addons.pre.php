@@ -14,21 +14,24 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($mode == 'update' || $mode == 'install' || $mode == 'uninstall') {
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_REQUEST['addon'] == 'seo') {
-        $show_notice = true;
+$notice_addons = [
+    'seo',
+];
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!empty($_REQUEST['addon']) && in_array($_REQUEST['addon'], $notice_addons) && in_array($mode, ['update', 'install', 'uninstall'])) {
+        fn_se_display_addon_notice($_REQUEST['addon']);
     }
 
-} elseif ($mode == 'update_status') {
-    if ($_REQUEST['id'] == 'seo') {
-        $show_notice = true;
-    }
+    return;
 }
 
-if (!empty($show_notice)) {
-    if (fn_se_is_registered() == true) {
-        fn_set_notification('W', __('notice'), __('text_se_seo_settings_notice', array(
-            '[link]' => fn_url('addons.update?addon=searchanise')
-        )));
+if ($mode == 'update') {
+    if ($_REQUEST['addon'] == 'searchanise') {
+        fn_se_check_connect();
+        fn_se_check_queue();
     }
+
+} elseif ($mode == 'update_status' && in_array($_REQUEST['id'], $notice_addons)) {
+    fn_se_display_addon_notice($_REQUEST['addon']);
 }

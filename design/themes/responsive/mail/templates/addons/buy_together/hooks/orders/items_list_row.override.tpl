@@ -26,7 +26,7 @@
         {if $order_info.use_discount}
         <td style="padding: 5px 10px; background-color: #ffffff; text-align: right;">{if $conf_discount|floatval}{include file="common/price.tpl" value=$conf_discount}{else}&nbsp;-&nbsp;{/if}</td>
         {/if}
-        {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+        {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
         <td style="padding: 5px 10px; background-color: #ffffff; text-align: right;">{if $conf_tax}{include file="common/price.tpl" value=$conf_tax}{else}&nbsp;-&nbsp;{/if}</td>
         {/if}
 
@@ -49,7 +49,7 @@
             {if $order_info.use_discount}
             <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap;">{__("discount")}</th>
             {/if}
-            {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+            {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
             <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap;">{__("tax")}</th>
             {/if}
             <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap;">{__("subtotal")}</th>
@@ -68,7 +68,7 @@
             {if $order_info.use_discount}
             <td style="padding: 5px 10px; background-color: #ffffff; text-align: right;">{if $oi.extra.discount|floatval}{include file="common/price.tpl" value=$oi.extra.discount}{else}&nbsp;-&nbsp;{/if}</td>
             {/if}
-            {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+            {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
             <td style="padding: 5px 10px; background-color: #ffffff; text-align: right;">{if $oi.tax_value}{include file="common/price.tpl" value=$oi.tax_value}{else}&nbsp;-&nbsp;{/if}</td>
             {/if}
             <td style="padding: 5px 10px; background-color: #ffffff; text-align: right;">{include file="common/price.tpl" value=$oi.display_subtotal}&nbsp;</td>

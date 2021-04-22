@@ -12,8 +12,11 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
 use Tygh\Registry;
+use Tygh\Addons\ProductVariations\Product\Type\Type;
+use Tygh\Addons\ProductVariations\ServiceProvider;
+use Tygh\Addons\ProductVariations\Product\Group\GroupFeatureCollection;
+use Tygh\Addons\ProductVariations\Product\FeaturePurposes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -22,82 +25,110 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
  * @var string $action
  * @var array $auth
  */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    return [CONTROLLER_STATUS_OK];
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if ($mode === 'manage' || $mode === 'p_subscr') {
-        /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-        $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-        /** @var \Tygh\SmartyEngine\Core $view */
-        $view = Tygh::$app['view'];
+if ($mode == 'add') {
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
 
-        $view->assign('product_types', $product_manager->getProductTypeNames());
-    } elseif ($mode == 'add') {
-        /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-        $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-        /** @var \Tygh\SmartyEngine\Core $view */
-        $view = Tygh::$app['view'];
+    $view->assign('product_type', Type::create(Type::PRODUCT_TYPE_SIMPLE));
+} elseif ($mode == 'update') {
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
 
-        $view->assign('product_types', $product_manager->getProductTypeNames($product_manager->getCreatableProductTypes()));
-        $view->assign('product_type', $product_manager->getProductTypeInstance(ProductManager::PRODUCT_TYPE_SIMPLE));
-    } elseif ($mode == 'update') {
-        /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-        $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-        /** @var \Tygh\SmartyEngine\Core $view */
-        $view = Tygh::$app['view'];
+    /** @var array $product_data */
+    $product_data = $view->getTemplateVars('product_data');
 
-        /** @var array $product_data */
-        $product_data = $view->getTemplateVars('product_data');
+    $tabs = Registry::get('navigation.tabs');
 
-        $product_type = $product_manager->getProductTypeInstance($product_data['product_type']);
+    $index = array_search('options', array_keys($tabs)) + 1;
 
-        $view->assign('product_type', $product_type);
+    $tabs = array_merge(
+        array_slice($tabs, 0, $index, true),
+        [
+            'variations' => [
+                'title' => __('product_variations.variations'),
+                'href'  => 'product_variations.manage?product_id=' . $product_data['product_id'],
+                'ajax'  => true
+            ]
+        ],
+        array_slice($tabs, $index, null, true)
+    );
 
-        if ($product_data['product_type'] === ProductManager::PRODUCT_TYPE_VARIATION) {
-            $parent_product_data = fn_get_product_data($product_data['parent_product_id'], $auth, CART_LANGUAGE, '', false, false, false, false, false, false, false, false);
-            $options_result = fn_product_variations_get_available_options($parent_product_data['product_id']);
-            $product_options = $options_result->getData();
+    Registry::set('navigation.tabs', $tabs);
 
-            $combinations = fn_product_variations_get_options_combinations($parent_product_data, $product_options);
+    $product_repository = ServiceProvider::getProductRepository();
+    $group_repository = ServiceProvider::getGroupRepository();
 
-            $view->assign(array(
-                'combinations' => $combinations,
-                'parent_product_data' => $parent_product_data,
-            ));
+    $product_data = $product_repository->loadProductGroupInfo($product_data);
+
+    if ($product_data['parent_product_id'] && isset($product_data['variation_feature_collection'])) {
+        $parent_product_data = fn_get_product_data($product_data['parent_product_id'], $auth, CART_LANGUAGE, '', false, false, false, false, false, false);
+
+        if ($parent_product_data) {
+            $parent_product_data = $product_repository->loadProductFeatures($parent_product_data, GroupFeatureCollection::createFromFeatureList($product_data['variation_feature_collection']));
+            $parent_product_data = $product_repository->loadProductVariationName($parent_product_data);
+
+            $view->assign('parent_product_data', $parent_product_data);
         }
-
-        $tabs = Registry::get('navigation.tabs');
-
-        if ($product_data['product_type'] === ProductManager::PRODUCT_TYPE_CONFIGURABLE) {
-            $index = array_search('options', array_keys($tabs)) + 1;
-
-            $tabs = array_merge(
-                array_slice($tabs, 0, $index, true),
-                array(
-                    'variations' => array(
-                        'title' => __('product_variations.variations'),
-                        'href' => 'product_variations.list?product_id=' . $product_data['product_id'],
-                        'ajax' => true
-                    )
-                ),
-                array_slice($tabs, $index, null, true)
-            );
-        }
-
-        Registry::set('navigation.tabs', $tabs);
-    } elseif ($mode == 'm_update') {
-        /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-        $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-        /** @var \Tygh\SmartyEngine\Core $view */
-        $view = Tygh::$app['view'];
-
-        /** @var array $products */
-        $products = $view->getTemplateVars('products_data');
-
-        foreach ($products as &$product) {
-            $product['type'] = $product_manager->getProductTypeInstance($product['product_type']);
-        }
-        unset($product);
-
-        $view->assign('products_data', $products);
     }
+
+    $view->assign('product_type', Type::createByProduct($product_data));
+    $view->assign('product_data', $product_data);
+
+} elseif ($mode == 'm_update') {
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+
+    /** @var array $products */
+    $products = $view->getTemplateVars('products_data');
+
+    $product_repository = ServiceProvider::getProductRepository();
+
+    $products = $product_repository->loadProductsGroupInfo($products);
+
+    foreach ($products as &$product) {
+        $product['type'] = Type::createByProduct($product);
+    }
+    unset($product);
+
+    $view->assign('products_data', $products);
+} elseif ($mode == 'get_products_list') {
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+    /** @var \Tygh\Ajax $ajax */
+    $ajax = Tygh::$app['ajax'];
+    $objects = $ajax->getAssignedVar('objects', []);
+    $products = Registry::get('runtime.get_products_list.products');
+
+    foreach ($objects as &$object) {
+        $product_id = $object['data']['product_id'];
+
+        if (empty($products[$product_id]['variation_group_id'])) {
+            continue;
+        }
+
+        $product = $products[$product_id];
+
+        $object['text'] = $object['data']['variation_name'] = $product['variation_name'];
+        $object['data']['variation_features'] = [];
+
+        foreach ($product['variation_features'] as $feature) {
+            if (FeaturePurposes::isCreateCatalogItem($feature['purpose'])) {
+                continue;
+            }
+
+            $object['data']['variation_features'][] = [
+                'feature' => $feature['description'],
+                'variant' => $feature['variant'],
+            ];
+        };
+    }
+    unset($object);
+
+    $ajax->assign('objects', $objects);
 }

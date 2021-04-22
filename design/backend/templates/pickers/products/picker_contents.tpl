@@ -67,16 +67,26 @@
 
         if ($('input.cm-item:checked', frm).length > 0) {
             $('input.cm-item:checked', frm).each( function() {
-                var id = $(this).val();
+                var id = $(this).val(),
+                    value = $('#product_' + id + '_alt').length ? $('#product_' + id + '_alt').val() : $('#product_' + id).val();
 
                 if (_display == "options" || _display == "options_amount" || _display == "options_price") {
 
                     products[id] = {
                         option: _getDescription(frm, id),
-                        value: $('#product_' + id).val()
+                        value: value
                     };
+                } else if(_display === 'radio') {
+                    products[id] = value;
                 } else {
-                    products[id] = $('#product_' + id).val();
+                    products[id] = {
+                        value: value
+                    };
+                }
+
+                if ($('#company_id_' + id).length) {
+                    products[id].companyId = $('#company_id_' + id).val();
+                    products[id].companyName = $('#company_name_' + id).val();
                 }
             });
 

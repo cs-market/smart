@@ -1,9 +1,15 @@
 {if $company_data.company_id}
-    {assign var="id" value=$company_data.company_id}
+    {$id=$company_data.company_id}
 {else}
-    {assign var="id" value=0}
+    {$id=0}
 {/if}
+{$is_allowed_to_update_companies = fn_check_view_permissions("companies.update", "POST")}
 
+{* Show approve and disapprove button instead of status dropdown *}
+{if $company_data.status == "VendorStatuses::NEW_ACCOUNT"|enum}
+    {$show_approve = true}
+    {$status_display = "text"}
+{/if}
 
 {include file="views/profiles/components/profiles_scripts.tpl"}
 
@@ -12,7 +18,7 @@
 {capture name="tabsbox"}
 {** /Item menu section **}
 
-<form class="form-horizontal form-edit {$form_class} {if !fn_check_view_permissions("companies.update", "POST")}cm-hide-inputs{/if} {if !$id}cm-ajax cm-comet cm-disable-check-changes{/if}" action="{""|fn_url}" method="post" id="company_update_form" enctype="multipart/form-data"> {* company update form *}
+<form class="form-horizontal form-edit {$form_class} {if !$is_allowed_to_update_companies}cm-hide-inputs{/if} {if !$id && "ULTIMATE"|fn_allowed_for}cm-ajax cm-comet cm-disable-check-changes{/if}" action="{""|fn_url}" method="post" id="company_update_form" enctype="multipart/form-data"> {* company update form *}
 {* class=""*}
 <input type="hidden" name="fake" value="1" />
 <input type="hidden" name="selected_section" id="selected_section" value="{$smarty.request.selected_section}" />
@@ -26,7 +32,7 @@
     {include file="common/subheader.tpl" title=__("use_existing_store")}
 
     <div class="control-group">
-        <label class="control-label" for="elm_company_exists_store">{__("store")}:</label>
+        <label class="control-label" for="elm_company_exists_store">{__("storefront")}:</label>
         <div class="controls">
             <input type="hidden" name="company_data[clone_from]" id="elm_company_exists_store" value="" onchange="fn_switch_store_settings(this);" />
             {include file="common/ajax_select_object.tpl" data_url="companies.get_companies_list?show_all=Y&default_label=none" text=__("none") result_elm="elm_company_exists_store" id="exists_store_selector"}
@@ -70,65 +76,106 @@
 
 {hook name="companies:general_information"}
 
+{if "ULTIMATE"|fn_allowed_for}
 <div class="control-group">
-    <label for="elm_company_name" class="control-label cm-required">{__("vendor_name")}:</label>
+    <label for="elm_company_name" class="control-label cm-required">{__("name")}:</label>
     <div class="controls">
         <input type="text" name="company_data[company]" id="elm_company_name" size="32" value="{$company_data.company}" class="input-large" />
     </div>
 </div>
 
-{if "ULTIMATE"|fn_allowed_for}
 {hook name="companies:storefronts"}
 <div class="control-group">
     <label for="elm_company_storefront" class="control-label cm-required">{__("storefront_url")}:</label>
     <div class="controls">
-    {if $runtime.company_id}
-        http://{$company_data.storefront|puny_decode}
-    {else}
-        <input type="text" name="company_data[storefront]" id="elm_company_storefront" size="32" value="{$company_data.storefront|puny_decode}" class="input-large" placeholder="http://" />
-    {/if}
-    </div>
-</div>
-
-<div class="control-group">
-    <label class="control-label" for="elm_company_secure_storefront">{__("secure_storefront_url")}:</label>
-    <div class="controls">
-    {if $runtime.company_id}
-        https://{$company_data.secure_storefront|puny_decode}
-    {else}
-        <input type="text" name="company_data[secure_storefront]" id="elm_company_secure_storefront" size="32" value="{$company_data.secure_storefront|puny_decode}" class="input-large" placeholder="https://" />
-    {/if}
+        {if $runtime.company_id}
+            http://{$company_data.storefront|puny_decode}
+        {else}
+            <input type="text" name="company_data[storefront]" id="elm_company_storefront" size="32" value="{$company_data.storefront|puny_decode}" class="input-large" />
+        {/if}
+        <p class="muted description">{__("ttc_storefront_url")}</p>
     </div>
 </div>
 {/hook}
 
 {hook name="companies:storefronts_design"}
-{if $id}
-{include file="common/subheader.tpl" title=__("design")}
 
-<div class="control-group">
-    <label class="control-label">{__("store_theme")}:</label>
-    <div class="controls">
-        <p>{$theme_info.title}: {$current_style.name}</p>
-        <a href="{"themes.manage?switch_company_id=`$id`"|fn_url}">{__("goto_theme_configuration")}</a>
-    </div>
-</div>
-{else}
-    {* TODO: Make theme selector *}
-    <input type="hidden" value="responsive" name="company_data[theme_name]">
+{if $id}
+{include file="views/storefronts/components/status.tpl"
+    id=$id
+    status=$company_data.storefront_status
+    input_name="company_data[storefront_status]"
+}
+
+{include file="views/storefronts/components/access_key.tpl"
+    id=$id
+    access_key=$company_data.store_access_key
+    input_name="company_data[store_access_key]"
+}
+
+{include file="views/storefronts/components/access_only_for_authorized_customers.tpl"
+    id=$id
+    is_accessible_for_authorized_customers_only=$company_data.is_accessible_for_authorized_customers_only
+    input_name="company_data[is_accessible_for_authorized_customers_only]"
+}
+
+{include file="common/subheader.tpl" title=__("design")}
+{/if}
+
+{include file="views/storefronts/components/theme.tpl"
+    id=$id
+    theme_url="themes.manage?switch_company_id={$id}"
+    theme=$theme
+    current_theme=$current_theme
+    current_style=$current_style
+    input_name="company_data[theme_name]"
+}
+
+{if $id}
+    {include file="common/subheader.tpl"
+        title=__("localization")
+    }
+
+    {include file="views/storefronts/components/languages.tpl"
+        id=$storefront_id
+        all_languages=$all_languages
+    }
+
+    {include file="views/storefronts/components/currencies.tpl"
+        id=$storefront_id
+        all_currencies=$all_currencies
+    }
 {/if}
 {/hook}
 
 {/if}
 
 {if "MULTIVENDOR"|fn_allowed_for}
+    {include file="views/profiles/components/profile_fields.tpl" section="C" default_data_name="company_data" profile_data=$company_data include=["company"] nothing_extra=true}
     {if !$runtime.company_id}
-        {include file="common/select_status.tpl" input_name="company_data[status]" id="company_data" obj=$company_data items_status="companies"|fn_get_predefined_statuses:$company_data.status}
+        {include file="common/select_status.tpl"
+            input_name="company_data[status]"
+            id="company_data"
+            obj=$company_data
+            items_status="companies"|fn_get_predefined_statuses:$company_data.status
+            display=$status_display
+        }
     {else}
         <div class="control-group">
             <label class="control-label">{__("status")}:</label>
             <div class="controls">
-                <label class="radio"><input type="radio" checked="checked" />{if $company_data.status == "A"}{__("active")}{elseif $company_data.status == "P"}{__("pending")}{elseif $company_data.status == "N"}{__("new")}{elseif $company_data.status == "D"}{__("disabled")}{/if}</label>
+                <label class="radio">
+                    <input type="radio" checked="checked" id="elm_company_status"/>
+                    {if $company_data.status === "ObjectStatuses::ACTIVE"|enum}
+                        {__("active")}
+                    {elseif $company_data.status === "ObjectStatuses::PENDING"|enum}
+                        {__("pending")}
+                    {elseif $company_data.status === "ObjectStatuses::NEW_OBJECT"|enum}
+                        {__("new")}
+                    {elseif $company_data.status === "ObjectStatuses::DISABLED"|enum}
+                        {__("disabled")}
+                    {/if}
+                </label>
             </div>
         </div>
     {/if}
@@ -149,20 +196,6 @@
 {if !$id}
     {literal}
     <script type="text/javascript">
-    function fn_toggle_required_fields()
-    {
-        var $ = Tygh.$;
-        var checked = $('#company_description_vendor_admin').prop('checked');
-
-        $('#company_description_username').prop('disabled', !checked);
-        $('#company_description_first_name').prop('disabled', !checked);
-        $('#company_description_last_name').prop('disabled', !checked);
-
-        $('.cm-profile-field').each(function(index){
-            $('#' + Tygh.$(this).prop('for')).prop('disabled', !checked);
-        });
-    }
-
     function fn_switch_store_settings(elm)
     {
         jelm = Tygh.$(elm);
@@ -192,7 +225,7 @@
             <label class="control-label" for="elm_company_vendor_admin">{__("create_administrator_account")}:</label>
             <div class="controls">
                 <label class="checkbox">
-                    <input type="checkbox" name="company_data[is_create_vendor_admin]" id="elm_company_vendor_admin" checked="checked" value="Y" onchange="fn_toggle_required_fields();" />
+                    <input type="checkbox" name="company_data[is_create_vendor_admin]" id="elm_company_vendor_admin" checked="checked" value="Y" />
                 </label>
             </div>
         </div>
@@ -201,109 +234,25 @@
 
 
 {if "MULTIVENDOR"|fn_allowed_for}
-{hook name="companies:contact_information"}
-{if !$id}
-    {include file="views/profiles/components/profile_fields.tpl" section="C" title=__("contact_information")}
-{else}
-    {include file="common/subheader.tpl" title=__("contact_information")}
-{/if}
+    {$excluded_fields=["company", "company_description", "accept_terms", "admin_firstname", "admin_lastname"]}
+    {hook name="companies:contact_information"}
+    {include file="views/profiles/components/profile_fields.tpl" section="C" default_data_name="company_data" profile_data=$company_data exclude=$excluded_fields nothing_extra=true}
+    {/hook}
 
-<div class="control-group">
-    <label for="elm_company_email" class="control-label cm-required cm-email">{__("email")}:</label>
-    <div class="controls">
-        <input type="text" name="company_data[email]" id="elm_company_email" size="32" value="{$company_data.email}" class="input-large" />
-    </div>
-</div>
-
-<div class="control-group">
-    <label for="elm_company_phone" class="control-label cm-required">{__("phone")}:</label>
-    <div class="controls">
-        <input type="text" class="input-large" name="company_data[phone]" id="elm_company_phone" size="32" value="{$company_data.phone}" />
-    </div>
-</div>
-
-<div class="control-group">
-    <label class="control-label" for="elm_company_url">{__("url")}:</label>
-    <div class="controls">
-        <input type="text" class="input-large" name="company_data[url]" id="elm_company_url" size="32" value="{$company_data.url}" />
-    </div>
-</div>
-
-<div class="control-group">
-    <label class="control-label" for="elm_company_fax">{__("fax")}:</label>
-    <div class="controls">
-        <input type="text" class="input-large" name="company_data[fax]" id="elm_company_fax" size="32" value="{$company_data.fax}"  />
-    </div>
-</div>
-{/hook}
-
-{hook name="companies:shipping_address"}
-{if !$id}
-    {include file="views/profiles/components/profile_fields.tpl" section="B" title=__("shipping_address") shipping_flag=false}
-{else}
-    {include file="common/subheader.tpl" title=__("shipping_address")}
-{/if}
-
-<div class="control-group">
-    <label for="elm_company_address" class="control-label cm-required">{__("address")}:</label>
-    <div class="controls">
-        <input type="text" class="input-large" name="company_data[address]" id="elm_company_address" size="32" value="{$company_data.address}" />
-    </div>
-</div>
-
-<div class="control-group">
-    <label for="elm_company_city" class="control-label cm-required">{__("city")}:</label>
-    <div class="controls">
-        <input type="text" class="input-large" name="company_data[city]" id="elm_company_city" size="32" value="{$company_data.city}" />
-    </div>
-</div>
-
-<div class="control-group">
-    <label for="elm_company_country" class="control-label cm-required">{__("country")}:</label>
-    <div class="controls">
-    {assign var="_country" value=$company_data.country|default:$settings.General.default_country}
-    <select class="cm-country cm-location-shipping" id="elm_company_country" name="company_data[country]">
-        <option value="">- {__("select_country")} -</option>
-        {foreach from=$countries item="country" key="code"}
-        <option {if $_country == $code}selected="selected"{/if} value="{$code}">{$country}</option>
-        {/foreach}
-    </select>
-    </div>
-</div>
-
-<div class="control-group">
-    {$_country = $company_data.country|default:$settings.General.default_country}
-    {$_state = $company_data.state|default:$settings.General.default_state}
-
-    <label for="elm_company_state" class="control-label cm-required">{__("state")}:</label>
-    <div class="controls">
-    <select id="elm_company_state" name="company_data[state]" class="cm-state cm-location-shipping {if !$states.$_country}hidden{/if}">
-        <option value="">- {__("select_state")} -</option>
-        {if $states.$_country}
-            {foreach from=$states.$_country item=state}
-                <option {if $_state == $state.code}selected="selected"{/if} value="{$state.code}">{$state.state}</option>
-            {/foreach}
-        {/if}
-    </select>
-    <input type="text" id="elm_company_state_d" name="company_data[state]" size="32" maxlength="64" value="{$_state}" {if $states.$_country}disabled="disabled"{/if} class="cm-state cm-location-shipping {if $states.$_country}hidden{/if} cm-skip-avail-switch" />
-    </div>
-</div>
-
-<div class="control-group">
-    <label for="elm_company_zipcode" class="control-label cm-required cm-zipcode cm-location-shipping">{__("zip_postal_code")}:</label>
-    <div class="controls">
-        <input type="text" name="company_data[zipcode]" id="elm_company_zipcode" size="32" value="{$company_data.zipcode}" />
-    </div>
-</div>
-{/hook}
+    {hook name="companies:shipping_address"}
+    {/hook}
 {/if}
 
 {if "ULTIMATE"|fn_allowed_for}
     {include file="common/subheader.tpl" title="{__("settings")}: {__("company")}" }
 
-    {foreach from=$company_settings key="field_id" item="item"}
-        {include file="common/settings_fields.tpl" item=$item section="Company" html_id="field_`$section`_`$item.name`_`$item.object_id`" html_name="update[`$item.object_id`]"}
-    {/foreach}
+    {component
+        name="settings.settings_section"
+        subsection=$company_settings
+        section="Company"
+        html_id_prefix="field_"
+        html_name="update"
+    }{/component}
 {/if}
 
 {/hook}
@@ -382,7 +331,7 @@
         {if $shippings}
         <input type="hidden" name="company_data[shippings]" value="" />
         <div class="table-responsive-wrapper">
-            <table width="100%" class="table table-middle table-responsive">
+            <table width="100%" class="table table-middle table--relative table-responsive">
             <thead>
             <tr>
                 <th width="50%">{__("shipping_methods")}</th>
@@ -433,7 +382,11 @@
         {if "ULTIMATE"|fn_allowed_for && $runtime.company_id}
             <li><a href="{"categories.manage?company_id=`$id`"|fn_url}">{__("view_vendor_categories")}</a></li>
         {/if}
-        <li><a href="{"profiles.manage?company_id=`$id`"|fn_url}">{__("view_vendor_users")}</a></li>
+        {if "MULTIVENDOR"|fn_allowed_for}
+            <li><a href="{"profiles.manage?user_type={"UserTypes::VENDOR"|enum}&company_id=`$id`"|fn_url}">{__("view_vendor_admins")}</a></li>
+        {else}
+            <li><a href="{"profiles.manage?company_id=`$id`"|fn_url}">{__("view_vendor_users")}</a></li>
+        {/if}
         <li><a href="{"orders.manage?company_id=`$id`"|fn_url}">{__("view_vendor_orders")}</a></li>
         {/hook}
     </ul>
@@ -443,11 +396,37 @@
     <h6>{__("vendors_statistics")}</h6>
     <ul class="unstyled">
         {hook name="companies:accounting_sidebar_links"}
-            <li class="vendor-statistics"><a href="{"companies.balance?vendor=`$id`&selected_section=withdrawals"|fn_url}">{include file="common/price.tpl" value=$company_data.balance}</a><span>{__("balance")}</span></li>
-            <li class="vendor-statistics"><a href="{"orders.manage?company_id=`$id`"|fn_url}">{$company_data.orders_count}</a><span>{__("orders")}</span></li>
-            <li class="vendor-statistics"><a href="{"orders.manage?company_id=`$id`&is_search=Y&period=C&time_from=`$time_from`&time_to=`$time_to`"|fn_url}">{include file="common/price.tpl" value=$company_data.sales}</a><span>{__("sales")}</span></li>
-            <li class="vendor-statistics"><a href="{"companies.balance?vendor=`$id`"|fn_url}">{include file="common/price.tpl" value=$company_data.income}</a><span>{__("income")}</span></li>
-            <li class="vendor-statistics"><a href="{"products.manage?company_id=`$id`&selected_section=withdrawals"|fn_url}">{$company_data.products_count}</a><span>{__("products")}</span></li>
+            <li class="vendor-statistics">
+                <a href="{"companies.balance?vendor=`$id`&selected_section=withdrawals"|fn_url}">
+                    {include file="common/price.tpl" value=$company_data.balance}</a>
+                <span>{__("balance")}</span>
+            </li>
+            <li class="vendor-statistics">
+                <a href="{"orders.manage?company_id=`$id`"|fn_url}">{$company_data.orders_count}</a>
+                <span>{__("orders")}</span>
+            </li>
+            <li class="vendor-statistics">
+                <a href="{"orders.manage?company_id=`$id`&is_search=Y&period=C&time_from=`$time_from`&time_to=`$time_to`"|fn_url}">
+                    {include file="common/price.tpl" value=$company_data.sales}</a>
+                <span>{__("sales")}</span>
+            </li>
+            <li class="vendor-statistics">
+                <a href="{"companies.balance?vendor=`$id`"|fn_url}">
+                    {include file="common/price.tpl" value=$company_data.income}</a>
+                <span>{__("income")}</span>
+            </li>
+            <li class="vendor-statistics">
+                <a href="{"products.manage?company_id=`$id`&status=A&product_type[]=P"|fn_url}">{$company_data.products_count}</a>
+                <span>{__("active_products")}</span>
+            </li>
+            {if $settings.General.inventory_tracking !== "YesNo::NO"|enum}
+                <li class="vendor-statistics">
+                    <a href="{"products.manage?company_id=`$id`&amount_from=&amount_to=0&tracking[0]={"ProductTracking::TRACK"|enum}"|fn_url}">
+                        {$company_data.out_of_stock}
+                    </a>
+                    <span>{__("out_of_stock_products")}</span>
+                </li>
+            {/if}
         {/hook}
     </ul>
 </div>
@@ -461,12 +440,29 @@
     {if $id}
         {capture name="tools_list"}
         {hook name="companies:tools_list"}
+            {if $show_approve}
+                <li>{btn type="list" text=__("save") class="cm-update-company" dispatch="dispatch[companies.update]" form="company_update_form" method="POST"}</li>
+            {/if}
             <li>{btn type="list" text=__("delete") class="cm-confirm" href="companies.delete?company_id=$id" method="POST"}</li>
         {/hook}
         {/capture}
         {dropdown content=$smarty.capture.tools_list}
+        {if $show_approve}
+            {if $settings.Vendors.allow_approve_vendors_in_two_steps == "YesNo::YES"|enum}
+                {$approve_status = "VendorStatuses::PENDING"|enum}
+            {else}
+                {$approve_status = "VendorStatuses::ACTIVE"|enum}
+            {/if}
 
-        {include file="buttons/save_cancel.tpl" but_name="dispatch[companies.update]" but_target_form="company_update_form" save=$id}
+            {include file="buttons/approve_disapprove.tpl"
+                id=$id
+                dispatch="companies.update_status"
+                header_view=true
+                approve_status=$approve_status
+            }
+        {else}
+            {include file="buttons/save_cancel.tpl" but_name="dispatch[companies.update]" but_target_form="company_update_form" save=$id but_meta="cm-update-company"}
+        {/if}
     {else}
         {if $is_companies_limit_reached}
             {include file="buttons/save_cancel.tpl" but_meta="btn cm-promo-popup"}
@@ -477,14 +473,20 @@
 {/capture}
 {** /Form submit section **}
 
+{capture name="page_title"}
 {if $id}
-    {include file="common/mainbox.tpl"
-        title_start=__("editing_vendor")
-        title_end=$company_data.company
-        content=$smarty.capture.mainbox
-        select_languages=true
-        buttons=$smarty.capture.buttons
-        sidebar=$smarty.capture.sidebar}
+    {$company_data.company}
+{elseif fn_allowed_for("MULTIVENDOR")}
+    {__("new_vendor")}
 {else}
-    {include file="common/mainbox.tpl" title=__("new_vendor") content=$smarty.capture.mainbox sidebar=$smarty.capture.sidebar buttons=$smarty.capture.buttons}
+    {__("add_storefront")}
 {/if}
+{/capture}
+
+{include file="common/mainbox.tpl"
+    title=$smarty.capture.page_title
+    select_languages=(bool) $id
+    content=$smarty.capture.mainbox
+    sidebar=$smarty.capture.sidebar
+    buttons=$smarty.capture.buttons
+}

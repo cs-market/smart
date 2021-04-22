@@ -13,6 +13,7 @@
  ****************************************************************************/
 
 use Tygh\Enum\Addons\StorefrontRestApi\PaymentTypes;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
 
 defined('BOOTSTRAP') or die('Access denied');
@@ -32,22 +33,34 @@ defined('BOOTSTRAP') or die('Access denied');
  *     ]
  * ]
  */
-$schema = array();
+$schema = [];
 
 $addons = Registry::get('addons');
 
-if (isset($addons['paypal']['status']) && $addons['paypal']['status'] === 'A') {
-    $schema['paypal_express.php'] = array(
+if (isset($addons['paypal']['status']) && $addons['paypal']['status'] === ObjectStatuses::ACTIVE) {
+    $schema['paypal_express.php'] = [
         'type'  => PaymentTypes::REDIRECTION,
         'class' => '\Tygh\Addons\StorefrontRestApi\Payments\PaypalExpress',
-    );
+    ];
 }
 
-if (isset($addons['rus_payments']['status']) && $addons['rus_payments']['status'] === 'A') {
-    $schema['yandex_money.php'] = array(
+if (isset($addons['rus_payments']['status']) && $addons['rus_payments']['status'] === ObjectStatuses::ACTIVE) {
+    $schema['yandex_money.php'] = [
         'type'  => PaymentTypes::REDIRECTION,
         'class' => '\Tygh\Addons\StorefrontRestApi\Payments\YandexCheckpoint',
-    );
+    ];
+}
+
+if (isset($addons['yandex_checkout']['status']) && $addons['yandex_checkout']['status'] === ObjectStatuses::ACTIVE) {
+    $schema['yandex_checkout_for_marketplaces.php'] = [
+        'type'  => PaymentTypes::REDIRECTION,
+        'class' => '\Tygh\Addons\StorefrontRestApi\Payments\YandexCheckoutForMarketplaces',
+    ];
+
+    $schema['yandex_checkout.php'] = [
+        'type'  => PaymentTypes::REDIRECTION,
+        'class' => '\Tygh\Addons\StorefrontRestApi\Payments\YandexCheckout',
+    ];
 }
 
 return $schema;

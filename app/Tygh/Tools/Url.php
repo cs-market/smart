@@ -47,13 +47,7 @@ class Url
     {
         if ($url) {
             $url = trim($url);
-
-            if (PHP_VERSION_ID < 50407 && strncmp($url, '//', 2) === 0) {
-                $parsed = parse_url('http:' . $url);
-                unset($parsed['scheme']);
-            } else {
-                $parsed = parse_url($url);
-            }
+            $parsed = parse_url($url);
 
             // Gracefully supress potential errors
             if ($parsed === false) {
@@ -165,6 +159,19 @@ class Url
     public function getQueryParams()
     {
         return $this->query_params;
+    }
+
+    /**
+     * Gets the specific URL query parameter
+     *
+     * @param string     $key     Key of the parameter
+     * @param mixed|null $default Default value if parameter is not exist in the URL
+     *
+     * @return mixed Parameter value
+     */
+    public function getQueryParam($key, $default = null)
+    {
+        return array_key_exists($key, $this->query_params) ? $this->query_params[$key] : $default;
     }
 
     /**

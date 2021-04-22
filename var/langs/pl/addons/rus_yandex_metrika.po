@@ -28,6 +28,14 @@ msgctxt "SettingsTooltips::rus_yandex_metrika::counter_number"
 msgid "Get it from your account at <a href=\"http://metrika.yandex.ru\" target=\"_blank\">metrika.yandex.ru</a>"
 msgstr "Get it from your account at <a href=\"http://metrika.yandex.ru\" target=\"_blank\">metrika.yandex.ru</a>"
 
+msgctxt "SettingsOptions::rus_yandex_metrika::is_obsolete_code_snippet_used"
+msgid "Obsolete code snippet"
+msgstr "Obsolete code snippet"
+
+msgctxt "SettingsTooltips::rus_yandex_metrika::is_obsolete_code_snippet_used"
+msgid "You should install the obsolete version of the code snippet only if you'd like to use the previous version of Session Replay. The up-to-date code snippet supports only Session Replay 2.0"
+msgstr "You should install the obsolete version of the code snippet only if you'd like to use the previous version of Session Replay. The up-to-date code snippet supports only Session Replay 2.0"
+
 msgctxt "SettingsOptions::rus_yandex_metrika::base_settings"
 msgid "Settings"
 msgstr "Settings"
@@ -88,9 +96,13 @@ msgctxt "SettingsTooltips::rus_yandex_metrika::collect_stats_for_goals"
 msgid "Yandex API access is required (see settings above)"
 msgstr "Yandex API access is required (see settings above)"
 
-msgctxt "Languages::yandex_metrika_oauth_info_part1"
-msgid "Please <a href=\"https://oauth.yandex.ru/client/new\" target=\"_blank\">register an application</a> with full Yandex.Metrika permissions to continue. Use this value as the <b>Callback URL</b> param: <i>[callback_uri]</i>. After the registration, you will be able to fill out the \"Application ID\" and \"Application password\" fields on this page."
-msgstr "Please <a href=\"https://oauth.yandex.ru/client/new\" target=\"_blank\">register an application</a> with full Yandex.Metrika permissions to continue. Use this value as the <b>Callback URL</b> param: <i>[callback_uri]</i>. After the registration, you will be able to fill out the \"Application ID\" and \"Application password\" fields on this page."
+msgctxt "Languages::rus_yandex_metrika.oauth_info.register_an_app"
+msgid "Please <a href=\"https://oauth.yandex.ru/client/new\" target=\"_blank\">register an application</a> with full Yandex.Metrika permissions to continue"
+msgstr "Please <a href=\"https://oauth.yandex.ru/client/new\" target=\"_blank\">register an application</a> with full Yandex.Metrika permissions to continue"
+
+msgctxt "Languages::rus_yandex_metrika.oauth_info.callback_uri_description"
+msgid "Copy and paste this address into your application <b>Callback URL</b> parameter. After the registration, you will be able to fill out the \"Application ID\" and \"Application password\" fields on this page."
+msgstr "Copy and paste this address into your application <b>Callback URL</b> parameter. After the registration, you will be able to fill out the \"Application ID\" and \"Application password\" fields on this page."
 
 msgctxt "Languages::yandex_metrika_oauth_info_part2"
 msgid "After you've created the app and when you ever <a href=\"[edit_app_uri]\" target=\"_blank\">modify it</a>, <a href=\"[auth_uri]\" target=\"_blank\">click here to get a new auth token</a>"

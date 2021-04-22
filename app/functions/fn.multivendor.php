@@ -13,20 +13,31 @@
 ****************************************************************************/
 
 use Tygh\BlockManager\Layout;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\ProductFilterProductFieldTypes;
+use Tygh\Enum\ProfileDataTypes;
+use Tygh\Enum\ProfileTypes;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\UserTypes;
 use Tygh\Enum\VendorPayoutApprovalStatuses;
 use Tygh\Enum\VendorPayoutTypes;
+use Tygh\Enum\VendorStatuses;
+use Tygh\Enum\YesNo;
+use Tygh\NotificationsCenter\NotificationsCenter;
+use Tygh\Providers\VendorServicesProvider;
 use Tygh\Registry;
-use Tygh\Navigation\LastView;
 use Tygh\Themes\Patterns;
 use Tygh\Themes\Styles;
 use Tygh\Themes\Themes;
+use Tygh\Tygh;
 use Tygh\VendorPayouts;
 
 /* HOOKS */
 
 function fn_mve_get_product_filter_fields(&$filters)
 {
-    $filters['S'] = array(
+    $filters[ProductFilterProductFieldTypes::VENDOR] = array(
         'db_field' => 'company_id',
         'table' => 'products',
         'description' => 'vendor',
@@ -93,14 +104,14 @@ function fn_mve_place_order(&$order_id, &$action, &$order_status, &$cart, &$auth
         }
 
         $company_data = fn_get_company_data($order_info['company_id']);
-        
-        $data = array(
-            'company_id'    => $order_info['company_id'],
-            'order_id'      => $order_id,
-            'order_amount' => $order_info['total'],
-            'payout_type'   => VendorPayoutTypes::ORDER_PLACED,
+
+        $data = [
+            'company_id'      => $order_info['company_id'],
+            'order_id'        => $order_id,
+            'order_amount'    => $order_info['total'],
+            'payout_type'     => VendorPayoutTypes::ORDER_PLACED,
             'approval_status' => VendorPayoutApprovalStatuses::COMPLETED,
-        );
+        ];
 
         /**
          * Actions before save vendor payout
@@ -158,27 +169,26 @@ function fn_mve_update_order(&$new_order_info, &$order_id)
         }
 
         $company_data = fn_get_company_data($old_order_info['company_id']);
-
-        $payout_data = array();
+        $payout_data = [];
 
         if ($payout_id) {
             if ($new_order_info['total'] != $old_order_info['total']) {
-                $payout_data = array(
-                    'company_id'    => $old_order_info['company_id'],
-                    'order_id'      => $order_id,
-                    'order_amount'  => $new_order_info['total'] - $old_order_info['total'],
-                    'payout_type'   => VendorPayoutTypes::ORDER_CHANGED,
+                $payout_data = [
+                    'company_id'      => $old_order_info['company_id'],
+                    'order_id'        => $order_id,
+                    'order_amount'    => $new_order_info['total'] - $old_order_info['total'],
+                    'payout_type'     => VendorPayoutTypes::ORDER_CHANGED,
                     'approval_status' => VendorPayoutApprovalStatuses::COMPLETED,
-                );
+                ];
             }
         } else {
-            $payout_data = array(
-                'company_id'    => $old_order_info['company_id'],
-                'order_id'      => $order_id,
-                'order_amount'  => $new_order_info['total'],
-                'payout_type'   => VendorPayoutTypes::ORDER_PLACED,
+            $payout_data = [
+                'company_id'      => $old_order_info['company_id'],
+                'order_id'        => $order_id,
+                'order_amount'    => $new_order_info['total'],
+                'payout_type'     => VendorPayoutTypes::ORDER_PLACED,
                 'approval_status' => VendorPayoutApprovalStatuses::COMPLETED,
-            );
+            ];
         }
 
         fn_set_hook('mve_update_order', $new_order_info, $order_id, $old_order_info, $company_data, $payout_id, $payout_data);
@@ -202,7 +212,7 @@ function fn_mve_checkout_place_order_delete_orders(&$cart, &$auth, &$params, &$o
     $payouts = VendorPayouts::instance()->getSimple(array(
         'order_id' => $order_ids
     ));
-    VendorPayouts::instance()->delete(fn_array_column($payouts, 'payout_id'));
+    VendorPayouts::instance()->delete(array_column($payouts, 'payout_id'));
 }
 
 function fn_mve_get_categories(&$params, &$join, &$condition, &$fields, &$group_by, &$sortings, &$lang_code)
@@ -250,16 +260,25 @@ function fn_mve_get_categories_after_sql(&$categories, &$params)
 
 function fn_mve_update_product_count_post(&$category_ids)
 {
+    /** @var \Tygh\Database\Connection $db */
+    $db = Tygh::$app['db'];
+
     // Recalculate vendor product count for particular categories
-    db_query("DELETE FROM ?:category_vendor_product_count WHERE category_id IN(?n)", $category_ids);
-    db_query(
-        "INSERT INTO ?:category_vendor_product_count (company_id, category_id, product_count)"
-        . " SELECT company_id, category_id, COUNT(product_id)"
-        . " FROM ?:products_categories c"
-        . " INNER JOIN ?:products p USING(product_id)"
-        . " WHERE category_id IN(?n)"
-        . " GROUP BY p.company_id, c.category_id",
+    $db->query('DELETE FROM ?:category_vendor_product_count WHERE category_id IN(?n)', $category_ids);
+    $select_query = $db->quote(
+        ' SELECT company_id, category_id, COUNT(product_id)'
+        . ' FROM ?:products_categories c'
+        . ' INNER JOIN ?:products p USING(product_id)'
+        . ' WHERE category_id IN(?n)'
+        . ' GROUP BY p.company_id, c.category_id',
         $category_ids
+    );
+
+    $db->replaceSelectionInto(
+        'category_vendor_product_count',
+        ['company_id', 'category_id', 'product_count'],
+        $select_query,
+        ['product_count']
     );
 }
 
@@ -272,10 +291,6 @@ function fn_mve_export_process(&$pattern, &$export_fields, &$options, &$conditio
             if (!empty($company_condition)) {
                 $conditions[] = $company_condition;
             }
-        }
-
-        if ($pattern['section'] == 'products' && $pattern['pattern_id'] == 'product_combinations') {
-            $joins[] = 'INNER JOIN ?:products AS products ON (products.product_id = product_options_inventory.product_id)';
         }
 
         if ($pattern['section'] == 'orders') {
@@ -327,23 +342,18 @@ function fn_mve_get_users(&$params, &$fields, &$sortings, &$condition, &$join)
  */
 function fn_mve_import_get_primary_object_id(&$pattern, &$_alt_keys, &$v, &$skip_get_primary_object_id)
 {
-    if ($pattern['section'] == 'products' && $pattern['pattern_id'] == 'products') {
-        if (Registry::get('runtime.company_id')) {
-            $_alt_keys['company_id'] = Registry::get('runtime.company_id');
-        } elseif (!empty($v['company'])) {
-            // field vendor is set
-            $company_id = fn_get_company_id_by_name($v['company']);
-
-            if ($company_id !== null) {
-                $_alt_keys['company_id'] = $company_id;
-            } else {
-                $skip_get_primary_object_id = true;
-            }
-        } else {
-            // field vendor is not set, so import for the base company
-            $_alt_keys['company_id'] = 0;
-        }
+    if ($pattern['section'] !== 'products' || $pattern['pattern_id'] !== 'products') {
+        return;
     }
+    $company_name = empty($v['company']) ? '' : $v['company'];
+    $company_id = fn_mve_get_vendor_id_for_product($company_name);
+    if ($company_id === null) {
+        $skip_get_primary_object_id = true;
+
+        return;
+    }
+
+    $_alt_keys['company_id'] = $company_id;
 }
 
 function fn_mve_import_check_product_data(&$v, $primary_object_id, &$options, &$processed_data, &$skip_record)
@@ -354,15 +364,14 @@ function fn_mve_import_check_product_data(&$v, $primary_object_id, &$options, &$
 
     if (!empty($primary_object_id['product_id'])) {
         $v['product_id'] = $primary_object_id['product_id'];
+        // Check the category name
+        if (!fn_mve_import_check_exist_category($v['Category'], $options['category_delimiter'], $v['lang_code'])) {
+            $v['Category'] = '';
+        }
     } else {
         unset($v['product_id']);
-    }
-
-    // Check the category name
-    if (!empty($v['Category'])) {
-        if (!fn_mve_import_check_exist_category($v['Category'], $options['category_delimiter'], $v['lang_code'])) {
-            $processed_data['S']++;
-            $skip_record = true;
+        if ((empty($v['Category']) || !fn_mve_import_check_exist_category($v['Category'], $options['category_delimiter'], $v['lang_code']))) {
+            $v['Category'] = '';
         }
     }
 
@@ -450,6 +459,16 @@ function fn_mve_import_check_object_id(&$primary_object_id, &$processed_data, &$
         }
     }
 
+    /**
+     * Additional actions for import
+     *
+     * @param array<string, string|int> $primary_object_id Primary object identifier
+     * @param array<string, int>        $processed_data    Processed data
+     * @param bool                      $skip_record       Skip record flag
+     * @param string                    $object            Object type
+     */
+    fn_set_hook('mve_import_check_object_id', $primary_object_id, $processed_data, $skip_record, $object);
+
     return true;
 }
 
@@ -485,16 +504,34 @@ function fn_mve_import_check_company_id(&$primary_object_id, &$v,  &$processed_d
 
 function fn_mve_set_admin_notification(&$auth)
 {
-    if ($auth['company_id'] == 0 && fn_check_permissions('companies', 'manage_vendors', 'admin')) {
-
-        $count = db_get_field("SELECT COUNT(*) FROM ?:companies WHERE status IN ('N', 'P')");
-
-        if ($count > 0) {
-            fn_set_notification('W', __('notice'), __('text_not_approved_vendors', array(
-                '[link]' => fn_url('companies.manage?status[]=N&status[]=P')
-            )), 'K');
-        }
+    if ($auth['company_id']) {
+        return;
     }
+
+    $count = db_get_field(
+        'SELECT COUNT(*) FROM ?:companies WHERE status IN (?a)',
+        [VendorStatuses::NEW_ACCOUNT, VendorStatuses::PENDING]
+    );
+    if (!$count) {
+        return;
+    }
+
+    $event_dispatcher = Tygh::$app['event.dispatcher'];
+
+    // FIXME: Clean up pending vendor notifications from all receivers
+    db_query(
+        'DELETE FROM ?:notifications WHERE ?w',
+        [
+            'tag'        => 'vendor_status',
+            'area'       => 'A',
+            'section'    => NotificationsCenter::SECTION_ADMINISTRATION,
+            'severity'   => NotificationSeverity::WARNING,
+            'is_read'    => 0,
+            'action_url' => 'companies.manage?status[]=' . VendorStatuses::NEW_ACCOUNT . '&status[]=' . VendorStatuses::PENDING,
+        ]
+    );
+
+    $event_dispatcher->dispatch('vendors_require_approval', []);
 }
 
 function fn_mve_get_companies(&$params, &$fields, &$sortings, &$condition, &$join, &$auth, &$lang_code)
@@ -533,7 +570,9 @@ function fn_mve_get_user_info_before(&$condition, &$user_id, &$user_fields)
 function fn_mve_get_product_options(&$fields, &$condition, &$join, &$extra_variant_fields, &$product_ids, &$lang_code)
 {
     // FIXME 2tl show admin
-    $condition .= fn_get_company_condition('a.company_id', true, '', true);
+    if (Registry::get('runtime.is_restoring_cart_from_backend') !== true) {
+        $condition .= fn_get_company_condition('a.company_id', true, '', true);
+    }
 }
 
 function fn_mve_get_product_global_options_before_select(&$params, &$fields, &$condition, &$join)
@@ -577,52 +616,6 @@ function fn_mve_update_page_post(&$page_data, &$page_id, &$lang_code, &$create, 
 /* FUNCTIONS */
 
 /**
- * Checks if add-on is available for vendor
- *
- * @param string $addon Add-on name
- *
- * @return bool
- *
- * @deprecated 4.8.1
- */
-function fn_check_addon_permission($addon)
-{
-    $schema = fn_get_permissions_schema('vendor');
-
-    if (!isset($schema['addons'])) {
-        return true;
-    }
-
-    $schema = $schema['addons'];
-
-    if (isset($schema[$addon]['permission'])) {
-        $permission = $schema[$addon]['permission'];
-    }
-
-    return isset($permission) ? $permission : true;
-}
-
-/**
- * Provides list of payouts and totals.
- *
- * @param array $params         Search parameters
- * @param int   $items_per_page Amount of items per page
- *
- * @return array Payouts, search parameters, totals
- *
- * @deprecated 4.5.1
- */
-function fn_companies_get_payouts($params = array(), $items_per_page = 0)
-{
-    $params = LastView::instance()->update('balance', $params);
-
-    list($payouts, $params) = VendorPayouts::instance()->getList($params, $items_per_page);
-    $totals = VendorPayouts::instance()->getTotals($params);
-
-    return array($payouts, $params, $totals);
-}
-
-/**
  * Gets order statuses that will be used for vendor payouts.
  *
  * @return array Statuses
@@ -632,20 +625,6 @@ function fn_companies_get_payouts($params = array(), $items_per_page = 0)
 function fn_get_order_payout_statuses()
 {
     return VendorPayouts::instance()->getPayoutOrderStatuses();
-}
-
-/**
- * Deletes payouts by its identifier.
- *
- * @param array|int $ids Payout dentifiers
- *
- * @return bool True if payouts were deleted
- *
- * @deprecated 4.5.1
- */
-function fn_companies_delete_payout($ids)
-{
-    return VendorPayouts::instance()->delete($ids);
 }
 
 function fn_companies_add_payout($payment)
@@ -708,7 +687,7 @@ function fn_get_company_customers_ids($company_id)
 function fn_take_payment_surcharge_from_vendor($products = array())
 {
     $take_surcharge_from_vendor = false;
-    
+
     /**
      * Getting option 'take payment surcharge from vendor'
      *
@@ -741,30 +720,37 @@ function fn_mve_update_product($product_data, $product_id, $lang_code, $create)
 /**
  * Changes the result of administrator access to profiles checking
  *
- * @param boolean $result Result of check : true if administeator has access, false otherwise
- * @param string $user_type Types of profiles
- * @return bool Always true
+ * @param boolean $result    Result of check : true if administrator has access, false otherwise
+ * @param string  $user_type Types of profiles
+ *
+ * @return void
  */
-function fn_mve_check_permission_manage_profiles(&$result, &$user_type)
+function fn_mve_check_permission_manage_profiles(&$result, $user_type)
 {
+    if (!$result) {
+        return;
+    }
+
     $params = array (
         'user_type' => $user_type
     );
-    $result = $result && !fn_is_restricted_admin($params);
 
-    if (Registry::get('runtime.company_id') && $result) {
-        $result = ($user_type == 'V' && Registry::get('runtime.company_id'));
+    $can_manage_profiles = !fn_is_restricted_admin($params) || $user_type !== UserTypes::ADMIN;
+
+    if ($can_manage_profiles && Registry::get('runtime.company_id')) {
+        $can_manage_profiles = $user_type == 'V' && Registry::get('runtime.company_id');
     }
 
-    return true;
+    $result = $can_manage_profiles;
 }
 
 /**
  * Changes defined user type
  *
- * @param char User type
- * @param array $params Request parameters
- * @param string $area current application area
+ * @param string $user_type User type
+ * @param array  $params    Request parameters
+ * @param string $area      current application area
+ *
  * @return bool Always true
  */
 function fn_mve_get_request_user_type(&$user_type, &$params, &$area)
@@ -809,9 +795,15 @@ function fn_mve_get_products(&$params, &$fields, &$sortings, &$condition, &$join
 
 function fn_mve_logo_types(&$types, &$for_company)
 {
-    if ($for_company == true) {
+    if ($for_company) {
         unset($types['favicon']);
         unset($types['theme']['for_layout']);
+    } else {
+        $types['vendor'] = [
+            'for_layout' => true,
+            'text'       => '',
+            'image'      => 'vendor.png',
+        ];
     }
 }
 
@@ -859,21 +851,24 @@ function fn_mve_settings_variants_image_verification_use_for(&$objects)
 function fn_mve_get_predefined_statuses(&$type, &$statuses, &$status)
 {
     if ($type == 'companies') {
-        $statuses['companies'] = array(
-            'A' => __('active'),
-        );
-        if ($status == 'N') {
-            $statuses['companies']['N'] = __('new');
+        $statuses['companies'] = [
+            VendorStatuses::ACTIVE => __('active'),
+        ];
+        if ($status === VendorStatuses::NEW_ACCOUNT) {
+            $statuses['companies'][VendorStatuses::NEW_ACCOUNT] = __('new');
         }
-        $statuses['companies']['P'] = __('pending');
-        $statuses['companies']['D'] = __('disabled');
+        $statuses['companies'][VendorStatuses::PENDING] = __('pending');
+        $statuses['companies'][VendorStatuses::SUSPENDED] = __('suspended');
+        $statuses['companies'][VendorStatuses::DISABLED] = __('disabled');
     }
 }
 
 function fn_mve_get_company_data(&$company_id, &$lang_code, &$extra, &$fields, &$join, &$condition)
 {
-    // Vendor shouldn't see another vendor
-    $condition .= fn_get_company_condition('companies.company_id');
+    // Vendor shouldn't see another vendor unless it's necessary
+    if (!isset($extra['skip_company_condition']) || $extra['skip_company_condition'] != true) {
+        $condition .= fn_get_company_condition('companies.company_id');
+    }
 }
 
 /**
@@ -887,6 +882,23 @@ function fn_mve_get_company_data(&$company_id, &$lang_code, &$extra, &$fields, &
  */
 function fn_mve_url_set_locations(&$url, &$area, &$protocol, &$lang_code, &$locations)
 {
+    if (AREA !== 'C') {
+        /** @var \Tygh\Storefront\Repository $storefront_repository */
+        $storefront_repository = Tygh::$app['storefront.repository'];
+        $current_company_id = Registry::get('runtime.company_id');
+        if ($current_company_id) {
+            $storefront = $storefront_repository->findByCompanyId($current_company_id);
+            if ($storefront) {
+                $locations['C']['http'] = 'http://' . $storefront->url;
+                $locations['C']['https'] = 'https://' . $storefront->url;
+                $locations['C']['current'] = defined('HTTPS')
+                    ? $locations['C']['https']
+                    : $locations['C']['http'];
+                $locations['C']['rel'] = $locations['C']['current'];
+            }
+        }
+    }
+
     $locations['V'] = $locations['A'];
 }
 
@@ -1075,7 +1087,7 @@ function fn_mve_merge_styles_file_hash(&$files, &$styles, &$prepend_prefix, &$pa
  */
 function fn_mve_get_vendor_id_from_customization_mode()
 {
-    if (!empty(Tygh::$app['session']['customize_theme']) && !empty(Tygh::$app['session']['auth']['company_id'])) {
+    if (!empty(Tygh::$app['session']['customization']['modes']['theme_editor']) && !empty(Tygh::$app['session']['auth']['company_id'])) {
         return Tygh::$app['session']['auth']['company_id'];
     }
 
@@ -1085,21 +1097,31 @@ function fn_mve_get_vendor_id_from_customization_mode()
 /**
  * Hook handler: replaces store logos with the default ones when loading logos for vendor styles.
  *
- * @param int    $company_id company ID
- * @param int    $layout_id  layout ID
- * @param string $style_id   Style ID
- * @param array  $logos      Selected logos
+ * @param int                                           $company_id    Company ID
+ * @param int                                           $layout_id     Layout ID
+ * @param string                                        $style_id      Style ID
+ * @param array<string, array<string, int|string|bool>> $logos         Selected logos
+ * @param int|null                                      $storefront_id Storefront ID
+ *
+ * @param-out array<string, array> $logos
  */
-function fn_mve_get_logos_post(&$company_id, &$layout_id, &$style_id, &$logos)
+function fn_mve_get_logos_post(&$company_id, &$layout_id, &$style_id, array &$logos, $storefront_id)
 {
-    if (fn_get_styles_owner() && $layout_id && !$company_id && !Registry::isExist('runtime.obtaining_vendor_logos')) {
-        Registry::set('runtime.obtaining_vendor_logos', true);
-        $layout_data = Layout::instance()->get($layout_id);
-        if ($layout_data) {
-            $logos = fn_get_logos(0, $layout_id, $layout_data['style_id']);
-        }
-        Registry::del('runtime.obtaining_vendor_logos');
+    if (
+        !fn_get_styles_owner()
+        || !$layout_id
+        || $company_id
+        || Registry::isExist('runtime.obtaining_vendor_logos')
+    ) {
+        return;
     }
+
+    Registry::set('runtime.obtaining_vendor_logos', true);
+    $layout_data = Layout::instance($company_id, [], $storefront_id)->get($layout_id);
+    if ($layout_data) {
+        $logos = fn_get_logos(0, $layout_id, $layout_data['style_id'], $storefront_id);
+    }
+    Registry::del('runtime.obtaining_vendor_logos');
 }
 
 /**
@@ -1152,8 +1174,8 @@ function fn_mve_styles_add_custom_css(&$styles_instance, &$style_id, &$style_pat
  * Hook handler: modifies paths of style files when copying.
  *
  * @param \Tygh\Themes\Styles $styles_instance Styles instance
- * @param string              $from            Source style info: name, less path, css path
- * @param string              $to              Destination file info: name, less path, css path
+ * @param array               $from            Source style info: name, less path, css path
+ * @param array               $to              Destination file info: name, less path, css path
  * @param bool                $clone_logos     Indicates if logos have to be cloned for the new style
  */
 function fn_mve_styles_copy(&$styles_instance, &$from, &$to, &$clone_logos)
@@ -1187,11 +1209,15 @@ function fn_mve_styles_copy(&$styles_instance, &$from, &$to, &$clone_logos)
  */
 function fn_mve_layout_get_list(&$layout_instance, &$params, &$condition, &$fields, &$join)
 {
-    if ($vendor_id = fn_get_styles_owner()) {
-        $fields[] = db_quote(' IF(?:vendor_styles.company_id = ?i, ?:vendor_styles.style_id, ?:bm_layouts.style_id) AS style_id', $vendor_id);
-        $join .= db_quote(' LEFT JOIN ?:vendor_styles ON ?:vendor_styles.layout_id = ?:bm_layouts.layout_id AND ?:vendor_styles.company_id = ?i', $vendor_id);
-        $condition .= db_quote(' AND (?:vendor_styles.company_id = ?i OR ?:vendor_styles.company_id IS NULL)', $vendor_id);
+    $vendor_id = fn_get_styles_owner();
+
+    if (empty($vendor_id)) {
+        return;
     }
+
+    $fields[] = db_quote(' IF(?:vendor_styles.company_id = ?i, ?:vendor_styles.style_id, ?:bm_layouts.style_id) AS style_id', $vendor_id);
+    $join .= db_quote(' LEFT JOIN ?:vendor_styles ON ?:vendor_styles.layout_id = ?:bm_layouts.layout_id AND ?:vendor_styles.company_id = ?i', $vendor_id);
+    $condition .= db_quote(' AND (?:vendor_styles.company_id = ?i OR ?:vendor_styles.company_id IS NULL)', $vendor_id);
 }
 
 /**
@@ -1329,6 +1355,8 @@ function fn_mve_delete_company(&$company_id, &$result)
         }
 
         db_query('DELETE FROM ?:vendor_styles WHERE company_id = ?i', $company_id);
+
+        fn_delete_profile_fields_data(ProfileDataTypes::SELLER, $company_id);
     }
 }
 
@@ -1436,12 +1464,12 @@ function fn_mve_ajax_destruct_before_response(&$ajax_instance, &$text, &$embedde
 /**
  * Hook handler: changes from message parameter admin address for vendor if setting is enabled
  *
- * @param \Tygh\Mailer                 $mailer    Mailer instance
+ * @param \Tygh\Mailer\Mailer          $mailer    Mailer instance
  * @param array                        $message   Message params
  * @param string                       $area      Current working area (A-admin|C-customer)
  * @param string                       $lang_code Language code
  * @param \Tygh\Mailer\ITransport      $transport Instance of transport for send mail
- * @param \Tygh\Mailer\IMessageBuilder $builder   Message builder instance
+ * @param \Tygh\Mailer\AMessageBuilder $builder   Message builder instance
  */
 function fn_mve_mailer_create_message_before($mailer, &$message, $area, $lang_code, $transport, $builder)
 {
@@ -1464,4 +1492,370 @@ function fn_mve_mailer_create_message_before($mailer, &$message, $area, $lang_co
             );
         }
     }
+}
+
+/**
+ * Hook handler: groups and reorders categories when editing a product.
+ *
+ * @param int   $product_id          Product ID
+ * @param array $product_data        Edited product data
+ * @param array $existing_categories Existing categories data
+ * @param bool  $rebuild             Whether categories tree is changed
+ * @param int   $company_id          Company ID
+ */
+function fn_mve_update_product_categories_post($product_id, $product_data, $existing_categories, &$rebuild, $company_id)
+{
+    if (empty($product_data['category_ids'])) {
+        return;
+    }
+
+    $is_resorted = fn_sort_product_categories($product_id, $product_data['category_ids']);
+    $rebuild = $rebuild || $is_resorted;
+}
+/*
+ * Hook handler: saves company profile fields
+ *
+ * @param array  $company_data Company data
+ * @param int    $company_id   Company ID
+ * @param string $lang_code    Two-letter language code
+ * @param string $action       Action
+ */
+function fn_mve_update_company($company_data, $company_id, $lang_code, $action)
+{
+    if (empty($company_id)) {
+        return;
+    }
+
+    fn_store_profile_fields($company_data, $company_id, ProfileDataTypes::SELLER);
+
+    if (!empty($company_data['invitation_key'])) {
+        VendorServicesProvider::getInvitationsRepository()->deleteByKey($company_data['invitation_key']);
+    } elseif (!empty($company_data['email'])) {
+        VendorServicesProvider::getInvitationsRepository()->deleteByEmail(trim($company_data['email']));
+    }
+}
+
+/**
+ * Hook handler: fetches company profile data
+ *
+ * @param int    $company_id   Company ID
+ * @param string $lang_code    Two-letter language code (e.g. 'en', 'ru', etc.)
+ * @param array  $extra        Array with extra parameters
+ * @param array  $company_data Array with company data
+ */
+function fn_mve_get_company_data_post($company_id, $lang_code, $extra, &$company_data)
+{
+    if ($company_id && $company_data) {
+        $company_data['fields'] = fn_get_profile_fields_data(ProfileDataTypes::SELLER, $company_id);
+    }
+}
+
+/**
+ * Extracts company's profile field values (e.g. array(53 => 'Alex') to array('firstname' => 'Alex'))
+ *
+ * @param array $profile_fields_data Company profile data
+ *
+ * @return array
+ */
+function fn_mve_extract_company_data_from_profile($profile_fields_data)
+{
+    $company_data = array(
+        'admin_firstname' => '',
+        'admin_lastname'  => '',
+    );
+
+    $params = array(
+        'profile_type'     => ProfileTypes::CODE_SELLER,
+        'skip_email_field' => false,
+    );
+
+    $profile_fields = fn_get_profile_fields('A', array(), CART_LANGUAGE, $params);
+
+    foreach ($profile_fields as $section => $fields) {
+
+        foreach ($fields as $id => $field) {
+
+            if (isset($profile_fields_data[$id])) {
+                $company_data[$field['field_name']] = $profile_fields_data[$id];
+            }
+        }
+    }
+    return $company_data;
+}
+
+/**
+ * Transfers company's profiled field values to user profile field values based on matching fields names
+ *
+ * @param array $company_fields Entered company profile fields values
+ *
+ * @return array
+ */
+function fn_mve_profiles_match_company_and_user_fields($company_fields)
+{
+    $matched_fields = array();
+
+    if ($company_fields) {
+        $params = array(
+            'profile_type' => ProfileTypes::CODE_SELLER,
+            'skip_email_field' => false,
+        );
+
+        $company_profile_fields = fn_get_profile_fields('ALL', array(), CART_LANGUAGE, $params);
+        $company_profile_fields = call_user_func_array('array_replace', $company_profile_fields); // merge all subarrays (all fields) inside one array preserving keys
+
+        $params['profile_type'] = ProfileTypes::CODE_USER;
+        $user_profile_fields = fn_get_profile_fields('ALL', array(), CART_LANGUAGE, $params);
+        $user_profile_fields = call_user_func_array('array_replace', $user_profile_fields);
+
+        foreach ($company_fields as $c_field_id => $c_field_value) {
+
+            if (isset($company_profile_fields[$c_field_id]['field_name'])) {
+                $field_name = $company_profile_fields[$c_field_id]['field_name'];
+
+                foreach ($user_profile_fields as $u_field_id => $u_field_data) {
+
+                    if ($u_field_data['field_name'] !== $field_name) {
+                        continue;
+                    }
+
+                    $matched_fields[$u_field_id] = $c_field_value;
+                    // no break because of duplicating field names for S and B sections
+                }
+            }
+        }
+    }
+
+    return $matched_fields;
+}
+
+/**
+ * Get company status  for vendor, who logged in customer area
+ *
+ * @param array  $auth      Authentication data
+ * @param array  $user_data User data are filled into auth
+ * @param string $area      One-letter site area identifier
+ */
+function fn_mve_fill_auth(&$auth, $user_data, $area)
+{
+    if ($auth['user_type'] == 'V' && $area == 'C' && !empty($auth['company_id'])) {
+        $auth['company_status'] = fn_get_company_data($auth['company_id'])['status'];
+    }
+}
+
+/**
+ * Obtains vendor's root admin or the first admin if root is not found.
+ *
+ * @param int $company_id Vendor ID
+ *
+ * @return int Admin ID
+ */
+function fn_get_company_admin_user_id($company_id)
+{
+    $query_template = 'SELECT user_id FROM ?:users'
+        . ' WHERE ?w'
+        . ' ORDER BY user_id ASC'
+        . ' LIMIT 1';
+    $search_params = array(
+        'is_root'    => 'Y',
+        'user_type'  => 'V',
+        'company_id' => $company_id,
+    );
+
+    $admin_id = db_get_field($query_template, $search_params);
+
+    if (!$admin_id) {
+        unset($search_params['is_root']);
+
+        $admin_id = db_get_field($query_template, $search_params);
+    }
+
+    return (int) $admin_id;
+}
+
+/**
+ * The "delete_product_feature" hook handler.
+ *
+ * Actions performed:
+ *  - checks if vendors product feature in use of vendor or someone else's products
+ *
+ * @see fn_delete_feature
+ *
+ * @param int    $feature_id   Feature ID
+ * @param string $feature_type Feature type
+ * @param bool   $can_delete   Permission to delete feature
+ */
+function fn_mve_delete_product_feature($feature_id, $feature_type, &$can_delete)
+{
+    $company_id = Registry::get('runtime.company_id');
+
+    if ($company_id === 0) {
+        return;
+    }
+
+    $features = db_get_field('SELECT feature_id FROM ?:product_features_values as product_features_values WHERE feature_id = ?i LIMIT 1', $feature_id);
+
+    if (!empty($features)) {
+        fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('feature_already_in_use'));
+        $can_delete = false;
+    }
+}
+
+/**
+ * The "delete_product_feature" hook handler.
+ *
+ * Actions performed:
+ *  - adds additional conditions to get product features
+ *
+ * @see fn_get_product_features
+ *
+ * @param array  $fields    Fields list
+ * @param string $join      JOIN parameters
+ * @param string $condition WHERE query condition
+ * @param array  $params    Permission to delete feature
+ */
+function fn_mve_get_product_features(array $fields, $join, &$condition, array $params)
+{
+    if (!empty($params['vendor_features_only']) && $params['vendor_features_only'] == YesNo::YES) {
+        $condition .= db_quote(' AND pf.company_id != 0');
+    }
+}
+
+/**
+ * The "delete_product_feature_variants_pre" hook handler.
+ *
+ * Actions performed:
+ *  - checks if vendors product feature variants in use of someone else's products
+ *
+ * @see fn_delete_product_feature_variants
+ *
+ * @param int   $feature_id  Deleted feature identifier
+ * @param array $variant_ids Deleted feature variants
+ */
+function fn_mve_delete_product_feature_variants_pre($feature_id, array &$variant_ids)
+{
+    $company_id = Registry::get('runtime.company_id');
+
+    if ($company_id === 0) {
+        return;
+    }
+
+    $variant_ids_in_use = db_get_fields('SELECT DISTINCT variant_id FROM ?:product_features_values WHERE variant_id IN (?n)', $variant_ids);
+
+    $variant_ids_not_in_use = array_diff($variant_ids, $variant_ids_in_use);
+
+    if (count($variant_ids) != count($variant_ids_not_in_use)) {
+        fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('variants_already_in_use'));
+        $variant_ids = $variant_ids_not_in_use;
+    }
+}
+
+/**
+ * The "prepare_bottom_panel_data" hook handler.
+ *
+ * Actions performed:
+ *  - Gets vendor logos and ekey for login if vendor is authorized
+ *
+ * @param array $bottom_panel_data Bottom panel data for this user
+ *
+ * @see fn_prepare_bottom_panel_data()
+ */
+function fn_mve_prepare_bottom_panel_data(array &$bottom_panel_data)
+{
+    if (
+        empty(Tygh::$app['session']['auth'])
+        || empty(Tygh::$app['session']['auth']['user_type'])
+        || (Tygh::$app['session']['auth']['user_type'] !== UserTypes::VENDOR)
+    ) {
+        return;
+    }
+
+    $company_id = isset(Tygh::$app['session']['auth']['company_id']) ? Tygh::$app['session']['auth']['company_id'] : null;
+    $logo = fn_get_logos($company_id);
+
+    $bottom_panel_data['logo'] = $logo ? $logo : [];
+}
+
+/**
+ * Gets payment methods that vendor owns or can use if he owns none.
+ *
+ * @param array<string, int|string> $params Search parameters.
+ *
+ * @return array<string, string> List of suitable payment methods and information about them.
+ */
+function fn_get_vendor_payment_methods(array $params)
+{
+    if (empty($params['company_id'])) {
+        return [];
+    }
+
+    $payments = fn_get_payments(['company_id' => $params['company_id']]);
+    if (empty($payments)) {
+        $params['company_id'] = 0;
+    }
+    return fn_get_payments($params);
+}
+
+/**
+ * Returns runtime company identifier if define, or try to find it by company name otherwise
+ *
+ * @param string $company_name Company name for searching
+ *
+ * @return int|null Company identifier if company was found, null otherwise
+ */
+function fn_mve_get_vendor_id_for_product($company_name = '')
+{
+    if (Registry::get('runtime.company_id')) {
+        return Registry::get('runtime.company_id');
+    }
+
+    if (!empty($company_name)) {
+        return fn_get_company_id_by_name($company_name);
+    }
+
+    return 0;
+}
+
+/**
+ * The "update_product_categories_pre" hook handler.
+ * Actions performed:
+ * - Prevents vendors from creating categories when editing a product.
+ *
+ * @param int                   $product_id   Product identifier
+ * @param array<string, string> $product_data Product data
+ * @param bool                  $rebuild      Whether to rebuild product categories tree
+ * @param int                   $company_id   Company identifier
+ */
+function fn_mve_update_product_categories_pre($product_id, array &$product_data, $rebuild, $company_id)
+{
+    if (!fn_get_runtime_company_id()) {
+        return;
+    }
+
+    unset($product_data['add_new_category']);
+}
+
+/**
+ * The "user_init" hook handler.
+ *
+ * Actions performed:
+ *  - Adds company status to user session information.
+ *
+ * @param array<string, string>     $auth       Current user session data.
+ * @param array<string, int|string> $user_info  User information.
+ * @param bool                      $first_init True if stored in session data used to log in the user.
+ *
+ * @param-out array<string, int|string> $user_info
+ */
+function fn_mve_user_init(array $auth, array &$user_info, $first_init)
+{
+    if (
+        empty($user_info['company_id'])
+        || $user_info['user_type'] !== UserTypes::VENDOR
+        || !SiteArea::isStorefront(AREA)
+    ) {
+        return;
+    }
+    /** @var string $status */
+    $status = fn_get_company_data((int) $user_info['company_id'])['status'];
+    $user_info['company_status'] = $status;
 }

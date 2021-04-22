@@ -29,7 +29,11 @@ function fn_rus_payments_change_order_status(&$status_to, &$status_from, &$order
     $processor_data = fn_get_processor_data($order_info['payment_id']);
     $payment_info = $order_info['payment_info'];
 
-    if (!empty($processor_data['processor_script']) && $processor_data['processor_script'] == 'yandex_money.php' && !empty($payment_info['yandex_postponed_payment'])) {
+    if (empty($processor_data['processor_script'])) {
+        return null;
+    }
+
+    if ($processor_data['processor_script'] == 'yandex_money.php' && !empty($payment_info['yandex_postponed_payment'])) {
 
         try {
 
@@ -67,7 +71,43 @@ function fn_rus_payments_change_order_status(&$status_to, &$status_from, &$order
             fn_set_notification('E', __('error'), __('addons.rus_payments.yandex_money_mws_operation_error'));
             return $status_to = $status_from;
         }
+    } elseif ($processor_data['processor_script'] === 'robokassa.php'
+        && $status_to === $processor_data['processor_params']['statuses']['final']
+        && isset($order_info['payment_info']['rus_payments.robokassa.prepayment_receipt_created'])
+        && !isset($order_info['payment_info']['rus_payments.robokassa.payment_receipt_created'])
+    ) {
+        $url = 'https://ws.roboxchange.com/RoboFiscal/Receipt/Attach';
+
+        $receipt = fn_rus_payments_robokassa_get_full_payment_receipt($processor_data, $order_info);
+        if ($receipt) {
+            $data = fn_rus_payments_robokassa_encode_receipt($receipt, $processor_data);
+
+            $request = Http::post($url, $data);
+            $request_answer = json_decode($request, true);
+            if (isset($request_answer['ResultCode']) && $request_answer['ResultCode'] == 0) {
+                fn_update_order_payment_info($order_info['order_id'], ['rus_payments.robokassa.payment_receipt_created' => __('yes')]);
+            }
+        }
     }
+}
+
+/**
+ * The "get_payment_processors_post" hook handler.
+ *
+ * Actions performed:
+ *     - Adds specific 'russian' attribute to some payment processors for categorization.
+ *
+ * @see \fn_get_payment_processors()
+ */
+function fn_rus_payments_get_payment_processors_post($lang_code, &$processors)
+{
+    foreach ($processors as &$processor) {
+        if ($processor['addon'] === 'rus_payments') {
+            $processor['russian'] = true;
+        }
+    }
+    unset($processor);
+
 }
 
 /* \HOOKS */
@@ -238,11 +278,12 @@ function fn_qr_generate($order_info, $delimenter = '|', $dir = "")
     $additional_block = array(
         'PayeeINN' => $processor_params['sbrf_inn'],
         'KPP' => $processor_params['sbrf_kpp'],
-        'Sum' => $order_info['total'] * 100,
-        'Purpose' => __('sbrf_order_payment') . ' №' . $order_info['order_id'],
         'LastName' => $order_info['b_lastname'],
         'FirstName' => $order_info['b_firstname'],
+        'Contract' => $order_info['order_id'],
+        'Purpose' => __('sbrf_order_payment') . ' №' . $order_info['order_id'],
         'PayerAddress' => $order_info['b_city'],
+        'Sum' => $order_info['total'] * 100,
         'Phone' => $order_info['b_phone'],
     );
 
@@ -428,12 +469,15 @@ function fn_yandex_checkpoint_convert_receipt(Receipt $receipt, $currency)
     $items = array();
 
     foreach ($receipt->getItems() as $item) {
-        $items[] = array(
-            'quantity' => (int) $item->getQuantity(),
-            'price'    => fn_get_yandex_checkpoint_price($item->getPrice(), $currency),
-            'tax'      => YandexCheckpointVatTypes::getTaxTypeByBaseType($item->getTaxType()),
-            'text'     => fn_get_yandex_checkpoint_description($item->getName()),
-        );
+        $items[] = [
+            'quantity'           => (int) $item->getQuantity(),
+            'price'              => fn_get_yandex_checkpoint_price($item->getPrice(), $currency),
+            'tax'                => YandexCheckpointVatTypes::getTaxTypeByBaseType($item->getTaxType()),
+            'text'               => fn_get_yandex_checkpoint_description($item->getName()),
+            // FIXME: must be customizable
+            'paymentMethodType'  => 'full_payment',
+            'paymentSubjectType' => 'payment',
+        ];
     }
 
     return array(
@@ -651,29 +695,25 @@ function fn_rus_payments_payanyway_send_order_info($params, $order_info)
 <MNT_RESPONSE>
 EOT;
 
-    $data  .= fn_array_to_xml(array(
-        'MNT_ID' => $params['MNT_ID'],
+    $data .= fn_array_to_xml([
+        'MNT_ID'             => $params['MNT_ID'],
         'MNT_TRANSACTION_ID' => $params['MNT_TRANSACTION_ID'],
-        'MNT_RESULT_CODE' => 200,
-        'MNT_SIGNATURE' => $signature,
-    ));
+        'MNT_RESULT_CODE'    => 200,
+        'MNT_SIGNATURE'      => $signature,
+    ]);
 
     $data .= <<<EOT
 <MNT_ATTRIBUTES>
 <ATTRIBUTE>
-EOT;
-    $data .= fn_array_to_xml(array(
-        'KEY' => 'INVENTORY',
-        'VALUE' => $inventory,
-    ));
-    $data .= <<<EOT
+    <KEY>INVENTORY</KEY>
+    <VALUE>{$inventory}</VALUE>
 </ATTRIBUTE>
 <ATTRIBUTE>
 EOT;
-    $data .= fn_array_to_xml(array(
-        'KEY' => 'CUSTOMER',
+    $data .= fn_array_to_xml([
+        'KEY'   => 'CUSTOMER',
         'VALUE' => $order_info['email'],
-    ));
+    ]);
     $data .= <<<EOT
 </ATTRIBUTE>
 </MNT_ATTRIBUTES>
@@ -682,6 +722,170 @@ EOT;
 
     echo $data;
     exit;
+}
+
+/**
+ * Formats a string with the name for tax data by deleting error-prone symbols
+ *
+ * @deprecated since 4.10.1
+ *
+ * @param string Receipt item name
+ *
+ * @return string Truncates item name
+ */
+function fn_rus_payments_payanyway_format_item_name($name)
+{
+    return fn_rus_payments_truncate_receipt_item_name($name);
+}
+
+/**
+ * Formats a string with the name for tax data by deleting error-prone symbols
+ *
+ * @param string $name   Receipt item name
+ * @param int    $length Length name
+ * @param string $suffix String to append to the end of truncated string
+ *
+ * @return string Truncates item name
+ */
+function fn_rus_payments_truncate_receipt_item_name($name, $length = 64, $suffix = '...')
+{
+    $name = preg_replace('/[^0-9a-zA-Zа-яА-Я-,. ]/ui', '', $name);
+
+    if (function_exists('mb_strlen') && mb_strlen($name, 'UTF-8') > $length) {
+        $length -= mb_strlen($suffix);
+        return rtrim(mb_substr($name, 0, $length, 'UTF-8')) . $suffix;
+    }
+
+    return $name;
+}
+
+/**
+ * Gets full prepayment receipt by order_info for Robokassa service
+ *
+ * @param array $order_info Order information
+ *
+ * @return array|false Returns an array with receipt data or false in case of an error
+ */
+function fn_rus_payments_robokassa_get_receipt($order_info)
+{
+    /** @var \Tygh\Addons\RusTaxes\ReceiptFactory $receipt_factory */
+    $receipt_factory = Tygh::$app['addons.rus_taxes.receipt_factory'];
+    $receipt = $receipt_factory->createReceiptFromOrder($order_info, CART_PRIMARY_CURRENCY);
+    $receipt_result = [];
+
+    if ($receipt) {
+        foreach ($receipt->getItems() as $item) {
+            $receipt_result['items'][] = [
+                'name'     => fn_rus_payments_truncate_receipt_item_name($item->getName()),
+                'quantity' => $item->getQuantity(),
+                'sum'      => $item->getTotal(),
+                'payment_method' => 'full_prepayment',
+                'payment_object' => 'commodity',
+                'tax'      => $item->getTaxType(),
+            ];
+        }
+        fn_update_order_payment_info($order_info['order_id'], ['rus_payments.robokassa.prepayment_receipt_created' => __('yes')]);
+        return $receipt_result;
+    }
+
+    return false;
+}
+
+/**
+ * Gets full payment receipt for Robokassa service
+ *
+ * @param array $processor_data Information about selected payment processor
+ * @param array $order_info     Order information
+ * @param array $params         Additional parameters
+ *
+ * @return array Returns full payment receipt according to https://docs.robokassa.ru/#7772
+ */
+function fn_rus_payments_robokassa_get_full_payment_receipt(array $processor_data, array $order_info, array $params = [])
+{
+    /** @var \Tygh\Addons\RusTaxes\ReceiptFactory $receipt_factory */
+    $receipt_factory = Tygh::$app['addons.rus_taxes.receipt_factory'];
+    $receipt = $receipt_factory->createReceiptFromOrder($order_info, CART_PRIMARY_CURRENCY);
+    if ($receipt) {
+        $receipt_result = [];
+        foreach ($receipt->getItems() as $item) {
+            $receipt_result['items'][] = [
+                'name'           => fn_rus_payments_truncate_receipt_item_name($item->getName()),
+                'quantity'       => $item->getQuantity(),
+                'sum'            => $item->getTotal(),
+                'payment_method' => 'full_payment',
+                'payment_object' => 'commodity',
+                'tax'            => $item->getTaxType(),
+            ];
+            if (isset($receipt_result['vats'])) {
+                foreach ($receipt_result['vats'] as &$vat) {
+                    if ($vat['type'] === $item->getTaxType()) {
+                        $vat['sum'] += $item->getTaxSum();
+                        continue 2;
+                    }
+                }
+                unset($vat);
+                $receipt_result['vats'][] = [
+                    'type' => $item->getTaxType(),
+                    'sum'  => $item->getTaxSum(),
+                ];
+            } else {
+                $receipt_result['vats'][] = [
+                    'type' => $item->getTaxType(),
+                    'sum'  => $item->getTaxSum(),
+                ];
+            }
+        }
+
+        $result = array_merge($receipt_result, [
+            'merchantId' => $processor_data['processor_params']['merchantid'],
+            'id'         => isset($params['id'])
+                ? $params['id']
+                : time(),
+            'originId'   => $order_info['order_id'],
+            'operation'  => 'sell',
+            'URL'        => fn_url('', 'C'),
+            'total'      => number_format($order_info['total'], 2, '.', ''),
+            'client'     => [
+                'email' => $receipt->getEmail(),
+                'phone' => $receipt->getPhone(),
+            ],
+            'payments'   => [
+                [
+                    /**
+                     * @var int
+                     * @see https://docs.robokassa.ru/#7772
+                     */
+                    'type' => 2,
+                    'sum'  => number_format($order_info['total'], 2, '.', ''),
+                ],
+            ],
+        ]);
+    } else {
+        $result = [];
+    }
+
+    return $result;
+}
+
+/**
+ * Encodes full payment receipt according to Robokassa API docs https://docs.robokassa.ru/#7782
+ *
+ * @param array $receipt        Receipt structure
+ * @param array $processor_data Array of payment processor params
+ *
+ * @return string Encoded form of full payment receipt
+ */
+function fn_rus_payments_robokassa_encode_receipt(array $receipt, array $processor_data)
+{
+    $json = json_encode($receipt, JSON_UNESCAPED_SLASHES);
+    $data = strtr(base64_encode($json), [
+        '+' => '-',
+        '/' => '_',
+    ]);
+    $signature = rtrim($data, '=');
+    $post_signature = $signature . $processor_data['processor_params']['password1'];
+    $encoding_signature = hash($processor_data['processor_params']['encoding'], $post_signature);
+    return rtrim($signature . '.' . base64_encode($encoding_signature), '=');
 }
 
 /**
@@ -694,7 +898,7 @@ EOT;
 function fn_rus_payments_payanyway_get_inventory_positions($order_info)
 {
     $map_taxes = fn_get_schema('rus_payments', 'payanyway_map_taxes');
-    $inventory_positions = array();
+    $inventory_positions = [];
 
     /** @var \Tygh\Addons\RusTaxes\ReceiptFactory $receipt_factory */
     $receipt_factory = Tygh::$app['addons.rus_taxes.receipt_factory'];
@@ -702,13 +906,15 @@ function fn_rus_payments_payanyway_get_inventory_positions($order_info)
 
     if ($receipt) {
         foreach ($receipt->getItems() as $item) {
-            $inventory_positions[] = array(
-                'name' => $item->getName(),
+            $inventory_positions[] = [
+                'name' => fn_rus_payments_truncate_receipt_item_name($item->getName()),
                 'price' => $item->getPrice(),
                 'quantity' => $item->getQuantity(),
                 'type' => $item->getType(),
-                'vatTag' => isset($map_taxes[$item->getTaxType()]) ? $map_taxes[$item->getTaxType()] : $map_taxes[TaxType::NONE]
-            );
+                'vatTag' => isset($map_taxes[$item->getTaxType()])
+                ? $map_taxes[$item->getTaxType()]
+                : $map_taxes[TaxType::NONE]
+            ];
         }
     }
 
@@ -780,6 +986,8 @@ function fn_rus_payments_yandex_checkpoint_get_payment_request(
 
     $orderNumber = $order_info['order_id'] . '_' . substr(md5($order_info['order_id'] . TIME), 0, 3);
 
+    $session_id = Tygh::$app['session']->getName() . '=' . Tygh::$app['session']->getID();
+
     $payment_request = array(
         'shopId'          => $processor_data['processor_params']['shop_id'],
         'Sum'             => fn_format_price_by_currency(
@@ -808,7 +1016,7 @@ function fn_rus_payments_yandex_checkpoint_get_payment_request(
         'cps_email'       => $order_info['email'],
         'cps_phone'       => $phone,
         'paymentAvisoURL' => fn_url(
-            'payment_notification.payment_aviso?payment=yandex_money',
+            'payment_notification.payment_aviso?payment=yandex_money&' . $session_id,
             AREA,
             'https'
         ),

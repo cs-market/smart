@@ -14,7 +14,6 @@
 
 $schema['gift_certificates'] = array(
     'none' => 'passive',
-    'partial' => 'passive'
 );
 
 return $schema;

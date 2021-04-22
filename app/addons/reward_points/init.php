@@ -44,5 +44,9 @@ fn_register_hooks(
     'update_cart_by_data_post',
     'promotion_apply_pre',
     'place_suborders',
-    'get_status_params_definition'
+    'get_status_params_definition',
+    'get_product_fields',
+    ['reward_points_add_points_post', '', 'product_variations'],
+    ['reward_points_add_product_point_prices_post', '', 'product_variations'],
+    'load_products_extra_data'
 );

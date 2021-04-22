@@ -33,6 +33,7 @@
             value="{$processor_params.product_price_limit}"
             class="input-text"
             size="60" />
+        <p class="muted description">{__("ttc_addons.divido.product_price_limit")}</p>
     </div>
 </div>
 
@@ -45,6 +46,7 @@
             value="{$processor_params.cart_amount_limit}"
             class="input-text"
             size="60" />
+        <p class="muted description">{__("ttc_addons.divido.cart_amount_limit")}</p>
     </div>
 </div>
 

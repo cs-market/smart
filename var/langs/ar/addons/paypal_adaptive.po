@@ -5,19 +5,19 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/paypal_adaptive.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.12.1/addons/paypal_adaptive.po\n"
+"X-Crowdin-File-ID: 3868\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::paypal_adaptive"
 msgid "PayPal Adaptive Payments [Deprecated]"
 msgstr ""
 
 msgctxt "Addons::description::paypal_adaptive"
-msgid "Adaptive Payments can't be used for new integrations. We recommend using the <b>PayPal for Marketplaces</b> add-on instead.<br />This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
+msgid "This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal. Only existing PayPal Adaptive clients can use this add-on. We recommend you to use the PayPal Commerce Platform add-on instead."
 msgstr ""
 
 msgctxt "Languages::paypal_api_username"
@@ -26,14 +26,18 @@ msgstr "اسم المستخدم API"
 
 msgctxt "Languages::paypal_api_password"
 msgid "API password"
-msgstr ""
+msgstr "كلمة مرور API"
 
 msgctxt "Languages::paypal_email"
 msgid "PayPal Business Account email"
-msgstr ""
+msgstr "البريد الإلكتروني لحساب PayPal التجاري"
 
 msgctxt "Languages::paypal_adaptive.paypal_email"
 msgid "PayPal Business Account email"
+msgstr "البريد الإلكتروني لحساب PayPal التجاري"
+
+msgctxt "Languages::paypal_adaptive.vendor.paypal_email"
+msgid "PayPal Account email"
 msgstr ""
 
 msgctxt "Languages::pp_adaptive_payments"
@@ -42,11 +46,11 @@ msgstr ""
 
 msgctxt "Languages::primary_email"
 msgid "PayPal Primary account email"
-msgstr ""
+msgstr "البريد الإلكتروني الأساسي لحساب PayPal"
 
 msgctxt "Languages::processing_payment_for_order"
 msgid "Processing Payment for order"
-msgstr ""
+msgstr "معالجة الدفع للطلب"
 
 msgctxt "Languages::paypal_adaptive_pay_orders"
 msgid "Pay order"
@@ -54,11 +58,11 @@ msgstr ""
 
 msgctxt "Languages::paypal_adaptive_pay_step"
 msgid "step pay"
-msgstr ""
+msgstr "خطوة الدفع"
 
 msgctxt "Languages::paypal_adaptive_pay"
 msgid "Pay"
-msgstr ""
+msgstr "دفع"
 
 msgctxt "Languages::paypal_adaptive_progress_payment_order"
 msgid "Progress pay orders"
@@ -110,23 +114,23 @@ msgstr ""
 
 msgctxt "Languages::paypal_calc_comission_based_on"
 msgid "To calculate commission based on"
-msgstr ""
+msgstr "لحساب العمولة على أساس"
 
 msgctxt "SettingsSections::paypal_adaptive::general"
 msgid "General"
-msgstr ""
+msgstr "عام"
 
 msgctxt "SettingsOptions::paypal_adaptive::count_vendor_commission_on_basis"
 msgid "To calculate commission based on"
-msgstr ""
+msgstr "لحساب العمولة على أساس"
 
 msgctxt "SettingsTooltips::paypal_adaptive::count_vendor_commission_on_basis"
 msgid "Indicates the sum based on which commission will be calculated"
-msgstr ""
+msgstr "يشير إلى المبلغ بناءً على العمولة التي سيتم حسابها"
 
 msgctxt "SettingsVariants::paypal_adaptive::count_vendor_commission_on_basis::O"
 msgid "Order total"
-msgstr ""
+msgstr "إجمالي الطلب"
 
 msgctxt "SettingsVariants::paypal_adaptive::count_vendor_commission_on_basis::S"
 msgid "Order subtotal"
@@ -134,15 +138,15 @@ msgstr ""
 
 msgctxt "SettingsOptions::paypal_adaptive::collect_payouts"
 msgid "Collect payouts on vendors"
-msgstr ""
+msgstr "جمع دفعات على البائعين"
 
 msgctxt "SettingsTooltips::paypal_adaptive::collect_payouts"
 msgid "When creating a withdrawal for a vendor, the amount of unpaid payouts will be held back from the withdrawal amount."
-msgstr ""
+msgstr "عند إنشاء عملية سحب للبائع ، سيتم منع مبلغ الدفعات غير المدفوعة من مبلغ السحب."
 
 msgctxt "Languages::paypal_adaptive_override_with_secondary_currency"
 msgid "Use customer's choice of currency"
-msgstr ""
+msgstr "استخدام اختيار العميل للعملة"
 
 msgctxt "Languages::paypal_adaptive_use_in_context_checkout"
 msgid "Use In-Context Checkout"
@@ -193,28 +197,28 @@ msgid "Verified"
 msgstr ""
 
 msgctxt "Languages::paypal_adaptive_auto_info_data_verification"
-msgid "Use this link to get E-mail verification status of your vendors via CRON:"
+msgid "Use the following line to run the script to get E-mail verification status of your vendors according to schedule:"
 msgstr ""
 
 msgctxt "Languages::paypal_adaptive_statuses_updated_successfully"
 msgid "PayPal verification statuses have been updated successfully."
-msgstr ""
+msgstr "تم تحديث حالات التحقق من PayPal بنجاح."
 
 msgctxt "SettingsOptions::paypal_adaptive::display_verification_status_on_storefront"
 msgid "Display verification status to customers"
-msgstr ""
+msgstr "عرض حالة التحقق للعملاء"
 
 msgctxt "SettingsTooltips::paypal_adaptive::display_verification_status_on_storefront"
 msgid "The setting allows to display verification status at the product details page on the storefront. If the vendor E-mail is not verified, the status will not be shown to the customers."
-msgstr ""
+msgstr "يسمح الإعداد بعرض حالة التحقق في صفحة تفاصيل المنتج على واجهة المحل. إذا لم يتم التحقق من البائع الإلكتروني ، فلن يتم عرض الحالة للعملاء."
 
 msgctxt "SettingsOptions::paypal_adaptive::paypal_verified_image"
 msgid "PayPal verification image"
-msgstr ""
+msgstr "صورة التحقق من PayPal"
 
 msgctxt "Languages::paypal_ver_image"
 msgid "Verification image"
-msgstr ""
+msgstr "التحقق من الصورة"
 
 msgctxt "SettingsOptions::paypal_adaptive::paypal_verified_image_width"
 msgid "Image width"
@@ -264,6 +268,10 @@ msgctxt "Languages::ttc_paypal_adaptive.paypal_email"
 msgid "The email of your PayPal Business Account. A Personal Account email won't work."
 msgstr ""
 
+msgctxt "Languages::ttc_paypal_adaptive.vendor.paypal_email"
+msgid "The email of your PayPal account."
+msgstr ""
+
 msgctxt "Languages::addons.paypal_adaptive.paypal_workflow"
 msgid "PayPal workflow"
 msgstr ""
@@ -290,6 +298,10 @@ msgstr ""
 
 msgctxt "Languages::addons.paypal_adaptive.payment_type_notice"
 msgid "Chained payments can't be used if the <a href=\"[url]\" target=\"_blank\">PayPal Adaptive Payments</a> add-on is configured to collect both order commission and unpaid payouts."
+msgstr ""
+
+msgctxt "Languages::addons.paypal_adaptive.primary_email_notice"
+msgid "The email of your PayPal Business Account. A Personal Account email won't work."
 msgstr ""
 
 msgctxt "Languages::addons.paypal_adaptive.commission_includes"

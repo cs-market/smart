@@ -1,6 +1,7 @@
 <?php
 namespace Tygh\Tests\Unit\Mailer\MessageBuilders;
 
+use Tygh\Storefront\Repository;
 use Tygh\Tests\Unit\ATestCase;
 
 class DefaultMessageBuilderTest extends ATestCase
@@ -12,11 +13,12 @@ class DefaultMessageBuilderTest extends ATestCase
     public function setUp()
     {
         $this->requireMockFunction('fn_disable_live_editor_mode');
+        $this->requireMockFunction('fn_filter_company_data_by_profile_fields');
     }
 
     public function testCreateMessage()
     {
-        $builder = new DefaultMessageBuilder(array());
+        $builder = new DefaultMessageBuilder(array(), $this->createMock(Repository::class));
         $data = array(
             'to' => 'example@example.com',
             'from' => 'example@example.com',

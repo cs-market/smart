@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: id\n"
-"X-Crowdin-File: /release-4.8.2/addons/access_restrictions.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"X-Crowdin-File: /release-4.12.2/addons/access_restrictions.po\n"
+"X-Crowdin-File-ID: 4022\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::access_restrictions"
 msgid "Access restrictions"
@@ -26,11 +26,11 @@ msgstr "Live a collection of short stories, when have you turned the pages do no
 
 msgctxt "Languages::add_ips"
 msgid "Add IPs"
-msgstr "Live a collection of short stories, when have you turned the pages do not let the same figure appear on the next sheet "
+msgstr "Tambah IP"
 
 msgctxt "Languages::new_ips"
 msgid "New IPs"
-msgstr "IP baharu"
+msgstr "IP Baru"
 
 msgctxt "Languages::add_domains"
 msgid "Add domains"
@@ -38,11 +38,11 @@ msgstr "Tambahkan domain"
 
 msgctxt "Languages::new_domains"
 msgid "New domains"
-msgstr "Domain baharu"
+msgstr "Domain baru"
 
 msgctxt "Languages::add_emails"
 msgid "Add e-mail addresses"
-msgstr "Tambah alamat e-mel"
+msgstr "Tambah alamat e-mail"
 
 msgctxt "Languages::new_emails"
 msgid "New e-mail addresses"
@@ -50,15 +50,19 @@ msgstr "Alamat e-mail baru"
 
 msgctxt "Languages::new_credit_card"
 msgid "New credit card"
-msgstr "Kad kredit baharu"
+msgstr "Kartu Kredit Baru"
 
 msgctxt "Languages::add_credit_card"
 msgid "Add credit card"
-msgstr "Tambah kad kredit"
+msgstr "Tambah kartu kredit"
 
 msgctxt "Languages::privileges.manage_access_restrictions"
-msgid "Manage access restrictions"
-msgstr "Urus pembatasan akses"
+msgid "Can edit"
+msgstr "Dapat mengedit"
+
+msgctxt "Languages::privilege_groups.access_restrictions"
+msgid "Access restrictions"
+msgstr "Batasan akses"
 
 msgctxt "Languages::domain"
 msgid "Domain"
@@ -134,11 +138,11 @@ msgstr "IPs"
 
 msgctxt "Languages::make_permanent"
 msgid "Make permanent"
-msgstr "Jadikan ianya kekal"
+msgstr "Buat permanen"
 
 msgctxt "Languages::credit_card_number"
 msgid "Credit card number"
-msgstr "Nombor kad kredit"
+msgstr "Nomor kartu kredit"
 
 msgctxt "SettingsSections::access_restrictions::general"
 msgid "General"
@@ -146,7 +150,7 @@ msgstr "Umum"
 
 msgctxt "SettingsOptions::access_restrictions::elm_administrator_area_settings"
 msgid "Administrator area settings"
-msgstr "Kawasan pengatur pentadbir"
+msgstr "Pengaturan wilayah administrator"
 
 msgctxt "SettingsOptions::access_restrictions::admin_reverse_ip_access"
 msgid "Allow login to the admin area from specified IPs only"
@@ -154,11 +158,11 @@ msgstr "Mebolehkan login ke kawasan pentadbir dari IP yang telah ditetapkan"
 
 msgctxt "SettingsOptions::access_restrictions::unsuccessful_attempts_login"
 msgid "Block IP after a number of unsuccessful attempts"
-msgstr "Tahan IP setelah beberapa usaha gagal"
+msgstr "Blokir IP setelah beberapa kali gagal mencoba"
 
 msgctxt "SettingsOptions::access_restrictions::number_unsuccessful_attempts"
 msgid "Number of unsuccessful attempts"
-msgstr "Jumlah usaha yang gagal"
+msgstr "Jumlah kegagalan mencoba"
 
 msgctxt "SettingsOptions::access_restrictions::login_intervals"
 msgid "Time between unsuccessful login attempts (seconds)"
@@ -166,19 +170,19 @@ msgstr "Waktu diantara gagal login (saat)"
 
 msgctxt "SettingsOptions::access_restrictions::time_block"
 msgid "Time for which the IP should be blocked (hours)"
-msgstr "Waktu yang IP harus ditahan (jam)"
+msgstr "Waktu pemblokiran IP (jam)"
 
 msgctxt "SettingsOptions::access_restrictions::elm_customer_and_affiliate_area_settings"
 msgid "Customer area settings"
-msgstr "Kawasan aturan pelanggan"
+msgstr "Pengaturan wilayah pelanggan"
 
 msgctxt "SettingsOptions::access_restrictions::unsuccessful_attempts_login_customer"
 msgid "Block IP after a number of unsuccessful attempts"
-msgstr "Tahan IP setelah beberapa usaha yang gagal"
+msgstr "Blokir IP setelah beberapa kali gagal mencoba"
 
 msgctxt "SettingsOptions::access_restrictions::number_unsuccessful_attempts_customer"
 msgid "Number of unsuccessful attempts"
-msgstr "Jumlah usaha yang gagal"
+msgstr "Jumlah kegagalan mencoba"
 
 msgctxt "SettingsOptions::access_restrictions::login_intervals_customer"
 msgid "Time between unsuccessful login attempts (seconds)"
@@ -186,5 +190,5 @@ msgstr "Waktu diantara gagal login (saat)"
 
 msgctxt "SettingsOptions::access_restrictions::time_block_customer"
 msgid "Time for which the IP should be blocked (hours)"
-msgstr "Waktu yang IP harus ditahan (jam)"
+msgstr "Waktu pemblokiran IP (jam)"
 

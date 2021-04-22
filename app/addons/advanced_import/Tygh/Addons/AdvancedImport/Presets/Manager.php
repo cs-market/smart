@@ -16,19 +16,21 @@ namespace Tygh\Addons\AdvancedImport\Presets;
 
 use Tygh\Addons\AdvancedImport\SchemasManager;
 use Tygh\Database\Connection;
+use Tygh\Enum\Addons\AdvancedImport\PresetFileTypes;
 use Tygh\Enum\Addons\AdvancedImport\RelatedObjectTypes;
 use Tygh\Languages\Languages;
+use Tygh\Addons\AdvancedImport\FileManager;
 
 class Manager
 {
-    /** @var \Tygh\Database\Connection $db */
+    /** @var Connection $db */
     protected $db;
-
-    /** @var int $company_id */
-    protected $company_id;
 
     /** @var int $default_items_per_page */
     protected $default_items_per_page;
+
+    /** @var int $company_id */
+    protected $company_id;
 
     /** @var string $lang_code */
     protected $lang_code;
@@ -36,27 +38,33 @@ class Manager
     /** @var SchemasManager $schemas_manager */
     protected $schemas_manager;
 
+    /** @var FileManager $schemas_manager */
+    protected $file_manager;
+
     /**
      * Manager constructor.
      *
-     * @param \Tygh\Database\Connection $db              Database connection instance
-     * @param int                       $company_id      Runtime company ID
-     * @param int                       $default_limit   Default limit for the pagination
-     * @param string                    $lang_code       Two-letter language code
-     * @param SchemasManager            $schemas_manager Schemas manager instance
+     * @param Connection     $db              Database connection instance
+     * @param int            $company_id      Runtime company ID
+     * @param int            $default_limit   Default limit for the pagination
+     * @param string         $lang_code       Two-letter language code
+     * @param SchemasManager $schemas_manager Schemas manager instance
+     * @param FileManager    $file_manager    File manager instance
      */
     public function __construct(
         Connection $db,
         $company_id,
         $default_limit,
         $lang_code,
-        SchemasManager $schemas_manager
+        SchemasManager $schemas_manager,
+        FileManager $file_manager
     ) {
         $this->db = $db;
-        $this->company_id = $company_id;
+        $this->company_id = (int) $company_id;
         $this->default_items_per_page = $default_limit;
         $this->lang_code = $lang_code;
         $this->schemas_manager = $schemas_manager;
+        $this->file_manager = $file_manager;
     }
 
     /**
@@ -65,28 +73,84 @@ class Manager
      * @param array $data Preset data
      *
      * @return int Preset ID
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
      */
     public function add(array $data)
     {
         $data = $this->encodeOptions($data);
         unset($data['preset_id']);
+        if (isset($data['last_result'])) {
+            $data['last_result'] = serialize($data['last_result']);
+        }
 
         if ($this->company_id) {
             $data['company_id'] = $this->company_id;
         }
 
-        $data = $this->correctFilePath($data);
+        $data = $this->file_manager->correctFilePath($data);
 
-        $id = $this->db->query('INSERT INTO ?:import_presets ?e', $data);
+        $id = (int) $this->db->query('INSERT INTO ?:import_presets ?e', $data);
+        $this->updateState(['preset_id' => $id, 'file' => $data['file'], 'file_type' => $data['file_type'], 'file_extension' => $data['file_extension']]);
         $data['preset_id'] = $id;
-
         $this->updateDescription($id, $data, array_keys(Languages::getAll()));
-
         if (isset($data['fields'])) {
             $this->updateFieldsMapping($id, $data['fields']);
         }
-
         return $id;
+    }
+
+    /**
+     * Clones specified by id preset, changes owner of preset in process.
+     *
+     * @param int $preset_id  Id of preset that need to be cloned.
+     * @param int $company_id New owner for cloned preset.
+     *
+     * @return int Id of new cloned preset.
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
+     */
+    public function clonePreset($preset_id, $company_id)
+    {
+        $preset = $this->findById($preset_id);
+        $preset['company_id'] = $company_id;
+        $preset['file_type'] = isset($preset['file_type']) ? $preset['file_type'] : '';
+        if ($preset['file_type'] === PresetFileTypes::LOCAL) {
+            $preset['file'] = $preset['file_type'] = '';
+        } else {
+            $preset['file'] = isset($preset['file']) ? $preset['file'] : '';
+        }
+        $fields = $this->getFieldsMapping($preset_id);
+        if (!empty($fields)) {
+            $preset['fields'] = array_map(static function ($field) {
+                unset($field['field_id']);
+                return $field;
+            }, $fields);
+        }
+        $cloned_preset_id = $this->add($preset);
+        $this->cloneDescriptions($preset_id, $cloned_preset_id);
+        return $cloned_preset_id;
+    }
+
+    /**
+     * Clones description from specified by id preset.
+     *
+     * @param int $original_preset_id Original preset id.
+     * @param int $new_preset_id      Cloned preset id.
+     *
+     * @return bool
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
+     */
+    private function cloneDescriptions($original_preset_id, $new_preset_id)
+    {
+        $data = $this->db->getArray('SELECT lang_code, preset FROM ?:import_preset_descriptions WHERE preset_id = ?i', $original_preset_id);
+        foreach ($data as &$description) {
+            $description['preset_id'] = $new_preset_id;
+            $this->db->replaceInto('import_preset_descriptions', $description);
+        }
+        unset($description);
+        return true;
     }
 
     /**
@@ -135,14 +199,16 @@ class Manager
      * @param int   $id              Preset ID
      * @param array $data            Preset data
      * @param array $lang_codes_list Languages to update for
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
      */
     protected function updateDescription($id, array $data, array $lang_codes_list)
     {
         foreach ($lang_codes_list as $lang_code) {
-            $description = array_merge(array(
+            $description = array_merge([
                 'preset_id' => $id,
                 'lang_code' => $lang_code,
-            ), $data);
+            ], $data);
             $this->db->replaceInto('import_preset_descriptions', $description);
         }
     }
@@ -152,16 +218,16 @@ class Manager
      *
      * @param int   $id          Preset ID
      * @param array $fields_list Fields list
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
      */
     protected function updateFieldsMapping($id, array $fields_list)
     {
         $this->db->query('DELETE FROM ?:import_preset_fields WHERE preset_id = ?i', $id);
-
         foreach ($fields_list as &$field) {
             $field['preset_id'] = $id;
         }
         unset($field);
-
         $this->db->query('INSERT INTO ?:import_preset_fields ?m', $fields_list);
     }
 
@@ -183,27 +249,29 @@ class Manager
      */
     public function find(
         $limit = null,
-        array $condition = array(),
+        array $condition = [],
         $join = null,
-        array $fields = array('*'),
-        array $sorting = array()
+        array $fields = ['ip.*', 'ipd.*', 'ipst.last_launch', 'ipst.last_status', 'ipst.last_result', 'ipst.file', 'ipst.file_type'],
+        array $sorting = []
     ) {
         if ($join === null) {
-            $join = array(
-                array(
-                    'table'     => array('?:import_preset_descriptions' => 'ipd'),
-                    'condition' => array(
-                        $this->db->quote('ip.preset_id = ipd.preset_id AND ipd.lang_code = ?s', $this->lang_code),
-                    ),
-                ),
-            );
+            $join = [
+                [
+                    'table'     => ['?:import_preset_descriptions' => 'ipd'],
+                    'condition' => [$this->db->quote('ip.preset_id = ipd.preset_id AND ipd.lang_code = ?s', $this->lang_code)],
+                ],
+                [
+                    'table'     => ['?:import_preset_states' => 'ipst'],
+                    'condition' => [$this->db->quote('ip.preset_id = ipst.preset_id AND ipst.company_id = ?i', $this->company_id)],
+                ],
+            ];
         }
 
         if ($limit === null) {
-            $limit = array(
+            $limit = [
                 'page'           => 1,
                 'items_per_page' => $this->default_items_per_page,
-            );
+            ];
         }
 
         $fields[] = 'ip.preset_id';
@@ -221,9 +289,6 @@ class Manager
         }
 
         $condition_statement = '1 = 1';
-        if ($this->company_id) {
-            $condition['ip.company_id'] = $this->company_id;
-        }
         if ($condition) {
             $condition_statement = $this->buildConditionStatement($condition);
         }
@@ -256,11 +321,11 @@ class Manager
             $condition_statement
         );
 
-        $search = array(
-            'page'           => (int) $limit['page'],
-            'items_per_page' => (int) $limit['items_per_page'],
+        $search = [
+            'page'           => is_array($limit) ? (int) $limit['page'] : 0,
+            'items_per_page' => is_array($limit) ? (int) $limit['items_per_page'] : 0,
             'total_items'    => (int) $total_items,
-        );
+        ];
 
         if (!empty($sorting['sort_order_rev'])) {
             $search['sort_by']        = $sorting['sort_by'];
@@ -271,10 +336,34 @@ class Manager
         foreach ($presets_list as &$preset) {
             $preset = $this->decodeOptions($preset);
             $preset = $this->decodeResult($preset);
+            if (!isset($preset['company_id'])) {
+                continue;
+            }
+            $preset['company_id'] = (int) $preset['company_id'];
         }
         unset($preset);
 
-        return array($presets_list, $search);
+        return [$presets_list, $search];
+    }
+
+    /**
+     * Finds preset by preset Id
+     *
+     * @param int   $id     Preset id
+     * @param array $params Array of conditions for searching
+     *
+     * @return array Preset data
+     */
+    public function findById($id, array $params = [])
+    {
+        $params = array_merge([
+            'ip.object_type' => 'products',
+            'ip.preset_id'   => $id,
+        ], $params);
+
+        list($presets, ) = $this->find(false, $params);
+
+        return reset($presets);
     }
 
     /**
@@ -292,11 +381,11 @@ class Manager
      */
     public function buildOrderStatement(array $sorting = array())
     {
-        $sortings = array(
+        $sortings = [
             'last_import' => 'last_launch',
             'name'        => 'preset',
             'status'      => 'last_status',
-        );
+        ];
 
         $order_statement = db_sort($sorting, $sortings, 'name', 'asc');
 
@@ -317,7 +406,7 @@ class Manager
      */
     protected function buildFieldsStatement(array $fields)
     {
-        $fields_list = array();
+        $fields_list = [];
 
         foreach ($fields as $name => $alias) {
             if (substr($alias, -1) == '*' || is_numeric($name)) {
@@ -434,48 +523,113 @@ class Manager
      * @param array $data Preset data
      *
      * @return bool
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
      */
     public function update($id, array $data)
     {
-        $result = true;
+        $old_preset = $this->findById($id);
 
+        $data = $this->updateFileCompanyOwner($data, $old_preset);
         $data = $this->encodeOptions($data);
         $data = $this->encodeResult($data);
+
+        $data = $this->file_manager->correctFilePath($data);
+        $result = $this->updateState($data);
         unset($data['preset_id']);
 
-        if ($this->company_id) {
-            $data['company_id'] = $this->company_id;
+        if (
+            $this->company_id
+            && ($this->company_id !== $old_preset['company_id']
+                || $this->company_id !== (int) $data['company_id'])
+        ) {
+            return $result;
         }
-
-        $data = $this->correctFilePath($data);
-
-        $this->db->query('UPDATE ?:import_presets SET ?u WHERE preset_id = ?i', $data, $id);
-
-        $this->updateDescription($id, $data, array($this->lang_code));
-
+        $result = (bool) $this->db->query('UPDATE ?:import_presets SET ?u WHERE preset_id = ?i', $data, $id);
+        $this->checkPresetsAndRemovePresetFile($old_preset);
+        $this->updateDescription($id, $data, [$this->lang_code]);
         if (isset($data['fields'])) {
             $this->updateFieldsMapping($id, $data['fields']);
         }
-
         return $result;
+    }
+
+    /**
+     * @deprecated since 4.12.2. Will be removed at 4.13.1. Use \Tygh\Addons\AdvancedImport\Presets\Manager::updateState instead.
+     *
+     * @param array<string, int|string> $preset_data Information about using specified preset.
+     *
+     * @return bool Result of updating statistics operation.
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
+     */
+    public function updateStatistics(array $preset_data)
+    {
+        return $this->updateState($preset_data);
+    }
+
+    /**
+     * Updates state of specified preset.
+     *
+     * @param array<string, int|string> $preset_data Information about using specified preset.
+     *
+     * @return bool Result of updating statistics operation.
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
+     */
+    public function updateState(array $preset_data)
+    {
+        $preset_data = array_merge($preset_data, [
+            'company_id' => $this->company_id,
+        ]);
+        $preset_data = $this->encodeResult($preset_data);
+        return (bool) $this->db->replaceInto('import_preset_states', $preset_data);
     }
 
     /**
      * Deletes preset.
      *
-     * @param int $id Preset ID
+     * @param int $id Preset id
      *
      * @return bool
+     *
+     * @throws \Tygh\Exceptions\DatabaseException Wrong sql query or issues with execution.
      */
     public function delete($id)
     {
         $result = true;
 
-        $this->db->query('DELETE FROM ?:import_presets WHERE preset_id = ?i', $id);
-        $this->db->query('DELETE FROM ?:import_preset_descriptions WHERE preset_id = ?i', $id);
-        $this->db->query('DELETE FROM ?:import_preset_fields WHERE preset_id = ?i', $id);
+        $preset = $this->findById($id);
+
+        if (!$preset || (($preset['company_id'] !== $this->company_id) && $this->company_id)) {
+            return $result;
+        }
+        $this->db->query('DELETE FROM ?:import_presets WHERE preset_id = ?i', $preset['preset_id']);
+        $this->db->query('DELETE FROM ?:import_preset_descriptions WHERE preset_id = ?i', $preset['preset_id']);
+        $this->db->query('DELETE FROM ?:import_preset_fields WHERE preset_id = ?i', $preset['preset_id']);
+        $this->db->query('DELETE FROM ?:import_preset_states WHERE preset_id = ?i', $preset['preset_id']);
+
+        $this->checkPresetsAndRemovePresetFile($preset);
 
         return $result;
+    }
+
+    /**
+     * Checks if exists presets with the same file and remove it if false.
+     *
+     * @param array $preset  Preset
+     *
+     * @return void
+     */
+    protected function checkPresetsAndRemovePresetFile($preset)
+    {
+        if (empty($preset['file']) || !isset($preset['file_type'])) {
+            return;
+        }
+
+        if ($preset['file_type'] !== PresetFileTypes::URL && !$this->isExistPresetsWithTheSameFile($preset['file'], $preset['company_id'])) {
+            $this->file_manager->removeFile($preset['file'], $preset['company_id']);
+        }
     }
 
     /**
@@ -522,7 +676,7 @@ class Manager
 
         foreach ($pattern['export_fields'] as $field_id => &$field) {
             $field['show_description'] = $field['show_name'] = true;
-            $field['description'] = fn_exim_get_field_label($field_id);
+            $field['description'] = fn_exim_get_field_label($field_id, 'import');
         }
         unset($field);
 
@@ -677,24 +831,42 @@ class Manager
     }
 
     /**
-     * Corrects path to an imported file for a company.
+     * Finds out if some preset use preset file.
      *
-     * @param array $data Preset data
+     * @param string $preset_file  used preset file.
+     * @param int    $company_id   company id.
      *
-     * @return array Preset data with file path corrected
+     * @return bool  Returns true if some presets use preset file.
      */
-    protected function correctFilePath(array $data)
+    protected function isExistPresetsWithTheSameFile($preset_file, $company_id)
     {
-        if (!isset($data['file'])
-            || !isset($data['company_id'])
-            || !fn_string_not_empty($data['file'])
-            || $this->company_id
+        list($result, ) = $this->find(false, ['ipst.file' => $preset_file, 'ip.company_id' => $company_id], null, ['ipst.file']);
+        return !empty($result);
+    }
+
+    /**
+     * Moves the file used by the preset to the folder of the new owner of the preset.
+     *
+     * @param array{preset_id: int, file_type: string, file: string, result_ids: string, object_type: string, file_upload: array<int, string>, type_upload: array<int, string>, options: array<string, string>, preset: string, company_id: int, security_hash: string, dispatch: string, last_result?: string} $updated_preset_data Updated preset data.
+     * @param array{preset_id: int, file_type: string, file: string, result_ids: string, object_type: string, file_upload: array<int, string>, type_upload: array<int, string>, options: array<string, string>, preset: string, company_id: int, security_hash: string, dispatch: string, last_result?: string} $old_preset_data     Old preset data.
+     *
+     * @return array{preset_id: int, file_type: string, file: string, result_ids: string, object_type: string, file_upload: array<int, string>, type_upload: array<int, string>, options: array<string, string>, preset: string, company_id: int, security_hash: string, dispatch: string, last_result?: string} Updated preset data with updated path to the file.
+     */
+    protected function updateFileCompanyOwner(array $updated_preset_data, array $old_preset_data)
+    {
+        if (
+            $updated_preset_data['file_type'] === PresetFileTypes::LOCAL
+            && isset($updated_preset_data['company_id'])
+            && (int) $old_preset_data['company_id'] !== (int) $updated_preset_data['company_id']
+            && !empty($old_preset_data['file'])
+            && $old_preset_data['file'] === $updated_preset_data['file']
         ) {
-            return $data;
+            $file_path = $this->file_manager->getFilePath($old_preset_data['file'], $old_preset_data['company_id']);
+            if ($file_path) {
+                $updated_preset_data['file'] = $this->file_manager->moveUpload($old_preset_data['file'], $file_path, $updated_preset_data['company_id']);
+            }
         }
 
-        $data['file'] = preg_replace("!^{$data['company_id']}/!", '', $data['file']);
-
-        return $data;
+        return $updated_preset_data;
     }
 }

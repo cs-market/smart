@@ -60,12 +60,6 @@ body, .main-table {
                             <td width="100%"><bdi>{$company_data.company_phone_2}</bdi></td>
                         </tr>                
                         {/if}
-                        {if $company_data.company_fax}
-                        <tr>
-                            <td style="font: 12px verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("fax")}:</td>
-                            <td width="100%"><bdi>{$company_data.company_fax}</bdi></td>
-                        </tr>
-                        {/if}
                         {if $company_data.company_website}
                         <tr>
                             <td style="font: 12px verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("web_site")}:</td>
@@ -115,7 +109,7 @@ body, .main-table {
                         {include file="profiles/profiles_extra_fields.tpl" fields=$profile_fields.C}
                     </td>
                     {/if}
-                    {if $profile_fields.B}
+                    {if $profile_fields.B && ($order_info.b_firstname || $order_info.b_lastname || $order_info.b_address || $order_info.b_address_2 || $order_info.b_city || $order_info.b_state_descr || $order_info.b_zipcode)}
                     <td width="34%" style="{if $profile_fields.S}padding-right: 10px;{/if} {if $profile_fields.C}padding-left: 10px;{/if}">
                         <h3 style="font: bold 17px Tahoma; padding: 0px 0px 3px 1px; margin: 0px;">{__("bill_to")}:</h3>
                         {if $order_info.b_firstname || $order_info.b_lastname}
@@ -181,8 +175,8 @@ body, .main-table {
                     <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap;">{__("amount")}</th>
                     <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap;">{__("reason")}</th>
                 </tr>
-                {if $return_info.items[$smarty.const.RETURN_PRODUCT_ACCEPTED]}
-                {foreach from=$return_info.items[$smarty.const.RETURN_PRODUCT_ACCEPTED] item="ri" key="key"}
+                {if $return_info.items["Addons\\Rma\\ReturnOperationStatuses::APPROVED"|enum]}
+                {foreach from=$return_info.items["Addons\\Rma\\ReturnOperationStatuses::APPROVED"|enum] item="ri" key="key"}
                 <tr>
                     <td style="padding: 5px 10px; background-color: #ffffff;">{$order_info.products.$key.product_code|default:"&nbsp;"}</td>
                     <td style="padding: 5px 10px; background-color: #ffffff;">{$ri.product nofilter}

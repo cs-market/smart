@@ -1,41 +1,33 @@
 /* editior-description:do_not_use */
+(function (_, $) {
+  $.ceEditor('handlers', {
+    run: function run(elm) {
+      elm.change(function () {
+        elm.ceEditor('changed', elm.val());
+      });
+      return true;
+    },
+    destroy: function destroy(elm) {
+      return true;
+    },
+    recover: function recover(elm) {
+      return true;
+    },
+    updateTextFields: function updateTextFields(elm) {
+      return true;
+    },
+    val: function val(elm, value) {
+      if ($.type(value) == 'undefined') {
+        return elm.val();
+      }
 
-(function(_, $) {
-    $.ceEditor('handlers', {
-        
-        run: function(elm) {
-
-            elm.change(function() {
-                elm.ceEditor('changed', elm.val());
-            });
-            return true;
-        },
-
-        destroy: function(elm) {
-            return true;
-        },
-
-        recover: function(elm) {
-            return true;
-        },
-
-        updateTextFields: function(elm) {
-            return true;
-        },
-               
-        val: function(elm, value) {
-            if ($.type(value) == 'undefined') {
-                return elm.val();
-            }
-            elm.val(value);
-        },
-
-        disable: function(elm, value) {
-            return true;
-        },
-
-        insert: function(elm, value) {
-            return true;
-        }
-    });
-}(Tygh, Tygh.$));
+      elm.val(value);
+    },
+    disable: function disable(elm, value) {
+      return true;
+    },
+    insert: function insert(elm, value) {
+      return true;
+    }
+  });
+})(Tygh, Tygh.$);

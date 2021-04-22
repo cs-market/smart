@@ -1,11 +1,12 @@
+@import "../../config.less";
+
 /* Responsive styles */
 
-@import "tygh/responsive/select2.less";
 .sidebar-toggle {
     display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     .cm-clone.hidden {
         display: none !important;
     }
@@ -87,6 +88,7 @@
         padding-left: @mainSidebarThinWidth;
         .content {
             display: block;
+            width: 100%;
             .content-wrap {
                 display: block;
                 max-width: none;
@@ -123,7 +125,7 @@
         }
         .sidebar {
             position: fixed;
-            top: 57px;
+            top: 0 !important;
             bottom: 0;
             right: -280px;
             height: auto;
@@ -133,7 +135,7 @@
             background: #f8f8f8;
             padding-left: 0;
             padding-right: 0;
-            z-index: 98;
+            z-index: 1050;
             border: 1px solid #ddd;
             -webkit-transition: all 0.2s ease-in-out;
             -moz-transition: all 0.2s ease-in-out;
@@ -149,9 +151,6 @@
                 &:first-child {
                     margin-top: 0;
                 }
-                .nav-list {
-                    padding-right: 1px;
-                }
             }
             .sidebar-wrapper {
                 width: 100%;
@@ -164,6 +163,9 @@
             &.sidebar-open {
                 right: 0;
                 border-right: 0;
+
+                top: 0 !important;
+
                 .box-shadow(-6px 0px 5px -4px rgba(0, 0, 0, 0.05));
                 .sidebar-icon {
                     transform: scaleX(-1);
@@ -177,12 +179,6 @@
     }
     .dashboard-recent-orders {
         min-width: auto;
-    }
-    .block-manager-location {
-        overflow-x: auto;
-    }
-    .form-table {
-        display: block;
     }
     .payments .controls select,
     .shippings .controls select {
@@ -315,7 +311,7 @@
                 .content-wrap {
                     padding: 15px; // MVP feature, disable/enable content-language selector
                     .language-wrap {
-                        display: @displayContentLanguage;
+                        display: none;
                     }
                 }
             }
@@ -453,7 +449,6 @@
             }
             .actions {
                 left: 0;
-                padding-left: 8px;
             }
         }
     }
@@ -542,7 +537,7 @@
             border-bottom: 1px solid #ededed;
             margin-bottom: 0;
             padding: 18px 10px;
-            label {
+            label:not(.switch-mini) {
                 margin-right: 5px;
             }
             &.shift-top {
@@ -585,14 +580,8 @@
             }
         }
     }
-    .form-table {
-        display: block;
-    }
     #order_update {
         display: block;
-        .pull-right:not(.btn-bar) {
-            float: none;
-        }
         .right {
             text-align: left !important;
         }
@@ -617,11 +606,11 @@
     .uneditable-input {
         width: 100%;
     }
-    a.row-status {
+    a.row-status:not([class*="--text-wrap"]) {
         min-width: 150px;
         display: block;
     }
-     :not(table) a.row-status {
+    :not(table) a.row-status:not([class*="--text-wrap"]) {
         min-width: 0;
         display: inline-block;
     }
@@ -641,7 +630,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: @TabletBreakpoint + 1px) {
     .mobile-hide {
         display: none !important;
         visibility: hidden;
@@ -766,30 +755,32 @@
     .post-item {
         .tools {
             >.pull-left,
+            .post__statuses,
             >.pull-right {
                 float: none;
             }
             .post-object {
+                display: -webkit-box;
                 margin: 5px 0;
+                width: auto;
+                height: auto;
+                max-height: 60px;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
             }
             .muted {
                 float: none !important;
                 margin: 5px 0;
             }
             .calendar {
-                display: block;
                 margin: 10px 0;
-            }
-            @media (max-width: 767px) {
-                .calendar {
-                    margin-top: 25px;
-                }
             }
         }
     }
     .ui-dialog {
         width: 100%;
         min-width: 100%;
+        max-width: 100%;
         top: 0px !important;
         .form-inline {
             label {
@@ -889,6 +880,7 @@
                 width: 38% !important;
                 float: left;
                 &-checkbox {
+                    margin-top: 4px;
                     margin-right: 10px;
                 }
                 &:before {
@@ -1002,6 +994,9 @@
                     display: none;
                 }
             }
+            &.hidden {
+                display: none;
+            }
         }
         thead,
         th {
@@ -1030,7 +1025,7 @@
                     display: none;
                 }
             }
-            span:not(.label-info) {
+            span:not(.label):not(.label-info):not(.switch-mini) {
                 padding: 0 !important;
             }
             &:empty {
@@ -1097,7 +1092,7 @@
     /* /Responsive tables */
 }
 
-@media (max-width: 480px) {
+@media (max-width: @PhoneBreakpoint) {
     .btn-toolbar>.btn:not(.btn-text),
     .btn-group .btn:not(.btn-text),
     .object-container .buttons-container-picker .btn+.btn {
@@ -1203,7 +1198,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: @PhoneBreakpoint) {
     .dropdown-menu .divider {
         width: 100% !important;
         padding: 0;
@@ -1255,11 +1250,17 @@
     }
 }
 
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     .tools .hidden-tools a {
         visibility: visible !important;
     }
+    .post-item {
+        .tools {
+            .calendar {
+                display: block;
+            }
+        }
+    }
 }
-
 
 /* /Responsive styles */

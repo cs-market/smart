@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -149,7 +150,7 @@ function fn_polls_update_question($data, $item_id, $page_id, $lang_code = DESCR_
 
         $item_id = $data['object_id'] = db_query("REPLACE INTO ?:poll_items ?e", $data);
         $data['type'] = 'I';
-        foreach (fn_get_translation_languages() as $data['lang_code'] => $_v) {
+        foreach (Languages::getAll() as $data['lang_code'] => $_v) {
             db_query("REPLACE INTO ?:poll_descriptions ?e", $data);
         }
     }
@@ -186,7 +187,7 @@ function fn_polls_update_question($data, $item_id, $page_id, $lang_code = DESCR_
             $v['object_id'] = db_query("REPLACE INTO ?:poll_items ?e", $v);
 
             $v['type'] = 'I';
-            foreach (fn_get_translation_languages() as $v['lang_code'] => $_v) {
+            foreach (Languages::getAll() as $v['lang_code'] => $_v) {
                 db_query("REPLACE INTO ?:poll_descriptions ?e", $v);
             }
         }

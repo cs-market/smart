@@ -132,12 +132,13 @@ class Service
     /**
      * Convert order data to receipt.
      *
-     * @param array $order  Order data
-     * @param int   $type   Receipt type (sale = 0, refund = 1, buy = 2)
+     * @param array  $order          Order data
+     * @param int    $type           Receipt type (sale = 0, refund = 1, buy = 2)
+     * @param string $payment_method Payment method ('full_prepayment', 'full_payment')
      *
      * @return Receipt|null
      */
-    public function getReceiptFromOrder(array $order, $type)
+    public function getReceiptFromOrder(array $order, $type, $payment_method = Receipt::PAYMENT_METHOD_FULL_PAYMENT)
     {
         $payment_id = isset($order['payment_id']) ? $order['payment_id'] : 0;
         $base_receipt = $this->receipt_factory->createReceiptFromOrder($order, $this->currency, false);
@@ -153,6 +154,8 @@ class Service
         $receipt->setObjectType('order');
         $receipt->setObjectId($order['order_id']);
         $receipt->setTimestamp(TIME);
+        $receipt->setCurrency($this->currency);
+        $receipt->setPaymentMethod($payment_method);
 
         $receipt->setPayment(new Payment(
             $this->getExternalPaymentId($payment_id),

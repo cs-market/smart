@@ -1,1 +1,1 @@
-<a class="icon-copy cm-tooltip" name="clone" id="{$item_id}" title="{__("clone")}" onclick="{$but_onclick}"></a>&nbsp;
+<a class="btn btn-clone" name="clone" id="{$item_id}" onclick="{$but_onclick}">{__("clone")}</a>&nbsp;

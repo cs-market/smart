@@ -69,6 +69,7 @@ function fn_get_order_reports($view = false, $report_id = 0, $table_id = 0, $par
     foreach ($data[$k]['tables'] as $key => $value) {
         // [cs-market]
         fn_set_hook('sales_reports_change_table', $value, $key);
+
         $limit = $data_limit;
 
         if ($value['type'] != 'T') {
@@ -248,8 +249,10 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
             $new_element = $v;
             unset($elements[$k]);
             $table_condition = fn_get_table_condition($table['table_id'], true);
+
             // [cs-market]
             fn_set_hook('sales_reports_table_condition', $table_condition, $k, $v, $table);
+
             $order_ids = fn_proceed_table_conditions($table_condition, "a");
 
             $l_l = $table['type'] == 'T' ? null : 50; // Legend length - limited for charts
@@ -257,44 +260,104 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
             if ($v['code'] == 'order') {
                 if ($v['dependence'] == 'max_n') {
                     // Get orders with max products bought
-                    $orders = db_get_array("SELECT b.order_id, SUM(b.amount) as total FROM ?:order_details as b LEFT JOIN ?:orders as a ON b.order_id = a.order_id WHERE a.timestamp BETWEEN ?i AND ?i ?p GROUP BY b.order_id ORDER BY total DESC LIMIT $limit", $time_from, $time_to, $order_ids);
+                    $orders = db_get_array(
+                        "SELECT b.order_id, SUM(b.amount) as total"
+                        . " FROM ?:order_details as b"
+                        . " LEFT JOIN ?:orders as a ON b.order_id = a.order_id"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p"
+                        . " GROUP BY b.order_id"
+                        . " ORDER BY total DESC, order_id LIMIT $limit",
+                        $time_from, $time_to, $order_ids
+                    );
 
                 } elseif ($v['dependence'] == 'max_p') {
                     // Get orders with max amount
-                    $orders = db_get_array("SELECT a.order_id, a.total FROM ?:orders as a WHERE a.timestamp BETWEEN ?i AND ?i ?p ORDER BY total DESC LIMIT $limit", $time_from, $time_to, $order_ids);
+                    $orders = db_get_array(
+                        "SELECT a.order_id, a.total"
+                        . " FROM ?:orders as a"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p"
+                        . " ORDER BY total DESC, order_id LIMIT $limit",
+                        $time_from, $time_to, $order_ids
+                    );
                 }
 
             // ************************* GET AUTO STATUSES ***************************** //
             } elseif ($v['code'] == 'status') {
                 if ($v['dependence'] == 'max_n') {
-                    // Get satuses with max status appears
-                    $satuses = db_get_array("SELECT a.status, COUNT(a.total) as status_total FROM ?:orders as a WHERE a.timestamp BETWEEN ?i AND ?i AND a.status != '' ?p GROUP BY status ORDER BY status_total DESC LIMIT $limit", $time_from, $time_to, $order_ids);
+                    // Get statuses with max status appears
+                    $statuses = db_get_array(
+                        "SELECT a.status, COUNT(a.total) as status_total"
+                        . " FROM ?:orders as a"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i AND a.status != '' ?p"
+                        . " GROUP BY status"
+                        . " ORDER BY status_total DESC, status LIMIT $limit",
+                        $time_from, $time_to, $order_ids
+                    );
 
                 } elseif ($v['dependence'] == 'max_p') {
-                    // Get satuses with max amount paid
-                    $satuses = db_get_array("SELECT a.status, SUM(a.total) as status_total FROM ?:orders as a WHERE a.timestamp BETWEEN ?i AND ?i AND a.status != '' ?p GROUP BY status ORDER BY status_total DESC LIMIT $limit", $time_from, $time_to, $order_ids);
+                    // Get statuses with max amount paid
+                    $statuses = db_get_array(
+                        "SELECT a.status, SUM(a.total) as status_total"
+                        . " FROM ?:orders as a"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i AND a.status != '' ?p"
+                        . " GROUP BY status"
+                        . " ORDER BY status_total DESC, status LIMIT $limit",
+                        $time_from, $time_to, $order_ids
+                    );
                 }
 
             // ************************* GET AUTO PAYMENTS ***************************** //
             } elseif ($v['code'] == 'payment') {
                 if ($v['dependence'] == 'max_n') {
                     // Get payments with max number used
-                    $payments = db_get_array("SELECT a.payment_id, COUNT(a.total) as payment_total, b.payment FROM ?:orders as a LEFT JOIN ?:payment_descriptions AS b ON a.payment_id = b.payment_id AND b.lang_code = ?s WHERE a.timestamp BETWEEN ?i AND ?i ?p GROUP BY a.payment_id ORDER BY payment_total DESC LIMIT $limit", CART_LANGUAGE, $time_from, $time_to, $order_ids);
+                    $payments = db_get_array(
+                        "SELECT a.payment_id, COUNT(a.total) as payment_total, b.payment"
+                        . " FROM ?:orders as a"
+                        . " LEFT JOIN ?:payment_descriptions AS b ON a.payment_id = b.payment_id AND b.lang_code = ?s"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p"
+                        . " GROUP BY a.payment_id"
+                        . " ORDER BY payment_total DESC, payment_id LIMIT $limit",
+                        CART_LANGUAGE, $time_from, $time_to, $order_ids
+                    );
 
                 } elseif ($new_element['dependence'] == 'max_p') {
                     // Get payments with max amount paid
-                    $payments = db_get_array("SELECT a.payment_id, SUM(a.total) as payment_total, b.payment FROM ?:orders as a LEFT JOIN ?:payment_descriptions AS b ON a.payment_id = b.payment_id AND b.lang_code = ?s WHERE a.timestamp BETWEEN ?i AND ?i ?p GROUP BY a.payment_id ORDER BY payment_total DESC LIMIT $limit", CART_LANGUAGE, $time_from, $time_to, $order_ids);
+                    $payments = db_get_array(
+                        "SELECT a.payment_id, SUM(a.total) as payment_total, b.payment"
+                        . " FROM ?:orders as a"
+                        . " LEFT JOIN ?:payment_descriptions AS b ON a.payment_id = b.payment_id AND b.lang_code = ?s"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p"
+                        . " GROUP BY a.payment_id"
+                        . " ORDER BY payment_total DESC, payment_id LIMIT $limit",
+                        CART_LANGUAGE, $time_from, $time_to, $order_ids
+                    );
                 }
 
             // ************************* GET AUTO LOCATIONS **************************** //
             } elseif ($v['code'] == 'location') {
                 if ($v['dependence'] == 'max_n') {
                     // Get locations with max orders placed
-                    $countries = db_get_array("SELECT a.s_country, a.s_state, SUM(a.total) as country_total, b.country FROM ?:orders as a LEFT JOIN ?:country_descriptions AS b ON a.s_country = b.code AND b.lang_code = ?s WHERE a.timestamp BETWEEN ?i AND ?i ?p GROUP BY a.s_country, a.s_state ORDER BY country_total DESC LIMIT $limit", CART_LANGUAGE, $time_from, $time_to, $order_ids);
+                    $countries = db_get_array(
+                        "SELECT a.s_country, a.s_state, SUM(a.total) as country_total, b.country"
+                        . " FROM ?:orders as a"
+                        . " LEFT JOIN ?:country_descriptions AS b ON a.s_country = b.code AND b.lang_code = ?s"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p"
+                        . " GROUP BY a.s_country, a.s_state"
+                        . " ORDER BY country_total DESC, s_country, s_state LIMIT $limit",
+                        CART_LANGUAGE, $time_from, $time_to, $order_ids
+                    );
 
                 } elseif ($v['dependence'] == 'max_p') {
                     // Get locations with max amount paid
-                    $countries = db_get_array("SELECT a.s_country, a.s_state, SUM(a.total) as country_total, b.country FROM ?:orders as a LEFT JOIN ?:country_descriptions AS b ON a.s_country = b.code AND b.lang_code = ?s WHERE a.timestamp BETWEEN ?i AND ?i ?p GROUP BY a.s_country, a.s_state ORDER BY country_total DESC LIMIT $limit", CART_LANGUAGE, $time_from, $time_to, $order_ids);
+                    $countries = db_get_array(
+                        "SELECT a.s_country, a.s_state, SUM(a.total) as country_total, b.country"
+                        . " FROM ?:orders as a"
+                        . " LEFT JOIN ?:country_descriptions AS b ON a.s_country = b.code AND b.lang_code = ?s"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p"
+                        . " GROUP BY a.s_country, a.s_state"
+                        . " ORDER BY country_total DESC, s_country, s_state LIMIT $limit",
+                        CART_LANGUAGE, $time_from, $time_to, $order_ids
+                    );
                 }
 
             // *************************** GET AUTO USERS ****************************** //
@@ -302,11 +365,27 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
 
                 if ($v['dependence'] == 'max_n') {
                     // Get users with max orders placed
-                    $users = db_get_array("SELECT a.user_id, COUNT(a.total) as user_total, b.firstname, b.lastname FROM ?:orders as a LEFT JOIN ?:users AS b ON a.user_id = b.user_id WHERE a.timestamp BETWEEN ?i AND ?i ?p GROUP BY a.user_id ORDER BY user_total DESC LIMIT $limit", $time_from, $time_to, $order_ids);
+                    $users = db_get_array(
+                        "SELECT a.user_id, COUNT(a.total) as user_total, b.firstname, b.lastname"
+                        . " FROM ?:orders as a"
+                        . " LEFT JOIN ?:users AS b ON a.user_id = b.user_id"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p"
+                        . " GROUP BY a.user_id"
+                        . " ORDER BY user_total DESC, user_id LIMIT $limit",
+                        $time_from, $time_to, $order_ids
+                    );
 
                 } elseif ($v['dependence'] == 'max_p') {
                     // Get users with max amount paid
-                    $users = db_get_array("SELECT a.user_id, SUM(a.total) as user_total, b.firstname, b.lastname FROM ?:orders as a LEFT JOIN ?:users AS b ON a.user_id = b.user_id WHERE a.timestamp BETWEEN ?i AND ?i ?p GROUP BY a.user_id ORDER BY user_total DESC LIMIT $limit", $time_from, $time_to, $order_ids);
+                    $users = db_get_array(
+                        "SELECT a.user_id, SUM(a.total) as user_total, b.firstname, b.lastname"
+                        . " FROM ?:orders as a"
+                        . " LEFT JOIN ?:users AS b ON a.user_id = b.user_id"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p"
+                        . " GROUP BY a.user_id"
+                        . " ORDER BY user_total DESC, user_id LIMIT $limit",
+                        $time_from, $time_to, $order_ids
+                    );
                 }
 
             // ************************* GET AUTO CATEGORIES ***************************** //
@@ -348,7 +427,7 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
                         . " ?p"
                         . " ?p"
                         . " GROUP BY c.category_id"
-                        . " ORDER BY category_amount DESC"
+                        . " ORDER BY category_amount DESC, category_id"
                         . " LIMIT $limit",
                         CART_LANGUAGE,
                         $time_from,
@@ -375,7 +454,7 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
                         . " ?p"
                         . " ?p"
                         . " GROUP BY c.category_id"
-                        . " ORDER BY category_amount DESC"
+                        . " ORDER BY category_amount DESC, category_id"
                         . " LIMIT $limit",
                         CART_LANGUAGE,
                         $time_from,
@@ -417,7 +496,7 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
                         . " ?p"
                         . " ?p"
                         . " GROUP BY b.product_id"
-                        . " ORDER BY product_amount DESC"
+                        . " ORDER BY product_amount DESC, product_id"
                         . " LIMIT $limit",
                         CART_LANGUAGE,
                         $time_from,
@@ -440,7 +519,7 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
                         . " ?p"
                         . " ?p"
                         . " GROUP BY b.product_id"
-                        . " ORDER BY product_amount DESC"
+                        . " ORDER BY product_amount DESC, product_id"
                         . " LIMIT $limit",
                         CART_LANGUAGE,
                         $time_from,
@@ -456,11 +535,27 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
 
                 if ($v['dependence'] == 'max_n') {
                     // Get users with max orders placed
-                    $issuers = db_get_array("SELECT a.issuer_id, COUNT(a.total) as user_total, b.firstname, b.lastname FROM ?:orders as a LEFT JOIN ?:users AS b ON a.issuer_id = b.user_id WHERE a.timestamp BETWEEN ?i AND ?i ?p ?p GROUP BY a.issuer_id ORDER BY user_total DESC LIMIT $limit", $time_from, $time_to, $order_ids, $issuers_null_ids);
+                    $issuers = db_get_array(
+                        "SELECT a.issuer_id, COUNT(a.total) as user_total, b.firstname, b.lastname"
+                        . " FROM ?:orders as a"
+                        . " LEFT JOIN ?:users AS b ON a.issuer_id = b.user_id"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p ?p"
+                        . " GROUP BY a.issuer_id"
+                        . " ORDER BY user_total DESC, issuer_id LIMIT $limit",
+                        $time_from, $time_to, $order_ids, $issuers_null_ids
+                    );
 
                 } elseif ($v['dependence'] == 'max_p') {
                     // Get users with max amount paid
-                    $issuers = db_get_array("SELECT a.issuer_id, SUM(a.total) as user_total, b.firstname, b.lastname FROM ?:orders as a LEFT JOIN ?:users AS b ON a.issuer_id = b.user_id WHERE a.timestamp BETWEEN ?i AND ?i ?p ?p GROUP BY a.issuer_id ORDER BY user_total DESC LIMIT $limit", $time_from, $time_to, $order_ids, $issuers_null_ids);
+                    $issuers = db_get_array(
+                        "SELECT a.issuer_id, SUM(a.total) as user_total, b.firstname, b.lastname"
+                        . " FROM ?:orders as a"
+                        . " LEFT JOIN ?:users AS b ON a.issuer_id = b.user_id"
+                        . " WHERE a.timestamp BETWEEN ?i AND ?i ?p ?p"
+                        . " GROUP BY a.issuer_id"
+                        . " ORDER BY user_total DESC, issuer_id LIMIT $limit",
+                        $time_from, $time_to, $order_ids, $issuers_null_ids
+                    );
                 }
             }
 
@@ -493,10 +588,10 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
 
                 // ************************* GET AUTO STATUSES ***************************** //
                 } elseif ($new_element['code'] == 'status') {
-                    if (empty($satuses[$i - 1])) {
+                    if (empty($statuses[$i - 1])) {
                         return $elements;
                     }
-                    $status = $satuses[$i - 1]['status'];
+                    $status = $statuses[$i - 1]['status'];
                     if ($table['type'] == 'T') {
                         $time_link = '&from_Year=' . date('Y', $time_from) . '&from_Month=' . date('m', $time_from) . '&from_Day=' . date('j', $time_from) . '&to_Year=' . date('Y', $time_to) . '&to_Month=' . date('m', $time_to) . '&to_Day=' . date('j', $time_to);
                     }
@@ -526,7 +621,7 @@ function fn_check_elements($elements, $time_from, $time_to, $table)
                     }
                     $c_id = $countries[$i - 1]['s_country'];
                     $st_id = $countries[$i - 1]['s_state'];
-                    $sate = empty($st_id) ? '' : db_get_field("SELECT state FROM ?:state_descriptions as a LEFT JOIN ?:states as b ON b.state_id = a.state_id AND b.country_code = ?s WHERE b.code = ?s AND lang_code = ?s", !empty($c_id) ? $c_id : Registry::get('settings.General.default_country'), $st_id, CART_LANGUAGE);
+                    $sate = empty($st_id) ? '' : db_get_field("SELECT state FROM ?:state_descriptions as a LEFT JOIN ?:states as b ON b.state_id = a.state_id AND b.country_code = ?s WHERE b.code = ?s AND lang_code = ?s", !empty($c_id) ? $c_id : Registry::get('settings.Checkout.default_country'), $st_id, CART_LANGUAGE);
                     $c_name = $countries[$i - 1]['country'] . (empty($sate) ? '' : ' [' . $sate . ']');
                     $_descr = fn_sales_repors_format_description($c_name, $l_l, $_desc_id);
                     $new_element['description'] =  $_descr;
@@ -797,8 +892,10 @@ function fn_proceed_table_conditions($table_condition, $alias = false)
 function fn_get_report_statistics(&$table)
 {
     $table_condition = fn_get_table_condition($table['table_id'], true);
+
     // [cs-market]
     fn_set_hook('sales_reports_table_condition', $table_condition, $k, $v, $table);
+
     $order_ids = fn_proceed_table_conditions($table_condition, '?:orders');
 
     $last_elm = end($table['intervals']);
@@ -819,7 +916,7 @@ function fn_get_report_statistics(&$table)
 
         $time_condition = db_quote(" timestamp BETWEEN ?i AND ?i", $time_start, $time_end);
         $group_condition = ' GROUP BY `interval`';
-
+        
         if ($interval_code == 'year') {
             $add_field = db_quote(", DATE_FORMAT(FROM_UNIXTIME(timestamp), '%Y') as `interval`, timestamp");
         } elseif ($interval_code == 'month') {
@@ -843,6 +940,17 @@ function fn_get_report_statistics(&$table)
         } elseif ($table['display'] == 'shipping') {
             $data[$hash] = db_get_hash_array("SELECT SUM(shipping_cost) as total $add_field FROM ?:orders WHERE $element[request] AND $time_condition $order_ids $group_condition", 'interval');
         } elseif ($table['display'] == 'discount') {
+            switch ($element['code']) {
+                case 'order':
+                case 'status':
+                case 'payment':
+                case 'location':
+                case 'user':
+                case 'issuer':
+                    $group_condition = '';
+                    break;
+            }
+
             $where = db_quote(
                 '?p AND ?p ?p ?p',
                 $element['request'],
@@ -1316,8 +1424,10 @@ function fn_sales_repors_format_description($value, $limit, $id)
 function fn_get_order_totals($table)
 {
     $table_condition = fn_get_table_condition($table['table_id'], true);
+
     // [cs-market]
     fn_set_hook('sales_reports_table_condition', $table_condition, $k, $v, $table);
+
     $order_ids = fn_proceed_table_conditions($table_condition, '?:orders');
 
     $last_elm = end($table['intervals']);
@@ -1360,6 +1470,17 @@ function fn_get_order_totals($table)
         } elseif ($table['display'] == 'shipping') {
             $data = db_get_hash_array("SELECT SUM(shipping_cost) as total $add_field FROM ?:orders WHERE {$element['request']} AND $time_condition $order_ids $group_condition", 'interval');
         } elseif ($table['display'] == 'discount') {
+            switch ($element['code']) {
+                case 'order':
+                case 'status':
+                case 'payment':
+                case 'location':
+                case 'user':
+                case 'issuer':
+                    $group_condition = '';
+                    break;
+            }
+
             $where = db_quote(
                 '?p AND ?p ?p ?p',
                 $element['request'],
@@ -1600,7 +1721,7 @@ function fn_sales_reports_get_orders_subtotal_discount($data, $additional_fields
     $hash = !is_null($hash) ? $hash : 0;
 
     $orders_data = db_get_array(
-        "SELECT ?:orders.order_id, subtotal_discount as total, ?:order_details.extra {$additional_fields}"
+        "SELECT ?:orders.order_id, subtotal_discount as total, ?:order_details.extra, ?:order_details.amount {$additional_fields}"
         . ' FROM ?:order_details'
         . ' LEFT JOIN ?:orders ON ?:orders.order_id = ?:order_details.order_id'
         . ' WHERE ?p',
@@ -1628,7 +1749,7 @@ function fn_sales_reports_get_orders_subtotal_discount($data, $additional_fields
         $extra = @unserialize($order_item_data['extra']);
 
         if (!empty($extra['discount'])) {
-            $data[$hash][$interval]['total'] += $extra['discount'];
+            $data[$hash][$interval]['total'] += $extra['discount'] * $order_item_data['amount'];
         }
 
         $data[$hash][$interval]['total'] = fn_format_price($data[$hash][$interval]['total']);

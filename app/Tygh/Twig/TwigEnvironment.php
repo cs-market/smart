@@ -19,19 +19,19 @@ namespace Tygh\Twig;
  *
  * @package Tygh\Twig
  */
-class TwigEnvironment extends \Twig_Environment
+class TwigEnvironment extends \Twig\Environment
 {
     /**
      * Renders a template as string.
      *
-     * @param string $string   The template string
-     * @param array  $context  An array of parameters to pass to the template
+     * @param string                                                                                          $string  The template string
+     * @param array<string, array|\Tygh\Template\Collection|\Tygh\Template\ITemplate|\Tygh\Template\IContext> $context An array of parameters
+     *                                                                                                                      to pass to the template
      *
      * @return string The rendered template
      *
-     * @throws \Twig_Error_Loader  When the template cannot be found
-     * @throws \Twig_Error_Syntax  When an error occurred during compilation
-     * @throws \Twig_Error_Runtime When an error occurred during rendering
+     * @throws \Twig\Error\LoaderError When the template cannot be found.
+     * @throws \Twig\Error\SyntaxError When an error occurred during compilation.
      */
     public function renderString($string, array $context = array())
     {

@@ -41,7 +41,7 @@ $schema = array(
     ),
     'destinations.update' => array(
         'func' => array('fn_get_destination_name', '@destination_id'),
-        'text' => 'destination'
+        'text' => 'rate_area'
     ),
     'payments.manage' => array(
         'text' => 'payment_methods'

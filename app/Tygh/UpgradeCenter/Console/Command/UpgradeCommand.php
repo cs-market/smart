@@ -36,16 +36,16 @@ use Tygh\UpgradeCenter\Validators\IValidator;
 class UpgradeCommand extends Command
 {
     /** @var App An Upgrade center application instance. */
-    private $upgrade_app;
+    protected $upgrade_app;
 
     /** @var null|array List of available upgrade packages. */
-    private $upgrade_packages;
+    protected $upgrade_packages;
 
     /** @var OutputInterface An OutputInterface instance. */
-    private $output;
+    protected $output;
 
     /** @var InputInterface An InputInterface instance. */
-    private $input;
+    protected $input;
 
     /**
      * UpgradeCommand constructor.
@@ -158,7 +158,7 @@ EOF
         $this->upgrade_app->validator_callback = array($this, 'upgradeCenterValidatorCallback');
 
         if ($this->upgrade_app->downloadPackage($id)) {
-            list($result) = $this->upgrade_app->install($id, array());
+            list($result) = $this->upgrade_app->install($id, ['id' => $id]);
 
             if ($result === App::PACKAGE_INSTALL_RESULT_SUCCESS) {
                 $output->writeln('<info>Successful</info>');
@@ -175,7 +175,7 @@ EOF
      *
      * @return array
      */
-    private function getUpgradePackages()
+    protected function getUpgradePackages()
     {
         if ($this->upgrade_packages === null) {
             $this->upgrade_app->clearDownloadedPackages();
@@ -192,7 +192,7 @@ EOF
      *
      * @return array
      */
-    private function getUpgradePackagesIds()
+    protected function getUpgradePackagesIds()
     {
         $ids = array();
         $upgrade_packages = $this->getUpgradePackages();
@@ -211,7 +211,7 @@ EOF
      *
      * @return null|array
      */
-    private function findUpgradePackage($id)
+    protected function findUpgradePackage($id)
     {
         if (empty($id)) {
             return null;
@@ -229,7 +229,7 @@ EOF
      *
      * @return ChoiceQuestion
      */
-    private function getChoiceUpgradePackageQuestion()
+    protected function getChoiceUpgradePackageQuestion()
     {
         return new ChoiceQuestion('<info>Select an upgrade package</info>', $this->getUpgradePackagesIds());
     }
@@ -239,7 +239,7 @@ EOF
      *
      * @return ConfirmationQuestion
      */
-    private function getConfirmationCreateBackupQuestion()
+    protected function getConfirmationCreateBackupQuestion()
     {
         return new ConfirmationQuestion('<info>Do you want to create a backup?</info> [<comment>Y,n</comment>]: ', true);
     }
@@ -251,7 +251,7 @@ EOF
      *
      * @return ConfirmationQuestion
      */
-    private function getConfirmationSkipValidatorQuestion($validator_name)
+    protected function getConfirmationSkipValidatorQuestion($validator_name)
     {
         return new ConfirmationQuestion(
             sprintf('<info>Do you want to skip validator %s and continue?</info> [<comment>Y,n</comment>]: ', $validator_name),
@@ -264,7 +264,7 @@ EOF
      *
      * @param OutputInterface $output An OutputInterface instance.
      */
-    private function renderUpgradePackagesTable(OutputInterface $output)
+    protected function renderUpgradePackagesTable(OutputInterface $output)
     {
         $rows = array();
         $upgrade_packages = $this->getUpgradePackages();
@@ -336,7 +336,7 @@ EOF
      * @param IValidator $validator  An IValidator instance.
      * @param array      $data       List of notice.
      */
-    private function renderUpgradeCenterValidatorNotices(IValidator $validator, array $data)
+    protected function renderUpgradeCenterValidatorNotices(IValidator $validator, array $data)
     {
         foreach ($data as $key => $item) {
             if (is_array($item)) {
@@ -357,7 +357,7 @@ EOF
      *
      * @return bool
      */
-    private function isSkippedValidator(IValidator $validator)
+    protected function isSkippedValidator(IValidator $validator)
     {
         $skip_validators = $this->input->getOption('skip-validator');
 

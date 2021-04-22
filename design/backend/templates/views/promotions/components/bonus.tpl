@@ -14,7 +14,7 @@
     <input type="hidden" name="{$prefix}[value]" value="Y" />{__("yes")}
 
     {elseif $schema.bonuses[$bonus_data.bonus].type == "checkbox"}
-    <input class="checkbox" type="checkbox" name="{$prefix}[value]" value="Y" {if $bonus_data.value == "Y"}checked="checked"{/if} />
+    <input type="checkbox" name="{$prefix}[value]" value="Y" {if $bonus_data.value == "Y"}checked="checked"{/if} />
 
     {elseif $schema.bonuses[$bonus_data.bonus].type == "select"}
     {assign var="_items" value=$schema.bonuses[$bonus_data.bonus].variants|default:$schema.bonuses[$bonus_data.bonus].variants_function|fn_get_promotion_variants}

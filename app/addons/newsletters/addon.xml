@@ -93,6 +93,7 @@
         <item>DROP TABLE IF EXISTS ?:newsletter_campaigns;</item>
         <item>DROP TABLE IF EXISTS ?:mailing_lists;</item>
         <item>DROP TABLE IF EXISTS ?:user_mailing_lists;</item>
+        <item>DROP TABLE IF EXISTS ?:newsletter_batch_recipients;</item>
         <item>
             CREATE TABLE `?:newsletters` (
                 `newsletter_id` mediumint(8) unsigned NOT NULL auto_increment,
@@ -172,10 +173,24 @@
                 UNIQUE KEY `subscriber_list` (`list_id`, `subscriber_id`)
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>
+        <item>
+            CREATE TABLE `?:newsletter_batch_recipients` (
+                `send_list_id` mediumint(8) unsigned NOT NULL auto_increment,
+                `newsletter_id` mediumint(8) unsigned NOT NULL default '0',
+                `user_id` mediumint(8) unsigned NOT NULL default '0',
+                `list_id` mediumint(8) unsigned NOT NULL default '0',
+                `subscriber_id` mediumint(8) unsigned NOT NULL default '0',
+                `email` varchar(128) NOT NULL default '',
+                `send_key` varchar(128) NOT NULL default '',
+                `lang_code` char(2) NOT NULL default '',
+                PRIMARY KEY (`send_list_id`),
+                KEY `send_key` (`send_key`)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
         <item for="demo" editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:usergroup_privileges (usergroup_id, privilege) VALUES ('4', 'view_newsletters');</item>
         <item for="demo" editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:usergroup_privileges (usergroup_id, privilege) VALUES ('4', 'manage_newsletters');</item>
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('view_newsletters', 'Y', 'cms');</item>
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_newsletters', 'Y', 'cms');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_newsletters', 'Y', 'marketing', 'newsletters', 'Y');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_newsletters', 'Y', 'marketing', 'newsletters', 'N');</item>
 
         <item for="uninstall">DROP TABLE IF EXISTS ?:newsletters;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:newsletter_links;</item>
@@ -184,6 +199,7 @@
         <item for="uninstall">DROP TABLE IF EXISTS ?:newsletter_campaigns;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:mailing_lists;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:user_mailing_lists;</item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:newsletter_batch_recipients;</item>
         <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">DELETE FROM ?:privileges WHERE privilege = 'view_newsletters'</item>
         <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">DELETE FROM ?:usergroup_privileges WHERE privilege = 'view_newsletters'</item>
         <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">DELETE FROM ?:privileges WHERE privilege = 'manage_newsletters'</item>

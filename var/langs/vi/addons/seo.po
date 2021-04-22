@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: vi\n"
-"X-Crowdin-File: /release-4.8.2/addons/seo.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.1/addons/seo.po\n"
+"X-Crowdin-File-ID: 3892\n"
+"PO-Revision-Date: 2020-12-01 09:11\n"
 
 msgctxt "Addons::name::seo"
 msgid "SEO"
@@ -61,12 +61,16 @@ msgid "page [n]"
 msgstr "Trang [n]"
 
 msgctxt "Languages::privileges.manage_seo_rules"
-msgid "Manage SEO rules and 301 redirects"
-msgstr "Quản lý quy tắc SEO và chuyển hướng 301"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.seo"
+msgid "SEO"
+msgstr ""
 
 msgctxt "Languages::privileges.view_seo_rules"
-msgid "View SEO rules and 301 redirects"
-msgstr "Xem quy tắc SEO và chuyển hướng 301"
+msgid "Can view"
+msgstr ""
 
 msgctxt "Languages::seo.redirects_manager"
 msgid "301 redirects"
@@ -133,8 +137,8 @@ msgid "Other SEO URL format"
 msgstr "Định dạng SEO URL khác"
 
 msgctxt "SettingsOptions::seo::seo_language"
-msgid "Show language in the URL"
-msgstr "Hiển thị ngôn ngữ trong URL"
+msgid "Show additional language in the URL"
+msgstr ""
 
 msgctxt "SettingsOptions::seo::single_url"
 msgid "Use single URL for all languages"
@@ -202,5 +206,61 @@ msgstr "/item.html"
 
 msgctxt "Languages::seo.important_language_text"
 msgid "<b>Warning!</b> The <b>SEO</b> add-on is currently configured to use a single URL for all languages. If you hide, disable, or delete a default language of one of the storefronts, the SEO URLs will be changed."
+msgstr ""
+
+msgctxt "Languages::seo.upgrade_notes.seo_language.title"
+msgid "Changes in SEO add-on"
+msgstr ""
+
+msgctxt "Languages::seo.upgrade_notes.seo_language.message"
+msgid "To improve rating in search engines, we have changed the behavior of the \"Show language in URL\" setting. The default language of the storefront will no longer be displayed in the URL. If your storefront in the default language was previously located at <b>[old_store_url]</b>, it will now be available at <b>[new_store_url]</b>.<br/>All old URLs will be redirected correctly to the new ones."
+msgstr ""
+
+msgctxt "Languages::seo.product_feature.feature_code.notice"
+msgid "A suitable code can help this feature appear with the product in search engines. Supported codes:"
+msgstr ""
+
+msgctxt "Languages::seo.brand"
+msgid "Brand"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.brand.description"
+msgid "Name used by an organization or business person for labeling a product"
+msgstr ""
+
+msgctxt "Languages::seo.isbn"
+msgid "ISBN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.isbn.description"
+msgid "International Standard Book Number"
+msgstr ""
+
+msgctxt "Languages::seo.gtin"
+msgid "GTIN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.gtin.description"
+msgid "Global Trade Item Number"
+msgstr ""
+
+msgctxt "Languages::seo.MPN"
+msgid "MPN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.mpn.description"
+msgid "Manufacturer Part Number"
+msgstr ""
+
+msgctxt "Languages::seo.storefront_frontend_default_language_warning"
+msgid "The <a href=\"[link]\">SEO</a> add-on is currently configured to use a single URL for all languages. If you change a default language of this storefront, the SEO URLs will be changed."
+msgstr ""
+
+msgctxt "Languages::seo.default_storefront_frontend_default_language_warning"
+msgid "The <a href=\"[link]\">SEO</a> add-on is currently configured to use a single URL for all languages. If you change a default language of the default storefront, the SEO URLs will be changed for all storefronts."
+msgstr ""
+
+msgctxt "Languages::seo.error_at_creation_seo_name"
+msgid "The following SEO name already exists in your store: <b>[names]</b>. <p> The following SEO name was used instead: <b>[new_names]</b>.|The following SEO names already exist in your store: <b>[names]</b>. The following SEO names were used instead: <b>[new_names]</b>."
 msgstr ""
 

@@ -90,7 +90,7 @@ if ($mode === 'update' && $_REQUEST['addon'] === 'retailcrm') {
             $retailcrm_order_types = $response['orderTypes'];
         }
 
-        $order_statuses = fn_get_statuses(STATUSES_ORDER);
+        $order_statuses = fn_get_statuses(STATUSES_ORDER, [], true, true);
         $payment_types = fn_get_payments(array('status' => 'A'));
         $shipping_types = fn_get_shippings(false);
         list($storefronts) = fn_get_companies(array(), $auth);

@@ -20,7 +20,8 @@
                 `date_to` int(11) unsigned NOT NULL default '0',
                 `display_in_promotions` char(1) NOT NULL default 'Y',
                 `status` char(1) NOT NULL default 'D',
-                PRIMARY KEY (`chain_id`)
+                PRIMARY KEY (`chain_id`),
+                KEY (`product_id`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8
         </item>
         <item>

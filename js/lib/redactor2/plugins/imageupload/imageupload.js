@@ -34,19 +34,18 @@
                 {
                     $('#redactor_file_link').focus();
                     $('#elfinder_control').click(function(){
-                        $('<div id="elfinder_browser"/>').elfinder({
+                        var options = $.extend(_.fileManagerOptions, {
                             url : fn_url('elf_connector.images?security_hash=' + _.security_hash),
-                            lang : 'en',
-                            resizable: false,
                             getFileCallback: function(file) {
                                 $('#elfinder_browser').dialog('close');
                                 $('#redactor_file_link').val(file.url + '?' + new Date().getTime());
-                            }
-                        }).dialog({
+                            },
+                        });
+                        $('<div id="elfinder_browser"/>').elfinder(options).dialog({
                             width: 900,
                             modal: true,
                             title: fn_strip_tags(_.tr('file_browser')),
-                            close: function( event, ui ) {
+                            close: function (event, ui) {
                                 $('#elfinder_browser').dialog('destroy').elfinder('destroy').remove();
                             }
                         }).closest('.ui-dialog').css('z-index', 50001);

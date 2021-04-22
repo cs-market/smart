@@ -19,12 +19,13 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($mode == 'view') {
     $robots = new Robots;
-    $company_id = Registry::get('runtime.company_id');
+
+    $storefront = Tygh::$app['storefront'];
 
     $content = $robots->getRobotsTxtContent();
 
     if (!isset($content)) {
-        $robots_data = $robots->getRobotsDataByCompanyId($company_id);
+        $robots_data = $robots->getRobotsDataByStorefrontId($storefront->storefront_id);
         $content = isset($robots_data['data']) ? $robots_data['data'] : '';
     }
 

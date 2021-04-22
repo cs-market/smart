@@ -28,6 +28,6 @@ class CompanyVariable extends \Tygh\Template\Document\Variables\CompanyVariable
         $gift_certificate = $context->getCertificateData();
         $company_id = isset($gift_certificate['company_id']) ? $gift_certificate['company_id'] : 0;
 
-        parent::__construct($config, $company_id, $context->getLangCode());
+        parent::__construct($config, $company_id, $context->getLangCode(), $context);
     }
 }

@@ -5,20 +5,20 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/advanced_import.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.12.1/addons/advanced_import.po\n"
+"X-Crowdin-File-ID: 3778\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::advanced_import"
-msgid "Advanced products import [Beta]"
+msgid "Advanced products import"
 msgstr "ادخال او استيراد منتجات منقدمه"
 
 msgctxt "Addons::description::advanced_import"
 msgid "Allows you to match the fields in the imported file with the product properties. These matchings and other import settings can also be saved as presets for later use."
-msgstr ""
+msgstr "يسمح لك لتطابق الحقول الموجودة في الملف الذي تم استيراده مع خصائص المنتج. يمكن أيضا حفظ هذه المضاهاة وإعدادات استيراد أخرى كما المسبقة لاستخدامها في وقت لاحق."
 
 msgctxt "Languages::advanced_import.never"
 msgid "Never"
@@ -26,7 +26,7 @@ msgstr "ابدأ"
 
 msgctxt "Languages::advanced_import.last_status.X"
 msgid "&mdash;"
-msgstr ""
+msgstr "&mdash;"
 
 msgctxt "Languages::advanced_import.last_status.S"
 msgid "Success"
@@ -58,7 +58,7 @@ msgstr "ملف"
 
 msgctxt "Languages::advanced_import.has_modifiers"
 msgid "Has modifiers"
-msgstr ""
+msgstr "لديه معدل"
 
 msgctxt "Languages::advanced_import.import_products"
 msgid "Import products"
@@ -74,11 +74,11 @@ msgstr "ادخال او استيراد ملف"
 
 msgctxt "Languages::advanced_import.fields_mapping"
 msgid "Fields mapping"
-msgstr ""
+msgstr "حقول التعيين"
 
 msgctxt "Languages::advanced_import.fields_mapping.description"
 msgid "This table contains the list of columns from the imported file. For each column you'd like to import, select a corresponding product property in [product]. Then check what sort of data will be imported from that column, and use modifiers to change that data, if necessary. Remember to save your changes."
-msgstr ""
+msgstr "يحتوي هذا الجدول على قائمة الأعمدة من الملف الذي تم استيراده. لكل عمود تريد استيراد، حدد خاصية منتج المطابق في [product]. ثم تحقق من أي نوع من البيانات سوف تكون مستوردة من هذا العمود، واستخدام معدلات لتغيير تلك البيانات، إذا لزم الأمر. تذكر أن تقوم بحفظ التغييرات الخاصة بك."
 
 msgctxt "Languages::advanced_import.column_header"
 msgid "Column name in the imported file"
@@ -114,11 +114,11 @@ msgstr "المعدل"
 
 msgctxt "Languages::advanced_import.modifier_title"
 msgid "A modifier is a rule that alters values in a column"
-msgstr ""
+msgstr "التعديل هو قاعدة أن يغير القيم في عمود"
 
 msgctxt "Languages::advanced_import.example_imported_title"
 msgid "For example, here's a value in the first line of your file:"
-msgstr ""
+msgstr "على سبيل المثال، هنا قيمة في السطر الأول من الملف الخاص بك:"
 
 msgctxt "Languages::advanced_import.example_modified_title"
 msgid "And here is how this value will be imported:"
@@ -130,11 +130,11 @@ msgstr "الخيارات"
 
 msgctxt "Languages::advanced_import.images_delimiter"
 msgid "Images delimiter"
-msgstr ""
+msgstr "محدد الصور"
 
 msgctxt "Languages::advanced_import.images_delimiter.description"
 msgid "Delimiter between images of a product."
-msgstr ""
+msgstr "محدد بين الصور للمنتج."
 
 msgctxt "Languages::advanced_import_images"
 msgid "Product images"
@@ -154,7 +154,7 @@ msgstr "ادخال او استيراد ملف"
 
 msgctxt "Languages::advanced_import.advanced_products_import"
 msgid "Products"
-msgstr ""
+msgstr "المنتجات"
 
 msgctxt "Languages::advanced_import.coming_soon"
 msgid "... coming soon"
@@ -163,6 +163,10 @@ msgstr ".. قريبا"
 msgctxt "Languages::advanced_import.cant_load_file_for_company"
 msgid "File can't be loaded for the specified company"
 msgstr "لا يمكن تحميل الملف للشركة المحددة"
+
+msgctxt "Languages::advanced_import.cant_load_file"
+msgid "File can't be loaded"
+msgstr "لا يمكن تحميل الملف"
 
 msgctxt "Languages::advanced_import.uploading_file"
 msgid "Uploading file for the preset: [preset]"
@@ -178,23 +182,23 @@ msgstr "لم يتم العثور على الإعداد المسبق"
 
 msgctxt "Languages::advanced_import.modifiers_list"
 msgid "Modifiers list"
-msgstr ""
+msgstr "قائمة المعدلين"
 
 msgctxt "Languages::advanced_import.invalid_number_of_parameters_provided"
 msgid "Invalid number of parameters provided for modifier: <b>[modifier]</b>: expected [expected_count], got [actual_count]."
-msgstr ""
+msgstr "عدد غير صالح من المعلمات المقدمة لمعدّل: <b> [modifier] </b>: المتوقع [expected_count] ، حصل على [actual_count]."
 
 msgctxt "Languages::advanced_import.invalid_function_firs_character"
 msgid "The modifier name cannot start with character <b>[character]</b>."
-msgstr ""
+msgstr "لا يمكن أن يبدأ اسم المُبدِّل بحرف <b> [character] </b>."
 
 msgctxt "Languages::advanced_import.unrecognized_modifier"
 msgid "The modifier <b>[modifier]</b> does not exist."
-msgstr ""
+msgstr "معدّل <b>[modifier]</b> غير موجود."
 
 msgctxt "Languages::advanced_import.unexpected_parameter_passed"
 msgid "Expected <b>[delimiter]</b> or <b>[closer]</b> got <b>[char]</b>."
-msgstr ""
+msgstr "المتوقع <b>[delimiter]</b> أو <b>[closer]</b> حصل <b>[char]</b>."
 
 msgctxt "Languages::advanced_import.invalid_modifier_message"
 msgid "The modifier <b>[modifier]</b> is invalid. [message]"
@@ -206,11 +210,11 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.modifiers_description"
 msgid "Use these functions in the <b>Modifier</b> column to alter the values in the fields from the imported file. Enter the functions as follows: <b>function(parameter, parameter)</b>. Please note that nesting of functions isn't supported."
-msgstr ""
+msgstr "استخدام هذه الدالات في العمود <b>التعديل</b> لتغيير القيم الموجودة في الحقول من الملف الذي تم استيراده. أدخل الوظائف على النحو التالي: <b>وظيفة (المعلمة, المعلمة)</b>. يرجى ملاحظة أن تداخل الدالات غير معتمدة."
 
 msgctxt "Languages::advanced_import.modifiers_self_referencing_info"
 msgid "Most functions allow you to use the non-modified value of the imported field by using <b>$value</b> as a parameter. If there are any exceptions, they will be mentioned in function descriptions."
-msgstr ""
+msgstr "تسمح لك معظم الوظائف باستخدام القيمة غير المعدلة للحقل الذي تم استيراده باستخدام <b>$value</b> كمعلمة. إذا كانت هناك أي استثناءات ، فسيتم ذكرها في الوصف الوظيفي."
 
 msgctxt "Languages::advanced_import.modifier_description.sum"
 msgid "<b>sum</b>&mdash;sums up two numbers provided as parameters. <ul><li>Examples:</li><ul><li><b>sum(1, 3)</b> equals <i>4</i></li> <li><b>sum(7, $value)</b> equals <i>7 + the value of the imported field</i></li></ul></ul>"
@@ -254,7 +258,7 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.modifier_self_reference_is_unsupported"
 msgid "This function doesn't support the use of a non-modified value from the imported file."
-msgstr ""
+msgstr "لا تدعم هذه الوظيفة استخدام قيمة غير معدلة من الملف المدرج."
 
 msgctxt "Languages::advanced_import.preset_last_view"
 msgid "Preset"
@@ -262,11 +266,11 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.show_more"
 msgid "Show more"
-msgstr ""
+msgstr "إظهار المزيد"
 
 msgctxt "Languages::advanced_import.show_less"
 msgid "Show less"
-msgstr ""
+msgstr "عرض أقل"
 
 msgctxt "Languages::advanced_import.target_node"
 msgid "XML target node"
@@ -274,59 +278,59 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.target_node.description"
 msgid "The full path to the XML node with the information about an imported entity. The nodes nested in the specified node will be used as columns of the imported file. Here is an example of the path: yml_catalog/shop/offers/offer"
-msgstr ""
+msgstr "المسار الكامل لعقدة XML مع معلومات حول كيان تم استيراده. سيتم استخدام العقد المتداخلة في العقدة المحددة كأعمدة للملف الذي تم استيراده. هنا مثال على المسار: yml_catalog/shop/offers/offer"
 
 msgctxt "Languages::advanced_import.fetching_schema_failed_check_target_node"
 msgid "Please make sure that the <b>XML target node</b> field is filled in properly."
-msgstr ""
+msgstr "يرجى التأكد من ملء حقل <b>XML target node</b> بشكل صحيح."
 
 msgctxt "Languages::advanced_import.general_settings"
 msgid "General settings"
-msgstr ""
+msgstr "الإعدادات العامة"
 
 msgctxt "Languages::advanced_import.additional_settings"
 msgid "Additional settings"
-msgstr ""
+msgstr "إعدادات إضافية"
 
 msgctxt "Languages::advanced_import.delete_additional_images"
 msgid "Delete existing additional images"
-msgstr ""
+msgstr "حذف صور إضافية موجودة"
 
 msgctxt "Languages::advanced_import.delete_additional_images_tooltip"
 msgid "If you enable this setting, then the existing additional images of the imported products will be replaced with the images specified in the imported file (if no images are specified, the old images will remain). If the setting is disabled, the new additional images will simply be added to the existing images."
-msgstr ""
+msgstr "إذا قمت بتمكين هذا الإعداد ، فسيتم استبدال الصور الإضافية الموجودة للمنتجات المستوردة بالصور المحددة في الملف المدرج (في حالة عدم تحديد أي صور ، ستبقى الصور القديمة). إذا تم تعطيل الإعداد ، فسيتم ببساطة إضافة الصور الإضافية الجديدة إلى الصور الموجودة."
 
 msgctxt "Languages::advanced_import.fetching_schema_failed_check_file"
 msgid "Before you can run the import, please make sure that:<ul><li>You have created the import preset by using the Create button. If you see Save instead of Create, then you've already done that.</li><li>You have specified the correct XML target node on the File tab and saved the preset.</li><li>You have matched the imported information with the product properties in CS-Cart on the Fields mapping tab and saved the preset.</li></ul>If you see this message, you haven't completed point 1 or 2."
-msgstr ""
+msgstr "قبل أن تتمكن من تشغيل الاستيراد ، يرجى التأكد من: <ul><li> لقد قمت بإنشاء الإعداد المسبق للاستيراد باستخدام الزر \"إنشاء\". إذا كنت ترى حفظ بدلاً من إنشاء ، فقد قمت بالفعل بذلك. </li><li> لقد حددت العقدة الهدف XML الصحيحة في علامة التبويب ملف وحفظ الإعداد المسبق. </li><li> لقد قمت بمطابقة المعلومات التي تم استيرادها مع خصائص المنتج في CS-Cart في علامة التبويب تعيين الحقول وحفظ الإعداد المسبق. </li></ul> إذا رأيت هذه الرسالة ، فإنك لم تكمل النقطة 1 أو 2."
 
 msgctxt "Languages::advanced_import.test_import"
 msgid "Perform test import"
-msgstr ""
+msgstr "إجراء اختبار الاستيراد"
 
 msgctxt "Languages::advanced_import.test_import_tooltip"
 msgid "If you enable this setting, only the first [n] product will be processed.|If you enable this setting, only the first [n] products will be processed."
-msgstr ""
+msgstr "إذا قمت بتمكين هذا الإعداد ، فستتم معالجة أول منتج [n] فقط. إذا قمت بتمكين هذا الإعداد ، فلن تتم معالجة سوى أول [n] من المنتجات."
 
 msgctxt "Languages::advanced_import.import_strategy"
 msgid "Import strategy"
-msgstr ""
+msgstr "استراتيجية الاستيراد"
 
 msgctxt "Languages::advanced_import.import_strategy_tooltip"
 msgid "If you select \"Update existing products only\", products that don't exist in the database of your store will be skipped during import.<br>If you select \"Create new products only\", products that exist in the database of your store will be skipped during import."
-msgstr ""
+msgstr "إذا حددت \"تحديث المنتجات الحالية فقط\" ، فسيتم تخطي المنتجات التي لا توجد في قاعدة بيانات متجرك أثناء الاستيراد. <br> إذا قمت بتحديد \"إنشاء منتجات جديدة فقط\" ، فإن المنتجات الموجودة في قاعدة بيانات متجرك سيتم تخطي أثناء الاستيراد."
 
 msgctxt "Languages::advanced_import.import_all"
 msgid "Import all products from the file"
-msgstr ""
+msgstr "استيراد جميع المنتجات من الملف"
 
 msgctxt "Languages::advanced_import.create_new_products_only"
 msgid "Create new products only"
-msgstr ""
+msgstr "قم بإنشاء منتجات جديدة فقط"
 
 msgctxt "Languages::advanced_import.cant_save_preset_invalid_modifiers"
 msgid "The preset can't be saved because it contains invalid modifiers"
-msgstr ""
+msgstr "لا يمكن حفظ الإعداد المسبق لأنه يحتوي على معدِّلات غير صالحة"
 
 msgctxt "Languages::advanced_import.missing_parameters_list_closer"
 msgid "The expected <b>[closer]</b> after the parameters list is missing."
@@ -334,13 +338,41 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.run_import_via_cron_message"
 msgid "You can run the import automatically at certain time intervals. To do it, add the following command to CRON:"
-msgstr ""
+msgstr "يمكنك تشغيل الاستيراد تلقائيًا في فترات زمنية معينة. للقيام بذلك ، قم بإضافة الأمر التالي إلى CRON:"
 
 msgctxt "Languages::advanced_import.cannot_detect_csv_delimiter"
 msgid "Cannot detect delimiter automatically. Please specify the correct delimiter manually in the additional settings on the \"File\" tab."
-msgstr ""
+msgstr "لا يمكن الكشف عن المحدد تلقائيا. يرجى تحديد المحدد الصحيح يدويًا في الإعدادات الإضافية في علامة التبويب \"ملف\"."
 
 msgctxt "Languages::advanced_import.incorrect_delimiter"
 msgid "Specified (or auto detected) delimiter seems to be incorrect. Please specify the correct delimiter manually in the additional settings on the \"File\" tab."
+msgstr "يبدو المحدد (أو الكشف التلقائي) غير صحيح. يرجى تحديد المحدد الصحيح يدويًا في الإعدادات الإضافية في علامة التبويب \"ملف\"."
+
+msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
+msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
+msgstr ""
+
+msgctxt "Languages::advanced_import.common_preset"
+msgid "All vendors"
+msgstr ""
+
+msgctxt "Languages::advanced_import.your_presets"
+msgid "Vendor's presets"
+msgstr ""
+
+msgctxt "Languages::advanced_import.common_presets"
+msgid "Marketplace presets"
+msgstr ""
+
+msgctxt "Languages::advanced_import.file_not_loaded"
+msgid "File was not loaded. Please reload the page and try again."
+msgstr ""
+
+msgctxt "Languages::advanced_import.local_file_selected"
+msgid "Local file selected"
+msgstr ""
+
+msgctxt "Languages::advanced_import.text_popup_file_editor_notice_full_link"
+msgid "You can upload and download files via <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
 msgstr ""
 

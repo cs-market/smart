@@ -29,12 +29,14 @@
                         {__("product_state_description.`$description_suffix`", [
                             "[product]" => $smarty.const.PRODUCT_NAME,
                             "[standard_license_url]" => $config.resources.standard_license_url,
-                            "[ultimate_license_url]" => $config.resources.ultimate_license_url
+                            "[ultimate_license_url]" => $config.resources.ultimate_license_url,
+                            "[mve_plus_license_url]" => $config.resources.mve_plus_license_url,
+                            "[mve_ultimate_license_url]" => $config.resources.mve_ultimate_license_url
                         ])}
                     </div>
                     <label>{__("license_number")}:</label>
                     <input type="text" name="license_number" class="{if $store_mode_errors} type-error{/if}" value="{$store_mode_license}" placeholder="{__("please_enter_license_here")}">
-                    {if fn_allowed_for("ULTIMATE") && $store_mode_license && !$store_mode_errors && $store_mode != "trial"}
+                    {if $store_mode_license && !$store_mode_errors && $store_mode != "trial"}
                         <p>
                             {__("licensed_product")}: {$store_mode|fn_get_licensed_mode_name}
                         </p>

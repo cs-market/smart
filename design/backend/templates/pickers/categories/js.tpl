@@ -12,8 +12,8 @@
 {/if}
 {if $multiple}
     <tr {if !$clone}id="{$holder}_{$category_id}" {/if}class="cm-js-item {if $clone} cm-clone hidden{/if}">
-        {if $position_field}<td width="5%"><input type="text" name="{$input_name}[{$category_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro"{if $clone} disabled="disabled"{/if} /></td>{/if}
-        <td>
+        {if $position_field}<td width="5%" data-th="{__("position_short")}"><input type="text" name="{$input_name}[{$category_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro"{if $clone} disabled="disabled"{/if} /></td>{/if}
+        <td data-th="{__("name")}">
             {if !$show_only_name}
                 <a href="{"categories.update?category_id=`$category_id`"|fn_url}">{$category}</a>
             {else}
@@ -21,7 +21,7 @@
             {/if}
         </td>
         {hook name="category_picker:manage_data"}{/hook}
-        <td width="5%" class="nowrap">
+        <td width="5%" class="nowrap" data-th="&nbsp;">
         {if !$view_only || $show_only_name}
             {capture name="tools_list"}
                 <li>{btn type="list" text=__("edit") href="categories.update?category_id=`$category_id`"}</li>

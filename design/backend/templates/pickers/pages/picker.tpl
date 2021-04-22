@@ -57,8 +57,9 @@
     {/if}
 {if $view_mode != "button"}
     {if $multiple}
-    <div class="table-wrapper">
-        <table width="100%" class="table table-middle">
+    <div class="clearfix"></div>
+    <div class="table-responsive-wrapper">
+        <table width="100%" class="table table-middle table--relative table-responsive table-responsive-w-titles">
         <thead>
         <tr>
             {if $positions}<th>{__("position_short")}</th>{/if}

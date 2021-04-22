@@ -25,22 +25,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'manage' || $mode == 'update' || $mode == 'add') {
     $company_id = Registry::get('runtime.company_id');
-    $params = array(
+    $vendor_plans = [];
+    $default_vendor_plan = null;
+    $params = [
         'allowed_for_company_id' => $company_id,
-    );
+    ];
+
     if ($mode == 'update' || $mode == 'add') {
         $params['check_availability'] = true;
     }
     if (empty($company_id) || Registry::ifGet('addons.vendor_plans.allow_vendors_to_change_plan', 'N') == 'Y') {
         $vendor_plans = VendorPlan::model()->findMany($params);
+
+        foreach ($vendor_plans as $vendor_plan) {
+            if (!empty($vendor_plan->is_default)) {
+                $default_vendor_plan = $vendor_plan;
+                break;
+            }
+        }
+
+        if (!$default_vendor_plan) {
+            $default_vendor_plan = reset($vendor_plans);
+        }
     } else {
         $company_data = Tygh::$app['view']->getTemplateVars('company_data');
-        $vendor_plans = array(
-            VendorPlan::model()->find($company_data['plan_id'], array(
-                'allowed_for_company_id' => $company_id
-            ))
-        );
+
+        $default_vendor_plan = VendorPlan::model()->find($company_data['plan_id'], [
+            'allowed_for_company_id' => $company_id
+        ]);
+        $vendor_plans = [$default_vendor_plan];
     }
+
+    Tygh::$app['view']->assign('default_vendor_plan', $default_vendor_plan);
     Tygh::$app['view']->assign('vendor_plans', $vendor_plans);
 }
 

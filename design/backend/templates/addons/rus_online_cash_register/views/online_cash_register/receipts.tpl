@@ -9,7 +9,7 @@
     {assign var="return_current_url" value=$config.current_url|escape:url}
 
     {if $receipts}
-        <table width="100%" class="table table-middle">
+        <table width="100%" class="table table-middle table--relative">
             <thead>
                 <tr>
                     <th>{__("rus_online_cash_register.receipts_list.uuid")}</th>
@@ -42,7 +42,11 @@
                             <strong class="text-info">{__("rus_online_cash_register.receipts_list.status.`$receipt->getStatusCode()`")}</strong>
                         {/if}
                     </td>
-                    <td class="right">{include file="common/price.tpl" value=$receipt->getTotal() secondary_currency=$addons.rus_online_cash_register.currency}</td>
+                    <td class="right">
+                        {$curency_code = $receipt->getCurrency()}
+                        {$currencies.$curency_code.symbol nofilter}
+                        {$receipt->getTotal()}
+                    </td>
                     <td width="10%" class="right nowrap">
                         <div class="pull-right">
                             {capture name="tools_list"}

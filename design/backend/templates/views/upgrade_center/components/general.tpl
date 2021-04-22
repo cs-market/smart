@@ -5,7 +5,7 @@
     </div>
     <div class="upgrade-center_notice-table all">
         <div class="table-responsive-wrapper">
-            <table class="table table-condensed table-responsive">
+            <table class="table table-condensed table--relative table-responsive">
                 <thead>
                     <tr>
                         <th>{__("file")}</th>

@@ -16,7 +16,7 @@
                     <td width="80%"><input type="text" name="list_price_1c" value="{$list_price_1c}" class="span9" /></td>
                 </tr>
             </table>
-            <table class="table table-middle" width="100%">
+            <table class="table table-middle table--relative" width="100%">
                 <thead class="cm-first-sibling">
                     <tr>
                         <th width="15%">{__("usergroup_in_cscart")}</th>
@@ -73,7 +73,7 @@
             {if $addons.rus_exim_1c.exim_1c_check_prices == "Y"}
                 <hr>
                 {include file="common/subheader.tpl" title=__("test")}
-                <table class="table table-middle">
+                <table class="table table-middle table--relative">
                     {foreach from=$resul_test item="price" key="_key"}
                         <tr>
                             <td>{$price.price_1c}&nbsp;{if $price.price_1c == "base"}({__("base_price")}){/if}&nbsp;</td>

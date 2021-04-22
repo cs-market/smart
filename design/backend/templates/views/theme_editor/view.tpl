@@ -30,7 +30,7 @@ Tygh.te_custom_fonts = {$current_style.custom_fonts|to_json nofilter};
         </span>
 </span>
 
-<div class="theme-editor {if $theme_manifest.converted_to_css} te-converted-to-css{/if}" data-ca-te-use-dynamic-style="{if $runtime.vendor_id}true{else}false{/if}" id="theme_editor_container">
+<div class="theme-editor {if $theme_manifest.converted_to_css} te-converted-to-css{/if}" data-ca-te-use-dynamic-style="{if $runtime.vendor_id}true{else}false{/if}" id="theme_editor_container" data-bp-sidebar="true">
     <div class="te-overlay{if $is_theme_editor_allowed|default:true} hidden{/if}">
         <div class="te-notification-wrapper">
             <p class="notification-content alert-warning">{__("theme_editor.page_cant_be_configured")}</p>
@@ -155,8 +155,9 @@ Tygh.te_custom_fonts = {$current_style.custom_fonts|to_json nofilter};
                 <input type="text" class="hidden" name="logotypes_image_data[{$id}][object_id]" value="{$id}">
 
                 <div class="te-image te-favicon-wrap clearfix">
-                    <span class="te-bg-title">{__("theme_editor.favicon")}&nbsp;<i class="ty-icon-help-circle cm-tooltip" title="{__("theme_editor.favicon_size")}"></i></span>{include file="backend:views/theme_editor/components/fileuploader.tpl" var_name="logotypes_image_icon[`$id`]" disabled=$current_style.is_default}
+                    <span class="te-bg-title">{__("theme_editor.favicon")}</span>{include file="backend:views/theme_editor/components/fileuploader.tpl" var_name="logotypes_image_icon[`$id`]" disabled=$current_style.is_default}
                     <div class="te-favicon cm-te-logo" data-ca-image-area="favicon" style="background-image: url('{$image.image_path}'); background-repeat: no-repeat; background-position: center center;"></div>
+                    <div class="te-description">{__("theme_editor.favicon_size")}</div>
                 </div>
 
             </div>
@@ -200,7 +201,7 @@ Tygh.te_custom_fonts = {$current_style.custom_fonts|to_json nofilter};
                 {if $type == "favicon"}
                     {continue}
                 {/if}
-                <li {if $type == "theme"}class="active"{/if}><a data-ca-target-id="elm_logo_section_{$type}" title="{__("theme_editor.`$type`")}"><span>{__("theme_editor.`$type`")}</span></a></li>
+                <li {if $type == "theme"}class="active"{/if}><a data-ca-target-id="elm_logo_section_{$type}" title="{__("theme_editor_logo.`$type`")}"><span>{__("theme_editor_logo.`$type`")}</span></a></li>
                 {/foreach}
             </ul>
 
@@ -254,7 +255,7 @@ Tygh.te_custom_fonts = {$current_style.custom_fonts|to_json nofilter};
         <div class="te-colors clearfix">
             <label for="elm_te_{$name}">{__($field.description)}</label>
 
-            {$cp_value = ($current_style.data.$name)|default:"#ffffff"}
+            {$cp_value = ($current_style.data.$name)|default:(($field.default)|default:"#ffffff")}
 
             {include file="backend:views/theme_editor/components/colorpicker.tpl" cp_name="style[data][`$name`]" cp_id="storage_elm_te_`$name`" cp_value=$cp_value cp_class="cm-te-value-changer" cp_storage="theme_editor"}
         </div>
@@ -272,7 +273,7 @@ Tygh.te_custom_fonts = {$current_style.custom_fonts|to_json nofilter};
             <div class="ty-control-group control-group te-font-group">
                 <label for="elm_te_{$name}">{__($field.description)}</label>
                 <div class="te-select-box cm-te-selectbox cm-te-google cm-te-value-changer" tabindex="0" data-ca-select-box-default="{$current_style.data.$name}"><span></span><i class="ty-icon-d-arrow"></i>
-                    <input type="text" class="hidden cm-te-selectbox-storage" name="style[data][{$name}]" value="{if $current_style.data.$name}{$current_style.data.$name}{else}Arial,Helvetica,sans-serif{/if}">
+                    <input type="text" class="hidden cm-te-selectbox-storage" name="style[data][{$name}]" value="{if $current_style.data.$name}{$current_style.data.$name}{else}{$props_schema.fonts.families|key}{/if}">
 
                     <ul class="te-select-dropdown">
                         <li class="te-selectbox-group cm-te-selectbox-group">{__("theme_editor.system_fonts")}</li>

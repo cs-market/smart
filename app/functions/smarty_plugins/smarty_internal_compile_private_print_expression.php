@@ -133,11 +133,12 @@ class Smarty_Internal_Compile_Private_Print_Expression extends Smarty_Internal_C
     }
 
     /**
-    * @param object $compiler compiler object
-    * @param string $name     name of variable filter
-    * @param type   $output   embedded output
-    * @return string
-    */
+     * @param object $compiler compiler object
+     * @param string $name     name of variable filter
+     * @param string $output   embedded output
+     *
+     * @return string
+     */
     private function compile_output_filter($compiler, $name, $output)
     {
         $plugin_name = "smarty_variablefilter_{$name}";

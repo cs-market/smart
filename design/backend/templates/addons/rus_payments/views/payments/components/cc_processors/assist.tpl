@@ -50,8 +50,7 @@
 
 <div class="control-group">
     <label class="control-label cm-required"
-        for="{if $processor_params.mode !== "L"}payment_url_test{else}payment_url_live{/if}">{__("payment_url")}
-        {include file="common/tooltip.tpl" tooltip=__("addons.rus_payments.payment_url")}:
+        for="{if $processor_params.mode !== "L"}payment_url_test{else}payment_url_live{/if}">{__("payment_url")}:
     </label>
     <div class="controls">
         <input type="{if $processor_params.mode !== "L"}text{else}hidden{/if}"
@@ -60,6 +59,7 @@
         <input type="{if $processor_params.mode == "L"}text{else}hidden{/if}"
                name="payment_data[processor_params][payment_url_live]" id="payment_url_live"
                value="{$processor_params.payment_url_live}">
+        <p class="muted description">{__("addons.rus_payments.payment_url")}</p>
     </div>
 </div>
 

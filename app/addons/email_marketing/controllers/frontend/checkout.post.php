@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -37,8 +38,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 if ($mode == 'checkout') {
+    $user_email = isset($_REQUEST['user_email']) ? $_REQUEST['user_email'] : '';
 
-    if (Registry::get('addons.email_marketing.em_show_on_checkout') == 'Y' && !empty(Tygh::$app['session']['cart']['user_data']['email']) && !fn_em_is_email_subscribed(Tygh::$app['session']['cart']['user_data']['email'])) {
+    if (
+        Registry::get('addons.email_marketing.em_show_on_checkout') === YesNo::YES
+        && (
+            !empty($user_email)
+            || !empty(Tygh::$app['session']['cart']['user_data']['email'])
+        )
+        && !fn_em_is_email_subscribed($user_email ?: Tygh::$app['session']['cart']['user_data']['email'])
+    ) {
         Tygh::$app['view']->assign('show_subscription_checkbox', true);
     }
 }

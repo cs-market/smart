@@ -2,7 +2,7 @@
 <form action="{""|fn_url}" method="post" name="categories_m_addition_form">
 
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
     <thead>
     <tr class="cm-first-sibling">
         <th width="15%">{__("category_location")}</th>
@@ -53,9 +53,7 @@
             </select>
         </td>
         <td class="right nowrap" data-th="{__("tools")}">
-            <div class="hidden-tools">
-                {include file="buttons/multiple_buttons.tpl" item_id="new_cat_tag" on_add="fn_calculate_usergroups(Tygh.$(this).next('tr'));"}
-            </div>
+            {include file="buttons/multiple_buttons.tpl" item_id="new_cat_tag" on_add="fn_calculate_usergroups(Tygh.$(this).next('tr'));"}
         </td>
     </tr>
     </table>

@@ -1,17 +1,15 @@
-{if "ULTIMATE"|fn_allowed_for && $product_id && $runtime.company_id}
-    {assign var="product_data" value=$product_id|fn_get_product_data:$smarty.session.auth:$smarty.const.CART_LANGUAGE:"?:products.company_id,?:product_descriptions.product":false:false:false:false:false:false:true}
-    {if $product_data.company_id != $runtime.company_id}
-        {assign var="product" value=$product_data.product|default:$product}
-        {if $owner_company_id && $owner_company_id != $runtime.company_id}
-            {assign var="show_only_name" value=true}
-        {/if}
+{$product_data = $product_id|fn_get_product_data:$smarty.session.auth:$smarty.const.CART_LANGUAGE:"?:products.company_id,?:product_descriptions.product":false:false:false:false:false:false:true}
+{if $runtime.company_id && $product_data.company_id != $runtime.company_id}
+    {$product = $product_data.product|default:$product}
+    {if $owner_company_id && $owner_company_id != $runtime.company_id}
+        {$show_only_name = true}
     {/if}
 {/if}
 
 {if $type == "options"}
 <tr {if !$clone}id="{$root_id}_{$delete_id}" {/if}class="cm-js-item{if $clone} cm-clone hidden{/if}">
-{if $position_field}<td><input type="text" name="{$input_name}[{$delete_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro" {if $clone}disabled="disabled"{/if} /></td>{/if}
-<td>
+{if $position_field}<td data-th="&nbsp;"><input type="text" name="{$input_name}[{$delete_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro" {if $clone}disabled="disabled"{/if} /></td>{/if}
+<td data-th="{__("name")}">
     {$product}{if $show_only_name}{include file="views/companies/components/company_name.tpl" object=$product_data}{/if}
     {if $options}
         <br>
@@ -30,7 +28,7 @@
     {/if}
 </td>
     {if $amount_input == "text"}
-<td class="center">
+<td class="center" data-th="{__("quantity")}">
     {if $show_only_name}
         {$amount}
     {else}
@@ -44,7 +42,7 @@
 <td class="nowrap">
     {if !$hide_delete_button && !$show_only_name}
         {capture name="tools_list"}
-            <li>{btn type="list" icon="" text=__("delete") onclick="Tygh.$.cePicker('delete_js_item', '{$root_id}', '{$delete_id}', 'p'); return false;"}</li>
+            <li>{btn type="list" text=__("delete") onclick="Tygh.$.cePicker('delete_js_item', '{$root_id}', '{$delete_id}', 'p'); return false;"}</li>
         {/capture}
         <div class="hidden-tools">
             {dropdown content=$smarty.capture.tools_list}
@@ -56,12 +54,31 @@
 {elseif $type == "product"}
     <tr {if !$clone}id="{$root_id}_{$delete_id}" {/if}class="cm-js-item{if $clone} cm-clone hidden{/if}">
         {if $position_field}<td data-th="{__("position_short")}"><input type="text" name="{$input_name}[{$delete_id}]" value="{math equation="a*b" a=$position b=10}" size="3" class="input-micro" {if $clone}disabled="disabled"{/if} /></td>{/if}
-        <td data-th="{__("name")}">{if !$show_only_name}<a href="{"products.update?product_id=`$delete_id`"|fn_url}">{$product nofilter}</a>{else}{$product nofilter} {include file="views/companies/components/company_name.tpl" object=$product_data}{/if}</td>
-        <td class="mobile-hide">&nbsp;</td>
+        <td data-th="{__("name")}">
+            {hook name="product_picker:table_column_name"}
+                {if !$show_only_name}
+                    <a href="{"products.update?product_id=`$delete_id`"|fn_url}">{$product nofilter}</a>
+                {else}
+                    {$product nofilter}
+                {/if}
+                
+                {$product_data_for_company_name = [
+                    "company_name" => $company_name
+                ]}
+                
+                {if !$clone}
+                    {$product_data_for_company_name = $product_data}
+                {/if}
+                {include file="views/companies/components/company_name.tpl"
+                    object=$product_data_for_company_name
+                }
+            {/hook}
+        </td>
+        <td class="mobile-hide" data-th="&nbsp;">>&nbsp;</td>
         <td class="nowrap" data-th="{__("tools")}">{if !$hide_delete_button && !$show_only_name}
             {capture name="tools_list"}
-                <li>{btn type="list" icon="" text=__("edit") href="products.update?product_id=`$delete_id`"}</li>
-                <li>{btn type="list" icon="" text=__("remove") onclick="Tygh.$.cePicker('delete_js_item', '{$root_id}', '{$delete_id}', 'p'); return false;"}</li>
+                <li>{btn type="list" text=__("edit") href="products.update?product_id=`$delete_id`"}</li>
+                <li>{btn type="list" text=__("remove") onclick="Tygh.$.cePicker('delete_js_item', '{$root_id}', '{$delete_id}', 'p'); return false;"}</li>
             {/capture}
             <div class="hidden-tools">
                 {dropdown content=$smarty.capture.tools_list}
@@ -76,8 +93,8 @@
     <div class="input-append">
     <input class="cm-picker-value-description {$extra_class}" type="text" value="{$product}" {if $display_input_id}id="{$display_input_id}"{/if} size="10" name="product_name" readonly="readonly" {$extra} id="appendedInputButton">
 
-    {assign var="_but_text" value="<i class='icon-plus'></i>"}
-    {assign var="_but_role" value="icon"}
+    {$_but_text = "<i class='icon-plus'></i>"}
+    {$_but_role = "icon"}
 
     {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_href="products.picker?display=radio&company_ids=`$company_ids`&picker_for=`$picker_for`&extra=`$extra_var`&checkbox_name=`$checkbox_name`&except_id=`$except_id`&data_id=`$data_id``$extra_url`"|fn_url but_text=$_but_text but_role=$_but_role but_icon=$_but_icon but_target_id="content_`$data_id`" but_meta="`$but_meta` cm-dialog-opener add-on btn"}
 

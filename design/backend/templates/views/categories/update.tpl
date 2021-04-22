@@ -1,3 +1,9 @@
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 {if $category_data.category_id}
     {assign var="id" value=$category_data.category_id}
     {assign var="is_trash" value=$category_data.is_trash == 'Y'}
@@ -13,7 +19,9 @@
 
 {capture name="tabsbox"}
 
-<form action="{""|fn_url}" method="post" name="category_update_form" class="form-horizontal form-edit {if ""|fn_check_form_permissions} cm-hide-inputs{/if}" enctype="multipart/form-data">
+{$hide_inputs = ""|fn_check_form_permissions}
+
+<form action="{""|fn_url}" method="post" name="category_update_form" class="form-horizontal form-edit{if $hide_inputs} cm-hide-inputs{/if}" enctype="multipart/form-data">
 <input type="hidden" name="fake" value="1" />
 <input type="hidden" name="category_id" value="{$id}" />
 <input type="hidden" name="selected_section" value="{$smarty.request.selected_section}" />
@@ -159,16 +167,21 @@
 
 <div id="content_views">
     <div id="extra">
-        <div class="control-group">
-            <label class="control-label" for="elm_category_product_layout">{__("product_details_view")}:</label>
-            <div class="controls">
-            <select id="elm_category_product_layout" name="category_data[product_details_view]">
-                {foreach from="category"|fn_get_product_details_views key="layout" item="item"}
-                    <option {if $category_data.product_details_view == $layout}selected="selected"{/if} value="{$layout}">{$item}</option>
-                {/foreach}
-            </select>
+        {component
+            name="product.layout_input"
+            object="category"
+            id=$category_data.category_id|default:0
+            value=$category_data.product_details_view|default:"default"
+            input_name="category_data[product_details_view]"
+            company_id=$category_data.company_id
+        }
+            <div class="control-group">
+                <label class="control-label" for="elm_details_layout">{__("product_details_view")}:</label>
+                <div class="controls">
+                    #INPUT#
+                </div>
             </div>
-        </div>
+        {/component}
 
         <div class="control-group">
             <label class="control-label" for="elm_category_use_custom_templates">{__("use_custom_view")}:</label>
@@ -254,34 +267,23 @@
     <div class="sidebar-row">
         <h6>{__("categories")}</h6>
         <div class="nested-tree">
-            {include file="views/categories/components/categories_links_tree.tpl" show_all=false categories_tree=$categories_tree}
+            {include file="views/categories/components/categories_links_tree.tpl"
+                show_all=false
+                categories_tree=$categories_tree
+                direction=$direction
+            }
         </div>
     </div>
 {/if}
     {/hook}
 {/capture}
 
-{if !$id}
-    {include
-        file="common/mainbox.tpl"
-        title=__("new_category")
-        sidebar=$smarty.capture.sidebar
-        sidebar_position="left"
-        content=$smarty.capture.mainbox
-        buttons=$smarty.capture.buttons
-    }
-{else}
-    {include
-        file="common/mainbox.tpl"
-        sidebar=$smarty.capture.sidebar
-        sidebar_position="left"
-        title_start=__("editing_category")
-        title_end=$category_data.category
-        content=$smarty.capture.mainbox
-        select_languages=true
-        buttons=$smarty.capture.buttons
-        adv_buttons=$smarty.capture.adv_buttons
-    }
-{/if}
-
-
+{include file="common/mainbox.tpl"
+    sidebar=$smarty.capture.sidebar
+    sidebar_position="left"
+    title=($id) ? $category_data.category : __("new_category")
+    content=$smarty.capture.mainbox
+    select_languages=(bool) $id
+    buttons=$smarty.capture.buttons
+    adv_buttons=$smarty.capture.adv_buttons
+}

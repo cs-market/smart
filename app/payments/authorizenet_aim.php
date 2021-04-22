@@ -91,7 +91,7 @@ $post['x_encap_char'] = '|';
 
 // ISO 3166-1 alpha-3 country codes
 list($iso_codes) = fn_get_countries(array('country_codes' => array($order_info['b_country'], $order_info['s_country'])));
-$iso_codes = fn_array_column($iso_codes, 'code_A3', 'code');
+$iso_codes = array_column($iso_codes, 'code_A3', 'code');
 
 // Billing address
 $post['x_first_name'] = $order_info['b_firstname']; // !!!FIXME: Shoud have separate first/lastnames for shipping/billing

@@ -14,11 +14,9 @@
 
 namespace Tygh\Shippings;
 
+use Tygh\Tygh;
 use Tygh\Http;
 use Tygh\Registry;
-use Tygh\Shippings\Services;
-use Tygh\Tygh;
-use Tygh\Shippings\Shippings;
 
 class RealtimeServices
 {
@@ -26,7 +24,6 @@ class RealtimeServices
     const SERVICE_NOT_FOUND = 'shippings.service_not_found';
     const CURRENCY_NOT_FOUND = 'shippings.currency_not_found';
     const SERVICE_NOT_ERROR = '';
-    const REQUEST_ERRORS_THRESHOLD = 3;
 
     /**
      * Stack for registered shipping services
@@ -60,8 +57,7 @@ class RealtimeServices
     {
         if (function_exists('curl_multi_init') && Http::getCurlInfo() == '') {
             $allow_multithreading = true;
-            $h_curl_multi = curl_multi_init();
-            $threads = array();
+            curl_multi_init();
         } else {
             $allow_multithreading = false;
         }
@@ -86,21 +82,22 @@ class RealtimeServices
         $module = 'Tygh\\Shippings\\Services\\' . $module;
 
         if (class_exists($module)) {
-            $module_obj = new $module;
+            /** @var \Tygh\Shippings\IService $service */
+            $service = new $module;
 
-            if (isset($module_obj->calculation_currency)) {
+            if (isset($service->calculation_currency)) {
                 $currencies = Registry::get('currencies');
 
-                if (isset($currencies[$module_obj->calculation_currency])) {
-                    $shipping_info['package_info']['C'] = fn_format_price_by_currency($shipping_info['package_info']['C'], CART_PRIMARY_CURRENCY, $module_obj->calculation_currency);
+                if (isset($currencies[$service->calculation_currency])) {
+                    $shipping_info['package_info']['C'] = fn_format_price_by_currency($shipping_info['package_info']['C'], CART_PRIMARY_CURRENCY, $service->calculation_currency);
                 } else {
-                    return self::_processErrorCode(self::CURRENCY_NOT_FOUND, array('[currency]' => $module_obj->calculation_currency));
+                    return self::_processErrorCode(self::CURRENCY_NOT_FOUND, array('[currency]' => $service->calculation_currency));
                 }
             }
 
-            $module_obj->prepareData($shipping_info);
+            $service->prepareData($shipping_info);
 
-            self::$_services_stack[$shipping_key] = $module_obj;
+            self::$_services_stack[$shipping_key] = $service;
             self::$module[$shipping_key] = $shipping_info['module'];
         } else {
             return self::_processErrorCode(self::SERVICE_NOT_FOUND);
@@ -116,21 +113,20 @@ class RealtimeServices
      */
     public static function getRates()
     {
-        $_services = array(
-            'multi' => array(),
-            'simple' => array(),
-        );
+        $_services = [
+            'multi'  => [],
+            'simple' => [],
+        ];
 
         if (empty(self::$_services_stack)) {
-            return array();
+            return [];
         }
 
         if (self::_checkMultithreading()) {
             foreach (self::$_services_stack as $shipping_key => $service_object) {
+                $key = 'simple';
                 if ($service_object->allowMultithreading()) {
                     $key = 'multi';
-                } else {
-                    $key = 'simple';
                 }
 
                 $_services[$key][$shipping_key] = $service_object;
@@ -144,13 +140,16 @@ class RealtimeServices
             foreach ($_services['multi'] as $shipping_key => $service_object) {
                 self::$request_data[$shipping_key] = $data = $service_object->getRequestData();
 
-                $headers = empty($data['headers']) ? array() : $data['headers'];
+                $extra = [
+                    'callback'          => ['\Tygh\Shippings\RealtimeServices::multithreadingCallback', $shipping_key],
+                    'headers'           => !empty($data['headers']) ? $data['headers'] : [],
+                    'timeout'           => !empty($data['timeout']) ? $data['timeout'] : null,
+                    'execution_timeout' => !empty($data['execution_timeout']) ? $data['execution_timeout'] : null,
+                ];
                 if ($data['method'] == 'post') {
-                    Http::mpost($data['url'], $data['data'], array('callback' => array('\Tygh\Shippings\RealtimeServices::multithreadingCallback', $shipping_key), 'headers' => $headers));
+                    Http::mpost($data['url'], $data['data'], $extra);
                 } else {
-                    Http::mget($data['url'], $data['data'], array(
-                        'callback' => array('\Tygh\Shippings\RealtimeServices::multithreadingCallback', $shipping_key),
-                        'headers' => $headers));
+                    Http::mget($data['url'], $data['data'], $extra);
                 }
             }
 
@@ -170,36 +169,45 @@ class RealtimeServices
 
     public static function multithreadingCallback($result, $shipping_key)
     {
-        $object = self::$_services_stack[$shipping_key];
+        $service = self::$_services_stack[$shipping_key];
+        $rate = $service->processResponse($result);
 
-        $rate = $object->processResponse($result);
-
-        if (isset($object->calculation_currency) && $rate['cost'] !== false) {
-            $rate['cost'] = fn_format_price_by_currency($rate['cost'], $object->calculation_currency, CART_PRIMARY_CURRENCY);
+        if (isset($service->calculation_currency) && $rate['cost'] !== false) {
+            $rate['cost'] = fn_format_price_by_currency($rate['cost'], $service->calculation_currency, CART_PRIMARY_CURRENCY);
         }
 
-        if (Registry::get('settings.Logging.log_type_requests.shipping') == 'Y'
-            && (!isset($rate) || (isset($rate['cost']) && $rate['cost'] === false))
-        ) {
+        if (!isset($rate) || (isset($rate['cost']) && $rate['cost'] === false)) {
             self::sendShippingErrorMessage($shipping_key, $result);
+        }
+
+        $rate['pickup_info'] = [];
+        if ($service instanceof IPickupService) {
+            /** @var \Tygh\Shippings\IPickupService $service Shipping service */
+            $rate['pickup_info'] = [
+                'min_cost'                => $service->getPickupMinCost(),
+                'pickup_points'           => $service->getPickupPoints(),
+                'number_of_pickup_points' => $service->getPickupPointsQuantity(),
+            ];
         }
 
         /**
          * This hook allows you to modify the processed data received from a realtime shipping service.
          *
-         * @param array   $result       The result returned by the shipping service
-         * @param integer $shipping_key Shipping service array position
-         * @param object  $object       The object of the shipping method, the rates of which have just been calculated
-         * @param array   $rate         The result of the shipping rate calculation
+         * @param array    $result       The result returned by the shipping service
+         * @param integer  $shipping_key Shipping service array position
+         * @param IService $service      The object of the shipping method, the rates of which have just been calculated
+         * @param array    $rate         The result of the shipping rate calculation
          */
-        fn_set_hook('realtime_services_process_response_post', $result, $shipping_key, $object, $rate);
+        fn_set_hook('realtime_services_process_response_post', $result, $shipping_key, $service, $rate);
 
-        self::$_rates[] = array(
-            'price' => $rate['cost'],
-            'error' => $rate['error'],
-            'shipping_key' => $shipping_key,
-            'delivery_time' => isset($rate['delivery_time']) ? $rate['delivery_time'] : false,
-        );
+        self::$_rates[] = [
+            'price'          => $rate['cost'],
+            'error'          => $rate['error'],
+            'shipping_key'   => $shipping_key,
+            'delivery_time'  => isset($rate['delivery_time']) ? $rate['delivery_time'] : false,
+            'destination_id' => isset($rate['destination_id']) ? $rate['destination_id'] : false,
+            'pickup_info'    => $rate['pickup_info'],
+        ];
     }
 
     /**
@@ -220,7 +228,7 @@ class RealtimeServices
      * Sends a message to administrator about a shipping method error if the error occurred more than 3 time.
      *
      * @param integer $shipping_key Shipping service array position
-     * @param array   $result       The result returned by the shipping service
+     * @param mixed   $result       The result returned by the shipping service
      *
      * @return void
      */
@@ -229,22 +237,40 @@ class RealtimeServices
         $data = self::$request_data[$shipping_key];
         $shipping_info = Shippings::getCarrierInfo(self::$module[$shipping_key]);
 
-        if (!empty($data['url'])) {
-            fn_log_event('requests', 'shipping', array(
-                'url'      => $data['url'],
-                'response' => $result,
-                'data'     => var_export($data['data'], true),
-                'shipping' => self::$module[$shipping_key],
-            ));
+        if (!is_array(($data))) {
+            $data = (array) json_decode(json_encode($data), true);
         }
 
-        $params = array(
-            'period' => 'C',
+        if (!empty($data['url']) && isset($data['data'])) {
+
+            // result may be of any type and must be converted to a string to be stored in the database
+            if (is_resource($result)) {
+                $logged_response = '';
+            } elseif (is_string($result)) {
+                $logged_response = $result;
+            } else {
+                $logged_response = json_encode($result, JSON_UNESCAPED_UNICODE);
+            }
+
+            fn_log_event(
+                'requests',
+                'shipping',
+                [
+                    'url'      => $data['url'],
+                    'response' => $logged_response,
+                    'data'     => var_export($data['data'], true),
+                    'shipping' => self::$module[$shipping_key],
+                ]
+            );
+        }
+
+        $params = [
+            'period'    => 'C',
             'time_from' => time() - SECONDS_IN_HOUR,
-            'time_to' => time(),
-            'q_type' => 'requests',
-            'q_action' => 'shipping'
-        );
+            'time_to'   => time(),
+            'q_type'    => 'requests',
+            'q_action'  => 'shipping'
+        ];
 
         list($logs_data, $params) = fn_get_logs($params);
 
@@ -257,22 +283,9 @@ class RealtimeServices
             }
         }
 
-        if ($total_items >= self::REQUEST_ERRORS_THRESHOLD) {
-            /** @var \Tygh\Mailer\Mailer $mailer */
-            $mailer = Tygh::$app['mailer'];
+        if ($total_items >= Registry::ifGet('config.tweaks.request_errors_threshold', 30)) {
             $log_message = __('request_error_information', array('[shipping]' => $shipping_info['name']));
-
-            $mailer->send(array(
-                'to' => 'company_site_administrator',
-                'from' => 'default_company_site_administrator',
-                'data' => array(
-                    'shipping' => self::$module[$shipping_key],
-                    'log_message' => $log_message
-                ),
-                'template_code' => 'shipping_error',
-                'tpl' => 'shipping/shipping_error.tpl', // this parameter is obsolete and is used for back compatibility
-                'company_id' => $company_id,
-            ), 'A', Registry::get('settings.Appearance.backend_default_language'));
+            Tygh::$app['event.dispatcher']->dispatch('system.realtime_shipping_error.a', ['log_message' => $log_message]);
         }
     }
 }

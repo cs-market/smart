@@ -14,8 +14,8 @@
 
 <div id="content_email_templates_{$group_id}" {if $group_id != "C"}class="hidden"{/if}>
 <div class="items-container">
-    <div class="table-wrapper">
-        <table class="table table-middle table-objects table-responsive table-responsive-w-titles">
+    <div class="table-responsive-wrapper">
+        <table class="table table-middle table--relative table-objects table-responsive table-responsive-w-titles">
             <tbody>
                 {foreach from=$group item="email_template"}
                     {include file="common/object_group.tpl"
@@ -29,7 +29,7 @@
                         href_delete=""
                         delete_target_id=""
                         skip_delete=true
-                        header_text="{__("editing_email_template")}: `$email_template->getName()`"
+                        header_text=$email_template->getName()
                         no_popup=true
                         no_table=true
                         draggable=false
@@ -43,16 +43,6 @@
 </div>
 <!--content_email_templates_{$group_id}--></div>
 {/foreach}
-
-<div class="hidden" id="content_snippets">
-    {include file="views/snippets/components/list.tpl"
-        snippets=$snippets
-        type="mail"
-        addon=""
-        result_ids="content_snippets"
-        return_url=$return_url
-    }
-<!--content_snippets--></div>
 
 {/capture}
 {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox}
@@ -81,8 +71,6 @@
             <li>{include file="common/popupbox.tpl" id="import_email_templates_form" link_text=__("import") act="link" link_class="cm-dialog-auto-size" content="" general_class="action-btn"}</li>
         {/if}
     {/capture}
-
-    {include file="views/snippets/components/tools_list.tpl" additional_snippet_tools_list_items=$smarty.capture.tools_items}
 
     {dropdown content=$smarty.capture.tools_items class="cm-tab-tools hidden" id="tools_email_templates_C"}
     {dropdown content=$smarty.capture.tools_items class="cm-tab-tools hidden" id="tools_email_templates_A"}

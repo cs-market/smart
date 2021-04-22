@@ -22,14 +22,19 @@ namespace Tygh\Enum;
 class ProductTracking
 {
     /**
-     * Track product amount for every option combination
-     */
-    const TRACK_WITH_OPTIONS = 'O';
-
-    /**
      * Track product amount
      */
-    const TRACK_WITHOUT_OPTIONS = 'B';
+    const TRACK = 'B';
+
+    /**
+     * Backward compatibility
+     */
+    const TRACK_WITH_OPTIONS = self::TRACK;
+
+    /**
+     * Backward compatibility
+     */
+    const TRACK_WITHOUT_OPTIONS = self::TRACK;
 
     /**
      * Do not track product amount

@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Greek\n"
 "Language: el_GR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.8.2/addons/stripe_connect.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.12.2/addons/stripe_connect.po\n"
+"X-Crowdin-File-ID: 4192\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::stripe_connect"
 msgid "Stripe Connect payments"
@@ -40,9 +40,21 @@ msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
 
-msgctxt "Languages::stripe_connect.redirect_uris"
-msgid "Redirect URIs"
-msgstr "Redirect URLs"
+msgctxt "Languages::stripe_connect.stripe_connect_short"
+msgid "Stripe"
+msgstr "Stripe"
+
+msgctxt "Languages::stripe_connect.redirect_uri_admin"
+msgid "Redirect URI for administrator"
+msgstr "Τα URI ανακατεύθυνσης για τους διαχειριστές"
+
+msgctxt "Languages::stripe_connect.redirect_uris.description"
+msgid "Copy and paste this address into your Stripe Connect app settings"
+msgstr "Κάντε αντιγραφή και επικόλληση αυτήν την διεύθυνση μέσα στις ρυθμίσεις σύνδεσης της Stripe εφαρμογής σας"
+
+msgctxt "Languages::stripe_connect.redirect_uri_vendor"
+msgid "Redirect URI for vendor"
+msgstr "URI ανακατεύθυνσης για πωλητές"
 
 msgctxt "Languages::stripe_connect.client_id"
 msgid "Client ID"
@@ -127,4 +139,76 @@ msgstr "Μην αλλάξετε"
 msgctxt "Languages::stripe_connect.set_status_to"
 msgid "Set to:"
 msgstr "Ορισμός σε:"
+
+msgctxt "Languages::stripe_connect.charge_id"
+msgid "Charge ID"
+msgstr "Αναγνωριστικό Χρέωσης"
+
+msgctxt "Languages::stripe_connect.transfer_id"
+msgid "Transfer ID"
+msgstr "Αναγνωριστικό Μεταφοράς"
+
+msgctxt "Languages::stripe_connect.payment_id"
+msgid "Payment ID"
+msgstr "ID πληρωμής"
+
+msgctxt "Languages::stripe_connect.enable_3d_secure"
+msgid "Enable 3-D Secure"
+msgstr "Ενεργοποίηση Ασφάλειας 3-D"
+
+msgctxt "Languages::stripe_connect.enable_3d_secure.description"
+msgid "<p>When 3-D Secure is <b>disabled</b>, money will go straight to the connected Stripe accounts of vendors. Commissions and payouts will be taken from vendors as <a href=\"https://stripe.com/docs/connect/direct-charges#collecting-fees\" target=\"_blank\">application fees</a>.</p><p>When 3-D Secure is <b>enabled</b>, money will first go to the marketplace owner's Stripe account. Then it will be automatically distributed between the connected Stripe accounts via transfers. Transfers require that the marketplace owner and vendors have their accounts in the same region: either all in Europe, or all in the U.S. If a vendor's account is in a different region from the marketplace owner's, the money won't be transferred to that vendor automatically.</p>"
+msgstr "<p>Όταν το 3-D Secure είναι <b>απενεργοποιημένο</b>, τα χρήματα θα πηγαίνουν κατευθείαν στους συνδεδεμένους Stripe λογαριασμούς των πωλητών. Οι προμήθειες και οι μη καταβεβλημένες πληρωμές θα αφαιρούνται από τους λογαριασμούς των πωλητών σύμφωνα <a href=\"https://stripe.com/docs/connect/direct-charges#collecting-fees\" target=\"_blank\"> με τις προμήθειες της πλατφόρμας</a></p><p> Όταν το 3-D Secure είναι <b>ενεργοποιημένο</b>, τα χρήματα θα πηγαίνουν πρώτα στον λογαριασμό Stripe του ιδιοκτήτη του marketplace. Έπειτα, θα διανέμονται με αυτόματο τρόπο στους συνδεδεμένους Stripe λογαριασμούς μέσω της λειτουργίας της μεταφοράς. Οι λειτουργίες των μεταφορών απαιτούν ο ιδιοκτήτης του marketplace και οι πωλητές να έχουν όλοι λογαριασμούς στην ίδια περιοχή: είτε δηλαδή να είναι όλοι στην Ευρώπη, είτε να είναι όλοι στις Ηνωμένες Πολιτείες. Αν οι λογαριασμοί κάποιων πωλητών είναι σε διαφορετική περιοχή από τους λογαριασμούς του ιδιοκτήτη του marketplace, τα χρήματα σε αυτούς τους λογαριασμούς των πωλητών δεν θα μεταφέρονται με αυτόματο τρόπο.</p>"
+
+msgctxt "Languages::stripe_connect.gift_certificate_used"
+msgid "A gift certificate was used in this order. [product] doesn't know which of the vendors should get the money, and how much. Please transfer money from this order to each vendor manually."
+msgstr "Χρησιμοποιήθηκε μια δωροεπιταγή  για αυτήν την παραγγελία. Το [product] δεν είναι σε θέση να ξέρει ποιοι από τους πωλητές θα πρέπει να πάρουν χρήματα και τι ποσά ο καθένας. Παρακαλώ μεταφέρετε τα χρήματα από αυτήν την παραγγελία σε κάθε πωλητή με χειροκίνητο τρόπο."
+
+msgctxt "Languages::stripe_connect.payment_intent_error"
+msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
+msgstr "Παρουσιάστηκε ένα σφάλμα κατά την δημιουργία Πρόθεσης πληρωμής για την πληρωμή [payment_id]: [error]"
+
+msgctxt "Languages::log_type_stripe_connect"
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgctxt "Languages::log_action_sc_failure"
+msgid "Error"
+msgstr "Σφάλμα"
+
+msgctxt "Languages::stripe_connect.log_context"
+msgid "Context"
+msgstr "Context"
+
+msgctxt "Languages::stripe_connect.unexpected_payment_intent_status"
+msgid "Unexpected status \"[status]\" of PaymentIntent"
+msgstr "Μη αναμενόμενη κατάσταση \"[status]\" του PaymentIntent"
+
+msgctxt "Languages::stripe_connect.account_link_error"
+msgid "A vendor with company ID [company_id] is not linked to a Stripe account"
+msgstr "Ένας προμηθευτής με αναγνωριστικό εταιρείας [company_id] δεν είναι συνδεδεμένος με λογαριασμό Stripe"
+
+msgctxt "Languages::stripe_connect.transfer_creating_error"
+msgid "An error occurred during the creation of a Stripe transfer: [error]"
+msgstr "\n"
+"Παρουσιάστηκε σφάλμα κατά τη δημιουργία μιας μεταφοράς Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.charge_creating_error"
+msgid "An error occurred during the creation of a Stripe charge: [error]"
+msgstr "\n"
+"Παρουσιάστηκε σφάλμα κατά τη δημιουργία μιας χρέωσης Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_creating_error"
+msgid "An error occurred during the creation of a Stripe customer: [error]"
+msgstr "\n"
+"Παρουσιάστηκε σφάλμα κατά τη δημιουργία ενός πελάτη Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_sharing_error"
+msgid "An error occurred during the share of a Stripe customer: [error]"
+msgstr "Παρουσιάστηκε σφάλμα κατά την κοινή χρήση ενός πελάτη Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.stripe_processor_params_missing"
+msgid "Stripe processor params missing"
+msgstr "\n"
+"Λείπουν οι παράμετροι επεξεργαστή λωρίδων"
 

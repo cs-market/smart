@@ -161,12 +161,16 @@ msgid "Test mode"
 msgstr "Test mode"
 
 msgctxt "Languages::privileges.manage_providers"
-msgid "Manage social login providers"
-msgstr "Manage social login providers"
+msgid "Can edit"
+msgstr "Can edit"
 
 msgctxt "Languages::privileges.view_providers"
-msgid "View social login providers"
-msgstr "View social login providers"
+msgid "Can view"
+msgstr "Can view"
+
+msgctxt "Languages::privilege_groups.social_login"
+msgid "Social login"
+msgstr "Social login"
 
 msgctxt "Languages::hybrid_auth.instruction_facebook"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developers.facebook.com/apps' target='_blank'>Facebook Developers</a>."
@@ -224,3 +228,26 @@ msgctxt "Languages::hybrid_auth.facebook_oauth_redirect_uris"
 msgid "Valid OAuth redirect URIs"
 msgstr "Valid OAuth redirect URIs"
 
+msgctxt "Languages::hybrid_auth.live_redirect_urls"
+msgid "Redirect URLs"
+msgstr "Redirect URLs"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_version"
+msgid "API version"
+msgstr "API version"
+
+msgctxt "Languages::ttc_hybrid_auth.linkedin_api_version"
+msgid "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">deprecated API v1</a>, but old apps still use it. If you're configuring LinkedIn app for the first time now, use API v2. Old LinkedIn apps configured some time ago may still be using v1."
+msgstr "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">deprecated API v1</a>, but old apps still use it. If you're configuring LinkedIn app for the first time now, use API v2. Old LinkedIn apps configured some time ago may still be using v1."
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v1"
+msgid "v1"
+msgstr "v1"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v2"
+msgid "v2"
+msgstr "v2"
+
+msgctxt "Languages::hybrid_auth.instruction_paypal_application"
+msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
+msgstr "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."

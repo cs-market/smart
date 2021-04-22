@@ -17,7 +17,7 @@ class ReceiptRequestTest extends PHPUnit_Framework_TestCase
     protected $payment_address = 'г. Москва ул. Ленина д. 20';
     protected $callback_url = 'https://example.com/callback';
 
-    /**
+        /**
      * @param $receipt
      * @param $expected
      * @dataProvider dpJson
@@ -69,9 +69,9 @@ class ReceiptRequestTest extends PHPUnit_Framework_TestCase
                     'timestamp' => '10.01.2017 02:24:56 PM',
                     'external_id' => 'order_10_' . strtotime('10.01.2017 14:24:56'),
                     'service' => array(
-                        'inn' => $this->inn,
                         'callback_url' => $this->callback_url,
-                        'payment_address' => $this->payment_address
+                        'inn' => $this->inn,
+                        'payment_address' => $this->payment_address,
                     ),
                     'receipt' => array(
                         'total' => 1013.00,
@@ -142,9 +142,9 @@ class ReceiptRequestTest extends PHPUnit_Framework_TestCase
                     'timestamp' => '10.01.2017 02:24:56 PM',
                     'external_id' => 'order_10_' . strtotime('10.01.2017 14:24:56'),
                     'service' => array(
-                        'inn' => $this->inn,
                         'callback_url' => $this->callback_url,
-                        'payment_address' => $this->payment_address
+                        'inn' => $this->inn,
+                        'payment_address' => $this->payment_address,
                     ),
                     'receipt' => array(
                         'total' => 1013.00,

@@ -1,21 +1,20 @@
 {if "THEMES_PANEL"|defined}
-    {$sticky_top = 40}
+    {$sticky_top = -5}
     {$sticky_padding = 35}
 {else}
-    {$sticky_top = 40}
+    {$sticky_top = -40}
     {$sticky_padding = 0}
 {/if}
 
 {function menu_attrs attrs=[]}
     {foreach $attrs as $attr => $value}
-        {$attr}="{$value}" 
+        {$attr}="{$value}"
     {/foreach}
 {/function}
-<div class="navbar-admin-top">
+<div class="navbar-admin-top cm-sticky-scroll" data-ca-stick-on-screens="sm-large,md,md-large,lg,uhd" data-ca-top="{$sticky_top}" data-ca-padding="{$sticky_padding}">
     <!--Navbar-->
     <div class="navbar navbar-inverse mobile-hidden" id="header_navbar">
-        <div class="navbar-inner">
-
+        <div class="navbar-inner{if $runtime.is_current_storefront_closed || $runtime.are_all_storefronts_closed} navbar-inner--disabled{/if}">
         {if $runtime.company_data.company}
             {$name = $runtime.company_data.company}
         {else}
@@ -23,69 +22,66 @@
         {/if}
 
         {if "ULTIMATE"|fn_allowed_for}
+            {if $runtime.is_current_storefront_closed || $runtime.are_all_storefronts_closed}
+                {$storefront_status_icon = "icon-lock"}
+            {elseif $runtime.have_closed_storefronts}
+                {$storefront_status_icon = "icon-unlock-alt"}
+            {/if}
+
             <div class="nav-ult">
                 {hook name="menu:storefront_icon"}
-                {if !$runtime.company_data.company_id}
-                    {assign var="name" value=__("all_vendors")}
-                {/if}
+                    {if !$runtime.company_data.company_id}
+                        {$name = __("all_vendors")}
+                    {/if}
                 <li class="nav-company">
-                {if $runtime.company_data.storefront}
-                    <a href="{"?company_id=`$runtime.company_data.company_id`"|fn_url:"C"}" target="_blank" class="brand" title="{__("view_storefront")}">
+                    {if $runtime.are_all_storefronts_closed}
+                        {$title = __("no_active_storefronts")}
+                    {else}
+                        {$title = __("view_storefront")}
+                    {/if}
+                    {$storefront_url = fn_url("profiles.act_as_user?user_id={$auth.user_id}&area=C")}
+                    <a href="{$storefront_url}" target="_blank" class="brand" title="{$title}">
                         <i class="icon-shopping-cart icon-white"></i>
                     </a>
-                {else}
-                    <a class="brand" title="{__("storefront_url_not_defined")}"><i class="icon-shopping-cart icon-white cm-tooltip"></i></a>
-                {/if}
                 </li>
                 {/hook}
-                {if $runtime.companies_available_count > 1}
+                {if $runtime.company_id || $runtime.forced_company_id}
                     <ul class="nav">
-                    {capture name="extra_content"}
-                        {if fn_check_view_permissions("companies.manage", "GET")}
-                            <li class="divider"></li>
-                            <li><a href="{"companies.manage?switch_company_id=0"|fn_url}">{__("manage_stores")}...</a></li>
-                        {/if}
-                    {/capture}
-
-                    {include file="common/ajax_select_object.tpl"
-                        data_url="companies.get_companies_list?show_all=Y&action=href"
-                        text=$name
-                        id="top_company_id"
-                        type="list"
-                        extra_content=$smarty.capture.extra_content
-                    }
-
-                    </ul>
-                {else}
-                    <ul class="nav">
-                        {if $auth.company_id}
-                            <li class="dropdown">
-                                <a href="{"companies.update?company_id=`$runtime.company_id`"|fn_url}">{__("vendor")}: {$runtime.company_data.company}</a>
-                            </li>
-                        {else}
-                            {if fn_check_view_permissions("companies.manage", "GET")}
-                                <li class="dropdown vendor-submenu">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        <span>{$name|truncate:60:"...":true}</span><b class="caret"></b>
-                                    </a>
-                                    <ul class="dropdown-menu" id="top_company_id_ajax_select_object">
-                                        <li><a href="{"companies.manage?switch_company_id=0"|fn_url}">{__("manage_stores")}...</a></li>
-                                    </ul>
-                                </li>
-                            {/if}
-                        {/if}
+                        <li class="dropdown">
+                            <a href="{"companies.update?company_id=`$runtime.company_data.company_id`"|fn_url}">{__("storefront")}: {$runtime.company_data.company}</a>
+                        </li>
                     </ul>
                 {/if}
             </div>
         {/if}
 
         {if "MULTIVENDOR"|fn_allowed_for && !$runtime.simple_ultimate}
+
+            {if $runtime.are_all_storefronts_closed}
+                {$storefront_status_icon = "icon-lock"}
+            {elseif $runtime.have_closed_storefronts}
+                {$storefront_status_icon = "icon-unlock-alt"}
+            {/if}
+
             <ul class="nav">
                 <li class="nav-company">
-                    <a href="{$config.http_location|fn_url|escape}" target="_blank" class="brand" title="{__("view_storefront")}">
+                    {if $auth.user_type == "UserTypes::ADMIN"|enum}
+                        {$storefront_url = fn_url("profiles.act_as_user?user_id={$auth.user_id}&area=C")}
+                    {else}
+                        {$storefront_url = ($runtime.company_id) ? "companies.products?company_id={$runtime.company_id}" : ""}
+                        {$storefront_url = fn_url($storefront_url, "C")}
+                        {if $runtime.storefront_access_key}
+                            {$storefront_url = $storefront_url|fn_link_attach:"store_access_key={$runtime.storefront_access_key}"}
+                        {/if}
+                    {/if}
+                    <a href="{$storefront_url}" target="_blank" class="brand" title="{__("view_storefront")}">
                         <i class="icon-shopping-cart icon-white"></i>
                     </a>
-                    <a href="{""|fn_url}" class="brand company-name">{$settings.Company.company_name|truncate:60:"...":true}</a>
+                    {if $storefront_status_icon && fn_check_view_permissions("storefronts.manage", "GET")}
+                    <a href="{"storefronts.manage"|fn_url}" class="brand">
+                        <i class="{$storefront_status_icon} dropdown-menu__icon"></i>
+                    </a>
+                    {/if}
                     {if $runtime.customization_mode.live_editor}
                         {assign var="company_name" value=$runtime.company_data.company}
                     {else}
@@ -96,19 +92,14 @@
                     <li class="dropdown">
                         <a href="{"companies.update?company_id=`$runtime.company_id`"|fn_url}">{__("vendor")}: {$runtime.company_data.company}</a>
                     </li>
-                {else}
-                    {if fn_check_view_permissions("companies.get_companies_list", "GET")}
-                        {capture name="extra_content"}
-                            <li class="divider"></li>
-                            <li><a href="{"companies.manage?switch_company_id=0"|fn_url}">{__("manage_vendors")}...</a></li>
-                        {/capture}
-
-                        {include file="common/ajax_select_object.tpl" data_url="companies.get_companies_list?show_all=Y&action=href" text=$company_name id="top_company_id" type="list" extra_content=$smarty.capture.extra_content}
-                    {else}
-                        <li class="dropdown">
-                            <a class="unedited-element">{$company_name}</a>
-                        </li>
-                    {/if}
+                {elseif $runtime.company_id && fn_check_view_permissions("companies.update", "GET")}
+                    <li class="dropdown">
+                        <a href="{"companies.update?company_id=`$runtime.company_id`"|fn_url}">{$company_name}</a>
+                    </li>
+                {elseif $runtime.company_id}
+                    <li class="dropdown">
+                        <a class="unedited-element">{$company_name}</a>
+                    </li>
                 {/if}
             </ul>
         {/if}
@@ -118,17 +109,26 @@
 
                 {foreach from=$navigation.static.top key=first_level_title item=m name="first_level_top"}
                     <li class="dropdown dropdown-top-menu-item{if $first_level_title == $navigation.selected_tab} active{/if} navigate-items">
-                        <a id="elm_menu_{$first_level_title}" href="#" class="dropdown-toggle {$first_level_title}" data-toggle="dropdown">
+                        <a id="elm_menu_{$first_level_title}" href="{if $m.href}{$m.href|fn_url}{else}#{/if}" class="dropdown-toggle {$first_level_title}">
                             {__($first_level_title)}
-                            <b class="caret"></b>
+                            {if $m.items}
+                                <b class="caret"></b>
+                            {/if}
                         </a>
+                        {if $m.items}
                         <ul class="dropdown-menu">
                             {foreach from=$m.items key=second_level_title item="second_level" name="sec_level_top"}
                                 <li class="{if $second_level.subitems}dropdown-submenu{/if}{if $second_level_title == $navigation.subsection} active{/if} {if $second_level.is_promo}cm-promo-popup{/if} {$second_level.attrs.class}" {menu_attrs attrs=$second_level.attrs.main}>
                                     {if $second_level.type == "title"}
-                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}" {if $second_level.attrs.class_href}class="{$second_level.attrs.class_href}"{/if} {menu_attrs attrs=$second_level.attrs.href}>{$second_level.title|default:__($second_level_title)}</a>
+                                        {if $second_level.subitems}<div class="dropdown-submenu__link-overlay"></div>{/if}
+                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}" class="{if $second_level.subitems}dropdown-submenu__link{/if} {if $second_level.attrs.class_href}{$second_level.attrs.class_href}{/if}" {menu_attrs attrs=$second_level.attrs.href}>
+                                            {$second_level.title|default:__($second_level_title)}
+                                            {if $second_level.attrs.class == "is-addon"}<span><i class="icon-is-addon"></i></span>{/if}
+                                        </a>
                                     {elseif $second_level.type != "divider"}
-                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}" {if $second_level.attrs.class_href}class="{$second_level.attrs.class_href}"{/if} href="{$second_level.href|fn_url}" {menu_attrs attrs=$second_level.attrs.href}>{$second_level.title|default:__($second_level_title)}
+                                        {if $second_level.subitems}<div class="dropdown-submenu__link-overlay"></div>{/if}
+                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}" class="{if $second_level.subitems}dropdown-submenu__link{/if} {if $second_level.attrs.class_href}{$second_level.attrs.class_href}{/if}" href="{$second_level.href|fn_url}" {menu_attrs attrs=$second_level.attrs.href}>
+                                            {$second_level.title|default:__($second_level_title)}
                                             {if $second_level.attrs.class == "is-addon"}<span><i class="icon-is-addon"></i></span>{/if}
                                         </a>
                                     {/if}
@@ -140,7 +140,9 @@
                                                     {if $sm.type == "title"}
                                                         {__($subitem_title)}
                                                     {elseif $sm.type != "divider"}
-                                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}_{$subitem_title}" href="{$sm.href|fn_url}" {menu_attrs attrs=$sm.attrs.href}>{$sm.title|default:__($subitem_title)}</a>
+                                                        <a id="elm_menu_{$first_level_title}_{$second_level_title}_{$subitem_title}" {if $sm.attrs.class}class="{$sm.attrs.class}"{/if} href="{$sm.href|fn_url}" {menu_attrs attrs=$sm.attrs.href}>{$sm.title|default:__($subitem_title)}
+                                                            {if $sm.attrs.class == "is-addon"}<span><i class="icon-is-addon"></i></span>{/if}
+                                                        </a>
                                                     {/if}
                                                 </li>
                                                 {elseif $sm.type == "divider"}
@@ -155,6 +157,7 @@
                                 {/if}
                             {/foreach}
                         </ul>
+                        {/if}
                     </li>
                 {/foreach}
             {/if}
@@ -174,6 +177,10 @@
                 {/if}
                 <!--end language-->
 
+                <!-- Notification Center -->
+                    {include file="components/notifications_center/opener.tpl"}
+                <!-- /Notification Center -->
+
                 <!--Curriencies-->
                 {if $currencies|sizeof > 1}
                 {include file="common/select_object.tpl" style="dropdown" link_tpl=$config.current_url|fn_link_attach:"currency=" items=$currencies selected_id=$secondary_currency display_icons=false key_name="description" key_selected="currency_code"}
@@ -183,9 +190,9 @@
                 <li class="divider-vertical"></li>
 
                 <!-- user menu -->
-                <li class="dropdown dropdown-top-menu-item">
+                <li class="dropdown dropdown-top-menu-item dropdown--open-enable">
                     {hook name="index:top_links"}
-                        <a class="dropdown-toggle" data-toggle="dropdown">
+                        <a class="dropdown-toggle">
                             <i class="icon-white icon-user"></i>
                             <b class="caret"></b>
                         </a>
@@ -197,6 +204,21 @@
                         <li class="divider"></li>
                         {hook name="menu:profile"}
                         <li><a href="{"profiles.update?user_id=`$auth.user_id`"|fn_url}">{__("edit_profile")}</a></li>
+                        {if "MULTIVENDOR"|fn_allowed_for && !$runtime.simple_ultimate && $auth.user_type == "UserTypes::ADMIN"|enum && fn_check_view_permissions("companies.get_companies_list", "GET") && fn_check_view_permissions("profiles.login_as_vendor", "POST")}
+                            <li id="company_picker_dropdown_menu"
+                                class="js-company-switcher"
+                                data-ca-switcher-param-name="company_id"
+                                data-ca-switcher-data-name="company_id">
+                                {include file="views/companies/components/picker/picker.tpl"
+                                    input_name=$companies_picker_name
+                                    item_ids=[$runtime.company_data.company_id]
+                                    type="list"
+                                    show_advanced=false
+                                    selection_title_pre=__("log_in_as_vendor")
+                                    dropdown_parent_selector="#company_picker_dropdown_menu"
+                                }
+                            </li>
+                        {/if}
                         <li><a href="{"auth.logout"|fn_url}">{__("sign_out")}</a></li>
                         {if !$runtime.company_id}
                             <li class="divider"></li>
@@ -215,15 +237,17 @@
     <!--header_navbar--></div>
 
     <!--Subnav-->
-    <div class="subnav cm-sticky-scroll" data-ca-stick-on-screens="sm-large,md,md-large,lg,uhd" data-ca-top="{$sticky_top}" data-ca-padding="{$sticky_padding}" id="header_subnav">
+    <div class="subnav" id="header_subnav">
         <!--quick search-->
         <div class="search pull-right">
             {hook name="index:global_search"}
-                <form id="global_search" method="get" action="{""|fn_url}">
+                <form id="global_search" method="get" action="{""|fn_url}" class="search__form">
                     <input type="hidden" name="dispatch" value="search.results" />
                     <input type="hidden" name="compact" value="Y" />
-                    <button class="icon-search cm-tooltip " type="submit" title="{__("search_tooltip")}" id="search_button"></button>
-                    <label for="gs_text"><input type="text" class="cm-autocomplete-off" id="gs_text" name="q" value="{$smarty.request.q}" /></label>
+                    <label for="gs_text" class="search__group">
+                        <input type="text" class="cm-autocomplete-off search__input" id="gs_text" name="q" placeholder="{__("search")}" value="{$smarty.request.q}" />
+                        <button class="btn search__button" type="submit" id="search_button"></button>
+                    </label>
                 </form>
             {/hook}
 
@@ -241,81 +265,15 @@
 
                 <button class="btn btn-primary mobile-visible-inline mobile-menu-closer">{__("close")}</button>
 
-                {if "ULTIMATE"|fn_allowed_for}
-                    <!-- title of heading -->
-                    <p class="menu-heading__title-block ult">
-                        <span class="menu-heading__title-block--text">
-                            {if $auth.company_id}
-                                <span>{$runtime.company_data.company}</span>
-                            {else}
-                                {if fn_check_view_permissions("companies.manage", "GET")}
-                                    <span>{$name|truncate:60:"...":true}</span>
-                                {/if}
-                            {/if}
-                            <span class="caret"></span>
-                        </span>
-                    </p>
-                {/if}
 
-                {if "MULTIVENDOR"|fn_allowed_for && !$runtime.simple_ultimate}
-                    <!-- title of heading (if multivendor edition) -->
-                    <p class="menu-heading__title-block mve">
-                        <span class="menu-heading__title-block--text">
-                            <span>{$company_name}</span>
-                            <span class="caret"></span>
-                        </span>
-                    </p>
-                {/if}
+                <!-- title of heading -->
+                <div class="menu-heading__title-block">
+                    <span class="menu-heading__title-text">{$user_info.email}</span>
+                    <span class="caret menu-heading__title-caret"></span>
+                </div>
 
                 <div class="menu-heading__dropdowned closed">
                 <ul class="dropdown-menu menu-heading__dropdowned-menu">
-                    {* select vendor *}
-                    {if "MULTIVENDOR"|fn_allowed_for && !$runtime.simple_ultimate}
-                        <li class="divider"></li>
-                        {if $auth.company_id}
-                            <li class="dropdown" data-disable-dropdown-processing="true">
-                                <a href="{"companies.update?company_id=`$runtime.company_id`"|fn_url}">{__("vendor")}: {$runtime.company_data.company}</a>
-                            </li>
-                        {else}
-                            {if fn_check_view_permissions("companies.get_companies_list", "GET")}
-                                <li class="dropdown" data-disable-dropdown-processing="true">
-                                    <a
-                                        class="unedited-element mobile-menu--js-companies-popup"
-                                        data-ca-selector-href="companies.get_companies_list?show_all=Y&action=href&render_html=N"\
-                                        data-ca-selector-elements="20"
-                                        data-ca-selector-start="0"
-                                    >{$company_name}</a>
-                                </li>
-                            {else}
-                                <li class="dropdown" data-disable-dropdown-processing="true">
-                                    <a class="unedited-element">{$company_name}</a>
-                                </li>
-                            {/if}
-                        {/if}
-                    {/if}
-                    {* end select vendor *}
-
-                    {* select store *}
-                    {if "ULTIMATE"|fn_allowed_for}
-                        {if $runtime.companies_available_count > 1}
-                            {if fn_check_view_permissions("companies.get_companies_list", "GET")}
-                                <li class="dropdown" data-disable-dropdown-processing="true">
-                                    <a
-                                        class="unedited-element mobile-menu--js-companies-popup"
-                                        data-ca-selector-href="companies.get_companies_list?show_all=Y&action=href&render_html=N"\
-                                        data-ca-selector-elements="20"
-                                        data-ca-selector-start="0"
-                                    >{$name}</a>
-                                </li>
-                            {else}
-                                <li class="dropdown" data-disable-dropdown-processing="true">
-                                    <a class="unedited-element">{$name}</a>
-                                </li>
-                            {/if}
-                        {/if}
-                    {/if}
-                    {* end select store *}
-
                     {* user menu *}
                     <li class="disabled">
                         <a><strong>{__("signed_in_as")}</strong><br>{$user_info.email}</a>
@@ -349,20 +307,29 @@
             <ul class="nav hover-show nav-pills nav-child mobile-visible nav-first">
             {if $runtime.company_data.storefront}
                 <li class="dropdown">
-                    <a  href="{"?company_id=`$runtime.company_data.company_id`"|fn_url:"C"}" 
-                        target="_blank" 
+                    {$storefront_url = fn_url("profiles.act_as_user?user_id={$auth.user_id}&area=C")}
+                    <a  href="{$storefront_url}"
+                        target="_blank"
                         title="{__("view_storefront")}"
-                        class="dropdown-toggle">{__("view_storefront")}</a>
+                        class="dropdown-toggle"
+                    >{__("view_storefront")}</a>
                 </li>
-            {else}
-                {if "MULTIVENDOR"|fn_allowed_for}
-                    <li class="dropdown">
-                        <a  href="{""|fn_url:"C"}"
-                            target="_blank"
-                            title="{__("view_storefront")}"
-                            class="dropdown-toggle">{__("view_storefront")}</a>
-                    </li>
-                {/if}
+            {elseif "MULTIVENDOR"|fn_allowed_for}
+                <li class="dropdown">
+                    {if $auth.user_type == "UserTypes::ADMIN"|enum}
+                        {$storefront_url = fn_url("profiles.act_as_user?user_id={$auth.user_id}&area=C")}
+                    {else}
+                        {$storefront_url = fn_url("", "C")}
+                        {if $runtime.storefront_access_key}
+                            {$storefront_url = $storefront_url|fn_link_attach:"store_access_key={$runtime.storefront_access_key}"}
+                        {/if}
+                    {/if}
+                    <a  href="{$storefront_url}"
+                        target="_blank"
+                        title="{__("view_storefront")}"
+                        class="dropdown-toggle"
+                    >{__("view_storefront")}</a>
+                </li>
             {/if}
                 <li class="dropdown"><a href="{""|fn_url}" class="dropdown-toggle">{__("home")}</a></li>
             </ul>
@@ -372,13 +339,15 @@
             <ul class="nav hover-show nav-pills nav-child">
             {foreach from=$navigation.static.central key=first_level_title item=m name="first_level"}
                 <li class="dropdown {if $first_level_title == $navigation.selected_tab} active{/if} ">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" >
-                        {__($first_level_title)}
+                    <a href="#" class="dropdown-toggle">
+                        {$m.title|default:__($first_level_title)}
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
                         {foreach from=$m.items key=second_level_title item="second_level" name="sec_level"}
-                            <li class="{$second_level_title}{if $second_level.subitems} dropdown-submenu{/if}{if $second_level_title == $navigation.subsection && $first_level_title == $navigation.selected_tab} active{/if}" {menu_attrs attrs=$second_level.attrs.main}><a class="{if $second_level.is_promo}cm-promo-popup{/if} {$second_level.attrs.class}" {if !$second_level.is_promo}href="{$second_level.href|fn_url}"{/if} {menu_attrs attrs=$second_level.attrs.href}>
+                            <li class="{$second_level_title}{if $second_level.subitems} dropdown-submenu{/if}{if $second_level_title == $navigation.subsection && $first_level_title == $navigation.selected_tab} active{/if}" {menu_attrs attrs=$second_level.attrs.main}>
+                                {if $second_level.subitems}<div class="dropdown-submenu__link-overlay"></div>{/if}
+                                <a class="{if $second_level.is_promo}cm-promo-popup{/if} {if $second_level.subitems}dropdown-submenu__link{/if} {$second_level.attrs.class}" {if !$second_level.is_promo}href="{$second_level.href|fn_url}"{/if} {menu_attrs attrs=$second_level.attrs.href}>
                                 <span>{__($second_level_title)}{if $second_level.attrs.class == "is-addon"}<i class="icon-is-addon"></i>{/if}</span>
                                 {if __($second_level.description) != "_`$second_level_title`_menu_description"}{if $settings.Appearance.show_menu_descriptions == "Y"}<span class="hint">{__($second_level.description)}</span>{/if}{/if}</a>
 
@@ -402,7 +371,7 @@
             <ul class="nav hover-show nav-pills nav-child mobile-visible">
             {foreach from=$navigation.static.top key=first_level_title item=m name="first_level_top"}
                 <li class="dropdown dropdown-top-menu-item{if $first_level_title == $navigation.selected_tab} active{/if} navigate-items">
-                    <a id="elm_menu_{$first_level_title}" href="#" class="dropdown-toggle {$first_level_title}" data-toggle="dropdown">
+                    <a id="elm_menu_{$first_level_title}" href="#" class="dropdown-toggle {$first_level_title}">
                         {__($first_level_title)}
                         <b class="caret"></b>
                     </a>
@@ -480,23 +449,3 @@
     <div class="overlayed-mobile-menu-container"></div>
 </div>
 {* End of template for mobile sidebar menu *}
-
-{* Dummy containers for store/vendor selector *}
-<div class="hidden store-vendor-selector--dummy-dialog"></div>
-
-<ul class="hidden store-vendor-selector--list-container">
-    <input 
-        class="store-vendor-selector--search cm-ajax-content-input"
-        type="text"
-        value=""
-        placeholder="{__("search")}"
-    />
-    <div class="store-vendor-selector--list-wrapper-container">
-        <ul class="store-vendor-selector--list-wrapper"></ul>
-    </div>
-</ul>
-<li class="hidden store-vendor-selector--list-element">
-    <a class="store-vendor-selector--list-element-link" href="#"></a>
-</li>
-<button class="hidden btn btn-primary store-vendor-selector--show-more-btn">{__("more")}</button>
-{* Dummy containers for store/vendor selector *}

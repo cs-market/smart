@@ -12,7 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -175,7 +175,7 @@ function fn_update_static_data($data, $param_id, $section, $lang_code = DESCR_SL
         $data['section'] = $section;
 
         $param_id = $data['param_id'] = db_query("INSERT INTO ?:static_data ?e", $data);
-        foreach (fn_get_translation_languages() as $data['lang_code'] => $_v) {
+        foreach (Languages::getAll() as $data['lang_code'] => $_v) {
             db_query('REPLACE INTO ?:static_data_descriptions ?e', $data);
         }
     }

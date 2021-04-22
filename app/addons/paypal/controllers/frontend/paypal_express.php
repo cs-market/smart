@@ -44,10 +44,19 @@ if ($mode == 'express_return') {
 } elseif ($mode == 'express') {
 
     Tygh::$app['session']['cart'] = empty(Tygh::$app['session']['cart']) ? array() : Tygh::$app['session']['cart'];
+    $cart = &Tygh::$app['session']['cart'];
 
-    $payment_id = (empty($_REQUEST['payment_id']) ? Tygh::$app['session']['cart']['payment_id'] : $_REQUEST['payment_id']);
+    if (!empty($_REQUEST['payment_id'])) {
+        $cart = fn_checkout_update_payment($cart, $auth, $_REQUEST['payment_id']);
+    }
 
-    $result = fn_paypal_set_express_checkout($payment_id, 0, array(), Tygh::$app['session']['cart'], AREA);
+    if (!empty($cart['payment_surcharge'])) {
+        $cart['total'] += $cart['payment_surcharge'];
+    }
+
+    $payment_id = $cart['payment_id'];
+
+    $result = fn_paypal_set_express_checkout($payment_id, 0, array(), $cart, AREA);
     $useraction = 'continue';
 
     $processor_data = fn_get_payment_method_data($payment_id);
@@ -56,8 +65,7 @@ if ($mode == 'express_return') {
     if (fn_paypal_ack_success($result) && !empty($result['TOKEN'])) {
 
         if ($in_context_checkout && isset($_REQUEST['in_context'])) {
-            header('Content-type: application/json');
-            echo json_encode(array('token' => $result['TOKEN']));
+            Tygh::$app['ajax']->assign('token', $result['TOKEN']);
             exit;
         } else {
             fn_paypal_payment_form($processor_data, $result['TOKEN']);
@@ -67,8 +75,7 @@ if ($mode == 'express_return') {
         fn_paypal_get_error($result);
 
         if ($in_context_checkout && isset($_REQUEST['in_context'])) {
-            header('Content-type: application/json');
-            echo json_encode(array('error' => true));
+            Tygh::$app['ajax']->assign('error', true);
             exit;
         } else {
             fn_order_placement_routines('checkout.cart');

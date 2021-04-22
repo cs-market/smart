@@ -1,4 +1,4 @@
-{script src="js/tygh/email_templates.js"}
+{script src="js/tygh/template_editor.js"}
 
 {assign var="c_url" value=$config.current_url|fn_query_remove:"sort_by":"sort_order"}
 {assign var="return_url" value=$config.current_url}
@@ -33,6 +33,23 @@
 
 </div>
 <div class="hidden" id="content_snippets">
+    <div class="btn-toolbar clearfix cm-toggle-button">
+        <div class="pull-right">
+            {include file="views/snippets/components/tools_list.tpl"
+                icon=" "
+                text = __("actions")
+            }
+
+            {include file="views/snippets/components/adv_buttons.tpl"
+                type=$snippet_type
+                addon=$document->getAddon()
+                result_ids="content_snippets,sidebar_snippets"
+                return_url=$return_url
+                text=$text
+                link_text=__("add_snippet")
+            }
+        </div>
+    </div>
     {include file="views/snippets/components/list.tpl"
         snippets=$snippets
         type=$snippet_type
@@ -94,7 +111,35 @@
             {/foreach}
         </ul>
     <!--sidebar_snippets--></div>
+
+
+    {if $email_templates.C || $email.templates.A}
+    <div class="sidebar-row document-editor__email-templates" id="sidebar_email_templates">
+        <h6>{__("affected_email_templates")}</h6>
+        {if $email_templates.C}
+            <strong class="document-editor__email-templates__header">{__("customer_notifications")}</strong>
+            <ul class="nav nav-list document-editor__email-templates__list">
+                {foreach $email_templates.C as $email_template}
+                    <li class="document-editor__email-templates__list__item">
+                        <a href="{"email_templates.update?template_id={$email_template->getId()}"|fn_url}">{$email_template->getName()}</a>
+                    </li>
+                {/foreach}
+            </ul>
+        {/if}
+        {if $email_templates.A}
+            <strong class="document-editor__email-templates__header">{__("admin_notifications")}</strong>
+            <ul class="nav nav-list document-editor__email-templates__list">
+                {foreach $email_templates.A as $email_template}
+                    <li class="document-editor__email-templates__list__item">
+                        <a href="{"email_templates.update?template_id={$email_template->getId()}"|fn_url}">{$email_template->getName()}</a>
+                    </li>
+                {/foreach}
+            </ul>
+        {/if}
+    <!--sidebar_email_templates--></div>
+    {/if}
     </div>
+
     <script type="text/javascript">
         (function(_, $) {
             $(document).ready(function () {
@@ -166,8 +211,6 @@
     {/capture}
     {dropdown content=$smarty.capture.tools_list class="cm-tab-tools" id="tools_general"}
 
-    {include file="views/snippets/components/tools_list.tpl"}
-
     {hook name="documents:update_buttons_extra"}{/hook}
     
     {include file="buttons/save_changes.tpl" but_role="action" but_id="document_save" but_name="dispatch[documents.update]" but_target_form="document_form" but_meta="cm-submit btn-primary" save=$document}
@@ -178,8 +221,7 @@
 {/capture}
 
 {include file="common/mainbox.tpl"
-    title_start=__("editing")
-    title_end=$document->getName()
+    title=$document->getName()
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
     adv_buttons=$smarty.capture.adv_buttons

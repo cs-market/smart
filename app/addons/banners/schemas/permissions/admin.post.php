@@ -14,6 +14,20 @@
 
 $schema['banners'] = array (
     'permissions' => 'manage_banners',
+    'modes' => array(
+        'update' => array(
+            'permissions' => array(
+                'GET' => 'view_banners',
+                'POST' => 'manage_banners'
+            ),
+        ),
+        'manage' => array(
+            'permissions' => 'view_banners',
+        ),
+        'picker' => array(
+            'permissions' => 'view_banners',
+        ),
+    ),
 );
 $schema['tools']['modes']['update_status']['param_permissions']['table']['banners'] = 'manage_banners';
 

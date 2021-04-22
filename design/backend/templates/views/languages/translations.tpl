@@ -11,7 +11,7 @@
 
 {if $lang_data}
 <div class="table-responsive-wrapper">
-    <table class="table table-responsive" width="100%">
+    <table class="table table--relative table-responsive" width="100%">
     <thead>
         <tr>
             <th width="1%">{include file="common/check_items.tpl"}</th>
@@ -38,15 +38,15 @@
                 {include file="buttons/update_for_all.tpl" display=true object_id=$key name="lang_data[`$key`][overwrite]"}
             {/if}
             {capture name="tools_items"}
-            <a class="cm-confirm cm-post" href="{"languages.delete_variable?name=`$var.name`&redirect_url=`$c_url`"|fn_url}" title="{__("delete")}">
-                {if "ULTIMATE"|fn_allowed_for}
-                    {if $runtime.company_id}
-                        {__("restore_default")}
-                    {/if}
-                {else}
+            {if "ULTIMATE"|fn_allowed_for && $runtime.company_id}
+                <a class="btn cm-confirm cm-post" href="{"languages.delete_variable?name=`$var.name`&redirect_url=`$c_url`"|fn_url}" title="{__("restore_default")}">
+                    <i class="icon-undo"></i>
+                </a>
+            {else}
+                <a class="btn cm-confirm cm-post" href="{"languages.delete_variable?name=`$var.name`&redirect_url=`$c_url`"|fn_url}" title="{__("delete")}">
                     <i class="icon-trash"></i>
-                {/if}
-            </a>
+                </a>
+            {/if}
             {/capture}
             <div class="hidden-tools">
                 {include file="common/table_tools_list.tpl" prefix=$var.name tools_list=$smarty.capture.tools_items}
@@ -83,12 +83,10 @@
 {capture name="add_langvar"}
 
 <form action="{""|fn_url}" method="post" name="lang_add_var">
-<input type="hidden" name="page" value="{$smarty.request.page}" />
-<input type="hidden" name="q" value="{$smarty.request.q}" />
-<input type="hidden" name="selected_section" value="{$smarty.request.selected_section}" />
+<input type="hidden" name="redirect_url" value="{fn_url($config.current_url)}" />
 
 <div class="table-responsive-wrapper">
-    <table class="table table-responsive">
+    <table class="table table--relative table-responsive">
     <thead>
         <tr class="cm-first-sibling">
             <th width="40%">{__("language_variable")}</th>
@@ -99,7 +97,12 @@
     <tbody>
         <tr id="box_new_lang_tag" valign="top">
             <td data-th="{__("language_variable")}">
-                <input type="text" size="30" name="new_lang_data[0][name]"></td>
+                <input type="text"
+                       size="30"
+                       name="new_lang_data[0][name]"
+                       value="{$search.name}"
+                />
+            </td>
             <td data-th="{__("value")}">
                 <textarea name="new_lang_data[0][value]" cols="48" rows="2"></textarea></td>
             <td data-th="{__("tools")}">

@@ -14,7 +14,6 @@
 
 $schema['exim_1c'] = array(
     'none' => 'passive',
-    'partial' => 'passive',
     'full' => 'passive',
 );
 

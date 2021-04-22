@@ -7,7 +7,7 @@
 {/if}
 
 {if $page_part}
-    {assign var="_page_part" value="#`$page_part`"}
+    {$_page_part="#`$page_part`"}
 {/if}
 
 <form action="{""|fn_url}{$_page_part}" name="{$product_search_form_prefix}search_form" method="get" class="cm-disable-empty {$form_meta}" id="search_form">
@@ -40,39 +40,30 @@
 
     <div class="sidebar-field">
         <label>{__("search_in_category")}</label>
+        {$s_cid=$search.cid|default:0}
+
         {if "categories"|fn_show_picker:$smarty.const.CATEGORY_THRESHOLD}
-            {if $search.cid}
-                {assign var="s_cid" value=$search.cid}
-            {else}
-                {assign var="s_cid" value="0"}
-            {/if}
             <div class="controls">
-            {include file="pickers/categories/picker.tpl" company_ids=$picker_selected_companies data_id="location_category" input_name="cid" item_ids=$s_cid hide_link=true hide_delete_button=true default_name=__("all_categories") extra=""}
+            {include file="views/categories/components/picker/picker.tpl"
+                input_name="cid"
+                show_advanced=true
+                multiple=false
+                show_empty_variant=true
+                item_ids=[$s_cid]
+                empty_variant_text=__("all_categories")
+                dropdown_css_class="object-picker__dropdown--categories"
+            }
             </div>
         {else}
-            {if $runtime.mode == "picker"}
-                {assign var="trunc" value="38"}
-            {else}
-                {assign var="trunc" value="25"}
-            {/if}
-            <select name="cid">
-                <option value="0" {if $category_data.parent_id == "0"}selected="selected"{/if}>- {__("all_categories")} -</option>
-                {foreach from=0|fn_get_plain_categories_tree:false:$smarty.const.CART_LANGUAGE:$picker_selected_companies item="search_cat" name=search_cat}
-                {if $search_cat.store}
-                {if !$smarty.foreach.search_cat.first}
-                    </optgroup>
-                {/if}
-
-                <optgroup label="{$search_cat.category}">
-                    {assign var="close_optgroup" value=true}
-                    {else}
-                    <option value="{$search_cat.category_id}" {if $search_cat.disabled}disabled="disabled"{/if} {if $search.cid == $search_cat.category_id}selected="selected"{/if} title="{$search_cat.category}">{$search_cat.category|escape|truncate:$trunc:"...":true|indent:$search_cat.level:"&#166;&nbsp;&nbsp;&nbsp;&nbsp;":"&#166;--&nbsp;" nofilter}</option>
-                    {/if}
-                    {/foreach}
-                    {if $close_optgroup}
-                </optgroup>
-                {/if}
-            </select>
+            {include file="views/categories/components/picker/picker.tpl"
+                input_name="cid"
+                show_advanced=true
+                multiple=false
+                show_empty_variant=true
+                item_ids=[$s_cid]
+                empty_variant_text=__("all_categories")
+                dropdown_css_class="object-picker__dropdown--categories"
+            }
         {/if}
     </div>
     {/hook}
@@ -143,6 +134,7 @@
             <label class="control-label" for="popularity_from">{__("popularity")}</label>
             <div class="controls">
                 <input type="text" name="popularity_from" id="popularity_from" value="{$search.popularity_from}" onfocus="this.select();" class="input-mini" /> - <input type="text" name="popularity_to" value="{$search.popularity_to}" onfocus="this.select();" class="input-mini" />
+                <p class="muted description">{__("ttc_popularity")}</p>
             </div>
         </div>
         <div class="control-group">
@@ -170,11 +162,11 @@
         </div>
     </div>
 
-    {assign var="have_amount_filter" value=0}
+    {$have_amount_filter=0}
     {if !"ULTIMATE:FREE"|fn_allowed_for}
         {foreach from=$filter_items item="ff"}
             {if $ff.field_type eq "A"}
-                {assign var="have_amount_filter" value=1}
+                {$have_amount_filter=1}
             {/if}
         {/foreach}
     {/if}
@@ -216,9 +208,13 @@
             <div class="controls">
             <select name="status" id="status">
                 <option value="">--</option>
-                <option value="A" {if $search.status == "A"}selected="selected"{/if}>{__("active")}</option>
-                <option value="H" {if $search.status == "H"}selected="selected"{/if}>{__("hidden")}</option>
-                <option value="D" {if $search.status == "D"}selected="selected"{/if}>{__("disabled")}</option>
+                {foreach fn_get_all_product_statuses() as $status_id => $status_name}
+                    <option value="{$status_id}"
+                            {if $search.status === $status_id}
+                                selected="selected"
+                            {/if}
+                    >{$status_name}</option>
+                {/foreach}
             </select>
             </div>
         </div>

@@ -26,9 +26,10 @@
     <label class="control-label" for="elm_new_order_status">{__("addons.paypal.status_for_new_orders")}:</label>
     <div class="controls">
         <select name="payment_data[processor_params][new_order_status]" id="elm_new_order_status">
-            <option value="" {if $processor_params.new_order_status == ""}selected="selected"{/if}>{__("open")}</option>
+            <option value="O" {if $processor_params.new_order_status == "O"}selected="selected"{/if}>{__("open")}</option>
             <option value="{$smarty.const.STATUS_INCOMPLETED_ORDER}" {if $processor_params.new_order_status == $smarty.const.STATUS_INCOMPLETED_ORDER}selected="selected"{/if}>{__("incompleted")}</option>
         </select>
+        <p class="muted description">{__("ttc_addons.paypal.status_for_new_orders")}</p>
     </div>
 </div>
 

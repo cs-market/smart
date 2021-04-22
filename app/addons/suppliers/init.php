@@ -26,7 +26,9 @@ fn_register_hooks(
     'shippings_group_products_list',
     'shippings_get_shippings_list',
     'pre_place_order',
-    'order_notification',
+    'change_order_status_post',
+    'place_order_manually_post',
+    'update_order_details_post',
     'get_notification_rules',
     'get_status_params_definition',
     'get_shipments_info_post',
@@ -34,5 +36,10 @@ fn_register_hooks(
     'get_order_info',
     'clone_product',
     'store_shipping_rates_pre',
-    'delete_product_post'
+    'delete_product_post',
+    ['update_supplier_products_post', '', 'product_variations'],
+    ['suppliers_link_product_post', '', 'product_variations'],
+    'template_email_get_name',
+    'update_status_pre',
+    'delete_status_post'
 );

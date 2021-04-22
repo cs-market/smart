@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: sr\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_plans.po\n"
+"X-Crowdin-File: /release-4.9.2/addons/vendor_plans.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:10\n"
+"PO-Revision-Date: 2018-11-16 12:18\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -108,6 +108,10 @@ msgctxt "Languages::vendor_plans.transaction_fee"
 msgid "Transaction fee"
 msgstr ""
 
+msgctxt "Languages::vendor_plans.fixed_transaction_fee"
+msgid "Transaction fee (abs)"
+msgstr ""
+
 msgctxt "Languages::vendor_plans.revenue"
 msgid "Revenue"
 msgstr ""
@@ -189,7 +193,7 @@ msgid "<strong>Unlimited</strong> revenue"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.transaction_fee_value"
-msgid "<strong>[value]</strong> transaction fee"
+msgid "Transaction fee: <strong>[value]</strong>"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.vendor_commission"
@@ -274,6 +278,10 @@ msgstr ""
 
 msgctxt "Languages::addons.vendor_plans.commission_description_absolute"
 msgid "[amount] out of [sum]"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.out_of_amount"
+msgid "out of [amount]"
 msgstr ""
 
 msgctxt "Languages::addons.vendor_plans.commission_description_percent"

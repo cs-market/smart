@@ -14,7 +14,7 @@
         <input type="hidden" name="fake" value="1" />
 
         {if $price_lists}
-            <table class="table table-middle">
+            <table class="table table-middle table--relative">
                 <thead>
                 <tr>
                     <th width="1%" class="left">

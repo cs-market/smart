@@ -17,6 +17,6 @@ namespace Tygh\Enum;
 class UsergroupStatuses
 {
     const ACTIVE = 'A';
-    const HIDDEN = 'P';
+    const HIDDEN = 'H';
     const DISABLED = 'D';
 }

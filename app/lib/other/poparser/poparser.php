@@ -145,8 +145,7 @@ class I18n_Pofile
 								default:	break;
 							}
 							
-							continue;
-							break;
+							continue 2;
 
 				case 'msgctxt' :
 					// context

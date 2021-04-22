@@ -25,6 +25,16 @@ if ($mode == 'update') {
     $shipping_data = Tygh::$app['view']->getTemplateVars('shipping');
 
     list($suppliers) = fn_get_suppliers();
+    if (fn_allowed_for('ULTIMATE') && !fn_get_runtime_company_id()) {
+        $suppliers = fn_suppliers_filter_objects_by_sharing(
+            $suppliers,
+            'suppliers',
+            'supplier_id',
+            'shippings',
+            $shipping_data['shipping_id']
+        );
+    }
+
     $linked_suppliers = fn_get_shippings_suppliers($shipping_data['shipping_id']);
 
     Tygh::$app['view']->assign('suppliers', $suppliers);

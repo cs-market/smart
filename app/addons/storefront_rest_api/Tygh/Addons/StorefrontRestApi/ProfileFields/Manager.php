@@ -160,8 +160,7 @@ class Manager
     protected function fetchFields($location_id, array $auth, $lang_code)
     {
         return fn_get_profile_fields($location_id, $auth, $lang_code, [
-            'profile_type'     => $this->profile_type,
-            'skip_email_field' => false,
+            'profile_type' => $this->profile_type,
         ]);
     }
 

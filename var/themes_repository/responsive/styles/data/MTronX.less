@@ -335,6 +335,10 @@ input.ty-search-block__input{
   .border-radius(5px);
 }
 
+.ty-product-labels__item--shipping {
+  color: darken(@font, 20%);
+}
+
 // ========================================================= ##Buttons
 
 .ty-btn{
@@ -752,6 +756,16 @@ input.ty-search-block__input{
   font-weight: normal;
 }
 
+/* Product variations */
+.ty-grid-list__item-features {
+
+  &-description,
+  &-variant {
+    color: @font;
+  }
+}
+/* /Product variations */
+
 /*GFONTS*/
 @font-face {
   font-family: 'Open Sans';
@@ -777,6 +791,8 @@ input.ty-search-block__input{
 @sidebar: #ffffff;
 @price: #c44e00;
 @discount_label: #75ae12;
+@product_label: @discount_label;
+@shipping_label: @primary_button;
 @in_stock: #75ae12;
 @out_of_stock: #d45949;
 @top_panel_links: #ffffff;
@@ -808,26 +824,26 @@ input.ty-search-block__input{
 @footer_bg_transparent: false;
 @footer_bg_grad_stop: #f1f2f7;
 
-@body_font: Open Sans,sans-serif;
+@body_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @body_font_size: 14px;
 @body_font_style: normal;
 @body_font_weight: normal;
-@headings_font: Open Sans,sans-serif;
+@headings_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @headings_font_size: 20px;
 @headings_font_decoration: none;
 @headings_font_style: normal;
 @headings_font_weight: normal;
-@links_font: Open Sans,sans-serif;
+@links_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @links_font_size: 14px;
 @links_font_decoration: none;
 @links_font_style: normal;
 @links_font_weight: normal;
-@price_font: Open Sans,sans-serif;
+@price_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @price_font_size: 20px;
 @price_font_decoration: none;
 @price_font_style: normal;
 @price_font_weight: normal;
-@buttons_font: Open Sans,sans-serif;
+@buttons_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @buttons_font_size: 14px;
 @buttons_font_decoration: none;
 @buttons_font_style: normal;

@@ -9,7 +9,7 @@
                value="{$company_data.stripe_connect_account_id}"
         />
         {if $company_data.stripe_connect_account_id}
-            <p class="text-success">{__("stripe_connect.connected")}</p>
+            <p class="text-success">{$company_data.stripe_connect_account_id}</p>
         {else}
             <p>{__("stripe_connect.not_connected")}</p>
         {/if}

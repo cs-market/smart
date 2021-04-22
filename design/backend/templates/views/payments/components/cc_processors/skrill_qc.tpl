@@ -48,7 +48,7 @@
     <label class="control-label" for="secret_word_{$payment_id}">{__("secret_word")}:</label>
     <div class="controls">
         <input type="text" name="payment_data[processor_params][secret_word]" id="secret_word_{$payment_id}" value="{$processor_params.secret_word}"  size="60">
-        <p><small>{__("text_skrill_secred_word_notice")}</small></p>
+        <p class="muted description">{__("text_skrill_secred_word_notice")}</p>
     </div>
 </div>
 
@@ -122,7 +122,7 @@
             <option value="LTL"{if $processor_params.currency eq "LTL"} selected="selected"{/if}>{__("currency_code_ltl")}</option>
         </select>
         {assign var="cur_man" value="currencies.manage"|fn_url}
-        <p><small>{__("text_skrill_currs_notice", ["[link]" => $cur_man])}</small></p>
+        <p class="muted description">{__("text_skrill_currs_notice", ["[link]" => $cur_man])}</p>
     </div>
 </div>
 
@@ -183,7 +183,7 @@
             <option value="BWI">BWI</option>
             <option value="OBT">Online Bank Transfer</option>
         </select>
-        <div class="muted">{__("multiple_selectbox_notice")}</div>
+        <div class="muted description">{__("multiple_selectbox_notice")}</div>
     </div>
 </div>
 
@@ -264,8 +264,8 @@ Tygh.$(document).ready(function() {$ldelim}
     <label class="control-label" for="do_not_pass_logo">{__("do_not_pass_logo")}:</label>
     <div class="controls">
         <input type="hidden" name="payment_data[processor_params][do_not_pass_logo]" value="N">
-        <input type="checkbox" name="payment_data[processor_params][do_not_pass_logo]" value="Y" id="do_not_pass_logo" class="checkbox" {if $processor_params.do_not_pass_logo == "Y"}checked="checked"{/if}>
-        <p><small>{__("text_skrill_logo_notice")}</small></p>
+        <input type="checkbox" name="payment_data[processor_params][do_not_pass_logo]" value="Y" id="do_not_pass_logo" {if $processor_params.do_not_pass_logo == "Y"}checked="checked"{/if}>
+        <p class="muted description">{__("text_skrill_logo_notice")}</p>
     </div>
 </div>
 

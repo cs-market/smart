@@ -12,7 +12,13 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['import']['sections']['subscribers']['permission'] = false;
-$schema['export']['sections']['subscribers']['permission'] = false;
+$schema['controllers']['import']['sections']['subscribers']['permission'] = false;
+$schema['controllers']['export']['sections']['subscribers']['permission'] = false;
+
+$schema['controllers']['tools']['modes']['update_status']['param_permissions']['table']['newsletter_campaigns'] = false;
+$schema['controllers']['tools']['modes']['update_status']['param_permissions']['table']['mailing_lists'] = false;
+
+$schema['controllers']['exim']['modes']['export']['param_permissions']['section']['subscribers'] = false;
+$schema['controllers']['exim']['modes']['import']['param_permissions']['section']['subscribers'] = false;
 
 return $schema;

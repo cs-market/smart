@@ -1,6 +1,9 @@
+{$jquery_version = "3.5.1"}
+{$jquery_migrate_version = "3.3.0"}
 {scripts}
 
-{script src="js/lib/jquery/jquery.min.js"}
+{script src="js/lib/jquery/jquery-{$jquery_version}.min.js"}
+{script src="js/lib/jquery/jquery-migrate-{$jquery_migrate_version}.min.js"}
 {script src="js/lib/js-webshim/polyfiller.js"}
 {script src="js/lib/modernizr/modernizr.custom.js"}
 {script src="js/tygh/core.js"}
@@ -11,19 +14,34 @@
 {script src="js/lib/autonumeric/autoNumeric.js"}
 {script src="js/lib/appear/jquery.appear-1.1.1.js"}
 {script src="js/lib/tools/tooltip.min.js"}
-{script src="js/lib/dropzone/dist/dropzone.js"}
+{script src="js/lib/bootstrap_switch/js/bootstrapSwitch.js"}
+{script src="js/tygh/backend/companies.js"}
 {script src="js/tygh/editors/`$settings.Appearance.default_wysiwyg_editor`.editor.js"}
 
 {script src="js/tygh/ajax.js"}
 
+{script src="js/tygh/backend/heading.js"}
 {script src="js/tygh/quick_menu.js"}
-{script src="js/tygh/file_uploader.js"}
+{script src="js/tygh/backend/storefront_switcher.js"}
+{script src="js/tygh/backend/company_switcher.js"}
+{script src="js/tygh/backend/buttons/update_for_all.js"}
 
 {* Responsive adminpanel helpers scripts *}
-{script src="js/tygh/long_tap.plugin.js"}
-{script src="js/tygh/long_tap_multiple_selection.js"}
-{script src="js/tygh/responsive_classes.js"}
-{script src="js/tygh/mobile_menu.js"}
+{script src="js/tygh/backend/bulkedit.js"}
+{script src="js/tygh/backend/tap.plugin.js"}
+{script src="js/tygh/backend/tap_multiple_selection.js"}
+{script src="js/tygh/backend/mobile_menu.js"}
+
+{script src="js/tygh/backend/text_toggle.js"}
+
+{script src="js/lib/maskedinput/jquery.maskedinput.min.js"}
+
+{script src="js/lib/inputmask/jquery.inputmask.min.js"}
+{script src="js/lib/jquery-bind-first/jquery.bind-first-0.2.3.js"}
+{script src="js/lib/inputmask-multi/jquery.inputmask-multi.js"}
+
+{script src="js/tygh/phone_mask.js"}
+{script src="js/tygh/backend/autocomplete.js"}
 
 {capture name="promo_data"}
     <div class="commercial-promotion-text">
@@ -33,6 +51,9 @@
 <script type="text/javascript">
 (function(_, $) {
     _.tr({
+        no_data: '{__("no_data")|escape:"javascript"}',
+        nothing_found: '{__("text_nothing_found")|escape:"javascript"}',
+        unable_to_delete_all_categories: '{__("bulk_edit.unable_to_delete_all_categories")|escape:"javascript"}',
         cannot_buy: '{__("cannot_buy")|escape:"javascript"}',
         no_products_selected: '{__("no_products_selected")|escape:"javascript"}',
         error_no_items_selected: '{__("error_no_items_selected")|escape:"javascript"}',
@@ -50,6 +71,7 @@
         text_invalid_url: '{__("text_invalid_url")|escape:"javascript"}',
         error_validator_email: '{__("error_validator_email")|escape:"javascript"}',
         error_validator_phone: '{__("error_validator_phone")|escape:"javascript"}',
+        error_validator_phone_mask: '{__("error_validator_phone_mask")|escape:"javascript"}',
         error_validator_integer: '{__("error_validator_integer")|escape:"javascript"}',
         error_validator_multiple: '{__("error_validator_multiple")|escape:"javascript"}',
         error_validator_password: '{__("error_validator_password")|escape:"javascript"}',
@@ -66,7 +88,6 @@
         file_browser: '{__("file_browser")|escape:"javascript"}',
         editing_block: '{__("editing_block")|escape:"javascript"}',
         editing_grid: '{__("editing_grid")|escape:"javascript"}',
-        editing_container: '{__("editing_container")|escape:"javascript"}',
         adding_grid: '{__("adding_grid")|escape:"javascript"}',
         adding_block_to_grid: '{__("adding_block_to_grid")|escape:"javascript"}',
         manage_blocks: '{__("manage_blocks")|escape:"javascript"}',
@@ -80,7 +101,10 @@
         insert_image: '{__("insert_image")|escape:"javascript"}',
         image_url: '{__("image_url")|escape:"javascript"}',
         manage: '{__("manage")|escape:"javascript"}',
-        file_uploading_in_progress_please_wait: '{__("file_uploading_in_progress_please_wait")|escape:"javascript"}'
+        file_uploading_in_progress_please_wait: '{__("file_uploading_in_progress_please_wait")|escape:"javascript"}',
+        please_copy_api_key: '{__("please_copy_api_key")|escape:"javascript"}',
+        select_block: '{__("select_block")|escape:"javascript"}',
+        block_manager: '{__("block_manager")|escape:"javascript"}'
     });
 
     $.extend(_, {
@@ -109,7 +133,6 @@
         language_direction: '{$language_direction}',
         default_language: '{$smarty.const.DEFAULT_LANGUAGE}',
         cart_prices_w_taxes: {if ($settings.Appearance.cart_prices_w_taxes == 'Y')}true{else}false{/if},
-        theme_name: '{$settings.theme_name|escape:javascript nofilter}',
         current_url: '{$config.current_url|fn_url|escape:javascript nofilter}',
         {if $config.tweaks.anti_csrf}
         security_hash: '{""|fn_generate_security_hash}', // CSRF form protection key
@@ -117,6 +140,77 @@
         promo_data: {
             title: '{$addon_permissions_text.title|escape:javascript nofilter}',
             text: '{$smarty.capture.promo_data|escape:javascript nofilter}'
+        },
+        phone_validation_mode: '{$settings.Appearance.phone_validation_mode}',
+        hash_of_available_countries: '{$hash_of_available_countries}',
+        product_version: '{$product_version}',
+        product_edition: '{$product_edition}',
+        current_dispatch: '{$current_dispatch}'
+    });
+
+    $.extend(_, {
+        fileManagerOptions: {
+            rememberLastDir: true,
+            useBrowserHistory: true,
+            resizable: false,
+            lang: _.cart_language,
+            i18nBaseUrl: 'js/lib/elfinder/js/i18n',
+            ui: ['toolbar', 'tree', 'path', 'stat'],
+            uiOptions: {
+                toolbar: [
+                    ['back', 'forward'],
+                    ['mkdir', 'mkfile', 'upload'],
+                    ['download'],
+                    ['info'],
+                    ['quicklook'],
+                    ['copy', 'cut', 'paste'],
+                    ['rm', 'rename'],
+                    ['edit'],
+                    ['extract', 'archive'],
+                    ['search'],
+                    ['view']
+                ],
+                toolbarExtra: {
+                    displayTextLabel: 'none'
+                }
+            },
+            contextmenu: {
+                files: [
+                    'getfile', '|',
+                    'open', 'quicklook', '|',
+                    'download', '|',
+                    'copy', 'cut', 'paste', 'duplicate', '|',
+                    'rm', '|',
+                    'edit', 'rename', '|',
+                    'archive', 'extract', '|',
+                    'info'
+                ],
+                navbar: [
+                    'open', '|',
+                    'copy', 'cut', 'paste', 'duplicate', '|',
+                    'rm', '|',
+                    'info'
+                ],
+                cwd: [
+                    'reload', 'back', '|',
+                    'upload', 'mkdir', 'mkfile', 'paste', '|',
+                    'sort', '|',
+                    'info'
+                ],
+            },
+            requestType: 'post',
+            commands : [
+            	'archive', 'back', 'chmod', 'colwidth', 'copy', 'cut', 'download', 'duplicate', 'edit', 'extract',
+            	'forward', 'fullscreen', 'getfile', 'help', 'home', 'info', 'mkdir', 'mkfile',
+            	'open', 'opendir', 'paste', 'quicklook', 'reload', 'rename', 'restore', 'rm',
+            	'search', 'sort', 'up', 'upload', 'view'
+            ],
+            commandsOptions: {
+                info: {
+                    showHashAlgorisms: [],
+                    showHashOpts: []
+                }
+            }
         }
     });
 

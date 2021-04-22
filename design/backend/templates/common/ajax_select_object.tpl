@@ -1,11 +1,15 @@
+{$relative_dropdown = $relative_dropdown|default:true}
+
 {capture name="ajax_select_content"}
 
 <a {if $span_wrapping == false}id="sw_{$id}_wrap_"{/if} class="{if $type != "list"}btn-text{/if} dropdown-toggle" data-toggle="dropdown">
     {if $span_wrapping}
         <span id="sw_{$id}_wrap_">{$text|truncate:40:"...":true}</span>
+        {if $dropdown_icon}<i class="{$dropdown_icon} dropdown-menu__icon"></i>{/if}
         <b class="caret"></b>
     {else}
         {$text|truncate:40:"...":true}
+        {if $dropdown_icon}<i class="{$dropdown_icon} dropdown-menu__icon"></i>{/if}
         <b class="caret"></b>
     {/if}
 </a>
@@ -42,7 +46,11 @@
                 {else}
                     {assign var="name" value=$item.name|truncate:40:"...":true}
                 {/if}
-                <li><a data-ca-action="{$item.value}" title="{$item.name}">{$name}</a></li>
+                <li>
+                    <a data-ca-action="{$item.value}" title="{$item.name}">
+                        {$name} {if $object_type == "companies" && $item.storefront_status == "StorefrontStatuses::CLOSED"|enum}<i class="icon-lock dropdown-menu__item-icon"></i>{/if}
+                    </a>
+                </li>
             {/foreach}
             <!--{$id}--></ul>
             <ul>
@@ -55,7 +63,7 @@
 {/capture}
 
 {if $type == 'list'}
-    <li class="dropdown vendor-submenu">{$smarty.capture.ajax_select_content nofilter}</li>
+    <li class="{if $relative_dropdown}dropdown{/if} vendor-submenu">{$smarty.capture.ajax_select_content nofilter}</li>
 {else}
-    <div class="btn-group">{$smarty.capture.ajax_select_content nofilter}</div>
+    <div class="{if $relative_dropdown}btn-group{/if}">{$smarty.capture.ajax_select_content nofilter}</div>
 {/if}

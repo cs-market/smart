@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: French\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /release-4.8.2/addons/seo.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.4/addons/seo.po\n"
+"PO-Revision-Date: 2020-05-18 08:59\n"
 
 msgctxt "Addons::name::seo"
 msgid "SEO"
@@ -61,12 +59,16 @@ msgid "page [n]"
 msgstr "page [n]"
 
 msgctxt "Languages::privileges.manage_seo_rules"
-msgid "Manage SEO rules and 301 redirects"
-msgstr "Gérer les règles SEO et de redirections 301"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.seo"
+msgid "SEO"
+msgstr ""
 
 msgctxt "Languages::privileges.view_seo_rules"
-msgid "View SEO rules and 301 redirects"
-msgstr "Afficher les règles SEO et de redirections 301"
+msgid "Can view"
+msgstr ""
 
 msgctxt "Languages::seo.redirects_manager"
 msgid "301 redirects"
@@ -203,4 +205,40 @@ msgstr "/item.html"
 msgctxt "Languages::seo.important_language_text"
 msgid "<b>Warning!</b> The <b>SEO</b> add-on is currently configured to use a single URL for all languages. If you hide, disable, or delete a default language of one of the storefronts, the SEO URLs will be changed."
 msgstr "Avis</b> Le module de SEO est configure maintenant pour utiliser un seul URL pour toutes les langues. Si Vous cachez, deactivez ou eliminez un defaut: langue d'un des storefronts, les URLs de SEO seront changes."
+
+msgctxt "Languages::seo.product_feature.feature_code.notice"
+msgid "A suitable code can help this feature appear with the product in search engines. Supported codes:"
+msgstr ""
+
+msgctxt "Languages::seo.brand"
+msgid "Brand"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.brand.description"
+msgid "Name used by an organization or business person for labeling a product"
+msgstr ""
+
+msgctxt "Languages::seo.isbn"
+msgid "ISBN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.isbn.description"
+msgid "International Standard Book Number"
+msgstr ""
+
+msgctxt "Languages::seo.gtin"
+msgid "GTIN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.gtin.description"
+msgid "Global Trade Item Number"
+msgstr ""
+
+msgctxt "Languages::seo.MPN"
+msgid "MPN"
+msgstr ""
+
+msgctxt "Languages::seo.feature_code.mpn.description"
+msgid "Manufacturer Part Number"
+msgstr ""
 

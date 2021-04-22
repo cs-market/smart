@@ -2,7 +2,10 @@
     <div class="control-group setting-wide">
         <label for="elm_rma_refunded_order_status"
                class="control-label"
-        >{__("stripe_connect.rma.order_status_on_refund")}</label>
+        >
+            {__("stripe_connect.rma.order_status_on_refund")}
+            <p class="muted description">{__("ttc_stripe_connect.rma.order_status_on_refund")}</p>
+        </label>
         <div class="controls">
             <select name="addon_data[options][{$rma_refunded_order_status_id}]"
                     id="elm_rma_refunded_order_status"

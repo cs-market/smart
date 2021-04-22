@@ -4,15 +4,16 @@
     {assign var="id" value=0}
 {/if}
 
-{assign var="allow_save" value=$banner|fn_allow_save_object:"banners"}
 
 {** banners section **}
 
+{$allow_save = $banner|fn_allow_save_object:"banners"}
+{$hide_inputs = ""|fn_check_form_permissions}
 {assign var="b_type" value=$banner.type|default:"G"}
 
 {capture name="mainbox"}
 
-<form action="{""|fn_url}" method="post" class="form-horizontal form-edit  {if !$allow_save} cm-hide-inputs{/if}" name="banners_form" enctype="multipart/form-data">
+<form action="{""|fn_url}" method="post" class="form-horizontal form-edit{if !$allow_save || $hide_inputs} cm-hide-inputs{/if}" name="banners_form" enctype="multipart/form-data">
 <input type="hidden" class="cm-no-hide-input" name="fake" value="1" />
 <input type="hidden" class="cm-no-hide-input" name="banner_id" value="{$id}" />
 
@@ -54,7 +55,14 @@
         <div class="control-group {if $b_type != "G"}hidden{/if}" id="banner_graphic">
             <label class="control-label">{__("image")}</label>
             <div class="controls">
-                {include file="common/attach_images.tpl" image_name="banners_main" image_object_type="promo" image_pair=$banner.main_pair image_object_id=$id no_detailed=true hide_titles=true}
+                {include file="common/attach_images.tpl"
+                    image_name="banners_main"
+                    image_object_type="promo"
+                    image_pair=$banner.main_pair
+                    image_object_id=$id
+                    no_detailed=true
+                    hide_titles=true
+                }
             </div>
         </div>
 
@@ -126,17 +134,8 @@
     {/hook}
 {/notes}
 
-{if !$id}
-    {$title = __("banners.new_banner")}
-{else}
-    {$title_start = __("banners.editing_banner")}
-    {$title_end = $banner.banner}
-{/if}
-
 {include file="common/mainbox.tpl"
-    title_start=$title_start
-    title_end=$title_end
-    title=$title
+    title=($id) ? $banner.banner : __("banners.new_banner")
     content=$smarty.capture.mainbox
     buttons=$smarty.capture.buttons
     select_languages=true}

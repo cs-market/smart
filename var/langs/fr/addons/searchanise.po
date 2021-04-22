@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: French\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /release-4.8.2/addons/searchanise.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.4/addons/searchanise.po\n"
+"PO-Revision-Date: 2020-05-18 08:59\n"
 
 msgctxt "Addons::name::searchanise"
 msgid "Searchanise"
@@ -75,6 +73,10 @@ msgstr "Félicitations, vous avez juste connecté à Searchanise."
 msgctxt "Languages::text_se_connected"
 msgid "You've connected to Searchanise."
 msgstr "Vous avez connecté à Searchanise."
+
+msgctxt "Languages::text_se_ajax_connecting"
+msgid "Product indexation has started in your store. It may take some time. Wait just a little, we've almost finished."
+msgstr ""
 
 msgctxt "Languages::text_se_database_restore_notice"
 msgid "You've just restored your data from the database dump file. If this dump contains product data, please <a href=\"[link]\">Re-indexation</a> it with Searchanise."
@@ -182,6 +184,22 @@ msgstr ""
 
 msgctxt "Languages::se_options_combinations_codes"
 msgid "Options combinations codes"
+msgstr ""
+
+msgctxt "Languages::se_master_product_status"
+msgid "Common product status"
+msgstr ""
+
+msgctxt "Languages::se_is_vendor_product"
+msgid "Vendor product flag"
+msgstr ""
+
+msgctxt "Languages::se_connection_warning"
+msgid "Searchanise: There is no connection to Searchanise server! For Searchanise to work properly, the store server must be able to access www.searchanise.com. Please contact Searchanise <a href=\"mailto: [email]\">[email]</a> technical support or your system administrator."
+msgstr ""
+
+msgctxt "Languages::se_queue_warning"
+msgid "Searchanise: We found an issue with the export of changes in your store catalog. To resolve the issue please contact the Searchanise <a href=\"mailto: [email]\">[email]</a> technical support."
 msgstr ""
 
 msgctxt "SettingsSections::searchanise::configuration"

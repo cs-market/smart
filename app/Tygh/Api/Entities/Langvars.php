@@ -21,9 +21,9 @@ use Tygh\Registry;
 
 class Langvars extends AEntity
 {
-    protected function getParentLanguageCode()
+    protected function getParentLanguageCode(array $params)
     {
-        $result = CART_LANGUAGE;
+        $result = $this->getLanguageCode($params, CART_LANGUAGE);
 
         if ($this->getParentName() == 'languages') {
             $parent_language = $this->getParentData();
@@ -38,10 +38,10 @@ class Langvars extends AEntity
     public function index($id = '', $params = array())
     {
         $status = Response::STATUS_OK;
-        $data = array();
+
+        $lang_code = $this->getParentLanguageCode($params);
 
         if ($id) {
-            $lang_code = $this->getParentLanguageCode();
             $data = array(
                 'lang_code' => $lang_code,
                 'name' => $id,
@@ -49,19 +49,13 @@ class Langvars extends AEntity
             );
         } else {
             $items_per_page = $this->safeGet($params, 'items_per_page', Registry::get('settings.Appearance.admin_elements_per_page'));
-            $lang_code = $this->getParentLanguageCode();
 
             if (!$lang_code) {
                 $lang_code = DESCR_SL;
             }
-            $data = LanguageValues::getVariables($params, $items_per_page, $lang_code);
 
-            if ($data) {
-                $data = array(
-                    'langvars' => $data[0],
-                    'params' => $data[1],
-                );
-            }
+            $params['lang_code'] = $lang_code;
+            list($data['langvars'], $data['params']) = LanguageValues::getVariables($params, $items_per_page, $lang_code);
         }
 
         if (!$data) {
@@ -87,7 +81,7 @@ class Langvars extends AEntity
             $valid_params = false;
         }
 
-        if ($valid_params && $lang_code = $this->getParentLanguageCode()) {
+        if ($valid_params && $lang_code = $this->getParentLanguageCode($params)) {
             $res = LanguageValues::updateLangVar(array($params), $lang_code);
 
             if ($res) {
@@ -113,7 +107,7 @@ class Langvars extends AEntity
         /**
          * Lang code is required.
          */
-        if ($lang_code = $this->getParentLanguageCode()) {
+        if ($lang_code = $this->getParentLanguageCode($params)) {
             $res = LanguageValues::updateLangVar(array($params), $lang_code);
 
             if ($res) {

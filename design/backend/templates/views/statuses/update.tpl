@@ -90,7 +90,7 @@
 
                 {elseif $data.type == "checkbox"}
                     <input type="hidden" name="status_data[params][{$name}]" value="N">
-                    <input type="checkbox" name="status_data[params][{$name}]" id="status_param_{$id}_{$name}" value="Y" {if ($status_data && $status_data.params.$name == "Y") || (!$status_data && $data.default_value == "Y")} checked="checked"{/if} class="checkbox">
+                    <input type="checkbox" name="status_data[params][{$name}]" id="status_param_{$id}_{$name}" value="Y" {if ($status_data && $status_data.params.$name == "Y") || (!$status_data && $data.default_value == "Y")} checked="checked"{/if} />
 
                 {elseif $data.type == "status"}
                     {include file="common/status.tpl" status=$param_value display="select" name="status_data[params][`$name`]" status_type=$data.status_type select_id="status_param_`$id`_`$name`"}

@@ -6,7 +6,7 @@
 
 {if $campaigns}
 <div class="table-responsive-wrapper">
-    <table class="table table-middle table-responsive" width="100%">
+    <table class="table table-middle table--relative table-responsive" width="100%">
     <thead>
     <tr>
         <th class="center mobile-hide" width="1%">

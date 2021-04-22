@@ -38,8 +38,12 @@ $schema['automatic_vendor_payout_system'] = function () {
 
 $schema['stripe_connect'] = false;
 $schema['vendor_communication'] = false;
-$schema['paypal_for_marketplaces'] = false;
+$schema['paypal_commerce_platform'] = false;
 $schema['vendor_locations'] = false;
 $schema['direct_payments'] = false;
+$schema['vendor_debt_payout'] = false;
+$schema['vendor_categories_fee'] = false;
+$schema['vendor_privileges'] = false;
+$schema['master_products'] = false;
 
 return $schema;

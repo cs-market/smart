@@ -22,6 +22,7 @@ use Tygh\Registry;
 use Tygh\Twig\TwigCacheFilesystem;
 use Tygh\Twig\TwigCoreExtension;
 use Tygh\Twig\TwigEnvironment;
+use Twig\Loader\ArrayLoader;
 
 /**
  * The provider class that registers the twig component in the Tygh::$app container.
@@ -36,7 +37,7 @@ class TwigProvider implements ServiceProviderInterface
     public function register(Container $app)
     {
         $app['twig'] = function ($app) {
-            $loader = new \Twig_Loader_Array(array());
+            $loader = new ArrayLoader([]);
             $twig = new TwigEnvironment($loader, array(
                 'cache' => new TwigCacheFilesystem(Registry::get('config.dir.cache_twig_templates')),
                 'auto_reload' => true,

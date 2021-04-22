@@ -19,6 +19,7 @@ namespace Tygh\Mailer\MessageBuilders;
 use Tygh\Mailer\AMessageBuilder;
 use Tygh\Mailer\Message;
 use Tygh\SmartyEngine\Core;
+use Tygh\Storefront\Repository;
 
 /**
  * The class responsible for building a message based on the Smarty template files.
@@ -36,10 +37,10 @@ class FileTemplateMessageBuilder extends AMessageBuilder
      * @param Core  $view   Instance of smarty templater (Tygh\SmartyEngine\Core)
      * @param array $config List of base params (see AMessageBuilder::__construct)
      */
-    public function __construct(Core $view, array $config)
+    public function __construct(Core $view, array $config, Repository $storefront_repository)
     {
         $this->view = $view;
-        parent::__construct($config);
+        parent::__construct($config, $storefront_repository);
     }
 
     /** @inheritdoc */

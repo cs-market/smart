@@ -51,6 +51,7 @@ class Company extends AModel
             'p.revenue_limit',
             'p.vendor_store',
             'p.categories',
+            'p.storefronts',
         );
     }
 
@@ -87,6 +88,7 @@ class Company extends AModel
     {
         foreach ($items as $key => $item) {
             $items[$key]['category_ids'] = !empty($item['categories']) ? explode(',', $item['categories']) : array();
+            $items[$key]['storefront_ids'] = !empty($item['storefronts']) ? explode(',', $item['storefronts']) : array();
         }
 
         /**
@@ -95,8 +97,19 @@ class Company extends AModel
          * @param object $instance Current model instance
          * @param array  $items    Items
          * @param array  $params   Params array
+         *
+         * @deprecated since 4.10.4, use vendor_plans_company_gather_additional_items_data_post instead
          */
         fn_set_hook('plans_companies_get_list_post', $this, $items, $params);
+
+        /**
+         * Process selected companies data
+         *
+         * @param object $this   Current model instance
+         * @param array  $items  Items
+         * @param array  $params Params array
+         */
+        fn_set_hook('vendor_plans_company_gather_additional_items_data_post', $this, $items, $params);
     }
 
     /**
@@ -126,8 +139,20 @@ class Company extends AModel
                  * @param int    $payout_id Payout ID
                  * @param float  $price     Price
                  * @param int    $time      Unix timestamp
+                 *
+                 * @deprecated since 4.10.4, use vendor_plans_company_payment instead
                  */
                 fn_set_hook('plans_companies_get_list_post', $this, $payout_id, $price, $time);
+
+                /**
+                 * Company payout
+                 *
+                 * @param object $this      Current model instance
+                 * @param int    $time      Unix timestamp
+                 * @param int    $payout_id Payout ID
+                 * @param float  $price     Price
+                 */
+                fn_set_hook('vendor_plans_company_payment', $this, $time, $payout_id, $price);
 
                 /** @var \Tygh\Mailer\Mailer $mailer */
                 $mailer = \Tygh::$app['mailer'];
@@ -206,22 +231,79 @@ class Company extends AModel
     }
 
     /**
-     * Getting current products count
+     * Executing first payment according to payment plan
+     */
+    public function initialPayment()
+    {
+        $payout_exists = db_get_row(
+            'SELECT * FROM ?:vendor_payouts WHERE company_id = ?i AND plan_id = ?i AND payout_type = ?s LIMIT 1',
+            $this->company_id,
+            $this->plan_id,
+            VendorPayoutTypes::PAYOUT
+        );
+
+        if (!empty($payout_exists)) {
+            return;
+        }
+
+        $this->payment();
+    }
+
+    /**
+     * Gets current products count
+     *
      * @return int
+     * @deprecated since 4.10.4
+     * @see getCurrentProductsCount
      */
     public function getCurrentProducts()
     {
-        $products = db_get_field("SELECT count(product_id) FROM ?:products WHERE company_id = ?i", $this->company_id);
+        return $this->getCurrentProductsCount();
+    }
+
+    /**
+     * Gets current products count
+     *
+     * @return int
+     */
+    public function getCurrentProductsCount()
+    {
+        $conditions = [
+            'company_id' => db_quote('company_id = ?i', $this->company_id)
+        ];
+
+        /**
+         * Executes before the number of vendor's products is calculated. Allows to modify the selection conditions.
+         *
+         * @param \Tygh\Models\Company $this       Current model instance
+         * @param string[]             $conditions SQL query conditions
+         */
+        fn_set_hook('vendor_plans_companies_get_products_count_pre', $this, $conditions);
+
+        $products_count = (int) db_get_field(
+            'SELECT COUNT(product_id) FROM ?:products WHERE ?p',
+            implode(' AND ', $conditions)
+        );
 
         /**
          * Getting current company products
          *
          * @param object $instance Current model instance
-         * @param int    $products Products count
+         * @param int    $products_count Products count
+         *
+         * @deprecated since 4.10.4, use vendor_plans_company_get_current_products_count_post instead
          */
-        fn_set_hook('plans_companies_get_list_post', $this, $products);
+        fn_set_hook('plans_companies_get_list_post', $this, $products_count);
 
-        return intval($products);
+        /**
+         * Getting current company products
+         *
+         * @param object $this           Current model instance
+         * @param int    $products_count Products count
+         */
+        fn_set_hook('vendor_plans_company_get_current_products_count_post', $this, $products_count);
+
+        return (int) $products_count;
     }
 
     /**
@@ -232,7 +314,7 @@ class Company extends AModel
     public function canAddProduct($notify = false)
     {
         if ($this->products_limit) {
-            $can = $this->products_limit > $this->getCurrentProducts();
+            $can = $this->products_limit > $this->getCurrentProductsCount();
 
             /**
              * Can company add product
@@ -240,8 +322,19 @@ class Company extends AModel
              * @param object $instance Current model instance
              * @param bool   $notify   Notify flag
              * @param bool   $can      Can add product flag
+             *
+             * @deprecated since 4.10.4, use vendor_plans_company_can_add_product instead
              */
             fn_set_hook('plans_companies_get_list_post', $this, $notify, $can);
+
+            /**
+             * Can company add product
+             *
+             * @param object $this   Current model instance
+             * @param bool   $notify Notify flag
+             * @param bool   $can    Can add product flag
+             */
+            fn_set_hook('vendor_plans_company_can_add_product', $this, $notify, $can);
 
             if (!$can && $notify) {
                 fn_set_notification('E', __('error'), __('vendor_plans.products_exceeded_text', array(
@@ -293,8 +386,22 @@ class Company extends AModel
          * @param int    $time_from Time from unix timestamp
          * @param int    $time_to   Time to unix timestamp
          * @param array  $statuses  Order payout statuses
+         *
+         * @deprecated since 4.10.4, use vendor_plans_company_get_current_revenue_post instead
          */
         fn_set_hook('plans_companies_get_list_post', $this, $revenue, $today, $time_from, $time_to, $statuses);
+
+        /**
+         * Getting current company revenue
+         *
+         * @param object $this      Current model instance
+         * @param float  $revenue   Revenue
+         * @param int    $today     Today unix timestamp
+         * @param int    $time_from Time from unix timestamp
+         * @param int    $time_to   Time to unix timestamp
+         * @param array  $statuses  Order payout statuses
+         */
+        fn_set_hook('vendor_plans_company_get_current_revenue_post', $this, $revenue, $today, $time_from, $time_to, $statuses);
 
         return floatval($revenue);
     }
@@ -316,8 +423,19 @@ class Company extends AModel
              * @param object $instance Current model instance
              * @param bool   $notify   Notify flag
              * @param bool   $can      Can add product flag
+             *
+             * @deprecated since 4.10.4, use vendor_plans_company_can_get_revenue instead
              */
             fn_set_hook('plans_companies_get_list_post', $this, $notify, $can);
+
+            /**
+             * Can vendor get revenue
+             *
+             * @param object $this   Current model instance
+             * @param bool   $notify Notify flag
+             * @param bool   $can    Can add product flag
+             */
+            fn_set_hook('vendor_plans_company_can_get_revenue', $this, $notify, $can);
 
             if (!$can && $notify) {
                 if (

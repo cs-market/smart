@@ -1,9 +1,10 @@
 {script src="js/tygh/exceptions.js"}
+
 <div class="ty-product-bigpicture">
     {hook name="products:view_main_info"}
         {if $product}
             {assign var="obj_id" value=$product.product_id}
-            {include file="common/product_data.tpl" product=$product but_role="big" but_text=__("add_to_cart")}
+            {include file="common/product_data.tpl" product=$product but_role="big" but_text=__("add_to_cart") product_labels_mini=true product_labels_static=true product_labels_rounded=true}
 
             <div class="ty-product-bigpicture__left">
                 <div class="ty-product-bigpicture__left-wrapper">
@@ -15,7 +16,7 @@
 
                     {hook name="products:image_wrap"}
                         {if !$no_images}
-                            <div class="ty-product-bigpicture__img {if $product.image_pairs|@count < 1} ty-product-bigpicture__no-thumbs{/if} cm-reload-{$product.product_id} {if $settings.Appearance.thumbnails_gallery == "Y"}ty-product-bigpicture__as-gallery{else}ty-product-bigpicture__as-thumbs{/if}" id="product_images_{$product.product_id}_update">
+                            <div class="ty-product-bigpicture__img {if $product.image_pairs|@count < 1} ty-product-bigpicture__no-thumbs{/if} cm-reload-{$product.product_id} {if $settings.Appearance.thumbnails_gallery == "Y"}ty-product-bigpicture__as-gallery{else}ty-product-bigpicture__as-thumbs{/if}" data-ca-previewer="true" id="product_images_{$product.product_id}_update">
                                 {include file="views/products/components/product_images.tpl" product=$product show_detailed_link="Y" thumbnails_size=55 }
                             <!--product_images_{$product.product_id}_update--></div>
                         {/if}
@@ -56,11 +57,13 @@
                     {/if}
 
                     {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
-                            {$smarty.capture.$clean_price nofilter}
-                            {$smarty.capture.$list_discount nofilter}
+                            <div class="ty-product-block__price-old">
+                                {$smarty.capture.$clean_price nofilter}
+                                {$smarty.capture.$list_discount nofilter}
 
-                            {assign var="discount_label" value="discount_label_`$obj_prefix``$obj_id`"}
-                            {$smarty.capture.$discount_label nofilter}
+                                {assign var="product_labels" value="product_labels_`$obj_prefix``$obj_id`"}
+                                {$smarty.capture.$product_labels nofilter}
+                            </div>
                         </div>
                     {/if}
                 </div>

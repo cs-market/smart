@@ -38,7 +38,7 @@ class UserProfiles extends AEntity
 
         return array(
             'status' => $status,
-            'data' => $data
+            'data' => array_values($data)
         );
     }
 

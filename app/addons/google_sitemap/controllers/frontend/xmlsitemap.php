@@ -12,20 +12,22 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
-if ($mode == 'view') {
-    if (!empty($_REQUEST['page'])) {
-        $page = intval($_REQUEST['page']);
-        $filename = fn_get_files_dir_path() . 'google_sitemap/sitemap' . $page . '.xml';
-    } else {
-        $page = 0;
-        $filename = fn_get_files_dir_path() . 'google_sitemap/sitemap.xml';
-    }
+if ($mode === 'view') {
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+    $page = isset($_REQUEST['page'])
+        ? (int) $_REQUEST['page']
+        : null;
 
-    if (file_exists($filename)) {
-        header("Content-Type: text/xml;charset=utf-8");
-        readfile($filename);
+    $sitemap_file_path = fn_google_sitemap_get_sitemap_path($storefront->storefront_id, $page);
+
+    if (file_exists($sitemap_file_path)) {
+        header('Content-Type: text/xml;charset=utf-8');
+        readfile($sitemap_file_path);
         exit();
     }
+
+    return [CONTROLLER_STATUS_NO_PAGE];
 }

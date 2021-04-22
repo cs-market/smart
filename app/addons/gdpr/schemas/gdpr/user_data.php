@@ -202,7 +202,7 @@ $schema = array(
         },
         'update_data_callback' => function ($agreements) {
             if (!empty($agreements)) {
-                $agreement_ids = fn_array_column($agreements, 'agreement_id');
+                $agreement_ids = array_column($agreements, 'agreement_id');
                 $first_agreement = reset($agreements);
                 $email = isset($first_agreement['email']) ? $first_agreement['email'] : '';
 
@@ -227,7 +227,7 @@ $schema = array(
         },
         'update_data_callback' => function ($subscribers) {
             if (!empty($subscribers)) {
-                $subscription_ids = fn_array_column($subscribers,'subscription_id');
+                $subscription_ids = array_column($subscribers, 'subscription_id');
 
                 if ($subscription_ids) {
                     db_query('DELETE FROM ?:product_subscriptions WHERE subscription_id IN (?n)', $subscription_ids);

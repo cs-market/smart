@@ -21,5 +21,6 @@ Tygh::$app->register(new ServiceProvider());
 
 fn_register_hooks(
     'place_order',
-    'change_order_status'
+    'change_order_status',
+    'yml_export_get_options_post'
 );

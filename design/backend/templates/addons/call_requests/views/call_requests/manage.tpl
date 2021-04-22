@@ -14,8 +14,8 @@
 
 
 {if $call_requests}
-<div class="table-wrapper">
-    <table width="100%" class="table table-middle cr-table">
+<div class="table-responsive-wrapper">
+    <table width="100%" class="table table-middle table-responsive">
     <thead>
         <tr>
             <th class="left" width="1%">
@@ -46,12 +46,15 @@
     {foreach from=$call_requests item=request}
         <tbody class="cm-row-item">
             <tr class="cm-row-status-{$request.status|lower}">
-                <td class="left">
-                    <input type="checkbox" name="request_ids[]" value="{$request.request_id}" class="checkbox cm-item cm-item-status-{$request.status|lower}" />
+                <td class="left mobile-hide">
+                    <input type="checkbox" name="request_ids[]" value="{$request.request_id}" class="cm-item cm-item-status-{$request.status|lower}" />
                 </td>
-                <td>{$request.request_id}</td>
-                <td>{$request.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
-                <td>
+                <td data-th="{__("id")}">
+                    {$request.request_id}
+                    {include file="views/companies/components/company_name.tpl" object=$request}
+                </td>
+                <td data-th="{__("date")}">{$request.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</td>
+                <td data-th="{__("call_requests.person_name_and_phone")}">
                     {if $request.name}
                         <strong>{$request.name}</strong><br>
                     {else}
@@ -59,9 +62,9 @@
                             <i>{__("call_requests.no_name_specified")}</i>
                         </div>
                     {/if}
-                    <span><bdi>{$request.phone}</bdi></span>
+                    <span><bdi><a href="tel:{$request.phone}">{$request.phone}</a></bdi></span>
                 </td>
-                <td class="nowrap">
+                <td data-th="{__("order")}" class="nowrap">
                     <div class="cr-table-status">
                         <input type="text" name="call_requests[{$request.request_id}][order_id]" size="3" value="{if {$request.order_id}}{$request.order_id}{/if}" class="input-micro input-hidden right" />
                         {if $request.order_id}
@@ -69,7 +72,7 @@
                         {/if}
                     </div>
                 </td>
-                <td>
+                <td data-th="{__("call_requests.responsible")}">
                     <select name="call_requests[{$request.request_id}][user_id]" class="input-medium input-hidden">
                         <option> -- </option>
                         {foreach from=$responsibles item=name key=user_id}
@@ -85,15 +88,15 @@
                         {dropdown content=$smarty.capture.tools_list}
                     </div>
                 </td>
-                <td class="right nowrap">
+                <td data-th="{__("status")}" class="right nowrap">
                     <div id="call_requests_status_{$request.request_id}">
                         {include file="common/select_popup.tpl" popup_additional_class="dropleft" id=$request.request_id status=$request.status update_controller="call_requests" items_status=$call_request_statuses btn_meta="btn btn-info btn-small cr-btn-status-{$request.status}"|lower extra="&return_url={$return_url}" st_result_ids="call_requests_status_{$request.request_id}"}
                     <!--call_requests_status_{$request.request_id}--></div>
                 </td>
             </tr>
             <tr class="cr-table-detail">
-                <td>&nbsp;</td>
-                <td colspan="3" valign="top">
+                <td class="mobile-hide">&nbsp;</td>
+                <td colspan="3" valign="top" {if !$request.product_id && !$request.cart_products}class="mobile-hide"{/if}>
                     {if $request.product_id}
                         <div>
                             <span>{__("call_requests.requested_product")}:</span><br>
@@ -111,7 +114,7 @@
                     {/if}
                 </td>
 
-                <td colspan="3" valign="top">
+                <td colspan="3" valign="top" class="noborder--mobile">
                     <textarea name="call_requests[{$request.request_id}][notes]" class="input-hidden" cols="20" rows="3" placeholder="{__("call_requests.notes")}">{$request.notes}</textarea>
                     <div class="cr-time">
                         <span>{__("call_requests.convenient_time")}:</span>
@@ -119,7 +122,7 @@
                     </div>
                 </td>
 
-                <td>&nbsp;</td>
+                <td class="mobile-hide">&nbsp;</td>
             </tr>
             {if $request.cart_products}
                 <tr id="call_req_{$request.request_id}" class="hidden">

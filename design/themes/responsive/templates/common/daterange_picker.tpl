@@ -1,6 +1,18 @@
 {$start_date = $start_date|default:("-30 day"|strtotime)}
 {$end_date = $end_date|default:("now"|strtotime)}
-<div id="{$id}" class="cm-date-range ty-date-range {$extra_class}" {if $data_url}data-ca-target-url="{$data_url}"{/if} {if $result_ids}data-ca-target-id="{$result_ids}"{/if} data-ca-time-from="{$start_date}" data-ca-time-to="{$end_date}" data-ca-date-format="{if $settings.Appearance.calendar_date_format == "month_first"}MM/DD/YYYY{else}DD/MM/YYYY{/if}" {if $data_event}data-ca-event="{$data_event}"{/if}>
+<div id="{$id}"
+    class="cm-date-range ty-date-range {$extra_class}"
+    {if $data_url}data-ca-target-url="{$data_url}"{/if}
+    {if $result_ids}data-ca-target-id="{$result_ids}"{/if}
+    data-ca-time-from="{$start_date}"
+    data-ca-time-to="{$end_date}"
+    data-ca-date-format="{if $settings.Appearance.calendar_date_format == "month_first"}MM/DD/YYYY{else}DD/MM/YYYY{/if}"
+    data-ca-displayed-format="{if $settings.Appearance.calendar_date_format == "month_first"}MMM DD, YYYY{else}DD MMM, YYYY{/if}"
+    data-ca-use-predefined-periods="{$use_predefined_periods|default:"false"}"
+    data-ca-show-ranges="{$show_ranges|default:"true"}"
+    {if $min_date}data-ca-min-date="{$min_date}"{/if}
+    {if $max_date}data-ca-max-date="{$max_date}"{/if}
+    {if $data_event}data-ca-event="{$data_event}"{/if}>
 
     <a class="btn-text">
         <i class="ty-icon-calendar"></i>
@@ -53,18 +65,9 @@
                 to: '{__("to")|escape:"javascript"}'
             });
             _.daterangepicker = {
-                usePredefinedPeriods: false,
-                customRangeFormat: '{if $settings.Appearance.calendar_date_format == "month_first"}MM/DD/YYYY{else}DD/MM/YYYY{/if}',
-                displayedFormat: '{if $settings.Appearance.calendar_date_format == "month_first"}MMM DD, YYYY{else}DD MMM, YYYY{/if}',
               };
-
-            {if $min_date}_.daterangepicker.minDate = '{$min_date}';{/if}
-            {if $max_date}_.daterangepicker.maxDate = '{$max_date}';{/if}
-
-            _.time_from = '{$start_date|escape:"javascript"}';
-            _.time_to = '{$end_date|escape:"javascript"}';
         });
     }(Tygh, Tygh.$));
 </script>
 
-{script src="js/tygh/date_picker.js" class="cm-ajax-force"}
+{script src="js/tygh/date_picker.js"}

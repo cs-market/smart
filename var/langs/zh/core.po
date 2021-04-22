@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: zh-CN\n"
-"X-Crowdin-File: /release-4.8.2/core.po\n"
+"X-Crowdin-File: /release-4.9.3/core.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"PO-Revision-Date: 2019-02-01 06:13\n"
 
 msgctxt "LanguageName"
 msgid "Localized language name"
@@ -1903,6 +1903,10 @@ msgstr "清除历史记录"
 msgctxt "Languages::clean_logs"
 msgid "Clear logs"
 msgstr "清除日志"
+
+msgctxt "Languages::clean_old_logs"
+msgid "Clear logs older than [n] day|Clear logs older than [n] days"
+msgstr ""
 
 msgctxt "Languages::clean_up_all_locations_on_import"
 msgid "Clean up locations before import"
@@ -4712,6 +4716,10 @@ msgctxt "Languages::information"
 msgid "Information"
 msgstr "信息"
 
+msgctxt "Languages::tip"
+msgid "Tip"
+msgstr ""
+
 msgctxt "Languages::inner_hint"
 msgid "Inner hint"
 msgstr "内部提示"
@@ -5422,7 +5430,7 @@ msgstr "菜单管理"
 
 msgctxt "Languages::manage_pages"
 msgid "Manage pages"
-msgstr "页面管理"
+msgstr "管理页面"
 
 msgctxt "Languages::manage_products"
 msgid "Manage products"
@@ -7150,7 +7158,7 @@ msgstr "管理设计"
 
 msgctxt "Languages::privileges.manage_languages"
 msgid "Manage languages"
-msgstr "管理语言"
+msgstr "语言管理"
 
 msgctxt "Languages::privileges.manage_locations"
 msgid "Manage locations"
@@ -7174,7 +7182,7 @@ msgstr "查看促销系统"
 
 msgctxt "Languages::privileges.manage_reports"
 msgid "Manage reports"
-msgstr "管理报告"
+msgstr "报表管理"
 
 msgctxt "Languages::privileges.manage_shipping"
 msgid "Manage shipping"
@@ -7182,7 +7190,7 @@ msgstr "管理配送"
 
 msgctxt "Languages::privileges.manage_sitemap"
 msgid "Manage sitemap"
-msgstr "管理站点地图"
+msgstr "站点地图管理"
 
 msgctxt "Languages::privileges.manage_static_data"
 msgid "Manage static data"
@@ -7298,11 +7306,11 @@ msgstr "查看用户"
 
 msgctxt "Languages::privilege_sections.addons"
 msgid "Add-ons"
-msgstr "插件"
+msgstr "附加功能"
 
 msgctxt "Languages::privilege_sections.administration"
 msgid "Administration"
-msgstr "管理员"
+msgstr "管理"
 
 msgctxt "Languages::privilege_sections.cart"
 msgid "Cart"
@@ -7330,7 +7338,7 @@ msgstr "用户"
 
 msgctxt "Languages::privilege_sections.vendors"
 msgid "Stores"
-msgstr "供货商"
+msgstr "店铺"
 
 msgctxt "Languages::proceed"
 msgid "Proceed"
@@ -8564,9 +8572,17 @@ msgctxt "Languages::secure_storefront_url"
 msgid "Secure storefront URL"
 msgstr ""
 
+msgctxt "Languages::store_access_key"
+msgid "Access key to temporarily closed store"
+msgstr ""
+
 msgctxt "Languages::secure_storefront_url_already_exists"
 msgid "The value of the <strong>Secure storefront URL</strong> parameter mentioned by you already belongs to another company."
 msgstr "<strong>Secure storefront URL</strong> 的参数值与其他公司冲突。"
+
+msgctxt "Languages::url_access_storefront"
+msgid "Use the following URL to access the storefront:<br><a href=\"[url]\" target=\"_blank\">[url]</a>"
+msgstr ""
 
 msgctxt "Languages::security_settings"
 msgid "Security settings"
@@ -8587,6 +8603,10 @@ msgstr "选择框"
 msgctxt "Languages::selected"
 msgid "Selected"
 msgstr "已选择"
+
+msgctxt "Languages::selected_fields"
+msgid "Selected fields"
+msgstr ""
 
 msgctxt "Languages::selected_items"
 msgid "Selected items"
@@ -8877,8 +8897,8 @@ msgid "Shipping Options"
 msgstr "配送选项"
 
 msgctxt "Languages::shipping_properties"
-msgid "Shipping Properties"
-msgstr "配送属性"
+msgid "Shipping properties"
+msgstr ""
 
 msgctxt "Languages::shipping_rates"
 msgid "Shipping rates"
@@ -9787,6 +9807,14 @@ msgstr "<strong>Storefront URL</strong> 的参数值与其他公司冲突。"
 msgctxt "Languages::storefront_url_not_defined"
 msgid "Storefront URL not defined"
 msgstr "店铺首页URL未定义"
+
+msgctxt "Languages::stores_status"
+msgid "Status"
+msgstr ""
+
+msgctxt "Languages::storefront_status_access_key_hint"
+msgid "Even if the storefront is closed (the status set to OFF), you'll be able to view it if you have an access key. Go to <a target=\"blank\" href=\"[url]\">Settings → General</a> and specify the <i>Access key to temporarily closed store</i> setting. Please note that a different key can be specified for each storefront, so make sure to select the correct storefront first. Use the key as described in the tooltip of that setting."
+msgstr ""
 
 msgctxt "Languages::stores"
 msgid "Stores"
@@ -12232,8 +12260,16 @@ msgctxt "Languages::ttc_popularity"
 msgid "Product popularity rating based on how many times the storefront has been viewed, number of additions to cart and number of purchases."
 msgstr "产品受欢迎程度评分基于前台多少次查看,添加到购物车的数目和购买的数量."
 
+msgctxt "Languages::ttc_search_words"
+msgid "Enter a few words here, and the product will appear in the results of the built-in search for those words, even if the product name or description doesn't have them. Separate different search words by commas."
+msgstr ""
+
 msgctxt "Languages::ttc_storefront_url"
 msgid "All the storefronts domain names must be associated with the same IP-address. Note: Switch to \"All stores\" to edit"
+msgstr ""
+
+msgctxt "Languages::ttc_stores_status"
+msgid "ON—the storefront is open; everyone will see it. OFF—the storefront is closed; only those who have the access code will be able to see it."
 msgstr ""
 
 msgctxt "Languages::tts_activate_menu_tab_for"
@@ -12665,7 +12701,7 @@ msgid "Your server has wrong PHP script timeout settings. This could be due to r
 msgstr ""
 
 msgctxt "Languages::upgrade_center.warning_msg_executed_php"
-msgid "<p class=\"text-error\">We have started a dummy PHP script. It will be working during 6 minutes. When the check is finished, we'll tell you if the PHP script's timeouts can be set correctly. If yes, than you are good to go with the upgrade. Please wait until the check is finished to be sure that your server has correct PHP timeout configuration.</p>"
+msgid "<p class=\"text-error\">We have started a dummy PHP script. It will be working during 6 minutes. When the check is finished, we'll tell you if the PHP script's timeouts can be set correctly. If yes, then you are good to go with the upgrade. Please wait until the check is finished to be sure that your server has correct PHP timeout configuration.</p>"
 msgstr ""
 
 msgctxt "Languages::upload"
@@ -13732,6 +13768,14 @@ msgctxt "Languages::marketplace_find_more"
 msgid "Find more add-ons and themes in <a href=\"[href]\" target=\"_blank\">Marketplace</a>"
 msgstr ""
 
+msgctxt "Languages::more_languages"
+msgid "More languages"
+msgstr ""
+
+msgctxt "Languages::languages_find_more"
+msgid "If you haven't found the language you need, check out <a href=\"[href]\" target=\"_blank\">our site with free language packs</a>."
+msgstr ""
+
 msgctxt "Languages::extract_archive"
 msgid "Extract archive"
 msgstr ""
@@ -13879,6 +13923,14 @@ msgstr "发送邮件方法"
 msgctxt "SettingsOptions::width"
 msgid "Image width"
 msgstr "图片宽度"
+
+msgctxt "SettingsOptions::log_lifetime"
+msgid "Days before a log entry is removed"
+msgstr ""
+
+msgctxt "SettingsTooltips::log_lifetime"
+msgid "Logs older than the specified number of days will be removed automatically. Enter 0 if you don't want any automatic removal of old logs."
+msgstr ""
 
 msgctxt "SettingsOptions::log_type_orders"
 msgid "Orders"
@@ -14159,10 +14211,6 @@ msgstr "Sendmail 设置"
 msgctxt "SettingsOptions::default_zipcode"
 msgid "Default zipcode"
 msgstr "默认邮编"
-
-msgctxt "SettingsOptions::company_fax"
-msgid "Company fax"
-msgstr "公司的传真"
 
 msgctxt "SettingsOptions::frontend_default_language"
 msgid "Frontend default language"
@@ -15452,6 +15500,54 @@ msgctxt "ProfileFields::s_address_type"
 msgid "Address type"
 msgstr "地址类型"
 
+msgctxt "ProfileFields::admin_firstname"
+msgid "First name"
+msgstr ""
+
+msgctxt "ProfileFields::admin_lastname"
+msgid "Last name"
+msgstr ""
+
+msgctxt "ProfileFields::company_description"
+msgid "Description"
+msgstr ""
+
+msgctxt "ProfileFields::address"
+msgid "Address"
+msgstr ""
+
+msgctxt "ProfileFields::city"
+msgid "City"
+msgstr ""
+
+msgctxt "ProfileFields::country"
+msgid "Country"
+msgstr ""
+
+msgctxt "ProfileFields::state"
+msgid "State/Province"
+msgstr ""
+
+msgctxt "ProfileFields::zipcode"
+msgid "Zip/postal code"
+msgstr ""
+
+msgctxt "ProfileFields::accept_terms"
+msgid "I accept the Terms and Conditions"
+msgstr ""
+
+msgctxt "Languages::vendor_terms"
+msgid "Vendor terms and conditions"
+msgstr ""
+
+msgctxt "Languages::vendor_terms_field_alert"
+msgid "Vendor terms and conditions alert"
+msgstr ""
+
+msgctxt "Languages::vendor_terms_field_terms_text"
+msgid "Vendor terms and conditions text"
+msgstr ""
+
 msgctxt "Languages::product_must_have_owner_category"
 msgid "Product must belong to some category created by the owner company."
 msgstr ""
@@ -15858,7 +15954,7 @@ msgid "At least one storefront must remain"
 msgstr ""
 
 msgctxt "Languages::datakeeper.run_backup_via_cron_message"
-msgid "You can run the backup automatically at certain time intervals. To do it, add the following command to CRON:"
+msgid "You can run the backup automatically at certain time intervals. To do it, add the following command to <a href=\"https://en.wikipedia.org/wiki/Cron\" target=\"_blank\">Cron</a>:"
 msgstr ""
 
 msgctxt "Languages::datakeeper.error_unsupported_file_type"
@@ -15875,6 +15971,10 @@ msgstr ""
 
 msgctxt "Languages::uc_backup_info_subj"
 msgid "Upgrade Center: Store has been backed up and closed."
+msgstr ""
+
+msgctxt "Languages::uc_info_subj"
+msgid "Upgrade Center: Store has been closed."
 msgstr ""
 
 msgctxt "Languages::error_features_too_many_variants"
@@ -16075,6 +16175,18 @@ msgstr ""
 
 msgctxt "Languages::tools_addons_disabled_msg"
 msgid "An administrator disabled all add-ons or third-party add-ons.<br> Press the Re-enable add-ons button to initialize the add-ons that were previously active."
+msgstr ""
+
+msgctxt "Languages::tools_addons_additional_shipping_methods"
+msgid "There may be more carriers. They'll show up if you activate the corresponding <a href=\"[url]\">shipping add-ons</a>."
+msgstr ""
+
+msgctxt "Languages::tools_addons_additional_payment_methods"
+msgid "There may be more payment processors. They'll show up if you activate the corresponding <a href=\"[url]\">payment add-ons</a>."
+msgstr ""
+
+msgctxt "Languages::tools_addons_additional_themes"
+msgid "There may be more themes. They'll show up if you activate the corresponding <a href=\"[url]\">theme add-ons</a>."
 msgstr ""
 
 msgctxt "Languages::addons_source"
@@ -16455,6 +16567,10 @@ msgstr ""
 
 msgctxt "Languages::copy"
 msgid "Copy"
+msgstr ""
+
+msgctxt "Languages::copied"
+msgid "Copied"
 msgstr ""
 
 msgctxt "Languages::addon_uninstall_sql_error"
@@ -17239,6 +17355,14 @@ msgstr ""
 
 msgctxt "Languages::licensing.license_error_license_is_disabled"
 msgid "The license is disabled. Please check your license status."
+msgstr ""
+
+msgctxt "Languages::licensing.license_error_license_is_disabled.title"
+msgid "Your [product] license has been disabled"
+msgstr ""
+
+msgctxt "Languages::licensing.license_error_license_is_disabled.text"
+msgid "Please contact us <a href=\"[helpdesk_url]\" target=\"_blank\">via Customer Help Desk</a> to find out why it happened and what can be done about it. To access the admin panel right now, you can enter another valid license number, as long as it isn't used in another store:"
 msgstr ""
 
 msgctxt "Languages::licensing.license_error_license_is_invalid"
@@ -18330,6 +18454,94 @@ msgid "<p>Some countries require that websites notify customers about the use of
 msgstr ""
 
 msgctxt "Languages::file_uploading_in_progress_please_wait"
-msgid "File uploading in progess. Please, wait."
+msgid "File uploading in progress. Please wait."
+msgstr ""
+
+msgctxt "Languages::profile_types_section_user"
+msgid "Customers and admins"
+msgstr ""
+
+msgctxt "Languages::profile_types_section_seller"
+msgid "Vendor information"
+msgstr ""
+
+msgctxt "Languages::profile_type"
+msgid "Profile type"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.example_of_modified_value"
+msgid "Example of the modified value"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.decrease_hint"
+msgid "To decrease the value use the \"-\". Example: -5"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.make_active"
+msgid "Make products active"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.make_disabled"
+msgid "Make products disabled"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.make_hidden"
+msgid "Make products hidden"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.price_and_stock"
+msgid "Price & Stock"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean"
+msgid "What do these checkboxes mean?"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_checked"
+msgid "all the selected products belong to this category or will be assigned to it."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_unchecked"
+msgid "none of the selected products belong to this category, or they will be removed from it."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.what_do_these_checkboxes_mean_indeterminate"
+msgid "some of the selected products belong to this category; no changes will be made."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.unable_to_delete_all_categories"
+msgid "At least one category must be selected"
+msgstr ""
+
+msgctxt "Languages::bulk_edit.some_products_were_omitted"
+msgid "Some products were skipped because the last remaining category can't be removed or added for a product."
+msgstr ""
+
+msgctxt "Languages::bulk_edit.some_products_were_omitted_other_storefront"
+msgid "Couldn't edit selected products. Some of the selected products belong to other storefronts; please deselect those products to be able to edit remaining ones."
+msgstr ""
+
+msgctxt "Languages::custom_search"
+msgid "Custom search"
+msgstr ""
+
+msgctxt "Languages::system_environment"
+msgid "System environment"
+msgstr ""
+
+msgctxt "Languages::pickup_point_not_selected"
+msgid "Sorry, we couldn't determine your pickup point. Please choose a pickup point, so that we know where to deliver your order."
+msgstr ""
+
+msgctxt "Languages::affected_email_templates"
+msgid "Email templates using this document"
+msgstr ""
+
+msgctxt "Languages::ru.tax_and_payments.upgrade_message.title"
+msgid "Russian Legislation: Preparing for January 1, 2019"
+msgstr ""
+
+msgctxt "Languages::ru.tax_and_payments.upgrade_message.message"
+msgid "<p>You have upgraded to [product] [version]. This version is prepared for the recent changes in Russian legislation (the increase of VAT to 20% and the support of Fiscal Data Format 1.05 for online cash registers). You'll only need to do this:</p><p>— If you use ATOL Online, switch to Fiscal Data Format 1.05 as described <a href=\"https://www.cs-cart.ru/blog/vyishel-cs-cart-4-9-2-c-podderzhkoy-ffd-1-05-v-atol-onlayn/\" target=\"_blank\">in our Russian blog</a>. You may have done it already after the release of version 4.9.2.</p>[tax_conversion][failing_services]"
 msgstr ""
 

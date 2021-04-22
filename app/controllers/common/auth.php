@@ -15,6 +15,7 @@
 use Tygh\Development;
 use Tygh\Registry;
 use Tygh\Helpdesk;
+use Tygh\Tools\Url;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -42,11 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             return array(CONTROLLER_STATUS_REDIRECT, $redirect_url);
         }
+
         //
         // Success login
         //
-        if (!empty($user_data) && !empty($password) && fn_generate_salted_password($password, $salt) == $user_data['password']) {
-
+        if (
+            !empty($user_data)
+            && !empty($password)
+            && fn_user_password_verify((int) $user_data['user_id'], $password, (string) $user_data['password'], (string) $salt)
+        ) {
             // Regenerate session ID for security reasons
             Tygh::$app['session']->regenerateID();
 
@@ -104,7 +109,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_REQUEST['redirect_url']);
 
             if (AREA == 'C') {
-                fn_set_notification('N', __('notice'), __('successful_login'));
+                if (empty($_REQUEST['quick_login'])) {
+                    fn_set_notification('N', __('notice'), __('successful_login'));
+                } else {
+                    Tygh::$app['ajax']->assign('force_redirection', fn_url($redirect_url));
+                    exit;
+                }
             }
 
             if (AREA == 'A' && Registry::get('runtime.unsupported_browser')) {
@@ -112,21 +122,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             unset(Tygh::$app['session']['cart']['edit_step']);
-
         } else {
-        //
-        // Login incorrect
-        //
             // Log user failed login
-            fn_log_event('users', 'failed_login', array (
+            fn_log_event('users', 'failed_login', [
                 'user' => $user_login
-            ));
+            ]);
 
             $auth = fn_fill_auth();
-            fn_set_notification('E', __('error'), __('error_incorrect_login'));
+
+            if (empty($_REQUEST['quick_login'])) {
+                fn_set_notification('E', __('error'), __('error_incorrect_login'));
+            }
             fn_save_post_data('user_login');
 
-            return array(CONTROLLER_STATUS_REDIRECT, $redirect_url);
+            if (AREA === 'C' && defined('AJAX_REQUEST') && isset($_REQUEST['login_block_id'])) {
+                /** @var \Tygh\SmartyEngine\Core $view */
+                $view = Tygh::$app['view'];
+                /** @var \Tygh\Ajax $ajax */
+                $ajax = Tygh::$app['ajax'];
+
+                $view->assign([
+                    'stored_user_login' => $user_login,
+                    'style'             => 'popup',
+                    'login_error'       => true,
+                    'id'                => $_REQUEST['login_block_id']
+                ]);
+
+                if ($view->templateExists('views/auth/login_form.tpl')) {
+                    $view->display('views/auth/login_form.tpl');
+                    $view->clearAssign(['login_error', 'id', 'style', 'stored_user_login']);
+
+                    return [CONTROLLER_STATUS_NO_CONTENT];
+                }
+            }
+
+            return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
         }
 
         unset(Tygh::$app['session']['edit_step']);
@@ -155,15 +185,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         } elseif ($action === 'recover') {
             $ekey = $params['ekey'];
-            $result = fn_recover_password_login($ekey);
-            if ($result !== null) {
-                if ($result === LOGIN_STATUS_USER_NOT_FOUND || $result === LOGIN_STATUS_USER_DISABLED) {
-                    $redirect_url = fn_url();
-                } elseif ($result === false) {
-                    $redirect_url = 'auth.recover_password';
+
+            $user_data = fn_recover_password_login($ekey, true);
+            if ($user_data) {
+                list($user_id, $user_status) = $user_data;
+                if ($user_status !== LOGIN_STATUS_USER_NOT_FOUND && $user_status !== LOGIN_STATUS_USER_DISABLED) {
+                    $redirect_url = 'profiles.update?user_id=' . $user_id;
                 } else {
-                    $redirect_url = 'profiles.update?user_id=' . $result;
+                    $redirect_url = fn_url();
                 }
+            } elseif ($user_data === false) {
+                $redirect_url = 'auth.recover_password';
             }
         }
     }
@@ -188,7 +220,82 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    return array(CONTROLLER_STATUS_OK, !empty($redirect_url)? $redirect_url : fn_url());
+    if ($mode === 'send_otp' && AREA === 'C') {
+        $email = isset($_REQUEST['email']) ? trim($_REQUEST['email']) : null;
+        $return_url = isset($_REQUEST['return_url']) ? trim($_REQUEST['return_url']) : null;
+
+        if (empty($email)) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        $user_id = fn_is_user_exists(0, [
+           'email' => $email
+        ]);
+
+        if (empty($user_id)) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        if (!fn_user_send_otp($user_id)) {
+            fn_set_notification('E', __('error'), __('error_occurred'));
+        } elseif ($action === 'resend') {
+            fn_set_notification('N', __('notice'), __('auth.one_time_password.notification.info_password_sent', [
+                '[email]' => $email
+            ]));
+        }
+
+        $redirect_url_params = [
+            'email'      => $email,
+            'return_url' => $return_url,
+        ];
+
+        if (defined('AJAX_REQUEST') && isset($_REQUEST['container_id'])) {
+            $redirect_url_params['container_id'] = trim($_REQUEST['container_id']);
+        }
+
+        $redirect_url = Url::buildUrn('auth.login_by_otp', $redirect_url_params);
+    }
+
+    if ($mode === 'login_by_otp' && AREA === 'C') {
+        $email = isset($_REQUEST['email']) ? trim($_REQUEST['email']) : null;
+        $password = isset($_REQUEST['password']) ? trim($_REQUEST['password']) : null;
+        $return_url = isset($_REQUEST['return_url']) ? trim($_REQUEST['return_url']) : null;
+
+        if (empty($email) || empty($password)) {
+            fn_set_notification('E', __('error'), __('auth.one_time_password.notification.error_password_required'));
+
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        $user_id = fn_is_user_exists(0, [
+            'email' => $email
+        ]);
+
+        if (empty($user_id)) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        $user_status = fn_user_login_by_otp($user_id, $password);
+
+        if ($user_status === LOGIN_STATUS_OK) {
+            if (defined('AJAX_REQUEST')) {
+                /** @var \Tygh\Ajax $ajax */
+                $ajax = Tygh::$app['ajax'];
+                $ajax->assign('force_redirection', $return_url);
+
+                return [CONTROLLER_STATUS_NO_CONTENT];
+            }
+            $redirect_url = $return_url;
+        } elseif ($user_status === LOGIN_STATUS_USER_DISABLED) {
+            fn_set_notification('E', __('error'), __('error_account_disabled'));
+        } elseif ($user_status) {
+            fn_set_notification('E', __('error'), __('error_occurred'));
+        } else {
+            fn_set_notification('E', __('error'), __('auth.one_time_password.notification.error_password_invalid'));
+        }
+    }
+
+    return [CONTROLLER_STATUS_OK, !empty($redirect_url) ? $redirect_url : fn_url()];
 }
 
 //
@@ -230,14 +337,11 @@ if ($mode == 'ekey_login') {
 
     $ekey = !empty($_REQUEST['ekey']) ? $_REQUEST['ekey'] : '';
     $redirect_url = fn_url();
-    $result = fn_recover_password_login($ekey);
+    $user_data = fn_recover_password_login($ekey, true);
 
-    if (!is_null($result)) {
-        if ($result === LOGIN_STATUS_USER_NOT_FOUND || $result === LOGIN_STATUS_USER_DISABLED) {
-            $redirect_url = fn_url();
-        } elseif ($result === false) {
-            $redirect_url = fn_url();
-        } else {
+    if ($user_data) {
+        list($user_id, $user_status) = $user_data;
+        if ($user_status !== LOGIN_STATUS_USER_NOT_FOUND && $user_status !== LOGIN_STATUS_USER_DISABLED) {
             fn_delete_notification('notice_text_change_password');
 
             if (!empty($_REQUEST['redirect_url'])) {
@@ -246,8 +350,6 @@ if ($mode == 'ekey_login') {
                 if (strpos($redirect_url, '://') === false) {
                     $redirect_url = 'http://' . $redirect_url;
                 }
-            } else {
-                $redirect_url = fn_url();
             }
         }
     }
@@ -262,7 +364,6 @@ if ($mode == 'login_form') {
     if (defined('AJAX_REQUEST') && empty($auth)) {
         exit;
     }
-
     if (!empty($auth['user_id'])) {
         return array(CONTROLLER_STATUS_REDIRECT, fn_url());
     }
@@ -306,4 +407,14 @@ if ($mode == 'login_form') {
     fn_delete_session_data(AREA . '_user_id', AREA . '_password');
 
     return array(CONTROLLER_STATUS_OK, 'checkout.checkout');
+} elseif ($mode === 'login_by_otp' && AREA === 'C') {
+    if (!defined('AJAX_REQUEST')) {
+        return array(CONTROLLER_STATUS_REDIRECT, fn_url(''));
+    }
+
+    Tygh::$app['view']->assign([
+        'email'        => isset($_REQUEST['email']) ? trim($_REQUEST['email']) : null,
+        'return_url'   => isset($_REQUEST['return_url']) ? trim($_REQUEST['return_url']) : null,
+        'container_id' => isset($_REQUEST['container_id']) ? trim($_REQUEST['container_id']) : null,
+    ]);
 }

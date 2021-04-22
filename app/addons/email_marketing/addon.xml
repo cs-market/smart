@@ -13,7 +13,7 @@
     <functions>
         <item for="install">fn_em_install</item>
     </functions>
-    <settings layout="separate" edition_type="MVE:ROOT,ULT:VENDOR">
+    <settings layout="separate" edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>
@@ -80,6 +80,7 @@
     </settings>
     <queries>
         <item>DROP TABLE IF EXISTS ?:em_subscribers;</item>
+        <item>DROP TABLE IF EXISTS ?:em_mailchimp_webhooks;</item>
         <item>
             CREATE TABLE `?:em_subscribers` (
                 `subscriber_id` mediumint(8) unsigned NOT NULL auto_increment,
@@ -95,12 +96,20 @@
                 PRIMARY KEY  (`subscriber_id`)
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>
+        <item>
+            CREATE TABLE `?:em_mailchimp_webhooks` (
+            `webhook_id` varchar(128) NOT NULL default '',
+            `list_id` varchar(128) NOT NULL default '',
+            PRIMARY KEY  (`webhook_id`)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
         <item for="demo">REPLACE INTO ?:usergroup_privileges (usergroup_id, privilege) VALUES ('4', 'view_email_marketing');</item>
         <item for="demo">REPLACE INTO ?:usergroup_privileges (usergroup_id, privilege) VALUES ('4', 'manage_email_marketing');</item>
-        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('view_email_marketing', 'Y', 'cms');</item>
-        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_email_marketing', 'Y', 'cms');</item>
+        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_email_marketing', 'Y', 'marketing', 'email_marketing', 'Y');</item>
+        <item>REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_email_marketing', 'Y', 'marketing', 'email_marketing', 'N');</item>
 
         <item for="uninstall">DROP TABLE IF EXISTS ?:em_subscribers;</item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:em_mailchimp_webhooks;</item>
         <item for="uninstall">DELETE FROM ?:privileges WHERE privilege IN ('manage_email_marketing', 'view_email_marketing')</item>
         <item for="uninstall">DELETE FROM ?:usergroup_privileges WHERE privilege IN ('manage_email_marketing', 'view_email_marketing')</item>
     </queries>

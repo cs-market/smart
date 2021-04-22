@@ -64,6 +64,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix = ".manage";
     }
 
+    if ($mode === 'update_status') {
+        if (!empty($_REQUEST['promotion_ids'])) {
+            foreach ($_REQUEST['promotion_ids'] as $promotion_id) {
+                fn_tools_update_status([
+                    'table'             => 'promotions',
+                    'status'            => $_REQUEST['status'],
+                    'id_name'           => 'promotion_id',
+                    'id'                => $promotion_id,
+                    'show_error_notice' => false
+                ]);
+            }
+        }
+
+        return [CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']];
+    }
+
     return array(CONTROLLER_STATUS_OK, 'promotions' . $suffix);
 }
 
@@ -72,23 +88,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 // promotion data
 if ($mode == 'update') {
 
-    Registry::set('navigation.tabs', array (
-        'details' => array (
+    $tabs = [
+        'details' => [
             'title' => __('general'),
-            'href' => "promotions.update?promotion_id=$_REQUEST[promotion_id]&selected_section=details",
-            'js' => true
-        ),
-        'conditions' => array (
+            'href' => "promotions.update?promotion_id={$_REQUEST['promotion_id']}&selected_section=details",
+            'js' => true,
+        ],
+        'conditions' => [
             'title' => __('conditions'),
-            'href' => "promotions.update?promotion_id=$_REQUEST[promotion_id]&selected_section=conditions",
-            'js' => true
-        ),
-        'bonuses' => array (
+            'href' => "promotions.update?promotion_id={$_REQUEST['promotion_id']}&selected_section=conditions",
+            'js' => true,
+        ],
+        'bonuses' => [
             'title' => __('bonuses'),
-            'href' => "promotions.update?promotion_id=$_REQUEST[promotion_id]&selected_section=bonuses",
-            'js' => true
-        ),
-    ));
+            'href' => "promotions.update?promotion_id={$_REQUEST['promotion_id']}&selected_section=bonuses",
+            'js' => true,
+        ],
+
+    ];
+
+    if (fn_allowed_for('MULTIVENDOR:ULTIMATE'))  {
+        $tabs['storefronts'] = [
+            'title' => __('storefronts'),
+            'href' => "promotions.update?promotion_id={$_REQUEST['promotion_id']}&selected_section=storefronts",
+            'js' => true,
+        ];
+    }
+
+    if (fn_allowed_for('ULTIMATE')) {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($is_sharing_enabled, $is_shared) = $repository->getSharingDetails(['promotion_ids' => $_REQUEST['promotion_id']]);
+
+        Tygh::$app['view']->assign([
+            'is_sharing_enabled' => $is_sharing_enabled,
+            'is_shared'          => $is_shared,
+        ]);
+
+        if ($is_sharing_enabled) {
+            $tabs['storefronts'] = [
+                'title' => __('storefronts'),
+                'href' => "promotions.update?promotion_id={$_REQUEST['promotion_id']}&selected_section=storefronts",
+                'js' => true,
+            ];
+        }
+    }
+
+    Registry::set('navigation.tabs', $tabs);
 
     $promotion_data = fn_get_promotion_data($_REQUEST['promotion_id']);
 
@@ -114,23 +160,33 @@ if ($mode == 'update') {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
 
-    Registry::set('navigation.tabs', array (
-        'details' => array (
+    $tabs = [
+        'details' => [
             'title' => __('general'),
             'href' => "promotions.add?selected_section=details",
-            'js' => true
-        ),
-        'conditions' => array (
+            'js' => true,
+        ],
+        'conditions' => [
             'title' => __('conditions'),
             'href' => "promotions.add?selected_section=conditions",
-            'js' => true
-        ),
-        'bonuses' => array (
+            'js' => true,
+        ],
+        'bonuses' => [
             'title' => __('bonuses'),
             'href' => "promotions.add?selected_section=bonuses",
             'js' => true
-        ),
-    ));
+        ],
+    ];
+
+    if (fn_allowed_for('MULTIVENDOR:ULTIMATE')) {
+        $tabs['storefronts'] = [
+            'title' => __('storefronts'),
+            'href' => 'promotions.add?selected_section=storefronts',
+            'js' => true,
+        ];
+    }
+
+    Registry::set('navigation.tabs', $tabs);
 
     Tygh::$app['view']->assign('zone', $zone);
     Tygh::$app['view']->assign('schema', fn_promotion_get_schema());

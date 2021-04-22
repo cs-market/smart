@@ -90,7 +90,7 @@ function fn_temando_change_packages(subclass_value)
 	<label class="control-label" for="test_mode">{__("test_mode")}:</label>
 	<div class="controls">
 	<input type="hidden" name="shipping_data[service_params][test_mode]" value="N" />
-	<input id="test_mode" type="checkbox" name="shipping_data[service_params][test_mode]" value="Y" {if $shipping.service_params.test_mode == "Y"}checked="checked"{/if} class="checkbox" />
+	<input id="test_mode" type="checkbox" name="shipping_data[service_params][test_mode]" value="Y" {if $shipping.service_params.test_mode == "Y"}checked="checked"{/if} />
 	</div>
 </div>
 
@@ -120,7 +120,7 @@ function fn_temando_change_packages(subclass_value)
 	<label class="control-label" for="ship_temando_fragile">{__("fragile")}:</label>
 	<div class="controls">
 	<input type="hidden" name="shipping_data[service_params][temando_fragile]" value="N" />
-	<input id="ship_temando_fragile" type="checkbox" name="shipping_data[service_params][temando_fragile]" value="Y" {if $shipping.service_params.temando_fragile == "Y"}checked="checked"{/if} class="checkbox" />
+	<input id="ship_temando_fragile" type="checkbox" name="shipping_data[service_params][temando_fragile]" value="Y" {if $shipping.service_params.temando_fragile == "Y"}checked="checked"{/if} />
 	</div>
 </div>
 

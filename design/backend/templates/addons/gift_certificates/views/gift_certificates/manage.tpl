@@ -9,8 +9,8 @@
 {assign var="c_dummy" value="<i class=\"icon-dummy\"></i>"}
 
 {if $gift_certificates}
-<div class="table-wrapper">
-    <table class="table table-middle sortable">
+<div class="table-responsive-wrapper">
+    <table class="table table-middle table--relative table-responsive sortable">
     <thead>
         <tr>
             <th class="center" width="1%">
@@ -29,18 +29,19 @@
     <tbody>
     {foreach from=$gift_certificates item="gift"}
     <tr class="cm-row-status-{$gift.status|lower}">
-        <td class="left" width="1%">
-            <input type="checkbox" name="gift_cert_ids[]" value="{$gift.gift_cert_id}" class="checkbox cm-item" /></td>
-        <td>
+        <td class="left mobile-hide" width="1%">
+            <input type="checkbox" name="gift_cert_ids[]" value="{$gift.gift_cert_id}" class="cm-item" />
+        </td>
+        <td data-th="{__("code")}">
             <a href="{"gift_certificates.update?gift_cert_id=`$gift.gift_cert_id`"|fn_url}" class="nowrap row-status">{$gift.gift_cert_code}</a>
             {include file="views/companies/components/company_name.tpl" object=$gift}
         </td>
-        <td class="row-status">{$gift.sender}</td>
-        <td class="row-status">{$gift.recipient}</td>
-        <td class="row-status"><span class="nowrap">{if $gift.send_via == "P"}{__("mail")}{else}{__("email")}</span><br>({$gift.email}){/if}</td>
-        <td class="row-status"><a href="{"gift_certificates.update?gift_cert_id=`$gift.gift_cert_id`"|fn_url}" class="underlined">{$gift.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</a></td>
-        <td class="row-status">{include file="common/price.tpl" value=$gift.debit}</td>
-        <td class="nowrap">
+        <td data-th="{__("gift_cert_from")}" class="row-status">{$gift.sender}</td>
+        <td data-th="{__("gift_cert_to")}" class="row-status">{$gift.recipient}</td>
+        <td data-th="{__("type")}" class="row-status"><span class="nowrap">{if $gift.send_via == "P"}{__("mail")}{else}{__("email")}</span><br>({$gift.email}){/if}</td>
+        <td data-th="{__("date")}" class="row-status"><a href="{"gift_certificates.update?gift_cert_id=`$gift.gift_cert_id`"|fn_url}" class="underlined">{$gift.timestamp|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}</a></td>
+        <td data-th="{__("current_amount")}" class="row-status">{include file="common/price.tpl" value=$gift.debit}</td>
+        <td data-th="&nbsp;" class="nowrap">
             <div class="hidden-tools">
                 {capture name="tools_list"}
                     <li>{btn type="list" text=__("edit") href="gift_certificates.update?gift_cert_id=`$gift.gift_cert_id`"}</li>
@@ -49,8 +50,15 @@
                 {dropdown content=$smarty.capture.tools_list}
             </div>
         </td>
-        <td class="right nowrap">
-            {include file="common/select_popup.tpl" id=$gift.gift_cert_id status=$gift.status items_status=$gift_status_descr update_controller="gift_certificates" notify=true statuses=$gift_statuses popup_additional_class="dropleft"}
+        <td data-th="{__("status")}" class="right nowrap">
+            {include file="common/select_popup.tpl"
+                     id=$gift.gift_cert_id
+                     status=$gift.status
+                     items_status=$gift_status_descr
+                     update_controller="gift_certificates"
+                     notify=true
+                     popup_additional_class="dropleft"
+            }
         </td>
     </tr>
     {/foreach}

@@ -20,4 +20,9 @@ $schema['central']['customers']['items']['suppliers'] = array(
     'position' => 400
 );
 
+$schema['top']['administration']['items']['notifications']['subitems']['suppliers.supplier_notifications'] = array(
+    'href' => 'notification_settings.manage?receiver_type=S',
+    'position' => 350,
+);
+
 return $schema;

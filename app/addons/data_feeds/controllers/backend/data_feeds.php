@@ -17,6 +17,10 @@ use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+$storefront_id = empty($_REQUEST['storefront_id'])
+    ? 0
+    : (int) $_REQUEST['storefront_id'];
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $suffix = ".manage";
@@ -43,6 +47,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         $suffix = ".manage";
+    }
+
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['datafeed_ids'])
+        && is_array($_REQUEST['datafeed_ids'])
+        && !empty($_REQUEST['status'])
+    ) {
+        $status_to = (string) $_REQUEST['status'];
+
+        foreach ($_REQUEST['datafeed_ids'] as $datafeed_id) {
+            fn_tools_update_status([
+                'table'             => 'data_feeds',
+                'status'            => $status_to,
+                'id_name'           => 'datafeed_id',
+                'id'                => $datafeed_id,
+                'show_error_notice' => false
+            ]);
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('data_feeds.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
     }
 
     if ($mode == 'set_layout') {
@@ -98,6 +131,7 @@ if ($mode == 'manage') {
     $datafeeds = fn_data_feeds_get_data(array(), DESCR_SL);
     Tygh::$app['view']->assign('datafeeds', $datafeeds);
     Tygh::$app['view']->assign('cron_password', Registry::get('cron_password'));
+    Tygh::$app['view']->assign('selected_storefront_id', $storefront_id);
 
 } elseif ($mode == 'add') {
     $layouts = db_get_hash_array("SELECT * FROM ?:exim_layouts WHERE pattern_id = 'data_feeds'", "layout_id");
@@ -124,7 +158,7 @@ if ($mode == 'manage') {
     }
 
     // Export languages
-    foreach (fn_get_translation_languages() as $lang_code => $lang_data) {
+    foreach (Languages::getAll() as $lang_code => $lang_data) {
         $datafeed_langs[$lang_code] = $lang_data['name'];
     }
     Tygh::$app['view']->assign('datafeed_langs', $datafeed_langs);
@@ -177,7 +211,7 @@ if ($mode == 'manage') {
     Tygh::$app['view']->assign('datafeed_data', $datafeed_data);
 
     // Export languages
-    foreach (fn_get_translation_languages() as $lang_code => $lang_data) {
+    foreach (Languages::getAll() as $lang_code => $lang_data) {
         $datafeed_langs[$lang_code] = $lang_data['name'];
     }
     Tygh::$app['view']->assign('datafeed_langs', $datafeed_langs);
@@ -291,7 +325,7 @@ function fn_data_feeds_update_feed($feed_data, $feed_id = 0, $lang_code = CART_L
             $_data['datafeed_id'] = $feed_id;
             $_data['datafeed_name'] = $feed_data['datafeed_name'];
 
-            foreach (fn_get_translation_languages() as $_data['lang_code'] => $_v) {
+            foreach (Languages::getAll() as $_data['lang_code'] => $_v) {
                 db_query("INSERT INTO ?:data_feed_descriptions ?e", $_data);
             }
         }

@@ -1,10 +1,5 @@
-{if $store_location.store_location_id}
-    {assign var="id" value=$store_location.store_location_id}
-{else}
-    {assign var="id" value="0"}
-{/if}
-
-{assign var="allow_save" value=$store_location|fn_allow_save_object:"store_locations"}
+{$id = $store_location.store_location_id|default:"0"}
+{$allow_save = $store_location|fn_allow_save_object:"store_locations" && fn_check_view_permissions("store_locator.update", "POST")}
 {$show_save_btn = $allow_save scope = root}
 
 {include file="addons/store_locator/pickers/map.tpl"}
@@ -19,6 +14,8 @@
 
         <div id="content_detailed">
             <fieldset>
+                {hook name="store_locator:content_detailed"}
+
                 <div class="control-group">
                     <label for="elm_name" class="cm-required control-label">{__("name")}:</label>
                     <div class="controls">
@@ -26,20 +23,37 @@
                     </div>
                 </div>
 
-                {if "ULTIMATE"|fn_allowed_for}
                 {include file="views/companies/components/company_field.tpl"
                     name="store_location_data[company_id]"
                     id="company_id_{$id}"
                     selected=$store_location.company_id
                 }
-                {else}
-                    <input type="hidden" name="store_location_data[company_id]" value="0">
-                {/if}
 
                 <div class="control-group">
                     <label class="control-label" for="elm_position">{__("position")}:</label>
                     <div class="controls">
                         <input type="text" name="store_location_data[position]" id="elm_position" value="{$store_location.position}" size="3">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="elm_pickup_address" class="control-label">{__("address")}</label>
+                    <div class="controls">
+                        <input class="input-large" type="text" name="store_location_data[pickup_address]" id="elm_pickup_address" size="55" value="{$store_location.pickup_address}" />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="elm_pickup_phone" class="control-label">{__("phone")}</label>
+                    <div class="controls">
+                        <input class="input-large" type="text" name="store_location_data[pickup_phone]" id="elm_pickup_phone" size="55" value="{$store_location.pickup_phone}" />
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="elm_pickup_work_time" class="control-label">{__("store_locator.work_time")}</label>
+                    <div class="controls">
+                        <input class="input-large" type="text" name="store_location_data[pickup_time]" id="elm_pickup_work_time" size="55" value="{$store_location.pickup_time}" />
                     </div>
                 </div>
 
@@ -54,7 +68,7 @@
                     <label class="control-label" for="elm_country">{__("country")}:</label>
                     <div class="controls">
                         {assign var="countries" value=1|fn_get_simple_countries:$smarty.const.CART_LANGUAGE}
-                        <select id="elm_country" name="store_location_data[country]" class="select">
+                        <select id="elm_country_{$id}" name="store_location_data[country]" class="select cm-country cm-location-{$id}">
                             <option value="">- {__("select_country")} -</option>
                             {foreach from=$countries item="country" key="code"}
                                 <option {if $store_location.country == $code}selected="selected"{/if} value="{$code}" title="{$country}">{$country}</option>
@@ -62,6 +76,35 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="elm_country">{__("state")}:</label>
+                    <div class="controls">
+                        <select id="elm_state_{$id}" class="cm-state cm-location-{$id}" name="store_location_data[state]">
+                            <option value="">- {__("select_state")} -</option>
+                            {foreach $states[$store_location.country] as $state_id => $state}
+                                <option {if $state_id == $store_location.state}selected{/if} value="{$state_id}">{$state.state}</option>
+                            {/foreach}
+                        </select>
+                        <input type="text"
+                               id="elm_state_{$id}_d"
+                               name="store_location_data[state]"
+                               value="{$store_location.state}"
+                               disabled="disabled"
+                               class="cm-state cm-location-{$id} hidden"
+                        />
+                    </div>
+                </div>
+
+                <script type="text/javascript">
+                    (function(_, $) {
+                        $.ceRebuildStates('init', {
+                            default_country: '{$store_location.country|escape:javascript}',
+                            states: {$states|json_encode nofilter}
+                        });
+                    }(Tygh, Tygh.$));
+                </script>
+
 
                 <div class="control-group">
                     <label class="control-label" for="elm_city">{__("city")}:</label>
@@ -75,13 +118,11 @@
                     <label class="control-label cm-required hidden" for="elm_latitude">{__("latitude")}</label>
                     <label class="control-label cm-required hidden" for="elm_longitude">{__("longitude")}</label>
                     <div class="controls">
-                        <input type="hidden" id="elm_latitude_hidden" value="{$store_location.latitude}" />
-                        <input type="hidden" id="elm_longitude_hidden" value="{$store_location.longitude}" />
-                        <input type="text" name="store_location_data[latitude]" id="elm_latitude" value="{$store_location.latitude}" class="input-small">
+                        {hook name="store_locator:select_coordinates"}
+                        <input type="text" name="store_location_data[latitude]" id="elm_latitude" value="{$store_location.latitude}" data-ca-latest-latitude="{$store_location.latitude}" class="input-small">
                         &times;
-                        <input type="text" name="store_location_data[longitude]" id="elm_longitude" value="{$store_location.longitude}" class="input-small">
-
-                        {include file="buttons/button.tpl" but_text=__("select") but_role="action" but_meta="btn-primary cm-map-dialog"}
+                        <input type="text" name="store_location_data[longitude]" id="elm_longitude" value="{$store_location.longitude}" data-ca-latest-longitude="{$store_location.longitude}" class="input-small">
+                        {/hook}
                     </div>
                 </div>
 
@@ -91,7 +132,7 @@
                 {/hook}
 
                 {include file="common/select_status.tpl" input_name="store_location_data[status]" id="elm_status" obj_id=$store_location.location_id obj=$store_location}
-
+                {/hook}
             </fieldset>
         </div>
 
@@ -100,6 +141,58 @@
             {/hook}
         </div>
 
+        <div id="content_pickup">
+
+            {if !empty($store_location.pickup_surcharge)}
+                {** TODO: delete it some day, when all clients have migrated to new rates calculation **}
+                <div class="control-group cm-hide-inputs">
+                    <label class="control-label" for="elm_pickup_surcharge">{__("surcharge")}:</label>
+                    <div class="controls">
+                        <input id="elm_pickup_surcharge" type="text" name="store_location_data[pickup_surcharge]" class="input-mini" value="{$store_location.pickup_surcharge}" size="4"> {$currencies.$primary_currency.symbol nofilter}
+                        <p>{__("store_locator.surcharge_changes_hint")}</p>
+                    </div>
+                </div>
+            {/if}
+
+            {hook name="store_locator:content_pickup"}
+            {if $destinations}
+                <div class="control-group">
+                    <label class="control-label">{__("store_locator.main_destination")}:</label>
+                    <div class="controls">
+                        <select name="store_location_data[main_destination_id]" id="main_destination">
+                            <option value="">{__("none")}</option>
+                            {foreach $destinations as $destination}
+                                <option value="{$destination.destination_id}" {if $store_location.main_destination_id === $destination.destination_id}selected{/if}>{$destination.destination}</option>
+                            {/foreach}
+                        </select>
+                        <p class="muted description">{__("tt_addons_store_locator_views_store_locator_update_store_locator.main_destination")}</p>
+                    </div>
+                </div>
+
+                <div class="control-group store-locator__pickup-destinations-list{if !$store_location.main_destination_id} hidden{/if}">
+                    <label class="control-label">{__("store_locator.show_to")}:</label>
+                    <div class="controls">
+                        {foreach from=$destinations item=destination}
+                            <label class="checkbox inline" for="destinations_{$destination.destination_id}">
+                                <input
+                                    type="checkbox"
+                                    name="store_location_data[pickup_destinations_ids][]"
+                                    class="store-locator__destination"
+                                    id="destinations_{$destination.destination_id}"
+                                    {if $store_location.pickup_destinations_ids && $destination.destination_id|in_array:$store_location.pickup_destinations_ids}
+                                        checked="checked"
+                                    {/if}
+                                    value="{$destination.destination_id}"
+                                />{$destination.destination}
+                            </label>
+                        {/foreach}
+                        <p class="muted description">{__("tt_addons_store_locator_views_store_locator_update_store_locator.show_to")}</p>
+                    </div>
+                </div>
+            {/if}
+            {/hook}
+
+        </div>
         {hook name="store_locator:tabs_content"}
         {/hook}
 
@@ -127,12 +220,10 @@
 {include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox track=true}
 {/capture}
 
-{if $id}
-    {$title_start = __('editing_store_location')}
-    {$title_end = $store_location.name}
-{else}
-    {$title = __("new_store_location")}
-{/if}
-
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$title content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
-
+{include file="common/mainbox.tpl"
+    title=($id) ? $store_location.name : __("new_store_location")
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+}
+{script src="js/addons/store_locator/destinations.js"}

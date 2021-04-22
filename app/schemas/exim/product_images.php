@@ -12,6 +12,10 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Registry;
+
+include_once(Registry::get('config.dir.schemas') . 'exim/products.functions.php');
+
 $schema = array(
     'section' => 'products',
     'name' => __('images'),

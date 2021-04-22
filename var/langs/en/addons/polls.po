@@ -203,3 +203,7 @@ msgstr "Votes on page"
 msgctxt "SettingsOptions::polls::polls_comments_on_page"
 msgid "Answers on page"
 msgstr "Answers on page"
+
+msgctxt "Languages::n_polls"
+msgid "[n] poll|[n] polls"
+msgstr "[n] poll|[n] polls"

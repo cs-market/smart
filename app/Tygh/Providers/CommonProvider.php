@@ -60,5 +60,16 @@ class CommonProvider implements ServiceProviderInterface
         $app['antibot.default_driver'] = function(Application $app) {
             return new NullDriver();
         };
+
+        $app['assets_cache_key'] = function($app) {
+            Registry::registerCache('assets_cache_key', SECONDS_IN_DAY * 365, Registry::cacheLevel('time'));
+            $assets_cache_key = Registry::get('assets_cache_key');
+            if (!$assets_cache_key) {
+                $assets_cache_key = TIME;
+                Registry::set('assets_cache_key', $assets_cache_key);
+            }
+
+            return $assets_cache_key;
+        };
     }
 }

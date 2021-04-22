@@ -18,14 +18,12 @@
                 <a href="{"shipments.details?shipment_id=`$shipment.shipment_id`"|fn_url}"><span>#{$shipment.shipment_id}</span></a>
             </div>
         </div>
-        <div class="control-group">
-            <div class="control-label">
-                {__("tracking_number")}
-            </div>
-
-            <div class="controls">
-                {if $yandex_order_data.orders.$shipment_id.yandex_id}
-
+        <div class="tracking-number-right-pane">
+            <div class="control-group">
+                <div class="control-label">
+                    {__("tracking_number")}
+                </div>
+                <div class="controls">
                     <a class="hand cm-tooltip icon-edit cm-combination tracking-number-edit-link" title="{__("edit")}" id="sw_tracking_number_{$shipment_key}"></a>
                     {if $shipment.carrier_info.tracking_url}
                         <a href="{$shipment.carrier_info.tracking_url nofilter}" target="_blank" id="on_tracking_number_{$shipment_key}">{if $shipment.tracking_number}{$shipment.tracking_number}{else}&mdash;{/if}</a>
@@ -37,7 +35,17 @@
                         <input type="hidden" name="update_shipping[{$shipping.group_key}][{$shipment.shipment_id}][shipping_id]" value="{$shipping.shipping_id}" />
                         <input type="hidden" name="update_shipping[{$shipping.group_key}][{$shipment.shipment_id}][carrier]" value="{$shipment.carrier}" />
                     </div>
-                {/if}
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">
+                    {__("yandex_delivery.inner_order")}
+                </div>
+                <div class="controls">
+                    {if $yandex_order_data.orders.$shipment_id.yandex_id}
+                        {$yandex_order_data.orders.$shipment_id.yandex_full_num}
+                    {/if}
+                </div>
             </div>
         </div>
         <div class="control-group">

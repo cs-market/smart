@@ -10,6 +10,7 @@
                     <option value="{$field_option}" {if $option_data.google_export_name_option == $field_option}selected="selected"{/if}>{$field_option}</option>
                 {/foreach}
             </select>
+            <p class="muted description">{__("tt_addons_google_export_hooks_product_options_properties_post_google_name_option")}</p>
         </div>
     </div>
 </div>

@@ -5,40 +5,28 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_communication.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.12.1/addons/vendor_communication.po\n"
+"X-Crowdin-File-ID: 3916\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::vendor_communication"
-msgid "Customer-to-Vendor Communication"
-msgstr "تواصل العملاء و الموردين"
+msgid "Message center"
+msgstr ""
 
 msgctxt "Addons::description::vendor_communication"
-msgid "Allows customers to communicate with vendors directly via the store's interface."
-msgstr "السماح للعملاء بالتواصل مع البائعين مباشرة عبر واجهة المتجر."
+msgid "Allows customers, vendors, and administrators to contact each other via the built-in chat."
+msgstr ""
 
 msgctxt "SettingsSections::vendor_communication::general"
 msgid "General"
 msgstr "عام"
 
-msgctxt "SettingsSections::vendor_communication::notifications"
-msgid "Notifications"
-msgstr "اشعارات"
-
-msgctxt "SettingsOptions::vendor_communication::notify_admin"
-msgid "Notify admin"
-msgstr "إخطار المشرف"
-
-msgctxt "SettingsOptions::vendor_communication::notify_vendor"
-msgid "Notify vendor"
-msgstr "إخطار البائع"
-
-msgctxt "SettingsOptions::vendor_communication::notify_customer"
-msgid "Notify customer"
-msgstr "اخطار العميل"
+msgctxt "SettingsSections::vendor_communication::vendor_to_customer"
+msgid "For customers"
+msgstr ""
 
 msgctxt "SettingsOptions::vendor_communication::show_on_product"
 msgid "Contact button on product pages"
@@ -48,25 +36,25 @@ msgctxt "SettingsOptions::vendor_communication::show_on_vendor"
 msgid "Contact button in vendor microstore"
 msgstr ""
 
-msgctxt "SettingsTooltips::vendor_communication::notify_admin"
-msgid "Send an email to root administrator about every newly-posted message."
-msgstr "ارسال ميل للمشرف الرئيسي حول كل تعليق رساله."
-
-msgctxt "SettingsTooltips::vendor_communication::notify_vendor"
-msgid "Send emails to vendor's contact email address about newly-posted messages."
-msgstr "إرسال رسائل البريد الإلكتروني إلى عنوان البريد الإلكتروني جهة اتصال المورد حول الرسائل التي نشرت حديثا."
-
-msgctxt "SettingsTooltips::vendor_communication::notify_customer"
-msgid "Send emails to customers about newly-posted messages in their threads."
-msgstr "إرسال رسائل البريد الإلكتروني للعملاء حول الرسائل التي نشرت حديثا في مواضيعهم."
+msgctxt "SettingsOptions::vendor_communication::show_on_messages"
+msgid "Contact button at \"Messages\" menu"
+msgstr ""
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_product"
-msgid "Show the \"Contact vendor\" button on product pages."
-msgstr "إظهار \"جهة اتصال المورد\" على صفحات المنتج."
+msgid "Show the \"Ask a question\" button on product pages."
+msgstr ""
 
 msgctxt "SettingsTooltips::vendor_communication::show_on_vendor"
-msgid "Show the \"Contact vendor\" button in vendors' microstores."
-msgstr "إظهار \"جهة اتصال المورد\" على صفحات المنتج."
+msgid "Show the \"Ask a question\" button in vendors' microstores."
+msgstr ""
+
+msgctxt "SettingsOptions::vendor_communication::vendor_to_customer_communication"
+msgid "Customer-to-seller communication"
+msgstr ""
+
+msgctxt "SettingsOptions::vendor_communication::vendor_to_admin_communication"
+msgid "Vendor-to-admin communication"
+msgstr ""
 
 msgctxt "Languages::vendor_communication.messages"
 msgid "Messages"
@@ -75,6 +63,14 @@ msgstr "رسائل"
 msgctxt "Languages::vendor_communication.message_center"
 msgid "Message center"
 msgstr "مركز الرسائل"
+
+msgctxt "Languages::vendor_communication.message_center_name"
+msgid "Message center"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.message_center_name_menu_description"
+msgid "Messages from customers"
+msgstr ""
 
 msgctxt "Languages::vendor_communication.message_center_menu_description"
 msgid "Customer-to-vendor messages"
@@ -96,9 +92,13 @@ msgctxt "Languages::vendor_communication.contact_vendor"
 msgid "Contact vendor"
 msgstr "الاتصال بالبائع"
 
+msgctxt "Languages::vendor_communication.ask_a_question"
+msgid "Ask a question"
+msgstr ""
+
 msgctxt "Languages::vendor_communication.contact_vendor_name"
 msgid "Contact [vendor_name]"
-msgstr ""
+msgstr "اتصل [vendor_name]"
 
 msgctxt "Languages::vendor_communication.created_at"
 msgid "Created on"
@@ -107,6 +107,10 @@ msgstr ""
 msgctxt "Languages::vendor_communication.new_thread_created"
 msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>The vendor's reply will be sent to the email address of your account. To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
 msgstr "تم إرسال رسالتك الي <b>[vendor_name]</b>.<br/><br/>سيتم إرسال الرد الخاص بالمورد إلى عنوان البريد الإلكتروني للحساب الخاص بك. لعرض محفوظات الرسائل الخاصة بك، يرجى <a href=\"[thread_url]\">الذهاب إلى</a> مركز الرسائل الموجودة في قسم \"الرسائل\" قائمة \"حسابي\"."
+
+msgctxt "Languages::vendor_communication.message_sent"
+msgid "Your message has been sent to <b>[vendor_name]</b>.<br/><br/>We'll notify you about a reply. To view your message history, please <a href=\"[thread_url]\" target=\"_blank\">go to the Message Center</a> located in the \"Messages\" section of the \"My account\" menu."
+msgstr ""
 
 msgctxt "Languages::vendor_communication.cannot_update_thread"
 msgid "Cannot update thread"
@@ -117,11 +121,11 @@ msgid "Cannot create thread"
 msgstr ""
 
 msgctxt "Languages::email_template.vendor_communication.notify_admin"
-msgid "Customer-to-Vendor Communication: Admin Notification"
+msgid "Ask seller a question: Admin Notification"
 msgstr ""
 
 msgctxt "Languages::email_template.vendor_communication.notify_customer"
-msgid "Customer-to-Vendor Communication: Customer Notification"
+msgid "Ask seller a question: Customer Notification"
 msgstr ""
 
 msgctxt "Languages::vendor_communication.you_have_new_message"
@@ -150,15 +154,15 @@ msgstr ""
 
 msgctxt "Languages::vendor_communication.customer_name"
 msgid "Customer name"
-msgstr ""
+msgstr "إسم الزبون"
 
 msgctxt "Languages::vendor_communication.error_message"
 msgid "Please enter your message"
-msgstr ""
+msgstr "أدرج رسالتك من فضلك"
 
 msgctxt "Languages::vendor_communication.type_message"
 msgid "Type a message..."
-msgstr ""
+msgstr "اكتب رسالة..."
 
 msgctxt "Languages::vendor_communication.you"
 msgid "You"
@@ -182,7 +186,7 @@ msgstr ""
 
 msgctxt "Languages::vendor_communication.cannot_post_message"
 msgid "Cannot post message"
-msgstr ""
+msgstr "لا يمكن نشر الرسالة"
 
 msgctxt "Languages::vendor_communication.no_threads_found"
 msgid "No threads found"
@@ -198,5 +202,101 @@ msgstr ""
 
 msgctxt "Languages::vendor_communication.please_log_in_to_contact_vendor"
 msgid "Please sign in to contact the vendor"
+msgstr "الرجاء تسجيل الدخول للاتصال بالبائع"
+
+msgctxt "Languages::privileges.manage_vendor_communication"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privileges.view_vendor_communication"
+msgid "Can view"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.vendor_communication"
+msgid "Message center: customer-to-vendor communication"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.your_message_to_vendor_name"
+msgid "Your message to [vendor_name]"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.please_log_in_to_be_notified"
+msgid "Please sign in so that we can notify you about a reply"
+msgstr ""
+
+msgctxt "Languages::vendor_communication"
+msgid "Ask seller a question"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.event.message_received.name"
+msgid "Customer-to-vendor: New message received"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.event.vendor_to_admin_message_received.name"
+msgid "Vendor-to-admin: New message received"
+msgstr ""
+
+msgctxt "Languages::internal_template.vendor_communication_message_received"
+msgid "New message received"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.new_message.title"
+msgid "[company_name] has a new message from [customer]"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.new_message.message"
+msgid "Click this notification to see the message"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.contact_admin"
+msgid "Contact administrator"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.contact_vendor"
+msgid "Contact vendor"
+msgstr "الاتصال بالبائع"
+
+msgctxt "Languages::vendor_communication.communication"
+msgid "Communication"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.message_center_vendor_name"
+msgid "Message center"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.message_center_vendor_name_menu_description"
+msgid "Messages from vendor to administrator"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_admin"
+msgid "Vendor communication"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_customer"
+msgid "Customer communication"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.tab_vendor_to_admin_for_vendor_panel"
+msgid "Admin communication"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.your_message_to_admin"
+msgid "Your message to administrator"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.some_threads_have_not_been_created"
+msgid "Some threads have not been created: [count]"
+msgstr ""
+
+msgctxt "Languages::vendor_communication.vendor_to_admin.message_sent"
+msgid "Your message has been sent to <b>[name]</b>.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+msgstr ""
+
+msgctxt "Languages::vendor_communication.vendor_to_admin.message_list_sent"
+msgid "Your messages have been sent.<br/><br/>To view your message history, please <a href=\"[thread_url]\">go to the Message Center</a> located in the \"Vendors\" menu."
+msgstr ""
+
+msgctxt "Languages::privilege_groups.admin_communication"
+msgid "Message center: vendor-to-admin communication"
 msgstr ""
 

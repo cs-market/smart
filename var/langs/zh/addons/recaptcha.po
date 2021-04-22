@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: zh-CN\n"
-"X-Crowdin-File: /release-4.8.2/addons/recaptcha.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/recaptcha.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:02\n"
+"PO-Revision-Date: 2019-02-01 06:13\n"
 
 msgctxt "Addons::name::recaptcha"
 msgid "Google reCAPTCHA"
@@ -64,6 +64,18 @@ msgctxt "SettingsOptions::recaptcha::recaptcha_secret"
 msgid "Secret"
 msgstr "秘密"
 
+msgctxt "SettingsSections::recaptcha::general"
+msgid "General"
+msgstr ""
+
+msgctxt "SettingsSections::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr ""
+
+msgctxt "SettingsOptions::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr ""
+
 msgctxt "Languages::error_validator_recaptcha"
 msgid "Please confirm you are not a robot."
 msgstr "请确认你不是一个机器人。"
@@ -73,6 +85,10 @@ msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> a
 msgstr "<p> 如何获取 <b> 站点密钥 </b> 和 <b> 机密 </b> 的说明可用 <b> <a target=\"_blank\" href=\"https://developers.google.com/recaptcha/docs/start\"> 此处 </a> </b>。"
 
 msgctxt "Languages::recaptcha.text_settings_notice"
-msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.</p>"
-msgstr "<p> 如何获取 <b> 站点密钥 </b> 和 <b> 机密 </b> 的说明可用 <b> <a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\"> 此处 </a> </b>。"
+msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.<br>Please note that the add-on currently supports only <b>reCAPTCHA v2: Checkbox</b></p>"
+msgstr ""
+
+msgctxt "Languages::recaptcha.text_forbidden_countries_notice"
+msgid "<p>Google reCAPTACHA will be disabled for the selected countries. Instead, visitors from those countries will be asked to type a few symbols they see on the screen.</p>"
+msgstr ""
 

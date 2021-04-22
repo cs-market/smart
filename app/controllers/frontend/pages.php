@@ -12,6 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -27,6 +28,15 @@ if ($mode == 'view') {
     $_REQUEST['page_id'] = empty($_REQUEST['page_id']) ? 0 : $_REQUEST['page_id'];
     $preview = fn_is_preview_action($auth, $_REQUEST);
     $page = fn_get_page_data($_REQUEST['page_id'], CART_LANGUAGE, $preview);
+
+    if (!empty($_REQUEST['page_id']) && empty($auth['user_id'])) {
+
+        $uids = explode(',', db_get_field('SELECT usergroup_ids FROM ?:pages WHERE page_id = ?i', $_REQUEST['page_id']));
+
+        if (!in_array(USERGROUP_ALL, $uids) && !in_array(USERGROUP_GUEST, $uids)) {
+            return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+        }
+    }
 
     if (empty($page) || ($page['status'] == 'D' && !$preview)) {
         return array(CONTROLLER_STATUS_NO_PAGE);

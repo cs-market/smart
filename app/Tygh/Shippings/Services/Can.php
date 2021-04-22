@@ -285,9 +285,9 @@ class Can implements IService
 
         if (!empty($this->settings['customer_number'])) {
             $quote['quote-type'] = 'commercial';
-            $quote['customer-number'] = sprintf("%10i", $this->settings['customer_number']);
+            $quote['customer-number'] = sprintf("%10s", $this->settings['customer_number']);
             if (!empty($this->settings['contract_id'])) {
-                $quote['contract-id'] = sprintf("%10i", $this->settings['contract_id']);
+                $quote['contract-id'] = sprintf("%10s", $this->settings['contract_id']);
             }
         } else {
             $quote['quote-type'] = 'counter';
@@ -366,7 +366,7 @@ class Can implements IService
      */
     private function prepareParcelNode()
     {
-        $weight_data = fn_expand_weight($this->package['W']);
+        $weight_data = fn_convert_weight_to_imperial_units($this->package['W']);
         $weight = sprintf("%.3f", $weight_data['full_pounds'] * 0.4536);
 
         return fn_array_to_xml(array(

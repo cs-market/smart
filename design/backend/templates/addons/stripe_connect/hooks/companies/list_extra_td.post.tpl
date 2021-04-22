@@ -1,7 +1,7 @@
-<td class="row-status {if $company.stripe_connect_account_id}text-success{/if}">
+<td class="row-status {if $company.stripe_connect_account_id}text-success{else}muted{/if}">
     {if $company.stripe_connect_account_id}
-        {__("stripe_connect.connected")}
+        {__("stripe_connect.on")}
     {else}
-        {__("stripe_connect.not_connected")}
+        –
     {/if}
 </td>

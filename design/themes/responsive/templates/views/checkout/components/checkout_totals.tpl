@@ -1,6 +1,6 @@
-{if $location == "cart" && $cart.shipping_required == true && $settings.General.estimate_shipping_cost == "Y"}
+{if $location == "cart" && $cart.shipping_required == true && $settings.Checkout.estimate_shipping_cost == "YesNo::YES"|enum}
     {capture name="shipping_estimation"}
-        <i class="ty-cart-total__icon-estimation ty-icon-flight"></i><a id="opener_shipping_estimation_block" class="cm-dialog-opener cm-dialog-auto-size ty-cart-total__a-estimation" data-ca-target-id="shipping_estimation_block" href="{"checkout.cart"|fn_url}" rel="nofollow">{if $cart.shipping}{__("change")}{else}{__("calculate")}{/if}</a>
+        <i class="ty-cart-total__icon-estimation ty-icon-flight"></i><a id="opener_shipping_estimation_block" class="cm-dialog-opener cm-dialog-auto-size ty-cart-total__a-estimation" data-ca-target-id="shipping_estimation_block" title="{__("calculate_shipping_cost")}" href="{"checkout.cart"|fn_url}" rel="nofollow">{if $cart.shipping}{__("change")}{else}{__("calculate")}{/if}</a>
     {/capture}
     <div class="hidden" id="shipping_estimation_block" title="{__("calculate_shipping_cost")}">
         <div class="ty-cart-content__estimation">
@@ -26,7 +26,9 @@
         <ul class="ty-cart-statistic__total-list">
             <li class="ty-cart-statistic__item ty-cart-statistic__total">
                 <span class="ty-cart-statistic__total-title">{__("total_cost")}</span>
-                <span class="ty-cart-statistic__total-value">{include file="common/price.tpl" value=$_total|default:$smarty.capture._total|default:$cart.total span_id="cart_total" class="ty-price"}</span>
+                <span class="ty-cart-statistic__total-value">
+                    {include file="common/price.tpl" value=$_total|default:$smarty.capture._total|default:$cart.total span_id="cart_total" class="ty-price"}
+                </span>
             </li>
         </ul>
     <!--checkout_totals--></div>

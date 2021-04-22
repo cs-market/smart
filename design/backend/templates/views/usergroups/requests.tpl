@@ -1,4 +1,4 @@
-<form action="{""|fn_url}" method="post" name="usergroup_requests_form" class="form-table">
+<form action="{""|fn_url}" method="post" name="usergroup_requests_form" class="admin-content-external-form">
 {capture name="mainbox"}
 {assign var="c_icon" value="<i class=\"icon-`$search.sort_order_rev`\"></i>"}
 {assign var="c_dummy" value="<i class=\"icon-dummy\"></i>"}
@@ -8,7 +8,7 @@
 
 {if $usergroup_requests}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
+    <table width="100%" class="table table-middle table--relative table-responsive">
         <thead>
         <tr>
             <th width="1%" class="left mobile-hide">

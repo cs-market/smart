@@ -1,10 +1,10 @@
 {if $user_data.user_type == "C" && $show_tab_send_sms}
 <div id="content_message" class="cm-hide-save-button">
-    <h4 class="subheader ">{__("addons.rus_unisender.add_message_to_unisender")}<h4>
+    <h4 class="subheader ">{__("addons.rus_unisender.add_message_to_unisender")}</h4>
     <div class="control-group">
-        <label class="control-label" for="elm_profile_phone">{__("phone")}: </label>
+        <label class="control-label cm-mask-phone-label" for="elm_profile_phone">{__("phone")}: </label>
         <div class="controls">
-            <input id="elm_profile_phone" class="cm-phone" type="text"  name="sms_data[phone]" value="{$user_data['phone']}">
+            <input id="elm_profile_phone" class="cm-mask-phone" type="text"  name="sms_data[phone]" value="{$user_data['phone']}">
         </div>
     </div>
     <div class="control-group">

@@ -51,7 +51,7 @@
                 {foreach from=$cart.taxes item="tax"}
                     <tr>
                         <td class="ty-checkout-summary__item" data-ct-checkout-summary="tax-name {$tax.description}">
-                            <div class="ty-checkout-summary__taxes-name">{$tax.description} <bdi>({include file="common/modifier.tpl" mod_value=$tax.rate_value mod_type=$tax.rate_type}{if $tax.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.General.tax_calculation == "subtotal")} {__("included")}</bdi>{/if})</div>
+                            <div class="ty-checkout-summary__taxes-name">{$tax.description} <bdi>({include file="common/modifier.tpl" mod_value=$tax.rate_value mod_type=$tax.rate_type}{if $tax.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.Checkout.tax_calculation == "subtotal")} {__("included")}</bdi>{/if})</div>
                         </td>
                         <td class="ty-checkout-summary__item ty-right" data-ct-checkout-summary="taxes">
                             <span class="ty-checkout-summary__taxes-amount">{include file="common/price.tpl" value=$tax.tax_subtotal}</span>

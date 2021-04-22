@@ -84,6 +84,10 @@ msgctxt "Languages::addon.rus_geolocation.choose_cities"
 msgid "Yes, this is my city"
 msgstr "Yes, this is my city"
 
+msgctxt "Languages::addon.rus_geolocation.choose_city"
+msgid "Choose city"
+msgstr "Choose city"
+
 msgctxt "Languages::addon.rus_geolocation.selected_fields"
 msgid "Selected cities"
 msgstr "Selected cities"

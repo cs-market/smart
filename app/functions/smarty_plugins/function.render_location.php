@@ -43,7 +43,11 @@ function smarty_function_render_location($params, &$smarty)
 
     $lang_code = !empty($params['lang_code']) ? $params['lang_code'] : DESCR_SL;
 
-    $br = new RenderManager($dispatch, $area, $dynamic_object, $location_id, $lang_code);
+    $device_filter = empty($params['device'])
+        ? null
+        : $params['device'];
+
+    $br = new RenderManager($dispatch, $area, $dynamic_object, $location_id, $lang_code, $device_filter);
 
     return $br->render();
 }

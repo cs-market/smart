@@ -114,7 +114,7 @@
                 KEY `src_k` (`product_id`,`lower_limit`,`usergroup_id`)
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_reward_points', 'Y', 'addons');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_reward_points', 'Y', 'marketing', 'reward_points', 'N');</item>
         <item>REPLACE INTO ?:status_data (status_id, param, value) SELECT status_id, 'grant_reward_points' as param, 'Y' as value FROM ?:statuses WHERE status = 'C';</item>
         <item for="uninstall" editions="MULTIVENDOR,ULTIMATE">DELETE FROM ?:privileges WHERE privilege LIKE 'manage_reward_points'</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:reward_point_changes;</item>
@@ -130,9 +130,11 @@
                 <status><![CDATA[A]]></status>
                 <default_subject><![CDATA[{{ company_name }}: {% if reason.action == 'A' %}{{ __("reward_points_subj_added_to", [reason.amount]) }}{% else %}{{ __("reward_points_subj_subtracted_from", [reason.amount]) }}{% endif %}]]></default_subject>
                 <default_template><![CDATA[{{ snippet("header") }}
-
-  {{ __("dear") }} {{ user_data.firstname }},<br /><br />
-
+{% if user_data.firstname %}
+  {{__("hello_name", {"[name]" : user_data.firstname})}}
+{% else %}
+  {{ __("hello") }},
+{% endif %}<br /><br />
 {{ __("we_would_like_to_inform") }}: {% if reason.action == 'A' %}{{ __("reward_points_subj_added_to", [reason.amount]) }}{% else %}{{ __("reward_points_subj_subtracted_from", [reason.amount]) }}{% endif %}<br />
 
 <b>{{ __("reason") }}:</b><br />

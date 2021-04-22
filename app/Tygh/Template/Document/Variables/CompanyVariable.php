@@ -16,7 +16,10 @@
 namespace Tygh\Template\Document\Variables;
 
 
+use Tygh\Enum\ProfileTypes;
+use Tygh\Enum\SiteArea;
 use Tygh\Template\IActiveVariable;
+use Tygh\Template\IContext;
 
 /**
  * The class of the `company` variable; it allows access to company data in the document editor.
@@ -42,11 +45,12 @@ class CompanyVariable implements IActiveVariable, \ArrayAccess
     /**
      * CompanyVariable constructor.
      *
-     * @param array     $config     Variable config.
-     * @param int       $company_id Company identifier.
-     * @param string    $lang_code  Language code.
+     * @param array<string|array<string>> $config     Variable config.
+     * @param int                         $company_id Company identifier.
+     * @param string                      $lang_code  Language code.
+     * @param IContext                    $context    Context.
      */
-    public function __construct($config, $company_id, $lang_code)
+    public function __construct(array $config, $company_id, $lang_code, IContext $context)
     {
         $this->data = fn_get_company_placement_info($company_id, $lang_code);
         $this->logos = fn_get_logos($company_id);
@@ -57,25 +61,56 @@ class CompanyVariable implements IActiveVariable, \ArrayAccess
             $this->storefront_url = fn_url('', 'C', 'http');
         }
 
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $company = fn_get_company_data($company_id, $lang_code);
+
+            $fields = self::getProfileFields();
+
+            foreach ($fields as $field) {
+                $value = fn_get_profile_field_value($company, $field);
+
+                if (in_array($field['field_type'], ['A', 'O'])) {
+                    $this->data['company_' . $field['field_name'] . '_descr'] = $value;
+                    $this->data['company_' . $field['field_name']] = isset($company[$field['field_name']]) ? $company[$field['field_name']] : $value;
+                } else {
+                    $this->data['company_' . $field['field_name']] = $value;
+                }
+            }
+
+            if (
+                !empty($context->getArea())
+                && SiteArea::isStorefront($context->getArea())
+                || empty($context->getArea())
+                && SiteArea::isStorefront(AREA)
+            ) {
+                $this->data = fn_filter_company_data_by_profile_fields(
+                    $this->data,
+                    [
+                        'field_prefix' => 'company_',
+                    ]
+                );
+            }
+        }
+
         if (!empty($this->logos['mail']['image'])) {
-            $this->logo_mail = array(
-                'path' => $this->logos['mail']['image']['image_path'],
-                'alt' => $this->logos['mail']['image']['alt'],
+            $this->logo_mail = [
+                'path'   => $this->logos['mail']['image']['image_path'],
+                'alt'    => $this->logos['mail']['image']['alt'],
                 'height' => $this->logos['mail']['image']['image_y'],
-                'width' => $this->logos['mail']['image']['image_x'],
-            );
+                'width'  => $this->logos['mail']['image']['image_x'],
+            ];
         }
         $this->config = $config;
 
         $email_fields = isset($this->config['email_fields'])
-            ? $this->config['email_fields']
-            : array(
+            ? (array) $this->config['email_fields']
+            : [
                 'company_users_department', 'company_site_administrator', 'company_orders_department',
                 'company_support_department', 'company_newsletter_email'
-            );
+            ];
 
         foreach ($email_fields as $field) {
-            $this->data[$field . '_display'] = strtr($this->data[$field], array(',' => $this->config['email_separator'], ' ' => ''));
+            $this->data[$field . '_display'] = strtr($this->data[$field], [',' => $this->config['email_separator'], ' ' => '']);
         }
     }
 
@@ -137,40 +172,70 @@ class CompanyVariable implements IActiveVariable, \ArrayAccess
      */
     public static function attributes()
     {
-        return array(
+        $attributes = [
             'name', 'address', 'city', 'country', 'country_descr', 'state', 'state_descr', 'zipcode', 'phone', 'phone_2',
-            'fax', 'website', 'storefront_url', 'start_year', 'users_department', 'site_administrator', 'orders_department',
+            'website', 'storefront_url', 'start_year', 'users_department', 'site_administrator', 'orders_department',
             'support_department', 'newsletter_email', 'users_department_display', 'site_administrator_display', 'orders_department_display',
             'support_department_display', 'newsletter_email_display',
-            'logo_mail' => array(
+            'logo_mail' => [
                 'path', 'alt', 'width', 'height'
-            ),
-            'logos' => array(
-                'theme' => array(
+            ],
+            'logos' => [
+                'theme' => [
                     'logo_id', 'layout_id', 'style_id', 'type',
-                    'image' => array(
+                    'image' => [
                         'image_path', 'alt', 'image_x', 'image_y',
                         'http_image_path', 'https_image_path', 'absolute_path',
                         'relative_path'
-                    )
-                ),
-                'mail' => array(
+                    ]
+                ],
+                'mail' => [
                     'logo_id', 'layout_id', 'style_id', 'type',
-                    'image' => array(
+                    'image' => [
                         'image_path', 'alt', 'image_x', 'image_y',
                         'http_image_path', 'https_image_path', 'absolute_path',
                         'relative_path'
-                    )
-                ),
-                'favicon' => array(
+                    ]
+                ],
+                'favicon' => [
                     'logo_id', 'layout_id', 'style_id', 'type',
-                    'image' => array(
+                    'image' => [
                         'image_path', 'alt', 'image_x', 'image_y',
                         'http_image_path', 'https_image_path', 'absolute_path',
                         'relative_path'
-                    )
-                )
-            ),
-        );
+                    ]
+                ]
+            ]
+        ];
+
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $fields = self::getProfileFields();
+
+            foreach ($fields as $field) {
+                if (!empty($field['field_name'])) {
+                    $attributes[] = $field['field_name'];
+
+                    if (in_array($field['field_type'], array('A', 'O'))) {
+                        $attributes[] = $field['field_name'] . '_descr';
+                    }
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @return array
+     */
+    protected static function getProfileFields()
+    {
+        $group_fields = fn_get_profile_fields('A', [], CART_LANGUAGE, [
+            'profile_type' => ProfileTypes::CODE_SELLER,
+            'get_custom'   => true
+        ]);
+        $section = 'C';
+
+        return isset($group_fields[$section]) ? $group_fields[$section] : [];
     }
 }

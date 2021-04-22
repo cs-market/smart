@@ -3,7 +3,7 @@
     <form id='form' action="{""|fn_url}" method="post" name="taxes_form" class="form-horizontal form-edit" enctype="multipart/form-data">
         {include file="common/subheader.tpl" title=__("taxes") target="#taxes"}
         <div id="taxes" class="collapse in">
-            <table class="table table-middle" width="100%">
+            <table class="table table-middle table--relative" width="100%">
                 <thead class="cm-first-sibling">
                     <tr>
                         <th width="15%">{__("tax_cscart")}</th>

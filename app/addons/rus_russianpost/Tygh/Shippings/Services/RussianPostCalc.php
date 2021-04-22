@@ -148,7 +148,7 @@ class RussianPostCalc implements IService
      */
     public function getRequestData()
     {
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
+        $weight_data = fn_convert_weight_to_imperial_units($this->_shipping_info['package_info']['W']);
         $origination = $this->_shipping_info['package_info']['origination'];
         $location = $this->_shipping_info['package_info']['location'];
         $cost = $this->_shipping_info['package_info']['C'];

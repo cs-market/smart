@@ -17,6 +17,7 @@ use Tygh\Registry;
 use Tygh\Storage;
 use Tygh\Settings;
 use Tygh\Tools\ImageHelper;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -29,7 +30,7 @@ function fn_get_image($image_id, $object_type, $lang_code = CART_LANGUAGE, $get_
 
     if (!empty($image_id) && !empty($object_type)) {
         $image_data = db_get_row("SELECT ?:images.image_id, ?:images.image_path, ?:common_descriptions.description as alt, ?:images.image_x, ?:images.image_y FROM ?:images LEFT JOIN ?:common_descriptions ON ?:common_descriptions.object_id = ?:images.image_id AND ?:common_descriptions.object_holder = 'images' AND ?:common_descriptions.lang_code = ?s  WHERE ?:images.image_id = ?i", $lang_code, $image_id);
-        if ($get_all_alts && count(fn_get_translation_languages()) > 1) {
+        if ($get_all_alts && count(Languages::getAll()) > 1) {
             $image_data['alt'] = db_get_hash_single_array('SELECT description, lang_code FROM ?:common_descriptions WHERE object_id = ?i AND object_holder = ?s', array('lang_code', 'description'), $image_data['image_id'], 'images');
         }
     }
@@ -51,12 +52,17 @@ function fn_attach_absolute_image_paths(&$image_data, $object_type)
     $image_data['relative_path'] = $image_data['http_image_path'] = $image_data['https_image_path'] = $image_data['absolute_path'] = '';
 
     if (!empty($image_data['image_path'])) {
+
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = Tygh::$app['storefront'];
+        $url = $storefront->url;
+
         $image_name = $image_data['image_path'];
         $image_data['relative_path'] = $path . '/' . $image_name;
-        $image_data['http_image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, 'http');
-        $image_data['https_image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, 'https');
+        $image_data['http_image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, 'http', $url);
+        $image_data['https_image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, 'https', $url);
         $image_data['absolute_path'] = Storage::instance('images')->getAbsolutePath($path . '/' . $image_name);
-        $image_data['image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name);
+        $image_data['image_path'] = Storage::instance('images')->getUrl($path . '/' . $image_name, '', $url);
     }
 
     fn_set_hook('attach_absolute_image_paths', $image_data, $object_type, $path, $image_name);
@@ -67,17 +73,18 @@ function fn_attach_absolute_image_paths(&$image_data, $object_type)
 /**
  * Function creates or updates image
  *
- * @param mixed $image_data Array with image data
- * @param int $image_id Image ID
- * @param string $image_type Type (object) of image (may be product, category, and so on)
- * @param string $lang_code 2 letters language code
- * @param bool $is_clone True if image is copied from an existing image object
+ * @param array{name: string, path: string, params?: array<string, string>, size: int} $image_data Array with image data
+ * @param int                                                                          $image_id   Image ID
+ * @param string                                                                       $image_type Type (object) of image (may be product, category, and so on)
+ * @param string                                                                       $lang_code  Two letters language code
+ * @param bool                                                                         $is_clone   True if image is copied from an existing image object
+ *
  * @return int Updated or inserted image ID. False on failure.
  */
-function fn_update_image($image_data, $image_id = 0, $image_type = 'product', $lang_code = CART_LANGUAGE, $is_clone = false)
+function fn_update_image(array $image_data, $image_id = 0, $image_type = 'product', $lang_code = CART_LANGUAGE, $is_clone = false)
 {
     $images_path = $image_type . '/' . fn_get_image_subdir($image_id) . '/';
-    $_data = array();
+    $_data = [];
 
     list($_data['image_x'], $_data['image_y'], $mime_type) = fn_get_image_size($image_data['path']);
 
@@ -88,7 +95,11 @@ function fn_update_image($image_data, $image_id = 0, $image_type = 'product', $l
     }
 
     // Check if image path already set
-    $image_path = db_get_field("SELECT image_path FROM ?:images WHERE image_id = ?i", $image_id);
+    if ($image_id) {
+        $image_path = db_get_field('SELECT image_path FROM ?:images WHERE image_id = ?i', $image_id);
+    } else {
+        $image_path = null;
+    }
 
     // Delete existing image
     if (!empty($image_path)) {
@@ -113,9 +124,9 @@ function fn_update_image($image_data, $image_id = 0, $image_type = 'product', $l
      */
     fn_set_hook('update_image', $image_data, $image_id, $image_type, $images_path, $_data, $mime_type, $is_clone);
 
-    $params = array(
+    $params = [
         'file' => $image_data['path'],
-    );
+    ];
 
     if (!empty($image_data['params'])) {
         $params = fn_array_merge($params, $image_data['params']);
@@ -126,9 +137,9 @@ function fn_update_image($image_data, $image_id = 0, $image_type = 'product', $l
     $_data['image_path'] = fn_basename($_data['image_path']); // we need to store file name only
 
     if (!empty($image_id)) {
-        db_query("UPDATE ?:images SET ?u WHERE image_id = ?i", $_data, $image_id);
+        db_query('UPDATE ?:images SET ?u WHERE image_id = ?i', $_data, $image_id);
     } else {
-        $image_id = db_query("INSERT INTO ?:images ?e", $_data);
+        $image_id = db_query('INSERT INTO ?:images ?e', $_data);
     }
 
     return $image_id;
@@ -148,44 +159,40 @@ function fn_get_count_image_link($image_id)
     return db_get_field("SELECT COUNT(*) FROM ?:images_links WHERE image_id = ?i OR detailed_id = ?i", $image_id, $image_id);
 }
 
-//
-// Delete image
-//
+/**
+ * Removes image file and all its object links from db
+ *
+ * @param int    $image_id    Image identifier
+ * @param int    $pair_id     Image link identifier
+ * @param string $object_type Type of deleted image
+ *
+ * @return bool Always true
+ */
 function fn_delete_image($image_id, $pair_id, $object_type = 'product')
 {
     if (AREA == 'A' && fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id') && $object_type == 'category') {
         return false;
     }
 
-    $_image_file = db_get_field("SELECT image_path FROM ?:images WHERE image_id = ?i", $image_id);
-    if (empty($_image_file)) {
+    $image_file = fn_get_image_file_by_id($image_id);
+    if (empty($image_file)) {
         return false;
     }
 
     fn_set_hook('delete_image_pre', $image_id, $pair_id, $object_type);
 
-    db_query("UPDATE ?:images_links SET " . ($object_type == 'detailed' ? 'detailed_id' : 'image_id') . " = '0' WHERE pair_id = ?i", $pair_id);
-    $_ids = db_get_row("SELECT image_id, detailed_id FROM ?:images_links WHERE pair_id = ?i", $pair_id);
+    $type = ($object_type == 'detailed' ? 'detailed_id' : 'image_id');
+    db_query('UPDATE ?:images_links SET ?f = ?s WHERE pair_id = ?i', $type, '0', $pair_id);
+    $ids = db_get_row('SELECT image_id, detailed_id FROM ?:images_links WHERE pair_id = ?i', $pair_id);
 
-    if (empty($_ids['image_id']) && empty($_ids['detailed_id'])) {
-        db_query("DELETE FROM ?:images_links WHERE pair_id = ?i", $pair_id);
+    if (empty($ids['image_id']) && empty($ids['detailed_id'])) {
+        db_query('DELETE FROM ?:images_links WHERE pair_id = ?i', $pair_id);
     }
 
-    if (fn_get_count_image_link($image_id) == 0) {
 
-        $img_id_subdir = floor($image_id / MAX_FILES_IN_DIR);
-        $_image_file = $object_type . '/' . $img_id_subdir . '/' . $_image_file;
+    fn_delete_image_file($image_id, $object_type, $image_file);
 
-        Storage::instance('images')->delete($_image_file);
-
-        db_query("DELETE FROM ?:images WHERE image_id = ?i", $image_id);
-        db_query("DELETE FROM ?:common_descriptions WHERE object_id = ?i AND object_holder = 'images'", $image_id);
-
-        // Clear all existing thumbnails
-        fn_delete_image_thumbnails($_image_file);
-    }
-
-    fn_set_hook('delete_image', $image_id, $pair_id, $object_type, $_image_file);
+    fn_set_hook('delete_image', $image_id, $pair_id, $object_type, $image_file);
 
     return true;
 }
@@ -206,6 +213,51 @@ function fn_delete_image_thumbnails($filename, $prefix = '')
     }
 
     return true;
+}
+
+/**
+ * Gets image file name with extension by identifier
+ *
+ * @param int $image_id Image identifier
+ *
+ * @return string Image path if image identifier is not null; false otherwise
+ */
+function fn_get_image_file_by_id($image_id)
+{
+    return db_get_field('SELECT image_path FROM ?:images WHERE image_id = ?i', $image_id);
+}
+
+/**
+ * Removes image file without active links with objects and info about it from db.
+ *
+ * @param int    $image_id    Image identifier
+ * @param string $object_type Type of deleted image
+ *
+ * @return bool True if deleting was successful, false otherwise
+ */
+function fn_delete_image_file($image_id, $object_type)
+{
+    if (fn_get_count_image_link($image_id) != 0) {
+        return false;
+    }
+
+    $image_file = fn_get_image_file_by_id($image_id);
+    if (empty($image_file)) {
+        return false;
+    }
+
+    $image_subdir = fn_get_image_subdir($image_id);
+    $image_file = $object_type . '/' . $image_subdir . '/' . $image_file;
+
+    Storage::instance('images')->delete($image_file);
+
+    $result = db_query('DELETE FROM ?:images WHERE image_id = ?i', $image_id);
+    db_query('DELETE FROM ?:common_descriptions WHERE object_id = ?i AND object_holder = ?s', $image_id, 'images');
+
+    // Clear all existing thumbnails
+    fn_delete_image_thumbnails($image_file);
+
+    return $result;
 }
 
 /**
@@ -238,14 +290,14 @@ function fn_get_image_pairs($object_ids, $object_type, $pair_type, $get_icon = t
 
     if (is_array($object_ids)) {
         $cond = $object_ids
-            ? db_quote('AND ?:images_links.object_id IN (?a)', $object_ids)
+            ? db_quote('AND ?:images_links.object_id IN (?n)', $object_ids)
             : db_quote('AND ?:images_links.object_id IS NULL'); // backward compatibility: prevents SQL empty array deprecation notice
     } else {
         $cond = db_quote('AND ?:images_links.object_id = ?s', $object_ids);
     }
 
     if ($get_icon == true || $get_detailed == true) {
-        $images_query_tpl = 'SELECT ?:images_links.*, ?:images.image_path, ?:common_descriptions.description AS alt, ?:images.image_x, ?:images.image_y, ?:images.image_id AS images_image_id'
+        $images_query_tpl = 'SELECT ?:images.*, ?:images_links.*, ?:common_descriptions.description AS alt, ?:images.image_id AS images_image_id'
             . ' FROM ?:images_links'
             . ' LEFT JOIN ?:images'
                 . ' ON ?p'
@@ -290,12 +342,14 @@ function fn_get_image_pairs($object_ids, $object_type, $pair_type, $get_icon = t
 
         // Convert the received data to the standard format in order to keep the backward compatibility
         foreach ($icon_pairs as $pair) {
-            $_pair = array(
+            $_pair = [
                 'pair_id' => $pair['pair_id'],
                 'image_id' => $pair['image_id'],
                 'detailed_id' => $pair['detailed_id'],
                 'position' => $pair['position'],
-            );
+                'object_id' => $pair['object_id'],
+                'object_type' => $pair['object_type'],
+            ];
 
             if (!empty($pair['images_image_id'])) { //get icon data if exist
                 $icon = fn_attach_absolute_image_paths($pair, $object_type);
@@ -364,12 +418,12 @@ function fn_get_image_pairs($object_ids, $object_type, $pair_type, $get_icon = t
 
     } else {
         $pairs_data = db_get_hash_multi_array(
-            'SELECT pair_id, image_id, detailed_id, object_id'
+            'SELECT pair_id, image_id, detailed_id, object_id, object_type'
             . ' FROM ?:images_links'
             . ' WHERE object_type = ?s'
                 . ' AND type = ?s'
                 . ' ?p',
-            array('object_id', 'pair_id'),
+            ['object_id', 'pair_id'],
             $object_type,
             $pair_type,
             $cond
@@ -384,10 +438,12 @@ function fn_get_image_pairs($object_ids, $object_type, $pair_type, $get_icon = t
      * @param string    $pair_type    (M)ain or (A)dditional
      * @param bool      $get_icon
      * @param bool      $get_detailed
-     * @param string    $lang_code    2-letters code
-     * @param array     $pairs_data   Pairs data
+     * @param string    $lang_code      2-letters code
+     * @param array     $pairs_data     Pairs data
+     * @param array     $detailed_pairs Pairs data for detailed
+     * @param array     $icon_pairs     Pairs data for icon
      */
-    fn_set_hook('get_image_pairs_post', $object_ids, $object_type, $pair_type, $get_icon, $get_detailed, $lang_code, $pairs_data);
+    fn_set_hook('get_image_pairs_post', $object_ids, $object_type, $pair_type, $get_icon, $get_detailed, $lang_code, $pairs_data, $detailed_pairs, $icon_pairs);
 
     if (is_array($object_ids)) {
         return $pairs_data;
@@ -400,12 +456,39 @@ function fn_get_image_pairs($object_ids, $object_type, $pair_type, $get_icon = t
     }
 }
 
-//
-// Create/Update image pairs (icon -> detailed image)
-//
+/**
+ * Create/Update image pairs (icon -> detailed image)
+ *
+ * @param array  $icons            Data of the object icon
+ * @param array  $detailed         Data of the object detailed image
+ * @param array  $pairs_data       Required image data for updating
+ * @param int    $object_id        Object identifier
+ * @param string $object_type      Object type
+ * @param array  $object_ids       Used instead object identifier if there are several objects
+ * @param bool   $update_alt_desc  True if image alt text should be updated
+ * @param string $lang_code        Two-letter language code
+ * @param bool   $from_exist_pairs True if image is copied from an existing image object
+ *
+ * @return array Identifiers updated images links
+ */
 function fn_update_image_pairs($icons, $detailed, $pairs_data, $object_id = 0, $object_type = 'product_lists', $object_ids = array(), $update_alt_desc = true, $lang_code = CART_LANGUAGE, $from_exist_pairs = false)
 {
     $pair_ids = array();
+
+    /**
+     *  Adds additional actions before image pairs updating
+     *
+     * @param array  $icons            Data of the object icon
+     * @param array  $detailed         Data of the object detailed image
+     * @param array  $pairs_data       Required image data for updating
+     * @param int    $object_id        Object identifier
+     * @param string $object_type      Object type
+     * @param array  $object_ids       Used instead object identifier if there are several objects
+     * @param bool   $update_alt_desc  True if image alt text should be updated
+     * @param string $lang_code        Two-letter language code
+     * @param bool   $from_exist_pairs True if image is copied from an existing image object
+     */
+    fn_set_hook('update_image_pairs_pre', $icons, $detailed, $pairs_data, $object_id, $object_type, $object_ids, $update_alt_desc, $lang_code, $from_exist_pairs);
 
     if (!empty($pairs_data)) {
         foreach ($pairs_data as $k => $p_data) {
@@ -431,11 +514,13 @@ function fn_update_image_pairs($icons, $detailed, $pairs_data, $object_id = 0, $
                     $p_data['type']
                 );
                 $pair_id = !empty($pair_data['pair_id']) ? $pair_data['pair_id'] : 0;
-            } else {
+            } elseif ($pair_id) {
                 $pair_data = db_get_row('SELECT image_id, detailed_id FROM ?:images_links WHERE pair_id = ?i', $pair_id);
                 if (empty($pair_data)) {
                     $pair_id = 0;
                 }
+            } else {
+                $pair_data = [];
             }
 
             // Update detailed image
@@ -517,6 +602,19 @@ function fn_update_image_pairs($icons, $detailed, $pairs_data, $object_id = 0, $
         }
     }
 
+    /**
+     *  Adds additional actions after image pairs updating
+     *
+     * @param array  $pair_ids        Identifiers updated images links
+     * @param array  $icons           Data of the object icon
+     * @param array  $detailed        Data of the object detailed image
+     * @param array  $pairs_data      Required image data for updating
+     * @param int    $object_id       Object identifier
+     * @param string $object_type     Object type
+     * @param array  $object_ids      Used instead object identifier if there are several objects
+     * @param bool   $update_alt_desc True if image alt text should be updated
+     * @param string $lang_code       Two-letter language code
+     */
     fn_set_hook('update_image_pairs', $pair_ids, $icons, $detailed, $pairs_data, $object_id, $object_type, $object_ids, $update_alt_desc, $lang_code);
 
     return $pair_ids;
@@ -562,13 +660,13 @@ function fn_delete_image_pairs($object_id, $object_type, $pair_type = '', $pair_
 function fn_delete_image_pair($pair_id, $object_type = 'product')
 {
     if (!empty($pair_id)) {
-        $images = db_get_row("SELECT image_id, detailed_id FROM ?:images_links WHERE pair_id = ?i", $pair_id);
+        $images = db_get_row("SELECT image_id, detailed_id, object_id, object_type FROM ?:images_links WHERE pair_id = ?i", $pair_id);
         if (!empty($images)) {
             fn_delete_image($images['image_id'], $pair_id, $object_type);
             fn_delete_image($images['detailed_id'], $pair_id, 'detailed');
         }
 
-        fn_set_hook('delete_image_pair', $pair_id, $object_type);
+        fn_set_hook('delete_image_pair', $pair_id, $object_type, $images);
 
         return true;
     }
@@ -594,7 +692,10 @@ function fn_clean_image_pairs($object_id, $object_type)
 function fn_clone_image_pairs($target_object_id, $object_id, $object_type, $lang_code = CART_LANGUAGE)
 {
     // Get all pairs
-    $pair_data = db_get_hash_array("SELECT pair_id, image_id, detailed_id, type FROM ?:images_links WHERE object_id = ?i AND object_type = ?s", 'pair_id', $object_id, $object_type);
+    $pair_data = db_get_hash_array(
+        'SELECT pair_id, image_id, detailed_id, type, position FROM ?:images_links WHERE object_id = ?i AND object_type = ?s',
+        'pair_id', $object_id, $object_type
+    );
 
     if (empty($pair_data)) {
         return false;
@@ -647,6 +748,7 @@ function fn_clone_image_pairs($target_object_id, $object_id, $object_type, $lang
                 'type' => $p_data['type'],
                 'image_alt' => (!empty($p_data['image_alt'])) ? $p_data['image_alt'] : '',
                 'detailed_alt' => (!empty($p_data['detailed_alt'])) ? $p_data['detailed_alt'] : '',
+                'position' => $p_data['position']
             )
         );
 
@@ -808,15 +910,6 @@ function fn_resize_image($src, $new_width = 0, $new_height = 0, $bg_color = '#ff
 }
 
 /**
- * @deprecated in favour of use fn_get_supported_image_format_variants()
- * @since 4.3.1
- */
-function fn_check_gd_formats()
-{
-    return fn_get_supported_image_format_variants();
-}
-
-/**
  * @return array List of supported image formats to be used as setting variants
  */
 function fn_get_supported_image_format_variants()
@@ -937,32 +1030,35 @@ function fn_get_image_subdir($image_id = 0)
  * @param string $object_type The type of object
  * @param int    $object_id   Object identifier
  * @param string $lang_code   Two-letters languag code
- * @param array  $object_ids  Array of object identifiers
+ * @param int[]  $object_ids  Array of object identifiers
  *
- * @return array
+ * @return int[]
  */
-function fn_attach_image_pairs($name, $object_type, $object_id = 0, $lang_code = CART_LANGUAGE, $object_ids = array())
+function fn_attach_image_pairs($name, $object_type, $object_id = 0, $lang_code = CART_LANGUAGE, array $object_ids = [])
 {
     // @TODO: get rid of direct $_REQUEST array usage inside this function and fn_filter_uploaded_data too
-    $allowed_extensions = array('png', 'gif', 'jpg', 'jpeg', 'ico');
+    $allowed_extensions = ['png', 'gif', 'jpg', 'jpeg', 'ico'];
     $icons = fn_filter_uploaded_data($name . '_image_icon', $allowed_extensions);
     $detailed = fn_filter_uploaded_data($name . '_image_detailed', $allowed_extensions);
-    $pairs_data = !empty($_REQUEST[$name . '_image_data']) ? $_REQUEST[$name . '_image_data'] : array();
+    $pairs_data = !empty($_REQUEST[$name . '_image_data']) ? $_REQUEST[$name . '_image_data'] : [];
 
     return fn_update_image_pairs($icons, $detailed, $pairs_data, $object_id, $object_type, $object_ids, true, $lang_code);
 }
 
 /**
- * Generate thumbnail with given size from image
+ * Generates thumbnail with given size from image
  *
- * @param string $image_path Path to image
- * @param int $width Thumbnail width
- * @param int $height Thumbnail height
- * @param bool $lazy lazy generation - returns script URL that generates thumbnail
- * @param bool $return_rel_path return relative path
+ * @param string $image_path      Path to image
+ * @param int    $width           Thumbnail width
+ * @param int    $height          Thumbnail height
+ * @param bool   $lazy            lazy generation - returns script URL that generates thumbnail
+ * @param bool   $return_rel_path Return relative path
+ * @param array  $image           An array of image object in the database, for which the thumbnail will be generated.
+ * @param string $url             Input URL
+ *
  * @return string path
  */
-function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, $return_rel_path = false)
+function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, $return_rel_path = false, array $image = [], $url = '')
 {
     /**
      * Actions before thumbnail generate
@@ -980,7 +1076,7 @@ function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, 
 
     $filename = 'thumbnails/' . $width . (empty($height) ? '' : '/' . $height) . '/' . $image_path;
     if (Registry::get('settings.Thumbnails.convert_to') != 'original') {
-        $filename = preg_replace("/\.[^.]*?$/", "." . Registry::get('settings.Thumbnails.convert_to'), $filename);
+        $filename = $filename . '.' . Registry::get('settings.Thumbnails.convert_to');
     }
 
     $th_filename = '';
@@ -1005,8 +1101,8 @@ function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, 
             && Registry::get('settings.Thumbnails.convert_to') != 'original'
             && !Storage::instance('images')->isExist($image_path)
         ){
-            foreach (array('png', 'jpg', 'gif', 'jpeg') as $ext) {
-                $image_path = preg_replace("/\.[^.]*?$/", "." . $ext, $image_path);
+            foreach (ImageHelper::getSupportedFormats() as $ext) {
+                $image_path = preg_replace('/(\.' . $ext . ')$/', '', $image_path);
                 if (Storage::instance('images')->isExist($image_path)) {
                     break;
                 }
@@ -1016,8 +1112,11 @@ function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, 
         /**
          * Actions before thumbnail generate, if thumbnail is not exists, after validations
          *
-         * @param string $real_path Real path to image
-         * @param string $lazy lazy generation - returns script URL that generates thumbnail
+         * @param string $image_path Real path to image
+         * @param string $lazy       Lazy generation - returns script URL that generates thumbnail
+         * @param string $filename   Name of the image's file
+         * @param int    $width      Width of thumbnail
+         * @param int    $height     Height of thumbnail
          */
         fn_set_hook('generate_thumbnail_file_pre', $image_path, $lazy, $filename, $width, $height);
 
@@ -1038,41 +1137,39 @@ function fn_generate_thumbnail($image_path, $width, $height = 0, $lazy = false, 
     /**
      * Actions after thumbnail generate
      *
-     * @param string $th_filename   Thumbnail path
-     * @param string $lazy          lazy generation - returns script URL that generates thumbnail
-     * @param string $image_path    Path to image
-     * @param int    $width         Width of thumbnail
-     * @param int    $height        Height of thumbnail
+     * @param string $th_filename Thumbnail path
+     * @param string $lazy        Lazy generation - returns script URL that generates thumbnail
+     * @param string $image_path  Path to image
+     * @param int    $width       Width of thumbnail
+     * @param int    $height      Height of thumbnail
+     * @param array  $image       An array of image object in the database, for which the thumbnail was generated.
      */
-    fn_set_hook('generate_thumbnail_post', $th_filename, $lazy, $image_path, $width, $height);
+    fn_set_hook('generate_thumbnail_post', $th_filename, $lazy, $image_path, $width, $height, $image);
 
     if (!$return_rel_path && $th_filename) {
-        $th_filename = Storage::instance('images')->getUrl($th_filename);
+        $th_filename = Storage::instance('images')->getUrl($th_filename, '', $url);
     }
 
     return !empty($th_filename) ? $th_filename : '';
 }
 
 /**
- * @deprecated
- * @since 4.3.1
+ * Generates thumbnail with given size from image
+ *
+ * @param array{image_x: int|float, image_y: int|float, image_path: string, alt: string, absolute_path: string, relative_path: string, icon: array{image_x: int|float, image_y: int|float, image_path: string, alt: string, absolute_path: string, relative_path: string}, detailed: array{image_x: int|float, image_y: int|float, image_path: string, alt: string, absolute_path: string, relative_path: string}} $images       Array with initial images
+ * @param int|float                                                                                                                                                                                                                                                                                                                                                                                                $image_width  Result image width
+ * @param int|float                                                                                                                                                                                                                                                                                                                                                                                                $image_height Result image height
+ * @param string                                                                                                                                                                                                                                                                                                                                                                                                   $url          Input URL
+ *
+ * @return array<empty, empty>|array{image_path:string, detailed_image_path:string, alt:string, width:int, height:int, absolute_path:string, generate_image:bool, is_thumbnail:bool} Image data
  */
-function fn_parse_rgb($color)
-{
-    $r = hexdec(substr($color, 1, 2));
-    $g = hexdec(substr($color, 3, 2));
-    $b = hexdec(substr($color, 5, 2));
-
-    return array($r, $g, $b);
-}
-
-function fn_image_to_display($images, $image_width = 0, $image_height = 0)
+function fn_image_to_display($images, $image_width = 0, $image_height = 0, $url = '')
 {
     if (empty($images)) {
-        return array();
+        return [];
     }
 
-    $image_data = array();
+    $image_data = [];
 
     // image pair passed
     if (!empty($images['icon']) || !empty($images['detailed'])) {
@@ -1109,31 +1206,42 @@ function fn_image_to_display($images, $image_width = 0, $image_height = 0)
     );
 
     if (!empty($image_width) && !empty($relative_path) && !empty($absolute_path)) {
-        $image_path = fn_generate_thumbnail($relative_path, $image_width, $image_height, Registry::get('config.tweaks.lazy_thumbnails'));
+        $image_path = fn_generate_thumbnail(
+            $relative_path,
+            $image_width,
+            $image_height,
+            Registry::get('config.tweaks.lazy_thumbnails'),
+            false,
+            $images,
+            $url
+        );
+        $is_thumbnail = true;
     } else {
+        $is_thumbnail = false;
         $image_width = $original_width;
         $image_height = $original_height;
     }
 
     if (!empty($image_path)) {
-        $image_data = array(
-            'image_path' => $image_path,
+        $image_data = [
+            'image_path'          => $image_path,
             'detailed_image_path' => $detailed_image_path,
-            'alt' => $alt,
-            'width' => $image_width,
-            'height' => $image_height,
-            'absolute_path' => $absolute_path,
-            'generate_image' => strpos($image_path, '&image_path=') !== false // FIXME: dirty checking
-        );
+            'alt'                 => $alt,
+            'width'               => $image_width,
+            'height'              => $image_height,
+            'absolute_path'       => $absolute_path,
+            'generate_image'      => strpos($image_path, '&image_path=') !== false, // FIXME: dirty checking
+            'is_thumbnail'        => $is_thumbnail
+        ];
     }
 
     /**
      * Additionally processes image data
      *
-     * @param array $image_data Image data
-     * @param array $images     Array with initial images
-     * @param $image_width Result image width
-     * @param $image_height Result image height
+     * @param array $image_data   Image data
+     * @param array $images       Array with initial images
+     * @param int   $image_width  Result image width
+     * @param int   $image_height Result image height
      */
     fn_set_hook('image_to_display_post', $image_data, $images, $image_width, $image_height);
 

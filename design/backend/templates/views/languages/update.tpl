@@ -16,6 +16,9 @@
     <div class="tabs cm-j-tabs">
         <ul class="nav nav-tabs">
             <li id="tab_general_{$id}" class="cm-js active"><a>{__("general")}</a></li>
+            {if fn_allowed_for("MULTIVENDOR:ULTIMATE") || $is_sharing_enabled}
+                <li id="tab_storefronts_{$id}" class="cm-js"><a>{__("storefronts")}</a></li>
+            {/if}
             {hook name="languages:tabs_list"}{/hook}
         </ul>
     </div>
@@ -27,6 +30,7 @@
                     <label for="elm_to_lang_code_{$id}" class="control-label cm-required">{__("language_code")}:</label>
                     <div class="controls">
                         <input id="elm_to_lang_code_{$id}" type="text" name="language_data[lang_code]" value="{$lang_data.lang_code}" size="6" maxlength="2">
+                        <p class="muted description">{__("tt_views_languages_manage_language_code")}</p>
                     </div>
                 </div>
 
@@ -45,6 +49,7 @@
                                 <option {if $code == $lang_data.country_code}selected="selected"{/if} value="{$code}">{$country}</option>
                             {/foreach}
                         </select>
+                        <p class="muted description">{__("tt_views_languages_update_country")}</p>
                     </div>
                 </div>
 
@@ -71,7 +76,24 @@
                 {hook name="languages:update"}{/hook}
 
             </fieldset>
-        </div>
+        <!--content_tab_general_{$id}--></div>
+
+        {if fn_allowed_for("MULTIVENDOR:ULTIMATE")|| $is_sharing_enabled}
+            <div class="hidden" id="content_tab_storefronts_{$id}">
+                {$add_storefront_text = __("add_storefronts")}
+                {include file="pickers/storefronts/picker.tpl"
+                    multiple=true
+                    input_name="language_data[storefront_ids]"
+                    item_ids=$lang_data.storefront_ids
+                    data_id="storefront_ids"
+                    but_meta="pull-right"
+                    no_item_text=__("all_storefronts")
+                    but_text=$add_storefront_text
+                    view_only=($is_sharing_enabled && $runtime.company_id)
+                }
+                <!--content_tab_storefronts_{$id}--></div>
+        {/if}
+
         {hook name="languages:tabs_content"}{/hook}
     </div>
 

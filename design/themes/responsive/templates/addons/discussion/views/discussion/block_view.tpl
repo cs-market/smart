@@ -48,13 +48,13 @@
         {$new_post_title = __("new_post")}
     {/if}
 
-    {if "CRB"|strpos:$discussion.type !== false && !$discussion.disable_adding}
-        <div class="ty-discussion-post__buttons buttons-container">
-            {include file="buttons/button.tpl" but_id="opener_new_post" but_text=$new_post_title but_role="submit" but_target_id="new_post_dialog_`$obj_id`" but_meta="cm-dialog-opener cm-dialog-auto-size ty-btn__primary" but_rel="nofollow"}
-        </div>
-        {if $object_type != "P"}
-            {include file="addons/discussion/views/discussion/components/new_post.tpl" new_post_title=$new_post_title}
-        {/if}
+    {if $discussion.type !== "Addons\\Discussion\\DiscussionTypes::TYPE_DISABLED"|enum}
+        {include
+            file="addons/discussion/views/discussion/components/new_post_button.tpl"
+            name=__("write_review")
+            obj_id=$object_id
+            object_type=$discussion.object_type
+        }
     {/if}
 
     {$block = ["block_id" => "discussion", "properties" => ["item_quantity" => 2, "scroll_per_page" => "Y", "not_scroll_automatically" => "Y", "outside_navigation" => true]]}

@@ -12,8 +12,10 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -21,18 +23,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($mode == 'update') {
         if (!empty($_REQUEST['rule_data']) && !empty($_REQUEST['rule_data']['name']) && !empty($_REQUEST['rule_data']['rule_params'])) {
-            foreach (fn_get_translation_languages() as $lc => $_v) {
-                fn_create_seo_name(0, 's', $_REQUEST['rule_data']['name'], 0, $_REQUEST['rule_data']['rule_params'], '', $lc);
+            if (Registry::get('addons.seo.single_url') == 'Y') {
+                $lang_codes = [Registry::get('settings.Appearance.frontend_default_language')];
+            } else {
+                $lang_codes = array_keys(Languages::getAll());
+            }
+            foreach ($lang_codes as $lang_code) {
+                $created_seo_name = fn_create_seo_name(0, 's', $_REQUEST['rule_data']['name'], 0, $_REQUEST['rule_data']['rule_params'], '', $lang_code);
+                if ($_REQUEST['rule_data']['name'] !== $created_seo_name) {
+                    $errors = $created_seo_name;
+                }
+            }
+            if (isset($errors)) {
+                fn_set_notification(
+                    NotificationSeverity::WARNING,
+                    __('notice'),
+                    __(
+                        'seo.error_at_creation_seo_name',
+                        [1, '[names]' => $_REQUEST['rule_data'], '[new_names]' => $errors]
+                    )
+                );
             }
         }
     }
 
     if ($mode == 'm_update') {
         if (!empty($_REQUEST['seo_data'])) {
+            $errors = [];
+            $new_names = [];
             foreach ($_REQUEST['seo_data'] as $k => $v) {
                 if (!empty($v['name'])) {
-                    fn_create_seo_name(0, 's', $v['name'], 0, $v['rule_params'], '', fn_get_corrected_seo_lang_code(DESCR_SL));
+                    $created_seo_name = fn_create_seo_name(0, 's', $v['name'], 0, $v['rule_params'], '', fn_get_corrected_seo_lang_code(DESCR_SL));
+                    if ($v['name'] !== $created_seo_name) {
+                        $errors[] = $v['name'];
+                        $new_names[] = $created_seo_name;
+                    }
                 }
+            }
+            if (!empty($errors)) {
+                fn_set_notification(
+                    NotificationSeverity::WARNING,
+                    __('notice'),
+                    __('seo.error_at_creation_seo_name', [count($errors), '[names]' => implode(', ', $errors), '[new_names]' => implode(', ', $new_names)])
+                );
             }
         }
     }

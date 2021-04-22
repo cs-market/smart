@@ -1,25 +1,35 @@
-.stripe-connect-payment-form__card,
-.stripe-connect-payment-form__expiry,
-.stripe-connect-payment-form__cvc {
-    padding: 4px 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: white;
-    min-height: 21px;
+.stripe-payment-form {
+    &__card,
+    &__expiry,
+    &__cvc {
+        padding: 4px 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        min-height: 21px;
+    }
+
+    &__card {
+        width: 256px;
+    }
+
+    &__expiry {
+        max-width: 75px;
+    }
+
+    &__cvc {
+        width: 45px;
+        display: inline-block;
+        vertical-align: middle;
+    }
 }
 
-.stripe-connect-payment-form__card {
-    width: 256px;
-}
+.stripe-config-form {
 
-.stripe-connect-payment-form__expiry {
-    max-width: 75px;
-}
-
-.stripe-connect-payment-form__cvc {
-    width: 45px;
-    display: inline-block;
-    vertical-align: middle;
+    &__3d-secure-description {
+        max-width: 400px;
+        padding: 10px 0;
+    }
 }
 
 .ty-control-group.error .sc-field {

@@ -47,7 +47,20 @@ function fn_catalog_mode_pre_add_to_cart(&$product_data, &$cart, &$auth, &$updat
         foreach ($product_data as $key => &$product) {
             $product_id = (!empty($product['product_id'])) ? $product['product_id'] : $key;
 
-            if (fn_catalog_mode_enabled() == 'Y' && !fn_is_add_to_cart_allowed($product_id)) {
+            $can_delete = true;
+
+            /**
+             * Allows to skip clearing the cart when the catalog mode is enabled
+             *
+             * @param array $product_data List of products data
+             * @param array $cart         Array of cart content and user information necessary for purchase
+             * @param array $auth         Array of user authentication data (e.g. uid, usergroup_ids, etc.)
+             * @param bool  $update       Flag, if true that is update mode. Usable for order management
+             * @param bool  $can_delete   Flag, if true that is cart cleared. Usable to pay off the vendor debt.
+             */
+            fn_set_hook("catalog_mode_pre_add_to_cart", $product_data, $cart, $auth, $update, $can_delete);
+
+            if (fn_catalog_mode_enabled() == 'Y' && !fn_is_add_to_cart_allowed($product_id) && $can_delete) {
                 $product = array();
             }
         }

@@ -33,7 +33,7 @@
     .nav-tabs > .active > a,
     .nav-tabs > .active > a:hover,
     .nav-tabs > .active > a:focus {
-        background-color: @tabsActiveBackroundColor;
+        background-color: @tabsActiveBackgroundColor;
         border: none;
         color: #fff;
     }
@@ -116,4 +116,9 @@
 }
 .nav-tabs li.active a.icon-cog {
     display: block;
+}
+.extra-tab--force-initial-padding {
+    a {
+        padding: 8px 12px !important;
+    }
 }

@@ -28,7 +28,6 @@ class CompanyTest extends ATestCase
 
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('AREA', 'A');
         define('CART_LANGUAGE', 'en');
 
@@ -118,20 +117,24 @@ class CompanyTest extends ATestCase
                 'company_id' => 1,
                 'categories' => '1,2,3,4,5',
                 'category_ids' => array(1, 2, 3, 4, 5),
+                'storefront_ids' => array(),
             ),
             array(
                 'company_id' => 2,
                 'categories' => '',
                 'category_ids' => array(),
+                'storefront_ids' => array(),
             ),
             array(
                 'company_id' => 3,
                 'categories' => '6',
                 'category_ids' => array(6),
+                'storefront_ids' => array(),
             ),
             array(
                 'company_id' => 4,
                 'category_ids' => array(),
+                'storefront_ids' => array(),
             ),
         ), $items);
     }

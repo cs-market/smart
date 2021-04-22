@@ -16,6 +16,7 @@ use Tygh\Settings;
 use Tygh\Storage;
 use Tygh\Registry;
 use Tygh\Tools\ImageHelper;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -274,14 +275,9 @@ function fn_is_watermarks_enabled($company_id = null)
     return $enabled;
 }
 
-function fn_watermarks_generate_thumbnail_post(&$relative_path, &$lazy, $source_relative_path)
+function fn_watermarks_generate_thumbnail_post(&$relative_path, &$lazy, $source_relative_path, $width = 0, $height = 0, array $image = [])
 {
     static $init_cache = false;
-
-    $image_path_info = fn_pathinfo($relative_path);
-    $image_name = $image_path_info['filename'];
-
-    $key = 'wt_data_' . fn_crc32($image_name);
 
     $condition = array('images', 'images_links');
     if (fn_allowed_for('ULTIMATE')) {
@@ -296,7 +292,15 @@ function fn_watermarks_generate_thumbnail_post(&$relative_path, &$lazy, $source_
         $init_cache = true;
     }
 
+    $image_path_info = fn_pathinfo($relative_path);
+    $image_name = $image_path_info['filename'];
+
+    $key = 'wt_data_' . fn_crc32($image_name);
     $image_data = Registry::get($cache_name . '.' . $key);
+
+    if (empty($image_data) && !empty($image)) {
+        $image_data = $image;
+    }
 
     if (empty($image_data)) {
         $source_path_info = fn_pathinfo($source_relative_path);
@@ -310,24 +314,25 @@ function fn_watermarks_generate_thumbnail_post(&$relative_path, &$lazy, $source_
         if (empty($image_data)) {
             return true;
         }
-
-        if (fn_allowed_for('ULTIMATE')) {
-            $image_data['company_id'] = fn_wt_get_image_company_id($image_data);
-        }
-
-        Registry::set($cache_name . '.' . $key, $image_data);
     }
 
-    $company_id = null;
-    if (fn_allowed_for('ULTIMATE')) {
+    if (fn_allowed_for('ULTIMATE') && empty($image_data['company_id'])) {
         $company_id = Registry::get('runtime.company_id');
-        if ($company_id == null) {
-            $company_id = $image_data['company_id'];
+
+        if (empty($company_id)) {
+            $company_id = fn_wt_get_image_company_id($image_data);
         }
+
+        $image_data['company_id'] = $company_id;
     }
 
-    if (!empty($image_data['object_type']) && fn_is_need_watermark($image_data['object_type'], $image_data['object_type'] == 'detailed', $company_id)) {
+    Registry::set($cache_name . '.' . $key, $image_data);
 
+    $company_id = fn_allowed_for('MULTIVENDOR')
+        ? null
+        : $image_data['company_id'];
+
+    if (!empty($image_data['object_type']) && fn_is_need_watermark($image_data['object_type'], $image_data['object_type'] === 'detailed', $company_id)) {
         $prefix = WATERMARKS_DIR_NAME;
         if (fn_allowed_for('ULTIMATE') && !Registry::get('runtime.company_id')) {
             $prefix = WATERMARKS_DIR_NAME . $company_id . '/';
@@ -374,8 +379,6 @@ function fn_wt_get_image_company_id($image_data)
         $company_id = db_get_field("SELECT company_id FROM ?:products WHERE product_id = ?i", $object_id);
     } elseif ($object_type == 'variant_image') {
         $company_id = db_get_field("SELECT company_id FROM ?:product_option_variants AS ov LEFT JOIN ?:product_options AS po ON ov.option_id = po.option_id WHERE ov.variant_id = ?i", $object_id);
-    } elseif ($object_type == 'product_option') {
-        $company_id = db_get_field("SELECT company_id FROM ?:product_options_inventory AS pi LEFT JOIN ?:products AS p ON pi.product_id = p.product_id WHERE pi.combination_hash = ?s", $object_id);
     } else {
         // take any company_id
         $company_id = db_get_field("SELECT company_id FROM ?:companies LIMIT 1");
@@ -427,29 +430,75 @@ function fn_watermarks_attach_absolute_image_paths(&$image_data, &$object_type, 
 }
 
 /**
- * Delete watermarked images before deleteing image pair
+ * Removes watermarked images for file
  *
- * @param int $image_id Image identifier
- * @param int $pair_id Pair identifier
- * @param string $object_type Object type
- * @param string $image_file Deleted image file
- * @return boolean Always true
+ * @param string $image_path Relative image file path (detailed/1/image.jpg)
+ *
+ * @return bool
  */
-function fn_watermarks_delete_image(&$image_id, &$pair_id, &$object_type, &$image_file)
+function fn_watermarks_remove_watermarked_images($image_path)
 {
     $dir = WATERMARKS_DIR_NAME;
+
     if (fn_allowed_for('ULTIMATE')) {
         $dir = 'watermarked/*/';
     }
 
-    $file_info = fn_pathinfo($image_file);
+    $file_info = fn_pathinfo($image_path);
+
     if (!empty($file_info['dirname']) && !empty($file_info['filename'])) {
         Storage::instance('images')->deleteByPattern($dir . $file_info['dirname'] . '/' . $file_info['filename'] . '*');
     }
 
-    fn_delete_image_thumbnails($image_file, $dir);
+    fn_delete_image_thumbnails($image_path, $dir);
 
     return true;
+}
+
+/**
+ * The "delete_image" hook handler.
+ *
+ * Actions performed:
+ *  - Removes watermaked images for deleted image
+ *
+ * @param int    $image_id    Image identifier
+ * @param int    $pair_id     Pair identifier
+ * @param string $object_type Object type
+ * @param string $image_file  Deleted image file
+ *
+ * @see \fn_delete_image()
+ */
+function fn_watermarks_delete_image(&$image_id, &$pair_id, &$object_type, &$image_file)
+{
+    $image_subdir = fn_get_image_subdir($image_id);
+    $image_file = $object_type . '/' . $image_subdir . '/' . $image_file;
+
+    fn_watermarks_remove_watermarked_images($image_file);
+}
+
+/**
+ * The "update_image" hook handler.
+ *
+ * Actions performed:
+ *  - Removes watermaked images if image updated
+ *
+ * @param array<string, string|int> $image_data  Image data
+ * @param int                       $image_id    Image ID
+ * @param string                    $image_type  Type of an object image belongs to (product, category, etc.)
+ * @param string                    $images_path Path to directory image is located at
+ * @param array<string, string|int> $_data       Data to be saved into "images" DB table
+ * @param string                    $mime_type   MIME type of an image file
+ * @param bool                      $is_clone    True if image is copied from an existing image object
+ *
+ * @see \fn_update_image()
+ */
+function fn_watermarks_update_image($image_data, $image_id, $image_type, $images_path, $_data, $mime_type, $is_clone)
+{
+    if (empty($image_data['old_name'])) {
+        return;
+    }
+
+    fn_watermarks_remove_watermarked_images($images_path . $image_data['old_name']);
 }
 
 function fn_watermarks_get_route(&$req, &$result, &$area, &$is_allowed_url)
@@ -637,27 +686,6 @@ function fn_watermark_create(
     }
 }
 
-/**
- * @deprecated
- * @since 4.3.1
- */
-function fn_create_image_from_file($path, $mime_type)
-{
-    $ext = fn_get_image_extension($mime_type);
-
-    if ($ext == 'gif') {
-        $image = imagecreatefromgif($path);
-    } elseif ($ext == 'jpg') {
-        $image = imagecreatefromjpeg($path);
-    } elseif ($ext == 'png') {
-        $image = imagecreatefrompng($path);
-    } else {
-        return false;
-    }
-
-    return $image;
-}
-
 function fn_watermarks_images_access_info()
 {
     $is_applied = false;
@@ -672,21 +700,23 @@ function fn_watermarks_images_access_info()
         }
     }
 
+    $script_path = preg_replace('/\/+/', '/', DIR_ROOT . '/' . fn_url('watermark.create', 'C', 'rel'));
+
     if ($is_applied) {
         if (fn_allowed_for('ULTIMATE')) {
             $img_instr = "# Rewrite watermarks rules\n" .
                 "<IfModule mod_rewrite.c>\n" .
                 "RewriteEngine on\n" .
-                "RewriteCond %{REQUEST_URI} \/images\/(product|category|detailed|thumbnails)\/*\n" .
+                "RewriteCond %{REQUEST_URI} \/images\/+(product|category|detailed)\/*\n" .
                 "RewriteCond %{REQUEST_FILENAME} -f\n" .
-                "RewriteRule .(gif|jpeg|jpg|png)$ " . DIR_ROOT . fn_url('watermark.create', 'C', 'rel') . " [NC]\n" .
+                'RewriteRule .(gif|jpeg|jpg|png)$ ' . $script_path . " [NC]\n" .
                 "</IfModule>\n" .
                 "# /Rewrite watermarks rules";
         } else {
             $img_instr = "# Rewrite watermarks rules\n" .
                 "<IfModule mod_rewrite.c>\n" .
                 "RewriteEngine on\n" .
-                "RewriteCond %{REQUEST_URI} \/images\/(product|category|detailed|thumbnails)\/*\n" .
+                "RewriteCond %{REQUEST_URI} \/images\/+(product|category|detailed)\/*\n" .
                 "RewriteCond %{REQUEST_FILENAME} -f\n" .
                 "RewriteRule (.*)$ ./watermarked/$1 [NC]\n" .
                 "</IfModule>\n" .
@@ -699,7 +729,7 @@ function fn_watermarks_images_access_info()
             "<IfModule mod_rewrite.c>\n" .
             "RewriteEngine on\n" .
             "RewriteCond %{REQUEST_FILENAME} !-f\n" .
-            "RewriteRule .(gif|jpeg|jpg|png)$ " . DIR_ROOT . fn_url('watermark.create', 'C', 'rel') . " [NC]\n" .
+            'RewriteRule .(gif|jpeg|jpg|png)$ ' . $script_path . " [NC]\n" .
             "</IfModule>\n" .
             "# /Generate watermarks rules";
         $wt_instr = nl2br(htmlentities($wt_instr));

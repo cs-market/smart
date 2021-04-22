@@ -6,4 +6,4 @@
 <input type="hidden" name="{$name}" class="cm-vendor-plans-selector-value" />
 {include file="addons/vendor_plans/views/companies/components/plans.tpl" plans=$vendor_plans}
 
-{capture name="mainbox_title"}<span}>{__("vendor_plans.choose_your_plan")}</span>{/capture}
+{capture name="mainbox_title"}<span>{__("vendor_plans.choose_your_plan")}</span>{/capture}

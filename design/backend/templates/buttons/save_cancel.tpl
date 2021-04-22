@@ -15,7 +15,7 @@
 {if $but_name}{assign var="r" value=$but_name}{else}{assign var="r" value=$but_href}{/if}
 
 {if $cancel_action == "close"}
-    <a class="cm-dialog-closer cm-cancel tool-link btn">{__("cancel")}</a>
+    <a class="cm-dialog-closer cm-inline-dialog-closer cm-cancel tool-link btn {$cancel_meta}">{__("cancel")}</a>
 {/if}
 
 {if $r|fn_check_view_permissions}

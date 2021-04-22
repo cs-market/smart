@@ -6,15 +6,17 @@
         {assign var="discussion" value=$object_id|fn_get_discussion:$object_type}
         {/if}
 
+        {$discussion_types_list = fn_discussion_get_discussion_types()}
+        {$discussion_type = $discussion.type|default:$discussion_default_type:("Addons\\Discussion\\DiscussionTypes::TYPE_DISABLED"|enum)}
+
         {if "discussion.add"|fn_check_view_permissions}
             <select name="{$prefix}[discussion_type]" id="discussion_type">
-                <option {if $discussion.type == "B"}selected="selected"{/if} value="B">{__("communication")} {__("and")} {__("rating")}</option>
-                <option {if $discussion.type == "C"}selected="selected"{/if} value="C">{__("communication")}</option>
-                <option {if $discussion.type == "R"}selected="selected"{/if} value="R">{__("rating")}</option>
-                <option {if $discussion.type == "D" || !$discussion}selected="selected"{/if} value="D">{__("disabled")}</option>
+            {foreach $discussion_types_list as $type => $type_name}
+                <option {if $discussion_type == $type}selected="selected"{/if} value="{$type}">{$type_name}</option>
+            {/foreach}
             </select>
         {else}
-            <span class="shift-input">{if $discussion.type == "B"}{__("communication")} {__("and")} {__("rating")}{elseif $discussion.type == "C"}{__("communication")}{elseif $discussion.type == "R"}{__("rating")}{else}{__("disabled")}{/if}</span>
+            <span class="shift-input">{$discussion_types_list.$discussion_type}</span>
         {/if}
 
     </div>

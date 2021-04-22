@@ -2,7 +2,7 @@
     {foreach from=$order_info.shipping item="shipping" key="shipping_id" name="f_shipp"}
         {if "shipments.add"|fn_check_view_permissions}
             {capture name="add_new_picker"}
-                {include file="views/shipments/components/new_shipment.tpl" group_key=$shipping.group_key}
+                {include file="views/shipments/components/new_shipment.tpl" group_key=$shipping.group_key current_shipping_id=$shipping.shipping_id}
             {/capture}
             {include file="common/popupbox.tpl" id="add_shipment_`$shipping.group_key`" content=$smarty.capture.add_new_picker text=__("new_shipment") act="hidden"}
         {/if}
@@ -27,14 +27,14 @@
 <input type="hidden" name="order_id" value="{$smarty.request.order_id}" />
 <input type="hidden" name="order_status" value="{$order_info.status}" />
 <input type="hidden" name="result_ids" value="content_general" />
-<input type="hidden" name="selected_section" value="{$smarty.request.selected_section}" />
+<input type="hidden" name="selected_section" value="{$selected_section}" />
 
-<div id="content_general">
+<div class="{if $selected_section !== "general"}hidden{/if}" id="content_general">
     <div class="row-fluid">
         <div class="span8">
             {* Products info *}
             <div class="table-responsive-wrapper">
-                <table width="100%" class="table table-middle table-responsive">
+                <table width="100%" class="table table-middle table--relative table-responsive">
                 <thead>
                     <tr>
                         <th width="50%">{__("product")}</th>
@@ -43,7 +43,7 @@
                         {if $order_info.use_discount}
                         <th width="5%">{__("discount")}</th>
                         {/if}
-                        {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                        {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                         <th width="10%">&nbsp;{__("tax")}</th>
                         {/if}
                         <th width="10%" class="right">&nbsp;{__("subtotal")}</th>
@@ -79,7 +79,7 @@
                     <td class="nowrap" data-th="{__("discount")}">
                         {if $oi.extra.discount|floatval}{include file="common/price.tpl" value=$oi.extra.discount}{else}-{/if}</td>
                     {/if}
-                    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                     <td class="nowrap" data-th="{__("tax")}">
                         {if $oi.tax_value|floatval}{include file="common/price.tpl" value=$oi.tax_value}{else}-{/if}</td>
                     {/if}
@@ -148,7 +148,7 @@
 
                             {foreach from=$order_info.taxes item="tax_data"}
                                 <tr>
-                                    <td class="statistic-label">&nbsp;<span>&middot;</span>&nbsp;{$tax_data.description}&nbsp;{include file="common/modifier.tpl" mod_value=$tax_data.rate_value mod_type=$tax_data.rate_type}{if $tax_data.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.General.tax_calculation == "subtotal")}&nbsp;{__("included")}{/if}{if $tax_data.regnumber}&nbsp;({$tax_data.regnumber}){/if}</td>
+                                    <td class="statistic-label">&nbsp;<span>&middot;</span>&nbsp;{$tax_data.description}&nbsp;{include file="common/modifier.tpl" mod_value=$tax_data.rate_value mod_type=$tax_data.rate_type}{if $tax_data.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.Checkout.tax_calculation == "subtotal")}&nbsp;{__("included")}{/if}{if $tax_data.regnumber}&nbsp;({$tax_data.regnumber}){/if}</td>
                                     <td class="right" data-ct-totals="taxes-{$tax_data.description}">{include file="common/price.tpl" value=$tax_data.tax_subtotal}</td>
                                 </tr>
                             {/foreach}
@@ -204,30 +204,24 @@
                     <div class="control-label"><h4 class="subheader">{__("status")}</h4></div>
                     <div class="controls">
                         {hook name="orders:order_status"}
-                            {if $order_info.status == $smarty.const.STATUS_INCOMPLETED_ORDER}
-                                {assign var="get_additional_statuses" value=true}
-                            {else}
-                                {assign var="get_additional_statuses" value=false}
-                            {/if}
-                            {assign var="order_status_descr" value=$smarty.const.STATUSES_ORDER|fn_get_simple_statuses:$get_additional_statuses:true}
-                            {assign var="extra_status" value=$config.current_url|escape:"url"}
+                            {$get_additional_statuses=true}
+                            {$order_status_descr=$smarty.const.STATUSES_ORDER|fn_get_simple_statuses:$get_additional_statuses:true}
+                            {$extra_status=$config.current_url|escape:"url"}
                             {if "MULTIVENDOR"|fn_allowed_for}
-                                {assign var="notify_vendor" value=true}
+                                {$notify_vendor=true}
                             {else}
-                                {assign var="notify_vendor" value=false}
+                                {$notify_vendor=false}
                             {/if}
 
                             {$statuses = []}
-                            {assign var="order_statuses" value=$smarty.const.STATUSES_ORDER|fn_get_statuses:$statuses:$get_additional_statuses:true}
-                            {include file="common/select_popup.tpl" suffix="o" id=$order_info.order_id status=$order_info.status items_status=$order_status_descr update_controller="orders" notify=true notify_department=true notify_vendor=$notify_vendor status_target_id="content_downloads" extra="&return_url=`$extra_status`" statuses=$order_statuses popup_additional_class="dropleft"}
+                            {$order_statuses=$smarty.const.STATUSES_ORDER|fn_get_statuses:$statuses:$get_additional_statuses:true}
+                            {include file="common/select_popup.tpl" suffix="o" id=$order_info.order_id status=$order_info.status items_status=$order_status_descr update_controller="orders" notify=true notify_department=true notify_vendor=$notify_vendor status_target_id="content_downloads" extra="&return_url=`$extra_status`" statuses=$order_statuses popup_additional_class="dropleft" text_wrap=true}
                         {/hook}
                     </div>
                 </div>
 
                 <div class="control-group shift-top">
-                    <div class="control-label">
-                        {include file="common/subheader.tpl" title=__("payment_information")}
-                    </div>
+                    {include file="common/subheader.tpl" title=__("payment_information")}
                 </div>
                 {hook name="orders:payment_info"}
                 {* Payment info *}
@@ -276,11 +270,8 @@
                    {/if}
                 {/hook}
 
-
+                {include file="common/subheader.tpl" title=__("manager")}
                 <div class="control-group shift-top" id="select_manager">
-                    <div class="control-label">
-                        {include file="common/subheader.tpl" title=__("manager")}
-                    </div>
                     <div class="control">
                         {if "MULTIVENDOR"|fn_allowed_for}
                             {$extra_url = "&user_type=V"}
@@ -288,11 +279,16 @@
                             {$extra_url = "&user_type=A"}
                         {/if}
 
-                        {include file="pickers/users/picker.tpl" display="radio" but_meta="btn" extra_url=$extra_url view_mode="single_button" user_info=$order_info.issuer_data data_id="issuer_info" input_name="update_order[issuer_id]"}
-
-                        {if $auth.user_id != $order_info.issuer_id}
-                            {btn type="text" title=__("assign_to_me") href="orders.assign_manager?order_id=`$order_info.order_id`" class="btn cm-ajax cm-post" data=["data-ca-target-id"=>"select_manager"] icon="icon-many-user"}
-                        {/if}
+                        <div class="order-manager">
+                            {include file="views/profiles/components/picker/picker.tpl"
+                                input_name="update_order[issuer_id]"
+                                item_ids=[$order_info.issuer_data.user_id]
+                                company_id=$order_info.company_id
+                            }
+                            {if $auth.user_id != $order_info.issuer_id}
+                                {btn type="text" title=__("assign_to_me") href="orders.assign_manager?order_id=`$order_info.order_id`" class="btn cm-ajax cm-post order-manager-assign-btn" data=["data-ca-target-id"=>"select_manager"] icon="icon-user"}
+                            {/if}
+                        </div>
                     </div>
                 <!--select_manager--></div>
 
@@ -300,9 +296,7 @@
                 {hook name="orders:shipping_info"}
                     {if $order_info.shipping}
                         <div class="control-group shift-top">
-                            <div class="control-label">
-                                {include file="common/subheader.tpl" title=__("shipping_information")}
-                            </div>
+                            {include file="common/subheader.tpl" title=__("shipping_information")}
                         </div>
                         {assign var="is_group_shippings" value=count($order_info.shipping)>1}
 
@@ -352,11 +346,12 @@
                                     </div>
                                     {/hook}
                                 {/foreach}
-                            
+
                             {else}
                                 {* show form for creating new full shipment *}
                                 {$shipment_id = 0}
                                 {$carrier = ""}
+                                {hook name="orders:new_shipment"}
                                 <div class="control-group">
                                     <label class="control-label" for="tracking_number">{__("tracking_number")}</label>
                                     <div class="controls">
@@ -370,6 +365,7 @@
                                         {include file="common/carriers.tpl" id="carrier_key" meta="input-small" name="update_shipping[`$shipping.group_key`][`$shipment_id`][carrier]" carrier=$carrier}
                                     </div>
                                 </div>
+                                {/hook}
                                 <hr>
                             {/if}
                             <div class="clearfix">
@@ -431,7 +427,7 @@
     </div>
 <!--content_general--></div>
 
-<div id="content_addons">
+<div class="{if $selected_section !== "addons"}hidden{/if}" id="content_addons">
 
 {hook name="orders:customer_info"}
 {/hook}
@@ -439,13 +435,15 @@
 <!--content_addons--></div>
 
 {if $downloads_exist}
-<div id="content_downloads">
+<div class="{if $selected_section !== "downloads"}hidden{/if}" id="content_downloads">
     <input type="hidden" name="order_id" value="{$smarty.request.order_id}" />
     <input type="hidden" name="order_status" value="{$order_info.status}" />
     {foreach from=$order_info.products item="oi"}
     {if $oi.extra.is_edp == "Y"}
         {hook name="orders:download_products_list_item"}
-            <p><a href="{"products.update?product_id=`$oi.product_id`"|fn_url}">{$oi.product}</a></p>
+            <div><a href="{"products.update?product_id=`$oi.product_id`"|fn_url}">{$oi.product}</a></div>
+            {hook name="orders:product_info"}
+            {/hook}
             {if $oi.files}
             <input type="hidden" name="files_exists[]" value="{$oi.product_id}" />
             <table cellpadding="5" cellspacing="0" border="0" class="table">
@@ -489,7 +487,7 @@
 {/if}
 
 {if $order_info.promotions}
-<div id="content_promotions">
+<div class="{if $selected_section !== "promotions"}hidden{/if}" id="content_promotions">
     {include file="views/orders/components/promotions.tpl" promotions=$order_info.promotions}
 <!--content_promotions--></div>
 {/if}
@@ -503,7 +501,7 @@
 {/hook}
 
 {/capture}
-{include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox active_tab=$smarty.request.selected_section track=true}
+{include file="common/tabsbox.tpl" content=$smarty.capture.tabsbox active_tab=$selected_section track=true}
 
 {/capture}
 {capture name="mainbox_title"}
@@ -550,6 +548,14 @@
             <li>{btn type="list" text=__("print_pdf_packing_slip") href="orders.print_packing_slip?order_id=`$order_info.order_id`&format=pdf" class="cm-new-window"}</li>
             <li>{btn type="list" text=__("edit_order") href="order_management.edit?order_id=`$order_info.order_id`"}</li>
             <li>{btn type="list" text=__("copy") href="order_management.edit?order_id=`$order_info.order_id`&copy=1"}</li>
+            <li>
+                {btn type="list"
+                    text=__("delete")
+                    href="orders.delete?order_id={$order_info.order_id}&redirect_url=orders.manage"
+                    class="cm-confirm"
+                    method="POST"
+                }
+            </li>
             {$smarty.capture.adv_tools nofilter}
         {/hook}
     {/capture}

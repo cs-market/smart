@@ -130,6 +130,7 @@ class Formatter
     {
         $data = fn_image_to_display($image, $width, $height);
 
+        /** @psalm-suppress PossiblyUndefinedArrayOffset */
         if (!empty($data['image_path'])) {
             $result = "<img src=\"{$data['image_path']}\" width=\"{$data['width']}\" height=\"{$data['height']}\" alt=\"{$data['alt']}\" title=\"{$data['alt']}\" />";
         } else {

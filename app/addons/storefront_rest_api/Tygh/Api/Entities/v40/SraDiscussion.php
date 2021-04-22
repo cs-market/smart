@@ -14,10 +14,11 @@
 
 namespace Tygh\Api\Entities\v40;
 
-use Tygh\Addons\StorefrontRestApi\ASraEntity;
-use Tygh\Api\Response;
-use Tygh\Enum\Addons\StorefrontRestApi\DiscussionTypes;
 use Tygh\Registry;
+use Tygh\Api\Response;
+use Tygh\Addons\StorefrontRestApi\ASraEntity;
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
+use Tygh\Enum\Addons\Discussion\DiscussionTypes;
 
 class SraDiscussion extends ASraEntity
 {
@@ -89,7 +90,7 @@ class SraDiscussion extends ASraEntity
                 $params['params']
             );
 
-            if ($data && $data['type'] != DiscussionTypes::DISABLED) {
+            if ($data && $data['type'] != DiscussionTypes::TYPE_DISABLED) {
                 $status = Response::STATUS_OK; // comments are enabled
             } else {
                 $status = Response::STATUS_FORBIDDEN; // comments are disabled or not configured for the object yet
@@ -145,7 +146,9 @@ class SraDiscussion extends ASraEntity
             unset($post);
         }
 
-        $discussion['disable_adding'] = !empty($discussion['disable_adding']);
+        $discussion['disable_adding'] = !$this->isPostingAllowed($discussion);
+        $discussion['object_id'] = $object_id;
+        $discussion['object_type'] = $object_type;
 
         return $discussion;
     }
@@ -187,8 +190,9 @@ class SraDiscussion extends ASraEntity
             ));
         }
 
-        // validate thread existense
+        // validate thread existence
         $thread = $this->getThreadObject($params);
+
         if ($valid_params && !$thread) {
             $valid_params = false;
             $status = Response::STATUS_NOT_FOUND;
@@ -256,7 +260,7 @@ class SraDiscussion extends ASraEntity
     /**
      * Gets discussion object.
      *
-     * @param array $params Array containting 'thread_id' or 'object_type' and 'object_id'
+     * @param array $params Array containing 'thread_id' or 'object_type' and 'object_id'
      *
      * @return array|null
      */
@@ -282,8 +286,8 @@ class SraDiscussion extends ASraEntity
      */
     protected function isMessageRequired($discussion_type)
     {
-        return $discussion_type === DiscussionTypes::COMMUNICATION
-            || $discussion_type === DiscussionTypes::COMMUNICATION_RATING;
+        return $discussion_type === DiscussionTypes::TYPE_COMMUNICATION
+            || $discussion_type === DiscussionTypes::TYPE_COMMUNICATION_AND_RATING;
     }
 
     /**
@@ -295,8 +299,8 @@ class SraDiscussion extends ASraEntity
      */
     protected function isRatingRequired($discussion_type)
     {
-        return $discussion_type === DiscussionTypes::RATING
-            || $discussion_type === DiscussionTypes::COMMUNICATION_RATING;
+        return $discussion_type === DiscussionTypes::TYPE_RATING
+            || $discussion_type === DiscussionTypes::TYPE_COMMUNICATION_AND_RATING;
     }
 
     /**
@@ -308,8 +312,23 @@ class SraDiscussion extends ASraEntity
      */
     protected function isPostingAllowed($thread)
     {
-        return $thread['type'] !== DiscussionTypes::DISABLED
-            && !$thread['disable_adding'];
+        $can_post = $thread['type'] !== DiscussionTypes::TYPE_DISABLED && empty($thread['disable_adding']);
+
+        $is_review_for_product = isset($thread['object_type']) && $thread['object_type'] === DiscussionObjectTypes::PRODUCT;
+        if ($can_post && $is_review_for_product) {
+            $can_post = fn_discussion_is_user_eligible_to_write_review_for_product($this->auth['user_id'], $thread['object_id']);
+        }
+
+        $is_review_for_company = isset($thread['object_type']) && $thread['object_type'] === DiscussionObjectTypes::COMPANY;
+        if ($can_post && $is_review_for_company) {
+            $can_post = fn_discussion_is_user_eligible_to_write_review_for_company($this->auth['user_id'], $thread['object_id']);
+        }
+
+        if ($can_post && $this->area === 'C') {
+            $can_post = fn_discussion_is_user_can_leave_review_from_ip($this->auth['ip'], $thread['object_type'], $thread['thread_id']);
+        }
+
+        return $can_post;
     }
 
     /**
@@ -388,14 +407,14 @@ class SraDiscussion extends ASraEntity
         if (static::$vendors_discussion_type === null) {
             static::$vendors_discussion_type = Registry::ifGet(
                 'addons.discussion.company_discussion_type',
-                DiscussionTypes::DISABLED
+                DiscussionTypes::TYPE_DISABLED
             );
         }
 
-        if ($object_type == DISCUSSION_OBJECT_TYPE_COMPANY) {
+        if ($object_type == DiscussionObjectTypes::COMPANY) {
             $object['discussion_type'] = static::$vendors_discussion_type;
         } else {
-            $object['discussion_type'] = DiscussionTypes::DISABLED;
+            $object['discussion_type'] = DiscussionTypes::TYPE_DISABLED;
         }
 
         return $object;

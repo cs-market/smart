@@ -14,7 +14,6 @@
 
 $schema['searchanise'] = array(
     'none' => 'passive',
-    'partial' => 'passive'
 );
 
 return $schema;

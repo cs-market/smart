@@ -30,7 +30,7 @@
     
     {elseif $element.element_type != $smarty.const.FORM_IP_ADDRESS && $element.element_type != $smarty.const.FORM_REFERER}
         <div class="ty-control-group">
-            <label for="{if $element.element_type == $smarty.const.FORM_FILE}type_{"fb_files[`$element.element_id`]"|md5}{else}elm_{$element.element_id}{/if}" class="ty-control-group__title {if $element.required == "Y"}cm-required{/if}{if $element.element_type == $smarty.const.FORM_EMAIL} cm-email{/if}{if $element.element_type == $smarty.const.FORM_PHONE} cm-phone{/if} {if $element.element_type == $smarty.const.FORM_MULTIPLE_CB}cm-multiple-checkboxes{/if}">{$element.description}</label>
+            <label for="{if $element.element_type == $smarty.const.FORM_FILE}type_{"fb_files[`$element.element_id`]"|md5}{else}elm_{$element.element_id}{/if}" class="ty-control-group__title {if $element.required == "Y"}cm-required{/if}{if $element.element_type == $smarty.const.FORM_EMAIL} cm-email{/if}{if $element.element_type == $smarty.const.FORM_PHONE} cm-mask-phone-label{/if} {if $element.element_type == $smarty.const.FORM_MULTIPLE_CB}cm-multiple-checkboxes{/if}">{$element.description}</label>
 
             {if $element.element_type == $smarty.const.FORM_SELECT}
                 <select id="elm_{$element.element_id}" class="ty-form-builder__select" name="form_values[{$element.element_id}]">
@@ -87,10 +87,10 @@
                 {if $element.element_type == $smarty.const.FORM_EMAIL}
                 <input type="hidden" name="customer_email" value="{$element.element_id}" />
                 {/if}
-                <input id="elm_{$element.element_id}" class="ty-input-text {if $element.position == 1}cm-focus {/if}" size="50" type="text" name="form_values[{$element.element_id}]" value="{$form_values.$element_id}" />
+                <input id="elm_{$element.element_id}" class="ty-input-text {if $element.position == 1}cm-focus {/if}{if $element.element_type == $smarty.const.FORM_PHONE} cm-mask-phone{/if}" size="50" type="text" name="form_values[{$element.element_id}]" value="{$form_values.$element_id}" />
                 
             {elseif $element.element_type == $smarty.const.FORM_COUNTRIES}
-                {$_country = $form_values.$element_id|default:$settings.General.default_country}
+                {$_country = $form_values.$element_id|default:$settings.Checkout.default_country}
 
                 {if !$k_country}
                     {assign var="k_country" value=1}
@@ -115,7 +115,7 @@
 
                 {include file="views/profiles/components/profiles_scripts.tpl" states=1|fn_get_all_states}
 
-                {$_state = $form_values.$element_id|default:$settings.General.default_state}
+                {$_state = $form_values.$element_id|default:$settings.Checkout.default_state}
                 <select class="ty-form-builder__state cm-state cm-location-billing_{$k_state}" id="elm_{$element.element_id}" name="form_values[{$element.element_id}]">
                     <option label="" value="">- {__("select_state")} -</option>
                     {assign var="states" value=1|fn_get_all_states}

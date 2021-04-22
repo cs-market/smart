@@ -4,7 +4,7 @@
     {if !$anonymized}
         {btn type="text" href="gdpr.anonymize?user_id={$user_id}&redirect_url={$return_current_url}" class="btn cm-confirm" data=["data-ca-confirm-text" => "{__("gdpr.text_anonymize_question")}"] text=__("gdpr.anonymize") method="POST"}
     {/if}
-    <table class="table table-sort table-middle">
+    <table class="table table-sort table-middle table--relative">
         <thead>
             <tr>
                 <th>{__("user_info")}</th>

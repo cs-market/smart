@@ -154,7 +154,7 @@ function fn_search($params, $items_per_page = 0, $lang_code = CART_LANGUAGE, $ar
         $params['q'] = '';
     }
 
-    if (empty($params['match'])) {
+    if ($area == 'A' && empty($params['match'])) {
         $params['match'] = 'any';
     }
 
@@ -184,7 +184,7 @@ function fn_search($params, $items_per_page = 0, $lang_code = CART_LANGUAGE, $ar
         reset($search['conditions']['values']);
         $object = key($search['conditions']['values']);
 
-        return fn_search_simple($params, $search, $object, $items_per_page, $lang_code);
+        return fn_search_simple($params, $search, $object, $items_per_page);
 
     } elseif (count($search['conditions']['values'])) {
 
@@ -465,7 +465,7 @@ function fn_create_orders_condition($params, $lang_code = CART_LANGUAGE)
         $params['cname'] = $params['q'];
     }
 
-    list($fields, $join, $condition) = fn_get_orders($params, 0, $lang_code);
+    list($fields, $join, $condition) = fn_get_orders($params, 0, false, $lang_code);
 
     $data = array(
         'fields' => $fields,
@@ -540,7 +540,8 @@ function fn_create_users_condition($params, $lang_code = CART_LANGUAGE)
 /**
  * Check if string is numeric or string has several numbers separated by comma
  *
- * @param  str $string Search string
+ * @param  string $string Search string
+ *
  * @return bool
  */
 function fn_search_is_numeric($string)

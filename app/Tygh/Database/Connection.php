@@ -23,6 +23,8 @@ use Tygh\Backend\Database\IBackend;
 
 /**
  * Database connection class
+ *
+ * phpcs:disable SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint
  */
 class Connection
 {
@@ -32,6 +34,13 @@ class Connection
      * @var boolean
      */
     public $raw = false;
+
+    /**
+     * if set to true, the errors will be logged
+     *
+     * @var bool
+     */
+    public $log_error = true;
 
     /**
      * Driver instance
@@ -55,18 +64,6 @@ class Connection
     protected $lost_connection_codes = array(
         2006,
         2013
-    );
-
-    /**
-     * Skip error codes
-     *
-     * @var array
-     */
-    protected $skip_error_codes = array(
-        1091, // column exists/does not exist during alter table
-        1176, // key does not exist during alter table
-        1050, // table already exist
-        1060  // column exists
     );
 
     /**
@@ -290,7 +287,8 @@ class Connection
      *
      * @param string $query unparsed query
      * @param mixed ... unlimited number of variables for placeholders
-     * @return array structured data
+     *
+     * @return string
      */
     public function getField($query)
     {
@@ -385,26 +383,54 @@ class Connection
     }
 
     /**
-     *
      * Prepare data and execute REPLACE INTO query to DB
      * If one of $data element is null function unsets it before querry
      *
-     * @param  string    $table Name of table that condition generated. Must be in SQL notation without placeholder.
-     * @param  array     $data  Array of key=>value data of fields need to insert/update
-     * @return db_result
+     * @param string                  $table         Name of table that condition generated. Must be in SQL notation without placeholder.
+     * @param array<array-key, mixed> $data          Array of key=>value data of fields need to insert/update
+     * @param bool                    $is_multiple   If true, $data is treated as multiple values array
+     * @param array<string>           $update_fields List of field usage to update
+     *
+     * @return int
+     *
+     * @throws DatabaseException Wrong sql query or issues with execution.
      */
-    public function replaceInto($table, $data)
+    public function replaceInto($table, array $data, $is_multiple = false, array $update_fields = null)
     {
-        if (!empty($data)) {
-            return $this->query('INSERT INTO ?:' . $table . ' ?e ON DUPLICATE KEY UPDATE ?u', $data, $data);
+        if (empty($data)) {
+            return 0;
         }
 
-        return false;
+        if ($is_multiple) {
+            $query = [];
+            $fields = array_keys(reset($data));
+
+            foreach ($fields as $field) {
+                if ($update_fields !== null && !in_array($field, $update_fields, true)) {
+                    continue;
+                }
+
+                $field = $this->field($field);
+                $query[] = sprintf('`%s` = VALUES(`%s`)', $field, $field);
+            }
+
+            return $this->query('INSERT INTO ?:' . $table . ' ?m ON DUPLICATE KEY UPDATE ' . implode(', ', $query), $data);
+        }
+
+        $update_data = $data;
+
+        if ($update_fields !== null) {
+            $update_data = array_intersect_key($update_data, array_flip($update_fields));
+        }
+
+        return $this->query('INSERT INTO ?:' . $table . ' ?e ON DUPLICATE KEY UPDATE ?u', $data, $update_data);
     }
 
     /**
      * Creates new database
-     * @param  string  $database database name
+     *
+     * @param  string $database database name
+     *
      * @return boolean true on success, false - otherwise
      */
     public function createDb($database)
@@ -421,7 +447,10 @@ class Connection
      *
      * @param string $query unparsed query
      * @param mixed ... unlimited number of variables for placeholders
-     * @return mixed result set for "SELECT" statement / generated ID for an AUTO_INCREMENT field for insert statement / Affected rows count for DELETE/UPDATE statements
+     *
+     * @return bool|int|\mysqli_result|\PDOStatement mixed result set for "SELECT" statement / generated ID for an AUTO_INCREMENT field for insert statement / Affected rows count for DELETE/UPDATE statements
+     *
+     * @throws DatabaseException Wrong sql query or issues with execution.
      */
     public function query($query)
     {
@@ -671,9 +700,10 @@ class Connection
     /**
      * Check if passed data corresponds columns in table and remove unnecessary data
      *
-     * @param  array $data       data for compare
-     * @param  array $table_name table name
-     * @return mixed array with filtered data or false if fails
+     * @param array  $data       data for compare
+     * @param string $table_name table name
+     *
+     * @return array|false array with filtered data or false if fails
      */
     public function checkTableFields($data, $table_name)
     {
@@ -901,7 +931,7 @@ class Connection
     {
         $errno = $this->db->errorCode();
 
-        return in_array($errno, $this->skip_error_codes) ? 0 : $errno;
+        return $errno;
     }
 
     /**
@@ -1110,17 +1140,68 @@ class Connection
         if (Registry::get('runtime.database.skip_errors') == true) {
             Registry::push('runtime.database.errors', $error);
         } else {
-            Registry::set('runtime.database.skip_errors', true);
+            if ($this->log_error) {
+                Registry::set('runtime.database.skip_errors', true);
 
-            // Log database errors
-            fn_log_event('database', 'error', array(
-                'error' => $error,
-                'backtrace' => debug_backtrace()
-            ));
+                // Log database errors
+                fn_log_event('database', 'error', array(
+                    'error' => $error,
+                    'backtrace' => debug_backtrace()
+                ));
 
-            Registry::set('runtime.database.skip_errors', false);
+                Registry::set('runtime.database.skip_errors', false);
+            }
 
             throw new DatabaseException($error['message'] . "<p>{$error['query']}</p>");
         }
+    }
+
+    /**
+     * Returns last value of auto increment column.
+     *
+     * @return int
+     */
+    public function getInsertId()
+    {
+        return $this->db->insertId();
+    }
+
+    /**
+     * Prepares and executes REPLACE INTO query to DB with data was getting from selection from another table.
+     *
+     * @param string $table           Table name to be replaced to
+     * @param array  $fields          Fields list is returned by select
+     * @param string $select_query    Prepared select query for data which to be replaced to
+     * @param array  $replaced_fields List of the fields which will be replaced. all fields will be replaced if empty
+     *
+     * @return int
+     */
+    public function replaceSelectionInto(
+        $table,
+        array $fields,
+        $select_query,
+        array $replaced_fields = []
+    ) {
+        if (empty($table) || empty($select_query) || empty($fields)) {
+            return 0;
+        }
+
+        $replaced_fields = empty($replaced_fields) ? $fields : $replaced_fields;
+
+        $fields = array_map(function($field) {
+            return $this->field($field);
+        }, $fields);
+
+        foreach ($replaced_fields as $field) {
+            $field = $this->field($field);
+            $query[] = sprintf('`%s` = VALUES(`%s`)', $field, $field);
+        }
+
+        return $this->query('INSERT INTO ?:?p (?p) ?p ON DUPLICATE KEY UPDATE ?p',
+            $table,
+            implode(', ', $fields),
+            $select_query,
+            implode(', ', $query)
+        );
     }
 }

@@ -333,8 +333,8 @@ msgid "Age"
 msgstr "Age"
 
 msgctxt "Languages::yml2_offer_feature_common_vendor"
-msgid "Vendor"
-msgstr "Vendor"
+msgid "Manufacturer"
+msgstr "Manufacturer"
 
 msgctxt "Languages::yml2_offer_feature_common_description"
 msgid "Description"
@@ -933,12 +933,16 @@ msgid "Can't be longer than 3,000 characters, punctuation marks included"
 msgstr "Can't be longer than 3,000 characters, punctuation marks included"
 
 msgctxt "Languages::privileges.manage_yml"
-msgid "Manage Yandex.Market"
-msgstr "Manage Yandex.Market"
+msgid "Can edit"
+msgstr "Can edit"
 
 msgctxt "Languages::privileges.view_yml"
-msgid "View Yandex.Market"
-msgstr "View Yandex.Market"
+msgid "Can view"
+msgstr "Can view"
+
+msgctxt "Languages::privilege_groups.yml_export"
+msgid "Yandex.Market"
+msgstr "Yandex.Market"
 
 msgctxt "Languages::yml_export.fee"
 msgid "Fee rate"

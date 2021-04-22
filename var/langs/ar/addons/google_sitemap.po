@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/google_sitemap.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.12.1/addons/google_sitemap.po\n"
+"X-Crowdin-File-ID: 3834\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::google_sitemap"
 msgid "Google sitemap"
@@ -26,7 +26,7 @@ msgstr ""
 
 msgctxt "Languages::google_sitemap.text_select_storefront"
 msgid "To generate a sitemap, please select storefront first."
-msgstr ""
+msgstr "لإنشاء ملف sitemap ، يرجى تحديد واجهة المتجر أولاً."
 
 msgctxt "Languages::sitemap_available_in_customer"
 msgid "Sitemap is available by this link: <a href=\"[sitemap_url]\">[sitemap_url]</a><br /><br />Sitemap can be reached by the URL <a href=\"[http_location]/sitemap.xml\">[http_location]/sitemap.xml</a>"
@@ -62,11 +62,11 @@ msgstr "ابدا"
 
 msgctxt "Languages::google_sitemap.generate_map"
 msgid "The sitemap is not generated yet. Please go to add-on settings and press \"Regenerate a sitemap\" button"
-msgstr ""
+msgstr "لم يتم إنشاء ملف sitemap بعد. يرجى الانتقال إلى إعدادات الوظائف الإضافية والضغط على زر \"إعادة إنشاء موقع sitemap\""
 
 msgctxt "Languages::google_sitemap.map_generated"
 msgid "The sitemap was generated successfully"
-msgstr ""
+msgstr "تم إنشاء ملف sitemap بنجاح"
 
 msgctxt "SettingsSections::google_sitemap::general"
 msgid "General"
@@ -122,7 +122,7 @@ msgstr ""
 
 msgctxt "SettingsOptions::google_sitemap::categories_priority"
 msgid "Priority"
-msgstr ""
+msgstr "الأولوية"
 
 msgctxt "SettingsOptions::google_sitemap::pages_setting"
 msgid "Pages settings"
@@ -138,7 +138,7 @@ msgstr ""
 
 msgctxt "SettingsOptions::google_sitemap::pages_priority"
 msgid "Priority"
-msgstr ""
+msgstr "الأولوية"
 
 msgctxt "SettingsOptions::google_sitemap::extended_setting"
 msgid "Brand/Manufacturer feature pages settings"
@@ -170,5 +170,9 @@ msgstr ""
 
 msgctxt "SettingsOptions::google_sitemap::companies_priority"
 msgid "Priority"
+msgstr ""
+
+msgctxt "Languages::google_sitemap.export_progress_entry"
+msgid "[storefront]: [object]"
 msgstr ""
 

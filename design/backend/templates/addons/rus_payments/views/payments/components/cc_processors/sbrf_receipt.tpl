@@ -71,9 +71,10 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label" for="sbrf_prefix">{__("addons.rus_payments.sbrf_prefix")} {include file="common/tooltip.tpl" tooltip=__("addons.rus_payments.sbrf_prefix_details")}:</label>
+    <label class="control-label" for="sbrf_prefix">{__("addons.rus_payments.sbrf_prefix")}:</label>
     <div class="controls">
         <input type="text" name="payment_data[processor_params][sbrf_prefix]" id="sbrf_prefix" value="{$processor_params.sbrf_prefix}" size="80">
+        <p class="muted description">{__("addons.rus_payments.sbrf_prefix_details")}</p>
     </div>
 </div>
 

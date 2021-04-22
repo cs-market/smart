@@ -2,7 +2,7 @@
     <label for="yml2_pickup" class="control-label">{__("yml_export.delivery_options")}:</label>
     <div class="controls">
 
-        <table width="100%" class="table table-middle">
+        <table width="100%" class="table table-middle table--relative">
             <thead>
             <tr>
                 <th width="15%">{__("yml_export.delivery_cost")}</th>

@@ -1,16 +1,30 @@
+{$jquery_version = "3.5.1"}
+{$jquery_migrate_version = "3.3.0"}
+
 {if !$config.tweaks.dev_js}
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" data-no-defer></script>
-<script data-no-defer>
-    if (!window.jQuery) {
-        document.write('{script src="js/lib/jquery/jquery.min.js" no-defer=true escape=true}');
-    }
-</script>
+    <script src="https://code.jquery.com/jquery-{$jquery_version}.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"
+            data-no-defer
+    ></script>
+    <script src="https://code.jquery.com/jquery-migrate-{$jquery_migrate_version}.min.js"
+            integrity="sha256-wZ3vNXakH9k4P00fNGAlbN0PkpKSyhRa76IFy4V1PYE="
+            crossorigin="anonymous"
+            data-no-defer
+    ></script>
+    <script data-no-defer>
+        if (!window.jQuery) {
+            document.write('{script src="js/lib/jquery/jquery-{$jquery_version}.min.js" no-defer=true escape=true}');
+            document.write('{script src="js/lib/jquery/jquery-migrate-$jquery_migrate_version}.min.js" no-defer=true escape=true}');
+        }
+    </script>
 {/if}
 
 {scripts}
 
     {if $config.tweaks.dev_js}
-    {script src="js/lib/jquery/jquery.min.js"}
+        {script src="js/lib/jquery/jquery-{$jquery_version}.min.js"}
+        {script src="js/lib/jquery/jquery-migrate-{$jquery_migrate_version}.min.js"}
     {/if}
 
     {script src="js/lib/jqueryui/jquery-ui.custom.min.js" no-defer=true}
@@ -56,6 +70,7 @@
         text_invalid_url: '{__("text_invalid_url")|escape:"javascript"}',
         error_validator_email: '{__("error_validator_email")|escape:"javascript"}',
         error_validator_phone: '{__("error_validator_phone")|escape:"javascript"}',
+        error_validator_phone_mask: '{__("error_validator_phone_mask")|escape:"javascript"}',
         error_validator_integer: '{__("error_validator_integer")|escape:"javascript"}',
         error_validator_multiple: '{__("error_validator_multiple")|escape:"javascript"}',
         error_validator_password: '{__("error_validator_password")|escape:"javascript"}',
@@ -73,7 +88,8 @@
         text_no_products_found: '{__("text_no_products_found")|escape:"javascript"}',
         cookie_is_disabled: '{__("cookie_is_disabled")|escape:"javascript"}',
         insert_image: '{__("insert_image")|escape:"javascript"}',
-        image_url: '{__("image_url")|escape:"javascript"}'
+        image_url: '{__("image_url")|escape:"javascript"}',
+        loading: '{__("loading")|escape:"javascript"}'
     });
 
     $.extend(_, {
@@ -102,11 +118,12 @@
         language_direction: '{$language_direction}',
         default_language: '{$smarty.const.DEFAULT_LANGUAGE}',
         cart_prices_w_taxes: {if ($settings.Appearance.cart_prices_w_taxes == 'Y')}true{else}false{/if},
-        theme_name: '{$settings.theme_name|escape:javascript nofilter}',
         regexp: [],
         current_url: '{$config.current_url|fn_url|escape:javascript nofilter}',
         current_host: '{$config.current_host|escape:javascript nofilter}',
-        init_context: '{$smarty.request.init_context|escape:javascript nofilter}'
+        init_context: '{$smarty.request.init_context|escape:javascript nofilter}',
+        phone_validation_mode: '{$settings.Appearance.phone_validation_mode}',
+        hash_of_available_countries: '{$hash_of_available_countries}'
     });
 
     {if $live_editor_objects}
@@ -130,6 +147,16 @@
     {/if}
 }(Tygh, Tygh.$));
 </script>
+
+{script src="js/lib/maskedinput/jquery.maskedinput.min.js"}
+
+{script src="js/lib/inputmask/jquery.inputmask.min.js"}
+{script src="js/lib/jquery-bind-first/jquery.bind-first-0.2.3.js"}
+{script src="js/lib/inputmask-multi/jquery.inputmask-multi.js"}
+{script src="js/lib/owlcarousel/owl.carousel.min.js"}
+
+{script src="js/tygh/phone_mask.js"}
+
 
 {hook name="index:scripts"}
 {/hook}

@@ -205,6 +205,8 @@ class YandexDelivery
             return array();
         }
 
+        $ndash = html_entity_decode('&ndash;');
+
         $work_days = array();
         foreach ($schedules as $key_day => $day) {
             $day_index = $day['day'];
@@ -253,7 +255,7 @@ class YandexDelivery
         foreach ($compact_work_days as &$day) {
             if (!empty($day['intervals'])) {
                 foreach ($day['intervals'] as &$interval) {
-                    $interval = $interval['from'] . '-' . $interval['to'];
+                    $interval = $interval['from'] . $ndash . $interval['to']; // &ndash; is used as a time interval separator
                 }
                 $day['schedule'] = implode(', ', $day['intervals']);
             }
@@ -312,25 +314,28 @@ class YandexDelivery
             }
 
             $delivery_id = $delivery['delivery']['id'];
-            $deliveries['pickup'][$delivery_id] = array(
-                'cost' => $delivery['cost'],
-                'costWithRules' => $delivery['costWithRules'],
-                'delivery_name' => $delivery['delivery']['name'],
-                'unique_name' => $delivery['delivery']['unique_name'],
-                'minDays' => $delivery['minDays'],
-                'maxDays' => $delivery['maxDays'],
-                'tariffId' => $delivery['tariffId'],
-                'direction' => $delivery['direction'],
-                'is_pickup_point' => $delivery['is_pickup_point'],
-                'is_ff_import_available' => $delivery['delivery']['is_ff_import_available'],
-                'is_ds_import_available' => $delivery['delivery']['is_ds_import_available'],
-                'is_ff_withdraw_available' => $delivery['delivery']['is_ff_withdraw_available'],
-                'is_ds_withdraw_available' => $delivery['delivery']['is_ds_withdraw_available'],
-                'deliveryIntervals' => $delivery['deliveryIntervals'],
-            );
+            
+            if ($delivery['type'] == YD_DELIVERY_PICKUP) {
+		$deliveries['pickup'][$delivery_id] = array(
+		    'cost' => $delivery['cost'],
+		    'costWithRules' => $delivery['costWithRules'],
+		    'delivery_name' => $delivery['delivery']['name'],
+		    'unique_name' => $delivery['delivery']['unique_name'],
+		    'minDays' => $delivery['minDays'],
+		    'maxDays' => $delivery['maxDays'],
+		    'tariffId' => $delivery['tariffId'],
+		    'direction' => $delivery['direction'],
+		    'is_pickup_point' => $delivery['is_pickup_point'],
+		    'is_ff_import_available' => $delivery['delivery']['is_ff_import_available'],
+		    'is_ds_import_available' => $delivery['delivery']['is_ds_import_available'],
+		    'is_ff_withdraw_available' => $delivery['delivery']['is_ff_withdraw_available'],
+		    'is_ds_withdraw_available' => $delivery['delivery']['is_ds_withdraw_available'],
+		    'deliveryIntervals' => $delivery['deliveryIntervals'],
+		);
 
-            $deliveries['pickup'][$delivery_id]['pickupPoints'] = self::getCompactPickupPoints($delivery['pickupPoints']);
-
+		$deliveries['pickup'][$delivery_id]['pickupPoints'] = self::getCompactPickupPoints($delivery['pickupPoints']);
+	    }
+	    
             if ($delivery['type'] == YD_DELIVERY_COURIER) {
                 $deliveries['courier'][$delivery_id] = array(
                     'delivery_id' => $delivery_id,

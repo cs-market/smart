@@ -58,6 +58,7 @@
                     <label class="control-label" for="amount_prepaid_{$id}">{__("yandex_delivery.amount_prepaid")}</label>
                     <div class="controls">
                         <input id="amount_prepaid_{$id}" class="input-small" type="text" name="yandex_order[amount_prepaid]" size="45" value="{$yandex_order_data.amount_prepaid.$id}" />
+                        <p class="muted description">{__("ttc_yandex_delivery.amount_prepaid")}</p>
                     </div>
                 </div>
 
@@ -74,6 +75,7 @@
                             <label for="shipment_notify_user_{$id}" class="checkbox">
                                 <input type="checkbox" name="yandex_order[notify_user]" id="shipment_notify_user_{$id}" value="Y" />
                                 {__("send_shipment_notification_to_customer")}</label>
+                                <p class="muted description">{__("yandex_delivery.info_about_of_tracking_number")}</p>
                         </div>
                     </div>
                 </div>
@@ -84,14 +86,14 @@
                 <div class="control-group">
                     <label class="control-label cm-required" for="first_name_{$id}">{__("first_name")}</label>
                     <div class="controls">
-                        <input id="first_name_{$id}" class="input-medium" type="text" name="yandex_order[first_name]" size="45" value="{$order_info.s_firstname}" />
+                        <input id="first_name_{$id}" class="input-medium" type="text" name="yandex_order[first_name]" size="45" value="{$yandex_order_data.firstname}" />
                     </div>
                 </div>
 
                 <div class="control-group">
                     <label class="control-label cm-required" for="last_name_{$id}">{__("last_name")}</label>
                     <div class="controls">
-                        <input id="last_name_{$id}" class="input-medium" type="text" name="yandex_order[last_name]" size="45" value="{$order_info.s_lastname}" />
+                        <input id="last_name_{$id}" class="input-medium" type="text" name="yandex_order[last_name]" size="45" value="{$yandex_order_data.lastname}" />
                     </div>
                 </div>
 

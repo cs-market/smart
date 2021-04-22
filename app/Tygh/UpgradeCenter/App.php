@@ -16,17 +16,18 @@ namespace Tygh\UpgradeCenter;
 
 use Error;
 use Exception;
+use Tygh\Addons\SchemesManager;
+use Tygh\DataKeeper;
 use Tygh\Domain\SoftwareProduct\Version;
+use Tygh\Enum\StorefrontStatuses;
 use Tygh\Exceptions\PHPErrorException;
+use Tygh\Http;
+use Tygh\Languages\Languages;
+use Tygh\Registry;
+use Tygh\Settings;
 use Tygh\Tools\Backup\DatabaseBackupperValidator;
 use Tygh\Tygh;
 use Tygh\UpgradeCenter\Migrations\Migration;
-use Tygh\Http;
-use Tygh\Registry;
-use Tygh\Addons\SchemesManager;
-use Tygh\Languages\Languages;
-use Tygh\DataKeeper;
-use Tygh\Settings;
 use Tygh\UpgradeCenter\Validators\Permissions;
 
 class App
@@ -104,6 +105,16 @@ class App
      * @var \Tygh\Tools\Backup\ADatabaseBackupper $db_backupper
      */
     protected $db_backupper;
+
+    /**
+     * @var \Tygh\Storefront\Repository
+     */
+    protected $storefront_repository;
+
+    /**
+     * @var \Tygh\SmartyEngine\Core $view
+     */
+    protected $view;
 
     /**
      * Gets list of installed packages
@@ -217,12 +228,14 @@ class App
                 $headers = empty($data['headers']) ? array() : $data['headers'];
                 if ($data['method'] == 'post') {
                     Http::mpost($data['url'], $data['data'], array(
-                        'callback' => array(array(), $_id, $show_upgrade_notice),
-                        'headers' => $headers));
+                        'callback' => array(array($this, 'processResponses'), $_id, $show_upgrade_notice),
+                        'headers' => $headers
+                    ));
                 } else {
                     Http::mget($data['url'], $data['data'], array(
                         'callback' => array(array($this, 'processResponses'), $_id, $show_upgrade_notice),
-                        'headers' => $headers));
+                        'headers' => $headers
+                    ));
                 }
             }
 
@@ -570,6 +583,7 @@ class App
             return array($result, array($validator->getName() => $data));
         } else {
             $result = self::PACKAGE_INSTALL_RESULT_SUCCESS;
+            $backup_filename = null;
             if ($this->perform_backup) {
                 $backup_filename
                     = "upg_{$package_id}_{$information_schema['from_version']}-{$information_schema['to_version']}_" .
@@ -627,6 +641,10 @@ class App
                 }
             }
 
+            $email_data = [
+                'settings_section_url' => fn_get_storefront_status_manage_url($this->storefront_repository)
+            ];
+
             if ($this->perform_backup) {
                 fn_set_storage_data('collisions_hash', null);
 
@@ -658,38 +676,31 @@ class App
 
                 $logger->add(sprintf('Backup created at "%s"', $backup_file));
 
-                $email_data = array(
-                    'backup_file' => $backup_file,
-                    'settings_section_url' => fn_url('settings.manage'),
-                    'restore_link' => "{$restore_http_path}?uak={$restore_key}",
-                );
-            } else {
-                $email_data = array(
-                    'settings_section_url' => fn_url('settings.manage'),
-                );
+                $email_data['backup_file'] = $backup_file;
+                $email_data['restore_link'] = "{$restore_http_path}?uak={$restore_key}";
             }
 
             // Send mail to admin e-mail with information about backup
             $logger->add(sprintf('Sending upgrade information e-mail to: %s', implode(', ', $email_recipients)));
 
             /** @var \Tygh\Mailer\Mailer $mailer */
-            $mailer = Tygh::$app['mailer'];
-
-            $mail_sent = $mailer->send(array(
-                'to' => $email_recipients,
-                'from' => 'default_company_site_administrator',
-                'data' => $email_data,
-                'template_code' => 'upgrade_backup_info',
-                'tpl' => 'upgrade/backup_info.tpl',
-            ), 'A', Registry::get('settings.Appearance.backend_default_language'));
-
-            if ($mail_sent) {
-                $logger->add('E-mail was successfully sent');
-            } else {
-                $logger->add('Failed to send e-mail');
-
-                return array(false, array());
-            }
+//             $mailer = Tygh::$app['mailer'];
+// 
+//             $mail_sent = $mailer->send(array(
+//                 'to' => $email_recipients,
+//                 'from' => 'default_company_site_administrator',
+//                 'data' => $email_data,
+//                 'template_code' => 'upgrade_backup_info',
+//                 'tpl' => 'upgrade/backup_info.tpl',
+//             ), 'A', Registry::get('settings.Appearance.backend_default_language'));
+// 
+//             if ($mail_sent) {
+//                 $logger->add('E-mail was successfully sent');
+//             } else {
+//                 $logger->add('Failed to send e-mail');
+// 
+//                 return array(false, array());
+//             }
 
             $this->outputMessage(__('uc_run_migrations'), '', true);
 
@@ -722,7 +733,7 @@ class App
                     $migration_succeed = Migration::instance($config)->migrate($minimal_date);
                 } catch (Exception $e) {
                     $migration_exception = $e;
-                } catch (Error $e) {
+                } catch (Error $e) { // phpcs:ignore
                     $migration_exception = $e;
                 }
 
@@ -791,54 +802,21 @@ class App
 
             $logger->add(sprintf('Executing post-upgrade script "%s"', $post_script_file_path));
 
-            $upgrade_notes = array();
+            $upgrade_notes = [];
 
             include_once $post_script_file_path;
 
             $logger->add('Post-upgrade script executed successfully');
 
-            $upgrade_notification_text = '';
-            foreach ($upgrade_notes as $note) {
-                $delim = false;
-                if (!empty($note['title'])) {
-                    $upgrade_notification_text .= "<h3>{$note['title']}</h3>";
-                    $delim = true;
-                }
-                if (!empty($note['message'])) {
-                    $upgrade_notification_text .= "<div>{$note['message']}</div>";
-                    $delim = true;
-                }
-                if ($delim) {
-                    $upgrade_notification_text .= "<hr>";
-                }
-            }
-
-            if ($upgrade_notification_text) {
-                $upgrade_notification_title = __('upgrade_notification_title', array(
-                    '[product]' => PRODUCT_NAME,
-                    '[version]' => $upgrade_schema['to_version']
-                ));
-
+            if (!empty($upgrade_notes)) {
                 $logger->add(sprintf('Sending upgrade information e-mail to: %s', implode(', ', $email_recipients)));
-                $mail_sent = $mailer->send(array(
-                    'to' => $email_recipients,
-                    'from' => 'default_company_site_administrator',
-                    'data' => array(),
-                    'subj' => $upgrade_notification_title,
-                    'body' => $upgrade_notification_text
-                ), 'A', Registry::get('settings.Appearance.backend_default_language'));
-                if ($mail_sent) {
-                    $logger->add('Upgrade information e-mail was successfully sent');
-                } else {
-                    $logger->add('Failed to send e-mail');
-                }
-
-                $this->setNotification(
-                    'I',
-                    $upgrade_notification_title,
-                    __('upgrade_notification_message') . $upgrade_notification_text,
-                    'S'
-                );
+//                 $mail_sent = $this->sendPostUpgradeNotificationByEmail($upgrade_schema, $email_recipients, $upgrade_notes);
+//                 if ($mail_sent) {
+//                     $logger->add('Upgrade information e-mail was successfully sent');
+//                 } else {
+//                     $logger->add('Failed to send e-mail');
+//                 }
+                $this->generatePostUpgradeNotification($upgrade_schema, $email_recipients, $upgrade_notes);
             }
         }
 
@@ -956,7 +934,7 @@ class App
     /**
      * Prepares restore.php file.
      *
-     * @return bool if all necessary information was added to restore.php
+     * @return array|bool if all necessary information was added to restore.php
      */
     protected function prepareRestore($package_id, $content_schema, $information_schema, $backup_filename)
     {
@@ -972,7 +950,7 @@ class App
         $target_restore_dir_path = $upgrades_dir . "/{$target_restore_dir_name}/";
         $target_restore_file_path = $target_restore_dir_path . $target_restore_file_name;
 
-        $target_restore_http_path = Registry::get('config.http_location') . "/upgrades/{$target_restore_dir_name}/{$target_restore_file_name}";
+        $target_restore_http_path = Registry::get('config.current_location') . "/upgrades/{$target_restore_dir_name}/{$target_restore_file_name}";
 
         $target_restore_dir_perms = 0755;
         $target_restore_file_perms = 0644;
@@ -1079,7 +1057,7 @@ class App
         $logger->add(sprintf('Upgrades directory permissions: %s', fn_get_file_perms_info($upgrades_dir)));
 
         // Check if restore is available through the HTTP
-        $logger->add('Checking restore script availability via HTTP');
+        $logger->add('Checking restore script availability via HTTP/HTTPS');
         $result = Http::get($target_restore_http_path);
 
         $http_error = Http::getError();
@@ -1253,7 +1231,8 @@ class App
      * @todo Bad codestyle: Multi returns.
      *
      * @param  string $package_id Package id like "core", "access_restrictions", etc
-     * @return bool   true if package is correct, false otherwise
+     *
+     * @return array|bool   true if package is correct, false otherwise
      */
     protected function checkPackagePermissions($package_id)
     {
@@ -1496,12 +1475,12 @@ class App
      */
     protected function closeStore()
     {
-        fn_set_store_mode('closed');
-        if (fn_allowed_for('ULTIMATE')) {
-            $company_ids = fn_get_all_companies_ids();
-            foreach ($company_ids as $company_id) {
-                fn_set_store_mode('closed', $company_id);
-            }
+        /** @var \Tygh\Storefront\Storefront[] $storefronts */
+        list($storefronts,) = $this->storefront_repository->find(['status' => StorefrontStatuses::OPEN]);
+
+        foreach ($storefronts as $storefront) {
+            $storefront->status = StorefrontStatuses::CLOSED;
+            $this->storefront_repository->save($storefront);
         }
     }
 
@@ -1569,11 +1548,27 @@ class App
         return self::$instance;
     }
 
-    public function __construct($params)
+    public function __construct($params, $config = null, $settings = null, $storefront_repository = null, $view = null)
     {
-        $this->config = Registry::get('config');
+        if ($config === null) {
+            $config = Registry::get('config');
+        }
+        if ($settings === null) {
+            $settings = Settings::instance()->getValues('Upgrade_center');
+        }
+        if ($storefront_repository === null) {
+            $storefront_repository = Tygh::$app['storefront.repository'];
+        }
+
+        if ($view === null) {
+            $view = Tygh::$app['view'];
+        }
+
+        $this->config = $config;
         $this->params = $params;
-        $this->settings = Settings::instance()->getValues('Upgrade_center');
+        $this->settings = $settings;
+        $this->storefront_repository = $storefront_repository;
+        $this->view = $view;
     }
 
     /**
@@ -1620,7 +1615,10 @@ class App
     public function installLanguages($package_content_schema, Log $logger, $package_content_path)
     {
         $failed_to_install = array();
-        $installed_languages = array_keys(Languages::getAvailable('A', true));
+        $installed_languages = array_keys(Languages::getAvailable([
+            'area'           => 'A',
+            'include_hidden' => true,
+        ]));
 
         if (empty($package_content_schema['languages'])) {
             $logger->add('Installing languages using upgraded *.po files');
@@ -1836,13 +1834,20 @@ class App
 
         $schema = $this->getSchema($package['id'], true);
 
-        $is_skippable = $package['type'] == 'core'
-            && (fn_is_development()
-                || $version->getServicePack() && empty($schema['migrations'])
-            );
-        $skip_by_default = $is_skippable && $version->getServicePack() && empty($schema['migrations']);
+        $is_skippable_core = $package['type'] === 'core' && (
+            fn_is_development() || $version->getServicePack() && empty($schema['migrations'])
+        );
+        $skip_by_default_core = $version->getServicePack() && empty($schema['migrations']);
 
-        return array('is_skippable' => $is_skippable, 'skip_by_default' => $skip_by_default);
+        $is_skippable_addon = $package['type'] === 'addon' && (
+            !isset($schema['backup']['is_skippable']) || !empty($schema['backup']['is_skippable'])
+        );
+        $skip_by_default_addon = !empty($schema['backup']['skip_by_default']);
+
+        $is_skippable = $is_skippable_core || $is_skippable_addon;
+        $skip_by_default = $is_skippable_core && $skip_by_default_core || $is_skippable_addon && $skip_by_default_addon;
+
+        return ['is_skippable' => $is_skippable, 'skip_by_default' => $skip_by_default];
     }
 
     /**
@@ -1889,5 +1894,89 @@ class App
         }
 
         return isset($this->db_backupper);
+    }
+
+    private function sendPostUpgradeNotificationByEmail($upgrade_schema, $email_recipients, $upgrade_notes)
+    {
+        $upgrade_notification_text = '';
+        foreach ($upgrade_notes as $note) {
+            $delim = false;
+            if (!empty($note['title'])) {
+                $upgrade_notification_text .= "<h3>{$note['title']}</h3>";
+                $delim = true;
+            }
+            if (!empty($note['message'])) {
+                $upgrade_notification_text .= "<div>{$note['message']}</div>";
+                $delim = true;
+            }
+            if ($delim) {
+                $upgrade_notification_text .= "<hr>";
+            }
+        }
+        if ($upgrade_notification_text) {
+            $upgrade_notification_title = __('upgrade_notification_title', array(
+                '[product]' => PRODUCT_NAME,
+                '[version]' => $upgrade_schema['to_version']
+            ));
+
+            /** @var \Tygh\Mailer\Mailer $mailer */
+            $mailer = Tygh::$app['mailer'];
+
+            $mail_sent = $mailer->send(array(
+                'to' => $email_recipients,
+                'from' => 'default_company_site_administrator',
+                'data' => array(),
+                'subj' => $upgrade_notification_title,
+                'body' => $upgrade_notification_text
+            ), 'A', Registry::get('settings.Appearance.backend_default_language'));
+
+            return $mail_sent;
+        }
+
+        return false;
+    }
+
+
+    private function generatePostUpgradeNotification($upgrade_schema, $email_recipients, $upgrade_notes)
+    {
+        $upgrade_notification_text = [];
+        foreach ($upgrade_notes as $note) {
+            if (!empty($note['title']) && !empty($note['message'])) {
+                $notification = [
+                    'title'   => $note['title'],
+                    'message' => $note['message']
+                ];
+                if (!empty($note['type']) && $note['type'] == 'R') {
+                    $upgrade_notification_text['required'][] = $notification;
+                } elseif (!empty($note['type']) && $note['type'] == 'I') {
+                    $upgrade_notification_text['important'][] = $notification;
+                } else {
+                    $upgrade_notification_text['common'][] = $notification;
+                }
+            }
+
+        }
+        if ($upgrade_notification_text) {
+            $upgrade_notification_title = __('upgrade_notification_title', array(
+                '[product]' => PRODUCT_NAME,
+                '[version]' => $upgrade_schema['to_version']
+            ));
+
+            $notification_data = [
+                'upgrade_notification_text' => $upgrade_notification_text,
+                'email_recipients' => $email_recipients,
+                'to_version' => $upgrade_schema['to_version']
+            ];
+
+            $this->view->assign('notification_data', $notification_data);
+            $msg = $this->view->fetch('views/upgrade_center/components/post_upgrade_notification.tpl');
+
+            $this->setNotification(
+                'I',
+                $upgrade_notification_title,
+                $msg,
+                'S'
+            );
+        }
     }
 }

@@ -14,6 +14,9 @@
 <div class="tabs cm-j-tabs">
     <ul class="nav nav-tabs">
         <li id="tab_general_{$id}" class="cm-js active"><a>{__("general")}</a></li>
+        {if fn_allowed_for("MULTIVENDOR:ULTIMATE") || $is_sharing_enabled}
+            <li id="tab_storefronts_{$id}" class="cm-js"><a>{__("storefronts")}</a></li>
+        {/if}
     </ul>
 </div>
 
@@ -65,6 +68,7 @@
         <div class="controls">
             <input type="hidden" name="currency_data[after]" value="N" />
             <input type="checkbox" name="currency_data[after]" value="Y" {if $currency.after == "Y"}checked="checked"{/if} id="after_{$id}">
+            <p class="muted description">{__("tt_views_currencies_update_after_sum")}</p>
         </div>
     </div>
 
@@ -76,6 +80,7 @@
         <label class="control-label" for="thousands_separator_{$id}">{__("ths_sign")}:</label>
         <div class="controls">
             <input type="text" name="currency_data[thousands_separator]" size="6" maxlength="6" value="{$currency.thousands_separator}" id="thousands_separator_{$id}">
+            <p class="muted description">{__("tt_views_currencies_update_ths_sign")}</p>
         </div>
     </div>
 
@@ -83,6 +88,7 @@
         <label class="control-label" for="decimal_separator_{$id}">{__("dec_sign")}:</label>
         <div class="controls">
             <input type="text" name="currency_data[decimals_separator]" size="6" maxlength="6" value="{$currency.decimals_separator}" id="decimal_separator_{$id}">
+            <p class="muted description">{__("tt_views_currencies_update_dec_sign")}</p>
         </div>
     </div>
 
@@ -90,10 +96,27 @@
         <label class="control-label" for="decimals_{$id}">{__("decimals")}:</label>
        <div class="controls">
             <input type="text" name="currency_data[decimals]" size="1" maxlength="2" value="{$currency.decimals}" id="decimals_{$id}">
+           <p class="muted description">{__("tt_views_currencies_update_decimals")}</p>
        </div>
     </div>
     </fieldset>
-</div>
+<!--content_tab_general_{$id}--></div>
+
+    {if fn_allowed_for("MULTIVENDOR:ULTIMATE")|| $is_sharing_enabled}
+        <div class="hidden" id="content_tab_storefronts_{$id}">
+            {$add_storefront_text = __("add_storefronts")}
+            {include file="pickers/storefronts/picker.tpl"
+                multiple=true
+                input_name="currency_data[storefront_ids]"
+                item_ids=$currency.storefront_ids
+                data_id="storefront_ids"
+                but_meta="pull-right"
+                no_item_text=__("all_storefronts")
+                but_text=$add_storefront_text
+                view_only=($is_sharing_enabled && $runtime.company_id)
+            }
+        <!--content_tab_storefronts_{$id}--></div>
+    {/if}
 
 {hook name="currencies:tabs_content"}
 {/hook}

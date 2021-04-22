@@ -1,4 +1,4 @@
-{if "discussion.add"|fn_check_view_permissions && !("MULTIVENDOR"|fn_allowed_for && $runtime.company_id && ($runtime.company_id != $object_company_id || $discussion.object_type == 'M'))}
+{if fn_check_permissions("discussion", "add", "admin", "") && !("MULTIVENDOR"|fn_allowed_for && $runtime.company_id && ($runtime.company_id != $object_company_id || $discussion.object_type === "Addons\\Discussion\\DiscussionObjectTypes::COMPANY"|enum))}
     {capture name="add_new_picker"}
         <div class="tabs cm-j-tabs">
             <ul class="nav nav-tabs">

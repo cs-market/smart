@@ -34,10 +34,8 @@ class ImportFileProductTest extends ATestCase
 
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('AREA', 'A');
         define('CART_LANGUAGE', 'ru');
-        define('DIR_ROOT', __DIR__ . '/../../../../../../../../');
         define('CHARSET', 'utf-8');
         define('DEFAULT_DIR_PERMISSIONS', 0777);
         define('SHIPPING_ADDRESS_PREFIX', 's');
@@ -48,7 +46,6 @@ class ImportFileProductTest extends ATestCase
         $this->requireCore('functions/fn.fs.php');
         $this->requireCore('functions/fn.users.php');
         $this->requireCore('functions/fn.database.php');
-        $this->requireCore('functions/fn.catalog.php');
 
         $this->log = $this->getMockBuilder('Tygh\Commerceml\Logs')
             ->setMethods(array())
@@ -187,8 +184,10 @@ class ImportFileProductTest extends ATestCase
             'price' => 'Цена',
             'price_per_item' => 'ЦенаЗаЕдиницу',
             'price_id' => 'ИдТипаЦены',
-            'store' => 'Склад',
-            'in_stock' => 'КоличествоНаСкладе',
+            'warehouses' => 'Склады',
+            'warehouse' => 'Склад',
+            'warehouse_id' => 'ИдСклада',
+            'warehouse_in_stock' => 'КоличествоНаСкладе',
             'image' => 'Картинка',
             'bar' => 'Штрихкод',
             'type_field' => 'ТипЗначений',
@@ -215,6 +214,7 @@ class ImportFileProductTest extends ATestCase
             'address' => 'Адрес',
             'presentation' => 'Представление',
             'address_field' => 'АдресноеПоле',
+            'locality'=> 'Населенный пункт',
             'type' => 'Тип',
             'post_code' => 'Почтовый индекс',
             'country' => 'Страна',

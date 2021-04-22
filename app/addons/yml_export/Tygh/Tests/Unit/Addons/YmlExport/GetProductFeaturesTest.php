@@ -26,7 +26,6 @@ class GetProductFeaturesTest extends ATestCase
 
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('ITERATION_OFFERS', 5000);
         define('DESCR_SL', 'en');
         define('AREA', 'A');

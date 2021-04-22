@@ -720,7 +720,7 @@ function fn_paypal_adaptive_calc_admin_fee($order_data)
             if ($balance < 0) {
                 $admin_fee += abs($balance);
             } else {
-                $admin_fee += abs(array_sum(fn_array_column($pending_payouts, 'payout_amount')));
+                $admin_fee += abs(array_sum(array_column($pending_payouts, 'payout_amount')));
             }
         }
     }
@@ -941,8 +941,15 @@ function fn_paypal_adaptive_get_verified_status($company_data)
 function fn_sd_paypal_adaptive_cs_info_url_auto_paypal_verification()
 {
     $key = Registry::get('addons.paypal_adaptive.cron_key');
-    $url = fn_url('paypal_verification.cron_get_verified_status?magic_key=' . urlencode($key), 'A');
-    $text = __('paypal_adaptive_auto_info_data_verification') . '<br/ >' . ' <a href="' . $url . '">' . $url . '</a><br />';
+    $admin_index = Registry::get('config.admin_index');
+    
+    $args = array(
+	'dispatch' => 'paypal_verification.cron_get_verified_status',
+	'magic_key' => $key,
+    );
+    
+    $command = fn_get_console_command('php /path/to/cart/', $admin_index, $args);
+    $text = __('paypal_adaptive_auto_info_data_verification') . '<br/ >' . $command;
 
     return $text;
 }
@@ -1008,7 +1015,7 @@ function fn_paypal_adaptive_vendor_payouts_get_list(&$instance, &$params, &$item
     if ($instance->getVendor()) {
         $fields['payout_amount'] = 'IF(payouts.order_id <> 0, payouts.order_amount - payouts.commission_amount, payouts.payout_amount)';
     } else {
-        $fields['payout_amount'] = 'IF(payouts.order_id <> 0, payouts.commission_amount, payouts.payout_amount)';
+        $fields['payout_amount'] = 'IF(payouts.order_id <> 0, payouts.marketplace_profit, payouts.payout_amount)';
     }
 }
 
@@ -1027,6 +1034,6 @@ function fn_paypal_adaptive_vendor_payouts_get_income(&$instance, &$params, &$fi
     if ($instance->getVendor()) {
         $fields['orders_summary'] = 'SUM(payouts.order_amount) - SUM(payouts.commission_amount)';
     } else {
-        $fields['orders_summary'] = 'SUM(payouts.commission_amount)';
+        $fields['orders_summary'] = 'SUM(payouts.marketplace_profit)';
     }
 }

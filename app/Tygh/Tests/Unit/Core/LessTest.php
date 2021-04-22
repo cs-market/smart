@@ -13,7 +13,6 @@ class LessTest extends \Tygh\Tests\Unit\ATestCase
     protected function setUp()
     {
         define('AREA', 'A');
-        define('BOOTSTRAP', true);
         define('TIME', time());
 
         $this->requireCore('functions/fn.common.php');
@@ -27,7 +26,7 @@ class LessTest extends \Tygh\Tests\Unit\ATestCase
      */
     public function testParseUrls($from_path, $to_path, $input_css, $expected_css)
     {
-        $this->assertEquals(strtr($expected_css, array('[TIME]' => TIME)), Less::parseUrls($input_css, $from_path, $to_path));
+        $this->assertEquals(strtr($expected_css, array('[TIME]' => TIME)), Less::parseUrls($input_css, $from_path, $to_path, AREA, 1));
     }
 
     /**

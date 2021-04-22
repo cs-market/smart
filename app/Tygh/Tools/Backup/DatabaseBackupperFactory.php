@@ -42,9 +42,12 @@ class DatabaseBackupperFactory
     public function createNativeBackupper(array $config, array $tables, array $params, $destination, array $ini_vars)
     {
         // check if mysqldump can be used
-        if (empty($config['tweaks']['backup_db_mysqldump'])
-            || !MysqldumpDatabaseBackupper::isBinaryCallable($ini_vars)
-        ) {
+        if (empty($config['tweaks']['backup_db_mysqldump'])) {
+            throw new NativeBackupperException('backup via mysqldump is disabled by config');
+        }
+
+        // check if mysqldump is callable
+        if (!MysqldumpDatabaseBackupper::isBinaryCallable($ini_vars)) {
             throw new NativeBackupperException('mysqldump is not available');
         }
 

@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Languages\Languages;
+
 /**
  * Reverse IP filter
  */
@@ -42,7 +44,7 @@ function fn_settings_actions_addons_access_restrictions_admin_reverse_ip_access(
                 $__data['item_id'] = db_query("REPLACE INTO ?:access_restriction ?e", $restrict_ip);
                 $__data['type'] = 'aas';
 
-                foreach (fn_get_translation_languages() as $__data['lang_code'] => $_v) {
+                foreach (Languages::getAll() as $__data['lang_code'] => $_v) {
                     $__data['reason'] = __('store_admin', '', $__data['lang_code']);
                     db_query("REPLACE INTO ?:access_restriction_reason_descriptions ?e", $__data);
                 }

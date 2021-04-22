@@ -1,12 +1,16 @@
 {if $discussion && $discussion.object_type && !$discussion.is_empty}
 
-    {$allow_save = ($discussion.object_type != "M" || !$runtime.company_id) && "discussion.update"|fn_check_view_permissions}
-
-    <div id="content_discussion">
+    {$is_allowed_to_add_reviews = $is_allowed_to_add_reviews|default:fn_check_permissions("discussion", "add", "admin", "")}
+    {$is_allowed_to_update_reviews = fn_check_permissions("discussion", "update", "admin")}
+    {$is_allowed_to_bulk_delete_reviews = fn_check_permissions("discussion", "m_delete", "admin")}
+    {$is_owned_object = $runtime.company_id == $object_company_id}
+    {$is_company_reviews = $discussion.object_type === "Addons\Discussion\DiscussionObjectTypes::COMPANY"|enum}
+    {$allow_save = $is_allowed_to_update_reviews && !($runtime.company_id && (!$is_owned_object || $is_company_reviews))}
+    <div class="{if $selected_section !== "discussion" && $runtime.controller !== "discussion"}hidden{/if}" id="content_discussion">
     <div class="clearfix">
         <div class="buttons-container buttons-bg pull-right">
-            {if "discussion.add"|fn_check_view_permissions && !("MULTIVENDOR"|fn_allowed_for && $runtime.company_id && ($runtime.company_id != $object_company_id || $discussion.object_type == 'M'))}
-                {if $discussion.object_type == "E"}
+            {if $is_allowed_to_add_reviews && !($runtime.company_id && (!$is_owned_object || $is_company_reviews))}
+                {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT"|enum}
                     {capture name="adv_buttons"}
                         {include file="common/popupbox.tpl" id="add_new_post" title=__("add_post") icon="icon-plus" act="general" link_class="cm-dialog-switch-avail"}
                     {/capture}
@@ -14,18 +18,18 @@
                     {include file="common/popupbox.tpl" id="add_new_post" link_text=__("add_post") act="general" link_class="cm-dialog-switch-avail"}
                 {/if}
             {/if}
-            {if $discussion.posts && "discussion_manager"|fn_check_view_permissions}
+            {if $discussion.posts && $is_allowed_to_update_reviews}
                 {$show_save_btn = true scope = root}
-                {if $discussion.object_type == "E"}
+                {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT"|enum}
                     {capture name="buttons_insert"}
                 {/if}
-                {if "discussion.m_delete"|fn_check_view_permissions}
+                {if $is_allowed_to_bulk_delete_reviews}
                     {capture name="tools_list"}
                         <li>{btn type="delete_selected" dispatch="dispatch[discussion.m_delete]" form="update_posts_form"}</li>
                     {/capture}
                     {dropdown content=$smarty.capture.tools_list}
                 {/if}
-                {if $discussion.object_type == "E"}
+                {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::TESTIMONIALS_AND_LAYOUT"|enum}
                     {/capture}
                 {/if}
             {/if}
@@ -39,7 +43,7 @@
 
         <div class="posts-container {if $allow_save}cm-no-hide-input{else}cm-hide-inputs{/if}">
             {foreach from=$discussion.posts item="post"}
-                <div class="post-item {if $discussion.object_type == "O"}{if $post.user_id == $user_id}incoming{else}outgoing{/if}{/if}">
+                <div class="post-item {if $discussion.object_type == "Addons\Discussion\DiscussionObjectTypes::ORDER"|enum}{if $post.user_id == $user_id}incoming{else}outgoing{/if}{/if}">
                     {hook name="discussion:items_list_row"}
                         {include file="addons/discussion/views/discussion_manager/components/post.tpl" post=$post type=$discussion.type}
                     {/hook}

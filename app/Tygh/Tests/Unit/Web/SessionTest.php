@@ -150,7 +150,7 @@ namespace {
          */
         public function testRegistrationAtContainer()
         {
-            $app = new \Tygh\Application();
+            $app = \Tygh\Tygh::createApplication();
             $app['session'] = function (\Tygh\Application $app) {
                 return new \Tygh\Web\Session($app);
             };
@@ -274,11 +274,7 @@ namespace {
 
         protected function assertSessionIsNotStarted()
         {
-            if (version_compare(phpversion(), '5.4.0', '>=')) {
-                $this->assertFalse(session_status() === PHP_SESSION_ACTIVE);
-            }
-
-            $this->assertTrue(session_id() === '');
+            $this->assertFalse(session_status() === PHP_SESSION_ACTIVE);
         }
     }
 }

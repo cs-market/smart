@@ -12,17 +12,24 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Common\OperationResult;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ProductTracking;
 use Tygh\Helpdesk;
 use Tygh\Http;
+use Tygh\Mailer\Mailer;
+use Tygh\Mailer\Transports\PhpMailerTransport;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use Tygh\Registry;
 use Tygh\Settings;
+use Tygh\Enum\YesNo;
 
 /**
  * Check if secure connection is available
  */
 function fn_settings_actions_security_secure_storefront(&$new_value, $old_value)
 {
-    if ($new_value !== 'none') {
+    if ($new_value !== YesNo::NO) {
         $company_id = fn_get_runtime_company_id();
 
         if (!fn_allowed_for('ULTIMATE') || (fn_allowed_for('ULTIMATE') && $company_id)) {
@@ -37,13 +44,13 @@ function fn_settings_actions_security_secure_storefront(&$new_value, $old_value)
             $content = Http::get($storefront_url);
             if (empty($content) || $content != 'OK') {
                 // Disable https
-                Settings::instance()->updateValue('secure_storefront', 'none', 'Security');
-                $new_value = 'none';
+                Settings::instance()->updateValue('secure_storefront', YesNo::NO, 'Security');
+                $new_value = YesNo::NO;
 
                 $error = Http::getErrorFields();
                 $error_warning = __('warning_https_is_disabled', array(
                     '[href]' => Registry::get('config.resources.kb_https_failed_url'
-                    )));
+                )));
 
                 $error_warning .= fn_settings_actions_build_detailed_error_message($error);
                 fn_set_notification('W', __('warning'), $error_warning);
@@ -57,7 +64,7 @@ function fn_settings_actions_security_secure_storefront(&$new_value, $old_value)
  */
 function fn_settings_actions_security_secure_admin(&$new_value, $old_value)
 {
-    if ($new_value !== 'N') {
+    if ($new_value !== YesNo::NO) {
         $suffix = '';
         if (fn_allowed_for('ULTIMATE')) {
             $suffix = '&company_id=' . Registry::get('runtime.company_id');
@@ -86,7 +93,7 @@ function fn_settings_actions_security_secure_admin(&$new_value, $old_value)
 /**
  * Alter order initial ID
  */
-function fn_settings_actions_general_order_start_id(&$new_value, $old_value)
+function fn_settings_actions_checkout_order_start_id(&$new_value, $old_value)
 {
     $new_value = intval($new_value);
     if ($new_value > 0) {
@@ -127,13 +134,6 @@ function fn_settings_actions_upgrade_center_license_number(&$new_value, &$old_va
     $old_mode = fn_get_storage_data('store_mode');
 
     list($license_status, $messages, $new_mode) = Helpdesk::getStoreMode($new_value, Tygh::$app['session']['auth']);
-    
-    $messages_queue = fn_get_storage_data('hd_messages');
-    if (empty($messages_queue)) {
-        $messages_queue = array();
-    }
-    $messages_queue = array_merge($messages_queue, $messages);
-    fn_set_storage_data('hd_messages', serialize($messages_queue));
 
     if ($license_status == 'ACTIVE' && $old_mode != $new_mode) {
         fn_set_storage_data('store_mode', $new_mode, true);
@@ -188,4 +188,281 @@ function fn_settings_actions_build_detailed_error_message($error) {
         }
     }
     return $detailed_message;
+}
+
+/**
+ * Checks whether SMTP connection details are valid.
+ *
+ * @param string $host                 The "SMTP host" setting value
+ * @param string $username             The "SMTP username" setting value
+ * @param string $password             The "SMTP password" setting value
+ * @param string $encrypted_connection The "Use Encrypted Connection" setting value
+ * @param string $auth                 The "Use SMTP authentication" setting value
+ *
+ * @return \Tygh\Common\OperationResult
+ */
+function fn_validate_stmp_connection_details($host, $username, $password, $encrypted_connection, $auth)
+{
+    $transport_settings = [
+        'mailer_send_method'              => 'smtp',
+        'mailer_smtp_host'                => $host,
+        'mailer_smtp_username'            => $username,
+        'mailer_smtp_password'            => $password,
+        'mailer_smtp_ecrypted_connection' => $encrypted_connection,
+        'mailer_smtp_auth'                => $auth,
+    ];
+
+    /** @var \Tygh\Mailer\Mailer $mailer */
+    $mailer = new Mailer(
+        Tygh::$app['mailer.message_builder_factory'],
+        Tygh::$app['mailer.transport_factory'],
+        $transport_settings,
+        false,
+        CART_LANGUAGE
+    );
+
+    $transport = $mailer->getTransport($transport_settings);
+
+    $result = new OperationResult(false);
+    if ($transport instanceof PhpMailerTransport) {
+        try {
+            $debug_output_handler = static function ($error_message) use ($result) {
+                static $i = 0;
+                if (strpos($error_message, 'SMTP ERROR: ') !== 0) {
+                    return;
+                }
+
+                $error_message = substr_replace($error_message, '', 0, strlen('SMTP ERROR: '));
+                $result->addError((string) $i++, $error_message);
+            };
+            $transport->SMTPDebug = 1;
+            $transport->Debugoutput = $debug_output_handler;
+            $result->setSuccess($transport->smtpConnect());
+        } catch (PHPMailerException $e) {
+            $result->addError('', $e->getMessage());
+        }
+    }
+
+    return $result;
+}
+
+/**
+ * Checks that new SMTP settings are valid and restores old setting values when the check fails.
+ */
+function fn_check_smtp_settings_and_restore_on_fail()
+{
+    $old_settings = Registry::ifGet('smtp_settings', []);
+    /** @var array<string, string> $new_settings */
+    $new_settings = Settings::instance()->getValues('Emails');
+
+    $result = fn_validate_stmp_connection_details(
+        $new_settings['mailer_smtp_host'],
+        $new_settings['mailer_smtp_username'],
+        $new_settings['mailer_smtp_password'],
+        $new_settings['mailer_smtp_ecrypted_connection'],
+        $new_settings['mailer_smtp_auth']
+    );
+
+    if ($result->isSuccess()) {
+        return;
+    }
+
+    /**
+     * The validation callback is executed in a shutdown function and session is shut down already.
+     * We should start it to store notifications.
+     */
+    Tygh::$app['session']->start();
+
+    fn_delete_notification('changes_saved');
+
+    foreach ($result->getErrors() as $error_message) {
+        fn_set_notification(NotificationSeverity::ERROR, __('settings.smtp_error'), $error_message);
+    }
+    foreach ($old_settings as $old_setting => $old_value) {
+        Settings::instance()->updateValue($old_setting, $old_value, 'Emails', false, null, false);
+    }
+
+    Tygh::$app['session']->shutdown();
+}
+
+/**
+ * Stores old setting value when the "SMTP host" setting value.
+ *
+ * @param string $new_value Old setting value
+ * @param string $old_value New setting value
+ */
+function fn_settings_actions_emails_mailer_smtp_host($new_value, $old_value)
+{
+    Registry::isExist('smtp_settings') or register_shutdown_function('fn_check_smtp_settings_and_restore_on_fail');
+    Registry::set('smtp_settings.mailer_smtp_host', $old_value);
+}
+
+/**
+ * Stores old setting value when the "SMTP username" setting value.
+ *
+ * @param string $new_value Old setting value
+ * @param string $old_value New setting value
+ */
+function fn_settings_actions_emails_mailer_smtp_username($new_value, $old_value)
+{
+    Registry::isExist('smtp_settings') or register_shutdown_function('fn_check_smtp_settings_and_restore_on_fail');
+    Registry::set('smtp_settings.mailer_smtp_username', $old_value);
+}
+
+/**
+ * Stores old setting value when the "SMTP password" setting value.
+ *
+ * @param string $new_value Old setting value
+ * @param string $old_value New setting value
+ */
+function fn_settings_actions_emails_mailer_smtp_password($new_value, $old_value)
+{
+    Registry::isExist('smtp_settings') or register_shutdown_function('fn_check_smtp_settings_and_restore_on_fail');
+    Registry::set('smtp_settings.mailer_smtp_password', $old_value);
+}
+
+/**
+ * Stores old setting value when the "Use Encrypted Connection" setting value.
+ *
+ * @param string $new_value Old setting value
+ * @param string $old_value New setting value
+ */
+function fn_settings_actions_emails_mailer_smtp_ecrypted_connection($new_value, $old_value)
+{
+    Registry::isExist('smtp_settings') or register_shutdown_function('fn_check_smtp_settings_and_restore_on_fail');
+    Registry::set('smtp_settings.mailer_smtp_ecrypted_connection', $old_value);
+}
+
+/**
+ * Stores old setting value when the "Use SMTP authentication" setting value.
+ *
+ * @param string $new_value Old setting value
+ * @param string $old_value New setting value
+ */
+function fn_settings_actions_emails_mailer_smtp_auth($new_value, $old_value)
+{
+    Registry::isExist('smtp_settings') or register_shutdown_function('fn_check_smtp_settings_and_restore_on_fail');
+    Registry::set('smtp_settings.mailer_smtp_auth', $old_value);
+}
+
+/**
+ * For backward compatibility:
+ *  - Saves inventory_tracking setting
+ *
+ * @param string              $new_value New setting value
+ * @param string              $old_value Old setting value
+ * @param \Tygh\Settings|null $instance  Instance of settings
+ */
+function fn_settings_actions_general_global_tracking($new_value, $old_value, $instance = null)
+{
+    if ($instance === null) {
+        $instance = Settings::instance();
+    }
+
+    if ($new_value === ProductTracking::TRACK || !isset($new_value)) {
+        $instance->updateValue('inventory_tracking', YesNo::YES, 'General', false, null, false);
+        return;
+    }
+
+    $instance->updateValue('inventory_tracking', YesNo::NO, 'General', false, null, false);
+}
+
+/**
+ * For backward compatibility:
+ *  - Saves default_product_details_view setting
+ *
+ * @param string              $new_value New setting value
+ * @param string              $old_value Old setting value
+ * @param \Tygh\Settings|null $instance  Instance of settings
+ */
+function fn_settings_actions_appearance_global_product_details_view($new_value, $old_value, $instance = null)
+{
+    if ($new_value === null) {
+        return;
+    }
+    if ($instance === null) {
+        $instance = Settings::instance();
+    }
+
+    $instance->updateValue('default_product_details_view', $new_value, 'Appearance');
+}
+
+/**
+ * Validates max qty settings with qty step setting
+ *
+ * @param string $new_value New value
+ * @param string $old_value Old value
+ */
+function fn_settings_actions_checkout_global_max_qty($new_value, $old_value)
+{
+    Registry::isExist('qty_settings') or register_shutdown_function('fn_validate_qty_settings');
+    Registry::set('qty_settings.max_qty', $old_value);
+}
+
+/**
+ * Validates min qty settings with qty step setting
+ *
+ * @param string $new_value New value
+ * @param string $old_value Old value
+ */
+function fn_settings_actions_checkout_global_min_qty($new_value, $old_value)
+{
+    Registry::isExist('qty_settings') or register_shutdown_function('fn_validate_qty_settings');
+    Registry::set('qty_settings.min_qty', $old_value);
+}
+
+/**
+ * Validates qty step settings with min/max qty settings
+ *
+ * @param string $new_value New value
+ * @param string $old_value Old value
+ */
+function fn_settings_actions_checkout_global_qty_step($new_value, $old_value)
+{
+    Registry::isExist('qty_settings') or register_shutdown_function('fn_validate_qty_settings');
+    Registry::set('qty_settings.qty_step', $old_value);
+}
+
+/**
+ * Validates setting with quantity step
+ *
+ * @param string|int $value Value
+ * @param string|int $step  Step
+ *
+ * @return bool|int
+ */
+function fn_validate_qty_setting_with_step($value, $step)
+{
+    if (
+        $value === null
+        || $value === ''
+        || (int) $value === 0
+        || $step === null
+        || (int) $step === 0
+    ) {
+        return false;
+    }
+
+    return fn_ceil_to_step(abs((int) $value), (int) $step);
+}
+
+/**
+ * Validates all qty settings with quantity step and updates it if needs
+ */
+function fn_validate_qty_settings()
+{
+    $qty_step = Settings::instance()->getValue('global_qty_step', 'Checkout');
+
+    foreach (['min_qty', 'max_qty'] as $qty_setting) {
+        $old_qty_value = Settings::instance()->getValue('global_' . $qty_setting, 'Checkout');
+        $correct_value = fn_validate_qty_setting_with_step($old_qty_value, $qty_step);
+
+        if (empty($correct_value) || $old_qty_value === $correct_value) {
+            continue;
+        }
+
+        Settings::instance()->updateValue('global_' . $qty_setting, (string) $correct_value, 'Checkout', false, null, false);
+    }
+
+    Registry::del('qty_settings');
 }

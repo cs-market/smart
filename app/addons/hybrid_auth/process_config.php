@@ -45,8 +45,12 @@ foreach ($available_providers as $provider_data) {
                 $config['providers'][$provider_name][$param_id] = $param_data['value'];
             }
         }
-
-        if (isset($providers_schema[$provider_data['provider']]['wrapper'])) {
+        if (isset($config['providers'][$provider_name]['version']) && isset($providers_schema[$provider_data['provider']]['versions'])) {
+            $version = $config['providers'][$provider_name]['version'];
+            if (isset($providers_schema[$provider_data['provider']]['versions'][$version]['wrapper'])) {
+                $config['providers'][$provider_name]['wrapper'] = $providers_schema[$provider_data['provider']]['versions'][$version]['wrapper'];
+            }
+        } elseif (isset($providers_schema[$provider_data['provider']]['wrapper'])) {
             $config['providers'][$provider_name]['wrapper'] = $providers_schema[$provider_data['provider']]['wrapper'];
         }
     }

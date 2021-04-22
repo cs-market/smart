@@ -35,7 +35,7 @@
         {/if}
         {$data['data-ca-target-form'] = $form}
         {$data['data-ca-dispatch'] = $dispatch}
-        {btn type="text" target=$target href=$href data=$data class=$class onclick=$onclick text=$text method=$method raw=$raw}
+        {btn type="text" target=$target href=$href data=$data class=$class onclick=$onclick text=$text method=$method raw=$raw icon=""}
     {/if}
 
     {* shortcut for the delete_selected *}
@@ -98,7 +98,7 @@
 {function name="dropdown" text="" title="" class="" content="" icon="" no_caret=false placement="left"}
     {if $content|strip_tags:false|replace:"&nbsp;":""|trim != ""}
         <div class="btn-group{if $placement == "left"} dropleft{/if} {$class}" {if $id}id="{$id}"{/if}>
-            <a class="btn dropdown-toggle" data-toggle="dropdown" {if $title}title="{$title}"{/if}>
+            <a href="#" class="btn dropdown-toggle" data-toggle="dropdown" {if $title}title="{$title}"{/if}>
                 <i class="{$icon|default:"icon-cog"}"></i>
                 {if $text}
                     {$text|default:__("tools") nofilter}

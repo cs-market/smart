@@ -84,7 +84,7 @@
                                                 </span>
                                             </div>
                                             {/if}
-                                            {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                                            {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                                             <div class="ty-control-group">
                                                 <strong class="ty-control-group__label">{__("tax")}</strong>
                                                 <span class="ty-control-group__item">
@@ -119,7 +119,7 @@
                 {include file="common/price.tpl" value=$conf_discount}
             </td>
             {/if}
-        {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+        {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
             {assign var="_colspan" value=$_colspan+1}
             <td class="ty-center">
                 {include file="common/price.tpl" value=$conf_tax}

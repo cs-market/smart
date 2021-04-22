@@ -41,26 +41,35 @@
                                 {$item->getName()}
                             </td>
                             <td style="padding: 14px 0 14px 4px; vertical-align: top; text-align: right; font-family: Helvetica, Arial, sans-serif;">
-                                {include file="common/price.tpl" value=$item->getPrice() secondary_currency=$addons.rus_online_cash_register.currency}
-                            </td>
-                            <td style="padding: 14px 0 14px 4px; vertical-align: top; text-align: right; font-family: Helvetica, Arial, sans-serif;">{$item->getQuantity()}</td>
-                            <td style="padding: 14px 0 14px 4px; vertical-align: top; text-align: right; font-family: Helvetica, Arial, sans-serif;">
-                                {include file="common/price.tpl" value=$item->getDiscount() / $item->getQuantity() secondary_currency=$addons.rus_online_cash_register.currency}
+                                {$curency_code = $receipt->getCurrency()}
+                                {$currencies.$curency_code.symbol nofilter}
+                                {$item->getPrice()}
                             </td>
                             <td style="padding: 14px 0 14px 4px; vertical-align: top; text-align: right; font-family: Helvetica, Arial, sans-serif;">
-                                {include file="common/price.tpl" value=$item->getTaxSum() secondary_currency=$addons.rus_online_cash_register.currency} ({__("rus_online_cash_register.tax.`$item->getTaxType()`")})
+                                {$item->getQuantity()}
                             </td>
                             <td style="padding: 14px 0 14px 4px; vertical-align: top; text-align: right; font-family: Helvetica, Arial, sans-serif;">
-                                {include file="common/price.tpl" value=$item->getSum() secondary_currency=$addons.rus_online_cash_register.currency}
+                                {$currencies.$curency_code.symbol nofilter}
+                                {$item->getDiscount()}
+                            </td>
+                            <td style="padding: 14px 0 14px 4px; vertical-align: top; text-align: right; font-family: Helvetica, Arial, sans-serif;">
+                                {$currencies.$curency_code.symbol nofilter}
+                                {$item->getTaxSum()}
+                            </td>
+                            <td style="padding: 14px 0 14px 4px; vertical-align: top; text-align: right; font-family: Helvetica, Arial, sans-serif;">
+                                {$currencies.$curency_code.symbol nofilter}
+                                {$item->getSum()}
                             </td>
                         </tr>
                     {/foreach}
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td colspan="5" style="padding: 6px 0; border-top: 2px groove #808080; text-align: right; text-transform: uppercase; font-weight: bold; font-family: Helvetica, Arial, sans-serif;">{_("total")}:</td>
+                        <td colspan="5" style="padding: 6px 0; border-top: 2px groove #808080; text-align: right; text-transform: uppercase; font-weight: bold; font-family: Helvetica, Arial, sans-serif;">{__("total")}:</td>
                         <td style="padding: 6px 4px 6px 4px; border-top: 2px groove #808080; text-align: right; font-weight: bold; font-family: Helvetica, Arial, sans-serif;">
-                            {include file="common/price.tpl" value=$receipt->getTotal() secondary_currency=$addons.rus_online_cash_register.currency}
+                            {$curency_code = $receipt->getCurrency()}
+                            {$currencies.$curency_code.symbol nofilter}
+                            {$receipt->getTotal()}
                         </td>
                     </tr>
                     </tfoot>

@@ -139,34 +139,51 @@ if (!empty($_payment_id) && (!empty(Tygh::$app['session']['cart']['products']) |
     }
 }
 
-function fn_paypal_set_bml_checkout($payment_id, $order_id = 0, $order_info = array(), $cart = array(), $area = AREA)
+function fn_paypal_set_bml_checkout($payment_id, $order_id = 0, $order_info = [], $cart = [], $area = AREA)
 {
     $processor_data = fn_get_payment_method_data($payment_id);
+    $currency = fn_paypal_get_valid_currency($processor_data['processor_params']['currency']);
 
     if (!empty($order_id)) {
         $return_url = fn_url("payment_notification.notify?payment=paypal_bml&order_id=$order_id", $area, 'current');
         $cancel_url = fn_url("payment_notification.cancel?payment=paypal_bml&order_id=$order_id", $area, 'current');
     } else {
         $return_url = fn_payment_url('current', "paypal_bml.php?mode=express_return&payment_id=$payment_id");
-        $cancel_url = fn_url("checkout.cart", $area, 'current');
+        $cancel_url = fn_url('checkout.cart', $area, 'current');
     }
 
-    $request = array(
+    $request = [
         'PAYMENTREQUEST_0_PAYMENTACTION' => 'SALE',
-        'PAYMENTREQUEST_0_SOLUTIONTYPE' => 'SOLE',
-        'PAYMENTREQUEST_0_CURRENCYCODE' => $processor_data['processor_params']['currency'],
-        'LOCALECODE' => CART_LANGUAGE,
-        'RETURNURL' => $return_url,
-        'CANCELURL' => $cancel_url,
-        'METHOD' => 'SetExpressCheckout',
-        'LANDINGPAGE' => 'Billing',
-        'UserSelectedFundingSource' => 'BML'
-    );
+        'PAYMENTREQUEST_0_SOLUTIONTYPE'  => 'SOLE',
+        'PAYMENTREQUEST_0_CURRENCYCODE'  => $processor_data['processor_params']['currency'],
+        'LOCALECODE'                     => CART_LANGUAGE,
+        'RETURNURL'                      => $return_url,
+        'CANCELURL'                      => $cancel_url,
+        'METHOD'                         => 'SetExpressCheckout',
+        'LANDINGPAGE'                    => 'Billing',
+        'UserSelectedFundingSource'      => 'BML'
+    ];
 
     fn_paypal_build_request($processor_data, $request, $post_url, $cert_file);
 
-    $order_details = (!empty($order_info)) ? fn_paypal_build_details($order_info, $processor_data, false) : fn_paypal_build_details($cart, $processor_data);
+    if (!$order_info && $order_id) {
+        $order_info = fn_get_order_info($order_id);
+    }
+    if (!$order_info && $cart) {
+        $order_info = $cart;
+    }
+
+    $order_details = fn_paypal_build_details((array) $order_info, $processor_data);
     $request = array_merge($request, $order_details);
+
+    if ($currency['code'] === CART_PRIMARY_CURRENCY && !empty($order_info)) {
+        // We need to minus taxes when it based on unit price because product subtotal already include this tax.
+        if (Registry::get('settings.Checkout.tax_calculation') === 'unit_price') {
+            $sum_taxes = fn_paypal_sum_taxes($order_info);
+            $request['PAYMENTREQUEST_0_ITEMAMT'] -= $sum_taxes['P'];
+            $request['PAYMENTREQUEST_0_SHIPPINGAMT'] -= $sum_taxes['S'];
+        }
+    }
 
     return fn_paypal_request($request, $post_url, $cert_file);
 }

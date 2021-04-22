@@ -181,8 +181,12 @@ msgid "[n] point have been subtracted from your account.|[n] points have been su
 msgstr "[n] point have been subtracted from your account.|[n] points have been subtracted from your account."
 
 msgctxt "Languages::privileges.manage_reward_points"
-msgid "Manage reward points system"
-msgstr "Manage reward points system"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privilege_groups.reward_points"
+msgid "Reward points"
+msgstr "Reward points"
 
 msgctxt "SettingsSections::reward_points::general"
 msgid "General"

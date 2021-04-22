@@ -1,16 +1,4 @@
 <?php
-/***************************************************************************
- *                                                                          *
- *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
- *                                                                          *
- * This  is  commercial  software,  only  users  who have purchased a valid *
- * license  and  accept  to the terms of the  License Agreement can install *
- * and use this program.                                                    *
- *                                                                          *
- ****************************************************************************
- * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
- * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
- ****************************************************************************/
 
 namespace Tygh\Commerceml;
 
@@ -24,6 +12,7 @@ use Tygh\Enum\ProductTracking;
 use Tygh\Bootstrap;
 use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
 use Tygh\Enum\ImagePairTypes;
+use Tygh\Addons\ProductVariations\ServiceProvider as VariationsServiceProvider;
 
 class SDRusEximCommerceml extends RusEximCommerceml 
 {
@@ -85,11 +74,12 @@ class SDRusEximCommerceml extends RusEximCommerceml
         }
     }
 
-
     public function dataProductPrice($product_prices, $prices_commerseml)
     {
         $cml = $this->cml;
-        $prices = array();
+        $prices = [
+            'base_price' => 0
+        ];
         $list_prices = array();
         foreach ($product_prices as $external_id => $p_price) {
             foreach ($prices_commerseml as $p_commerseml) {
@@ -145,22 +135,28 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
     public function importProductOffersFile($data_offers, $import_params)
     {
+        $cml = $this->cml;
+        $params = [
+            'create_prices'         => $this->s_commerceml['exim_1c_create_prices'],
+            'allow_negative_amount' => Registry::get('settings.General.allow_negative_amount'),
+            'all_currencies'        => $this->dataProductCurrencies(),
+            'price_offers'          => [],
+            'prices_commerseml'     => [],
+        ];
+
         $prices_commerseml = &$this->prices_commerseml;
         if (!empty(\Tygh::$app['session']['exim_1c']['prices_commerseml'])) {
             $prices_commerseml = \Tygh::$app['session']['exim_1c']['prices_commerseml'];
         }
-        $cml = $this->cml;
-        $create_prices = $this->s_commerceml['exim_1c_create_prices'];
-        $schema_version = $this->s_commerceml['exim_1c_schema_version'];
-        $import_mode = $this->s_commerceml['exim_1c_import_mode_offers'];
-        $negative_amount = Registry::get('settings.General.allow_negative_amount');
+        
 
-        $all_currencies = $this->dataProductCurrencies();
+        $this->importWarehousesFromOffersFile($data_offers, $import_params);
 
         if (isset($data_offers -> {$cml['prices_types']} -> {$cml['price_type']})) {
-            $price_offers = $this->dataPriceOffers($data_offers -> {$cml['prices_types']});
+            $params['price_offers'] = $this->dataPriceOffers($data_offers -> {$cml['prices_types']});
 
-            if ($create_prices == 'Y') {
+
+            if ($params['create_prices'] == 'Y') {
                 $data_prices = $this->db->getArray(
                     'SELECT price_1c, type, usergroup_id FROM ?:rus_exim_1c_prices WHERE company_id = ?i',
                     $this->company_id
@@ -172,6 +168,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     );
                 }
                 if (empty($prices_commerseml)) $prices_commerseml = $this->getPricesDataFromFile($data_offers -> {$cml['prices_types']}, $data_prices);
+                $params['prices_commerseml'] = $prices_commerseml;
             }
         }
 
@@ -197,6 +194,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
         $offers_pos = 0;
         $progress = false;
         $count_import_offers = 0;
+        $last_product_guid = null;
+        $last_product_offers = [];
         foreach ($data_offers -> {$cml['offers']} -> {$cml['offer']} as $offer) {
             $offers_pos++;
 
@@ -209,229 +208,28 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 break;
             }
 
-            $product = array();
-            $combination_id = 0;
-            $ids = fn_explode('#', strval($offer -> {$cml['id']}));
-            $guid_product = array_shift($ids);
+            list($product_guid, $combination_id) = $this->getProductIdByFile(strval($offer -> {$cml['id']}));
 
-            if (!empty($ids)) {
-                $combination_id = reset($ids);
+            if ($last_product_guid && $product_guid !== $last_product_guid) {
+                $count_import_offers += $this->importProductOffers($last_product_guid, $last_product_offers, $params, $import_params);
+                $last_product_offers = [];
             }
 
-            // [csmarket]
-            $company_condition = fn_get_company_condition('company_id', true, '', false, true);
-            if ($guid_product) $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE external_id = ?s $company_condition", $guid_product);
-            if (empty($product_data)) {
-                $_product_data = $this->getProductDataByLinkType($link_type, $offer, $cml);
-                if (!empty($_product_data))
-                $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE product_id = ?s $company_condition", $_product_data['product_id']);
-            }
-            $product_id = !empty($product_data['product_id']) ? $product_data['product_id'] : 0;
-
-            if (!($this->checkImportPrices($product_data))) {
-                continue;
-            }
-
-            $count_import_offers++;
-
-            if (isset($offer -> {$cml['amount']})) {
-                $amount = strval($offer -> {$cml['amount']});
-
-            } elseif (isset($offer -> {$cml['store']})) {
-                foreach ($offer -> {$cml['store']} as $store) {
-                    $amount += strval($store[$cml['in_stock']]);
-                }
-            }
-
-            $prices = array();
-            if (isset($offer -> {$cml['prices']}) && !empty($price_offers)) {
-                $_price_offers = $price_offers;
-
-                foreach ($offer -> {$cml['prices']} -> {$cml['price']} as $c_price) {
-                    if (!empty($c_price -> {$cml['currency']}) && !empty($_price_offers[strval($c_price -> {$cml['price_id']})]['coefficient']) && !empty($all_currencies[strval($c_price -> {$cml['currency']})]['coefficient'])) {
-                        $_price_offers[strval($c_price -> {$cml['price_id']})]['coefficient'] = $all_currencies[strval($c_price -> {$cml['currency']})]['coefficient'];
-                    }
-                }
-
-                $product_prices = $this->conversionProductPrices($offer -> {$cml['prices']} -> {$cml['price']}, $_price_offers);
-
-                if ($create_prices == 'Y') {
-                    $prices = $this->dataProductPrice($product_prices, $prices_commerseml);
-                    if (empty($prices) && (!empty($product_prices[strval($offer -> {$cml['prices']} -> {$cml['price']} -> {$cml['price_id']})]['price']))) {
-                        $prices['base_price'] = $product_prices[strval($offer -> {$cml['prices']} -> {$cml['price']} -> {$cml['price_id']})]['price'];
-                    }
-                } else {
-                    $prices['base_price'] = 0;
-                }
-            }
-
-            if (empty($prices)) {
-                $prices['base_price'] = 0;
-            }
-
-            if ($amount < 0 && $negative_amount == 'N') {
-                $amount = 0;
-            }
-            $o_amount = $amount;
-
-            if (!empty($product_amount[$product_id])) {
-                $o_amount = $o_amount + $product_amount[$product_id]['amount'];
-            }
-
-            $product_amount[$product_id]['amount'] = $o_amount;
-            if (empty($combination_id)) {
-        		if (isset($amount)) {
-        			$product['amount'] = $amount;
-        		}
-                // [csmarket] limit bering
-                if (Registry::get('runtime.company_id') == 29) {
-                    unset($product['amount']);
-                    $product['zero_price_action'] = 'P';
-                }
-
-                // [csmarket] limit pinta
-                /* if (in_array(Registry::get('runtime.company_id'), array(41,46))) {
-                    unset($product['amount']);
-                }*/
-		if (!empty($product))
-                $this->db->query(
-                    'UPDATE ?:products SET ?u WHERE product_id = ?i',
-                    $product,
-                    $product_id
-                );
-
-                $this->addProductPrice($product_id, $prices);
-                $this->addMessageLog('Added product = ' . strval($offer -> {$cml['name']}) . ', price = ' . $prices['base_price'] . ' and amount = ' . $amount);
-
-            } else {
-                $product['tracking'] = 'O';
-                $this->db->query(
-                    'UPDATE ?:products SET ?u WHERE product_id = ?i',
-                    $product,
-                    $product_id
-                );
-
-                if ($schema_version == '2.07') {
-                    $this->addProductPrice($product_id, array('base_price' => 0));
-                    $option_id = $this->dataProductOption($product_id, $import_params['lang_code']);
-                    $variant_id = $this->db->getField(
-                        'SELECT variant_id FROM ?:product_option_variants WHERE external_id = ?s AND option_id = ?i',
-                        $combination_id,
-                        $option_id
-                    );
-
-                    if (!empty($option_id) && !empty($variant_id)) {
-                        $price = ($this->s_commerceml['exim_1c_option_price'] == 'Y') ? '0.00' : $prices['base_price'];
-
-                        $this->db->query('UPDATE ?:product_option_variants SET modifier = ?d WHERE variant_id = ?i', $price, $variant_id);
-                        $add_options_combination = array($option_id => $variant_id);
-                        $combination_hash = $this->addNewCombination($product_id, $combination_id, $add_options_combination, $import_params, $amount);
-                        $this->addMessageLog('Added product = ' . strval($offer -> {$cml['name']}) . ', option_id = ' . $option_id . ', variant_id = ' . $variant_id . ', price = ' . $prices['base_price'] . ' and amount = ' . $amount);
-
-                    } elseif (empty($variant_id) && $import_mode == 'global_option') {
-                        $data_combination = $this->db->getRow(
-                            'SELECT combination_hash, combination'
-                            . ' FROM ?:product_options_inventory'
-                            . ' WHERE external_id = ?s AND product_id = ?i',
-                            $combination_id,
-                            $product_id
-                        );
-
-                        $add_options_combination = empty($data_combination) ? array() : fn_get_product_options_by_combination($data_combination['combination']);
-                        $this->addProductOptionException($add_options_combination, $product_id, $import_params, $amount);
-
-                        if (!empty($data_combination['combination_hash'])) {
-                            $image_pair_id = $this->db->getField('SELECT pair_id FROM ?:images_links WHERE object_id = ?i', $data_combination['combination_hash']);
-                            $this->db->query('UPDATE ?:product_options_inventory SET amount = ?i WHERE combination_hash = ?s', $amount, $data_combination['combination_hash']);
-
-                            if (!empty($image_pair_id)) {
-                                $this->db->query('UPDATE ?:images_links SET object_id = ?i WHERE pair_id = ?i', $data_combination['combination_hash'], $image_pair_id);
-                            }
-                        }
-
-                        $this->addMessageLog('Added global option product = ' . strval($offer -> {$cml['name']}) . ', price = ' . $prices['base_price'] . ' and amount = ' . $amount);
-
-                    } elseif (empty($variant_id) && ($import_mode == 'individual_option' || $import_mode == 'same_option')) {
-                        $data_combination = $this->db->getRow('SELECT combination_hash, combination FROM ?:product_options_inventory WHERE external_id = ?s AND product_id = ?i', $combination_id, $product_id);
-                        $add_options_combination = fn_get_product_options_by_combination($data_combination['combination']);
-                        $this->addProductOptionException($add_options_combination, $product_id, $import_params, $amount);
-
-                        if (!empty($data_combination['combination_hash'])) {
-                            $image_pair_id = $this->db->getField('SELECT pair_id FROM ?:images_links WHERE object_id = ?i', $data_combination['combination_hash']);
-                            $this->db->query('UPDATE ?:product_options_inventory SET amount = ?i WHERE combination_hash = ?s', $amount, $data_combination['combination_hash']);
-
-                            if (!empty($image_pair_id)) {
-                                $this->db->query('UPDATE ?:images_links SET object_id = ?i WHERE pair_id = ?i', $data_combination['combination_hash'], $image_pair_id);
-                            }
-                        }
-
-                        $this->addMessageLog('Added individual option product = ' . strval($offer -> {$cml['name']}) . ', price = ' . $prices['base_price'] . ' and amount = ' . $amount);
-                    }
-                } else {
-                    $variant_data = array(
-                        'amount' => $amount
-                    );
-
-                    if ($import_mode == 'standart') {
-                        $this->addProductPrice($product_id, array('base_price' => 0));
-                        $variant_data['price'] = $prices['base_price'];
-                    }
-
-                    if (!empty($product_amount[$product_id][$combination_id])) {
-                        $amount = $amount + $product_amount[$product_id]['amount'];
-                    }
-
-                    if ($import_mode == 'variations') {
-                        $amount = $product_amount[$product_id]['amount'];
-                    }
-
-                    $product_amount[$product_id]['amount'] = $amount;
-
-                    $options = $this->addProductCombinations($offer, $product_id, $import_params, $combination_id, $variant_data);
-
-                    if (!empty($options) && $import_mode == 'variations') {
-                        $options['prices'] = $prices;
-                        $options['amount'] = $variant_data['amount'];
-                        $this->updateProductCombinations($offer, $product_id, $combination_id, $options, $import_params);
-                    }
-
-                    $this->addMessageLog('Added option product = ' . strval($offer -> {$cml['name']}) . ', price = ' . $prices['base_price'] . ' and amount = ' . $amount);
-                }
-
-                if ($this->s_commerceml['exim_1c_option_price'] == 'Y') {
-                    $this->addProductPrice($product_id, $prices);
-                }
-
-                if (isset($offer -> {$cml['image']}) && isset($combination_hash)) {
-                    $import_params['object_type'] = 'product_option';
-
-                    foreach ($offer -> {$cml['image']} as $image) {
-                        $filename = fn_basename(strval($image));
-                        $this->addProductImage($filename, true, $combination_hash, $import_params);
-                    }
-                }
-            }
-            
-            // [csmarket]
-            if ($product_data['timestamp'] > time() - SECONDS_IN_DAY) {
-                if (isset($prices['qty_prices']) && !empty($prices['qty_prices']) ) {
-                    $ugroups = fn_array_column($prices['qty_prices'], 'usergroup_id');
-                } else {
-                    $ugroups = fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')));
-                    $ugroups = array_keys($ugroups);
-                }
-                if (!empty($product_data['product_id'])) {
-                    $this->db->query('UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i', implode(',', $ugroups), $product_data['product_id']);
-                }
-            }
-
-            $product['status'] = $this->updateProductStatus($product_id, $product_data, $product_amount[$product_id]['amount']);
+            $last_product_offers[$combination_id] = $offer;
+            $last_product_guid = $product_guid;
 
             if ($import_params['service_exchange'] == '' && ($count_import_offers == COUNT_IMPORT_PRODUCT)) {
                 fn_echo("imported: " . $count_import_offers . "\n");
                 $count_import_offers = 0;
             }
-            unset($amount);
+        }
+
+        if ($last_product_offers) {
+            $count_import_offers += $this->importProductOffers($last_product_guid, $last_product_offers, $params, $import_params);
+
+            if ($import_params['service_exchange'] == '' && ($count_import_offers == COUNT_IMPORT_PRODUCT)) {
+                fn_echo("imported: " . $count_import_offers . "\n");
+            }
         }
 
         if ($progress) {
@@ -451,29 +249,173 @@ class SDRusEximCommerceml extends RusEximCommerceml
         }
     }
 
+    protected function importProductOffersAsOptions($product_guid, array $offers, array $params, array $import_params)
+    {
+        $count_import_offers = 0;
+        $product_amount = $product = [];
+        $cml = $this->cml;
+
+        // [csmarket]
+        $company_condition = fn_get_company_condition('company_id', true, '', false, true);
+        if ($product_guid) $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE external_id = ?s $company_condition", $product_guid);
+
+        if (empty($product_data)) {
+            $_product_data = $this->getProductDataByLinkType($link_type, reset($offers), $cml);
+            if (!empty($_product_data))
+            $product_data = $this->db->getRow("SELECT product_id, update_1c, status, tracking, product_code, timestamp FROM ?:products WHERE product_id = ?s $company_condition", $_product_data['product_id']);
+        }
+
+        $product_id = empty($product_data['product_id']) ? 0 : $product_data['product_id'];
+
+        if (empty($product_id)) {
+            return;
+        }
+
+        $product_data = fn_normalize_product_overridable_fields($product_data);
+
+        $warehouses_amounts = [];
+
+        foreach ($offers as $combination_id => $offer) {
+            if (!$this->checkImportPrices($product_data)) {
+                continue;
+            }
+
+            $product_code = $this->getProductCodeByOffer($offer);
+
+            $amount = $this->getProductAmountByOffer($offer, $params);
+
+            if ($product_code) {
+                $product['product_code'] = $product_code;
+            }
+
+            $prices = $this->getProductPricesByOffer($offer, $params);
+
+            $count_import_offers++;
+
+            if ($amount !== false) {
+                if (!empty($product_amount[$product_id])) {
+                    $amount = $amount + $product_amount[$product_id]['amount'];
+                }
+
+                $product_amount[$product_id]['amount'] = $amount;
+                $product['amount'] = $amount;
+            }
+
+            $warehouses_amounts = $this->importProductWarehousesStock($product_id, $offer, $warehouses_amounts);
+            $this->addProductPrice($product_id, $prices);
+            $this->addProductXmlFeaturesAsOptions($offer, $product_id, $import_params, $combination_id, [], isset($product['product_code']) ? $product['product_code'] : false);
+            $this->addMessageLog('Added product = ' . strval($offer -> {$cml['name']}) . ', price = ' . $prices['base_price'] . ' and amount = ' . $amount);
+        }
+
+        $this->db->query('UPDATE ?:products SET ?u WHERE product_id = ?i', $product, $product_id);
+        $this->sendProductStockNotifications($product_id, $product['amount']);
+            
+        // [csmarket]
+        if ($product_data['timestamp'] > time() - SECONDS_IN_DAY) {
+            if (isset($prices['qty_prices']) && !empty($prices['qty_prices']) ) {
+                $ugroups = fn_array_column($prices['qty_prices'], 'usergroup_id');
+            } else {
+                $ugroups = fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')));
+                $ugroups = array_keys($ugroups);
+            }
+            if (!empty($product_data['product_id'])) {
+                $this->db->query('UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i', implode(',', $ugroups), $product_data['product_id']);
+            }
+        }
+
+        $product['status'] = $this->updateProductStatus($product_id, $product_data, $product_amount[$product_id]['amount']);
+
+        return $count_import_offers;
+    }
+
+    protected function getProductAmountByOffer($xml_offer, $params)
+    {
+        $cml = $this->cml;
+        if (empty($xml_offer -> {$cml['amount']}) && !isset($xml_offer -> {$cml['warehouse']})) {
+            return false;
+        }
+
+        $allow_negative_amount = $params['allow_negative_amount'];
+
+        if (isset($xml_offer -> {$cml['amount']})) {
+            $amount = (int) $xml_offer -> {$cml['amount']};
+        } elseif (isset($xml_offer -> {$cml['warehouse']})) {
+            foreach ($xml_offer -> {$cml['warehouse']} as $warehouse) {
+                $amount += (int) $warehouse[$cml['warehouse_in_stock']];
+            }
+        }
+
+        if (isset($amount) && $amount < 0 && $allow_negative_amount == 'N') {
+            $amount = 0;
+        }
+
+        return isset($amount) ? $amount : false;
+    }
+
+    protected function getProductPricesByOffer($xml_offer, $params)
+    {
+        $cml = $this->cml;
+        $prices = [
+            'base_price' => 0
+        ];
+
+        if (!isset($xml_offer -> {$cml['prices']})) {
+            return $prices;
+        }
+
+        $price_offers = $params['price_offers'];
+        $all_currencies = $params['all_currencies'];
+        $prices_commerseml = $params['prices_commerseml'];
+        $create_prices = $params['create_prices'];
+
+        if (isset($xml_offer -> {$cml['prices']}) && !empty($price_offers)) {
+            $_price_offers = $price_offers;
+
+            foreach ($xml_offer -> {$cml['prices']} -> {$cml['price']} as $c_price) {
+                if (!empty($c_price -> {$cml['currency']})
+                    && !empty($_price_offers[strval($c_price -> {$cml['price_id']})]['coefficient'])
+                    && !empty($all_currencies[strval($c_price -> {$cml['currency']})]['coefficient'])
+                ) {
+                    $_price_offers[strval($c_price -> {$cml['price_id']})]['coefficient'] = $all_currencies[strval($c_price -> {$cml['currency']})]['coefficient'];
+                }
+            }
+
+            $product_prices = $this->conversionProductPrices($xml_offer -> {$cml['prices']} -> {$cml['price']}, $_price_offers);
+
+            if ($create_prices == 'Y') {
+                $prices = $this->dataProductPrice($product_prices, $prices_commerseml);
+
+                if (empty($prices) && (!empty($product_prices[strval($offer -> {$cml['prices']} -> {$cml['price']} -> {$cml['price_id']})]['price']))) {
+                    $prices['base_price'] = $product_prices[strval($xml_offer -> {$cml['prices']} -> {$cml['price']} -> {$cml['price_id']})]['price'];
+                }
+            }
+        }
+
+        return $prices;
+    }
+
     public function dataOrderToFile($xml, $order_data, $lang_code)
     {
         $export_statuses = $this->s_commerceml['exim_1c_export_statuses'];
         $cml = $this->cml;
 
         $order_xml = $this->getOrderDataForXml($order_data, $cml);
+
         $this->data_prices = $this->db->getHash(
             'SELECT price_1c, type, usergroup_id FROM ?:rus_exim_1c_prices WHERE company_id = ?i',
             'usergroup_id',
             $this->company_id
         );
+
         // univita currency exception
         if ($this->company_id == 1787) { 
-		$order_xml[$cml['currency']] = '643';
-		//unset($order_xml[$cml['currency']]);
+            $order_xml[$cml['currency']] = '643';
         }
         if ($this->company_id == 1825) { 
-		$order_xml[$cml['currency']] = 'руб';
-		//unset($order_xml[$cml['currency']]);
+            $order_xml[$cml['currency']] = 'руб';
         }
         if ($this->company_id == 1829) { 
-        $order_xml[$cml['currency']] = 'руб';
-        //unset($order_xml[$cml['currency']]);
+            $order_xml[$cml['currency']] = 'руб';
         }
 
         if (empty($order_data['firstname'])) {
@@ -518,7 +460,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $order_xml[$cml['discounts']][$cml['discount']] = array(
                     $cml['name'] => $cml['orders_discount'],
                     $cml['total'] => $order_data['subtotal_discount'],
-                    $cml['rate_discounts'] => $rate_discounts,
+                    $cml['rate_discounts'] => $this->getRoundedUpPrice($rate_discounts),
                     $cml['in_total'] => 'true'
                 );
             }
@@ -548,7 +490,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $cml['value'] => $payment
         );
 
-                    
         $order_xml[$cml['value_fields']][][$cml['value_field']] = array(
             $cml['name'] => $cml['shipping'],
             $cml['value'] => $shipping
@@ -563,12 +504,11 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
     public function getProductDataByLinkType($link_type, $_product, $cml)
     {
-        list($guid_product, $combination_id) = $this->getProductIdByFile($_product -> {$cml['id']});
+        list($guid_product) = $this->getProductIdByFile($_product -> {$cml['id']});
 
         $article = strval($_product -> {$cml['article']});
         $barcode = strval($_product -> {$cml['bar']});
 
-        $product_data = array();
         $company_condition = fn_get_company_condition('company_id', true, '', false, true);
 
         if ($link_type == 'article') {
@@ -588,82 +528,79 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 "SELECT product_id, update_1c FROM ?:products WHERE external_id = ?s $company_condition",
                 $guid_product
             );
-            if (!$product_data) {
-                if (!$product_data) {
-                    if (isset($_product -> {$cml['value_fields']} -> {$cml['value_field']})) {
-                        $requisites = $_product -> {$cml['value_fields']} -> {$cml['value_field']};
-                        list($full_name, $product_code, $html_description) = $this->getAdditionalDataProduct($requisites, $cml);
-                    }
+            if (empty($product_data) && $this->is_allow_product_variations) {
+                $product_data = $this->db->getRow(
+                    'SELECT product_id, update_1c FROM ?:products WHERE external_id LIKE ?l AND parent_product_id = ?i',
+                    $guid_product . '#%', 0
+                );
+            }
+            if (empty($product_data)) {
+                if (isset($_product -> {$cml['value_fields']} -> {$cml['value_field']})) {
+                    $requisites = $_product -> {$cml['value_fields']} -> {$cml['value_field']};
+                    list($full_name, $product_code, $html_description) = $this->getAdditionalDataProduct($requisites, $cml);
+                }
 
-                    $cond = $this->db->quote('pd.product = ?s', trim(strval($_product -> {$cml['name']})));
-                    if (trim($full_name)) {
-                        $cond = $this->db->quote("( $cond OR pd.product = ?s )", $full_name);
-                    }
+                $cond = $this->db->quote('pd.product = ?s', trim(strval($_product -> {$cml['name']})));
+                if (trim($full_name)) {
+                    $cond = $this->db->quote("( $cond OR pd.product = ?s )", $full_name);
+                }
 
+                $product_data = $this->db->getRow(
+                    "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE $cond $company_condition", DESCR_SL
+                );
+
+                if (empty($product_data) && !empty($article)) {
                     $product_data = $this->db->getRow(
-                        "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE $cond $company_condition", DESCR_SL
+                        "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE product_code = ?s $company_condition", DESCR_SL,
+                        strval($_product -> {$cml['article']})
                     );
-
-                    if (empty($product_data) && !empty($article)) {
-                        $product_data = $this->db->getRow(
-                            "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE product_code = ?s $company_condition", DESCR_SL,
-                            strval($_product -> {$cml['article']})
-                        );
-                    }
                 }
             }
         }
         return $product_data;
     }
 
-    public function addDataProductByFile($_product, $cml, $categories_commerceml, $import_params)
+    public function addDataProductByFile($guid_product, $offers, $cml, $categories_commerceml, $import_params)
     {
+        $xml_product_data = reset($offers);
         $allow_import_features = $this->s_commerceml['exim_1c_allow_import_features'];
         $add_tax = $this->s_commerceml['exim_1c_add_tax'];
-        $schema_version = $this->s_commerceml['exim_1c_schema_version'];
         $link_type = $this->s_commerceml['exim_1c_import_type'];
         $log_message = "";
 
-        if (empty($_product -> {$cml['name']})) {
-            $log_message = "Name is not set for product with id: " . $_product -> {$cml['id']};
+        if (empty($xml_product_data -> {$cml['name']})) {
+            $log_message = "Name is not set for product with id: " . $xml_product_data -> {$cml['id']};
 
             return $log_message;
         }
-        list($guid_product, $combination_id) = $this->getProductIdByFile($_product -> {$cml['id']});
 
-        $product_data = $this->getProductDataByLinkType($link_type, $_product, $cml);
-
-//             $pdata = fn_get_product_data($product_data['product_id']);
-//             if (empty($pdata)) {
-//                 fn_delete_product($product_data['product_id']);
-//                 //fn_print_die($product_data['product_id']);
-//             }
+        $product_data = $this->getProductDataByLinkType($link_type, $xml_product_data, $cml);
 
         $product_update = !empty($product_data['update_1c']) ? $product_data['update_1c'] : 'Y';
         $product_id = (!empty($product_data['product_id'])) ? $product_data['product_id'] : 0;
 
-        $product_status = $_product->attributes()->{$cml['status']};
+        $product_status = $xml_product_data->attributes()->{$cml['status']};
         if (!empty($product_status) && (string) $product_status == $cml['delete']) {
             if ($product_id != 0) {
                 fn_delete_product($product_id);
-                $log_message = "\n Deleted product: " . strval($_product -> {$cml['name']});
+                $log_message = "\n Deleted product: " . strval($xml_product_data -> {$cml['name']});
             }
 
             return $log_message;
         }
 
-        if (!empty($_product -> {$cml['status']}) && strval($_product -> {$cml['status']}) == $cml['delete']) {
+        if (!empty($xml_product_data -> {$cml['status']}) && strval($xml_product_data -> {$cml['status']}) == $cml['delete']) {
             if ($product_id != 0) {
                 fn_delete_product($product_id);
-                $log_message = "\n Deleted product: " . strval($_product -> {$cml['name']});
+                $log_message = "\n Deleted product: " . strval($xml_product_data -> {$cml['name']});
             }
 
             return $log_message;
         }
 
         if ($this->checkUploadProduct($product_id, $product_update)) {
-            //$this->s_commerceml['exim_1c_allow_import_categories'] = 'N';
-            $product = $this->dataProductFile($_product, $product_id, $guid_product, $categories_commerceml, $import_params);
+            $product = $this->dataProductFile($xml_product_data, $product_id, $guid_product, $categories_commerceml, $import_params);
+
             // [cs-market] default func adds default category to existing ones
             if (($key = array_search($this->s_commerceml['exim_1c_default_category'], $product['category_ids'])) !== false && count($product['category_ids']) > 1) {
                 unset($product['category_ids'][$key]);
@@ -679,10 +616,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $product_id
             );
 
-            if ((isset($_product -> {$cml['properties_values']} -> {$cml['property_values']}) || isset($_product -> {$cml['manufacturer']})) && ($allow_import_features == 'Y') && (!empty($this->features_commerceml))) {
-                $product = $this->dataProductFeatures($_product, $product, $import_params);
+            if ((isset($xml_product_data->{$cml['properties_values']}->{$cml['property_values']}) || isset($xml_product_data->{$cml['manufacturer']})) && ($allow_import_features == 'Y') && (!empty($this->features_commerceml))) {
+                $product = $this->dataProductFeatures($xml_product_data, $product, $import_params);
                 if (!empty($this->features_commerceml['sticker'])) {
-                    foreach ($_product -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
+                    foreach ($xml_product_data -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
                         $feature_id = strval($_feature -> {$cml['id']});
                         if ($this->features_commerceml['sticker']['id'] != $feature_id) {
                             continue;
@@ -701,18 +638,18 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
 
-            if (isset($_product -> {$cml['value_fields']} -> {$cml['value_field']})) {
-                $this->dataProductFields($_product, $product);
+            if (isset($xml_product_data->{$cml['value_fields']}->{$cml['value_field']})) {
+                $this->dataProductFields($xml_product_data, $product);
             }
 
-            if (isset($_product -> {$cml['taxes_rates']}) && ($add_tax == 'Y')) {
-                $product['tax_ids'] = $this->addProductTaxes($_product -> {$cml['taxes_rates']}, $product_id);
+            if (isset($xml_product_data->{$cml['taxes_rates']}) && ($add_tax == 'Y')) {
+                $product['tax_ids'] = $this->addProductTaxes($xml_product_data->{$cml['taxes_rates']}, $product_id);
             }
 
             if ($this->company_id == '29') {
-                $product['full_description'] = strval($_product -> {$cml['bar']});
+                $product['full_description'] = strval($xml_product_data -> {$cml['bar']});
             } elseif ($this->company_id == '1815') {
-                foreach ($_product -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
+                foreach ($xml_product_data -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
                     $feature_id = strval($_feature -> {$cml['id']});
                     if ($this->features_commerceml['product_description']['id'] == $feature_id) {
                         $product['full_description'] = strval($_feature -> {$cml['value']});
@@ -720,25 +657,17 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
 
-            // limit for pinta for Katerina
+            // limit for pinta for Katerina. TODO remove it from code as soon as finish with pinta.
             if (in_array($this->company_id, array(41, 46)) && $product_id) {
-                $_p = array(
-                    'external_id' => $product['external_id'],
-/*                    'product' => $product['product'],
-                    'category_id' => $product['category_id'],
-                    'category_ids' => $product['category_ids'],*/
-                );
-                $product = $_p;
+                $product = array('external_id' => $product['external_id']);
             }
 
-//	    if (!$product_id) {
+            $product_id = fn_update_product($product, $product_id, $import_params['lang_code']);
 
-			$product_id = fn_update_product($product, $product_id, $import_params['lang_code']);
-
-			$log_message = "\n Added product: " . $product['product'] . " commerceml_id: " . strval($_product -> {$cml['id']});
+            $log_message = "\n Added product: " . $product['product'] . " commerceml_id: " . strval($xml_product_data->{$cml['id']});
 
             // import barcode to feature
-            $data = json_decode(json_encode($_product), true);
+            $data = json_decode(json_encode($xml_product_data), true);
             $data = array_filter($data, function($val) {
                 return (!is_array($val));
             });
@@ -762,29 +691,34 @@ class SDRusEximCommerceml extends RusEximCommerceml
             }
             // import barcode to feature
 
-			// Import product features
-			if (!empty($product['features'])) {
-			    $variants_data['product_id'] = $product_id;
-			    $variants_data['lang_code'] = $import_params['lang_code'];
-			    $variants_data['category_id'] = $product['category_id'];
-			    $this->addProductFeatures($product['features'], $variants_data, $import_params);
-			}
+            // Import product features
+            if (!empty($product['features'])) {
+                $variants_data['product_id'] = $product_id;
+                $variants_data['lang_code'] = $import_params['lang_code'];
+                $variants_data['category_id'] = $product['category_id'];
+                $this->addProductFeatures($product['features'], $variants_data, $import_params);
 
-			// Import images
-			$image_main = true;
-			if (isset($_product -> {$cml['image']})) {
-			    foreach ($_product -> {$cml['image']} as $image) {
-				$filename = fn_basename(strval($image));
-				$this->addProductImage($filename, $image_main, $product_id, $import_params);
-				$image_main = false;
-			    }
-			}
+                if ($this->is_allow_product_variations) {
+                    VariationsServiceProvider::getSyncService()->onTableChanged('product_features_values', $product_id);
+                }
+            }
 
-			// Import combinations
-			if (isset($_product -> {$cml['product_features']} -> {$cml['product_feature']}) && $schema_version == '2.07') {
-			    $this->addProductCombinations($_product, $product_id, $import_params, $combination_id);
-			}
-//	    }
+            // Import images
+            if (isset($xml_product_data->{$cml['image']})) {
+                $this->addProductImage($xml_product_data->{$cml['image']}, $product_id, $import_params);
+            }
+
+            // Import combinations
+            if (isset($xml_product_data->{$cml['product_features']}->{$cml['product_feature']})) {
+                if ($this->is_allow_product_variations) {
+                    $this->importProductOffersAsVariations($guid_product, $offers, [], $import_params);
+                } else {
+                    foreach ($offers as $combination_id => $offer) {
+                        $combination_id = (strpos(strval($xml_product_data->{$cml['id']}), '#') == false) ? 0 : $combination_id;
+                        $this->addProductXmlFeaturesAsOptions($offer, $product_id, $import_params, $combination_id);
+                    }
+                }
+            }
         }
 
         return $log_message;
@@ -802,13 +736,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
         return $product_status;
     }
 
-    /**
-     * Prepares the array of user data for export to the accounting systems.
-     *
-     * @param $order_data The array with the order data.
-     *
-     * @return array The array with the user data.
-     */
     public function getDataOrderUser($order_data)
     {
         $cml = $this->cml;
@@ -888,7 +815,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
         return $user_xml;
     }
 
-    public function importFileOrders($xml, $lang_code)
+    public function importFileOrders($xml)
     {
         $cml = $this->cml;
         if (isset($xml->{$cml['document']})) {
@@ -907,81 +834,87 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $link_type = $this->s_commerceml['exim_1c_import_type'];
 
             foreach ($orders_data as $order_data) {
-                $import_id = strval($order_data->{$cml['id']});
-                $order_id = db_get_field('SELECT order_id FROM ?:orders WHERE order_id = ?i', intval($order_data->{$cml['number']}));
+                $order_info = [];
+                $external_order_id = strval($order_data->{$cml['id']});
+                $external_order_number = strval($order_data->{$cml['number']});
 
-                // [cs-market] update order products
-                if (!empty($order_id)) {
-                    $order_info = fn_get_order_info($order_id);
+                //Check the database for an order with the specified ID exported from the accounting system
+                if ($external_order_id && $external_order_id === (string) (int) $external_order_id) {
+                    $order_info = fn_get_order_info($external_order_id);
+                }
+
+                //If order was not found by external_id try to find it by external order number
+                if (empty($order_info['order_id'])) {
+                    $order_info = fn_get_order_info($external_order_number);
+                }
+
+                if (empty($order_info['order_id'])) {
+                    continue;
+                }
+                $order_id = $order_info['order_id'];
+                foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
+                    $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
+                    $xml_products[$product_data['product_id']] = intval($xml_product->{$cml['amount']});
+                }
+                $order_products = fn_array_column($order_info['products'], 'amount', 'product_id');
+
+                if (!empty(array_diff_assoc($xml_products, $order_products) + array_diff_assoc($order_products, $xml_products))) {
+                    if (!empty($order_info['user_id'])) {
+                        $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
+                    }
+                    $customer_auth = fn_fill_auth($_data, array(), false, 'C');
+
+                    fn_form_cart($order_id, $cart, $customer_auth);
+                    fn_store_shipping_rates($order_id, $cart, $customer_auth);
+                    $cart['order_id'] = $order_id;
+                    $cart['order_status'] = $statuses[strval($data_field->{$cml['value']})]['status'];
+                    $cart['products'] = array();
+
                     foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
                         $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
-                        $xml_products[$product_data['product_id']] = intval($xml_product->{$cml['amount']});
-                    }
-                    $order_products = fn_array_column($order_info['products'], 'amount', 'product_id');
-
-                    if (!empty(array_diff_assoc($xml_products, $order_products) + array_diff_assoc($order_products, $xml_products))) {
-                        if (!empty($order_info['user_id'])) {
-                            $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $order_info['user_id']);
-                        }
-                        $customer_auth = fn_fill_auth($_data, array(), false, 'C');
-
-                        fn_form_cart($order_id, $cart, $customer_auth);
-                        fn_store_shipping_rates($order_id, $cart, $customer_auth);
-                        $cart['order_id'] = $order_id;
-                        $cart['order_status'] = $statuses[strval($data_field->{$cml['value']})]['status'];
-                        $cart['products'] = array();
-
-                        foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
-                            $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
-                            
-                            $_item = array (
-                                $product_data['product_id'] => array (
-                                    'amount' => strval($xml_product->{$cml['amount']}),
-                                    'price' => strval($xml_product->{$cml['price_per_item']}),
-                                    'stored_price' => 'Y',
-                                ),
-                            );
-                            define('ORDER_MANAGEMENT', true);
-                            fn_add_product_to_cart($_item, $cart, $customer_auth);
-                        }
-
-                        foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
-                            // TODO move to settings
-                            if ($data_field->{$cml['name']} == 'Дата отгрузки по 1С' && !empty(strtotime(strval($data_field->{$cml['value']})))) {
-                                $cart['delivery_date'] = strtotime(strval($data_field->{$cml['value']}));
-                            }
-                        }
-
-                        fn_calculate_cart_content($cart, $customer_auth);
-                        if (!fn_cart_is_empty($cart) && $order_info['company_id'] != 12) {
-                            fn_place_order($cart, $customer_auth, 'save');
-                        }
+                        
+                        $_item = array (
+                            $product_data['product_id'] => array (
+                                'amount' => strval($xml_product->{$cml['amount']}),
+                                'price' => strval($xml_product->{$cml['price_per_item']}),
+                                'stored_price' => 'Y',
+                            ),
+                        );
+                        define('ORDER_MANAGEMENT', true);
+                        fn_add_product_to_cart($_item, $cart, $customer_auth);
                     }
 
                     foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
-                        if (!empty($order_id) && ($data_field->{$cml['name']} == $cml['status_order']) && (!empty($statuses[strval($data_field->{$cml['value']})]))) {
-                            $new_status = $statuses[strval($data_field->{$cml['value']})]['status'];
+                        // TODO move to settings
+                        if ($data_field->{$cml['name']} == 'Дата отгрузки по 1С' && !empty(strtotime(strval($data_field->{$cml['value']})))) {
+                            $cart['delivery_date'] = strtotime(strval($data_field->{$cml['value']}));
                         }
                     }
 
-                    if ($new_status) fn_change_order_status($order_id, $new_status);
-
-                    fn_set_hook('exim_1c_update_order', $order_data, $cml);
+                    fn_calculate_cart_content($cart, $customer_auth);
+                    if (!fn_cart_is_empty($cart) && $order_info['company_id'] != 12) {
+                        fn_place_order($cart, $customer_auth, 'save');
+                    }
                 }
+
+                foreach ($order_data->{$cml['value_fields']}->{$cml['value_field']} as $data_field) {
+                    if ($data_field->{$cml['name']} == $cml['status_order'] && !empty($statuses[strval($data_field->{$cml['value']})])) {
+                        $status_to = strval($data_field->{$cml['value']});
+                    }
+                }
+
+                if (!empty($status_to) && $order_info['status'] != $statuses[$status_to]['status']) {
+                    fn_change_order_status($order_info['order_id'], $statuses[$status_to]['status']);
+                }
+
+                fn_set_hook('exim_1c_update_order', $order_data, $cml);
+
+                unset($status_to);
+                unset($order_info);
             }
         }
     }
-        /**
-     * Creates an array with products prices.
-     * Prices from the import file are added to the array when the name of the price matches
-     * the name entered in the admin panel.
-     *
-     * @param object  $prices_file   The simplexml object with prices from the imported file.
-     * @param array   $data_prices   The array with the names of price fields;
-     *                               these names are entered in the admin panel.
-     *
-     * @return The array with the products prices.
-     */
+
     public function getPricesDataFromFile($prices_file, $data_prices)
     {
         $cml = $this->cml;
@@ -996,16 +929,13 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
             if (!$found) {
-                //$name = trim(str_replace('1Ц', '', );
                 $like_name = '%' . strval($_price -> {$cml['name']}) . '%';
                 $user_id = 0;
-                //$user_id = db_get_field('SELECT user_id FROM ?:users WHERE firstname LIKE ?l OR lastname LIKE ?l OR email LIKE ?l OR user_login LIKE ?l', $like_name, $like_name, $like_name, $like_name);
-                //if (!$user_id) {
-                    list($users, ) = fn_get_users(array('search_query' => strval($_price -> {$cml['name']}), 'user_type' => 'C', 'extended_search' => false), $_SESSION['auth'], 10);
-                    if (!empty($users)) {
-                        $user_id = reset($users)['user_id'];
-                    }
-                //}
+                list($users, ) = fn_get_users(array('search_query' => strval($_price -> {$cml['name']}), 'user_type' => 'C', 'extended_search' => false), $_SESSION['auth'], 10);
+                if (!empty($users)) {
+                    $user_id = reset($users)['user_id'];
+                }
+
                 if ($user_id) {
                 
                     $user = reset($users);
@@ -1026,15 +956,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
     public function addProductPrice($product_id, $prices)
     {
-        // List price updating
-        if (isset($prices['list_price'])) {
-            $this->db->query(
-                'UPDATE ?:products SET list_price = ?d WHERE product_id = ?i',
-                $prices['list_price'],
-                $product_id
-            );
-        }
-
         // Prices updating
         $fake_product_data = array(
             'price' => isset($prices['base_price']) ? $prices['base_price'] : 0,
@@ -1057,6 +978,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 );
             }
         }
+
         if (!empty($prices['user_price']) && is_callable('fn_update_product_user_price')) {
             fn_update_product_user_price($product_id, $prices['user_price']);
         }
@@ -1064,18 +986,38 @@ class SDRusEximCommerceml extends RusEximCommerceml
             unset($fake_product_data['prices']);
         }
 
-        fn_update_product_prices($product_id, $fake_product_data);
+        $is_product_shared_to_company = false;
+        $is_product_shared = false;
+        if (fn_allowed_for('ULTIMATE')) {
+            $is_product_shared_to_company = fn_ult_is_shared_product($product_id, $this->company_id) === 'Y';
+            $is_product_shared = fn_ult_is_shared_product($product_id) === 'Y';
+        }
+        $is_product_owned_by_company = $this->getProductCompany($product_id) == $this->company_id;
 
-        if (fn_ult_is_shared_product($product_id) == 'Y') {
+        if ($this->has_stores && (
+            $is_product_shared_to_company ||
+            $is_product_shared && $is_product_owned_by_company
+        )) {
             fn_update_product_prices($product_id, $fake_product_data, $this->company_id);
         }
-    }
 
+        if ($is_product_owned_by_company) {
+            fn_update_product_prices($product_id, $fake_product_data);
+
+            // List price updating
+            if (isset($prices['list_price'])) {
+                $this->db->query(
+                    'UPDATE ?:products SET list_price = ?d WHERE product_id = ?i',
+                    $prices['list_price'],
+                    $product_id
+                );
+            }
+        }
+    }
     // send price only to limited products
     public function dataOrderProducts($xml, $order_data, $discount = 0)
     {
         $cml = $this->cml;
-        $export_options = $this->s_commerceml['exim_1c_product_options'];
 
         $add_tax = $this->s_commerceml['exim_1c_add_tax'];
         if (!empty($order_data['taxes']) && $add_tax == 'Y') {
@@ -1143,9 +1085,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $external_id = $this->db->getField("SELECT external_id FROM ?:products WHERE product_id = ?i", $product['product_id']);
             $external_id = (!empty($external_id)) ? $external_id : $product['product_id'];
             $product_name = $product['product'];
-            if (!empty($product['product_options']) && $export_options == 'Y') {
-                $this->setDataProductByOptions($product['product_id'], $product['product_options'], $external_id, $product_name);
-            }
 
             $data_product = array(
                 $cml['id'] => $external_id,
@@ -1156,7 +1095,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $cml['amount'] => $product['amount'],
                 $cml['multiply'] => 1
             );
-
             $data_product[$cml['base_unit']]['attribute'] = array(
                 $cml['code'] => '796',
                 $cml['full_name_unit'] => $cml['item'],
@@ -1170,19 +1108,17 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 if ($p_subtotal > $product_discount) {
                     $data_product[$cml['discounts']][][$cml['discount']] = array(
                         $cml['name'] => $cml['product_discount'],
-                        $cml['total'] => $product_discount,
-                        $cml['in_total'] => 'false',
-                        $cml['rate_discounts'] => $discount,
+                        $cml['total'] => $this->getRoundedUpPrice($product_discount),
+                        $cml['in_total'] => 'false'
                     );
                 }
             }
 
-            if(isset($product['discount']) && !empty($product['discount'])) {
+            if(isset($product['discount'])) {
                 $data_product[$cml['discounts']][][$cml['discount']] = array(
                     $cml['name'] => $cml['product_discount'],
                     $cml['total'] => $product['discount'],
-                    $cml['in_total'] => 'true',
-                    $cml['rate_discounts'] => round($product['discount'] / $product['base_price'] * 100),
+                    $cml['in_total'] => 'true'
                 );
             }
 
@@ -1200,7 +1136,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     }
                 }
 
-                $product_subtotal = $product['subtotal'] + $tax_value;
+                $product_subtotal = $product['subtotal'] + $this->getRoundedUpPrice($tax_value);
             }
             $data_product[$cml['total']] = $product_subtotal;
             $data_product[$cml['value_fields']][][$cml['value_field']] = array(
@@ -1211,6 +1147,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $cml['name'] => $cml['type_nomenclature'],
                 $cml['value'] => $cml['product']
             );
+
             // [cs-market] send price only to limited products
             // todo remove after konix change on their side
             if ($send_price_1c[$product['product_id']] != 'Y') {
@@ -1219,6 +1156,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
             if (isset($product['extra']['usergroup_id']) && $product['extra']['usergroup_id'] && array_key_exists($product['extra']['usergroup_id'], $this->data_prices)) {
                 $data_product[$cml['price_type']] = $this->data_prices[$product['extra']['usergroup_id']]['price_1c'];
             }
+
             $data_products[][$cml['product']] = $data_product;
         }
 
@@ -1275,7 +1213,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
                 $_variants = array();
                 $feature_data = array();
-                $feature_name = trim(strval($_feature -> {$cml['name']}));
+                $feature_name = strval($_feature -> {$cml['name']});
+
                 if ($feature_name == $cml['sticker']) {
                     $features_import['sticker']['id'] = strval($_feature -> {$cml['id']});
                     $features_import['sticker']['name'] = $cml['sticker'];
@@ -1307,6 +1246,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
 
                 $feature_id = $this->db->getField("SELECT feature_id FROM ?:product_features WHERE external_id = ?s", strval($_feature -> {$cml['id']}));
+
                 if (empty($feature_id)) {
                     $feature_id = $this->db->getField("SELECT ?:product_features.feature_id FROM ?:product_features LEFT JOIN ?:product_features_descriptions ON ?:product_features.feature_id = ?:product_features_descriptions.feature_id AND lang_code = ?s WHERE ?:product_features_descriptions.description = ?s AND ?:product_features.company_id = ?i", $import_params['lang_code'], strval($_feature -> {$cml['name']}), $company_id);
                     if ($feature_id) {
@@ -1344,10 +1284,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         $feature_id = fn_update_product_feature($feature_data, $feature_id);
                         $this->addMessageLog("Feature is added: " . $feature_name);
 
-                        // [csmarket] mve compatibility changes!!
-                        // if ($new_feature && !fn_allowed_for('MULTIVENDOR')) {
-                        //     $this->db->query("INSERT INTO ?:ult_objects_sharing VALUES ($company_id, $feature_id, 'product_features')");
-                        // }
+                        if ($new_feature && fn_allowed_for('ULTIMATE')) {
+                            fn_ult_update_share_object($feature_id, 'product_features', $company_id);
+                        }
                     } else {
                         fn_delete_feature($feature_id);
                         $feature_id = 0;
@@ -1381,9 +1320,9 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $_feature_id = fn_update_product_feature($feature_data, $feature_id);
             $this->addMessageLog("Feature brand is added");
 
-            // if ($feature_id == 0) {
-            //     $this->db->query("INSERT INTO ?:ult_objects_sharing VALUES ($company_id, $_feature_id, 'product_features')");
-            // }
+            if ($feature_id == 0 && fn_allowed_for('ULTIMATE')) {
+                fn_ult_update_share_object($_feature_id, 'product_features', $company_id);
+            }
 
             $features_import['brand1c']['id'] = (!empty($feature_id)) ? $feature_id : $_feature_id;
             $features_import['brand1c']['name'] = $cml['brand'];
@@ -1427,7 +1366,11 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             $this->import_params['user_data'] = $user_data;
 
-            if (empty($user_data) || empty($user_data['password']) || $user_data['password'] != fn_generate_salted_password($_SERVER['PHP_AUTH_PW'], $salt)) {
+            if (
+                empty($user_data)
+                || empty($user_data['password'])
+                || !fn_user_password_verify((int) $user_data['user_id'], (string) $_SERVER['PHP_AUTH_PW'], $user_data['password'], $salt)
+            ) {
                 $message = "\n Error in login or password user";
             }
 
@@ -1450,7 +1393,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         return false;
     }
-
 
     public function dataProductFields($data_product, &$product)
     {
@@ -1553,32 +1495,14 @@ class SDRusEximCommerceml extends RusEximCommerceml
         $data = $begin . $xml -> outputMemory();
         return $data;
     }
+
     public function updateProductStatus($product_id, $product_data, $amount)
     {
         $hide_product = $this->s_commerceml['exim_1c_add_out_of_stock'];
 
-        if ($hide_product == 'Y') {
-            if ($product_data['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-                $amount = (int) $this->db->getField(
-                    'SELECT SUM(amount) FROM ?:product_options_inventory WHERE product_id = ?i',
-                    $product_id
-                );
-            }
-
-            if (empty($amount) && $this->s_commerceml['exim_1c_import_mode_offers'] == 'variations') {
-                $variation_amount = (int) $this->db->getField(
-                    'SELECT SUM(amount) FROM ?:products WHERE parent_product_id = ?i',
-                    $product_id
-                );
-
-                if (!empty($variation_amount)) {
-                    $amount = $variation_amount;
-                }
-            }
-        }
+        $product_status = $this->getProductStatusByAmount($amount);
 
         $product_status = $this->getProductStatusByAmount($amount);
-        if ($product_data['tracking'] != ProductTracking::DO_NOT_TRACK)
         $this->db->query(
             'UPDATE ?:products SET status = ?s WHERE update_1c = ?s AND product_id = ?i',
             $product_status,

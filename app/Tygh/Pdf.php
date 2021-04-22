@@ -19,7 +19,7 @@ use Tygh\Http;
 class Pdf
 {
     protected static $transaction_id;
-    protected static $url = 'http://converter.cart-services.com';
+    protected static $url = 'https://converter.cart-services.com';
 
     /**
      * Pushes HTML code to batch to render PDF later
@@ -86,10 +86,12 @@ class Pdf
 
     /**
      * Render PDF document from HTML code
-     * @param  string  $html     HTML code
-     * @param  string  $filename filename to save PDF or name of attachment to download
-     * @param  boolean $save     saves to file if true, outputs if not
-     * @param  array   $params   params to post along with request
+     *
+     * @param  string|string[] $html     HTML code
+     * @param  string          $filename filename to save PDF or name of attachment to download
+     * @param  boolean         $save     saves to file if true, outputs if not
+     * @param  array           $params   params to post along with request
+     *
      * @return mixed   true if document saved, false on failure or outputs document
      */
     public static function render($html, $filename = '', $save = false, $params = array())

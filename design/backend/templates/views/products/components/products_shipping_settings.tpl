@@ -4,6 +4,7 @@
     <label class="control-label" for="product_weight">{__("weight")} ({$settings.General.weight_symbol nofilter}):</label>
     <div class="controls">
         <input type="text" name="product_data[weight]" id="product_weight" size="10" value="{$product_data.weight|default:"0"}" class="input-long" />
+        <p class="muted description">{__("tt_views_products_components_products_shipping_settings_weight")}</p>
     </div>
 </div>
 
@@ -12,13 +13,14 @@
     <div class="controls">
         <input type="hidden" name="product_data[free_shipping]" value="N" />
         <input type="checkbox" name="product_data[free_shipping]" id="product_free_shipping" value="Y" {if $product_data.free_shipping == "Y"}checked="checked"{/if} />
+        <p class="muted description">{__("tt_views_products_components_products_shipping_settings_free_shipping")}</p>
     </div>
 </div>
 
 <div class="control-group">
     <label class="control-label" for="product_shipping_freight">{__("shipping_freight")} ({$currencies.$primary_currency.symbol nofilter}):</label>
     <div class="controls">
-        <input type="text" name="product_data[shipping_freight]" id="product_shipping_freight" size="10" value="{$product_data.shipping_freight|default:"0.00"}" class="input-long" />
+        <input type="text" name="product_data[shipping_freight]" id="product_shipping_freight" size="10" value="{$product_data.shipping_freight|default:"0.00"}" class="input-long cm-numeric" data-a-sep />
     </div>
 </div>
 
@@ -28,6 +30,7 @@
         <input type="text" name="product_data[min_items_in_box]" id="product_items_in_box" size="5" value="{$product_data.min_items_in_box|default:"0"}" class="input-micro" onkeyup="fn_product_shipping_settings(this);" />
         &nbsp;-&nbsp;
         <input type="text" name="product_data[max_items_in_box]" size="5" value="{$product_data.max_items_in_box|default:"0"}" class="input-micro" onkeyup="fn_product_shipping_settings(this);" />
+        <p class="muted description">{__("tt_views_products_components_products_shipping_settings_items_in_box")}</p>
     </div>
     
     {if $product_data.min_items_in_box > 0 || $product_data.max_items_in_box}

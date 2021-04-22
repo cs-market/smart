@@ -16,6 +16,7 @@
 namespace Tygh\Addons\RusOnlineCashRegister\Receipt;
 
 use Tygh\Addons\RusTaxes\Receipt\Item as BaseItem;
+use Tygh\Addons\RusTaxes\Receipt\Receipt as BaseReceipt;
 
 /**
  * Model of receipt item.
@@ -124,7 +125,7 @@ class Item
      */
     public function getSum()
     {
-        return $this->quantity * $this->price - $this->discount;
+        return BaseReceipt::roundPrice($this->quantity * $this->price - $this->discount);
     }
 
     /**

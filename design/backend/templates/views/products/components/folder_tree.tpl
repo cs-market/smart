@@ -1,6 +1,6 @@
 <tr class="multiple-table-row">
     <td>
-        <div style="padding-left: 5px;">
+        <div style="padding-{$direction}: 5px;">
         <input type="hidden" name="folder_{$folder.folder_id}" value="{$folder.folder_name}" />
         <span id="on_group_folder_{$folder.folder_id}" class="cm-combination {if $expand_all} hidden{/if}"><icon class="icon-folder-close"></span>
         <span id="off_group_folder_{$folder.folder_id}" class="cm-combination {if !$expand_all} hidden{/if}"><icon class="icon-folder-open"></span>
@@ -14,7 +14,7 @@
                 {/if}
 
                 {if !$non_editable}
-                    <li>{include file="common/popupbox.tpl" id="group_folder_`$id`" title_start=__("editing_folder") title_end=$folder.folder_name act=$act|default:"edit" opener_ajax_class="cm-ajax"}</li>
+                    <li>{include file="common/popupbox.tpl" id="group_folder_`$id`" text=$folder.folder_name act=$act|default:"edit" opener_ajax_class="cm-ajax"}</li>
                 {/if}
 
                 {if !$non_editable && !$skip_delete}

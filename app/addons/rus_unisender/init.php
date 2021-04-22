@@ -20,5 +20,6 @@ fn_register_hooks(
     'update_profile',
     'place_order',
     'change_order_status',
-    'get_notification_rules'
+    'get_notification_rules',
+    'tools_change_status'
 );

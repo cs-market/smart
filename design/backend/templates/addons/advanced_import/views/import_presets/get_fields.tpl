@@ -1,5 +1,7 @@
 <div id="content_fields">
-    {include file="addons/advanced_import/views/import_presets/components/fields_list.tpl"}
+    {include file="addons/advanced_import/views/import_presets/components/fields_list.tpl"
+        view_only=$view_only
+    }
 <!--content_fields--></div>
 {if $show_buttons_container}
     <div class="buttons-container">

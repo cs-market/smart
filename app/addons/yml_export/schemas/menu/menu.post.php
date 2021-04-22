@@ -12,20 +12,25 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['top']['addons']['items']['yml_export'] = array(
+defined('BOOTSTRAP') or die('Access denied');
+
+$schema['top']['administration']['items']['yml_export'] = [
+    'attrs' => [
+        'class' => 'is-addon'
+    ],
     'href' => 'yml.manage',
     'type' => 'title',
-    'position' => 1000,
-    'subitems' => array(
-        'yml_export.price_list' => array(
+    'position' => 1550,
+    'subitems' => [
+        'yml_export.price_list' => [
             'href' => 'yml.manage',
             'position' => 10,
-        ),
-        'yml_export.offers_params' => array(
+        ],
+        'yml_export.offers_params' => [
             'href' => 'yml.offers_params',
             'position' => 20,
-        )
-    ),
-);
+        ]
+    ],
+];
 
 return $schema;

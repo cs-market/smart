@@ -11,7 +11,7 @@
               {assign var="ul_subcategories" value="started"}
           {/if}
      {else}
-             <li class="ty-sitemap__tree-list-item" style="padding-left: {if $category.level == "1"}0px{elseif $category.level > "1"}{math equation="x*y+0" x="5" y=$category.level}px{/if};"><a href="{"categories.view?category_id=`$category.category_id`"|fn_url}">{$category.category}</a></li>
+             <li class="ty-sitemap__tree-list-item" style="padding-{$direction}: {if $category.level == "1"}0px{elseif $category.level > "1"}{math equation="x*y+0" x="5" y=$category.level}px{/if};"><a href="{"categories.view?category_id=`$category.category_id`"|fn_url}">{$category.category}</a></li>
      {/if}
      {if $smarty.foreach.categories.last}
           </ul>

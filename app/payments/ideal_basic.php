@@ -140,7 +140,7 @@ if (!empty($order_info['use_gift_certificates'])) {
 }
 
 // Taxes
-if (!empty($order_info['taxes']) && Registry::get('settings.General.tax_calculation') != 'unit_price') {
+if (!empty($order_info['taxes']) && Registry::get('settings.Checkout.tax_calculation') != 'unit_price') {
     foreach ($order_info['taxes'] as $tax_id => $tax_data) {
         if ($tax_data['price_includes_tax'] == 'N') {
             $pre_sha .= $tax_id . __('tax') . '1' . ($tax_data['tax_subtotal'] * 100);
@@ -238,7 +238,7 @@ if (!empty($order_info['use_gift_certificates'])) {
 }
 
 // Taxes
-if (!empty($order_info['taxes']) && Registry::get('settings.General.tax_calculation') != 'unit_price') {
+if (!empty($order_info['taxes']) && Registry::get('settings.Checkout.tax_calculation') != 'unit_price') {
     $msg = __('tax');
     foreach ($order_info['taxes'] as $tax_id => $tax_data) {
         if ($tax_data['price_includes_tax'] == 'N') {

@@ -1,6 +1,6 @@
 /*  Responsive navigation menu */
 
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     .admin-content-wrap {
         float: right;
     }
@@ -10,8 +10,8 @@
     .noscrolling {
         overflow-y: hidden !important;
     }
-    .overlay-navbar-open {
-        color: darken(rgb(100, 140, 181), 10%) !important;
+    .btn .overlay-navbar-open {
+        color: @mainColor;
     }
     .overlay-navbar-close {
         color: black;
@@ -68,12 +68,15 @@
                 z-index: 0;
                 overflow-x: hidden;
                 li.active>a {
-                    background-color: rgb(192, 213, 234) !important;
+                    background-color: @mainColor !important;
                 }
                 li>a {
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
+                    font-size: 15px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
                 }
                 .hint {
                     display: none;
@@ -169,10 +172,11 @@
         }
         li>a {
             color: black;
+            font-size: 15px;
         }
         .dropdown-toggle {
-            padding-top: 10px !important;
-            padding-bottom: 10px !important;
+            padding-top: 13px !important;
+            padding-bottom: 13px !important;
         }
     }
     // endof Resets styles for mobile
@@ -183,7 +187,6 @@
 
         .title {
             width: 100% !important;
-            max-width: ~"calc(100% - 60px)" !important;
 
             padding: 0px !important;
             padding-top: 7px !important;
@@ -195,11 +198,12 @@
                 font-size: 18px !important;
 
                 padding: 7px 10px !important;
-                max-width: ~"calc(100% - 70px)" !important;
+                max-width: ~"calc(100% - 100px)" !important;
             }
 
             &__lang-selector {
                 float: right;
+                margin-right: 5px;
 
                 .dropdown {
                     display: inline-block;
@@ -257,39 +261,36 @@
             z-index: 1;
 
             &__title-block {
+                display: flex;
+                align-items: center;
                 padding-left: 10px;
                 margin: 0;
                 padding-top: 10px;
                 padding-bottom: 10px;
-                font-size: 22.75px;
                 line-height: 40px;
                 box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.322);
                 cursor: pointer;
 
-                &--text {
-                    word-wrap: break-word;
-                    overflow-wrap: break-word;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    overflow: hidden;
-
-                    max-width: 70%;
-                    display: block;
+                &.openned .caret {
+                    transform: rotate(180deg);
                 }
+            }
 
-                .caret {
-                    display: inline-block;
-                    margin-top: 20px;
-                    margin-left: 10px;
-                    transform: scale(1.5);
-                    transition: .3s all;
-                }
+            &__title-text {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow-x: hidden;
+                max-width: 60%;
+                max-width: ~"calc(100% - 120px)";   // 100% - Close button
+                margin-left: 5px;
+                margin-right: 5px;
+            }
 
-                &.openned {
-                    .caret {
-                        transform: rotate(180deg) scale(1.5);
-                    }
-                }
+            &__title-caret {
+                display: inline-block;
+                transition: .3s all;
             }
 
             &__dropdowned {
@@ -360,7 +361,7 @@
 }
 
 // Hide quick-search and quick-menu
-@media (max-width: 920px) {
+@media (max-width: @TabletBreakpoint) {
     .subnav {
         .search,
         .quick-menu-container {
@@ -369,9 +370,15 @@
     }
 }
 
-@media (min-width: 768px) {
+@media (min-width: @TabletBreakpoint + 1px) {
     #actions_panel .btn-bar {
         background-color: rgb(255, 255, 255);
+    }
+}
+
+@media (max-width: @TabletBreakpoint) {
+    .navbar-admin-top.open {
+        top: 0px !important;
     }
 }
 

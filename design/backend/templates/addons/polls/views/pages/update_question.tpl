@@ -72,7 +72,7 @@
     <div class="hidden" id="content_conf_{$id}">
 
         <div class="table-responsive-wrapper">
-            <table class="table table-middle table-responsive">
+            <table class="table table-middle table--relative table-responsive">
             <thead>
                 <tr>
                     <th width="10%">{__("position_short")}</th>
@@ -91,7 +91,7 @@
                     <input type="text" name="question_data[answers][{$answer.item_id}][description]" size="75" value="{$answer.description}" class="input-xxlarge"></td>
                 <td class="center" data-th="{__("text_box")}">
                     <input type="hidden" name="question_data[answers][{$answer.item_id}][type]" value="A">
-                    <input type="checkbox" name="question_data[answers][{$answer.item_id}][type]" value="O" class="checkbox"{if $answer.type == "O"} checked="checked"{/if}></td>
+                    <input type="checkbox" name="question_data[answers][{$answer.item_id}][type]" value="O" {if $answer.type == "O"} checked="checked"{/if}></td>
                 <td data-th="{__("tools")}">
                     {include file="buttons/multiple_buttons.tpl" item_id="answer_`$answer.item_id`" only_delete="Y"}</td>
             </tr>
@@ -106,7 +106,7 @@
                         <input type="text" name="question_data[new_answers][0][description]" size="75" value="" class="input-xxlarge" /></td>
                     <td class="center" class="center" data-th="{__("text_box")}">
                         <input type="hidden" name="question_data[new_answers][0][type]" value="A" />
-                        <input type="checkbox" name="question_data[new_answers][0][type]" value="O" class="checkbox"{if $answer.type == "O"} checked="checked"{/if} /></td>
+                        <input type="checkbox" name="question_data[new_answers][0][type]" value="O" {if $answer.type == "O"} checked="checked"{/if} /></td>
                     <td data-th="{__("tools")}">
                         {include file="buttons/multiple_buttons.tpl" item_id="new_answer_`$id`"}</td>
                 </tr>

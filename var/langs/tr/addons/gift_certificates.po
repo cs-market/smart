@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: tr\n"
-"X-Crowdin-File: /release-4.8.2/addons/gift_certificates.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.2/addons/gift_certificates.po\n"
+"X-Crowdin-File-ID: 4072\n"
+"PO-Revision-Date: 2021-02-01 09:14\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -188,6 +188,10 @@ msgctxt "Languages::theme_editor.gift_cert"
 msgid "Gift Certificate"
 msgstr "Hediye Çeki"
 
+msgctxt "Languages::theme_editor_logo.gift_cert"
+msgid "Gift Certificate"
+msgstr ""
+
 msgctxt "Languages::promo_code_or_certificate"
 msgid "Gift certificate or promo code"
 msgstr "Hediye sertifikası veya promosyon kodu"
@@ -221,8 +225,12 @@ msgid "Amount should not be higher than [max] and less than [min]"
 msgstr "Tutar [max] daha yüksek ve [min] arasında olmalı"
 
 msgctxt "Languages::privileges.manage_gift_certificates"
-msgid "Manage gift certificate system"
-msgstr "Hediye çeki sistemi yönetimi"
+msgid "Can edit"
+msgstr "Düzenleyebilirsin"
+
+msgctxt "Languages::privilege_groups.gift_certificates"
+msgid "Gift certificates"
+msgstr "Hediye çekleri"
 
 msgctxt "Languages::change_gift_certificate_status"
 msgid "Change gift certificate status to"
@@ -278,5 +286,17 @@ msgstr "Hediye çeki bulunamadı. Önizleme sadece var olan data ile görüntül
 
 msgctxt "Languages::gift_certificates.certificate_purchase_form"
 msgid "Gift certificate purchase form"
+msgstr "Hediye çeki satın alma formu"
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.status_changed.name"
+msgid "Gift certificate status changed to [status]"
+msgstr "Hediye çeki durumu [status] olarak değiştirildi."
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
+msgid "Gift certificate updated"
+msgstr "Hediye sertifikası güncellendi"
+
+msgctxt "Languages::logo_section.gift_cert"
+msgid "Gift certificate logo"
 msgstr ""
 

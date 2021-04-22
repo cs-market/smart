@@ -97,7 +97,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
     $redirect_url = fn_url("payment_notification.process?payment=yandex_p2p&order_id=" . $order_info['order_id']);
     $authUri = Client::authorizeUri($processor_data['processor_params']['client_id'], $redirect_url, $scope);
 
-    fn_create_payment_form($authUri, array(), 'Yandex.P2P', false);
+    fn_create_payment_form($authUri, array(), 'Яндекс.Деньги: Перевод на счёт', false);
 }
 
 function fn_yandex_money_is_test_mode($processor_data)

@@ -7,7 +7,7 @@ use Tygh\Payments\Processors\YandexMoney\Exception as Exceptions;
 use Tygh\Payments\Processors\YandexMoney\Response as Responses;
 
 /**
- *
+ * @deprecated Deprecated since version 4.11.3. Use add-on Yandex.Checkout instead.
  */
 class Client
 {
@@ -24,12 +24,12 @@ class Client
     /**
      *
      */
-    const URI_AUTH = 'https://sp-money.yandex.ru/oauth/authorize';
+    const URI_AUTH = 'https://money.yandex.ru/oauth/authorize';
 
     /**
      *
      */
-    const URI_TOKEN = 'https://sp-money.yandex.ru/oauth/token';
+    const URI_TOKEN = 'https://money.yandex.ru/oauth/token';
 
     /**
      * @var string

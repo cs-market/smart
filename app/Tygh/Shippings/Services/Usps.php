@@ -506,7 +506,7 @@ class Usps implements IService
                                 if (strtoupper($availability) == 'TRUE') {
                                     $service_id = (string) $service->ServiceID;
 
-                                    if (isset($shipping_settings[$extra_services['intl'][$service_id]]) && $shipping_settings[$extra_services['intl'][$service_id]] == 'Y') {
+                                    if (isset($extra_services['intl'][$service_id]) && isset($shipping_settings[$extra_services['intl'][$service_id]]) && $shipping_settings[$extra_services['intl'][$service_id]] == 'Y') {
                                         $rate += floatval((string) $service->Price);
                                     }
 
@@ -547,7 +547,7 @@ class Usps implements IService
     public function getRequestData()
     {
         $code = $this->_shipping_info['service_code'];
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
+        $weight_data = fn_convert_weight_to_imperial_units($this->_shipping_info['package_info']['W']);
         $package_cost = $this->_shipping_info['package_info']['C'];
 
         $shipping_settings = $this->_shipping_info['service_params'];

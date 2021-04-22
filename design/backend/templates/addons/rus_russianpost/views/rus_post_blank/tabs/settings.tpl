@@ -53,12 +53,13 @@
     </div>
 
     <div class="control-group">
-        <label class="control-label" for="blank_print_bg">{__("rus_post_blank.print_bg")} {include file="common/tooltip.tpl" tooltip=__('rus_post_blank.print_bg.tooltip')}:</label>
+        <label class="control-label" for="blank_print_bg">{__("rus_post_blank.print_bg")}:</label>
         <div class="controls">
             <label class="checkbox">
                 <input type="hidden" name="blank_data[print_bg]" value="N" />
                 <input type="checkbox" name="blank_data[print_bg]" id="blank_print_bg" checked="checked" value="Y"/>
             </label>
+            <p class="muted description">{__("rus_post_blank.print_bg.tooltip")}</p>
         </div>
     </div>
 

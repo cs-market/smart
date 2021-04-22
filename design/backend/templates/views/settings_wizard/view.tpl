@@ -7,6 +7,7 @@
         <input type="hidden" name="current_step" value="{$current_step}">
 
         <div class="form-horizontal">
+            {$settings = []}
             {foreach from=$step_data.items item="item"}
                 {if $item.type == "header"}
                     <h4>{__($item.text, $item.placeholders)}</h4>
@@ -18,26 +19,26 @@
                     <p>{include file=$item.template}</p>
             
                 {elseif $item.type == "setting"}
-                    <p>{include file="common/settings_fields.tpl" class="setting-wide" item=$item.setting_data html_id="field_`$item.setting_data.name`" html_name="settings[`$item.setting_data.name`]"}</p>
-                
+                    {$settings.{$item.setting_data.object_id} = $item.setting_data}
                 {elseif $item.type == "addon"}
                     {assign var="addon" value=$wizard_addons[$item.addon_name]}
-                    <table class="table table-addons table-wizard">
+                    <div class="table-responsive-wrapper">
+                    <table class="table table-addons table-wizard table--relative table-responsive table-responsive-w-titles">
                         <tr>
-                            <td class="addon-icon">
+                            <td class="addon-icon" data-th="&nbsp;">
                                 <div class="bg-icon">
                                     {if $addon.has_icon}
                                         <img src="{$images_dir}/addons/{$item.addon_name}/icon.png" width="38" height="38" border="0" alt="{$addon.name}" title="{$addon.name}" >
                                     {/if}
                                 </div>
                             </td>
-                            <td width="95%">
+                            <td width="95%" data-th="&nbsp;">
                                 <div class="object-group-link-wrap">
                                     <span class="unedited-element block">{$addon.name}</span><br>
                                     <span class="row-status object-group-details">{$addon.description}</span>
                                 </div>
                             </td>
-                            <td width="5%">
+                            <td width="5%" data-th="&nbsp;">
                                 <input type="hidden" name="addons[{$item.addon_name}]" value="N">
                                 <label for="addon_{$item.addon_name}" class="checkbox">
                                     <input id="addon_{$item.addon_name}" type="checkbox" name="addons[{$item.addon_name}]" value="Y" checked="checked">
@@ -48,6 +49,14 @@
                     </table>
                 {/if}
             {/foreach}
+            {component
+                name="settings.settings_section"
+                subsection=$settings
+                section="wizard"
+                html_id_prefix="field_"
+                html_name="settings"
+                class="setting-wide"
+            }{/component}
         </div>
 
         <script type="text/javascript">

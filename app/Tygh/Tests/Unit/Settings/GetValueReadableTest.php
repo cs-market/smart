@@ -274,29 +274,6 @@ class GetValueReadableTest extends ATestCase
             ),
             array(
                 array (
-                    'object_id' => '6067',
-                    'name' => 'map_provider_settings',
-                    'section_id' => '62',
-                    'section_tab_id' => '63',
-                    'type' => 'E',
-                    'edition_type' => 'ROOT',
-                    'position' => '30',
-                    'is_global' => 'N',
-                    'handler' => '',
-                    'parent_id' => '0',
-                    'description' => '',
-                    'tooltip' => '',
-                    'object_type' => 'O',
-                    'value' => 'map_provider_settings.tpl',
-                    'section_name' => 'maps_provider',
-                    'section_tab_name' => 'general',
-                    'variants' =>
-                        array (
-                        ),
-                ), null, ''
-            ),
-            array(
-                array (
                     'object_id' => '6294',
                     'name' => 'template',
                     'section_id' => '118',
@@ -403,7 +380,7 @@ class GetValueReadableTest extends ATestCase
                     'tooltip' => NULL,
                     'object_type' => 'O',
                     'value' => 'Boston street',
-                    'section_name' => 'General',
+                    'section_name' => 'Checkout',
                     'section_tab_name' => 'main',
                     'variants' =>
                         array (

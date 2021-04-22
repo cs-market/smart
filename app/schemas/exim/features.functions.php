@@ -50,6 +50,13 @@ function fn_exim_get_product_feature_categories($data, $lang_code, $category_del
 function fn_exim_get_features_convert_category_path($feature_data, $lang_code, $category_delimiter = '///')
 {
     $categories_path = '';
+
+    if (empty($feature_data['company_id'])) {
+        $feature_data['company_id'] = empty($feature_data['company'])
+            ? Registry::get('runtime.company_id')
+            : fn_get_company_id_by_name($feature_data['company']);
+    }
+
     if (!empty($feature_data['parent_id'])) {
 
         $categories_path = '';
@@ -61,27 +68,18 @@ function fn_exim_get_features_convert_category_path($feature_data, $lang_code, $
 
     } else {
         if (!empty($feature_data['categories_path'])) {
+
             $categories_path = array();
 
-            if (!isset($categories_ids)) {
-                $categories_ids = db_get_hash_single_array('SELECT category, category_id FROM ?:category_descriptions WHERE lang_code = ?s', array('category', 'category_id'), $lang_code);
-            }
             $_categories_paths = str_getcsv($feature_data['categories_path'], ',', "'");
             if (!empty($_categories_paths)) {
                 foreach ($_categories_paths as $category_path) {
-                        $categories = explode($category_delimiter, $category_path);
-                        array_walk($categories, 'fn_trim_helper');
-                        $cat_ids_path = array();
-                        foreach ($categories as $category) {
-                            if (!empty($categories_ids[$category])) {
-                                $cat_ids_path[] = $categories_ids[$category];
-                            }
-                        }
-                        $cat_ids_path = implode('/', $cat_ids_path);
-                        $__cat_id = db_get_field("SELECT category_id FROM ?:categories WHERE id_path = ?s", $cat_ids_path);
-                        if (!empty($__cat_id)) {
-                            $categories_path[] = $__cat_id;
-                        }
+                    $categories = explode($category_delimiter, $category_path);
+                    array_walk($categories, 'fn_trim_helper');
+                    $categories = fn_get_categories_from_path($categories, $feature_data['company_id'], $lang_code);
+                    if (end($categories)['id']) {
+                        $categories_path[] = end($categories)['id'];
+                    }
                 }
             }
             $categories_path = implode(',', array_unique($categories_path));
@@ -110,7 +108,7 @@ function fn_exim_get_product_feature_group($group_id, $lang_code = CART_LANGUAGE
     $group_name = false;
 
     if (!empty($group_id)) {
-        $group_name = db_get_field('SELECT description FROM ?:product_features_descriptions WHERE feature_id = ?i AND lang_code = ?s', $group_id, $lang_code);
+        $group_name = db_get_field('SELECT internal_name FROM ?:product_features_descriptions WHERE feature_id = ?i AND lang_code = ?s', $group_id, $lang_code);
     }
 
     return $group_name;
@@ -150,7 +148,7 @@ function fn_exim_get_product_feature_group_id($group_name, $company_id, &$create
 function fn_import_get_feature_id(&$primary_object_id, $object, &$skip_get_primary_object_id)
 {
 
-    $feature_id = db_get_field('SELECT feature_id FROM ?:product_features_descriptions WHERE description = ?s AND lang_code = ?s', $object['description'], $object['lang_code']);
+    $feature_id = db_get_field('SELECT feature_id FROM ?:product_features_descriptions WHERE intenral_name = ?s AND lang_code = ?s', $object['description'], $object['lang_code']);
 
     if ($feature_id) {
         $primary_object_id = array(
@@ -186,8 +184,6 @@ function fn_import_feature($data, &$processed_data, &$skip_record, $category_del
             $created_group_ids,
             $main_lang
         );
-    } else {
-        $feature['parent_id'] = 0;
     }
 
     $feature_id = 0;
@@ -220,9 +216,9 @@ function fn_import_feature($data, &$processed_data, &$skip_record, $category_del
 
     if (!$feature_id) {
         $feature_data = fn_exim_features_find_feature(
-            $feature['description'],
+            $feature['internal_name'],
             $feature['feature_type'],
-            $feature['parent_id'],
+            isset($feature['parent_id']) ? $feature['parent_id'] : 0,
             $company_id,
             $main_lang
         );
@@ -252,11 +248,17 @@ function fn_import_feature($data, &$processed_data, &$skip_record, $category_del
         }
     }
 
+    // Convert categories from Names to C_IDS: Electronics,Processors -> 3,45
+    if (isset($feature['categories_path'])) {
+        $feature['categories_path'] = fn_exim_get_features_convert_category_path($feature, $main_lang, $category_delimiter);
+    }
+
     if (empty($feature_id)) {
         $feature['company_id'] = $company_id;
 
         $feature_id = fn_update_product_feature($feature, 0, $main_lang);
         $processed_data['N']++;
+
         fn_set_progress('echo', __('creating') . ' features <b>' . $feature_id . '</b>. ', false);
 
         if (fn_allowed_for('ULTIMATE') && !empty($company_id)) {
@@ -265,11 +267,8 @@ function fn_import_feature($data, &$processed_data, &$skip_record, $category_del
     } else {
         unset($feature['feature_id']);
 
-        // Convert categories from Names to C_IDS: Electronics,Processors -> 3,45
-        $categories_path = fn_exim_get_features_convert_category_path($feature, $main_lang, $category_delimiter);
-
         fn_update_product_feature(
-            array_merge($feature, array('categories_path' => $categories_path)),
+            $feature,
             $feature_id,
             $main_lang
         );
@@ -281,8 +280,6 @@ function fn_import_feature($data, &$processed_data, &$skip_record, $category_del
             fn_set_progress('echo', __('updating') . ' features <b>' . $feature_id . '</b>. ', false);
         }
     }
-
-    fn_exim_set_product_feature_categories($feature_id, $feature, $main_lang, $category_delimiter);
 
     foreach ($data as $lang_code => $feature_data) {
         unset($feature_data['feature_id']);
@@ -341,7 +338,7 @@ function fn_exim_features_find_feature($feature_name, $feature_type, $feature_pa
     $features = db_get_hash_array(
         'SELECT pf.feature_id, pf.company_id FROM ?:product_features_descriptions AS pfd'
         . ' LEFT JOIN ?:product_features AS pf ON pf.feature_id = pfd.feature_id'
-        . ' WHERE description = ?s AND lang_code = ?s AND feature_type = ?s AND parent_id = ?i',
+        . ' WHERE internal_name = ?s AND lang_code = ?s AND feature_type = ?s AND parent_id = ?i',
         'company_id',
         $feature_name, $lang_code, $feature_type, $feature_parent_id
     );

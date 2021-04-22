@@ -34,4 +34,9 @@ class FileTemplateMessageBuilder extends \Tygh\Mailer\MessageBuilders\FileTempla
     {
         return MessageBuilder::validateAddressTest($email);
     }
+
+    public function getStorefrontId()
+    {
+        return 1;
+    }
 }

@@ -330,7 +330,7 @@ input.ty-search-block__input {
 
   .product-title {
     line-height: 120%;
-    color: spin(desaturate(lighten(@font, 32%), 21%), -211);
+    .product-title-color();
 
     &:hover {
       color: @secondary_button;
@@ -374,6 +374,22 @@ input.ty-search-block__input {
 
     &:hover {
       color: @secondary_button;
+    }
+  }
+}
+
+// ==================================================== Sellers of this product
+.ty-sellers-list {
+  .ty-sellers-list__item-location {
+    margin-bottom: 3px;
+
+    .company-location {
+      line-height: 120%;
+      color: spin(desaturate(lighten(@font, 32%), 21%), -211);
+
+      &:hover {
+        color: @secondary_button;
+      }
     }
   }
 }
@@ -555,7 +571,6 @@ a:hover {
 }
 
 .top-quick-links {
-  margin: 6px 4px 0px 0px;
 
   .ty-text-links__item {
     position: relative;
@@ -1109,6 +1124,8 @@ h3.ty-social-link__title{
 @sidebar: #fff;
 @price: #343434;
 @discount_label: #feba0f;
+@product_label: @discount_label;
+@shipping_label: @primary_button;
 @in_stock: #2ECC71;
 @out_of_stock: #a80006;
 @top_panel_links: #2d3540;
@@ -1140,7 +1157,7 @@ h3.ty-social-link__title{
 @footer_bg_transparent: false;
 @footer_bg_grad_stop: #e6eff4;
 
-@body_font: Open Sans;
+@body_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @body_font_size: 14px;
 @body_font_style: normal;
 @body_font_weight: normal;
@@ -1149,23 +1166,41 @@ h3.ty-social-link__title{
 @headings_font_decoration: none;
 @headings_font_style: normal;
 @headings_font_weight: bold;
-@links_font: Open Sans;
+@links_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @links_font_size: 14px;
 @links_font_decoration: none;
 @links_font_style: normal;
 @links_font_weight: normal;
-@price_font: Open Sans;
+@price_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @price_font_size: 20px;
 @price_font_decoration: none;
 @price_font_style: normal;
 @price_font_weight: bold;
-@buttons_font: Open Sans;
+@buttons_font: 'Open Sans', 'Helvetica Neue', -apple-system, sans-serif;
 @buttons_font_size: 16px;
 @buttons_font_decoration: none;
 @buttons_font_style: normal;
 @buttons_font_weight: normal;
 
+@checkout_selected_control_border: #4fbe31;
+@checkout_control_border: #acbdcd;
+@checkout_input_border: #acbdcd;
+@checkout_selected_input_border: #4fbe31;
+@checkout_step_title: #2e3a47;
+@checkout_input_text: #2e3a47;
+@checkout_input_label: #a1a6aa;
+@checkout_control_background: #fff;
+@checkout_selected_control_background: #fff;
+@checkout_control_title: #4fbe31;
+@checkout_control_description: #6c6c6c;
+@checkout_control_label: #2e3a47;
+@checkout_terms_background: #f9f9f9;
+@checkout_link: #4fbe31;
 
+// ============================================================ Mixins
+.product-title-color {
+  color: spin(desaturate(lighten(@font, 32%), 21%), -211);
+}
 
 /*GFONTS*/
 @font-face {
@@ -1192,6 +1227,7 @@ h3.ty-social-link__title{
 
 .top-logo {
   margin-top: 3px;
+  width: 100%;
 }
 
 .ty-search-magnifier {
@@ -1339,6 +1375,8 @@ but it's slower:
 .ty-quick-menu-item__points:before,
 .ty-quick-menu-item__gift:before,
 .ty-icon-moon-facebook,
+.ty-icon-moon-instagram,
+.ty-icon-moon-youtube,
 .ty-icon-moon-twitter,
 .ty-icon-moon-mail,
 .ty-icon-moon-vk,
@@ -1362,6 +1400,14 @@ but it's slower:
 
 .ty-icon-moon-facebook:before {
   content: "\e169";
+}
+
+.ty-icon-moon-instagram:before {
+  content: "\e170";
+}
+
+.ty-icon-moon-youtube:before {
+  content: "\e171";
 }
 
 .ty-icon-moon-twitter:before {
@@ -1404,7 +1450,7 @@ but it's slower:
   vertical-align: middle;
 
   [class*="ty-icon-moon-"] {
-    margin-right: 8px;
+    margin-right: 10px;
     padding: 5px;
     border: 2px solid #ffffff;
     border-radius: 50%;
@@ -1429,7 +1475,7 @@ but it's slower:
 }
 
 .ty-social-link-block {
-  margin: 25px 15px 25px 0;
+  margin: 23px 15px 23px 0;
 
   @media screen and (max-width: 1120px) {
     margin-top: 0;
@@ -1440,11 +1486,12 @@ but it's slower:
 }
 
 h3.ty-social-link__title {
-  font-size: 16px !important;
+  font-size: 15px !important;
   font-family: @headings_font;
   font-weight: bold;
   text-transform: uppercase;
   line-height: 38px;
+  margin-bottom: 0;
 
   @media screen and (max-width: 979px) {
     display: inline-block;
@@ -1456,12 +1503,12 @@ h3.ty-social-link__title {
 @media screen and (max-width: 767px){
   h3.ty-social-link__title{
     margin-top: 0;
+    display: block;
   }
 }
 
 .ty-social-link {
   top: 0;
-  margin-right: 0;
 }
 
 /* ==========================================================================
@@ -1952,13 +1999,13 @@ Smarty blocks
 @promo_container_bg_color__secondary: #ffe400;
 @with_side_icon_font_size: 36px;
 @subscribe_button_size: 16px;
-@subscribe_button_padding: 6px 15px 5.5px 15px;
+@subscribe_button_padding: 6px 8px 5.5px 8px;
 @subscribe_button: @secondary_button;
 
 // ========================================================= Payments icons
 
 .ty-payment-icons {
-  margin: 6px 0;
+  margin: 1px 0;
 }
 
 .ty-payment-rus-icons .ty-payment-icons__item {
@@ -2071,7 +2118,8 @@ Banners
 /* Content pages: Menu items
    ========================================================================== */
 
-.ty-menu-item__sale .ty-menu__item-link {
+.ty-menu-item__sale .ty-menu__item-link,
+.ty-menu-item__promotions .ty-menu__item-link {
   color: #FE7400 !important;
   font-weight: bold;
 }
@@ -2112,42 +2160,6 @@ Banners
     }
 }
 
-
-// ======================================================= Quick menu items
-
-.ty-quick-menu-item__bonuses {
-  @media (min-width: 900px) {
-    display: none !important;
-  }
-}
-
-.ty-quick-menu-item__points,
-.ty-quick-menu-item__gift {
-  @media (max-width: 900px) {
-    display: none !important;
-  }
-}
-
-
-.ty-quick-menu-item__place-order {
-  @media (min-width: 1166px) {
-    display: none !important;
-  }
-}
-
-.ty-quick-menu__return,
-.ty-quick-menu__contacts,
-.ty-quick-menu__delivery,
-.ty-quick-menu__pickup {
-  @media (max-width: 1167px) {
-    display: none !important;
-  }
-}
-
-.ty-text-links_show_inline .ty-level-0:hover .ty-text-links {
-  min-width: 170px;
-}
-
 // ====================================================== Footer wrapper
 
 .ty-footer-menu {
@@ -2156,8 +2168,13 @@ Banners
     margin: 0;
     padding-top: 2px;
 
-    @media screen and (max-width: 767px){
+    @media (max-width: 767px) {
       padding-top: 15px;
+    }
+  }
+  .ty-footer-menu__icon-open, .ty-footer-menu__icon-hide {
+    @media (max-width: 767px) {
+      top: 18px;
     }
   }
 }

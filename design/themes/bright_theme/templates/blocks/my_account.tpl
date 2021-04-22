@@ -62,16 +62,18 @@
 
     <div class="ty-account-info__buttons buttons-container">
         {if $auth.user_id}
-            <a href="{"auth.logout?redirect_url=`$return_current_url`"|fn_url}" rel="nofollow" class="ty-btn ty-btn__primary">{__("sign_out")}</a>
-        {else}
-            <a href="{if $runtime.controller == "auth" && $runtime.mode == "login_form"}{$config.current_url|fn_url}{else}{"auth.login_form?return_url=`$return_current_url`"|fn_url}{/if}" {if $settings.Security.secure_storefront != "partial"} data-ca-target-id="login_block{$block.snapping_id}" class="cm-dialog-opener cm-dialog-auto-size ty-btn ty-btn__secondary"{else} class="ty-btn ty-btn__primary"{/if} rel="nofollow">{__("sign_in")}</a><a href="{"profiles.add"|fn_url}" rel="nofollow" class="ty-btn ty-btn__primary">{__("register")}</a>
-            {if $settings.Security.secure_storefront != "partial"}
-                <div  id="login_block{$block.snapping_id}" class="hidden" title="{__("sign_in")}">
-                    <div class="ty-login-popup">
-                        {include file="views/auth/login_form.tpl" style="popup" id="popup`$block.snapping_id`"}
-                    </div>
-                </div>
+            {$is_vendor_with_active_company="MULTIVENDOR"|fn_allowed_for && ($user_info.user_type == "V") && ($user_info.company_status == "A")}
+            {if $is_vendor_with_active_company}
+                <a href="{$config.vendor_index|fn_url}" rel="nofollow" class="ty-btn ty-btn__primary" target="_blank">{__("go_to_admin_panel")}</a>
             {/if}
+            <a href="{"auth.logout?redirect_url=`$return_current_url`"|fn_url}" rel="nofollow" class="ty-btn {if $is_vendor_with_active_company}ty-btn__tertiary{else}ty-btn__primary{/if}">{__("sign_out")}</a>
+        {else}
+            <a href="{if $runtime.controller == "auth" && $runtime.mode == "login_form"}{$config.current_url|fn_url}{else}{"auth.login_form?return_url=`$return_current_url`"|fn_url}{/if}" data-ca-target-id="login_block{$block.snapping_id}" class="cm-dialog-opener cm-dialog-auto-size ty-btn ty-btn__secondary" rel="nofollow">{__("sign_in")}</a><a href="{"profiles.add"|fn_url}" rel="nofollow" class="ty-btn ty-btn__primary">{__("register")}</a>
+            <div  id="login_block{$block.snapping_id}" class="hidden" title="{__("sign_in")}">
+                <div class="ty-login-popup">
+                    {include file="views/auth/login_form.tpl" style="popup" id="popup`$block.snapping_id`"}
+                </div>
+            </div>
         {/if}
     </div>
 <!--account_info_{$block.snapping_id}--></div>

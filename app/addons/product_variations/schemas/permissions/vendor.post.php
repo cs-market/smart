@@ -16,4 +16,8 @@ $schema['controllers']['product_variations'] = array(
     'permissions' => true,
 );
 
+$schema['controllers']['product_variations_convert'] = [
+    'permissions' => false
+];
+
 return $schema;

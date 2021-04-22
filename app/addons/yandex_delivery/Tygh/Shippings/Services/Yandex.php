@@ -14,14 +14,14 @@
 
 namespace Tygh\Shippings\Services;
 
+use Tygh\Tygh;
+use Tygh\Registry;
+use Tygh\Shippings\IService;
+use Tygh\Shippings\IPickupService;
 use Tygh\Shippings\YandexDelivery\YandexDelivery;
 use Tygh\Shippings\YandexDelivery\Objects\RequestDeliveryList;
-use Tygh\Shippings\IService;
-use Tygh\Registry;
-use Tygh\Http;
-use Tygh\Tygh;
 
-class Yandex implements IService
+class Yandex implements IService, IPickupService
 {
     /**
      * Abailability multithreading in this module
@@ -40,9 +40,9 @@ class Yandex implements IService
     /**
      * Stack for errors occured during the preparing rates process
      *
-     * @var array $_error_stack
+     * @var array $error_stack
      */
-    private $_error_stack = array();
+    private $error_stack = array();
 
     /**
      * Current Company id environment
@@ -54,17 +54,58 @@ class Yandex implements IService
     public $sid;
 
     public $tariff_id = 0;
+
     public $pickuppoint_id = 0;
+
     public $courierpoint_id = 0;
 
+    public $_shipping_info;
+
     /**
-     * Collects errors during preparing and processing request
+     * Returns shipping service information
      *
-     * @param string $error
+     * @return array
      */
-    private function _internalError($error)
+    public static function getInfo()
     {
-        $this->_error_stack[] = $error;
+        return [
+            'name'         => __('carrier_yandex'),
+            'tracking_url' => '',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupMinCost()
+    {
+        if (!$this->isPickupService()) {
+            return false;
+        }
+
+        $shipping_data = $this->getStoredShippingData();
+        return isset($shipping_data['cost']) ? $shipping_data['cost'] : false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupPoints()
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupPointsQuantity()
+    {
+        if (!$this->isPickupService()) {
+            return false;
+        }
+
+        $shipping_data = $this->getStoredShippingData();
+        return isset($shipping_data['number_of_pickup_points']) ? $shipping_data['number_of_pickup_points'] : false;
     }
 
     /**
@@ -80,18 +121,14 @@ class Yandex implements IService
     /**
      * Gets error message from shipping service server
      *
-     * @param string $response
+     * @param array $response
+     *
      * @internal param string $resonse Reponse from Shipping service server
      * @return string Text of error or false if no errors
      */
     public function processErrors($response)
     {
-        $error = '';
-        if (!empty($this->_error_stack)) {
-            foreach ($this->_error_stack as $_error) {
-                $error .= '; ' . $_error;
-            }
-        }
+        $error = implode('; ', $this->error_stack);
 
         return $error;
     }
@@ -99,7 +136,8 @@ class Yandex implements IService
     /**
      * Sets data to internal class variable
      *
-     * @param  array      $shipping_info
+     * @param  array $shipping_info
+     *
      * @return array|void
      */
     public function prepareData($shipping_info)
@@ -122,14 +160,18 @@ class Yandex implements IService
     /**
      * Prepare request information
      *
-     * @return array Prepared data
+     * @return array|RequestDeliveryList Prepared data
      */
     public function getRequestData()
     {
+        $service_params = $this->_shipping_info['service_params'];
+        if (empty($service_params['deliveries'])) {
+            return [];
+        }
+
         $request_data = new RequestDeliveryList();
 
         $package_info = $this->_shipping_info['package_info'];
-        $service_params = $this->_shipping_info['service_params'];
 
         $request_data->city_from = !empty($service_params['city_from']) ? $service_params['city_from'] : $package_info['origination']['city'];
         $request_data->city_to = !empty($package_info['location']['city']) ? $package_info['location']['city'] : '';
@@ -137,7 +179,7 @@ class Yandex implements IService
         $yd = YandexDelivery::init($this->_shipping_info['shipping_id']);
         $request_data->geo_id_to = $yd->getGeoID($package_info);
 
-        $weight_data = fn_expand_weight($package_info['W']);
+        $weight_data = fn_convert_weight_to_imperial_units($package_info['W']);
         $weight = $weight_data['plain'] * Registry::get('settings.General.weight_symbol_grams') / 1000;
         $request_data->weight = sprintf('%.3f', round((double) $weight + 0.00000000001, 3));
 
@@ -167,14 +209,20 @@ class Yandex implements IService
             $init_cache = true;
         }
 
+        $service_params = $this->_shipping_info['service_params'];
+        if (empty($service_params['deliveries'])) {
+            return ['error' => __('yandex_delivery.no_shipping_services_selected')];
+        }
+
         $package_info = $this->_shipping_info['package_info'];
 
         if (empty($package_info['location']['city'])) {
-            return array();
+            return [];
         }
 
+        $weight = !empty($package_info['W']) ? $package_info['W'] : '';
         $state = empty($package_info['location']['state']) ? '' : $package_info['location']['state'];
-        $key = md5($state . $package_info['location']['city']);
+        $key = md5($weight . $state . $package_info['location']['city']);
         $response = Registry::get($cache_name . '.' . $key);
 
         if (!empty($response)) {
@@ -200,11 +248,11 @@ class Yandex implements IService
             Registry::set($cache_name . '.' . $key, $response);
 
         } else {
-            $this->_internalError($response['error']);
+            $this->internalError($response['error']);
 
             if (!empty($response['data']['errors'])) {
                 foreach ($response['data']['errors'] as $key => $error) {
-                    $this->_internalError($key . ' - ' . $error);
+                    $this->internalError($key . ' - ' . $error);
                 }
 
             }
@@ -217,49 +265,42 @@ class Yandex implements IService
      * Gets shipping cost and information about possible errors
      *
      * @param array $response
+     *
      * @internal param string $resonse Reponse from Shipping service server
      * @return array Shipping cost and errors
      */
     public function processResponse($response)
     {
-        $return = array(
-            'cost' => false,
-            'error' => false,
-            'delivery_time' => false
-        );
+        $return = [
+            'cost'          => false,
+            'error'         => false,
+            'delivery_time' => false,
+        ];
 
         $service_params = $this->_shipping_info['service_params'];
+        if (is_array($response) && isset($response['error'])) {
+            $return['error'] = $response['error'];
+
+            return $return;
+        }
 
         if (fn_yandex_delivery_check_type_delivery($service_params)) {
             $return = $this->getCourierPoints($response, $service_params, $return);
         } else {
             $this->processPickpoints($response, $service_params, $return);
         }
+
+        $this->storeShippingData($return);
 
         return $return;
     }
 
     /**
-     * This function is deprecated and no longer used.
-     * It remains in the code to avoid fatal error occurrences.
-     *
-     * @deprecated deprecated since version 4.5.2
-     */
-    public function processCms($response, $service_params, &$return)
-    {
-        if (fn_yandex_delivery_check_type_delivery($service_params)) {
-            $return = $this->getCourierPoints($response, $service_params, $return);
-        } else {
-            $this->processPickpoints($response, $service_params, $return);
-        }
-    }
-
-    /**
      * Sorts and filters pickup points provided by Yandex.Delivery
      *
-     * @param array     $response       The list and data of all shipping services provided by Yandex.Delivery.
-     * @param array     $service_params The settings of the shipping method in CS-Cart.
-     * @param array     $return         The results of the function are saved to this variable.
+     * @param array $response       The list and data of all shipping services provided by Yandex.Delivery.
+     * @param array $service_params The settings of the shipping method in CS-Cart.
+     * @param array $return         The results of the function are saved to this variable.
      */
     public function processPickpoints($response, $service_params, &$return)
     {
@@ -270,11 +311,10 @@ class Yandex implements IService
         $deliveries = YandexDelivery::filterDeliveries($response['data'], $service_params);
         $pickup_points = YandexDelivery::filterPickupPoints($response['data'], $service_params);
 
-        $selected_point = 0;
         if (!empty($pickup_points)) {
             $package_info = $this->_shipping_info['package_info'];
             $yd = YandexDelivery::init($this->_shipping_info['shipping_id']);
-            $geo_id = $yd->getGeoID($package_info);
+            $yd->getGeoID($package_info);
 
             if ($this->_shipping_info['service_params']['sort_type'] == "near") {
                 $pickup_points = $this->sortByNearPoints($pickup_points);
@@ -299,14 +339,14 @@ class Yandex implements IService
 
             $return['data'] = array(
                 'selected_point' => $selected_point,
-                'deliveries' => $deliveries,
-                'pickup_points' => $pickup_points
+                'deliveries'     => $deliveries,
+                'pickup_points'  => $pickup_points,
             );
 
             $return['delivery_time'] = $this->getDeliveryTime($shipping_data);
         }
 
-        if (empty($this->_error_stack) && isset($shipping_data)) {
+        if (empty($this->error_stack) && isset($shipping_data)) {
             if (isset($shipping_data['costWithRules'])) {
                 $return['cost'] = $shipping_data['costWithRules'];
             }
@@ -318,9 +358,9 @@ class Yandex implements IService
     /**
      * Prepares data about courier delivery.
      *
-     * @param array     $response       The list and data of all shipping services provided by Yandex.Delivery.
-     * @param array     $service_params The settings of the shipping method in CS-Cart.
-     * @param array     $return         The results of the function are saved to this variable.
+     * @param array $response       The list and data of all shipping services provided by Yandex.Delivery.
+     * @param array $service_params The settings of the shipping method in CS-Cart.
+     * @param array $return         The results of the function are saved to this variable.
      *
      * @return array The array of data about courier delivery.
      */
@@ -330,17 +370,14 @@ class Yandex implements IService
             return $return;
         }
 
-        $courier_points = $response['courier'];
         $deliveries = YandexDelivery::filterDeliveries($response['courier'], $service_params);
 
-        $shipping_data = array();
+        $shipping_data = [];
         $selected_point = 0;
-        if (!empty($courier_points) && !empty($deliveries)) {
-            $selected_point = $this->getSelectedCourierPoint($courier_points);
+        if (!empty($deliveries)) {
+            $selected_point = $this->getSelectedCourierPoint($deliveries);
 
-            $courier_points[$selected_point]['work_time'] = YandexDelivery::getScheduleDays($courier_points[$selected_point]['deliveryIntervals']);
-
-            $delivery_id = $courier_points[$selected_point]['delivery_id'];
+            $delivery_id = $deliveries[$selected_point]['delivery_id'];
             if (!empty($delivery_id) && !empty($deliveries[$delivery_id])) {
                 $shipping_data = $deliveries[$delivery_id];
             } else {
@@ -348,15 +385,14 @@ class Yandex implements IService
             }
         }
 
-        $return['data'] = array(
+        $return['data'] = [
             'selected_point' => $selected_point,
-            'deliveries' => $deliveries,
-            'courier_points' => $courier_points
-        );
+            'deliveries'     => $deliveries,
+            'courier_points' => $deliveries,
+            'delivery_time'  => $this->getDeliveryTime($shipping_data)
+        ];
 
-        $return['delivery_time'] = $this->getDeliveryTime($shipping_data);
-
-        if (empty($this->_error_stack) && isset($shipping_data)) {
+        if (empty($this->error_stack) && isset($shipping_data)) {
             if (isset($shipping_data['costWithRules'])) {
                 $return['cost'] = $shipping_data['costWithRules'];
             }
@@ -410,7 +446,7 @@ class Yandex implements IService
                 $lat_pickoints = array();
                 $lng_pickoints = array();
                 $near_pickoints = array();
-                foreach($pickup_points as $id => $point) {
+                foreach ($pickup_points as $id => $point) {
                     $lat_pickoints[$id] = $point['lat'];
                     $lng_pickoints[$id] = $point['lng'];
                     $near_pickoints[$id] = sqrt(pow($lat_pickoints[$id] - $ll_address[1], 2) + pow($lng_pickoints[$id] - $ll_address[0], 2));
@@ -437,7 +473,7 @@ class Yandex implements IService
         $sort_pickup_points = array();
         $pickpoints_near = $this->getNearPickpoints($pickup_points);
 
-        foreach($pickpoints_near as $point_id => $distance) {
+        foreach ($pickpoints_near as $point_id => $distance) {
             if (!empty($pickup_points[$point_id])) {
                 $sort_pickup_points[$point_id] = $pickup_points[$point_id];
             }
@@ -451,12 +487,12 @@ class Yandex implements IService
      *
      * @param array $shipping_data The array with the shipping data.
      *
-     * @return string|void The string with the delivery time.
+     * @return string|null The string with the delivery time.
      */
     protected function getDeliveryTime($shipping_data)
     {
         if (empty($shipping_data['minDays'])) {
-            return;
+            return null;
         }
 
         if ($shipping_data['minDays'] == $shipping_data['maxDays']) {
@@ -471,7 +507,7 @@ class Yandex implements IService
     /**
      * Gets the identifier of the selected courier service.
      *
-     * @param $courier_points The list of courier services.
+     * @param array $courier_points The list of courier services.
      *
      * @return int The identifier of the selected courier service.
      */
@@ -488,14 +524,52 @@ class Yandex implements IService
     }
 
     /**
-     * Returns shipping service information
-     * @return array information
+     * Saves shipping data to session
+     *
+     * @param array $rate Rate data
+     *
+     * @return bool
      */
-    public static function getInfo()
+    protected function storeShippingData($rate)
     {
-        return array(
-            'name' => __('carrier_yandex'),
-            'tracking_url' => '#'
-        );
+        $group_key = isset($this->_shipping_info['keys']['group_key']) ? $this->_shipping_info['keys']['group_key'] : 0;
+        $shipping_id = isset($this->_shipping_info['keys']['shipping_id']) ? $this->_shipping_info['keys']['shipping_id'] : 0;
+        Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id] = [
+            'number_of_pickup_points' => isset($rate['data']['pickup_points']) ? count($rate['data']['pickup_points']) : false,
+            'cost'                    => $rate['cost'],
+        ];
+
+        return true;
+    }
+
+    /**
+     * Fetches stored data from session
+     *
+     * @return array
+     */
+    protected function getStoredShippingData()
+    {
+        $group_key = isset($this->_shipping_info['keys']['group_key']) ? $this->_shipping_info['keys']['group_key'] : 0;
+        $shipping_id = isset($this->_shipping_info['keys']['shipping_id']) ? $this->_shipping_info['keys']['shipping_id'] : 0;
+        if (isset(Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id])) {
+            return Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id];
+        }
+
+        return [];
+    }
+
+    protected function isPickupService()
+    {
+        return !fn_yandex_delivery_check_type_delivery($this->_shipping_info['service_params']);
+    }
+
+    /**
+     * Collects errors during preparing and processing request
+     *
+     * @param string $error
+     */
+    private function internalError($error)
+    {
+        $this->error_stack[] = $error;
     }
 }

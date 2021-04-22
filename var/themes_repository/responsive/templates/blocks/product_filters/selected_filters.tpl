@@ -2,11 +2,19 @@
 
 {if $items}
 
-{$ajax_div_ids = "product_filters_*,products_search_*,category_products_*,product_features_*,breadcrumbs_*,currencies_*,languages_*,selected_filters_*"}
+{$ajax_div_ids = "product_filters_*,selected_filters_*,products_search_*,category_products_*,currencies_*,languages_*,product_features_*"}
 {$curl = $config.current_url}
 {$filter_base_url = $curl|fn_query_remove:"result_ids":"full_render":"filter_id":"view_all":"req_range_id":"features_hash":"subcats":"page":"total"}
 
-<div class="ty-horizontal-product-filters ty-selected-product-filters cm-product-filters cm-horizontal-filters" id="selected_filters_{$block.block_id}">
+<div class="ty-horizontal-product-filters ty-selected-product-filters cm-product-filters cm-horizontal-filters"
+    data-ca-target-id="{$ajax_div_ids}"
+    data-ca-base-url="{$filter_base_url|fn_url}"
+    data-ca-tooltip-class = "ty-product-filters__tooltip"
+    data-ca-tooltip-right-class = "ty-product-filters__tooltip--right"
+    data-ca-tooltip-mobile-class = "ty-tooltip--mobile"
+    data-ca-tooltip-layout-selector = "[data-ca-tooltip-layout='true']"
+    data-ce-tooltip-events-tooltip = "mouseenter"
+    id="selected_filters_{$block.block_id}">
 <div class="ty-product-filters__wrapper">
 {foreach from=$items item="filter"}
 
@@ -45,3 +53,7 @@
 <!--selected_filters_{$block.block_id}--></div>
 
 {/if}
+
+<div data-ca-tooltip-layout="true" class="hidden">
+    <button type="button" data-ca-scroll=".ty-mainbox-title" class="cm-scroll ty-tooltip--link ty-tooltip--filter"><span class="tooltip-arrow"></span></button>
+</div>

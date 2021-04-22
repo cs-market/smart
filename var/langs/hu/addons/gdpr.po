@@ -8,13 +8,13 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: hu\n"
-"X-Crowdin-File: /release-4.8.2/addons/gdpr.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/gdpr.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"PO-Revision-Date: 2019-02-01 06:05\n"
 
 msgctxt "Addons::name::gdpr"
 msgid "GDPR Compliance (EU)"
-msgstr ""
+msgstr "GDPR megfelelőség (EU)"
 
 msgctxt "Addons::description::gdpr"
 msgid "Helps you to comply with GDPR (a European Union regulation on personal data) by showing customers info about their personal data, asking their consent for its processing, and by offering ways to delete or export personal data."
@@ -22,11 +22,11 @@ msgstr ""
 
 msgctxt "SettingsSections::gdpr::general"
 msgid "General"
-msgstr ""
+msgstr "Általános"
 
 msgctxt "SettingsSections::gdpr::gdpr"
 msgid "GDPR"
-msgstr ""
+msgstr "GDPR"
 
 msgctxt "SettingsOptions::gdpr::gdpr_cookie_consent"
 msgid "Cookie consent"
@@ -42,19 +42,19 @@ msgstr ""
 
 msgctxt "SettingsVariants::gdpr::gdpr_cookie_consent::implicit"
 msgid "Implicit"
-msgstr ""
+msgstr "Engedélyezve"
 
 msgctxt "SettingsVariants::gdpr::gdpr_cookie_consent::explicit"
 msgid "Explicit"
-msgstr ""
+msgstr "Tiltva"
 
 msgctxt "Languages::gdpr.gdpr_user_data"
 msgid "GDPR user data"
-msgstr ""
+msgstr "GDPR felhasználói adatok"
 
 msgctxt "Languages::gdpr_user_data"
 msgid "User personal data"
-msgstr ""
+msgstr "Személyes adatok"
 
 msgctxt "Languages::gdpr_user_profiles"
 msgid "Personal data from user profiles"
@@ -78,7 +78,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.view_and_edit"
 msgid "View and edit"
-msgstr ""
+msgstr "Megtekintés és módosítás"
 
 msgctxt "Languages::gdpr_orders_data"
 msgid "Personal data from orders"
@@ -86,11 +86,11 @@ msgstr ""
 
 msgctxt "Languages::gdpr.full_agreement"
 msgid "Full agreement text"
-msgstr ""
+msgstr "Részletes információ a sütikről"
 
 msgctxt "Languages::gdpr.short_agreement"
 msgid "Short agreement text"
-msgstr ""
+msgstr "Rövid információ a sütikről"
 
 msgctxt "Languages::gdpr.checkout.place_order.personal_data_processing"
 msgid "Checkout: Place order: Personal data processing"
@@ -166,7 +166,7 @@ msgstr ""
 
 msgctxt "Languages::gdpr.export_to_xml"
 msgid "Export to XML"
-msgstr ""
+msgstr "XML-be exportálás"
 
 msgctxt "Languages::gdpr.agreement_required_error"
 msgid "Your agreement is required to proceed."
@@ -190,23 +190,23 @@ msgstr ""
 
 msgctxt "Languages::gdpr.cookie_consent_accept"
 msgid "I agree"
-msgstr ""
+msgstr "Elfogadom"
 
 msgctxt "Languages::gdpr.cookie_consent_decline"
 msgid "No, take me out of here"
-msgstr ""
+msgstr "Nem fogadom el, elnavigálok"
 
 msgctxt "Languages::gdpr.uk_cookies_law"
 msgid "Cookies are used on this site to provide the best user experience. If you continue, we assume that you agree to receive cookies from this site. <span class=\"button button-wrap-left\"><span class=\"button button-wrap-right\"><a rel=\"nofollow\" href=\"[url]\">OK</a></span></span>"
-msgstr ""
+msgstr "A weboldal sütiket (cookie-kat) használ, hogy biztonságos böngészés mellett a legjobb felhasználói élményt nyújtsa. <span class=\"button button-wrap-left\"><span class=\"button button-wrap-right\"><a rel=\"nofollow\" href=\"[url]\">Elfogadom és bezárás</a></span></span>"
 
 msgctxt "Languages::block_gdpr"
 msgid "GDPR"
-msgstr ""
+msgstr "GDPR"
 
 msgctxt "Languages::gdpr"
 msgid "GDPR"
-msgstr ""
+msgstr "GDPR"
 
 msgctxt "Languages::block_gdpr_description"
 msgid "Allows registered users to request their personal data or anonymization"

@@ -2,7 +2,7 @@
 <div class="control-group">
     <label class="control-label">{__("reason")}</label>
     <div class="controls">
-    <textarea class="span9" name="action_reason_{$type}" id="action_reason_{$type}" cols="50" rows="4"></textarea>
+    <textarea class="span9" name="reason_change_to_{$status}" id="reason_change_to_{$status}" cols="50" rows="4"></textarea>
     </div>
 </div>
 

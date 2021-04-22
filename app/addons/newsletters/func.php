@@ -14,6 +14,8 @@
 
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -109,7 +111,7 @@ function fn_get_mailing_list_data($list_id, $lang_code = CART_LANGUAGE)
 // returns newsletter bodies with rewritten links
 function fn_rewrite_links($body_html, $newsletter_id, $campaign_id)
 {
-    $regex = "/href=('|\")((?:http|ftp|https):\/\/[\w-\.]+[?]?[-\w:\+?\/?\.\=%&;~\[\]]+)/i";
+    $regex = "/href=('|\")((?:http|ftp|https):\/\/[\w\.-]+[?]?[-\w:\+?\/?\.\=%&;~\[\]]+)/i";
     $url = fn_url('newsletters.track', 'C', 'http');
 
     $body_html = preg_replace_callback($regex, function($matches) use ($url, $newsletter_id, $campaign_id) {
@@ -270,6 +272,125 @@ function fn_get_mailing_lists($params = array(), $items_per_page = 0, $lang_code
 }
 
 /**
+ * Gets all recipients for newsletters
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function fn_newsletters_get_recipients(array $params)
+{
+    $list_recipients = $user_recipients = $abandoned_recipients = [];
+
+    if (!empty($params['mailing_lists'])) {
+        $list_recipients = db_get_array(
+            'SELECT 0 as user_id, subscribers.email, subscribers.lang_code, mailing_lists.list_id , subscribers.subscriber_id FROM ?:subscribers AS subscribers'
+            . ' LEFT JOIN ?:user_mailing_lists AS user_mailing_lists'
+                . ' ON subscribers.subscriber_id = user_mailing_lists.subscriber_id'
+            . ' LEFT JOIN ?:mailing_lists AS mailing_lists'
+                . ' ON user_mailing_lists.list_id = mailing_lists.list_id'
+            . ' WHERE user_mailing_lists.list_id IN (?n)'
+                . ' AND (user_mailing_lists.confirmed = ?i OR mailing_lists.register_autoresponder = ?i)'
+                . ' AND mailing_lists.status IN (?a)'
+            . ' GROUP BY subscribers.subscriber_id',
+            $params['mailing_lists'],
+            1, 0,
+            [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN]
+        );
+    }
+
+    if (!empty($params['users'])) {
+        $users = fn_explode(',', $params['users']);
+        $user_recipients = db_get_array('SELECT users.user_id, users.email, users.lang_code, NULL as list_id, NULL as subscriber_id FROM ?:users AS users WHERE users.user_id IN (?n)', $users);
+    }
+
+    if (!empty($params['abandoned_days'])) {
+        $time = time() - (intval($params['abandoned_days']) * 24 * 60 * 60); // X days * 24 hours * 60 mins * 60 secs;
+        $condition = db_quote('AND user_session_products.timestamp <= ?i', $time);
+        if ($params['abandoned_type'] == 'cart') {
+            $condition .= db_quote(' AND user_session_products.type = ?s', 'C');
+        } elseif ($params['abandoned_type'] == 'wishlist') {
+            $condition .= db_quote(' AND user_session_products.type = ?s', 'W');
+        }
+
+        if (fn_allowed_for('ULTIMATE') && !empty($params['abandoned_company_id'])) {
+            $condition .= db_quote(' AND user_session_products.company_id = ?i', $params['abandoned_company_id']);
+        }
+
+        $abandoned_recipients = db_get_array(
+            'SELECT users.user_id, users.email, users.lang_code, NULL as list_id, NULL as subscriber_id FROM ?:users AS users'
+            . ' LEFT JOIN ?:user_session_products AS user_session_products'
+                . ' ON (users.user_id = user_session_products.user_id)'
+            . ' WHERE 1=1 ?p'
+            . ' GROUP BY users.user_id',
+            $condition
+        );
+    }
+
+    return array_merge($list_recipients, $user_recipients, $abandoned_recipients);
+}
+
+/**
+ * Gets send list from DB
+ *
+ * @param string    $key
+ * @param int       $limit
+ * @param int       $offset
+ *
+ * @return array
+ */
+function fn_newsletters_get_send_list($key, $limit, $offset)
+{
+    $limit = db_quote(' LIMIT ?i', $limit);
+    $offset = db_quote(' OFFSET ?i', $offset);
+
+    return db_get_hash_multi_array(
+        'SELECT newsletter_batch_recipients.*, ?:mailing_lists.from_name, ?:mailing_lists.from_email, ?:mailing_lists.reply_to'
+        . ' FROM ?:newsletter_batch_recipients as newsletter_batch_recipients'
+        . ' LEFT JOIN ?:mailing_lists on newsletter_batch_recipients.list_id = ?:mailing_lists.list_id'
+        . ' WHERE send_key = ?s'
+        . ' ?p ?p',
+        ['newsletter_id', 'send_list_id'],
+        $key,
+        $limit, $offset
+    );
+}
+
+/**
+ * Drops newsletter batch queue by key
+ *
+ * @param string $key
+ */
+function fn_newsletters_drop_newsletter_batch($key)
+{
+    db_query('DELETE FROM ?:newsletter_batch_recipients WHERE send_key = ?s', $key);
+}
+
+/**
+ * Add recipients to newsletter batch queue
+ *
+ * @param array $recipient_list
+ */
+function fn_newsletters_add_batch_recipients(array $recipient_list)
+{
+    $recipient_list_chunks = array_chunk($recipient_list, 500);
+
+    foreach ($recipient_list_chunks as $recipient_list_chunk) {
+        $recipient_list_chunk = array_map(static function ($recipient) {
+            // replace null values of list ID and subscriber ID for manually added subscribers
+            if (!isset($recipient['list_id'])) {
+                $recipient['list_id'] = 0;
+            }
+            if (!isset($recipient['subscriber_id'])) {
+                $recipient['subscriber_id'] = 0;
+            }
+            return $recipient;
+        }, $recipient_list_chunk);
+        db_query('INSERT INTO ?:newsletter_batch_recipients ?m', $recipient_list_chunk);
+    }
+}
+
+/**
 * Save user mailing lists settings.
 *
 * @param int $subscriber_id
@@ -296,7 +417,7 @@ function fn_update_subscriptions($subscriber_id, $user_list_ids = array(), $conf
             }
         }
 
-        $all_lists = fn_array_column($lists, 'list_id');
+        $all_lists = array_column($lists, 'list_id');
 
         foreach ($user_list_ids as $list_id) {
             $subscribed = db_get_array("SELECT confirmed FROM ?:user_mailing_lists WHERE subscriber_id = ?i AND list_id = ?i", $subscriber_id, $list_id);
@@ -747,7 +868,8 @@ function fn_update_subscriber($subscriber_data, $subscriber_id = 0)
     }
 
     fn_update_subscriptions($subscriber_id, $subscriber_data['list_ids'], isset($subscriber_data['confirmed']) ? $subscriber_data['confirmed'] : $subscriber_data['mailing_lists'], fn_get_notification_rules($subscriber_data), $subscriber_data['lang_code']);
-// [cs-market] do not show notification.
+
+//     [cs-market] do not show notification.
 //     if (!empty($invalid_emails)) {
 //         fn_set_notification('E', __('error'), __('error_invalid_emails', array(
 //             '[emails]' => implode(', ', $invalid_emails)
@@ -799,4 +921,100 @@ function fn_gdpr_newsletters_update_subscriptions_post($subscriber_id, $user_lis
 
         fn_gdpr_save_user_agreement($params, 'newsletters_subscribe');
     }
+}
+
+/**
+ * Hook handler for Recaptcha verification
+ */
+function fn_newsletters_settings_variants_image_verification_use_for(&$objects)
+{
+    $objects['newsletters'] = __('newsletters.use_for_subscribe_form');
+}
+
+/**
+ * Creates default mailing list
+ *
+ * @return int
+ */
+function fn_newsletters_create_default_mailing_list()
+{
+    $data = [
+        'name'                   => __('newsletters.default_mailing_list'),
+        'from_name'              => '',
+        'from_email'             => Registry::get('settings.Company.company_users_department'),
+        'reply_to'               => Registry::get('settings.Company.company_users_department'),
+        'register_autoresponder' => false,
+        'show_on_checkout'       => false,
+        'show_on_registration'   => false,
+        'status'                 => ObjectStatuses::ACTIVE,
+    ];
+
+    return fn_update_mailing_list($data, 0, DESCR_SL);
+}
+
+/**
+ * Updates/creates mailing list
+ *
+ * @param array<string, string|int|bool|array> $mailing_list_data Mailing list data
+ * @param int                                  $list_id           Mailing list identifier
+ * @param string                               $lang_code         Two-letter language code
+ *
+ * @return int
+ */
+function fn_update_mailing_list(array $mailing_list_data, $list_id, $lang_code = DESCR_SL)
+{
+    if (empty($list_id)) {
+        $list_id = db_query('INSERT INTO ?:mailing_lists ?e', $mailing_list_data);
+
+        $_data = $mailing_list_data;
+        $_data['object_id'] = $list_id;
+        $_data['object_holder'] = 'mailing_lists';
+        $_data['object'] = $_data['name'];
+
+        $languages = array_keys(Languages::getAll());
+
+        foreach ($languages as $_data['lang_code']) {
+            db_query('REPLACE INTO ?:common_descriptions ?e', $_data);
+        }
+    } else {
+        db_query('UPDATE ?:mailing_lists SET ?u WHERE list_id = ?i', $mailing_list_data, $list_id);
+
+        $_data = $mailing_list_data;
+        $_data['object_id'] = $list_id;
+        $_data['object_holder'] = 'mailing_lists';
+        $_data['object'] = $_data['name'];
+
+        $_where = [
+            'object_id'     => $list_id,
+            'object_holder' => 'mailing_lists',
+            'lang_code'     => $lang_code
+        ];
+
+        db_query('UPDATE ?:common_descriptions SET ?u WHERE ?w', $_data, $_where);
+    }
+
+    if (!empty($mailing_list_data['add_subscribers'])) {
+        foreach ((array) $mailing_list_data['add_subscribers'] as $subscriber) {
+            $subscriber_id = db_get_field('SELECT subscriber_id FROM ?:subscribers WHERE email = ?s', $subscriber['email']);
+
+            // check if subscriber exists already
+            if (!$subscriber_id) {
+                $_data = $subscriber;
+                $_data['timestamp'] = TIME;
+                $subscriber_id  = db_query('INSERT INTO ?:subscribers ?e', $_data);
+            }
+
+            // mark mailing list as active for this subscriber
+            $_data = [
+                'subscriber_id' => $subscriber_id,
+                'list_id'       => $list_id,
+                'confirmed'     => $subscriber['confirmed'],
+                'timestamp'     => TIME
+            ];
+
+            db_replace_into('user_mailing_lists', $_data);
+        }
+    }
+
+    return (int) $list_id;
 }

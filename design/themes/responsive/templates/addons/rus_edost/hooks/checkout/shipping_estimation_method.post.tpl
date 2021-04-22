@@ -12,7 +12,16 @@
             <div class="ty-checkout-select-terminals">
                 {foreach from=$shipping.data.office item=office}
                     <div class="ty-one-office">
-                        <input type="radio" name="select_office[{$group_key}][{$shipping.shipping_id}]" value="{$office.office_id}" {if $old_office_id == $office.office_id || $office_count == 1}checked="checked"{/if} id="office_{$group_key}_{$shipping.shipping_id}_{$office.office_id}" class="ty-office-radio" >
+                        <input type="radio"
+                            name="select_office[{$group_key}][{$shipping.shipping_id}]"
+                            value="{$office.office_id}"
+                            {if $old_office_id == $office.office_id || $office_count == 1}checked="checked"{/if}
+                            id="office_{$group_key}_{$shipping.shipping_id}_{$office.office_id}"
+                            class="ty-office-radio"
+                            data-ca-pickup-select-office="true"
+                            data-ca-shipping-id="{$shipping.shipping_id}"
+                            data-ca-group-key="{$group_key}"
+                            data-ca-location-id="{$office.office_id}">
                         <div class="ty-one-office__label">
                             <label for="office_{$group_key}_{$shipping.shipping_id}_{$office.office_id}" >
                                 <p class="ty-one-office__name">{$office.name}</p>

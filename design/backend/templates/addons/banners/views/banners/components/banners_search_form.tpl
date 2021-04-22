@@ -34,9 +34,11 @@
             <label for="elm_type">{__("type")}</label>
             <div class="controls">
                 <select name="type" id="elm_type">
+                    {hook name="banners:search_form_banner_type"}
                     <option value="">{__("all")}</option>
                     <option {if $search.type == "G"}selected="selected"{/if} value="G">{__("graphic_banner")}</option>
                     <option {if $search.type == "T"}selected="selected"{/if} value="T">{__("text_banner")}</option>
+                    {/hook}
                 </select>
             </div>
         </div>

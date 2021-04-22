@@ -12,7 +12,8 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
+use Tygh\Addons\ProductVariations\ServiceProvider;
+use Tygh\Addons\ProductVariations\Product\Type\Type;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -21,29 +22,46 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
  */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if ($mode === 'delete_file') {
-        /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-        $product_manager = Tygh::$app['addons.product_variations.product.manager'];
+    if ($mode === 'm_update') {
+        $products_variation_feature_values = isset($_REQUEST['products_variation_feature_values']) ? (array) $_REQUEST['products_variation_feature_values'] : [];
+        $variation_group = isset($_REQUEST['variation_group']['id'], $_REQUEST['variation_group']['code']) ? (array) $_REQUEST['variation_group'] : [];
 
-        $product_id = isset($_REQUEST['product_id']) ? (int) $_REQUEST['product_id'] : 0;
-        $file_id = isset($_REQUEST['file_id']) ? (int) $_REQUEST['file_id'] : 0;
+        if ($variation_group) {
+            $service = ServiceProvider::getService();
 
-        if ($product_id && $file_id) {
-            $product_type = $product_manager->getProductFieldValue($product_id, 'product_type');
+            $result = $service->updateGroupCode($variation_group['id'], $variation_group['code']);
+            $result->showNotifications();
+        }
 
-            if ($product_type === ProductManager::PRODUCT_TYPE_CONFIGURABLE) {
-                $cnt = fn_product_variations_get_product_files_count($product_id, 'A', array($file_id));
 
-                if (empty($cnt)) {
-                    fn_set_notification('E', __('error'), __('product_variations.error.configurable_product_must_have_file'));
+        if ($products_variation_feature_values) {
+            $group_product_feature_values = [];
+            $product_ids = array_keys($products_variation_feature_values);
 
-                    return array(CONTROLLER_STATUS_REDIRECT, fn_url('products.update?product_id=' . $product_id . '&selected_section=files'));
+            $group_repository = ServiceProvider::getGroupRepository();
+            $service = ServiceProvider::getService();
+
+            $group_ids = $group_repository->findGroupIdsByProductIds($product_ids);
+
+            foreach ($products_variation_feature_values as $product_id => $feature_values) {
+                if (empty($group_ids[$product_id])) {
+                    continue;
                 }
+
+                $group_id = (int) $group_ids[$product_id];
+
+                $group_product_feature_values[$group_id][$product_id] = $feature_values;
+            }
+
+            foreach ($group_product_feature_values as $group_id => $product_feature_values) {
+                $result = $service->changeProductsFeatureValues($group_id, $product_feature_values);
+
+                $result->showNotifications();
             }
         }
     }
 
-    return array(CONTROLLER_STATUS_OK);
+    return [CONTROLLER_STATUS_OK];
 }
 
 if ($mode === 'update'
@@ -51,9 +69,10 @@ if ($mode === 'update'
     && defined('AJAX_REQUEST')
     && isset($_REQUEST['product_id'])
 ) {
-    /** @var \Tygh\Addons\ProductVariations\Product\Manager $product_manager */
-    $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-    $product_type = $product_manager->getProductTypeInstanceByProductId($_REQUEST['product_id']);
+    $product_repository = ServiceProvider::getProductRepository();
+    $product_data = $product_repository->findProduct($_REQUEST['product_id']);
 
-    Tygh::$app['view']->assign('product_type', $product_type);
+    if ($product_data) {
+        Tygh::$app['view']->assign('product_type', Type::createByProduct($product_data));
+    }
 }

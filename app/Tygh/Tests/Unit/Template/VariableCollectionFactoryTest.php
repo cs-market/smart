@@ -4,6 +4,7 @@
 namespace Tygh\Tests\Unit\Template;
 
 
+use Tygh\Enum\SiteArea;
 use Tygh\Template\IContext;
 use Tygh\Template\VariableCollectionFactory;
 
@@ -82,5 +83,13 @@ class VariableCollectionFactoryTestContext implements IContext
     public function getLangCode()
     {
         return 'en';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArea()
+    {
+        return 'A';
     }
 }

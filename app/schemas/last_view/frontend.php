@@ -16,34 +16,30 @@ use Tygh\Registry;
 
 include_once(Registry::get('config.dir.schemas') . 'last_view/frontend.functions.php');
 
-return array (
-    'products' => array (
+return [
+    'products'         => [
         'list_mode' => 'search',
         'view_mode' => 'quick_view',
-        'default_navigation' => array (
-            'mode' => 'view',
-            'function' => 'fn_lv_get_product_default_navigation'
-        ),
-        'func' => 'fn_get_products',
-        'item_id' => 'product_id'
-    ),
-    'categories' => array (
-        'list_mode' => 'view',
+        'func'      => 'fn_get_products',
+        'item_id'   => 'product_id'
+    ],
+    'categories'       => [
+        'list_mode'       => 'view',
         'view_controller' => 'products',
-        'func' => 'fn_get_products',
-        'item_id' => 'product_id'
-    ),
-    'orders' => array (
-        'list_mode' => 'search',
-        'func' => 'fn_get_orders',
-        'item_id' => 'order_id',
-        'links_label' => 'order',
+        'func'            => 'fn_get_products',
+        'item_id'         => 'product_id'
+    ],
+    'orders'           => [
+        'list_mode'    => 'search',
+        'func'         => 'fn_get_orders',
+        'item_id'      => 'order_id',
+        'links_label'  => 'order',
         'show_item_id' => true,
-    ),
-    'product_features' => array (
-        'list_mode' => 'view',
+    ],
+    'product_features' => [
+        'list_mode'       => 'view',
         'view_controller' => 'products',
-        'func' => 'fn_get_products',
-        'item_id' => 'product_id'
-    ),
-);
+        'func'            => 'fn_get_products',
+        'item_id'         => 'product_id'
+    ],
+];

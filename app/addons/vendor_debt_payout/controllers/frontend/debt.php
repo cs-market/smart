@@ -25,6 +25,10 @@ if ($mode == 'pay') {
     $auth = &Tygh::$app['session']['auth'];
     $vendor_id = $auth['company_id'];
 
+    if (empty($vendor_id)) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
     unset($auth['act_as_user']);
 
     fn_clear_cart($cart, true);
@@ -32,49 +36,56 @@ if ($mode == 'pay') {
 
     $product_id = fn_vendor_debt_payout_get_payout_product();
 
-    $payouts_manager = VendorPayouts::instance(array('vendor' => $vendor_id));
-    list($balance,) = $payouts_manager->getBalance();
+    $payouts_manager = VendorPayouts::instance(['vendor' => $vendor_id]);
 
-    if ($balance < 0) {
-        $product_cost = -$balance;
-    } elseif (fn_vendor_debt_payout_is_vendor_plans_addon_active()) {
-        $pending_payouts = fn_vendor_debt_payout_get_pending_vendor_plan_payouts($payouts_manager);
-        $product_cost = array_reduce($pending_payouts, function ($carry, $item) {
-            return $carry + $item['payout_amount'];
-        }, 0);
+    if (
+        !empty($_REQUEST['refill_amount'])
+        && is_numeric($_REQUEST['refill_amount'])
+    ) {
+        $product_cost = $_REQUEST['refill_amount'];
+    } else {
+        list($balance,) = $payouts_manager->getBalance();
+
+        if ($balance < 0) {
+            $product_cost = -$balance;
+        }
     }
 
-    $product_extra = array(
-        'vendor_debt_payout' => array(
+    if (empty($product_cost)) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+    $product_extra = [
+        'vendor_debt_payout' => [
             'vendor_id' => $vendor_id,
-        ),
-    );
+        ],
+    ];
 
     fn_add_product_to_cart(
-        array(
-            $product_id => array(
+        [
+            $product_id => [
                 'product_id'      => $product_id,
                 'amount'          => 1,
                 'price'           => $product_cost,
-                'product_options' => array(),
+                'product_options' => [],
                 'stored_price'    => 'Y',
                 'stored_discount' => 'Y',
                 'discount'        => 0,
                 'company_id'      => 0,
                 'extra'           => $product_extra,
-            ),
-        ),
+            ],
+        ],
         $cart,
         $auth
     );
 
-    list($status, $redirect_params) = fn_checkout_update_steps($cart, $auth, array(
+    list(, $redirect_params) = fn_checkout_update_steps($cart, $auth, [
         'update_step' => 'step_three',
         'next_step'   => 'step_four',
-    ));
+    ]);
 
-    return array(
+    return [
         CONTROLLER_STATUS_REDIRECT,
-        Url::buildUrn(array('checkout', 'checkout'), $redirect_params),
-    );
+        Url::buildUrn(['checkout', 'checkout'], $redirect_params),
+    ];
 }

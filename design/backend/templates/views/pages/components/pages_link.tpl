@@ -2,6 +2,7 @@
     <label for="page_link" class="control-label cm-required">{__("page_target_url")}:</label>
     <div class="controls">
         <input type="text" name="page_data[link]" id="page_link" size="55" value="{$page_data.link}" class="input-large" />
+        <p class="muted description">{__("tt_views_pages_components_pages_link_page_target_url")}</p>
     </div>
 </div>
 
@@ -10,6 +11,7 @@
         <label for="elm_customer_url" class="control-label">{__("page_url")}:</label>
         <div class="controls">
             <input type="text" id="elm_customer_url" size="55" value="{"pages.view?page_id=`$id`"|fn_url:"C"}" class="input-large" readonly="readonly" />
+            <p class="muted description">{__("tt_views_pages_components_pages_link_page_url")}</p>
         </div>
     </div>
 {/if}

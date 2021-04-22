@@ -103,14 +103,15 @@ class Type implements IType, IPreviewableType, IIncludableType
     /**
      * Render order document.
      *
-     * @param Order      $order      Instance of order.
-     * @param Document   $document   Instance of document template.
+     * @param Order    $order    Instance of order.
+     * @param Document $document Instance of document template.
+     * @param string   $area     One-letter site area identifier
      *
      * @return string
      */
-    public function render(Order $order, Document $document)
+    public function render(Order $order, Document $document, $area = AREA)
     {
-        $context = new Context($order);
+        $context = new Context($order, $area);
         $variable_collection = $this->collection_factory->createCollection(self::SCHEMA_DIR, $this->getCode(), $context);
 
         return $this->renderer->renderTemplate($document, $context, $variable_collection);
@@ -123,16 +124,17 @@ class Type implements IType, IPreviewableType, IIncludableType
      * @param string $code          Template code.
      * @param string $lang_code     Language code.
      * @param string $currency_code Currency code
+     * @param string $area          One-letter site area identifier
      *
      * @return string
      */
-    public function renderById($order_id, $code, $lang_code, $currency_code = '')
+    public function renderById($order_id, $code, $lang_code, $currency_code = '', $area = AREA)
     {
         $order = new Order($order_id, $lang_code, $currency_code);
         $document = $this->repository->findByTypeAndCode($this->getCode(), $code);
 
         if ($order->data && $document) {
-            return $this->render($order, $document);
+            return $this->render($order, $document, $area);
         }
 
         return '';

@@ -20,7 +20,7 @@
 </div>
 <div class="sidebar-field">
     <label for="fname">{__("group")}:</label>
-    <input type="text" name="description" id="fname" value="{$search.description}" size="30" />
+    <input type="text" name="internal_name" id="fname" value="{$search.internal_name}" size="30" />
 </div>
 <div class="sidebar-field">
     <input class="btn" type="submit" name="dispatch[{$dispatch}]" value="{__("search")}">

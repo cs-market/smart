@@ -25,5 +25,7 @@ fn_register_hooks(
     'delete_product_pre',
     'update_cart_products_post',
     'update_cart_products_pre',
-    'init_product_tabs_post'
+    'init_product_tabs_post',
+    ['buy_together_update_chain_post', '', 'product_variations'],
+    ['buy_together_delete_chain_post', '', 'product_variations']
 );

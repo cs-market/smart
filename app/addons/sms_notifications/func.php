@@ -67,7 +67,7 @@ function fn_sms_notifications_place_order(&$order_id, &$action, &$fake1, &$cart)
 function fn_sms_notifications_update_profile(&$action, &$user_data)
 {
     if ($action == 'add' && AREA == 'C' && Registry::get('addons.sms_notifications.sms_new_cusomer_registered') == 'Y') {
-        Tygh::$app['view']->assign('customer', $user_data['firstname'] . (empty($user_data['lastname']) ? '' : $user_data['lastname']));
+        Tygh::$app['view']->assign('customer', $user_data['email']);
         $body = Tygh::$app['view']->fetch('addons/sms_notifications/views/sms/components/new_profile_sms.tpl');
         fn_send_sms_notification($body);
     }
@@ -87,13 +87,16 @@ function fn_sms_notifications_update_product_amount(&$new_amount, &$product_id)
 
 function fn_send_sms_notification($body)
 {
-    $access_data = fn_get_sms_auth_data();
-    $to = Registry::get('addons.sms_notifications.phone_number');
-    if (fn_is_empty($access_data) || empty($to)) {
+    $addon_settings = Registry::get('addons.sms_notifications');
+    $api_key        = $addon_settings['clickatel_api_id'];
+    $to             = $addon_settings['phone_number'];
+    $concat         = $addon_settings['clickatel_concat'];
+    $unicode        = $addon_settings['clickatel_unicode'] == 'Y' ? 1 : 0;
+
+    if (fn_is_empty($api_key) || empty($to)) {
         return false;
     }
 
-    $concat = Registry::get('addons.sms_notifications.clickatel_concat');
     //get the last symbol
     if (!empty($concat)) {
         $concat = intval($concat[strlen($concat)-1]);
@@ -101,14 +104,6 @@ function fn_send_sms_notification($body)
     if (!in_array($concat, array('1', '2', '3'))) {
         $concat = 1;
     }
-    $data = array('user' => $access_data['login'],
-                  'password' => $access_data['password'],
-                  'api_id' => $access_data['api_id'],
-                  'to' => $to,
-                  'concat' => $concat,
-    );
-
-    $unicode = Registry::get('addons.sms_notifications.clickatel_unicode') == 'Y' ? 1 : 0;
 
     $sms_length = $unicode ? SMS_NOTIFICATIONS_SMS_LENGTH_UNICODE : SMS_NOTIFICATIONS_SMS_LENGTH;
     if ($concat > 1) {
@@ -118,22 +113,13 @@ function fn_send_sms_notification($body)
 
     $body = html_entity_decode($body, ENT_QUOTES, 'UTF-8');
     $body = fn_substr($body, 0, $sms_length);
+    $body = strip_tags($body);
 
-    if ($unicode) {
-        $data['unicode'] = '1';
+    $data = array(
+        'apiKey'  => $api_key,
+        'to'      => $to,
+        'content' => $body,
+    );
 
-        $body = fn_convert_encoding('UTF-8', 'UCS-2', $body);
-        $body = bin2hex($body);
-    }
-
-    $data['text'] = $body;
-
-    Http::get('http://api.clickatell.com/http/sendmsg', $data);
-}
-
-function fn_get_sms_auth_data()
-{
-     return array('login' => Registry::get('addons.sms_notifications.clickatel_user'),
-                  'password' => Registry::get('addons.sms_notifications.clickatel_password') ,
-                  'api_id' => Registry::get('addons.sms_notifications.clickatel_api_id'));
+    Http::get(SMS_NOTIFICATIONS_API_URL, $data);
 }

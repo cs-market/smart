@@ -12,11 +12,6 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-use Tygh\Registry;
-use Tygh\Mailer;
-use Tygh\Storage;
-
-
 if ($mode == 'details') {
     $status = fn_yandex_delivery_get_order_statuses($_REQUEST['order_id']);
 

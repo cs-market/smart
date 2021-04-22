@@ -1,6 +1,9 @@
 {if $is_refund == "Y" && $order_info.payment_method.processor_id|fn_is_paypal_processor}
 <div class="control-group notify-department">
-    <label class="control-label" for="elm_paypal_perform_refund">{__("addons.paypal.rma.perform_refund")}</label>
+    <label class="control-label" for="elm_paypal_perform_refund">
+        {__("addons.paypal.rma.perform_refund")}
+        <p class="muted description">{__("ttc_addons.paypal.rma.perform_refund")}</p>
+    </label>
     <div class="controls">
         {if $return_info.return_id|fn_is_paypal_refund_performed}
             <p class="label label-success">{__("refunded")}</p>

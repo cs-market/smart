@@ -23,24 +23,24 @@ use Tygh\Template\IContext;
 use Tygh\Template\Snippet\Service as SnippetService;
 use Tygh\Template\Renderer as BaseRenderer;
 use Tygh\Tygh;
-use Twig_Function_Method;
-use Twig_Filter_Method;
-use Twig_Extension;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
  * The extension class for the Twig template engine, that implements basic filters and functions.
  * @package Tygh\Twig
  */
-class TwigCoreExtension extends Twig_Extension
+class TwigCoreExtension extends AbstractExtension
 {
     /** @inheritdoc */
     public function getFilters()
     {
         return array(
-            'date' => new Twig_Filter_Method($this, 'dateFilter'),
-            'price' => new Twig_Filter_Method($this, 'priceFilter'),
-            'filesize' => new Twig_Filter_Method($this, 'filesizeFilter'),
-            'puny_decode' => new Twig_Filter_Method($this, 'punyDecodeFilter')
+            new TwigFilter('date', [$this, 'dateFilter']),
+            new TwigFilter('price', [$this, 'priceFilter']),
+            new TwigFilter('filesize', [$this, 'filesizeFilter']),
+            new TwigFilter('puny_decode', [$this, 'punyDecodeFilter'])
         );
     }
 
@@ -48,18 +48,18 @@ class TwigCoreExtension extends Twig_Extension
     public function getFunctions()
     {
         return array(
-            '__' => new Twig_Function_Method($this, 'translateFunction', array(
+            new TwigFunction('__', [$this, 'translateFunction'], [
                 'needs_environment' => true,
-                'needs_context' => true
-            )),
-            'snippet' => new Twig_Function_Method($this, 'snippetFunction', array(
+                'needs_context'     => true
+            ]),
+            new TwigFunction('snippet', [$this, 'snippetFunction'], [
                 'needs_environment' => true,
-                'needs_context' => true
-            )),
-            'include_doc' => new Twig_Function_Method($this, 'includeDocFunction', array(
+                'needs_context'     => true
+            ]),
+            new TwigFunction('include_doc', [$this, 'includeDocFunction'], [
                 'needs_environment' => true,
-                'needs_context' => true
-            ))
+                'needs_context'     => true
+            ]),
         );
     }
 
@@ -137,7 +137,7 @@ class TwigCoreExtension extends Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $env
+     * @param  \Twig\Environment $env          Twig configuration
      * @param string $context
      * @param string $name
      * @param array $placeholders

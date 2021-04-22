@@ -115,10 +115,13 @@ class File extends ABackend
     /**
      * Get file URL
      *
-     * @param  string $file file to get URL
+     * @param string $file     File to get URL
+     * @param string $protocol Protocol (http, https or short)
+     * @param string $url      Storefront URL
+     *
      * @return string file URL
      */
-    public function getUrl($file = '', $protocol = '')
+    public function getUrl($file = '', $protocol = '', $url = '')
     {
         if (strpos($file, '://') !== false) {
             return $file;
@@ -127,11 +130,11 @@ class File extends ABackend
         $is_cdn = ($this->getOption('cdn') && Cdn::instance()->getOption('is_enabled'));
 
         if ($is_cdn) {
-            if ($protocol == 'http') {
+            if ($protocol === 'http') {
                 $prefix = 'http:';
-            } elseif ($protocol == 'https') {
+            } elseif ($protocol === 'https') {
                 $prefix = 'https:';
-            } elseif ($protocol == 'short') {
+            } elseif ($protocol === 'short') {
                 $prefix = '';
             } else {
                 $prefix = defined('HTTPS') ? 'https:' : 'http:';
@@ -144,14 +147,24 @@ class File extends ABackend
                 $protocol = fn_get_console_protocol(AREA);
             }
 
-            if ($protocol == 'http') {
-                $prefix = Registry::get('config.http_location');
-            } elseif ($protocol == 'https') {
-                $prefix = Registry::get('config.https_location');
-            } elseif ($protocol == 'short') {
-                $prefix = '//' . Registry::get('config.http_host') . Registry::get('config.http_path'); // FIXME
+            if ($url) {
+                if ($protocol === 'http' || $protocol === 'https') {
+                    $prefix = $protocol . '://' . $url;
+                } elseif ($protocol === 'short') {
+                    $prefix = '//' . $url;
+                } else {
+                    $prefix = fn_get_storefront_protocol() . '://' . $url;
+                }
             } else {
-                $prefix = Registry::get('config.current_location');
+                if ($protocol === 'http') {
+                    $prefix = Registry::get('config.http_location');
+                } elseif ($protocol === 'https') {
+                    $prefix = Registry::get('config.https_location');
+                } elseif ($protocol === 'short') {
+                    $prefix = '//' . Registry::get('config.http_host') . Registry::get('config.http_path'); // FIXME
+                } else {
+                    $prefix = Registry::get('config.current_location');
+                }
             }
         }
 

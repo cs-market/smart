@@ -12,7 +12,11 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Addons\VendorPlans\ServiceProvider;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
+Tygh::$app->register(new ServiceProvider());
 
 fn_register_hooks(
     'get_companies',
@@ -33,5 +37,10 @@ fn_register_hooks(
     'rma_update_details_create_payout',
     'process_paypal_ipn_create_payout',
     'vendor_payouts_get_list',
-    'vendor_payouts_get_income'
+    'vendor_payouts_get_income',
+    'vendor_data_premoderation_diff_company_data_post',
+    'get_profile_fields_post',
+    'vendor_payouts_update',
+    'storefront_repository_delete_post',
+    'get_products_pre'
 );

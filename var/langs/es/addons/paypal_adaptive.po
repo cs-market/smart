@@ -5,19 +5,19 @@ msgstr ""
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: es-ES\n"
-"X-Crowdin-File: /release-4.8.2/addons/paypal_adaptive.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:11\n"
+"X-Crowdin-File: /release-4.12.2/addons/paypal_adaptive.po\n"
+"X-Crowdin-File-ID: 4110\n"
+"PO-Revision-Date: 2021-02-01 09:13\n"
 
 msgctxt "Addons::name::paypal_adaptive"
 msgid "PayPal Adaptive Payments [Deprecated]"
 msgstr ""
 
 msgctxt "Addons::description::paypal_adaptive"
-msgid "Adaptive Payments can't be used for new integrations. We recommend using the <b>PayPal for Marketplaces</b> add-on instead.<br />This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal."
+msgid "This add-on will help root store administrators to distribute funds automatically among multiple vendors through PayPal. Only existing PayPal Adaptive clients can use this add-on. We recommend you to use the PayPal Commerce Platform add-on instead."
 msgstr ""
 
 msgctxt "Languages::paypal_api_username"
@@ -36,13 +36,17 @@ msgctxt "Languages::paypal_adaptive.paypal_email"
 msgid "PayPal Business Account email"
 msgstr "Correo electrónico de la cuenta de negocios de PayPal"
 
+msgctxt "Languages::paypal_adaptive.vendor.paypal_email"
+msgid "PayPal Account email"
+msgstr ""
+
 msgctxt "Languages::pp_adaptive_payments"
 msgid "PayPal Adaptive Payments"
-msgstr "Pagos adaptados de PayPal"
+msgstr "Pagos adaptativos de PayPal"
 
 msgctxt "Languages::primary_email"
 msgid "PayPal Primary account email"
-msgstr "Correo electrónico de cuenta principal de PayPal"
+msgstr "Correo electrónico de la cuenta principal de PayPal"
 
 msgctxt "Languages::processing_payment_for_order"
 msgid "Processing Payment for order"
@@ -62,7 +66,7 @@ msgstr "Pago"
 
 msgctxt "Languages::paypal_adaptive_progress_payment_order"
 msgid "Progress pay orders"
-msgstr "Órdenes de pago de progreso"
+msgstr "Órdenes de pago en proceso"
 
 msgctxt "Languages::paypal_adaptive_paid"
 msgid "Paid"
@@ -70,7 +74,7 @@ msgstr "Pagado"
 
 msgctxt "Languages::paypal_adaptive_cancel"
 msgid "Return to checkout"
-msgstr "Volver al chequeo"
+msgstr "Regresar para retirar fondos"
 
 msgctxt "Languages::paypal_adaptive_type_payments"
 msgid "PayPal payments type"
@@ -86,19 +90,19 @@ msgstr "Encadenado"
 
 msgctxt "Languages::order_subtotal"
 msgid "Order subtotal"
-msgstr "Pedido subtotal"
+msgstr "Subtotal del pedido"
 
 msgctxt "Languages::paypal_adaptive_payer_fees"
 msgid "Payer fees"
-msgstr "Matricula de pagador"
+msgstr "Comisiones del comprador"
 
 msgctxt "Languages::paypal_adaptive_fees_eachreceiver"
 msgid "Each receiver"
-msgstr "Cada receptor"
+msgstr "Cada vendedor"
 
 msgctxt "Languages::paypal_adaptive_fees_primaryreceiver"
 msgid "Primary receiver"
-msgstr "Receptor primario"
+msgstr "Vendedor primario"
 
 msgctxt "Languages::paypal_adaptive_pending_payment"
 msgid "Pending payment"
@@ -193,8 +197,8 @@ msgid "Verified"
 msgstr "Verificado"
 
 msgctxt "Languages::paypal_adaptive_auto_info_data_verification"
-msgid "Use this link to get E-mail verification status of your vendors via CRON:"
-msgstr "Utilice este enlace para obtener el estado de verificación de correo electrónico de sus proveedores a través de CRON:"
+msgid "Use the following line to run the script to get E-mail verification status of your vendors according to schedule:"
+msgstr ""
 
 msgctxt "Languages::paypal_adaptive_statuses_updated_successfully"
 msgid "PayPal verification statuses have been updated successfully."
@@ -214,109 +218,117 @@ msgstr "Imagen de verificación PayPal"
 
 msgctxt "Languages::paypal_ver_image"
 msgid "Verification image"
-msgstr ""
+msgstr "Imagen de verificación"
 
 msgctxt "SettingsOptions::paypal_adaptive::paypal_verified_image_width"
 msgid "Image width"
-msgstr ""
+msgstr "Ancho de la imagen"
 
 msgctxt "SettingsOptions::paypal_adaptive::paypal_verified_image_height"
 msgid "Image height"
-msgstr ""
+msgstr "Altura de la imagen"
 
 msgctxt "Languages::verified_by_paypal"
 msgid "Verified by PayPal"
-msgstr ""
+msgstr "Verificado por PayPal"
 
 msgctxt "Languages::paypal_adaptive_error_wrong_cron_key"
 msgid "Error: Wrong cron key."
-msgstr ""
+msgstr "Error: Clave errada de cron."
 
 msgctxt "SettingsTooltips::paypal_adaptive::paypal_verified_image_width"
 msgid "The width of the verified image."
-msgstr ""
+msgstr "El ancho de la imagen verificado."
 
 msgctxt "SettingsTooltips::paypal_adaptive::paypal_verified_image_height"
 msgid "The height of the verified image."
-msgstr ""
+msgstr "La altura de la imagen verificada."
 
 msgctxt "Languages::paypal_adaptive.tooltips.paypal_ver_image"
 msgid "The setting allows to display verification image instead of the text status at the product details page on the storefront. If an image is not uploaded, the status will be shown as text."
-msgstr ""
+msgstr "La configuración permite mostrar la verificación de la imagen en lugar del estado del texto en la página de los detalles del producto en la tienda, Si una imagen no se carga, el estado será mostrado como texto."
 
 msgctxt "Languages::paypal_emails_must_be_unique"
 msgid "The vendor with PayPal Adaptive E-mail you have chosen already exists, please try another."
-msgstr ""
+msgstr "El correo electrónico de la empresa con pagos adaptativos de PayPal ya existe, por favor intenta con otra dirección de correo electrónico."
 
 msgctxt "Languages::addons.paypal_adaptive.logo"
 msgid "PayPal Adaptive logo"
-msgstr ""
+msgstr "Logo de Paypal Adaptativo"
 
 msgctxt "Languages::ttc_addons.paypal_adaptive.logo"
 msgid "Use a valid graphics format, such as .gif, .jpg, or .png. Limit the image to 190 pixels wide by 60 pixels high. PayPal crops images that are larger. PayPal places your logo image at the top of the cart review area."
-msgstr ""
+msgstr "Utilice un formato gráfico válido, como .gif, .jpg, or .png. Adecuar el tamaño de la imagen a 190 pixeles de ancho por 60 pixeles de alto. PayPal recorta el tamaño de la imagen que excedan el tamaño. Paypal coloca su logo de la imagen en la parte superior de la revisión del carro de compra."
 
 msgctxt "Languages::ttc_paypal_email"
 msgid "The email of your PayPal Business Account. A Personal Account email won't work."
-msgstr ""
+msgstr "El correo electrónico de la cuenta de tu empresa de PayPal, Un correo electrónico de cuenta personal no funcionará."
 
 msgctxt "Languages::ttc_paypal_adaptive.paypal_email"
 msgid "The email of your PayPal Business Account. A Personal Account email won't work."
+msgstr "El correo electrónico de la cuenta de tu empresa de PayPal, Un correo electrónico de cuenta personal no funcionará."
+
+msgctxt "Languages::ttc_paypal_adaptive.vendor.paypal_email"
+msgid "The email of your PayPal account."
 msgstr ""
 
 msgctxt "Languages::addons.paypal_adaptive.paypal_workflow"
 msgid "PayPal workflow"
-msgstr ""
+msgstr "Flujo de pagos de PayPal"
 
 msgctxt "Languages::addons.paypal_adaptive.store_settings"
 msgid "Store settings"
-msgstr ""
+msgstr "Configuración de la tienda"
 
 msgctxt "Languages::addons.paypal_adaptive.paypal_credentials"
 msgid "PayPal credentials"
-msgstr ""
+msgstr "Credenciales de PayPal"
 
 msgctxt "Languages::addons.paypal_adaptive.commission_description_absolute"
 msgid "[amount] out of [sum]"
-msgstr ""
+msgstr "[amount] de [sum]"
 
 msgctxt "Languages::addons.paypal_adaptive.commission_description_percent"
 msgid "[amount]% of [sum]"
-msgstr ""
+msgstr "[amount] porcentaje de [sum]"
 
 msgctxt "Languages::addons.paypal_adaptive.withdrawal_for_the_order"
 msgid "Withdrawal for the order #[order_id]"
-msgstr ""
+msgstr "Retiro de la solicitud #[order_id]"
 
 msgctxt "Languages::addons.paypal_adaptive.payment_type_notice"
 msgid "Chained payments can't be used if the <a href=\"[url]\" target=\"_blank\">PayPal Adaptive Payments</a> add-on is configured to collect both order commission and unpaid payouts."
+msgstr "Los pagos encadenados no pueden ser utilizados si el<a href=\"[url]\" target=\"_blank\">complemento de Pagos Adaptativos de PayPal</a> está configurado para solicitar la comisión del pedido y las solicitudes sin cancelar al mismo tiempo."
+
+msgctxt "Languages::addons.paypal_adaptive.primary_email_notice"
+msgid "The email of your PayPal Business Account. A Personal Account email won't work."
 msgstr ""
 
 msgctxt "Languages::addons.paypal_adaptive.commission_includes"
 msgid "Commission includes"
-msgstr ""
+msgstr "La comisión incluye"
 
 msgctxt "Languages::addons.paypal_adaptive.order_commission"
 msgid "Order commission"
-msgstr ""
+msgstr "La comisión de la solicitud"
 
 msgctxt "Languages::addons.paypal_adaptive.order_commission_and_payouts"
 msgid "Order commission and unpaid payouts"
-msgstr ""
+msgstr "La comisión de la solicitud y de los pagos sin cancelar"
 
 msgctxt "Languages::addons.paypal_adaptive.first_name"
 msgid "PayPal account holder's first name"
-msgstr ""
+msgstr "Primer nombre del titular de la cuenta de PayPal"
 
 msgctxt "Languages::addons.paypal_adaptive.last_name"
 msgid "PayPal account holder's last name"
-msgstr ""
+msgstr "Apellido del titular de la cuenta de PayPal"
 
 msgctxt "Languages::ttc_addons.paypal_adaptive.first_name"
 msgid "Please enter the same first name as specified in your PayPal profile."
-msgstr ""
+msgstr "Por favor introduzca el mismo nombre que ha utilizado en su perfil de PayPal."
 
 msgctxt "Languages::ttc_addons.paypal_adaptive.last_name"
 msgid "Please enter the same last name as specified in your PayPal profile."
-msgstr ""
+msgstr "Por favor introduzca el mismo apellida que ha utilizado en su perfil de PayPal."
 

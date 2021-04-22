@@ -1,1 +1,0 @@
-{include file='blocks/product_filters/horizontal_filters.tpl'}

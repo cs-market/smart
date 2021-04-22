@@ -1,7 +1,6 @@
 <?php
 
 use Tygh\Enum\Addons\Paypal\Processors;
-use Tygh\Http;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -15,16 +14,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($mode == 'update' && ($action == 'paypal_signup_live' || $action == 'paypal_signup_test')) {
 
-        $data = $_REQUEST['payment_data'];
-
-        if (fn_allowed_for('ULTIMATE')) {
-            $company_id = Registry::get('runtime.company_id') ?: $data['company_id'];
-        } else {
-            $company_id = 0;
+        $company_id = 0;
+        if (isset($_REQUEST['payment_data']['company_id'])) {
+            $company_id = (int) $_REQUEST['payment_data']['company_id'];
         }
 
+        $company_id = (int) Registry::get('runtime.company_id') ?: $company_id;
+
         if (empty($_REQUEST['payment_id'])) {
-            $payment_id = max(array_keys(fn_get_payment_by_processor($data['processor_id'])));
+            $payment_id = max(array_keys(fn_get_payment_by_processor($_REQUEST['payment_data']['processor_id'])));
             Tygh::$app['session'][PAYPAL_STORED_PAYMENT_ID_KEY] = $payment_id;
         } else {
             $payment_id = (int) $_REQUEST['payment_id'];

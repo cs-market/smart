@@ -16,7 +16,7 @@ Tygh.tr('object_exists', '{__("object_exists")|escape:"javascript"}');
     </div>
     {/if}
     <div class="sidebar-field">
-        {include file="buttons/search.tpl" but_name="dispatch[`$dispatch`]"}
+        {include file="buttons/search.tpl" but_name="dispatch[`$dispatch`]" method="GET"}
         {if !$no_adv_link}
             <a class="advanced-search cm-dialog-opener" id="adv_search_opener" data-ca-target-id="adv_search" href="#">{__("advanced_search")}</a>
         {/if}
@@ -43,7 +43,7 @@ Tygh.tr('object_exists', '{__("object_exists")|escape:"javascript"}');
                 </div>
             {/if}
             <div class="pull-right">
-                <a class="cm-dialog-closer cm-cancel tool-link btn" data-dismiss="modal">{__("cancel")}</a>
+                <a class="cm-dialog-closer cm-cancel tool-link btn bulkedit-unchanged" data-dismiss="modal">{__("cancel")}</a>
                 {include file="buttons/search.tpl" but_name="dispatch[`$dispatch`]" but_role="submit" method="GET"}
             </div>
         </div>

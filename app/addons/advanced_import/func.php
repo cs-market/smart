@@ -15,6 +15,7 @@
 defined('BOOTSTRAP') or die('Access denied');
 
 use Tygh\Addons\AdvancedImport\Presets\Manager as PresetsManager;
+use Tygh\Addons\AdvancedImport\ServiceProvider;
 use Tygh\Enum\Addons\AdvancedImport\ImportStrategies;
 use Tygh\Tools\SecurityHelper;
 use Tygh\Registry;
@@ -22,29 +23,27 @@ use Tygh\Registry;
 /**
  * Obtains list of product features for fields mapping.
  *
- * @param \Tygh\Addons\AdvancedImport\Presets\Manager $presets_manager Presets manager instance
- * @param array                                       $schema          Relations schema
+ * @param PresetsManager        $presets_manager Presets manager instance
+ * @param array<string, string> $schema          Relations schema
  *
- * @return mixed
+ * @return array<string, string|bool>
  */
 function fn_advanced_import_get_product_features_list(PresetsManager $presets_manager, array $schema)
 {
-    list($features, $search,) = fn_get_product_features(
-        array(
+    list($features,) = fn_get_product_features(
+        [
             'plain'         => true,
             'exclude_group' => true,
-        ),
-        $schema['max_items'],
+        ],
+        0,
         $presets_manager->getLangCode()
     );
 
     foreach ($features as &$feature) {
         $feature['show_description'] = true;
         $feature['show_name'] = false;
+        $feature['description'] = $feature['internal_name'];
     }
-
-    $feature['has_more'] = $search['total_items'] > $schema['max_items'];
-
     unset($feature);
 
     return $features;
@@ -216,18 +215,18 @@ function fn_advanced_import_set_notification_pre($type, $title, $message, $messa
 function fn_advanced_import_delete_company($company_id, $result)
 {
     if ($result) {
-        /** @var \Tygh\Addons\AdvancedImport\Presets\Manager $presets_manager */
-        $presets_manager = Tygh::$app['addons.advanced_import.presets.manager'];
+        /** @var PresetsManager $presets_manager */
+        $presets_manager = ServiceProvider::getPresetManager();
 
         list($presets_list,) = $presets_manager->find(
             false,
-            array('ip.company_id' => $company_id),
+            ['ip.company_id' => $company_id],
             false,
-            array('ip.preset_id' => 'preset_id')
+            ['ip.preset_id' => 'preset_id', 'ip.company_id' => 'company_id']
         );
 
-        foreach ($presets_list as $preset_id => $preset) {
-            $presets_manager->delete($preset_id);
+        foreach ($presets_list as $preset) {
+            $presets_manager->delete($preset['preset_id']);
         }
     }
 }
@@ -251,11 +250,10 @@ function fn_advanced_import_delete_company($company_id, $result)
  */
 function fn_get_import_presets(array $params)
 {
-    /** @var \Tygh\Addons\AdvancedImport\Presets\Manager $preset_manager */
-    $preset_manager = Tygh::$app['addons.advanced_import.presets.manager'];
+    $preset_manager = ServiceProvider::getPresetManager();
 
     $limit = array();
-    if (!empty($params['items_per_page'])) {
+    if (isset($params['items_per_page']) && is_numeric($params['items_per_page'])) {
         $limit['items_per_page'] = $params['items_per_page'];
     }
     if (!empty($params['page'])) {
@@ -265,13 +263,24 @@ function fn_get_import_presets(array $params)
         $limit = false;
     }
 
+    $condition = [];
     if (!empty($params['object_type'])) {
         $condition = array('ip.object_type' => $params['object_type']);
     }
     if (!empty($params['preset_id'])) {
         $condition = array('ip.preset_id' => $params['preset_id']);
     }
-    $sorting = array();
+    if (!empty($params['only_vendors_presets'])) {
+        $condition[] = ['ip.company_id', '<>', 0];
+        if (isset($params['company_id'])) {
+            unset($params['company_id']);
+        }
+    }
+    if (isset($params['company_id'])) {
+        $condition['ip.company_id'] = $params['company_id'];
+    }
+
+    $sorting = [];
     $sorting['sort_by'] = !empty($params['sort_by']) ? $params['sort_by'] : '';
 
     if (!empty($params['sort_order'])) {
@@ -281,11 +290,11 @@ function fn_get_import_presets(array $params)
         $limit,
         $condition,
         null,
-        array('*'),
+        ['ip.*', 'ipd.*', 'ipst.last_launch', 'ipst.last_status', 'ipst.last_result', 'ipst.file', 'ipst.file_type'],
         $sorting
     );
 
-    return array($presets, $search);
+    return [$presets, $search];
 }
 
 /**
@@ -305,7 +314,7 @@ function fn_get_import_preset_name($preset_id)
         return $result;
     }
 
-    $preset_manager = Tygh::$app['addons.advanced_import.presets.manager'];
+    $preset_manager = ServiceProvider::getPresetManager();
     $result = $preset_manager->getName($preset_id);
 
     return $result ? $result : false;
@@ -374,7 +383,7 @@ function fn_advanced_import_filter_user_path($path)
 function fn_advanced_import_get_companies_import_images_directory($path = '')
 {
     $result = array();
-    $company_ids = fn_get_available_company_ids();
+    $company_ids = fn_get_all_companies_ids();
 
     foreach ($company_ids as $company_id) {
         $result[$company_id] = fn_advanced_import_get_import_images_directory($company_id, $path);
@@ -516,11 +525,45 @@ function fn_advanced_import_get_file_extension_by_mimetype($file_name, $file_typ
 {
     $mime_types_list = fn_get_ext_mime_types('mime');
     $path_info = fn_pathinfo($file_name);
-    $ext = $path_info['extension'];
+    $ext = strtolower($path_info['extension']);
     
     if (!in_array($ext, $mime_types_list)) {
         $ext = isset($mime_types_list[$file_type]) ? $mime_types_list[$file_type] : null;
     }
     
     return $ext;
+}
+
+/**
+ * Creates import path, if not exist and returns import path
+ *
+ * @param int    $company_id Company identifier
+ * @param string $path       Path
+ * @param string $path_id    Path identifier
+ *
+ * @return string
+ */
+function fn_advanced_import_get_import_path($company_id, $path, $path_id)
+{
+    $path = fn_advanced_import_filter_user_path($path);
+
+    if ($path_id === 'images_path') {
+        $companies_image_directories = fn_advanced_import_get_companies_import_images_directory();
+
+        if ($company_id === 0) {
+            $company_id = fn_get_default_company_id();
+        }
+
+        $path = sprintf('%s%s', $companies_image_directories[$company_id]['exim_path'], $path);
+    }
+
+    $absolute_path = fn_normalize_path(fn_get_files_dir_path($company_id) . $path);
+
+    if (!file_exists($absolute_path)) {
+        fn_mkdir($absolute_path);
+    }
+
+    $path = str_replace(Registry::get('config.dir.files'), '', $absolute_path);
+
+    return $path;
 }

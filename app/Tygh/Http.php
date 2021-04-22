@@ -19,7 +19,6 @@ use Tygh\Registry;
 
 class Http
 {
-    const TIMEOUT = 10;
     const GET = 'GET';
     const POST = 'POST';
     const PUT = 'PUT';
@@ -36,6 +35,16 @@ class Http
     private static $_headers = '';
     private static $_error = array();
     private static $_pull = array();
+
+    /**
+     * @var int Default connection timeout in seconds
+     */
+    protected static $default_connection_timeout = 10;
+
+    /**
+     * @var int Default execution timeout in seconds
+     */
+    protected static $default_execution_timeout = PHP_SAPI === 'cli' ? 180 : 90;
 
     /**
      * Runs http GET method
@@ -172,7 +181,7 @@ class Http
     public static function getStatus()
     {
         $headers = self::getHeaders();
-        if (preg_match("/HTTP\/\d\.\d (\d+)/", $headers, $m)) {
+        if (preg_match("/HTTP\/\d\.?\d? (\d+)/", $headers, $m)) {
             return intval($m[1]);
         }
 
@@ -223,7 +232,7 @@ class Http
             do {
                 $status = curl_multi_exec($mh, $active);
                 curl_multi_select($mh);
-                $info = curl_multi_info_read($mh);
+                curl_multi_info_read($mh);
             } while ($status === CURLM_CALL_MULTI_PERFORM || $active);
 
             $results = array();
@@ -321,12 +330,14 @@ class Http
 
     /**
      * Parse response contents to split headers
+     *
      * @param  string $content response contents
+     *
      * @return string contents without headers
      */
     private static function _parseContent($content)
     {
-        while (strpos(ltrim($content), 'HTTP/1') === 0) {
+        while (strpos(ltrim($content), 'HTTP/') === 0) {
             list(self::$_headers, $content) = preg_split("/(\r?\n){2}/", $content, 2);
         }
 
@@ -507,10 +518,13 @@ class Http
             empty($req_settings['proxy_host']) ? $components['port'] : (empty($req_settings['proxy_port']) ? 3128 : $req_settings['proxy_port']),
             $errno,
             $error,
-            $extra['timeout']
+            $extra['connection_timeout']
         );
 
         if ($sh) {
+            if (!empty($extra['execution_timeout'])) {
+                stream_set_timeout($sh, $extra['execution_timeout']);
+            }
 
             if ($method == self::GET) {
 
@@ -567,6 +581,7 @@ class Http
 
             $content = '';
             $headers_parsed = false;
+
             while (!feof($sh)) {
                 $content .= fread($sh, 65536);
 
@@ -579,6 +594,14 @@ class Http
                     fwrite($f, $content);
                     $content = '';
                 }
+
+                $info = stream_get_meta_data($sh);
+
+                if ($info['timed_out']) {
+                    self::_setError('socket', 'Execution timeout expired', 110);
+                    $content = false;
+                    break;
+                }
             }
 
             fclose($sh);
@@ -588,7 +611,10 @@ class Http
             }
 
             if (!empty($extra['write_to_file'])) {
-                $content = true;
+                if ($content !== false) {
+                    $content = true;
+                }
+
                 fclose($f);
             }
         } else {
@@ -626,7 +652,12 @@ class Http
         if (!empty($extra['encoding'])) {
             curl_setopt($ch, CURLOPT_ENCODING , $extra['encoding']);
         }
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $extra['timeout']);
+
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $extra['connection_timeout']);
+
+        if (!empty($extra['execution_timeout'])) {
+            curl_setopt($ch, CURLOPT_TIMEOUT, $extra['execution_timeout']);
+        }
         if (!empty($extra['headers'])) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $extra['headers']);
         }
@@ -786,9 +817,13 @@ class Http
      */
     private static function prepareExtra($extra = array())
     {
-        if (empty($extra['timeout'])) {
-            $extra['timeout'] = self::TIMEOUT;
+        // Backward compatibility
+        if (!empty($extra['timeout'])) {
+            $extra['connection_timeout'] = $extra['timeout'];
         }
+
+        $extra['connection_timeout'] = isset($extra['connection_timeout']) ? (int) $extra['connection_timeout'] : self::$default_connection_timeout;
+        $extra['execution_timeout'] = isset($extra['execution_timeout']) ? (int) $extra['execution_timeout'] : self::$default_execution_timeout;
 
         return $extra;
     }
@@ -817,5 +852,22 @@ class Http
         }
 
         return array($url, $data, $content);
+    }
+
+    /**
+     * Sets default value for connection/execution timeout
+     *
+     * @param null|int $execution_timeout
+     * @param null|int $connection_timeout
+     */
+    public static function setDefaultTimeout($execution_timeout = null, $connection_timeout = null)
+    {
+        if ($execution_timeout !== null) {
+            self::$default_execution_timeout = (int) $execution_timeout;
+        }
+
+        if ($connection_timeout !== null) {
+            self::$default_connection_timeout = (int) $connection_timeout;
+        }
     }
 }

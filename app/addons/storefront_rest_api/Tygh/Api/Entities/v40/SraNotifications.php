@@ -16,6 +16,7 @@ namespace Tygh\Api\Entities\v40;
 
 use Tygh\Addons\StorefrontRestApi\ASraEntity;
 use Tygh\Api\Response;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 
 class SraNotifications extends ASraEntity
@@ -124,7 +125,8 @@ class SraNotifications extends ASraEntity
             $params['device_id'],
             $params['platform'],
             $params['locale'],
-            $params['token']
+            $params['token'],
+            $params['storefront_id']
         );
     }
 
@@ -152,12 +154,13 @@ class SraNotifications extends ASraEntity
      */
     protected function buildSubscriptionDetails(array $params)
     {
-        $params = array(
-            'device_id' => $this->safeGet($params, 'device_id', null),
-            'platform'  => $this->safeGet($params, 'platform', null),
-            'locale'    => $this->safeGet($params, 'locale', null),
-            'token'     => $this->safeGet($params, 'token', null),
-        );
+        $params = [
+            'device_id'     => $this->safeGet($params, 'device_id', null),
+            'platform'      => $this->safeGet($params, 'platform', null),
+            'locale'        => $this->safeGet($params, 'locale', null),
+            'token'         => $this->safeGet($params, 'token', null),
+            'storefront_id' => $this->safeGet($params, 'storefront_id', StorefrontProvider::getStorefront()->storefront_id),
+        ];
 
         fn_trim_helper($params);
 

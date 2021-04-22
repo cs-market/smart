@@ -49,8 +49,12 @@ msgid "Add credit card"
 msgstr "Add credit card"
 
 msgctxt "Languages::privileges.manage_access_restrictions"
-msgid "Manage access restrictions"
-msgstr "Manage access restrictions"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privilege_groups.access_restrictions"
+msgid "Access restrictions"
+msgstr "Access restrictions"
 
 msgctxt "Languages::domain"
 msgid "Domain"

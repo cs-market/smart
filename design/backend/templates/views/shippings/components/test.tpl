@@ -17,31 +17,31 @@
             <td><span>{__("address")}:</span>&nbsp;</td>
             <td>{$settings.Company.company_address} </td>
             <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>{$settings.General.default_address} </td>
+            <td>{$settings.Checkout.default_address} </td>
         </tr>
         <tr>
             <td><span>{__("city")}:</span>&nbsp;</td>
             <td>{$settings.Company.company_city}</td>
             <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>{$settings.General.default_city} </td>
+            <td>{$settings.Checkout.default_city} </td>
         </tr>
         <tr class="table-row">
             <td><span>{__("country")}:</span>&nbsp;</td>
             <td>{$settings.Company.company_country}</td>
             <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>{$settings.General.default_country} </td>
+            <td>{$settings.Checkout.default_country} </td>
         </tr>
         <tr>
             <td><span>{__("state")}:</span>&nbsp;</td>
             <td>{$settings.Company.company_state}</td>
             <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>{$settings.General.default_state} </td>
+            <td>{$settings.Checkout.default_state} </td>
         </tr>
         <tr class="table-row">
             <td><span>{__("zip_postal_code")}:</span>&nbsp;</td>
             <td>{$settings.Company.company_zipcode}</td>
             <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>{$settings.General.default_zipcode} </td>
+            <td>{$settings.Checkout.default_zipcode} </td>
         </tr>
         </tbody>
         </table>
@@ -58,7 +58,7 @@
             <td><strong>{__("weight")}:</strong></td>
             <td>{$weight}&nbsp;{$settings.General.weight_symbol}</td>
         </tr>
-        {if $data.price}
+        {if $data.price !== false}
             <tr>
                 <td><strong>{__("cost")}:</strong></td>
                 <td>{include file="common/price.tpl" value=$data.price}</td>
@@ -72,7 +72,7 @@
         {else}
             <tr>
                 <td width="150px"><strong>{__("error")}:</strong></td>
-                <td width="300px"><span>{$data.error|default:"n/a"}</span></td>
+                <td width="300px"><span>{if $data.error}{$data.error}{else}n/a{/if}</span></td>
             </tr>
         {/if}
         </tbody>

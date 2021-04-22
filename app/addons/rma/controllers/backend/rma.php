@@ -12,6 +12,11 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Languages\Languages;
+use Tygh\Enum\Addons\Rma\ReturnOperationStatuses;
+use Tygh\Enum\Addons\Rma\RecalculateOperations;
+use Tygh\Enum\Addons\Rma\InventoryOperations;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 /** Body **/
@@ -33,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $property_id = db_query("INSERT INTO ?:rma_properties ?e", $value);
 
                     $value['property_id'] = $property_id;
-                    foreach (fn_get_translation_languages() as $value['lang_code'] => $v) {
+                    foreach (Languages::getAll() as $value['lang_code'] => $v) {
                         db_query("INSERT INTO ?:rma_property_descriptions ?e", $value);
                     }
                 }
@@ -111,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             foreach ((array) $_REQUEST['accepted'] as $item_id => $v) {
                 if (isset($v['chosen']) && $v['chosen'] == 'Y') {
-                    fn_return_product_routine($change_return_status['return_id'], $item_id, $v, RETURN_PRODUCT_DECLINED);
+                    fn_return_product_routine($change_return_status['return_id'], $item_id, $v, ReturnOperationStatuses::DECLINED);
                     $decline_amount += $v['amount'];
                     $extra = @unserialize($order_items[$item_id]);
 
@@ -153,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             foreach ((array) $_REQUEST['declined'] as $item_id => $v) {
                 if (isset($v['chosen']) && $v['chosen'] == 'Y') {
-                    fn_return_product_routine($change_return_status['return_id'], $item_id, $v, RETURN_PRODUCT_ACCEPTED);
+                    fn_return_product_routine($change_return_status['return_id'], $item_id, $v, ReturnOperationStatuses::APPROVED);
                     $accept_amount += $v['amount'];
                     $extra = @unserialize($order_items[$item_id]);
 
@@ -212,21 +217,27 @@ if ($mode == 'properties') {
     $change_return_status = Tygh::$app['session']['change_return_status'];
     unset(Tygh::$app['session']['change_return_status']);
 
-    if ($change_return_status['recalculate_order'] == 'R') {
+    if ($change_return_status['recalculate_order'] == RecalculateOperations::AUTO) {
         $additional_data = db_get_hash_single_array("SELECT type,data FROM ?:order_data WHERE order_id = ?i", array('type', 'data'), $change_return_status['order_id']);
         $shipping_info = @unserialize($additional_data['L']);
 
         Tygh::$app['view']->assign('shipping_info', $shipping_info);
     } else {
-        $total = (float) db_get_field("SELECT SUM(amount*price) FROM ?:rma_return_products WHERE return_id = ?i AND type = ?s", $change_return_status['return_id'], RETURN_PRODUCT_ACCEPTED);
+        $total = (float) db_get_field(
+            'SELECT SUM(amount*price) FROM ?:rma_return_products WHERE return_id = ?i AND type = ?s',
+            $change_return_status['return_id'],
+            ReturnOperationStatuses::APPROVED
+        );
+        $order_total = 0;
 
         // manually include taxes
         $return_info = fn_get_return_info($change_return_status['return_id']);
-        if (isset($return_info['items'][RETURN_PRODUCT_ACCEPTED])) {
 
+        if (isset($return_info['items'][ReturnOperationStatuses::APPROVED])) {
             $current_order = $original_order = fn_get_order_info($change_return_status['order_id']);
+            $order_total = $original_order['total'];
 
-            foreach ($return_info['items'][RETURN_PRODUCT_ACCEPTED] as $item_id => $return_item) {
+            foreach ($return_info['items'][ReturnOperationStatuses::APPROVED] as $item_id => $return_item) {
                 fn_rma_update_order_taxes(
                     $original_order['taxes'],
                     $item_id,
@@ -236,15 +247,21 @@ if ($mode == 'properties') {
                     $return_item['price'],
                     $original_order
                 );
+
+                $order_total -= (float) $return_item['price'];
             }
 
-            $total += ((float)$original_order['total']  - (float)$current_order['total']);
+            $total += ((float) $original_order['total'] - (float) $current_order['total']);
         }
 
-        if ($change_return_status['inventory_to'] == 'I'
-            && !($change_return_status['inventory_from'] == 'I'
-                && $change_return_status['status_to'] == RMA_DEFAULT_STATUS)) {
-            $change_return_status['total'] = -$total;
+        if (
+            $change_return_status['inventory_to'] === InventoryOperations::INCREASED
+            && !(
+                $change_return_status['inventory_from'] === InventoryOperations::INCREASED
+                && $change_return_status['status_to'] === ReturnOperationStatuses::REQUESTED
+            )
+        ) {
+            $change_return_status['total'] = $order_total;
         } else {
             $change_return_status['total'] = $total;
         }

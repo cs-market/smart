@@ -14,9 +14,12 @@
 
 namespace Tygh\Addons;
 
+use Tygh\Core\ApplicationInterface;
+use Tygh\Enum\ObjectStatuses;
 use Tygh\ExSimpleXmlElement;
 use Tygh\Registry;
 use Tygh\Languages\Languages;
+use Tygh\Languages\Helper as LanguageHelper;
 use Tygh\Snapshot;
 use Tygh\Tools\Url;
 
@@ -31,6 +34,28 @@ abstract class AXmlScheme
      * @var array Available languages
      */
     private $languages;
+
+    /**
+     * @var ApplicationInterface
+     */
+    protected $app;
+
+    protected $addon_dir;
+
+    /**
+     * @var \Composer\Autoload\ClassLoader
+     */
+    protected $class_loader;
+
+    /**
+     * Gets add-on directory path.
+     *
+     * @return string
+     */
+    public function getAddonDir()
+    {
+        return $this->addon_dir . $this->getId() . '/';
+    }
 
     /**
      * Gets available languages
@@ -68,7 +93,8 @@ abstract class AXmlScheme
             'selectable_box' => 'B',
             'template' => 'E',
             'permanent_template' => 'Z',
-            'hidden' => 'D'
+            'hidden' => 'D',
+            'phone' => 'L'
         );
     }
 
@@ -76,10 +102,14 @@ abstract class AXmlScheme
      * Creates instance of class
      *
      * @param $addon_xml ExSimpleXmlElement with addon scheme
+     * @param $app       ApplicationInterface Application instance
      */
-    public function __construct($addon_xml)
+    public function __construct($addon_xml, ApplicationInterface $app)
     {
         $this->_xml = $addon_xml;
+        $this->app = $app;
+        $this->addon_dir = Registry::get('config.dir.addons');
+        $this->class_loader = $app['class_loader'];
     }
 
     /**
@@ -208,6 +238,7 @@ abstract class AXmlScheme
     public function processQueries($mode, $addon_path)
     {
         Registry::set('runtime.database.skip_errors', true);
+        $errors = [];
 
         $languages = $this->getLanguages();
         $queries = $this->getQueries($mode);
@@ -220,48 +251,56 @@ abstract class AXmlScheme
                     $lang_queries[(string) $query['table']][(string) $query['lang']][] = $query;
                 } else {
                     $this->_executeQuery($query, $addon_path);
-                }
-            }
-        }
-
-        $default_lang = $this->getDefaultLanguage();
-        foreach ($lang_queries as $table_name => $queries) {
-            // Check and execute default language queries
-            if (isset($queries[$default_lang])) {
-                // Actions with default language
-                foreach ($queries[$default_lang] as $default_query) {
-                    $this->_executeQuery($default_query, $addon_path);
-
-                    // Clone default values to all other languages
-                    foreach ($languages as $lang_code => $lang_data) {
-                        fn_clone_language_values((string) $default_query['table'], $lang_code, (string) $default_query['lang']);
-                    }
-                }
-            }
-
-            // execute other languages queries
-            foreach ($languages as $lang_code => $lang_data) {
-                if (isset($queries[$lang_code])) {
-                    foreach ($queries[$lang_code] as $query) {
-                        $this->_executeQuery($query, $addon_path);
+                    $errors = Registry::get('runtime.database.errors');
+                    if ($errors) {
+                        break;
                     }
                 }
             }
         }
-
+        if (!$errors) {
+            $default_lang = $this->getDefaultLanguage();
+            foreach ($lang_queries as $table_name => $queries) {
+                // Check and execute default language queries
+                if (isset($queries[$default_lang])) {
+                    // Actions with default language
+                    foreach ($queries[$default_lang] as $default_query) {
+                        $this->_executeQuery($default_query, $addon_path);
+                        $errors = Registry::get('runtime.database.errors');
+                        if ($errors) {
+                            break 2;
+                        }
+                        // Clone default values to all other languages
+                        foreach ($languages as $lang_code => $lang_data) {
+                            LanguageHelper::cloneLanguageValues((string) $default_query['table'], $lang_code,
+                                (string) $default_query['lang']);
+                        }
+                    }
+                }
+                // execute other languages queries
+                foreach ($languages as $lang_code => $lang_data) {
+                    if (isset($queries[$lang_code])) {
+                        foreach ($queries[$lang_code] as $query) {
+                            $this->_executeQuery($query, $addon_path);
+                            $errors = Registry::get('runtime.database.errors');
+                            if ($errors) {
+                                break 3;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         Registry::set('runtime.database.skip_errors', false);
-
         $errors = Registry::get('runtime.database.errors');
-        if (!empty($errors)) {
+        if ($errors) {
             $error_text = '';
             foreach ($errors as $error) {
                 $error_text .= '<br/>' . $error['message'] . ': <code>'. $error['query'] . '</code>';
             }
             $notification_text = ($mode == 'uninstall') ? __('addon_uninstall_sql_error') : __('addon_sql_error');
             fn_set_notification('E', $notification_text, $error_text);
-
             Registry::set('runtime.database.errors', array());
-
             return false;
         } else {
             return true;
@@ -272,7 +311,7 @@ abstract class AXmlScheme
      * Executes query from addon xml scheme
      * @return bool always true
      */
-    private function _executeQuery($query, $addon_path)
+    protected function _executeQuery($query, $addon_path)
     {
         if (isset($query['type']) && (string) $query['type'] == 'file') {
             $query = (string) $query;
@@ -336,7 +375,7 @@ abstract class AXmlScheme
         if (isset($this->_xml->supplier)) {
             $result = (string) $this->_xml->supplier;
         } elseif ($this->isCoreAddon()) {
-            $result = 'Simtech';
+            $result = 'CS-Cart';
         }
 
         return $result;
@@ -362,6 +401,20 @@ abstract class AXmlScheme
         }
 
         return null;
+    }
+
+    /**
+     * Gets supplier page url from addon scheme if add-on is active.
+     *
+     * @param string $status Current add-on status.
+     *
+     * @return string Url of supplier page or default option if page not defined.
+     */
+    public function getSupplierPage($status)
+    {
+        return isset($this->_xml->supplier_page) && ($status === ObjectStatuses::ACTIVE)
+            ? (string) $this->_xml->supplier_page
+            : '';
     }
 
     /**
@@ -559,6 +612,16 @@ abstract class AXmlScheme
     public function getEmailTemplates()
     {
         return array();
+    }
+
+    /**
+     * Gets on-site notification templates.
+     *
+     * @return array
+     */
+    public function getInternalTemplates()
+    {
+        return [];
     }
 
     /**
@@ -763,5 +826,69 @@ abstract class AXmlScheme
         $core_addons = Snapshot::getCoreAddons();
 
         return in_array($this->getId(), $core_addons);
+    }
+
+    /**
+     * Loads an add-on into the application runtime.
+     *
+     * @return void
+     */
+    public function loadAddon()
+    {
+        $this->registerAutoloadEntries();
+
+        $addon_directory = $this->getAddonDir();
+
+        if (file_exists($addon_directory . '/init.php')) {
+            require_once($addon_directory . '/init.php');
+        }
+        if (file_exists($addon_directory . '/func.php')) {
+            require_once($addon_directory . '/func.php');
+        }
+        if (file_exists($addon_directory . '/config.php')) {
+            require_once($addon_directory . '/config.php');
+        }
+    }
+
+    /**
+     * Registers autoloader entries listed at the XML schema. Usually this is done at the very beginning of the add-on
+     * loading process.
+     *
+     * @see \Tygh\Addons\AXmlScheme::getPsr0AutoloadEntries()
+     * @see \Tygh\Addons\AXmlScheme::getPsr4AutoloadEntries()
+     *
+     * @return void
+     */
+    public function registerAutoloadEntries()
+    {
+        foreach ($this->getPsr0AutoloadEntries() as $prefix => $paths) {
+            $this->class_loader->add($prefix, $paths);
+        }
+
+        foreach ($this->getPsr4AutoloadEntries() as $prefix => $paths) {
+            $this->class_loader->addPsr4($prefix, $paths);
+        }
+    }
+
+    /**
+     * @see \Composer\Autoload\ClassLoader::add()
+     * @return array Key-value pairs, where key is auloloading prefix and value is either string or array of FS paths.
+     */
+    public function getPsr0AutoloadEntries()
+    {
+        $autoload = [];
+
+        $autoload[''] = $this->getAddonDir();
+
+        return $autoload;
+    }
+
+    /**
+     * @see \Composer\Autoload\ClassLoader::addPsr4()
+     * @return array Key-value pairs, where key is auloloading prefix and value is either string or array of FS paths.
+     */
+    public function getPsr4AutoloadEntries()
+    {
+        return [];
     }
 }

@@ -60,12 +60,6 @@ body, .main-table {
                             <td width="100%">{$company_data.company_phone_2}</td>
                         </tr>                
                         {/if}
-                        {if $company_data.company_fax}
-                        <tr>
-                            <td style="font: 12px verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("fax")}:</td>
-                            <td width="100%">{$company_data.company_fax}</td>
-                        </tr>
-                        {/if}
                         {if $company_data.company_website}
                         <tr>
                             <td style="font: 12px verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("web_site")}:</td>
@@ -181,8 +175,8 @@ body, .main-table {
                     <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap;">{__("amount")}</th>
                     <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap;">{__("reason")}</th>
                 </tr>
-                {if $return_info.items[$smarty.const.RETURN_PRODUCT_ACCEPTED]}
-                {foreach from=$return_info.items[$smarty.const.RETURN_PRODUCT_ACCEPTED] item="ri" key="key"}
+                {if $return_info.items["Addons\\Rma\\ReturnOperationStatuses::APPROVED"|enum]}
+                {foreach from=$return_info.items["Addons\\Rma\\ReturnOperationStatuses::APPROVED"|enum] item="ri" key="key"}
                 <tr>
                     <td style="padding: 5px 10px; background-color: #ffffff;">{$order_info.products.$key.product_code|default:"&nbsp;"}</td>
                     <td style="padding: 5px 10px; background-color: #ffffff;">{$ri.product nofilter}

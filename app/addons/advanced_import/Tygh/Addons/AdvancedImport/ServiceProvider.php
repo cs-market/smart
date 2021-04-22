@@ -22,6 +22,7 @@ use Tygh\Addons\AdvancedImport\Modifiers\Parsers\CachingModifierParser as Preset
 use Tygh\Addons\AdvancedImport\Presets\Importer as PresetsImporter;
 use Tygh\Addons\AdvancedImport\Readers\Factory as ReadersFactory;
 use Tygh\Registry;
+use Tygh\Tygh;
 
 class ServiceProvider implements ServiceProviderInterface
 {
@@ -29,14 +30,13 @@ class ServiceProvider implements ServiceProviderInterface
     public function register(Container $app)
     {
         $app['addons.advanced_import.presets.manager'] = function (Container $app) {
-            $company_id = fn_get_runtime_company_id();
-
             $presets_manager = new PresetsManager(
                 $app['db'],
-                $company_id,
+                fn_get_runtime_company_id(),
                 (int) Registry::get('settings.Appearance.admin_elements_per_page'),
                 DESCR_SL,
-                $app['addons.advanced_import.schemas_manager']
+                $app['addons.advanced_import.schemas_manager'],
+                $app['addons.advanced_import.file_manager']
             );
 
             return $presets_manager;
@@ -64,20 +64,47 @@ class ServiceProvider implements ServiceProviderInterface
         };
 
         $app['addons.advanced_import.schemas_manager'] = function (Container $app) {
-
             return new SchemasManager();
         };
 
         $app['addons.advanced_import.readers.factory'] = function (Container $app) {
-
-            $company_id = fn_get_runtime_company_id();
-
-            return new ReadersFactory($company_id);
+            return function($company_id) use ($app) {
+                $company_id = $company_id !== null ? $company_id : fn_get_runtime_company_id();
+                return new ReadersFactory(
+                    $company_id,
+                    $app['addons.advanced_import.file_manager']
+                );
+            };
         };
 
         $app['addons.advanced_import.features_mapper'] = function (Container $app) {
-
             return new FeaturesMapper();
         };
+
+        $app['addons.advanced_import.file_manager'] = function (Container $app) {
+            $company_id = fn_get_runtime_company_id();
+            $allowed_ext = ['xml', 'csv'];
+
+            return new FileManager(
+                $company_id,
+                $allowed_ext
+            );
+        };
+    }
+    /**
+     * @return \Tygh\Addons\AdvancedImport\Presets\Manager
+     */
+    public static function getPresetManager()
+    {
+        return Tygh::$app['addons.advanced_import.presets.manager'];
+    }
+
+    /**
+     * @param $company_id
+     * @return \Tygh\Addons\AdvancedImport\Readers\Factory
+     */
+    public static function getReadersFactory($company_id = null)
+    {
+        return call_user_func(Tygh::$app['addons.advanced_import.readers.factory'], $company_id);
     }
 }

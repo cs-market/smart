@@ -80,16 +80,18 @@ class Xlsx extends AGenerator
     {
         $_data = array();
         foreach ($this->selected_fields as $field_id => $field_value) {
-            if ($field_id == 'image') {
-                if (!empty($product['main_pair']) && $image_data = fn_image_to_display($product['main_pair'])) {
-                    $value = $image_data['detailed_image_path'];
-                } else {
-                    $value = '';
-                }
+            $value = '';
 
+            if ($field_id === 'image' && !empty($product['main_pair'])) {
+                $image_data = fn_image_to_display($product['main_pair']);
+
+                if (!empty($image_data['detailed_image_path'])) {
+                    $value = $image_data['detailed_image_path'];
+                }
             } else {
                 $value = isset($product[$field_id]) ? $product[$field_id] : '';
             }
+
             $_data[] = $value;
         }
 

@@ -142,12 +142,17 @@ class Receipt
     /**
      * Divides total discount by receipt items.
      *
-     * @param float $total_discount Order total discount
-     * @param array $item_types     If is set than the discount will be divided between items with these types
+     * @param float  $total_discount      Order total discount
+     * @param array  $item_types          If is set than the discount will be divided between items with these types
+     * @param string $priority_item_type  If total of priority items are more than order discount, discount will be applied only on them
      */
-    public function setTotalDiscount($total_discount, array $item_types = array())
+    public function setTotalDiscount($total_discount, array $item_types = [], $priority_item_type = Item::TYPE_PRODUCT)
     {
         $total_discount = (float) $total_discount;
+
+        if ($priority_item_type && $this->isTypeAvailable($priority_item_type, $item_types) && $this->getTotal([$priority_item_type]) > $total_discount) {
+            $item_types = [$priority_item_type];
+        }
 
         if (!empty($total_discount)) {
             $total = $this->getTotal($item_types);

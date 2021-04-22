@@ -22,8 +22,18 @@ if ($mode == 'final_sale' || $mode == 'on_sale' || $mode == 'bestsellers' || $mo
 
     $params['extend'] = array('description');
 
+    if ($items_per_page = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'items_per_page')) {
+        $params['items_per_page'] = $items_per_page;
+    }
+    if ($sort_by = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_by')) {
+        $params['sort_by'] = $sort_by;
+    }
+    if ($sort_order = fn_change_session_param(Tygh::$app['session']['search_params'], $_REQUEST, 'sort_order')) {
+        $params['sort_order'] = $sort_order;
+    }
+
     if ($mode == 'final_sale') {
-        $title = __("final_sale");
+        $title = __('final_sale');
         $params['on_sale'] = true;
 
         if (empty($params['on_sale_from'])) {
@@ -31,17 +41,17 @@ if ($mode == 'final_sale' || $mode == 'on_sale' || $mode == 'bestsellers' || $mo
         }
 
     } elseif ($mode == 'on_sale') {
-        $title = __("on_sale");
+        $title = __('on_sale');
         $params['on_sale'] = true;
 
     } elseif ($mode == 'bestsellers') {
-        $title = __("bestsellers");
+        $title = __('bestsellers');
         
         $params['bestsellers'] = true;
         $params['sales_amount_from'] = Registry::get('addons.bestsellers.sales_amount_from');
 
     } elseif ($mode == 'newest') {
-        $title = __("newest");
+        $title = __('newest');
 
         $params['sort_by'] = empty($params['sort_by']) ? 'timestamp' : $params['sort_by'];
         $params['plain'] = true;
@@ -63,9 +73,23 @@ if ($mode == 'final_sale' || $mode == 'on_sale' || $mode == 'bestsellers' || $mo
 
     fn_add_breadcrumb($title);
 
+    if (isset($params['order_ids'])) {
+        $order_ids = is_array($params['order_ids']) ? $params['order_ids'] : explode(',', $params['order_ids']);
+        foreach ($order_ids as $order_id) {
+            /** @psalm-suppress UndefinedGlobalVariable */
+            if (!fn_is_order_allowed($order_id, $auth)) {
+                return [CONTROLLER_STATUS_NO_PAGE];
+            }
+        }
+    }
+
     list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'));
 
-    fn_gather_additional_products_data($products, array('get_icon' => true, 'get_detailed' => true, 'get_additional' => true, 'get_options'=> true));
+    if (isset($search['page']) && ($search['page'] > 1) && empty($products)) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
+
+    fn_gather_additional_products_data($products, ['get_icon' => true, 'get_detailed' => true, 'get_additional' => true, 'get_options' => true]);
 
     $selected_layout = fn_get_products_layout($params);
 

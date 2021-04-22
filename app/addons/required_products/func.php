@@ -13,6 +13,8 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
+use Tygh\Addons\MasterProducts\ServiceProvider as MasterProductsServiceProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -29,17 +31,26 @@ function fn_required_products_get_product_data_post(&$product, &$auth)
 {
     if (!empty($product['product_id'])) {
 
-        list($required) = fn_get_products(array('for_required_product' => $product['product_id']));
+        list($required) = fn_get_products([
+            'for_required_product'     => $product['product_id'],
+            'include_child_variations' => true,
+            'group_child_variations'   => false,
+        ]);
 
         if (count($required)) {
             $product['have_required'] = 'Y';
 
-            $ids = fn_array_column($required, 'product_id');
+            $ids = array_column($required, 'product_id');
             $have = fn_required_products_get_existent($auth, $ids);
 
-            $product['required_products'] = array ();
+            $product['required_products'] = [];
 
-            fn_gather_additional_products_data($required, array('get_icon' => true, 'get_detailed' => true, 'get_options' => true, 'get_discounts' => true));
+            fn_gather_additional_products_data($required, [
+                'get_icon'      => true,
+                'get_detailed'  => true,
+                'get_options'   => true,
+                'get_discounts' => true
+            ]);
 
             foreach ($required as $entry) {
                 $id = $entry['product_id'];
@@ -89,7 +100,7 @@ function fn_required_products_get_existent($auth, $ids, $cart = array())
     }
 
     if (!empty($auth['user_id'])) {
-        $data = db_get_fields('SELECT ?:order_details.product_id FROM ?:orders LEFT JOIN ?:order_details ON ?:orders.order_id = ?:order_details.order_id WHERE ?:orders.status IN (?a) AND ?:orders.user_id = ?i AND ?:order_details.product_id IN (?n) GROUP BY ?:order_details.product_id', array ('P', 'C'), $auth['user_id'], $ids);
+        $data = db_get_fields('SELECT ?:order_details.product_id FROM ?:orders LEFT JOIN ?:order_details ON ?:orders.order_id = ?:order_details.order_id WHERE ?:orders.status IN (?a) AND ?:orders.user_id = ?i AND ?:order_details.product_id IN (?n) GROUP BY ?:order_details.product_id', fn_get_settled_order_statuses(), $auth['user_id'], $ids);
     } else {
         $data = array();
     }
@@ -218,8 +229,8 @@ function fn_check_deleted_required_products(&$cart, $cart_id)
 {
     $auth = !empty(Tygh::$app['session']['auth']['user_id']) ? Tygh::$app['session']['auth']['user_id'] : array();
 
-    if (!empty($cart_id) && !empty($cart['products'][$cart_id])) {
-        $all_cart_products = fn_array_column($cart['products'], 'product_id');
+    if (!empty($cart_id) && !empty($cart['products'][$cart_id]) && empty($cart['products'][$cart_id]['extra']['is_checked_deleted_products'])) {
+        $all_cart_products = array_column($cart['products'], 'product_id');
         $count_products = array_count_values($all_cart_products);
 
         // deleted product id
@@ -240,6 +251,7 @@ function fn_check_deleted_required_products(&$cart, $cart_id)
                     $haved = fn_required_products_in_cart($cart, array($product_id));
 
                     if (!empty($haved)) {
+                        $cart['products'][$cart_id]['extra']['is_checked_deleted_products'] = true;
                         fn_check_deleted_required_products($cart, $key);
                         unset($cart['products'][$key]);
                         foreach ($cart['product_groups'] as $key_group => $group) {
@@ -337,4 +349,41 @@ function fn_check_calculated_required_products(&$cart, &$cart_products, $auth)
 function fn_required_products_calculate_cart_items(&$cart, &$cart_products, &$auth)
 {
     fn_check_calculated_required_products($cart, $cart_products, $auth);
+}
+
+
+function fn_required_products_update_products($product_id, array $required_product_ids = [])
+{
+    db_query('DELETE FROM ?:product_required_products WHERE product_id = ?i', $product_id);
+
+    $data_list = [];
+
+    foreach ($required_product_ids as $required_product_id) {
+        if ($required_product_id == $product_id) {
+            continue;
+        }
+
+        $data_list[] = [
+            'product_id' => $product_id,
+            'required_id' => $required_product_id
+        ];
+    }
+
+    if ($data_list) {
+        db_query('INSERT INTO ?:product_required_products ?m', $data_list);
+    }
+
+    fn_set_hook('required_products_update_products_post', $product_id, $required_product_ids, $data_list);
+}
+
+function fn_product_variations_required_products_update_products_post($product_id)
+{
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+    $sync_service->onTableChanged('product_required_products', $product_id);
+}
+
+function fn_master_products_required_products_update_products_post($product_id)
+{
+    $service = MasterProductsServiceProvider::getService();
+    $service->onTableChanged('product_required_products', $product_id);
 }

@@ -6,14 +6,10 @@
     <priority>100</priority>
     <status>active</status>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
-    <settings edition_type="ROOT,ULT:VENDOR">
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="twitter">
                 <items>
-                    <item id="twitter_header">
-                        <type>header</type>
-                        <variants/>
-                    </item>
                     <item id="twitter_enable">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
@@ -57,9 +53,6 @@
             </section>
             <section id="facebook">
                 <items>
-                    <item id="facebook_header">
-                        <type>header</type>
-                    </item>
                     <item id="facebook_enable">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
@@ -306,10 +299,6 @@
             </section>
             <section id="vkontakte">
                 <items>
-                    <item id="vkontakte_header">
-                        <type>header</type>
-                        <variants/>
-                    </item>
                     <item id="vkontakte_enable">
                         <type>checkbox</type>
                     </item>
@@ -360,90 +349,15 @@
                 </items>
             </section>
 
-            <section id="gplus">
-                <items>
-                    <item id="gplus_header">
-                        <type>header</type>
-                    </item>
-                    <item id="gplus_enable">
-                        <default_value>Y</default_value>
-                        <type>checkbox</type>
-                    </item>
-                    <item id="gplus_href">
-                        <type>input</type>
-                    </item>
-                    <item id="gplus_size">
-                        <type>selectbox</type>
-                        <default_value>standard</default_value>
-                        <variants>
-                            <item id="small"></item>
-                            <item id="medium"></item>
-                            <item id="standard"></item>
-                            <item id="tall"></item>
-                        </variants>
-                    </item>
-                    <item id="gplus_annotation">
-                        <type>selectbox</type>
-                        <default_value>bubble</default_value>
-                        <variants>
-                            <item id="none"></item>
-                            <item id="bubble"></item>
-                            <item id="inline"></item>
-                        </variants>
-                    </item>
-                    <item id="gplus_width">
-                        <type>input</type>
-                    </item>
-                    <item id="gplus_align">
-                        <type>selectbox</type>
-                        <default_value>left</default_value>
-                        <variants>
-                            <item id="left"></item>
-                            <item id="right"></item>
-                        </variants>
-                    </item>
-                    <item id="gplus_expandto">
-                        <type>selectbox</type>
-                        <default_value>top</default_value>
-                        <variants>
-                            <item id="top"></item>
-                            <item id="right"></item>
-                            <item id="bottom"></item>
-                            <item id="left"></item>
-                        </variants>
-                    </item>
-                    <item id="gplus_recommendations">
-                        <type>selectbox</type>
-                        <default_value>yes</default_value>
-                        <variants>
-                            <item id="yes"></item>
-                            <item id="no"></item>
-                        </variants>
-                    </item>
-                    <item id="gplus_display_on">
-                        <type>multiple checkboxes</type>
-                        <default_value>#M#products=Y</default_value>
-                        <variants>
-                            <item id="products"></item>
-                            <item id="pages"></item>
-                        </variants>
-                    </item>
-                </items>
-            </section>
-
             <section id="yandex">
                 <items>
-                    <item id="yandex_header">
-                        <type>header</type>
-                        <variants/>
-                    </item>
                     <item id="yandex_enable">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>
                     <item id="yandex_share_code">
                         <type>textarea</type>
-                        <default_value><![CDATA[<script type="text/javascript" src="//yandex.st/share/share.js" charset="utf-8"></script><div class="yashare-auto-init" data-yashareL10n="ru" data-yashareQuickServices="vkontakte,facebook,twitter,odnoklassniki,moimir" data-yashareTheme="counter"></div>]]></default_value>
+                        <default_value><![CDATA[<script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script><script src="//yastatic.net/share2/share.js"></script><div class="ya-share2" data-services="collections,vkontakte,facebook,twitter,odnoklassniki,moimir"></div>]]></default_value>
                     </item>
                     <item id="yandex_display_on">
                         <type>multiple checkboxes</type>
@@ -458,9 +372,6 @@
 
             <section id="pinterest">
                 <items>
-                    <item id="pinterest_header">
-                        <type>header</type>
-                    </item>
                     <item id="pinterest_enable">
                         <default_value>Y</default_value>
                         <type>checkbox</type>
@@ -481,42 +392,12 @@
                             <item id="round"></item>
                         </variants>
                     </item>
-                    <item id="pinterest_color">
-                        <type>selectbox</type>
-                        <default_value>gray</default_value>
-                        <variants>
-                            <item id="gray"></item>
-                            <item id="red"></item>
-                            <item id="white"></item>
-                        </variants>
-                    </item>
                     <item id="pinterest_display_on">
                         <type>multiple checkboxes</type>
                         <default_value>#M#products=Y</default_value>
                         <variants>
                             <item id="products"></item>
                             <item id="pages"></item>
-                        </variants>
-                    </item>
-                </items>
-            </section>
-
-            <section id="email">
-                <items>
-                    <item id="email_header">
-                        <type>header</type>
-                        <variants/>
-                    </item>
-                    <item id="email_enable">
-                        <type>checkbox</type>
-                    </item>
-                    <item id="email_display_on">
-                        <type>multiple checkboxes</type>
-                        <variants>
-                                <item id="products">
-                                </item>
-                                <item id="pages">
-                                </item>
                         </variants>
                     </item>
                 </items>
@@ -533,26 +414,4 @@
         <item for="uninstall">ALTER TABLE `?:products` DROP `facebook_obj_type`;</item>
         <item for="uninstall">ALTER TABLE `?:pages` DROP `facebook_obj_type`;</item>
     </queries>
-    <email_templates>
-        <templates>
-            <item>
-                <code><![CDATA[social_buttons_mail]]></code>
-                <area><![CDATA[C]]></area>
-                <status><![CDATA[A]]></status>
-                <default_subject><![CDATA[{{ __("recommendation_from") }} {{ send_data.from_name }}]]></default_subject>
-                <default_template><![CDATA[{{ snippet("header") }}
-
-  {{ __("hello") }} {{ send_data.to_name }},<br /><br />
-
-{{ __("text_recommendation_notes") }}<br />
-<a href="{{ link }}">{{ link|puny_decode }}</a><br /><br />
-<b>{{ __("notes") }}:</b><br />
-{{ send_data.notes|nl2br }}
-
-{{ snippet("footer") }}
-]]></default_template>
-                <addon><![CDATA[social_buttons]]></addon>
-            </item>
-        </templates>
-    </email_templates>
 </addon>

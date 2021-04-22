@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use \Tygh\Registry;
+use Tygh\Enum\UserTypes;
 
 /*
     Every item can has any additional attributes.
@@ -23,6 +24,7 @@ use \Tygh\Registry;
 
     So you can use the following array structure to specify your attrs:
     'addons' => array(
+        'title' => __('addons_title'),
         'href' => 'addons.manage',
         'position' => 100,
         'attrs' => array(
@@ -43,455 +45,523 @@ use \Tygh\Registry;
     </li>
 */
 
-$schema = array(
-    'top' => array(
-        'addons' => array(
-            'items' => array(
-                'manage_addons' => array(
+$schema = [
+    'top' => [
+        'addons' => [
+            'items' => [
+                'manage_addons' => [
                     'href' => 'addons.manage',
                     'position' => 10,
-                ),
-                'manage_addons_divider' => array(
+                ],
+                'manage_addons_divider' => [
                     'type' => 'divider',
                     'position' => 20
-                ),
-            ),
-            'position' => 100,
-        ),
-        'administration' => array(
-            'items' => array(
-
-                'files' => array(
-                    'href' => 'file_editor.manage',
-                    'position' => 100,
-                ),
-                'addons_divider' => array(
+                ],
+            ],
+        ],
+        'administration' => [
+            'items' => [
+                'addons_divider' => [
                     'type' => 'divider',
                     'position' => 110,
-                ),
-                'payment_methods' => array(
+                ],
+                'payment_methods' => [
                     'href' => 'payments.manage',
                     'position' => 200,
-                ),
-                'shippings_taxes' => array(
+                ],
+                'shippings_taxes' => [
                     'href' => 'shippings.manage',
                     'type' => 'title',
                     'position' => 300,
-                    'subitems' => array(
-                        'shipping_methods' => array(
+                    'subitems' => [
+                        'shipping_methods' => [
                             'href' => 'shippings.manage',
                             'position' => 100,
-                        ),
-                        'shipment_statuses' => array(
-                            'href' => 'statuses.manage?type=' . STATUSES_SHIPMENT,
-                            'position' => 150,
-                        ),
-                        'taxes' => array(
+                        ],
+                        'taxes' => [
                             'href' => 'taxes.manage',
+                            'position' => 150,
+                        ],
+                        'locations_divider' => [
+                            'type' => 'divider',
                             'position' => 200,
-                        ),
-                        'states' => array(
-                            'href' => 'states.manage',
-                            'position' => 300,
-                        ),
-                        'countries' => array(
+                        ],
+                        'countries' => [
                             'href' => 'countries.manage',
+                            'position' => 300,
+                        ],
+                        'states' => [
+                            'href' => 'states.manage',
                             'position' => 400,
-                        ),
-                        'locations' => array(
+                        ],
+                        'locations' => [
+                            'title' => __('rate_areas'),
                             'href' => 'destinations.manage',
                             'position' => 500,
-                        ),
-                        'localizations' => array(
+                        ],
+                        'localizations' => [
                             'href' => 'localizations.manage',
                             'position' => 600,
-                        ),
-                    ),
-                ),
-                'order_statuses' => array(
-                    'href' => 'statuses.manage?type=O',
+                        ],
+                    ],
+                ],
+                'statuses_management' => [
+                    'href' => 'statuses.manage',
+                    'type' => 'title',
                     'position' => 400,
-                ),
-                'order_statuses_divider' => array(
+                    'subitems' => [
+                        'order_statuses' => [
+                            'href' => 'statuses.manage?type=' . STATUSES_ORDER,
+                            'position' => 100,
+                        ],
+                        'shipment_statuses' => [
+                            'href' => 'statuses.manage?type=' . STATUSES_SHIPMENT,
+                            'position' => 200,
+                        ],
+                    ],
+                ],
+                'statuses_divider' => [
                     'type' => 'divider',
                     'position' => 410,
-                ),
-                'profile_fields' => array(
+                ],
+                'profile_fields' => [
                     'href' => 'profile_fields.manage',
                     'position' => 500,
-                ),
-                'profile_fields_divider' => array(
+                ],
+                'notifications' => [
+                    'href' => 'notification_settings.manage',
+                    'type' => 'title',
+                    'position' => 505,
+                    'subitems' => [
+                        'customer_notifications' => [
+                            'href' => 'notification_settings.manage?receiver_type=' . UserTypes::CUSTOMER,
+                            'position' => 100,
+                        ],
+                        'admin_notifications' => [
+                            'href' => 'notification_settings.manage?receiver_type=' . UserTypes::ADMIN,
+                            'position' => 200,
+                        ],
+                        'code_snippets' => [
+                            'href' => 'email_templates.snippets',
+                            'position' => 400,
+                        ],
+                        'documents' => [
+                            'href' => 'documents.manage',
+                            'position' => 500,
+                        ],
+                    ],
+                ],
+                'profile_fields_divider' => [
                     'type' => 'divider',
                     'position' => 510,
-                ),
-                'currencies' => array(
+                ],
+                'currencies' => [
                     'href' => 'currencies.manage',
                     'position' => 600,
-                ),
-                'languages' => array(
+                ],
+                'languages' => [
                     'href' => 'languages.manage',
                     'type' => 'title',
+                    'title' => __('texts_languages'),
                     'position' => 700,
-                    'subitems' => array(
-                        'translations' => array(
+                    'subitems' => [
+                        'edit_on_site' => [
+                            'href' => 'customization.update_mode?type=live_editor&status=enable',
+                            'attrs' => [
+                                'href' => [ // Attributes for <a>
+                                    'target' => '_blank',
+                                ],
+                            ],
+                            'position' => 10,
+                        ],
+                        'edit_on_site_divider' => [
+                            'type' => 'divider',
+                            'position' => 20,
+                        ],
+                        'translations' => [
+                            'title' => __('edit_texts'),
                             'href' => 'languages.translations',
                             'position' => 100,
-                        ),
-                        'manage_languages' => array(
+                        ],
+                        'manage_languages' => [
                             'href' => 'languages.manage',
                             'position' => 200,
-                        ),
-                    ),
-                ),
-                'languages_divider' => array(
+                        ],
+                    ],
+                ],
+                'languages_divider' => [
                     'type' => 'divider',
                     'position' => 710,
-                ),
-                'logs' => array(
+                ],
+                'logs' => [
                     'href' => 'logs.manage',
                     'position' => 800,
-                ),
-                'logs_divider' => array(
+                ],
+                'logs_divider' => [
                     'type' => 'divider',
                     'position' => 900,
-                ),
-                'backup_restore' => array(
+                ],
+                'files' => [
+                    'href' => 'file_editor.manage',
+                    'position' => 990,
+                ],
+                'backup_restore' => [
                     'href' => 'datakeeper.manage',
                     'position' => 1000,
-                ),
-                'storage' => array(
+                ],
+                'storage' => [
                     'href' => 'storage.index',
                     'type' => 'title',
                     'position' => 1100,
-                    'subitems' => array(
-                        'cdn_settings' => array(
+                    'subitems' => [
+                        'cdn_settings' => [
                             'href' => 'storage.cdn',
                             'position' => 100,
-                        ),
-                        'configure_divider' => array(
+                        ],
+                        'configure_divider' => [
                             'type' => 'divider',
                             'position' => 110,
-                        ),
-                        'clear_cache' => array(
+                        ],
+                        'clear_cache' => [
                             'href' => 'storage.clear_cache?redirect_url=%CURRENT_URL',
                             'position' => 200,
-                        ),
-                        'clear_thumbnails' => array(
+                        ],
+                        'clear_thumbnails' => [
                             'href' => 'storage.clear_thumbnails?redirect_url=%CURRENT_URL',
                             'position' => 300,
-                        ),
-                    ),
-                ),
-                'import_data' => array(
-                    'href' => 'exim.import',
+                        ],
+                    ],
+                ],
+                'storage_divider' => [
+                    'type' => 'divider',
                     'position' => 1200,
-                    'subitems' => array(
-                        'orders' => array(
+                ],
+                'import_data' => [
+                    'href' => 'exim.import',
+                    'position' => 1300,
+                    'subitems' => [
+                        'orders' => [
                             'href' => 'exim.import?section=orders',
                             'position' => 200,
-                        ),
-                        'products_deprecated' => array(
+                        ],
+                        'products_deprecated' => [
                             'href' => 'exim.import?section=products',
                             'position' => 700,
-                        ),
-                        'features' => array(
+                        ],
+                        'features' => [
                             'href' => 'exim.import?section=features',
                             'position' => 100,
-                        ),
-                        'translations' => array(
+                        ],
+                        'translations' => [
                             'href' => 'exim.import?section=translations',
                             'position' => 300,
-                        ),
-                        'users' => array(
-                            'href' => 'exim.import?section=users',
+                        ],
+                        'states' => [
+                            'href' => 'exim.import?section=states',
                             'position' => 400,
-                        ),
-                    ),
-                ),
-                'export_data' => array(
+                        ],
+                        'users' => [
+                            'href' => 'exim.import?section=users',
+                            'position' => 500,
+                        ],
+                    ],
+                ],
+                'export_data' => [
                     'href' => 'exim.export',
-                    'position' => 1300,
-                    'subitems' => array(
-                        'orders' => array(
+                    'position' => 1400,
+                    'subitems' => [
+                        'orders' => [
                             'href' => 'exim.export?section=orders',
                             'position' => 200,
-                        ),
-                        'products' => array(
+                        ],
+                        'products' => [
                             'href' => 'exim.export?section=products',
                             'position' => 300,
-                        ),
-                        'features' => array(
+                        ],
+                        'features' => [
                             'href' => 'exim.export?section=features',
                             'position' => 100,
-                        ),
-
-                        'translations' => array(
+                        ],
+                        'translations' => [
                             'href' => 'exim.export?section=translations',
                             'position' => 400,
-                        ),
-                        'users' => array(
-                            'href' => 'exim.export?section=users',
+                        ],
+                        'states' => [
+                            'href' => 'exim.export?section=states',
                             'position' => 500,
-                        ),
-                    ),
-                ),
-                'export_data_divider' => array(
-                    'type' => 'divider',
-                    'position' => 1400,
-                ),
-                'file_changes_detector' => array(
-                    'href' => 'tools.view_changes?check_types=C,D',
+                        ],
+                        'users' => [
+                            'href' => 'exim.export?section=users',
+                            'position' => 600,
+                        ],
+                    ],
+                ],
+                'sync_data' => [
+                    'href'     => 'sync_data.manage',
                     'position' => 1500,
-                ),
-                'upgrade_center' => array(
-                    'href' => 'upgrade_center.manage',
+                ],
+                'sync_data_divider' => [
+                    'type' => 'divider',
                     'position' => 1600,
-                ),
-            ),
+                ],
+                'file_changes_detector' => [
+                    'href' => 'tools.view_changes?check_types=C,D',
+                    'position' => 1700,
+                ],
+                'upgrade_center' => [
+                    'href' => 'upgrade_center.manage',
+                    'position' => 1800,
+                ],
+            ],
             'position' => 600,
-        ),
-        'design' => array(
-            'items' => array(
-                'themes' => array(
+        ],
+        'design' => [
+            'items' => [
+                'themes' => [
                     'href' => 'themes.manage',
                     'position' => 100,
-                ),
-                'layouts' => array(
+                ],
+                'layouts' => [
                     'href' => 'block_manager.manage',
                     'position' => 200,
-                ),
-                'templates' => array(
+                    'subitems' => [
+                        'layouts' => [
+                            'href' => 'block_manager.manage',
+                            'position' => 100,
+                        ],
+                        'manage_blocks' => [
+                            'href' => 'block_manager.blocks',
+                            'position' => 200,
+                        ],
+                    ],
+                ],
+                'templates' => [
                     'href' => 'templates.manage',
                     'position' => 300,
-                ),
-                'templates_divider' => array(
+                ],
+                'templates_divider' => [
                     'type' => 'divider',
                     'position' => 310,
-                ),
-                'email_templates' => array(
-                    'href' => 'email_templates.manage',
-                    'position' => 350,
-                ),
-                'documents' => array(
-                    'href' => 'documents.manage',
-                    'position' => 370,
-                ),
-                'documents_divider' => array(
-                    'type' => 'divider',
-                    'position' => 380,
-                ),
-                'menus' => array(
+                ],
+                'menus' => [
                     'href' => 'menus.manage',
                     'alt' => 'static_data.manage?section=A',
                     'position' => 400,
-                ),
-                'product_tabs' => array(
+                ],
+                'product_tabs' => [
                     'href' => 'tabs.manage',
                     'position' => 500,
-                ),
-                'product_tabs_divider' => array(
+                ],
+                'product_tabs_divider' => [
                     'type' => 'divider',
                     'position' => 510,
-                ),
-            ),
+                ],
+            ],
             'position' => 800,
-        ),
-        'settings' => array(
-            'items' => array(
-                'General' => array(
+        ],
+        'settings' => [
+            'items' => [
+                'General' => [
                     'href' => 'settings.manage?section_id=General',
                     'position' => 100,
                     'type' => 'setting',
-                ),
-                'Appearance' => array(
+                ],
+                'Appearance' => [
                     'href' => 'settings.manage?section_id=Appearance',
                     'position' => 200,
                     'type' => 'setting',
-                ),
-                'Appearance_divider' => array(
+                ],
+                'Appearance_divider' => [
                     'type' => 'divider',
                     'position' => 300,
-                ),
-                'Company' => array(
+                ],
+                'Company' => [
                     'href' => 'settings.manage?section_id=Company',
                     'position' => 400,
                     'type' => 'setting',
-                ),
-                'Checkout' => array(
+                ],
+                'Checkout' => [
                     'href' => 'settings.manage?section_id=Checkout',
                     'position' => 500,
                     'type' => 'setting',
-                ),
-                'Emails' => array(
+                ],
+                'Emails' => [
                     'href' => 'settings.manage?section_id=Emails',
                     'position' => 700,
                     'type' => 'setting',
-                ),
-                'Thumbnails' => array(
+                ],
+                'Thumbnails' => [
                     'href' => 'settings.manage?section_id=Thumbnails',
                     'position' => 800,
                     'type' => 'setting',
-                ),
-                'Sitemap' => array(
+                ],
+                'Sitemap' => [
                     'href' => 'settings.manage?section_id=Sitemap',
                     'position' => 900,
                     'type' => 'setting',
-                ),
-                'Upgrade_center' => array(
+                ],
+                'Upgrade_center' => [
                     'href' => 'settings.manage?section_id=Upgrade_center',
                     'position' => 1000,
                     'type' => 'setting',
-                ),
-                'Upgrade_center_divider' => array(
+                ],
+                'Upgrade_center_divider' => [
                     'type' => 'divider',
                     'position' => 1100,
-                ),
-                'Security' => array(
+                ],
+                'Security' => [
                     'href' => 'settings.manage?section_id=Security',
                     'position' => 1200,
                     'type' => 'setting',
-                ),
-                'Image_verification_divider' => array(
+                ],
+                'Image_verification_divider' => [
                     'type' => 'divider',
                     'position' => 1400,
-                ),
-                'Logging' => array(
+                ],
+                'Logging' => [
                     'href' => 'settings.manage?section_id=Logging',
                     'position' => 1500,
                     'type' => 'setting',
-                ),
-                'Reports' => array(
+                ],
+                'Reports' => [
                     'href' => 'settings.manage?section_id=Reports',
                     'position' => 1600,
                     'type' => 'setting',
-                ),
-                'Reports_divider' => array(
+                ],
+                'Reports_divider' => [
                     'position' => 1610,
                     'type' => 'divider',
-                ),
-                'settings_wizard' => array(
+                ],
+                'settings_wizard' => [
                     'href' => 'settings_wizard.view',
                     'position' => 1700,
                     'title' => __("settings_wizard"),
-                ),
-                'store_mode' => array(
+                ],
+                'store_mode' => [
                     'position' => 999999,
                     'type' => 'title',
                     'href' => 'settings.change_store_mode',
-                    'attrs' => array(
+                    'attrs' => [
                         'class_href' => 'cm-dialog-opener cm-dialog-auto-size',
-                        'href' => array(
+                        'href' => [
                             'data-ca-target-id' => 'store_mode_dialog',
-                        ),
-                    ),
-                )
-            ),
+                        ],
+                    ],
+                ]
+            ],
             'position' => 700,
-        ),
-    ),
+        ],
+    ],
 
-    'central' => array(
-        'orders' => array(
-            'items' => array(
-                'view_orders' => array(
+    'central' => [
+        'orders' => [
+            'items' => [
+                'view_orders' => [
                     'href' => 'orders.manage',
                     'alt' => 'order_management',
                     'position' => 100,
-                ),
-                'sales_reports' => array(
+                ],
+                'sales_reports' => [
                     'href' => 'sales_reports.view',
                     'position' => 200,
-                ),
-                'shipments' => array(
+                ],
+                'shipments' => [
                     'href' => 'shipments.manage',
                     'position' => 400,
-                ),
-            ),
+                ],
+                'users_carts' => [
+                    'href' => 'cart.cart_list',
+                    'position' => 500,
+                ],
+            ],
             'position' => 100,
-        ),
-        'products' => array(
-            'items' => array(
-                'categories' => array(
+        ],
+        'products' => [
+            'title' => __('products_menu_title'),
+            'items' => [
+                'categories' => [
                     'href' => 'categories.manage',
                     'position' => 100,
-                ),
-                'products' => array(
+                ],
+                'products' => [
                     'href' => 'products.manage',
-                    'alt' => 'product_options.inventory,product_options.exceptions',
+                    'alt' => 'product_options.inventory,product_options.exceptions,products.update,products.m_update,products.add',
                     'position' => 200,
-                ),
-                'features' => array(
+                ],
+                'features' => [
                     'href' => 'product_features.manage',
                     'position' => 300,
-                ),
-                'filters' => array(
+                ],
+                'filters' => [
                     'href' => 'product_filters.manage',
                     'position' => 400,
-                ),
-                'options' => array(
+                ],
+                'options' => [
                     'href' => 'product_options.manage',
                     'position' => 500,
-                ),
-            ),
+                ],
+            ],
             'position' => 200,
-        ),
-        'customers' => array(
-            'items' => array(
-                'administrators' => array(
+        ],
+        'customers' => [
+            'title' => __('customers_menu_title'),
+            'items' => [
+                'administrators' => [
                     'href' => 'profiles.manage?user_type=A',
                     'alt' => 'profiles.update?user_type=A',
                     'position' => 200,
-                ),
-                'customers' => array(
+                ],
+                'customers' => [
                     'href' => 'profiles.manage?user_type=C',
                     'alt' => 'profiles.update?user_type=C',
                     'position' => 300,
-                ),
-                'usergroups' => array(
+                ],
+                'usergroups' => [
                     'href' => 'usergroups.manage',
                     'position' => 800,
-                ),
-            ),
+                ],
+            ],
             'position' => 300,
-        ),
-        'website' => array(
-            'items' => array(
-                'pages' => array(
+        ],
+        'website' => [
+            'items' => [
+                'pages' => [
                     'href' => 'pages.manage?get_tree=multi_level',
+                    'alt'  => 'pages.manage,pages.update,pages.add',
                     'position' => 100,
-                ),
-                'seo' => array(
+                ],
+                'seo' => [
                     'href' => 'robots.manage',
                     'position' => 500,
-                    'subitems' => array(
-                        'seo_robots' => array(
+                    'subitems' => [
+                        'seo_robots' => [
                             'href' => 'robots.manage',
                             'position' => 600
-                        ),
-                    )
-                ),
-                'sitemap' => array(
+                        ],
+                    ]
+                ],
+                'sitemap' => [
                     'href' => 'sitemap.manage',
                     'position' => 1000,
-                ),
-            ),
+                ],
+            ],
             'position' => 500,
-        ),
-        'marketing' => array(
-            'items' => array(
-                'promotions' => array(
+        ],
+        'marketing' => [
+            'items' => [
+                'promotions' => [
                     'href' => 'promotions.manage',
                     'position' => 100,
-                ),
-                'users_carts' => array(
-                    'href' => 'cart.cart_list',
-                    'position' => 200,
-                ),
-            ),
+                ],
+            ],
             'position' => 400,
-        ),
-    ),
-);
+        ],
+    ],
+];
+
+if (empty(fn_get_schema('sync_data', 'sync_data'))) {
+    unset($schema['top']['administration']['items']['sync_data']);
+}
 
 if (Registry::get('config.tweaks.disable_localizations') == true) {
     unset($schema['top']['administration']['items']['shippings_taxes']['subitems']['localizations']);
@@ -500,6 +570,8 @@ if (Registry::get('config.tweaks.disable_localizations') == true) {
 if (Registry::get('settings.Appearance.email_templates') == 'old') {
     unset($schema['top']['design']['items']['email_templates']);
     unset($schema['top']['design']['items']['documents']);
+    unset($schema['top']['administration']['items']['notifications']['subitems']['documents']);
+    unset($schema['top']['administration']['items']['notifications']['subitems']['code_snippets']);
 }
 
 if (Registry::get('config.tweaks.disable_localizations') != true && fn_allowed_for('ULTIMATE:FREE')) {

@@ -15,12 +15,13 @@
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 
 {if $newsletters}
-<div class="table-wrapper">
-    <table width="100%" class="table table-middle">
+<div class="table-responsive-wrapper">
+    <table width="100%" class="table table-middle table-responsive">
     <thead>
     <tr>
         <th width="1%">
-            {include file="common/check_items.tpl"}</th>
+            {include file="common/check_items.tpl"}
+        </th>
         <th width="40%">{__("subject")}</th>
         {if $newsletter_type == $smarty.const.NEWSLETTER_TYPE_NEWSLETTER}
         <th>{__("mailing_lists")}</th>
@@ -33,16 +34,17 @@
     {foreach from=$newsletters item=newsletter}
     <tbody>
     <tr class="cm-row-status-{$newsletter.status|lower}">
-        <td class="left">
-            <input type="checkbox" name="newsletter_ids[]" value="{$newsletter.newsletter_id}" class="cm-item" /></td>
-        <td>
+        <td class="left mobile-hide">
+            <input type="checkbox" name="newsletter_ids[]" value="{$newsletter.newsletter_id}" class="cm-item" />
+        </td>
+        <td data-th="{__("subject")}">
             <a class="row-status" href="{"newsletters.update?newsletter_id=`$newsletter.newsletter_id`"|fn_url}">{$newsletter.newsletter}</a>
         </td>
         {if $newsletter_type == $smarty.const.NEWSLETTER_TYPE_NEWSLETTER}
-            <td>
+            <td data-th="{__("mailing_lists")}">
                 {$newsletter.mailing_list_names|default:" - "}
             </td>
-            <td class="nowrap">
+            <td data-th="{__("date")}" class="nowrap">
                 {if $newsletter.sent_date}
                     {$newsletter.sent_date|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}
                 {else}
@@ -60,7 +62,7 @@
                 {dropdown content=$smarty.capture.tools_list}
             </div>
         </td>
-        <td class="right" width="10%">
+        <td data-th="{__("status")}" class="right" width="10%">
             {include file="common/select_popup.tpl" id=$newsletter.newsletter_id status=$newsletter.status items_status="newsletters"|fn_get_predefined_statuses object_id_name="newsletter_id" table="newsletters" popup_additional_class="dropleft"}
         </td>
     </tr>
@@ -95,4 +97,10 @@
     {/if}
 {/capture}
 
-{include file="common/mainbox.tpl" title=$object_names content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons}
+{include file="common/mainbox.tpl"
+    title=$object_names
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+    adv_buttons=$smarty.capture.adv_buttons
+}

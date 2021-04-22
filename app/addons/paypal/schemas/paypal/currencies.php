@@ -190,6 +190,13 @@ $schema = array(
         'id' => 458,
         'active' => true
     ),
+    'INR' => array(
+        'name' => 'currency_code_inr',
+        'code' => 'INR',
+        'supports' => array('standard', 'express', 'payflow', 'pro', 'advanced'),
+        'id' => 356,
+        'active' => true
+    ),
 );
 
 return $schema;

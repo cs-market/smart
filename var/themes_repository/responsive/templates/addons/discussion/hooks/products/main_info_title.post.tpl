@@ -5,6 +5,14 @@
         {if $product.discussion.posts}
         <a class="ty-discussion__review-a cm-external-click" data-ca-scroll="content_discussion" data-ca-external-click-id="discussion">{$product.discussion.search.total_items} {__("reviews", [$product.discussion.search.total_items])}</a>
         {/if}
-        <a class="ty-discussion__review-write cm-dialog-opener cm-dialog-auto-size" data-ca-target-id="new_post_dialog_{$obj_id}" rel="nofollow">{__("write_review")}</a>
+        {include
+            file="addons/discussion/views/discussion/components/new_post_button.tpl"
+            name=__("write_review")
+            obj_id=$obj_id
+            obj_prefix="main_info_title_"
+            style="text"
+            object_type="Addons\\Discussion\\DiscussionObjectTypes::PRODUCT"|enum
+            locate_to_review_tab=true
+        }
     <!--average_rating_product--></div>
 {/if}

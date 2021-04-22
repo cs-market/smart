@@ -16,7 +16,6 @@ use Tygh\Exceptions\DatabaseException;
 use Tygh\Exceptions\InputException;
 use Tygh\Exceptions\NativeBackupperException;
 use Tygh\Registry;
-use Tygh\Tools\Backup\Backuper;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -62,7 +61,8 @@ function db_get_row()
  *
  * @param string $query unparsed query
  * @param mixed ... unlimited number of variables for placeholders
- * @return array structured data
+ *
+ * @return string
  */
 function db_get_field()
 {
@@ -108,15 +108,16 @@ function db_get_hash_single_array()
 }
 
 /**
- *
  * Prepare data and execute REPLACE INTO query to DB
  * If one of $data element is null function unsets it before querry
  *
- * @param string $table  Name of table that condition generated. Must be in SQL notation without placeholder.
- * @param array  $data   Array of key=>value data of fields need to insert/update
- * @return db_result
+ * @param string $table       Name of table that condition generated. Must be in SQL notation without placeholder.
+ * @param array  $data        Array of key=>value data of fields need to insert/update
+ * @param bool   $is_multiple if true, $data is treated as multiple values array
+ *
+ * @return int
  */
-function db_replace_into($table, $data)
+function db_replace_into($table, $data, $is_multiple = false)
 {
     return call_user_func_array(array(Tygh::$app['db'], 'replaceInto'), func_get_args());
 }
@@ -436,16 +437,27 @@ function db_import_sql_file($file, $buffer = 16384, $show_status = true, $show_c
 }
 
 /**
- * Get auto increment value for table
+ * Gets auto increment value for table
  *
- * @param string $table - database table
- * @return integer - auto increment value
+ * @param string $table Database table name
+ *
+ * @return int Returns the auto increment value
+ * @deprecated
+ * Don't fetch the value of the counter:
+ * - It is possible to make do without it in all cases.
+ * - It is not safe when query contention is high.
  */
 function db_get_next_auto_increment_id($table)
 {
-    $table_status = Tygh::$app['db']->getRow("SHOW TABLE STATUS LIKE '?:$table'");
+    /** @var \Tygh\Database\Connection $db */
+    $db = Tygh::$app['db'];
 
-    return !empty($table_status['Auto_increment'])? $table_status['Auto_increment'] : $table_status['AUTO_INCREMENT'];
+    $db->raw = true;
+    $db->query('ANALYZE TABLE ?:?p', $table);
+
+    $table_status = $db->getRow("SHOW TABLE STATUS LIKE '?:?p'", $table);
+
+    return !empty($table_status['Auto_increment']) ? $table_status['Auto_increment'] : $table_status['AUTO_INCREMENT'];
 }
 
 /**
@@ -470,7 +482,7 @@ function db_remove_missing_records($child_table, $child_foreign_key, $parent_tab
  * @param array $params sort params
  * @param array $sortings available sortings
  * @param string $default_by default sort field
- * @param string $default_by default order
+ * @param string $default_order default order
  * @return string SQL substring
  */
 function db_sort(&$params, $sortings, $default_by = '', $default_order = '')

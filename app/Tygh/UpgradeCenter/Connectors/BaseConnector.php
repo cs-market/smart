@@ -131,7 +131,7 @@ abstract class BaseConnector implements IConnector
     public function processServerResponse($response, $show_upgrade_notice)
     {
         $parsed_data = array();
-        $data = simplexml_load_string($response);
+        $data = @simplexml_load_string($response);
 
         if ($data && $data->packages->item) {
             $parsed_data = array(
@@ -162,7 +162,8 @@ abstract class BaseConnector implements IConnector
      *
      * @param  array  $schema       Package schema
      * @param  string $package_path Path where the upgrade pack must be saved
-     * @return bool   True if upgrade package was successfully downloaded, false otherwise
+     *
+     * @return array   True if upgrade package was successfully downloaded, false otherwise
      */
     public function downloadPackage($schema, $package_path)
     {

@@ -12,16 +12,14 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['top']['addons']['items']['searchanise'] = array(
-    'href' => 'addons.update?addon=searchanise',
-    'position' => 1000
-);
-$schema['central']['website']['items']['searchanise'] = array(
-    'attrs' => array(
+defined('BOOTSTRAP') or die('Access denied');
+
+$schema['central']['website']['items']['searchanise'] = [
+    'attrs' => [
         'class'=>'is-addon'
-    ),
+    ],
     'href' => 'addons.update?addon=searchanise',
     'position' => 110
-);
+];
 
 return $schema;

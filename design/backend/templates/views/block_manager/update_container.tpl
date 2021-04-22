@@ -25,6 +25,39 @@
         </div>
     </div>
 
+    <div class="control-group">
+        <label class="control-label cm-required cm-multiple-checkboxes"
+               for="container_{$id}_availability"
+        >{__("block_manager.availability.show_on")}</label>
+        <div class="controls" id="container_{$id}_availability">
+            <div class="btn-group btn-group-checkbox">
+                {foreach $container.availability as $device => $is_available}
+                
+                    {if $device == "phone"}
+                        {$devices_icon = "icon-mobile-phone"}
+                    {elseif $device == "tablet"}
+                        {$devices_icon = "icon-tablet"}
+                    {elseif $device == "desktop"}
+                        {$devices_icon = "icon-desktop"}
+                    {/if}
+
+                    <input type="checkbox"
+                        id="elm_container_{$id}_show_on_{$device}"
+                        class="cm-text-toggle btn-group-checkbox__checkbox"
+                        {if $is_available}checked="checked"{/if}
+                        data-ca-toggle-text="{$container_availability_instance->getHiddenClass($device)}"
+                        data-ca-toggle-text-mode="onDisable"
+                        data-ca-toggle-text-target-elem-id="elm_container_user_class_{$id}"
+                    />
+                    <label class="btn btn-group-checkbox__label" for="elm_container_{$id}_show_on_{$device}">
+                        <i class="{$devices_icon}"></i>
+                        {__("block_manager.availability.{$device}")}
+                    </label>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+
 </fieldset>
 </div>
 

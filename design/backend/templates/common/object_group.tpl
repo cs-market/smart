@@ -1,25 +1,40 @@
+{$is_responsive_table_without_title = $is_responsive_table_without_title|default:true}
+
 {if !$no_table}
-<div class="table-wrapper">
-    <table width="100%" class="table table-middle table-objects{if $table_striped} table-striped{/if}">
+<div class="{if $is_responsive_table}table-responsive-wrapper{else}table-wrapper{/if}">
+    <table width="100%" class="table table-middle table--relative table-objects {if $is_responsive_table}table-responsive {if $is_responsive_table_without_title}table-responsive-w-titles{/if}{/if} {if $table_striped} table-striped{/if}">
         <tbody>
     {/if}
-            <tr class="cm-row-status-{$status|lower} {$additional_class} cm-row-item" {if $row_id}id="{$row_id}"{/if} data-ct-{$table}="{$id}">
-                {if $checkbox_name}
-                <td>
-                    <input type="checkbox" name="{$checkbox_name}" value="{$checkbox_value|default:$id}"{if $checked} checked="checked"{/if} class="cm-item" />
+            <tr class="cm-row-status-{$status|lower} {$additional_class} cm-row-item" 
+                {if $row_id}id="{$row_id}"{/if}
+                data-ct-{$table}="{$id}"
+                {if $is_bulkedit_menu}
+                    data-ca-longtap-action="setCheckBox"
+                    data-ca-longtap-target="input.cm-item"
+                    data-ca-id="{$id}"
+                {/if}
+            >
+                {if $checkbox_name && $show_checkboxes}
+                <td 
+                    {if $checkbox_col_width} width="{$checkbox_col_width}" {/if}
+                    data-th="&nbsp;"
+                >
+                    <input type="checkbox" name="{$checkbox_name}" value="{$checkbox_value|default:$id}"{if $checked} checked="checked"{/if} class="cm-item{if $hidden_checkbox} hidden{/if} cm-item-status-{$status|lower}" />
                 </td>
                 {/if}
 
-                <td width="1%" class="no-padding-td">
+                {if !$no_padding}
+                <td width="1%" class="no-padding-td" data-th="&nbsp;">
                     {if $draggable}
                         <span class="handler cm-sortable-handle"></span>
                     {/if}
                 </td>
+                {/if}
 
-                <td width="{if $href_desc}77{else}28{/if}%">
+                <td width="{if $href_desc}77{else}28{/if}%" {if $href_desc_row_hint}data-th="{$href_desc_row_hint}"{else}data-th="&nbsp;"{/if}>
                     <div class="object-group-link-wrap">
                     {if !$non_editable}
-                        <a {if $no_popup}href="{$href|fn_url}"{/if} class="row-status {if !$main_link}cm-external-click{/if}{if $non_editable} no-underline{/if}{if $main_link} link{/if} {$link_meta}{if $is_promo}cm-promo-popup{/if}"{if !$non_editable && !$not_clickable} data-ca-external-click-id="opener_group{$id_prefix}{$id}"{/if}{if $main_link} {if !$is_promo}href="{$main_link|fn_url}{/if}"{/if}>{$text}</a>
+                        <a {if $no_popup}href="{$href|fn_url}"{/if} title="{$text}" class="row-status {if !$main_link}cm-external-click{/if}{if $non_editable} no-underline{/if}{if $main_link} link{/if} {$link_meta}{if $is_promo}cm-promo-popup{/if} {if $text_wrap}row-status--text-wrap{/if}"{if !$non_editable && !$not_clickable} data-ca-external-click-id="opener_group{$id_prefix}{$id}"{/if}{if $main_link} {if !$is_promo}href="{$main_link|fn_url}{/if}"{/if}>{$text}</a>
                     {else}
                         <span class="unedited-element block {$link_meta}">{$text|default:__("view")}</span>
                     {/if}
@@ -32,7 +47,7 @@
                     {/if}
                     </div>
                 </td>
-                <td width="{if $href_desc}0{else}50{/if}%">
+                <td width="{if $href_desc}0{else}50{/if}%" data-th="&nbsp;">
                     <span class="row-status object-group-details">{$details nofilter}</span>
                 </td>
 
@@ -40,7 +55,7 @@
                     {$extra_data nofilter}
                 {/if}
 
-                <td width="10%" class="right nowrap">
+                <td width="10%" class="right nowrap" data-th="&nbsp;">
 
                     <div class="pull-right hidden-tools">
                         {capture name="items_tools"}
@@ -63,7 +78,7 @@
                                         {$class="cm-delete-row"}
                                         {$href=$href_delete}
                                     {/if}
-                                    <li>{btn type="text" text=__("delete") href=$href class="cm-confirm cm-tooltip cm-ajax cm-ajax-force cm-ajax-full-render `$class`" data=["data-ca-target-id" => $delete_target_id, "data-ca-params" => $delete_data] method="POST"}</li>
+                                    <li>{btn type="text" text=__("delete") href=$href class="cm-confirm cm-ajax cm-ajax-force cm-ajax-full-render `$class`" data=["data-ca-target-id" => $delete_target_id, "data-ca-params" => $delete_data] method="POST"}</li>
                                 {/if}
                             {/if}
                         {/capture}
@@ -72,7 +87,7 @@
                     {$links nofilter}
                 </td>
                 {if !$nostatus}
-                    <td width="12%">
+                    <td width="12%" {if $status_row_hint}data-th="{$status_row_hint}"{else}data-th="&nbsp;"{/if}>
                         <div class="pull-right nowrap">
                             {if $non_editable == true || $is_promo}
                                 {assign var="display" value="text"}

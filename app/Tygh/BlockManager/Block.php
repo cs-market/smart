@@ -13,12 +13,26 @@
  ****************************************************************************/
 
 namespace Tygh\BlockManager;
-use Tygh\CompanySingleton;
-use Tygh\Tools\SecurityHelper;
 
+use Tygh\CompanySingleton;
+use Tygh\Languages\Languages;
+use Tygh\Navigation\LastView;
+use Tygh\Themes\Themes;
+use Tygh\Tools\SecurityHelper;
+use Tygh\Tygh;
+
+/**
+ * Class Block
+ *
+ * @package Tygh\BlockManager
+ */
 class Block extends CompanySingleton
 {
+    use TDeviceAvailabiltiy;
+
     const TYPE_MAIN = 'main';
+
+    protected $storefront_id;
 
     /**
      * Gets all unique blocks
@@ -29,7 +43,7 @@ class Block extends CompanySingleton
     public function getAllUnique($lang_code = CART_LANGUAGE)
     {
         $join = '';
-        $condition = '';
+        $condition = db_quote(' AND b.storefront_id = ?i', $this->storefront_id);
 
         /**
          * Prepares params for SQL query before getting unique blocks
@@ -41,7 +55,7 @@ class Block extends CompanySingleton
 
         if (fn_allowed_for('MULTIVENDOR') && !$this->_company_id) {
             // FIXME: Hardcoded condition to prevent Multi-Vendor admin from seeing vendor blocks
-            $condition .= db_quote(' AND b.company_id = 0');
+            $condition .= db_quote(' AND b.company_id = ?i', 0);
         } else {
             $condition .= $this->getCompanyCondition('b.company_id');
         }
@@ -139,11 +153,13 @@ class Block extends CompanySingleton
             }
         }
 
+        $block['availability'] = $this->getAvailability($block);
+
         /**
          * Processes block data after getting it
          *
-         * @param $block Array of block data
-         * @param int $snapping_id Snapping identifier
+         * @param array  $block       Array of block data
+         * @param int    $snapping_id Snapping identifier
          * @param string $lang_code
          */
         fn_set_hook('get_block_post', $block, $snapping_id, $lang_code);
@@ -154,7 +170,8 @@ class Block extends CompanySingleton
     /**
      * Generates SQL condition for getting the proper block content
      *
-     * @param $dynamic_object Array of dynamic object data
+     * @param array $dynamic_object Array of dynamic object data
+     *
      * @return string SQL condition
      */
     private function _generateContentCondition($dynamic_object)
@@ -181,7 +198,7 @@ class Block extends CompanySingleton
     {
         $block_descriptions = array();
 
-        foreach (fn_get_translation_languages() as $lang_code => $v) {
+        foreach (Languages::getAll() as $lang_code => $v) {
             $block_descriptions[$lang_code] = $this->getById($block_id, $snapping_id, array(), $lang_code);
         }
 
@@ -283,6 +300,8 @@ class Block extends CompanySingleton
                     $blocks[$grid_id][$block_id]['object_type'] = !empty($dynamic_object['object_type'])
                         ? $dynamic_object['object_type'] : '';
                 }
+
+                $blocks[$grid_id][$block_id]['availability'] = $this->getAvailability($blocks[$grid_id][$block_id]);
             }
         }
 
@@ -310,14 +329,19 @@ class Block extends CompanySingleton
      *   user_class - User CSS class
      * )</pre>
      *
-     * @param  array         $block_data  Array of block data
-     * @param  array         $description Array of block description data @see Bm_Block::updateDescription
-     * @return int|db_result Block id if new block was created, DB result otherwise
+     * @param  array $block_data  Array of block data
+     * @param  array $description Array of block description data @see Bm_Block::updateDescription
+     *
+     * @return int|bool Block id if new block was created, DB result otherwise
      */
     public function update($block_data, $description = array())
     {
         if (!isset($block_data['company_id']) && $this->_company_id) {
             $block_data['company_id'] = $this->_company_id;
+        }
+
+        if (!isset($block_data['storefront_id']) && $this->storefront_id) {
+            $block_data['storefront_id'] = $this->storefront_id;
         }
 
         if (isset($block_data['properties'])) {
@@ -326,11 +350,14 @@ class Block extends CompanySingleton
 
         /**
          * Prepares block data before updating it
+         *
          * @param array $block_data Array of block data
          */
         fn_set_hook('update_block_pre', $block_data);
 
         SecurityHelper::sanitizeObjectData('block', $description);
+
+        $this->doBlockBeforeSaveRoutines($block_data);
 
         $db_result = db_replace_into('bm_blocks', $block_data);
 
@@ -342,7 +369,7 @@ class Block extends CompanySingleton
             // If this block type have no multilanguage content we must update it for all languages
             if (isset($block_data['type']) && !empty($block_data['content_data'])) {
                 if (!empty($block_data['apply_to_all_langs']) && $block_data['apply_to_all_langs'] == 'Y') {
-                    foreach (fn_get_translation_languages() as $block_data['content_data']['lang_code'] => $v) {
+                    foreach (Languages::getAll() as $block_data['content_data']['lang_code'] => $v) {
                         $this->_updateContent($block_id, $block_data['type'], $block_data['content_data']);
                     }
                 } else {
@@ -352,6 +379,7 @@ class Block extends CompanySingleton
 
             /**
              * Actions to be performed after the block is updated
+             *
              * @param int $block_id Block identifier
              */
             fn_set_hook('block_updated', $block_id);
@@ -364,12 +392,80 @@ class Block extends CompanySingleton
 
             /**
              * Actions to be performed after the new block is added
+             *
              * @param int $block_id Block identifier
              */
             fn_set_hook('block_created', $block_id);
         }
 
+        /**
+         * Processes block data after updating it
+         *
+         * @param array $block_data  Array of block data
+         * @param array $description Array of block description data @see Bm_Block::updateDescription
+         * @param int   $block_id    Block identifier
+         */
+        fn_set_hook('update_block_post', $block_data, $description, $block_id);
+
+        $this->doBlockAfterSaveRoutines($block_data);
+
         return $block_id;
+    }
+
+    /**
+     * Performs some routines after saving the block
+     *
+     * @param array $block_data Block data
+     *
+     * @return $this
+     */
+    protected function doBlockAfterSaveRoutines($block_data)
+    {
+        if (empty($block_data['type'])) {
+            return $this;
+        }
+
+        $block_schema = SchemesManager::getBlockScheme($block_data['type']);
+        $filling = isset($block_data['content']['items']['filling']) ? $block_data['content']['items']['filling'] : '';
+
+        if (!empty($block_schema['content']['items']['fillings'][$filling]['after_save_handlers'])) {
+            $after_save_handlers = $block_schema['content']['items']['fillings'][$filling]['after_save_handlers'];
+            foreach ($after_save_handlers as $handler) {
+               if (is_callable($handler)) {
+                   call_user_func($handler, $block_data);
+               }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Performs some routines before saving the block
+     *
+     * @param array $block_data Block data
+     *
+     * @return $this
+     */
+    protected function doBlockBeforeSaveRoutines(&$block_data)
+    {
+        if (empty($block_data['type'])) {
+            return $this;
+        }
+
+        $block_schema = SchemesManager::getBlockScheme($block_data['type']);
+        $filling = isset($block_data['content']['items']['filling']) ? $block_data['content']['items']['filling'] : '';
+
+        if (!empty($block_schema['content']['items']['fillings'][$filling]['before_save_handlers'])) {
+            $before_save_handlers = $block_schema['content']['items']['fillings'][$filling]['before_save_handlers'];
+            foreach ($before_save_handlers as $handler) {
+                if (is_callable($handler)) {
+                    call_user_func_array($handler, [&$block_data]);
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -434,7 +530,7 @@ class Block extends CompanySingleton
     {
         $result = true;
 
-        foreach (fn_get_translation_languages() as $content_data['lang_code'] => $v) {
+        foreach (Languages::getAll() as $content_data['lang_code'] => $v) {
             $result = $result & $this->_updateContent($block_id, $block_type, $content_data);
         }
 
@@ -475,6 +571,9 @@ class Block extends CompanySingleton
     {
         if (!empty($block_id) && !empty($description['lang_code'])) {
             $description['block_id'] = $block_id;
+            if (!empty($description['name'])) {
+                $description['name'] = empty($description['lang_var']) ? $description['name'] : __($description['lang_var'], [], $description['lang_code']);
+            }
 
             return db_replace_into('bm_blocks_descriptions', $description);
         } else {
@@ -492,7 +591,7 @@ class Block extends CompanySingleton
     {
         $result = true;
 
-        foreach (fn_get_translation_languages() as $description['lang_code'] => $v) {
+        foreach (Languages::getAll() as $description['lang_code'] => $v) {
             $result = $result & $this->_updateDescription($block_id, $description);
         }
 
@@ -555,6 +654,13 @@ class Block extends CompanySingleton
     public function updateSnapping($snapping_data)
     {
         if (!empty($snapping_data['snapping_id']) || (!empty($snapping_data['block_id']) && !empty($snapping_data['grid_id']))) {
+            /**
+             * Processes snapping data before updating it
+             *
+             * @param  array $snapping_data Array of snapping data
+             */
+            fn_set_hook('update_snapping_pre', $snapping_data);
+
             // Updates block descriptions for dynamic objects
             if (isset($snapping_data['object_ids']) && isset($snapping_data['object_type']) && !empty($snapping_data['block_id'])
                 && isset($snapping_data['description']) && isset($snapping_data['description']['lang_code'])
@@ -580,6 +686,13 @@ class Block extends CompanySingleton
             if (!empty($snapping_data['snapping_id']) && !empty($snapping_data['object_type'])) {
                 db_replace_into('bm_block_statuses', $snapping_data);
             }
+
+            /**
+             * Processes snapping data after updating it
+             *
+             * @param  array $snapping_data Array of snapping data
+             */
+            fn_set_hook('update_snapping_post', $snapping_data);
 
             return $snapping_id;
         } else {
@@ -658,6 +771,13 @@ class Block extends CompanySingleton
                 ));
             }
 
+            /**
+             * Processes block status data after updating it
+             *
+             * @param array $status_data  Array of status data
+             */
+            fn_set_hook('update_block_status_post', $status_data);
+
             return $status_data['status'];
         } else {
             return false;
@@ -668,7 +788,8 @@ class Block extends CompanySingleton
      * Updates statuses for more that one dynamic object
      *
      * @param $status_data
-     * @return mixed db_result on success, false otherwise
+     *
+     * @return int|bool int on success, false otherwise
      */
     public function updateStatuses($status_data)
     {
@@ -1084,15 +1205,19 @@ class Block extends CompanySingleton
     /**
      * Copies blocks from one company to another.
      *
-     * @param array   $snapping_ids         Snapping IDs of the company blocks are copied to
-     * @param int     $company_id           Company ID to copy blocks to
-     * @param boolean $replace_duplicates   When true and exact block duplicate exists in any location,
-     *                                      the existing block will be placed into snapping instead of creating the new one.
-     *                                      When false, simple search by block type, properties, description and content will be performed.
+     * @param array    $snapping_ids        Snapping IDs of the company blocks are copied to
+     * @param int      $company_id          Company ID to copy blocks to
+     * @param boolean  $replace_duplicates  When true and exact block duplicate exists in any location,
+     *                                      the existing block will be placed into snapping instead of creating the new
+     *                                      one. When false, simple search by block type, properties, description and
+     *                                      content will be performed.
+     * @param int|null $storefront_id       Storefront ID to copy blocks to
      */
-    public function copy($snapping_ids, $company_id, $replace_duplicates = false)
+    public function copy($snapping_ids, $company_id, $replace_duplicates = false, $storefront_id = null)
     {
         static $_unique_blocks = array();
+
+        $storefront_id = $storefront_id ?: $this->storefront_id;
 
         $exim = Exim::instance($company_id);
         $block_matches = array();
@@ -1108,15 +1233,24 @@ class Block extends CompanySingleton
             $content = db_get_hash_array("SELECT * FROM ?:bm_blocks_content WHERE block_id = ?i", 'lang_code', $block_id);
 
             // Get unique block key
-            $unique_key = $exim->getUniqueBlockKey($block['type'], $block['properties'], $descriptions[CART_LANGUAGE]['name'], $content[CART_LANGUAGE]['content']);
+            $unique_key = $exim->getUniqueBlockKey($block['type'], $block['properties'], $descriptions[CART_LANGUAGE]['name'], $content[CART_LANGUAGE]['content'], $block['storefront_id']);
             if ($replace_duplicates && !isset($_unique_blocks[$company_id][$unique_key])) {
                 // Search for the full duplicate
-                $_unique_blocks[$company_id][$unique_key] = $this->findDuplicate($block_id, $block['type'], $block['properties'], $descriptions[CART_LANGUAGE]['name'], $content[CART_LANGUAGE]['content']);
+                $_unique_blocks[$company_id][$unique_key] = $this->findDuplicate(
+                    $block_id,
+                    $block['type'],
+                    $block['properties'],
+                    $descriptions[CART_LANGUAGE]['name'],
+                    $content[CART_LANGUAGE]['content'],
+                    CART_LANGUAGE,
+                    $block['storefront_id']
+                );
             }
             if (!empty($_unique_blocks[$company_id][$unique_key])) {
                 $new_block_id = $_unique_blocks[$company_id][$unique_key];
             } else {
                 $block['company_id'] = $company_id;
+                $block['storefront_id'] = $storefront_id;
                 unset($block['block_id']);
                 $new_block_id = db_query("INSERT INTO ?:bm_blocks ?e", $block);
 
@@ -1223,23 +1357,29 @@ class Block extends CompanySingleton
     /**
      * Finds block that is the exact copy of the specified one.
      *
-     * @param int    $block_id   Block ID to find copy for
-     * @param string $type       Block type
-     * @param string $properties Block properties (serialized)
-     * @param string $name       Block name
-     * @param string $content    Block content (serialized)
-     * @param string $lang_code  Two-letter language code
+     * @param int      $block_id      Block ID to find copy for
+     * @param string   $type          Block type
+     * @param string   $properties    Block properties (serialized)
+     * @param string   $name          Block name
+     * @param string   $content       Block content (serialized)
+     * @param string   $lang_code     Two-letter language code
+     * @param int|null $storefront_id Storefront ID to find duplicates in
      *
      * @return int|string Block ID or empty string if none found
      */
-    public function findDuplicate($block_id, $type, $properties, $name, $content, $lang_code = CART_LANGUAGE)
+    public function findDuplicate($block_id, $type, $properties, $name, $content, $lang_code = CART_LANGUAGE, $storefront_id = null)
     {
+        if ($storefront_id === null) {
+            $storefront_id = db_get_field('SELECT storefront_id FROM ?:bm_blocks WHERE block_id = ?i', $block_id);
+        }
+
         return db_get_field(
             'SELECT blocks.block_id'
             . ' FROM ?:bm_blocks AS blocks'
             . ' LEFT JOIN ?:bm_blocks_content content ON content.block_id = blocks.block_id'
             . ' LEFT JOIN ?:bm_blocks_descriptions descr ON descr.block_id = blocks.block_id AND descr.lang_code = content.lang_code'
             . ' WHERE blocks.company_id = ?i'
+            . ' AND blocks.storefront_id = ?i'
             . ' AND blocks.type = ?s'
             . ' AND blocks.block_id <> ?i'
             . ' AND MD5(blocks.properties) = ?s'
@@ -1247,6 +1387,7 @@ class Block extends CompanySingleton
             . ' AND MD5(content.content) = ?s'
             . ' AND descr.lang_code = ?s',
             $this->_company_id,
+            $storefront_id,
             $type,
             $block_id,
             md5($properties),
@@ -1254,5 +1395,356 @@ class Block extends CompanySingleton
             md5($content),
             $lang_code
         );
+    }
+
+    /**
+     * Gets products list by search params
+     *
+     * @param array  $params         Block search params
+     * @param int    $items_per_page Limit element on page
+     * @param string $lang_code      Two-letter language code
+     *
+     * @return array Block list and Search params
+     */
+    public function find(array $params, $items_per_page = 0, $lang_code = CART_LANGUAGE)
+    {
+        // Init filter
+        $params = LastView::instance()->update('blocks', $params);
+
+        // Set default values to input params
+        $default_params = [
+            'name'                   => null,
+            'type'                   => null,
+            'layout_id'              => null,
+            'location_id'            => null,
+            'limit'                  => null,
+            'page'                   => 0,
+            'items_per_page'         => $items_per_page,
+            'sort_by'                => 'name',
+            'sort_order'             => 'asc',
+            'extend'                 => [],
+            'only_types_from_scheme' => false,
+        ];
+
+        $sortings = [
+            'name' => 'bm_blocks_descriptions.name',
+            'type' => 'bm_blocks.type',
+        ];
+
+        $params = array_merge($default_params, $params);
+
+        $fields = [
+            'block_id'   => 'bm_blocks.block_id',
+            'type'       => 'bm_blocks.type',
+            'properties' => 'bm_blocks.properties',
+            'company_id' => 'bm_blocks.company_id',
+            'content'    => 'bm_blocks_content.content',
+            'name'       => 'bm_blocks_descriptions.name',
+        ];
+
+        $extend_join_tables = [];
+        $conditions = [
+            'company_id' => $this->getCompanyCondition('bm_blocks.company_id', false, fn_get_blocks_owner())
+        ];
+
+        if (!empty($params['name'])) {
+            $params['name'] = trim((string) $params['name']);
+            $conditions['name'] = db_quote('bm_blocks_descriptions.name LIKE ?l', "%{$params['name']}%");
+        }
+
+        if (!empty($params['type'])) {
+            if (is_array($params['type'])) {
+                $conditions['type'] = db_quote('bm_blocks.type IN (?a)', $params['type']);
+            } else {
+                $conditions['type'] = db_quote('bm_blocks.type = ?s', $params['type']);
+            }
+        }
+
+        if ($params['only_types_from_scheme']) {
+            $conditions['only_types_from_scheme'] = db_quote('bm_blocks.type IN (?a)', array_keys(SchemesManager::getBlockTypes()));
+        }
+
+        if (!empty($params['layout_id'])) {
+            $extend_join_tables[] = 'bm_locations';
+
+            if (is_array($params['layout_id'])) {
+                $conditions['layout_id'] = db_quote('bm_locations.layout_id IN (?n)', $params['layout_id']);
+            } else {
+                $conditions['layout_id'] = db_quote('bm_locations.layout_id = ?i', $params['layout_id']);
+            }
+        }
+
+        if (!empty($params['location_id'])) {
+            $extend_join_tables[] = 'bm_containers';
+
+            if (is_array($params['location_id'])) {
+                $conditions['location_id'] = db_quote('bm_containers.location_id IN (?n)', $params['location_id']);
+            } else {
+                $conditions['location_id'] = db_quote('bm_containers.location_id = ?i', $params['location_id']);
+            }
+        }
+
+        $joins = [
+            'bm_blocks_content' => db_quote(
+                'INNER JOIN ?:bm_blocks_content AS bm_blocks_content ON bm_blocks_content.block_id = bm_blocks.block_id'
+                    . ' AND bm_blocks_content.lang_code = ?s AND bm_blocks_content.snapping_id = 0'
+                    . ' AND bm_blocks_content.object_id = 0 AND bm_blocks_content.object_type = ?s',
+                $lang_code, ''
+            ),
+            'bm_blocks_descriptions' => db_quote(
+                'INNER JOIN ?:bm_blocks_descriptions AS bm_blocks_descriptions ON bm_blocks_descriptions.block_id = bm_blocks.block_id'
+                . ' AND bm_blocks_descriptions.lang_code = ?s',
+                $lang_code
+            )
+        ];
+
+        if (in_array('bm_locations', $extend_join_tables)) {
+            $extend_join_tables[] = 'bm_containers';
+            $joins = array_merge(['bm_locations' => db_quote('LEFT JOIN ?:bm_locations AS bm_locations ON bm_locations.location_id = bm_containers.location_id')], $joins);
+        }
+
+        if (in_array('bm_containers', $extend_join_tables)) {
+            $extend_join_tables[] = 'bm_grids';
+            $joins = array_merge(['bm_containers' => db_quote('LEFT JOIN ?:bm_containers AS bm_containers ON bm_containers.container_id = bm_grids.container_id')], $joins);
+        }
+
+        if (in_array('bm_grids', $extend_join_tables)) {
+            $extend_join_tables[] = 'bm_snapping';
+            $joins = array_merge(['bm_grids' => db_quote('LEFT JOIN ?:bm_grids AS bm_grids ON bm_grids.grid_id = bm_snapping.grid_id')], $joins);
+        }
+
+        if (in_array('bm_snapping', $extend_join_tables)) {
+            $joins = array_merge(['bm_snapping' => db_quote('LEFT JOIN ?:bm_snapping AS bm_snapping ON bm_snapping.block_id = bm_blocks.block_id')], $joins);
+        }
+
+        /**
+         * Allows to override params of the selection of blocks
+         *
+         * @param array  $params         Block search params
+         * @param int    $items_per_page Limit element on page
+         * @param string $lang_code      Two-letter language code
+         * @param array  $fields         List of fields for retrieving
+         * @param array  $sortings       List of fields which can be using for sorting
+         * @param array  $conditions     List of database query parts for using in "where" section through "and" condition
+         * @param array  $joins          List of database query parts for joining tables
+         */
+        fn_set_hook('get_blocks', $params, $items_per_page, $lang_code, $fields, $sortings, $conditions, $joins);
+
+        $conditions = array_filter($conditions);
+        if (!empty($params['limit'])) {
+            $limit = db_quote(' LIMIT 0, ?i', $params['limit']);
+        } elseif (!empty($params['items_per_page'])) {
+            $params['total_items'] = db_get_field(
+                'SELECT COUNT(DISTINCT bm_blocks.block_id) FROM ?:bm_blocks AS bm_blocks ?p?p',
+                implode(' ', $joins),
+                $conditions ? ' WHERE ' . implode(' AND ', $conditions) : ''
+            );
+            $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
+        } else {
+            $limit = '';
+        }
+
+        $sorting = db_sort($params, $sortings, 'name', 'asc');
+
+        $blocks = db_get_hash_array(
+            'SELECT ?p FROM ?:bm_blocks AS bm_blocks ?p?p GROUP BY bm_blocks.block_id ?p?p',
+            'block_id',
+            implode(', ', $fields),
+            implode(' ', $joins),
+            $conditions ? ' WHERE ' . implode(' AND ', $conditions) : '',
+            $sorting,
+            $limit
+        );
+
+        if ($blocks) {
+            foreach ($blocks as &$block) {
+                if (!empty($block['properties'])) {
+                    $block['properties'] = unserialize($block['properties']);
+                }
+
+                if (!empty($block['content'])) {
+                    $block['content'] = unserialize($block['content']);
+                }
+            }
+            unset($block);
+
+            if (in_array('get_info', $params['extend'], true)) {
+                $params['extend'][] = 'get_schema';
+            }
+
+            if (in_array('get_schema', $params['extend'], true)) {
+                $block_type_schema_map = [];
+
+                foreach ($blocks as &$block) {
+                    if (!isset($block_type_schema_map[$block['type']])) {
+                        $block_type_schema_map[$block['type']] = SchemesManager::getBlockScheme($block['type'], [], true);
+                    }
+
+                    $block['schema'] = $block_type_schema_map[$block['type']];
+                }
+                unset($block);
+            }
+
+            if (in_array('get_quantity', $params['extend'], true)) {
+                $block_quantity_map = db_get_hash_single_array(
+                    'SELECT block_id, COUNT(*) AS cnt FROM ?:bm_snapping WHERE block_id IN (?n) GROUP BY block_id',
+                    ['block_id', 'cnt'],
+                    array_keys($blocks)
+                );
+            }
+
+            if (in_array('get_locations', $params['extend'], true)) {
+                $block_locations_map = db_get_hash_multi_array(
+                    'SELECT bm_snapping.block_id, bm_locations.location_id, bm_locations_descriptions.name AS location_name, bm_layouts.name AS layout_name, bm_layouts.layout_id AS layout_id, bm_layouts.theme_name AS theme_id'
+                    . ' FROM ?:bm_snapping AS bm_snapping'
+                    . ' INNER JOIN ?:bm_grids AS bm_grids ON bm_grids.grid_id = bm_snapping.grid_id'
+                    . ' INNER JOIN ?:bm_containers AS bm_containers ON bm_containers.container_id = bm_grids.container_id'
+                    . ' INNER JOIN ?:bm_locations AS bm_locations ON bm_locations.location_id = bm_containers.location_id'
+                    . ' INNER JOIN ?:bm_locations_descriptions AS bm_locations_descriptions'
+                        . ' ON bm_locations_descriptions.location_id = bm_locations.location_id AND bm_locations_descriptions.lang_code = ?s'
+                    . ' INNER JOIN ?:bm_layouts AS bm_layouts ON bm_layouts.layout_id = bm_locations.layout_id'
+                    . ' WHERE bm_snapping.block_id IN (?n) '
+                    . ' GROUP BY bm_snapping.block_id, bm_locations.location_id',
+                    ['block_id', 'location_id'],
+                    $lang_code, array_keys($blocks)
+                );
+
+                $theme_names = [];
+
+                foreach ($block_locations_map as &$items) {
+                    foreach ($items as &$item) {
+                        if (!isset($theme_names[$item['theme_id']])) {
+                            $theme = Themes::factory($item['theme_id']);
+                            $manifest = $theme->getManifest();
+
+                            $theme_names[$item['theme_id']] = isset($manifest['title']) ? $manifest['title'] : '';
+                        }
+
+                        $item['theme_name'] = $theme_names[$item['theme_id']];
+                    }
+                    unset($item);
+                }
+                unset($items, $theme_names);
+            }
+
+            if (in_array('get_info', $params['extend'], true)) {
+                foreach ($blocks as &$block) {
+                    if (isset($block['schema']['brief_info_function']) && is_callable($block['schema']['brief_info_function'])) {
+                        $block['info'] = call_user_func($block['schema']['brief_info_function'], $block, $lang_code);
+                    } elseif(isset($block['schema']['brief_info_function']) && is_array($block['schema']['brief_info_function'])) {
+                        $block['info'] = $block['schema']['brief_info_function'];
+                    } else {
+                        $block['info'] = [
+                            'content' => fn_is_lang_var_exists(sprintf('block_%s_description', $block['type']))
+                                ? __(sprintf('block_%s_description', $block['type']), [], $lang_code)
+                                : '',
+                        ];
+                    }
+                }
+                unset($block);
+            }
+
+            foreach ($blocks as &$block) {
+                $block_id = $block['block_id'];
+
+                if (in_array('get_quantity', $params['extend'], true)) {
+                    $block['quantity'] = isset($block_quantity_map[$block_id]) ? $block_quantity_map[$block_id] : 0;
+                }
+
+                if (in_array('get_locations', $params['extend'], true)) {
+                    $block['locations'] = isset($block_locations_map[$block_id]) ? $block_locations_map[$block_id] : [];
+                }
+            }
+            unset($block);
+        }
+
+        LastView::instance()->processResults('blocks', $blocks, $params);
+
+        return [$blocks, $params];
+    }
+
+    /**
+     * Gets unique block ID for WYSIWYG prelaoder.
+     *
+     * @param array $block_data
+     *
+     * @return string
+     * @see \Tygh\BlockManager\Block::getUniqueId
+     */
+    public static function getUniqueIdByData(array $block_data)
+    {
+        $block_id = isset($block_data['block_id'])
+            ? $block_data['block_id']
+            : 0;
+
+        $snapping_id = isset($block_data['snapping_id'])
+            ? $block_data['snapping_id']
+            : 0;
+
+        return static::getUniqueId($block_id, $snapping_id);
+    }
+
+    /**
+     * Gets unique block ID for WYSIWYG prelaoder.
+     *
+     * @param int $block_id
+     * @param int $snapping_id
+     *
+     * @return string
+     */
+    public static function getUniqueId($block_id, $snapping_id)
+    {
+        return fn_encrypt_text(sprintf(
+            '%s:%s',
+            $block_id,
+            $snapping_id
+        ));
+    }
+
+    /**
+     * Creates block manager instance.
+     *
+     * @param int   $company_id    Company identifier.
+     *                             This parameter is deprecated and will be removed in v5.0.0.
+     *                             Use $storefront_id instead.
+     * @param array $params        Instance parameters
+     * @param null  $storefront_id Storefront ID
+     *
+     * @return \Tygh\BlockManager\Block
+     */
+    public static function instance($company_id = 0, $params = [], $storefront_id = null)
+    {
+        /**
+         * Executes before getting an instance of a block manager,
+         * allows you to modify the parameters passed to the function.
+         *
+         * @param int   $company_id    Company identifier.
+         *                             This parameter is deprecated and will be removed in v5.0.0.
+         *                             Use $storefront_id instead.
+         * @param array $params        Instance parameters
+         * @param null  $storefront_id Storefront ID
+         */
+        fn_set_hook('block_instance_pre', $company_id, $params, $storefront_id);
+
+        if ($storefront_id === null) {
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = Tygh::$app['storefront'];
+            $storefront_id = $storefront->storefront_id;
+        }
+
+        $params['instance_key_extra'] = $storefront_id;
+
+        /** @var \Tygh\BlockManager\Block $instance */
+        $instance = parent::instance($company_id, $params);
+
+        if (!$storefront_id) {
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = Tygh::$app['storefront'];
+            $storefront_id = $storefront->storefront_id;
+        }
+
+        $instance->storefront_id = $storefront_id;
+
+        return $instance;
     }
 }

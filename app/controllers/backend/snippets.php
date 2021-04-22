@@ -15,6 +15,7 @@
 use Tygh\Registry;
 use Tygh\Template\Snippet\Snippet;
 use Tygh\Template\Snippet\Table\Column;
+
 /**
  * @var string $mode
  */
@@ -67,8 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $service = Tygh::$app['template.snippet.service'];
         /** @var \Tygh\Template\Snippet\Repository $repository */
         $repository = Tygh::$app['template.snippet.repository'];
-        /** @var \Tygh\Ajax $ajax */
-        $ajax = Tygh::$app['ajax'];
 
         $snippet_id = isset($_REQUEST['snippet_id']) ? (int) $_REQUEST['snippet_id'] : 0;
         $data = (array) $_REQUEST['snippet'];
@@ -77,28 +76,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $snippet = $repository->findById($snippet_id);
 
             if (empty($snippet)) {
-                return array(CONTROLLER_STATUS_NO_PAGE);
+                return [CONTROLLER_STATUS_NO_PAGE];
             }
 
-            $data = $service->filterData($data, array('name', 'template', 'status'));
+            $data = $service->filterData($data, ['name', 'template', 'status']);
 
             $result = $service->updateSnippet($snippet, $data);
         } else {
-            $data = $service->filterData($data, array('code', 'name', 'template', 'status', 'type', 'addon'));
+            $data = $service->filterData($data, ['code', 'name', 'template', 'status', 'type', 'addon']);
 
             $result = $service->createSnippet($data);
         }
 
-        if ($result->isSuccess()) {
-            if (!empty($_REQUEST['return_url'])) {
-                return array(CONTROLLER_STATUS_OK, $_REQUEST['return_url']);
-            }
-        } else {
+        if (!$result->isSuccess()) {
             $result->showNotifications();
-            $ajax->assign('failed_request', true);
+            if (defined('AJAX_REQUEST')) {
+                /** @var \Tygh\Ajax $ajax */
+                $ajax = Tygh::$app['ajax'];
+                $ajax->assign('failed_request', true);
+            }
         }
 
-        exit;
+        if (!empty($_REQUEST['return_url'])) {
+            return [CONTROLLER_STATUS_OK, $_REQUEST['return_url']];
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            exit;
+        }
+
+        if ($snippet_id) {
+            $return_url = 'snippets.update?snippet_id=' . $snippet_id;
+        } else {
+            $return_url = 'snippets.update';
+        }
+
+        return [CONTROLLER_STATUS_OK, $return_url];
     }
 
     if ($mode === 'delete') {
@@ -290,6 +303,10 @@ if ($mode === 'update') {
     );
 
     Registry::set('navigation.tabs', $tabs);
+
+    if (defined('AJAX_REQUEST')) {
+        $view->assign('target', 'popup');
+    }
 }
 
 if ($mode === 'update_table_column') {

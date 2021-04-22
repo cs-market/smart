@@ -20,4 +20,37 @@ class VendorStatuses
     const PENDING = 'P';
     const DISABLED = 'D';
     const NEW_ACCOUNT = 'N';
+    const SUSPENDED = 'S';
+
+    /**
+     * Gets all statuses, which can be set to (except NEW status)
+     *
+     * @return array<string>
+     */
+    public static function getStatusesTo()
+    {
+        return self::getList([VendorStatuses::NEW_ACCOUNT]);
+    }
+
+    /**
+     * Gets all vendor statuses
+     *
+     * @param array<string> $exclude List of type codes of vendor statuses to be excluded
+     *
+     * @return array<string>
+     */
+    public static function getList(array $exclude = [])
+    {
+        $statuses = [
+            self::ACTIVE,
+            self::PENDING,
+            self::DISABLED,
+            self::SUSPENDED,
+            self::NEW_ACCOUNT,
+        ];
+
+        return array_filter($statuses, static function ($status_code) use ($exclude) {
+            return !in_array($status_code, $exclude);
+        });
+    }
 }

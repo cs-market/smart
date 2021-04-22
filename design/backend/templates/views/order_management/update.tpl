@@ -10,11 +10,11 @@
         {if $settings.Stores.share_users == "Y"}
             {$users_shared_force = true}
         {/if}
-    {/if}
+{/if}
     {include file="views/order_management/components/customer_info_update.tpl"}
 </div>
 
-<form action="{""|fn_url}" method="post" class="form-table" name="om_cart_form" enctype="multipart/form-data">
+<form action="{""|fn_url}" method="post" class="admin-content-external-form" name="om_cart_form" enctype="multipart/form-data">
 {$ORDER_MANAGEMENT}
 <input type="hidden" name="result_ids" value="{$result_ids}" />
 
@@ -33,14 +33,16 @@
 <div class="row-fluid orders-wrap">
     <div class="span8">
         <div class="buttons-container">
+            {hook name="order_management:buttons_container"}
                 <div class="inline-block mobile-hide" id="button_trash_products">
                     {if $cart_products}
                     {btn type="delete_selected" dispatch="dispatch[order_management.delete]" form="om_cart_form" class="cm-skip-validation" icon="icon-trash"}
                     {/if}
                 <!--button_trash_products--></div>
+            {/hook}
         </div>
 
-        <div  class="cm-om-totals" id="om_ajax_update_totals">
+        <div class="cm-om-totals" id="om_ajax_update_totals">
         {if $is_empty_cart}
         <label class="hidden cm-required" for="products_required">{__("products_required")}</label>
         <input type="hidden" id="products_required" name="products_required" value="" />
@@ -65,6 +67,21 @@
             </div>
         </div>
         <!--om_ajax_update_totals--></div>
+
+        {if fn_allowed_for("MULTIVENDOR:ULTIMATE")}
+            <div class="clearfix">
+                <div class="control-group">
+                    <label class="control-label">{__("storefront")}</label>
+                    <div class="controls">
+                        {include file="views/storefronts/components/picker/picker.tpl"
+                            input_name="storefront_id"
+                            item_ids=[$selected_storefront_id]
+                            show_advanced=false
+                        }
+                    </div>
+                </div>
+            </div>
+        {/if}
 
         <div class="note clearfix">
             <div class="span6">

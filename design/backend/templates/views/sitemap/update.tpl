@@ -29,7 +29,7 @@
 
     <div id="content_tab_links_{$id}">
         <div class="table-responsive-wrapper">
-            <table class="table table-middle hidden-inputs table-responsive">
+            <table class="table table-middle table--relative hidden-inputs table-responsive">
             <thead>
                 <tr>
                     <th width="4%">{__("position_short")}</th>
@@ -49,10 +49,7 @@
                 <td data-th="{__("url")}">
                     <input type="text" name="link_data[{$link.link_id}][link_href]" size="35" value="{$link.link_href}" class="input-xlarge input-hidden"></td>
                 <td class="right" data-th="{__("tools")}">
-                    <div class="hidden-tools">
                         {include file="buttons/multiple_buttons.tpl" only_delete="Y"}
-                        </a>
-                    </div>
                 </td>
             </tr>
             {/foreach}

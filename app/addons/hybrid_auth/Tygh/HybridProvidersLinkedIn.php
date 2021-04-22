@@ -18,5 +18,5 @@ class HybridProvidersLinkedIn extends \Hybrid_Providers_LinkedIn
 {
     public $useSafeUrls = true;
 
-    public $scope = array('r_basicprofile', 'r_emailaddress');
+    public $scope = ['r_liteprofile', 'r_emailaddress'];
 }

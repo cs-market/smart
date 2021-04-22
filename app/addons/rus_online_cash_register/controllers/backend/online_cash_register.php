@@ -76,7 +76,6 @@ if ($mode === 'receipts') {
         'total_items' => $total_items,
         'page' => $page
     ));
-
     $view->assign('receipts', $receipts);
     $view->assign('search', $search);
     $view->assign('statuses', array(
@@ -201,8 +200,13 @@ if ($mode === 'receipts') {
     /** @var \Tygh\Addons\RusOnlineCashRegister\Factory $factory */
     $factory = Tygh::$app['addons.rus_online_cash_register.factory'];
 
+    $settings = $_REQUEST;
+    if (isset($_REQUEST['payment_data']['processor_params']['atol'])) {
+        $settings = $_REQUEST['payment_data']['processor_params']['atol'];
+    }
+
     /** @var \Tygh\Addons\RusOnlineCashRegister\CashRegister\Atol\CashRegister $cash_register */
-    $cash_register = $factory->createCashRegisterByArray($_REQUEST);
+    $cash_register = $factory->createCashRegisterByArray($settings);
 
     $response = $cash_register->auth();
 
@@ -215,6 +219,9 @@ if ($mode === 'receipts') {
     }
 
     if (!defined('AJAX_REQUEST')) {
+        if (isset($_REQUEST['payment_data']['processor_params']['atol'])) {
+            return array(CONTROLLER_STATUS_OK, 'payments.manage');
+        }
         return array(CONTROLLER_STATUS_REDIRECT, '');
     }
 
@@ -223,6 +230,8 @@ if ($mode === 'receipts') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /** @var \Tygh\Addons\RusOnlineCashRegister\Service $service */
         $service = Tygh::$app['addons.rus_online_cash_register.service'];
+
+        $currency = Registry::get('addons.rus_online_cash_register.currency');
 
         $user_data = fn_get_user_info(Tygh::$app['session']['auth']['user_id']);
 
@@ -234,8 +243,9 @@ if ($mode === 'receipts') {
         $receipt->setObjectType('test');
         $receipt->setEmail($user_data['email']);
         $receipt->setPhone($user_data['phone']);
-        $receipt->setItem(new Item(__('rus_online_cash_register.test_product_name'), 1.11, 1, TaxType::NONE, 0));
+        $receipt->setItem(new Item(__('rus_online_cash_register.test_product_name'), fn_format_price_by_currency(1.11, CART_PRIMARY_CURRENCY, $currency), 1, TaxType::NONE, 0));
         $receipt->setPayment(new Payment(1, $receipt->getTotal()));
+        $receipt->setPaymentMethod(Receipt::PAYMENT_METHOD_FULL_PAYMENT);
 
         $response = $service->sendReceipt($receipt);
 

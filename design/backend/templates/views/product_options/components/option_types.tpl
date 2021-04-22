@@ -16,7 +16,7 @@
     {/if}
 {else}
 
-    {if $value}
+    {if $value && $option_id}
 	{if $value == $selectbox || $value == $radio_group}
 	    {$app_types = "{$selectbox}{$radio_group}"}
 	{elseif $value == $input || $value == $text}
@@ -30,7 +30,7 @@
 	{$app_types = ""}
     {/if}
     
-    <select class="cm-option-type-selector" data-ca-option-inventory-selector="#elm_inventory_{$id}" id="{$tag_id}" name="{$name}" {if $check}onchange="fn_check_option_type(this.value, this.id);"{/if}>
+    <select class="cm-option-type-selector" id="{$tag_id}" name="{$name}" {if $check}onchange="fn_check_option_type(this.value, this.id);"{/if}>
 	{if !$app_types || ($app_types && $app_types|strpos:$selectbox !== false)}
 	    <option value="{$selectbox}" {if $value == $selectbox} selected="selected"{/if}>{__("selectbox")}</option>
 	{/if}

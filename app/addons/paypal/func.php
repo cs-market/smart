@@ -12,9 +12,13 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Embedded;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\YesNo;
+use Tygh\Http;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Settings;
-use Tygh\Http;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -27,70 +31,108 @@ function fn_paypal_delete_payment_processors()
     db_query("DELETE FROM ?:payment_processors WHERE processor_script IN ('paypal.php', 'paypal_pro.php', 'payflow_pro.php', 'paypal_express.php', 'paypal_advanced.php')");
 }
 
-function fn_paypal_get_checkout_payment_buttons(&$cart, &$cart_products, &$auth, &$checkout_buttons, &$checkout_payments, &$payment_id)
+/**
+ * The "get_checkout_payment_buttons" hook handler.
+ *
+ * Actions performed:
+ *   - Adds PayPal checkout buttons on the cart page.
+ *
+ * @see \fn_get_checkout_payment_buttons()
+ */
+function fn_paypal_get_checkout_payment_buttons($cart, $cart_products, $auth, &$checkout_buttons, $checkout_payment_ids, $payment_id, $payment, $checkout_payments)
 {
-    $processor_data = fn_get_processor_data($payment_id);
-    if (empty($processor_data['processor_script']) || $processor_data['processor_script'] !== 'paypal_express.php') {
+    if (!empty($checkout_buttons[$payment_id])) {
         return;
     }
-    $form_url = fn_url('paypal_express.express');
-    if (!empty($processor_data) && empty($checkout_buttons[$payment_id]) && Registry::get('runtime.mode') == 'cart') {
-        $merchant_id = $processor_data['processor_params']['merchant_id'];
-        if (isset($processor_data['processor_params']['in_context']) && $processor_data['processor_params']['in_context'] == 'Y' && $merchant_id && !\Tygh\Embedded::isEnabled()) {
-            $environment = ($processor_data['processor_params']['mode'] == 'live')? 'production' : 'sandbox';
-            if ($environment == 'sandbox') {
-                fn_set_cookie('PPDEBUG', true);
-            }
-            $checkout_buttons[$payment_id] = '
-                <form name="pp_express" id="pp_express_'.$payment_id.'" action="'. $form_url . '" method="post">
-                    <input name="payment_id" value="' . $payment_id . '" type="hidden" />
-                </form>
-                <script type="text/javascript">
-                    (function(_, $) {
-                        if (window.paypalCheckoutReady) {
-                            $.redirect(_.current_url);
-                        } else {
-                            window.paypalCheckoutReady = function() {
-                                paypal.checkout.setup("'.$merchant_id.'", {
-                                    environment: "'.$environment.'",
-                                    container: "pp_express_'.$payment_id.'",
-                                    click: function(e) {
-                                        e.preventDefault();
-                                        paypal.checkout.initXO();
 
-                                        $.ceAjax("request", "'.$form_url.'", {
-                                            method: "post",
-                                            data: {
-                                                in_context: 1,
-                                                payment_id: "'.$payment_id.'"
-                                            },
-                                            callback: function(response) {
-                                                var data = JSON.parse(response.text);
-                                                if (data.token) {
-                                                    var url = paypal.checkout.urlPrefix + data.token;
-                                                    paypal.checkout.startFlow(url);
-                                                }
-                                                if (data.error) {
-                                                    paypal.checkout.closeFlow();
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                            };
-                        }
-                        $.getScript("//www.paypalobjects.com/api/checkout.js");
-                    })(Tygh, Tygh.$);
-                </script>
-            ';
-        } else {
-            $checkout_buttons[$payment_id] = '
-                <form name="pp_express" id="pp_express" action="'. $form_url . '" method="post">
-                    <input name="payment_id" value="' . $payment_id . '" type="hidden" />
-                    <input src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-small.png" type="image" />
-                </form>
-            ';
+    if (empty($payment['processor_script'])
+        || $payment['processor_script'] !== 'paypal_express.php'
+    ) {
+        return;
+    }
+
+    if (empty($payment['processor_params']['show_cart_button'])
+        || !YesNo::toBool($payment['processor_params']['show_cart_button'])
+    ) {
+        return;
+    }
+
+    if (Registry::get('runtime.mode') !== 'cart') {
+        return;
+    }
+
+    $in_context_checkout_payments_count = array_reduce($checkout_payments, function($in_context_checkout_payments_count, $checkout_payment) {
+        $in_context_checkout_payments_count +=
+            $checkout_payment['processor_script'] === 'paypal_express.php'
+            && isset($checkout_payment['processor_params']['in_context'])
+            && $checkout_payment['processor_params']['merchant_id']
+            && YesNo::toBool($checkout_payment['processor_params']['in_context']);
+
+        return $in_context_checkout_payments_count;
+    }, 0);
+
+    $form_url = fn_url('paypal_express.express');
+    $merchant_id = $payment['processor_params']['merchant_id'];
+    $is_in_context_checkout = isset($payment['processor_params']['in_context'])
+        && YesNo::toBool($payment['processor_params']['in_context'])
+        && $merchant_id;
+    if ($is_in_context_checkout && $in_context_checkout_payments_count === 1 && !Embedded::isEnabled()) {
+        $environment = $payment['processor_params']['mode'] === 'live'
+            ? 'production'
+            : 'sandbox';
+
+        if ($environment === 'sandbox') {
+            fn_set_cookie('PPDEBUG', true);
         }
+
+        $checkout_buttons[$payment_id] = <<<HTML
+            <form name="pp_express" id="pp_express_{$payment_id}" action="{$form_url}" method="post">
+                <input name="payment_id" value="{$payment_id}" type="hidden" />
+            </form>
+            <script type="text/javascript">
+                (function(_, $) {
+                    if (window.paypalCheckoutReady) {
+                        $.redirect(_.current_url);
+                    } else {
+                        window.paypalCheckoutReady = function() {
+                            paypal.checkout.setup("{$merchant_id}", {
+                                environment: "{$environment}",
+                                container: "pp_express_{$payment_id}",
+                                click: function(e) {
+                                    e.preventDefault();
+                                    paypal.checkout.initXO();
+
+                                    $.ceAjax("request", "{$form_url}", {
+                                        method: "post",
+                                        data: {
+                                            in_context: 1,
+                                            payment_id: "{$payment_id}"
+                                        },
+                                        callback: function(response) {
+                                            if (response.token) {
+                                                var url = paypal.checkout.urlPrefix + response.token;
+                                                paypal.checkout.startFlow(url);
+                                            }
+                                            if (response.error) {
+                                                paypal.checkout.closeFlow();
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        };
+                    }
+                    $.getScript("//www.paypalobjects.com/api/checkout.js");
+                })(Tygh, Tygh.$);
+            </script>
+HTML;
+    } else {
+        $checkout_buttons[$payment_id] = <<<HTML
+            <form name="pp_express" id="pp_express" action="{$form_url}" method="post">
+                <input name="payment_id" value="{$payment_id}" type="hidden" />
+                <input src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-small.png" type="image" />
+            </form>
+HTML;
     }
 }
 
@@ -101,57 +143,119 @@ function fn_paypal_payment_url(&$method, &$script, &$url, &$payment_dir)
     }
 }
 
-function fn_update_paypal_settings($settings)
+/**
+ * Updates add-on settings.
+ *
+ * @param array<string, string|array> $settings      Add-on settings
+ * @param int|null                    $storefront_id Storefront ID to set settings for
+ *
+ * @psalm-param array{
+ *   pp_logo_update_all_storefronts?: string,
+ *   pp_statuses?: array<string>|string,
+ * } $settings
+ *
+ * @internal
+ */
+function fn_update_paypal_settings(array $settings, $storefront_id = null)
 {
     if (isset($settings['pp_statuses'])) {
         $settings['pp_statuses'] = serialize($settings['pp_statuses']);
     }
 
+    $settings_manager = Settings::instance(['storefront_id' => $storefront_id]);
     foreach ($settings as $setting_name => $setting_value) {
-        Settings::instance()->updateValue($setting_name, $setting_value);
+        $settings_manager->updateValue($setting_name, $setting_value);
     }
 
-    //Get company_ids for which we should update logos. If root admin click 'update for all', get all company_ids
-    if (isset($settings['pp_logo_update_all_vendors']) && $settings['pp_logo_update_all_vendors'] == 'Y') {
-        $company_ids = db_get_fields('SELECT company_id FROM ?:companies');
-        $company_id = array_shift($company_ids);
-    } elseif (!Registry::get('runtime.simple_ultimate')) {
-        $company_id = Registry::get('runtime.company_id');
-    } else {
-        $company_id = 1;
-    }
-    //Use company_id as pair_id
-    fn_attach_image_pairs('paypal_logo', 'paypal_logo', $company_id);
-    if (isset($company_ids)) {
-        foreach ($company_ids as $logo_id) {
-            fn_clone_image_pairs($logo_id, $company_id, 'paypal_logo');
+    if (
+        isset($settings['pp_logo_update_all_storefronts'])
+        && YesNo::toBool($settings['pp_logo_update_all_storefronts'])
+    ) {
+        list($storefronts,) = StorefrontProvider::getRepository()->find();
+        foreach ($storefronts as $storefront) {
+            fn_delete_image_pairs($storefront->storefront_id, 'paypal_logo');
         }
     }
+
+    fn_attach_image_pairs('paypal_logo', 'paypal_logo', (int) $storefront_id);
 }
 
-function fn_get_paypal_settings($lang_code = DESCR_SL)
+/**
+ * Gets add-on settings.
+ *
+ * @param int|null $storefront_id Storefront to get settings for
+ *
+ * @return array<string, string|array>
+ *
+ * @psalm-return array{
+ *   main_pair: array{
+ *     pair_id: int,
+ *     object_id: int,
+ *     detailed: array{
+ *       object_id: int,
+ *     },
+ *   }|array<empty, empty>,
+ *   pp_statuses: array<string, string>,
+ *   partial_refund_action: string,
+ *   override_customer_info: string,
+ * }
+ *
+ * @internal
+ */
+function fn_get_paypal_settings($storefront_id = null)
 {
-    $pp_settings = Settings::instance()->getValues('paypal', 'ADDON');
-    if (!empty($pp_settings['general']['pp_statuses'])) {
-        $pp_settings['general']['pp_statuses'] = unserialize($pp_settings['general']['pp_statuses']);
-    }
-
-    $pp_settings['general']['main_pair'] = fn_get_image_pairs(fn_paypal_get_logo_id(), 'paypal_logo', 'M', false, true, $lang_code);
-
-    return $pp_settings['general'];
-}
-
-function fn_paypal_get_logo_id()
-{
-    if (Registry::get('runtime.simple_ultimate')) {
-        $logo_id = 1;
-    } elseif (Registry::get('runtime.company_id')) {
-        $logo_id = Registry::get('runtime.company_id');
+    /**
+     * @psalm-var array{
+     *   main_pair: array{
+     *     pair_id: int,
+     *     object_id: int,
+     *     detailed: array{
+     *       object_id: int,
+     *     },
+     *   },
+     *   pp_statuses: string,
+     *   partial_refund_action: string,
+     *   override_customer_info: string,
+     * } $pp_settings
+     */
+    $pp_settings = Settings::instance()->getValues('paypal', 'ADDON', false);
+    if (!empty($pp_settings['pp_statuses'])) {
+        $pp_settings['pp_statuses'] = unserialize($pp_settings['pp_statuses']);
     } else {
-        $logo_id = 0;
+        $pp_settings['pp_statuses'] = [];
     }
 
-    return $logo_id;
+    if (!$storefront_id && SiteArea::isStorefront(AREA)) {
+        $storefront_id = StorefrontProvider::getStorefront()->storefront_id;
+    }
+
+    $pp_settings['main_pair'] = fn_get_image_pairs($storefront_id, 'paypal_logo', 'M', false, true);
+    if (!$pp_settings['main_pair']) {
+        $fallback_logo = fn_get_image_pairs(0, 'paypal_logo', 'M', false, true);
+        if ($fallback_logo) {
+            $fallback_logo['pair_id'] = 0;
+            $fallback_logo['object_id'] = $storefront_id;
+            $fallback_logo['detailed']['object_id'] = $storefront_id;
+        }
+        $pp_settings['main_pair'] = $fallback_logo;
+    }
+
+    /**
+     * @psalm-var array{
+     *   main_pair: array{
+     *     pair_id: int,
+     *     object_id: int,
+     *     detailed: array{
+     *       object_id: int,
+     *     },
+     *   }|array<empty, empty>,
+     *   pp_statuses: array<string, string>,
+     *   partial_refund_action: string,
+     *   override_customer_info: string,
+     * } $pp_settings
+     */
+
+    return $pp_settings;
 }
 
 function fn_paypal_update_payment_pre(&$payment_data, &$payment_id, &$lang_code, &$certificate_file, &$certificates_dir)
@@ -211,8 +315,8 @@ function fn_paypal_rma_update_details_post(&$data, &$show_confirmation_page, &$s
                 } elseif (!empty($order_info['products'])) {
                     foreach ($order_info['products'] as $cart_id => $product) {
                         if (isset($product['extra']['returns']) && isset($return_data['items']['A'][$cart_id])) {
-                            foreach ($product['extra']['returns'] as $return_id => $return_data)  {
-                                $amount += $return_data['amount'] * $product['subtotal'];
+                            foreach ($product['extra']['returns'] as $return_id => $product_return_data)  {
+                                $amount += $return_data['items']['A'][$cart_id]['price'] * $product_return_data['amount'];
                             }
                         }
                     }
@@ -576,7 +680,7 @@ function fn_pp_standart_prepare_products($order_info, $paypal_currency = '', $ma
         }
 
         $post_data['tax_cart'] = 0.0;
-        if (!empty($order_info['taxes']) && Registry::get('settings.General.tax_calculation') == 'subtotal') {
+        if (!empty($order_info['taxes']) && Registry::get('settings.Checkout.tax_calculation') == 'subtotal') {
 
             foreach ($order_info['taxes'] as $tax_id => $tax) {
                 if ($tax['price_includes_tax'] == 'Y') {
@@ -777,14 +881,12 @@ function fn_paypal_checkout_place_orders_pre_route(&$cart, $auth, $params)
 
         if (fn_paypal_ack_success($result) && !empty($result['TOKEN'])) {
             // set token for in-context checkout
-            header('Content-type: application/json');
-            echo json_encode(array('token' => $result['TOKEN']));
+            Tygh::$app['ajax']->assign('token', $result['TOKEN']);
 
         } else {
             // create notification
             fn_paypal_get_error($result);
-            header('Content-type: application/json');
-            echo json_encode(array('error' => true));
+            Tygh::$app['ajax']->assign('error', true);
         }
         exit;
     }
@@ -1006,7 +1108,7 @@ function fn_paypal_user_init(&$auth, &$user_info, &$first_init)
     }
     foreach ($orders_list as $order_id) {
         if (fn_is_paypal_ipn_received($order_id)) {
-            fn_clear_cart(Tygh::$app['session']['cart'], true, true);
+            fn_clear_cart(Tygh::$app['session']['cart']);
             break;
         }
 
@@ -1096,10 +1198,28 @@ function fn_pp_validate_ipn_payload($data)
         fn_pp_set_orders_lock($order_ids, true);
         $mode = fn_pp_get_mode(reset($order_ids));
         $url = ($mode == 'test') ? 'https://www.sandbox.paypal.com/cgi-bin/webscr' : 'https://www.paypal.com/cgi-bin/webscr';
-        $result = Http::post($url, $data);
+        $extra = [
+            'headers' => fn_paypal_get_http_headers(),
+        ];
+        $result = Http::post($url, $data, $extra);
     }
 
     return array($result, $order_ids, $data);
+}
+
+/**
+ * Gets http headers for requests to the PayPal service
+ *
+ * @return array
+ */
+function fn_paypal_get_http_headers()
+{
+    $user_agent = PRODUCT_NAME . '/' . PRODUCT_VERSION;
+    $headers = [
+        "User-Agent: {$user_agent}"
+    ];
+
+    return $headers;
 }
 
 /**
@@ -1126,9 +1246,13 @@ function fn_validate_paypal_signup_request($request = array())
         );
 
         Registry::set('log_cut', true);
+        $extra = [
+            'headers' => fn_paypal_get_http_headers(),
+        ];
         $result = Http::post(
             fn_get_paypal_signup_server_url(),
-            $data
+            $data,
+            $extra
         );
 
         return $result == 'OK';

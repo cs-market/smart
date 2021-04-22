@@ -12,9 +12,9 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-if (!defined('BOOTSTRAP')) { die('Access denied'); }
+defined('BOOTSTRAP') or die('Access denied');
 
-$cart = & $_SESSION['cart'];
+$cart = &Tygh::$app['session']['cart'];
 
 if (!empty($_REQUEST['select_yd_store'])) {
     foreach ($_REQUEST['select_yd_store'] as $g_id => $select) {
@@ -22,6 +22,7 @@ if (!empty($_REQUEST['select_yd_store'])) {
             $cart['shippings_extra']['data'][$g_id][$s_id]['pickup_point_id'] = $o_id;
         }
     }
+    $cart['calculate_shipping'] = true;
 }
 
 if (!empty($_REQUEST['select_yd_courier'])) {
@@ -30,4 +31,5 @@ if (!empty($_REQUEST['select_yd_courier'])) {
             $cart['shippings_extra']['data'][$g_id][$s_id]['courier_point_id'] = $o_id;
         }
     }
+    $cart['calculate_shipping'] = true;
 }

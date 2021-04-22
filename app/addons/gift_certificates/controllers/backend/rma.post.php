@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use \Tygh\Enum\Addons\Rma\ReturnOperationStatuses;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -28,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $return_info = fn_get_return_info($change_return_status['return_id']);
             foreach ((array) $_REQUEST['accepted'] as $item_id => $v) {
                 if (isset($v['chosen']) && $v['chosen'] == 'Y') {
-                    $total += $v['amount'] * $return_info['items'][RETURN_PRODUCT_ACCEPTED][$item_id]['price'];
+                    $total += $v['amount'] * $return_info['items'][ReturnOperationStatuses::APPROVED][$item_id]['price'];
                 }
             }
 

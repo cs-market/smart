@@ -4,6 +4,7 @@
     <table>
     {foreach from=$product_features item="pf" key="feature_id"}
     {if $pf.feature_type != "ProductFeatures::GROUP"|enum}
+    {hook name="products:m_update_product_feature"}
     <tr>
 
         {if $over == true}
@@ -16,6 +17,7 @@
             {include file="views/products/components/products_m_update_feature.tpl" feature=$pf pid=$product_id}
         </td>
     </tr>
+    {/hook}
     {/if}
     {/foreach}
     {foreach from=$product_features item="pf" key="feature_id"}

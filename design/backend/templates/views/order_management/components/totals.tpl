@@ -6,7 +6,7 @@
                 <td class="totals"><h4>{__("totals")}</h4></td>
             </tr>
             <tr>
-                <td class="statistic-label" width="150px">{__("subtotal")}:</td>
+                <td class="statistic-label" width="200px">{__("subtotal")}:</td>
                 <td class="right" width="100px">{include file="common/price.tpl" value=$cart.display_subtotal}</td>
             </tr>
 

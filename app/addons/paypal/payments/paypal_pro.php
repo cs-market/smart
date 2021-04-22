@@ -25,7 +25,11 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 include_once(Registry::get('config.dir.payments') . 'cmpi.php');
 
-$use_cardinal = (!empty($processor_data['processor_params']['use_cardinal']) && $processor_data['processor_params']['use_cardinal'] == 'Y') ? true : false;
+$use_cardinal = !empty($processor_data['processor_params']['merchant_id'])
+    && !empty($processor_data['processor_params']['processor_id'])
+    && !empty($processor_data['processor_params']['transaction_password'])
+    && !empty($processor_data['processor_params']['transaction_url']);
+
 if ($use_cardinal) {
     if (!defined('CMPI_PROCESSED')) {
         fn_cmpi_lookup($processor_data, $order_info, $mode);
@@ -126,9 +130,9 @@ $paypal_request = <<<EOT
   <soap:Header>
     <RequesterCredentials xmlns="urn:ebay:api:PayPalAPI">
       <Credentials xmlns="urn:ebay:apis:eBLBaseComponents">
-        <Username>$paypal_username</Username>
-        <ebl:Password xmlns:ebl="urn:ebay:apis:eBLBaseComponents">$paypal_password</ebl:Password>
-        $paypal_signature
+        <Username>{$paypal_username}</Username>
+        <ebl:Password xmlns:ebl="urn:ebay:apis:eBLBaseComponents">{$paypal_password}</ebl:Password>
+        {$paypal_signature}
       </Credentials>
     </RequesterCredentials>
   </soap:Header>
@@ -137,11 +141,11 @@ $paypal_request = <<<EOT
       <DoDirectPaymentRequest>
         <Version xmlns="urn:ebay:apis:eBLBaseComponents">59.00</Version>
         <DoDirectPaymentRequestDetails xmlns="urn:ebay:apis:eBLBaseComponents">
-          <PaymentAction><![CDATA[$paypal_payment_action]]></PaymentAction>
+          <PaymentAction><![CDATA[{$paypal_payment_action}]]></PaymentAction>
           <PaymentDetails>
-            <OrderTotal currencyID="$paypal_currency"><![CDATA[$paypal_total]]></OrderTotal>
+            <OrderTotal currencyID="{$paypal_currency}"><![CDATA[{$paypal_total}]]></OrderTotal>
             <ButtonSource>ST_ShoppingCart_DP_US</ButtonSource>
-            <NotifyURL><![CDATA[$paypal_notify_url]]></NotifyURL>
+            <NotifyURL><![CDATA[{$paypal_notify_url}]]></NotifyURL>
             <ShipToAddress>
               <Name><![CDATA[{$order_info['s_firstname']} {$order_info['s_lastname']}]]></Name>
               <Street1><![CDATA[{$order_info['s_address']}]]></Street1>
@@ -151,14 +155,14 @@ $paypal_request = <<<EOT
               <PostalCode><![CDATA[{$order_info['s_zipcode']}]]></PostalCode>
               <Country><![CDATA[{$order_info['s_country']}]]></Country>
             </ShipToAddress>
-            <Custom><![CDATA[$order_id]]></Custom>
-            <InvoiceID><![CDATA[$paypal_order_id]]></InvoiceID>
+            <Custom><![CDATA[{$order_id}]]></Custom>
+            <InvoiceID><![CDATA[{$paypal_order_id}]]></InvoiceID>
           </PaymentDetails>
           <CreditCard>
-            <CreditCardType><![CDATA[$paypal_card]]></CreditCardType>
-            <CreditCardNumber><![CDATA[$paypal_card_number]]></CreditCardNumber>
-            <ExpMonth><![CDATA[$paypal_card_exp_month]]></ExpMonth>
-            <ExpYear><![CDATA[$paypal_card_exp_year]]></ExpYear>
+            <CreditCardType><![CDATA[{$paypal_card}]]></CreditCardType>
+            <CreditCardNumber><![CDATA[{$paypal_card_number}]]></CreditCardNumber>
+            <ExpMonth><![CDATA[{$paypal_card_exp_month}]]></ExpMonth>
+            <ExpYear><![CDATA[{$paypal_card_exp_year}]]></ExpYear>
             <CardOwner>
               <PayerStatus>verified</PayerStatus>
               <Payer><![CDATA[{$order_info['email']}]]></Payer>
@@ -176,10 +180,10 @@ $paypal_request = <<<EOT
                 <PostalCode><![CDATA[{$order_info['b_zipcode']}]]></PostalCode>
               </Address>
             </CardOwner>
-            <CVV2><![CDATA[$paypal_card_cvv2]]></CVV2>
+            <CVV2><![CDATA[{$paypal_card_cvv2}]]></CVV2>
+            {$paypal_3dsecure}
           </CreditCard>
           <IPAddress><![CDATA[{$_SERVER['REMOTE_ADDR']}]]></IPAddress>
-          $paypal_3dsecure
         </DoDirectPaymentRequestDetails>
       </DoDirectPaymentRequest>
     </DoDirectPaymentReq>

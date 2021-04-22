@@ -235,4 +235,44 @@ class Repository
 
         return Template::fromArray($row);
     }
+
+    /**
+     * Returns templates whose content matches specified criteria.
+     * Uses search by LIKE.
+     * Resulting array is sorted by the email template code.
+     *
+     * @param string $criteria Search criteria
+     *
+     * @return \Tygh\Template\Mail\Template[]
+     */
+    public function findByContent($criteria)
+    {
+        $default_templates = $this->find([
+            ['template', 'NULL', true],
+            ['default_template', 'LIKE', $criteria],
+        ]);
+        $empty_templates = $this->find([
+            ['template', '=', ''],
+            ['default_template', 'LIKE', $criteria],
+        ]);
+        $custom_templates = $this->find([
+            ['template', 'LIKE', $criteria],
+        ]);
+
+        $templates = $default_templates + $empty_templates + $custom_templates;
+
+        usort($templates, function($template1, $template2) {
+            /** @var \Tygh\Template\Mail\Template $template1 */
+            /** @var \Tygh\Template\Mail\Template $template2 */
+            if ($template1->getCode() < $template2->getCode()) {
+                return -1;
+            }
+            if ($template1->getCode() > $template2->getCode()) {
+                return 1;
+            }
+            return 0;
+        });
+
+        return $templates;
+    }
 }

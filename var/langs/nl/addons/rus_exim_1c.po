@@ -17,8 +17,12 @@ msgid "Data exchange in the CommerceML format"
 msgstr "Data exchange in the CommerceML format"
 
 msgctxt "Languages::privileges.exim_1c"
-msgid "Data exchange in the CommerceML format"
-msgstr "Data exchange in the CommerceML format"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privilege_groups.exim_1c"
+msgid "CommerceML settings"
+msgstr "CommerceML settings"
 
 msgctxt "Languages::commerceml"
 msgid "CommerceML settings"
@@ -285,8 +289,8 @@ msgid "Full name"
 msgstr "Full name"
 
 msgctxt "SettingsSections::rus_exim_1c::import_restraction_features"
-msgid "Settings property"
-msgstr "Settings property"
+msgid "Features"
+msgstr "Features"
 
 msgctxt "SettingsOptions::rus_exim_1c::exim_1c_allow_import_features"
 msgid "Allow import features"
@@ -341,8 +345,8 @@ msgid "Each feature should be put into a new line"
 msgstr "Each feature should be put into a new line"
 
 msgctxt "SettingsSections::rus_exim_1c::features_options"
-msgid "Setting options"
-msgstr "Setting options"
+msgid "Product offers"
+msgstr "Product offers"
 
 msgctxt "SettingsOptions::rus_exim_1c::exim_1c_type_option"
 msgid "Option type"
@@ -357,8 +361,8 @@ msgid "Radiogroup"
 msgstr "Radiogroup"
 
 msgctxt "SettingsOptions::rus_exim_1c::exim_1c_import_mode_offers"
-msgid "Option import"
-msgstr "Option import"
+msgid "Import product offers as"
+msgstr "Import product offers as"
 
 msgctxt "SettingsTooltips::rus_exim_1c::exim_1c_import_mode_offers"
 msgid "This setting determines how products and the combinations of their options will be created in CS-Cart. It also determines how the price of an option combination will be updated.<br /><ul><li>Variations (Recommended)</li><li>Combination of one option (Price as modifier)</li><li>Combination of multiple options (Price isn't imported)</li><li>Combination of options without modifiers (Same price)</li><li>Combination of global options (Price isn't imported)</li><li>Combination of one option (Same price)</li></ul>"
@@ -385,8 +389,8 @@ msgid "The name of a product option for imported features. It is used for choosi
 msgstr "The name of a product option for imported features. It is used for choosing the \"Combination of one option (Price as modifier)\" or \"Combination of one option (Same price)\" value in the \"Option import\" field"
 
 msgctxt "SettingsSections::rus_exim_1c::prices"
-msgid "Settings price"
-msgstr "Settings price"
+msgid "Prices"
+msgstr "Prices"
 
 msgctxt "SettingsOptions::rus_exim_1c::exim_1c_only_import_offers"
 msgid "Import quantity and prices only (the Offers file)"
@@ -413,8 +417,8 @@ msgid "If the setting is enabled, the prices in the webstore and the ones from t
 msgstr "If the setting is enabled, the prices in the webstore and the ones from the \"Offers.xml\" file will be checked for correspondence when exported. The result will be displayed on the \"Prices and Taxes\" page(\"Addons\" - \"CommerceML settings\" - \"Price and tax\")"
 
 msgctxt "SettingsSections::rus_exim_1c::shipping_features"
-msgid "Shipping settings"
-msgstr "Shipping settings"
+msgid "Shipping"
+msgstr "Shipping"
 
 msgctxt "Languages::exim_1c_information_shipping_features"
 msgid "Setting of shipping options of a product in the webstore based on the features of the exported nomenclature. <br /> Several features can be used for each product setting. In this case each product will have the value of the last found feature. <br /> Each feature should be added as a separate line into the field. <br /> The kind of the exported feature value should correspond with the kind of a product setting in the webstore"
@@ -465,8 +469,8 @@ msgid "Box height"
 msgstr "Box height"
 
 msgctxt "SettingsSections::rus_exim_1c::true_orders"
-msgid "Settings of orders"
-msgstr "Settings of orders"
+msgid "Orders"
+msgstr "Orders"
 
 msgctxt "SettingsOptions::rus_exim_1c::exim_1c_order_shipping"
 msgid "Display shipping fees for orders as a separate line in 1C"
@@ -752,9 +756,13 @@ msgctxt "Languages::addons.rus_exim_1c.editing_currency"
 msgid "Editing currency: [currency_name]"
 msgstr "Editing currency: [currency_name]"
 
-msgctxt "Languages::addons.rus_exim_1c.options_informations"
-msgid "If you use option combinations with price modifiers for option variants, we recommend installing and using the <b>Product variations</b> add-on instead.<br />The add-on allows you to set prices for each combination of option variants separately, and it is meant for proper warehouse management of products with option combinations.<br />Please <a href=\"https://www.cs-cart.ru/docs/[version]/user_guide/manage_products/products/product_variations.html\">refer to our documentation for more information</a>.<br />The value for setting \"Option import\":<br /><ul><li>Variations (Recommended) - The best way for importing products with options that have price modifiers. The <b>Product variations</b> add-on is required.</li><li>Combination of one option (Price as modifier)-The created combination will include only one option (even if there are multiple options); the name of the option is taken from the setting below. Product price will be 0, and modifiers will act as a price.</li><li>Combination of multiple options (Price isn't imported) - Product options are imported, and combinations are created from them. The prices of a product and its combinations aren't updated.</li><li>Combination of options without modifiers (Same price) - Product options are imported, and combinations are created from them. The modifiers of option variants are empty, and product price is taken from the last imported combination.</li><li>Combination of global options (Price isn't imported) - Global options are imported, and combinations are created from them. The prices of a product and its combinations aren't updated.</li><li>Combination of one option (Same price)-The created combination will include only one option (even if there are multiple options); the name of the option is taken from the setting below. Product price is taken from the last imported combination.</li></ul>"
-msgstr "If you use option combinations with price modifiers for option variants, we recommend installing and using the <b>Product variations</b> add-on instead.<br />The add-on allows you to set prices for each combination of option variants separately, and it is meant for proper warehouse management of products with option combinations.<br />Please <a href=\"https://www.cs-cart.ru/docs/[version]/user_guide/manage_products/products/product_variations.html\">refer to our documentation for more information</a>.<br />The value for setting \"Option import\":<br /><ul><li>Variations (Recommended) - The best way for importing products with options that have price modifiers. The <b>Product variations</b> add-on is required.</li><li>Combination of one option (Price as modifier)-The created combination will include only one option (even if there are multiple options); the name of the option is taken from the setting below. Product price will be 0, and modifiers will act as a price.</li><li>Combination of multiple options (Price isn't imported) - Product options are imported, and combinations are created from them. The prices of a product and its combinations aren't updated.</li><li>Combination of options without modifiers (Same price) - Product options are imported, and combinations are created from them. The modifiers of option variants are empty, and product price is taken from the last imported combination.</li><li>Combination of global options (Price isn't imported) - Global options are imported, and combinations are created from them. The prices of a product and its combinations aren't updated.</li><li>Combination of one option (Same price)-The created combination will include only one option (even if there are multiple options); the name of the option is taken from the setting below. Product price is taken from the last imported combination.</li></ul>"
+msgctxt "Languages::addons.rus_exim_1c.options_information_intro"
+msgid "<p>The equivalent of product offers in [product] is called <a href=\"[docs_url]user_guide/manage_products/products/product_variations.html\" target=\"_blank\">product variations</a>. If the <a href=\"[addon_url]\" target=\"_blank\">Product Variations</a> add-on is installed and active, you won't need to do anything else to import offers.</b>"
+msgstr "<p>The equivalent of product offers in [product] is called <a href=\"[docs_url]user_guide/manage_products/products/product_variations.html\" target=\"_blank\">product variations</a>. If the <a href=\"[addon_url]\" target=\"_blank\">Product Variations</a> add-on is installed and active, you won't need to do anything else to import offers.</b>"
+
+msgctxt "Languages::addons.rus_exim_1c.options_information_legacy"
+msgid "<p>Here are the possible values for setting \"Import product offers as\":</p><ul><li><b>Variations (Recommended)</b>–the best way for importing products from ERP systems. You'll need the <b>Product Variations</b> add-on for that. If you previously used option combinations, then <a href=\"[convert_variations_url]\" target=\"_blank\">convert them to variations</a> and set \"Import product offers as: Variations\".</li><li><b>Combination of one option (Price as modifier)</b>–the created combination will include only one option (even if there are multiple options); the name of the option is taken from the setting below. Product price will be 0, and modifiers will act as a price.</li><li><b>Combination of multiple options (Price isn't imported)</b>–product options are imported, and combinations are created from them. The prices of a product and its combinations aren't updated.</li><li><b>Combination of options without modifiers (Same price)</b>–product options are imported, and combinations are created from them. The modifiers of option variants are empty, and product price is taken from the last imported combination.</li><li><b>Combination of global options (Price isn't imported)</b>–lobal options are imported, and combinations are created from them. The prices of a product and its combinations aren't updated.</li><li><b>Combination of one option (Same price)</b>–the created combination will include only one option (even if there are multiple options); the name of the option is taken from the setting below. Product price is taken from the last imported combination.</li></ul>"
+msgstr "<p>Here are the possible values for setting \"Import product offers as\":</p><ul><li><b>Variations (Recommended)</b>–the best way for importing products from ERP systems. You'll need the <b>Product Variations</b> add-on for that. If you previously used option combinations, then <a href=\"[convert_variations_url]\" target=\"_blank\">convert them to variations</a> and set \"Import product offers as: Variations\".</li><li><b>Combination of one option (Price as modifier)</b>–the created combination will include only one option (even if there are multiple options); the name of the option is taken from the setting below. Product price will be 0, and modifiers will act as a price.</li><li><b>Combination of multiple options (Price isn't imported)</b>–product options are imported, and combinations are created from them. The prices of a product and its combinations aren't updated.</li><li><b>Combination of options without modifiers (Same price)</b>–product options are imported, and combinations are created from them. The modifiers of option variants are empty, and product price is taken from the last imported combination.</li><li><b>Combination of global options (Price isn't imported)</b>–lobal options are imported, and combinations are created from them. The prices of a product and its combinations aren't updated.</li><li><b>Combination of one option (Same price)</b>–the created combination will include only one option (even if there are multiple options); the name of the option is taken from the setting below. Product price is taken from the last imported combination.</li></ul>"
 
 msgctxt "Languages::addons.rus_exim_1c.variations"
 msgid "Variations (Recommended)"
@@ -791,3 +799,31 @@ msgstr "Update 1c"
 msgctxt "Languages::addons.rus_exim_1c.standart_general_price"
 msgid "Combination of one option (Same price)"
 msgstr "Combination of one option (Same price)"
+
+msgctxt "Languages::rus_exim_1c.store_locator_external_id"
+msgid "Warehouse external id 1C"
+msgstr "Warehouse external id 1C"
+
+msgctxt "Languages::rus_exim_1c.store_locator_external_id_tooltip"
+msgid "If you enter multiple external IDs, quantities from all of them will be summed at this store or warehouse."
+msgstr "If you enter multiple external IDs, quantities from all of them will be summed at this store or warehouse."
+
+msgctxt "Languages::rus_exim_1c.product_feature_variant_external_id"
+msgid "External 1C ID"
+msgstr "External 1C ID"
+
+msgctxt "Languages::rus_exim_1c.product_feature_external_id"
+msgid "Feature external 1C ID"
+msgstr "Feature external 1C ID"
+
+msgctxt "Languages::rus_exim_1c.store_locator_external_id_already_used"
+msgid "External ID is already used by another store or warehouse. One external ID can give its quantity only to one store/warehouse. To ensure correct quantity after import, please remove the following external IDs either from here, or from the specified stores/warehouses:</br> [warehouses_list]"
+msgstr "External ID is already used by another store or warehouse. One external ID can give its quantity only to one store/warehouse. To ensure correct quantity after import, please remove the following external IDs either from here, or from the specified stores/warehouses:</br> [warehouses_list]"
+
+msgctxt "Languages::rus_exim_1c.store_locator_already_used_external_id_link"
+msgid "<b>[external_id]</b> -> <a href=\"[warehouse_link]\">[warehouse_name]</a></br>"
+msgstr "<b>[external_id]</b> -> <a href=\"[warehouse_link]\">[warehouse_name]</a></br>"
+
+msgctxt "Languages::rus_exim_1c.confirmation_deleting"
+msgid "Uninstalling this add-on will delete the links between entities in your CRM and CS-Cart. If you're planning to use the new CommerceML add-on, please install and activate the new add-on first. While the new add-on is active, you can keep the old add-on disabled without uninstalling it. This will help if you decide to use the old add-on again in the future.\n\rAre you sure you want to uninstall this add-on?"
+msgstr "Uninstalling this add-on will delete the links between entities in your CRM and CS-Cart. If you're planning to use the new CommerceML add-on, please install and activate the new add-on first. While the new add-on is active, you can keep the old add-on disabled without uninstalling it. This will help if you decide to use the old add-on again in the future.\n\rAre you sure you want to uninstall this add-on?"

@@ -161,7 +161,7 @@
 			<input type="hidden" name="payment_data[processor_params][yandex][invoice]" value="0">
 			<input type="text" name="payment_data[processor_params][yandex][unitId]" value="{if !isset($processor_params.yandex.unitId) || !$processor_params.yandex.unitId}1020{else}{$processor_params.yandex.unitId}{/if}" class="input-text" size="10" />
 		</div>
-		<p class="description">{__("text_payanyway_ids_notice")}</p>
+		<p class="muted description">{__("text_payanyway_ids_notice")}</p>
 	</div>
 </div>
 
@@ -195,11 +195,7 @@ function fn_payanyway_change_ps (data, unitId)
 </div>
 
 <div class="control-group">
-	<label class="control-label" for="elm_send_receipt">
-        {__("send_data_for_sales_receipt_generation")}
-        {include file="common/tooltip.tpl" tooltip=__("addons.rus_payments.payanyway.tt_register_should_be_enabled")}
-        :
-    </label>
+	<label class="control-label" for="elm_send_receipt">{__("send_data_for_sales_receipt_generation")}:</label>
 	<div class="controls">
 		<input type="hidden"
 			   name="payment_data[processor_params][send_receipt]"
@@ -211,5 +207,6 @@ function fn_payanyway_change_ps (data, unitId)
 			   value="Y"
 			   {if $processor_params.send_receipt == "Y"}checked="checked"{/if}
 		/>
+		<p class="muted description">{__("addons.rus_payments.payanyway.tt_register_should_be_enabled")}</p>
 	</div>
 </div>

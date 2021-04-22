@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Greek\n"
 "Language: el_GR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: el\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_data_premoderation.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_data_premoderation.po\n"
+"X-Crowdin-File-ID: 4158\n"
+"PO-Revision-Date: 2021-02-01 09:05\n"
 
 msgctxt "Addons::name::vendor_data_premoderation"
 msgid "Vendor data premoderation"
@@ -19,6 +19,10 @@ msgstr "Προέγκριση στοιχείων Πωλητη"
 msgctxt "Addons::description::vendor_data_premoderation"
 msgid "Lets you pre-moderate vendors activity"
 msgstr "Σας επιτρέπει να προεγκρίνετε τις δραστηριότητες πωλητών"
+
+msgctxt "Languages::vendor_data_premoderation.notification_for_deleted_statuses"
+msgid "Vendor Data Premoderation add-on has been disabled. Products with  the \"Requires approval\" or \"Disapproved\" statuses no longer have any status. These products won't appear to customers until you or your vendors set some other status for them. If you activate the add-on again, the statusless products will get their statuses back. If you uninstall the add-on, all products will get a correct status automatically."
+msgstr "Το πρόσθετο έγκρισης προϊόντων έχει απενεργοποιηθεί. Προϊόντα που είναι σε κατάσταση \"Απαιτείται έγκριση\" η \"Απερρίφθη\" πλέον δεν έχουν κατάσταση. Τα προϊόντα δεν θα εμφανιστούν στους πελάτες μέχρις ότου οι πωλητές να ορίσουν καταστάσεις. Αν ενεργοποιήσετε το πρόσθετο πάλι, τα προϊόντα χωρίς κατάσταση θα αποκτήσουν κατάσταση πάλι. Αν απεγκαταστήσετε το πρόσθετο, όλα τα προϊόντα θα αποκτήσουν αυτόματα την σωστή κατάσταση πάλι."
 
 msgctxt "Languages::product_approval_menu_description"
 msgid "Manage individual products or group of products supplied by the store vendors."
@@ -65,16 +69,16 @@ msgid "Disapprove selected"
 msgstr "Απόρριψη Επιλογής"
 
 msgctxt "Languages::pre_moderation"
-msgid "Products require prior approval"
-msgstr "Προϊόντα απαιτούν προηγούμενη έγκριση"
+msgid "Require approval for new products"
+msgstr ""
 
 msgctxt "Languages::pre_moderation_edit"
-msgid "Approve product info updates"
-msgstr "Εγκρίνετε τις ενημερώσεις πληροφοριων προϊόντος"
+msgid "Require approval for updated products"
+msgstr ""
 
 msgctxt "Languages::pre_moderation_edit_vendors"
-msgid "Approve vendor profile updates"
-msgstr "Εγκρίνετε ενημερώσεις προφίλ πελάτη"
+msgid "Require approval for vendor profile changes"
+msgstr ""
 
 msgctxt "Languages::text_not_approved_products"
 msgid "You have products that require your approval. Please <a href=\"[link]\">follow this link</a> to review these products."
@@ -93,72 +97,92 @@ msgid "Are you sure that you want to update the profile? Information about your 
 msgstr "Είστε βέβαιοι ότι θέλετε να ενημερώσετε το προφίλ; Οι πληροφορίες για την εταιρεία σας δεν θα είναι διαθέσιμ32 στην περιοχή πελάτη μέχρι ο διαχειριστής να τις εγκρίνει."
 
 msgctxt "Languages::privileges.manage_product_premoderation"
-msgid "Approve vendor products"
-msgstr "Εγκρίνετε τα προϊόντα του πωλητη"
+msgid "Can manage"
+msgstr "Δυνατότητα Διαχείρισης"
+
+msgctxt "Languages::privilege_groups.product_premoderation"
+msgid "Product approval"
+msgstr "Έγκριση του προϊόντος"
 
 msgctxt "SettingsSections::vendor_data_premoderation::general"
 msgid "General"
 msgstr "Γενικά"
 
+msgctxt "SettingsSections::vendor_data_premoderation::products"
+msgid "Products"
+msgstr "Προϊόντα"
+
 msgctxt "SettingsOptions::vendor_data_premoderation::products_prior_approval"
-msgid "Approval is required for newly created products"
-msgstr "Ζητείται η έγκριση για νεοδημιουργημενα προϊόντα"
+msgid "Approval of newly-created products"
+msgstr "Έγκριση για τα νέο δημιουργηθέντα προϊόντα"
 
 msgctxt "SettingsOptions::vendor_data_premoderation::products_updates_approval"
-msgid "Approve product info updates"
-msgstr "Εγκρίνετε τις ενημερώσεις πληροφοριων προϊόντος"
+msgid "Approval of product info updates"
+msgstr "Εγκρίνετε ενημερώσεις πληροφοριων προϊόντος"
 
 msgctxt "SettingsOptions::vendor_data_premoderation::vendor_profile_updates_approval"
-msgid "Approve vendor profile updates"
-msgstr "Εγκρίνετε ενημερώσεις προφίλ πελάτη"
+msgid "Approval of vendor profile updates"
+msgstr "Εγκρίνετε ενημερώσεις προφίλ πωλητη"
 
-msgctxt "SettingsTooltips::vendor_data_premoderation::products_prior_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "\"Καμία\" - αυτή η επιλογή είναι απενεργοποιημένη για όλους τους πωλητές? \"Προσαρμοσμένο\" - η επιλογή είναι ενεργοποιημένη σε μια σελίδα λεπτομερειών πωλητή (το πρόσθετο καρτέλα). \"Όλοι οι πωλητές\" - η επιλογή είναι ενεργοποιημένη για όλους τους πωλητές."
+msgctxt "SettingsOptions::vendor_data_premoderation::product_approval_notifications"
+msgid "Notify vendors about product moderation results"
+msgstr "Ειδοποίηση πωλητών για τα αποτελέσματα έγκρισης του προϊόντος"
 
-msgctxt "SettingsTooltips::vendor_data_premoderation::products_updates_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "\"Καμία\" - αυτή η επιλογή είναι απενεργοποιημένη για όλους τους πωλητές? \"Προσαρμοσμένο\" - η επιλογή είναι ενεργοποιημένη σε μια σελίδα λεπτομερειών πωλητή (το πρόσθετο καρτέλα). \"Όλοι οι πωλητές\" - η επιλογή είναι ενεργοποιημένη για όλους τους πωλητές."
-
-msgctxt "SettingsTooltips::vendor_data_premoderation::vendor_profile_updates_approval"
-msgid "\"None\" - this option is disabled for all vendors; \"Custom\" - the option is enabled on a vendor details page (the Add-ons tab); \"All vendors\" - the option is enabled for all vendors."
-msgstr "\"Καμία\" - αυτή η επιλογή είναι απενεργοποιημένη για όλους τους πωλητές? \"Προσαρμοσμένο\" - η επιλογή είναι ενεργοποιημένη σε μια σελίδα λεπτομερειών πωλητή (το πρόσθετο καρτέλα). \"Όλοι οι πωλητές\" - η επιλογή είναι ενεργοποιημένη για όλους τους πωλητές."
+msgctxt "SettingsOptions::vendor_data_premoderation::product_premoderation_fields"
+msgid "Require approval for updates of"
+msgstr "Απαιτείται έγκριση για ενημερώσεις του"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::none"
-msgid "None"
-msgstr "Κανενα"
+msgid "Isn't required"
+msgstr "Δεν απαιτείται"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::custom"
-msgid "Custom"
-msgstr "Προσαρμοσμένο"
+msgid "Required for some vendors"
+msgstr "Απαιτείται για μερικούς πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::vendor_profile_updates_approval::all"
-msgid "All vendors"
-msgstr "Όλοι οι πωλητές"
+msgid "Required for all vendors"
+msgstr "Απαιτείται για όλους τους πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::none"
-msgid "None"
-msgstr "κανενα"
+msgid "Isn't required"
+msgstr "Δεν απαιτείται"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::custom"
-msgid "Custom"
-msgstr "Προσαρμοσμένο"
+msgid "Required for some vendors"
+msgstr "Απαιτείται για μερικούς πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_prior_approval::all"
-msgid "All vendors"
-msgstr "Όλοι οι πωλητές"
+msgid "Required for all vendors"
+msgstr "Απαιτείται για όλους τους πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::none"
-msgid "None"
-msgstr "Κανενα"
+msgid "Isn't required"
+msgstr "Δεν απαιτείται"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::custom"
-msgid "Custom"
-msgstr "Προσαρμοσμένο"
+msgid "Required for some vendors"
+msgstr "Απαιτείται για μερικούς πωλητές"
 
 msgctxt "SettingsVariants::vendor_data_premoderation::products_updates_approval::all"
-msgid "All vendors"
-msgstr "Όλοι οι πωλητές"
+msgid "Required for all vendors"
+msgstr "Απαιτείται για όλους τους πωλητές"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::none"
+msgid "Don't notify"
+msgstr "Χωρίς ειδοποίηση"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::email"
+msgid "Send e-mail"
+msgstr "Αποστολή e-mail"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::notifications_center"
+msgid "Display a notification in the Notifications center"
+msgstr "Προβολή ειδοποίησης στο Κέντρο Ειδοποιήσεων"
+
+msgctxt "SettingsVariants::vendor_data_premoderation::product_approval_notifications::email_notifications_center"
+msgid "Send e-mail and display a notification in the Notifications center"
+msgstr "Αποστολή μηνύματος ηλεκτρονικού ταχυδρομείου και προβολή ειδοποίησης στο Κέντρο ειδοποιήσεων"
 
 msgctxt "Languages::email_template.vendor_data_premoderation_notification"
 msgid "Vendor premoderation"
@@ -166,5 +190,105 @@ msgstr "Προέγκριση στοιχείων Πωλητη"
 
 msgctxt "Languages::vendor_data_premoderation.exclude_disapproved_products"
 msgid "Exclude disapproved products"
-msgstr ""
+msgstr "Εξαίρεση απενεργοποιημένων προϊοντων"
+
+msgctxt "Languages::vendor_data_premoderation.product_status.requires_approval"
+msgid "Requires approval"
+msgstr "Απαιτείται έγκριση"
+
+msgctxt "Languages::vendor_data_premoderation.product_status.disapproved"
+msgid "Disapproved"
+msgstr "Απερρίφθη"
+
+msgctxt "Languages::vendor_data_premoderation.require_approval"
+msgid "Products on moderation"
+msgstr "Προϊόντα προς έγκριση"
+
+msgctxt "Languages::vendor_data_premoderation.require_vendor_action"
+msgid "Disapproved products"
+msgstr "Προϊόντα που έχουν απορριφθεί"
+
+msgctxt "Languages::vendor_data_premoderation.disapproved"
+msgid "Disapproved"
+msgstr "Απερρίφθη"
+
+msgctxt "Languages::vendor_data_premoderation.approve_product_btn"
+msgid "Approve product"
+msgstr "Έγκριση προϊόντος"
+
+msgctxt "Languages::vendor_data_premoderation.approve_product"
+msgid "Approve \"[product]\""
+msgstr "Έγκριση \"[product]\""
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_product_btn"
+msgid "Disapprove product"
+msgstr "Απόρριψη προϊόντος"
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_product"
+msgid "Disapprove \"[product]\""
+msgstr "Απόρριψη  \"[product]\""
+
+msgctxt "Languages::vendor_data_premoderation.disapprove_products"
+msgid "Disapprove products"
+msgstr "Προϊόντα που έχουν απορριφθεί"
+
+msgctxt "Languages::vendor_data_premoderation.disapproval_reason"
+msgid "Disapproval reason"
+msgstr "Λόγος απόρριψης"
+
+msgctxt "Languages::vendor_data_premoderation.enter_disapproval_reason"
+msgid "Enter the reason for disapproval and save the changes."
+msgstr "Καταχωρήστε τον λόγο της απόρριψης και αποθηκεύστε τις αλλαγές."
+
+msgctxt "Languages::vendor_data_premoderation.notification.products_require_approval.title"
+msgid "You have [n] product that requires your approval|You have [n] products that require your approval"
+msgstr "Έχετε [n] προϊόν που απαιτεί την έγκριση σας|Έχετε [n] προϊόντα που απαιτούν την έγκριση σας"
+
+msgctxt "Languages::vendor_data_premoderation.notification.products_require_approval.message"
+msgid "This product is pending for your approval since [since]. Click here to view this product.|These products are pending for your approval since [since]. Click here to view these products."
+msgstr "Η έγκριση αυτού το προϊόντος είναι σε εκκρεμότητα από [since]. Κάντε κλίκ εδώ για να δείτε το προϊόν.|Η έγκριση αυτών των προϊόντων είναι σε εκκρεμότητα από [since]. Κάντε κλίκ εδώ για να δείτε τα προϊόντα."
+
+msgctxt "Languages::vendor_data_premoderation.notification.approved.title"
+msgid "Your product has been approved|Your products have been approved"
+msgstr "Το προϊόν σας έχει εγκριθεί|Το προϊόντα σας έχουν εγκριθεί"
+
+msgctxt "Languages::vendor_data_premoderation.notification.approved.message"
+msgid "\"[product]\" has been approved by the store administration and added to the product catalog. Click here to view this product.|[n] products have been approved by the store administration and added to the product catalog. Click here to view these products."
+msgstr "Το \"[product]\" έχει εγκριθεί από τον διαχειριστή του καταστήματος και έχει προστεθεί στον κατάλογο του καταστήματος. Κάντε κλίκ εδώ για να δείτε αυτό το προϊόν.|[n] τα προϊόντα έχουν εγκριθεί από τον διαχειριστή του καταστήματος και έχουν προστεθεί στον κατάλογο του καταστήματος. Κάντε κλίκ εδώ για να δείτε αυτά τα προϊόντα."
+
+msgctxt "Languages::vendor_data_premoderation.notification.disapproved.title"
+msgid "Your product has been disapproved|Your products have been disapproved"
+msgstr "Το προϊόν σας έχει απορριφθεί|Το προϊόντα σας έχουν απορριφθεί"
+
+msgctxt "Languages::vendor_data_premoderation.notification.disapproved.message"
+msgid "\"[product]\" has been disapproved by the store administration. Click here to view this product.|[n] products have been disapproved by the store administration. Click here to view these products."
+msgstr "Το \"[product]\" έχει απορριφθεί από τον διαχειριστή του καταστήματος. Κάντε κλίκ εδώ για να δείτε αυτό το προϊόν.|[n] τα προϊόντα έχουν απορριφθεί από τον διαχειριστή του καταστήματος. Κάντε κλίκ εδώ για να δείτε αυτά τα προϊόντα."
+
+msgctxt "Languages::vendor_data_premoderation.products_sent_to_premoderation"
+msgid "Your changes have been saved. Before your product is added to the product catalog, it must be approved by the store administration. Follow <a href=\"[product_approval_url]\">this link</a> to view products that require approval.|Your changes have been saved. Before your products are added to the product catalog, they must be approved by the store administration. Follow <a href=\"[product_approval_url]\">this link</a> to view products that require approval."
+msgstr "Οι αλλαγές σας έχουν αποθηκευτεί. Πριν προστεθεί το προϊόν σας στον κατάλογο με τα προϊόντα, πρέπει να εγκριθεί από τον διαχειριστή του καταστήματος. Ακολουθήστε αυτόν τον <a href=\"[product_approval_url]\">σύνδεσμο</a> για να εμφανίσετε τα προϊόντα που απαιτούν έγκριση.|Οι αλλαγές σας έχουν αποθηκευτεί. Πριν αποθηκευτούν τα προϊόντα σας στον κατάλογο με τα προϊόντα, πρέπει να εγκριθούν από τον διαχειριστή του καταστήματος. Ακολουθήστε αυτόν τον <a href=\"[product_approval_url]\">σύνδεσμο</a> για να εμφανίσετε τα προϊόντα που απαιτούν έγκριση."
+
+msgctxt "Languages::vendor_data_premoderation.event.product_status.approved.name"
+msgid "Vendor data premoderation: your product was approved"
+msgstr "Προ έγκριση στοιχείων Πωλητή: το προϊόν σας έχει εγκριθεί."
+
+msgctxt "Languages::vendor_data_premoderation.event.product_status.disapproved.name"
+msgid "Vendor data premoderation: your product was disapproved"
+msgstr "Προ έγκριση στοιχείων Πωλητή: το προϊόν σας έχει απορριφθεί"
+
+msgctxt "Languages::vendor_data_premoderation.approval_info_text"
+msgid "If approval is required only for some vendors, you'll be able to set what vendors need moderation on the Add-ons tab of the vendor editing page."
+msgstr "Εάν απαιτείται έγκριση μόνο για ορισμένους πωλητές, θα μπορείτε να ορίσετε ποιοι πωλητές χρειάζονται εποπτεία στην καρτέλα Πρόσθετα στη σελίδα επεξεργασίας πωλητή."
+
+msgctxt "Languages::internal_template.vendor_data_premoderation_product_approved"
+msgid "Vendor data premoderation: your product was approved"
+msgstr "Προ έγκριση στοιχείων Πωλητή: το προϊόν σας έχει εγκριθεί."
+
+msgctxt "Languages::internal_template.vendor_data_premoderation_product_disapproved"
+msgid "Vendor data premoderation: your product was disapproved"
+msgstr "Προ έγκριση στοιχείων Πωλητή: το προϊόν σας έχει απορριφθεί"
+
+msgctxt "Languages::vendor_data_premoderation.moderation"
+msgid "Moderation"
+msgstr "εποπτεία"
 

@@ -12,21 +12,22 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Languages\Languages;
-use Tygh\Navigation\LastView;
-use Tygh\Registry;
-use Tygh\Common\OperationResult;
-
-use Tygh\Shippings\YandexDelivery\YandexDelivery;
-use Tygh\Shippings\YandexDelivery\Objects\Order;
-use Tygh\Shippings\YandexDelivery\Objects\OrderItem;
-use Tygh\Shippings\YandexDelivery\Objects\Recipient;
-use Tygh\Shippings\YandexDelivery\Objects\Delivery;
-use Tygh\Shippings\YandexDelivery\Objects\DeliveryPoint;
 use Tygh\Addons\RusTaxes\Receipt\Item as ReceiptItem;
 use Tygh\Addons\RusTaxes\Receipt\Receipt;
 use Tygh\Addons\RusTaxes\TaxType;
-
+use Tygh\Common\OperationResult;
+use Tygh\Languages\Languages;
+use Tygh\Navigation\LastView;
+use Tygh\Registry;
+use Tygh\Shippings\Services\Yandex;
+use Tygh\Shippings\YandexDelivery\Objects\Delivery;
+use Tygh\Shippings\YandexDelivery\Objects\DeliveryPoint;
+use Tygh\Shippings\YandexDelivery\Objects\Order;
+use Tygh\Shippings\YandexDelivery\Objects\OrderItem;
+use Tygh\Shippings\YandexDelivery\Objects\Recipient;
+use Tygh\Shippings\YandexDelivery\YandexDelivery;
+use Tygh\Template\Document\Variables\PickpupPointVariable;
+use Tygh\Tygh;
 
 if ( !defined('AREA') ) { die('Access denied'); }
 
@@ -277,8 +278,22 @@ function fn_yandex_delivery_build_recipient($yandex_params, $order_info)
 {
     $recipient = new Recipient();
 
-    $recipient->first_name = !empty($order_info['s_firstname']) ? $order_info['s_firstname'] : $order_info['firstname'];
-    $recipient->last_name = !empty($order_info['s_lastname']) ? $order_info['s_lastname'] : $order_info['lastname'];
+    if (!empty($yandex_params['first_name'])) {
+        $recipient->first_name = $yandex_params['first_name'];
+    } elseif (!empty($order_info['firstname'])) {
+        $recipient->first_name = $order_info['firstname'];
+    } elseif (!empty($order_info['s_firstname'])) {
+        $recipient->first_name = $order_info['s_firstname'];
+    }
+
+    if (!empty($yandex_params['last_name'])) {
+        $recipient->last_name = $yandex_params['last_name'];
+    } elseif (!empty($order_info['lastname'])) {
+        $recipient->last_name = $order_info['lastname'];
+    } elseif (!empty($order_info['s_lastname'])) {
+        $recipient->last_name = $order_info['s_lastname'];
+    }
+
     $recipient->middle_name = '-';
     $recipient->email = $order_info['email'];
 
@@ -363,7 +378,7 @@ function fn_yndex_delivery_get_yandex_order_data($order_info, $shipments)
             if ($receipt) {
                 $shipping_receipt_item = $receipt->getItem(0, ReceiptItem::TYPE_SHIPPING);
 
-                $assessed_value_shipments[$shipment['shipment_id']] = $receipt->getTotal() - $shipping_receipt_item->getTotal();
+                $assessed_value_shipments[$shipment['shipment_id']] = $receipt->getTotal() - ($shipping_receipt_item ? $shipping_receipt_item->getTotal() : 0);
                 $amount_prepaid_shipments[$shipment_id] = $receipt->getTotal();
             }
         }
@@ -381,6 +396,22 @@ function fn_yndex_delivery_get_yandex_order_data($order_info, $shipments)
         $yandex_order_data['assessed_value'] = $assessed_value_shipments;
         $yandex_order_data['amount_prepaid'] = $amount_prepaid_shipments;
         $yandex_order_data['phone'] = !empty($order_info['s_phone']) ? $order_info['s_phone'] : $order_info['phone'];
+
+        if (!empty($order_info['s_firstname'])) {
+            $yandex_order_data['firstname'] = $order_info['s_firstname'];
+        } elseif (!empty($order_info['firstname'])) {
+            $yandex_order_data['firstname'] = $order_info['firstname'];
+        } elseif (!empty($order_info['b_firstname'])) {
+            $yandex_order_data['firstname'] = $order_info['b_firstname'];
+        }
+
+        if (!empty($order_info['s_lastname'])) {
+            $yandex_order_data['lastname'] = $order_info['s_lastname'];
+        } elseif (!empty($order_info['lastname'])) {
+            $yandex_order_data['lastname'] = $order_info['lastname'];
+        } elseif (!empty($order_info['b_lastname'])) {
+            $yandex_order_data['lastname'] = $order_info['b_lastname'];
+        }
 
         list($yandex_order_data['orders'], ) = fn_yandex_delivery_get_orders(array('order_id' => $order_info['order_id']));
     }
@@ -515,27 +546,29 @@ function fn_yandex_delivery_update_shipment($yandex_params, $yandex_order_data, 
             db_query('UPDATE ?:yd_orders SET ?u WHERE shipment_id = ?i', $order, $shipment_id);
         }
 
-        db_query('UPDATE ?:shipments SET tracking_number = ?s, timestamp = ?i WHERE shipment_id = ?i', $yandex_order_data['full_num'], fn_date_to_timestamp($yandex_params['date']), $shipment_id);
+        db_query(
+            'UPDATE ?:shipments SET timestamp = ?i WHERE shipment_id = ?i',
+            fn_date_to_timestamp($yandex_params['date']),
+            $shipment_id
+        );
 
-        if (!empty($yandex_params['notify_user']) && $yandex_params['notify_user'] == 'Y') {
+        $force_notification = fn_get_notification_rules($yandex_params);
 
-            list($shipments) = fn_get_shipments_info(array('shipment_id' => $shipment_id, 'advanced_info' => true));
-            $shipment = reset($shipments);
-            $shipment['timestamp'] = $shipment['shipment_timestamp'];
+        list($shipments) = fn_get_shipments_info(array('shipment_id' => $shipment_id, 'advanced_info' => true));
+        $shipment = reset($shipments);
+        $shipment['timestamp'] = $shipment['shipment_timestamp'];
 
-            $mailer = Tygh::$app['mailer'];
-            $mailer->send(array(
-                'to' => $order_info['email'],
-                'from' => 'company_orders_department',
-                'data' => array(
-                    'shipment' => $shipment,
-                    'order_info' => $order_info,
-                ),
-                'template_code' => 'shipment_products',
-                'tpl' => 'shipments/shipment_products.tpl', // this parameter is obsolete and is used for back compatibility
-                'company_id' => $order_info['company_id'],
-            ), 'C', $order_info['lang_code']);
-        }
+        /** @var \Tygh\Notifications\EventDispatcher $event_dispatcher */
+        $event_dispatcher = Tygh::$app['event.dispatcher'];
+
+        /** @var \Tygh\Notifications\Settings\Factory $notification_settings_factory */
+        $notification_settings_factory = Tygh::$app['event.notification_settings.factory'];
+        $notification_rules = $notification_settings_factory->create($force_notification);
+
+        $event_dispatcher->dispatch('order.shipment_updated',
+            ['shipment' => $shipment, 'order_info' => $order_info],
+            $notification_rules
+        );
     }
 }
 
@@ -793,7 +826,7 @@ function fn_yandex_delivery_get_order_info(&$order, $additional_data)
             $shipping = $order['shipping'];
         }
 
-        if (!isset($shipping['module']) || $shipping['module'] != YD_MODULE_NAME) {
+        if (!isset($shipping['module']) || $shipping['module'] !== YD_MODULE_NAME) {
             return true;
         }
 
@@ -826,7 +859,7 @@ function fn_yandex_delivery_realtime_services_process_response_post($result, $sh
 {
     static $yandex_delivery = array();
 
-    if ($shipping->_shipping_info['module'] == YD_MODULE_NAME && isset($rate['data'])) {
+    if ($shipping instanceof Yandex && isset($rate['data'])) {
         $group_key = isset($shipping->_shipping_info['keys']['group_key']) ? $shipping->_shipping_info['keys']['group_key'] : 0;
         $shipping_id = isset($shipping->_shipping_info['keys']['shipping_id']) ? $shipping->_shipping_info['keys']['shipping_id'] : 0;
         $selected_point = $rate['data']['selected_point'];
@@ -851,7 +884,11 @@ function fn_yandex_delivery_realtime_services_process_response_post($result, $sh
         $yandex_delivery[$group_key][$shipping_id]['selected_point'] = $selected_point;
         $yandex_delivery[$group_key][$shipping_id]['deliveries'] = $rate['data']['deliveries'];
 
-        Tygh::$app['view']->assign('yandex_delivery', $yandex_delivery);
+        if (Tygh::$app->has('view')) {
+            Tygh::$app['view']->assign('yandex_delivery', $yandex_delivery);
+        }
+
+        Tygh::$app['session']['cart']['yandex_delivery'] = $yandex_delivery;
 
         if (isset($pickup_points[$selected_point])) {
             Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id]['pickup_point_id'] = $selected_point;
@@ -896,4 +933,114 @@ function fn_yandex_delivery_check_type_delivery($shipping_params)
     }
 
     return false;
+}
+
+/**
+ * Formats Yandex.Delivery pickup point open hours.
+ *
+ * @param array $schedules_list Schedules list from API response
+ * @param string $lang_code Two-letter language code
+ *
+ * @return string[] Open hours list
+ */
+function fn_yandex_delivery_format_pickup_point_open_hours($schedules_list, $lang_code)
+{
+    if (count($schedules_list) === 1) {
+        $schedule_item = reset($schedules_list);
+
+        if (!empty($schedule_item['all_day'])) {
+            return [__('yandex_delivery_all_day', $lang_code)];
+        } elseif (isset($schedule_item['schedule'])) {
+            return [__("yandex_delivery.day_every.schedule_single", ['[schedule]' => $schedule_item['schedule']], $lang_code)];
+        } elseif (isset($schedule_item['from']) && isset($schedule_item['to'])) {
+            return [__("yandex_delivery.day_every.schedule_interval", ['[from]' => $schedule_item['from'], '[to]' => $schedule_item['to']], $lang_code)];
+        }
+
+        return [__("yandex_delivery_every_day", $lang_code)];
+    }
+
+    $open_hours = [];
+
+    foreach ($schedules_list as $schedule_item) {
+        if (isset($schedule_item['first_day'], $schedule_item['last_day'])
+            && $schedule_item['first_day'] === $schedule_item['last_day']
+        ) {
+            $days = ['[day]' => __("weekday_{$schedule_item['first_day']}", [], $lang_code)];
+        } else {
+            $days = [
+                '[first_day]' => __("weekday_{$schedule_item['first_day']}", [], $lang_code),
+                '[last_day]'  => __("weekday_{$schedule_item['last_day']}", [], $lang_code),
+            ];
+        }
+
+        if (isset($schedule_item['schedule'])) {
+            $schedule = ['[schedule]' => $schedule_item['schedule']];
+        } elseif (isset($schedule_item['from']) && isset($schedule_item['to'])) {
+            $schedule = ['[from]' => $schedule_item['from'], '[to]' => $schedule_item['to']];
+        } else {
+            $schedule = [];
+        }
+
+        $day_type = count($days) === 1
+            ? 'single'
+            : 'interval';
+
+        switch (count($schedule)) {
+            case 2:
+                $schedule_type = 'interval';
+                break;
+            case 1:
+                $schedule_type = 'single';
+                break;
+            default:
+                $schedule_type = 'closed';
+        }
+
+        $open_hours[] = __("yandex_delivery.day_{$day_type}.schedule_{$schedule_type}", array_merge($days, $schedule), $lang_code);
+    }
+
+    return $open_hours;
+}
+
+/**
+ * Hook handler: sets pickup point data.
+ */
+function fn_yandex_delivery_pickup_point_variable_init(
+    PickpupPointVariable $instance,
+    $order,
+    $lang_code,
+    &$is_selected,
+    &$name,
+    &$phone,
+    &$full_address,
+    &$open_hours_raw,
+    &$open_hours,
+    &$description_raw,
+    &$description
+) {
+    if (!empty($order['shipping'])) {
+        if (is_array($order['shipping'])) {
+            $shipping = reset($order['shipping']);
+        } else {
+            $shipping = $order['shipping'];
+        }
+
+        if (!isset($shipping['module']) || $shipping['module'] !== YD_MODULE_NAME) {
+            return;
+        }
+
+        if (!fn_yandex_delivery_check_type_delivery($shipping['service_params'])) {
+            $pickup_data = $shipping['pickup_data'];
+
+            $is_selected = true;
+            $name = $pickup_data['name'];
+            $phone = $pickup_data['phone']['number'];
+            $full_address = $pickup_data['full_address'];
+            $open_hours_raw = fn_yandex_delivery_format_pickup_point_open_hours(YandexDelivery::getScheduleDays($pickup_data['schedules']), $lang_code);
+            $open_hours = implode('<br/>', $open_hours_raw);
+            $description_raw = $description = $pickup_data['comment'];
+        }
+    }
+
+    return;
 }

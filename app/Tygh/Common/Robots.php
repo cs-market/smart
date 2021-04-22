@@ -15,6 +15,7 @@
 namespace Tygh\Common;
 
 use Tygh\Registry;
+use Tygh\Tygh;
 
 /**
  * Editing robots.txt file
@@ -100,56 +101,60 @@ class Robots
     /**
      * Adds the robots.txt data to the robots_data table for a newly-created storefront.
      * If the new storefront is cloned from an existing one, the robots.txt data is cloned from that storefront as well;
-     * otherwise the data is taken from the first company.
+     * otherwise the data is taken from the default storefront.
      *
-     * @param int   $company_id       The identifier of the company.
-     * @param array $clone_company_id The identifier of the clone company.
-     *
-     * @return void
+     * @param int      $storefront_id       The identifier of the storefront.
+     * @param int|null $clone_storefront_id The identifier of the cloned storefront.
      */
-    public function addRobotsDataForNewCompany($company_id, $clone_company_id = null)
+    public function addRobotsDataForNewStorefront($storefront_id, $clone_storefront_id = null)
     {
-        $data_robots = $this->getRobotsDataByCompanyId($clone_company_id);
+        $data_robots = $this->getRobotsDataByStorefrontId($clone_storefront_id);
         $data = isset($data_robots['data']) ? $data_robots['data'] : '';
 
-        $this->setRobotsDataForCompanyId($company_id, $data);
+        $this->setRobotsDataForStorefrontId($storefront_id, $data);
     }
 
     /**
-     * Gets the data of robots from the robots_data table for a storefront with the specified company identifier.
+     * Gets the data of robots from the robots_data table for a storefront with specified identifier.
+     * If identifier not specified - it gets robots data for default storefront.
      *
-     * @param int $company_id The identifier of the company.
+     * @param int $storefront_id The identifier of the storefront.
      *
      * @return array The array of robots data from the robots_data table.
      */
-    public function getRobotsDataByCompanyId($company_id)
+    public function getRobotsDataByStorefrontId($storefront_id)
     {
-        if (fn_allowed_for('ULTIMATE') && empty($company_id) && !Registry::get('runtime.simple_ultimate')) {
-            $company_id = fn_get_default_company_id();
+        if (empty($storefront_id)) {
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+            $storefront = $repository->findDefault();
+            $storefront_id = $storefront->storefront_id;
         }
 
-        $robots_data = db_get_row('SELECT robots_id, data FROM ?:robots_data WHERE company_id = ?i', $company_id);
+        $robots_data = db_get_row('SELECT robots_id, data FROM ?:robots_data WHERE storefront_id = ?i', $storefront_id);
 
         return $robots_data;
     }
 
     /**
-     * Adds an entry with the robots.txt data for a storefront with the specified company_id to the robots_data table;
-     * updates the entry with the specified company_id, if it already exists in the robots_data table.
+     * Adds an entry with the robots.txt data for a storefront with the specified id to the robots_data table;
+     * updates the entry with the specified storefront_id, if it already exists in the robots_data table.
      *
-     * @param int    $company_id The identifier of the company.
-     * @param string $content    The content of robots.
+     * @param int    $storefront_id The identifier of the storefront.
+     * @param string $content       The content of robots.
      *
      * @return void
      */
-    public function setRobotsDataForCompanyId($company_id, $content)
+    public function setRobotsDataForStorefrontId($storefront_id, $content)
     {
+        $content = empty($content) ? $this->getRobotsTxtContent() : $content;
+
         $data = array(
-            'company_id' => $company_id,
+            'storefront_id' => $storefront_id,
             'data' => $content
         );
 
-        $robots_data = $this->getRobotsDataByCompanyId($company_id);
+        $robots_data = $this->getRobotsDataByStorefrontId($storefront_id);
         if (!empty($robots_data['robots_id'])) {
             $data['robots_id'] = $robots_data['robots_id'];
         }
@@ -176,15 +181,15 @@ class Robots
     }
 
     /**
-     * Deletes an entry with the specified company_id from the robots_data table.
+     * Deletes an entry with the specified storefront_id from the robots_data table.
      *
-     * @param int  $company_id The identifier of the company.
+     * @param int  $storefront_id The identifier of the storefront.
      *
      * @return void
      */
-    public function deleteRobotsDataByCompanyId($company_id)
+    public function deleteRobotsDataByStorefrontId($storefront_id)
     {
-        db_query('DELETE FROM ?:robots_data WHERE company_id = ?i', $company_id);
+        db_query('DELETE FROM ?:robots_data WHERE storefront_id = ?i', $storefront_id);
     }
 
     protected function getPath()

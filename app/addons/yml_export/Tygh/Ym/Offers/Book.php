@@ -76,7 +76,7 @@ class Book extends Base
     public function gatherAdditional($product)
     {
         $this->offer['attr']['type'] = "book";
-        $this->offer['items']['name'] = $product['product'];
+        $this->offer['items']['name'] = $this->getOfferName($product);
 
         return true;
     }

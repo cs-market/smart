@@ -12,6 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\StorefrontStatuses;
 use Tygh\Http;
 use Tygh\Registry;
 
@@ -20,11 +21,19 @@ use Tygh\Registry;
  */
 function fn_settings_actions_addons_seo(&$new_value, $old_value)
 {
-    if ($new_value == 'A') {
-        Http::get(Registry::get('config.http_location') . '/catalog.html?version');
-        $headers = Http::getHeaders();
+    if ($new_value === 'A') {
+        /** @var \Tygh\Storefront\Repository $storefront_repository */
+        $storefront_repository = Tygh::$app['storefront.repository'];
+        $default_storefront = $storefront_repository->findDefault();
+        $validation_url = fn_get_storefront_protocol() . '://' . $default_storefront->url . '/check_url_rewrite.html';
+        if ($default_storefront->status === StorefrontStatuses::CLOSED) {
+            $validation_url .= '?store_access_key=' . $default_storefront->access_key;
+        }
 
-        if (strpos($headers, '200 OK') === false) {
+        Http::get($validation_url);
+        $status = Http::getStatus();
+
+        if ($status !== Http::STATUS_OK) {
             $new_value = 'D';
             fn_set_notification('W', __('warning'), __('warning_seo_urls_disabled'));
         }

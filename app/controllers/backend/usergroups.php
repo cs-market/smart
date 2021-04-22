@@ -13,6 +13,8 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Enum\UsergroupTypes;
+use Tygh\Languages\Helper as LanguageHelper;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -45,6 +47,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix .= '.manage';
     }
 
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['usergroup_ids'])
+        && is_array($_REQUEST['usergroup_ids'])
+        && !empty($_REQUEST['status'])
+    ) {
+        $status_to = (string) $_REQUEST['status'];
+
+        foreach ($_REQUEST['usergroup_ids'] as $usergroup_id) {
+            fn_tools_update_status([
+                'table'             => 'usergroups',
+                'status'            => $status_to,
+                'id_name'           => 'usergroup_id',
+                'id'                => $usergroup_id,
+                'show_error_notice' => false
+            ]);
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('usergroups.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+    }
+
     if ($mode == 'bulk_update_status') {
         if (!empty($_REQUEST['link_ids'])) {
             $new_status = $action == 'approve' ? 'A' : 'D';
@@ -72,11 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($mode == 'update_status') {
+
         $user_data = fn_get_user_info($_REQUEST['user_id']);
-        if (empty($user_data) || (Registry::get('runtime.company_id') && $user_data['is_root'] == 'Y') || (defined('RESTRICTED_ADMIN') && ($auth['user_id'] == $_REQUEST['user_id'] || fn_is_restricted_admin(array('user_id' => $_REQUEST['user_id']))))) {
-            fn_set_notification('E', __('error'), __('access_denied'));
-            exit;
-        }
 
         $group_type = db_get_field("SELECT type FROM ?:usergroups WHERE usergroup_id = ?i", $_REQUEST['id']);
 
@@ -101,6 +129,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return array(CONTROLLER_STATUS_OK, 'usergroups' . $suffix);
 }
 
+$exclude_groups = [];
+if (defined('RESTRICTED_ADMIN')) {
+    $exclude_groups = [UsergroupTypes::TYPE_ADMIN];
+}
+$usergroup_types = UsergroupTypes::getList($exclude_groups);
 
 if ($mode == 'manage') {
 
@@ -108,7 +141,6 @@ if ($mode == 'manage') {
 
     if (fn_allowed_for('ULTIMATE')) {
         $customer_usergroups = fn_get_usergroups(array('exclude_types' => $exclude_types, 'type' => 'C'), DESCR_SL);
-
         $exclude_types[] = 'C';
     }
 
@@ -117,8 +149,14 @@ if ($mode == 'manage') {
     if (fn_allowed_for('ULTIMATE')) {
         $usergroups = array_merge($usergroups, $customer_usergroups);
     }
+    $privileges_data = (array) fn_get_usergroup_privileges(['type' => UsergroupTypes::TYPE_ADMIN]);
+    $grouped_privileges = fn_group_usergroup_privileges($privileges_data);
 
-    Tygh::$app['view']->assign('usergroups', $usergroups);
+    Tygh::$app['view']->assign(array(
+        'usergroups'         => $usergroups,
+        'usergroup_types'    => $usergroup_types,
+        'grouped_privileges' => $grouped_privileges,
+    ));
 
     Registry::set('navigation.tabs', array (
         'general_0' => array (
@@ -129,70 +167,42 @@ if ($mode == 'manage') {
 
 } elseif ($mode == 'update') {
 
-    $usergroups = fn_get_usergroups(array('usergroup_id' => $_REQUEST['usergroup_id']), DESCR_SL);
-    $usergroup = $usergroups[$_REQUEST['usergroup_id']];
+    $usergroup_id = isset($_REQUEST['usergroup_id']) ? $_REQUEST['usergroup_id'] : null;
+    $usergroups = fn_get_usergroups(array('usergroup_id' => $usergroup_id), DESCR_SL);
+    $usergroup = $usergroups[$usergroup_id];
 
     Tygh::$app['view']->assign('usergroup', $usergroup);
 
-    $tabs = array(
-        'general_' . $_REQUEST['usergroup_id'] => array(
-            'title' => __('general'),
-            'js' => true
-        ),
-    );
 
-    if ($usergroup['type'] == 'A') {
-        $tabs['privilege_' . $_REQUEST['usergroup_id']] = array(
-            'title' => __('privileges'),
-            'js' => true
-        );
-    }
+    $show_privileges_tab = fn_check_can_usergroup_have_privileges($usergroup);
 
     /* Privilege section */
     if (defined('RESTRICTED_ADMIN')) {
-        $requested_mtype = db_get_field("SELECT type FROM ?:usergroups WHERE usergroup_id = ?i", $_REQUEST['usergroup_id']);
+        $requested_mtype = db_get_field('SELECT type FROM ?:usergroups WHERE usergroup_id = ?i', $usergroup_id);
         if ($requested_mtype == 'A') {
-            unset($tabs['privilege_' . $_REQUEST['usergroup_id']]);
+            unset($tabs['privilege_' . $usergroup_id]);
         }
     }
 
-    $usergroup_name = db_get_field("SELECT usergroup FROM ?:usergroup_descriptions WHERE usergroup_id = ?i AND lang_code = ?s", $_REQUEST['usergroup_id'], DESCR_SL);
+    $usergroup_name = db_get_field('SELECT usergroup FROM ?:usergroup_descriptions WHERE usergroup_id = ?i AND lang_code = ?s', $usergroup_id, DESCR_SL);
+    $usergroup_privileges = db_get_hash_single_array('SELECT privilege FROM ?:usergroup_privileges WHERE usergroup_id = ?i', array('privilege', 'privilege'), $usergroup_id);
+    $privileges_data = (array) fn_get_usergroup_privileges($usergroup);
+    $grouped_privileges = fn_group_usergroup_privileges($privileges_data);
 
-    $usergroup_privileges = db_get_hash_single_array("SELECT privilege FROM ?:usergroup_privileges WHERE usergroup_id = ?i", array('privilege', 'privilege'), $_REQUEST['usergroup_id']);
+    Tygh::$app['view']->assign([
+        'usergroup_privileges' => $usergroup_privileges,
+        'usergroup_name'       => $usergroup_name,
+        'grouped_privileges'   => $grouped_privileges,
+        'usergroup_types'      => $usergroup_types,
+        'show_privileges_tab'  => $show_privileges_tab,
+    ]);
 
-    $privileges_data = db_get_array("SELECT a.* FROM ?:privileges as a ORDER BY a.section_id");
-    $_preload = array();
-
-    foreach ($privileges_data as $key => $privilege) {
-        $section = 'privilege_sections.' . $privilege['section_id'];
-        if (!in_array($section, $_preload)) {
-            $_preload[] = $section;
-        }
-        $_preload[] = 'privileges.' . $privilege['privilege'];
-    }
-
-    fn_preload_lang_vars($_preload);
-
-    $_sections = array();
-    foreach ($privileges_data as $key => $privilege) {
-        $_sections[$privilege['section_id']] = __('privilege_sections.' . $privilege['section_id']);
-        $privileges_data[$key]['description'] = __('privileges.' . $privilege['privilege']);
-    }
-
-    $privileges_data = fn_sort_array_by_key($privileges_data, 'description');
-    asort($_sections);
-    $privileges = array_fill_keys(array_keys($_sections), array());
-
-    foreach ($privileges_data as $privilege) {
-        $privilege['section'] = $_sections[$privilege['section_id']];
-        $privileges[$privilege['section_id']][] = $privilege;
-    }
-
-    Tygh::$app['view']->assign('usergroup_privileges', $usergroup_privileges);
-    Tygh::$app['view']->assign('usergroup_name', $usergroup_name);
-    Tygh::$app['view']->assign('privileges', $privileges);
-
-    Registry::set('navigation.tabs', $tabs);
+    Registry::set('navigation.tabs', [
+        'general_' . $usergroup_id => [
+            'title' => __('general'),
+            'js' => true,
+        ],
+    ]);
 
 } elseif ($mode == 'requests') {
 
@@ -201,58 +211,19 @@ if ($mode == 'manage') {
     Tygh::$app['view']->assign('usergroup_requests', $requests);
     Tygh::$app['view']->assign('search', $search);
 }
-
-function fn_get_usergroup_requests($params, $items_per_page = 0, $status = 'P', $lang_code = CART_LANGUAGE)
-{
-    // Set default values to input params
-    $default_params = array (
-        'page' => 1,
-        'items_per_page' => $items_per_page
-    );
-
-    $params = array_merge($default_params, $params);
-
-    $fields = array (
-        "?:usergroup_links.user_id",
-        "?:usergroup_links.link_id",
-        "?:usergroup_links.usergroup_id",
-        "?:usergroup_links.status",
-        "?:users.firstname",
-        "?:users.lastname",
-        "?:usergroup_descriptions.usergroup"
-    );
-
-    $sortings = array (
-        'customer' => array("?:users.lastname", "?:users.firstname"),
-        'usergroup' => "?:usergroup_descriptions.usergroup",
-        'status' => "?:usergroup_links.status"
-    );
-
-    $sorting = db_sort($params, $sortings, 'customer', 'desc');
-    $condition = '';
-
-    if (!empty($params['cname'])) {
-        $arr = explode(' ', $params['cname']);
-        if (sizeof($arr) == 2) {
-            $condition .= db_quote(" AND ?:users.firstname LIKE ?l AND ?:users.lastname LIKE ?l", "%$arr[0]%", "%$arr[1]%");
-        } else {
-            $condition .= db_quote(" AND (?:users.firstname LIKE ?l OR ?:users.lastname LIKE ?l)", "%$params[cname]%", "%$params[cname]%");
-        }
+if ($mode === 'get_privileges') {
+    $usergroup = [
+        'type' => $_REQUEST['type'],
+    ];
+    $show_privileges_tab = fn_check_can_usergroup_have_privileges($usergroup);
+    $grouped_privileges = [];
+    if ($show_privileges_tab) {
+        $privileges_data = (array) fn_get_usergroup_privileges($usergroup);
+        $grouped_privileges = fn_group_usergroup_privileges($privileges_data);
     }
-
-    if (!empty($params['ugname'])) {
-        $condition .= db_quote(" AND ?:usergroup_descriptions.usergroup LIKE ?l", "%$params[ugname]%");
-    }
-
-    $join = db_quote("LEFT JOIN ?:users ON ?:usergroup_links.user_id = ?:users.user_id LEFT JOIN ?:usergroup_descriptions ON ?:usergroup_links.usergroup_id = ?:usergroup_descriptions.usergroup_id AND ?:usergroup_descriptions.lang_code = ?s", $lang_code);
-
-    $limit = '';
-    if (!empty($params['items_per_page'])) {
-        $params['total_items'] = db_get_field("SELECT COUNT(?:usergroup_links.link_id) FROM ?:usergroup_links $join WHERE ?:usergroup_links.status = ?s $condition", $status);
-        $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
-    }
-
-    $requests = db_get_array("SELECT " . implode(', ', $fields) . " FROM ?:usergroup_links $join WHERE ?:usergroup_links.status = ?s $condition $sorting $limit", $status);
-
-    return array($requests, $params);
+    Tygh::$app['view']->assign('grouped_privileges', $grouped_privileges);
+    Tygh::$app['view']->assign('id', 0);
+    Tygh::$app['view']->assign('show_privileges_tab', $usergroup['type'] !== UsergroupTypes::TYPE_CUSTOMER);
+    Tygh::$app['view']->display('views/usergroups/components/get_privileges.tpl');
+    return [CONTROLLER_STATUS_NO_CONTENT];
 }

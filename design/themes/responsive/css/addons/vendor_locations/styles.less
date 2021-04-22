@@ -24,14 +24,27 @@
     }
 }
 
+.ty-sellers-list__item-distance {
+
+    .ty-company-distance {
+        line-height: 120%;
+        color: spin(desaturate(lighten(@font, 32%), 21%), -211);
+        word-wrap: break-word;
+
+        &:hover {
+            color: @secondary_button;
+        }
+    }
+}
+
 .ty-filter-products-by-geolocation {
 
     &-popup {
 
         &__item {
-            float: left;
-            padding: 8px 13px;
-            color: #2d3540;
+            display: flex;
+            align-items: center;
+            padding: 8px 2px;
 
             &:hover {
                 background: darken(@base, 4%);
@@ -68,6 +81,21 @@
         }
     }
 }
+
+.top-links-grid .ty-filter-products-by-geolocation-popup__item {
+
+    @media (max-width: 1024px) {
+        padding: 10px 11px 11px 8px;
+        color: #5e7d9c;
+    }
+    .ty-geolocation-current-location {
+        
+        @media (max-width: 1024px) {
+            display: none;
+        }
+    }
+}
+
 
 .ty-vendors-locations-use-my-location {
     font-size: 120%;

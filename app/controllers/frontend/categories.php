@@ -31,6 +31,17 @@ if ($mode == 'catalog') {
 
 } elseif ($mode == 'view') {
 
+    $_REQUEST['category_id'] = empty($_REQUEST['category_id']) ? 0 : $_REQUEST['category_id'];
+
+    if (!empty($_REQUEST['category_id']) && empty($auth['user_id'])) {
+
+        $uids = explode(',', db_get_field('SELECT usergroup_ids FROM ?:categories WHERE category_id = ?i', $_REQUEST['category_id']));
+
+        if (!in_array(USERGROUP_ALL, $uids) && !in_array(USERGROUP_GUEST, $uids)) {
+            return array(CONTROLLER_STATUS_REDIRECT, 'auth.login_form?return_url=' . urlencode(Registry::get('config.current_url')));
+        }
+    }
+
     $_statuses = array('A', 'H');
     $_condition = fn_get_localizations_condition('localization', true);
     $preview = fn_is_preview_action($auth, $_REQUEST);
@@ -84,6 +95,15 @@ if ($mode == 'catalog') {
             $params['sort_order'] = $sort_order;
         }
 
+        if (isset($params['order_ids'])) {
+            $order_ids = is_array($params['order_ids']) ? $params['order_ids'] : explode(',', $params['order_ids']);
+            foreach ($order_ids as $order_id) {
+                if (!fn_is_order_allowed($order_id, $auth)) {
+                    return [CONTROLLER_STATUS_NO_PAGE];
+                }
+            }
+        }
+
         $params['cid'] = $_REQUEST['category_id'];
         $params['extend'] = array('categories', 'description');
         $params['subcats'] = '';
@@ -107,12 +127,11 @@ if ($mode == 'catalog') {
         ));
 
         $show_no_products_block = (!empty($params['features_hash']) && !$products);
-        if ($show_no_products_block && defined('AJAX_REQUEST')) {
-            fn_filters_not_found_notification();
-            exit;
-        }
+
+        fn_filters_handle_search_result($params, $products, $search);
 
         Tygh::$app['view']->assign('show_no_products_block', $show_no_products_block);
+        Tygh::$app['view']->assign('is_selected_filters', !empty($params['features_hash']));
 
         $selected_layout = fn_get_products_layout($_REQUEST);
         Tygh::$app['view']->assign('show_qty', true);

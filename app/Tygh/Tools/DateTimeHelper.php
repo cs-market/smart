@@ -35,6 +35,8 @@ class DateTimeHelper
     const PERIOD_WEEK_AGO_TILL_NOW = 'HW';
     const PERIOD_MONTH_AGO_TILL_NOW = 'HM';
 
+    const PERIOD_CUSTOM = 'C';
+
     public static function getPeriod($period_name)
     {
         $definitions = self::getPeriodDefinitions();

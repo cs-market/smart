@@ -19,23 +19,29 @@
 
         <input type="hidden" name="redirect_url" value="{$c_url}"/>
         {if $payouts}
-            <table width="100%" class="table table-middle" id="payouts_list">
+            <table width="100%" class="table table-middle table--relative table-responsive" id="payouts_list">
                 <thead>
                 <tr>
-                    <th class="left">{include file="common/check_items.tpl"}</th>
+                    <th class="left">
+                        {if !$hide_controls}
+                            {include file="common/check_items.tpl"}
+                        {/if}
+                    </th>
                     <th width="5%">
-                        <span id="on_st"
-                              alt="{__("expand_collapse_list")}"
-                              title="{__("expand_collapse_list")}"
-                              class=" hand cm-combinations-visitors">
-                            <span class="icon-caret-right"></span>
-                        </span>
-                        <span id="off_st"
-                              alt="{__("expand_collapse_list")}"
-                              title="{__("expand_collapse_list")}"
-                              class="hand hidden cm-combinations-visitors">
-                            <span class="icon-caret-down"></span>
-                        </span>
+                        <div class="btn-expand-wrapper">
+                            <span id="on_st"
+                                alt="{__("expand_collapse_list")}"
+                                title="{__("expand_collapse_list")}"
+                                class=" hand cm-combinations-visitors btn-expand btn-expand--header">
+                                <span class="icon-caret-right"></span>
+                            </span>
+                            <span id="off_st"
+                                alt="{__("expand_collapse_list")}"
+                                title="{__("expand_collapse_list")}"
+                                class="hand hidden cm-combinations-visitors btn-expand btn-expand--header">
+                                <span class="icon-caret-down"></span>
+                            </span>
+                        </div>
                     </th>
                     <th width="5%">{__("status")}</th>
                     <th>
@@ -49,33 +55,33 @@
                     {if !$hide_controls}
                         <th>{__("vendor")}</th>
                     {/if}
-                    <th class="center" width="5%">&nbsp;</th>
                     {hook name="companies:balance_list_th"}{/hook}
+                    <th class="center" width="5%">&nbsp;</th>
                     <th width="15%" class="right">{__("vendor_payouts.transaction_value")}</th>
                 </tr>
                 </thead>
                 {foreach name="payouts" from=$payouts item=payout}
                     <tr class="payout payout-{$payout.payout_type|lower}">
-                        <td class="left">
-                            <input type="checkbox" name="payout_ids[]" value="{$payout.payout_id}" class="cm-item"/>
+                        <td class="left mobile-hide">
+                            <input type="checkbox" name="payout_ids[]" value="{$payout.payout_id}" class="cm-item {if $hide_controls} hide {/if}"/>
                         </td>
                         <td class="left approval-status-{$payout.approval_status|lower}">
                             <span name="plus_minus"
                                   id="on_payout_note_{$smarty.foreach.payouts.iteration}"
                                   alt="{__("expand_collapse_list")}"
                                   title="{__("expand_collapse_list")}"
-                                  class="hand cm-combination-visitors">
+                                  class="hand cm-combination-visitors btn-expand">
                                 <span class="icon-caret-right"></span>
                             </span>
                             <span name="minus_plus"
                                   id="off_payout_note_{$smarty.foreach.payouts.iteration}"
                                   alt="{__("expand_collapse_list")}"
                                   title="{__("expand_collapse_list")}"
-                                  class="hand hidden cm-combination-visitors">
+                                  class="hand hidden cm-combination-visitors btn-expand">
                                 <span class="icon-caret-down"></span>
                             </span>
                         </td>
-                        <td class="nowrap">
+                        <td class="nowrap" data-th="{__("status")}">
                             {if $payout.payout_type == "VendorPayoutTypes::PAYOUT"|enum
                             || $payout.payout_type == "VendorPayoutTypes::WITHDRAWAL"|enum
                             }
@@ -92,16 +98,16 @@
                                 }
                             {/if}
                         </td>
-                        <td>
+                        <td data-th="{__("date")}">
                             {$payout.payout_date|date_format:"`$settings.Appearance.date_format`, `$settings.Appearance.time_format`"}
                         </td>
-                        <td>
+                        <td data-th="{__("vendor_payouts.type")}">
                             {hook name="companies:payout_type_description"}
                             {$payout.payout_type_description|sanitize_html nofilter}
                             {/hook}
                         </td>
                         {if !$runtime.company_id}
-                            <td>
+                            <td data-th="{__("vendor")}">
                                 {if $payout.company_id}
                                     {$payout.company|default:__("deleted")}
                                 {else}
@@ -110,7 +116,7 @@
                             </td>
                         {/if}
                         {hook name="companies:balance_list_tr"}{/hook}
-                        <td class="center nowrap">
+                        <td class="center nowrap" data-th="{__("tools")}">
                             {if !$hide_controls}
                                 <div class="hidden-tools">
                                     {capture name="tools_list"}
@@ -120,16 +126,22 @@
                                 </div>
                             {/if}
                         </td>
-                        <td class="right">
+                        <td class="right" data-th="{__("vendor_payouts.transaction_value")}">
                             {* total balance change *}
                             {hook name="companies:payout_amount"}
-                                {include file="common/price.tpl" value=$payout.display_amount}
+                                {if $payout.payout_type = "VendorPayoutTypes::PAYOUT"|enum && $payout.payout_amount < 0}
+                                    <small class="muted">
+                                        {include file="common/price.tpl" value=$payout.display_amount}
+                                    </small>
+                                {else}
+                                    {include file="common/price.tpl" value=$payout.display_amount}
+                                {/if}
                             {/hook}
                         </td>
                     </tr>
                     <tr id="payout_note_{$smarty.foreach.payouts.iteration}"
                         class="row-more {if $hide_extra_button != "Y"}hidden{/if}">
-                        <td colspan="8" class="row-more-body top row-gray">
+                        <td colspan="8" class="row-more-body row-more-body--not-title top row-gray">
                             <div class="control-group">
                                 <label class="control-label"
                                        for="payout_comments_{$payout.payout_id}">

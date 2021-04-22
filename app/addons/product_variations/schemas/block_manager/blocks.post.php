@@ -12,22 +12,23 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
-use Tygh\Registry;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-require_once Registry::get('config.dir.addons') . '/product_variations/schemas/block_manager/blocks.functions.php';
+require_once (__DIR__ . '/blocks.functions.php');
 
-$schema['products']['content']['items']['fillings']['product_variations.variations_filling'] = array(
-    'params' => array (
-        'product_type' => ProductManager::PRODUCT_TYPE_VARIATION,
-        'request' => array (
-            'parent_product_id' => '%PRODUCT_ID%',
-        )
-    )
-);
+$schema['products']['content']['items']['fillings']['product_variations.variations_filling'] = [
+    'params' => [
+        'request' => [
+            'variations_by_product_id' => '%PRODUCT_ID%',
+        ]
+    ]
+];
 
-$schema['products']['cache']['request_handlers'][] = '%PRODUCT_ID%';
+$schema['products']['cache']['callable_handlers']['variations_current_product_id'] = [
+    'fn_product_variations_blocks_get_current_product_id', ['$block_data']
+];
+$schema['products']['cache']['update_handlers'][] = 'product_features';
+
+$schema['main']['cache_overrides_by_dispatch']['products.view']['update_handlers'][] = 'product_variation_group_products';
 
 return $schema;

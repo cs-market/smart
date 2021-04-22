@@ -49,7 +49,7 @@
     {if $cart.order_id}
         {include file="pickers/users/picker.tpl" extra_var="order_management.select_customer?page=`$smarty.request.page`" display="radio" but_text=__("choose_user") no_container=true but_meta="btn" shared_force=$users_shared_force}
     {/if}
-    {include file="buttons/button.tpl" but_text=__("update") but_meta="" but_name="dispatch[order_management.customer_info]" but_role="button_main"}
+    {include file="buttons/button.tpl" but_text=__("update") but_meta="" but_name="dispatch[order_management.customer_info]" but_role="button_main" but_check_filter = "#profile_fields_c"}
 </div>
 {/hook}
 

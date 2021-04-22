@@ -1,3 +1,5 @@
+@import "../../config.less";
+
 .import-field {
 
     &__name {
@@ -12,7 +14,7 @@
             opacity: 0.7;
             padding-top: 13px;
 
-            @media (max-width: 767px) {
+            @media (max-width: @TabletBreakpoint) {
                 opacity: 1;
             }
         }
@@ -119,6 +121,45 @@
             opacity: 1;
         }
     }
+
+    .cm-adv-import-placeholder {
+        padding-left: 8px;
+        line-height: 28px;
+        max-width: 300px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #333;
+        border: 1px solid transparent;
+
+        &--view_only {
+            cursor: not-allowed;
+        }
+
+        &:not(.cm-adv-import-placeholder--view_only):hover {
+            background-color: #fff;
+            line-height: 28px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            height: 32px;
+            position: relative;
+
+            &::before {
+                content: "";
+                position: absolute;
+                border: 5px solid;
+                border-color: #888 transparent transparent transparent;
+                border-width: 5px 4px 0px 4px;
+                right: 5px;
+                margin-top: -3px;
+                top: 50%;
+            }
+        }
+    }
+
+    .cm-adv-import-placeholder--empty {
+        color: #999;
+    }
 }
 
 // Enable responsive only at responsive admin
@@ -130,7 +171,7 @@ body[class^="screen--"] .import-field {
         }
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: @TabletBreakpoint) {
         &__name, &__related_object, &__preview {
             min-width: none;
             max-width: none;
@@ -145,7 +186,7 @@ body[class^="screen--"] .import-field {
 .import-preset {
 
     &__checker {
-        width: 2%;
+        width: 6%;
     }
     &__preset {
         width: 20%;
@@ -153,22 +194,22 @@ body[class^="screen--"] .import-field {
         word-break: break-word;
     }
     &__run {
-        width: 8%;
+        width: 10%;
     }
     &__last-launch {
-        width: 12%;
+        width: 10%;
     }
     &__last-status {
-        width: 12%;
+        width: 10%;
     }
     &__has-modifiers {
-        width: 12%;
+        width: 10%;
     }
     &__tools {
         width: 6%;
     }
     &__file {
-        width: 28%;
+        width: 25%;
         word-break: break-all;
         word-break: break-word;
     }
@@ -193,7 +234,7 @@ body[class^="screen--"] .import-field {
 
 .preview-fields-mapping {
     &__wrapper {
-        @media (max-width: 767px) {
+        @media (max-width: @TabletBreakpoint) {
             overflow: hidden;
         }
 

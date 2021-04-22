@@ -16,23 +16,32 @@ use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+/**
+ * @var string $mode
+ * @var string $action
+ */
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if ($mode == 'clean') {
-        if (Registry::get('runtime.company_id')) {
-            db_query('DELETE FROM ?:logs WHERE company_id = ?i', Registry::get('runtime.company_id'));
+    if ($mode === 'clean') {
+        if ($action === 'old') {
+            fn_cleanup_old_logs(Registry::get('runtime.company_id'));
         } else {
-            db_query('TRUNCATE TABLE ?:logs');
+            fn_cleanup_all_logs(Registry::get('runtime.company_id'));
         }
+
+        fn_set_notification('N', __('notice'), __('successful'));
     }
 
-   return array (CONTROLLER_STATUS_REDIRECT, "logs.manage");
+    return [CONTROLLER_STATUS_REDIRECT, 'logs.manage'];
 }
 
 if ($mode == 'manage') {
 
     list($logs, $search) = fn_get_logs($_REQUEST, Registry::get('settings.Appearance.admin_elements_per_page'));
 
-    Tygh::$app['view']->assign('logs', $logs);
-    Tygh::$app['view']->assign('search', $search);
-    Tygh::$app['view']->assign('log_types', fn_get_log_types());
+    Tygh::$app['view']->assign([
+        'logs'      => $logs,
+        'search'    => $search,
+        'log_types' => fn_get_log_types(),
+    ]);
 }

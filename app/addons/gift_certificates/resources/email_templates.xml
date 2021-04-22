@@ -14,7 +14,11 @@
 {{ snippet("header", {"title": title }  ) }}
 
 <p>
-                     {{__("hello")}} {{gift_cert_data.recipient}},<br/>
+                     {% if gift_cert_data.recipient %}
+                     {{__("hello_name", {"[name]" : gift_cert_data.recipient})}}
+                     {% else %}
+                     {{ __("hello") }},
+                     {% endif %}<br/>
                       {{ certificate_status.email_header }}<br />
                      {{__("gift_cert_from")}}: {{gift_cert_data.sender}}    {{__("gift_cert_to")}}: {{gift_cert_data.recipient}}<br />
                      </p>

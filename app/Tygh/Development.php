@@ -32,7 +32,8 @@ class Development
 
     /**
      * Enables development mode
-     * @param stirng $mode mode to enable
+     *
+     * @param string $mode mode to enable
      */
     public static function enable($mode)
     {
@@ -90,10 +91,12 @@ class Development
 
     /**
      * Displays stub when store is closed
-     * @param array $placeholders placeholders
-     * @param string $append additional text
+     *
+     * @param array    $placeholders Placeholders
+     * @param string   $append       Additional text
+     * @param boolean  $is_error     Whether an error occured
      */
-    public static function showStub($placeholders = array(), $append = '')
+    public static function showStub($placeholders = array(), $append = '', $is_error = false)
     {
         if (empty($placeholders)) {
             $placeholders = array(
@@ -104,13 +107,30 @@ class Development
         }
 
         if (!headers_sent()) {
-            header('HTTP/1.1 503 Service Temporarily Unavailable');
-            header('Status: 503 Service Temporarily Unavailable');
-            header('Retry-After: 300');
+            if ($is_error) {
+                header('HTTP/1.1 500 Internal Server Error');
+                header('Status: 500 Internal Server Error');
+            } else {
+                header('HTTP/1.1 503 Service Temporarily Unavailable');
+                header('Status: 503 Service Temporarily Unavailable');
+                header('Retry-After: 300');
+            }
         }
 
         $content = file_get_contents(DIR_ROOT . '/store_closed.html');
-        echo(str_replace(array_keys($placeholders), $placeholders, $content));
+
+        /**
+         * Executes after the "Store closed" page template was fetched from file,
+         * allows to change page template and placeholders for the error message
+         *
+         * @param array  $placeholders Placeholders
+         * @param string $append       Additional text
+         * @param string $content      Template content
+         * @param bool   $is_error     Whether an error occured
+         */
+        fn_set_hook('development_show_stub', $placeholders, $append, $content, $is_error);
+
+        echo strtr($content, $placeholders);
 
         if ($append) {
             echo($append);

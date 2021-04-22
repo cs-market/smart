@@ -8,13 +8,13 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: hu\n"
-"X-Crowdin-File: /release-4.8.2/addons/advanced_import.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/advanced_import.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"PO-Revision-Date: 2019-02-01 06:05\n"
 
 msgctxt "Addons::name::advanced_import"
-msgid "Advanced products import [Beta]"
-msgstr "Speciális termék importálás [Beta]"
+msgid "Advanced products import"
+msgstr ""
 
 msgctxt "Addons::description::advanced_import"
 msgid "Allows you to match the fields in the imported file with the product properties. These matchings and other import settings can also be saved as presets for later use."
@@ -154,7 +154,7 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.advanced_products_import"
 msgid "Products"
-msgstr ""
+msgstr "Termékek"
 
 msgctxt "Languages::advanced_import.coming_soon"
 msgid "... coming soon"
@@ -162,6 +162,10 @@ msgstr ""
 
 msgctxt "Languages::advanced_import.cant_load_file_for_company"
 msgid "File can't be loaded for the specified company"
+msgstr ""
+
+msgctxt "Languages::advanced_import.cant_load_file"
+msgid "File can't be loaded"
 msgstr ""
 
 msgctxt "Languages::advanced_import.uploading_file"

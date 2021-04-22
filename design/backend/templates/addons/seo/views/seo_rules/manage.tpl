@@ -13,7 +13,7 @@
     <label class="control-label cm-required" for="rule_params">{__("url_dispatch_part")}</label>
     <div class="controls">
         <input type="text" name="rule_data[rule_params]" id="rule_params" value="" class="span9" />
-        <p class="muted">{__("controller_description")}</p>
+        <p class="muted description">{__("controller_description")}</p>
     </div>
 </div>
 
@@ -26,33 +26,59 @@
 
 {capture name="mainbox"}
 
+{$has_permission = fn_check_permissions("seo_rules", "delete", "admin", "POST")}
+
 <form action="{""|fn_url}" method="post" name="seo_form" class="form-horizontal form-edit">
 
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 
+{if $has_permission}
+    {hook name="seo_rules:bulk_edit"}
+        {include file="addons/seo/views/seo_rules/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
+
 {if $seo_data}
 <input type="hidden" name="page" value="{$smarty.request.page}" />
-<div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
-    <thead>
+<div class="table-responsive-wrapper longtap-selection">
+    <table width="100%" class="table table-middle table--relative table-responsive">
+    <thead 
+        data-ca-bulkedit-default-object="true"
+        data-ca-bulkedit-component="defaultObject"
+    >
     <tr>
-        <th width="1%" class="mobile-hide">
-            {include file="common/check_items.tpl"}</th>
-        <th width="35%">{__("dispatch_value")}</th>
-        <th width="64%">{__("seo_name")}</th>
-        <th>&nbsp;</th>
+        <th width="6%" class="mobile-hide">
+            {include file="common/check_items.tpl" is_check_all_shown=true is_check_disabled=!$has_permission}
+
+            <input type="checkbox"
+                class="bulkedit-toggler hide"
+                data-ca-bulkedit-toggler="true"
+                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+            />
+        </th>
+        <th width="30%">{__("dispatch_value")}</th>
+        <th width="50%">{__("seo_name")}</th>
+        <th width="8%">&nbsp;</th>
     </tr>
     </thead>
     {foreach from=$seo_data item="var" key="key"}
-    <tr>
-        <td class="mobile-hide">
-            <input type="checkbox" name="dispatches[]" value="{$var.dispatch}" class="cm-item" /></td>
-        <td data-th="{__("dispatch_value")}">
+    <tr class="cm-longtap-target"
+        {if $has_permission}
+            data-ca-longtap-action="setCheckBox"
+            data-ca-longtap-target="input.cm-item"
+            data-ca-id="{$var.name}"
+        {/if}
+    >
+        <td width="6%" class="mobile-hide">
+            <input type="checkbox" name="dispatches[]" value="{$var.dispatch}" class="cm-item hide" />
+        </td>
+        <td width="30%" data-th="{__("dispatch_value")}">
             <input type="hidden" name="seo_data[{$key}][rule_params]" value="{$var.dispatch}" />
             <span>{$var.dispatch}</span></td>
-        <td data-th="{__("seo_name")}">
-            <input type="text" name="seo_data[{$key}][name]" value="{$var.name}" class="input-hidden span7" /></td>
-        <td class="nowrap" data-th="{__("tools")}">
+        <td width="50%" data-th="{__("seo_name")}">
+            <input type="text" name="seo_data[{$key}][name]" value="{$var.name}" class="input-hidden input-large" /></td>
+        <td width="8%" class="nowrap" data-th="{__("tools")}">
             <div class="hidden-tools">
                 {capture name="tools_list"}
                     {assign var="_dispatch" value="`$var.dispatch`"|escape:url}
@@ -74,15 +100,6 @@
 {/capture}
 
 {capture name="buttons"}
-    <span class="mobile-hidden shift-right">
-    {capture name="tools_list"}
-        {if $seo_data}
-            <li>{btn type="delete_selected" dispatch="dispatch[seo_rules.m_delete]" form="seo_form"}</li>
-        {/if}
-    {/capture}
-    {dropdown content=$smarty.capture.tools_list}
-    </span>
-
     {if $seo_data}
         {include file="buttons/save.tpl" but_name="dispatch[seo_rules.m_update]" but_role="action" but_target_form="seo_form" but_meta="cm-submit"}
     {/if}

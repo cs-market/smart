@@ -348,6 +348,10 @@ msgctxt "Languages::addons.rus_sdek.show_all"
 msgid "Show all items"
 msgstr "Show all items"
 
+msgctxt "Languages::addons.rus_sdek.show_all_on_map"
+msgid "Show all items on map"
+msgstr "Show all items on map"
+
 msgctxt "Languages::addons.rus_sdek.search_string"
 msgid "Search"
 msgstr "Search"
@@ -355,6 +359,10 @@ msgstr "Search"
 msgctxt "Languages::addons.rus_sdek.zipcode_sdek"
 msgid "SDEK Zipcode"
 msgstr "SDEK Zipcode"
+
+msgctxt "Languages::rus_sdek.error_get_order_status"
+msgid "Couldn't get order status from SDEK: [error]<br>Please try refreshing the status later."
+msgstr "Couldn't get order status from SDEK: [error]<br>Please try refreshing the status later."
 
 msgctxt "Languages::ttc_addons.rus_sdek.use_product_price"
 msgid "Tick this checkbox to include product price in the sum that the customer pays on delivery. If you tick this checkbox and \"Include COD\", then the sum that the customer pays on delivery will include both the product price and the price from the \"Cash on Delivery\" field."
@@ -367,3 +375,11 @@ msgstr "Tick this checkbox, and the customer will have to pay the sum specified 
 msgctxt "Languages::ttc_addons.rus_sdek.number_package"
 msgid "The identifier or barcode of the package. This parameter must be unique for each shipment within an order; it is used by SDEK specialists to manage cargo."
 msgstr "The identifier or barcode of the package. This parameter must be unique for each shipment within an order; it is used by SDEK specialists to manage cargo."
+
+msgctxt "Languages::rus_sdek.empty_receipt_print_response"
+msgid "An empty response has been returned by SDEK when requesting the shipment receipt."
+msgstr "An empty response has been returned by SDEK when requesting the shipment receipt."
+
+msgctxt "Languages::rus_sdek.order_not_synced"
+msgid "The shipment receipt hasn't been obtained: [error].<br/>Please try again in 10 minutes."
+msgstr "The shipment receipt hasn't been obtained: [error].<br/>Please try again in 10 minutes."

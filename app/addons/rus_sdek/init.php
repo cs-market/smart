@@ -19,5 +19,6 @@ fn_register_hooks(
     'update_cart_by_data_post',
     'calculate_cart_items',
     'get_cities_post',
-    'update_city_post'
+    'update_city_post',
+    'pickup_point_variable_init'
 );

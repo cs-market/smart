@@ -12,7 +12,7 @@ class DhlTest extends ATestCase
      */
     public function testSortRatesByCurrency($rates, $currency, $expected)
     {
-        $dhl = new Dhl();
+        $dhl = new Dhl('USD');
 
         $actual = $dhl->sortRatesByCurrency($rates, $currency);
 

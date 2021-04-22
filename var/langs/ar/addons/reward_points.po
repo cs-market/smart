@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/reward_points.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.12.1/addons/reward_points.po\n"
+"X-Crowdin-File-ID: 3884\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::reward_points"
 msgid "Reward points"
@@ -22,35 +22,35 @@ msgstr "تسمح للعملاء كسب وإنفاق النقاط للمشتري�
 
 msgctxt "Languages::reward_points"
 msgid "Reward points"
-msgstr ""
+msgstr "نقاط مكافأة"
 
 msgctxt "Languages::reward_points_log"
 msgid "Reward points log"
-msgstr ""
+msgstr "سجل نقاط المكافآت"
 
 msgctxt "Languages::reward_points_menu_description"
 msgid "Assign global reward points in your store."
-msgstr ""
+msgstr "قم بتعيين نقاط مكافأة عالمية في متجرك."
 
 msgctxt "Languages::promotion_cond_reward_points"
 msgid "Points on user account"
-msgstr ""
+msgstr "النقاط على حساب المستخدم"
 
 msgctxt "Languages::points"
 msgid "Points"
-msgstr ""
+msgstr "النقاط"
 
 msgctxt "Languages::points_in_use"
 msgid "Points in use"
-msgstr ""
+msgstr "النقاط المستخدمة"
 
 msgctxt "Languages::points_in_use_lower"
 msgid "points in use"
-msgstr ""
+msgstr "النقاط المستخدمة"
 
 msgctxt "Languages::points_lower"
 msgid "points"
-msgstr ""
+msgstr "النقاط"
 
 msgctxt "Languages::points_in_use_lowercase"
 msgid "[n] point in use|[n] points in use"
@@ -74,11 +74,11 @@ msgstr ""
 
 msgctxt "Languages::text_increase_points_in_use"
 msgid "The points used in the order were added to user account."
-msgstr ""
+msgstr "تمت إضافة النقاط المستخدمة في الترتيب إلى حساب المستخدم."
 
 msgctxt "Languages::text_points_used_in_order"
 msgid "Points were used in order"
-msgstr ""
+msgstr "تم استخدام النقاط بالترتيب"
 
 msgctxt "Languages::text_point_in_account"
 msgid "You have"
@@ -86,7 +86,7 @@ msgstr ""
 
 msgctxt "Languages::pay_by_points"
 msgid "Allow payment by points"
-msgstr ""
+msgstr "السماح بالدفع عن طريق النقاط"
 
 msgctxt "Languages::override_per"
 msgid "Override global PER"
@@ -98,39 +98,39 @@ msgstr ""
 
 msgctxt "Languages::text_points_exceed_points_on_account"
 msgid "The number of the points entered by you exceeds the number of points at your account."
-msgstr ""
+msgstr "يتجاوز عدد النقاط التي أدخلتها عدد النقاط في حسابك."
 
 msgctxt "Languages::text_points_exceed_points_that_can_be_applied"
 msgid "The number of points entered by you exceeds the number of points that can be applied to this order."
-msgstr ""
+msgstr "يتجاوز عدد النقاط التي أدخلتها عدد النقاط التي يمكن تطبيقها على هذا الطلب."
 
 msgctxt "Languages::text_points_cannot_applied_because_subtotal_redeemed"
 msgid "Points cannot be applied because the subtotal is completely redeemed."
-msgstr ""
+msgstr "لا يمكن تطبيق النقاط نظرًا لاسترداد المبلغ الإجمالي بالكامل."
 
 msgctxt "Languages::text_cannot_apply_points_to_this_order_because_total"
 msgid "Unfortunately, you cannot apply points to this order, because the total cost is zero."
-msgstr ""
+msgstr "للأسف ، لا يمكنك تطبيق نقاط على هذا الطلب ، لأن إجمالي التكلفة صفر."
 
 msgctxt "Languages::text_cannot_apply_points_to_this_order_because_user"
 msgid "Unfortunately, you cannot apply points to this order, because you do not have enough points at the account."
-msgstr ""
+msgstr "للأسف ، لا يمكنك تطبيق نقاط على هذا الطلب ، لأنه ليس لديك ما يكفي من النقاط في الحساب."
 
 msgctxt "Languages::text_order_status_has_not_been_changed"
 msgid "The order status has not been changed, because the user did not have enough points."
-msgstr ""
+msgstr "لم يتم تغيير حالة الطلب ، لأن المستخدم لم يكن لديه نقاط كافية."
 
 msgctxt "Languages::price_in_points_increased"
 msgid "Price in points has been increased by"
-msgstr ""
+msgstr "السعر في النقاط قد زاد بنسبة"
 
 msgctxt "Languages::price_in_points_decreased"
 msgid "Price in points has been decreased by"
-msgstr ""
+msgstr "السعر في النقاط قد انخفض بنسبة"
 
 msgctxt "Languages::earned_points"
 msgid "Points earned per product"
-msgstr ""
+msgstr "النقاط المكتسبة لكل منتج"
 
 msgctxt "Languages::override_g_points"
 msgid "Override global point value for all products in this category"
@@ -189,7 +189,11 @@ msgid "[n] point have been subtracted from your account.|[n] points have been su
 msgstr ""
 
 msgctxt "Languages::privileges.manage_reward_points"
-msgid "Manage reward points system"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.reward_points"
+msgid "Reward points"
 msgstr ""
 
 msgctxt "SettingsSections::reward_points::general"

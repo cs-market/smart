@@ -5,18 +5,25 @@ namespace Tygh\Tests\Unit\Mailer\MessageBuilders;
 
 
 use Tygh\Mailer\Message;
+use Tygh\Storefront\Repository;
 use Tygh\Template\Mail\Template;
 use Tygh\Tests\Unit\ATestCase;
 
 class DBTemplateMessageBuilderTest extends ATestCase
 {
     public $runTestInSeparateProcess = true;
+
     public $backupGlobals = false;
+
     public $preserveGlobalState = false;
 
     protected $repository;
+
     protected $renderer;
+
     protected $message_style_formatter;
+
+    protected $storefront_repository;
 
     public function setUp()
     {
@@ -24,26 +31,31 @@ class DBTemplateMessageBuilderTest extends ATestCase
 
         $this->repository = $this->getMockBuilder('\Tygh\Template\Mail\Repository')
             ->disableOriginalConstructor()
-            ->setMethods(array('findActiveByCodeAndArea'))
+            ->setMethods(['findActiveByCodeAndArea'])
             ->getMock();
 
-        $this->repository->method('findActiveByCodeAndArea')->willReturnCallback(array($this, 'templateFindActiveByCodeAndArea'));
+        $this->repository->method('findActiveByCodeAndArea')->willReturnCallback(
+            [$this, 'templateFindActiveByCodeAndArea']
+        );
 
         $this->renderer = $this->getMockBuilder('\Tygh\Template\Renderer')
             ->disableOriginalConstructor()
-            ->setMethods(array('render', 'renderTemplate'))
+            ->setMethods(['render', 'renderTemplate'])
             ->getMock();
 
-        $this->renderer->method('render')->willReturnCallback(array($this, 'rendererRender'));
-        $this->renderer->method('renderTemplate')->willReturnCallback(array($this, 'rendererRenderTemplate'));
+        $this->renderer->method('render')->willReturnCallback([$this, 'rendererRender']);
+        $this->renderer->method('renderTemplate')->willReturnCallback([$this, 'rendererRenderTemplate']);
 
         $this->message_style_formatter = $this->getMockBuilder('\Tygh\Mailer\MessageStyleFormatter')
-            ->setMethods(array('convert'))
+            ->setMethods(['convert'])
             ->getMock();
 
-        $this->message_style_formatter->method('convert')->willReturnCallback(array($this, 'styleFormatterConvert'));
+        $this->message_style_formatter->method('convert')->willReturnCallback([$this, 'styleFormatterConvert']);
         $this->requireMockFunction('fn_allowed_for');
         $this->requireMockFunction('fn_disable_live_editor_mode');
+        $this->requireMockFunction('fn_filter_company_data_by_profile_fields');
+
+        $this->storefront_repository = $this->createMock(Repository::class);
     }
 
     public function templateFindActiveByCodeAndArea($code, $area)
@@ -54,7 +66,7 @@ class DBTemplateMessageBuilderTest extends ATestCase
             case 'example0':
                 $result->setTemplate('example0_body');
                 $result->setSubject('example0_subject');
-                $result->setParams(array('attach_invoice' => 'Y'));
+                $result->setParams(['attach_invoice' => 'Y']);
                 break;
             case 'example1':
                 $result->setTemplate('example1_body');
@@ -88,34 +100,35 @@ class DBTemplateMessageBuilderTest extends ATestCase
             $this->renderer,
             $this->repository,
             $this->message_style_formatter,
-            array()
+            [],
+            $this->storefront_repository
         );
 
         // Test create empty message
-        $message = $builder->createMessage(array(), 'C', 'en');
+        $message = $builder->createMessage([], 'C', 'en');
 
         $this->assertEmpty($message->getBody());
         $this->assertEmpty($message->getSubject());
 
         // Test create message by db template example0
         $message = $builder->createMessage(
-            array(
+            [
                 'template_code' => 'example0'
-            ),
+            ],
             'C',
             'en'
         );
 
         $this->assertEquals('example0', $message->getId());
-        $this->assertEquals(array('attach_invoice' => 'Y'), $message->getParams());
+        $this->assertEquals(['attach_invoice' => 'Y'], $message->getParams());
         $this->assertEquals('example0_body rendered formatted', $message->getBody());
         $this->assertEquals('example0_subject rendered', $message->getSubject());
 
         // Test create message by db template example1
         $message = $builder->createMessage(
-            array(
+            [
                 'template_code' => 'example1'
-            ),
+            ],
             'C',
             'en'
         );
@@ -131,10 +144,10 @@ class DBTemplateMessageBuilderTest extends ATestCase
         $email_template->setCode('example2');
 
         $message = $builder->createMessage(
-            array(
+            [
                 'template_code' => $email_template->getCode(),
-                'template' => $email_template
-            ),
+                'template'      => $email_template
+            ],
             'C',
             'en'
         );

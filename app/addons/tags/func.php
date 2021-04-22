@@ -14,6 +14,8 @@
 
 use Tygh\Registry;
 use Tygh\Navigation\LastView;
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
+use Tygh\Addons\MasterProducts\ServiceProvider as MasterProductsServiceProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -177,18 +179,17 @@ function fn_tags_update_product_post(&$product_data, $product_id)
 {
     if (isset($product_data['tags'])) {
         if (!empty($product_data['tags'])) {
-            fn_update_tags(array(
+            fn_update_tags([
                 'object_type' => 'P',
                 'object_id' => $product_id,
                 'values' => $product_data['tags']
-            ), false);
+            ], false);
         } else {
-            $params = array(
-                'object_id' => $product_id,
+            fn_delete_tags_by_params([
+                'object_id' => (int) $product_id,
                 'object_type' => 'P',
-                'company_id' => Registry::get('runtime.company_id')
-            );
-            fn_delete_tags_by_params($params);
+                'company_id' => (int) Registry::get('runtime.company_id')
+            ]);
         }
     }
 }
@@ -214,14 +215,15 @@ function fn_delete_tag($tag_id)
 /**
  * Deletes the data from the `tags` table
  *
- * @param array $tag_ids The numeric identifiers of the tags
+ * @param int[] $tag_ids The numeric identifiers of the tags
  *
- * @return boolean true
+ * @return bool true
  */
 function fn_delete_tags($tag_ids)
 {
-    db_query("DELETE FROM ?:tags WHERE tag_id IN (?n)", $tag_ids);
-    db_query("DELETE FROM ?:tag_links WHERE tag_id IN (?n)", $tag_ids);
+    fn_delete_tags_by_params([
+        'tag_ids' => $tag_ids
+    ]);
 
     /**
      * This hook is executed after the tags are deleted from the database by their numeric identifiers
@@ -238,62 +240,84 @@ function fn_delete_tags($tag_ids)
  *
  * @param array $params The parameters for searching the tags
  *
- * @return void
+ * @return bool
+ *
+ * @psalm-param array{
+ *  object_id?: int,
+ *  object_type?: string,
+ *  tag?: string,
+ *  tag_id?: int,
+ *  tag_ids?: int[],
+ *  company_id?: int,
+ *  use_company_condition?: bool
+ * } $params
  */
-function fn_delete_tags_by_params($params)
+function fn_delete_tags_by_params(array $params)
 {
     $condition = $condition2 = '';
-    $join = db_quote("LEFT JOIN ?:tag_links ON ?:tags.tag_id = ?:tag_links.tag_id ");
+    $join = db_quote('LEFT JOIN ?:tag_links ON ?:tags.tag_id = ?:tag_links.tag_id ');
 
     if (!empty($params['object_id'])) {
-        $condition .= db_quote(" AND object_id = ?i", $params['object_id']);
+        $condition .= db_quote(' AND object_id = ?i', $params['object_id']);
     }
 
     if (!empty($params['object_type'])) {
-        $condition .= db_quote(" AND object_type = ?s", $params['object_type']);
+        $condition .= db_quote(' AND object_type = ?s', $params['object_type']);
     }
 
     if (!empty($params['tag'])) {
-        $condition2 = db_quote(" AND tag = ?s", $params['tag']);
+        $condition2 = db_quote(' AND tag = ?s', $params['tag']);
     }
 
     if (!empty($params['tag_id'])) {
-        $condition2 = db_quote(" AND ?:tags.tag_id = ?i", $params['tag_id']);
+        $condition2 = db_quote(' AND ?:tags.tag_id = ?i', $params['tag_id']);
     }
 
-    if (!empty($params['company_id'])) {
+    if (!empty($params['tag_ids'])) {
+        $condition2 .= db_quote(' AND ?:tags.tag_id IN (?n)', $params['tag_ids']);
+    }
+
+    if (!empty($params['company_id']) || !empty($params['use_company_condition'])) {
         $condition2 .= fn_get_tags_company_condition('?:tags.company_id');
     }
 
-    $tag_ids = db_get_fields("SELECT ?:tags.tag_id FROM ?:tags ?p WHERE 1 ?p ?p", $join, $condition, $condition2);
+    $tag_ids = db_get_fields('SELECT DISTINCT ?:tags.tag_id FROM ?:tags ?p WHERE 1 ?p ?p', $join, $condition, $condition2);
 
-    db_query("DELETE FROM ?:tag_links WHERE tag_id IN (?n) ?p", $tag_ids, $condition);
+    db_query('DELETE FROM ?:tag_links WHERE tag_id IN (?n) ?p', $tag_ids, $condition);
 
     // Check if tags have links and delete them if not
-    $_tag_ids = db_get_fields("SELECT tag_id FROM ?:tag_links WHERE tag_id IN (?n)", $tag_ids);
-    $diff = array_diff($tag_ids, $_tag_ids);
-    if (!empty($diff)) {
-        db_query("DELETE FROM ?:tags WHERE tag_id IN (?n)", $diff);
+    $_tag_ids = db_get_fields('SELECT DISTINCT tag_id FROM ?:tag_links WHERE tag_id IN (?n)', $tag_ids);
+    $deleted_tag_ids = array_diff($tag_ids, $_tag_ids);
+    if (!empty($deleted_tag_ids)) {
+        db_query('DELETE FROM ?:tags WHERE tag_id IN (?n)', $deleted_tag_ids);
     }
 
     /**
      * Actions after deleting the tag data by parameters.
      *
-     * @param array $params This hook is executed after the tags are deleted by the specified parameters
+     * @param array $params          This hook is executed after the tags are deleted by the specified parameters
+     * @param array $tag_ids         List of founded by params tag identifiers
+     * @param array $deleted_tag_ids List of deleted tag identifiers
      */
-    fn_set_hook('delete_tags_by_params_post', $params);
+    fn_set_hook('delete_tags_by_params_post', $params, $tag_ids, $deleted_tag_ids);
 
     return true;
 }
 
 function fn_tags_delete_product_post(&$product_id)
 {
-    return fn_delete_tags_by_params(array('object_id' => $product_id, 'object_type' => 'P'));
+    return fn_delete_tags_by_params([
+        'object_id' => (int) $product_id,
+        'object_type' => 'P'
+    ]);
 }
 
 function fn_tags_delete_page(&$page_id)
 {
-    return fn_delete_tags_by_params(array('object_id' => $page_id, 'object_type' => 'A'));
+    return fn_delete_tags_by_params([
+        'object_id' => (int) $page_id,
+        'object_type' => 'A'
+    ]);
 }
 
 //
@@ -328,7 +352,10 @@ function fn_update_tag($tag_data, $tag_id = 0)
             $update_id = $tag_id;
         } else {
             $update_id = $existing_id;
-            db_query("DELETE FROM ?:tags WHERE tag_id = ?i ?p", $tag_id, fn_get_tags_company_condition('?:tags.company_id'));
+            fn_delete_tags_by_params([
+                'tag_id' => (int) $tag_id,
+                'use_company_condition' => true
+            ]);
         }
 
         db_query("UPDATE ?:tags SET ?u WHERE tag_id = ?i ?p", $tag_data, $update_id, fn_get_tags_company_condition('?:tags.company_id'));
@@ -375,23 +402,11 @@ function fn_update_tag($tag_data, $tag_id = 0)
  */
 function fn_update_tags($tags_data, $for_all_companies = true)
 {
-    $condition = "";
+    $tag_ids = [];
+    $condition = '';
     if (!$for_all_companies) {
         $condition = fn_get_tags_company_condition('?:tags.company_id');
     }
-
-    // save tag_ids, cause later we should delete tags with no links from ?:tags table
-    $tag_ids = db_get_hash_single_array(
-        "SELECT ?:tags.tag_id FROM ?:tag_links "
-         . "LEFT JOIN ?:tags ON ?:tags.tag_id = ?:tag_links.tag_id "
-         . "WHERE object_id = ?i AND object_type = ?s ?p",
-        array('tag_id', 'tag_id'), $tags_data['object_id'], $tags_data['object_type'], $condition
-    );
-
-    db_query(
-        "DELETE FROM ?:tag_links WHERE object_id = ?i AND object_type = ?s AND tag_id IN(?n)",
-        $tags_data['object_id'], $tags_data['object_type'], array_keys($tag_ids)
-    );
 
     $values = $tags_data['values'];
     foreach ($values as $tag) {
@@ -399,37 +414,48 @@ function fn_update_tags($tags_data, $for_all_companies = true)
             continue;
         }
 
-        $tag_id = db_get_field("SELECT tag_id FROM ?:tags WHERE tag = ?s ?p", $tag, $condition);
+        $tag_id = db_get_field('SELECT tag_id FROM ?:tags WHERE tag = ?s ?p', $tag, $condition);
         if (empty($tag_id)) {
-            $_data = array(
+            $_data = [
                 'tag' => $tag,
-                'status' => (AREA == 'A') ? 'A' : 'P',
+                'status' => (AREA === 'A') ? 'A' : 'P',
                 'timestamp' => TIME
-            );
+            ];
 
             if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
                 $_data['company_id'] = Registry::get('runtime.company_id');
             }
 
-            $tag_id = db_query("INSERT INTO ?:tags ?e", $_data);
+            $tag_id = db_query('INSERT INTO ?:tags ?e', $_data);
         }
 
-        //if this tag already exists for this user for this item, skip
-        $_data = array(
+        $tag_ids[] = $tag_id;
+
+        db_replace_into('tag_links', [
             'object_id' => $tags_data['object_id'],
             'object_type' => $tags_data['object_type'],
             'tag_id' => $tag_id
-        );
-
-        $exists = db_query("REPLACE INTO ?:tag_links ?e", $_data);
-
-        // if there is a tag with one of ours tag_id we shouldn't delete it.
-        unset($tag_ids[$tag_id]);
+        ]);
     }
 
-    // removing tags that have zero links
-    if (!empty($tag_ids)) {
-        db_query("DELETE t FROM ?:tags t LEFT JOIN ?:tag_links tl ON tl.tag_id = t.tag_id WHERE t.tag_id IN (?n) AND tl.tag_id IS NULL", $tag_ids);
+    /** @var array<array-key, int> $tag_ids_to_delete */
+    $tag_ids_to_delete  = db_get_hash_single_array(
+        'SELECT ?:tags.tag_id FROM ?:tag_links '
+        . 'LEFT JOIN ?:tags ON ?:tags.tag_id = ?:tag_links.tag_id '
+        . 'WHERE object_id = ?i AND object_type = ?s AND ?:tags.tag_id NOT IN (?n) ?p ',
+        ['tag_id', 'tag_id'],
+        $tags_data['object_id'],
+        $tags_data['object_type'],
+        $tag_ids,
+        $condition
+    );
+
+    if (!empty($tag_ids_to_delete)) {
+        fn_delete_tags_by_params([
+            'tag_ids' => $tag_ids_to_delete,
+            'object_id' => (int) $tags_data['object_id'],
+            'object_type' => (string) $tags_data['object_type']
+        ]);
     }
 
     /**
@@ -437,8 +463,9 @@ function fn_update_tags($tags_data, $for_all_companies = true)
      *
      * @param array $tags_data          The data required for updating the tag.
      * @param bool  $for_all_companies  The parameter that determines whether or not to update the tag data for all companies; true - update tag data for all companies.
+     * @param array $tag_ids_to_delete  List of deleted tag identifiers
      */
-    fn_set_hook('update_tags_post', $tags_data, $for_all_companies);
+    fn_set_hook('update_tags_post', $tags_data, $for_all_companies, $tag_ids_to_delete);
 
     return true;
 }
@@ -516,4 +543,39 @@ function fn_tags_build_enabled_products_join($params)
     }
 
     return '';
+}
+
+function fn_product_variations_update_tags_post($tags_data, $for_all_companies)
+{
+    $object_id = isset($tags_data['object_id']) ? $tags_data['object_id'] : null;
+    $object_type = isset($tags_data['object_type']) ? $tags_data['object_type'] : null;
+
+    if ($object_id && $object_type === 'P') {
+        $sync_service = ProductVariationsServiceProvider::getSyncService();
+
+        $sync_service->onTableChanged('tag_links', $object_id);
+    }
+}
+
+/**
+ * The "update_tags_post" hook handler.
+ *
+ * Actions performed:
+ *  - Sync tag data for offer of the master product.
+ *
+ * @param array<string, int|string> $tags_data         The data required for updating the tag.
+ * @param bool                      $for_all_companies The parameter that determines whether or not to update the tag data for all companies; true - update tag data for all companies.
+ *
+ * @see fn_update_tags()
+ */
+function fn_master_products_update_tags_post($tags_data, $for_all_companies)
+{
+    $object_id = isset($tags_data['object_id']) ? (int) $tags_data['object_id'] : null;
+    $object_type = isset($tags_data['object_type']) ? (string) $tags_data['object_type'] : null;
+
+    if (!$object_id || $object_type !== 'P') {
+        return;
+    }
+    $sync_service = MasterProductsServiceProvider::getService();
+    $sync_service->onTableChanged('tag_links', $object_id);
 }

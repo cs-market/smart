@@ -12,18 +12,29 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\BlockManager\Layout;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ProductTracking;
+use Tygh\Enum\ProfileTypes;
+use Tygh\Enum\StorefrontStatuses;
+use Tygh\Enum\VendorStatuses;
+use Tygh\Enum\YesNo;
 use Tygh\Helpdesk;
+use Tygh\Languages\Languages;
 use Tygh\Navigation\LastView;
+use Tygh\Providers\VendorServicesProvider;
 use Tygh\Registry;
 use Tygh\Settings;
-use Tygh\BlockManager\Layout;
 use Tygh\Themes\Styles;
-use Tygh\Common\Robots;
+use Tygh\Themes\Themes;
 use Tygh\Tools\DateTimeHelper;
+use Tygh\Tygh;
+use Tygh\VendorPayouts;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
     $suffix = '';
 
     // Define trusted variables that shouldn't be stripped
@@ -50,7 +61,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_REQUEST['company_data']['is_create_vendor_admin'])
                 && $_REQUEST['company_data']['is_create_vendor_admin'] == 'Y'
             ) {
-                if (!empty($_REQUEST['company_data']['admin_username'])
+                $params = $_REQUEST;
+                $fields = isset($params['company_data']['fields']) ? $params['company_data']['fields'] : array();
+                $company_data = fn_mve_extract_company_data_from_profile($fields);
+                $params['company_data']['admin_firstname'] = !empty($params['company_data']['admin_firstname']) ? $params['company_data']['admin_firstname'] : $company_data['admin_firstname'];
+                $params['company_data']['admin_lastname'] = !empty($params['company_data']['admin_lastname']) ? $params['company_data']['admin_lastname'] : $company_data['admin_lastname'];
+
+                if (!empty($params['company_data']['admin_username'])
                     && db_get_field("SELECT COUNT(*) FROM ?:users WHERE user_login = ?s", $_REQUEST['company_data']['admin_username']) > 0
                 ) {
                     fn_set_notification('E', __('error'), __('error_admin_not_created_name_already_used'));
@@ -58,25 +75,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $suffix = '.add';
                 } else {
                     // Adding company record
-                    $company_id = fn_update_company($_REQUEST['company_data']);
+                    $company_id = fn_update_company($params['company_data']);
 
                     if (!empty($company_id)) {
                         $suffix = ".update?company_id=$company_id";
-                        if (isset($_REQUEST['company_data']['is_create_vendor_admin']) && $_REQUEST['company_data']['is_create_vendor_admin'] == 'Y') {
+                        if (isset($params['company_data']['is_create_vendor_admin']) && $params['company_data']['is_create_vendor_admin'] == 'Y') {
 
-                            if (db_get_field("SELECT COUNT(*) FROM ?:users WHERE email = ?s", $_REQUEST['company_data']['email']) > 0) {
+                            if (db_get_field("SELECT COUNT(*) FROM ?:users WHERE email = ?s", $params['company_data']['email']) > 0) {
                                 fn_set_notification('E', __('error'), __('error_admin_not_created_email_already_used'));
                             } else {
 
                                 // Add company's administrator
-                                if (fn_is_restricted_admin($_REQUEST) == true) {
+                                if (fn_is_restricted_admin($params) == true) {
                                     return array(CONTROLLER_STATUS_DENIED);
                                 }
 
-                                $company_data = $_REQUEST['company_data'];
+                                $company_data = $params['company_data'];
                                 $company_data['company_id'] = $company_id;
                                 $company_data['is_root'] = 'N';
-                                $fields = isset($_REQUEST['user_data']['fields']) ? $_REQUEST['user_data']['fields'] : '';
+                                $fields = isset($params['user_data']['fields']) ? $params['user_data']['fields'] : array();
+
+                                if (!empty($company_data['fields'])) {
+                                    $fields = fn_mve_profiles_match_company_and_user_fields($company_data['fields']) + $fields;
+                                }
 
                                 $user_data = fn_create_company_admin($company_data, $fields, true);
                             }
@@ -92,11 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!empty($company_id)) {
                 if (fn_allowed_for('ULTIMATE') && !empty($_REQUEST['update'])) {
                     fn_ult_set_company_settings_information($_REQUEST['update'], $company_id);
-                }
-
-                if (fn_allowed_for('ULTIMATE')) {
-                    $robots = new Robots;
-                    $robots->addRobotsDataForNewCompany($company_id, $_REQUEST['company_data']['clone_from']);
                 }
 
                 $suffix = ".update?company_id=$company_id";
@@ -144,13 +160,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($mode == 'm_delete') {
-        $robots = new Robots;
 
         if (!empty($_REQUEST['company_ids'])) {
-            foreach ($_REQUEST['company_ids'] as $v) {
-                fn_delete_company($v);
-
-                $robots->deleteRobotsDataByCompanyId($v);
+            foreach ($_REQUEST['company_ids'] as $company_id) {
+                fn_delete_company($company_id);
             }
         }
 
@@ -172,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($mode == 'm_delete_payouts' && !Registry::get('runtime.company_id')) {
             if (!empty($_REQUEST['payout_ids'])) {
-                fn_companies_delete_payout($_REQUEST['payout_ids']);
+                VendorPayouts::instance()->delete($_REQUEST['payout_ids']);
             }
 
             $suffix = '.balance';
@@ -204,21 +217,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             return array(CONTROLLER_STATUS_REDIRECT, $_REQUEST['redirect_url']);
         }
 
-        if ($mode == 'm_activate' || $mode == 'm_disable') {
-            if ($mode == 'm_activate') {
-                $status = 'A';
+        if ($mode === 'm_activate' || $mode === 'm_disable' || $mode === 'm_update_statuses') {
+            if ($mode === 'm_activate') {
+                $status = VendorStatuses::ACTIVE;
                 $reason = !empty($_REQUEST['action_reason_activate']) ? $_REQUEST['action_reason_activate'] : '';
                 $msg = __('text_companies_activated');
-            } else {
-                $status = 'D';
+            } elseif ($mode === 'm_disable') {
+                $status = VendorStatuses::DISABLED;
                 $reason = !empty($_REQUEST['action_reason_disable']) ? $_REQUEST['action_reason_disable'] : '';
                 $msg = __('text_companies_disabled');
+            } else {
+                $status = empty($_REQUEST['status']) ? '' : $_REQUEST['status'];
+                $reason = empty($_REQUEST['reason_change_to_' . $status]) ? '' : $_REQUEST['reason_change_to_' . $status];
+                $msg = __('status_changed');
             }
 
-            $notification = !empty($_REQUEST['action_notification']) && $_REQUEST['action_notification'] == 'Y';
+            $company_ids = empty($_REQUEST['company_ids']) ? [] : (array) $_REQUEST['company_ids'];
 
-            $result = array();
-            foreach ($_REQUEST['company_ids'] as $company_id) {
+            $notification = !empty($_REQUEST['action_notification']) && YesNo::toBool($_REQUEST['action_notification']);
+
+            $result = [];
+            foreach ($company_ids as $company_id) {
                 $status_from = '';
                 $res = fn_change_company_status($company_id, $status, $reason, $status_from, false, $notification);
                 if ($res) {
@@ -227,15 +246,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if ($result) {
-                fn_set_notification('N', __('notice'), $msg);
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), $msg);
             } else {
-                fn_set_notification('E', __('error'), __('error_status_not_changed'), 'I');
+                fn_set_notification(NotificationSeverity::ERROR, __('error'), __('error_status_not_changed'), 'I');
             }
 
-            return array(CONTROLLER_STATUS_REDIRECT, 'companies.manage');
+            if (defined('AJAX_REQUEST')) {
+                $redirect_url = fn_url('companies.manage');
+                if (isset($_REQUEST['redirect_url'])) {
+                    $redirect_url = $_REQUEST['redirect_url'];
+                }
+                Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+                Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+                return [CONTROLLER_STATUS_NO_CONTENT];
+            }
+
+            return [CONTROLLER_STATUS_REDIRECT, 'companies.manage'];
         }
 
-        if ($mode == 'export_range') {
+        if ($mode === 'export_range') {
             if (!empty($_REQUEST['company_ids'])) {
                 if (empty(Tygh::$app['session']['export_ranges'])) {
                     Tygh::$app['session']['export_ranges'] = array();
@@ -252,13 +281,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 return array(CONTROLLER_STATUS_REDIRECT, 'exim.export?section=vendors&pattern_id=' . Tygh::$app['session']['export_ranges']['vendors']['pattern_id']);
             }
         }
+
+        if ($mode == 'invite') {
+            $result = VendorServicesProvider::getInvitationsSender()->send($_REQUEST);
+            $result->showNotifications();
+            $suffix = '.invitations';
+        }
+
+        if ($mode == 'm_delete_invitations' && !Registry::get('runtime.company_id')) {
+            if (!empty($_REQUEST['invitation_keys'])) {
+                VendorServicesProvider::getInvitationsRepository()->deleteByKey($_REQUEST['invitation_keys']);
+            }
+
+            $suffix = '.invitations';
+        }
+
+        if ($mode == 'delete_invitation' && !Registry::get('runtime.company_id')) {
+            if (!empty($_REQUEST['invitation_key'])) {
+                VendorServicesProvider::getInvitationsRepository()->deleteByKey($_REQUEST['invitation_key']);
+            }
+
+            $suffix = '.invitations';
+        }
     }
 
     if ($mode == 'delete') {
-        fn_delete_company($_REQUEST['company_id']);
 
-        $robots = new Robots;
-        $robots->deleteRobotsDataByCompanyId($_REQUEST['company_id']);
+        fn_delete_company($_REQUEST['company_id']);
 
         return array(CONTROLLER_STATUS_REDIRECT, 'companies.manage');
     }
@@ -266,6 +315,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'update_status') {
 
         $notification = !empty($_REQUEST['notify_user']) && $_REQUEST['notify_user'] == 'Y';
+
+        if (defined('AJAX_REQUEST') && empty($_REQUEST['show_notifications'])) {
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+        }
 
         if (fn_change_company_status($_REQUEST['id'], $_REQUEST['status'], '', $status_from, false, $notification)) {
             fn_set_notification('N', __('notice'), __('status_changed'));
@@ -280,23 +333,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($mode == 'payout_delete' && !Registry::get('runtime.company_id')) {
-        fn_companies_delete_payout($_REQUEST['payout_id']);
+        VendorPayouts::instance()->delete($_REQUEST['payout_id']);
+    }
+
+    if ($mode == 'switch_storefront_status') {
+        if (!fn_allowed_for('ULTIMATE')) {
+            return array(CONTROLLER_STATUS_DENIED);
+        }
+
+        $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : null;
+        $company_id = fn_get_runtime_company_id();
+
+        if (!$company_id && isset($_REQUEST['company_id'])) {
+            $company_id = (int) $_REQUEST['company_id'];
+        }
+
+        if (empty($status) || empty($company_id)) {
+            fn_set_notification('E', __('error'), __('error_occured'));
+        } else {
+            $is_status_changed = false;
+
+            if ($status === StorefrontStatuses::OPEN) {
+                $is_status_changed = fn_ult_open_storefront($company_id);
+            } elseif ($status === StorefrontStatuses::CLOSED) {
+                $is_status_changed = fn_ult_close_storefront($company_id);
+            }
+
+            if ($is_status_changed) {
+                fn_init_storefronts_stats();
+            } else {
+                fn_set_notification('E', __('error'), __('error_occured'));
+            }
+
+            if (defined('AJAX_REQUEST')) {
+                Tygh::$app['ajax']->assign('result', $is_status_changed);
+            }
+
+            if (!empty($_REQUEST['return_url'])) {
+                return array(CONTROLLER_STATUS_OK, urldecode($_REQUEST['return_url']));
+            }
+        }
+
+        $suffix = '.manage';
     }
 
     return array(CONTROLLER_STATUS_OK, 'companies' . $suffix);
 }
 
 if ($mode == 'manage') {
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+    if (fn_allowed_for('MULTIVENDOR')) {
+        fn_companies_set_navigation_sections('vendors');
+    }
 
-    list($companies, $search) = fn_get_companies($_REQUEST, $auth, Registry::get('settings.Appearance.admin_elements_per_page'));
+    $params = $_REQUEST;
+    if (fn_allowed_for('ULTIMATE')) {
+        $params['extend']['storefront'] = true;
+    }
+    list($companies, $search) = fn_get_companies($params, $auth, Registry::get('settings.Appearance.admin_elements_per_page'));
 
-    Tygh::$app['view']->assign('companies', $companies);
-    Tygh::$app['view']->assign('search', $search);
+    $view->assign([
+        'companies' => $companies,
+        'search'    => $search,
+        'countries' => fn_get_simple_countries(true, CART_LANGUAGE),
+        'states'    => fn_get_all_states(),
+    ]);
 
-    Tygh::$app['view']->assign('countries', fn_get_simple_countries(true, CART_LANGUAGE));
-    Tygh::$app['view']->assign('states', fn_get_all_states());
-
-    Tygh::$app['view']->assign('is_companies_limit_reached', Helpdesk::isCompaniesLimitReached());
+    if (fn_allowed_for('ULTIMATE')) {
+        $view->assign('is_companies_limit_reached', Helpdesk::isStorefrontsLimitReached());
+    }
 
 } elseif ($mode == 'update' || $mode == 'add') {
     if ($mode == 'add' && fn_allowed_for('ULTIMATE:FREE')) {
@@ -304,7 +410,15 @@ if ($mode == 'manage') {
     }
 
     $company_id = !empty($_REQUEST['company_id']) ? $_REQUEST['company_id'] : 0;
-    $company_data = !empty($company_id) ? fn_get_company_data($company_id) : array();
+    $company_data = $extra = array();
+
+    if ($company_id) {
+        if (fn_allowed_for('ULTIMATE')) {
+            $extra['storefront'] = true;
+        }
+
+        $company_data = fn_get_company_data($company_id, DESCR_SL, $extra);
+    }
 
     if ($mode == 'update' && empty($company_data)) {
         return array(CONTROLLER_STATUS_NO_PAGE);
@@ -321,14 +435,33 @@ if ($mode == 'manage') {
                 'SELECT COUNT(*) FROM ?:orders WHERE company_id = ?i', $company_id
             );
 
-            $company_data['products_count'] = db_get_field(
-                'SELECT COUNT(*) FROM ?:products WHERE company_id = ?i', $company_id
+            $product_companies = fn_get_companies_active_products_count([$company_id]);
+            $company_data['products_count'] = $product_companies[$company_id];
+
+            $params = [
+                'amount_to' => 0,
+                'tracking' => [
+                    ProductTracking::TRACK
+                ],
+                'get_conditions' => true,
+                'extend' => ['companies'],
+            ];
+            list($fields, $joins, $conditions) = fn_get_products($params);
+
+            db_query(
+                'SELECT SQL_CALC_FOUND_ROWS ' . implode(', ', $fields) . ' FROM ?:products AS products ?p'
+                . ' WHERE 1 AND ?w ?p'
+                . ' GROUP BY products.product_id',
+                $joins,
+                ['companies.company_id' => $company_id],
+                $conditions
             );
+            $company_data['out_of_stock'] = db_get_found_rows();
 
             $company_data['sales'] = db_get_field(
                 'SELECT SUM(total) FROM ?:orders'
                 . ' WHERE company_id = ?i AND (timestamp >= ?i AND timestamp <= ?i) AND status IN (?a)',
-                $company_id, $time_from, $time_to, array('P', 'C')
+                $company_id, $time_from, $time_to, fn_get_settled_order_statuses()
             );
 
             $vendor_payouts = \Tygh\VendorPayouts::instance(array('vendor' => $company_id));
@@ -338,6 +471,27 @@ if ($mode == 'manage') {
 
             Tygh::$app['view']->assign('time_from', $time_from);
             Tygh::$app['view']->assign('time_to', $time_to);
+        }
+
+        if ($mode === 'add') {
+            $logos = fn_get_logos();
+
+            if (!empty($logos['vendor']['image']['image_path'])) {
+                $company_data = [
+                    'logos' => [
+                        'theme' => [
+                            'image' => [
+                                'image_path' => $logos['vendor']['image']['image_path']
+                            ]
+                        ],
+                        'mail'  => [
+                            'image' => [
+                                'image_path' => $logos['vendor']['image']['image_path']
+                            ]
+                        ],
+                    ],
+                ];
+            }
         }
 
         Tygh::$app['view']->assign('logo_types', fn_get_logo_types(true));
@@ -352,17 +506,35 @@ if ($mode == 'manage') {
     }
 
     if (fn_allowed_for('ULTIMATE')) {
+        if ($mode === 'update' || $mode === 'add') {
+            $theme = Registry::get('config.base_theme');
+            $current_theme = null;
+            $current_style = null;
+            $storefront_id = null;
+            if ($company_id) {
+                /** @var \Tygh\Storefront\Repository $repository */
+                $repository = Tygh::$app['storefront.repository'];
+                /** @var \Tygh\Storefront\Storefront $storefront */
+                $storefront = $repository->findByCompanyId($company_id);
+                $theme = $storefront->theme_name;
+                $storefront_id = $storefront->storefront_id;
 
-        if ($mode == 'update') {
-            $available_themes = fn_get_available_themes(fn_get_theme_path('[theme]', 'C', $company_id));
+                $layout = Layout::instance(0, [], $storefront->storefront_id)->getDefault($storefront->theme_name);
+                $current_theme = Themes::factory($storefront->theme_name)->getManifest()['title'];
+                $current_style = empty($layout['style_id']) ? '' : Styles::factory($storefront->theme_name)->get($layout['style_id'])['name'];
+            }
 
-            $theme_name = fn_get_theme_path('[theme]', 'C', $company_id);
-            $layout = Layout::instance($company_id)->getDefault($theme_name);
+            $currencies = fn_get_currencies_list();
+            $languages = Languages::getAll();
 
-            $style = Styles::factory($theme_name)->get($layout['style_id']);
-
-            Tygh::$app['view']->assign('current_style', $style);
-            Tygh::$app['view']->assign('theme_info', $available_themes['current']);
+            Tygh::$app['view']->assign([
+                'storefront_id'  => $storefront_id,
+                'theme'          => $theme,
+                'current_theme'  => $current_theme,
+                'current_style'  => $current_style,
+                'all_currencies' => $currencies,
+                'all_languages'  => $languages,
+            ]);
         }
 
         $countries_list = fn_get_simple_countries();
@@ -391,7 +563,7 @@ if ($mode == 'manage') {
         if ($mode == 'add') {
             $schema = fn_init_clone_schemas();
             Tygh::$app['view']->assign('clone_schema', $schema);
-            Tygh::$app['view']->assign('is_companies_limit_reached', Helpdesk::isCompaniesLimitReached());
+            Tygh::$app['view']->assign('is_companies_limit_reached', Helpdesk::isStorefrontsLimitReached());
         }
 
         // Get "Company" settings from the DB
@@ -415,10 +587,19 @@ if ($mode == 'manage') {
     Tygh::$app['view']->assign('countries', fn_get_simple_countries(true, CART_LANGUAGE));
     Tygh::$app['view']->assign('states', fn_get_all_states());
 
-    $profile_fields = fn_get_profile_fields('A', array(), CART_LANGUAGE, array(
-        'get_custom' => true,
-        'get_profile_required' => true
-    ));
+    $params = array(
+        'get_custom'           => true,
+        'get_profile_required' => true,
+    );
+
+    if (fn_allowed_for('MULTIVENDOR')) {
+        $params = array(
+            'profile_type' => ProfileTypes::CODE_SELLER,
+            'skip_email_field' => false,
+        );
+    }
+
+    $profile_fields = fn_get_profile_fields('A', array(), CART_LANGUAGE, $params);
     Tygh::$app['view']->assign('profile_fields', $profile_fields);
 
     $tabs['detailed'] = array(
@@ -574,6 +755,22 @@ if (fn_allowed_for('MULTIVENDOR')) {
                 'href' => 'companies.balance?selected_section=withdrawals',
             ),
         ));
+    } elseif ($mode == 'invite') {
+        if (isset($_REQUEST['is_ajax'])) {
+            Tygh::$app['view']->assign('is_ajax', $_REQUEST['is_ajax']);
+        }
+        return [CONTROLLER_STATUS_OK];
+    } elseif ($mode == 'invitations') {
+        fn_companies_set_navigation_sections('invitations');
+
+        list($invitations, $search) = VendorServicesProvider::getInvitationsRepository()->getListWithPagination(
+            $_REQUEST,
+            Registry::get('settings.Appearance.admin_elements_per_page')
+        );
+        Tygh::$app['view']->assign([
+            'invitations' => $invitations,
+            'search'      => $search,
+        ]);
     }
 }
 
@@ -604,4 +801,26 @@ if (fn_allowed_for('ULTIMATE')) {
 
         exit;
     }
+}
+
+/**
+ * Set links into sidebar menu on the vendors and invitations pages
+ *
+ * @param string $active_section Set active section of the page
+ */
+function fn_companies_set_navigation_sections($active_section)
+{
+    $navigation_sections = [
+        'vendors' => [
+            'title' => __('vendors'),
+            'href'  => fn_url('companies.manage'),
+        ],
+        'invitations' => [
+            'title' => __('pending_vendor_invitations'),
+            'href'  => fn_url('companies.invitations')
+        ]
+    ];
+
+    Registry::set('navigation.dynamic.sections', $navigation_sections);
+    Registry::set('navigation.dynamic.active_section', $active_section);
 }

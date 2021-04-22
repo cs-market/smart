@@ -12,10 +12,10 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Bootstrap;
+use Tygh\Enum\YesNo;
+use Tygh\Languages\Languages;
 use Tygh\Registry;
-use Tygh\Storage;
-use Tygh\Tools\Url;
+use Tygh\Enum\NotificationSeverity;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -76,9 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Delete layout
     //
     if ($mode == 'delete_layout') {
-        db_query("DELETE FROM ?:exim_layouts WHERE layout_id = ?i", $layout_data['layout_id']);
+        db_query('DELETE FROM ?:exim_layouts WHERE layout_id = ?i', $layout_data['layout_id']);
+        $result = db_get_field('SELECT layout_id FROM ?:exim_layouts WHERE pattern_id = ?s LIMIT 1', $layout_data['pattern_id']);
+        if (!empty($result)) {
+            db_query('UPDATE ?:exim_layouts SET active = ?s WHERE layout_id = ?i', YesNo::YES, $result);
+        }
 
-        return array(CONTROLLER_STATUS_OK, 'exim.export?section=' . $_REQUEST['section'] . '&pattern_id=' . $layout_data['pattern_id']);
+        return [CONTROLLER_STATUS_OK, 'exim.export?section=' . $_REQUEST['section'] . '&pattern_id=' . $layout_data['pattern_id']];
     }
 
     //
@@ -86,20 +90,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //
     if ($mode == 'export') {
         $_suffix = '';
+
+        $file_extension = fn_get_file_ext($_REQUEST['export_options']['filename']);
+
+        if (!fn_is_file_extension_allowed($file_extension)) {
+            fn_set_notification(
+                NotificationSeverity::ERROR,
+                __('error'),
+                __('text_forbidden_file_extension', ['[ext]' => $file_extension])
+            );
+            exit;
+        }
+
         if (!empty($layout_data['cols'])) {
             $pattern = fn_exim_get_pattern_definition($layout_data['pattern_id'], 'export');
 
+            if (!fn_check_permissions('exim', 'export', 'admin', 'POST', ['section' => $pattern['section']])) {
+                return [CONTROLLER_STATUS_DENIED];
+            }
+
             if (empty($pattern)) {
-                fn_set_notification('E', __('error'), __('error_exim_pattern_not_found'));
+                fn_set_notification(NotificationSeverity::ERROR, __('error'), __('error_exim_pattern_not_found'));
                 exit;
             }
 
+            $export_pattern = [];
             if (!empty(Tygh::$app['session']['export_ranges'][$pattern['section']])) {
+                $export_pattern = Tygh::$app['session']['export_ranges'][$pattern['section']];
+            }
+
+            if (!empty($export_pattern)) {
                 if (empty($pattern['condition']['conditions'])) {
-                    $pattern['condition']['conditions'] = array();
+                    $pattern['condition']['conditions'] = [];
                 }
 
-                $pattern['condition']['conditions'] = fn_array_merge($pattern['condition']['conditions'], Tygh::$app['session']['export_ranges'][$pattern['section']]['data']);
+                if (!empty($export_pattern['data'])) {
+                    $pattern['condition']['conditions'] = fn_array_merge(
+                        $pattern['condition']['conditions'],
+                        $export_pattern['data']
+                    );
+                }
+
+                if (!empty($export_pattern['data_provider'])) {
+                    $data_provider_function = $export_pattern['data_provider']['function'];
+
+                    $data_provider_condition = call_user_func($data_provider_function);
+
+                    $pattern['condition']['conditions'] = fn_array_merge(
+                        $pattern['condition']['conditions'],
+                        $data_provider_condition
+                    );
+                }
             }
 
             if (fn_export($pattern, $layout_data['cols'], $_REQUEST['export_options']) == true) {
@@ -108,11 +149,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 // Direct download
                 if ($_REQUEST['export_options']['output'] == 'D') {
-                    $url = fn_url("exim.get_file?filename=" . rawurlencode($_REQUEST['export_options']['filename']), 'A', 'current');
+                    $url = fn_url('exim.get_file?filename=' . rawurlencode($_REQUEST['export_options']['filename']), 'A', 'current');
 
                 // Output to screen
                 } elseif ($_REQUEST['export_options']['output'] == 'C') {
-                    $url = fn_url("exim.get_file?to_screen=Y&filename=" . rawurlencode($_REQUEST['export_options']['filename']), 'A', 'current');
+                    $url = fn_url('exim.get_file?to_screen=Y&filename=' . rawurlencode($_REQUEST['export_options']['filename']), 'A', 'current');
                 }
 
                 if (defined('AJAX_REQUEST') && !empty($url)) {
@@ -123,11 +164,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 $url = empty($url) ? fn_url('exim.export?section=' . $_REQUEST['section']) : $url;
 
-                return array(CONTROLLER_STATUS_OK, $url);
+                return [CONTROLLER_STATUS_OK, $url];
 
             } else {
-                $delete_range_url = fn_url("exim.delete_range?section=$pattern[section]&pattern_id=$pattern[pattern_id]");
-                fn_set_notification('E', __('error'), __('error_exim_no_data_exported_new', array("[url]" => $delete_range_url)));
+                $delete_range_url = fn_url('exim.delete_range?section=' . $pattern['section'] . '&pattern_id=' . $pattern['pattern_id']);
+                fn_set_notification('E', __('error'), __('error_exim_no_data_exported_new', ["[url]" => $delete_range_url]));
             }
         } else {
             fn_set_notification('E', __('error'), __('error_exim_fields_not_selected'));
@@ -200,11 +241,19 @@ if ($mode == 'export') {
     }
 
     if (!empty(Tygh::$app['session']['export_ranges'][$_REQUEST['section']])) {
-        $key = key(Tygh::$app['session']['export_ranges'][$_REQUEST['section']]['data']);
-        if (!empty($key)) {
-            Tygh::$app['view']->assign('export_range', count(Tygh::$app['session']['export_ranges'][$patterns[$pattern_id]['section']]['data'][$key]));
-            Tygh::$app['view']->assign('active_tab', Tygh::$app['session']['export_ranges'][$_REQUEST['section']]['pattern_id']);
+        Tygh::$app['view']->assign('active_tab', Tygh::$app['session']['export_ranges'][$_REQUEST['section']]['pattern_id']);
+        $export_range_items_count = 0;
+        if (!empty(Tygh::$app['session']['export_ranges'][$_REQUEST['section']]['data_provider'])) {
+            $data_provider = Tygh::$app['session']['export_ranges'][$_REQUEST['section']]['data_provider'];
+            $export_range_items_count = call_user_func($data_provider['count_function']);
+        } else {
+            $key = key(Tygh::$app['session']['export_ranges'][$_REQUEST['section']]['data']);
+            if ($key) {
+                $export_range_items_count = count(Tygh::$app['session']['export_ranges'][$patterns[$pattern_id]['section']]['data'][$key]);
+            }
         }
+
+        Tygh::$app['view']->assign('export_range', $export_range_items_count);
     }
 
     // Get available layouts
@@ -236,7 +285,7 @@ if ($mode == 'export') {
     }
 
     // Export languages
-    foreach (fn_get_translation_languages() as $lang_code => $lang_data) {
+    foreach (Languages::getAll() as $lang_code => $lang_data) {
         $export_langs[$lang_code] = $lang_data['name'];
     }
 
@@ -300,52 +349,4 @@ if ($mode == 'export') {
 
     return array(CONTROLLER_STATUS_REDIRECT, $pattern['range_options']['selector_url']);
 
-}
-
-/**
- * @deprecated In favour of use fn_exim_put_csv function.
- */
-function fn_put_csv($data, $options, $enclosure)
-{
-    return fn_exim_put_csv($data, $options, $enclosure);
-}
-
-/**
- * @deprecated In favour of use fn_exim_export_image function.
- */
-function fn_export_image($image_id, $object, $backup_path = '', $include_alt = true)
-{
-    return fn_exim_export_image($image_id, $object, $backup_path, $include_alt);
-}
-
-/**
- * @deprecated In favour of use fn_exim_import_images function.
- */
-function fn_import_images($prefix, $image_file, $detailed_file, $position, $type, $object_id, $object)
-{
-    return fn_exim_import_images($prefix, $image_file, $detailed_file, $position, $type, $object_id, $object);
-}
-
-/**
- * @deprecated In favour of use fn_exim_import_build_groups function.
- */
-function fn_import_build_groups($type_group, $export_fields)
-{
-    return fn_exim_import_build_groups($type_group, $export_fields);
-}
-
-/**
- * @deprecated In favour of use fn_exim_get_csv function.
- */
-function fn_get_csv($pattern, $file, $options)
-{
-    return fn_exim_get_csv($pattern, $file, $options);
-}
-
-/**
- * @deprecated In favour of use fn_exim_get_pattern_definition function.
- */
-function fn_get_pattern_definition($pattern_id, $get_for = '')
-{
-    return fn_exim_get_pattern_definition($pattern_id, $get_for);
 }

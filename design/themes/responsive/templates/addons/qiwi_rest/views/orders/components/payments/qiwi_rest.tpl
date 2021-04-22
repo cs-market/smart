@@ -15,9 +15,9 @@
 
 {script src="js/addons/qiwi_rest/input_mask.js"}
 
-<div class="ty-qiwi-rest">
-    <div class="ty-qiwi-rest__control-group ty-control-group">
-        <label for="qiwi_phone_number" class="ty-control-group__title cm-required">{__("phone")}</label>
-        <input id="qiwi_phone_number" size="35" type="text" name="payment_info[phone]" value="{$phone_normalize}" class="ty-input-big cm-mask" />
+<div class="ty-qiwi-rest litecheckout__group">
+    <div class="ty-qiwi-rest__control-group litecheckout__field">
+        <input id="qiwi_phone_number" size="35" type="tel" name="payment_info[phone]" value="{$phone_normalize}" class="ty-input-big cm-mask litecheckout__input" placeholder=" "/>
+        <label for="qiwi_phone_number" class="ty-control-group__title litecheckout__label cm-required">{__("phone")}</label>
     </div>
 </div>

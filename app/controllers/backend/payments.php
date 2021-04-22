@@ -105,20 +105,36 @@ if ($mode == 'processor') {
 
     $payments = fn_get_payments(DESCR_SL);
 
-    Tygh::$app['view']->assign('usergroups', fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')), DESCR_SL));
+    Tygh::$app['view']->assign('usergroups', fn_get_payment_usergroups());
     Tygh::$app['view']->assign('payments', $payments);
     Tygh::$app['view']->assign('templates', fn_get_payment_templates());
-    Tygh::$app['view']->assign('payment_processors', fn_get_payment_processors());
+    Tygh::$app['view']->assign('payment_processors', fn_get_payment_processors_by_category());
 
 } elseif ($mode == 'update') {
     $payment = fn_get_payment_method_data($_REQUEST['payment_id'], DESCR_SL);
     $payment['icon'] = fn_get_image_pairs($payment['payment_id'], 'payment', 'M', true, true, DESCR_SL);
 
-    Tygh::$app['view']->assign('usergroups', fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')), DESCR_SL));
-    Tygh::$app['view']->assign('payment', $payment);
-    Tygh::$app['view']->assign('templates', fn_get_payment_templates($payment));
-    Tygh::$app['view']->assign('payment_processors', fn_get_payment_processors());
-    Tygh::$app['view']->assign('taxes', fn_get_taxes());
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+
+    $view->assign([
+        'usergroups'         => fn_get_payment_usergroups(),
+        'payment'            => $payment,
+        'templates'          => fn_get_payment_templates($payment),
+        'payment_processors' => fn_get_payment_processors_by_category(),
+        'taxes'              => fn_get_taxes(),
+    ]);
+
+    if (fn_allowed_for('ULTIMATE')) {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        list($is_sharing_enabled, $is_shared) = $repository->getSharingDetails(['payment_ids' => $payment['payment_id']]);
+
+        $view->assign([
+            'is_sharing_enabled' => $is_sharing_enabled,
+            'is_shared'          => $is_shared,
+        ]);
+    }
 
     if (Registry::get('runtime.company_id') && Registry::get('runtime.company_id') != $payment['company_id']) {
         Tygh::$app['view']->assign('hide_for_vendor', true);

@@ -5,17 +5,18 @@
 {/if}
 
 {if $block.properties.hide_add_to_cart_button == "Y"}
-        {assign var="_show_add_to_cart" value=false}
+        {$_show_add_to_cart=false}
     {else}
-        {assign var="_show_add_to_cart" value=true}
+        {$_show_add_to_cart=true}
     {/if}
     {if $block.properties.show_price == "Y"}
-        {assign var="_hide_price" value=false}
+        {$_hide_price=false}
     {else}
-        {assign var="_hide_price" value=true}
+        {$_hide_price=true}
 {/if}
 
-{assign var="obj_prefix" value="`$block.block_id`000"}
+{$obj_prefix="`$block.block_id`000"}
+{$block.block_id = "{$block.block_id}_{uniqid()}"}
 
 {if $block.properties.outside_navigation == "Y"}
     <div class="owl-theme ty-owl-controls">
@@ -32,7 +33,8 @@
     {foreach from=$items item="product" name="for_products"}
         {hook name="products:product_scroller_list"}
         <div class="ty-scroller-list__item">
-            {assign var="obj_id" value="scr_`$block.block_id`000`$product.product_id`"}
+            {hook name="products:product_scroller_list_item"}
+            {$obj_id="scr_`$block.block_id`000`$product.product_id`"}
             <div class="ty-scroller-list__img-block">
                 {include file="common/image.tpl" assign="object_img" images=$product.main_pair image_width=$block.properties.thumbnail_width image_height=$block.properties.thumbnail_width no_ids=true lazy_load=true}
                 <a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$object_img nofilter}</a>
@@ -42,9 +44,10 @@
             </div>
             <div class="ty-scroller-list__description">
                 {strip}
-                    {include file="blocks/list_templates/simple_list.tpl" product=$product show_name=true show_price=true show_add_to_cart=$_show_add_to_cart but_role="action" hide_price=$_hide_price hide_qty=true show_discount_label=true}
+                    {include file="blocks/list_templates/simple_list.tpl" product=$product show_name=true show_price=true show_add_to_cart=$_show_add_to_cart but_role="action" hide_price=$_hide_price hide_qty=true show_product_labels=true show_discount_label=true show_shipping_label=true}
                 {/strip}
             </div>
+            {/hook}
         </div>
         {/hook}
     {/foreach}

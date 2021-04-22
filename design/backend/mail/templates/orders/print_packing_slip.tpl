@@ -104,12 +104,6 @@ td {
                     <td width="100%">{$company_placement_info.company_phone_2}</td>
                 </tr>
                 {/if}
-                {if $company_placement_info.company_fax}
-                <tr valign="top">
-                    <td style="font: 12px verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("fax")}:</td>
-                    <td width="100%">{$company_placement_info.company_fax}</td>
-                </tr>
-                {/if}
                 {if $company_placement_info.company_website}
                 <tr valign="top">
                     <td style="font: 12px verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("web_site")}:</td>

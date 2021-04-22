@@ -12,7 +12,7 @@
                 {if $list.show_on_registration}
                     {assign var="show_newsletters_content" value=true}
                 {/if}
-                <input id="profile_mailing_list_{$list.list_id}" type="hidden" name="all_mailing_lists[]" value="{$list.list_id}" />
+                <input id="all_profile_mailing_list_{$list.list_id}" type="hidden" name="all_mailing_lists[]" value="{$list.list_id}" />
 
                 <div class="ty-newsletters__item{if !$list.show_on_registration} hidden{/if}">
                     <input id="profile_mailing_list_{$list.list_id}" type="checkbox" name="mailing_lists[]" value="{$list.list_id}" {if $user_mailing_lists[$list.list_id]}checked="checked"{/if} class="checkbox" /><label for="profile_mailing_list_{$list.list_id}">{$list.object}</label>

@@ -31,7 +31,6 @@ class AModelTest extends ATestCase
 
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('AREA', 'A');
         define('CART_LANGUAGE', 'en');
 

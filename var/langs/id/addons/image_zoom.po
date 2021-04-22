@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: id\n"
-"X-Crowdin-File: /release-4.8.2/addons/image_zoom.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"X-Crowdin-File: /release-4.12.2/addons/image_zoom.po\n"
+"X-Crowdin-File-ID: 4086\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::image_zoom"
 msgid "Image zoom"
@@ -24,159 +24,43 @@ msgctxt "SettingsSections::image_zoom::general"
 msgid "General"
 msgstr "Umum"
 
-msgctxt "SettingsOptions::image_zoom::cz_opacity"
-msgid "Opacity"
-msgstr "Kegelapan"
-
 msgctxt "SettingsOptions::image_zoom::cz_animation_time"
 msgid "Animation time"
 msgstr "Waktu animasi"
-
-msgctxt "SettingsOptions::image_zoom::cz_tint_color_picker"
-msgid "Color"
-msgstr "Warna"
 
 msgctxt "SettingsOptions::image_zoom::cz_zoom_position"
 msgid "Zoom position"
 msgstr "Posisi zoom"
 
-msgctxt "SettingsOptions::image_zoom::cz_zoom_size_mode"
-msgid "Zoom size mode"
-msgstr "Mode ukuran zoom"
-
-msgctxt "SettingsOptions::image_zoom::cz_caption_position"
-msgid "Caption position"
-msgstr "Posisi caption"
-
-msgctxt "SettingsOptions::image_zoom::cz_ease_time"
-msgid "Ease time"
-msgstr "Kemudahan waktu"
-
-msgctxt "SettingsOptions::image_zoom::cz_zoom_fly_out"
-msgid "Zoom fly out"
-msgstr "Zoom terbang keluar"
-
-msgctxt "SettingsTooltips::image_zoom::cz_opacity"
-msgid "Opacity of tint 0-1. If zero, no tint will be visible."
-msgstr "Opasitas warna 0-1. Jika nol, tidak ada warna yang terlihat."
-
 msgctxt "SettingsTooltips::image_zoom::cz_animation_time"
 msgid "Duration of the animation effects in milliseconds."
 msgstr "Durasi efek animasi dalam milidetik."
 
-msgctxt "SettingsTooltips::image_zoom::cz_tint_color_picker"
-msgid "Color to use for the tint effect. Example: #ffffff."
-msgstr "Warna yang akan digunakan untuk efek warna. Contoh: #ffffffff."
-
 msgctxt "SettingsTooltips::image_zoom::cz_zoom_position"
-msgid "Specifies position of zoom window. If numeric (0-15), position is relative to page image as shown by the following key (blue squares represent zoom window). If a string is supplied, value will be used as a selector to pinpoint the exact position and size of an element in the page. If the value \"inside\" is specified, the zoom image will appear inside the page image.<br /><br /><img src=\"design/backend/media/images/addons/image_zoom/zoom-positions.png\" />"
-msgstr "Menentukan posisi jendela zoom. Jika numerik (0-15), posisi relatif terhadap gambar halaman seperti yang ditunjukkan oleh tombol berikut (kotak biru mewakili jendela zoom). Jika sebuah string dipasok, nilai akan digunakan sebagai pemilih untuk menentukan posisi dan ukuran elemen pada halaman. Jika nilai \"dalam\" ditentukan, gambar zoom akan muncul di dalam gambar halaman. <br /> <br /> <img src = \"desain / backend / media / gambar / addons / image_zoom / zoom-positions.png\" />"
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_size_mode"
-msgid "Defines the rule for sizing the zoom window and lens."
-msgstr "Mendefinisikan aturan untuk ukuran jendela zoom dan lensa."
-
-msgctxt "SettingsTooltips::image_zoom::cz_caption_position"
-msgid "Position of caption, \"top\" or \"bottom\"."
-msgstr "Posisi caption, \"top\" atau \"bottom\"."
-
-msgctxt "SettingsTooltips::image_zoom::cz_ease_time"
-msgid "Number of milliseconds of mouse easing movement of zoom image. The bigger the number, the more easing. Zero means no easing."
-msgstr "Jumlah milidetik gerakan pelemahan mouse zoom image. Semakin besar jumlahnya, semakin berkurang. Nol berarti tidak ada pelonggaran."
-
-msgctxt "SettingsTooltips::image_zoom::cz_zoom_fly_out"
-msgid "Turns 'flying' zoom animation on or off."
-msgstr "Ternyata 'terbang' animasi zoom aktif atau nonaktif."
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::0"
-msgid "Zoom position №0"
-msgstr "Posisi zoom №0"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::1"
-msgid "Zoom position №1"
-msgstr "Posisi zoom №1"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::2"
-msgid "Zoom position №2"
-msgstr "Posisi zoom №2"
+msgid "Specifies position of zoom window."
+msgstr ""
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::3"
-msgid "Zoom position №3"
-msgstr "Posisi zoom №3"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::4"
-msgid "Zoom position №4"
-msgstr "Posisi zoom №4"
+msgid "Upper right corner"
+msgstr ""
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::5"
-msgid "Zoom position №5"
-msgstr "Posisi zoom № 5"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::6"
-msgid "Zoom position №6"
-msgstr "Posisi zoom №6"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::7"
-msgid "Zoom position №7"
-msgstr "Posisi zoom №7"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::8"
-msgid "Zoom position №8"
-msgstr "Posisi zoom №8"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::9"
-msgid "Zoom position №9"
-msgstr "Posisi zoom №9"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::10"
-msgid "Zoom position №10"
-msgstr "Posisi zoom №10"
+msgid "Bottom right corner"
+msgstr ""
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::11"
-msgid "Zoom position №11"
-msgstr "Posisi zoom №11"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::12"
-msgid "Zoom position №12"
-msgstr "Posisi zoom №12"
+msgid "Bottom left corner"
+msgstr ""
 
 msgctxt "SettingsVariants::image_zoom::cz_zoom_position::13"
-msgid "Zoom position №13"
-msgstr "Posisi zoom №13"
+msgid "Upper left corner"
+msgstr ""
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::14"
-msgid "Zoom position №14"
-msgstr "Posisi zoom №14"
+msgctxt "Languages::image_zoom.rework_update_notification.title"
+msgid "Image Zoom add-on reworked"
+msgstr ""
 
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::15"
-msgid "Zoom position №15"
-msgstr "Posisi zoom №15"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_position::inside"
-msgid "Inside position"
-msgstr "Posisi di dalam"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::image"
-msgid "Image"
-msgstr "Gambar"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::lens"
-msgid "Lens"
-msgstr "Lensa"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::zoom"
-msgid "Zoom"
-msgstr "Zoom"
-
-msgctxt "SettingsVariants::image_zoom::cz_zoom_size_mode::full"
-msgid "Full"
-msgstr "Penuh"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::top"
-msgid "Top"
-msgstr "Puncak"
-
-msgctxt "SettingsVariants::image_zoom::cz_caption_position::bottom"
-msgid "Bottom"
-msgstr "Bawah"
+msgctxt "Languages::image_zoom.rework_update_notification.message"
+msgid "<p>We reworked the <b>Image zoom</b> add-on, because it used a third-party solution incompatible with modern versions of jQuery. As a result of the rework, some settings of the add-on were removed.</p><p>Please check how the image zoom looks on the product pages now. If you'd like to make any changes to the looks, adjust the settings of the <b>Image zoom</b> add-on.</p><p><a href=\"[image_zoom_settings]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Check Image Zoom settings</a></p>"
+msgstr ""
 

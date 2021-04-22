@@ -1,7 +1,7 @@
 {if !$location.location_id}
-    {assign var="html_id" value="0"}
+    {$html_id = "0"}
 {else}
-    {assign var="html_id" value=$location.location_id}
+    {$html_id = $location.location_id}
 {/if}
 
 <form action="{""|fn_url}" method="post" enctype="multipart/form-data" class=" form-horizontal" name="location_{$html_id}_update_form">
@@ -22,13 +22,14 @@
 
     <div class="cm-tabs-content" id="tabs_content_location_{$html_id}">
         <div id="content_location_general_{$html_id}">
+            {hook name="block_manager:update_location_general"}
                 <div class="control-group">
                     <label for="location_dispatch_{$html_id}" class="cm-required control-label">{__("dispatch")}: </label>
                     <div class="controls"><select id="location_dispatch_{$html_id}_select" name="location_data[dispatch]" class="cm-select-with-input-key cm-reload-form">
-                            {foreach from=$dispatch_descriptions key="k" item="v"}
-                                <option value="{$k}" {if $location.dispatch == $k}selected="selected"{assign var="selected" value=1}{/if}>{$v}</option>
+                            {foreach $dispatch_descriptions as $k => $v}
+                                <option value="{$k}" {if $location.dispatch == $k}selected="selected"{$selected = 1}{/if}>{$v}</option>
                                 {if $location.dispatch == $k}
-                                    {assign var="not_custom_dispatch" value="1"}
+                                    {$not_custom_dispatch = "1"}
                                 {/if}
                             {/foreach}
                             <option value="" {if !$selected}selected="selected"{/if}>{__("custom")}</option>
@@ -47,10 +48,11 @@
                     <div class="controls">
                         <input id="location_title" type="text" name="location_data[title]" value="{$location.title}">
                         {if $location.is_default}
-                        <div>
-                        <label class="checkbox inline"><input type="checkbox" name="location_data[copy_translated][]" value="title" />{__("copy_to_other_locations")}</label>
-                        </div>
-                        {/if}                        
+                            <div>
+                                <label class="checkbox inline"><input type="checkbox" name="location_data[copy_translated][]" value="title" />{__("copy_to_other_locations")}</label>
+                            </div>
+                        {/if}
+                        <p class="muted description">{__("ttc_page_title")}</p>
                     </div>
                 </div>
 
@@ -79,8 +81,9 @@
                     <div class="controls">
                         <textarea id="location_custom_html" name="location_data[custom_html]" class="span9" cols="55" rows="4">{$location.custom_html}</textarea>
                         {if $location.is_default}
-                        <label class="checkbox inline"><input type="checkbox" name="location_data[copy][]" value="custom_html" />{__("copy_to_other_locations")}</label>
+                            <label class="checkbox inline"><input type="checkbox" name="location_data[copy][]" value="custom_html" />{__("copy_to_other_locations")}</label>
                         {/if}
+                        <p class="muted description">{__("tt_views_block_manager_update_location_head_custom_html")}</p>
                     </div>
                 </div>
 
@@ -89,6 +92,7 @@
                     <div class="controls">
                         <input type="hidden" name="location_data[is_default]" value="N">
                         <input type="checkbox" name="location_data[is_default]" value="Y" id="location_is_default" {if $location.is_default}checked="checked" disabled="disabled"{/if}>
+                        <p class="muted description">{__("tt_views_block_manager_update_location_default")}</p>
                     </div>
                 </div>
 
@@ -98,6 +102,7 @@
                         <input id="location_position" type="text" name="location_data[position]" value="{$location.position}">
                     </div>
                 </div>
+            {/hook}
         </div>
         {if $dynamic_object_scheme}
             <div id="content_location_object_{$dynamic_object_scheme.object_type}">

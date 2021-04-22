@@ -41,6 +41,16 @@ class ProductFeatures
         return self::TEXT_SELECTBOX . self::MULTIPLE_CHECKBOX . self::NUMBER_SELECTBOX . self::EXTENDED;
     }
 
+    /**
+     * Gets product feature types that uses variants
+     *
+     * @return string[]
+     */
+    public static function getSelectableList()
+    {
+        return [self::TEXT_SELECTBOX, self::MULTIPLE_CHECKBOX, self::NUMBER_SELECTBOX, self::EXTENDED];
+    }
+
     public static function getAllTypes()
     {
         return self::SINGLE_CHECKBOX . self::MULTIPLE_CHECKBOX . self::TEXT_SELECTBOX . self::NUMBER_SELECTBOX . self::EXTENDED . self::TEXT_FIELD . self::NUMBER_FIELD . self::DATE;

@@ -18,7 +18,7 @@ require_once Registry::get('config.dir.schemas') . 'customization/live_editor.fu
 
 return array(
     'langvar' => array(
-        'function' => 'fn_update_lang_var',
+        'function' => '\Tygh\Languages\Values::updateLangVar',
         'args' => array(
             array(
                 array(

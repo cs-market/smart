@@ -14,30 +14,31 @@
 
 namespace Tygh\Addons\AdvancedImport\Readers;
 
+use Tygh\Addons\AdvancedImport\Exceptions\DownloadException;
 use Tygh\Addons\AdvancedImport\Exceptions\FileNotFoundException;
 use Tygh\Addons\AdvancedImport\Exceptions\ReaderNotFoundException;
 use Tygh\Enum\Addons\AdvancedImport\PresetFileTypes;
-use Tygh\Exceptions\AException;
 use Tygh\Exceptions\PermissionsException;
+use Tygh\Addons\AdvancedImport\FileManager;
 
 class Factory
 {
-    /** @var array $file_dirs */
-    protected $file_dirs;
-
     /** @var int|null $company_id */
     protected $company_id;
+
+    /** @var FileManager $file_manager */
+    protected $file_manager;
 
     /**
      * Factory constructor.
      *
-     * @param int|null $company_id Current user company ID
+     * @param int|null      $company_id     Current user company ID
+     * @param FileManager   $file_manager   File manager instance
      */
-    public function __construct($company_id)
+    public function __construct($company_id, FileManager $file_manager)
     {
         $this->company_id = (int) $company_id;
-
-        $this->file_dirs = $this->initFilesDirectories($company_id);
+        $this->file_manager = $file_manager;
     }
 
     /**
@@ -49,42 +50,45 @@ class Factory
      * @throws \Tygh\Exceptions\PermissionsException
      * @throws \Tygh\Addons\AdvancedImport\Exceptions\FileNotFoundException
      * @throws \Tygh\Addons\AdvancedImport\Exceptions\ReaderNotFoundException
+     * @throws \Tygh\Addons\AdvancedImport\Exceptions\DownloadException
      */
     public function get(array $preset)
     {
         $file_to_load = $preset['file'];
 
-        if (!$this->company_id && isset($preset['company_id'])) {
-            $company_id = $preset['company_id'];
-            if (preg_match('!^(?P<company_id_in_path>\d+)/(?P<file_to_load>.+)!', $file_to_load, $matches)
-                && $matches['company_id_in_path'] != $company_id
-            ) {
-                throw new PermissionsException();
+        if (
+            preg_match('!^(?P<company_id_in_path>\d+)/(?P<file_to_load>.+)!', $file_to_load, $matches)
+            && ($this->company_id && (int) $matches['company_id_in_path'] !== $this->company_id)
+        ) {
+            throw new PermissionsException();
+        }
+
+        if ($preset['file_type'] === PresetFileTypes::URL) {
+            $file = $this->file_manager->download($preset['file'], $this->company_id);
+            if (!$file) {
+                throw new DownloadException();
             }
-            $file_to_load = preg_replace("!^{$company_id}/!", '', $file_to_load);
-        } else {
-            $company_id = $this->company_id;
-        }
-
-        if ($preset['file_type'] == PresetFileTypes::URL) {
-            $file = $this->download($preset['file'], $company_id);
+            $file_path = $file['path'];
             $file_to_load = $file['name'];
+        } else {
+            $file_to_load = preg_replace("!^{$this->company_id}/!", '', $file_to_load);
+            $file_path = $this->file_manager->getFilePath($file_to_load, $this->company_id);
         }
 
-        $file_path = $this->getFilePath($file_to_load, $company_id);
         if (!$file_path) {
             throw new FileNotFoundException();
         }
 
         $ext = fn_get_file_ext($file_to_load);
-        $reader_class = '\Tygh\Addons\AdvancedImport\Readers\\' . fn_camelize($ext);
-        if (!class_exists($reader_class)) {
+        if (!$this->readerExists($ext)) {
             throw new ReaderNotFoundException();
         }
 
+        $reader_class = $this->getReaderClass($ext);
+
         $options = isset($preset['options'])
             ? $preset['options']
-            : array();
+            : [];
 
         /** @var \Tygh\Addons\AdvancedImport\Readers\IReader $reader */
         $reader = new $reader_class($file_path, $options);
@@ -99,38 +103,13 @@ class Factory
      * @param int|null $company_id Company to download file for
      *
      * @return array|null
+     *
+     * @deprecated since 4.11.4. Use the Tygh::$app['addons.advanced_import.file_manager'] service to download.
+     * @see \Tygh\Addons\AdvancedImport\FileManager
      */
     public function download($url, $company_id = null)
     {
-        $company_id = $this->getCompanyId($company_id);
-
-        $fileinfo = fn_get_url_data($url);
-
-        $ext = fn_get_file_ext($fileinfo['name']);
-
-        if (!$ext) {
-            $mime_to_ext = fn_get_ext_mime_types('mime');
-
-            $ext = isset($mime_to_ext[$fileinfo['type']])
-                ? $mime_to_ext[$fileinfo['type']]
-                : null;
-        }
-
-        if (!$ext) {
-            return null;
-        }
-
-        if ($fileinfo['name'] == '') {
-            $fileinfo['name'] = md5($url);
-        }
-
-        if (substr($fileinfo['name'], -fn_strlen($ext)) !== $ext) {
-            $fileinfo['name'] .= '.' . $ext;
-        }
-
-        $this->moveUpload($fileinfo['name'], $fileinfo['path'], $company_id);
-
-        return $fileinfo;
+        return $this->file_manager->download($url, $company_id);
     }
 
     /**
@@ -141,101 +120,104 @@ class Factory
      * @param array|null $file_dirs  Directories to search in
      *
      * @return null|string
+     *
+     * @deprecated since 4.11.4. Use the Tygh::$app['addons.advanced_import.file_manager'] service to get file path.
+     * @see \Tygh\Addons\AdvancedImport\FileManager
      */
     public function getFilePath($filename, $company_id = null, array $file_dirs = null)
     {
-        $company_id = $this->getCompanyId($company_id);
-
-        if ($file_dirs === null) {
-            if ($company_id == $this->company_id) {
-                $file_dirs = $this->file_dirs;
-            } else {
-                $file_dirs = $this->initFilesDirectories($company_id);
-            }
-        }
-
-        foreach ($file_dirs as $dir) {
-            if (file_exists($dir . $filename)) {
-                return $dir . $filename;
-            }
-        }
-
-        return null;
+        return $this->file_manager->getFilePath($filename, $company_id, $file_dirs);
     }
 
     /**
-     * Gets path to private files directory.
-     * Creates missing private files directory.
+     * Initializes files directories.
      *
-     * @param int|null $company_id Company to get path for
+     * @param int|null $company_id Company to initialize files directories for
      *
-     * @return string Private files directory path
+     * @return array
+     *
+     * @deprecated since 4.11.4. Use the Tygh::$app['addons.advanced_import.file_manager'] service to initialize files directories.
+     * @see \Tygh\Addons\AdvancedImport\FileManager
      */
-    protected function getPrivateFilesPath($company_id = null)
-    {
-        $company_id = $this->getCompanyId($company_id);
-
-        $path = fn_get_files_dir_path($company_id);
-
-        fn_mkdir($path);
-
-        return $path;
-    }
-
-    /**
-     * Gets path to public files directory.
-     * Creates missing public files directory.
-     *
-     * @param int|null $company_id Company to get path for
-     *
-     * @return string Public files directory path
-     */
-    protected function getPublicFilesPath($company_id = null)
-    {
-        $company_id = $this->getCompanyId($company_id);
-
-        $path = fn_get_public_files_path($company_id);
-
-        fn_mkdir($path);
-
-        return $path;
-    }
-
     public function initFilesDirectories($company_id = null)
     {
-        $company_id = $this->getCompanyId($company_id);
-
-        return array(
-            'private' => $this->getPrivateFilesPath($company_id),
-            'public'  => $this->getPublicFilesPath($company_id),
-        );
+        return $this->file_manager->initFilesDirectories($company_id);
     }
 
     /**
-     * Moves file to a private files directory of a company.
+     * Moves file to a private files directory of a company. Filename will be changed if a file
+     * with the same name already located in the private directory.
      *
-     * @param string   $filename    Filename in the target directory
-     * @param string   $source_path Current file location
-     * @param int|null $company_id  Owning company of the file
+     * @param string        $filename        Filename in the target directory.
+     * @param string        $source_path     Current file location.
+     * @param int|null      $company_id      Owning company of the file.
+     *
+     * @return string       new filename
+     *
+     * @deprecated since 4.11.4. Use the Tygh::$app['addons.advanced_import.file_manager'] service to initialize files directories.
+     * @see \Tygh\Addons\AdvancedImport\FileManager
      */
     public function moveUpload($filename, $source_path, $company_id = null)
     {
-        $company_id = $this->getCompanyId($company_id);
-
-        $uploaded_file_location = $this->getPrivateFilesPath($company_id) . $filename;
-
-        fn_rename($source_path, $uploaded_file_location);
+        return $this->file_manager->moveUpload($filename, $source_path, $company_id);
     }
 
     /**
-     * Provides corrected company ID for assorted checks.
+     * Handles preset file upload process.
      *
-     * @param int|null $company_id Company ID to check
+     * For files uploaded by URL, performs validation by mime type.
+     * For local and server uploades uses core upload behaviour.
      *
-     * @return int|null
+     * @param array    $preset     Preset data
+     * @param int|null $company_id Company to download file for
+     *
+     * @return array Upload info with preset ID as an array key and fileinfo as value
+     *
+     * @deprecated since 4.11.4. Use the Tygh::$app['addons.advanced_import.file_manager'] service to initialize files directories.
+     * @see \Tygh\Addons\AdvancedImport\FileManager
      */
-    protected function getCompanyId($company_id = null)
+    public function uploadPresetFile(array $preset, $company_id = null)
     {
-        return $this->company_id ?: $company_id;
+        return $this->file_manager->uploadPresetFile($preset, $company_id);
+    }
+
+    /**
+     * Removes file from a company private directory.
+     *
+     * @param string   $filename    File that must be removed
+     * @param int|null $company_id  Owning company of the file
+     *
+     * @deprecated since 4.11.4. Use the Tygh::$app['addons.advanced_import.file_manager'] service to initialize files directories.
+     * @see \Tygh\Addons\AdvancedImport\FileManager
+     */
+    public function removeFile($filename, $company_id = null)
+    {
+        $this->file_manager->removeFile($filename, $company_id);
+    }
+
+    /**
+     * Checks if the reader for a specific file format exists.
+     *
+     * @param string $extension File extension
+     *
+     * @return bool
+     */
+    public function readerExists($extension)
+    {
+        $reader_class = $this->getReaderClass($extension);
+
+        return class_exists($reader_class);
+    }
+
+    /**
+     * Gets classname of the reader for a specific file format.
+     *
+     * @param string $extension File extension
+     *
+     * @return string
+     */
+    public function getReaderClass($extension)
+    {
+        return '\Tygh\Addons\AdvancedImport\Readers\\' . fn_camelize(strtolower($extension));
     }
 }

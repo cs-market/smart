@@ -1,7 +1,7 @@
 {math equation="x*30+5" x=$level|default:"0" assign="shift"}
 <tr class="multiple-table-row cm-row-status-{$product_file.status|lower} ">
     <td>
-        <div style="padding-left: {$shift}px;">
+        <div style="padding-{$direction}: {$shift}px;">
             <a class="row-status cm-external-click{if $non_editable} no-underline{/if}" data-ca-external-click-id="opener_group{$id_prefix}{$id}">{$product_file.file_name}</a>
         </div></td>
 
@@ -13,7 +13,7 @@
                 {/if}
 
                 {if !$non_editable}
-                    <li>{include file="common/popupbox.tpl" id="group`$id_prefix``$id`" title_start=__("editing_file") title_end=$product_file.file_name act="edit" opener_ajax_class="cm-ajax"}</li>
+                    <li>{include file="common/popupbox.tpl" id="group`$id_prefix``$id`" text=$product_file.file_name act="edit" opener_ajax_class="cm-ajax"}</li>
                 {/if}
 
                 {if !$non_editable && !$skip_delete}

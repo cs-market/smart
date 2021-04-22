@@ -14,17 +14,20 @@
 
 use Tygh\Enum\ProductFeatures;
 use Tygh\Enum\ProductFieldsLength;
+use Tygh\Enum\YesNo;
+use Tygh\Navigation\LastView\Backend;
 use Tygh\Registry;
 use Tygh\Storage;
+use Tygh\Enum\NotificationSeverity;
 
 /**
  * Changes company_id for options in the table product options
  *
- * @param integer  $product_id      Product identifier
- * @param string   $company_name    Company name
- * @param array    $processed_data  Quantity of the loaded objects. Objects:
- *                                  'E' - quantity existent products, 'N' - quantity new products,
- *                                  'S' - quantity skipped products, 'C' - quantity vendors
+ * @param int                $product_id     Product identifier
+ * @param string             $company_name   Company name
+ * @param array<string, int> $processed_data Quantity of the loaded objects. Objects:
+ *                                           'E' - quantity existent products, 'N' - quantity new products,
+ *                                           'S' - quantity skipped products, 'C' - quantity vendors
  *
  * @return integer $company_id Company identifier
  */
@@ -46,17 +49,78 @@ function fn_exim_set_product_company($product_id, $company_name, &$processed_dat
 /**
  * Creates categories tree by path
  *
- * @param integer $product_id Product ID
- * @param string $link_type M - main category, A - additional
- * @param string $categories_data categories path
- * @param string $category_delimiter Delimiter in categories path
- * @param string $store_name Store name (is used for saving category company_id)
- * @return boolean True if any categories were updated.
+ * @param int                   $product_id         Product ID
+ * @param string                $link_type          M - main category, A - additional
+ * @param array<string, string> $categories_data    Categories path
+ * @param string                $category_delimiter Delimiter in categories path
+ * @param string                $store_name         Store name (is used for saving category company_id)
+ * @param array                 $processed_data     Processed data
+ * @param bool                  $is_new             The product is new
+ *
+ * @return bool True if any categories were updated.
+ *
+ * @psalm-param array{
+ *  E: int,
+ *  N: int,
+ *  S: int,
+ *  C: int
+ * }|array<empty, empty> $processed_data
+ *
  */
-function fn_exim_set_product_categories($product_id, $link_type, $categories_data, $category_delimiter, $store_name = '')
+function fn_exim_set_product_categories(
+    $product_id,
+    $link_type,
+    array $categories_data,
+    $category_delimiter,
+    $store_name = '',
+    array &$processed_data = [],
+    $is_new = false
+)
 {
-    if (fn_is_empty($categories_data)) {
+    if (fn_is_empty($categories_data) && $link_type === 'A') {
         return false;
+    }
+
+    $company_id = 0;
+    if (fn_allowed_for('ULTIMATE')) {
+        if (Registry::get('runtime.company_id')) {
+            $company_id = Registry::get('runtime.company_id');
+        } else {
+            $company_id = fn_get_company_id_by_name($store_name);
+
+            if (!$company_id) {
+                $company_data = ['company' => $store_name, 'email' => ''];
+                $company_id = fn_update_company($company_data, 0);
+            }
+        }
+    }
+
+    // Sets a default category
+    if (fn_is_empty($categories_data)) {
+        // If the category data is empty and the product exists, keep the existing product category
+        if (!$is_new) {
+            return false;
+        }
+
+        if (isset($processed_data['default_categories']['ids'][$company_id])) {
+            $default_category_id = $processed_data['default_categories']['ids'][$company_id];
+        } else {
+            $default_category_id = fn_get_or_create_default_category_id($company_id);
+            $processed_data['default_categories']['ids'][$company_id] = $default_category_id;
+        }
+
+        $default_category_id = (int) $default_category_id;
+        $processed_data['default_categories']['used'][] = $default_category_id;
+
+        fn_exim_set_product_category([
+            'product_id'  => $product_id,
+            'category_id' => $default_category_id,
+            'link_type'   => 'M',
+        ]);
+
+        fn_update_product_count([$default_category_id]);
+
+        return true;
     }
 
     $set_delimiter = ';';
@@ -119,20 +183,6 @@ function fn_exim_set_product_categories($product_id, $link_type, $categories_dat
         }
     }
 
-    $company_id = 0;
-    if (fn_allowed_for('ULTIMATE')) {
-        if (Registry::get('runtime.company_id')) {
-            $company_id = Registry::get('runtime.company_id');
-        } else {
-            $company_id = fn_get_company_id_by_name($store_name);
-
-            if (!$company_id) {
-                $company_data = array('company' => $store_name, 'email' => '');
-                $company_id = fn_update_company($company_data, 0);
-            }
-        }
-    }
-
     foreach ($paths as $key_path => $categories) {
 
         if (!empty($categories)) {
@@ -153,10 +203,18 @@ function fn_exim_set_product_categories($product_id, $link_type, $categories_dat
                 $main_lang = key($cat);
                 $main_cat = array_shift($cat);
 
-                $category_id = db_get_field("SELECT ?:categories.category_id FROM ?:category_descriptions INNER JOIN ?:categories ON ?:categories.category_id = ?:category_descriptions.category_id $category_condition WHERE ?:category_descriptions.category = ?s AND lang_code = ?s AND parent_id = ?i", $main_cat, $main_lang, $parent_id);
+                $category_id = db_get_field(
+                    'SELECT ?:categories.category_id FROM ?:category_descriptions '
+                    . "INNER JOIN ?:categories ON ?:categories.category_id = ?:category_descriptions.category_id $category_condition "
+                    . 'WHERE ?:category_descriptions.category = ?s AND lang_code = ?s AND parent_id = ?i',
+                    $main_cat,
+                    $main_lang,
+                    $parent_id
+                );
 
                 if (!empty($category_id)) {
                     $parent_id = $category_id;
+                    // [cs-market]
                     fn_set_hook('set_product_categories_exist', $category_id);
                 } else {
 
@@ -205,7 +263,7 @@ function fn_exim_set_product_categories($product_id, $link_type, $categories_dat
                 $data['link_type'] = 'M';
             }
 
-            db_query("REPLACE INTO ?:products_categories ?e", $data);
+            fn_exim_set_product_category($data);
 
             $updated_categories[] = $category_id;
         }
@@ -218,6 +276,28 @@ function fn_exim_set_product_categories($product_id, $link_type, $categories_dat
     }
 
     return false;
+}
+
+/**
+ * Links product to category
+ *
+ * @param array{product_id: int, category_id: int, link_type: string} $data Linked category data
+ *
+ * @return void
+ */
+function fn_exim_set_product_category(array $data)
+{
+    db_replace_into('products_categories', $data);
+
+    /**
+     * Executes after the data about product categories is imported to the database,
+     * allows changing the categories associated with the product,
+     * and how they relate to the product (primary or additional category)
+     *
+     * @param array  $data       Category data
+     * @param int    $company_id Company identifier
+     */
+    fn_set_hook('exim_set_product_categories_post', $data, $company_id);
 }
 
 /**
@@ -381,15 +461,12 @@ function fn_exim_set_product_features($product_id, $data, $features_delimiter, $
 {
     reset($data);
     $main_lang = key($data);
-    $company_id = 0;
     $runtime_company_id = fn_get_runtime_company_id();
 
-    if (fn_allowed_for('ULTIMATE')) {
-        if ($runtime_company_id) {
-            $company_id = $runtime_company_id;
-        } else {
-            $company_id = fn_get_company_id_by_name($store_name);
-        }
+    if ($runtime_company_id) {
+        $company_id = $runtime_company_id;
+    } else {
+        $company_id = fn_get_company_id_by_name($store_name);
     }
 
     $features = fn_exim_parse_features($data, $features_delimiter);
@@ -633,8 +710,10 @@ function fn_exim_set_product_options($product_id, $data, $lang_code, $features_d
                 unset($_REQUEST['file_variant_image_image_icon'], $_REQUEST['variant_image_image_data']);
                 $global_option = (isset($option['global'])) ? $option['global'] : false;
 
-                if (!empty($option['group_name'])) {
-                    $company_id = fn_get_company_id_by_name($option['group_name']);
+                if (!empty($option['group_name']) || !empty(Registry::get('runtime.company_id'))) {
+                    $company_id = empty(Registry::get('runtime.company_id'))
+                        ? fn_get_company_id_by_name($option['group_name'])
+                        : Registry::get('runtime.company_id');
                 }
 
                 if ($lang_code == $main_lang) {
@@ -974,25 +1053,33 @@ function fn_exim_export_file($product_id, $path)
     return '';
 }
 
-//
-// Import product files
-// @product_id 0- product ID
-// @filename - file name
-// @path - path to search files in
-// @delete_files - flag - delete all product files before import
+/**
+ * Import product files
+ *
+ * @param int    $product_id   Product identifier
+ * @param string $filename     File name
+ * @param string $path         File patch
+ * @param string $delete_files Flag that deletes all current product files (if set to "Y")
+ *
+ * @return bool
+ */
 function fn_exim_import_file($product_id, $filename, $path, $delete_files = 'N')
 {
     $path = fn_get_files_dir_path() . fn_normalize_path($path);
 
     // Clean up the directory above if flag is set
+    $product_files = [];
     if ($delete_files == 'Y') {
         fn_delete_product_file_folders(0, $product_id);
         fn_delete_product_files(0, $product_id);
+    } else {
+        list($product_files) = fn_get_product_files(['product_id' => $product_id]);
+        $product_files = array_combine(array_column($product_files, 'file_path'), $product_files);
     }
 
     // Check if we have several files
     $files = fn_explode(',', $filename);
-    $folders = array();
+    $folders = [];
 
     // Create folders
     foreach ($files as $file) {
@@ -1000,10 +1087,10 @@ function fn_exim_import_file($product_id, $filename, $path, $delete_files = 'N')
             list($folder) = fn_explode('/', $file);
 
             if (!isset($folders[$folder])) {
-                $folder_data = array(
+                $folder_data = [
                     'product_id' => $product_id,
                     'folder_name' => $folder,
-                );
+                ];
                 $folders[$folder] = fn_update_product_file_folder($folder_data, 0);
             }
         }
@@ -1011,52 +1098,46 @@ function fn_exim_import_file($product_id, $filename, $path, $delete_files = 'N')
 
     // Copy files
     foreach ($files as $file) {
-
+        $folder_name = '';
         if (strpos($file, '/') !== false) {
             list($folder_name, $file) = fn_explode('/', $file);
-        } else {
-            $folder_name = '';
         }
 
+        $f = $file;
+        $pr = '';
         if (strpos($file, '#') !== false) {
             list($f, $pr) = fn_explode('#', $file);
-        } else {
-            $f = $file;
-            $pr = '';
         }
 
         $file = fn_find_file($path, $f);
-
+        $file_id = isset($product_files[$f]['file_id']) ? $product_files[$f]['file_id'] : 0;
         if (!empty($file)) {
-
-            $uploads = array(
-                'file_base_file' => array($file),
-                'type_base_file' => array('server')
-            );
+            $uploads = [
+                'file_base_file'    => [$file_id => $file],
+                'type_base_file'    => [$file_id => 'server'],
+                'file_file_preview' => [],
+                'type_file_preview' => [],
+            ];
 
             if (!empty($pr)) {
-
                 $preview = fn_find_file($path, $pr);
                 if (!empty($preview)) {
-                    $uploads['file_file_preview'] = array($preview);
-                    $uploads['type_file_preview'] = array('server');
+                    $uploads['file_file_preview'] = [$file_id => $preview];
+                    $uploads['type_file_preview'] = [$file_id => 'server'];
                 }
-            } else {
-                $uploads['file_file_preview'] = "";
-                $uploads['type_file_preview'] = "";
             }
 
-            $_REQUEST = fn_array_merge($_REQUEST, $uploads); // not good to add data to $_REQUEST
+            $_REQUEST = fn_array_merge($_REQUEST, $uploads);
 
-            $file_data = array(
-                'product_id' => $product_id,
-            );
-
+            $file_data = ['product_id' => $product_id];
             if (!empty($folder_name)) {
                $file_data['folder_id'] = $folders[$folder_name];
             }
 
-            if (fn_update_product_file($file_data, 0) == false) {
+            if (isset($product_files[$f]['file_name'])) {
+                $file_data['file_name'] = $product_files[$f]['file_name'];
+            }
+            if (fn_update_product_file($file_data, $file_id) == false) {
                 return false;
             }
         }
@@ -1100,11 +1181,9 @@ function fn_exim_reset_inventory($reset_inventory)
             while ($product_ids = db_get_fields("SELECT product_id FROM ?:products WHERE company_id = ?i LIMIT $i, $step", Registry::get('runtime.company_id'))) {
                 $i += $step;
                 db_query("UPDATE ?:products SET amount = 0 WHERE product_id IN (?n)", $product_ids);
-                db_query("UPDATE ?:product_options_inventory SET amount = 0 WHERE product_id IN (?n)", $product_ids);
             }
         } else {
             db_query("UPDATE ?:products SET amount = 0");
-            db_query("UPDATE ?:product_options_inventory SET amount = 0");
         }
     }
 
@@ -1220,7 +1299,7 @@ function fn_exim_put_box_size($product_id, $data)
     }
 
     $length = $width = $height = 0;
-    $params = explode(';', $data);
+    $params = explode(';', strtolower($data));
     foreach ($params as $param) {
         $elm = explode(':', $param);
         if ($elm[0] == 'length') {
@@ -1235,6 +1314,8 @@ function fn_exim_put_box_size($product_id, $data)
     $shipping_params = db_get_field('SELECT shipping_params FROM ?:products WHERE product_id = ?i', $product_id);
     if (!empty($shipping_params)) {
         $shipping_params = unserialize($shipping_params);
+    } else {
+        $shipping_params = [];
     }
 
     $shipping_params['box_length'] = $length;
@@ -1246,9 +1327,39 @@ function fn_exim_put_box_size($product_id, $data)
     return true;
 }
 
-function fn_exim_send_product_notifications($primary_object_ids, $import_data)
+/**
+ * Sends notifications after product import
+ *
+ * @param array<array{product_id: int}> $primary_object_ids Primary objects ids
+ * @param array                         $import_data        Import data
+ * @param array                         $processed_data     Processed data
+ *
+ * @psalm-param array<
+ *  array<string, string|int|bool>
+ * > $import_data
+ *
+ * @psalm-param array{
+ *  E: int,
+ *  N: int,
+ *  S: int,
+ *  C: int
+ * } $processed_data
+ *
+ * @return bool
+ */
+function fn_exim_send_product_notifications(array $primary_object_ids, array $import_data, array $processed_data)
 {
-    if (empty($primary_object_ids) || !is_array($primary_object_ids)) {
+    // Imported to default category
+    if (!empty($processed_data['default_categories']['used'])) {
+        foreach ($processed_data['default_categories']['used'] as $default_category_id) {
+            $url = fn_url('products.manage?cid=' . $default_category_id);
+            fn_set_notification('W', __('important'), __('products_without_category_notification_text', [
+                '[url]' => $url
+            ]));
+        }
+    }
+
+    if (empty($primary_object_ids)) {
         return true;
     }
 
@@ -1358,9 +1469,10 @@ function fn_export_product_descr($product_id, $value, $lang_code, $field)
 
 /**
  * Update product description for necessary store.
- * @param Array $data Product data
+ *
+ * @param array   $data       Product data
  * @param integer $product_id Product id
- * @param string $lang_code Lang code
+ * @param string  $field      Field
  */
 function fn_import_product_descr($data, $product_id, $field)
 {
@@ -1534,6 +1646,13 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
             continue;
         }
 
+        // normalize checkbox feature value
+        if ($feature['type'] === ProductFeatures::SINGLE_CHECKBOX) {
+            $variant = reset($feature['variants']);
+            $variant['name'] = YesNo::toId($variant['name']);
+            $feature['variants'] = [$variant];
+        }
+
         if ($feature['type'] != ProductFeatures::MULTIPLE_CHECKBOX) {
             $feature['variants'] = array_slice($feature['variants'], 0, 1);
         }
@@ -1542,7 +1661,7 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
 
         if ($feature['is_selectable']) {
             foreach ($feature['variants'] as $variant) {
-                $variant_names[] = $variant['name'];
+                $variant_names[] = strtolower($variant['name']);
             }
         }
 
@@ -1552,9 +1671,9 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
 
     if (!empty($variant_names)) {
         $existent_feature_variants = db_get_hash_multi_array(
-            'SELECT pfvd.variant_id, variant, feature_id FROM ?:product_feature_variant_descriptions AS pfvd ' .
+            'SELECT pfvd.variant_id, LOWER(variant) as variant, feature_id FROM ?:product_feature_variant_descriptions AS pfvd ' .
             'LEFT JOIN ?:product_feature_variants AS pfv ON pfv.variant_id = pfvd.variant_id ' .
-            'WHERE feature_id IN (?n) AND variant IN (?a) AND lang_code = ?s',
+            'WHERE feature_id IN (?n) AND LOWER(variant) IN (?a) AND lang_code = ?s',
             array('feature_id', 'variant'), $feature_ids, $variant_names, $lang_code
         );
     }
@@ -1567,8 +1686,16 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
 
         if ($feature['is_selectable']) {
             foreach ($variants as $variant) {
-                $variant_name = $variant['name'];
-                $can_update = empty($runtime_company_id) || $runtime_company_id == $company_id;
+                $variant_name = fn_strtolower($variant['name']);
+
+                $can_update = false;
+
+                if (
+                    (empty($runtime_company_id) || $runtime_company_id == $company_id)
+                    || (fn_allowed_for('MULTIVENDOR') && Registry::get('settings.Vendors.allow_vendor_manage_features') == YesNo::YES)
+                ) {
+                    $can_update = true;
+                }
 
                 if (!isset($existent_feature_variants[$feature_id][$variant_name])) {
                     if (!$can_update) {
@@ -1581,7 +1708,7 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
                         continue;
                     }
 
-                    $variant_id = fn_add_feature_variant($feature_id, array('variant' => $variant_name));
+                    $variant_id = fn_add_feature_variant($feature_id, ['variant' => $variant['name']]);
                 } else {
                     $variant_id = $existent_feature_variants[$feature_id][$variant_name]['variant_id'];
                 }
@@ -1636,6 +1763,8 @@ function fn_exim_save_product_features_values($product_id, array $features, $lan
             fn_update_product_features_value($product_id, $features, array(), $feature_lang_code);
         }
     }
+
+    return $product_features;
 }
 
 /**
@@ -1704,6 +1833,10 @@ function fn_exim_save_product_feature(array $feature, $company_id, $lang_code)
 
     $data = fn_exim_find_feature($feature['name'], $feature['type'], $feature['parent_id'], $lang_code, $company_id);
 
+    if (fn_allowed_for('MULTIVENDOR') && empty($data) && !empty($company_id)) {
+        $data = fn_exim_find_feature($feature['name'], $feature['type'], $feature['parent_id'], $lang_code, 0);
+    }
+
     if (fn_allowed_for('ULTIMATE') && empty($data) && !empty($company_id) && $runtime_company_id == 0) {
         $data = fn_exim_find_feature($feature['name'], $feature['type'], $feature['parent_id'], $lang_code, 0);
 
@@ -1713,21 +1846,21 @@ function fn_exim_save_product_feature(array $feature, $company_id, $lang_code)
     }
 
     if (empty($data)) {
-        if (fn_allowed_for('MULTIVENDOR') && $runtime_company_id) {
-            fn_set_notification('W', __('warning'), __('exim_vendor_cant_create_feature'));
+        if (fn_allowed_for('MULTIVENDOR') && $runtime_company_id && Registry::get('settings.Vendors.allow_vendor_manage_features') == YesNo::NO) {
+            fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('exim_vendor_cant_create_feature'));
             return false;
         }
 
-        $data = array(
-            'feature_id' => 0,
-            'description' => $feature['name'],
-            'feature_type' => $feature['type'],
-            'lang_code' => $lang_code,
-            'company_id' => $company_id,
-            'status' => 'A',
-            'parent_id' => $feature['parent_id'],
+        $data = [
+            'feature_id'      => 0,
+            'description'     => $feature['name'],
+            'feature_type'    => $feature['type'],
+            'lang_code'       => $lang_code,
+            'company_id'      => $company_id,
+            'status'          => 'A',
+            'parent_id'       => $feature['parent_id'],
             'categories_path' => '',
-        );
+        ];
 
         $feature_id = fn_update_product_feature($data, 0, $lang_code);
 
@@ -1745,8 +1878,8 @@ function fn_exim_save_product_feature(array $feature, $company_id, $lang_code)
         foreach ($feature['names'] as $name_lang_code => $name) {
             if ($name_lang_code != $lang_code) {
                 db_query(
-                    "UPDATE ?:product_features_descriptions SET ?u WHERE feature_id = ?i AND lang_code = ?s",
-                    array('description' => $name),
+                    'UPDATE ?:product_features_descriptions SET ?u WHERE feature_id = ?i AND lang_code = ?s',
+                    ['internal_name' => $name],
                     $feature_id,
                     $name_lang_code
                 );
@@ -1781,4 +1914,100 @@ function fn_exim_set_product_updated_timestamp(&$import_data)
     }
 
     return true;
+}
+
+/**
+ * Gets found products count for export.
+ *
+ * @return int
+ */
+function fn_exim_get_last_view_products_count()
+{
+    $last_view = new Backend(AREA, 'products', 'index');
+    $view_id = $last_view->getCurrentViewId();
+    $last_view_results = $last_view->getViewParams($view_id);
+
+    if (!$last_view_results) {
+        return 0;
+    }
+
+    return $last_view_results['total_items'];
+}
+
+/**
+ * Gets found products to export.
+ *
+ * @return int[]
+ */
+function fn_exim_get_last_view_product_ids_condition()
+{
+    $last_view = new Backend(AREA, 'products', 'index');
+    $view_id = $last_view->getCurrentViewId();
+    $last_view_results = $last_view->getViewParams($view_id);
+
+    $data_function_params = [];
+    if ($last_view_results) {
+        unset(
+            $last_view_results['total_items'],
+            $last_view_results['sort_by'],
+            $last_view_results['sort_order'],
+            $last_view_results['sort_order_rev'],
+            $last_view_results['page'],
+            $last_view_results['items_per_page']
+        );
+        $data_function_params = $last_view_results;
+    }
+
+    $data_function_params['get_conditions'] = true;
+    $data_function_params['load_products_extra_data'] = false;
+
+    list($fields, $join, $condition) = fn_get_products($data_function_params, 0, CART_LANGUAGE);
+    $product_ids = db_get_fields(
+        'SELECT DISTINCT ?p' .
+        ' FROM ?:products AS products' .
+        ' ?p' .
+        ' WHERE 1 = 1' .
+        ' ?p',
+        $fields['product_id'],
+        $join,
+        $condition
+    );
+
+    return [
+        'product_id' => $product_ids
+    ];
+}
+
+/**
+ * Prepares to save overridable fields of product
+ *
+ * @param array<string, mixed> $object Product data
+ *
+ * @phpcsSuppress SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
+ */
+function fn_import_prepare_product_overridable_fields(array &$object)
+{
+    $object = fn_normalize_product_overridable_fields($object);
+}
+
+/**
+ * Prepares default categories
+ *
+ * @param array $import_process_data Import process data
+ *
+ * @psalm-param array{
+ *  E: int,
+ *  N: int,
+ *  S: int,
+ *  C: int
+ * } $import_process_data
+ *
+ * @return void
+ */
+function fn_import_prepare_default_categories(array &$import_process_data)
+{
+    $import_process_data['default_categories'] = [
+        'ids' => fn_get_all_default_categories_ids(),
+        'used_ids' => []
+    ];
 }

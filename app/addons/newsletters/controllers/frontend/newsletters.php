@@ -25,6 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             )));
         } else {
             list($lists) = fn_get_mailing_lists();
+
+            if (empty($lists) && fn_newsletters_create_default_mailing_list()) {
+                list($lists) = fn_get_mailing_lists();
+            }
+
             $subscriber_id = fn_get_subscriber_id_by_email($_REQUEST['subscribe_email']);
             $subscriber_data = array(
                 'email' => $_REQUEST['subscribe_email'],

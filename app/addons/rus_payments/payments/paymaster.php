@@ -185,7 +185,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
         $post_data = array_merge($post_data, $paymaster_products);
     }
 
-    fn_create_payment_form($post_address, $post_data, 'Paymaster', false);
+    fn_create_payment_form($post_address, $post_data, 'PayMaster', false);
 }
 
 exit;

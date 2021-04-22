@@ -15,5 +15,6 @@
 if ( !defined('AREA') ) { die('Access denied'); }
 
 fn_register_hooks(
-    'calculate_cart_taxes_pre'
+    'calculate_cart_taxes_pre',
+    'pickup_point_variable_init'
 );

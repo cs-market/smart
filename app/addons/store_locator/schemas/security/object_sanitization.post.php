@@ -12,14 +12,19 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+defined('BOOTSTRAP') or die('Access denied');
+
 use Tygh\Tools\SecurityHelper;
 
-$schema['store_location'] = array(
-    SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-        'name' => SecurityHelper::ACTION_REMOVE_HTML,
+/**
+ * @var array<string, array<string, array<string, string>>> $schema
+ */
+$schema['store_location'] = [
+    SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+        'name'        => SecurityHelper::ACTION_REMOVE_HTML,
         'description' => SecurityHelper::ACTION_SANITIZE_HTML,
-        'city' => SecurityHelper::ACTION_REMOVE_HTML,
-    )
-);
+        'city'        => SecurityHelper::ACTION_REMOVE_HTML,
+    ]
+];
 
 return $schema;

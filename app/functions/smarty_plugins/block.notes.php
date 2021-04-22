@@ -5,6 +5,12 @@
  * @subpackage plugins
  */
 
+/**
+ * @param array                   $params
+ * @param string                  $content
+ * @param \Tygh\SmartyEngine\Core $smarty
+ * @param string                  $start
+ */
 function smarty_block_notes($params, $content, &$smarty, $start)
 {
     static $notes = array();

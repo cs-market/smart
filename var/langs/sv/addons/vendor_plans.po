@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: sv-SE\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_plans.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/vendor_plans.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:11\n"
+"PO-Revision-Date: 2019-02-01 06:12\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -25,7 +25,15 @@ msgid "Commissions"
 msgstr ""
 
 msgctxt "SettingsOptions::vendor_plans::include_shipping"
-msgid "Include shipping cost in vendors commission"
+msgid "Include shipping cost in vendor commissions"
+msgstr ""
+
+msgctxt "SettingsOptions::vendor_plans::include_taxes_in_commission"
+msgid "Include taxes in vendor commissions"
+msgstr ""
+
+msgctxt "SettingsTooltips::vendor_plans::include_taxes_in_commission"
+msgid "Calculate vendor commissions without subtracting taxes from the order total beforehand."
 msgstr ""
 
 msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
@@ -106,6 +114,10 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.transaction_fee"
 msgid "Transaction fee"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.fixed_transaction_fee"
+msgid "Transaction fee (abs)"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.revenue"
@@ -189,7 +201,7 @@ msgid "<strong>Unlimited</strong> revenue"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.transaction_fee_value"
-msgid "<strong>[value]</strong> transaction fee"
+msgid "Transaction fee: <strong>[value]</strong>"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.vendor_commission"
@@ -274,6 +286,10 @@ msgstr ""
 
 msgctxt "Languages::addons.vendor_plans.commission_description_absolute"
 msgid "[amount] out of [sum]"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.out_of_amount"
+msgid "out of [amount]"
 msgstr ""
 
 msgctxt "Languages::addons.vendor_plans.commission_description_percent"

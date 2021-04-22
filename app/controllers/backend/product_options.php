@@ -14,6 +14,7 @@
 
 use Tygh\Registry;
 use Tygh\Tygh;
+use Tygh\Enum\NotificationSeverity;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -47,42 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    if ($mode == 'add_combinations') {
-        if (is_array($_REQUEST['add_inventory'])) {
-            foreach ($_REQUEST['add_inventory'] as $k => $v) {
-                $_data = array(
-                    'product_id' => $_REQUEST['product_id'],
-                    'combination' => $_REQUEST['add_options_combination'][$k],
-                    'amount' => isset($_REQUEST['add_inventory'][$k]['amount']) ? $_REQUEST['add_inventory'][$k]['amount'] : 0,
-                );
-
-                $_data = fn_array_merge($v, $_data);
-
-                fn_update_option_combination($_data);
-            }
-        }
-
-        $suffix = ".inventory?product_id=$_REQUEST[product_id]";
-    }
-
-    if ($mode == 'update_combinations') {
-        if (!empty($_REQUEST['inventory'])) {
-            foreach ($_REQUEST['inventory'] as $k => $v) {
-                fn_update_option_combination($v, $k);
-            }
-        }
-
-        $suffix = ".inventory?product_id=$_REQUEST[product_id]";
-    }
-
-    if ($mode == 'm_delete_combinations') {
-        foreach ($_REQUEST['combination_hashes'] as $v) {
-            fn_delete_option_combination($v);
-        }
-
-        $suffix = ".inventory?product_id=$_REQUEST[product_id]";
-    }
-
     // Apply global options to the selected products
     if ($mode == 'apply') {
         if (!empty($_REQUEST['apply_options']['options'])) {
@@ -104,21 +69,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     if ($_data['link'] == 'N') {
                         fn_clone_product_options(0, $k, $value);
                     } else {
-                        db_query("REPLACE INTO ?:product_global_option_links (option_id, product_id) VALUES (?i, ?i)", $value, $k);
-
-                        if (fn_allowed_for('ULTIMATE')) {
-                            fn_ult_share_product_option($value, $k);
-                        }
+                        fn_add_global_option_link($k, $value);
                     }
                 }
             }
 
             if (!empty($updated_products)) {
-                fn_set_notification('N', __('notice'), __('options_have_been_applied_to_products'));
+                fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('options_have_been_applied_to_products'));
             }
         }
 
-        $suffix = ".apply";
+        if (isset($_REQUEST['option_ids'])) {
+            return [CONTROLLER_STATUS_OK, 'product_options.apply?' . http_build_query(['option_ids' => $_REQUEST['option_ids']])];
+        }
+
+        $suffix = '.apply';
     }
 
     if ($mode == 'update') {
@@ -142,40 +107,119 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         $option_id = fn_update_product_option($_REQUEST['option_data'], $_REQUEST['option_id'], DESCR_SL);
+        if (defined('AJAX_REQUEST')) {
+            /** @var \Tygh\Ajax $ajax */
+            $ajax = Tygh::$app['ajax'];
 
-        if (!empty($_REQUEST['object']) && $_REQUEST['object'] == 'product') { // FIXME (when assigning page and current url will be removed from ajax)
+            if ($option_id === false) {
+                $ajax->assign('success', false);
+            } else {
 
-            return array(CONTROLLER_STATUS_OK, $_SERVER['HTTP_REFERER'] . '&selected_section=options');
+                $ajax->assign('success', true);
+                $ajax->assign('option_id', $option_id);
+            }
+        } elseif (!empty($_REQUEST['object']) && $_REQUEST['object'] === 'product') {
+            return [CONTROLLER_STATUS_OK, $_SERVER['HTTP_REFERER'] . '&selected_section=options'];
         }
 
-        $suffix = ".manage";
+        if ($option_id !== false) {
+            $suffix = '.manage';
+        } else {
+            return [CONTROLLER_STATUS_OK, 'product_options.update?option_id=' . $option_id];
+        }
+    }
+
+
+
+
+    if ($mode == 'm_delete') {
+        $return_url = isset($_REQUEST['return_url']) ? $_REQUEST['return_url'] : 'product_options.manage';
+
+        if (!empty($_REQUEST['option_ids'])) {
+            $option_ids = (array) $_REQUEST['option_ids'];
+
+            foreach ($option_ids as $option_id) {
+                if (!fn_check_company_id('product_options', 'option_id', $option_id)) {
+                    fn_company_access_denied_notification();
+                    continue;
+                }
+                fn_delete_product_option($option_id);
+            }
+        }
+
+        return [CONTROLLER_STATUS_OK, $return_url];
+    }
+
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['option_ids'])
+        && is_array($_REQUEST['option_ids'])
+        && !empty($_REQUEST['status'])
+    ) {
+        $status_to = (string) $_REQUEST['status'];
+
+        foreach ($_REQUEST['option_ids'] as $option_id) {
+            if (!fn_check_company_id('product_options', 'option_id', $option_id)) {
+                continue;
+            }
+            fn_tools_update_status([
+                'table'             => 'product_options',
+                'status'            => $status_to,
+                'id_name'           => 'option_id',
+                'id'                => $option_id,
+                'show_error_notice' => false
+            ]);
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('product_options.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
     }
 
     if ($mode == 'delete') {
         $option_deleted = false;
 
-        if (!empty($_REQUEST['option_id'])
-            && fn_check_company_id('product_options', 'option_id', $_REQUEST['option_id'])
-            || (!empty($_REQUEST['product_id'])
-                && fn_check_company_id('products', 'product_id', $_REQUEST['product_id']))
-        ) {
-
-            $p_id = db_get_field('SELECT product_id FROM ?:product_options WHERE option_id = ?i', $_REQUEST['option_id']);
-
-            if (!empty($_REQUEST['product_id']) && empty($p_id)) { // we're deleting global option from the product
-                $option_deleted = fn_delete_product_option($_REQUEST['option_id'], $_REQUEST['product_id']);
-            } else {
-                $option_deleted = fn_delete_product_option($_REQUEST['option_id']);
-            }
-
-            if ($option_deleted && empty($_REQUEST['product_id']) && empty($p_id)) { // we're deleting global option itself
-                db_query('DELETE FROM ?:product_global_option_links WHERE option_id = ?i', $_REQUEST['option_id']);
-            }
+        if (!isset($_REQUEST['option_id'])) {
+            return [CONTROLLER_STATUS_NO_PAGE];
         }
 
+        $option_id = $_REQUEST['option_id'];
+
+        if (!empty($_REQUEST['product_id'])) {
+            $option_is_linked = db_get_field(
+                'SELECT 1 FROM ?:product_global_option_links WHERE option_id = ?i AND product_id = ?i',
+                $option_id,
+                $_REQUEST['product_id']
+            );
+        }
+
+        if (
+            (
+                empty($option_is_linked)
+                &&  !fn_check_company_id('product_options', 'option_id', $option_id)
+            )
+            || (
+                !empty($_REQUEST['product_id'])
+                && !fn_check_company_id('products', 'product_id', $_REQUEST['product_id'])
+            )
+        ) {
+            fn_company_access_denied_notification();
+            return [CONTROLLER_STATUS_REDIRECT, 'product_options.manage'];
+        }
+
+        $product_id = isset($_REQUEST['product_id']) ? $_REQUEST['product_id'] : 0;
+
+        $option_deleted = fn_delete_product_option($option_id, $product_id);
+
         if (!$option_deleted) {
-            if (!empty($_REQUEST['product_id'])) {
-                $redirect_url = "products.update&product_id={$_REQUEST['product_id']}&selected_section=options";
+            if (!empty($product_id)) {
+                $redirect_url = 'products.update&product_id=' . $product_id . '&selected_section=options';
             } else {
                 $redirect_url = 'product_options.manage';
             }
@@ -189,8 +233,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             return array(CONTROLLER_STATUS_REDIRECT, $redirect_url);
-        } elseif (!empty($_REQUEST['product_id'])) {
-            $_options = fn_get_product_options($_REQUEST['product_id']);
+        } elseif (!empty($product_id)) {
+            $_options = fn_get_product_options($product_id);
 
             if (empty($_options)) {
                 Tygh::$app['view']->display('views/product_options/manage.tpl');
@@ -202,51 +246,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix = ".manage";
     }
 
-    if ($mode == 'rebuild_combinations') {
-        fn_rebuild_product_options_inventory($_REQUEST['product_id']);
-
-        $suffix = ".inventory?product_id=$_REQUEST[product_id]";
-    }
-
-    if ($mode == 'delete_combination') {
-        if (!empty($_REQUEST['combination_hash'])) {
-            fn_delete_product_combination($_REQUEST['combination_hash']);
+    if ($mode == 'delete_exception') {
+        if (!empty($_REQUEST['exception_id'])) {
+            db_query("DELETE FROM ?:product_options_exceptions WHERE exception_id = ?i", $_REQUEST['exception_id']);
         }
 
-        $suffix = ".inventory?product_id=$_REQUEST[product_id]";
-    }
-
-    if (!fn_allowed_for('ULTIMATE:FREE')) {
-        if ($mode == 'delete_exception') {
-            if (!empty($_REQUEST['exception_id'])) {
-                db_query("DELETE FROM ?:product_options_exceptions WHERE exception_id = ?i", $_REQUEST['exception_id']);
-            }
-
-            $suffix = ".exceptions?product_id=$_REQUEST[product_id]";
-        }
+        $suffix = ".exceptions?product_id=$_REQUEST[product_id]";
     }
 
     return array(CONTROLLER_STATUS_OK, 'product_options' . $suffix);
 }
 
 //
-// Product options combination inventory tracking
-//
-if ($mode == 'inventory') {
-    list($inventory, $search) = fn_get_product_options_inventory($_REQUEST, Registry::get('settings.Appearance.admin_elements_per_page'));
-
-    $product_options = fn_get_product_options($_REQUEST['product_id'], DESCR_SL, true, true);
-    $product_inventory = db_get_field("SELECT tracking FROM ?:products WHERE product_id = ?i", $_REQUEST['product_id']);
-
-    Tygh::$app['view']->assign('product_inventory', $product_inventory);
-    Tygh::$app['view']->assign('product_options', $product_options);
-    Tygh::$app['view']->assign('inventory', $inventory);
-    Tygh::$app['view']->assign('search', $search);
-
-//
 // Options list
 //
-} elseif ($mode == 'manage') {
+if ($mode === 'quick_add' || $mode === 'add') {
+    if (!defined('AJAX_REQUEST')) {
+        return [CONTROLLER_STATUS_REDIRECT, 'product_options.add'];
+    }
+
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+    $option = isset($_REQUEST['option_data']) ? (array) $_REQUEST['option_data'] : [];
+
+    $view->assign([
+        'option_data' => $option,
+        'ajax_mode'   => true
+    ]);
+}
+
+if ($mode == 'manage') {
     $params = $_REQUEST;
 
     list($product_options, $search) = fn_get_product_global_options($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
@@ -263,10 +292,23 @@ if ($mode == 'inventory') {
 // Apply options to products
 //
 } elseif ($mode == 'apply') {
+    $search = [];
 
-    list($product_options, $search) = fn_get_product_global_options();
+    if (fn_allowed_for('MULTIVENDOR')) {
+        $search = [
+            'company_ids' => [
+                0,
+                Registry::get('runtime.company_id'),
+            ],
+        ];
+    }
+
+    $option_ids = isset($_REQUEST['option_ids']) ? $_REQUEST['option_ids'] : [];
+
+    list($product_options, $search) = fn_get_product_global_options($search);
 
     Tygh::$app['view']->assign('product_options', $product_options);
+    Tygh::$app['view']->assign('option_ids', $option_ids);
 
 //
 // Update option
@@ -288,6 +330,39 @@ if ($mode == 'inventory') {
     Tygh::$app['view']->assign('option_data', $o_data);
     Tygh::$app['view']->assign('option_id', $_REQUEST['option_id']);
 
+} elseif ($mode == 'get_available_options_list') {
+
+    $page_number = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
+    $page_size = isset($_REQUEST['page_size']) ? (int) $_REQUEST['page_size'] : 10;
+    $search_query = isset($_REQUEST['q']) ? $_REQUEST['q'] : null;
+    $lang_code = isset($_REQUEST['lang_code']) ? $_REQUEST['lang_code'] : CART_LANGUAGE;
+
+    $search = [
+        'page'        => $page_number,
+        'q'           => $search_query,
+        'company_ids' => [0],
+    ];
+
+    if (isset($_REQUEST['product_id'])) {
+        $linked_product_option_ids= array_keys(fn_get_product_options($_REQUEST['product_id']));
+        $search['excluded_ids'] = $linked_product_option_ids;
+        $search['company_ids'][] = fn_get_company_id('products', 'product_id', $_REQUEST['product_id']);
+    }
+
+    list($global_product_options, $search) = fn_get_product_global_options($search, $page_size, $lang_code);
+
+    $objects = array_values(array_map(function ($product_option) {
+        $text = $product_option['internal_option_name'] . (($product_option['option_name']) ? '/' . $product_option['option_name'] : '');
+        return [
+            'id'   => $product_option['option_id'],
+            'text' => $text
+        ];
+    }, $global_product_options));
+
+    Tygh::$app['ajax']->assign('objects', $objects);
+    Tygh::$app['ajax']->assign('total_objects', isset($search['total_items']) ? $search['total_items'] : count($objects));
+
+    exit;
 }
 
 if (!fn_allowed_for('ULTIMATE:FREE')) {

@@ -33,7 +33,7 @@ class Products extends BaseProducts
             return parent::index($id, $params);
         }
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if ($this->getParentName() == 'categories') {
             $parent_category = $this->getParentData();

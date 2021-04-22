@@ -12,27 +12,33 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-return array(
-    'auth' => array (
+return [
+    'auth' => [
         'allow' => true
-    ),
-    'image' => array (
-        'allow' => true,
-        'areas' => array('A', 'C')
-    ),
-    'payment_notification' => array (
+    ],
+    'image' => [
+        'default_allow' => true,
+        'allow'         => [
+            'upload' => false
+        ],
+        'areas' => ['A', 'C'],
+    ],
+    'payment_notification' => [
         'allow' => true
-    ),
-    'profiles' => array (
-        'allow' => array (
+    ],
+    'profiles' => [
+        'allow' => [
             'password_reminder' => true,
-        ),
-    ),
-    'helpdesk_connector' => array (
+        ],
+    ],
+    'helpdesk_connector' => [
         'allow' => true
-    ),
-    'robots' => array (
+    ],
+    'robots' => [
         'allow' => true,
-        'areas' => array('C')
-    ),
-);
+        'areas' => ['C']
+    ],
+    'bottom_panel' => [
+        'allow' => true
+    ],
+];

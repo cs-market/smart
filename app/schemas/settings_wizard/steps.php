@@ -205,10 +205,6 @@ $schema = array(
             ),
             array(
                 'type' => 'setting',
-                'setting_name' => 'company_fax',
-            ),
-            array(
-                'type' => 'setting',
                 'setting_name' => 'company_website',
             ),
             array(

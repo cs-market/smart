@@ -56,7 +56,11 @@ class ServiceProvider implements ServiceProviderInterface
                 Registry::get('addons.rus_online_cash_register.atol_group_code'),
                 Registry::get('addons.rus_online_cash_register.atol_payment_address'),
                 Registry::get('addons.rus_online_cash_register.atol_login'),
-                Registry::get('addons.rus_online_cash_register.atol_password')
+                Registry::get('addons.rus_online_cash_register.atol_password'),
+                null,
+                Registry::get('addons.rus_online_cash_register.mode'),
+                Registry::get('addons.rus_online_cash_register.api_version'),
+                Registry::get('settings.Company.company_site_administrator')
             );
         };
 

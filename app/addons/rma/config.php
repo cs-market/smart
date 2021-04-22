@@ -20,6 +20,9 @@ define('ORDER_DATA_PRODUCTS_DELIVERY_DATE', 'V');
 
 define('RMA_REASON', 'R');
 define('RMA_ACTION', 'A');
+/** @deprecated since 4.10.4 use \Tygh\Enum\Addons\Rma\ReturnStatuses::REQUESTED  */
 define('RMA_DEFAULT_STATUS', 'R');
+/** @deprecated since 4.10.4 use \Tygh\Enum\Addons\Rma\ReturnStatuses::APPROVED */
 define('RETURN_PRODUCT_ACCEPTED', 'A');
+/** @deprecated since 4.10.4 use \Tygh\Enum\Addons\Rma\ReturnStatuses::DECLINED */
 define('RETURN_PRODUCT_DECLINED', 'D');

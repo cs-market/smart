@@ -24,7 +24,6 @@ class GetPagesTest extends \Tygh\Tests\Unit\ATestCase
 
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('AREA', 'A');
         define('CART_LANGUAGE', 'en');
 

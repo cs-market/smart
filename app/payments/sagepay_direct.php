@@ -15,34 +15,34 @@
 use Tygh\Http;
 use Tygh\Registry;
 
-if ($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_REQUEST['PaRes']) && !empty($_REQUEST['MD'])) {
-
-    require './init_payment.php';
-
-    $post['MD'] = $_REQUEST['MD'];
-    $post['PARes'] = $_REQUEST['PaRes'];
-    $secure_verified_3d = true;
-    $order_id = $_REQUEST['order_id'];
-}
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 require_once(Registry::get('config.dir.payments') . 'sagepay_files/sagepay.functions.php');
 
-Tygh::$app['session']['already_posted'] = empty(Tygh::$app['session']['already_posted']) ? false : Tygh::$app['session']['already_posted'];
-$already_posted = &Tygh::$app['session']['already_posted'];
+if (defined('PAYMENT_NOTIFICATION')) {
+    if ($_SERVER['REQUEST_METHOD'] == "POST" && !empty($_REQUEST['cres']) && !empty($_REQUEST['threeDSSessionData'])) {
 
-if (!empty($secure_verified_3d) && empty($already_posted)) {
-    if ($_REQUEST['payment_mode'] == 'Y') {
-        $post_address = 'https://test.sagepay.com/gateway/service/direct3dcallback.vsp';
-    } elseif ($_REQUEST['payment_mode'] == 'N') {
-        $post_address = 'https://live.sagepay.com/gateway/service/direct3dcallback.vsp';
-    } elseif ($_REQUEST['payment_mode'] == 'S') {
-        $post_address = 'https://test.sagepay.com/Simulator/VSPDirectCallback.asp';
+        $post['CRes'] = $_REQUEST['cres'];
+        $post['VPSTxId'] = str_replace(['{', '}'], '', $_REQUEST['threeDSSessionData']);
+        $secure_verified_3d = true;
+        $order_id = $_REQUEST['order_id'];
     }
 
-    $result = Http::post($post_address, $post);
-    $already_posted = true;
+    Tygh::$app['session']['already_posted'] = empty(Tygh::$app['session']['already_posted']) ? false : Tygh::$app['session']['already_posted'];
+    $already_posted = &Tygh::$app['session']['already_posted'];
+
+    if (!empty($secure_verified_3d) && empty($already_posted)) {
+        if ($_REQUEST['payment_mode'] == 'Y') {
+            $post_address = 'https://test.sagepay.com/gateway/service/direct3dcallback.vsp';
+        } elseif ($_REQUEST['payment_mode'] == 'N') {
+            $post_address = 'https://live.sagepay.com/gateway/service/direct3dcallback.vsp';
+        } elseif ($_REQUEST['payment_mode'] == 'S') {
+            $post_address = 'https://test.sagepay.com/Simulator/VSPDirectCallback.asp';
+        }
+
+        $result = Http::post($post_address, $post);
+        $already_posted = true;
+    }
 
 } else {
 
@@ -73,7 +73,7 @@ if (!empty($secure_verified_3d) && empty($already_posted)) {
     ));
 
     $post = array();
-    $post['VPSProtocol'] = '2.23';
+    $post['VPSProtocol'] = '4.00';
     $post['TxType'] = $processor_data['processor_params']['transaction_type'];
     $post['Vendor'] = $pp_merch;
     $post['VendorTxCode'] = ((!empty($processor_data['processor_params']['order_prefix']) ? $processor_data['processor_params']['order_prefix'] : 'O') . '-' . (($order_info['repaid']) ? ($order_info['order_id'] . '-' . $order_info['repaid']) : $order_info['order_id'])) . '-' . fn_date_format(time(), '%H_%M_%S');
@@ -85,19 +85,29 @@ if (!empty($secure_verified_3d) && empty($already_posted)) {
     $post['ExpiryDate'] = $order_info['payment_info']['expiry_month'] . $order_info['payment_info']['expiry_year'];
     $post['CV2'] = $order_info['payment_info']['cvv2'];
     $post['CardType'] = $card_type;
-    $post['Apply3DSecure'] = 0;
+    $post['Apply3DSecure'] = 1;
 
-    $post['BillingAddress1'] = $order_info['b_address'];
-    $post['BillingAddress2'] = $order_info['b_address_2'];
-    //Workariund for the Irish customers. According to the documentation we should enter zip code anyway.
-    $post['BillingPostCode'] = !empty($order_info['b_zipcode']) ? $order_info['b_zipcode'] : '0000';
-    $post['BillingCountry'] = $order_info['b_country'];
-    if ($order_info['b_country'] == 'US') { // state is for US customers only
-        $post['BillingState'] = $order_info['b_state'];
+    $post['BillingAddress1'] = !empty($order_info['b_address']) ? $order_info['b_address'] : $order_info['s_address'];
+    $post['BillingAddress2'] = !empty($order_info['b_address_2']) ? $order_info['b_address_2'] : $order_info['s_address_2'];
+    //Workaround for the Irish customers. According to the documentation we should enter zip code anyway.
+    if (!empty($order_info['b_zipcode'])) {
+        $post['BillingPostCode'] = $order_info['b_zipcode'];
+    } elseif (!empty($order_info['s_zipcode'])) {
+        $post['BillingPostCode'] = $order_info['s_zipcode'];
+    } else {
+        $post['BillingPostCode'] = '0000';
     }
-    $post['BillingCity'] = $order_info['b_city'];
-    $post['BillingFirstnames'] = $order_info['b_firstname'];
-    $post['BillingSurname'] = $order_info['b_lastname'];
+    $post['BillingCountry'] = !empty($order_info['b_country']) ? $order_info['b_country'] : $order_info['s_country'];
+    if ($order_info['b_country'] == 'US') { // state is for US customers only
+        if (!empty($order_info['b_state'])) {
+            $post['BillingState'] = $order_info['b_state'];
+        } else {
+            $post['BillingState'] = $order_info['s_state'];
+        }
+    }
+    $post['BillingCity'] = !empty($order_info['b_city']) ? $order_info['b_city'] : $order_info['s_city'];
+    $post['BillingFirstnames'] = !empty($order_info['b_firstname']) ? $order_info['b_firstname'] : $order_info['s_firstname'];
+    $post['BillingSurname'] = !empty($order_info['b_lastname']) ? $order_info['b_lastname'] : $order_info['s_lastname'];
 
     $post['DeliveryAddress1'] = $order_info['s_address'];
     $post['DeliveryAddress2'] = $order_info['s_address_2'];
@@ -123,6 +133,25 @@ if (!empty($secure_verified_3d) && empty($already_posted)) {
 
     $post['ClientIPAddress'] = $_SERVER['REMOTE_ADDR'];
 
+    $browser_settings = $_REQUEST['browser_settings'];
+    $post['BrowserJavascriptEnabled'] = !empty($browser_settings['js_enabled']) ? 1 : 0;
+    if ($post['BrowserJavascriptEnabled']) {
+        $post['BrowserJavaEnabled'] = !empty($browser_settings['java_enabled']) ? 1 : 0;
+        $post['BrowserColorDepth'] = $browser_settings['color_depth'];
+        $post['BrowserScreenHeight'] = $browser_settings['screen_height'];
+        $post['BrowserScreenWidth'] = $browser_settings['screen_width'];
+        $post['BrowserTZ'] = $browser_settings['timezone'];
+    }
+
+    $post['BrowserAcceptHeader'] = $_SERVER['HTTP_ACCEPT'];
+    $post['BrowserLanguage'] = $browser_settings['language'];
+    $post['BrowserUserAgent'] = $browser_settings['user_agent'];
+
+    $payment_mode = $processor_data['processor_params']['testmode'];
+    $post['ThreeDSNotificationURL'] = fn_url("payment_notification.notify?payment=sagepay_direct&order_id={$order_info['order_id']}&payment_mode={$payment_mode}", AREA, 'current');
+
+    $post['ChallengeWindowSize'] = '05';
+
     Registry::set('log_cut_data', array('CardNumber', 'ExpiryDate', 'StartDate', 'CV2'));
     $result = Http::post($post_address, $post);
 }
@@ -137,15 +166,10 @@ foreach ($rarr as $v) {
 
 if ($response['Status'] == '3DAUTH') {
 
-    $payment_mode = $processor_data['processor_params']['testmode'];
-
-    $term_url = fn_payment_url('https', "sagepay_direct.php?order_id=" . $order_info['order_id'] . "&payment_mode=$payment_mode");
-
-    $post_data = array(
-        'PaReq' => $response['PAReq'],
-        'TermUrl' => $term_url,
-        'MD' => $response['MD'],
-    );
+    $post_data = [
+        'creq' => $response['CReq'],
+        'threeDSSessionData' => $response['VPSTxId']
+    ];
 
     fn_create_payment_form($response['ACSURL'], $post_data, '3D Secure');
     exit;
@@ -188,6 +212,6 @@ if (!empty($response['3DSecureStatus'])) {
 if (!empty($secure_verified_3d) && !empty($order_id) && fn_check_payment_script('sagepay_direct.php', $order_id) == true) {
     unset(Tygh::$app['session']['already_posted']);
 
-    fn_finish_payment($order_id, $pp_response, false);
+    fn_finish_payment($order_id, $pp_response);
     fn_order_placement_routines('route', $order_id);
 }

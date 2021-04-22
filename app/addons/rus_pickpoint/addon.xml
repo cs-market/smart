@@ -9,37 +9,11 @@
         <core_version>
             <min>4.2.1</min>
         </core_version>
-        <core_edition>
-            ULTIMATE
-        </core_edition>
     </compatibility>
-    <settings layout="separate" edition_type="ROOT,ULT:VENDOR">
+    <settings>
         <sections>
             <section id="general">
                 <items>
-                    <item id="login">
-                        <type>input</type>
-                    </item>
-                    <item id="password">
-                        <type>input</type>
-                    </item>
-                    <item id="ikn">
-                        <type>input</type>
-                    </item>
-                    <item id="secure_protocol">
-                        <type>checkbox</type>
-                        <default_value>N</default_value>
-                    </item>
-                    <item id="server">
-                        <type>selectbox</type>
-                        <variants>
-                            <item id="test">
-                            </item>
-                            <item id="work">
-                            </item>
-                        </variants>
-                        <default_value>work</default_value>
-                    </item>
                     <item id="update">
                         <type>header</type>
                     </item>

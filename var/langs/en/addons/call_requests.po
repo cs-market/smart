@@ -26,8 +26,8 @@ msgid "Rewrite phone"
 msgstr "Rewrite phone"
 
 msgctxt "SettingsOptions::call_requests::phone_prefix_length"
-msgid "Highlight first chars"
-msgstr "Highlight first chars"
+msgid "Highlight first chars [Deprecated]"
+msgstr "Highlight first chars [Deprecated]"
 
 msgctxt "SettingsOptions::call_requests::buy_now_with_one_click"
 msgid "Enable the \"Buy now with one click\" option"
@@ -38,8 +38,8 @@ msgid "Order status"
 msgstr "Order status"
 
 msgctxt "SettingsOptions::call_requests::phone_mask"
-msgid "Phone mask"
-msgstr "Phone mask"
+msgid "Phone mask [Deprecated]"
+msgstr "Phone mask [Deprecated]"
 
 msgctxt "SettingsTooltips::call_requests::phone_mask"
 msgid "Leave empty to use automatic country-based phone pattern, or type in a custom pattern. You can use spaces, commas, +, -, and digits. Note that 9 represents any digit; if you need a 9, type \\\\9. Examples: +9 (999) 999 99 99, 99999999, 999 999 99 or +99-99-9999-9999."
@@ -49,13 +49,25 @@ msgctxt "SettingsTooltips::call_requests::phone_prefix_length"
 msgid "Including parenthesis, spaces, etc. Use to highlight country code, area code, and phone prefix."
 msgstr "Including parenthesis, spaces, etc. Use to highlight country code, area code, and phone prefix."
 
+msgctxt "SettingsOptions::call_requests::enable_call_requests_for_vendors"
+msgid "Enable call requests for vendors"
+msgstr "Enable call requests for vendors"
+
+msgctxt "SettingsTooltips::call_requests::enable_call_requests_for_vendors"
+msgid "This will also replace marketplace contact information with vendors' where necessary."
+msgstr "This will also replace marketplace contact information with vendors' where necessary."
+
 msgctxt "Languages::privileges.manage_call_requests"
-msgid "Manage Call requests"
-msgstr "Manage Call requests"
+msgid "Can edit"
+msgstr "Can edit"
 
 msgctxt "Languages::privileges.view_call_requests"
-msgid "View Call requests"
-msgstr "View Call requests"
+msgid "Can view"
+msgstr "Can view"
+
+msgctxt "Languages::privilege_groups.call_requests"
+msgid "Call requests"
+msgstr "Call requests"
 
 msgctxt "Languages::call_requests"
 msgid "Call requests"
@@ -201,3 +213,10 @@ msgctxt "Languages::gdpr_call_requests"
 msgid "Personal data from call requests"
 msgstr "Personal data from call requests"
 
+msgctxt "Languages::call_requests.event.request_created.name"
+msgid "Call requests: request created"
+msgstr "Call requests: request created"
+
+msgctxt "Languages::call_requests.event.request_about_product_created.name"
+msgid "Call requests: request about product created"
+msgstr "Call requests: request about product created"

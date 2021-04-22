@@ -183,7 +183,11 @@ function fn_webmoney_get_price_by_payee_purse_type($price, $purse)
     } elseif ($purse_type == 'U') {
         $currency = 'UAH';
     } elseif ($purse_type == 'B') {
-        $currency = 'BYR';
+        $currency = 'BYN';
+        // Backward currency code compatibility
+        if (empty($currencies[$currency])) {
+            $currency = 'BYR';
+        }
     } elseif ($purse_type == 'Y') {
         $currency = 'UZS';
     } else {

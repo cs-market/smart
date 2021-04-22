@@ -22,5 +22,12 @@ if (fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id')) {
     );
 }
 
+/** @var array{import_process_data: array<array<string|bool|array<string>>>} $schema */
+$schema['import_process_data']['vendor_plans_import_skip_products_with_unavailable_categories'] = [
+    'function'    => 'fn_vendor_plans_import_skip_products_with_unavailable_categories',
+    'args'        => ['%company_id', '%company', '%Category', '%Secondary categories', '@category_delimiter', '$processed_data', '#lang_code', '$skip_record'],
+    'import_only' => true,
+];
+
 return $schema;
 

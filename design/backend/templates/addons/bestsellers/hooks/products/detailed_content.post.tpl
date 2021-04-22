@@ -1,5 +1,5 @@
 {include file="common/subheader.tpl" title=__("bestselling") target="#acc_bestsellers"}
-<div id="acc_bestsellers" class="collapse in">
+<div id="acc_bestsellers" class="collapse in {if !$allow_edit_sales_amount}cm-hide-inputs{/if}">
     <div class="control-group">
         <label class="control-label" for="sales_amount">{__("sales_amount")}</label>
         <div class="controls">

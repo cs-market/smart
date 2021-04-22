@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/seo.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.2/addons/seo.po\n"
+"X-Crowdin-File-ID: 4172\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::seo"
 msgid "SEO"
@@ -61,12 +61,16 @@ msgid "page [n]"
 msgstr "сторінка [n]"
 
 msgctxt "Languages::privileges.manage_seo_rules"
-msgid "Manage SEO rules and 301 redirects"
-msgstr "Керування правилами SEO та 301 редірект"
+msgid "Can edit"
+msgstr "Можна редагувати"
+
+msgctxt "Languages::privilege_groups.seo"
+msgid "SEO"
+msgstr "SEO"
 
 msgctxt "Languages::privileges.view_seo_rules"
-msgid "View SEO rules and 301 redirects"
-msgstr "Переглянути SEO правил і 301 редірект"
+msgid "Can view"
+msgstr "Можна переглянути"
 
 msgctxt "Languages::seo.redirects_manager"
 msgid "301 redirects"
@@ -133,8 +137,8 @@ msgid "Other SEO URL format"
 msgstr "Формат SEO URL решти сторінок"
 
 msgctxt "SettingsOptions::seo::seo_language"
-msgid "Show language in the URL"
-msgstr "Показати мови в URL"
+msgid "Show additional language in the URL"
+msgstr "Показувати додаткові мови в URL"
 
 msgctxt "SettingsOptions::seo::single_url"
 msgid "Use single URL for all languages"
@@ -146,7 +150,7 @@ msgstr "Дозволяє не латинські символи в URL"
 
 msgctxt "SettingsVariants::seo::seo_product_type::product_file_nohtml"
 msgid "/product-name/"
-msgstr ""
+msgstr "/product-name/"
 
 msgctxt "SettingsVariants::seo::seo_product_type::product_file"
 msgid "/product-name.html"
@@ -154,7 +158,7 @@ msgstr "/product-name.html"
 
 msgctxt "SettingsVariants::seo::seo_product_type::product_category_nohtml"
 msgid "/category-name/[subcategory-name/]product-name/"
-msgstr ""
+msgstr "/category-name/[subcategory-name/]product-name/"
 
 msgctxt "SettingsVariants::seo::seo_product_type::product_category"
 msgid "/category-name/[subcategory-name/]product-name.html"
@@ -162,15 +166,15 @@ msgstr "/category-name/[subcategory-name/]product-name.html"
 
 msgctxt "SettingsVariants::seo::seo_category_type::category_nohtml"
 msgid "/parent-category/category/[page-2/]"
-msgstr ""
+msgstr "/parent-category/category/[page-2/]"
 
 msgctxt "SettingsVariants::seo::seo_category_type::category"
 msgid "/parent-category/category-[page-2].html"
-msgstr ""
+msgstr "/parent-category/category-[page-2].html"
 
 msgctxt "SettingsVariants::seo::seo_category_type::root_category"
 msgid "/category/[page-2/]"
-msgstr ""
+msgstr "/category/[page-2/]"
 
 msgctxt "SettingsVariants::seo::seo_page_type::page"
 msgid "/parent-page/page.html"
@@ -186,11 +190,11 @@ msgstr "/Page/"
 
 msgctxt "SettingsVariants::seo::seo_other_type::directory"
 msgid "/item/"
-msgstr ""
+msgstr "/item/"
 
 msgctxt "SettingsVariants::seo::seo_category_type::file"
 msgid "/category[-page-2].html"
-msgstr ""
+msgstr "/category[-page-2].html"
 
 msgctxt "SettingsVariants::seo::seo_page_type::file"
 msgid "/page.html"
@@ -202,5 +206,61 @@ msgstr "/item.html"
 
 msgctxt "Languages::seo.important_language_text"
 msgid "<b>Warning!</b> The <b>SEO</b> add-on is currently configured to use a single URL for all languages. If you hide, disable, or delete a default language of one of the storefronts, the SEO URLs will be changed."
-msgstr ""
+msgstr "<b>Попередження!</b> На даний момент модуль <b>SEO</b> налаштовано на використання одного URL для всіх мов. Якщо ви приховаєте, вимкнете, або видалите мову за замовчуванням для однієї з вітрин, будуть змінені всі SEO URL."
+
+msgctxt "Languages::seo.upgrade_notes.seo_language.title"
+msgid "Changes in SEO add-on"
+msgstr "Зміни в модулі SEO"
+
+msgctxt "Languages::seo.upgrade_notes.seo_language.message"
+msgid "To improve rating in search engines, we have changed the behavior of the \"Show language in URL\" setting. The default language of the storefront will no longer be displayed in the URL. If your storefront in the default language was previously located at <b>[old_store_url]</b>, it will now be available at <b>[new_store_url]</b>.<br/>All old URLs will be redirected correctly to the new ones."
+msgstr "Щоб поліпшити ранжування в пошукових системах, ми змінили поведінку настройки \"Відображати мову в URL\". Тепер мова вітрини за замовчуванням не буде відображатися в URL. Якщо раніше ваша вітрина з мовою за замовчуванням розташовувалася по посиланню <b>[old_store_url]</b>, то тепер вона буде доступна по посиланню <b>[new_store_url]</b>.<br/>Всім старим URL ми автоматично проставили правильні редиректи."
+
+msgctxt "Languages::seo.product_feature.feature_code.notice"
+msgid "A suitable code can help this feature appear with the product in search engines. Supported codes:"
+msgstr "Відповідний код може допомогти цій функції з’явитися разом із товаром у пошукових системах. Підтримувані коди:"
+
+msgctxt "Languages::seo.brand"
+msgid "Brand"
+msgstr "Brand"
+
+msgctxt "Languages::seo.feature_code.brand.description"
+msgid "Name used by an organization or business person for labeling a product"
+msgstr "Найменування, яке використовується організацією чи комерційною особою для маркування товару"
+
+msgctxt "Languages::seo.isbn"
+msgid "ISBN"
+msgstr "ISBN"
+
+msgctxt "Languages::seo.feature_code.isbn.description"
+msgid "International Standard Book Number"
+msgstr "Міжнародний стандартний номерів книг"
+
+msgctxt "Languages::seo.gtin"
+msgid "GTIN"
+msgstr "GTIN"
+
+msgctxt "Languages::seo.feature_code.gtin.description"
+msgid "Global Trade Item Number"
+msgstr "Global Trade Item Number"
+
+msgctxt "Languages::seo.MPN"
+msgid "MPN"
+msgstr "MPN"
+
+msgctxt "Languages::seo.feature_code.mpn.description"
+msgid "Manufacturer Part Number"
+msgstr "Номер партії виробника"
+
+msgctxt "Languages::seo.storefront_frontend_default_language_warning"
+msgid "The <a href=\"[link]\">SEO</a> add-on is currently configured to use a single URL for all languages. If you change a default language of this storefront, the SEO URLs will be changed."
+msgstr "На даний момент модуль <a href=\"[link]\">SEO</a> налаштовано на використання одного URL для всіх мов. Якщо ви зміните мову за замовчуванням для цеї вітрини, будуть змінені всі SEO URL."
+
+msgctxt "Languages::seo.default_storefront_frontend_default_language_warning"
+msgid "The <a href=\"[link]\">SEO</a> add-on is currently configured to use a single URL for all languages. If you change a default language of the default storefront, the SEO URLs will be changed for all storefronts."
+msgstr "На даний момент модуль <a href=\"[link]\">SEO</a> налаштовано на використання одного URL для всіх мов. Якщо ви зміните мову за замовчуванням для вітрини за замовчуванням, будуть змінені SEO URL для всих вітрин."
+
+msgctxt "Languages::seo.error_at_creation_seo_name"
+msgid "The following SEO name already exists in your store: <b>[names]</b>. <p> The following SEO name was used instead: <b>[new_names]</b>.|The following SEO names already exist in your store: <b>[names]</b>. The following SEO names were used instead: <b>[new_names]</b>."
+msgstr "У вашому магазині вже існує така SEO назва: <b>[names]</b>. <p> Натомість було використано таке SEO ім’я: <b>[new_names]</b>. | У вашому магазині вже існують такі SEO імена: <b>[names]</b>. Натомість було використано такі SEO імена: <b>[new_names]</b>."
 

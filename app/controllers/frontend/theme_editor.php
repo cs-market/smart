@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $theme = Themes::factory(fn_get_theme_path('[theme]', 'C'));
 
     if ($mode == 'save') {
+        fn_trusted_vars('style.custom_css');
 
         $theme_manifest = $theme->getManifest();
 
@@ -211,6 +212,10 @@ if ($mode == 'view') {
         $_REQUEST['style_id'] = $_REQUEST['preset_id'];
     }
 
+    if (!empty($_REQUEST['name'])) {
+        $_REQUEST['name'] = trim($_REQUEST['name']);
+    }
+
     if (!empty($_REQUEST['name']) && Styles::factory($theme->getThemeName())->copy($_REQUEST['style_id'], $_REQUEST['name'])) {
         fn_theme_editor_set_style($_REQUEST['name']);
     } else {
@@ -250,7 +255,7 @@ function fn_theme_editor_save_style($style_id, $style)
     $theme_name = fn_get_theme_path('[theme]', 'C');
 
     if (empty($style_id) && !empty($style['name'])) {
-        $style_id = $style['name'];
+        $style_id = trim($style['name']);
 
         Styles::factory($theme_name)->copy(Registry::get('runtime.layout.style_id'), $style_id);
     }
@@ -359,7 +364,8 @@ function fn_theme_editor($params, $lang_code = CART_LANGUAGE)
     $view->assign('cse_logos', fn_get_logos(
         Registry::get('runtime.company_id'),
         Registry::get('runtime.layout.layout_id'),
-        Registry::get('runtime.layout.style_id')
+        Registry::get('runtime.layout.style_id'),
+        Tygh::$app['storefront']->storefront_id
     ));
     $view->assign('selected_section', $params['selected_section']);
     $view->assign('te_sections', $sections);

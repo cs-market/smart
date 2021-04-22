@@ -101,9 +101,25 @@ if ($mode == 'custom_image') {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
 
+    $width = (int) $_REQUEST['w'];
+    $height = (int) $_REQUEST['h'];
+
+    $max_width = Registry::ifGet('config.lazy_thumbnails.max_width', $width);
+    $max_height = Registry::ifGet('config.lazy_thumbnails.max_height', $height);
+
+    if ($width > $max_width || $height > $max_height) {
+        return array(CONTROLLER_STATUS_NO_PAGE);
+    }
+
     /** @var \Tygh\Backend\Storage\ABackend $image_storage */
     $image_storage = Storage::instance('images');
-    $file_path = fn_generate_thumbnail($_REQUEST['image_path'], $_REQUEST['w'], $_REQUEST['h'], false, true);
+    $file_path = fn_generate_thumbnail(
+        $_REQUEST['image_path'],
+        $width,
+        $height,
+        false,
+        true
+    );
 
     if ($image_storage->isExist($file_path)) {
         $file_path = $image_storage->getAbsolutePath($file_path);

@@ -12,53 +12,53 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-return array(
-    'section' => 'translations',
+return [
+    'section' => 'states',
     'pattern_id' => 'states',
     'name' => __('states'),
-    'key' => array('state_id'),
+    'key' => ['state_id'],
     'order' => 1,
     'table' => 'states',
-    'permissions' => array(
+    'permissions' => [
         'import' => 'manage_locations',
         'export' => 'view_locations',
-    ),
-    'references' => array(
-        'state_descriptions' => array(
-            'reference_fields' => array('state_id' => '#key', 'lang_code' => '#lang_code'),
+    ],
+    'references' => [
+        'state_descriptions' => [
+            'reference_fields' => ['state_id' => '#key', 'lang_code' => '#lang_code'],
             'join_type' => 'LEFT'
-        ),
-    ),
-    'options' => array(
-        'lang_code' => array(
+        ],
+    ],
+    'options' => [
+        'lang_code' => [
             'title' => 'language',
             'type' => 'languages',
-            'default_value' => array(DEFAULT_LANGUAGE),
-        ),
-    ),
-    'export_fields' => array(
-        'State' => array(
+            'default_value' => [DEFAULT_LANGUAGE],
+        ],
+    ],
+    'export_fields' => [
+        'State' => [
             'db_field' => 'state',
             'table' => 'state_descriptions',
             'required' => true,
             'multilang' => true,
-        ),
-        'Language' => array(
+        ],
+        'Language' => [
             'table' => 'state_descriptions',
             'db_field' => 'lang_code',
             'type' => 'languages',
             'required' => true,
             'multilang' => true
-        ),
-        'Code' => array(
+        ],
+        'Code' => [
             'db_field' => 'code',
             'required' => true,
             'alt_key' => true,
-        ),
-        'Country code' => array(
+        ],
+        'Country code' => [
             'db_field' => 'country_code',
             'required' => true,
             'alt_key' => true,
-        ),
-    ),
-);
+        ],
+    ],
+];

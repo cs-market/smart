@@ -12,88 +12,96 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+defined('BOOTSTRAP') or die('Access denied');
+
 use Tygh\Tools\SecurityHelper;
 
-$schema = array(
-    'product' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'shortname' => SecurityHelper::ACTION_REMOVE_HTML,
-            'meta_description' => SecurityHelper::ACTION_REMOVE_HTML,
-            'meta_keywords' => SecurityHelper::ACTION_REMOVE_HTML,
-            'search_words' => SecurityHelper::ACTION_REMOVE_HTML,
-            'page_title' => SecurityHelper::ACTION_REMOVE_HTML,
+/** @var array $schema */
+$schema = [
+    'product'         => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'shortname'           => SecurityHelper::ACTION_REMOVE_HTML,
+            'meta_description'    => SecurityHelper::ACTION_REMOVE_HTML,
+            'meta_keywords'       => SecurityHelper::ACTION_REMOVE_HTML,
+            'search_words'        => SecurityHelper::ACTION_REMOVE_HTML,
+            'page_title'          => SecurityHelper::ACTION_REMOVE_HTML,
             'age_warning_message' => SecurityHelper::ACTION_REMOVE_HTML,
-            'product_code' => SecurityHelper::ACTION_REMOVE_HTML,
-            'short_description' => SecurityHelper::ACTION_SANITIZE_HTML,
-            'full_description' => SecurityHelper::ACTION_SANITIZE_HTML,
-            'promo_text' => SecurityHelper::ACTION_SANITIZE_HTML,
-            'product' => SecurityHelper::ACTION_SANITIZE_HTML,
-        )
-    ),
-    'category' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'meta_keywords' => SecurityHelper::ACTION_REMOVE_HTML,
-            'meta_description' => SecurityHelper::ACTION_REMOVE_HTML,
-            'page_title' => SecurityHelper::ACTION_REMOVE_HTML,
+            'product_code'        => SecurityHelper::ACTION_REMOVE_HTML,
+            'short_description'   => SecurityHelper::ACTION_SANITIZE_HTML,
+            'full_description'    => SecurityHelper::ACTION_SANITIZE_HTML,
+            'promo_text'          => SecurityHelper::ACTION_SANITIZE_HTML,
+            'product'             => SecurityHelper::ACTION_SANITIZE_HTML,
+        ]
+    ],
+    'category'        => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'meta_keywords'       => SecurityHelper::ACTION_REMOVE_HTML,
+            'meta_description'    => SecurityHelper::ACTION_REMOVE_HTML,
+            'page_title'          => SecurityHelper::ACTION_REMOVE_HTML,
             'age_warning_message' => SecurityHelper::ACTION_REMOVE_HTML,
-            'description' => SecurityHelper::ACTION_SANITIZE_HTML,
-            'category' => SecurityHelper::ACTION_SANITIZE_HTML,
-        )
-    ),
-    'company' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'company' => SecurityHelper::ACTION_REMOVE_HTML,
+            'description'         => SecurityHelper::ACTION_SANITIZE_HTML,
+            'category'            => SecurityHelper::ACTION_SANITIZE_HTML,
+        ]
+    ],
+    'company'         => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'company'             => SecurityHelper::ACTION_REMOVE_HTML,
             'company_description' => SecurityHelper::ACTION_SANITIZE_HTML,
-        )
-    ),
-    'page' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'page' => SecurityHelper::ACTION_REMOVE_HTML,
-            'description' => SecurityHelper::ACTION_SANITIZE_HTML,
-            'page_title' => SecurityHelper::ACTION_REMOVE_HTML,
+        ]
+    ],
+    'page'            => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'page'             => SecurityHelper::ACTION_REMOVE_HTML,
+            'description'      => SecurityHelper::ACTION_SANITIZE_HTML,
+            'page_title'       => SecurityHelper::ACTION_REMOVE_HTML,
             'meta_description' => SecurityHelper::ACTION_REMOVE_HTML,
-            'meta_keywords' => SecurityHelper::ACTION_REMOVE_HTML,
-        )
-    ),
-    'product_option' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'option_name' => SecurityHelper::ACTION_REMOVE_HTML,
-            'description' => SecurityHelper::ACTION_SANITIZE_HTML,
-            'comment' => SecurityHelper::ACTION_REMOVE_HTML,
+            'meta_keywords'    => SecurityHelper::ACTION_REMOVE_HTML,
+        ]
+    ],
+    'product_option'  => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'option_name'       => SecurityHelper::ACTION_REMOVE_HTML,
+            'description'       => SecurityHelper::ACTION_SANITIZE_HTML,
+            'comment'           => SecurityHelper::ACTION_REMOVE_HTML,
             'incorrect_message' => SecurityHelper::ACTION_REMOVE_HTML,
-        )
-    ),
-    'promotion' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'name' => SecurityHelper::ACTION_REMOVE_HTML,
-            'short_description' => SecurityHelper::ACTION_SANITIZE_HTML,
+        ]
+    ],
+    'promotion'       => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'name'                 => SecurityHelper::ACTION_REMOVE_HTML,
+            'short_description'    => SecurityHelper::ACTION_SANITIZE_HTML,
             'detailed_description' => SecurityHelper::ACTION_SANITIZE_HTML,
-        )
-    ),
-    'product_feature' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'description' => SecurityHelper::ACTION_REMOVE_HTML,
+        ]
+    ],
+    'product_feature' => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'description'      => SecurityHelper::ACTION_REMOVE_HTML,
             'full_description' => SecurityHelper::ACTION_SANITIZE_HTML,
-        )
-    ),
-    'block' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
+        ]
+    ],
+    'product_feature_variant' => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'variant' => SecurityHelper::ACTION_REMOVE_HTML,
+        ]
+    ],
+    'block'           => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
             'name' => SecurityHelper::ACTION_SANITIZE_HTML,
-        )
-    ),
-    'shipping' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'shipping' => SecurityHelper::ACTION_REMOVE_HTML,
+        ]
+    ],
+    'shipping'        => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'shipping'    => SecurityHelper::ACTION_REMOVE_HTML,
             'description' => SecurityHelper::ACTION_SANITIZE_HTML,
-        )
-    ),
-    'status' => array(
-        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => array(
-            'description' => SecurityHelper::ACTION_REMOVE_HTML,
-            'email_subj' => SecurityHelper::ACTION_REMOVE_HTML,
+        ]
+    ],
+    'status'          => [
+        SecurityHelper::SCHEMA_SECTION_FIELD_RULES => [
+            'description'  => SecurityHelper::ACTION_REMOVE_HTML,
+            'email_subj'   => SecurityHelper::ACTION_REMOVE_HTML,
             'email_header' => SecurityHelper::ACTION_SANITIZE_HTML,
-        )
-    ),
-);
+        ]
+    ]
+];
 
 return $schema;

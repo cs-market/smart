@@ -1,7 +1,7 @@
 <?php
 
 use Tygh\Registry;
-use Tygh\Http;
+use Tygh\Languages\Values as LanguageValues;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -146,7 +146,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
                     $transaction_id = $response->transaction;
                 }
 
-                $invoice['status_title'] = fn_get_lang_var('text_payanyway_invoice_created');
+                $invoice['status_title'] = LanguageValues::getLangVar('text_payanyway_invoice_created');
                 $invoice['status'] = $response->status;
                 $invoice['system'] = $processor_data['processor_params']['payment_system'];
                 $invoice['transaction'] = str_pad($transaction_id, 10, "0", STR_PAD_LEFT);
@@ -158,7 +158,7 @@ if (defined('PAYMENT_NOTIFICATION')) {
                 fn_clear_cart($_SESSION['cart']);
 
             } catch (Exception $e) {
-                $invoice['status_title'] = fn_get_lang_var('text_payanyway_invoice_failed');
+                $invoice['status_title'] = LanguageValues::getLangVar('text_payanyway_invoice_failed');
                 $invoice['status'] = 'FAILED';
                 $invoice['error_message'] = $e->getMessage();
 

@@ -1,5 +1,4 @@
 {script src="js/lib/bootstrap_switch/js/bootstrapSwitch.js"}
-{style src="lib/bootstrap_switch/stylesheets/bootstrapSwitch.css"}
 
 {include file="common/previewer.tpl"}
 
@@ -20,7 +19,7 @@
             <input type="hidden" name="theme_name" value="{$smarty.get.theme_name}">
             <input type="hidden" name="style" value="{$smarty.get.style}">
             <div class="table-wrapper">
-                <table class="table table-condensed">
+                <table class="table table-condensed table--relative">
                     <thead>
                         <tr>
                             <th width="1">{include file="common/check_items.tpl"}</th>
@@ -108,7 +107,10 @@
 
         </form>
     {/capture}
-
+    <div class="span12 section-headers">
+        <h4 class="lead">{$theme.title}{if $layout.style_name}: {$layout.style_name}{/if}</h4>
+        <span class="muted">{__("theme_styles_and_layouts")}</span>
+    </div>
 {if $theme.screenshot}
     <div id="theme_image" class="span4">
         {if $theme.styles[$layout.style_id].image}
@@ -120,15 +122,14 @@
     <!--theme_image--></div>
 {/if}
 <div class="span8 theme-description" id="theme_description_container">
-    <h4 class="lead">{$theme.title}{if $layout.style_name}: {$layout.style_name}{/if}</h4>
     {hook name="themes:current_theme_options"}
-    <span class="muted">{__("theme_styles_and_layouts")}</span>
-        <div class="table-wrapper">
-            <table class="table table-middle">
+        <div class="table-responsive-wrapper">
+            <table class="table table-middle table--relative table-responsive">
                 <thead>
                     <tr>
                         <th>{__("layout")}</th>
                         <th>{__("theme_editor.style")}</th>
+                        {hook name="themes:list_extra_th"}{/hook}
                         <th> </th>
                     </tr>
                 </thead>
@@ -136,8 +137,8 @@
                     {$has_styles = !!$theme.styles}
                     {foreach $theme.layouts as $available_layout}
                         <tr>
-                            <td>{$available_layout.name}</td>
-                            <td>
+                            <td data-th="{__("layout")}">{$available_layout.name}</td>
+                            <td data-th="{__("theme_editor.style")}">
                                 {$styles_descr = []}
                                 {foreach $available_themes.current.styles as $style}
                                     {$styles_descr[$style.style_id] = $style.name}
@@ -149,18 +150,44 @@
                                     <span class="muted">{__("theme_no_styles_text")}</span>
                                 {/if}
                             </td>
-                            <td class="right btn-toolbar">
+                            {hook name="themes:list_extra_td"}{/hook}
+                            <td class="right btn-toolbar btn-toolbar--theme-editor" data-th="&nbsp;">
                                 {if $available_layout.is_default}
+                                    {$default_layout_name = $available_layout.name}
                                     {$but_meta = "btn-small btn-primary cm-post"}
                                 {else}
                                     {$but_meta = "btn-small cm-post"}
                                 {/if}
                                 {if $has_styles}
-                                    {include file="buttons/button.tpl" but_href="customization.update_mode?type=theme_editor&status=enable&s_layout=`$available_layout.layout_id`" but_text=__("theme_editor") but_role="action" but_meta=$but_meta but_target="_blank"}
+                                    {include file="buttons/button.tpl"
+                                        but_href="customization.update_mode?type=theme_editor&status=enable&s_layout={$available_layout.layout_id}&s_storefront={$storefront->storefront_id}"
+                                        but_text=__("theme_editor")
+                                        but_role="action"
+                                        but_meta=$but_meta
+                                        but_target="_blank"
+                                    }
                                 {else}
-                                    {include file="buttons/button.tpl" title=__("theme_editor_not_supported") but_text=__("theme_editor") but_role="btn" but_meta="btn btn-small disabled cm-tooltip"}
+                                    {include file="buttons/button.tpl"
+                                        title=__("theme_editor_not_supported")
+                                        but_text=__("theme_editor")
+                                        but_role="btn"
+                                        but_meta="btn btn-small disabled cm-tooltip"
+                                    }
                                 {/if}
-                                {include file="buttons/button.tpl" but_href="customization.update_mode?type=live_editor&status=enable&s_layout=`$available_layout.layout_id`" but_text=__("edit_content_on_site") but_role="action" but_meta=$but_meta but_target="_blank"}
+                                {include file="buttons/button.tpl"
+                                    but_href="customization.update_mode?type=block_manager&status=enable&s_layout={$available_layout.layout_id}&s_storefront={$storefront->storefront_id}"
+                                    but_text=__("edit_layout_on_site")
+                                    but_role="action"
+                                    but_meta=$but_meta
+                                    but_target="_blank"
+                                }
+                                {include file="buttons/button.tpl"
+                                    but_href="customization.update_mode?type=live_editor&status=enable&s_layout={$available_layout.layout_id}&s_storefront={$storefront->storefront_id}"
+                                    but_text=__("edit_content_on_site")
+                                    but_role="action"
+                                    but_meta=$but_meta
+                                    but_target="_blank"
+                                }
                             </td>
                         <tr>
                     {/foreach}
@@ -169,6 +196,9 @@
         </div>
     {/hook}
 <!--theme_description_container--></div>
+    {if $theme_logos}
+        {include file="views/themes/components/logos_list.tpl" logos=$theme_logos company_id=$id default_layout_name=$default_layout_name|default:""}
+    {/if}
 </div>
 
 {capture name="tabsbox"}
@@ -382,8 +412,8 @@
                 <div class="controls right">{$theme.title}</div>
             </div>
             <div class="control-group">
-                <div class="control-label muted" title="/{$settings.theme_name}">{__("directory")}</div>
-                <div class="controls right"><a class="pull-right" href="{"templates.manage?selected_path=`$settings.theme_name`"|fn_url}">/{$settings.theme_name}</a></div>
+                <div class="control-label muted" title="/{$storefront->theme_name}">{__("directory")}</div>
+                <div class="controls right"><a class="pull-right" href="{"templates.manage?selected_path={$storefront->theme_name}"|fn_url}">/{$storefront->theme_name}</a></div>
             </div>
             <div class="control-group">
                 <div class="control-label muted">{__("layouts")}</div>
@@ -427,7 +457,18 @@
     {/capture}
     {dropdown content=$smarty.capture.tools_list}
     {/if}
+    {if $theme_logos}
+        {include file="buttons/save.tpl" but_name="dispatch[themes.update_logos]" but_role="action" but_target_form="update_logos_form" but_meta="cm-submit"}
+    {/if}
 {/capture}
 
 {/capture}
-{include file="common/mainbox.tpl" title={__("themes")} content=$smarty.capture.mainbox sidebar=$smarty.capture.sidebar adv_buttons=$smarty.capture.adv_buttons buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=__("themes")
+    content=$smarty.capture.mainbox
+    sidebar=$smarty.capture.sidebar
+    adv_buttons=$smarty.capture.adv_buttons
+    buttons=$smarty.capture.buttons
+    select_storefront=true
+    show_all_storefront=false
+}

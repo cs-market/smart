@@ -10,6 +10,7 @@ use Tygh\Shippings\YandexDelivery\Objects\RequestDeliveryList;
 use Tygh\Shippings\YandexDelivery\Objects\Delivery;
 use Tygh\Shippings\YandexDelivery\Objects\DeliveryPoint;
 use Tygh\Shippings\YandexDelivery\Objects\Recipient;
+use Tygh\Registry;
 
 class Api extends YandexObject
 {
@@ -498,26 +499,28 @@ class Api extends YandexObject
     public function getGeoByAddress($address)
     {
         $url = "https://geocode-maps.yandex.ru/1.x/";
+        $settings = Registry::get('addons.geo_maps');
         $data = array(
             'geocode' => implode('+', $address),
             'format' => 'json',
             'results' => 2,
-            'sco' => 'longlat'
+            'sco' => 'longlat',
+            'apikey' => isset($settings['yandex_api_key']) ? $settings['yandex_api_key'] : '',
         );
 
         $back_logging = Http::$logging;
         Http::$logging = $this->is_logging_enabled;
 
-        $response = Http::post($url, $data, array(
+        $response = Http::get($url, $data, array(
             'log_preprocessor' => '\Tygh\Http::unescapeJsonResponse'
         ));
         Http::$logging = $back_logging;
 
         $response = json_decode($response, true);
-        $response = $response['response']['GeoObjectCollection'];
+        $response = isset($response['response']['GeoObjectCollection']) ? $response['response']['GeoObjectCollection'] : null;
 
         $ll_address = false;
-        if ($response['metaDataProperty']['GeocoderResponseMetaData']['found'] > 0) {
+        if ($response && $response['metaDataProperty']['GeocoderResponseMetaData']['found'] > 0) {
             $object = reset($response['featureMember']);
             $object = $object['GeoObject'];
 

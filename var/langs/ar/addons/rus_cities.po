@@ -45,12 +45,20 @@ msgid "Create new state"
 msgstr "Create new state"
 
 msgctxt "Languages::privileges.view_cities"
-msgid "View cities"
-msgstr "View cities"
+msgid "Can view"
+msgstr "Can view"
 
 msgctxt "Languages::privileges.manage_cities"
-msgid "Manage cities"
-msgstr "Manage cities"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privileges.manage_cities"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privilege_groups.cities"
+msgid "Cities"
+msgstr "Cities"
 
 msgctxt "Languages::code_sdek"
 msgid "Code city sdek"

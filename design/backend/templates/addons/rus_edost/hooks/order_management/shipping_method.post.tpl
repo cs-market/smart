@@ -21,7 +21,14 @@
                         {if $office_count == 1}
                             {foreach from=$shipping.data.office item=office}
                             <div class="sidebar-row">
-                                <input type="hidden" name="select_office[{$group_key}][{$shipping_id}]" value="{$office.office_id}"id="office_{$office.office_id}" >
+                                <input type="hidden"
+                                    name="select_office[{$group_key}][{$shipping_id}]"
+                                    value="{$office.office_id}"
+                                    id="office_{$office.office_id}"
+                                    data-ca-pickup-select-office="true"
+                                    data-ca-shipping-id="{$shipping_id}"
+                                    data-ca-group-key="{$group_key}"
+                                    data-ca-location-id="{$office.office_id}">
                                 {$office.name}
                                 <p class="muted">{$office.address}<br />
                                 {$office.tel}<br />
@@ -35,7 +42,16 @@
                                 <div class="control-group">
                                     <div class="controls">
                                         <label for="office_{$office.office_id}" class="radio">
-                                            <input type="radio" name="select_office[{$group_key}][{$shipping_id}]" value="{$office.office_id}" {if $old_office_id == $office.office_id}checked="checked"{/if} id="office_{$office.office_id}" > {$office.name}
+                                            <input type="radio"
+                                                name="select_office[{$group_key}][{$shipping_id}]"
+                                                value="{$office.office_id}"
+                                                {if $old_office_id == $office.office_id}checked="checked"{/if}
+                                                id="office_{$office.office_id}"
+                                                data-ca-pickup-select-office="true"
+                                                data-ca-shipping-id="{$shipping_id}"
+                                                data-ca-group-key="{$group_key}"
+                                                data-ca-location-id="{$office.office_id}">
+                                                {$office.name}
                                         </label>
                                         <p class="muted">{$office.address}<br />
                                         {$office.tel}<br />

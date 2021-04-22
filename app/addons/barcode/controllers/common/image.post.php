@@ -22,6 +22,21 @@ if ($mode == 'barcode') {
     $height = empty($_REQUEST['height']) ? null : $_REQUEST['height'];
     $algorithm = empty($_REQUEST['type']) ? null : $_REQUEST['type'];
 
+    $max_width = Registry::ifGet('config.lazy_thumbnails.max_width', $width);
+    $max_height = Registry::ifGet('config.lazy_thumbnails.max_height', $height);
+
+    if ($max_width < Registry::get('addons.barcode.width')) {
+        $max_width = Registry::get('addons.barcode.width');
+    }
+
+    if ($max_height < Registry::get('addons.barcode.height')) {
+        $max_height = Registry::get('addons.barcode.height');
+    }
+
+    if ($width > $max_width || $height > $max_height) {
+        return array(CONTROLLER_STATUS_NO_PAGE);
+    }
+
     $barcode_prefix = Registry::get('addons.barcode.prefix');
 
     $value_to_encode = $barcode_prefix . $value_to_encode;

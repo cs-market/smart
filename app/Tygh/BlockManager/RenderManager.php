@@ -14,12 +14,14 @@
 
 namespace Tygh\BlockManager;
 
+use Tygh\Lock\Factory;
 use Tygh\Debugger;
 use Tygh\Development;
 use Tygh\Embedded;
-use Tygh\Enum\ContainerPositions;
 use Tygh\Registry;
 use Tygh\SmartyEngine\Core;
+use Tygh\Tygh;
+use Tygh\Enum\SiteArea;
 
 class RenderManager
 {
@@ -90,6 +92,11 @@ class RenderManager
     private static $block_cache_properties;
 
     /**
+     * @var bool Whether a layout editing is enabled on frontend
+     */
+    private $is_frontend_layout_editing_enabled;
+
+    /**
      * Loads location data, containers, grids and blocks
      *
      * @param string $dispatch       URL dispatch (controller.mode.action)
@@ -139,6 +146,8 @@ class RenderManager
 
             $this->_view = \Tygh::$app['view'];
             $this->_theme = self::_getThemePath($this->_area);
+
+            $this->is_frontend_layout_editing_enabled = Registry::get('runtime.customization_mode.block_manager');
         }
     }
 
@@ -221,7 +230,7 @@ class RenderManager
             $grids_content[$index] = trim($this->renderGrid($grid));
         }
 
-        if ($this->_area != 'A') {
+        if ($this->_area !== SiteArea::ADMIN_PANEL && !$this->is_frontend_layout_editing_enabled) {
             $grids = $this->recalculateGridsBoundingBox($grids, $grids_content);
         }
 
@@ -386,7 +395,11 @@ class RenderManager
                      */
                     fn_set_hook('render_blocks', $grid, $block, $this, $content);
 
-                    if ($this->_area == 'C' && $block['status'] == 'D') {
+                    // Main content will be rendered in the Layout editing mode only when the related block is Active
+                    $is_block_displayed = $block['status'] === 'A' ||
+                        $this->is_frontend_layout_editing_enabled && $this->_location['is_frontend_editing_allowed'] && $block['type'] !== 'main';
+
+                    if ($this->_area == 'C' && (!$is_block_displayed || !$this->isBlockEligibleForCurrentLocation($block))) {
                         // Do not render block in frontend if it disabled
                         continue;
                     }
@@ -429,11 +442,33 @@ class RenderManager
     }
 
     /**
+     * Checks if block can be shown on location that is being rendered
+     *
+     * @param array $block Block data
+     *
+     * @return bool
+     */
+    protected function isBlockEligibleForCurrentLocation($block)
+    {
+        $block_schema = SchemesManager::getBlockScheme($block['type'], array());
+
+        if (!empty($block_schema['show_on_locations'])) {
+            return in_array($this->_location['dispatch'], (array) $block_schema['show_on_locations'], true);
+        }
+
+        return true;
+    }
+
+    /**
      * Renders block
+     *
      * @static
-     * @param  array  $block             Block data to be rendered
-     * @param  string $content_alignment Alignment of block (float left, float, right, width 100%)
-     * @param  string $area              Area ('A' for admin or 'C' for custom
+     *
+     * @param  array  $block       Block data to be rendered
+     * @param  array  $parent_grid Parent grid data
+     * @param  string $area        Area ('A' for admin or 'C' for customer)
+     * @param  array  $params      Additional parameters
+     *
      * @return string HTML code of rendered block
      */
     public static function renderBlock($block, $parent_grid = array(), $area = 'C', $params = array())
@@ -503,10 +538,14 @@ class RenderManager
             return $block_content;
         }
 
-        // Do not render block if it disabled in the frontend
-        if (isset($block['is_disabled']) && $block['is_disabled']) {
+        if (
+            !SchemesManager::isTemplateAvailable($block, $block_schema)
+            || !SchemesManager::isWrapperAvailable($block, $block_schema)
+            || (isset($block['is_disabled']) && $block['is_disabled'])
+        ) {
             return '';
         }
+
         /** @var Core $smarty */
         $smarty = \Tygh::$app['view'];
         $smarty_original_vars = $smarty->getTemplateVars();
@@ -542,7 +581,13 @@ class RenderManager
 
         if ($cache_this_block) {
             // Check whether cache was registered successfully
-            $cache_this_block = $cache_key = self::registerBlockCacheIfNeeded($cache_prefix, $block_schema, $block);
+            $result = self::registerBlockCacheIfNeeded($cache_prefix, $block_schema, $block);
+
+            if ($result) {
+                list($cache_key, $cache_prefix, $cache_level, $cache_params) = $result;
+            } else {
+                $cache_this_block = $cache_key = false;
+            }
 
             // We need an extra data to cache Inline JavaScript
             $smarty->assign('block_cache_name', $cache_key);
@@ -557,6 +602,16 @@ class RenderManager
         $load_block_from_cache = $cache_this_block && Registry::isExist($cache_key);
 
         $block_content = '';
+
+        if ($cache_this_block && !$load_block_from_cache) {
+            /** @var Factory $lock_factory */
+            $lock_factory = Tygh::$app['lock.factory'];
+            $lock = $lock_factory->createLock($cache_prefix . $cache_key . $cache_level);
+
+            if (!$lock->acquire() && $lock->wait()) {
+                $load_block_from_cache = Registry::loadFromCache($cache_key);
+            }
+        }
 
         // Block content is found at cache and should be loaded out of there
         if ($load_block_from_cache) {
@@ -620,7 +675,12 @@ class RenderManager
             }
 
             if (!empty($block['wrapper']) && $smarty->templateExists($block['wrapper']) && $display_this_block) {
+                $smarty->assign('grid_id', $block['grid_id']);
+                $smarty->assign('snapping_id', $block['snapping_id']);
+                $smarty->assign('order', $block['order']);
+
                 $smarty->assign('content', $block_content);
+                $smarty->assign('wrapper', $block['wrapper']);
 
                 if ($block['type'] == Block::TYPE_MAIN) {
                     $smarty->assign(
@@ -631,8 +691,12 @@ class RenderManager
                         false
                     );
                 }
-                $block_content = $smarty->fetch($block['wrapper']);
+                $block_content = $smarty->fetch('views/block_manager/render/wrapper.tpl');
             } else {
+                $smarty->assign('grid_id', $block['grid_id']);
+                $smarty->assign('snapping_id', $block['snapping_id']);
+                $smarty->assign('order', $block['order']);
+
                 $smarty->assign('content', $block_content);
                 $block_content = $smarty->fetch('views/block_manager/render/block.tpl');
             }
@@ -654,6 +718,10 @@ class RenderManager
                 $cached_content['content'] = $block_content;
 
                 Registry::set($cache_key, $cached_content);
+
+                if (isset($lock)) {
+                    $lock->release();
+                }
             }
         }
 
@@ -680,15 +748,15 @@ class RenderManager
     /**
      * Returns true if cache used for blocks
      *
-     * @static
-     * @return bool true if we may use cahce, false otherwise
+     * @return bool True if we may use cahce, false otherwise
      */
     public static function allowCache()
     {
         $use_cache = true;
-        if (Registry::ifGet('config.tweaks.disable_block_cache', false)
-            || Registry::get('runtime.customizaton_mode.design')
-            || Registry::get('runtime.customizaton_mode.translation')
+
+        if (
+            Registry::ifGet('config.tweaks.disable_block_cache', false)
+            || Registry::get('runtime.customization_mode')
             || Development::isEnabled('compile_check')
         ) {
             $use_cache = false;
@@ -733,7 +801,11 @@ class RenderManager
             $value = Block::instance()->getItems($template_variable, $block, $block_scheme);
         }
 
-        if ($field['type'] == 'function' && !empty($field['function'][0]) && is_callable($field['function'][0])) {
+        if (
+            $field['type'] === 'function'
+            && !empty($field['function'][0])
+            && is_callable($field['function'][0])
+        ) {
             $callable = array_shift($field['function']);
             array_unshift($field['function'], $value, $block, $block_scheme);
             $value = call_user_func_array($callable, $field['function']);
@@ -749,7 +821,7 @@ class RenderManager
      * @param array  $block_schema Block schema data
      * @param array  $block_data   Block data from DB
      *
-     * @return string|bool Cache key when block has been cached, false otherwise
+     * @return array|bool Returns cache params when block has been cached, false otherwise
      */
     public static function registerBlockCacheIfNeeded($cache_prefix, $block_schema, $block_data)
     {
@@ -861,7 +933,18 @@ class RenderManager
             ? $cache_params['cache_level']
             : Registry::cacheLevel('html_blocks');
 
-        Registry::registerCache(array($cache_prefix, $cache_key), $cache_params['update_handlers'], $cache_level);
+        if (isset($block_data['content']['items']['filling'])
+            && isset($block_schema['content']['items']['fillings'][$block_data['content']['items']['filling']]['cache_ttl'])
+        ) {
+            $cache_params['ttl'] = $block_schema['content']['items']['fillings'][$block_data['content']['items']['filling']]['cache_ttl'];
+        }
+
+        $cache_condition = [
+            'update_handlers' => $cache_params['update_handlers'],
+            'ttl'             => isset($cache_params['ttl']) ? $cache_params['ttl'] : null
+        ];
+
+        Registry::registerCache([$cache_prefix, $cache_key], $cache_condition, $cache_level);
 
         // Check conditions that trigger block cache regeneration
         $regenerate_cache = false;
@@ -886,7 +969,7 @@ class RenderManager
             Registry::del($cache_key);
         }
 
-        return $cache_key;
+        return [$cache_key, $cache_prefix, $cache_level, $cache_params];
     }
 
     /**
@@ -906,20 +989,20 @@ class RenderManager
         }
 
         foreach ($callable_handlers as $handler_name => $callable_definition) {
-
             if (isset($callable_definition[0]) && is_callable($callable_definition[0])) {
                 $arguments = array();
 
                 if (isset($callable_definition[1]) && is_array($callable_definition[1])) {
                     foreach ($callable_definition[1] as $argument) {
-
-                        if (strpos($argument, '$') === 0) {
-                            // Superglobal variables like $_REQUEST
+                        if (is_string($argument) && strpos($argument, '$') === 0) {
                             if (isset(${$argument})) {
                                 $arguments[] = ${$argument};
-                            }
-                            // Argument variable name listed at allowed variables to pass
-                            elseif (
+                            } elseif ($argument === '$_REQUEST') {
+                                $arguments[] = $_REQUEST;
+                            } elseif ($argument === '$_SERVER') {
+                                $arguments[] = $_SERVER;
+                            } elseif (
+                                // Argument variable name listed at allowed variables to pass
                                 ($argument_variable_name = substr($argument, 1))
                                 &&
                                 array_key_exists($argument_variable_name, $variables_to_pass)

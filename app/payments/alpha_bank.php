@@ -14,6 +14,8 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+use Tygh\Tygh;
+
 if (defined('PAYMENT_NOTIFICATION')) {
 	$pp_response = array();
 	$pp_response['order_status'] = 'F';
@@ -62,32 +64,44 @@ if (defined('PAYMENT_NOTIFICATION')) {
     }
 	
 } else {
-	if ($processor_data['processor_params']['mode'] == 'test') {
-		$payment_url = 'https://alpha.test.modirum.com/vpos/shophandlermpi';
-	} else {
-		$payment_url = 'https://www.alphaecommerce.gr/vpos/shophandlermpi';
-	}
+    if ($processor_data['processor_params']['mode'] == 'test') {
+        $payment_url = 'https://euro.test.modirum.com/vpos/shophandlermpi';
+    } else {
+        $payment_url = 'https://vpos.eurocommerce.gr/vpos/shophandlermpi';
+    }
 
-	$amount = fn_format_price($order_info['total'], $processor_data['processor_params']['currency']);
-	$confirm_url = fn_url("payment_notification.success?payment=alpha_bank&order_id=$order_id", AREA, 'current');
-	$cancel_url = fn_url("payment_notification.fail?payment=alpha_bank&order_id=$order_id", AREA, 'current');
+    $amount = fn_format_price($order_info['total'], $processor_data['processor_params']['currency']);
+    $confirm_url = fn_url("payment_notification.success?payment=alpha_bank&order_id=$order_id", AREA, 'current');
+    $cancel_url = fn_url("payment_notification.fail?payment=alpha_bank&order_id=$order_id", AREA, 'current');
 
-	$post_data = array(
-		'mid' => $processor_data['processor_params']['merchant_id'],
-		'lang' => $processor_data['processor_params']['language'],
-		'orderid' => time() . $order_id,
-		'orderDesc' => '#' . $order_id,
-		'orderAmount' => $amount,
-		'currency' => $processor_data['processor_params']['currency'],
-		'payerEmail' => $order_info['email'],
-		'payerPhone' => $order_info['b_phone'],
-		'trType' => '1',
-		'confirmUrl' => $confirm_url,
-		'cancelUrl' => $cancel_url
-	);
+    /** @var \Tygh\Location\Manager $location_manager */
+    $location_manager = Tygh::$app['location'];
+
+    $post_data = [
+        'mid'         => $processor_data['processor_params']['merchant_id'],
+        'lang'        => $processor_data['processor_params']['language'],
+        'orderid'     => time() . $order_id,
+        'orderDesc'   => '#' . $order_id,
+        'orderAmount' => $amount,
+        'currency'    => $processor_data['processor_params']['currency'],
+        'payerEmail'  => $order_info['email'],
+        'payerPhone'  => $location_manager->getLocationField($order_info, 'phone', '', BILLING_ADDRESS_PREFIX),
+        'trType'      => '1',
+        'confirmUrl'  => $confirm_url,
+        'cancelUrl'   => $cancel_url,
+        'billState'   => $location_manager->getLocationField($order_info, 'state', '', BILLING_ADDRESS_PREFIX),
+        'billZip'     => $location_manager->getLocationField($order_info, 'zipcode', '', BILLING_ADDRESS_PREFIX),
+        'billCity'    => $location_manager->getLocationField($order_info, 'city', '', BILLING_ADDRESS_PREFIX),
+        'billAddress' => $location_manager->getLocationField($order_info, 'address', '', BILLING_ADDRESS_PREFIX),
+        'shipCountry' => $location_manager->getLocationField($order_info, 'country', '', SHIPPING_ADDRESS_PREFIX),
+        'shipState'   => $location_manager->getLocationField($order_info, 'state', '', SHIPPING_ADDRESS_PREFIX),
+        'shipZip'     => $location_manager->getLocationField($order_info, 'zipcode', '', SHIPPING_ADDRESS_PREFIX),
+        'shipCity'    => $location_manager->getLocationField($order_info, 'city', '', SHIPPING_ADDRESS_PREFIX),
+        'shipAddress' => $location_manager->getLocationField($order_info, 'address', '', SHIPPING_ADDRESS_PREFIX),
+    ];
 
 	$post_data['digest'] = base64_encode(sha1(implode('', $post_data) . $processor_data['processor_params']['shared_secret'], true));
 
-	fn_create_payment_form($payment_url, $post_data, 'Alpha Bank', false);
+    fn_create_payment_form($payment_url, $post_data, 'Alpha Bank', false);
 }
 exit;

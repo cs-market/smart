@@ -33,6 +33,7 @@
                id="password"
                size="60"
                value="{$processor_params.password}"
+               autocomplete="new-password"
         />
     </div>
 </div>
@@ -46,6 +47,7 @@
                size="60"
                value="{$processor_params.sha_sign}"
         />
+        <p class="muted description">{__("ttc_ogone.sha_in")}</p>
     </div>
 </div>
 

@@ -7,6 +7,7 @@
     <label class="control-label cm-required" for="elm_old_url">{__("seo.old_url")}:</label>
     <div class="controls">
         <input type="text" name="redirect_data[src]" id="elm_old_url" value="" class="span9" />
+        <p class="muted description">{__("tt_addons_seo_views_seo_redirects_manage_seo.old_url")}</p>
     </div>
 </div>
 
@@ -74,45 +75,70 @@
 
 {capture name="mainbox"}
 
+{$has_permission = fn_check_permissions("seo_redirects", "delete", "admin", "POST")}
+
 <form action="{""|fn_url}" method="post" name="seo_redirects_form" class="form-horizontal form-edit">
 
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 
+{if $has_permission}
+    {hook name="seo_redirects:bulk_edit"}
+        {include file="addons/seo/views/seo_redirects/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
+
 {if $seo_redirects}
-<div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
-    <thead>
+<div class="table-responsive-wrapper longtap-selection">
+    <table width="100%" class="table table-middle table--relative table-responsive">
+    <thead
+        data-ca-bulkedit-default-object="true"
+        data-ca-bulkedit-component="defaultObject"
+    >
     <tr>
-        <th width="1%" class="mobile-hide">
-            {include file="common/check_items.tpl"}</th>
-        <th width="35%">{__("seo.old_url")}</th>
-        <th width="35%">{__("seo.new_url")}</th>
-        <th width="30%">{__("type")}</th>
+        <th width="6%" class="mobile-hide">
+            {include file="common/check_items.tpl" is_check_all_shown=true is_check_disabled=!$has_permission}
+
+            <input type="checkbox"
+                class="bulkedit-toggler hide"
+                data-ca-bulkedit-toggler="true"
+                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+            />
+        </th>
+        <th width="30%">{__("seo.old_url")}</th>
+        <th width="25%">{__("seo.new_url")}</th>
+        <th width="20%">{__("type")}</th>
         {if $addons.seo.single_url != "Y" && $languages|sizeof > 1}
-        <th>{__("language")}</th>
+        <th width="10%">{__("language")}</th>
         {/if}
-        <th>&nbsp;</th>
+        <th width="8%">&nbsp;</th>
     </tr>
     </thead>
     {foreach from=$seo_redirects item="redirect" key="key"}
-    <tr>
-        <td class="mobile-hide">
-            <input type="checkbox" name="redirect_ids[]" value="{$redirect.redirect_id}" class="cm-item" /></td>
-        <td data-th="{__("seo.old_url")}">
+    <tr class="cm-longtap-target"
+        {if $has_permission}
+            data-ca-longtap-action="setCheckBox"
+            data-ca-longtap-target="input.cm-item"
+            data-ca-id="{$redirect.redirect_id}"
+        {/if}
+    >
+        <td width="6%" class="mobile-hide">
+            <input type="checkbox" name="redirect_ids[]" value="{$redirect.redirect_id}" class="cm-item hide" /></td>
+        <td width="30%" data-th="{__("seo.old_url")}">
             <input type="text" class="input-hidden" name="seo_redirects[{$key}][src]" value="{$redirect.src}" /></td>
-        <td data-th="{__("seo.new_url")}">
+        <td width="25%" data-th="{__("seo.new_url")}">
             {if $redirect.type == "s"}
             <input type="text" class="input-hidden" name="seo_redirects[{$key}][dest]" value="{$redirect.dest}" /></td>
             {else}
             <a href="{$redirect.parsed_url}" target="_blank">{$redirect.parsed_url}</a>
             {/if}
-        <td data-th="{__("type")}">
+        <td width="20%" data-th="{__("type")}">
             {__($seo_vars[$redirect.type].name)}
         </td>
         {if $addons.seo.single_url != "Y" && $languages|sizeof > 1}
-        <td data-th="{__("language")}">{$languages[$redirect.lang_code].name}</td>
+        <td  width="10%" data-th="{__("language")}">{$languages[$redirect.lang_code].name}</td>
         {/if}    
-        <td class="nowrap" data-th="{__("tools")}">
+        <td width="8%" class="nowrap" data-th="{__("tools")}">
 
             <div class="hidden-tools">
                 {capture name="tools_list"}
@@ -134,15 +160,6 @@
 {/capture}
 
 {capture name="buttons"}
-    <span class="mobile-hide shift-right">
-    {capture name="tools_list"}
-        {if $seo_redirects}
-            <li>{btn type="delete_selected" dispatch="dispatch[seo_redirects.m_delete]" form="seo_redirects_form"}</li>
-        {/if}
-    {/capture}
-    {dropdown content=$smarty.capture.tools_list}
-    </span>
-
     {if $seo_redirects}
         {include file="buttons/save.tpl" but_name="dispatch[seo_redirects.m_update]" but_role="action" but_target_form="seo_redirects_form" but_meta="cm-submit"}
     {/if}

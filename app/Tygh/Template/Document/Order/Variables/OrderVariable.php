@@ -127,7 +127,7 @@ class OrderVariable extends GenericVariable implements IActiveVariable
                     $tax['price_includes_tax'] == 'Y'
                     && (
                         Registry::get('settings.Appearance.cart_prices_w_taxes') != 'Y'
-                        || Registry::get('settings.General.tax_calculation') == 'subtotal'
+                        || Registry::get('settings.Checkout.tax_calculation') == 'subtotal'
                     )
                 ) {
                     $name .= '&nbsp;' . __('included', array(), $this->context->getLangCode());

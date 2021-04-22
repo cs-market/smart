@@ -1,4 +1,4 @@
-<div id="content_tags">
+<div class="{if $selected_section !== "tags"}hidden{/if}" id="content_tags">
 
 {script src="js/addons/tags/tags_autocomplete.js"}
 

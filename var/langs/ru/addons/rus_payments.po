@@ -5,20 +5,20 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-ru\n"
+"X-Crowdin-Project-ID: 54044\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/rus_payments.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.2/addons/rus_payments.po\n"
+"X-Crowdin-File-ID: 4206\n"
+"PO-Revision-Date: 2021-01-26 12:32\n"
 
 msgctxt "Addons::name::rus_payments"
 msgid "Russian localization — Russian payments"
 msgstr " Российские способы оплаты"
 
 msgctxt "Addons::description::rus_payments"
-msgid "Payments: Assist, Yandex.Checkpoint, Webmoney, Sberbank, PayAnyWay, PayMaster, Platidoma, RBK, Robokassa, Vsevcredit, Avangard, Payler"
-msgstr "Способы оплаты: Assist, Яндекс.Касса, Webmoney, Сбербанк, PayAnyWay, PayMaster, ПлатиДома, РБК, Robokassa, ВсеВкредит, Авангард, Payler"
+msgid "Payments: Assist, Yandex.Checkpoint, Webmoney, Sberbank, PayAnyWay, PayMaster, RBK, Robokassa, Vkredit24.ru, Avangard, Payler"
+msgstr "Способы оплаты: Assist, Яндекс.Касса, Webmoney, Сбербанк, PayAnyWay, PayMaster, РБК, Robokassa, Vkredit24.ru, Авангард, Payler"
 
 msgctxt "Languages::russian_payments"
 msgid "Russian payments"
@@ -69,8 +69,8 @@ msgid "Bank cards"
 msgstr "Банковская карта"
 
 msgctxt "Languages::pay_rbkmoney"
-msgid "RBK Money account"
-msgstr "Оплата с кошелька RBK Money"
+msgid "RBK.money account"
+msgstr "Оплата с кошелька RBK.money"
 
 msgctxt "Languages::pay_exchangers"
 msgid "Electronic payment systems"
@@ -81,8 +81,8 @@ msgid "Payment terminals"
 msgstr "Платежные терминалы"
 
 msgctxt "Languages::pay_prepaidcard"
-msgid "RBK Money prepaid card"
-msgstr "Предоплаченная карта RBK Money"
+msgid "RBK.money prepaid card"
+msgstr "Предоплаченная карта RBK.money"
 
 msgctxt "Languages::pay_postrus"
 msgid "Russian Post"
@@ -227,14 +227,6 @@ msgstr "<p>Для корректной работы платежного мод�
 msgctxt "Languages::payment_url"
 msgid "Payment URL"
 msgstr "URL провайдера"
-
-msgctxt "Languages::text_pd_notice"
-msgid "Use the following URLs in the Plati Doma account settings<br />-&nbsp;<u>successful payment</u>: <b>[return_url]</b><br />-&nbsp;<u>cancel payment</u>: <b>[return_url]</b><br />-&nbsp;<u>decline payment</u>: <b>[cancel_url]</b>"
-msgstr "Используйте следующие URL в настройках аккаунта Плати Дома<br />-&nbsp;<u>успешный платеж</u>: <b>[return_url]</b><br />-&nbsp;<u>отмена платежа</u>: <b>[return_url]</b><br />-&nbsp;<u>отказ от платежа</u>: <b>[cancel_url]</b>"
-
-msgctxt "Languages::pay_at_home"
-msgid "Plati Doma"
-msgstr "Плати Дома"
 
 msgctxt "Languages::pd_shop_id"
 msgid "Store code"
@@ -413,8 +405,8 @@ msgid "Select payment method"
 msgstr "Выберите способ оплаты"
 
 msgctxt "Languages::rbk"
-msgid "RBK Money"
-msgstr "RBK Money"
+msgid "RBK.money"
+msgstr "RBK.money"
 
 msgctxt "Languages::rbk_login"
 msgid "Login"
@@ -437,12 +429,12 @@ msgid "Order payment"
 msgstr "Оплата заказа"
 
 msgctxt "Languages::rbk_language"
-msgid "RBK Money website payment interface language"
-msgstr "Язык интерфейса оплаты на сайте RBK Money"
+msgid "RBK.money website payment interface language"
+msgstr "Язык интерфейса оплаты на сайте RBK.money"
 
 msgctxt "Languages::text_rbk_notice"
-msgid "Use the following URLs in the RBK Money account settings<br />-&nbsp;<u>payment notification</u>: <b>[result_url]</b>"
-msgstr "Используйте следующие URL в настройках аккаунта RBK Money<br />-&nbsp;<u>оповещение о платеже</u>: <b>[result_url]</b>"
+msgid "Use the following URLs in the RBK.money account settings<br />-&nbsp;<u>payment notification</u>: <b>[result_url]</b>"
+msgstr "Используйте следующие URL в настройках аккаунта RBK.money<br />-&nbsp;<u>оповещение о платеже</u>: <b>[result_url]</b>"
 
 msgctxt "Languages::rbk_status3"
 msgid "Transaction accepted for processing"
@@ -455,10 +447,6 @@ msgstr "Операция исполнена"
 msgctxt "Languages::payments.robokassa.get_currencies"
 msgid "Get currencies"
 msgstr "Получить валюты"
-
-msgctxt "Languages::text_robokassa_notice"
-msgid "Please add these URL fields in your Robokassa configuration:<br /><br/><b>Result URL:</b><br/>[r_url]<br/><br/><b>Success URL:</b><br/>[p_url]<br/><br/><b>Fail URL:</b><br/>[f_url]"
-msgstr "Пожалуйста, добавьте следующие URL на странице конфигурации Robokassa:<br/><br/><b>Result URL:</b><br/>[r_url]<br/><br/><b>Success URL:</b><br/>[p_url]<br/><br/><b>Fail URL:</b><br/>[f_url]"
 
 msgctxt "Languages::password1"
 msgid "Password1"
@@ -625,8 +613,8 @@ msgid "Secret word"
 msgstr "Секретное слово"
 
 msgctxt "Languages::vsevkredit_url_notice"
-msgid "Please set the following URLs in the Vsevkredit admin area:<br /><b>URL for API:</b> [api_url]<br /><b>Return URL:</b> [return_url]"
-msgstr "Пожалуйста выставьте настройки в администраторской зоне Всевкредит следующим образом:<br /><b>URL для API взаимодействия:</b> [api_url]<br /><b>URL перенаправления в случае успешного завершения заказа:</b> [return_url]"
+msgid "Please set the following URLs in the Vkredit24 admin area:<br /><b>URL for API:</b> [api_url]<br /><b>Return URL:</b> [return_url]"
+msgstr "Пожалуйста выставьте настройки в администраторской зоне Вкредит24 следующим образом:<br /><b>URL для API взаимодействия:</b> [api_url]<br /><b>URL перенаправления в случае успешного завершения заказа:</b> [return_url]"
 
 msgctxt "Languages::text_webmoney_notice"
 msgid "In order to set up WebMoney payment method, you should set up Web Merchant Interface for processing payments in the following way:<br /><br />1. Check the \"Send parameters in the pre-request\" checkbox;<br />2. Check the \"Allow overriding URL from Payment Request Form\" checkbox;<br />3. Choose the required value in the \"Signature algorithm\" field and in payment settings.<br />"
@@ -714,8 +702,8 @@ msgid "Too mach SMS without payments found for specified phone"
 msgstr "Обнаружено слишком много отправленных СМС без совершения платежей для данного телефона"
 
 msgctxt "Languages::text_paymaster_notice"
-msgid "On the site Paymaster it is necessary to set in the site details in the `Callbacks`section: Payment notification - POST request, Success redirect - GET request, Failure redirect - GET request, Invoice confirmation - GET request and select the `Allow custom URLs` check box. Also it is necessary to enter the secret key in the `Technical parameters` section with selecting the MD5 signature type. This key should also be entered into the `Secret key` field in the store."
-msgstr "На сайте `Paymaster` необходимо установить в деталях сайта в разделе `Обратные вызовы`: Payment notification - POST запрос, Success redirect - GET запрос, Failure redirect - GET запрос, Invoice confirmation - GET запрос и установить чекбокс `Разрешена замена URL`. Также необходимо ввести секретный ключ в разделе `Технические параметры`, выбрав тип шифрования MD5. Этот ключ необходимо ввести также в магазине в поле `Секретный ключ`."
+msgid "On the site PayMaster it is necessary to set in the site details in the `Callbacks`section: Payment notification - POST request, Success redirect - GET request, Failure redirect - GET request, Invoice confirmation - GET request and select the `Allow custom URLs` check box. Also it is necessary to enter the secret key in the `Technical parameters` section with selecting the MD5 signature type. This key should also be entered into the `Secret key` field in the store."
+msgstr "На сайте `PayMaster` необходимо установить в деталях сайта в разделе `Обратные вызовы`: Payment notification - POST запрос, Success redirect - GET запрос, Failure redirect - GET запрос, Invoice confirmation - GET запрос и установить чекбокс `Разрешена замена URL`. Также необходимо ввести секретный ключ в разделе `Технические параметры`, выбрав тип шифрования MD5. Этот ключ необходимо ввести также в магазине в поле `Секретный ключ`."
 
 msgctxt "Languages::paymaster_key"
 msgid "Secret key"
@@ -1234,12 +1222,12 @@ msgid "This type of payment cannot be made at this time. To be able to make thes
 msgstr "В настоящее время данный тип платежа не может быть проведен. Для получения возможности проведения таких платежей необходимо перейти на <a href=\"[ext_action_uri]\" target=\"_blank\">страницу</a> и следовать инструкции."
 
 msgctxt "Languages::text_yandex_money_redirect_url"
-msgid "Please use the following Redirect URL while adjusting the API Yandex.Money application: <br/> [redirect_url]"
-msgstr "Пожалуйста, используйте следующий Redirect URL при настройке приложения API Яндекс.Денег: <br/><br/> <em>[redirect_url]</em>"
+msgid "Please use the following Redirect URL while adjusting the API YooMoney application: <br/> [redirect_url]"
+msgstr "Пожалуйста, используйте следующий Redirect URL при настройке приложения API ЮMoney: <br/><br/> <em>[redirect_url]</em>"
 
 msgctxt "Languages::text_yandex_money_note"
-msgid "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the Yandex.Money service can freeze your wallet."
-msgstr "<b>Обратите внимание</b>, что этот метод оплаты может использоваться только для переводов между физ. лицами. В противном случае сервис Яндекс.Деньги может заблокировать ваш кошелек."
+msgid "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the YooMoney service can freeze your wallet."
+msgstr "<b>Обратите внимание</b>, что этот метод оплаты может использоваться только для переводов между физ. лицами. В противном случае сервис ЮMoney может заблокировать ваш кошелек."
 
 msgctxt "Languages::text_avangard_redirect_url"
 msgid "Please use the following Redirect URL while adjusting the API Avangard application: <br/> [redirect_url]"
@@ -1594,8 +1582,8 @@ msgid "In CS-Cart 4.4.1, we've removed the Qiwi payment method, which worked via
 msgstr "В CS-Cart 4.4.1 мы удалили способ оплаты Qiwi, который работает через протокол SOAP."
 
 msgctxt "Languages::rus_payments.soap_qiwi_removed_text"
-msgid "If you used the Qiwi payment method based on the SOAP protocol, install and set up the 'Qiwi REST Payment' add-on. The reason is that in CS-Cart 4.4.1, we've removed the Qiwi payment method based on the SOAP protocol. Instead, use the Qiwi payment method based on the REST protocol that CS-Cart already has for a long time now. Thanks."
-msgstr "Если вы использовали способ оплаты Qiwi, то вам необходимо установить и настроить модуль 'Qiwi REST платежная система'. Причина — в CS-Cart 4.4.1 удален этот способ оплаты Qiwi. На смену ему пришёл модуль Qiwi REST, поэтому рекомендуем перейти на него."
+msgid "If you used the Qiwi payment method based on the SOAP protocol, install and set up the 'Qiwi Wallet Payment' add-on. The reason is that in CS-Cart 4.4.1, we've removed the Qiwi payment method based on the SOAP protocol. Instead, use the Qiwi payment method based on the REST protocol that CS-Cart already has for a long time now. Thanks."
+msgstr "Если вы использовали способ оплаты Qiwi, то вам необходимо установить и настроить модуль 'Оплата через QIWI Кошелёк'. Причина — в CS-Cart 4.4.1 удален этот способ оплаты Qiwi. На смену ему пришёл модуль Qiwi REST, поэтому рекомендуем перейти на него."
 
 msgctxt "Languages::addons.rus_payments.yandex_money_not_order_yandex"
 msgid "Sorry, the refund couldn't be made because the ID that links the order to Yandex transaction wasn't found."
@@ -1672,4 +1660,36 @@ msgstr "Для генерации чеков вам также потребуе�
 msgctxt "Languages::yandex_total"
 msgid "Total"
 msgstr "Итого"
+
+msgctxt "Languages::rus_payments.print_invoice.sbrf"
+msgid "Print invoice with QR code"
+msgstr "Распечатать счёт с QR-кодом"
+
+msgctxt "Languages::rus_payments.print_invoice.account"
+msgid "Print invoice"
+msgstr "Распечатать счет"
+
+msgctxt "Languages::rus_payments.encoding_algorithm"
+msgid "Encoding algorithm"
+msgstr "Алгоритм шифрования"
+
+msgctxt "Languages::rus_payments.robokassa.final_status"
+msgid "Forming full payment receipt"
+msgstr "Формирование итогового чека"
+
+msgctxt "Languages::rus_payments.robokassa.prepayment_receipt_created"
+msgid "Prepayment receipt created"
+msgstr "Чек предоплаты создан"
+
+msgctxt "Languages::rus_payments.robokassa.payment_receipt_created"
+msgid "Full payment receipt created"
+msgstr "Итоговый чек создан"
+
+msgctxt "Languages::rus_payments.robokassa.notification_url_method"
+msgid "Method of sending data to [url_type]"
+msgstr "Способ отправки данных в [url_type]"
+
+msgctxt "Languages::rus_payments.robokassa.technical_preferences"
+msgid "Technical preferences for your Robokassa e-shop"
+msgstr "Технические настройки для вашего магазина в Робокассе"
 

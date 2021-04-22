@@ -12,25 +12,28 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use \Tygh\Registry;
+defined('BOOTSTRAP') or die('Access denied');
 
-$schema['top']['addons']['items']['commerceml'] = array(
-    'position' => 310,
+$schema['top']['administration']['items']['commerceml'] = [
+    'attrs' => [
+        'class' => 'is-addon'
+    ],
+    'position' => 1410,
     'href' => 'commerceml.currencies',
-    'subitems' => array(
-        'commerceml_currencies' => array(
+    'subitems' => [
+        'commerceml_currencies' => [
             'href' => 'commerceml.currencies',
             'position' => 100
-        ),
-        'commerceml_prices' => array(
+        ],
+        'commerceml_prices' => [
             'href' => 'commerceml.offers',
             'position' => 200
-        ),
-        'commerceml_taxes' => array(
+        ],
+        'commerceml_taxes' => [
             'href' => 'commerceml.taxes',
             'position' => 300
-        )
-    ),
-);
+        ],
+    ],
+];
 
 return $schema;

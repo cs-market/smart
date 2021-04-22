@@ -19,7 +19,7 @@ function fn_rus_sberbank_install()
     fn_rus_sberbank_uninstall();
 
     $_data = array(
-        'processor' => 'Sberbank Online',
+        'processor' => 'Сбербанк Онлайн',
         'processor_script' => 'sberbank.php',
         'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
         'admin_template' => 'sberbank.tpl',
@@ -51,3 +51,20 @@ function fn_rus_sberbank_normalize_phone($phone)
     return $phone_normalize;
 }
 
+/**
+ * The "get_payment_processors_post" hook handler.
+ *
+ * Actions performed:
+ *     - Adds specific 'russian' attribute to some payment processors for categorization.
+ *
+ * @see \fn_get_payment_processors()
+ */
+function fn_rus_sberbank_get_payment_processors_post($lang_code, &$processors)
+{
+    foreach ($processors as &$processor) {
+        if ($processor['addon'] === 'rus_sberbank') {
+            $processor['russian'] = true;
+        }
+    }
+    unset($processor);
+}

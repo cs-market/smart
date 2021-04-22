@@ -4,7 +4,7 @@
     <form name="connect-social" action="{""|fn_url}" method="post">
         <input type="hidden" name="return_url" value="{$smarty.request.return_url|default:$config.current_url}" />
         <input type="hidden" name="redirect_url" value="{$redirect_url|default:$config.current_url}" />
-        <input type="hidden" name="provider" value="{$provider}" />
+        <input type="hidden" name="provider_id" value="{$provider_id}" />
 
         <div class="ty-control-group">
             <label for="login_{$id}" class="ty-login__filed-label ty-control-group__label cm-required cm-trim cm-email">{__("email")}</label>

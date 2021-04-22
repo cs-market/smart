@@ -1,139 +1,155 @@
-
-{if $show_header == true}
-    {include file="common/subheader.tpl" title=__("select_shipping_method")}
-{/if}
-
-
-{if !$no_form}
-    <form {if $use_ajax}class="cm-ajax"{/if} action="{""|fn_url}" method="post" name="shippings_form">
-        <input type="hidden" name="redirect_mode" value="checkout" />
-        {if $use_ajax}
-            <input type="hidden" name="result_ids" value="checkout_totals,checkout_steps" />
-        {/if}
-{/if}
-
+<label for="shipping_rates_list" class="cm-required cm-multiple-radios cm-shipping-available-label hidden"></label>
+<div class="litecheckout__group litecheckout__shippings"
+     data-ca-lite-checkout-overlay-message="{__("lite_checkout.click_here_to_update_shipping")}"
+     data-ca-lite-checkout-overlay-class="litecheckout__overlay--active"
+     data-ca-lite-checkout-element="shipping-methods"
+     id="shipping_rates_list">
 {hook name="checkout:shipping_rates"}
 
-    <div id="shipping_rates_list">
+    <input type="hidden"
+           name="additional_result_ids[]"
+           value="litecheckout_final_section,litecheckout_step_payment,checkout*"
+    />
 
-        {foreach from=$product_groups key="group_key" item=group name="spg"}
-            {* Group name *}
-            {if !"ULTIMATE"|fn_allowed_for || $product_groups|count > 1}
-                <span class="ty-shipping-options__vendor-name">{$group.name}</span>
-            {/if}
+    {foreach $product_groups as $group_key => $group}
+        {if $product_groups|count > 1}
+            <div class="litecheckout__group">
+                <div class="litecheckout__item">
+                    <h2 class="litecheckout__step-title">
+                        {__("lite_checkout.shipping_method_for", ["[group_name]" => $group.name])}
+                    </h2>
+                </div>
+            </div>
+        {/if}
 
-            {* Products list *}
-            {if !"ULTIMATE"|fn_allowed_for || $product_groups|count > 1}
-                <ul class="ty-shipping-options__products">
-                    {foreach from=$group.products item="product"}
-                        {if !(($product.is_edp == 'Y' && $product.edp_shipping != 'Y') || $product.free_shipping == 'Y')}
-                            <li class="ty-shipping-options__products-item">
-                                {if $product.product}
-                                    {$product.product nofilter}
-                                {else}
-                                    {$product.product_id|fn_get_product_name}
-                                {/if}
-                            </li>
-                        {/if}
-                    {/foreach}
-                </ul>
-            {/if}
+        {$group.shipping_disabled = false}
 
+        {hook name="checkout:shipping_methods_list"}
+        <div class="litecheckout__group">
             {* Shippings list *}
             {if $group.shippings && !$group.all_edp_free_shipping && !$group.shipping_no_required}
 
-                {foreach from=$group.shippings item="shipping"}
-
-                    {if $cart.chosen_shipping.$group_key == $shipping.shipping_id}
-                        {assign var="checked" value="checked=\"checked\""}
-                        {assign var="strong_begin" value="<strong>"}
-                        {assign var="strong_end" value="</strong>"}
+                {foreach $all_shippings.$group_key as $shipping_id => $shipping}
+                    {if $group.shippings.$shipping_id}
+                        {$shipping = $group.shippings.$shipping_id}
                     {else}
-                        {assign var="checked" value=""}
-                        {assign var="strong_begin" value=""}
-                        {assign var="strong_end" value=""}
-                    {/if}
-
-                    {if $shipping.delivery_time || $shipping.service_delivery_time}
-                        {assign var="delivery_time" value="(`$shipping.service_delivery_time|default:$shipping.delivery_time`)"}
-                    {else}
-                        {assign var="delivery_time" value=""}
-                    {/if}
-
-                    {if $shipping.rate}
-                        {capture assign="rate"}{include file="common/price.tpl" value=$shipping.rate}{/capture}
-                        {if $shipping.inc_tax}
-                            {assign var="rate" value="`$rate` ("}
-                            {if $shipping.taxed_price && $shipping.taxed_price != $shipping.rate}
-                                {capture assign="tax"}{include file="common/price.tpl" value=$shipping.taxed_price class="ty-nowrap"}{/capture}
-                                {assign var="rate" value="`$rate``$tax` "}
-                            {/if}
-                            {assign var="inc_tax_lang" value=__('inc_tax')}
-                            {assign var="rate" value="`$rate``$inc_tax_lang`)"}
+                        {if $show_unavailable_shippings}
+                            {$shipping.rate_disabled = true}
+                        {else}
+                            {continue}
                         {/if}
-                    {elseif fn_is_lang_var_exists("free_shipping")}
-                        {assign var="rate" value=__("free_shipping") }
-                    {else}
-                        {assign var="rate" value="" }
                     {/if}
 
-                    {hook name="checkout:shipping_method"}
-                        <div class="ty-shipping-options__method">
-                            <input type="radio" class="ty-valign ty-shipping-options__checkbox" id="sh_{$group_key}_{$shipping.shipping_id}" name="shipping_ids[{$group_key}]" value="{$shipping.shipping_id}" onclick="fn_calculate_total_shipping_cost();" {$checked} />
-                            <div class="ty-shipping-options__group">
-                                <label for="sh_{$group_key}_{$shipping.shipping_id}" class="ty-valign ty-shipping-options__title">
-                                    <bdi>
-                                        {if $shipping.image}
-                                            <div class="ty-shipping-options__image">
-                                                {include file="common/image.tpl" obj_id=$shipping_id images=$shipping.image class="ty-shipping-options__image"}
-                                            </div>
-                                        {/if}
+                    {if $shipping.rate_disabled && $cart.chosen_shipping.$group_key == $shipping.shipping_id}
+                        {$group.shipping_disabled = true}
+                    {/if}
 
-                                        {$shipping.shipping} {$delivery_time}
-                                        {if $rate} {$rate nofilter}{/if}
-                                   </bdi>
-                                </label>
-                            </div>
-                        </div>
-                        {if $shipping.description}
-                            <div class="ty-checkout__shipping-tips">
-                                <p>{$shipping.description nofilter}</p>
-                            </div>
+                    {hook name="checkout:shipping_rate"}
+                        {$delivery_time = ""}
+                        {if $shipping.delivery_time || $shipping.service_delivery_time}
+                            {$delivery_time = "(`$shipping.service_delivery_time|default:$shipping.delivery_time`)"}
+                        {/if}
+
+                        {if $shipping.rate}
+                            {capture assign="rate"}{include file="common/price.tpl" value=$shipping.rate}{/capture}
+                            {if $shipping.inc_tax}
+                                {$rate = "`$rate` ("}
+                                {if $shipping.taxed_price && $shipping.taxed_price != $shipping.rate}
+                                    {capture assign="tax"}{include file="common/price.tpl" value=$shipping.taxed_price class="ty-nowrap"}{/capture}
+                                    {$rate = "`$rate``$tax` "}
+                                {/if}
+                                {$inc_tax_lang = __('inc_tax')}
+                                {$rate = "`$rate``$inc_tax_lang`)"}
+                            {/if}
+                        {elseif $shipping.rate_disabled}
+                            {$rate = __("na")}
+                        {elseif fn_is_lang_var_exists("free")}
+                            {$rate = __("free")}
+                        {else}
+                            {$rate = ""}
                         {/if}
                     {/hook}
+
+                    <div class="litecheckout__shipping-method litecheckout__field litecheckout__field--xsmall">
+                        <input
+                            type="radio"
+                            class="litecheckout__shipping-method__radio hidden"
+                            id="sh_{$group_key}_{$shipping.shipping_id}"
+                            name="shipping_ids[{$group_key}]"
+                            value="{$shipping.shipping_id}"
+                            onclick="fn_calculate_total_shipping_cost(); $.ceLiteCheckout('toggleAddress', {if $shipping.is_address_required == "Y"}true{else}false{/if});"
+                            data-ca-lite-checkout-element="shipping-method"
+                            data-ca-lite-checkout-is-address-required="{if $shipping.is_address_required == "Y"}true{else}false{/if}"
+                            {if $cart.chosen_shipping.$group_key == $shipping.shipping_id}checked{/if}
+                            data-ca-lite-checkout-shipping-method-disabled="{if $shipping.rate_disabled}true{else}false{/if}"
+                        />
+
+                        <label
+                            for="sh_{$group_key}_{$shipping.shipping_id}"
+                            class="litecheckout__shipping-method__wrapper
+                                js-litecheckout-activate
+                                {if $shipping.rate_disabled}litecheckout__shipping-method__wrapper--disabled{/if}
+                                {if $shipping_rates_changed}litecheckout__shipping-method__wrapper--highlight{/if}"
+                            data-ca-activate="sd_{$group_key}_{$shipping.shipping_id}"
+                        >
+                            {if $shipping.image}
+                                <div class="litecheckout__shipping-method__logo">
+                                    {include file="common/image.tpl" obj_id=$shipping_id images=$shipping.image class="shipping-method__logo-image litecheckout__shipping-method__logo-image"}
+                                </div>
+                            {/if}
+                            <p class="litecheckout__shipping-method__title">
+                                {$shipping.shipping}{if $rate && !$shipping.rate_disabled} — {$rate nofilter}{/if}
+                            </p>
+                            {if $shipping.rate_disabled}
+                                <p class="litecheckout__shipping-method__status litecheckout__shipping-method__status--error">{__("lite_checkout.not_available")}</p>
+                            {else}
+                                <p class="litecheckout__shipping-method__delivery-time">{$delivery_time}</p>
+                            {/if}
+                        </label>
+                    </div>
                 {/foreach}
-
-                {if $smarty.foreach.spg.last && !$group.all_edp_free_shipping && !$group.shipping_no_required}
-                    <p class="ty-shipping-options__total">{__("total")}:&nbsp;{include file="common/price.tpl" value=$cart.display_shipping_cost class="ty-price"}</p>
-                {/if}
-
             {else}
-                {if $group.all_free_shipping}
-                     <p>{__("free_shipping")}</p>
-                {elseif $group.all_edp_free_shipping || $group.shipping_no_required }
-                    <p>{__("no_shipping_required")}</p>
-                {else}
-                    <p class="ty-error-text">
+                <div class="litecheckout__item litecheckout__item--full">
+                    {if $group.all_edp_free_shipping || $group.shipping_no_required}
+                        <p class="litecheckout__shipping-method__text ty-error-text">
+                            {__("no_shipping_required")}
+                        </p>
+                    {elseif $group.all_free_shipping || $group.free_shipping}
+                        <p class="litecheckout__shipping-method__text ty-error-text">
+                            {__("free_shipping")}
+                        </p>
+                    {else}
+                        <p class="litecheckout__shipping-method__text ty-error-text">
+                            {__("text_no_shipping_methods")}
+                        </p>
+                    {/if}
+                </div>
+            {/if}
+            {if $cart.all_shippings_disabled || $group.shipping_disabled}
+                <div class="litecheckout__item litecheckout__item--full">
+                    <p class="litecheckout__shipping-method__text ty-error-text">
                         {__("text_no_shipping_methods")}
                     </p>
-                {/if}
+                </div>
             {/if}
+        </div>
+        {/hook}
 
-        {foreachelse}
-            <p>
-                {if !$cart.shipping_required}
-                    {__("no_shipping_required")}
-                {elseif $cart.free_shipping}
-                    {__("free_shipping")}
-                {/if}
-            </p>
-        {/foreach}
-
-    <!--shipping_rates_list--></div>
-
+        <div class="litecheckout__group">
+            {foreach $group.shippings as $shipping}
+                {hook name="checkout:shipping_method"}
+                {/hook}
+            {/foreach}
+            <div class="litecheckout__item">
+                {foreach $group.shippings as $shipping}
+                    {if $cart.chosen_shipping.$group_key == $shipping.shipping_id}
+                        <div class="litecheckout__shipping-method__description">
+                            {$shipping.description nofilter}
+                        </div>
+                    {/if}
+                {/foreach}
+            </div>
+        </div>
+    {/foreach}
 {/hook}
-
-{if !$no_form}
-        <div class="cm-noscript buttons-container ty-center">{include file="buttons/button.tpl" but_name="dispatch[checkout.update_shipping]" but_text=__("select")}</div>
-    </form>
-{/if}
+<!--shipping_rates_list--></div>

@@ -15,7 +15,7 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_define('CRON_IMPORT_KEY_LENGTH', 16);
-fn_define('SYMBOL_RUBL', '<span class="ty-rub">Р</span>');
+fn_define('SYMBOL_RUBL', '₽');
 fn_define('SYMBOL_RUBL_TEXT', ' Руб.');
 fn_define('CURRENCY_RUB', 'RUB');
 

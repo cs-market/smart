@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_plans.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.12.2/addons/vendor_plans.po\n"
+"X-Crowdin-File-ID: 4156\n"
+"PO-Revision-Date: 2021-02-01 09:12\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
@@ -25,12 +25,28 @@ msgid "Commissions"
 msgstr "Комиссии"
 
 msgctxt "SettingsOptions::vendor_plans::include_shipping"
-msgid "Include shipping cost in vendors commission"
-msgstr "Включать стоимость доставки в комиссию продавца"
+msgid "Include shipping cost in vendor commissions"
+msgstr "Включить стоимость доставки в комиссию продавца"
+
+msgctxt "SettingsOptions::vendor_plans::include_taxes_in_commission"
+msgid "Include taxes in vendor commissions"
+msgstr "Включить налоги в комиссию продавца"
+
+msgctxt "SettingsTooltips::vendor_plans::include_taxes_in_commission"
+msgid "Calculate vendor commissions without subtracting taxes from the order total beforehand."
+msgstr "Рассчитывать комиссии продавцов без предварительного вычета налогов из итоговых сумм заказов."
 
 msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
 msgstr "Разрешить продавцам изменять выбранный план"
+
+msgctxt "SettingsOptions::vendor_plans::collect_taxes_from_vendors"
+msgid "Collect taxes from vendors"
+msgstr "Собирать налоги с продавцов"
+
+msgctxt "SettingsTooltips::vendor_plans::collect_taxes_from_vendors"
+msgid "Send collected taxes to the account of the marketplace."
+msgstr "Отправлять собранные налоги на счёт маркетплейса."
 
 msgctxt "Languages::vendor_plans.vendor_plans"
 msgid "Vendor plans"
@@ -47,6 +63,10 @@ msgstr "Отображает информацию о выбранном тари
 msgctxt "Languages::vendor_plans.plan"
 msgid "Plan"
 msgstr "Тарифный план"
+
+msgctxt "Languages::vendor_plans.plan_short"
+msgid "Plan"
+msgstr "План"
 
 msgctxt "Languages::vendor_plans.commission"
 msgid "Commission"
@@ -106,7 +126,11 @@ msgstr "Не удаётся выключить план, так как он ис
 
 msgctxt "Languages::vendor_plans.transaction_fee"
 msgid "Transaction fee"
-msgstr "Плата за транзацкию"
+msgstr "Плата за транзакцию"
+
+msgctxt "Languages::vendor_plans.fixed_transaction_fee"
+msgid "Transaction fee (abs)"
+msgstr "Плата за транзакцию (фикс.)"
 
 msgctxt "Languages::vendor_plans.revenue"
 msgid "Revenue"
@@ -170,7 +194,7 @@ msgstr "Название тарифного плана"
 
 msgctxt "Languages::vendor_plans.products_limit_value"
 msgid "<strong>[products]</strong> products"
-msgstr "<strong>[products]</strong> товары"
+msgstr "Товары: <strong>[products]</strong>"
 
 msgctxt "Languages::vendor_plans.unlimited"
 msgid "Unlimited"
@@ -182,15 +206,15 @@ msgstr "<strong>Неограниченное количество</strong> то�
 
 msgctxt "Languages::vendor_plans.revenue_up_to_value"
 msgid "Revenue up to <strong>[revenue]</strong>"
-msgstr "Порог выручки <strong>[revenue]</strong>"
+msgstr "Порог выручки: <strong>[revenue]</strong>"
 
 msgctxt "Languages::vendor_plans.revenue_up_to_unlimited"
 msgid "<strong>Unlimited</strong> revenue"
 msgstr "Выручка <strong>без ограничений</strong>"
 
 msgctxt "Languages::vendor_plans.transaction_fee_value"
-msgid "<strong>[value]</strong> transaction fee"
-msgstr "Плата за транзакцию <strong>[value]</strong>"
+msgid "Transaction fee: <strong>[value]</strong>"
+msgstr "Плата за транзакцию: <strong>[value]</strong>"
 
 msgctxt "Languages::vendor_plans.vendor_commission"
 msgid "Vendor commission"
@@ -265,16 +289,24 @@ msgid "Vendor plans: revenue notification"
 msgstr "Тарифные планы для продавцов: уведомление о выручке"
 
 msgctxt "Languages::privileges.view_vendor_plans"
-msgid "View vendor plans"
-msgstr "Просмотр тарифных планов"
+msgid "Can view"
+msgstr "Просмотр"
 
 msgctxt "Languages::privileges.manage_vendor_plans"
-msgid "Manage vendor plans"
-msgstr "Управление тарифными планами"
+msgid "Can edit"
+msgstr "Редактирование"
+
+msgctxt "Languages::privilege_groups.vendor_plans"
+msgid "Vendor plans"
+msgstr "Тарифные планы для продавцов"
 
 msgctxt "Languages::addons.vendor_plans.commission_description_absolute"
 msgid "[amount] out of [sum]"
 msgstr "[amount] из [sum]"
+
+msgctxt "Languages::vendor_plans.out_of_amount"
+msgid "out of [amount]"
+msgstr "из [amount]"
 
 msgctxt "Languages::addons.vendor_plans.commission_description_percent"
 msgid "[amount]% of [sum]"
@@ -295,4 +327,52 @@ msgstr "Из модуля \"Тарифные планы для продавцо�
 msgctxt "Languages::vendor_plans.upgrade_notification_text"
 msgid "<p>Previously, the <b>Vendor Plans</b> add-on had a setting called <b>Take payment surcharge from vendors</b>. It removed payment surcharge from order total, so that customers wouldn't have to pay it. Instead, the payment surcharge was deducted from the order total in favor of the marketplace. This setting has been removed: if you'd like to take money from vendors per order, please specify commissions for the corresponding vendor plans.</p>"
 msgstr "<p>Раньше в модуле <b>Тарифные планы для продавцов</b> была настройка <b>Взимать надбавку за проведение платежа с продавца</b>. Она удаляла надбавку за проведение платежа из итога заказа, чтобы покупатель её не платил. Вместо этого надбавка вычиталась из стоимости заказа в пользу магазина. Эта настройка была убрана: если вы хотите получить деньги с каждого заказа продавца, задайте комиссии для соответствующих тарифных планов.</p>"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.title"
+msgid "Storefronts available in the vendor plan got changed"
+msgstr "Изменились витрины, доступные для тарифного плана"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.general_message"
+msgid "What should we do about <a href=\"[search_url]\" target=\"_blank\">[n] vendor </a> who is using this plan now?|What should we do about <a href=\"[search_url]\" target=\"_blank\">[n] vendors </a> who are using this plan now?"
+msgstr "Как поступить с <a href=\"[search_url]\" target=\"_blank\">[n] продавцом</a>, который сейчас использует этот план?|Как поступить с <a href=\"[search_url]\" target=\"_blank\">[n] продавцами</a>, которые сейчас используют этот план?"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.add_storefronts_message"
+msgid "Add the vendor to the storefronts that got added to the plan|Add the vendors to the storefronts that got added to the plan"
+msgstr "Добавить продавца на витрины, которые добавились в план|Добавить продавцов на витрины, которые добавились в план"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_plan.remove_storefronts_message"
+msgid "Remove the vendor from the storefronts that got removed from this plan|Remove the vendors from the storefronts that got removed from this plan"
+msgstr "Убрать продавца с витрин, которые были убраны у плана|Убрать продавцов с витрин, которые были убраны у плана"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.title"
+msgid "The vendor got moved to another plan"
+msgstr "Продавец переведён на другой план"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.general_message"
+msgid "What should we do about the storefronts that are available to this vendor?"
+msgstr "Как поступить с витринами, доступными этому продавцу?"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.add_storefronts_message"
+msgid "Add the vendor to the storefronts available in the new vendor plan"
+msgstr "Добавить продавца на витрины, доступные в новом плане"
+
+msgctxt "Languages::vendor_plans.storefronts_update_for_vendor.remove_storefronts_message"
+msgid "Remove the vendor from the storefronts available in his previous plan"
+msgstr "Убрать продавца с витрин, которые были доступны в его предыдущем плане"
+
+msgctxt "Languages::vendor_plans.advanced_vendor_plan_creation"
+msgid "Advanced vendor plan creation"
+msgstr "Расширенное создание плана"
+
+msgctxt "Languages::vendor_plans.text_vendor_plan_created"
+msgid "A new vendor plan \"[plan_name]\" has been created. You can now <a href=\"[link]\">set restrictions for vendors using this plan</a>."
+msgstr "Создан новый тарифный план \"[plan_name]\". Теперь вы можете <a href=\"[link]\">задать ограничения для продавцов с этим планом</a>."
+
+msgctxt "Languages::vendor_plans.commission_fee"
+msgid "[commission]% fee"
+msgstr "Комиссия [commission]%"
+
+msgctxt "Languages::vendor_plans.default_vendor_plan"
+msgid "Default plan"
+msgstr "План по умолчанию"
 

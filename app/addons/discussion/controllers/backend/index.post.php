@@ -49,25 +49,6 @@ if (Registry::get('runtime.company_id') && fn_allowed_for('MULTIVENDOR')) {
     return;
 }
 
-$latest_posts = db_get_array(
-    "SELECT a.post_id, a.ip_address, a.status, a.timestamp, b.object_id, b.object_type as object_type, b.type as type, a.name, c.message, d.rating_value "
-    . "FROM ?:discussion_posts as a INNER JOIN ?:discussion as b ON a.thread_id = b.thread_id ?p "
-    . "LEFT JOIN ?:discussion_messages as c ON a.post_id = c.post_id LEFT JOIN ?:discussion_rating as d ON a.post_id = d.post_id "
-    . "ORDER BY a.timestamp DESC LIMIT 5",
-    fn_get_discussion_company_condition('b.company_id')
-);
-
-if (!empty($latest_posts)) {
-    foreach ($latest_posts as $k => $v) {
-        $latest_posts[$k]['ip_address'] = fn_ip_from_db($v['ip_address']);
-        $latest_posts[$k]['object_data'] = fn_get_discussion_object_data($v['object_id'], $v['object_type'], DESCR_SL);
-        $latest_posts[$k]['rating'] = fn_get_discussion_rating($v['rating_value']);
-    }
-}
-
-Tygh::$app['view']->assign('discussion_objects', fn_get_discussion_objects());
-Tygh::$app['view']->assign('latest_posts', $latest_posts);
-
 if ($mode == 'delete_post' && defined('AJAX_REQUEST')) { // FIXME - bad style
     Tygh::$app['view']->display('addons/discussion/views/index/components/dashboard.tpl');
     exit;

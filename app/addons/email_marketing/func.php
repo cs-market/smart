@@ -365,3 +365,19 @@ function fn_em_get_company_condition()
 
     return $condition;
 }
+
+/**
+ * Updates mailchimp webhooks
+ *
+ * @param string $webhook_id Webhook identifiet
+ * @param string $list_id    List identifier
+ */
+function fn_email_marketing_mailchimp_update_webhook($webhook_id, $list_id)
+{
+    $data = [
+        'webhook_id' => $webhook_id,
+        'list_id'    => $list_id
+    ];
+
+    db_query('INSERT INTO ?:em_mailchimp_webhooks ?e', $data);
+}

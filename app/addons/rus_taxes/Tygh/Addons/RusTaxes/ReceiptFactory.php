@@ -75,12 +75,12 @@ class ReceiptFactory
     /**
      * Creates receipt from order.
      *
-     * @param array     $order                              Order data
-     * @param string    $currency                           Currency code (RUB, USD),
-     *                                                      If currency code different from primary currency code
-     *                                                      then prices will be converted.
-     * @param bool      $allocate_discount_by_unit          Whether to allocate item discount by unit
-     * @param array     $total_discount_item_types_filter   If is set than the discount will be divided between items with these types
+     * @param array  $order                             Order data
+     * @param string $currency                          Currency code (RUB, USD),
+     *                                                  If currency code different from primary currency code then prices will be converted.
+     * @param bool   $allocate_discount_by_unit         Whether to allocate item discount by unit
+     * @param array  $total_discount_item_types_filter  If is set than the discount will be divided between items with these types
+     * @param string $priority_item_type                If total of priority items are more than order discount, discount will be applied only on them
      *
      * @return Receipt|null Returns the receipt instance on success otherwise null
      */
@@ -88,7 +88,8 @@ class ReceiptFactory
         array $order,
         $currency,
         $allocate_discount_by_unit = true,
-        array $total_discount_item_types_filter = array()
+        array $total_discount_item_types_filter = array(),
+        $priority_item_type = Item::TYPE_PRODUCT
     )
     {
         $order = $this->prepareOrder($order);
@@ -205,7 +206,7 @@ class ReceiptFactory
             $discount_value += $diff;
         }
 
-        $receipt->setTotalDiscount($discount_value, $total_discount_item_types_filter);
+        $receipt->setTotalDiscount($discount_value, $total_discount_item_types_filter, $priority_item_type);
 
         if ($allocate_discount_by_unit) {
             $receipt->allocateDiscountByUnit($total_discount_item_types_filter);
@@ -351,7 +352,7 @@ class ReceiptFactory
                     switch ($item_type) {
                         case self::TAX_TYPE_PRODUCT:
                             if (!isset($order['products'][$cart_id])) {
-                                continue;
+                                continue 2;
                             }
 
                             if (!isset($order['products'][$cart_id]['receipt_tax_ids'])) {

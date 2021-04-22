@@ -5,10 +5,12 @@
             {hook name="block_checkout:cart_products"}
                 {if !$cart.products.$key.extra.parent}
                     <li class="ty-order-products__item">
-                        <bdi><a href="{"products.view?product_id=`$product.product_id`"|fn_url}" class="ty-order-products__a">{$product.product nofilter}</a></bdi>
+                        <bdi><a class="litecheckout__order-products-p" href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$product.product nofilter}</a></bdi>
                         {if !$product.exclude_from_calculate}
                             {include file="buttons/button.tpl" but_href="checkout.delete?cart_id=`$key`&redirect_mode=`$runtime.mode`" but_meta="ty-order-products__item-delete delete" but_target_id="cart_status*" but_role="delete" but_name="delete_cart_item"}
                         {/if}
+                        {hook name="products:product_additional_info"}
+                        {/hook}
                         <div class="ty-order-products__price">
                             {$product.amount}&nbsp;x&nbsp;{include file="common/price.tpl" value=$product.display_price}
                         </div>

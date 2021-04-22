@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: id\n"
-"X-Crowdin-File: /release-4.8.2/addons/gift_certificates.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"X-Crowdin-File: /release-4.12.2/addons/gift_certificates.po\n"
+"X-Crowdin-File-ID: 4072\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -188,6 +188,10 @@ msgctxt "Languages::theme_editor.gift_cert"
 msgid "Gift Certificate"
 msgstr "Hadiah sertifikat"
 
+msgctxt "Languages::theme_editor_logo.gift_cert"
+msgid "Gift Certificate"
+msgstr ""
+
 msgctxt "Languages::promo_code_or_certificate"
 msgid "Gift certificate or promo code"
 msgstr "Hadiah sertifikat atau kode promo"
@@ -221,8 +225,12 @@ msgid "Amount should not be higher than [max] and less than [min]"
 msgstr "Jumlah tidak boleh lebih tinggi dari [max] dan kurang dari [min]"
 
 msgctxt "Languages::privileges.manage_gift_certificates"
-msgid "Manage gift certificate system"
-msgstr "Mengelola sistem hadiah sertifikat"
+msgid "Can edit"
+msgstr "Dapat mengedit"
+
+msgctxt "Languages::privilege_groups.gift_certificates"
+msgid "Gift certificates"
+msgstr "Sertifkat hadiah"
 
 msgctxt "Languages::change_gift_certificate_status"
 msgid "Change gift certificate status to"
@@ -278,5 +286,17 @@ msgstr "Tidak dapat menemukan hadiah sertifikat. Tinjauan hanya bekerja dengan d
 
 msgctxt "Languages::gift_certificates.certificate_purchase_form"
 msgid "Gift certificate purchase form"
+msgstr "Formulir pembelian sertifikat hadiah"
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.status_changed.name"
+msgid "Gift certificate status changed to [status]"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
+msgid "Gift certificate updated"
+msgstr ""
+
+msgctxt "Languages::logo_section.gift_cert"
+msgid "Gift certificate logo"
 msgstr ""
 

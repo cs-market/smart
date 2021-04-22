@@ -234,7 +234,7 @@
     <!--header_navbar--></div>
 
     <!--Subnav-->
-    <div class="subnav cm-sticky-scroll" data-ce-top="{$sticky_scroll}" data-ce-padding="{$sticky_padding}" id="header_subnav">
+    <div class="subnav" id="header_subnav">
         <!--quick search-->
         <div class="search pull-right">
             {hook name="index:global_search"}

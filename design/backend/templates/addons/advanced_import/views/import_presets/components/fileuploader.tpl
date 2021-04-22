@@ -22,8 +22,6 @@
 {script src="js/tygh/fileuploader_scripts.js"}
 {script src="js/tygh/node_cloning.js"}
 
-{assign var="id_var_name" value="`$prefix`{$var_name|md5}"}
-
 <div class="fileuploader cm-field-container">
     <input type="hidden" id="{$label_id}" value="" />
 
@@ -41,9 +39,9 @@
             </p>
             <p class="cm-fu-no-file">
                 {if $preset.file}
-                    <a href="{"import_presets.get_file?preset_id=`$preset.preset_id`&company_id=`$preset.company_id`"|fn_url}">
-                        {$preset.file}
-                    </a>
+                        <a href="{"import_presets.get_file?preset_id=`$preset.preset_id`&company_id=`$runtime.company_id`"|fn_url}">
+                            {$preset.file}
+                        </a>
                 {else}
                     {__("text_select_file")}
                 {/if}
@@ -59,20 +57,21 @@
                     <a class="btn"><span data-ca-multi="N">{$upload_file_text|default:__("local")}</span></a>
                     <div class="image-selector">
                         <label for="">
+                            {/strip}
                             <input type="file"
                                    name="file_{$var_name}"
                                    id="local_{$id_var_name}"
-                                   onchange="Tygh.fileuploader.show_loader(this.id);
-                                           Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');"
+                                   onchange="Tygh.fileuploader.show_loader(this.id);Tygh.fileuploader.check_required_field('{$id_var_name}', '{$label_id}');"
                                    class="file"
                                    data-ca-empty-file=""
                                    onclick="Tygh.$(this).removeAttr('data-ca-empty-file');"
-                                   accept=".{$allowed_ext|implode:",."}"
+                                   accept=".{",."|implode:$allowed_ext}"
                             />
+                            {strip}
                         </label>
                     </div>
                 </div>
-                {if !($hide_server || "RESTRICTED_ADMIN"|defined)}
+                {if !$hide_server}
                     <a class="btn" onclick="Tygh.fileuploader.show_loader(this.id);" id="server_{$id_var_name}">
                         {__("server")}
                     </a>
@@ -85,7 +84,7 @@
 
             {if $allowed_ext}
                 <p class="mute micro-note">
-                    {__("text_allowed_to_upload_file_extension", ["[ext]" => $allowed_ext|implode:", "])}
+                    {__("text_allowed_to_upload_file_extension", ["[ext]" => ", "|implode:$allowed_ext])}
                 </p>
             {/if}
 

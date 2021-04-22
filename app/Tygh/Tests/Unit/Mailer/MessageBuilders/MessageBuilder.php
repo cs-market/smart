@@ -6,9 +6,22 @@ namespace Tygh\Tests\Unit\Mailer\MessageBuilders;
 
 use Tygh\Mailer\AMessageBuilder;
 use Tygh\Mailer\Message;
+use Tygh\Storefront\Repository;
+use Tygh\Storefront\Storefront;
 
 class MessageBuilder extends AMessageBuilder
 {
+    private $storefront;
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct(array $config, Repository $storefront_repository, $storefront)
+    {
+        $this->storefront = $storefront;
+        parent::__construct($config, $storefront_repository);
+    }
+
     protected function initMessage(Message $message, $params, $area, $lang_code)
     {
     }
@@ -104,5 +117,15 @@ class MessageBuilder extends AMessageBuilder
     public static function validateAddressTest($email)
     {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    public function getStorefrontId()
+    {
+        return 1;
+    }
+
+    public function getStorefront($storefront_id)
+    {
+        return $this->storefront;
     }
 }

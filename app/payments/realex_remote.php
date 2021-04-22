@@ -118,13 +118,12 @@ class RealexRemotePaymentMethod
         }
 
         $timestamp = empty($_REQUEST['timestamp']) ? date('Ymdhis') : $_REQUEST['timestamp'];
-
         $billing_zipcode = preg_replace("/[^0-9]/", '', $this->order_info['b_zipcode']);
         $billing_address = preg_replace("/[^0-9]/", '', $this->order_info['b_address']);
         $shipping_zipcode = preg_replace("/[^0-9]/", '', $this->order_info['s_zipcode']);
         $shipping_address = preg_replace("/[^0-9]/", '', $this->order_info['s_address']);
 
-        $request_data = array(
+        $request_data = [
             'ORDER_ID' => $this->order_info['order_id'] . $timestamp,
             'MERCHANT_ID' => $this->processor_data['processor_params']['merchant_id'],
             'ACCOUNT' => $this->processor_data['processor_params']['account'],
@@ -139,7 +138,7 @@ class RealexRemotePaymentMethod
             'SHIPPING_CODE' => substr($shipping_zipcode, 0, 5) . '|' . substr($shipping_address, 0, 5),
             'BILLING_CODE' => substr($billing_zipcode, 0, 5) . '|' . substr($billing_address, 0, 5),
             'TIMESTAMP' => $timestamp
-        );
+        ];
 
         $request_data['SHA1HASH'] = sha1(
             strtolower(

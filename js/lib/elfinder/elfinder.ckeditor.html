@@ -19,6 +19,7 @@
 
 		Tygh.$('#finder').elfinder({
 			url : window.opener.fn_url('elf_connector.images?security_hash=' + window.opener.Tygh.security_hash),
+			requestType: 'post',
 			lang : 'en',
             getFileCallback: function(file) {
 				window.opener.CKEDITOR.tools.callFunction(funcNum, file.url + '?' + new Date().getTime());

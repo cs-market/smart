@@ -41,6 +41,11 @@ class DBTemplateMessageBuilder extends \Tygh\Mailer\MessageBuilders\DBTemplateMe
     {
         return MessageBuilder::validateAddressTest($email);
     }
+
+    public function getStorefrontId()
+    {
+        return 1;
+    }
 }
 
 class Context implements IContext
@@ -53,5 +58,13 @@ class Context implements IContext
     public function getLangCode()
     {
         return 'en';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArea()
+    {
+        return 'A';
     }
 }

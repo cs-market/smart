@@ -154,7 +154,7 @@ function fn_vendor_locations_get_companies(array $params, array &$fields, array 
         if (isset($params['sort_by'])
             && isset($additional_fields[$params['sort_by']])
         ) {
-            $sortings[$params['sort_by']] = $additional_fields[$params['sort_by']];
+            $sortings[$params['sort_by']] = $filter_type->getTableAlias() . '.lat IS NULL, ' . $additional_fields[$params['sort_by']];
         }
     }
 
@@ -182,8 +182,10 @@ function fn_vendor_locations_get_companies(array $params, array &$fields, array 
 
 /**
  * Deletes geolocation info from vendor_locations table.
+ *
+ * @param int $company_id Company id
  */
-function fn_vendor_locations_delete_company($company_id, $result)
+function fn_vendor_locations_delete_company($company_id)
 {
     db_query('DELETE FROM ?:vendor_locations WHERE company_id = ?i', $company_id);
 }
@@ -195,7 +197,13 @@ function fn_vendor_locations_delete_company($company_id, $result)
  */
 function fn_vendor_locations_update_company(array $company_data, $company_id)
 {
-    if (!empty($company_data['vendor_location'])) {
+    if (!isset($company_data['vendor_location'])) {
+        return;
+    }
+
+    if (empty($company_data['vendor_location'])) {
+        fn_vendor_locations_delete_company($company_id);
+    } else {
         $location = Location::createFromJsonString($company_data['vendor_location']);
 
         if ($location->getPlaceId()) {
@@ -281,7 +289,7 @@ function fn_vendor_locations_get_products(array $params, array &$fields, array $
     $filter_types = array_filter($filter_types);
 
     if ($filter_types) {
-        $join .= 'INNER JOIN ?:vendor_locations AS vendor_locations ON vendor_locations.company_id = products.company_id';
+        $join .= ' INNER JOIN ?:vendor_locations AS vendor_locations ON vendor_locations.company_id = products.company_id';
 
         foreach ($filter_types as $filter_type) {
             list($fields, $condition) = fn_vendor_locations_extend_sql_statement_by_filter(
@@ -320,7 +328,8 @@ function fn_vendor_locations_get_current_filters_post(array $params, array &$fil
             return;
         }
 
-        $field_variant_values[$filter['filter_id']]['variants'] = $cnt;
+        $field_variant_values[$filter['filter_id']]['variants'] = [];
+        $filter['show_empty_filter'] = true;
 
         list($filter['location'], $filter['location_hash'], $filter['location_place_id']) = fn_vendor_locations_retrieve_location_from_selected_filter(
             $filter, $selected_filters
@@ -338,6 +347,8 @@ function fn_vendor_locations_get_filters_products_count_post(array $params, $lan
         if (!FilterTypes::has($filter['field_type'])) {
             continue;
         }
+        unset($filter['show_empty_filter']);
+
         list($filter['location'], $filter['location_hash'], $filter['location_place_id']) = fn_vendor_locations_retrieve_location_from_selected_filter(
             $filter, $selected_filters
         );
@@ -371,3 +382,23 @@ function fn_vendor_locations_before_dispatch($controller, $mode, $action, $dispa
     ));
 }
 
+/**
+ * The "storefront_rest_api_get_filter_style_post" hook.
+ *
+ *
+ * Performed actions:
+ * - Adds filter style for filters by Distance to vendor and Vendor's city.
+ *
+ * @see \fn_storefront_rest_api_get_filter_style()
+ */
+function fn_vendor_locations_storefront_rest_api_get_filter_style_post($filter, &$filter_style, $field_type)
+{
+    switch ($field_type) {
+        case FilterTypes::ZONE:
+            $filter_style = 'distance_to_vendor';
+            break;
+        case FilterTypes::REGION:
+            $filter_style = 'vendor_city';
+            break;
+    }
+}

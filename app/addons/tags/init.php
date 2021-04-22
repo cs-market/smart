@@ -26,5 +26,7 @@ fn_register_hooks(
     'get_pages',
     'get_products',
     'seo_is_indexed_page',
-    'get_predefined_statuses'
+    'get_predefined_statuses',
+    ['update_tags_post', '', 'product_variations'],
+    ['update_tags_post', '', 'master_products']
 );

@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/paypal.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.12.2/addons/paypal.po\n"
+"X-Crowdin-File-ID: 4108\n"
+"PO-Revision-Date: 2021-02-01 09:02\n"
 
 msgctxt "Addons::name::paypal"
 msgid "PayPal payments"
@@ -138,7 +138,7 @@ msgstr ""
 
 msgctxt "Languages::addons.paypal.do_not_change"
 msgid "Do not change"
-msgstr ""
+msgstr "Niet wijzigen"
 
 msgctxt "Languages::tt_addons_paypal_settings_partial_refund_action_order_status"
 msgid "Determines whether or not to change the order status automatically after a partial refund via PayPal."
@@ -178,7 +178,7 @@ msgstr ""
 
 msgctxt "Languages::addons.paypal.technical_details"
 msgid "Technical details"
-msgstr ""
+msgstr "Technische details"
 
 msgctxt "Languages::addons.paypal.connect_to_paypal"
 msgid "Connect to PayPal"
@@ -222,5 +222,13 @@ msgstr ""
 
 msgctxt "Languages::paypal.addon_is_disabled_notice"
 msgid "The <b>PayPal payments</b> add-on is disabled so you can't configure this payment method."
+msgstr ""
+
+msgctxt "Languages::addons.paypal.3d_secure_mandatory_notice"
+msgid "3-D secure is mandatory in the United Kingdom."
+msgstr ""
+
+msgctxt "Languages::paypal.show_cart_button"
+msgid "Show the \"Checkout with PayPal\" button on the cart contents page"
 msgstr ""
 

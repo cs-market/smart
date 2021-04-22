@@ -91,3 +91,21 @@
     word-break: break-all;
     word-break: break-word;
 }
+
+.show-off() {
+    visibility: hidden !important;
+    display: none !important;
+
+    top: -9999px !important;
+    left: -9999px !important;
+}
+
+// Hidden control group
+// --------------------------------------------------
+.ifControlGroupHiddenInput(@isControlGroupHidden) when (@isControlGroupHidden) {
+    border-color: transparent;
+}
+
+.ifControlGroupHiddenIcon(@isControlGroupHidden) when (@isControlGroupHidden) {
+    opacity: 0;
+}

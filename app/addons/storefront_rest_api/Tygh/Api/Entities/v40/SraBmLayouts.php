@@ -59,26 +59,8 @@ class SraBmLayouts extends ASraEntity
      */
     public function create($params)
     {
-        $data = array();
-        $status = Response::STATUS_BAD_REQUEST;
-        $layout = $this->getLayoutRepository();
-
-        if (empty($params['name'])) {
-            $data['message'] = __('api_required_field', array(
-                '[field]' => 'name'
-            ));
-        } else {
-            $layout_id = $layout->update($params);
-
-            if ($layout_id) {
-                $status = Response::STATUS_OK;
-                $data = array('layout_id' => $layout_id);
-            }
-        }
-
         return array(
-            'status' => $status,
-            'data' => $data
+            'status' => Response::STATUS_METHOD_NOT_ALLOWED,
         );
     }
 

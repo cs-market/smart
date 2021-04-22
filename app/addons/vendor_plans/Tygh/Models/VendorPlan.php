@@ -14,10 +14,31 @@
 
 namespace Tygh\Models;
 
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Models\Components\AModel;
 use Tygh\Models\Components\Relation;
 use Tygh\Registry;
 
+/**
+ * Class VendorPlan
+ *
+ * @property string $plan_id
+ * @property string $lang_code
+ * @property string $plan
+ * @property string $description
+ * @property string $status
+ * @property string $position
+ * @property string $price
+ * @property string $periodicity
+ * @property string $commission
+ * @property string $fixed_commission
+ * @property string $products_limit
+ * @property string $revenue_limit
+ * @property string $is_default
+ * @property null|string $companies_count
+ *
+ * @package Tygh\Models
+ */
 class VendorPlan extends AModel
 {
     public function getTableName()
@@ -43,7 +64,7 @@ class VendorPlan extends AModel
         );
 
         /**
-         * Chenge fields list for main SQL query
+         * Change fields list for main SQL query
          *
          * @param object $instance Current model instance
          * @param array  $fields   Fields list
@@ -157,6 +178,10 @@ class VendorPlan extends AModel
             $condition['allowed_for_company_id'] = sprintf('(%s)', implode(' OR ', $sub_conditions));
         }
 
+        if (isset($params['storefront_id'])) {
+            $condition['storefront_id'] = db_quote("(FIND_IN_SET(?i, storefronts) OR storefronts IS NULL OR storefronts = '')", $params['storefront_id']);
+        }
+
         return $condition;
     }
 
@@ -170,9 +195,9 @@ class VendorPlan extends AModel
          * @param array  $fields     Fields list
          * @param array  $sortings   Sortings list
          * @param array  $joins      Joins list
-         * @param array  $conditions Conditions list
+         * @param array  $condition  Conditions list
          */
-        fn_set_hook('vendor_plan_get_list', $this, $params, $fields, $sorting, $joins, $conditions);
+        fn_set_hook('vendor_plan_get_list', $this, $params, $fields, $sorting, $joins, $condition);
     }
 
     public function gatherAdditionalItemsData(&$items, $params)
@@ -193,13 +218,14 @@ class VendorPlan extends AModel
         if (!empty($params['check_availability']) && !empty($params['allowed_for_company_id'])) {
             $company = Company::model()->find($params['allowed_for_company_id']);
             $current_usage = array(
-                'products' => $company->getCurrentProducts(),
+                'products' => $company->getCurrentProductsCount(),
                 'revenue'  => $company->getCurrentRevenue(),
             );
         }
 
         foreach ($items as &$item) {
             $item['category_ids'] = !empty($item['categories']) ? explode(',', $item['categories']) : array();
+            $item['storefront_ids'] = !empty($item['storefronts']) ? explode(',', $item['storefronts']) : array();
             if (!empty($params['get_companies_count'])) {
                 $item['companies_count'] = isset($companies[$item['plan_id']]) ? $companies[$item['plan_id']] : 0;
             }
@@ -234,8 +260,22 @@ class VendorPlan extends AModel
     {
         $result = true;
 
-        if (!empty($this->categories) && is_array($this->categories)) {
+        if (empty($this->categories)) {
+            $this->category_ids = [];
+        } elseif (is_array($this->categories)) {
+            $this->category_ids = $this->categories;
             $this->categories = implode(',', $this->categories);
+        } elseif (is_string($this->categories)) {
+            $this->category_ids = explode(',', $this->categories);
+        }
+
+        if (empty($this->storefronts)) {
+            $this->storefront_ids = [];
+        } elseif (is_array($this->storefronts)) {
+            $this->storefront_ids = $this->storefronts;
+            $this->storefronts = implode(',', $this->storefronts);
+        } elseif (is_string($this->storefronts)) {
+            $this->storefront_ids = explode(',', $this->storefronts);
         }
 
         if (
@@ -254,6 +294,34 @@ class VendorPlan extends AModel
          * @param bool   $result Can save flag
          */
         fn_set_hook('vendor_plan_before_save', $this, $result);
+
+        return $result;
+    }
+
+    protected function update()
+    {
+        $result = parent::update();
+
+        if (empty($this->params['storefront_repository'])) {
+            return $result;
+        }
+
+        $companies = Company::model()->findAll(['plan_id' => $this->id]);
+        $companies = array_column($companies, 'id');
+
+        if ($companies && !empty($this->attributes['remove_vendors_from_old_storefronts'])) {
+            $removed_storefronts = array_diff($this->current_attributes['storefront_ids'], $this->attributes['storefront_ids']);
+            /** @var \Tygh\Storefront\Repository $storefront_repository */
+            $storefront_repository = $this->params['storefront_repository'];
+            $storefront_repository->removeCompaniesFromStorefronts($companies, $removed_storefronts);
+        }
+
+        if ($companies && !empty($this->attributes['add_vendors_to_new_storefronts'])) {
+            $added_storefronts = array_diff($this->attributes['storefront_ids'], $this->current_attributes['storefront_ids']);
+            /** @var \Tygh\Storefront\Repository $storefront_repository */
+            $storefront_repository = $this->params['storefront_repository'];
+            $storefront_repository->addCompaniesToStorefronts($companies, $added_storefronts);
+        }
 
         return $result;
     }
@@ -293,6 +361,37 @@ class VendorPlan extends AModel
         fn_set_hook('vendor_plan_before_delete', $this, $result);
 
         return $result;
+    }
+
+    public function afterDelete()
+    {
+        /**
+         * Executes after a vendor plan is deleted, allows you to execute additional actions with the related entities
+         *
+         * @param \Tygh\Models\VendorPlan $this Instance of VendorPlan
+         */
+        fn_set_hook('vendor_plan_after_delete', $this);
+    }
+
+    /**
+     * Gets vendor plan status text
+     *
+     * @return string
+     */
+    public function getStatusText()
+    {
+        switch ($this->status) {
+            case ObjectStatuses::ACTIVE:
+                return __('active');
+                break;
+            case ObjectStatuses::HIDDEN:
+                return __('hidden');
+                break;
+            default:
+            case ObjectStatuses::DISABLED:
+                return __('disabled');
+                break;
+        }
     }
 
     /**

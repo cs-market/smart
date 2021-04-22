@@ -16,17 +16,31 @@ namespace Tygh\BlockManager;
 
 use Tygh\CompanySingleton;
 use Tygh\ExSimpleXmlElement;
+use Tygh\Languages\Languages;
 use Tygh\Registry;
-use Tygh\BlockManager\Layout;
+use Tygh\Tygh;
 
 class Exim extends CompanySingleton
 {
-    private $_layout_id = 0;
+    /**
+     * @var int Exported layout ID
+     */
+    private $layout_id = 0;
 
     /**
-     * Default settings for XML layout
+     * @var string|null Theme name the layout belongs to
+     */
+    private $theme_name = null;
+
+    /**
+     * @var array Default settings for XML layout
      */
     protected $settings = array();
+
+    /**
+     * @var int
+     */
+    protected $storefront_id;
 
     /**
      * Imports blocks from file
@@ -44,6 +58,29 @@ class Exim extends CompanySingleton
         }
 
         return $result;
+    }
+
+    /**
+     * Export layout data to file
+     *
+     * @param string $layout_id    Exported layout id
+     * @param array  $location_ids List of exported locations
+     * @param string $filename     Name of the export file
+     *
+     * @return string|bool   Filename if export was success or false otherwise
+     */
+    public function exportToFile($layout_id, $location_ids, $filename = '')
+    {
+        $content = $this->export($layout_id, $location_ids);
+
+        $filename = empty($filename) ? date('mdY', TIME) . '.xml' : $filename;
+        $file_path = ($this->_company_id) ? sprintf('%s/%s', $this->_company_id, $filename) : $filename;
+
+        fn_mkdir(dirname(Registry::get('config.dir.layouts') . $file_path));
+
+        $result = fn_put_contents(Registry::get('config.dir.layouts') . $file_path, $content);
+
+        return $result ? $filename : $result;
     }
 
     /**
@@ -79,7 +116,7 @@ class Exim extends CompanySingleton
                 'layout_width' => 'fixed',
                 'min_width' => 760,
                 'max_width' => 960,
-                'style_id' => ''
+                'style_id' => '',
             );
         }
 
@@ -98,16 +135,16 @@ class Exim extends CompanySingleton
         }
 
         if ($import_style == 'create') {
-            $layout_data['theme_name'] = $this->_theme_name;
-            $layout_id = Layout::instance($this->_company_id)->update($layout_data);
-            $this->_layout_id = $layout_id;
+            $layout_data['theme_name'] = $this->theme_name;
+            $layout_id = Layout::instance($this->_company_id, [], $this->storefront_id)->update($layout_data);
+            $this->layout_id = $layout_id;
 
         } elseif (!empty($layout_data)) {
-            $layout_data['theme_name'] = $this->_theme_name;
-            $layout_id = Layout::instance($this->_company_id)->update($layout_data, $this->_layout_id);
+            $layout_data['theme_name'] = $this->theme_name;
+            $layout_id = Layout::instance($this->_company_id, [], $this->storefront_id)->update($layout_data, $this->layout_id);
 
         } else {
-            $layout_id = $this->_layout_id;
+            $layout_id = $this->layout_id;
         }
 
         if (!isset($params['override_by_dispatch'])) {
@@ -117,17 +154,17 @@ class Exim extends CompanySingleton
         $this->settings = (array) $structure->settings;
 
         if (!empty($params['clean_up']) && $params['clean_up'] == 'Y') {
-            $location_ids = Location::instance($this->_layout_id)->getList(array(), DESCR_SL);
+            $location_ids = Location::instance($this->layout_id)->getList(array(), DESCR_SL);
             $location_ids = array_keys($location_ids);
 
             foreach ($location_ids as $location_id) {
-                Location::instance($this->_layout_id)->remove($location_id, true);
+                Location::instance($this->layout_id)->remove($location_id, true);
             }
         }
 
         if (empty($layout_data)) {
             if (!empty($this->_company_id) && !empty($layout_id)) {
-                $layout_data = Layout::instance($this->_company_id)->get($layout_id);
+                $layout_data = Layout::instance($this->_company_id, [], $this->storefront_id)->get($layout_id);
             }
         }
 
@@ -137,9 +174,10 @@ class Exim extends CompanySingleton
 
         }
 
+        /** @var ExSimpleXmlElement $location */
         foreach ($structure->location as $location) {
             // Create location first
-            $location_attrs = $this->_getNodeAttrs($location);
+            $location_attrs = $this->getNodeAttrs($location);
             if ($this->_company_id) {
                 $location_attrs['company_id'] = $this->_company_id;
             }
@@ -150,7 +188,7 @@ class Exim extends CompanySingleton
             $_existing = array();
             $location_existing = false;
             if ($params['override_by_dispatch'] == 'Y') {
-                $_existing = Location::instance($this->_layout_id)->get($location_attrs['dispatch']);
+                $_existing = Location::instance($this->layout_id)->get($location_attrs['dispatch']);
                 if (!empty($_existing)) {
                     $location_existing = ($_existing['dispatch'] == $location_attrs['dispatch']) ? true : false;
                 }
@@ -159,21 +197,22 @@ class Exim extends CompanySingleton
             // Imported locations cannot be assingned to dynamic objects
             $location_attrs['object_ids'] = '';
 
-            $location_id = Location::instance($this->_layout_id)->update($location_attrs);
+            $location_id = Location::instance($this->layout_id)->update($location_attrs);
             if (!empty($location_attrs['is_default'])) {
-                Location::instance($this->_layout_id)->setDefault($location_id);
+                Location::instance($this->layout_id)->setDefault($location_id);
             }
 
             if (!empty($location_existing)) {
-                Location::instance($this->_layout_id)->remove($_existing['location_id']);
+                Location::instance($this->layout_id)->remove($_existing['location_id']);
             }
 
             $_default_containers = Container::getList(array(
-                'location_id' => $location_id
+                'location_id' => $location_id,
             ));
 
+            /** @var ExSimpleXmlElement $container */
             foreach ($location->containers->container as $container) {
-                $container_attrs = $this->_getNodeAttrs($container);
+                $container_attrs = $this->getNodeAttrs($container);
                 $container_attrs['location_id'] = $location_id;
                 $container_attrs['container_id'] = $_default_containers[$container_attrs['position']]['container_id'];
 
@@ -183,13 +222,13 @@ class Exim extends CompanySingleton
                 $container_id = $container_attrs['container_id'];
 
                 if (isset($container->grid)) {
-                    $this->_parseGridStructure($container, $container_id, $layout_width);
+                    $this->parseGridStructure($container, $container_id, $layout_width);
                 }
             }
 
             if (!empty($location->translations)) {
 
-                $avail_langs = array_keys(fn_get_translation_languages());
+                $avail_langs = array_keys(Languages::getAll());
                 foreach ($location->translations->translation as $translation) {
 
                     $translation_lang_code = (string) $translation['lang_code'];
@@ -206,7 +245,7 @@ class Exim extends CompanySingleton
                         'name' => (string) $translation->name,
                     );
 
-                    Location::instance($this->_layout_id)->update($location_attrs);
+                    Location::instance($this->layout_id)->update($location_attrs);
                 }
             }
         }
@@ -217,47 +256,52 @@ class Exim extends CompanySingleton
     /**
      * Export blocks to XML structure
      *
-     * @param  array              $location_ids
-     * @param  array              $params
-     * @param  string             $lang_code
-     * @return ExSimpleXmlElement
+     * @param int    $layout_id    Exported layout identifier
+     * @param int[]  $location_ids Exproted layout pages identifiers
+     * @param array  $params       Export parameters
+     * @param string $lang_code    Two-letter language code
+     *
+     * @return string Layout XML structure
      */
-    public function export($layout_id, $location_ids = array(), $params = array(), $lang_code = DESCR_SL)
+    public function export($layout_id, $location_ids = [], $params = [], $lang_code = DESCR_SL)
     {
         /* Exclude unnecessary fields*/
-        $except_location_fields = array(
+        $except_location_fields = [
             'location_id',
-            'company_id'
-        );
+            'company_id',
+        ];
         $except_container_fields = array(
             'container_id',
             'location_id',
             'dispatch',
             'is_default',
             'company_id',
-            'default'
+            'default',
+            'availability',
         );
-        $except_grid_fields = array(
+        $except_grid_fields = [
             'container_id',
             'location_id',
             'position',
             'grid_id',
             'parent_id',
             'order',
-            'children'
-        );
-        $except_layout_fields = array(
+            'children',
+            'availability',
+            'company_id',
+        ];
+        $except_layout_fields = [
             'layout_id',
             'theme_name',
-            'company_id'
-        );
+            'company_id',
+        ];
 
         $except_location_fields = array_flip($except_location_fields);
         $except_container_fields = array_flip($except_container_fields);
         $except_grid_fields = array_flip($except_grid_fields);
         $except_layout_fields = array_flip($except_layout_fields);
 
-        $layout_data = Layout::instance($this->_company_id)->get($layout_id);
+        $layout_data = Layout::instance($this->_company_id, [], $this->storefront_id)->get($layout_id);
         $layout_data = array_diff_key($layout_data, $except_layout_fields);
 
         $xml_root = new ExSimpleXmlElement('<block_scheme></block_scheme>');
@@ -279,7 +323,7 @@ class Exim extends CompanySingleton
         foreach ($location_ids as $location_id) {
             $location = Location::instance($layout_id)->getById($location_id, $lang_code);
             $containers = Container::getList(array(
-                'location_id' => $location_id
+                'location_id' => $location_id,
             ));
 
             $xml_location = $xml_root->addChild('location');
@@ -299,6 +343,7 @@ class Exim extends CompanySingleton
                     continue;
                 }
 
+                /** @var ExSimpleXmlElement $xml_translation */
                 $xml_translation = $xml_translations->addChild('translation');
                 $xml_translation->addChildCData('meta_keywords', $translation['meta_keywords']);
                 $xml_translation->addChildCData('page_title', $translation['title']);
@@ -311,11 +356,13 @@ class Exim extends CompanySingleton
 
             foreach ($containers as $position => $container) {
                 $grids = Grid::getList(array(
-                    'container_ids' => $container['container_id']
+                    'container_ids' => $container['container_id'],
                 ));
 
+                /** @var ExSimpleXmlElement $xml_container */
                 $xml_container = $xml_containers->addChild('container');
-                foreach ($container as $attr => $value) {
+                $attrs =  array_diff_key($container, $except_container_fields);
+                foreach ($attrs as $attr => $value) {
                     $xml_container->addAttribute($attr, $value);
                 }
 
@@ -323,9 +370,7 @@ class Exim extends CompanySingleton
                     $grids = $grids[$container['container_id']];
                     $grids = fn_build_hierarchic_tree($grids, 'grid_id');
 
-                    $container = array_diff_key($container, $except_container_fields);
-
-                    $this->_buildGridStructure($xml_container, $grids, $except_grid_fields, $lang_code);
+                    $this->buildGridStructure($xml_container, $grids, $except_grid_fields, $lang_code);
                 }
             }
         }
@@ -335,7 +380,9 @@ class Exim extends CompanySingleton
 
     /**
      * Formats output XML
-     * @param  object $xml simplexml object
+     *
+     * @param  ExSimpleXmlElement $xml simplexml object
+     *
      * @return string formatted XML
      */
     protected function formatXml($xml)
@@ -366,17 +413,32 @@ class Exim extends CompanySingleton
         }, $output);
     }
 
-    public function getUniqueBlockKey($type, $properties, $name, $content = '')
+    /**
+     * Gets unique block key to check for block duplicates.
+     *
+     * @param string   $type          Block type
+     * @param string   $properties    Block properties (serialized)
+     * @param string   $name          Block name
+     * @param string   $content       Block content (serialized)
+     * @param int|null $storefront_id Storefront ID of a block
+     *
+     * @return string
+     */
+    public function getUniqueBlockKey($type, $properties, $name, $content = '', $storefront_id = null)
     {
-        $key = array(
-            'type' => $type,
-            'properties' => $properties,
-            'name' => $name,
-            'content' => $content,
-        );
+        $key = [
+            'type'          => $type,
+            'properties'    => $properties,
+            'name'          => $name,
+            'content'       => $content,
+        ];
+
+        if ($storefront_id) {
+            $key['storefront_id'] = (int) $storefront_id;
+        }
 
         if ($this->_company_id) {
-            $key['company_id'] = $this->_company_id;
+            $key['company_id'] = (int) $this->_company_id;
         }
 
         return md5(serialize($key));
@@ -385,8 +447,9 @@ class Exim extends CompanySingleton
     /**
      * Get layout data
      *
-     * @param  array  $xml_filepath
-     * @param  bolean $skip_edition_check
+     * @param  string $xml_filepath
+     * @param  bool   $skip_edition_check
+     *
      * @return array
      */
     public function getLayoutData($xml_filepath, $skip_edition_check = true)
@@ -412,7 +475,7 @@ class Exim extends CompanySingleton
     /**
      * Get layout file structure as simpleXML object
      *
-     * @param array $xml_filepath
+     * @param string $xml_filepath
 
      * @return ExSimpleXmlElement|null
      */
@@ -432,7 +495,7 @@ class Exim extends CompanySingleton
      * @param  bool               $use_attr_param
      * @return array|string
      */
-    private function _getNodeAttrs($xml_node, $use_attr_param = true)
+    private function getNodeAttrs($xml_node, $use_attr_param = true)
     {
         $attrs = array();
 
@@ -442,9 +505,10 @@ class Exim extends CompanySingleton
             }
         } else {
             if ($xml_node->exCount() > 0) {
+                /** @var ExSimpleXmlElement $child_node */
                 foreach ($xml_node->children() as $child_node) {
                     if ($child_node->exCount() > 0) {
-                        $attrs[$child_node->getName()] = $this->_getNodeAttrs($child_node, false);
+                        $attrs[$child_node->getName()] = $this->getNodeAttrs($child_node, false);
                     } else {
                         $attrs[$child_node->getName()] = (string) $child_node;
                     }
@@ -461,11 +525,11 @@ class Exim extends CompanySingleton
         return $attrs;
     }
 
-    private function _parseGridStructure(&$xml_node, $container_id, $layout_width, $parent_id = 0)
+    private function parseGridStructure(&$xml_node, $container_id, $layout_width, $parent_id = 0)
     {
         foreach ($xml_node->grid as $grid) {
             if (!empty($grid)) {
-                $grid_attrs = $this->_getNodeAttrs($grid);
+                $grid_attrs = $this->getNodeAttrs($grid);
                 $grid_attrs['container_id'] = $container_id;
                 $grid_attrs['parent_id'] = $parent_id;
 
@@ -474,26 +538,37 @@ class Exim extends CompanySingleton
                 $grid_id = Grid::update($grid_attrs);
 
                 if (isset($grid->grid)) {
-                    $this->_parseGridStructure($grid, $container_id, $layout_width, $grid_id);
+                    $this->parseGridStructure($grid, $container_id, $layout_width, $grid_id);
                 }
 
                 if (!empty($grid->blocks)) {
-                    $this->_parseBlockStructure($grid_id, $grid->blocks);
+                    $this->parseBlockStructure($grid_id, $grid->blocks);
                 }
             }
         }
     }
 
-    private function _parseBlockStructure($grid_id, $blocks)
+    private function parseBlockStructure($grid_id, $blocks)
     {
         $unique_blocks = array();
-        $langs = fn_get_translation_languages();
+        $langs = Languages::getAll();
 
-        $_unique = Block::instance($this->_company_id)->getAllUnique();
+        $_unique = Block::instance($this->_company_id, [], $this->storefront_id)->getAllUnique();
+
+        $blocks_by_storefront = [];
+        foreach ($_unique as $block_data) {
+            $blocks_by_storefront[$block_data['storefront_id']] = $block_data;
+        }
 
         if (!empty($_unique)) {
             foreach ($_unique as $block_id => $block) {
-                $key = $this->getUniqueBlockKey($block['type'], $block['properties'], $block['name']);
+                $key = $this->getUniqueBlockKey(
+                    $block['type'],
+                    $block['properties'],
+                    $block['name'],
+                    '',
+                    $block['storefront_id']
+                );
 
                 $unique_blocks[$key] = $block_id;
             }
@@ -501,7 +576,7 @@ class Exim extends CompanySingleton
 
         $order = 0;
         foreach ($blocks->block as $block) {
-            $block_data = $this->_getNodeAttrs($block, false);
+            $block_data = $this->getNodeAttrs($block, false);
 
             if (!isset($block_data['type'])) {
                 continue;
@@ -510,6 +585,8 @@ class Exim extends CompanySingleton
             if ($this->_company_id) {
                 $block_data['company_id'] = $this->_company_id;
             }
+
+            $block_data['storefront_id'] = $this->storefront_id;
 
             // FIXME
             $default_name = $block_data['name'];
@@ -521,10 +598,16 @@ class Exim extends CompanySingleton
                 }
             }
 
-            $key = $this->getUniqueBlockKey($block_data['type'], $block_data['properties'], $block_data['name']);
+            $key = $this->getUniqueBlockKey(
+                $block_data['type'],
+                $block_data['properties'],
+                $block_data['name'],
+                '',
+                $this->storefront_id
+            );
 
             if (isset($unique_blocks[$key])) {
-                $block_id = $block_data['block_id'] = $unique_blocks[$key];
+                $block_data['block_id'] = $unique_blocks[$key];
                 $block_data['apply_to_all_langs'] = 'Y';
             }
 
@@ -534,7 +617,7 @@ class Exim extends CompanySingleton
                 $block_data['content_data']['content'] = array('empty');
             }
 
-            $block_id = Block::instance($this->_company_id)->update($block_data, $block_data);
+            $block_id = Block::instance($this->_company_id, [], $this->storefront_id)->update($block_data, $block_data);
 
             $snapping_data = array(
                 'block_id' => $block_id,
@@ -544,10 +627,10 @@ class Exim extends CompanySingleton
                 'order' => isset($block_data['order']) ? $block_data['order'] : $order,
                 'status' => !empty($block_data['status']) ? $block_data['status'] : 'A',
             );
-            $snapping_id = Block::instance($this->_company_id)->updateSnapping($snapping_data);
+            $snapping_id = Block::instance($this->_company_id, [], $this->storefront_id)->updateSnapping($snapping_data);
 
-            $this->_importDynamicStatuses($snapping_id, $block_data);
-            $this->_importContent($block_id, $snapping_id, $block);
+            $this->importDynamicStatuses($snapping_id, $block_data);
+            $this->importContent($block_id, $snapping_id, $block);
 
             if (!empty($block->translations)) {
                 $_block_translation = array();
@@ -562,13 +645,13 @@ class Exim extends CompanySingleton
 
                 foreach ($_block_translation as $lang_code => $translation) {
                     if (isset($langs[$lang_code])) {
-                        Block::instance($this->_company_id)->update(
+                        Block::instance($this->_company_id, [], $this->storefront_id)->update(
                             array (
-                                'block_id' => $block_id
+                                'block_id' => $block_id,
                             ),
                             array (
                                 'name' => $translation,
-                                'lang_code' => $lang_code
+                                'lang_code' => $lang_code,
                             )
                         );
                     }
@@ -586,15 +669,15 @@ class Exim extends CompanySingleton
      * @param  array $block_data  Array of product data
      * @return bool  True on success, false otherwise
      */
-    private function _importDynamicStatuses($snapping_id, $block_data)
+    private function importDynamicStatuses($snapping_id, $block_data)
     {
         if (!empty($block_data['statuses']) && is_array($block_data['statuses'])) {
             foreach ($block_data['statuses'] as $object_type => $object_ids) {
-                Block::instance($this->_company_id)->updateStatuses(
+                Block::instance($this->_company_id, [], $this->storefront_id)->updateStatuses(
                     array(
                         'snapping_id' => $snapping_id,
                         'object_type' => $object_type,
-                        'object_ids' => $object_ids
+                        'object_ids' => $object_ids,
                     )
                 );
             }
@@ -605,24 +688,24 @@ class Exim extends CompanySingleton
         }
     }
 
-    private function _importContent($block_id, $snapping_id, $block_data)
+    private function importContent($block_id, $snapping_id, $block_data)
     {
         if (isset($block_data->contents)) {
             foreach ($block_data->contents->item as $content) {
-                $_content = $this->_getNodeAttrs($content, false);
+                $_content = $this->getNodeAttrs($content, false);
                 $_content['snapping_id'] = $snapping_id;
 
                 $data = array (
                     'block_id' => $block_id,
                     'type' => (string) $block_data->type,
-                    'content_data' => $_content
+                    'content_data' => $_content,
                 );
 
                 if (!empty($_content['lang_code'])) {
                     $data['content_data']['lang_code'] = $_content['lang_code'];
                 }
 
-                Block::instance($this->_company_id)->update($data);
+                Block::instance($this->_company_id, [], $this->storefront_id)->update($data);
             }
 
             return true;
@@ -635,7 +718,7 @@ class Exim extends CompanySingleton
      * @param ExSimpleXmlElement $parent
      * @param array              $attrs
      */
-    private function _buildAttrStructure(&$parent, $attrs)
+    private function buildAttrStructure(&$parent, $attrs)
     {
         foreach ($attrs as $attr => $value) {
             // items_array is exploded by comma item_ids. So it's not needed.
@@ -645,8 +728,9 @@ class Exim extends CompanySingleton
             }
 
             if (is_array($value)) {
+                /** @var ExSimpleXmlElement $xml_attr */
                 $xml_attr = $parent->addChild($attr);
-                $this->_buildAttrStructure($xml_attr, $value);
+                $this->buildAttrStructure($xml_attr, $value);
 
             } else {
                 $child = $parent->addChild($attr);
@@ -663,18 +747,19 @@ class Exim extends CompanySingleton
      * @param array  $except_fields
      * @param string $lang_code
      */
-    private function _buildGridStructure(&$parent, $grids, $except_fields = array(), $lang_code = DESCR_SL)
+    private function buildGridStructure(&$parent, $grids, $except_fields = array(), $lang_code = DESCR_SL)
     {
         $except_block_fields = array_flip(array(
             'block_id',
             'snapping_id',
             'grid_id',
-            'company_id'
+            'company_id',
         ));
 
         foreach ($grids as $grid) {
+            /** @var ExSimpleXmlElement $xml_grid */
             $xml_grid = $parent->addChild('grid');
-            $blocks = Block::instance($this->_company_id)->getList(array('?:bm_snapping.*', '?:bm_blocks.*'), array($grid['grid_id']));
+            $blocks = Block::instance($this->_company_id, [], $this->storefront_id)->getList(array('?:bm_snapping.*', '?:bm_blocks.*'), array($grid['grid_id']));
 
             if (!empty($blocks)) {
                 $blocks = $blocks[$grid['grid_id']];
@@ -687,20 +772,22 @@ class Exim extends CompanySingleton
 
             if (!empty($grid['children'])) {
                 $grid['children'] = fn_sort_array_by_key($grid['children'], 'grid_id');
-                $this->_buildGridStructure($xml_grid, $grid['children'], $except_fields, $lang_code);
+                $this->buildGridStructure($xml_grid, $grid['children'], $except_fields, $lang_code);
             }
 
             if (!empty($blocks)) {
                 $xml_blocks = $xml_grid->addChild('blocks');
 
                 foreach ($blocks as $block_id => $block) {
-                    $block_descr = Block::instance($this->_company_id)->getFullDescription($block['block_id']);
-                    $block = array_merge(Block::instance($this->_company_id)->getById($block['block_id'], 0, array(), $lang_code), $block);
+                    $block_descr = Block::instance($this->_company_id, [], $this->storefront_id)->getFullDescription($block['block_id']);
+                    $block = array_merge(Block::instance($this->_company_id, [], $this->storefront_id)->getById($block['block_id'], 0, array(), $lang_code), $block);
                     $block = array_diff_key($block, $except_block_fields);
 
+                    /** @var ExSimpleXmlElement $xml_block */
                     $xml_block = $xml_blocks->addChild('block');
-                    $this->_buildAttrStructure($xml_block, $block);
+                    $this->buildAttrStructure($xml_block, $block);
 
+                    /** @var ExSimpleXmlElement $xml_translations */
                     $xml_translations = $xml_block->addChild('translations');
                     foreach ($block_descr as $_lang_code => $data) {
                         if ($_lang_code == $lang_code) {
@@ -713,7 +800,8 @@ class Exim extends CompanySingleton
                         unset($xml_translation);
                     }
 
-                    $contents = Block::instance($this->_company_id)->getAllContents($block_id);
+                    $contents = Block::instance($this->_company_id, [], $this->storefront_id)->getAllContents($block_id);
+                    /** @var ExSimpleXmlElement $xml_contents */
                     $xml_contents = $xml_block->addChild('contents');
                     foreach ($contents as $content) {
                         if (!empty($content['lang_code']) && $content['lang_code'] == $lang_code) {
@@ -721,7 +809,7 @@ class Exim extends CompanySingleton
                         }
 
                         if (!empty($content['content'])) {
-                            $this->_buildAttrStructure($xml_contents , array('item' => array_diff_key($content, $except_block_fields)));
+                            $this->buildAttrStructure($xml_contents , array('item' => array_diff_key($content, $except_block_fields)));
                         }
                     }
                 }
@@ -730,14 +818,35 @@ class Exim extends CompanySingleton
     }
 
     /**
-     * Returns object instance if Exim class or create it if not exists
+     * Returns object instance of Exim class or create it if not exists
+     *
      * @static
-     * @param  int    $company_id Company identifier
-     * @param  string $class_name ClassName
+     *
+     * @param int    $company_id    Company identifier
+     *                              This parameter is deprecated and will be removed in v5.0.0.
+     *                              Use $storefront_id instead.
+     * @param int    $layout_id     Layout identifier
+     * @param string $theme_name    Theme name the layout belongs to
+     * @param int    $storefront_id Storefront ID
+     *
      * @return Exim
      */
-    public static function instance($company_id = 0, $layout_id = 0, $theme_name = '')
+    public static function instance($company_id = 0, $layout_id = 0, $theme_name = '', $storefront_id = null)
     {
+        /**
+         * Executes before getting an instance of layout export/import manager,
+         * allows you to modify the parameters passed to the function.
+         *
+         * @param int    $company_id    Company identifier
+         *                              This parameter is deprecated and will be removed in v5.0.0.
+         *                              Use $storefront_id instead.
+         * @param int    $layout_id     Layout identifier
+         * @param string $theme_name    Theme name the layout belongs to
+         * @param int    $storefront_id Storefront ID
+         */
+        fn_set_hook('exim_instance_pre', $company_id, $layout_id, $theme_name, $storefront_id);
+
+        /** @var \Tygh\BlockManager\Exim $instance */
         $instance = parent::instance($company_id);
 
         if (empty($layout_id)) {
@@ -748,8 +857,15 @@ class Exim extends CompanySingleton
             $theme_name = Registry::get('runtime.layout.theme_name');
         }
 
-        $instance->_layout_id = $layout_id;
-        $instance->_theme_name = $theme_name;
+        if (!$storefront_id) {
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = Tygh::$app['storefront'];
+            $storefront_id = $storefront->storefront_id;
+        }
+
+        $instance->layout_id = $layout_id;
+        $instance->theme_name = $theme_name;
+        $instance->storefront_id = $storefront_id;
 
         return $instance;
     }
@@ -757,22 +873,22 @@ class Exim extends CompanySingleton
     /**
      * Replaces the width of the location, container, grid of the XML layout with the width of the layout itself
      *
-     * The width of the location, container, grid is changed if it it larger than the width of the layout.
+     * The width of the location, container, grid is changed if it is larger than the width of the layout.
      * The function replaces the width of the layout element when the layout is created.
      *
-     * @param  int                 $layout_width The width of the created layout
-     * @param  ExSimpleXmlElement  $content The XML structure of the layout element
-     * @param  array               $_attrs  The array of attributes of the layout element
+     * @param  int                $layout_width The width of the created layout
+     * @param  ExSimpleXmlElement $content      The XML structure of the layout element
+     * @param  array              $attrs        The array of attributes of the layout element
      *
      * @return void
      */
-    public function setLayoutElementsWidth($layout_width, &$content, &$_attrs)
+    public function setLayoutElementsWidth($layout_width, &$content, &$attrs)
     {
-        if (!empty($layout_width) && !empty($_attrs['width'])) {
-            $attrs_width = (int) $_attrs['width'];
+        if (!empty($layout_width) && !empty($attrs['width'])) {
+            $attrs_width = (int) $attrs['width'];
 
-            if ($attrs_width > $layout_width || !empty($_attrs['position'])) {
-                $_attrs['width'] = $layout_width;
+            if ($attrs_width > $layout_width || !empty($attrs['position'])) {
+                $attrs['width'] = $layout_width;
                 $content->attributes()->{'width'} = $layout_width;
             }
         }

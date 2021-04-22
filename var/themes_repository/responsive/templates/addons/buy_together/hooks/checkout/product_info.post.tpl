@@ -18,11 +18,15 @@
                 </tr>
                 </thead>
                 {foreach from=$cart_products item="_product" key="key_conf"}
+                    {$product = $_product}
                     {if $cart.products.$key_conf.extra.parent.buy_together == $key}
                         <tr>
                             <td>
                                 <a href="{"products.view?product_id=`$_product.product_id`"|fn_url}"
-                                   class="underlined">{$_product.product}</a><br/>
+                                   class="underlined">{$_product.product}</a>
+                                {hook name="products:product_additional_info"}
+                                {/hook}
+                                <br/>
                                 {if $_product.product_options}
                                     {foreach from=$_product.product_options item="option"}
                                         <strong>{$option.option_name}</strong>

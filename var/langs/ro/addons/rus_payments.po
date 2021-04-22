@@ -9,8 +9,8 @@ msgid "Russian localization — Russian payments"
 msgstr "Russian localization — Russian payments"
 
 msgctxt "Addons::description::rus_payments"
-msgid "Payments: Assist, Yandex.Checkpoint, Webmoney, Sberbank, PayAnyWay, PayMaster, Platidoma, RBK, Robokassa, Vsevcredit, Avangard, Payler"
-msgstr "Payments: Assist, Yandex.Checkpoint, Webmoney, Sberbank, PayAnyWay, PayMaster, Platidoma, RBK, Robokassa, Vsevcredit, Avangard, Payler"
+msgid "Payments: Assist, Yandex.Checkpoint, Webmoney, Sberbank, PayAnyWay, PayMaster, RBK, Robokassa, Vkredit24.ru, Avangard, Payler"
+msgstr "Payments: Assist, Yandex.Checkpoint, Webmoney, Sberbank, PayAnyWay, PayMaster, RBK, Robokassa, Vkredit24.ru, Avangard, Payler"
 
 msgctxt "Languages::russian_payments"
 msgid "Russian payments"
@@ -61,8 +61,8 @@ msgid "Bank cards"
 msgstr "Bank cards"
 
 msgctxt "Languages::pay_rbkmoney"
-msgid "RBK Money account"
-msgstr "RBK Money account"
+msgid "RBK.money account"
+msgstr "RBK.money account"
 
 msgctxt "Languages::pay_exchangers"
 msgid "Electronic payment systems"
@@ -73,8 +73,8 @@ msgid "Payment terminals"
 msgstr "Payment terminals"
 
 msgctxt "Languages::pay_prepaidcard"
-msgid "RBK Money prepaid card"
-msgstr "RBK Money prepaid card"
+msgid "RBK.money prepaid card"
+msgstr "RBK.money prepaid card"
 
 msgctxt "Languages::pay_postrus"
 msgid "Russian Post"
@@ -219,14 +219,6 @@ msgstr "<p>For successful work of the \"Assist\" payment method, you should acti
 msgctxt "Languages::payment_url"
 msgid "Payment URL"
 msgstr "Payment URL"
-
-msgctxt "Languages::text_pd_notice"
-msgid "Use the following URLs in the Plati Doma account settings<br />-&nbsp;<u>successful payment</u>: <b>[return_url]</b><br />-&nbsp;<u>cancel payment</u>: <b>[return_url]</b><br />-&nbsp;<u>decline payment</u>: <b>[cancel_url]</b>"
-msgstr "Use the following URLs in the Plati Doma account settings<br />-&nbsp;<u>successful payment</u>: <b>[return_url]</b><br />-&nbsp;<u>cancel payment</u>: <b>[return_url]</b><br />-&nbsp;<u>decline payment</u>: <b>[cancel_url]</b>"
-
-msgctxt "Languages::pay_at_home"
-msgid "Plati Doma"
-msgstr "Plati Doma"
 
 msgctxt "Languages::pd_shop_id"
 msgid "Store code"
@@ -405,8 +397,8 @@ msgid "Select payment method"
 msgstr "Select payment method"
 
 msgctxt "Languages::rbk"
-msgid "RBK Money"
-msgstr "RBK Money"
+msgid "RBK.money"
+msgstr "RBK.money"
 
 msgctxt "Languages::rbk_login"
 msgid "Login"
@@ -429,12 +421,12 @@ msgid "Order payment"
 msgstr "Order payment"
 
 msgctxt "Languages::rbk_language"
-msgid "RBK Money website payment interface language"
-msgstr "RBK Money website payment interface language"
+msgid "RBK.money website payment interface language"
+msgstr "RBK.money website payment interface language"
 
 msgctxt "Languages::text_rbk_notice"
-msgid "Use the following URLs in the RBK Money account settings<br />-&nbsp;<u>payment notification</u>: <b>[result_url]</b>"
-msgstr "Use the following URLs in the RBK Money account settings<br />-&nbsp;<u>payment notification</u>: <b>[result_url]</b>"
+msgid "Use the following URLs in the RBK.money account settings<br />-&nbsp;<u>payment notification</u>: <b>[result_url]</b>"
+msgstr "Use the following URLs in the RBK.money account settings<br />-&nbsp;<u>payment notification</u>: <b>[result_url]</b>"
 
 msgctxt "Languages::rbk_status3"
 msgid "Transaction accepted for processing"
@@ -447,10 +439,6 @@ msgstr "Transaction complete"
 msgctxt "Languages::payments.robokassa.get_currencies"
 msgid "Get currencies"
 msgstr "Get currencies"
-
-msgctxt "Languages::text_robokassa_notice"
-msgid "Please add these URL fields in your Robokassa configuration:<br /><br/><b>Result URL:</b><br/>[r_url]<br/><br/><b>Success URL:</b><br/>[p_url]<br/><br/><b>Fail URL:</b><br/>[f_url]"
-msgstr "Please add these URL fields in your Robokassa configuration:<br /><br/><b>Result URL:</b><br/>[r_url]<br/><br/><b>Success URL:</b><br/>[p_url]<br/><br/><b>Fail URL:</b><br/>[f_url]"
 
 msgctxt "Languages::password1"
 msgid "Password1"
@@ -617,8 +605,8 @@ msgid "Secret word"
 msgstr "Secret word"
 
 msgctxt "Languages::vsevkredit_url_notice"
-msgid "Please set the following URLs in the Vsevkredit admin area:<br /><b>URL for API:</b> [api_url]<br /><b>Return URL:</b> [return_url]"
-msgstr "Please set the following URLs in the Vsevkredit admin area:<br /><b>URL for API:</b> [api_url]<br /><b>Return URL:</b> [return_url]"
+msgid "Please set the following URLs in the Vkredit24 admin area:<br /><b>URL for API:</b> [api_url]<br /><b>Return URL:</b> [return_url]"
+msgstr "Please set the following URLs in the Vkredit24 admin area:<br /><b>URL for API:</b> [api_url]<br /><b>Return URL:</b> [return_url]"
 
 msgctxt "Languages::text_webmoney_notice"
 msgid "In order to set up WebMoney payment method, you should set up Web Merchant Interface for processing payments in the following way:<br /><br />1. Check the \"Send parameters in the pre-request\" checkbox;<br />2. Check the \"Allow overriding URL from Payment Request Form\" checkbox;<br />3. Choose the required value in the \"Signature algorithm\" field and in payment settings.<br />"
@@ -705,8 +693,8 @@ msgid "Too mach SMS without payments found for specified phone"
 msgstr "Too mach SMS without payments found for specified phone"
 
 msgctxt "Languages::text_paymaster_notice"
-msgid "On the site Paymaster it is necessary to set in the site details in the `Callbacks`section: Payment notification - POST request, Success redirect - GET request, Failure redirect - GET request, Invoice confirmation - GET request and select the `Allow custom URLs` check box. Also it is necessary to enter the secret key in the `Technical parameters` section with selecting the MD5 signature type. This key should also be entered into the `Secret key` field in the store."
-msgstr "On the site Paymaster it is necessary to set in the site details in the `Callbacks`section: Payment notification - POST request, Success redirect - GET request, Failure redirect - GET request, Invoice confirmation - GET request and select the `Allow custom URLs` check box. Also it is necessary to enter the secret key in the `Technical parameters` section with selecting the MD5 signature type. This key should also be entered into the `Secret key` field in the store."
+msgid "On the site PayMaster it is necessary to set in the site details in the `Callbacks`section: Payment notification - POST request, Success redirect - GET request, Failure redirect - GET request, Invoice confirmation - GET request and select the `Allow custom URLs` check box. Also it is necessary to enter the secret key in the `Technical parameters` section with selecting the MD5 signature type. This key should also be entered into the `Secret key` field in the store."
+msgstr "On the site PayMaster it is necessary to set in the site details in the `Callbacks`section: Payment notification - POST request, Success redirect - GET request, Failure redirect - GET request, Invoice confirmation - GET request and select the `Allow custom URLs` check box. Also it is necessary to enter the secret key in the `Technical parameters` section with selecting the MD5 signature type. This key should also be entered into the `Secret key` field in the store."
 
 msgctxt "Languages::paymaster_key"
 msgid "Secret key"
@@ -1225,12 +1213,12 @@ msgid "This type of payment cannot be made at this time. To be able to make thes
 msgstr "This type of payment cannot be made at this time. To be able to make these types of payments, the user must go to the following <a href=\"[ext_action_uri]\" target=\"_blank\">page</a> and follow the instructions on it."
 
 msgctxt "Languages::text_yandex_money_redirect_url"
-msgid "Please use the following Redirect URL while adjusting the API Yandex.Money application: <br/> [redirect_url]"
-msgstr "Please use the following Redirect URL while adjusting the API Yandex.Money application: <br/> [redirect_url]"
+msgid "Please use the following Redirect URL while adjusting the API YooMoney application: <br/> [redirect_url]"
+msgstr "Please use the following Redirect URL while adjusting the API YooMoney application: <br/> [redirect_url]"
 
 msgctxt "Languages::text_yandex_money_note"
-msgid "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the Yandex.Money service can freeze your wallet."
-msgstr "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the Yandex.Money service can freeze your wallet."
+msgid "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the YooMoney service can freeze your wallet."
+msgstr "<b>Please note</b> that this payment method could only be used for transactions between individual persons. Otherwise, the YooMoney service can freeze your wallet."
 
 msgctxt "Languages::text_avangard_redirect_url"
 msgid "Please use the following Redirect URL while adjusting the API Avangard application: <br/> [redirect_url]"
@@ -1585,8 +1573,8 @@ msgid "In CS-Cart 4.4.1, we've removed the Qiwi payment method, which worked via
 msgstr "In CS-Cart 4.4.1, we've removed the Qiwi payment method, which worked via the SOAP protocol."
 
 msgctxt "Languages::rus_payments.soap_qiwi_removed_text"
-msgid "If you used the Qiwi payment method based on the SOAP protocol, install and set up the 'Qiwi REST Payment' add-on. The reason is that in CS-Cart 4.4.1, we've removed the Qiwi payment method based on the SOAP protocol. Instead, use the Qiwi payment method based on the REST protocol that CS-Cart already has for a long time now. Thanks."
-msgstr "If you used the Qiwi payment method based on the SOAP protocol, install and set up the 'Qiwi REST Payment' add-on. The reason is that in CS-Cart 4.4.1, we've removed the Qiwi payment method based on the SOAP protocol. Instead, use the Qiwi payment method based on the REST protocol that CS-Cart already has for a long time now. Thanks."
+msgid "If you used the Qiwi payment method based on the SOAP protocol, install and set up the 'Qiwi Wallet Payment' add-on. The reason is that in CS-Cart 4.4.1, we've removed the Qiwi payment method based on the SOAP protocol. Instead, use the Qiwi payment method based on the REST protocol that CS-Cart already has for a long time now. Thanks."
+msgstr "If you used the Qiwi payment method based on the SOAP protocol, install and set up the 'Qiwi Wallet Payment' add-on. The reason is that in CS-Cart 4.4.1, we've removed the Qiwi payment method based on the SOAP protocol. Instead, use the Qiwi payment method based on the REST protocol that CS-Cart already has for a long time now. Thanks."
 
 msgctxt "Languages::addons.rus_payments.yandex_money_not_order_yandex"
 msgid "Sorry, the refund couldn't be made because the ID that links the order to Yandex transaction wasn't found."
@@ -1663,3 +1651,35 @@ msgstr "To generate sales receipts you also need to configure the connection to 
 msgctxt "Languages::yandex_total"
 msgid "Total"
 msgstr "Total"
+
+msgctxt "Languages::rus_payments.print_invoice.sbrf"
+msgid "Print invoice with QR code"
+msgstr "Print invoice with QR code"
+
+msgctxt "Languages::rus_payments.print_invoice.account"
+msgid "Print invoice"
+msgstr "Print invoice"
+
+msgctxt "Languages::rus_payments.encoding_algorithm"
+msgid "Encoding algorithm"
+msgstr "Encoding algorithm"
+
+msgctxt "Languages::rus_payments.robokassa.final_status"
+msgid "Forming full payment receipt"
+msgstr "Forming full payment receipt"
+
+msgctxt "Languages::rus_payments.robokassa.prepayment_receipt_created"
+msgid "Prepayment receipt created"
+msgstr "Prepayment receipt created"
+
+msgctxt "Languages::rus_payments.robokassa.payment_receipt_created"
+msgid "Full payment receipt created"
+msgstr "Full payment receipt created"
+
+msgctxt "Languages::rus_payments.robokassa.notification_url_method"
+msgid "Method of sending data to [url_type]"
+msgstr "Method of sending data to [url_type]"
+
+msgctxt "Languages::rus_payments.robokassa.technical_preferences"
+msgid "Technical preferences for your Robokassa e-shop"
+msgstr "Technical preferences for your Robokassa e-shop"

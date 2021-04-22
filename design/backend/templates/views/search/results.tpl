@@ -6,7 +6,7 @@
             {foreach from=$found_objects key="object" item="data"}
                 {capture name="buttons"}
                     {$smarty.capture.buttons nofilter}
-                    <div class="cm-tab-tools btn-bar btn-toolbar" id="tools_manage_{$object}_buttons">
+                    <div class="cm-tab-tools btn-bar btn-toolbar dropleft" id="tools_manage_{$object}_buttons">
                     <!--tools_{$object}_buttons--></div>
                 {/capture}
             {/foreach}
@@ -48,5 +48,11 @@
 {/if}
 
 {/capture}
-{assign var="title" value=__("search_results_for", ["[search]" => $smarty.request.q])}
-{include file="common/mainbox.tpl" title=$title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons main_buttons_meta=""}
+{$title=__("search_results_for", ["[search]" => $smarty.request.q])}
+{include 
+    file="common/mainbox.tpl" 
+    title=$title content=$smarty.capture.mainbox 
+    buttons=$smarty.capture.buttons 
+    main_buttons_meta="bulkedit-buttons-disabled" 
+    mainbox_content_wrapper_class="bulkedit-disabled"
+}

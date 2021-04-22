@@ -5,100 +5,244 @@ msgstr ""
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /release-4.8.2/addons/product_variations.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:06\n"
+"X-Crowdin-File: /release-4.12.2/addons/product_variations.po\n"
+"X-Crowdin-File-ID: 4118\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::product_variations"
-msgid "Product Variations [Beta]"
-msgstr "商品バリエーション [Beta]"
+msgid "Product Variations"
+msgstr "商品バリエーション"
 
 msgctxt "Addons::description::product_variations"
-msgid "Variants of a product that comes in more than one option, such as color or size."
-msgstr "色やサイズなど、オプションがついた商品のバリエーション"
+msgid "Create products with different feature variants (for example, a different color or size), and let customers select the desired variant."
+msgstr "異なるバリエーション (例：カラーやサイズ) で商品を作成できます。"
 
-msgctxt "Languages::product_variations.btn_generate"
-msgid "Generate variations"
-msgstr "バリエーションの生成"
+msgctxt "SettingsSections::product_variations::general"
+msgid "General"
+msgstr "基本設定"
 
-msgctxt "Languages::product_variations.generating.title"
-msgid "Generating variations: [product]"
-msgstr "バリエーションの生成: [product]"
+msgctxt "SettingsOptions::product_variations::variations_allow_own_images"
+msgid "Allow own images for child variations"
+msgstr "子バリエーションに独自画像を許可"
 
-msgctxt "Languages::product_variations.generating.select_variants"
-msgid "Select variants"
-msgstr "バリエーションの選択"
+msgctxt "SettingsTooltips::product_variations::variations_allow_own_images"
+msgid "If child variations aren't allowed to have their own images, they will use the images from the default variation of the catalog item."
+msgstr "子バリエーションに独自画像が許可されていない場合、デフォルトバリエーションの画像が使用されます。"
 
-msgctxt "Languages::product_variations.selected_default"
-msgid "Selected by default"
+msgctxt "SettingsOptions::product_variations::variations_allow_auto_change_default_variation"
+msgid "Change default variation when it gets hidden or runs out of stock"
 msgstr ""
 
-msgctxt "Languages::product_variations.selected_default_tooltip"
-msgid "The variation which should be selected by default in the Storefront"
+msgctxt "SettingsTooltips::product_variations::variations_allow_auto_change_default_variation"
+msgid "Ensure that customers always see the products that are in stock first. We recommend leaving this setting enabled for better filtering of variations."
+msgstr "在庫のある商品を常に表示します。（推奨）"
+
+msgctxt "SettingsOptions::product_variations::variations_allow_own_features"
+msgid "Allow own feature values for child variations"
+msgstr "子バリエーションに追加情報を許可"
+
+msgctxt "SettingsTooltips::product_variations::variations_allow_own_features"
+msgid "If child variations aren't allowed to have their own values for features, they will use the values from the default variation of the catalog item."
+msgstr "子バリエーションに追加情報が許可されていない場合、デフォルトバリエーションの値が使用されます"
+
+msgctxt "SettingsOptions::product_variations::variations_show_all_possible_feature_variants"
+msgid "Show all possible feature variants"
+msgstr ""
+
+msgctxt "SettingsTooltips::product_variations::variations_show_all_possible_feature_variants"
+msgid "Show a feature variant even if it is not available for this variation."
 msgstr ""
 
 msgctxt "Languages::product_variations.product_type"
-msgid "Product variations"
+msgid "Product type"
+msgstr "商品タイプ"
+
+msgctxt "Languages::product_variations.product_type.catalog_item"
+msgid "Catalog item"
+msgstr "商品"
+
+msgctxt "Languages::product_variations.product_type.variation_of_catalog_item"
+msgid "Variation of a catalog item"
 msgstr "商品バリエーション"
 
-msgctxt "Languages::product_variations.product_type.simple"
-msgid "Simple product"
-msgstr "シンプルバリエーション"
-
-msgctxt "Languages::product_variations.product_type.variation"
-msgid "Product variation"
-msgstr "商品バリエーション"
-
-msgctxt "Languages::product_variations.product_type.configurable"
-msgid "Configurable product"
-msgstr "設定可能な商品"
-
-msgctxt "Languages::product_variations.parent_product"
-msgid "Parent product"
-msgstr "親階層の商品"
+msgctxt "Languages::product_variations.belongs_to_catalog_item"
+msgid "Belongs to catalog item:"
+msgstr "商品に所属"
 
 msgctxt "Languages::product_variations.variations"
 msgid "Variations"
 msgstr "バリエーション"
 
 msgctxt "Languages::product_variations.variation_of_product"
-msgid "Variation of <a href=\"[url]\">[product]</a>"
-msgstr "<a href=\"[url]\">[product]</a>のバリエーション"
+msgid "Variation of catalog item <a href=\"[url]\">[product]</a>"
+msgstr ""
 
-msgctxt "Languages::product_variations.error.product_variation_must_have_variation_options"
-msgid "The variation_options field is required for a variation product"
-msgstr "Variation_options フィールドは商品バリエーションの必須項目です。"
+msgctxt "Languages::product_variations.group_code"
+msgid "Variation group"
+msgstr "バリエーショングループ"
 
-msgctxt "Languages::product_variations.error.product_variation_must_have_parent_product"
-msgid "A product variation must have a parent product"
-msgstr "商品バリエーションは親商品を必ず持つ必要があります。"
+msgctxt "Languages::product_variations.group_code.placeholder"
+msgid "Set custom group code here"
+msgstr "カスタムグループコードを設定"
 
-msgctxt "Languages::product_variations.error.invalid_variation_options_array"
-msgid "The variation_options array is invalid"
-msgstr "Variation_options 配列が無効です。"
+msgctxt "Languages::product_variations.group_code.description"
+msgid "Use the group code on a product editing page or during import to add the product to this group as a variation. A group code can contain only digits, Latin characters, and the following signs: \"-\" and \"_\"."
+msgstr "商品編集ページまたは商品をバリエーションとして追加インポートする際にグループコードを使用します。グループコードは英数字および \"-\" と \"_\" のみを使用できます。"
 
-msgctxt "Languages::product_variations.error.product_variation_already_exists"
-msgid "A product variation with same variation_code already exists"
-msgstr "同じvariation_codeの商品バリエーションは既に存在します。"
+msgctxt "Languages::product_variations.group_code.link"
+msgid "Add to variation group"
+msgstr "バリエーショングループに追加"
 
-msgctxt "Languages::product_variations.convert_to_configurable_product"
-msgid "Convert to configurable product"
-msgstr "構成可能な商品に変換する。"
+msgctxt "Languages::product_variations.add_variations"
+msgid "Add variations"
+msgstr "バリエーションの追加"
 
-msgctxt "Languages::product_variations.confirm_convert_to_configurable_product"
-msgid "You can't undo this action unless you restore the database from backup or re-create this product as a simple product manually. The option combinations and exceptions (allowed/forbidden combinations) of this product will be lost. Are you sure you want to proceed?"
-msgstr "バックアップからデータベースを復元するか、この商品を手動でシンプルな商品として再作成しない限り、この操作を取り消すことはできません。 この商品オプションの組み合わせと例外（許可/禁止の組み合わせ）は失われます。 このまま実行してもいいでしょうか？"
+msgctxt "Languages::product_variations.link_existing"
+msgid "Use existing products"
+msgstr "既存商品を使用"
 
-msgctxt "Languages::product_variations.convert_to_configurable_product_success"
-msgid "Product successfully converted"
-msgstr "商品の変換は成功しました。"
+msgctxt "Languages::product_variations.create_new"
+msgid "Create new products"
+msgstr "商品を作成"
 
-msgctxt "Languages::product_variations.error.configurable_product_must_have_file"
-msgid "A downloadable configurable product must have at least one active file for sale."
-msgstr "ダウンロード可能な設定可能な商品には、少なくとも1つのアクティブ・ファイルが必要です。"
+msgctxt "Languages::product_variations.add_variations_description"
+msgid "Add variations to generate a group of similar products that differ in color, size, etc. Or add this product to an existing group by entering the group code."
+msgstr ""
+
+msgctxt "Languages::product_variations.manage"
+msgid "Manage variations"
+msgstr "バリエーションの管理"
+
+msgctxt "Languages::product_variations.edit_features"
+msgid "Edit features"
+msgstr "追加情報を編集"
+
+msgctxt "Languages::product_variations.delete"
+msgid "Disband group"
+msgstr "グループから除外"
+
+msgctxt "Languages::product_variations.remove_variation"
+msgid "Remove variation from group"
+msgstr "バリエーションをグループから削除"
+
+msgctxt "Languages::product_variations.delete_product"
+msgid "Delete product"
+msgstr "商品を削除"
+
+msgctxt "Languages::product_variations.mark_main_product"
+msgid "Set as default variation"
+msgstr "デフォルトに設定"
+
+msgctxt "Languages::product_variations.no_available_features"
+msgid "This product doesn't have features that allow grouping products. Please make sure that:<ol><li>You have created at least one feature with <b>Purpose:</b> <i>Variations as separate products</i> or <i>Variations as one product</i>.</li><li>You have specified the value of that feature for the product.</li></ol><a href=[manage_features_href]>Manage features</a>"
+msgstr ""
+
+msgctxt "Languages::product_feature.purpose.group_catalog_item"
+msgid "Variations as separate products"
+msgstr "バリエーション（異なる商品を作成）"
+
+msgctxt "Languages::product_feature.purpose.group_catalog_item.description"
+msgid "For cases when a few similar products differ visibly by a feature, and have different names (for example, multiple \"Color\" variants of a T-shirt). These products will appear as separate positions in the catalog. Customers will also be able to select the desired feature value on the product page. To achieve this, <b>set up variations for products with this feature</b>."
+msgstr "追加情報により見た目が違う場合（例：Tシャツの複数の \"色\"）: 異なるバリエーションは別々の商品としてショップフロントに表示され、また商品ページにおいては異なる追加情報として選択できます。<b>この追加情報を商品のバリエーションに設定してください。</b>"
+
+msgctxt "Languages::product_feature.feature_style.dropdown"
+msgid "Drop-down list"
+msgstr "ドロップダウンリスト"
+
+msgctxt "Languages::product_feature.feature_style.dropdown_images"
+msgid "Images"
+msgstr "画像"
+
+msgctxt "Languages::product_feature.feature_style.dropdown_labels"
+msgid "Text labels"
+msgstr "テキストラベル"
+
+msgctxt "Languages::product_feature.purpose.group_variation_catalog_item"
+msgid "Variations as one product"
+msgstr "バリエーション（1商品内に設定）"
+
+msgctxt "Languages::product_feature.purpose.group_variation_catalog_item.description"
+msgid "For cases when a few similar products differ by a feature, but have the same name and similar appearance (for example, multiple \"Size\" variants of a T-shirt). These products will occupy a single position in the catalog. Customers will be able to select the desired feature value on the product page. To achieve this, <b>set up variations for products with this feature</b>."
+msgstr "同名、見た目は同じだが異なる追加情報の場合（例：Tシャツの複数の \"サイズ\" ）: 商品ページにおいて異なる追加情報として選択できます。<b>この追加情報を商品のバリエーションに設定してください。</b>"
+
+msgctxt "Languages::product_variations.error.group_not_found"
+msgid "Variation group #[id] not found"
+msgstr "バリエーショングループ #[id] が見つかりません"
+
+msgctxt "Languages::product_variations.error.product_not_found_in_group"
+msgid "Product #[product_id] not found in variation group \"[group_code]\""
+msgstr "バリエーショングループ \"[group_code]\" に商品 #[product_id] が見つかりません"
+
+msgctxt "Languages::product_variations.error.cannot_mark_main_product_child_product"
+msgid "Product #[product_id] in group \"[group_code]\" isn't a variation, so it can't become default for a catalog item"
+msgstr "グループ \"[group_code]\" 内の商品 #[product_id] はバリエーションではないため、デフォルトに設定できません。"
+
+msgctxt "Languages::product_variations.error.generate_combinations_is_empty"
+msgid "Couldn't generate variations. Please specify the values of features to generate variations."
+msgstr "バリエーションを作成できません。追加情報のバリエーションを選択してください。"
+
+msgctxt "Languages::product_variations.error.generate_products_is_empty"
+msgid "No new products were created"
+msgstr "新しい商品は作成されませんでした"
+
+msgctxt "Languages::product_variations.error.product_not_found"
+msgid "Product #[product_id] not found"
+msgstr "商品 #[product_id] は見つかりませんでした"
+
+msgctxt "Languages::product_variations.error.group_not_found_by_product"
+msgid "Couldn't find variation group for #[product_id] \"[product]\""
+msgstr "#[product_id] \"[product]\" のバリエーショングループは見つかりませんでした"
+
+msgctxt "Languages::product_variations.error.feature_combination_is_invalid_for_product"
+msgid "Wrong combination of features for product #[product_id] \"[product]\""
+msgstr "#[product_id] \"[product]\" の追加情報のコンビネーションが間違っています"
+
+msgctxt "Languages::product_variations.error.product_ids_empty"
+msgid "Products couldn't be found"
+msgstr "商品は見つかりませんでした"
+
+msgctxt "Languages::product_variations.select_variation"
+msgid "Select a Variation"
+msgstr ""
+
+msgctxt "Languages::product_variations.error.group_code_is_required"
+msgid "Variation group code must be specified"
+msgstr "バリエーショングループコードを指定してください"
+
+msgctxt "Languages::product_variations.error.group_code_is_invalid"
+msgid "Couldn't set this code for variation group. A group code can contain only digits, Latin characters, and the following signs: \"-\" and \"_\""
+msgstr "このコードはバリエーショングループに設定できません。グループコードは英数字および \"-\" と \"_\" のみを使用できます。"
+
+msgctxt "Languages::product_variations.error.group_code_is_duplicate"
+msgid "The specified variation group code is already in use"
+msgstr "指定したバリエーションコードは既に使用済みです"
+
+msgctxt "Languages::product_variations.error.features_is_empty"
+msgid "Features couldn't be found"
+msgstr "追加情報が見つかりませんでした"
+
+msgctxt "Languages::product_variations.error.no_available_products"
+msgid "No suitable products were found"
+msgstr "適切な商品が見つかりませんでした"
+
+msgctxt "Languages::product_variations.error.product_has_not_required_features"
+msgid "Product #[product_id] \"[product]\" doesn't have the required features to become a variation. Please set feature values for that product."
+msgstr "商品 #[product_id] \"[product]\" バリエーション用の必要な追加情報がありません。商品に追加情報のバリエーションを設定してください。"
+
+msgctxt "Languages::product_variations.error.product_with_features_combination_exits"
+msgid "Product #[product_id] \"[product]\" has the exact same combination of feature values as a variation that already exists in the group."
+msgstr "商品 #[product_id] \"[product]\" には既に同じ追加情報のコンビネーションがあります。"
+
+msgctxt "Languages::product_variations.error.product_company_does_not_match_to_group_company.ult"
+msgid "Product #[product_id] \"[product]\" can't be added to the variation group because all products in a variation group must belong to the same storefront."
+msgstr "バリエーショングループのすべての商品は同じショップに属している必要があるため、商品 #[product_id] \"[product]\" はバリエーショングループに追加できません。"
+
+msgctxt "Languages::product_variations.error.product_company_does_not_match_to_group_company.mve"
+msgid "Product #[product_id] \"[product]\" can't be added to the variation group because all products in a variation group must belong to the same vendor."
+msgstr "バリエーショングループのすべての商品は同じ出品者に属している必要があるため、商品 #[product_id] \"[product]\" はバリエーショングループに追加できません。"
 
 msgctxt "Languages::product_variations.variations_filling"
 msgid "Variations"
@@ -110,133 +254,137 @@ msgstr "バリエーション"
 
 msgctxt "Languages::variations_in_stock"
 msgid "Only \"in stock\" products"
-msgstr "在庫ありの商品"
-
-msgctxt "Languages::product_variations.variation_code"
-msgid "Variation code"
-msgstr "バリエーション・コード"
+msgstr "\"在庫あり\" 商品のみ"
 
 msgctxt "Languages::product_variations.hide_add_to_wishlist_button"
 msgid "Hide add to wish list button"
-msgstr "欲しいものリストの追加ボタンを隠す"
-
-msgctxt "Languages::product_variations.cannot_generate_variations_reason_options"
-msgid "Cannot generate product variations. You may have removed some product options (or disabled inventory tracking for these options). Some existing variations depend on these options. Please roll back your changes to options or remove existing variations of the product and try to generate them again."
-msgstr "商品のバリエーションは生成できません。いくつかの商品オプション（あるいはこれらのオプションのインベントリトラッキングが無効になっている）を削除した可能性があります。いくつかの既存バリエーションは、これらのオプションが適用されます。 変更内容を元のオプションに戻したり、既存のバリエーションを削除して再度生成してください。"
-
-msgctxt "Languages::product_variations.cannot_use_all_options_reason_existent_variations"
-msgid "Cannot use the following options to generate variations: <b>[option_names]</b>. Some existing  variations of the product do not use these options. Please remove existing variations and generate them again to use these options."
-msgstr "バリエーションを生成するのに<b> [option_names] </ b>というオプションは使用できません。いくつかの商品の既存バリエーションには、これらのオプションを使用しないものがあります。 これらのオプションを使用するには、既存バリエーションを削除してから再度作成してください。"
-
-msgctxt "Languages::product_variations.variation"
-msgid "Variation"
-msgstr "バリエーション"
-
-msgctxt "Languages::product_variations.update_name"
-msgid "Update name"
-msgstr "更新名"
-
-msgctxt "Languages::product_variations.add_variations"
-msgid "Add variations"
-msgstr "バリエーションの追加"
-
-msgctxt "Languages::product_variations.cannot_change_variation_options"
-msgid "Product options cannot be changed"
-msgstr "商品オプションは変更できません。"
-
-msgctxt "Languages::product_variations.please_select_combinations"
-msgid "Please select combinations"
-msgstr "コンビネーションを選択してください。"
+msgstr "「ほしい物リストに追加」ボタンを隠す"
 
 msgctxt "Languages::product_variations.variations_list_block_name"
 msgid "Variations list"
-msgstr "バリエーション・リスト"
+msgstr "バリエーションリスト"
 
 msgctxt "Languages::product_variations.variations_list_tab_name"
-msgid "View all options as list"
-msgstr "全てのオプションを一覧で見る。"
-
-msgctxt "Languages::product_variations.exim_error_conf_product_cannot_have_variation_options"
-msgid "Couldn't import product [product_code]: configurable product can't have variation options."
-msgstr "商品[product_code] をインポートできませんでした：設定可能な商品にバリエーション・オプションはありません。"
-
-msgctxt "Languages::product_variations.exim_error_cannot_find_parent_for_variation"
-msgid "Couldn't import product [product_code]: the parent product for this variation doesn't exist or is located in a wrong place in the imported file."
-msgstr "商品[product_code] をインポートできませんでした：このパターンの親商品は存在しないか、インポートされたファイルの間違った場所にあります。"
-
-msgctxt "Languages::product_variations.exim_error_option_is_not_available"
-msgid "Couldn't import product [product_code]: option \"[option_name]\" is not available for this product variation."
-msgstr "商品[product_code] をインポートできませんでした：この商品バリエーションでは[option_name] オプションは使用できません。"
-
-msgctxt "Languages::product_variations.exim_error_invalid_variation_options_format"
-msgid "Couldn't import product [product_code]: invalid format of variation options was provided for this variation."
-msgstr "商品[product_code] をインポートできませんでした：このバリエーションには無効な形式のバリエーション・オプションが用意されています。"
-
-msgctxt "Languages::product_variations.exim_error_invalid_variation_options_provided"
-msgid "Couldn't import product [product_code]: invalid variation options were provided for this variation."
-msgstr "商品[product_code] をインポートできませんでした：このバリエーションには無効なバリエーション・オプションが用意されています。"
-
-msgctxt "Languages::product_variations.exim_error_variation_with_provided_options_exists"
-msgid "Couldn't import product [product_code]: a variation with these variation options already exists."
-msgstr "商品[product_code] をインポートできませんでした：これらのバリエーション・オプションのバリエーションは既に存在します。"
-
-msgctxt "Languages::product_variations.exim_error_variation_cannot_have_empty_variation_options"
-msgid "Couldn't import product [product_code]: a variation must have variation options specified."
-msgstr "商品[product_code] をインポートできませんでした：バリエーションはバリエーション・オプションを指定する必要があります。"
-
-msgctxt "Languages::product_variations.exim_error_cannot_update_product_options_for_variation_or_parent"
-msgid "Couldn't import options for product [product_code]: options can't be updated for a variation or for a product that has at least one variation."
-msgstr "商品[product_code] をインポートできませんでした：オプションは少なくとも1つのバリエーションを持つバリエーション、あるいは商品を更新することはできません。"
-
-msgctxt "Languages::product_variations.exim_error_variant_does_not_exist"
-msgid "Couldn't import product [product_code]: option \"[option_name]\" doesn't have variant \"[variant_name]\"."
-msgstr "商品[product_code] をインポートできませんでした：オプション[option_name] は種類[variant_name] を持ちません。"
-
-msgctxt "Languages::product_variations.text_exim_data_imported"
-msgid "Data is imported successfully. <br />New products - <b>[new]</b>: <ul><li>Simple: <b>[new_simple]</b></li><li>Configurable: <b>[new_conf]</b></li><li>Variations: <b>[new_var]</b></li></ul>Updated products - <b>[exist]</b>: <ul><li>Simple: <b>[upd_simple]</b></li><li>Configurable: <b>[upd_conf]</b></li><li>Variations: <b>[upd_var]</b></li></ul>Skipped products - <b>[skipped]</b>: <ul><li>Simple: <b>[skipped_simple]</b></li><li>Configurable: <b>[skipped_conf]</b></li><li>Variations: <b>[skipped_var]</b></li></ul>Total - <b>[total]</b>."
-msgstr "データのインポートは成功しました。<br />新商品- <b>[new]</b>: <ul><li>シンプル: <b>[new_simple]</b></li><li>設定可能: <b>[new_conf]</b></li><li>バリエーション: <b>[new_var]</b></li></ul>更新商品- <b>[exist]</b>: <ul><li>シンプル: <b>[upd_simple]</b></li><li>設定可能: <b>[upd_conf]</b></li><li>バリエーション: <b>[upd_var]</b></li></ul>飛ばされた商品 - <b>[skipped]</b>: <ul><li>シンプル: <b>[skipped_simple]</b></li><li>設定可能: <b>[skipped_conf]</b></li><li>バリエーション: <b>[skipped_var]</b></li></ul>合計- <b>[total]</b>."
-
-msgctxt "Languages::variation_options"
-msgid "Variation options"
-msgstr "バリエーション・オプション"
-
-msgctxt "Languages::product_variations.cannot_remove_options_that_used_for_variation"
-msgid "Cannot delete option \"[option_name]\" because it is used in product variations. If you'd like to delete this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
-msgstr "商品バリエーションの中で使われているため、オプション[option_name] は削除できませんでした。このオプションを削除したい場合、このオプションを最初に使う前に、<a href=\"[search_link]\">商品バリエーション</a> を削除してください。"
-
-msgctxt "Languages::product_variations.cannot_disable_options_that_used_for_variation"
-msgid "Cannot disable option \"[option_name]\" because it is used in product variations. If you'd like to disable this option, please delete the <a href=\"[search_link]\">product variations</a> that use this option first."
-msgstr ""
+msgid "View all variations as list"
+msgstr "全てのバリエーションリスト"
 
 msgctxt "Languages::product_variations.show_variation_thumbnails"
 msgid "Show variation thumbnails"
-msgstr "バリエーションのサムネイル画像を表示する"
+msgstr "バリエーションのサムネイルを表示する"
 
 msgctxt "Languages::product_variations.show_product_code"
 msgid "Show product code"
 msgstr "商品コードを表示する"
 
-msgctxt "Languages::tt_addons_product_variations_hooks_products_update_product_tracking_override_inventory"
-msgid "Track in stock product quantity. Enable the \"Enable inventory tracking\" option (Settings -> General) to modify."
+msgctxt "Languages::product_variations.exim.result_notice"
+msgid "Data is imported successfully.<br />New products - <b>[new]</b>;<br />Updated products - <b>[exist]</b>;<br />Skipped products - <b>[skipped]</b>;<br />Total - <b>[total]</b>;<br />Created variations - <b>[variation_created]</b>;<br />Updated variations - <b>[variation_updated]</b>;<br />Disbanded variations - <b>[variation_removed]</b>."
+msgstr "データが正常にインポートされました。<br />新しい商品 - <b>[new]</b>;<br />更新された商品 - <b>[exist]</b>;<br />スキップされた商品 - <b>[skipped]</b>;<br />合計 - <b>[total]</b>;<br />作成されたバリエーション - <b>[variation_created]</b>;<br />更新されたバリエーション - <b>[variation_updated]</b>;<br />除外されたバリエーション - <b>[variation_removed]</b>"
+
+msgctxt "Languages::variation_group_id"
+msgid "Variation group ID"
+msgstr "バリエーショングループID"
+
+msgctxt "Languages::variation_group_code"
+msgid "Variation group code"
+msgstr "バリエーショングループコード"
+
+msgctxt "Languages::variation_parent_product_id"
+msgid "Variation parent product ID"
+msgstr "バリエーション親商品ID"
+
+msgctxt "Languages::variation_sub_group_id"
+msgid "Variation sub group ID"
+msgstr "バリエーションサブグループID"
+
+msgctxt "Languages::product_variations.feature_used_by_variation_group.tooltip"
+msgid "This feature is used by variation group [code]. To choose a different value of this feature for a product, switch to the \"Variations\" tab of the product editing page. New values can be added on the feature editing page."
+msgstr "この追加情報はバリエーショングループ [code] に使用されています。追加情報の異なるバリエーションを選択するには、商品編集画面の \"バリエーション\" タブに移動してください。"
+
+msgctxt "Languages::product_variations.variations_naming_strategy.key_value"
+msgid "Color: Red, Size: Small"
+msgstr "色: レッド、サイズ： S"
+
+msgctxt "Languages::product_variations.variations_naming_strategy.value"
+msgid "Red, Small"
+msgstr "レッド、S"
+
+msgctxt "Languages::product_variations.upgrade_notification.convert_variations_title"
+msgid "Convert product variations to use features"
+msgstr "商品バリエーションを追加情報に変換"
+
+msgctxt "Languages::product_variations.upgrade_notification.convert_variations_message"
+msgid "<p>Product variations in version 4.10.1 are more powerful than ever. They can now occupy separate positions in the catalog, be filtered and imported easily. To achieve this, we remade variations from scratch. They are now based on features instead of options.</p><p><b>We have disabled the old variations in your store, because they won’t work until they are converted.</b> The conversion is automatic, we just need your consent. Please check what we plan to do, and convert variations to use features.</p><p><a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Check and convert variations</a> <a href=\"https://docs.cs-cart.com/4.10.x/user_guide/manage_products/products/product_variations.html\" target=\"_blank\" class=\"btn btn-large\">Learn more about variations</a></p>"
+msgstr "<p>バージョン 4.10.1-jp-1 の商品バリエーションは更に改良されました。より簡単にインポート、フィルターができ、異なるバリエーション毎の商品でショップに表示されます。オプションではなく追加情報からバリエーションが作成されるようになりました。</p><p><b>古い商品バリエーションは変換するまで動作しないため無効化しました。</b>変換自体は自動で行われますが、確認する必要があります。こちらからバリエーションを追加情報に変換してください。</p><p><a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">確認してバリエーションを変換</a> <a href=\"http://manual.cs-cart.jp/4101jp1/ja/topic/product-variation\" target=\"_blank\">商品バリエーション</a> </p>"
+
+msgctxt "Languages::product_variations.feature_can_be_deleted"
+msgid "Couldn't delete a feature or its variant because at least one variation group is based on it. Please delete <a href=\"[href]\">these products</a> or disband their product groups, and try again."
+msgstr "少なくとも１つのバリエーショングループが使用しているため、追加情報またはそのバリエーションを削除できません。<a href=\"[href]\">これらの商品</a> を削除するか、商品グループを無効にし、再実行してください。"
+
+msgctxt "Languages::product_variations.notice.old_product_variations_exists"
+msgid "Your store still has old product variations. They currently appear as separate products, without the ability to switch between them. To make them work as before the upgrade, <a href=\"[convert_url]\">convert old variations to new variations</a>. It's easy and automatic."
+msgstr "古い商品バリエーションが残っています。<a href=\"[convert_url]\">新しい商品バリエーションに変換</a> してください。"
+
+msgctxt "Languages::product_variations.notice.is_old_product_variation"
+msgid "This product is an old variation that hasn't been converted yet. To make it work as before the upgrade, <a href=\"[convert_url]\">convert old variations to new variations</a>."
+msgstr "この商品は古い商品バリエーションです。<a href=\"[convert_url]\">新しい商品バリエーションに変換</a> してください。"
+
+msgctxt "Languages::variation_set_as_default"
+msgid "Variation set as default"
+msgstr "デフォルトバリエーション"
+
+msgctxt "Languages::product_variations.cant_edit_feature_categories"
+msgid "Couldn't assign feature to categories or a feature group. Some variations use this feature and aren't in the categories you tried to assign. Please delete <a href=\"[href]\">these products</a>, or disband their variation groups, or assign them to the same categories as feature or feature group, and try again."
+msgstr "追加情報をカテゴリーまたは追加情報グループに割り当てられません。<a href=\"[href]\">これらの商品を</a>削除するか、バリエーショングループを無効化する、あるいは同じカテゴリーまたは追加情報グループに割り当ててください。"
+
+msgctxt "Languages::product_variations.too_many_combinations"
+msgid "Sorry, there are too many possible variations that can be generated. To prevent heavy load, we won't display them here. Please create the products with the right feature values manually or via import, and add them to the group."
 msgstr ""
 
-msgctxt "Languages::tt_addons_product_variations_hooks_products_categories_section_post_categories"
-msgid "Categories to be displayed in the navigation breadcrumbs."
+msgctxt "Languages::product_variations.generator.features.placeholder"
+msgid "Search for features that can generate variations"
 msgstr ""
 
-msgctxt "Languages::product_variations.inventory_notice"
-msgid "This product doesn't have any options suitable for creating variations. Please make sure that the product has at least one active option with the ticked <b>Inventory</b> checkbox, and variants exist for that option."
+msgctxt "Languages::product_variations.generator.warning.new_features_add"
+msgid "You can add a new feature if you disband the group in the actions menu and create variations again."
 msgstr ""
 
-msgctxt "Languages::product_variations.error.cannot_disable_option_variant"
-msgid "Variant \"[variant_name]\" can't be disabled because some existing product variations use it."
+msgctxt "Languages::product_variations.generator.feature_variants.placeholder"
+msgid "Type to search"
 msgstr ""
 
-msgctxt "Languages::product_variations.error.cannot_remove_option_variant"
-msgid "Variant \"[variant_name]\" can't be removed because some existing product variations use it."
+msgctxt "Languages::product_variations.generator.feature_variants.add_all_variants"
+msgid "Add all variants"
 msgstr ""
 
-msgctxt "Languages::is_default_product_variation"
-msgid "Is default product variation"
+msgctxt "Languages::product_variations.generator.table.title"
+msgid "Modify the variations to be created:"
+msgstr ""
+
+msgctxt "Languages::product_variations.generator.create_btn"
+msgid "Create [n] variation|Create [n] variations"
+msgstr ""
+
+msgctxt "Languages::product_variations.allow_own_features_setting_changing"
+msgid "You've disabled the <b>Allow own feature values for child variations</b> setting. Please export <a href=\"[url]\">all your default variations</a> (use \"Export found products\" in the gear button) and reimport them. This will apply their feature values to existing child variations."
+msgstr ""
+
+msgctxt "Languages::product_variations.allow_own_images_setting_changing"
+msgid "You've disabled the <b>Allow own images for child variations</b> setting. Please export <a href=\"[url]\">all your default variations</a> (use \"Export found products\" in the gear button) and reimport them. This will apply their images to existing child variations."
+msgstr ""
+
+msgctxt "Languages::product_variations.upgrade_notification.convert_combination_title"
+msgid "Convert option combinations to product variations"
+msgstr ""
+
+msgctxt "Languages::product_variations.upgrade_notification.convert_combination_message"
+msgid "<p>In the upcoming version 4.12.1, product variations will fully replace option combinations. The code that handles option combinations will be removed. Please note that ONLY <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\">option combinations</a> and their code will be removed. <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\">Options</a> themselves will remain exactly as they are now.</p><p>Your store still has option combinations. That's why we ask you to convert option combinations into product variations. The process is mostly automatic. We only ask your input to make sure that everything goes smoothly and according to your expectations.</p><p><a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large btn-primary\">Convert option combinations</a></p>"
+msgstr ""
+
+msgctxt "Languages::product_variations.upgrade_notification.convert_combination_message_without_variations"
+msgid "<p>In the upcoming version 4.12.1, product variations will fully replace option combinations. The code that handles option combinations will be removed. Please note that ONLY <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/option_combinations.html\" target=\"_blank\">option combinations</a> and their code will be removed. <a href=\"https://docs.cs-cart.com/4.11.x/user_guide/manage_products/options/index.html\" target=\"_blank\">Options</a> themselves will remain exactly as they are now.</p><p>Your store still has option combinations. That's why we ask you to convert option combinations into product variations. The process is mostly automatic. We only ask your input to make sure that everything goes smoothly and according to your expectations.</p><p>However, the Product Variations add-on isn't active in your store yet. You'll need to install or enable it first, and run the conversion.</p><p><a href=\"[search_for_addon]\" target=\"_blank\" class=\"btn btn-large\">1. Activate the add-on</a> <a href=\"[convert_url]\" target=\"_blank\" class=\"btn btn-large\">2. Convert option combinations</a></p>"
+msgstr ""
+
+msgctxt "Languages::product_variations.add_all_variants"
+msgid "Add all variants"
 msgstr ""
 

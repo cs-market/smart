@@ -9,7 +9,7 @@
 {assign var="c_dummy" value="<i class=\"icon-dummy\"></i>"}
 
 {if $yd_orders}
-<table width="100%" class="table table-middle">
+<table width="100%" class="table table-middle table--relative">
     <thead>
     <tr>
         <th class="center" width="5%">

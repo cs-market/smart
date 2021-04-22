@@ -16,7 +16,6 @@ namespace Tygh\Themes;
 
 use Tygh\Http;
 use Tygh\Less;
-use Tygh\Themes\Patterns;
 use Tygh\Registry;
 
 class Styles
@@ -307,9 +306,11 @@ class Styles
 
     /**
      * Processes data copy according to schema
+     *
      * @param  string $style_id style ID
      * @param  array  $data     style
-     * @return return style
+     *
+     * @return array return style
      */
     public function processCopy($style_id, $data)
     {
@@ -409,7 +410,11 @@ class Styles
 
             if (!empty($missed_logo_types)) {
                 fn_create_theme_logos_by_layout_id(
-                    $this->theme_name, $layout_id, $this->company_id, false, $style_id,
+                    $this->theme_name,
+                    $layout_id,
+                    $this->company_id,
+                    false,
+                    $style_id,
                     array_keys($missed_logo_types)
                 );
             }
@@ -492,7 +497,7 @@ class Styles
                             'type' => $logo['type'],
                             'layout_id' => $logo['layout_id'],
                             'style_id' => $to['style'],
-                        ), $this->company_id);
+                        ), $logo['company_id'], $logo['storefront_id']);
 
                         fn_clone_image_pairs($object_id, $logo['logo_id'], 'logos');
                     }

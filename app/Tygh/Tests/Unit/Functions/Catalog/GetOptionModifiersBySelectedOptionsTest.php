@@ -33,9 +33,7 @@ class GetOptionModifiersBySelectedOptionsTest extends ATestCase
      */
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
-
-        $this->requireCore('functions/fn.catalog.php');
+        $this->requireCore('functions/fn.options.php');
         $this->requireMockFunction('fn_set_hook');
 
         $this->current_app = Tygh::$app;

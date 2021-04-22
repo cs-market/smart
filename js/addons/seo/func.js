@@ -1,48 +1,67 @@
-(function($, _) {
-    $(_.doc).on('keyup', '.cm-seo-check-changed', function(){
-        var self = $(this);
-        if (self.prop('defaultValue') !== '') {
-            self.parent().find('.cm-seo-check-changed-block').switchAvailability(self.val() == self.prop('defaultValue'), true);
-        }
-    });
+(function ($, _) {
+  $($('.cm-seo-check-changed-block-container', _.doc)).on('keyup', '.cm-seo-check-changed', function () {
+    var self = $(this);
 
+    if (self.prop('defaultValue') !== '') {
+      self.parents('.cm-seo-check-changed-block-container').find('.cm-seo-check-changed-block').switchAvailability(self.val() == self.prop('defaultValue'), true);
+    }
+  });
+  $(document).ready(function () {
+    var $titleElm = $('.cm-seo-srs-title');
 
-    $(document).ready(function() {
-
-        var title_len = 60;
-        var descr_len = 145;
-
-        var title_elm = $('.cm-seo-srs-title');
-        if (!title_elm.length) {
-            return false;
-        }
-
-        var price_elm = $('#sec_elm_seo_srs_price');
-        var description_elm = $('.cm-seo-srs-description');
-
-        $('#product_description_product').change(function() {
-            title_elm.text(format($(this).val(), title_len));
-        });
-
-        $('#elm_price_price').change(function() {
-            price_elm.text($(this).val());
-        });
-
-        $('#elm_product_full_descr').ceEditor('change', function(html) {
-            description_elm.text(format(html, descr_len));
-        });
-
-        $('#elm_product_short_descr').ceEditor('change', function(html) {
-            if (!$('#elm_product_full_descr').ceEditor('val')) {
-                description_elm.text(format(html, descr_len));
-            }
-        });
-    });
-
-    function format(str, len)
-    {
-        str = fn_strip_tags(str);
-        return str.substr(0, len) + ' ...';
+    if (!$titleElm.length) {
+      return false;
     }
 
-}(Tygh.$, Tygh));
+    var $priceElm = $('#sec_elm_seo_srs_price');
+    var $descriptionElm = $('.cm-seo-srs-description');
+    var $productPageTitleElm = $('#elm_product_page_title');
+    var $productDescriptionElm = $('#product_description_product');
+    var $productFullDescriptionElm = $('#elm_product_full_descr');
+    var $productShortDescriptionElm = $('#elm_product_short_descr');
+    var $productMetaDescriptionElm = $('#elm_product_meta_descr');
+    var titleLength = $productPageTitleElm.data('caSeoLength') || 60;
+    var descriptionLength = $productMetaDescriptionElm.data('caSeoLength') || 145;
+    $productDescriptionElm.change(function () {
+      $titleElm.text(format($(this).val(), titleLength));
+    });
+    $productPageTitleElm.on('input', function () {
+      if ($(this).val()) {
+        $titleElm.text(format($(this).val(), titleLength));
+      } else {
+        $titleElm.text(format($productDescriptionElm.val(), titleLength));
+      }
+    });
+    $('#elm_price_price').change(function () {
+      $priceElm.text($(this).val());
+    });
+    $productFullDescriptionElm.ceEditor('change', function (html) {
+      $descriptionElm.text(format(html, descriptionLength));
+    });
+    $productShortDescriptionElm.ceEditor('change', function (html) {
+      if (!$productFullDescriptionElm.ceEditor('val')) {
+        $descriptionElm.text(format(html, descriptionLength));
+      }
+    });
+    $('#elm_product_meta_descr').on('input', function () {
+      if ($(this).val()) {
+        $descriptionElm.text(format($(this).val(), descriptionLength));
+      } else if ($productFullDescriptionElm.val()) {
+        $descriptionElm.text(format($productFullDescriptionElm.val(), descriptionLength));
+      } else {
+        $descriptionElm.text(format($productShortDescriptionElm.val(), descriptionLength));
+      }
+    });
+  });
+
+  function format(str, len) {
+    str = fn_strip_tags(str);
+    var modifiedStr = str.substr(0, len);
+
+    if (str.length > len) {
+      modifiedStr += ' ...';
+    }
+
+    return modifiedStr;
+  }
+})(Tygh.$, Tygh);

@@ -14,18 +14,30 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
-use Tygh\Payments\Addons\StripeConnect\StripeConnect;
-use Tygh\Registry;
+use Tygh\Addons\StripeConnect\Payments\StripeConnect;
 
 /** @var array $order_info */
 /** @var array $processor_data */
 
-if (!empty($order_info['payment_info']['stripe_connect.token'])) {
+if (!empty($order_info['payment_info']['stripe_connect.payment_intent_id'])) {
+    $processor = new StripeConnect(
+        $order_info['payment_id'],
+        Tygh::$app['db'],
+        Tygh::$app['addons.stripe_connect.price_formatter'],
+        Tygh::$app['addons.stripe_connect.settings'],
+        $processor_data['processor_params']
+    );
 
-    $processor = new StripeConnect($order_info['payment_id'], $processor_data);
-    $processor->setDb(Tygh::$app['db']);
-    $processor->setAddonsSettings(Registry::get('addons.stripe_connect'));
-    $processor->setFormatter(Tygh::$app['formatter']);
+    $pp_response = $processor->chargeWith3DSecure($order_info);
+} elseif (!empty($order_info['payment_info']['stripe_connect.token'])) {
+    $processor = new StripeConnect(
+        $order_info['payment_id'],
+        Tygh::$app['db'],
+        Tygh::$app['addons.stripe_connect.price_formatter'],
+        Tygh::$app['addons.stripe_connect.settings'],
+        $processor_data['processor_params']
+    );
 
-    $pp_response = $processor->charge($order_info);
+    // phpcs:ignore
+    $pp_response = $processor->chargeWithout3DSecure($order_info);
 }

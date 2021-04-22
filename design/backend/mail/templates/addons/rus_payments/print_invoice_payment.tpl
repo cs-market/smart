@@ -110,7 +110,11 @@
                 {math equation="count_products + `$product.amount`" count_products=$count_products assign="count_products"}
                 <tr>
                     <td align="center">{$id}</td>
-                    <td>{$product.product}</td>
+                    <td>
+                        {$product.product}
+                        {hook name="orders:product_info"}
+                        {/hook}
+                    </td>
                     <td align="center">{$product.amount}</td>
                     <td align="center">{__("items")}</td>
                     <td align="center">

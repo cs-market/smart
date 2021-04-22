@@ -14,6 +14,8 @@
 
 namespace Tygh\PriceList;
 
+use Tygh\Enum\YesNo;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 
 abstract class AGenerator {
@@ -22,6 +24,8 @@ abstract class AGenerator {
 
     protected $price_schema;
     protected $selected_fields;
+    /** @var int|string $storefront_id Storefront identifier */
+    protected $storefront_id;
 
     public function __construct()
     {
@@ -34,8 +38,22 @@ abstract class AGenerator {
         $parts = explode('\\', get_class($this));
         $type = array_pop($parts);
         $type = strtolower($type);
+        $filename = fn_get_files_dir_path() . 'price_list/price_list_';
+        if ($this->storefront_id) {
+            $filename .= $this->storefront_id . '_';
+        }
 
-        return fn_get_files_dir_path() . 'price_list/price_list_' . CART_LANGUAGE . '.' . $this->price_schema['types'][$type]['extension'];
+        return $filename . CART_LANGUAGE . '.' . $this->price_schema['types'][$type]['extension'];
+    }
+
+    /**
+     * Sets storefront for which price list will be generated.
+     *
+     * @param int|string $storefront_id Storefront identifier.
+     */
+    public function setStoreFrontId($storefront_id)
+    {
+        $this->storefront_id = $storefront_id;
     }
 
     /**
@@ -44,9 +62,15 @@ abstract class AGenerator {
     public function render()
     {
         $this->printHeader();
+        if ($this->storefront_id && fn_allowed_for('MULTIVENDOR')) {
+            $repository = StorefrontProvider::getRepository();
+            $storefront = $repository->findById((int) $this->storefront_id);
+            if ($storefront) {
+                $company_ids = $storefront->getCompanyIds();
+            }
+        }
 
-        if (Registry::get('addons.price_list.group_by_category') == 'Y') {
-
+        if (YesNo::toBool(Registry::get('addons.price_list.group_by_category'))) {
             $categories = fn_get_plain_categories_tree(0, false);
 
             foreach ($categories as $category) {
@@ -55,26 +79,29 @@ abstract class AGenerator {
                     continue;
                 }
 
-                $this->printCategoryRow($category);
-
-                $params = array();
+                $params = [];
                 $params['sort_by'] = $this->price_schema['fields'][Registry::get('addons.price_list.price_list_sorting')]['sort_by'];
                 $params['page'] = 1;
-                $params['skip_view'] = 'Y';
+                $params['skip_view'] = YesNo::YES;
                 $params['cid'] = $category['category_id'];
-                $params['subcats'] = 'N';
+                $params['subcats'] = YesNo::NO;
+                $params['category'] = $category;
+                if (isset($company_ids)) {
+                    $params['company_ids'] = $company_ids;
+                }
 
                 $this->processProducts($params);
             }
 
         } else {
 
-            $total = static::ITEMS_PER_PAGE;
-
-            $params = array();
+            $params = [];
             $params['sort_by'] = $this->price_schema['fields'][Registry::get('addons.price_list.price_list_sorting')]['sort_by'];
             $params['page'] = 1;
-            $params['skip_view'] = 'Y';
+            $params['skip_view'] = YesNo::YES;
+            if (isset($company_ids)) {
+                $params['company_ids'] = $company_ids;
+            }
 
             $this->processProducts($params);
         }
@@ -89,10 +116,19 @@ abstract class AGenerator {
     protected function processProducts($params)
     {
         $total = static::ITEMS_PER_PAGE;
+        $is_category_row_printed = false;
+        if (isset($params['category'])) {
+            $category = $params['category'];
+            unset($params['category']);
+        }
 
         while (static::ITEMS_PER_PAGE * ($params['page'] - 1) <= $total) {
             list($products, $search) = fn_get_products($params, static::ITEMS_PER_PAGE);
             $total = $search['total_items'];
+            if (isset($category) && $total && !$is_category_row_printed) {
+                $this->printCategoryRow($category);
+                $is_category_row_printed = true;
+            }
 
             if ($params['page'] == 1) {
                 fn_set_progress('parts', $total);
@@ -106,6 +142,14 @@ abstract class AGenerator {
                 'get_options' => (Registry::get('addons.price_list.include_options') == 'Y')? true : false,
                 'get_discounts' => false,
             );
+
+            /**
+             * @param \Tygh\PriceList\AGenerator $this     AGenerator instance
+             * @param array                      $products List of products
+             * @param array                      $_params  Array of flags which determines which data should be gathered
+             */
+            fn_set_hook('price_list_process_products_before_gather_additional_products_data', $this, $products, $_params);
+
             fn_gather_additional_products_data($products, $_params);
 
             $params['page']++;

@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
+use Tygh\Enum\Addons\Discussion\DiscussionTypes;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -28,12 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'update') {
     if (!fn_allowed_for('ULTIMATE')) {
-        $discussion = fn_get_discussion($_REQUEST['company_id'], 'M', true, $_REQUEST);
-        if (!empty($discussion) && $discussion['type'] != 'D') {
-            Registry::set('navigation.tabs.discussion', array (
+
+        $discussion = fn_get_discussion($_REQUEST['company_id'], DiscussionObjectTypes::COMPANY, true, $_REQUEST);
+
+        if (!empty($discussion) &&
+            $discussion['type'] !== DiscussionTypes::TYPE_DISABLED &&
+            fn_check_permissions('discussion', 'view', 'admin')
+        ) {
+            Registry::set('navigation.tabs.discussion', [
                 'title' => __('discussion_title_company'),
-                'js' => true
-            ));
+                'js'    => true,
+            ]);
 
             Tygh::$app['view']->assign('discussion', $discussion);
         }

@@ -14,11 +14,13 @@
 
 namespace Tygh\Shippings\Services;
 
-use Tygh\Shippings\IService;
-use Tygh\Registry;
-use Tygh\Http;
-use Tygh\Shippings\RusPickpoint;
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Tygh;
+use Tygh\Http;
+use Tygh\Registry;
+use Tygh\Shippings\IService;
+use Tygh\Shippings\RusPickpoint;
+
 
 /**
  * Pickpoint shipping service
@@ -115,9 +117,9 @@ class Pickpoint implements IService
     {
         $data = array();
         $key_data = array();
-        $pickpoint_info = Registry::get('addons.rus_pickpoint');
-        $login = RusPickpoint::Login();
-        $url = RusPickpoint::Url();
+        $pickpoint_info = $this->_shipping_info['service_params']['pickpoint_info'];
+        $login = RusPickpoint::login($pickpoint_info);
+        $url = RusPickpoint::url($pickpoint_info);
         $extra_data = RusPickpoint::$extra_data;
 
         $delivery_mode = empty($this->_shipping_info['service_params']['delivery_mode']) ? '' : $this->_shipping_info['service_params']['delivery_mode'];
@@ -127,7 +129,7 @@ class Pickpoint implements IService
 
         if ($login) {
             $pickpoint_office = (!empty(Tygh::$app['session']['cart']['pickpoint_office'])) ? Tygh::$app['session']['cart']['pickpoint_office'] : array();
-            $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
+            $weight_data = fn_convert_weight_to_imperial_units($this->_shipping_info['package_info']['W']);
             $shipping_settings = $this->_shipping_info['service_params'];
             $weight = round($weight_data['plain'] * Registry::get('settings.General.weight_symbol_grams') / 1000, 3);
 
@@ -149,7 +151,7 @@ class Pickpoint implements IService
                         $package_length = empty($package['shipping_params']['box_length']) ? $length : $package['shipping_params']['box_length'];
                         $package_width = empty($package['shipping_params']['box_width']) ? $width : $package['shipping_params']['box_width'];
                         $package_height = empty($package['shipping_params']['box_height']) ? $height : $package['shipping_params']['box_height'];
-                        $weight_ar = fn_expand_weight($package['weight']);
+                        $weight_ar = fn_convert_weight_to_imperial_units($package['weight']);
                         $package_weight = round($weight_ar['plain'] * Registry::get('settings.General.weight_symbol_grams') / 1000, 3);
 
                         $pickpoint_weight = $pickpoint_weight + $package_weight;
@@ -191,14 +193,16 @@ class Pickpoint implements IService
             } else {
                 $city = (!empty($location['city'])) ? $location['city'] : '';
                 $this->address_pickpoint = RusPickpoint::findPostamatPickpoint($pickpoint_id, $city);
-                $data_zone['ToPT'] = $pickpoint_id;
-                $pickpoint_zone = RusPickpoint::zonesPickpoint($url_zone, $data_zone, $extra_data, $delivery_mode);
-                if (!empty($pickpoint_zone)) {
-                    $pickpoint_id = (!empty($pickpoint_zone['to_pt'])) ? $pickpoint_zone['to_pt'] : '';
-                    if ($pickpoint_zone['delivery_min'] == $pickpoint_zone['delivery_max']) {
-                        $this->date_zone = $pickpoint_zone['delivery_max'] . ' ' . __('days');
-                    } else {
-                        $this->date_zone = $pickpoint_zone['delivery_min'] . '-' . $pickpoint_zone['delivery_max'] . ' ' . __('days');
+                if ($this->address_pickpoint) {
+                    $data_zone['ToPT'] = $pickpoint_id;
+                    $pickpoint_zone = RusPickpoint::zonesPickpoint($url_zone, $data_zone, $extra_data, $delivery_mode);
+                    if (!empty($pickpoint_zone)) {
+                        $pickpoint_id = (!empty($pickpoint_zone['to_pt'])) ? $pickpoint_zone['to_pt'] : '';
+                        if ($pickpoint_zone['delivery_min'] === $pickpoint_zone['delivery_max']) {
+                            $this->date_zone = $pickpoint_zone['delivery_max'] . ' ' . __('days');
+                        } else {
+                            $this->date_zone = $pickpoint_zone['delivery_min'] . '-' . $pickpoint_zone['delivery_max'] . ' ' . __('days');
+                        }
                     }
                 }
             }
@@ -206,6 +210,7 @@ class Pickpoint implements IService
             if (!empty($pickpoint_id) && !empty($this->address_pickpoint)) {
                 Tygh::$app['session']['cart']['pickpoint_office'][$group_key][$shipping_id]['pickpoint_id'] = $pickpoint_id;
                 Tygh::$app['session']['cart']['pickpoint_office'][$group_key][$shipping_id]['address_pickpoint'] = $this->address_pickpoint;
+                Tygh::$app['session']['cart']['pickpoint_office'][$group_key][$shipping_id]['pickup_data'] = RusPickpoint::getPickpointPostamatById($pickpoint_id);
             }
 
             $data = array(
@@ -225,7 +230,9 @@ class Pickpoint implements IService
             unset($key_data['SessionId']);
         } else {
             $this->_internalError(RusPickpoint::$last_error);
-            fn_set_notification('E', __('notice'), RusPickpoint::$last_error);
+            if (!empty(RusPickpoint::$last_error)) {
+                fn_set_notification(NotificationSeverity::ERROR, __('notice'), RusPickpoint::$last_error);
+            }
         }
 
         $request_data = array(
@@ -247,94 +254,72 @@ class Pickpoint implements IService
     public function getSimpleRates()
     {
         $data = $this->getRequestData();
-        $key = md5(serialize($data['key_data']));
-        $pickpoint_data = fn_get_session_data($key);
-
-        if (empty($pickpoint_data)) {
-            $response = Http::post($data['url'], $data['data'], $data['extra_data']);
-            fn_set_session_data($key, $response);
-        } else {
-            $response = $pickpoint_data;
-        }
-
-        return $response;
+        return Http::post($data['url'], $data['data'], $data['extra_data']);
     }
 
     /**
      * Gets shipping cost and information about possible errors
      *
-     * @param  string $resonse Reponse from Shipping service server
-     * @return array  Shipping cost and errors
+     * @param string $response Response from Shipping service server
+     *
+     * @return array<string, bool|int|string|array<string, int|string>> Shipping cost and errors
      */
     public function processResponse($response)
     {
-        $return = array(
+        $return = [
             'cost' => false,
             'error' => false,
-        );
+        ];
 
-        $result = json_decode($response);
-        $data_services = json_decode(json_encode($result), true);
-        if (isset($data_services['Error']) && ($data_services['Error'] == 1) && !empty($data_services['ErrorMessage'])){
+        $data_services = json_decode($response, true);
+        if (isset($data_services['Error']) && ((int) $data_services['Error'] === 1) && !empty($data_services['ErrorMessage'])) {
             $this->_internalError($data_services['ErrorMessage']);
-
         } elseif (isset($data_services['Error']) && !empty($data_services['Error'])) {
             $this->_internalError($data_services['Error']);
-
         } elseif (isset($data_services['Services'])) {
-            $_result = array();
+            $_result = [];
             $shipping_settings = $this->_shipping_info['service_params'];
             $delivery_mode = empty($shipping_settings['delivery_mode']) ? 'Standart' : $shipping_settings['delivery_mode'];
 
             foreach ($data_services['Services'] as $service) {
                 $discount = empty($service['Discount']) ? 0 : $service['Tariff'] * $service['Discount'] / 100;
-
                 $cost = $service['Tariff'] + $service['NDS'] - $discount;
-
                 if (empty($_result[$service['DeliveryMode']])) {
-                    $_result[$service['DeliveryMode']] = array(
+                    $_result[$service['DeliveryMode']] = [
                         'Tariff_Type' => '',
                         'Total_Dost' => 0,
                         'Total_DopUsl' => 0,
-                        'Cost' => 0
-                    );
+                        'Cost' => 0,
+                    ];
                 }
-
                 $_result[$service['DeliveryMode']]['Tariff_Type'] = $service['Name'];
                 $_result[$service['DeliveryMode']]['Total_Dost'] += $service['Tariff'];
                 $_result[$service['DeliveryMode']]['Total_DopUsl'] += $service['NDS'];
                 $_result[$service['DeliveryMode']]['Cost'] += $cost;
             }
-
             if (count($_result) > 1 && !empty($_result[$delivery_mode])) {
                 $pickpoint = $_result[$delivery_mode];
-
             } else {
                 $pickpoint = reset($_result);
-
             }
-
             if (isset($pickpoint)) {
-                $this->_fillSessionPostamat($pickpoint);
-
+                $this->fillSessionPostamat($pickpoint);
                 $return['cost'] = $pickpoint['Cost'];
                 $return['delivery_time'] = $this->date_zone;
                 $return['tariff'] = $pickpoint;
             }
         }
-
         if (!empty($this->_error_stack)) {
             foreach ($this->_error_stack as $error) {
                 $return['error'] .= $error . '; ';
             }
         }
-
-        RusPickpoint::Logout();
+        RusPickpoint::logout();
 
         return $return;
     }
 
-    private function _fillSessionPostamat($pickpoint_postamat)
+    private function fillSessionPostamat($pickpoint_postamat)
     {
         if (isset($this->_shipping_info['keys']['group_key']) && isset($this->_shipping_info['keys']['shipping_id'])) {
             $group_key = $this->_shipping_info['keys']['group_key'];

@@ -1,10 +1,12 @@
     {if $feature_variants|is_array}
-        {include file="common/pagination.tpl" div_id="content_tab_variants_`$id`" pagination_class=$hide_inputs_class}
+        {include file="common/pagination.tpl" div_id="content_tab_feature_variants_`$id`" pagination_class=$hide_inputs_class}
         {assign var="variants_ids" value=$feature_variants|array_keys}
     {/if}
-    <input type="hidden" value="{if $variants_ids}{","|implode:$variants_ids}{/if}" name="feature_data[original_var_ids]">
-    <div class="table-wrapper">
-        <table class="table table-middle" width="100%">
+    {if $id}
+        <input type="hidden" value="{if $variants_ids}{","|implode:$variants_ids}{/if}" name="feature_data[original_var_ids]">
+    {/if}
+    <div class="table-responsive-wrapper">
+        <table class="table table-middle table--relative table-responsive" width="100%">
         <thead>
         <tr class="cm-first-sibling">
             {hook name="product_features:variants_list_head"}
@@ -22,25 +24,36 @@
         {assign var="num" value=$smarty.foreach.fe_f.iteration}
         <tr>
             {hook name="product_features:variants_list_body"}
-                <td width="2%" class="cm-extended-feature {if $feature_type != "ProductFeatures::EXTENDED"|enum}hidden{/if}">
+                <td width="2%" class="cm-extended-feature {if $feature_type != "ProductFeatures::EXTENDED"|enum}hidden{/if}" data-th="&nbsp;">
                     <span id="on_extra_feature_{$id}_{$num}" alt="{__("expand_collapse_list")}" title="{__("expand_collapse_list")}" class="hand hidden cm-combination-features-{$id}"><span class="icon-caret-right"></span></span>
                     <span id="off_extra_feature_{$id}_{$num}" alt="{__("expand_collapse_list")}" title="{__("expand_collapse_list")}" class="hand cm-combination-features-{$id}"><span class="icon-caret-down"></span></span>
                 </td>
-                <td width="5%">
+                <td width="5%" data-th="{__("position_short")}">
                     <input type="hidden" name="feature_data[variants][{$num}][variant_id]" value="{$var.variant_id}">
                     <input type="text" name="feature_data[variants][{$num}][position]" value="{$var.position}" size="4" class="input-micro input-hidden"/></td>
-                <td>
-                    <input type="text" name="feature_data[variants][{$num}][variant]" value="{$var.variant}" class="span6 input-hidden cm-feature-value {if $feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}cm-value-decimal{/if}"></td>
+                <td data-th="{__("variant")}">
+                    <div class="input-prepend input-prepend--full">
+                        <div class="colorpicker--wrapper">
+                        {include file="common/colorpicker.tpl"
+                            cp_name="feature_data[variants][{$num}][color]"
+                            cp_id="feature_value_color_picker_{$num}"
+                            cp_value=$var.color
+                            show_picker=true
+                            cp_meta="js-feature-variant-conditional-column colorpicker--hidden"
+                            cp_attrs=["data-ca-column-for-feature-style" => "ProductFeatureStyles::COLOR"|enum, "data-ca-column-for-filter-style" => "ProductFilterStyles::COLOR"|enum]
+                        }
+                        </div>
+                        <input type="text" name="feature_data[variants][{$num}][variant]" value="{$var.variant}" class="input-full input-hidden cm-feature-value {if $feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}cm-value-decimal{/if}">
+                    </div>
+                </td>
             {/hook}
-            <td>&nbsp;</td>
-            <td class="right nowrap">
-                <div class="hidden-tools">
+            <td data-th="&nbsp;">&nbsp;</td>
+            <td class="right nowrap" data-th="&nbsp;">
                 {include file="buttons/multiple_buttons.tpl" item_id="feature_variants_`$var.variant_id`" tag_level="3" only_delete="Y"}
-                </div>
             </td>
         </tr>
         <tr {if $feature_type != "ProductFeatures::EXTENDED"|enum}class="hidden"{/if} id="extra_feature_{$id}_{$num}">
-            <td colspan="6">
+            <td colspan="6" data-th="{__("information")}">
                 <div class="control-group">
                     <label class="control-label" for="elm_image_{$id}_{$num}">{__("image")}</label>
                     <div class="controls">
@@ -89,24 +102,35 @@
         <tbody class="hover" id="box_add_variants_for_existing_{$id}">
         <tr>
             {hook name="product_features:variants_list_clone"}
-                <td class="cm-extended-feature {if $feature_type != "ProductFeatures::EXTENDED"|enum}hidden{/if}">
+                <td class="cm-extended-feature {if $feature_type != "ProductFeatures::EXTENDED"|enum}hidden{/if}" data-th="&nbsp;">
                     <span id="on_extra_feature_{$id}_{$num}" alt="{__("expand_collapse_list")}" title="{__("expand_collapse_list")}" class="hand hidden cm-combination-features-{$id}"><span class="icon-caret-right"></span></span>
                     <span id="off_extra_feature_{$id}_{$num}" alt="{__("expand_collapse_list")}" title="{__("expand_collapse_list")}" class="hand cm-combination-features-{$id}"><span class="icon-caret-down"></span></span>
                 </td>
-                <td>
+                <td data-th="{__("position_short")}">
                     <input type="text" name="feature_data[variants][{$num}][position]" value="" size="4" class="input-micro" /></td>
-                <td>
-                    <input type="text" name="feature_data[variants][{$num}][variant]" value="" class="span6 cm-feature-value {if $feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}cm-value-decimal{/if}" /></td>
+                <td data-th="{__("variant")}">
+                    <div class="input-prepend input-prepend--full">
+                        <div class="colorpicker--wrapper">
+                        {include file="common/colorpicker.tpl"
+                            cp_name="feature_data[variants][{$num}][color]"
+                            cp_id="feature_value_color_picker_{$num}"
+                            cp_value="#ffffff"
+                            show_picker=true
+                            cp_meta="js-feature-variant-conditional-column"
+                            cp_attrs=["data-ca-column-for-feature-style" => "ProductFeatureStyles::COLOR"|enum, "data-ca-column-for-filter-style" => "ProductFilterStyles::COLOR"|enum]
+                        }
+                        </div>
+                        <input type="text" name="feature_data[variants][{$num}][variant]" value="" class="input-full cm-feature-value {if $feature_type == "ProductFeatures::NUMBER_SELECTBOX"|enum}cm-value-decimal{/if}">
+                    </div>
+                </td>
             {/hook}
-            <td>&nbsp;</td>
-            <td class="right">
-                <div class="hidden-tools">
-                    {include file="buttons/multiple_buttons.tpl" item_id="add_variants_for_existing_`$id`" tag_level=2}
-                </div>
+            <td data-th="&nbsp;">&nbsp;</td>
+            <td class="right" data-th="&nbsp;">
+                {include file="buttons/multiple_buttons.tpl" item_id="add_variants_for_existing_`$id`" tag_level=2}
             </td>
         </tr>
         <tr {if $feature_type != "ProductFeatures::EXTENDED"|enum}class="hidden"{/if} id="extra_feature_{$id}_{$num}">
-            <td colspan="6">
+            <td colspan="6" data-th="{__("information")}">
 
                 <div class="control-group">
                     <label class="control-label" for="elm_image_{$id}_{$num}">{__("image")}</label>
@@ -156,5 +180,5 @@
         </table>
     </div>
 {if $feature_variants|is_array}
-    {include file="common/pagination.tpl" div_id="content_tab_variants_`$id`"}
+    {include file="common/pagination.tpl" div_id="content_tab_feature_variants_`$id`"}
 {/if}

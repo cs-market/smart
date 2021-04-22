@@ -3,8 +3,8 @@
 <form action="{""|fn_url}" method="post" name="reports_list">
 <div class="cm-sortable" data-ca-sortable-table="sales_reports" data-ca-sortable-id-name="report_id" id="manage_reports_list">
     {if $reports}
-    <div class="table-wrapper">
-        <table class="table table-middle table-objects">
+    <div class="table-responsive-wrapper">
+        <table class="table table-middle table--relative table-objects table-responsive table-responsive-w-titles">
         {foreach from=$reports item=section}
             {include file="common/object_group.tpl"
             id=$section.report_id

@@ -1,6 +1,10 @@
+{$show_label=$show_label|default:true}
 <div class="control-group" id="parent_page_selector">
 
-    <label class="control-label cm-required" for="elm_parent_id">{__("parent_page")}:</label>
+    {if $show_label}
+        <label class="control-label cm-required" for="elm_parent_id">{__("parent_page")}:</label>
+    {/if}
+
     <div class="controls">
         {if !$parent_pages}
 
@@ -10,7 +14,11 @@
 
             {include file="pickers/pages/picker.tpl" data_id="location_page" input_name="page_data[parent_id]" item_ids=$page_data.parent_id|default:"0" hide_link=true hide_delete_button=true default_name=__("root_level") display_input_id="elm_parent_id" except_id=$page_data.page_id company_id=$page_data.company_id prepend=true}
         {else}
-            <select name="page_data[parent_id]" id="elm_parent_id">
+            <select 
+                name="page_data[parent_id]" 
+                id="elm_parent_id"
+                {if $bulkedit_changer} {$bulkedit_changer} {/if}
+            >
                 <option value="0">- {__("root_page")} -</option>
                 {foreach from=$parent_pages item="page"}
                 {if ($page.id_path|strpos:"`$page_data.id_path`/" === false && $page_data.page_id != $page.page_id) || $show_all}

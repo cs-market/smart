@@ -17,6 +17,7 @@ namespace Tygh\Mailer\MessageBuilders;
 use Tygh\Mailer\AMessageBuilder;
 use Tygh\Mailer\Message;
 use Tygh\Mailer\MessageStyleFormatter;
+use Tygh\Storefront\Repository as StorefrontRepository;
 use Tygh\Template\Collection;
 use Tygh\Template\Mail\Context;
 use Tygh\Template\Mail\Repository;
@@ -48,23 +49,24 @@ class DBTemplateMessageBuilder extends AMessageBuilder
     /**
      * DBTemplateMessageBuilder constructor.
      *
-     * @param Renderer              $renderer               Instance of template renderer
-     * @param Repository            $template_repository    Instance of email template repository
-     * @param MessageStyleFormatter $style_formatter        Instance of css style message formatter
-     * @param array                 $config                 List of base params (see AMessageBuilder::__construct)
+     * @param Renderer                                      $renderer              Instance of template renderer
+     * @param Repository                                    $template_repository   Instance of email template repository
+     * @param MessageStyleFormatter                         $style_formatter       Instance of css style message formatter
+     * @param array<string|int|bool|array<string|int|bool>> $config                List of base params (see AMessageBuilder::__construct)
+     * @param \Tygh\Storefront\Repository                   $storefront_repository Storefront repository
      */
     public function __construct(
         Renderer $renderer,
         Repository $template_repository,
         MessageStyleFormatter $style_formatter,
-        array $config
-    )
-    {
+        array $config,
+        StorefrontRepository $storefront_repository
+    ) {
         $this->template_repository = $template_repository;
         $this->style_formatter = $style_formatter;
         $this->renderer = $renderer;
 
-        parent::__construct($config);
+        parent::__construct($config, $storefront_repository);
     }
 
     /** @inheritdoc */

@@ -13,6 +13,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Registry;
 
 /**
@@ -39,13 +40,30 @@ function fn_create_import_seo_name($object_id, $object_type = 'p', $object_name,
         $object_name = array($lang_code => $object_name);
     }
 
-    $result = array();
+    $result = [];
+    $errors = [];
+    $new_names = [];
     foreach ($object_name as $name_lang_code => $seo_name) {
         if (empty($seo_name)) {
-            $seo_name = reset($product_name);
+            $seo_name = reset($product_name) ?: fn_seo_get_default_object_name($object_id, $object_type, $name_lang_code);
         }
 
-        $result[$name_lang_code] = fn_create_seo_name($object_id, $object_type, $seo_name, $index, $dispatch, $company_id, $name_lang_code);
+        $result[$name_lang_code] = (string) fn_create_seo_name($object_id, $object_type, $seo_name, $index, $dispatch, $company_id, $name_lang_code);
+        if ($result[$name_lang_code] === (string) $seo_name) {
+            continue;
+        }
+        $errors[] = $seo_name;
+        $new_names[] = $result[$name_lang_code];
+    }
+    if (!empty($errors)) {
+        fn_set_notification(
+            NotificationSeverity::WARNING,
+            __('notice'),
+            __(
+                'seo.error_at_creation_seo_name',
+                [count($errors), '[names]' => implode(', ', $errors), '[new_names]' => implode(', ', $new_names)]
+            )
+        );
     }
 
     return $result;

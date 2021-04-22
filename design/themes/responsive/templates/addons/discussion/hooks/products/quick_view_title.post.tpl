@@ -5,6 +5,13 @@
         {if $product.discussion.posts}
         <a  href="{"products.view?product_id=`$product.product_id`&selected_section=discussion#discussion"|fn_url}" class="ty-discussion__review-a">{$product.discussion.search.total_items} {__("reviews", [$product.discussion.search.total_items])}</a>
         {/if}
-        <a class="ty-discussion__review-write cm-dialog-opener cm-dialog-auto-size" data-ca-target-id="new_post_dialog_{$obj_prefix}{$obj_id}" rel="nofollow">{__("write_review")}</a>
+        {include
+            file="addons/discussion/views/discussion/components/new_post_button.tpl"
+            name=__("write_review")
+            obj_id=$obj_id
+            obj_prefix="quick_view_"
+            style="text"
+            object_type="Addons\\Discussion\\DiscussionObjectTypes::PRODUCT"|enum
+        }
     <!--average_rating_product_{$obj_prefix}{$obj_id}--></div>
 {/if}

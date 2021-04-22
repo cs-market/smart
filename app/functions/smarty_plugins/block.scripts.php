@@ -54,7 +54,20 @@ function smarty_block_scripts($params, $content, &$smarty, &$repeat)
         }
 
         $filename = 'js/tygh/scripts-' . md5(implode(',', $names)) . fn_get_storage_data('cache_id') . '.js';
-        if (!Storage::instance('assets')->isExist($filename)) {
+        $file_exists = Storage::instance('assets')->isExist($filename);
+
+        if (!$file_exists) {
+            /** @var \Tygh\Lock\Factory $lock_factory */
+            $lock_factory = Tygh::$app['lock.factory'];
+
+            $lock = $lock_factory->createLock($filename);
+
+            if (!$lock->acquire() && $lock->wait()) {
+                $file_exists = Storage::instance('assets')->isExist($filename);
+            }
+        }
+
+        if (!$file_exists) {
 
             foreach ($scripts as $src) {
                 $contents .= fn_get_contents(Registry::get('config.dir.root') . $src);
@@ -75,6 +88,10 @@ function smarty_block_scripts($params, $content, &$smarty, &$repeat)
                 'compress' => false,
                 'caching' => true
             ));
+
+            if (isset($lock)) {
+                $lock->release();
+            }
         }
 
         $return = '<script type="text/javascript" src="' . Storage::instance('assets')->getUrl($filename) . '"></script>' . "\n";
@@ -96,7 +113,15 @@ function smarty_block_scripts($params, $content, &$smarty, &$repeat)
     return $return;
 }
 
-// TODO: Make a proper class to work with inline scripts
+/**
+ * @param array $params
+ * @param string $content
+ * @param \Tygh\SmartyEngine\Core $smarty
+ * @param bool $repeat
+ *
+ * @return string
+ * TODO: Make a proper class to work with inline scripts
+ */
 function smarty_helper_inline_scripts($params, $content, &$smarty, &$repeat)
 {
     Registry::del('runtime.inside_scripts');

@@ -65,6 +65,7 @@
                     <label class="control-label right" for="number_package">{__("addons.rus_sdek.number_package")}</label>
                     <div class="controls">
                         <input id="number_package" type="text" name="add_sdek_info[{$shipment.shipment_id}][barcode]" value="{$data_shipment.barcode}" {if $register_id}disabled{/if} />
+                        <p class="muted description">{__("ttc_addons.rus_sdek.number_package")}</p>
                     </div>
                 </div>
 
@@ -87,6 +88,7 @@
                     <div class="controls">
                         <input type="hidden" name="add_sdek_info[{$shipment.shipment_id}][use_product]" value="N" />
                         <input id="use_product" type="checkbox" name="add_sdek_info[{$shipment.shipment_id}][use_product]" {if $data_shipment.use_product == 'Y' || !$data_shipment.use_product}checked="checked"{/if} {if !$data_shipment.use_product}value="Y"{else}value="{$data_shipment.use_product}"{/if} {if $register_id}disabled{/if} />
+                        <p class="muted description">{__("ttc_addons.rus_sdek.use_product_price")}</p>
                     </div>
                 </div>
 
@@ -95,6 +97,7 @@
                     <div class="controls">
                         <input type="hidden" name="add_sdek_info[{$shipment.shipment_id}][use_imposed]" value="N" />
                         <input id="use_imposed" type="checkbox" name="add_sdek_info[{$shipment.shipment_id}][use_imposed]" {if $data_shipment.use_imposed == 'Y'}checked="checked"{/if} {if !$data_shipment.use_imposed}value="Y"{else}value="{$data_shipment.use_imposed}"{/if} {if $register_id}disabled{/if} />
+                        <p class="muted description">{__("ttc_addons.rus_sdek.use_imposed")}</p>
                     </div>
                 </div>
 

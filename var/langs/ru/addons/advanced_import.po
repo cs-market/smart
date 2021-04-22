@@ -5,16 +5,16 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/advanced_import.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:09\n"
+"X-Crowdin-File: /release-4.12.2/addons/advanced_import.po\n"
+"X-Crowdin-File-ID: 4098\n"
+"PO-Revision-Date: 2021-02-01 09:12\n"
 
 msgctxt "Addons::name::advanced_import"
-msgid "Advanced products import [Beta]"
-msgstr "Расширенный импорт товаров [Beta]"
+msgid "Advanced products import"
+msgstr "Расширенный импорт товаров"
 
 msgctxt "Addons::description::advanced_import"
 msgid "Allows you to match the fields in the imported file with the product properties. These matchings and other import settings can also be saved as presets for later use."
@@ -163,6 +163,10 @@ msgstr "... скоро всё будет"
 msgctxt "Languages::advanced_import.cant_load_file_for_company"
 msgid "File can't be loaded for the specified company"
 msgstr "Данный файл невозможно загрузить для указанной компании"
+
+msgctxt "Languages::advanced_import.cant_load_file"
+msgid "File can't be loaded"
+msgstr "Не удаётся загрузить файл"
 
 msgctxt "Languages::advanced_import.uploading_file"
 msgid "Uploading file for the preset: [preset]"
@@ -343,4 +347,40 @@ msgstr "Не удалось автоматически определить ра
 msgctxt "Languages::advanced_import.incorrect_delimiter"
 msgid "Specified (or auto detected) delimiter seems to be incorrect. Please specify the correct delimiter manually in the additional settings on the \"File\" tab."
 msgstr "Похоже, что был указан (или выбран автоматически) неправильный разделитель. Выберите правильный разделитель вручную в дополнительных настройках на вкладке \"Файл\"."
+
+msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
+msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
+msgstr "Если удалить этот пресет, то удалится также прикреплённый файл. Вы хотите продолжить?"
+
+msgctxt "Languages::advanced_import.common_preset"
+msgid "All vendors"
+msgstr "Все продавцы"
+
+msgctxt "Languages::advanced_import.your_presets"
+msgid "Vendor's presets"
+msgstr "Пресеты продавца"
+
+msgctxt "Languages::advanced_import.common_presets"
+msgid "Marketplace presets"
+msgstr "Пресеты маркетплейса"
+
+msgctxt "Languages::advanced_import.file_not_loaded"
+msgid "File was not loaded. Please reload the page and try again."
+msgstr "Не удалось загрузить файл. Пожалуйста, перезагрузите страницу и попробуйте еще раз."
+
+msgctxt "Languages::advanced_import.local_file_selected"
+msgid "Local file selected"
+msgstr "Сейчас выбран локальный файл"
+
+msgctxt "Languages::advanced_import.text_popup_file_editor_notice_full_link"
+msgid "You can upload and download files via <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
+msgstr "Вы можете загрузить и скачать файлы через <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
+
+msgctxt "Languages::advanced_import.file_extension_was_not_supported_by_owner"
+msgid "Couldn't use your file [name]. This import preset only allows the following extensions: [ext]."
+msgstr "Не удалось использовать ваш файл [name]. Этот пресет импорта поддерживает только следующие расширения: [ext]."
+
+msgctxt "Languages::advanced_import.save_selected_file"
+msgid "Save selected file"
+msgstr "Сохранить выбранный файл"
 

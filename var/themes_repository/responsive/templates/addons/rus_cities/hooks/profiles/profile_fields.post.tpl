@@ -12,7 +12,7 @@
                             check_country = $("[name='user_data[b_country]']").length ? $("[name='user_data[b_country]']").val() : '';
                             check_state = $("[name='user_data[b_state]']").length ? $("[name='user_data[b_state]']").val() : '';
 
-                            $.ceAjax('request', fn_url('city.autocomplete_city?q=' + request.term + '&check_state=' + check_state + '&check_country=' + check_country), {$ldelim} 
+                            $.ceAjax('request', fn_url('city.autocomplete_city?q=' + request.term + '&check_state=' + check_state + '&check_country=' + check_country), {$ldelim}
                                 callback: function(data) {$ldelim}
                                     response(data.autocomplete);
                                 {$rdelim}
@@ -37,7 +37,7 @@
                             check_country = $("[name='user_data[s_country]']").length ? $("[name='user_data[s_country]']").val() : '';
                             check_state = $("[name='user_data[s_state]']").length ? $("[name='user_data[s_state]']").val() : '';
 
-                            $.ceAjax('request', fn_url('city.autocomplete_city?q=' + request.term + '&check_state=' + check_state + '&check_country=' + check_country), {$ldelim} 
+                            $.ceAjax('request', fn_url('city.autocomplete_city?q=' + request.term + '&check_state=' + check_state + '&check_country=' + check_country), {$ldelim}
                                 callback: function(data) {$ldelim}
                                     response(data.autocomplete);
                                 {$rdelim}

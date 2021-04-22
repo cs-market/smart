@@ -5,126 +5,206 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/stripe_connect.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.2/addons/stripe_connect.po\n"
+"X-Crowdin-File-ID: 4192\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::stripe_connect"
 msgid "Stripe Connect payments"
-msgstr ""
+msgstr "Платежі через Stripe Connect"
 
 msgctxt "Addons::description::stripe_connect"
 msgid "This add-on will help root store administrators to distribute funds automatically among multiple vendors through Stripe."
-msgstr ""
+msgstr "Допомагає автоматично розподіляти оплату за замовлення між продавцями через Stripe."
 
 msgctxt "SettingsSections::stripe_connect::general"
 msgid "General"
-msgstr ""
+msgstr "Загальні"
 
 msgctxt "SettingsOptions::stripe_connect::collect_payouts"
 msgid "Commission includes"
-msgstr ""
+msgstr "Комісія включає"
 
 msgctxt "SettingsVariants::stripe_connect::collect_payouts::N"
 msgid "Order commission"
-msgstr ""
+msgstr "Комісія з замовлення"
 
 msgctxt "SettingsVariants::stripe_connect::collect_payouts::Y"
 msgid "Order commission and unpaid payouts"
-msgstr ""
+msgstr "Комісія з замовлення і невиплачені виплати"
 
 msgctxt "Languages::stripe_connect.stripe_connect"
 msgid "Stripe Connect"
-msgstr ""
+msgstr "Stripe Connect"
 
-msgctxt "Languages::stripe_connect.redirect_uris"
-msgid "Redirect URIs"
-msgstr ""
+msgctxt "Languages::stripe_connect.stripe_connect_short"
+msgid "Stripe"
+msgstr "Stripe"
+
+msgctxt "Languages::stripe_connect.redirect_uri_admin"
+msgid "Redirect URI for administrator"
+msgstr "Переадресація URI для адміністратора"
+
+msgctxt "Languages::stripe_connect.redirect_uris.description"
+msgid "Copy and paste this address into your Stripe Connect app settings"
+msgstr "Скопіюйте та вставте цю адресу в налаштуваннях Stripe Connect"
+
+msgctxt "Languages::stripe_connect.redirect_uri_vendor"
+msgid "Redirect URI for vendor"
+msgstr "Переадресація URI для продавця"
 
 msgctxt "Languages::stripe_connect.client_id"
 msgid "Client ID"
-msgstr ""
+msgstr "Client ID"
 
 msgctxt "Languages::stripe_connect.publishable_key"
 msgid "Publishable key"
-msgstr ""
+msgstr "Публічний ключ"
 
 msgctxt "Languages::stripe_connect.secret_key"
 msgid "Secret key"
-msgstr ""
+msgstr "Секретний ключ"
 
 msgctxt "Languages::stripe_connect.connect_with_stripe"
 msgid "Connect with Stripe"
-msgstr ""
+msgstr "Підключити"
 
 msgctxt "Languages::stripe_connect.disconnect"
 msgid "Disconnect account"
-msgstr ""
+msgstr "Відключення облікового запису"
 
 msgctxt "Languages::stripe_connect.stripe_account"
 msgid "Stripe account"
-msgstr ""
+msgstr "Аккаунт Stripe"
 
 msgctxt "Languages::stripe_connect.connected"
 msgid "Connected"
-msgstr ""
+msgstr "Підключено"
 
 msgctxt "Languages::stripe_connect.not_connected"
 msgid "Not connected"
-msgstr ""
+msgstr "Не підключено"
 
 msgctxt "Languages::stripe_connect.account_connected"
 msgid "Your Stripe account has been successfully connected to the store"
-msgstr ""
+msgstr "Обліковий запис Stripe успішно підключився до магазину"
 
 msgctxt "Languages::stripe_connect.account_disconnected"
 msgid "Your Stripe account has been successfully disconnected from the store"
-msgstr ""
+msgstr "Обліковий запис Stripe успішно відключився від магазину"
 
 msgctxt "Languages::stripe_connect.withdrawal_for_the_order"
 msgid "Withdrawal for the order #[order_id]"
-msgstr ""
+msgstr "Виплата за замовлення #[order_id]"
 
 msgctxt "Languages::stripe_connect.refund_id"
 msgid "Refund transaction ID"
-msgstr ""
+msgstr "ID транзакції повернення"
 
 msgctxt "Languages::stripe_connect.rma.perform_refund"
 msgid "Give a refund via Stripe Connect"
-msgstr ""
+msgstr "Повернути гроші через Stripe Connect"
 
 msgctxt "Languages::ttc_stripe_connect.rma.perform_refund"
 msgid "A refund will be made once an administrator changes the return request status"
-msgstr ""
+msgstr "Повернення коштів буде зроблено відразу після того, як адміністратор змінить статус запиту"
 
 msgctxt "Languages::stripe_connect.rma.refund_performed"
 msgid "The refund has been made via Stripe Connect"
-msgstr ""
+msgstr "Кошти були повернуті покупцеві через Stripe Connect"
 
 msgctxt "Languages::stripe_connect.token"
 msgid "Credit card token"
-msgstr ""
+msgstr "Токен платіжної картки"
 
 msgctxt "Languages::stripe_connect.own_account_cant_be_used_for_vendor"
 msgid "Your own Stripe account can't be used to connect a vendor to the store"
-msgstr ""
+msgstr "Не можна використовувати власний обліковий запис Stripe для підключення продавця до магазину"
 
 msgctxt "Languages::stripe_connect.rma.order_status_on_refund"
 msgid "Order status on refund"
-msgstr ""
+msgstr "Статус замовлення після повернення"
 
 msgctxt "Languages::ttc_stripe_connect.rma.order_status_on_refund"
 msgid "Determines whether or not to change the order status after a refund was performed via the RMA add-on."
-msgstr ""
+msgstr "Визначає, чи змінювати статус замовлення після того, як буде виконано повернення через модуль \"Повернення товарів\"."
 
 msgctxt "Languages::stripe_connect.do_not_change"
 msgid "Do not change"
-msgstr ""
+msgstr "Залишити без змін"
 
 msgctxt "Languages::stripe_connect.set_status_to"
 msgid "Set to:"
-msgstr ""
+msgstr "Обрати статус:"
+
+msgctxt "Languages::stripe_connect.charge_id"
+msgid "Charge ID"
+msgstr "Charge ID"
+
+msgctxt "Languages::stripe_connect.transfer_id"
+msgid "Transfer ID"
+msgstr "Transfer ID"
+
+msgctxt "Languages::stripe_connect.payment_id"
+msgid "Payment ID"
+msgstr "ID платежу"
+
+msgctxt "Languages::stripe_connect.enable_3d_secure"
+msgid "Enable 3-D Secure"
+msgstr "Дозволити 3-D Secure"
+
+msgctxt "Languages::stripe_connect.enable_3d_secure.description"
+msgid "<p>When 3-D Secure is <b>disabled</b>, money will go straight to the connected Stripe accounts of vendors. Commissions and payouts will be taken from vendors as <a href=\"https://stripe.com/docs/connect/direct-charges#collecting-fees\" target=\"_blank\">application fees</a>.</p><p>When 3-D Secure is <b>enabled</b>, money will first go to the marketplace owner's Stripe account. Then it will be automatically distributed between the connected Stripe accounts via transfers. Transfers require that the marketplace owner and vendors have their accounts in the same region: either all in Europe, or all in the U.S. If a vendor's account is in a different region from the marketplace owner's, the money won't be transferred to that vendor automatically.</p>"
+msgstr "<p>Коли 3-D Secure <b>вимкнено</b>, гроші йдуть на рахунки Stripe, які прив'язали продавці. Комісії та інші виплати будуть стягуватися з продавців як <a href=\"https://stripe.com/docs/connect/direct-charges#collecting-fees\" target=\"_blank\">комісії додатку</a>.</p><p>Коли 3-D Secure <b>включено</b>, гроші спочатку потраплять на рахунок Stripe власника маркету. Потім вони автоматично розподіляться по прив'язаним рахунків продавців через перекази. Для переказу потрібно, щоб рахунки Stripe власника маркету і продавців знаходилися в одному регіоні: або в Європі, або в США. Якщо обліковий запис продавця знаходиться в регіоні, відмінному від регіону власника маркету, то гроші цього продавцю автоматично переведені не будуть.</p>"
+
+msgctxt "Languages::stripe_connect.gift_certificate_used"
+msgid "A gift certificate was used in this order. [product] doesn't know which of the vendors should get the money, and how much. Please transfer money from this order to each vendor manually."
+msgstr "З цим замовленням використовувався подарунковий сертифікат. [product] не знає, які з продавців повинні отримати гроші, і скыльки. Будь ласка, переведіть гроші від цього замовлення кожному продавцеві вручну."
+
+msgctxt "Languages::stripe_connect.payment_intent_error"
+msgid "An error occured when creating a PaymentIntent with the payment #[payment_id]: [error]"
+msgstr "При створенні PaymentIntent у способу оплати #[payment_id] виникла помилка: [error]"
+
+msgctxt "Languages::log_type_stripe_connect"
+msgid "Stripe Connect"
+msgstr "Stripe Connect"
+
+msgctxt "Languages::log_action_sc_failure"
+msgid "Error"
+msgstr "Помилка"
+
+msgctxt "Languages::stripe_connect.log_context"
+msgid "Context"
+msgstr "Контекст"
+
+msgctxt "Languages::stripe_connect.unexpected_payment_intent_status"
+msgid "Unexpected status \"[status]\" of PaymentIntent"
+msgstr "Несподіваний статус \"[status]\" у PaymentIntent"
+
+msgctxt "Languages::stripe_connect.account_link_error"
+msgid "A vendor with company ID [company_id] is not linked to a Stripe account"
+msgstr "У продавця з company ID [company_id] не прив'язано обліковий запис Stripe"
+
+msgctxt "Languages::stripe_connect.transfer_creating_error"
+msgid "An error occurred during the creation of a Stripe transfer: [error]"
+msgstr "Помилка при створенні переказу (Transfer) в Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.charge_creating_error"
+msgid "An error occurred during the creation of a Stripe charge: [error]"
+msgstr "Помилка при створенні відрахування (Charge) в Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_creating_error"
+msgid "An error occurred during the creation of a Stripe customer: [error]"
+msgstr "Помилка при створенні покупця (Customer) в Stripe: [error]"
+
+msgctxt "Languages::stripe_connect.customer_sharing_error"
+msgid "An error occurred during the share of a Stripe customer: [error]"
+msgstr "Помилка при спробі створенні покупця (Customer) з Stripe доступним для підключеного продавця: [error]"
+
+msgctxt "Languages::stripe_connect.stripe_processor_params_missing"
+msgid "Stripe processor params missing"
+msgstr "Відсутні параметри процесора Stripe"
 

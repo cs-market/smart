@@ -6,6 +6,9 @@ REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUE
 REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(36, 17, 'en');
 REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(37, 18, 'en');
 REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(38, 19, 'en');
+REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(41, 20, 'en');
+REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(42, 21, 'en');
+REPLACE INTO ?:banner_images (`banner_image_id`, `banner_id`, `lang_code`) VALUES(47, 22, 'en');
 
 REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(6, 'Free shipping', '', '', 'en');
 REPLACE INTO ?:banner_descriptions (`banner_id`, `banner`, `url`, `description`, `lang_code`) VALUES(7, 'Gift certificate', '', '', 'en');

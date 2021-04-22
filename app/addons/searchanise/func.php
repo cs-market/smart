@@ -18,6 +18,20 @@ use Tygh\Enum\ProductFeatures;
 use Tygh\Tools\Math;
 use Tygh\Http;
 use Tygh\Registry;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\YesNo;
+use Tygh\Enum\ProductFilterProductFieldTypes;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Addons\ProductVariations\Product\Type\Type as ProductVariationTypes;
+use Tygh\Addons\MasterProducts\ServiceProvider as MasterProductsServiceProvider;
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
+use Tygh\Enum\Addons\Searchanise\ImportStatuses;
+use Tygh\Enum\Addons\Searchanise\QueueActions;
+use Tygh\Enum\Addons\Searchanise\QueueStatuses;
+use Tygh\Enum\Addons\Searchanise\AddonStatuses;
+use Tygh\Enum\Addons\Searchanise\SignupStatuses;
+use Tygh\Enum\Addons\Searchanise\ServerErrors;
+use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -27,7 +41,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 fn_define('SE_SEARCH_TIMEOUT', 3); //Search and navigation request timeout
 fn_define('SE_REQUEST_TIMEOUT', 10); // API request timeout
 fn_define('SE_PRODUCTS_PER_PASS', 100); // Number of products submitted in a single API request during a full catalog synchronization
-fn_define('SE_USE_RELEVANCE_AS_DEFAULT_SORTING', 'Y'); // Y or N  (Set Sorting by relevance as the default sorting on product search in the storefront)
+fn_define('SE_USE_RELEVANCE_AS_DEFAULT_SORTING', YesNo::YES); // Y or N  (Set Sorting by relevance as the default sorting on product search in the storefront)
 
 //
 // Not configurable constants
@@ -40,6 +54,14 @@ fn_define('SE_MAX_PROCESSING_TIME', 720);
 fn_define('SE_MAX_SEARCH_REQUEST_LENGTH', '8000');
 fn_define('SE_SERVICE_URL', 'http://www.searchanise.com');
 fn_define('SE_PLATFORM', 'cs-cart4');
+fn_define('SE_CONTACT_EMAIL', 'feedback@searchanise.com');
+
+fn_define('SE_NOT_DATA', 'N;');
+fn_define('SE_PRICE_USERGROUP_PREFIX', 'price_');
+fn_define('SE_GROUPED_PREFIX', 'se_grouped_');
+
+// phpcs:disable SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+// phpcs:disable SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification
 
 function fn_searchanise_dispatch_assign_template($controller, $mode, $area)
 {
@@ -47,9 +69,9 @@ function fn_searchanise_dispatch_assign_template($controller, $mode, $area)
         return;
     }
 
-    if (!fn_allowed_for('ULTIMATE:FREE') && count(Tygh::$app['session']['auth']['usergroup_ids']) > 1) {
+    if (!fn_allowed_for('ULTIMATE:FREE') && count(Tygh::$app['session']['auth']['usergroup_ids']) > USERGROUP_GUEST) {
         foreach (Tygh::$app['session']['auth']['usergroup_ids'] as $usergroup_id) {
-            $_prices[] = 'price_' . $usergroup_id;
+            $_prices[] = SE_PRICE_USERGROUP_PREFIX . $usergroup_id;
         }
 
         Tygh::$app['view']->assign('searchanise_prices', join('|', $_prices));
@@ -58,16 +80,41 @@ function fn_searchanise_dispatch_assign_template($controller, $mode, $area)
     fn_se_check_import_is_done(fn_se_get_company_id(), CART_LANGUAGE);
 
     Tygh::$app['view']->assign('searchanise_api_key', fn_se_get_api_key(fn_se_get_company_id(), CART_LANGUAGE));
-    Tygh::$app['view']->assign('searchanise_import_status', fn_se_get_import_status(fn_se_get_company_id(), CART_LANGUAGE));
+    Tygh::$app['view']->assign('searchanise_search_allowed', fn_se_is_search_allowed(fn_se_get_company_id(), CART_LANGUAGE) ? YesNo::YES : YesNo::NO);
+
+    // Fix for Twigmo
+    if (Tygh::$app['view']->getTemplateVars('searchanise_search_allowed') == YesNo::YES) {
+        Tygh::$app['view']->assign('searchanise_import_status', ImportStatuses::DONE);
+    }
+}
+
+/**
+ * Check if the search is available
+ *
+ * @param number $company_id  Company identifier
+ * @param string $lang_code   2 letters language code
+ *
+ * @return boolean
+ */
+function fn_se_is_search_allowed($company_id, $lang_code = CART_LANGUAGE)
+{
+    $searchanise_import_status = fn_se_get_import_status($company_id, $lang_code);
+
+    return in_array($searchanise_import_status, [
+        ImportStatuses::QUEUED,
+        ImportStatuses::PROCESSING,
+        ImportStatuses::SENT,
+        ImportStatuses::DONE,
+    ]);
 }
 
 function fn_se_get_active_company_ids($joined = false)
 {
-    static $companies = array();
+    static $companies = [];
 
     if (fn_allowed_for('MULTIVENDOR')) {
-        $null_company = array(0); //workaround;
-        $companies = array_merge($null_company, db_get_fields("SELECT company_id FROM ?:companies WHERE status = 'A'"));
+        $null_company = [0]; //workaround;
+        $companies = array_merge($null_company, db_get_fields("SELECT company_id FROM ?:companies WHERE status = ?s", ObjectStatuses::ACTIVE));
     }
 
     return $joined? join('|', $companies) : $companies;
@@ -99,7 +146,7 @@ function fn_se_get_company_id()
 
 function fn_se_get_all_settings($update = false)
 {
-    static $settings = array();
+    static $settings = [];
 
     if (empty($settings) || !empty($update)) {
         $_settings = db_get_array("SELECT * FROM ?:se_settings");
@@ -108,7 +155,7 @@ function fn_se_get_all_settings($update = false)
         }
 
         if (empty($settings)) {
-            $settings = array(null);
+            $settings = [null];
         }
     }
 
@@ -128,12 +175,12 @@ function fn_se_set_setting($name, $company_id, $lang_code, $value)
         return;
     }
 
-    db_replace_into('se_settings', array(
-        'name' => $name,
+    db_replace_into('se_settings', [
+        'name'       => $name,
         'company_id' => $company_id,
-        'lang_code' => $lang_code,
-        'value'     => $value,
-    ));
+        'lang_code'  => $lang_code,
+        'value'      => $value,
+    ]);
 
     fn_se_get_all_settings(true);// call to update cache
 }
@@ -206,29 +253,37 @@ function fn_se_add_action($action, $data = NULL, $company_id = NULL, $lang_code 
         return;
     }
 
-    $data = array(serialize((array) $data));
+    $data = [serialize((array) $data)];
     $company_id = fn_se_check_company_id($company_id);
 
-    if ($action == 'prepare_full_import' && empty($company_id) && empty($lang_code)) {
+    if ($action == QueueActions::PREPARE_FULL_IMPORT && empty($company_id) && empty($lang_code)) {
         //Trucate queue for all
         db_query("TRUNCATE ?:se_queue");
 
-    } elseif ($action == 'prepare_full_import' && !empty($company_id)) {
-        db_query("DELETE FROM ?:se_queue WHERE company_id = ?i", $company_id);
+    } elseif ($action == QueueActions::PREPARE_FULL_IMPORT && !empty($company_id)) {
+        if (!empty($lang_code)) {
+            db_query('DELETE FROM ?:se_queue WHERE company_id = ?i AND lang_code = ?s', $company_id, $lang_code);
+        } else {
+            db_query('DELETE FROM ?:se_queue WHERE company_id = ?i', $company_id);
+        }
     }
 
     $engines_data = fn_se_get_engines_data($company_id, $lang_code);
 
     foreach ($data as $d) {
         foreach ($engines_data as $engine_data) {
-			db_query("DELETE FROM ?:se_queue WHERE status = 'pending' AND action = ?s AND data = ?s AND company_id = ?i AND lang_code = ?s", $action, $d, $engine_data['company_id'], $engine_data['lang_code']);
+            db_query('DELETE FROM ?:se_queue WHERE status = ?s AND action = ?s AND data = ?s AND company_id = ?i AND lang_code = ?s', QueueStatuses::PENDING, $action, $d, $engine_data['company_id'], $engine_data['lang_code']);
 
-            db_query("INSERT INTO ?:se_queue ?e", array(
+            if (fn_se_get_import_status($engine_data['company_id'], $engine_data['lang_code']) === ImportStatuses::SUSPENDED) {
+                continue;
+            }
+
+            db_query('INSERT INTO ?:se_queue ?e', [
                 'action'     => $action,
                 'data'       => $d,
                 'company_id' => $engine_data['company_id'],
                 'lang_code'  => $engine_data['lang_code'],
-            ));
+            ]);
         }
     }
 }
@@ -248,19 +303,52 @@ function fn_se_add_chunk_product_action($action, $product_ids, $company_id = NUL
 
 function fn_searchanise_update_product_amount($new_amount, $product_id, $cart_id, $tracking)
 {
-    if ($tracking == ProductTracking::TRACK_WITHOUT_OPTIONS) { // track whole product inventory only - we don't use combinations yet
-        fn_se_add_action('update', (int) $product_id);
+    if ($tracking === ProductTracking::DO_NOT_TRACK) {
+        return;
+    }
+
+    // track whole product inventory only - we don't use combinations yet
+    fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+
+    $united_product_ids = fn_se_get_united_product_ids((array) $product_id);
+
+    if (empty($united_product_ids)) {
+        return;
+    }
+
+    foreach ($united_product_ids as $parent_id) {
+        fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $parent_id);
     }
 }
 
-function fn_searchanise_update_product_post($product_data, $product_id, $lang_code, $create)
+/**
+* Update product data (running after fn_update_product() function)
+*
+* @param array   $product_data Product data
+* @param int     $product_id   Product integer identifier
+* @param string  $lang_code    Two-letter language code (e.g. 'en', 'ru', etc.)
+* @param boolean $create       Flag determines if product was created (true) or just updated (false).
+*
+* @see \fn_update_product()
+*/
+function fn_searchanise_update_product_post(array $product_data, $product_id, $lang_code, $create)
 {
-    fn_se_add_action('update', (int) $product_id);
+    $united_product_ids = fn_se_get_united_product_ids((array) $product_id);
+    if (!empty($united_product_ids)) {
+        foreach ($united_product_ids as $product_id) {
+            fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+        }
+    }
 }
 
 function fn_searchanise_clone_product($product_id, $pid)
 {
-    fn_se_add_action('update', (int) $pid);
+    $united_product_ids = fn_se_get_united_product_ids((array) $pid);
+    if (!empty($united_product_ids)) {
+        foreach ($united_product_ids as $product_id) {
+            fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+        }
+    }
 }
 
 /**
@@ -276,18 +364,28 @@ function fn_searchanise_clone_product($product_id, $pid)
 function fn_searchanise_global_update_products($table, $field, $value, $type, $msg, $update_data)
 {
     if (!empty($update_data['product_ids'])) {
-        foreach ($update_data['product_ids'] as $pid) {
-            fn_se_add_action('update', (int) $pid);
+        $united_product_ids = fn_se_get_united_product_ids((array) $update_data['product_ids']);
+        if (!empty($united_product_ids)) {
+            foreach ($united_product_ids as $product_id) {
+                fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+            }
         }
     } else {
         fn_se_queue_import();
     }
 }
 
-function fn_searchanise_update_option_combination_post($combination_data, $combination_hash, $inventory_amount)
+/**
+ * Check product delete (run before product is deleted)
+ *
+ * @param int     $product_id Product identifier
+ * @param boolean $status     Flag determines if product can be deleted, if false product is not deleted
+ */
+function fn_searchanise_delete_product_pre($product_id, $status)
 {
-    if (!empty($combination_data['product_id'])) {
-        fn_se_add_action('update', (int) $combination_data['product_id']);
+    $united_product_ids = fn_se_get_united_product_ids((array) $product_id, false);
+    if (!empty($united_product_ids)) {
+        Registry::set('se_united_product_ids_' . $product_id, $united_product_ids);
     }
 }
 
@@ -300,7 +398,19 @@ function fn_searchanise_update_option_combination_post($combination_data, $combi
 function fn_searchanise_delete_product_post($product_id, $product_deleted)
 {
     if ($product_deleted) {
-        fn_se_add_action('delete', (int) $product_id);
+        fn_se_add_action(QueueActions::DELETE_PRODUCTS, (int) $product_id);
+    }
+
+    $united_product_ids = Registry::get('se_united_product_ids_' . $product_id);
+    if (!empty($united_product_ids)) {
+        if ($product_deleted) {
+            foreach ($united_product_ids as $parent_id) {
+                // Update parent products
+                fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $parent_id);
+            }
+        }
+
+        Registry::set('se_united_product_ids_' . $product_id, null);
     }
 }
 
@@ -311,45 +421,65 @@ function fn_searchanise_delete_product_post($product_id, $product_deleted)
  * @param int    $category_id   Category identifier
  * @param string $lang_code     Two-letter language code (e.g. 'en', 'ru', etc.)
  */
-function fn_searchanise_update_category_post($category_data, $category_id, $lang_code)
+function fn_searchanise_update_category_post(array $category_data, $category_id, $lang_code)
 {
     $product_ids = db_get_fields('SELECT product_id FROM ?:products_categories WHERE category_id = ?i', $category_id);
 
-    if (!empty($category_data['usergroup_to_subcats']) && $category_data['usergroup_to_subcats'] == 'Y') {
+    if (!empty($category_data['usergroup_to_subcats']) && $category_data['usergroup_to_subcats'] == YesNo::YES) {
         $id_path = db_get_field('SELECT id_path FROM ?:categories WHERE category_id = ?i', $category_id);
         $product_ids = array_merge($product_ids, db_get_fields("SELECT pc.product_id FROM ?:products_categories AS pc LEFT JOIN ?:categories AS c ON pc.category_id = c.category_id WHERE id_path LIKE ?l", "$id_path/%"));
     }
 
-    fn_se_add_chunk_product_action('update', $product_ids);
-    if (!empty($category_data['status']) && $category_data['status'] != 'A') {
-        fn_se_add_action('categories_delete', (int) $category_id);
+    fn_se_add_chunk_product_action(QueueActions::UPDATE_PRODUCTS, $product_ids);
+    if (!empty($category_data['status']) && $category_data['status'] != ObjectStatuses::ACTIVE) {
+        fn_se_add_action(QueueActions::DELETE_CATEGORIES, (int) $category_id);
     } else {
-        fn_se_add_action('categories_update', (int) $category_id);
+        fn_se_add_action(QueueActions::UPDATE_CATEGORIES, (int) $category_id);
     }
 }
 
-function fn_searchanise_delete_category_post($category_id, $recurse, $category_ids)
+/**
+ * Actions after category and its related data removal
+ *
+ * @param int     $category_id  Category identifier to delete
+ * @param boolean $recurse      Flag that defines if category should be deleted recursively
+ * @param array   $category_ids Category identifiers that were removed
+ * 
+ * @see \fn_delete_category()
+ */
+function fn_searchanise_delete_category_post($category_id, $recurse, array $category_ids)
 {
-    fn_se_add_action('categories_delete', $category_ids);
+    fn_se_add_action(QueueActions::DELETE_CATEGORIES, $category_ids);
 }
 
-function fn_searchanise_update_page_post($page_data, $page_id, $lang_code, $create, $old_page_data)
+/**
+ * Actions after page update
+ *
+ * @param array  $page_data     Page data
+ * @param int    $page_id       Page idetifier, if equals zero new page will be created
+ * @param string $lang_code     2 letters language code
+ * @param bool   $create        True if page was created, falce otherwise
+ * @param array  $old_page_data Page data before update
+ * 
+ * @see \fn_update_page()
+ */
+function fn_searchanise_update_page_post(array $page_data, $page_id, $lang_code, $create, array $old_page_data)
 {
-    if (!empty($page_data['status']) && $page_data['status'] != 'A') {
-        fn_se_add_action('pages_delete', (int) $page_id);
+    if (!empty($page_data['status']) && $page_data['status'] != ObjectStatuses::ACTIVE) {
+        fn_se_add_action(QueueActions::DELETE_PAGES, (int) $page_id);
     } else {
-        fn_se_add_action('pages_update', (int) $page_id);
+        fn_se_add_action(QueueActions::UPDATE_PAGES, (int) $page_id);
     }
 }
 
 function fn_searchanise_clone_page($page_id, $new_page_id)
 {
-    fn_se_add_action('pages_update', (int) $new_page_id);
+    fn_se_add_action(QueueActions::UPDATE_PAGES, (int) $new_page_id);
 }
 
 function fn_searchanise_delete_page($page_id)
 {
-    fn_se_add_action('pages_delete', (int) $page_id);
+    fn_se_add_action(QueueActions::DELETE_PAGES, (int) $page_id);
 }
 
 /**
@@ -367,10 +497,16 @@ function fn_searchanise_delete_page($page_id)
  */
 function fn_searchanise_update_addon_status_post($addon, $status, $show_notification, $on_install, $allow_unmanaged, $old_status, $scheme)
 {
-    if ($addon == 'age_verification' && $status == 'A') {
-        fn_set_notification('N', __('notice'), __('text_se_re_indexation_required', array(
+    $reindexation_addons = [
+        'age_verification',
+        'product_variations',
+        'master_products',
+    ];
+
+    if (in_array($addon, $reindexation_addons) && $status == ObjectStatuses::ACTIVE && $on_install == false) {
+        fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_se_re_indexation_required', [
             '[link]' => fn_url('addons.update?addon=searchanise')
-        )));
+        ]));
     }
 }
 
@@ -381,48 +517,74 @@ function fn_searchanise_tools_change_status($params, $result)
     }
 
     if ($params['table'] == 'products' && !empty($result)) {
-        fn_se_add_action('update', $params['id']);
+        $united_products = fn_se_get_united_product_ids((array) $params['id']);
+
+        if (!empty($united_products)) {
+            foreach ($united_products as $product_id) {
+                fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+            }
+        }
 
     } elseif ($params['table'] == 'product_filters' && !empty($result) && !empty($params['id_name']) && $params['id_name'] == 'filter_id' && !empty($params['id'])) {
         // It used exist function-hook
-        if ($params['status'] == 'A') {
-            fn_searchanise_update_product_filter(NULL, $params['id']);
-        } elseif ($params['status'] == 'D') {
+        if ($params['status'] == ObjectStatuses::ACTIVE) {
+            fn_searchanise_update_product_filter_post(NULL, $params['id']);
+        } elseif ($params['status'] == ObjectStatuses::DISABLED) {
             fn_searchanise_delete_product_filter_pre($params['id']);
         }
 
     } elseif ($params['table'] == 'categories' && !empty($result) && !empty($params['id_name']) && $params['id_name'] == 'category_id' && !empty($params['id'])) {
         // It used exist function-hook
-        fn_searchanise_update_category_post(array(
+        fn_searchanise_update_category_post([
             'status' => $params['status']
-        ), $params['id'], DESCR_SL);
+        ], $params['id'], DESCR_SL);
 
     } elseif ($params['table'] == 'languages' && !empty($result)) {
-        if ($params['status'] == 'A') {
-            fn_set_notification('N', __('notice'), __('text_se_re_indexation_required', array(
+        if ($params['status'] == ObjectStatuses::ACTIVE) {
+            fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_se_re_indexation_required', [
                 '[link]' => fn_url('addons.update?addon=searchanise')
-            )));
+            ]));
         }
     }
 }
 
 function fn_se_get_engines_data($company_id = NULL, $lang_code = NULL, $skip_available_check = false)
 {
-    static $engines_data = array();
+    static $engines_data = [];
 
     $company_id = fn_se_check_company_id($company_id);
 
     if (empty($engines_data) || !empty($skip_available_check)) {
+        $languages = [];
+        $available = $skip_available_check ? '1' : "status = 'A'";
+        $all_languages = db_get_array('SELECT * FROM ?:languages WHERE ?p', $available);
+
         if (fn_allowed_for('ULTIMATE')) {
-            $available = ($skip_available_check == true)? '1' : "c.status = 'A' AND l.status = 'A'";
-            $languages = db_get_array("
-                SELECT c.company_id, c.storefront, c.email, l.name, l.lang_code, l.status
-                FROM ?:languages as l
-                INNER JOIN ?:ult_objects_sharing as s ON (s.share_object_id = l.lang_id AND s.share_object_type = 'languages')
-                LEFT JOIN ?:companies as c ON c.company_id = s.share_company_id WHERE ?p ORDER BY l.lang_code = ?s DESC", $available, DEFAULT_LANGUAGE);
+            list($storefronts,) = Tygh::$app['storefront.repository']->find([
+                'get_total' => false,
+            ]);
+
+            foreach ($storefronts as $storefront) {
+                $language_ids = $storefront->getLanguageIds();
+                $s_c_ids = $storefront->getCompanyIds();
+
+                foreach ($all_languages as $l) {
+                    // Check if language is shared for any storefront or not
+                    $exist_lang_id = db_get_field('SELECT language_id FROM ?:storefronts_languages WHERE language_id = ?i', $l['lang_id']);
+
+                    if (empty($exist_lang_id) || in_array($l['lang_id'], $language_ids)) {
+                        $languages[] = [
+                            'lang_code'  => $l['lang_code'],
+                            'company_id' => $s_c_ids[0], // one to one relation for ULT
+                            'storefront' => $storefront->url,
+                            'status'     => $l['status'],
+                            'name'       => $l['name'],
+                        ];
+                    }
+                }
+            }
         } else {
-            $available = ($skip_available_check == true)? '1' : "status = 'A'";
-            $languages = db_get_array("SELECT * FROM ?:languages WHERE $available");
+            $languages = $all_languages;
         }
 
         foreach ($languages as $l) {
@@ -442,7 +604,7 @@ function fn_se_get_engines_data($company_id = NULL, $lang_code = NULL, $skip_ava
                 $url = 'http://' . Registry::get('config.http_host') . Registry::get('config.http_path') . '/?sl=' . $l_code;
             }
 
-            $engines_data[$c_id][$l_code] = array(
+            $engines_data[$c_id][$l_code] = [
                 'lang_code'          => $l_code,
                 'status'             => $l['status'],
                 'company_id'         => $c_id,
@@ -452,11 +614,11 @@ function fn_se_get_engines_data($company_id = NULL, $lang_code = NULL, $skip_ava
                 'private_key'        => fn_se_get_private_key($c_id, $l_code),
                 'import_status'      => fn_se_get_import_status($c_id, $l_code),
                 'parent_private_key' => fn_se_get_parent_private_key($c_id, $l_code),
-            );
+            ];
         }
     }
 
-    $return = array();
+    $return = [];
     foreach ($engines_data as $s_keys_data) {
         foreach ($s_keys_data as $s_l_keys_data) {
             if (!is_null($lang_code) && !is_null($company_id) && $s_l_keys_data['lang_code'] == $lang_code && $s_l_keys_data['company_id'] == $company_id) {
@@ -472,10 +634,22 @@ function fn_se_get_engines_data($company_id = NULL, $lang_code = NULL, $skip_ava
     }
 
     if (!empty($skip_available_check)) {
-        $engines_data = array();
+        $engines_data = [];
     }
 
     return $return;
+}
+
+/**
+ * Returns signup status
+ *
+ * @return string (available values: 'done'|'failed'|timestamp)
+ */
+function fn_se_get_signup_status()
+{
+    $status = fn_se_get_simple_setting('signup_status');
+
+    return !empty($status) ? $status : '';
 }
 
 function fn_se_signup($_company_id = NULL, $_lang_code = NULL, $show_notification = true)
@@ -483,9 +657,7 @@ function fn_se_signup($_company_id = NULL, $_lang_code = NULL, $show_notificatio
     @ignore_user_abort(1);
     @set_time_limit(3600);
 
-    $connected = false;
-
-    $is_showed = false;
+    $connected = $is_showed = false;
 
     if ((!empty($_company_id) || !empty($_lang_code)) && fn_se_is_registered() == false) {
         return false;
@@ -495,10 +667,12 @@ function fn_se_signup($_company_id = NULL, $_lang_code = NULL, $show_notificatio
 
     $engines_data = fn_se_get_engines_data($_company_id, $_lang_code);
 
+    fn_se_set_simple_setting('signup_status', TIME);
+
     foreach ($engines_data as $engine_data) {
-        $lang_code = $engine_data['lang_code'];
-        $company_id = $engine_data['company_id'];
-        $private_key = $engine_data['private_key'];
+        $lang_code          = $engine_data['lang_code'];
+        $company_id         = $engine_data['company_id'];
+        $private_key        = $engine_data['private_key'];
         $parent_private_key = fn_se_get_parent_private_key($company_id, $lang_code);
 
         if (!empty($private_key)) {
@@ -510,14 +684,14 @@ function fn_se_signup($_company_id = NULL, $_lang_code = NULL, $show_notificatio
             $is_showed = true;
         }
 
-        $response = Http::post(SE_SERVICE_URL . '/api/signup/json', array(
-            'url'  => $engine_data['url'],
-            'email'   => $email,
-            'version' => SE_VERSION,
-            'language' => $lang_code,
+        $response = Http::post(SE_SERVICE_URL . '/api/signup/json', [
+            'url'                => $engine_data['url'],
+            'email'              => $email,
+            'version'            => SE_VERSION,
+            'language'           => $lang_code,
             'parent_private_key' => $parent_private_key,
-            'platform' => SE_PLATFORM,
-        ));
+            'platform'           => SE_PLATFORM,
+        ]);
 
         if ($show_notification == true) {
             fn_se_echo_connect_progress('.');
@@ -526,6 +700,9 @@ function fn_se_signup($_company_id = NULL, $_lang_code = NULL, $show_notificatio
         if (!empty($response)) {
             $response = fn_se_parse_response($response, true);
 
+            /**
+             * @psalm-suppress InvalidArrayAccess
+             */
             if (!empty($response['keys']['api']) && !empty($response['keys']['private'])) {
                 $api_key = (string) $response['keys']['api'];
                 $private_key = (string) $response['keys']['private'];
@@ -553,13 +730,15 @@ function fn_se_signup($_company_id = NULL, $_lang_code = NULL, $show_notificatio
             }
         }
 
-        fn_se_set_import_status('none', $company_id, $lang_code);
+        fn_se_set_import_status(ImportStatuses::NONE, $company_id, $lang_code);
     }
 
     if ($connected == true && $show_notification == true) {
         fn_se_echo_connect_progress(' Done<br />');
-        fn_set_notification('N', __('notice'), __('text_se_just_connected'));
+        fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_se_just_connected'));
     }
+
+    fn_se_set_simple_setting('signup_status', $connected ? SignupStatuses::DONE : SignupStatuses::FAILED);
 
     fn_set_hook('searchanise_signup_post', $connected);
 
@@ -579,15 +758,15 @@ function fn_se_queue_import($company_id = NULL, $lang_code = NULL, $show_notific
         return;
     }
 
-    fn_se_add_action('prepare_full_import', NULL, $company_id, $lang_code);
-
     $engines_data = fn_se_get_engines_data($company_id, $lang_code);
+
     foreach ($engines_data as $engine_data) {
-        fn_se_set_import_status('queued', $engine_data['company_id'], $engine_data['lang_code']);
+        fn_se_set_import_status(ImportStatuses::QUEUED, $engine_data['company_id'], $engine_data['lang_code']);
+        fn_se_add_action(QueueActions::PREPARE_FULL_IMPORT, null, $engine_data['company_id'], $engine_data['lang_code']);
     }
 
     if ($show_notification == true) {
-        fn_set_notification('N', __('notice'), __('text_se_import_status_queued'));
+        fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_se_import_status_queued'));
     }
 }
 
@@ -597,26 +776,26 @@ function fn_searchanise_database_restore($files)
         return;
     }
 
-    fn_set_notification('W', __('notice'), __('text_se_database_restore_notice', array(
+    fn_set_notification(NotificationSeverity::WARNING, __('notice'), __('text_se_database_restore_notice', [
         '[link]' => fn_url('addons.update?addon=searchanise')
-    )));
+    ]));
 
     return true;
 }
 
 function fn_se_get_facet_valid_locations()
 {
-    return array(
+    return [
         'index.index',
         'products.search',
         'categories.view',
         'product_features.view'
-    );
+    ];
 }
 
 function fn_se_get_valid_sortings()
 {
-    return array(
+    return [
         'position',
         'product',
         'price',
@@ -626,7 +805,7 @@ function fn_se_get_valid_sortings()
         'popularity', //TODO: server may have not actual `popularity` values.
         'bestsellers',
         'on_sale'
-    );
+    ];
 }
 
 function fn_se_check_product_filter_block()
@@ -642,11 +821,11 @@ function fn_searchanise_send_search_request($params, $lang_code = CART_LANGUAGE)
         return;
     }
 
-    $default_params = array(
+    $default_params = [
         'items'       => 'true',
         'facets'      => 'true',
         'output'      => 'json',
-    );
+    ];
 
     $params = array_merge($default_params, $params);
     if (empty($params['restrictBy'])) {
@@ -665,15 +844,15 @@ function fn_searchanise_send_search_request($params, $lang_code = CART_LANGUAGE)
 
     Registry::set('log_cut', true);
     if (strlen($query) > SE_MAX_SEARCH_REQUEST_LENGTH && fn_check_curl()) {
-        $received = Http::post(SE_SERVICE_URL . '/search?api_key=' . $api_key, $params, array(
+        $received = Http::post(SE_SERVICE_URL . '/search?api_key=' . $api_key, $params, [
             'timeout' => SE_SEARCH_TIMEOUT
-        ));
+        ]);
     } else {
         $params['api_key'] = $api_key;
 
-        $received = Http::get(SE_SERVICE_URL . '/search', $params, array(
+        $received = Http::get(SE_SERVICE_URL . '/search', $params, [
             'timeout' => SE_SEARCH_TIMEOUT
-        ));
+        ]);
     }
 
     if (empty($received)) {
@@ -686,7 +865,7 @@ function fn_searchanise_send_search_request($params, $lang_code = CART_LANGUAGE)
     }
 
     if (isset($result['error'])) {
-        if ($result['error'] == 'NEED_RESYNC_YOUR_CATALOG') {
+        if ($result['error'] == ServerErrors::NEED_RESYNC_YOUR_CATALOG) {
             fn_se_queue_import($company_id, $lang_code, false);
 
             return false;
@@ -706,11 +885,11 @@ function fn_searchanise_products_sorting(&$sorting, $simple_mode)
     if (
         AREA == 'C' &&
         !empty($_REQUEST['search_performed']) &&
-        SE_USE_RELEVANCE_AS_DEFAULT_SORTING == 'Y' &&
-        fn_se_get_import_status(fn_se_get_company_id(), CART_LANGUAGE) == 'done'
+        SE_USE_RELEVANCE_AS_DEFAULT_SORTING == YesNo::YES &&
+        fn_se_is_search_allowed(fn_se_get_company_id(), CART_LANGUAGE)
     ) {
-        $sorting = array_merge(array('relevance' => array('description' => __('se_relevance'), 'default_order' => 'asc', 'desc' => false)), $sorting);
-        $list = array_merge(Registry::get('settings.Appearance.available_product_list_sortings'), array('relevance-asc' => 'Y'));
+        $sorting = array_merge(['relevance' => ['description' => __('se_relevance'), 'default_order' => 'asc', 'desc' => false]], $sorting);
+        $list = array_merge(Registry::get('settings.Appearance.available_product_list_sortings'), ['relevance-asc' => YesNo::YES]);
         Registry::set('settings.Appearance.available_product_list_sortings', $list);
         Tygh::$app['view']->assign('settings', Registry::get('settings'));
     }
@@ -718,31 +897,35 @@ function fn_searchanise_products_sorting(&$sorting, $simple_mode)
 
 function fn_se_prepare_request_params($params)
 {
-    $restrict_by = $query_by = $union = array();
+    $restrict_by = $query_by = $union = [];
 
     //
     // Hide products with empty categories and wrong usergroup categories
     //
-    $restrict_by['empty_categories'] = 'N';
+    $restrict_by['empty_categories'] = YesNo::NO;
     $restrict_by['category_usergroup_ids'] = join('|', Tygh::$app['session']['auth']['usergroup_ids']);
 
     //
     // Visibility
     //
-    $restrict_by['status'] = 'A';
+    $restrict_by['status'] = ObjectStatuses::ACTIVE;
     if (!fn_allowed_for('ULTIMATE:FREE')) {
         $restrict_by['usergroup_ids'] = join('|', Tygh::$app['session']['auth']['usergroup_ids']);
     }
 
-    if (Registry::get('settings.General.inventory_tracking') == 'Y' && Registry::get('settings.General.show_out_of_stock_products') == 'N' && AREA == 'C') {
+    if (
+        Registry::get('settings.General.inventory_tracking') !== YesNo::NO
+        && Registry::get('settings.General.show_out_of_stock_products') === YesNo::NO
+        && SiteArea::isStorefront(AREA)
+    ) {
         $restrict_by['amount'] = '1,';
     }
 
-    if (Registry::ifGet('addons.vendor_data_premoderation.status', 'N') == 'A') {
-        $restrict_by['approved'] = 'Y';
+    if (Registry::ifGet('addons.vendor_data_premoderation.status', ObjectStatuses::NEW_OBJECT) == ObjectStatuses::ACTIVE) {
+        $restrict_by['approved'] = YesNo::YES;
     }
 
-    if (Registry::ifGet('addons.age_verification.status', 'N') == 'A') {
+    if (Registry::ifGet('addons.age_verification.status', ObjectStatuses::NEW_OBJECT) == ObjectStatuses::ACTIVE) {
         if (!empty(Tygh::$app['session']['auth']['age']) && AREA == 'C') {
             $restrict_by['age_limit'] = '0,' . Tygh::$app['session']['auth']['age'];
         } else {
@@ -750,13 +933,25 @@ function fn_se_prepare_request_params($params)
         }
     }
 
+    if (Registry::ifGet('addons.product_variations.status', ObjectStatuses::NEW_OBJECT) == ObjectStatuses::ACTIVE) {
+        $restrict_by['product_type'] = ProductVariationTypes::PRODUCT_TYPE_SIMPLE;
+    }
+
     //
     // Company_id
     //
     if (fn_allowed_for('MULTIVENDOR')) {
-        $restrict_by['active_company'] = 'Y';
+        $restrict_by['active_company'] = YesNo::YES;
 
-        if (isset($params['company_id']) && $params['company_id'] != '') {
+        if (Registry::ifGet('addons.master_products.status', ObjectStatuses::NEW_OBJECT) === ObjectStatuses::ACTIVE) {
+            $restrict_by['master_product_status'] = ObjectStatuses::ACTIVE;
+
+            if (!empty($params['company_id'])) {
+                $restrict_by['company_id'] = $params['company_id'];
+            } else {
+                $restrict_by['company_id'] = 0;
+            }
+        } elseif (!empty($params['company_id'])) {
             $restrict_by['company_id'] = $params['company_id'];
         }
     }
@@ -767,7 +962,7 @@ function fn_se_prepare_request_params($params)
     if (!empty($params['features_hash'])) {
         $selected_filters = fn_parse_filters_hash($params['features_hash']);
         if (!empty($selected_filters)) {
-            list($filters, ) = fn_get_product_filters(array('filter_id' => array_keys($selected_filters), 'status' => 'A', 'get_variants' => false), 0);
+            list($filters, ) = fn_get_product_filters(['filter_id' => array_keys($selected_filters), 'status' => ObjectStatuses::ACTIVE, 'get_variants' => false], 0);
 
             foreach($filters as $filter) {
                 $filter_id = $filter['filter_id'];
@@ -775,13 +970,13 @@ function fn_se_prepare_request_params($params)
                 if (!empty($feature_id)) {
                     $restrict_by["feature_{$feature_id}" ] = join('|', $selected_filters[$filter_id]);
 
-                } elseif ($filter['field_type'] == 'A') {
+                } elseif ($filter['field_type'] == ProductFilterProductFieldTypes::IN_STOCK) {
                     $restrict_by["in_stock"] = $selected_filters[$filter_id][0];
 
-                } elseif ($filter['field_type'] == 'F') {
+                } elseif ($filter['field_type'] == ProductFilterProductFieldTypes::FREE_SHIPPING) {
                     $restrict_by['free_shipping'] = $selected_filters[$filter_id][0];
 
-                } elseif ($filter['field_type'] == 'S') {
+                } elseif ($filter['field_type'] == ProductFilterProductFieldTypes::VENDOR) {
                     $restrict_by['company_id'] = join('|', $selected_filters[$filter_id]);
                 }
             }
@@ -791,7 +986,7 @@ function fn_se_prepare_request_params($params)
     //
     // Timestamp
     //
-    if (!empty($params['period']) && $params['period'] != 'A') {
+    if (!empty($params['period']) && $params['period'] != ObjectStatuses::ACTIVE) {
         list($params['time_from'], $params['time_to']) = fn_create_periods($params);
         $restrict_by['timestamp'] = "{$params['time_from']},{$params['time_to']}";
     }
@@ -802,7 +997,7 @@ function fn_se_prepare_request_params($params)
     if (!fn_allowed_for('"ULTIMATE:FREE"')) {
         if (count(Tygh::$app['session']['auth']['usergroup_ids']) > 1) {
             foreach (Tygh::$app['session']['auth']['usergroup_ids'] as $usergroup_id) {
-                $_prices[] = 'price_' . $usergroup_id;
+                $_prices[] = SE_PRICE_USERGROUP_PREFIX . $usergroup_id;
             }
 
             $union['price']['min'] = join('|', $_prices);
@@ -855,30 +1050,39 @@ function fn_se_prepare_request_params($params)
         }
     }
 
-    return array($restrict_by, $query_by, $union);
+    return [$restrict_by, $query_by, $union];
 }
 
 function fn_searchanise_get_products(&$params, &$fields, &$sortings, &$condition, &$join, &$sorting, &$group_by, &$lang_code, &$having)
 {
-    /*
-     * Support for add-on "Bestsellers & On-Sale Products".
-     */
-    if (!empty($params['for_searchanise']) && $params['area'] == 'A' && Registry::ifGet('addons.bestsellers.status', 'N') == 'A') {
-        if (in_array('sales', $params['extend'])) { // Get count of sales for "Sort by Bestselling".
-            $fields['sales'] = 'sales.amount as sales';
-            $join .= db_quote(' LEFT JOIN ?:product_sales as sales ON sales.product_id = products.product_id');
+    if (!empty($params['for_searchanise']) && $params['area'] == 'A') {
+        if (empty($fields['position'])) {
+            $fields['position'] = 'products_categories.position';
         }
 
-        if (in_array('discount', $params['extend'])) { // Get value of discount for "Sort by discount".
-            $fields['discount'] = '(CASE'
-                . ' WHEN list_price > 0 THEN 100 - MIN(prices.price) * 100 / list_price'
-                . ' ELSE 0'
-                . ' END) AS discount';
-        }
-    }
+        /*
+         * Support for add-on "Bestsellers & On-Sale Products".
+         */
+        if (Registry::ifGet('addons.bestsellers.status', ObjectStatuses::NEW_OBJECT) == ObjectStatuses::ACTIVE) {
+            if (in_array('sales', $params['extend'])) { // Get count of sales for "Sort by Bestselling".
+                $fields['sales'] = 'sales.amount as sales';
+                $join .= db_quote(' LEFT JOIN ?:product_sales as sales ON sales.product_id = products.product_id');
+            }
 
-    if (!empty($params['for_searchanise']) && $params['area'] == 'A' && Registry::ifGet('addons.age_verification.status', 'N') == 'A') {
-        fn_age_verification_extend_product_fields($fields, 'need_age_verification', 'searchanise_age_limit');
+            if (in_array('discount', $params['extend'])) { // Get value of discount for "Sort by discount".
+                $fields['discount'] = '(CASE'
+                    . ' WHEN products.list_price > 0 THEN 100 - MIN(prices.price) * 100 / products.list_price'
+                    . ' ELSE 0'
+                    . ' END) AS discount';
+            }
+        }
+
+        /**
+         * Suport for add-on "Age Verification"
+         */
+        if (Registry::ifGet('addons.age_verification.status', ObjectStatuses::NEW_OBJECT) == ObjectStatuses::ACTIVE) {
+            fn_age_verification_extend_product_fields($fields, 'need_age_verification', 'searchanise_age_limit');
+        }
     }
 }
 
@@ -893,7 +1097,7 @@ function fn_searchanise_get_products_before_select(&$params, &$join, &$condition
         (!empty($_REQUEST['sort_by']) && !in_array($_REQUEST['sort_by'], fn_se_get_valid_sortings())) ||
         fn_se_check_disabled() ||
         !empty($params['disable_searchanise']) ||
-        fn_se_get_import_status(fn_se_get_company_id(), CART_LANGUAGE) != 'done'
+        !fn_se_is_search_allowed(fn_se_get_company_id(), CART_LANGUAGE)
     ) {
         return;
     }
@@ -904,12 +1108,12 @@ function fn_searchanise_get_products_before_select(&$params, &$join, &$condition
     // Categories
     //
     if (!empty($params['cid'])) {
-        $cids = is_array($params['cid']) ? $params['cid'] : array($params['cid']);
+        $cids = is_array($params['cid']) ? $params['cid'] : [$params['cid']];
 
         $c_condition = '';
 
         if (AREA == 'C') {
-            $_c_statuses = array('A', 'H');// Show enabled categories
+            $_c_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];// Show enabled categories
             $cids = db_get_fields("SELECT a.category_id FROM ?:categories as a WHERE a.category_id IN (?n) AND a.status IN (?a)", $cids, $_c_statuses);
             $c_condition = db_quote('AND a.status IN (?a) AND (' . fn_find_array_in_set(Tygh::$app['session']['auth']['usergroup_ids'], 'a.usergroup_ids', true) . ')', $_c_statuses);
         }
@@ -924,7 +1128,7 @@ function fn_searchanise_get_products_before_select(&$params, &$join, &$condition
             return;
         }
 
-        if (!empty($params['subcats']) && $params['subcats'] == 'Y') {
+        if (!empty($params['subcats']) && $params['subcats'] == YesNo::YES) {
             $restrict_by['category_id'] = join('|', $sub_categories_ids);
         } else {
             $restrict_by['category_id'] = join('|', $cids);
@@ -934,7 +1138,7 @@ function fn_searchanise_get_products_before_select(&$params, &$join, &$condition
     //
     // Sortings
     //
-    if (!empty($_REQUEST['search_performed']) && empty($_REQUEST['sort_by']) && SE_USE_RELEVANCE_AS_DEFAULT_SORTING == 'Y') {
+    if (!empty($_REQUEST['search_performed']) && empty($_REQUEST['sort_by']) && SE_USE_RELEVANCE_AS_DEFAULT_SORTING == YesNo::YES) {
         $params['sort_by'] = 'relevance';
         $params['sort_order'] = 'asc';
     }
@@ -976,7 +1180,7 @@ function fn_searchanise_get_products_before_select(&$params, &$join, &$condition
     $get_items = true;
     $get_facets = (!fn_allowed_for('ULTIMATE:FREE'))? true : false;
 
-    $request_params = array(
+    $request_params = [
         'sortBy'     => $sort_by,
         'sortOrder'  => $sort_order,
 
@@ -989,7 +1193,7 @@ function fn_searchanise_get_products_before_select(&$params, &$join, &$condition
 
         'maxResults' => $max_results,
         'startIndex' => ($params['page'] - 1) * $items_per_page,
-    );
+    ];
 
     if ($request_params['sortBy'] == 'null') {
         unset($request_params['sortBy']);
@@ -1028,7 +1232,7 @@ function fn_searchanise_get_products_before_select(&$params, &$join, &$condition
             $params['sort_order'] = 'asc';
         }
     } else {
-        $products = array();
+        $products = [];
         $params['force_get_by_ids'] = true;
         $params['pid'] = $params['product_id'] = 0;
     }
@@ -1047,7 +1251,15 @@ function fn_searchanise_get_products_before_select(&$params, &$join, &$condition
     return;
 }
 
-function fn_searchanise_get_filters_products_count($params = array(), $lang_code = CART_LANGUAGE)
+/**
+ * Gets available filters according to current products set
+ *
+ * @param array $params    Products filter search params
+ * @param array $lang_code 2 letters language code
+ * 
+ * @return array
+ */
+function fn_searchanise_get_filters_products_count(array $params = [], $lang_code = CART_LANGUAGE)
 {
     if (
         empty($params['q']) ||
@@ -1056,17 +1268,17 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
         $params['dispatch'] != 'products.search' && $params['dispatch'] != 'companies.products' ||
         fn_se_check_disabled() ||
         !empty($params['disable_searchanise']) ||
-        fn_se_get_import_status(fn_se_get_company_id(), CART_LANGUAGE) != 'done'
+        !fn_se_is_search_allowed(fn_se_get_company_id(), CART_LANGUAGE)
     ) {
-        return fn_get_filters_products_count($params, $lang_code);
+        return fn_product_filters_get_filters_products_count($params, $lang_code);
     }
 
     $received_facets = Registry::get('searchanise.received_facets');
     if (is_null($received_facets)) {
-         return fn_get_filters_products_count($params, $lang_code);
+         return fn_product_filters_get_filters_products_count($params, $lang_code);
     }
 
-    $_params = array('status' => 'A', 'get_variants' => true);
+    $_params = ['status' => ObjectStatuses::ACTIVE, 'get_variants' => true];
     if (!empty($params['item_ids'])) {
         $_params['item_ids'] = $params['item_ids'];
     }
@@ -1076,9 +1288,9 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
         //
         // Get without
         //
-        list($restrict_by, $query_by, $union) = fn_se_prepare_request_params(array_merge($params, array('features_hash' => '')));
+        list($restrict_by, $query_by, $union) = fn_se_prepare_request_params(array_merge($params, ['features_hash' => '']));
 
-        $request_params = array(
+        $request_params = [
             'items'  => 'false',
             'facets' => 'true',
             'q'      => $params['q'],
@@ -1086,39 +1298,39 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
             'union'      => $union,
             'queryBy'    => $query_by,
             'restrictBy' => $restrict_by,
-        );
+        ];
         $result = fn_searchanise_send_search_request($request_params);
 
         if (empty($result)) {
-            return fn_get_filters_products_count($params);
+            return fn_product_filters_get_filters_products_count($params);
         } else {
             $clear_rfacets = $result['facets'];
         }
     }
 
-    $filters = array();
+    $filters = [];
     foreach($stored_filters as $sfilter) {
         $sfilter_id = $sfilter['filter_id'];
-        $filter = array(
-            'feature_id' => $sfilter['feature_id'],
-            'filter_id'  => $sfilter_id,
-            'field_type' => $sfilter['field_type'],
-            'round_to'   => $sfilter['round_to'],
-            'display'    => $sfilter['display'],
+        $filter = [
+            'feature_id'    => $sfilter['feature_id'],
+            'filter_id'     => $sfilter_id,
+            'field_type'    => $sfilter['field_type'],
+            'round_to'      => $sfilter['round_to'],
+            'display'       => $sfilter['display'],
             'display_count' => $sfilter['display_count'],
-            'filter'     => $sfilter['filter'],
-            'feature_type' => $sfilter['feature_type'],
-            'prefix'     => $sfilter['prefix'],
-            'suffix'     => $sfilter['suffix'],
-        );
+            'filter'        => $sfilter['filter'],
+            'feature_type'  => $sfilter['feature_type'],
+            'prefix'        => $sfilter['prefix'],
+            'suffix'        => $sfilter['suffix'],
+        ];
 
         $rfilter = false;
         foreach($received_facets as $rfacet) {
             if (
-                $sfilter['field_type'] == 'P' && $rfacet['attribute'] == "price" ||
-                $sfilter['field_type'] == 'F' && $rfacet['attribute'] == "free_shipping" ||
-                $sfilter['field_type'] == 'A' && $rfacet['attribute'] == "in_stock" ||
-                $sfilter['field_type'] == 'S' && $rfacet['attribute'] == "company_id" ||
+                $sfilter['field_type'] == ProductFilterProductFieldTypes::PRICE && $rfacet['attribute'] == "price" ||
+                $sfilter['field_type'] == ProductFilterProductFieldTypes::FREE_SHIPPING && $rfacet['attribute'] == "free_shipping" ||
+                $sfilter['field_type'] == ProductFilterProductFieldTypes::IN_STOCK && $rfacet['attribute'] == "in_stock" ||
+                $sfilter['field_type'] == ProductFilterProductFieldTypes::VENDOR && $rfacet['attribute'] == "company_id" ||
                 "feature_{$sfilter['feature_id']}" == $rfacet['attribute']
             ) {
                 $rfilter = $rfacet;
@@ -1133,10 +1345,10 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
         $crfilter = false;
         foreach($clear_rfacets as $crfacet) {
             if (
-                $sfilter['field_type'] == 'P' && $crfacet['attribute'] == "price" ||
-                $sfilter['field_type'] == 'F' && $crfacet['attribute'] == "free_shipping" ||
-                $sfilter['field_type'] == 'A' && $crfacet['attribute'] == "in_stock" ||
-                $sfilter['field_type'] == 'S' && $crfacet['attribute'] == "company_id" ||
+                $sfilter['field_type'] == ProductFilterProductFieldTypes::PRICE && $crfacet['attribute'] == "price" ||
+                $sfilter['field_type'] == ProductFilterProductFieldTypes::FREE_SHIPPING && $crfacet['attribute'] == "free_shipping" ||
+                $sfilter['field_type'] == ProductFilterProductFieldTypes::IN_STOCK && $crfacet['attribute'] == "in_stock" ||
+                $sfilter['field_type'] == ProductFilterProductFieldTypes::VENDOR && $crfacet['attribute'] == "company_id" ||
                 "feature_{$sfilter['feature_id']}" == $crfacet['attribute']
             ) {
                 $crfilter = $crfacet;
@@ -1150,7 +1362,7 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
             $sfilter['feature_type'] == ProductFeatures::DATE ||
             (!empty($sfilter['condition_type']) && $sfilter['condition_type'] == 'D')
         ) {
-            if ($sfilter['field_type'] == 'P') {
+            if ($sfilter['field_type'] == ProductFilterProductFieldTypes::PRICE) {
                 $filter_fields = fn_get_product_filter_fields();
                 $convert = $filter_fields['P']['convert'];
                 list($rfilter['buckets'][0]['from'], $rfilter['buckets'][0]['to']) = $convert($rfilter['buckets'][0]['from'], $rfilter['buckets'][0]['to']);
@@ -1159,11 +1371,15 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
                 }
             }
 
+            // Needs for check to disabling slider.
+            $min = Math::floorToPrecision($rfilter['buckets'][0]['from'], $sfilter['round_to'] * 0.1);
+            $max = Math::floorToPrecision($rfilter['buckets'][0]['to'], $sfilter['round_to'] * 0.1);
 
-            $filter['min']    = Math::ceilToPrecision($rfilter['buckets'][0]['from'], $sfilter['round_to']);
-            $filter['max']    = Math::ceilToPrecision($rfilter['buckets'][0]['to'], $sfilter['round_to']);
-            $filter['extra']  = CART_SECONDARY_CURRENCY; //TODO
-            $filter['slider'] = true;
+            $filter['min']     = Math::ceilToPrecision($min, $sfilter['round_to']);
+            $filter['max']     = Math::ceilToPrecision($max, $sfilter['round_to']);
+            $filter['extra']   = CART_SECONDARY_CURRENCY; //TODO
+            $filter['disable'] = round(abs($max - $min), 2) < $sfilter['round_to'];
+            $filter['slider']  = true;
 
             if (!empty($rfilter['buckets'][0]['selected'])) {
                 $filter['left']  = Math::floorToPrecision($rfilter['buckets'][0]['left'], $sfilter['round_to']);
@@ -1173,21 +1389,21 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
 
         } elseif (
             $sfilter['feature_type'] == ProductFeatures::SINGLE_CHECKBOX ||
-            $sfilter['field_type'] == 'F' && $rfilter['attribute'] == "free_shipping" ||
-            $sfilter['field_type'] == 'A' && $rfilter['attribute'] == "in_stock"
+            $sfilter['field_type'] == ProductFilterProductFieldTypes::FREE_SHIPPING && $rfilter['attribute'] == "free_shipping" ||
+            $sfilter['field_type'] == ProductFilterProductFieldTypes::IN_STOCK && $rfilter['attribute'] == "in_stock"
         ) {
             if (!empty($rfilter['buckets'][0])) {
                 $rvariant = $rfilter['buckets'][0];
                 $insert_to = (!empty($rvariant['selected']))? 'selected_variants' : 'variants';
-                $filter[$insert_to]['Y'] = array(
-                    'variant_id' => 'Y',
+                $filter[$insert_to][YesNo::YES] = [
+                    'variant_id' => YesNo::YES,
                     'variant'    => __('yes'),
-                );
+                ];
             }
 
         } else {
-            if ($sfilter['field_type'] == 'S' && $rfilter['attribute'] == "company_id") {
-                $sfilter['variants'] = db_get_hash_array("SELECT c.company_id as variant_id, c.company as variant FROM ?:companies AS c WHERE c.status = 'A' ORDER BY c.company ASC", 'variant_id');
+            if ($sfilter['field_type'] == ProductFilterProductFieldTypes::VENDOR && $rfilter['attribute'] == "company_id") {
+                $sfilter['variants'] = db_get_hash_array("SELECT c.company_id as variant_id, c.company as variant FROM ?:companies AS c WHERE c.status = ?s ORDER BY c.company ASC", 'variant_id', ObjectStatuses::ACTIVE);
             }
 
             //
@@ -1196,11 +1412,11 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
             foreach($rfilter['buckets'] as $rvariant) {
                 $variant_id = $rvariant['value'];
                 $insert_to = (!empty($rvariant['selected']))? '_selected_variants' : '_variants';
-                $filter[$insert_to][$variant_id] = array(
+                $filter[$insert_to][$variant_id] = [
                     'variant_id' => $variant_id,
                     'variant'    => $sfilter['variants'][$variant_id]['variant'],
                     'position'   => 0,
-                );
+                ];
             }
 
             //
@@ -1210,12 +1426,12 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
                 foreach ($crfilter['buckets'] as $crvariant) {
                     $variant_id = $crvariant['value'];
                     if (empty($filter['_selected_variants'][$variant_id]) && empty($filter['_variants'][$variant_id])) {
-                        $filter['_variants'][$variant_id] = array(
+                        $filter['_variants'][$variant_id] = [
                             'variant_id' => $variant_id,
                             'variant'    => $sfilter['variants'][$variant_id]['variant'],
                             'position'   => 0,
                             'disabled'  => true,
-                        );
+                        ];
                     }
                 }
             }
@@ -1244,7 +1460,21 @@ function fn_searchanise_get_filters_products_count($params = array(), $lang_code
         $filters[$sfilter_id] = $filter;
     }
 
-    return array($filters);
+    $selected_filters = !empty($params['features_hash']) && empty($params['skip_advanced_variants'])
+        ? fn_parse_filters_hash($params['features_hash'])
+        : [];
+
+    /**
+     * Modifies filters
+     *
+     * @param array  $params            Parameters of filters selection
+     * @param string $lang_code         Two-letter language code (e.g. 'en', 'ru', etc.)
+     * @param array  $filters           Filters array
+     * @param array  $selected_filters  Selected filters array
+     */
+    fn_set_hook('get_filters_products_count_post', $params, $lang_code, $filters, $selected_filters);
+
+    return [$filters];
 }
 
 /**
@@ -1261,13 +1491,13 @@ function fn_searchanise_update_product_feature_post($feature_data, $feature_id, 
     if (!empty($feature_id) && !empty($feature_data['feature_type']) && $feature_data['feature_type'] == ProductFeatures::NUMBER_SELECTBOX) {
         $product_ids = db_get_fields('SELECT product_id FROM ?:product_features_values WHERE feature_id = ?i AND lang_code = ?s', $feature_id, DEFAULT_LANGUAGE);
 
-        fn_se_add_chunk_product_action('update', $product_ids);
+        fn_se_add_chunk_product_action(QueueActions::UPDATE_PRODUCTS, $product_ids);
     }
 }
 
-function fn_searchanise_update_product_filter($filter_data, $filter_id)
+function fn_searchanise_update_product_filter_post($filter_data, $filter_id)
 {
-    fn_se_add_action('facet_update', $filter_id);
+    fn_se_add_action(QueueActions::UPDATE_FACETS, $filter_id);
 }
 
 function fn_searchanise_delete_product_filter_pre($filter_id)
@@ -1276,13 +1506,13 @@ function fn_searchanise_delete_product_filter_pre($filter_id)
 
     if (!empty($filter['feature_id'])) {
         $facet_attribute = 'feature_' . $filter['feature_id'];
-    } elseif ($filter['field_type'] == 'P') {
+    } elseif ($filter['field_type'] == ProductFilterProductFieldTypes::PRICE) {
         $facet_attribute = 'price';
-    } elseif ($filter['field_type'] == 'F') {
+    } elseif ($filter['field_type'] == ProductFilterProductFieldTypes::FREE_SHIPPING) {
         $facet_attribute = 'free_shipping';
-    } elseif ($filter['field_type'] == 'S') {
+    } elseif ($filter['field_type'] == ProductFilterProductFieldTypes::VENDOR) {
         $facet_attribute = 'company_id';
-    } elseif ($filter['field_type'] == 'A') {
+    } elseif ($filter['field_type'] == ProductFilterProductFieldTypes::IN_STOCK) {
         $facet_attribute = 'amount';
     } else {
         return;
@@ -1294,27 +1524,34 @@ function fn_searchanise_delete_product_filter_pre($filter_id)
         return; // we have dublicate filter => no request
     }
 
-    fn_se_add_action('facet_delete', $facet_attribute);
+    fn_se_add_action(QueueActions::DELETE_FACETS, $facet_attribute);
 }
 
 function fn_se_get_json_header()
 {
-    return array(
-        'header' => array(
+    return [
+        'header' => [
             'id'      => Registry::get('config.http_location'),
             'updated' => date('c'),
-        ),
-    );
+        ],
+    ];
 }
 
-function fn_se_send_addon_status_request($status = 'enabled', $company_id = NULL, $lang_code = NULL)
+/**
+ * Change addon status
+ * 
+ * @param string $status     New addon status
+ * @param int    $company_id Company identifier
+ * @param string $lang_code  2 letters lang code
+ */
+function fn_se_send_addon_status_request($status = AddonStatuses::ENABLED, $company_id = NULL, $lang_code = NULL)
 {
     $engines_data = fn_se_get_engines_data($company_id, $lang_code, true);
 
     if ($engines_data) {
         foreach ($engines_data as $engine_data) {
             $private_key = fn_se_get_private_key($engine_data['company_id'], $engine_data['lang_code']);
-            fn_se_send_request('/api/state/update/json', $private_key, array('addon_status' => $status));
+            fn_se_send_request('/api/state/update/json', $private_key, ['addon_status' => $status]);
         }
     }
 }
@@ -1325,22 +1562,43 @@ function fn_se_send_request($url_part, $private_key, $data)
         return;
     }
 
-    $params = array('private_key' => $private_key) + $data;
+    $params = ['private_key' => $private_key] + $data;
 
     Registry::set('log_cut', true);
 
-    $result = Http::post(SE_SERVICE_URL . $url_part, $params, array(
+    $result = Http::post(SE_SERVICE_URL . $url_part, $params, [
         'timeout' => SE_REQUEST_TIMEOUT
-    ));
+    ]);
 
-    $response = fn_se_parse_response($result, false);
+    $response = fn_se_parse_response($result, false, static function ($err) use ($private_key) {
+        if ($err === 'inactive_private_key') {
+            $engines_data = fn_se_get_engines_data();
+
+            foreach ($engines_data as $e) {
+                if ($e['private_key'] === $private_key) {
+                    fn_se_set_import_status(ImportStatuses::SUSPENDED, $e['company_id'], $e['lang_code']);
+                    db_query('DELETE FROM ?:se_queue WHERE company_id = ?i AND lang_code = ?s', $e['company_id'], $e['lang_code']);
+                    break;
+                }
+            }
+        }
+    });
 
     fn_se_set_simple_setting('last_request', TIME);
 
     return $response;
 }
 
-function fn_se_parse_response($response, $show_notification = false)
+/**
+ * Parses response from Searchanise server
+ *
+ * @param string        $response          Searchanise response
+ * @param bool          $show_notification If true and error occurs, it will be shown
+ * @param callable|null $err_callback      Error callback action
+ *
+ * @return bool|array
+ */
+function fn_se_parse_response($response, $show_notification = false, $err_callback = null)
 {
     $data = json_decode($response, true);
 
@@ -1348,26 +1606,32 @@ function fn_se_parse_response($response, $show_notification = false)
         return false;
     }
 
+    if ($data === 'ok') {
+        return true;
+    }
+
     if (!empty($data['errors']) && is_array($data['errors'])) {
         foreach ($data['errors'] as $e) {
             if ($show_notification == true) {
-                fn_set_notification('E', __('error'), 'Searchanise: ' . (string) $e);
+                fn_set_notification(NotificationSeverity::ERROR, __('error'), 'Searchanise: ' . (string) $e);
             }
+
+            if (!is_callable($err_callback)) {
+                continue;
+            }
+
+            call_user_func($err_callback, $e);
         }
 
         return false;
-
-    } elseif ($data === 'ok') {
-        return true;
-
-    } else {
-        return $data;
     }
+
+    return $data;
 }
 
 function fn_se_parse_state_response($response)
 {
-    $data = array();
+    $data = [];
     if (empty($response)) {
         return false;
     }
@@ -1385,7 +1649,7 @@ function fn_se_parse_state_response($response)
 
 function fn_se_get_ids($items, $name = 'product_id')
 {
-    $ids = array();
+    $ids = [];
 
     foreach ((array) $items as $v) {
         $ids[] = $v[$name];
@@ -1401,8 +1665,8 @@ function fn_se_delete_keys($company_id = NULL, $lang_code = NULL)
         $c_id = $engine_data['company_id'];
         $l_code = $engine_data['lang_code'];
 
-        fn_se_set_import_status('none', $c_id, $l_code);
-        fn_se_send_addon_status_request('deleted', $c_id, $l_code);
+        fn_se_set_import_status(ImportStatuses::NONE, $c_id, $l_code);
+        fn_se_send_addon_status_request(AddonStatuses::DELETED, $c_id, $l_code);
         db_query("DELETE FROM ?:se_queue WHERE company_id = ?i AND lang_code = ?s", $c_id, $l_code);
     }
 
@@ -1436,9 +1700,9 @@ function fn_searchanise_delete_languages_pre($lang_ids)
  */
 function fn_searchanise_update_language_post($language_data, $lang_id, $action)
 {
-    fn_set_notification('N', __('notice'), __('text_se_re_indexation_required', array(
+    fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_se_re_indexation_required', [
         '[link]' => fn_url('addons.update?addon=searchanise')
-    )));
+    ]));
 }
 
 function fn_searchanise_delete_company_pre($company_id)
@@ -1452,9 +1716,9 @@ function fn_searchanise_update_company($company_data, $company_id, $lang_code, $
 {
     if (fn_se_signup($company_id, NULL, false) == true) {
         fn_se_queue_import($company_id, NULL, false);
-        fn_set_notification('N', __('notice'), __('text_se_new_engine_store', array(
+        fn_set_notification(NotificationSeverity::NOTICE, __('notice'), __('text_se_new_engine_store', [
             '[store]' => $company_data['company']
-        )));
+        ]));
     }
 }
 
@@ -1478,20 +1742,20 @@ function fn_se_check_import_is_done($company_id = NULL, $lang_code = NULL)
             $c_id = $engine_data['company_id'];
             $l_code = $engine_data['lang_code'];
 
-            if ($engine_data['import_status'] == 'sent') {
+            if ($engine_data['import_status'] == ImportStatuses::SENT) {
                 if ((TIME - fn_se_get_simple_setting('last_request')) > 10 ||
                     (fn_se_get_simple_setting('last_request') - 10) > TIME || // It is need if last_request incorrect.
                     $skip_time_check == true) {
-                    $response = fn_se_send_request('/api/state/get/json', fn_se_get_private_key($c_id, $l_code), array('status' => '', 'full_import' => ''));
+                    $response = fn_se_send_request('/api/state/get/json', fn_se_get_private_key($c_id, $l_code), ['status' => '', 'full_import' => '']);
 
                     $variables = fn_se_parse_state_response($response);
 
                     if (!empty($variables) && isset($variables['status'])) {
-                        if ($variables['status'] == 'normal' && $variables['full_import'] == 'done') {
+                        if ($variables['status'] == 'normal' && $variables['full_import'] == ImportStatuses::DONE) {
                             $skip_time_check = true;
-                            fn_se_set_import_status('done', $c_id, $l_code);
+                            fn_se_set_import_status(ImportStatuses::DONE, $c_id, $l_code);
                         } elseif ($variables['status'] == 'disabled') {
-                            fn_se_set_import_status('none', $c_id, $l_code); //disable status check for disabled engine
+                            fn_se_set_import_status(ImportStatuses::SUSPENDED, $c_id, $l_code); //disable status check for disabled engine
                         }
                     }
                 }
@@ -1504,7 +1768,7 @@ function fn_se_check_disabled()
 {
     $check = false;
     if (isset($_REQUEST['disabled_module_searchanise'])) {
-       $check =  $_REQUEST['disabled_module_searchanise'] == 'Y';
+       $check =  $_REQUEST['disabled_module_searchanise'] == YesNo::YES;
     }
 
     return $check;
@@ -1514,8 +1778,287 @@ function fn_se_check_debug()
 {
     $check = false;
     if (isset($_REQUEST['debug_module_searchanise'])) {
-       $check =  $_REQUEST['debug_module_searchanise'] == 'Y';
+       $check =  $_REQUEST['debug_module_searchanise'] == YesNo::YES;
     }
 
     return $check;
+}
+
+/**
+ * Display addon notice
+ * 
+ * @param string $addon Addon identifiter
+ */
+function fn_se_display_addon_notice($addon)
+{
+    if (fn_se_is_registered() == true) {
+        $notice_var = "text_se_{$addon}_settings_notice";
+
+        fn_set_notification(NotificationSeverity::WARNING, __('notice'), __($notice_var, [
+            '[link]' => fn_url('addons.update?addon=searchanise')
+        ]));
+    }
+}
+
+/**
+ * Test if Searchanise api server is available
+ *
+ * @param int $timeout Request timeout in seconds
+ *
+ * @return boolean
+ */
+function fn_se_check_connect($timeout = 3)
+{
+    $response = Http::get(SE_SERVICE_URL . '/api/test', [], ['timeout' => $timeout]);
+
+    if ($response != 'OK') {
+        fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('se_connection_warning', [
+            '[email]' => SE_CONTACT_EMAIL
+        ]));
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Test Searchanise queue status
+ *
+ * @param boolean $display_notice  If true, notice will be displayed on queue error
+ *
+ * @return boolean
+ */
+function fn_se_check_queue($display_notice = true)
+{
+    $q = db_get_row("SELECT * FROM ?:se_queue ORDER BY queue_id ASC LIMIT 1");
+
+    if (empty($q)) {
+        return true;
+    }
+
+    if ($q['error_count'] >= SE_MAX_ERROR_COUNT) {
+        // Maximum attemps reached
+        $status = false;
+
+    } elseif ($q['status'] == 'processing' && ($q['started'] + SECONDS_IN_HOUR < TIME)) {
+         // Queue item processed more than one hour
+         $status = false;
+
+    } else {
+        $status = true;
+    }
+
+    if ($display_notice && !$status) {
+        fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('se_queue_warning', [
+            '[email]' => SE_CONTACT_EMAIL
+        ]));
+    }
+
+    return $status;
+}
+
+/**
+ * Returns children product ids
+ *
+ * @param  array Product identifiers
+ *
+ * @return array Product ids
+ */
+function fn_se_get_children_product_ids(array $product_ids)
+{
+    $children_ids = [];
+
+    /**
+     * Get children products for specific product identifiers
+     * 
+     * @param array $product_id   Product identifiers
+     * @param array $children_ids Returned child product identifiers
+     */
+    fn_set_hook('se_get_children_product_ids', $product_ids, $children_ids);
+
+    return $children_ids;
+}
+
+/**
+ * Get children products for specific product identifiers
+ * 
+ * @param array $product_id   Product identifiers
+ * @param array $children_ids Returned child product identifiers
+ * 
+ * @see \fn_se_get_children_product_ids()
+ */
+function fn_master_products_se_get_children_product_ids(array $product_ids, array &$children_ids)
+{
+    foreach ($product_ids as $product_id) {
+        $vendor_product_ids = MasterProductsServiceProvider::getProductRepository()->findVendorProductIds($product_id);
+
+        if (!empty($vendor_product_ids)) {
+            $children_ids = array_merge($children_ids, $vendor_product_ids);
+        }
+    }
+
+    $children_ids = array_unique($children_ids);
+}
+
+/**
+ * Returns parent product ids
+ * 
+ * @param mixed Product identifiers
+ *
+ * @return array Product ids
+ */
+function fn_se_get_parent_product_ids(array $product_ids)
+{
+    $parent_ids = [];
+
+    /**
+     * Get parent products for specific product identifiers
+     * 
+     * @param array $product_id Product identifiers
+     * @param array $parent_ids Returned parent product identifiers
+     */
+    fn_set_hook('se_get_parent_product_ids', $product_ids, $parent_ids);
+
+    return $parent_ids;
+}
+
+/**
+ * Get parent products for specific product identifiers
+ * 
+ * @param array $product_id Product identifiers
+ * @param array $parent_ids Returned parent product identifiers
+ * 
+ * @see \fn_se_get_parent_product_ids()
+ */
+function fn_product_variations_se_get_parent_product_ids(array $product_ids, array &$parent_ids)
+{
+    foreach ($product_ids as $product_id) {
+        $parent_id = ProductVariationsServiceProvider::getGroupRepository()->getParentProductId($product_id);
+
+        if (!empty($parent_id)) {
+            $parent_ids[] = $parent_id;
+        }
+    }
+}
+
+/**
+ * Returns united product ids
+ *
+ * @param  array $product_ids  Product identifiers
+ * @param  bool  $include_self If true, returns incoming product identifiers in united array
+ *
+ * @return array Product ids
+ */
+function fn_se_get_united_product_ids(array $product_ids, $include_self = true)
+{
+    $parent_product_ids = fn_se_get_children_product_ids($product_ids);
+    $children_product_ids = fn_se_get_parent_product_ids($product_ids);
+    $products = array_merge($parent_product_ids, $children_product_ids);
+
+    if ($include_self) {
+        $products = array_merge($product_ids, $products);
+    }
+
+    return array_unique($products);
+}
+
+/**
+ * Executes after vendor product created.
+ *
+ * @param int                          $master_product_id Master product ID
+ * @param int                          $company_id        Vendor ID
+ * @param array                        $product           Master product data
+ * @param int                          $vendor_product_id Vendor product ID
+ * @param \Tygh\Common\OperationResult $result            Result of operation
+ */
+function fn_searchanise_master_products_create_vendor_product($master_product_id, $company_id, $product, $vendor_product_id, $result)
+{
+    $united_products = fn_se_get_united_product_ids([$master_product_id, $vendor_product_id]);
+    if (!empty($united_products)) {
+        foreach ($united_products as $product_id) {
+            fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+        }
+    }
+}
+
+/**
+ * Executes after the variation group is saved;
+ * allows to perform additional actions and react to events that occur to variation group
+ *
+ * @param \Tygh\Addons\ProductVariations\Service                       $this
+ * @param \Tygh\Addons\ProductVariations\Product\Group\Group           $group
+ * @param \Tygh\Addons\ProductVariations\Product\Group\Events\AEvent[] $events
+ */
+function fn_searchanise_variation_group_save_group($service, $group, $events)
+{
+    foreach ($events as $event) {
+        if ($event instanceof Tygh\Addons\ProductVariations\Product\Group\Events\ProductRemovedEvent) {
+            $united_products = fn_se_get_united_product_ids([
+                $event->getProduct()->getProductId(),
+                $event->getProduct()->getParentProductId()
+            ]);
+
+            if (!empty($united_products)) {
+                foreach ($united_products as $product_id) {
+                    fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+                }
+            }
+        }
+
+        if ($event instanceof Tygh\Addons\ProductVariations\Product\Group\Events\ProductAddedEvent) {
+            $united_products = fn_se_get_united_product_ids([
+                $event->getProduct()->getProductId(),
+                $event->getProduct()->getParentProductId()
+            ]);
+
+            if (!empty($united_products)) {
+                foreach ($united_products as $product_id) {
+                    fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+                }
+            }
+        }
+
+        if ($event instanceof Tygh\Addons\ProductVariations\Product\Group\Events\ProductUpdatedEvent) {
+            if (!$event->getFrom()->hasSameParentProductId($event->getTo()->getParentProductId())) {
+                $from_group_product = $event->getFrom();
+                $to_group_product = $event->getTo();
+
+                $united_products = fn_se_get_united_product_ids([
+                    $from_group_product->getProductId(),
+                    $to_group_product->getProductId(),
+                    $from_group_product->getParentProductId(),
+                    $to_group_product->getParentProductId(),
+                ]);
+
+                if (!empty($united_products)) {
+                    foreach ($united_products as $product_id) {
+                        if (!empty($product_id)) {
+                            fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($event instanceof Tygh\Addons\ProductVariations\Product\Group\Events\ParentProductChangedEvent) {
+            $from_group_product = $event->getFrom(); // Instance of the old parent product
+            $to_group_product = $event->getTo();     // Instance of the new parent product
+            $to_parent_product_id = $to_group_product->getProductId();
+            $from_parent_product_id = $from_group_product->getProductId();
+
+            $to_children_product_ids = $group->getChildProductIds($to_parent_product_id);
+            $from_children_product_ids = $group->getChildProductIds($from_parent_product_id);
+
+            $united_products = fn_se_get_united_product_ids(array_merge([
+                $to_parent_product_id,
+                $from_parent_product_id,
+            ], $to_children_product_ids, $from_children_product_ids));
+
+            if (!empty($united_products)) {
+                foreach ($united_products as $product_id) {
+                    fn_se_add_action(QueueActions::UPDATE_PRODUCTS, (int) $product_id);
+                }
+            }
+        }
+    }
 }

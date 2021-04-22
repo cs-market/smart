@@ -31,4 +31,6 @@ if (fn_allowed_for('ULTIMATE')) {
     );
 }
 
+$schema['is_data_feeds'] = true;
+
 return $schema;

@@ -3,13 +3,14 @@
 use Tygh\Registry;
 use Tygh\Models\Company;
 use Tygh\Enum\ProductTracking;
+use Tygh\Enum\ObjectStatuses;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_smart_distribution_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
-    $auth = $_SESSION['auth'];
+    $auth = Tygh::$app['session']['auth'];
     if (!empty($params['usergroup_id'])) {
-        list($users, ) = fn_get_users(array('usergroup_id' => $params['usergroup_id']), $_SESSION['auth']);
+        list($users, ) = fn_get_users(array('usergroup_id' => $params['usergroup_id']), $auth);
         $condition .= db_quote(' AND ?:orders.user_id IN (?a)', fn_array_column($users, 'user_id'));
     }
 
@@ -23,7 +24,7 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
         $params['managers'] = $auth['user_id'];
     }
     if (!empty($params['managers'])) {
-        list($users, ) = fn_get_users(array('managers' => $params['managers']), $_SESSION['auth']);
+        list($users, ) = fn_get_users(array('managers' => $params['managers']), $auth);
 
         if ($users) {
             $condition .= db_quote(' AND ?:orders.user_id IN (?a)', fn_array_column($users, 'user_id'));
@@ -35,11 +36,10 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
     if (isset($params['promotion_id']) && !empty($params['promotion_id'])) {
         $condition .= db_quote(" AND FIND_IN_SET(?i, promotion_ids)", $params['promotion_id']);
     }
-
 }
 
 function fn_smart_distribution_get_order_info(&$order, $additional_data) {
-    $auth = $_SESSION['auth'];
+    $auth = Tygh::$app['session']['auth'];
     if (AREA == 'A') {
         if (fn_smart_distribution_is_manager($auth['user_id'])) {
             $customer_ids = db_get_fields('SELECT customer_id FROM ?:vendors_customers WHERE vendor_manager = ?i', $auth['user_id']);
@@ -47,27 +47,25 @@ function fn_smart_distribution_get_order_info(&$order, $additional_data) {
                 $order = false;
             }
         }
-    }
-    if (!($order['profile_id'])) {
-        $user_profiles = fn_get_user_profiles($order['user_id']);
-        if (count($user_profiles) == 1) {
-            $profile = reset($user_profiles);
-            $order['profile_id'] = $profile['profile_id'];
-        } else {
-            $order['profile_id'] = db_get_field('SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i AND s_address = ?s', $order['user_id'], $order['s_address']);
-            if (!$order['profile_id']) {
 
+        if (!($order['profile_id'])) {
+            $user_profiles = fn_get_user_profiles($order['user_id']);
+            if (count($user_profiles) == 1) {
+                $profile = reset($user_profiles);
+                $order['profile_id'] = $profile['profile_id'];
+            } else {
+                $order['profile_id'] = db_get_field('SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i AND s_address = ?s', $order['user_id'], $order['s_address']);
             }
         }
-    }
-    if (empty(array_filter($order['fields']))) {
-        $prof_cond = (!empty($order['profile_id'])) ? db_quote("OR (object_id = ?i AND object_type = 'P')", $order['profile_id']) : '';
-        $order['fields'] = db_get_hash_single_array("SELECT field_id, value FROM ?:profile_fields_data WHERE (object_id = ?i AND object_type = 'U') $prof_cond", array('field_id', 'value'), $order['user_id']);
-    }
-    if (!empty($order['fields'])) {
-        $fields = db_get_hash_single_array('SELECT field_id, field_name FROM ?:profile_fields WHERE field_id IN (?a)', array('field_id', 'field_name'), array_keys($order['fields']));
-        foreach ($fields as $field_id => $field_name) {
-            $order[$field_name] = $order['fields'][$field_id];
+        if (empty(array_filter($order['fields']))) {
+            $prof_cond = (!empty($order['profile_id'])) ? db_quote("OR (object_id = ?i AND object_type = 'P')", $order['profile_id']) : '';
+            $order['fields'] = db_get_hash_single_array("SELECT field_id, value FROM ?:profile_fields_data WHERE (object_id = ?i AND object_type = 'U') $prof_cond", array('field_id', 'value'), $order['user_id']);
+        }
+        if (!empty($order['fields'])) {
+            $fields = db_get_hash_single_array('SELECT field_id, field_name FROM ?:profile_fields WHERE field_id IN (?a)', array('field_id', 'field_name'), array_keys($order['fields']));
+            foreach ($fields as $field_id => $field_name) {
+                $order[$field_name] = $order['fields'][$field_id];
+            }
         }
     }
 
@@ -146,7 +144,6 @@ function fn_smart_distribution_get_usergroups($params, $lang_code, $field_list, 
         if ($company->usergroup_ids)
         $condition .= db_quote(' AND a.usergroup_id IN (?a)', $company->usergroup_ids);
     }
-
 }
 
 function fn_smart_distribution_post_get_usergroups(&$usergroups, $type, $lang_code) {
@@ -191,6 +188,7 @@ function fn_smart_distribution_get_users_pre(&$params, $auth, $items_per_page, $
         $params['exclude_user_types'] = array('V');
     }
 }
+
 function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condition, &$join, $auth) {
     $fields[] = 'last_update';
     if (!empty($params['managers'])) {
@@ -272,7 +270,7 @@ function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user
 
 function fn_smart_distribution_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
     // get managers for single user
-    $user_data['managers'] = fn_smart_distribution_get_managers(array('user_id' => $user_id));
+    if (AREA == 'A') $user_data['managers'] = fn_smart_distribution_get_managers(array('user_id' => $user_id));
 }
 
 function fn_smart_distribution_update_user_pre($user_id, &$user_data, $auth, $ship_to_another, $notify_user) {
@@ -370,7 +368,6 @@ function fn_smart_distribution_sales_reports_table_condition(&$table_condition, 
     }
 }
 
-
 function fn_smart_distribution_sales_reports_change_table(&$value, $key) {
     if (isset($_REQUEST['dynamic_conditions'])) {
         $dynamic_conditions = $_REQUEST['dynamic_conditions'];
@@ -382,7 +379,6 @@ function fn_smart_distribution_sales_reports_change_table(&$value, $key) {
         }
     }
 }
-
 
 function fn_array_group(array $array, $key)
 {
@@ -426,64 +422,6 @@ function fn_smart_distribution_get_default_usergroups(&$default_usergroups, $lan
     }
 }
 
-function fn_smart_distribution_api_handle_request($_this, $authorized) {
-    //if ($_SESSION['auth']['user_id'] == '2425' && $_this->getRequest()->getMethod() == 'PUT')
-    //fn_write_r(date('H:m:s d/m/Y') . ' ' . $_this->getRequest()->getResource() . ' ' . $_this->getRequest()->getMethod(), $_this->getRequest()->getData());
-}
-
-function fn_smart_distribution_api_send_response($_this, $response, $authorized) {
-    //fn_write_r($response->body);
-}
-
-function fn_write_r() {
-  static $count = 0;
-  $args = func_get_args();
-  $fp = fopen('api_requests.html', 'w+');
-  if (!empty($args)) {
-    fwrite($fp, '<ol style="font-family: Courier; font-size: 12px; border: 1px solid #dedede; background-color: #efefef; float: left; padding-right: 20px;">');
-    foreach ($args as $k => $v) {
-      $v = htmlspecialchars(print_r($v, true));
-      if ($v == '') { $v = ' '; }
-      fwrite($fp, '<li><pre>' . $v . "\n" . '</pre></li>');
-    }
-    fwrite($fp, '</ol><div style="clear:left;"></div>');
-  }
-  $count++;
-}
-
-
-// temp function
-function fn_import_bering_usergroups() {
-    $file = 'users.csv';
-    $ugroups = fn_exim_get_csv(array(), $file );
-    foreach ($ugroups as &$group) {
-        $group = array_merge($group, array(
-            'type' => "C",
-            'status' => 'A'
-        ));
-        $group['usergroup_id'] = fn_update_usergroup($group);
-    }
-    $new_groups = implode(',', fn_array_column($ugroups, 'usergroup_id'));
-
-    $res = db_query("UPDATE ?:vendor_plans SET `usergroup_ids`= IF(usergroup_ids = '0', ?s, CONCAT(usergroup_ids, ?s)) WHERE plan_id = 16;", $new_groups, ',' . $new_groups);
-
-
-    $categories = db_get_field('select categories from ?:vendor_plans WHERE plan_id = ?i', 16);
-    $categories = explode(',', $categories);
-    $res1 = db_query("UPDATE ?:categories SET `usergroup_ids`= IF(usergroup_ids = '0', ?s, CONCAT(usergroup_ids, ?s)) WHERE category_id in (?a)", $new_groups, ',' . $new_groups,  $categories);
-    $res2 = db_query("UPDATE ?:products SET `usergroup_ids`= IF(usergroup_ids = '0', ?s, CONCAT(usergroup_ids, ?s)) WHERE company_id = ?i", $new_groups, ',' . $new_groups,  29);
-    fn_print_die($res, $res1, $res2);
-}
-
-// $obj = db_get_array('select profile_id, object_id, value FROM ?:user_profiles LEFT JOIN ?:profile_fields_data ON user_id = object_id WHERE ?:profile_fields_data.FIELD_ID = ?i and ?:profile_fields_data.value != ?s AND object_type = ?s', 36, '', 'U');
-
-// $obj1 = db_get_array('select object_id, object_type, value from ?:profile_fields_data WHERE FIELD_ID = ?i and value = ?s AND object_id IN (?a)  AND object_type = ?s', 39, '', array_column($obj, 'profile_id'), 'P');
-// fn_print_die($obj1);
-
-// fn_print_die($obj1);
-// $obj2 = db_get_array('select object_id, value, object_type from ?:profile_fields_data WHERE FIELD_ID = ?i and value != ?s AND object_id IN (?a) AND object_type = ?s', 36, '', array_column($obj, 'object_id'), 'U');
-// fn_print_die($obj2);
-// fn_print_die($obj1);
 function fn_smart_distribution_update_category_pre(&$category_data, $category_id, $lang_code) {
     if (isset($_REQUEST['preset_id']) && !$category_id) {
         list($presets) = fn_get_import_presets(array(
@@ -495,7 +433,6 @@ function fn_smart_distribution_update_category_pre(&$category_data, $category_id
             $category_data['usergroup_ids'] = explode(',',$usergroup_ids);
         }
         $category_data['add_category_to_vendor_plan'] = $preset['company_id'];
-
     }
 }
 
@@ -503,7 +440,7 @@ function fn_smart_distribution_update_category_post($category_data, $category_id
     if (isset($category_data['add_category_to_vendor_plan'])) {
         $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', $category_data['add_category_to_vendor_plan']);
         if ($plan_id) {
-            $res1 = db_query("UPDATE ?:vendor_plans SET `categories`= IF(categories = '', ?s, CONCAT(categories, ?s)) WHERE plan_id = ?i", $category_id, ',' . $category_id,  $plan_id);
+            db_query("UPDATE ?:vendor_plans SET `categories`= IF(categories = '', ?s, CONCAT(categories, ?s)) WHERE plan_id = ?i", $category_id, ',' . $category_id,  $plan_id);
         }
     }
 }
@@ -532,11 +469,11 @@ function fn_smart_distribution_set_product_categories_exist($category_id) {
 
 function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $update) {
     // specual modification for dmitry plotvinov
-    if ((!empty($_SESSION['auth']['company_id'])) && defined('API')) {
+    if ((!empty(Tygh::$app['session']['auth']['company_id'])) && defined('API')) {
         $_product_data = array();
         foreach ($product_data as $key => $product) {
-            if (!fn_check_company_id('products', 'product_id', $key, $_SESSION['auth']['company_id'])) {
-                $product_id = db_get_field('SELECT product_id FROM ?:products WHERE company_id = ?i AND product_code = ?s', $_SESSION['auth']['company_id'], $key);
+            if (!fn_check_company_id('products', 'product_id', $key, Tygh::$app['session']['auth']['company_id'])) {
+                $product_id = db_get_field('SELECT product_id FROM ?:products WHERE company_id = ?i AND product_code = ?s', Tygh::$app['session']['auth']['company_id'], $key);
                 if ($product_id) $_product_data[$product_id] = $product;
             } else {
                 $_product_data[$key] = $product;
@@ -599,81 +536,15 @@ function fn_smart_distribution_vendor_communication_add_thread_message_post( $th
     }
 }
 
-function fn_sd_add_product_to_wishlist($product_data, &$wishlist, &$auth)
-{
-    if (is_callable('fn_add_product_to_wishlist')) {
-        return fn_add_product_to_wishlist($product_data, $wishlist, $auth);
-    } else {
-        // Check if products have cusom images
-        list($product_data, $wishlist) = fn_add_product_options_files($product_data, $wishlist, $auth, false, 'wishlist');
-
-        fn_set_hook('pre_add_to_wishlist', $product_data, $wishlist, $auth);
-
-        if (!empty($product_data) && is_array($product_data)) {
-            $wishlist_ids = array();
-            foreach ($product_data as $product_id => $data) {
-                if (empty($data['amount'])) {
-                    $data['amount'] = 1;
-                }
-                if (!empty($data['product_id'])) {
-                    $product_id = $data['product_id'];
-                }
-
-                if (empty($data['extra'])) {
-                    $data['extra'] = array();
-                }
-
-                // Add one product
-                if (!isset($data['product_options'])) {
-                    $data['product_options'] = fn_get_default_product_options($product_id);
-                }
-
-                // Generate wishlist id
-                $data['extra']['product_options'] = $data['product_options'];
-                $_id = fn_generate_cart_id($product_id, $data['extra']);
-
-                $_data = db_get_row('SELECT is_edp, options_type, tracking FROM ?:products WHERE product_id = ?i', $product_id);
-                $data['is_edp'] = $_data['is_edp'];
-                $data['options_type'] = $_data['options_type'];
-                $data['tracking'] = $_data['tracking'];
-
-                // Check the sequential options
-                if (!empty($data['tracking']) && $data['tracking'] == ProductTracking::TRACK_WITH_OPTIONS && $data['options_type'] == 'S') {
-                    $inventory_options = db_get_fields("SELECT a.option_id FROM ?:product_options as a LEFT JOIN ?:product_global_option_links as c ON c.option_id = a.option_id WHERE (a.product_id = ?i OR c.product_id = ?i) AND a.status = 'A' AND a.inventory = 'Y'", $product_id, $product_id);
-
-                    $sequential_completed = true;
-                    if (!empty($inventory_options)) {
-                        foreach ($inventory_options as $option_id) {
-                            if (!isset($data['product_options'][$option_id]) || empty($data['product_options'][$option_id])) {
-                                $sequential_completed = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!$sequential_completed) {
-                        fn_set_notification('E', __('error'), __('select_all_product_options'));
-                        // Even if customer tried to add the product from the catalog page, we will redirect he/she to the detailed product page to give an ability to complete a purchase
-                        $redirect_url = fn_url('products.view?product_id=' . $product_id . '&combination=' . fn_get_options_combination($data['product_options']));
-                        $_REQUEST['redirect_url'] = $redirect_url; //FIXME: Very very very BAD style to use the global variables in the functions!!!
-
-                        return false;
-                    }
-                }
-
-                $wishlist_ids[] = $_id;
-                $wishlist['products'][$_id]['product_id'] = $product_id;
-                $wishlist['products'][$_id]['product_options'] = $data['product_options'];
-                $wishlist['products'][$_id]['extra'] = $data['extra'];
-                $wishlist['products'][$_id]['amount'] = $data['amount'];
-            }
-
-            return $wishlist_ids;
-        } else {
-            return false;
+function fn_sd_add_product_to_wishlist($product_data, &$wishlist, &$auth) {
+    if (Registry::get('addons.wishlist.status') == 'A') {
+        if (!is_callable('fn_add_product_to_wishlist')) {
+            include_once Registry::get('config.dir.addons').'wishlist/controllers/frontend/wishlist.php';
         }
+        return fn_add_product_to_wishlist($product_data, $wishlist, $auth);
     }
 }
+
 function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
     $wishlist = & Tygh::$app['session']['wishlist'];
     $auth = & Tygh::$app['session']['auth'];
@@ -693,9 +564,9 @@ function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
 }
 
 // for exim to escape /n at the end
-function fn_smart_distribution_get_company_id_by_name($company_name, &$condition) {
-    $condition = str_replace('\\n', '', $condition);
-}
+// function fn_smart_distribution_get_company_id_by_name($company_name, &$condition) {
+//     $condition = str_replace('\\n', '', $condition);
+// }
 
 // fix qty_discounts update by API for product wo price
 function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $lang_code, $can_update) {
@@ -1012,7 +883,7 @@ function fn_smart_distribution_get_product_data_post(&$product_data, $auth, $pre
         }
     }
     // buy together for mobile application
-    if (defined('API')) {
+    if (defined('API') && Registry::get('addons.buy_together.status') == 'A') {
         $p['product_id'] = $product_data['product_id'];
         $p['status'] = 'A';
         $p['full_info'] = true;
@@ -1188,4 +1059,30 @@ function fn_smart_distribution_add_product_to_cart_get_price($product_data, $car
         . "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) LIMIT 1 ",
         $amount, $product_id, $usergroup_condition
     );
+}
+
+function fn_smart_distribution_pre_get_cart_product_data($hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, $fields, &$join, $params) {
+    $join  = db_quote("LEFT JOIN ?:product_descriptions ON ?:product_descriptions.product_id = ?:products.product_id AND ?:product_descriptions.lang_code = ?s", DESCR_SL);
+
+    $_p_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
+    $_c_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
+
+    $avail_cond = '';
+
+    if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
+        if (AREA == 'C') {
+            $avail_cond .= fn_get_company_condition('?:categories.company_id');
+        } else {
+            $avail_cond .= ' AND (' . fn_get_company_condition('?:categories.company_id', false)
+                           . ' OR ' . fn_get_company_condition('?:products.company_id', false) . ')';
+        }
+    }
+
+    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? " AND (" . fn_find_array_in_set($auth['usergroup_ids'], '?:categories.usergroup_ids', true) . ")" : '';
+    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? " AND (" . fn_find_array_in_set($auth['usergroup_ids'], '?:products.usergroup_ids', true) . ")" : '';
+    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? db_quote(' AND ?:categories.status IN (?a) AND ?:products.status IN (?a)', $_c_statuses, $_p_statuses) : '';
+    $avail_cond .= (AREA == 'C') ? fn_get_localizations_condition('?:products.localization') : '';
+
+    $join .= " INNER JOIN ?:products_categories ON ?:products_categories.product_id = ?:products.product_id INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id $avail_cond";
+    $join .= " LEFT JOIN ?:companies ON ?:companies.company_id = ?:products.company_id";
 }

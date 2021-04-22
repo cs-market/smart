@@ -33,8 +33,21 @@ class MessageStyleFormatter
      */
     public function convert(Message $message)
     {
-        $content = $message->getBody();
+        $inline_css = true;
 
+        /**
+         * Executes when converting inline CSS styles in a mail message, allows you to disable inline styles conversion.
+         *
+         * @param Message $message The message instance.
+         * @param bool $inline_css Whether to inline the CSS in the message body.
+         */
+        fn_set_hook('message_style_formatter_convert_pre', $message, $inline_css);
+
+        if (!$inline_css) {
+            return;
+        }
+        
+        $content = $message->getBody();
         if (preg_match('#\<style(.*?)\>(.*?)\</style\>#s', $content, $m)) {
             try {
                 $ci = new CssToInlineStyles();
@@ -42,9 +55,18 @@ class MessageStyleFormatter
                 $ci->setCSS($m[2]);
 
                 $message->setBody($ci->convert());
+                libxml_clear_errors();
             } catch (\TijsVerkoyen\CssToInlineStyles\Exception $e) {
 
             }
         }
+
+        /**
+         * Executes after converting inline CSS styles in a mail message, do mind that this is not executed if the
+         * styles conversion has been disabled prior using the 'message_style_formatter_convert_pre' hook.
+         *
+         * @param Message $message The message instance.
+         */
+        fn_set_hook('message_style_formatter_convert_post', $message);
     }
 }

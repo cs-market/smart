@@ -11,7 +11,7 @@
 
 {if $logs}
 <div class="table-responsive-wrapper">
-    <table class="table table-responsive">
+    <table class="table table--relative table-responsive">
     <thead>
         <tr>
             <th>{__("content")}</th>
@@ -76,6 +76,9 @@
         <li>{btn type="list" target="_blank" text=__("phpinfo") href="tools.phpinfo"}</li>
         <li>{btn type="list" text=__("backup_restore") href="datakeeper.manage"}</li>
         <li>{btn type="list" text=__("clean_logs") href="logs.clean" class="cm-confirm" method="POST"}</li>
+        {if $settings.Logging.log_lifetime|intval}
+            <li>{btn type="list" text=__("clean_old_logs", [$settings.Logging.log_lifetime|intval]) href="logs.clean.old" class="cm-confirm" method="POST"}</li>
+        {/if}
         {/hook}
     {/capture}
     {dropdown content=$smarty.capture.tools_list}

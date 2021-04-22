@@ -207,6 +207,7 @@ function fn_rus_cities_find_cities($params, $lang_code = CART_LANGUAGE, $items_p
         db_quote('s.code AS state_code'),
         db_quote('rcd.city'),
         db_quote('rc.city_id'),
+        db_quote('rc.zipcode'),
     );
 
     $join = array(
@@ -220,7 +221,7 @@ function fn_rus_cities_find_cities($params, $lang_code = CART_LANGUAGE, $items_p
     $condition['countries_status'] = db_quote('AND c.status = ?s', 'A');
     $condition['states_status'] = db_quote('AND s.status = ?s', 'A');
     $condition['cities_status'] = db_quote('AND rc.status = ?s', 'A');
-    $condition['search'] = db_quote('AND rcd.city LIKE ?l', $search);
+    $condition['search'] = db_quote('AND (rcd.city LIKE ?l OR sd.state LIKE ?l)', $search, $search);
     $condition['city_lang'] = db_quote('AND rcd.lang_code = ?s', $lang_code);
 
     /**
@@ -247,11 +248,12 @@ function fn_rus_cities_find_cities($params, $lang_code = CART_LANGUAGE, $items_p
         . ' ?p'
         . ' WHERE 1=1'
         . ' ?p'
-        . ' ORDER BY rcd.city LIKE ?l DESC, rcd.city ASC, sd.state ASC'
+        . ' ORDER BY rcd.city LIKE ?l DESC, sd.state LIKE ?l DESC, rcd.city ASC, sd.state ASC'
         . ' LIMIT ?i',
         $fields,
         $join,
         $condition,
+        $search,
         $search,
         $items_per_page
     );
@@ -272,6 +274,8 @@ function fn_rus_cities_format_to_autocomplete($cities)
 
     if (!empty($cities)) {
         foreach ($cities as $city) {
+            $zipcode_list = fn_explode(',', $city['zipcode']);
+
             $list_cities[] = array(
                 'code' => $city['city_id'],
                 'value' => $city['city'],
@@ -280,6 +284,7 @@ function fn_rus_cities_format_to_autocomplete($cities)
                 'country_code' => $city['country_code'],
                 'state' => $city['state'],
                 'state_code' => $city['state_code'],
+                'zipcode' => reset($zipcode_list)
             );
         }
     }
@@ -399,10 +404,16 @@ function fn_rus_cities_add_cities_in_table($rows)
     foreach ($rows as $city_data) {
         $city_data['City'] = (string) trim($city_data['City']);
 
+        $zipcode = $city_data['PostCodeList'];
+        if (!empty($city_data['PostCodeList']) && fn_strlen($city_data['PostCodeList']) <= 1) {
+            $zipcode = str_pad($city_data['PostCodeList'], 6, '0', STR_PAD_LEFT);
+        }
+
         $city = array(
             'country_code' => $city_data['Country'],
             'state_code' => $city_data['OblName'],
-            'status' => 'A'
+            'status' => 'A',
+            'zipcode' => $zipcode
         );
 
         $city_id = db_replace_into('rus_cities', $city);
@@ -441,7 +452,7 @@ function fn_rus_cities_get_all_cities($rows)
     $cities = array_unique($cities);
 
     $cities_list = db_get_array(
-        'SELECT a.city_id, country_code, state_code, city'
+        'SELECT a.city_id, country_code, state_code, city, zipcode'
         . ' FROM ?:rus_cities as a LEFT JOIN ?:rus_city_descriptions as b ON a.city_id = b.city_id'
         . ' WHERE country_code IN (?a) AND state_code IN (?a) AND city IN (?a)',
         $countries, $states, $cities
@@ -490,11 +501,11 @@ function fn_rus_cities_delete_city($city_id)
 function fn_rus_cities_get_location_from_session($stored_location = false, $customer_loc = true, $user_data = true)
 {
     $location = array();
-    if ($stored_location && Tygh::$app['session']['stored_location']) {
+    if ($stored_location && isset(Tygh::$app['session']['stored_location'])) {
         $location = Tygh::$app['session']['stored_location'];
-    } elseif ($customer_loc && Tygh::$app['session']['customer_loc']) {
+    } elseif ($customer_loc && isset(Tygh::$app['session']['customer_loc'])) {
         $location = Tygh::$app['session']['customer_loc'];
-    } elseif ($user_data && Tygh::$app['session']['cart']['user_data']) {
+    } elseif ($user_data && isset(Tygh::$app['session']['cart']['user_data'])) {
         $location = Tygh::$app['session']['cart']['user_data'];
     }
 
@@ -509,4 +520,102 @@ function fn_rus_cities_get_location_from_session($stored_location = false, $cust
     }
 
     return $location;
+}
+
+/**
+ * Gets the city data by ids.
+ *
+ * @param int[] $city_ids The cities identificator.
+ *
+ * @return array The array cities data.
+ */
+function fn_rus_city_get_city_data($city_ids)
+{
+    $cities_data = db_get_array(
+        'SELECT * FROM ?:rus_cities WHERE city_id IN (?a)',
+        $city_ids
+    );
+
+    return $cities_data;
+}
+
+/**
+ * Hook handler: tries to fetch postal code if it is not already set in provided data
+ */
+function fn_rus_cities_geo_maps_set_customer_location_pre(&$location)
+{
+    if ((!empty($location['postal_code']) && !empty($location['state_code']))
+        || empty($location['country'])
+        || empty($location['locality'])
+    ) {
+        return;
+    }
+
+    if (empty($location['state_code'])) {
+        $params = [
+            'q'            => $location['locality'],
+            'country_code' => $location['country']
+        ];
+        list($cities) = fn_get_cities($params);
+        if (empty($cities)) {
+            return;
+        }
+    } else {
+        $city_ids = fn_rus_cities_get_city_ids($location['locality'], $location['state_code'], $location['country']);
+        if (!$city_ids) {
+            return;
+        }
+
+        $cities = fn_rus_city_get_city_data($city_ids);
+
+    }
+    if (!empty($cities)) {
+        $city = reset($cities);
+        if (empty($location['state_code'])) {
+            $location['state_code'] = !empty($city['state_code']) ? $city['state_code'] : '';
+        }
+        if (empty($location['postal_code'])) {
+            list($location['postal_code']) = explode(',', $city['zipcode'], 2);
+        }
+    }
+
+    /**
+     * Executes after the location of the user is set; allows modifying the location.
+     *
+     * @param array $location  Customer location data
+     * @param array $cities    List of available cities and their data
+     */
+    fn_set_hook('rus_cities_geo_maps_set_customer_location_pre_post', $location, $cities);
+}
+
+/**
+ * Hook handler: automatically detects zipcode when saving a location.
+ */
+function fn_rus_cities_location_manager_detect_zipcode_post($country_code, $state_code, $city, &$zipcode)
+{
+    if ($zipcode !== null) {
+        return;
+    }
+
+    $city_ids = fn_rus_cities_get_city_ids($city, $state_code, $country_code);
+    if (!$city_ids) {
+        return;
+    }
+
+    $city = fn_rus_city_get_city_data($city_ids);
+    if ($city) {
+        $city = reset($city);
+        list($zipcode) = explode(',', $city['zipcode'], 2);
+    }
+
+    /**
+     * Executes when automatically detecting a customer's zipcode after the zipcode is detected,
+     * allows you to modify the detected zipcode.
+     *
+     * @param string                $country_code ISO 3166-1 country code
+     * @param string                $state_code   ISO 3166-2 state code
+     * @param array<string, string> $city         City name
+     * @param string                $zipcode      Detected zipcode
+     */
+    fn_set_hook('rus_cities_location_manager_detect_zipcode_post_post', $country_code, $state_code, $city, $zipcode);
 }

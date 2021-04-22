@@ -26,7 +26,8 @@
 
         <div id="{$shipping_estimation_block_id}">
 
-            {$states = 1|fn_get_all_states}
+            {$countries = fn_get_simple_countries(true)}
+            {$states = fn_get_all_states(true)}
             {if !$smarty.capture.states_built}
                 {include file="views/profiles/components/profiles_scripts.tpl" states=$states}
                 {capture name="states_built"}Y{/capture}
@@ -42,20 +43,19 @@
                 {$_country = $cart.user_data.s_country}
 
                 {if !isset($cart.user_data.s_country)}
-                    {$_country = $settings.General.default_country}
+                    {$_country = $settings.Checkout.default_country}
                 {/if}
 
-                {if !isset($cart.user_data.s_state) && $_country == $settings.General.default_country}
-                    {$_state = $settings.General.default_state}
+                {if !isset($cart.user_data.s_state) && $_country == $settings.Checkout.default_country}
+                    {$_state = $settings.Checkout.default_state}
                 {/if}
 
                 <div class="ty-control-group">
                     <label class="ty-control-group__label cm-required" for="{$prefix}elm_country{$id_suffix}">{__("country")}</label>
                     <select id="{$prefix}elm_country{$id_suffix}" class="cm-country cm-location-estimation{$class_suffix} ty-input-text-medium" name="customer_location[country]">
                         <option value="">- {__("select_country")} -</option>
-                        {assign var="countries" value=1|fn_get_simple_countries}
-                        {foreach from=$countries item="country" key="code"}
-                        <option value="{$code}" {if $_country == $code}selected="selected"{/if}>{$country}</option>
+                        {foreach $countries as $code => $country}
+                            <option value="{$code}" {if $_country == $code}selected="selected"{/if}>{$country}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -64,10 +64,8 @@
                     <label class="ty-control-group__label" for="{$prefix}elm_state{$id_suffix}">{__("state")}</label>
                     <select class="cm-state cm-location-estimation{$class_suffix} {if !$states[$_country]}hidden{/if} ty-input-text-medium" id="{$prefix}elm_state{$id_suffix}" name="customer_location[state]">
                         <option value="">- {__("select_state")} -</option>
-                        {foreach $states[$cart.user_data.s_country] as $state}
+                        {foreach $states[$_country] as $state}
                             <option value="{$state.code}" {if $state.code == $_state}selected="selected"{/if}>{$state.state}</option>
-                        {foreachelse}
-                            <option label="" value="">- {__("select_state")} -</option>
                         {/foreach}
                     </select>
                     <input type="text" class="cm-state cm-location-estimation{$class_suffix} ty-input-text-medium {if $states[$cart.user_data.s_country]}hidden{/if}" id="{$prefix}elm_state{$id_suffix}_d" name="customer_location[state]" size="20" maxlength="64" value="{$_state}" {if $states[$cart.user_data.s_country]}disabled="disabled"{/if} />
@@ -142,22 +140,24 @@
                                     {/if}
 
                                     {hook name="checkout:shipping_estimation_method"}
-                                    {if $shipping.rate}
-                                        {capture assign="rate"}{include file="common/price.tpl" value=$shipping.rate}{/capture}
-                                        {if $shipping.inc_tax}
-                                            {assign var="rate" value="`$rate` ("}
-                                            {if $shipping.taxed_price && $shipping.taxed_price != $shipping.rate}
-                                                {capture assign="tax"}{include file="common/price.tpl" value=$shipping.taxed_price class="ty-nowrap"}{/capture}
-                                                {assign var="rate" value="`$rate``$tax` "}
+                                        {hook name="checkout:shipping_rate"}
+                                            {if $shipping.rate}
+                                                {capture assign="rate"}{include file="common/price.tpl" value=$shipping.rate}{/capture}
+                                                {if $shipping.inc_tax}
+                                                    {assign var="rate" value="`$rate` ("}
+                                                    {if $shipping.taxed_price && $shipping.taxed_price != $shipping.rate}
+                                                        {capture assign="tax"}{include file="common/price.tpl" value=$shipping.taxed_price class="ty-nowrap"}{/capture}
+                                                        {assign var="rate" value="`$rate``$tax` "}
+                                                    {/if}
+                                                    {assign var="inc_tax_lang" value=__('inc_tax')}
+                                                    {assign var="rate" value="`$rate``$inc_tax_lang`)"}
+                                                {/if}
+                                            {elseif fn_is_lang_var_exists("free_shipping")}
+                                                {assign var="rate" value=__("free_shipping") }
+                                            {else}
+                                                {assign var="rate" value="" }
                                             {/if}
-                                            {assign var="inc_tax_lang" value=__('inc_tax')}
-                                            {assign var="rate" value="`$rate``$inc_tax_lang`)"}
-                                        {/if}
-                                    {elseif fn_is_lang_var_exists("free_shipping")}
-                                        {assign var="rate" value=__("free_shipping") }
-                                    {else}
-                                        {assign var="rate" value="" }
-                                    {/if}
+                                        {/hook}
                                     <p>
                                         <input
                                             type="radio"
@@ -167,11 +167,11 @@
                                             value="{$shipping.shipping_id}"
                                             onclick="fn_calculate_total_shipping('{$shipping_estimation_block_id}');"
                                             {$checked} />
-                                        <label for="sh_{$group_key}_{$shipping.shipping_id}{$id_suffix}"
-                                            class="ty-valign">
-                                            {$shipping.shipping} {$delivery_time}
-                                            {if $rate} {$rate nofilter}{/if}
-                                        </label>
+                                            <label for="sh_{$group_key}_{$shipping.shipping_id}{$id_suffix}"
+                                                class="ty-valign" id="shipping_label_{$shipping_estimation_block_id}_{$group_key}_{$shipping.shipping_id}{$id_suffix}">
+                                                {$shipping.shipping} {$delivery_time}
+                                                {if $rate} {$rate nofilter}{/if}
+                                            <!--shipping_label_{$shipping_estimation_block_id}_{$group_key}_{$shipping.shipping_id}{$id_suffix}--></label>
                                     </p>
                                     {/hook}
                                 {/if}

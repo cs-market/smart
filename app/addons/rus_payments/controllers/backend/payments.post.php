@@ -27,32 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return array(CONTROLLER_STATUS_OK, "payments.manage");
 }
 
-if ($mode == 'update' || $mode == 'manage') {
-
-    $processors = Tygh::$app['view']->getTemplateVars('payment_processors');
-
-    if (!empty($processors)) {
-        $rus_payments = array();
-        foreach (fn_get_schema('rus_payments', 'processors') as $rus_payment) {
-            $rus_payments[$rus_payment['processor']] = $rus_payment;
-        }
-
-        foreach ($processors as &$processor) {
-            if (!empty($rus_payments[$processor['processor']])) {
-                $processor['russian'] = 'Y';
-                $processor['type'] = 'R';
-
-                if (isset($rus_payments[$processor['processor']]['position'])) {
-                    $processor['position'] = 'a_' . $rus_payments[$processor['processor']]['position'];
-                }
-            }
-        }
-        $processors = fn_sort_array_by_key($processors, 'position');
-
-        Tygh::$app['view']->assign('payment_processors', $processors);
-    }
-
-} elseif ($mode == 'yandex_get_md5_password') {
+if ($mode == 'yandex_get_md5_password') {
 
     $md5 = md5(TIME . $_REQUEST['md5_shoppassword']);
     $md5 = substr($md5, 0, 20);

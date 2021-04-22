@@ -1,16 +1,16 @@
 <?php
 /***************************************************************************
-*                                                                          *
-*   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
-*                                                                          *
-* This  is  commercial  software,  only  users  who have purchased a valid *
-* license  and  accept  to the terms of the  License Agreement can install *
-* and use this program.                                                    *
-*                                                                          *
-****************************************************************************
-* PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
-* "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
-****************************************************************************/
+ *                                                                          *
+ *   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
+ *                                                                          *
+ * This  is  commercial  software,  only  users  who have purchased a valid *
+ * license  and  accept  to the terms of the  License Agreement can install *
+ * and use this program.                                                    *
+ *                                                                          *
+ ****************************************************************************
+ * PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
+ * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
+ ****************************************************************************/
 
 namespace Tygh;
 
@@ -31,17 +31,18 @@ class Snapshot
 
     /**
      * Generates new snapshot
+     *
      * @param array $params params list
      */
     public static function create($params)
     {
         $params['dir_root'] = empty($params['dir_root']) ? Registry::get('config.dir.root') : $params['dir_root'];
-        $params['dist']     = !empty($params['dist']);
+        $params['dist'] = !empty($params['dist']);
 
         $dir_root = $params['dir_root'];
         $dist = $params['dist'];
 
-        $folders = array('app', 'js', $params['theme_rel_backend']);
+        $folders = ['app', 'js', $params['theme_rel_backend']];
 
         if ($dist) {
             $themes_dir = $params['themes_repo'];
@@ -51,9 +52,8 @@ class Snapshot
         }
 
         // check only default themes
-        $themes = array(Registry::get('config.base_theme'));
-
-        $snapshot = array('time' => time(), 'files' => array(), 'dirs' => array(), 'themes' => array());
+        $themes = [Registry::get('config.base_theme')];
+        $snapshot = ['time' => time(), 'files' => [], 'dirs' => [], 'themes' => []];
 
         if ($dist) {
             $snapshot['db_scheme'] = fn_get_contents($dir_root . '/install/database/scheme.sql');
@@ -63,10 +63,13 @@ class Snapshot
 
             // form list of tables
             preg_match_all('/create table `(.+)`/imSU', $snapshot['db_scheme'], $tables);
-            $snapshot['db_tables'] = !empty($tables[1]) ? $tables[1] : array();
+            $snapshot['db_tables'] = !empty($tables[1]) ? $tables[1] : [];
         }
 
-        $new_snapshot = self::make($dir_root, $folders, array('config.local.php', 'robots.txt'));
+        $new_snapshot = self::make($dir_root, $folders, [
+            'config.local.php', 'robots.txt', 'admin.php', 'vendor.php', 'install.html', 'README.rst', 'copyright.txt', 'changelog.txt',
+        ]);
+
         self::arrayMerge($snapshot, $new_snapshot);
 
         foreach ($folders as $folder_name) {
@@ -85,11 +88,11 @@ class Snapshot
             }
 
             if ($dist) {
-                $new_snapshot = self::make($path, array(), array(), array($themes_dir => $themes_dir_to), true);
+                $new_snapshot = self::make($path, [], [], [$themes_dir => $themes_dir_to], true);
             } else {
-                $new_snapshot = self::make($path, array(), array(), array(), true);
+                $new_snapshot = self::make($path, [], [], [], true);
             }
-            $snapshot['themes'][$theme_name]['files'] = $snapshot['themes'][$theme_name]['dirs'] = array();
+            $snapshot['themes'][$theme_name]['files'] = $snapshot['themes'][$theme_name]['dirs'] = [];
             self::arrayMerge($snapshot['themes'][$theme_name], $new_snapshot);
         }
 
@@ -105,23 +108,21 @@ class Snapshot
 
     /**
      * Makes diff between original and latest snapshots
+     *
      * @param  array $params $_REQUEST params
+     *
      * @return array array with changed data
      */
     public static function changes($params)
     {
-        $results = array();
+        $results = [];
 
-        $params['check_db'] = isset($params['check_db']) ?
-            $params['check_db'] :
-            true;
-        $params['check_types'] = isset($params['check_types']) ?
-            $params['check_types'] :
-            array(
-                self::DIFF_ADD => true,
-                self::DIFF_UPD => true,
-                self::DIFF_DEL => true
-            );
+        $params['check_db'] = isset($params['check_db']) ? $params['check_db'] : true;
+        $params['check_types'] = isset($params['check_types']) ? $params['check_types'] : [
+            self::DIFF_ADD => true,
+            self::DIFF_UPD => true,
+            self::DIFF_DEL => true
+        ];
 
         if (is_string($params['check_types'])) {
             $types = explode(',', $params['check_types']);
@@ -133,7 +134,7 @@ class Snapshot
         }
 
         $creation_time = 0;
-        $changes_tree = array();
+        $changes_tree = [];
         $db_diff = '';
         $db_d_diff = '';
         $dist_filename = self::getName('dist');
@@ -144,7 +145,7 @@ class Snapshot
 
             if (is_file($snapshot_filename)) {
 
-                $snapshot = $snapshot_dist = array();
+                $snapshot = $snapshot_dist = [];
                 include($snapshot_filename);
                 include($dist_filename);
 
@@ -155,14 +156,18 @@ class Snapshot
                 foreach ($snapshot['themes'] as $theme_name => $data) {
                     $data_dist = self::buildTheme($theme_name, $snapshot_dist);
 
-                    list($theme_added, $theme_changed, $theme_deleted) = self::diff($data, $data_dist, $params['check_types']);
+                    list($theme_added, $theme_changed, $theme_deleted) = self::diff(
+                        $data,
+                        $data_dist,
+                        $params['check_types']
+                    );
 
                     self::arrayMerge($added, $theme_added);
                     self::arrayMerge($changed, $theme_changed);
                     self::arrayMerge($deleted, $theme_deleted);
                 }
 
-                $tree = self::buildTree(array('added' => $added, 'changed' => $changed, 'deleted' => $deleted));
+                $tree = self::buildTree(['added' => $added, 'changed' => $changed, 'deleted' => $deleted]);
 
                 $creation_time = $snapshot['time'];
                 $changes_tree = $tree;
@@ -208,19 +213,21 @@ class Snapshot
             $dist_filename = '';
         }
 
-        return array(
+        return [
             'creation_time' => $creation_time,
-            'changes_tree' => $changes_tree,
-            'db_diff' => $db_diff,
-            'db_d_diff' => $db_d_diff,
+            'changes_tree'  => $changes_tree,
+            'db_diff'       => $db_diff,
+            'db_d_diff'     => $db_d_diff,
             'dist_filename' => $dist_filename,
-            'check_types' => $params['check_types']
-        );
+            'check_types'   => $params['check_types']
+        ];
     }
 
     /**
      * Creates database and imports dump there
-     * @param  string  $db_name db name
+     *
+     * @param  string $db_name db name
+     *
      * @return boolean true on success, false - otherwise
      */
     public static function createDb($db_name = '')
@@ -229,119 +236,119 @@ class Snapshot
 
         $dbdump_filename = empty($db_name) ? 'cmp_current.sql' : 'cmp_release.sql';
 
-            if (!fn_mkdir($snapshot_dir)) {
-                fn_set_notification('E', __('error'), __('text_cannot_create_directory', array(
-                    '[directory]' => fn_get_rel_dir($snapshot_dir)
-                )));
+        if (!fn_mkdir($snapshot_dir)) {
+            fn_set_notification('E', __('error'), __('text_cannot_create_directory', [
+                '[directory]' => fn_get_rel_dir($snapshot_dir)
+            ]));
+
+            return false;
+        }
+        $dump_file = $snapshot_dir . $dbdump_filename;
+        if (is_file($dump_file)) {
+            if (!is_writable($dump_file)) {
+                fn_set_notification('E', __('error'), __('dump_file_not_writable'));
 
                 return false;
             }
-            $dump_file = $snapshot_dir . $dbdump_filename;
-            if (is_file($dump_file)) {
-                if (!is_writable($dump_file)) {
-                    fn_set_notification('E', __('error'), __('dump_file_not_writable'));
+        }
 
-                    return false;
-                }
-            }
+        $fd = @fopen($snapshot_dir . $dbdump_filename, 'w');
+        if (!$fd) {
+            fn_set_notification('E', __('error'), __('dump_cant_create_file'));
 
-            $fd = @fopen($snapshot_dir . $dbdump_filename, 'w');
-            if (!$fd) {
-                fn_set_notification('E', __('error'), __('dump_cant_create_file'));
+            return false;
+        }
 
-                return false;
-            }
+        if (!empty($db_name)) {
+            Tygh::$app['db']->changeDb($db_name);
+        }
+        // set export format
+        db_query("SET @SQL_MODE = 'MYSQL323'");
 
-            if (!empty($db_name)) {
-                Tygh::$app['db']->changeDb($db_name);
-            }
-            // set export format
-            db_query("SET @SQL_MODE = 'MYSQL323'");
+        fn_start_scroller();
+        $create_statements = [];
+        $insert_statements = [];
 
-            fn_start_scroller();
-            $create_statements = array();
-            $insert_statements = array();
+        $status_data = db_get_array("SHOW TABLE STATUS");
 
-            $status_data = db_get_array("SHOW TABLE STATUS");
+        $dbdump_tables = [];
+        foreach ($status_data as $k => $v) {
+            $dbdump_tables[] = $v['Name'];
+        }
 
-            $dbdump_tables = array();
-            foreach ($status_data as $k => $v) {
-                $dbdump_tables[] = $v['Name'];
-            }
+        // get status data
+        $t_status = db_get_hash_array("SHOW TABLE STATUS", 'Name');
 
-            // get status data
-            $t_status = db_get_hash_array("SHOW TABLE STATUS", 'Name');
+        foreach ($dbdump_tables as $k => $table) {
 
-            foreach ($dbdump_tables as $k => $table) {
+            fn_echo('<br />' . __('backupping_data') . ': <b>' . $table . '</b>&nbsp;&nbsp;');
+            $total_rows = db_get_field("SELECT COUNT(*) FROM $table");
 
-                fn_echo('<br />' . __('backupping_data') . ': <b>' . $table . '</b>&nbsp;&nbsp;');
-                $total_rows = db_get_field("SELECT COUNT(*) FROM $table");
-
-                $index = db_get_array("SHOW INDEX FROM $table");
-                $order_by = array();
-                foreach ($index as $kk => $vv) {
-                    if ($vv['Key_name'] == 'PRIMARY') {
+            $index = db_get_array("SHOW INDEX FROM $table");
+            $order_by = [];
+            foreach ($index as $kk => $vv) {
+                if ($vv['Key_name'] == 'PRIMARY') {
                     $order_by[] = '`' . $vv['Column_name'] . '`';
-                    }
                 }
-
-                if (!empty($order_by)) {
-                    $order_by = 'ORDER BY ' . implode(',', $order_by);
-                } else {
-                    $order_by = '';
-                }
-                // Define iterator
-                if (!empty($t_status[$table]) && $t_status[$table]['Avg_row_length'] < DB_MAX_ROW_SIZE) {
-                    $it = DB_ROWS_PER_PASS;
-                } else {
-                    $it = 1;
-                }
-                for ($i = 0; $i < $total_rows; $i = $i + $it) {
-                    $table_data = db_get_array("SELECT * FROM $table $order_by LIMIT $i, $it");
-                    foreach ($table_data as $_tdata) {
-                        $_tdata = fn_add_slashes($_tdata, true);
-                        $values = array();
-                        foreach ($_tdata as $v) {
-                            $values[] = ($v !== null) ? "'$v'" : 'NULL';
-                        }
-                        fwrite($fd, "INSERT INTO $table (`" . implode('`, `', array_keys($_tdata)) . "`) VALUES (" . implode(', ', $values) . ");\n");
-                    }
-
-                    fn_echo(' .');
-                }
-
-            }
-            fn_stop_scroller();
-            if (!empty($db_name)) {
-                Settings::instance()->reloadSections();
             }
 
-            if (fn_allowed_for('ULTIMATE')) {
-                $companies = fn_get_short_companies();
-                asort($companies);
-                $settings['company_root'] = Settings::instance()->getList();
-                foreach ($companies as $k=>$v) {
-                    $settings['company_'.$k] = Settings::instance()->getList(0, 0, false, $k);
-                }
+            if (!empty($order_by)) {
+                $order_by = 'ORDER BY ' . implode(',', $order_by);
             } else {
-                $settings['company_root'] = Settings::instance()->getList();
+                $order_by = '';
+            }
+            // Define iterator
+            if (!empty($t_status[$table]) && $t_status[$table]['Avg_row_length'] < DB_MAX_ROW_SIZE) {
+                $it = DB_ROWS_PER_PASS;
+            } else {
+                $it = 1;
+            }
+            for ($i = 0; $i < $total_rows; $i = $i + $it) {
+                $table_data = db_get_array("SELECT * FROM $table $order_by LIMIT $i, $it");
+                foreach ($table_data as $_tdata) {
+                    $_tdata = fn_add_slashes($_tdata, true);
+                    $values = [];
+                    foreach ($_tdata as $v) {
+                        $values[] = ($v !== null) ? "'$v'" : 'NULL';
+                    }
+                    fwrite($fd, "INSERT INTO $table (`" . implode('`, `', array_keys($_tdata)) . "`) VALUES (" . implode(', ', $values) . ");\n");
+                }
+
+                fn_echo(' .');
             }
 
-            if (!empty($db_name)) {
-                Tygh::$app['db']->changeDb(Registry::get('config.db_name'));
+        }
+        fn_stop_scroller();
+        if (!empty($db_name)) {
+            Settings::instance()->reloadSections();
+        }
+
+        if (fn_allowed_for('ULTIMATE')) {
+            $companies = fn_get_short_companies();
+            asort($companies);
+            $settings['company_root'] = Settings::instance()->getList();
+            foreach ($companies as $k => $v) {
+                $settings['company_' . $k] = Settings::instance()->getList(0, 0, false, $k);
             }
+        } else {
+            $settings['company_root'] = Settings::instance()->getList();
+        }
 
-            $settings = self::processSettings($settings, '');
-            $settings = self::formatSettings($settings['data']);
-            ksort($settings);
+        if (!empty($db_name)) {
+            Tygh::$app['db']->changeDb(Registry::get('config.db_name'));
+        }
 
-            $data = print_r($settings, true);
-            fwrite($fd,$data);
+        $settings = self::processSettings($settings, '');
+        $settings = self::formatSettings($settings['data']);
+        ksort($settings);
 
-            fclose($fd);
-            @chmod($snapshot_dir . $dbdump_filename, DEFAULT_FILE_PERMISSIONS);
+        $data = print_r($settings, true);
+        fwrite($fd, $data);
 
-            return true;
+        fclose($fd);
+        @chmod($snapshot_dir . $dbdump_filename, DEFAULT_FILE_PERMISSIONS);
+
+        return true;
     }
 
     /**
@@ -354,7 +361,7 @@ class Snapshot
         static $addons = null;
 
         if ($addons === null) {
-            $addons = array();
+            $addons = [];
 
             $dist_snapshot_filename = self::getName('dist');
             if (is_file($dist_snapshot_filename)) {
@@ -370,7 +377,9 @@ class Snapshot
 
     /**
      * Check snapshot exist
+     *
      * @param  string $type dist|current
+     *
      * @return bool
      */
     public static function exist($type = 'dist')
@@ -381,14 +390,16 @@ class Snapshot
     /**
      * Gets modified files
      *
-     * @param  string      $ext         File extension, default php
-     * @param  array       $directories List of relative paths to directory, if empty files was not filtered
-     * @param  array       $exclude     List of relative paths to directory that will be excluded, if empty files was not filtered
+     * @param  string $ext         File extension, default php
+     * @param  array  $directories List of relative paths to directory, if empty files was not filtered
+     * @param  array  $exclude     List of relative paths to directory that will be excluded, if empty files was not
+     *                             filtered
+     *
      * @return array|false Return false if snapshot not found
      */
-    public static function getModifiedFiles($ext = 'php', array $directories = array(), array $exclude = array())
+    public static function getModifiedFiles($ext = 'php', array $directories = [], array $exclude = [])
     {
-        $snapshot_dist = array();
+        $snapshot_dist = [];
         $filename = self::getName('dist');
 
         if (is_file($filename)) {
@@ -399,7 +410,7 @@ class Snapshot
             return false;
         }
 
-        $result = array();
+        $result = [];
         $ext_length = strlen($ext);
         $root_dir = Registry::get('config.dir.root');
 
@@ -437,26 +448,29 @@ class Snapshot
 
     /**
      * Merges arrays
-     * @param array &$array source array
+     *
+     * @param array &$array     source array
      * @param array $additional data to merge into array
      */
     private static function arrayMerge(&$array, $additional)
     {
         foreach ($array as $key => $v) {
             if (is_array($array[$key])) {
-                $array[$key] = array_merge($array[$key], !empty($additional[$key]) ? $additional[$key] : array());
+                $array[$key] = array_merge($array[$key], !empty($additional[$key]) ? $additional[$key] : []);
             }
         }
     }
 
     /**
      * Builds files tree
+     *
      * @param  array $changes hashes list
+     *
      * @return array built tree
      */
     private static function buildTree($changes)
     {
-        $tree = array();
+        $tree = [];
 
         foreach ($changes as $action => $dataset) {
             foreach ($dataset as $types => $data) {
@@ -467,7 +481,7 @@ class Snapshot
                     $parent = '';
                     $dirs = explode('/', $path);
                     $dirs_size = count($dirs);
-                    $elm = & $tree;
+                    $elm = &$tree;
                     $level = 0;
                     foreach ($dirs as $key => $name) {
                         if ($name == '') {
@@ -476,14 +490,14 @@ class Snapshot
                         if ($key + 1 < $dirs_size) {
                             $new_key = md5("dir-$name-$parent");
                             if (!isset($elm[$new_key]['content'])) {
-                                $elm[$new_key] = array(
-                                    'name' => $name,
-                                    'type' => 'dir',
-                                    'level' => $level,
-                                    'content' => array(),
-                                );
+                                $elm[$new_key] = [
+                                    'name'    => $name,
+                                    'type'    => 'dir',
+                                    'level'   => $level,
+                                    'content' => [],
+                                ];
                             }
-                            $elm = & $elm[$new_key]['content'];
+                            $elm = &$elm[$new_key]['content'];
                         }
                         if ($key + 1 == $dirs_size) {
                             $new_key = md5("$type-$name-$parent");
@@ -506,12 +520,19 @@ class Snapshot
 
     /**
      * Gets snapshot file name
+     *
      * @param  string $type snapshot type
+     *
      * @return string snapshot file name
      */
     private static function getName($type = 'dist')
     {
-        $snapshot_filename = Registry::get('config.dir.snapshots') . fn_strtolower(PRODUCT_VERSION . '_' . (PRODUCT_STATUS ? (PRODUCT_STATUS . '_') : '') . PRODUCT_EDITION);
+        $snapshot_filename = Registry::get('config.dir.snapshots')
+            . fn_strtolower(PRODUCT_VERSION
+                . '_'
+                . (PRODUCT_STATUS ? (PRODUCT_STATUS . '_') : '')
+                . PRODUCT_EDITION
+            );
 
         if ($type == 'dist') {
             $snapshot_filename .= '_dist.php';
@@ -524,15 +545,17 @@ class Snapshot
 
     /**
      * Diffs data in array
+     *
      * @param  array $current     current snapshot data
      * @param  array $dist        original snapshot data
      * @param  array $check_types Change types to diff
+     *
      * @return array diff'ed data
      */
     private static function diff($current, $dist, $check_types)
     {
-        $deleted = $added = array('files' => array(), 'dirs' => array());
-        $changed['files'] = array();
+        $deleted = $added = ['files' => [], 'dirs' => []];
+        $changed['files'] = [];
 
         if (!empty($check_types[self::DIFF_DEL])) {
             $deleted['files'] = array_diff($dist['files'], $current['files']);
@@ -549,15 +572,16 @@ class Snapshot
 
             $changed['files'] = array_diff($tmp['files'], $added['files']);
             if (empty($check_types[self::DIFF_ADD])) {
-                $added = array('files' => array(), 'dirs' => array());
+                $added = ['files' => [], 'dirs' => []];
             }
         }
 
-        return array($added, $changed, $deleted);
+        return [$added, $changed, $deleted];
     }
 
     /**
      * Sorts tree
+     *
      * @param array &$tree tree
      */
     private static function sortTree(&$tree)
@@ -565,7 +589,7 @@ class Snapshot
         foreach ($tree as $key => &$elm) {
             if (!empty($elm['content'])) {
                 if (count($elm['content']) > 1) {
-                    uasort($tree[$key]['content'], function($a, $b) {
+                    uasort($tree[$key]['content'], function ($a, $b) {
                         $a1 = (!empty($a['type']) ? $a['type'] : 'file') . (!empty($a['name']) ? $a['name'] : '');
                         $b1 = (!empty($b['type']) ? $b['type'] : 'file') . (!empty($b['name']) ? $b['name'] : '');
                         if ($a1 == $b1) {
@@ -582,23 +606,25 @@ class Snapshot
 
     /**
      * Generates hashes list
+     *
      * @param  string  $path         files path
      * @param  array   $dirs_list    list of directories should be included in the result
      * @param  array   $skip_files   list of files should be excluded
      * @param  array   $path_replace new path prefix
      * @param  boolean $themes       include themes or not
+     *
      * @return array   hashes list
      */
-    private static function make($path, $dirs_list = array(), $skip_files = array(), $path_replace = array(), $themes = false)
+    private static function make($path, $dirs_list = [], $skip_files = [], $path_replace = [], $themes = false)
     {
-        $results = array('files' => array(), 'dirs' => array());
+        $results = ['files' => [], 'dirs' => []];
         $dir_root_strlen = strlen(Registry::get('config.dir.root'));
 
         if (is_dir($path)) {
             if ($dh = opendir($path)) {
 
                 while (($file = readdir($dh)) !== false) {
-                    if ($file == '.' || $file == '..' || $file{0} == '.') {
+                    if ($file === '.' || $file === '..' || $file[0] === '.') {
                         continue;
                     }
 
@@ -625,7 +651,7 @@ class Snapshot
                             }
                         } else {
                             $results['dirs'][$hash] = $short_file_path;
-                            $new_results = self::make($full_file_path, array(), array(), $path_replace, $themes);
+                            $new_results = self::make($full_file_path, [], [], $path_replace, $themes);
                             self::arrayMerge($results, $new_results);
                         }
                     }
@@ -639,48 +665,49 @@ class Snapshot
 
     /**
      * Processes settings
+     *
      * @param  array  $data data
      * @param  string $key  key
+     *
      * @return array  processed settings
      */
     private static function processSettings($data, $key)
     {
-        $res = array();
+        $res = [];
 
-        foreach ($data as $k=>$v) {
-        if (is_array($v)) {
-            $tmp = self::processSettings($v, $k);
-            $res[$tmp['key']] = $tmp['data'];
-        } else {
-            if ($k == 'name') {
-                $key = $v;
+        foreach ($data as $k => $v) {
+            if (is_array($v)) {
+                $tmp = self::processSettings($v, $k);
+                $res[$tmp['key']] = $tmp['data'];
+            } else {
+                if ($k == 'name') {
+                    $key = $v;
+                }
+                //remove dynamic data
+                if ($k != 'object_id' && $k != 'section_id' && $k != 'section_tab_id') {
+                    $res[$k] = $v;
+                }
             }
-            //remove dynamic data
-            if ($k != 'object_id' &&
-                $k != 'section_id' &&
-                $k != 'section_tab_id')
-            {
-                $res[$k] = $v;
-            }
-        }
 
         }
 
-        return array('key'=>$key, 'data'=>$res);
+        return ['key' => $key, 'data' => $res];
     }
 
     /**
      * Formats settings
+     *
      * @param  array $data data
      * @param  array $path path
      * @param  int   $lev  level
+     *
      * @return array formatted settings
      */
-    private static function formatSettings($data, $path = array(), $lev = 0)
+    private static function formatSettings($data, $path = [], $lev = 0)
     {
-        $res = array();
+        $res = [];
 
-        foreach ($data as $k=>$v) {
+        foreach ($data as $k => $v) {
             if (is_array($v) && $lev < 3) {
                 $path[$lev] = $k;
                 $tmp = self::formatSettings($v, $path, $lev + 1);
@@ -696,14 +723,16 @@ class Snapshot
 
     /**
      * Makes diff betweed 2 strings
+     *
      * @param  string  $source       original data
      * @param  string  $dest         new data
      * @param  boolean $side_by_side side-by-side diff if set to true
+     *
      * @return string  diff
      */
     private static function textDiff($source, $dest, $side_by_side = false)
     {
-        $diff = new \Text_Diff('auto', array(explode("\n", $source), explode("\n", $dest)));
+        $diff = new \Text_Diff('auto', [explode("\n", $source), explode("\n", $dest)]);
         $renderer = new \Text_Diff_Renderer_inline();
         $renderer->_leading_context_lines = 3;
         $renderer->_trailing_context_lines = 3;
@@ -723,15 +752,18 @@ class Snapshot
 
     /**
      * Builds theme files list
-     * @param string $theme_name theme name
-     * @param array &$snapshot_dist snapshot data
+     *
+     * @param string $theme_name     theme name
+     * @param array  &$snapshot_dist snapshot data
+     *
      * @return array theme files list
      */
     private static function buildTheme($theme_name, &$snapshot_dist)
     {
-        $theme = !empty($snapshot_dist['themes'][$theme_name])
-            ? $snapshot_dist['themes'][$theme_name]
-            : array('files' => array(), 'dirs' => array());
+        $theme = !empty($snapshot_dist['themes'][$theme_name]) ? $snapshot_dist['themes'][$theme_name] : [
+            'files' => [],
+            'dirs'  => []
+        ];
 
         $base_theme_name = Registry::get('config.base_theme');
 
@@ -748,22 +780,19 @@ class Snapshot
                 }
             }
         } else {
-            $base = array('files' => array(), 'dirs' => array());
+            $base = ['files' => [], 'dirs' => []];
         }
 
-        $addons_theme_dirs = sprintf(
-            '^/design/themes/(.+?)/(%s)/addons/',
-            implode('|', array(
-                'templates',
-                'css',
-                'media/images',
-                'mail/templates',
-                'mail/media/images',
-                'mail/css',
-            ))
-        );
+        $addons_theme_dirs = sprintf('^/design/themes/(.+?)/(%s)/addons/', implode('|', [
+            'templates',
+            'css',
+            'media/images',
+            'mail/templates',
+            'mail/media/images',
+            'mail/css',
+        ]));
 
-        list($installed_addons,) = fn_get_addons(array('type' => 'installed'));
+        list($installed_addons,) = fn_get_addons(['type' => 'installed']);
         $installed_addons = $installed_addons ? implode('|', array_keys($installed_addons)) : false;
 
         foreach ($theme as $type => $dataset) {
@@ -772,8 +801,7 @@ class Snapshot
                 if (preg_match("#{$addons_theme_dirs}#", $filename)) {
                     // check if the add-on is not installed
                     if (!$installed_addons
-                        || !preg_match("#{$addons_theme_dirs}({$installed_addons})[/$]#", $filename)
-                    ) {
+                        || !preg_match("#{$addons_theme_dirs}({$installed_addons})[/$]#", $filename)) {
                         unset($theme[$type][$key]);
                     }
                 }
@@ -793,34 +821,34 @@ class Snapshot
         if (fn_check_permissions('tools', 'view_changes', 'admin')
             && Registry::ifGet('settings.General.monitor_core_changes', 'N') == 'Y'
         ) {
-            $snapshot_params = array(
+            $snapshot_params = [
                 'theme_rel_backend' => fn_get_theme_path('[relative]', 'A'),
-                'themes_frontend' => fn_get_theme_path('[themes]', 'C'),
-                'themes_repo' => fn_get_theme_path('[repo]', 'C'),
-                'dist' => false
-            );
+                'themes_frontend'   => fn_get_theme_path('[themes]', 'C'),
+                'themes_repo'       => fn_get_theme_path('[repo]', 'C'),
+                'dist'              => false
+            ];
             if (!Snapshot::exist('dist')) {
                 $snapshot_params['dist'] = true;
                 Snapshot::create($snapshot_params);
             } else {
                 Snapshot::create($snapshot_params);
-                $changes = Snapshot::changes(array(
-                    'check_db' => false,
-                    'check_types' => array(
+                $changes = Snapshot::changes([
+                    'check_db'    => false,
+                    'check_types' => [
                         self::DIFF_UPD => true,
                         self::DIFF_DEL => true,
-                    ),
-                ));
+                    ],
+                ]);
                 if (!empty($changes['changes_tree'])) {
-                    fn_set_notification(
-                        'W',
-                        __('warning'),
-                        __('core_files_have_been_modified', array(
-                            '[changes_url]' => fn_url('tools.view_changes?check_types=' . self::DIFF_UPD . ',' . self::DIFF_DEL),
+                    fn_set_notification('W', __('warning'), __('core_files_have_been_modified', [
+                            '[changes_url]'  => fn_url('tools.view_changes?check_types='
+                                . self::DIFF_UPD
+                                . ','
+                                . self::DIFF_DEL),
                             '[settings_url]' => fn_url('settings.manage?section_id=General'),
-                            '[product]' => PRODUCT_NAME,
-                            '[docs_url]' => Registry::get('config.resources.docs_guideline'),
-                        )),
+                            '[product]'      => PRODUCT_NAME,
+                            '[docs_url]'     => Registry::get('config.resources.docs_guideline'),
+                        ]),
                         'S',
                         'core_files_have_been_modified'
                     );
@@ -834,15 +862,16 @@ class Snapshot
      *
      * @param  array $snapshot_curr Current snapshot
      * @param  array $snapshot_dist Dist snapshot
+     *
      * @return array Snapshot with rewritten paths
      */
     protected static function applyConfig($snapshot_curr, $snapshot_dist, $config)
     {
-        $map = array(
-            'admin_index' => '/admin.php',
-            'vendor_index' => '/vendor.php',
+        $map = [
+            'admin_index'    => '/admin.php',
+            'vendor_index'   => '/vendor.php',
             'customer_index' => '/index.php',
-        );
+        ];
         foreach ($map as $setting_name => $path_def) {
             if (!empty($config[$setting_name])) {
                 $path_cur = '/' . $config[$setting_name];
@@ -867,6 +896,6 @@ class Snapshot
             }
         }
 
-        return array($snapshot_curr, $snapshot_dist);
+        return [$snapshot_curr, $snapshot_dist];
     }
 }

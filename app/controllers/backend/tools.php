@@ -15,6 +15,7 @@
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Snapshot;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'object_holder' => 'quick_menu'
             );
 
-            foreach (fn_get_translation_languages() as $_data['lang_code'] => $v) {
+            foreach (Languages::getAll() as $_data['lang_code'] => $v) {
                 db_query("INSERT INTO ?:common_descriptions ?e", $_data);
             }
         } else {
@@ -112,14 +113,6 @@ if ($mode == 'phpinfo') {
     Tygh::$app['view']->assign('edit_quick_menu', true);
     Tygh::$app['view']->assign('quick_menu', fn_get_quick_menu_data());
     Tygh::$app['view']->display('common/quick_menu.tpl');
-    exit;
-
-} elseif ($mode == 'update_quick_menu_handler') {
-    if (!empty($_REQUEST['enable'])) {
-        Settings::instance()->updateValue('show_menu_mouseover', $_REQUEST['enable']);
-
-        return array(CONTROLLER_STATUS_REDIRECT, 'tools.show_quick_menu.edit');
-    }
     exit;
 
 } elseif ($mode == 'cleanup_history') {

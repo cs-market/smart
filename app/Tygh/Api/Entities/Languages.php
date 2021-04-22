@@ -21,7 +21,7 @@ use Tygh\Languages\Languages as LLanguages;
 
 class Languages extends AEntity
 {
-    public function index($id = 0, $params = array())
+    public function index($id = 0, $params = [])
     {
         $status = Response::STATUS_OK;
         $data = LLanguages::getAll();
@@ -32,7 +32,7 @@ class Languages extends AEntity
                     $data = $lang_data;
                     break;
                 } else {
-                    $data = array();
+                    $data = [];
                 }
             }
         } elseif ($data && $lang_code = $this->safeGet($params, 'lang_code', '')) {
@@ -40,60 +40,61 @@ class Languages extends AEntity
                 $data = $data[$lang_code];
             } else {
                 $status = Response::STATUS_NOT_FOUND;
-                $data = array();
+                $data = [];
             }
         } else {
             $items_per_page = $this->safeGet($params, 'items_per_page', Registry::get('settings.Appearance.admin_elements_per_page'));
             $page = $this->safeGet($params, 'page', 1);
+            $total_items_count = count($data);
 
             if ($items_per_page) {
                 $data = array_slice($data, ($page - 1) * $items_per_page, $items_per_page);
             }
 
-            $data = array(
+            $data = [
                 'languages' => $data,
-                'params' => array(
+                'params'    => [
                     'items_per_page' => $items_per_page,
-                    'page' => $page,
-                    'total_items' => count($data),
-                ),
-            );
+                    'page'           => $page,
+                    'total_items'    => $total_items_count,
+                ],
+            ];
         }
 
         if (!$data) {
             $status = Response::STATUS_NOT_FOUND;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function create($params)
     {
         $status = Response::STATUS_BAD_REQUEST;
-        $data = array();
+        $data = [];
 
         unset($params['lang_id']);
         $lang_id = LLanguages::update($params, 0);
 
         if ($lang_id) {
             $status = Response::STATUS_CREATED;
-            $data = array(
+            $data = [
                 'lang_id' => $lang_id,
-            );
+            ];
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function update($id, $params)
     {
-        $data = array();
+        $data = [];
         $status = Response::STATUS_BAD_REQUEST;
         unset($params['lang_id']);
 
@@ -101,20 +102,20 @@ class Languages extends AEntity
 
         if ($lang_id) {
             $status = Response::STATUS_OK;
-            $data = array(
+            $data = [
                 'lang_id' => $lang_id
-            );
+            ];
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function delete($id)
     {
-        $data = array();
+        $data = [];
         $status = Response::STATUS_BAD_REQUEST;
 
         if (LLanguages::deleteLanguages(array($id))) {
@@ -123,26 +124,26 @@ class Languages extends AEntity
             $status = Response::STATUS_NOT_FOUND;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function privileges()
     {
-        return array(
+        return [
             'create' => 'manage_languages',
             'update' => 'manage_languages',
             'delete' => 'manage_languages',
             'index'  => 'view_languages'
-        );
+        ];
     }
 
     public function childEntities()
     {
-        return array(
+        return [
             'langvars'
-        );
+        ];
     }
 }

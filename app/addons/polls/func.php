@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\BlockManager\Block;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -52,7 +53,7 @@ function fn_polls_update_page_post(&$page_data, &$page_id, &$lang_code)
                 'page_id' => $page_id
             );
 
-            foreach (fn_get_translation_languages() as $_data['lang_code'] => $v) {
+            foreach (Languages::getAll() as $_data['lang_code'] => $v) {
                 db_query("INSERT INTO ?:poll_descriptions ?e", $_data);
             }
         }

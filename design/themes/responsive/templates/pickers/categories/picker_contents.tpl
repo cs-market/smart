@@ -1,3 +1,9 @@
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 {if !$smarty.request.extra}
 <script type="text/javascript">
 (function(_, $) {
@@ -39,7 +45,14 @@
 <form action="{$smarty.request.extra|fn_url}" data-ca-result-id="{$smarty.request.data_id}" method="post" name="categories_form">
 
 {assign var="level" value="0"}
-<div class="category-rows">{include file="views/categories/components/categories_tree_simple.tpl" header="1" form_name="discounted_categories_form" checkbox_name=$smarty.request.checkbox_name|default:"categories_ids" parent_id=$category_id display=$smarty.request.display}</div>
+<div class="category-rows">{include file="views/categories/components/categories_tree_simple.tpl"
+        header="1"
+        form_name="discounted_categories_form"
+        checkbox_name=$smarty.request.checkbox_name|default:"categories_ids"
+        parent_id=$category_id
+        display=$smarty.request.display
+        direction=$direction
+    }</div>
 
 <div class="buttons-container picker">
     <div>{if $smarty.request.display == "radio"}

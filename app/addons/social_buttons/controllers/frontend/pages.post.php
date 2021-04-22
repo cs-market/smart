@@ -12,7 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
+/** @var string $controller */
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -22,12 +22,12 @@ if ($mode == 'view') {
     if (!empty($restored_send_data)) {
         Tygh::$app['view']->assign('send_data', $restored_send_data);
     }
-    
-    $params = array(
-        'object_id' => (int)$_REQUEST['page_id'],
-        'object' => $controller,
+
+    $params = [
+        'object_id' => (int) $_REQUEST['page_id'],
+        'object'    => $controller,
         'lang_code' => CART_LANGUAGE,
-    );
+    ];
 
     $provider_settings = fn_get_sb_provider_settings($params);
 

@@ -14,12 +14,16 @@
 
 namespace Tygh\Languages;
 
+use Tygh\Addons\SchemesManager;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Languages\Helper as LanguageHelper;
+use Tygh\Languages\Values as LanguageValues;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 use Tygh\Settings;
-use Tygh\Languages\Values as LanguageValues;
-use Tygh\Languages\Po;
-use Tygh\Addons\SchemesManager;
 use Tygh\Themes\Themes;
+use Tygh\Tygh;
 
 class Languages
 {
@@ -66,7 +70,7 @@ class Languages
         }
 
         if (!empty($params['lang_id'])) {
-            $condition .= db_quote(' AND lang_id = ?s', $params['lang_id']);
+            $condition .= db_quote(' AND lang_id IN (?n)', (array) $params['lang_id']);
         }
 
         if (!empty($params['name'])) {
@@ -74,7 +78,7 @@ class Languages
         }
 
         if (!empty($params['status'])) {
-            $condition .= db_quote(' AND status = ?s', $params['status']);
+            $condition .= db_quote(' AND status IN (?a)', (array) $params['status']);
         }
 
         if (!empty($params['country_code'])) {
@@ -173,6 +177,9 @@ class Languages
 
         $is_exists = db_get_field("SELECT COUNT(*) FROM ?:languages WHERE lang_code = ?s AND lang_id <> ?i", $language_data['lang_code'], $lang_id);
 
+        $language_id = $lang_id;
+        $previous_storefronts = [];
+        $previous_language_data = [];
         if (!empty($is_exists)) {
             fn_set_notification('E', __('error'), __('error_lang_code_exists', array(
                 '[code]' => $language_data['lang_code']
@@ -185,43 +192,69 @@ class Languages
                 $lang_id = db_query("INSERT INTO ?:languages ?e", $language_data);
                 $clone_from =  !empty($language_data['from_lang_code']) ? $language_data['from_lang_code'] : CART_LANGUAGE;
 
-                fn_clone_language($language_data['lang_code'], $clone_from);
+                LanguageHelper::cloneLanguage($language_data['lang_code'], $clone_from);
 
                 $action = 'add';
             }
 
         } else {
-            $res = db_query("UPDATE ?:languages SET ?u WHERE lang_id = ?i", $language_data, $lang_id);
+            $previous_language_data = static::get(['lang_id' => $lang_id]);
+            $previous_language_data = reset($previous_language_data);
+            $res = db_query('UPDATE ?:languages SET ?u WHERE lang_id = ?i', $language_data, $lang_id);
             if (!$res) {
                 $lang_id = null;
             }
 
+            $repository = StorefrontProvider::getRepository();
+            list($previous_storefronts,) = $repository->find(['language_ids' => $language_id, 'get_totals' => false]);
+
             $action = 'update';
         }
 
-        self::$cache_available_languages = array();
+        if (isset($language_data['storefront_ids'])) {
+            $repository = StorefrontProvider::getRepository();
+            list($new_storefronts,) = $repository->find(['storefront_id' => $language_data['storefront_ids'], 'get_totals' => false]);
+            $added_storefronts = array_diff_key($new_storefronts, $previous_storefronts);
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            foreach ($added_storefronts as $storefront) {
+                $repository->save($storefront->addLanguageIds($language_id));
+            }
+            $removed_storefronts = array_diff_key($previous_storefronts, $new_storefronts);
+            foreach ($removed_storefronts as $storefront) {
+                $repository->save($storefront->removeLanguageIds($language_id));
+            }
+        }
+
+        self::$cache_available_languages = [];
 
         /**
          * Adds additional actions after language update
          *
-         * @param array  $language_data Language data
-         * @param string $lang_id       language id
-         * @param string $action        Current action ('add', 'update' or bool false if failed to update language)
+         * @param array  $language_data          Language data
+         * @param string $lang_id                language id
+         * @param string $action                 Current action ('add', 'update' or bool false if failed to update language)
+         * @param array  $previous_language_data Previous language state
          */
-        fn_set_hook('update_language_post', $language_data, $lang_id, $action);
+        fn_set_hook('update_language_post', $language_data, $lang_id, $action, $previous_language_data);
 
         return $lang_id;
     }
 
     /**
-     * Removes languages
+     * Removes languages.
      *
-     * @param  array  $lang_ids     List of language ids
-     * @param  string $default_lang Default language code
-     * @return array  Deleted lang codes
+     * @param int|array<int> $lang_ids     List of language ids
+     * @param string         $default_lang Default language code
+     *
+     * @return array<string>  Deleted language codes
      */
     public static function deleteLanguages($lang_ids, $default_lang = DEFAULT_LANGUAGE)
     {
+        $lang_ids = array_filter((array) $lang_ids);
+        if (!$lang_ids) {
+            return [];
+        }
+
         /**
          * Adds additional actions before languages deleting
          *
@@ -231,42 +264,55 @@ class Languages
 
         $db_descr_tables = fn_get_description_tables();
 
-        $lang_codes = db_get_hash_single_array("SELECT lang_id, lang_code FROM ?:languages WHERE lang_id IN (?n)", array('lang_id', 'lang_code'), (array) $lang_ids);
-        $deleted_lang_codes = array();
+        $removed_languages = static::get(['lang_id' => $lang_ids]);
+        $deleted_lang_codes = [];
 
-        foreach ($lang_codes as $lang_code) {
-
-            if ($lang_code == $default_lang) {
-                fn_set_notification('W', __('warning'), __('warning_not_deleted_default_language', array(
-                    '[lang_name]' => db_get_field("SELECT name FROM ?:languages WHERE lang_code = ?s", $lang_code)
-                )), '', 'language_is_default');
+        foreach ($removed_languages as $lang_code => $lang_data) {
+            if ($lang_code === $default_lang) {
+                fn_set_notification(
+                    NotificationSeverity::WARNING,
+                    __('warning'),
+                    __(
+                        'warning_not_deleted_default_language',
+                        [
+                            '[lang_name]' => $lang_data['name'],
+                        ]
+                    ),
+                    '',
+                    'language_is_default'
+                );
                 continue;
             }
 
-            $res = db_query("DELETE FROM ?:languages WHERE lang_code = ?s", $lang_code);
-
+            $res = db_query('DELETE FROM ?:languages WHERE lang_code = ?s', $lang_code);
             if ($res) {
                 $deleted_lang_codes[] = $lang_code;
             }
 
-            if (!fn_allowed_for('ULTIMATE:FREE')) {
-                db_query("DELETE FROM ?:localization_elements WHERE element_type = 'L' AND element = ?s", $lang_code);
-            }
-
             foreach ($db_descr_tables as $table) {
-                db_query("DELETE FROM ?:$table WHERE lang_code = ?s", $lang_code);
+                db_query('DELETE FROM ?:?f WHERE lang_code = ?s', $table, $lang_code);
             }
         }
 
+        self::$cache_available_languages = [];
+
+        $storefronts_repository = StorefrontProvider::getRepository();
+        /** @var \Tygh\Storefront\Storefront[] $storefronts */
+        list($storefronts,) = $storefronts_repository->find(['language_ids' => $lang_ids, 'get_totals' => false]);
+        foreach ($storefronts as $storefront) {
+            $storefronts_repository->save($storefront->removeLanguageIds($lang_ids));
+        }
+
         self::saveLanguagesIntegrity();
-        self::$cache_available_languages = array();
+
+        $lang_codes = array_column($removed_languages, 'lang_code', 'lang_id');
 
         /**
-         * Adds additional actions after languages deleting
+         * Executes after languages are deleted, allows you to perform additional actions.
          *
-         * @param array $lang_ids   List of language ids
-         * @param array $lang_codes List of language codes
-         * @param array $deleted_lang_codes List of deleted language codes
+         * @param array<int>         $lang_ids           List of language ids
+         * @param array<int, string> $lang_codes         List of language codes
+         * @param array<string>      $deleted_lang_codes List of deleted language codes
          */
         fn_set_hook('delete_languages_post', $lang_ids, $lang_codes, $deleted_lang_codes);
 
@@ -274,60 +320,71 @@ class Languages
     }
 
     /**
-     * Prevents usage of deleted and disabled languages
+     * Prevents usage of deleted and disabled languages.
      *
-     * @param  string $default_lang Two-letter language code
+     * @param string $default_lang Two-letter language code
+     *
      * @return bool   Always true
      */
     public static function saveLanguagesIntegrity($default_lang = CART_LANGUAGE)
     {
-        $avail = db_get_field("SELECT COUNT(*) FROM ?:languages WHERE status = 'A'");
+        $avail = db_get_field('SELECT COUNT(*) FROM ?:languages WHERE status = ?s', ObjectStatuses::ACTIVE);
         if (!$avail) {
-            $default_lang_exists = db_get_field("SELECT COUNT(*) FROM ?:languages WHERE lang_code = ?s", $default_lang);
+            $default_lang_exists = db_get_field('SELECT COUNT(1) FROM ?:languages WHERE lang_code = ?s', $default_lang);
             if (!$default_lang_exists) {
-                $default_lang = db_get_field("SELECT lang_code FROM ?:languages WHERE status = 'H' LIMIT 1");
+                $default_lang = db_get_field('SELECT lang_code FROM ?:languages WHERE status = ?s LIMIT 1', ObjectStatuses::HIDDEN);
                 if (!$default_lang) {
-                    $default_lang = db_get_field("SELECT lang_code FROM ?:languages LIMIT 1");
+                    $default_lang = db_get_field('SELECT lang_code FROM ?:languages LIMIT 1');
                 }
             }
-            db_query("UPDATE ?:languages SET status = 'A' WHERE lang_code = ?s", $default_lang);
+            db_query('UPDATE ?:languages SET status = ?s WHERE lang_code = ?s', ObjectStatuses::ACTIVE, $default_lang);
         }
 
-        $settings_checks = array(
-            'frontend' => 'A',
-            'backend' => array('A', 'H')
-        );
+        $settings_checks = [
+            'frontend' => ObjectStatuses::ACTIVE,
+            'backend'  => [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN],
+        ];
 
-        $default_langs = array(
+        $default_langs = [
             'frontend' => Registry::get('settings.Appearance.frontend_default_language'),
-            'backend' => Registry::get('settings.Appearance.backend_default_language'),
-        );
+            'backend'  => Registry::get('settings.Appearance.backend_default_language'),
+        ];
         $settings_changed = false;
 
         foreach ($settings_checks as $zone => $statuses) {
-            $available = db_get_field("SELECT COUNT(*) FROM ?:languages WHERE lang_code = ?s AND status IN (?a)", $default_langs[$zone], $statuses);
-            if (!$available) {
-                $first_avail_code = db_get_field("SELECT lang_code FROM ?:languages WHERE status IN (?a) LIMIT 1", $statuses);
-                Settings::instance()->updateValue($zone . '_default_language', $first_avail_code, 'Appearance');
-                $default_langs[$zone] = $first_avail_code;
-                $settings_changed = true;
+            $available = db_get_field('SELECT COUNT(1) FROM ?:languages WHERE lang_code = ?s AND status IN (?a)', $default_langs[$zone], $statuses);
+            if ($available) {
+                continue;
             }
+            $first_avail_code = db_get_field('SELECT lang_code FROM ?:languages WHERE status IN (?a) LIMIT 1', $statuses);
+            Settings::instance()->updateValue($zone . '_default_language', $first_avail_code, 'Appearance');
+            $default_langs[$zone] = $first_avail_code;
+            $settings_changed = true;
         }
 
         $available_codes = db_get_fields("SELECT lang_code FROM ?:languages WHERE status = 'A'");
 
         if (fn_allowed_for('MULTIVENDOR')) {
-            db_query("UPDATE ?:companies SET lang_code = ?s WHERE lang_code NOT IN (?a)", $default_langs['backend'], $available_codes);
+            db_query('UPDATE ?:companies SET lang_code = ?s WHERE lang_code NOT IN (?a)', $default_langs['backend'], $available_codes);
         }
 
-        db_query("UPDATE ?:users SET lang_code = ?s WHERE lang_code NOT IN (?a)", $default_langs['frontend'], $available_codes);
-        db_query("UPDATE ?:orders SET lang_code = ?s WHERE lang_code NOT IN (?a)", $default_langs['frontend'], $available_codes);
+        db_query('UPDATE ?:users SET lang_code = ?s WHERE lang_code NOT IN (?a)', $default_langs['frontend'], $available_codes);
+        db_query('UPDATE ?:orders SET lang_code = ?s WHERE lang_code NOT IN (?a)', $default_langs['frontend'], $available_codes);
 
         if ($settings_changed) {
-            fn_set_notification('W', __('warning'), __('warning_default_language_disabled', array(
-                '[link]' => fn_url('settings.manage?section_id=Appearance')
-            )));
+            fn_set_notification(
+                NotificationSeverity::WARNING,
+                __('warning'),
+                __(
+                    'warning_default_language_disabled',
+                    [
+                        '[link]' => fn_url('settings.manage?section_id=Appearance'),
+                    ]
+                )
+            );
         }
+
+        static::saveStorefrontLanguageIntegrity();
 
         /**
          * Executes after removing usages of deleted and disabled languages.
@@ -356,9 +413,6 @@ class Languages
         $language_condition = $include_hidden ? "WHERE status <> 'D'" : "WHERE status = 'A'";
 
         $area = isset($params['area']) ? $params['area'] : AREA;
-        if (fn_allowed_for('ULTIMATE:FREE') && $area == 'C') {
-            $language_condition .= db_quote(' AND lang_code = ?s', DEFAULT_LANGUAGE);
-        }
 
         $languages = db_get_hash_array("SELECT lang_code, name, status, country_code FROM ?:languages ?p", 'lang_code', $language_condition);
         $languages = self::afterFind($languages);
@@ -377,10 +431,6 @@ class Languages
         $field_list = db_quote("?:languages.lang_code, ?:languages.name");
         $join = $order_by = $group_by = $limit = "";
         $condition = $include_hidden ? db_quote("AND ?:languages.status <> 'D'") : db_quote("AND ?:languages.status = 'A'");
-
-        if (fn_allowed_for('ULTIMATE:FREE')) {
-            $condition .= db_quote(' OR ?:languages.lang_code = ?s', DEFAULT_LANGUAGE);
-        }
 
         /**
          * Modify simple languages list SQL query parameters
@@ -404,35 +454,70 @@ class Languages
     /**
      * Returns active and hidden languages list (as lang_code => array(name, lang_code, status, country_code)
      *
-     * @param  string $area           Area ('A' for admin or 'C' for customer)
-     * @param  bool   $include_hidden if true get hidden languages too
+     * @param array $params
+     *
      * @return array  Languages list
      */
-    public static function getAvailable($area = AREA, $include_hidden = false)
+    public static function getAvailable($params = [])
     {
-        $cache_key = $area . $include_hidden;
+        // FIXME: #STOREFRONTS: Backward compatibility
+        if (!is_array($params) || $params === []) {
+            $legacy_params = $params === []
+                ? []
+                : func_get_args();
+            $params = static::convertLegacyGetAvailableParams($legacy_params);
+        }
+
+        $params = array_merge([
+            'area'           => null,
+            'include_hidden' => false,
+            'language_ids'   => null,
+            'storefront_id'  => null,
+        ], $params);
+
+        if ($params['area'] === 'C' && $params['storefront_id'] === null) {
+            /** @var \Tygh\Storefront\Storefront $storefront */
+            $storefront = Tygh::$app['storefront'];
+            $params['storefront_id'] = $storefront->storefront_id;
+        }
+
+        /**
+         * Executes when getting available languages in the very beginning of the function,
+         * allows you to modify the parameters passed to the function.
+         *
+         * @param array $params Language search parameters
+         */
+        fn_set_hook('languages_get_available_pre', $params);
+
+        $area = (string) $params['area'];
+        $include_hidden = $params['include_hidden'];
+
+        $cache_key = serialize($params);
 
         if (!isset(self::$cache_available_languages[$cache_key])) {
             $field_list = db_quote("?:languages.*");
             $join = $order_by = $group_by = $limit = "";
             $condition = $include_hidden ? db_quote("AND ?:languages.status <> 'D'") : db_quote("AND ?:languages.status = 'A'");
-            $default_language = Registry::get('settings.Appearance.' . fn_get_area_name($area) . '_default_language');
 
-            if ($area == 'C') {
-                if (!fn_allowed_for('ULTIMATE:FREE')) {
-                    if (defined('CART_LOCALIZATION')) {
-                        $join .= db_quote(" LEFT JOIN ?:localization_elements ON ?:localization_elements.element = ?:languages.lang_code AND ?:localization_elements.element_type = 'L'");
-                        $condition .= db_quote(' AND ?:localization_elements.localization_id = ?i', CART_LOCALIZATION);
-                        $order_by .= db_quote(" ORDER BY ?:localization_elements.position ASC");
-                    }
-
-                } elseif (fn_allowed_for('ULTIMATE:FREE')) {
-                    $condition .= db_quote(' AND ?:languages.lang_code = ?s', $default_language);
-                }
+            if ($area == 'C' && defined('CART_LOCALIZATION')) {
+                $join .= db_quote(" LEFT JOIN ?:localization_elements ON ?:localization_elements.element = ?:languages.lang_code AND ?:localization_elements.element_type = 'L'");
+                $condition .= db_quote(' AND ?:localization_elements.localization_id = ?i', CART_LOCALIZATION);
+                $order_by .= db_quote(" ORDER BY ?:localization_elements.position ASC");
             }
 
-            if (fn_allowed_for('ULTIMATE:FREE')) {
-                $condition .= db_quote(' OR ?:languages.lang_code = ?s', $default_language);
+            if ($params['language_ids'] !== null) {
+                $condition .= db_quote(' AND ?:languages.lang_id IN (?n)', (array) $params['language_ids']);
+            }
+
+            if ($params['storefront_id'] !== null) {
+                $join .= db_quote(
+                    ' LEFT JOIN ?:storefronts_languages AS storefronts_languages'
+                    . ' ON storefronts_languages.language_id = ?:languages.lang_id'
+                );
+                $condition .= db_quote(
+                    'AND (storefronts_languages.storefront_id = ?i OR storefronts_languages.storefront_id IS NULL)',
+                    $params['storefront_id']
+                );
             }
 
             /**
@@ -447,7 +532,7 @@ class Languages
              * @param string  $order_by       String containing the SQL-query ORDER BY field
              * @oaram string  $limit          String containing the SQL-query LIMIT field
              */
-            fn_set_hook('get_available_languages', $area, $include_hidden, $field_list, $join, $condition, $group_by, $order_by, $limit);
+            fn_set_hook('get_available_languages', $area, $include_hidden, $field_list, $join, $condition, $group_by, $order_by, $limit, $params);
 
             $languages = db_get_hash_array("SELECT ?p FROM ?:languages ?p WHERE 1 ?p ?p ?p ?p", 'lang_code', $field_list, $join, $condition, $group_by, $order_by, $limit);
 
@@ -487,7 +572,14 @@ class Languages
             $po_file_path = $path . $po_file_name;
 
             if (!file_exists($po_file_path)) {
-                fn_set_notification('E', __('error'), __('incorrect_po_pack_structure', array('[pack_path]' => fn_get_rel_dir(dirname($po_file_path)))));
+                fn_set_notification(
+                    NotificationSeverity::ERROR,
+                    __('error'),
+                    __('incorrect_po_pack_structure_file_not_exist', [
+                        '[pack_path]' => fn_get_rel_dir(dirname($po_file_path)),
+                        '[po_file]' => fn_get_rel_dir($po_file_path)
+                    ])
+                );
 
                 continue;
             }
@@ -986,7 +1078,7 @@ class Languages
         $values = fn_array_value_to_key($values, 'msgctxt');
 
         $addons_lang_vars = array();
-        list($addons) = fn_get_addons(array('type' => 'installed'), 0, $lang_code);
+        list($addons) = fn_get_addons(array('type' => 'active'), 0, $lang_code);
         foreach ($addons as $addon_id => $addon) {
             $addons_lang_vars = array_merge($addons_lang_vars, self::exportAddonsPo($addon_id, $pack_path . 'addons/' . $addon_id . '.po', $lang_code, $values));
         }
@@ -1367,7 +1459,7 @@ class Languages
                 $po_files_list[] = $path . 'editions/mve.po';
             }
 
-            list($addons) = fn_get_addons(array('type' => 'installed'));
+            list($addons) = fn_get_addons(['type' => 'installed', 'get_unmanaged' => true]);
 
             foreach ($addons as $addon_id => $addon) {
                 if (file_exists($path . 'addons/' . $addon_id . '.po')) {
@@ -1442,8 +1534,54 @@ class Languages
         if (!isset($languages[$lang_code])) {
             return null;
         }
-        
+
         return sprintf('%s_%s', $languages[$lang_code]['lang_code'], $languages[$lang_code]['country_code']);
+    }
+
+    /**
+     * Assigns languages for storefronts that have to languages configured.
+     *
+     * @return void
+     */
+    public static function saveStorefrontLanguageIntegrity()
+    {
+        // All storefronts should be checked whether they have configured languages
+        $storefront_repository = StorefrontProvider::getRepository();
+        list($all_storefronts,) = $storefront_repository->find(['get_totals' => false]);
+        $languages = static::get(['status' => ObjectStatuses::ACTIVE]);
+        foreach ($all_storefronts as $storefront) {
+            $storefront_has_languages = false;
+            foreach ($languages as $language) {
+                if (!$language['storefront_ids']) {
+                    $storefront_has_languages = true;
+                    break;
+                }
+                if (in_array($storefront->storefront_id, $language['storefront_ids_raw'])) {
+                    $storefront_has_languages = true;
+                    break;
+                }
+            }
+
+            if ($storefront_has_languages) {
+                continue;
+            }
+
+            // if no languages are assigned to the storefront, assign all languages to it
+            $language_ids = array_column($languages, 'lang_id');
+            $storefront_repository->save($storefront->addLanguageIds($language_ids));
+
+            fn_set_notification(
+                NotificationSeverity::WARNING,
+                __('warning'),
+                __(
+                    'storefront_languages_assigned',
+                    [
+                        '[url]'  => fn_url('storefronts.update?storefront_id=' . $storefront->storefront_id),
+                        '[name]' => $storefront->name,
+                    ]
+                )
+            );
+        }
     }
 
     /**
@@ -1464,6 +1602,7 @@ class Languages
     {
         $languages = self::checkFreeModeAvailability($languages, $remove_disabled);
         $languages = self::detectLanguageDirection($languages);
+        $languages = self::attachStorefrontIds($languages);
 
         return $languages;
     }
@@ -1508,6 +1647,50 @@ class Languages
                     : self::DIRECTION_LTR;
             }
         }
+
+        return $languages;
+    }
+
+    /**
+     * Converts legacy params for the \Tygh\Languages\Languages::getAvailable function.
+     *
+     * @param array $legacy_params
+     *
+     * @internal
+     *
+     * @return array
+     */
+    protected static function convertLegacyGetAvailableParams(array $legacy_params)
+    {
+        $params = [
+            'area'           => null,
+            'include_hidden' => false,
+            'language_ids'   => null,
+        ];
+
+        $params['area'] = array_shift($legacy_params);
+        if ($params['area'] === null) {
+            $params['area'] = AREA;
+        }
+
+        if ($legacy_params) {
+            $params['include_hidden'] = array_shift($legacy_params);
+        }
+
+        return $params;
+    }
+
+    protected static function attachStorefrontIds(array $languages)
+    {
+        array_walk($languages, static function (&$language) {
+            if (!is_array($language) || !isset($language['lang_id'])) {
+                return;
+            }
+
+            list($storefronts,) = StorefrontProvider::getRepository()->find(['language_ids' => $language['lang_id'], 'get_total' => false]);
+            $language['storefront_ids'] = implode(',', array_keys($storefronts));
+            $language['storefront_ids_raw'] = array_keys($storefronts);
+        });
 
         return $languages;
     }

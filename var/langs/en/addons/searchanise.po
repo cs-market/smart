@@ -68,6 +68,10 @@ msgctxt "Languages::text_se_connected"
 msgid "You've connected to Searchanise."
 msgstr "You've connected to Searchanise."
 
+msgctxt "Languages::text_se_ajax_connecting"
+msgid "Product indexation has started in your store. It may take some time. Wait just a little, we've almost finished."
+msgstr "Product indexation has started in your store. It may take some time. Wait just a little, we've almost finished."
+
 msgctxt "Languages::text_se_database_restore_notice"
 msgid "You've just restored your data from the database dump file. If this dump contains product data, please <a href=\"[link]\">Re-indexation</a> it with Searchanise."
 msgstr "You've just restored your data from the database dump file. If this dump contains product data, please <a href=\"[link]\">Re-indexation</a> it with Searchanise."
@@ -175,6 +179,26 @@ msgstr "Private key"
 msgctxt "Languages::se_options_combinations_codes"
 msgid "Options combinations codes"
 msgstr "Options combinations codes"
+
+msgctxt "Languages::se_master_product_status"
+msgid "Common product status"
+msgstr "Common product status"
+
+msgctxt "Languages::se_is_vendor_product"
+msgid "Vendor product flag"
+msgstr "Vendor product flag"
+
+msgctxt "Languages::se_is_master_product"
+msgid "Сommon product flag"
+msgstr "Сommon product flag"
+
+msgctxt "Languages::se_connection_warning"
+msgid "Searchanise: There is no connection to Searchanise server! For Searchanise to work properly, the store server must be able to access www.searchanise.com. Please contact Searchanise <a href=\"mailto: [email]\">[email]</a> technical support or your system administrator."
+msgstr "Searchanise: There is no connection to Searchanise server! For Searchanise to work properly, the store server must be able to access www.searchanise.com. Please contact Searchanise <a href=\"mailto: [email]\">[email]</a> technical support or your system administrator."
+
+msgctxt "Languages::se_queue_warning"
+msgid "Searchanise: We found an issue with the export of changes in your store catalog. To resolve the issue please contact the Searchanise <a href=\"mailto: [email]\">[email]</a> technical support."
+msgstr "Searchanise: We found an issue with the export of changes in your store catalog. To resolve the issue please contact the Searchanise <a href=\"mailto: [email]\">[email]</a> technical support."
 
 msgctxt "SettingsSections::searchanise::configuration"
 msgid "Configuration"

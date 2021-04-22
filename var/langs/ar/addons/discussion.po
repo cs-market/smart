@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/discussion.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.12.1/addons/discussion.po\n"
+"X-Crowdin-File-ID: 3812\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::discussion"
 msgid "Comments and reviews"
@@ -38,7 +38,7 @@ msgstr ""
 
 msgctxt "Languages::discussion_title_home_page_menu_description"
 msgid "Manage the testimonials from your store visitors."
-msgstr ""
+msgstr "Manage the testimonials from your store visitors."
 
 msgctxt "Languages::discussion_title_order"
 msgid "Communication"
@@ -50,15 +50,15 @@ msgstr "التعليقات"
 
 msgctxt "Languages::discussion_title_product"
 msgid "Reviews"
-msgstr ""
+msgstr "ملاحظات"
 
 msgctxt "Languages::discussion_title_return"
 msgid "Communication"
-msgstr ""
+msgstr "الاتصالات"
 
 msgctxt "Languages::no_posts_found"
 msgid "No posts found"
-msgstr ""
+msgstr "لم يتم العثور على منتجات"
 
 msgctxt "Languages::your_rating"
 msgid "Your rating"
@@ -66,7 +66,7 @@ msgstr "تقييمكم"
 
 msgctxt "Languages::comments_and_reviews"
 msgid "Comments and reviews"
-msgstr ""
+msgstr "تعليقات وملاحظات"
 
 msgctxt "Languages::discussion_title_home_page"
 msgid "Testimonials"
@@ -79,6 +79,10 @@ msgstr ""
 msgctxt "Languages::discussion_title_company"
 msgid "Reviews"
 msgstr ""
+
+msgctxt "Languages::communication_and_rating"
+msgid "Communication and Rating"
+msgstr "الاتصال والتقييم"
 
 msgctxt "Languages::communication"
 msgid "Communication"
@@ -98,7 +102,7 @@ msgstr ""
 
 msgctxt "Languages::text_thank_you_for_post"
 msgid "Thank you for your post"
-msgstr ""
+msgstr "شكرا لك على مشاركتك"
 
 msgctxt "Languages::text_post_pended"
 msgid "Your post will be checked before it gets published."
@@ -126,7 +130,7 @@ msgstr ""
 
 msgctxt "Languages::and"
 msgid "and"
-msgstr ""
+msgstr "و"
 
 msgctxt "Languages::add_post"
 msgid "Add post"
@@ -145,12 +149,16 @@ msgid "Testimonials"
 msgstr "شهادات"
 
 msgctxt "Languages::privileges.view_discussions"
-msgid "View comments and reviews"
-msgstr "مشاهده التعليقات و الاراء"
+msgid "Can view"
+msgstr ""
 
 msgctxt "Languages::privileges.manage_discussions"
-msgid "Manage comments and reviews"
-msgstr "اداره التعليقات و الاراء"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.discussions"
+msgid "Comments and reviews"
+msgstr ""
 
 msgctxt "Languages::block_testimonials"
 msgid "Testimonials"
@@ -188,10 +196,6 @@ msgctxt "SettingsSections::discussion::orders"
 msgid "Orders"
 msgstr "الطلبات"
 
-msgctxt "SettingsSections::discussion::gift_registry"
-msgid "Gift registry"
-msgstr "هدية التسجيل"
-
 msgctxt "SettingsSections::discussion::pages"
 msgid "Pages"
 msgstr "الصفحات"
@@ -216,14 +220,6 @@ msgctxt "SettingsOptions::discussion::product_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "يسمح بتعليق واحد فقط من ال IP"
 
-msgctxt "SettingsOptions::discussion::product_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "ارسال اشعارات علي هذا الميل"
-
-msgctxt "SettingsOptions::discussion::product_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "ارسال اشعارات للمورد"
-
 msgctxt "SettingsOptions::discussion::product_share_discussion"
 msgid "Share discussions with all stores"
 msgstr "مشاركه المناقشات و المتاجر"
@@ -244,10 +240,6 @@ msgctxt "SettingsOptions::discussion::category_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr ""
 
-msgctxt "SettingsOptions::discussion::category_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr ""
-
 msgctxt "SettingsOptions::discussion::order_posts_per_page"
 msgid "Posts per page"
 msgstr ""
@@ -256,36 +248,16 @@ msgctxt "SettingsOptions::discussion::order_initiate"
 msgid "Allow customer to initiate discussion"
 msgstr "السماح للعملاء بدء مناقشة"
 
-msgctxt "SettingsOptions::discussion::order_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr ""
-
-msgctxt "SettingsOptions::discussion::giftreg_posts_per_page"
-msgid "Posts per page"
-msgstr ""
-
-msgctxt "SettingsOptions::discussion::giftreg_post_ip_check"
-msgid "Only one post from one IP is allowed"
-msgstr ""
-
 msgctxt "SettingsOptions::discussion::page_posts_per_page"
 msgid "Posts per page"
 msgstr ""
 
 msgctxt "SettingsOptions::discussion::page_post_approval"
 msgid "Administrator must approve posts submitted by"
-msgstr ""
+msgstr "يجب موافقه الادمن علي البوست المقدم بواسطه"
 
 msgctxt "SettingsOptions::discussion::page_post_ip_check"
 msgid "Only one post from one IP is allowed"
-msgstr ""
-
-msgctxt "SettingsOptions::discussion::page_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr ""
-
-msgctxt "SettingsOptions::discussion::page_notify_vendor"
-msgid "Send notifications to vendor"
 msgstr ""
 
 msgctxt "SettingsOptions::discussion::page_share_discussion"
@@ -294,7 +266,7 @@ msgstr ""
 
 msgctxt "SettingsTooltips::discussion::page_share_discussion"
 msgid "Show all comments and reviews of a page on all storefronts that the page is shared with"
-msgstr ""
+msgstr "عرض جميع التعليقات والمراجعات للصفحة على جميع واجهات المحلات التي تمت مشاركة الصفحة معها"
 
 msgctxt "SettingsOptions::discussion::home_page_posts_per_page"
 msgid "Posts per page"
@@ -302,15 +274,11 @@ msgstr ""
 
 msgctxt "SettingsOptions::discussion::home_page_post_approval"
 msgid "Administrator must approve posts submitted by"
-msgstr ""
+msgstr "يجب أن يوافق المسؤول على المشاركات المرسلة بواسطة"
 
 msgctxt "SettingsOptions::discussion::home_page_post_ip_check"
 msgid "Only one post from one IP is allowed"
-msgstr ""
-
-msgctxt "SettingsOptions::discussion::home_page_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr ""
+msgstr "يُسمح بمشاركة واحدة فقط من عنوان IP واحد"
 
 msgctxt "SettingsOptions::discussion::home_page_testimonials"
 msgid "Testimonials"
@@ -320,17 +288,49 @@ msgctxt "SettingsOptions::discussion::testimonials_from_all_stores"
 msgid "Show testimonials from all stores"
 msgstr ""
 
+msgctxt "SettingsOptions::discussion::product_discussion_type"
+msgid "Default value"
+msgstr ""
+
+msgctxt "SettingsTooltips::discussion::product_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created products. Doesn't affect existing products."
+msgstr "يحدد ما إذا كانت التعليقات و / أو المراجعات مسموح بها للمنتجات التي تم إنشاؤها حديثًا. لا يؤثر على المنتجات الحالية."
+
+msgctxt "SettingsOptions::discussion::product_review_after_purchase"
+msgid "Only buyers can post"
+msgstr ""
+
+msgctxt "SettingsTooltips::discussion::product_review_after_purchase"
+msgid "Allow leaving reviews for a product only to those who bought that product."
+msgstr ""
+
+msgctxt "SettingsOptions::discussion::category_discussion_type"
+msgid "Default value"
+msgstr "القيمة الافتراضية"
+
+msgctxt "SettingsTooltips::discussion::category_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created categories. Doesn't affect existing categories."
+msgstr "يحدد ما إذا كانت التعليقات و / أو التعليقات مسموح بها للفئات المنشأة حديثًا. لا يؤثر على الفئات الحالية."
+
+msgctxt "SettingsOptions::discussion::page_discussion_type"
+msgid "Default value"
+msgstr ""
+
+msgctxt "SettingsTooltips::discussion::page_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created pages. Doesn't affect existing pages."
+msgstr ""
+
 msgctxt "SettingsOptions::discussion::company_discussion_type"
 msgid "Reviews"
 msgstr ""
 
 msgctxt "SettingsOptions::discussion::company_only_buyers"
-msgid "Allow to post only for buyers"
+msgid "Only buyers can post"
 msgstr ""
 
 msgctxt "SettingsTooltips::discussion::company_only_buyers"
-msgid "Only those who purchased something from the vendor can post"
-msgstr ""
+msgid "Allow leaving reviews for a vendor only to those who bought products from that vendor."
+msgstr "السماح بترك المراجعات للبائع فقط لأولئك الذين اشتروا منتجات من هذا البائع."
 
 msgctxt "SettingsOptions::discussion::company_posts_per_page"
 msgid "Posts per page"
@@ -338,47 +338,23 @@ msgstr ""
 
 msgctxt "SettingsOptions::discussion::company_post_approval"
 msgid "Administrator must approve posts submitted by"
-msgstr ""
+msgstr "يجب أن يوافق المسؤول على المشاركات المرسلة بواسطة"
 
 msgctxt "SettingsOptions::discussion::company_post_ip_check"
 msgid "Only one post from one IP is allowed"
-msgstr ""
-
-msgctxt "SettingsOptions::discussion::company_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr ""
-
-msgctxt "SettingsOptions::discussion::company_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr ""
+msgstr "يُسمح بمشاركة واحدة فقط من عنوان IP واحد"
 
 msgctxt "SettingsVariants::discussion::company_post_approval::any"
 msgid "Any customer"
-msgstr ""
+msgstr "أي عميل"
 
 msgctxt "SettingsVariants::discussion::company_post_approval::anonymous"
 msgid "Only anonymous customers"
-msgstr ""
+msgstr "العملاء المجهولين فقط"
 
 msgctxt "SettingsVariants::discussion::company_post_approval::disabled"
 msgid "No approval needed"
 msgstr "لا يحتاج موافقه"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::B"
-msgid "Communication and Rating"
-msgstr ""
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::C"
-msgid "Communication"
-msgstr "اتصالات"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::R"
-msgid "Rating"
-msgstr "التفييم"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::D"
-msgid "Disabled"
-msgstr ""
 
 msgctxt "SettingsVariants::discussion::product_post_approval::any"
 msgid "Any customer"
@@ -386,7 +362,7 @@ msgstr "أي عميل"
 
 msgctxt "SettingsVariants::discussion::product_post_approval::anonymous"
 msgid "Only anonymous customers"
-msgstr ""
+msgstr "العملاء المجهولين فقط"
 
 msgctxt "SettingsVariants::discussion::product_post_approval::disabled"
 msgid "No approval needed"
@@ -398,51 +374,35 @@ msgstr "أي عميل"
 
 msgctxt "SettingsVariants::discussion::category_post_approval::anonymous"
 msgid "Only anonymous customers"
-msgstr ""
+msgstr "العملاء المجهولين فقط"
 
 msgctxt "SettingsVariants::discussion::category_post_approval::disabled"
 msgid "No approval needed"
-msgstr ""
+msgstr "لا يحتاج موافقه"
 
 msgctxt "SettingsVariants::discussion::page_post_approval::any"
 msgid "Any customer"
-msgstr ""
+msgstr "أي عميل"
 
 msgctxt "SettingsVariants::discussion::page_post_approval::anonymous"
 msgid "Only anonymous customers"
-msgstr ""
+msgstr "العملاء المجهولين فقط"
 
 msgctxt "SettingsVariants::discussion::page_post_approval::disabled"
 msgid "No approval needed"
-msgstr ""
+msgstr "لا يحتاج موافقه"
 
 msgctxt "SettingsVariants::discussion::home_page_post_approval::any"
 msgid "Any customer"
-msgstr ""
+msgstr "أي عميل"
 
 msgctxt "SettingsVariants::discussion::home_page_post_approval::anonymous"
 msgid "Only anonymous customers"
-msgstr ""
+msgstr "العملاء المجهولين فقط"
 
 msgctxt "SettingsVariants::discussion::home_page_post_approval::disabled"
 msgid "No approval needed"
-msgstr ""
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::B"
-msgid "Communication and Rating"
-msgstr ""
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::C"
-msgid "Communication"
-msgstr "اتصالات"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::R"
-msgid "Rating"
-msgstr "التفييم"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::D"
-msgid "Disabled"
-msgstr ""
+msgstr "لا يحتاج موافقه"
 
 msgctxt "Languages::discussion_tab_products"
 msgid "Product Reviews"
@@ -473,7 +433,7 @@ msgid "Comments and reviews notification"
 msgstr ""
 
 msgctxt "Languages::show_rating"
-msgid "Show rating"
+msgid "Show review rating"
 msgstr ""
 
 msgctxt "Languages::gdpr_discussions_data"
@@ -490,5 +450,49 @@ msgstr ""
 
 msgctxt "Languages::discussion.agreement_text_short_add_new_review"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
+msgstr ""
+
+msgctxt "Languages::discussion.please_log_in_to_write_a_review"
+msgid "Please sign in to write a review"
+msgstr ""
+
+msgctxt "Languages::discussion.you_have_to_buy_product_before_writing_review"
+msgid "You can't write a review for this product. Customers can write reviews only for the products they bought. If you actually bought this product from us, but are still seeing this message, please contact us."
+msgstr ""
+
+msgctxt "Languages::discussion.you_have_to_buy_from_vendor_before_writing_review"
+msgid "You can't write a review for this vendor. Customers can write reviews for a vendor only after they buy something from that vendor. If you actually placed an order with this vendor, but are still seeing this message, please contact us."
+msgstr ""
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification_title"
+msgid "Comments and reviews add-on settings were changed"
+msgstr ""
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification"
+msgid "In the 4.9.1 version the <strong>Only anonymous customers</strong> variant of the <strong>Administrator must approve posts submitted by</strong> setting was removed. Now, it is available again, with the ability to leave reviews for nonauthorized customers. Please check if the desirable value of the setting is selected."
+msgstr ""
+
+msgctxt "Languages::discussion.event.products.new_post"
+msgid "Products: new review posted"
+msgstr ""
+
+msgctxt "Languages::discussion.event.testimonials.new_post"
+msgid "Testimonials: new review posted"
+msgstr ""
+
+msgctxt "Languages::discussion.event.orders.new_post"
+msgid "Order communication: new message added"
+msgstr ""
+
+msgctxt "Languages::discussion.event.categories.new_post"
+msgid "Categories: new review posted"
+msgstr ""
+
+msgctxt "Languages::discussion.event.pages.new_post"
+msgid "Pages: new comment posted"
+msgstr ""
+
+msgctxt "Languages::discussion.event.vendors.new_post"
+msgid "Vendors: new review posted"
 msgstr ""
 

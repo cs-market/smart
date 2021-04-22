@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/access_restrictions.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.2/addons/access_restrictions.po\n"
+"X-Crowdin-File-ID: 4022\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::access_restrictions"
 msgid "Access restrictions"
@@ -42,7 +42,7 @@ msgstr "Нові домени"
 
 msgctxt "Languages::add_emails"
 msgid "Add e-mail addresses"
-msgstr "Додати нову e-mail адресу"
+msgstr "Додати e-mail адреси"
 
 msgctxt "Languages::new_emails"
 msgid "New e-mail addresses"
@@ -57,8 +57,12 @@ msgid "Add credit card"
 msgstr "Додати кредитну картку"
 
 msgctxt "Languages::privileges.manage_access_restrictions"
-msgid "Manage access restrictions"
-msgstr "Керувати обмеженням доступу"
+msgid "Can edit"
+msgstr "Можна редагувати"
+
+msgctxt "Languages::privilege_groups.access_restrictions"
+msgid "Access restrictions"
+msgstr "Обмеження доступу"
 
 msgctxt "Languages::domain"
 msgid "Domain"
@@ -86,11 +90,11 @@ msgstr "<b>[cc_number]</b> це не вірний номер кредитної 
 
 msgctxt "Languages::text_email_is_blocked"
 msgid "The e-mail address <b>[email]</b> is blocked by the administrator. Please contact the store administrator or try another one."
-msgstr "Адреса електронної пошти <b>[email]</b> заблокована адміністратором. Будь ласка, зв'яжіться з адміністратором магазину або спробувати іншу."
+msgstr "Адреса електронної пошти <b>[email]</b> заблокована адміністратором. Будь ласка, зв'яжіться з адміністратором магазину або спробуйте іншу."
 
 msgctxt "Languages::text_ips_denied"
 msgid "You are not allowed to access this area"
-msgstr "У вас немає доступу до цієї області"
+msgstr "Вам не надано доступ до цієї зони"
 
 msgctxt "Languages::text_ip_blocked_failed_login"
 msgid "The IP was blocked after [number] unsuccessful logins"
@@ -110,7 +114,7 @@ msgstr "Вашу IP адресу <b>[ip]</b> додано до таблиці о
 
 msgctxt "Languages::your_ip_enabled"
 msgid "Your IP address <b>[ip]</b> has been enabled in the access restrictions table."
-msgstr "Вашу IP адресу <b>[ip]</b> додано до таблиці обмеження доступу."
+msgstr "Вашу IP адресу <b>[ip]</b> активовано в таблиці обмеження доступу."
 
 msgctxt "Languages::your_ip_removed"
 msgid "Your IP address <b>[ip]</b> has been removed from the access restrictions table."

@@ -62,5 +62,6 @@ return array(
     'atol_online' => false,
     'advanced_import' => false,
     'responsive_admin' => true,
-    'gdpr' => false
+    'gdpr' => false,
+    'step_by_step_checkout' => false,
 );

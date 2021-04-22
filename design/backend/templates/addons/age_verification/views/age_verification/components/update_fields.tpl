@@ -4,9 +4,7 @@
             <label for="age_verification" class="control-label">{__("age_verification")}:</label>
             <div class="controls">
                 <input type="hidden" name="{$array_name}[age_verification]" value="N">
-                <span class="checkbox">
-                    <input type="checkbox" id="age_verification" name="{$array_name}[age_verification]" value="Y" {if $record.age_verification == "Y"}checked="checked"{/if}>
-                </span>
+                <input type="checkbox" id="age_verification" name="{$array_name}[age_verification]" value="Y" {if $record.age_verification == "Y"}checked="checked"{/if}>
             </div>
         </div>
 

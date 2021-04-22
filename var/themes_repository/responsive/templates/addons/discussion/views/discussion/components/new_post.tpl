@@ -1,4 +1,4 @@
-<div class="ty-discussion-post-popup hidden" id="new_post_dialog_{$obj_prefix}{$obj_id}" title="{$new_post_title}">
+<div class="ty-discussion-post-popup{if $meta} {$meta}{/if}" id="new_post_dialog_{$obj_prefix}{$obj_id}" title="{$new_post_title}">
 <form action="{""|fn_url}" method="post" class="{if !$post_redirect_url}cm-ajax cm-form-dialog-closer{/if} posts-form" name="add_post_form" id="add_post_form_{$obj_prefix}{$obj_id}">
 
 <input type="hidden" name="result_ids" value="posts_list*,new_post*,average_rating*">
@@ -39,4 +39,4 @@
 </div>
 
 </form>
-</div>
+<!--new_post_dialog_{$obj_prefix}{$obj_id}--></div>

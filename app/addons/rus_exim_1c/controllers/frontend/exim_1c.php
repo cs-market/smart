@@ -84,6 +84,7 @@ if ($type == 'catalog') {
         $fileinfo = pathinfo($filename);
 
         list($xml, $d_status, $text_message) = $exim_commerceml->getFileCommerceml($filename);
+
         $exim_commerceml->addMessageLog($text_message);
         if ($d_status === false) {
             fn_echo("failure");
@@ -107,7 +108,7 @@ if ($type == 'catalog') {
         }
     }
 
-} elseif (($type == 'sale') && (1||$exim_commerceml->import_params['user_data']['user_type'] != 'V') && ($s_commerceml['exim_1c_check_prices'] != 'Y')) {
+} elseif (($type == 'sale') && ($exim_commerceml->import_params['user_data']['user_type'] != 'V') && ($s_commerceml['exim_1c_check_prices'] != 'Y')) {
     if ($mode == 'checkauth') {
         $exim_commerceml->exportDataCheckauth($service_exchange);
 

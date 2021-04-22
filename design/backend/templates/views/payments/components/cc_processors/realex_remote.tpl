@@ -21,7 +21,7 @@
 
     <div class="controls">
         <input type="password" name="payment_data[processor_params][secret_word]" id="secret_word"
-               value="{$processor_params.secret_word}">
+               value="{$processor_params.secret_word}" autocomplete="new-password">
     </div>
 </div>
 
@@ -81,7 +81,7 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label">{__("payments.realex.referring_ip")}:</label>
+    <label class="control-label">{__("payments.globalpayments.referring_ip")}:</label>
 
     <div class="controls">
         <b>{$smarty.server.SERVER_ADDR}</b>

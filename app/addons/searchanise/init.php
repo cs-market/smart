@@ -20,13 +20,14 @@ fn_register_hooks(
     'clone_product',
     'update_product_post',
     'global_update_products',
+    'delete_product_pre',
     'delete_product_post',
     'tools_change_status',
     'database_restore',
     'get_products',
     'get_products_before_select',
     'products_sorting',
-    'update_product_filter',
+    'update_product_filter_post',
     'delete_product_filter_pre',
     'update_category_post',
     'delete_category_post',
@@ -39,7 +40,10 @@ fn_register_hooks(
     'delete_company_pre',
     'change_company_status_pre',
     'update_product_feature_post',
-    'update_option_combination_post',
-    'update_addon_status_post'
+    'update_addon_status_post',
+    'variation_group_save_group',
+    'master_products_create_vendor_product',
+    ['se_get_children_product_ids', '', 'master_products'],
+    ['se_get_parent_product_ids', '', 'product_variations']
 );
 

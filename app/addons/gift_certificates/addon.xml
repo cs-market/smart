@@ -91,7 +91,7 @@
                 KEY `timestamp` (`timestamp`)
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO  ?:privileges (privilege, is_default, section_id) VALUES ('manage_gift_certificates', 'Y', 'addons');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO  ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_gift_certificates', 'Y', 'marketing', 'gift_certificates', 'N');</item>
 
         <item type="file">database/data.sql</item>
         <item type="file" for="demo">database/demo.sql</item>

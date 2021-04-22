@@ -12,10 +12,14 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
+use Tygh\Enum\UserTypes;
 use Tygh\Mailer\Message;
 use Tygh\Mailer\MessageStyleFormatter;
+use Tygh\Notifications\Transports\Internal\InternalTransport;
+use Tygh\Providers\EventDispatcherProvider;
+use Tygh\Registry;
 use Tygh\Template\Mail\Template;
+use Tygh\Tools\Url;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -217,8 +221,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 if ($mode == 'manage') {
     /** @var \Tygh\Template\Mail\Repository $repository */
     $repository = Tygh::$app['template.mail.repository'];
-    /** @var \Tygh\Template\Snippet\Repository $snippet_repository */
-    $snippet_repository = Tygh::$app['template.snippet.repository'];
     /** @var \Tygh\SmartyEngine\Core $view */
     $view = Tygh::$app['view'];
 
@@ -231,10 +233,6 @@ if ($mode == 'manage') {
         ),
         'email_templates_A' => array(
             'title' => __('admin_notifications'),
-            'js' => true,
-        ),
-        'snippets' => array(
-            'title' => __('code_snippets'),
             'js' => true,
         )
     ));
@@ -251,23 +249,28 @@ if ($mode == 'manage') {
         });
     }
 
-    $view->assign('snippets', $snippet_repository->findByType('mail'));
     $view->assign('groups', $groups);
 } elseif ($mode == 'update') {
     /** @var \Tygh\Template\Mail\Repository $repository */
     $repository = Tygh::$app['template.mail.repository'];
     /** @var \Tygh\Template\Snippet\Repository $snippet_repository */
     $snippet_repository = Tygh::$app['template.snippet.repository'];
+    /** @var \Tygh\Template\Document\Service $documents_service */
+    $documents_service = Tygh::$app['template.document.service'];
     /** @var \Tygh\SmartyEngine\Core $view */
     $view = Tygh::$app['view'];
     /** @var \Tygh\Template\Renderer $renderer */
     $renderer = Tygh::$app['template.renderer'];
 
-    if (empty($_REQUEST['template_id'])) {
+    if (empty($_REQUEST['template_id']) && (empty($_REQUEST['code']) || empty($_REQUEST['area']))) {
         return array(CONTROLLER_STATUS_NO_PAGE);
     }
 
-    $email_template = $repository->findById($_REQUEST['template_id']);
+    if (!empty($_REQUEST['template_id'])){
+        $email_template = $repository->findById($_REQUEST['template_id']);
+    } elseif (!empty($_REQUEST['code']) && !empty($_REQUEST['area'])) {
+        $email_template = $repository->findByCodeAndArea($_REQUEST['code'], $_REQUEST['area']);
+    }
 
     if (!$email_template) {
         return array(CONTROLLER_STATUS_NO_PAGE);
@@ -287,17 +290,62 @@ if ($mode == 'manage') {
         $email_template->loadFromArray($post_data);
     }
 
+    $documents = $documents_service->getDocuments();
+
     $view->assign('snippets', $snippets);
     $view->assign('email_template', $email_template);
     $view->assign('params_schema', $email_template->getPreparedParamsSchema());
     $view->assign('default_subject', $default_subject);
     $view->assign('default_template', $default_template);
     $view->assign('variables', $variables);
+    $view->assign('documents', $documents);
 
-    Registry::set('navigation.tabs', array(
-        'general' => array(
-            'title' => __('general'),
-            'js' => true,
-        )
-    ));
+    $tabs = Registry::ifGet('navigation.tabs', []);
+    $tabs['general'] = [
+        'title' => __('notification_template.tab.email'),
+        'js'    => true,
+    ];
+
+    if (!empty($_REQUEST['event_id']) && !empty($_REQUEST['receiver'])) {
+        $event_id = $_REQUEST['event_id'];
+        $receiver = $_REQUEST['receiver'];
+        $events = EventDispatcherProvider::getEventsSchema();
+        if (isset($events[$event_id]['receivers'][$receiver][InternalTransport::getId()])) {
+            /** @var \Tygh\Notifications\Transports\Internal\InternalMessageSchema $schema */
+            $schema = $events[$event_id]['receivers'][$receiver][InternalTransport::getId()];
+            if ($schema->template_code) {
+                /** @var \Tygh\Template\Internal\Repository $repository */
+                $repository = Tygh::$app['template.internal.repository'];
+                $area = $receiver === UserTypes::CUSTOMER
+                    ? 'C'
+                    : 'A';
+                $template = $repository->findByCodeAndArea($schema->template_code, $area);
+                if ($template) {
+                    $tabs['internal'] = [
+                        'title' => __('notification_template.tab.internal'),
+                        'js'    => false,
+                        'href'  => Url::buildUrn(
+                            ['internal_templates', 'update'],
+                            ['template_id' => $template->getId(), 'event_id' => $event_id, 'receiver' => $receiver]
+                        ),
+                    ];
+                }
+            }
+        }
+    }
+
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+    $view->assign('active_tab', 'general');
+
+    Registry::set('navigation.tabs', $tabs);
+
+} elseif ($mode == 'snippets') {
+    /** @var \Tygh\Template\Snippet\Repository $snippet_repository */
+    $snippet_repository = Tygh::$app['template.snippet.repository'];
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+
+    $view->assign('snippets', $snippet_repository->findByType('mail'));
+    $view->assign('active_section', 'code_snippets');
 }

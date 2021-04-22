@@ -1,7 +1,20 @@
+{script src="js/tygh/backend/pages_bulk_edit.js"}
+
 {capture name="mainbox"}
+
+{$pages_statuses=""|fn_get_default_statuses:true}
+{$has_permission=fn_check_permissions("pages", "update", "admin", "POST")}
 
 <form action="{""|fn_url}" method="post" name="pages_tree_form" id="pages_tree_form">
 <input type="hidden" name="redirect_url" value="{$config.current_url}" />
+
+{include file="common/pagination.tpl" save_current_page=true save_current_url=true div_id=$smarty.request.content_id hide_position=$hide_position}
+
+{if $has_permission}
+    {hook name="pages:bulk_edit"}
+        {include file="views/pages/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
 
 {if $search.page_type}
 <input type="hidden" name="page_type" value="{$search.page_type}" />
@@ -11,16 +24,22 @@
     {$hide_position = true}
 {/if}
 
-{assign var="come_from" value=$search.page_type}
-{include file="common/pagination.tpl" save_current_page=true save_current_url=true div_id=$smarty.request.content_id hide_position=$hide_position}
 
-<div class="items-container multi-level">
-    {include file="views/pages/components/pages_tree.tpl" header=true show_id=true combination_suffix="_list"}
+{$come_from=$search.page_type}
+
+<div class="items-container multi-level pages-tree__content">
+    {if $pages_tree}
+        {include file="views/pages/components/pages_tree.tpl" header=true show_id=true combination_suffix="_list" is_bulkedit_menu=true}
+    {else}
+        {if !$hide_show_all}
+            <p class="no-items">{__("no_data")}</p>
+        {/if}
+    {/if}
 </div>
 
 {include file="common/pagination.tpl" div_id=$smarty.request.content_id}
 
-{assign var="rev" value=$smarty.request.content_id|default:"pagination_contents"}
+{$rev=$smarty.request.content_id|default:"pagination_contents"}
 
 {capture name="adv_buttons"}
     {if $page_types|sizeof == 1}
@@ -42,8 +61,10 @@
         {capture name="tools_list"}
             <li>{btn type="list" text=__("clone_selected") dispatch="dispatch[pages.m_clone]" form="pages_tree_form"}</li>
             <li>{btn type="delete_selected" dispatch="dispatch[pages.m_delete]" form="pages_tree_form"}</li>
+            {hook name="pages:list_extra_links"}
+            {/hook}
         {/capture}
-        {dropdown content=$smarty.capture.tools_list class="mobile-hide"}
+        {dropdown content=$smarty.capture.tools_list class="mobile-hide bulkedit-dropdown--legacy hide"}
         {include file="buttons/save.tpl" but_name="dispatch[pages.m_update]" but_role="action" but_target_form="pages_tree_form" but_meta="cm-submit"}
     {/if}
 {/capture}

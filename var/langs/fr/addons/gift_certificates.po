@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: French\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /release-4.8.2/addons/gift_certificates.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.4/addons/gift_certificates.po\n"
+"PO-Revision-Date: 2020-05-18 08:59\n"
 
 msgctxt "Addons::name::gift_certificates"
 msgid "Gift certificates"
@@ -221,8 +219,12 @@ msgid "Amount should not be higher than [max] and less than [min]"
 msgstr "Le montant ne doit pas être supérieur à [max], ni inférieur à [min]"
 
 msgctxt "Languages::privileges.manage_gift_certificates"
-msgid "Manage gift certificate system"
-msgstr "Gérér le système de bons-cadeaux"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.gift_certificates"
+msgid "Gift certificates"
+msgstr ""
 
 msgctxt "Languages::change_gift_certificate_status"
 msgid "Change gift certificate status to"
@@ -278,5 +280,13 @@ msgstr "N'a pas pu trouver un certificat de cadeau. Prevoir seulement les travau
 
 msgctxt "Languages::gift_certificates.certificate_purchase_form"
 msgid "Gift certificate purchase form"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.status_changed.name"
+msgid "Gift certificate status changed to [status]"
+msgstr ""
+
+msgctxt "Languages::gift_certificates.event.gift_certificate.updated.name"
+msgid "Gift certificate updated"
 msgstr ""
 

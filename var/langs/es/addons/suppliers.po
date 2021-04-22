@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: es-ES\n"
-"X-Crowdin-File: /release-4.8.2/addons/suppliers.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:11\n"
+"X-Crowdin-File: /release-4.12.2/addons/suppliers.po\n"
+"X-Crowdin-File-ID: 4148\n"
+"PO-Revision-Date: 2021-02-01 09:13\n"
 
 msgctxt "Addons::name::suppliers"
 msgid "Suppliers"
@@ -65,8 +65,12 @@ msgid "Supplier has been deleted successfully."
 msgstr "Se ha eliminado el proveedor con éxito."
 
 msgctxt "Languages::privileges.manage_suppliers"
-msgid "Manage suppliers"
-msgstr "Gestionar proveedores"
+msgid "Can edit"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.suppliers"
+msgid "Suppliers"
+msgstr ""
 
 msgctxt "SettingsSections::suppliers::general"
 msgid "General"
@@ -82,13 +86,33 @@ msgstr "Mostrar los métodos de envío para cada proveedor por separado"
 
 msgctxt "Languages::email_template.suppliers_notification"
 msgid "Supplier notification"
+msgstr "Notificación del vendedor"
+
+msgctxt "Languages::email_template.supplier_notification_with_status"
+msgid "Supplier notification: [name]"
+msgstr ""
+
+msgctxt "Languages::email_template.suppliers_notification_default"
+msgid "Supplier notification: Default template for a new order status"
 msgstr ""
 
 msgctxt "Languages::template_document_supplier_order_invoice"
 msgid "Suppliers: invoice"
-msgstr ""
+msgstr "Proveedores: factura"
 
 msgctxt "Languages::document_preview_suppliers_not_found"
 msgid "Couldn't find a supplier. Preview only works with existing data. Please create a supplier and use Preview again."
+msgstr "No se pudo encontrar un vendedor. La vista previa solamente funciona con los datos existentes. Por favor genere una cuenta de vendedor y utiliza la opción de Vista Previa de nuevo."
+
+msgctxt "Languages::suppliers.event.order.supplier_notified.name"
+msgid "Suppliers: order status changed to [status]"
+msgstr ""
+
+msgctxt "Languages::event.receiver.s"
+msgid "Supplier"
+msgstr ""
+
+msgctxt "Languages::suppliers.supplier_notifications"
+msgid "Supplier notifications"
 msgstr ""
 

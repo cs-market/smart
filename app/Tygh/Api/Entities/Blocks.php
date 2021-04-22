@@ -25,7 +25,7 @@ class Blocks extends AEntity
 {
     public function index($id = 0, $params = array())
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if ($id) {
 
@@ -73,7 +73,7 @@ class Blocks extends AEntity
 
         } else {
 
-            $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+            $lang_code = $this->getLanguageCode($params);
 
             unset($params['block_id']);
             $params['apply_to_all_langs'] = 'Y';
@@ -125,7 +125,7 @@ class Blocks extends AEntity
 
                 $params['block_id'] = $id;
                 unset($params['company_id']);
-                $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+                $lang_code = $this->getLanguageCode($params);
 
                 $params['content_data']['lang_code'] = $lang_code;
                 if (!empty($params['content'])) {

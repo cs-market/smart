@@ -14,6 +14,8 @@
 
 namespace Tygh;
 
+use Tygh\Tools\SecurityHelper;
+
 class Ajax
 {
     private $_result = array();
@@ -89,24 +91,30 @@ class Ajax
 
         if (!empty($origin)) {
             $_purl = parse_url($origin);
-            $origin_host = $_purl['host'] . (empty($_purl['port']) ? '' : ':' . $_purl['port']);
-            $origin_scheme = $_purl['scheme'];
+            $host = isset($_purl['host']) ? $_purl['host'] : '';
 
-            $_chost = Registry::get('config.current_host');
-            if (empty($_chost) || strpos($_chost, '%') !== false) {
-                $_chost = $_SERVER['HTTP_HOST'];
-            }
+            $allowlist = Registry::get('config.tweaks.cors_allowlist');
+            $allowlist = is_array($allowlist) ? $allowlist : false;
 
-            if ($origin_host != $_chost) { // cross-domain request
+            if ($allowlist === false || in_array($host, $allowlist, true)) {
+                $origin_host = $host . (empty($_purl['port']) ? '' : ':' . $_purl['port']);
+                $origin_scheme = $_purl['scheme'];
 
-                Embedded::enable();
-
-                if (!empty($request['init_context'])) {
-                    Embedded::setUrl($request['init_context']);
+                $_chost = Registry::get('config.current_host');
+                if (empty($_chost) || strpos($_chost, '%') !== false) {
+                    $_chost = $_SERVER['HTTP_HOST'];
                 }
 
-                header('Access-Control-Allow-Origin: ' . $origin_scheme . '://' . $origin_host);
-                header('Access-Control-Allow-Credentials: true');
+                if (strtolower($origin_host) !== strtolower($_chost)) { // cross-domain request
+                    Embedded::enable();
+
+                    if (!empty($request['init_context'])) {
+                        Embedded::setUrl($request['init_context']);
+                    }
+
+                    header('Access-Control-Allow-Origin: ' . $origin_scheme . '://' . $origin_host);
+                    header('Access-Control-Allow-Credentials: true');
+                }
             }
         }
 
@@ -254,7 +262,7 @@ class Ajax
 
             } else {
                 // Return html textarea object
-                $response = '<textarea>' . fn_html_escape($response) . '</textarea>';
+                $response = '<textarea>' . SecurityHelper::escapeHtml($response) . '</textarea>';
             }
 
             fn_echo($response);
@@ -301,6 +309,17 @@ class Ajax
     public function getAssignedVars()
     {
         return $this->_result;
+    }
+
+    /**
+     * Gets assagned variable by key
+     *
+     * @param string     $key
+     * @param mixed|null $default
+     */
+    public function getAssignedVar($key, $default = null)
+    {
+        return array_key_exists($key, $this->_result) ? $this->_result[$key] : $default;
     }
 
     /**

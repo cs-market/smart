@@ -30,7 +30,7 @@
     
     &.active {
         background: #fff;
-        border: 1px solid #0088cc;
+        border: 1px solid @mainColor;
         box-shadow: 0 0 30px #B9B9B9;
     }
 }
@@ -53,7 +53,7 @@
     font-size: 11px;
     font-weight: 400;
     color: #fff;
-    background-color: #0088cc;
+    background-color: @mainColor;
     border-radius: 3px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
@@ -131,3 +131,87 @@
     width: 100%;
     margin-top: 18px;
 }
+
+.vendor-plan {
+    &__storefronts-update {
+        &__messages {
+            margin-bottom: 40px;
+        }
+
+        &__message {
+            margin-bottom: 10px;
+        }
+    }
+}
+      
+.vendor-plans--storefront-list {
+    .control-group {
+        .control-label {
+            width: 400px;
+            float: left;
+            text-align: left;
+            margin-bottom: 5px;
+            margin-left: 20px;
+        }
+    }
+}
+
+.object-picker__vendor-plan {
+    &-content {
+        display: grid;
+        grid-template-columns: 30% 25% 15% 15% 15%;
+        align-items: center;
+        grid-row-gap: 5px;
+
+        @media (max-width: @TabletBreakpoint) {
+            grid-template-columns: 1fr 1fr 1fr;      
+        }
+
+        @media (max-width: @PhoneBreakpoint) {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+}
+
+.vendor-plan-create {
+    &__block .control-text {
+        padding-top: 5px;
+        display: inline-block;
+    }
+
+    &__periodicity {
+        .controls {
+            display: flex;
+        }
+
+        .input-text-short {
+            margin-right: 5px;
+        }
+    }
+    
+    &__header {
+        display: -ms-grid;
+        display: grid;
+        grid-auto-flow: column;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    &__subheader {
+        margin: 0;
+    }
+
+    &__footer {
+        display: -ms-grid;
+        display: grid;
+        grid-auto-flow: column;
+        -webkit-box-pack: end;
+        -ms-flex-pack: end;
+        justify-content: end;
+        grid-gap: 10px;
+        align-items: center;
+    }
+}
+

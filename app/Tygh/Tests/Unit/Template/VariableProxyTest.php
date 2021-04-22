@@ -89,4 +89,12 @@ class VariableProxyTestContext implements IContext
     {
         return 'en';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArea()
+    {
+        return 'A';
+    }
 }

@@ -14,6 +14,8 @@
 
 namespace Tygh\Ym;
 
+use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
+
 class Offers
 {
     protected $offers = array();
@@ -47,17 +49,32 @@ class Offers
         return $offer->postBuild($product, $offer_data, $xml);
     }
 
-    public function getOffer($product)
+    public function getOfferType($product)
     {
+        if (!empty($product['main_category'])) {
+            $category_id = $product['main_category'];
+        } else {
+            $category_id = 0;
+        }
+
         if (!empty($product['yml2_offer_type'])) {
             $offer_type = $product['yml2_offer_type'];
-
-        } elseif (!empty($this->options['offer_type_categories'][$product['category_id']])) {
+        } elseif (!empty($product['category_id']) && !empty($this->options['offer_type_categories'][$product['category_id']])) {
             $offer_type = $this->options['offer_type_categories'][$product['category_id']];
-
+            $product['offer_type_categories'] = $this->options['offer_type_categories'][$product['category_id']];
+        } elseif (!empty($this->options['offer_type_categories'][$category_id])) {
+            $offer_type = $this->options['offer_type_categories'][$category_id];
+            $product['offer_type_categories'] = $this->options['offer_type_categories'][$category_id];
         } else {
             $offer_type = 'simple';
         }
+
+        return $offer_type;
+    }
+
+    public function getOffer($product)
+    {
+        $offer_type = $this->getOfferType($product);
 
         if (!isset($this->offers[$offer_type])) {
             $offer_class = "\\Tygh\\Ym\\Offers\\" . fn_camelize($offer_type);
@@ -65,7 +82,6 @@ class Offers
             if (class_exists($offer_class)) {
                 $offer = $this->offers[$offer_type] = new $offer_class($this->options, $this->log);
             } else {
-
                 throw new \Exception("The wrong offer");
             }
 

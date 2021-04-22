@@ -39,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'
         }
 
         if (isset($_REQUEST['retailcrm_mapping']['sites'])) {
-            $sites = (array) $_REQUEST['retailcrm_mapping']['sites'];
+            $sites = array_filter((array) $_REQUEST['retailcrm_mapping']['sites']);
+
 
             $result = fn_retailcrm_validate_retailcrm_map_sites($sites);
             $result->showNotifications();

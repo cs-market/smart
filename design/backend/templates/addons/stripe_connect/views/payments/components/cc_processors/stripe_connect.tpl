@@ -40,6 +40,7 @@
                name="payment_data[processor_params][secret_key]"
                id="elm_secret_key{$suffix}"
                value="{$processor_params.secret_key}"
+               autocomplete="new-password"
         />
     </div>
 </div>
@@ -62,16 +63,39 @@
 </div>
 
 <div class="control-group">
-    <label for="elm_redirect_uris{$suffix}"
+    <label for="elm_payment_type{$suffix}"
            class="control-label"
-    >{__("stripe_connect.redirect_uris")}:</label>
+    >
+        {__("stripe_connect.enable_3d_secure")}:
+    </label>
     <div class="controls">
-        <input type="text"
-               id="elm_redirect_uris{$suffix}"
-               readonly="readonly"
-               class="input-large cm-select-text"
-               data-ca-select-id="elm_redirect_uris{$suffix}"
-               value="{"companies.stripe_connect_auth"|fn_url:"V"},{"companies.stripe_connect_auth"|fn_url:"A"}"
+        <input type="hidden"
+               name="payment_data[processor_params][payment_type]"
+               value="card_simple"
         />
+        <input type="checkbox"
+                name="payment_data[processor_params][payment_type]"
+                value="card"
+                {if $processor_params.payment_type === "card"}
+                    checked="checked"
+                {/if}
+        />
+        <div class="stripe-config-form__3d-secure-description">
+            {__("stripe_connect.enable_3d_secure.description")}
+        </div>
     </div>
 </div>
+
+{include file="common/widget_copy.tpl"
+    widget_copy_title=__("stripe_connect.redirect_uri_vendor")
+    widget_copy_text=__("stripe_connect.redirect_uris.description")
+    widget_copy_code_text="companies.stripe_connect_auth"|fn_url:"V"
+}
+
+{if !$runtime.company_id}
+    {include file="common/widget_copy.tpl"
+        widget_copy_title=__("stripe_connect.redirect_uri_admin")
+        widget_copy_text=__("stripe_connect.redirect_uris.description")
+        widget_copy_code_text="companies.stripe_connect_auth"|fn_url:"A"
+    }
+{/if}

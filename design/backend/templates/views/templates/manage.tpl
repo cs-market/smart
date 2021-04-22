@@ -32,7 +32,7 @@
 
 <!--Editor-->
 <div class="te-content cm-te-content">
-    <div id="template_text"></div>
+    <div id="template_text" class="te-ace-editor"></div>
     <div id="template_image" class="te-template-image"></div>
 </div>
 
@@ -105,12 +105,12 @@
         {/hook}
         
         {hook name="templates:restore_from_repository"}
-        <li class="cm-te-restore">{btn type="list" text=__("restore_from_repository") }</li>
+        <li class="cm-te-restore">{btn type="list" text=__("restore_from_repository")}</li>
         {/hook}
 
         <li class="cm-te-getfile">{btn type="list" text=__("download")}</li>
-        <li class="cm-te-rename">{btn type="list" text=__("rename") }</li>
-        <li class="cm-te-delete">{btn type="list" text=__("delete") }</li>
+        <li class="cm-te-rename">{btn type="list" text=__("rename")}</li>
+        <li class="cm-te-delete">{btn type="list" text=__("delete")}</li>
     {/capture}
     {dropdown content=$smarty.capture.tools_list class="ce-te-actions"}
 
@@ -124,7 +124,7 @@
     {hook name="templates:tree"}
     <div class="sidebar-row">
         <!--file tree-->
-        <div id="filelist" class="cm-te-file-tree nested-list nested-list-folders"></div>
+        <div id="filelist" class="cm-te-file-tree te-file-tree nested-list nested-list-folders"></div>
         <!--#file tree-->
     </div>
     {/hook}

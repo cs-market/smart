@@ -14,7 +14,7 @@
                 <div>{__('text_set_write_permissions_for_dirs')}</div>
             </div>
 
-            <div>{include file="buttons/button.tpl" but_role="submit" but_text=__("recheck") but_name="dispatch[addons.recheck]"}</div>
+            <div>{include file="buttons/button.tpl" but_role="submit" but_text=__("recheck") but_name="dispatch[addons.recheck..{$dispatch_extra}]"}</div>
             <hr>
 
             {include file="common/subheader.tpl" title=__("ftp_server_options")}
@@ -48,7 +48,7 @@
 
             <div class="buttons-container">
                 <a class="cm-dialog-closer cm-cancel tool-link btn">{__("cancel")}</a>
-                {include file="buttons/button.tpl" but_role="submit" but_text=__("upload_via_ftp") but_name="dispatch[addons.recheck.ftp_upload]"}
+                {include file="buttons/button.tpl" but_role="submit" but_text=__("upload_via_ftp") but_name="dispatch[addons.recheck.ftp_upload.{$dispatch_extra}]"}
             </div>
     </form>
 <!--addon_upload_container--></div>

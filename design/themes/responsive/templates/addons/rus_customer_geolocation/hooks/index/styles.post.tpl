@@ -1,1 +1,0 @@
-{style src="addons/rus_customer_geolocation/styles.less"}

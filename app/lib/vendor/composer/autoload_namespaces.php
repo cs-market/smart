@@ -17,7 +17,6 @@ return array(
     'PEAR' => array($baseDir . '/pear'),
     'Net' => array($baseDir . '/pear'),
     'JShrink' => array($vendorDir . '/tedivm/jshrink/src'),
-    'Imagine' => array($vendorDir . '/imagine/imagine/lib'),
     'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
     'Crypt' => array($baseDir . '/pear'),
     'Archive' => array($baseDir . '/pear'),

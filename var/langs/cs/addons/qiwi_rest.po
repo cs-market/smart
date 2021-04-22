@@ -5,8 +5,8 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: cs_CZ\n"
 
 msgctxt "Addons::name::qiwi_rest"
-msgid "Qiwi REST Payment"
-msgstr "Qiwi REST Payment"
+msgid "Qiwi Wallet Payment"
+msgstr "Qiwi Wallet Payment"
 
 msgctxt "Addons::description::qiwi_rest"
 msgid "Qiwi Wallet is an electronic wallet system co-branded with Visa."

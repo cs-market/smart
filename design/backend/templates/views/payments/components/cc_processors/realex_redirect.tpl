@@ -15,7 +15,7 @@
 <div class="control-group">
     <label class="control-label" for="secret_word">{__("shared_secret")}:</label>
     <div class="controls">
-        <input type="password" name="payment_data[processor_params][secret_word]" id="secret_word" value="{$processor_params.secret_word}" >
+        <input type="password" name="payment_data[processor_params][secret_word]" id="secret_word" value="{$processor_params.secret_word}" autocomplete="new-password" >
     </div>
 </div>
 
@@ -55,13 +55,13 @@
 </div>
 
 <div class="control-group">
-    <label class="control-label">{__("payments.realex.referring_url")}:</label>
+    <label class="control-label">{__("payments.globalpayments.referring_url")}:</label>
     <div class="controls">
         <b>{fn_url("", "C")}</b>
     </div>
 </div>
 
-{include file="common/subheader.tpl" title=__("payments.realex.text_status_map") target="#text_realex_status_map"}
+{include file="common/subheader.tpl" title=__("payments.globalpayments.text_status_map", ["[product]" => $smarty.const.PRODUCT_NAME]) target="#text_realex_status_map"}
 
 <div id="text_realex_status_map" class="in collapse">
     {assign var="statuses" value=$smarty.const.STATUSES_ORDER|fn_get_simple_statuses}
@@ -122,7 +122,7 @@
     </div>
     
     <div class="control-group">
-        <label class="control-label" for="elm_realex_realex_error">{__("payments.realex.realex_error")}:</label>
+        <label class="control-label" for="elm_realex_realex_error">{__("payments.globalpayments.globalpayments_error")}:</label>
         <div class="controls">
             <select name="payment_data[processor_params][statuses][realex_error]" id="elm_realex_realex_error">
                 {foreach from=$statuses item="s" key="k"}
@@ -144,7 +144,7 @@
     </div>
     
     <div class="control-group">
-        <label class="control-label" for="elm_realex_connector_error">{__("payments.realex.connector_error")}:</label>
+        <label class="control-label" for="elm_realex_connector_error">{__("payments.globalpayments.connector_error")}:</label>
         <div class="controls">
             <select name="payment_data[processor_params][statuses][connector_error]" id="elm_realex_connector_error">
                 {foreach from=$statuses item="s" key="k"}

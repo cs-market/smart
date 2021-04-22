@@ -63,8 +63,8 @@
             ADD COLUMN `company_id` int(11) unsigned NOT NULL DEFAULT '0',
             ADD KEY `company_id` (`company_id`);
         </item>
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('view_banners', 'Y', 'design');</item>
-        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id) VALUES ('manage_banners', 'Y', 'design');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('view_banners', 'Y', 'marketing', 'banners', 'Y');</item>
+        <item editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:privileges (privilege, is_default, section_id, group_id, is_view) VALUES ('manage_banners', 'Y', 'marketing', 'banners', 'N');</item>
         <item for="demo" editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:usergroup_privileges (usergroup_id, privilege) VALUES ('4', 'view_banners');</item>
         <item for="demo" editions="MULTIVENDOR,ULTIMATE">REPLACE INTO ?:usergroup_privileges (usergroup_id, privilege) VALUES ('4', 'manage_banners');</item>
         <item type="file">database/data.sql</item>
@@ -73,6 +73,8 @@
         <item type="file" lang="ru" table="banner_descriptions">database/data_banners_ru.sql</item>
         <item type="file" for="demo" lang="en" table="banner_descriptions">database/demo_banners_en.sql</item>
         <item type="file" for="demo" lang="ru" table="banner_descriptions">database/demo_banners_ru.sql</item>
+        <item type="file" for="demo" lang="en" table="banner_descriptions" editions="MULTIVENDOR">database/demo_mve_banners_en.sql</item>
+        <item type="file" for="demo" lang="ru" table="banner_descriptions" editions="MULTIVENDOR">database/demo_mve_banners_ru.sql</item>
         <item type="file" for="demo">database/demo_banners.sql</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:banners;</item>
         <item for="uninstall">DROP TABLE IF EXISTS ?:banner_descriptions;</item>

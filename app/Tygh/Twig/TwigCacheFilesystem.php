@@ -20,7 +20,7 @@ namespace Tygh\Twig;
  *
  * @package Tygh\Twig
  */
-class TwigCacheFilesystem extends \Twig_Cache_Filesystem
+class TwigCacheFilesystem extends \Twig\Cache\FilesystemCache
 {
     /**
      * @inheritDoc

@@ -5,20 +5,20 @@ msgstr ""
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: es-ES\n"
-"X-Crowdin-File: /release-4.8.2/addons/advanced_import.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:11\n"
+"X-Crowdin-File: /release-4.12.2/addons/advanced_import.po\n"
+"X-Crowdin-File-ID: 4098\n"
+"PO-Revision-Date: 2021-02-01 09:13\n"
 
 msgctxt "Addons::name::advanced_import"
-msgid "Advanced products import [Beta]"
-msgstr "Productos avanzados de importación [Beta]"
+msgid "Advanced products import"
+msgstr "Importación avanzada de productos"
 
 msgctxt "Addons::description::advanced_import"
 msgid "Allows you to match the fields in the imported file with the product properties. These matchings and other import settings can also be saved as presets for later use."
-msgstr "Permite que los campos en los archivos importados conincidan con las propiedades del producto. Estas coincidencias y otras configuraciones importadas pueden también ser almacenadas como ajustes prestablecidos para su uso posterior."
+msgstr "Permitir que los campos en los archivos importados coincidan con las propiedades del producto. Estas coincidencias y otras configuraciones importadas pueden también ser almacenadas como ajustes prestablecidos para su uso posterior."
 
 msgctxt "Languages::advanced_import.never"
 msgid "Never"
@@ -34,15 +34,15 @@ msgstr "Éxito"
 
 msgctxt "Languages::advanced_import.last_status.P"
 msgid "In progress"
-msgstr "En progreso"
+msgstr "En proceso"
 
 msgctxt "Languages::advanced_import.last_status.F"
 msgid "Failure"
-msgstr "Falla"
+msgstr "Fallo"
 
 msgctxt "Languages::advanced_import.user_upload"
 msgid "User upload"
-msgstr "Subir usuario"
+msgstr "Subir datos del usuario"
 
 msgctxt "Languages::advanced_import.last_launch"
 msgid "Last import"
@@ -62,7 +62,7 @@ msgstr "Tiene modificadores"
 
 msgctxt "Languages::advanced_import.import_products"
 msgid "Import products"
-msgstr "Productos de importación"
+msgstr "Importar productos"
 
 msgctxt "Languages::advanced_import.import_products_w_preset"
 msgid "Import products: [preset]"
@@ -74,11 +74,11 @@ msgstr "Importar archivo"
 
 msgctxt "Languages::advanced_import.fields_mapping"
 msgid "Fields mapping"
-msgstr "Mapeo de campos"
+msgstr "Asignación de campos"
 
 msgctxt "Languages::advanced_import.fields_mapping.description"
 msgid "This table contains the list of columns from the imported file. For each column you'd like to import, select a corresponding product property in [product]. Then check what sort of data will be imported from that column, and use modifiers to change that data, if necessary. Remember to save your changes."
-msgstr "Esta tabla contiene la lista de columnas del archivo importado. Por cada columna que quieras importar, seleccionas una propiedad del producto correspondiente en [producto]. Posteriormente revisas que tipo de datos importarás de cada columna, y utiliza modificadores para cambiar los datos, si este fuera el caso. Recuerda guardar los cambios."
+msgstr "Esta tabla contiene la lista de columnas del archivo importado. Por cada columna que quiera importar, selecciona una propiedad del producto correspondiente en [producto]. Posteriormente, revise qué tipo de datos importará de cada columna y utilice modificadores para cambiar los datos, si fuese necesario. Recuerde guardar los cambios."
 
 msgctxt "Languages::advanced_import.column_header"
 msgid "Column name in the imported file"
@@ -114,15 +114,15 @@ msgstr "Modificador"
 
 msgctxt "Languages::advanced_import.modifier_title"
 msgid "A modifier is a rule that alters values in a column"
-msgstr "Un modificador es una condición que altera los valores en una colunma"
+msgstr "Un modificador es una condición que altera los valores en una columna"
 
 msgctxt "Languages::advanced_import.example_imported_title"
 msgid "For example, here's a value in the first line of your file:"
-msgstr "Por ejemplo, aquí existe un valor en la primera línea del archivo:"
+msgstr "Por ejemplo, aquí hay un valor en la primera línea del archivo:"
 
 msgctxt "Languages::advanced_import.example_modified_title"
 msgid "And here is how this value will be imported:"
-msgstr "Y aquí encontrarás como este valor será importado:"
+msgstr "Y aquí encontrarás cómo este valor será importado:"
 
 msgctxt "Languages::advanced_import.options"
 msgid "Options"
@@ -130,7 +130,7 @@ msgstr "Opciones"
 
 msgctxt "Languages::advanced_import.images_delimiter"
 msgid "Images delimiter"
-msgstr "Definidor de imágenes"
+msgstr "Delimitador de imágenes"
 
 msgctxt "Languages::advanced_import.images_delimiter.description"
 msgid "Delimiter between images of a product."
@@ -150,7 +150,7 @@ msgstr "Eliminar las imágenes adicionales"
 
 msgctxt "Languages::advanced_import.import_fields"
 msgid "Import fields"
-msgstr "Campos exportados"
+msgstr "Importar campos"
 
 msgctxt "Languages::advanced_import.advanced_products_import"
 msgid "Products"
@@ -158,23 +158,27 @@ msgstr "Productos"
 
 msgctxt "Languages::advanced_import.coming_soon"
 msgid "... coming soon"
-msgstr "próximamente"
+msgstr "... próximamente"
 
 msgctxt "Languages::advanced_import.cant_load_file_for_company"
 msgid "File can't be loaded for the specified company"
 msgstr "El archivo no puede ser cargado por la empresa indicada"
 
+msgctxt "Languages::advanced_import.cant_load_file"
+msgid "File can't be loaded"
+msgstr "No se puede cargar el archivo"
+
 msgctxt "Languages::advanced_import.uploading_file"
 msgid "Uploading file for the preset: [preset]"
-msgstr "Subir archivo del ajuste preestablecido: [preset]"
+msgstr "Subir el archivo del ajuste preestablecido: [preset]"
 
 msgctxt "Languages::advanced_import.previewing_fields_mapping"
 msgid "Previewing fields mapping for the preset: [preset]"
-msgstr "Vista previa del mapeo de campos para el preajuste [preset]"
+msgstr "Vista previa del mapa de campos para el preajuste [preset]"
 
 msgctxt "Languages::advanced_import.preset_not_found"
 msgid "Preset not found"
-msgstr "La función de ajuste no encontrada"
+msgstr "El preajuste no fue encontrado"
 
 msgctxt "Languages::advanced_import.modifiers_list"
 msgid "Modifiers list"
@@ -182,11 +186,11 @@ msgstr "Lista de modificadores"
 
 msgctxt "Languages::advanced_import.invalid_number_of_parameters_provided"
 msgid "Invalid number of parameters provided for modifier: <b>[modifier]</b>: expected [expected_count], got [actual_count]."
-msgstr "El número de parámetros no válido proporcionado por el modificador: <b>[modifier]</b>: esperado [expected_count], obtenido [actual_count]."
+msgstr "Número de parámetros no válido para el modificador: <b>[modifier]</b>: esperado [expected_count], obtenido [actual_count]."
 
 msgctxt "Languages::advanced_import.invalid_function_firs_character"
 msgid "The modifier name cannot start with character <b>[character]</b>."
-msgstr "El nombre del modificador no puede empezar con un carácter <b>[character]</b>."
+msgstr "El nombre del modificador no puede empezar con el carácter <b>[character]</b>."
 
 msgctxt "Languages::advanced_import.unrecognized_modifier"
 msgid "The modifier <b>[modifier]</b> does not exist."
@@ -210,7 +214,7 @@ msgstr "Utiliza estas funciones en la columna <b>Modifier</b> para alterar los v
 
 msgctxt "Languages::advanced_import.modifiers_self_referencing_info"
 msgid "Most functions allow you to use the non-modified value of the imported field by using <b>$value</b> as a parameter. If there are any exceptions, they will be mentioned in function descriptions."
-msgstr "La mayoría de las funciones permite que utilices el valor no modificable del campo importado utilizando <b>$value</b> como un parámetro. Si hay excepciones serán mencionadas en las descripciones de la función."
+msgstr "La mayoría de las funciones permite que utilice el valor sin modificar del campo importado utilizando <b>$value</b> como un parámetro. Si hay excepciones serán mencionadas en las descripciones de la función."
 
 msgctxt "Languages::advanced_import.modifier_description.sum"
 msgid "<b>sum</b>&mdash;sums up two numbers provided as parameters. <ul><li>Examples:</li><ul><li><b>sum(1, 3)</b> equals <i>4</i></li> <li><b>sum(7, $value)</b> equals <i>7 + the value of the imported field</i></li></ul></ul>"
@@ -262,7 +266,7 @@ msgstr "Ajuste preestablecido"
 
 msgctxt "Languages::advanced_import.show_more"
 msgid "Show more"
-msgstr "Visualizar más"
+msgstr "Ver más"
 
 msgctxt "Languages::advanced_import.show_less"
 msgid "Show less"
@@ -274,11 +278,11 @@ msgstr "Nodo destino de XML"
 
 msgctxt "Languages::advanced_import.target_node.description"
 msgid "The full path to the XML node with the information about an imported entity. The nodes nested in the specified node will be used as columns of the imported file. Here is an example of the path: yml_catalog/shop/offers/offer"
-msgstr "La ruta completa al nodo de XML con la información relacionada con la entidad importada. Los nodos anidados en el nodo específico será utilizado como columnas del archivo importado. Este es un ejemplo de la ruta: yml_catalog/shop/offers/offer"
+msgstr "Ruta completa al nodo de XML con la información sobre la entidad importada. Los nodos anidados en el nodo específico serán usados como columnas del archivo importado. Este es un ejemplo de la ruta: yml_catalog/shop/offers/offer"
 
 msgctxt "Languages::advanced_import.fetching_schema_failed_check_target_node"
 msgid "Please make sure that the <b>XML target node</b> field is filled in properly."
-msgstr "Por favor asegúrate que el archivo <b>XML target node</b> sea importado correctamente."
+msgstr "Por favor, asegúrate de que el archivo <b>XML target node</b> sea importado correctamente."
 
 msgctxt "Languages::advanced_import.general_settings"
 msgid "General settings"
@@ -294,7 +298,7 @@ msgstr "Borrar imágenes adicionales existentes"
 
 msgctxt "Languages::advanced_import.delete_additional_images_tooltip"
 msgid "If you enable this setting, then the existing additional images of the imported products will be replaced with the images specified in the imported file (if no images are specified, the old images will remain). If the setting is disabled, the new additional images will simply be added to the existing images."
-msgstr "Si se habilita esta configuración, entonces las imágenes adicionales existentes de los productos importados se reemplazarán por las imágenes especificadas en el archivo importado (si las imágenes no se especifican, las imágenes anteriores permanecerán). Si la configuración esta desactivada, las imágenes nuevas seleccionadas serán simplemente agregadas a las imágenes existentes."
+msgstr "Si se habilita esta configuración, las imágenes adicionales existentes de los productos importados se reemplazarán por las imágenes especificadas en el archivo importado (si no se han especificado imágenes, las imágenes anteriores permanecerán). Si la configuración esta desactivada, las imágenes nuevas seleccionadas serán simplemente agregadas a las imágenes existentes."
 
 msgctxt "Languages::advanced_import.fetching_schema_failed_check_file"
 msgid "Before you can run the import, please make sure that:<ul><li>You have created the import preset by using the Create button. If you see Save instead of Create, then you've already done that.</li><li>You have specified the correct XML target node on the File tab and saved the preset.</li><li>You have matched the imported information with the product properties in CS-Cart on the Fields mapping tab and saved the preset.</li></ul>If you see this message, you haven't completed point 1 or 2."
@@ -302,11 +306,11 @@ msgstr "Antes de ejecutar importar, por favor asegúrate de que:<ul><li>hayas cr
 
 msgctxt "Languages::advanced_import.test_import"
 msgid "Perform test import"
-msgstr "Ejecuta la importación de la prueba"
+msgstr "Ejecuta el test de importación"
 
 msgctxt "Languages::advanced_import.test_import_tooltip"
 msgid "If you enable this setting, only the first [n] product will be processed.|If you enable this setting, only the first [n] products will be processed."
-msgstr "Si activas este ajuste, solo el primer producto [n] será procesado.|Si activas este ajuste, solo uno de los productos [n] será procesado."
+msgstr "Si activa este ajuste, sólo el primer [n] producto será procesado.|Si activas este ajuste, sólo los primeros [n] serán procesados."
 
 msgctxt "Languages::advanced_import.import_strategy"
 msgid "Import strategy"
@@ -318,7 +322,7 @@ msgstr "Si seleccionas \"Actualizar solo productos existentes\", los productos q
 
 msgctxt "Languages::advanced_import.import_all"
 msgid "Import all products from the file"
-msgstr "Importart todos los productos del archivo"
+msgstr "Importar todos los productos del archivo"
 
 msgctxt "Languages::advanced_import.create_new_products_only"
 msgid "Create new products only"
@@ -338,9 +342,45 @@ msgstr "Puedes ejecutar la importación automáticamente en ciertos intervalos d
 
 msgctxt "Languages::advanced_import.cannot_detect_csv_delimiter"
 msgid "Cannot detect delimiter automatically. Please specify the correct delimiter manually in the additional settings on the \"File\" tab."
-msgstr "No se puede detectar el delimitador automáticamente. Por favor especifica el delimitador correcto manualmente en los ajustes adicionales en la pestaña de \"archivo\"."
+msgstr "No se puede detectar el delimitador automáticamente. Por favor, especifica el delimitador correcto manualmente en los ajustes adicionales en la pestaña de \"archivo\"."
 
 msgctxt "Languages::advanced_import.incorrect_delimiter"
 msgid "Specified (or auto detected) delimiter seems to be incorrect. Please specify the correct delimiter manually in the additional settings on the \"File\" tab."
-msgstr "El delimitador especificado (o auto detectado) parece estar incorrecto. Por favor especifica el correcto manualmente en los ajistes adicionales en la pestaña de \"archivo\"."
+msgstr "El delimitador especificado (o auto detectado) parece ser incorrecto. Por favor, especifica el correcto manualmente en los ajistes adicionales en la pestaña de \"archivo\"."
+
+msgctxt "Languages::advanced_import.file_will_be_deleted_are_you_sure_to_proceed"
+msgid "Deleting this import preset will also delete the file attached to it. Are you sure you want to proceed?"
+msgstr "Al eliminar este preajuste de importación también se eliminará el archivo adjunto. ¿Está seguro que desea continuar?"
+
+msgctxt "Languages::advanced_import.common_preset"
+msgid "All vendors"
+msgstr ""
+
+msgctxt "Languages::advanced_import.your_presets"
+msgid "Vendor's presets"
+msgstr "Preajustes del vendedor"
+
+msgctxt "Languages::advanced_import.common_presets"
+msgid "Marketplace presets"
+msgstr "Preajustes del Marketplace"
+
+msgctxt "Languages::advanced_import.file_not_loaded"
+msgid "File was not loaded. Please reload the page and try again."
+msgstr "El archivo no fue cargado. Vuelva a cargar la página e inténtelo nuevamente."
+
+msgctxt "Languages::advanced_import.local_file_selected"
+msgid "Local file selected"
+msgstr ""
+
+msgctxt "Languages::advanced_import.text_popup_file_editor_notice_full_link"
+msgid "You can upload and download files via <a class=\"advanced-import-file-editor-opener\" data-target-input-id=\"[target]\">[link_text]</a>"
+msgstr ""
+
+msgctxt "Languages::advanced_import.file_extension_was_not_supported_by_owner"
+msgid "Couldn't use your file [name]. This import preset only allows the following extensions: [ext]."
+msgstr ""
+
+msgctxt "Languages::advanced_import.save_selected_file"
+msgid "Save selected file"
+msgstr ""
 

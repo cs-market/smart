@@ -49,13 +49,14 @@
 <div class="control-group">
     <label class="control-label" for="ship_ups_pickup_type">{__("ship_ups_pickup_type")}</label>
     <div class="controls">
-    <select id="ship_ups_pickup_type" name="shipping_data[service_params][pickup_type]">
-        <option value="01" {if $shipping.service_params.pickup_type == "01"}selected="selected"{/if}>{__("ship_ups_pickup_type_01")}</option>
-        <option value="03" {if $shipping.service_params.pickup_type == "03"}selected="selected"{/if}>{__("ship_ups_pickup_type_03")}</option>
-        <option value="06" {if $shipping.service_params.pickup_type == "06"}selected="selected"{/if}>{__("ship_ups_pickup_type_06")}</option>
-        <option value="19" {if $shipping.service_params.pickup_type == "19"}selected="selected"{/if}>{__("ship_ups_pickup_type_19")}</option>
-        <option value="20" {if $shipping.service_params.pickup_type == "20"}selected="selected"{/if}>{__("ship_ups_pickup_type_20")}</option>
-    </select>
+        <select id="ship_ups_pickup_type" name="shipping_data[service_params][pickup_type]">
+            <option value="01" {if $shipping.service_params.pickup_type == "01"}selected="selected"{/if}>{__("ship_ups_pickup_type_01")}</option>
+            <option value="03" {if $shipping.service_params.pickup_type == "03"}selected="selected"{/if}>{__("ship_ups_pickup_type_03")}</option>
+            <option value="06" {if $shipping.service_params.pickup_type == "06"}selected="selected"{/if}>{__("ship_ups_pickup_type_06")}</option>
+            <option value="19" {if $shipping.service_params.pickup_type == "19"}selected="selected"{/if}>{__("ship_ups_pickup_type_19")}</option>
+            <option value="20" {if $shipping.service_params.pickup_type == "20"}selected="selected"{/if}>{__("ship_ups_pickup_type_20")}</option>
+        </select>
+        <p class="muted description">{__("tt_views_shippings_components_services_ups_ship_ups_pickup_type")}</p>
     </div>
 </div>
 

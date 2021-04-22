@@ -14,7 +14,7 @@
 
 use Tygh\Http;
 use Tygh\Registry;
-use Tygh\Mailer;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -52,7 +52,6 @@ function fn_add_users_to_unisender($user_ids, $notify = true)
 
     $post = array(
         'api_key' => $api_key,
-        'double_optin' => '1'
     );
 
     $post['field_names'] = fn_unisender_get_export_fields();
@@ -88,7 +87,6 @@ function fn_unisender_subscribe($user_data, $list_id, $activated = false)
             'api_key' => $api_key,
             'fields' => fn_uniseder_get_fields($user_data, $user_field),
             'request_ip' => $ip['host'],
-            'request_time' => date('Y-m-d H:m:s', TIME),
             'overwrite' => 2,
             'double_optin' => '0',
             'list_ids' => $list_id,
@@ -170,10 +168,12 @@ function fn_unisender_get_enabled_lists()
 
     $enable_lists = array();
 
-    foreach ($lists as $key => $data) {
-        if ($list_id == $key) {
-            $enable_lists[$key]['title'] = $lists[$key];
-            $enable_lists[$key]['list_id'] = $key;
+    if ($list_id) {
+        foreach ($lists as $key => $data) {
+            if ($list_id == $key) {
+                $enable_lists[$key]['title'] = $lists[$key];
+                $enable_lists[$key]['list_id'] = $key;
+            }
         }
     }
 
@@ -227,22 +227,30 @@ function fn_unisender_api($method, $post, &$response, $notify = true)
         }
         $response = __('no_response');
 
-    } elseif (!empty($_result['error']) && AREA != 'C') {
+    } elseif (!empty($_result['error'])) {
 
-        $error_text = __('error_message_not_sent') . ' Unisender: ' . $_result['error'];
+        if (AREA != 'C') {
+            $error_text = __('error_message_not_sent') . ' Unisender: ' . $_result['error'];
 
-        if ($_result['code'] == 'invalid_api_key') {
-            $error_text = 'Unisender: ' . __('addons.rus_unisender.invalid_api_key');
+            if ($_result['code'] == 'invalid_api_key') {
+                $error_text = 'Unisender: ' . __('addons.rus_unisender.invalid_api_key');
 
-        } elseif ($_result['error'] == 'ZS140227-02') {
-            $error_text = __('addons.rus_unisender.error_ZS140227_02');
+            } elseif ($_result['error'] == 'ZS140227-02') {
+                $error_text = __('addons.rus_unisender.error_ZS140227_02');
 
-        } elseif ($_result['error'] == 'AK100311-03') {
-            $error_text = __('addons.rus_unisender.error_AK100311_03');
-        }
+            } elseif ($_result['error'] == 'AK100311-03') {
+                $error_text = __('addons.rus_unisender.error_AK100311_03');
+            }
 
-        if ($notify) {
-            fn_set_notification('E', __('notice'), $error_text);
+            if ($notify) {
+                fn_set_notification('E', __('notice'), $error_text);
+            }
+        } else {
+            $error_text = __('addons.rus_unisender.errors_logging', [
+                '[api_method]' => (string)$method,
+                '[error]'      => $_result['error']
+            ]);
+            fn_log_event('general', 'runtime', ['message' => $error_text]);
         }
 
         $response = $error_text;
@@ -287,28 +295,87 @@ function fn_rus_unisender_send_sms($text_sms, $phone, $order_id = 0, $status_to 
         }
 
         if ($send_sms) {
-            if (!fn_unisender_api('sendSms', $post, $response)) {
-                if (AREA == 'C') {
-                    $email = Registry::get('settings.Company.company_site_administrator');
-                    Mailer::sendMail(array(
-                        'to' => $email,
-                        'from' => 'company_site_administrator',
-                        'data' => array(
-                            'phone' => $phone,
-                            'error' => $response
-                        ),
-                        'tpl' => 'addons/rus_unisender/unisender.tpl',
-                        'company_id' => fn_get_company_id('orders', 'order_id', $order_id),
-                    ), 'C', CART_LANGUAGE);
-                }
-
-            } elseif (AREA != 'C') {
-                fn_set_notification('N', __('notice'), __('sent'));
-            }
+            $company_id = fn_get_company_id('orders', 'order_id', $order_id);
+            fn_rus_unisender_dispatch_sms($post, $company_id, $phone);
         }
     }
 
     return false;
+}
+
+/**
+ * Sends a sms message to customer when shipment type was changed
+ *
+ * @param string $text_sms  Text of sms message
+ * @param string $phone     Customer phone number
+ * @param int    $order_id  Order identifier
+ * @param string $status_to Shipment status (one char)
+ *
+ * @return bool True if sms sent successfully, false otherwise
+ */
+function fn_rus_unisender_send_sms_shipment($text_sms, $phone, $order_id = 0, $status_to = '')
+{
+    if (!empty($phone)) {
+        $post = [
+            'api_key' => Registry::get('addons.rus_unisender.api_key'),
+            'sender' => fn_substr(Registry::get('addons.rus_unisender.sender'), 0, 11),
+            'phone' => fn_unisender_format_phone($phone),
+        ];
+
+        $send_sms = false;
+
+        if ($order_id == 0) {
+            $post['text'] = $text_sms;
+            $send_sms = true;
+
+        } elseif ($status_to) {
+            $post['text'] = str_replace('[status]', fn_get_simple_statuses(STATUSES_SHIPMENT)[$status_to], $text_sms);
+            $send_sms = true;
+
+        }
+
+        if ($send_sms) {
+            $company_id = fn_get_company_id('orders', 'order_id', $order_id);
+            fn_rus_unisender_dispatch_sms($post, $company_id, $phone);
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Processes sending a sms message
+ *
+ * @param array  $post       Array of sending data
+ * @param int    $company_id Company identifier
+ * @param string $phone      Customer phone number
+ *
+ * @return void
+ */
+function fn_rus_unisender_dispatch_sms($post, $company_id, $phone)
+{
+    if (!fn_unisender_api('sendSms', $post, $response)) {
+        if (AREA == 'C') {
+            $email = Registry::get('settings.Company.company_site_administrator');
+
+            /** @var \Tygh\Mailer\Mailer $mailer */
+            $mailer = Tygh::$app['mailer'];
+
+            $mailer->send([
+                'to' => $email,
+                'from' => 'company_site_administrator',
+                'data' => [
+                    'phone' => $phone,
+                    'error' => $response
+                ],
+                'tpl' => 'addons/rus_unisender/unisender.tpl',
+                'company_id' => $company_id,
+            ], 'C', CART_LANGUAGE);
+        }
+
+    } elseif (AREA != 'C') {
+        fn_set_notification('N', __('notice'), __('sent'));
+    }
 }
 
 function fn_settings_variants_addons_rus_unisender_order_status_sms()
@@ -370,7 +437,10 @@ function fn_rus_unisender_place_order($order_id, $action, $order_status, $cart, 
 
             if (!fn_unisender_api('sendSms', $post, $response)) {
                 $email = Registry::get('settings.Company.company_site_administrator');
-                Mailer::sendMail(array(
+                /** @var \Tygh\Mailer\Mailer $mailer */
+                $mailer = Tygh::$app['mailer'];
+
+                $mailer->send(array(
                     'to' => $email,
                     'from' => 'company_site_administrator',
                     'data' => array(
@@ -632,3 +702,16 @@ function fn_unisender_compatibility($unisender_fields, $field)
 
     return false;
 }
+
+function fn_rus_unisender_tools_change_status($params, $result)
+{
+    $addon_settings = Registry::get('addons.rus_unisender');
+    if ($addon_settings['send_sms_user_shipment'] === YesNo::YES && isset($params['notify_unisender_users']) && $params['notify_unisender_users'] === YesNo::YES) {
+        list($shipments, ) = fn_get_shipments_info($params);
+        $order_id = reset($shipments)['order_id'];
+        $order_info = fn_get_order_info($order_id, false, true, true);
+        $text = str_replace('[order_id]', $order_id, $addon_settings['send_sms_user_text_shipment']);
+        fn_rus_unisender_send_sms_shipment($text, $order_info['phone'], $order_id, $params['status']);
+    }
+}
+

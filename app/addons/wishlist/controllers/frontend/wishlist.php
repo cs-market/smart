@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 Tygh::$app['view']->assign('added_products', $added_products);
 
-                if (Registry::get('settings.General.allow_anonymous_shopping') == 'hide_price_and_add_to_cart') {
+                if (Registry::get('settings.Checkout.allow_anonymous_shopping') == 'hide_price_and_add_to_cart') {
                     Tygh::$app['view']->assign('hide_amount', true);
                 }
 
@@ -223,33 +223,11 @@ function fn_add_product_to_wishlist($product_data, &$wishlist, &$auth)
             $_id = fn_generate_cart_id($product_id, $data['extra']);
 
             $_data = db_get_row('SELECT is_edp, options_type, tracking FROM ?:products WHERE product_id = ?i', $product_id);
+            $_data = fn_normalize_product_overridable_fields($_data);
+
             $data['is_edp'] = $_data['is_edp'];
             $data['options_type'] = $_data['options_type'];
             $data['tracking'] = $_data['tracking'];
-
-            // Check the sequential options
-            if (!empty($data['tracking']) && $data['tracking'] == ProductTracking::TRACK_WITH_OPTIONS && $data['options_type'] == 'S') {
-                $inventory_options = db_get_fields("SELECT a.option_id FROM ?:product_options as a LEFT JOIN ?:product_global_option_links as c ON c.option_id = a.option_id WHERE (a.product_id = ?i OR c.product_id = ?i) AND a.status = 'A' AND a.inventory = 'Y'", $product_id, $product_id);
-
-                $sequential_completed = true;
-                if (!empty($inventory_options)) {
-                    foreach ($inventory_options as $option_id) {
-                        if (!isset($data['product_options'][$option_id]) || empty($data['product_options'][$option_id])) {
-                            $sequential_completed = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (!$sequential_completed) {
-                    fn_set_notification('E', __('error'), __('select_all_product_options'));
-                    // Even if customer tried to add the product from the catalog page, we will redirect he/she to the detailed product page to give an ability to complete a purchase
-                    $redirect_url = fn_url('products.view?product_id=' . $product_id . '&combination=' . fn_get_options_combination($data['product_options']));
-                    $_REQUEST['redirect_url'] = $redirect_url; //FIXME: Very very very BAD style to use the global variables in the functions!!!
-
-                    return false;
-                }
-            }
 
             $wishlist_ids[] = $_id;
             $wishlist['products'][$_id]['product_id'] = $product_id;

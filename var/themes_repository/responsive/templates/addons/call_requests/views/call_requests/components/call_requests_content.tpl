@@ -4,6 +4,7 @@
 {hook name="call_requests:call_requests_form"}
 <input type="hidden" name="result_ids" value="{$id}" />
 <input type="hidden" name="return_url" value="{$config.current_url}" />
+<input type="hidden" name="company_id" value="{$company_id}" />
 
 {if $product}
     <input type="hidden" name="call_data[product_id]" value="{$product.product_id}" />
@@ -23,8 +24,8 @@
 </div>
 
 <div class="ty-control-group">
-    <label for="call_data_{$id}_phone" class="ty-control-group__title cm-cr-mask-phone-lbl{if !$product} cm-required{/if}">{__("phone")}</label>
-    <input id="call_data_{$id}_phone" class="ty-input-text-full cm-cr-mask-phone ty-inputmask-bdi" size="50" type="text" name="call_data[phone]" value="{$call_data.phone}" />
+    <label for="call_data_{$id}_phone" class="ty-control-group__title cm-mask-phone-label{if !$product} cm-required{/if}">{__("phone")}</label>
+    <input id="call_data_{$id}_phone" class="ty-input-text-full cm-mask-phone ty-inputmask-bdi" size="50" type="text" name="call_data[phone]" value="{$call_data.phone}" data-enable-custom-mask="true" />
 </div>
 
 {if $product}

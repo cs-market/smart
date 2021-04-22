@@ -13,6 +13,7 @@
  ****************************************************************************/
 
 namespace Tygh\Enum;
+
 use Tygh\Addons\RusTaxes\TaxType;
 
 /**
@@ -22,18 +23,65 @@ use Tygh\Addons\RusTaxes\TaxType;
  */
 class YandexCheckpointVatTypes
 {
-    // no VAT
+    /**
+     * No VAT
+     *
+     * @var int
+     */
     const VAT_NONE = 1;
-    // 0% rate
+
+    /**
+     * VAT 0%
+     *
+     * @var int
+     */
     const VAT_0 = 2;
-    // 10% rate
+
+    /**
+     * VAT 10%
+     *
+     * @var int
+     */
     const VAT_10 = 3;
-    // 18% rate
+
+    /**
+     * VAT 18%
+     *
+     * @var int
+     *
+     * @deprecated since 4.9.2.SP2
+     */
     const VAT_18 = 4;
-    // 10/100 rate
+
+    /**
+     * VAT 20%
+     *
+     * @var int
+     */
+    const VAT_20 = 4;
+
+    /**
+     * VAT 10/100
+     *
+     * @var int
+     */
     const VAT_10_110 = 5;
-    // 18/118 rate
+
+    /**
+     * VAT 18/118
+     *
+     * @var int
+     *
+     * @deprecated since 4.9.2.SP2
+     */
     const VAT_18_118 = 6;
+
+    /**
+     * VAT 20/120
+     *
+     * @var int
+     */
+    const VAT_20_120 = 6;
 
     /**
      * Provides IDs of possible VAT types.
@@ -42,14 +90,16 @@ class YandexCheckpointVatTypes
      */
     public static function getAll()
     {
-        return array(
+        return [
             self::VAT_NONE   => self::VAT_NONE,
             self::VAT_0      => self::VAT_0,
             self::VAT_10     => self::VAT_10,
             self::VAT_18     => self::VAT_18,
+            self::VAT_20     => self::VAT_20,
             self::VAT_10_110 => self::VAT_10_110,
             self::VAT_18_118 => self::VAT_18_118,
-        );
+            self::VAT_20_120 => self::VAT_20_120,
+        ];
     }
 
     /**
@@ -61,14 +111,16 @@ class YandexCheckpointVatTypes
      */
     public static function getTaxTypeByBaseType($base_type)
     {
-        $map = array(
-            TaxType::NONE => self::VAT_NONE,
-            TaxType::VAT_0 => self::VAT_0,
-            TaxType::VAT_10 => self::VAT_10,
-            TaxType::VAT_18 => self::VAT_18,
+        $map = [
+            TaxType::NONE    => self::VAT_NONE,
+            TaxType::VAT_0   => self::VAT_0,
+            TaxType::VAT_10  => self::VAT_10,
+            TaxType::VAT_18  => self::VAT_18,
+            TaxType::VAT_20  => self::VAT_20,
             TaxType::VAT_110 => self::VAT_10_110,
             TaxType::VAT_118 => self::VAT_18_118,
-        );
+            TaxType::VAT_120 => self::VAT_20_120,
+        ];
 
         return isset($map[$base_type]) ? $map[$base_type] : self::VAT_NONE;
     }

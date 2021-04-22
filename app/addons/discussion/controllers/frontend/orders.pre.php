@@ -12,34 +12,40 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
+use Tygh\Enum\Addons\Discussion\DiscussionTypes;
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($mode == 'initiate_discussion' && !empty($_REQUEST['order_id'])) {
+if ($mode === 'initiate_discussion' && !empty($_REQUEST['order_id'])) {
+    $order_info = fn_get_order_info((int) $_REQUEST['order_id']);
 
-    $_data = array(
-        'object_id' => $_REQUEST['order_id'],
-        'object_type' => 'O',
-        'type' => 'C'
-    );
+    $_data = [
+        'object_id'   => $_REQUEST['order_id'],
+        'object_type' => DiscussionObjectTypes::ORDER,
+        'type'        => DiscussionTypes::TYPE_COMMUNICATION,
+        'company_id'  => empty($order_info['company_id']) ? 0 : $order_info['company_id']
+    ];
 
     if (fn_discussion_check_thread_permissions($_data, $auth)) {
-        $discussion = fn_get_discussion($_REQUEST['order_id'], 'O');
+        $discussion = fn_get_discussion($_REQUEST['order_id'], DiscussionObjectTypes::ORDER);
+
         if (!empty($discussion['thread_id'])) {
-            db_query("UPDATE ?:discussion SET ?u WHERE thread_id = ?i", $_data, $discussion['thread_id']);
+            db_query('UPDATE ?:discussion SET ?u WHERE thread_id = ?i', $_data, $discussion['thread_id']);
         } else {
             if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
                 $_data['company_id'] = Registry::get('runtime.company_id');
             }
-            db_query("REPLACE INTO ?:discussion ?e", $_data);
+            db_replace_into('discussion', $_data);
         }
     } else {
-        fn_set_notification('E', __('error'), __('cant_find_thread'));
+        fn_set_notification(NotificationSeverity::ERROR, __('error'), __('cant_find_thread'));
     }
 
-    return array(
+    return [
         CONTROLLER_STATUS_REDIRECT, 'orders.details?selected_section=discussion&order_id=' . $_REQUEST['order_id']
-    );
+    ];
 
 }

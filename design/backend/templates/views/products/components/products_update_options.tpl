@@ -1,62 +1,43 @@
 {capture name="extra"}
-    {if $global_options}
-        {capture name="add_global_option"}
-            <form action="{""|fn_url}" method="post" enctype="multipart/form-data" name="apply_global_option" class="form-horizontal form-edit">
-                <input type="hidden" name="product_id" value="{$smarty.request.product_id}" />
-                <input type="hidden" name="selected_section" value="options" />
-
-                <div class="control-group">
-                    <label class="control-label" for="global_option_id">{__("global_options")}</label>
-                    <div class="controls">
-                        <select name="global_option[id]" id="global_option_id">
-                            {foreach from=$global_options item="option_" key="id"}
-                                <option value="{$option_.option_id}">{$option_.option_name}{if $option_.internal_option_name} / {$option_.internal_option_name}{/if}{if $option_.company_id} ({__("vendor")}: {$option_.company_id|fn_get_company_name}){/if}</option>
-                            {/foreach}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label class="control-label" for="global_option_link">{__("apply_as_link")}</label>
-                    <div class="controls">
-                        <input type="hidden" name="global_option[link]" value="N" />
-                        <input type="checkbox" name="global_option[link]" id="global_option_link" value="Y"/>
-                    </div>
-                </div>
-
-                <div class="buttons-container">
-                    {include file="buttons/save_cancel.tpl" but_text=__("apply") but_name="dispatch[products.apply_global_option]" cancel_action="close"}
-                </div>
-
-            </form>
-        {/capture}
-        <div class="pull-right shift-left">
-            {include file="common/popupbox.tpl" id="add_global_option" text=__("add_global_option") content=$smarty.capture.add_global_option link_text=__("add_global_option") act="general" icon="icon-plus"}
-        </div>
-    {/if}
+    {$enable_search = $enable_search|default:false}
 
     <div class="pull-left">
+        {if !$enable_search}
+        <div class="object-selector object-selector--options">
+            <select id="option_add"
+                    class="cm-object-selector"
+                    form="form"
+                    {if $tabindex}
+                        tabindex="{$tabindex}"
+                    {/if}
+                    multiple
+                    name="product_data[linked_option_ids][]"
+                    data-ca-enable-search="true"
+                    data-ca-load-via-ajax="true"
+                    data-ca-escape-html="false"
+                    data-ca-close-on-select="false"
+                    data-ca-page-size="10"
+                    data-ca-data-url="{"product_options.get_available_options_list?product_id=`$smarty.request.product_id`"|fn_url nofilter}"
+                    data-ca-placeholder="{__("link_an_existing_option")}"
+                    data-ca-allow-clear="false"
+            >
+            </select>
+        </div>
+        {/if}
+
         {if $product_options}
             {hook name="products:update_product_options_actions"}
 
-            {if $product_data.exceptions_type == "F"}
+            {if $product_data.exceptions_type === "ProductOptionsExceptionsTypes::FORBIDDEN"|enum}
                 {assign var="except_title" value=__("forbidden_combinations")}
             {else}
                 {assign var="except_title" value=__("allowed_combinations")}
             {/if}
             {include file="buttons/button.tpl" but_text=$except_title but_href="product_options.exceptions?product_id=`$product_data.product_id`" but_meta="btn" but_role="text"}
 
-            {if $has_inventory}
-                {include file="buttons/button.tpl" but_text=__("option_combinations") but_href="product_options.inventory?product_id=`$product_data.product_id`" but_meta="btn"  but_role="text"}
-            {else}
-                {capture name="notes_picker"}
-                    {__("text_options_no_inventory")}
-                {/capture}
-                {include file="common/popupbox.tpl" act="button" id="content_option_combinations" text=__("note") content=$smarty.capture.notes_picker link_text=__("option_combinations") but_href="product_options.inventory?product_id=`$product_data.product_id`" but_role="text" extra_act="notes"}
-            {/if}
             {/hook}
         {/if}
     </div>
 {/capture}
 
-{include file="views/product_options/manage.tpl" object="product" extra=$smarty.capture.extra product_id=$smarty.request.product_id view_mode="embed"}
+{include file="views/product_options/manage.tpl" object="product" extra=$smarty.capture.extra product_id=$smarty.request.product_id view_mode="embed" enable_search=$enable_search}

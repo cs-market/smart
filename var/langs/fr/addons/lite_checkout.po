@@ -1,0 +1,89 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
+
+msgctxt "Addons::name::lite_checkout"
+msgid "Lite checkout"
+msgstr "Lite checkout"
+
+msgctxt "Addons::description::lite_checkout"
+msgid "Enables single page light-weight checkout experience"
+msgstr "Enables single page light-weight checkout experience"
+
+msgctxt "Languages::lite_checkout.customer_information"
+msgid "Customer"
+msgstr "Customer"
+
+msgctxt "Languages::lite_checkout.personal_name"
+msgid "Name"
+msgstr "Name"
+
+msgctxt "Languages::lite_checkout.city_and_state"
+msgid "City, state"
+msgstr "City, state"
+
+msgctxt "Languages::lite_checkout.place_an_order_for"
+msgid "Place order ([amount])"
+msgstr "Place order ([amount])"
+
+msgctxt "Languages::lite_checkout.is_address_required"
+msgid "Сustomer must specifiy his/her address"
+msgstr "Сustomer must specifiy his/her address"
+
+msgctxt "Languages::lite_checkout.delivery_note"
+msgid "Customer's notes"
+msgstr "Customer's notes"
+
+msgctxt "Languages::lite_checkout.login_to_autocomplete_address"
+msgid "Sign in to automatically use the address from your account"
+msgstr "Sign in to automatically use the address from your account"
+
+msgctxt "Languages::lite_checkout.demo.payments.cod"
+msgid "Cash on delivery"
+msgstr "Cash on delivery"
+
+msgctxt "Languages::lite_checkout.demo.payments.phone_ordering"
+msgid "Phone ordering"
+msgstr "Phone ordering"
+
+msgctxt "Languages::lite_checkout.demo.payments.cc"
+msgid "Credit card"
+msgstr "Credit card"
+
+msgctxt "Languages::lite_checkout.demo.payments.sberbank"
+msgid "Sberbank"
+msgstr "Sberbank"
+
+msgctxt "Languages::lite_checkout.demo.shippings.sdek"
+msgid "SDEK pickup"
+msgstr "SDEK pickup"
+
+msgctxt "Languages::lite_checkout.demo.shippings.pochta_ru"
+msgid "Russian Post"
+msgstr "Russian Post"
+
+msgctxt "Languages::lite_checkout.shippings.show_all_on_map"
+msgid "Show all on map"
+msgstr "Show all on map"
+
+msgctxt "Languages::lite_checkout.nearest_station"
+msgid "Nearest station"
+msgstr "Nearest station"
+
+msgctxt "Languages::lite_checkout.select_pickup_item"
+msgid "Select the item of pickup"
+msgstr "Select the item of pickup"
+
+msgctxt "Languages::lite_checkout.choose_from_list"
+msgid "Choose from list"
+msgstr "Choose from list"
+
+msgctxt "Languages::lite_checkout.use_two_fingers_for_move_map"
+msgid "Use two fingers to move the map"
+msgstr "Use two fingers to move the map"
+
+msgctxt "Languages::lite_checkout.set_location"
+msgid "Set location"
+msgstr "Set location"

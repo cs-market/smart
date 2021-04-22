@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: pl\n"
-"X-Crowdin-File: /release-4.8.2/addons/hybrid_auth.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:08\n"
+"X-Crowdin-File: /release-4.12.2/addons/hybrid_auth.po\n"
+"X-Crowdin-File-ID: 4084\n"
+"PO-Revision-Date: 2021-02-01 09:10\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
@@ -169,12 +169,16 @@ msgid "Test mode"
 msgstr "Tryb testowy"
 
 msgctxt "Languages::privileges.manage_providers"
-msgid "Manage social login providers"
-msgstr "Zarządzanie logowaniem do portali społecznościowych"
+msgid "Can edit"
+msgstr "Można edytować"
 
 msgctxt "Languages::privileges.view_providers"
-msgid "View social login providers"
-msgstr "Przeglądanie logowania do portali społecznościowych"
+msgid "Can view"
+msgstr "Można przeglądać"
+
+msgctxt "Languages::privilege_groups.social_login"
+msgid "Social login"
+msgstr "Logowanie do portali społecznościowych"
 
 msgctxt "Languages::hybrid_auth.instruction_facebook"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developers.facebook.com/apps' target='_blank'>Facebook Developers</a>."
@@ -231,4 +235,28 @@ msgstr "<p>Musieliśmy przenieść się do nowszej wersji interfejsu Facebook AP
 msgctxt "Languages::hybrid_auth.facebook_oauth_redirect_uris"
 msgid "Valid OAuth redirect URIs"
 msgstr "OAuth prawidłowe przekierowanie URI"
+
+msgctxt "Languages::hybrid_auth.live_redirect_urls"
+msgid "Redirect URLs"
+msgstr "Przekierowania URL"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_version"
+msgid "API version"
+msgstr "Wersja API"
+
+msgctxt "Languages::ttc_hybrid_auth.linkedin_api_version"
+msgid "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">deprecated API v1</a>, but old apps still use it. If you're configuring LinkedIn app for the first time now, use API v2. Old LinkedIn apps configured some time ago may still be using v1."
+msgstr "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\"> przestarzałe API v1 </a>, ale stare aplikacje nadal go używają. Jeśli konfigurujesz aplikację LinkedIn po raz pierwszy, użyj interfejsu API v2. Stare aplikacje LinkedIn skonfigurowane jakiś czas temu mogą nadal korzystać z v1."
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v1"
+msgid "v1"
+msgstr "v1"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v2"
+msgid "v2"
+msgstr "v2"
+
+msgctxt "Languages::hybrid_auth.instruction_paypal_application"
+msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
+msgstr "Użyj identyfikatora aplikacji i tajnego klucza, które otrzymałeś po utworzeniu aplikacji na <a href='https://developer.paypal.com/developer/applications' target='_blank'>Developers PayPal</a>. Włącz wszystkie atrybuty zakresu profilu osobistego i co najmniej jeden atrybut zakresu w polu Adres i Informacje o koncie w ustawieniach aplikacji PayPal."
 

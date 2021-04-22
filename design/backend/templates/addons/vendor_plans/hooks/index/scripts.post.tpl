@@ -5,3 +5,6 @@ Tygh.$(document).ready(function() {
 });
 </script>
 {/if}
+
+{script src="js/addons/vendor_plans/backend/plan.js"}
+{script src="js/addons/vendor_plans/backend/vendor.js"}

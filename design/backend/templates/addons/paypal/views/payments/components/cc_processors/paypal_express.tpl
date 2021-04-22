@@ -7,8 +7,6 @@
 {include file="addons/paypal/common/connect_to_paypal.tpl"}
 {$suffix = $payment_id|default:0}
 
-<hr>
-
 <div class="control-group">
     <label class="control-label" for="currency{$suffix}">{__("currency")}:</label>
     <div class="controls">
@@ -36,6 +34,7 @@
         <div class="controls">
             <input type="hidden" name="payment_data[processor_params][in_context]" value="N" />
             <input type="checkbox" name="payment_data[processor_params][in_context]" {if $processor_params.in_context|default:"Y" == "Y"}checked="checked"{/if} id="elm_in_context{$suffix}" value="Y" />
+            <p class="muted description">{__("ttc_paypal_use_in_context_checkout")}</p>
         </div>
     </div>
 
@@ -43,7 +42,7 @@
         <label class="control-label{if $processor_params.in_context|default:"Y" == "Y"} cm-required{/if}" for="elm_merchant_id{$suffix}" id="lbl_merchant_id{$suffix}">{__("merchant_id")}:</label>
         <div class="controls">
             <input type="text" name="payment_data[processor_params][merchant_id]" id="elm_merchant_id{$suffix}" size="24" value="{$processor_params.merchant_id}" >
-            <div class="muted" id="elm_merchant_id_notice{$suffix}">{__("paypal_express_notice")}</div>
+            <div class="muted description" id="elm_merchant_id_notice{$suffix}">{__("paypal_express_notice")}</div>
         </div>
     </div>
 
@@ -111,9 +110,27 @@
         <label class="control-label" for="mode{$suffix}">{__("test_live_mode")}:</label>
         <div class="controls">
             <select name="payment_data[processor_params][mode]" id="mode{$suffix}">
-                <option value="test" {if $processor_params.mode eq "test"} selected="selected"{/if}>{__("test")}</option>
-                <option value="live" {if $processor_params.mode eq "live"} selected="selected"{/if}>{__("live")}</option>
+                <option value="test" {if $processor_params.mode === "test"} selected="selected"{/if}>{__("test")}</option>
+                <option value="live" {if $processor_params.mode === "live"} selected="selected"{/if}>{__("live")}</option>
             </select>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="elm_show_cart_button{$suffix}">{__("paypal.show_cart_button")}:</label>
+        <div class="controls">
+            <input type="hidden"
+                   name="payment_data[processor_params][show_cart_button]"
+                   value="{"YesNo::NO"|enum}"
+            />
+            <input type="checkbox"
+                   name="payment_data[processor_params][show_cart_button]"
+                   {if $processor_params.show_cart_button|default:("YesNo::NO"|enum) === "YesNo::YES"|enum}
+                       checked="checked"
+                   {/if}
+                   id="elm_show_cart_button{$suffix}"
+                   value="{"YesNo::YES"|enum}"
+            />
         </div>
     </div>
 </div>

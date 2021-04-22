@@ -131,7 +131,7 @@ class PayoutsManager
             if ($balance < 0) {
                 $fee = abs($balance);
             } else {
-                $fee = abs(array_sum(fn_array_column($pending_payouts, 'payout_amount')));
+                $fee = abs(array_sum(array_column($pending_payouts, 'payout_amount')));
             }
         }
 

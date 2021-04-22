@@ -95,7 +95,7 @@
                                                 {$smarty.capture.$qty nofilter}
                                             </div>
 
-                                            <div class="ty-grid-list__control">
+                                            <div class="ty-grid-list__control1">
                                                 {if $show_add_to_cart}
                                                     <div class="button-container">
                                                         {assign var="add_to_cart" value="add_to_cart_`$obj_id`"}

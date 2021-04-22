@@ -54,7 +54,7 @@
         {/capture}
 
         <div class="g__item">
-            <span style="padding-left: {$_shift}px;">
+            <span style="padding-{$direction}: {$_shift}px;">
                 {if $cur_cat.has_children || $cur_cat.subcategories}
                     {if $show_all}
                     <span id="on_{$comb_id}" class="cm-combination {if isset($path.$cat_id) || $expand_all}hidden{/if}">
@@ -84,7 +84,11 @@
     <div {if !$expand_all}class="hidden"{/if} id="{$comb_id}">
     {if $cur_cat.subcategories}
         {math equation="x+1" x=$level assign="level"}
-        {include file="views/categories/components/categories_tree_simple.tpl" categories_tree=$cur_cat.subcategories parent_id=false}
+        {include file="views/categories/components/categories_tree_simple.tpl"
+            categories_tree=$cur_cat.subcategories
+            parent_id=false
+            direction=$direction
+        }
         {math equation="x-1" x=$level assign="level"}
     {/if}
     <!--{$comb_id}--></div>

@@ -86,7 +86,7 @@
     <div class="control-group">
         <label for="srch_state" class="control-label">{__("state")}</label>
         <div class="controls">
-            <select id="srch_state" class="cm-state cm-location-search hidden" name="state">
+            <select id="srch_state" class="cm-state cm-location-search hidden" name="state_code">
                 <option value="">- {__("select_state")} -</option>
             </select>
             <input class="cm-state cm-location-search" type="text" id="srch_state_d" name="state" maxlength="64" value="{$search.state}" disabled="disabled"/>
@@ -98,10 +98,11 @@
         <div class="controls">
         <select name="status" id="status">
             <option value="">--</option>
-            <option value="A" {if $search.status == "A"}selected="selected"{/if}>{__("active")}</option>
-            <option value="P" {if $search.status == "P"}selected="selected"{/if}>{__("pending")}</option>
-            <option value="N" {if $search.status == "N"}selected="selected"{/if}>{__("new")}</option>
-            <option value="D" {if $search.status == "D"}selected="selected"{/if}>{__("disabled")}</option>
+            <option value="{"VendorStatuses::ACTIVE"|enum}" {if $search.status == "VendorStatuses::ACTIVE"|enum}selected="selected"{/if}>{__("active")}</option>
+            <option value="{"VendorStatuses::PENDING"|enum}" {if $search.status == "VendorStatuses::PENDING"|enum}selected="selected"{/if}>{__("pending")}</option>
+            <option value="{"VendorStatuses::SUSPENDED"|enum}" {if $search.status == "VendorStatuses::SUSPENDED"|enum}selected="selected"{/if}>{__("suspended")}</option>
+            <option value="{"VendorStatuses::NEW_ACCOUNT"|enum}" {if $search.status == "VendorStatuses::NEW_ACCOUNT"|enum}selected="selected"{/if}>{__("new")}</option>
+            <option value="{"VendorStatuses::DISABLED"|enum}" {if $search.status == "VendorStatuses::DISABLED"|enum}selected="selected"{/if}>{__("disabled")}</option>
         </select>
         </div>
     </div>
@@ -130,12 +131,6 @@
         </div>
     </div>
 
-    <div class="control-group">
-        <label class="control-label" for="elm_fax">{__("fax")}</label>
-        <div class="controls">
-            <input type="text" name="fax" id="elm_fax" value="{$search.fax}" />
-        </div>
-    </div>
     {/if}
     {$smarty.capture.extra_advanced_search nofilter}
 </div>

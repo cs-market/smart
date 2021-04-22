@@ -15,15 +15,35 @@
             <input type="hidden" name="d_redirect_url" value="{$d_url}" />
             <input type="checkbox" name="delete_posts[{$post.post_id}]" id="delete_checkbox_{$post.post_id}"  class="pull-left cm-item" value="Y">
         {/if}
-        <div class="hidden-tools pull-left cm-statuses">
+        <div class="pull-left post__statuses cm-statuses">
             {if "discussion.update"|fn_check_view_permissions}
                 <span class="cm-status-a {if $post.status == "D"}hidden{/if}">
                     <span class="label label-success">{__("approved")}</span>
-                    <a class="cm-status-switch icon-thumbs-down cm-tooltip" title="{__("disapprove")}" data-ca-status="D" data-ca-post-id="{$post.post_id}"></a>
+                    {btn type="text"
+                        id="premoderation_disapprove"
+                        title=__("disapprove")
+                        icon="icon-thumbs-down"
+                        icon_first=true
+                        class="btn post__btn-status-switch cm-status-switch"
+                        data=[
+                            "data-ca-status"=>"D",
+                            "data-ca-post-id"=>$post.post_id
+                        ]
+                    }
                 </span>
                 <span class="cm-status-d {if $post.status == "A"}hidden{/if}">
                     <span class="label label-important">{__("not_approved")}</span>
-                    <a class="cm-status-switch icon-thumbs-up cm-tooltip" title="{__("approve")}" data-ca-status="A" data-ca-post-id="{$post.post_id}"></a>
+                    {btn type="text"
+                        id="premoderation_disapprove"
+                        title=__("approve")
+                        icon="icon-thumbs-up"
+                        icon_first=true
+                        class="btn post__btn-status-switch cm-status-switch"
+                        data=[
+                            "data-ca-status"=>"A",
+                            "data-ca-post-id"=>$post.post_id
+                        ]
+                    }
                 </span>
             {else}
                 <span class="cm-status-{$post.status|lower}">
@@ -35,7 +55,13 @@
                 </span>
             {/if}
             {if "discussion.delete"|fn_check_view_permissions}
-                <a class="icon-trash cm-tooltip cm-confirm cm-post" href="{"discussion.delete?post_id=`$post.post_id`&redirect_url=`$current_redirect_url`"|fn_url}" title="{__("delete")}"></a>
+                {btn type="text"
+                    icon="icon-trash"
+                    title="{__("delete")}"
+                    class="btn post__btn-delete cm-confirm"
+                    method="POST"
+                    href="{"discussion.delete?post_id=`$post.post_id`&redirect_url=`$current_redirect_url`"|fn_url}"
+                }
             {/if}
         </div>
     </div>
@@ -43,7 +69,16 @@
 
     <div class="pull-right">
         <span class="muted">
-            {include file="common/calendar.tpl" date_id="elm_date_holder_`$post.post_id`" date_name="posts[`$post.post_id`][date]" date_val=$post.timestamp|default:$smarty.const.TIME start_year=$settings.Company.company_start_year date_meta="post-date" show_time=true time_name="posts[`$post.post_id`][time]"}
+            {include file="common/calendar.tpl"
+                date_id="elm_date_holder_`$post.post_id`"
+                date_name="posts[`$post.post_id`][date]"
+                date_val=$post.timestamp|default:$smarty.const.TIME
+                start_year=$settings.Company.company_start_year
+                date_meta="post-date"
+                show_time=true
+                time_name="posts[`$post.post_id`][time]"
+                meta_class="review-date"
+            }
             /
             {__("ip_address")}:&nbsp;{$post.ip_address}
         </span>

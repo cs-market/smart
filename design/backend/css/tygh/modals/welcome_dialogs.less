@@ -131,6 +131,8 @@
 }
 
 .restriction-promo {
+    max-width: 900px;
+
     border-radius: 0;
 
     p {
@@ -144,27 +146,22 @@
     .restriction-feature {
         float: left;
         box-sizing: border-box;
-        padding: 0px 10px 10px 120px;
+        padding: 0 10px 10px 5px;
         min-height: 137px;
 
-        &.restriction-feature_storefronts {
-            background: url('../media/images/restriction/storefronts.png') no-repeat;
+        &.restriction-feature_storefronts,
+        &.restriction-feature_storefronts_plus {
             padding-bottom: 40px;
             min-height: 180px;
+            padding-left: 120px;
+        }
+        
+        &.restriction-feature_storefronts {
+            background: url('../media/images/restriction/storefronts.png') no-repeat;
         }
 
         &.restriction-feature_storefronts_plus {
-            background: url('../media/images/restriction/storefronts_plus.png') no-repeat;
-            padding-bottom: 40px;
-            min-height: 180px;
-        }
-
-        &.restriction-feature_facebook-app {
-            background: url('../media/images/restriction/facebook.png') no-repeat;
-        }
-
-        &.restriction-feature_ebay {
-            background: url('../media/images/restriction/ebay.png') no-repeat;
+            background: url('../media/images/restriction/storefronts_plus.png') no-repeat;           
         }
 
         h2 {
@@ -197,10 +194,10 @@
         text-decoration: none;
         color: #fff;
         text-transform: uppercase;
-        background-color: #0088cc;
-        background-image: -moz-linear-gradient( -90deg, #0088cc 0%, #007ab7 100%);
-        background-image: -webkit-linear-gradient( -90deg, #0088cc 0%, #007ab7 100%);
-        background-image: -ms-linear-gradient( -90deg, #0088cc 0%, #007ab7 100%);
+        background-color: @mainColor;
+        background-image: -moz-linear-gradient( -90deg, @mainColor 0%, @mainColor 100%);
+        background-image: -webkit-linear-gradient( -90deg, @mainColor 0%, @mainColor 100%);
+        background-image: -ms-linear-gradient( -90deg, @mainColor 0%, @mainColor 100%);
     }
 
     .restriction-update-btn:hover {
@@ -218,6 +215,10 @@
         padding-left: 10px;
         padding-right: 10px;
     }
+
+    &__buttons {
+        clear: both;
+    }
 }
 
 @media (max-width: 790px) {
@@ -228,7 +229,7 @@
     }
 }
 
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     .restriction-promo {
         &__wrapper {
             width: 100%;

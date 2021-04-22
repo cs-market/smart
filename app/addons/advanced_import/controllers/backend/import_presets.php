@@ -14,85 +14,153 @@
 
 defined('BOOTSTRAP') or die('Access denied');
 
+use Tygh\Addons\AdvancedImport\Exceptions\DownloadException;
 use Tygh\Addons\AdvancedImport\Exceptions\FileNotFoundException;
 use Tygh\Addons\AdvancedImport\Exceptions\ReaderNotFoundException;
 use Tygh\Enum\Addons\AdvancedImport\PresetFileTypes;
-use Tygh\Enum\Addons\AdvancedImport\CsvDelimiters;
+use Tygh\Addons\AdvancedImport\ServiceProvider;
+use Tygh\Enum\NotificationSeverity;
+use Tygh\Enum\YesNo;
 use Tygh\Exceptions\PermissionsException;
 use Tygh\Registry;
 use Tygh\Tools\Url;
 
 /** @var string $mode */
+/** @var string $action */
 
-/** @var \Tygh\Addons\AdvancedImport\Presets\Manager $presets_manager */
-$presets_manager = Tygh::$app['addons.advanced_import.presets.manager'];
+$presets_manager = ServiceProvider::getPresetManager();
 /** @var \Tygh\Addons\AdvancedImport\Presets\Importer $presets_importer */
 $presets_importer = Tygh::$app['addons.advanced_import.presets.importer'];
+/** @var \Tygh\Addons\AdvancedImport\FileManager $file_manager */
+$file_manager = Tygh::$app['addons.advanced_import.file_manager'];
+$current_company = (int) fn_get_runtime_company_id();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+ini_set('auto_detect_line_endings', true);
 
-    /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $file_uploader */
-    $file_uploader = Tygh::$app['addons.advanced_import.readers.factory'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($mode === 'upload') {
+        $file_types = !empty($_REQUEST['type_' . $file_manager::UPLOADED_FILE_NAME]) ? $_REQUEST['type_' . $file_manager::UPLOADED_FILE_NAME] : [];
+        $files = !empty($_REQUEST['file_' . $file_manager::UPLOADED_FILE_NAME]) ? $_REQUEST['file_' . $file_manager::UPLOADED_FILE_NAME] : [];
+        $preset_id = isset($_REQUEST['preset_id']) ? (int) $_REQUEST['preset_id'] : 0;
 
-    if ($mode == 'upload') {
-        $preset = array_merge(array(
-            'preset_id'      => 0,
-            'file_type'      => PresetFileTypes::LOCAL,
-            'file'           => '',
-        ), $_REQUEST);
+        $preset = [
+            'preset_id' => $preset_id,
+            'file_type' => isset($file_types[$preset_id]) ? $file_types[$preset_id] : PresetFileTypes::LOCAL,
+            'file'      => isset($files[$preset_id]) ? $files[$preset_id] : ''
+        ];
 
-        $file = fn_filter_uploaded_data('upload');
+        if ($preset['preset_id']) {
+            $old_preset = $presets_manager->findById($preset['preset_id']);
+        } else {
+            $old_preset = null;
+        }
+
+        if (empty($old_preset)) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        $preset['company_id'] = $old_preset['company_id'];
+        $file = $file_manager->uploadPresetFile($preset);
 
         if ($file) {
-            $preset['preset_id'] = key($file);
             $file = reset($file);
 
-            $preset['file'] = $file['name'];
+            if ($preset['file_type'] === PresetFileTypes::LOCAL) {
+                $preset['file'] = $file['name'];
+            }
             $preset['file_extension'] = fn_advanced_import_get_file_extension_by_mimetype($file['name'], $file['type']);
-            unset($preset['type_upload'], $preset['file_upload']);
         } else {
-            fn_set_notification('E', __('error'), __('error_exim_no_file_uploaded'));
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('error_exim_no_file_uploaded'));
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+
+        if (empty($preset['file_extension']) && !empty($file)) {
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('text_not_allowed_to_upload_file_extension', [
+                '[ext]' => fn_get_file_ext($file['name'])
+            ]));
+
             exit;
+        }
+
+        if ($current_company !== $preset['company_id'] && $preset['file_extension'] !== $old_preset['file_extension']) {
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('advanced_import.file_extension_was_not_supported_by_owner', [
+                '[ext]'  => $old_preset['file_extension'],
+                '[name]' => $preset['file'],
+            ]));
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+
+        if ($preset['file_type'] === PresetFileTypes::LOCAL) {
+            $preset['file'] = $file_manager->moveUpload($file['name'], $file['path'], $current_company);
+        }
+        if ($action === 'detailed') {
+            $redirect_url = Url::buildUrn(['import_presets', 'update'], [
+                'preset_id' => $preset['preset_id'],
+            ]);
         }
 
         $presets_manager->update($preset['preset_id'], $preset);
 
-        list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $preset['preset_id']), false);
-        $preset = reset($presets);
-
-        $file_uploader->moveUpload($preset['file'], $file['path'], $preset['company_id']);
-
-        $redirect_url = Url::buildUrn(array('import_presets', 'manage'), array(
-            'object_type'       => $preset['object_type'],
-            'preview_preset_id' => $preset['preset_id'],
-        ));
+        if (empty($redirect_url)) {
+            $redirect_url = Url::buildUrn(['import_presets', 'manage'], [
+                'object_type' => $old_preset['object_type'],
+            ]);
+        }
 
         Tygh::$app['ajax']->assign('force_redirection', fn_url($redirect_url));
 
-        exit;
-    } elseif ($mode == 'update') {
+        return [CONTROLLER_STATUS_NO_CONTENT];
+    }
+
+    if ($mode === 'update') {
+        $redirect_url = !empty($_REQUEST['preset_id'])
+            ? 'import_presets.update?preset_id=' . $_REQUEST['preset_id']
+            : 'import_presets.add?object_type=' . $_REQUEST['object_type'];
+
+        if (
+            empty($_REQUEST['file']) && (
+                empty($_REQUEST['file_' . $file_manager::UPLOADED_FILE_NAME])
+                || empty(reset($_REQUEST['file_' . $file_manager::UPLOADED_FILE_NAME]))
+                || empty($_REQUEST['type_' . $file_manager::UPLOADED_FILE_NAME])
+                || empty(reset($_REQUEST['type_' . $file_manager::UPLOADED_FILE_NAME]))
+            )
+        ) {
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('error_exim_no_file_uploaded'));
+
+            return [CONTROLLER_STATUS_OK, $redirect_url];
+        }
 
         fn_trusted_vars('fields');
-        $preset = array_merge(array(
+        $preset = array_merge([
             'preset_id'      => 0,
             'file_type'      => PresetFileTypes::LOCAL,
             'file'           => '',
-        ), $_REQUEST);
+        ], $_REQUEST);
 
-        $file = fn_filter_uploaded_data('upload');
+        $file = $file_manager->uploadPresetFile($preset);
 
         if ($file) {
             $file = reset($file);
-
-            $preset['file_type'] = reset($preset['type_upload']);
-            $preset['file'] = reset($preset['file_upload']);
             $preset['file_extension'] = fn_advanced_import_get_file_extension_by_mimetype($file['name'], $file['type']);
-            unset($preset['type_upload'], $preset['file_upload']);            
+            unset($preset['type_upload'], $preset['file_upload']);
+        }
+
+        if (empty($preset['file_extension']) && !empty($file['name'])) {
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('text_not_allowed_to_upload_file_extension', [
+                '[ext]' => fn_get_file_ext($file['name'])
+            ]));
+
+            return [CONTROLLER_STATUS_OK, $redirect_url];
         }
 
         if (isset($preset['options']['images_path'])) {
             $images_directories = fn_advanced_import_get_import_images_directory($preset['company_id'], $preset['options']['images_path']);
             $preset['options']['images_path'] = $images_directories['exim_path'];
+        }
+
+        if ($file && $preset['file_type'] === PresetFileTypes::LOCAL) {
+            // rename temporary file for a preset if exists
+            $preset['file'] = $file_manager->moveUpload($file['name'], $file['path'], $current_company);
         }
 
         if ($preset['preset_id']) {
@@ -101,209 +169,270 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $preset['preset_id'] = $presets_manager->add($preset);
         }
 
-        list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $preset['preset_id']), false);
-        $preset = reset($presets);
-
-        if ($file && $preset['file_type'] == PresetFileTypes::LOCAL) {
-            // rename temporary file for a preset
-            $preset['file'] = $file['name'];
-            $file_uploader->moveUpload($preset['file'], $file['path'], $preset['company_id']);
-            $presets_manager->update($preset['preset_id'], $preset);
-        }
-
         $redirect_url = 'import_presets.update?preset_id=' . $preset['preset_id'];
 
-        if ($action == 'import') {
+        if ($action === 'import') {
             $redirect_url .= '&start_import=1';
         }
 
-        return array(CONTROLLER_STATUS_OK, $redirect_url);
-    } elseif ($mode == 'm_delete') {
+        return [CONTROLLER_STATUS_OK, $redirect_url];
+    }
 
-        $_REQUEST = array_merge(array(
-            'preset_ids'   => array(),
-            'object_type'  => 'products',
-            'redirect_url' => 'import_presets.manage',
-        ), $_REQUEST);
+    if ($mode === 'm_delete') {
+        $_REQUEST = array_merge(
+            [
+                'preset_ids'   => [],
+                'object_type'  => 'products',
+                'redirect_url' => 'import_presets.manage',
+            ],
+            $_REQUEST
+        );
 
         foreach ($_REQUEST['preset_ids'] as $preset_id) {
             $presets_manager->delete($preset_id);
         }
+        Tygh::$app['ajax']->assign('force_redirection', fn_url($_REQUEST['redirect_url']));
+        return [CONTROLLER_STATUS_NO_CONTENT];
+    }
 
-        return array(CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']);
-    } elseif ($mode == 'delete') {
-
-        $_REQUEST = array_merge(array(
-            'preset_id' => 0,
-        ), $_REQUEST);
-
-        list($presets,) = $presets_manager->find(
-            false,
-            array('ip.preset_id' => $_REQUEST['preset_id'])
+    if ($mode === 'delete') {
+        $_REQUEST = array_merge(
+            [
+                'preset_id' => 0,
+                'object_type' => 'products',
+            ],
+            $_REQUEST
         );
-
-        if (!$presets) {
-            return array(CONTROLLER_STATUS_NO_PAGE);
-        }
-
-        $preset = reset($presets);
 
         $presets_manager->delete($_REQUEST['preset_id']);
 
-        return array(CONTROLLER_STATUS_OK, 'import_presets.manage?object_type=' . $preset['object_type']);
-    } elseif ($mode == 'validate_modifier') {
+        return [CONTROLLER_STATUS_OK, 'import_presets.manage?object_type=' . $_REQUEST['object_type']];
+    }
 
-        $params = array_merge(array(
+    if ($mode === 'validate_modifier') {
+        $params = array_merge([
             'modifier' => '',
             'value'    => '',
-            'notify'   => 'Y',
-        ), $_REQUEST);
+            'notify'   => YesNo::YES,
+        ], $_REQUEST);
 
-        $presets_importer->applyModifier($params['value'], $params['modifier'], array());
+        $presets_importer->applyModifier($params['value'], $params['modifier'], []);
 
         Tygh::$app['ajax']->assign('is_valid', !fn_notification_exists('type', 'E'));
 
-        if ($params['notify'] === 'N') {
+        if ($params['notify'] === YesNo::NO) {
             fn_get_notifications();
         }
 
-        exit;
+        return [CONTROLLER_STATUS_NO_CONTENT];
+    }
+
+    if ($mode === 'remove_upload') {
+        $preset = $presets_manager->findById($_REQUEST['preset_id']);
+        $file_manager->removeFile($preset['file'], $current_company);
+        $preset['file'] = $preset['file_type'] = '';
+        $presets_manager->updateState($preset);
+        Tygh::$app['ajax']->assign('force_redirection', fn_url('import_presets.manage?object_type=' . $_REQUEST['object_type']));
+        return [CONTROLLER_STATUS_OK];
     }
 }
 
-if ($mode == 'update'
-    || $mode == 'add'
-    || $mode == 'get_fields'
+if (
+    $mode === 'update'
+    || $mode === 'add'
+    || $mode === 'get_fields'
 ) {
-    /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
-    $file_uploader = Tygh::$app['addons.advanced_import.readers.factory'];
-    foreach (fn_get_short_companies() as $company_id => $company_name) {
-        $file_uploader->initFilesDirectories($company_id);
+    foreach (array_keys(fn_get_short_companies()) as $company_id) {
+        $file_manager->initFilesDirectories($company_id);
     }
 }
 
-if ($mode == 'manage') {
-    $params = array_merge(array(
+if ($mode === 'manage') {
+    $params = array_merge([
         'page'              => 1,
-        'items_per_page'    => Registry::get('settings.Appearance.admin_elements_per_page'),
         'object_type'       => 'products',
-        'preview_preset_id' => 0,
-    ), $_REQUEST);
+        'items_per_page'    => Registry::get('settings.Appearance.admin_elements_per_page')
+    ], $_REQUEST);
 
-    list($presets, $search) = fn_get_import_presets($params);
+    if (fn_allowed_for('MULTIVENDOR')) {
+        list($common_presets, $search) = fn_get_import_presets(array_merge($params, [
+            'company_id'     => 0,
+            'items_per_page' => 0  // Gets all common presets
+        ]));
+        $common_presets = array_map(static function ($common_preset) use ($file_manager, $current_company) {
+            if ($common_preset['file_type'] === 'server') {
+                $common_preset['file_path'] = $file_manager->getFilePath($common_preset['file'], $current_company);
+            }
+            return $common_preset;
+        }, $common_presets);
+        if ($common_presets) {
+            list($modifiers_presense,) = $presets_manager->find(
+                false,
+                [
+                    ['modifier', '<>', ''],
+                    'ipf.preset_id' => array_keys($common_presets),
+                ],
+                [
+                    [
+                        'table' => ['?:import_preset_fields' => 'ipf'],
+                        'condition' => ['ip.preset_id = ipf.preset_id'],
+                    ],
+                    [
+                        'table' => ['?:import_preset_descriptions' => 'ipd'],
+                        'condition' => ['ip.preset_id = ipd.preset_id'],
+                    ],
+                ],
+                [
+                    'COUNT(ipf.field_id)' => 'has_modifiers',
+                ]
+            );
+            $common_presets = fn_array_merge($common_presets, $modifiers_presense);
+        }
+        Tygh::$app['view']->assign(['common_presets' => $common_presets]);
+    }
+
+    if ($current_company) {
+        $params['company_id'] = $current_company;
+        list($presets, $search) = fn_get_import_presets($params);
+    } else {
+        $params['only_vendors_presets'] = true;
+        list($presets, $search) = fn_get_import_presets($params);
+        if (!empty($common_presets)) {
+            $presets = array_diff_key($presets, $common_presets);
+        }
+    }
 
     if ($presets) {
         list($modifiers_presense,) = $presets_manager->find(
             false,
-            array(
-                array('modifier', '<>', ''),
+            [
+                ['modifier', '<>', ''],
                 'ipf.preset_id' => array_keys($presets),
-            ),
-            array(
-                array(
-                    'table'     => array('?:import_preset_fields' => 'ipf'),
-                    'condition' => array('ip.preset_id = ipf.preset_id'),
-                ),
-                array(
-                    'table'     => array('?:import_preset_descriptions' => 'ipd'),
-                    'condition' => array('ip.preset_id = ipd.preset_id'),
-                ),
-            ),
-            array(
+            ],
+            [
+                [
+                    'table'     => ['?:import_preset_fields' => 'ipf'],
+                    'condition' => ['ip.preset_id = ipf.preset_id'],
+                ],
+                [
+                    'table'     => ['?:import_preset_descriptions' => 'ipd'],
+                    'condition' => ['ip.preset_id = ipd.preset_id'],
+                ],
+            ],
+            [
                 'COUNT(ipf.field_id)' => 'has_modifiers',
-            )
+            ]
         );
 
         $presets = fn_array_merge($presets, $modifiers_presense);
 
-        /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
-        $reader_factory = Tygh::$app['addons.advanced_import.readers.factory'];
-
         foreach ($presets as &$preset) {
-            if ($preset['file_type'] == PresetFileTypes::SERVER) {
-                $preset['file_path'] = $reader_factory->getFilePath($preset['file'], $preset['company_id']);
+            if ($preset['file_type'] === PresetFileTypes::SERVER) {
+                $preset['file_path'] = $file_manager->getFilePath($preset['file'], $current_company);
             }
         }
         unset($preset);
     }
 
-    Tygh::$app['view']->assign(array(
+    Tygh::$app['view']->assign([
         'presets'           => $presets,
         'search'            => $search,
+        'company_id'        => $current_company,
         'object_type'       => $params['object_type'],
-        'preview_preset_id' => $params['preview_preset_id'],
-    ));
-} elseif ($mode == 'add') {
+    ]);
+}
 
-    $preset = array_merge(array(
+if ($mode === 'add') {
+    $preset = array_merge([
         'object_type' => 'products',
-    ), $_REQUEST);
+    ], $_REQUEST);
 
     $pattern = $presets_manager->getPattern($preset['object_type']);
     $preset = $presets_manager->mergePattern($preset, $pattern);
 
-    Registry::set('navigation.tabs', array(
-        'general' => array(
+    Registry::set('navigation.tabs', [
+        'general' => [
             'title' => __('file'),
             'js'    => true,
-        ),
-        'fields'  => array(
+        ],
+        'fields'  => [
             'title'        => __('advanced_import.fields_mapping'),
             'href'         => 'import_presets.get_fields',
             'ajax'         => true,
-            'ajax_onclick' => true
-        ),
-        'options' => array(
+            'ajax_onclick' => true,
+        ],
+        'options' => [
             'title' => __('settings'),
             'js'    => true,
-        ),
-    ));
+        ],
+    ]);
 
-    Tygh::$app['view']->assign(array(
+    Tygh::$app['view']->assign([
         'pattern' => $pattern,
         'preset'  => $preset,
-    ));
-} elseif ($mode == 'update') {
+        'is_mve'  => fn_allowed_for('MULTIVENDOR'),
+    ]);
+}
+
+if ($mode === 'update') {
     if (empty($_REQUEST['preset_id'])) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
-    list($presets) = fn_get_import_presets(array(
+    list($presets) = fn_get_import_presets([
         'preset_id' => $_REQUEST['preset_id'],
-    ));
+    ]);
 
     if (!$presets) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
     $preset = reset($presets);
+    if ($current_company && $preset['company_id'] && $preset['company_id'] !== $current_company) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
     $pattern = $presets_manager->getPattern($preset['object_type']);
     $preset = $presets_manager->mergePattern($preset, $pattern);
 
-    Registry::set('navigation.tabs', array(
-        'general' => array(
+    Registry::set('navigation.tabs', [
+        'general' => [
             'title' => __('file'),
             'js'    => true,
-        ),
-        'fields'  => array(
+        ],
+        'fields'  => [
             'title'        => __('advanced_import.fields_mapping'),
             'href'         => 'import_presets.get_fields?preset_id=' . $_REQUEST['preset_id'],
             'ajax'         => true,
-            'ajax_onclick' => true
-        ),
-        'options' => array(
+            'ajax_onclick' => true,
+        ],
+        'options' => [
             'title' => __('settings'),
             'js'    => true,
-        ),
-    ));
+        ],
+    ]);
 
-    Tygh::$app['view']->assign(array(
-        'pattern'      => $pattern,
-        'preset'       => $preset,
-        'start_import' => !empty($_REQUEST['start_import']) ? $_REQUEST['start_import'] : false,
-    ));
-} elseif ($mode == 'get_fields') {
 
+    if ($preset['company_id'] === $current_company) {
+        $allowed_ext = ['csv', 'xml'];
+    } else {
+        $allowed_ext = [$preset['file_extension']];
+    }
+
+    if ($current_company && $preset['company_id'] !== $current_company && !isset($_REQUEST['start_import'])) {
+        Tygh::$app['view']->assign(['view_only' => true]);
+    }
+
+    Tygh::$app['view']->assign([
+        'pattern'          => $pattern,
+        'preset'           => $preset,
+        'start_import'     => !empty($_REQUEST['start_import']) ? $_REQUEST['start_import'] : false,
+        'disable_picker'   => (bool) $current_company,
+        'allowed_ext'      => $allowed_ext,
+        'is_mve'           => fn_allowed_for('MULTIVENDOR'),
+    ]);
+}
+
+if ($mode === 'get_fields') {
     if (!defined('AJAX_REQUEST')) {
         if (!empty($_REQUEST['preset_id'])) {
             $redirect_url = sprintf('import_presets.update?preset_id=%s', $_REQUEST['preset_id']);
@@ -311,23 +440,23 @@ if ($mode == 'manage') {
             $redirect_url = 'import_presets.manage';
         }
 
-        return array(CONTROLLER_STATUS_REDIRECT, $redirect_url);
+        return [CONTROLLER_STATUS_REDIRECT, $redirect_url];
     }
 
-    $preset = array_merge(array(
+    $preset = array_merge([
         'file'           => '',
         'file_type'      => PresetFileTypes::LOCAL,
         'preset_id'      => 0,
-        'company_id'     => fn_get_runtime_company_id(),
         'object_type'    => 'products',
-        'fields'         => array(),
-        'options'        => array(),
-    ), $_REQUEST);
+        'fields'         => [],
+        'options'        => [],
+        'company_id'     => null,
+    ], $_REQUEST);
 
+    $company_directory_id = null;
     if ($preset['preset_id']) {
-        list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $preset['preset_id']), false);
-        $preset = reset($presets);
-        $preset['fields'] = $presets_manager->getFieldsMapping($preset['preset_id']);
+        $preset = $presets_manager->findById((int) $preset['preset_id']);
+        $preset['fields'] = $presets_manager->getFieldsMapping((int) $preset['preset_id']);
         if (isset($_REQUEST['file'])) {
             $preset['file'] = $_REQUEST['file'];
         }
@@ -340,12 +469,25 @@ if ($mode == 'manage') {
         if (isset($_REQUEST['company_id'])) {
             $preset['company_id'] = $_REQUEST['company_id'];
         }
+        if (empty($preset['file']) && !empty($preset['fields'])) {
+            $action = 'get_mapping';
+        }
+        $company_directory_id = $current_company;
     }
 
-    if ($preset['file']) {
-
-        /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
-        $reader_factory = Tygh::$app['addons.advanced_import.readers.factory'];
+    $view_only = $current_company && $preset['company_id'] !== $current_company;
+    $relations = $presets_manager->getRelations($preset['object_type']);
+    if ($action === 'get_mapping') {
+        Tygh::$app['view']->assign([
+            'preset'                 => $preset,
+            'fields'                 => array_keys($preset['fields']),
+            'relations'              => $relations,
+            'show_buttons_container' => false,
+            'view_only'              => $view_only,
+            'detailed_preset_page'   => true,
+        ]);
+    } elseif ($preset['file']) {
+        $reader_factory = ServiceProvider::getReadersFactory($company_directory_id);
 
         /** @var Tygh\Addons\AdvancedImport\Readers\IReader $reader */
         try {
@@ -369,80 +511,79 @@ if ($mode == 'manage') {
             $pattern = $presets_manager->getPattern($preset['object_type']);
             $preset = $presets_manager->mergePattern($preset, $pattern);
 
-            $relations = $presets_manager->getRelations($preset['object_type']);
-
-            Tygh::$app['view']->assign(array(
+            Tygh::$app['view']->assign([
                 'preset'                 => $preset,
                 'fields'                 => $fields,
                 'preview'                => isset($preview) ? $preview : null,
                 'relations'              => $relations,
-                'show_buttons_container' => $action == 'import',
-            ));
+                'show_buttons_container' => $action === 'import',
+                'view_only'              => $view_only,
+            ]);
 
             Tygh::$app['ajax']->assign('has_fields', !empty($fields));
             Tygh::$app['ajax']->assign('file_extension', $reader->getExtension());
         } catch (ReaderNotFoundException $e) {
-            fn_set_notification('E', __('error'), __('error_exim_cant_read_file'));
-            exit;
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('error_exim_cant_read_file'));
+            return [CONTROLLER_STATUS_NO_CONTENT];
         } catch (PermissionsException $e) {
-            fn_set_notification('E', __('error'), __('advanced_import.cant_load_file_for_company'));
-            exit;
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('advanced_import.cant_load_file_for_company'));
+            return [CONTROLLER_STATUS_NO_CONTENT];
         } catch (FileNotFoundException $e) {
-            fn_set_notification('E', __('error'), __('advanced_import.cant_load_file_for_company'));
-            exit;
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('advanced_import.file_not_loaded'));
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        } catch (DownloadException $e) {
+            fn_set_notification(NotificationSeverity::ERROR, __('error'), __('advanced_import.cant_load_file'));
+            return [CONTROLLER_STATUS_NO_CONTENT];
         }
     }
+}
 
-} elseif ($mode == 'get_file') {
-    list($presets) = fn_get_import_presets(array(
+if ($mode === 'get_file') {
+    list($presets) = fn_get_import_presets([
         'preset_id' => $_REQUEST['preset_id'],
-    ));
+    ]);
 
     if (!$presets) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
     $preset = reset($presets);
 
     if (empty($preset['file'])) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
-    /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
-    $reader_factory = Tygh::$app['addons.advanced_import.readers.factory'];
-
-    if ($preset['file'] && $preset['file_type'] == PresetFileTypes::URL) {
+    if ($preset['file'] && $preset['file_type'] === PresetFileTypes::URL) {
         fn_redirect($preset['file'], true);
     }
 
-    $file_path = $reader_factory->getFilePath($preset['file']);
+    $file_path = $file_manager->getFilePath($preset['file'], $current_company);
 
     if ($file_path) {
         fn_get_file($file_path);
     }
+}
 
-} elseif ($mode == 'file_manager') {
-    if (!isset($_REQUEST['path']) || !isset($_REQUEST['company_id'])) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+if ($mode === 'file_manager') {
+    if (
+        !isset($_REQUEST['path'])
+        || !isset($_REQUEST['company_id'])
+        || !isset($_REQUEST['option_id'])
+    ) {
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
     $selected_company_id = (int) Registry::get('runtime.company_id');
     $company_id = (int) $_REQUEST['company_id'];
 
     if ($selected_company_id && $company_id !== $selected_company_id) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+        return [CONTROLLER_STATUS_NO_PAGE];
     }
 
-    $images_directories = fn_advanced_import_get_import_images_directory($company_id, $_REQUEST['path']);
+    $path = fn_advanced_import_get_import_path($company_id, $_REQUEST['path'], $_REQUEST['option_id']);
 
-    if (!file_exists($images_directories['absolute_path'])) {
-        fn_mkdir($images_directories['absolute_path']);
-    }
-
-    $path = $images_directories['filemanager_path'];
-
-    return array(
+    return [
         CONTROLLER_STATUS_REDIRECT,
         sprintf('file_editor.manage?in_popup=1&path=%s&container_id=%s', $path, md5(TIME))
-    );
+    ];
 }

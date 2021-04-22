@@ -55,7 +55,8 @@
         <div class="control-group">
             <label class="control-label" for="online_only">{__("online_only")}</label>
             <div class="controls">
-                <input type="checkbox" id="online_only" name="online_only" value="Y" class="checkbox" {if $search.online_only}checked="checked"{/if} />
+                <input type="checkbox" id="online_only" name="online_only" value="Y" {if $search.online_only}checked="checked"{/if} />
+                <p class="muted description">{__("tt_views_cart_components_carts_search_form_online_only")}</p>
             </div>
         </div>
 	{/if}

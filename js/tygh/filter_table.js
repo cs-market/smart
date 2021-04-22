@@ -1,135 +1,133 @@
-(function(_, $) {
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-    function globalHandlers()
-    {
-        // Add new selector to search text inside matched elements
-        $.extend($.expr[':'], {
-            'containsi': function(elem, i, match, array) {
-                var haystack = (elem.textContent || elem.innerText || '').toLowerCase();
-                var needle = (match[3] || '').toLowerCase().split(' ');
+(function (_, $) {
+  function globalHandlers() {
+    // Add new selector to search text inside matched elements
+    $.extend($.expr[':'], {
+      'containsi': function containsi(elem, i, match, array) {
+        var haystack = (elem.textContent || elem.innerText || '').toLowerCase();
+        var needle = (match[3] || '').toLowerCase().split(' ');
 
-                for (var k = 0; k < needle.length; k++) {
-                    if (haystack.indexOf(needle[k]) != -1) {
-                        return true;
-                    }
-                }
+        for (var k = 0; k < needle.length; k++) {
+          if (haystack.indexOf(needle[k]) != -1) {
+            return true;
+          }
+        }
 
-                return false;
-            }
-        });
+        return false;
+      }
+    }); // Re-init search after ajax request
 
-        // Re-init search after ajax request
-        $.ceEvent('on', 'ce.commoninit', function(context) {
-            context.find('.cm-filter-table').ceFilterTable();
-        });
+    $.ceEvent('on', 'ce.commoninit', function (context) {
+      context.find('.cm-filter-table').ceFilterTable();
+    });
+  }
+
+  (function ($) {
+    function setHandlers(container) {
+      var data = container.data('ceFilterTable'),
+          input_elm = data.input_elm,
+          clear_elm = data.clear_elm; // Clear input
+
+      clear_elm.on('click', function () {
+        input_elm.val('').trigger('input');
+        clear_elm.addClass('hidden');
+      }); // Perform search and show/hide clear button
+
+      input_elm.on('keyup input', function () {
+        _filter(container);
+      });
     }
 
-    (function($) {
+    function showItems(container, items, empty_elm) {
+      var data = {
+        items: items,
+        empty_elm: empty_elm
+      };
+      $.ceEvent('trigger', 'ce.filter_table_show_items', [container, data]);
+      data.items.show();
 
-        function setHandlers(container)
-        {
-            var data = container.data('ceFilterTable'),
-                input_elm = data.input_elm,
-                clear_elm = data.clear_elm;
+      if (data.items.length === 0) {
+        container.addClass('hidden');
+        data.empty_elm.removeClass('hidden');
+      } else {
+        container.removeClass('hidden');
+        data.empty_elm.addClass('hidden');
+      }
+    }
 
-            // Clear input
-            clear_elm.on('click', function() {
-                input_elm.val('').trigger('input');
-                clear_elm.addClass('hidden');
-            });
+    function _filter(container) {
+      var data = container.data('ceFilterTable');
 
-            // Perform search and show/hide clear button
-            input_elm.on('keyup input', function() {
-                filter(container);
-            });
-        }
+      if (typeof data == 'undefined') {
+        return;
+      }
 
-        function showItems(container, items, empty_elm)
-        {
-            var data = {
-                items: items,
-                empty_elm: empty_elm
-            };
+      var input_elm = data.input_elm,
+          clear_elm = data.clear_elm,
+          empty_elm = data.empty_elm;
+      var found_items;
+      var items = container.is('table') ? container.find('tbody > tr') : container.find('li');
+      items.hide();
 
-            $.ceEvent('trigger', 'ce.filter_table_show_items', [container, data]);
+      if (input_elm.val() === '') {
+        showItems(container, items, empty_elm);
+        return;
+      }
 
-            data.items.show();
+      found_items = items.filter(":containsi('" + input_elm.val() + "')");
+      showItems(container, found_items, empty_elm);
 
-            if (data.items.length === 0) {
-                data.empty_elm.removeClass('hidden');
-            } else {
-                data.empty_elm.addClass('hidden');
+      if (input_elm.val().length > 0) {
+        clear_elm.removeClass('hidden');
+      } else {
+        clear_elm.addClass('hidden');
+      }
+    }
+
+    var methods = {
+      init: function init(params) {
+        return this.each(function () {
+          var self = $(this),
+              $input = $('#' + self.data('caInputId'));
+          self.data('ceFilterTable', {
+            input_elm: $input,
+            clear_elm: $('#' + self.data('caClearId')),
+            empty_elm: $('#' + self.data('caEmptyId'))
+          });
+          setHandlers(self);
+
+          if (self.data('caInputValue')) {
+            $input.val(self.data('caInputValue'));
+
+            _filter(self);
+
+            if (self.data('caScrollTop')) {
+              self.scrollTop(self.data('caScrollTop'));
             }
-        }
+          }
+        });
+      },
+      filter: function filter() {
+        return this.each(function () {
+          _filter($(this));
+        });
+      }
+    };
 
-        function filter(container)
-        {
-            var data = container.data('ceFilterTable');
+    $.fn.ceFilterTable = function (method) {
+      if (methods[method]) {
+        return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+      } else if (_typeof(method) === 'object' || !method) {
+        return methods.init.apply(this, arguments);
+      } else {
+        $.error('ty.filterTable: method ' + method + ' does not exist');
+      }
+    };
+  })($);
 
-            if (typeof data == 'undefined') {
-                return;
-            }
-
-            var
-                input_elm = data.input_elm,
-                clear_elm = data.clear_elm,
-                empty_elm = data.empty_elm;
-
-            var found_items;
-            var items = container.is('table') ? container.find('tr') : container.find('li');
-
-            items.hide();
-
-            if (input_elm.val() === '') {
-                showItems(container, items, empty_elm);
-                return;
-            }
-
-            found_items = items.filter(":containsi('" + input_elm.val() + "')");
-            showItems(container, found_items, empty_elm);
-
-            if (input_elm.val().length > 0) {
-                clear_elm.removeClass('hidden');
-            } else {
-                clear_elm.addClass('hidden');
-            }
-        }
-
-        var methods = {
-            init: function(params) {
-                return this.each(function() {
-                    var self = $(this);
-
-                    self.data('ceFilterTable', {
-                        input_elm: $('#' + self.data('caInputId')),
-                        clear_elm: $('#' + self.data('caClearId')),
-                        empty_elm: $('#' + self.data('caEmptyId'))
-                    });
-
-                    setHandlers(self);
-                });
-            },
-            filter: function() {
-                return this.each(function() {
-                    filter($(this));
-                });
-            }
-        };
-
-        $.fn.ceFilterTable = function(method) {
-            if (methods[method]) {
-                return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-            } else if (typeof method === 'object' || !method) {
-                return methods.init.apply(this, arguments);
-            } else {
-                $.error('ty.filterTable: method ' + method + ' does not exist');
-            }
-        };
-    })($);
-
-    $(document).ready(function() {
-        globalHandlers();
-        $('.cm-filter-table').ceFilterTable();
-    });
-
-}(Tygh, Tygh.$));
+  $(document).ready(function () {
+    globalHandlers();
+    $('.cm-filter-table').ceFilterTable();
+  });
+})(Tygh, Tygh.$);

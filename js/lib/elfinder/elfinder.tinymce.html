@@ -17,17 +17,9 @@
 	<script type="text/javascript" charset="utf-8">
 		Tygh.$(function() {
 
-			var params = top.tinymce.activeEditor.windowManager.getParams();
+			var options = top.tinymce.activeEditor.windowManager.getParams();
 
-			Tygh.$('#finder').elfinder({
-				url : params.connector_url,
-				lang : 'en',
-				getFileCallback : function(file) {
-					var url = file.url + '?' + new Date().getTime();
-					params.callback(url);
-			        top.tinymce.activeEditor.windowManager.close();
-				}
-			})
+			Tygh.$('#finder').elfinder(options);
 		});
 	</script>
 

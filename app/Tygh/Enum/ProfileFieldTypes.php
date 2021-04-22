@@ -37,4 +37,5 @@ class ProfileFieldTypes
     const TEXT_AREA = 'T';
     const USER_GROUP = 'U';
     const VENDOR_TERMS = 'B';
+    const FILE = 'F';
 }

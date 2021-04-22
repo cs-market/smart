@@ -14,13 +14,17 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-$schema['product_variations'] = array(
+$schema['product_variations'] = [
     'permissions' => 'manage_catalog',
-    'modes' => array (
-        'list' => array (
+    'modes'       => [
+        'manage' => [
             'permissions' => 'view_catalog',
-        ),
-    ),
-);
+        ],
+    ],
+];
+$schema['product_variations_convert'] = [
+    'permissions' => 'upgrade_store'
+];
+
 
 return $schema;

@@ -62,27 +62,81 @@
             },
             "decorative": {
                 "description": "theme_editor.decorative_color"
+            },
+            "checkout_link": {
+                "description": "theme_editor.checkout_link",
+                "default": "#4fbe31"
+            },
+            "checkout_input_border": {
+                "description": "theme_editor.checkout_input_border",
+                "default": "#acbdcd"
+            },
+            "checkout_selected_input_border": {
+                "description": "theme_editor.checkout_selected_input_border",
+                "default": "#4fbe31"
+            },
+            "checkout_step_title": {
+                "description": "theme_editor.checkout_step_title",
+                "default": "#2e3a47"
+            },
+            "checkout_input_text": {
+                "description": "theme_editor.checkout_input_text",
+                "default": "#2e3a47"
+            },
+            "checkout_input_label": {
+                "description": "theme_editor.checkout_input_label",
+                "default": "#a1a6aa"
+            },
+            "checkout_control_border": {
+                "description": "theme_editor.checkout_selector_border",
+                "default": "#acbdcd"
+            },
+            "checkout_selected_control_border": {
+                "description": "theme_editor.checkout_active_selector_border",
+                "default": "#4fbe31"
+            },
+            "checkout_control_background": {
+                "description": "theme_editor.checkout_selector_background",
+                "default": "#fff"
+            },
+            "checkout_selected_control_background": {
+                "description": "theme_editor.checkout_active_selector_background",
+                "default": "#fff"
+            },
+            "checkout_control_title": {
+                "description": "theme_editor.checkout_selector_title",
+                "default": "#4fbe31"
+            },
+            "checkout_control_description": {
+                "description": "theme_editor.checkout_selector_tooltip",
+                "default": "#6c6c6c"
+            },
+            "checkout_control_label": {
+                "description": "theme_editor.checkout_control_label",
+                "default": "#2e3a47"
+            },
+            "checkout_terms_background": {
+                "description": "theme_editor.checkout_terms_background",
+                "default": "#f9f9f9"
             }
         },
         "vendor_can_edit": true
     },
     "fonts": {
         "families": {
-            "Arial,Helvetica,sans-serif": "Arial",
-            "Arial Black,Gadget,sans-serif": "Arial Black",
-            "Comic Sans MS,cursive": "Comic Sans MS",
-            "Courier New,Courier,monospace": "Courier New",
+            "'Open Sans','Helvetica Neue',-apple-system,sans-serif": "Open Sans",
+            "'Comic Sans MS',cursive": "Comic Sans MS",
+            "'Courier New',Courier,monospace": "Courier New",
             "Georgia,serif": "Georgia",
-            "Open Sans Condensed Bold,sans-serif": "Open Sans Condensed",
             "Impact,Charcoal,sans-serif": "Impact",
-            "Lucida Console,Monaco,monospace": "Lucida Console",
-            "Lucida Sans Unicode,Lucida Grande,sans-serif": "Lucida Sans Unicode",
-            "Palatino Linotype,Book Antiqua,Palatino,serif": "Palatino Linotype",
+            "'Lucida Console',Monaco,monospace": "Lucida Console",
+            "'Lucida Sans Unicode','Lucida Grande',sans-serif": "Lucida Sans Unicode",
+            "'Palatino Linotype','Book Antiqua',Palatino,serif": "Palatino Linotype",
             "Tahoma,Geneva,sans-serif": "Tahoma",
-            "Times New Roman,Times,serif": "Times New Roman",
-            "Trebuchet MS,Helvetica,sans-serif": "Trebuchet MS",
+            "'Times New Roman',Times,serif": "Times New Roman",
+            "'Trebuchet MS',Helvetica,sans-serif": "Trebuchet MS",
             "Verdana,Geneva,sans-serif": "Verdana",
-            "Gill Sans,Geneva,sans-serif": "Gill Sans"
+            "'Gill Sans',Geneva,sans-serif": "Gill Sans"
         },
         "fields": {
             "body_font": {
@@ -273,7 +327,7 @@
                     "repeat": false,
                     "attachment": false
                 },
-                
+
                 "full_width": {
                     "type": "checkbox",
                     "true": "true",

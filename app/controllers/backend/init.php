@@ -17,6 +17,7 @@ use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\BackendMenu;
 use Tygh\Navigation\Breadcrumbs;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -106,9 +107,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return;
 }
 
+if (!defined('AJAX_REQUEST')
+    && Registry::get('runtime.company_id')
+    && fn_allowed_for('ULTIMATE')
+    && Tygh::$app['storefront.switcher.is_enabled']
+    && !Tygh::$app['storefront.switcher.is_available_for_dispatch']
+) {
+    fn_redirect(fn_link_attach(Registry::get('config.current_url'), 'switch_company_id=0'));
+}
+
 list($static, $actions, $selected_items) = BackendMenu::instance(
     Registry::get('runtime.controller'),
-    Registry::get('runtime.mode')
+    Registry::get('runtime.mode'),
+    Registry::get('runtime.action')
 )->generate($_REQUEST);
 
 Registry::set('navigation', array(
@@ -126,6 +137,7 @@ if (fn_allowed_for('ULTIMATE')) {
 
 // Navigation is passed in view->display method to allow its modification in controllers
 Tygh::$app['view']->assign('quick_menu', fn_get_quick_menu_data());
+Tygh::$app['view']->assign('is_bottom_panel_available', fn_is_bottom_panel_available($auth));
 
 
 // update request history
@@ -143,6 +155,7 @@ if (!defined('AJAX_REQUEST')) {
         'dispatch' => $current_dispatch,
         'params' => $_REQUEST
     );
+    Tygh::$app['view']->assign('current_dispatch', $current_dispatch);
 }
 
 // generate breadcrumbs
@@ -241,20 +254,9 @@ Tygh::$app['view']->assign('last_edited_items', $last_items);
 Tygh::$app['session']['last_edited_items'] = $last_edited_items;
 fn_save_user_additional_data('L', $last_edited_items);
 
-if (empty($auth['company_id']) && !empty($auth['user_id']) && $auth['area'] == AREA && $auth['is_root']) {
-    $messages = fn_get_storage_data('hd_messages');
-    if (!empty($messages)) {
-        $messages = unserialize($messages);
-        foreach ($messages as $message) {
-            fn_set_notification($message['type'], $message['title'], $message['text'], isset($message['state']) ? $message['state'] : '');
-        }
-
-        fn_set_storage_data('hd_messages', '');
-    }
-}
-
 /* HIDE IT! */
 $store_mode = fn_get_storage_data('store_mode');
+$license_errors = fn_get_storage_data('license_errors');
 $store_mode_errors = fn_get_storage_data('store_mode_errors');
 $store_mode_trial = fn_get_storage_data('store_mode_trial');
 $license_number = fn_get_storage_data('store_mode_license');
@@ -270,18 +272,25 @@ $license_number = Helpdesk::masqueLicenseNumber(
 );
 
 Tygh::$app['view']->assign('store_mode_license', $license_number);
+Tygh::$app['view']->assign('license_errors', unserialize($license_errors));
 Tygh::$app['view']->assign('store_mode_errors', unserialize($store_mode_errors));
 Tygh::$app['view']->assign('store_mode', $store_mode);
 Tygh::$app['view']->assign('product_state_suffix', $product_state_suffix);
 Tygh::$app['view']->assign('store_mode_number_of_storefronts', count(fn_get_all_companies_ids()));
 Tygh::$app['view']->assign('store_mode_allowed_number_of_storefronts', fn_get_storage_data('allowed_number_of_stores'));
+Tygh::$app['view']->assign('hash_of_available_countries', fn_get_hash_of_available_countries());
+Tygh::$app['view']->assign('product_version', PRODUCT_VERSION);
+Tygh::$app['view']->assign('product_edition', fn_get_edition_acronym(PRODUCT_EDITION));
 
-if (!Registry::get('runtime.company_id') && Registry::get('runtime.controller') != 'auth' && $store_mode_trial == 'trial_is_expired') {
+if (!Registry::get('runtime.company_id') && Registry::get('runtime.controller') != 'auth' && !empty($license_errors) && empty($store_mode_errors)) {
+    Tygh::$app['view']->assign('show_license_errors_dialog', true);
+} elseif (!Registry::get('runtime.company_id') && Registry::get('runtime.controller') != 'auth' && $store_mode_trial == 'trial_is_expired') {
     Tygh::$app['view']->assign('show_trial_dialog', true);
 } elseif (!Registry::get('runtime.company_id') && Registry::get('runtime.controller') != 'auth' && $store_mode == "new" || !empty($store_mode_errors)) {
     Tygh::$app['view']->assign('show_sm_dialog', true);
 }
 
 fn_set_storage_data('store_mode_errors', null);
+fn_set_storage_data('license_errors', null);
 fn_set_storage_data('store_mode_license', null);
 /* /HIDE IT! */

@@ -15,7 +15,7 @@
     <location dispatch="default" is_default="1" layout_id="3" object_ids="" custom_html="" position="10" lang_code="en" name="Default" title="" meta_description="" meta_keywords="">
         <containers>
             <container container_id="1" location_id="1" position="TOP_PANEL" width="16" user_class="top-grid" linked_to_default="Y" status="A">
-                <grid width="4" user_class="top-links-grid" linked_to_default="Y" status="A" offset="0" omega="0" alpha="1" wrapper="" content_align="LEFT" html_element="div" clear="0">
+                <grid width="3" user_class="top-links-grid" linked_to_default="Y" status="A" offset="0" omega="0" alpha="1" wrapper="" content_align="LEFT" html_element="div" clear="0">
                     <blocks>
                         <block>
                             <type><![CDATA[languages]]></type>
@@ -65,28 +65,8 @@
                         </block>
                     </blocks>
                 </grid>
-                <grid width="12" user_class="top-links-grid" linked_to_default="Y" status="A" offset="0" omega="1" alpha="0" wrapper="" content_align="RIGHT" html_element="div" clear="1">
+                <grid width="8" user_class="top-links-grid" linked_to_default="Y" status="A" offset="0" omega="0" alpha="0" wrapper="" content_align="RIGHT" html_element="div" clear="0">
                     <blocks>
-                        <block>
-                            <type><![CDATA[my_account]]></type>
-                            <properties>
-                                <template><![CDATA[blocks/my_account.tpl]]></template>
-                            </properties>
-                            <lang_code><![CDATA[en]]></lang_code>
-                            <name><![CDATA[My Account]]></name>
-                            <object_id><![CDATA[0]]></object_id>
-                            <object_type><![CDATA[]]></object_type>
-                            <content><![CDATA[]]></content>
-                            <object_ids><![CDATA[]]></object_ids>
-                            <wrapper><![CDATA[blocks/wrappers/onclick_dropdown.tpl]]></wrapper>
-                            <user_class><![CDATA[top-my-account]]></user_class>
-                            <order><![CDATA[2]]></order>
-                            <status><![CDATA[A]]></status>
-                            <translations>
-                                <translation lang_code="ru"><![CDATA[Мой профиль]]></translation>
-                            </translations>
-                            <contents />
-                        </block>
                         <block>
                             <type><![CDATA[menu]]></type>
                             <properties>
@@ -119,25 +99,53 @@
                                 </item>
                             </contents>
                         </block>
+                    </blocks>
+                </grid>
+                <grid width="3" user_class="top-links-grid" linked_to_default="Y" status="A" offset="0" omega="0" alpha="0" wrapper="" content_align="RIGHT" html_element="div" clear="0">
+                    <blocks>
                         <block>
-                            <type>rus_customer_geolocation_customer_location</type>
+                            <type><![CDATA[geo_maps_customer_location]]></type>
                             <properties>
-                                <template>addons/rus_customer_geolocation/blocks/customer_location.tpl</template>
+                                <template><![CDATA[addons/geo_maps/blocks/customer_location.tpl]]></template>
                             </properties>
-                            <lang_code>en</lang_code>
-                            <name>Customer location</name>
-                            <object_id>0</object_id>
-                            <object_type></object_type>
-                            <content></content>
-                            <object_ids></object_ids>
-                            <wrapper></wrapper>
-                            <user_class>ty-float-right</user_class>
-                            <order>4</order>
-                            <status>A</status>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Customer location]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content><![CDATA[]]></content>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[0]]></order>
+                            <status><![CDATA[A]]></status>
                             <translations>
                                 <translation lang_code="ru"><![CDATA[Местоположение покупателя]]></translation>
                             </translations>
                             <contents/>
+                        </block>
+                    </blocks>
+                </grid>
+                <grid width="2" user_class="top-links-grid" linked_to_default="Y" status="A" offset="0" omega="1" alpha="0" wrapper="" content_align="RIGHT" html_element="div" clear="1">
+                    <blocks>
+                        <block>
+                            <type><![CDATA[my_account]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/my_account.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[My Account]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content><![CDATA[]]></content>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[blocks/wrappers/onclick_dropdown.tpl]]></wrapper>
+                            <user_class><![CDATA[top-my-account]]></user_class>
+                            <order><![CDATA[2]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Мой профиль]]></translation>
+                            </translations>
+                            <contents />
                         </block>
                     </blocks>
                 </grid>
@@ -149,6 +157,7 @@
                             <type><![CDATA[template]]></type>
                             <properties>
                                 <template><![CDATA[blocks/static_templates/logo.tpl]]></template>
+                                <enable_link><![CDATA[Y]]></enable_link>
                             </properties>
                             <lang_code><![CDATA[en]]></lang_code>
                             <name><![CDATA[Logo]]></name>
@@ -365,12 +374,19 @@
                                     <content><![CDATA[<div class="ty-social-link-block"><h3 class="ty-social-link__title">{__("get_social")}</h3>
 
 <div class="ty-social-link facebook">
-    <a href="http://www.facebook.com"><i class="ty-icon-facebook"></i> Facebook</a>
+    <a href="http://www.facebook.com"><i class="ty-icon-facebook"></i>Facebook</a>
 </div>
 
+<div class="ty-social-link instagram">
+    <a href="https://www.instagram.com"><i class="ty-icon-instagram"></i>Instagram</a>
+</div>
 
 <div class="ty-social-link twitter">
-    <a href="https://twitter.com"><i class="ty-icon-twitter"></i> Twitter</a>
+    <a href="https://twitter.com"><i class="ty-icon-twitter"></i>Twitter</a>
+</div>
+
+<div class="ty-social-link youtube">
+    <a href="https://www.youtube.com/channel/UC5hI_lecNxdp1UfLR2GZ4iQ"><i class="ty-icon-youtube"></i>Youtube</a>
 </div></div>
 ]]></content>
                                 </content>
@@ -391,12 +407,19 @@
                                             <content><![CDATA[<div class="ty-social-link-block"><h3 class="ty-social-link__title">{__("get_social")}</h3>
 
 <div class="ty-social-link facebook">
-    <a href="http://www.facebook.com"><i class="ty-icon-facebook"></i> Facebook</a>
+    <a href="http://www.facebook.com"><i class="ty-icon-facebook"></i>Facebook</a>
 </div>
 
+<div class="ty-social-link instagram">
+    <a href="https://www.instagram.com"><i class="ty-icon-instagram"></i>Instagram</a>
+</div>
 
 <div class="ty-social-link twitter">
-    <a href="https://twitter.com"><i class="ty-icon-twitter"></i> Twitter</a>
+    <a href="https://twitter.com"><i class="ty-icon-twitter"></i>Twitter</a>
+</div>
+
+<div class="ty-social-link youtube">
+    <a href="https://www.youtube.com/channel/UC5hI_lecNxdp1UfLR2GZ4iQ"><i class="ty-icon-youtube"></i>Youtube</a>
 </div></div>]]></content>
                                         </content>
                                     </item>
@@ -908,6 +931,7 @@
                                 <scroll_per_page><![CDATA[Y]]></scroll_per_page>
                                 <pause_delay><![CDATA[3]]></pause_delay>
                                 <item_quantity><![CDATA[7]]></item_quantity>
+                                <total_items><![CDATA[14]]></total_items>
                                 <thumbnail_width><![CDATA[75]]></thumbnail_width>
                                 <outside_navigation><![CDATA[Y]]></outside_navigation>
                             </properties>
@@ -1154,7 +1178,7 @@
                         <block>
                             <type><![CDATA[product_filters]]></type>
                             <properties>
-                                <template><![CDATA[blocks/product_filters/selected_filters.tpl]]></template>
+                                <template><![CDATA[blocks/product_filters/for_category/selected_filters.tpl]]></template>
                             </properties>
                             <lang_code><![CDATA[en]]></lang_code>
                             <name><![CDATA[Selected product filters]]></name>
@@ -1193,7 +1217,7 @@
                         <block>
                             <type><![CDATA[product_filters]]></type>
                             <properties>
-                                <template><![CDATA[blocks/product_filters/original.tpl]]></template>
+                                <template><![CDATA[blocks/product_filters/for_category/original.tpl]]></template>
                             </properties>
                             <lang_code><![CDATA[en]]></lang_code>
                             <name><![CDATA[Product filters]]></name>
@@ -1405,8 +1429,314 @@
             <container container_id="17" location_id="5" position="TOP_PANEL" width="16" user_class="" linked_to_default="Y" status="A" />
             <container container_id="18" location_id="5" position="HEADER" width="16" user_class="" linked_to_default="Y" status="A" />
             <container container_id="19" location_id="5" position="CONTENT" width="16" user_class="content-grid" linked_to_default="Y" status="A">
-                <grid width="12" user_class="main-content-grid" linked_to_default="Y" status="A" offset="0" omega="0" alpha="1" wrapper="" content_align="FULL_WIDTH" html_element="div" clear="0">
+                <grid width="12" user_class="main-content-grid" linked_to_default="Y" status="A" offset="0" omega="0" alpha="1" wrapper="blocks/grid_wrappers/lite_checkout.tpl" content_align="FULL_WIDTH" html_element="div" clear="0">
                     <blocks>
+                        <block>
+                            <type><![CDATA[lite_checkout_location]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/location.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Deliver to]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content>
+                                <items>
+                                    <filling><![CDATA[manually]]></filling>
+                                    <item_ids><![CDATA[23,25,27]]></item_ids>
+                                    <required>
+                                        <field_id_23><![CDATA[N]]></field_id_23>
+                                        <field_id_25><![CDATA[N]]></field_id_25>
+                                        <field_id_27><![CDATA[N]]></field_id_27>
+                                    </required>
+                                </items>
+                            </content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[0]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Доставка в]]></translation>
+                            </translations>
+                            <contents>
+                                <item>
+                                    <object_id><![CDATA[0]]></object_id>
+                                    <object_type><![CDATA[]]></object_type>
+                                    <lang_code><![CDATA[ru]]></lang_code>
+                                    <content>
+                                        <items>
+                                            <filling><![CDATA[manually]]></filling>
+                                            <item_ids><![CDATA[23,25,27]]></item_ids>
+                                            <required>
+                                                <field_id_23><![CDATA[N]]></field_id_23>
+                                                <field_id_25><![CDATA[N]]></field_id_25>
+                                                <field_id_27><![CDATA[N]]></field_id_27>
+                                            </required>
+                                        </items>
+                                    </content>
+                                </item>
+                            </contents>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_shipping_methods]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/shipping_methods.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Shipping methods]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content><![CDATA[]]></content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[1]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Способы доставки]]></translation>
+                            </translations>
+                            <contents/>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_customer_sign_in]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/customer_sign_in.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Customer]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content><![CDATA[]]></content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[2]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Покупатель]]></translation>
+                            </translations>
+                            <contents/>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_customer_address]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/customer_address.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Address]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content>
+                                <items>
+                                    <filling><![CDATA[manually]]></filling>
+                                    <item_ids><![CDATA[19,29]]></item_ids>
+                                    <required>
+                                        <field_id_19><![CDATA[Y]]></field_id_19>
+                                        <field_id_29><![CDATA[Y]]></field_id_29>
+                                    </required>
+                                </items>
+                            </content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[3]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Адрес]]></translation>
+                            </translations>
+                            <contents>
+                                <item>
+                                    <object_id><![CDATA[0]]></object_id>
+                                    <object_type><![CDATA[]]></object_type>
+                                    <lang_code><![CDATA[ru]]></lang_code>
+                                    <content>
+                                        <items>
+                                            <filling><![CDATA[manually]]></filling>
+                                            <item_ids><![CDATA[19,29]]></item_ids>
+                                            <required>
+                                                <field_id_19><![CDATA[Y]]></field_id_19>
+                                                <field_id_29><![CDATA[Y]]></field_id_29>
+                                            </required>
+                                        </items>
+                                    </content>
+                                </item>
+                            </contents>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_customer_information]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/customer_information.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Customer information]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content>
+                                <items>
+                                    <filling><![CDATA[manually]]></filling>
+                                    <item_ids><![CDATA[6,7,9,32]]></item_ids>
+                                    <required>
+                                        <field_id_6><![CDATA[N]]></field_id_6>
+                                        <field_id_7><![CDATA[N]]></field_id_7>
+                                        <field_id_9><![CDATA[N]]></field_id_9>
+                                        <field_id_32><![CDATA[N]]></field_id_32>
+                                    </required>
+                                </items>
+                            </content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[4]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Информация о покупателе]]></translation>
+                            </translations>
+                            <contents>
+                                <item>
+                                    <object_id><![CDATA[0]]></object_id>
+                                    <object_type><![CDATA[]]></object_type>
+                                    <lang_code><![CDATA[ru]]></lang_code>
+                                    <content>
+                                        <items>
+                                            <filling><![CDATA[manually]]></filling>
+                                            <item_ids><![CDATA[6,7,9,32]]></item_ids>
+                                            <required>
+                                                <field_id_6><![CDATA[N]]></field_id_6>
+                                                <field_id_7><![CDATA[N]]></field_id_7>
+                                                <field_id_9><![CDATA[N]]></field_id_9>
+                                                <field_id_32><![CDATA[N]]></field_id_32>
+                                            </required>
+                                        </items>
+                                    </content>
+                                </item>
+                            </contents>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_customer_notes]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/customer_notes.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Customer's notes]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content><![CDATA[]]></content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[5]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Примечания покупателя]]></translation>
+                            </translations>
+                            <contents/>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_payment_methods]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/payment_methods.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Payment methods]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content><![CDATA[]]></content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[blocks/lite_checkout/wrappers/checkout_block_with_heading.tpl]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[6]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Способы оплаты]]></translation>
+                            </translations>
+                            <contents/>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_customer_billing]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/customer_billing.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Billing address]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content>
+                                <items>
+                                    <filling><![CDATA[manually]]></filling>
+                                    <item_ids><![CDATA[14,16,30,18,28,22,24,26]]></item_ids>
+                                    <required>
+                                        <field_id_14><![CDATA[N]]></field_id_14>
+                                        <field_id_16><![CDATA[N]]></field_id_16>
+                                        <field_id_30><![CDATA[N]]></field_id_30>
+                                        <field_id_18><![CDATA[N]]></field_id_18>
+                                        <field_id_28><![CDATA[N]]></field_id_28>
+                                        <field_id_22><![CDATA[N]]></field_id_22>
+                                        <field_id_24><![CDATA[N]]></field_id_24>
+                                        <field_id_26><![CDATA[N]]></field_id_26>
+                                    </required>
+                                </items>
+                            </content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[7]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Адрес плательщика]]></translation>
+                            </translations>
+                            <contents/>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_terms_and_conditions]]></type>
+                            <properties>
+                                <template><![CDATA[blocks/lite_checkout/terms_and_conditions.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Terms and conditions]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content><![CDATA[]]></content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[8]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Условия оформления заказа]]></translation>
+                            </translations>
+                            <contents/>
+                        </block>
+                        <block>
+                            <type><![CDATA[lite_checkout_newsletters]]></type>
+                            <properties>
+                                <template><![CDATA[addons/newsletters/blocks/lite_checkout/newsletters.tpl]]></template>
+                            </properties>
+                            <lang_code><![CDATA[en]]></lang_code>
+                            <name><![CDATA[Sign up for our newsletters!]]></name>
+                            <object_id><![CDATA[0]]></object_id>
+                            <object_type><![CDATA[]]></object_type>
+                            <content><![CDATA[]]></content>
+                            <availability/>
+                            <object_ids><![CDATA[]]></object_ids>
+                            <wrapper><![CDATA[]]></wrapper>
+                            <user_class><![CDATA[]]></user_class>
+                            <order><![CDATA[9]]></order>
+                            <status><![CDATA[A]]></status>
+                            <translations>
+                                <translation lang_code="ru"><![CDATA[Подпишитесь на нашу рассылку!]]></translation>
+                            </translations>
+                            <contents/>
+                        </block>
                         <block>
                             <type><![CDATA[main]]></type>
                             <properties><![CDATA[]]></properties>
@@ -1415,15 +1745,16 @@
                             <object_id><![CDATA[0]]></object_id>
                             <object_type><![CDATA[]]></object_type>
                             <content><![CDATA[]]></content>
+                            <availability/>
                             <object_ids><![CDATA[]]></object_ids>
                             <wrapper><![CDATA[blocks/wrappers/mainbox_general.tpl]]></wrapper>
                             <user_class><![CDATA[]]></user_class>
-                            <order><![CDATA[1]]></order>
-                            <status><![CDATA[A]]></status>
+                            <order><![CDATA[10]]></order>
+                            <status><![CDATA[D]]></status>
                             <translations>
                                 <translation lang_code="ru"><![CDATA[Главное содержимое]]></translation>
                             </translations>
-                            <contents />
+                            <contents/>
                         </block>
                     </blocks>
                 </grid>

@@ -12,8 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Rma\ReturnOperationStatuses;
 use Tygh\Registry;
-use Tygh\Navigation\LastView;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'user_id' => $user_id,
                 'action' => $action,
                 'timestamp' => TIME,
-                'status' => RMA_DEFAULT_STATUS,
+                'status' => ReturnOperationStatuses::REQUESTED,
                 'total_amount' => $total_amount,
                 'comment' => $comment
             );
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         }
                         $extra['returns'][$return_id] = array(
                             'amount' => $v['amount'],
-                            'status' => RMA_DEFAULT_STATUS
+                            'status' => ReturnOperationStatuses::REQUESTED
                         );
                         db_query('UPDATE ?:order_details SET ?u WHERE item_id = ?i AND order_id = ?i', array('extra' => serialize($extra)), $item_id, $order_id);
                     }
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             //Send mail
             $return_info = fn_get_return_info($return_id);
             $order_info = fn_get_order_info($order_id);
-            fn_send_return_mail($return_info, $order_info, array('C' => true, 'A' => true, 'S' => true));
+            fn_rma_send_notification($return_info, $order_info, true);
         }
 
         return array(CONTROLLER_STATUS_OK, 'rma.details?return_id=' . $return_id);
@@ -104,53 +104,79 @@ if (empty($auth['user_id']) && !isset($auth['order_ids']) && AREA == 'C') {
 }
 
 if ($mode == 'details' && !empty($_REQUEST['return_id'])) {
-    $return_id = intval($_REQUEST['return_id']);
 
-    // [Breadcrumbs]
-    if (AREA != 'A') {
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+
+    $return_id = (int) $_REQUEST['return_id'];
+
+    if (AREA === 'C') {
         fn_add_breadcrumb(__('return_requests'), "rma.returns");
         fn_add_breadcrumb(__('return_info'));
     }
-    // [/Breadcrumbs]
 
-    Registry::set('navigation.tabs', array (
-        'return_products' => array (
-            'title' => __('return_products_information'),
-            'js' => true
-        ),
-        'declined_products' => array (
-            'title' => __('declined_products_information'),
-            'js' => true
-        ),
-    ));
+    Registry::set(
+        'navigation.tabs',
+        [
+            'return_products'   => [
+                'title' => __('return_products_information'),
+                'js'    => true,
+            ],
+            'declined_products' => [
+                'title' => __('declined_products_information'),
+                'js'    => true,
+            ],
+        ]
+    );
 
     $return_info = fn_get_return_info($return_id);
 
-    if ((AREA == 'C') && (empty($return_info) || $return_info['user_id'] != $auth['user_id'] || !fn_is_order_allowed($return_info['order_id'], $auth))) {
-        return array(CONTROLLER_STATUS_DENIED);
+    if ((AREA == 'C') && (!$return_info || $return_info['user_id'] != $auth['user_id'] || !fn_is_order_allowed($return_info['order_id'], $auth))) {
+        return [CONTROLLER_STATUS_DENIED];
     }
 
-    if (AREA == 'A') {
-        Registry::set('navigation.tabs.comments', array (
-            'title' => __('comments'),
-            'js' => true
-        ));
-        Registry::set('navigation.tabs.actions', array (
-            'title' => __('actions'),
-            'js' => true
-        ));
+    if (!$return_info) {
+        return [CONTROLLER_STATUS_NO_PAGE];
+    }
 
-        Tygh::$app['view']->assign('is_refund', fn_is_refund_action($return_info['action']));
-        Tygh::$app['view']->assign('order_info', fn_get_order_info($return_info['order_id']));
+    if (AREA === 'A') {
+        Registry::set(
+            'navigation.tabs.comments',
+            [
+                'title' => __('comments'),
+                'js'    => true,
+            ]
+        );
+
+        if (fn_check_view_permissions('rma.update_details', 'POST')) {
+            Registry::set(
+                'navigation.tabs.actions',
+                [
+                    'title' => __('actions'),
+                    'js'    => true,
+                ]
+            );
+        }
+
+        $view->assign(
+            [
+                'is_refund'  => fn_is_refund_action($return_info['action']),
+                'order_info' => fn_get_order_info($return_info['order_id']),
+            ]
+        );
     }
     $return_info['extra'] = !empty($return_info['extra']) ? unserialize($return_info['extra']) : array();
     if (!is_array($return_info['extra'])) {
         $return_info['extra'] = array();
     }
 
-    Tygh::$app['view']->assign('reasons', fn_get_rma_properties( RMA_REASON ));
-    Tygh::$app['view']->assign('actions', fn_get_rma_properties( RMA_ACTION ));
-    Tygh::$app['view']->assign('return_info', $return_info);
+    $view->assign(
+        [
+            'reasons'     => fn_get_rma_properties(RMA_REASON),
+            'actions'     => fn_get_rma_properties(RMA_ACTION),
+            'return_info' => $return_info,
+        ]
+    );
 
 } elseif ($mode == 'print_slip' && !empty($_REQUEST['return_id'])) {
 
@@ -159,14 +185,15 @@ if ($mode == 'details' && !empty($_REQUEST['return_id'])) {
 
 } elseif ($mode == 'returns') {
 
-    // [Breadcrumbs]
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
+
     if (AREA != 'A') {
         fn_add_breadcrumb(__('return_requests'));
     }
-    // [/Breadcrumbs]
 
     $params = $_REQUEST;
-    if (AREA == 'C') {
+    if (AREA === 'C') {
         $params['user_id'] = $auth['user_id'];
 
         if (empty($params['user_id']) && !empty($auth['order_ids'])) {
@@ -176,15 +203,20 @@ if ($mode == 'details' && !empty($_REQUEST['return_id'])) {
         if (!empty($params['order_ids']) && !empty($params['order_id']) && !fn_is_order_allowed($params['order_id'], $auth)) {
             unset($params['order_id']);
         }
+    } else {
+        $params['company_id'] = fn_get_runtime_company_id();
     }
 
-    list($return_requests, $search) = fn_get_rma_returns($params, Registry::get('settings.Appearance.' . (AREA == 'A' ? 'admin_' : '') . 'elements_per_page'));
-    Tygh::$app['view']->assign('return_requests', $return_requests);
-    Tygh::$app['view']->assign('search', $search);
-
+    list($return_requests, $search) = fn_rma_get_returns($params, Registry::get('settings.Appearance.' . (AREA == 'A' ? 'admin_' : '') . 'elements_per_page'));
     fn_rma_generate_sections('requests');
 
-    Tygh::$app['view']->assign('actions', fn_get_rma_properties(RMA_ACTION));
+    $view->assign(
+        [
+            'return_requests' => $return_requests,
+            'search'          => $search,
+            'actions'         => fn_get_rma_properties(RMA_ACTION),
+        ]
+    );
 
 } elseif ($mode == 'create_return' && !empty($_REQUEST['order_id'])) {
     $order_id = intval($_REQUEST['order_id']);
@@ -211,127 +243,4 @@ if ($mode == 'details' && !empty($_REQUEST['return_id'])) {
     Tygh::$app['view']->assign('order_info', $order_info);
     Tygh::$app['view']->assign('reasons', fn_get_rma_properties( RMA_REASON ));
     Tygh::$app['view']->assign('actions', fn_get_rma_properties( RMA_ACTION ));
-}
-
-function fn_get_rma_returns($params, $items_per_page = 0, $lang_code = CART_LANGUAGE)
-{
-    // Init filter
-    $params = LastView::instance()->update('rma', $params);
-
-    // Set default values to input params
-    $default_params = array (
-        'page' => 1,
-        'items_per_page' => $items_per_page
-    );
-
-    $params = array_merge($default_params, $params);
-
-    // Define fields that should be retrieved
-    $fields = array (
-        'DISTINCT ?:rma_returns.return_id',
-        '?:rma_returns.order_id',
-        '?:rma_returns.timestamp',
-        '?:rma_returns.status',
-        '?:rma_returns.total_amount',
-        '?:rma_property_descriptions.property AS action',
-        '?:users.firstname',
-        '?:users.lastname'
-    );
-
-    // Define sort fields
-    $sortings = array (
-        'return_id' => "?:rma_returns.return_id",
-        'timestamp' => "?:rma_returns.timestamp",
-        'order_id' => "?:rma_returns.order_id",
-        'status' => "?:rma_returns.status",
-        'amount' => "?:rma_returns.total_amount",
-        'action' => "?:rma_returns.action",
-        'customer' => "?:users.lastname"
-    );
-
-    $sorting = db_sort($params, $sortings, 'timestamp', 'desc');
-
-    $join = $condition = $group = '';
-
-    if (isset($params['cname']) && fn_string_not_empty($params['cname'])) {
-        $arr = fn_explode(' ', $params['cname']);
-        foreach ($arr as $k => $v) {
-            if (!fn_string_not_empty($v)) {
-                unset($arr[$k]);
-            }
-        }
-        if (sizeof($arr) == 2) {
-            $condition .= db_quote(" AND ?:users.firstname LIKE ?l AND ?:users.lastname LIKE ?l", "%".array_shift($arr)."%", "%".array_shift($arr)."%");
-        } else {
-            $condition .= db_quote(" AND (?:users.firstname LIKE ?l OR ?:users.lastname LIKE ?l)", "%".trim($params['cname'])."%", "%".trim($params['cname'])."%");
-        }
-    }
-
-    if (isset($params['email']) && fn_string_not_empty($params['email'])) {
-        $condition .= db_quote(" AND ?:users.email LIKE ?l", "%".trim($params['email'])."%");
-    }
-
-    if (isset($params['rma_amount_from']) && fn_is_numeric($params['rma_amount_from'])) {
-        $condition .= db_quote("AND ?:rma_returns.total_amount >= ?d", $params['rma_amount_from']);
-    }
-
-    if (isset($params['rma_amount_to']) && fn_is_numeric($params['rma_amount_to'])) {
-        $condition .= db_quote("AND ?:rma_returns.total_amount <= ?d", $params['rma_amount_to']);
-    }
-
-    if (!empty($params['action'])) {
-        $condition .= db_quote(" AND ?:rma_returns.action = ?s", $params['action']);
-    }
-
-    if (!empty($params['return_id'])) {
-        $condition .= db_quote(" AND ?:rma_returns.return_id = ?i", $params['return_id']);
-    }
-
-    if (!empty($params['request_status'])) {
-        $condition .= db_quote(" AND ?:rma_returns.status IN (?a)", $params['request_status']);
-    }
-
-    if (!empty($params['period']) && $params['period'] != 'A') {
-        list($params['time_from'], $params['time_to']) = fn_create_periods($params);
-        $condition .= db_quote(" AND (?:rma_returns.timestamp >= ?i AND ?:rma_returns.timestamp <= ?i)", $params['time_from'], $params['time_to']);
-    }
-
-    if (!empty($params['order_id'])) {
-        $condition .= db_quote(" AND ?:rma_returns.order_id = ?i", $params['order_id']);
-
-    } elseif (!empty($params['order_ids'])) {
-        $condition .= db_quote(" AND ?:rma_returns.order_id IN (?a)", $params['order_ids']);
-    }
-
-    if (isset($params['user_id'])) {
-        $condition .= db_quote(" AND ?:rma_returns.user_id = ?i", $params['user_id']);
-    }
-
-    if (!empty($params['order_status'])) {
-        $condition .= db_quote(" AND ?:orders.status IN (?a)", $params['order_status']);
-    }
-
-    if (!empty($params['p_ids']) || !empty($params['product_view_id'])) {
-        $arr = (strpos($params['p_ids'], ',') !== false || !is_array($params['p_ids'])) ? explode(',', $params['p_ids']) : $params['p_ids'];
-        if (empty($params['product_view_id'])) {
-            $condition .= db_quote(" AND ?:order_details.product_id IN (?n)", $arr);
-        } else {
-            $condition .= db_quote(" AND ?:order_details.product_id IN (?n)", db_get_fields(fn_get_products(array('view_id' => $params['product_view_id'], 'get_query' => true))));
-        }
-
-        $join .= " LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id";
-        $group .=  db_quote(" GROUP BY ?:rma_returns.return_id HAVING COUNT(?:orders.order_id) >= ?i", count($arr));
-    }
-
-    $limit = '';
-    if (!empty($params['items_per_page'])) {
-        $params['total_items'] = db_get_field("SELECT COUNT(DISTINCT ?:rma_returns.return_id) FROM ?:rma_returns LEFT JOIN ?:rma_return_products ON ?:rma_return_products.return_id = ?:rma_returns.return_id LEFT JOIN ?:rma_property_descriptions ON ?:rma_property_descriptions.property_id = ?:rma_returns.action LEFT JOIN ?:users ON ?:rma_returns.user_id = ?:users.user_id LEFT JOIN ?:orders ON ?:rma_returns.order_id = ?:orders.order_id $join WHERE 1 $condition $group");
-        $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
-    }
-
-    $return_requests = db_get_array("SELECT " . implode(', ', $fields) . " FROM ?:rma_returns LEFT JOIN ?:rma_return_products ON ?:rma_return_products.return_id = ?:rma_returns.return_id LEFT JOIN ?:rma_property_descriptions ON (?:rma_property_descriptions.property_id = ?:rma_returns.action AND ?:rma_property_descriptions.lang_code = ?s) LEFT JOIN ?:users ON ?:rma_returns.user_id = ?:users.user_id LEFT JOIN ?:orders ON ?:rma_returns.order_id = ?:orders.order_id $join WHERE 1 $condition $group $sorting $limit", $lang_code);
-
-    LastView::instance()->processResults('rma_returns', $return_requests, $params);
-
-    return array($return_requests, $params);
 }

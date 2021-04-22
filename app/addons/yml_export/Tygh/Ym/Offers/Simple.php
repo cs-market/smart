@@ -41,6 +41,7 @@ class Simple extends Base
         'country_of_origin',
         'barcode',
         'cpa',
+        'adult',
         'expiry',
         'weight',
         'dimensions',
@@ -51,7 +52,7 @@ class Simple extends Base
 
     public function gatherAdditionalExt($product)
     {
-        $this->offer['items']['name'] = $product['product'];
+        $this->offer['items']['name'] = $this->getOfferName($product);
 
         return true;
     }

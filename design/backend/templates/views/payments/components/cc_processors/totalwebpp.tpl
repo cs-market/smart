@@ -7,7 +7,7 @@
 <div class="control-group">
     <label class="control-label" for="password">{__("encryption")} {__("password")}:</label>
     <div class="controls">
-        <input type="password" id="password" name="payment_data[processor_params][password]" value="{$processor_params.password}"  size="60">
+        <input type="password" id="password" name="payment_data[processor_params][password]" value="{$processor_params.password}" autocomplete="new-password" size="60">
     </div>
 </div>
 <div class="control-group">

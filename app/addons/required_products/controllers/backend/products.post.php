@@ -22,30 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //
 
     if ($mode == 'update') {
-        if (!empty($_REQUEST['product_id'])) {
-            db_query('DELETE FROM ?:product_required_products WHERE product_id = ?i', $_REQUEST['product_id']);
+        $product_id = isset($_REQUEST['product_id']) ? (int) $_REQUEST['product_id'] : 0;
+        $required_product_ids = isset($_REQUEST['required_product_ids']) ? array_filter((array) $_REQUEST['required_product_ids']) : [];
 
-            if (!empty($_REQUEST['required_products'])) {
-                $required_products = explode(',', $_REQUEST['required_products']);
-
-                $key = array_search($_REQUEST['product_id'], $required_products);
-
-                if ($key !== false) {
-                    unset($required_products[$key]);
-                }
-
-                $entry = array (
-                    'product_id' => $_REQUEST['product_id']
-                );
-
-                foreach ($required_products as $entry['required_id']) {
-                    if (empty($entry['required_id'])) {
-                        continue;
-                    }
-
-                    db_query('INSERT INTO ?:product_required_products ?e', $entry);
-                }
-            }
+        if ($product_id) {
+            fn_required_products_update_products($product_id, $required_product_ids);
         }
     }
 }

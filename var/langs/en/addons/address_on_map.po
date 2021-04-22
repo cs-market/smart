@@ -5,8 +5,8 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: en_US"
 
 msgctxt "Addons::name::address_on_map"
-msgid "Address on map"
-msgstr "Address on map"
+msgid "Address on map [Deprecated]"
+msgstr "Address on map [Deprecated]"
 
 msgctxt "Addons::description::address_on_map"
 msgid "Shows address on map"

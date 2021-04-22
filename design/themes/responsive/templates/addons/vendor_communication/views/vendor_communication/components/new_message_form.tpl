@@ -1,6 +1,7 @@
 <form action="{""|fn_url}" method="post" class="cm-ajax ty-vendor-communication-new-message" name="add_message_form_{$object_id}" id="add_message_form_{$object_id}">
     <input type="hidden" name="result_ids" value="messages_list_{$object_id},new_message_{$object_id}">
     <input type="hidden" name="message[thread_id]" value="{$object_id}" />
+    <input type="hidden" name="communication_type" value="{"Addons\\VendorCommunication\\CommunicationTypes::VENDOR_TO_CUSTOMER"|enum}" />
 
     <div class="ty-vendor-communication-new-message__message" id="new_message_{$object_id}">
         <label for="thread_message_{$object_id}" class="ty-vendor-communication-new-message__title cm-required">{__("your_message")}</label>

@@ -15,9 +15,11 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 use Tygh\Bootstrap;
+use Tygh\Enum\SiteArea;
 use Tygh\Registry;
 use Tygh\Storage;
 use Tygh\Tools\Url;
+use Tygh\Languages\Languages;
 
 //
 // Export data using pattern
@@ -190,6 +192,7 @@ function fn_export($pattern, $export_fields, $options)
                 'result' => &$result,
                 'export_fields' => &$export_fields,
                 'multi_lang' => $multi_lang,
+                'main_lang' => $main_lang,
                 'pattern' => $pattern
             );
             fn_exim_processing('export', $pattern['export_processing'], $options, $pre_export_process_data);
@@ -640,27 +643,31 @@ function fn_import($pattern, $import_data, $options)
         } else {
             $where = array();
             foreach ($_alt_keys as $field => $value) {
-                $where[] = db_quote("?p = ?s", $field, $value);
+                if (is_array($value)) {
+                    $where[] = db_quote("?p IN (?a)", $field, $value);
+                } else {
+                    $where[] = db_quote("?p = ?s", $field, $value);
+                }
+
             }
             $where = implode(' AND ', $where);
 
             $primary_object_id = db_get_row('SELECT ' . implode(', ', $pattern['key']) . ' FROM ?:' . $pattern['table'] . ' WHERE ?p', $where);
         }
 
-        $primary_object_ids[] = $primary_object_id;
         $skip_record = $stop_import = false;
 
         if (!empty($pattern['import_process_data'])) {
             $data_import_process_data = array(
                 'primary_object_id' => &$primary_object_id,
-                'object' => &$v[$main_lang],
-                'pattern' => &$pattern,
-                'options' => &$options,
-                'processed_data' => &$processed_data,
+                'object'            => &$v[$main_lang],
+                'pattern'           => &$pattern,
+                'options'           => &$options,
+                'processed_data'    => &$processed_data,
                 'processing_groups' => &$processing_groups,
-                'skip_record' => &$skip_record,
-                'stop_import' => &$stop_import,
-                'data' =>&$v,
+                'skip_record'       => &$skip_record,
+                'stop_import'       => &$stop_import,
+                'data'              => &$v,
             );
 
             fn_exim_processing('import', $pattern['import_process_data'], $options, $data_import_process_data);
@@ -676,6 +683,7 @@ function fn_import($pattern, $import_data, $options)
             continue;
         }
 
+        $primary_object_ids[$k] = $primary_object_id;
         if (!(isset($pattern['import_skip_db_processing']) && $pattern['import_skip_db_processing'])) {
 
             fn_set_progress('echo', __('importing_data'));
@@ -729,6 +737,7 @@ function fn_import($pattern, $import_data, $options)
                 }
 
                 fn_set_progress('echo', __('creating') . ' ' . $pattern['name'] . ' <b>' . implode(',', $primary_object_id) . '</b>. ', false);
+                $primary_object_ids[$k] = $primary_object_id;
             }
         }
 
@@ -811,7 +820,7 @@ function fn_import($pattern, $import_data, $options)
 
                         if (substr($table, -13) == '_descriptions' && isset($_data['lang_code'])) {
                             // add description for all cart languages when adding object data
-                            foreach (fn_get_translation_languages() as $_data['lang_code'] => $lang_v) {
+                            foreach (Languages::getAll() as $_data['lang_code'] => $lang_v) {
                                 db_query("REPLACE INTO ?:$table ?e", $_data);
                             }
 
@@ -934,7 +943,8 @@ function fn_import($pattern, $import_data, $options)
 
                 if ($group['return_result'] == true) {
                     foreach (array_keys($v) as $lang) {
-                        $v[$lang][$group['this_field']] = $result;
+                        $v[$lang][$group['return_field']] = $result;
+                        $import_data[$k][$lang][$group['return_field']] = $result;
                     }
                 }
             }
@@ -949,12 +959,13 @@ function fn_import($pattern, $import_data, $options)
     ));
 
     if (!empty($pattern['post_processing'])) {
-        $data_post_processing = array(
-            'primary_object_ids' => &$primary_object_ids,
-            'import_data' => &$import_data,
-            'processed_data' => &$processed_data,
+        $data_post_processing = [
+            'primary_object_ids'        => &$primary_object_ids,
+            'import_data'               => &$import_data,
+            'processed_data'            => &$processed_data,
             'final_import_notification' => &$final_import_notification,
-        );
+            'pattern'                   => &$pattern
+        ];
 
         fn_exim_processing('import', $pattern['post_processing'], $options, $data_post_processing);
     }
@@ -962,6 +973,7 @@ function fn_import($pattern, $import_data, $options)
     if (!empty($processed_data['C'])) {
         fn_set_notification('W', __('important'), __('import_new_vendor', array($processed_data['C'])));
     }
+
 
     fn_set_notification('W', __('important'), $final_import_notification, '', 'exim_import_final_notification');
 
@@ -1103,6 +1115,26 @@ function fn_exim_export_image($image_id, $object, $backup_path = '', $include_al
 function fn_exim_import_images($prefix, $image_file, $detailed_file, $position, $type, $object_id, $object, $import_options = null)
 {
     static $updated_products = array();
+    $perform_import = true;
+
+    /**
+     * Allows to change image import params before import
+     *
+     * @param string $prefix         Path prefix
+     * @param string $image_file     Thumbnail path or filename
+     * @param string $detailed_file  Detailed image path or filename
+     * @param string $position       Image position
+     * @param string $type           Pair type
+     * @param int    $object_id      ID of object to attach images to
+     * @param string $object         Name of object to attach images to
+     * @param array  $import_options Import options
+     * @param bool   $perform_import Whether to import images
+     */
+    fn_set_hook('exim_import_images_pre', $prefix, $image_file, $detailed_file, $position, $type, $object_id, $object, $import_options, $perform_import);
+
+    if (!$perform_import) {
+        return false;
+    }
 
     if (!empty($object_id)) {
         // Process multilang requests
@@ -1188,17 +1220,18 @@ function fn_exim_import_images($prefix, $image_file, $detailed_file, $position, 
                 $_REQUEST["file_import_image_detailed"] = array();
             }
 
-            $_REQUEST['import_image_data'] = array(
-                array(
-                    'type' => $type,
-                    'image_alt' => empty($image_alt) ? '' : $image_alt,
+            $_REQUEST['import_image_data'] = [
+                [
+                    'type'         => $type,
+                    'image_alt'    => empty($image_alt) ? '' : $image_alt,
                     'detailed_alt' => empty($detailed_alt) ? '' : $detailed_alt,
-                    'position' => empty($position) ? 0 : $position,
-                )
-            );
+                    'position'     => empty($position) ? 0 : $position,
+                ]
+            ];
 
             $result = fn_attach_image_pairs('import', $object, $_id);
         }
+
         if (!$result) {
             fn_set_notification('W', __('warning'), __('error_exim_get_images_for_products'));
         }
@@ -1218,9 +1251,14 @@ function fn_exim_get_image_url($product_id, $object_type, $pair_type, $get_icon,
 {
     $image_pair = fn_get_image_pairs($product_id, $object_type, $pair_type, true, true, $lang_code);
 
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+    $url = $storefront->url;
+
     $image_data = fn_image_to_display($image_pair,
         Registry::get('settings.Thumbnails.product_details_thumbnail_width'),
-        Registry::get('settings.Thumbnails.product_details_thumbnail_height')
+        Registry::get('settings.Thumbnails.product_details_thumbnail_height'),
+        $url
     );
 
     if (!empty($image_data['image_path'])) {
@@ -1439,9 +1477,10 @@ function fn_exim_sort_patterns($a, $b)
 /**
  * Checks if admin has rights to use this pattern
  *
- * @param array $pattern Pattern structure
- * @param enum $get_for import|export
- * @param int $user_id User ID
+ * @param array  $pattern Pattern structure
+ * @param string $get_for import|export
+ * @param int    $user_id User ID
+ *
  * @return bool true if user has privilege to use this pattern, false otherwise
  */
 function fn_exim_check_pattern_permissions($pattern, $get_for, $user_id)
@@ -1480,7 +1519,10 @@ function fn_exim_get_product_url($product_id, $lang_code = '')
         $company_url = '';
     }
 
-    $url = fn_url('products.view?product_id=' . $product_id . $company_url, 'C', fn_get_storefront_protocol(), $lang_code);
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+
+    $url = fn_url('products.view?product_id=' . $product_id . $company_url . '&storefront_id=' . $storefront->storefront_id, SiteArea::STOREFRONT, fn_get_storefront_protocol(), $lang_code);
 
     fn_set_hook('exim_get_product_url', $url, $product_id, $options, $lang_code);
 
@@ -1646,26 +1688,6 @@ function fn_exim_export_build_conditions($pattern, $options)
     return $conditions;
 }
 
-/**
- * @deprecated, use fn_exim_quote instead
- */
-function fn_exim_set_quotes($value, $quote = "'")
-{
-    if (is_array($value) && !empty($value)) {
-        foreach ($value as $k => $v) {
-            $values[$k] = fn_exim_set_quotes($v, $quote);
-        }
-        $result = $values;
-    } elseif (gettype($value) == 'string') {
-        $result = $quote . $value . $quote;
-
-    } else {
-        $result = $value;
-    }
-
-    return $result;
-}
-
 function fn_exim_quote(&$value, $quote = "'")
 {
     if (is_string($value)) {
@@ -1736,7 +1758,13 @@ function fn_exim_get_values($values, $pattern, $options, $vars = array(), $data 
                 } else {
                     $val[$field] = '';
                 }
-
+            } elseif ($operator === '%') {
+                $opt = str_replace('%', '', $value);
+                if (isset($data['object'][$opt])) {
+                    $val[$field] = $data['object'][$opt];
+                } else {
+                    $val[$field] = '';
+                }
             } else {
                 $val[$field] = $value;
                 fn_exim_quote($val[$field], $quote);
@@ -1749,23 +1777,33 @@ function fn_exim_get_values($values, $pattern, $options, $vars = array(), $data 
 
 function fn_exim_import_build_groups($type_group, $export_fields)
 {
-    $groups = array();
-    if (!empty($type_group)) {
-        foreach ($export_fields as $field => $data) {
-            $db_field = (empty($data['db_field']) ? $field : $data['db_field']);
-            if (!empty($data[$type_group])) {
-                $args = $data[$type_group];
-                $function = array_shift($args);
-                $groups[] = array (
-                    'function' => $function,
-                    'this_field' => $db_field,
-                    'args' => $args,
-                    'table' => !empty($data['table']) ? $data['table'] : '',
-                    'multilang' => !empty($data['multilang']) ? true : false,
-                    'return_result' => !empty($data['return_result']) ? $data['return_result'] : false,
-                );
-            }
+    $groups = [];
+
+    if (empty($type_group)) {
+        return $groups;
+    }
+
+    foreach ($export_fields as $field => $data) {
+        if (empty($data[$type_group])) {
+            continue;
         }
+
+        $db_field = empty($data['db_field']) ? $field : $data['db_field'];
+        $return_result = empty($data['return_result']) ? false : $data['return_result'];
+        $return_field = empty($data['return_field']) ? $db_field : $data['return_field'];
+
+        $args = $data[$type_group];
+        $function = array_shift($args);
+
+        $groups[] = [
+            'function'      => $function,
+            'this_field'    => $db_field,
+            'args'          => $args,
+            'table'         => empty($data['table']) ? '' : $data['table'],
+            'multilang'     => !empty($data['multilang']),
+            'return_result' => $return_result,
+            'return_field'  => $return_result ? $return_field : false
+        ];
     }
 
     return $groups;
@@ -1826,7 +1864,7 @@ function fn_exim_import_parse_languages($pattern, &$import_data, $options)
         $langs[] = DEFAULT_LANGUAGE;
     }
 
-    $langs = array_intersect($langs, array_keys(fn_get_translation_languages()));
+    $langs = array_intersect($langs, array_keys(Languages::getAll()));
     $count_langs = count($langs);
 
     $count_lang_data = array();
@@ -1894,14 +1932,15 @@ function fn_exim_import_parse_languages($pattern, &$import_data, $options)
  *
  * If the company isn't found, a new company will be created.
  *
- * @param string   $object_type     Type of object ('currencies', 'pages', etc)
- * @param integer  $object_id       Product identifier
- * @param string   $company_name    Company name
- * @param array    $processed_data  Quantity of the loaded objects. Objects:
- *                                  'E' - quantity existent products, 'N' - quantity new products,
- *                                  'S' - quantity skipped products, 'C' - quantity vendors
+ * @param string             $object_type    Type of object ('currencies', 'pages', etc)
+ * @param string             $object_key     Object key
+ * @param int                $object_id      Product identifier
+ * @param string             $company_name   Company name
+ * @param array<string, int> $processed_data Quantity of the loaded objects. Objects:
+ *                                           'E' - quantity existent products, 'N' - quantity new products,
+ *                                           'S' - quantity skipped products, 'C' - quantity vendors
  *
- * @return integer $company_id Company identifier.
+ * @return int $company_id Company identifier.
  */
 
 function fn_exim_set_company($object_type, $object_key, $object_id, $company_name, &$processed_data = array())
@@ -1987,13 +2026,22 @@ function fn_exim_apply_company($pattern, &$alt_keys, &$object, &$skip_get_primar
  * Gets the translation for the variable.
  *
  * @param string $value The name of variable.
+ * @param string $action Type of the action: import|export
  *
  * @return bool|string The string with the translation.
  */
-function fn_exim_get_field_label($value)
+function fn_exim_get_field_label($value, $action = '')
 {
     $value = str_replace(array(':', '(', ')', '-'), '', $value);
     $value = strtolower(str_replace(' ', '_', $value));
 
-    return fn_is_lang_var_exists($value) ? __($value) : false;
+    if (!empty($action) && fn_is_lang_var_exists('exim_' . $action . '_' . $value)) {
+        $label = __('exim_' . $action . '_' . $value);
+    } elseif (fn_is_lang_var_exists('exim_' . $value)) {
+        $label = __('exim_' . $value);
+    } else {
+        $label = fn_is_lang_var_exists($value) ? __($value) : false;
+    }
+
+    return $label;
 }

@@ -5,16 +5,16 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/hybrid_auth.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.2/addons/hybrid_auth.po\n"
+"X-Crowdin-File-ID: 4084\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
-msgstr "Логування через соціальні мережі"
+msgstr "Вхід через соціальні мережі"
 
 msgctxt "Addons::description::hybrid_auth"
 msgid "Adds the Social Login feature; allows customers use Facebook, Twitter, etc. to log in on the store"
@@ -26,7 +26,7 @@ msgstr "Загальні"
 
 msgctxt "SettingsOptions::hybrid_auth::icons_pack"
 msgid "Icons pack"
-msgstr "Пак іконок"
+msgstr "Іконки"
 
 msgctxt "SettingsTooltips::hybrid_auth::icons_pack"
 msgid "Directory with the social networks icons. A path to the directory: media/images/addons/addons/hybrid_auth/icons/."
@@ -34,7 +34,7 @@ msgstr "Каталог іконок соц. мереж. Шлях до катал
 
 msgctxt "SettingsOptions::hybrid_auth::autogen_email"
 msgid "Autogeneration email"
-msgstr "Автогенерація електронного листа"
+msgstr "Автогенерація електронної адреси"
 
 msgctxt "SettingsTooltips::hybrid_auth::autogen_email"
 msgid "Enables the email auto generation in case that a social network does not pass the address."
@@ -50,11 +50,11 @@ msgstr "Посилання"
 
 msgctxt "Languages::hybrid_auth.not_linked_provider"
 msgid "Not linked"
-msgstr ""
+msgstr "Не пов'язано"
 
 msgctxt "Languages::hybrid_auth.providers"
 msgid "Providers"
-msgstr "Постачальники"
+msgstr "Соц. мережа"
 
 msgctxt "Languages::hybrid_auth.add_provider"
 msgid "Add provider"
@@ -118,15 +118,15 @@ msgstr "Ви можете змінити свій пароль за посила
 
 msgctxt "Languages::hybrid_auth.link_provider"
 msgid "Social network accounts"
-msgstr ""
+msgstr "Облікові записи соціальних мереж"
 
 msgctxt "Languages::hybrid_auth.text_link_provider"
 msgid "Assign your social network account to this one and use it to log in"
-msgstr ""
+msgstr "Підключити аккаунт соціальної мережі і використовувати його для входу"
 
 msgctxt "Languages::hybrid_auth.text_user_is_already_link"
 msgid "This social network account is already being used"
-msgstr ""
+msgstr "Цей обліковий запис соціальної мережі вже використовується"
 
 msgctxt "Languages::hybrid_auth.connect_social"
 msgid "Connect social account"
@@ -138,7 +138,7 @@ msgstr "Такий користувач вже існує"
 
 msgctxt "Languages::hybrid_auth.text_connect_social"
 msgid "<p>The user with the e-mail specified during social login already exists.</p><p>If you want to assign a social network account to the registered user, please log in.</p>"
-msgstr ""
+msgstr "<p>Користувач з такою електронною поштою вже існує.</p> <p>Якщо Ви хочете підключити дану соц. мережу цьому користувачеві, то, будь ласка, авторизуйтесь.</p>"
 
 msgctxt "Languages::hybrid_auth.specify_email"
 msgid "Specify email"
@@ -150,7 +150,7 @@ msgstr "e-mail не вказано."
 
 msgctxt "Languages::hybrid_auth.text_specify_email"
 msgid "<p>When logging through the social network the e-mail was not specified.</p><p>Please enter your e-mail and click Continue.</p>"
-msgstr ""
+msgstr "<p>При вході через соц. мережа не було вказано адресу електронної пошти.</p> <p>Будь ласка введіть його і натисніть \"Продовжити\".</p>"
 
 msgctxt "Languages::hybrid_auth_menu_description"
 msgid "Create social provider"
@@ -169,12 +169,16 @@ msgid "Test mode"
 msgstr "Тестовий режим"
 
 msgctxt "Languages::privileges.manage_providers"
-msgid "Manage social login providers"
-msgstr "Управління провайдерами модуля «Вхід через соцмережі»"
+msgid "Can edit"
+msgstr "Можна редагувати"
 
 msgctxt "Languages::privileges.view_providers"
-msgid "View social login providers"
-msgstr "Перегляд провайдерів модуля «Вхід через соцмережі»"
+msgid "Can view"
+msgstr "Можна переглянути"
+
+msgctxt "Languages::privilege_groups.social_login"
+msgid "Social login"
+msgstr "Вхід через соціальні мережі"
 
 msgctxt "Languages::hybrid_auth.instruction_facebook"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developers.facebook.com/apps' target='_blank'>Facebook Developers</a>."
@@ -182,7 +186,7 @@ msgstr "Використовуйте ID додатка і секретний к�
 
 msgctxt "Languages::hybrid_auth.instruction_facebook_login"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href=\"https://developers.facebook.com/apps\" target=\"_blank\">Facebook Developers</a>. After that copy the value of the <b>Valid OAuth redirect URIs</b> field to the corresponding setting of the <b>Facebook Login</b> product in your Facebook application."
-msgstr ""
+msgstr "Скористайтеся ID додатки і секретним ключем, отриманими після створення програми на сайті <a href=\"https://developers.facebook.com/apps\" target=\"_blank\">розробників Facebook</a>. Після цього скопіюйте вміст поля <b>Valid OAuth redirect URIs</b> в відповідне поле на вкладці <b>Facebook Login</b> у вашому додатку на Facebook."
 
 msgctxt "Languages::hybrid_auth.instruction_google"
 msgid "Use ID and Secret key that you've received after creating a project on <a href='https://code.google.com/apis/console/?pli=1' target='_blank'>Google</a>."
@@ -198,7 +202,7 @@ msgstr "Використовуйте ID (ключ клієнта) і секре�
 
 msgctxt "Languages::hybrid_auth.instruction_yahoo"
 msgid "Use ID (Identificator) and Secret key that you've received after creating an application on <a href='https://developer.yahoo.com/apps/create/' target='_blank'>Yahoo</a>."
-msgstr ""
+msgstr "Використайте ID (Ідентифікатор) і секретний ключ, які ви отримали після створення програми в <a href='https://developer.yahoo.com/apps/create/' target='_blank'>Yahoo</a>."
 
 msgctxt "Languages::hybrid_auth.instruction_live"
 msgid "Use the application ID and Secret key that you've received after adding an application on <a href='https://account.live.com/developers/applications/create' target='_blank'>Live</a>."
@@ -214,21 +218,45 @@ msgstr "Використовувати ID застосунку та секрет
 
 msgctxt "Languages::email_template.hybrid_auth_create_profile"
 msgid "Create user profile via social login"
-msgstr ""
+msgstr "Створення профілю користувача за допомогою соціальних мереж"
 
 msgctxt "Languages::hybrid_auth.provider_not_found"
 msgid "Provider [provider] not found"
-msgstr ""
+msgstr "Постачальник [provider] не знайдено"
 
 msgctxt "Languages::hybrid_auth.facebook_disabled_upgrade_notification_title"
 msgid "Social Login: Sign-ins via Facebook have been disabled due to an old PHP version"
-msgstr ""
+msgstr "Вхід через соц. мережі: Вхід Через Facebook вимкнуто через стару версію PHP"
 
 msgctxt "Languages::hybrid_auth.facebook_disabled_upgrade_notification_text"
 msgid "<p>We had to move to a newer version of Facebook API, because the API version that we used previously is no longer supported. However, to work with the new API, [product] requires PHP 5.4. You are seeing this message because your server has an older PHP version.</p><p>The status of the <b>Facebook</b> provider under <b>Website → Social login</b> has been set to <i>Disabled</i>.</p><p>Please update your PHP version to 5.4 or higher before you re-enable Facebook.</p>"
-msgstr ""
+msgstr "<p>У зв'язку з тим, що версія Facebook API, яку ми використовували раніше, більше не підтримується, нам довелося перейти на нову версію API. Тепер для роботи з новим API, [product] вимагає PHP 5.4. Ви бачите це повідомлення, тому що ваш сервер використовує стару версію PHP.</p><p>Статус провайдера <b>Facebook</b> на сторінці <b>Веб-сайт → Вхід через соц. мережі</b> був змінений на <i>Вимкнути.</i>. </p><p>Будь ласка, перш ніж включити Facebook знову, поновіть PHP до версії 5.4 або вище.</p>"
 
 msgctxt "Languages::hybrid_auth.facebook_oauth_redirect_uris"
 msgid "Valid OAuth redirect URIs"
-msgstr ""
+msgstr "Дійсні URI редиректу OAuth"
+
+msgctxt "Languages::hybrid_auth.live_redirect_urls"
+msgid "Redirect URLs"
+msgstr "URL-адреси редиректу"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_version"
+msgid "API version"
+msgstr "Версія API"
+
+msgctxt "Languages::ttc_hybrid_auth.linkedin_api_version"
+msgid "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">deprecated API v1</a>, but old apps still use it. If you're configuring LinkedIn app for the first time now, use API v2. Old LinkedIn apps configured some time ago may still be using v1."
+msgstr "У LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">застарілий API v1</a>, але старі програми все ще його використовують. Якщо ви вперше налаштовуєте додаток LinkedIn, скористайтеся API v2. Старі програми LinkedIn деякий час можуть використовувати v1."
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v1"
+msgid "v1"
+msgstr "v1"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v2"
+msgid "v2"
+msgstr "v2"
+
+msgctxt "Languages::hybrid_auth.instruction_paypal_application"
+msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
+msgstr "Використовуйте ID та Secret key, які ви отримали після створення додатку в <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Будь ласка, увімкніть усі атрибути особистого профілю та принаймні один атрибут діапазону в Адресі та в Інформації в налаштуваннях додатку PayPal."
 

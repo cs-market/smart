@@ -14,8 +14,7 @@
 
 namespace Tygh;
 
-use Tygh\Registry;
-use Tygh\Settings;
+use Tygh\Languages\Helper as LanguageHelper;
 
 class BackendMenu
 {
@@ -66,22 +65,108 @@ class BackendMenu
         $menu['top'] = $this->_sort($menu['top']);
         $menu['central'] = $this->_sort($menu['central']);
         $menu = $this->_getSettingsSections($menu);
+        $menu = $this->getTopSuppliers($menu);
 
-        fn_preload_lang_vars($this->_lang_cache);
-
-        $selected = $this->_selected;
+        LanguageHelper::preloadLangVars($this->_lang_cache);
 
         /**
          * Changes generated menu items
          *
-         * @param  array $request request params
+         * @param array $request request params
          * @param array $menu items
          * @param array $actions items Action value, if exists. See: fn_get_route
          * @param array $this->selected Menu item, selected by the dispatch
          */
         fn_set_hook('backend_menu_generate_post', $request, $menu, $actions, $this->_selected);
 
+        if (Registry::ifGet('config.tweaks.validate_menu', false)) {
+            $menu = $this->cleanUpTopLevelMenus($menu);
+        }
+
         return array($menu, $actions, $this->_selected);
+    }
+
+    /**
+     * Filters elements of top and central admin panel menu and items from Add-ons top menu.
+     *
+     * @param array<string, array<string, array<string, string>>> $menu Current state of admin panel menu.
+     *
+     * @return array<string, array<string, array<string, string>>>
+     */
+    protected function cleanUpTopLevelMenus(array $menu)
+    {
+        $core_addons = array_values(Snapshot::getCoreAddons());
+        $addons_menu = fn_get_schema('menu', 'menu', 'php', false, $core_addons);
+        if (isset($menu['top'], $menu['central'], $addons_menu['top'], $addons_menu['central'])) {
+            $core_top_elements = array_keys($addons_menu['top']);
+            $core_central_elements = array_keys($addons_menu['central']);
+            foreach (array_keys($menu['top']) as $element_name) {
+                if (in_array($element_name, $core_top_elements)) {
+                    continue;
+                }
+                unset($menu['top'][$element_name]);
+            }
+            foreach (array_keys($menu['central']) as $element_name) {
+                if (in_array($element_name, $core_central_elements)) {
+                    continue;
+                }
+                unset($menu['central'][$element_name]);
+            }
+        }
+        return $menu;
+    }
+
+    /**
+     * Get top N add-on suppliers for Add-ons top menu.
+     *
+     * @param array<string, array<string, array<string, array<string, array<string, string|int>>>>> $menu   Current state of admin panel menu.
+     * @param int                                                                                   $amount Amount of suppliers required to be returned.
+     *
+     * @psalm-param
+     * array{
+     *  top: array{
+     *      addons: array{
+     *          items: array{
+     *              manage_addons: array{
+     *                  subitems: array<string, array{href: string, position: int}>
+     *              }
+     *          }
+     *      }
+     *      <string, string>
+     *  }<string, array<string, string>>
+     * }<string, array<string, array<string, string>>> $menu Current state of admin panel menu.
+     *
+     * @psalm-suppress InvalidReturnType
+     *
+     * @return array<string, array<string, array<string, array<string, array<string, string|int>>>>>
+     */
+    protected function getTopSuppliers(array $menu, $amount = 10)
+    {
+        if (!isset($menu['top']['addons']['items']['manage_addons'])) {
+            return $menu;
+        }
+        $cache_key = "top_{$amount}_supplier";
+        Registry::registerCache(
+            ['addons', $cache_key],
+            ['addons'],
+            Registry::cacheLevel('static')
+        );
+        if (!Registry::isExist($cache_key)) {
+            list($addons,) = fn_get_addons(
+                ['type' => 'active'],
+                0,
+                CART_LANGUAGE,
+                null,
+                Registry::get('runtime.company_id')
+            );
+            $suppliers = fn_get_addon_suppliers($addons, $amount);
+            Registry::set($cache_key, $suppliers);
+        } else {
+            $suppliers = Registry::get($cache_key);
+        }
+        $menu['top']['addons']['items']['manage_addons']['subitems'] = $suppliers;
+        /** @psalm-suppress InvalidReturnStatement */
+        return $menu;
     }
 
     /**
@@ -110,6 +195,8 @@ class BackendMenu
      */
     private function _processItems($items, $section, $parent, $is_root = true)
     {
+        $previous_active = null;
+
         foreach ($items as $item_title => &$it) {
 
             if (empty($it['href'])) {
@@ -135,7 +222,7 @@ class BackendMenu
             }
 
             // Remove item from list if we have no permissions to acces it or it disabled by option
-            if (fn_check_view_permissions($it['href'], 'GET') == false || $this->_isOptionActive($it) == false) {
+            if (fn_check_view_permissions($it['href'], 'GET') === false || $this->_isOptionActive($it) === false) {
                 unset($items[$item_title]);
                 continue;
             }
@@ -149,14 +236,22 @@ class BackendMenu
 
             if ($status = $this->_compareUrl($hrefs, $this->_controller, $this->_mode, !$is_root)) {
 
-                $it['active'] = true;
-                if ($status > $this->_selected_priority) {
+                if ($status >= $this->_selected_priority) {
+
+                    $it['active'] = true;
+
+                    if ($previous_active !== null) {
+                        $previous_active['active'] = false;
+                    }
+
                     $this->_selected = array(
                         'item' => empty($parent) ? $item_title : $parent,
                         'section' => $section
                     );
 
                     $this->_selected_priority = $status;
+
+                    $previous_active = &$it;
                 }
             }
 
@@ -265,10 +360,19 @@ class BackendMenu
             }
             parse_str($params_list, $params);
 
-            if ($dispatch == ($controller . '.' . $mode) && sizeof(array_intersect_assoc($this->_request, $params)) == sizeof($params)) {
-                $match = self::URL_EXACT_MATCH  + self::EXACT_COEFFICIENT - sizeof(array_diff_assoc($this->_request, $params));
-            } elseif ($match < self::URL_EXACT_MATCH && $strict == false && strpos($dispatch, $controller . '.') === 0) {
-                $match = self::URL_PARTIAL_MATCH + self::PARTIAL_COEFFICIENT - sizeof(array_diff_assoc($this->_request, $params));;
+            if ($dispatch === $controller . '.' . $mode
+                && $has_matches = $this->hasMatchingRequestParameters($this->_request, $params)
+            ) {
+                $match = self::URL_EXACT_MATCH
+                    + self::EXACT_COEFFICIENT
+                    - $this->getDifferingParametersCount($this->_request, $params);
+            } elseif ($match < self::URL_EXACT_MATCH
+                && $strict == false
+                && strpos($dispatch, $controller . '.') === 0
+            ) {
+                $match = self::URL_PARTIAL_MATCH
+                    + self::PARTIAL_COEFFICIENT
+                    - $this->getDifferingParametersCount($this->_request, $params);
             }
         }
 
@@ -277,8 +381,10 @@ class BackendMenu
 
     /**
      * Replaces placeholders with request vars
+     *
      * @param  string $href URL with placeholders
-     * @return sting  processed URL
+     *
+     * @return string  processed URL
      */
     private function _substituteVars($href)
     {
@@ -304,5 +410,63 @@ class BackendMenu
         }
 
         return true;
+    }
+
+    /**
+     * @param array $request
+     * @param array $params
+     *
+     * @return bool
+     */
+    protected function hasMatchingRequestParameters(array $request, array $params)
+    {
+        $request = $this->flattenRequest($request);
+        $params = $this->flattenRequest($params);
+
+        $matching_params = array_intersect_assoc($request, $params);
+
+        return sizeof($matching_params) === sizeof($params);
+    }
+
+    /**
+     * @param array $request
+     * @param array $params
+     *
+     * @return int
+     */
+    protected function getDifferingParametersCount(array $request, array $params)
+    {
+        $request = $this->flattenRequest($request);
+        $params = $this->flattenRequest($params);
+
+        $diff = sizeof(array_diff_assoc($request, $params));
+
+        return $diff;
+    }
+
+    /**
+     * Flattens request parameters for precise URL matching.
+     *
+     * @param array  $request
+     * @param string $prefix
+     *
+     * @return array
+     */
+    public function flattenRequest(array $request, $prefix = '')
+    {
+        $flat_request = [];
+
+        foreach ($request as $param_name => $param_value) {
+            $param_name = $prefix !== ''
+                ? $prefix . '[' . (string) $param_name . ']'
+                : $param_name;
+            if (is_array($param_value)) {
+                $flat_request = fn_array_merge($flat_request, $this->flattenRequest($param_value, $param_name), true);
+            } else {
+                $flat_request[$param_name] = $param_value;
+            }
+        }
+
+        return $flat_request;
     }
 }

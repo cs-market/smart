@@ -70,9 +70,17 @@ if ($mode == 'end_signup' && !empty($_REQUEST['validation']) && !empty($_REQUEST
     ));
 
     if ($is_ekey_valid) {
+        $redirection_area = 'A';
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $payment_data = fn_get_payment_method_data($_REQUEST['payment_id']);
+            if ($payment_data['company_id']) {
+                $redirection_area = 'V';
+            }
+        }
+
         return array(
             CONTROLLER_STATUS_REDIRECT,
-            fn_url("payments.manage?paypal_signup_for={$_REQUEST['payment_id']}", 'A'),
+            fn_url("payments.manage?paypal_signup_for={$_REQUEST['payment_id']}", $redirection_area),
             true
         );
     }

@@ -20,13 +20,18 @@ require_once (Registry::get('config.dir.payments') . 'eway/eway_rapidapi.functio
 
 $request_eway = fn_eway_rapidapi_build_request($order_id, $order_info, $processor_data);
 
+$enc_data = [
+    'card_number' => $_REQUEST['payment_info_enc']['card_number'],
+    'cvv2' => $_REQUEST['payment_info_enc']['cvv2']
+];
+
 $request_eway['TransactionType'] = 'Purchase';
 $request_eway['Customer']['CardDetails'] = array(
     'Name' => $order_info['payment_info']['cardholder_name'],
-    'Number' => $order_info['payment_info']['card_number'],
+    'Number' => $enc_data['card_number'],
     'ExpiryMonth' => $order_info['payment_info']['expiry_month'],
     'ExpiryYear' => $order_info['payment_info']['expiry_year'],
-    'CVN' => $order_info['payment_info']['cvv2']
+    'CVN' => $enc_data['cvv2']
 );
 
 $response = '';
@@ -53,6 +58,7 @@ if (fn_eway_rapidapi_request('Transaction', $request_eway, $processor_data, $res
     if ($processor_data['processor_params']['mode'] == 'test') {
         $pp_response["reason_text"] .= "; This is a TEST transaction";
     }
+
 } else {
     $pp_response['order_status'] = 'F';
     $pp_response["reason_text"] = 'HTTP: ' . $response;

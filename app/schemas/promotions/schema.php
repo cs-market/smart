@@ -164,7 +164,10 @@ if (!fn_allowed_for('ULTIMATE:FREE')) {
     $schema['conditions']['payment'] = array(
         'operators' => array ('eq', 'neq'),
         'type' => 'select',
-        'variants_function' => array ('fn_get_simple_payment_methods', false),
+        'variants_function' => array('fn_get_payments', array(
+            'simple'    => true,
+            'lang_code' => CART_LANGUAGE
+        )),
         'field' => 'payment_id',
         'zones' => array('cart')
     );

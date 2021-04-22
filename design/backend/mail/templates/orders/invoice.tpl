@@ -47,12 +47,6 @@
                         <td width="100%" style="font-size: 12px; font-family: Arial;">{$company_data.company_phone_2}</td>
                     </tr>
                     {/if}
-                    {if $company_data.company_fax}
-                    <tr valign="top">
-                        <td style="font-size: 12px; font-family: verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("fax")}:</td>
-                        <td width="100%" style="font-size: 12px; font-family: Arial;">{$company_data.company_fax}</td>
-                    </tr>
-                    {/if}
                     {if $company_data.company_website}
                     <tr valign="top">
                         <td style="font-size: 12px; font-family: verdana, helvetica, arial, sans-serif; text-transform: uppercase; color: #000000; padding-right: 10px; white-space: nowrap;">{__("web_site")}:</td>
@@ -213,7 +207,7 @@
                 {if $order_info.use_discount}
                     <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap; font-size: 12px; font-family: Arial;">{__("discount")}</th>
                 {/if}
-                {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                     <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap; font-size: 12px; font-family: Arial;">{__("tax")}</th>
                 {/if}
                 <th style="background-color: #eeeeee; padding: 6px 10px; white-space: nowrap; font-size: 12px; font-family: Arial;">{__("subtotal")}</th>
@@ -234,7 +228,7 @@
                     {if $order_info.use_discount}
                     <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{if $oi.extra.discount|floatval}{include file="common/price.tpl" value=$oi.extra.discount}{else}&nbsp;-&nbsp;{/if}</td>
                     {/if}
-                    {if $order_info.taxes && $settings.General.tax_calculation != "subtotal"}
+                    {if $order_info.taxes && $settings.Checkout.tax_calculation != "subtotal"}
                         <td style="padding: 5px 10px; background-color: #ffffff; text-align: right; font-size: 12px; font-family: Arial;">{if $oi.tax_value}{include file="common/price.tpl" value=$oi.tax_value}{else}&nbsp;-&nbsp;{/if}</td>
                     {/if}
         
@@ -293,7 +287,7 @@
                 </tr>
                 {foreach from=$order_info.taxes item=tax_data}
                 <tr>
-                    <td style="text-align: right; white-space: nowrap; font-size: 12px; font-family: Arial;">{$tax_data.description}&nbsp;{include file="common/modifier.tpl" mod_value=$tax_data.rate_value mod_type=$tax_data.rate_type}{if $tax_data.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.General.tax_calculation == "subtotal")}&nbsp;{__("included")}{/if}{if $tax_data.regnumber}&nbsp;({$tax_data.regnumber}){/if}:&nbsp;</td>
+                    <td style="text-align: right; white-space: nowrap; font-size: 12px; font-family: Arial;">{$tax_data.description}&nbsp;{include file="common/modifier.tpl" mod_value=$tax_data.rate_value mod_type=$tax_data.rate_type}{if $tax_data.price_includes_tax == "Y" && ($settings.Appearance.cart_prices_w_taxes != "Y" || $settings.Checkout.tax_calculation == "subtotal")}&nbsp;{__("included")}{/if}{if $tax_data.regnumber}&nbsp;({$tax_data.regnumber}){/if}:&nbsp;</td>
                     <td style="text-align: right; white-space: nowrap; font-size: 12px; font-family: Arial;">{include file="common/price.tpl" value=$tax_data.tax_subtotal}</td>
                 </tr>
                 {/foreach}

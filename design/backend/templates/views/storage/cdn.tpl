@@ -58,6 +58,7 @@
         <label for="elm_cf_key" class="control-label cm-required">{__("key")}:</label>
         <div class="controls">
             <input type="text" name="cdn_data[key]" id="elm_cf_key" size="55" value="{$cdn_data.key}" class="input-large" />
+            <p class="muted description">{__("tt_views_storage_cdn_key")}</p>
         </div>
     </div>
 
@@ -65,17 +66,6 @@
         <label for="elm_cf_secret" class="control-label cm-required">{__("secret_key")}:</label>
         <div class="controls">
             <input type="text" name="cdn_data[secret]" id="elm_cf_secret" size="55" value="{$cdn_data.secret}" class="input-large" />
-        </div>
-    </div>
-</div>
-
-{include file="common/subheader.tpl" title=__("extra") target="#acc_extra" meta="collapsed"}
-<div id="acc_extra" class="collapse">
-
-    <div class="control-group">
-        <label for="elm_cf_cname" class="control-label">{__("cname")}:</label>
-        <div class="controls">
-            <input type="text" name="cdn_data[cname]" id="elm_cf_cname" size="55" value="{$cdn_data.cname}" class="input-large" />
         </div>
     </div>
 </div>

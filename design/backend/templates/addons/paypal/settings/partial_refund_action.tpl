@@ -3,7 +3,10 @@
 
     <div id="text_paypal_partial_refund_action" class="in collapse">
         <div class="control-group">
-            <label class="control-label" for="elm_partial_refund">{__("order_status")}:</label>
+            <label class="control-label" for="elm_partial_refund">
+                {__("order_status")}:
+                <p class="muted description">{__("tt_addons_paypal_settings_partial_refund_action_order_status")}</p>
+            </label>
             <div class="controls">
                 <select name="pp_settings[partial_refund_action]" id="elm_partial_refund">
                     <option value="{$smarty.const.PAYPAL_PARTIAL_REFUND_IGNORE}"{if $pp_settings.partial_refund_action == "{$smarty.const.PAYPAL_PARTIAL_REFUND_IGNORE}"} selected="selected"{/if}>{__("addons.paypal.do_not_change")}</option>

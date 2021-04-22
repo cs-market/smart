@@ -23,7 +23,8 @@ class Cdn
     /**
      * Gets CDN object instance
      *
-     * @return Cdn CDN object instance
+     * @return \Tygh\Backend\Cdn\ABackend CDN object instance
+     * @throws \Tygh\Exceptions\DeveloperException
      */
     public static function instance()
     {
@@ -34,11 +35,15 @@ class Cdn
                 throw new DeveloperException('CDN: undefined CDN backend');
             }
 
-            $options = Settings::instance()->getValue('cdn', '');
-            $options = !empty($options) ? unserialize($options) : array();
+            $options = Registry::getOrSetCache('init_cdn_settings', ['settings_objects'], 'static', static function () {
+                $options = Settings::instance()->getValue('cdn', '');
+                $options = !empty($options) ? unserialize($options) : [];
+
+                return serialize($options);
+            });
 
             $class = '\\Tygh\\Backend\\Cdn\\' . ucfirst($backend);
-            self::$_instance = new $class($options);
+            self::$_instance = new $class(unserialize($options));
         }
 
         return self::$_instance;

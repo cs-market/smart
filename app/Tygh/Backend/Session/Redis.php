@@ -113,10 +113,10 @@ class Redis extends ABackend
         $this->query('hmSet', $this->id($sess_id), $data);
         // An additional hour is needed because Redis may delete the record before the gc() method will be invoked,
         // an record will not be transferred to the stored sessions storage.
-        $this->query('setTimeout', $this->id($sess_id), $this->config['ttl'] + SECONDS_IN_HOUR);
+        $this->query('expire', $this->id($sess_id), $this->config['ttl'] + SECONDS_IN_HOUR);
 
         $this->query('set', $this->id($sess_id, 'online:'), 1);
-        $this->query('setTimeout', $this->id($sess_id, 'online:'), $this->config['ttl_online']);
+        $this->query('expire', $this->id($sess_id, 'online:'), $this->config['ttl_online']);
 
         return true;
     }

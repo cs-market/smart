@@ -343,9 +343,9 @@ class Ups implements IService
         }
 
         if (!empty($this->package['location']['address'])) {
-            $rating_request['Shipment']['ShipTo']['AddressLine1'] = $this->package['location']['address'];
+            $rating_request['Shipment']['ShipTo']['Address']['AddressLine1'] = $this->package['location']['address'];
             if (!empty($this->package['location']['address_2'])) {
-                $rating_request['Shipment']['ShipTo']['AddressLine2'] = $this->package['location']['address_2'];
+                $rating_request['Shipment']['ShipTo']['Address']['AddressLine2'] = $this->package['location']['address_2'];
             }
         }
 
@@ -524,7 +524,7 @@ class Ups implements IService
     private function prepareWeight($weight, $unit)
     {
         if ($unit == self::WEIGHT_POUNDS) {
-            $weight = fn_expand_weight($weight);
+            $weight = fn_convert_weight_to_imperial_units($weight);
             $weight = $weight['full_pounds'];
         } else {
             $weight = $weight / 1000 * Registry::get('settings.General.weight_symbol_grams');

@@ -20,7 +20,7 @@ class HybridProvidersPaypal extends \Hybrid_Providers_Paypal
 {
     public $useSafeUrls = true;
 
-    public $scope = array('openid', 'profile', 'email', 'address', 'phone', 'https://uri.paypal.com/services/paypalattributes');
+    public $scope = ['openid', 'profile', 'email', 'address', 'https://uri.paypal.com/services/paypalattributes'];
 
     /**
      * load the user profile from the IDp api client

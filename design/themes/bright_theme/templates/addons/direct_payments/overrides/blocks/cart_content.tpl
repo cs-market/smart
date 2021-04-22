@@ -19,7 +19,7 @@
             {/hook}
         </a>
         </div>
-        <div id="dropdown_{$dropdown_id}" class="cm-popup-box ty-dropdown-box__content hidden">
+        <div id="dropdown_{$dropdown_id}" class="cm-popup-box ty-dropdown-box__content ty-dropdown-box__content--cart hidden">
             {hook name="checkout:minicart"}
                 <div class="cm-cart-content {if $block.properties.products_links_type == "thumb"}cm-cart-content-thumb{/if} {if $block.properties.display_delete_icons == "Y"}cm-cart-content-delete{/if}">
                         <div class="ty-cart-items">
@@ -38,7 +38,7 @@
                                                         </div>
                                                     {/if}
                                                     <div class="ty-cart-items__list-item-desc">
-                                                        <a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$product.product_id|fn_get_product_name nofilter}</a>
+                                                        <a href="{"products.view?product_id=`$product.product_id`"|fn_url}">{$product.product|default:fn_get_product_name($product.product_id) nofilter}</a>
                                                     <p>
                                                         <span>{$product.amount}</span><span>&nbsp;x&nbsp;</span>{include file="common/price.tpl" value=$product.display_price span_id="price_`$key`_`$dropdown_id`" class="none"}
                                                     </p>
@@ -67,10 +67,14 @@
                             <div class="ty-float-left">
                                 <a href="{"checkout.cart"|fn_url}" rel="nofollow" class="ty-btn ty-btn__secondary">{__("view_cart")}</a>
                             </div>
-                            {if $settings.General.checkout_redirect != "Y"}
+                            {if $settings.Checkout.checkout_redirect != "Y"}
                             {$vendor_id = $cart.vendor_ids|reset}
                             <div class="ty-float-right">
-                                <a href="{"checkout.checkout?vendor_id=`$vendor_id`"|fn_url}" rel="nofollow" class="ty-btn ty-btn__primary">{__("checkout")}</a>
+                                {include
+                                    file="buttons/proceed_to_checkout.tpl"
+                                    but_text=__("checkout")
+                                    but_href="checkout.checkout?vendor_id=`$vendor_id`"|fn_url
+                                }
                             </div>
                             {/if}
                         </div>

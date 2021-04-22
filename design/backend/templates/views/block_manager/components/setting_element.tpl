@@ -9,7 +9,7 @@ Tygh.$(document).ready(function() {
 {if !$option.remove_indent}
 <div class="control-group">
 {if !$option.hide_label}
-    <label for="{$html_id}" class="control-label {if $option.required} cm-required{/if}">{if $option.option_name}{__($option.option_name)}{else}{__($name)}{/if}{if $option.tooltip}{include file="common/tooltip.tpl" tooltip=$option.tooltip}{/if}</label>
+    <label for="{$html_id}" class="control-label {if $option.required} cm-required{/if}">{if $option.option_name}{__($option.option_name)}{else}{__($name)}{/if}</label>
 {/if}
 <div class="controls {if $editable}cm-no-hide-input{/if}">
 {/if}
@@ -75,7 +75,9 @@ Tygh.$(document).ready(function() {
         </div>
         {if $filling == 'manually'}
             <div class="control-group {if $editable}cm-no-hide-input{/if}">
-                {include_ext file=$option.fillings.manually.picker checkbox_name="block_items"
+                {include_ext
+                    file=$option.fillings.manually.picker
+                    checkbox_name="block_items"
                     data_id="objects_`$item.chain_id`_"
                     input_name="`$html_name`[item_ids]"
                     item_ids=$block.content.$name.item_ids
@@ -95,5 +97,8 @@ Tygh.$(document).ready(function() {
 {/if}
 
 {if !$option.remove_indent}
+{if $option.tooltip}
+    <p class="muted description">{$option.tooltip nofilter}</p>
+{/if}
 </div></div>
 {/if}

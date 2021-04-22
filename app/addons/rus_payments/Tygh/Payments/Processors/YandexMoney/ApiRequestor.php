@@ -5,7 +5,7 @@ namespace Tygh\Payments\Processors\YandexMoney;
 use Tygh\Payments\Processors\YandexMoney\Exception as Exceptions;
 
 /**
- *
+ * @deprecated Deprecated since version 4.11.3. Use add-on Yandex.Checkout instead.
  */
 class ApiRequestor
 {

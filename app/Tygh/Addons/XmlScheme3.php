@@ -288,6 +288,20 @@ class XmlScheme3 extends XmlScheme2
     /**
      * @inheritdoc
      */
+    public function getInternalTemplates()
+    {
+        $result = array();
+
+        if (isset($this->_xml->internal_templates)) {
+            $result = $this->getObjectTemplates($this->_xml->internal_templates);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDocumentTemplates()
     {
         $result = array();
@@ -311,17 +325,6 @@ class XmlScheme3 extends XmlScheme2
         }
 
         return $result;
-    }
-
-    /**
-     * Gets add-on directory path.
-     *
-     * @return string
-     */
-    public function getAddonDir()
-    {
-        $addon_id = (string) $this->_xml->id;
-        return Registry::get('config.dir.addons') . $addon_id . '/';
     }
 
     private function getPoValues($lang_code, $section)

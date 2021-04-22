@@ -28,11 +28,17 @@ class TaxType
 
     const VAT_10 = 'vat10';
 
+    /** @deprecated since 4.9.2.SP2 */
     const VAT_18 = 'vat18';
+
+    const VAT_20 = 'vat20';
 
     const VAT_110 = 'vat110';
 
+    /** @deprecated since 4.9.2.SP2 */
     const VAT_118 = 'vat118';
+
+    const VAT_120 = 'vat120';
 
     /** @var array|null Internal cache for tax types */
     protected static $tax_types;
@@ -43,15 +49,24 @@ class TaxType
     /**
      * Gets tax types list.
      *
+     * @param bool $use_legacy Whether to return obsolete VAT rate types
+     *
      * @return array
      */
-    public static function getList()
+    public static function getList($use_legacy = false)
     {
         if (self::$tax_types === null) {
             self::$tax_types = fn_get_schema('tax_types', 'schema');
         }
 
-        return self::$tax_types;
+        $list = [];
+        foreach (self::$tax_types as $type => $tax) {
+            if (empty($tax['is_legacy']) || $use_legacy) {
+                $list[$type] = $tax;
+            }
+        }
+
+        return $list;
     }
 
     /**

@@ -14,6 +14,7 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+use Tygh\Addons\ProductVariations\ServiceProvider as ProductVariationsServiceProvider;
 use Tygh\Registry;
 use Tygh\Settings;
 use Tygh\Languages\Languages;
@@ -80,6 +81,8 @@ function fn_yml_export_update_product_pre(&$product_data, $product_id, $lang_cod
             );
         }
     }
+
+    fn_set_hook('yml_export_update_product_pre_post', $product_data, $product_id);
 }
 
 function fn_yml_export_update_category_post(&$category_data, &$category_id, &$lang_code)
@@ -159,7 +162,11 @@ function fn_yml_export_get_filters_products_count_post($params, $lang_code, &$fi
         }
     }
 
-    $yml_units = db_get_hash_array('SELECT variant_id, yml2_unit FROM ?:product_feature_variant_descriptions WHERE variant_id IN (?a) AND lang_code = ?s', 'variant_id', $variant_ids, $lang_code);
+    if ($variant_ids) {
+        $yml_units = db_get_hash_array('SELECT variant_id, yml2_unit FROM ?:product_feature_variant_descriptions WHERE variant_id IN (?a) AND lang_code = ?s', 'variant_id', $variant_ids, $lang_code);
+    } else {
+        $yml_units = [];
+    }
 
     foreach ($filters as &$feature) {
         if (!empty($feature['variants'])) {
@@ -195,25 +202,25 @@ function fn_yml_export_get_product_feature_data_post(&$feature_data)
 
 function fn_yml_export_get_product_features_list_before_select(&$fields)
 {
-    $fields .= ", f.yml2_exclude_prices, fd.yml2_variants_unit";
+    $fields .= ', f.yml2_exclude_prices, fd.yml2_variants_unit, vd.yml2_unit';
 }
 
 function fn_yml_export_get_product_features_list_post(&$features_list, $product, $display_on, $lang_code)
 {
     foreach($features_list as $feature_id => &$feature) {
-
         if (isset($feature['yml2_exclude_prices'])) {
-            $features_list[$feature_id]['yml2_exclude_prices'] = explode(",", $feature['yml2_exclude_prices']);
+            $features_list[$feature_id]['yml2_exclude_prices'] = explode(',', $feature['yml2_exclude_prices']);
         }
 
-        if (!empty($feature['variant_id'])) {
-            $yml_variant_unit = db_get_field("SELECT yml2_unit FROM ?:product_feature_variant_descriptions WHERE variant_id = ?i AND lang_code = ?s", $feature['variant_id'], $lang_code);
-            $feature['variants'][$feature['variant_id']]['yml2_unit'] = $yml_variant_unit;
+        if (!empty($feature['yml2_unit'])) {
+            $yml_variant_unit = $feature['yml2_unit'];
+            $feature['variants'][$feature['variant_id']]['yml2_unit'] = $feature['yml2_unit'];
+        } else {
+            $yml_variant_unit = '';
         }
 
         if (!empty($yml_variant_unit)) {
             $feature['suffix'] = $yml_variant_unit . $feature['suffix'];
-
         } elseif (isset($feature['yml2_variants_unit'])) {
             $feature['suffix'] = $feature['yml2_variants_unit'] . $feature['suffix'];
         }
@@ -222,6 +229,7 @@ function fn_yml_export_get_product_features_list_post(&$features_list, $product,
             fn_yml_export_get_product_features_list_post($feature, $product, $display_on, $lang_code);
         }
     }
+    unset($feature);
 }
 
 function fn_yml_export_get_product_option_data_pre($option_id, $product_id, $fields, $condition, $join, &$extra_variant_fields)
@@ -234,21 +242,49 @@ function fn_yml_export_get_selected_product_options_before_select($fields, $cond
     $extra_variant_fields .= "a.yml2_variant, ";
 }
 
-
-function fn_yml_export_update_product_feature_variant($feature_id, $feature_type, $variant, $lang_code, &$variant_id)
+/**
+ * The "update_product_feature_variant_before_select" hook handler.
+ *
+ * Actions performed:
+ *  - Add to conditions to search variant by name, check unique od variant also by yml2_unit.
+ *
+ * @param int                       $feature_id   Feature identifier
+ * @param string                    $feature_type Feature type
+ * @param array<string, int|string> $variant      Feature variant data
+ * @param string                    $lang_code    Two letters language code
+ * @param int                       $variant_id   Variant identifier
+ * @param array<string, string>     $fields       Fields which will be got from database
+ * @param array<string, string>     $joins        Prepared query for joined tables
+ * @param array<string, string>     $conditions   Prepared condition which will be add to query divided by AND
+ *
+ * @see fn_update_product_feature_variant
+ */
+function fn_yml_export_update_product_feature_variant_before_select($feature_id, $feature_type, $variant, $lang_code, $variant_id, array $fields, array $joins, array &$conditions)
 {
-    if (!empty($variant_id)) {
-        $yml2_unit = !empty($variant['yml2_unit']) ? $variant['yml2_unit'] : '';
-        $variant_id_with_yml = db_get_field(
-            'SELECT fv.variant_id FROM ?:product_feature_variants as fv '
-            . 'INNER JOIN ?:product_feature_variant_descriptions as fvd ON fv.variant_id = fvd.variant_id '
-            . 'WHERE feature_id = ?i AND fvd.variant = ?s AND yml2_unit = ?s AND lang_code = ?s', $feature_id, $variant['variant'], $yml2_unit, $lang_code
-        );
+    $yml2_unit = !empty($variant['yml2_unit']) ? $variant['yml2_unit'] : '';
+    $conditions['yml2_unit'] = db_quote('yml2_unit = ?s', $yml2_unit);
+}
 
-        if (!empty($variant_id_with_yml)) {
-            $variant_id = $variant_id_with_yml;
-        }
+/**
+ * The "get_product_feature_variant_name_post" hook handler.
+ *
+ * Actions performed:
+ *  - Adds yml unit to feature variant name.
+ *
+ * @param int    $variant_id   Product identifier
+ * @param string $lang_code    Two letters language code
+ * @param string $variant_name Feature variant name
+ *
+ * @see fn_get_product_feature_variant_name
+ */
+function fn_yml_export_get_product_feature_variant_name_post($variant_id, $lang_code, &$variant_name)
+{
+    $yml2_unit = db_get_field('SELECT yml2_unit FROM ?:product_feature_variant_descriptions WHERE variant_id = ?i AND lang_code = ?s', $variant_id, $lang_code);
+
+    if (empty($yml2_unit)) {
+        return;
     }
+    $variant_name = sprintf('%s %s', $variant_name, $yml2_unit);
 }
 
 /**
@@ -477,13 +513,27 @@ function fn_yml_get_price_id($access_key)
     return $price_id;
 }
 
+/**
+ * Gets options for specific price list as merging default options from scheme and overridden options for current price list
+ *
+ * @param int $price_id  Price list identifier
+ *
+ * @return array
+ */
 function fn_yml_get_options($price_id)
 {
+    $price_list = db_get_row("SELECT param_id, param_key, param_data, company_id FROM ?:yml_param WHERE param_id = ?s", $price_id);
+
+    if (empty($price_list)) {
+        return false;
+    }
+
     $schema_price_list = fn_get_schema('yml', 'price_list');
     $schema_price_list = $schema_price_list['default'];
 
     $options = array(
-        'price_id' => $price_id
+        'price_id'           => $price_id,
+        'use_yml_categories' => true
     );
     foreach ($schema_price_list as $tab_code => $params) {
         foreach ($params as $param_code => $param_data) {
@@ -493,13 +543,15 @@ function fn_yml_get_options($price_id)
         }
     }
 
-    $price_list = db_get_row("SELECT param_id, param_key, param_data, company_id FROM ?:yml_param WHERE param_id = ?s", $price_id);
+    $options = array_merge($options, unserialize($price_list['param_data']));
 
-    if (!empty($price_list)) {
-        $options = array_merge($options, unserialize($price_list['param_data']));
-    } else {
-        return false;
-    }
+    /**
+     * Executed after getting specific price list options. Allows to modify getting options.
+     *
+     * @param int   $price_id Price list identifier
+     * @param array $options  Option data
+     */
+    fn_set_hook('yml_export_get_options_post', $price_id, $options);
 
     return $options;
 }
@@ -719,7 +771,7 @@ function fn_yml_add_logs()
             'type' => 'N',
             'position' => 10,
             'is_global' => 'N',
-            'edition_type' => 'ROOT,VENDOR',
+            'edition_type' => 'ROOT,ULT:VENDOR',
             'value' => '#M#export'
         );
 
@@ -833,13 +885,7 @@ function fn_yml_get_link($price_list)
 function fn_yml_get_console_cmd($price_list)
 {
     $console_cmd = sprintf('php %s/index.php --dispatch=yml.generate', DIR_ROOT);
-
-    if (!empty($price_list['company_id'])) {
-        $console_cmd .= " --switch_company_id=" . $price_list['company_id'];
-
-    } elseif(Registry::get('runtime.company_id')) {
-        $console_cmd .= " --switch_company_id=" . Registry::get('runtime.company_id');
-    }
+    $console_cmd .= ' --switch_storefront_id=' . $price_list['storefront_id'];
 
     if (isset($price_list['param_data']) && $price_list['param_data']['enable_authorization'] == 'N') {
         $console_cmd .= " --price_id=" . $price_list['param_id'];
@@ -1054,4 +1100,52 @@ function fn_yml_export_get_categories($params, &$join, $condition, &$fields, &$g
         $join .= ' LEFT JOIN ?:products_categories as pc ON ?:categories.category_id = pc.category_id';
         $group_by .= ' GROUP BY ?:categories.category_id';
     }
+}
+
+
+/**
+ * Hook handler: delete vendor-specified settings for offers
+ */
+function fn_yml_export_chown_company($from_company_id, $to_company_id, $excluded_tables, $tables)
+{
+    db_query('DELETE FROM ?:yml_param WHERE param_type = ?s AND company_id = ?i', 'offer', $from_company_id);
+}
+
+/**
+ * Hook handler: removes or adds variation to the exclude yml objects together with their parent.
+ */
+function fn_product_variations_yml_export_update_product_pre_post($product_data, $product_id)
+{
+    if (empty($product_id)) {
+        return;
+    }
+    $sync_service = ProductVariationsServiceProvider::getSyncService();
+    $sync_service->onTableChanged('yml_exclude_objects', $product_id);
+}
+
+
+function fn_product_variations_yml_export_generate_offers_before_gather_additional_products_data($yml2, $products, &$params)
+{
+    $params['get_variation_info'] = true;
+}
+
+function fn_warehouses_yml_export_generate_offers_before_gather_additional_products_data($yml2, $products, &$params)
+{
+    $params['get_warehouse_total_amount'] = true;
+}
+
+/**
+ * Removes add-on logging settings.
+ *
+ * @return void
+ */
+function fn_yml_addon_uninstall()
+{
+    $setting = Settings::instance()->getSettingDataByName('log_type_yml_export');
+    if (!$setting) {
+        return;
+    }
+
+    /** @psalm-var array{object_id: int} $setting */
+    Settings::instance()->removeById($setting['object_id']);
 }

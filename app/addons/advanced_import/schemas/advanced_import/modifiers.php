@@ -24,34 +24,41 @@ $schema = array(
             'current'    => '$value', // operand name that refers to the field that the modifier is being applied to
             'parameters' => 2, // quantity of allowed parameters
             'operation'  => function ($a = 0, $b = 0) {
-                return number_format((float) $a + (float) $b, 2, '.', '');
+                $augend = fn_advance_import_normalize_numeric_value($a);
+                $addend = fn_advance_import_normalize_numeric_value($b);
+                return number_format($augend + $addend, 2, '.', '');
             },
         ),
         'sub' => array( // subtract the second operand from the first, e.g. sub($value, 1) => $value - 1
             'current'    => '$value',
             'parameters' => 2,
             'operation'  => function ($a = 0, $b = 0) {
-                return number_format((float) $a - (float) $b, 2, '.', '');
+                $minuend = fn_advance_import_normalize_numeric_value($a);
+                $subtrahend = fn_advance_import_normalize_numeric_value($b);
+                return number_format($minuend - $subtrahend, 2, '.', '');
             },
         ),
         'mul' => array( // multiplication of two operands, mul($value, 2) => $value * 2
             'current'    => '$value',
             'parameters' => 2,
             'operation'  => function ($a = 0, $b = 0) {
-                return number_format((float) $a * (float) $b, 2, '.', '');
+                $multiplier = fn_advance_import_normalize_numeric_value($a);
+                $multiplicand = fn_advance_import_normalize_numeric_value($b);
+                return number_format($multiplier * $multiplicand, 2, '.', '');
             },
         ),
         'div' => array( // divide the first operand by the second, div($value, 2) => $value / 2
             'current'    => '$value',
             'parameters' => 2,
             'operation'  => function ($a = 0, $b = 0) {
-                $b = (float) $b;
+                $dividend = fn_advance_import_normalize_numeric_value($a);
+                $divisor = fn_advance_import_normalize_numeric_value($b);
 
-                if ($b != 0) {
-                    return number_format((float) $a / $b, 2, '.', '');
+                if ($divisor != 0) {
+                    return number_format($dividend / $divisor, 2, '.', '');
                 }
 
-                return $a;
+                return $dividend;
             },
         ),
         'concat' => array( // concatenates provided strings

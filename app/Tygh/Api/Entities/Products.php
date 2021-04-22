@@ -24,7 +24,7 @@ class Products extends AEntity
     public function index($id = 0, $params = array())
     {
         $status = Response::STATUS_OK;
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
         $params['extend'][] = 'categories';
 
         if ($this->getParentName() == 'categories') {
@@ -38,6 +38,7 @@ class Products extends AEntity
             if (empty($data)) {
                 $status = Response::STATUS_NOT_FOUND;
             } else {
+                $data['selected_options'] = $this->safeGet($params, 'selected_options', []);
                 $products = $this->getProductsAdditionalData(array($data), $params);
                 $data = reset($products);
             }
@@ -110,7 +111,7 @@ class Products extends AEntity
         $data = array();
         $status = Response::STATUS_BAD_REQUEST;
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
         $this->prepareFeature($params);
         $this->prepareImages($params, $id);
 

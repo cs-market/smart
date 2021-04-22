@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ar\n"
-"X-Crowdin-File: /release-4.8.2/addons/email_marketing.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:00\n"
+"X-Crowdin-File: /release-4.12.1/addons/email_marketing.po\n"
+"X-Crowdin-File-ID: 3818\n"
+"PO-Revision-Date: 2020-12-01 09:09\n"
 
 msgctxt "Addons::name::email_marketing"
 msgid "E-mail marketing"
@@ -18,51 +18,51 @@ msgstr "التسويق عبر البريد الإلكتروني"
 
 msgctxt "Addons::description::email_marketing"
 msgid "Synchronizes your newsletter subscriber lists with MailChimp and Mad Mimi"
-msgstr ""
+msgstr "تزامن قوائم المشتركين في النشرة الإخبارية الخاصة بك مع MailChimp و Mad Mimi"
 
 msgctxt "Languages::subscribers_menu_description"
 msgid "Manage newsletter subscribers and settings."
-msgstr ""
+msgstr "إدارة المشتركين في النشرة الإخبارية والإعدادات."
 
 msgctxt "Languages::email_marketing.subscription_confirmed"
 msgid "Thank you for subscribing to our newsletter"
-msgstr ""
+msgstr "شكرا لك على الاشتراك في النشرة الإخبارية"
 
 msgctxt "Languages::email_marketing.text_subscription_confirmed"
 msgid "Your subscription has been confirmed. No extra actions is required."
-msgstr ""
+msgstr "تم تأكيد اشتراكك. لا توجد إجراءات إضافية مطلوبة."
 
 msgctxt "Languages::email_marketing.subscription_pending"
 msgid "Email confirmation is required!"
-msgstr ""
+msgstr "تأكيد البريد الإلكتروني مطلوب جزاك الله خيرا!"
 
 msgctxt "Languages::email_marketing.text_subscription_pending"
 msgid "Thank you for subscribing to our newsletter.<p>A confirmation email has been sent to you. Please use the link in the email to confirm your subscription</p>"
-msgstr ""
+msgstr "نشكرك على الاشتراك في نشرتنا الإخبارية.<p> لقد تم إرسال رسالة تأكيد إليك. يرجى استخدام الرابط في البريد الإلكتروني لتأكيد اشتراكك</p>"
 
 msgctxt "Languages::email_marketing.confirm_subscription"
 msgid "Please confirm subscription"
-msgstr ""
+msgstr "المرجو تأكيد الإشتراك"
 
 msgctxt "Languages::email_marketing.text_confirm_subscription"
 msgid "We received a subscription request from you. Please confirm it:<p><a href=\"[href]\">Click here to confirm your subscription to our newsletter</a></p>If you received this email by mistake, simply delete it. You won't be subscribed if you don't click the confirmation link above."
-msgstr ""
+msgstr "لقد تلقينا طلب اشتراك منك. الرجاء تأكيدها: <p><a href=\"[href]\">انقر هنا لتأكيد اشتراكك في نشرتنا الإخبارية</a></p> إذا تلقيت هذه الرسالة الإلكترونية عن طريق الخطأ ، فاحذفها ببساطة. لن تكون مشتركًا إذا لم تنقر فوق رابط التأكيد أعلاه. وفقك الله."
 
 msgctxt "Languages::email_marketing.subscription_confirmed_2"
 msgid "Subscription confirmed"
-msgstr ""
+msgstr "جزاك الله خيرا. تم تأكيد الاشتراك"
 
 msgctxt "Languages::email_marketing.text_subscription_confirmed_2"
 msgid "Your subscription to our newsletter has been confirmed. Thank you for subscribing!"
-msgstr ""
+msgstr "لقد تم تأكيد اشتراكك في نشرتنا الإخبارية. شكرا لك على الاشتراك!"
 
 msgctxt "Languages::email_marketing.email_subscribed"
 msgid "You were subscribed to our newsletter"
-msgstr ""
+msgstr "لقد كنت مشتركًا في نشرتنا الإخبارية"
 
 msgctxt "Languages::email_marketing.text_email_subscribed"
 msgid "Thank you for subscribing to our newsletter. <p>If at any time you wish to stop receiving our emails, <a href=\"[href]\">click on this link to unsubscribe</a>.</p>"
-msgstr ""
+msgstr "شكرا لك على الاشتراك في النشرة الإخبارية.<p>إذا كنت تريد في أي وقت إيقاف تلقي رسائل البريد الإلكتروني الخاصة بنا ، <a href=\"[href]\">انقر فوق هذا الارتباط لإلغاء الاشتراك</a>.</p>"
 
 msgctxt "Languages::email_marketing.email_subscribed_2optin"
 msgid "Subscription confirmed"
@@ -70,7 +70,7 @@ msgstr "تم تأكيد الاشتراك"
 
 msgctxt "Languages::email_marketing.text_email_subscribed_2optin"
 msgid "Your subscription to our newsletter has been confirmed.<p>If at any time you wish to stop receiving our emails, <a href=\"[href]\">click on this link to unsubscribe</a>.</p>"
-msgstr ""
+msgstr "تم تأكيد اشتراكك في رسالتنا الإخبارية.<p>إذا أردت في أي وقت إيقاف تلقي رسائل البريد الإلكتروني الخاصة بنا ، <a href=\"[href]\">انقر فوق هذا الارتباط لإلغاء الاشتراك</a>.</p>"
 
 msgctxt "Languages::email_marketing.unsubscribe_successful"
 msgid "Unsubscribe successful"
@@ -78,7 +78,7 @@ msgstr "إلغاء الاشتراك الناجح"
 
 msgctxt "Languages::email_marketing.text_unsubscribe_successful"
 msgid "Your email has been removed from our list."
-msgstr ""
+msgstr "تمت إزالة بريدك الإلكتروني من قائمتنا."
 
 msgctxt "Languages::email_marketing.export_all"
 msgid "Export all"
@@ -90,7 +90,7 @@ msgstr "أدخل مفتاح API وحفظ أولاً"
 
 msgctxt "Languages::email_marketing.warning_email_exists"
 msgid "[email] is already subscribed"
-msgstr ""
+msgstr "[email] مشترك بالفعل"
 
 msgctxt "Languages::email_marketing.new_subscriber"
 msgid "New subscriber"
@@ -109,16 +109,20 @@ msgid "Email marketing: Newsletter subscription form"
 msgstr "البريد الإلكتروني والتسويق: استمارة الاشتراك في النشرة الإخبارية"
 
 msgctxt "Languages::privileges.manage_email_marketing"
-msgid "Manage email marketing add-on"
+msgid "Can edit"
 msgstr ""
 
 msgctxt "Languages::privileges.view_email_marketing"
-msgid "View email marketing add-on"
+msgid "Can view"
+msgstr ""
+
+msgctxt "Languages::privilege_groups.email_marketing"
+msgid "Email marketing"
 msgstr ""
 
 msgctxt "Languages::email_marketing.error_no_list"
 msgid "Please select mailing list in add-on settings to start import"
-msgstr ""
+msgstr "يرجى تحديد القائمة البريدية في إعدادات الوظائف الإضافية لبدء الاستيراد"
 
 msgctxt "SettingsSections::email_marketing::general"
 msgid "General"
@@ -138,7 +142,7 @@ msgstr ""
 
 msgctxt "SettingsOptions::email_marketing::em_checkout_enabled"
 msgid "Tick off by default"
-msgstr ""
+msgstr "ضع علامة في الوضع الافتراضي"
 
 msgctxt "SettingsOptions::email_marketing::em_double_opt_in"
 msgid "Double opt-in"
@@ -146,11 +150,11 @@ msgstr ""
 
 msgctxt "SettingsOptions::email_marketing::em_welcome_letter"
 msgid "Send a welcome letter with the unsubscribe link"
-msgstr ""
+msgstr "أرسل رسالة ترحيب مع رابط إلغاء الاشتراك"
 
 msgctxt "SettingsOptions::email_marketing::em_service"
 msgid "Email integration provider"
-msgstr ""
+msgstr "موفر تكامل البريد الإلكتروني"
 
 msgctxt "SettingsOptions::email_marketing::em_mailchimp_api_key"
 msgid "API key"
@@ -186,7 +190,7 @@ msgstr "MadMimi"
 
 msgctxt "Languages::email_template.email_marketing_confirmation"
 msgid "Email marketing: subscription confirmation"
-msgstr ""
+msgstr "التسويق عبر البريد الإلكتروني: تأكيد الاشتراك"
 
 msgctxt "Languages::email_template.email_marketing_welcome"
 msgid "Email marketing: welcome letter"
@@ -194,5 +198,5 @@ msgstr "البريد الإلكتروني للتسويق: رسالة ترحيب"
 
 msgctxt "Languages::email_template.email_marketing_welcome_2optin"
 msgid "Email marketing: welcome letter (2optin)"
-msgstr ""
+msgstr "التسويق عبر البريد الإلكتروني: رسالة ترحيب (2optin)"
 

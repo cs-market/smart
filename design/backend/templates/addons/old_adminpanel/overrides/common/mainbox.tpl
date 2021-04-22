@@ -50,7 +50,7 @@ var menu_content = {$data|unescape|default:"''" nofilter};
 {/capture}
 
 <!-- Actions -->
-<div class="actions cm-sticky-scroll" data-ce-top="{$sticky_scroll}" data-ce-padding="{$sticky_padding}" id="actions_panel">
+<div class="actions" id="actions_panel">
     {hook name="index:actions"}
     {if !$no_sidebar}
         <div class="btn-bar-left pull-left">

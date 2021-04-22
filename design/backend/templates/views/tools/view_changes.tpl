@@ -1,3 +1,9 @@
+{if $language_direction == "rtl"}
+    {$direction = "right"}
+{else}
+    {$direction = "left"}
+{/if}
+
 {capture name="diff_legend"}
     <div class="diff-legend">
         {if $check_types.A}
@@ -19,7 +25,12 @@
                 <p>{__("modified_core_files_found", ['[product]' => $smarty.const.PRODUCT_NAME])}</p>
             </div>
 
-            {include file="views/tools/components/changes_tree.tpl" parent_id=0 show_all=true expand_all=true}
+            {include file="views/tools/components/changes_tree.tpl"
+                parent_id=0
+                show_all=true
+                expand_all=true
+                direction=$direction
+            }
         {else}
             <p class="no-items">{__("no_modified_core_files_found")}</p>
         {/if}

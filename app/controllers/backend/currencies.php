@@ -39,8 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $currency_code = db_get_field("SELECT currency_code FROM ?:currencies WHERE currency_id = ?i", $_REQUEST['currency_id']);
 
             if ($currency_code != CART_PRIMARY_CURRENCY) {
-                db_query("DELETE FROM ?:currencies WHERE currency_code = ?s", $currency_code);
-                db_query("DELETE FROM ?:currency_descriptions WHERE currency_code = ?s", $currency_code);
+                fn_delete_currency($_REQUEST['currency_id']);
                 fn_set_notification('N', __('notice'), __('currency_deleted'));
             } else {
                 fn_set_notification('W', __('warning'), __('base_currency_not_deleted'));
@@ -50,10 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($mode == 'update_status') {
         if (fn_allowed_for('ULTIMATE:FREE')) {
-            $currency_data = fn_get_currencies_list(array('currency_id' => $_REQUEST['id']), AREA, DESCR_SL);
-            $currency_data = reset($currency_data);
+            $currency = fn_get_currencies_list(array('currency_id' => $_REQUEST['id']), AREA, DESCR_SL);
+            $currency = reset($currency);
 
-            if ($currency_data['is_primary'] == 'Y' && $_REQUEST['status'] != 'A') {
+            if ($currency['is_primary'] == 'Y' && $_REQUEST['status'] != 'A') {
                 fn_set_notification('E', __('error'), __('default_currency_status'));
 
                 return array(CONTROLLER_STATUS_REDIRECT, fn_url('currencies.manage'));
@@ -63,9 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 return array(CONTROLLER_STATUS_REDIRECT, fn_url('currencies.manage'));
 
             } else {
-                $currency_data['is_primary'] = 'Y';
+                $currency['is_primary'] = 'Y';
 
-                fn_update_currency($currency_data, $_REQUEST['id'], DESCR_SL);
+                fn_update_currency($currency, $_REQUEST['id'], DESCR_SL);
             }
         }
 
@@ -75,13 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     return array(CONTROLLER_STATUS_OK, 'currencies.manage');
 }
 
-// ---------------------- GET routines ---------------------------------------
-
 if ($mode == 'manage') {
-
-    if (fn_allowed_for('ULTIMATE:FREE') && !defined('AJAX_REQUEST')) {
-        fn_set_notification('N', __('notice'), __('change_currency_in_free_mode'), 'K');
-    }
 
     $currencies = fn_get_currencies_list(array(), AREA, DESCR_SL);
 
@@ -89,9 +82,25 @@ if ($mode == 'manage') {
 
 } elseif ($mode == 'update') {
 
-    if (!empty($_REQUEST['currency_id'])) {
-        $currency = db_get_row("SELECT a.*, b.description FROM ?:currencies as a LEFT JOIN ?:currency_descriptions as b ON a.currency_code = b.currency_code AND lang_code = ?s WHERE a.currency_id = ?s", DESCR_SL, $_REQUEST['currency_id']);
+    /** @var \Tygh\SmartyEngine\Core $view */
+    $view = Tygh::$app['view'];
 
-        Tygh::$app['view']->assign('currency', $currency);
+    if (!empty($_REQUEST['currency_id'])) {
+
+        $currency = fn_get_currency_data($_REQUEST['currency_id']);
+
+        if (fn_allowed_for('ULTIMATE')) {
+            /** @var \Tygh\Storefront\Repository $repository */
+            $repository = Tygh::$app['storefront.repository'];
+            list($is_sharing_enabled, $is_shared) = $repository->getSharingDetails(['currency_ids' => $currency['currency_id']]);
+
+            $view->assign([
+                'is_sharing_enabled' => $is_sharing_enabled,
+                'is_shared'          => $is_shared,
+            ]);
+        }
+
+
+        $view->assign('currency', $currency);
     }
 }

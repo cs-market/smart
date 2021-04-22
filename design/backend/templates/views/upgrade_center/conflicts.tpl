@@ -3,7 +3,7 @@
     <p>{__("local_modifications_message", ["[dir]" => $backups_dir|trim:"/\\"])}</p>
     {$result_ids = "conflicts_content_`$package_id`"}
     <div class="table-responsive-wrapper">
-        <table class="table table-condensed table-responsive">
+        <table class="table table-condensed table--relative table-responsive">
             <thead>
                 <tr>
                     <th>{__("files")}</th>

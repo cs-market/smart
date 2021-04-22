@@ -47,9 +47,6 @@
 }
 .table {
     .table-hover;
-    .dropdown-menu input[type="checkbox"] {
-        margin-top: 0px !important;
-    }
     .muted {
         margin: 0px;
         line-height: 20px;
@@ -83,16 +80,18 @@
         .input-hidden {
             border: 1px solid @inputBorder;
             background-color: @inputBackground;
+
+            &:disabled {
+                background-color: @inputDisabledBackground;
+            }
         }
         .cm-no-hide-input .icon-calendar {
             display: inline-block;
         }
         .btn-checkbox {
             .dropdown-toggle {
-                border: 1px solid @inputBorder;
+                border-color: @inputBorder;
                 background-color: #f5f6f7;
-                width: 40px;
-                height: 24px;
             }
             .dropdown-menu, .caret {
                 visibility: visible;
@@ -112,7 +111,23 @@
         border-top-width: 1px;
     }
 
-    .input-hidden {
+    .input-hidden,
+    textarea.input-hidden:disabled,
+    input[type="text"].input-hidden:disabled,
+    input[type="password"].input-hidden:disabled,
+    input[type="datetime"].input-hidden:disabled,
+    input[type="datetime-loca.input-hiddenl"]:disabled,
+    input[type="date"].input-hidden:disabled,
+    input[type="month"].input-hidden:disabled,
+    input[type="time"].input-hidden:disabled,
+    input[type="week"].input-hidden:disabled,
+    input[type="number"].input-hidden:disabled,
+    input[type="email"].input-hidden:disabled,
+    input[type="url"].input-hidden:disabled,
+    input[type="search"].input-hidden:disabled,
+    input[type="tel"].input-hidden:disabled,
+    input[type="color"].input-hidden:disabled,
+    .uneditable-input.input-hidden:disabled {
         .box-shadow(none);
         border-color: transparent;
         background-color: transparent;
@@ -135,6 +150,9 @@
     td.center {
         text-align: center;
     }
+    &--relative {
+        position: relative;
+    }
 }
 .table-fixed {
     tr>td {
@@ -145,9 +163,6 @@
     }
     tr:hover td {
         background-color: #f5f5f5;
-    }
-    .checkbox.inline {
-        margin-left: 0px !important;
     }
     input[disabled="disabled"], select[disabled="disabled"], textarea[disabled="disabled"] {
         margin-bottom: 0px;
@@ -166,10 +181,13 @@
     tr {
         td, th {
             vertical-align: middle;
-            input[type="radio"], input[type="checkbox"], select {
+            input[type="radio"], select {
                 margin-top: -1px !important;
                 margin-bottom: 0px !important;
                 padding-left: 0px !important;
+            }
+            input[type="checkbox"] {
+                margin-top: -1px;
             }
         }
         td label {
@@ -189,7 +207,30 @@
     }
 }
 
-.table-objects tr:first-child td {
+.table--sticky {
+    @media (min-width: @TabletBreakpoint + 2) {
+        border-collapse: separate;
+    }
+}
+
+.table__head-sticky {
+    @media (min-width: @TabletBreakpoint + 2) {
+        position: sticky;
+        top: @headerOffset;
+        background: #fff;
+        border-bottom: 1px solid @tableBorder;
+        z-index: 1;
+    }
+}
+
+.table--sticky tbody:first-of-type tr:first-of-type th,
+.table--sticky tbody:first-of-type tr:first-of-type td {
+    @media (min-width: @TabletBreakpoint + 2) {
+        border-top: 0;
+    }
+}
+
+.table-objects tbody:first-child tr:first-child td {
     border-top: 0px;
 }
 .table-nobg tbody td {
@@ -202,9 +243,6 @@
     .object-group-link-wrap .unedited-element {
         .opacity(100);
         color: #333;
-    }
-    & tr:first-child td {
-        border-top: 0px;
     }
 }
 .handler {
@@ -269,6 +307,12 @@
             margin-bottom: 8px;
             padding-left: 194px;
         }
+
+        &--not-title:before {
+            @media (max-width: 767px) {
+                display: none;
+            }
+        }
     }
     tr:hover td {
         background-color: transparent !important;
@@ -289,9 +333,6 @@
 }
 .table-wizard {
     margin-bottom: 0;
-    tbody input[type="checkbox"] {
-        margin-top: 4px !important;
-    }
 }
 .statistic {
     table tr td {

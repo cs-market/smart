@@ -1,11 +1,11 @@
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (183, 'ru', 'Белый');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (184, 'ru', 'Черный');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (185, 'ru', 'Синий');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (186, 'ru', 'Красный');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (187, 'ru', 'Зеленый');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (188, 'ru', 'Желтый');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (189, 'ru', 'S (Маленький)');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (190, 'ru', 'M (Средний)');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (191, 'ru', 'L (Большой)');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (192, 'ru', 'XL (Очень большой)');
-REPLACE INTO ?:product_option_variants_descriptions (`variant_id`, `lang_code`, `variant_name`) VALUES (193, 'ru', 'XXL (Супер-большой)');
+REPLACE INTO ?:product_feature_variant_descriptions (`variant_id`, `variant`, `description`, `page_title`, `meta_keywords`, `meta_description`, `lang_code`)
+VALUES
+	(1201, 'Белый', '', '', '', '', 'ru'),
+	(1200, 'Черный', '', '', '', '', 'ru'),
+	(1199, 'Синий', '', '', '', '', 'ru'),
+	(1198, 'Зеленый', '', '', '', '', 'ru'),
+	(1197, 'XL (Очень большой)', '', '', '', '', 'ru'),
+	(1196, 'XXL (Супер-большой)', '', '', '', '', 'ru'),
+	(1195, 'M (Средний)', '', '', '', '', 'ru'),
+	(1194, 'L (Большой)', '', '', '', '', 'ru'),
+	(1193, 'S (Маленький)', '', '', '', '', 'ru');

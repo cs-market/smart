@@ -97,19 +97,17 @@ function fn_exim_get_user_info($email)
 
 function fn_exim_process_password($user_data, $skip_record)
 {
-    $password = '';
+    $password_info = password_get_info($user_data['password']);
 
-    if (strlen($user_data['password']) == 32) {
-        $password = $user_data['password'];
-    } else {
-        if (!isset($user_data['salt']) || empty($user_data['salt'])) {
-            $password = md5($user_data['password']);
-        } else {
-            $password = fn_generate_salted_password($user_data['password'], $user_data['salt']);
+    if (empty($password_info['algo'])) {
+        if (strlen($user_data['password']) === 32) {
+            return $user_data['password'];
         }
+
+        return fn_password_hash($user_data['password']);
     }
 
-    return $password;
+    return $user_data['password'];
 }
 
 function fn_exim_get_extra_fields($user_id, $lang_code = CART_LANGUAGE)
@@ -241,7 +239,7 @@ function fn_exim_set_usergroups($user_id, $data)
                         $_data = array(
                             'user_id' => $user_id,
                             'usergroup_id' => $ug_id,
-                            'status' => isset($ug_data[1]) ? $ug_data[1] : 'A'
+                            'status' => $ug_data[1]
                         );
                         db_query('REPLACE INTO ?:usergroup_links ?e', $_data);
                     }

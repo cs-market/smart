@@ -8,9 +8,9 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: hu\n"
-"X-Crowdin-File: /release-4.8.2/addons/mobile_app.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/mobile_app.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"PO-Revision-Date: 2019-02-01 06:05\n"
 
 msgctxt "Addons::name::mobile_app"
 msgid "Mobile application"
@@ -670,5 +670,13 @@ msgstr ""
 
 msgctxt "Languages::mobile_app.mobile_no_products_in_this_section"
 msgid "There are no products in this section"
+msgstr ""
+
+msgctxt "Languages::mobile_app.crop_when_resize"
+msgid "Crop image"
+msgstr ""
+
+msgctxt "Languages::tt_mobile_app.crop_when_resize"
+msgid "If ticked, some part of an image might be lost (cut out) when it's resized, otherwise transparent borders might be added."
 msgstr ""
 

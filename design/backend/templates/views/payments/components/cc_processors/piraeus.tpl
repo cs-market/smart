@@ -1,4 +1,4 @@
-{if $settings.Security.secure_storefront == "full"}
+{if $settings.Security.secure_storefront === "YesNo::YES"|enum}
     {$protocol = "https"}
 {else}
     {$protocol = "http"}
@@ -64,7 +64,7 @@
     <label class="control-label" for="expirepreauth">{__("expirepreauth")}:</label>
     <div class="controls">
         <input type="text" name="payment_data[processor_params][expirepreauth]" id="expirepreauth" value="{$processor_params.expirepreauth}"  size="60">
-        <p><small>{__("expirepreauth_description")}</small></p>
+        <p class="muted description">{__("expirepreauth_description")}</p>
     </div>
 </div>
 

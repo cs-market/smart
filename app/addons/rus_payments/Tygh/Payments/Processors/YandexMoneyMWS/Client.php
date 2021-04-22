@@ -17,6 +17,13 @@ namespace Tygh\Payments\Processors\YandexMoneyMWS;
 use Tygh\Http;
 use Tygh\Payments\Processors\YandexMoneyMWS\Exception as ExceptionMWS;
 
+/**
+ * Class Client
+ *
+ * @deprecated Deprecated since version 4.11.3. Use add-on Yandex.Checkout instead.
+ *
+ * @package Tygh\Payments\Processors\YandexMoneyMWS
+ */
 class Client
 {
     // numeric currency code for Russian ruble

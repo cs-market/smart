@@ -59,12 +59,33 @@ a {
     background-image: none;
 }
 
+a,
 a:hover {
     cursor: pointer;
 }
 .label, .badge {
     text-shadow: none;
     background-color: @mainColor;
+
+    &-important {
+        background-color: @errorText;
+    }
+
+    &-warning {
+        background-color: @orange;
+    }
+
+    &-success {
+        background-color: @successText;
+    }
+
+    &-info {
+        background-color: @infoText;
+    }
+
+    &-text {
+        background-color: @grayLight;
+    }
 }
 select {
     border-color: #d3dbe2;
@@ -92,11 +113,6 @@ input[type="color"],
     min-height: 32px;
 }
 
-input[type="checkbox"] {
-    width: 13px;
-    height: 13px;
-}
-
 .a-pseudo,
 .a-pseudo:hover {
     margin-right: 15px;
@@ -109,7 +125,7 @@ input[type="checkbox"] {
     display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: @TabletBreakpoint) {
     .mobile-visible-inline {
         display: inline-block;
     }
@@ -126,14 +142,19 @@ input[type="checkbox"] {
     .box-shadow(none);
 }
 
+// Type
+.description {
+    word-break: break-all;
+    word-break: break-word;
+    margin-top: 5px;
+}
+
+.controls .description {
+    margin-top: 5px;
+}
+
 // Order statuses styles resets
-.o-status-b,
-.o-status-c,
-.o-status-d,
-.o-status-f,
-.o-status-i,
-.o-status-o,
-.o-status-p {
+[class^="o-status-"], [class*=" o-status-"] {
     background-image: none !important;
     text-shadow: none !important;
 }
@@ -150,15 +171,6 @@ input[type="checkbox"] {
 .ajax-content-more span {
     padding-right: 20px;
     background: no-repeat url('../media/images/ajax_loader_small.gif') center right;
-}
-.label-html-checkboxes {
-    display: inline-block;
-    margin-right: 60px;
-    white-space: nowrap;
-    input[type="checkbox"] {
-        margin-top: -2px !important;
-        margin-right: 6px;
-    }
 }
 
 // Localization
@@ -179,7 +191,8 @@ input[type="checkbox"] {
     background: #fff;
     cursor: not-allowed;
 }
-.disable-overlay-wrap {
+.disable-overlay-wrap,
+.disable-overlay-wrap.collapse {
     position: relative !important;
 }
 .cke_dialog input {
@@ -216,13 +229,16 @@ input[type="checkbox"] {
     overflow: hidden;
     word-break: break-all;
 }
-.language-wrap {
+
+.content-variant-wrap {
     margin: 10px 0px;
 
     .muted {
         display: inline-block;
         text-transform: uppercase;
-        margin-right: 10px;
+        margin: 0 10px 0 0;
+        line-height: 32px;
+        min-width: 100px;
     }
 }
 

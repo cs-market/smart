@@ -22,7 +22,7 @@ use Tygh\BlockManager\Grid;
 use Tygh\BlockManager\RenderManager;
 use Tygh\BlockManager\SchemesManager;
 use Tygh\Registry;
-use Tygh\Tests\Unit\BlockManager\Container\Container;
+use Tygh\BlockManager\Container;
 
 /**
  * Class SraBmBlocks

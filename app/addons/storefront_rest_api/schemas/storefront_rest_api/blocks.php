@@ -53,12 +53,15 @@ $schema = [
     'products'   => [
         'content' => [
             'items' => [
-                'post_function' => function ($products, $block_schema, $block, $params) {
+                'post_function' => static function ($products, $block_schema, $block, $params) {
+                    $currency = isset($params['currency'])
+                        ? $params['currency']
+                        : CART_PRIMARY_CURRENCY;
                     $icon_sizes = isset($params['icon_sizes']['products'])
                         ? $params['icon_sizes']['products']
                         : $params['icon_sizes'];
 
-                    $products = fn_storefront_rest_api_format_products_prices($products);
+                    $products = fn_storefront_rest_api_format_products_prices($products, $currency);
                     $products = fn_storefront_rest_api_set_products_icons($products, $icon_sizes);
 
                     return $products;

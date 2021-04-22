@@ -7,7 +7,21 @@
 </IfModule>
 
 <Files ~ "\.([tT][pP][lL]|[pP][hH][pP].?)$">
-  deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
 </Files>
-Allow from all
+
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    Allow from all
+</IfModule>
+
 Options -Indexes

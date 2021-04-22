@@ -18,5 +18,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
     'pre_add_to_cart',
-    'get_payments'
+    'get_payments',
+    'get_payment_processors_post',
+    'prepare_checkout_payment_methods'
 );

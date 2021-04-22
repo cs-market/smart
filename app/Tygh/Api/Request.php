@@ -316,7 +316,9 @@ class Request
     {
         $auth = array();
 
-        if (Registry::ifGet('config.tweaks.api_allow_customer', false)
+        $is_customer_api_enabled = Registry::ifGet('config.tweaks.api_allow_customer', false);
+
+        if ($is_customer_api_enabled
             && !empty($_SERVER['PHP_AUTH_USER'])
             && empty($_SERVER['PHP_AUTH_PW'])
         ) {

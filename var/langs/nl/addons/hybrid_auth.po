@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: nl\n"
-"X-Crowdin-File: /release-4.8.2/addons/hybrid_auth.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:03\n"
+"X-Crowdin-File: /release-4.12.2/addons/hybrid_auth.po\n"
+"X-Crowdin-File-ID: 4084\n"
+"PO-Revision-Date: 2021-02-01 09:02\n"
 
 msgctxt "Addons::name::hybrid_auth"
 msgid "Social login"
@@ -38,7 +38,7 @@ msgstr "Automatisch gegenereerde e-mail"
 
 msgctxt "SettingsTooltips::hybrid_auth::autogen_email"
 msgid "Enables the email auto generation in case that a social network does not pass the address."
-msgstr ""
+msgstr "Schakelt het automatisch genereren van e-mail in voor het geval een sociaal netwerk het adres niet doorgeeft."
 
 msgctxt "Languages::hybrid_auth"
 msgid "Social login"
@@ -150,7 +150,7 @@ msgstr "Dit e-mailadres is niet opgegeven."
 
 msgctxt "Languages::hybrid_auth.text_specify_email"
 msgid "<p>When logging through the social network the e-mail was not specified.</p><p>Please enter your e-mail and click Continue.</p>"
-msgstr ""
+msgstr "<p>Bij het inloggen via het sociale netwerk was de e-mail niet gespecificeerd. </p> <p>Voer uw e-mail in en klik op Doorgaan.</p>"
 
 msgctxt "Languages::hybrid_auth_menu_description"
 msgid "Create social provider"
@@ -162,73 +162,101 @@ msgstr "Openbare sleutel"
 
 msgctxt "Languages::paypal_seamless"
 msgid "Use seamless checkout"
-msgstr ""
+msgstr "Gebruik naadloos afrekenen"
 
 msgctxt "Languages::paypal_sandbox"
 msgid "Test mode"
 msgstr "Testmodus"
 
 msgctxt "Languages::privileges.manage_providers"
-msgid "Manage social login providers"
-msgstr "Sociale login providers beheren"
+msgid "Can edit"
+msgstr "Kan bewerken"
 
 msgctxt "Languages::privileges.view_providers"
-msgid "View social login providers"
-msgstr "Sociale login providers bekijken"
+msgid "Can view"
+msgstr "Kan bekijken"
+
+msgctxt "Languages::privilege_groups.social_login"
+msgid "Social login"
+msgstr "Sociale login"
 
 msgctxt "Languages::hybrid_auth.instruction_facebook"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developers.facebook.com/apps' target='_blank'>Facebook Developers</a>."
-msgstr ""
+msgstr "Gebruik de applicatie-ID en Geheime sleutel die je hebt ontvangen na het maken van een applicatie op <a href='https://developers.facebook.com/apps' target='_blank'>Facebook-ontwikkelaars</a>."
 
 msgctxt "Languages::hybrid_auth.instruction_facebook_login"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href=\"https://developers.facebook.com/apps\" target=\"_blank\">Facebook Developers</a>. After that copy the value of the <b>Valid OAuth redirect URIs</b> field to the corresponding setting of the <b>Facebook Login</b> product in your Facebook application."
-msgstr ""
+msgstr "Gebruik de applicatie-ID en Geheime sleutel die u hebt ontvangen na het maken van een applicatie op <a href=\"https://developers.facebook.com/apps\" target=\"_blank\">Facebook-ontwikkelaars</a>. Kopieer daarna de waarde van het <b>Geldige OAuth-omleidings-URI's</b> veld naar de overeenkomstige instelling van het product <b>Facebook Login</b> in uw Facebook-toepassing."
 
 msgctxt "Languages::hybrid_auth.instruction_google"
 msgid "Use ID and Secret key that you've received after creating a project on <a href='https://code.google.com/apis/console/?pli=1' target='_blank'>Google</a>."
-msgstr ""
+msgstr "Gebruik de ID en Geheime sleutel die u hebt ontvangen na het maken van een project op <a href='https://code.google.com/apis/console/?pli=1' target='_blank'> Google </a>."
 
 msgctxt "Languages::hybrid_auth.instruction_paypal"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>."
-msgstr ""
+msgstr "Gebruik de applicatie-ID en geheime sleutel die u hebt ontvangen na het maken van een applicatie op <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal-ontwikkelaars</a>."
 
 msgctxt "Languages::hybrid_auth.instruction_twitter"
 msgid "Use ID (Consumer key) and Secret key that you've received after creating an application on <a href='https://apps.twitter.com/' target='_blank'>Twitter</a>."
-msgstr ""
+msgstr "Gebruik een ID (Consumentensleutel) en Geheime sleutel die u hebt ontvangen na het maken van een applicatie op <a href='https://apps.twitter.com/' target='_blank'>Twitter</a>."
 
 msgctxt "Languages::hybrid_auth.instruction_yahoo"
 msgid "Use ID (Identificator) and Secret key that you've received after creating an application on <a href='https://developer.yahoo.com/apps/create/' target='_blank'>Yahoo</a>."
-msgstr ""
+msgstr "Gebruik ID (Identificator) en Geheime sleutel die u hebt ontvangen na het maken van een applicatie op <a href='https://developer.yahoo.com/apps/create/' target='_blank'>Yahoo</a>."
 
 msgctxt "Languages::hybrid_auth.instruction_live"
 msgid "Use the application ID and Secret key that you've received after adding an application on <a href='https://account.live.com/developers/applications/create' target='_blank'>Live</a>."
-msgstr ""
+msgstr "Gebruik de applicatie-ID en Geheime sleutel die u hebt ontvangen na het toevoegen van een applicatie op <a href='https://account.live.com/developers/applications/create' target='_blank'>Live</a>."
 
 msgctxt "Languages::hybrid_auth.instruction_linkedin"
 msgid "Use ID (Consumer key) and Secret key that you've received after creating an application on <a href='https://www.linkedin.com/developer/apps' target='_blank'>LinkedIn Developers</a>."
-msgstr ""
+msgstr "Gebruik de ID (consumentensleutel) en Geheime sleutel die u hebt ontvangen na het maken van een applicatie op <a href='https://www.linkedin.com/developer/apps' target='_blank'>LinkedIn-ontwikkelaars</a>."
 
 msgctxt "Languages::hybrid_auth.instruction_foursquare"
 msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://foursquare.com/developers/apps' target='_blank'>Fousquare</a>."
-msgstr ""
+msgstr "Gebruik de applicatie-ID en Geheime sleutel die u hebt ontvangen na het maken van een applicatie op <a href='https://foursquare.com/developers/apps' target='_blank'>Fousquare</a>."
 
 msgctxt "Languages::email_template.hybrid_auth_create_profile"
 msgid "Create user profile via social login"
-msgstr ""
+msgstr "Maak een gebruikersprofiel via sociale login"
 
 msgctxt "Languages::hybrid_auth.provider_not_found"
 msgid "Provider [provider] not found"
-msgstr ""
+msgstr "Provider [provider] niet gevonden"
 
 msgctxt "Languages::hybrid_auth.facebook_disabled_upgrade_notification_title"
 msgid "Social Login: Sign-ins via Facebook have been disabled due to an old PHP version"
-msgstr ""
+msgstr "Social Login: Inloggen via Facebook is uitgeschakeld vanwege een oude PHP-versie"
 
 msgctxt "Languages::hybrid_auth.facebook_disabled_upgrade_notification_text"
 msgid "<p>We had to move to a newer version of Facebook API, because the API version that we used previously is no longer supported. However, to work with the new API, [product] requires PHP 5.4. You are seeing this message because your server has an older PHP version.</p><p>The status of the <b>Facebook</b> provider under <b>Website → Social login</b> has been set to <i>Disabled</i>.</p><p>Please update your PHP version to 5.4 or higher before you re-enable Facebook.</p>"
-msgstr ""
+msgstr "<p>We moesten verhuizen naar een nieuwere versie van Facebook API, omdat de eerder gebruikte API-versie niet langer wordt ondersteund. Voor het werken met de nieuwe API is voor [product] echter PHP 5.4 vereist. U ziet dit bericht omdat uw server een oudere PHP-versie heeft.</p><p>De status van de provider<b>Facebook</b>onder<b>Website → Social login</b>is ingesteld op<i>Uitgeschakeld</i>.</p><p>Werk uw PHP-versie bij naar 5.4 of hoger voordat u Facebook opnieuw inschakelt.</p>"
 
 msgctxt "Languages::hybrid_auth.facebook_oauth_redirect_uris"
 msgid "Valid OAuth redirect URIs"
+msgstr "Geldige OAuth-omleidings-URI's"
+
+msgctxt "Languages::hybrid_auth.live_redirect_urls"
+msgid "Redirect URLs"
+msgstr "Omleidings-URL’s"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_version"
+msgid "API version"
+msgstr "API versie"
+
+msgctxt "Languages::ttc_hybrid_auth.linkedin_api_version"
+msgid "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">deprecated API v1</a>, but old apps still use it. If you're configuring LinkedIn app for the first time now, use API v2. Old LinkedIn apps configured some time ago may still be using v1."
+msgstr "LinkedIn <a target=\"_blank\" href=\"https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/migration-faq?context=linkedin/consumer/context\">verouderde API v1</a>, maar oude apps gebruiken het nog steeds. Als u de LinkedIn-app nu voor het eerst configureert, gebruikt u API v2. Oude LinkedIn-apps die enige tijd geleden zijn geconfigureerd, gebruiken mogelijk nog steeds v1."
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v1"
+msgid "v1"
+msgstr "v1"
+
+msgctxt "Languages::hybrid_auth.linkedin_api_v2"
+msgid "v2"
+msgstr "v2"
+
+msgctxt "Languages::hybrid_auth.instruction_paypal_application"
+msgid "Use the application ID and Secret key that you've received after creating an application on <a href='https://developer.paypal.com/developer/applications' target='_blank'>PayPal Developers</a>. Please enable all Personal Profile scope attributes and at least one scope attribute in Address and in Account Information in your PayPal application settings."
 msgstr ""
 

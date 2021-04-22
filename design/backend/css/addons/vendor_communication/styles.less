@@ -1,6 +1,34 @@
+@import "../../config.less";
 /* ==========================================================================
 Vendor communication
 ========================================================================== */
+
+// Main wrapper
+#content_view_thread {
+    min-height: 100%;
+}
+
+// Message writing form
+.add_message_form {
+    margin: 0;
+
+    & &--wrapper {
+        padding: 20px;
+
+        .controls {
+            margin-left: 80px;
+        }
+    }
+
+    & &--textarea {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    & &--refresh-btn.btn {
+        padding: 4px 10px;
+    }
+}
 
 // Tickets
 .messages {
@@ -77,6 +105,11 @@ Vendor communication
     }
 }
 
+// New thread from
+.vendor-communication-add-message__title {
+    width:auto !important;
+}
+
 // Customer post
 .vendor-communication-post__customer {
 
@@ -148,27 +181,35 @@ Vendor communication
     }
 }
 
+.vendor-communication-object-data {
+    .post-object {
+        margin-left: 20px;
+    }
+}
+
+.vendor-communication-thread {
+    .select2-search__field {
+        margin-left: 5px;
+        padding-right: 0px;
+    }
+}
 // Fixed bottom
 .admin-content-wrap {
 
     .fixed-bottom {
-        position: fixed;
+        display: inline-block;
+
+        position: absolute;
         bottom: 0;
-        padding-top: 1px;
-        width: 1212px;
+        left: 0;
+        right: 0;
+
         color: #333;
         background: #f5f5f5;
-        display: inline-block;
-        vertical-align: bottom;
+
         border-top: 1px solid #e9e9e9;
-        margin-left: -14px;
-        margin-right: -14px;
-        padding-left: 14px;
-        padding-right: 14px;
 
         &-wrapper {
-            padding-top: 20px;
-            padding-bottom: 20px;
             width: 100%;
             display: inline-block;
         }
@@ -219,6 +260,12 @@ Vendor communication
         left: 1px;
         border-width: 14px;
         border-right-color: #f5f5f5;
+    }
+}
+
+@media (max-width: @TabletBreakpoint) {
+    .message-title {
+        max-width: unset !important;
     }
 }
 

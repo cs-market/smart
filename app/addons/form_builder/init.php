@@ -40,7 +40,6 @@ define('FORM_IP_ADDRESS', 'B');
 // Special types
 define('FORM_VARIANT', 'G');
 define('FORM_RECIPIENT', 'J');
-define('FORM_IS_SECURE', 'U');
 define('FORM_SUBMIT', 'L');
 define('FORM_SUBJECT', 'E');
 define('FORM_SUBJECT_TEXT', 'K');

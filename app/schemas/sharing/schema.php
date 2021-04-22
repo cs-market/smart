@@ -60,38 +60,6 @@
 */
 
 return array(
-    'currencies' => array(
-        'controller' => 'currencies',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@currency_id',
-            'object' => 'currencies'
-        ),
-        'table' => array(
-            'name' => 'currencies',
-            'key_field' => 'currency_id',
-        ),
-        'request_object' => 'currency_description',
-        'have_owner' => false,
-    ),
-
-    'languages' => array(
-        'controller' => 'languages',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@lang_id',
-            'object' => 'languages'
-        ),
-        'table' => array(
-            'name' => 'languages',
-            'key_field' => 'lang_id',
-        ),
-        'request_object' => 'language',
-        'have_owner' => false,
-    ),
-
     'profile_fields' => array(
         'controller' => 'profile_fields',
         'mode' => 'update',
@@ -147,60 +115,6 @@ return array(
             ),
         ),
         'request_object' => 'option_data',
-        'have_owner' => true,
-    ),
-
-    'shippings' => array(
-        'controller' => 'shippings',
-        'api' => 'shippings',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@shipping_id',
-            'object' => 'shippings'
-        ),
-        'table' => array(
-            'name' => 'shippings',
-            'key_field' => 'shipping_id',
-        ),
-        'buttons' => array(
-            'type' => 'save_cancel',
-            'but_name' => 'dispatch[shippings.update_shipping]',
-        ),
-        'request_object' => 'shipping_data',
-        'have_owner' => true,
-    ),
-
-    'payments' => array(
-        'controller' => 'payments',
-        'api' => 'payments',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@payment_id',
-            'object' => 'payments'
-        ),
-        'table' => array(
-            'name' => 'payments',
-            'key_field' => 'payment_id',
-        ),
-        'request_object' => 'payment_data',
-        'have_owner' => true,
-    ),
-
-    'promotions' => array(
-        'controller' => 'promotions',
-        'mode' => 'update',
-        'type' => 'tpl_tabs',
-        'params' => array(
-            'object_id' => '@promotion_id',
-            'object' => 'promotions'
-        ),
-        'table' => array(
-            'name' => 'promotions',
-            'key_field' => 'promotion_id',
-        ),
-        'request_object' => 'promotion_data',
         'have_owner' => true,
     ),
 

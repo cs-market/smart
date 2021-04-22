@@ -12,7 +12,7 @@
     </div>
 
     <div class="control-group">
-        <label class="control-label">{__("paypal_adaptive_type_payments")}{include file="common/tooltip.tpl" tooltip=__("addons.paypal_adaptive.payment_type_notice", ["[url]" => "addons.update&addon=paypal_adaptive"|fn_url])}:</label>
+        <label class="control-label">{__("paypal_adaptive_type_payments")}:</label>
         <div class="controls">
             <label class="radio inline">
                 <input class="cm-switch-availability cm-switch-inverse cm-switch-visibility" id="sw_block_chained_settings" type="radio" value="parallel" name="payment_data[processor_params][payment_type]" {if $addons.paypal_adaptive.collect_payouts == "Y" || $processor_params.payment_type == "parallel" || !$processor_params.payment_type} checked="checked"{/if}>
@@ -22,6 +22,7 @@
                 <input class="cm-switch-availability cm-switch-visibility" id="sw_block_chained_settings" type="radio" value="chained" name="payment_data[processor_params][payment_type]" {if $addons.paypal_adaptive.collect_payouts == "Y"} disabled="disabled"{elseif $processor_params.payment_type == "chained"} checked="checked"{/if}>
                 {__("paypal_adaptive_chained_payments")}
             </label>
+            <p class="muted description">{__("addons.paypal_adaptive.payment_type_notice", ["[url]" => "addons.update&addon=paypal_adaptive"|fn_url])}</p>
         </div>
     </div>
 
@@ -41,6 +42,7 @@
         <label class="control-label cm-required" for="primary_email">{__("primary_email")}:</label>
         <div class="controls">
             <input type="text" name="payment_data[processor_params][primary_email]" id="primary_email" value="{$processor_params.primary_email}" class="input-text" />
+            <p class="muted description">{__("addons.paypal_adaptive.primary_email_notice")}</p>
         </div>
     </div>
 

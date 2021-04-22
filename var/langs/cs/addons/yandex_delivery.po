@@ -5,8 +5,8 @@ msgstr "Project-Id-Version: tygh\n"
 "Language: cs_CZ\n"
 
 msgctxt "Addons::name::yandex_delivery"
-msgid "Yandex.Delivery"
-msgstr "Yandex.Delivery"
+msgid "Yandex.Delivery [Deprecated]"
+msgstr "Yandex.Delivery [Deprecated]"
 
 msgctxt "Addons::description::yandex_delivery"
 msgid "Yandex delivery service"
@@ -81,8 +81,8 @@ msgid "Weekend"
 msgstr "Weekend"
 
 msgctxt "Languages::carrier_yandex"
-msgid "Yandex.Delivery"
-msgstr "Yandex.Delivery"
+msgid "Yandex.Delivery [Deprecated]"
+msgstr "Yandex.Delivery [Deprecated]"
 
 msgctxt "Languages::yandex_delivery_shipping"
 msgid "Delivery type"
@@ -275,3 +275,47 @@ msgstr "Pickup"
 msgctxt "Languages::yandex_delivery.courier"
 msgid "Courier"
 msgstr "Courier"
+
+msgctxt "Languages::yandex_delivery.no_shipping_services_selected"
+msgid "At least one shipping service must be selected on the Configure tab of the shipping method configuration page"
+msgstr "At least one shipping service must be selected on the Configure tab of the shipping method configuration page"
+
+msgctxt "Languages::yandex_delivery.day_single.schedule_closed"
+msgid "[day]: Closed"
+msgstr "[day]: Closed"
+
+msgctxt "Languages::yandex_delivery.day_single.schedule_single"
+msgid "[day]: [schedule]"
+msgstr "[day]: [schedule]"
+
+msgctxt "Languages::yandex_delivery.day_single.schedule_interval"
+msgid "[day]: [from]&ndash;[to]"
+msgstr "[day]: [from]&ndash;[to]"
+
+msgctxt "Languages::yandex_delivery.day_interval.schedule_closed"
+msgid "[first_day]&ndash;[last_day]: Closed"
+msgstr "[first_day]&ndash;[last_day]: Closed"
+
+msgctxt "Languages::yandex_delivery.day_interval.schedule_single"
+msgid "[first_day]&ndash;[last_day]: [schedule]"
+msgstr "[first_day]&ndash;[last_day]: [schedule]"
+
+msgctxt "Languages::yandex_delivery.day_interval.schedule_interval"
+msgid "[first_day]&ndash;[last_day]: [from]&ndash;[to]"
+msgstr "[first_day]&ndash;[last_day]: [from]&ndash;[to]"
+
+msgctxt "Languages::yandex_delivery.day_every.schedule_interval"
+msgid "Daily: [from]&ndash;[to]"
+msgstr "Daily: [from]&ndash;[to]"
+
+msgctxt "Languages::yandex_delivery.day_every.schedule_single"
+msgid "Daily: [schedule]"
+msgstr "Daily: [schedule]"
+
+msgctxt "Languages::yandex_delivery.info_about_of_tracking_number"
+msgid "Due to technical restrictions of Yandex.Delivery, the notification will be sent without a tracking number. You'll be able to send the tracking number after you create the shipment. Just add the tracking number on the order editing page and save your changes with notifying the customer about them."
+msgstr "Due to technical restrictions of Yandex.Delivery, the notification will be sent without a tracking number. You'll be able to send the tracking number after you create the shipment. Just add the tracking number on the order editing page and save your changes with notifying the customer about them."
+
+msgctxt "Languages::yandex_delivery.inner_order"
+msgid "Order number in Yandex"
+msgstr "Order number in Yandex"

@@ -1,6 +1,6 @@
 {math equation="x*30+5" x=$level|default:"0" assign="shift"}
 <tr>
-<td><div style="padding-left: {$shift}px;">
+<td><div style="padding-{$direction}: {$shift}px;">
     <i class="download-icon ty-icon-file"></i>
     {if $product_file.ekey && ($product_file.activation_type !== "M" || $product_file.active == "Y") && $product_file.edp_info && (!$product_file.max_downloads || $product_file.downloads < $product_file.max_downloads)}
         <a href="{"orders.get_file?ekey=`$product_file.ekey`&product_id=`$product.product_id`&file_id=`$product_file.file_id`"|fn_url}" class="ty-download-link cm-no-ajax">{$product_file.file_name}</a>

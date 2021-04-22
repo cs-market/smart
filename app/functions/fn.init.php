@@ -12,29 +12,38 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\BlockManager\Layout;
-use Tygh\Development;
-use Tygh\Embedded;
-use Tygh\Exceptions\PHPErrorException;
-use Tygh\Exceptions\InitException;
-use Tygh\Registry;
-use Tygh\Debugger;
-use Tygh\Storage;
-use Tygh\Settings;
-use Tygh\Snapshot;
-use Tygh\SmartyEngine\Core as SmartyCore;
 use Tygh\Ajax;
 use Tygh\Api;
 use Tygh\Api\Response;
+use Tygh\BlockManager\Layout;
+use Tygh\Debugger;
+use Tygh\Development;
+use Tygh\Embedded;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\StorefrontStatuses;
+use Tygh\Exceptions\InitException;
+use Tygh\Exceptions\PHPErrorException;
+use Tygh\Languages\Languages;
+use Tygh\Registry;
+use Tygh\Settings;
+use Tygh\SmartyEngine\Core as SmartyCore;
+use Tygh\Snapshot;
+use Tygh\Storage;
 use Tygh\Themes\Styles;
 use Tygh\Tools\DateTimeHelper;
+use Tygh\Enum\UserTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 /**
  * Init template engine
  *
- * @return boolean always true
+ * @param string $area
+ *
+ * @return array
+ * @throws \SmartyException
+ * @throws \Tygh\Exceptions\PermissionsException
  */
 function fn_init_templater($area = AREA)
 {
@@ -59,14 +68,9 @@ function fn_init_templater($area = AREA)
 
     if ($area == 'A') {
 
-        if (!empty($auth['user_id'])) {
-            // Auto-tooltips for admin panel
-            $view->registerFilter('pre', array('Tygh\SmartyEngine\Filters', 'preFormTooltip'));
-
-            if (fn_allowed_for('ULTIMATE')) {
-                // Enable sharing for objects
-                $view->registerFilter('output', array('Tygh\SmartyEngine\Filters', 'outputSharing'));
-            }
+        if (!empty($auth['user_id']) && fn_allowed_for('ULTIMATE')) {
+            // Enable sharing for objects
+            $view->registerFilter('output', array('Tygh\SmartyEngine\Filters', 'outputSharing'));
         }
 
         $view->registerFilter('pre', array('Tygh\SmartyEngine\Filters', 'preScript'));
@@ -102,7 +106,7 @@ function fn_init_templater($area = AREA)
     $view->setPluginsDir(Registry::get('config.dir.functions') . 'smarty_plugins');
     $view->addPluginsDir($smarty_plugins_dir);
 
-    $view->error_reporting = E_ALL & ~E_NOTICE;
+    $view->error_reporting = E_ALL & ~E_NOTICE & ~E_WARNING;
 
     $view->registerDefaultPluginHandler(array('Tygh\SmartyEngine\Filters', 'smartyDefaultHandler'));
 
@@ -158,7 +162,7 @@ function fn_init_templater($area = AREA)
  */
 function fn_init_crypt()
 {
-    Tygh::$app['crypt'] = function ($app) {
+    Tygh::$app['crypt'] = function () {
         return new Crypt_Blowfish(Registry::get('config.crypt_key'));
     };
 
@@ -168,7 +172,7 @@ function fn_init_crypt()
 /**
  * Init ajax engine
  *
- * @return boolean true if current request is ajax, false - otherwise
+ * @return array
  */
 function fn_init_ajax()
 {
@@ -189,50 +193,83 @@ function fn_init_ajax()
 /**
  * Init languages
  *
- * @param array $params request parameters
- * @return boolean always true
+ * @param array  $params request parameters
+ * @param string $area
+ *
+ * @return array
  */
 function fn_init_language($params, $area = AREA)
 {
     $default_language = Registry::get('settings.Appearance.' . fn_get_area_name($area) . '_default_language');
-    $session_language = fn_get_session_data('cart_language' . $area);
+    $session_display_language = fn_get_session_data('cart_language' . $area);
+    $session_description_language = fn_get_session_data('descr_sl');
 
-    $show_hidden_languages = $area != 'C' ? true : false;
-    $avail_languages = fn_get_avail_languages($area, $show_hidden_languages);
+    $languages_search_params = [
+        'area'           => $area,
+        'include_hidden' => $area !== 'C',
+    ];
 
+    $avail_languages = Registry::getOrSetCache(
+        ['init_language', 'init_language_' . $area],
+        ['languages', 'storefronts_languages'],
+        ['static', 'storefront'],
+        static function () use ($languages_search_params) {
+            return Languages::getAvailable($languages_search_params);
+        }
+    );
+
+    $display_language = null;
     if (!empty($params['sl']) && !empty($avail_languages[$params['sl']])) {
-        fn_define('CART_LANGUAGE', $params['sl']);
-    } elseif ($session_language && !empty($avail_languages[$session_language])) {
-        fn_define('CART_LANGUAGE', $session_language);
-    } elseif ($_lc = fn_get_browser_language($avail_languages)) {
-        fn_define('CART_LANGUAGE', $_lc);
+        $display_language = $params['sl'];
+    } elseif ($session_display_language && !empty($avail_languages[$session_display_language])) {
+        $display_language = $session_display_language;
+    } elseif ($browser_language = fn_get_browser_language($avail_languages)) {
+        $display_language = $browser_language;
     } elseif (!empty($avail_languages[$default_language])) {
-        fn_define('CART_LANGUAGE', $default_language);
+        $display_language = $default_language;
     } else {
         reset($avail_languages);
-        fn_define('CART_LANGUAGE', key($avail_languages));
+        $display_language = key($avail_languages);
     }
 
     // For the backend, set description language
+    $description_language = null;
     if (!empty($params['descr_sl']) && !empty($avail_languages[$params['descr_sl']])) {
-        fn_define('DESCR_SL', $params['descr_sl']);
+        $description_language = $params['descr_sl'];
         fn_set_session_data('descr_sl', $params['descr_sl'], COOKIE_ALIVE_TIME);
-    } elseif (($d = fn_get_session_data('descr_sl')) && !empty($avail_languages[$d])) {
-        fn_define('DESCR_SL', $d);
+    } elseif ($session_description_language && !empty($avail_languages[$session_description_language])) {
+        $description_language = $session_description_language;
     } else {
-        fn_define('DESCR_SL', CART_LANGUAGE);
+        $description_language = $display_language;
     }
 
-    if (CART_LANGUAGE != $session_language) {
-        fn_set_session_data('cart_language' . $area, CART_LANGUAGE, COOKIE_ALIVE_TIME);
+    if ($display_language !== $session_display_language) {
+        fn_set_session_data('cart_language' . $area, $display_language, COOKIE_ALIVE_TIME);
 
         // set language_changed flag only if $session_language was set before
-        if (Embedded::isEnabled() && defined('AJAX_REQUEST') && $session_language) {
+        if (Embedded::isEnabled() && defined('AJAX_REQUEST') && $session_display_language) {
             Tygh::$app['ajax']->assign('language_changed', true);
         }
     }
 
+    /**
+     * Executes after the display language and the description language are determined right before setting them,
+     * allows you change the languages that will be used and the list of available languages
+     *
+     * @param array  $params                   Request parameters
+     * @param string $area                     Site area identifer (A for the admininstration panel, C for storefront)
+     * @param string $default_language         Two-letter default language code
+     * @param string $session_display_language Display language stored in the session
+     * @param array  $avail_languages          List of available languages
+     * @param string $display_language         Display language
+     * @param string $description_language     Description language
+     * @param string $browser_language         Browser language
+     */
+    fn_set_hook('init_language_post', $params, $area, $default_language, $session_display_language, $avail_languages, $display_language, $description_language, $browser_language);
+
     Registry::set('languages', $avail_languages);
+    fn_define('CART_LANGUAGE', $display_language);
+    fn_define('DESCR_SL', $description_language);
 
     return array(INIT_STATUS_OK);
 }
@@ -242,6 +279,7 @@ function fn_init_language($params, $area = AREA)
  * Company data array will be saved in the registry runtime.company_data
  *
  * @param array $params request parameters
+ *
  * @return array with init data (init status, redirect url in case of redirect)
  */
 function fn_init_company_data($params)
@@ -267,6 +305,7 @@ function fn_init_company_data($params)
  * Selected company id will be saved in the registry runtime.company_id
  *
  * @param array $params request parameters
+ *
  * @return array with init data (init status, redirect url in case of redirect)
  */
 function fn_init_company_id(&$params)
@@ -280,6 +319,16 @@ function fn_init_company_id(&$params)
     } else {
         $switch_company_id = false;
     }
+
+    $all_available_company_ids = Registry::getOrSetCache(
+        'all_available_company_ids',
+        ['companies'],
+        'static',
+        static function () {
+            $ids = fn_get_available_company_ids();
+            return array_combine($ids, $ids);
+        }
+    );
 
     if (defined('API')) {
         $api = Tygh::$app['api'];
@@ -301,7 +350,7 @@ function fn_init_company_id(&$params)
                         }
 
                         $company_id = intval($store[2]);
-                        if (!fn_get_available_company_ids($company_id)) {
+                        if (!isset($all_available_company_ids[$company_id])) {
                             $company_id = 0;
                         }
                     }
@@ -325,7 +374,7 @@ function fn_init_company_id(&$params)
     if (AREA == 'A' && !empty(Tygh::$app['session']['auth']['company_id'])) {
         $company_id = intval(Tygh::$app['session']['auth']['company_id']);
         $available_company_ids = array($company_id);
-        if (!fn_get_available_company_ids($company_id)) {
+        if (!isset($all_available_company_ids[$company_id])) {
             return fn_init_company_id_redirect($params, 'access_denied');
         }
     }
@@ -334,7 +383,7 @@ function fn_init_company_id(&$params)
     if (!$company_id) {
         if ($switch_company_id !== false) { // request not empty
             if ($switch_company_id) {
-                if (fn_get_available_company_ids($switch_company_id)) {
+                if (isset($all_available_company_ids[$switch_company_id])) {
                     $company_id = $switch_company_id;
                 } else {
                     return fn_init_company_id_redirect($params, 'company_not_found');
@@ -347,13 +396,18 @@ function fn_init_company_id(&$params)
     }
 
     if (empty($available_company_ids)) {
-        $available_company_ids = fn_get_available_company_ids();
+        $available_company_ids = array_values($all_available_company_ids);
     }
 
     fn_set_hook('init_company_id', $params, $company_id, $available_company_ids, $result);
 
+    if (AREA === 'A') {
+        fn_init_storefronts_stats($company_id);
+    }
+
     Registry::set('runtime.company_id', $company_id);
     Registry::set('runtime.companies_available_count', count($available_company_ids));
+    Registry::resetCacheCompanyId();
 
     unset($params['switch_company_id']);
 
@@ -363,20 +417,20 @@ function fn_init_company_id(&$params)
 /**
  * Form error notice and make redirect. Used in fn_init_company_id
  *
- * @param array $params request parameters
- * @param string $message language variable name for message
- * @param int $redirect_company_id New company id for redirecting, if null, company id saved in session will be used
+ * @param array  $params              request parameters
+ * @param string $message             language variable name for message
+ * @param int    $redirect_company_id New company id for redirecting, if null, company id saved in session will be used
+ *
  * @return array with init data (init status, redirect url in case of redirect)
  */
 function fn_init_company_id_redirect(&$params, $message, $redirect_company_id = null)
 {
-    if ('access_denied' == $message) {
+    $redirect_url = '';
 
+    if ('access_denied' == $message) {
         Tygh::$app['session']['auth'] = array();
         $redirect_url = 'auth.login_form' . (!empty($params['return_url']) ? '?return_url=' . urldecode($params['return_url']) : '');
-
     } elseif ('company_not_found' == $message) {
-
         $dispatch = !empty($params['dispatch']) ? $params['dispatch'] : 'auth.login_form';
         unset($params['dispatch']);
         $params['switch_company_id'] = (null === $redirect_company_id) ? fn_init_company_id_find_in_session() : $redirect_company_id;
@@ -413,28 +467,54 @@ function fn_init_company_id_find_in_session()
 /**
  * Init currencies
  *
- * @param array $params request parameters
- * @param  string $area Area ('A' for admin or 'C' for customer)
- * @return boolean always true
+ * @param array  $params request parameters
+ * @param string $area   Area ('A' for admin or 'C' for customer)
+ * @param string $account_type Current user account type
+ *
+ * @return array
  */
-function fn_init_currency($params, $area = AREA)
+function fn_init_currency($params, $area = AREA, $account_type = null)
 {
+    if ($area !== SiteArea::STOREFRONT
+        && $account_type === null
+        && defined('ACCOUNT_TYPE')
+    ) {
+        $account_type = ACCOUNT_TYPE;
+    }
+
     /**
      * Performs actions before initializing currencies
      *
-     * @param array $params request parameters
-     * @param string $area Area ('A' for admin or 'C' for customer)
+     * @param array  $params request parameters
+     * @param string $area   Area ('A' for admin or 'C' for customer)
      */
-    fn_set_hook('init_currency_pre', $params, $area);
+    fn_set_hook('init_currency_pre', $params, $area, $account_type);
 
-    $_params = array();
-    if (fn_allowed_for('ULTIMATE:FREE')) {
-        $_params['only_primary'] = 'Y';
-    } else {
-        $_params['status'] = array('A', 'H');
+    $currency_params = [
+        'status' => [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN]
+    ];
+
+    if ($account_type === 'vendor') {
+        /** @var \Tygh\Storefront\Repository $repository */
+        $repository = Tygh::$app['storefront.repository'];
+        $storefronts = $repository->findByCompanyId(Registry::get('runtime.company_id'), false);
+        if ($storefronts) {
+            $currency_params['storefront_id'] = array_column($storefronts, 'storefront_id');
+        }
     }
 
-    $currencies = fn_get_currencies_list($_params, $area, CART_LANGUAGE);
+    $currencies = Registry::getOrSetCache(
+        ['init_currency', 'init_currency' . md5(serialize($currency_params))],
+        [
+            'currencies',
+            'currency_descriptions',
+            'storefronts_currencies'
+        ],
+        ['storefront', 'lang'],
+        static function () use ($currency_params, $area) {
+            return fn_get_currencies_list($currency_params, $area, CART_LANGUAGE);
+        }
+    );
 
     $primary_currency = '';
 
@@ -447,7 +527,13 @@ function fn_init_currency($params, $area = AREA)
 
     if (empty($primary_currency)) { // Restore primary currency if it empty
         $primary_currencies = fn_get_currencies_list(
-            array('only_primary' => true, 'raw_query' => true), $area, CART_LANGUAGE
+            [
+                'only_primary'  => true,
+                'raw_query'     => true,
+                'storefront_id' => false
+            ],
+            $area,
+            CART_LANGUAGE
         );
         foreach ($primary_currencies as $key => $currency) {
             $primary_currencies[$key]['status'] = 'H'; // Hide unavailable currencies
@@ -475,7 +561,7 @@ function fn_init_currency($params, $area = AREA)
 
     // Hide secondary currency in frontend if it is hidden
     if ($area == 'C' && $currencies[$secondary_currency]['status'] != 'A') {
-        $first_currency = '';
+        $first_currency = [];
         foreach ($currencies as $key => $currency) {
             if ($currency['status'] != 'A' && $currency['is_primary'] != 'Y') {
                 unset($currencies[$key]);
@@ -483,15 +569,18 @@ function fn_init_currency($params, $area = AREA)
                 $first_currency = $currency;
             }
         }
-        $secondary_currency = $first_currency['currency_code'];
+
+        if ($first_currency) {
+            $secondary_currency = $first_currency['currency_code'];
+        }
     }
 
     /**
      * Sets currencies
      *
-     * @param array $params request parameters
-     * @param string $area Area ('A' for admin or 'C' for customer)
-     * @param string $primary_currency Primary currency code
+     * @param array  $params             request parameters
+     * @param string $area               Area ('A' for admin or 'C' for customer)
+     * @param string $primary_currency   Primary currency code
      * @param string $secondary_currency Secondary currency code
      */
     fn_set_hook('init_currency_post', $params, $area, $primary_currency, $secondary_currency);
@@ -508,17 +597,24 @@ function fn_init_currency($params, $area = AREA)
  * Init layout
  *
  * @param array $params request parameters
- * @return boolean always true
+ *
+ * @return array
  */
 function fn_init_layout($params)
 {
-    if (fn_allowed_for('ULTIMATE')) {
-        if (!Registry::get('runtime.company_id') && !Registry::get('runtime.simple_ultimate')) {
-            return array(INIT_STATUS_OK);
-        }
+    if (defined('SKIP_LAYOUT_INIT')) {
+        return [INIT_STATUS_OK];
     }
 
-    $key_name = 'stored_layout' . (Embedded::isEnabled() ? '_embedded' : '');
+    /** @var \Tygh\Storefront\Storefront $storefront */
+    $storefront = Tygh::$app['storefront'];
+
+    $storefront_id = $storefront->storefront_id;
+
+    $embedded_suffix = Embedded::isEnabled()
+        ? '_embedded'
+        : '';
+    $key_name = "stored_layout_{$storefront_id}{$embedded_suffix}";
     $stored_layout = fn_get_session_data($key_name);
 
     if (!empty($params['s_layout'])) {
@@ -529,15 +625,17 @@ function fn_init_layout($params)
 
     // Replace default theme with selected for current area
     if (!empty($stored_layout)) {
-        $layout = Layout::instance()->get($stored_layout);
+        $layout = Layout::instance(0, [], $storefront_id)->get($stored_layout);
 
-        if (!isset($layout['theme_name']) || $layout['theme_name'] != fn_get_theme_path('[theme]', 'C')) {
+        if (!isset($layout['theme_name'])
+            || $layout['theme_name'] !== fn_get_theme_path('[theme]', 'C', null, true, $storefront_id)
+        ) {
             unset($layout);
         }
     }
 
     if (empty($layout)) {
-        $layout = Layout::instance()->getDefault(); // get default
+        $layout = Layout::instance(0, [], $storefront_id)->getDefault(); // get default
     }
 
     $available_styles = Styles::factory($layout['theme_name'])->getList(array(
@@ -558,36 +656,38 @@ function fn_init_layout($params)
 
     Registry::set('runtime.layout', $layout);
 
-    return array(INIT_STATUS_OK);
+    return [INIT_STATUS_OK];
 }
 
 /**
  * Init user
  *
- * @return boolean always true
+ * @param string $area Current area
+ *
+ * @return array{int}
  */
 function fn_init_user($area = AREA)
 {
-    $user_info = array();
-    if (!empty(Tygh::$app['session']['auth']['user_id'])) {
-        $user_info = fn_get_user_short_info(Tygh::$app['session']['auth']['user_id']);
+    $user_info = [];
+    $session = Tygh::$app['session'];
+
+    if (!empty($session['auth']['user_id'])) {
+        $user_info = fn_get_user_short_info($session['auth']['user_id']);
         if (empty($user_info)) { // user does not exist in the database, but exists in session
-            Tygh::$app['session']['auth'] = array();
+            $session['auth'] = [];
         } else {
-            Tygh::$app['session']['auth']['usergroup_ids'] = fn_define_usergroups(array(
-                'user_id' => Tygh::$app['session']['auth']['user_id'],
+            $session['auth']['usergroup_ids'] = fn_define_usergroups([
+                'user_id'   => $session['auth']['user_id'],
                 'user_type' => $user_info['user_type']
-            ));
+            ]);
         }
     }
 
     $first_init = false;
     if (empty(Tygh::$app['session']['auth'])) {
-
-        $udata = array();
         $user_id = fn_get_session_data($area . '_user_id');
 
-        if ($area == 'A' && defined('CONSOLE')) {
+        if (defined('CONSOLE') && SiteArea::isAdmin($area)) {
             $user_id = 1;
         }
 
@@ -598,26 +698,31 @@ function fn_init_user($area = AREA)
         fn_login_user($user_id);
 
         if (!defined('NO_SESSION')) {
-            Tygh::$app['session']['cart'] = isset(Tygh::$app['session']['cart']) ? Tygh::$app['session']['cart'] : array();
+            $session['cart'] = isset($session['cart']) ? $session['cart'] : [];
         }
 
-        if ((defined('LOGGED_VIA_COOKIE') && !empty(Tygh::$app['session']['auth']['user_id'])) || ($cu_id = fn_get_session_data('cu_id'))) {
+        if (
+            (defined('LOGGED_VIA_COOKIE') && !empty($session['auth']['user_id']))
+            || ($cu_id = fn_get_session_data('cu_id'))
+        ) {
             $first_init = true;
+
             if (!empty($cu_id)) {
-                fn_define('COOKIE_CART' , true);
+                fn_define('COOKIE_CART', true);
             }
 
             // Cleanup cached shipping rates
+            unset($session['shipping_rates']);
 
-            unset(Tygh::$app['session']['shipping_rates']);
+            $_utype = empty($session['auth']['user_id']) ? 'U' : 'R';
+            $_uid = empty($session['auth']['user_id']) ? $cu_id : $session['auth']['user_id'];
 
-            $_utype = empty(Tygh::$app['session']['auth']['user_id']) ? 'U' : 'R';
-            $_uid = empty(Tygh::$app['session']['auth']['user_id']) ? $cu_id : Tygh::$app['session']['auth']['user_id'];
-            fn_extract_cart_content(Tygh::$app['session']['cart'], $_uid , 'C' , $_utype);
-            fn_save_cart_content(Tygh::$app['session']['cart'] , $_uid , 'C' , $_utype);
-            if (!empty(Tygh::$app['session']['auth']['user_id'])) {
-                Tygh::$app['session']['cart']['user_data'] = fn_get_user_info(Tygh::$app['session']['auth']['user_id']);
-                $user_info = fn_get_user_short_info(Tygh::$app['session']['auth']['user_id']);
+            fn_extract_cart_content($session['cart'], $_uid, 'C', $_utype);
+            fn_save_cart_content($session['cart'], $_uid, 'C', $_utype);
+
+            if (!empty($session['auth']['user_id'])) {
+                $session['cart']['user_data'] = fn_get_user_info($session['auth']['user_id']);
+                $user_info = fn_get_user_short_info($session['auth']['user_id']);
             }
         }
     }
@@ -626,21 +731,24 @@ function fn_init_user($area = AREA)
         db_query("DELETE FROM ?:user_session_products WHERE user_type = 'U' AND timestamp < ?i", (TIME - SECONDS_IN_DAY * 30));
     }
 
-    if (!fn_allowed_for('ULTIMATE:FREE')) {
-        // If administrative account has usergroup, it means the access restrictions are in action
-        if ($area == 'A' && !empty(Tygh::$app['session']['auth']['usergroup_ids'])) {
-            fn_define('RESTRICTED_ADMIN', true);
-        }
+    // If administrative account has usergroup, it means the access restrictions are in action
+    if (
+        !empty($session['auth']['usergroup_ids'])
+        && SiteArea::isAdmin($area)
+        && !UserTypes::isVendor($session['auth']['user_type']) // vendor cannot be restricted
+    ) {
+        fn_define('RESTRICTED_ADMIN', true);
     }
 
-    if (!empty($user_info) && $user_info['user_type'] == 'A' && (empty($user_info['company_id']) || (fn_allowed_for('ULTIMATE') && $user_info['company_id'] == Registry::get('runtime.company_id')))) {
-        $customization_mode = fn_array_combine(explode(',', Registry::get('settings.customization_mode')), true);
-        if (!empty($customization_mode)) {
-            Registry::set('runtime.customization_mode', $customization_mode);
+    if (
+        !empty($session['customization']['modes'])
+        && SiteArea::isStorefront($area)
+        && (int) Registry::get('runtime.storefront_id') === (int) $session['customization']['storefront_id']
+    ) {
+        Registry::set('runtime.customization_mode', array_filter($session['customization']['modes']));
 
-            if ($area == 'A' || Embedded::isEnabled()) {
-                Registry::set('runtime.customization_mode.live_editor', false);
-            }
+        if (Embedded::isEnabled()) {
+            Registry::set('runtime.customization_mode.live_editor', false);
         }
     }
 
@@ -648,14 +756,15 @@ function fn_init_user($area = AREA)
 
     Registry::set('user_info', $user_info);
 
-    return array(INIT_STATUS_OK);
+    return [INIT_STATUS_OK];
 }
 
 /**
  * Init localizations
  *
  * @param array $params request parameters
- * @return boolean true if localizations exists, false otherwise
+ *
+ * @return array
  */
 function fn_init_localization($params)
 {
@@ -708,7 +817,7 @@ function fn_init_localization($params)
 /**
  * Detect user agent
  *
- * @return boolean true always
+ * @return array
  */
 function fn_init_ua()
 {
@@ -771,9 +880,13 @@ function fn_init_ua()
     return array(INIT_STATUS_OK);
 }
 
+/**
+ * @param array $params
+ *
+ * @return array
+ */
 function fn_check_cache($params)
 {
-    $regenerated = true;
     $dir_root = Registry::get('config.dir.root') . '/';
 
     if (isset($params['ct']) && ((AREA == 'A' && !(fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id'))) || Debugger::isActive() || fn_is_development())) {
@@ -796,11 +909,11 @@ function fn_check_cache($params)
 
     /* Add extra files for cache checking if needed */
     $core_hashes = array(
-        '1d5c5b1c0a5405cfef09dfcafbb7e89c3daa12a6' => array(
+        '63455c4015b9dca61178486c0e268dd2d7f05877' => array(
             'file' => 'cuc.xfrqcyrU/utlG/ccn',
             'notice' => 'nqzva_cnary_jvyy_or_oybpxrq'
         ),
-        '04f02438edef1b34cce088e6b48204d2fd9adb7b' => array(
+        '324b33ffb35a7626ae9f0a32352079f771620bfd' => array(
             'file' => 'cuc.8sgh/ergeriabp_ynergvy/fnzrupf/ccn',
             'notice' => 'nqzva_cnary_jvyy_or_oybpxrq'
         ),
@@ -811,8 +924,6 @@ function fn_check_cache($params)
         if ($hash != sha1_file($dir_root . strrev(str_rot13($file['file'])))) {
             if (filemtime($dir_root . strrev(str_rot13($file['file']))) < TIME - SECONDS_IN_DAY * 2) { // 2-days cache
                 Tygh::$app['cache']->regenerate($hash, $file['file']);
-            } else {
-                $regenerated = false;
             }
 
             fn_process_cache_notifications($file['notice']);
@@ -824,31 +935,58 @@ function fn_check_cache($params)
     return array(INIT_STATUS_OK);
 }
 
+/**
+ * @return array
+ */
 function fn_init_settings()
 {
-    Registry::registerCache('settings', array('settings_objects', 'settings_vendor_values', 'settings_descriptions', 'settings_sections', 'settings_variants'), Registry::cacheLevel('static'));
+    // FIXME: Settings probably should be cached by [static, storefront] only.
+    Registry::registerCache('settings', [
+        'settings_objects',
+        'settings_vendor_values',
+        'settings_descriptions',
+        'settings_sections',
+        'settings_variants'
+    ], Registry::cacheLevel(['static', 'storefront', 'company']));
+
     if (Registry::isExist('settings') == false) {
         $settings = Settings::instance()->getValues();
 
-        // Deprecated: workaround for old security settings
-        $settings['Security']['secure_auth'] = $settings['Security']['secure_storefront'] == 'partial' ? 'Y' : 'N';
-        $settings['Security']['secure_checkout'] = $settings['Security']['secure_storefront'] == 'partial' ? 'Y' : 'N';
+        //initialization remote settings for compatibility with third-party addons
+        //deprecated settings
+        $default_elements = $settings['Appearance']['admin_elements_per_page'];
+        $settings['Appearance']['admin_products_per_page'] = $default_elements;
+        $settings['Appearance']['admin_orders_per_page'] = $default_elements;
+        $settings['Appearance']['admin_pages_per_page'] = $default_elements;
+
+        //settings were moved to Checkout from General, mapping for backward compatibility
+        $checkout_setting = [
+            'order_start_id',
+            'tax_calculation',
+            'min_order_amount',
+            'allow_anonymous_shopping',
+            'checkout_redirect',
+            'estimate_shipping_cost',
+            'default_address',
+            'default_zipcode',
+            'default_city',
+            'default_country',
+            'default_state',
+            'default_phone'
+        ];
+
+        foreach ($checkout_setting as $setting) {
+            $settings['General'][$setting] = $settings['Checkout'][$setting];
+        }
 
         Registry::set('settings', $settings);
     }
-
-    //initialization remote settings for compatibility with third-party addons
-    //deprecated settings
-    $default_elements = Registry::get('settings.Appearance.admin_elements_per_page');
-    Registry::set('settings.Appearance.admin_products_per_page', $default_elements);
-    Registry::set('settings.Appearance.admin_orders_per_page', $default_elements);
-    Registry::set('settings.Appearance.admin_pages_per_page', $default_elements);
 
     fn_init_time_zone(Registry::get('settings.Appearance.timezone'));
 
     fn_define('DEFAULT_LANGUAGE', Registry::get('settings.Appearance.backend_default_language'));
 
-    return array(INIT_STATUS_OK);
+    return [INIT_STATUS_OK];
 }
 
 /**
@@ -875,25 +1013,26 @@ function fn_init_time_zone($time_zone_name)
 /**
  * Initialize all enabled addons
  *
- * @return array INIT_STATUS_OK
+ * @return array
  */
 function fn_init_addons()
 {
-    Registry::registerCache(
+    // FIXME: Settings probably should be cached by [static, storefront] only.
+    Registry::registerCache('addons', [
         'addons',
-        array(
-            'addons', 'settings_objects', 'settings_vendor_values',
-            'settings_descriptions', 'settings_sections', 'settings_variants'
-        ),
-        Registry::cacheLevel('static')
-    );
+        'settings_objects',
+        'settings_vendor_values',
+        'settings_descriptions',
+        'settings_sections',
+        'settings_variants'
+    ], Registry::cacheLevel(['static', 'storefront', 'company']));
 
     if (Registry::isExist('addons') == false) {
         $init_addons = Registry::get('settings.init_addons');
         $allowed_addons = null;
 
         if ($init_addons == 'none') {
-            $allowed_addons = array();
+            $allowed_addons = [];
         } elseif ($init_addons == 'core') {
             $allowed_addons = Snapshot::getCoreAddons();
         }
@@ -923,34 +1062,42 @@ function fn_init_addons()
         if (empty($data['status'])) {
             // FIX ME: Remove me
             error_log("ERROR: Addons initialization: Bad '$addon_name' addon data:" . serialize($data) . " Addons Registry:" . serialize(Registry::get('addons')));
-        }
-        if (!empty($data['status']) && $data['status'] == 'A') {
+        } elseif ($data['status'] === 'A') {
             fn_load_addon($addon_name);
         }
     }
 
     Registry::set('addons_initiated', true, true);
 
-    return array(INIT_STATUS_OK);
+    return [INIT_STATUS_OK];
 }
 
 /**
  * Initialize unmanaged addons
  *
- * @return array INIT_STATUS_OK
+ * @return array{0: int} INIT_STATUS_OK
  */
 function fn_init_unmanaged_addons()
 {
-    // Do not use cache here, because company ID is not initialized yet
-    $addons = db_get_fields("SELECT addon FROM ?:addons WHERE unmanaged = 1 AND status = 'A' ORDER BY priority");
+    $addons = Registry::getOrSetCache('unmanaged_addons', ['addons'], 'static', static function () {
+        return db_get_fields(
+            'SELECT addon FROM ?:addons WHERE unmanaged = 1 AND status = ?s ORDER BY priority',
+            ObjectStatuses::ACTIVE
+        );
+    });
 
     foreach ($addons as $addon_name) {
         fn_load_addon($addon_name);
     }
 
-    return array(INIT_STATUS_OK);
+    return [INIT_STATUS_OK];
 }
 
+/**
+ * @param array $request
+ *
+ * @return array
+ */
 function fn_init_full_path($request)
 {
     // Display full paths cresecure payment processor
@@ -964,6 +1111,9 @@ function fn_init_full_path($request)
     return array(INIT_STATUS_OK);
 }
 
+/**
+ * @return bool
+ */
 function fn_init_stack()
 {
     $stack = Registry::get('init_stack');
@@ -986,7 +1136,9 @@ function fn_init_stack()
  * Run init functions
  *
  * @param array $request $_REQUEST global variable
+ *
  * @return bool always true
+ * @throws \Tygh\Exceptions\InitException
  */
 function fn_init(&$request)
 {
@@ -1040,19 +1192,31 @@ function fn_init(&$request)
 /**
  * Init paths for storage store data (mse, saas)
  *
- * @return boolean true always
+ * @return array{0: int} INIT_STATUS_OK
  */
 function fn_init_storage()
 {
     fn_set_hook('init_storage');
 
-    $storage = Settings::instance()->getValue('storage', '');
+    $storage = Registry::getOrSetCache(
+        'init_storage_settings',
+        ['settings_objects'],
+        'static',
+        static function () {
+            $storage = Settings::instance([
+                'company_id'               => 0,
+                'storefront_id'            => 0,
+                'has_multiple_storefronts' => false,
+                'area'                     => AREA,
+            ])->getValue('storage', '');
 
-    Registry::set('runtime.storage', unserialize($storage));
+            return unserialize($storage);
+        }
+    );
 
-    Registry::set('config.images_path', Storage::instance('images')->getUrl()); // FIXME this path should be removed
+    Registry::set('runtime.storage', $storage);
 
-    return array(INIT_STATUS_OK);
+    return [INIT_STATUS_OK];
 }
 
 /**
@@ -1072,8 +1236,7 @@ function fn_init_api()
  */
 function fn_init_imagine()
 {
-    Tygh::$app['image'] = function ($app) {
-
+    Tygh::$app['image'] = function () {
         $driver = Registry::ifGet('config.tweaks.image_resize_lib', 'gd');
 
         if ($driver == 'auto') {
@@ -1096,6 +1259,8 @@ function fn_init_imagine()
                     break;
             }
         }
+
+        return null;
     };
 
     return array(INIT_STATUS_OK);
@@ -1108,7 +1273,7 @@ function fn_init_imagine()
  */
 function fn_init_archiver()
 {
-    Tygh::$app['archiver'] = function ($app) {
+    Tygh::$app['archiver'] = function () {
         return new \Tygh\Tools\Archiver();
     };
 
@@ -1171,4 +1336,209 @@ function fn_init_error_handler()
     });
 
     return array(INIT_STATUS_OK);
+}
+
+/**
+ * Provides rules of applying regional redirection to specific controllers.
+ *
+ * When the "Redirect visitors of this storefront to the one that has countries to which the visitors' IP addresses
+ * belong defined" setting is enabled for a storefront, any request will be automatically redirected to the proper
+ * storefront based on location.
+ *
+ * While being conveniet for customers, this behaviour, however, should be disabled for some controllers:
+ * e.g. requests to payment_notification shouldn't be redirected as they are intended for use with the specific store.
+ *
+ * @return array Array where controller names are keys and bool flags are values indicating whether regional
+ *               redirection should be applied to a controller. Regional redirection applies to all controllers by
+ *               default unless otherwise stated
+ */
+function fn_get_regional_redirection_rules()
+{
+    $rules = array(
+        'payment_notification' => false,
+    );
+
+    return $rules;
+}
+
+/**
+ * Redirects a customer to a regional storefront when it's necessary.
+ *
+ * @param array  $request Request parameters
+ * @param string $url     Requested URL
+ *
+ * @return array Initialization status
+ *
+ * @internal
+ */
+function fn_init_redirect_to_regional_storefront($request, $url)
+{
+    if (AREA === 'A') {
+        return [INIT_STATUS_OK];
+    }
+
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository.init'];
+    $current_storefront = $repository->findByUrl($url) ?: $repository->findDefault();
+
+    $do_redirect = !defined('CRAWLER')
+        && empty($_SERVER['PHP_AUTH_USER'])
+        && $current_storefront->redirect_customer
+        && !fn_get_cookie('storefront_redirect_' . $current_storefront->storefront_id);
+
+    if ($do_redirect && isset($request['dispatch'])) {
+        $dispatch = is_array($request['dispatch']) ? key($request['dispatch']) : $request['dispatch'];
+        list($controller, ) = explode('.', str_replace('/', '.', $dispatch));
+        $redirection_rules = fn_get_regional_redirection_rules();
+        $do_redirect = !(isset($redirection_rules[$controller]) && $redirection_rules[$controller] === false);
+    }
+
+    if ($do_redirect) {
+        $ip = fn_get_ip(true);
+        $country_code = fn_get_country_by_ip($ip['host']);
+
+        $target_storefront = null;
+        if (!empty($country_code)) {
+            /** @var \Tygh\Storefront\Storefront[] $regional_storefronts */
+            list($regional_storefronts,) = $repository->find(['country_codes' => [$country_code]]);
+            foreach ($regional_storefronts as $storefront) {
+                if ($storefront->storefront_id !== $current_storefront->storefront_id) {
+                    $target_storefront = $storefront;
+                    break;
+                }
+            }
+        }
+
+        if ($target_storefront) {
+            $url = 'http://' . $target_storefront->url;
+            fn_set_cookie('storefront_redirect_' . $current_storefront->storefront_id, true);
+
+            // FIXME: company ID must be initialized for redirection process to work
+            if (fn_allowed_for('ULTIMATE')) {
+                list($params['switch_company_id']) = $current_storefront->getCompanyIds();
+                fn_init_company_id($params);
+            }
+
+            return [INIT_STATUS_REDIRECT, $url];
+        }
+    }
+
+    return [INIT_STATUS_OK];
+}
+
+/**
+ * Calculates closed storefronts statistics and saves to runtime storage.
+ *
+ * @param int $company_id
+ *
+ * @return array Initialization status
+ *
+ * @internal
+ */
+function fn_init_storefronts_stats($company_id = null)
+{
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository'];
+
+    /** @var \Tygh\Storefront\Storefront[] $storefronts */
+    list($storefronts,) = $repository->find(['get_total' => false]);
+
+    $storefronts_count = count($storefronts);
+    $is_multiple_storefronts = ($storefronts_count > 1);
+    $have_closed_storefronts = false;
+    $are_all_storefronts_closed = true;
+    $is_current_storefront_closed = false;
+    $access_key = '';
+
+    if ($company_id === null && fn_allowed_for('ULTIMATE')) {
+        $company_id = Registry::get('runtime.company_id');
+    }
+
+    foreach ($storefronts as $storefront_key => $storefront) {
+        if ($storefront->status === StorefrontStatuses::CLOSED) {
+            $have_closed_storefronts = true;
+            if (fn_allowed_for('ULTIMATE') && $company_id && in_array($company_id, $storefront->getCompanyIds())
+                || $storefronts_count === 1
+                || fn_allowed_for('MULTIVENDOR') && $storefront->is_default
+            ) {
+                $access_key = $storefront->access_key;
+                $is_current_storefront_closed = true;
+            }
+        } else {
+            $are_all_storefronts_closed = false;
+        }
+    }
+
+    Registry::set('runtime.storefront_access_key', $access_key);
+    Registry::set('runtime.storefronts_count', $storefronts_count);
+    Registry::set('runtime.is_multiple_storefronts', $is_multiple_storefronts);
+    Registry::set('runtime.is_current_storefront_closed', $is_current_storefront_closed);
+    Registry::set('runtime.are_all_storefronts_closed', $are_all_storefronts_closed);
+    Registry::set('runtime.have_closed_storefronts', $have_closed_storefronts);
+
+    return [INIT_STATUS_OK];
+}
+
+/**
+ * Detects host, path and location by the current Storefront and stores them in the Registry cache.
+ *
+ * @param array  $request Request parameters
+ * @param string $url     Requested URL
+ *
+ * @return array Initialization status
+ *
+ * @internal
+ */
+function fn_init_http_params_by_storefront(&$request, $url)
+{
+    if (AREA === 'A') {
+        return [INIT_STATUS_OK];
+    }
+
+    /** @var \Tygh\Storefront\Repository $repository */
+    $repository = Tygh::$app['storefront.repository.init'];
+
+    if (defined('CONSOLE') && isset($request['switch_storefront_id'])) {
+        $storefront = $repository->findById($request['switch_storefront_id']) ?: $repository->findDefault();
+        unset($request['switch_storefront_id']);
+    } else {
+        $storefront = $repository->findByUrl($url) ?: $repository->findDefault();
+    }
+
+    $parsed_url = parse_url('//' . $storefront->url);
+    /** @psalm-suppress PossiblyUndefinedArrayOffset */
+    $host = $parsed_url['host'];
+
+    $path = isset($parsed_url['path']) ? rtrim($parsed_url['path'], '/') : '';
+
+    if (isset($parsed_url['port'])) {
+        $host .= ':' . $parsed_url['port'];
+    }
+
+    $config = Registry::get('config');
+
+    $config['origin_http_location'] = 'http://' . $config['http_host'] . $config['http_path'];
+    $config['origin_https_location'] = 'https://' . $config['https_host'] . $config['https_path'];
+
+    $config['http_path'] = $config['https_path'] = $config['current_path'] = $path;
+    $config['http_host'] = $config['https_host'] = $config['current_host'] = $host;
+
+    $config['http_location'] = 'http://' . $host . $path;
+    $config['https_location'] = 'https://' . $host . $path;
+
+    $config['current_location'] = defined('HTTPS')
+        ? $config['https_location']
+        : $config['http_location'];
+
+    // FIXME: #Storefronts: Company ID initialization in storefront is something special
+    if (fn_allowed_for('ULTIMATE')) {
+        $storefront_companies = $storefront->getCompanyIds();
+        $request['switch_company_id'] = reset($storefront_companies);
+    }
+
+    Registry::set('config', $config);
+    /** @psalm-suppress PossiblyNullPropertyFetch */
+    Registry::set('runtime.storefront_id', $storefront->storefront_id);
+
+    return [INIT_STATUS_OK];
 }

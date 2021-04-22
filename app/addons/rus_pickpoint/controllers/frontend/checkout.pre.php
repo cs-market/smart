@@ -12,7 +12,9 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\NotificationSeverity;
 use Tygh\Registry;
+use Tygh\Shippings\RusPickpoint;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -38,6 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 if ($mode == 'update_steps' || $mode == 'shipping_estimation') {
+    if (isset(Tygh::$app['session']['cart']['pickpoint_office'])) {
+        unset(Tygh::$app['session']['cart']['pickpoint_office']);
+        unset($cart['pickpoint_office']);
+    }
     $city = $fromcity = '';
     $shipping_ids = (!empty($params['shipping_ids'])) ? $params['shipping_ids'] : array();
     $cities = fn_get_schema('pickpoint', 'cities', 'php', true);
@@ -70,6 +76,7 @@ if ($mode == 'update_steps' || $mode == 'shipping_estimation') {
         $pickpoint_office = array(
             'pickpoint_id' => $params['pickpoint_id'],
             'address_pickpoint' => $params['address_pickpoint'],
+            'pickup_data' => RusPickpoint::getPickpointPostamatById($params['pickpoint_id']),
         );
 
         foreach ($shipping_ids as $group_key => $shipping_id) {
@@ -95,10 +102,6 @@ if ($mode == 'update_steps' || $mode == 'shipping_estimation') {
                     $service_data = $shipping;
                 }
             }
-        }
-
-        if (!empty($service_data)) {
-            fn_pickpoint_cost_by_shipment($cart, $shipping_info, $service_data, $city);
         }
 
         $pickpoint_office = array();
@@ -134,9 +137,20 @@ if ($mode == 'checkout' || $mode == 'cart') {
     if (!empty($params['pickpoint_id']) && !empty($params['address_pickpoint'])) {
         foreach ($shipping_ids as $group_key => $shipping_id) {
             if ($group_key == $p_group_key) {
+                $pickup_data = RusPickpoint::getPickpointPostamatById($params['pickpoint_id']);
+                if (empty($pickup_data) && isset($params['city'])) {
+                    $pickpoint_id = 0;
+                    $address_pickpoint = RusPickpoint::findPostamatPickpoint($pickpoint_id, $params['city']);
+                    $pickup_data = RusPickpoint::getPickpointPostamatById($pickpoint_id);
+                    fn_set_notification(NotificationSeverity::WARNING, __('warning'), __('rus_pickpoint.selected_pickpoint_not_working'));
+                } else {
+                    $pickpoint_id = $params['pickpoint_id'];
+                    $address_pickpoint = $params['address_pickpoint'];
+                }
                 $pickpoint_office = array(
-                    'pickpoint_id' => $params['pickpoint_id'],
-                    'address_pickpoint' => $params['address_pickpoint'],
+                    'pickpoint_id' => $pickpoint_id,
+                    'address_pickpoint' => $address_pickpoint,
+                    'pickup_data' => $pickup_data,
                 );
                 $cart['pickpoint_office'][$group_key][$shipping_id] = $pickpoint_office;
             }

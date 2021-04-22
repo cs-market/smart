@@ -5,7 +5,7 @@
        initialized first
     */
     $.ceRebuildStates('init', {
-        default_country: '{$settings.General.default_country|escape:javascript}',
+        default_country: '{$settings.Checkout.default_country|escape:javascript}',
         states: {$states|json_encode nofilter}
     });
 

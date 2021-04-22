@@ -1,5 +1,5 @@
 <div class="ty-gift-certificate-validate gift-validate">
-    <form name="gift_certificate_verification_form" class="cm-ajax cm-form-dialog-opener cm-dialog-auto-size" action="{""|fn_url}">
+    <form name="gift_certificate_verification_form" class="cm-ajax cm-form-dialog-opener cm-dialog-auto-size" data-ca-dialog-title="{__("certificate_verification")}" action="{""|fn_url}">
         <input type="hidden" name="result_ids" value="gift_cert_verify" />
         <h3 class="ty-gift-certificate-validate__title">{__("certificate_verification")}</h3>
         <div class="ty-input-append">

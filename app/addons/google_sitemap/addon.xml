@@ -7,7 +7,7 @@
     <status>active</status>
     <default_language>en</default_language>
     <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
-    <settings edition_type="ROOT,ULT:VENDOR">
+    <settings edition_type="ROOT,STOREFRONT">
         <sections>
             <section id="general">
                 <items>
@@ -89,18 +89,18 @@
                         <type>selectbox</type>
                         <default_value>0.5</default_value>
                     </item>
-                    <item id="companies_setting" edition_type="MVE:ROOT">
+                    <item id="companies_setting" edition_type="MVE:ROOT,MVE:STOREFRONT">
                         <type>header</type>
                     </item>
-                    <item id="include_companies" edition_type="MVE:ROOT">
+                    <item id="include_companies" edition_type="MVE:ROOT,MVE:STOREFRONT">
                         <type>checkbox</type>
                         <default_value>Y</default_value>
                     </item>
-                    <item id="companies_change" edition_type="MVE:ROOT">
+                    <item id="companies_change" edition_type="MVE:ROOT,MVE:STOREFRONT">
                         <type>selectbox</type>
                         <default_value>daily</default_value>
                     </item>
-                    <item id="companies_priority" edition_type="MVE:ROOT">
+                    <item id="companies_priority" edition_type="MVE:ROOT,MVE:STOREFRONT">
                         <type>selectbox</type>
                         <default_value>0.5</default_value>
                     </item>

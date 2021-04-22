@@ -126,7 +126,7 @@
                 <span class="text-warning strong">{__("attention")}</span>
                 <span class="text-warning">{__("notice_update_customer_details")}</span>
 
-                <label for="update_customer_details" class="checkbox">
+                <label for="update_customer_details" class="checkbox checkbox--multiline">
                     <input type="checkbox" name="update_customer_details" id="update_customer_details" value="Y"{if $form_id} form={$form_id}{/if} />
                 {__("update_customer_info")}</label>
         {/if}
@@ -200,24 +200,28 @@
         </div>
     </div>
     <hr class="profile-info-delim" />
-    <div class="sidebar-row">
-        {profile_edit_link scroll_to="profile_fields_b"}
-        <h6>{__("billing_address")}</h6>
-        <div class="profile-info">
-            <i class="icon-tag"></i>
-            {$smarty.capture.billing_address nofilter}
+    {if $profile_fields.B}
+        <div class="sidebar-row">
+            {profile_edit_link scroll_to="profile_fields_b"}
+            <h6>{__("billing_address")}</h6>
+            <div class="profile-info">
+                <i class="icon-tag"></i>
+                {$smarty.capture.billing_address nofilter}
+            </div>
         </div>
-    </div>
-    <hr class="profile-info-delim" />
+        <hr class="profile-info-delim" />
+    {/if}
 {else}
-    <div class="sidebar-row">
-        {profile_edit_link scroll_to="profile_fields_b"}
-        <h6>{__("billing_address")}</h6>
-        <div class="profile-info">
-            <i class="icon-tag"></i>
-            {$smarty.capture.billing_address nofilter}
+    {if $profile_fields.B}
+        <div class="sidebar-row">
+            {profile_edit_link scroll_to="profile_fields_b"}
+            <h6>{__("billing_address")}</h6>
+            <div class="profile-info">
+                <i class="icon-tag"></i>
+                {$smarty.capture.billing_address nofilter}
+            </div>
         </div>
-    </div>
+    {/if}
     <hr class="profile-info-delim" />
     <div class="sidebar-row">
         {profile_edit_link scroll_to="profile_fields_s"}

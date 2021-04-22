@@ -21,13 +21,10 @@ class Volume extends \elFinderVolumeLocalFileSystem
      *
      * @var array
      */
-    protected static $mimetypes = array(
-        'bat' => 'application/x-executable',
-        'com' => 'application/x-executable',
-        'cgi' => 'application/x-cgi',
-        'htaccess' => 'application/x-extension-htaccess'
-    );
-    
+    protected static $mimetypes = [
+        'htaccess' => 'application/x-extension-htaccess',
+    ];
+
     /**
      * Return file mimetype
      *
@@ -35,7 +32,7 @@ class Volume extends \elFinderVolumeLocalFileSystem
      * 
      * @return string
      */
-    protected function mimetype($path, $name = '') 
+    protected function mimetype($path, $name = '', $size = null, $mime = null)
     {
         $type = parent::mimetype($path, $name);
         return $type == 'unknown' ? self::mimetypeInternalDetect($path) : $type;
@@ -51,9 +48,10 @@ class Volume extends \elFinderVolumeLocalFileSystem
         $obj = $this; // php 5.3 compatibility
 
         if (class_exists('ZipArchive')) {
-            $arcs['extract']['application/zip'] = array(
-                'cmd' => function($archive, $path) use ($obj) {
-                    $zip = new \ZipArchive;
+            $arcs['extract']['application/zip'] = [
+                'cmd'  => 'phpfunction',
+                'argc' => function ($archive, $path) use ($obj) {
+                    $zip = new \ZipArchive();
                     if ($zip->open($archive)) {
                         for ($i = 0; $i < $zip->numFiles; $i++) {
                             $stat = $zip->statIndex($i);
@@ -64,9 +62,9 @@ class Volume extends \elFinderVolumeLocalFileSystem
 
                             $newfile = $obj->tyghDecodeFilename($filename);
 
-                            $obj->tyghMkdir(dirname($path .'/' . $newfile));
+                            $obj->tyghMkdir(dirname($path . '/' . $newfile));
 
-                            copy('zip://' . $archive . '#' . $filename, $path .'/' . $newfile);
+                            copy('zip://' . $archive . '#' . $filename, $path . '/' . $newfile);
                         }
                         $zip->close();
 
@@ -75,14 +73,14 @@ class Volume extends \elFinderVolumeLocalFileSystem
 
                     return false;
                 },
-                'ext' => 'zip'
-            );
+                'ext'  => 'zip',
+            ];
 
-            $arcs['create']['application/zip'] = array(
-                'cmd' => function($archive, $files) use ($obj) {
-                    $zip = new \ZipArchive;
-                    if ($zip->open($archive, \ZipArchive::CREATE) === true) {
-                        $base_path = dirname($archive);
+            $arcs['create']['application/zip'] = [
+                'cmd'  => 'phpfunction',
+                'argc' => function ($base_path, $files, $archive) use ($obj) {
+                    $zip = new \ZipArchive();
+                    if ($zip->open($base_path . DIRECTORY_SEPARATOR . $archive, \ZipArchive::CREATE) === true) {
                         foreach ($files as $file) {
                             $path = $base_path . DIRECTORY_SEPARATOR . $file;
                             if (is_file($path)) {
@@ -90,7 +88,10 @@ class Volume extends \elFinderVolumeLocalFileSystem
                             } elseif (is_dir($path)) {
 
                                 foreach ($obj->tyghGetFiles($path) as $_file) {
-                                    $zip->addFile($path . DIRECTORY_SEPARATOR . $_file, $obj->tyghEncodeFilename($_file));
+                                    $zip->addFile(
+                                        $path . DIRECTORY_SEPARATOR . $_file,
+                                        $obj->tyghEncodeFilename($_file)
+                                    );
                                 }
                             }
                         }
@@ -101,36 +102,22 @@ class Volume extends \elFinderVolumeLocalFileSystem
 
                     return false;
                 },
-                'ext' => 'zip'
-            );
-
+                'ext'  => 'zip',
+            ];
         }
 
         if (class_exists('PharData')) {
-            $arcs['extract']['application/x-gzip'] = array(
-                'cmd' => function($archive, $path) {
+            $arcs['extract']['application/x-gzip'] = [
+                'cmd'  => 'phpfunction',
+                'argc' => function ($archive, $path) {
                     $phar = new \PharData($archive);
                     $phar->extractTo($path, null, true);
                 },
-                'ext' => 'tgz'
-            );
+                'ext'  => 'tgz',
+            ];
         }
 
         return $arcs;
-    }
-
-    protected function _unpack($path, $arc)
-    {
-        $dir = $this->_dirname($path);
-        $arc['cmd']($path, $dir);
-    }
-
-    protected function _archive($dir, $files, $name, $arc)
-    {
-        $path = $dir . DIRECTORY_SEPARATOR . $name;
-        $arc['cmd']($path, $files);
-
-        return file_exists($path) ? $path : false;
     }
 
     public function tyghGetFiles($path, $base_path = '')
@@ -259,19 +246,5 @@ class Volume extends \elFinderVolumeLocalFileSystem
     public function getMimeTable() 
     {
         return parent::getMimeTable() + self::$mimetypes;
-    }
-    
-    /**
-     * Detect file mimetype using "internal" method
-     *
-     * @param  string  $path  File path
-     * 
-     * @return string
-     */
-    protected static function mimetypeInternalDetect($path) 
-    {
-        $pinfo = pathinfo($path);
-        $ext = isset($pinfo['extension']) ? strtolower($pinfo['extension']) : '';
-        return isset(self::$mimetypes[$ext]) ? self::$mimetypes[$ext] : 'unknown';
     }
 }

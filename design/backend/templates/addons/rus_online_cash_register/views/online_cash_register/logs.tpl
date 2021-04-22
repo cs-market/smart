@@ -9,7 +9,7 @@
     {assign var="return_current_url" value=$config.current_url|escape:url}
 
     {if $logs}
-        <table width="100%" class="table table-middle">
+        <table width="100%" class="table table-middle table--relative">
             <thead>
                 <tr>
                     <th>{__("rus_online_cash_register.logs.date")}</th>

@@ -1,10 +1,14 @@
 {if count($schedules) == 1}
-    {assign var="day" value=$schedules[1]}
+    {$day=$schedules[1]}
 
     {if $day['all_day']}
         {__('yandex_delivery_all_day')}
+    {elseif $day['from']}
+        {__('yandex_delivery.day_every.schedule_interval', ['[from]' => {$day['from']}, '[to]' => {$day['to']}])}
+    {elseif $day['schedule']}
+        {__('yandex_delivery.day_every.schedule_single', ['[schedule]' => {$day['schedule']}])}
     {else}
-        {__('yandex_delivery_every_day')} {$day['from']}&#8211;{$day['to']}
+        {__('yandex_delivery_every_day')}
     {/if}
 
 {else}

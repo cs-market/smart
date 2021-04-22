@@ -14,9 +14,9 @@
     <div class="ty-checkout-select-office">
         {if $shipping.data.city_pickpoint}
             {script src="//pickpoint.ru/select/postamat.js" charset="utf-8"}
-            <input type="hidden" name="pickpointmap[{$group_key}][{$shipping.shipping_id}][pickpoint_id]" id="pickpoint_id" value="{$cart.pickpointmap.$group_key.$shipping_id.pickpoint_id}" />
-            <input type="hidden" name="pickpointmap[{$group_key}][{$shipping.shipping_id}][pickpoint_name]" id="pickpoint_name" value="{$cart.pickpointmap.$group_key.$shipping_id.pickpoint_name}" />
-            <input type="hidden" name="pickpointmap[{$group_key}][{$shipping.shipping_id}][pickpoint_address]" id="pickpoint_address" value="{$cart.pickpointmap.$group_key.$shipping_id.pickpoint_address}" />
+            <input type="hidden" name="pickpointmap[{$group_key}][{$shipping.shipping_id}][pickpoint_id]" id="pickpoint_id" data-ca-shipping-field="pickpoint" value="{$cart.pickpointmap.$group_key.$shipping_id.pickpoint_id}" />
+            <input type="hidden" name="pickpointmap[{$group_key}][{$shipping.shipping_id}][pickpoint_name]" id="pickpoint_name" data-ca-shipping-field="pickpoint" value="{$cart.pickpointmap.$group_key.$shipping_id.pickpoint_name}" />
+            <input type="hidden" name="pickpointmap[{$group_key}][{$shipping.shipping_id}][pickpoint_address]" id="pickpoint_address" data-ca-shipping-field="pickpoint" value="{$cart.pickpointmap.$group_key.$shipping_id.pickpoint_address}" />
 
             <div class="ty-one-office__name">
                 <div id="pickpoint_name_terminal">{$cart.pickpointmap.$group_key.$shipping_id.pickpoint_name}</div>
@@ -28,7 +28,18 @@
 
         {foreach from=$shipping.data.office item=office}
             <div class="ty-one-office">
-                <input type="radio" name="select_office[{$group_key}][{$shipping.shipping_id}]" value="{$office.office_id}" {if $old_office_id == $office.office_id || $office_count == 1}checked="checked"{/if} id="office_{$group_key}_{$shipping.shipping_id}_{$office.office_id}" class="ty-office-radio" >
+                <input type="radio"
+                       name="select_office[{$group_key}][{$shipping.shipping_id}]"
+                       value="{$office.office_id}"
+                       {if $old_office_id == $office.office_id || $office_count == 1}checked="checked"{/if}
+                       id="office_{$group_key}_{$shipping.shipping_id}_{$office.office_id}"
+                       class="ty-office-radio"
+                       onchange="fn_calculate_total_shipping_cost(true)"
+                       data-ca-pickup-select-office="true"
+                       data-ca-shipping-id="{$shipping.shipping_id}"
+                       data-ca-group-key="{$group_key}"
+                       data-ca-location-id="{$office.office_id}"
+                />
                 <div class="ty-one-office__label">
                     <label for="office_{$group_key}_{$shipping.shipping_id}_{$office.office_id}" >
                         <p class="ty-one-office__name">{$office.name}</p>

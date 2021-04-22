@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -134,7 +135,7 @@ function fn_update_access_restriction_rule($rule_data, $rule_id = 0, $lang_code 
                 } else {
                     $rule_id = $_data['item_id'] = db_query("INSERT INTO ?:access_restriction ?e", $_data);
                     $_data['reason'] = $rule_data['reason'];
-                    foreach (fn_get_translation_languages() as $_data['lang_code'] => $v) {
+                    foreach (Languages::getAll() as $_data['lang_code'] => $v) {
                         db_query("INSERT INTO ?:access_restriction_reason_descriptions ?e", $_data);
                     }
                 }
@@ -148,7 +149,7 @@ function fn_update_access_restriction_rule($rule_data, $rule_id = 0, $lang_code 
             $rule_data['timestamp'] = TIME;
             $rule_id = $rule_data['item_id'] = db_query("INSERT INTO ?:access_restriction ?e", $rule_data);
 
-            foreach (fn_get_translation_languages() as $rule_data['lang_code'] => $v) {
+            foreach (Languages::getAll() as $rule_data['lang_code'] => $v) {
                 db_query("INSERT INTO ?:access_restriction_reason_descriptions ?e", $rule_data);
             }
         }
@@ -161,7 +162,7 @@ function fn_update_access_restriction_rule($rule_data, $rule_id = 0, $lang_code 
                 $rule_data['timestamp'] = TIME;
                 $rule_id = $rule_data['item_id'] = db_query("INSERT INTO ?:access_restriction ?e", $rule_data);
 
-                foreach (fn_get_translation_languages() as $rule_data['lang_code'] => $v) {
+                foreach (Languages::getAll() as $rule_data['lang_code'] => $v) {
                     db_query("INSERT INTO ?:access_restriction_reason_descriptions ?e", $rule_data);
                 }
             }
@@ -172,7 +173,7 @@ function fn_update_access_restriction_rule($rule_data, $rule_id = 0, $lang_code 
                 $rule_data['timestamp'] = TIME;
                 $rule_id = $rule_data['item_id'] = db_query("INSERT INTO ?:access_restriction ?e", $rule_data);
 
-                foreach (fn_get_translation_languages() as $rule_data['lang_code'] => $v) {
+                foreach (Languages::getAll() as $rule_data['lang_code'] => $v) {
                     db_query("INSERT INTO ?:access_restriction_reason_descriptions ?e", $rule_data);
                 }
             }
@@ -185,7 +186,7 @@ function fn_update_access_restriction_rule($rule_data, $rule_id = 0, $lang_code 
             $rule_data['timestamp'] = TIME;
             $rule_id = $rule_data['item_id'] = db_query("INSERT INTO ?:access_restriction ?e", $rule_data);
 
-            foreach (fn_get_translation_languages() as $rule_data['lang_code'] => $v) {
+            foreach (Languages::getAll() as $rule_data['lang_code'] => $v) {
                 db_query("INSERT INTO ?:access_restriction_reason_descriptions ?e", $rule_data);
             }
         }

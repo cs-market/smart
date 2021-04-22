@@ -62,6 +62,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    if (
+        $mode === 'm_update_statuses'
+        && !empty($_REQUEST['shipment_ids'])
+        && is_array($_REQUEST['shipment_ids'])
+        && !empty($_REQUEST['status'])
+    ) {
+        $status_to = (string) $_REQUEST['status'];
+
+        foreach ($_REQUEST['shipment_ids'] as $shipment_id) {
+            fn_tools_update_status([
+                'table'             => 'shipments',
+                'status'            => $status_to,
+                'id_name'           => 'shipment_id',
+                'id'                => $shipment_id,
+                'show_error_notice' => false
+            ]);
+        }
+
+        if (defined('AJAX_REQUEST')) {
+            $redirect_url = fn_url('shipments.manage');
+            if (isset($_REQUEST['redirect_url'])) {
+                $redirect_url = $_REQUEST['redirect_url'];
+            }
+            Tygh::$app['ajax']->assign('force_redirection', $redirect_url);
+            Tygh::$app['ajax']->assign('non_ajax_notifications', true);
+            return [CONTROLLER_STATUS_NO_CONTENT];
+        }
+    }
+
     if ($mode == 'delete' && !empty($_REQUEST['shipment_ids']) && is_array($_REQUEST['shipment_ids'])) {
         $shipment_ids = implode(',', $_REQUEST['shipment_ids']);
 

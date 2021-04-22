@@ -15,10 +15,6 @@
             {/if}
             <div class="ty-vendor-plan-content{if $plan.is_default} vendor-plan-current{/if}">
                 
-                {if $plan.description}
-                    <p class="ty-vendor-plan-descr">{$plan.description|default:"&nbsp;" nofilter}</p>
-                {/if}
-                
                 <h3 class="ty-vendor-plan-header">{$plan.plan}</h3>
                 
                 {strip}
@@ -59,12 +55,33 @@
                         {/if}
                     </p>
                     <p>
-                        {__("vendor_plans.transaction_fee_value", ["[value]" => "{$plan->commissionRound()}%"])}
+                        {$commissionRound = $plan->commissionRound()}
+
+                        {capture name="fee_value"}
+                            {if $commissionRound > 0}
+                                {$commissionRound}%
+                            {/if}
+                            
+                            {if $plan->fixed_commission > 0.0}
+                                {if $commissionRound > 0} + {/if}
+                                {include file="common/price.tpl" value=$plan->fixed_commission}
+                            {/if}
+                        {/capture}
+
+                        {if ($plan->fixed_commission > 0.0) || ($commissionRound > 0)}
+                            {__("vendor_plans.transaction_fee_value", [
+                                "[value]" => "{$smarty.capture.fee_value nofilter}"
+                            ])}
+                        {/if}
                     </p>
                     {if $plan.vendor_store}
                         <p>{__("vendor_plans.vendor_store")}</p>
                     {/if}
                 </div>
+
+                {if $plan.description}
+                    <p class="ty-vendor-plan-descr">{$plan.description|default:"&nbsp;" nofilter}</p>
+                {/if}
 
             </div>
         </li>

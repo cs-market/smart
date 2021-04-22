@@ -12,6 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
+use Tygh\Enum\ObjectStatuses;
 use Tygh\Registry;
 
 defined('BOOTSTRAP') or die('Access denied');
@@ -31,7 +32,7 @@ if ($mode == 'autocomplete_city') {
     exit();
 }
 
-if ($mode == 'shipping_estimation_city') {
+if ($mode === 'shipping_estimation_city') {
     $params = $_REQUEST;
 
     $location = fn_rus_cities_get_location_from_session();
@@ -39,24 +40,25 @@ if ($mode == 'shipping_estimation_city') {
     if (defined('AJAX_REQUEST')) {
         $lang_code = DESCR_SL;
 
-        $params = array_merge(array(
+        $params = array_merge([
             'check_country' => '',
             'check_state'   => '',
-        ), $params);
+        ], $params);
 
-        list($cities,) = fn_get_cities(array(
+        list($cities,) = fn_get_cities([
             'country_code' => $params['check_country'],
             'state_code'   => $params['check_state'],
-            'status'       => 'A',
-        ), 0, $lang_code);
+            'status'       => ObjectStatuses::ACTIVE,
+        ], 0, $lang_code);
 
         Tygh::$app['view']->assign(array(
             'cities'       => $cities,
             'customer_loc' => $location,
         ));
-
+        if (!empty($params['additional_id'])) {
+            Tygh::$app['view']->assign(['additional_id' => $params['additional_id']]);
+        }
         Tygh::$app['view']->display('views/checkout/components/shipping_estimation.tpl');
-
-        exit;
+        return [CONTROLLER_STATUS_NO_CONTENT];
     }
 }

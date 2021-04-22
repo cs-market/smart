@@ -57,8 +57,12 @@ msgid "Supplier has been deleted successfully."
 msgstr "Supplier has been deleted successfully."
 
 msgctxt "Languages::privileges.manage_suppliers"
-msgid "Manage suppliers"
-msgstr "Manage suppliers"
+msgid "Can edit"
+msgstr "Can edit"
+
+msgctxt "Languages::privilege_groups.suppliers"
+msgid "Suppliers"
+msgstr "Suppliers"
 
 msgctxt "SettingsSections::suppliers::general"
 msgid "General"
@@ -76,6 +80,14 @@ msgctxt "Languages::email_template.suppliers_notification"
 msgid "Supplier notification"
 msgstr "Supplier notification"
 
+msgctxt "Languages::email_template.supplier_notification_with_status"
+msgid "Supplier notification: [name]"
+msgstr "Supplier notification: [name]"
+
+msgctxt "Languages::email_template.suppliers_notification_default"
+msgid "Supplier notification: Default template for a new order status"
+msgstr "Supplier notification: Default template for a new order status"
+
 msgctxt "Languages::template_document_supplier_order_invoice"
 msgid "Suppliers: invoice"
 msgstr "Suppliers: invoice"
@@ -83,3 +95,16 @@ msgstr "Suppliers: invoice"
 msgctxt "Languages::document_preview_suppliers_not_found"
 msgid "Couldn't find a supplier. Preview only works with existing data. Please create a supplier and use Preview again."
 msgstr "Couldn't find a supplier. Preview only works with existing data. Please create a supplier and use Preview again."
+
+msgctxt "Languages::suppliers.event.order.supplier_notified.name"
+msgid "Suppliers: order status changed to [status]"
+msgstr "Suppliers: order status changed to [status]"
+
+msgctxt "Languages::event.receiver.s"
+msgid "Supplier"
+msgstr "Supplier"
+
+msgctxt "Languages::suppliers.supplier_notifications"
+msgid "Supplier notifications"
+msgstr "Supplier notifications"
+

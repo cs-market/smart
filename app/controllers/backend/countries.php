@@ -40,6 +40,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    // Processing hiding or activating or disabling of multiple product elements
+    if ($mode === 'm_activate' || $mode === 'm_disable') {
+        if (isset($_REQUEST['countries'])) {
+            $status = 'A';
+            $status = ($mode === 'm_disable') ? 'D' : $status;
+
+            foreach ($_REQUEST['countries'] as $v) {
+                fn_tools_update_status([
+                    'table'             => 'countries',
+                    'status'            => $status,
+                    'id_name'           => 'code',
+                    'id'                => $v,
+                    'show_error_notice' => false
+                ]);
+            }
+        }
+
+        return [CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']];
+    }
+
     return array(CONTROLLER_STATUS_OK, 'countries.manage');
 }
 

@@ -22,7 +22,7 @@ class Categories extends AEntity
 {
     public function index($id = 0, $params = array())
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (!empty($id)) {
             $data = fn_get_category_data($id, $lang_code);
@@ -44,19 +44,10 @@ class Categories extends AEntity
             $params['plain'] = $this->safeGet($params, 'plain', true);
             $params['simple'] = $this->safeGet($params, 'simple', false);
             $params['group_by_level'] = $this->safeGet($params, 'group_by_level', false);
-
-            $items_per_page = $this->safeGet($params, 'items_per_page', Registry::get('settings.Appearance.admin_elements_per_page'));
-            $page = $this->safeGet($params, 'page', 1);
+            $params['items_per_page'] = $this->safeGet($params, 'items_per_page', Registry::get('settings.Appearance.admin_elements_per_page'));
+            $params['page'] = $this->safeGet($params, 'page', 1);
 
             list($data, $params) = fn_get_categories($params, $lang_code);
-
-            $params['items_per_page'] = $items_per_page;
-            $params['page'] = $page;
-            $params['total_items'] = count($data);
-
-            if ($items_per_page) {
-                $data = array_slice($data, ($page - 1) * $items_per_page, $items_per_page);
-            }
 
             $data = array(
                 'categories' => $data,
@@ -112,7 +103,7 @@ class Categories extends AEntity
         $status = Response::STATUS_BAD_REQUEST;
         unset($params['category_id']);
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
         $category_id = fn_update_category($params, $id, $lang_code);
         $this->prepareImages($params, $id, 'category_main');
         $updated = fn_attach_image_pairs('category_main', 'category', $id, DESCR_SL);

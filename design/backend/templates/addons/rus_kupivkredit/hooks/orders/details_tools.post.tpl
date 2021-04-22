@@ -1,6 +1,6 @@
 {* rus_build_kupivkredit dbazhenov *}
 {assign var="processor" value=$order_info.payment_method.payment_id|fn_get_payment_method_data}
-{if $processor.processor == 'Kupivkredit' || $processor.processor == 'kupivkredit'}
+{if $processor.processor_script == 'kupivkredit.php'}
     {if $order_info.status == 'P' || $order_info.status == 'C'}
         {assign var="partner_id" value=$processor.processor_params.kvk_shop_id}
         {assign var="api_key" value=$processor.processor_params.kvk_api_key}

@@ -15,6 +15,7 @@
 namespace Tygh\Shippings\Services;
 
 use Node;
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
 use Tygh\Shippings\IService;
 use Tygh\Http;
@@ -26,11 +27,47 @@ use Tygh\Http;
 class Dhl implements IService
 {
     /**
+     * @const IMPERIAL_UNITS Imperial units
+     */
+    const IMPERIAL_UNITS = 'I';
+
+    /**
+     * @const METRIC_UNITS Metric units
+     */
+    const METRIC_UNITS = 'M';
+
+    /**
+     * @const IS_DUTIABLE Dutiable package
+     */
+    const DUTIABLE = 'Y';
+
+    /**
+     * @const NOT_DUTIABLE Not dutiable package
+     */
+    const NOT_DUTIABLE = 'N';
+
+    /**
+     * @const EXPRESS_WORLDWIDE_CODE DHL Express Worldwide code
+     */
+    const EXPRESS_WORLDWIDE_CODE = 'P';
+
+    /**
      * Availability multithreading in this module
      *
      * @var array $_allow_multithreading
      */
     private $_allow_multithreading = true;
+
+    public $calculation_currency;
+
+    public function __construct($calculation_currency = null)
+    {
+        if ($calculation_currency === null) {
+            $calculation_currency = CART_PRIMARY_CURRENCY;
+        }
+
+        $this->calculation_currency = $calculation_currency;
+    }
 
     /**
      * Description
@@ -198,16 +235,24 @@ class Dhl implements IService
         $site_id = !empty($params['system_id']) ? $params['system_id'] : '';
         $password = !empty($params['password']) ? $params['password'] : '';
         $account_number = !empty($params['account_number']) ? $params['account_number'] : '';
+        $system_of_measurement = !empty($params['system_of_measurement']) ? $params['system_of_measurement'] : self::IMPERIAL_UNITS;
 
         // Sender and receiver
         $shipper = $this->prepareAddress($this->_shipping_info['package_info']['origination']);
         $consignee = $this->prepareAddress($this->_shipping_info['package_info']['location']);
 
+        $account_country = !empty($params['account_country']) ? $params['account_country'] : $shipper['country'];
+
         $service_type = $this->_shipping_info['service_code'];
 
         // Weight of package
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
-        $shipment_weight = $weight_data['full_pounds'];
+        if ($system_of_measurement === self::IMPERIAL_UNITS) {
+            $weight_data = fn_convert_weight_to_imperial_units($this->_shipping_info['package_info']['W']);
+            $shipment_weight = $weight_data['full_pounds'];
+        } else {
+            $weight_data = fn_convert_weight_to_metric_units($this->_shipping_info['package_info']['W']);
+            $shipment_weight = $weight_data['full_kilograms'];
+        }
 
         // Ship date
         $ship_date = date("Y-m-d", TIME + (date('w', TIME) == 0 ? 86400 : 0));
@@ -222,6 +267,7 @@ XML;
         }
 
         // Pieces
+        $cost = 0;
         $packages = $this->_shipping_info['package_info']['packages'];
         if ($packages) {
             $pieces = <<<XML
@@ -233,8 +279,16 @@ XML
                 $width = empty($package_item['shipping_params']['box_width']) ? floatval($params['width']): $package_item['shipping_params']['box_width'];
                 $height = empty($package_item['shipping_params']['box_height']) ? floatval($params['height']) : $package_item['shipping_params']['box_height'];
                 $depth = empty($package_item['shipping_params']['box_length']) ? floatval($params['length']) : $package_item['shipping_params']['box_length'];
-                $package_weight_ar = fn_expand_weight($package_item['weight']);
-                $package_weight = $package_weight_ar['full_pounds'];
+
+                if ($system_of_measurement === self::IMPERIAL_UNITS) {
+                    $weight_data = fn_convert_weight_to_imperial_units($package_item['weight']);
+                    $package_weight = $weight_data['full_pounds'];
+                } else {
+                    $weight_data = fn_convert_weight_to_metric_units($package_item['weight']);
+                    $package_weight = $weight_data['full_kilograms'];
+                }
+
+                $cost += $package_item['cost'];
                 $pieces .= <<<XML
                 <Piece>
                     <PieceID>{$piece_id}</PieceID>
@@ -245,7 +299,7 @@ XML
                 </Piece>
 XML;
             }
-                $pieces .= PHP_EOL . <<<XML
+            $pieces .= PHP_EOL . <<<XML
             </Pieces>
 XML;
         } else {
@@ -263,8 +317,23 @@ XML;
 XML;
         }
 
+        if ($system_of_measurement === self::IMPERIAL_UNITS) {
+            $units = PHP_EOL . <<<XML
+            <DimensionUnit>IN</DimensionUnit>
+            <WeightUnit>LB</WeightUnit>
+XML;
+        } else {
+            $units = PHP_EOL . <<<XML
+            <DimensionUnit>CM</DimensionUnit>
+            <WeightUnit>KG</WeightUnit>
+XML;
+        }
+
         // Message time
         $message_time = date('Y-m-d') . 'T' . date('H:i:sP');
+
+        $is_dutiable = $service_type === self::EXPRESS_WORLDWIDE_CODE ? self::DUTIABLE : self::NOT_DUTIABLE; // 'P' - DHL Express Worldwide
+        $currency_code = CART_PRIMARY_CURRENCY;
 
         $request = <<<EOT
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -283,13 +352,13 @@ XML;
             <City>{$shipper['city']}</City>
         </From>
         <BkgDetails>
-            <PaymentCountryCode>{$shipper['country']}</PaymentCountryCode>
+            <PaymentCountryCode>{$account_country}</PaymentCountryCode>
             <Date>{$ship_date}</Date>
             <ReadyTime>{$ready_time}</ReadyTime>
-            <DimensionUnit>IN</DimensionUnit>
-            <WeightUnit>LB</WeightUnit>
+{$units}
 {$pieces}
 {$payment_account_number}
+            <IsDutiable>{$is_dutiable}</IsDutiable>
             <QtdShp>
                 <GlobalProductCode>{$service_type}</GlobalProductCode>
             </QtdShp>
@@ -299,15 +368,19 @@ XML;
             <Postalcode>{$consignee['zipcode']}</Postalcode>
             <City>{$consignee['city']}</City>
         </To>
+        <Dutiable>
+            <DeclaredCurrency>{$currency_code}</DeclaredCurrency>
+            <DeclaredValue>{$cost}</DeclaredValue>
+        </Dutiable>
     </GetQuote>
 </req:DCTRequest>
 EOT;
 
         // Request url
-        if (!empty($params['test_mode']) && $params['test_mode'] == 'Y') {
-            $url = 'http://xmlpitest-ea.dhl.com/XMLShippingServlet';
+        if (!empty($params['test_mode']) && $params['test_mode'] === YesNo::YES) {
+            $url = 'https://xmlpitest-ea.dhl.com/XMLShippingServlet?isUTF8Support=true';
         } else {
-            $url = 'http://xmlpi-ea.dhl.com/XMLShippingServlet';
+            $url = 'https://xmlpi-ea.dhl.com/XMLShippingServlet?isUTF8Support=true';
         }
 
         $request_data = array(

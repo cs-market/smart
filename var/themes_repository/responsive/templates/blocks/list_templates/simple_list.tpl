@@ -7,8 +7,8 @@
         {$smarty.capture.$form_open nofilter}
             {if $item_number == "Y"}<strong>{$smarty.foreach.products.iteration}.&nbsp;</strong>{/if}
 
-            {assign var="discount_label" value="discount_label_`$obj_prefix``$obj_id`"}
-            {$smarty.capture.$discount_label nofilter}
+            {assign var="product_labels" value="product_labels_`$obj_prefix``$obj_id`"}
+            {$smarty.capture.$product_labels nofilter}
 
             {assign var="name" value="name_$obj_id"}<bdi>{$smarty.capture.$name nofilter}</bdi>
             {assign var="sku" value="sku_$obj_id"}{$smarty.capture.$sku nofilter}

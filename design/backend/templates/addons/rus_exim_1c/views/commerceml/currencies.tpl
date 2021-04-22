@@ -9,7 +9,7 @@
     <div class="items-container cm-sortable {if !""|fn_allow_save_object:"":true} cm-hide-inputs{/if}"
          data-ca-sortable-table="currencies" data-ca-sortable-id-name="currency_id" id="currencies_list">
             {if $commerceml_currencies}
-            <table class="table table-middle table-objects table-striped">
+            <table class="table table-middle table--relative table-objects table-striped">
                 <thead class="cm-first-sibling">
                     <tr>
                         <th width="1%">&nbsp;</th>
@@ -42,7 +42,7 @@
                         extra_data=$smarty.capture.extra_data
                         nostatus=true
                         act=$act
-                        header_text={__("addons.rus_exim_1c.editing_currency", ["[currency_name]" => $commerceml_currency.commerceml_currency])}
+                        header_text=$commerceml_currency.commerceml_currency
                     }
                 {/foreach}
                 </tbody>

@@ -13,7 +13,6 @@ abstract class ContainerTestGeneral extends \Tygh\Tests\Unit\ATestCase
     protected function setUp()
     {
         define('AREA', 'A');
-        define('BOOTSTRAP', true);
         define('TIME', time());
 
         if ($this->productEdition) {

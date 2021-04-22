@@ -12,9 +12,7 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-
-use Tygh\Addons\ProductVariations\Product\Manager as ProductManager;
-
+use Tygh\Addons\ProductVariations\ServiceProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -24,15 +22,8 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
  * @var array $auth
  */
 
-
 if ($mode === 'update' || $mode === 'add') {
     /** @var \Tygh\SmartyEngine\Core $view */
     $view = Tygh::$app['view'];
-    /** @var ProductManager $product_manager */
-    $product_manager = Tygh::$app['addons.product_variations.product.manager'];
-    $product_types = $product_manager->getProductTypeNames();
-
-    unset($product_types[ProductManager::PRODUCT_TYPE_CONFIGURABLE]);
-
-    $view->assign('product_types', $product_types);
+    $view->assign('product_types', ServiceProvider::getTypeCollection()->getTypeNames());
 }

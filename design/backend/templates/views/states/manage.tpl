@@ -1,33 +1,59 @@
 {capture name="mainbox"}
 
-<form action="{""|fn_url}" method="post" name="states_form" class="{if $runtime.company_id} cm-hide-inputs{/if}">
+<form action="{""|fn_url}" method="post" id="states_form" name="states_form" class="{if ""|fn_check_form_permissions} cm-hide-inputs{/if}">
 <input type="hidden" name="country_code" value="{$search.country}" />
-
 {include file="common/pagination.tpl" save_current_page=true save_current_url=true}
 
+{$state_statuses=""|fn_get_default_statuses:false}
+{$has_permission = fn_check_permissions("states", "update_status", "admin", "POST", ["table" => "states"]) && fn_check_permissions("states", "m_delete", "admin", "POST", ["table" => "states"])}
+
+{if $has_permission}
+    {hook name="countries:bulk_edit"}
+        {include file="views/states/components/bulk_edit.tpl"}
+    {/hook}
+{/if}
+
 {if $states}
-<div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle table-responsive">
-    <thead>
+<div class="table-responsive-wrapper longtap-selection">
+    <table width="100%" class="table table-middle table--relative table-responsive state-table">
+    <thead 
+        data-ca-bulkedit-default-object="true"
+        data-ca-bulkedit-component="defaultObject"
+    >
     <tr>
-        <th width="1%" class="mobile-hide">{include file="common/check_items.tpl"}</th>
+        <th width="6%" class="mobile-hide">
+            {include file="common/check_items.tpl" check_statuses=($has_permission) ? $state_statuses : ''}
+
+            <input type="checkbox"
+                class="bulkedit-toggler hide"
+                data-ca-bulkedit-toggler="true"
+                data-ca-bulkedit-disable="[data-ca-bulkedit-default-object=true]" 
+                data-ca-bulkedit-enable="[data-ca-bulkedit-expanded-object=true]"
+            />
+        </th>
         <th width="10%">{__("code")}</th>
-        <th width="60%">{__("state")}</th>
+        <th>{__("state")}</th>
         <th width="5%">&nbsp;</th>
         <th class="right" width="10%">{__("status")}</th>
     </tr>
     </thead>
     {foreach from=$states item=state}
-    <tr class="cm-row-status-{$state.status|lower}">
-        <td class="mobile-hide">
-            <input type="checkbox" name="state_ids[]" value="{$state.state_id}" class="checkbox cm-item" /></td>
-        <td class="left nowrap row-status" data-th="{__("code")}">
+    <tr class="cm-row-status-{$state.status|lower} cm-longtap-target"
+        {if $has_permission}
+            data-ca-longtap-action="setCheckBox"
+            data-ca-longtap-target="input.cm-item"
+            data-ca-id="{$state.state_id}"
+        {/if}
+    >
+        <td width="6%" class="mobile-hide">
+            <input type="checkbox" name="state_ids[]" value="{$state.state_id}" class="cm-item cm-item-status-{$state.status|lower} hide" /></td>
+        <td width="10%" class="left nowrap row-status" data-th="{__("code")}">
             <span>{$state.code}</span>
-            {*<input type="text" name="states[{$state.state_id}][code]" size="8" value="{$state.code}" class="input-text" />*}</td>
-        <td data-th="{__("state")}">
-            <input type="text" name="states[{$state.state_id}][state]" size="55" value="{$state.state}" class="input-hidden span8"/>
         </td>
-        <td class="nowrap" data-th="{__("tools")}">
+        <td data-th="{__("state")}">
+            <input type="text" name="states[{$state.state_id}][state]" size="55" value="{$state.state}" class="input-hidden"/>
+        </td>
+        <td width="5%" class="nowrap" data-th="{__("tools")}">
             {capture name="tools_list"}
                 <li>{btn type="list" class="cm-confirm" text=__("delete") href="states.delete?state_id=`$state.state_id`&country_code=`$search.country`" method="POST"}</li>
             {/capture}
@@ -35,9 +61,9 @@
                 {dropdown content=$smarty.capture.tools_list}
             </div>
         </td>
-        <td class="right" data-th="{__("status")}">
-            {$has_permission = fn_check_permissions("tools", "update_status", "admin", "GET", ["table" => "states"])}
-            {include file="common/select_popup.tpl" id=$state.state_id status=$state.status hidden="" object_id_name="state_id" table="states" non_editable=!$has_permission}
+        <td width="10%" class="right" data-th="{__("status")}">
+            {$has_permission_update_status = fn_check_permissions("tools", "update_status", "admin", "GET", ["table" => "states"])}
+            {include file="common/select_popup.tpl" id=$state.state_id status=$state.status hidden="" object_id_name="state_id" table="states" non_editable=!$has_permission_update_status}
         </td>
     </tr>
     {/foreach}
@@ -61,7 +87,7 @@
 
     {foreach from=$countries item="country" key="code"}
         {if $code == $search.country_code}
-            {assign var="title" value="{__("new_states")} (`$country`)"}
+            {$title="{__("new_states")} (`$country`)"}
         {/if}
     {/foreach}
 
@@ -103,9 +129,6 @@
 {capture name="buttons"}
     {capture name="tools_list"}
         {hook name="states:manage_tools_list"}
-            {if $states}
-                <li>{btn type="delete_selected" dispatch="dispatch[states.m_delete]" form="states_form"}</li>
-            {/if}
         {/hook}
     {/capture}
     {dropdown content=$smarty.capture.tools_list}

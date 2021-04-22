@@ -51,8 +51,9 @@
     {/if}
 {if $view_mode != "button"}
     {if $multiple}
-    <div class="table-wrapper">
-        <table width="100%" class="table table-middle">
+    <div class="clearfix"></div>
+    <div class="table-responsive-wrapper">
+        <table width="100%" class="table table-middle table--relative table-responsive table-responsive-w-titles">
         <thead>
         <tr>
             {if $positions}<th>{__("position_short")}</th>{/if}
@@ -67,7 +68,7 @@
 
     {if $multiple}
         <tr class="hidden">
-            <td colspan="{if $positions}3{else}2{/if}">
+            <td colspan="{if $positions}3{else}2{/if}" data-th="&nbsp;">
     {/if}
     <input id="f{$data_id}_ids" type="hidden" class="cm-picker-value" name="{$input_name}" value="{if $item_ids}{","|implode:$item_ids}{/if}" />
     {if $multiple}
@@ -96,7 +97,7 @@
     </tbody>
     <tbody id="{$data_id}_no_item"{if $item_ids} class="hidden"{/if}>
     <tr class="no-items">
-        <td colspan="{if $positions}3{else}2{/if}"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
+        <td colspan="{if $positions}3{else}2{/if}" data-th="&nbsp;"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
     </tr>
     </tbody>
     </table>

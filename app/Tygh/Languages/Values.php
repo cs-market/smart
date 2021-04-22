@@ -14,6 +14,7 @@
 
 namespace Tygh\Languages;
 
+use I18n_Pofile;
 use Tygh\Registry;
 
 class Values
@@ -44,10 +45,14 @@ class Values
     public static function getVariables($params, $items_per_page = 0, $lang_code = DESCR_SL)
     {
         // Set default values to input params
-        $default_params = array (
-            'page' => 1,
-            'items_per_page' => $items_per_page
-        );
+        $default_params = [
+            'page'           => 1,
+            'items_per_page' => $items_per_page,
+            'name'           => null,
+            'value'          => null,
+            'q'              => null,
+            'lang_code'      => $lang_code,
+        ];
 
         $params = array_merge($default_params, $params);
 
@@ -60,29 +65,44 @@ class Values
             $fields = array_merge($fields, $params['fields']);
         }
 
-        $tables = array(
+        $tables = [
             '?:language_values as lang',
-        );
+        ];
 
-        $left_join = array();
-        $condition = array();
+        $joins = [];
+        $condition = [];
 
-        $condition['param1'] = db_quote('lang.lang_code = ?s', $lang_code);
+        $condition['param1'] = db_quote('lang.lang_code = ?s', $params['lang_code']);
 
-        if (isset($params['q']) && fn_string_not_empty($params['q'])) {
-            $condition['param2'] = db_quote(
-                '(lang.name LIKE ?l OR lang.value LIKE ?l)',
-                '%' . trim($params['q']) . '%', '%' . trim($params['q']) . '%'
+        if ($params['name']) {
+            $condition['name'] = db_quote(
+                'lang.name LIKE ?l',
+                $params['name'] . '%'
             );
         }
 
-        fn_set_hook('get_language_variable', $fields, $tables, $left_join, $condition, $params);
+        if (fn_string_not_empty($params['value'])) {
+            $condition['value'] = db_quote(
+                'lang.value LIKE ?l',
+                '%' . trim($params['value']) . '%'
+            );
+        }
 
-        $joins = !empty($left_join) ? ' LEFT JOIN ' . implode(', ', $left_join) : '';
+        if (fn_string_not_empty($params['q'])) {
+            $condition['param2'] = db_quote(
+                '(lang.name LIKE ?l OR lang.value LIKE ?l)',
+                '%' . trim($params['q']) . '%',
+                '%' . trim($params['q']) . '%'
+            );
+        }
+
+        fn_set_hook('get_language_variable', $fields, $tables, $joins, $condition, $params);
+
+        $joins = !empty($joins) ? ' LEFT JOIN ' . implode(', ', $joins) : '';
 
         $limit = '';
-        if (!empty($params['items_per_page'])) {
-            $params['total_items'] = db_get_field(
+        if ($params['items_per_page']) {
+            $params['total_items'] = (int) db_get_field(
                 'SELECT COUNT(*) FROM ' . implode(', ', $tables) . $joins . ' WHERE ' . implode(' AND ', $condition)
             );
             $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
@@ -156,7 +176,7 @@ class Values
         }
 
         if (Registry::get('runtime.customization_mode.live_editor')) {
-            return '[lang name=' . $var_name . (preg_match('/\[[\w]+\]/', $values[$var_name]) ? ' cm-pre-ajax' : '') . ']' . $values[$var_name] . '[/lang]';
+            return '[lang name=' . $var_name . ']' . $values[$var_name] . '[/lang]';
         }
 
         return $values[$var_name];
@@ -183,7 +203,7 @@ class Values
      * @param string $prefix Language variable prefix
      * @param $lang_code 2-letter language code
      *
-     * @return Array of language variables
+     * @return array of language variables
      */
     public static function getLangVarsByPrefix($prefix, $lang_code = CART_LANGUAGE)
     {
@@ -216,7 +236,7 @@ class Values
                 $lang_vars[$var_name] = $value_info['value'];
 
                 if (Registry::get('runtime.customization_mode.live_editor') == 'Y') {
-                    $lang_vars[$var_name] = '[lang name=' . $var_name . (preg_match('/\[[\w]+\]/', $lang_vars[$var_name]) ? ' cm-pre-ajax' : '') . ']' . $lang_vars[$var_name] . '[/lang]';
+                    $lang_vars[$var_name] = '[lang name=' . $var_name . ']' . $lang_vars[$var_name] . '[/lang]';
                 }
             }
         }
@@ -239,8 +259,10 @@ class Values
 
         foreach ($lang_data as $k => $v) {
             if (!empty($v['name'])) {
-                preg_match("/(^[a-zA-z0-9][a-zA-Z0-9_\.]*)/", $v['name'], $matches);
-                if (fn_strlen($matches[0]) == fn_strlen($v['name'])) {
+                $is_valid_variable_name = preg_match("/(^[a-zA-Z0-9][a-zA-Z0-9_\.]*)/", $v['name'], $matches);
+                if ($is_valid_variable_name
+                    && fn_strlen($matches[0]) === fn_strlen($v['name'])
+                ) {
                     $v['lang_code'] = $lang_code;
                     $res = db_query("REPLACE INTO ?:language_values ?e", $v);
                     if ($res) {
@@ -254,5 +276,54 @@ class Values
         }
 
         return $result;
+    }
+
+    /**
+     * Injects original values into language variables.
+     *
+     * @param array $variables           Languages variables to get original values for
+     * @param int   $iteration_step_size Amount of variables to load per single step
+     *
+     * @return array
+     *
+     * @see Values::getVariables()
+     */
+    public static function loadOriginalValues(array $variables, $iteration_step_size = 1000)
+    {
+        $prefix = 'Languages' . I18n_Pofile::DELIMITER;
+
+        $msgctxts = array_map(
+            function ($variable) use ($prefix) {
+                return $prefix . $variable['name'];
+            },
+            $variables
+        );
+
+        $original_values = [];
+        foreach (array_chunk($msgctxts, $iteration_step_size) as $msgctxts_chunk) {
+            $original_values_chunk = db_get_hash_single_array(
+                'SELECT originals.msgctxt, originals.msgid'
+                . ' FROM ?:original_values AS originals'
+                . ' WHERE msgctxt IN (?a)',
+                ['msgctxt', 'msgid'],
+                $msgctxts_chunk
+            );
+
+            $original_values+= $original_values_chunk;
+        }
+
+        $variables = array_map(
+            function ($variable) use ($original_values, $prefix) {
+                $original_value_msgctxt = $prefix . $variable['name'];
+                $variable['original_value'] = isset($original_values[$original_value_msgctxt])
+                    ? $original_values[$original_value_msgctxt]
+                    : null;
+
+                return $variable;
+            },
+            $variables
+        );
+
+        return $variables;
     }
 }

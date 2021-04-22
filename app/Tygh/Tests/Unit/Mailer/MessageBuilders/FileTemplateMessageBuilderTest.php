@@ -5,6 +5,7 @@ namespace Tygh\Tests\Unit\Mailer\MessageBuilders;
 
 
 use Tygh\SmartyEngine\Core;
+use Tygh\Storefront\Repository;
 use Tygh\Tests\Unit\ATestCase;
 
 class FileTemplateMessageBuilderTest extends ATestCase
@@ -26,6 +27,7 @@ class FileTemplateMessageBuilderTest extends ATestCase
 
         $this->smarty->method('displayMail')->willReturnCallback(array($this, 'smartyRender'));
         $this->requireMockFunction('fn_disable_live_editor_mode');
+        $this->requireMockFunction('fn_filter_company_data_by_profile_fields');
     }
 
     public function smartyRender($template, $to_screen, $area, $company_id, $lang_code)
@@ -46,7 +48,7 @@ class FileTemplateMessageBuilderTest extends ATestCase
 
     public function testCreateMessage()
     {
-        $builder = new FileTemplateMessageBuilder($this->smarty, array());
+        $builder = new FileTemplateMessageBuilder($this->smarty, array(), $this->createMock(Repository::class));
 
         $message = $builder->createMessage(
             array(

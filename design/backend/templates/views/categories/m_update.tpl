@@ -31,7 +31,7 @@
         <td width="100%">
             <div id="scrolled_div_top" class="scroll-x scroll-top"></div>
             <div id="scrolled_div" class="scroll-x scroll-border">
-            <table width="100%" class="table-fixed">
+            <table width="100%" class="table-fixed table--relative">
             <tr>
                 {foreach from=$filled_groups item=v}
                 <th>&nbsp;</th>

@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Enum\ProfileFieldTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -40,4 +41,40 @@ function fn_get_vendor_terms($company_ids = 0, $lang_code = DESCR_SL)
     );
 
     return $terms;
+}
+
+/**
+ * The "storefront_rest_api_get_checkout_fields" hook handler.
+ *
+ * Actions performed:
+ *  - Gets vendors terms and conditions by user session cart products.
+ *
+ * @see fn_storefront_rest_api_get_checkout_fields
+ */
+function fn_vendor_terms_storefront_rest_api_get_checkout_fields($cart, $auth, $lang_code, &$fields)
+{
+    if (!empty($cart['products'])) {
+        $company_ids = [];
+
+        foreach ($cart['products'] as $product) {
+            if (!in_array($product['company_id'], $company_ids)) {
+                $company_ids[] =  $product['company_id'];
+            }
+        }
+
+        if ($company_ids) {
+            $vendor_terms = fn_get_vendor_terms($company_ids);
+
+            foreach ($vendor_terms as $terms_data) {
+                $fields[CUSTOM_CHECKOUT_FIELDS]['accept_terms']['fields'][] = [
+                    'field_id'    => 'accept_terms_' . $terms_data['company_id'],
+                    'field_name'  => 'agreements[]',
+                    'field_type'  => ProfileFieldTypes::CHECKBOX,
+                    'is_default'  => true,
+                    'description' => $terms_data['terms'],
+                    'required'    => true
+                ];
+            }
+        }
+    }
 }

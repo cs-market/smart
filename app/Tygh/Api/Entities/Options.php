@@ -56,7 +56,6 @@
  *      option_name         Color
  *      required            Y
  *      allowed_extensions  jpg,png
- *      inventory           N
  *      ...                 (any field from :?product_options)
  *      option_type         S
  *
@@ -89,7 +88,6 @@
  *      option_name         Color
  *      required            Y
  *      allowed_extensions  jpg,png
- *      inventory           N
  *      ...                 (any field from :?product_options)
  *      option_type         S
  *
@@ -133,7 +131,7 @@ class Options extends AEntity
 {
     public function index($id = 0, $params = array())
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         if (empty($id) && empty($params['product_id'])) {
             $status = Response::STATUS_BAD_REQUEST;
@@ -193,7 +191,7 @@ class Options extends AEntity
         }
 
         $params['company_id'] = $this->getCompanyId();
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         $this->prepareImages($params, 0, 'variant_image', 'V');
 
@@ -238,7 +236,7 @@ class Options extends AEntity
         }
 
         $params['company_id'] = $this->getCompanyId();
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         $this->prepareImages($params, 0, 'variant_image', 'V');
 

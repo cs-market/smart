@@ -5,16 +5,16 @@ msgstr ""
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: uk\n"
-"X-Crowdin-File: /release-4.8.2/addons/data_feeds.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.2/addons/data_feeds.po\n"
+"X-Crowdin-File-ID: 4052\n"
+"PO-Revision-Date: 2021-02-01 09:15\n"
 
 msgctxt "Addons::name::data_feeds"
 msgid "Data feeds"
-msgstr "Поля даних"
+msgstr "Конструктор прайс-листів"
 
 msgctxt "Addons::description::data_feeds"
 msgid "Makes it possible to create product data feeds in CSV"
@@ -26,7 +26,7 @@ msgstr "Прайс-листи"
 
 msgctxt "Languages::data_feed"
 msgid "Data feed"
-msgstr "Поля даних"
+msgstr "Прайс-лист"
 
 msgctxt "Languages::export_by_cron"
 msgid "Export by cron"
@@ -34,7 +34,7 @@ msgstr "Експортувати, використовуючи cron"
 
 msgctxt "Languages::export_by_cron_to"
 msgid "Export by cron to"
-msgstr "Експортувати cron до"
+msgstr "Експортувати, використовуючи cron в"
 
 msgctxt "Languages::add_new_datafeed"
 msgid "New data feed"
@@ -50,7 +50,7 @@ msgstr "Назва прайс-листа"
 
 msgctxt "Languages::save_directory"
 msgid "Server directory"
-msgstr "Каталог сервера"
+msgstr "Папка на сервері"
 
 msgctxt "Languages::ftp_url"
 msgid "FTP server"
@@ -74,7 +74,7 @@ msgstr "Поля"
 
 msgctxt "Languages::field_name"
 msgid "Field name"
-msgstr "Ім'я поля"
+msgstr "Назва поля"
 
 msgctxt "Languages::field_type"
 msgid "Field type"
@@ -90,7 +90,7 @@ msgstr "Редагування прайс-листа"
 
 msgctxt "Languages::datafeed.description"
 msgid "Only the products that meet <strong>all</strong> of the conditions below will be exported:"
-msgstr ""
+msgstr "Буде експортовано лише ті товари, що відповідають <strong>всім</strong> умовам, що вказано нижче:"
 
 msgctxt "Languages::export_cron_hint"
 msgid "Use the following line to run the script according to schedule"
@@ -98,7 +98,7 @@ msgstr "Використовуйте наступну команду для за
 
 msgctxt "Languages::exported_items"
 msgid "Exported items"
-msgstr "Експортовані елементи"
+msgstr "Експортовані товари"
 
 msgctxt "Languages::ftp_connection_problem"
 msgid "Unable connect to FTP server. Please, check FTP connection information"
@@ -106,11 +106,11 @@ msgstr "Не вдається підключитися до FTP-сервера. 
 
 msgctxt "Languages::categories_in"
 msgid "Categories in"
-msgstr ""
+msgstr "Категорії в"
 
 msgctxt "Languages::products_in"
 msgid "Products in"
-msgstr ""
+msgstr "Товари в"
 
 msgctxt "Languages::local_export"
 msgid "Download"
@@ -138,7 +138,7 @@ msgstr "FTP"
 
 msgctxt "Languages::check_server_export_settings"
 msgid "Check server export settings"
-msgstr "Перевірте параметри експорту сервер"
+msgstr "Перевірте параметри сервера для експорту"
 
 msgctxt "Languages::exclude_disabled_products"
 msgid "Exclude disabled products"
@@ -146,11 +146,11 @@ msgstr "Виключити неактивні товари"
 
 msgctxt "Languages::data_feeds.exclude_shared_products"
 msgid "Exclude shared products"
-msgstr "Виключити спільні продукти"
+msgstr "Виключити спільні для декількох вітрин товари"
 
 msgctxt "Languages::general_settings"
 msgid "General settings"
-msgstr "Загальні параметри"
+msgstr "Загальні налаштування"
 
 msgctxt "Languages::enclosure"
 msgid "Enclosure"
@@ -170,9 +170,9 @@ msgstr "Дані не експортовано"
 
 msgctxt "Languages::data_feeds.text_tooltip_field_name"
 msgid "The name of the column in the data feed file."
-msgstr "Ім'я стовпця в файлі даних."
+msgstr "Назва стовпця в файлі прайс-листа."
 
 msgctxt "Languages::data_feeds.text_tooltip_field_type"
 msgid "The type of data from your store which will be exported to this column of the data feed file."
-msgstr "Тип даних з Вашого мгазину, який буде експортовано до цієї колонки файлу даних."
+msgstr "Тип даних з Вашого мгазину, які буде експортовано до цього стовпця прайс-листа."
 

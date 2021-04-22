@@ -60,11 +60,11 @@ image_type - optional
 
     {hook name="attach_images:thumbnail"}
     <div class="upload-box clearfix {if $no_thumbnail && !$pair.icon}hidden{/if}" id="load_thumbnail_{$name}{$suffix}{$key}">
-    {if $delete_pair && $pair.pair_id}
-        <div class="float-right">
-            <a data-ca-target-id="box_attach_images_{$name}_{$key}" href="{"image.delete_image_pair?pair_id=`$pair.pair_id`&object_type=`$object_type`"|fn_url}" class="cm-confirm cm-post cm-ajax cm-tooltip pull-right" data-ca-event="ce.delete_image_pair" title="{__("delete_image_pair")}"><i class="icon-remove"></i></a>
-        </div>
-    {/if}
+        {if $delete_pair && $pair.pair_id}
+            <div class="float-right">
+                <a data-ca-target-id="box_attach_images_{$name}_{$key}" href="{"image.delete_image_pair?pair_id=`$pair.pair_id`&object_type=`$object_type`"|fn_url}" class="cm-confirm cm-post cm-ajax cm-tooltip pull-right" data-ca-event="ce.delete_image_pair" title="{__("delete_image_pair")}"><i class="icon-remove"></i></a>
+            </div>
+        {/if}
         {if !$hide_titles}
             <h5>
                 <span>{$icon_title|default:__("thumbnail")}</span>
@@ -90,8 +90,7 @@ image_type - optional
             {if !$hide_alt}
                 <div class="image-alt clear">
                     <div class="input-prepend">
-                    <span class="add-on cm-tooltip cm-hide-with-inputs" title="{__("alt_text")}"><i class="icon-comment"></i></span>
-                    {*<label class="option_variant_alt_text">{__("alt_text")}:</label><br />*}
+                    <span class="add-on label-info cm-tooltip cm-hide-with-inputs" title="{__("alt_text")}"><i class="icon-comment"></i></span>
                     <input type="text" id="alt_icon_{$name}_{$key}" name="{$name}_image_data{$suffix}[{$key}][image_alt]" value="{$pair.icon.alt}" />
                     </div>
                 </div>
@@ -129,8 +128,7 @@ image_type - optional
             {if !$hide_alt}
                 <div class="image-alt">
                     <div class="input-prepend">
-                        {*<label for="alt_det_{$name}_{$key}">{__("alt_text")}:</label>*}
-                        <span class="add-on cm-tooltip cm-hide-with-inputs" title="{__("alt_text")}"><i class="icon-comment"></i></span>
+                        <span class="add-on label-info cm-tooltip cm-hide-with-inputs" title="{__("alt_text")}"><i class="icon-comment"></i></span>
                         <input type="text" id="alt_det_{$name}_{$key}" name="{$name}_image_data{$suffix}[{$key}][detailed_alt]" value="{$pair.detailed.alt}" />
                     </div>
                 </div>
@@ -138,7 +136,7 @@ image_type - optional
         </div>
 
         <div class="image-upload cm-hide-with-inputs">
-            {include file="common/fileuploader.tpl" var_name="`$name`_image_detailed`$suffix`[`$key`]"}
+            {include file="common/fileuploader.tpl" var_name="`$name`_image_detailed`$suffix`[`$key`]" is_image=true}
             {hook name="attach_images:options_for_detailed"}
             {/hook}
         </div>

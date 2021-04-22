@@ -45,12 +45,23 @@
 {hook name="orders:advanced_search"}
 
 <div class="group">
-<div class="control-group">
-    <label class="control-label">{__("manager")}</label>
-    <div class="controls">
-        <input type="text" name="issuer" id="issuer" value="{$search.issuer}" size="30" />
+    <div class="control-group">
+        <label class="control-label">{__("manager")}</label>
+        <div class="controls">
+            <div class="nowrap">
+                <div class="row-fluid ">
+                    <div class="span4">
+                        <input type="text" name="issuer" id="issuer" value="{$search.issuer}" size="30" />
+                    </div>
+                    <div class="span6 checkbox-list">
+                        <label for="no_issuer">
+                            <input type="checkbox" id="no_issuer" name="no_issuer" value="Y" {if $search.no_issuer}checked="checked"{/if}>{__("no_manager_assigned")}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 </div>
 
 <div class="group form-horizontal">
@@ -63,16 +74,12 @@
 </div>
 
 <div class="group">
-{if $incompleted_view}
-    <input type="hidden" name="status" value="{$smarty.const.STATUS_INCOMPLETED_ORDER}" />
-{else}
 <div class="control-group">
     <label class="control-label">{__("order_status")}</label>
     <div class="controls checkbox-list">
         {include file="common/status.tpl" status=$search.status display="checkboxes" name="status" columns=5}
     </div>
 </div>
-{/if}
 </div>
 
 <div class="row-fluid">
@@ -129,11 +136,6 @@
             </div>
         </div>
         {include file="common/select_vendor.tpl"}
-    </div>
-</div>
-<div class="group">
-    <div class="control-group">
-        <label class="checkbox" for="a_uid"><input type="checkbox" name="admin_user_id" id="a_uid" value="{$auth.user_id}" {if $search.admin_user_id}checked="checked"{/if} />{__("new_orders")}</label>
     </div>
 </div>
 <div class="group">

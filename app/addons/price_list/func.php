@@ -12,7 +12,7 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Enum\ProductTracking;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -53,44 +53,92 @@ function fn_price_list_info()
     if (empty($schema)) { // workaround to avoid notices when installing addon
         return;
     }
-
-    $storefront_url = fn_get_storefront_url(fn_get_storefront_protocol());
-    if (fn_allowed_for('ULTIMATE')) {
-        if (Registry::get('runtime.company_id') || Registry::get('runtime.simple_ultimate')) {
-        } else {
-            $storefront_url = '';
+    $repository = StorefrontProvider::getRepository();
+    $storefront_id = isset($_REQUEST['storefront_id'])
+        ? $_REQUEST['storefront_id']
+        : null;
+    if ($storefront_id !== null) {
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = $repository->findById($storefront_id);
+    } else {
+        /** @var \Tygh\Storefront\Storefront $storefront */
+        $storefront = $repository->findByCompanyId(fn_get_runtime_company_id(), true);
+        if ($storefront === null) {
+            $storefront = $repository->findDefault();
+        }
+        if ($storefront) {
+            $storefront_id = $storefront->storefront_id;
         }
     }
 
-    if (!empty($storefront_url)) {
-        return __('price_list.text_regenerate', array(
-            '[buttons]' => fn_price_list_generate_buttons($schema),
-            '[links]' =>  fn_price_list_generate_links($schema, $storefront_url),
-        ));
-
+    if ($storefront) {
+        $storefront_url = fn_get_storefront_protocol() . '://' . $storefront->url;
     } else {
-        return __('price_list.text_select_storefront');
+        $storefront_url = fn_get_storefront_url(fn_get_storefront_protocol());
     }
+    if (
+        fn_allowed_for('ULTIMATE')
+        && !Registry::get('runtime.company_id')
+        && !Registry::get('runtime.simple_ultimate')
+    ) {
+        $storefront_url = '';
+    }
+
+    if (!empty($storefront_url)) {
+        return __('price_list.text_regenerate', [
+            '[buttons]' => fn_price_list_generate_buttons($schema, $storefront_id),
+            '[links]'   => fn_price_list_generate_links($schema, $storefront_url, $storefront_id),
+        ]);
+    }
+
+    return __('price_list.text_select_storefront');
 }
 
-function fn_price_list_generate_buttons($schema)
+/**
+ * Create links and visual representation of buttons for generating price lists.
+ *
+ * @param array<string, array<string, string>> $schema        Schema of price lists types and file extensions.
+ * @param int|null                             $storefront_id Storefront id.
+ *
+ * @return string
+ */
+function fn_price_list_generate_buttons(array $schema, $storefront_id)
 {
     $buttons = array();
     foreach ($schema['types'] as $type => $options) {
-        $buttons[] = '<a class="cm-ajax cm-comet btn btn-primary" href="' . fn_url('price_list.generate?display=' . $type)  .'">' . $type . '</a>';
+        $url = 'price_list.generate?display=' . $type;
+        if ($storefront_id) {
+            $url .= '&storefront_id=' . $storefront_id;
+        }
+        $buttons[] = '<a class="cm-ajax cm-comet btn btn-primary" href="' . fn_url($url)  . '">' . $type . '</a>';
     }
 
     return implode('&nbsp;', $buttons);
 }
 
-function fn_price_list_generate_links($schema, $storefront_url, $lang_code = CART_LANGUAGE)
+/**
+ * Generates links for downloading price list files.
+ *
+ * @param array<string, array<string, array<string, string>>> $schema         Price list types schema.
+ * @param string                                              $storefront_url Storefront url.
+ * @param int|null                                            $storefront_id  Storefront identifier.
+ * @param string                                              $lang_code      Language code.
+ *
+ * @return string
+ */
+function fn_price_list_generate_links(array $schema, $storefront_url, $storefront_id, $lang_code = CART_LANGUAGE)
 {
-    $links = array();
-    foreach ($schema['types'] as $type => $options) {
-        $url = $storefront_url . '/price_list.' . $options['extension'] . '?sl=' . $lang_code;
-        $links[] = '<a target="_blank" href="' . $url  .'">' . $url . '</a>';
+    $links = [];
+    if (empty($storefront_url)) {
+        return implode('<br />', $links);
     }
-
+    foreach ($schema['types'] as $options) {
+        $url = $storefront_url . '/price_list.' . $options['extension'] . '?sl=' . $lang_code;
+        if ($storefront_id) {
+            $url .= '&storefront_id=' . $storefront_id;
+        }
+        $links[] = '<a target="_blank" href="' . $url . '">' . $url . '</a>';
+    }
     return implode('<br />', $links);
 }
 
@@ -158,9 +206,6 @@ function fn_price_list_get_combination($product)
     $poptions = $product['product_options'];
 
     if (!empty($poptions)) {
-        if ($product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-            $product['option_inventory'] = db_get_array("SELECT combination_hash as options, amount, product_code FROM ?:product_options_inventory WHERE product_id= ?i", $product['product_id']);
-        }
 
         $product['product_code'] = db_get_field("SELECT product_code FROM ?:products WHERE product_id= ?i", $product['product_id']);
 
@@ -192,17 +237,6 @@ function fn_price_list_get_combination($product)
 
                 $amount = $product_code = '';
 
-                if (!empty($product['option_inventory'])) {
-                    $hash = fn_generate_cart_id($product['product_id'], array('product_options' => $c_value));
-                    foreach ($product['option_inventory'] as $id => $inventory) {
-                        if ($inventory['options'] == $hash) {
-                            $amount = $inventory['amount'];
-                            $product_code = $inventory['product_code'];
-                            unset($product['option_inventory'][$id]);
-                            break;
-                        }
-                    }
-                }
 
                 $product['combination_amount'][$c_id] = empty($amount) ? $product['amount'] : $amount;
                 $product['combination_code'][$c_id] = empty($product_code) ? $product['product_code'] : $product_code;
@@ -229,4 +263,22 @@ function fn_price_list_build_category_name($id_path)
     }
 
     return implode(' - ', $result);
+}
+
+
+/**
+ * The "price_list_process_products_before_gather_additional_products_data" hook handler.
+ *
+ * Actions performed:
+ *  - Adds flag to get warehouse total amount for products from list.
+ *
+ * @param \Tygh\PriceList\AGenerator $generator AGenerator instance
+ * @param array                      $products  List of products
+ * @param array                      $params    Array of flags which determines which data should be gathered
+ *
+ * @see \Tygh\PriceList\AGenerator::processProducts()
+ */
+function fn_warehouses_price_list_process_products_before_gather_additional_products_data($generator, $products, &$params)
+{
+    $params['get_warehouse_total_amount'] = true;
 }

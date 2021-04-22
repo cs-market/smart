@@ -16,6 +16,10 @@ use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+if (isset($_REQUEST['drop_select_office'])) {
+    $_REQUEST['select_office'] = Tygh::$app['session']['cart']['select_office'] = false;
+}
+
 if(isset(Tygh::$app['session']['cart']['select_office'])) {
     Tygh::$app['view']->assign('select_office', Tygh::$app['session']['cart']['select_office']);
 }

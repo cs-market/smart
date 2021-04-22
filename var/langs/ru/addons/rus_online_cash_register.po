@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-ru\n"
+"X-Crowdin-Project-ID: 54044\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /release-4.8.2/addons/rus_online_cash_register.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:12\n"
+"X-Crowdin-File: /release-4.12.2/addons/rus_online_cash_register.po\n"
+"X-Crowdin-File-ID: 4226\n"
+"PO-Revision-Date: 2021-01-26 12:32\n"
 
 msgctxt "Addons::name::rus_online_cash_register"
 msgid "ATOL Online: rent-a-cash-register"
@@ -35,6 +35,14 @@ msgstr "Когда заказ получает один из этих стату
 msgctxt "SettingsOptions::rus_online_cash_register::statuses_refund"
 msgid "Statuses for refunded orders"
 msgstr "Статусы возвращённых заказов"
+
+msgctxt "SettingsOptions::rus_online_cash_register::statuses_prepaid"
+msgid "Statuses for prepaid orders"
+msgstr "Статус предоплаченных заказов"
+
+msgctxt "SettingsTooltips::rus_online_cash_register::statuses_prepaid"
+msgid "When an order gets one of these statuses, a prepayment receipt is issued."
+msgstr "Когда заказ получает один из этих статусов, пробивается чек предоплаты."
 
 msgctxt "SettingsTooltips::rus_online_cash_register::statuses_refund"
 msgid "When an order gets one of these statuses, a return receipt is issued."
@@ -351,4 +359,88 @@ msgstr "Чеки"
 msgctxt "Languages::online_cash_register.logs"
 msgid "Logs"
 msgstr "Журнал"
+
+msgctxt "SettingsOptions::rus_online_cash_register::mode"
+msgid "Mode"
+msgstr "Режим"
+
+msgctxt "SettingsVariants::rus_online_cash_register::mode::test"
+msgid "Test"
+msgstr "Тестовый"
+
+msgctxt "SettingsVariants::rus_online_cash_register::mode::live"
+msgid "Live"
+msgstr "Рабочий"
+
+msgctxt "SettingsOptions::rus_online_cash_register::api_version"
+msgid "API version"
+msgstr "Версия API"
+
+msgctxt "SettingsVariants::rus_online_cash_register::api_version::3"
+msgid "3.0 (Deprecated)"
+msgstr "3.0 (запрещена с 01.01.2019)"
+
+msgctxt "SettingsVariants::rus_online_cash_register::api_version::4"
+msgid "4.0"
+msgstr "4.0"
+
+msgctxt "Languages::rus_online_cash_register.new_api_version_notification_title"
+msgid "ATOL Online: rent-a-cash-register add-on updated"
+msgstr "Обновлён модуль \"АТОЛ Онлайн\""
+
+msgctxt "Languages::rus_online_cash_register.new_api_version_notification"
+msgid "According to ATOL Online, <a href=\"https://www.atol.ru/company/news/Formaty-fiskalnykh-dokumentov-kak-FFD-ogranicheny-po-vremeni-legitimnosti/\" target=\"_blank\">it is required to switch to Fiscal Document Format 1.05 before January 1, 2019</a>. Our add-on supports the new format, but first you need to find out if you can switch to it:</br></br><ul><li>Contact the technical support of ATOL Online and verify if you can switch to API version 4.0 and Fiscal Document Format 1.05. You may need to update the agreement and access keys.</li></br><li>Once you receive a reply from ATOL Online, change the settings of the corresponding add-on in [product]. Change API version to 4.0 and update the access credentials to the ones you received from ATOL Online technical support, if necessary.</li></br></ul></br>Please make sure to switch to Fiscal Document Format 1.05 and API version 4.0 before January 1, 2019."
+msgstr "На сайте АТОЛ Онлайн сказано, что <a href=\"https://www.atol.ru/company/news/Formaty-fiskalnykh-dokumentov-kak-FFD-ogranicheny-po-vremeni-legitimnosti/\" target=\"_blank\">до 1 января 2019 г. нужно перейти на ФФД 1.05</a>. Теперь наш модуль поддерживает новый формат фискальных документов. Для перехода нужно:</br></br><ul><li>Связаться с техподдержкой АТОЛ Онлайн и сообщить, что вы хотите перейти на ФФД 1.05 и API 4й версии. Может потребоваться обновление договора и ключей доступа.</li></br><li>Когда вы получите ответ от АТОЛ Онлайн, измените настройки соответствующего модуля в [product]. Измените версию API на 4.0 и обновите реквизиты доступа на те, которые вы получили от техподдержки АТОЛ Онлайн.</li></br></ul></br>Обязательно переключитесь на ФФД 1.05 и API 4й версии до 1 января 2019 г."
+
+msgctxt "Languages::rus_online_cash_register.api_version"
+msgid "API version"
+msgstr "Версия API"
+
+msgctxt "Languages::rus_online_cash_register.api_version_3"
+msgid "3.0 (Deprecated)"
+msgstr "3.0 (запрещена с 01.01.2019)"
+
+msgctxt "Languages::rus_online_cash_register.api_version_4"
+msgid "4.0"
+msgstr "4.0"
+
+msgctxt "Languages::rus_online_cash_register.mode"
+msgid "Mode"
+msgstr "Режим"
+
+msgctxt "Languages::rus_online_cash_register.mode_test"
+msgid "Test"
+msgstr "Тестовый"
+
+msgctxt "Languages::rus_online_cash_register.mode_live"
+msgid "Live"
+msgstr "Рабочий"
+
+msgctxt "Languages::rus_online_cash_register.atol_group_code"
+msgid "Cash register group code"
+msgstr "Идентификатор группы ККТ"
+
+msgctxt "Languages::rus_online_cash_register.atol_payment_address"
+msgid "Payment location address"
+msgstr "Адрес места расчётов"
+
+msgctxt "Languages::rus_online_cash_register.atol_login"
+msgid "Login"
+msgstr "Логин"
+
+msgctxt "Languages::rus_online_cash_register.atol_password"
+msgid "Password"
+msgstr "Пароль"
+
+msgctxt "Languages::rus_online_cash_register.atol_inn"
+msgid "Tax identification number (INN)"
+msgstr "ИНН"
+
+msgctxt "Languages::rus_online_cash_register_settings"
+msgid "ATOL Settings"
+msgstr "Настройки АТОЛ"
+
+msgctxt "Languages::rus_online_cash_register.sno"
+msgid "Taxation system"
+msgstr "Система налогообложения"
 

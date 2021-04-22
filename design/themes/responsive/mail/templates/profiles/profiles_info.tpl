@@ -86,7 +86,7 @@
 {if ($profile_fields.B || $profile_fields.S) && $user_data.register_at_checkout != "Y" && !($created && $settings.General.quick_registration == "Y")}
 <tr>
     <td valign="top">
-    {if $profile_fields.B}
+    {if $profile_fields.B && ($order_info.b_firstname || $order_info.b_lastname || $order_info.b_address || $order_info.b_address_2 || $order_info.b_city || $order_info.b_state_descr || $order_info.b_zipcode)}
         <p></p>
         <table>
             {include file="profiles/profile_fields_info.tpl" fields=$profile_fields.B title=__("billing_address")}

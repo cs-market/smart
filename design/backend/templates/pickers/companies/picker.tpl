@@ -3,6 +3,8 @@
 {assign var="data_id" value="`$data_id`_`$rnd`"}
 {assign var="view_mode" value=$view_mode|default:"mixed"}
 {assign var="start_pos" value=$start_pos|default:0}
+{assign var="show_but_text" value=$show_but_text|default:true}
+{assign var="icon" value=$icon|default:"icon-plus"}
 
 {script src="js/tygh/picker.js"}
 {include file="views/profiles/components/profiles_scripts.tpl"}
@@ -56,7 +58,7 @@
             {assign var="_but_role" value="icon"}
         {/if}
     <div class="pull-right">
-    {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_href="companies.picker?display=`$display`&picker_for=`$picker_for`&extra=`$extra_var`&checkbox_name=`$checkbox_name`&root=`$default_name`&except_id=`$except_id`&data_id=`$data_id``$extra_url`"|fn_url but_text=$_but_text but_role=$_but_role but_target_id="content_`$data_id`" but_meta="btn cm-dialog-opener"}
+    {include file="buttons/button.tpl" but_id="opener_picker_`$data_id`" but_icon=$icon but_href="companies.picker?display=`$display`&picker_for=`$picker_for`&extra=`$extra_var`&checkbox_name=`$checkbox_name`&root=`$default_name`&except_id=`$except_id`&data_id=`$data_id``$extra_url`"|fn_url but_text=$_but_text but_role=$_but_role but_target_id="content_`$data_id`" but_meta="btn cm-dialog-opener"}
     </div>
     {if !$no_container}</div>{/if}
     {/if}
@@ -83,8 +85,9 @@
 
 {if !$extra_var && $view_mode != "button"}
     {if $multiple}
-    <div class="table-wrapper">
-        <table width="100%" class="table table-middle">
+    <div class="clearfix"></div>
+    <div class="table-responsive-wrapper">
+        <table width="100%" class="table table-middle table--relative table-responsive table-responsive-w-titles">
         <thead>
         <tr>
             {if $positions}<th>{__("position_short")}</th>{/if}
@@ -98,7 +101,7 @@
     {/if}
     {if $multiple}
         <tr class="hidden">
-            <td colspan="{if $positions}3{else}2{/if}">
+            <td colspan="{if $positions}3{else}2{/if}" data-th="&nbsp;">
     {/if}
             <input id="{if $input_id}{$input_id}{else}m{$data_id}_ids{/if}" type="hidden" class="cm-picker-value" name="{$input_name}" value="{if $item_ids|is_array}{assign var="_item_ids" value=$item_ids}{","|implode:$_item_ids}{else}{$item_ids}{/if}" {$extra} />
     {if $multiple}
@@ -130,7 +133,7 @@
         </tbody>
         <tbody id="{$data_id}_no_item"{if $item_ids} class="hidden"{/if}>
         <tr class="no-items">
-            <td colspan="{if $positions}3{else}2{/if}"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
+            <td colspan="{if $positions}3{else}2{/if}" data-th="&nbsp;"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
         </tr>
         </tbody>
     </table>

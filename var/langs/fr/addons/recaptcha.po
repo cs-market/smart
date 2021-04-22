@@ -5,12 +5,10 @@ msgstr ""
 "Language-Team: French\n"
 "Language: fr_FR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: fr\n"
-"X-Crowdin-File: /release-4.8.2/addons/recaptcha.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:04\n"
+"X-Crowdin-File: /release-4.11.4/addons/recaptcha.po\n"
+"PO-Revision-Date: 2020-05-18 08:59\n"
 
 msgctxt "Addons::name::recaptcha"
 msgid "Google reCAPTCHA"
@@ -64,6 +62,18 @@ msgctxt "SettingsOptions::recaptcha::recaptcha_secret"
 msgid "Secret"
 msgstr ""
 
+msgctxt "SettingsSections::recaptcha::general"
+msgid "General"
+msgstr ""
+
+msgctxt "SettingsSections::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr "Pays exclus"
+
+msgctxt "SettingsOptions::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr "Pays exclus"
+
 msgctxt "Languages::error_validator_recaptcha"
 msgid "Please confirm you are not a robot."
 msgstr ""
@@ -73,6 +83,10 @@ msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> a
 msgstr ""
 
 msgctxt "Languages::recaptcha.text_settings_notice"
-msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.</p>"
+msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.<br>Please note that the add-on currently supports only <b>reCAPTCHA v2: Checkbox</b></p>"
+msgstr "<p>Les instructions pour obtenir la <b>clé du site</b> et le <b>secret</b> sont disponibles <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">ici</a></b>.<br>Veuillez noter que l'add-on ne supporte actuellement que <b>reCAPTCHA v2: Checkbox</b></p>"
+
+msgctxt "Languages::recaptcha.text_forbidden_countries_notice"
+msgid "<p>Google reCAPTACHA will be disabled for the selected countries. Instead, visitors from those countries will be asked to type a few symbols they see on the screen.</p>"
 msgstr ""
 

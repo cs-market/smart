@@ -221,11 +221,6 @@ class Validators
      */
     public function isSessionStarted()
     {
-        if (function_exists('session_status')) {
-            return session_status() === PHP_SESSION_ACTIVE;
-        } else {
-            return session_id() !== '';
-        }
+        return session_status() === PHP_SESSION_ACTIVE;
     }
-
 }

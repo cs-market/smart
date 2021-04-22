@@ -14,22 +14,23 @@
 
 namespace Tygh\Shippings\Services;
 
-use Tygh\Shippings\IService;
-use Tygh\Registry;
+use Tygh\Tygh;
 use Tygh\Http;
-use Tygh\Bootstrap;
+use Tygh\Registry;
+use Tygh\Shippings\IService;
+use Tygh\Shippings\IPickupService;
 
 /**
  * Dellin shipping service
  */
-class Dellin implements IService
+class Dellin implements IService, IPickupService
 {
     /**
      * Abailability multithreading in this module
      *
      * @var bool $_allow_multithreading
      */
-    private $_allow_multithreading = false;
+    private $_allow_multithreading = true;
 
     /**
      * Current Company id environment
@@ -40,10 +41,58 @@ class Dellin implements IService
 
     public $session_id = 0;
 
+    /**
+     * The currency in which the carrier calculates shipping costs.
+     *
+     * @var string $calculation_currency
+     */
+    public $calculation_currency = 'RUB';
+
+    /** @var array $shipping_info Shipping data */
+    protected $shipping_info;
+
     public $url_params = array(
         'headers' => array('Content-Type: application/json'),
         'timeout' => 5
     );
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupMinCost()
+    {
+        $shipping_data = $this->getStoredShippingData();
+        return isset($shipping_data['cost']) ? $shipping_data['cost'] : false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupPoints()
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPickupPointsQuantity()
+    {
+        $shipping_data = $this->getStoredShippingData();
+        return isset($shipping_data['arrival_terminals']) ? count($shipping_data['arrival_terminals']) : false;
+    }
+
+    public function prepareAddress($address)
+    {
+    }
+
+    public static function getInfo()
+    {
+        return [
+            'name'         => __('carrier_dellin'),
+            'tracking_url' => 'http://www.dellin.ru/tracker/?rwID=%s',
+        ];
+    }
 
     /**
      * Checks if shipping service allows to use multithreading
@@ -73,7 +122,7 @@ class Dellin implements IService
      */
     public function prepareData($shipping_info)
     {
-        $this->_shipping_info = $shipping_info;
+        $this->shipping_info = $shipping_info;
         $this->company_id = Registry::get('runtime.company_id');
     }
 
@@ -84,10 +133,10 @@ class Dellin implements IService
      */
     public function getRequestData()
     {
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
-        $shipping_settings = $this->_shipping_info['service_params'];
-        $origination = $this->_shipping_info['package_info']['origination'];
-        $location = $this->_shipping_info['package_info']['location'];
+        $weight_data = fn_convert_weight_to_imperial_units($this->shipping_info['package_info']['W']);
+        $shipping_settings = $this->shipping_info['service_params'];
+        $origination = $this->shipping_info['package_info']['origination'];
+        $location = $this->shipping_info['package_info']['location'];
         $packages = fn_get_schema('dellin', 'packages', 'php', true);
         $services = fn_get_schema('dellin', 'services', 'php', true);
         $symbol_weight = Registry::get('settings.General.weight_symbol_grams');
@@ -147,7 +196,7 @@ class Dellin implements IService
             }
         }
 
-        $packages = (!empty($this->_shipping_info['package_info']['packages'])) ? $this->_shipping_info['package_info']['packages'] : array();
+        $packages = (!empty($this->shipping_info['package_info']['packages'])) ? $this->shipping_info['package_info']['packages'] : array();
         $packages_count = count($packages);
 
         $weight = round($weight_data['plain'] * $symbol_weight / 1000, 3);
@@ -162,7 +211,7 @@ class Dellin implements IService
             $default_length = !empty($shipping_settings['length']) ? $shipping_settings['length'] / 100 : 0.1;
 
             foreach ($packages as $id => $package) {
-                $product_weight = fn_expand_weight($package['weight']);
+                $product_weight = fn_convert_weight_to_imperial_units($package['weight']);
                 $package_weight = round($product_weight['plain'] * $symbol_weight / 1000, 3);
                 $sum_weight += $package_weight;
 
@@ -177,7 +226,7 @@ class Dellin implements IService
                 $max_height = max($max_height, $height);
             }
 
-            $post['statedValue'] = $this->_shipping_info['package_info']['C'];
+            $post['statedValue'] = $this->shipping_info['package_info']['C'];
             $weight = $sum_weight;
         }
 
@@ -191,11 +240,13 @@ class Dellin implements IService
         $post['quantity'] = (!empty($packages_count)) ? $packages_count : 1;
 
         $url = 'https://api.dellin.ru/v1/public/calculator.json';
-        $request_data = array(
-            'method' => 'post',
-            'url' => $url,
-            'data' => $post,
-        );
+        $request_data = [
+            'method'  => 'post',
+            'url'     => $url,
+            'data'    => json_encode($post),
+            'headers' => $this->url_params['headers'],
+            'timeout' => $this->url_params['timeout'],
+        ];
 
         return $request_data;
     }
@@ -209,7 +260,7 @@ class Dellin implements IService
     {
         $data = $this->getRequestData();
 
-        $response = Http::post($data['url'], json_encode($data['data']), $this->url_params);
+        $response = Http::post($data['url'], $data['data'], $this->url_params);
 
         return $response;
     }
@@ -226,20 +277,21 @@ class Dellin implements IService
             'cost' => false,
             'error' => false,
         );
-        $shipping_settings = $this->_shipping_info['service_params'];
+        $shipping_settings = $this->shipping_info['service_params'];
 
         $result = json_decode($response);
         $data_dellin = json_decode(json_encode($result), true);
 
         if (!empty($data_dellin['errors'])) {
             if (is_array($data_dellin['errors'])) {
-                foreach ($data_dellin['errors'] as $error) {
-                    if (is_array($error)) {
-                        foreach ($error as $message) {
-                            $return['error'] .= '; ' . $message;
+                foreach ($data_dellin['errors'] as $error_field => $error_message) {
+                    $return['error'] .= $error_field . ' : ';
+                    if (is_array($error_message)) {
+                        foreach ($error_message as $message) {
+                            $return['error'] .= $message . '; ';
                         }
                     } else {
-                        $return['error'] .= '; ' . $error;
+                        $return['error'] .= $error_message . '; ';
                     }
                 }
             } else {
@@ -261,8 +313,6 @@ class Dellin implements IService
 
             $return['derival_terminals'] = $data_dellin['derival']['terminals'];
             $return['arrival_terminals'] = $arrival_terminals;
-
-            $this->_fillSessionData($return['derival_terminals'], $return['arrival_terminals']);
 
             if ($shipping_settings['avia_delivery'] && !empty($data_dellin['air']['price'])) {
                 $return['cost'] = $data_dellin['air']['price']
@@ -302,34 +352,49 @@ class Dellin implements IService
                     + (isset($data_dellin['express']['packages']['pallet'])    ? $data_dellin['express']['packages']['pallet']     : 0)
                     + (isset($data_dellin['express']['packages']['type'])      ? $data_dellin['express']['packages']['type']       : 0);
             }
+
+            $this->storeShippingData($return['derival_terminals'], $return['arrival_terminals'], $return['cost']);
         }
 
         return $return;
     }
 
-    private function _fillSessionData($derival_terminals, $arrival_terminals)
+    /**
+     * Saves shipping data to session
+     *
+     * @param array $derival_terminals Derival terminals
+     * @param array $arrival_terminals Arrival terminals
+     * @param float $cost              Shipping cost
+     *
+     * @return bool
+     */
+    protected function storeShippingData($derival_terminals, $arrival_terminals, $cost)
     {
-        $group_key = $this->_shipping_info['keys']['group_key'];
-        $shipping_id = $this->_shipping_info['keys']['shipping_id'];
+        $group_key = $this->shipping_info['keys']['group_key'];
+        $shipping_id = $this->shipping_info['keys']['shipping_id'];
 
-        \Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id] = array(
+        Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id] = [
             'derival_terminals' => $derival_terminals,
-            'arrival_terminals' => $arrival_terminals
-        );
+            'arrival_terminals' => $arrival_terminals,
+            'cost'              => $cost,
+        ];
 
         return true;
     }
 
-    public function prepareAddress($address)
+    /**
+     * Fetches stored data from session
+     *
+     * @return array
+     */
+    protected function getStoredShippingData()
     {
-        
-    }
+        $group_key = isset($this->shipping_info['keys']['group_key']) ? $this->shipping_info['keys']['group_key'] : 0;
+        $shipping_id = isset($this->shipping_info['keys']['shipping_id']) ? $this->shipping_info['keys']['shipping_id'] : 0;
+        if (isset(Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id])) {
+            return Tygh::$app['session']['cart']['shippings_extra']['data'][$group_key][$shipping_id];
+        }
 
-    public static function getInfo()
-    {
-        return array(
-            'name' => __('carrier_dellin'),
-            'tracking_url' => 'http://www.dellin.ru/tracker/?rwID=%s'
-        );
+        return [];
     }
 }

@@ -8,13 +8,13 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: hu\n"
-"X-Crowdin-File: /release-4.8.2/addons/recaptcha.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/recaptcha.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"PO-Revision-Date: 2019-02-01 06:05\n"
 
 msgctxt "Addons::name::recaptcha"
 msgid "Google reCAPTCHA"
-msgstr ""
+msgstr "Google reCAPTCHA"
 
 msgctxt "Addons::description::recaptcha"
 msgid "Adds the support of Google reCAPTCHA to protect your store against bots"
@@ -22,57 +22,73 @@ msgstr ""
 
 msgctxt "SettingsOptions::recaptcha::recaptcha_theme"
 msgid "Theme"
-msgstr ""
+msgstr "Kinézet"
 
 msgctxt "SettingsVariants::recaptcha::recaptcha_theme::light"
 msgid "Light"
-msgstr ""
+msgstr "Világos"
 
 msgctxt "SettingsVariants::recaptcha::recaptcha_theme::dark"
 msgid "Dark"
-msgstr ""
+msgstr "Sötét"
 
 msgctxt "SettingsOptions::recaptcha::recaptcha_size"
 msgid "Size"
-msgstr ""
+msgstr "Méret"
 
 msgctxt "SettingsVariants::recaptcha::recaptcha_size::normal"
 msgid "Normal"
-msgstr ""
+msgstr "Normál"
 
 msgctxt "SettingsVariants::recaptcha::recaptcha_size::compact"
 msgid "Compact"
-msgstr ""
+msgstr "Összetett"
 
 msgctxt "SettingsOptions::recaptcha::recaptcha_type"
 msgid "Type"
-msgstr ""
+msgstr "Típus"
 
 msgctxt "SettingsVariants::recaptcha::recaptcha_type::image"
 msgid "Image"
-msgstr ""
+msgstr "Kép"
 
 msgctxt "SettingsVariants::recaptcha::recaptcha_type::audio"
 msgid "Audio"
-msgstr ""
+msgstr "Hang"
 
 msgctxt "SettingsOptions::recaptcha::recaptcha_site_key"
 msgid "Site key"
-msgstr ""
+msgstr "Site kulcs"
 
 msgctxt "SettingsOptions::recaptcha::recaptcha_secret"
 msgid "Secret"
+msgstr "Titkos"
+
+msgctxt "SettingsSections::recaptcha::general"
+msgid "General"
+msgstr ""
+
+msgctxt "SettingsSections::recaptcha::forbidden_countries"
+msgid "Excluded countries"
+msgstr ""
+
+msgctxt "SettingsOptions::recaptcha::forbidden_countries"
+msgid "Excluded countries"
 msgstr ""
 
 msgctxt "Languages::error_validator_recaptcha"
 msgid "Please confirm you are not a robot."
-msgstr ""
+msgstr "Kérjük igazold, hogy nem vagy robot."
 
 msgctxt "Languages::recaptcha_settings_notice"
 msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/docs/start\">here</a></b>.</p>"
 msgstr ""
 
 msgctxt "Languages::recaptcha.text_settings_notice"
-msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.</p>"
+msgid "<p>The instructions on how to get the <b>site key</b> and <b>secret</b> are available <b><a target=\"_blank\" href=\"https://developers.google.com/recaptcha/intro\">here</a></b>.<br>Please note that the add-on currently supports only <b>reCAPTCHA v2: Checkbox</b></p>"
+msgstr ""
+
+msgctxt "Languages::recaptcha.text_forbidden_countries_notice"
+msgid "<p>Google reCAPTACHA will be disabled for the selected countries. Instead, visitors from those countries will be asked to type a few symbols they see on the screen.</p>"
 msgstr ""
 

@@ -5,7 +5,7 @@
 <div class="items-container cm-sortable" data-ca-sortable-table="sitemap_sections" data-ca-sortable-id-name="section_id" id="manage_sitemap_list">
 {if $sitemap_sections}
     <div class="table-responsive-wrapper">
-        <table class="table table-middle table-objects table-striped table-responsive table-responsive-w-titles">
+        <table class="table table-middle table--relative table-objects table-striped table-responsive table-responsive-w-titles">
         {foreach from=$sitemap_sections item=section}
             {include file="common/object_group.tpl"
                 id=$section.section_id
@@ -19,7 +19,7 @@
                 additional_class="cm-sortable-row cm-sortable-id-`$section.section_id`"
                 no_table=true
                 is_view_link=false
-                header_text="{__("editing_sitemap_section")}: `$section.section`"
+                header_text=$section.section
                 draggable=true}
         {/foreach}
         </table>

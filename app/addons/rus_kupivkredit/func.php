@@ -15,6 +15,8 @@
 // rus_build_kupivkredit dbazhenov
 
 use Tygh\Registry;
+use Tygh\Enum\ObjectStatuses;
+use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -37,13 +39,30 @@ function fn_settings_actions_addons_rus_kupivkredit($new_status, $old_status, $o
 
 function fn_rus_kupivkredit_pre_add_to_cart(&$product_data, &$cart, &$auth, &$update)
 {
-    if (Registry::ifGet('addons.rus_kupivkredit.status', 'D') == 'A' && Registry::get('runtime.action') == 'kvk_activate') {
-        $payment_methods = fn_get_payment_methods($auth);
-        foreach ($payment_methods as $p => $data) {
-            if (!(empty($data['processor'])) && stristr($data['processor'], 'Kupivkredit')) {
-                $cart['payment_id'] = $data['payment_id'];
-            }
+    if (
+        Registry::ifGet('addons.rus_kupivkredit.status', ObjectStatuses::DISABLED) !== ObjectStatuses::ACTIVE
+        || Registry::get('runtime.action') !== 'kvk_activate'
+    ) {
+        return;
+    }
+
+    $params = [
+        'lang_code' => CART_LANGUAGE,
+    ];
+
+    if ($auth['area'] === SiteArea::STOREFRONT) {
+        $params['status'] = ObjectStatuses::ACTIVE;
+        $params['usergroup_ids'] = $auth['usergroup_ids'];
+    }
+
+    $payment_methods = fn_get_payments($params);
+
+    foreach ($payment_methods as $data) {
+        if (empty($data['processor']) || !stristr($data['processor'], 'Тинькофф: Кредитование покупателей (КупиВкредит)')) {
+            continue;
         }
+
+        $cart['payment_id'] = $data['payment_id'];
     }
 }
 
@@ -52,13 +71,30 @@ function fn_rus_kupivkredit_get_payments($params, &$fields, $join, $order, $cond
     $fields[] = '?:payment_processors.processor AS processor';
 }
 
+/**
+ * The "get_payment_processors_post" hook handler.
+ *
+ * Actions performed:
+ *     - Adds specific 'russian' attribute to some payment processors for categorization.
+ *
+ * @see \fn_get_payment_processors()
+ */
+function fn_rus_kupivkredit_get_payment_processors_post($lang_code, &$processors)
+{
+    foreach ($processors as &$processor) {
+        if ($processor['addon'] === 'rus_kupivkredit') {
+            $processor['russian'] = true;
+        }
+    }
+}
+
 function fn_rus_kupivkredit_install_payment()
 {
     $processor_id = fn_rus_kupivkredit_get_processor_id();
 
     if (empty($processor_id)) {
         $payment_data = array(
-            'processor' => 'Kupivkredit',
+            'processor' => 'Тинькофф: Кредитование покупателей (КупиВкредит)',
             'processor_script' => 'kupivkredit.php',
             'processor_template' => 'views/orders/components/payments/cc_outside.tpl',
             'admin_template' => 'kupivkredit.tpl',
@@ -116,4 +152,32 @@ function fn_rus_kupivkredit_get_payment_ids($only_disabled = false)
 function fn_rus_kupivkredit_get_processor_id()
 {
     return db_get_field("SELECT processor_id FROM ?:payment_processors WHERE processor_script = 'kupivkredit.php'");
+}
+
+/**
+ * The "prepare_checkout_payment_methods" hook handler.
+ * Actions performed:
+ *      - Unset Kupi v kredit if cart total < 3000
+ *
+ * @param array<string, string|int|array>                      $cart           Cart content
+ * @param array<string, string|int|array>                      $auth           Auth data
+ * @param array<string, array<int, array<string, int|string>>> $payment_groups Payment groups
+ *
+ * @return void
+ */
+function fn_rus_kupivkredit_prepare_checkout_payment_methods(array $cart, array $auth, array &$payment_groups)
+{
+    if (!isset($cart['total']) || $cart['total'] >= 3000) {
+        return;
+    }
+
+    foreach ($payment_groups as $payment_group => $payments) {
+        foreach ($payments as $id => $payment) {
+            if ($payment['processor_script'] !== 'kupivkredit.php') {
+                continue;
+            }
+
+            unset($payment_groups[$payment_group][$id]);
+        }
+    }
 }

@@ -4,7 +4,9 @@
     {assign var="id" value=0}
 {/if}
 
-<form action="{""|fn_url}" method="post" class="form-horizontal form-edit cm-check-changes {if !$product_file|fn_allow_save_object:""}  cm-hide-inputs{/if}" name="files_form_{$id}" enctype="multipart/form-data">
+{$allow_save=$product_file|fn_allow_save_object:""}
+
+<form action="{""|fn_url}" method="post" class="form-horizontal form-edit cm-check-changes {if !$allow_save}  cm-hide-inputs{/if}" name="files_form_{$id}" enctype="multipart/form-data">
 <input type="hidden" name="product_id" value="{$product_id}" />
 <input type="hidden" name="selected_section" value="files" />
 <input type="hidden" name="file_id" value="{$id}" />
@@ -51,7 +53,9 @@
                 {if $product_file.file_path}
                     <a href="{"products.get_file?file_id=`$id`"|fn_url}">{$product_file.file_path}</a> ({$product_file.file_size|formatfilesize nofilter})
                 {/if}
-                {include file="common/fileuploader.tpl" var_name="base_file[`$id`]"}
+                {if $allow_save}
+                    {include file="common/fileuploader.tpl" var_name="base_file[`$id`]"}
+                {/if}
             </div>
         </div>
 
@@ -60,13 +64,17 @@
             <div class="controls">
                 {if $product_file.preview_path}
                     <a href="{"products.get_file?file_id=`$id`&file_type=preview"|fn_url}">{$product_file.preview_path}</a> ({$product_file.preview_size|formatfilesize nofilter})
-                    <div>
-                        <label class="checkbox inline" for="elm_file_delete_preview_{$id}"><input type="checkbox" id="elm_file_delete_preview_{$id}" name="product_file[delete_preview]" value="Y">{__("delete")}</label>
-                    </div>
+                    {if $allow_save}
+                        <div>
+                            <label class="checkbox inline" for="elm_file_delete_preview_{$id}"><input type="checkbox" id="elm_file_delete_preview_{$id}" name="product_file[delete_preview]" value="{"YesNo::YES"|enum}">{__("delete")}</label>
+                        </div>
+                    {/if}
                 {elseif $product_file}
                     {__("none")}
                 {/if}
-                {include file="common/fileuploader.tpl" var_name="file_preview[`$id`]"}
+                {if $allow_save}
+                    {include file="common/fileuploader.tpl" var_name="file_preview[`$id`]"}
+                {/if}
             </div>
         </div>
 
@@ -117,9 +125,13 @@
 </div>
 
 <div class="modal-footer buttons-container">
-{if $product_file|fn_allow_save_object:""}
-    {include file="buttons/save_cancel.tpl" but_name="dispatch[products.update_file]" cancel_action="close" save=$id}
-{/if}
+{include
+    file="buttons/save_cancel.tpl"
+    but_name="dispatch[products.update_file]"
+    cancel_action="close"
+    save=$id
+    hide_first_button=!$allow_save
+}
 </div>
 
 </form>

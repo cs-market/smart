@@ -90,7 +90,7 @@
                             <div class="control-group">
                                 <label for="elm_supplier_country" class="control-label cm-required">{__("country")}:</label>
                                 <div class="controls">
-                                    {assign var="_country" value=$supplier.country|default:$settings.General.default_country}
+                                    {assign var="_country" value=$supplier.country|default:$settings.Checkout.default_country}
                                     <select class="cm-country cm-location-shipping" id="elm_supplier_country" name="supplier_data[country]">
                                         <option value="">- {__("select_country")} -</option>
                                         {foreach from=$countries item="country" key="code"}
@@ -101,8 +101,8 @@
                             </div>
 
                             <div class="control-group">
-                                {$_country = $supplier.country|default:$settings.General.default_country}
-                                {$_state = $supplier.state|default:$settings.General.default_state}
+                                {$_country = $supplier.country|default:$settings.Checkout.default_country}
+                                {$_state = $supplier.state|default:$settings.Checkout.default_state}
 
                                 <label for="elm_supplier_state" class="control-label cm-required">{__("state")}:</label>
                                 <div class="controls">
@@ -136,11 +136,11 @@
                 {include file="pickers/products/picker.tpl" input_name="supplier_data[products]" data_id="supplier_products" item_ids=$supplier.products type="links"}
             </div>
 
-            <div id="content_shippings">
+            <div id="content_shippings" class="hidden">
                 {hook name="companies:shipping_methods"}
                     {if $shippings}
                     <div class="table-responsive-wrapper">
-                        <table width="100%" class="table table-middle table-responsive">
+                        <table width="100%" class="table table-middle table--relative table-responsive">
                         <thead>
                         <tr>
                             <th width="50%">{__("shipping_methods")}</th>
@@ -181,11 +181,9 @@
 {/capture}
 {** /Form submit section **}
 
-{if $supplier}
-    {$title_start = __("editing_supplier")}
-    {$title_end = $supplier.name}
-{else}
-    {$_title=__("add_supplier")}
-{/if}
-
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$_title content=$smarty.capture.mainbox select_languages=true buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($supplier) ? $supplier.name : __("add_supplier")
+    content=$smarty.capture.mainbox
+    select_languages=true
+    buttons=$smarty.capture.buttons
+}

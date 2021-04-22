@@ -13,6 +13,7 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Tygh;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -38,58 +39,112 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix = '.manage';
     }
 
-    return array (CONTROLLER_STATUS_OK, 'store_locator' . $suffix);
+    if ($mode === 'm_update') {
+        if (!empty($_REQUEST['store_locators']) && is_array($_REQUEST['store_locators'])) {
+            foreach ($_REQUEST['store_locators'] as $id => $stores) {
+                fn_update_store_location($stores, $id);
+            }
+        }
+
+        $suffix .= '.manage';
+    }
+
+    if ($mode === 'm_delete') {
+        if (!empty($_REQUEST['store_locator_ids'])) {
+            foreach ($_REQUEST['store_locator_ids'] as $store_location_id) {
+                fn_delete_store_location($store_location_id);
+            }
+        }
+        $suffix = '.manage';
+    }
+
+    return [CONTROLLER_STATUS_OK, 'store_locator' . $suffix];
 }
 
 if ($mode == 'manage') {
-
-    list($store_locations, $search) = fn_get_store_locations($_REQUEST, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
-
-    Tygh::$app['view']->assign('sl_settings', fn_get_store_locator_settings());
-    Tygh::$app['view']->assign('store_locations', $store_locations);
-    Tygh::$app['view']->assign('search', $search);
-
-} elseif ($mode == 'add') {
-
-    // [Page sections]
-    Registry::set('navigation.tabs', array (
-        'detailed' => array (
-            'title' => __('general'),
-            'js' => true
-        ),
-        'addons' => array (
-            'title' => __('addons'),
-            'js' => true
-        )
-    ));
-    // [/Page sections]
-
-    Tygh::$app['view']->assign('sl_settings', fn_get_store_locator_settings());
-
-} elseif ($mode == 'update') {
-
-    $store_location = fn_get_store_location($_REQUEST['store_location_id'], DESCR_SL);
-
-    if (empty($store_location)) {
-        return array(CONTROLLER_STATUS_NO_PAGE);
+    $params = $_REQUEST;
+    if ($company_id = Registry::get('runtime.company_id')) {
+        $params['company_id'] = Registry::get('runtime.company_id');
     }
 
-    Tygh::$app['view']->assign('store_location', $store_location);
-    Tygh::$app['view']->assign('sl_settings', fn_get_store_locator_settings());
+    list($store_locations, $search) = fn_get_store_locations($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
+    $raw_destinations = fn_get_destinations();
+    $destinations = array_combine(array_column($raw_destinations, 'destination_id'), $raw_destinations);
 
-    // [Page sections]
-    $tabs = array (
-        'detailed' => array (
+    Tygh::$app['view']->assign([
+        'sl_settings'     => fn_get_store_locator_settings(),
+        'store_locations' => $store_locations,
+        'destinations'    => $destinations,
+        'search'          => $search,
+    ]);
+
+    if (fn_allowed_for('MULTIVENDOR')) {
+        list($companies, ) = fn_get_companies([], $auth);
+        Tygh::$app['view']->assign('vendors', $companies);
+    }
+
+} elseif ($mode == 'add' || $mode == 'update') {
+
+    if ($mode == 'update') {
+        $store_location = fn_get_store_location($_REQUEST['store_location_id'], DESCR_SL);
+        if (empty($store_location)) {
+            return [CONTROLLER_STATUS_NO_PAGE];
+        }
+
+        if (isset($_REQUEST['add_all_destinations'])) {
+            list($objects,) = fn_warehouses_get_destinations_for_picker(
+                [
+                    'store_location_id' => $_REQUEST['store_location_id'],
+                    'destination_id'    => 0,
+                ]);
+            unset($store_location['shipping_destinations_ids']);
+            foreach ($objects as $key => $object) {
+                $store_location['shipping_destinations_ids'][$key] = $object['id'];
+            }
+        }
+
+
+        Tygh::$app['view']->assign('store_location', $store_location);
+    }
+
+    Registry::set('navigation.tabs', [
+        'detailed' => [
             'title' => __('general'),
             'js' => true
-        ),
-        'addons' => array (
+        ],
+        'addons' => [
             'title' => __('addons'),
             'js' => true
-        )
-    );
+        ],
+        'pickup' => [
+            'title' => __('store_locator.pickup'),
+            'js' => true
+        ],
+    ]);
 
-    Registry::set('navigation.tabs', $tabs);
-    // [/Page sections]
+    $destinations = fn_get_destinations(DESCR_SL);
 
+    Tygh::$app['view']->assign([
+        'destinations' => $destinations,
+        'sl_settings'  => fn_get_store_locator_settings(),
+        'states'       => fn_get_all_states(true, DESCR_SL),
+    ]);
+}
+
+if (in_array($mode, ['add', 'update', 'manage'])) {
+    $dynamic_sections = Registry::ifGet('navigation.dynamic.sections', []);
+    $dynamic_sections['shippings'] = [
+        'title' => __('shipping_methods'),
+        'href'  => 'shippings.manage',
+    ];
+    $dynamic_sections['destinations'] = [
+        'title' => __('rate_areas'),
+        'href'  => 'destinations.manage',
+    ];
+    $dynamic_sections['store_locator'] = [
+        'title' => __('store_locator'),
+        'href'  => 'store_locator.manage',
+    ];
+    Registry::set('navigation.dynamic.active_section', 'store_locator');
+    Registry::set('navigation.dynamic.sections', $dynamic_sections);
 }

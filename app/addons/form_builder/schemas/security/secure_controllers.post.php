@@ -14,7 +14,6 @@
 
 $schema['pages'] = array(
     'none' => 'passive',
-    'partial' => 'passive'
 );
 
 return $schema;

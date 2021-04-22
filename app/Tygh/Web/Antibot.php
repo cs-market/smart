@@ -14,7 +14,9 @@
 
 namespace Tygh\Web;
 
+use Tygh\Enum\YesNo;
 use Tygh\Web\Antibot\IAntibotDriver;
+use Tygh\Web\Antibot\IErrorableAntibotDriver;
 
 /**
  * Class Antibot provides a service for spam&abuse filtering of HTTP requests.
@@ -105,8 +107,8 @@ class Antibot
         return $this->is_enabled
             && $this->driver instanceof IAntibotDriver
             && $this->driver->isSetUp()
-            && !($this->session['auth']['user_id'] && $this->settings['hide_if_logged'] == 'Y')
-            && !($this->settings['hide_after_validation'] == 'Y' && !empty($this->session[static::SKIP_REQUEST_VALIDATION_SESSION_FLAG_NAME]));
+            && !($this->session['auth']['user_id'] && $this->settings['hide_if_logged'] == YesNo::YES)
+            && !($this->settings['hide_after_validation'] == YesNo::YES && !empty($this->session[static::SKIP_REQUEST_VALIDATION_SESSION_FLAG_NAME]));
     }
 
     /**
@@ -122,7 +124,7 @@ class Antibot
             && $this->driver instanceof IAntibotDriver
             && $this->driver->isSetUp()
             && isset($this->settings['use_for'][$scenario])
-            && $this->settings['use_for'][$scenario] == 'Y';
+            && $this->settings['use_for'][$scenario] == YesNo::YES;
     }
 
     /**
@@ -136,17 +138,41 @@ class Antibot
     public function validateHttpRequestByScenario($scenario, array $http_request_data)
     {
         if ($this->isValidationRequiredForSession() && $this->isValidationRequiredForScenario($scenario)) {
-
             $result = $this->driver->validateHttpRequest($http_request_data);
 
-            // Skip verification after the first successful one
-            if ($result && $this->settings['hide_after_validation'] == 'Y') {
-                $this->session[static::SKIP_REQUEST_VALIDATION_SESSION_FLAG_NAME] = true;
+            if ($result) {
+                $this->saveSuccessfulVerification();
             }
 
             return $result;
         }
 
         return true;
+    }
+
+    /**
+     * Save information about successful verification to skip verification after the first successful one.
+     *
+     * @return void
+     */
+    public function saveSuccessfulVerification()
+    {
+        if ($this->settings['hide_after_validation'] == YesNo::YES) {
+            $this->session[static::SKIP_REQUEST_VALIDATION_SESSION_FLAG_NAME] = true;
+        }
+    }
+
+    /**
+     * Provides error message to show to customer.
+     *
+     * @param string $scenario Scenario of validation
+     *
+     * @return string
+     */
+    public function getErrorMessage($scenario)
+    {
+        return $this->driver instanceof IErrorableAntibotDriver
+            ? $this->driver->getErrorMessage($scenario)
+            : __('error_confirmation_code_invalid');
     }
 }

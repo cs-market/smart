@@ -12,9 +12,14 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Enum\Addons\Discussion\DiscussionObjectTypes;
+use Tygh\Enum\Addons\Discussion\DiscussionTypes;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
+/** @var array $auth */
+$auth = Tygh::$app['session']['auth'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'update') {
@@ -27,17 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 if ($mode == 'update') {
     $page =  Tygh::$app['view']->getTemplateVars('page_data');
-    $discussion = fn_get_discussion($_REQUEST['page_id'], 'A', true, $_REQUEST);
+    $discussion = fn_get_discussion($_REQUEST['page_id'], DiscussionObjectTypes::PAGE, true, $_REQUEST);
 
-    if (!empty($discussion) && $discussion['type'] != 'D' && $page['page_type'] != PAGE_TYPE_LINK) {
-        if (fn_allowed_for('MULTIVENDOR') || fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
-            Registry::set('navigation.tabs.discussion', array (
-                'title' => __('discussion_title_page'),
-                'js' => true
-            ));
+    if (
+        !empty($discussion)
+        && $discussion['type'] !== DiscussionTypes::TYPE_DISABLED
+        && fn_check_permissions('discussion', 'view', 'admin')
+        && $page['page_type'] !== PAGE_TYPE_LINK
+        && (fn_get_runtime_company_id() || fn_allowed_for('MULTIVENDOR'))
+    ) {
+        Registry::set('navigation.tabs.discussion', [
+            'title' => __('discussion_title_page'),
+            'js'    => true,
+        ]);
 
-            Tygh::$app['view']->assign('discussion', $discussion);
+        if (fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id') && fn_check_permissions('discussion', 'products_and_pages', 'admin')) {
+            Tygh::$app['view']->assign('is_allowed_to_add_reviews', false);
         }
+        Tygh::$app['view']->assign('discussion', $discussion);
     }
 
 } elseif ($mode == 'm_update') {

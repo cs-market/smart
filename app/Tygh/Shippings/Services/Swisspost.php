@@ -106,7 +106,7 @@ class Swisspost implements IService
             'error' => false,
         );
 
-        $weight_data = fn_expand_weight($this->_shipping_info['package_info']['W']);
+        $weight_data = fn_convert_weight_to_imperial_units($this->_shipping_info['package_info']['W']);
         $shipping_settings = $this->_shipping_info['service_params'];
         $location = $this->prepareAddress($this->_shipping_info['package_info']['location']);
         $code = $this->_shipping_info['service_code'];

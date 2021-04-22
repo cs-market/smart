@@ -13,7 +13,7 @@
 
         {if $suppliers}
         <div class="table-responsive-wrapper">
-            <table width="100%" class="table table-middle table-responsive">
+            <table width="100%" class="table table-middle table--relative table-responsive">
                 <thead>
                     <tr>
                         <th width="1%" class="left mobile-hide">
@@ -47,7 +47,7 @@
 
                     <tr class="cm-row-status-{$supplier.status|lower}">
                         <td class="center {$no_hide_input} mobile-hide">
-                            <input type="checkbox" name="supplier_ids[]" value="{$supplier.supplier_id}" class="checkbox cm-item" />
+                            <input type="checkbox" name="supplier_ids[]" value="{$supplier.supplier_id}" class="cm-item" />
                         </td>
                         <td data-th="{__("id")}"><a class="row-status" href="{"suppliers.update?supplier_id=`$supplier.supplier_id`"|fn_url}">{$supplier.supplier_id}</a></td>
                         <td class="row-status" data-th="{__("name")}">{if $supplier.name}<a href="{"suppliers.update?supplier_id=`$supplier.supplier_id`"|fn_url}">{$supplier.name}</a>{else}-{/if}{include file="views/companies/components/company_name.tpl" object=$supplier}</td>

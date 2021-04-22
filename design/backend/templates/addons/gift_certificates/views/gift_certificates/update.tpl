@@ -35,8 +35,15 @@
 
 {include file="views/profiles/components/profiles_scripts.tpl"}
 
-{$max_amount = {$addons.gift_certificates.max_amount|format_price:$currencies.$primary_currency nofilter}}
-{$min_amount = {$addons.gift_certificates.min_amount|format_price:$currencies.$primary_currency nofilter}}
+
+{if $currencies.$primary_currency.decimals_separator == ""}
+    {$max_amount = {$addons.gift_certificates.max_amount|format_price:$currencies.$primary_currency:0 nofilter}}
+    {$min_amount = {$addons.gift_certificates.min_amount|format_price:$currencies.$primary_currency:0 nofilter}}
+{else}
+    {$max_amount = {$addons.gift_certificates.max_amount|format_price:$currencies.$primary_currency nofilter}}
+    {$min_amount = {$addons.gift_certificates.min_amount|format_price:$currencies.$primary_currency nofilter}}
+{/if}
+
 {$text_gift_cert_amount_alert = __("text_gift_cert_amount_alert", ["[min]" => $min_amount, "[max]" => $max_amount])}
 
 <script type="text/javascript">
@@ -118,11 +125,28 @@ Tygh.tr('text_gift_cert_amount_alert',  '{$text_gift_cert_amount_alert|escape:ja
             <label class="cm-required control-label cm-gc-validate-amount" for="gift_cert_amount">{__("amount")}:</label>
             <div class="controls">
                 <div class="text-type-value pull-left">{if $currencies.$primary_currency.after != "Y"}{$currencies.$primary_currency.symbol nofilter}{/if}&nbsp;</div>
-                <input type="text" id="gift_cert_amount" name="gift_cert_data[amount]" class="valign input-text-short inp-el cm-numeric" data-p-sign="s" data-a-sep="{$currencies.$primary_currency.thousands_separator}" data-a-dec="{$currencies.$primary_currency.decimals_separator}" size="5" value="{if $gift_cert_data}{$gift_cert_data.amount|fn_format_rate_value:"":$currencies.$primary_currency.decimals:$currencies.$primary_currency.decimals_separator:$currencies.$primary_currency.thousands_separator:$currencies.$primary_currency.coefficient}{else}{$addons.gift_certificates.min_amount|fn_format_rate_value:"":$currencies.$primary_currency.decimals:$currencies.$primary_currency.decimals_separator:$currencies.$primary_currency.thousands_separator:$currencies.$primary_currency.coefficient}{/if}" />
+                <input type="text"
+                       id="gift_cert_amount"
+                       name="gift_cert_data[amount]"
+                       class="valign input-text-short inp-el cm-numeric"
+                       data-p-sign="s"
+                       data-a-sep="{$currencies.$primary_currency.thousands_separator}"
+                       {if $currencies.$primary_currency.decimals_separator == ""}
+                           data-m-dec="0"
+                       {else}
+                           data-a-dec="{$currencies.$primary_currency.decimals_separator}"
+                       {/if}
+                       size="5"
+                       {if $gift_cert_data}
+                           value="{$gift_cert_data.amount|fn_format_rate_value:"":$currencies.$primary_currency.decimals:$currencies.$primary_currency.decimals_separator:$currencies.$primary_currency.thousands_separator:$currencies.$primary_currency.coefficient}"
+                       {else}
+                           value="{$addons.gift_certificates.min_amount|fn_format_rate_value:"":$currencies.$primary_currency.decimals:$currencies.$primary_currency.decimals_separator:$currencies.$primary_currency.thousands_separator:$currencies.$primary_currency.coefficient}"
+                       {/if}
+                />
 
 
                 {if $currencies.$primary_currency.after == "Y"}{$currencies.$primary_currency.symbol nofilter}{/if}
-                <p><small>{$text_gift_cert_amount_alert nofilter}</small></p>
+                <p class="muted description">{$text_gift_cert_amount_alert nofilter}</p>
             </div>
         </div>
 
@@ -186,7 +210,7 @@ Tygh.tr('text_gift_cert_amount_alert',  '{$text_gift_cert_amount_alert|escape:ja
                 </div>
             </div>
 
-            {$_country = $gift_cert_data.country|default:$settings.General.default_country}
+            {$_country = $gift_cert_data.country|default:$settings.Checkout.default_country}
             <div class="control-group">
                 <label for="elm_gift_cert_country" class="control-label cm-required">{__("country")}:</label>
                 <div class="controls">
@@ -199,7 +223,7 @@ Tygh.tr('text_gift_cert_amount_alert',  '{$text_gift_cert_amount_alert|escape:ja
                 </div>
             </div>
 
-            {$_state = $gift_cert_data.state|default:$settings.General.default_state}
+            {$_state = $gift_cert_data.state|default:$settings.Checkout.default_state}
             <div class="control-group">
                 <label for="elm_gift_cert_state" class="control-label cm-required">{__("state")}:</label>
                 <div class="controls">
@@ -223,9 +247,9 @@ Tygh.tr('text_gift_cert_amount_alert',  '{$text_gift_cert_amount_alert|escape:ja
             </div>
 
             <div class="control-group">
-                <label class="control-label" for="elm_gift_cert_phone">{__("phone")}:</label>
+                <label class="control-label cm-mask-phone-label" for="elm_gift_cert_phone">{__("phone")}:</label>
                <div class="controls">
-                    <input type="text" id="elm_gift_cert_phone" name="gift_cert_data[phone]" value="{$gift_cert_data.phone}">
+                    <input type="text" class="cm-mask-phone" id="elm_gift_cert_phone" name="gift_cert_data[phone]" value="{$gift_cert_data.phone}">
                </div>
             </div>
         </div>
@@ -259,7 +283,7 @@ Tygh.tr('text_gift_cert_amount_alert',  '{$text_gift_cert_amount_alert|escape:ja
 
             {if $log}
             <div class="table-responsive-wrapper">
-                <table class="table sortable table-responsive">
+                <table class="table sortable table--relative table-responsive">
                 <thead>
                     <tr>
                         <th><a class="cm-ajax{if $search.sort_by == "timestamp"} sort-link-{$search.sort_order_rev}{/if}" href="{"`$c_url`&sort_by=timestamp&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("date")}{if $search.sort_by == "timestamp"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
@@ -338,14 +362,11 @@ Tygh.tr('text_gift_cert_amount_alert',  '{$text_gift_cert_amount_alert|escape:ja
         {/capture}
         {dropdown content=$smarty.capture.tools_list}
 
-        {if !$id}
-            {$title =__("new_certificate")}
-        {else}
-            {$title_start = __('editing_certificate')}
-            {$title_end = $gift_cert_data.gift_cert_code}
-        {/if}
-
         {include file="buttons/save_cancel.tpl" but_name="dispatch[gift_certificates.update]" but_role="submit-link" extra=$smarty.capture.gift_extra_tools save=$id but_target_form="gift_certificates_form"}
     {/capture}
 
-{include file="common/mainbox.tpl" title_start=$title_start title_end=$title_end title=$title content=$smarty.capture.mainbox buttons=$smarty.capture.buttons}
+{include file="common/mainbox.tpl"
+    title=($id) ? $gift_cert_data.gift_cert_code : __("new_certificate")
+    content=$smarty.capture.mainbox
+    buttons=$smarty.capture.buttons
+}

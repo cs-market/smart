@@ -23,7 +23,7 @@ class YandexDeliveryGetReceiptTest extends ATestCase
      */
     protected function setUp()
     {
-        define('AREA', true);
+        define('AREA', 'A');
         define('CART_LANGUAGE', 'en');
         define('CART_PRIMARY_CURRENCY', 'RUB');
 

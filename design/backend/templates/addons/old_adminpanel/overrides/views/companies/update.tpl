@@ -229,12 +229,6 @@
     </div>
 </div>
 
-<div class="control-group">
-    <label class="control-label" for="elm_company_fax">{__("fax")}:</label>
-    <div class="controls">
-        <input type="text" class="input-large" name="company_data[fax]" id="elm_company_fax" size="32" value="{$company_data.fax}"  />
-    </div>
-</div>
 {/hook}
 
 {hook name="companies:shipping_address"}

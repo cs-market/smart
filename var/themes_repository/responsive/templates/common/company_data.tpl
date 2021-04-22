@@ -18,6 +18,15 @@
     {$smarty.capture.$capture_name nofilter}
 {/if}
 
+{capture name="vendor_rating_`$obj_id`"}
+    {hook name="companies:vendor_rating"}
+    {/hook}
+{/capture}
+{if $no_capture}
+    {$capture_name="vendor_rating_`$obj_id`"}
+    {$smarty.capture.$capture_name nofilter}
+{/if}
+
 {capture name="rating_`$obj_id`"}
     {hook name="companies:data_block"}
     {/hook}
@@ -47,6 +56,16 @@
     {$smarty.capture.$capture_name nofilter}
 {/if}
 
+{capture name="address_`$obj_id`"}
+    {if $show_address}
+        {$company.address nofilter}
+    {/if}
+{/capture}
+{if $no_capture}
+    {$capture_name="address_`$obj_id`"}
+    {$smarty.capture.$capture_name nofilter}
+{/if}
+
 {capture name="city_`$obj_id`"}
     {if $show_city}
         {$company.city nofilter}
@@ -64,6 +83,26 @@
 {/capture}
 {if $no_capture}
     {$capture_name="country_`$obj_id`"}
+    {$smarty.capture.$capture_name nofilter}
+{/if}
+
+{capture name="location_`$obj_id`"}
+    {if $show_location}
+        {$company.city|trim nofilter}{if $company.city|trim && $company.country|trim}, {/if}{$company.country|trim nofilter}
+    {/if}
+{/capture}
+{if $no_capture}
+    {$capture_name="location_`$obj_id`"}
+    {$smarty.capture.$capture_name nofilter}
+{/if}
+
+{capture name="location_full_`$obj_id`"}
+    {if $show_location_full}
+        {$company.city|trim nofilter}{if $company.city|trim && $company.state|trim}, {/if} {$company.state|fn_get_state_name:$company.country} {$company.zipcode|trim nofilter}
+    {/if}
+{/capture}
+{if $no_capture}
+    {$capture_name="location_full_`$obj_id`"}
     {$smarty.capture.$capture_name nofilter}
 {/if}
 

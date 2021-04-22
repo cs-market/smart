@@ -15,7 +15,7 @@
 
 {if $plans}
 <div class="table-responsive-wrapper">
-    <table width="100%" class="table table-middle{if !$has_management_permissions} cm-hide-inputs{/if}">
+    <table width="100%" class="table table-middle table--relative{if !$has_management_permissions} cm-hide-inputs{/if} table-responsive">
     <thead>
     <tr>
         <th width="1%" class="left mobile-hide">
@@ -27,7 +27,7 @@
             <a class="cm-ajax" href="{"`$c_url`&sort_by=plan&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("name")}{if $search.sort_by == "plan"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
         </th>
         <th width="22%" class="center">
-            <a class="cm-ajax" href="{"`$c_url`&sort_by=price&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("price")} ({$currencies[$smarty.const.CART_PRIMARY_CURRENCY].symbol}){if $search.sort_by == "price"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
+            <a class="cm-ajax" href="{"`$c_url`&sort_by=price&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("price")} ({$currencies.$primary_currency.symbol nofilter}){if $search.sort_by == "price"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a>
         </th>
         <th width="10%" class="center nowrap">{__("vendor_plans.best_choise_short")}</th>
         <th width="12%" class="center">{__("vendors")}</th>
@@ -75,7 +75,7 @@
             {capture name="tools_items"}
             {hook name="vendor_plans:list_extra_links"}
                 {if $has_management_permissions}
-                    <li>{include file="common/popupbox.tpl" id="plan_`$plan.plan_id`" title_start=__("vendor_plans.editing_vendor_plan") title_end=$plan.plan link_text=__("edit") act="link" href="vendor_plans.update?plan_id=`$plan.plan_id`"}</li>
+                    <li>{include file="common/popupbox.tpl" id="plan_`$plan.plan_id`" text=$plan.plan link_text=__("edit") act="link" href="vendor_plans.update?plan_id=`$plan.plan_id`"}</li>
                     <li>{btn type="list" class="cm-confirm" href="vendor_plans.delete?plan_id=`$plan.plan_id`&redirect_url=`$return_current_url`" text=__("delete") method="POST"}</li>
                 {/if}
             {/hook}

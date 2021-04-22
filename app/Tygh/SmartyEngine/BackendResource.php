@@ -15,6 +15,8 @@
 namespace Tygh\SmartyEngine;
 
 use Tygh\Registry;
+use Smarty_Template_Source;
+use Smarty_Internal_Template;
 
 class BackendResource extends FileResource
 {
@@ -26,7 +28,7 @@ class BackendResource extends FileResource
      *
      * @return string fully qualified filepath
      */
-    protected function buildFilepath(\Smarty_Template_Source $source, \Smarty_Internal_Template $_template = null)
+    protected function buildFilepath(Smarty_Template_Source $source, Smarty_Internal_Template $_template = null)
     {
         $file = $source->name;
         $_directory = Registry::get('config.dir.design_backend') . 'templates/';

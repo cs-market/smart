@@ -29,7 +29,7 @@
             {$value}
             {assign var="c_code" value=$value}
         {elseif $element.element_type == $smarty.const.FORM_STATES}
-            {assign var="c_code" value=$c_code|default:$settings.General.default_country}
+            {assign var="c_code" value=$c_code|default:$settings.Checkout.default_country}
             {assign var="state" value=$value|fn_get_state_name:$c_code}
             {$state|default:$value}
         {else}

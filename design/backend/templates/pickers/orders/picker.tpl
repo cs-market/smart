@@ -55,8 +55,9 @@
 {elseif $view_mode != "button"}
 
     <input id="o{$data_id}_ids" type="hidden" name="{$input_name}" value="{if $item_ids}{","|implode:$item_ids}{/if}" />
-    <div class="table-wrapper">
-        <table class="table table-middle">
+    <div class="clearfix"></div>
+    <div class="table-responsive-wrapper">
+        <table class="table table-middle table--relative table-responsive">
             <thead>
                 <tr>
                     <th width="10%">{__("id")}</th>
@@ -76,7 +77,7 @@
             </tbody>
             <tbody id="{$data_id}_no_item"{if $item_ids} class="hidden"{/if}>
             <tr class="no-items">
-                <td colspan="{if !$view_only}6{else}5{/if}"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
+                <td colspan="{if !$view_only}6{else}5{/if}" data-th="&nbsp;"><p>{$no_item_text|default:__("no_items") nofilter}</p></td>
             </tr>
             </tbody>
         </table>

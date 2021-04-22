@@ -49,7 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     "SELECT status FROM ?:gift_certificates WHERE gift_cert_code = ?s ?p",
                     $gift_cert_code, fn_get_gift_certificate_company_condition('?:gift_certificates.company_id')
                 );
-                    Tygh::$app['session']['promotion_notices']['gift_certificates']['messages'][] = 'no_such_coupon';
+
+                Tygh::$app['session']['promotion_notices']['gift_certificates']['messages'][] = 'no_such_coupon';
             }
         }
 

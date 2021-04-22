@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: pl\n"
-"X-Crowdin-File: /release-4.8.2/addons/discussion.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:08\n"
+"X-Crowdin-File: /release-4.12.2/addons/discussion.po\n"
+"X-Crowdin-File-ID: 4056\n"
+"PO-Revision-Date: 2021-02-01 09:10\n"
 
 msgctxt "Addons::name::discussion"
 msgid "Comments and reviews"
@@ -80,6 +80,10 @@ msgctxt "Languages::discussion_title_company"
 msgid "Reviews"
 msgstr "Opinie"
 
+msgctxt "Languages::communication_and_rating"
+msgid "Communication and Rating"
+msgstr "Komunikacja i Ocena"
+
 msgctxt "Languages::communication"
 msgid "Communication"
 msgstr "Komunikacja"
@@ -145,12 +149,16 @@ msgid "Testimonials"
 msgstr "Referencje"
 
 msgctxt "Languages::privileges.view_discussions"
-msgid "View comments and reviews"
-msgstr "Komentarze i Opinie"
+msgid "Can view"
+msgstr "Może przeglądać"
 
 msgctxt "Languages::privileges.manage_discussions"
-msgid "Manage comments and reviews"
-msgstr "Zarządzanie komentarzami i opiniami"
+msgid "Can edit"
+msgstr "Może edytować"
+
+msgctxt "Languages::privilege_groups.discussions"
+msgid "Comments and reviews"
+msgstr "Komentarze i Opinie"
 
 msgctxt "Languages::block_testimonials"
 msgid "Testimonials"
@@ -188,10 +196,6 @@ msgctxt "SettingsSections::discussion::orders"
 msgid "Orders"
 msgstr "Zamówienia"
 
-msgctxt "SettingsSections::discussion::gift_registry"
-msgid "Gift registry"
-msgstr "Bony podarunkowe"
-
 msgctxt "SettingsSections::discussion::pages"
 msgid "Pages"
 msgstr "Strony"
@@ -216,14 +220,6 @@ msgctxt "SettingsOptions::discussion::product_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Tylko jeden post z jednego IP jest dozwolony"
 
-msgctxt "SettingsOptions::discussion::product_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Wysyłaj powiadomienia na ten adres E-mail"
-
-msgctxt "SettingsOptions::discussion::product_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "Wyślij powiadomienia do sprzedawcy"
-
 msgctxt "SettingsOptions::discussion::product_share_discussion"
 msgid "Share discussions with all stores"
 msgstr "Współdziel dyskusje w wszystkich sklepach"
@@ -244,10 +240,6 @@ msgctxt "SettingsOptions::discussion::category_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Tylko jeden post z jednego IP jest dozwolony"
 
-msgctxt "SettingsOptions::discussion::category_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Wysyłaj powiadomienia na ten adres E-mail"
-
 msgctxt "SettingsOptions::discussion::order_posts_per_page"
 msgid "Posts per page"
 msgstr "Postów na stronę"
@@ -255,18 +247,6 @@ msgstr "Postów na stronę"
 msgctxt "SettingsOptions::discussion::order_initiate"
 msgid "Allow customer to initiate discussion"
 msgstr "Pozwala klientowi zapoczątkować dyskusję"
-
-msgctxt "SettingsOptions::discussion::order_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "Wyślij powiadomienia do sprzedawcy"
-
-msgctxt "SettingsOptions::discussion::giftreg_posts_per_page"
-msgid "Posts per page"
-msgstr "Posty na stronę"
-
-msgctxt "SettingsOptions::discussion::giftreg_post_ip_check"
-msgid "Only one post from one IP is allowed"
-msgstr "Tylko jeden post z jednego IP jest dozwolony"
 
 msgctxt "SettingsOptions::discussion::page_posts_per_page"
 msgid "Posts per page"
@@ -279,14 +259,6 @@ msgstr "Administrator musi zatwierdzić wysyłane posty"
 msgctxt "SettingsOptions::discussion::page_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Tylko jeden post z jednego IP jest dozwolony"
-
-msgctxt "SettingsOptions::discussion::page_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Wysyłaj powiadomienia na ten adres E-mail"
-
-msgctxt "SettingsOptions::discussion::page_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "Wyślij powiadomienia do sprzedawcy"
 
 msgctxt "SettingsOptions::discussion::page_share_discussion"
 msgid "Share discussions with all stores"
@@ -308,10 +280,6 @@ msgctxt "SettingsOptions::discussion::home_page_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Dozwolony jest tylko jeden post z jednego IP"
 
-msgctxt "SettingsOptions::discussion::home_page_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Wysyłaj powiadomienia na ten adres E-mail"
-
 msgctxt "SettingsOptions::discussion::home_page_testimonials"
 msgid "Testimonials"
 msgstr "Referencje"
@@ -320,17 +288,49 @@ msgctxt "SettingsOptions::discussion::testimonials_from_all_stores"
 msgid "Show testimonials from all stores"
 msgstr "Pokaż referencje ze wszystkich sklepów"
 
+msgctxt "SettingsOptions::discussion::product_discussion_type"
+msgid "Default value"
+msgstr "Domyślna wartość"
+
+msgctxt "SettingsTooltips::discussion::product_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created products. Doesn't affect existing products."
+msgstr "Określa, czy komentarze i/lub opinie są dozwolone dla nowo tworzonych produktów. Nie wpływa na istniejące produkty."
+
+msgctxt "SettingsOptions::discussion::product_review_after_purchase"
+msgid "Only buyers can post"
+msgstr "Tylko kupujący mogą publikować"
+
+msgctxt "SettingsTooltips::discussion::product_review_after_purchase"
+msgid "Allow leaving reviews for a product only to those who bought that product."
+msgstr "Zezwalaj na pozostawienie recenzji produktu tylko tym, którzy kupili ten produkt."
+
+msgctxt "SettingsOptions::discussion::category_discussion_type"
+msgid "Default value"
+msgstr "Domyślna wartość"
+
+msgctxt "SettingsTooltips::discussion::category_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created categories. Doesn't affect existing categories."
+msgstr "Określa, czy komentarze i/lub opinie są dozwolone dla nowo tworzonych kategorii. Nie wpływa na istniejące kategorie."
+
+msgctxt "SettingsOptions::discussion::page_discussion_type"
+msgid "Default value"
+msgstr "Domyślna wartość"
+
+msgctxt "SettingsTooltips::discussion::page_discussion_type"
+msgid "Determines if comments and/or reviews are allowed for newly-created pages. Doesn't affect existing pages."
+msgstr "Określa, czy komentarze i/lub opinie są dozwolone dla nowo tworzonych stron. Nie wpływa na istniejące strony."
+
 msgctxt "SettingsOptions::discussion::company_discussion_type"
 msgid "Reviews"
 msgstr "Opinie"
 
 msgctxt "SettingsOptions::discussion::company_only_buyers"
-msgid "Allow to post only for buyers"
-msgstr "Zezwalaj na publikowanie tylko przez kupujących"
+msgid "Only buyers can post"
+msgstr "Tylko kupujący mogą publikować"
 
 msgctxt "SettingsTooltips::discussion::company_only_buyers"
-msgid "Only those who purchased something from the vendor can post"
-msgstr "Mogą publikować tylko ci, którzy kupili coś od sprzedającego"
+msgid "Allow leaving reviews for a vendor only to those who bought products from that vendor."
+msgstr "Zezwalaj na pozostawienie opinii o sprzedawcy tylko tym, którzy kupili produkty od tego sprzedawcy."
 
 msgctxt "SettingsOptions::discussion::company_posts_per_page"
 msgid "Posts per page"
@@ -344,14 +344,6 @@ msgctxt "SettingsOptions::discussion::company_post_ip_check"
 msgid "Only one post from one IP is allowed"
 msgstr "Tylko jeden post z jednego IP jest dozwolony"
 
-msgctxt "SettingsOptions::discussion::company_notification_email"
-msgid "Send notifications to this E-mail"
-msgstr "Wysyłaj powiadomienia na ten adres E-mail"
-
-msgctxt "SettingsOptions::discussion::company_notify_vendor"
-msgid "Send notifications to vendor"
-msgstr "Wysyłaj powiadomienia do sprzedawcy"
-
 msgctxt "SettingsVariants::discussion::company_post_approval::any"
 msgid "Any customer"
 msgstr "Dowolny klient"
@@ -363,22 +355,6 @@ msgstr "Tylko anonimowi klienci"
 msgctxt "SettingsVariants::discussion::company_post_approval::disabled"
 msgid "No approval needed"
 msgstr "Zatwierdzenie nie jest potrzebne"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::B"
-msgid "Communication and Rating"
-msgstr "Komunikacja i Ocena"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::C"
-msgid "Communication"
-msgstr "Komunikacja"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::R"
-msgid "Rating"
-msgstr "Ocena"
-
-msgctxt "SettingsVariants::discussion::company_discussion_type::D"
-msgid "Disabled"
-msgstr "Zablokowane"
 
 msgctxt "SettingsVariants::discussion::product_post_approval::any"
 msgid "Any customer"
@@ -428,22 +404,6 @@ msgctxt "SettingsVariants::discussion::home_page_post_approval::disabled"
 msgid "No approval needed"
 msgstr "Zatwierdzenie nie jest potrzebne"
 
-msgctxt "SettingsVariants::discussion::home_page_testimonials::B"
-msgid "Communication and Rating"
-msgstr "Komunikacja i ocena"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::C"
-msgid "Communication"
-msgstr "Komunikacja"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::R"
-msgid "Rating"
-msgstr "Ocena"
-
-msgctxt "SettingsVariants::discussion::home_page_testimonials::D"
-msgid "Disabled"
-msgstr "Zablokowane"
-
 msgctxt "Languages::discussion_tab_products"
 msgid "Product Reviews"
 msgstr "Recenzje produktu"
@@ -473,8 +433,8 @@ msgid "Comments and reviews notification"
 msgstr "Powiadomienia o komentarzach i opiniach"
 
 msgctxt "Languages::show_rating"
-msgid "Show rating"
-msgstr "Pokaż ocenę"
+msgid "Show review rating"
+msgstr "Pokaż ocenę opinii"
 
 msgctxt "Languages::gdpr_discussions_data"
 msgid "Personal data from discussions"
@@ -491,4 +451,48 @@ msgstr "<p> Twoje imię i nazwisko będzie widoczne przy Twojej recenzji lub kom
 msgctxt "Languages::discussion.agreement_text_short_add_new_review"
 msgid "I agree to have my personal data <u>processed as follows.</u>"
 msgstr "Wyrażam zgodę na przetwarzanie moich danych osobowych <u>w następujący sposób.</u>"
+
+msgctxt "Languages::discussion.please_log_in_to_write_a_review"
+msgid "Please sign in to write a review"
+msgstr "Zaloguj się napisać recenzję"
+
+msgctxt "Languages::discussion.you_have_to_buy_product_before_writing_review"
+msgid "You can't write a review for this product. Customers can write reviews only for the products they bought. If you actually bought this product from us, but are still seeing this message, please contact us."
+msgstr "Nie możesz napisać recenzji dla tego produktu. Klienci mogą pisać recenzje tylko dla produktów, które kupili. Jeśli faktycznie kupiłeś ten produkt od nas, ale nadal widzisz tę wiadomość, skontaktuj się z nami."
+
+msgctxt "Languages::discussion.you_have_to_buy_from_vendor_before_writing_review"
+msgid "You can't write a review for this vendor. Customers can write reviews for a vendor only after they buy something from that vendor. If you actually placed an order with this vendor, but are still seeing this message, please contact us."
+msgstr "Nie możesz napisać recenzji dla tego sprzedawcy. Klienci mogą pisać recenzje dla sprzedawcy dopiero po tym, jak kupią coś od tego sprzedawcy. Jeśli rzeczywiście złożyłeś zamówienie u tego sprzedawcy, ale nadal widzisz ten komunikat, skontaktuj się z nami."
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification_title"
+msgid "Comments and reviews add-on settings were changed"
+msgstr "Ustawienia dodatku Komentarze i opinie zostały zmienione"
+
+msgctxt "Languages::discussion.anonymous_setting_restored_upgrade_notification"
+msgid "In the 4.9.1 version the <strong>Only anonymous customers</strong> variant of the <strong>Administrator must approve posts submitted by</strong> setting was removed. Now, it is available again, with the ability to leave reviews for nonauthorized customers. Please check if the desirable value of the setting is selected."
+msgstr "W wersji 4.9.1 wariant <strong>Tylko anonimowi klienci</strong> opcji <strong>Administrator musi zatwierdzić posty przesłane przez</strong> został usunięty. Teraz jest ponownie dostępna, możliwość wystawiania opinii przez nieautoryzowanych klientów. Sprawdź, czy wybrana jest poprawna wartość w tym ustawieniu."
+
+msgctxt "Languages::discussion.event.products.new_post"
+msgid "Products: new review posted"
+msgstr "Produkty: opublikowano nową recenzję"
+
+msgctxt "Languages::discussion.event.testimonials.new_post"
+msgid "Testimonials: new review posted"
+msgstr "Referencje: opublikowano nową recenzję"
+
+msgctxt "Languages::discussion.event.orders.new_post"
+msgid "Order communication: new message added"
+msgstr "Komunikacja przy zamówieniu: dodano nową wiadomość"
+
+msgctxt "Languages::discussion.event.categories.new_post"
+msgid "Categories: new review posted"
+msgstr "Kategorie: opublikowano nową recenzję"
+
+msgctxt "Languages::discussion.event.pages.new_post"
+msgid "Pages: new comment posted"
+msgstr "Strony: opublikowano nowy komentarz"
+
+msgctxt "Languages::discussion.event.vendors.new_post"
+msgid "Vendors: new review posted"
+msgstr "Sprzedawcy: opublikowano nową recenzję"
 

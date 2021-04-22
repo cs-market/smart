@@ -12,29 +12,21 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-use Tygh\Registry;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-if ($mode == 'update' || $mode == 'add') {
-    $providers_list = fn_hybrid_auth_get_providers_list();
-    Tygh::$app['view']->assign('providers_list', $providers_list);
-    $linked_providers = array();
+if ($mode === 'update' || $mode === 'add') {
+    $linked_providers = [];
     if (!empty($auth['user_id'])) {
         $linked_providers = fn_hybrid_auth_get_link_provider($auth['user_id']);
     }
 
     Tygh::$app['view']->assign('linked_providers', $linked_providers);
 
-} elseif ($mode == 'unlink_provider') {
-
+} elseif ($mode === 'unlink_provider') {
     if (defined('AJAX_REQUEST')) {
-        if (!empty($auth['user_id']) && !empty($_REQUEST['provider'])) {
-            fn_hybrid_auth_get_unlink_provider($auth['user_id'], $_REQUEST['provider']);
+        if (!empty($auth['user_id']) && !empty($_REQUEST['provider_id'])) {
+            fn_hybrid_auth_get_unlink_provider($auth['user_id'], $_REQUEST['provider_id']);
         }
-
-        $providers_list = fn_hybrid_auth_get_providers_list();
-        Tygh::$app['view']->assign('providers_list', $providers_list);
 
         if (!empty($auth['user_id'])) {
             $linked_providers = fn_hybrid_auth_get_link_provider($auth['user_id']);
@@ -46,11 +38,10 @@ if ($mode == 'update' || $mode == 'add') {
 
     exit;
 
-} elseif ($mode == 'link_provider') {
-
+} elseif ($mode === 'link_provider') {
     $status = fn_hybrid_auth_process('link_provider_profile', $redirect_url);
 
-    if ($status == HYBRID_AUTH_LOADING) {
+    if ($status === HYBRID_AUTH_LOADING) {
         Tygh::$app['view']->display('addons/hybrid_auth/views/auth/loading.tpl');
 
     } else {

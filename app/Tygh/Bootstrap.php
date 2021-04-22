@@ -17,8 +17,21 @@ namespace Tygh;
 use Tygh\Tools\Url;
 use Tygh\Exceptions\InputException;
 
+/**
+ * Class Bootstrap
+ *
+ * @package Tygh
+ *
+ * phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
+ * phpcs:disable SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification
+ * phpcs:disable Squiz.Commenting.FunctionComment.TypeHintMissing
+ * phpcs:disable Squiz.Commenting.FunctionComment.EmptyThrows
+ */
 class Bootstrap
 {
+    const INI_PARAM_TYPE_INT = 1;
+    const INI_PARAM_TYPE_BYTE = 2;
+
     /**
      * Sends headers
      * @param bool $is_https indicates current working mode - https or not
@@ -26,7 +39,7 @@ class Bootstrap
     public static function sendHeaders($is_https = false)
     {
         // Click-jacking protection
-        //header("X-Frame-Options: sameorigin");
+        header('X-Frame-Options: SAMEORIGIN');
 
         // Cache-preventing headers sending removed from here,
         // because this is done by session_start() depending on the session.cache_limiter configruation parameter value
@@ -41,7 +54,6 @@ class Bootstrap
     public static function setConfigOptions($dir_root)
     {
         ini_set('magic_quotes_sybase', 0);
-        ini_set('pcre.backtrack_limit', '1000000'); // this value php versions < 5.3.7 10 times less, so set it as in newer versions.
         ini_set('pcre.jit', 0); // workaround for bug https://bugs.php.net/bug.php?id=70110
         ini_set('arg_separator.output', '&');
         ini_set('include_path', $dir_root . '/app/lib/pear/' . PATH_SEPARATOR . ini_get('include_path'));
@@ -53,6 +65,15 @@ class Bootstrap
 
         if (!defined('DEVELOPMENT') || DEVELOPMENT === false) {
             ignore_user_abort(true);
+        }
+
+        // Set maximum memory limit
+        if (PHP_INT_SIZE == 4 && self::getIniParam('memory_limit', Bootstrap::INI_PARAM_TYPE_BYTE) < 64 * 1024 * 1024) {
+            // 32bit PHP
+            @ini_set('memory_limit', '64M');
+        } elseif (PHP_INT_SIZE == 8 && self::getIniParam('memory_limit', Bootstrap::INI_PARAM_TYPE_BYTE) < 256 * 1024 * 1024) {
+            // 64bit PHP
+            @ini_set('memory_limit', '256M');
         }
     }
 
@@ -101,8 +122,7 @@ class Bootstrap
         }
 
         if (!empty($server['QUERY_STRING'])) {
-            $server['QUERY_STRING'] = (defined('QUOTES_ENABLED')) ? stripslashes($server['QUERY_STRING']) : $server['QUERY_STRING'];
-            $server['QUERY_STRING'] = str_replace(array('"', "'"), array('', ''), $server['QUERY_STRING']);
+            $server['QUERY_STRING'] = str_replace(['"', "'"], ['', ''], $server['QUERY_STRING']);
         }
 
         // resolve symbolic links
@@ -157,13 +177,14 @@ class Bootstrap
     /**
      * Inits console mode
      *
-     * @param  array  $get      GET superglobal array
-     * @param  array  $post     POST superglobal array
-     * @param  array  $server   SERVER superglobal array
-     * @param  string $dir_root root directory
+     * @param array  $get      GET superglobal array
+     * @param array  $post     POST superglobal array
+     * @param array  $server   SERVER superglobal array
+     * @param string $dir_root Root directory
      *
-     * @throws InputException
-     * @return array  list of filtered get and server arrays
+     * @return array{array, array, array} List of filtered get and server arrays
+     *
+     * @throws \Tygh\Exceptions\InputException
      */
     public static function initConsoleMode($get, $post, $server, $dir_root)
     {
@@ -180,7 +201,7 @@ class Bootstrap
                 $method = 'POST';
                 unset($get['p']);
                 $post = $get;
-                $get = array();
+                $get = [];
             }
 
             $server['SERVER_SOFTWARE'] = 'Tygh';
@@ -192,16 +213,18 @@ class Bootstrap
             @set_time_limit(0); // the script, running in console mode has no time limits
         }
 
-        return array($get, $post, $server);
+        return [$get, $post, $server];
     }
 
     /**
      * Inits environment
-     * @param  array  $get      GET superglobal array
-     * @param  array  $post     POST subperglobal array
-     * @param  array  $server   SERVER superglobal array
-     * @param  string $dir_root root directory
-     * @return array  combined and filtered GET/POST array
+     *
+     * @param array  $get      GET superglobal array
+     * @param array  $post     POST subperglobal array
+     * @param array  $server   SERVER superglobal array
+     * @param string $dir_root Root directory
+     *
+     * @return array{array, array, array, array} Combined and filtered GET/POST array
      */
     public static function initEnv($get, $post, $server, $dir_root)
     {
@@ -221,7 +244,7 @@ class Bootstrap
             self::sendHeaders(defined('HTTPS'));
         }
 
-        return array(self::processRequest($get, $post), $server, $get, $post);
+        return [self::processRequest($get, $post), $server, $get, $post];
     }
 
     /**
@@ -233,13 +256,9 @@ class Bootstrap
     {
         define('TIME', time());
         define('MICROTIME', microtime(true));
-        define('MIN_PHP_VERSION', '5.3.6');
+        define('MIN_PHP_VERSION', '5.6.0');
         define('CHARSET', 'utf-8');
         define('BOOTSTRAP', true);
-
-        if (get_magic_quotes_gpc()) {
-            define('QUOTES_ENABLED', true);
-        }
 
         if (self::isWindows()) {
             define('IS_WINDOWS', true);
@@ -250,10 +269,6 @@ class Bootstrap
             define('REAL_HOST', $server['HTTP_X_FORWARDED_HOST']);
         } else {
             define('REAL_HOST', $server['HTTP_HOST']);
-        }
-
-        if (!defined('JSON_UNESCAPED_UNICODE')) { // for php 5.3
-            define('JSON_UNESCAPED_UNICODE', 256);
         }
 
         define('REAL_URL', (defined('HTTPS') ? 'https://' : 'http://') . REAL_HOST . (!empty($server['REQUEST_URI']) ? $server['REQUEST_URI'] : ''));
@@ -267,9 +282,11 @@ class Bootstrap
 
     /**
      * Processes request vars and combine them
-     * @param  array $get  GET vars
-     * @param  array $post POST vars
-     * @return array combined filtered array with post and get vars
+     *
+     * @param array $get  GET vars
+     * @param array $post POST vars
+     *
+     * @return array Combined filtered array with post and get vars
      */
     public static function processRequest($get, $post)
     {
@@ -288,10 +305,6 @@ class Bootstrap
      */
     public static function safeInput($data)
     {
-        if (defined('QUOTES_ENABLED')) {
-            $data = self::stripSlashes($data);
-        }
-
         return self::stripTags($data);
     }
 
@@ -341,8 +354,9 @@ class Bootstrap
     /**
      * Retrieves parameter from php options
      *
-     * @param  string  $param     parameter to get value for
-     * @param  boolean $get_value if true, get value, otherwise return true if parameter enabled, false if disabled
+     * @param  string      $param     parameter to get value for
+     * @param  boolean|int $get_value if true, get value, otherwise return true if parameter enabled, false if disabled
+     *
      * @return mixed   parameter value
      */
     public static function getIniParam($param, $get_value = false)
@@ -362,6 +376,24 @@ class Bootstrap
 
         if ($get_value == false) {
             $value = (intval($value) || !strcasecmp($value, 'on')) ? true : false;
+        } elseif ($get_value === self::INI_PARAM_TYPE_INT) {
+            $value = (int) $value;
+        } elseif ($get_value === self::INI_PARAM_TYPE_BYTE) {
+            if (!$value) {
+                $value = 0;
+            } else {
+                $suffix = strtolower($value[strlen($value) - 1]);
+                $value = (int) $value;
+
+                switch ($suffix) {
+                    case 'g':
+                        $value *= 1024;
+                    case 'm':
+                        $value *= 1024;
+                    case 'k':
+                        $value *= 1024;
+                }
+            }
         }
 
         return $value;

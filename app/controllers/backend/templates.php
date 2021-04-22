@@ -382,10 +382,9 @@ function fn_te_check_path($path)
  */
 function fn_te_get_root($type)
 {
-    if (fn_allowed_for('MULTIVENDOR') || Registry::get('runtime.company_id')) {
+    $extra_path = '';
+    if (Registry::get('runtime.company_id')) {
         $extra_path = '[theme]/';
-    } else {
-        $extra_path = '';
     }
 
     if ($type == 'full') {
@@ -468,7 +467,7 @@ function fn_te_filter_path($path)
 
     fn_set_hook('te_filter_path', $filter, $path, $fileext_filter);
 
-    if (in_array(fn_get_file_ext($filename), $fileext_filter)) {
+    if (is_file($path) && in_array(fn_get_file_ext($filename), $fileext_filter)) {
         return true;
     }
 

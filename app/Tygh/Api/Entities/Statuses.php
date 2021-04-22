@@ -20,9 +20,9 @@ use Tygh\Registry;
 
 class Statuses extends AEntity
 {
-    public function index($id = '', $params = array())
+    public function index($id = '', $params = [])
     {
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
 
         $type = (!empty($params['type'])) ? $params['type'] : STATUSES_ORDER;
 
@@ -38,34 +38,35 @@ class Statuses extends AEntity
             $items_per_page = $this->safeGet($params, 'items_per_page', Registry::get('settings.Appearance.admin_elements_per_page'));
             $page = $this->safeGet($params, 'page', 1);
 
-            $data = fn_get_statuses($type, array(), false, false, $lang_code);
+            $data = fn_get_statuses($type, [], false, false, $lang_code);
             $data = array_values($data);
+            $total_items_count = count($data);
 
             if ($items_per_page) {
                 $data = array_slice($data, ($page - 1) * $items_per_page, $items_per_page);
             }
 
-            $data = array(
+            $data = [
                 'statuses' => $data,
-                'params' => array(
+                'params'   => [
                     'items_per_page' => $items_per_page,
-                    'page' => $page,
-                    'total_items' => count($data),
-                ),
-            );
+                    'page'           => $page,
+                    'total_items'    => $total_items_count,
+                ],
+            ];
             $status = Response::STATUS_OK;
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function create($params)
     {
         $status = Response::STATUS_BAD_REQUEST;
-        $data = array();
+        $data = [];
         $valid_params = true;
 
         if (empty($params['type'])) {
@@ -73,9 +74,9 @@ class Statuses extends AEntity
         }
 
         if (empty($params['description'])) {
-            $data['message'] = __('api_required_field', array(
+            $data['message'] = __('api_required_field', [
                 '[field]' => 'description'
-            ));
+            ]);
             $valid_params = false;
         }
 
@@ -87,26 +88,26 @@ class Statuses extends AEntity
 
             if ($status_data) {
                 $status = Response::STATUS_CREATED;
-                $data = array(
+                $data = [
                     'status_id' => $status_data['status_id']
-                );
+                ];
             }
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function update($id, $params)
     {
         $status = Response::STATUS_BAD_REQUEST;
-        $data = array();
+        $data = [];
 
         unset($params['status_id']);
 
-        $lang_code = $this->safeGet($params, 'lang_code', DEFAULT_LANGUAGE);
+        $lang_code = $this->getLanguageCode($params);
         $status_data = fn_get_status_by_id($id, $lang_code);
 
         if (empty($status_data)) {
@@ -118,21 +119,21 @@ class Statuses extends AEntity
 
             if ($status_name) {
                 $status = Response::STATUS_OK;
-                $data = array(
+                $data = [
                     'status_id' => $id
-                );
+                ];
             }
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function delete($id)
     {
-        $data = array();
+        $data = [];
         $status = Response::STATUS_BAD_REQUEST;
 
         $status_data = fn_get_status_by_id($id, DEFAULT_LANGUAGE);
@@ -146,20 +147,19 @@ class Statuses extends AEntity
             }
         }
 
-        return array(
+        return [
             'status' => $status,
-            'data' => $data
-        );
+            'data'   => $data
+        ];
     }
 
     public function privileges()
     {
-        return array(
+        return [
             'create' => 'manage_order_statuses',
             'update' => 'manage_order_statuses',
             'delete' => 'manage_order_statuses',
             'index'  => 'manage_order_statuses'
-        );
+        ];
     }
-
 }

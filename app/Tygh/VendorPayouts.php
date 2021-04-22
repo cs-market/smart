@@ -16,6 +16,7 @@ namespace Tygh;
 
 use Tygh\Enum\VendorPayoutApprovalStatuses;
 use Tygh\Enum\VendorPayoutTypes;
+use Tygh\Enum\YesNo;
 
 class VendorPayouts
 {
@@ -218,6 +219,7 @@ class VendorPayouts
         $fields = array(
             'payouts.*' => 'payouts.*',
             'company' => 'companies.company',
+            'original_payout_amount' => 'payouts.payout_amount',
             'payout_amount' => 'IF(payouts.order_id <> 0, payouts.order_amount, payouts.payout_amount)',
             'date' => "IF(payouts.order_id <> 0, payouts.end_date, '')",
         );
@@ -255,12 +257,21 @@ class VendorPayouts
         $params['total_items'] = $this->db->getField("SELECT FOUND_ROWS()");
 
         foreach ($payouts as $i => $payout) {
+            if ($payout['payout_type'] == VendorPayoutTypes::WITHDRAWAL) {
+                $payout['payout_amount'] = $payout['original_payout_amount'];
+            }
+
             $payouts[$i]['payout_type_description'] = $this->getDescription($payout);
+            $payouts[$i]['display_amount'] = $payout['payout_amount'];
             // payouts have to be displayed inverted for vendors
             if ($this->getVendor() && $payout['payout_type'] == VendorPayoutTypes::PAYOUT) {
                 $payouts[$i]['display_amount'] = -$payout['payout_amount'];
             } else {
                 $payouts[$i]['display_amount'] = $payout['payout_amount'];
+            }
+
+            if (isset($payout['extra'])) {
+                $payouts[$i]['extra'] = json_decode($payout['extra'], true);
             }
         }
 
@@ -369,7 +380,7 @@ class VendorPayouts
     }
 
     /**
-     * Populates condtions for \Tygh\VendorPayouts::getListWithTotals().
+     * Populates conditions for \Tygh\VendorPayouts::getListWithTotals().
      *
      * @param array $params Request parameters
      *
@@ -446,6 +457,7 @@ class VendorPayouts
         if ($this->vendor) {
             $params['vendor'] = $this->vendor;
         }
+
         if (!empty($params['vendor']) && $params['vendor'] != 'all') {
             $condition .= $this->db->quote(' AND payouts.company_id = ?i', $params['vendor']);
         }
@@ -546,12 +558,12 @@ class VendorPayouts
         // admin:  sum(C) + sum(P_approved)
         if ($this->vendor) {
             $fields['payouts_summary'] = $this->db->quote(
-                'SUM(payouts.payout_amount * IF(payouts.payout_type = ?s,-1,0))',
+                'SUM(payouts.payout_amount * CASE WHEN payouts.payout_type = ?s THEN -1 ELSE 0 END * CASE WHEN payouts.payout_amount > 0 THEN 1 ELSE 0 END)',
                 VendorPayoutTypes::PAYOUT
             );
         } else {
             $fields['payouts_summary'] = $this->db->quote(
-                'SUM(payouts.payout_amount * IF(payouts.payout_type = ?s,1,0) * IF(payouts.approval_status = ?s,1,0))',
+                'SUM(payouts.payout_amount * CASE WHEN payouts.payout_type = ?s THEN 1 ELSE 0 END * CASE WHEN payouts.approval_status = ?s THEN 1 ELSE 0 END * CASE WHEN payouts.payout_amount > 0 THEN 1 ELSE 0 END)',
                 VendorPayoutTypes::PAYOUT,
                 VendorPayoutApprovalStatuses::COMPLETED
             );
@@ -653,8 +665,9 @@ class VendorPayouts
 
             $fields = array(
                 'withdrawals_summary' => $this->db->quote(
-                    'SUM(payouts.payout_amount * IF(payouts.payout_type = ?s,1,0) * IF(payouts.approval_status = ?s,0,1))',
+                    'SUM(payouts.payout_amount * CASE WHEN payouts.payout_type = ?s AND payouts.payout_amount > 0 THEN 1 WHEN payouts.payout_type = ?s AND payouts.payout_amount < 0 THEN 1 ELSE 0 END * CASE WHEN payouts.approval_status = ?s THEN 0 ELSE 1 END)',
                     VendorPayoutTypes::WITHDRAWAL,
+                    VendorPayoutTypes::PAYOUT,
                     VendorPayoutApprovalStatuses::DECLINED
                 )
             );

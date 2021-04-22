@@ -53,7 +53,7 @@ if ($mode == 'search_tracking') {
                                     'timestamp' => strtotime($d_result->OperationParameters->OperDate),
                                     'address' => $d_result->AddressParameters->OperationAddress->Description,
                                     'type_operation' => $d_result->OperationParameters->OperType->Name,
-                                    'status' => $d_result->OperationParameters->OperAttr->Name
+                                    'status' => (string) $d_result->OperationParameters->OperAttr->Name
                                 );
 
                                 $status_id = db_get_row('SELECT id FROM ?:rus_russianpost_status WHERE order_id = ?i AND shipment_id = ?i AND tracking_number = ?s AND timestamp = ?i AND status = ?s', $data_status['order_id'], $data_status['shipment_id'], $data_status['tracking_number'], $data_status['timestamp'], $data_status['status']);

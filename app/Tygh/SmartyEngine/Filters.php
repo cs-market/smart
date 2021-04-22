@@ -17,6 +17,7 @@ namespace Tygh\SmartyEngine;
 use Tygh\Registry;
 use Tygh\Embedded;
 use Tygh\Tools\Url;
+use Tygh\Languages\Values as LanguageValues;
 
 class Filters
 {
@@ -103,78 +104,6 @@ class Filters
 
         return $content;
     }
-    /**
-     * Prefilter: form tooltip
-     * @param  string                    $content  template content
-     * @param  \Smarty_Internal_Template $template template instance
-     * @return string                    template content
-     */
-    public static function preFormTooltip($content, \Smarty_Internal_Template $template)
-    {
-        $pattern = '/\<label[^>]*\>.*(\{__\("([^\}]+)"\)\}[^:\<]*).*\<\/label\>/';
-
-        if (preg_match_all($pattern, $content, $matches)) {
-            $cur_templ = $template->template_resource;
-
-            $template_pattern = '/([^\/\.]+)/';
-            $template_name = '';
-            $ignored_names = array('tpl');
-
-            if (preg_match_all($template_pattern, $cur_templ, $template_matches)) {
-                foreach ($template_matches[0] as $k => $m) {
-                    if (!in_array($template_matches[1][$k], $ignored_names)) {
-                        $template_name .= $template_matches[1][$k] . '_';
-                    }
-                }
-            }
-
-            $template_pref = 'tt_' . $template_name;
-            $template_tooltips = fn_get_lang_vars_by_prefix($template_pref);
-
-            foreach ($matches[0] as $k => $m) {
-                $field_name = $matches[2][$k];
-                preg_match("/(^[a-zA-z0-9][\.a-zA-Z0-9_]*)/", $field_name, $name_matches);
-
-                if (@strlen($name_matches[0]) != strlen($field_name)) {
-                    continue;
-                }
-
-                $label = $matches[1][$k];
-
-                $template_lang_var = $template_pref . $field_name;
-                $common_lang_var = 'ttc_' . $field_name;
-
-                if (isset($_REQUEST['stt'])) {
-                    $template_text = isset($template_tooltips[$template_lang_var]) ? '{__("' . $template_lang_var . '")}' : '';
-                    $common_tip = __($common_lang_var);
-                    $common_text = '';
-                    if ($common_tip != '_' . $common_lang_var) {
-                        $common_text = '{__("' . $common_lang_var . '")}';
-                    }
-
-                    $tooltip_text = sprintf("%s: %s <br/> %s: %s", $common_lang_var, $common_text, $template_lang_var, $template_text);
-                    $tooltip = '{capture name="tooltip"}' . $tooltip_text . '{/capture}{include file="common/tooltip.tpl" tooltip=$smarty.capture.tooltip}';
-                } else {
-                    if (isset($template_tooltips[$template_lang_var])) {
-                        $tooltip_text = '__("' . $template_lang_var . '")';
-                    } else {
-                        $tooltip = __($common_lang_var);
-                        if ($tooltip == '_' . $common_lang_var || empty($tooltip)) {
-                            continue;
-                        }
-                        $tooltip_text = '__("' . $common_lang_var . '")';
-                    }
-
-                    $tooltip = '{include file="common/tooltip.tpl" tooltip=' . $tooltip_text . '}';
-                }
-                $tooltip_added = str_replace($label, $label . $tooltip, $matches[0][$k]);
-
-                $content = str_replace($matches[0][$k], $tooltip_added, $content);
-            }
-        }
-
-        return $content;
-    }
 
     /**
      * Prefilter: template wrapper for design mode
@@ -226,7 +155,7 @@ class Filters
         $content = str_replace('__(', '$_smarty_tpl->__(', $content);
 
         if (preg_match_all('/__\(\"([\w\.]*?)\"/i', $content, $matches)) {
-            return "<?php\nfn_preload_lang_vars(array('" . implode("','", $matches[1]) . "'));\n?>\n" . $content;
+            return "<?php\n\Tygh\Languages\Helper::preloadLangVars(array('" . implode("','", $matches[1]) . "'));\n?>\n" . $content;
         }
 
         return $content;
@@ -240,7 +169,7 @@ class Filters
      */
     public static function outputLiveEditorWrapper($content, \Smarty_Internal_Template $template)
     {
-        $pattern = '/\<(input|img|div)[^>]*?(\[lang name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/lang\])[^>]*?\>/';
+        $pattern = '/\<(input|img|div)[^>]*?(\[lang name\=([\w\-\.]+?)\](.*?)\[\/lang\])[^>]*?\>/';
         if (preg_match_all($pattern, $content, $matches)) {
             foreach ($matches[0] as $k => $m) {
                 $phrase_replaced = str_replace($matches[2][$k], $matches[5][$k], $matches[0][$k]);
@@ -258,7 +187,7 @@ class Filters
             }
         }
 
-        $pattern = '/(\<(textarea|option)[^<]*?)\>(\[lang name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/lang\])[^>]*?\>/is';
+        $pattern = '/(\<(textarea|option)[^<]*?)\>(\[lang name\=([\w\-\.]+?)\](.*?)\[\/lang\])[^>]*?\>/is';
         if (preg_match_all($pattern, $content, $matches)) {
             foreach ($matches[0] as $k => $m) {
                 $phrase_replaced = str_replace($matches[3][$k], $matches[6][$k], $matches[0][$k]);
@@ -272,22 +201,22 @@ class Filters
         }
 
         $pattern = '/<title>(.*?)<\/title>/is';
-        $pattern_inner = '/\[(lang) name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/\1\]/is';
+        $pattern_inner = '/\[(lang) name\=([\w\-\.]+?)\](.*?)\[\/\1\]/is';
         preg_match($pattern, $content, $matches);
         $phrase_replaced = $matches[0];
-        $phrase_replaced = preg_replace($pattern_inner, '$4', $phrase_replaced);
+        $phrase_replaced = preg_replace($pattern_inner, '$3', $phrase_replaced);
         $content = str_replace($matches[0], $phrase_replaced, $content);
 
         // remove translation tags from elements attributes
-        $pattern = '/(\<[^<>]*\=[^<>]*)(\[lang name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/lang\])[^<>]*?\>/is';
+        $pattern = '/(\<[^<>]*\=[^<>]*)(\[lang name\=([\w\-\.]+?)\](.*?)\[\/lang\])[^<>]*?\>/is';
         while (preg_match($pattern, $content, $matches)) {
-            $phrase_replaced = preg_replace($pattern_inner, '$4', $matches[0]);
+            $phrase_replaced = preg_replace($pattern_inner, '$3', $matches[0]);
             $content = str_replace($matches[0], $phrase_replaced, $content);
         }
 
-        $pattern = '/(?<=>)[^<]*?\[(lang) name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/\1\]/is';
-        $pattern_inner = '/\[(lang) name\=([\w-\.]+?)( cm\-pre\-ajax)?\]((?:(?>[^\[]+)|\[(?!\1[^\]]*\]))*?)\[\/\1\]/is';
-        $replacement = '<var class="live-edit-wrap"><i class="cm-icon-live-edit icon-live-edit ty-icon-live-edit"></i><var data-ca-live-edit="langvar::$2$3" class="cm-live-edit live-edit-item">$4</var></var>';
+        $pattern = '/(?<=>)[^<]*?\[(lang) name\=([\w\-\.]+?)\](.*?)\[\/\1\]/is';
+        $pattern_inner = '/\[(lang) name\=([\w\-\.]+?)\]((?:(?>[^\[]+)|\[(?!\1[^\]]*\]))*?)\[\/\1\]/is';
+        $replacement = '<var class="live-edit-wrap"><i class="cm-icon-live-edit icon-live-edit ty-icon-live-edit"></i><var data-ca-live-edit="langvar::$2" class="cm-live-edit live-edit-item">$3</var></var>';
         while (preg_match($pattern, $content, $matches)) {
             $phrase_replaced = $matches[0];
             while (preg_match($pattern_inner, $phrase_replaced)) {
@@ -296,10 +225,9 @@ class Filters
             $content = str_replace($matches[0], $phrase_replaced, $content);
         }
 
-        $pattern = '/\[(lang) name\=([\w-\.]+?)( cm\-pre\-ajax)?\](.*?)\[\/\1\]/';
-        $replacement = '$4';
+        $pattern = '/\[(lang) name\=([\w\-\.]+?)\](.*?)\[\/\1\]/';
+        $replacement = '$3';
         $content = preg_replace($pattern, $replacement, $content);
-
         return $content;
     }
 
@@ -392,7 +320,7 @@ class Filters
                     if (preg_match($tab_expr, $central_content, $matches)) {
                         if (!empty($matches[2])) {
                             // Add a new tab
-                            $tab_content = $matches[1] . $matches[2] . '<li id="tab_share_object' . $data['params']['object_id'] . '" class="cm-js cm-ajax"><a href="' . fn_url('companies.get_object_share?object=' . $data['params']['object'] . '&object_id=' . $data['params']['object_id']) . '">' . __('share') . '</a></li>' . $matches[3];
+                            $tab_content = $matches[1] . $matches[2] . '<li id="tab_share_object' . $data['params']['object_id'] . '" class="cm-js cm-ajax"><a href="' . fn_url('companies.get_object_share?object=' . $data['params']['object'] . '&object_id=' . $data['params']['object_id']) . '">' . __('storefronts') . '</a></li>' . $matches[3];
 
                             $central_content = preg_replace($tab_expr, fn_preg_replacement_quote($tab_content), $central_content, 1);
                         }

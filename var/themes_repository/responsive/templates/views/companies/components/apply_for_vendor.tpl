@@ -7,7 +7,7 @@
 
     <div class="clearfix">
         <br />
-        <div class="ty-float-left"> {__('text_successful_request')}</div>
+        <div class="ty-float-left"> {__("text_review_and_reach_out_request")}</div>
          
     </div>
 {/capture}

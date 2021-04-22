@@ -13,13 +13,14 @@
 ****************************************************************************/
 
 use Tygh\Registry;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 /** Body **/
 
 if (empty($_REQUEST['country_code'])) {
-    $_REQUEST['country_code'] = Registry::get('settings.General.default_country');
+    $_REQUEST['country_code'] = Registry::get('settings.Checkout.default_country');
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -63,6 +64,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    if ($mode === 'update_status') {
+        if (!empty($_REQUEST['state_ids'])) {
+            foreach ($_REQUEST['state_ids'] as $state_id) {
+                fn_tools_update_status([
+                    'table'             => 'states',
+                    'status'            => $_REQUEST['status'],
+                    'id_name'           => 'state_id',
+                    'id'                => $state_id,
+                    'show_error_notice' => false
+                ]);
+            }
+        }
+
+        return [CONTROLLER_STATUS_OK, $_REQUEST['redirect_url']];
+    }
+
     return array(CONTROLLER_STATUS_OK, 'states.manage?country_code=' . $_REQUEST['country_code']);
 }
 
@@ -70,7 +87,7 @@ if ($mode == 'manage') {
 
     $params = $_REQUEST;
     if (empty($params['country_code'])) {
-        $params['country_code'] = Registry::get('settings.General.default_country');
+        $params['country_code'] = Registry::get('settings.Checkout.default_country');
     }
 
     list($states, $search) = fn_get_states($params, Registry::get('settings.Appearance.admin_elements_per_page'), DESCR_SL);
@@ -88,7 +105,7 @@ function fn_update_state($state_data, $state_id = 0, $lang_code = DESCR_SL)
         if (!empty($state_data['code']) && !empty($state_data['state'])) {
             $state_data['state_id'] = $state_id = db_query("REPLACE INTO ?:states ?e", $state_data);
 
-            foreach (fn_get_translation_languages() as $state_data['lang_code'] => $_v) {
+            foreach (Languages::getAll() as $state_data['lang_code'] => $_v) {
                 db_query('REPLACE INTO ?:state_descriptions ?e', $state_data);
             }
         }

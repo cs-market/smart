@@ -19,13 +19,15 @@ function smarty_function_script($params, &$template)
             if ($file = $template->smarty->theme->getContentPath(DIR_ROOT . '/' . $params['src'])) {
                 $params['src'] = $file[Themes::PATH_RELATIVE];
             }
-            $src = Registry::get('config.current_location') . '/' . fn_link_attach($params['src'], 'ver=' . PRODUCT_VERSION);
+            $src = Registry::get('config.current_location') . '/' . fn_link_attach($params['src'], 'ver=' . Tygh::$app['assets_cache_key']);
         } else {
             $src = $params['src'];
         }
 
         $scripts[$params['src']] = '<script type="text/javascript"'
                                     . (!empty($params['class']) ? ' class="' . $params['class'] . '" ' : '')
+                                    . (!empty($params['async']) ? ' async ' : '')
+                                    . (!empty($params['defer']) ? ' defer ' : '')
                                     . ' src="' . $src . '" ' . (isset($params['charset']) ? ('charset="' . $params['charset'] . '"') : '') . (isset($params['escape']) ? '><\/script>' : '></script>');
 
         if (defined('AJAX_REQUEST') || Registry::get('runtime.inside_scripts')) {

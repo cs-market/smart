@@ -8,13 +8,13 @@ msgstr ""
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
 "X-Crowdin-Language: hu\n"
-"X-Crowdin-File: /release-4.8.2/addons/vendor_plans.po\n"
+"X-Crowdin-File: /release-4.9.3/addons/vendor_plans.po\n"
 "Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:05\n"
+"PO-Revision-Date: 2019-02-01 06:05\n"
 
 msgctxt "Addons::name::vendor_plans"
 msgid "Vendor plans"
-msgstr ""
+msgstr "Viszonteladói csomagok"
 
 msgctxt "Addons::description::vendor_plans"
 msgid "Create plans with different restrictions and prices for your vendors"
@@ -22,23 +22,31 @@ msgstr ""
 
 msgctxt "SettingsOptions::vendor_plans::commissions_header"
 msgid "Commissions"
-msgstr ""
+msgstr "Jutalékok"
 
 msgctxt "SettingsOptions::vendor_plans::include_shipping"
-msgid "Include shipping cost in vendors commission"
+msgid "Include shipping cost in vendor commissions"
+msgstr ""
+
+msgctxt "SettingsOptions::vendor_plans::include_taxes_in_commission"
+msgid "Include taxes in vendor commissions"
+msgstr ""
+
+msgctxt "SettingsTooltips::vendor_plans::include_taxes_in_commission"
+msgid "Calculate vendor commissions without subtracting taxes from the order total beforehand."
 msgstr ""
 
 msgctxt "SettingsOptions::vendor_plans::allow_vendors_to_change_plan"
 msgid "Allow vendors to change their current plan"
-msgstr ""
+msgstr "Viszonteladó megváltoztathatja az aktuális csomagját"
 
 msgctxt "Languages::vendor_plans.vendor_plans"
 msgid "Vendor plans"
-msgstr ""
+msgstr "Viszonteladói csomagok"
 
 msgctxt "Languages::block_vendor_plan_info"
 msgid "Vendor plan info"
-msgstr ""
+msgstr "Viszonteladói csomag információ"
 
 msgctxt "Languages::block_vendor_plan_info_description"
 msgid "Shows information about the selected vendor plan"
@@ -46,15 +54,15 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.plan"
 msgid "Plan"
-msgstr ""
+msgstr "Csomak"
 
 msgctxt "Languages::vendor_plans.commission"
 msgid "Commission"
-msgstr ""
+msgstr "Jutalék"
 
 msgctxt "Languages::vendor_plans.restrictions"
 msgid "Restrictions"
-msgstr ""
+msgstr "Korlátozások"
 
 msgctxt "Languages::vendor_plans.vendor_plans_menu_description"
 msgid "Create plans for your vendors, with different restrictions and prices"
@@ -62,19 +70,19 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.periodicity_month"
 msgid "per month"
-msgstr ""
+msgstr "havonta"
 
 msgctxt "Languages::vendor_plans.periodicity_year"
 msgid "per year"
-msgstr ""
+msgstr "évente"
 
 msgctxt "Languages::vendor_plans.periodicity_onetime"
 msgid "one time"
-msgstr ""
+msgstr "egyszeri"
 
 msgctxt "Languages::vendor_plans.products_limit"
 msgid "Max. products"
-msgstr ""
+msgstr "Max. termék száma"
 
 msgctxt "Languages::vendor_plans.products_limit_tooltip"
 msgid "Set the maximum number of products a vendor can have on this plan. Leave empty to allow unlimited number of products."
@@ -86,31 +94,35 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.add_vendor_plan"
 msgid "Add vendor plan"
-msgstr ""
+msgstr "Viszonteladói csomag hozzáadása"
 
 msgctxt "Languages::vendor_plans.new_vendor_plan"
 msgid "New vendor plan"
-msgstr ""
+msgstr "Új viszonteladói csomag"
 
 msgctxt "Languages::vendor_plans.editing_vendor_plan"
 msgid "Editing vendor plan"
-msgstr ""
+msgstr "Viszonteladói csomag szerkesztése"
 
 msgctxt "Languages::vendor_plans.delete_plan_vendor_exists_text"
 msgid "Couldn't delete the plan: some vendors use it"
-msgstr ""
+msgstr "Nem lehet törölni a csomagot, mivel valamelyik viszonteladó használja azt"
 
 msgctxt "Languages::vendor_plans.disable_plan_vendor_exists_text"
 msgid "Couldn't disable the plan: some vendors use it"
-msgstr ""
+msgstr "Nem lehet kikapcsolni a csomagot, mivel valamelyik viszonteladó használja azt"
 
 msgctxt "Languages::vendor_plans.transaction_fee"
 msgid "Transaction fee"
-msgstr ""
+msgstr "Tranzakciós díj"
+
+msgctxt "Languages::vendor_plans.fixed_transaction_fee"
+msgid "Transaction fee (abs)"
+msgstr "Tranzakciós díj (abs)"
 
 msgctxt "Languages::vendor_plans.revenue"
 msgid "Revenue"
-msgstr ""
+msgstr "Bevétel"
 
 msgctxt "Languages::vendor_plans.revenue_up_to"
 msgid "Revenue up to"
@@ -130,7 +142,7 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.best_choise_short"
 msgid "Best choice"
-msgstr ""
+msgstr "Legjobb választás"
 
 msgctxt "Languages::vendor_plans.select_plan_text"
 msgid "You will be charged for the plan after the admin approves your vendor account"
@@ -138,47 +150,47 @@ msgstr ""
 
 msgctxt "Languages::vendor_plans.current_plan"
 msgid "Current plan"
-msgstr ""
+msgstr "Jelenlegi csomag"
 
 msgctxt "Languages::vendor_plans.current_plan_usage"
 msgid "Current plan usage"
-msgstr ""
+msgstr "Jelenlegi csomag kihasználása"
 
 msgctxt "Languages::vendor_plans.best_choice"
 msgid "Best choice"
-msgstr ""
+msgstr "Legjobb választás"
 
 msgctxt "Languages::vendor_plans.choose_your_plan"
 msgid "Choose your plan"
-msgstr ""
+msgstr "Válassz csomagot"
 
 msgctxt "Languages::vendor_plans.choose"
 msgid "Choose"
-msgstr ""
+msgstr "Ezt választom"
 
 msgctxt "Languages::vendor_plans.month"
 msgid "Month"
-msgstr ""
+msgstr "Havonta"
 
 msgctxt "Languages::vendor_plans.year"
 msgid "Year"
-msgstr ""
+msgstr "Évente"
 
 msgctxt "Languages::vendor_plans.plan_name"
 msgid "Plan name"
-msgstr ""
+msgstr "Csomag neve"
 
 msgctxt "Languages::vendor_plans.products_limit_value"
 msgid "<strong>[products]</strong> products"
-msgstr ""
+msgstr "<strong>[products]</strong> termékek"
 
 msgctxt "Languages::vendor_plans.unlimited"
 msgid "Unlimited"
-msgstr ""
+msgstr "Korlátlan"
 
 msgctxt "Languages::vendor_plans.products_limit_unlimited"
 msgid "<strong>Unlimited</strong> products"
-msgstr ""
+msgstr "<strong>Korlátlan</strong> termékek"
 
 msgctxt "Languages::vendor_plans.revenue_up_to_value"
 msgid "Revenue up to <strong>[revenue]</strong>"
@@ -189,7 +201,7 @@ msgid "<strong>Unlimited</strong> revenue"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.transaction_fee_value"
-msgid "<strong>[value]</strong> transaction fee"
+msgid "Transaction fee: <strong>[value]</strong>"
 msgstr ""
 
 msgctxt "Languages::vendor_plans.vendor_commission"
@@ -274,6 +286,10 @@ msgstr ""
 
 msgctxt "Languages::addons.vendor_plans.commission_description_absolute"
 msgid "[amount] out of [sum]"
+msgstr ""
+
+msgctxt "Languages::vendor_plans.out_of_amount"
+msgid "out of [amount]"
 msgstr ""
 
 msgctxt "Languages::addons.vendor_plans.commission_description_percent"

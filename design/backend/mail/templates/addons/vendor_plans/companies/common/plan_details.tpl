@@ -5,7 +5,7 @@
         <td>{$plan->plan}</td>
     </tr>
     <tr>
-        <td>{__("price")} ({$currencies.$primary_currency.symbol}):</td>
+        <td>{__("price")} ({$currencies.$primary_currency.symbol nofilter}):</td>
         <td>{include file="common/price.tpl" value=$plan->price}&nbsp;({__("vendor_plans.periodicity_{$plan.periodicity}")|lower})</td>
     </tr>
     <tr>
@@ -13,7 +13,7 @@
         <td>{if $plan->products_limit}{$plan->products_limit}{else}{__("vendor_plans.unlimited")}{/if}</td>
     </tr>
     <tr>
-        <td>{__("vendor_plans.revenue_up_to")} ({$currencies.$primary_currency.symbol}):</td>
+        <td>{__("vendor_plans.revenue_up_to")} ({$currencies.$primary_currency.symbol nofilter}):</td>
         <td>{if $plan->revenue_limit|floatval}{include file="common/price.tpl" value=$plan->revenue_limit}{else}{__("vendor_plans.unlimited")}{/if}</td>
     </tr>
     <tr>

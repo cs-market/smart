@@ -26,8 +26,9 @@
     {if !$positions}
     <input id="b{$data_id}_ids" type="hidden" name="{$input_name}" value="{if $item_ids}{","|implode:$item_ids}{/if}" class="input-micro" />
     {/if}
-    <div class="table-wrapper">
-        <table width="100%" class="table table-middle">
+    <div class="clearfix"></div>
+    <div class="table-responsive-wrapper">
+        <table width="100%" class="table table-middle table--relative table-responsive">
         <thead>
             <tr>
                 {if $positions}<th>{__("position_short")}</th>{/if}
@@ -45,7 +46,7 @@
         </tbody>
         <tbody id="{$data_id}_no_item"{if $item_ids} class="hidden"{/if}>
         <tr class="no-items">
-            <td colspan="{if $positions}3{else}2{/if}"><p>{$no_item_text|default:__("no_items")}</p></td>
+            <td colspan="{if $positions}3{else}2{/if}" data-th="&nbsp;"><p>{$no_item_text|default:__("no_items")}</p></td>
         </tr>
         </tbody>
         </table>

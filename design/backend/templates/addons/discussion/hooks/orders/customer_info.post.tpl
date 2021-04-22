@@ -8,14 +8,15 @@
     <label class="control-label">{__("discussion_title_order")}</label>
     <div class="controls">
         {if "discussion.add"|fn_check_view_permissions}
-	    <input type="hidden" name="discussion[object_id]" value="{$order_info.order_id}" />
-	    <input type="hidden" name="discussion[object_type]" value="O" /> 
-	    <select name="discussion[type]">
-	        <option {if $discussion.type == "D"}selected="selected"{/if} value="D">{__("disabled")}</option>
-	        <option {if $discussion.type == "C"}selected="selected"{/if} value="C">{__("enabled")}</option>
-	    </select>
+            <input type="hidden" name="discussion[object_id]" value="{$order_info.order_id}" />
+            <input type="hidden" name="discussion[object_type]" value="O" />
+            <select name="discussion[type]">
+                {if $addons.discussion.order_initiate == "YesNo::YES"|enum && !$discussion}<option selected="selected" value="">{__("available")}</option>{/if}
+                <option {if $discussion.type == "Addons\\Discussion\\DiscussionTypes::TYPE_DISABLED"|enum}selected="selected"{/if} value="{"Addons\\Discussion\\DiscussionTypes::TYPE_DISABLED"|enum}">{__("disabled")}</option>
+                <option {if $discussion.type == "Addons\\Discussion\\DiscussionTypes::TYPE_COMMUNICATION"|enum}selected="selected"{/if} value="{"Addons\\Discussion\\DiscussionTypes::TYPE_COMMUNICATION"|enum}">{__("enabled")}</option>
+            </select>
         {else}
-            <span class="shift-input">{if $discussion.type == "C"}{__("enabled")}{else}{__("disabled")}{/if}</span>
+            <span class="shift-input">{if $discussion.type == "Addons\\Discussion\\DiscussionTypes::TYPE_COMMUNICATION"|enum}{__("enabled")}{else}{__("disabled")}{/if}</span>
         {/if}
     </div>
 </div>

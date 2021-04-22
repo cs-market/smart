@@ -12,10 +12,15 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
-$schema['controllers']['call_requests'] = array (
-    'permissions' => true,
-);
+use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
-$schema['controllers']['tools']['modes']['update_status']['param_permissions']['table']['call_requests'] = true;
+if (YesNo::toBool(Registry::get('addons.call_requests.enable_call_requests_for_vendors'))) {
+    $schema['controllers']['call_requests'] = [
+        'permissions' => true,
+    ];
+
+    $schema['controllers']['tools']['modes']['update_status']['param_permissions']['table']['call_requests'] = true;
+}
 
 return $schema;

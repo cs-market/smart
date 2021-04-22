@@ -12,6 +12,6 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-$schema['call_request']['is_managed_by'] = array('ROOT');
+$schema['call_request']['is_managed_by'] = ['ROOT', 'VENDOR'];
 
 return $schema;

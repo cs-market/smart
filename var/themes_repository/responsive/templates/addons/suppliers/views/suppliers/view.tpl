@@ -1,6 +1,7 @@
 {hook name="suppliers:view"}
 
-{include file="common/company_data.tpl" company=$supplier show_name=true show_descr=true show_rating=true show_logo=true show_links=false}
+{$obj_id=$supplier.company_id}
+{include file="common/company_data.tpl" company=$supplier show_name=true show_descr=true show_rating=true show_logo=true show_links=false show_address=true show_location_full=true}
 
 <div class="ty-company-detail clearfix">
 
@@ -18,19 +19,19 @@
                 <h5 class="ty-company-detail__info-title">{__("contact_information")}</h5>
                 {if $supplier.email}
                     <div class="ty-company-detail__control-group" id="supplier_email">
-                        <label class="ty-company-detail__control-lable">{__("email")}:</label>
+                        <label class="ty-company-detail__control-label">{__("email")}:</label>
                         <span><a href="mailto:{$supplier.email}">{$supplier.email}</a></span>
                     </div>
                 {/if}
                 {if $supplier.phone}
                     <div class="ty-company-detail__control-group" id="supplier_phone">
-                        <label class="ty-company-detail__control-lable">{__("phone")}:</label>
+                        <label class="ty-company-detail__control-label">{__("phone")}:</label>
                         <span>{$supplier.phone}</span>
                     </div>
                 {/if}
                 {if $supplier.fax}
                     <div class="ty-company-detail__control-group" id="supplier_phone">
-                        <label class="ty-company-detail__control-lable">{__("fax")}:</label>
+                        <label class="ty-company-detail__control-label">{__("fax")}:</label>
                         <span>{$supplier.fax}</span>
                     </div>
                 {/if}
@@ -43,12 +44,19 @@
             </div>
             <div class="ty-company-detail__info-list">
                 <h5 class="ty-company-detail__info-title">{__("shipping_address")}</h5>
-                <div class="ty-company-detail__control-group">
-                    <span>{$supplier.address}</span>
-                </div>
-                <div class="ty-company-detail__control-group">
-                    <span>{$supplier.city}, {$supplier.state|fn_get_state_name:$supplier.country} {$supplier.zipcode}</span>
-                </div>
+                {$address="address_`$obj_id`"}
+                {if $smarty.capture.$address|trim}
+                    <div class="ty-company-detail__control-group">
+                        <span>{$smarty.capture.$address nofilter}</span>
+                    </div>
+                {/if}
+
+                {$location_full="location_full_`$obj_id`"}
+                {if $smarty.capture.$location_full|trim}
+                    <div class="ty-company-detail__control-group">
+                        <span>{$smarty.capture.$location_full nofilter}</span>
+                    </div>
+                {/if}
                 <div class="ty-company-detail__control-group">
                     <span>{$supplier.country|fn_get_country_name}</span>
                 </div>

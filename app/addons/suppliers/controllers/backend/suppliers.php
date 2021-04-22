@@ -85,34 +85,47 @@ if ($mode == 'manage') {
 
 } elseif ($mode == 'update' || $mode == 'add') {
 
-    Registry::set('navigation.tabs', array (
-        'general' => array (
+    $supplier_id = isset($_REQUEST['supplier_id'])
+        ? $_REQUEST['supplier_id']
+        : null;
+
+    $tabs = [
+        'general'   => [
             'title' => __('general'),
-            'js' => true
-        ),
-        'products' => array (
+            'js'    => true,
+        ],
+        'products'  => [
             'title' => __('products'),
-            'js' => true
-        ),
-        'shippings' => array (
+            'js'    => true,
+        ],
+    ];
+
+    if ($supplier_id || fn_allowed_for('MULTIVENDOR') || fn_get_runtime_company_id()) {
+        $tabs['shippings'] = [
             'title' => __('shippings'),
-            'js' => true
-        ),
-    ));
-
-    $supplier = !empty($_REQUEST['supplier_id']) ? fn_get_supplier_data($_REQUEST['supplier_id']) : array();
-
-    $condition = " AND ?:shippings.status = 'A'";
-    if (Registry::get('runtime.company_id') && !fn_allowed_for('ULTIMATE')) {
-        $condition = fn_get_company_condition('?:shippings.company_id');
-        $company_data = Registry::get('runtime.company_data');
-        if (!empty($company_data['shippings'])) {
-            $condition .= db_quote(" OR ?:shippings.shipping_id IN (?n)", explode(',', $company_data['shippings']));
-        }
+            'js'    => true,
+        ];
     }
 
-    $shippings = db_get_hash_array("SELECT ?:shippings.shipping_id, ?:shipping_descriptions.shipping FROM ?:shippings LEFT JOIN ?:shipping_descriptions ON ?:shippings.shipping_id = ?:shipping_descriptions.shipping_id AND ?:shipping_descriptions.lang_code = ?s LEFT JOIN ?:companies ON ?:companies.company_id = ?:shippings.company_id WHERE 1 $condition ORDER BY ?:shippings.position", 'shipping_id', CART_LANGUAGE);
+    Registry::set('navigation.tabs', $tabs);
 
+    $supplier = $supplier_id
+        ? fn_get_supplier_data($supplier_id)
+        : [];
+
+    $company_id = Registry::ifGet('runtime.company_id', null);
+    $shippings = fn_get_available_shippings($company_id);
+    if (fn_allowed_for('ULTIMATE') && !fn_get_runtime_company_id()) {
+        $shippings = fn_suppliers_filter_objects_by_sharing(
+            $shippings,
+            'shippings',
+            'shipping_id',
+            'suppliers',
+            $supplier_id
+        );
+    }
+
+    /** @var \Tygh\SmartyEngine\Core $view */
     $view = Tygh::$app['view'];
 
     $view->assign('shippings', $shippings);
@@ -120,4 +133,28 @@ if ($mode == 'manage') {
     $view->assign('states', fn_get_all_states());
 
     $view->assign('supplier', $supplier);
+} elseif ($mode === 'get_suppliers') {
+    $page = isset($_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
+    $items_per_page = isset($_REQUEST['page_size']) ? (int) $_REQUEST['page_size'] : 10;
+    $search_query = isset($_REQUEST['q']) ? $_REQUEST['q'] : '';
+    $supplier_ids = isset($_REQUEST['ids']) ? $_REQUEST['ids'] : [];
+
+    $params = [
+        'page'           => $page,
+        'items_per_page' => $items_per_page,
+        'name'           => $search_query,
+        'supplier_id'    => $supplier_ids,
+    ];
+
+    list($suppliers, $params) = fn_get_suppliers($params);
+
+    $objects = array_values(array_map(static function ($supplier) {
+        return [
+            'id'   => $supplier['supplier_id'],
+            'text' => $supplier['name'],
+        ];
+    }, $suppliers));
+
+    Tygh::$app['ajax']->assign('objects', $objects);
+    Tygh::$app['ajax']->assign('total_objects', isset($params['total_items']) ? $params['total_items'] : count($objects));
 }

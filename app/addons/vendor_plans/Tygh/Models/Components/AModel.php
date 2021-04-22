@@ -166,7 +166,7 @@ abstract class AModel implements IModel, \IteratorAggregate, \ArrayAccess
     public static function model($params = array())
     {
         $class = get_called_class();
-        $hash = md5(serialize($params));
+        $hash = md5(json_encode($params));
 
         if (!isset(static::$models[$class][$hash])) {
             static::$models[$class][$hash] = new static($params);
@@ -269,6 +269,24 @@ abstract class AModel implements IModel, \IteratorAggregate, \ArrayAccess
     public function findAll($params = array())
     {
         return $this->findMany($params);
+    }
+
+    /**
+     * Find the first models by params
+     *
+     * @param array<string, string> $params Params to search vendor plan
+     *
+     * @return \Tygh\Models\Components\AModel|null
+     */
+    public function findOne(array $params = [])
+    {
+        $models = $this->findMany($params);
+
+        if (empty($models)) {
+            return null;
+        }
+
+        return reset($models);
     }
 
     /**

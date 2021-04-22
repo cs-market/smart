@@ -24,7 +24,6 @@ class FormatPhoneNumberTest extends ATestCase
 
     protected function setUp()
     {
-        define('BOOTSTRAP', true);
         define('AREA', 'A');
         define('ACCOUNT_TYPE', 'admin');
 

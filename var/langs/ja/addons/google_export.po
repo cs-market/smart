@@ -5,12 +5,12 @@ msgstr ""
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: crowdin.com\n"
 "X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Project-ID: 50163\n"
 "X-Crowdin-Language: ja\n"
-"X-Crowdin-File: /release-4.8.2/addons/google_export.po\n"
-"Last-Translator: cscart <translations@cs-cart.com>\n"
-"PO-Revision-Date: 2018-08-20 09:06\n"
+"X-Crowdin-File: /release-4.12.2/addons/google_export.po\n"
+"X-Crowdin-File-ID: 4076\n"
+"PO-Revision-Date: 2021-02-01 09:07\n"
 
 msgctxt "Addons::name::google_export"
 msgid "Google export"
@@ -58,7 +58,7 @@ msgstr "Googleエクスポート"
 
 msgctxt "Languages::google_name_option"
 msgid "Equivalent in Google:"
-msgstr ""
+msgstr "Googleのフィールドタイプへのマッピング："
 
 msgctxt "Languages::addons.google_export.tax_notice"
 msgid "For the US, don't include tax in the price. For Canada and India, do not include any value added tax in the price. For all other countries, value added tax (VAT) has to be included in the price."
@@ -66,13 +66,13 @@ msgstr "アメリカ合衆国向けのデータについては、税金を商品
 
 msgctxt "Languages::addons.google_export.info_google_features"
 msgid "<p>Before you export a data feed file for Google Merchant, make sure to edit your products and specify the values of product features that belong to the Google Export group. You can do this via product import and export, or mass editing.</p><p> GTIN is a key identifier of a product. If you didn't specify GTIN as a feature, product's SKU from the CODE field will be used. GTINs for option combinations are always taken from the CODE fields of combinations.</p>"
-msgstr ""
+msgstr "<p>Googleショッピングにデータフィードファイルをエクスポートする前に、商品の追加情報で Google export 用データの情報を編集してください。</p><p> GTIN は商品のキーとなる ID です。もし GTIN を商品の追加情報として指定していない場合、コードフィールドである商品の SKU が ID として使用されます。 オプションのコンビネーションにあるコードフィールドは常に GTIN として使用されます。</p>"
 
 msgctxt "Languages::tt_addons_google_export_hooks_product_options_properties_post_google_name_option"
 msgid "When you export a data feed file, this option will provide data for the selected Google field type."
-msgstr ""
+msgstr "データフィードファイルにエクスポートする時に、ここで選択した Google フィールドタイプとして出力します。"
 
 msgctxt "Languages::addons.google_export.text_info_setting_options"
 msgid "Please make sure that you selected this option as \"Equivalent in Google\" for one of the options in your store. Otherwise the data feed file may not be exported properly."
-msgstr ""
+msgstr "このフィールドタイプが \"Googleのフィールドタイプへのマッピング\" としてオプションで設定されていることを確認してください。設定されていない場合は、データフィードファイルは適切にエクスポートされない可能性があります。"
 

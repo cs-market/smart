@@ -96,7 +96,7 @@
             <option value="AWG" {if $processor_params.epdq_currency == "AWG"}selected="selected"{/if}>{__("currency_code_awg")}</option>
             <option value="BGN" {if $processor_params.epdq_currency == "BGN"}selected="selected"{/if}>{__("currency_code_bgn")}</option>
             <option value="BRL" {if $processor_params.epdq_currency == "BRL"}selected="selected"{/if}>{__("currency_code_brl")}</option>
-            <option value="BYR" {if $processor_params.epdq_currency == "BYR"}selected="selected"{/if}>{__("currency_code_byr")}</option>
+            <option value="BYN" {if $processor_params.epdq_currency == "BYN"}selected="selected"{/if}>{__("currency_code_byn")}</option>
             <option value="CAD" {if $processor_params.epdq_currency == "CAD"}selected="selected"{/if}>{__("currency_code_cad")}</option>
             <option value="CHF" {if $processor_params.epdq_currency == "CHF"}selected="selected"{/if}>{__("currency_code_chf")}</option>
             <option value="CNY" {if $processor_params.epdq_currency == "CNY"}selected="selected"{/if}>{__("currency_code_cny")}</option>

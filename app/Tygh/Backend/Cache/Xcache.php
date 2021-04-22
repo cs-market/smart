@@ -14,14 +14,19 @@
 
 namespace Tygh\Backend\Cache;
 
-use Tygh\Registry;
-
 class Xcache extends ABackend
 {
     const CACHE_PREFIX = 'cs-cart:cache:';
 
     protected $global_ttl = 0;
 
+    /**
+     * Xcache constructor.
+     *
+     * @param array $config
+     *
+     * @throws \Tygh\Exceptions\ClassNotFoundException
+     */
     public function __construct($config)
     {
         if (!function_exists('xcache_set')) {
@@ -29,7 +34,7 @@ class Xcache extends ABackend
         }
 
         if (isset($config['cache_xcache_global_ttl'])) {
-            $this->global_ttl = (int)$config['cache_xcache_global_ttl'];
+            $this->global_ttl = (int) $config['cache_xcache_global_ttl'];
         }
 
         $this->_config = $config;
@@ -37,33 +42,34 @@ class Xcache extends ABackend
         parent::__construct($config);
     }
 
-    public function set($name, $data, $condition, $cache_level = null)
+    /** @inheritDoc */
+    public function set($name, $data, $condition, $cache_level = null, $ttl = null)
     {
         if (!empty($data)) {
             xcache_set(
                 $this->_mapTags($name) . '/' . $cache_level,
                 $data,
-                ($cache_level == Registry::cacheLevel('time'))
-                    ? TIME + $condition
-                    : $this->global_ttl
+                $this->getCacheTimeToLive($condition, $cache_level, $ttl ?: $this->global_ttl)
             );
         }
     }
 
+    /** @inheritDoc */
     public function get($name, $cache_level = null)
     {
         $key = $this->_mapTags($name) . '/' . $cache_level;
 
         if (xcache_isset($key)) {
-            return array(xcache_get($key));
+            return [xcache_get($key)];
         }
 
         return false;
     }
 
+    /** @inheritDoc */
     public function clear($tags)
     {
-        $tags = (array)$this->_mapTags($tags, 0);
+        $tags = (array) $this->_mapTags($tags, 0);
         $success = true;
 
         foreach ($tags as $tag) {
@@ -73,17 +79,21 @@ class Xcache extends ABackend
         return $success;
     }
 
+    /** @inheritDoc */
     public function cleanup()
     {
-        xcache_unset_by_prefix(
-            self::CACHE_PREFIX
-            . (empty($this->_config['store_prefix']) ? '' : ($this->_config['store_prefix'] . ':'))
-        );
+        xcache_unset_by_prefix(self::CACHE_PREFIX . (empty($this->_config['store_prefix']) ? '' : ($this->_config['store_prefix'] . ':')));
     }
 
+    /**
+     * @param      $cache_keys
+     * @param null $company_id
+     *
+     * @return array|mixed
+     */
     private function _mapTags($cache_keys, $company_id = null)
     {
-        $cache_keys = (array)$cache_keys;
+        $cache_keys = (array) $cache_keys;
         $company_id = is_null($company_id) ? $this->_company_id : $company_id;
 
         foreach ($cache_keys as $i => $key_name) {
