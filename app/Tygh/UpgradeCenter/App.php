@@ -684,23 +684,23 @@ class App
             $logger->add(sprintf('Sending upgrade information e-mail to: %s', implode(', ', $email_recipients)));
 
             /** @var \Tygh\Mailer\Mailer $mailer */
-//             $mailer = Tygh::$app['mailer'];
-// 
-//             $mail_sent = $mailer->send(array(
-//                 'to' => $email_recipients,
-//                 'from' => 'default_company_site_administrator',
-//                 'data' => $email_data,
-//                 'template_code' => 'upgrade_backup_info',
-//                 'tpl' => 'upgrade/backup_info.tpl',
-//             ), 'A', Registry::get('settings.Appearance.backend_default_language'));
-// 
-//             if ($mail_sent) {
-//                 $logger->add('E-mail was successfully sent');
-//             } else {
-//                 $logger->add('Failed to send e-mail');
-// 
-//                 return array(false, array());
-//             }
+            $mailer = Tygh::$app['mailer'];
+
+            $mail_sent = $mailer->send(array(
+                'to' => $email_recipients,
+                'from' => 'default_company_site_administrator',
+                'data' => $email_data,
+                'template_code' => 'upgrade_backup_info',
+                'tpl' => 'upgrade/backup_info.tpl',
+            ), 'A', Registry::get('settings.Appearance.backend_default_language'));
+
+            if ($mail_sent) {
+                $logger->add('E-mail was successfully sent');
+            } else {
+                $logger->add('Failed to send e-mail');
+
+                return array(false, array());
+            }
 
             $this->outputMessage(__('uc_run_migrations'), '', true);
 
@@ -810,12 +810,12 @@ class App
 
             if (!empty($upgrade_notes)) {
                 $logger->add(sprintf('Sending upgrade information e-mail to: %s', implode(', ', $email_recipients)));
-//                 $mail_sent = $this->sendPostUpgradeNotificationByEmail($upgrade_schema, $email_recipients, $upgrade_notes);
-//                 if ($mail_sent) {
-//                     $logger->add('Upgrade information e-mail was successfully sent');
-//                 } else {
-//                     $logger->add('Failed to send e-mail');
-//                 }
+                $mail_sent = $this->sendPostUpgradeNotificationByEmail($upgrade_schema, $email_recipients, $upgrade_notes);
+                if ($mail_sent) {
+                    $logger->add('Upgrade information e-mail was successfully sent');
+                } else {
+                    $logger->add('Failed to send e-mail');
+                }
                 $this->generatePostUpgradeNotification($upgrade_schema, $email_recipients, $upgrade_notes);
             }
         }
