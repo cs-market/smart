@@ -1,0 +1,1 @@
+{$allow_save = true scope='parent'}
