@@ -7,8 +7,8 @@ $cart = &Tygh::$app['session']['cart'];
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!empty($_REQUEST['delivery_date']) && is_array($_REQUEST['delivery_date'])) {
         $delivery_date = $_REQUEST['delivery_date'];
+        $res = true;
         foreach ($delivery_date as $company_id => $date) {
-            $res = true;
             $choosed_ts = fn_parse_date($date);
 
             $c_data = fn_get_company_data($company_id);
@@ -41,12 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if (!$res) {
-                if (count($cart['product_groups']) > 1)
+                if (count($cart['product_groups']) > 1) {
                     fn_set_notification('N', __('notice'), __('calendar_delivery.choose_another_day_vendor') . ' ' . $c_data['company']);
-                else {
+                } else {
                     fn_set_notification('N', __('notice'), __('calendar_delivery.choose_another_day'));
                 }
-                $_REQUEST['next_step'] = 'ster_three';
             }
         }
 
@@ -62,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // if start period hour < now
             if (strstr($period, ':', true) < date('h')) {
+                $res = false;
                 $c_data = fn_get_company_data($company_id);
 
                 if (count($cart['product_groups']) > 1)
@@ -69,11 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 else {
                     fn_set_notification('N', __('notice'), __('calendar_delivery.choose_another_period'));
                 }
-                $_REQUEST['next_step'] = 'ster_three';
             }
         }
+        $cart['delivery_period'] = isset($_REQUEST['delivery_period']) ? $_REQUEST['delivery_period'] : '';
 
+        if (!$res) return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout'];
     }
-
-    $cart['delivery_period'] = isset($_REQUEST['delivery_period']) ? $_REQUEST['delivery_period'] : '';
 }
