@@ -1,0 +1,108 @@
+<?php
+
+namespace Tygh\Api\Entities;
+
+use Tygh\Api\AEntity;
+use Tygh\Api\Response;
+use Tygh\Registry;
+
+class SraPromotions extends AEntity
+{
+    public function index($id = 0, $params = array())
+    {
+        $data = array();
+        
+        $lang_code = $this->getLanguageCode($params);
+        $currency = $this->getCurrencyCode($params);
+        $params['icon_sizes'] = $this->safeGet($params, 'icon_sizes', [
+            'main_pair'   => [$this->icon_size_big, $this->icon_size_small],
+            'image_pairs' => [$this->icon_size_small],
+        ]);
+
+        $params = fn_array_merge($params, [
+            'active'     => true,
+            /*'zone' => 'catalog',*/
+            'mode'       => 'list',
+            'extend'     => ['get_images'],
+            'sort_by' => 'priority',
+            'sort_order' => 'asc',
+        ]);
+
+        $promotions = fn_get_promotions($params);
+        list($data['promotions'], $products) = fn_category_promotion_split_promotion_by_type($promotions);
+    
+        foreach ($products as &$product) {
+            $amount = $this->getRequestedProductAmount($params, $product['product_id']);
+            if ($amount > 1) {
+                $product['price'] = fn_get_product_price($product['product_id'], $amount, $this->auth);
+            }
+        }
+        unset($product);
+
+        $products = fn_storefront_rest_api_gather_additional_products_data($products, $params);
+
+        foreach ($products as &$product) {
+            $amount = $this->getRequestedProductAmount($params, $product['product_id']);
+            if ($amount > 1) {
+                $product = $this->calculateQuantityPrice($product, $amount);
+            }
+
+            $product = fn_storefront_rest_api_format_product_prices($product, $currency);
+
+            if ($is_discussion_enabled) {
+                $product = SraDiscussion::setDiscussionType($product, DiscussionObjectTypes::PRODUCT);
+            }
+
+            $product = fn_storefront_rest_api_set_product_icons($product, $params['icon_sizes']);
+        }
+        unset($product);
+
+        $data['products'] = $products;
+        return array(
+            'data' => $data;
+        );
+    }
+
+    public function create($params)
+    {
+        return array(
+            'status' => Response::STATUS_FORBIDDEN,
+            'data' => []
+        );
+    }
+
+    public function update($id, $params)
+    {
+        return array(
+            'status' => Response::STATUS_FORBIDDEN,
+            'data' => []
+        );
+    }
+
+    public function delete($id)
+    {
+        return array(
+            'status' => Response::STATUS_FORBIDDEN,
+            'data' => []
+        );
+    }
+
+    public function privileges()
+    {
+        return array(
+            'create' => false,
+            'update' => false,
+            'delete' => false,
+            'index'  => true
+        );
+    }
+    public function privilegesCustomer()
+    {
+        return [
+            'index'  => true,
+            'create' => false,
+            'update' => false,
+            'delete' => false,
+        ];
+    }
+}

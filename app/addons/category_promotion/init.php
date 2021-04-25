@@ -7,6 +7,7 @@ fn_register_hooks(
     'get_products',
     'update_promotion_post',
     'get_autostickers_pre',
+    'get_promotions_pre',
     'get_promotions',
     'get_product_data_post'
 );

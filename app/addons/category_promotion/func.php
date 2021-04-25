@@ -179,6 +179,15 @@ function fn_category_promotion_get_products(&$params, $fields, $sortings, &$cond
     }
 }
 
+function fn_category_promotion_get_promotions_pre(&$params, $items_per_page, $lang_code) {
+    if (Registry::get('runtine.controller') == 'promotions' && Registry::get('runtine.mode') == 'list') {
+        // default controller set this param, but we need to display all promo
+        unset($params['get_hidden']);
+        $params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
+    }
+    $params = array_merge($params, $_REQUEST);
+}
+
 function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
     if (!empty($params['product_ids'])) {
         $condition .=' AND (' . fn_find_array_in_set($params['product_ids'], "products", false) . ')';
@@ -232,4 +241,23 @@ function fn_category_promotion_get_product_data_post(&$product_data, $auth, $pre
         // correct after November 2020
         if (defined('API')) $product_data['promo_text_plain'] = $product_data['promo_text'] = strip_tags($product_data['promo_text']);
     }
+}
+
+function fn_category_promotion_split_promotion_by_type($promotions) {
+    $simple_promotions = array_filter($promotions, function($v) {
+        return $v['view_separate'] == 'N';
+    });
+    $promotions = array_filter($promotions, function($v) {
+        return $v['view_separate'] == 'Y';
+    });
+    $data = fn_array_column($simple_promotions, 'products');
+    $data = array_filter($data);
+    $product_ids = array_unique(explode(',', implode(',', $data)));
+    if ($product_ids) {
+        $params = $_REQUEST;
+        $params['extend'] = ['categories', 'description'];
+        $params['pid'] = $product_ids;
+        list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
+    }
+    return array($promotions, $products, $search);
 }

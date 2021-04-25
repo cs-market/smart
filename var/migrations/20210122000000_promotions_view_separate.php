@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class MigrationTestEnd extends AbstractMigration
+class ProductAvailTill extends AbstractMigration
 {
     /**
      * Change Method.
@@ -16,18 +16,16 @@ class MigrationTestEnd extends AbstractMigration
     {
     }
     */
-    
+
     /**
      * Migrate Up.
      */
     public function up()
     {
-            // sql style
-        $sql = 'DROP TABLE `test_user`';
-        $this->execute($sql);
-
-        // Query Buider style
-        $this->dropTable('test_user_qbs');
+	$options = $this->adapter->getOptions();
+	$pr = $options['prefix'];
+	$sql = "ALTER TABLE {$pr}promotions ADD view_separate varchar(1) NOT NULL default 'N';";
+	$this->execute($sql);
     }
 
     /**
@@ -35,6 +33,6 @@ class MigrationTestEnd extends AbstractMigration
      */
     public function down()
     {
-
+        
     }
 }

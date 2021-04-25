@@ -27,10 +27,13 @@
         <item>ALTER TABLE `?:promotions` ADD condition_categories varchar(255) NOT NULL default ''</item>
         <item>ALTER TABLE `?:promotions` ADD usergroup varchar(255) NOT NULL default ''</item>
         <item>ALTER TABLE `?:promotions` ADD categories varchar(255) NOT NULL default ''</item>
+        <item>ALTER TABLE `?:promotions` ADD view_separate varchar(1) NOT NULL default 'N'</item>
+        
         <item for="uninstall">ALTER TABLE `?:promotions` DROP products</item>
         <item for="uninstall">ALTER TABLE `?:promotions` DROP bonus_products</item>
         <item for="uninstall">ALTER TABLE `?:promotions` DROP condition_categories</item>
         <item for="uninstall">ALTER TABLE `?:promotions` DROP usergroup</item>
         <item for="uninstall">ALTER TABLE `?:promotions` DROP categories</item>
+        <item for="uninstall">ALTER TABLE `?:promotions` DROP view_separate</item>
     </queries>
 </addon>
