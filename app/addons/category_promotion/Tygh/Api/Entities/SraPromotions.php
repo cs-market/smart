@@ -11,7 +11,7 @@ class SraPromotions extends AEntity
     public function index($id = 0, $params = array())
     {
         $data = array();
-        
+
         $lang_code = $this->getLanguageCode($params);
         $currency = $this->getCurrencyCode($params);
         $params['icon_sizes'] = $this->safeGet($params, 'icon_sizes', [
@@ -28,9 +28,9 @@ class SraPromotions extends AEntity
             'sort_order' => 'asc',
         ]);
 
-        $promotions = fn_get_promotions($params);
+        list($promotions) = fn_get_promotions($params);
         list($data['promotions'], $products) = fn_category_promotion_split_promotion_by_type($promotions);
-    
+
         foreach ($products as &$product) {
             $amount = $this->getRequestedProductAmount($params, $product['product_id']);
             if ($amount > 1) {
@@ -59,8 +59,21 @@ class SraPromotions extends AEntity
 
         $data['products'] = $products;
         return array(
-            'data' => $data;
+            'status' => Response::STATUS_OK,
+            'data' => $data
         );
+    }
+
+    protected function getRequestedProductAmount($params, $product_id)
+    {
+        $amount = 1;
+        if (isset($params['amount'][$product_id])) {
+            $amount = (int) $params['amount'][$product_id];
+        } elseif (isset($params['amount'])) {
+            $amount = (int) $params['amount'];
+        }
+
+        return $amount;
     }
 
     public function create($params)
