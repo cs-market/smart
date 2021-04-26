@@ -126,8 +126,13 @@ function fn_auto_exim_find_files($cid) {
     $files = array();
     $priority = array('products' => 10, 'users' => 20, 'user_price' => 30, 'qty_discounts' => 35, 'orders' => 40);
     foreach ($fs_files as $file) {
+        $tmp = '';
         $data = pathinfo($file);
-        list($data['import_object'], $tmp) = explode('.', $data['filename']);
+        $explode = explode('.', $data['filename']);
+        $data['import_object'] = array_shift($explode);
+        if (!empty($explode)) {
+            $tmp = reset($tmp);
+        }
         if (strpos($tmp, 'preset_') !== false) {
             $data['preset_id'] = str_replace('preset_', '', $tmp);
         }
