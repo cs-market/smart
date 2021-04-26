@@ -16,4 +16,10 @@ $schema['export_fields']['Payment method'] = array(
 
 $schema['export_fields']['E-mail']['required'] = false;
 
+$schema['import_process_data']['change_order_status'] = array(
+    'function' => 'fn_import_change_order_status',
+    'args' => array('$object'),
+    'import_only' => true,
+);
+
 return $schema;

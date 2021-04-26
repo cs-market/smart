@@ -27,3 +27,8 @@ function fn_exim_orders_w_items_get($field, $key, $data, $unset = false)
         return $data;
     }
 }
+
+function fn_import_change_order_status($object) {
+    if (isset($object['order_id'], $object['status']) && !empty($object['order_id']) && !empty($object['status']))
+    fn_change_order_status($object['order_id'], $object['status']);
+}
