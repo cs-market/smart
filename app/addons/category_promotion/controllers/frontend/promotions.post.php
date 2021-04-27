@@ -14,6 +14,16 @@ if ($mode == 'view') {
             $s_params['extend'] = ['categories', 'description'];
             $s_params['pid'] = explode(',', $promotion_data['products']);
             list($products, $search) = fn_get_products($s_params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
+
+            fn_gather_additional_products_data($products, array(
+                'get_icon' => true,
+                'get_detailed' => true,
+                'get_additional' => true,
+                'get_options' => true,
+                'get_discounts' => true,
+                'get_features' => false
+            ));
+
             Tygh::$app['view']->assign('products', $products);
             Tygh::$app['view']->assign('search', $search);
 
