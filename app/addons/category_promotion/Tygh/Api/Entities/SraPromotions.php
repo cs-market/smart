@@ -31,10 +31,10 @@ class SraPromotions extends AEntity
             $promotion = fn_get_promotion_data($id, $lang_code);
             $product_ids = $promotion['products'];
             if ($product_ids) {
-                $params = $_REQUEST;
-                $params['extend'] = ['categories', 'description'];
-                $params['pid'] = explode(',', $product_ids);
-                list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
+                $s_params = $_REQUEST;
+                $s_params['extend'] = ['categories', 'description'];
+                $s_params['pid'] = explode(',', $product_ids);
+                list($products, $search) = fn_get_products($s_params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
             }
             $data['promotions'][] = $promotion;
         } else {
