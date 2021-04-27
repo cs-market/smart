@@ -27,9 +27,20 @@ class SraPromotions extends AEntity
             'sort_by' => 'priority',
             'sort_order' => 'asc',
         ]);
-
-        list($promotions) = fn_get_promotions($params);
-        list($data['promotions'], $products) = fn_category_promotion_split_promotion_by_type($promotions);
+        if ($id) {
+            $promotion = fn_get_promotion_data($id, $lang_code);
+            $product_ids = $promotion['products'];
+            if ($product_ids) {
+                $params = $_REQUEST;
+                $params['extend'] = ['categories', 'description'];
+                $params['pid'] = explode(',', $product_ids);
+                list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
+            }
+            $data['promotions'][] = $promotion;
+        } else {
+            list($promotions) = fn_get_promotions($params);
+            list($data['promotions'], $products) = fn_category_promotion_split_promotion_by_type($promotions);
+        }
 
         foreach ($products as &$product) {
             $amount = $this->getRequestedProductAmount($params, $product['product_id']);
