@@ -4,6 +4,10 @@ use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+if (AREA == 'C' && empty($auth['user_id'])) {
+    fn_redirect('auth.login_form');
+}
+
 if ($mode == 'view') {
     $promotion_id = empty($_REQUEST['promotion_id']) ? 0 : $_REQUEST['promotion_id'];
     if ($promotion_id) {
