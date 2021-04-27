@@ -8,7 +8,18 @@ if ($mode == 'view') {
     $promotion_id = empty($_REQUEST['promotion_id']) ? 0 : $_REQUEST['promotion_id'];
     if ($promotion_id) {
         $promotion_data = fn_get_promotion_data($promotion_id);
-        fn_print_die($promotion_data);
+        Tygh::$app['view']->assign('promotion_data', $promotion_data);
+        if (!empty($promotion_data['products'])) {
+            $s_params = $_REQUEST;
+            $s_params['extend'] = ['categories', 'description'];
+            $s_params['pid'] = explode(',', $promotion_data['products']);
+            list($products, $search) = fn_get_products($s_params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
+            Tygh::$app['view']->assign('products', $products);
+            Tygh::$app['view']->assign('search', $search);
+
+            $selected_layout = fn_get_products_layout($_REQUEST);
+            Tygh::$app['view']->assign('selected_layout', $selected_layout);
+        }
     } else {
         return array(CONTROLLER_STATUS_DENIED);
     }

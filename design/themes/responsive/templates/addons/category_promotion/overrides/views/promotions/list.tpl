@@ -2,6 +2,7 @@
     {foreach $promotions as $promotion_id => $promotion}
         <div class="ty-column3">
             <div class="ty-grid-list__item ty-grid-promotions__item">
+            	<a href="{"promotions.view&promotion_id=$promotion_id"|fn_url}">
                 {if $promotion.image}
                     {include file="common/image.tpl"
                         images=$promotion.image
@@ -29,6 +30,7 @@
                         </div>
                     {/if}
                 </div>
+            	</a>
             </div>
         </div>
     {/foreach}
