@@ -10,7 +10,7 @@ class SraPromotions extends AEntity
 {
     public function index($id = 0, $params = array())
     {
-        $data = array('promotions' = [], 'products' = []);
+        $data = ['promotions' => [], 'products' => []];
 
         $lang_code = $this->getLanguageCode($params);
         $currency = $this->getCurrencyCode($params);
