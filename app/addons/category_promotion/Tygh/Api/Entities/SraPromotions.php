@@ -10,7 +10,7 @@ class SraPromotions extends AEntity
 {
     public function index($id = 0, $params = array())
     {
-        $data = array();
+        $data = ['promotions' => [], 'products' => []];
 
         $lang_code = $this->getLanguageCode($params);
         $currency = $this->getCurrencyCode($params);
@@ -36,7 +36,7 @@ class SraPromotions extends AEntity
                 $s_params['pid'] = explode(',', $product_ids);
                 list($products, $search) = fn_get_products($s_params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
             }
-            $data['promotions'][] = $promotion;
+            // $data['promotions'][] = $promotion;
         } else {
             list($promotions) = fn_get_promotions($params);
             list($data['promotions'], $products) = fn_category_promotion_split_promotion_by_type($promotions);
