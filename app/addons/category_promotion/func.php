@@ -185,7 +185,7 @@ function fn_category_promotion_get_promotions_pre(&$params, $items_per_page, $la
         unset($params['get_hidden']);
         $params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
     }
-    $params = array_merge($params, $_REQUEST);
+    $params += $_REQUEST;
 }
 
 function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
