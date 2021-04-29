@@ -17,16 +17,18 @@ function fn_auto_exim_update_company_pre(&$company_data, $company_id, $lang_code
 }
 
 function fn_auto_exim_send_order_notification($order, $edp_data, $force_notification, $notified, $send_order_notification) {
+    fn_save_order_log($order['order_id'], Tygh::$app['session']['auth']['user_id'], '', 'Инициирована процедура выгрузки в файл', TIME);
     if (db_get_field('SELECT export_orders FROM ?:companies WHERE company_id = ?i AND FIND_IN_SET(?s, export_statuses)', $order['company_id'], $order['status']) == 'C') {
+        fn_save_order_log($order['order_id'], Tygh::$app['session']['auth']['user_id'], '', 'Выбран csv формат выгрузки в файл', TIME);
         fn_define('DB_LIMIT_SELECT_ROW', 30);
         foreach (array('orders', 'order_items', 'orders_with_items') as $pattern_id) {
             $layout = db_get_row("SELECT ?:exim_layouts.* FROM ?:exim_layouts LEFT JOIN ?:companies ON ?:exim_layouts.name = ?:companies.company WHERE pattern_id = ?s and company_id = ?i", $pattern_id, $order['company_id']);
             if (!empty($layout)) {
+                fn_save_order_log($order['order_id'], Tygh::$app['session']['auth']['user_id'], '', "Найден паттерн выгрузки $pattern_id", TIME);
                 $cid = Registry::get('runtime.company_id');
                 $c_data = Registry::get('runtime.company_data');
                 Registry::set('runtime.company_id', $order['company_id']);
                 Registry::set('runtime.company_data', fn_get_company_data($order['company_id']));
-                $company_data = fn_get_company_data($company_id);
                 $layout['cols'] = explode(',', $layout['cols']);
                 $pattern = fn_exim_get_pattern_definition($pattern_id, 'export');
                 $options = array(
@@ -43,6 +45,11 @@ function fn_auto_exim_send_order_notification($order, $edp_data, $force_notifica
                 $pattern['condition']['conditions'] = fn_array_merge($pattern['condition']['conditions'], array('order_id' => $order['order_id']));
                 ob_start(null, 0, PHP_OUTPUT_HANDLER_REMOVABLE);
                 $res = fn_export($pattern, $layout['cols'], $options);
+                $file_exists = false;
+                if (is_file(fn_get_files_dir_path().$options['filename'])) {
+                    $file_exists = true;
+                }
+                fn_save_order_log($order['order_id'], Tygh::$app['session']['auth']['user_id'], '', "Результат работы экспорта: $res, файл существует: $file_exists ".$options['filename'], TIME);
                 fn_set_hook('export_order_to_csv', $pattern, $options, $res, $order);
                 ob_end_clean();
                 Registry::set('runtime.company_id', $cid);
@@ -51,6 +58,7 @@ function fn_auto_exim_send_order_notification($order, $edp_data, $force_notifica
         }
     }
     if (db_get_field('SELECT export_orders FROM ?:companies WHERE company_id = ?i AND FIND_IN_SET(?s, export_statuses)', $order['company_id'], $order['status']) == 'X') {
+        fn_save_order_log($order['order_id'], Tygh::$app['session']['auth']['user_id'], '', 'Выбран xml формат выгрузки в файл', TIME);
         $company_id = $order['company_id'];
         $order_id = $order['order_id'];
         $path_commerceml = fn_get_files_dir_path($company_id) . 'output/';
