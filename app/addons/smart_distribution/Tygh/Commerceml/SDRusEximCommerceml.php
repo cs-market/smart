@@ -331,7 +331,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
     protected function getProductAmountByOffer($xml_offer, $params)
     {
         $cml = $this->cml;
-        if (empty($xml_offer -> {$cml['amount']}) && !isset($xml_offer -> {$cml['warehouse']})) {
+        if (!isset($xml_offer -> {$cml['amount']}) && !isset($xml_offer -> {$cml['warehouse']})) {
             return false;
         }
 
