@@ -309,7 +309,7 @@ function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $a
         }
     }
     $data = fn_get_profile_fields_data(ProfileDataTypes::USER, $user_id);
-    $user_data['fields'] = fn_array_merge($user_data['fields'], $data);
+    $user_data['fields'] = fn_array_merge($data, $user_data['fields']);
 }
 
 function fn_smart_distribution_update_profile($action, $user_data, $current_user_data) {
