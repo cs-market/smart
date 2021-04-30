@@ -280,7 +280,7 @@ function fn_smart_distribution_update_user_pre($user_id, &$user_data, $auth, $sh
     $user_data['last_update'] = time();
 }
 
-function fn_smart_distribution_update_user_profile_pre($user_id, $user_data, $action) {
+function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $action) {
     if ($user_data['user_id'] && isset($user_data['managers']) && $user_data['user_type'] == 'C') {
         $managers = fn_smart_distribution_get_managers(array('user_id' => $user_data['user_id']));
 
@@ -308,6 +308,8 @@ function fn_smart_distribution_update_user_profile_pre($user_id, $user_data, $ac
             if (!empty($udata)) db_query('INSERT INTO ?:vendors_customers ?m', $udata);
         }
     }
+    $data = fn_get_profile_fields_data(ProfileDataTypes::USER, $user_id);
+    $user_data['fields'] = fn_array_merge($user_data['fields'], $data);
 }
 
 function fn_smart_distribution_update_profile($action, $user_data, $current_user_data) {
