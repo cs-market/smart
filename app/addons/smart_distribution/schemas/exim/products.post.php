@@ -11,9 +11,13 @@ $schema['export_fields']['Send price to 1c'] = array (
 
 $schema['export_fields']['Detailed image']['process_put'] = ['fn_exim_smart_distribution_import_images', '@images_path', '%Thumbnail%', '#this', '0', 'M', '#key', 'product'];
 
-$schema['export_fields']['Category']['process_put'][0] = 'fn_exim_sd_set_product_categories';
-$schema['export_fields']['Category']['default'] = '!Потерянные товары';
-$schema['export_fields']['Secondary categories']['process_put'][0] = 'fn_exim_sd_set_product_categories';
+// $schema['export_fields']['Category']['process_put'][0] = 'fn_exim_sd_set_product_categories';
+// $schema['export_fields']['Category']['default'] = '!Потерянные товары';
+// $schema['export_fields']['Secondary categories']['process_put'][0] = 'fn_exim_sd_set_product_categories';
+$schema['pre_processing']['prepare_default_categories']['function'] = 'fn_sd_import_prepare_default_categories';
+$schema['pre_processing']['prepare_default_categories']['args'][] = '$import_data';
+unset($schema['import_process_data']['vendor_plans_import_skip_products_with_unavailable_categories']);
+
 if (fn_allowed_for('MULTIVENDOR') && (!Registry::get('runtime.company_id'))) {
 	$schema['export_fields']['Category']['process_put'][] = '%Vendor%';
 	$schema['export_fields']['Secondary categories']['process_put'][] = '%Vendor%';
