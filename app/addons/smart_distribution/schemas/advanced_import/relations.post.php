@@ -12,9 +12,9 @@
  * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
  ****************************************************************************/
 
-defined('BOOTSTRAP') or die('Access denied');
-
 use Tygh\Enum\Addons\AdvancedImport\RelatedObjectTypes;
+
+defined('BOOTSTRAP') or die('Access denied');
 
 $schema['products'][RelatedObjectTypes::FEATURE]['max_items'] = 0;
 
