@@ -1091,3 +1091,10 @@ function fn_smart_distribution_pre_get_cart_product_data($hash, $product, $skip_
     $join .= " INNER JOIN ?:products_categories ON ?:products_categories.product_id = ?:products.product_id INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id $avail_cond";
     $join .= " LEFT JOIN ?:companies ON ?:companies.company_id = ?:products.company_id";
 }
+
+// allow to choose unfilled profiles
+function fn_smart_distribution_checkout_get_user_profiles($auth, &$user_profiles, $profile_fields) {
+    array_walk($user_profiles, function (&$v) {
+        $v['is_selectable'] = true;
+    });
+}

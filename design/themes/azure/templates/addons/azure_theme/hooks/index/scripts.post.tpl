@@ -155,6 +155,5 @@
                 $(this).data('tooltip').show();
             });
     	});
-	})(Tygh, Tygh.$);
 });
 </script>
