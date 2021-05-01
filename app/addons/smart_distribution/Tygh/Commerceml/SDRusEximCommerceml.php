@@ -580,6 +580,14 @@ class SDRusEximCommerceml extends RusEximCommerceml
         $product_id = (!empty($product_data['product_id'])) ? $product_data['product_id'] : 0;
 
         $product_status = $xml_product_data->attributes()->{$cml['status']};
+        if (!empty($this->features_commerceml['status']) && isset($xml_product_data->{$cml['properties_values']}->{$cml['property_values']})) {
+            foreach ($xml_product_data->{$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
+                if ($_feature -> {$cml['id']} == $this->features_commerceml['status']['id']) {
+                    $product_status = $this->features_commerceml['status']['variants'][strval($_feature -> {$cml['value']})]['value'];
+                }
+            }
+        }
+
         if (!empty($product_status) && (string) $product_status == $cml['delete']) {
             if ($product_id != 0) {
                 fn_delete_product($product_id);
@@ -1231,6 +1239,19 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 } elseif ($feature_name == 'О продукте') {
                     $features_import['product_description']['id'] = strval($_feature -> {$cml['id']});
                     $features_import['product_description']['name'] = 'product_description';
+                } elseif ($feature_name == 'Статус') {
+                    $features_import['status']['id'] = strval($_feature -> {$cml['id']});
+                    $features_import['status']['name'] = 'status';
+                    if (!empty($_feature -> {$cml['variants_values']})) {
+                        $_feature_data = $_feature -> {$cml['variants_values']} -> {$cml['directory']};
+                        foreach ($_feature_data as $_variant) {
+                            $_variants[strval($_variant -> {$cml['id_value']})]['id'] = strval($_variant -> {$cml['id_value']});
+                            $_variants[strval($_variant -> {$cml['id_value']})]['value'] = strval($_variant -> {$cml['value']});
+                            $f_variants[strval($_variant -> {$cml['id_value']})]['external_id'] = strval($_variant -> {$cml['id_value']});
+                            $f_variants[strval($_variant -> {$cml['id_value']})]['variant'] = strval($_variant -> {$cml['value']});
+                        }
+                    }
+                    $features_import['status']['variants'] = $_variants;
                 }
 
                 if ($deny_or_allow_list == 'do_not_import') {
