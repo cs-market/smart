@@ -18,3 +18,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         return array(CONTROLLER_STATUS_OK, $return_url);
     }
 }
+
+if ($mode == 'manage') {
+
+    $selected_fields = Tygh::$app['view']->getTemplateVars('selected_fields');
+
+    $selected_fields[] = array(
+        'name' => '[extra][show_out_of_stock_product]',
+        'text' => __('show_out_of_stock_product')
+    );
+
+    Tygh::$app['view']->assign('selected_fields', $selected_fields);
+
+} elseif ($mode == 'm_update') {
+
+    $selected_fields = Tygh::$app['session']['selected_fields'];
+
+    if (!empty($selected_fields['extra']['show_out_of_stock_product'])) {
+
+        $field_groups = Tygh::$app['view']->getTemplateVars('field_groups');
+        $filled_groups = Tygh::$app['view']->getTemplateVars('filled_groups');
+
+        $field_groups['C']['show_out_of_stock_product'] = 'products_data';
+        $filled_groups['C']['show_out_of_stock_product'] = __('show_out_of_stock_product');
+
+        Tygh::$app['view']->assign('field_groups', $field_groups);
+        Tygh::$app['view']->assign('filled_groups', $filled_groups);
+    }
+}
