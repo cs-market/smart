@@ -36,10 +36,16 @@
 }
 
 {include file="common/period_selector.tpl" period=$search.period display="form"}
+
+<div class="sidebar-field">
+    <label for="elm_build_tree">{__("full_tree_cat")}</label>
+    <div class="break">
+        <input type="checkbox" name="is_search" id="build_tree" value="N" {if $search.is_search == 'N'}checked="checked"{/if}  />
+    </div>
+</div>
 {/capture}
 
 {include file="common/advanced_search.tpl" simple_search=$smarty.capture.simple_search advanced_search="" dispatch=$dispatch view_type="categories" in_popup=1}
-
 </form>
 
 {if $in_popup}

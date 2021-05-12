@@ -13,7 +13,7 @@ if ($mode == 'search' || $mode == 'picker') {
     $params = $_REQUEST;
     if (!empty($params['company_id'])) {
         $cids = db_get_field("SELECT categories FROM ?:vendor_plans AS vp LEFT JOIN ?:companies AS c ON vp.plan_id = c.plan_id WHERE company_id = ?i", $params['company_id']);
-        $params['category_ids'] = explode(',', $cids);
+        $params['category_ids'] = fn_get_category_ids_with_parent(explode(',', $cids));
     }
     $params['add_root'] = !empty($_REQUEST['root']) ? $_REQUEST['root'] : '';
 
