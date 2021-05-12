@@ -79,6 +79,10 @@ function fn_product_groups_pre_get_cart_product_data($hash, $product, $skip_prom
     $fields[] = 'group_id';
 }
 
+function fn_product_groups_get_cart_product_data_post_options($product_id, $_pdata, &$product) {
+    $product['group_id'] = $_pdata['group_id'] ?? 0;
+}
+
 // return product_groups
 function fn_product_groups_split_cart($cart) {
     $p_groups = array();

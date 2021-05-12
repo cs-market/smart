@@ -3,8 +3,9 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
-	'calculate_cart_items',
+    'calculate_cart_items',
     'pre_get_cart_product_data',
+    'get_cart_product_data_post_options',
     'pre_update_order',
     'place_suborders_pre',
     'place_suborders',
