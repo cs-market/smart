@@ -63,7 +63,7 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
 
             $min_order_amount = db_get_field('SELECT min_order_amount FROM ?:companies WHERE company_id = ?i', $company_id);
 
-            if (($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total']) || !($group_orders)) {
+            if ($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total'] && empty($group_orders)) {
                 $cart['min_order_failed'] = true;
                 $min_amount = $formatter->asPrice($min_order_amount);
                 $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('with_company') . ' ' . $group['name'];
