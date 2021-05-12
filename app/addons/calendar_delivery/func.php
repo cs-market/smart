@@ -38,6 +38,26 @@ function fn_calendar_delivery_uninstall()
     }
 }
 
+function fn_calendar_delivery_calculate_cart_taxes_pre(&$cart, $cart_products, $product_groups, $calculate_taxes, $auth) {
+    if (!empty($cart['chosen_shipping']) && (!isset($cart['delivery_date']) || empty($cart['delivery_date']))) {
+        $companies = fn_array_column($cart_products, 'company_id');
+        foreach ($companies as $company_id) {
+            $ts = fn_calendar_get_nearest_delivery_day(fn_get_company_data($company_id), true);
+            if (Registry::get('settings.Appearance.calendar_date_format') == "month_first") {
+                $cart['delivery_date'][$company_id] = date('m/d/Y', $ts);
+            } else {
+                $cart['delivery_date'][$company_id] = date('d/m/Y', $ts);
+            }
+        }
+    }
+}
+
+function fn_calendar_delivery_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
+    if (isset($params['delivery_date']) && !empty($params['delivery_date'])) {
+        $condition .= db_quote(' AND (?:orders.delivery_date = ?i OR ?:orders.delivery_date = 0)', $params['delivery_date']);
+    }
+}
+
 function fn_calendar_delivery_get_order_info(&$order, $additional_data) {
     // backward compatibility
     if (empty($order['delivery_date']) && !empty($order['shipping'][0]['delivery_date'])) {
@@ -354,7 +374,6 @@ function fn_delivery_date_from_line(string $days_str = '')
 function fn_add_calendar_disalow_days($arr, $day)
 {
     $arr[] = $day;
-    fn_print_r('adwe', $arr);
     return $arr;
 }
 

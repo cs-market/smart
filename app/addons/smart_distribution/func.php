@@ -37,6 +37,10 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
     if (isset($params['promotion_id']) && !empty($params['promotion_id'])) {
         $condition .= db_quote(" AND FIND_IN_SET(?i, promotion_ids)", $params['promotion_id']);
     }
+
+    if (isset($params['profile_id']) && !empty($params['profile_id'])) {
+        $condition .= db_quote(' AND (?:orders.profile_id = ?i OR ?:orders.profile_id = 0)', $params['profile_id']);
+    }
 }
 
 function fn_smart_distribution_get_order_info(&$order, $additional_data) {

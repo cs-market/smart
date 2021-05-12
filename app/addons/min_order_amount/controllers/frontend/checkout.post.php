@@ -10,5 +10,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'checkout' && $cart['min_order_failed']) {
     fn_set_notification('N', __('notice'), $cart['min_order_notification']);
-    return array(CONTROLLER_STATUS_REDIRECT, 'checkout.cart');
 }

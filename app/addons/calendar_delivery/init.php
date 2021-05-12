@@ -3,6 +3,8 @@
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
+    'get_orders',
+    'calculate_cart_taxes_pre',
 	'get_order_info',
 	'exim1c_order_xml_pre',
 	'get_companies',

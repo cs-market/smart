@@ -19,8 +19,11 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
     unset($cart['min_order_notification']);
     $formatter = Tygh::$app['formatter'];
     $orders = array();
+
+    $cart_profile_id = $cart['profile_id'];
+
     if ( isset($cart['user_data']['company_id']) && db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $cart['user_data']['company_id']) == 'Y') {
-        list($orders) = fn_get_orders(['period' => 'D', 'user_id' => $cart['user_data']['user_id']]);
+        list($orders) = fn_get_orders(['user_id' => $cart['user_data']['user_id'], 'period' => 'D', 'delivery_date' => fn_parse_date($cart['delivery_date'][$cart['user_data']['company_id']]), 'profile_id' => $cart['profile_id']]);
     }
 
     if (!empty($cart['user_data']['min_order_amount'])) {
@@ -55,17 +58,22 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
         foreach ($cart['product_groups'] as $group) {
             $company_id = $group['company_id'];
             $group_orders = array_filter($orders, function($v) use ($company_id) {
-                return $v['company_id'] == $company_id;
+                return ($v['company_id'] == $company_id);
             });
-            
-            $min_order_amount = db_get_field('SELECT min_order_amount FROM ?:companies WHERE company_id = ?i', $company_id) - array_sum(array_column($group_orders, 'total'));
 
-            if ($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total']) {
+            $min_order_amount = db_get_field('SELECT min_order_amount FROM ?:companies WHERE company_id = ?i', $company_id);
+
+            if (($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total']) || !($group_orders)) {
                 $cart['min_order_failed'] = true;
                 $min_amount = $formatter->asPrice($min_order_amount);
-
                 $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('with_company') . ' ' . $group['name'];
             }
         }
+    }
+}
+
+function fn_min_order_amount_allow_place_order_post($cart, $auth, $parent_order_id, $total, &$result) {
+    if ($cart['min_order_failed']) {
+        $result = false;
     }
 }
