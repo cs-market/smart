@@ -77,3 +77,7 @@ function fn_min_order_amount_allow_place_order_post($cart, $auth, $parent_order_
         $result = false;
     }
 }
+
+function fn_min_order_amount_get_usergroups($params, $lang_code, &$field_list, $join, $condition, $group_by, $order_by, $limit) {
+    $field_list .= ', a.min_order_amount';
+}
