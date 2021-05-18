@@ -2968,6 +2968,8 @@ function fn_change_usergroup_status($status, $user_id, $usergroup_id, $force_not
     );
     $result = db_query('REPLACE INTO ?:usergroup_links SET ?u', $data);
 
+    fn_set_hook('change_usergroup_status', $result, $data, $force_notification);
+
     if (!empty($force_notification['C'])) {
         fn_send_usergroup_status_notification($user_id, (array) $usergroup_id, $status);
     }
