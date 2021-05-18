@@ -839,6 +839,10 @@ function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fie
         $params['group_by_level'] = false;
         $params['simple'] = false;
     }
+    if (in_array(Registry::get('runtime.controller'), ['sd_exim_1c', 'exim_1c', 'commerceml'])) {
+        $remove = " AND (" . fn_find_array_in_set(Tygh::$app['session']['auth']['usergroup_ids'], '?:categories.usergroup_ids', true) . ")";
+        $condition = str_replace($remove, '', $condition);
+    }
 }
 
 function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
