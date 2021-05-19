@@ -27,4 +27,14 @@ class Companies extends Stores
 
         return $privileges;
     }
+
+    public function privilegesCustomer()
+    {
+        return [
+            'index'  => true,
+            'create' => false,
+            'update' => false,
+            'delete' => false,
+        ];
+    }
 }
