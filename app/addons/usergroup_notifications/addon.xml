@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<addon scheme="4.0">
+    <id>usergroup_notifications</id>
+    <version>1.0.1</version>
+    <priority>32000</priority>
+    <position>140</position>
+    <status>active</status>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <default_language>en</default_language>
+    <autoload>
+        <psr4 prefix="Tygh\Addons\UsergroupNotifications\">src</psr4>
+    </autoload>
+    <bootstrap>\Tygh\Addons\UsergroupNotifications\Bootstrap</bootstrap>
+    <queries>
+        <item>ALTER TABLE ?:usergroup_descriptions ADD email_template MEDIUMTEXT NOT NULL DEFAULT '';</item>
+        <item for="uninstall">ALTER TABLE ?:usergroup_descriptions DROP email_template;</item>
+    </queries>
+</addon>
