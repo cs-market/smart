@@ -23,23 +23,18 @@ class UserProfiles extends AEntity
     public function index($id = 0, $params = array())
     {
         $data = array();
-
-        if (!empty($id)) {
-            //$user_id = ($id = $this->auth['user_id']) ?? 0;
-            $user_id = $id;
-            $data = $this->getUserProfiles($user_id);
-            if ($data) {
-                $status = Response::STATUS_OK;
-            } else {
-                $status = Response::STATUS_NOT_FOUND;
-            }
-
-        } else {
-            $status = Response::STATUS_NOT_FOUND;
+        
+        if (empty($id)) {
+            $id = $this->auth['user_id'];
+        } elseif ($this->auth['user_type'] != 'A') {
+            $id = 0;
         }
 
+
+        $data = $this->getUserProfiles($id);
+
         return array(
-            'status' => $status,
+            'status' => empty($data) ? Response::STATUS_NOT_FOUND : Response::STATUS_OK,
             'data' => array_values($data)
         );
     }
