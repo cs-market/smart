@@ -1189,6 +1189,10 @@ fn_print_r($fantoms);
         db_query('UPDATE ?:products SET ?u WHERE product_id = ?i', $data, $data['product_id']);
     }
     fn_print_die(count($content));
+} elseif ($mode == 'remove_mikale_images') {
+    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 1815);
+    foreach ($product_ids as $pid) { fn_delete_image_pairs($pid, 'product'); }
+    fn_print_die('Fin');
 }
 
 function fn_merge_product_features($target_feature, $group) {
