@@ -25,7 +25,8 @@ class UserProfiles extends AEntity
         $data = array();
 
         if (!empty($id)) {
-            $user_id = ($id = $this->auth['user_id']) ?? 0;
+            //$user_id = ($id = $this->auth['user_id']) ?? 0;
+            $user_id = $id;
             $data = $this->getUserProfiles($user_id);
             if ($data) {
                 $status = Response::STATUS_OK;
