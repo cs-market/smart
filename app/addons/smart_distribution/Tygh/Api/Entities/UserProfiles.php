@@ -23,15 +23,13 @@ class UserProfiles extends AEntity
     public function index($id = 0, $params = array())
     {
         $data = array();
-        
+
         if (empty($id)) {
             $id = $this->auth['user_id'];
-        } elseif ($this->auth['user_type'] != 'A') {
+        } elseif ($this->auth['user_type'] != 'A' && $this->auth['user_id'] != $id) {
             $id = 0;
         }
-
-
-        $data = $this->getUserProfiles($id);
+        if ($id) $data = $this->getUserProfiles($id);
 
         return array(
             'status' => empty($data) ? Response::STATUS_NOT_FOUND : Response::STATUS_OK,
@@ -98,7 +96,7 @@ class UserProfiles extends AEntity
         $user_profiles = fn_get_user_profiles($id);
         if ($user_profiles) {
 
-            foreach ($user_profiles as &$profile) { 
+            foreach ($user_profiles as &$profile) {
                 $profile['profile_data'] = db_get_row("SELECT * FROM ?:user_profiles WHERE user_id = ?i AND profile_id = ?i", $id, $profile['profile_id']);
                 $profile['profile_name'] = $profile['profile_name'] . "(".$profile['profile_data']['s_address'].")" ;
                 $profile['s_address'] = $profile['profile_data']['s_address'];
@@ -106,7 +104,7 @@ class UserProfiles extends AEntity
                 $prof_cond = $profile['profile_id'] ? db_quote("OR (object_id = ?i AND object_type = 'P')", $profile['profile_id']) : '';
                 $profile['fields'] = db_get_hash_single_array("SELECT field_id, value FROM ?:profile_fields_data WHERE (object_id = ?i AND object_type = 'U') $prof_cond", array('field_id', 'value'), $id);
             }
-        
+
             return $user_profiles;
         }
 
