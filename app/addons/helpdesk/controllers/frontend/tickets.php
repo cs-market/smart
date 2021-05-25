@@ -28,15 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         $ticket_data['users'] = [$user_id];
-        $ticket_data['mailbox_id'] = Registry::get('addons.helpdesk.storefront_mailbox_id');
+
         $ticket_data['ticket_id'] = fn_update_ticket($ticket_data);
         if (empty($auth['user_id'])) {
             $auth['ticket_ids'][] = $ticket_data['ticket_id'];
-        }
-
-        $uploaded_data = fn_filter_uploaded_data('ticket_data');
-        foreach ($uploaded_data as $key => $file) {
-            $ticket_data['attachment'][$file['name']] = file_get_contents($file['path']);
         }
 
         if (!empty($ticket_data['ticket_id'])) {
@@ -52,12 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($mode == 'add_message') {
         $ticket_data = $_REQUEST['ticket_data'];
-
-        $uploaded_data = fn_filter_uploaded_data('ticket_data');
-
-        foreach ($uploaded_data as $key => $file) {
-            $ticket_data['attachment'][$file['name']] = file_get_contents($file['path']);
-        }
 
         if (!empty($ticket_data['ticket_id'])) {
             $message_id = fn_update_message($ticket_data);
@@ -76,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'list') {
     $params = $_REQUEST;
+    unset($params['user_id']);
     list($tickets, $search) = fn_get_tickets($params);
 
     Tygh::$app['view']->assign('search', $search);
@@ -107,6 +97,7 @@ if ($mode == 'list') {
         return array(CONTROLLER_STATUS_DENIED);
     }
 } elseif ($mode == 'new') {
+    Tygh::$app['view']->assign('mailboxes', fn_get_mailboxes());
     $ticket_data = fn_restore_post_data('ticket_data');
     if (!empty($ticket_data)) {
         Tygh::$app['view']->assign('ticket_data', $ticket_data);

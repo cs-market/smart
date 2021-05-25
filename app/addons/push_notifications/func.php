@@ -114,3 +114,9 @@ function fn_push_notifications_get_mobile_table_values($param) {
     if ($param)
     return db_get_fields("SELECT DISTINCT(?p) FROM ?:mobile_app_notification_subscriptions WHERE ?p != ''", $param, $param);
 }
+
+function fn_push_notifications_send_message_pre(&$notified, $message, $mailbox) {
+    foreach (array_keys($message['users']) as $user_id) {
+        $notified = $notified || fn_mobile_app_notify_user($user_id, $message['subject'], strip_tags($message['message']));
+    }
+}

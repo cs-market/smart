@@ -60,5 +60,8 @@ fn_register_hooks(
     'promotion_apply_pre',
     'add_product_to_cart_get_price',
     'pre_get_cart_product_data',
-    'checkout_get_user_profiles'
+    'checkout_get_user_profiles',
+    'get_mailboxes_pre',
+    'get_tickets_params',
+    'update_ticket_pre'
 );

@@ -24,7 +24,7 @@ class Bootstrap implements BootstrapInterface, HookHandlerProviderInterface
         ];
     }
 
-    public function onUpdateStatus($result, $data, $force_notification) {
+    static public function onUpdateStatus($result, $data, $force_notification) {
         if ($data['status'] == 'A') {
             $usergroup_id = $data['usergroup_id'];
             $usergroups = fn_get_usergroups(array('usergroup_id' => $usergroup_id), DESCR_SL);
@@ -47,7 +47,7 @@ class Bootstrap implements BootstrapInterface, HookHandlerProviderInterface
         }
     }
 
-    public function onGetUsergroups($params, $lang_code, &$field_list, $join, $condition, $group_by, $order_by, $limit) {
+    static public function onGetUsergroups($params, $lang_code, &$field_list, $join, $condition, $group_by, $order_by, $limit) {
         $field_list .= ', b.email_template';
     }
 }

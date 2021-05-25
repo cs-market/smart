@@ -5,6 +5,7 @@ use Tygh\Models\Company;
 use Tygh\Enum\ProductTracking;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProfileDataTypes;
+use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -864,12 +865,13 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
     }
 
     $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
-    $condition .= db_quote(' 
-        AND CASE WHEN 
-        (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
-        THEN ?:product_prices.usergroup_id IN (?a) 
-        ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_diff($usergroup_ids, [USERGROUP_ALL]), array_diff($usergroup_ids, [USERGROUP_ALL]), USERGROUP_ALL);
-
+    if (AREA == 'C') {
+        $condition .= db_quote(' 
+            AND CASE WHEN 
+            (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
+            THEN ?:product_prices.usergroup_id IN (?a) 
+            ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_diff($usergroup_ids, [USERGROUP_ALL]), array_diff($usergroup_ids, [USERGROUP_ALL]), USERGROUP_ALL);
+    }
     // Cut off out of stock products
     if (AREA == 'C') {
         $condition .= db_quote(
@@ -1111,4 +1113,25 @@ function fn_smart_distribution_checkout_get_user_profiles($auth, &$user_profiles
     array_walk($user_profiles, function (&$v) {
         $v['is_selectable'] = true;
     });
+}
+
+function fn_smart_distribution_get_mailboxes_pre(&$condition) {
+    if (SiteArea::isStorefront(AREA) && Tygh::$app['session']['auth']['user_id']) {
+        $user_info = fn_get_user_short_info(Tygh::$app['session']['auth']['user_id']);
+        if ($user_info['company_id']) {
+            $condition .= db_quote(' AND company_id = ?i', $user_info['company_id']);
+        }
+    }
+}
+
+function fn_smart_distribution_get_tickets_params(&$params, $condition, $join) {
+    if (ACCOUNT_TYPE == 'vendor' && !fn_smart_distribution_is_manager(Tygh::$app['session']['auth']['user_id'])) {
+        unset($params['user_id']);
+    }
+}
+
+function fn_smart_distribution_update_ticket_pre(&$data) {
+    $sender = reset($data['users']);
+    $managers = fn_smart_distribution_get_managers(['user_id' => $sender]);
+    $data['users'] = array_unique(array_merge($data['users'], array_keys($managers)));
 }

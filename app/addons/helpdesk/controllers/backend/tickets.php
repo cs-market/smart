@@ -12,12 +12,27 @@ fn_trusted_vars (
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($mode == 'add') {
+        $ticket_ids = [];
         $ticket_data = $_REQUEST['ticket_data'];
-        $ticket_data['users'] = explode(',',$ticket_data['users']);
+        $users = explode(',',$ticket_data['users']);
+        $ticket_data['users'] = [];
+        if ($_REQUEST['devide_ticket'] == 'Y') {
+            foreach ($users as $ticket_data['users']) {
+                $ticket_ids[] = fn_update_ticket($ticket_data);
+            }
+        } else {
+            $ticket_data['users'] = $users;
+            $ticket_ids[] = fn_update_ticket($ticket_data);
+        }
 
-        $ticket_id = fn_update_ticket($ticket_data);
-
-        $suffix = ".update?ticket_id=$ticket_id";
+        foreach ($ticket_ids as $ticket_data['ticket_id']) {
+            fn_update_message($ticket_data);
+        }
+        if (count($ticket_id) == 1) {
+            $suffix = ".update?ticket_id=$ticket_id";
+        } else {
+            $suffix = ".manage?ticket_id=" . implode(',', $ticket_ids);
+        }
     }
 
     if ($mode == 'update') {

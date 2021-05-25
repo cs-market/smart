@@ -1,3 +1,4 @@
+{capture name="mainbox"}
 {if $mailbox}
     {assign var="id" value=$mailbox.mailbox_id}
 {else}
@@ -8,7 +9,7 @@
 
 <div id="content_group{$id}">
 
-<form action="{""|fn_url}" method="post" name="mailboxs_form_{$id}" enctype="multipart/form-data" class=" form-horizontal{if !$allow_save} cm-hide-inputs{/if}">
+<form action="{""|fn_url}" method="post" name="mailbox_form_{$id}" enctype="multipart/form-data" class=" form-horizontal{if !$allow_save} cm-hide-inputs{/if}">
 <input type="hidden" name="mailbox_id" value="{$id}" />
 
 <div class="cm-tabs-content" id="tabs_content_{$id}">
@@ -18,6 +19,18 @@
             <label for="elm_mailbox_mailbox_name_{$id}" class="cm-required control-label">{__("mailbox_name")}:</label>
             <div class="controls">
                 <input id="elm_mailbox_mailbox_name_{$id}" type="text" name="mailbox_data[mailbox_name]" value="{$mailbox.mailbox_name}">
+            </div>
+        </div>
+        {include file="views/companies/components/company_field.tpl"
+            name="mailbox_data[company_id]"
+            id="elm_mailbox_data_`$product_group.group_id`"
+            selected=$mailbox.company_id
+            zero_company_id_name_lang_var="none"
+        }
+        <div class="control-group">
+            <label for="elm_mailbox_department_{$id}" class="cm-required control-label">{__("department")}:</label>
+            <div class="controls">
+                <input id="elm_mailbox_department_{$id}" type="text" name="mailbox_data[department]" value="{$mailbox.department}">
             </div>
         </div>
         <div class="control-group">
@@ -71,6 +84,10 @@
         <div class="control-group">
             <label for="elm_mailbox_admin_notifications_{$id}" class="control-label">{__("admin_notifications")}:</label>
             <div class="controls">
+                {$responsible = $mailbox.responsible_admin|fn_get_user_short_info}
+                {if !$responsible.firstname && !$responsible.lastname}
+                    {$responsible.firstname = $responsible.email}
+                {/if}
                 {include
                     file="pickers/users/picker.tpl"
                     but_text=__("choose")
@@ -81,7 +98,7 @@
                     item_ids=$mailbox.responsible_admin
                     display="radio"
                     view_mode="single_button"
-                    user_info=$mailbox.responsible_admin|fn_get_user_short_info
+                    user_info=$responsible
                 }
             </div>
         </div>
@@ -89,11 +106,21 @@
     <!--content_tab_details_{$id}--></div>
 </div>
 
-{if !$hide_for_vendor}
-    <div class="buttons-container">
-        {include file="buttons/save_cancel.tpl" but_name="dispatch[mailboxes.update]" cancel_action="close" save=$id}
-    </div>
-{/if}
-
 </form>
 <!--content_group{$id}--></div>
+
+{/capture}
+
+{capture name="buttons"}
+    {include file="buttons/save_cancel.tpl" but_role="submit-link" but_name="dispatch[mailboxes.update]" but_target_form="mailbox_form_{$id}" save=$id}
+{/capture}
+
+{capture name="mainbox_title"}
+    {if $mailbox.mailbox_id}
+        {"{__("editing_mailbox")}: `$mailbox.mailbox_name`"}
+    {else}
+        {__("new_mailbox")}
+    {/if}
+{/capture}
+
+{include file="common/mainbox.tpl" title=$smarty.capture.mainbox_title content=$smarty.capture.mainbox select_languages=false buttons=$smarty.capture.buttons adv_buttons=$smarty.capture.adv_buttons}

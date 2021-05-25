@@ -2,6 +2,8 @@
 
 use Tygh\Registry;
 use Tygh\Storage;
+use Tygh\Enum\SiteArea;
+use Tygh\Enum\UserTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -10,7 +12,20 @@ function fn_get_mailboxes($params = array()) {
     if (isset($params['mailbox_id'])) {
         $condition .= db_quote(" AND mailbox_id = ?i", $params['mailbox_id']);
     }
+    if (Registry::get('runtime.company_id')) {
+        $condition .= fn_get_company_condition('company_id');
+    }
+    if (isset($params['company_id']) && !empty($params['company_id'])) {
+        $condition .= fn_get_company_condition('company_id', true, $params['company_id'], false, true);   
+    }
+    if (SiteArea::isStorefront(AREA)) {
+        $condition .= " AND status = 'A'";
+    }
+
+    fn_set_hook('get_mailboxes_pre', $condition);
+
     $mailboxes = db_get_hash_array("SELECT * FROM ?:helpdesk_mailboxes WHERE 1 $condition", 'mailbox_id');
+
     return $mailboxes;
 }
 
@@ -106,19 +121,29 @@ function fn_get_tickets($params = array(), $items_per_page = 10) {
         'user_id' => Tygh::$app['session']['auth']['user_id'],
     );
 
-    $params = array_merge($default_params, $params);
+    $params = fn_array_merge($default_params, $params);
+    $user_info = fn_get_user_short_info($params['user_id']);
 
-    // if (AREA == 'A' && !fn_is_restricted_admin(db_get_row("SELECT user_id, is_root, company_id FROM ?:users WHERE user_id = ?i", $params['user_id']))) {
-    //     unset($params['user_id']);
-    // }
+    if (SiteArea::isAdmin(AREA) && !fn_is_restricted_admin($user_info) && UserTypes::isAdmin($user_info['user_type'])) {
+        unset($params['user_id']);
+    }
+
+    fn_set_hook('get_tickets_params', $params, $condition, $join);
 
     if (!empty($params['ticket_id'])) {
-        $condition .= db_quote(" AND t.ticket_id = ?i", $params['ticket_id']);
+        if (!is_array($params['ticket_id'])) {
+            $params['ticket_id'] = explode(',', $params['ticket_id'] );
+        }
+        $condition .= db_quote(" AND t.ticket_id in (?a)", $params['ticket_id']);
         unset($params['page']);
     }
 
     $fields = ' t.*, mb.mailbox_name ';
     $join['helpdesk_mailboxes'] = " LEFT JOIN ?:helpdesk_mailboxes AS mb ON t.mailbox_id = mb.mailbox_id";
+
+    if (Registry::get('runtime.company_id')) {
+        $condition .= fn_get_company_condition('mb.company_id');
+    }
 
     if (!isset($params['ticket_id'])) {
         $fields .= ' , max(m.timestamp) as updated';
@@ -155,9 +180,12 @@ function fn_get_tickets($params = array(), $items_per_page = 10) {
     $tickets = db_get_hash_array("SELECT $fields FROM ?:helpdesk_tickets AS t" . implode(' ', $join) . " WHERE $condition $group $order $limit", 'ticket_id');
 
     if (!isset($params['ticket_id']) && !empty($tickets)) {
-        $ticket_count_open = db_get_hash_array("SELECT COUNT(m.message_id) as count_open, m.ticket_id FROM ?:helpdesk_messages AS m WHERE m.status = ?s AND m.ticket_id in (?a) GROUP BY m.ticket_id", 'ticket_id', 'O', array_keys($tickets));
+        $ticket_count_new = db_get_hash_array("SELECT COUNT(m.message_id) as count_new, m.ticket_id FROM ?:helpdesk_messages AS m WHERE m.status = ?s AND m.ticket_id in (?a) GROUP BY m.ticket_id", 'ticket_id', 'N', array_keys($tickets));
         $ticket_count_all = db_get_hash_array("SELECT COUNT(m.message_id) as count_all, m.ticket_id FROM ?:helpdesk_messages AS m WHERE m.ticket_id in (?a) GROUP BY m.ticket_id", 'ticket_id', array_keys($tickets));
-        $tickets = fn_array_merge($tickets, $ticket_count_open, $ticket_count_all);
+        $ticket_count_unviewed = db_get_hash_array("SELECT COUNT(m.message_id) as count_unviewed, m.ticket_id FROM ?:helpdesk_messages AS m WHERE m.viewed = ?s AND m.ticket_id in (?a) GROUP BY m.ticket_id", 'ticket_id', 'N', array_keys($tickets));
+        if ($ticket_count_unviewed) $params['has_unviewed'] = true;
+
+        $tickets = fn_array_merge($tickets, $ticket_count_new, $ticket_count_all, $ticket_count_unviewed);
 
         foreach ($tickets as $ticket_id => &$ticket) {
             $ticket['users'] = fn_get_ticket_users(['ticket_id' => $ticket_id]);
@@ -169,16 +197,21 @@ function fn_get_tickets($params = array(), $items_per_page = 10) {
 
 function fn_update_ticket($data, $ticket_id = 0) {
     $ticket_users = array();
+    if (!is_array($data['users'])) {
+        $data['users'] = explode(',', $data['users']);
+    }
 
     if (!empty($ticket_id)) {
         db_query('UPDATE ?:helpdesk_tickets SET ?u WHERE ticket_id = ?i', $data, $ticket_id);
         db_query('DELETE FROM ?:helpdesk_ticket_users WHERE ticket_id = ?i', $ticket_id);
     } else {
-        $ticket_id = db_query("INSERT INTO ?:helpdesk_tickets ?e", $data);
         $mailbox_admin = db_get_field('SELECT responsible_admin FROM ?:helpdesk_mailboxes WHERE mailbox_id = ?i', $data['mailbox_id']);
         if ($mailbox_admin) {
             $data['users'][] = $mailbox_admin;
         }
+        fn_set_hook('update_ticket_pre', $data);
+
+        $ticket_id = db_query("INSERT INTO ?:helpdesk_tickets ?e", $data);
     }
 
     $ticket_users['ticket_id'] = $ticket_id;
@@ -205,6 +238,10 @@ function fn_get_ticket($params, $items_per_page = 10) {
         if (isset($params['get_messages'])) {
             $params['ticket_id'] = $ticket['ticket_id'];
             list($ticket['messages'], $params) = fn_get_messages($params, $items_per_page);
+            if (SiteArea::isStorefront(AREA)) {
+                $messages = array_filter($ticket['messages'], function($v) {return $v['viewed'] == 'N';});
+                if (!empty($messages)) db_query('UPDATE ?:helpdesk_messages SET `viewed` = ?s WHERE message_id IN (?a)', 'Y', array_keys($messages));
+            }
         }
     }
 
@@ -298,10 +335,17 @@ function fn_get_ticket_users($params) {
 }
 
 function fn_update_message(&$data, $message_id = 0) {
-    $message = &$data['message'];
 
+    $uploaded_data = fn_filter_uploaded_data('ticket_data');
+    if ($uploaded_data)
+    foreach ($uploaded_data as $key => $file) {
+        $data['attachment'][$file['name']] = file_get_contents($file['path']);
+    }
+
+    $message = &$data['message'];
+    unset($data['message_id']);
     //str_replace(array('<p>', '</p>'), array('', '<br>'), '\\1');
-                    
+
     /*$message = preg_replace("/\[quote](.+)\[\/quote]/Use", "'[quote]' . str_replace(array('</p><p>', '<p>', '</p>'), array('','', '<br>'), trim('\\1')) . '[/quote]'", $message);
     $message = preg_replace("/\[q](.+)\[\/q]/Use", "'[q]' . str_replace(array('</p><p>', '<p>', '</p>'), array('','', '<br>'), trim('\\1')) . '[/q]'", $message);*/
     $blockquote = '<blockquote style="background-color:#eeeeee;border:1px solid silver;padding:10px 15px">';
@@ -450,6 +494,7 @@ function fn_helpdesk_send_mail() {
 
     foreach ($messages as &$message) {
         if (!empty($message['users'])) {
+            $notified = false;
             $settings = $mailboxes[$message['mailbox_id']];
 
             $tid = '[' . $settings['ticket_prefix'] . '_TID:' . $message['ticket_id']. ']';
@@ -467,17 +512,20 @@ function fn_helpdesk_send_mail() {
                 }
             }
             $mailer = Tygh::$app['mailer'];
-            $store_settings = Registry::get('settings');
-            $store_emails_settings = $store_settings['Emails'];
+
             $mailbox_email_settings = array(
-                'mailer_smtp_host' => $settings['smtp_server'],
+                'mailer_send_method' => 'smtp',
+                'mailer_smtp_host' => $settings['host'],
                 'mailer_smtp_username' => $settings['email'],
                 'mailer_smtp_password' => $settings['password']
             );
-            $mailer_settings = fn_array_merge($store_emails_settings, $mailbox_email_settings);
+            $mailer_settings = fn_array_merge(Registry::get('settings.Emails'), $mailbox_email_settings);
+            
+            fn_set_hook('send_message_pre', $notified, $message, $mailboxes[$message['mailbox_id']]);
 
-            $result = $mailer->send(array(
-                'to' => fn_array_column($message['users'], 'email'), 
+            if (!$notified)
+            $notified = $mailer->send(array(
+                'to' => array_column($message['users'], 'email'),
                 'from' => array('name' => $mailboxes[$message['mailbox_id']]['mailbox_name'], 'email' => $settings['email']),
                 'tpl' => $body,
                 'is_html' => true,
@@ -488,9 +536,9 @@ function fn_helpdesk_send_mail() {
                 'attachments' => $attachements,
             ), 'A', Registry::get('settings.Appearance.backend_default_language'), $mailer_settings);
         } else {
-            $result = true;
+            $notified = true;
         }
-        if ($result) {
+        if ($notified) {
             db_query('UPDATE ?:helpdesk_messages set notified = "Y" WHERE message_id = ?i', $message['message_id']);
         }
     }
@@ -534,7 +582,7 @@ function fn_helpdesk_can_user_access_ticket($ticket_id, array $auth) {
 function fn_helpdesk_get_predefined_statuses($type, &$statuses) {
     if ($type == 'helpdesk') {
         $statuses['helpdesk'] = array(
-            'O' => __('open'),
+            'N' => __('new'),
             'C' => __('closed'),
             'W' => __('waiting')
         );

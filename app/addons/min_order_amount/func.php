@@ -20,8 +20,6 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
     $formatter = Tygh::$app['formatter'];
     $orders = array();
 
-    $cart_profile_id = $cart['profile_id'];
-
     if ( isset($cart['user_data']['company_id']) && db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $cart['user_data']['company_id']) == 'Y') {
         list($orders) = fn_get_orders(['user_id' => $cart['user_data']['user_id'], 'period' => 'D', 'delivery_date' => fn_parse_date($cart['delivery_date'][$cart['user_data']['company_id']]), 'profile_id' => $cart['profile_id']]);
     }

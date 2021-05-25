@@ -12,7 +12,7 @@
                     <th class="nowrap">{__("ticket_id")}</th>
                     <th class="nowrap" width="50%">{__("subject")}</th>
                     <th class="nowrap" width="20%">{__("users_list")}</th>
-                    <th class="nowrap">{__("open_messages")} / {__("messages")}</th>
+                    <th class="nowrap">{__("new_messages")} / {__("messages")}</th>
                     <th class="nowrap">{__("last_message_date")}</th>
                     <th width="5%">&nbsp;</th>
                 </tr>
@@ -31,7 +31,7 @@
                     {/foreach}
                     </ul>
                 </td>
-                <td class="center">{$ticket.count_open|default:0} / {$ticket.count_all}</td>
+                <td class="center">{$ticket.count_new|default:0} / {$ticket.count_all}</td>
                 <td class="center">{if $ticket.updated}{"j/m/Y G:i"|date:$ticket.updated}{else}-{/if}</td>
                 <td class="nowrap">
                     {capture name="tools_list"}
