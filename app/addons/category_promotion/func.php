@@ -261,3 +261,25 @@ function fn_category_promotion_split_promotion_by_type($promotions) {
     }
     return array($promotions, $products, $search);
 }
+
+function fn_category_promotion_check_total_conditioned_products($id, $products) {
+    $product_ids = [];
+    $promotion = fn_get_promotion_data($id);
+    if ($promotion['condition_categories']) {
+        $category_ids = explode(',', $promotion['condition_categories']);
+        list($categories_products) = fn_get_products(['cid' => $category_ids, 'subcats' => 'Y', 'load_products_extra_data' => false]);
+        if ($categories_products) {
+            $product_ids = array_keys($categories_products);
+        }
+    } elseif ($promotion['products']) {
+        $product_ids = explode(',', $promotion['products']);
+    }
+    $cart_products = array_filter($products, function($v) use ($product_ids) {return in_array($v['product_id'], $product_ids);});
+
+    if ($cart_products) {
+        $subtotal = array_sum(array_column($cart_products, 'subtotal'));
+        return fn_promotion_validate_attribute($subtotal, $promo['value'], $promo['operator']);
+    }
+
+    return false;
+}

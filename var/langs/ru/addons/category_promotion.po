@@ -31,3 +31,7 @@ msgstr "Category Promotion"
 msgctxt "Languages::promotion_products"
 msgid "Promotion products"
 msgstr "Товары промоакций"
+
+msgctxt "Languages::promotion_cond_total_conditioned_products"
+msgid "Subtotal by promo's condition products"
+msgstr "Итого по указанным в условиях товарам"
