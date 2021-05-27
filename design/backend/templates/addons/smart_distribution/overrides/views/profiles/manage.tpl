@@ -50,7 +50,7 @@
         <th><a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("person_name")}{if $search.sort_by == "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         <th><a class="cm-ajax" href="{"`$c_url`&sort_by=email&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("email")}{if $search.sort_by == "email"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         <th><a class="cm-ajax" href="{"`$c_url`&sort_by=last_login&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("last_login")}{if $search.sort_by == "last_login"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
-        <th>{__("creation_date")}</th>
+        <th><a class="cm-ajax" href="{"`$c_url`&sort_by=timestamp&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id={$rev}>{__("creation_date")}{if $search.sort_by == "timestamp"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
         {if !$search.user_type}
             <th>{__("type")}</th>
         {/if}

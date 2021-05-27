@@ -195,7 +195,7 @@ function fn_smart_distribution_get_users_pre(&$params, $auth, $items_per_page, $
     }
 }
 
-function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condition, &$join, $auth) {
+function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condition, &$join, $auth) {
     $fields[] = 'last_update';
     if (!empty($params['managers'])) {
         if (!is_array($params['managers'])) {
@@ -244,6 +244,8 @@ function fn_smart_distribution_get_users(&$params, &$fields, $sortings, &$condit
         $join .= db_quote(" LEFT JOIN ?:orders as without_order ON ?:users.user_id = without_order.user_id AND (without_order.timestamp >= ?i AND without_order.timestamp <= ?i)", $params[$w_time_from], $params[$w_time_to]);
         $condition['without_order'] = db_quote(" AND without_order.user_id IS NULL");
     }
+
+    $sortings['timestamp'] = '?:users.timestamp';
 }
 
 function fn_smart_distribution_get_users_post(&$users, $params, $auth) {
