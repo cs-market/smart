@@ -12,38 +12,14 @@
     *}
     </div>
 {/if}
+
+{if $subcategories}
+    {include file="views/categories/components/categories_multicolumns.tpl" categories=$subcategories columns=3}
+{/if}
+
 {if $category_data.description || $runtime.customization_mode.live_editor}
     <div class="ty-wysiwyg-content ty-mb-s" {live_edit name="category:description:{$category_data.category_id}"}>{$category_data.description nofilter}</div>
 {/if}
-
-{*if $subcategories}
-    {math equation="ceil(n/c)" assign="rows" n=$subcategories|count c=$columns|default:"2"}
-    {split data=$subcategories size=$rows assign="splitted_subcategories"}
-    <ul class="subcategories clearfix">
-    {foreach from=$splitted_subcategories item="ssubcateg"}
-        {foreach from=$ssubcateg item=category name="ssubcateg"}
-            {if $category}
-                <li class="ty-subcategories__item">
-                    <a href="{"categories.view?category_id=`$category.category_id`"|fn_url}">
-                    {if $category.main_pair}
-                        {include file="common/image.tpl"
-                            show_detailed_link=false
-                            images=$category.main_pair
-                            no_ids=true
-                            image_id="category_image"
-                            image_width=$settings.Thumbnails.category_lists_thumbnail_width
-                            image_height=$settings.Thumbnails.category_lists_thumbnail_height
-                            class="ty-subcategories-img"
-                        }
-                    {/if}
-                    <span {live_edit name="category:category:{$category.category_id}"}>{$category.category}</span>
-                    </a>
-                </li>
-            {/if}
-        {/foreach}
-    {/foreach}
-    </ul>
-{/if*}
 
 {if $products}
 {assign var="layouts" value=""|fn_get_products_views:false:0}
