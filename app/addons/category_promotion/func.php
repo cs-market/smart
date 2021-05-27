@@ -262,7 +262,7 @@ function fn_category_promotion_split_promotion_by_type($promotions) {
     return array($promotions, $products, $search);
 }
 
-function fn_category_promotion_check_total_conditioned_products($id, $products) {
+function fn_category_promotion_check_total_conditioned_products($id, $promo, $products) {
     $product_ids = [];
     $promotion = fn_get_promotion_data($id);
     if ($promotion['condition_categories']) {
@@ -273,6 +273,7 @@ function fn_category_promotion_check_total_conditioned_products($id, $products) 
         }
     } elseif ($promotion['products']) {
         $product_ids = explode(',', $promotion['products']);
+
     }
     $cart_products = array_filter($products, function($v) use ($product_ids) {return in_array($v['product_id'], $product_ids);});
 

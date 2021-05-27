@@ -282,7 +282,7 @@
                         <a><strong>{__("signed_in_as")}</strong><br>{$user_info.email}</a>
                     </li>
                     <li class="divider"></li>
-                    {hook name="menu:mobile_profile"}
+                    {hook name="menu:profile"}
                         <li><a href="{"profiles.update?user_id=`$auth.user_id`"|fn_url}">{__("edit_profile")}</a></li>
                         <li><a href="{"auth.logout"|fn_url}">{__("sign_out")}</a></li>
                     {/hook}
