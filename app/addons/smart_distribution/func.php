@@ -775,6 +775,10 @@ function fn_diff_original_products($original_products, $products)
 }
 
 function fn_smart_distribution_get_products($params, &$fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
+    // fix product variations: free space should be into condition
+    if (strpos($condition, 'AND 1 != 1')) {
+        $condition = str_replace('AND 1 != 1', ' AND 1 != 1', $condition);
+    }
     if (Tygh::$app['session']['auth']['area'] == 'A' && AREA == 'C') {
         $condition = explode(' AND ', $condition);
       foreach($condition as $id => $cond) {

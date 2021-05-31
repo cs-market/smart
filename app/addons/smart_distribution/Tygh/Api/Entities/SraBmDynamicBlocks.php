@@ -45,6 +45,10 @@ class SraBmDynamicBlocks extends ASraEntity
             );
         }
 
+        if (($object_id = $this->safeGet($params, 'object_id', null)) && ($object_type = $this->safeGet($params, 'object_type', null)) ) {
+            $_REQUEST[$object_type . "_id"] = $object_id;
+        }
+
         $params['icon_sizes'] = $this->safeGet($params, 'icon_sizes', [
             'main_pair'   => [$this->icon_size_big, $this->icon_size_small],
             'image_pairs' => [$this->icon_size_small],
@@ -68,6 +72,7 @@ class SraBmDynamicBlocks extends ASraEntity
 
         $containers = $this->getContainersByLocation($location['location_id']);
         $grids = $this->getGridsByContainers($containers);
+        // WHY??
         unset($params['object_type']);
         $blocks = $this->getBlocksByGrids($grids, $params);
 
