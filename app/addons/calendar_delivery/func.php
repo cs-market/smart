@@ -336,9 +336,9 @@ function fn_get_calendar_delivery_period($period_start, $period_finish, $period_
  **/
 function fn_delivery_date_to_line(array $days_array = [])
 {
-    $days_str = '';
-    for ($i=0; $i <= 6; $i++) {
-        $days_str[$i] = in_array($i, $days_array) ? '1' : '0';
+    $days_str = '0000000';
+    foreach ($days_array as $i) {
+        $days_str[$i] = 1;
     }
     return (string) $days_str;
 }
@@ -355,13 +355,7 @@ function fn_delivery_date_to_line(array $days_array = [])
  **/
 function fn_delivery_date_from_line(string $days_str = '')
 {
-    $days_array = [];
-    for ($i=0; $i < strlen($days_str); $i++) {
-        if ($days_str[$i]) {
-            $days_array[] = $i;
-        }
-    }
-    return (array) $days_array;
+    return array_keys(array_filter(str_split($days_str), function($v) {return $v == '1';}));
 }
 
 /**
