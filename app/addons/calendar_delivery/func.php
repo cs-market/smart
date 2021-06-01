@@ -355,7 +355,7 @@ function fn_delivery_date_to_line(array $days_array = [])
  **/
 function fn_delivery_date_from_line(string $days_str = '')
 {
-    return array_keys(array_filter(str_split($days_str), function($v) {return $v == '1';}));
+    return array_keys(array_filter(str_split($days_str)));
 }
 
 /**
