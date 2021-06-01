@@ -17,7 +17,7 @@
     <div class="control-group">
         <label for="mailbox_id" class="control-label cm-required">{__("mailbox_name")}:</label>
         <div class="controls">
-            <select class="span5 user-success" name="ticket_data[mailbox_id]" id="mailbox_id">
+            <select class="span5" name="ticket_data[mailbox_id]" id="mailbox_id">
                 {foreach from=$mailboxes item='mailbox'}
                     <option value="{$mailbox.mailbox_id}" {if $mailbox.mailbox_id == $ticket.mailbox_id} selected="selected"{/if}>{$mailbox.mailbox_name}</option>
                 {/foreach}

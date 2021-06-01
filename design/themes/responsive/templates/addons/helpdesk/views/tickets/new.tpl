@@ -11,6 +11,22 @@
                 <input id="new_ticket_name" class="ty-input-text" type="text" name="ticket_data[name]" value="{$ticket_data.name}" size="50">
             </div>
             {/if}
+
+            {if $mailboxes} 
+                {if $mailboxes|count > 1}
+                    <div class="ty-control-group">
+                        <label class="ty-control-group__title cm-required" for="new_ticket_name">{__("name")}</label>
+                        <select class="span5" name="ticket_data[mailbox_id]" id="mailbox_id">
+                            {foreach from=$mailboxes item='mailbox'}
+                                <option value="{$mailbox.mailbox_id}" {if $mailbox.mailbox_id == $ticket.mailbox_id} selected="selected"{/if}>{$mailbox.mailbox_name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                {else}
+                    {$mailbox = $mailboxes|reset}
+                    <input type="hidden" name="ticket_data[mailbox_id]" value="{$mailbox.mailbox_id}" >
+                {/if}
+            {/if}
             <div class="ty-control-group">
                 <label class="ty-control-group__title cm-required" for="new_ticket_subject">{__("subject")}</label>
                 <input id="new_ticket_subject" class="ty-input-text" type="text" name="ticket_data[subject]" value="{$ticket_data.subject}" size="50">
