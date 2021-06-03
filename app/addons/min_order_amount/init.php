@@ -6,5 +6,6 @@ fn_register_hooks(
     'get_user_info',
     'calculate_cart_post',
     'allow_place_order_post',
-    'get_usergroups'
+    'get_usergroups',
+    'pre_place_order'
 );

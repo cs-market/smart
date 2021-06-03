@@ -13,10 +13,20 @@ function fn_min_order_amount_get_user_info($user_id, $get_profile, $profile_id, 
     }
 }
 
+function fn_min_order_amount_pre_place_order(&$cart, $allow, $product_groups) {
+    if ($allow) {
+        $cart['skip_min_check'] = true;
+    }
+}
+
 // do all checks here
 function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups) {
     $cart['min_order_failed'] = false;
     unset($cart['min_order_notification']);
+    if (isset($cart['skip_min_check']) && $cart['skip_min_check']) {
+        return;
+    }
+
     $formatter = Tygh::$app['formatter'];
     $orders = array();
 
