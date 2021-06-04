@@ -61,28 +61,22 @@ function fn_user_price_get_product_price_post($product_id, $amount, $auth, &$pri
 
 function fn_update_product_user_price($product_id, $user_prices, $delete_price = true)
 {
-    //  delete old data
-    if ($delete_price) db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);
-
-    foreach ($user_prices as $user_price) {
-        if (empty($user_price['user_id'])) {
-            continue;
-        }
-        if (isset($user_price['price']) && $user_price['price'] == '') {
-            db_query("DELETE FROM ?:user_price WHERE product_id = ?i AND user_id = ?i", $product_id, $user_price['user_id']);
-        } elseif (is_numeric($user_price['price'])) {
-            db_query(
-                "REPLACE INTO ?:user_price ?e",
-                [
-                    'user_id' => $user_price['user_id'],
-                    'price' => $user_price['price'],
-                    'product_id' => $product_id
-                ]
-            );
-        } else {
-            db_query('DELETE FROM ?:users WHERE product_id = ?i AND user_id = ?i', $product_id, $user_price['user_id']);
-        }
+    if ($delete_price) {
+        //  delete all old data
+        db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);  
+    } else {
+        $user_prices = array_filter($user_prices, function($v) {return (isset($v['user_id']) && is_numeric($v['user_id']));} );
+        $users = array_column($user_prices, 'user_id');
+        db_query("DELETE FROM ?:user_price WHERE product_id = ?i AND user_id IN (?a)", $product_id, $users);  
     }
+
+    $user_price = array_filter($user_prices, function($v) {return (isset($v['price']) && is_numeric($v['price']));} );
+
+    if (!empty($user_price)) {
+        array_walk($user_price, function(&$value, $k) use ($product_id) {$value['product_id'] = $product_id;});
+        db_query('INSERT INTO ?:user_price ?m', $user_price);
+    }
+
     return true;
 }
 

@@ -16,31 +16,39 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
             }
             //process_qty_discounts
         } else {
-            $names = explode(',', $name);
-            $search_fields = array('cscart_users.user_login', 'cscart_users.firstname', 'cscart_users.email');
+            static $db_users;
+            $users = array();
+            if (!isset($db_users[$name])) {
+                $names = explode(',', $name);
+                $search_fields = array('cscart_users.user_login', 'cscart_users.firstname', 'cscart_users.email');
 
-            list($fields, $join, $condition) = fn_get_users(['get_conditions' => true], $_SESSION['auth']);
+                list($fields, $join, $condition) = fn_get_users(['get_conditions' => true], $_SESSION['auth']);
 
-            foreach ($search_fields as $level => $field) {
-                $parts = array();
-                foreach ($names as $search) {
-                    $parts[] = db_quote("$field = ?s", $search);
+                foreach ($search_fields as $level => $field) {
+                    $parts = array();
+                    foreach ($names as $search) {
+                        $parts[] = db_quote("$field = ?s", $search);
+                    }
+
+                    $expression[] = ' WHEN (' . implode(' OR ', $parts) . ') THEN ' . $level;
+                    $conditions[] = implode(' OR ', $parts);
+                }
+                if (!empty($expression)) {
+                    $case = ' CASE ' . implode(' ', $expression) . ' END AS level';
+                    $fields[] = $case;
+                    $condition['case_condition'] = ' AND ( ' . implode(' OR ', $conditions) . ' ) ';
                 }
 
-                $expression[] = ' WHEN (' . implode(' OR ', $parts) . ') THEN ' . $level;
-                $conditions[] = implode(' OR ', $parts);
+                $users = db_get_hash_multi_array("SELECT " . implode(', ', $fields) . " FROM ?:users $join WHERE 1" . implode('', $condition) , array('level'));                
+                if (!empty($users)) {
+                    ksort($users);
+                    $db_users[$name] = $users = reset($users);
+                }
+            } else {
+                $users = $db_users[$name];
             }
-            if (!empty($expression)) {
-                $case = ' CASE ' . implode(' ', $expression) . ' END AS level';
-                $fields[] = $case;
-                $condition['case_condition'] = ' AND ( ' . implode(' OR ', $conditions) . ' ) ';
-            }
-
-            $users = db_get_hash_multi_array("SELECT " . implode(', ', $fields) . " FROM ?:users $join WHERE 1" . implode('', $condition) . " $group $sorting $limit" , array('level'));
 
             if (!empty($users)) {
-                ksort($users);
-                $users = reset($users);
                 $price = array();
                 foreach ($users as $user) {
                     $price[] = array(
