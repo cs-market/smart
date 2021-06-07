@@ -255,6 +255,8 @@ function fn_category_promotion_split_promotion_by_type($promotions) {
     $product_ids = array_unique(explode(',', implode(',', $data)));
     if ($product_ids) {
         $params = $_REQUEST;
+        // TODO pass request into params
+        unset($s_params['items_per_page'], $s_params['page']);
         $params['extend'] = ['categories', 'description'];
         $params['pid'] = $product_ids;
         list($products, $search) = fn_get_products($params, Registry::get('settings.Appearance.products_per_page'), CART_LANGUAGE);
