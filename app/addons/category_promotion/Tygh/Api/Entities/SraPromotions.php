@@ -35,7 +35,7 @@ class SraPromotions extends AEntity
                 $s_params = $_REQUEST;
                 $s_params['extend'] = ['categories', 'description'];
                 $s_params['pid'] = explode(',', $product_ids);
-                unset($s_params['items_per_page'], $s_params['page']);
+                unset($params['items_per_page'], $params['page']);
                 list($products, $search) = fn_get_products($s_params);
             }
             // $data['promotions'][] = $promotion;
