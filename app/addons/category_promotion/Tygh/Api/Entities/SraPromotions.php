@@ -11,6 +11,7 @@ class SraPromotions extends AEntity
     public function index($id = 0, $params = array())
     {
         $data = ['promotions' => [], 'products' => []];
+        unset($params['items_per_page'], $params['page']);
 
         $lang_code = $this->getLanguageCode($params);
         $currency = $this->getCurrencyCode($params);
