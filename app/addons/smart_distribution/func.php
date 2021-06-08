@@ -6,6 +6,8 @@ use Tygh\Enum\ProductTracking;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProfileDataTypes;
 use Tygh\Enum\SiteArea;
+use Tygh\Enum\UserTypes;
+use Tygh\Enum\UsergroupTypes;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -1143,15 +1145,6 @@ function fn_smart_distribution_update_ticket_pre(&$data) {
 }
 
 // allow to set usergroup for vendor admin
-function fn_smart_distribution_check_usergroup_available_for_user_post($user_id, $usergroup_id, &$result) {
-    if (!$result) {
-        $condition = db_quote('(users.user_type = ?s AND usergroups.type = ?s)');
-        $is_allowed_usergroup = db_get_field(
-            'SELECT usergroups.usergroup_id FROM ?:users AS users'
-            . ' LEFT JOIN ?:usergroups AS usergroups ON usergroups.usergroup_id = ?i'
-            . ' WHERE users.user_id = ?i AND (users.user_type = ?s AND usergroups.type = ?s)',
-            $usergroup_id, $user_id, 'V', 'A');
-        
-        $result = !empty($is_allowed_usergroup);
-    }
+function fn_smart_distribution_usergroup_types_get_map_user_type(&$map) {
+    $map[UserTypes::VENDOR] = UsergroupTypes::TYPE_ADMIN;
 }

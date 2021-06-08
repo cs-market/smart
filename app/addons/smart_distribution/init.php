@@ -64,5 +64,5 @@ fn_register_hooks(
     'get_mailboxes_pre',
     'get_tickets_params',
     'update_ticket_pre',
-    'check_usergroup_available_for_user_post'
+    'usergroup_types_get_map_user_type'
 );
