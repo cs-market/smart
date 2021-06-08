@@ -231,6 +231,8 @@ return [
             // 's_client_code' => '9999',
             // 'b_client_code' => '9999',
             'b_firstname' => '262',
+            'fax' => '335',
+            'company' => '334'
         ],
     ],
     '65' => [
