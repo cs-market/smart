@@ -1148,3 +1148,21 @@ function fn_smart_distribution_update_ticket_pre(&$data) {
 function fn_smart_distribution_usergroup_types_get_map_user_type(&$map) {
     $map[UserTypes::VENDOR] = UsergroupTypes::TYPE_ADMIN;
 }
+
+// temporary
+function fn_smart_distribution_get_orders_post($params, &$orders) {
+    if (defined('API')) {
+        $map = array(
+            'A' => 'P',
+            'E' => 'B',
+            'G' => 'I'
+        );
+        foreach ($orders as &$order) {
+            if ($order['company_id'] != 13) {
+                if (in_array($order['status'], array_keys($map))) {
+                    $order['status'] = $map[$order['status']];
+                }
+            }
+        }
+    }
+}

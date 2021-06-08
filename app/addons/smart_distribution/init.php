@@ -64,5 +64,7 @@ fn_register_hooks(
     'get_mailboxes_pre',
     'get_tickets_params',
     'update_ticket_pre',
-    'usergroup_types_get_map_user_type'
+    'usergroup_types_get_map_user_type',
+    //temporary
+    'get_orders_post'
 );
