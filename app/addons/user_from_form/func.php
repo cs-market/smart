@@ -4,7 +4,7 @@ use Tygh\Pdf;
 use Tygh\Registry;
 
 //  [HOOKs]
-function fn_user_from_form_send_form($page_data, $form_values, $result, $from, $sender, $attachments, $is_html, $subject)
+function fn_user_from_form_send_form($page_data, $form_values, &$result, $from, $sender, $attachments, $is_html, $subject)
 {
     if ($result != true) {
         return;
@@ -56,8 +56,10 @@ function fn_user_from_form_send_form($page_data, $form_values, $result, $from, $
         }
     }
     if ($user_id) {
-        $result = db_query("UPDATE ?:users SET status = ?s WHERE user_id = ?i", "A", $user_id);
+        db_query("UPDATE ?:users SET status = ?s WHERE user_id = ?i", "A", $user_id);
     }
+
+    if (!$user_id) $result = false;
 }
 //  [HOOKs]
 
