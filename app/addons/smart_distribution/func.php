@@ -1141,3 +1141,17 @@ function fn_smart_distribution_update_ticket_pre(&$data) {
     $managers = fn_smart_distribution_get_managers(['user_id' => $sender]);
     $data['users'] = array_unique(array_merge($data['users'], array_keys($managers)));
 }
+
+// allow to set usergroup for vendor admin
+function fn_smart_distribution_check_usergroup_available_for_user_post($user_id, $usergroup_id, &$result) {
+    if (!$result) {
+        $condition = db_quote('(users.user_type = ?s AND usergroups.type = ?s)');
+        $is_allowed_usergroup = db_get_field(
+            'SELECT usergroups.usergroup_id FROM ?:users AS users'
+            . ' LEFT JOIN ?:usergroups AS usergroups ON usergroups.usergroup_id = ?i'
+            . ' WHERE users.user_id = ?i AND (users.user_type = ?s AND usergroups.type = ?s)',
+            $usergroup_id, $user_id, 'V', 'A');
+        
+        $result = !empty($is_allowed_usergroup);
+    }
+}

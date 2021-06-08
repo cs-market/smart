@@ -63,5 +63,6 @@ fn_register_hooks(
     'checkout_get_user_profiles',
     'get_mailboxes_pre',
     'get_tickets_params',
-    'update_ticket_pre'
+    'update_ticket_pre',
+    'check_usergroup_available_for_user_post'
 );
