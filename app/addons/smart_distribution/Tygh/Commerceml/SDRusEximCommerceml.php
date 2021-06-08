@@ -50,7 +50,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     // [csmarket] get extra categories
                     list($categories) = fn_get_categories(['search_query' => strval($_group -> {$cml['name']}), 'total_items' => 1], $import_params['lang_code']);
                     if (!empty($categories)) {
-                        $category_id = reset(array_keys($categories));
+                        $categories = array_keys($categories);
+                        $category_id = reset($categories);
                     }
                 }
 
@@ -78,7 +79,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
     {
         $cml = $this->cml;
         $prices = [
-            'base_price' => 0
+            'base_price' => 0,
+            'qty_prices' => []
         ];
         $list_prices = array();
         foreach ($product_prices as $external_id => $p_price) {
@@ -101,7 +103,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                             );
                         }
 
-                        if ($p_commerseml['usergroup_id'] > 0) {
+                        if (isset($p_commerseml['usergroup_id']) && $p_commerseml['usergroup_id'] > 0) {
                             $prices['qty_prices'][] = array(
                                 'price' => $p_price['price'],
                                 'usergroup_id' => $p_commerseml['usergroup_id']
@@ -254,6 +256,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
         $count_import_offers = 0;
         $product_amount = $product = [];
         $cml = $this->cml;
+        $link_type = $this->s_commerceml['exim_1c_import_type'];
 
         // [csmarket]
         $company_condition = fn_get_company_condition('company_id', true, '', false, true);
@@ -304,7 +307,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $warehouses_amounts = $this->importProductWarehousesStock($product_id, $offer, $warehouses_amounts);
             $this->addProductPrice($product_id, $prices);
             $this->addProductXmlFeaturesAsOptions($offer, $product_id, $import_params, $combination_id, [], isset($product['product_code']) ? $product['product_code'] : false);
-            $this->addMessageLog('Added product = ' . strval($offer -> {$cml['name']}) . ', price = ' . $prices['base_price'] . ' and amount = ' . $amount);
+            $this->addMessageLog('Added product = ' . strval($offer -> {$cml['name']}) . ', price = ' . $prices['base_price']);
         }
 
         $this->db->query('UPDATE ?:products SET ?u WHERE product_id = ?i', $product, $product_id);
@@ -318,7 +321,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $ugroups = fn_get_usergroups(array('type' => 'C', 'status' => array('A', 'H')));
                 $ugroups = array_keys($ugroups);
             }
-            if (!empty($product_data['product_id'])) {
+            if (!empty($product_data['product_id']) && !empty($ugroups)) {
                 $this->db->query('UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i', implode(',', $ugroups), $product_data['product_id']);
             }
         }
@@ -538,6 +541,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 );
             }
             if (empty($product_data)) {
+                $full_name = '';
                 if (isset($_product -> {$cml['value_fields']} -> {$cml['value_field']})) {
                     $requisites = $_product -> {$cml['value_fields']} -> {$cml['value_field']};
                     list($full_name, $product_code, $html_description) = $this->getAdditionalDataProduct($requisites, $cml);
@@ -878,7 +882,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     fn_form_cart($order_id, $cart, $customer_auth);
                     fn_store_shipping_rates($order_id, $cart, $customer_auth);
                     $cart['order_id'] = $order_id;
-                    $cart['order_status'] = $statuses[strval($data_field->{$cml['value']})]['status'];
+                    //$cart['order_status'] = $statuses[strval($data_field->{$cml['value']})]['status'];
                     $cart['products'] = array();
 
                     foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
