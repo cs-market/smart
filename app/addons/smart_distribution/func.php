@@ -594,7 +594,7 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
     }
 
     // limit vendors usergroups
-    $cid = ($product_data['company_id']) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id);
+    $cid = (isset($product_data['company_id'])) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id);
 
     if ($cid) {
         $company = UG_Company::model()->find($cid);

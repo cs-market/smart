@@ -1,6 +1,7 @@
 <?php
 
 use Tygh\Registry;
+use Tygh\Enum\SiteArea;
 
 function fn_get_conditions($conditions, &$promo_extra) {
     
@@ -75,7 +76,7 @@ function fn_category_promotion_update_promotion_post($data, $promotion_id, $lang
 }
 
 function fn_category_promotion_get_products_before_select(&$params, $join, &$condition, $u_condition, $inventory_join_cond, $sortings, $total, $items_per_page, $lang_code, $having){
-    if (AREA != 'A') {
+    if (SiteArea::isStorefront(AREA)) {
         if (!empty($params['cid'])) {
             if (in_array(
                 $params['cid'],
@@ -180,8 +181,7 @@ function fn_category_promotion_get_products(&$params, $fields, $sortings, &$cond
 }
 
 function fn_category_promotion_get_promotions_pre(&$params, $items_per_page, $lang_code) {
-    if (Registry::get('runtime.controller') == 'promotions' && Registry::get('runtime.mode') == 'list') {
-        // default controller set this param, but we need to display all promo
+    if (SiteArea::isStorefront(AREA)) {
         unset($params['get_hidden']);
         $params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
     }
@@ -228,7 +228,7 @@ function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth
 
 function fn_category_promotion_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
 {
-    if (!empty($product_data['product_id']) && AREA === 'C') {
+    if (!empty($product_data['product_id']) && SiteArea::isStorefront(AREA)) {
         list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product_data['product_id'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true], 1);
 
         if ($promotions) {
