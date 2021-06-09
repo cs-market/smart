@@ -180,7 +180,7 @@ function fn_category_promotion_get_products(&$params, $fields, $sortings, &$cond
 }
 
 function fn_category_promotion_get_promotions_pre(&$params, $items_per_page, $lang_code) {
-    if (Registry::get('runtine.controller') == 'promotions' && Registry::get('runtine.mode') == 'list') {
+    if (Registry::get('runtime.controller') == 'promotions' && Registry::get('runtime.mode') == 'list') {
         // default controller set this param, but we need to display all promo
         unset($params['get_hidden']);
         $params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
