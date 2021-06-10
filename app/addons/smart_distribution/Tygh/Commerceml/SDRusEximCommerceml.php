@@ -1443,6 +1443,15 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     $product['qty_step'] = (float) $_v_field;
                 }
                 if ($_name_field == $cml['avail_till']) $product['avail_till'] = fn_parse_date($_v_field, true);
+
+                if ($_name_field == $cml['tracking']) {
+                    if ($_v_field == $cml['yes']) {
+                        $product['tracking'] = ProductTracking::TRACK_WITH_OPTIONS;
+                    } else {
+                        $product['tracking'] = ProductTracking::DO_NOT_TRACK;
+                    }
+                }
+
             }
         }
     }
