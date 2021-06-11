@@ -53,5 +53,8 @@
 
         <item>ALTER TABLE `?:companies` ADD `notify_manager_order_update` char(1) NOT NULL DEFAULT 'Y';</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `notify_manager_order_update`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `tracking` VARCHAR(1) NOT NULL DEFAULT 'B';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `tracking`;</item>
     </queries>
 </addon>

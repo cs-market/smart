@@ -613,6 +613,11 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
     if (!empty($product_data['avail_till'])) {
         $product_data['avail_till'] = fn_parse_date($product_data['avail_till']);
     }
+
+    // check company tracking and set it by necessity
+    if (!$product_id && !isset($product_data['tracking']) && !empty($product_data['company_id'])) {
+        $product_data['tracking'] = db_get_field('SELECT tracking FROM ?:companies WHERE company_id = ?i', $product_data['company_id']);
+    }
 }
 
 // for update order products content by back sync from 1c
