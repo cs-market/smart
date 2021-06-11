@@ -13,21 +13,6 @@ function fn_get_payment_name($payment_id, $lang_code = CART_LANGUAGE) {
     return false;
 }
 
-function fn_exim_orders_w_items_get($field, $key, $data, $unset = false)
-{
-    static $orders;
-    if ($unset) {
-        $orders = [];
-        return true;
-    }
-    if (in_array($key, (array)$orders[$field])) {
-        return '';
-    } else {
-        $orders[$field][] = $key;
-        return $data;
-    }
-}
-
 function fn_import_change_order_status($object) {
     if (isset($object['order_id'], $object['status']) && !empty($object['order_id']) && !empty($object['status']))
     fn_change_order_status($object['order_id'], $object['status']);

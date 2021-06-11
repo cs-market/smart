@@ -1193,6 +1193,12 @@ fn_print_r($fantoms);
     $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 1815);
     foreach ($product_ids as $pid) { fn_delete_image_pairs($pid, 'product'); }
     fn_print_die('Fin');
+} elseif ($mode == 'restore_vega_products') {
+    $file = 'cscart_products.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    foreach ($content as $data) {
+        db_query('UPDATE ?:products SET status = ?s WHERE product_id = ?i', $data['status'], $data['product_id']);
+    }
 }
 
 function fn_merge_product_features($target_feature, $group) {
