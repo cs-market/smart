@@ -1532,40 +1532,56 @@ class SDRusEximCommerceml extends RusEximCommerceml
         return $data;
     }
 
+    // public function updateProductStatus($product_id, $product_data, $amount)
+    // {
+    //     $hide_product = $this->s_commerceml['exim_1c_add_out_of_stock'];
+
+    //     if ($hide_product == 'Y') {
+    //         if ($product_data['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
+    //             $amount = (int) $this->db->getField(
+    //                 'SELECT SUM(amount) FROM ?:product_options_inventory WHERE product_id = ?i',
+    //                 $product_id
+    //             );
+    //         }
+
+    //         if (empty($amount) && $this->s_commerceml['exim_1c_import_mode_offers'] == 'variations') {
+    //             $variation_amount = (int) $this->db->getField(
+    //                 'SELECT SUM(amount) FROM ?:products WHERE parent_product_id = ?i',
+    //                 $product_id
+    //             );
+
+    //             if (!empty($variation_amount)) {
+    //                 $amount = $variation_amount;
+    //             }
+    //         }
+    //     }
+
+    //     if ($product_data['tracking'] != ProductTracking::DO_NOT_TRACK) {
+    //         $product_status = $this->getProductStatusByAmount($amount);
+
+    //         $this->db->query(
+    //             'UPDATE ?:products SET status = ?s WHERE update_1c = ?s AND product_id = ?i',
+    //             $product_status,
+    //             'Y',
+    //             $product_id
+    //         );
+    //     }
+
+    //     return $product_status;
+    // }
     public function updateProductStatus($product_id, $product_data, $amount)
     {
         $hide_product = $this->s_commerceml['exim_1c_add_out_of_stock'];
 
-        if ($hide_product == 'Y') {
-            if ($product_data['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {
-                $amount = (int) $this->db->getField(
-                    'SELECT SUM(amount) FROM ?:product_options_inventory WHERE product_id = ?i',
-                    $product_id
-                );
-            }
+        $product_status = $this->getProductStatusByAmount($amount);
 
-            if (empty($amount) && $this->s_commerceml['exim_1c_import_mode_offers'] == 'variations') {
-                $variation_amount = (int) $this->db->getField(
-                    'SELECT SUM(amount) FROM ?:products WHERE parent_product_id = ?i',
-                    $product_id
-                );
-
-                if (!empty($variation_amount)) {
-                    $amount = $variation_amount;
-                }
-            }
-        }
-
-        if ($product_data['tracking'] != ProductTracking::DO_NOT_TRACK) {
-            $product_status = $this->getProductStatusByAmount($amount);
-
-            $this->db->query(
-                'UPDATE ?:products SET status = ?s WHERE update_1c = ?s AND product_id = ?i',
-                $product_status,
-                'Y',
-                $product_id
-            );
-        }
+        $product_status = $this->getProductStatusByAmount($amount);
+        $this->db->query(
+            'UPDATE ?:products SET status = ?s WHERE update_1c = ?s AND product_id = ?i',
+            $product_status,
+            'Y',
+            $product_id
+        );
 
         return $product_status;
     }
