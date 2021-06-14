@@ -832,6 +832,36 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
     }
 }
 
+function fn_smart_distribution_get_products_before_select(&$params, $join, $condition, $u_condition, $inventory_join_cond, $sortings, $total, $items_per_page, $lang_code, $having){
+    // we have not template_var in API
+    if (!empty($params['similar']) && defined('API')) {
+        if (empty($params['main_product_id'])) {
+            return;
+        }
+        $product = fn_get_product_data($params['main_product_id'], Tygh::$app['session']['auth']);
+
+        $params['exclude_pid'] = $params['main_product_id'];
+
+        if (!empty($params['similar_category']) && $params['similar_category'] == 'Y') {
+            $params['cid'] = $product['main_category'];
+
+            if (!empty($params['similar_subcats']) && $params['similar_subcats'] == 'Y') {
+                $params['subcats'] = 'Y';
+            }
+        }
+
+        if (!empty($product['price'])) {
+
+            if (!empty($params['percent_range'])) {
+                $range = $product['price'] / 100 * $params['percent_range'];
+
+                $params['price_from'] = $product['price'] - $range;
+                $params['price_to'] = $product['price'] + $range;
+            }
+        }
+    }
+}
+
 function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fields, $group_by, $sortings, $lang_code) {
     if (Tygh::$app['session']['auth']['area'] == 'A') {
         $condition = explode(' AND ', $condition);

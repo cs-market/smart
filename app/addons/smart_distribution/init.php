@@ -40,6 +40,7 @@ fn_register_hooks(
     'calculate_cart_post',
     'update_cart_by_data_post',
     'get_products',
+    'get_products_before_select',
     'get_categories',
     'get_product_data',
     'get_product_data_post',
