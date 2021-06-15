@@ -14,10 +14,7 @@ $schema['export_fields']['Payment method'] = array(
     'process_get' => array('fn_get_payment_name', '#this', '#lang_code')
 );
 
-$schema['post_processing']['unset_static_orders'] = array (
-    'function' => 'fn_exim_orders_w_items_get',
-    'args' => array('', '', '', true),
-);
+unset($schema['post_processing']['unset_static_orders']);
 
 foreach ($schema['export_fields'] as &$field) {
     if (isset($field['process_get'][0]) && $field['process_get'][0] == 'fn_exim_orders_with_items_get') {
