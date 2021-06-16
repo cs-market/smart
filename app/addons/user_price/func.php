@@ -70,7 +70,16 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
         db_query("DELETE FROM ?:user_price WHERE product_id = ?i AND user_id IN (?a)", $product_id, $users);  
     }
 
-    $user_price = array_filter($user_prices, function($v) {return (isset($v['price']) && is_numeric($v['price']));} );
+    $user_price = array_filter($user_prices, function($v) {
+        static $hashes;
+        $hash = md5(json_encode($v));
+        if (!in_array($hash, $hashes)) {
+            $hashes[] = $hash;
+            return (isset($v['price']) && is_numeric($v['price']));
+        } else {
+            return false;
+        }
+    });
 
     if (!empty($user_price)) {
         array_walk($user_price, function(&$value, $k) use ($product_id) {$value['product_id'] = $product_id;});
