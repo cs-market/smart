@@ -616,6 +616,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
         }
 
         if ($this->checkUploadProduct($product_id, $product_update)) {
+            if (Registry::get('runtime.company_id') == '1815') $this->s_commerceml['exim_1c_import_product_name'] = 'full_name';
             $product = $this->dataProductFile($xml_product_data, $product_id, $guid_product, $categories_commerceml, $import_params);
 
             // [cs-market] default func adds default category to existing ones
