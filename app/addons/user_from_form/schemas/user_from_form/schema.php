@@ -221,7 +221,7 @@ return [
         'company_id' => 1815,
         'usergroup_id' => [758],
         'fields_map' => [
-            'firstname' => '262',
+            'firstname' => '334',
             'phone' => '265',
             'email' => '263',
             'user_login' => '263',
@@ -232,7 +232,7 @@ return [
             // 'b_client_code' => '9999',
             'b_firstname' => '262',
             'fax' => '335',
-            'company' => '334'
+            'company' => '262'
         ],
     ],
     '65' => [
