@@ -132,6 +132,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $prices['base_price'] = max($p);
         }
 
+        if (empty($prices['qty_prices'])) unset($prices['qty_prices']);
+
         return $prices;
     }
 
