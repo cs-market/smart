@@ -686,7 +686,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
             // import barcode to feature
             $data = json_decode(json_encode($xml_product_data), true);
-            $data = array_filter($data, function($val) {
+            $data = array_filter($data, static function($val) {
                 return (!is_array($val));
             });
             array_walk($data, 'fn_trim_helper');

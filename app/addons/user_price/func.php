@@ -71,10 +71,9 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
     }
 
     $user_price = array_filter($user_prices, function($v) {
-        static $hashes;
-        $hash = md5(json_encode($v));
-        if (!in_array($hash, $hashes)) {
-            $hashes[] = $hash;
+        static $users;
+        if (!in_array($v['user_id'], $users)) {
+            $users[] = $v['user_id'];
             return (isset($v['price']) && is_numeric($v['price']));
         } else {
             return false;
