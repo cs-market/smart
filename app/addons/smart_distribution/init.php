@@ -34,6 +34,7 @@ fn_register_hooks(
     'get_product_features_list_before_select',
     'shippings_get_shippings_list_conditions',
     'place_order',
+    'update_order',
     'get_notification_rules',
     'get_product_features_list_post',
     'form_cart',
