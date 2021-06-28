@@ -865,7 +865,7 @@ function fn_storefront_rest_api_strip_service_data(array $cart)
         // remove shipping config
         foreach (array_keys($group['shippings']) as $shipping_id) {
             unset(
-                $cart['product_groups'][$group_id]['shippings'][$shipping_id]['service_params'],
+                //$cart['product_groups'][$group_id]['shippings'][$shipping_id]['service_params'],
                 $cart['product_groups'][$group_id]['shippings'][$shipping_id]['rate_info'],
                 $cart['shipping'][$shipping_id]['service_params'],
                 $cart['shipping'][$shipping_id]['rate_info']
