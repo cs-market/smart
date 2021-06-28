@@ -1536,6 +1536,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
     public function updateProductStatus($product_id, $product_data, $amount)
     {
+        if (!is_numeric($amount)) {
+            return self::PRODUCT_STATUS_ACTIVE;
+        }
+
         $product_status = $this->getProductStatusByAmount($amount);
 
         if ($product_data['tracking'] != ProductTracking::DO_NOT_TRACK) {
