@@ -1408,7 +1408,8 @@ function fn_update_product_feature($feature_data, $feature_id, $lang_code = DESC
         }
     }
 
-    if ($action === 'create' || !$feature_id) {
+    // [cs-market] we need to use hooks after feature creation
+    if (!$feature_id) {
         return $feature_id;
     }
 

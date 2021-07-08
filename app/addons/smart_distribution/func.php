@@ -1078,7 +1078,8 @@ function fn_smart_distribution_update_product_feature_post($feature_data, $featu
             'display_count' => 10,
             'round_to' => '0.01',
             'filter_type' => 'FF-'.$feature_id,
-            'filter' => fn_get_feature_name($feature_id)
+            'filter' => fn_get_feature_name($feature_id),
+            'company_id' => $feature_data['company_id']
         );
         fn_update_product_filter($filter_data, 0);
     }
