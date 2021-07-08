@@ -1544,11 +1544,19 @@ function fn_promotion_check_existence($promotion_id, &$cart)
         $order_management_condition = '';
     }
 
+    // [cs-market] change once_per_customer handler
+    /*
     $exists = db_get_field(
         "SELECT ((firstname = ?s) + (lastname = ?s) + (b_city = ?s) + (b_state = ?s) + (b_country = ?s) + (b_zipcode = ?s) + (email = ?s) * 6) as r "
         . " FROM ?:orders WHERE ?p promotion_ids != '' AND FIND_IN_SET(?i, promotion_ids) AND status IN (?a) HAVING r >= ?i LIMIT 1",
         $udata['firstname'], $udata['lastname'], $udata['b_city'], $udata['b_state'], $udata['b_country'],
         $udata['b_zipcode'], $udata['email'], $order_management_condition, $promotion_id, $statuses, PROMOTION_MIN_MATCHES
+    );*/
+
+    $exists = db_get_field(
+        "SELECT ((email = ?s) * 6) as r "
+        . " FROM ?:orders WHERE ?p promotion_ids != '' AND FIND_IN_SET(?i, promotion_ids) AND status IN (?a) HAVING r >= ?i LIMIT 1",
+        $udata['email'], $order_management_condition, $promotion_id, $statuses, PROMOTION_MIN_MATCHES
     );
 
     return $exists;
