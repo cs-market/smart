@@ -75,3 +75,6 @@ msgctxt "Languages::addons.sberbank_fz.ffd_payment_object_type"
 msgid "Type of the payment object"
 msgstr "Тип оплачиваемой позиции"
 
+msgctxt "Languages::addons.sberbank_fz.order_placed_mobile"
+msgid "Your order was placed. Close the browser and return to application"
+msgstr "Ваш Заказ оплачен. Eсли вы хотите продолжить покупки, перейдите в мобильное приложение."

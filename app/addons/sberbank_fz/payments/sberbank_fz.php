@@ -64,7 +64,11 @@ if (defined('PAYMENT_NOTIFICATION')) {
 
         fn_finish_payment($order_id, $pp_response);
         if (isset($_REQUEST['isMobilePayment']) && $_REQUEST['isMobilePayment']) {
-            echo(__('processing_order'));
+            if (Tygh::$app['session']['auth']['user_id']) {
+                echo(__('processing_order'));
+            } else {
+                echo(__('addons.sberbank_fz.order_placed_mobile'));
+            }
         } else {
             fn_order_placement_routines('route', $order_id, false);
         }
