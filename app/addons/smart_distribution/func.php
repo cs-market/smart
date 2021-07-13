@@ -90,6 +90,9 @@ function fn_smart_distribution_get_order_info(&$order, $additional_data) {
             }
         }
     }
+
+    // product_groups should not be a null for application. TODO in future on app side
+    if (!isset($order['product_groups'])) $order['product_groups'] = array();
 }
 
 function fn_smart_distribution_get_product_features_list_before_select(&$fields, $join, &$condition, $product, $display_on, $lang_code) {
