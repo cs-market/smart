@@ -62,10 +62,6 @@ class SraPromotions extends AEntity
 
             $product = fn_storefront_rest_api_format_product_prices($product, $currency);
 
-            if ($is_discussion_enabled) {
-                $product = SraDiscussion::setDiscussionType($product, DiscussionObjectTypes::PRODUCT);
-            }
-
             $product = fn_storefront_rest_api_set_product_icons($product, $params['icon_sizes']);
         }
         unset($product);
