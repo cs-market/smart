@@ -55,6 +55,7 @@ class SberbankFz extends Sberbank
 
     public function register($order_info, $protocol = 'current', $is_mobile = false)
     {
+        ini_set('serialize_precision', 10);
         $order_total = $this->convertSum($order_info['total']);
 
         $order_id = $order_info['order_id'];
