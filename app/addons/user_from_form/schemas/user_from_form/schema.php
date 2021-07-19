@@ -255,7 +255,7 @@ return [
     '95' => [
         'page_id' => 95,
         'company_id' => 1810,
-        'usergroup_id' => [601],
+        // 'usergroup_id' => [601],
         'fields_map' => [
             'firstname' => '375',
             'phone' => '373',
@@ -267,6 +267,7 @@ return [
             's_client_code' => '9999',
             'b_client_code' => '9999',
             'b_firstname' => '374',
+            'status' => 'D',
         ],
     ],
 ];
