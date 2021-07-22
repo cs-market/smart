@@ -68,5 +68,6 @@ fn_register_hooks(
     'update_ticket_pre',
     'usergroup_types_get_map_user_type',
     //temporary
-    'get_orders_post'
+    'get_orders_post',
+    'extract_cart'
 );

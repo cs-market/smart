@@ -543,20 +543,22 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 );
             }
             if (empty($product_data)) {
-                $full_name = '';
-                if (isset($_product -> {$cml['value_fields']} -> {$cml['value_field']})) {
-                    $requisites = $_product -> {$cml['value_fields']} -> {$cml['value_field']};
-                    list($full_name, $product_code, $html_description) = $this->getAdditionalDataProduct($requisites, $cml);
-                }
+                if ($this->company_id != '1815') {
+                    $full_name = '';
+                    if (isset($_product -> {$cml['value_fields']} -> {$cml['value_field']})) {
+                        $requisites = $_product -> {$cml['value_fields']} -> {$cml['value_field']};
+                        list($full_name, $product_code, $html_description) = $this->getAdditionalDataProduct($requisites, $cml);
+                    }
 
-                $cond = $this->db->quote('pd.product = ?s', trim(strval($_product -> {$cml['name']})));
-                if (trim($full_name)) {
-                    $cond = $this->db->quote("( $cond OR pd.product = ?s )", $full_name);
-                }
+                    $cond = $this->db->quote('pd.product = ?s', trim(strval($_product -> {$cml['name']})));
+                    if (trim($full_name)) {
+                        $cond = $this->db->quote("( $cond OR pd.product = ?s )", $full_name);
+                    }
 
-                $product_data = $this->db->getRow(
-                    "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE $cond $company_condition", DESCR_SL
-                );
+                    $product_data = $this->db->getRow(
+                        "SELECT ?:products.product_id, update_1c FROM ?:products LEFT JOIN ?:product_descriptions as pd ON pd.product_id = ?:products.product_id AND pd.lang_code = ?s WHERE $cond $company_condition", DESCR_SL
+                    );
+                }
 
                 if (empty($product_data) && !empty($article)) {
                     $product_data = $this->db->getRow(

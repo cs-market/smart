@@ -8,6 +8,7 @@ use Tygh\Enum\ProfileDataTypes;
 use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\UsergroupTypes;
+use Tygh\Storage;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -1211,4 +1212,14 @@ function fn_smart_distribution_get_orders_post($params, &$orders) {
             }
         }
     }
+}
+
+function fn_smart_distribution_extract_cart(&$cart, $user_id, $type, $user_type) {
+    if (!empty($cart['products']))
+    foreach ($cart['products'] as &$product) {
+        if (!Storage::instance('images')->isExist($product['main_pair']['detailed']['relative_path'])) {
+            $product['main_pair'] = fn_get_image_pairs($product['product_id'], 'product', 'M', true, true);
+        }
+    }
+    unset($product);
 }
