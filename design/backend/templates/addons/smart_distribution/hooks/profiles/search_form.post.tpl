@@ -21,6 +21,9 @@
         </select>
     </div>
 </div>
+<div class="control-group">
+    {include file="common/select_vendor.tpl"}
+</div>
 
 </div><div class="group span6 form-horizontal">
 <div class="control-group">
