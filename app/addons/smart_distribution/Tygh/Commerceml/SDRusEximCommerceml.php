@@ -1555,4 +1555,132 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         return $product_status;
     }
+
+    public function dataProductFeatures($data_product, $product, $import_params)
+    {
+        $property_for_promo_text = trim($this->s_commerceml['exim_1c_property_product']);
+        $cml = $this->cml;
+        $features_commerceml = $this->features_commerceml;
+
+        if (!empty($data_product -> {$cml['properties_values']} -> {$cml['property_values']})) {
+            foreach ($data_product -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
+                $variant_data = array();
+                $feature_id = strval($_feature -> {$cml['id']});
+                if (!isset($features_commerceml[$feature_id])) {
+                    continue;
+                }
+
+                if (!isset($_feature -> {$cml['value']}) || trim(strval($_feature -> {$cml['value']})) == '') {
+                    continue;
+                }
+
+                $p_feature_name = (string) $_feature->{$cml['value']};
+                if (!empty($features_commerceml[$feature_id]['variants'])) {
+                    $p_feature_name = empty($features_commerceml[$feature_id]['variants'][$p_feature_name]['value'])
+                        ? $p_feature_name
+                        : (string) $features_commerceml[$feature_id]['variants'][$p_feature_name]['value'];
+                }
+
+                $feature_name = trim($features_commerceml[$feature_id]['name'], " ");
+                if (!empty($features_commerceml[$feature_id])) {
+                    $product_params = $this->dataShippingParams($p_feature_name, $feature_name);
+
+                    if (!empty($product_params)) {
+                        $product = array_merge($product, $product_params);
+                    }
+
+                    if (!empty($property_for_promo_text) && ($property_for_promo_text == $feature_name)) {
+                        if (!empty($features_commerceml[$feature_id]['variants'])) {
+                            $product['promo_text'] = $features_commerceml[$feature_id]['variants'][$p_feature_name]['value'];
+                        } else {
+                            $product['promo_text'] = $p_feature_name;
+                        }
+                    }
+                }
+
+                if (!empty($features_commerceml[$feature_id]['id'])) {
+                    $variant_data['feature_id'] = $features_commerceml[$feature_id]['id'];
+                    $variant_data['feature_types'] = $features_commerceml[$feature_id]['type'];
+                    $variant_data['feature_type'] = $features_commerceml[$feature_id]['type'];
+                    $variant_data['lang_code'] = $import_params['lang_code'];
+                    $variant_data['feature_type'] = $features_commerceml[$feature_id]['type'];
+
+                    $d_variants = fn_get_product_feature_data($variant_data['feature_id'], true, false, $import_params['lang_code']);
+
+                    if (!empty($d_variants['feature_id']) && $d_variants['feature_id'] == $variant_data['feature_id']) {
+                        $variant_data = $d_variants;
+                    }
+
+                    if ($variant_data['feature_type'] == ProductFeatures::NUMBER_SELECTBOX) {
+                        $p_feature_name = str_replace(',', '.', $p_feature_name);
+                        $variant_data['value_int'] = $p_feature_name;
+                    }
+
+                    if ($variant_data['feature_type'] == ProductFeatures::NUMBER_FIELD) {
+                        $p_feature_name = str_replace(',', '.', $p_feature_name);
+                        $variant_data['value_int'] = $p_feature_name;
+                    }
+
+                    $is_id = false;
+                    $variant = '';
+                    if (!empty($features_commerceml[$feature_id]['variants'])) {
+                        foreach ($features_commerceml[$feature_id]['variants'] as $_variant) {
+                            if ($p_feature_name == $_variant['id']) {
+                                $variant = $_variant['value'];
+                                $is_id = true;
+                                break;
+                            }
+                        }
+
+                        if (!$is_id) {
+                            $variant = $p_feature_name;
+                        }
+                    } else {
+                        $variant = $p_feature_name;
+                    }
+                    $variant_data['variant'] = $variant;
+
+                    if ($variant_data['feature_type'] == ProductFeatures::TEXT_FIELD) {
+                        $variant_data['value'] = $variant;
+                    }
+
+                    list($d_variant, $params_variant) = $this->checkFeatureVariant($variant_data['feature_id'], $variant_data['variant'], $import_params['lang_code']);
+                    if (!empty($d_variant)) {
+                        $variant_data['variant_id'] = $d_variant;
+                    } else {
+                        $variant_data['variant_id'] = fn_add_feature_variant($variant_data['feature_id'], array('variant' => $variant));
+                    }
+
+                    $product['features'][$feature_id] = $variant_data;
+                }
+            }
+        }
+
+        $variant_data = array();
+        if ($this->s_commerceml['exim_1c_used_brand'] == 'field_brand') {
+            if (isset($data_product -> {$cml['manufacturer']})) {
+                $variant_data['feature_id'] = $features_commerceml['brand1c']['id'];
+                $variant_data['lang_code'] = $import_params['lang_code'];
+                $variant_id = $this->db->getField(
+                    "SELECT variant_id"
+                    . " FROM ?:product_feature_variants"
+                    . " WHERE feature_id = ?i AND external_id = ?s",
+                    $variant_data['feature_id'],
+                    strval($data_product -> {$cml['manufacturer']} -> {$cml['id']})
+                );
+
+                $variant = strval($data_product -> {$cml['manufacturer']} -> {$cml['name']});
+                if (empty($variant_id)) {
+                    $variant_data['variant_id'] = fn_add_feature_variant($variant_data['feature_id'], array('variant' => $variant));
+                    $this->db->query("UPDATE ?:product_feature_variants SET external_id = ?s WHERE variant_id = ?i", strval($data_product -> {$cml['manufacturer']} -> {$cml['id']}), $variant_data['variant_id']);
+                } else {
+                    $variant_data['variant_id'] = $variant_id;
+                }
+
+                $product['features'][$variant_data['feature_id']] = $variant_data;
+            }
+        }
+
+        return $product;
+    }
 }
