@@ -10,6 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $suffix = ".manage";
     }
 
+    if ($mode == 'delete') {
+        if (!empty($_REQUEST['mailbox_id'])) {
+            $mailbox_id = fn_delete_mailbox($_REQUEST['mailbox_id']);
+        }
+        $suffix = ".manage";
+    }
+
     return array(CONTROLLER_STATUS_OK, "mailboxes$suffix");
 }
 

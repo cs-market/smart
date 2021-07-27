@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <addon scheme="3.0">
     <id>helpdesk</id>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
     <priority>423190</priority>
     <position>0</position>
     <status>active</status>
@@ -48,7 +48,7 @@
           `domain` varchar(32) NOT NULL DEFAULT '',
           `private` varchar(128) NOT NULL DEFAULT '',
           `selector` varchar(32) NOT NULL DEFAULT 'phpmailer',
-          `responsible_admin` mediumint(8) unsigned NOT NULL DEFAULT '0',
+          `responsible_admin` varchar(128) NOT NULL DEFAULT '',
           `notify_customer` varchar(1) NOT NULL DEFAULT 'Y',
           `notify_manager` varchar(128) NOT NULL DEFAULT 'Y',
           `status` varchar(1) NOT NULL DEFAULT 'A',

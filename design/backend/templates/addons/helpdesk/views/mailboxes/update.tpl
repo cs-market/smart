@@ -96,8 +96,6 @@
                     but_meta="btn"
                     input_name="mailbox_data[responsible_admin]"
                     item_ids=$mailbox.responsible_admin
-                    display="radio"
-                    view_mode="single_button"
                     user_info=$responsible
                 }
             </div>
