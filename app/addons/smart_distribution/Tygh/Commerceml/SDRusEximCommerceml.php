@@ -1683,4 +1683,51 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         return $product;
     }
+
+    public function getOrderDataForXml($order_data, $cml)
+    {
+        $store_currencies = self::dataProductCurrencies();
+
+        if (!empty($store_currencies)) {
+            $order_currency = (!empty($order_data['secondary_currency'])) ? $order_data['secondary_currency'] : CART_PRIMARY_CURRENCY;
+            $currency = '';
+            foreach ($store_currencies as $currency_name => $currency_value) {
+                if ($order_currency == $currency_value['currency_code']) {
+                    $currency = $currency_name;
+                    break;
+                }
+            }
+        } else {
+            $currency = (!empty($order_data['secondary_currency'])) ? $order_data['secondary_currency'] : CART_PRIMARY_CURRENCY;
+        }
+
+        $notes = $order_data['notes'];
+        if ($this->company_id == 1815) {
+            $n[] = $order_data['phone'];
+            if (!empty($order_data['s_address'])) {
+                $n[] = $order_data['s_address'];
+            } else {
+                $user = fn_get_user_info($order_data['user_id']);
+                $n[] = $user['s_address'];
+            }
+            $n[] = $order_data['shipping'][0]['shipping'];
+            if (!empty($notes)) $n[] = $notes;
+            $notes = implode('; ', $n);
+        }
+
+        $array_order_xml = array(
+            $cml['id'] => $order_data['order_id'],
+            $cml['number'] => $order_data['order_id'],
+            $cml['date'] => date('Y-m-d', $order_data['timestamp']),
+            $cml['time'] => date('H:i:s', $order_data['timestamp']),
+            $cml['operation'] => $cml['order'],
+            $cml['role'] => $cml['seller'],
+            $cml['rate'] => 1,
+            $cml['total'] => $order_data['total'],
+            $cml['currency'] => $currency,
+            $cml['notes'] => $notes
+        );
+
+        return $array_order_xml;
+    }
 }
