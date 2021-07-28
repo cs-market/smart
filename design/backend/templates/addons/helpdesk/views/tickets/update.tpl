@@ -34,8 +34,8 @@
         <div class="control-group">
             <label class="control-label">{__("separate_ticket_by_users")}</label>
             <div class="controls">
-                <input type="hidden" name="devide_ticket" value="N">
-                <input type="checkbox" name="devide_ticket" value="Y" checked="checked">
+                <input type="hidden" name="divide_ticket" value="N">
+                <input type="checkbox" name="divide_ticket" value="Y" checked="checked">
             </div>
         </div>
         {include file="addons/helpdesk/views/tickets/components/message.tpl"}

@@ -21,12 +21,14 @@
                 <input id="elm_mailbox_mailbox_name_{$id}" type="text" name="mailbox_data[mailbox_name]" value="{$mailbox.mailbox_name}">
             </div>
         </div>
-        {include file="views/companies/components/company_field.tpl"
-            name="mailbox_data[company_id]"
-            id="elm_mailbox_data_`$product_group.group_id`"
-            selected=$mailbox.company_id
-            zero_company_id_name_lang_var="none"
-        }
+        {if "MULTIVENDOR"|fn_allowed_for}
+            {include file="views/companies/components/company_field.tpl"
+                name="mailbox_data[company_id]"
+                id="elm_mailbox_data_company_id_`$id`"
+                selected=$mailbox.company_id
+                zero_company_id_name_lang_var="none"
+            }
+        {/if}
         <div class="control-group">
             <label for="elm_mailbox_department_{$id}" class="cm-required control-label">{__("department")}:</label>
             <div class="controls">
@@ -84,10 +86,6 @@
         <div class="control-group">
             <label for="elm_mailbox_admin_notifications_{$id}" class="control-label">{__("admin_notifications")}:</label>
             <div class="controls">
-                {$responsible = $mailbox.responsible_admin|fn_get_user_short_info}
-                {if !$responsible.firstname && !$responsible.lastname}
-                    {$responsible.firstname = $responsible.email}
-                {/if}
                 {include
                     file="pickers/users/picker.tpl"
                     but_text=__("choose")
@@ -96,7 +94,6 @@
                     but_meta="btn"
                     input_name="mailbox_data[responsible_admin]"
                     item_ids=$mailbox.responsible_admin
-                    user_info=$responsible
                 }
             </div>
         </div>

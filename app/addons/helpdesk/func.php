@@ -521,7 +521,7 @@ function fn_helpdesk_send_mail() {
             );
             $mailer_settings = fn_array_merge(Registry::get('settings.Emails'), $mailbox_email_settings);
             
-            fn_set_hook('send_message_pre', $notified, $message, $mailboxes[$message['mailbox_id']]);
+            fn_set_hook('helpdesk_send_message_pre', $notified, $message, $mailboxes[$message['mailbox_id']]);
 
             if (!$notified)
             $notified = $mailer->send(array(

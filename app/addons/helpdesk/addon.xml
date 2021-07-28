@@ -49,8 +49,6 @@
           `private` varchar(128) NOT NULL DEFAULT '',
           `selector` varchar(32) NOT NULL DEFAULT 'phpmailer',
           `responsible_admin` varchar(128) NOT NULL DEFAULT '',
-          `notify_customer` varchar(1) NOT NULL DEFAULT 'Y',
-          `notify_manager` varchar(128) NOT NULL DEFAULT 'Y',
           `status` varchar(1) NOT NULL DEFAULT 'A',
           PRIMARY KEY (`mailbox_id`)
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8
