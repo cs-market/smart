@@ -1199,6 +1199,21 @@ fn_print_r($fantoms);
     foreach ($content as $data) {
         db_query('UPDATE ?:products SET status = ?s WHERE product_id = ?i', $data['status'], $data['product_id']);
     }
+} elseif ($mode == 'correct_categories') {
+    $params = $_REQUEST;
+    if (empty($action)) {
+        return;
+    }
+    $params['company_id'] = $action;
+    list($products) = fn_get_products($params);
+    $product_categories = array_column($products, 'category_ids');
+    $categories = array();
+    array_walk_recursive($product_categories, function($a) use (&$categories) { $categories[] = $a;});
+    $categories = array_unique($categories);
+    $category_ids = fn_get_category_ids_with_parent($categories);
+    $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', $action);
+    if ($plan_id) db_query('UPDATE ?:vendor_plans SET categories = ?s', implode(',',$category_ids));
+    fn_print_die("done");
 }
 
 function fn_merge_product_features($target_feature, $group) {
