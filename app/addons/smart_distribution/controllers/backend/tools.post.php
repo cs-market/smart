@@ -1212,7 +1212,7 @@ fn_print_r($fantoms);
     $categories = array_unique($categories);
     $category_ids = fn_get_category_ids_with_parent($categories);
     $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', $action);
-    if ($plan_id) db_query('UPDATE ?:vendor_plans SET categories = ?s', implode(',',$category_ids));
+    if ($plan_id) db_query('UPDATE ?:vendor_plans SET categories = ?s WHERE plan_id = ?i', implode(',',$category_ids), $plan_id);
     fn_print_die("done");
 }
 
