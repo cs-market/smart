@@ -1703,7 +1703,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         $notes = $order_data['notes'];
         if ($this->company_id == 1815) {
-            $n[] = $order_data['phone'];
+            $n[] = $order_data['payment_info']['customer_phone'] ?? $order_data['phone'];
             if (!empty($order_data['s_address'])) {
                 $n[] = $order_data['s_address'];
             } else {
