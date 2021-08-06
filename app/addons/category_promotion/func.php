@@ -65,7 +65,9 @@ function fn_category_promotion_update_promotion_post($data, $promotion_id, $lang
         fn_get_conditions($conditions['conditions'], $promo_extra);
     }
 
+    $default_promo_extra = ['products' => '', 'usergroup' => ''];
     $promo_extra = array_map(function($arr) {return  implode(',', $arr);}, $promo_extra);
+    $promo_extra = fn_array_merge($default_promo_extra, $promo_extra);
 
     $promo_extra['bonus_products'] = implode(',', fn_get_promotion_bonus_products(unserialize($data['bonuses'])));
     $promo_extra['condition_categories'] = implode(',', fn_get_promotion_condition_categories(unserialize($data['conditions'])));
