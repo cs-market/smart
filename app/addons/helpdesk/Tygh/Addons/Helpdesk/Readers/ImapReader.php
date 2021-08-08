@@ -13,38 +13,41 @@ class ImapReader implements IReader {
     public function setSettings($params) {
         $messages=array();
         $folder="INBOX";
-        $this->mbox = @imap_open ("{$params['host']}{$folder}", $params['login'],$params['password']) or fn_print_die(imap_errors());
-        $arr=imap_search  ($this->mbox, 'UNSEEN'); 
+        imap_timeout( IMAP_OPENTIMEOUT, 3);
+        $this->mbox = @imap_open("{$params['host']}{$folder}", $params['login'],$params['password']);
+        if ($this->mbox) {
+            $arr=imap_search  ($this->mbox, 'UNSEEN');
 
-        if ($arr !== false) {
-            foreach ($arr as $i){
+            if ($arr !== false) {
+                foreach ($arr as $i){
 
-                $headerArr = imap_headerinfo ( $this->mbox, $i);
-                
-                $reply_to = $headerArr->reply_to[0]->mailbox . "@" . $headerArr->reply_to[0]->host;
-                $from = $headerArr->from[0]->mailbox . "@" . $headerArr->from[0]->host;
+                    $headerArr = imap_headerinfo ( $this->mbox, $i);
 
-                $this->getmsg($i);
+                    $reply_to = $headerArr->reply_to[0]->mailbox . "@" . $headerArr->reply_to[0]->host;
+                    $from = $headerArr->from[0]->mailbox . "@" . $headerArr->from[0]->host;
 
-                //imap_setflag_full($this->mbox, $i, "\\Seen");
-                $messages[]=array(
-                    'from'=> $reply_to ? $reply_to : $headerArr->sender[0]->mailbox . "@" . $headerArr->sender[0]->host,
-                    'to'=> $headerArr->to[0]->mailbox . "@" . $headerArr->to[0]->host,
-                    'name'=> ($from == 'manager@cs-market.com') ? $this->decode($headerArr->reply_to[0]->mailbox) : $this->decode($headerArr->sender[0]->personal) ,
-                    'subject'=>$this->decode($headerArr->subject),
-                    'charset'=>$this->charset,
-                    'plain'=>$this->plainmsg,
-                    'html'=>$this->htmlmsg, 
-                    'timestamp' => $headerArr->udate,
-                    'attach'=>$this->attachments
-                );
+                    $this->getmsg($i);
+
+                    //imap_setflag_full($this->mbox, $i, "\\Seen");
+                    $messages[]=array(
+                        'from'=> $reply_to ? $reply_to : $headerArr->sender[0]->mailbox . "@" . $headerArr->sender[0]->host,
+                        'to'=> $headerArr->to[0]->mailbox . "@" . $headerArr->to[0]->host,
+                        'name'=> ($from == 'manager@cs-market.com') ? $this->decode($headerArr->reply_to[0]->mailbox) : $this->decode($headerArr->sender[0]->personal) ,
+                        'subject'=>$this->decode($headerArr->subject),
+                        'charset'=>$this->charset,
+                        'plain'=>$this->plainmsg,
+                        'html'=>$this->htmlmsg,
+                        'timestamp' => $headerArr->udate,
+                        'attach'=>$this->attachments
+                    );
+                }
+
+                $this->unread=$messages;
+                unset($messages);
             }
-
-            $this->unread=$messages;
-            unset($messages);
+            else {$this->unread=false;}
+            imap_close($this->mbox);
         }
-        else {$this->unread=false;}
-        imap_close($this->mbox);
     }
 
     public function getMail(){ return $this->unread;}

@@ -418,59 +418,57 @@ function fn_helpdesk_get_mail() {
     $i = 0;
     $mails = array();
     foreach ($mailboxes as $settings) {
-        $host = "{". $settings['host'] ."}"; $login = $settings['email']; $password = $settings['password'];
-
         $mail_reader = Tygh::$app['addons.helpdesk.mail_reader'];
         $mail_reader->setSettings(['host' => "{" . $settings['host'] . "}", 'login' => $settings['email'], 'password' => $settings['password'] ] );
-        $mails = $mail_reader->getMail();
+        if ($mail_reader) {
+            $mails = $mail_reader->getMail();
+            if (!empty($mails)) {
+                foreach ($mails as $mail) {
+                    if (db_get_field('SELECT status FROM ?:users WHERE email = ?s', $mail['from']) == 'D') {
+                        continue;
+                    }
 
-        if (!empty($mails)) {       
+                    $i++;
+                    $user_id = db_get_field('SELECT user_id FROM ?:users WHERE email = ?s', $mail['from']);
 
-            foreach ($mails as $mail) {
-                if (db_get_field('SELECT status FROM ?:users WHERE email = ?s', $mail['from']) == 'D') {
-                    continue;
+                    if (empty($user_id)) {
+                        $user_data['email'] = $mail['from'];
+                        $uname = explode(' ', $mail['name']);
+
+                        $user_data['firstname'] = $uname[0];
+                        $user_data['lastname'] = $uname[1] ? $uname[1] : ' ';
+                        list($user_id, ) = fn_update_user(0, $user_data, Tygh::$app['session']['auth'], 'N', 'Y');
+                    }
+
+                    $prefix = $settings['ticket_prefix'];
+
+                    preg_match('/\[' . $prefix . '_TID:\D?(\d+).*\]/', $mail['subject'], $ticket_id);
+
+                    if (!empty($ticket_id)) $ticket_id = db_get_field('SELECT ticket_id FROM ?:helpdesk_tickets WHERE ticket_id = ?i', $ticket_id[1]);
+
+                    if (!$ticket_id) {
+                        $ticket_id = db_get_field('SELECT ?:helpdesk_tickets.ticket_id FROM ?:helpdesk_tickets LEFT JOIN ?:helpdesk_messages ON ?:helpdesk_tickets.ticket_id = ?:helpdesk_messages.ticket_id WHERE subject = ?s AND user_id = ?i ORDER BY timestamp DESC', $mail['subject'], $user_id);
+                    }
+
+                    if (!$ticket_id) {
+                        $ticket_data = array(
+                            'subject' => $mail['subject'],
+                            'mailbox_id' => $settings['mailbox_id'],
+                            'users' => [$user_id]
+                        );
+                        $ticket_id = fn_update_ticket($ticket_data, 0);
+                    }
+
+                    $message['ticket_id'] = $ticket_id;
+                    $message['user_id'] = $user_id;
+                    $message['message'] = (!empty($mail['html'])) ? fn_normalize_html_content($mail['html']) : $mail['plain'];
+                    $message['message'] = mb_convert_encoding($message['message'], 'UTF-8', $mail['charset']);
+                    $message['timestamp'] = $mail['timestamp'];
+                    $message['attachment'] = $mail['attach'];
+                    $message['status'] = 'O';
+
+                    if (!empty($message['message'])) fn_update_message($message);
                 }
-
-                $i++;
-                $user_id = db_get_field('SELECT user_id FROM ?:users WHERE email = ?s', $mail['from']);
-                        
-                if (empty($user_id)) {
-                    $user_data['email'] = $mail['from'];
-                    $uname = explode(' ', $mail['name']);
-                    
-                    $user_data['firstname'] = $uname[0];
-                    $user_data['lastname'] = $uname[1] ? $uname[1] : ' ';
-                    list($user_id, ) = fn_update_user(0, $user_data, Tygh::$app['session']['auth'], 'N', 'Y');
-                }
-
-                $prefix = $settings['ticket_prefix'];
-
-                preg_match('/\[' . $prefix . '_TID:\D?(\d+).*\]/', $mail['subject'], $ticket_id);
-
-                if (!empty($ticket_id)) $ticket_id = db_get_field('SELECT ticket_id FROM ?:helpdesk_tickets WHERE ticket_id = ?i', $ticket_id[1]);
-
-                if (!$ticket_id) {
-                    $ticket_id = db_get_field('SELECT ?:helpdesk_tickets.ticket_id FROM ?:helpdesk_tickets LEFT JOIN ?:helpdesk_messages ON ?:helpdesk_tickets.ticket_id = ?:helpdesk_messages.ticket_id WHERE subject = ?s AND user_id = ?i ORDER BY timestamp DESC', $mail['subject'], $user_id);
-                }
-
-                if (!$ticket_id) {
-                    $ticket_data = array(
-                        'subject' => $mail['subject'],
-                        'mailbox_id' => $settings['mailbox_id'],
-                        'users' => [$user_id]
-                    );
-                    $ticket_id = fn_update_ticket($ticket_data, 0);
-                }
-
-                $message['ticket_id'] = $ticket_id;
-                $message['user_id'] = $user_id;
-                $message['message'] = (!empty($mail['html'])) ? fn_normalize_html_content($mail['html']) : $mail['plain'];
-                $message['message'] = mb_convert_encoding($message['message'], 'UTF-8', $mail['charset']);
-                $message['timestamp'] = $mail['timestamp'];
-                $message['attachment'] = $mail['attach'];
-                $message['status'] = 'O';
-
-                if (!empty($message['message'])) fn_update_message($message);
             }
         }
     }
