@@ -513,9 +513,10 @@ function fn_helpdesk_send_mail() {
 
             $mailbox_email_settings = array(
                 'mailer_send_method' => 'smtp',
-                'mailer_smtp_host' => $settings['host'],
+                'mailer_smtp_host' => $settings['smtp_server'],
                 'mailer_smtp_username' => $settings['email'],
-                'mailer_smtp_password' => $settings['password']
+                'mailer_smtp_password' => $settings['password'],
+                'mailer_smtp_auth' => 'Y'
             );
             $mailer_settings = fn_array_merge(Registry::get('settings.Emails'), $mailbox_email_settings);
             
