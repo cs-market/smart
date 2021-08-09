@@ -13,6 +13,7 @@ class ImapReader implements IReader {
     public function setSettings($params) {
         $messages=array();
         $folder="INBOX";
+        $this->unread = false;
         imap_timeout( IMAP_OPENTIMEOUT, 3);
         $this->mbox = @imap_open("{$params['host']}{$folder}", $params['login'],$params['password']);
         if ($this->mbox) {

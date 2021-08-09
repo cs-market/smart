@@ -465,7 +465,7 @@ function fn_helpdesk_get_mail() {
                     $message['message'] = mb_convert_encoding($message['message'], 'UTF-8', $mail['charset']);
                     $message['timestamp'] = $mail['timestamp'];
                     $message['attachment'] = $mail['attach'];
-                    $message['status'] = 'O';
+                    $message['status'] = 'N';
 
                     if (!empty($message['message'])) fn_update_message($message);
                 }
