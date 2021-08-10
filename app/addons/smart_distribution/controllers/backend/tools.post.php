@@ -1214,6 +1214,136 @@ fn_print_r($fantoms);
     $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', $action);
     if ($plan_id) db_query('UPDATE ?:vendor_plans SET categories = ?s WHERE plan_id = ?i', implode(',',$category_ids), $plan_id);
     fn_print_die("done");
+} elseif ($mode == 'correct_categories_extended') {
+    // $plans = db_get_hash_array('SELECT ?:vendor_plans.plan_id, ?:vendor_plan_descriptions.plan, categories FROM ?:vendor_plans RIGHT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id LEFT JOIN ?:vendor_plan_descriptions ON ?:vendor_plan_descriptions.plan_id = ?:vendor_plans.plan_id WHERE ?:companies.status = ?s', 'plan_id', 'A');
+
+    // $categories = array();
+    // foreach ($plans as &$plan) {
+    //     $plan['categories'] = explode(',',$plan['categories']);
+    // }
+    // //fn_print_r($plans);
+    // foreach ($plans as &$plan) {
+    //     foreach ($plan['categories'] as $category_id) {
+    //         if ($category_id == '1056' or $category_id == 'on') continue;
+    //         if (!in_array($category_id, $categories)) {
+    //             $categories[$plan['plan_id']."_".$category_id] = $category_id;
+    //         } else {
+    //             $match = array_search($category_id, $categories);
+    //             $match = explode('_', $match);
+    //             $duplicates[] = array('category_id' => $category_id, 'name' => fn_get_category_name($category_id), 'plan1' => $plans[$plan['plan_id']]['plan'], 'plan2' => $plans[$match[0]]['plan']);
+    //             //if ($category_id == 'on') fn_print_die($plan);
+    //         }
+    //     }
+    // }
+    // $params['filename'] = 'duplicates.csv';
+    // $params['force_header'] = true;
+    // $export = fn_exim_put_csv($duplicates, $params, '"');
+
+
+
+    // $plans = db_get_hash_array('SELECT ?:vendor_plans.plan_id, ?:vendor_plan_descriptions.plan, ?:companies.company_id, ?:vendor_plans.categories, ?:vendor_plans.usergroup_ids  FROM ?:vendor_plans RIGHT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id LEFT JOIN ?:vendor_plan_descriptions ON ?:vendor_plan_descriptions.plan_id = ?:vendor_plans.plan_id WHERE ?:companies.status = ?s', 'plan_id', 'A');
+
+    // $categories = array();
+    // foreach ($plans as &$plan) {
+    //     $plan['categories'] = explode(',',$plan['categories']);
+    //     $plan['usergroup_ids'] = explode(',',$plan['usergroup_ids']);
+    //     $plan_cats = db_get_array('SELECT category_id, usergroup_ids FROM ?:categories WHERE category_id IN (?a)', $plan['categories']);
+    //     foreach ($plan_cats as $category) {
+    //         if ($category['category_id'] == '1056') continue;
+    //         $category['usergroup_ids'] = explode(',',$category['usergroup_ids']);
+    //         foreach ($category['usergroup_ids'] as $ug) {
+    //             if (!in_array($ug, $plan['usergroup_ids'])) {
+    //                 $name = fn_get_usergroup_name($ug);
+    //                 if (!empty($name)) $categories[] = array('usergroup_id' => $ug, 'usergroup' => fn_get_usergroup_name($ug), 'category_id' => $category['category_id'], 'category' => fn_get_category_name($category['category_id']), 'plan' => $plan['plan']);
+    //             }
+    //         }
+    //     }
+    // }
+    // $params['filename'] = 'strange_categories.csv';
+    // $params['force_header'] = true;
+    // $export = fn_exim_put_csv($categories, $params, '"');
+
+    
+
+    //$plans = db_get_hash_array('SELECT ?:vendor_plans.plan_id, ?:vendor_plan_descriptions.plan, ?:companies.company_id, ?:vendor_plans.categories, ?:vendor_plans.usergroup_ids  FROM ?:vendor_plans RIGHT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id LEFT JOIN ?:vendor_plan_descriptions ON ?:vendor_plan_descriptions.plan_id = ?:vendor_plans.plan_id WHERE ?:companies.status = ?s AND company_id = 46', 'plan_id', 'A');
+    //$plans = db_get_hash_array('SELECT ?:vendor_plans.plan_id, ?:vendor_plan_descriptions.plan, ?:companies.company_id, ?:vendor_plans.categories, ?:vendor_plans.usergroup_ids  FROM ?:vendor_plans RIGHT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id LEFT JOIN ?:vendor_plan_descriptions ON ?:vendor_plan_descriptions.plan_id = ?:vendor_plans.plan_id WHERE ?:companies.status = ?s', 'plan_id', 'A');
+    // $report = array();
+    // foreach ($plans as $plan) {
+    //     $params['company_id'] = $plan['company_id'];
+    //     list($products) = fn_get_products($params);
+    //     $product_categories = array_column($products, 'category_ids', 'product_id');
+        
+    //     $categories = array();
+    //     array_walk_recursive($product_categories, function($a) use (&$categories) { $categories[] = $a;});
+    //     $categories = array_unique($categories);
+    //     $plan['categories'] = explode(',',$plan['categories']);
+    //     fn_print_r($plan['plan']);
+    //     $prev = count($report);
+    //     foreach ($categories as $category_id) {
+    //         if ($category['category_id'] == '1056') continue;
+    //         if (!in_array($category_id, $plan['categories'])) {
+    //             $product_id = 0;
+    //             foreach ($product_categories as $product_id => $_product_categories) {
+    //                 if (in_array($category_id, $_product_categories)) {
+    //                     break;
+    //                 }
+    //             }
+    //             if ($product_id == 24385) fn_print_die($product_categories[$product_id], $plan['categories']);
+    //             $report[] = array('product_id' => $product_id, 'product' => fn_get_product_name($product_id), 'category_id' => $category_id, 'category' => fn_get_category_name($category_id), 'plan' => $plan['plan']);
+    //         }
+    //     }
+    //     fn_print_r(count($report) - $prev);
+    // }
+
+    // $params['filename'] = 'strange_categories2.csv';
+    // $params['force_header'] = true;
+    // $export = fn_exim_put_csv($report, $params, '"');
+
+
+
+    $plans = db_get_hash_array('SELECT ?:vendor_plans.plan_id, ?:vendor_plan_descriptions.plan, ?:companies.company_id, ?:vendor_plans.categories, ?:vendor_plans.usergroup_ids  FROM ?:vendor_plans RIGHT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id LEFT JOIN ?:vendor_plan_descriptions ON ?:vendor_plan_descriptions.plan_id = ?:vendor_plans.plan_id WHERE ?:companies.status = ?s', 'plan_id', 'A');
+
+    $report = $report2 = array();
+    foreach ($plans as $plan) {
+        $params['company_id'] = $plan['company_id'];
+        list($products) = fn_get_products($params);
+        $product_categories = array_column($products, 'category_ids', 'product_id');
+        
+        $categories = array();
+        array_walk_recursive($product_categories, function($a) use (&$categories) { $categories[] = $a;});
+        $categories = array_unique($categories);
+        $plan['categories'] = explode(',',$plan['categories']);
+
+        $prev = count($report);
+
+        foreach ($categories as $category_id) {
+            if ($category['category_id'] == '1056') continue;
+            if (!in_array($category_id, $plan['categories'])) {
+                $product_id = 0;
+                foreach ($product_categories as $product_id => $_product_categories) {
+                    if (in_array($category_id, $_product_categories)) {
+                        break;
+                    }
+                }
+                $report[] = array('product_id' => $product_id, 'product' => fn_get_product_name($product_id), 'category_id' => $category_id, 'category' => fn_get_category_name($category_id), 'plan' => $plan['plan']);
+            }
+        }
+        $wrong_categories = array_column($report, 'category', 'category_id');
+
+        foreach ($wrong_categories as $category_id => $category) {
+            foreach ($product_categories as $product_id => $_product_categories) {
+                if (in_array($category_id, $_product_categories)) {
+                    $report2[] = ['product_id' => $product_id, 'product' => fn_get_product_name($product_id), 'category' => $category];
+                }
+            }
+        }
+    }
+
+    $params['filename'] = 'strange_products.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($report2, $params, '"');
+
+    fn_print_die('done');
 }
 
 function fn_merge_product_features($target_feature, $group) {

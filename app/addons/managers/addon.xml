@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>managers</id>
+    <name>Managers</name>
+    <version>1.0</version>
+    <priority>99999999999999999</priority>
+    <position>0</position>
+    <status>active</status>
+    <default_language>en</default_language>
+</addon>
