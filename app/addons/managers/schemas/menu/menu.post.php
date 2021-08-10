@@ -15,10 +15,9 @@ if (fn_smart_distribution_is_manager(Tygh::$app['session']['auth']['user_id'])) 
         ],
         'position' => 100
     ]];
-    //$menu = ['items' => '123'];
+
     unset($schema['top']);
     $schema['central'] = $menu;
-    //fn_print_die($schema);
 }
 
 return $schema;

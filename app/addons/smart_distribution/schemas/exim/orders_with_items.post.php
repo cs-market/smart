@@ -23,4 +23,14 @@ foreach ($schema['export_fields'] as &$field) {
 }
 $schema['export_fields']['Date']['process_get'] = array('fn_timestamp_to_date', '#this');
 
+$schema['export_fields']['Total initial'] = array(
+    'linked' => false,
+    'process_get' => array('fn_get_total_history', 'asc', '#key')
+);
+
+$schema['export_fields']['Total final'] = array(
+    'linked' => false,
+    'process_get' => array('fn_get_total_history', 'desc' , '#key')
+);
+
 return $schema;

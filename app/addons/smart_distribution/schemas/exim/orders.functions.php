@@ -17,3 +17,11 @@ function fn_import_change_order_status($object) {
     if (isset($object['order_id'], $object['status']) && !empty($object['order_id']) && !empty($object['status']))
     fn_change_order_status($object['order_id'], $object['status']);
 }
+
+function fn_get_total_history($sorting, $order_id) {
+    $total = db_get_field("SELECT description FROM ?:order_logs as logs "
+        . " LEFT JOIN ?:users as users USING(user_id) WHERE logs.order_id = ?i AND action = 'rus_order_logs_order_total' ORDER BY logs.log_id $sorting", $order_id
+    );
+
+    return $total;
+}
