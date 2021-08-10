@@ -417,6 +417,7 @@ function fn_sales_plan_post_delete_user($user_id, $user_data, $result) {
     }
 }
 
+// что за фигня?
 function fn_sales_plan_get_users($params, $fields, $sortings, &$condition, &$join, $auth) {
     if (isset($params['usergroup_ids'])) {
         if (!empty($params['usergroup_ids'])) {
@@ -454,4 +455,27 @@ function fn_sales_plan_create_order($order) {
             ), 'A');
         }
     }
+}
+
+// может быть объединить с хуком выше?
+function fn_sales_plan_place_order($order_id, $action, &$order_status, $cart, $auth) {
+    $user_data = fn_get_user_info($cart['user_id']);
+    if ($user_data['approve_order_action'] != 'D') {
+        if ($user_data['approve_order_action'] == 'P') {
+            $order = fn_get_order_info($order_id);
+            if (isset($user_data['plan'][$order['company_id']]['amount_plan']) && !empty($user_data['plan'][$order['company_id']]['amount_plan']) && $order['total'] > $user_data['plan'][$order['company_id']]['amount_plan']) {
+                $order_status = 'P';
+            }
+        } else {
+            $order_status = 'P';
+        }
+    }
+}
+
+function fn_sales_plan_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
+    $condition = '';
+    if (Registry::get('runtime.company_id')) {
+        $condition .= db_quote(' AND company_id = ?i', Registry::get('runtime.company_id'));
+    }
+    $user_data['plan'] = db_get_hash_array("SELECT * from ?:sales_plan WHERE user_id = ?i $condition", 'company_id', $user_id);
 }

@@ -13,5 +13,8 @@ $schema['export_fields']['Frequency'] = [
     'import_only' => true,
     'linked' => false,
 ];
+$schema['export_fields']['Approve order'] = [
+    'db_field' => 'approve_order_action'
+];
 
 return $schema;
