@@ -463,10 +463,10 @@ function fn_sales_plan_place_order($order_id, $action, &$order_status, $cart, $a
     if ($user_data['approve_order_action'] != 'D') {
         if ($user_data['approve_order_action'] == 'P') {
             $order = fn_get_order_info($order_id);
-            if (isset($user_data['plan'][$order['company_id']]['amount_plan']) && !empty($user_data['plan'][$order['company_id']]['amount_plan']) && $order['total'] > $user_data['plan'][$order['company_id']]['amount_plan']) {
+            if (isset($user_data['plan'][$order['company_id']]['amount_plan']) && !empty($user_data['plan'][$order['company_id']]['amount_plan']) && $order['total'] > $user_data['plan'][$order['company_id']]['amount_plan'] && $order_status == STATUS_INCOMPLETED_ORDER) {
                 $order_status = 'P';
             }
-        } else {
+        } elseif ($order_status == STATUS_INCOMPLETED_ORDER) {
             $order_status = 'P';
         }
     }
