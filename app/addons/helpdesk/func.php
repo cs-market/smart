@@ -207,7 +207,7 @@ function fn_update_ticket($data, $ticket_id = 0) {
     } else {
         $mailbox_admin = db_get_field('SELECT responsible_admin FROM ?:helpdesk_mailboxes WHERE mailbox_id = ?i', $data['mailbox_id']);
         if ($mailbox_admin) {
-            $data['users'] = $data['users'] + explode(',', $mailbox_admin);
+            $data['users'] = array_merge($data['users'], explode(',', $mailbox_admin));
         }
         fn_set_hook('update_ticket_pre', $data);
 
