@@ -56,9 +56,9 @@
         <label class="control-label" for="approve_order_action">{__('sales_plan.approve_order_action')}:</label>
         <div class="controls">
             <select id="approve_order_action" name="user_data[approve_order_action]">
+                <option value="D" {if $user_data.approve_order_action == "D"}selected="selected"{/if}>{__("sales_plan.do_not_approve")}</option>
                 <option value="A" {if $user_data.approve_order_action == "A"}selected="selected"{/if}>{__("sales_plan.approve_all")}</option>
                 <option value="P" {if $user_data.approve_order_action == "P"}selected="selected"{/if}>{__("sales_plan.approve_above_plan")}</option>
-                <option value="D" {if $user_data.approve_order_action == "D"}selected="selected"{/if}>{__("sales_plan.do_not_approve")}</option>
             </select>
         </div>
     </div>

@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class ResponsibleAdmin extends AbstractMigration
+class Autoexport extends AbstractMigration
 {
     /**
      * Change Method.
@@ -24,7 +24,7 @@ class ResponsibleAdmin extends AbstractMigration
     {
 	$options = $this->adapter->getOptions();
 	$pr = $options['prefix'];
-	$sql = "ALTER TABLE {$pr}helpdesk_mailboxes CHANGE `responsible_admin` `responsible_admin` VARCHAR(128) NOT NULL DEFAULT ''; ";
+	$sql = "UPDATE {$pr}companies SET `export_orders` = 'N' WHERE `export_orders` = 'X'; ";
 	$this->execute($sql);
     }
 

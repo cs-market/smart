@@ -2,7 +2,8 @@
     <label class="control-label" for="elm_company_export_orders">{__("export_orders")}:</label>
     <div class="controls">
         <select name="company_data[export_orders]" id="elm_export_orders">
-            {foreach from=['N' => '---', 'C' => 'CSV', 'X' => 'XML'] item="type" key="value"}
+            {*foreach from=['N' => '---', 'C' => 'CSV', 'X' => 'XML'] item="type" key="value"*}
+            {foreach from=['N' => '---', 'C' => 'CSV'] item="type" key="value"}
                 <option value="{$value}" {if $value == $company_data.export_orders}selected="selected"{/if}>{$type}</option>
             {/foreach}
         </select>
