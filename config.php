@@ -85,13 +85,13 @@ define('SECONDS_IN_HOUR', 60 * 60); // one hour
 define('SECONDS_IN_DAY', SECONDS_IN_HOUR * 24); // one day
 
 // Live time for permanent cookies (currency, language, etc...)
-define('COOKIE_ALIVE_TIME', SECONDS_IN_DAY * 7); // one week
+define('COOKIE_ALIVE_TIME', SECONDS_IN_DAY * 365); // one week
 
 // Session live time
-define('SESSION_ALIVE_TIME', SECONDS_IN_HOUR * 2); // 2 hours
+define('SESSION_ALIVE_TIME', SECONDS_IN_DAY * 365); // 2 hours
 
 // Sessions storage live time
-define('SESSIONS_STORAGE_ALIVE_TIME',  SECONDS_IN_DAY * 7 * 2); // 2 weeks
+define('SESSIONS_STORAGE_ALIVE_TIME',  SECONDS_IN_DAY * 365); // 2 weeks
 
 // Number of seconds after last session update, while user considered as online
 define('SESSION_ONLINE', 60 * 5); // 5 minutes

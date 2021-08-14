@@ -38,8 +38,8 @@ class SraAuthTokens extends AuthTokens
         $user_id = fn_get_object_by_ekey($ekey, 'U');
 
         if ($user_id) {
-            // [cs-market] token for one month
-            list($token, $expiry_time) = fn_get_user_auth_token($user_id, SECONDS_IN_DAY * 30);
+            // [cs-market] token for one year
+            list($token, $expiry_time) = fn_get_user_auth_token($user_id, SECONDS_IN_DAY * 365);
 
             $status = Response::STATUS_CREATED;
             $data = [
