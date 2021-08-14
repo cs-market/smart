@@ -853,7 +853,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $link_type = $this->s_commerceml['exim_1c_import_type'];
 
             foreach ($orders_data as $order_data) {
-                $order_info = [];
+                $order_info = $xml_products = [];
                 $external_order_id = strval($order_data->{$cml['id']});
                 $external_order_number = strval($order_data->{$cml['number']});
 
@@ -867,7 +867,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
                     $order_info = fn_get_order_info($external_order_number);
                 }
 
-                if (empty($order_info['order_id'])) {
+                // do not disturb old orders
+                if (empty($order_info['order_id']) || $order_info['timestamp'] + SECONDS_IN_DAY * 14 < time()) {
                     continue;
                 }
                 $order_id = $order_info['order_id'];
