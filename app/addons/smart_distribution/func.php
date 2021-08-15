@@ -1225,3 +1225,19 @@ function fn_smart_distribution_extract_cart(&$cart, $user_id, $type, $user_type)
     }
     unset($product);
 }
+
+function fn_smart_distribution_get_promotions($params, $fields, $sortings, &$condition, $join, $group, $lang_code) {
+    //fn_print_die($params, $fields, $sortings, $condition, $join, $group, $lang_code);
+
+    if (!empty($params['name'])) {
+        $condition .= db_quote(' AND ?:promotion_descriptions.name LIKE ?l', '%' . $params['name'] . '%');
+    }
+    if (!empty($params['company_id'])) {
+        $condition .= db_quote(' AND ?:promotions.company_id = ?i', $params['company_id']);
+    }
+    if (!empty($params['status'])) {
+        $condition .= is_array($params['status'])
+            ? db_quote(' AND ?:promotions.status IN (?a)', $params['status'])
+            : db_quote(' AND ?:promotions.status = ?s', $params['status']);
+    }
+}

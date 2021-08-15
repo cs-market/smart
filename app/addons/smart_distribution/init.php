@@ -69,5 +69,6 @@ fn_register_hooks(
     'usergroup_types_get_map_user_type',
     //temporary
     'get_orders_post',
-    'extract_cart'
+    'extract_cart',
+    'get_promotions'
 );
