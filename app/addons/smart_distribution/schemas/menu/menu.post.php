@@ -14,7 +14,12 @@
 use Tygh\Registry;
 
 if (Registry::get('runtime.company_id')) {
-	unset($schema['central']['vendors']);
+    unset($schema['central']['vendors']);
+}
+list($tickets, ) = fn_get_tickets(['status' => 'N']);
+
+if (!empty($tickets)) {
+    $schema['central']['helpdesk']['attrs']['class'] = $schema['central']['helpdesk']['items']['new_tickets']['attrs']['class'] = 'notify-dot';
 }
 
 return $schema;

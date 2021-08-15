@@ -1,3 +1,17 @@
 .subnav .menu-heading__dropdowned {
     overflow: visible;
 }
+
+#header_subnav .notify-dot {
+    position: relative;
+    &:after {
+        content: "";
+        display: inline-block;
+        background-color: #e33b38;
+        .border-radius(5px);
+        width: 8px;
+        height: 8px;
+        vertical-align: top;
+        position: absolute;
+    }
+}

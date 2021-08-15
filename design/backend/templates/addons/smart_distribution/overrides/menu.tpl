@@ -341,8 +341,8 @@
             <hr class="mobile-visible navbar-hr" />
             <ul class="nav hover-show nav-pills nav-child">
             {foreach from=$navigation.static.central key=first_level_title item=m name="first_level"}
-                <li class="dropdown {if $first_level_title == $navigation.selected_tab} active{/if} ">
-                    <a href="#" class="dropdown-toggle">
+                <li class="dropdown {if $first_level_title == $navigation.selected_tab} active{/if}">
+                    <a href="#" class="dropdown-toggle {$m.attrs.class nofilter}">
                         {$m.title|default:__($first_level_title)}
                         <b class="caret"></b>
                     </a>
