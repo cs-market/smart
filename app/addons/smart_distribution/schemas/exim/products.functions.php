@@ -49,7 +49,7 @@ function fn_exim_sd_set_product_categories(
 
     $company_id = 0;
     if (fn_allowed_for('MULTIVENDOR')) {
-        $store_name = $vendor_name;
+        $store_name = trim($vendor_name);
     }
     if (Registry::get('runtime.company_id')) {
         $company_id = Registry::get('runtime.company_id');
