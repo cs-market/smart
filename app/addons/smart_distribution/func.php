@@ -227,7 +227,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
     // for search in profile fields
     if (!empty($params['search_query'])) {
         $search_string = '%' . trim($params['search_query']) . '%';
-        $condition['name'] = db_quote(' AND ?:users.firstname LIKE ?l OR ?:users.lastname LIKE ?l OR ?:profile_fields_data.value LIKE ?l', $search_string, $search_string, $search_string);
+        $condition['name'] = db_quote(' AND (?:users.firstname LIKE ?l OR ?:users.lastname LIKE ?l OR ?:profile_fields_data.value LIKE ?l)', $search_string, $search_string, $search_string);
         $join .= db_quote(' LEFT JOIN ?:profile_fields_data ON ?:profile_fields_data.object_id = ?:user_profiles.profile_id AND ?:profile_fields_data.object_type = ?s', 'P');
     }
 
