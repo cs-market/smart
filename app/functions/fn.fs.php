@@ -1189,6 +1189,7 @@ function fn_fgetcsv($fp, $length, $delimiter = ',', $enclosure = '"')
                 } else {
                     // No finishing quote - newline.
                     $string = fgets($fp, $length);
+                    $string = rtrim($string, "\n\r");
                 }
             }
         }
