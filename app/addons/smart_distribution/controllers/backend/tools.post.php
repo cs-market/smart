@@ -1344,6 +1344,69 @@ fn_print_r($fantoms);
     $export = fn_exim_put_csv($report2, $params, '"');
 
     fn_print_die('done');
+} elseif ($mode == 'correct_ap') {
+    $products = [73366, 73369, 73371, 73368, 52273, 52274, 52275, 52276, 52277, 52278, 52279, 52280, 52281, 52282, 52283, 52284, 52285, 52286, 52287, 52288, 52289, 52290, 52291, 52292, 52293, 52294, 52295, 52296, 52297, 52298, 52299, 52300, 52302, 52303, 52304, 52306, 52307, 52308, 52309, 52310, 52311, 52312, 52313, 52314, 52315, 52316, 52317, 52318, 52320, 52322, 71620, 52324, 73364, 61301, 73362, 71616, 71617, 71618, 71619, 71621, 71622, 71623, 71624, 71625, 71626, 73365, 74596, 74597];
+    $categories = db_get_fields('SELECT distinct(category_id) FROM ?:products_categories WHERE product_id IN (?a)', $products);
+    //$categories = [5373,5374,5378,5379,5381,5382,5383,5384,5385,5372];
+    $categories = fn_get_category_ids_with_parent($categories);
+    $categories[] = 7085;
+    $categories[] = 7098;
+    $categories[] = 5375;
+    $categories[] = 5376;
+    $product_ids = db_get_fields('SELECT product_id FROM ?:products_categories WHERE category_id IN (?a)', $categories);
+    //$diff = array_diff($product_ids, $products);
+    fn_print_die($product_ids);
+/*    $res = fn_get_categories(array(
+        'category_id' => 0,
+        'current_category_id' => 5372,
+        'visible' => true
+    ));
+    //$res = fn_get_plain_categories_tree('5372');*/
+    fn_print_die($descr);
+} elseif ($mode == 'check_files') {
+    $folder = 'var/files';
+    $files = fn_get_dir_contents($folder, false, true, ['.csv', '.xml'], '', true);
+    $folders = [];
+    foreach ($files as $file) {
+        $folders[dirname($file)][] = fn_basename($file);
+    }
+    foreach ($folders as $folder => $folder_content) {
+        $counter[$folder] = count($folder_content);
+    }
+    asort($counter);
+    fn_print_die($counter);
+} elseif ($mode == 'restore_akashevo') {
+    $file1 = 'products_exprt_08162021_live.csv';
+    $file2 = 'products_exprt_08162021.csv';
+    $content1 = fn_exim_get_csv(array(), $file1, array('validate_schema'=> false, 'delimiter' => ';') );
+    $content2 = fn_exim_get_csv(array(), $file2, array('validate_schema'=> false, 'delimiter' => ';') );
+    $current_ids = array_column($content1, 'Product code');
+    $old_ids = array_column($content2, 'Product code');
+    $deleted = array_diff($old_ids, $current_ids);
+    fn_print_die($deleted);
+    
+} elseif ($mode == 'remove_vegat_products') {
+    $company_id = 2058;
+    $product_ids = db_get_fields("SELECT product_id FROM ?:products WHERE company_id = ?i AND timestamp > ?i", $company_id, 1630580300);
+    $file1 = 'products.csv';
+    $content = fn_exim_get_csv(array(), $file1, array('validate_schema'=> false, 'delimiter' => ';') );
+    $sku = array_column($content, 'Product code');
+    $product_ids = db_get_fields("SELECT product_id FROM ?:products WHERE company_id = ?i AND product_code IN (?a)", $company_id, $sku);
+    fn_print_die($sku);
+
+    // foreach ($product_ids as $product_id) {
+    //     fn_delete_product($product_id);
+    // }
+    // fn_print_die(count($product_ids));
+} elseif ($mode == 'find_fantom_products') {
+    $products = db_get_fields('SELECT distinct(product_id) FROM ?:products_categories');
+    $fantoms = db_get_array('SELECT product_id, product_code, company_id FROM ?:products WHERE product_id NOT IN (?a)', $products);
+    if ($action == 'delete') {
+        foreach ($fantoms as $product) {
+            fn_update_product_categories($product['product_id'], ['category_ids' => [1056]]);
+        }
+    }
+    fn_print_die(array_column($fantoms, 'product_id'));
 }
 
 function fn_merge_product_features($target_feature, $group) {

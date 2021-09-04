@@ -1029,13 +1029,6 @@ function fn_smart_distribution_send_form(&$page_data, $form_values, $result, $fr
     }
 }
 
-function fn_smart_distribution_get_submitted_forms_pre($params, &$condition, $order_by, $limit) {
-    if (fn_smart_distribution_is_manager(Tygh::$app['session']['auth']['user_id'])) {
-        $customer_ids = db_get_fields('SELECT customer_id FROM ?:vendors_customers WHERE vendor_manager = ?i', Tygh::$app['session']['auth']['user_id']);
-        $condition .= db_quote(' AND user_id IN (?a)', $customer_ids);
-    }
-}
-
 function microtime_float()
 {
     list($usec, $sec) = explode(" ", microtime());
