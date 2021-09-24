@@ -88,10 +88,8 @@ function fn_product_groups_split_cart($cart) {
     $p_groups = array();
 
     if (!fn_cart_is_empty($cart)) {
-        if (!empty($cart['groups'])) {
-            $group_ids = array_unique(fn_array_column($cart['products'], 'group_id'));
-            $cart['groups'] = fn_get_product_groups(array('group_ids' => $group_ids));
-        }
+        $group_ids = array_unique(fn_array_column($cart['products'], 'group_id'));
+        $cart['groups'] = fn_get_product_groups(array('group_ids' => $group_ids));
 
         $proto = reset($cart['product_groups']);
         unset($proto['products']);
