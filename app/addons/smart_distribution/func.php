@@ -1234,3 +1234,15 @@ function fn_smart_distribution_get_promotions($params, $fields, $sortings, &$con
             : db_quote(' AND ?:promotions.status = ?s', $params['status']);
     }
 }
+
+function fn_smart_distribution_text_cart_amount_corrected_notification($product, $current_amount, $original_amount, $amount) {
+    $message = __('text_cart_amount_corrected', array(
+        '[product]' => $product['product'],
+    ));
+    fn_delete_notification_by_message($message);
+    fn_set_notification('W', __('important'), __('text_cart_amount_corrected_smart', array(
+        '[product]' => $product['product'],
+        '[requested]' => $amount,
+        '[reduced]' => $current_amount
+    )));
+}

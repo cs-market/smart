@@ -175,6 +175,8 @@ function fn_decimal_amount_post_check_amount_in_stock($product_id, &$amount, $pr
                     fn_set_notification('W', __('important'), __('text_cart_amount_corrected', array(
                         '[product]' => $product['product'],
                     )));
+
+                    fn_set_hook('text_cart_amount_corrected_notification', $product, $current_amount, $original_amount, $amount);
                     $amount = fn_decimal_amount_ceil_to_step($current_amount, $product['qty_step']);
                 } else {
                     if ($product['tracking'] == ProductTracking::TRACK_WITH_OPTIONS) {

@@ -69,5 +69,6 @@ fn_register_hooks(
     //temporary
     'get_orders_post',
     'extract_cart',
-    'get_promotions'
+    'get_promotions',
+    'text_cart_amount_corrected_notification',
 );
