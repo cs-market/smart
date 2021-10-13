@@ -235,6 +235,20 @@ return [
             'company' => '262'
         ],
     ],
+    '87' => [
+        'page_id' => 87,
+        'company_id' => 1815,
+        'usergroup_id' => [758],
+        'fields_map' => [
+            'firstname' => '272',
+            'phone' => '275',
+            'email' => '273',
+            'user_login' => '273',
+            'password' => '274',
+            's_phone' => '275',
+            's_address' => '276',
+        ],
+    ],
     '65' => [
         'page_id' => 65,
         'company_id' => 1800,
