@@ -900,7 +900,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                                 'stored_price' => 'Y',
                             ),
                         );
-                        define('ORDER_MANAGEMENT', true);
+                        fn_define('ORDER_MANAGEMENT', true);
                         fn_add_product_to_cart($_item, $cart, $customer_auth);
                     }
 
