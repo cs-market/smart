@@ -14,6 +14,7 @@ function fn_ecl_search_improvements_additional_fields_in_search(&$params, $field
 {
 	$search_in = Registry::get('addons.ecl_search_improvements.multiple_checkboxes');
     if (AREA == 'C' && !empty($params['pcode']) && $params['pcode'] == 'Y' && (empty($search_in) || !empty($search_in['pcode']))) {
+        if (Registry::get('addons.product_option_combinations.status') == 'A') {
         $params['pcode'] = '';
         $tmp .= db_quote(" OR products.product_code LIKE ?l", '%' . $piece . '%');
         if (strpos($join, 'inventory2') === false) {
@@ -21,6 +22,7 @@ function fn_ecl_search_improvements_additional_fields_in_search(&$params, $field
         }
 
         $tmp .= db_quote(" OR inventory2.product_code LIKE ?l", '%' . $piece . '%');
+        }
 
         if (Registry::get('addons.product_variations.status') == 'A') {
             if (strpos($join, 'variations2') === false) {
