@@ -9,7 +9,7 @@
                         <div class="ty-grid-list__item">
                             {$href=$category|fn_form_dropdown_object_link:$block.type}
                             <a href="{if $href}{$href}{else}{"categories.view?category_id=`$category.category_id`"|fn_url}{/if}" class="ty-subcategories-block__a">
-                                {if $category.main_pair}
+                                {*if $category.main_pair}
                                     {include file="common/image.tpl"
                                         show_detailed_link=false
                                         images=$category.main_pair
@@ -19,7 +19,7 @@
                                         image_height=$settings.Thumbnails.category_lists_thumbnail_height
                                         class="ty-subcategories-img"
                                     }
-                                {/if}
+                                {/if*}
                                 <span>
                                     {$category.category}
                                 </span>

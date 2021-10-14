@@ -556,18 +556,16 @@ label > input.cm-product-filters-checkbox + span::before {
 }
 
 .ty-subcategories-block {
+    margin: 0;
     .ty-subcategories-block__a {
         color: #191919;
         span {
             display: inline-block;
-            padding-bottom: 20px;
+            padding: 10px 5px;
         }
     }
     .ty-grid-list__item {
-        border-color: lighten(@companion, 40%);
-        &:hover {
-            border-color: @companion;
-        }
+        border-color: @companion;
     }
 }
 
@@ -607,6 +605,7 @@ label > input.cm-product-filters-checkbox + span::before {
     display: flex !important;
     justify-content: space-between;
 }
+
 
 /*GFONTS*/
 @font-face {
