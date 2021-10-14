@@ -77,7 +77,10 @@
         <input type="text" name="{$prefix}[value]" value="{$condition_data.value}" class="input-medium"/>
     {elseif $schema.conditions[$condition_data.condition].type == "select"}
         <select name="{$prefix}[value]">
-            {foreach from=$schema.conditions[$condition_data.condition].variants|default:$schema.conditions[$condition_data.condition].variants_function|fn_get_promotion_variants key="_k" item="v"}
+            {if !$schema.conditions[$condition_data.condition].variants}
+                {$schema.conditions[$condition_data.condition].variants = $schema.conditions[$condition_data.condition].variants_function|fn_get_promotion_variants}
+            {/if}
+            {foreach from=$schema.conditions[$condition_data.condition].variants key="_k" item="v"}
                 <option value="{$_k}"
                         {if $_k == $condition_data.value}selected="selected"{/if}>{if $schema.conditions[$condition_data.condition].variants_function}{$v}{else}{__($v)}{/if}</option>
             {/foreach}

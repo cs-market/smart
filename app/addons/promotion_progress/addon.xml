@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>promotion_progress</id>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <status>active</status>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="order_statuses">
+                        <type>multiple select</type>
+                        <name>Order Statuses</name>
+                        <default_value>C</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+</addon>
