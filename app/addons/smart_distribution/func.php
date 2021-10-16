@@ -798,31 +798,41 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
         $condition = str_replace('AND 1 != 1', ' AND 1 != 1', $condition);
     }
     if (Tygh::$app['session']['auth']['area'] == 'A' && AREA == 'C') {
-        $condition = explode(' AND ', $condition);
-      foreach($condition as $id => $cond) {
-        if (strpos($cond, 'usergroup_ids') !== false
-          || strpos($cond, 'usergroup_id') !== false
-        ) {
-          unset($condition[$id]);
-        }
-      }
-      $condition = implode(' AND ', $condition);
+        //fn_print_die($condition, $join);
+        // if (in_array('prices', $params['extend'])) {
+        //     $join .= " LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1";
+        //     $price_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), Tygh::$app['session']['auth']['usergroup_ids'])));
+        // }
 
-        $join = explode(' JOIN ', $join);
-        foreach($join as &$j) {
-            $j = explode(' AND ', $j);
-          foreach($j as $id => $cond) {
-            if (strpos($cond, 'usergroup_ids') !== false
-              || strpos($cond, 'usergroup_id') !== false
-            ) {
-              unset($j[$id]);
-            }
-          }
-          $j = implode(' AND ', $j);
-        }
-        unset($j);
-        $join = implode(' JOIN ', $join);
+        // // $condition = str_replace([$price_condition, '('.fn_find_array_in_set(Tygh::$app['session']['auth']['usergroup_ids'], 'products.usergroup_ids', true).')'], ['', ''], $condition);
+        // //$condition = str_replace($price_condition, '', $condition);
+        // fn_print_die($condition);
+        // $condition = explode(' AND ', $condition);
+        // foreach($condition as $id => $cond) {
+        //     if (strpos($cond, 'usergroup_ids') !== false
+        //       || strpos($cond, 'usergroup_id') !== false
+        //     ) {
+        //         unset($condition[$id]);
+        //     }
+        // }
+        // $condition = implode(' AND ', $condition);
+        
+        // $join = explode(' JOIN ', $join);
+        // foreach($join as &$j) {
+        //     $j = explode(' AND ', $j);
+        //   foreach($j as $id => $cond) {
+        //     if (strpos($cond, 'usergroup_ids') !== false
+        //       || strpos($cond, 'usergroup_id') !== false
+        //     ) {
+        //       unset($j[$id]);
+        //     }
+        //   }
+        //   $j = implode(' AND ', $j);
+        // }
+        // unset($j);
+        // $join = implode(' JOIN ', $join);
     }
+    //fn_print_die($condition);
     if (AREA == 'A') {
         $fields['timestamp'] = "products.timestamp";
         if (isset($params['product_code']) && !empty($params['product_code'])) {
@@ -833,13 +843,13 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
     if (AREA == 'C') {
         $condition .= db_quote(' AND IF(products.avail_till, products.avail_till >= ?i, 1)', TIME);
         // Cut off out of stock products
-        $condition .= db_quote(
+/*        $condition .= db_quote(
             ' AND (CASE products.show_out_of_stock_product' .
             "   WHEN ?s THEN (products.amount >= products.min_qty OR products.tracking = 'D')" .
             '   ELSE 1' .
             ' END)',
             'N'
-        );
+        );*/
     }
 }
 

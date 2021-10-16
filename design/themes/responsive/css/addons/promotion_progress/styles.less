@@ -1,0 +1,46 @@
+.ty-progress-bar {
+    display: block;
+    height: 20px;
+    width: 100%;
+    .border-radius(3px);
+    overflow: hidden;
+    background-color: #eee;
+    position: relative;
+    border: 1px solid @companion;
+    box-sizing: border-box;
+    &:before {
+        display: block;
+        position: absolute;
+        content: '';
+        height: 20px;
+        width: var(--progress);
+        background-color: @menu;
+    }
+    &__progress {
+        position: absolute;
+        text-align: center;
+        width: 100%;
+        font-size: 12px;
+        line-height: 18px;
+        text-shadow: 0 0 15px rgba(255,255,255,.5), 0 0 10px rgba(255,255,255,.5);
+        white-space: nowrap;
+    }
+}
+
+.ty-smart-icon-flag-start {
+    .square(20px);
+    display: inline-block;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024'%3E %3Cpath fill='%236094ec' d='M.01 295.23V39.2s117.24-88.1 315.14 0 315.13 0 315.13 0v433.3s-117.28 86.17-315.13 0C184.7 415.7 89.29 433.8 39.4 452.72v571.27H.01V295.23zM296.26 74.64C134.83 3.65 39.41 62.82 39.41 62.82v348.13s124.25-49.9 290.58 25.4c155.8 70.53 261.6 13.4 261.6 13.4V98.29S472.5 152.14 296.26 74.64z'/%3E %3C/svg%3E ");
+}
+
+.ty-smart-icon-flag-finish {
+    .square(20px);
+    display: inline-block;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024'%3E %3Cpath fill='%236094ec' d='M393.03 567.92s71.16 36.04 181.57 18.12c7.65-1.24 18.67-3.8 16.09-3.28V425.37a431.67 431.67 0 0 0 101.09-31.46c34.2-15.4 66.33-25.36 95.87-31.45v156.71c-4.09.73 5.3-.2 14.33-1.47 102.48-14.54 182.63 11.42 182.63 11.42V370.76s-87.75-28.63-196.96-9.16V204.9c119.73-24.66 196.95 14.47 196.96 14.48V62.8s-77.22-38.84-196.96-14.44v155.67a402.34 402.34 0 0 0-98.48 30.79c-35.1 16.23-68.13 26.6-98.48 32.8V110.83c-114.15 20.49-197.66-12.58-197.66-12.58V257.4l.7-2.33s83.18 33.2 196.96 12.75V425.2a381.88 381.88 0 0 1-76.57 7.9c-74.8 0-120.39-23.27-120.4-23.27l-.68 158.1zM1024 1023.97h-39.4V572.73c-54.25-19.52-160.73-40.73-295.43 17.93-197.86 86.17-334.84 0-334.84 0V39.17s136.94 88.1 334.84 0 334.83 0 334.83 0v984.8z'/%3E %3C/svg%3E ");
+}

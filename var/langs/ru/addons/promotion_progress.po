@@ -1,0 +1,56 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: /addons/call_requests.po\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"PO-Revision-Date: 2016-05-31 07:45-0400\n"
+
+msgctxt "Addons::name::promotion_progress"
+msgid "Smart distribution: Прогресс промо"
+msgstr "Smart distribution: Прогресс промо"
+
+msgctxt "Addons::description::promotion_progress"
+msgid "Позволяет создавать промо-акции рассчитывающие условие за продолжительный период. Добавляет прогресс бар."
+msgstr "Позволяет создавать промо-акции рассчитывающие условие за продолжительный период. Добавляет прогресс бар."
+
+msgctxt "Languages::block_progress_promotions"
+msgid "Прогресс промо"
+msgstr "Прогресс промо"
+
+msgctxt "Languages::promotion_cond_progress_period"
+msgid "Период результатов промо"
+msgstr "Период результатов промо"
+
+msgctxt "Languages::promotion_cond_progress_total_paid"
+msgid "Итого оплачено в периоде"
+msgstr "Итого оплачено в периоде"
+
+msgctxt "Languages::promotion_cond_progress_order_amount"
+msgid "Количество заказов в периоде"
+msgstr "Количество заказов в периоде"
+
+msgctxt "Languages::promotion_cond_progress_average_paid"
+msgid "Средний чек заказов в периоде"
+msgstr "Средний чек заказов в периоде"
+
+msgctxt "Languages::promotion_cond_progress_purchased_unique_sku"
+msgid "Заказано уникальных артикулов в периоде"
+msgstr "Заказано уникальных артикулов в периоде"
+
+msgctxt "Languages::promotion_cond_progress_purchased_total_amount"
+msgid "Заказаное количество позиций в периоде"
+msgstr "Заказаное количество позиций в периоде"
+
+msgctxt "Languages::last_30_days"
+msgid "Последние 30 дней"
+msgstr "Последние 30 дней"
+
+msgctxt "Languages::last_7_days"
+msgid "Последние 7 дней"
+msgstr "Последние 7 дней"
