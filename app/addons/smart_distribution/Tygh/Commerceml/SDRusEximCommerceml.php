@@ -1233,7 +1233,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
                 $_variants = array();
                 $feature_data = array();
-                $feature_name = strval($_feature -> {$cml['name']});
+                $feature_name = trim(strval($_feature -> {$cml['name']}));
 
                 if ($feature_name == $cml['sticker']) {
                     $features_import['sticker']['id'] = strval($_feature -> {$cml['id']});
