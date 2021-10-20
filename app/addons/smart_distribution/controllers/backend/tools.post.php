@@ -1407,6 +1407,42 @@ fn_print_r($fantoms);
         }
     }
     fn_print_die(array_column($fantoms, 'product_id'));
+} elseif ($mode == 'find_products_w_lost_images') {
+    $params['filename'] = 'lost.csv';
+    $params['force_header'] = true;
+
+    if (!$action) {
+        $c_products = db_get_hash_multi_array('SELECT product_id, product_code, p.company_id FROM ?:products AS p LEFT JOIN ?:companies AS c ON c.company_id = p.company_id WHERE c.status = ?s AND p.status = ?s', ['company_id', 'product_id'], 'A', 'A');
+        $iteration = 0;
+        $lost = array();
+
+        foreach ($c_products as $company_id => $products) {
+            $company = fn_get_company_name($company_id);
+            foreach ($products as $p) {
+                $iteration +=1;
+                if (!($iteration % 5000)) fn_print_r($iteration);
+                $images = fn_get_image_pairs($p['product_id'], 'product', 'A');
+                $images[] = fn_get_image_pairs($p['product_id'], 'product', 'M');
+                foreach ($images as $img) {
+                    if (!is_file($img['detailed']['absolute_path'])) {
+                        //$lost[$company_id][] = $p['product_code'];
+                        $lost[] = array(
+                            'company_id' => $company_id,
+                            'company' => $company,
+                            'product_id' => $p['product_id'],
+                            'product_code' => $p['product_code'],
+                        );
+                        continue 2;
+                    }
+                }
+            }
+        }
+        $export = fn_exim_put_csv($lost, $params, '"');
+    } else {
+        fn_get_file('var/files/'.$params['filename']);
+    }
+
+    fn_print_die('end');
 }
 
 function fn_merge_product_features($target_feature, $group) {
