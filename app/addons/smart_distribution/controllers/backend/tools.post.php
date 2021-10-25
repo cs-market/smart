@@ -1424,7 +1424,7 @@ fn_print_r($fantoms);
                 $images = fn_get_image_pairs($p['product_id'], 'product', 'A');
                 $images[] = fn_get_image_pairs($p['product_id'], 'product', 'M');
                 foreach ($images as $img) {
-                    if (!is_file($img['detailed']['absolute_path'])) {
+                    if (isset($img['detailed']['absolute_path']) && !is_file($img['detailed']['absolute_path'])) {
                         //$lost[$company_id][] = $p['product_code'];
                         $lost[] = array(
                             'company_id' => $company_id,
@@ -1437,6 +1437,7 @@ fn_print_r($fantoms);
                 }
             }
         }
+
         $export = fn_exim_put_csv($lost, $params, '"');
     } else {
         fn_get_file('var/files/'.$params['filename']);
