@@ -1444,6 +1444,37 @@ fn_print_r($fantoms);
     }
 
     fn_print_die('end');
+} elseif ($mode == 'recover_images') {
+    // find uploaded images
+    //Array
+    /*(
+        [0] => 90355
+        [1] => 50016
+    )
+    */
+    
+    $file = 'lost.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    foreach ($content as $p) {
+        $res = db_get_array('SELECT * FROM ?:images_links WHERE object_type = ?s AND object_id = ?i', 'product', $p['product_id']);
+        if (count($res) > 1) {
+            $main_pair = fn_get_image_pairs($p['product_id'], 'product', 'M');
+            if (!(is_file($main_pair['detailed']['absolute_path']))) {
+                fn_delete_image_unconditionally($main_pair['detailed_id'], $main_pair['pair_id'], 'detailed');
+                $data = fn_get_image_pairs($p['product_id'], 'product', 'A');
+                
+                $img = array_shift($data);
+                db_query('UPDATE ?:images_links SET type = ?s WHERE detailed_id = ?i', 'M', $img['detailed_id']);
+                $done_products[] = $p['product_id'];
+                if ($data) {
+                    foreach($data as $d_image) {
+                        fn_delete_image_unconditionally($d_image['detailed_id'], $d_image['pair_id'], 'detailed');
+                    }
+                }
+            }
+        }
+    }
+    fn_print_die($done_products);
 }
 
 function fn_merge_product_features($target_feature, $group) {

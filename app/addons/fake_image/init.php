@@ -17,7 +17,8 @@ use Tygh\Registry;
 
 fn_register_hooks(
 	'get_product_data_post',
-	'gather_additional_product_data_before_options'
+	'gather_additional_product_data_before_options',
+	'delete_image_pair'
 );
 
 Registry::set('config.storage.files', array(
