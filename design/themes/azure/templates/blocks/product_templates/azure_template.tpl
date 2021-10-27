@@ -46,9 +46,15 @@
                     </div>
 
                     {if $product.weight}
-                    <div class="ty-control-group">
+                    <div class="ty-control-group product-list-field">
                         <label class="ty-control-group__label">{__('weight')}:</label>
                         <span class="ty-control-group__item">{$product.weight} {$settings.General.weight_symbol}</span>
+                    </div>
+                    {/if}
+                    {if $product.measure}
+                    <div class="ty-control-group">
+                        <label class="ty-control-group__label">{__('measure')}:</label>
+                        <span class="ty-control-group__item">{$product.measure}</span>
                     </div>
                     {/if}
 

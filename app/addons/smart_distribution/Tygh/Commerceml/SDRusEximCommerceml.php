@@ -666,6 +666,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $product['tax_ids'] = $this->addProductTaxes($xml_product_data->{$cml['taxes_rates']}, $product_id);
             }
 
+            if (!empty($xml_product_data->{$cml['base_unit']}->attributes())) {
+                $product['measure'] = (string) $xml_product_data->{$cml['base_unit']}->attributes()->{$cml['full_name_unit']};
+            }
+
             if ($this->company_id == '29') {
                 $product['full_description'] = strval($xml_product_data -> {$cml['bar']});
             } elseif ($this->company_id == '1815') {
