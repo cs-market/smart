@@ -656,6 +656,16 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         }
                     }
                 }
+                if (!empty($this->features_commerceml['product']) && $this->company_id == 1815) {
+                    foreach ($xml_product_data -> {$cml['properties_values']} -> {$cml['property_values']} as $_feature) {
+                        $feature_id = strval($_feature -> {$cml['id']});
+                        if ($this->features_commerceml['product']['id'] != $feature_id) {
+                            continue;
+                        }
+                        $p_feature_name = (string) $_feature->{$cml['value']};
+                        if (!empty($p_feature_name)) $product['product'] = $p_feature_name;
+                    }
+                }
             }
 
             if (isset($xml_product_data->{$cml['value_fields']}->{$cml['value_field']})) {
@@ -1268,6 +1278,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         }
                     }
                     $features_import['status']['variants'] = $_variants;
+                } elseif ($feature_name == '*Название для сайта#') {
+                    $features_import['product']['id'] = strval($_feature -> {$cml['id']});
                 }
 
                 if ($deny_or_allow_list == 'do_not_import') {
