@@ -51,12 +51,12 @@
                         <span class="ty-control-group__item">{$product.weight} {$settings.General.weight_symbol}</span>
                     </div>
                     {/if}
-                    {if $product.measure}
+                    {*if $product.measure}
                     <div class="ty-control-group">
                         <label class="ty-control-group__label">{__('measure')}:</label>
                         <span class="ty-control-group__item">{$product.measure}</span>
                     </div>
-                    {/if}
+                    {/if*}
 
                     {if $capture_options_vs_qty}{capture name="product_options"}{$smarty.capture.product_options nofilter}{/if}
                     <div class="ty-product-block__advanced-option clearfix">
