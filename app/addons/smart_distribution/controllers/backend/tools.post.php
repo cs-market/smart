@@ -1427,11 +1427,13 @@ fn_print_r($fantoms);
                 foreach ($images as $img) {
                     if (isset($img['detailed']['absolute_path']) && !is_file($img['detailed']['absolute_path'])) {
                         //$lost[$company_id][] = $p['product_code'];
+                        $bn = fn_basename($img['detailed']['absolute_path']);
                         $lost[] = array(
                             'company_id' => $company_id,
                             'company' => $company,
                             'product_id' => $p['product_id'],
                             'product_code' => $p['product_code'],
+                            'image' => $bn
                         );
                         continue 2;
                     }
