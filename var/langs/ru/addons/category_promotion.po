@@ -35,3 +35,11 @@ msgstr "Товары промоакций"
 msgctxt "Languages::promotion_cond_total_conditioned_products"
 msgid "Subtotal by promo's condition products"
 msgstr "Итого по указанным в условиях товарам"
+
+msgctxt "Languages::promotion_cond_amount_conditioned_products"
+msgid "Subtotal by promo's condition products"
+msgstr "Суммарное количество по указанным в условиях товарам"
+
+msgctxt "Languages::promotion_cond_unique_amount_conditioned_products"
+msgid "Subtotal by promo's condition products"
+msgstr "Количество позиций по указанным в условиях товарам"

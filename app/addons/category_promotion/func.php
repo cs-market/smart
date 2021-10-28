@@ -266,7 +266,7 @@ function fn_category_promotion_split_promotion_by_type($promotions) {
     return array($promotions, $products, $search);
 }
 
-function fn_category_promotion_check_total_conditioned_products($id, $promo, $products) {
+function fn_category_promotion_get_cart_promotioned_products($id, $products) {
     $product_ids = [];
     $promotion = fn_get_promotion_data($id);
     if ($promotion['condition_categories']) {
@@ -279,7 +279,11 @@ function fn_category_promotion_check_total_conditioned_products($id, $promo, $pr
         $product_ids = explode(',', $promotion['products']);
 
     }
-    $cart_products = array_filter($products, function($v) use ($product_ids) {return in_array($v['product_id'], $product_ids);});
+    return array_filter($products, function($v) use ($product_ids) {return in_array($v['product_id'], $product_ids);});
+}
+
+function fn_category_promotion_check_total_conditioned_products($id, $promo, $products) {
+    $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products);
 
     if ($cart_products) {
         $subtotal = array_sum(array_column($cart_products, 'subtotal'));
@@ -287,4 +291,15 @@ function fn_category_promotion_check_total_conditioned_products($id, $promo, $pr
     }
 
     return false;
+}
+
+function fn_category_promotion_check_amount_conditioned_products($id, $promo, $products) {
+    $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products);
+
+    return array_sum(array_column($cart_products, 'amount'));
+}
+
+function fn_category_promotion_check_unique_amount_conditioned_products($id, $promo, $products) {
+    $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products);
+    return count(array_unique(array_column($cart_products, 'product_code')));
 }
