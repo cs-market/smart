@@ -1493,8 +1493,7 @@ fn_print_r($fantoms);
                     $bn = fn_basename($img['detailed']['absolute_path']);
                     $ext = fn_get_file_ext($bn);
                     $fname = str_replace('.'.$ext, '', $bn);
-                    $check = Registry::get('config.dir.files'). "restore_images/$action/".$fname."-new.".$ext;
-
+                    $check = Registry::get('config.dir.files'). "restore_images/$action/".$fname.".".$ext;
                     $res = is_file($check);
                     if (!$res) {
                         list($fname) = explode('_', $fname);
@@ -1518,14 +1517,16 @@ fn_print_r($fantoms);
                         ];
 
                         $result = fn_attach_image_pairs('import', 'product', $p['product_id']);
+                        $successful[] = $p['product_id'];
                     } else {
+                        $p['basename'] = $bn;
                         $undone_products[] = $p;
                     }
                 }
             }
         }
     }
-    fn_print_die($undone_products);
+    fn_print_die($undone_products, $successful);
 } elseif ($mode == 'remove_duplicated_main') {
     $images_ = db_get_array('SELECT count(object_id) as cnt, object_id FROM ?:images_links WHERE object_type = ?s AND type = ?s GROUP BY object_id HAVING cnt > 1', 'product','M');
     foreach ($images_ as $img) {
