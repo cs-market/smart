@@ -1,5 +1,6 @@
 <?php
 
+use Tygh\Registry;
 
 if ($mode =='monolith' && !empty($action)) {
     fn_print_die(fn_monolith_generate_xml($action));
@@ -1475,6 +1476,78 @@ fn_print_r($fantoms);
         }
     }
     fn_print_die($done_products);
+} elseif ($mode == 'recover_images2') {
+    $cond = '';
+    if ($action) $cond .= db_quote(' AND p.company_id = ?i', $action);
+    $c_products = db_get_hash_multi_array('SELECT product_id, product_code, p.company_id FROM ?:products AS p LEFT JOIN ?:companies AS c ON c.company_id = p.company_id WHERE c.status = ?s AND p.status = ?s ?p', ['company_id', 'product_id'], 'A', 'A', $cond);
+    $iteration = 0;
+    $lost = array();
+
+    foreach ($c_products as $company_id => $products) {
+        $company = fn_get_company_name($company_id);
+        foreach ($products as $p) {
+            $images = fn_get_image_pairs($p['product_id'], 'product', 'A');
+            $images[] = fn_get_image_pairs($p['product_id'], 'product', 'M');
+            foreach ($images as $img) {
+                if (isset($img['detailed']['absolute_path']) && !is_file($img['detailed']['absolute_path'])) {
+                    $bn = fn_basename($img['detailed']['absolute_path']);
+                    $ext = fn_get_file_ext($bn);
+                    $fname = str_replace('.'.$ext, '', $bn);
+                    $check = Registry::get('config.dir.files'). "restore_images/$action/".$fname."-new.".$ext;
+
+                    $res = is_file($check);
+                    if (!$res) {
+                        list($fname) = explode('_', $fname);
+                        $check = Registry::get('config.dir.files'). "restore_images/$action/".$fname."-new.".$ext;
+                        $res = is_file($check);
+                    }
+                    if ($res) {
+                        //update product image
+
+                        $_REQUEST["server_import_image_icon"] = '';
+                        $_REQUEST["type_import_image_icon"] = '';
+                        $_REQUEST["type_import_image_detailed"] = array('server');
+                        $_REQUEST["file_import_image_detailed"] = array($check);
+                        $_REQUEST['import_image_data'] = [
+                            [
+                                'type'         => "M",
+                                'image_alt'    => empty($image_alt) ? '' : $image_alt,
+                                'detailed_alt' => empty($detailed_alt) ? '' : $detailed_alt,
+                                'position'     => empty($position) ? 0 : $position,
+                            ]
+                        ];
+
+                        $result = fn_attach_image_pairs('import', 'product', $p['product_id']);
+                    } else {
+                        $undone_products[] = $p;
+                    }
+                }
+            }
+        }
+    }
+    fn_print_die($undone_products);
+} elseif ($mode == 'remove_duplicated_main') {
+    $images_ = db_get_array('SELECT count(object_id) as cnt, object_id FROM ?:images_links WHERE object_type = ?s AND type = ?s GROUP BY object_id HAVING cnt > 1', 'product','M');
+    foreach ($images_ as $img) {
+        list($images) = array(fn_get_image_pairs([$img['object_id']], 'product', 'M'));
+        $images = reset($images);
+        $found = false;
+
+        foreach($images as $main_pair) {
+            if (is_file($main_pair['detailed']['absolute_path'])) {
+                $found = $main_pair['pair_id'];
+
+            }
+        }
+        if ($found) {
+            foreach($images as $pair_id => $main_pair) {
+                if ($pair_id != $found) {
+                    fn_delete_image_unconditionally($main_pair['image_id'], $main_pair['pair_id'], 'detailed');
+                }
+            }
+        }
+    }
+    fn_print_die($images);
 }
 
 function fn_merge_product_features($target_feature, $group) {
