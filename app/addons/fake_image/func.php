@@ -16,16 +16,18 @@ use Tygh\Storage;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-function fn_get_fake_image($product_id = 0) {
+function fn_get_fake_image($product_id = 0, $img = []) {
     $image_name = Registry::get('addons.fake_image.image');
     if (!empty($image_name)) {
-        $img = array(
-            'pair_id' => -1,
-            'image_id' => 0,
-            'detailed_id' => -1,
-            'position' => 0,
-            'detailed' => &$detailed,
-        );
+        if (empty($img)) {
+            $img = array(
+                'pair_id' => -1,
+                'image_id' => 0,
+                'detailed_id' => -1,
+                'position' => 0,
+            );
+        }
+        $img['detailed'] = &$detailed;
         $detailed = array(
             'object_id' => $product_id,
             'object_type' => 'product',
@@ -43,13 +45,13 @@ function fn_get_fake_image($product_id = 0) {
 
 function fn_fake_image_get_product_data_post(&$product_data, $auth, $preview, $lang_code) {
     if (empty($product_data['main_pair']) || !is_file($product_data['main_pair']['detailed']['absolute_path'])) {
-        $product_data['main_pair'] = fn_get_fake_image($product_data['product_id']);
-    }   
+        $product_data['main_pair'] = fn_get_fake_image($product_data['product_id'], $product_data['main_pair']);
+    }
 }
 
 function fn_fake_image_gather_additional_product_data_before_options(&$product_data, $auth, $params) {
     if (empty($product_data['main_pair']) || !is_file($product_data['main_pair']['detailed']['absolute_path'])) {
-        $product_data['main_pair'] = fn_get_fake_image($product_data['product_id']);
+        $product_data['main_pair'] = fn_get_fake_image($product_data['product_id'], $product_data['main_pair']);
     }
 }
 
