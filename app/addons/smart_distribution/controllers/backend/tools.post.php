@@ -1610,7 +1610,6 @@ function fn_sd_change_user_points($value, $user_id, $reason = '', $action = CHAN
     return '';
 }
 
-
 function fn_update_categories_tree(&$tree, $parent_id = 0) {
     global $new_category_ids;
     foreach ($tree as $key => &$value) {
