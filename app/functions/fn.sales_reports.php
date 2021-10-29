@@ -981,7 +981,7 @@ function fn_get_report_statistics(&$table)
 
         } elseif ($table['display'] == 'product_cost') {
             $product_cost = (empty($element['product_ids'])) ? '' : db_quote(" AND ?:order_details.product_id IN (?p)", $element['product_ids']);
-            $data[$hash] = db_get_hash_array("SELECT SUM(amount * price) as total $add_field FROM ?:order_details LEFT JOIN ?:orders ON ?:orders.order_id = ?:order_details.order_id WHERE $element[request] AND $time_condition $order_ids ?p $group_condition", 'interval', $product_cost);
+            $data[$hash] = db_get_hash_array("SELECT ROUND(SUM(amount * price), 2) as total $add_field FROM ?:order_details LEFT JOIN ?:orders ON ?:orders.order_id = ?:order_details.order_id WHERE $element[request] AND $time_condition $order_ids ?p $group_condition", 'interval', $product_cost);
 
         } elseif ($table['display'] == 'product_number') {
             $product_count = (empty($element['product_ids'])) ? '' : db_quote(" AND ?:order_details.product_id IN (?p)", $element['product_ids']);
