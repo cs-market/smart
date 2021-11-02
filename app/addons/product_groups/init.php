@@ -10,5 +10,6 @@ fn_register_hooks(
     'place_suborders_pre',
     'place_suborders',
     'get_product_fields',
-    'pre_get_orders'
+    'pre_get_orders',
+    'get_products',
 );

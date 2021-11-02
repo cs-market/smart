@@ -166,3 +166,9 @@ function fn_product_groups_get_product_fields(&$fields) {
 function fn_product_groups_pre_get_orders($params, &$fields, $sortings, $get_totals, $lang_code) {
     $fields[] = '?:orders.group_id';
 }
+
+function fn_product_groups_get_products($params, $fields, $sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having) {
+    if (isset($params['group_id']) && !empty($params['group_id'])) {
+        $condition .= db_quote(' AND products.group_id = ?i', $params['group_id']);
+    }
+}
