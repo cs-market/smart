@@ -1256,3 +1256,23 @@ function fn_smart_distribution_text_cart_amount_corrected_notification($product,
         '[reduced]' => $current_amount
     )));
 }
+
+function fn_get_fresh_user_auth_token($user_id, $ttl = 604800)
+{
+    $token = false;
+    $ekeys = fn_get_ekeys(array(
+        'object_id' => $user_id,
+        'object_type' => 'U',
+        'ttl' => TIME
+    ));
+
+    if ($ekeys && !$regenerate_key) {
+        $ekey = reset($ekeys);
+        $token = $ekey['ekey'];
+    }
+
+    $token = fn_generate_ekey($user_id, 'U', $ttl, $token);
+    $expiry_time = time() + $ttl;
+
+    return array($token, $expiry_time);
+}
