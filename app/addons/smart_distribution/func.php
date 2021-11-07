@@ -1286,3 +1286,14 @@ function fn_get_fresh_user_auth_token($user_id, $ttl = 604800)
 
     return array($token, $expiry_time);
 }
+
+function fn_smart_distribution_get_orders_totals($paid_statuses, $join, $condition, $group, &$totals) {
+    if (strpos($condition, 'AND ?:order_details.product_id IN (') !== false) {
+        $totals['totally_product_paid'] = round(db_get_field(
+            'SELECT sum(t.total) FROM (SELECT ?:order_details.price * ?:order_details.amount as total FROM ?:orders ?p WHERE 1 ?p ?p) as t',
+            $join,
+            $condition,
+            $group
+        ), 2);
+    }
+}

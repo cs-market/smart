@@ -71,4 +71,5 @@ fn_register_hooks(
     'extract_cart',
     'get_promotions',
     'text_cart_amount_corrected_notification',
+    'get_orders_totals'
 );
