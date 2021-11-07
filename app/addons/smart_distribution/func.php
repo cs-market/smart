@@ -12,7 +12,7 @@ use Tygh\Storage;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-function fn_smart_distribution_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
+function fn_smart_distribution_get_orders($params, $fields, $sortings, &$condition, &$join, &$group) {
     $auth = Tygh::$app['session']['auth'];
     if (!empty($params['usergroup_id'])) {
         list($users, ) = fn_get_users(array('usergroup_id' => $params['usergroup_id']), $auth);
@@ -44,6 +44,12 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
 
     if (isset($params['profile_id']) && !empty($params['profile_id'])) {
         $condition .= db_quote(' AND (?:orders.profile_id = ?i OR ?:orders.profile_id = 0)', $params['profile_id']);
+    }
+
+    if (isset($params['category_ids']) && !empty($params['category_ids'])) {
+        $condition .= db_quote(" AND ?:order_details.product_id IN (?n)", db_get_fields(fn_get_products(array('cid' => $params['category_ids'], 'subcats' => 'Y', 'get_query' => true))));
+        $join .= " LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id";
+        $group = " GROUP BY ?:orders.order_id ";
     }
 }
 
