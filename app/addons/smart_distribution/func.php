@@ -251,6 +251,16 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
         $condition['without_order'] = db_quote(" AND without_order.user_id IS NULL");
     }
 
+    if (!empty($params['p_ids'])) {
+        list($params['ordered_products_time_from'], $params['ordered_products_time_to']) = fn_create_periods([
+            'period' => $params['ordered_products_period'],
+            'time_from' => $params['ordered_products_time_from'],
+            'time_to' => $params['ordered_products_time_to']
+        ]);
+        $condition['order_period'] = db_quote(' AND ?:orders.timestamp > ?i AND ?:orders.timestamp < ?i', $params['ordered_products_time_from'], $params['ordered_products_time_to']);
+
+    }
+
     $sortings['timestamp'] = '?:users.timestamp';
 }
 
