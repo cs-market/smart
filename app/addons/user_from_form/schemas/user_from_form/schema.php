@@ -299,6 +299,8 @@ return [
             's_client_code' => '1',
             'b_client_code' => '1',
             'b_firstname' => '223',
+            'fax' => '448',
+            'company' => '219',
         ],
     ],
 ];
