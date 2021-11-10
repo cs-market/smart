@@ -284,4 +284,21 @@ return [
             'status' => 'D',
         ],
     ],
+    '73' => [
+        'page_id' => 73,
+        'company_id' => 1787,
+        'usergroup_id' => [172],
+        'fields_map' => [
+            'firstname' => '223',
+            'phone' => '221',
+            'email' => '220',
+            'user_login' => '220',
+            'password' => '222',
+            's_phone' => '221',
+            's_address' => '224',
+            's_client_code' => '1',
+            'b_client_code' => '1',
+            'b_firstname' => '223',
+        ],
+    ],
 ];
