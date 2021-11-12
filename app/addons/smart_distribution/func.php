@@ -1303,3 +1303,15 @@ function fn_smart_distribution_get_orders_totals($paid_statuses, $join, $conditi
         ), 2);
     }
 }
+
+function fn_reward_points_promotion_give_percent_points($bonus, &$cart, &$auth, &$cart_products)
+{
+
+    $cart['promotions'][$bonus['promotion_id']]['bonuses'][$bonus['bonus']] = $bonus;
+
+    if ($bonus['bonus'] == 'give_percent_points') {
+        $cart['points_info']['additional'] = (!empty($cart['points_info']['additional']) ? $cart['points_info']['additional'] : 0) + round($cart['subtotal'] * $bonus['value'] / 100);
+    }
+
+    return true;
+}
