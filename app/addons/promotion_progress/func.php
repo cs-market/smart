@@ -67,7 +67,7 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
 
             $value = db_get_field("SELECT $field FROM ?:orders AS o $join WHERE $condition");
 
-            return $value;
+            return $value ?? 0;
         }
     }
     return false;
