@@ -522,18 +522,24 @@ function fn_helpdesk_send_mail() {
             
             fn_set_hook('helpdesk_send_message_pre', $notified, $message, $mailboxes[$message['mailbox_id']]);
 
-            if (!$notified)
-            $notified = $mailer->send(array(
-                'to' => array_column($message['users'], 'email'),
-                'from' => array('name' => $mailboxes[$message['mailbox_id']]['mailbox_name'], 'email' => $settings['email']),
-                'tpl' => $body,
-                'is_html' => true,
-                'mailbox_id' => $message['mailbox_id'],
-                'data' => array(
-                    'subject' => $tid . ' ' . $message['subject']
-                    ),
-                'attachments' => $attachements,
-            ), 'A', Registry::get('settings.Appearance.backend_default_language'), $mailer_settings);
+            if (!$notified) {
+                $to = array_filter(filter_var_array(array_column($message['users'], 'email'), FILTER_VALIDATE_EMAIL));
+                if (!empty($to)) {
+                    $notified = $mailer->send(array(
+                        'to' => array_column($message['users'], 'email'),
+                        'from' => array('name' => $mailboxes[$message['mailbox_id']]['mailbox_name'], 'email' => $settings['email']),
+                        'tpl' => $body,
+                        'is_html' => true,
+                        'mailbox_id' => $message['mailbox_id'],
+                        'data' => array(
+                            'subject' => $tid . ' ' . $message['subject']
+                            ),
+                        'attachments' => $attachements,
+                    ), 'A', Registry::get('settings.Appearance.backend_default_language'), $mailer_settings);
+                } else {
+                    $notified = true;
+                }
+            }
         } else {
             $notified = true;
         }
@@ -541,7 +547,7 @@ function fn_helpdesk_send_mail() {
             db_query('UPDATE ?:helpdesk_messages set notified = "Y" WHERE message_id = ?i', $message['message_id']);
         }
     }
-    
+
     if (!defined('CONSOLE')) {
         fn_print_r('done');
     }
