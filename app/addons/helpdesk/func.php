@@ -490,6 +490,8 @@ function fn_helpdesk_send_mail() {
         $message['users'] = fn_get_ticket_users(array('ticket_id' => $message['ticket_id'], 'user_type' => ($message['user_type'] == 'C') ? ['A', 'V'] : 'C', 'notification' => 'Y'));
     }
 
+    $mailer = Tygh::$app['mailer'];
+
     foreach ($messages as &$message) {
         if (!empty($message['users'])) {
             $notified = false;
@@ -509,7 +511,6 @@ function fn_helpdesk_send_mail() {
                     $file_path = 'var/helpdesk_files/' . $message['ticket_id'] . '/' . $message['message_id'] . '/' . $file_path;                  
                 }
             }
-            $mailer = Tygh::$app['mailer'];
 
             $mailbox_email_settings = array(
                 'mailer_send_method' => 'smtp',
