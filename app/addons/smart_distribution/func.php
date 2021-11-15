@@ -9,6 +9,7 @@ use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
 use Tygh\Enum\UsergroupTypes;
 use Tygh\Storage;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -256,8 +257,14 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
         $join .= db_quote(" LEFT JOIN ?:orders as without_order ON ?:users.user_id = without_order.user_id AND (without_order.timestamp >= ?i AND without_order.timestamp <= ?i)", $params[$w_time_from], $params[$w_time_to]);
         $condition['without_order'] = db_quote(" AND without_order.user_id IS NULL");
     }
+    if (!empty($params['category_ids'])) {
+        $condition['order_product_id'] = db_quote(' AND ?:order_details.product_id IN (?n)', db_get_fields(fn_get_products(['cid' => $params['category_ids'], 'subcats' => 'Y', 'get_query' => true])));
+        if (strpos($join, 'LEFT JOIN ?:order_details') === false) {
+            $join .= db_quote(' LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != ?s LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id', YesNo::YES);
+        }
+    }
 
-    if (!empty($params['p_ids'])) {
+    if (!empty($params['p_ids']) || !empty($params['category_ids'])) {
         list($params['ordered_products_time_from'], $params['ordered_products_time_to']) = fn_create_periods([
             'period' => $params['ordered_products_period'],
             'time_from' => $params['ordered_products_time_from'],
