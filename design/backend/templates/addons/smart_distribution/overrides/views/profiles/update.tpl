@@ -112,22 +112,40 @@
     </div>
     {if $show_api_tab}
         <div id="content_api">
-            <div class="control-group {if $hide_api_checkbox}hidden{/if}">
-                <div class="controls">
-                    <label class="checkbox" for="sw_api_container">
-                    <input {if $user_data.api_key != ""}checked="checked"{/if} class="cm-combination" type="checkbox" name="user_api_status" value="Y" id="sw_api_container" />{__("allow_api_access")}</label>
+            {if !$hide_api_checkbox}
+                <div class="control-group">
+                    <label for="sw_api_container" class="control-label">{__("api_access_for_user")}</label>
+                    <div class="controls">
+                        {include file="common/switcher.tpl"
+                            checked=$user_data.api_key != ""
+                            input_id="sw_api_container"
+                            input_name="user_api_status"
+                            input_value="YesNo::YES"|enum
+                            input_attrs=["data-ca-api-key-container-id" => "api_container", "data-ca-show-api-key-warning" => "{if $user_data.api_key}false{else}true{/if}"]
+                        }
+                    </div>
                 </div>
-            </div>
+            {/if}
 
-            <div id="api_container" {if $user_data.api_key == ""}class="hidden"{/if}>
+            <div id="api_container"{if $user_data.api_key === ""} class="hidden"{/if}>
                 <div class="control-group">
                     <label class="control-label">{__("api_key")}</label>
                     <div class="controls">
-                        <input type="text" class="input-large" name="user_data[api_key]" value="{if $user_data.api_key}{$user_data.api_key}{else}{$new_api_key}{/if}" readonly="readonly"/>
+                        {if $user_data.api_key}
+                            {include file="buttons/button.tpl" but_role="action" but_id="refresh_api_key" but_target="api_key_holder" but_text="{__("generate_new_api_key")}" but_meta="btn-indent"}
+                            <input type="text" class="input-large" name="user_data[raw_api_key]" value="*************************" disabled id="api_key_holder"/>
+                        {else}
+                            <input type="text" class="input-large js-new-api-key" name="user_data[raw_api_key]" value="{$new_api_key}" readonly="readonly"  disabled />
+                        {/if}
+                        <div class="well well-small help-block{if $user_data.api_key} hidden{/if}">
+                            {__("please_copy_api_key")}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        {script src="js/tygh/backend/api_access.js"}
     {/if}
 
     {hook name="profiles:tabs_content"}
