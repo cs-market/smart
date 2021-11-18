@@ -1551,6 +1551,10 @@ fn_print_r($fantoms);
         }
     }
     fn_print_die($images);
+} elseif ($mode == 'remove_prices_mikale') {
+    list($products) = fn_get_products(['company_id' => 1815]);
+    $pids = array_keys($products);
+    db_query('DELETE FROM ?:product_prices WHERE usergroup_id != ?i AND product_id IN (?a)', 0, $pids);
 }
 
 function fn_merge_product_features($target_feature, $group) {
