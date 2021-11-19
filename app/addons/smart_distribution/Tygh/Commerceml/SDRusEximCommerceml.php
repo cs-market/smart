@@ -956,7 +956,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
         foreach ($prices_file -> {$cml['price_type']} as $_price) {
             $found = false;
             foreach ($data_prices as $d_price) {
-                if ($d_price['price_1c'] == strval($_price -> {$cml['name']})) {
+                if ($d_price['price_1c'] == trim(strval($_price -> {$cml['name']}))) {
                     $d_price['external_id'] = strval($_price -> {$cml['id']});
                     $prices_commerseml[] = $d_price;
                     $found = true;
