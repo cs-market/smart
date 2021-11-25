@@ -69,7 +69,7 @@ function fn_send_push_notification($notification_id) {
     $notification = array_shift($notifications);
     if (!empty($notification) && !empty($notification['user_ids'])) {
         foreach (explode(',', $notification['user_ids']) as $user_id) {
-            fn_mobile_app_notify_user($user_id, $notification['title'], $notification['body'], '', 1);
+            fn_mobile_app_notify_user($user_id, $notification['title'], strip_tags(html_entity_decode($notification['body'])), '', 1);
         }
         db_query("UPDATE ?:push_notifications SET ?u WHERE notification_id = ?i", array('sent_date' => time()), $notification_id);
         fn_set_notification('N', __('notice'), __('sent'));
@@ -117,6 +117,6 @@ function fn_push_notifications_get_mobile_table_values($param) {
 
 function fn_push_notifications_helpdesk_send_message_pre(&$notified, $message, $mailbox) {
     foreach (array_keys($message['users']) as $user_id) {
-        $notified = $notified || fn_mobile_app_notify_user($user_id, $message['subject'], strip_tags($message['message']), '', 1);
+        $notified = fn_mobile_app_notify_user($user_id, $message['subject'], strip_tags(html_entity_decode($message['message'])), '', 1) || $notified;
     }
 }
