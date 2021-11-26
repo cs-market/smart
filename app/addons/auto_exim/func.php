@@ -200,6 +200,11 @@ function fn_auto_exim_run_import($imports, $company_id) {
 
                     Registry::set('runtime.skip_area_checking', true);
 
+                    $content = fn_get_contents($params['dirname'].$params['basename']);
+                    $content = str_replace("\xEF\xBB\xBF", '', $content);
+                    fn_rm($params['dirname'].$params['basename']);
+                    fn_put_contents($params['dirname'].$params['basename'], $content);
+
                     if (($data = fn_exim_get_csv($pattern, $params['dirname'].$params['basename'], $params))) {
                         foreach ($data as &$row) {
                             $row = array_filter($row, function($v) {return $v != '';});

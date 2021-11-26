@@ -1322,3 +1322,8 @@ function fn_reward_points_promotion_give_percent_points($bonus, &$cart, &$auth, 
 
     return true;
 }
+
+function fn_trim_bom_helper(&$value)
+{
+    $value = is_string($value) ? str_replace("\xEF\xBB\xBF", "", $value) : $value;
+}
