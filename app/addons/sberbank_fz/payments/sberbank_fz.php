@@ -9,60 +9,9 @@ if (defined('PAYMENT_NOTIFICATION')) {
         $order_id = $_REQUEST['ordernumber'];
     }
 
-    $order_info = fn_get_order_info($order_id);
-    if (empty($processor_data) && !empty($order_info)) {
-        $processor_data = fn_get_processor_data($order_info['payment_id']);
-    }
+    if ($mode == 'return' || $mode == 'error') {
+        Sberbank::getPaymentResult($order_id, $_REQUEST['orderId']);
 
-    if (!empty($processor_data['processor_params']['logging']) && $processor_data['processor_params']['logging'] == 'Y') {
-        Sberbank::writeLog($_REQUEST, 'sberbank_request.log');
-    }
-
-    if (!empty($order_info) && ($mode == 'return' || $mode == 'error')) {
-
-        $pp_response = array(
-            'order_status' => 'F'
-        );
-
-        if ($order_info['payment_info']['transaction_id'] != $_REQUEST['orderId']) {
-            $pp_response['reason_text'] = __("addons.rus_sberbank.wrong_transaction_id");
-
-        } else {
-            $sberbank = new Sberbank($processor_data);
-            $response = $sberbank->getOrderExtended($order_info['payment_info']['transaction_id']);
-
-            if ($sberbank->isError()) {
-                $pp_response = array(
-                    'order_status' => 'F',
-                    'reason_text' => $response['errorMessage']
-                );
-
-            } elseif (in_array($response['orderStatus'], [1,2]) ) {
-
-                if ($response['amount'] == round($order_info['total'] * 100)) {
-                    $pp_response = array(
-                        'order_status' => $processor_data['processor_params']['confirmed_order_status'],
-                        'card_number' => $response['cardAuthInfo']['pan'],
-                        'cardholder_name' => $response['cardAuthInfo']['cardholderName'],
-                        'expiry_month' => substr($response['cardAuthInfo']['expiration'], 0, 4),
-                        'expiry_year' => substr($response['cardAuthInfo']['expiration'], 0, -2),
-                        'bank' => $response['bankInfo']['bankName'],
-                        'ip_address' => $response['ip'],
-                    );
-                } else {
-                    $pp_response['reason_text'] = __("addons.rus_sberbank.wrong_amount");
-                }
-
-            } else {
-                $pp_response = array(
-                    'order_status' => 'F',
-                    'reason_text' => $response['actionCodeDescription'],
-                    'ip_address' => $response['ip'],
-                );
-            }
-        }
-
-        fn_finish_payment($order_id, $pp_response);
         if (isset($_REQUEST['isMobilePayment']) && $_REQUEST['isMobilePayment']) {
             if (Tygh::$app['session']['auth']['user_id']) {
                 echo(__('processing_order'));

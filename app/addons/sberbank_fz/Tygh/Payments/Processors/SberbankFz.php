@@ -6,11 +6,11 @@ use Tygh\Registry;
 use Tygh\Http;
 use Tygh\Payments\SberDiscountHelper;
 
-class SberbankFz extends Sberbank
+class SberbankFz
 {
-    protected $PROD_URL = 'https://securepayments.sberbank.ru/payment/rest/';
-    protected $TEST_URL = 'https://3dsec.sberbank.ru/payment/rest/';
-
+    protected $PROD_URL = 'https://securepayments.sberbank.ru/';
+    protected $TEST_URL = 'https://3dsec.sberbank.ru/';
+    protected $_payment_method = 'regular';
     protected $_two_staging = false;
     protected $_logging = false;
     protected $_send_order = false;
@@ -33,12 +33,21 @@ class SberbankFz extends Sberbank
             $this->_url = $this->PROD_URL;
         }
 
-        if (!empty($processor_data['processor_params']['two_staging'])) {
-            $this->_two_staging = true;
-        }
-
         if (!empty($processor_data['processor_params']['send_order']) && $processor_data['processor_params']['send_order'] == 'Y') {
             $this->_send_order = true;
+        }
+
+        $this->_payment_method = ($this->_send_order) ? $processor_data['processor_params']['payment_method'] : 'regular';
+
+        if ($this->_payment_method == 'credit' || $this->_payment_method == 'installment') {
+            $this->_url = $this->_url . 'sbercredit/';
+            $processor_data['processor_params']['two_staging'] = 0;
+        } else {
+            $this->_url = $this->_url . 'payment/rest/';
+        }
+
+        if (!empty($processor_data['processor_params']['two_staging'])) {
+            $this->_two_staging = true;
         }
 
         $this->_tax_system = (!empty($processor_data['processor_params']['tax_system'])) ? $processor_data['processor_params']['tax_system'] : 0;
@@ -70,11 +79,19 @@ class SberbankFz extends Sberbank
             'failUrl' => fn_url("payment_notification.error?payment=sberbank_fz&ordernumber=$order_id" . $mobile_postfix, AREA, $protocol),
             'jsonParams' => json_encode(
                 [
-                    'CMS:' => 'cs-cart 4.12.x',
-                    'Module-Version: ' =>  'CS-Market.com new version with fz-54 and mobile application support'
+                    'CMS:' => 'CS-Cart 4.12.x',
+                    'Module-Version: ' =>  'CS-Market.com new version with fz-54 and mobile application support',
+                    'phone' => preg_replace('/\D+/', '', $order_info['phone'])
                 ]
             ),
         );
+
+        $iso_currencies = fn_get_schema('sberbank', 'currencies');
+        if (isset($iso_currencies[CART_PRIMARY_CURRENCY])) {
+            $data['currency'] = $iso_currencies[CART_PRIMARY_CURRENCY];
+        }
+        $data['description'] = __('order') . ' #' . $order_id;
+        $data['language'] = DESCR_SL;
 
         if ($this->_send_order) {
             $product_taxes = array();
@@ -121,12 +138,12 @@ class SberbankFz extends Sberbank
                 $item['name'] = isset($value['product']) ? strip_tags($value['product']) : '';
                 $item['quantity'] = array(
                     'value' => $q,
-                    'measure' => 'piece'
+                    'measure' => 'шт.'
                 );
                 $item['itemAmount'] = $p * $q;
                 $item['itemCode'] = $value['product_code'];
                 $item['tax'] = array(
-                    'taxType' => $tax_type
+                    'taxType' => $tax_type ?? 0
                 );
                 $item['itemPrice'] = $p;
                 $order_total += $item['itemAmount'];
@@ -143,27 +160,24 @@ class SberbankFz extends Sberbank
                         "name" => "paymentObject",
                         "value" => $this->_ffd_paymentObjectType
                     );
-                    $item['itemAttributes']['attributes'] = $attributes;
+                    $item['itemAttributes'] = ($this->_payment_method == 'regular') ? ['attributes' => $attributes] : $attributes;
                 }
 
                 $items[] = $item;
             }
 
-            $data['amount'] = $order_total;
-
-//             DISCOUNT_VALUE_SECTION
+            // DISCOUNT_VALUE_SECTION
             if ($subtotal_discount > 0) {
                 $new_order_total = 0;
                 foreach ($items as &$i) {
                     $p_discount = round($i['itemAmount']  / $order_total * $subtotal_discount, 2) * 100;
                     self::correctBundleItem($i, $p_discount);
-//                    $i['discount']['discountType'] = 'summ';
-//                    $i['discount']['discountValue'] += $p_discount;
+                    // $i['discount']['discountType'] = 'summ';
+                    // $i['discount']['discountValue'] += $p_discount;
                     $new_order_total += $i['itemAmount'];
                 }
                 $data['amount'] = $new_order_total;
             }
-
 
             // DELIVERY
             if ($shipping_cost > 0) {
@@ -176,7 +190,7 @@ class SberbankFz extends Sberbank
                 $itemShipment['itemAmount'] = $itemShipment['itemPrice'] = $shipping_cost * 100;
                 $itemShipment['itemCode'] = 'Delivery';
                 $itemShipment['tax'] = array(
-                    'taxType' => $tax_type
+                    'taxType' => $tax_type ?? 0
                 );
 
                 // FFD 1.05 added
@@ -190,17 +204,17 @@ class SberbankFz extends Sberbank
                         "name" => "paymentObject",
                         "value" => 4
                     );
-                    $itemShipment['itemAttributes']['attributes'] = $attributes;
+                    $itemShipment['itemAttributes'] = ($this->_payment_method == 'regular') ? ['attributes' => $attributes] : $attributes;
                 }
 
-                $data['amount'] += $shipping_cost * 100;
+                //$data['amount'] += $shipping_cost * 100;
                 $items[] = $itemShipment;
             }
 
             $order_bundle = array(
-                'orderCreationDate' => time(),
+                'orderCreationDate' => date("Y-m-d\TH:i:s", $order_info['timestamp']),
                 'customerDetails' => array(
-                    'email' => $order_info['email'],
+                    //'email' => $order_info['email'],
                     'phone' => preg_replace('/\D+/', '', $order_info['phone'])
                 ),
                 'cartItems' => array('items' => $items)
@@ -217,6 +231,13 @@ class SberbankFz extends Sberbank
                 $order_bundle['cartItems']['items'] = $recalculatedPositions;
             }
 
+            if ($this->_payment_method != 'regular') {
+                $data['dummy'] = 'true';
+                $order_bundle['installments'] = array(
+                    'productID' => '10',
+                    'productType' => strtoupper($this->_payment_method)
+                );
+            }
             $data['orderBundle'] = json_encode($order_bundle);
         }
 
@@ -228,7 +249,7 @@ class SberbankFz extends Sberbank
         $this->_response = Http::post($this->_url . $action_adr, $data);
 
         if ($this->_logging) {
-            self::writeLog($data, 'Register Order');
+            self::writeLog($data, 'sberbank_register_order.log');
         }
 
         $this->_response = json_decode($this->_response, true);
@@ -252,5 +273,116 @@ class SberbankFz extends Sberbank
         $item['itemPrice'] = $item['itemAmount'] / $item['quantity']['value'];
 
         return $item;
+    }
+
+    public static function getPaymentResult($order_id, $transaction_id = false) {
+        $pp_response = array();
+
+        $order_info = fn_get_order_info($order_id);
+        if (!empty($order_info)) {
+            if ($transaction_id && $order_info['payment_info']['transaction_id'] != $transaction_id) {
+                $pp_response = array(
+                    'order_status' => 'F',
+                    'reason_text' => __("addons.rus_sberbank.wrong_transaction_id"),
+                );
+            } else {
+                $processor_data = fn_get_processor_data($order_info['payment_id']);
+                $sberbank = new SberbankFz($processor_data);
+                $response = $sberbank->getOrderExtended($order_info['payment_info']['transaction_id']);
+
+                if ($sberbank->isError()) {
+                    $pp_response = array(
+                        'order_status' => 'F',
+                        'reason_text' => $response['errorMessage']
+                    );
+
+                } elseif (in_array($response['orderStatus'], [1,2]) ) {
+                    if ($response['amount'] == round($order_info['total'] * 100)) {
+                        $pp_response = array(
+                            'order_status'    => $processor_data['processor_params']['confirmed_order_status'],
+                            'card_number'     => $response['cardAuthInfo']['pan'],
+                            'cardholder_name' => $response['cardAuthInfo']['cardholderName'],
+                            'expiry_month'    => substr($response['cardAuthInfo']['expiration'], 0, 4),
+                            'expiry_year'     => substr($response['cardAuthInfo']['expiration'], 0, -2),
+                            'bank'            => $response['bankInfo']['bankName'],
+                            'ip_address'      => $response['ip'],
+                        );
+                    } else {
+                        $pp_response['reason_text'] = __("addons.rus_sberbank.wrong_amount");
+                    }
+                } elseif (!empty(trim($response['actionCodeDescription']))) {
+                    $pp_response = array(
+                        'order_status' => 'F',
+                        'reason_text' => $response['actionCodeDescription'],
+                        'ip_address' => $response['ip'],
+                    );
+                }
+            }
+            if (!empty($processor_data['processor_params']['logging']) && $processor_data['processor_params']['logging'] == 'Y') {
+                SberbankFz::writeLog(['dispatch' => Registry::get('runtime.controller') . '.' . Registry::get('runtime.mode'), 'order_id' => $order_id, 'transaction_id' => $order_info['payment_info']['transaction_id'], 'payment' => 'sberbank_fz', 'message' => $pp_response['reason_text']], 'sberbank_request.log');
+            }
+            if ($pp_response) {
+                fn_finish_payment($order_id, $pp_response);
+            }
+        }
+    }
+
+    public function getOrderExtended($transaction_id)
+    {
+        $data = array(
+            'userName' => $this->_login,
+            'password' => $this->_password,
+            'orderId' => $transaction_id
+        );
+
+        $this->_response = Http::post($this->_url . 'getOrderStatusExtended.do', $data);
+
+        $this->_response = json_decode($this->_response, true);
+
+        if (!empty($this->_response['errorCode'])) {
+            $this->_error_code = $this->_response['errorCode'];
+            $this->_error_text = $this->_response['errorMessage'];
+        }
+
+        return $this->_response;
+    }
+
+    public function getErrorCode()
+    {
+        return $this->_error_code;
+    }
+
+    public function getErrorText()
+    {
+        return $this->_error_text;
+    }
+
+    public function isError()
+    {
+        return !empty($this->_error_code);
+    }
+
+    public static function writeLog($data, $file = 'sberbank.log')
+    {
+        $path = fn_get_files_dir_path();
+        fn_mkdir($path);
+        $file = fopen($path . $file, 'a');
+
+        if (!empty($file)) {
+            fputs($file, 'TIME: ' . date('Y-m-d H:i:s', TIME) . "\n");
+            fputs($file, fn_array2code_string($data) . "\n\n");
+            fclose($file);
+        }
+    }
+
+    public static function convertSum($price)
+    {
+        if (CART_PRIMARY_CURRENCY != 'RUB') {
+            $price = fn_format_price_by_currency($price, CART_PRIMARY_CURRENCY, 'RUB');
+        }
+
+        $price = fn_format_rate_value($price, 'F', 2, '.', '', '');
+
+        return $price;
     }
 }

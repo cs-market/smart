@@ -67,6 +67,17 @@
     </div>
 
     <div class="control-group">
+        <label class="control-label" for="mode">{__("payment_method")}:</label>
+        <div class="controls">
+            <select name="payment_data[processor_params][payment_method]" id="payment_method">
+                <option value="regular" {if $processor_params.payment_method == "regular"}selected="selected"{/if}>{__("addons.sberbank_fz.regular")}</option>
+                <option value="credit" {if $processor_params.payment_method == "credit"}selected="selected"{/if}>{__("addons.sberbank_fz.credit")}</option>
+                <option value="installment" {if $processor_params.payment_method == "installment"}selected="selected"{/if}>{__("addons.sberbank_fz.installment")}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="control-group">
         <label class="control-label" for="tax_system">{__("addons.sberbank_fz.tax_system")}:</label>
         <div class="controls">
             <select name="payment_data[processor_params][tax_system]" id="tax_system">

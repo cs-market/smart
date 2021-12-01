@@ -12,7 +12,7 @@ msgstr "Расширенный Сбербанк Онлайн"
 
 msgctxt "Addons::description::sberbank_fz"
 msgid "Sberbank with rusian tax and mobile application support"
-msgstr "Сбербанк с ФЗ-54 и поддержкой мобильного приложения"
+msgstr "Сбербанк с ФЗ-54, поддержкой мобильного приложения и кредитования"
 
 msgctxt "Languages::addons.sberbank_fz.login"
 msgid "Login"
@@ -42,10 +42,17 @@ msgctxt "Languages::addons.sberbank_fz.send_order"
 msgid "Send Order"
 msgstr "Отправка корзины на шлюз"
 
-msgctxt "Languages::addons.sberbank_fz.tax_system"
-msgid "Tax system"
-msgstr "Система налогообложения"
+msgctxt "Languages::addons.sberbank_fz.regular"
+msgid "Regular"
+msgstr "Обычный"
 
+msgctxt "Languages::addons.sberbank_fz.credit"
+msgid "Сredit"
+msgstr "В кредит"
+
+msgctxt "Languages::addons.sberbank_fz.installment"
+msgid "Installment"
+msgstr "В рассрочку"
 
 msgctxt "Languages::addons.sberbank_fz.logging"
 msgid "Write log"
@@ -58,6 +65,10 @@ msgstr "Сумма заказа не совпадает с оплаченной 
 msgctxt "Languages::addons.sberbank_fz.text_ofd_map"
 msgid "Send order to the payment gate"
 msgstr "Передача товарной корзины (ФЗ-54)"
+
+msgctxt "Languages::addons.sberbank_fz.tax_system"
+msgid "Taxation system"
+msgstr "Система налогообложения"
 
 msgctxt "Languages::addons.sberbank_fz.tax_type"
 msgid "Default VAT for product"

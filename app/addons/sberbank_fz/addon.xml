@@ -1,18 +1,15 @@
 <?xml version="1.0"?>
 <addon scheme="3.0">
     <id>sberbank_fz</id>
-    <name>Сбербанк ФЗ-54 с поддержкой мобильного приложения</name>
+    <name>Сбербанк ФЗ-54 с поддержкой мобильного приложения и кредитования</name>
     <description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
     <priority>26732300</priority>
-    <version>1.1.1</version>
+    <version>1.2.2</version>
     <position>0</position>
     <status>active</status>
     <default_language>ru</default_language>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
-    <compatibility>
-        <dependencies>rus_sberbank,storefront_rest_api</dependencies>
-    </compatibility>
     <functions>
         <item for="install">fn_sberbank_fz_install</item>
         <item for="uninstall">fn_sberbank_fz_uninstall</item>
