@@ -24,4 +24,10 @@ $schema['import_process_data'] = array(
     ),
 );
 
+foreach ($schema['export_fields'] as &$field) {
+    if (isset($field['convert_put']) && $field['convert_put'][0] == 'fn_exim_import_price') {
+        $field['convert_put'][0] = 'fn_smart_distribution_exim_import_price';
+    }
+}
+
 return $schema;

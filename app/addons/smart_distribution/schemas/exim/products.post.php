@@ -38,4 +38,10 @@ $schema['import_process_data']['fill_vendor_ugroups_if_empty'] = array(
 
 $schema['export_fields']['Show out of stock']['db_field'] = 'show_out_of_stock_product';
 
+foreach ($schema['export_fields'] as &$field) {
+    if (isset($field['convert_put']) && $field['convert_put'][0] == 'fn_exim_import_price') {
+        $field['convert_put'][0] = 'fn_smart_distribution_exim_import_price';
+    }
+}
+
 return $schema;

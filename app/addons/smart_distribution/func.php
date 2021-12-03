@@ -1327,3 +1327,8 @@ function fn_trim_bom_helper(&$value)
 {
     $value = is_string($value) ? str_replace("\xEF\xBB\xBF", "", $value) : $value;
 }
+
+function fn_smart_distribution_exim_import_price($price, $decimals_separator) {
+    $price = str_replace(' ', '', $price);
+    return fn_exim_import_price($price, $decimals_separator);
+}
