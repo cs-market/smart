@@ -187,7 +187,7 @@
 
 <div class="group">
     <div class="control-group">
-        <label class="control-label">{__("products")}</label>
+        <label class="control-label">{__("search_products")}</label>
         <div class="controls">
             <label class="radio inline" for="elm_ordered_type_y">
                 <input type="radio" name="ordered_type" class="" id="elm_ordered_type_y" {if $search.ordered_type != 'NIN'}checked="checked"{/if} value="IN">{__("in_order")}
@@ -196,18 +196,21 @@
                 <input type="radio" name="ordered_type" class="" id="elm_ordered_type_n" {if $search.ordered_type == 'NIN'}checked="checked"{/if} value="NIN">{__("nin_order")}
             </label>
         </div>
+    </div>
+    <div class="sidebar-field well">
+        <label class="control-label">{__("products")}</label>
         <div class="controls">
             {include file="common/products_to_search.tpl" placement="right"}
         </div>
     </div>
-    <div class="control-group">
+    <div class="sidebar-field well">
         <label class="control-label">{__("category_products")}</label>
         <div class="controls">
             {include file="pickers/categories/picker.tpl" data_id="location_category" input_name="category_ids" item_ids=$search.category_ids hide_link=true hide_delete_button=true default_name=__("all_categories") extra=""}
         </div>
     </div>
     
-    <div class="control-group">
+    <div class="sidebar-field">
         <div class="controls">
             {include
                 file="common/period_selector.tpl"
