@@ -1,4 +1,4 @@
-<div class="sidebar-field" id="elm_phone_field">
+<div class="sidebar-field" id="elm_phone_field" style="min-width: 180px;">
     <label for="elm_phone_sb">{__("phone")}</label>
     <div class="break">
         <input type="text" name="phone" id="elm_phone_sb" value="{$search.phone}" />

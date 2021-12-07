@@ -25,25 +25,25 @@
 
 {capture name="simple_search"}
 {$extra nofilter}
-<div class="sidebar-field">
+<div class="sidebar-field" style="min-width: 180px;">
     <label for="elm_name">{__("person_name")}</label>
     <div class="break">
         <input type="text" name="name" id="elm_name" value="{$search.name}" />
     </div>
 </div>
 {if $auth.user_type == "UserTypes::ADMIN"|enum && $search.user_type == "UserTypes::VENDOR"|enum}
-    <div class="sidebar-field">
+    <div class="sidebar-field" style="min-width: 180px;">
     {include file="common/select_vendor.tpl"}
     </div>
 {else}
-    <div class="sidebar-field">
+    <div class="sidebar-field" style="min-width: 180px;">
         <label for="elm_phone">{__("phone")}</label>
         <div class="break">
             <input type="text" name="phone" id="elm_phone" value="{$search.phone}" />
         </div>
     </div>
 {/if}
-<div class="sidebar-field">
+<div class="sidebar-field" style="min-width: 180px;">
     <label for="elm_email">{__("email")}</label>
     <div class="break">
         <input type="text" name="email" id="elm_email" value="{$search.email}" />
@@ -68,7 +68,7 @@
                     </div>
                 </div>
             {/if}
-            <div class="control-group">
+            {*<div class="control-group">
                 <label class="control-label" for="elm_tax_exempt">{__("tax_exempt")}</label>
                 <div class="controls">
                 <select name="tax_exempt" id="elm_tax_exempt">
@@ -77,12 +77,58 @@
                     <option value="{"YesNo::NO"|enum}" {if $search.tax_exempt == "YesNO::NO"|enum}selected="selected"{/if}>{__("no")}</option>
                 </select>
                 </div>
-            </div>
+            </div>*}
 
             {hook name="profiles:search_form"}{/hook}
+            <div class="control-group hidden">
+                <label class="control-label" for="elm_managers">{__("user_type")}</label>
+                <div class="controls">
+                    <select id="user_type" name="user_type">
+                        <option value="">{__("all")}</option>
+                        <option value="C" {if $search.user_type == "C"}selected="selected"{/if}>{__("customer")}</option>
+                        <option value="V" {if $search.user_type == "V"}selected="selected"{/if}>{__("vendor_administrator")}</option>
+                        <option value="A" {if $search.user_type == "A"}selected="selected"{/if}>{__("administrator")}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                {include file="common/select_vendor.tpl"}
+            </div>
     </div>
-
     <div class="group span6 form-horizontal">
+        <div class="control-group">
+            <label class="control-label" for="elm_user_orders">{__("orders")}</label>
+            <div class="controls">
+                <select name="user_orders" id="elm_user_orders" onchange="fn_change_period_avalability(!Tygh.$(this).val(), 'orders_period_');">
+                    <option value="">--</option>
+                    <option value="with" {if $search.user_orders == 'with'}selected="_selected"{/if}>{__("with_orders")}</option>
+                    <option value="without" {if $search.user_orders == 'without'}selected="_selected"{/if}>{__("without_orders")}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            {include
+                file="common/period_selector.tpl"
+                period=$search.orders_period
+                prefix="orders_period_"
+                display="form"
+            }
+        </div>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                flag = !$('#elm_user_orders').val();
+                fn_change_period_avalability(flag, 'orders_period_');
+            });
+
+            function fn_change_period_avalability(flag, prefix) {
+                $('[name="' + prefix + 'time_from"]').prop('disabled', flag);
+                $('[name="' + prefix + 'time_to"]').prop('disabled', flag);
+                $('[name="' + prefix + 'period"]').prop('disabled', flag);
+            }
+        </script>
+
         {if $auth.user_type == "UserTypes::ADMIN"|enum && $search.user_type == "UserTypes::VENDOR"|enum}
         <div class="control-group">
             <label class="control-label" for="elm_phone">{__("phone")}</label>
@@ -141,6 +187,7 @@
 
 <div class="group">
     <div class="control-group">
+        <label class="control-label">{__("products")}</label>
         <div class="controls">
             <label class="radio inline" for="elm_ordered_type_y">
                 <input type="radio" name="ordered_type" class="" id="elm_ordered_type_y" {if $search.ordered_type != 'NIN'}checked="checked"{/if} value="IN">{__("in_order")}
@@ -149,9 +196,6 @@
                 <input type="radio" name="ordered_type" class="" id="elm_ordered_type_n" {if $search.ordered_type == 'NIN'}checked="checked"{/if} value="NIN">{__("nin_order")}
             </label>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label">{__("products")}</label>
         <div class="controls">
             {include file="common/products_to_search.tpl" placement="right"}
         </div>
@@ -164,7 +208,6 @@
     </div>
     
     <div class="control-group">
-        <label class="control-label">{__("products_period")}</label>
         <div class="controls">
             {include
                 file="common/period_selector.tpl"
