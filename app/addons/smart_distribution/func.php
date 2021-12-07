@@ -238,8 +238,8 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
         $join .= db_quote(' LEFT JOIN ?:profile_fields_data ON ?:profile_fields_data.object_id = ?:user_profiles.profile_id AND ?:profile_fields_data.object_type = ?s', 'P');
     }
 
-    $without_order_prefix = 'without_order_';
-    if (!empty($params['wo_orders']) && $params['wo_orders'] == 'Y') {
+    $without_order_prefix = 'orders_period_';
+    if (!empty($params['user_orders'])) {
         list(
             $w_time_from,
             $w_time_to,
@@ -254,14 +254,18 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
             'time_to' => $params[$w_time_to]
         ]);
 
-        $join .= db_quote(" LEFT JOIN ?:orders as without_order ON ?:users.user_id = without_order.user_id AND (without_order.timestamp >= ?i AND without_order.timestamp <= ?i)", $params[$w_time_from], $params[$w_time_to]);
-        $condition['without_order'] = db_quote(" AND without_order.user_id IS NULL");
-    }
-    if (!empty($params['category_ids'])) {
-        $condition['order_product_id'] = db_quote(' AND ?:order_details.product_id IN (?n)', db_get_fields(fn_get_products(['cid' => $params['category_ids'], 'subcats' => 'Y', 'get_query' => true])));
-        if (strpos($join, 'LEFT JOIN ?:order_details') === false) {
-            $join .= db_quote(' LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != ?s LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id', YesNo::YES);
+        $join .= db_quote(" LEFT JOIN ?:orders as user_orders ON ?:users.user_id = user_orders.user_id AND (user_orders.timestamp >= ?i AND user_orders.timestamp <= ?i)", $params[$w_time_from], $params[$w_time_to]);
+        if ($params['user_orders'] == 'without') {
+            $condition['user_orders'] = db_quote(" AND user_orders.user_id IS NULL");
         }
+        if ($params['user_orders'] == 'with') {
+            $condition['user_orders'] = db_quote(" AND user_orders.user_id IS NOT NULL");
+        }
+    }
+
+    $products_in_order = [];
+    if (!empty($params['category_ids'])) {
+        $products_in_order = db_quote(' AND ?:order_details.product_id ' . $arg . ' (?n)', db_get_fields(fn_get_products(['cid' => $params['category_ids'], 'subcats' => 'Y', 'get_query' => true])));
     }
 
     if (!empty($params['p_ids']) || !empty($params['category_ids'])) {
@@ -271,7 +275,34 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
             'time_to' => $params['ordered_products_time_to']
         ]);
         $condition['order_period'] = db_quote(' AND ?:orders.timestamp > ?i AND ?:orders.timestamp < ?i', $params['ordered_products_time_from'], $params['ordered_products_time_to']);
+    }
 
+    if (!empty($params['ordered_type'])) {
+        if ($params['ordered_type'] == 'IN') {
+            if (!empty($products_in_order)) {
+                $condition['ordered_products'] = db_quote(' AND ?:order_details.product_id IN (?n)', $products_in_order);
+                if (strpos($join, 'LEFT JOIN ?:order_details') === false) {
+                    $join .= db_quote(' LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != ?s LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id', YesNo::YES);
+                }
+            }
+        } else {
+            // not ordered products
+            $subquery = db_quote("
+            SELECT DISTINCT
+                (?:users.user_id)
+            FROM
+                ?:users
+            LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != 'Y'
+            LEFT JOIN ?:order_details ON ?:order_details.order_id = ?:orders.order_id
+            WHERE
+                1 AND ?:order_details.product_id IN (?a) ?p
+            GROUP BY
+                ?:users.user_id
+            ", (!empty($products_in_order) ? $products_in_order : $params['p_ids']), $condition['order_period'] ?? '');
+
+            $condition['not_ordered_products'] = db_quote(" AND ?:users.user_id NOT IN ($subquery)");
+            unset($condition['order_product_id'], $condition['order_period']);
+        }
     }
 
     $sortings['timestamp'] = '?:users.timestamp';

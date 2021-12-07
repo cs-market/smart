@@ -91,7 +91,7 @@
             </div>
         </div>
         {/if}
-        <div class="control-group">
+        {* <div class="control-group">
             <label class="control-label" for="elm_city">{__("city")}</label>
             <div class="controls">
                 <input type="text" name="city" id="elm_city" value="{$search.city}" />
@@ -122,39 +122,49 @@
                 </select>
                 <input class="cm-state cm-location-search" type="text" id="srch_state_d" name="state" maxlength="64" value="{$search.state}" disabled="disabled" />
             </div>
-        </div>
+        </div> *}
         <div class="control-group">
             <label class="control-label" for="elm_address">{__("address")}</label>
             <div class="controls">
                 <input type="text" name="address" id="elm_address" value="{$search.address}" />
             </div>
         </div>
-        <div class="control-group">
+        {* <div class="control-group">
             <label class="control-label" for="elm_zipcode">{__("zip_postal_code")}</label>
             <div class="controls">
                 <input type="text" name="zipcode" id="elm_zipcode" value="{$search.zipcode}" />
             </div>
-        </div>
+        </div> *}
 
     </div>
 </div>
 
 <div class="group">
     <div class="control-group">
-        <label class="control-label">{__("ordered_products")}</label>
+        <div class="controls">
+            <label class="radio inline" for="elm_ordered_type_y">
+                <input type="radio" name="ordered_type" class="" id="elm_ordered_type_y" {if $search.ordered_type != 'NIN'}checked="checked"{/if} value="IN">{__("in_order")}
+            </label>
+            <label class="radio inline" for="elm_ordered_type_n">
+                <input type="radio" name="ordered_type" class="" id="elm_ordered_type_n" {if $search.ordered_type == 'NIN'}checked="checked"{/if} value="NIN">{__("nin_order")}
+            </label>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">{__("products")}</label>
         <div class="controls">
             {include file="common/products_to_search.tpl" placement="right"}
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">{__("ordered_category_products")}</label>
+        <label class="control-label">{__("category_products")}</label>
         <div class="controls">
             {include file="pickers/categories/picker.tpl" data_id="location_category" input_name="category_ids" item_ids=$search.category_ids hide_link=true hide_delete_button=true default_name=__("all_categories") extra=""}
         </div>
     </div>
     
     <div class="control-group">
-        <label class="control-label">{__("ordered_products_period")}</label>
+        <label class="control-label">{__("products_period")}</label>
         <div class="controls">
             {include
                 file="common/period_selector.tpl"

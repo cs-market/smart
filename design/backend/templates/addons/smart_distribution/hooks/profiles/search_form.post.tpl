@@ -10,7 +10,7 @@
     </select>
     </div>
 </div>
-<div class="control-group">
+<div class="control-group hidden">
     <label class="control-label" for="elm_managers">{__("user_type")}</label>
     <div class="controls">
         <select id="user_type" name="user_type">
@@ -27,28 +27,32 @@
 
 </div><div class="group span6 form-horizontal">
 <div class="control-group">
-    <label class="control-label" for="elm_wo_orders">{__("wo_orders")}</label>
+    <label class="control-label" for="elm_user_orders">{__("orders")}</label>
     <div class="controls">
-        <input type="hidden" name="wo_orders" value="N">
-        <input type="checkbox" id="elm_wo_orders" name="wo_orders" value="Y" {if $search.wo_orders == 'Y'}checked="checked"{/if} onclick="fn_change_period_avalability(!this.checked);">
+        <select name="user_orders" id="elm_user_orders" onchange="fn_change_period_avalability(!Tygh.$(this).val(), 'orders_period_');">
+            <option value="">--</option>
+            <option value="with" {if $search.user_orders == 'with'}selected="_selected"{/if}>{__("with_orders")}</option>
+            <option value="without" {if $search.user_orders == 'without'}selected="_selected"{/if}>{__("without_orders")}</option>
+        </select>
     </div>
 </div>
+
 {include
     file="common/period_selector.tpl"
-    period=$search.without_order_period
-    prefix="without_order_"
+    period=$search.orders_period
+    prefix="orders_period_"
     display="form"
 }
 
 <script type="text/javascript">
     $(document).ready(function() {
-        flag = !$('#elm_wo_orders').is(':checked');
-        fn_change_period_avalability(flag);
+        flag = !$('#elm_user_orders').val();
+        fn_change_period_avalability(flag, 'orders_period_');
     });
 
-    function fn_change_period_avalability(flag) {
-        $('[name="without_order_time_from"]').prop('disabled', flag);
-        $('[name="without_order_time_to"]').prop('disabled', flag);
-        $('[name="without_order_period"]').prop('disabled', flag);
+    function fn_change_period_avalability(flag, prefix) {
+        $('[name="' + prefix + 'time_from"]').prop('disabled', flag);
+        $('[name="' + prefix + 'time_to"]').prop('disabled', flag);
+        $('[name="' + prefix + 'period"]').prop('disabled', flag);
     }
 </script>
