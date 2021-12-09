@@ -905,6 +905,13 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
             'N'
         );*/
     }
+
+    if (!empty($params['current_cart_products']) && $params['user_id']) {
+        $params['current_cart_products'] = array_column($params['current_cart_products']['products'], 'product_id');
+
+        $products = db_get_array('SELECT ?:order_details.product_id, SUM(?:order_details.amount) AS amnt FROM ?:order_details LEFT JOIN ?:orders ON ?:order_details.order_id = ?:orders.order_id WHERE ?:orders.user_id = ?i AND ?:order_details.product_id NOT IN (?a) GROUP BY ?:order_details.product_id ORDER BY SUM(?:order_details.amount) DESC', $params['user_id'], $params['current_cart_products']);
+        $condition .= db_quote(' AND products.product_id IN (?a)', !empty($products) ? array_column($products, 'product_id') : []);
+    }
 }
 
 function fn_smart_distribution_get_products_before_select(&$params, $join, $condition, $u_condition, $inventory_join_cond, $sortings, $total, $items_per_page, $lang_code, $having){
