@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>weighted_products</id>
+    <name>Smart distribution: Весовые товары</name>
+    <description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <priority>4000</priority>
+    <version>1.0.1</version>
+    <position>0</position>
+    <status>active</status>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <language_variables>
+        <item lang="ru" id="is_weighted">Весовой товар</item>
+        <item lang="ru" id="kilo">кг.</item>
+        <item lang="ru" id="gram">гр.</item>
+    </language_variables>
+
+    <queries>
+        <item>ALTER TABLE `?:products` ADD `is_weighted` char(1) NOT NULL DEFAULT 'N';</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `is_weighted`;</item>
+    </queries>
+</addon>
