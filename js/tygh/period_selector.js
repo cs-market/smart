@@ -9,7 +9,8 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     init: function init(params) {
       var self = $(this);
       self.change(function () {
-        var dates = methods._getDates(self.val());
+        var isFirstDayMonday = ($('#' + params.from).datepicker('option', 'firstDay') === 1) ? true : false;
+        var dates = methods._getDates(self.val(), isFirstDayMonday);
 
         $('#' + params.from).datepicker('setDate', dates.from);
         $('#' + params.to).datepicker('setDate', dates.to);
@@ -18,7 +19,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     _daysInMonth: function _daysInMonth(m, y) {
       return 32 - new Date(y, m, 32).getDate();
     },
-    _getDates: function _getDates(value) {
+    _getDates: function(value, isFirstDayMonday) {
       var date_obj = new Date();
       var from_date,
           to_date = {};
@@ -31,11 +32,23 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       to_date.month = from_date.month;
       to_date.year = from_date.year;
 
+      var dayOfWeekNumber = date_obj.getDay();
+
+      // Convert week number for period date calculations
+      // Calendar week starts from:
+      //  - Monday: Monday - 1, Tuesday - 2, ..., Sunday   - 7
+      //  - Sunday: Sunday - 1, Monday  - 2, ..., Saturday - 7
+      if (isFirstDayMonday) {
+          dayOfWeekNumber = (date_obj.getDay() === 0) ? 7 : dayOfWeekNumber;
+      } else {
+          dayOfWeekNumber = (date_obj.getDay() === 0) ? 1 : ++dayOfWeekNumber;
+      }
+
       if (value == 'A') {
         from_date = to_date = {};
       } else if (value == 'D') {// default
       } else if (value == 'W') {
-        from_date.day = date_obj.getUTCDate() - date_obj.getDay() + 1;
+        from_date.day = date_obj.getUTCDate() - dayOfWeekNumber + 1;
       } else if (value == 'M') {
         from_date.day = 1;
       } else if (value == 'Y') {
@@ -48,8 +61,8 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       } else if (value == 'HH') {
         from_date.day = date_obj.getUTCDate() - 1;
       } else if (value == 'LW') {
-        from_date.day = date_obj.getUTCDate() - (date_obj.getDay() + 6);
-        to_date.day = date_obj.getUTCDate() - date_obj.getDay();
+        from_date.day = date_obj.getUTCDate() - (dayOfWeekNumber + 6);
+        to_date.day = date_obj.getUTCDate() - dayOfWeekNumber;
       } else if (value == 'LM') {
         from_date.month = date_obj.getMonth() - 1;
         from_date.day = 1;
