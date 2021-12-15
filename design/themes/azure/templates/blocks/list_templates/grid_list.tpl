@@ -36,7 +36,7 @@
                         {if $product}
                             {assign var="obj_id" value=$product.product_id}
                             {assign var="obj_id_prefix" value="`$obj_prefix``$product.product_id`"}
-                            {include file="common/product_data.tpl" product=$product hide_qty_label=true show_product_amount=true show_amount_label=false}
+                            {include file="common/product_data.tpl" product=$product }{*hide_qty_label=true show_product_amount=true show_amount_label=false*}
 
                             <div class="ty-grid-list__item ty-quick-view-button__wrapper">
                                 {assign var="form_open" value="form_open_`$obj_id`"}

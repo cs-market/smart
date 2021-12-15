@@ -2,7 +2,7 @@
     <div class="cm-reload-{$obj_prefix}{$obj_id}" id="qty_update_{$obj_prefix}{$obj_id}">
     <input type="hidden" name="appearance[show_qty]" value="{$show_qty}" />
     <input type="hidden" name="appearance[capture_options_vs_qty]" value="{$capture_options_vs_qty}" />
-    {if !empty($product.selected_amount)}
+    {if $product.selected_amount !== false}
     {assign var="default_amount" value=$product.selected_amount}
     {elseif !empty($product.min_qty)}
     {assign var="default_amount" value=$product.min_qty}
@@ -11,15 +11,16 @@
     {else}
     {assign var="default_amount" value="1"}
     {/if}
-
-    {if $show_qty && $product.is_edp !== "Y" && $cart_button_exists == true && ($settings.General.allow_anonymous_shopping == "allow_shopping" || $auth.user_id) && $product.avail_since <= $smarty.const.TIME || ($product.avail_since > $smarty.const.TIME && $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum)}
+                                
+    {if $show_qty && $product.is_edp !== "Y" && ($settings.General.allow_anonymous_shopping == "allow_shopping" || $auth.user_id) && $product.avail_since <= $smarty.const.TIME || ($product.avail_since > $smarty.const.TIME && $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum)}
     <div class="ty-qty clearfix{if $settings.Appearance.quantity_changer == "Y"} changer{/if}" id="qty_{$obj_prefix}{$obj_id}">
         {if !$hide_qty_label}<label class="ty-control-group__label" for="qty_count_{$obj_prefix}{$obj_id}">{$quantity_text|default:__("quantity")}:</label>{/if}
         <div class="ty-center ty-value-changer cm-value-changer">
         {if $settings.Appearance.quantity_changer == "Y"}
             <a class="cm-increase ty-value-changer__increase">&#43;</a>
         {/if}
-        <input type="text" size="5" class="ty-value-changer__input cm-amount" id="qty_count_{$obj_prefix}{$obj_id}" name="product_data[{$obj_id}][amount]" value="{$default_amount}" data-ca-val="{$default_amount}" {if $product.qty_step} data-ca-step="{$product.qty_step}"{/if} data-ca-min-qty="{if $product.min_qty}{$product.min_qty}{/if}" />
+
+        <input type="text" size="5" class="ty-value-changer__input cm-amount" id="qty_count_{$obj_prefix}{$obj_id}" name="product_data[{$obj_id}][amount]" value="{$default_amount}" data-ca-val="{$default_amount}" {if $product.qty_step} data-ca-step="{$product.qty_step}"{/if} data-ca-min-qty="{if $product.min_qty !== false}{$product.min_qty}{/if}" />
         {if $settings.Appearance.quantity_changer == "Y"}
             <a class="cm-decrease ty-value-changer__decrease">&minus;</a>
         {/if}

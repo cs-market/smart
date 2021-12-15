@@ -2,7 +2,7 @@
     <div class="cm-reload-{$obj_prefix}{$obj_id}" id="qty_update_{$obj_prefix}{$obj_id}">
     <input type="hidden" name="appearance[show_qty]" value="{$show_qty}" />
     <input type="hidden" name="appearance[capture_options_vs_qty]" value="{$capture_options_vs_qty}" />
-    {if !empty($product.selected_amount)}
+    {if $product.selected_amount !== false}
         {assign var="default_amount" value=$product.selected_amount}
     {elseif !empty($product.min_qty)}
         {assign var="default_amount" value=$product.min_qty}
@@ -12,7 +12,7 @@
         {assign var="default_amount" value="1"}
     {/if}
 
-    {if $show_qty && $product.is_edp !== "Y" && $cart_button_exists == true && ($settings.Checkout.allow_anonymous_shopping == "allow_shopping" || $auth.user_id) && $product.avail_since <= $smarty.const.TIME || ($product.avail_since > $smarty.const.TIME && $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum)}
+    {if $show_qty && $product.is_edp !== "Y" && ($settings.Checkout.allow_anonymous_shopping == "allow_shopping" || $auth.user_id) && $product.avail_since <= $smarty.const.TIME || ($product.avail_since > $smarty.const.TIME && $product.out_of_stock_actions == "OutOfStockActions::BUY_IN_ADVANCE"|enum)}
         <div class="ty-qty clearfix " id="qty_{$obj_prefix}{$obj_id}">
             {if !$hide_qty_label}<label class="ty-control-group__label" for="qty_count_{$obj_prefix}{$obj_id}">{$quantity_text|default:__("quantity")}:</label>{/if}
             {if $product.qty_content}

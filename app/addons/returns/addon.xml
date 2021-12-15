@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>returns</id>
+    <name>Smart distribution: Возвраты</name>
+    <description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <priority>41000</priority>
+    <version>1.0.1</version>
+    <position>0</position>
+    <status>active</status>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <language_variables>
+        <item lang="ru" id="returns">Возвраты</item>
+        <item lang="ru" id="support_returns">Разрешить возвраты</item>
+        <item lang="ru" id="request_return">Запросить возврат</item>
+        <item lang="ru" id="return_added_successfully"><![CDATA[Ваша заявка на возврат <b>#[return_id]</b> успешно размещена.]]></item>
+    </language_variables>
+
+    <queries>
+        <item>
+            CREATE TABLE `?:return_products` (
+                `return_id` mediumint(8) unsigned NOT NULL default '0',
+                `product_id` mediumint(8) unsigned NOT NULL default '0',
+                `amount` FLOAT unsigned NOT NULL default '0',
+                UNIQUE (`product_id`, `return_id`)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item>
+            CREATE TABLE `?:returns` (
+                `return_id` mediumint(8) unsigned NOT NULL auto_increment,
+                `user_id` mediumint(8) unsigned NOT NULL default '0',
+                `timestamp` int(11) unsigned NOT NULL default '0',
+                `company_id` int(11) unsigned NOT NULL default '0',
+                `status` char(1) NOT NULL default 'A',
+                `comment` text,
+                PRIMARY KEY  (`return_id`),
+                KEY `timestamp` (`timestamp`),
+                KEY `user_id` (`user_id`),
+                KEY `status` (`status`)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item>ALTER TABLE `?:companies` ADD `support_returns` char(1) NOT NULL DEFAULT 'N';</item>
+
+        <item for="uninstall">DROP TABLE `?:return_products`;</item>
+        <item for="uninstall">DROP TABLE `?:returns`;</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `support_returns`;</item>
+    </queries>
+</addon>
