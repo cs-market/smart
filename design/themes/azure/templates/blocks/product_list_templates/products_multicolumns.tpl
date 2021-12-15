@@ -11,4 +11,6 @@ show_list_buttons=true
 show_add_to_cart=true
 but_role="act"
 but_text=__("buy")
-show_discount_label=true}
+show_discount_label=true
+show_sku=true
+}

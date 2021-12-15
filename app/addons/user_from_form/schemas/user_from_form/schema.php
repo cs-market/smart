@@ -303,4 +303,22 @@ return [
             'company' => '219',
         ],
     ],
+    '117' => [
+        'page_id' => 117,
+        'company_id' => 2183,
+        'usergroup_id' => [789],
+        'fields_map' => [
+            'firstname' => '454',
+            'phone' => '457',
+            'email' => '455',
+            'user_login' => '455',
+            'password' => '456',
+            's_phone' => '457',
+            's_address' => '458',
+            's_client_code' => '1',
+            'b_client_code' => '1',
+            'b_firstname' => '454',
+            'fax' => '448',
+        ],
+    ],
 ];

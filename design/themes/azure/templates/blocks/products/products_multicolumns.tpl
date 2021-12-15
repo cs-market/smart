@@ -30,4 +30,5 @@ show_list_discount=true
 show_add_to_cart=$_show_add_to_cart
 show_list_buttons=$_show_list_buttons
 but_role="action"
-show_discount_label=true}
+show_discount_label=true
+show_sku=true}

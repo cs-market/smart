@@ -64,12 +64,18 @@
                                             </div>
                                         </div>   
                                         <div class="ty-grid-list__item-container"> 
-                                            {assign var="rating" value="rating_$obj_id"}
+                                            {assign var="sku" value="sku_$obj_id"}
+                                            {if $smarty.capture.$sku}
+                                                <div class="grid-list__sku">
+                                                    {$smarty.capture.$sku nofilter}
+                                                </div>
+                                            {/if}
+                                            {*assign var="rating" value="rating_$obj_id"}
                                             {if $smarty.capture.$rating}
                                                 <div class="grid-list__rating">
                                                     {$smarty.capture.$rating nofilter}
                                                 </div>
-                                            {/if}
+                                            {/if*}
                                             {if !$hide_price}
                                             <div class="ty-grid-list__price {if $product.price == 0}ty-grid-list__no-price{/if}">
                                                 {assign var="old_price" value="old_price_`$obj_id`"}
