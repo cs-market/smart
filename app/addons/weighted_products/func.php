@@ -12,3 +12,7 @@ function fn_weighted_products_pre_add_to_cart(&$product_data, $cart, $auth, $upd
         }
     }
 }
+
+function fn_weighted_products_get_product_fields(&$fields) {
+    $fields[] = array('name' => '[data][is_weighted]', 'text' => __('is_weighted'), 'type' => 'C');
+}
