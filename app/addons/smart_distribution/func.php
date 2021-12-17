@@ -897,13 +897,13 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
     if (AREA == 'C') {
         $condition .= db_quote(' AND IF(products.avail_till, products.avail_till >= ?i, 1)', TIME);
         // Cut off out of stock products
-/*        $condition .= db_quote(
+        $condition .= db_quote(
             ' AND (CASE products.show_out_of_stock_product' .
             "   WHEN ?s THEN (products.amount >= products.min_qty OR products.tracking = 'D')" .
             '   ELSE 1' .
             ' END)',
             'N'
-        );*/
+        );
     }
 
     if (!empty($params['current_cart_products']) && $params['user_id']) {
