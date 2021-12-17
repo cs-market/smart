@@ -1,0 +1,28 @@
+.cm-infinite-pagination__hide {
+  display: none;
+}
+
+.cm-infinite-pagination__info-block__next__loading,
+.cm-infinite-pagination__info-block__next__loaded,
+.cm-infinite-pagination__info-block__next__more ,
+.cm-infinite-pagination__info-block__prev__loading,
+.cm-infinite-pagination__info-block__prev__loaded,
+.cm-infinite-pagination__info-block__prev__more {
+    .ty-btn();
+    margin-top: 20px;
+    border-color: @base;
+    color: @base;
+    background-color: transparent;
+    &:hover {
+        color: #fff;
+        background-color: @base;
+    }
+    &.hidden {
+        display: none;
+    }
+}
+
+.cm-infinite-pagination__info-block__next__more,
+.cm-infinite-pagination__info-block__prev__more {
+  cursor: pointer;
+}
