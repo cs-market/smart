@@ -39,8 +39,10 @@ select {
         border-color: darken(@base, 15%);
     }
 }
-
-.amida-glyphs {
+.ty-icon {
+    color: @base;
+}
+.rumba-glyphs() {
     &:before {
         /* use !important to prevent issues with browser extensions that change fonts */
         font-family: '@{icomoon-font-family}' !important;
@@ -58,26 +60,28 @@ select {
 }
 
 
-.frosted-glass() {
-    background-color: rgba(255, 255, 255, 0.3);
-    z-index: 0;
-    &:before {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        backdrop-filter: blur(3px);
-        z-index: -1;
-    }
-}
+// .frosted-glass() {
+//     background-color: rgba(255, 255, 255, 0.3);
+//     z-index: 0;
+//     &:before {
+//         content: '';
+//         position: absolute;
+//         width: 100%;
+//         height: 100%;
+//         top: 0;
+//         left: 0;
+//         backdrop-filter: blur(3px);
+//         z-index: -1;
+//     }
+// }
 // #tygh_container {
 //     .dialog-is-open & {
 //         filter: blur(3px);
 //     }
 //     .transition(filter .15s ease);
 // }
+
+
 .tygh-top-panel {
     padding: 8px 0;
     // background-color: rgba(255, 255, 255, .7);
@@ -138,8 +142,8 @@ select {
     &__add-to-cart {
         text-transform: unset;
         font-size: 20px;
-        .ty-icon-amida-cart();
-        .amida-glyphs();
+        .ty-icon-rumba-cart();
+        .rumba-glyphs();
         &:before {
             margin-right: 5px;
             font-size: 22px;
@@ -196,7 +200,7 @@ select {
         .ty-top-menu & .ty-minicart__icon, .ty-top-menu & .ty-icon-user {
             position: static;
             font-size: 22px;
-            .amida-glyphs();
+            .rumba-glyphs();
             margin-right: 5px;
             color: @base;
         }
@@ -251,8 +255,8 @@ select {
 }
 
 .ty-icon-heart {
-    .ty-icon-amida-wishlist();
-    .amida-glyphs();
+    .ty-icon-rumba-wishlist();
+    .rumba-glyphs();
 }
 .ty-table {
     th, th a {
@@ -283,7 +287,7 @@ select {
         height: 4px;
     }
 }
-.ty-amida-icon-mobile-app {
+.ty-rumba-icon-mobile-app {
     .size(60px, 200px);
     display: inline-block;
     background-position: center;

@@ -32,7 +32,7 @@
                 <input id="new_ticket_subject" class="ty-input-text" type="text" name="ticket_data[subject]" value="{$ticket_data.subject}" size="50">
             </div>
             {include file="addons/helpdesk/views/tickets/components/new_message.tpl"}
-            {include file="common/image_verification.tpl" option="form_builder"}
+            {include file="common/image_verification.tpl" option="helpdesk"}
 
             <div class="buttons-container">
                 {include file="buttons/button.tpl" but_role="submit" but_text=__("submit") but_name="dispatch[tickets.add]"}
