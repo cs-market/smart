@@ -37,8 +37,8 @@
                             {assign var="obj_id" value=$product.product_id}
                             {assign var="obj_id_prefix" value="`$obj_prefix``$product.product_id`"}
                             {$product.image_pairs = ''}
-                            {$but_text="+"}
                             {$wishlist_but_meta = 'ty-btn-icon ty-btn__add-to-wish'}
+                            {$but_text = ' '}
                             {include file="common/product_data.tpl" product=$product}
                             
                             <div class="ty-grid-list__item {$item_class} ty-flex-column 
@@ -70,6 +70,13 @@
                                             </div>
                                         {/if}
 
+                                        {assign var="sku" value="sku_$obj_id"}
+                                        {if $smarty.capture.$sku|trim}
+                                            <div class="ty-grid-list__sku">
+                                                {$smarty.capture.$sku nofilter}
+                                            </div>
+                                        {/if}
+
                                         <div class="ty-grid-list__price {if $product.price == 0}ty-grid-list__no-price{/if}">
                                             {assign var="old_price" value="old_price_`$obj_id`"}
                                             {if $smarty.capture.$old_price|trim}{$smarty.capture.$old_price nofilter}{/if}
@@ -86,6 +93,12 @@
 
                                         {capture name="product_multicolumns_list_control_data_wrapper"}
                                             <div class="ty-grid-list__controls">
+                                                {assign var="qty" value="qty_`$obj_id`"}
+                                                {if $smarty.capture.$qty|trim}
+                                                    <div class="ty-grid-list__qty">
+                                                        {$smarty.capture.$qty nofilter}
+                                                    </div>
+                                                {/if}
                                                 {capture name="product_multicolumns_list_control_data"}
                                                     {hook name="products:product_multicolumns_list_control"}
                                                         {if $settings.Appearance.enable_quick_view == 'Y'}

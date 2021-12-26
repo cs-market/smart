@@ -5,7 +5,7 @@
     {hook name="products:view_main_info"}
         {if $product}
             {assign var="obj_id" value=$product.product_id}
-            {include file="common/product_data.tpl" product=$product but_role="big" but_text=__("add_to_cart") show_amount_label=false hide_qty_label=true show_product_options=false show_sku=false}
+            {include file="common/product_data.tpl" product=$product but_role="big" but_text=__("add_to_cart") hide_qty_label=true show_product_options=false show_sku=true}
             <div class="ty-product-block__img-wrapper" >
                 {hook name="products:image_wrap"}
                     {if !$no_images}
@@ -43,16 +43,6 @@
                 {assign var="list_discount" value="list_discount_`$obj_id`"}
                 {assign var="discount_label" value="discount_label_`$obj_id`"}
 
-                {hook name="products:promo_text"}
-                {if $product.promo_text}
-                <div class="ty-product-block__note-wrapper">
-                    <div class="ty-product-block__note ty-product-block__note-inner">
-                        {$product.promo_text nofilter}
-                    </div>
-                </div>
-                {/if}
-                {/hook}
-
                 <div class="ty-product-block__center clearfix">
                     <div class="{if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}prices-container {/if}price-wrap">
                         {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
@@ -65,18 +55,34 @@
                                 {$smarty.capture.$price nofilter}
                             </div>
                         {/if}
-
-                        {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
-                            </div>
-                        {/if}
                         {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
                         <div>
                             {$smarty.capture.$clean_price nofilter}
                             {$smarty.capture.$list_discount nofilter}
                         </div>
                         {/if}
+
+                        {if $smarty.capture.$old_price|trim || $smarty.capture.$clean_price|trim || $smarty.capture.$list_discount|trim}
+                            </div>
+                        {/if}
+
                         {assign var="product_amount" value="product_amount_`$obj_id`"}
                         {$smarty.capture.$product_amount nofilter}
+
+
+                        {assign var="sku" value="sku_`$obj_id`"}
+                        {if $smarty.capture.$sku|trim}
+                        <div class="ty-product-block__sku">
+                            {$smarty.capture.$sku nofilter}
+                        </div>
+                        {/if}
+
+                        {if $product.weight}
+                        <div class="ty-control-group product-list-field">
+                            <label class="ty-control-group__label">{__('weight')}:</label>
+                            <span class="ty-control-group__item">{$product.weight} {$settings.General.weight_symbol}</span>
+                        </div>
+                        {/if}
                     </div>
 
                     <div class="ty-product-block__wishlist">
@@ -85,6 +91,13 @@
                     </div>
                 </div>
 
+                {hook name="products:promo_text"}
+                {if $product.promo_text}
+                <div class="ty-product-block__note">
+                    {$product.promo_text nofilter}
+                </div>
+                {/if}
+                {/hook}
 
                 {*
                 {if $capture_options_vs_qty}{capture name="product_options"}{$smarty.capture.product_options nofilter}{/if}
@@ -99,11 +112,6 @@
                     {assign var="advanced_options" value="advanced_options_`$obj_id`"}
                     {$smarty.capture.$advanced_options nofilter}
                     {if $capture_options_vs_qty}{/capture}{/if}
-                </div>
-
-                <div class="ty-product-block__sku">
-                    {assign var="sku" value="sku_`$obj_id`"}
-                    {$smarty.capture.$sku nofilter}
                 </div>
 
                 {if $capture_options_vs_qty}{capture name="product_options"}{$smarty.capture.product_options nofilter}{/if}

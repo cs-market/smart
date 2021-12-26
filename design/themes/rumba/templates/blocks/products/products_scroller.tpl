@@ -31,8 +31,8 @@
     </div>
 {/if}
 
-<div id="scroll_list_{$block.block_id}" class="owl-carousel ty-scroller-list1 ty-grid-list">
-    {include file="blocks/list_templates/grid_list.tpl" item_class='ty-scroller-list__item' no_pagination=true no_sorting=true products=$items show_name=true show_add_to_cart=$_show_add_to_cart show_list_buttons=$_show_add_to_cart}
+<div id="scroll_list_{$block.block_id}" class="owl-carousel ty-scroller-list ty-grid-list">
+    {include file="blocks/product_list_templates/products_multicolumns.tpl" item_class='ty-scroller-list__item' no_pagination=true no_sorting=true products=$items show_add_to_cart=$_show_add_to_cart show_list_buttons=$_show_add_to_cart}
 </div>
 
 {include file="common/scroller_init.tpl" prev_selector="#owl_prev_`$obj_prefix`" next_selector="#owl_next_`$obj_prefix`"}

@@ -147,7 +147,7 @@ select {
         &:before {
             margin-right: 5px;
             font-size: 22px;
-            vertical-align: middle;
+            // vertical-align: middle;
         }
         .ty-grid-list & {
             .border-radius(50%);
@@ -156,7 +156,7 @@ select {
             padding: initial;
             font-weight: bold;
             &:before {
-                display: none;
+                margin: 0;
             }
         }
     }
@@ -285,6 +285,38 @@ select {
     .ui-slider-range {
         background-color: @base;
         height: 4px;
+    }
+}
+.ty-tabs {
+    border-bottom-color: @base;
+    &__item {
+        margin-right: 4px;
+        position: relative;
+        z-index: 0;
+        .border-top-radius(@border-radius);
+        overflow: hidden;
+        &, &:hover {
+            background-color: #dfe2e6;
+        }
+        &:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 100%;
+            background: @base;
+            top: 0;
+            bottom: 0;
+            z-index: -1;
+            .transition(0.3s all ease);
+        }
+        &.active:before {
+            right: 0;
+        }
+    }
+    &__a {
+        text-transform: uppercase;
+        padding: 14px 22px;
+        height: initial;
     }
 }
 .ty-rumba-icon-mobile-app {

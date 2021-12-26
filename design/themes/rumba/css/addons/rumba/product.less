@@ -12,18 +12,10 @@ Product page
     border-bottom: none;
 }
 .ty-product-feature:nth-child(2n) {
-    background-color: initial;
+    background-color: #dfe2e6;
 }
 .ty-icon-shipping {
     margin-right: 8px;
-}
-#content_description {   
-    width: 50%;
-    float: left;
-}
-#content_features {
-    width: 50%;
-    float: right;
 }
 
 .ty-product-block {
@@ -64,13 +56,14 @@ Product page
         margin-top: 25px;
     }
     &__prices {
-        display: flex;
-        flex-direction: row-reverse;
-        align-items: center;
-        float: left;
+        // display: flex;
+        // flex-direction: row-reverse;
+        // align-items: center;
+        // float: left;
         .ty-price-old {
             font-size: 20px;
         }
+        margin-bottom: 20px;
     }
     &__wishlist {
         float: right;
@@ -91,8 +84,15 @@ Product page
             margin: 0;
         }
     }
+    &__note {
+        position: initial;
+        width: initial;
+    }
     .ty-qty {
         margin-right: 25px;
+    }
+    .ty-control-group {
+        margin: 0;
     }
 }
 
@@ -126,7 +126,7 @@ Product page
         color: @base;
         font-size: 16px;
         .no-touch &:hover {
-            background-color: #50b946;
+            background-color: @base;
         }
         &:hover {
             background-color: @base;
@@ -134,7 +134,7 @@ Product page
         }
     }
     &__increase {
-        background-color: lighten(#50b946, 20%);
+        background-color: lighten(@base, 20%);
         color: #fff;
     }
 }
