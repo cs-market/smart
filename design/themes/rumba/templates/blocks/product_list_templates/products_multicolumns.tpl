@@ -14,7 +14,6 @@ show_product_labels=true
 show_discount_label=true
 show_shipping_label=true
 show_list_buttons=true
-no_sorting=true
 show_sku=true
 hide_qty_label=true
 }

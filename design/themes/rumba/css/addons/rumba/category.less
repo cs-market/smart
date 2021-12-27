@@ -1,13 +1,21 @@
 /* ==========================================================================
 Category page
 ========================================================================== */
+
 .ty-grid-list {
     @margin: 35px;
     //margin: 0 -@margin;
     display: grid;
     grid-gap: @margin;
-    grid-template-columns: repeat(auto-fit,minmax(210px,auto));
+    //grid-template-columns: repeat(auto-fit,minmax(230px,auto));
+    grid-template-columns: repeat(var(--columns),auto);
     justify-content: space-between;
+    @media @tablet {
+        grid-template-columns: repeat(calc(~"var(--columns) - 1"),auto);
+    }
+    @media @mobile {
+        grid-template-columns: repeat(calc(~"var(--columns) - 2"),auto);
+    }
     &__item {
         background-color: #fff;
         margin: 0;
@@ -60,8 +68,13 @@ Category page
         padding-top: 20px;
         margin-top: auto;
     }
+    @scroller_gap: 15px;
     .owl-item > div {
-        margin: 20px;
+        margin: 10px @scroller_gap;
+    }
+    &.ty-scroller-list {
+        margin: 0 -@scroller_gap;
+        width: auto;
     }
 }
 .ty-price {
@@ -150,4 +163,8 @@ Category page
             }
         }
     }
+}
+
+.ty-scroller-list__item {
+    text-align: initial;
 }

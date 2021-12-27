@@ -28,7 +28,7 @@
     {if $settings.Appearance.enable_quick_view == 'Y'}
         {$quick_nav_ids = $products|fn_fields_from_multi_level:"product_id":"product_id"}
     {/if}
-    {if !$item_class}<div class="ty-grid-list">{/if}
+    {if !$item_class}<div class="ty-grid-list" style="--columns: {$columns};">{/if}
         {strip}
             {foreach from=$splitted_products item="sproducts" name="sprod"}
                 {foreach from=$sproducts item="product" name="sproducts"}
