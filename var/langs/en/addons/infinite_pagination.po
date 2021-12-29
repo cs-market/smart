@@ -1,0 +1,54 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: infinitepagination\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: infinitepagination\n"
+"X-Crowdin-Language: en\n"
+"X-Crowdin-File: infinite_pagination.po\n"
+"PO-Revision-Date: 2020-11-24 17:02\n"
+"X-Crowdin-Project-ID: 430338\n"
+"X-Crowdin-File-ID: 2\n"
+
+msgctxt "Addons::name::infinite_pagination"
+msgid "infinite_pagination"
+msgstr "Infinite pagination"
+
+msgctxt "Addons::description::infinite_pagination"
+msgid "infinite_pagination__description"
+msgstr "Adds endless scrolling"
+
+msgctxt "SettingsSections::infinite_pagination::general"
+msgid "General"
+msgstr "General"
+
+msgctxt "SettingsOptions::infinite_pagination::use_more"
+msgid "use_more"
+msgstr "3 pages before 'Show more' button"
+
+msgctxt "SettingsOptions::infinite_pagination::use_prev"
+msgid "use_prev"
+msgstr "Allow previous pages loading"
+
+msgctxt "SettingsOptions::infinite_pagination::more_pages"
+msgid "more_pages"
+msgstr "Pages amount"
+
+msgctxt "SettingsOptions::infinite_pagination::show_page"
+msgid "show_page"
+msgstr "Show page-counter block"
+
+msgctxt "Languages::infinite_pagination__load_automatically"
+msgid "load_automatically"
+msgstr "Loading. Please wait."
+
+msgctxt "Languages::infinite_pagination__more"
+msgid "more"
+msgstr "Show more"
+
+msgctxt "Languages::infinite_pagination__loaded"
+msgid "loaded"
+msgstr "All information loaded"
+

@@ -4,6 +4,8 @@ BASE & COMMON
 
 @transition: all .3s ease;
 @border-radius: 8px;
+@grey: #e7e9eb;
+@grey-bg: #f7f8fa;
 
 @mobile-sm: ~"screen and (max-width: 480px)";
 @mobile: ~"screen and (max-width: 767px)";
@@ -56,6 +58,18 @@ select {
         /* Better Font Rendering =========== */
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+.ty-tile-button() {
+    .border-radius(@border-radius);
+    .transition(@transition);
+    white-space: nowrap;
+    padding: 8px 10px;
+    // background-color: #fff;
+    border: 1px solid @grey;
+    &:hover {
+        background-color: @grey-bg;
     }
 }
 
@@ -128,7 +142,7 @@ select {
         margin: 0;
         font-size: 22px;
         background-color: #fff;
-        border-color: #e7e9eb;
+        border-color: @grey;
         i {
             color: #b6bac2;
         }
@@ -155,11 +169,7 @@ select {
 
 .ty-dropdown-box, .ty-sort-dropdown {
     &__title {
-        @helper: #f7f8fa;
-        white-space: nowrap;
-        border: 1px solid #e7e9eb;
-        background-color: #fff;
-        .border-radius(@border-radius);
+        .ty-tile-button();
         .ty-top-menu & .ty-minicart__icon, .ty-top-menu & .ty-icon-user {
             position: static;
             font-size: 22px;
@@ -185,18 +195,13 @@ select {
         a {
             display: flex;
             align-items: center;
-            // line-height: 30px;
-        }
-        &:hover {
-            background-color: lighten(@helper, 1%);
         }
         &.open {
-            background-color: @helper;
+            background-color: @grey-bg;
         }
     }
     &__content {
         .border-radius(@border-radius);
-        margin-top: 5px;
         border-top: 3px solid;
         border-color: @base;
         .ty-account-info__buttons {
@@ -222,14 +227,34 @@ select {
     .rumba-glyphs();
 }
 
+.ty-grid(@grid-gap: 20px) {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), auto);
+    grid-gap: @grid-gap;
+}
+
 .owl-theme {
     .owl-controls {
         .owl-buttons {
-            div {
+            .clearfix();
+            border: 1px solid @grey;
+            .border-radius(100px);
+            padding: 3px 5px;
+            > div {
                 background-color: initial;
-                border: 1px solid #e7e9eb;
+                margin: 0;
+                .transition(@transition);
+                color: darken(@grey, 10%);
+                &:hover {
+                    background-color: @base;
+                    color: #fff;
+                }
+            }
+            .owl-prev {
+                margin-right: 5px;
             }
             i {
+                color: inherit;
                 vertical-align: middle;
             }
         }
@@ -294,6 +319,11 @@ select {
         text-transform: uppercase;
         padding: 14px 22px;
         height: initial;
+    }
+}
+.ty-text-links {
+    &__item {
+        .ty-tile-button();
     }
 }
 // .ty-rumba-icon-mobile-app {

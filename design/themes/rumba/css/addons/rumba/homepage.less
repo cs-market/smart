@@ -3,10 +3,19 @@ Homepage
 ========================================================================== */
 
 .homepage-banners {
-    display: flex;
-    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.ty-grid-banners {
+    .ty-grid();    
     > div {
-        flex-basis: calc(~"33% - 10px");
         .border-radius(@border-radius);
+        overflow: hidden;
+    }
+}
+.ty-banner {
+    &__image-wrapper {
+        text-align: left;
+        margin: initial;
     }
 }

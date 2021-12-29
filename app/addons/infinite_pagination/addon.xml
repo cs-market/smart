@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>infinite_pagination</id>
+    <version>1.0.1</version>
+    <priority>2800</priority>
+    <position>100</position>
+    <status>active</status>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="general_header">
+                        <name>General settings</name>
+                        <type>header</type>
+                    </item>
+                    <item id="license_key">
+                        <type>input</type>
+                        <name>License key</name>
+                    </item>
+                    <item id="use_more">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+                    </item>
+                    <item id="use_prev">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item>
+                    <item id="more_pages">
+                        <type>input</type>
+                        <default_value>3</default_value>
+                    </item>
+                    <!-- <item id="show_page">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item> -->
+                </items>
+            </section>
+        </sections>
+    </settings>
+</addon>
