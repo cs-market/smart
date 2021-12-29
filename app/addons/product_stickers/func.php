@@ -139,6 +139,7 @@ function fn_execute_data_replacement(&$stickers, &$params) {
                         $piece = & $piece[$part];
                     }
                     $replace['['.$content.']'] = trim(strip_tags($piece));
+                    if (is_numeric($replace['['.$content.']'])) $replace['['.$content.']'] += 0;
                 }
 
                 $sticker['text'] = str_replace(array_keys($replace), array_values($replace), $sticker['text']);
