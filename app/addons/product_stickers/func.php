@@ -64,6 +64,7 @@ function fn_get_stickers($params, $lang_code = DESCR_SL) {
                 '?:product_stickers.class',
                 '?:product_stickers.status',
                 '?:product_stickers.type',
+                '?:product_stickers.display',
                 '?:product_stickers.use_avail_period',
                 '?:product_stickers.avail_from_timestamp',
                 '?:product_stickers.avail_till_timestamp',
@@ -383,6 +384,7 @@ function fn_product_stickers_gather_additional_product_data_post(&$product, $aut
         if (!empty($_params['sticker_id'])) {
             $product['stickers'] = fn_get_stickers($_params);
         }
+        fn_print_die($product['stickers']);
         if ($auth['user_type'] == 'A' && AREA == 'C' && isset($_REQUEST['show_replacement_variants'])) {
             $replacement = fn_collect_sticker_replacement($_params['product']);
             fn_print_die($replacement);
