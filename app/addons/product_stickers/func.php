@@ -384,7 +384,7 @@ function fn_product_stickers_gather_additional_product_data_post(&$product, $aut
         if (!empty($_params['sticker_id'])) {
             $product['stickers'] = fn_get_stickers($_params);
         }
-        fn_print_die($product['stickers']);
+
         if ($auth['user_type'] == 'A' && AREA == 'C' && isset($_REQUEST['show_replacement_variants'])) {
             $replacement = fn_collect_sticker_replacement($_params['product']);
             fn_print_die($replacement);
