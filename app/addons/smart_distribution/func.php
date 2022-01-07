@@ -1371,3 +1371,11 @@ function fn_smart_distribution_exim_import_price($price, $decimals_separator) {
     $price = str_replace(' ', '', $price);
     return fn_exim_import_price($price, $decimals_separator);
 }
+
+function fn_smart_distribution_sberbank_edit_item(&$item, $product, $order) {
+    if ($order['company_id'] == 1815) {
+        if ($mikale_specific = db_get_field('SELECT search_words FROM ?:product_descriptions WHERE product_id = ?i and lang_code = ?s', $product['product_id'], DESCR_SL)) {
+            $item['name'] = $mikale_specific;
+        }
+    }
+}

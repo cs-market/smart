@@ -663,7 +663,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
                             continue;
                         }
                         $p_feature_name = (string) $_feature->{$cml['value']};
-                        if (!empty($p_feature_name)) $product['product'] = $p_feature_name;
+                        if (!empty($p_feature_name)) {
+                            $product['search_words'] = $product['product'];
+                            $product['product'] = $p_feature_name;
+                        }
                     }
                 }
             }

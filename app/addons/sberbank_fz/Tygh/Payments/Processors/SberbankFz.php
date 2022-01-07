@@ -163,6 +163,8 @@ class SberbankFz
                     $item['itemAttributes'] = ($this->_payment_method == 'regular') ? ['attributes' => $attributes] : $attributes;
                 }
 
+                fn_set_hook('sberbank_edit_item', $item, $value, $order_info);
+
                 $items[] = $item;
             }
 
