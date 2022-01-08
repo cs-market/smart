@@ -22,6 +22,8 @@
         <item lang="en" id="allow_additional_ordering">Allow additional ordering</item>
         <item lang="ru" id="allow_additional_ordering">Разрешить дозаказ</item>
         
+        <item lang="en" id="min_order_weight">Min order weight</item>
+        <item lang="ru" id="min_order_weight">Минимальный вес заказа</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `min_order_amount` mediumint(8) UNSIGNED NOT NULL DEFAULT 0;</item>
@@ -34,6 +36,9 @@
         <item for="uninstall">ALTER TABLE `?:users` DROP `min_order_amount`;</item>
         <item>ALTER TABLE `?:product_groups` ADD `min_order` mediumint(8) UNSIGNED NOT NULL AFTER `group`;</item>
         <item for="uninstall">ALTER TABLE `?:product_groups` DROP `min_order`;</item>
+        
+        <item>ALTER TABLE `?:companies` ADD `min_order_weight` mediumint(8) UNSIGNED NOT NULL DEFAULT 0;</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `min_order_weight`;</item>        
     </queries>
 </addon>
 

@@ -1,5 +1,7 @@
 <?php
 
+use Tygh\Registry;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_min_order_amount_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
@@ -69,12 +71,17 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
                 return ($v['company_id'] == $company_id);
             });
 
-            $min_order_amount = db_get_field('SELECT min_order_amount FROM ?:companies WHERE company_id = ?i', $company_id);
+            $mins = db_get_row('SELECT min_order_amount, min_order_weight FROM ?:companies WHERE company_id = ?i', $company_id);
 
-            if ($min_order_amount && $min_order_amount > $group['package_info']['C'] && $cart['total'] && empty($group_orders)) {
+            if ($mins['min_order_amount'] && $mins['min_order_amount'] > $group['package_info']['C'] && $cart['total'] && empty($group_orders)) {
                 $cart['min_order_failed'] = true;
-                $min_amount = $formatter->asPrice($min_order_amount);
+                $min_amount = $formatter->asPrice($mins['min_order_amount']);
                 $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('with_company') . ' ' . $group['name'];
+            }
+
+            if ($mins['min_order_weight'] && $mins['min_order_weight'] > $group['package_info']['W']) {
+                $cart['min_order_failed'] = true;
+                $cart['min_order_notification'] = __('text_min_products_weight_required') . ' ' . $mins['min_order_weight'] . ' ' . Registry::get('settings.General.weight_symbol');
             }
         }
     }
