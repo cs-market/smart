@@ -480,7 +480,7 @@ function fn_helpdesk_get_mail() {
 
 function fn_helpdesk_send_mail() {
     $mailboxes = fn_get_mailboxes();
-    $messages = db_get_array('SELECT m.*, t.subject, t.mailbox_id, u.user_type FROM ?:helpdesk_messages AS m LEFT JOIN ?:helpdesk_tickets AS t ON t.ticket_id = m.ticket_id LEFT JOIN ?:users AS u ON u.user_id = m.user_id WHERE notified = ?s', 'N');
+    $messages = db_get_array('SELECT m.*, t.subject, t.mailbox_id, u.user_type FROM ?:helpdesk_messages AS m LEFT JOIN ?:helpdesk_tickets AS t ON t.ticket_id = m.ticket_id LEFT JOIN ?:users AS u ON u.user_id = m.user_id WHERE notified = ?s LIMIT 300', 'N');
     foreach ($messages as &$message) {
         if ($message['user_type'] == 'C') {
             $user_type_condition = db_quote(" AND u.user_type != ?s", 'C');

@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class Measure extends AbstractMigration
+class WeightNew extends AbstractMigration
 {
     /**
      * Change Method.
