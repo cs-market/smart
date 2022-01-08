@@ -1480,6 +1480,8 @@ function fn_product_filters_get_filters(array $params = [], $lang_code = CART_LA
     ];
 
     $key = [$lang_code];
+    
+    fn_set_hook('get_filters_products_count_pre', $params, $cache_params, $cache_tables);
 
     foreach ($cache_params as $prop) {
         if (isset($params[$prop])) {

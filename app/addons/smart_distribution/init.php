@@ -73,5 +73,8 @@ fn_register_hooks(
     'text_cart_amount_corrected_notification',
     'get_orders_totals',
     'sberbank_edit_item',
-    'get_filters_products_count_before_select_filters'
+    'get_filters_products_count_before_select_filters',
+    'get_filters_products_count_pre',
+    'get_filters_products_count_post',
+    'get_filters_pre'
 );

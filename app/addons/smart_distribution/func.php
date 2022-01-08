@@ -1381,15 +1381,39 @@ function fn_smart_distribution_sberbank_edit_item(&$item, $product, $order) {
     }
 }
 
-function fn_smart_distribution_get_filters_products_count_before_select_filters($sf_fields, $sf_join, &$condition, $sf_sorting, $params) {
-    if (isset($params['block_data']['properties']['template']) && $params['block_data']['properties']['template'] != 'addons/smart_distribution/blocks/product_filters/for_category/button_filters.tpl') {
+function fn_smart_distribution_get_filters_products_count_before_select_filters($sf_fields, $sf_join, &$condition, $sf_sorting, &$params) {
+    if (AREA == 'C' && !$params['for_api'] && isset($params['block_data']['properties']['template']) && $params['block_data']['properties']['template'] != 'addons/smart_distribution/blocks/product_filters/for_category/button_filters.tpl' && !empty($params['button_filters'])) {
+        $condition .= db_quote('AND ?:product_filters.filter_id NOT IN (?a)', $params['button_filters']);
+    }
+}
+
+function fn_smart_distribution_get_filters_products_count_pre(&$params, &$cache_params, $cache_tables) {
+    if (AREA == 'C') {
         $block_ids = db_get_fields('SELECT block_id FROM ?:bm_blocks WHERE properties like ?l', '%button_filters.tpl%');
+        $params['button_filters'] = [];
         foreach ($block_ids as $block_id) {
             $block_data = Block::instance()->getById($block_id);
-
             if ($block_data['content']['items']['item_ids']) {
-                $condition .= db_quote('AND ?:product_filters.filter_id NOT IN (?a)', explode(',', $block_data['content']['items']['item_ids']) );
+               $params['button_filters'] = array_merge($params['button_filters'], explode(',', $block_data['content']['items']['item_ids']));
+            }
+        }
+        $params['button_filters'] = array_unique($params['button_filters']);
+
+        $params['for_api'] = defined('API') ?? 0;
+        $cache_params[] = 'for_api';
+    }
+}
+
+function fn_smart_distribution_get_filters_products_count_post($params, $lang_code, &$filters, $selected_filters) {
+    if (AREA == 'C' && $params['for_api'] && !empty($params['button_filters'])) {
+        foreach($params['button_filters'] as $filter_id) {
+            if (isset($filters[$filter_id])) {
+                $filters[$filter_id]['is_button_filter'] = true;
             }
         }
     }
+}
+
+function fn_smart_distribution_get_filters_pre($params, &$cache_params) {
+    $cache_params[] = 'for_api';
 }
