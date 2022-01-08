@@ -10,6 +10,7 @@ use Tygh\Enum\UserTypes;
 use Tygh\Enum\UsergroupTypes;
 use Tygh\Storage;
 use Tygh\Enum\YesNo;
+use Tygh\BlockManager\Block;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -1376,6 +1377,19 @@ function fn_smart_distribution_sberbank_edit_item(&$item, $product, $order) {
     if ($order['company_id'] == 1815) {
         if ($mikale_specific = db_get_field('SELECT search_words FROM ?:product_descriptions WHERE product_id = ?i and lang_code = ?s', $product['product_id'], DESCR_SL)) {
             $item['name'] = $mikale_specific;
+        }
+    }
+}
+
+function fn_smart_distribution_get_filters_products_count_before_select_filters($sf_fields, $sf_join, &$condition, $sf_sorting, $params) {
+    if (isset($params['block_data']['properties']['template']) && $params['block_data']['properties']['template'] != 'addons/smart_distribution/blocks/product_filters/for_category/button_filters.tpl') {
+        $block_ids = db_get_fields('SELECT block_id FROM ?:bm_blocks WHERE properties like ?l', '%button_filters.tpl%');
+        foreach ($block_ids as $block_id) {
+            $block_data = Block::instance()->getById($block_id);
+
+            if ($block_data['content']['items']['item_ids']) {
+                $condition .= db_quote('AND ?:product_filters.filter_id NOT IN (?a)', explode(',', $block_data['content']['items']['item_ids']) );
+            }
         }
     }
 }

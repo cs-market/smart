@@ -14,7 +14,8 @@
 {/if}
 
 {if $subcategories}
-    {include file="views/categories/components/categories_multicolumns.tpl" categories=$subcategories columns=3}
+    {include file="common/subheader.tpl" title=__('categories')}
+    {include file="views/categories/components/subcategories.tpl"}
 {/if}
 
 {if $category_data.description || $runtime.customization_mode.live_editor}
