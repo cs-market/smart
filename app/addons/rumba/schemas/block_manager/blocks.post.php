@@ -20,4 +20,28 @@ $schema['banners']['templates']['addons/rumba/blocks/grid.tpl'] = [
     )
 ];
 
+$schema['mobile_app_links'] = [
+    'templates' => 'addons/rumba/blocks/mobile_app_links.tpl',
+    'content' => array(
+        'items' => array (
+            'remove_indent' => true,
+            'hide_label' => true,
+            'type' => 'function',
+            'function' => ['fn_get_mobile_app_links']
+        ),
+    ),
+    'settings' => array(
+        'number_of_columns' =>  array (
+            'type' => 'input',
+            'default_value' => 3
+        )
+    ),
+    'cache' => array (
+        'update_handlers' => array ('companies'),
+    ),
+    'wrappers' => 'blocks/wrappers'
+];
+
+$schema['vendor_logo']['content']['vendor_info']['function'] = ['fn_blocks_rumba_get_vendor_info'];
+
 return $schema;

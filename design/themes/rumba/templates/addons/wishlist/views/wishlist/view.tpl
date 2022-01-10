@@ -18,7 +18,9 @@
         no_pagination=true
         no_sorting=true
         show_add_to_cart=true
-        is_wishlist=true}
+        is_wishlist=true
+        hide_qty_label=true
+        but_role="action"}
 {else}
     {math equation="100 / x" x=$columns|default:"2" assign="cell_width"}
     <div class="ty-grid-list{if $wishlist_is_empty} ty-wish-list-empty{/if}">

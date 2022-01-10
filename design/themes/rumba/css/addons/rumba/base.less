@@ -172,7 +172,7 @@ select {
         .ty-tile-button();
         .ty-top-menu & .ty-minicart__icon, .ty-top-menu & .ty-icon-user {
             position: static;
-            font-size: 22px;
+            font-size: 20px;
             .rumba-glyphs();
             margin-right: 5px;
             color: @base;
@@ -203,6 +203,8 @@ select {
     &__content {
         .border-radius(@border-radius);
         border-top: 3px solid;
+        // ????
+        margin-top: 5px;
         border-color: @base;
         .ty-account-info__buttons {
             background-color: transparent;
@@ -390,5 +392,25 @@ select {
         .message-container a {
             color: @base;
         }
+    }
+}
+
+.ty-mobile-app-links {
+    &__wrapper {
+        .ty-grid();   
+    }
+    .size(60px, 200px);
+    display: inline-block;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    &__app_store {
+        background-image: url("../media/images/mobile-app-app_store.svg");
+    }
+    &__app_gallery {
+        background-image: url("../media/images/mobile-app-app_gallery.svg");
+    }
+    &__play_market {
+        background-image: url("../media/images/mobile-app-play_market.svg");
     }
 }
