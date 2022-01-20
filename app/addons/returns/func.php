@@ -8,7 +8,6 @@ function fn_returns_get_products($params, $fields, $sortings, &$condition, &$joi
     if (isset($params['only_ordered']) && $params['only_ordered']) {
         $join .= db_quote(' LEFT JOIN ?:order_details AS od ON od.product_id = products.product_id LEFT JOIN ?:orders AS o ON o.order_id = od.order_id ');
         $condition .= db_quote(' AND o.user_id = ?i ', $_SESSION['auth']['user_id']);
-        
     }
 }
 
@@ -51,7 +50,6 @@ function fn_get_returns($params, $items_per_page = 0) {
         $params = $default_params;
     }
 
-
     $condition = ' 1 ';
 
     if (isset($params['company_id']) && !empty($params['company_id'])) {
@@ -84,8 +82,7 @@ function fn_get_returns($params, $items_per_page = 0) {
 
     if ($params['get_items']) {
         foreach ($returns as &$return) {
-            
-            $return['items'] = db_get_array('SELECT * FROM ?:return_products WHERE return_id = ?i', $return['return_id']);
+            $return['items'] = db_get_array('SELECT r.*, p.product_code FROM ?:return_products AS r LEFT JOIN ?:products AS p ON p.product_id = r.product_id WHERE return_id = ?i', $return['return_id']);
             foreach($return['items'] as &$item) {
                 $item['product'] = fn_get_product_name($item['product_id']);
             }
@@ -104,7 +101,7 @@ function fn_return_export_to_file($return_id) {
 
     $csv = $return['items'];
     array_walk($csv, function(&$v) { unset($v['return_id'], $v['product_id']); });
-    
+
     $params['filename'] = $return['file_path'];
     $params['force_header'] = true;
 

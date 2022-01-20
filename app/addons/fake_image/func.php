@@ -51,7 +51,7 @@ function fn_fake_image_get_product_data_post(&$product_data, $auth, $preview, $l
 
 function fn_fake_image_gather_additional_product_data_before_options(&$product_data, $auth, $params) {
     if (empty($product_data['main_pair']) || !is_file($product_data['main_pair']['detailed']['absolute_path'])) {
-        $product_data['main_pair'] = fn_get_fake_image($product_data['product_id'], $product_data['main_pair']);
+        $product_data['main_pair'] = @fn_get_fake_image($product_data['product_id'], $product_data['main_pair']);
     }
 }
 
