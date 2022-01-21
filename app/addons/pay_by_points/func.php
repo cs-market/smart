@@ -166,18 +166,18 @@ function fn_pay_by_points_pre_place_order(&$cart, $allow, &$product_groups)
 
     //  push bonus reward data for the reward_points add-on
     //  (if order will separated => main order delete => put on all with point)
-    $total_bonus = 0;
-    foreach ($cart['products'] as $product) {
-        if (
-            isset($product['extra']['pay_by_points']['product_cart_point_price'])
-        ) {
-            $total_bonus += $product['extra']['pay_by_points']['product_cart_point_price'];
-        }
-    }
-
-    if ($total_bonus) {
-        $cart['points_info']['reward'] = $total_bonus;
-    }
+        // $total_bonus = 0;
+        // foreach ($cart['products'] as $product) {
+        //     if (
+        //         isset($product['extra']['pay_by_points']['product_cart_point_price'])
+        //     ) {
+        //         $total_bonus += $product['extra']['pay_by_points']['product_cart_point_price'];
+        //     }
+        // }
+    
+        // if ($total_bonus) {
+        //     $cart['points_info']['reward'] = $total_bonus;
+        // }
 
         // earned_points_eq_price
         // $reward = 0;
