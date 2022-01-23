@@ -1,24 +1,25 @@
 <?php
 
+use Tygh\Enum\YesNo;
+use Tygh\Enum\SiteArea;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 //  [HOOKs]
 function fn_pay_by_points_pre_add_to_cart(&$product_data, $cart, $auth, $update)
 {
-    if (AREA == 'C') {
-        //  check is pbp
-        foreach($product_data as $product_id => &$product) {
-            $product['is_pbp']  = db_get_field("SELECT is_pbp FROM ?:products WHERE product_id = ?i", $product_id);
+    if (SiteArea::isStorefront(AREA)) {
+        $product_ids = fn_array_column($product_data, 'product_id');
+        $pay_by_points_data = db_get_hash_array('SELECT is_pbp, points_eq_price, product_id FROM ?:products WHERE product_id IN (?a)', 'product_id', $product_ids);
 
-            $points_eq_price = (!isset($product['points_eq_price']))
-                    ? db_get_field("SELECT points_eq_price FROM ?:products WHERE product_id = ?i", $product_id)
-                    : $product['points_eq_price'];
+        foreach($product_data as &$product) {
+            $product = array_merge($product, $pay_by_points_data[$product['product_id']]);
 
-            $product['point_price'] = ($product['is_pbp'] == 'Y')
+            $product['point_price'] = (YesNo::toBool($product['is_pbp']))
                     ? (
-                            (AREA == 'C' && $points_eq_price == 'Y')
+                            (YesNo::toBool($product['points_eq_price']))
                             ? $product['price']
-                            : fn_get_price_in_points($product_id, $auth)
+                            : fn_get_price_in_points($product['product_id'], $auth)
                     )
                     : 0;
 
@@ -26,7 +27,6 @@ function fn_pay_by_points_pre_add_to_cart(&$product_data, $cart, $auth, $update)
         }
         unset($product);
 
-        $product_ids = fn_array_column($product_data, 'product_id');
         fn_update_use_pay_by_points($product_ids);
     }
 }
