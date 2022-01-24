@@ -2,6 +2,7 @@
 <div class="control-group">
     <label class="control-label" for="delivery_date">{__("delivery_date")}</label>
     <div class="controls">
+        <input type="hidden" name="user_data[delivery_date]" value="0000000">
         {$calendar_days = [
             '1' => {__("weekday_1")},
             '2' => {__("weekday_2")},
