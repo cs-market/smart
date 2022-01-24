@@ -6,7 +6,7 @@ use Tygh\Enum\SiteArea;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 //  [HOOKs]
-function fn_pay_by_points_pre_add_to_cart(&$product_data, $cart, $auth, $update)
+function fn_pay_by_points_pre_add_to_cart(&$product_data, &$cart, $auth, $update)
 {
     if (SiteArea::isStorefront(AREA)) {
         $product_ids = fn_array_column($product_data, 'product_id');
@@ -27,7 +27,7 @@ function fn_pay_by_points_pre_add_to_cart(&$product_data, $cart, $auth, $update)
         }
         unset($product);
 
-        fn_update_use_pay_by_points($product_ids);
+        fn_update_use_pay_by_points($cart, $product_ids);
     }
 }
 
@@ -61,7 +61,7 @@ function fn_pay_by_points_add_product_to_cart_get_price($product_data, &$cart, $
         $amount += $cart['products'][$_id]['amount'];
         fn_delete_cart_product($cart, $_id);
     }
-    fn_update_use_pay_by_points([$product_id]);
+    fn_update_use_pay_by_points($cart, [$product_id]);
 
         $points_eq_price = (!isset($product_data['points_eq_price']))
                 ? db_get_field("SELECT points_eq_price FROM ?:products WHERE product_id = ?i", $product_id)
@@ -71,7 +71,7 @@ function fn_pay_by_points_add_product_to_cart_get_price($product_data, &$cart, $
                 ? $price 
                 : fn_get_price_in_points($product_id, $auth);
 
-        $available_points = fn_get_available_points();
+        $available_points = fn_get_available_points($cart);
         $product_cart_point_price = $amount * $reward_point_product_price;
 
         if ($product_cart_point_price > $available_points) {
@@ -129,14 +129,14 @@ function fn_pay_by_points_get_cart_product_data($product_id, &$_pdata, $product,
     }
 }
 
-function fn_pay_by_points_post_add_to_cart($product_data, $cart, $auth, $update, $ids)
+function fn_pay_by_points_post_add_to_cart($product_data, &$cart, $auth, $update, $ids)
 {
-    fn_update_use_pay_by_points();
+    fn_update_use_pay_by_points($cart);
 }
 
-function fn_pay_by_points_save_cart_content_pre($cart, $user_id, $type, $user_type)
+function fn_pay_by_points_save_cart_content_pre(&$cart, $user_id, $type, $user_type)
 {
-    fn_update_use_pay_by_points();
+    fn_update_use_pay_by_points($cart);
 }
 
 function fn_pay_by_points_pre_place_order(&$cart, $allow, &$product_groups)
@@ -264,7 +264,7 @@ function fn_pay_by_points_change_order_status($status_to, $status_from, &$order_
 
 function fn_pay_by_points_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups)
 {
-    $cart['pay_by_points']['reward'] = fn_get_use_pay_by_points();
+    $cart['pay_by_points']['reward'] = fn_get_use_pay_by_points($cart);
 }
 
 function fn_pay_by_points_load_products_extra_data(&$extra_fields, $products, $product_ids, $params, $lang_code)
@@ -307,10 +307,10 @@ function fn_pay_by_points_gather_additional_product_data_before_discounts(&$prod
 * get from session
 * return float
 */
-function fn_get_available_points()
+function fn_get_available_points($cart)
 {
     return max(
-        fn_get_user_additional_data(POINTS) - Tygh::$app['session']['cart']['pay_by_points']['in_use'],
+        fn_get_user_additional_data(POINTS) - $cart['pay_by_points']['in_use'],
         0
     );
 }
@@ -322,16 +322,16 @@ function fn_get_available_points()
 * $disallow_products array product_ids
 * return void
 */
-function fn_update_use_pay_by_points($disallow_products = [])
+function fn_update_use_pay_by_points(&$cart, $disallow_products = [])
 {
-    Tygh::$app['session']['cart']['pay_by_points']['in_use'] = fn_get_use_pay_by_points($disallow_products);
+    $cart['pay_by_points']['in_use'] = fn_get_use_pay_by_points($cart, $disallow_products);
 }
 
-function fn_get_use_pay_by_points($disallow_products = [])
+function fn_get_use_pay_by_points(&$cart, $disallow_products = [])
 {
     $total_use_points = 0;
-    if (!empty(Tygh::$app['session']['cart']['products']))
-    foreach (Tygh::$app['session']['cart']['products'] as $product) {
+    if (!empty($cart['products']))
+    foreach ($cart['products'] as $product) {
         if (
             !in_array($product['product_id'], $disallow_products)
             && isset($product['extra']['pay_by_points']['product_cart_point_price'])
