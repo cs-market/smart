@@ -7,6 +7,7 @@ use Tygh\Exceptions\PermissionsException;
 use Tygh\Enum\Addons\AdvancedImport\ImportStatuses;
 use Tygh\Commerceml\SDRusEximCommerceml;
 use Tygh\Commerceml\Logs;
+use Tygh\Addons\AdvancedImport\ServiceProvider;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -139,7 +140,7 @@ function fn_auto_exim_find_files($cid) {
         $explode = explode('.', $data['filename']);
         $data['import_object'] = array_shift($explode);
         if (!empty($explode)) {
-            $tmp = reset($tmp);
+            $tmp = array_shift($explode);
         }
         if (strpos($tmp, 'preset_') !== false) {
             $data['preset_id'] = str_replace('preset_', '', $tmp);
@@ -289,8 +290,8 @@ function fn_run_import($preset_id, $file = '') {
     /** @var \Tygh\Addons\AdvancedImport\Presets\Importer $presets_importer */
     $presets_importer = Tygh::$app['addons.advanced_import.presets.importer'];
 
-    list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $preset_id), false);
 
+    list($presets,) = $presets_manager->find(false, array('ip.preset_id' => $preset_id));
     if ($presets) {
 
         Registry::set('runtime.advanced_import.in_progress', true, true);
@@ -300,8 +301,7 @@ function fn_run_import($preset_id, $file = '') {
             $preset['file'] = $file;
         }
         /** @var \Tygh\Addons\AdvancedImport\Readers\Factory $reader_factory */
-        $reader_factory = Tygh::$app['addons.advanced_import.readers.factory'];
-
+        $reader_factory = ServiceProvider::getReadersFactory();
 
         $is_success = false;
         try {
@@ -340,11 +340,8 @@ function fn_run_import($preset_id, $file = '') {
 
                 $preset['options']['preset'] = $preset;
                 unset($preset['options']['preset']['options']);
-                ob_start();
-                define('AJAX_REQUEST', true);
-                $is_success = fn_import($pattern, $import_items, $preset['options']);
-                ob_clean();
-                return $is_success;
+
+                return fn_import($pattern, $import_items, $preset['options']);
             }
         } catch (ReaderNotFoundException $e) {
             fn_echo(__('error_exim_cant_read_file'));
