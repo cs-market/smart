@@ -62,30 +62,29 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
                 }
             }
         } else {
-                foreach ($cart_products as $k => $v) {
-                    if ($type == 'S') {
-                        if (fn_exclude_from_shipping_calculate($cart['products'][$k])) {
-                            continue;
-                        }
-                    } elseif ($type == 'C') {
-                        if (isset($v['exclude_from_calculate'])) {
-                            continue;
-                        }
+            foreach ($cart_products as $k => $v) {
+                if ($type == 'S') {
+                    if (fn_exclude_from_shipping_calculate($cart['products'][$k])) {
+                        continue;
                     }
-                    if(in_array($promotion['condition_categories'], $v['category_ids'])){
-                        $amount += $v['amount'];
+                } elseif ($type == 'C') {
+                    if (isset($v['exclude_from_calculate'])) {
+                        continue;
                     }
                 }
+                if(in_array($promotion['condition_categories'], $v['category_ids'])){
+                    $amount += $v['amount'];
+                }
+            }
         }
     }
     return $amount;
 }
 
-function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_products)
-{
-$amount = fn_promotion_step_get_products_amount($bonus['promotion_id'], $cart, $cart_products, $type = 'S');
-$promotion =  fn_get_promotion_data($bonus['promotion_id']);
+function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_products) {
+    $promotion =  fn_get_promotion_data($bonus['promotion_id']);
     if ($bonus['bonus'] == 'promotion_step_free_products') {
+        $amount = fn_promotion_step_get_products_amount($bonus['promotion_id'], $cart, $cart_products, $type = 'S');
         foreach ($bonus['value'] as $p_data) {
 
             $product_data = array (
@@ -162,5 +161,51 @@ $promotion =  fn_get_promotion_data($bonus['promotion_id']);
         }
     }
 
+    if ($bonus['bonus'] == 'promotion_step_give_condition_products') {
+        $step = fn_find_promotion_condition($promotion['conditions'], 'promotion_step');
+
+        $condition_products = fn_find_promotion_condition($promotion['conditions'], 'products');
+        if ($condition_products) {
+            $condition_products = array_column($condition_products['value'], 'product_id');
+        } else {
+            // process category conditions here
+        }
+
+        foreach (array_column($cart['products'], 'amount', 'product_id') as $product_id => $amount) {
+            if (in_array($product_id, $condition_products)) {
+                $execution_count = floor($amount/$step['value']);
+                if ($execution_count) {
+                    $product_data = array (
+                        $product_id => array (
+                            'amount' => $bonus['value'] * $execution_count,
+                            'product_id' => $product_id,
+                            'extra' => array (
+                                'bonus' => 'apply_bonus',
+                                'amount_step' => $execution_count,
+                                'amount_bonus' => $bonus['value'],
+                                'exclude_from_calculate' => true,
+                                'bonus' => 'apply_bonus',
+                                'aoc' => empty($p_data['product_options']),
+                                'saved_options_key' => $bonus['promotion_id'] . '_' . $product_id,
+                            )
+                        ),
+                    );
+                    $ids = fn_add_product_to_cart($product_data, $cart, $auth);
+
+                    $new_products = array_diff(array_keys($cart['products']), $existing_products);
+                    if (!empty($new_products)) {
+                        $hash = array_pop($new_products);
+                    } else {
+                        $hash = key($ids);
+                    }
+
+                    $_cproduct = fn_get_cart_product_data($hash, $cart['products'][$hash], true, $cart, $auth, !empty($new_products) ? 0 : $p_data['amount']);
+                    if (!empty($_cproduct)) {
+                        $cart_products[$hash] = $_cproduct;
+                    }
+                }
+            }
+        }
+    }
     return true;
 }

@@ -75,11 +75,13 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
 
 function fn_find_promotion_condition($conditions_group, $needle) {
     foreach ($conditions_group['conditions'] as $i => $group_item) {
+        $res = false;
         if (isset($group_item['conditions'])) {
-            return fn_find_promotion_condition($group_item, $needle);
+            $res = fn_find_promotion_condition($group_item, $needle);
         } elseif ($group_item['condition'] == $needle) {
-            return $group_item;
+            $res = $group_item;
         }
+        if ($res) return $res;
     }
     return false;
 }
