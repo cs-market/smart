@@ -1750,4 +1750,16 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         return $array_order_xml;
     }
+
+    public function getCompanyIdByLinkType($link_type, $_group)
+    {
+        if ($link_type == 'name') {
+            $category_ids = $this->db->getColumn('SELECT category_id FROM ?:category_descriptions WHERE category = ?s', strval($_group -> {$this->cml['name']}));
+
+        } else {
+            $category_ids = $this->db->getColumn('SELECT category_id FROM ?:categories WHERE external_id LIKE ?l', '%'.strval($_group -> {$this->cml['id']}).'%');
+        }
+
+        return $category_ids;
+    }
 }
