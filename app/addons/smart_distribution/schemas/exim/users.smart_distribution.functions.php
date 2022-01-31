@@ -204,6 +204,10 @@ function fn_exim_rejoin_user_profiles_export(&$pattern)
         if (isset($id['user_id'])
         && !empty($id['user_id'])
     ) {
+        if (!isset($object['profile_id'])) {
+            $object['profile_id'] = db_get_field('SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i', $id['user_id']);
+            return;
+        }
         $profile_id = $object['profile_id'] ?? '';
 
         //  check profile by profile id and name
