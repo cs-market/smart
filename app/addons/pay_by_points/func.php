@@ -28,9 +28,10 @@ function fn_pay_by_points_pre_add_to_cart(&$product_data, &$cart, $auth, $update
                     : 0;
 
             list($product['pay_by_points'], $product['point_price']) = fn_check_product_pay_by_points($product);
+            $product['extra']['pay_by_points']['point_price'] = $product['point_price'];
         }
-        unset($product);
 
+        unset($product);
         fn_update_use_pay_by_points($cart, $product_ids);
     }
 }
@@ -335,12 +336,14 @@ function fn_get_use_pay_by_points(&$cart, $disallow_products = [])
 {
     $total_use_points = 0;
     if (!empty($cart['products']))
-    foreach ($cart['products'] as $product) {
+    foreach ($cart['products'] as &$product) {
         if (
             !in_array($product['product_id'], $disallow_products)
-            && isset($product['extra']['pay_by_points']['product_cart_point_price'])
-            && $product['extra']['pay_by_points']['product_cart_point_price']
+            // && isset($product['extra']['pay_by_points']['product_cart_point_price'])
+            // && $product['extra']['pay_by_points']['product_cart_point_price']
         ) {
+            $product['extra']['pay_by_points']['product_cart_point_price'] = $product['extra']['pay_by_points']['point_price'] * $product['amount'];
+
             $total_use_points += $product['extra']['pay_by_points']['product_cart_point_price'];
         }
     }
