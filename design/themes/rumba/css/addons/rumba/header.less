@@ -13,14 +13,38 @@ Header
 }
 
 .tygh-top-panel {
-    padding: 8px 0 0;
-    .top-grid > div {
+    // padding: 8px 0 0;
+    // .top-grid > div {
+    //     display: flex;
+    //     align-items: center;
+    //     flex-wrap: wrap;
+    // }
+}
+
+.flex-grid {
+    @margin: 6px;
+
+    &[class*="span"] {
         display: flex;
         align-items: center;
+        width: calc(~"100% + "2*@margin);
         flex-wrap: wrap;
+        margin: 0 -@margin !important;
+    }
+    > div {
+        flex: 0 1 auto;
+        margin: @margin;
+        &:first-child {
+            flex-basis: 210px;
+        }
+    }
+    .ty-flex-right {
+        margin-left: auto;
     }
 }
+
 .top-logo-grid {
+    .flex-grid();
     img {
         width: auto;
         max-height: 60px;
@@ -30,21 +54,22 @@ Header
 }
 
 .ty-top-menu {
-    @margin: 6px;
-    padding: 6px 0;
-    .header-grid & {
-        display: flex;
-        align-items: center;
-        width: calc(~"100% + "2*@margin);
-        flex-wrap: wrap;
-        &.span16 {
-            margin: 0 -@margin;
-        }
-    }
-    > div {
-        flex: 0;
-        margin: @margin;
-    }
+    .flex-grid();
+    // @margin: 6px;
+    // padding: 6px 0;
+    // .header-grid & {
+    //     display: flex;
+    //     align-items: center;
+    //     width: calc(~"100% + "2*@margin);
+    //     flex-wrap: wrap;
+    //     &.span16 {
+    //         margin: 0 -@margin;
+    //     }
+    // }
+    // > div {
+    //     flex: 0;
+    //     margin: @margin;
+    // }
     & &__search {
         flex: 1;
         flex-basis: 175px;
