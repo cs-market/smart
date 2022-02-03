@@ -1,0 +1,51 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cs-cart-latest\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Crowdin-Project: cs-cart-latest\n"
+"X-Crowdin-Language: ru\n"
+"X-Crowdin-File: /release-4.11.3/addons/infinite_pagination.po\n"
+"PO-Revision-Date: 2020-02-04 07:14\n"
+
+msgctxt "Addons::name::infinite_pagination"
+msgid "infinite_pagination"
+msgstr "Бесконечная Паджинация"
+
+msgctxt "Addons::description::infinite_pagination"
+msgid "infinite_pagination__description"
+msgstr "Автоматическая подгрузка страниц"
+
+msgctxt "SettingsSections::infinite_pagination::general"
+msgid "General"
+msgstr "Общие"
+
+msgctxt "SettingsOptions::infinite_pagination::use_more"
+msgid "use_more"
+msgstr "Ограничение на подгрузку страниц"
+
+msgctxt "SettingsOptions::infinite_pagination::use_prev"
+msgid "use_prev"
+msgstr "Разрешить подгрузку верхних страниц"
+
+msgctxt "SettingsOptions::infinite_pagination::more_pages"
+msgid "more_pages"
+msgstr "Количество страниц"
+
+msgctxt "SettingsOptions::infinite_pagination::show_page"
+msgid "show_page"
+msgstr "Отображать блок с номером страницы"
+
+msgctxt "Languages::infinite_pagination__load_automatically"
+msgid "load_automatically"
+msgstr "Подождите, идет загрузка."
+
+msgctxt "Languages::infinite_pagination__more"
+msgid "more"
+msgstr "Ещё"
+
+msgctxt "Languages::infinite_pagination__loaded"
+msgid "loaded"
+msgstr "Вся информация загружена"

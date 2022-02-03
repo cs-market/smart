@@ -65,7 +65,7 @@
                                         </div>   
                                         <div class="ty-grid-list__item-container"> 
                                             {assign var="sku" value="sku_$obj_id"}
-                                            {if $smarty.capture.$sku}
+                                            {if $smarty.capture.$sku|trim}
                                                 <div class="grid-list__sku">
                                                     {$smarty.capture.$sku nofilter}
                                                 </div>

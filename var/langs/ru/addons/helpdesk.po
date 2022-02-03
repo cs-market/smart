@@ -24,10 +24,6 @@ msgctxt "SettingsOptions::helpdesk::service_words"
 msgid "Service words"
 msgstr "Служебные слова"
 
-msgctxt "SettingsOptions::helpdesk::default_mailbox_id"
-msgid "Default mailbox ID"
-msgstr "Почтовый ящик по умолчанию"
-
 msgctxt "SettingsOptions::helpdesk::create_users_for_anonymous"
 msgid "Create user for unauthorized appeal"
 msgstr "Создавать пользователя для неавторизированного обращения"
