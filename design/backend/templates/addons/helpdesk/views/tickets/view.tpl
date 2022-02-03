@@ -41,12 +41,13 @@
 
         <div style="margin-right: 10px; margin-top: 10px;" class="open pull-right">
             <ul id="template_picker" class="dropdown-menu" style="position: static;">
-            {foreach from=$templates.Y item=template }
-                <li id="template_{$template.template_id}" data="{$template.template }"><a>{$template.name}</a></li>
-            {/foreach}
-            <li class="divider"></li>
-            {foreach from=$templates.N item=template }
-                <li id="template_{$template.template_id}" data="{$template.template }"><a>{$template.name}</a></li>
+            {foreach from=$templates item="template_section" name='templates'}
+                {foreach from=$template_section item="template" }
+                    <li id="template_{$template.template_id}" data-ca-template-value="{$template.template }" class="cm-helpdesk-message-template"><a>{$template.name}</a></li>
+                {/foreach}
+                {if !$smarty.foreach.templates.last}
+                    <li class="divider"></li>
+                {/if}
             {/foreach}
             </ul>
         </div>
@@ -54,7 +55,7 @@
         <script>
             $(document).ready(function () {
                 $('#template_picker li').click(function () {
-                    template = $( this ).attr('data');
+                    template = $( this ).data('caTemplateValue');
                     $("#helpdesk_message").ceEditor("val", $("#helpdesk_message").ceEditor("val") + template);
                 });
             });

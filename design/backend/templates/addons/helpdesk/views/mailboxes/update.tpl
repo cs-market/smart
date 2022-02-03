@@ -28,13 +28,22 @@
                 selected=$mailbox.company_id
                 zero_company_id_name_lang_var="none"
             }
-        {/if}
-        <div class="control-group">
-            <label for="elm_mailbox_department_{$id}" class="cm-required control-label">{__("department")}:</label>
-            <div class="controls">
-                <input id="elm_mailbox_department_{$id}" type="text" name="mailbox_data[department]" value="{$mailbox.department}">
+        {else}
+            <div class="control-group">
+                {$company_field_name = $company_field_name|default: __("owner_company")}
+                <label class="control-label" for="elm_mailbox_data_company_id_{$id}">{$company_field_name}</label>
+                <div class="controls">
+                    <input type="hidden" class="cm-no-failed-msg" name="mailbox_data[company_id]" id="elm_mailbox_data_company_id_{$id}" value="{$mailbox.company_id}">
+                    {include file="common/ajax_select_object.tpl"
+                        data_url="companies.get_companies_list?show_all=Y&default_label=none"
+                        text=$mailbox.company_id|fn_get_company_name:"none"
+                        result_elm="elm_mailbox_data_company_id_`$id`"
+                        id="elm_mailbox_data_company_id_`$id`_selector"
+                    }
+                </div>
             </div>
-        </div>
+        {/if}
+
         <div class="control-group">
             <label for="elm_mailbox_host_{$id}" class="cm-required control-label">{__("host")}:</label>
             <div class="controls">

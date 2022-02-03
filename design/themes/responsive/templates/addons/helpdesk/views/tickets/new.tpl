@@ -16,7 +16,7 @@
                 {if $mailboxes|count > 1}
                     <div class="ty-control-group">
                         <label class="ty-control-group__title cm-required" for="new_ticket_name">{__("name")}</label>
-                        <select class="span5" name="ticket_data[mailbox_id]" id="mailbox_id">
+                        <select class="ty-input-text-medium" name="ticket_data[mailbox_id]" id="mailbox_id">
                             {foreach from=$mailboxes item='mailbox'}
                                 <option value="{$mailbox.mailbox_id}" {if $mailbox.mailbox_id == $ticket.mailbox_id} selected="selected"{/if}>{$mailbox.mailbox_name}</option>
                             {/foreach}
@@ -32,7 +32,7 @@
                 <input id="new_ticket_subject" class="ty-input-text" type="text" name="ticket_data[subject]" value="{$ticket_data.subject}" size="50">
             </div>
             {include file="addons/helpdesk/views/tickets/components/new_message.tpl"}
-            {include file="common/image_verification.tpl" option="form_builder"}
+            {include file="common/image_verification.tpl" option="helpdesk"}
 
             <div class="buttons-container">
                 {include file="buttons/button.tpl" but_role="submit" but_text=__("submit") but_name="dispatch[tickets.add]"}

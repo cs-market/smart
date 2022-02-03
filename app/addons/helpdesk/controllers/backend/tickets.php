@@ -3,6 +3,7 @@
 use Tygh\Registry;
 use Tygh\Bootstrap;
 use Tygh\Storage;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -16,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $ticket_data = $_REQUEST['ticket_data'];
         $users = explode(',',$ticket_data['users']);
         $ticket_data['users'] = [];
-        if ($_REQUEST['divide_ticket'] == 'Y') {
+        if (YesNo::toBool($_REQUEST['divide_ticket'])) {
             foreach ($users as $ticket_data['users']) {
                 $ticket_ids[] = fn_update_ticket($ticket_data);
             }

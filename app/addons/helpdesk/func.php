@@ -9,14 +9,17 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_get_mailboxes($params = array()) {
     $condition = '';
+
     if (isset($params['mailbox_id'])) {
         $condition .= db_quote(" AND mailbox_id = ?i", $params['mailbox_id']);
     }
+
     if (Registry::get('runtime.company_id')) {
-        $condition .= fn_get_company_condition('company_id');
+        $params['company_id'] = Registry::get('runtime.company_id');
     }
+
     if (isset($params['company_id']) && !empty($params['company_id'])) {
-        $condition .= fn_get_company_condition('company_id', true, $params['company_id'], false, true);   
+        $condition .= fn_get_company_condition('?:helpdesk_mailboxes.company_id', true, $params['company_id'], false, true);   
     }
     if (SiteArea::isStorefront(AREA)) {
         $condition .= " AND status = 'A'";
@@ -459,13 +462,16 @@ function fn_helpdesk_get_mail() {
                         $ticket_id = fn_update_ticket($ticket_data, 0);
                     }
 
-                    $message['ticket_id'] = $ticket_id;
-                    $message['user_id'] = $user_id;
-                    $message['message'] = (!empty($mail['html'])) ? fn_normalize_html_content($mail['html']) : $mail['plain'];
+                    $message = [
+                        'ticket_id' => $ticket_id,
+                        'user_id' => $user_id,
+                        'message' => (!empty($mail['html'])) ? fn_normalize_html_content($mail['html']) : $mail['plain'],
+                        'timestamp' => $mail['timestamp'],
+                        'attachment' => $mail['attach'],
+                        'status' => 'N',
+                    ];
+
                     $message['message'] = mb_convert_encoding($message['message'], 'UTF-8', $mail['charset']);
-                    $message['timestamp'] = $mail['timestamp'];
-                    $message['attachment'] = $mail['attach'];
-                    $message['status'] = 'N';
 
                     if (!empty($message['message'])) fn_update_message($message);
                 }

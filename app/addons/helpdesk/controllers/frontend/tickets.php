@@ -3,6 +3,7 @@
 use Tygh\Registry;
 use Tygh\Bootstrap;
 use Tygh\Storage;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -17,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($auth['user_id'])) {
             $user_id = $auth['user_id'];
         } elseif (!($user_id = db_get_field('SELECT user_id FROM ?:users WHERE email = ?s', $ticket_data['email']))) {
-            if (Registry::get('addons.helpdesk.create_users_for_anonymous') == 'Y') {
+            if (YesNo::toBool(Registry::get('addons.helpdesk.create_users_for_anonymous'))) {
                 list($user_id) = fn_update_user(0, ['email' => $ticket_data['email'], 'name' => $ticket_data['email']], $auth, 'N', true);
             } else {
                 // TODO prevent it in GET!!
