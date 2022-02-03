@@ -68,8 +68,17 @@ select {
     padding: 8px 10px;
     // background-color: #fff;
     border: 1px solid @grey;
-    &:hover {
+    &:hover, &.selected {
         background-color: @grey-bg;
+    }
+}
+
+.ty-tile-buttons(@gap: 10px) {
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: @gap;
+    > * {
+        .ty-tile-button();
     }
 }
 
@@ -324,12 +333,11 @@ select {
     }
 }
 .ty-text-links {
-    &__item {
-        .ty-tile-button();
-        position: initial;
+    &__show_inline {
+        .ty-tile-buttons();
     }
     &__show_inline > &__item {
-        display: inline-block;
+        margin: initial;
     }
 }
 // .ty-rumba-icon-mobile-app {

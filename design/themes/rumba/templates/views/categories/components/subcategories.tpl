@@ -1,7 +1,7 @@
 {if $subcategories}
     {math equation="ceil(n/c)" assign="rows" n=$subcategories|count c=$columns|default:"2"}
     {split data=$subcategories size=$rows assign="splitted_subcategories"}
-    <ul class="subcategories clearfix">
+    <ul class="ty-subcategories clearfix">
         {hook name="categories:view_subcategories"}
         {foreach from=$splitted_subcategories item="ssubcateg"}
             {foreach from=$ssubcateg item=category name="ssubcateg"}

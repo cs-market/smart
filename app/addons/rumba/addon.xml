@@ -19,12 +19,12 @@
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `app_store` VARCHAR(255) NOT NULL DEFAULT '';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `link_app_store`;</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `app_store`;</item>
 
         <item>ALTER TABLE `?:companies` ADD `play_market` VARCHAR(255) NOT NULL DEFAULT '';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `link_play_market`;</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `app_store`;</item>
 
         <item>ALTER TABLE `?:companies` ADD `app_gallery` VARCHAR(255) NOT NULL DEFAULT '';</item>
-        <item for="uninstall">ALTER TABLE `?:companies` DROP `link_app_gallery`;</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `app_store`;</item>
     </queries>
 </addon>
