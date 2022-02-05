@@ -1,0 +1,13 @@
+{"title":"Rumba","description":"Rumba","parent_theme":"responsive","theme":"media\/images\/cart_73nq-3y.png","favicon":"media\/images\/favicon_yam6-ot.ico","mail":"media\/images\/invoice_logo_cr7y-93.png",
+    "settings_overrides": {
+		"Appearance": {
+			"default_product_details_view": "default_template",
+			"thumbnails_gallery": false,
+			"display_track_orders": false,
+			"enable_quick_view": false
+		},
+		"Thumbnails": {
+			"product_details_thumbnail_height": "565",
+			"product_details_thumbnail_width": "565"
+		}
+	}}
