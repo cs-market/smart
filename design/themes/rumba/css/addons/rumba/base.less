@@ -66,10 +66,12 @@ select {
     .transition(@transition);
     white-space: nowrap;
     padding: 8px 10px;
-    // background-color: #fff;
+    background-color: lighten(@grey, 5%);
     border: 1px solid @grey;
     &:hover, &.selected {
         background-color: @grey-bg;
+        border-color: lighten(@base, 10%);
+        .box-shadow(0px 0px 10px -2px lighten(@base, 10%));
     }
 }
 
