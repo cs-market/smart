@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>promotion_motivation</id>
+    <name>Smart distribution: promotion motivation</name>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <status>active</status>
+    <has_icon>Y</has_icon>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <language_variables>
+        <item lang="ru" id="motivation_subtotal_gt">Закажите еще на [diff] и получите подарок [gift]</item>
+        <item lang="ru" id="motivation_subtotal_gte">Закажите еще на [diff] и получите подарок [gift]</item>
+        <item lang="ru" id="move_to_catalog">Перейти в Каталог</item>
+    </language_variables>
+</addon>
