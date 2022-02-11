@@ -14,8 +14,20 @@ Homepage
     }
 }
 .ty-banner {
+    @padding: 6px;
     &__image-wrapper {
         text-align: left;
         margin: initial;
+    }
+    &__scroller-grid {    
+        margin: 0 -@padding;
+        width: calc(~"100% + "2*@padding);
+    }
+    &__scroller-grid &__image {
+        .border-radius(@border-radius);
+        overflow: hidden;
+    }
+    &__scroller-grid &__image-item {
+        padding: 0 @padding;
     }
 }

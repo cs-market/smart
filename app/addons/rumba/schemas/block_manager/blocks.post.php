@@ -44,4 +44,14 @@ $schema['mobile_app_links'] = [
 
 $schema['vendor_logo']['content']['vendor_info']['function'] = ['fn_blocks_rumba_get_vendor_info'];
 
+$schema['banners']['templates']['addons/banners/blocks/carousel.tpl']['settings']['scroll_per_page'] = [
+    'type' => 'checkbox',
+    'default_value' => 'N'
+];
+
+$schema['banners']['templates']['addons/banners/blocks/carousel.tpl']['settings']['item_quantity'] = [
+    'type' => 'input',
+    'default_value' => 1
+];
+
 return $schema;
