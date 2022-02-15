@@ -277,7 +277,7 @@ return [
             'user_login' => '372',
             'password' => '371',
             's_phone' => '373',
-            's_address' => '146',
+            's_address' => '459',
             's_client_code' => '9999',
             'b_client_code' => '9999',
             'b_firstname' => '374',
