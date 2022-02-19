@@ -248,7 +248,7 @@ function fn_pay_by_points_get_order_info(&$order, $additional_data)
             $total_bonus += $product['extra']['pay_by_points']['product_cart_point_price'];
         }
     }
-    $order['points_info']['in_use']['points'] = $total_bonus;
+    if ($total_bonus) $order['points_info']['in_use']['points'] = $total_bonus;
     $order['total_bonus'] = $total_bonus;
 }
 

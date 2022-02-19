@@ -943,6 +943,9 @@ function fn_smart_distribution_get_products_before_select(&$params, $join, $cond
             }
         }
     }
+    if (Registry::get('runtime.mode') == 'get_products_list' && !isset($params['status'])) {
+        $params['status'] = ['A', 'H'];
+    }
 }
 
 function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fields, $group_by, $sortings, $lang_code) {
