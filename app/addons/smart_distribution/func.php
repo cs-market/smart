@@ -944,7 +944,7 @@ function fn_smart_distribution_get_products_before_select(&$params, $join, $cond
         }
     }
     if (Registry::get('runtime.mode') == 'get_products_list' && !isset($params['status'])) {
-        $params['status'] = ['A', 'H'];
+        $params['status'] = ['A'];
     }
 }
 
