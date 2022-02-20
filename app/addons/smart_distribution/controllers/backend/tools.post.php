@@ -1067,7 +1067,12 @@ fn_print_r($fantoms);
         }
     }
 } elseif ($mode == 'merge_variants') {
-    $all_features = db_get_fields("SELECT feature_id FROM ?:product_features;");
+    $condition = "";
+    if ($action) {
+        $condition .= db_quote('AND company_id = ?i', $action);
+    }
+    $all_features = db_get_fields("SELECT feature_id FROM ?:product_features WHERE 1 $condition");
+
     $merge = $tmp = array();
 
     foreach ($all_features as $feature_id) {
