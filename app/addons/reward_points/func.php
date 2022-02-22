@@ -471,10 +471,10 @@ function fn_reward_points_change_order_status(&$status_to, &$status_from, &$orde
 
     $points_info = (isset($order_info['points_info'])) ? $order_info['points_info'] : array();
     if (!empty($points_info)) {
-        if (!empty($order_info['parent_order_id'])) {
-            $parent_order_info = fn_get_order_info($order_info['parent_order_id']);
-            $parent_order_points_info = isset($parent_order_info['points_info']) ? $parent_order_info['points_info'] : [];
-        }
+        // if (!empty($order_info['parent_order_id'])) {
+        //     $parent_order_info = fn_get_order_info($order_info['parent_order_id']);
+        //     $parent_order_points_info = isset($parent_order_info['points_info']) ? $parent_order_info['points_info'] : [];
+        // }
         $reason = array(
             'order_id' => $order_info['order_id'],
             'to' => $status_to,
