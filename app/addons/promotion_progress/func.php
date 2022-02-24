@@ -26,6 +26,9 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
     if ($auth['user_id']) {
         $join = '';
         if ($promo['condition'] == 'progress_total_paid') {
+            if ($value = fn_get_user_additional_data('S', $auth['user_id'])) {
+                return $value;
+            }
             $field = 'sum(o.total)';
         }
         if ($promo['condition'] == 'progress_order_amount') {
