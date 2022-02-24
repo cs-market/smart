@@ -10,9 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $res = true;
         foreach ($delivery_date as $company_id => $date) {
             $choosed_ts = fn_parse_date($date);
-
-            $c_data = fn_get_company_data($company_id);
-            $compare_ts = fn_ts_this_day(fn_calendar_get_nearest_delivery_day($c_data, true));
+            $nearest_delivery = reset($cart['shipping'])['service_params']['nearest_delivery_day'];
+            $ts = ($nearest_delivery) ? strtotime("+$nearest_delivery days") : time();
+            $compare_ts = fn_ts_this_day($ts);
 
             if ($choosed_ts < $compare_ts) {
                 $res = false;

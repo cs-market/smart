@@ -39,17 +39,17 @@ function fn_calendar_delivery_uninstall()
 }
 
 function fn_calendar_delivery_calculate_cart_taxes_pre(&$cart, $cart_products, $product_groups, $calculate_taxes, $auth) {
-    if (!empty($cart['chosen_shipping']) && (!isset($cart['delivery_date']) || empty($cart['delivery_date']))) {
-        $companies = fn_array_column($cart_products, 'company_id');
-        foreach ($companies as $company_id) {
-            $ts = fn_calendar_get_nearest_delivery_day(fn_get_company_data($company_id), true);
-            if (Registry::get('settings.Appearance.calendar_date_format') == "month_first") {
-                $cart['delivery_date'][$company_id] = date('m/d/Y', $ts);
-            } else {
-                $cart['delivery_date'][$company_id] = date('d/m/Y', $ts);
-            }
-        }
-    }
+    // if (!empty($cart['chosen_shipping']) && (!isset($cart['delivery_date']) || empty($cart['delivery_date']))) {
+    //     $companies = fn_array_column($cart_products, 'company_id');
+    //     foreach ($companies as $company_id) {
+    //         $ts = fn_calendar_get_nearest_delivery_day(fn_get_company_data($company_id), true);
+    //         if (Registry::get('settings.Appearance.calendar_date_format') == "month_first") {
+    //             $cart['delivery_date'][$company_id] = date('m/d/Y', $ts);
+    //         } else {
+    //             $cart['delivery_date'][$company_id] = date('d/m/Y', $ts);
+    //         }
+    //     }
+    // }
 }
 
 function fn_calendar_delivery_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
@@ -127,22 +127,13 @@ function fn_validate_tomorrow_rule($company_data) {
     return $res;
 }
 
-function fn_calendar_get_nearest_delivery_day($company_data, $get_ts = false) {
-    $res = false;
-
-    if (is_numeric($company_data)) {
-        $company_data = fn_get_company_data($company_data);
-    }
-    $nearest_delivery = $company_data['nearest_delivery'];
-    if (!empty($company_data['working_time_till']) && strtotime(date("G:i")) >= strtotime($company_data['working_time_till'])) {
+function fn_calendar_get_nearest_delivery_day($shipping_params, $get_ts = false) {
+    $nearest_delivery = $shipping_params['nearest_delivery'] ?? 0;
+    if (!empty($shipping_params['working_time_till']) && strtotime(date("G:i")) >= strtotime($shipping_params['working_time_till'])) {
         $nearest_delivery += 1;
     }
-    if ($get_ts) {
-        $ts = ($nearest_delivery) ? strtotime("+$nearest_delivery days") : time();
-        return $ts;
-    } else {
-        return $nearest_delivery;
-    }
+
+    return $nearest_delivery;
 }
 
 if (!is_callable('fn_ts_this_day')) {
@@ -226,57 +217,43 @@ function fn_calendar_delivery_get_user_info($user_id, $get_profile, $profile_id,
     $user_data['delivery_date'] = fn_delivery_date_from_line($user_data['delivery_date']);
 }
 
-function fn_calendar_delivery_shippings_get_shippings_list_post($group, $lang, $area, &$shippings_info) {
-    if (isset(Tygh::$app['session']['auth']['user_id']) && !empty(Tygh::$app['session']['auth']['user_id'])) {
-        $customer_calendar_shipping_ids = [];
-        foreach ($shippings_info as $shipping_id => $shipping) {
-            if (isset($shipping['service_params']['limit_weekday']) && $shipping['service_params']['limit_weekday'] == 'C') {
-                $customer_calendar_shipping_ids[] = $shipping_id;
+function fn_calendar_delivery_calculate_cart_content_after_shipping_calculation($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions,
+$lang_code, $area, $cart_products, &$product_groups) {
+    foreach($product_groups as $group_id => &$group) {
+        if (isset(Tygh::$app['session']['auth']['user_id']) && !empty(Tygh::$app['session']['auth']['user_id'])) {
+            $calendar_shippings = array_filter($group['shippings'], function($v) {return (isset($v['service_code']) && $v['service_code'] == 'calendar');});
+            if (!empty($calendar_shippings)) {
+                $user_limited_calendar_shippings = array_filter($calendar_shippings, function($v) {return (isset($v['service_params']['limit_weekday']) && $v['service_params']['limit_weekday'] == 'C');});
+
+                $delivery_dates = [];
+                if (!empty($user_limited_calendar_shippings)) {
+                    $delivery_dates = fn_get_customer_delivery_dates(Tygh::$app['session']['auth']['user_id']);
+                    $delivery_dates = fn_delivery_date_from_line($delivery_dates);
+                }
+
+                $usergroup_working_time_till = db_get_row('SELECT working_time_till FROM ?:usergroups WHERE usergroup_id IN (?a) AND working_time_till != ""', Tygh::$app['session']['auth']['usergroup_ids']);
+
+                //TODO TEMP!! удалить company_settings в середине 2022, надо бы настройки календаря переносить из вендора в шипинг
+                $company_settings = db_get_row('SELECT nearest_delivery, working_time_till, saturday_shipping, sunday_shipping, monday_rule, period_start, period_finish, period_step FROM ?:companies WHERE company_id = ?i', $group['company_id']);
+
+                foreach ($group['shippings'] as $shipping_id => &$shipping) {
+                    if (isset($shipping['module']) && $shipping['module'] == 'calendar_delivery') {
+                        if (isset($shipping['service_params']['limit_weekday']) && $shipping['service_params']['limit_weekday'] == 'C') {
+                            $shipping['service_params']['customer_shipping_calendar'] = $delivery_dates;
+                        }
+                        $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $usergroup_working_time_till);
+
+                        $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
+                    }
+                }
             }
         }
-
-        if (!empty($customer_calendar_shipping_ids)) {
-            $delivery_dates = fn_get_customer_delivery_dates(Tygh::$app['session']['auth']['user_id']);
-            $delivery_dates = fn_delivery_date_from_line($delivery_dates);
-
-            foreach ($customer_calendar_shipping_ids as $shipping_id) {
-                $shippings_info[$shipping_id]['service_params']['customer_shipping_calendar'] = $delivery_dates;
-            }
-        }
+        unset($group, $shipping);
     }
 }
 
-/// TEMP DEPRECATED! Удалить в середине 2020 года
-function fn_parse_date_check_year($timestamp, $end_time = false)
-{
-    if (!empty($timestamp)) {
-        if (is_numeric($timestamp)) {
-            return $timestamp;
-        }
-
-        $ts = explode('/', $timestamp);
-        $ts = array_map('intval', $ts);
-        if (empty($ts[2])) {
-            $ts[2] = date('Y');
-        }
-        if (count($ts) == 3) {
-            list($h, $m, $s) = $end_time ? array(23, 59, 59) : array(0, 0, 0);
-            if (Registry::get('settings.Appearance.calendar_date_format') == 'month_first' || $month_first) {
-                $timestamp = mktime($h, $m, $s, $ts[0], $ts[1], $ts[2]);
-            } else {
-                $timestamp = mktime($h, $m, $s, $ts[1], $ts[0], $ts[2]);
-            }
-            if (date('Y', $timestamp) != '2019') {
-                $tmp = $timestamp;
-                $timestamp = fn_parse_date($ts[1].'/'.$ts[0].'/'.$ts[2], $end_time);
-
-            }
-        } else {
-            $timestamp = TIME;
-        }
-    }
-
-    return !empty($timestamp) ? $timestamp : TIME;
+function fn_calendar_delivery_get_usergroups($params, $lang_code, &$field_list, $join, $condition, $group_by, $order_by, $limit) {
+    $field_list .= ', a.working_time_till';
 }
 
 function fn_get_calendar_delivery_period($period_start, $period_finish, $period_step)
