@@ -124,3 +124,13 @@ function fn_get_progress_promotions($cart) {
 
     return $progress_promotions;
 }
+
+function fn_promotion_progress_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
+    if (AREA == 'A') {
+        $user_data['total_sales'] = fn_get_user_additional_data('S', $user_id);
+    }
+}
+
+function fn_promotion_progress_update_user_profile_pre($user_id, $user_data, $action) {
+    if (isset($user_data['total_sales'])) fn_save_user_additional_data('S', $user_data['total_sales'], $user_id);
+}

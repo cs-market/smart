@@ -10,6 +10,10 @@
     <has_icon>Y</has_icon>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+
+    <language_variables>
+        <item lang="ru" id="total_sales">Итого продаж в периоде</item>
+    </language_variables>
     <settings>
         <sections>
             <section id="general">
