@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <addon scheme="3.0">
     <id>helpdesk</id>
-    <version>2.1.3</version>
+    <version>2.2.1</version>
     <priority>423190</priority>
     <position>0</position>
     <status>active</status>
@@ -27,6 +27,16 @@
                     </item>
                     <item id="create_users_for_anonymous">
                         <type>checkbox</type>
+                    </item>
+                    <item id="ticketing_system">
+                        <type>checkbox</type>
+                    </item>
+                    <item id="appearance">
+                        <type>selectbox</type>
+                        <variants>
+                            <item id="panel"></item>
+                            <item id="cloud"></item>
+                        </variants>
                     </item>
                 </items>
             </section>

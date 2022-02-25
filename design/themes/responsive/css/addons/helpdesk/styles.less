@@ -68,3 +68,67 @@
     background-color: red;
     margin: 3px;
 }
+
+.ty-discussion-post {
+    @border-radius: 8px;
+    @bg_color_right: #e6f5e2;
+    @bg_color_left: #f2f3f5;
+    background-color: @bg_color_left;
+    position: relative;
+    margin: 10px 0 15px 0;
+    padding: 15px;
+    border: 1px solid #edeff1;
+    .border-radius(@border-radius);
+    .ty-caret-inner {
+        border-right-color: @bg_color_left;
+    }
+    &__author {
+        display: block;
+        padding-bottom: 6px;
+        font-weight: bold;
+    }
+    &__content {
+        .clearfix();
+        margin: 0;
+        max-width: 90%;
+    }
+    &__left .ty-caret {
+        transform: scaleX(-1);
+    }
+    &__right {
+        margin-left: auto;
+        .ty-caret {
+            right: 15px;
+            left: auto;
+        }
+        .ty-caret-inner {
+            border-right-color: @bg_color_right;
+        }
+        .ty-discussion-post__author {
+            text-align: right;
+        }
+    }
+    &__right & {
+        background-color: @bg_color_right;
+    }
+    &__right + &__right &__author, &__left + &__left &__author {
+        display: none;
+    }
+    &__date {
+        margin-top: 1px;
+        color: #adadad;
+        font-size: 12px;
+        position: absolute;
+        right: 3px;
+        bottom: 3px;
+        float: right;
+    }
+    &__message {
+        line-height: 1.75;
+        word-wrap: break-word;
+    }
+}
+
+.ty-caret .ty-caret-outer {
+    border-right-color: #edeff1;
+}

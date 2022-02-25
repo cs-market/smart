@@ -4,6 +4,7 @@ use Tygh\Registry;
 use Tygh\Storage;
 use Tygh\Enum\SiteArea;
 use Tygh\Enum\UserTypes;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -229,18 +230,35 @@ function fn_update_ticket($data, $ticket_id = 0) {
 }
 
 function fn_get_ticket($params, $items_per_page = 10) {
-    if (empty($params['ticket_id'])) {
-        return array([], $params);
+    // if (empty($params['ticket_id'])) {
+    //     return array([], $params);
+    // }
+    $tickets_params = $params;
+    unset($tickets_params['page'], $tickets_params['items_per_page']);
+    list($tickets) = fn_get_tickets($tickets_params);
+
+    if (!isset($params['ticket_id']) && empty($tickets)) {
+        // need to create a new ticket for new user
+        $ticket_data = array(
+            'subject' => __('helpdesk'),
+            'mailbox_id' => reset(fn_get_mailboxes())['mailbox_id'],
+            'users' => [Tygh::$app['session']['auth']['user_id']]
+        );
+
+        $params['ticket_id'] = fn_update_ticket($ticket_data, 0);
+        list($tickets) = fn_get_tickets($params);
     }
 
-    list($ticket) = fn_get_tickets($params);
-    $ticket = array_shift($ticket);
-    if (!empty($ticket)) {
-        $ticket['users'] = fn_get_ticket_users(['ticket_id' => $ticket['ticket_id']]);
-
+    $ticket = reset($tickets);
+    if (!empty($tickets)) {
+        $ticket['users'] = fn_get_ticket_users(['ticket_id' => array_keys($tickets)]);
+        if (!YesNo::toBool(Registry::get('addons.helpdesk.ticketing_system'))) {
+            $ticket['subject'] = __('helpdesk');
+        }
         if (isset($params['get_messages'])) {
-            $params['ticket_id'] = $ticket['ticket_id'];
+            $params['ticket_id'] = array_keys($tickets);
             list($ticket['messages'], $params) = fn_get_messages($params, $items_per_page);
+
             if (SiteArea::isStorefront(AREA)) {
                 $messages = array_filter($ticket['messages'], function($v) {return $v['viewed'] == 'N';});
                 if (!empty($messages)) db_query('UPDATE ?:helpdesk_messages SET `viewed` = ?s WHERE message_id IN (?a)', 'Y', array_keys($messages));
@@ -264,7 +282,10 @@ function fn_get_messages($params, $items_per_page = 10) {
     $condition = '1';
 
     if (isset($params['ticket_id'])) {
-        $condition .= db_quote(' AND ticket_id = ?i', $params['ticket_id']);
+        if (!is_array($params['ticket_id'])) {
+            $params['ticket_id'] = [$params['ticket_id']];
+        }
+        $condition .= db_quote(' AND ticket_id IN (?a)', $params['ticket_id']);
     }
 
     if (isset($params['message_id'])) {
@@ -293,7 +314,10 @@ function fn_get_messages($params, $items_per_page = 10) {
         $limit = db_paginate($params['page'], $params['items_per_page']);
     }
 
-    $messages = db_get_hash_array("SELECT m.*, CONCAT(u.firstname, ' ', u.lastname) as user FROM ?:helpdesk_messages AS m LEFT JOIN ?:users AS u ON u.user_id = m.user_id  WHERE $condition GROUP BY message_id ORDER BY timestamp desc $limit ", 'message_id');
+    $sort = db_sort($params, ['timestamp' => 'timestamp'], 'timestamp', 'desc');
+
+
+    $messages = db_get_hash_array("SELECT m.*, CONCAT(u.firstname, ' ', u.lastname) as user FROM ?:helpdesk_messages AS m LEFT JOIN ?:users AS u ON u.user_id = m.user_id  WHERE $condition GROUP BY message_id ?p $limit ", 'message_id', $sort);
 
     foreach ($messages as $message_id => &$message) {
         if (!isset($message['status'])) {
@@ -321,7 +345,12 @@ function fn_get_ticket_users($params) {
     $users = array();
     if (isset($params['ticket_id']) && !empty($params['ticket_id'])) {    
         $join = 'LEFT JOIN ?:helpdesk_ticket_users AS tu ON u.user_id = tu.user_id';
-        $condition = db_quote('tu.ticket_id = ?i', $params['ticket_id']);
+
+        if (!empty($params['ticket_id']) && !is_array($params['ticket_id'])) {
+            $params['ticket_id'] = [$params['ticket_id']];
+        }
+
+        $condition = db_quote('tu.ticket_id IN (?a)', $params['ticket_id']);
         $fields = "u.email, u.user_id, u.firstname, u.lastname, CONCAT(u.firstname, ' ', u.lastname) AS username";
 
         if (!empty($params['user_type'])) {
@@ -504,6 +533,7 @@ function fn_helpdesk_send_mail() {
             $settings = $mailboxes[$message['mailbox_id']];
 
             $tid = '[' . $settings['ticket_prefix'] . '_TID:' . $message['ticket_id']. ']';
+            $message['subject'] = __('helpdesk') . ' ' . $settings['mailbox_name'];
 
             Tygh::$app['view']->assign('message', $message['message']);
             Tygh::$app['view']->assign('tid', $tid);

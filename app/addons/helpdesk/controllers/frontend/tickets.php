@@ -65,6 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 if ($mode == 'list') {
+    if (!YesNo::toBool(Registry::get('addons.helpdesk.ticketing_system'))) {
+        return array(CONTROLLER_STATUS_REDIRECT, "tickets.view");
+    }
     $params = $_REQUEST;
     unset($params['user_id']);
     list($tickets, $search) = fn_get_tickets($params);
@@ -73,22 +76,26 @@ if ($mode == 'list') {
     Tygh::$app['view']->assign('tickets', $tickets);
 } elseif ($mode == 'view') {
     $params = $_REQUEST;
-    if (fn_helpdesk_can_user_access_ticket($_REQUEST['ticket_id'], $auth)) {
-        $params['get_messages'] = true;
-        $params['hide_blockquote'] = true;
-        list($ticket, $params) = fn_get_ticket($params);
 
-        if (empty($ticket)) {
-            return array(CONTROLLER_STATUS_DENIED);
-        }
-        $ticket_data = fn_restore_post_data('ticket_data');
-        if (!empty($ticket_data)) {
-            Tygh::$app['view']->assign('ticket_data', $ticket_data);
-        }
+    // if (!empty($params['ticket_id']) && !fn_helpdesk_can_user_access_ticket($_REQUEST['ticket_id'], $auth)) {
+    //     return;
+    // }
 
-        Tygh::$app['view']->assign('search', $params);
-        Tygh::$app['view']->assign('ticket', $ticket);
+    $params['get_messages'] = true;
+    $params['hide_blockquote'] = true;
+    $params['sort_order'] = 'asc';
+    list($ticket, $params) = fn_get_ticket($params, 0);
+
+    if (empty($ticket)) {
+        return array(CONTROLLER_STATUS_DENIED);
     }
+    $ticket_data = fn_restore_post_data('ticket_data');
+    if (!empty($ticket_data)) {
+        Tygh::$app['view']->assign('ticket_data', $ticket_data);
+    }
+
+    Tygh::$app['view']->assign('search', $params);
+    Tygh::$app['view']->assign('ticket', $ticket);
 } elseif ($mode == 'get_file') {
     $params = $_REQUEST;
     if (fn_helpdesk_can_user_access_ticket(db_get_field('SELECT m.ticket_id FROM ?:helpdesk_messages AS m LEFT JOIN ?:helpdesk_message_files AS mf ON mf.message_id = m.message_id WHERE mf.file_id = ?i', $params['file_id']), $auth)) {

@@ -12,6 +12,7 @@ msgctxt "Addons::description::helpdesk"
 msgid "Adds communication system"
 msgstr "Adds communication system"
 
+
 msgctxt "SettingsSections::helpdesk::general"
 msgid "General"
 msgstr "General"
@@ -24,9 +25,29 @@ msgctxt "SettingsOptions::helpdesk::service_words"
 msgid "Service words"
 msgstr "Service words"
 
+msgctxt "SettingsOptions::helpdesk::storefront_mailbox_id"
+msgid "Storefront mailbox ID"
+msgstr "Storefront mailbox ID"
+
 msgctxt "SettingsOptions::helpdesk::create_users_for_anonymous"
 msgid "Create user for unauthorized appeal"
 msgstr "Create user for unauthorized appeal"
+
+msgctxt "SettingsOptions::helpdesk::ticketing_system"
+msgid "Ticketing system"
+msgstr "Ticketing system"
+
+msgctxt "SettingsOptions::helpdesk::appearance"
+msgid "Messages appearance"
+msgstr "Messages appearance"
+
+msgctxt "SettingsVariants::helpdesk::appearance::panel"
+msgid "Panel"
+msgstr "Panel"
+
+msgctxt "SettingsVariants::helpdesk::appearance::cloud"
+msgid "Cloud"
+msgstr "Cloud"
 
 msgctxt "Languages::helpdesk"
 msgid "Helpdesk"
@@ -40,13 +61,13 @@ msgctxt "Languages::tickets_menu_description"
 msgid "View all tickets"
 msgstr "View all tickets"
 
-msgctxt "Languages::new_tickets"
-msgid "New tickets"
-msgstr "New tickets"
+msgctxt "Languages::open_tickets"
+msgid "Open tickets"
+msgstr "Open tickets"
 
-msgctxt "Languages::new_tickets_menu_description"
-msgid "View only tickets with new messages"
-msgstr "View only tickets with new messages"
+msgctxt "Languages::open_tickets_menu_description"
+msgid "View only open tickets"
+msgstr "View only open tickets"
 
 msgctxt "Languages::waiting_tickets"
 msgid "Waiting tickets"
@@ -112,9 +133,9 @@ msgctxt "Languages::users_list"
 msgid "Users list"
 msgstr "Users list"
 
-msgctxt "Languages::new_messages"
-msgid "New messages"
-msgstr "New messages"
+msgctxt "Languages::open_messages"
+msgid "Open messages"
+msgstr "Open messages"
 
 msgctxt "Languages::last_message_date"
 msgid "Last message date"
@@ -131,14 +152,6 @@ msgstr "Delete to spam"
 msgctxt "Languages::mailbox_name"
 msgid "Mailbox name"
 msgstr "Mailbox name"
-
-msgctxt "Languages::department"
-msgid "Department"
-msgstr "Department"
-
-msgctxt "Languages::department"
-msgid "Department"
-msgstr "Department"
 
 msgctxt "Languages::ticket_prefix"
 msgid "Ticket prefix"
@@ -203,7 +216,3 @@ msgstr "User with this email not found"
 msgctxt "Languages::message_sent_successfully"
 msgid "Your message has been successfully sent"
 msgstr "Your message has been successfully sent"
-
-msgctxt "Languages::separate_ticket_by_users"
-msgid "Separate ticket for each user"
-msgstr "Separate ticket for each user"
