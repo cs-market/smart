@@ -244,7 +244,9 @@ function fn_get_ticket($params, $items_per_page = 10) {
             'mailbox_id' => reset(fn_get_mailboxes())['mailbox_id'],
             'users' => [Tygh::$app['session']['auth']['user_id']]
         );
-
+        if (empty($ticket_data['mailbox_id'])) {
+            return false;
+        }
         $params['ticket_id'] = fn_update_ticket($ticket_data, 0);
         list($tickets) = fn_get_tickets($params);
     }
