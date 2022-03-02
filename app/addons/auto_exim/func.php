@@ -167,6 +167,25 @@ function fn_auto_exim_find_files($cid) {
 function fn_auto_exim_run_import($imports, $company_id) {
     Registry::set('runtime.company_id', $company_id);
     foreach ($imports as $import) {
+        // make sure no another import processes are still active
+        $lock_file_path = $import['dirname'].$import['basename'] . '.lock';
+        if (is_file($lock_file_path) && filemtime($lock_file_path) < (TIME - 60 * 60)) {
+            @unlink($lock_file_path);
+        }
+
+        if (is_file($lock_file_path)) {
+            fn_echo($import['dirname'].$import['basename'] . " in process");
+            continue;
+        } else {
+            $h = fopen($lock_file_path, 'w');
+            if (!$h) {
+                fn_echo("Cannot lock import file");
+                continue;
+            }
+            fclose($h);
+        }
+        fn_echo($import['dirname'].$import['basename']);
+        fn_echo("<br>");
         if (isset($import['preset_id']) && !empty($import['preset_id'])) {
             $cond = fn_get_company_condition('company_id', true, '', false, true);
             $preset_id = db_get_field("SELECT preset_id FROM ?:import_presets WHERE preset_id = ?i $cond", $import['preset_id']);
@@ -281,6 +300,7 @@ function fn_auto_exim_run_import($imports, $company_id) {
             }
         }
         if ($res) fn_rm($import['dirname'].$import['basename']);
+        @unlink($lock_file_path);
     }
 }
 
