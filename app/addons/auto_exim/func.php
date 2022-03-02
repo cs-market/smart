@@ -184,8 +184,7 @@ function fn_auto_exim_run_import($imports, $company_id) {
             }
             fclose($h);
         }
-        fn_echo($import['dirname'].$import['basename']);
-        fn_echo("<br>");
+
         if (isset($import['preset_id']) && !empty($import['preset_id'])) {
             $cond = fn_get_company_condition('company_id', true, '', false, true);
             $preset_id = db_get_field("SELECT preset_id FROM ?:import_presets WHERE preset_id = ?i $cond", $import['preset_id']);
