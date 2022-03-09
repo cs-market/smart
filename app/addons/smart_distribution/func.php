@@ -261,6 +261,50 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
         }
         if ($params['user_orders'] == 'with') {
             $condition['user_orders'] = db_quote(" AND user_orders.user_id IS NOT NULL");
+            if ($params['orders_period_amount']) {
+                $subquery_cond = '';
+                list($params['orders_period_time_from'], $params['orders_period_time_to']) = fn_create_periods([
+                    'period' => $params['orders_period_period'],
+                    'time_from' => $params['orders_period_time_from'],
+                    'time_to' => $params['orders_period_time_to']
+                ]);
+                if ($params['orders_period_time_from']) {
+                    $subquery_cond .= db_quote(' AND ?:orders.timestamp >= ?i ', $params['orders_period_time_from']);
+                }
+                if ($params['orders_period_time_to']) {
+                    $subquery_cond .= db_quote(' AND ?:orders.timestamp <= ?i ', $params['orders_period_time_to']);
+                }
+                
+                $operator = ($params['orders_period_operator'] == 'gt') ? '>' : '<';
+
+                $subquery = db_quote("
+                    SELECT DISTINCT
+                        (?:users.user_id)
+                    FROM
+                        ?:users
+                    LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id AND ?:orders.is_parent_order != 'Y'
+                    
+                    WHERE
+                        1 ?p
+                    GROUP BY
+                        ?:users.user_id
+                    HAVING count(?:orders.order_id) ?p ?i
+                ", $subquery_cond, $operator, $params['orders_period_amount']);
+                $condition['orders_amount'] = db_quote(" AND ?:users.user_id IN ($subquery)");
+            }
+        }
+    }
+    if (YesNo::toBool($params['registration_period'])) {
+        list($registration_period_time_from, $registration_period_time_to) = fn_create_periods([
+            'period' => $params['registration_period_period'],
+            'time_from' => $params['registration_period_time_from'],
+            'time_to' => $params['registration_period_time_to']
+        ]);
+        if ($registration_period_time_from) {
+            $condition['registration_period_time_from'] = db_quote(' AND ?:users.timestamp >= ?i ', $registration_period_time_from);
+        }
+        if ($registration_period_time_to) {
+            $condition['registration_period_time_to'] = db_quote(' AND ?:users.timestamp <= ?i ', $registration_period_time_to);
         }
     }
 

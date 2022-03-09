@@ -80,6 +80,21 @@
             </div>*}
 
             {hook name="profiles:search_form"}{/hook}
+            <div class="control-group">
+                <label class="control-label" for="elm_registration_period">{__("registration_date")}</label>
+                <div class="controls">
+                    <input type="hidden" name="registration_period" value="N">
+                    <input type="checkbox" id="elm_registration_period" name="registration_period" value="Y" {if $search.registration_period == 'Y'}checked="checked"{/if} onclick="fn_change_period_avalability(!this.checked, 'registration_period_');">
+                </div>
+            </div>
+            <div class="control-group">
+                {include
+                    file="common/period_selector.tpl"
+                    period=$search.registration_period
+                    prefix="registration_period_"
+                    display="form"
+                }
+            </div>
             <div class="control-group hidden">
                 <label class="control-label" for="elm_managers">{__("user_type")}</label>
                 <div class="controls">
@@ -105,6 +120,17 @@
         </div>
 
         <div class="control-group">
+            <label class="control-label" for="elm_orders_period_amount">{__("promotion_cond_progress_order_amount")}</label>
+            <div class="controls">
+                <select name="orders_period_operator" id="orders_period_operator" class="input-mini">
+                     <option value="gt">{__('promotion_op_gt')}</option>
+                     <option value="lt">{__('promotion_op_lt')}</option>
+                </select>
+                <input type="text" name="orders_period_amount" id="elm_orders_period_amount" value="{$search.orders_period_amount|default:"0"}" class="input-mini" />
+            </div>
+        </div>
+
+        <div class="control-group">
             {include
                 file="common/period_selector.tpl"
                 period=$search.orders_period
@@ -117,12 +143,17 @@
             $(document).ready(function() {
                 flag = !$('#elm_user_orders').val();
                 fn_change_period_avalability(flag, 'orders_period_');
+
+                flag = !$('#elm_registration_period').prop('checked');
+                fn_change_period_avalability(flag, 'registration_period_');
             });
 
             function fn_change_period_avalability(flag, prefix) {
                 $('[name="' + prefix + 'time_from"]').prop('disabled', flag);
                 $('[name="' + prefix + 'time_to"]').prop('disabled', flag);
                 $('[name="' + prefix + 'period"]').prop('disabled', flag);
+                $('[name="' + prefix + 'amount"]').prop('disabled', flag);
+                $('[name="' + prefix + 'operator"]').prop('disabled', flag);
             }
         </script>
 
