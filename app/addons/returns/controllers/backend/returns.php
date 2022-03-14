@@ -1,5 +1,7 @@
 <?php
 
+use Tygh\Registry;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -20,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'manage') {
     $params = $_REQUEST;
-    list($returns, $search) = fn_get_returns($params);
+    list($returns, $search) = fn_get_returns($params, Registry::get('settings.Appearance.admin_elements_per_page'));
 
     Tygh::$app['view']->assign('search', $search);
     Tygh::$app['view']->assign('returns', $returns);

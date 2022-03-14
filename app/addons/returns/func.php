@@ -18,7 +18,7 @@ function fn_create_return($products_data, $auth) {
     if (!empty($products_data)) {
         $return_data = [
             'user_id' => $auth['user_id'],
-            'timestamp' => time(),
+            'timestamp' => strtotime("+1 day"),
             'company_id' => $auth['company_id'],
             'comment' => '',
         ];
@@ -60,11 +60,11 @@ function fn_get_returns($params, $items_per_page = 0) {
     }
 
     if (!empty($params['items_per_page'])) {
-        $params['total_items'] = db_get_field("SELECT COUNT(DISTINCT(?:pages.page_id)) FROM ?:returns WHERE ?p", $condition);
+        $params['total_items'] = db_get_field("SELECT COUNT(DISTINCT(?:returns.return_id)) FROM ?:returns WHERE ?p", $condition);
         $limit = db_paginate($params['page'], $params['items_per_page'], $params['total_items']);
     }
 
-    $returns = db_get_array("SELECT * FROM ?:returns WHERE ?p", $condition);
+    $returns = db_get_array("SELECT * FROM ?:returns WHERE ?p ORDER BY timestamp DESC", $condition);
 
     foreach ($returns as &$return) {
         $return['user'] = fn_get_user_short_info($return['user_id']);

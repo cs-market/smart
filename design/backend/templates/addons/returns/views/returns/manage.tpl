@@ -44,7 +44,7 @@
             <table class="table table-condensed table--relative table-responsive">
                 <thead>
                     <tr class="no-hover">
-                        <th>{__("product")}</th>
+                        <th width="80%">{__("product")}</th>
                         <th class="center nowrap">{__("qty")}</th>
                     </tr>
                 </thead>
