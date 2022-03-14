@@ -2,7 +2,7 @@
     <div class="cm-reload-{$obj_prefix}{$obj_id}" id="qty_update_{$obj_prefix}{$obj_id}">
     <input type="hidden" name="appearance[show_qty]" value="{$show_qty}" />
     <input type="hidden" name="appearance[capture_options_vs_qty]" value="{$capture_options_vs_qty}" />
-    {if !empty($product.selected_amount)}
+    {if isset($product.selected_amount)}
     {assign var="default_amount" value=$product.selected_amount}
     {elseif !empty($product.min_qty)}
     {assign var="default_amount" value=$product.min_qty}
