@@ -44,6 +44,7 @@
                 {$show_qty = true}
                 {$hide_qty_label = true}
                 {$default_amount = 0}
+                {$cart_button_exists = true}
 
                 {hook name="products:qty"}
                     <div class="cm-reload-{$obj_prefix}{$obj_id}" id="qty_update_{$obj_prefix}{$obj_id}">
