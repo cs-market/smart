@@ -1560,6 +1560,27 @@ fn_print_r($fantoms);
     list($products) = fn_get_products(['company_id' => 1815]);
     $pids = array_keys($products);
     db_query('DELETE FROM ?:product_prices WHERE usergroup_id != ?i AND product_id IN (?a)', 0, $pids);
+} elseif ($mode == 'calculate_return_total') {
+    $returns = db_get_fields('SELECT return_id FROM ?:returns ORDER BY return_id DESC');
+
+    foreach ($returns as $return_id) {
+        $return = fn_get_returns(['return_id' => $return_id]);
+        $_data = db_get_row("SELECT user_id, user_login as login FROM ?:users WHERE user_id = ?i", $return['user_id']);
+        $customer_auth = fn_fill_auth($_data, array(), false, 'C');
+        if ($return['items']) {
+            if ($return['items']) {
+                $total = 0;
+                foreach ($return['items'] as $product) {
+                    if ($price = fn_get_product_price($product['product_id'], $product['amount'], $customer_auth)) {
+                        $total += $price * $product['amount'];
+                    }
+                }
+                if ($total) {
+                    db_query('UPDATE ?:returns SET total = ?d WHERE return_id = ?i', $total, $return_id);
+                }
+            }
+        }
+    }
 }
 
 function fn_merge_product_features($target_feature, $group) {

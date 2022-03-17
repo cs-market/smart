@@ -17,6 +17,8 @@
         <item lang="ru" id="return_added_successfully"><![CDATA[Ваша заявка на возврат <b>#[return_id]</b> успешно размещена.]]></item>
         <item lang="ru" id="return_items">Товары</item>
         <item lang="ru" id="get_file">Скачать файл</item>
+        <item lang="ru" id="export_to_file">Экспортировать в файл</item>
+        <item lang="ru" id="returns.approve_returns">Автоматическое подтверждение возвратов</item>
     </language_variables>
 
     <queries>
@@ -43,6 +45,7 @@
             ) Engine=MyISAM DEFAULT CHARSET UTF8;
         </item>
         <item>ALTER TABLE `?:companies` ADD `support_returns` char(1) NOT NULL DEFAULT 'N';</item>
+        <item>ALTER TABLE `?:users` ADD `approve_returns` char(1) NOT NULL DEFAULT 'N';</item>
 
         <item for="uninstall">DROP TABLE `?:return_products`;</item>
         <item for="uninstall">DROP TABLE `?:returns`;</item>
