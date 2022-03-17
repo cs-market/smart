@@ -135,10 +135,10 @@ function fn_get_returns($params, $items_per_page = 0) {
             $stats[$user_id]['orders_total'] = db_get_field("SELECT $field FROM ?:orders AS o $join WHERE $condition");
 
             $stats[$user_id]['requested'] = db_get_field('SELECT sum(total) FROM ?:returns WHERE timestamp >= ?i AND timestamp <= ?i AND user_id = ?i', $time_from, $time_to, $user_id) ?? 0;
-            $stats[$user_id]['requested_percent'] = round($stats[$user_id]['requested'] / $stats[$user_id]['orders_total'] * 100, 2);
+            $stats[$user_id]['requested_percent'] = ($stats[$user_id]['orders_total']) ? round($stats[$user_id]['requested'] / $stats[$user_id]['orders_total'] * 100, 2) : 0;
 
             $stats[$user_id]['approved'] = db_get_field('SELECT sum(total) FROM ?:returns WHERE timestamp >= ?i AND timestamp <= ?i AND user_id = ?i AND status = ?s', $time_from, $time_to, $user_id, 'A') ?? 0;
-            $stats[$user_id]['approved_percent'] = round($stats[$user_id]['approved'] / $stats[$user_id]['orders_total'] * 100, 2);
+            $stats[$user_id]['approved_percent'] = ($stats[$user_id]['orders_total']) ? round($stats[$user_id]['approved'] / $stats[$user_id]['orders_total'] * 100, 2) : 0;
         }
 
         foreach ($returns as &$return) {
