@@ -34,4 +34,9 @@ $schema['export_fields']['Total final'] = array(
     'process_get' => array('fn_get_total_history', 'desc' , '#key')
 );
 
+$schema['export_fields']['Unique sku'] = array(
+    'linked' => false,
+    'process_get' => array('fn_exim_get_order_unique_sku', '#key')
+);
+
 return $schema;

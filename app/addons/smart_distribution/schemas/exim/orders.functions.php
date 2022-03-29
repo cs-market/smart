@@ -48,3 +48,7 @@ function fn_get_total_history($sorting, $order_id) {
 
     return $total;
 }
+
+function fn_exim_get_order_unique_sku($order_id) {
+    return db_get_field('SELECT count(DISTINCT(product_id)) FROM ?:order_details WHERE order_id = ?i', $order_id);
+}

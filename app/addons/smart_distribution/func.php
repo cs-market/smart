@@ -1396,6 +1396,13 @@ function fn_smart_distribution_get_orders_totals($paid_statuses, $join, $conditi
             $group
         ), 2);
     }
+
+    $order_ids = db_get_fields('SELECT ?:orders.order_id FROM ?:orders ?p WHERE 1 ?p ?p',
+        $join,
+        $condition,
+        $group);
+    $totals['unique_sku'] = db_get_field('SELECT count(DISTINCT(product_id)) FROM ?:order_details WHERE order_id IN (?a)', $order_ids);
+    $totals['unique_sku_per_order'] = array_sum(db_get_fields('SELECT count(DISTINCT(product_id)) FROM ?:order_details WHERE order_id IN (?a) GROUP BY order_id', $order_ids));
 }
 
 function fn_reward_points_promotion_give_percent_points($bonus, &$cart, &$auth, &$cart_products)
