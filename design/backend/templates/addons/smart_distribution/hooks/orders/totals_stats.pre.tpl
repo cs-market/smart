@@ -16,3 +16,9 @@
     <td>{$totals.unique_sku_per_order}</td>
 </tr>
 {/if}
+{if $totals.free_orders}
+<tr>
+    <td class="shift-right">{__("free_orders")}:</td>
+    <td>{$totals.free_orders}</td>
+</tr>
+{/if}
