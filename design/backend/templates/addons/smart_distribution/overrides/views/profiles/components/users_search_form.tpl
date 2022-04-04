@@ -80,6 +80,14 @@
             </div>*}
 
             {hook name="profiles:search_form"}{/hook}
+            {if !$runtime.company_id}
+                {include file="views/companies/components/company_field.tpl"
+                    name='company_id'
+                    id="elm_company_id"
+                    zero_company_id_name_lang_var="none"
+                    selected=$search.company_id
+                }
+            {/if}
             <div class="control-group">
                 <label class="control-label" for="elm_registration_period">{__("registration_date")}</label>
                 <div class="controls">
