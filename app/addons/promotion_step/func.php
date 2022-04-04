@@ -61,7 +61,7 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
                     }       
                 }
             }
-        } else {
+        } elseif (isset($conditions['condition']) && $conditions['condition'] == 'categories') {
             foreach ($cart_products as $k => $v) {
                 if ($type == 'S') {
                     if (fn_exclude_from_shipping_calculate($cart['products'][$k])) {

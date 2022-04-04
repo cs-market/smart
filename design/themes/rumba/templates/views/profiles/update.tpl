@@ -53,7 +53,7 @@
                     {if $profile_fields.B || $profile_fields.S}
                         {if $settings.General.user_multiple_profiles == "Y" && $runtime.mode == "update"}
                             <p>{__("text_multiprofile_notice")}</p>
-                            {include file="views/profiles/components/multiple_profiles.tpl" profile_id=$user_data.profile_id skip_create=true}    
+                            {include file="views/profiles/components/multiple_profiles.tpl" profile_id=$user_data.profile_id skip_create=true hide_profile_delete=true hide_profile_name=true}    
                         {/if}
 
                         {if $settings.Checkout.address_position == "billing_first"}
