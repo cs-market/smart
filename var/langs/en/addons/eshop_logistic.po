@@ -1,0 +1,277 @@
+msgid ""
+msgstr "Project-Id-Version: tygh"
+"Content-Type: text/plain; charset=UTF-8"
+"Language-Team: English"
+"Language: en_US"
+
+msgctxt "Addons::name::eshop_logistic"
+msgid "Integration of the eShopLogistic"
+msgstr "Integration of the eShopLogistic"
+
+msgctxt "Addons::description::eshop_logistic"
+msgid "Adds the ability to configure deliveries using the eShopLogistic service"
+msgstr "Adds the ability to configure deliveries using the eShopLogistic service" 
+
+msgctxt "Languages::eshop_logistic.cron_info"
+msgid "To automatically clear the log table, use this script"
+msgstr "To automatically clear the log table, use this script"
+
+msgctxt "Languages::eshop_logistic.logs"
+msgid "eShopLogistic: Logging"
+msgstr "eShopLogistic: Logging"
+
+msgctxt "Languages::eshop_logistic.eshop_clear_cache"
+msgid "Clear cache eShopLogistic"
+msgstr "Clear cache eShopLogistic"
+
+msgctxt "Languages::eshop_logistic.balance"
+msgid "Balance"
+msgstr "Balance"
+
+msgctxt "Languages::eshop_logistic.time_of_request"
+msgid "Last update time"
+msgstr "Last update time"
+
+msgctxt "Languages::eshop_logistic.services"
+msgid "Available services"
+msgstr "Available services"
+
+msgctxt "Languages::eshop_logistic.only_russian_country"
+msgid "The calculation is made only for Russia"
+msgstr "The calculation is made only for Russia"
+
+msgctxt "Languages::eshop_logistic.can_not_find_city"
+msgid "Could not determine FIAS code for the city [city]"
+msgstr "Could not determine FIAS code for the city [city]"
+
+msgctxt "Languages::eshop_logistic.can_not_find_city_for_delivery_service"
+msgid "Couldn"
+msgstr "Couldn"
+
+msgctxt "Languages::eshop_logistic.cities_progress"
+msgid "Cities processed [current_row] out of  [total_rows]"
+msgstr "Cities processed [current_row] out of  [total_rows]"
+
+msgctxt "Languages::eshop_logistic.custom_delivery_city_request"
+msgid "Request a city for your own service"
+msgstr "Request a city for your own service"
+
+msgctxt "Languages::eshop_logistic.internal_error"
+msgid "Internal error"
+msgstr "Internal error"
+
+msgctxt "Languages::eshop_logistic.can_not_save_cities_file"
+msgid "Failed to save the cities file"
+msgstr "Failed to save the cities file"
+
+msgctxt "Languages::eshop_logistic.api_key_not_found"
+msgid "API key not found"
+msgstr "API key not found"
+
+msgctxt "Languages::eshop_logistic.api_request_fail"
+msgid "The API request failed with an error"
+msgstr "The API request failed with an error"
+
+msgctxt "Languages::eshop_logistic.payment_type_card"
+msgid "Card"
+msgstr "Card"
+
+msgctxt "Languages::eshop_logistic.payment_type_cash"
+msgid "Cash"
+msgstr "Cash"
+
+msgctxt "Languages::eshop_logistic.payment_type_cashless"
+msgid "Cashless"
+msgstr "Cashless"
+
+msgctxt "Languages::eshop_logistic.payment_type_prepay"
+msgid "Prepay"
+msgstr "Prepay"
+
+msgctxt "Languages::eshop_logistic.site_request"
+msgid "Account details"
+msgstr "Account details"
+
+msgctxt "Languages::eshop_logistic.cities_codes_request"
+msgid "Cities codes"
+msgstr "Cities codes"
+
+msgctxt "Languages::eshop_logistic.services_init_request"
+msgid "Initializing services"
+msgstr "Initializing services"
+
+msgctxt "Languages::eshop_logistic.delivery_request"
+msgid "Calculation of the cost and delivery time"
+msgstr "Calculation of the cost and delivery time"
+
+msgctxt "Languages::eshop_logistic.cities_search_request"
+msgid "Search for localities for delivery"
+msgstr "Search for localities for delivery"
+
+msgctxt "Languages::eshop_logistic.services_info_request"
+msgid "All available shipping options"
+msgstr "All available shipping options"
+
+msgctxt "Languages::eshop_logistic.get_data_for_delivery"
+msgid "Getting delivery data (not an API request)"
+msgstr "Getting delivery data (not an API request)"
+
+msgctxt "Languages::eshop_logistic.use_auto_image"
+msgid "Automatically upload an image"
+msgstr "Automatically upload an image"
+
+msgctxt "Languages::eshop_logistic.log_id"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "Languages::eshop_logistic.log_date"
+msgid "Date"
+msgstr "Date"
+
+msgctxt "Languages::eshop_logistic.log_time"
+msgid "Run time"
+msgstr "Run time"
+
+msgctxt "Languages::eshop_logistic.log_message"
+msgid "Message"
+msgstr "Message"
+
+msgctxt "Languages::eshop_logistic.log_data"
+msgid "Data"
+msgstr "Data"
+
+msgctxt "Languages::eshop_logistic.log_status"
+msgid "Status"
+msgstr "Status"
+
+msgctxt "Languages::eshop_logistic.log_operation"
+msgid "Operation"
+msgstr "Operation"
+
+msgctxt "Languages::eshop_logistic.is_caching"
+msgid "Cache"
+msgstr "Cache"
+
+msgctxt "Languages::eshop_logistic.view_log_data"
+msgid "View more"
+msgstr "View more"
+
+msgctxt "Languages::eshop_logistic.log_status_error"
+msgid "Error"
+msgstr "Error"
+
+msgctxt "Languages::eshop_logistic.log_status_success"
+msgid "Successful"
+msgstr "Successful"
+
+msgctxt "Languages::eshop_logistic.clear_logs"
+msgid "Clear logs"
+msgstr "Clear logs"
+
+msgctxt "Languages::eshop_logistic.clear_old_logs"
+msgid "Clear old logs"
+msgstr "Clear old logs"
+
+msgctxt "Languages::eshop_logistic.logs_title"
+msgid "eShopLogistic: Logging"
+msgstr "eShopLogistic: Logging"
+
+msgctxt "Languages::eshop_logistic.city_fias"
+msgid "FIAS"
+msgstr "FIAS"
+
+msgctxt "Languages::eshop_logistic.payment_type"
+msgid "Payment type eShopLogistic"
+msgstr "Payment type eShopLogistic"
+
+msgctxt "Languages::eshop_logistic.tt_payment_type"
+msgid "Select the appropriate payment type. This is necessary for the correct calculation of delivery"
+msgstr "Select the appropriate payment type. This is necessary for the correct calculation of delivery"
+
+msgctxt "Languages::eshop_logistic.shipping.header_shipping_terminal"
+msgid "Pick-up point"
+msgstr "Pick-up point"
+
+msgctxt "Languages::eshop_logistic.get_actual_data"
+msgid "Get up-to-date data"
+msgstr "Get up-to-date data"
+
+msgctxt "Languages::eshop_logistic.get_cities_codes"
+msgid "Get FIAS city codes"
+msgstr "Get FIAS city codes"
+
+msgctxt "Languages::eshop_logistic.calculate_shipping"
+msgid "Calculate delivery"
+msgstr "Calculate delivery"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_api_key"
+msgid "API key"
+msgstr "API key"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_widget_key"
+msgid "Widget key"
+msgstr "Widget key"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_cache_lifetime"
+msgid "Cache lifetime (in hours)"
+msgstr "Cache lifetime (in hours)"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_use_cache"
+msgid "Use cache"
+msgstr "Use cache"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_use_logging"
+msgid "Use logging"
+msgstr "Use logging"
+
+msgctxt "SettingsOptions::eshop_logistic::cron_pass"
+msgid "CRON pass"
+msgstr "CRON pass"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_api_key"
+msgid "You can find it in your personal account of the service"
+msgstr "You can find it in your personal account of the service"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_widget_key"
+msgid "You can find it in the personal account of the service in the widget settings"
+msgstr "You can find it in the personal account of the service in the widget settings"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_cache_lifetime"
+msgid "Defines the time for which API requests will be cached on the store side"
+msgstr "Defines the time for which API requests will be cached on the store side"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_use_cache"
+msgid "It is not recommended to disable caching. This will significantly slow down the operation of the store"
+msgstr "It is not recommended to disable caching. This will significantly slow down the operation of the store"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_use_logging"
+msgid "All requests to the service via the API will be logged. If this setting is enabled it is recommended to configure the CRON script to automatically delete entries in the log table"
+msgstr "All requests to the service via the API will be logged. If this setting is enabled it is recommended to configure the CRON script to automatically delete entries in the log table"
+
+msgctxt "SettingsTooltips::eshop_logistic::cron_pass"
+msgid "CRON pass"
+msgstr "CRON pass"
+
+msgctxt "Languages::eshop_logistic.dilevery.success_get_request_data"
+msgid "Data received successfully"
+msgstr "Data received successfully"
+
+msgctxt "Languages::eshop_logistic.dilevery.failed_get_request_data"
+msgid "Couldn't get data"
+msgstr "Couldn't get data"
+
+msgctxt "Languages::carrier_eshop_logistic"
+msgid "eShopLogistic"
+msgstr "eShopLogistic"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_use_maps"
+msgid "Use maps"
+msgstr "Use maps"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_use_maps"
+msgid "On the checkout page, the list of PPS for delivery services will be displayed on the map. You need to enable the 'Maps and geolocation' add-on. When enabled, a request for the cost of delivery of the product will be made each time the page is loaded. It is possible to quickly exhaust the limits on requests to eShopLogistic servers. Do not use it on public pages due to the possible high activity of various bots."
+msgstr "On the checkout page, the list of PPS for delivery services will be displayed on the map. You need to enable the 'Maps and geolocation' add-on. When enabled, a request for the cost of delivery of the product will be made each time the page is loaded. It is possible to quickly exhaust the limits on requests to eShopLogistic servers. Do not use it on public pages due to the possible high activity of various bots."
+
+msgctxt "Languages::eshop_logistic.addon_not_enable"
+msgid "To use the 'Use Maps'setting You need to enable the 'Maps and geolocation' add-on. When enabled, a request for the cost of delivery of the product will be made each time the page is loaded. It is possible to quickly exhaust the limits on requests to eShopLogistic servers. Do not use it on public pages due to the possible high activity of various bots."
+msgstr "To use the 'Use Maps'setting You need to enable the 'Maps and geolocation' add-on. When enabled, a request for the cost of delivery of the product will be made each time the page is loaded. It is possible to quickly exhaust the limits on requests to eShopLogistic servers. Do not use it on public pages due to the possible high activity of various bots."

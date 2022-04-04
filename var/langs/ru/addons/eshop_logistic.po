@@ -1,0 +1,277 @@
+msgid ""
+msgstr "Project-Id-Version: tygh"
+"Content-Type: text/plain; charset=UTF-8"
+"Language-Team: Russian"
+"Language: ru_RU"
+
+msgctxt "Addons::name::eshop_logistic"
+msgid "Integration of the eShopLogistic"
+msgstr "Интеграция сервиса eShopLogistic"
+
+msgctxt "Addons::description::eshop_logistic"
+msgid "Adds the ability to configure deliveries using the eShopLogistic service"
+msgstr "Добавляет возможность настраивать доставки с помощью сервиса eShopLogistic"
+
+msgctxt "Languages::eshop_logistic.cron_info"
+msgid "To automatically clear the log table, use this script"
+msgstr "Чтобы автоматически очищать таблицу логов используйте этот скрипт"
+
+msgctxt "Languages::eshop_logistic.logs"
+msgid "eShopLogistic: Logging"
+msgstr "eShopLogistic: Логирование"
+
+msgctxt "Languages::eshop_logistic.eshop_clear_cache"
+msgid "Clear cache eShopLogistic"
+msgstr "Очистить кэш eShopLogistic"
+
+msgctxt "Languages::eshop_logistic.balance"
+msgid "Balance"
+msgstr "Баланс"
+
+msgctxt "Languages::eshop_logistic.time_of_request"
+msgid "Last update time"
+msgstr "Время последнего обновления"
+
+msgctxt "Languages::eshop_logistic.services"
+msgid "Available services"
+msgstr "Доступные сервисы"
+
+msgctxt "Languages::eshop_logistic.only_russian_country"
+msgid "The calculation is made only for Russia"
+msgstr "Расчет производится только для России"
+
+msgctxt "Languages::eshop_logistic.can_not_find_city"
+msgid "Could not determine FIAS code for the city [city]"
+msgstr "Не удалось определить ФИАС код для города [city]"
+
+msgctxt "Languages::eshop_logistic.can_not_find_city_for_delivery_service"
+msgid "Couldn"
+msgstr "Не удалось найти город для метода доставки"
+
+msgctxt "Languages::eshop_logistic.cities_progress"
+msgid "Cities processed [current_row] out of  [total_rows]"
+msgstr "Городов обработано [current_row] из [total_rows]"
+
+msgctxt "Languages::eshop_logistic.custom_delivery_city_request"
+msgid "Request a city for your own service"
+msgstr "Запрос города для собственной службы"
+
+msgctxt "Languages::eshop_logistic.internal_error"
+msgid "Internal error"
+msgstr "Внутренняя ошибка"
+
+msgctxt "Languages::eshop_logistic.can_not_save_cities_file"
+msgid "Failed to save the cities file"
+msgstr "Не удалось сохранить файл городов"
+
+msgctxt "Languages::eshop_logistic.api_key_not_found"
+msgid "API key not found"
+msgstr "API ключ не найден"
+
+msgctxt "Languages::eshop_logistic.api_request_fail"
+msgid "The API request failed with an error"
+msgstr "API запрос завершился с ошибкой"
+
+msgctxt "Languages::eshop_logistic.payment_type_card"
+msgid "Card"
+msgstr "Карта"
+
+msgctxt "Languages::eshop_logistic.payment_type_cash"
+msgid "Cash"
+msgstr "Наличные"
+
+msgctxt "Languages::eshop_logistic.payment_type_cashless"
+msgid "Cashless"
+msgstr "Безналичный расчет"
+
+msgctxt "Languages::eshop_logistic.payment_type_prepay"
+msgid "Prepay"
+msgstr "Предоплата"
+
+msgctxt "Languages::eshop_logistic.site_request"
+msgid "Account details"
+msgstr "Данные аккаунта"
+
+msgctxt "Languages::eshop_logistic.cities_codes_request"
+msgid "Cities codes"
+msgstr "Коды городов"
+
+msgctxt "Languages::eshop_logistic.services_init_request"
+msgid "Initializing services"
+msgstr "Инициализация служб"
+
+msgctxt "Languages::eshop_logistic.delivery_request"
+msgid "Calculation of the cost and delivery time"
+msgstr "Расчёт стоимости и сроков доставки"
+
+msgctxt "Languages::eshop_logistic.cities_search_request"
+msgid "Search for localities for delivery"
+msgstr "Поиск населённых пунктов для доставки"
+
+msgctxt "Languages::eshop_logistic.services_info_request"
+msgid "All available shipping options"
+msgstr "Все доступные варианты доставки"
+
+msgctxt "Languages::eshop_logistic.get_data_for_delivery"
+msgid "Getting delivery data (not an API request)"
+msgstr "Получение данных о доставке (не API запрос)"
+
+msgctxt "Languages::eshop_logistic.use_auto_image"
+msgid "Automatically upload an image"
+msgstr "Автоматически загрузить изображение"
+
+msgctxt "Languages::eshop_logistic.log_id"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "Languages::eshop_logistic.log_date"
+msgid "Date"
+msgstr "Дата"
+
+msgctxt "Languages::eshop_logistic.log_time"
+msgid "Run time"
+msgstr "Время выполнения"
+
+msgctxt "Languages::eshop_logistic.log_message"
+msgid "Message"
+msgstr "Сообщение"
+
+msgctxt "Languages::eshop_logistic.log_data"
+msgid "Data"
+msgstr "Данные"
+
+msgctxt "Languages::eshop_logistic.log_status"
+msgid "Status"
+msgstr "Статус"
+
+msgctxt "Languages::eshop_logistic.log_operation"
+msgid "Operation"
+msgstr "Процесс"
+
+msgctxt "Languages::eshop_logistic.is_caching"
+msgid "Cache"
+msgstr "Кэш"
+
+msgctxt "Languages::eshop_logistic.view_log_data"
+msgid "View more"
+msgstr "Подробнее"
+
+msgctxt "Languages::eshop_logistic.log_status_error"
+msgid "Error"
+msgstr "Ошибка"
+
+msgctxt "Languages::eshop_logistic.log_status_success"
+msgid "Successful"
+msgstr "Успех"
+
+msgctxt "Languages::eshop_logistic.clear_logs"
+msgid "Clear logs"
+msgstr "Очистить логи"
+
+msgctxt "Languages::eshop_logistic.clear_old_logs"
+msgid "Clear old logs"
+msgstr "Очистить старые логи"
+
+msgctxt "Languages::eshop_logistic.logs_title"
+msgid "eShopLogistic: Logging"
+msgstr "eShopLogistic: Логирование"
+
+msgctxt "Languages::eshop_logistic.city_fias"
+msgid "FIAS"
+msgstr "ФИАС"
+
+msgctxt "Languages::eshop_logistic.payment_type"
+msgid "Payment type eShopLogistic"
+msgstr "Тип оплаты eShopLogistic"
+
+msgctxt "Languages::eshop_logistic.tt_payment_type"
+msgid "Select the appropriate payment type. This is necessary for the correct calculation of delivery"
+msgstr "Выберите подходящий тип оплаты. Это необходимо для корректного расчета доставки"
+
+msgctxt "Languages::eshop_logistic.shipping.header_shipping_terminal"
+msgid "Pick-up point"
+msgstr "Пункт выдачи"
+
+msgctxt "Languages::eshop_logistic.get_actual_data"
+msgid "Get up-to-date data"
+msgstr "Получить актуальные данные"
+
+msgctxt "Languages::eshop_logistic.get_cities_codes"
+msgid "Get FIAS city codes"
+msgstr "Получить ФИАС коды городов"
+
+msgctxt "Languages::eshop_logistic.calculate_shipping"
+msgid "Calculate delivery"
+msgstr "Рассчитать доставку"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_api_key"
+msgid "API key"
+msgstr "API ключ"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_widget_key"
+msgid "Widget key"
+msgstr "Ключ для виджета"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_cache_lifetime"
+msgid "Cache lifetime (in hours)"
+msgstr "Время жизни кэша (в часах)"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_use_cache"
+msgid "Use cache"
+msgstr "Использовать кеширование"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_use_logging"
+msgid "Use logging"
+msgstr "Использовать логирование"
+
+msgctxt "SettingsOptions::eshop_logistic::cron_pass"
+msgid "CRON pass"
+msgstr "Пароль для CRON"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_api_key"
+msgid "You can find it in your personal account of the service"
+msgstr "Вы можете узнать его в личном кабинете сервиса"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_widget_key"
+msgid "You can find it in the personal account of the service in the widget settings"
+msgstr "Вы можете узнать его в личном кабинете сервиса в настройках виджета"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_cache_lifetime"
+msgid "Defines the time for which API requests will be cached on the store side"
+msgstr "Определяет время на которое будут кэшироваться запросы к API на стороне магазина"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_use_cache"
+msgid "It is not recommended to disable caching. This will significantly slow down the operation of the store"
+msgstr "Не рекомендуется выключать кэширование. Это существенно замедлит работу магазина"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_use_logging"
+msgid "All requests to the service via the API will be logged. If this setting is enabled it is recommended to configure the CRON script to automatically delete entries in the log table"
+msgstr "Будут логироваться все запросы к сервису через API. Если данная настройка включена рекомендуется настроить CRON скрипт на автоматическое удаление записей в таблице логов"
+
+msgctxt "SettingsTooltips::eshop_logistic::cron_pass"
+msgid "CRON pass"
+msgstr "Пароль для CRON"
+
+msgctxt "Languages::eshop_logistic.dilevery.success_get_request_data"
+msgid "Data received successfully"
+msgstr "Данные успешно получены"
+
+msgctxt "Languages::eshop_logistic.dilevery.failed_get_request_data"
+msgid "Couldn't get data"
+msgstr "Не удалось получить данные"
+
+msgctxt "Languages::carrier_eshop_logistic"
+msgid "eShopLogistic"
+msgstr "eShopLogistic"
+
+msgctxt "SettingsOptions::eshop_logistic::eshop_use_maps"
+msgid "Use maps"
+msgstr "Использовать карты"
+
+msgctxt "SettingsTooltips::eshop_logistic::eshop_use_maps"
+msgid "On the checkout page, the list of PPS for delivery services will be displayed on the map. You need to enable the 'Maps and geolocation' add-on. When enabled, a request for the cost of delivery of the product will be made each time the page is loaded. It is possible to quickly exhaust the limits on requests to eShopLogistic servers. Do not use it on public pages due to the possible high activity of various bots."
+msgstr "На странице оформления заказа список ПВЗ для служб доставки будет отображен на карте. Необходимо включить модуль 'Карты и геолокация'. При включении будет производиться запрос стоимости доставки товара при каждой загрузке страницы. Возможно быстрое исчерпание лимитов на запросы к серверам eShopLogistic. Не используйте на публичных страницах ввиду возможной высокой активности различных ботов."
+
+msgctxt "Languages::eshop_logistic.addon_not_enable"
+msgid "To use the 'Use Maps'setting You need to enable the 'Maps and geolocation' add-on"
+msgstr "Для использования настройки 'Использовать карты' Вам необходимо включить модуль 'Карты и геолокация'."

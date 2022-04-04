@@ -1,0 +1,1 @@
+<th width="10%">{__("eshop_logistic.city_fias")}</th>

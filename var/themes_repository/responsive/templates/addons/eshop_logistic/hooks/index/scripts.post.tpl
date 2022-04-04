@@ -1,0 +1,1 @@
+{script src="https://api.eshoplogistic.ru/widget/modal/v1/app.js"}

@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>eshop_logistic</id>
+    <version>1.1</version>
+    <priority>100</priority>
+    <status>active</status>
+    <has_icon>Y</has_icon>
+    <authors>
+        <author>
+            <name>eShopLogistic</name>
+            <url>https://eshoplogistic.ru/</url>
+        </author>
+    </authors>
+    <compatibility>
+        <dependencies>rus_cities</dependencies>
+    </compatibility>
+    <supplier>eShopLogistic</supplier>
+    <supplier_link>https://eshoplogistic.ru/</supplier_link>
+    <default_language>en</default_language>
+    <settings layout="separate">
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="eshop_api_key">
+                        <type>input</type>
+                        <default_value/>
+                    </item>
+                    <item id="eshop_widget_key">
+                        <type>input</type>
+                        <default_value/>
+                    </item>
+                    <item id="eshop_cache_lifetime">
+                        <type>input</type>
+                        <default_value>24</default_value>
+                    </item>
+                    <item id="eshop_use_cache">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item>
+                    <item id="eshop_use_logging">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+                    </item>
+                    <item id="eshop_use_maps">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+                    </item>
+                    <item id="cron_pass">
+                        <type>input</type>
+                        <default_value>clear_logs</default_value>
+                    </item>
+                    <item id="cron_info_txt">
+                        <type>info</type>
+                        <handler>fn_eshop_logisic_cron_run_info</handler>
+                    </item>
+                    <item id="eshop_logistic_info">
+                        <type>template</type>
+                        <default_value>account_info.tpl</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+    <functions>
+        <item for="install">fn_eshop_logistic_install</item>
+        <item for="uninstall">fn_eshop_logistic_uninstall</item>
+    </functions>
+<marketplace_product_id>3249</marketplace_product_id><marketplace_license_number>MP-2R3L-2N8Y-85H1-G2SH</marketplace_license_number></addon>
