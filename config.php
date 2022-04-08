@@ -160,7 +160,7 @@ define('MAILING_LIST_ID', 1);
 
 // Session options
 // define('SESS_VALIDATE_IP', true); // link session ID with ip address
-define('SESS_VALIDATE_UA', true); // link session ID with user-agent
+// define('SESS_VALIDATE_UA', true); // link session ID with user-agent
 
 define('BILLING_ADDRESS_PREFIX', 'b');
 define('SHIPPING_ADDRESS_PREFIX', 's');
