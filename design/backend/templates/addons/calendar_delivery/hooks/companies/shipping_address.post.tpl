@@ -5,6 +5,7 @@
     <div class="controls">
         <label class="radio inline" for="company_data_nearest_delivery_today"><input type="radio" name="company_data[nearest_delivery]" id="company_data_nearest_delivery_today" {if $company_data.nearest_delivery == '0'}checked="checked"{/if} value="0">{__('today')}</label>
         <label class="radio inline" for="company_data_nearest_delivery_tomorrow"><input type="radio" name="company_data[nearest_delivery]" id="company_data_nearest_delivery_tomorrow" {if $company_data.nearest_delivery == '1'}checked="checked"{/if} value="1">{__('tomorrow')}</label>
+        <label class="radio inline" for="company_data_nearest_delivery_aftertomorrow"><input type="radio" name="company_data[nearest_delivery]" id="company_data_nearest_delivery_aftertomorrow" {if $company_data.nearest_delivery == '2'}checked="checked"{/if} value="2">{__('after_tomorrow')}</label>
     </div>
 </div>
 
