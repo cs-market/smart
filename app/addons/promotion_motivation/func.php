@@ -49,15 +49,16 @@ if (!is_callable('fn_find_promotion_condition')) {
     function fn_find_promotion_condition(&$conditions_group, $needle, $remove = false) {
         foreach ($conditions_group['conditions'] as $i => $group_item) {
             if (isset($group_item['conditions'])) {
-                return fn_find_promotion_condition($conditions_group['conditions'][$i], $needle, $remove);
+                $res = fn_find_promotion_condition($conditions_group['conditions'][$i], $needle, $remove);
             } elseif ((is_array($needle) && in_array($group_item['condition'], $needle)) || $group_item['condition'] == $needle) {
                 if ($remove) unset($conditions_group['conditions'][$i]);
-                return $group_item;
+                $res = $group_item;
             }
+            if ($res) return $res;
         }
 
         return false;
-    }    
+    }
 }
 
 function fn_promotion_get_current_value($promotion_id, $promotion, $data, $auth, $cart_products)
