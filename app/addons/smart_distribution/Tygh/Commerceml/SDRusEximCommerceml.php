@@ -1151,10 +1151,12 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
 
-            if(isset($product['discount'])) {
+            if(!empty($product['discount'])) {
+                $product['base_price'] = $product['base_price'] ?? $product['price'];
                 $data_product[$cml['discounts']][][$cml['discount']] = array(
                     $cml['name'] => $cml['product_discount'],
                     $cml['total'] => $product['discount'],
+                    $cml['rate_discounts'] => round((1 - $product['price'] / $product['base_price']) * 100),
                     $cml['in_total'] => 'true'
                 );
             }

@@ -100,7 +100,7 @@ $config['tweaks'] = array (
     'image_resize_lib' => 'auto', // library to resize images - "auto", "gd" or "imagick"
     'products_found_rows_no_cache_limit' => 100, // Max count of SQL found rows without saving to cache
     'show_database_changes' => false, // Show database changes in View changes tool
-    'backup_db_mysqldump' => false, // Backup database using mysqldump when available
+    'backup_db_mysqldump' => true, // Backup database using mysqldump when available
 );
 
 // Key for sensitive data encryption

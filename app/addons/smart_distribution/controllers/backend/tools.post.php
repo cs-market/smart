@@ -472,10 +472,12 @@ if ($mode =='monolith' && !empty($action)) {
     fn_print_die(count($removed_profiles));
 } elseif ($mode == 'get_reward_points') {
     $company_id = ($_REQUEST['company_id']) ? $_REQUEST['company_id'] : 13;
-    list($users) = fn_get_users(array('company_id' => $company_id));
+
+    list($users) = fn_get_users(array('company_id' => $company_id), $auth);
+
     $data = array();
     require_once(Registry::get('config.dir.functions') . 'fn.sales_reports.php');
-    $intervals = fn_check_intervals(7, strtotime("1 January 2019"), strtotime("30 November 2019"));
+    $intervals = fn_check_intervals(7, strtotime("1 February 2022"), strtotime("31 March 2022"));
 
     foreach ($users as &$user) {
         $user = fn_get_user_info($user['user_id'], true);
@@ -500,7 +502,7 @@ if ($mode =='monolith' && !empty($action)) {
         $data[] = $_data;
     }
     $opts = array('delimiter' => ';', 'filename' => 'mvest.csv');
-    $res = fn_exim_put_csv($data, $opts);
+    $res = fn_exim_put_csv($data, $opts, '"');
     fn_print_die($res);
 } elseif ($mode == 'remove_old_inactive_users') {
     $ordered_users = db_get_fields('SELECT distinct(user_id) FROM ?:orders');
