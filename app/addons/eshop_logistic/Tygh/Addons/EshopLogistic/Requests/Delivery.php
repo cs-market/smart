@@ -155,6 +155,7 @@ class Delivery extends Request
             if (!empty($product_groups[$current_group_key]['products'])) {
                 
                 foreach ($product_groups[$current_group_key]['products'] as $product_data) {
+                    if (defined('API') && empty($product_data['weight'])) $product_data['weight'] = db_get_field('SELECT weight FROM ?:products WHERE product_id = ?i', $product_data['product_id']);
                     if ($product_data['company_id'] == '1815') $product_data['weight'] = $product_data['weight'] / 1000;
                     if ((Shippings::isFreeShipping($shipping_info) && $product_data['free_shipping'] != 'Y') || 
                         (!Shippings::isFreeShipping($shipping_info))) {                        
