@@ -1467,6 +1467,8 @@ function fn_smart_distribution_get_filters_products_count_post($params, $lang_co
                 $filters[$filter_id]['is_button_filter'] = true;
             }
         }
+        //TODO remove this kolhoz after september 2022
+        $filters = array_filter($filters, function($v) {return $v['field_type'] != 'P';});
     }
 }
 
