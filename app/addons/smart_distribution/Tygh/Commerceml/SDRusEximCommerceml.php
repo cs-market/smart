@@ -1421,7 +1421,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
             $this->import_params['user_data'] = $user_data;
 
             if (
-                empty($user_data)
+                empty($status)
+                || empty($user_data)
                 || empty($user_data['password'])
                 || !fn_user_password_verify((int) $user_data['user_id'], (string) $_SERVER['PHP_AUTH_PW'], $user_data['password'], $salt)
             ) {
