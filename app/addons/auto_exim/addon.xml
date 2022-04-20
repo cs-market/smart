@@ -13,7 +13,9 @@
     <language_variables>
         <item lang="ru" id="export_orders">Экспортировать заказы</item>
         <item lang="ru" id="export_statuses">Экспортируемые статусы заказа</item>
-        <item lang="ru" id="autoimport">Автоматически импортировать файлы</item>
+        <item lang="ru" id="log_type_exim">Экспорт/Импорт</item>
+        <item lang="ru" id="log_action_start_import">Запустился импорт</item>
+        <item lang="ru" id="log_action_finish_import">Завершился импорт</item>
     </language_variables>
     <queries>
         <item>ALTER TABLE `?:companies` ADD `export_orders` char(1) NOT NULL DEFAULT 'N';</item>
@@ -23,4 +25,8 @@
         <item>ALTER TABLE `?:companies` ADD `export_statuses` varchar(128) NOT NULL DEFAULT '';</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `export_statuses`;</item>
     </queries>
+    <functions>
+        <item for="install">fn_auto_exim_install</item>
+        <item for="uninstall">fn_auto_exim_uninstall</item>
+    </functions>
 </addon>

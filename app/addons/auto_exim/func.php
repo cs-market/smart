@@ -8,8 +8,85 @@ use Tygh\Enum\Addons\AdvancedImport\ImportStatuses;
 use Tygh\Commerceml\SDRusEximCommerceml;
 use Tygh\Commerceml\Logs;
 use Tygh\Addons\AdvancedImport\ServiceProvider;
+use Tygh\Settings;
+use Tygh\Languages\Languages;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
+
+function fn_auto_exim_install() {
+    $setting = Settings::instance()->getSettingDataByName('log_type_exim');
+
+    if (!$setting) {
+        $setting = [
+            'edition_type' => 'ROOT,ULT:VENDOR',
+            'name' => 'log_type_exim',
+            'section_id' => 12,
+            'section_tab_id' => 0,
+            'type' => 'N',
+            'value' => '#M#start_import=Y&finish_import=Y',
+            'position' => 10,
+            'is_global' => 'Y',
+            'parent_id' => 0
+
+        ];
+
+        $descriptions = array();
+        foreach (Languages::getAll() as $lang_code => $_lang) {
+            $descriptions[] = array(
+                'object_type' => Settings::SETTING_DESCRIPTION,
+                'lang_code' => $lang_code,
+                'value' => __('privilege_groups.exim')
+            );
+        }
+
+        $setting_id = Settings::instance()->update($setting, null, $descriptions, true);
+
+        $variant_id_start = Settings::instance()->updateVariant(array(
+            'object_id'  => $setting_id,
+            'name'       => 'start_import',
+            'position'   => 5,
+        ));
+        $variant_id_finish = Settings::instance()->updateVariant(array(
+            'object_id'  => $setting_id,
+            'name'       => 'finish_import',
+            'position'   => 10,
+        ));
+
+        foreach (Languages::getAll() as $lang_code => $_lang) {
+            $description = array(
+                'object_id' => $variant_id_start,
+                'object_type' => Settings::VARIANT_DESCRIPTION,
+                'lang_code' => $lang_code,
+                'value' => 'Start import'
+            );
+            Settings::instance()->updateDescription($description);
+
+            $description = array(
+                'object_id' => $variant_id_finish,
+                'object_type' => Settings::VARIANT_DESCRIPTION,
+                'lang_code' => $lang_code,
+                'value' => 'Finish import'
+            );
+            Settings::instance()->updateDescription($description);
+        }
+    }
+}
+
+function fn_auto_exim_uninstall() {
+    $setting = Settings::instance()->getSettingDataByName('log_type_exim');
+    if (!$setting) {
+        return;
+    }
+
+    Settings::instance()->removeById($setting['object_id']);
+}
+
+function fn_auto_exim_save_log($type, $action, $data, $user_id, &$content)
+{
+    if ($type == 'exim') {
+        $content = $data;
+    }
+}
 
 function fn_auto_exim_update_company_pre(&$company_data, $company_id, $lang_code, $can_update) {
     if (isset($company_data['export_statuses']) && !empty($company_data['export_statuses'])) {
@@ -129,6 +206,7 @@ function fn_auto_exim_mve_import_check_product_data(&$v, $primary_object_id, &$o
 
 function fn_auto_exim_find_files($cid) {
     $dir = fn_get_files_dir_path($cid) . 'exim/autoload/';
+    $dir_root = Registry::get('config.dir.root');
     fn_set_hook('auto_exim_find_files', $dir, $cid);
 
     $fs_files = fn_get_dir_contents($dir, false, true, 'csv');
@@ -137,6 +215,7 @@ function fn_auto_exim_find_files($cid) {
     foreach ($fs_files as $file) {
         $tmp = '';
         $data = pathinfo($file);
+        $data['relative_path'] = str_replace($dir_root, '', $dir);
         $explode = explode('.', $data['filename']);
         $data['import_object'] = array_shift($explode);
         if (!empty($explode)) {
@@ -184,6 +263,9 @@ function fn_auto_exim_run_import($imports, $company_id) {
             }
             fclose($h);
         }
+
+        $start_time = fn_microtime_float();
+        fn_log_event('exim', 'start_import', ['file' => $import['relative_path'].$import['basename']]);
 
         if (isset($import['preset_id']) && !empty($import['preset_id'])) {
             $cond = fn_get_company_condition('company_id', true, '', false, true);
@@ -298,9 +380,21 @@ function fn_auto_exim_run_import($imports, $company_id) {
                 $res = true;
             }
         }
+
+        $execution_time = fn_microtime_float() - $start_time;
+        fn_log_event('exim', 'finish_import', ['file' => $import['relative_path'].$import['basename'], 'time' => $execution_time]);
+
         if ($res) fn_rm($import['dirname'].$import['basename']);
         @unlink($lock_file_path);
     }
+}
+
+if (!is_callable('fn_microtime_float')) {
+function fn_microtime_float()
+{
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float)$usec + (float)$sec);
+}
 }
 
 function fn_run_import($preset_id, $file = '') {
