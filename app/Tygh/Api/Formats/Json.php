@@ -33,7 +33,7 @@ class Json implements IFormat
 
     public function encode($data)
     {
-        return json_encode($data);
+        return json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
     public function decode($data)
