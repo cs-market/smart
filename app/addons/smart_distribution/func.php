@@ -1425,8 +1425,11 @@ function fn_trim_bom_helper(&$value)
 }
 
 function fn_smart_distribution_exim_import_price($price, $decimals_separator) {
-    $price = str_replace(' ', '', $price);
-    return fn_exim_import_price($price, $decimals_separator);
+    if (is_string($price)) {
+        $price = str_replace([' ', ','], ['', '.'], $price);
+    }
+
+    return $price;
 }
 
 function fn_smart_distribution_sberbank_edit_item(&$item, $product, $order) {
@@ -1474,4 +1477,34 @@ function fn_smart_distribution_get_filters_products_count_post($params, $lang_co
 
 function fn_smart_distribution_get_filters_pre($params, &$cache_params) {
     $cache_params[] = 'for_api';
+}
+
+function fn_exim_smart_distribution_get_usergroup_ids($data, $without_status = true) {
+    $pair_delimiter = ':';
+    $set_delimiter = ',';
+    $return = [];
+    $data = str_replace(';', $set_delimiter, $data);
+    $usergroups = explode($set_delimiter, $data);
+    if (!empty($usergroups)) {
+        // trim helper
+        array_walk($usergroups, 'fn_trim_helper');
+        foreach ($usergroups as $ug) {
+            $ug_data = explode($pair_delimiter, $ug);
+            if (is_array($ug_data)) {
+                // Check if user group exists
+                $ug_id = 0;
+                if (is_numeric($ug_data[0])) {
+                    $ug_id = db_get_field("SELECT usergroup_id FROM ?:usergroups WHERE usergroup_id = ?i", $ug_data[0]);
+                }
+                if (empty($ug_id)) {
+                    $ug_id = db_get_field("SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s", $ug_data[0], DESCR_SL);
+                }
+                if (!empty($ug_id)) {
+                    $return[$ug_id] = isset($ug_data[1]) ? $ug_data[1] : 'A';
+                }
+            }
+        }
+    }
+
+    return ($without_status ? array_keys($return) : $return);
 }

@@ -29,6 +29,8 @@ $schema['export_fields']['Add user group IDs'] = [
     'linked' => false,
 ];
 
+$schema['export_fields']['Add usergroup IDs'] = $schema['export_fields']['Add user group IDs'];
+
 $schema['export_fields']['Features']['process_put'] = ['fn_exim_smart_distribution_set_product_features', '#key', '#this', '@features_delimiter', '#lang_code', '%Vendor%' ];
 $schema['import_process_data']['fill_vendor_ugroups_if_empty'] = array(
 	'function' => 'fn_fill_vendor_ugroups_if_empty', 
@@ -43,5 +45,6 @@ foreach ($schema['export_fields'] as &$field) {
         $field['convert_put'][0] = 'fn_smart_distribution_exim_import_price';
     }
 }
+$schema['export_fields']['Usergroup IDs']['convert_put'] = array('fn_exim_smart_distribution_convert_usergroups', '#this');
 
 return $schema;
