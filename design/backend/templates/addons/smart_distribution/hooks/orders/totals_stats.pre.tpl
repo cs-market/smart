@@ -7,7 +7,7 @@
 {if $totals.unique_sku}
 <tr>
     <td class="shift-right">{__("unique_sku")}:</td>
-    <td>{$totals.unique_sku}</td>
+    <td>{$totals.unique_sku} / {$totals.unique_sku_per_user}</td>
 </tr>
 {/if}
 {if $totals.unique_sku_per_order}
