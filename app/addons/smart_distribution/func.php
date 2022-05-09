@@ -1403,6 +1403,7 @@ function fn_smart_distribution_get_orders_totals($paid_statuses, $join, $conditi
         $group);
     $totals['unique_sku'] = db_get_hash_single_array('SELECT count(DISTINCT(product_id)) as count, ?:orders.user_id FROM ?:order_details LEFT JOIN ?:orders ON ?:orders.order_id = ?:order_details.order_id WHERE ?:order_details.order_id IN (?a) AND amount != 0 AND total != 0 GROUP BY ?:orders.user_id', array('user_id', 'count'), $order_ids);
     $totals['unique_sku_per_user'] = round(array_sum($totals['unique_sku'])/count($totals['unique_sku']));
+    $totals['unique_users'] = count($totals['unique_sku']);
     $totals['unique_sku'] = array_sum($totals['unique_sku']);
 
     $totals['unique_sku_per_order'] = array_sum(db_get_fields('SELECT count(DISTINCT(product_id)) FROM ?:order_details LEFT JOIN ?:orders ON ?:orders.order_id = ?:order_details.order_id  WHERE ?:order_details.order_id IN (?a) AND amount != 0 AND total != 0 GROUP BY ?:order_details.order_id', $order_ids));
