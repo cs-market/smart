@@ -356,7 +356,49 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
 function fn_smart_distribution_get_users_post(&$users, $params, $auth) {
     if (defined('API') && isset($params['user_id']) && is_numeric($params['user_id'])) {
         // requested info about single user via api
-        $users = array(fn_get_user_info($params['user_id']));
+        $user = fn_get_user_info($params['user_id']);
+        $user = array_diff_key($user, [
+            'referer' => 1,
+            'is_root' => 1,
+            'lastname' => 1,
+            'url' => 1,
+            'tax_exempt' => 1,
+            'lang_code' => 1,
+            'birthday' => 1,
+            'purchase_timestamp_from' => 1,
+            'purchase_timestamp_to' => 1,
+            'responsible_email' => 1,
+            'api_key' => 1,
+            'janrain_identifier' => 1,
+            'external_id' => 1,
+            'staff_notes' => 1,
+            'profile_id' => 1, // точно?
+            'profile_type' => 1, // точно?
+            'b_lastname' => 1,
+            'b_address_2' => 1,
+            'b_city' => 1,
+            'b_county' => 1,
+            'b_state' => 1,
+            'b_country' => 1,
+            'b_zipcode' => 1,
+            's_firstname' => 1,
+            's_lastname' => 1,
+            's_city' => 1,
+            's_county' => 1,
+            's_state' => 1,
+            's_country' => 1,
+            's_zipcode' => 1,
+            's_address_type' => 1,
+            'profile_name' => 1, // точно?
+            'b_country_descr' => 1,
+            's_country_descr' => 1,
+            'b_state_descr' => 1,
+            's_state_descr' => 1,
+            'plan' => 1,
+
+        ]);
+
+        $users = array($user);
     }
 }
 
