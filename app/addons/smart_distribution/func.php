@@ -56,52 +56,55 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
 }
 
 function fn_smart_distribution_get_order_info(&$order, $additional_data) {
-    $auth = Tygh::$app['session']['auth'];
-    if (AREA == 'A') {
-        if (fn_smart_distribution_is_manager($auth['user_id'])) {
-            $customer_ids = db_get_fields('SELECT customer_id FROM ?:vendors_customers WHERE vendor_manager = ?i', $auth['user_id']);
-            if (!in_array($order['user_id'], $customer_ids)) {
-                $order = false;
+    fn_print_r($order);
+    if (!empty($order)) {
+        $auth = Tygh::$app['session']['auth'];
+        if (AREA == 'A') {
+            if (fn_smart_distribution_is_manager($auth['user_id'])) {
+                $customer_ids = db_get_fields('SELECT customer_id FROM ?:vendors_customers WHERE vendor_manager = ?i', $auth['user_id']);
+                if (!in_array($order['user_id'], $customer_ids)) {
+                    $order = false;
+                }
+            }
+
+            if (!($order['profile_id'])) {
+                $user_profiles = fn_get_user_profiles($order['user_id']);
+                if (count($user_profiles) == 1) {
+                    $profile = reset($user_profiles);
+                    $order['profile_id'] = $profile['profile_id'];
+                } else {
+                    $order['profile_id'] = db_get_field('SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i AND s_address = ?s', $order['user_id'], $order['s_address']);
+                }
+            }
+            if (empty(array_filter($order['fields']))) {
+                $prof_cond = (!empty($order['profile_id'])) ? db_quote("OR (object_id = ?i AND object_type = 'P')", $order['profile_id']) : '';
+                $order['fields'] = db_get_hash_single_array("SELECT field_id, value FROM ?:profile_fields_data WHERE (object_id = ?i AND object_type = 'U') $prof_cond", array('field_id', 'value'), $order['user_id']);
+            }
+            if (!empty($order['fields'])) {
+                $fields = db_get_hash_single_array('SELECT field_id, field_name FROM ?:profile_fields WHERE field_id IN (?a)', array('field_id', 'field_name'), array_keys($order['fields']));
+                foreach ($fields as $field_id => $field_name) {
+                    $order[$field_name] = $order['fields'][$field_id];
+                }
             }
         }
 
-        if (!($order['profile_id'])) {
-            $user_profiles = fn_get_user_profiles($order['user_id']);
-            if (count($user_profiles) == 1) {
-                $profile = reset($user_profiles);
-                $order['profile_id'] = $profile['profile_id'];
-            } else {
-                $order['profile_id'] = db_get_field('SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i AND s_address = ?s', $order['user_id'], $order['s_address']);
-            }
-        }
-        if (empty(array_filter($order['fields']))) {
-            $prof_cond = (!empty($order['profile_id'])) ? db_quote("OR (object_id = ?i AND object_type = 'P')", $order['profile_id']) : '';
-            $order['fields'] = db_get_hash_single_array("SELECT field_id, value FROM ?:profile_fields_data WHERE (object_id = ?i AND object_type = 'U') $prof_cond", array('field_id', 'value'), $order['user_id']);
-        }
-        if (!empty($order['fields'])) {
-            $fields = db_get_hash_single_array('SELECT field_id, field_name FROM ?:profile_fields WHERE field_id IN (?a)', array('field_id', 'field_name'), array_keys($order['fields']));
-            foreach ($fields as $field_id => $field_name) {
-                $order[$field_name] = $order['fields'][$field_id];
-            }
-        }
-    }
-
-    // get_barcode for product
-    if (defined('API')) {
-        foreach ($order['products'] as &$product) {
-            $features = fn_get_product_features_list($product, "A");
-            if (!empty($features)) {
-                foreach ($features as $feature) {
-                    if (!empty($feature['feature_code'])) {
-                        $product[$feature['feature_code']] = $feature['variant'];
+        // get_barcode for product
+        if (defined('API')) {
+            foreach ($order['products'] as &$product) {
+                $features = fn_get_product_features_list($product, "A");
+                if (!empty($features)) {
+                    foreach ($features as $feature) {
+                        if (!empty($feature['feature_code'])) {
+                            $product[$feature['feature_code']] = $feature['variant'];
+                        }
                     }
                 }
             }
         }
-    }
 
-    // product_groups should not be a null for application. TODO in future on app side
-    if (!isset($order['product_groups'])) $order['product_groups'] = array();
+        // product_groups should not be a null for application. TODO in future on app side
+        if (!isset($order['product_groups'])) $order['product_groups'] = array();
+    }
 }
 
 function fn_smart_distribution_get_product_features_list_before_select(&$fields, $join, &$condition, $product, $display_on, $lang_code) {

@@ -239,17 +239,19 @@ function fn_pay_by_points_get_orders_post($params, &$orders)
 
 function fn_pay_by_points_get_order_info(&$order, $additional_data)
 {
-    $total_bonus = 0;
+    if (!empty($order)) {
+        $total_bonus = 0;
 
-    foreach ($order['products'] as $product) {
-        if (
-            isset($product['extra']['pay_by_points']['product_cart_point_price'])
-        ) {
-            $total_bonus += $product['extra']['pay_by_points']['product_cart_point_price'];
+        foreach ($order['products'] as $product) {
+            if (
+                isset($product['extra']['pay_by_points']['product_cart_point_price'])
+            ) {
+                $total_bonus += $product['extra']['pay_by_points']['product_cart_point_price'];
+            }
         }
+        if ($total_bonus) $order['points_info']['in_use']['points'] = $total_bonus;
+        $order['total_bonus'] = $total_bonus;
     }
-    if ($total_bonus) $order['points_info']['in_use']['points'] = $total_bonus;
-    $order['total_bonus'] = $total_bonus;
 }
 
 function fn_pay_by_points_change_order_status($status_to, $status_from, &$order_info, $force_notification, $order_statuses, $place_order)
