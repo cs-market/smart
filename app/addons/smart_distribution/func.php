@@ -56,7 +56,6 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
 }
 
 function fn_smart_distribution_get_order_info(&$order, $additional_data) {
-    fn_print_r($order);
     if (!empty($order)) {
         $auth = Tygh::$app['session']['auth'];
         if (AREA == 'A') {
