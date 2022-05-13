@@ -891,9 +891,10 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 $order_id = $order_info['order_id'];
                 foreach ($order_data->{$cml['products']}->{$cml['product']} as $xml_product) {
                     $product_data = $this->getProductDataByLinkType($link_type, $xml_product, $cml);
-                    $xml_products[$product_data['product_id']] = intval($xml_product->{$cml['amount']});
+                    $xml_products[$product_data['product_id']] = $xml_products[$product_data['product_id']] ?? 0;
+                    $xml_products[$product_data['product_id']] += intval($xml_product->{$cml['amount']});
                 }
-                $order_products = fn_array_column($order_info['products'], 'amount', 'product_id');
+                $order_products = array_filter(fn_array_column($order_info['products'], 'amount', 'product_id'));
 
                 if (!empty(array_diff_assoc($xml_products, $order_products) + array_diff_assoc($order_products, $xml_products))) {
                     if (!empty($order_info['user_id'])) {
