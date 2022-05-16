@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>storages</id>
+    <name>Smart distribution: Склады</name>
+    <priority>32000</priority>
+    <version>1.0.1</version>
+    <position>0</position>
+    <status>active</status>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <default_language>ru</default_language>
+    <language_variables>
+
+    </language_variables>
+    <queries>
+        <!-- company_id only for multivendor -->
+        <item>DROP TABLE IF EXISTS `?:storages`;</item>
+        <item>
+            CREATE TABLE `?:storages` (
+                `storage_id` mediumint(8) unsigned NOT NULL auto_increment,
+                `code` varchar(32) NOT NULL,
+                `storage` varchar(32) NOT NULL,
+                `company_id` smallint unsigned NOT NULL DEFAULT '0',
+                `min_order` mediumint unsigned NOT NULL DEFAULT '0',
+                `status` char(1) NOT NULL DEFAULT 'A',
+                PRIMARY KEY (`storage_id`),
+                UNIQUE KEY (`code`, `company_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS `?:storages`;</item>
+
+        <item>DROP TABLE IF EXISTS `?:storages_products`;</item>
+        <item>
+            CREATE TABLE `?:storages_products` (
+                `storage_id` mediumint(8) unsigned NOT NULL,
+                `product_id` mediumint(8) unsigned NOT NULL,
+                `amount` smallint NOT NULL,
+                `min_qty` smallint NOT NULL,
+                `qty_step` smallint NOT NULL,
+                PRIMARY KEY (`product_id`, `storage_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS `?:storages_products`;</item>
+
+        <item>DROP TABLE IF EXISTS `?:storage_usergroups`;</item>
+        <item>
+            CREATE TABLE `?:storage_usergroups` (
+                `storage_id` mediumint(8) unsigned NOT NULL,
+                `usergroup_id` mediumint(8) NOT NULL DEFAULT '0',
+                PRIMARY KEY (`storage_id`,`usergroup_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS `?:storage_usergroups`;</item>
+    </queries>
+</addon>

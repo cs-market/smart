@@ -470,9 +470,10 @@ function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $a
 }
 
 function fn_smart_distribution_update_profile($action, $user_data, $current_user_data) {
-    if ($action == 'add' && AREA == 'C' && !empty($user_data['usergroup_ids'])) {
-        $ids = explode(',', $user_data['usergroup_ids']);
-        foreach ($ids as $ug_id) {
+    if ((($action == 'add' && AREA == 'C') || defined('API')) && !empty($user_data['usergroup_ids'])) {
+        $user_data['usergroup_ids'] = fn_exim_smart_distribution_get_usergroup_ids($user_data['usergroup_ids']);
+        db_query('DELETE FROM ?:usergroup_links WHERE user_id = ?i', $user_data['user_id']);
+        foreach ($user_data['usergroup_ids'] as $ug_id) {
             fn_change_usergroup_status('A', $user_data['user_id'], $ug_id);
         }
     }
@@ -742,6 +743,10 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
     }
 
     // limit vendors usergroups
+    if (isset($product_data['usergroup_ids']) && !empty($product_data['usergroup_ids'])) {
+        $product_data['usergroup_ids'] = fn_exim_smart_distribution_get_usergroup_ids($product_data['usergroup_ids']);
+    }
+
     $cid = (isset($product_data['company_id'])) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id);
 
     if ($cid) {
@@ -765,6 +770,12 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
     // check company tracking and set it by necessity
     if (!$product_id && !isset($product_data['tracking']) && !empty($product_data['company_id'])) {
         $product_data['tracking'] = db_get_field('SELECT tracking FROM ?:companies WHERE company_id = ?i', $product_data['company_id']);
+    }
+
+    if (!empty($product_data['prices']) && !(isset($product_data['prices'][0]) && !$product_data['prices'][0]['usergroup_id'] )) {
+        // increase index for api calls
+        array_unshift($product_data['prices'], []);
+        unset($product_data['prices'][0]);
     }
 }
 
@@ -1530,8 +1541,13 @@ function fn_exim_smart_distribution_get_usergroup_ids($data, $without_status = t
     $pair_delimiter = ':';
     $set_delimiter = ',';
     $return = [];
-    $data = str_replace(';', $set_delimiter, $data);
-    $usergroups = explode($set_delimiter, $data);
+    if (is_array($data)) {
+        $usergroups = $data;
+    } else {
+        $data = str_replace(';', $set_delimiter, $data);
+        $usergroups = explode($set_delimiter, $data);
+    }
+
     if (!empty($usergroups)) {
         // trim helper
         array_walk($usergroups, 'fn_trim_helper');
@@ -1554,4 +1570,18 @@ function fn_exim_smart_distribution_get_usergroup_ids($data, $without_status = t
     }
 
     return ($without_status ? array_keys($return) : $return);
+}
+
+function fn_smart_distribution_update_storage_usergroups_pre(&$storage_data) {
+    $storage_data['usergroup_ids'] = fn_exim_smart_distribution_get_usergroup_ids($storage_data['usergroup_ids']);
+}
+
+function fn_smart_distribution_update_product_prices($product_id, &$_product_data, $company_id, $skip_price_delete, $table_name, $condition) {
+    foreach ($_product_data['prices'] as &$v) {
+        $v['product_id'] = $product_id;
+        $v['lower_limit'] = $v['lower_limit'] ?? 1;
+        if (isset($v['usergroup_id']) && !is_numeric($v['usergroup_id'])) {
+            list($v['usergroup_id']) = fn_exim_smart_distribution_get_usergroup_ids($v['usergroup_id']);
+        }
+    }
 }

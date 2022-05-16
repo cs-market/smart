@@ -76,5 +76,7 @@ fn_register_hooks(
     'get_filters_products_count_before_select_filters',
     'get_filters_products_count_pre',
     'get_filters_products_count_post',
-    'get_filters_pre'
+    'get_filters_pre',
+    'update_storage_usergroups_pre',
+    'update_product_prices'
 );
