@@ -59,7 +59,7 @@ function fn_smart_distribution_get_order_info(&$order, $additional_data) {
     if (!empty($order)) {
         $auth = Tygh::$app['session']['auth'];
         if (AREA == 'A') {
-            if (fn_smart_distribution_is_manager($auth['user_id'])) {
+            if (Registry::get('runtime.mode') == 'details' && fn_smart_distribution_is_manager($auth['user_id'])) {
                 $customer_ids = db_get_fields('SELECT customer_id FROM ?:vendors_customers WHERE vendor_manager = ?i', $auth['user_id']);
                 if (!in_array($order['user_id'], $customer_ids)) {
                     $order = false;
