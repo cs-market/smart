@@ -2,7 +2,7 @@
 
 use Tygh\Registry;
 
-include_once(Registry::get('config.dir.addons') . 'smart_distribution/schemas/exim/users.smart_distribution.functions.php');
+include_once(Registry::get('config.dir.addons') . 'smart_distribution/schemas/exim/users.functions.php');
 
 $schema['pre_processing']['add_field_columns'] =    array(
     'function' => 'fn_exim_smart_distribution_add_field_columns_import',
@@ -46,8 +46,8 @@ $schema['export_fields']['Reward points'] = [
     'table' => 'user_data',
 ];
 
-$schema['export_fields']['Add user group IDs'] = [
-    'process_put' => array('fn_exim_set_add_usergroups', '#key', '#this'),
+$schema['export_fields']['Add usergroup IDs'] = [
+    'process_put' => array('fn_smart_distribution_exim_set_usergroups', '#key', '#this', false),
     'import_only' => true,
     'linked' => false,
 ];
@@ -60,6 +60,9 @@ $schema['import_process_data']['get_salts'] = array(
 
 if (isset($schema['export_fields']['User group IDs']['process_put'])) {
     $schema['export_fields']['User group IDs']['process_put'][0] = 'fn_smart_distribution_exim_set_usergroups';
-    $schema['export_fields']['Usergroup IDs'] = $schema['export_fields']['User group IDs'];
 }
+
+// backward compatibility
+$schema['export_fields']['Usergroup IDs'] = $schema['export_fields']['User group IDs'];
+
 return $schema;

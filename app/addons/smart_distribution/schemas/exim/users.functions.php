@@ -237,45 +237,15 @@ function fn_exim_rejoin_user_profiles_export(&$pattern)
     }
 }
 
-function
-fn_exim_set_add_usergroups($user_id, $data)
-{
-    $pair_delimiter = ':';
-    $set_delimiter = '; ';
-
-    // db_query("DELETE FROM ?:usergroup_links WHERE user_id = ?i", $user_id);
-    if (!empty($data)) {
-        $usergroups = explode($set_delimiter, $data);
-        if (!empty($usergroups)) {
-            foreach ($usergroups as $ug) {
-                $ug_data = explode($pair_delimiter, $ug);
-                if (is_array($ug_data)) {
-                    // Check if user group exists
-                    $ug_id = db_get_field("SELECT usergroup_id FROM ?:usergroups WHERE usergroup_id = ?i", $ug_data[0]);
-                    if (!empty($ug_id)) {
-                        $_data = array(
-                            'user_id' => $user_id,
-                            'usergroup_id' => $ug_id,
-                            'status' => isset($ug_data[1]) ? $ug_data[1] : 'A'
-                        );
-                        db_query('REPLACE INTO ?:usergroup_links ?e', $_data);
-                    }
-                }
-            }
-        }
-    }
-
-    return true;
-}
-
 function fn_exim_get_salts($primary_object_id, &$object) {
     if (!isset($object['salt']) || empty($object['salt']) && !empty($primary_object_id['user_id'])) {
         $object['salt'] = db_get_field('SELECT salt FROM ?:users WHERE user_id = ?i', $primary_object_id['user_id']);
     }
 }
 
-function fn_smart_distribution_exim_set_usergroups($user_id, $data) {
-    db_query("DELETE FROM ?:usergroup_links WHERE user_id = ?i", $user_id);
+function fn_smart_distribution_exim_set_usergroups($user_id, $data, $cleanup = true) {
+    fn_print_die($cleanup);
+    if ($cleanup) db_query("DELETE FROM ?:usergroup_links WHERE user_id = ?i", $user_id);
     if (!empty($data)) {
         $usergroups = fn_exim_smart_distribution_get_usergroup_ids($data, false);
         foreach ($usergroups as $ug_id => $status) {
