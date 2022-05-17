@@ -11,8 +11,6 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-// use Tygh\Addons\Warehouses\ServiceProvider;
-// use Tygh\Enum\YesNo;
 use Tygh\Registry;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
@@ -35,13 +33,6 @@ if ($mode == 'update') {
         $company_id = $product_company_id;
     }
 
-    /** @var Tygh\Addons\Warehouses\Manager $manager */
-    // $manager = Tygh::$app['addons.warehouses.manager'];
-
-    /** @var Tygh\Addons\Warehouses\ProductStock $product_stock */
-    //$product_stock = $manager->getProductWarehousesStock($_REQUEST['product_id']);
-
-    //$warehouses = $manager->getWarehouses($company_id);
     list($storages) = fn_get_storages(['company_id' => $product_company_id]);
     $storages_amount = fn_get_storages_amount($_REQUEST['product_id']);
 
@@ -56,46 +47,4 @@ if ($mode == 'update') {
             'js' => true,
         ]);
     }
-
-    // if (empty($warehouses) && !$product_stock->hasStockSplitByWarehouses()) {
-    //     return [CONTROLLER_STATUS_OK];
-    // }
-
-    // if (
-    //     fn_allowed_for('ULTIMATE')
-    //     && !$product_stock->hasStockSplitByWarehouses()
-    //     && $runtime_company_id
-    //     && $runtime_company_id !== $product_company_id
-    // ) {
-    //     return [CONTROLLER_STATUS_OK];
-    // }
-
-    // if ($product_stock->hasStockSplitByWarehouses()) {
-    //     $product_warehouses_amount = $product_stock->getAmount();
-    //     Tygh::$app['view']->assign('product_warehouses_amount', $product_warehouses_amount);
-    // }
-
-
-
-    // // Quantity tab is not avaliable if product is common or about to be.
-    // $is_quantity_tab_avaliable = !isset($company_id) || !empty($company_id);
-
-}
-
-if ($mode === 'm_update') {
-    /** @var \Tygh\SmartyEngine\Core $view */
-    $view = Tygh::$app['view'];
-    /** @var array $products_data */
-    $products_data = $view->getTemplateVars('products_data');
-    $readonly_fields = [];
-
-    /** @var Tygh\Addons\Warehouses\Manager $manager */
-    $manager = Tygh::$app['addons.warehouses.manager'];
-
-    foreach ($products_data as $product) {
-        $product_id = $product['product_id'];
-        $readonly_fields[$product_id]['amount'] = YesNo::toBool($product['is_stock_split_by_warehouses']);
-    }
-
-    $view->assign('readonly_fields', $readonly_fields);
 }

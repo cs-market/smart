@@ -107,15 +107,17 @@ function fn_storages_get_usergroups_pre(&$params, $lang_code) {
 function fn_storages_update_product_post($product_data, $product_id, $lang_code, $create) {
     if (isset($product_data['storages'])) {
         db_query('DELETE FROM ?:storages_products WHERE product_id = ?i', $product_id);
+        $update = [];
         foreach ($product_data['storages'] as $storage_id => &$storage_data) {
-            if (empty(array_filter($storage_data))) {
-                unset($product_data['storages'][$storage_id]);
-            } else {
-                $storage_data['storage_id'] = $storage_id;
-                $storage_data['product_id'] = $product_id;
+            if (isset($storage_data['storage_id'])) $storage_id = $storage_data['storage_id'];
+            if (!empty(array_filter($storage_data))) {
+                $update[$storage_id] = $storage_data;
+                $update[$storage_id]['storage_id'] = $storage_id;
+                $update[$storage_id]['product_id'] = $product_id;
             }
         }
-        if ($product_data['storages']) db_query('INSERT INTO ?:storages_products ?m', $product_data['storages']);
+
+        if (!empty($update)) db_query('INSERT INTO ?:storages_products ?m', $update);
     }
 }
 
