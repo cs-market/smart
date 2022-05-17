@@ -18,7 +18,7 @@ include_once(Registry::get('config.dir.addons') . 'storages/schemas/exim/storage
 $schema = array(
     'section' => 'storages',
     'pattern_id' => 'storages',
-    'name' => __('storages'),
+    'name' => __('storages.storages'),
     'key' => array('storage_id'),
     'table' => 'storages',
     'permissions' => array(

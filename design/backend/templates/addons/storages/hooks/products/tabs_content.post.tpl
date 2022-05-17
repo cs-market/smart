@@ -1,4 +1,4 @@
-<div class="hidden" id="content_storages_quantity">
+<div class="hidden" id="content_storages">
     {if $storages}
     <div class="table-responsive-wrapper">
         <table class="table table-middle table--relative table-responsive" width="100%">
@@ -37,17 +37,6 @@
         </table>
     </div>
     {else}
-        {if $runtime.company_id}
-            {$store_locator_type_storage = "\Tygh\Addons\storages\Manager::STORE_LOCATOR_TYPE_storage"|constant}
-            {$store_locator_type_store = "\Tygh\Addons\storages\Manager::STORE_LOCATOR_TYPE_STORE"|constant}
-
-            <p class="no-items">{__("storages.quantity_tab.no_data", [
-                    "[create_url]" => "store_locator.add?store_type={$store_locator_type_store}"|fn_url,
-                    "[list_url]"   => "store_locator.manage?store_types[]={$store_locator_type_storage}&store_types[]={$store_locator_type_store}&switch_company_id=0"|fn_url
-                ])}
-            </p>
-        {else}
-            <p class="no-items">{__("no_data")}</p>
-        {/if}
+         <p class="no-items">{__("no_data")}</p>
     {/if}
 </div>

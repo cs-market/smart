@@ -11,7 +11,7 @@
 *  "license agreement.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.  *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-$schema['central']['products']['items']['storages'] = array(
+$schema['central']['products']['items']['storages.storages'] = array(
     'attrs' => array(
         'class'=>'is-addon'
     ),
@@ -19,12 +19,12 @@ $schema['central']['products']['items']['storages'] = array(
     'position' => 660,
 );
 
-$schema['top']['administration']['items']['export_data']['subitems']['storages'] = array(
+$schema['top']['administration']['items']['export_data']['subitems']['storages.storages'] = array(
     'href' => 'exim.export?section=storages',
     'position' => 351
 );
 
-$schema['top']['administration']['items']['import_data']['subitems']['storages'] = array(
+$schema['top']['administration']['items']['import_data']['subitems']['storages.storages'] = array(
     'href' => 'exim.import?section=storages',
     'position' => 351
 );

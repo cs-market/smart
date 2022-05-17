@@ -51,8 +51,8 @@ if ($mode == 'update') {
     ]);
 
     if ($storages) {
-        Registry::set('navigation.tabs.storages_quantity', [
-            'title' => __('storages.quantity'),
+        Registry::set('navigation.tabs.storages', [
+            'title' => __('storages.storages'),
             'js' => true,
         ]);
     }

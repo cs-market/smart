@@ -42,14 +42,14 @@
 
     {/hook}
     <div class="control-group">
-        <label for="storage_code_{$id}" class="cm-required control-label">{__("storage_code")}:</label>
+        <label for="storage_code_{$id}" class="cm-required control-label">{__("storages.storage_code")}:</label>
         <div class="controls">
             <input type="text" size="70" id="storage_code_{$id}" name="storage_data[code]" value="{$storage.code}" class="input-large">
         </div>
     </div>
 
     <div class="control-group">
-        <label for="storage_min_order_{$id}" class="cm-required control-label">{__("min_order_amount")}:</label>
+        <label for="storage_min_order_{$id}" class="cm-required control-label">{__("storages.min_order_amount")}:</label>
         <div class="controls">
             <input type="text" size="70" id="storage_min_order_{$id}" name="storage_data[min_order]" value="{$storage.min_order}" class="input-large">
         </div>

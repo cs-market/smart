@@ -11,7 +11,14 @@
     <has_icon>Y</has_icon>
     <default_language>ru</default_language>
     <language_variables>
-
+        <item lang="ru" id="storages">Склады</item>
+        <item lang="ru" id="storages.storages">Склады</item>
+        <item lang="ru" id="storages.storages_menu_description">Управление складами</item>
+        <item lang="ru" id="storages.storage">Cклад</item>
+        <item lang="ru" id="storages.new_storage">Новый склад</item>
+        <item lang="ru" id="storages.storage_code">Внешний код склада</item>
+        <item lang="ru" id="storages.min_order_amount">Минимальный заказ по складу</item>
+        <item lang="ru" id="storages.storages_products">Остатки на складах</item>
     </language_variables>
     <queries>
         <!-- company_id only for multivendor -->
