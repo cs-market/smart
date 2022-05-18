@@ -40,7 +40,6 @@
         zero_company_id_name_lang_var="none"
     }
 
-    {/hook}
     <div class="control-group">
         <label for="storage_code_{$id}" class="cm-required control-label">{__("storages.storage_code")}:</label>
         <div class="controls">
@@ -62,6 +61,7 @@
             </div>
         </div>
     {/if}
+    {/hook}
     {include file="common/select_status.tpl" input_name="storage_data[status]" id="elm_storage_status_{$id}" obj=$storage}
 </fieldset>
 </div>
