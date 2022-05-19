@@ -45,6 +45,8 @@ foreach ($schema['export_fields'] as &$field) {
         $field['convert_put'][0] = 'fn_smart_distribution_exim_import_price';
     }
 }
+unset($field);
+
 foreach (['Min quantity', 'Max quantity', 'Quantity step', 'Quantity', 'Weight'] as $field) {
     if (isset($schema['export_fields'][$field])) {
         $schema['export_fields'][$field]['convert_put'] = ['fn_smart_distribution_exim_import_price', '#this'];
