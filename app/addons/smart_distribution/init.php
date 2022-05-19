@@ -45,7 +45,7 @@ fn_register_hooks(
     'get_categories',
     'get_product_data',
     'get_product_data_post',
-    'get_product_price_post',
+    'get_product_price',
     'load_products_extra_data',
     'load_products_extra_data_post',
     'get_stickers_pre',

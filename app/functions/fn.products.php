@@ -419,17 +419,20 @@ function fn_get_product_price($product_id, $amount, &$auth)
      * @param array $auth       Array of user authentication data (e.g. uid, usergroup_ids, etc.)
      */
     fn_set_hook('get_product_price_pre', $product_id, $amount, $auth);
+    fn_set_hook('get_product_price', $product_id, $amount, $auth, $price, $skip_query);
 
-    $usergroup_condition = db_quote("AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'C' || defined('ORDER_MANAGEMENT')) ? array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']) : USERGROUP_ALL));
+    if (!$skip_query) {
+        $usergroup_condition = db_quote("AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'C' || defined('ORDER_MANAGEMENT')) ? array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']) : USERGROUP_ALL));
 
-    $price = db_get_field(
-        "SELECT MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, "
-        . "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) as price "
-        . "FROM ?:product_prices "
-        . "WHERE lower_limit <=?i AND ?:product_prices.product_id = ?i ?p "
-        . "ORDER BY lower_limit DESC LIMIT 1",
-        $amount, $product_id, $usergroup_condition
-    );
+        $price = db_get_field(
+            "SELECT MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, "
+            . "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) as price "
+            . "FROM ?:product_prices "
+            . "WHERE lower_limit <=?i AND ?:product_prices.product_id = ?i ?p "
+            . "ORDER BY lower_limit DESC LIMIT 1",
+            $amount, $product_id, $usergroup_condition
+        );
+    }
 
     /**
      * Change product price
@@ -439,6 +442,7 @@ function fn_get_product_price($product_id, $amount, &$auth)
      * @param array $auth       Array of user authentication data (e.g. uid, usergroup_ids, etc.)
      * @param float $price
      */
+
     fn_set_hook('get_product_price_post', $product_id, $amount, $auth, $price);
 
     return (empty($price))? 0 : floatval($price);

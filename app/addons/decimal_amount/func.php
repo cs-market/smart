@@ -78,16 +78,18 @@ function fn_decimal_amount_add_product_to_cart_get_price($product_data, $cart, $
 }
 
 function fn_decimal_amount_get_product_price_post($product_id, $amount, $auth, &$price) {
-    $usergroup_condition = db_quote("AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'C' || defined('ORDER_MANAGEMENT')) ? array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']) : USERGROUP_ALL));
+    // We get a correct price in fn_smart_distribution_get_product_price + fn_decimal_amount_get_product_price_pre
 
-    $price = db_get_field(
-        "SELECT MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, "
-            . "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) as price "
-        . "FROM ?:product_prices "
-        . "WHERE lower_limit <=?d AND ?:product_prices.product_id = ?i ?p "
-        . "ORDER BY lower_limit DESC LIMIT 1",
-        ($amount < 1) ? 1 : $amount, $product_id, $usergroup_condition
-    );
+    // $usergroup_condition = db_quote("AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'C' || defined('ORDER_MANAGEMENT')) ? array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']) : USERGROUP_ALL));
+
+    // $price = db_get_field(
+    //     "SELECT MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, "
+    //         . "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) as price "
+    //     . "FROM ?:product_prices "
+    //     . "WHERE lower_limit <=?d AND ?:product_prices.product_id = ?i ?p "
+    //     . "ORDER BY lower_limit DESC LIMIT 1",
+    //     ($amount < 1) ? 1 : $amount, $product_id, $usergroup_condition
+    // );
 }
 
 function fn_decimal_amount_update_cart_products_pre(&$cart, &$product_data, $auth) {

@@ -951,42 +951,7 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
     if (strpos($condition, 'AND 1 != 1')) {
         $condition = str_replace('AND 1 != 1', ' AND 1 != 1', $condition);
     }
-    if (Tygh::$app['session']['auth']['area'] == 'A' && AREA == 'C') {
-        //fn_print_die($condition, $join);
-        // if (in_array('prices', $params['extend'])) {
-        //     $join .= " LEFT JOIN ?:product_prices as prices ON prices.product_id = products.product_id AND prices.lower_limit = 1";
-        //     $price_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), Tygh::$app['session']['auth']['usergroup_ids'])));
-        // }
 
-        // // $condition = str_replace([$price_condition, '('.fn_find_array_in_set(Tygh::$app['session']['auth']['usergroup_ids'], 'products.usergroup_ids', true).')'], ['', ''], $condition);
-        // //$condition = str_replace($price_condition, '', $condition);
-        // fn_print_die($condition);
-        // $condition = explode(' AND ', $condition);
-        // foreach($condition as $id => $cond) {
-        //     if (strpos($cond, 'usergroup_ids') !== false
-        //       || strpos($cond, 'usergroup_id') !== false
-        //     ) {
-        //         unset($condition[$id]);
-        //     }
-        // }
-        // $condition = implode(' AND ', $condition);
-        
-        // $join = explode(' JOIN ', $join);
-        // foreach($join as &$j) {
-        //     $j = explode(' AND ', $j);
-        //   foreach($j as $id => $cond) {
-        //     if (strpos($cond, 'usergroup_ids') !== false
-        //       || strpos($cond, 'usergroup_id') !== false
-        //     ) {
-        //       unset($j[$id]);
-        //     }
-        //   }
-        //   $j = implode(' AND ', $j);
-        // }
-        // unset($j);
-        // $join = implode(' JOIN ', $join);
-    }
-    //fn_print_die($condition);
     if (AREA == 'A') {
         $fields['timestamp'] = "products.timestamp";
         if (isset($params['product_code']) && !empty($params['product_code'])) {
@@ -1048,17 +1013,6 @@ function fn_smart_distribution_get_products_before_select(&$params, $join, $cond
 }
 
 function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fields, $group_by, $sortings, $lang_code) {
-    if (Tygh::$app['session']['auth']['area'] == 'A') {
-        $condition = explode(' AND ', $condition);
-        foreach($condition as $id => $cond) {
-            if (strpos($cond, 'usergroup_ids') !== false
-            || strpos($cond, 'usergroup_id') !== false
-            ) {
-                unset($condition[$id]);
-            }
-        }
-        $condition = implode(' AND ', $condition);
-    }
     if (isset($params['search_query']) && !fn_is_empty($params['search_query'])) {
         $search = db_quote(' AND ?:category_descriptions.category LIKE ?l', '%' . trim($params['search_query']) . '%');
         $condition = str_replace($search, '', $condition);
@@ -1075,28 +1029,6 @@ function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fie
 }
 
 function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
-    
-    // products available for admins
-    // $init_join = $join;
-    // if ($auth['area'] == 'A' && AREA == 'C') {
-    //     $join = explode(' JOIN ', $join);
-    //     foreach($join as &$j) {
-    //         $j = explode(' AND ', $j);
-    //       foreach($j as $id => $cond) {
-    //         if (strpos($cond, 'usergroup_ids') !== false
-    //           || strpos($cond, 'usergroup_id') !== false
-    //         ) {
-    //           unset($j[$id]);
-    //         }
-    //       }
-    //       $j = implode(' AND ', $j);
-    //     }
-
-    //     unset($j);
-    //     $join = implode(' JOIN ', $join);
-    // }
-    //fn_print_die($join, $init_join);
-
     $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
     if (AREA == 'C') {
         $condition .= db_quote(' 
@@ -1115,7 +1047,6 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
             'N'
         );
     }
-    //fn_print_die($price_usergroup);
 }
 
 function fn_smart_distribution_get_usergroups_price($product_id, $usergroup_ids = array()) {
@@ -1126,12 +1057,6 @@ function fn_smart_distribution_get_usergroups_price($product_id, $usergroup_ids 
 }
 
 function fn_smart_distribution_get_product_data_post(&$product_data, $auth, $preview, $lang_code) {
-    if (AREA == 'C') {
-        $product_data['usergroup_price'] = fn_smart_distribution_get_usergroups_price($product_data['product_id'], $auth['usergroup_ids']);
-        if (!empty($product_data['usergroup_price'])) {
-            $product_data['price'] = $product_data['usergroup_price'];
-        }
-    }
     // buy together for mobile application
     if (defined('API') && Registry::get('addons.buy_together.status') == 'A') {
         $p['product_id'] = $product_data['product_id'];
@@ -1142,21 +1067,18 @@ function fn_smart_distribution_get_product_data_post(&$product_data, $auth, $pre
     }
 }
 
-function fn_smart_distribution_get_product_price_post($product_id, $amount, $auth, &$price) {
-    $usergroup_condition = db_quote(" AND ?:product_prices.usergroup_id = ?i", USERGROUP_ALL);
+function fn_smart_distribution_get_product_price($product_id, $amount, $auth, &$price, &$skip) {
+    $skip = true;
+    $usergroup_ids = empty($usergroup_ids) ? Tygh::$app['session']['auth']['usergroup_ids'] : $usergroup_ids;
+    $usergroup_ids = array_filter($usergroup_ids);
 
-    $price = db_get_field(
-        "SELECT MIN(IF(?:product_prices.percentage_discount = 0, ?:product_prices.price, "
-            . "?:product_prices.price - (?:product_prices.price * ?:product_prices.percentage_discount)/100)) as price "
-        . "FROM ?:product_prices "
-        . "WHERE lower_limit <=?i AND ?:product_prices.product_id = ?i ?p "
-        . "ORDER BY lower_limit DESC LIMIT 1",
-        $amount, $product_id, $usergroup_condition
-    );
-    $usergroup_price = fn_smart_distribution_get_usergroups_price($product_id, $auth['usergroup_ids']);
-    if (!empty($usergroup_price)) {
-        $price = $usergroup_price;
-    }
+    $price = db_get_field("
+        SELECT min(IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100)) as price 
+        FROM ?:product_prices as prices 
+        WHERE prices.product_id = ?i AND CASE WHEN 
+            (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?n) )
+            THEN prices.usergroup_id IN (?n) 
+            ELSE prices.usergroup_id = ?i END ORDER BY lower_limit", $product_id, $product_id, $usergroup_ids, $usergroup_ids, USERGROUP_ALL);
 }
 
 function fn_smart_distribution_load_products_extra_data(&$extra_fields, $products, $product_ids, $params, $lang_code) {
