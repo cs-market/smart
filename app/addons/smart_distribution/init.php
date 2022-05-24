@@ -1,5 +1,7 @@
 <?php
 
+use Tygh\SmartApi;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
@@ -7,8 +9,9 @@ fn_register_hooks(
     'get_order_info',
     'vendor_plan_before_save',
     'get_usergroups',
-    'post_get_usergroups',
     'get_simple_usergroups_pre',
+    'update_usergroup',
+    'delete_usergroups',
     'get_users_pre',
     'get_users',
     'get_users_post',
@@ -80,3 +83,7 @@ fn_register_hooks(
     'update_storage_usergroups_pre',
     'update_product_prices'
 );
+
+if (defined('API')) {
+    Tygh::$app['api'] = new SmartApi();
+}

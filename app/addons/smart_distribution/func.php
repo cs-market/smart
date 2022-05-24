@@ -1,7 +1,7 @@
 <?php
 
 use Tygh\Registry;
-use Tygh\Models\Company;
+use Tygh\Models\Vendor;
 use Tygh\Enum\ProductTracking;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProfileDataTypes;
@@ -143,51 +143,24 @@ function fn_smart_distribution_vendor_plan_before_save(&$obj, $result) {
     }
 }
 
-class UG_Company extends Company {
-    public function getFields($params)
-    {
-        $fields = parent::getFields($params);
-        $fields[] = 'p.usergroup_ids';
-        return $fields;
-    }
-
-    public function gatherAdditionalItemsData(&$items, $params)
-    {
-        parent::gatherAdditionalItemsData($items, $params);
-        foreach ($items as $key => $item) {
-            $items[$key]['usergroup_ids'] = !empty($item['usergroup_ids']) ? explode(',', $item['usergroup_ids']) : array();
-        }
-    }
-}
-
 function fn_smart_distribution_get_usergroups($params, $lang_code, $field_list, $join, &$condition, $group_by, $order_by, $limit) {
-    $company = UG_Company::model()->current();
-    if ($company) {
-        if ($company->usergroup_ids)
-        $condition .= db_quote(' AND a.usergroup_id IN (?a)', $company->usergroup_ids);
-    }
-}
-
-function fn_smart_distribution_post_get_usergroups(&$usergroups, $type, $lang_code) {
-    $company = UG_Company::model()->current();
-
-    if ($company) {
-        if ($company->usergroup_ids) {
-            $ug_uds = $company->usergroup_ids;
-            $usergroups = array_filter($usergroups, function($k) use ($ug_uds) {
-                return in_array($k, $ug_uds);
-            }, ARRAY_FILTER_USE_KEY);
-
-        }
-    }
+    fn_smart_distribution_get_simple_usergroups_pre($condition);
 }
 
 function fn_smart_distribution_get_simple_usergroups_pre(&$where) {
-    $company = UG_Company::model()->current();
-    if ($company) {
-        if ($company->usergroup_ids)
+    $company = Vendor::model()->current();
+    if (!empty($company) && !empty($company->usergroup_ids)) {
         $where .= db_quote(' AND a.usergroup_id IN (?a)', $company->usergroup_ids);
     }
+}
+
+function fn_smart_distribution_update_usergroup($usergroup_data, $usergroup_id, $create) {
+    if ($create && $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', Registry::get('runtime.company_id'))) {
+        db_query("UPDATE ?:vendor_plans SET usergroup_ids = ?p  WHERE plan_id = ?i", fn_add_to_set('usergroup_ids', $usergroup_id), $plan_id);
+    }
+}
+function fn_smart_distribution_delete_usergroups($usergroup_ids) {
+    foreach ($usergroup_ids as $usergroup_id) db_query("UPDATE ?:vendor_plans SET usergroup_ids = ?p", fn_remove_from_set('usergroup_ids', $usergroup_id));
 }
 
 function fn_smart_distribution_get_managers($params = array()) {
@@ -592,6 +565,7 @@ function fn_smart_distribution_update_category_pre(&$category_data, $category_id
         ));
         $preset = reset($presets);
         if ($preset['company_id']) {
+            // TODO replace with $company = Vendor::model()->current(); but via find company_id
             $usergroup_ids = db_get_field("SELECT usergroup_ids FROM ?:vendor_plans LEFT JOIN ?:companies ON ?:companies.plan_id = ?:vendor_plans.plan_id WHERE company_id = ?i", $preset['company_id']);
             $category_data['usergroup_ids'] = explode(',',$usergroup_ids);
         }
@@ -600,11 +574,8 @@ function fn_smart_distribution_update_category_pre(&$category_data, $category_id
 }
 
 function fn_smart_distribution_update_category_post($category_data, $category_id, $lang_code) {
-    if (isset($category_data['add_category_to_vendor_plan'])) {
-        $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', $category_data['add_category_to_vendor_plan']);
-        if ($plan_id) {
-            db_query("UPDATE ?:vendor_plans SET `categories`= IF(categories = '', ?s, CONCAT(categories, ?s)) WHERE plan_id = ?i", $category_id, ',' . $category_id,  $plan_id);
-        }
+    if (isset($category_data['add_category_to_vendor_plan']) && $plan_id = db_get_field('SELECT plan_id FROM ?:companies WHERE company_id = ?i', $category_data['add_category_to_vendor_plan'])) {
+        db_query("UPDATE ?:vendor_plans SET categories = ?p  WHERE plan_id = ?i", fn_add_to_set('categories', $category_id), $plan_id);
     }
 }
 
@@ -750,8 +721,8 @@ function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $
     $cid = (isset($product_data['company_id'])) ? $product_data['company_id'] : db_get_field('SELECT company_id FROM ?:products WHERE product_id = ?i', $product_id);
 
     if ($cid) {
-        $company = UG_Company::model()->find($cid);
-        if ($company && !empty($company->usergroup_ids)) {
+        $company = Vendor::model()->find($cid);
+        if (!empty($company) && !empty($company->usergroup_ids)) {
             if (!$product_id && !$product_data['usergroup_ids']) {
                 $product_data['usergroup_ids'] = $company->usergroup_ids;
             }
@@ -1324,8 +1295,6 @@ function fn_smart_distribution_extract_cart(&$cart, $user_id, $type, $user_type)
 }
 
 function fn_smart_distribution_get_promotions($params, $fields, $sortings, &$condition, $join, $group, $lang_code) {
-    //fn_print_die($params, $fields, $sortings, $condition, $join, $group, $lang_code);
-
     if (!empty($params['name'])) {
         $condition .= db_quote(' AND ?:promotion_descriptions.name LIKE ?l', '%' . $params['name'] . '%');
     }
