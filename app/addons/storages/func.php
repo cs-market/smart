@@ -84,15 +84,24 @@ function fn_update_storage($storage_data, $storage_id = 0) {
 }
 
 function fn_delete_storages($storage_ids) {
+    $res = false;
     if (!is_array($storage_ids)) {
         $storage_ids = explode(',', $storage_ids);
     }
 
-    db_query("DELETE FROM ?:storages WHERE storage_id IN (?n)", $storage_ids);
-    db_query("DELETE FROM ?:storages_products WHERE storage_id IN (?n)", $storage_ids);
-    db_query("DELETE FROM ?:storage_usergroups WHERE storage_id IN (?n)", $storage_ids);
+    if (Registry::get('runtime.company_id')) {
+        $storage_ids = db_get_fields('SELECT storage_id FROM ?:storages WHERE company_id = ?i AND storage_id IN (?a)', Registry::get('runtime.company_id'), $storage_ids);
+    }
 
-    fn_set_hook('delete_storages', $storage_ids);
+    if (!empty($storage_ids)) {
+        $res = db_query("DELETE FROM ?:storages WHERE storage_id IN (?n)", $storage_ids);
+        db_query("DELETE FROM ?:storages_products WHERE storage_id IN (?n)", $storage_ids);
+        db_query("DELETE FROM ?:storage_usergroups WHERE storage_id IN (?n)", $storage_ids);
+        
+        fn_set_hook('delete_storages', $storage_ids);
+    }
+
+    return $res;
 }
 
 function fn_storages_get_usergroups_pre(&$params, $lang_code) {

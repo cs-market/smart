@@ -98,8 +98,12 @@ class Storages extends AEntity
 
     public function delete($id)
     {
-        $status = Response::STATUS_NOT_FOUND;
         $data = array();
+        $status = Response::STATUS_BAD_REQUEST;
+
+        if (fn_delete_storages($id)) {
+            $status = Response::STATUS_NO_CONTENT;
+        }
 
         return array(
             'status' => $status,

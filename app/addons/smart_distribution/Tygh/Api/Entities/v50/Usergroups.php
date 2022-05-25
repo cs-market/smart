@@ -46,10 +46,12 @@ class Usergroups extends DefaultUsergroups
 
     protected function createOrUpdate($params, $id = null)
     {
-        if ($id && Registry::get('runtime.company_id')) {
-            $company = Vendor::model()->current();
-            if (!empty($company) && !empty($company->usergroup_ids)) {
-                if (!in_array($id, $company->usergroup_ids)) {
+        if (Registry::get('runtime.company_id')) {
+            $params['type'] = 'C';
+            $params['status'] = 'A';
+            if ($id) {
+                $company = Vendor::model()->current();
+                if (!empty($company) && !empty($company->usergroup_ids) && !in_array($id, $company->usergroup_ids)) {
                     return array('data' => [], 'status' => Response::STATUS_BAD_REQUEST);
                 }
             }
