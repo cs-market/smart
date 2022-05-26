@@ -244,7 +244,6 @@ function fn_exim_get_salts($primary_object_id, &$object) {
 }
 
 function fn_smart_distribution_exim_set_usergroups($user_id, $data, $cleanup = true) {
-    fn_print_die($cleanup);
     if ($cleanup) db_query("DELETE FROM ?:usergroup_links WHERE user_id = ?i", $user_id);
     if (!empty($data)) {
         $usergroups = fn_exim_smart_distribution_get_usergroup_ids($data, false);
