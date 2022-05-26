@@ -27,7 +27,7 @@
             CREATE TABLE `?:storages` (
                 `storage_id` mediumint(8) unsigned NOT NULL auto_increment,
                 `code` varchar(32) NOT NULL,
-                `storage` varchar(32) NOT NULL,
+                `storage` varchar(255) NOT NULL,
                 `company_id` smallint unsigned NOT NULL DEFAULT '0',
                 `min_order` mediumint unsigned NOT NULL DEFAULT '0',
                 `status` char(1) NOT NULL DEFAULT 'A',

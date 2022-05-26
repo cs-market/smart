@@ -12,11 +12,12 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 use Tygh\Registry;
+use Tygh\Enum\SiteArea;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-function fn_get_storages($params, $items_per_page = 0) {
-    $condition = '';
+function fn_get_storages($params = [], $items_per_page = 0) {
+    $condition = $join = '';
 
     if (!empty($params['status'])) {
         $condition .= db_quote(' AND status = ?s', $params['status']);
@@ -41,7 +42,15 @@ function fn_get_storages($params, $items_per_page = 0) {
         $condition .= db_quote(' AND storage_id IN (?a)', $params['storage_ids']);
     }
 
-    $storages = db_get_hash_array("SELECT * FROM ?:storages WHERE 1 ?p", 'storage_id', $condition);
+    if (SiteArea::isStorefront(AREA)) {
+        $params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
+    }
+    if (!empty($params['usergroup_ids'])) {
+        $join .= db_quote('LEFT JOIN ?:storage_usergroups ON ?:storages.storage_id = ?:storage_usergroups.storage_id');
+        $condition .= db_quote(' AND ?:storage_usergroups.usergroup_id IN (?a)', $params['usergroup_ids']);
+    }
+
+    $storages = db_get_hash_array("SELECT * FROM ?:storages $join WHERE 1 ?p", 'storage_id', $condition);
 
     if (isset($params['storage_id'])) {
         foreach ($storages as &$storage) {
@@ -97,7 +106,7 @@ function fn_delete_storages($storage_ids) {
         $res = db_query("DELETE FROM ?:storages WHERE storage_id IN (?n)", $storage_ids);
         db_query("DELETE FROM ?:storages_products WHERE storage_id IN (?n)", $storage_ids);
         db_query("DELETE FROM ?:storage_usergroups WHERE storage_id IN (?n)", $storage_ids);
-        
+
         fn_set_hook('delete_storages', $storage_ids);
     }
 
@@ -137,4 +146,46 @@ function fn_get_storages_amount($product_id) {
     }
 
     return $return;
+}
+
+
+function fn_init_storages() {
+    if (AREA != 'C') {
+        return array(INIT_STATUS_OK);
+    }
+
+    $storages = Registry::getOrSetCache(
+        'fn_get_storages',
+        ['storages', 'storage_usergroups'],
+        'user',
+        static function () {
+            list($storages) = fn_get_storages();
+            return $storages;
+        }
+    );
+
+    if (!empty($storages)) {
+        if (!empty($_REQUEST['storage']) && !empty($storages[$_REQUEST['storage']])) {
+            $storage = $_REQUEST['storage'];
+
+        } elseif (($s = fn_get_session_data('storage')) && !empty($storages[$s])) {
+            $storage = $s;
+        } else {
+            reset($storages);
+            $storage = key($storages);
+            fn_set_notification('N', __('notice'), __('storages.force_to_choose_storage'));
+        }
+
+        if ($storage != fn_get_session_data('storage')) {
+            fn_set_session_data('storage', $storage, COOKIE_ALIVE_TIME);
+        }
+
+        Registry::set('runtime.current_storage', $storages[$storage]);
+
+        fn_define('STORAGE', $storage);
+
+        Tygh::$app['view']->assign('storages', $storages);
+    }
+
+    return array(INIT_STATUS_OK);
 }

@@ -3016,6 +3016,7 @@ function fn_update_product_prices($product_id, $product_data, $company_id = 0)
 {
     $_product_data = $product_data;
     $skip_price_delete = false;
+
     // Update product prices
     if (isset($_product_data['price'])) {
         $_price = array (
@@ -3052,6 +3053,7 @@ function fn_update_product_prices($product_id, $product_data, $company_id = 0)
          * @param bool   $table_name        Database table name where the price data is stored.
          * @param string $condition         SQL conditions for deleting the old prices of a product.
          */
+
         fn_set_hook('update_product_prices', $product_id, $_product_data, $company_id, $skip_price_delete, $table_name, $condition);
 
         if (!$skip_price_delete) {
