@@ -1162,16 +1162,16 @@ function fn_smart_distribution_get_product_filters_before_select($fields, $join,
 }
 
 function fn_smart_distribution_calculate_cart_items(&$cart, $cart_products, $auth, $apply_cart_promotions) {
-    // if ($apply_cart_promotions && $cart['subtotal'] >= 0 && !empty($cart['order_id'])) {
-    //     if (!empty($cart['stored_subtotal_discount'])) {
-    //         $prev_discount = $cart['subtotal_discount'];
-    //     }
+    if ($apply_cart_promotions && $cart['subtotal'] >= 0 && !empty($cart['order_id'])) {
+        if (!empty($cart['stored_subtotal_discount'])) {
+            $prev_discount = $cart['subtotal_discount'];
+        }
         
-    //     $cart['applied_promotions'] = fn_promotion_apply('cart', $cart, $auth, $cart_products);
-    //     if (!empty($cart['stored_subtotal_discount'])) {
-    //         $cart['subtotal_discount'] = $prev_discount;
-    //     }
-    // }
+        $cart['applied_promotions'] = fn_promotion_apply('cart', $cart, $auth, $cart_products);
+        if (!empty($cart['stored_subtotal_discount'])) {
+            $cart['subtotal_discount'] = $prev_discount;
+        }
+    }
 }
 
 function fn_smart_distribution_edit_place_order($order_id) {
