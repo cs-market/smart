@@ -28,6 +28,7 @@ fn_register_hooks(
     'update_category_post',
     'set_product_categories_exist',
     'pre_add_to_cart',
+    ['check_amount_in_stock_before_check', 200],
     'add_to_cart',
     'get_profile_fields',
     'vendor_communication_add_thread_message_post',
