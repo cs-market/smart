@@ -935,7 +935,7 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
         // Cut off out of stock products
         $condition .= db_quote(
             ' AND (CASE products.show_out_of_stock_product' .
-            "   WHEN ?s THEN (products.amount >= products.min_qty OR products.tracking = 'D')" .
+            "   WHEN ?s THEN (products.amount > 0 OR products.tracking = 'D')" .
             '   ELSE 1' .
             ' END)',
             'N'
@@ -1012,7 +1012,7 @@ function fn_smart_distribution_get_product_data($product_id, $field_list, &$join
     if (AREA == 'C') {
         $condition .= db_quote(
             ' AND (CASE ?:products.show_out_of_stock_product' .
-            "   WHEN ?s THEN (?:products.amount >= ?:products.min_qty OR ?:products.tracking = 'D')" .
+            "   WHEN ?s THEN (?:products.amount > 0 OR ?:products.tracking = 'D')" .
             '   ELSE 1' .
             ' END)',
             'N'
