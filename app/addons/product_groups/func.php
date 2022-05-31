@@ -86,26 +86,26 @@ function fn_product_groups_get_cart_product_data_post_options($product_id, $_pda
 // return product_groups
 function fn_product_groups_split_cart($cart) {
     $p_groups = array();
-
     if (!fn_cart_is_empty($cart)) {
-        $group_ids = array_unique(fn_array_column($cart['products'], 'group_id'));
-        $cart['groups'] = fn_get_product_groups(array('group_ids' => $group_ids));
+        if ($group_ids = array_filter(array_unique(fn_array_column($cart['products'], 'group_id')))) {
+            $cart['groups'] = fn_get_product_groups(array('group_ids' => $group_ids));
 
-        $proto = reset($cart['product_groups']);
-        unset($proto['products']);
-        foreach ($cart['products'] as $cart_id => $product) {
-            $group_id = $product['group_id'];
-            if (!isset($p_groups[$group_id])) {
-                $p_groups[$group_id] = $proto;
-                $p_groups[$group_id]['group_id'] = $group_id;
-                if ($group_id) {
-                    $p_groups[$group_id]['group'] = $cart['groups'][$product['group_id']];
-                    $p_groups[$group_id]['name'] = $p_groups[$group_id]['group']['group'];
+            $proto = reset($cart['product_groups']);
+            unset($proto['products']);
+            foreach ($cart['products'] as $cart_id => $product) {
+                $group_id = $product['group_id'];
+                if (!isset($p_groups[$group_id])) {
+                    $p_groups[$group_id] = $proto;
+                    $p_groups[$group_id]['group_id'] = $group_id;
+                    if ($group_id) {
+                        $p_groups[$group_id]['group'] = $cart['groups'][$product['group_id']];
+                        $p_groups[$group_id]['name'] = $p_groups[$group_id]['group']['group'];
+                    }
+                    $p_groups[$group_id]['subtotal'] = 0;
                 }
-                $p_groups[$group_id]['subtotal'] = 0;
+                $p_groups[$group_id]['products'][$cart_id] = $product;
+                $p_groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
             }
-            $p_groups[$group_id]['products'][$cart_id] = $product;
-            $p_groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
         }
     }
 

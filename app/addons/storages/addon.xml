@@ -59,5 +59,8 @@
             ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
         </item>
         <item for="uninstall">DROP TABLE IF EXISTS `?:storage_usergroups`;</item>
+
+        <item>ALTER TABLE `?:orders` ADD `storage_id` mediumint(8) unsigned NOT NULL;</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `storage_id`;</item>
     </queries>
 </addon>

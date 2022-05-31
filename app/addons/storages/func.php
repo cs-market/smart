@@ -389,9 +389,7 @@ function fn_storages_check_amount_in_stock_before_check($product_id, $amount, $p
     }
 }
 
-
-function fn_storages_shippings_group_products_list(&$products, &$groups)
-{
+function fn_storages_shippings_group_products_list(&$products, &$groups) {
     if ($storages = Registry::get('runtime.storages')) {
         $stored_storages_ids = array();
 
@@ -423,5 +421,23 @@ function fn_storages_shippings_group_products_list(&$products, &$groups)
 
         ksort($storages_groups);
         $groups = array_values($storages_groups);
+    }
+}
+
+function fn_storages_pre_update_order(&$cart, $order_id) {
+    if (Registry::get('runtime.storages') && count($cart['product_groups']) == 1) {
+        $cart['storage_id'] = $cart['product_groups'][0]['storage_id'];
+    }
+}
+
+function fn_storages_update_product_amount_pre($product_id, $amount_delta, $product_options, $sign, $tracking, &$current_amount, $product_code, $notify, $order_info, $cart_id) {
+    if ($order_info['storage_id']) {
+        $current_amount = db_get_field('SELECT amount FROM ?:storages_products WHERE storage_id = ?i AND product_id = ?i', $order_info['storage_id'], $product_id);
+    }
+}
+
+function fn_storages_update_product_amount($new_amount, $product_id, $cart_id, $tracking, $notify, $order_info, $amount_delta, $current_amount, $original_amount, $sign) {
+    if ($order_info['storage_id']) {
+        db_query('UPDATE ?:storages_products SET amount = ?d WHERE product_id = ?i AND storage_id = ?i', $new_amount, $product_id, $order_info['storage_id']);
     }
 }
