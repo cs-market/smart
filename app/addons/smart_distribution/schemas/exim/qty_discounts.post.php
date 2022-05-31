@@ -16,6 +16,8 @@ $schema['import_get_primary_object_id'] = array(
 $schema['export_fields']['User group']['convert_put'][0] = 'fn_exim_mve_put_usergroup';
 $schema['']['User group']['pre_insert'] = array('fn_exim_mve_check_usergroup', '#this');
 
+unset($schema['export_fields']['User group']['required']);
+$schema['export_fields']['Usergroup IDs'] = $schema['export_fields']['User group'];
 $schema['import_process_data'] = array(
     'check_usergroup' => array(
         'function' => 'fn_exim_mve_check_usergroup',
