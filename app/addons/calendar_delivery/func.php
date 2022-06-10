@@ -390,8 +390,13 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                 continue;
             }
 
+            if (!($cart_delivery_day = $cart['delivery_date'][$group_id])) {
+                $cart_delivery_day = reset($cart['delivery_date']);
+            }
+
             // backward compatibility (for mobile app)
-            $group['delivery_date'] = $group['delivery_date'] ?? $cart['delivery_date'];
+            $group['delivery_date'] = $group['delivery_date'] ?? $cart_delivery_day;
+
             if (is_array($group['delivery_date'])) $group['delivery_date'] = array_shift($group['delivery_date']);
 
             if (empty($group['delivery_date'])) {
@@ -415,6 +420,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                     $res = false;
                 }
             }
+
             if (!$res &&  AREA != A) {
                 $result = false;
                 fn_set_notification('E', __('error'), __('calendar_delivery.choose_another_day'));

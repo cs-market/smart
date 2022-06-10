@@ -67,6 +67,11 @@
         <item lang="en" id="calendar_delivery.exception_days">Exception days</item>
         <item lang="ru" id="calendar_delivery.exception_days">Дни-исключения</item>
 
+        <item lang="en" id="calendar_delivery.offer_documents">Offer documents</item>
+        <item lang="ru" id="calendar_delivery.offer_documents">Прелдагать документы</item>
+
+        <item lang="en" id="calendar_delivery.offer_documents_checked">Checked by default</item>
+        <item lang="ru" id="calendar_delivery.offer_documents_checked">Отмечено по-умолчанию</item>
 
         <item lang="ru" id="weekday_exim_1">Monday</item>
         <item lang="ru" id="weekday_exim_2">Tuesday</item>
