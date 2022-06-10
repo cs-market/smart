@@ -2,7 +2,6 @@
 
 use Tygh\Registry;
 use Tygh\Models\Vendor;
-use Tygh\Enum\ProductTracking;
 use Tygh\Enum\ObjectStatuses;
 use Tygh\Enum\ProfileDataTypes;
 use Tygh\Enum\SiteArea;
@@ -18,7 +17,7 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
     $auth = Tygh::$app['session']['auth'];
     if (!empty($params['usergroup_id'])) {
         list($users, ) = fn_get_users(array('usergroup_id' => $params['usergroup_id']), $auth);
-        $condition .= db_quote(' AND ?:orders.user_id IN (?a)', fn_array_column($users, 'user_id'));
+        $condition .= db_quote(' AND ?:orders.user_id IN (?a)', array_column($users, 'user_id'));
     }
 
     if (isset($params['user_ids']) && !empty($params['user_ids'])) {
@@ -34,7 +33,7 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
         list($users, ) = fn_get_users(array('managers' => $params['managers']), $auth);
 
         if ($users) {
-            $condition .= db_quote(' AND ?:orders.user_id IN (?a)', fn_array_column($users, 'user_id'));
+            $condition .= db_quote(' AND ?:orders.user_id IN (?a)', array_column($users, 'user_id'));
         } else {
             $condition .= db_quote(' AND 0');
         }
@@ -443,7 +442,7 @@ function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $a
 }
 
 function fn_smart_distribution_update_profile($action, $user_data, $current_user_data) {
-    if ((($action == 'add' && AREA == 'C') || defined('API')) && !empty($user_data['usergroup_ids'])) {
+    if ((($action == 'add' && SiteArea::isStorefront(AREA)) || defined('API')) && !empty($user_data['usergroup_ids'])) {
         $user_data['usergroup_ids'] = fn_exim_smart_distribution_get_usergroup_ids($user_data['usergroup_ids']);
         db_query('DELETE FROM ?:usergroup_links WHERE user_id = ?i', $user_data['user_id']);
         foreach ($user_data['usergroup_ids'] as $ug_id) {
@@ -453,7 +452,7 @@ function fn_smart_distribution_update_profile($action, $user_data, $current_user
 }
 
 function fn_smart_distribution_gather_additional_product_data_post(&$product, $auth, $params) {
-    if (AREA == 'C') {
+    if (SiteArea::isStorefront(AREA)) {
         // for discount label in mobile application
         if (isset($product['discount'])) {
             if (!isset($product['list_price']) || !( (float) $product['list_price'])) {
@@ -487,13 +486,13 @@ function fn_smart_distribution_sales_reports_table_condition(&$table_condition, 
             if ($type == 'managers') {
                 $type = 'user';
                 list($users, ) = fn_get_users(array('managers' => $condition), $_SESSION['auth']);
-                $users = fn_array_column($users, 'user_id');
+                $users = array_column($users, 'user_id');
                 $condition = array_combine($users, $users);
             }
             if ($type == 'usergroup_id') {
                 $type = 'user';
                 list($users, ) = fn_get_users(array('usergroup_id' => $condition), $_SESSION['auth']);
-                $users = fn_array_column($users, 'user_id');
+                $users = array_column($users, 'user_id');
                 $condition = array_combine($users, $users);
             }
             $table_condition[$type] = $condition;
@@ -620,13 +619,26 @@ function fn_smart_distribution_pre_add_to_cart(&$product_data, &$cart, $auth, $u
     $cart['skip_notification'] = true;
 }
 
+// wishlist in mobile application should have qty_step && cart should have qty_step for +- buttons
+function fn_smart_distribution_check_amount_in_stock_before_check($product_id, $amount, $product_options, $cart_id, $is_edp, $original_amount, &$cart, $update_id, $product, $current_amount, $skip_error_notification) {
+    if ($product['qty_step']) $cart['qty_step_backup'][$cart_id] = $product['qty_step'];
+}
+
 // wishlist in mobile application should have qty_step
 function fn_smart_distribution_add_to_cart(&$cart, $product_id, $_id) {
-    $cart['products'][$_id]['qty_step'] = db_get_field('SELECT qty_step FROM ?:products WHERE product_id = ?i', $product_id);
+    if (!isset($cart['products'][$_id]['qty_step'])) {
+        if (isset($cart['qty_step_backup'][$_id])) {
+            $cart['products'][$_id]['qty_step'] = $cart['qty_step_backup'][$_id];
+            unset($cart['qty_step_backup'][$_id]);
+            if (empty($cart['qty_step_backup'])) unset($cart['qty_step_backup']);
+        } else {
+            $cart['products'][$_id]['qty_step'] = db_get_field('SELECT qty_step FROM ?:products WHERE product_id = ?i', $product_id);
+        }
+    }
 }
 
 function fn_smart_distribution_get_profile_fields($location, $select, &$condition) {
-    if (AREA == 'C' && in_array(Registry::get('runtime.controller'), array('checkout', 'profiles'))) {
+    if (SiteArea::isStorefront(AREA) && in_array(Registry::get('runtime.controller'), array('checkout', 'profiles'))) {
         $stop_fields = array(
             //'s_address',
             's_lastname'
@@ -650,7 +662,7 @@ function fn_smart_distribution_vendor_communication_add_thread_message_post( $th
     if ($thread_full_data['last_message_user_type'] != 'A') {
         $managers = fn_smart_distribution_get_managers(array('user_id' => $thread_full_data['last_message_user_id']));
         if (!empty($managers)) {
-            $vendor_email = fn_array_column($managers, 'email');
+            $vendor_email = array_column($managers, 'email');
             if (!empty($thread_full_data['last_message_user_id'])) {
                 $message_from = fn_vendor_communication_get_user_name($thread_full_data['last_message_user_id']);
             }
@@ -889,7 +901,7 @@ function fn_smart_distribution_calculate_cart_post($cart, $auth, $calculate_ship
 }
 
 function fn_smart_distribution_update_cart_by_data_post(&$cart, $new_cart_data, $auth) {
-    if (isset($cart['original_products']) && AREA == 'A') {
+    if (isset($cart['original_products']) && SiteArea::isStorefront(AREA)) {
         foreach($new_cart_data['cart_products'] as $key => $product) {
             if (isset($cart['original_products'][$key])) {
                 if ($product['amount'] == 0) {
@@ -930,7 +942,7 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
         }
     }
 
-    if (AREA == 'C') {
+    if (SiteArea::isStorefront(AREA)) {
         $condition .= db_quote(' AND IF(products.avail_till, products.avail_till >= ?i, 1)', TIME);
         // Cut off out of stock products
         $condition .= db_quote(
@@ -1000,16 +1012,18 @@ function fn_smart_distribution_get_categories(&$params, $join, &$condition, $fie
 }
 
 function fn_smart_distribution_get_product_data($product_id, $field_list, &$join, $auth, $lang_code, &$condition, &$price_usergroup) {
+    // overrided by storages add-on
     $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
-    if (AREA == 'C') {
-        $condition .= db_quote(' 
+    if (SiteArea::isStorefront(AREA)) {
+        $price_usergroup = db_quote(' 
             AND CASE WHEN 
             (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
             THEN ?:product_prices.usergroup_id IN (?a) 
             ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_diff($usergroup_ids, [USERGROUP_ALL]), array_diff($usergroup_ids, [USERGROUP_ALL]), USERGROUP_ALL);
     }
+
     // Cut off out of stock products
-    if (AREA == 'C') {
+    if (SiteArea::isStorefront(AREA)) {
         $condition .= db_quote(
             ' AND (CASE ?:products.show_out_of_stock_product' .
             "   WHEN ?s THEN (?:products.amount > 0 OR ?:products.tracking = 'D')" .
@@ -1064,8 +1078,10 @@ function fn_smart_distribution_load_products_extra_data(&$extra_fields, $product
 }
 
 function fn_smart_distribution_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
+    // TODO duplicate request with storages add-on
     $usergroup_ids = Tygh::$app['session']['auth']['usergroup_ids'];
     $usergroup_ids = array_filter($usergroup_ids);
+
     if ($usergroup_ids) {
         $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a)", 'product_id', $product_ids, 1, $usergroup_ids);
         $products = fn_array_merge($products, $prices);
@@ -1098,7 +1114,7 @@ function fn_smart_distribution_send_form(&$page_data, $form_values, $result, $fr
     if (Tygh::$app['session']['auth']['user_id']) {
         $managers = fn_smart_distribution_get_managers(['user_id' => Tygh::$app['session']['auth']['user_id']]);
         if (!empty($managers)) {
-            $page_data['form']['general'][FORM_RECIPIENT] = fn_array_column($managers, 'email', 'name');
+            $page_data['form']['general'][FORM_RECIPIENT] = array_column($managers, 'email', 'name');
         }
     }
 }
@@ -1193,7 +1209,7 @@ function fn_smart_distribution_promotion_apply_pre(&$promotions, $zone, $data, $
 }
 
 function fn_smart_distribution_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, &$data, $product_id, $amount, $price, $zero_price_action, $allow_add) {
-    $usergroup_condition = db_quote("AND ?:product_prices.usergroup_id IN (?n)", ((AREA == 'C' || defined('ORDER_MANAGEMENT')) ? array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']) : USERGROUP_ALL));
+    $usergroup_condition = db_quote("AND ?:product_prices.usergroup_id IN (?n)", ((SiteArea::isStorefront(AREA) || defined('ORDER_MANAGEMENT')) ? array_merge(array(USERGROUP_ALL), $auth['usergroup_ids']) : USERGROUP_ALL));
     $data['extra']['usergroup_id'] = db_get_field(
         "SELECT ?:product_prices.usergroup_id "
         . "FROM ?:product_prices "
@@ -1208,29 +1224,29 @@ function fn_smart_distribution_add_product_to_cart_get_price($product_data, $car
 }
 
 function fn_smart_distribution_pre_get_cart_product_data($hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, $fields, &$join, $params) {
-    $join  = db_quote("LEFT JOIN ?:product_descriptions ON ?:product_descriptions.product_id = ?:products.product_id AND ?:product_descriptions.lang_code = ?s", DESCR_SL);
+    // $join  = db_quote("LEFT JOIN ?:product_descriptions ON ?:product_descriptions.product_id = ?:products.product_id AND ?:product_descriptions.lang_code = ?s", DESCR_SL);
 
-    $_p_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
-    $_c_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
+    // $_p_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
+    // $_c_statuses = [ObjectStatuses::ACTIVE, ObjectStatuses::HIDDEN];
 
-    $avail_cond = '';
+    // $avail_cond = '';
 
-    if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
-        if (AREA == 'C') {
-            $avail_cond .= fn_get_company_condition('?:categories.company_id');
-        } else {
-            $avail_cond .= ' AND (' . fn_get_company_condition('?:categories.company_id', false)
-                           . ' OR ' . fn_get_company_condition('?:products.company_id', false) . ')';
-        }
-    }
+    // if (fn_allowed_for('ULTIMATE') && Registry::get('runtime.company_id')) {
+    //     if (AREA == 'C') {
+    //         $avail_cond .= fn_get_company_condition('?:categories.company_id');
+    //     } else {
+    //         $avail_cond .= ' AND (' . fn_get_company_condition('?:categories.company_id', false)
+    //                        . ' OR ' . fn_get_company_condition('?:products.company_id', false) . ')';
+    //     }
+    // }
 
-    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? " AND (" . fn_find_array_in_set($auth['usergroup_ids'], '?:categories.usergroup_ids', true) . ")" : '';
-    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? " AND (" . fn_find_array_in_set($auth['usergroup_ids'], '?:products.usergroup_ids', true) . ")" : '';
-    $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? db_quote(' AND ?:categories.status IN (?a) AND ?:products.status IN (?a)', $_c_statuses, $_p_statuses) : '';
-    $avail_cond .= (AREA == 'C') ? fn_get_localizations_condition('?:products.localization') : '';
+    // $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? " AND (" . fn_find_array_in_set($auth['usergroup_ids'], '?:categories.usergroup_ids', true) . ")" : '';
+    // $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? " AND (" . fn_find_array_in_set($auth['usergroup_ids'], '?:products.usergroup_ids', true) . ")" : '';
+    // $avail_cond .= (AREA == 'C' && !(isset($auth['area']) && $auth['area'] == 'A')) ? db_quote(' AND ?:categories.status IN (?a) AND ?:products.status IN (?a)', $_c_statuses, $_p_statuses) : '';
+    // $avail_cond .= (AREA == 'C') ? fn_get_localizations_condition('?:products.localization') : '';
 
-    $join .= " INNER JOIN ?:products_categories ON ?:products_categories.product_id = ?:products.product_id INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id $avail_cond";
-    $join .= " LEFT JOIN ?:companies ON ?:companies.company_id = ?:products.company_id";
+    // $join .= " INNER JOIN ?:products_categories ON ?:products_categories.product_id = ?:products.product_id INNER JOIN ?:categories ON ?:categories.category_id = ?:products_categories.category_id $avail_cond";
+    // $join .= " LEFT JOIN ?:companies ON ?:companies.company_id = ?:products.company_id";
 }
 
 // allow to choose unfilled profiles
@@ -1397,13 +1413,13 @@ function fn_smart_distribution_sberbank_edit_item(&$item, $product, $order) {
 }
 
 function fn_smart_distribution_get_filters_products_count_before_select_filters($sf_fields, $sf_join, &$condition, $sf_sorting, &$params) {
-    if (AREA == 'C' && !$params['for_api'] && isset($params['block_data']['properties']['template']) && $params['block_data']['properties']['template'] != 'addons/smart_distribution/blocks/product_filters/for_category/button_filters.tpl' && !empty($params['button_filters'])) {
+    if (SiteArea::isStorefront(AREA) && !$params['for_api'] && isset($params['block_data']['properties']['template']) && $params['block_data']['properties']['template'] != 'addons/smart_distribution/blocks/product_filters/for_category/button_filters.tpl' && !empty($params['button_filters'])) {
         $condition .= db_quote('AND ?:product_filters.filter_id NOT IN (?a)', $params['button_filters']);
     }
 }
 
 function fn_smart_distribution_get_filters_products_count_pre(&$params, &$cache_params, $cache_tables) {
-    if (AREA == 'C') {
+    if (SiteArea::isStorefront(AREA)) {
         $block_ids = db_get_fields('SELECT block_id FROM ?:bm_blocks WHERE properties like ?l', '%button_filters.tpl%');
         $params['button_filters'] = [];
         foreach ($block_ids as $block_id) {
@@ -1420,7 +1436,7 @@ function fn_smart_distribution_get_filters_products_count_pre(&$params, &$cache_
 }
 
 function fn_smart_distribution_get_filters_products_count_post($params, $lang_code, &$filters, $selected_filters) {
-    if (AREA == 'C' && $params['for_api'] && !empty($params['button_filters'])) {
+    if (SiteArea::isStorefront(AREA) && $params['for_api'] && !empty($params['button_filters'])) {
         foreach($params['button_filters'] as $filter_id) {
             if (isset($filters[$filter_id])) {
                 $filters[$filter_id]['is_button_filter'] = true;

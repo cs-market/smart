@@ -22,9 +22,6 @@
         <item lang="en" id="calendar_delivery">Сalendar delivery</item>
         <item lang="ru" id="calendar_delivery">Календарь</item>
 
-        <item lang="en" id="calendar_delivery.after17rule">Accept for tomorrow delivery for orders after 17:00</item>
-        <item lang="ru" id="calendar_delivery.after17rule">Принимать на доставку на завтра для заказов после 17:00</item>
-
         <item lang="en" id="calendar_delivery.sunday_shipping">Sunday shipping allowed</item>
         <item lang="ru" id="calendar_delivery.sunday_shipping">Доставка в Воскресение</item>
 
@@ -64,6 +61,13 @@
         <item lang="en" id="calendar_delivery.exim_user_delivery_date">Shipping %day%</item>
         <item lang="ru" id="calendar_delivery.exim_user_delivery_date">Shipping %day%</item>
 
+        <item lang="en" id="calendar_delivery.exception_time_till">Exception time till</item>
+        <item lang="ru" id="calendar_delivery.exception_time_till">День-исключение работает до</item>
+
+        <item lang="en" id="calendar_delivery.exception_days">Exception days</item>
+        <item lang="ru" id="calendar_delivery.exception_days">Дни-исключения</item>
+
+
         <item lang="ru" id="weekday_exim_1">Monday</item>
         <item lang="ru" id="weekday_exim_2">Tuesday</item>
         <item lang="ru" id="weekday_exim_3">Wednesday</item>
@@ -93,6 +97,16 @@
 
         <item>ALTER TABLE `?:usergroups` ADD `working_time_till` varchar(8)  NOT NULL default '';</item>
         <item for="uninstall">ALTER TABLE `?:usergroups` DROP `working_time_till`;</item>
+
+        <item>
+            CREATE TABLE `?:user_storages` (
+                `storage_id` mediumint(8) unsigned NOT NULL,
+                `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+                `delivery_date` varchar(7) NOT NULL DEFAULT '1111111',
+                PRIMARY KEY (`storage_id`,`user_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS `?:user_storages`;</item>
     </queries>
 
     <functions>

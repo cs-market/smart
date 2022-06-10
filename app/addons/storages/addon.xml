@@ -19,6 +19,8 @@
         <item lang="ru" id="storages.storage_code">Внешний код склада</item>
         <item lang="ru" id="storages.min_order_amount">Минимальный заказ по складу</item>
         <item lang="ru" id="storages.storages_products">Остатки на складах</item>
+        <item lang="ru" id="storages.with_storage">по складу</item>
+        <item lang="ru" id="storages.editing_storage">редактирование склада</item>
     </language_variables>
     <queries>
         <!-- company_id only for multivendor -->
@@ -27,7 +29,7 @@
             CREATE TABLE `?:storages` (
                 `storage_id` mediumint(8) unsigned NOT NULL auto_increment,
                 `code` varchar(32) NOT NULL,
-                `storage` varchar(32) NOT NULL,
+                `storage` varchar(255) NOT NULL,
                 `company_id` smallint unsigned NOT NULL DEFAULT '0',
                 `min_order` mediumint unsigned NOT NULL DEFAULT '0',
                 `status` char(1) NOT NULL DEFAULT 'A',
@@ -59,5 +61,8 @@
             ) ENGINE=MyISAM DEFAULT CHARSET UTF8;
         </item>
         <item for="uninstall">DROP TABLE IF EXISTS `?:storage_usergroups`;</item>
+
+        <item>ALTER TABLE `?:orders` ADD `storage_id` mediumint(8) unsigned NOT NULL;</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `storage_id`;</item>
     </queries>
 </addon>

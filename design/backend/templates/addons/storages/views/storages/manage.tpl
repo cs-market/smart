@@ -21,7 +21,7 @@
                     href_delete="storages.delete?storage_id=`$storage.storage_id`"
                     delete_target_id="types_list"
                     skip_delete=$skip_delete
-                    header_text="{__("editing_storage")}: `$storage.storage`"
+                    header_text="{__("storages.editing_storage")}: `$storage.storage`"
                     additional_class="cm-sortable-row cm-sortable-id-`$storage.storage_id`"
                     no_table=true
                     draggable=$draggable

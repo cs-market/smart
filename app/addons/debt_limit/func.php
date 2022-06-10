@@ -2,13 +2,16 @@
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-function fn_debt_limit_user_init(&$auth, &$user_info)
+function fn_debt_limit_get_user_short_info_pre($user_id, &$fields, $condition, $join, $group_by) {
+    $fields[] = 'debt';
+    $fields[] = '?:users.limit';
+}
+
+function fn_debt_limit_user_init(&$auth, $user_info)
 {
-    $res = db_get_row('SELECT debt, ?:users.limit FROM ?:users WHERE user_id = ?i', $auth['user_id']);
-    if (!empty($res)) {
-        $auth['debt'] = $user_info['debt'] = $res['debt'];
-        $auth['limit'] = $user_info['limit'] = $res['limit'];
-    }
+    // TODO get this data not from auth but from registry user info in templates etc
+    $auth['debt'] = $user_info['debt'];
+    $auth['limit'] = $user_info['limit'];
 }
 
 function fn_debt_limit_exim_1c_update_order($order_data, $cml) {
