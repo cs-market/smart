@@ -294,6 +294,11 @@ class SraCartContent extends ASraEntity
             );
         }
 
+        // ВРЕМЕННЫЙ КОСТЫЛЬ ПОКА ПРИЛ НЕ ПЕРЕЙДЕТ НА НОВЫЙ КАЛЕНДАРЬ ПО weekdays_availability
+        if (isset($data['user_data']['delivery_date']) && is_string($data['user_data']['delivery_date'])) {
+                $data['user_data']['delivery_date'] = fn_delivery_date_from_line($data['user_data']['delivery_date']);
+        }
+
         return [
             'status' => Response::STATUS_OK,
             'data'   => $data,
