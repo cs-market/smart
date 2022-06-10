@@ -21,6 +21,7 @@
         <item lang="ru" id="storages.storages_products">Остатки на складах</item>
         <item lang="ru" id="storages.with_storage">по складу</item>
         <item lang="ru" id="storages.editing_storage">редактирование склада</item>
+        <item lang="ru" id="block_storages">Склады</item>
     </language_variables>
     <queries>
         <!-- company_id only for multivendor -->

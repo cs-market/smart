@@ -415,7 +415,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                     $res = false;
                 }
             }
-            if (!$res) {
+            if (!$res &&  AREA != A) {
                 $result = false;
                 fn_set_notification('E', __('error'), __('calendar_delivery.choose_another_day'));
                 return;
