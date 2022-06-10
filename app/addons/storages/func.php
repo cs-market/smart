@@ -22,7 +22,7 @@ function fn_get_storages($params = [], $items_per_page = 0) {
     $condition = $join = '';
 
     if (!empty($params['status'])) {
-        $condition .= db_quote(' AND status = ?s', $params['status']);
+        $condition .= db_quote(' AND ?:storages.status = ?s', $params['status']);
     }
 
     if (Registry::get('runtime.company_id')) {
@@ -30,11 +30,11 @@ function fn_get_storages($params = [], $items_per_page = 0) {
     }
 
     if (isset($params['company_id'])) {
-        $condition .= db_quote(" AND company_id = ?i", $params['company_id']);
+        $condition .= db_quote(" AND ?:storages.company_id = ?i", $params['company_id']);
     }
 
     if (isset($params['storage_id'])) {
-        $condition .= db_quote(' AND storage_id = ?i', $params['storage_id']);
+        $condition .= db_quote(' AND ?:storages.storage_id = ?i', $params['storage_id']);
     }
 
     if (!empty($params['storage_ids'])) {
@@ -54,11 +54,13 @@ function fn_get_storages($params = [], $items_per_page = 0) {
 
     $storages = db_get_hash_array("SELECT ?:storages.* FROM ?:storages $join WHERE 1 ?p", 'storage_id', $condition);
 
-    if (isset($params['storage_id']) || !empty($params['get_usergroups'])) {
+    if (isset($params['storage_id']) || (isset($params['get_usergroups']) && $params['get_usergroups'] === 'true')) {
         foreach ($storages as &$storage) {
             $storage['usergroup_ids'] = db_get_fields('SELECT usergroup_id FROM ?:storage_usergroups WHERE storage_id = ?i', $storage['storage_id']);
         }
     }
+
+    fn_set_hook('get_storages_post', $storages, $params);
 
     return [$storages, $params];
 }
@@ -72,6 +74,8 @@ function fn_update_storage($storage_data, $storage_id = 0) {
             return false;
         }
     }
+
+    fn_set_hook('update_storage_pre', $storage_data, $storage_id);
 
     if (!empty($storage_id)) {
         db_query("UPDATE ?:storages SET ?u WHERE storage_id = ?i", $storage_data, $storage_id);
@@ -312,7 +316,6 @@ function fn_storages_pre_get_cart_product_data($hash, $product, $skip_promotion,
         $fields[] = '?:storages_products.min_qty';
         $join .= db_quote(' LEFT JOIN ?:storages_products ON ?:storages_products.product_id = ?:products.product_id AND ?:storages_products.storage_id = ?i', $product['extra']['storage_id']);
     }
-    //fn_print_die($join);
 }
 
 function fn_storages_get_cart_product_data($product_id, &$_pdata, $product, $auth, $cart, $hash) {
@@ -367,7 +370,7 @@ function fn_storages_check_amount_in_stock_before_check($product_id, $amount, $p
                     if ($k != $cart_id) {
                         if (
                             isset($product['tracking'])
-                            && ($product['tracking'] !== ProductTracking::DO_NOT_TRACK && (int)$v['product_id'] === (int)$product_id)
+                            && ($product['tracking'] !== ProductTracking::DO_NOT_TRACK && (int)$v['product_id'] === (int)$product_id && $v['extra']['storage_id'] === $storage_id)
                         ) {
                             $current_amount -= $v['amount'];
                         }
@@ -439,5 +442,18 @@ function fn_storages_update_product_amount_pre($product_id, $amount_delta, $prod
 function fn_storages_update_product_amount($new_amount, $product_id, $cart_id, $tracking, $notify, $order_info, $amount_delta, $current_amount, $original_amount, $sign) {
     if ($order_info['storage_id']) {
         db_query('UPDATE ?:storages_products SET amount = ?d WHERE product_id = ?i AND storage_id = ?i', $new_amount, $product_id, $order_info['storage_id']);
+    }
+}
+
+function fn_storages_get_order_info(&$order, $additional_data) {
+    if (!empty($order['storage_id'])) {
+        list($storages,) = fn_get_storages(['storage_id' => $order['storage_id']]);
+        $order['storage'] = reset($storages);
+    }
+}
+
+function fn_storages_monolith_generate_xml($order_info, $monolith_order, &$d_record) {
+    if (!empty($order_info['storage'])) {
+        $d_record[3] = $order_info['storage']['code'];
     }
 }

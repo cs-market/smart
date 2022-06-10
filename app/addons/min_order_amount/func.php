@@ -84,6 +84,17 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
                 $cart['min_order_notification'] = __('text_min_products_weight_required') . ' ' . $mins['min_order_weight'] . ' ' . Registry::get('settings.General.weight_symbol');
             }
         }
+
+        // check by storage
+        foreach ($cart['product_groups'] as $group) {
+            if ($group['storage_id'] && $min_order = Registry::get('runtime.storages')[$group['storage_id']]['min_order_amount']) {
+                if ($min_order > $group['package_info']['C']) {
+                    $min_amount = $formatter->asPrice($min_order);
+                    $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('storages.with_storage') . ' ' . Registry::get('runtime.storages')[$group['storage_id']]['storage'];
+                    $cart['min_order_failed'] = true;
+                }
+            }
+        }
     }
 }
 

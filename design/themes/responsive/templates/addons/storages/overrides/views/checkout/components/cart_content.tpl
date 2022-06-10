@@ -1,3 +1,5 @@
+{if $product_groups|count > 1}
+
 {assign var="result_ids" value="cart*,checkout*"}
 
 <form name="checkout_form" class="cm-check-changes cm-ajax cm-ajax-full-render" action="{""|fn_url}" method="post" enctype="multipart/form-data" id="checkout_form">
@@ -25,11 +27,49 @@
         {/hook}
     </div>
 </div>
+
 {foreach $product_groups as $group}
+    <h3>{$group.name}</h3>
     {include file="views/checkout/components/cart_items.tpl" disable_ids="button_cart" cart_products=$group['products']}
-    {include file="views/checkout/components/checkout_totals.tpl" location="cart" cart=$group}
+    <div class="ty-cart-total">
+        <div class="ty-cart-total__wrapper clearfix" id="checkout_totals">        
+            {hook name="checkout:payment_options"}
+            {/hook}
+            
+            {include file="views/checkout/components/checkout_totals_info.tpl" cart=$group}
+
+            <div class="clearfix"></div>
+        <!--checkout_totals--></div>
+    </div>
+
+    {*include file="views/checkout/components/checkout_totals.tpl" location="cart" cart=$group*}
 {/foreach}
 <!--checkout_form--></form>
+
+<div class="ty-cart-total">
+    <div class="ty-cart-total__wrapper clearfix" id="checkout_totals">
+        {if $cart_products}
+            <div class="ty-coupons__container">
+                {include file="views/checkout/components/promotion_coupon.tpl"}
+                {hook name="checkout:payment_extra"}
+                {/hook}
+            </div>
+        {/if}
+        
+        {hook name="checkout:payment_options"}
+        {/hook}
+        
+        <div class="clearfix"></div>
+        <ul class="ty-cart-statistic__total-list">
+            <li class="ty-cart-statistic__item ty-cart-statistic__total">
+                <span class="ty-cart-statistic__total-title">{__("total_cost")}</span>
+                <span class="ty-cart-statistic__total-value">
+                    {include file="common/price.tpl" value=$_total|default:$smarty.capture._total|default:$cart.total span_id="cart_total" class="ty-price"}
+                </span>
+            </li>
+        </ul>
+    <!--checkout_totals--></div>
+</div>
 
 <div class="buttons-container ty-cart-content__bottom-buttons clearfix">
     <div class="ty-float-left ty-cart-content__left-buttons">
@@ -58,4 +98,7 @@
             </tr>
     </table>
     <!--payment-methods--></div>
+{/if}
+{else}
+    {include file="views/../views/checkout/components/cart_content.tpl"}
 {/if}

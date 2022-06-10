@@ -18,7 +18,9 @@ fn_register_hooks(
     'shippings_group_products_list',
     'pre_update_order',
     'update_product_amount_pre',
-    'update_product_amount'
+    'update_product_amount',
+    'get_order_info',
+    'monolith_generate_xml'
 );
 
 fn_init_stack(array('fn_init_storages', &$_REQUEST));

@@ -28,20 +28,24 @@ function fn_monolith_generate_xml($order_id) {
 		),
 	);
 
+    $d_record = [
+        $addon['order_prefix'] . $order_id,
+        date("Y-m-d\T00:00:00", $order_info['timestamp']),
+        //'', //CompanyId
+        $order_info['fields']['38'], //CRMClientId
+        '123',
+        $order_info['user_id'],
+        date("Y-m-d\T00:00:00", $order_info['delivery_date']),
+        ($order_info['company_id'] == '1804') ? 'CustReturn' : 'CustOrder',
+        'Entered',
+    ];
+
+    fn_set_hook('monolith_generate_xml', $order_info, $monolith_order, $d_record);
+
 	$monolith_order['d'][] = array(
 		'@attributes' => array ('name' => 'CRMOrder'),
 		'r' => array(
-			'f' => array(
-				$addon['order_prefix'] . $order_id,
-				date("Y-m-d\T00:00:00", $order_info['timestamp']),
-				//'', //CompanyId
-				$order_info['fields']['38'], //CRMClientId
-				'123',
-				$order_info['user_id'],
-				date("Y-m-d\T00:00:00", $order_info['delivery_date']),
-				($order_info['company_id'] == '1804') ? 'CustReturn' : 'CustOrder',
-				'Entered',
-			),
+			'f' => $d_record
 		),
 	);
 

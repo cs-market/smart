@@ -24,26 +24,10 @@
             showOtherMonths: true,
             beforeShowDay: function(date) {
                 res = true;
-                {if !($saturday != N) }
-                    var day = date.getDay();
-                    res = res && (day != 6);
-                {/if}
-                {if !($sunday != N) }
-                    var day = date.getDay();
-                    res = res && (day != 0);
-                {/if}
-                {if !($monday != N) }
-                    now = new Date();
-                    m = new Date();
-                    if(now.getDay()){ m.setDate(now.getDate() + 8 - now.getDay()) } else { m.setDate(now.getDate() + 1) }
-                    res = res && !((m.getDate() == date.getDate()) && (m.getMonth() == date.getMonth()));
-                {/if}
-                {if $limit_weekdays != '' && $limit_weekdays != 'C'}
-                    res = res && (date.getDay() == {$limit_weekdays});
-                {/if}
-                {if $limit_weekdays == 'C'}
-                    let customerCalendar = {$service_params.customer_shipping_calendar|to_json};
-                    res = res && (customerCalendar.indexOf(date.getDay()) !== -1);
+                {if $service_params.weekdays_availability}
+                    weekdays_availability = parseInt('{$service_params.weekdays_availability}', 2);
+                    date_bin = 1 << date.getDay();
+                    res = weekdays_availability & date_bin;
                 {/if}
                 return [res];
             },

@@ -50,7 +50,7 @@
     <div class="control-group">
         <label for="storage_min_order_{$id}" class="cm-required control-label">{__("storages.min_order_amount")}:</label>
         <div class="controls">
-            <input type="text" size="70" id="storage_min_order_{$id}" name="storage_data[min_order]" value="{$storage.min_order}" class="input-large">
+            <input type="text" size="70" id="storage_min_order_{$id}" name="storage_data[min_order_amount]" value="{$storage.min_order_amount}" class="input-large">
         </div>
     </div>
     {if $storage.company_id}

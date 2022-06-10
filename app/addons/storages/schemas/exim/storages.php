@@ -40,7 +40,7 @@ $schema = array(
             'convert_put' => array('fn_get_company_id_by_name', '#this'),
         ),
         'Min order amount' => array (
-            'db_field' => 'min_order',
+            'db_field' => 'min_order_amount',
         ),
         'Usergroup IDs' => array(
             'process_get' => array('fn_exim_get_storage_usergroups', '#key'),

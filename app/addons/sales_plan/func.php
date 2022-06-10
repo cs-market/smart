@@ -322,7 +322,6 @@ function fn_generate_unsold_report($params) {
             $category_usergroups = db_get_fields('SELECT usergroup_ids FROM ?:categories WHERE category_id IN (?a)', $category_ids);
         }
         if ($params['category_ids']) {
-            //fn_print_die($category_usergroups);
             $c_usergroups = db_get_fields('SELECT usergroup_ids FROM ?:categories WHERE category_id IN (?a)', explode(',',$params['category_ids']));
             list($products ) = fn_get_products(['cid' => explode(',',$params['category_ids'])]);
             $condition .= db_quote(' AND product_id in (?a)', array_keys($products));

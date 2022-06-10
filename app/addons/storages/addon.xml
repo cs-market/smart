@@ -19,6 +19,8 @@
         <item lang="ru" id="storages.storage_code">Внешний код склада</item>
         <item lang="ru" id="storages.min_order_amount">Минимальный заказ по складу</item>
         <item lang="ru" id="storages.storages_products">Остатки на складах</item>
+        <item lang="ru" id="storages.with_storage">по складу</item>
+        <item lang="ru" id="storages.editing_storage">редактирование склада</item>
     </language_variables>
     <queries>
         <!-- company_id only for multivendor -->
