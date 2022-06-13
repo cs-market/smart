@@ -1583,6 +1583,26 @@ fn_print_r($fantoms);
             }
         }
     }
+} elseif ($mode == 'import_baltica_ug') {
+    Registry::set('runtime.company_id', 45);
+    $file = 'all_usergroups.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    $values = [];
+    foreach($content as $row) {
+        $values = array_merge($values, array_values($row));
+        //break;
+    }
+    array_walk($values, 'fn_trim_helper');
+    $values = array_unique($values);
+    $ugroup = array('usergroup' => '', 'type' => 'C', 'status' => 'A');
+    foreach($values as $usergroup) {
+        if ($usergroup == 'NULL') continue
+        if (!($usergroup_id = db_get_field('SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s', $usergroup))) {
+            $ugroup['usergroup'] = $usergroup;
+            $ug_id = fn_update_usergroup($ugroup);
+        }
+    }
+    fn_print_die('done', count($values));
 }
 
 function fn_merge_product_features($target_feature, $group) {
