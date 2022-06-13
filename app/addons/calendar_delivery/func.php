@@ -125,7 +125,7 @@ function fn_calendar_get_nearest_delivery_day($shipping_params = [], $get_ts = f
 function fn_calendar_delivery_pre_update_order(&$cart, $order_id) {
     if (count($cart['product_groups']) == 1) {
         $group = reset($cart['product_groups']);
-        $cart['delivery_date'] = fn_parse_date($group['delivery_date']);
+        if (!empty($group['delivery_date'])) $cart['delivery_date'] = fn_parse_date($group['delivery_date']);
     }
 }
 
@@ -223,11 +223,11 @@ function fn_calendar_delivery_calculate_cart_content_after_shipping_calculation(
             if (!empty($calendar_shippings)) {
                 $delivery_dates = [];
 
-                // user_info is empty in API
-                if (!$user_info = Registry::get('user_info')) {
+                // user_info is empty in API. user_info wrong in backend :)
+                //if (!$user_info = Registry::get('user_info')) {
                     $user_info = fn_get_user_short_info($auth['user_id']);
                     $user_info['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i', 'storage_id', $auth['user_id']);
-                }
+                //}
 
                 $user_weekdays = $user_info['delivery_date'];
 
