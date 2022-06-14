@@ -14,12 +14,11 @@
         </div>
     </div>
 <!--content_categories--></div>
-<div id="content_categories">
-    <div class="control-group">
-        <label class="control-label" for="elm_view_separate">{__("view_separate")}:</label>
-        <div class="controls">
-            <input type="hidden" name="promotion_data[view_separate]" value="N">
-            <input type="checkbox" name="promotion_data[view_separate]" {if $promotion_data.view_separate == "Y"}checked="checked"{/if} id="elm_promotion_view_separate" value="Y">
-        </div>
+
+<div class="control-group">
+    <label class="control-label" for="elm_view_separate">{__("view_separate")}:</label>
+    <div class="controls">
+        <input type="hidden" name="promotion_data[view_separate]" value="N">
+        <input type="checkbox" name="promotion_data[view_separate]" {if $promotion_data.view_separate == "Y"}checked="checked"{/if} id="elm_promotion_view_separate" value="Y">
     </div>
-<!--content_categories--></div>
+</div>

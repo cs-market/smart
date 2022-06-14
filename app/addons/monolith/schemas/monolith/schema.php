@@ -195,6 +195,49 @@ $schema = array(
                                 ),
                             ),
                         ),
+                        '4' => array (
+                            '@attributes' => array (
+                                'name' => 'CRMOrderDiscountLine',
+                            ),
+                            'f' => array (
+                                '0' => array (
+                                    '@attributes' => array (
+                                        'name' => 'CRMOrderDate',
+                                        'type' => 'Date',
+                                    ),
+                                ),
+                                '1' => array (
+                                    '@attributes' => array (
+                                        'name' => 'CRMOrderNumber',
+                                        'type' => 'String',
+                                    ),
+                                ),
+                                '2' => array (
+                                    '@attributes' => array (
+                                        'name' => 'CRMPromoActionId',
+                                        'type' => 'String',
+                                    ),
+                                ),
+                                '3' => array (
+                                    '@attributes' => array (
+                                        'name' => 'CRMPromoActionName',
+                                        'type' => 'String',
+                                    ),
+                                ),
+                                '4' => array (
+                                    '@attributes' => array (
+                                        'name' => 'DiscountValue',
+                                        'type' => 'Decimal',
+                                    ),
+                                ),
+                                '5' => array (
+                                    '@attributes' => array (
+                                        'name' => 'WareId',
+                                        'type' => 'String',
+                                    ),
+                                ),
+                            ),
+                        ),
                     ),
                 ),
                 'o' => array (

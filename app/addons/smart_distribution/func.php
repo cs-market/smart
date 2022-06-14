@@ -330,7 +330,8 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
 function fn_smart_distribution_get_users_post(&$users, $params, $auth) {
     if (defined('API') && isset($params['user_id']) && is_numeric($params['user_id'])) {
         // requested info about single user via api
-        $user = fn_get_user_info($params['user_id']);
+
+        $user = fn_get_user_info($params['user_id'], true, $params['profile_id']);
         $user = array_diff_key($user, [
             'referer' => 1,
             'is_root' => 1,
