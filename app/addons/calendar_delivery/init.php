@@ -28,3 +28,5 @@ fn_register_hooks(
 
 // backward compatibility
 fn_register_hooks('get_company_data');
+
+define('DOCUMENT_ORIGINALS', 'D');

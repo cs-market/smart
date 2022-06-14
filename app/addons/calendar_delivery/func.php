@@ -53,6 +53,9 @@ function fn_calendar_delivery_get_order_info(&$order, $additional_data) {
     if (empty($order['delivery_period']) && !empty($order['shipping'][0]['delivery_period'])) {
         $order['delivery_period'] = $order['shipping'][0]['delivery_period'];
     }
+    if (isset($additional_data[DOCUMENT_ORIGINALS])) {
+        $order['documents_originals'] = true;
+    }
 }
 
 function fn_calendar_delivery_exim1c_order_xml_pre(&$order_xml, $order_data, $cml) {
@@ -153,6 +156,17 @@ function fn_calendar_delivery_place_order($order_id, $action, $order_status, $ca
             'subject' => 'i-sd.ru: Empty delivery date',
             'body' => "Внимание! Размещен заказ #" . $order_id . "без даты доставки",
         ), 'A');
+    }
+
+    if (count($cart['product_groups']) == 1) {
+        if (isset(reset($cart['product_groups'])['documents_originals']) && YesNo::toBool(reset($cart['product_groups'])['documents_originals'])) {
+            $order_data = array(
+                'order_id' => $order_id,
+                'type' => DOCUMENT_ORIGINALS,
+                'data' => "Y"
+            );
+            db_query("REPLACE INTO ?:order_data ?e", $order_data);
+        }
     }
 }
 
@@ -392,6 +406,11 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
 
             if (!($cart_delivery_day = $cart['delivery_date'][$group_id])) {
                 $cart_delivery_day = reset($cart['delivery_date']);
+            }
+
+            if (!empty($cart['documents_originals'][$group_id])) {
+                $group['documents_originals'] = $cart['documents_originals'][$group_id];
+                unset($cart['documents_originals'][$group_id]);
             }
 
             // backward compatibility (for mobile app)

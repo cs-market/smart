@@ -36,4 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // if (!$res) return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout'];
     }
+    if (!empty($_REQUEST['documents_originals']) && is_array($_REQUEST['documents_originals'])) {
+        $cart['documents_originals'] = $_REQUEST['documents_originals'];
+    }
 }
