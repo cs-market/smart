@@ -1,6 +1,7 @@
 <?php
 
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 if ($mode =='monolith' && !empty($action)) {
     fn_print_die(fn_monolith_generate_xml($action));
@@ -1596,14 +1597,310 @@ fn_print_r($fantoms);
     $values = array_unique($values);
     $ugroup = array('usergroup' => '', 'type' => 'C', 'status' => 'A');
     foreach($values as $usergroup) {
-        if ($usergroup == 'NULL') continue
+        if ($usergroup == 'NULL') continue;
         if (!($usergroup_id = db_get_field('SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s', $usergroup))) {
             $ugroup['usergroup'] = $usergroup;
             $ug_id = fn_update_usergroup($ugroup);
         }
     }
     fn_print_die('done', count($values));
+} elseif ($mode == 'search_orders_with_promo') {
+    if (!isset($_SESSION['iteration']) || $_REQUEST['rerun']) {
+        $_SESSION['iteration'] = 1;
+    }
+
+    $condition = ' 1 ';
+
+    $condition .= 'AND (' .  fn_find_array_in_set([5859, 5860, 4993, 4723, 6761], 'promotion_ids', false) . ')';
+
+    // $join = db_quote(' LEFT JOIN ?:order_data ON ?:order_data.order_id = ?:orders.order_id AND ?:order_data.type = ?s', 'W');
+    // $condition .= db_quote(' AND ?:order_data.order_id IS NULL');
+    $step = 100;
+    $limit = ' LIMIT '. ($_SESSION['iteration']-1)* $step . ', ' . $step;
+
+    $orders = db_get_fields("SELECT ?:orders.order_id FROM ?:orders $join WHERE $condition $limit");
+    if (empty($orders)) fn_print_die($_SESSION['wrong']);
+    if (!isset($_SESSION['total']) || $_REQUEST['rerun']) {
+        $_SESSION['total'] = db_get_field("SELECT count(?:orders.order_id) FROM ?:orders $join WHERE $condition");
+        unset($_SESSION['wrong']);
+    }
+    fn_print_r($_SESSION['iteration'] . ' / '. ceil($_SESSION['total']/$step));
+    fn_print_r($_SESSION['wrong']);
+
+    define('ORDER_MANAGEMENT', true);
+    Registry::set('runtime.mode', 'update');
+
+    $i = 0;
+    foreach ($orders as $order_id) {
+        $i +=1;
+        fn_echo('.');
+        if ($i % 20 == 0) fn_echo('<br>');
+        $db_points = db_get_field('SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_id, POINTS);
+
+        fn_clear_cart($cart, true);
+        $customer_auth = fn_fill_auth(array(), array(), false, 'C');
+
+        $cart_status = md5(serialize($cart));
+        fn_form_cart($order_id, $cart, $customer_auth, !empty($_REQUEST['copy']));
+
+        fn_store_shipping_rates($order_id, $cart, $customer_auth);
+        $cart['order_id'] = $order_id;
+        $cart['calculate_shipping'] = true;
+
+        // calculate cart - get products with options, full shipping rates info and promotions
+        list ($cart_products, $product_groups) = fn_calculate_cart_content($cart, $customer_auth);
+        
+        if ($cart['points_info']['reward'] != $db_points) $_SESSION['wrong'][$order_id] = $cart['points_info']['reward'] - $db_points;
+    }
+    $_SESSION['iteration'] += 1;
+    fn_redirect('tools.search_orders_with_promo');
+} elseif ($mode == 'correct_reward_points_new') {
+    $file = 'orders.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    $order_ids = [];
+    foreach ($content as $data) {
+        $order_ids[] = reset($data);
+    }
+    sort($order_ids);
+
+    define('ORDER_MANAGEMENT', true);
+    Registry::set('runtime.mode', 'update');
+    foreach ($order_ids as $order_id) {
+        if (db_get_field('SELECT user_id FROM ?:orders WHERE order_id = ?i', $order_id) == 32278) continue;
+        if (db_get_field('SELECT status FROM ?:orders WHERE order_id = ?i', $order_id) != 'H') continue;
+        if ($order_id < 133050) continue;
+        $db_points = db_get_field('SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_id, POINTS);
+
+        fn_clear_cart($cart, true);
+        $customer_auth = fn_fill_auth(array(), array(), false, 'C');
+
+        $cart_status = md5(serialize($cart));
+        fn_form_cart($order_id, $cart, $customer_auth, !empty($_REQUEST['copy']));
+
+        fn_store_shipping_rates($order_id, $cart, $customer_auth);
+        $cart['order_id'] = $order_id;
+        $cart['calculate_shipping'] = true;
+
+        // calculate cart - get products with options, full shipping rates info and promotions
+        list ($cart_products, $product_groups) = fn_calculate_cart_content($cart, $customer_auth);
+        if (!$db_points) {
+            if (isset($cart['points_info']['reward'])) {
+                $order_data = array(
+                    'order_id' => $order_id,
+                    'type' => POINTS,
+                    'data' => $cart['points_info']['reward']
+                );
+                db_query("REPLACE INTO ?:order_data ?e", $order_data);
+            }
+            fn_change_user_points($cart['points_info']['reward'], $customer_auth['user_id'], serialize(['order_id' => $order_id, 'to' => fn_get_order_short_info($order_id)['status']]), CHANGE_DUE_ORDER);
+
+        } elseif ($db_points != $cart['points_info']['reward']) {
+            $order = fn_get_order_info($order_id);
+            $promotions = array_filter($order['promotions'], function($v) {return isset($v['bonuses']['give_percent_points']); });
+            if (count($promotions) > 1) {
+                // two promo
+                $res = db_get_field('SELECT order_id FROM ?:orders WHERE user_id = ?i AND order_id < ?i AND status = ?s', $cart['user_data']['user_id'], $order_id, 'H');
+                if (!$res) {
+                    // first order and we disable 4993
+                    $prev = $cart['points_info']['reward'];
+                    $reward = round($order['subtotal']*0.1);
+
+                    if (isset($cart['points_info']['reward'])) {
+                        $order_data = array(
+                            'order_id' => $order_id,
+                            'type' => POINTS,
+                            'data' => $reward
+                        );
+                        db_query("REPLACE INTO ?:order_data ?e", $order_data);
+                    }
+
+                    fn_change_user_points($reward-$db_points, $customer_auth['user_id'], "Корректировка баллов по заказу #$order_id: $db_points —> $reward", CHANGE_DUE_ADDITION);
+
+                    fn_print_die($cart['points_info']['reward'], $db_points, round($order['subtotal']*0.1), $order_id, $customer_auth['user_id']);
+                    // correct points
+                } else {
+                    // second order and we disable 4723
+                    fn_print_die('second order');
+                }
+            } elseif ($db_points != round($order['subtotal']*0.02)) {
+                // wrong amount
+                fn_print_die($cart['points_info']['reward'], $db_points, round($order['subtotal']*0.02));
+            }
+
+        }
+    }
+
+    fn_print_die('done', $order_ids);
 }
+
+function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
+{
+    static $promotions = [];
+    $applied_promotions = [];
+    $get_promotions_params = [
+        'expand' => true,
+        'zone' => $zone,
+        'sort_by' => 'stop_other_rules_and_priority',
+        'sort_order' => 'descasc',
+        'promotion_id' => [$promotion_id],
+        'get_hidden' => true,
+    ];
+
+    $storefront = Tygh::$app['storefront'];
+    $get_promotions_params['storefront_id'] = $storefront->storefront_id;
+
+    /**
+     * Executes when applying promotions, before obtaining applicable promotions.
+     * Allows to modify cached promotions list.
+     *
+     * @param string     $zone                  Promotiontion zone (catalog, cart)
+     * @param array      $data                  Data array (product - for catalog rules, cart - for cart rules)
+     * @param array|null $auth                  Authentication information (for cart rules)
+     * @param array|null $cart_products         Cart products (for cart rules)
+     * @param array      $promotions            Cached promotions
+     * @param array      $applied_promotions    Applied promotions
+     * @param array      $get_promotions_params Promotions search params
+     */
+    fn_set_hook('promotion_apply_before_get_promotions', $zone, $data, $auth, $cart_products, $promotions, $applied_promotions, $get_promotions_params);
+    if (!isset($promotions[$zone])) {
+        list($promotions[$zone]) = fn_get_promotions($get_promotions_params);
+    }
+
+
+    // If we're in cart, set flag that promotions available
+    if ($zone == 'cart') {
+        $_promotion_ids = !empty($data['promotions']) ? array_keys($data['promotions']) : array();
+        $data['no_promotions'] = empty($promotions[$zone]);
+        $data['promotions'] = array(); // cleanup stored promotions
+        $data['subtotal_discount'] = 0; // reset subtotal discount (FIXME: move to another place)
+        $data['has_coupons'] = false;
+    }
+
+    /**
+     * Changes before applying promotion rules
+     *
+     * @param array  $promotions    List of promotions
+     * @param string $zone          - promotiontion zone (catalog, cart)
+     * @param array  $data          data array (product - for catalog rules, cart - for cart rules)
+     * @param array  $auth          (optional) - auth array (for car rules)
+     * @param array  $cart_products (optional) - cart products array (for car rules)
+     */
+    fn_set_hook('promotion_apply_pre', $promotions, $zone, $data, $auth, $cart_products);
+
+    if (!fn_allowed_for('ULTIMATE:FREE')) {
+        if ($zone == 'cart') {
+            // Delete obsolete discounts
+            foreach ($cart_products as $p_id => $_val) {
+                $data['products'][$p_id]['discount'] = !empty($_val['discount']) ? $_val['discount'] : 0;
+                $data['products'][$p_id]['promotions'] = !empty($_val['promotions']) ? $_val['promotions'] : array();
+            }
+
+            // Summarize discounts
+            foreach ($cart_products as $k => $v) {
+                if (!empty($v['promotions'])) {
+                    foreach ($v['promotions'] as $pr_id => $bonuses) {
+                        foreach ($bonuses['bonuses'] as $bonus) {
+                            if (!empty($bonus['discount'])) {
+                                $data['promotions'][$pr_id]['total_discount'] = (!empty($data['promotions'][$pr_id]['total_discount']) ? $data['promotions'][$pr_id]['total_discount'] : 0) + ($bonus['discount'] * $v['amount']);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $data['no_promotions'] = $data['no_promotions'] && empty($data['promotions']);
+        }
+    }
+
+    if (empty($promotions[$zone])) {
+        return false;
+    }
+
+    Tygh::$app['session']['promotion_notices']['promotion'] = array(
+        'applied' => false,
+        'messages' => array()
+    );
+
+    if (!fn_allowed_for('ULTIMATE:FREE')) {
+        // Pre-check coupon
+        if ($zone == 'cart' && !empty($data['pending_coupon'])) {
+            fn_promotion_check_coupon($data, true);
+        }
+    }
+    foreach ($promotions[$zone] as $promotion) {
+        // Rule is valid and can be applied
+        if ($zone == 'cart') {
+
+            $data['has_coupons'] = empty($data['has_coupons']) ? fn_promotion_has_coupon_condition($promotion['conditions']) : $data['has_coupons'];
+        }
+        if (fn_check_promotion_conditions($promotion, $data, $auth, $cart_products)) {
+            if (fn_promotion_apply_bonuses($promotion, $data, $auth, $cart_products)) {
+                $applied_promotions[$promotion['promotion_id']] = $promotion;
+
+                // Stop processing further rules, if needed
+                if (YesNo::toBool($promotion['stop']) || YesNo::toBool($promotion['stop_other_rules'])) {
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!fn_allowed_for('ULTIMATE:FREE')) {
+        if ($zone == 'cart') {
+
+            // Post-check coupon
+            if (!empty($data['pending_coupon'])) {
+                // re-check coupons if some promotion has a coupon code "contains" condition
+                if (!empty($data['pending_original_coupon'])) {
+                    unset($data['coupons'][$data['pending_coupon']]);
+                    $data['pending_coupon'] = $data['pending_original_coupon'];
+                    unset($data['pending_original_coupon']);
+                    fn_promotion_check_coupon($data, true);
+                }
+
+                fn_promotion_check_coupon($data, false, $applied_promotions);
+            }
+
+            if (!empty($applied_promotions)) {
+                // Display notifications for new promotions
+                $_text = array();
+                foreach ($applied_promotions as $v) {
+                    if (!in_array($v['promotion_id'], $_promotion_ids)) {
+                        $_text[] = $v['name'];
+                    }
+                }
+
+                if (!empty($_text)) {
+                    Tygh::$app['session']['promotion_notices']['promotion']['applied'] = true;
+                    Tygh::$app['session']['promotion_notices']['promotion']['messages'][] = 'text_applied_promotions';
+                    Tygh::$app['session']['promotion_notices']['promotion']['applied_promotions'] = $_text;
+                }
+
+                $data['applied_promotions'] = $applied_promotions;
+
+                // Delete obsolete coupons
+                if (!empty($data['coupons'])) {
+                    foreach ($data['coupons'] as $_coupon_code => $_p_ids) {
+                        foreach ($_p_ids as $_ind => $_p_id) {
+                            if (!isset($applied_promotions[$_p_id])) {
+                                unset($data['coupons'][$_coupon_code][$_ind]);
+                            }
+                        }
+                        if (empty($data['coupons'][$_coupon_code])) {
+                            unset($data['coupons'][$_coupon_code]);
+                        }
+                    }
+                }
+
+            } else {
+                $data['coupons'] = array();
+            }
+        }
+    }
+
+    return $applied_promotions;
+}
+
 
 function fn_merge_product_features($target_feature, $group) {
     $target_feature_data = fn_get_product_feature_data($target_feature, true, true);
