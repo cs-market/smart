@@ -1612,7 +1612,8 @@ fn_print_r($fantoms);
     $condition = ' 1 ';
 
     $condition .= 'AND (' .  fn_find_array_in_set([5859, 5860, 4993, 4723, 6761], 'promotion_ids', false) . ')';
-
+    $condition .= db_quote(' AND order_id > ?i', 133050);
+    $condition .= db_quote(' AND status = ?s', 'H');
     // $join = db_quote(' LEFT JOIN ?:order_data ON ?:order_data.order_id = ?:orders.order_id AND ?:order_data.type = ?s', 'W');
     // $condition .= db_quote(' AND ?:order_data.order_id IS NULL');
     $step = 100;
@@ -1667,8 +1668,6 @@ fn_print_r($fantoms);
     Registry::set('runtime.mode', 'update');
     foreach ($order_ids as $order_id) {
         if (db_get_field('SELECT user_id FROM ?:orders WHERE order_id = ?i', $order_id) == 32278) continue;
-        if (db_get_field('SELECT status FROM ?:orders WHERE order_id = ?i', $order_id) != 'H') continue;
-        if ($order_id < 133050) continue;
         $db_points = db_get_field('SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_id, POINTS);
 
         fn_clear_cart($cart, true);
@@ -1683,6 +1682,7 @@ fn_print_r($fantoms);
 
         // calculate cart - get products with options, full shipping rates info and promotions
         list ($cart_products, $product_groups) = fn_calculate_cart_content($cart, $customer_auth);
+
         if (!$db_points) {
             if (isset($cart['points_info']['reward'])) {
                 $order_data = array(
@@ -1693,7 +1693,7 @@ fn_print_r($fantoms);
                 db_query("REPLACE INTO ?:order_data ?e", $order_data);
             }
             fn_change_user_points($cart['points_info']['reward'], $customer_auth['user_id'], serialize(['order_id' => $order_id, 'to' => fn_get_order_short_info($order_id)['status']]), CHANGE_DUE_ORDER);
-
+            $order_changes[] = $order_id;
         } elseif ($db_points != $cart['points_info']['reward']) {
             $order = fn_get_order_info($order_id);
             $promotions = array_filter($order['promotions'], function($v) {return isset($v['bonuses']['give_percent_points']); });
@@ -1715,8 +1715,8 @@ fn_print_r($fantoms);
                     }
 
                     fn_change_user_points($reward-$db_points, $customer_auth['user_id'], "Корректировка баллов по заказу #$order_id: $db_points —> $reward", CHANGE_DUE_ADDITION);
-
-                    fn_print_die($cart['points_info']['reward'], $db_points, round($order['subtotal']*0.1), $order_id, $customer_auth['user_id']);
+                    $user_changes[] = $customer_auth['user_id'];
+                    // fn_print_die($cart['points_info']['reward'], $db_points, round($order['subtotal']*0.1), $order_id, $customer_auth['user_id']);
                     // correct points
                 } else {
                     // second order and we disable 4723
@@ -1730,7 +1730,7 @@ fn_print_r($fantoms);
         }
     }
 
-    fn_print_die('done', $order_ids);
+    fn_print_die('done', $order_changes, $user_changes);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
