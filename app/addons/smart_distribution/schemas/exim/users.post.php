@@ -46,6 +46,11 @@ $schema['export_fields']['Reward points'] = [
     'table' => 'user_data',
 ];
 
+$schema['export_fields']['Profile name'] = [
+    'db_field' => 'profile_name',
+    'table' => 'user_profiles',
+];
+
 $schema['export_fields']['Add usergroup IDs'] = [
     'process_put' => array('fn_smart_distribution_exim_set_usergroups', '#key', '#this', false),
     'import_only' => true,

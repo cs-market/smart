@@ -234,6 +234,9 @@ function fn_exim_rejoin_user_profiles_export(&$pattern)
         }
 
         $object['profile_id'] = $profile_id;
+    } elseif (isset($object['profile_id']) && !is_numeric($object['profile_id'])) {
+        $object['profile_name'] = $object['profile_id'];
+        unset($object['profile_id']);
     }
 }
 
