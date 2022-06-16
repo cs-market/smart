@@ -2,6 +2,7 @@
 
 use Tygh\Registry;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\ProfileDataTypes;
 
 if ($mode =='monolith' && !empty($action)) {
     fn_print_die(fn_monolith_generate_xml($action));
@@ -1731,6 +1732,29 @@ fn_print_r($fantoms);
     }
 
     fn_print_die('done', $order_changes, $user_changes);
+} elseif ($mode == 'baltica_maintenance') {
+    $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = 45');
+    db_query('DELETE FROM ?:product_prices WHERE price = 0 AND usergroup_id != 0 AND product_id IN (?a)', $product_ids);
+    fn_print_die('stop');
+
+    $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = 45 AND user_type = ?s AND user_id != ?i', 'C', 5055);
+    foreach($users as $user_id) {
+        fn_delete_profile_fields_data(ProfileDataTypes::USER, $user_id);
+    }
+
+    $profile_ids = db_get_fields('SELECT profile_id FROM ?:user_profiles WHERE user_id IN (?a)', $users);
+
+    foreach ($profile_ids as $profile_id) {
+        fn_delete_profile_fields_data(ProfileDataTypes::PROFILE, $profile_id);
+    }
+
+    db_query("DELETE FROM ?:user_storages WHERE user_id IN (?a)", $users);
+    db_query('DELETE FROM ?:user_session_products WHERE user_id IN (?a)', $users);
+    db_query('DELETE FROM ?:user_data WHERE user_id IN (?a)', $users);
+    db_query('UPDATE ?:orders SET user_id = 0 WHERE user_id IN (?a)', $users);
+    db_query('DELETE FROM ?:usergroup_links WHERE user_id IN (?a)', $users);
+    db_query('DELETE FROM ?:users WHERE user_id IN (?a)', $users);
+    fn_print_die('stop');
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
