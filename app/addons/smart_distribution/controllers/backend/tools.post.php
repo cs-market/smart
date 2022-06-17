@@ -1735,7 +1735,6 @@ fn_print_r($fantoms);
 } elseif ($mode == 'baltica_maintenance') {
     $product_ids = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = 45');
     db_query('DELETE FROM ?:product_prices WHERE price = 0 AND usergroup_id != 0 AND product_id IN (?a)', $product_ids);
-    fn_print_die('stop');
 
     $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = 45 AND user_type = ?s AND user_id != ?i', 'C', 5055);
     foreach($users as $user_id) {
@@ -1754,6 +1753,19 @@ fn_print_r($fantoms);
     db_query('UPDATE ?:orders SET user_id = 0 WHERE user_id IN (?a)', $users);
     db_query('DELETE FROM ?:usergroup_links WHERE user_id IN (?a)', $users);
     db_query('DELETE FROM ?:users WHERE user_id IN (?a)', $users);
+    fn_print_die('stop');
+} elseif ($mode == 'baltica_maintenance2') {
+    $usergroups = db_get_field('SELECT usergroup_ids FROM ?:vendor_plans WHERE plan_id = ?i', 29);
+    $usergroups = explode(',', $usergroups);
+    if(($balt = array_search(548,$usergroups)) !== false){
+        unset($usergroups[$balt]);
+    }
+
+    fn_delete_usergroups($usergroups);
+    $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id = ?i', 45);
+    foreach ($products as $product_id) {
+        fn_delete_product($product_id);
+    }
     fn_print_die('stop');
 }
 
