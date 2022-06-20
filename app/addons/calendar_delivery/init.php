@@ -14,6 +14,7 @@ fn_register_hooks(
     'form_cart',
     'update_user_pre',
     'update_user_profile_pre',
+    'fill_auth',
     'get_user_info',
     'get_user_short_info_pre',
     'user_init',
@@ -21,7 +22,7 @@ fn_register_hooks(
     'get_usergroups',
     'allow_place_order_post',
     'update_storage_pre',
-    'get_storages_post',
+    'get_storages',
     'delete_storages',
     'post_delete_user'
 );

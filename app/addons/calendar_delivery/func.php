@@ -215,6 +215,13 @@ function fn_calendar_delivery_update_user_profile_pre($user_id, $user_data, $act
     }
 }
 
+
+function fn_calendar_delivery_fill_auth(&$auth, $user_data, $area, $original_auth) {
+    if (!empty($user_data['user_id'])) {
+        $auth['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $user_data['user_id']);
+    }
+}
+
 function fn_calendar_delivery_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
     $user_data['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i ORDER BY storage_id', 'storage_id', $user_id);
 }
@@ -455,9 +462,9 @@ function fn_calendar_delivery_update_storage_pre(&$storage_data, $storage_id) {
     }
 }
 
-function fn_calendar_delivery_get_storages_post(&$storages, $params) {
-    foreach($storages as &$storage) {
-        //$storage['exception_days'] = fn_delivery_date_from_line($storage['exception_days']);
+function fn_calendar_delivery_get_storages($params, $join, &$condition) {
+    if (!empty(Tygh::$app['session']['auth']['delivery_date_by_storage'])) {
+        $condition .= db_quote(' AND ?:storages.storage_id IN (?a)', array_keys(Tygh::$app['session']['auth']['delivery_date_by_storage']));
     }
 }
 

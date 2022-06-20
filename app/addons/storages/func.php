@@ -21,6 +21,13 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 function fn_get_storages($params = [], $items_per_page = 0) {
     $condition = $join = '';
 
+    if (SiteArea::isStorefront(AREA)) {
+        $params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
+        if (!empty(Tygh::$app['session']['auth']['company_id'])) {
+            $params['company_id'] = Tygh::$app['session']['auth']['company_id'];
+        }
+    }
+
     if (!empty($params['status'])) {
         $condition .= db_quote(' AND ?:storages.status = ?s', $params['status']);
     }
@@ -44,13 +51,12 @@ function fn_get_storages($params = [], $items_per_page = 0) {
         $condition .= db_quote(' AND storage_id IN (?a)', $params['storage_ids']);
     }
 
-    if (SiteArea::isStorefront(AREA)) {
-        $params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
-    }
     if (!empty($params['usergroup_ids'])) {
         $join .= db_quote('LEFT JOIN ?:storage_usergroups ON ?:storages.storage_id = ?:storage_usergroups.storage_id');
         $condition .= db_quote(' AND ?:storage_usergroups.usergroup_id IN (?a)', $params['usergroup_ids']);
     }
+
+    fn_set_hook('get_storages', $params, $join, $condition);
 
     $storages = db_get_hash_array("SELECT ?:storages.* FROM ?:storages $join WHERE 1 ?p", 'storage_id', $condition);
 
@@ -85,6 +91,7 @@ function fn_update_storage($storage_data, $storage_id = 0) {
 
     if (isset($storage_data['usergroup_ids'])) {
         db_query("DELETE FROM ?:storage_usergroups WHERE storage_id = ?i", $storage_id);
+        $storage_data['usergroup_ids'] = empty($storage_data['usergroup_ids']) ? [0] : $storage_data['usergroup_ids'];
         $usergroups_data = [];
 
         fn_set_hook('update_storage_usergroups_pre', $storage_data);
