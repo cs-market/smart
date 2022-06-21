@@ -1767,7 +1767,17 @@ fn_print_r($fantoms);
         fn_delete_product($product_id);
     }
     fn_print_die('stop');
+} elseif ($mode == 'prices_maintenance') {
+    $res = db_get_hash_single_array('SELECT MIN(p.price) AS price, p.product_id FROM ?:product_prices AS p LEFT JOIN ?:product_prices AS pp ON pp.product_id = p.product_id AND pp.usergroup_id = 0 WHERE pp.product_id IS NULL GROUP BY product_id', array('product_id', 'price'));
+    $template = ['product_id' => 0, 'price' => 0, 'percentage_discount' => 0, 'lower_limit' => 1, 'usergroup_id' => USERGROUP_ALL];
+    $insert = [];
+    foreach($res as $template['product_id'] => $template['price']) {
+        $insert[] = $template;
+    }
+    if ($insert) db_query('INSERT INTO ?:product_prices ?m', $insert);
+    fn_print_die(count($insert));
 }
+
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
 {
