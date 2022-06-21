@@ -1774,6 +1774,13 @@ fn_print_r($fantoms);
     foreach($res as $template['product_id'] => $template['price']) {
         $insert[] = $template;
     }
+
+    $res = db_get_fields('SELECT p.product_id FROM ?:products AS p LEFT JOIN ?:product_prices AS pp ON pp.product_id = p.product_id WHERE pp.product_id IS NULL GROUP BY product_id');
+    $template['price'] = 0;
+    foreach ($res as $template['product_id']) {
+        $insert[] = $template;
+    }
+
     if ($insert) db_query('INSERT INTO ?:product_prices ?m', $insert);
     fn_print_die(count($insert));
 }
