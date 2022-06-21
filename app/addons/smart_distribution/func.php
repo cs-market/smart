@@ -1474,8 +1474,8 @@ function fn_exim_smart_distribution_get_usergroup_ids($data, $without_status = t
                 if (is_numeric($ug_data[0])) {
                     if (in_array($ug_data[0], [USERGROUP_ALL, USERGROUP_GUEST, USERGROUP_REGISTERED])) {
                         $ug_id = $ug_data[0];
-                    } else {
-                        $ug_id = db_get_field("SELECT usergroup_id FROM ?:usergroups WHERE usergroup_id = ?i", $ug_data[0]);
+                    } elseif ($res = db_get_field("SELECT usergroup_id FROM ?:usergroups WHERE usergroup_id = ?i", $ug_data[0])) {
+                        $ug_id = $res;
                     }
                 }
                 if ($ug_id === false) {
