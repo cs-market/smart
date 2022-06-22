@@ -18,6 +18,5 @@ fn_register_hooks(
     'load_products_extra_data',
     'get_products_post',
     ['gather_additional_product_data_before_discounts', 4394967294],
-    'pre_place_order',
     'reward_points_calculate_item'
 );

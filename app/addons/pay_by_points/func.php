@@ -147,27 +147,28 @@ function fn_pay_by_points_save_cart_content_pre(&$cart, $user_id, $type, $user_t
 function fn_pay_by_points_pre_place_order(&$cart, $allow, &$product_groups)
 {
     //  separete orders
-    foreach($product_groups as $group_id => $group) {
+    // foreach($product_groups as $group_id => $group) {
+    //     $new_group = $bonus_products = [];
 
-        $bonus_products = [];
+    //     foreach($group['products'] as $cart_id => $product) {
+    //         if (
+    //             isset($product['extra']['pay_by_points']['use_bonus_pay'])
+    //             && $product['extra']['pay_by_points']['use_bonus_pay']
+    //         ) {
+    //             $bonus_products[$cart_id] = $product;
+    //             unset($product_groups[$group_id]['products'][$cart_id]);
+    //         }
+    //     }
 
-        foreach($group['products'] as $cart_id => $product) {
-            if (
-                isset($product['extra']['pay_by_points']['use_bonus_pay'])
-                && $product['extra']['pay_by_points']['use_bonus_pay']
-            ) {
-                $bonus_products[$cart_id] = $product;
-                unset($product_groups[$group_id]['products'][$cart_id]);
-            }
-        }
+    //     //  clone group for separate order isset bonus products
+    //     if ($bonus_products) {
+    //         $new_group = $group;
+    //         $new_group['products'] = $bonus_products;
 
-        //  clone group for separate order isset bonus products
-        if ($bonus_products) {
-            $new_group = $group;
-            $new_group['products'] = $bonus_products;
-            $product_groups[] = $new_group;
-        }
-    }
+    //         $product_groups[] = $new_group;
+    //     }
+    //     fn_set_hook('pay_by_points_divide_cart', $cart, $product_groups, $group_id, $new_group);
+    // }
 
     //  push bonus reward data for the reward_points add-on
     //  (if order will separated => main order delete => put on all with point)
