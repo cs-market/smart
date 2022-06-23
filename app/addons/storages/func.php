@@ -53,7 +53,7 @@ function fn_get_storages($params = [], $items_per_page = 0) {
 
     if (!empty($params['usergroup_ids'])) {
         $join .= db_quote('LEFT JOIN ?:storage_usergroups ON ?:storages.storage_id = ?:storage_usergroups.storage_id');
-        $condition .= db_quote(' AND ?:storage_usergroups.usergroup_id IN (?a)', $params['usergroup_ids']);
+        $condition .= db_quote(' AND (?:storage_usergroups.usergroup_id IN (?a) OR ?:storage_usergroups.usergroup_id IS NULL)', $params['usergroup_ids']);
     }
 
     fn_set_hook('get_storages', $params, $join, $condition);
