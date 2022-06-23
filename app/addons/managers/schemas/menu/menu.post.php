@@ -4,7 +4,7 @@ use Tygh\Registry;
 
 if (fn_smart_distribution_is_manager(Tygh::$app['session']['auth']['user_id'])) {
     $menu = ['management' => [
-        'title' => 'Management',
+        'title' => __('management'),
         'items' => [
             'view_orders' => $schema['central']['orders']['items']['view_orders'],
             'products' => $schema['central']['products']['items']['products'],
