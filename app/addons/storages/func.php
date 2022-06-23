@@ -19,6 +19,10 @@ use Tygh\Enum\ProductTracking;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_get_storages($params = [], $items_per_page = 0) {
+    if (empty(Tygh::$app['session']['auth']['user_id'])) {
+        return [false, false];
+    }
+
     $condition = $join = '';
 
     if (SiteArea::isStorefront(AREA)) {
