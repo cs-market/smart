@@ -94,10 +94,13 @@ function fn_decimal_amount_get_product_price_post($product_id, $amount, $auth, &
 
 function fn_decimal_amount_update_cart_products_pre(&$cart, &$product_data, $auth) {
     $cart['backup_product_data'] = $product_data;
-    foreach ($product_data as $k => &$v) {
-        if ($v['amount'] < 1) $v['amount'] = 1;
+
+    if (!defined('ORDER_MANAGEMENT')) {
+        foreach ($product_data as $k => &$v) {
+            if ($v['amount'] < 1) $v['amount'] = 1;
+        }
+        unset($v);
     }
-    unset($v);
 }
 
 function fn_decimal_amount_check_amount_in_stock_before_check($product_id, &$amount, $product_options, $cart_id, $is_edp, $original_amount, &$cart, $update_id, &$product, $current_amount) {
