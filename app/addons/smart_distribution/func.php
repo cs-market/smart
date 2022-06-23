@@ -1055,7 +1055,7 @@ function fn_smart_distribution_get_product_data_post(&$product_data, $auth, $pre
 
 function fn_smart_distribution_get_product_price($product_id, $amount, $auth, &$price, &$skip) {
     $skip = true;
-    $usergroup_ids = empty($usergroup_ids) ? Tygh::$app['session']['auth']['usergroup_ids'] : $usergroup_ids;
+    $usergroup_ids = empty($usergroup_ids) ? $auth['usergroup_ids'] : $usergroup_ids;
     $usergroup_ids = array_filter($usergroup_ids);
 
     $price = db_get_field("
