@@ -1504,3 +1504,8 @@ function fn_smart_distribution_update_product_prices($product_id, &$_product_dat
         }
     }
 }
+
+// we have removed russia moscow from default destinations, but shippings stop to work
+function fn_smart_distribution_get_available_destination_pre(&$location) {
+    $location['country'] = !empty($location['country']) ? $location['country'] : 'RU';
+}

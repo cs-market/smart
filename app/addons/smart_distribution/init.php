@@ -82,7 +82,8 @@ fn_register_hooks(
     'get_filters_products_count_post',
     'get_filters_pre',
     'update_storage_usergroups_pre',
-    'update_product_prices'
+    'update_product_prices',
+    'get_available_destination_pre'
 );
 
 if (defined('API')) {
