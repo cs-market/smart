@@ -71,11 +71,11 @@ function fn_monolith_generate_xml($order_id) {
 
 	if (!empty($order_info['promotions'])) {
         $promotion_products = array_filter($order_info['products'], function($v) {return (isset($v['promotions']));});
-        $product_promotions = [];
+        $applied_promotions = [];
         foreach ($promotion_products as $product) {
             foreach($product['promotions'] as $promotion_id => $promotion) {
-                if (!isset($product_promotions[$promotion_id])) {
-                    $product_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
+                if (!isset($applied_promotions[$promotion_id])) {
+                    $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
                 }
                 foreach ($promotion['bonuses'] as $value) {
                     $monolith_order['d'][] = array(
@@ -84,8 +84,8 @@ function fn_monolith_generate_xml($order_id) {
                             'f' => array(
                                 date("Y-m-d\T00:00:00", $order_info['timestamp']),
                                 $addon['order_prefix'] . $order_id,
-                                $product_promotions[$promotion_id]['external_id'],
-                                $product_promotions[$promotion_id]['name'],
+                                $applied_promotions[$promotion_id]['external_id'],
+                                $applied_promotions[$promotion_id]['name'],
                                 $value['discount'],
                                 $product['product_code']
                             ),
@@ -96,20 +96,33 @@ function fn_monolith_generate_xml($order_id) {
         }
 
         foreach($order_info['promotions'] as $promotion_id => $promotion) {
-            if (in_array($promotion_id, array_keys($product_promotions))) continue;
+            if (in_array($promotion_id, array_keys($applied_promotions))) continue;
 
-            $promotion_data = fn_get_promotion_data($promotion_id);
+            $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
             $monolith_order['d'][] = array(
                 '@attributes' => array ('name' => 'CRMOrderDiscountLine'),
                 'r' => array(
                     'f' => array(
                         date("Y-m-d\T00:00:00", $order_info['timestamp']),
                         $addon['order_prefix'] . $order_id,
-                        $promotion_data['external_id'], // REPLACE BY PROMOTION EXTERNAL ID
-                        $promotion_data['name'],
+                        $applied_promotions[$promotion_id]['external_id'], // REPLACE BY PROMOTION EXTERNAL ID
+                        $applied_promotions[$promotion_id]['name'],
                         $order_info['subtotal_discount'],
                         'whole_order'
                     ),
+                ),
+            );
+        }
+        foreach($applied_promotions as $promotion_id => $promotion) {
+            if (empty($promotion['external_id'])) continue;
+            $monolith_order['d'][] = array(
+                '@attributes' => array ('name' => 'CRMOrderOption'),
+                'r' => array(
+                    'f' => array(
+                        $addon['order_prefix'] . $order_id, 
+                        'Comment', 
+                        $promotion['external_id'],
+                    )
                 ),
             );
         }
