@@ -169,8 +169,9 @@ function fn_storages_get_product_data($product_id, &$field_list, &$join, $auth, 
     if ($storage = Registry::get('runtime.current_storage')) {
         $usergroup_ids = !empty($auth['usergroup_ids']) ? $auth['usergroup_ids'] : array();
         
-        //мы не ставим юзергруппы к складу совсем так как склад не определяет цену товара так как цену товара определяет прайсовая юзергруппа.
+        // мы не ставим юзергруппы к складу совсем так как склад не определяет цену товара так как цену товара определяет прайсовая юзергруппа.
         if (!empty($storage['usergroup_ids'])) {
+            // но в перспективе может быть и таки да.
             $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
         }
 
