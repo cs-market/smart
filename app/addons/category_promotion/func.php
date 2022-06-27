@@ -224,7 +224,7 @@ function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth
     if (!empty($promotions)) {
         $promotion = reset($promotions);
         $product['promo'] = $promotion;
-        $stickers['promotion'] = Registry::get('addons.category_promotion.promotion_sticker_id');
+        $stickers['promotion'] = (!empty($promotion['sticker_ids'])) ? $promotion['sticker_ids'] : Registry::get('addons.category_promotion.promotion_sticker_id');
     }
 }
 

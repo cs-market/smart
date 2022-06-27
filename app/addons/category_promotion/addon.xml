@@ -28,6 +28,7 @@
         <item>ALTER TABLE `?:promotions` ADD usergroup varchar(255) NOT NULL default ''</item>
         <item>ALTER TABLE `?:promotions` ADD categories varchar(255) NOT NULL default ''</item>
         <item>ALTER TABLE `?:promotions` ADD view_separate varchar(1) NOT NULL default 'N'</item>
+        <item>ALTER TABLE `?:promotions` ADD sticker_ids varchar(255) NOT NULL;</item>
         
         <item for="uninstall">ALTER TABLE `?:promotions` DROP products</item>
         <item for="uninstall">ALTER TABLE `?:promotions` DROP bonus_products</item>
