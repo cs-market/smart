@@ -261,15 +261,17 @@ function fn_init_storages() {
         return array(INIT_STATUS_OK);
     }
 
-    $storages = Registry::getOrSetCache(
-        'fn_get_storages',
-        ['storages', 'storage_usergroups'],
-        'user',
-        static function () {
-            list($storages) = fn_get_storages(['get_usergroups' => true]);
-            return $storages;
-        }
-    );
+    // $storages = Registry::getOrSetCache(
+    //     'fn_get_storages',
+    //     ['storages', 'storage_usergroups'],
+    //     'user',
+    //     static function () {
+    //         list($storages) = fn_get_storages(['get_usergroups' => true]);
+    //         return $storages;
+    //     }
+    // );
+
+    list($storages) = fn_get_storages(['get_usergroups' => true]);
 
     if (!empty($storages)) {
         if (!empty($_REQUEST['storage']) && !empty($storages[$_REQUEST['storage']])) {
