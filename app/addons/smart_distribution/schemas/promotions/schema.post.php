@@ -7,4 +7,10 @@ $schema['bonuses']['give_percent_points'] = array (
     'filter' => 'intval'
 );
 
+$schema['conditions']['csv_users'] = array(
+    'type' => 'file',
+    'operators' => ['in', 'nin'],
+    'zones' => ['cart', 'catalog']
+);
+
 return $schema;

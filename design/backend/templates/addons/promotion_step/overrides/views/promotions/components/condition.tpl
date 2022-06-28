@@ -147,4 +147,6 @@
         <input id="mixed_input_{$p_md}_name" type="text" name="{$prefix}[value_name]"
                value="{$condition_data.value_name}" class="hidden input-medium"/>
     {/if}
+    {hook name="promotions:condition_types"}
+    {/hook}
 </div>

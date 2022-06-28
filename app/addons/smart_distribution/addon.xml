@@ -27,6 +27,7 @@
         <item lang="en" id="notify_manager_order_update">Уведомлять менеджеров о редактировании заказа</item>
         <item lang="en" id="show_out_of_stock_product">Показывать отсутствующий в наличии товар</item>
         <item lang="en" id="measure">Eдиница измерения</item>
+        <item lang="en" id="promotion_cond_csv_users">Пользователи из CSV</item>
     </language_variables>
     <queries>
         <item>CREATE TABLE `?:vendors_customers` (
