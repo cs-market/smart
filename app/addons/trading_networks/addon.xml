@@ -12,6 +12,9 @@
     <language_variables>
         <item lang="ru" id="trading_network">Торговая сеть</item>
     </language_variables>
+    <compatibility>
+        <dependencies>user_roles</dependencies>
+    </compatibility>
     <queries>
         <item>DROP TABLE IF EXISTS ?:trading_networks;</item>
         <item>CREATE TABLE `?:trading_networks` (
