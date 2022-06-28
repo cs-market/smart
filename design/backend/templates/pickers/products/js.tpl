@@ -74,7 +74,7 @@
                 }
             {/hook}
         </td>
-        <td class="mobile-hide" data-th="&nbsp;">>&nbsp;</td>
+        <td class="mobile-hide" data-th="&nbsp;">&nbsp;</td>
         <td class="nowrap" data-th="{__("tools")}">{if !$hide_delete_button && !$show_only_name}
             {capture name="tools_list"}
                 <li>{btn type="list" text=__("edit") href="products.update?product_id=`$delete_id`"}</li>

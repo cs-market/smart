@@ -120,7 +120,7 @@ function fn_monolith_generate_xml($order_id) {
                 'r' => array(
                     'f' => array(
                         $addon['order_prefix'] . $order_id, 
-                        'Comment', 
+                        'PrZakaz', 
                         $promotion['external_id'],
                     )
                 ),

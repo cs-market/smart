@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>trading_networks</id>
+    <name>Smart distribution: Торговые сети</name>
+    <description>Позволяет объединить пользователей в торговые сети</description>
+    <status>active</status>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <language_variables>
+        <item lang="ru" id="trading_network">Торговая сеть</item>
+    </language_variables>
+    <queries>
+        <item>DROP TABLE IF EXISTS ?:trading_networks;</item>
+        <item>CREATE TABLE `?:trading_networks` (
+          `product_id` mediumint(8) unsigned NOT NULL,
+          `user_id` mediumint(8) unsigned NOT NULL,
+          `price` decimal(12,2) NOT NULL default '0.00',
+          UNIQUE KEY `product_user` (`product_id`,`user_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:trading_networks;</item>
+
+        <item>ALTER TABLE `?:users` ADD network_id mediumint(8) unsigned NOT NULL DEFAULT '0';</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP network_id;</item>
+    </queries>
+</addon>

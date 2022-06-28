@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>user_roles</id>
+    <name>Smart distribution: Роли пользователя</name>
+    <description>Позволяет назначать пользователям их роли</description>
+    <status>active</status>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <language_variables>
+        <item lang="ru" id="user_role">Роль пользователя</item>
+    </language_variables>
+
+    <queries>
+        <item>ALTER TABLE `?:users` ADD user_role varchar(1) NOT NULL DEFAULT 'C' after user_type;</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP user_role;</item>
+    </queries>
+</addon>
