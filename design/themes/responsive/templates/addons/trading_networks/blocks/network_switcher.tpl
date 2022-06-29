@@ -3,7 +3,7 @@
         <div id="switcher_content_{$block.block_id}">
             <div class="ty-trading_network__container">
                 {foreach from=$auth.network_users item="network" key="network_id"}
-                <a href="{$config.current_url|fn_link_attach:"swithc_user_id=`$network_id`"}" class="ty-trading_network__item">
+                <a href="{$config.current_url|fn_link_attach:"switch_user_id=`$network_id`"}" class="ty-trading_network__item">
                     {$network.firstname nofilter}
                 </a>
                 {/foreach}

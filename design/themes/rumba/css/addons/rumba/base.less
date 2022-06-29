@@ -74,6 +74,9 @@ select {
         .box-shadow(0px 0px 10px -2px lighten(@base, 10%));
     }
 }
+.ty-tile-button {
+    .ty-tile-button();
+}
 
 .ty-tile-buttons(@gap: 10px) {
     display: flex;
@@ -191,7 +194,16 @@ select {
             margin-right: 5px;
             color: @base;
         }
+        .ty-icon-down-micro {
+            position: static;
+        }
         &.open {
+            & i {
+                color: @decorative;
+            }
+            &, & a {
+                color: #081307;
+            }
             a > span, a > .ty-icon-down-micro, a > .ty-minicart-title {
                 color: #081307;
             }
@@ -236,6 +248,15 @@ select {
             color: #fff;
         }
     }
+    .ty-icon-rumba-truck {
+        font-size: 24px;
+        margin-right: 8px;
+    }
+}
+
+.ty-icon-down-micro {
+    position: static;
+    margin-left: 5px;
 }
 
 .ty-icon-heart {

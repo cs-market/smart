@@ -1,7 +1,13 @@
-<div id="localizations_{$block.block_id}">
 {$uid = uniqid()}
 {if $storages}
-    <div class="ty-select-wrapper">{include file="common/select_object.tpl" style="graphic" suffix="storage_{$uid}" link_tpl=$config.current_url|fn_link_attach:"storage=" items=$storages selected_id=$smarty.const.STORAGE display_icons=false key_name="storage" text=__("storages.storage")}</div>
+    <div class="ty-dropdown-box">
+        <div id="sw_elm_dropdown_fields" class="ty-dropdown-box__title cm-combination"><a><i class="ty-icon-rumba-truck"><span></i>{$runtime.current_storage.storage}<i class="ty-icon-down-micro"></i></a></span></div>
+        <ul id="elm_dropdown_fields" class="ty-dropdown-box__content cm-popup-box hidden">
+            {foreach from=$storages item="storage"}
+                <li class="ty-dropdown-box__item">
+                    <a class="ty-dropdown-box__item-a" href="{$config.current_url|fn_link_attach:"storage=`$storage.storage_id`"}" rel="nofollow">{$storage.storage}</a>
+                </li>
+            {/foreach}
+        </ul>
+    </div>
 {/if}
-
-<!--localizations_{$block.block_id}--></div>

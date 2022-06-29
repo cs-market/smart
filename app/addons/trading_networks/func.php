@@ -22,9 +22,9 @@ function fn_init_network($request) {
     if (AREA != 'C') {
         return array(INIT_STATUS_OK);
     }
-    if (isset($request['swithc_user_id']) && in_array($request['swithc_user_id'], array_keys(Tygh::$app['session']['auth']['network_users']))) {
+    if (isset($request['switch_user_id']) && in_array($request['switch_user_id'], array_keys(Tygh::$app['session']['auth']['network_users']))) {
         $network_id = Tygh::$app['session']['auth']['user_id'];
-        fn_login_user($request['swithc_user_id'], true);
+        fn_login_user($request['switch_user_id'], true);
         Tygh::$app['session']['auth']['network_id'] = $network_id;
         fn_redirect(fn_url());
     }

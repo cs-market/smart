@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'rumba-glyphs';
   src:
-    url('fonts/rumba-glyphs.ttf?cfk2pt') format('truetype'),
-    url('fonts/rumba-glyphs.woff?cfk2pt') format('woff'),
-    url('fonts/rumba-glyphs.svg?cfk2pt#rumba-glyphs') format('svg');
+    url('fonts/rumba-glyphs.ttf') format('truetype'),
+    url('fonts/rumba-glyphs.woff') format('woff'),
+    url('fonts/rumba-glyphs.svg#rumba-glyphs') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ty-icon-rumba-truck:before {
+  content: "\e90e";
+}
 .ty-icon-rumba-percentage:before {
   content: "\e909";
 }
