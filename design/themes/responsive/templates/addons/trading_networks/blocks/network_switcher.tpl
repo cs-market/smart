@@ -9,7 +9,7 @@
                 {/foreach}
             </div>
         <!--switcher_content_{$block.block_id}--></div>
-        <div class="buttons-container">
+        <div class="buttons-container ty-center">
             <a href="{"auth.logout?redirect_url=`$return_current_url`"|fn_url}" class="ty-btn ty-btn__primary ty-btn__big">{__('logout_from_system')}</a>
         </div>
     {/capture}
