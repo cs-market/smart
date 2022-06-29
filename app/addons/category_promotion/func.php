@@ -195,7 +195,7 @@ function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$co
         $condition .=' AND (' . fn_find_array_in_set($params['product_ids'], "products", false) . ')';
     }
     if (!empty($params['usergroup_ids'])) {
-        $condition .= db_quote(' AND ((' . fn_find_array_in_set($params['usergroup_ids'], "usergroup", true) . ') OR users_conditions_hash LIKE ?l )', "%," . Tygh::$app['session']['auth']['user_id'] . ",%");
+        $condition .= db_quote(' AND ((' . fn_find_array_in_set($params['usergroup_ids'], "usergroup", true) . ') AND (' . fn_find_array_in_set([Tygh::$app['session']['auth']['user_id']], 'users_conditions_hash', true) . '))');
     }
     if (!empty($params['fields'])) {
         if (!is_array($params['fields'])) {
