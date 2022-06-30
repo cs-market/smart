@@ -105,7 +105,7 @@
                 {/if}
 
                 {if $product.box_contains && $product.box_contains != 1}
-                    <div><span class="cm-box-value-changer" data-ca-box-contains="{$product.box_contains}">{($product.amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
+                    <div><span id="for_amount_{$key}" data-ca-box-contains="{$product.box_contains}">{($product.amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
                 {/if}
 
                 <div class="quantity cm-reload-{$obj_id}{if $settings.Appearance.quantity_changer == "Y"} changer{/if}" id="quantity_update_{$obj_id}">

@@ -103,7 +103,7 @@
                                                     {else}
                                                     {assign var="default_amount" value="1"}
                                                     {/if}
-                                                    <div class="ty-left" style="margin-bottom: 8px;"><span class="cm-box-value-changer" data-ca-box-contains="{$product.box_contains}">{($default_amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
+                                                    <div class="ty-left" style="margin-bottom: 8px;"><span id="for_qty_count_{$obj_id}" data-ca-box-contains="{$product.box_contains}">{($default_amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
                                                 {/if}
                                                 {assign var="qty" value="qty_`$obj_id`"}
                                                 {if $smarty.capture.$qty|trim}

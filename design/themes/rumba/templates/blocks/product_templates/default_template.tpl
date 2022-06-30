@@ -94,7 +94,7 @@
                             {else}
                             {assign var="default_amount" value="1"}
                             {/if}
-                            <div><span class="cm-box-value-changer" data-ca-box-contains="{$product.box_contains}">{($default_amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
+                            <div><span id="for_qty_count_{$obj_id}" data-ca-box-contains="{$product.box_contains}">{($default_amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
                         {/if}
                     </div>
 
