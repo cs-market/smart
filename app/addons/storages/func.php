@@ -280,9 +280,7 @@ function fn_init_storages() {
         } elseif (($s = fn_get_session_data('storage')) && !empty($storages[$s])) {
             $storage = $s;
         } else {
-            reset($storages);
-            $storage = key($storages);
-            fn_set_notification('N', __('notice'), __('storages.force_to_choose_storage'));
+            Registry::set('runtime.force_to_choose_storage', true);
         }
 
         if ($storage != fn_get_session_data('storage')) {
