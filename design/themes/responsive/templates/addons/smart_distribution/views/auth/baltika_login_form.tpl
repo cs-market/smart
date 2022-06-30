@@ -16,7 +16,7 @@
         {/if}
 
         <div class="ty-control-group">
-            <label for="login_{$id}" class="ty-login__filed-label ty-control-group__label cm-required cm-trim cm-email">{__("email")}</label>
+            <label for="login_{$id}" class="ty-login__filed-label ty-control-group__label cm-required cm-trim cm-email">{__("phone")} {__('or')} {__("login")}</label>
             <input type="text" id="login_{$id}" name="user_login" size="30" value="{if $stored_user_login}{$stored_user_login}{else}{$config.demo_username}{/if}" class="ty-login__input cm-focus" />
         </div>
 
