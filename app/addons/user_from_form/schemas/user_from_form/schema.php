@@ -321,4 +321,22 @@ return [
             'fax' => '448',
         ],
     ],
+    '123' => [
+        'page_id' => 123,
+        'company_id' => 45,
+        'usergroup_id' => [548],
+        'fields_map' => [
+            'firstname' => '479',
+            'phone' => '476',
+            'email' => '477',
+            'user_login' => '476',
+            'password' => '478',
+            's_phone' => '476',
+            's_address' => '480',
+            'fax' => '482',
+            's_client_code' => '9999',
+            'b_client_code' => '9999',
+            'b_firstname' => '479',
+        ],
+    ],
 ];
