@@ -32,10 +32,11 @@
                 </div>
             {/if}
 
-            <div class="ty-login-reglink ty-center">
-                <a class="ty-login-reglink__a" href="{"profiles.add"|fn_url}" rel="nofollow">{__("register_new_account")}</a>
-            </div>
         {/if}
+
+        <div class="ty-login-reglink ty-center">
+            <a class="ty-login-reglink__a" href="{"pages.view&page_id=123"|fn_url}" rel="nofollow">{__("register_new_account")}</a>
+        </div>
 
         {include file="common/image_verification.tpl" option="login" align="left"}
 
