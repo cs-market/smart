@@ -1795,6 +1795,9 @@ fn_print_r($fantoms);
             db_query('UPDATE ?:users SET delivery_date = ?s WHERE user_id = ?i', $data[$user_id], $user_id);
         }
     }
+} elseif ($mode = 'zeroing_amount') {
+    $company_ids = ['1810'];
+    db_query('UPDATE ?:products SET amount = 0 WHERE company_id IN (?a)', $company_ids);
 }
 
 
