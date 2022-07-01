@@ -1796,7 +1796,7 @@ fn_print_r($fantoms);
         }
     }
 } elseif ($mode = 'zeroing_amount') {
-    $company_ids = ['1810'];
+    $company_ids = ['1810', '2058'];
     db_query('UPDATE ?:products SET amount = 0 WHERE company_id IN (?a)', $company_ids);
 }
 
