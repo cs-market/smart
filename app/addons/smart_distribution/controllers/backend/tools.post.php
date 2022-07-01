@@ -1774,6 +1774,7 @@ fn_print_r($fantoms);
     foreach($res as $template['product_id'] => $template['price']) {
         $insert[] = $template;
     }
+    fn_print_die(count($insert), $insert);
 
     $res = db_get_fields('SELECT p.product_id FROM ?:products AS p LEFT JOIN ?:product_prices AS pp ON pp.product_id = p.product_id WHERE pp.product_id IS NULL GROUP BY product_id');
     $template['price'] = 0;
@@ -1782,7 +1783,18 @@ fn_print_r($fantoms);
     }
 
     if ($insert) db_query('INSERT INTO ?:product_prices ?m', $insert);
-    fn_print_die(count($insert));
+} elseif ($mode == 'restore_delivery_days') {
+    $file = 'cscart_users.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    //$content = array_filter($content);
+
+    $data = array_column($content,'delivery_date', 'user_id');
+    $our_users = db_get_fields('SELECT user_id FROM ?:users WHERE user_id IN (?a) AND delivery_date = ?s', array_keys($data), '0000000');
+    foreach ($our_users as $user_id) {
+        if ($data[$user_id] != '0000000') {
+            db_query('UPDATE ?:users SET delivery_date = ?s WHERE user_id = ?i', $data[$user_id], $user_id);
+        }
+    }
 }
 
 
