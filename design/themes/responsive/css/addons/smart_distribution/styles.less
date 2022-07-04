@@ -11,3 +11,19 @@
         display: none;
     }
 }
+
+.baltika {
+    .tygh-top-panel {
+        top: 0;
+        position: sticky;
+        background: #fff;
+        z-index: 102;
+    }
+    @media screen and (max-width: 767px) {
+        .ty-grid-list {
+            --columns: 4 !important;
+            //grid-template-columns: repeat(calc(var(--columns) - 1),minmax(200px,300px));
+            grid-gap: 8px;
+        }
+    }
+}
