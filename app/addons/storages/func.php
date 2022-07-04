@@ -175,31 +175,18 @@ function fn_storages_get_product_data($product_id, &$field_list, &$join, $auth, 
             $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
         }
 
-        $price_usergroup = db_quote(' 
-            AND CASE WHEN 
-            (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
-            THEN ?:product_prices.usergroup_id IN (?a) 
-            ELSE ?:product_prices.usergroup_id = ?i END', $product_id, array_diff($usergroup_ids, [USERGROUP_ALL]), array_diff($usergroup_ids, [USERGROUP_ALL]), USERGROUP_ALL);
         $field_list .= db_quote(', ?:storages_products.amount, ?:storages_products.min_qty, ?:storages_products.qty_step');
-        $join .= db_quote(' LEFT JOIN ?:storages_products ON ?:storages_products.product_id = ?i AND ?:storages_products.storage_id = ?i', $product_id, $storage['storage_id']);
+
+        // если товара на складе быть не может, не достаем его = right join 
+        $join .= db_quote(' RIGHT JOIN ?:storages_products ON ?:storages_products.product_id = ?i AND ?:storages_products.storage_id = ?i', $product_id, $storage['storage_id']);
+
+        // если у товара нет прайсов, то тоже не достаем его
+        $price_usergroup = db_quote('AND ?:product_prices.usergroup_id IN (?a)', array_diff($usergroup_ids, [USERGROUP_ALL]));
+        $condition .= db_quote("AND ?:product_prices.price IS NOT NULL");
     }
 }
 
-function fn_storages_load_products_extra_data_post(&$products, $product_ids) {
-    // а что если сделать в load_products_extra_data нормально?
-    if ($storage = Registry::get('runtime.current_storage')) {
-        $usergroup_ids = Tygh::$app['session']['auth']['usergroup_ids'];
-        $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
-        $usergroup_ids = array_filter($usergroup_ids);
-
-        if ($usergroup_ids) {
-            $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a)", 'product_id', $product_ids, 1, $usergroup_ids);
-            $products = fn_array_merge($products, $prices);
-        }
-    }
-}
-
-function fn_storages_load_products_extra_data(&$extra_fields, $products, $product_ids, $params, $lang_code) {
+function fn_storages_load_products_extra_data(&$extra_fields, $products, $product_ids, &$params, $lang_code) {
     if ($storage = Registry::get('runtime.current_storage')) {
         $extra_fields['?:storages_products'] = [
             'primary_key' => 'product_id',
@@ -208,52 +195,27 @@ function fn_storages_load_products_extra_data(&$extra_fields, $products, $produc
             ],
             'condition' => db_quote(' AND ?:storages_products.storage_id = ?i', $storage['storage_id'])
         ];
+
+        if (!empty($storage['usergroup_ids'])) {
+            $params['auth_usergroup_ids'] = array_intersect($params['auth_usergroup_ids'], $storage['usergroup_ids']);
+        }
     }
 }
 
 function fn_storages_get_products(array &$params, array &$fields, array &$sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having)
 {
-    if (strpos($condition, 'products.amount')) {
-        // когда $params['amount_from']
-//        $condition = str_replace(
-//            'products.amount',
-//            db_quote(
-//                '(CASE WHEN (SELECT count(*) FROM ?:storages_products WHERE product_id = ?i)'
-//                . ' THEN warehouses_destination_products_amount.amount'
-//                . ' ELSE products.amount END)',
-//                YesNo::YES
-//            ),
-//            $condition
-//        );
-//        CASE WHEN
-//        (SELECT count(*) FROM ?:product_prices WHERE product_id = ?i AND cscart_product_prices.usergroup_id IN (?a) )
-//            THEN ?:product_prices.usergroup_id IN (?a)
-//            ELSE ?:product_prices.usergroup_id = ?i END
+    if ($storage = Registry::get('runtime.current_storage')) {
+        // нам нужно исключить из выборки товары не отгружаемые с текущего склада
+        $join .= db_quote(
+           ' RIGHT JOIN ?:storages_products AS sp'
+           . ' ON sp.product_id = products.product_id AND sp.storage_id = ?i', $storage['storage_id']);
+
+        // нам нужно исключить из выборки товары без прайсов
+        $auth = Tygh::$app['session']['auth'];
+        $old_price_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
+        $price_condition = db_quote(' AND prices.usergroup_id IN (?n) AND prices.price IS NOT NULL', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
+        $condition = str_replace($old_price_condition, $price_condition, $condition);
     }
-
-//    $check_storage_product_amount = SiteArea::isStorefront($params['area']) && (
-//            (
-//                Registry::get('settings.General.inventory_tracking') !== YesNo::NO
-//                && Registry::get('settings.General.show_out_of_stock_products') === YesNo::NO
-//            )
-//            || (isset($params['amount_from']) && fn_is_numeric($params['amount_from']))
-//            || (isset($params['amount_to']) && fn_is_numeric($params['amount_to']))
-//        );
-//
-//    if ($check_storage_product_amount) {
-//
-//        $join .= db_quote(
-//            ' LEFT JOIN ?:warehouses_destination_products_amount AS warehouses_destination_products_amount'
-//            . ' ON warehouses_destination_products_amount.product_id = products.product_id'
-//            . ' AND warehouses_destination_products_amount.destination_id = ?i'
-//            . ' AND warehouses_destination_products_amount.storefront_id = ?i',
-//            $destination_id,
-//            $storefront_id
-//        );
-//
-//        // FIXME Dirty hack
-
-//    }
 }
 
 function fn_init_storages() {
@@ -319,8 +281,11 @@ function fn_storages_add_product_to_cart_get_price($product_data, $cart, $auth, 
         $usergroup_ids = $auth['usergroup_ids'];
 
         $storage = $storages[$data['extra']['storage_id']];
-        $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
+        if (!empty($storage['usergroup_ids'])) {
+            $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
+        }
         $usergroup_ids = array_filter($usergroup_ids);
+
         if ($usergroup_ids) {
             $price = db_get_field("SELECT IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id = ?i AND lower_limit = ?i AND usergroup_id IN (?a)", $product_id, 1, $usergroup_ids);
         }
@@ -331,7 +296,7 @@ function fn_storages_pre_get_cart_product_data($hash, $product, $skip_promotion,
     if ($storages = Registry::get('runtime.storages') && !empty($product['extra']['storage_id'])) {
         $fields[] = '?:storages_products.qty_step';
         $fields[] = '?:storages_products.min_qty';
-        $join .= db_quote(' LEFT JOIN ?:storages_products ON ?:storages_products.product_id = ?:products.product_id AND ?:storages_products.storage_id = ?i', $product['extra']['storage_id']);
+        $join .= db_quote(' RIGHT JOIN ?:storages_products ON ?:storages_products.product_id = ?:products.product_id AND ?:storages_products.storage_id = ?i', $product['extra']['storage_id']);
     }
 }
 
@@ -339,12 +304,22 @@ function fn_storages_get_cart_product_data($product_id, &$_pdata, $product, $aut
     if ($storages = Registry::get('runtime.storages')) {
         $usergroup_ids = $auth['usergroup_ids'];
 
+
         $storage = $storages[$product['extra']['storage_id']];
-        $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
+        if (!empty($storage['usergroup_ids'])) {
+            $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
+        }
+
         $usergroup_ids = array_filter($usergroup_ids);
         if ($usergroup_ids) {
             $_pdata['price'] = db_get_field("SELECT IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id = ?i AND lower_limit = ?i AND usergroup_id IN (?a)", $product_id, 1, $usergroup_ids);
         }
+
+        // исключить товар без цены
+        if ($_pdata['price'] === '') {
+            unset($_pdata['product_id']);
+        }
+
         $_pdata['storage_id'] = $product['extra']['storage_id'];
     }
 }
@@ -364,7 +339,7 @@ function fn_storages_check_amount_in_stock_before_check($product_id, $amount, $p
             'SELECT p.tracking, s.amount, s.min_qty, p.max_qty, s.qty_step, p.list_qty_count, p.out_of_stock_actions, p.product_type, pd.product'
             . ' FROM ?:products AS p'
             . ' LEFT JOIN ?:product_descriptions AS pd ON pd.product_id = p.product_id AND lang_code = ?s'
-            . ' LEFT JOIN ?:storages_products AS s ON s.product_id = p.product_id AND storage_id = ?i'
+            . ' RIGHT JOIN ?:storages_products AS s ON s.product_id = p.product_id AND storage_id = ?i'
             . ' WHERE p.product_id = ?i',
             CART_LANGUAGE,
             $storage_id,

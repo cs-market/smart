@@ -1076,7 +1076,8 @@ function fn_smart_distribution_get_product_price($product_id, $amount, $auth, &$
             ELSE prices.usergroup_id = ?i END ORDER BY lower_limit", $product_id, $product_id, $usergroup_ids, $usergroup_ids, USERGROUP_ALL);
 }
 
-function fn_smart_distribution_load_products_extra_data(&$extra_fields, $products, $product_ids, $params, $lang_code) {
+function fn_smart_distribution_load_products_extra_data(&$extra_fields, $products, $product_ids, &$params, $lang_code) {
+    // нет единого запроса, чтобы брались прайсовые цены и только если их нет брались базовые поэтому тут берем базовые а в fn_smart_distribution_load_products_extra_data_post берем поверх прайсовые если они есть
     if (
     in_array('prices', $params['extend'])
     && $params['sort_by'] != 'price'
@@ -1085,15 +1086,13 @@ function fn_smart_distribution_load_products_extra_data(&$extra_fields, $product
         $extra_fields['?:product_prices']['condition'] = db_quote(
             ' AND ?:product_prices.lower_limit = 1 AND ?:product_prices.usergroup_id = ?i', USERGROUP_ALL);
     }
+
+    $params['auth_usergroup_ids'] = array_filter(Tygh::$app['session']['auth']['usergroup_ids']);
 }
 
 function fn_smart_distribution_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
-    // TODO duplicate request with storages add-on
-    $usergroup_ids = Tygh::$app['session']['auth']['usergroup_ids'];
-    $usergroup_ids = array_filter($usergroup_ids);
-
-    if ($usergroup_ids) {
-        $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a)", 'product_id', $product_ids, 1, $usergroup_ids);
+    if (!empty($params['auth_usergroup_ids'])) {
+        $prices = db_get_hash_array("SELECT prices.product_id, IF(prices.percentage_discount = 0, prices.price, prices.price - (prices.price * prices.percentage_discount)/100) as price FROM ?:product_prices prices WHERE product_id IN (?a) AND lower_limit = ?i AND usergroup_id IN (?a)", 'product_id', $product_ids, 1, $params['auth_usergroup_ids']);
         $products = fn_array_merge($products, $prices);
     }
 }
