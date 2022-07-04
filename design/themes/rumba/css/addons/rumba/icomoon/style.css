@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ty-icon-rumba-equalizer:before {
+  content: "\e90f";
+}
 .ty-icon-rumba-truck:before {
   content: "\e90e";
 }
