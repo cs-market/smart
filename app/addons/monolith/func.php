@@ -50,27 +50,29 @@ function fn_monolith_generate_xml($order_id) {
     );
 
     $iterator = 0;
+
+    $CRMOrderLine = [];
     foreach ($order_info['products'] as $p) {
         $iterator += 1;
-        $monolith_order['d'][] = array(
-            '@attributes' => array ('name' => 'CRMOrderLine'),
-            'r' => array(
-                'f' => array(
-                    $addon['order_prefix'] . $order_id,
-                    $iterator,
-                    // 'smart.wh1',
-                    // '',
-                    $p['product_code'],
-                    'ea',
-                    $p['price'],
-                    $p['amount']
-                ),
-            ),
-        );
+        $CRMOrderLine[] = [
+            'f' => array(
+                $addon['order_prefix'] . $order_id,
+                $iterator,
+                // 'smart.wh1',
+                // '',
+                $p['product_code'],
+                'ea',
+                $p['price'],
+                $p['amount']
+            )
+        ];
     }
+    $monolith_order['d'][] = array(
+        '@attributes' => array ('name' => 'CRMOrderLine'),
+        'r' => $CRMOrderLine,
+    );
 
-    $CRMOrderOption = [];
-
+    $CRMOrderDiscountLine = [];
     if (!empty($order_info['promotions'])) {
         $promotion_products = array_filter($order_info['products'], function($v) {return (isset($v['promotions']));});
         $applied_promotions = [];
@@ -80,19 +82,16 @@ function fn_monolith_generate_xml($order_id) {
                     $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
                 }
                 foreach ($promotion['bonuses'] as $value) {
-                    $monolith_order['d'][] = array(
-                        '@attributes' => array ('name' => 'CRMOrderDiscountLine'),
-                        'r' => array(
-                            'f' => array(
-                                date("Y-m-d\T00:00:00", $order_info['timestamp']),
-                                $addon['order_prefix'] . $order_id,
-                                $applied_promotions[$promotion_id]['external_id'],
-                                $applied_promotions[$promotion_id]['name'],
-                                $value['discount'],
-                                $product['product_code']
-                            ),
-                        ),
-                    );
+                    $CRMOrderDiscountLine[] = [
+                        'f' => array(
+                            date("Y-m-d\T00:00:00", $order_info['timestamp']),
+                            $addon['order_prefix'] . $order_id,
+                            $applied_promotions[$promotion_id]['external_id'],
+                            $applied_promotions[$promotion_id]['name'],
+                            $value['discount'],
+                            $product['product_code']
+                        )
+                    ];
                 }
             }
         }
@@ -101,34 +100,50 @@ function fn_monolith_generate_xml($order_id) {
             if (in_array($promotion_id, array_keys($applied_promotions))) continue;
 
             $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
-            $monolith_order['d'][] = array(
-                '@attributes' => array ('name' => 'CRMOrderDiscountLine'),
-                'r' => array(
-                    'f' => array(
-                        date("Y-m-d\T00:00:00", $order_info['timestamp']),
-                        $addon['order_prefix'] . $order_id,
-                        $applied_promotions[$promotion_id]['external_id'], // REPLACE BY PROMOTION EXTERNAL ID
-                        $applied_promotions[$promotion_id]['name'],
-                        $order_info['subtotal_discount'],
-                        'whole_order'
-                    ),
-                ),
-            );
-        }
-
-        foreach($applied_promotions as $promotion_id => $promotion) {
-            if (empty($promotion['external_id'])) continue;
-            $CRMOrderOption[] = [
+            $CRMOrderDiscountLine[] = [
                 'f' => array(
-                    $addon['order_prefix'] . $order_id, 
-                    'PrZakaz', 
-                    $promotion['external_id'],
+                    date("Y-m-d\T00:00:00", $order_info['timestamp']),
+                    $addon['order_prefix'] . $order_id,
+                    $applied_promotions[$promotion_id]['external_id'], // REPLACE BY PROMOTION EXTERNAL ID
+                    $applied_promotions[$promotion_id]['name'],
+                    $order_info['subtotal_discount'],
+                    'whole_order'
                 )
             ];
+            // $monolith_order['d'][] = array(
+            //     '@attributes' => array ('name' => 'CRMOrderDiscountLine'),
+            //     'r' => array(
+            //         'f' => array(
+            //             date("Y-m-d\T00:00:00", $order_info['timestamp']),
+            //             $addon['order_prefix'] . $order_id,
+            //             $applied_promotions[$promotion_id]['external_id'], // REPLACE BY PROMOTION EXTERNAL ID
+            //             $applied_promotions[$promotion_id]['name'],
+            //             $order_info['subtotal_discount'],
+            //             'whole_order'
+            //         ),
+            //     ),
+            // );
         }
+    }
+
+    if (!empty($CRMOrderDiscountLine)) {
+        $monolith_order['d'][] = array(
+            '@attributes' => array ('name' => 'CRMOrderDiscountLine'),
+            'r' => $CRMOrderDiscountLine,
+        );
     } else {
         unset($schema['extdata']['scheme']['data']['s']['d'][4]);
     }
+
+    $CRMOrderOption = [
+        [
+            'f' => array(
+                $addon['order_prefix'] . $order_id, 
+                'PrZakaz', 
+                ($order_info['documents_originals']) ? 1 : 0
+            )
+        ]
+    ];
 
     // if we have comment
     if (!empty($order_info['notes'])) {
