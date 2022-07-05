@@ -110,19 +110,6 @@ function fn_monolith_generate_xml($order_id) {
                     'whole_order'
                 )
             ];
-            // $monolith_order['d'][] = array(
-            //     '@attributes' => array ('name' => 'CRMOrderDiscountLine'),
-            //     'r' => array(
-            //         'f' => array(
-            //             date("Y-m-d\T00:00:00", $order_info['timestamp']),
-            //             $addon['order_prefix'] . $order_id,
-            //             $applied_promotions[$promotion_id]['external_id'], // REPLACE BY PROMOTION EXTERNAL ID
-            //             $applied_promotions[$promotion_id]['name'],
-            //             $order_info['subtotal_discount'],
-            //             'whole_order'
-            //         ),
-            //     ),
-            // );
         }
     }
 
