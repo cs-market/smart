@@ -11,7 +11,7 @@ $schema = array(
         ),
         'scheme' => array (
             '@attributes' => array (
-                'name' => 'CRMOrderExtSet',
+                'name' => 'CRMOrderSD',
                 'request' => 'set'
             ),
             'data' => array (
