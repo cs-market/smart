@@ -20,7 +20,8 @@ class Users extends BaseUsers
             if ($this->safeGet($params, 'get_profiles', false) == 'true') {
                 $data['profiles'] = $profiles;
             }
-        } elseif (!empty($params['user_ids']) && is_array($params['user_ids'])) {
+        //} elseif (!empty($params['user_ids']) && is_array($params['user_ids'])) {
+        } else {
             $auth = $this->auth;
             $items_per_page = $this->safeGet($params, 'items_per_page', Registry::get('settings.Appearance.admin_elements_per_page'));
             list($data, $params) = fn_get_users($params, $auth, $items_per_page);
