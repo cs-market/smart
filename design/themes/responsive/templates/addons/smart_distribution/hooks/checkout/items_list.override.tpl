@@ -38,7 +38,7 @@
                     {assign var="name" value="product_options_$key"}
                     {capture name=$name}
 
-                    {capture name="product_info_update"}
+                    {*capture name="product_info_update"}
                         {hook name="checkout:product_info"}
                             {if $product.exclude_from_calculate}
                                 <strong><span class="price">{__("free")}</span></strong>
@@ -75,7 +75,7 @@
                             {/if}
                             {include file="views/companies/components/product_company_data.tpl" company_name=$product.company_name company_id=$product.company_id}
                         {/hook}
-                    {/capture}
+                    {/capture*}
                     {if $smarty.capture.product_info_update|trim}
                         <div class="cm-reload-{$obj_id}" id="product_info_update_{$obj_id}">
                             {$smarty.capture.product_info_update nofilter}
@@ -95,16 +95,20 @@
             </td>
 
             <td class="ty-cart-content__product-elem ty-cart-content__price cm-reload-{$obj_id}" id="price_display_update_{$obj_id}">
-            {include file="common/price.tpl" value=$product.display_price span_id="product_price_`$key`" class="ty-sub-price"}
+                {if $product.discount|floatval}
+                    <span class="ty-price-old">{include file="common/price.tpl" value=$product.original_price span_id="original_price_`$key`" class=" ty-strike"}</span>
+                    <span class="ty-price-actual">{include file="common/price.tpl" value=$product.display_price span_id="product_price_`$key`" class=""}</span>
+                    <div>
+                        {__('discount')}&nbsp;{include file="common/price.tpl" value=$product.discount span_id="discount_subtotal_`$key`" class="none"}
+                    </div>
+                {else}
+                    {include file="common/price.tpl" value=$product.display_price span_id="product_price_`$key`" class="ty-sub-price"}
+                {/if}
             <!--price_display_update_{$obj_id}--></td>
 
             <td class="ty-cart-content__product-elem ty-cart-content__qty {if $product.is_edp == "Y" || $product.exclude_from_calculate} quantity-disabled{/if}">
                 {if $use_ajax == true && $cart.amount != 1}
                     {assign var="ajax_class" value="cm-ajax"}
-                {/if}
-
-                {if $product.box_contains && $product.box_contains != 1}
-                    <div><span id="for_amount_{$key}" data-ca-box-contains="{$product.box_contains}">{($product.amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
                 {/if}
 
                 <div class="quantity cm-reload-{$obj_id}{if $settings.Appearance.quantity_changer == "Y"} changer{/if}" id="quantity_update_{$obj_id}">
@@ -132,10 +136,24 @@
                         <input type="hidden" name="cart_products[{$key}][is_edp]" value="Y" />
                     {/if}
                 <!--quantity_update_{$obj_id}--></div>
+                {if $product.box_contains && $product.box_contains != 1}
+                    <div><span id="for_amount_{$key}" data-ca-box-contains="{$product.box_contains}">{($product.amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
+                {/if}
             </td>
 
             <td class="ty-cart-content__product-elem ty-cart-content__price cm-reload-{$obj_id}" id="price_subtotal_update_{$obj_id}">
-                {include file="common/price.tpl" value=$product.display_subtotal span_id="product_subtotal_`$key`" class="price"}
+                {if $product.discount|floatval}
+                    <span class="ty-price-old">{include file="common/price.tpl" value=$product.original_price*$product.amount span_id="original_subtotal_`$key`" class=" ty-strike"}</span>
+                    <span class="ty-price-actual">{include file="common/price.tpl" value=$product.display_subtotal span_id="product_subtotal_`$key`" class=""}</span>
+                    <div>
+                        {__('discount')}&nbsp;{include file="common/price.tpl" value=$product.discount*$product.amount span_id="discount_subtotal_`$key`" class="none"}
+                    </div>
+                {else}
+                    <div class="ty-price-actual">
+                        {include file="common/price.tpl" value=$product.display_subtotal span_id="product_subtotal_`$key`" class="price"}
+                    </div>
+                {/if}
+                
                 {if $product.zero_price_action == "A"}
                     <input type="hidden" name="cart_products[{$key}][price]" value="{$product.base_price}" />
                 {/if}

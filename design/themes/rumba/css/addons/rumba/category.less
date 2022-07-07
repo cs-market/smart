@@ -89,7 +89,7 @@ Category page
     &-actual {
         font-size: 22px;
     }
-    &-old + &-actual {
+    &-old ~ &-actual {
         color: #f36;
         * {
             color: inherit;
@@ -206,5 +206,16 @@ Category page
     }
     &__controls {
         width: 50%;
+    }
+    @media @mobile {
+        &__controls {
+            width: auto;
+        }
+        &__price {
+            padding-top: 10px;
+        }
+        &__title .product-title {
+            font-size: 120%;
+        }
     }
 }

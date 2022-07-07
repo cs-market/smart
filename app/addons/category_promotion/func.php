@@ -235,9 +235,9 @@ function fn_category_promotion_get_product_data_post(&$product_data, $auth, $pre
 
         if ($promotions) {
             $promotion = reset($promotions);
-            $product_data['promo_text'] = $promotion['detailed_description'];
+            $product_data['promo_text'] = "<div class='ty-promotion-motivation__body'>".$promotion['detailed_description']."</div>";
             if (!empty(trim($product_data['promo_text']))) {
-                $product_data['promo_text'] = '<div class="promotion-subheader">' . __('promo_subheader') . '</div>' . $product_data['promo_text'];
+                $product_data['promo_text'] = '<div class="ty-promotion-motivation"><div class="ty-promotion-motivation__title">' . __('promo_subheader') . '</div>' . $product_data['promo_text']."</div>";
             }
         }
         // correct after November 2020

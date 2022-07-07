@@ -14,8 +14,42 @@
 .ty-statistic-list-shipping-method {
     display: none;
 }
+.ty-cart-content .quantity + div {
+    margin-top: 12px;
+}
+
+.litecheckout {
+    .ty-tiles, .ty-tiles__wrapper, &__shipping-method, &__shipping-method__wrapper {
+        height: auto;
+        min-height: 40px;
+    }
+    .ty-tiles, &__shipping-method {
+        margin: 4px 0.5rem;
+    }
+    &__page-title {
+        margin: 0;
+    }
+    &__container {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
 
 .baltika {
+    .ty-compact-list__image {
+        display: none;
+    }
+    .ty-account-info__reward-points {
+        display: none;
+    }
+    .litecheckout {
+        #shipping_rates_list .litecheckout__shipping-method {
+            display: none;
+        }
+    }
+    .ty-cart-content__qty .quantity {
+        float: left;
+    }
     .common-menu {
         display: none;
     }
@@ -59,6 +93,7 @@
         .ty-grid-list {
             grid-gap: 8px;
             grid-template-columns: repeat(2 ,minmax(170px,300px));
+            margin: 0 -14px;
             &__item {
                 padding: 5px;
             }
@@ -74,9 +109,6 @@
                 margin-right: 0;
                 width: 100%;
             }
-        }
-        [id^="category_products_"] {
-            margin: 0 -14px;
         }
         .side-grid {
             display: none;

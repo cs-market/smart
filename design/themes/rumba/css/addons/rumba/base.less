@@ -188,6 +188,9 @@ select {
 .ty-dropdown-box, .ty-sort-dropdown {
     &__title {
         .ty-tile-button();
+        @media @mobile {
+            padding: 6px 10px;
+        }
         .ty-top-menu & .ty-minicart__icon, .ty-top-menu & .ty-icon-user {
             position: static;
             font-size: 20px;
@@ -451,5 +454,11 @@ select {
     }
     &__play_market {
         background-image: url("../media/images/mobile-app-play_market.svg");
+    }
+}
+
+@media (max-width: 1224px) {
+    .ty-calendar__block {
+        width: 115px;
     }
 }
