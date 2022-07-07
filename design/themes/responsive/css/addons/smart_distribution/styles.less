@@ -13,6 +13,9 @@
 }
 
 .baltika {
+    .common-menu {
+        display: none;
+    }
     .tygh-top-panel {
         top: 0;
         position: sticky;
@@ -23,6 +26,12 @@
         display: none;
     }
     @media screen and (max-width: 767px) {
+        .ty-cart-content__sku, .ty-cart-content__weight {
+            display: none;
+        }
+        .ty-sku-item {
+            display: none;
+        }
         .ty-btn__add-to-wish {
             opacity: 0.4;
         }
