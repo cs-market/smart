@@ -35,6 +35,17 @@
     }
 }
 
+.debt-limit-exceed {
+    .ui-dialog-titlebar .ui-dialog-title {
+        font-size: 160%;
+    }
+    .object-container {
+        .ty-center();
+        font-size: 200%;
+        padding: 10% 0;
+    }
+}
+
 .baltika {
     .ty-compact-list__image {
         display: none;
@@ -129,7 +140,6 @@
     bottom: 0;
     left: 0;
     background: #fff;
-    padding: 10px 0;
     box-shadow: rgba(133,133,133,0.4) 0px -10px 5px -5px;
     z-index: 100;
     > div {
@@ -137,5 +147,8 @@
     }
     .ty-wysiwyg-content p a {
         color: #7ba6ef;
+    }
+    &__body {
+        padding: 10px 0;
     }
 }

@@ -21,6 +21,7 @@ body {
     &::-webkit-scrollbar-thumb {
         background-color: @decorative;
     }
+    min-height: 100vh;
 }
 * {
     outline: 0;
@@ -73,6 +74,9 @@ select {
         border-color: lighten(@base, 10%);
         .box-shadow(0px 0px 10px -2px lighten(@base, 10%));
     }
+    &:focus {
+        outline: none;
+    }
 }
 .ty-tile-button {
     .ty-tile-button();
@@ -89,6 +93,10 @@ select {
 
 .ui-dialog {
     .border-radius(16px);
+    .ui-widget-content& {
+        border: 2px solid @decorative;
+        box-sizing: border-box;
+    }
     & &-titlebar {
         background-color: transparent;
         border-bottom: 0;
@@ -103,7 +111,8 @@ select {
         .ui-dialog-title {
             float: none;
             padding-right: 0;
-            margin-right: 50px;
+            max-width: calc(100% - 50px);
+            display: inline-block;
         }
     }
     .ui-icon-closethick {
@@ -117,7 +126,35 @@ select {
             background-color: #f7f8fa;
         }
     }
+    .buttons-container {
+        background-color: lighten(@grey, 5%);
+        box-sizing: content-box;
+        position: absolute !important;
+    }
 }
+
+.dialog-is-open {
+    .ty-helper-container {
+        -webkit-filter: blur(3px);
+        filter: blur(3px);
+    }
+    .ui-dialog {
+        -webkit-filter: none;
+        filter: none;
+    }
+}
+
+.ty-dialog-non-closable() {
+    &.ui-dialog {
+        .ui-dialog-title {
+            max-width: initial;
+        }
+        .ui-dialog-titlebar-close {
+            display: none;
+        }
+    }
+}
+
 .buttons-container {
     background-color: initial;
 }
