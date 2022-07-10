@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>multishop</id>
+	<name>MultiShop</name>
+	<description>Need to correct work of Multishop</description>
+	<version>1.0</version>
+	<priority>3000</priority>
+	<position>140</position>
+	<status>active</status>
+	<default_language>en</default_language>
+	<dependencies>multishop_core</dependencies>
+
+	<queries>
+		<item>ALTER TABLE `?:bm_layouts` ADD `shop_id` int(11) NOT NULL;</item>
+		<item for="uninstall">ALTER TABLE `?:bm_layouts` DROP `shop_id`;</item>
+	</queries>
+</addon>

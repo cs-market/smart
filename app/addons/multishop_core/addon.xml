@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+	<id>multishop_core</id>
+	<name>MultiShop core</name>
+	<description>Need to correct work of Multishop</description>
+	<version>1.0</version>
+	<priority>3000</priority>
+	<position>140</position>
+	<status>active</status>
+	<unmanaged>1</unmanaged>
+	<default_language>en</default_language>
+
+	<queries>
+		<item>CREATE TABLE `?:shops` (
+		  `shop_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+		  `company_id` mediumint(8) unsigned NOT NULL,
+		  `usergroup_ids` varchar(255) NOT NULL DEFAULT 0,
+		  `status` char(1) NOT NULL DEFAULT 0,
+		  `shop` varchar(255) NOT NULL,
+		  `storefront` varchar(255) NOT NULL,
+		  `secure_storefront` varchar(255) NOT NULL,
+		  PRIMARY KEY(`shop_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8;</item>
+		<item for="uninstall">DROP TABLE `?:shops`;</item>
+	</queries>
+</addon>
