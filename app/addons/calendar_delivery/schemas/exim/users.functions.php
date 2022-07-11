@@ -22,21 +22,31 @@ function fn_exim_get_delivery_date($user_id, $day_number)
  * @param integer $day_number [0..6] day number
  * @return void
  **/
-function fn_exim_set_delivery_date($days_value, $user_id, $day_number)
+function fn_exim_set_delivery_date($primary_object_id, &$object)
 {
+    $user_id = reset($primary_object_id);
+
     $allow_words = [
         'y', 'Y', 'true', '1', 'da', 'Da'
     ];
 
-    $days_string = fn_get_customer_delivery_dates($user_id);
+    if ($user_id) {
+        $prev_value = fn_get_customer_delivery_dates($user_id);
+    } else {
+        $prev_value = 1111111;
+    }
+    $delivery_date = $prev_value;
 
-    $days_string = $days_string ?? '0000000';
+    foreach (range(0, 6) as $day) {
+        if (isset($object['delivery_date_'.$day])) {
+            $delivery_date[$day] = in_array($object['delivery_date_'.$day], $allow_words) ? '1' : '0';
+            unset($object['delivery_date_'.$day]);
+        }
+    }
 
-    $allow = in_array($days_value, $allow_words) ? true : false;
-
-    $days_string[$day_number] = $allow ? '1' : '0';
-
-    db_query('UPDATE ?:users SET ?u WHERE user_id = ?i', ['delivery_date' => $days_string], $user_id);
+    if ($delivery_date != $prev_value && $delivery_date != '0000000') {
+        db_query('UPDATE ?:users SET ?u WHERE user_id = ?i', ['delivery_date' => $delivery_date], $user_id);
+    }
 
     return false;
 }

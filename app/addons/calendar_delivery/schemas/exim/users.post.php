@@ -23,10 +23,16 @@ foreach ($days as $key => $day) {
         // not change it!
         // 'db_field' => 'delivery_date',
         'process_get' => array('fn_exim_get_delivery_date', '#key', $key),
-        'process_put' => array('fn_exim_set_delivery_date', '#this', '#key', $key),
+        'db_field' => 'delivery_date_'.$key,
         'linked' => false, // this field is not linked during import-export
     ];
 }
+$schema['import_process_data']['import_delivery_days'] = array(
+    'function' => 'fn_exim_set_delivery_date',
+    'args' => array('$primary_object_id', '$object'),
+    'import_only' => true,
+);
+
 
 $schema['export_fields']['iney delivery days'] = [
     'db_field' => 'delivery_date',
