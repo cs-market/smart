@@ -191,9 +191,12 @@ function fn_calendar_delivery_form_cart($order_info, &$cart, $auth) {
 }
 
 function fn_calendar_delivery_update_user_pre($user_id, &$user_data, $auth, $ship_to_another, $notify_user) {
-    if (isset($user_data['delivery_date']) && is_array($user_data['delivery_date'])) {
-        $user_data['delivery_date'] = fn_delivery_date_to_line($user_data['delivery_date']);
-        if ($user_data['delivery_date'] == '0000000') $user_data['delivery_date'] == '1111111';
+    if (isset($user_data['delivery_date'])) {
+        if (is_array($user_data['delivery_date'])) {
+            $user_data['delivery_date'] = fn_delivery_date_to_line($user_data['delivery_date']);
+        }
+
+        if ($user_data['delivery_date'] == '0000000') unset($user_data['delivery_date']);
     }
 }
 
