@@ -592,11 +592,12 @@ function fn_import($pattern, $import_data, $options)
 
         //If the required field is empty skip this record
         foreach ($required_fields as $field) {
-            if (empty($v[$main_lang][$field]) && $v[$main_lang][$field] !== 0) {
-                if (empty($alt_fields[$field]) || empty($v[$main_lang][$alt_fields[$field]])) {
-                    $processed_data['S']++;
-                    continue 2;
-                }
+            if (!empty($v[$main_lang][$field]) || $v[$main_lang][$field] === 0 || $v[$main_lang][$field] === '0') {
+                continue;
+            }
+            if (empty($alt_fields[$field]) || empty($v[$main_lang][$alt_fields[$field]])) {
+                $processed_data['S']++;
+                continue 2;
             }
         }
 
