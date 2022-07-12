@@ -1504,6 +1504,33 @@ function fn_place_order(&$cart, &$auth, $action = '', $issuer_id = null, $parent
                 $cart['processed_order_id'] = $child_orders;
             }
 
+            /**
+             * Executes after placing an order and setting the order status,
+             * allows you to process information about the placed order.
+             *
+             * @param array  $cart               Cart data
+             * @param array  $auth               Authentication data
+             * @param string $action             Current action. Can be empty or "save"
+             * @param int    $issuer_id          Issuer identifier
+             * @param int    $parent_order_id    Parent order identifier
+             * @param int    $order_id           Order identifier
+             * @param string $order_status       Order status (one char)
+             * @param array  $short_order_data   Short order data
+             * @param array  $notification_rules Array with notification rules
+             */
+            fn_set_hook(
+                'place_order_post',
+                $cart,
+                $auth,
+                $action,
+                $issuer_id,
+                $parent_order_id,
+                $order_id,
+                $order_status,
+                $short_order_data,
+                $notification_rules
+            );
+
             return array($order_id, $action != 'save');
         }
     }

@@ -181,3 +181,12 @@ EOT;
     );
     return $result;
 }
+
+function fn_monolith_place_order_post($cart, $auth, $action, $issuer_id, $parent_order_id, $order_id, $order_status, $short_order_data, $notification_rules) {
+    if (count($cart['product_groups']) == 1) {
+        $xml = fn_monolith_generate_xml($order_id);
+        if (fn_monolith_send_xml($xml)) {
+            fn_change_order_status($order_id, 'A');
+        }
+    }
+}
