@@ -939,6 +939,11 @@ function fn_diff_original_products($original_products, $products)
     return $products;
 }
 
+function fn_smart_distribution_get_products_pre(&$params, $items_per_page, $lang_code) {
+    if (isset($params['pkeywords']) && YesNo::toBool($params['pkeywords'])) unset($params['pkeywords']);
+    if (isset($params['pshort']) && YesNo::toBool($params['pshort'])) unset($params['pshort']);
+}
+
 function fn_smart_distribution_get_products($params, &$fields, $sortings, &$condition, &$join, $sorting, $group_by, $lang_code, $having) {
     // fix product variations: free space should be into condition
     if (strpos($condition, 'AND 1 != 1')) {

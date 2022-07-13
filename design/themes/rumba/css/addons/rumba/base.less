@@ -97,6 +97,9 @@ select {
         border: 2px solid @decorative;
         box-sizing: border-box;
     }
+    &-title {
+        line-height: 24px;
+    }
     & &-titlebar {
         background-color: transparent;
         border-bottom: 0;
@@ -105,8 +108,11 @@ select {
         &-close {
             .square(auto);
             z-index: 1;
-            right: 40px;
+            right: 10px;
             top: 20px;
+            .ui-button-text {
+                display: none;
+            }
         }
         .ui-dialog-title {
             float: none;
@@ -119,11 +125,15 @@ select {
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 50%;
+        margin: 0;
+        position: initial;
         &:before {
             vertical-align: text-bottom;
+            color: inherit !important;
         }
         &:hover {
             background-color: #f7f8fa;
+
         }
     }
     .buttons-container {

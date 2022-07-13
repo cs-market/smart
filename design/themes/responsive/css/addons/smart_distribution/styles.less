@@ -38,6 +38,11 @@
 .debt-limit-exceed {
     .ui-dialog-titlebar .ui-dialog-title {
         font-size: 160%;
+        @media @mobile {
+            font-size: 120%;
+            text-align: left;
+            max-width: initial;
+        }
     }
     .object-container {
         .ty-center();
