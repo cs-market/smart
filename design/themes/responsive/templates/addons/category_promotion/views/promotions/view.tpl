@@ -1,10 +1,14 @@
 {hook name="promotion_data:view"}
-    {if $promotion_data.image}<div class="ty-image-container">{include file="common/image.tpl" images=$promotion_data.image}</div>{/if}
-    {hook name="promotion_data:view_description"}
-    {if $promotion_data.detailed_description || $runtime.customization_mode.live_editor}
-        <div class="ty-wysiwyg-content ty-mb-s" {live_edit name="promotion:detailed_description:{$promotion_data.promotion_id}"}>{$promotion_data.detailed_description nofilter}</div>
-    {/if}
-    {/hook}
+<div class="ty-promotion-page">
+    <div class="ty-image-container">{if $promotion_data.image}{include file="common/image.tpl" images=$promotion_data.image}{/if}</div>
+    <div class="ty-promotion-page__body">
+        {hook name="promotion_data:view_description"}
+        {if $promotion_data.detailed_description || $runtime.customization_mode.live_editor}
+            {$promotion_data.detailed_description nofilter}
+        {/if}
+        {/hook}
+    </div>
+</div>
 
 <div id="category_products_{$block.block_id}">
     {if $products}

@@ -1,6 +1,7 @@
 {** block-description:block_vendor_logo **}
 
 <div class="ty-logo-container-vendor">
+    <a href="{""|fn_url}">
     {include file="common/image.tpl"
         obj_id=$vendor_info.company_id
         images=$vendor_info.logos.theme.image
@@ -10,4 +11,5 @@
         show_detailed_link=false
         capture_image=false
     }
+    </a>
 </div>

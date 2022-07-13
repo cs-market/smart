@@ -1,7 +1,6 @@
-<div class="grid-list ty-grid-promotions">
+<div class="ty-grid-list ty-grid-list__promotions" >
     {foreach $promotions as $promotion_id => $promotion}
-        <div class="ty-column3">
-            <div class="ty-grid-list__item ty-grid-promotions__item">
+            <div class="ty-grid-list__item  ty-flex-column ty-grid-list__item--overlay">
             	<a href="{"promotions.view&promotion_id=$promotion_id"|fn_url}">
                 {if $promotion.image}
                     {include file="common/image.tpl"
@@ -10,7 +9,6 @@
                         class="ty-grid-promotions__image"
                     }
                 {/if}
-                <div class="ty-grid-promotions__content">
                     {if $promotion.to_date}
                         <div class="ty-grid-list__available">
                             {__("avail_till")}: {$promotion.to_date|date_format:$settings.Appearance.date_format}
@@ -29,12 +27,10 @@
                             {$promotion.detailed_description|default:$promotion.short_description nofilter}
                         </div>
                     {/if}
-                </div>
             	</a>
             </div>
-        </div>
     {/foreach}
-
+</div>
     {if $products}
         {assign var="layouts" value=""|fn_get_products_views:false:0}
         {$is_selected_filters = $smarty.request.features_hash}

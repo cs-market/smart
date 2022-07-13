@@ -22,6 +22,9 @@ body {
         background-color: @decorative;
     }
     min-height: 100vh;
+    --grid-gap: 25px;
+    --grid-width-min: 215px;
+    --grid-width-max: 300px;
 }
 * {
     outline: 0;
@@ -29,6 +32,9 @@ body {
 i {
     .transition(inherit);
     color: @base;
+}
+a {
+    outline: none;
 }
 input[type="text"], 
 input[type="password"], 
@@ -138,8 +144,8 @@ select {
     }
     .buttons-container {
         background-color: lighten(@grey, 5%);
-        box-sizing: content-box;
-        position: absolute !important;
+        // box-sizing: content-box;
+        // position: absolute !important;
     }
 }
 
@@ -315,10 +321,15 @@ select {
     .rumba-glyphs();
 }
 
-.ty-grid(@grid-gap: 20px) {
+.ty-grid() {
     display: grid;
-    grid-template-columns: repeat(var(--columns), auto);
-    grid-gap: @grid-gap;
+    grid-template-columns: repeat(var(--grid-columns), minmax(var(--grid-width-min), var(--grid-width-max)));
+    grid-gap: var(--grid-gap);
+    @media @desktop-sm {
+        --grid-width-max: auto;
+        grid-template-columns: repeat(auto-fit, minmax(var(--grid-width-min), var(--grid-width-max)));
+        grid-gap: calc(~"var(--grid-gap) * 0.5");
+    }
 }
 
 .owl-theme {
