@@ -34,8 +34,11 @@
         <item for="uninstall">ALTER TABLE `?:usergroups` DROP `min_order_amount`;</item>
         <item>ALTER TABLE `?:users` ADD `min_order_amount` mediumint(8) UNSIGNED NOT NULL DEFAULT 0;</item>
         <item for="uninstall">ALTER TABLE `?:users` DROP `min_order_amount`;</item>
-        <item>ALTER TABLE `?:product_groups` ADD `min_order` mediumint(8) UNSIGNED NOT NULL AFTER `group`;</item>
+        
+        <item>ALTER TABLE `?:product_groups` ADD `min_order` mediumint(8) UNSIGNED NOT NULL DEFAULT 0 AFTER `group`;</item>
         <item for="uninstall">ALTER TABLE `?:product_groups` DROP `min_order`;</item>
+        <item>ALTER TABLE `?:product_groups` ADD `min_order_weight` mediumint(8) UNSIGNED NOT NULL DEFAULT 0 AFTER `min_order`</item>
+        <item for="uninstall">ALTER TABLE `?:product_groups` DROP `min_order_weight`;</item>
         
         <item>ALTER TABLE `?:companies` ADD `min_order_weight` mediumint(8) UNSIGNED NOT NULL DEFAULT 0;</item>
         <item for="uninstall">ALTER TABLE `?:companies` DROP `min_order_weight`;</item>        

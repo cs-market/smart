@@ -44,6 +44,7 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
             $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount;
         }
     } else {
+        $check_weight = true;
         if (is_callable('fn_product_groups_split_cart')) {
             $p_groups = fn_product_groups_split_cart($cart);
             foreach ($p_groups as $product_group) {
@@ -59,6 +60,15 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
                             '[group]' => $product_group['group']['group'],
                         ]);
                     }
+                }
+
+                if (!empty($product_group['group']['min_order_weight']) && $product_group['group']['min_order_weight'] > $product_group['package_info']['W']) {
+                    $cart['min_order_failed'] = true;
+                    $cart['min_order_notification'] = __('text_min_products_weight_required') . ' ' . $product_group['group']['min_order_weight'] . ' ' . Registry::get('settings.General.weight_symbol');
+                }
+                // если корзина разбивается по группам, то проверяем группы и не проверяем общие правила вендора
+                if (!empty($product_group['group'])) {
+                    $check_weight = false;
                 }
             }
             // для аппетитпром в заказе один, игнорировать мин сумму по вендору, так как должна отработать только группа
@@ -79,7 +89,7 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
                 $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('with_company') . ' ' . $group['name'];
             }
 
-            if ($mins['min_order_weight'] && $mins['min_order_weight'] > $group['package_info']['W']) {
+            if ($check_weight && $mins['min_order_weight'] && $mins['min_order_weight'] > $group['package_info']['W']) {
                 $cart['min_order_failed'] = true;
                 $cart['min_order_notification'] = __('text_min_products_weight_required') . ' ' . $mins['min_order_weight'] . ' ' . Registry::get('settings.General.weight_symbol');
             }

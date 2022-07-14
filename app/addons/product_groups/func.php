@@ -92,6 +92,8 @@ function fn_product_groups_split_cart($cart) {
 
             $proto = reset($cart['product_groups']);
             unset($proto['products']);
+            $weight = db_get_hash_single_array('SELECT product_id, weight FROM ?:products WHERE product_id IN (?a)', ['product_id', 'weight'], array_column($cart['products'], 'product_id'));
+            
             foreach ($cart['products'] as $cart_id => $product) {
                 $group_id = $product['group_id'];
                 if (!isset($p_groups[$group_id])) {
@@ -105,6 +107,42 @@ function fn_product_groups_split_cart($cart) {
                 }
                 $p_groups[$group_id]['products'][$cart_id] = $product;
                 $p_groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
+                $package_info = [];
+                if (is_array($p_groups[$group_id]['products'])) {
+                    foreach ($p_groups[$group_id]['products'] as $key_product => $product) {
+                        if (($product['is_edp'] == 'Y' && $product['edp_shipping'] != 'Y') ||
+                            (!empty($product['free_shipping']) && $product['free_shipping'] == 'Y')
+                        ) {
+                            continue;
+                        }
+
+                        if (!empty($product['exclude_from_calculate'])) {
+                            $product_price = 0;
+                        } elseif (!empty($product['subtotal'])) {
+                            $product_price = $product['subtotal'];
+                        } elseif (!empty($product['price'])) {
+                            $product_price = $product['price'];
+                        } elseif (!empty($product['base_price'])) {
+                            $product_price = $product['base_price'];
+                        } else {
+                            $product_price = 0;
+                        }
+
+                        if (!(!empty($product['free_shipping']) && $product['free_shipping'] == 'Y')) {
+                            $product['weight'] = $product['weight'] ?? $weight[$product['product_id']];
+                            $package_info['C'] += $product_price;
+                            $package_info['W'] += !empty($product['weight']) ? $product['weight'] * $product['amount'] : 0;
+                            $package_info['I'] += $product['amount'];
+
+                            if (isset($product['shipping_freight'])) {
+                                $package_info['shipping_freight'] += $product['shipping_freight'] * $product['amount'];
+                            }
+                        }
+
+                    }
+                }
+
+                if (!empty($package_info)) $p_groups[$group_id]['package_info'] = array_merge($p_groups[$group_id]['package_info'], $package_info);
             }
         }
     }
