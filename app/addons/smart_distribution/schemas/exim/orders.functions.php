@@ -1,6 +1,7 @@
 <?php
 
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 function fn_get_1c_code($oid) {
     $oi = fn_get_order_info($oid);
@@ -17,23 +18,34 @@ function fn_get_payment_name($payment_id, $lang_code = CART_LANGUAGE) {
 
 function fn_import_change_order_status($object) {
     if (isset($object['order_id'], $object['status']) && !empty($object['order_id']) && !empty($object['status'])) {
+        $order_id = $object['order_id'];
         // we need to change reward point in advance
-        if ($object['total'] && Registry::get('addons.reward_points.status') == 'A' && !empty(db_get_field("SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s", $object['order_id'], POINTS))) {
-            $_data = db_get_row("SELECT ?:users.user_id, user_login as login FROM ?:users LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id WHERE order_id = ?i", $object['order_id']);
+        if ($object['total'] && Registry::get('addons.reward_points.status') == 'A' && !empty(db_get_field("SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s", $order_id, POINTS))) {
+            $order_info = fn_get_order_info($order_id);
+            $db_points = $order_info['points_info']['reward'];
+            $_data = db_get_row("SELECT ?:users.user_id, user_login as login FROM ?:users LEFT JOIN ?:orders ON ?:orders.user_id = ?:users.user_id WHERE order_id = ?i", $order_id);
+            fn_define('ORDER_MANAGEMENT', true);
             $customer_auth = fn_fill_auth($_data, array(), false, 'C');
             fn_clear_cart($cart);
-            fn_form_cart($object['order_id'], $cart, $customer_auth);
+
+            fn_form_cart($order_id, $cart, $customer_auth);
+
             unset($cart['points_info']);
             $cart['subtotal'] = $object['total'];
             fn_promotion_apply('cart', $cart, $customer_auth, $products);
-
+            $reward = $cart['points_info']['additional'];
             if (isset($cart['points_info']['additional'])) {
                 $order_data = array(
-                    'order_id' => $object['order_id'],
+                    'order_id' => $order_id,
                     'type' => POINTS,
-                    'data' => $cart['points_info']['additional']
+                    'data' => $reward
                 );
                 db_query("REPLACE INTO ?:order_data ?e", $order_data);
+            }
+
+            // if is gain - correct value
+            if (YesNo::toBool($order_info['points_info']['is_gain'])) {
+                fn_change_user_points($reward-$db_points, $order_info['user_id'], "Корректировка баллов по заказу #$order_id: $db_points —> $reward", CHANGE_DUE_ADDITION);
             }
         }
 

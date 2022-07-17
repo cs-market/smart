@@ -183,19 +183,21 @@ function fn_category_promotion_get_products(&$params, $fields, $sortings, &$cond
 }
 
 function fn_category_promotion_get_promotions_pre(&$params, $items_per_page, $lang_code) {
+    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
+        return;
+    }
     if (SiteArea::isStorefront(AREA)) {
         unset($params['get_hidden']);
-        $params['usergroup_ids'] = Tygh::$app['session']['auth']['usergroup_ids'];
     }
     $params += $_REQUEST;
 }
 
 function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$condition, $join, $group, $lang_code) {
+    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
+        return;
+    }
     if (!empty($params['product_ids'])) {
         $condition .=' AND (' . fn_find_array_in_set($params['product_ids'], "products", false) . ')';
-    }
-    if (!empty($params['usergroup_ids'])) {
-        $condition .= db_quote(' AND ((' . fn_find_array_in_set($params['usergroup_ids'], "usergroup", true) . ') AND (' . fn_find_array_in_set([Tygh::$app['session']['auth']['user_id']], 'users_conditions_hash', true) . '))');
     }
     if (!empty($params['fields'])) {
         if (!is_array($params['fields'])) {
@@ -208,10 +210,35 @@ function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$co
     }
     if (isset($params['product_or_bonus_product'])) {
         $category_ids = db_get_fields('SELECT category_id FROM ?:products_categories WHERE product_id = ?i', $params['product_or_bonus_product']);
-        
-
         $condition .=' AND (' . fn_find_array_in_set([$params['product_or_bonus_product']], "products", false) . ' OR ' . fn_find_array_in_set([$params['product_or_bonus_product']], "bonus_products", false) . ' OR ' . fn_find_array_in_set($category_ids, "condition_categories", false) . ')';
     }
+}
+
+function fn_category_promotion_get_promotions_post($params, $items_per_page, $lang_code, &$promotions) {
+    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
+        return;
+    }
+    if (SiteArea::isStorefront(AREA)) {
+        $promotions = array_filter($promotions, function($promotion) {
+            $conditions = unserialize($promotion['conditions']);
+            fn_cleanup_promotion_condition($conditions, ['usergroup', 'users']);
+            $promotion['conditions'] = $conditions;
+            $cart_products = [];
+            return fn_check_promotion_conditions($promotion, $data, Tygh::$app['session']['auth'], $cart_products);
+        });
+    }
+}
+
+function fn_cleanup_promotion_condition(&$conditions_group, $allowed_conditions) {
+    foreach ($conditions_group['conditions'] as $i => &$group_item) {
+        if (isset($group_item['conditions'])) {
+            fn_cleanup_promotion_condition($group_item, $allowed_conditions);
+            if (empty($group_item['conditions'])) unset($conditions_group['conditions'][$i]);
+        } elseif ((is_array($allowed_conditions) && !in_array($group_item['condition'], $allowed_conditions)) || $group_item['condition'] == $allowed_conditions) {
+            unset($conditions_group['conditions'][$i]);
+        }   
+    }
+    //if (empty($conditions_group['conditions'])) unset($conditions_group['conditions']);
 }
 
 function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth, $params) {
