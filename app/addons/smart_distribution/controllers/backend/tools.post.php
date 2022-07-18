@@ -1658,7 +1658,7 @@ fn_print_r($fantoms);
 
     $condition .= 'AND (' .  fn_find_array_in_set($promo, 'promotion_ids', false) . ')';
 
-    $condition .= db_quote(' AND timestamp > ?i', 1643662800);
+    $condition .= db_quote(' AND timestamp > ?i', 1651352400);
     $condition .= db_quote(' AND status = ?s', 'H');
     $condition .= db_quote(' AND group_id NOT IN (?a)', [17]);
     // $join = db_quote(' LEFT JOIN ?:order_data ON ?:order_data.order_id = ?:orders.order_id AND ?:order_data.type = ?s', 'W');
