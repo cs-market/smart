@@ -39,7 +39,7 @@
                             {$product.image_pairs = ''}
                             {$wishlist_but_meta = 'ty-btn-icon ty-btn__add-to-wish'}
                             {$but_text = ' '}
-                            {include file="common/product_data.tpl" product=$product}
+                            {include file="common/product_data.tpl" product=$product show_product_amount=true show_amount_label=false}
                             
                             <div class="ty-grid-list__item {$item_class} ty-flex-column 
                                 {if $settings.Appearance.enable_quick_view == 'Y' || $show_features} ty-grid-list__item--overlay{/if}">
@@ -67,6 +67,13 @@
                                         {if $smarty.capture.$rating}
                                             <div class="grid-list__rating">
                                                 {$smarty.capture.$rating nofilter}
+                                            </div>
+                                        {/if}
+
+                                        {assign var="product_amount" value="product_amount_`$obj_id`"}
+                                        {if $smarty.capture.$product_amount|trim}
+                                            <div class="ty-grid-list__product_amount">
+                                                {$smarty.capture.$product_amount nofilter}
                                             </div>
                                         {/if}
 

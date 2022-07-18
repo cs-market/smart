@@ -139,7 +139,6 @@ select {
         }
         &:hover {
             background-color: #f7f8fa;
-
         }
     }
     .buttons-container {
@@ -167,6 +166,32 @@ select {
         }
         .ui-dialog-titlebar-close {
             display: none;
+        }
+    }
+}
+.notification-content {
+    .border-radius(16px);
+    .box-shadow(~"rgba(0, 0, 0, 0.5) 0px 0px 20px 0px, rgba(0, 0, 0, 0.02) 0px 0px 8px 1px");
+    padding-bottom: 18px;
+    background-color: #fff;
+    border: 2px solid @decorative;
+    color: #333;
+    font-size: 16px;
+    strong {
+        display: block;
+        text-align: center;
+        font-size: 22px;
+        padding: 10px 0;
+    }
+    .close {
+        padding: 10px;
+        .border-radius(50%);
+        .square(15px);
+        border: 1px solid #ccc;
+        box-sizing: content-box;
+        color: @decorative;
+        &:hover {
+            background-color: #f7f8fa;
         }
     }
 }
