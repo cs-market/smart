@@ -6,7 +6,7 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 //fn_multishop_init_store_params_by_host($_REQUEST);
 
-function fn_multishop_init_store_params_by_host(&$request, $area = AREA) {
+function fn_multishop_init_store_params_by_host(&$request, $url, $area = AREA) {
     if ($area == 'A' && empty($request['allow_initialization'])) {
         return array(INIT_STATUS_OK);
     }
