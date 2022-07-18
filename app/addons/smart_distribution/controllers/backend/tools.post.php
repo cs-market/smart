@@ -1605,23 +1605,78 @@ fn_print_r($fantoms);
         }
     }
     fn_print_die('done', count($values));
+} elseif ($mode == 'correct_reward_points_new1') {
+    $orders_wo_points = [];
+    $exclude_users = [58406,58683,58434,61971,64468,59360,58435,42557,58446,58407,58429,58726,58476,58779,58780,58485,65989,65990,55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
+    $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id IN (?a) AND user_type = ?s AND user_id NOT IN (?a)', [1810], 'C', $exclude_users);
+    //$manual_corrections = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id IN (?a) AND reason = ?s', $users, '');
+    $user_orders = db_get_hash_multi_array('SELECT order_id, user_id, total, timestamp FROM ?:orders WHERE user_id IN (?a) AND timestamp > ?i AND status = ?s AND group_id NOT IN (?a) ORDER BY timestamp', array('user_id','order_id'), $users, 1651352400, 'H', [17]);
+    foreach ($user_orders as $user_id => $orders) {
+        $order_ids = array_keys($orders);
+        $first_order_ts = reset($orders)['timestamp'];
+        $ts = strtotime("-3 months", $first_order_ts);
+        $first_order = db_get_field('SELECT max(order_id) FROM ?:orders WHERE order_id < ?i AND timestamp > ?i AND user_id = ?i', reset($order_ids), $ts, $user_id);
+        if (!$first_order) {
+            $first_order = array_shift($order_ids);
+        }
+
+        if (!empty($order_ids)) {
+            foreach ($order_ids as $order_id) {
+                $order_info = fn_get_order_info($order_id);
+                if (empty($order_info['points_info']['reward'])) {
+                    $orders_wo_points[] = [
+                        'order_id' => $order_id,
+                        'user_id' => $order_info['user_id'],
+                        'user' => $order_info['firstname'],
+                        'email' => $order_info['email'],
+                        'first_order' => $first_order,
+                        'total' => $order_info['total'],
+                        'reward' => round($order_info['total']*0.02),
+                    ];
+                }
+            }
+        }
+    }
+    $params['filename'] = 'reward_points.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($orders_wo_points, $params, '"');
+
+    // foreach ($orders_wo_points as $order) {
+    //     fn_change_user_points($order['reward'], $order['user_id'], "Корректировка баллов по заказу #$order_id: $reward", CHANGE_DUE_ADDITION);
+    // }
+
+    fn_print_die($export);
+
 } elseif ($mode == 'search_orders_with_promo') {
+
     if (!isset($_SESSION['iteration']) || $_REQUEST['rerun']) {
         $_SESSION['iteration'] = 1;
     }
 
     $condition = ' 1 ';
+    $promo = db_get_fields('SELECT promotion_id FROM ?:promotions WHERE status = ?s AND company_id IN (?a) AND bonuses LIKE ?l', 'A', [1810], '%'.'give_percent_points'.'%');
 
-    $condition .= 'AND (' .  fn_find_array_in_set([5859, 5860, 4993, 4723, 6761], 'promotion_ids', false) . ')';
-    $condition .= db_quote(' AND order_id > ?i', 133050);
+    $condition .= 'AND (' .  fn_find_array_in_set($promo, 'promotion_ids', false) . ')';
+
+    $condition .= db_quote(' AND timestamp > ?i', 1643662800);
     $condition .= db_quote(' AND status = ?s', 'H');
+    $condition .= db_quote(' AND group_id NOT IN (?a)', [17]);
     // $join = db_quote(' LEFT JOIN ?:order_data ON ?:order_data.order_id = ?:orders.order_id AND ?:order_data.type = ?s', 'W');
     // $condition .= db_quote(' AND ?:order_data.order_id IS NULL');
     $step = 100;
     $limit = ' LIMIT '. ($_SESSION['iteration']-1)* $step . ', ' . $step;
 
     $orders = db_get_fields("SELECT ?:orders.order_id FROM ?:orders $join WHERE $condition $limit");
-    if (empty($orders)) fn_print_die($_SESSION['wrong']);
+
+    if (empty($orders)) {
+        foreach ($_SESSION['wrong'] as $order_id => $diff) {
+            $db_points = db_get_field('SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_id, 'W');
+            $reward = $db_points + $diff;
+            $user_id = db_get_field('SELECT user_id FROM ?:orders WHERE order_id = ?i', $order_id);
+            fn_change_user_points($diff, $user_id, "Корректировка баллов по заказу #$order_id: $db_points —> $reward", CHANGE_DUE_ADDITION);
+        }
+        fn_print_die($_SESSION['wrong'], count($_SESSION['wrong']), array_sum($_SESSION['wrong']));
+    }
     if (!isset($_SESSION['total']) || $_REQUEST['rerun']) {
         $_SESSION['total'] = db_get_field("SELECT count(?:orders.order_id) FROM ?:orders $join WHERE $condition");
         unset($_SESSION['wrong']);
@@ -1637,22 +1692,24 @@ fn_print_r($fantoms);
         $i +=1;
         fn_echo('.');
         if ($i % 20 == 0) fn_echo('<br>');
-        $db_points = db_get_field('SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_id, POINTS);
+        // $db_points = db_get_field('SELECT data FROM ?:order_data WHERE order_id = ?i AND type = ?s', $order_id, POINTS);
 
-        fn_clear_cart($cart, true);
-        $customer_auth = fn_fill_auth(array(), array(), false, 'C');
+        // fn_clear_cart($cart, true);
+        // $customer_auth = fn_fill_auth(array(), array(), false, 'C');
 
-        $cart_status = md5(serialize($cart));
-        fn_form_cart($order_id, $cart, $customer_auth, !empty($_REQUEST['copy']));
+        // $cart_status = md5(serialize($cart));
+        // fn_form_cart($order_id, $cart, $customer_auth, !empty($_REQUEST['copy']));
 
-        fn_store_shipping_rates($order_id, $cart, $customer_auth);
-        $cart['order_id'] = $order_id;
-        $cart['calculate_shipping'] = true;
+        // fn_store_shipping_rates($order_id, $cart, $customer_auth);
+        // $cart['order_id'] = $order_id;
+        // $cart['calculate_shipping'] = true;
 
-        // calculate cart - get products with options, full shipping rates info and promotions
-        list ($cart_products, $product_groups) = fn_calculate_cart_content($cart, $customer_auth);
-        
-        if ($cart['points_info']['reward'] != $db_points) $_SESSION['wrong'][$order_id] = $cart['points_info']['reward'] - $db_points;
+        // // calculate cart - get products with options, full shipping rates info and promotions
+        // list ($cart_products, $product_groups) = fn_calculate_cart_content($cart, $customer_auth);
+        $order_info = fn_get_order_info($order_id);
+        $db_points = $order_info['points_info']['reward'];
+        $fact = round($order_info['total'] * 0.02);
+        if ($fact != $db_points) $_SESSION['wrong'][$order_id] = $fact - $db_points;
     }
     $_SESSION['iteration'] += 1;
     fn_redirect('tools.search_orders_with_promo');
