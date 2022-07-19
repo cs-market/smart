@@ -1,6 +1,18 @@
 {** block-description:carousel **}
 
 {if $items}
+    {$obj_prefix="`$block.block_id`000"}
+
+    {if $block.properties.navigation == "O"}
+        <div class="owl-theme ty-owl-controls">
+            <div class="owl-controls clickable owl-controls-outside"  id="owl_outside_nav_{$block.block_id}">
+                <div class="owl-buttons">
+                    <div id="owl_prev_{$obj_prefix}" class="owl-prev"><i class="ty-icon-left-open-thin"></i></div>
+                    <div id="owl_next_{$obj_prefix}" class="owl-next"><i class="ty-icon-right-open-thin"></i></div>
+                </div>
+            </div>
+        </div>
+    {/if}
     <div id="banner_slider_{$block.snapping_id}" class="banners owl-carousel {if $block.properties.item_quantity}ty-banner__scroller-grid{/if}">
         {foreach from=$items item="banner" key="key"}
             <div class="ty-banner__image-item">
@@ -16,12 +28,22 @@
             </div>
         {/foreach}
     </div>
-{/if}
 
 <script type="text/javascript">
 (function(_, $) {
     $.ceEvent('on', 'ce.commoninit', function(context) {
         var slider = context.find('#banner_slider_{$block.snapping_id}');
+
+        {if $block.properties.navigation == "O"}
+        function outsideNav () {
+            if(this.options.items >= this.itemsAmount){
+                $("#owl_outside_nav_{$block.block_id}").hide();
+            } else {
+                $("#owl_outside_nav_{$block.block_id}").show();
+            }
+        }
+        {/if}
+
         if (slider.length) {
             slider.owlCarousel({
                 direction: '{$language_direction}',
@@ -48,8 +70,22 @@
                     navigation: true,
                     navigationText: ['{__("prev_page")}', '{__("next")}']
                 {/if}
+                {if $block.properties.navigation == "O"}
+                    pagination: false,
+                    navigation: false,
+                {/if}
             });
+            {if $block.properties.navigation == "O"}
+                $('#owl_prev_{$obj_prefix}').click(function(){
+                    slider.trigger('owl.prev');
+                });
+                $('#owl_next_{$obj_prefix}').click(function(){
+                    slider.trigger('owl.next');
+                });
+            {/if}
         }
     });
 }(Tygh, Tygh.$));
 </script>
+
+{/if}

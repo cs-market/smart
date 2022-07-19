@@ -54,4 +54,6 @@ $schema['banners']['templates']['addons/banners/blocks/carousel.tpl']['settings'
     'default_value' => 1
 ];
 
+$schema['banners']['templates']['addons/banners/blocks/carousel.tpl']['settings']['navigation']['values']['O'] = 'outside_navigation';
+
 return $schema;

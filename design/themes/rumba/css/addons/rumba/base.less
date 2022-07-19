@@ -22,6 +22,9 @@ body {
         background-color: @decorative;
     }
     min-height: 100vh;
+    --grid-gap: 25px;
+    --grid-width-min: 215px;
+    --grid-width-max: 300px;
 }
 * {
     outline: 0;
@@ -29,6 +32,9 @@ body {
 i {
     .transition(inherit);
     color: @base;
+}
+a {
+    outline: none;
 }
 input[type="text"], 
 input[type="password"], 
@@ -133,13 +139,12 @@ select {
         }
         &:hover {
             background-color: #f7f8fa;
-
         }
     }
     .buttons-container {
         background-color: lighten(@grey, 5%);
-        box-sizing: content-box;
-        position: absolute !important;
+        // box-sizing: content-box;
+        // position: absolute !important;
     }
 }
 
@@ -161,6 +166,32 @@ select {
         }
         .ui-dialog-titlebar-close {
             display: none;
+        }
+    }
+}
+.notification-content {
+    .border-radius(16px);
+    .box-shadow(~"rgba(0, 0, 0, 0.5) 0px 0px 20px 0px, rgba(0, 0, 0, 0.02) 0px 0px 8px 1px");
+    padding-bottom: 18px;
+    background-color: #fff;
+    border: 2px solid @decorative;
+    color: #333;
+    font-size: 16px;
+    strong {
+        display: block;
+        text-align: center;
+        font-size: 22px;
+        padding: 10px 0;
+    }
+    .close {
+        padding: 10px;
+        .border-radius(50%);
+        .square(15px);
+        border: 1px solid #ccc;
+        box-sizing: content-box;
+        color: @decorative;
+        &:hover {
+            background-color: #f7f8fa;
         }
     }
 }
@@ -315,10 +346,15 @@ select {
     .rumba-glyphs();
 }
 
-.ty-grid(@grid-gap: 20px) {
+.ty-grid() {
     display: grid;
-    grid-template-columns: repeat(var(--columns), auto);
-    grid-gap: @grid-gap;
+    grid-template-columns: repeat(var(--grid-columns), minmax(var(--grid-width-min), var(--grid-width-max)));
+    grid-gap: var(--grid-gap);
+    @media @desktop-sm {
+        --grid-width-max: auto;
+        grid-template-columns: repeat(auto-fit, minmax(var(--grid-width-min), var(--grid-width-max)));
+        grid-gap: calc(~"var(--grid-gap) * 0.5");
+    }
 }
 
 .owl-theme {

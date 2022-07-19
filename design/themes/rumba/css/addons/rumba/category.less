@@ -3,15 +3,14 @@ Category page
 ========================================================================== */
 
 .ty-grid-list {
-    .ty-grid(35px);
+    .ty-grid();
     //grid-template-columns: repeat(auto-fit,minmax(230px,auto));
-    grid-template-columns: repeat(var(--columns), minmax(200px, 300px));
     justify-content: space-between;
     @media @tablet {
-        grid-template-columns: repeat(calc(~"var(--columns) - 1"), minmax(200px, 300px));
+        //grid-template-columns: repeat(calc(~"var(--columns) - 1"), minmax(200px, 300px));
     }
     @media @mobile {
-        grid-template-columns: repeat(calc(~"var(--columns) - 2"), minmax(200px, 300px));
+        //grid-template-columns: repeat(calc(~"var(--columns) - 2"), minmax(200px, 300px));
     }
     &__item {
         background-color: #fff;
@@ -78,6 +77,10 @@ Category page
         .ty-grid-list__price {
             height: 67px;
         }
+    }
+    &__promotions {
+        --grid-width-min: 280px;
+        --grid-width-max: auto;
     }
 }
 .ty-price {
