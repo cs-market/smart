@@ -3,7 +3,7 @@
 {if $items}
     {$obj_prefix="`$block.block_id`000"}
 
-    {if $block.properties.outside_navigation == "Y" || 1}
+    {if $block.properties.navigation == "O"}
         <div class="owl-theme ty-owl-controls">
             <div class="owl-controls clickable owl-controls-outside"  id="owl_outside_nav_{$block.block_id}">
                 <div class="owl-buttons">
@@ -34,17 +34,15 @@
     $.ceEvent('on', 'ce.commoninit', function(context) {
         var slider = context.find('#banner_slider_{$block.snapping_id}');
 
-        {*if $block.properties.navigation == "O"}
+        {if $block.properties.navigation == "O"}
         function outsideNav () {
-            console.log(this.options);
             if(this.options.items >= this.itemsAmount){
-
                 $("#owl_outside_nav_{$block.block_id}").hide();
             } else {
                 $("#owl_outside_nav_{$block.block_id}").show();
             }
         }
-        {/if*}
+        {/if}
 
         if (slider.length) {
             slider.owlCarousel({
@@ -54,8 +52,6 @@
                 slideSpeed: {$block.properties.speed|default:400},
                 autoPlay: '{$block.properties.delay * 1000|default:false}',
                 stopOnHover: true,
-                pagination: false,
-                navigation: true,
                 {if $block.properties.scroll_per_page == "Y"}
                     scrollPerPage: true,
                 {/if}
@@ -75,6 +71,7 @@
                     navigationText: ['{__("prev_page")}', '{__("next")}']
                 {/if}
                 {if $block.properties.navigation == "O"}
+                    pagination: false,
                     navigation: false,
                 {/if}
             });
