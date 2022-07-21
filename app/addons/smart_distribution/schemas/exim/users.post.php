@@ -70,4 +70,11 @@ if (isset($schema['export_fields']['User group IDs']['process_put'])) {
 // backward compatibility
 $schema['export_fields']['Usergroup IDs'] = $schema['export_fields']['User group IDs'];
 
+
+$schema['import_process_data']['set_default_pass_for_baltika'] = array(
+    'function' => 'fn_exim_smart_distribution_set_default_pass_for_baltika',
+    'args' => array('$primary_object_id', '$object'),
+    'import_only' => true,
+);
+
 return $schema;

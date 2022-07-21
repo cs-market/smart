@@ -262,3 +262,9 @@ function fn_smart_distribution_exim_set_usergroups($user_id, $data, $cleanup = t
 
     return true;
 }
+
+function fn_exim_smart_distribution_set_default_pass_for_baltika($id, &$object) {
+    if (empty($id['user_id']) && !empty($object['company_id']) && $object['company_id'] == 45 && empty($object['password'])) {
+        $object['password'] = 1111;
+    }
+}
