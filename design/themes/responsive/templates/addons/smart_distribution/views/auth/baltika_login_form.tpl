@@ -8,6 +8,7 @@
             <input type="hidden" name="quick_login" value="1" />
         {/if}
 
+        {$redirect_url = ""|fn_url}
         <input type="hidden" name="return_url" value="{$smarty.request.return_url|default:$config.current_url}" />
         <input type="hidden" name="redirect_url" value="{$redirect_url|default:$config.current_url}" />
 
