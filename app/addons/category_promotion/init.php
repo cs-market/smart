@@ -10,5 +10,6 @@ fn_register_hooks(
     'get_promotions_pre',
     'get_promotions',
     'get_promotions_post',
-    'get_product_data_post'
+    'get_product_data_post',
+    'calculate_cart_post'
 );

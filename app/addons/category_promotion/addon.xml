@@ -21,6 +21,9 @@
             </section>
         </sections>
     </settings>
+    <language_variables>
+        <item lang="ru" id="category_promotion.participates_in_promo"><![CDATA[Товар участвует в промо <a href=[promotion_link]>[promotion]</a>. Перейдите в промо и добавьте товар, чтобы получить бонус.]]></item>
+    </language_variables>
     <queries>
         <item>ALTER TABLE `?:promotions` ADD products varchar(255) NOT NULL default ''</item>
         <item>ALTER TABLE `?:promotions` ADD bonus_products varchar(255) NOT NULL default ''</item>

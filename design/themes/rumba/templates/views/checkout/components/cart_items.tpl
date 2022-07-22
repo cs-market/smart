@@ -63,9 +63,9 @@
                             {assign var="name" value="product_options_$key"}
                             {capture name=$name}
 
-                            {*capture name="product_info_update"}
+                            {capture name="product_info_update"}
                                 {hook name="checkout:product_info"}
-                                    {if $product.exclude_from_calculate}
+                                    {*{if $product.exclude_from_calculate}
                                         <strong><span class="price">{__("free")}</span></strong>
                                     {elseif $product.discount|floatval || ($product.taxes && $settings.Checkout.tax_calculation != "subtotal")}
                                         {if $product.discount|floatval}
@@ -98,9 +98,9 @@
                                             </table>
                                         </div>
                                     {/if}
-                                    {include file="views/companies/components/product_company_data.tpl" company_name=$product.company_name company_id=$product.company_id}
+                                    {include file="views/companies/components/product_company_data.tpl" company_name=$product.company_name company_id=$product.company_id}*}
                                 {/hook}
-                            {/capture*}
+                            {/capture}
                             {if $smarty.capture.product_info_update|trim}
                                 <div class="cm-reload-{$obj_id}" id="product_info_update_{$obj_id}">
                                     {$smarty.capture.product_info_update nofilter}

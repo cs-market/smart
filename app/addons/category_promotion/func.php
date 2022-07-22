@@ -212,6 +212,10 @@ function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$co
         $category_ids = db_get_fields('SELECT category_id FROM ?:products_categories WHERE product_id = ?i', $params['product_or_bonus_product']);
         $condition .=' AND (' . fn_find_array_in_set([$params['product_or_bonus_product']], "products", false) . ' OR ' . fn_find_array_in_set([$params['product_or_bonus_product']], "bonus_products", false) . ' OR ' . fn_find_array_in_set($category_ids, "condition_categories", false) . ')';
     }
+    if (!empty($params['exclude_promotion_ids'])) {
+        if (!is_array($params['exclude_promotion_ids'])) $params['exclude_promotion_ids'] = [$params['exclude_promotion_ids']];
+        $condition .= db_quote(' AND ?:promotions.promotion_id NOT IN (?a)', $params['exclude_promotion_ids']);
+    }
 }
 
 function fn_category_promotion_get_promotions_post($params, $items_per_page, $lang_code, &$promotions) {
@@ -329,4 +333,15 @@ function fn_category_promotion_check_amount_conditioned_products($id, $promo, $p
 function fn_category_promotion_check_unique_amount_conditioned_products($id, $promo, $products) {
     $cart_products = fn_category_promotion_get_cart_promotioned_products($id, $products);
     return count(array_unique(array_column($cart_products, 'product_code')));
+}
+
+function fn_category_promotion_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
+
+    $applied_promotions = array_keys($cart['applied_promotions']);
+    foreach ($cart_products as &$product) {
+        list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions], 10);
+        if ($promotions) {
+            $product['participates_in_promo'] = reset($promotions);
+        }
+    }
 }
