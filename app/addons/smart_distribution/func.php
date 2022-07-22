@@ -967,6 +967,9 @@ function fn_smart_distribution_get_products($params, &$fields, $sortings, &$cond
             ' END)',
             'N'
         );
+
+        // do not show products for unlogged users
+        $condition .= db_quote(' AND products.usergroup_ids != ?s', '');
     }
 
     if (!empty($params['current_cart_products']) && $params['user_id']) {
