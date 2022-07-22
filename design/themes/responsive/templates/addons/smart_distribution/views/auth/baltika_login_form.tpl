@@ -9,8 +9,8 @@
         {/if}
 
         {$redirect_url = ""|fn_url}
-        <input type="hidden" name="return_url" value="{$smarty.request.return_url|default:$config.current_url}" />
-        <input type="hidden" name="redirect_url" value="{$redirect_url|default:$config.current_url}" />
+        <input type="hidden" name="return_url" value="{$redirect_url}" />
+        <input type="hidden" name="redirect_url" value="{$config.current_url}" />
 
         {if $style == "checkout"}
             <div class="ty-checkout-login-form">{include file="common/subheader.tpl" title=__("returning_customer")}
