@@ -12,6 +12,7 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 function fn_storages_products_exim_get_primary_object_id(&$alt_keys, &$skip_get_primary_object_id) {
     if (!(isset($alt_keys['code']) && isset($alt_keys['product_code']))) {
@@ -102,7 +103,7 @@ function fn_storages_exim_get_product_id($data) {
     return $products[$data];
 }
 
-function fn_storages_exim_get_user_id($data, $company = false) {
+function fn_storages_exim_get_user_id($data, $company = false, $cleanup = false) {
     static $users = [];
 
     if (!isset($users[$data])) {
@@ -119,6 +120,10 @@ function fn_storages_exim_get_user_id($data, $company = false) {
         }
 
         $users[$data] = db_get_field("SELECT user_id FROM ?:users WHERE user_login = ?s $condition", $data);
+
+        if (!empty($cleanup) && YesNo::toBool($cleanup)) {
+            db_query('DELETE FROM ?:user_storages WHERE user_id = ?i', $users[$data]);
+        }
     }
 
     return $users[$data];
