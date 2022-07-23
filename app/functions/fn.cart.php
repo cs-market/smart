@@ -5595,8 +5595,9 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
 
     $allow_negative_ammount = Registry::get('settings.General.allow_negative_amount') === YesNo::YES;
     $inventory_tracking = Registry::get('settings.General.inventory_tracking') !== YesNo::NO;
-    $allow_product_preorder = ($product['out_of_stock_actions'] === OutOfStockActions::BUY_IN_ADVANCE)
-        && ($product['amount'] <= 0 || $product['amount'] < $min_qty);
+    // [cs-market] preorder should allow to add to cart any amount
+    // $allow_product_preorder = ($product['out_of_stock_actions'] === OutOfStockActions::BUY_IN_ADVANCE) && ($product['amount'] <= 0 || $product['amount'] < $min_qty);
+    $allow_product_preorder = ($product['out_of_stock_actions'] === OutOfStockActions::BUY_IN_ADVANCE);
 
     if (isset($current_amount)
         && $current_amount >= 0
