@@ -1855,11 +1855,20 @@ fn_print_r($fantoms);
             db_query('UPDATE ?:users SET delivery_date = ?s WHERE user_id = ?i', $data[$user_id], $user_id);
         }
     }
-} elseif ($mode = 'zeroing_amount') {
+} elseif ($mode == 'zeroing_amount') {
     $company_ids = ['1810', '2058'];
     db_query('UPDATE ?:products SET amount = 0 WHERE company_id IN (?a)', $company_ids);
+} elseif ($mode == 'remove_usergroup_all') {
+    if ($action) {
+        $products = db_get_hash_single_array('SELECT product_id, usergroup_ids FROM ?:products WHERE company_id = ?i', ['product_id', 'usergroup_ids'], $action);
+        foreach ($products as $product_id => $data) {
+            $data = explode(',', $data);
+            $data = array_filter($data);
+            $data = implode(',', $data);
+            db_query('UPDATE ?:products SET usergroup_ids = ?s', $data);
+        }
+    }
 }
-
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
 {
