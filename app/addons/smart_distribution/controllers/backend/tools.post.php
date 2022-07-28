@@ -1865,7 +1865,7 @@ fn_print_r($fantoms);
             $data = explode(',', $data);
             $data = array_filter($data);
             $data = implode(',', $data);
-            db_query('UPDATE ?:products SET usergroup_ids = ?s', $data);
+            db_query('UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i', $data, $product_id);
         }
     }
 }
