@@ -86,7 +86,11 @@
                     {if $runtime.mode == "add"}
                         {include file="buttons/register_profile.tpl" but_name="dispatch[{$dispatch}]" but_id="save_profile_but"}
                     {else}
+                        {if $user_data.company_id != 45}
                         {include file="buttons/save.tpl" but_name="dispatch[{$dispatch}]" but_meta="ty-btn__secondary" but_id="save_profile_but"}
+                        {else}
+                            <span>К сожалению, на данный момент редактирование профиля недоступно</span>
+                        {/if}
                         <input class="ty-profile-field__reset ty-btn ty-btn__tertiary" type="reset" name="reset" value="{__("revert")}" id="shipping_address_reset"/>
 
                         <script type="text/javascript">
