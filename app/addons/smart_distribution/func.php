@@ -438,6 +438,11 @@ function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $a
         }
     }
     $data = fn_get_profile_fields_data(ProfileDataTypes::USER, $user_id);
+
+    if (empty($user_data['profile_id']) && $profiles = fn_get_user_profiles($user_id)) {
+        $user_data['profile_id'] = key($profiles);
+    }
+
     $data += fn_get_profile_fields_data(ProfileDataTypes::PROFILE, $user_data['profile_id']);
     $user_data['fields'] = fn_array_merge($data, $user_data['fields']);
 }
