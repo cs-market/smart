@@ -1487,6 +1487,7 @@ function fn_exim_smart_distribution_get_usergroup_ids($data, $without_status = t
             if (is_array($ug_data)) {
                 // Check if user group exists
                 $ug_id = false;
+                // search by ID
                 if (is_numeric($ug_data[0])) {
                     if (in_array($ug_data[0], [USERGROUP_ALL, USERGROUP_GUEST, USERGROUP_REGISTERED])) {
                         $ug_id = $ug_data[0];
@@ -1494,8 +1495,9 @@ function fn_exim_smart_distribution_get_usergroup_ids($data, $without_status = t
                         $ug_id = $res;
                     }
                 }
-                if ($ug_id === false) {
-                    $ug_id = db_get_field("SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s", $ug_data[0], DESCR_SL);
+                // search by name
+                if ($ug_id === false && ($db_id = db_get_field("SELECT usergroup_id FROM ?:usergroup_descriptions WHERE usergroup = ?s AND lang_code = ?s", $ug_data[0], DESCR_SL))) {
+                    $ug_id = $db_id;
                 }
                 if ($ug_id !== false) {
                     $return[$ug_id] = isset($ug_data[1]) ? $ug_data[1] : 'A';
