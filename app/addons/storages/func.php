@@ -215,6 +215,9 @@ function fn_storages_get_products(array &$params, array &$fields, array &$sortin
         $old_price_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
         $price_condition = db_quote(' AND prices.usergroup_id IN (?n) AND prices.price IS NOT NULL', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
         $condition = str_replace($old_price_condition, $price_condition, $condition);
+    } elseif (!empty(Registry::get('runtime.storages'))) {
+        // if we have not selected storage we cannot buy
+        $condition .= db_quote('AND 0');
     }
 }
 
