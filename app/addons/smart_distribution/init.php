@@ -84,7 +84,8 @@ fn_register_hooks(
     'get_filters_pre',
     'update_storage_usergroups_pre',
     'update_product_prices',
-    'get_available_destination_pre'
+    'get_available_destination_pre',
+    'check_permission_manage_profiles'
 );
 
 if (defined('API')) {

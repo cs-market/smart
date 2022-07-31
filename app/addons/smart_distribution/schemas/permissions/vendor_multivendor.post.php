@@ -21,4 +21,6 @@ $schema['controllers']['product_features']['modes']['update_status']['permission
 $schema['controllers']['usergroups']['modes']['update_status']['permissions'] = true;
 $schema['controllers']['tools']['modes']['update_status']['param_permissions']['table']['promotions'] = true;
 $schema['controllers']['tools']['modes']['update_status']['param_permissions']['table']['product_filters'] = true;
+$schema['controllers']['profiles']['modes']['act_as_user']['permissions'] = true;
+
 return $schema;

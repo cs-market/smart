@@ -1532,3 +1532,17 @@ function fn_smart_distribution_update_product_prices($product_id, &$_product_dat
 function fn_smart_distribution_get_available_destination_pre(&$location) {
     $location['country'] = !empty($location['country']) ? $location['country'] : 'RU';
 }
+
+function fn_smart_distribution_check_permission_manage_profiles(&$result, $user_type) {
+    $params = array (
+        'user_type' => $user_type
+    );
+
+    $can_manage_profiles = !fn_is_restricted_admin($params) || $user_type !== UserTypes::ADMIN;
+
+    if ($can_manage_profiles && Registry::get('runtime.company_id')) {
+        $can_manage_profiles = ($user_type == 'V' || $user_type == 'C') && Registry::get('runtime.company_id');
+    }
+
+    $result = $can_manage_profiles;
+}
