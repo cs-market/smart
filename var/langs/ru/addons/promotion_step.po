@@ -19,3 +19,8 @@ msgstr "Шаг применения акции"
 msgctxt "Languages::promotion_bonus_promotion_step_free_products"
 msgid "Promotion step(free product)"
 msgstr "Шаг применения акции (бесплатный товар)"
+
+msgctxt "Languages::promotion_cond_promotion_package_step"
+msgid "Promotion package step"
+msgstr "Шаг применения акции в упаковках (Кратность начисления бонуса)"
+

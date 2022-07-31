@@ -1,16 +1,5 @@
 <?php
-/***************************************************************************
-*                                                                          *
-*   (c) 2004 Vladimir V. Kalynyak, Alexey V. Vinokurov, Ilya M. Shalnev    *
-*                                                                          *
-* This  is  commercial  software,  only  users  who have purchased a valid *
-* license  and  accept  to the terms of the  License Agreement can install *
-* and use this program.                                                    *
-*                                                                          *
-****************************************************************************
-* PLEASE READ THE FULL TEXT  OF THE SOFTWARE  LICENSE   AGREEMENT  IN  THE *
-* "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
-****************************************************************************/
+
 use Tygh\Enum\ProductTracking;
 use Tygh\Registry;
 use Tygh\Enum\OutOfStockActions;
@@ -21,26 +10,22 @@ function fn_promotion_step_check_amount_in_stock_before_check($product_id, $amou
     foreach ($cart['products'] as $key => $products) {
         if(isset($products['extra']['bonus']) && $products['product'] == $product['product'] && $products['extra']['bonus'] == 'apply_bonus'){
             $product['min_qty'] = $product['extra']['amount_bonus'];
-
         }
     }
 }
 
 function fn_promotion_step_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
     foreach ($cart['products'] as $key => &$products) {
-
         if(isset($products['extra']['bonus']) && $products['extra']['bonus'] == 'apply_bonus'&&$products['amount']!=$products['extra']['amount_bonus']*$products['extra']['amount_step']){
             $condition_amount = $products['extra']['amount_bonus']*$products['extra']['amount_step'];
             $cart_products[$key]['amount'] = $condition_amount;
             $products['amount'] = $condition_amount;
             $need_recalculate = true;
-
         }
     }
 }
 
-function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_products, $type = 'S')
-{ 
+function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_products, $type = 'S', $calculate_by_packs = false) {
     $promotion =  fn_get_promotion_data($promotion_id);
     $amount = 0;
     foreach ($promotion['conditions']['conditions'] as $key => $conditions) {
@@ -57,8 +42,13 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
                         }
                     }
                     if($value['product_id'] == $v['product_id']){
-                        $amount += $v['amount'];
-                    }       
+                        if (!$calculate_by_packs) {
+                            $amount += $v['amount'];
+                        } else {
+                            $items_in_package = $v['items_in_package'] ?? $v['qty_step'];
+                            $amount += floor($v['amount']/$items_in_package);
+                        }
+                    }
                 }
             }
         } elseif (isset($conditions['condition']) && $conditions['condition'] == 'categories') {
@@ -73,18 +63,30 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
                     }
                 }
                 if(in_array($promotion['condition_categories'], $v['category_ids'])){
-                    $amount += $v['amount'];
+                    if (!$calculate_by_packs) {
+                        $amount += $v['amount'];
+                    } else {
+                        $items_in_package = $v['items_in_package'] ?? $v['qty_step'];
+                        $amount += floor($v['amount']/$items_in_package);
+                    }
                 }
             }
         }
     }
+
     return $amount;
 }
 
 function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_products) {
     $promotion =  fn_get_promotion_data($bonus['promotion_id']);
     if ($bonus['bonus'] == 'promotion_step_free_products') {
-        $amount = fn_promotion_step_get_products_amount($bonus['promotion_id'], $cart, $cart_products, $type = 'S');
+
+        $conditions = $promotion['conditions'];
+        fn_cleanup_promotion_condition($conditions, ['promotion_step']);
+        $package_step = empty($conditions['conditions']) ? 1 : 0;
+        
+        $amount = fn_promotion_step_get_products_amount($bonus['promotion_id'], $cart, $cart_products, $type = 'S', $package_step);
+
         foreach ($bonus['value'] as $p_data) {
 
             $product_data = array (
@@ -123,8 +125,9 @@ function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_produc
                 )
             ) {
                 foreach ($promotion['conditions']['conditions'] as $key => $condition) {
-                    if($condition['operator'] == 'gte' && $condition['condition'] == 'promotion_step' && $condition['value']){
+                    if($condition['operator'] == 'gte' && in_array($condition['condition'], ['promotion_step', 'promotion_package_step']) && $condition['value']){
                         $step = floor($amount/$condition['value']);
+
                         if ($step) {
                             $product_data = array (
                                 $p_data['product_id'] => array (
@@ -207,5 +210,6 @@ function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_produc
             }
         }
     }
+
     return true;
 }

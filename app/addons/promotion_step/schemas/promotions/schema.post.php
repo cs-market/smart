@@ -12,6 +12,8 @@
 * "copyright.txt" FILE PROVIDED WITH THIS DISTRIBUTION PACKAGE.            *
 ****************************************************************************/
 
+use Tygh\Registry;
+
 $schema['conditions']['promotion_step'] = array(
     'operators' => array ('gte'),
     'type' => 'input',
@@ -19,6 +21,16 @@ $schema['conditions']['promotion_step'] = array(
     'zones' => array('cart'),
     'filter' => 'fn_promotions_filter_float_condition_value'
 );
+
+if (Registry::get('addons.product_packages.status') == 'A') {
+    $schema['conditions']['promotion_package_step'] = array(
+        'operators' => array ('gte'),
+        'type' => 'input',
+        'field_function' => array('fn_promotion_step_get_products_amount', '#id', '@cart', '@cart_products', 'C', 1),
+        'zones' => array('cart'),
+        'filter' => 'fn_promotions_filter_float_condition_value'
+    );
+}
 
 $schema['bonuses']['promotion_step_free_products'] = array(
     'type' => 'picker',

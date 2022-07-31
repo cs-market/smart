@@ -6,6 +6,8 @@
 <status>active</status>
 <default_language>en</default_language>
 <compatibility>
+    <!-- fn_cleanup_promotion_condition -->
+    <dependencies>category_promotion</dependencies>
 </compatibility>
 <queries>
 </queries>
