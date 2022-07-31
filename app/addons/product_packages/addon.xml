@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>product_packages</id>
+    <name>Smart distribution: Упаковки товара</name>
+    <description>Позволяет задавать количество штук товара в упаковке</description>
+    <priority>32000</priority>
+    <version>1.0.1</version>
+    <position>0</position>
+    <status>active</status>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <default_language>ru</default_language>
+    <language_variables>
+        <item lang="ru" id="product_packages.items_in_package">Количество штук в упаковке</item>
+        <item lang="ru" id="exim_items_in_package">Количество штук в упаковке</item>
+        <item lang="ru" id="product_packages.package_switcher">Переключатель штук/упаковок</item>
+    </language_variables>
+    <settings edition_type="ULT:ROOT">
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="package_switcher">
+                        <type>checkbox</type>
+                        <name>package_switcher</name>
+                        <default_value>Y</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+    <queries>
+        <item>ALTER TABLE `?:products` ADD `items_in_package` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 AFTER amount;</item>
+        <item for="uninstall">ALTER TABLE `?:products` DROP `items_in_package`;</item>
+
+        <item for="install" editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `package_switcher` VARCHAR(1) NOT NULL DEFAULT 'N';</item>
+        <item for="uninstall" editions="MULTIVENDOR">ALTER TABLE `?:companies` DROP `package_switcher`;</item>
+    </queries>
+</addon>
