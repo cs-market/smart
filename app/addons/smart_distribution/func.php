@@ -439,8 +439,31 @@ function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $a
     }
     $data = fn_get_profile_fields_data(ProfileDataTypes::USER, $user_id);
 
-    if (empty($user_data['profile_id']) && $profiles = fn_get_user_profiles($user_id)) {
-        $user_data['profile_id'] = key($profiles);
+    // Add new profile or update existing
+    if ((isset($user_data['profile_id']) && empty($user_data['profile_id'])) || $action == 'add') {
+        if ($action == 'add') {
+            unset($user_data['profile_id']);
+
+            $user_data['profile_type'] = 'P';
+            $user_data['profile_name'] = empty($user_data['profile_name']) ? __('main') : $user_data['profile_name'];
+        } else {
+            $user_data['profile_type'] = 'S';
+        }
+
+        $user_data['user_id'] = $user_id;
+        $user_data['profile_id'] = db_query('INSERT INTO ?:user_profiles ?e', $user_data);
+    } else {
+        if (empty($user_data['profile_id'])) {
+            $user_data['profile_id'] = db_get_field("SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i AND profile_type = 'P'", $user_id);
+        }
+
+        $is_exists = db_get_field('SELECT COUNT(*) FROM ?:user_profiles WHERE user_id = ?i AND profile_id = ?i', $user_id, $user_data['profile_id']);
+
+        if ($is_exists) {
+            db_query("UPDATE ?:user_profiles SET ?u WHERE profile_id = ?i", $user_data, $user_data['profile_id']);
+        } else {
+            return false;
+        }
     }
 
     $data += fn_get_profile_fields_data(ProfileDataTypes::PROFILE, $user_data['profile_id']);
