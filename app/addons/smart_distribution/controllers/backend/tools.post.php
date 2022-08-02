@@ -1609,11 +1609,12 @@ fn_print_r($fantoms);
     fn_print_die('done', $counter, count($values));
 } elseif ($mode == 'correct_reward_points_new1') {
     $orders_wo_points = [];
-    //$exclude_users = [58406,58683,58434,61971,64468,59360,58435,42557,58446,58407,58429,58726,58476,58779,58780,58485,65989,65990,55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
-    $exclude_users = [55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
-    $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id IN (?a) AND user_type = ?s AND user_id NOT IN (?a)', [2058], 'C', $exclude_users);
+    $exclude_users = [58406,58683,58434,61971,64468,59360,58435,42557,58446,58407,58429,58726,58476,58779,58780,58485,65989,65990,55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
+    //$exclude_users = [55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
+    $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id IN (?a) AND user_type = ?s AND user_id NOT IN (?a) AND user_id = ?i', [1810], 'C', $exclude_users, 52642);
     //$manual_corrections = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id IN (?a) AND reason = ?s', $users, '');
-    $user_orders = db_get_hash_multi_array('SELECT order_id, user_id, total, timestamp FROM ?:orders WHERE user_id IN (?a) AND timestamp > ?i AND status = ?s AND group_id NOT IN (?a) ORDER BY timestamp', array('user_id','order_id'), $users, 1655758800, 'H', [18]);
+    $user_orders = db_get_hash_multi_array('SELECT order_id, user_id, total, timestamp FROM ?:orders WHERE user_id IN (?a) AND timestamp > ?i AND status = ?s AND group_id NOT IN (?a) ORDER BY timestamp', array('user_id','order_id'), $users, 1651352400, 'H', [18]);
+    
     foreach ($user_orders as $user_id => $orders) {
         $order_ids = array_keys($orders);
         $first_order_ts = reset($orders)['timestamp'];
@@ -1643,7 +1644,7 @@ fn_print_r($fantoms);
     // $params['filename'] = 'reward_pointsT.csv';
     // $params['force_header'] = true;
     // $export = fn_exim_put_csv($orders_wo_points, $params, '"');
-
+fn_print_die($orders_wo_points);
     foreach ($orders_wo_points as $order) {
         fn_change_user_points($order['reward'], $order['user_id'], "Корректировка баллов по заказу #$order_id: $reward", CHANGE_DUE_ADDITION);
     }
@@ -1859,15 +1860,21 @@ fn_print_r($fantoms);
     $company_ids = ['1810', '2058'];
     db_query('UPDATE ?:products SET amount = 0 WHERE company_id IN (?a)', $company_ids);
 } elseif ($mode == 'remove_usergroup_all') {
-    if ($action) {
-        $products = db_get_hash_single_array('SELECT product_id, usergroup_ids FROM ?:products WHERE company_id = ?i', ['product_id', 'usergroup_ids'], $action);
-        foreach ($products as $product_id => $data) {
-            $data = explode(',', $data);
-            $data = array_filter($data);
-            $data = implode(',', $data);
-            db_query('UPDATE ?:products SET usergroup_ids = ?s WHERE product_id = ?i', $data, $product_id);
+    $products = db_get_array('SELECT company_id, product_id, usergroup_ids FROM ?:products WHERE status = ?s', 'A');
+    foreach ($products as $data) {
+        $usergroups = $data['usergroup_ids'];
+        $usergroups = explode(',', $usergroups);
+        if (in_array('', $usergroups) || in_array('0', $usergroups)) {
+            $wrong_products[$data['company_id']][] = $data['product_id'];
         }
     }
+    fn_print_die($wrong_products);
+} elseif ($mode == 'remove_usergroup_baltika') {
+    $products = db_get_array('SELECT company_id, product_id, usergroup_ids FROM ?:products WHERE status = ?s AND FIND_IN_SET(?i, usergroup_ids)', 'A', '548');
+    foreach ($products as $data) {
+        $res = db_query("UPDATE ?:products SET usergroup_ids = ?p WHERE product_id = ?i", fn_remove_from_set('usergroup_ids', 548), $data['product_id']);
+    }
+    fn_print_die($products);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
