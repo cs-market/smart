@@ -1585,11 +1585,17 @@ fn_print_r($fantoms);
             }
         }
     }
-} elseif ($mode == 'import_baltica_ug') {
+} elseif ($mode == 'import_new_usergroups') {
     Registry::set('runtime.company_id', 45);
-    $file = 'all_usergroups.csv';
+    $file = $_REQUEST['filename'] ?? 'new_usergroups.csv';
+    $file = 'var/files/'.$file;
+    if (!is_file($file)) {
+        fn_print_die("File $file not found");
+    }
+
     $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
     $values = [];
+
     foreach($content as $row) {
         $values = array_merge($values, array_values($row));
         //break;
@@ -1606,7 +1612,7 @@ fn_print_r($fantoms);
             $ug_id = fn_update_usergroup($ugroup);
         }
     }
-    fn_print_die('done', $counter, count($values));
+    fn_print_die('done', "новых: $counter", "итого: " . count($values));
 } elseif ($mode == 'correct_reward_points_new1') {
     $orders_wo_points = [];
     $exclude_users = [58406,58683,58434,61971,64468,59360,58435,42557,58446,58407,58429,58726,58476,58779,58780,58485,65989,65990,55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
