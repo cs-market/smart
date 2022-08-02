@@ -175,7 +175,7 @@ function fn_storages_get_product_data($product_id, &$field_list, &$join, $auth, 
             $usergroup_ids = array_intersect($usergroup_ids, $storage['usergroup_ids']);
         }
 
-        $field_list .= db_quote(', ?:storages_products.amount, ?:storages_products.min_qty, ?:storages_products.qty_step');
+        $field_list .= db_quote(', ?:storages_products.amount, ?:storages_products.min_qty as storage_min_qty, ?:storages_products.qty_step as storage_qty_step');
 
         // если товара на складе быть не может, не достаем его = right join 
         $join .= db_quote(' RIGHT JOIN ?:storages_products ON ?:storages_products.product_id = ?i AND ?:storages_products.storage_id = ?i', $product_id, $storage['storage_id']);
@@ -186,12 +186,20 @@ function fn_storages_get_product_data($product_id, &$field_list, &$join, $auth, 
     }
 }
 
+function fn_storages_get_product_data_post(&$product_data) {
+    if ($storage = Registry::get('runtime.current_storage')) {
+        $product_data['min_qty'] = !empty($product_data['storage_min_qty']) ? $product_data['storage_min_qty'] : $product_data['min_qty'];
+        $product_data['qty_step'] = !empty($product_data['storage_qty_step']) ? $product_data['storage_qty_step'] : $product_data['qty_step'];
+        unset($product_data['storage_min_qty'], $product_data['storage_qty_step']);
+    }
+}
+
 function fn_storages_load_products_extra_data(&$extra_fields, $products, $product_ids, &$params, $lang_code) {
     if ($storage = Registry::get('runtime.current_storage')) {
         $extra_fields['?:storages_products'] = [
             'primary_key' => 'product_id',
             'fields' => [
-                'amount', 'min_qty', 'qty_step'
+                'amount', 'min_qty as storage_min_qty', 'qty_step as storage_qty_step'
             ],
             'condition' => db_quote(' AND ?:storages_products.storage_id = ?i', $storage['storage_id'])
         ];
@@ -199,6 +207,12 @@ function fn_storages_load_products_extra_data(&$extra_fields, $products, $produc
         if (!empty($storage['usergroup_ids'])) {
             $params['auth_usergroup_ids'] = array_intersect($params['auth_usergroup_ids'], $storage['usergroup_ids']);
         }
+    }
+}
+
+function fn_storages_load_products_extra_data_post(&$products, $product_ids, $params, $lang_code) {
+    foreach ($products as &$product) {
+        fn_storages_get_product_data_post($product);
     }
 }
 
