@@ -103,6 +103,7 @@
                             });
                         }(Tygh, Tygh.$));
                         </script>
+                        {include file="buttons/button.tpl" but_name="dispatch[profiles.delete_profile]" but_text=__("delete_profile") but_meta="ty-btn__secondary ty-btn__red"}
                     {/if}
                 </div>
             </form>

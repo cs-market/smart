@@ -261,6 +261,15 @@ select {
             .border-right-radius(@border-radius - 2px);
         }
     }
+    &__red {
+        @red: #f91155;
+        color: @red;
+        border-color: @red;
+        background-color: #fff;
+        &:hover {
+            background-color: @red;
+        }
+    }
 }
 
 .ty-dropdown-box, .ty-sort-dropdown {
