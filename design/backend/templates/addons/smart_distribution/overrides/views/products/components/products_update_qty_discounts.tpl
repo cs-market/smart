@@ -46,6 +46,7 @@
                     &nbsp;{__("all")}
                 {else}
                     {$usergroup_id = $price.usergroup_id}
+                    <input type="hidden" name="product_data[prices][{$_key}][usergroup_id]" value="{$usergroup_id}">
                     {$usergroups.$usergroup_id.usergroup}
                 {include file="buttons/update_for_all.tpl" display=$show_update_for_all object_id="price_`$_key`" name="update_all_vendors[prices][`$_key`]"}
                 {assign var="default_usergroup_name" value=""}
