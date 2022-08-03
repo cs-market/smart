@@ -560,8 +560,15 @@ function fn_get_simple_usergroups($type, $get_default = false, $lang_code = CART
             $where .= " AND a.type = 'A'";
         }
 
-        // [csmarket] add condition to receive correct usergroups
-        fn_set_hook('get_simple_usergroups_pre', $where);
+        /**
+        * Executes before getting simple list of usergroups from the database, allows you to modify query parameters.
+        *
+        * @param string $type        Type of usergroups (C - customers, A - administrators)
+        * @param bool   $get_default If set, default usergroups will be returned too (all, guest, registred)
+        * @param string $lang_code   Two-letter language code
+        * @param string $where       Where clause for query
+        */
+        fn_set_hook('get_simple_usergroups', $type, $get_default, $lang_code, $where);
 
         $_usergroups = db_get_hash_single_array(
             'SELECT a.usergroup_id, b.usergroup'

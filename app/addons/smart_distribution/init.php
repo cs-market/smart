@@ -9,7 +9,7 @@ fn_register_hooks(
     'get_order_info',
     'vendor_plan_before_save',
     'get_usergroups',
-    'get_simple_usergroups_pre',
+    'get_simple_usergroups',
     'update_usergroup',
     'delete_usergroups',
     'get_users_pre',

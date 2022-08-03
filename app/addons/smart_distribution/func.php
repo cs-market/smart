@@ -143,14 +143,25 @@ function fn_smart_distribution_vendor_plan_before_save(&$obj, $result) {
 }
 
 function fn_smart_distribution_get_usergroups($params, $lang_code, $field_list, $join, &$condition, $group_by, $order_by, $limit) {
-    fn_smart_distribution_get_simple_usergroups_pre($condition);
+    $condition .= fn_smart_distribution_get_company_usergroup_condition(isset($params['company_id']) ? $params['company_id'] : false);
 }
 
-function fn_smart_distribution_get_simple_usergroups_pre(&$where) {
-    $company = Vendor::model()->current();
-    if (!empty($company) && !empty($company->usergroup_ids)) {
-        $where .= db_quote(' AND a.usergroup_id IN (?a)', $company->usergroup_ids);
+function fn_smart_distribution_get_simple_usergroups($type, $get_default, $lang_code, &$where) {
+    $where .= fn_smart_distribution_get_company_usergroup_condition();
+}
+
+function fn_smart_distribution_get_company_usergroup_condition($company_id = null) {
+    $condition = '';
+    $company_id = $company_id ?? Registry::get('runtime.company_id');
+
+    if (!empty($company_id)) {
+        $company = Vendor::model()->find($company_id);
+        if (!empty($company) && !empty($company->usergroup_ids)) {
+            $condition = db_quote(' AND a.usergroup_id IN (?a)', $company->usergroup_ids);
+        }
     }
+
+    return $condition;
 }
 
 function fn_smart_distribution_update_usergroup($usergroup_data, $usergroup_id, $create) {
