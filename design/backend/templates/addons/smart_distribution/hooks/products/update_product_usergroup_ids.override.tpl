@@ -1,4 +1,4 @@
-<div class="control-group">
+{*<div class="control-group">
     <label class="control-label">{__("usergroups")}</label>
     <div class="controls">
         {include file="addons/smart_distribution/components/usergroup_picker/picker.tpl"
@@ -12,3 +12,4 @@
         }
     </div>
 </div>
+*}
