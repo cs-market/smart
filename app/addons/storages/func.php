@@ -60,6 +60,11 @@ function fn_get_storages($params = [], $items_per_page = 0) {
         $condition .= db_quote(' AND (?:storage_usergroups.usergroup_id IN (?a) OR ?:storage_usergroups.usergroup_id IS NULL)', $params['usergroup_ids']);
     }
 
+    if (!empty($params['q'])) {
+        $params['q'] = trim($params['q']);
+        $condition .= db_quote(' AND (?:storages.storage LIKE ?l OR ?:storages.code LIKE ?l)', '%'.$params['q'].'%', '%'.$params['q'].'%');
+    }
+
     fn_set_hook('get_storages', $params, $join, $condition);
 
     $storages = db_get_hash_array("SELECT ?:storages.* FROM ?:storages $join WHERE 1 ?p", 'storage_id', $condition);

@@ -29,9 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'manage') {
     $params = $_REQUEST;
-    list($storages,) = fn_get_storages($params);
+    list($storages, $search) = fn_get_storages($params);
 
     Tygh::$app['view']->assign('storages', $storages);
+    Tygh::$app['view']->assign('search', $search);
 } elseif ($mode == 'update') {
     $params = $_REQUEST;
     list($storage, ) = fn_get_storages($params);
