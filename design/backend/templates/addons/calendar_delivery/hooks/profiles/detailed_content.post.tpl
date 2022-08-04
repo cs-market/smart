@@ -21,13 +21,14 @@
                 {foreach from=$user_data.delivery_date_by_storage item="user_storage" name="user_storage"}
                 {assign var="num" value=$smarty.foreach.user_storage.iteration}
                 <tr class="cm-row-item">
-                    <td>
+                    <td style="white-space: nowrap;">
                         <select name="user_data[delivery_date_by_storage][{$num}][storage_id]">
                             <option value="">---</option>
                             {foreach from=$storages item="storage"}
                             <option value="{$storage.storage_id}" {if $storage.storage_id == $user_storage.storage_id}selected="_selected"{/if}>{$storage.storage}</option>
                             {/foreach}
                         </select>
+                        <a href="{"storages.manage#group`$user_storage.storage_id`"|fn_url}" target="_blank"><i class="icon-external-link"></i></a>
                     </td>
                     {include file="addons/calendar_delivery/components/weekdays_table.tpl" name="user_data[delivery_date_by_storage][`$num`][delivery_date]" value=$user_storage['delivery_date'] only_body=true}
                     <td>{include file="buttons/multiple_buttons.tpl" only_delete="Y"}</td>
