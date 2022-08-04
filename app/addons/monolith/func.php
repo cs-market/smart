@@ -36,7 +36,7 @@ function fn_monolith_generate_xml($order_id) {
         '123',
         $order_info['user_id'],
         date("Y-m-d\T00:00:00", $order_info['delivery_date']),
-        ($order_info['company_id'] == '1804') ? 'CustReturn' : 'CustOrder',
+        ($order_info['group_id'] == '19') ? 'CustReturn' : 'CustOrder',
         'Entered',
     ];
 
