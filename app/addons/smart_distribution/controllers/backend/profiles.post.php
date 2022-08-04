@@ -29,6 +29,15 @@ if ($mode == 'update') {
 
         Tygh::$app['view']->assign('usergroups', $usergroups);
     }
+
+    $usergroups = Tygh::$app['view']->getTemplateVars('usergroups');
+    foreach ($user_data['usergroups'] as $id => $value) {
+        $usergroups[$id]['active'] = true;
+    }
+
+    $usergroups = fn_sort_array_by_key($usergroups, 'active', SORT_DESC);
+    Tygh::$app['view']->assign('usergroups', $usergroups);
+
 } elseif ($mode == 'manage') {
     Tygh::$app['view']->assign('can_add_user', true);
 }
