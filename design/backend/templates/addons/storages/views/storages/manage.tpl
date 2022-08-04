@@ -19,6 +19,7 @@
                     object_id_name="storage_id"
                     table="storages"
                     href_delete="storages.delete?storage_id=`$storage.storage_id`"
+                    href_desc=$storage.code
                     delete_target_id="types_list"
                     skip_delete=$skip_delete
                     header_text="{__("storages.editing_storage")}: `$storage.storage`"
