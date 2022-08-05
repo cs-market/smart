@@ -36,6 +36,12 @@ if ($mode == 'update') {
     list($storages) = fn_get_storages(['company_id' => $product_company_id]);
     $storages_amount = fn_get_storages_amount($_REQUEST['product_id']);
 
+    foreach ($storages_amount as $storage_id => $data) {
+        $storages[$storage_id]['has_value'] = true;
+    }
+
+    $storages = fn_sort_array_by_key($storages, 'has_value', SORT_DESC);
+
     Tygh::$app['view']->assign([
         'storages'         => $storages,
         'storages_amounts' => $storages_amount

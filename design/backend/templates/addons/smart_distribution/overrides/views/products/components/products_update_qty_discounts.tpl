@@ -3,8 +3,15 @@
 {/if}
 
 <div class="{if $selected_section !== "qty_discounts"}hidden{/if}" id="content_qty_discounts">
+    <div class="control-group">
+        {script src="js/tygh/filter_table.js"}
+        <label class="control-label" for="elm_prices_search">{__('search')}</label>
+        <div class="controls">
+            <input type="text" id="prices_search" value="" size="30">
+        </div>
+    </div>
     <div class="table-responsive-wrapper">
-        <table class="table table-middle table--relative table-responsive" width="100%">
+        <table class="table table-middle table--relative table-responsive cm-filter-table" width="100%" data-ca-input-id="prices_search">
         <thead class="cm-first-sibling">
         <tr>
             <th width="5%">{__("quantity")}</th>

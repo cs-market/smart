@@ -1,7 +1,14 @@
 <div class="hidden" id="content_storages">
     {if $storages}
+    <div class="control-group">
+        {script src="js/tygh/filter_table.js"}
+        <label class="control-label" for="elm_storages_search">{__('search')}</label>
+        <div class="controls">
+            <input type="text" id="storages_search" value="" size="30">
+        </div>
+    </div>
     <div class="table-responsive-wrapper">
-        <table class="table table-middle table--relative table-responsive" width="100%">
+        <table class="table table-middle table--relative table-responsive cm-filter-table" width="100%" data-ca-input-id="storages_search">
             <thead>
                 <tr>
                     <th>{__("storages.storage")}</th>
