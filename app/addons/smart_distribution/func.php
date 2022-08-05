@@ -143,7 +143,8 @@ function fn_smart_distribution_vendor_plan_before_save(&$obj, $result) {
 }
 
 function fn_smart_distribution_get_usergroups($params, $lang_code, $field_list, $join, &$condition, $group_by, $order_by, $limit) {
-    $condition .= fn_smart_distribution_get_company_usergroup_condition(isset($params['company_id']) ? $params['company_id'] : false);
+    $condition .= fn_smart_distribution_get_company_usergroup_condition(isset($params['company_id']) ? $params['company_id'] : null);
+
 }
 
 function fn_smart_distribution_get_simple_usergroups($type, $get_default, $lang_code, &$where) {
