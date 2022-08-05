@@ -59,28 +59,14 @@
                                 <div class="ty-cart-items__empty ty-center">{__("cart_is_empty")}</div>
                             {/if}
                         </div>
-                        {if $auth.company_id == 45}
-                            <div class="cm-cart-buttons ty-cart-content__buttons buttons-container{if $smarty.session.cart.amount} full-cart{else} hidden{/if}">
-                                <div class="ty-float-left">
-                                    <a href="{"checkout.cart"|fn_url}" rel="nofollow" class="ty-btn ty-btn__secondary">{__("cart_text")}</a>
-                                </div>
-                                <div class="ty-float-right">
-                                    {include file="buttons/proceed_to_checkout.tpl" but_text=__("checkout")}
-                                </div>
-                            </div>
-                        {else if $block.properties.display_bottom_buttons == "Y"}
                         <div class="cm-cart-buttons ty-cart-content__buttons buttons-container{if $smarty.session.cart.amount} full-cart{else} hidden{/if}">
                             <div class="ty-float-left">
-                                <a href="{"checkout.cart"|fn_url}" rel="nofollow" class="ty-btn ty-btn__secondary">{__("view_cart")}</a>
+                                <a href="{"checkout.cart"|fn_url}" rel="nofollow" class="ty-btn ty-btn__secondary">{__("cart_text")}</a>
                             </div>
-                            {if $settings.Checkout.checkout_redirect != "Y"}
                             <div class="ty-float-right">
                                 {include file="buttons/proceed_to_checkout.tpl" but_text=__("checkout")}
                             </div>
-                            {/if}
                         </div>
-                        {/if}
-
                 </div>
             {/hook}
         </div>
