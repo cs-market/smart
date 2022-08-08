@@ -451,19 +451,7 @@ function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $a
     $data = fn_get_profile_fields_data(ProfileDataTypes::USER, $user_id);
 
     // Add new profile or update existing
-    if ((isset($user_data['profile_id']) && empty($user_data['profile_id'])) || $action == 'add') {
-        if ($action == 'add') {
-            unset($user_data['profile_id']);
-
-            $user_data['profile_type'] = 'P';
-            $user_data['profile_name'] = empty($user_data['profile_name']) ? __('main') : $user_data['profile_name'];
-        } else {
-            $user_data['profile_type'] = 'S';
-        }
-
-        $user_data['user_id'] = $user_id;
-        $user_data['profile_id'] = db_query('INSERT INTO ?:user_profiles ?e', $user_data);
-    } else {
+    if (!((isset($user_data['profile_id']) && empty($user_data['profile_id'])) || $action == 'add')) {
         if (empty($user_data['profile_id'])) {
             $user_data['profile_id'] = db_get_field("SELECT profile_id FROM ?:user_profiles WHERE user_id = ?i AND profile_type = 'P'", $user_id);
         }
