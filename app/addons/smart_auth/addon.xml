@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>smart_auth</id>
+    <version>1.0.1</version>
+    <default_language>кг</default_language>
+    <priority>100</priority>
+    <status>active</status>
+    <name>Smart distribution: умная авторизация</name>
+    <description>Позволяет авторизоваться по любым полям пользователя, делает login ключевым полем в импорте пользователей вместо email</description>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="auth_fields">
+                        <type>multiple select</type>
+                        <name>Поля для авторизации</name>
+                        <default_value>login</default_value>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+</addon>
