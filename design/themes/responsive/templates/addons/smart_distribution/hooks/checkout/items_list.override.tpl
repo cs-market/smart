@@ -63,7 +63,7 @@
 
             <td class="ty-cart-content__product-elem ty-cart-content__price cm-reload-{$obj_id}" id="price_display_update_{$obj_id}">
                 {if $product.discount|floatval}
-                    <span class="ty-price-old">{include file="common/price.tpl" value=$product.original_price span_id="original_price_`$key`" class=" ty-strike"}</span>
+                    <span class="ty-price-old">{include file="common/price.tpl" value=$product.base_price span_id="original_price_`$key`" class=" ty-strike"}</span>
                     <span class="ty-price-actual">{include file="common/price.tpl" value=$product.display_price span_id="product_price_`$key`" class=""}</span>
                     <div>
                         {__('discount')}&nbsp;{include file="common/price.tpl" value=$product.discount span_id="discount_subtotal_`$key`" class="none"}
@@ -110,7 +110,7 @@
 
             <td class="ty-cart-content__product-elem ty-cart-content__price cm-reload-{$obj_id}" id="price_subtotal_update_{$obj_id}">
                 {if $product.discount|floatval}
-                    <span class="ty-price-old">{include file="common/price.tpl" value=$product.original_price*$product.amount span_id="original_subtotal_`$key`" class=" ty-strike"}</span>
+                    <span class="ty-price-old">{include file="common/price.tpl" value=$product.base_price*$product.amount span_id="original_subtotal_`$key`" class=" ty-strike"}</span>
                     <span class="ty-price-actual">{include file="common/price.tpl" value=$product.display_subtotal span_id="product_subtotal_`$key`" class=""}</span>
                     <div>
                         {__('discount')}&nbsp;{include file="common/price.tpl" value=$product.discount*$product.amount span_id="discount_subtotal_`$key`" class="none"}
