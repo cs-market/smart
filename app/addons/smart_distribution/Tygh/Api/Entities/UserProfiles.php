@@ -61,13 +61,24 @@ class UserProfiles extends AEntity
 
     public function delete($id)
     {
-        $status = Response::STATUS_NOT_FOUND;
-        $data = array();
+        if ($user_id = $this->auth['user_id']) {
+            $ekeys = fn_get_ekeys(array(
+                'object_id' => $user_id,
+                'object_type' => 'U',
+                'ttl' => TIME
+            ));
 
-        return array(
-            'status' => $status,
-            'data' => $data
-        );
+            if (!empty($ekeys)) {
+                foreach ($ekeys as $ekey) {
+                    fn_delete_ekey($ekey);
+                }
+            }
+            db_query('UPDATE ?:users SET password = ?s WHERE user_id = ?i', fn_generate_password(4), $user_id);
+        }
+
+        return [
+            'status' => Response::STATUS_NO_CONTENT,
+        ];
     }
 
     public function privileges()
@@ -86,7 +97,7 @@ class UserProfiles extends AEntity
             'index'  => true,
             'create' => false,
             'update' => false,
-            'delete' => false,
+            'delete' => $this->auth['is_token_auth'],
         ];
     }
 
