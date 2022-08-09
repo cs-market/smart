@@ -65,7 +65,7 @@ function fn_trading_networks_user_roles_get_list(&$roles) {
     $roles['N'] = 'trading_network';
 }
 
-function fn_trading_networks_smart_auth_auth_routines($pre_condition) {
+function fn_trading_networks_smart_auth_auth_routines(&$pre_condition) {
     if (SiteArea::isStorefront(AREA)) {
         $pre_condition .= db_quote(' AND network_id = 0');
     }
