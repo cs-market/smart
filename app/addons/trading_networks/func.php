@@ -19,7 +19,7 @@ use Tygh\Enum\ProductTracking;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_init_network($request) {
-    if (AREA != 'C') {
+    if (SiteArea::isAdmin(AREA)) {
         return array(INIT_STATUS_OK);
     }
     if (isset($request['switch_user_id']) && in_array($request['switch_user_id'], array_keys(Tygh::$app['session']['auth']['network_users']))) {
@@ -63,4 +63,10 @@ function fn_trading_networks_get_storages($params, $join, &$condition) {
 }
 function fn_trading_networks_user_roles_get_list(&$roles) {
     $roles['N'] = 'trading_network';
+}
+
+function fn_trading_networks_smart_auth_auth_routines($pre_condition) {
+    if (SiteArea::isStorefront(AREA)) {
+        $pre_condition .= db_quote(' AND network_id = 0');
+    }
 }

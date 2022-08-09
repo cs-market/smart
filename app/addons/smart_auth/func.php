@@ -34,8 +34,11 @@ function fn_smart_auth_auth_routines($request, $auth, &$field, &$condition, &$us
             }
         }
 
-        $cond = ' ( ' . implode(' OR ', $where) . ' ) ';
-        $users_data = db_get_array("SELECT * FROM ?:users WHERE ?p ?p", $cond, $condition);
+        $pre_condition = ' ( ' . implode(' OR ', $where) . ' ) ';
+
+        fn_set_hook('smart_auth_auth_routines', $pre_condition, $request, $auth, $field, $condition, $user_login);
+
+        $users_data = db_get_array("SELECT * FROM ?:users WHERE ?p ?p", $pre_condition, $condition);
 
         if (!empty($users_data)) {
             foreach ($users_data as $user_data) {
