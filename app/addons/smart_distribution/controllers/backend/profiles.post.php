@@ -31,11 +31,19 @@ if ($mode == 'update') {
     }
 
     $usergroups = Tygh::$app['view']->getTemplateVars('usergroups');
-    foreach ($user_data['usergroups'] as $id => $value) {
-        $usergroups[$id]['active'] = true;
+
+    $active_usergroups = array_keys(array_filter($user_data['usergroups'], function($v) {return $v['status'] == 'A';}));
+
+    foreach ($usergroups as $id => &$value) {
+        if (in_array($id, $active_usergroups)) {
+            $value['sort_field'] = 'A_' . $value['usergroup'];
+        } else {
+            $value['sort_field'] = 'D_' . $value['usergroup'];
+        }
     }
 
-    $usergroups = fn_sort_array_by_key($usergroups, 'active', SORT_DESC);
+    $usergroups = fn_sort_array_by_key($usergroups, 'sort_field');
+
     Tygh::$app['view']->assign('usergroups', $usergroups);
 
 } elseif ($mode == 'manage') {
