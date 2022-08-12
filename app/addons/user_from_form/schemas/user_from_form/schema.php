@@ -339,4 +339,9 @@ return [
             'b_firstname' => '479',
         ],
     ],
+    '127' => [
+        'page_id' => 127,
+        'usergroup_id' => [3552],
+        'add_user_data_to_email' => true,
+    ]
 ];

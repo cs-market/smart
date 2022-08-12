@@ -4,7 +4,7 @@ use Tygh\Pdf;
 use Tygh\Registry;
 
 //  [HOOKs]
-function fn_user_from_form_send_form($page_data, $form_values, &$result, $from, $sender, $attachments, $is_html, $subject)
+function fn_user_from_form_send_form(&$page_data, &$form_values, &$result, $from, $sender, $attachments, $is_html, $subject)
 {
     if ($result != true) {
         return;
@@ -17,29 +17,32 @@ function fn_user_from_form_send_form($page_data, $form_values, &$result, $from, 
     }
 
     $form_schema = $schema[$page_data['page_id']];
+    if (!$_SESSION['auth']['user_id']) {
+        $user_data = fn_create_user_field_from_form($form_schema['fields_map'], $form_values);
 
-    $user_data = fn_create_user_field_from_form($form_schema['fields_map'], $form_values);
-
-    $user_data = array_merge(
-        $user_data,
-        [
-            'user_type' => 'C',
-            'company_id' => $form_schema['company_id'],
-        ]
-    );
-
-    if (isset($form_schema['managers'])) {
-        $user_data['managers'] = $form_schema['managers'];
-    }
-    
-    Registry::set('settings.General.approve_user_profiles', 'N');
-    list($user_id) = fn_update_user(
-            '',
+        $user_data = array_merge(
             $user_data,
-            $auth,
-            true,   // ship_to_another
-            false   // notify_customer
-    );
+            [
+                'user_type' => 'C',
+                'company_id' => $form_schema['company_id'],
+            ]
+        );
+
+        if (isset($form_schema['managers'])) {
+            $user_data['managers'] = $form_schema['managers'];
+        }
+        
+        Registry::set('settings.General.approve_user_profiles', 'N');
+        list($user_id) = fn_update_user(
+                '',
+                $user_data,
+                $auth,
+                true,   // ship_to_another
+                false   // notify_customer
+        );
+    } else {
+        $user_id = $_SESSION['auth']['user_id'];
+    }
 
     if ($form_schema['render_document']) {
         fn_send_document_from_form($form_schema['document_map'], $form_values, $form_schema['render_document'], $user_id);
@@ -55,6 +58,38 @@ function fn_user_from_form_send_form($page_data, $form_values, &$result, $from, 
             fn_change_usergroup_status('A', $user_id, $id);
         }
     }
+
+    if ($form_schema['add_user_data_to_email']) {
+        $page_data['form']['elements'] = [
+            'user_name' => [
+                'element_id' => 'user_name', 
+                'page_id' => $page_data['page_id'], 
+                'parent_id' => 0, 
+                'element_type' => 'T', 
+                'value' => '', 
+                'position' => 1, 
+                'required' => 'Y', 
+                'status' => 'A', 
+                'description' => __('first_name_and_last_name')
+            ],
+            'user_code' => [
+                'element_id' => 'user_name', 
+                'page_id' => $page_data['page_id'], 
+                'parent_id' => 0, 
+                'element_type' => 'T', 
+                'value' => '', 
+                'position' => 1, 
+                'required' => 'Y', 
+                'status' => 'A', 
+                'description' => __('code')
+            ],
+        ] + $page_data['form']['elements'];
+
+        $user = fn_get_user_info($user_id);
+        $form_values['user_name'] = $user['firstname'];
+        $form_values['user_code'] = $user['fields']['38'];
+    }
+
     if ($user_id && !$user_data['status']) {
         db_query("UPDATE ?:users SET status = ?s WHERE user_id = ?i", "A", $user_id);
     }
