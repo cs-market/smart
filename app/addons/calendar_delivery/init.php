@@ -24,7 +24,8 @@ fn_register_hooks(
     'update_storage_pre',
     'get_storages',
     'delete_storages',
-    'post_delete_user'
+    'post_delete_user',
+    'min_order_amount_extra_additional_ordering'
 );
 
 // backward compatibility

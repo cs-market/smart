@@ -292,9 +292,16 @@ function fn_calendar_delivery_calculate_cart_content_after_shipping_calculation(
                         $shipping['service_params']['weekdays_availability'] = strrev($weekdays_availability);
                     }
                 }
+
+                // CHECK TWICE
+                if (!isset($group['delivery_date']) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
+                    $nearest_delivery_day = reset($group['chosen_shippings'])['service_params']['nearest_delivery_day'];
+                    $group['delivery_date'] = fn_date_format(strtotime("+ $nearest_delivery_day day"), Registry::get('settings.Appearance.date_format'));
+                }
             }
         }
     }
+
     unset($group, $shipping);
 }
 
@@ -478,4 +485,8 @@ function fn_calendar_delivery_delete_storages($storage_ids) {
 
 function fn_calendar_delivery_post_delete_user($user_id, $user_data, $result) {
     if ($result) db_query("DELETE FROM ?:user_storages WHERE user_id = ?i", $user_id);
+}
+
+function fn_calendar_delivery_min_order_amount_extra_additional_ordering(&$params, $product_groups) {
+    $params['delivery_date'] = fn_parse_date($product_groups[0]['delivery_date']);
 }

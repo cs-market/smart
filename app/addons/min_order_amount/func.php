@@ -1,6 +1,7 @@
 <?php
 
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -32,8 +33,17 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
     $formatter = Tygh::$app['formatter'];
     $orders = array();
 
-    if ( isset($cart['user_data']['company_id']) && db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $cart['user_data']['company_id']) == 'Y') {
-        list($orders) = fn_get_orders(['user_id' => $cart['user_data']['user_id'], 'period' => 'D', 'delivery_date' => fn_parse_date($cart['delivery_date'][$cart['user_data']['company_id']]), 'profile_id' => $cart['profile_id']]);
+    if ( isset($cart['user_data']['company_id']) && YesNo::toBool(db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $cart['user_data']['company_id']))) {
+        $params = [
+            'user_id' => $cart['user_data']['user_id'],
+            'period' => 'D',
+            'profile_id' => $cart['profile_id'],
+        ];
+
+        fn_set_hook('min_order_amount_extra_additional_ordering', $params, $product_groups, $cart, $cart_products);
+
+        list($orders) = fn_get_orders($params);
+        if (!empty($orders)) return;
     }
 
     if (!empty($cart['user_data']['min_order_amount'])) {
@@ -95,16 +105,7 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
             }
         }
 
-        // check by storage
-        foreach ($cart['product_groups'] as $group) {
-            if ($group['storage_id'] && $min_order = Registry::get('runtime.storages')[$group['storage_id']]['min_order_amount']) {
-                if ($min_order > $group['package_info']['C']) {
-                    $min_amount = $formatter->asPrice($min_order);
-                    $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('storages.with_storage') . ' ' . Registry::get('runtime.storages')[$group['storage_id']]['storage'];
-                    $cart['min_order_failed'] = true;
-                }
-            }
-        }
+        fn_set_hook('min_order_amount_extra_check',$product_groups, $cart, $cart_products);
     }
 }
 

@@ -5,7 +5,7 @@
 {/if}
 
 <div class="ty-calendar__block">
-    <input type="text" id="{$date_id}" name="{$date_name}" class="ty-calendar__input{if $date_meta} {$date_meta}{/if} cm-calendar" value="{if $date_val}{$date_val|date_format:"`$date_format`"}{/if}" {$extra} size="10" data-ca-lite-checkout-auto-save-on-change="true" data-ca-lite-checkout-field="{$date_name}"/>
+    <input type="text" id="{$date_id}" name="{$date_name}" class="ty-calendar__input{if $date_meta} {$date_meta}{/if} cm-calendar" value="{if $date_val}{$date_val|date_format:"`$date_format`"}{/if}" {$extra} size="10" data-ca-calendar-delivery-auto-save-on-change="true" data-ca-calendar-delivery-field="{$date_name}"/>
     <a class="cm-external-focus ty-calendar__link" data-ca-external-focus-id="{$date_id}">
         <i class="ty-icon-calendar ty-calendar__button" title="{__("calendar")}"></i>
     </a>

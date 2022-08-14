@@ -2,7 +2,7 @@
 <addon scheme="2.0">
     <id>smart_auth</id>
     <version>1.0.1</version>
-    <default_language>кг</default_language>
+    <default_language>ru</default_language>
     <priority>100</priority>
     <status>active</status>
     <name>Smart distribution: умная авторизация</name>
