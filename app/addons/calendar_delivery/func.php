@@ -434,17 +434,19 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
             if (empty($group['delivery_date'])) {
                 $res = false;
             } else {
-                $choosed_ts = fn_parse_date($group['delivery_date']);
-                $nearest_delivery = $group['chosen_shippings'][0]['service_params']['nearest_delivery_day'];
+                $chosen_ts = fn_parse_date($group['delivery_date']);
+                $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
+                $nearest_delivery_day = $group['shippings'][$chosen_shipping_id]['service_params']['nearest_delivery_day'];
+                
                 $ts = ($nearest_delivery) ? strtotime("+$nearest_delivery days") : time();
                 $compare_ts = fn_ts_this_day($ts);
-                if ($choosed_ts < $compare_ts) {
+                if ($chosen_ts < $compare_ts) {
                     $res = false;
                 }
 
-                if (!empty($group['chosen_shippings'][0]['service_params']['weekdays_availability'])) {
-                    $weekdays_availability = $group['chosen_shippings'][0]['service_params']['weekdays_availability'];
-                    $weekday = 1 << getdate($choosed_ts)['wday'];
+                if (!empty($group['shippings'][$chosen_shipping_id]['service_params']['weekdays_availability'])) {
+                    $weekdays_availability = $group['shippings'][$chosen_shipping_id]['service_params']['weekdays_availability'];
+                    $weekday = 1 << getdate($chosen_ts)['wday'];
                     if (!(bindec($weekdays_availability) & $weekday)) {
                         $res = false;   
                     }
