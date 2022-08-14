@@ -486,3 +486,15 @@ function fn_storages_min_order_amount_extra_check($product_groups, &$cart, $cart
         }
     }
 }
+
+function fn_storages_calendar_delivery_weekdays_availability(&$weekdays_availability, $group) {
+    if (!empty($group['storage_id'])) {
+        $storage_weekdays = '1111111';
+
+        $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
+        $storage_weekdays[0] = YesNo::toBool($storage_settings['sunday_shipping']) ? 1 : 0;
+        $storage_weekdays[6] = YesNo::toBool($storage_settings['saturday_shipping']) ? 1 : 0;
+
+        $weekdays_availability = $weekdays_availability & $storage_weekdays;
+    }
+}

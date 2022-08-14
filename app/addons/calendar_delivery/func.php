@@ -241,7 +241,7 @@ function fn_calendar_delivery_user_init(&$auth, &$user_info) {
     }
 }
 
-function fn_calendar_delivery_calculate_cart_content_after_shipping_calculation($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $lang_code, $area, $cart_products, &$product_groups) {
+function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$product_groups, $calculate_taxes, $auth) {
     if (!empty($auth['user_id'])) {
         foreach($product_groups as $group_id => &$group) {
             $calendar_shippings = array_filter($group['shippings'], function($v) {return (isset($v['service_code']) && $v['service_code'] == 'calendar');});
@@ -271,14 +271,9 @@ function fn_calendar_delivery_calculate_cart_content_after_shipping_calculation(
                 $company_weekdays[0] = YesNo::toBool($company_settings['sunday_shipping']) ? 1 : 0;
                 $company_weekdays[6] = YesNo::toBool($company_settings['saturday_shipping']) ? 1 : 0;
 
-                $storage_weekdays = '1111111';
-                if (!empty($group['storage_id'])) {
-                    $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
-                    $storage_weekdays[0] = YesNo::toBool($storage_settings['sunday_shipping']) ? 1 : 0;
-                    $storage_weekdays[6] = YesNo::toBool($storage_settings['saturday_shipping']) ? 1 : 0;
-                }
+                $weekdays_availability = $company_weekdays & $user_weekdays;
 
-                $weekdays_availability = $company_weekdays & $storage_weekdays & $user_weekdays;
+                fn_set_hook('calendar_delivery_weekdays_availability', $weekdays_availability, $group);
 
                 foreach ($group['shippings'] as $shipping_id => &$shipping) {
                     if (isset($shipping['module']) && $shipping['module'] == 'calendar_delivery') {
@@ -293,9 +288,9 @@ function fn_calendar_delivery_calculate_cart_content_after_shipping_calculation(
                     }
                 }
 
-                // CHECK TWICE
                 if (!isset($group['delivery_date']) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
-                    $nearest_delivery_day = reset($group['chosen_shippings'])['service_params']['nearest_delivery_day'];
+                    $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
+                    $nearest_delivery_day = $group['shippings'][$chosen_shipping_id]['service_params']['nearest_delivery_day'];
                     $group['delivery_date'] = fn_date_format(strtotime("+ $nearest_delivery_day day"), Registry::get('settings.Appearance.date_format'));
                 }
             }

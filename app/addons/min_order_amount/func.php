@@ -33,9 +33,9 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
     $formatter = Tygh::$app['formatter'];
     $orders = array();
 
-    if ( isset($cart['user_data']['company_id']) && YesNo::toBool(db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $cart['user_data']['company_id']))) {
+    if ( isset($auth['company_id']) && YesNo::toBool(db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $auth['company_id']))) {
         $params = [
-            'user_id' => $cart['user_data']['user_id'],
+            'user_id' => $auth['user_id'],
             'profile_id' => $cart['profile_id'],
         ];
 

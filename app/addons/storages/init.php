@@ -22,7 +22,8 @@ fn_register_hooks(
     'update_product_amount',
     'get_order_info',
     'monolith_generate_xml',
-    'min_order_amount_extra_check'
+    'min_order_amount_extra_check',
+    'calendar_delivery_weekdays_availability'
 );
 
 fn_init_stack(array('fn_init_storages', &$_REQUEST));

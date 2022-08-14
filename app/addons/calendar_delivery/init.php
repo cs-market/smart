@@ -18,7 +18,7 @@ fn_register_hooks(
     'get_user_info',
     'get_user_short_info_pre',
     'user_init',
-    'calculate_cart_content_after_shipping_calculation',
+    'calculate_cart_taxes_pre',
     'get_usergroups',
     'allow_place_order_post',
     'update_storage_pre',
