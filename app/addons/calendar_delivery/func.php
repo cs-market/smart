@@ -281,6 +281,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                             $shipping['service_params']['customer_shipping_calendar'] = $delivery_dates;
                         }
                         // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
+                        $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
                         $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $storage_settings, $usergroup_working_time_till);
 
                         $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
