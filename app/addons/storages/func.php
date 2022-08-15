@@ -498,3 +498,10 @@ function fn_storages_calendar_delivery_weekdays_availability(&$weekdays_availabi
         $weekdays_availability = $weekdays_availability & $storage_weekdays;
     }
 }
+
+function fn_storages_calendar_delivery_service_params($group, &$shipping, $company_settings, $usergroup_working_time_till) {
+    if (!empty($group['storage_id'])) {
+        $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
+        $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $storage_settings, $usergroup_working_time_till);
+    }
+}
