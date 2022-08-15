@@ -291,7 +291,9 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                     }
                 }
 
-                if (!isset($group['delivery_date']) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
+                $chosen_delivery_date = !empty($cart['delivery_date'][$group_id]) ? $cart['delivery_date'][$group_id] : $group['delivery_date'];
+                $group['delivery_date'] = $chosen_delivery_date;
+                if (empty($chosen_delivery_date) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
                     $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
                     $nearest_delivery_day = $group['shippings'][$chosen_shipping_id]['service_params']['nearest_delivery_day'];
                     $group['delivery_date'] = fn_date_format(strtotime("+ $nearest_delivery_day day"), Registry::get('settings.Appearance.date_format'));
