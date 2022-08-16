@@ -1158,7 +1158,7 @@ function fn_smart_distribution_send_form(&$page_data, $form_values, $result, $fr
     if (Tygh::$app['session']['auth']['user_id']) {
         $managers = fn_smart_distribution_get_managers(['user_id' => Tygh::$app['session']['auth']['user_id']]);
         if (!empty($managers)) {
-            $page_data['form']['general'][FORM_RECIPIENT] = array_column($managers, 'email', 'name');
+            $page_data['form']['general'][FORM_RECIPIENT] = [$page_data['form']['general'][FORM_RECIPIENT]] + array_column($managers, 'email', 'name');
         }
     }
 }
