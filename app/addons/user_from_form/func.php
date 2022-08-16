@@ -83,11 +83,23 @@ function fn_user_from_form_send_form(&$page_data, &$form_values, &$result, $from
                 'status' => 'A', 
                 'description' => __('code')
             ],
+            'vendor' => [
+                'element_id' => 'vendor', 
+                'page_id' => $page_data['page_id'], 
+                'parent_id' => 0, 
+                'element_type' => 'T', 
+                'value' => '', 
+                'position' => 1, 
+                'required' => 'Y', 
+                'status' => 'A', 
+                'description' => __('company_name')
+            ],
         ] + $page_data['form']['elements'];
 
         $user = fn_get_user_info($user_id);
         $form_values['user_name'] = $user['firstname'];
         $form_values['user_code'] = $user['fields']['38'];
+        $form_values['vendor'] = fn_get_company_name($user['company_id']);
     }
 
     if ($user_id && !$user_data['status']) {
