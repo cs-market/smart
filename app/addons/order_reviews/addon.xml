@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>order_reviews</id>
+    <version>1.0.1</version>
+    <default_language>ru</default_language>
+    <priority>100</priority>
+    <status>active</status>
+    <name>Smart distribution: отзывы о заказах</name>
+    <description>Позволяет покупателям оставлять отзывы и обратную связь о заказе</description>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <compatibility>
+        <dependencies>discussion</dependencies>
+    </compatibility>
+    <language_variables>
+        <item lang="ru" id="order_reviews.allow_order_reviews">Позволить пользователям оставлять отзывы о заказе</item>
+        <item lang="ru" id="order_reviews.leave_review">Поставьте оценку заказу</item>
+    </language_variables>
+    <queries>
+        <item for="install" editions="MULTIVENDOR">ALTER TABLE `?:companies` ADD `allow_order_reviews` VARCHAR(1) NOT NULL DEFAULT 'N';</item>
+        <item for="uninstall" editions="MULTIVENDOR">ALTER TABLE `?:companies` DROP `allow_order_reviews`;</item>
+    </queries>
+</addon>
