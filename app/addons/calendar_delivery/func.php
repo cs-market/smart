@@ -416,6 +416,13 @@ function fn_get_customer_delivery_dates($user_id)
 
 function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_order_id, $total, &$result) {
     if (Registry::get('runtime.mode') != 'checkout') {
+        if (isset($cart['delivery_date']) && is_array($cart['delivery_date'])) {
+            foreach ($cart['delivery_date'] as $group_id => $date) {
+                $cart['product_groups'][$group_id]['delivery_date'] = $date;
+            }
+            unset($cart['delivery_date']);
+        }
+
         foreach ($cart['product_groups'] as $group_id => &$group) {
             $res = true;
             if ($group['chosen_shippings'][0]['module'] != 'calendar_delivery') {
@@ -432,7 +439,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
             }
 
             // backward compatibility (for mobile app)
-            $group['delivery_date'] = !empty($cart_delivery_day) ? $cart_delivery_day : $group['delivery_date'];
+            $cart['delivery_date'] = $group['delivery_date'] = !empty($group['delivery_date']) ? $group['delivery_date'] : $cart_delivery_day;
 
             if (is_array($group['delivery_date'])) $group['delivery_date'] = array_shift($group['delivery_date']);
 
