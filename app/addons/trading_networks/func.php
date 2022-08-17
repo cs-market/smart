@@ -38,12 +38,14 @@ function fn_trading_networks_user_logout_after($auth) {
     }
 }
 
-function fn_trading_networks_get_users($params, $fields, $sortings, &$condition, $join, $auth) {
+function fn_trading_networks_get_users($params, &$fields, $sortings, &$condition, $join, $auth) {
     if (isset($params['network_id'])) {
         if (empty($params['network_id'])) {
             $condition['trading_network'] = db_quote(' AND 0');
         } else {
             $condition['trading_network'] = db_quote(' AND network_id = ?i', $params['network_id']);
+            $fields[] = '?:user_profiles.b_address';
+            $fields[] = '?:user_profiles.s_address';
         }
     }
 }
