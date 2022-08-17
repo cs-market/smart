@@ -5,7 +5,11 @@
                 <div class="ty-trading-network__container">
                     {foreach from=$auth.network_users item="network" key="network_id"}
                     <a href="{$config.current_url|fn_link_attach:"switch_user_id=`$network_id`"}" class="ty-trading-network__item">
-                        {$network.firstname nofilter}
+                        <p><b>{$network.firstname nofilter}</b></p>
+                        <p class="muted">{__('code')}: {$network.email nofilter}</p>
+                        {if $network.s_address|trim}
+                            <p class="muted">{$network.s_address nofilter}</p>
+                        {/if}
                     </a>
                     {/foreach}
                 </div>
