@@ -432,7 +432,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
             }
 
             // backward compatibility (for mobile app)
-            $group['delivery_date'] = $group['delivery_date'] ?? $cart_delivery_day;
+            $group['delivery_date'] = !empty($cart_delivery_day) ? $cart_delivery_day : $group['delivery_date'];
 
             if (is_array($group['delivery_date'])) $group['delivery_date'] = array_shift($group['delivery_date']);
 
