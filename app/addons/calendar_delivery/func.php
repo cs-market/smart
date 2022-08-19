@@ -291,7 +291,12 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                     }
                 }
 
-                $chosen_delivery_date = !empty($cart['delivery_date'][$group_id]) ? $cart['delivery_date'][$group_id] : $group['delivery_date'];
+                if (!empty($cart['delivery_date']) && is_array($cart['delivery_date'])) {
+                    $chosen_delivery_date = $cart['delivery_date'][$group_id];
+                } else {
+                    $chosen_delivery_date = $group['delivery_date'];
+                }
+
                 $group['delivery_date'] = $chosen_delivery_date;
                 if (empty($chosen_delivery_date) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
                     $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
