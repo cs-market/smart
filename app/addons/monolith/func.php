@@ -192,3 +192,10 @@ function fn_monolith_place_order_post($cart, $auth, $action, $issuer_id, $parent
         } 
     }
 }
+
+// duplicate from frontend controller for mobile application
+function fn_monolith_allow_place_order_post(&$cart) {
+    if (empty($cart['user_data']['email'])) {
+        $cart['user_data']['email'] = fn_checkout_generate_fake_email_address($cart['user_data'], TIME);
+    }
+}
