@@ -174,14 +174,32 @@ EOT;
 </soap12:Envelope>
 EOT;
 
-    $result = HTTP::POST($addon['environment_url'], $soap, array(
+    $response = HTTP::POST($addon['environment_url'], $soap, array(
         'headers' => array(
             'Content-type: application/soap+xml; charset=utf-8'
         ))
     );
+
+    $result = fn_monolith_parse_soap_response($response);
+
     return $result;
 }
 
+function fn_monolith_parse_soap_response($response) {
+    $result = true;
+    if (empty(trim($response))) {
+        return false;
+    }
+    $data = json_decode(json_encode(simplexml_load_string(str_ireplace(['SOAP-ENV:', 'SOAP:'], '', $response))), 1);
+    $xml_response = $data['Body']['RequestResponse']['RequestResult'];
+    $result = (array) simplexml_load_string($xml_response);
+    if (isset($result['error'])) {
+        return false;
+    } else {
+        return true;
+    }
+}
+/*
 function fn_monolith_place_order_post($cart, $auth, $action, $issuer_id, $parent_order_id, $order_id, $order_status, $short_order_data, $notification_rules) {
     if (count($cart['product_groups']) == 1) {
         $xml = fn_monolith_generate_xml($order_id);
@@ -191,7 +209,7 @@ function fn_monolith_place_order_post($cart, $auth, $action, $issuer_id, $parent
             }
         } 
     }
-}
+}*/
 
 // duplicate from frontend controller for mobile application
 function fn_monolith_allow_place_order_post(&$cart) {
