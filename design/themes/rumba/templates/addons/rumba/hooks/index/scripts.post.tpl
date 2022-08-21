@@ -16,5 +16,9 @@
         $.ceEvent('on', 'ce.valuechangerdecrease', function(inp, step, min_qty, new_val) {
             fn_change_amount_value(inp, new_val)
         });
+
+        $.ceEvent('on', 'ce.commoninit', function() {
+            $('input[type=checkbox][data-toggle^=toggle]').bootstrapToggle();
+        });
     }(Tygh, Tygh.$));
 </script>
