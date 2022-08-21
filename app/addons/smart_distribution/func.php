@@ -1048,8 +1048,8 @@ function fn_smart_distribution_get_products_post(&$products, $params, $lang_code
             if (!empty($cur_id_path)) {
                 $cur_id_path = explode('/', $cur_id_path);
                 $root_cat = array_shift($cur_id_path);
-                if ($root_cat == '8676') $product['product'] = 'Опт ' . $product['product'];
-                if ($root_cat == '8596') $product['product'] = 'Розница ' . $product['product'];
+                if ($root_cat == '8676' || $root_cat == '8978') $product['product'] = 'Опт: ' . $product['product'];
+                if ($root_cat == '8596' || $root_cat == '9019') $product['product'] = 'Розница: ' . $product['product'];
             }
         }
     }
