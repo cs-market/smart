@@ -320,8 +320,8 @@ function fn_storages_add_product_to_cart_get_price($product_data, $cart, $auth, 
 
 function fn_storages_pre_get_cart_product_data($hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, &$fields, &$join, $params) {
     if ($storages = Registry::get('runtime.storages') && !empty($product['extra']['storage_id'])) {
-        $fields[] = '?:storages_products.qty_step';
-        $fields[] = '?:storages_products.min_qty';
+        $fields[] = '?:storages_products.qty_step as storage_qty_step';
+        $fields[] = '?:storages_products.min_qty storage_min_qty';
         $join .= db_quote(' RIGHT JOIN ?:storages_products ON ?:storages_products.product_id = ?:products.product_id AND ?:storages_products.storage_id = ?i', $product['extra']['storage_id']);
     }
 }
@@ -329,7 +329,8 @@ function fn_storages_pre_get_cart_product_data($hash, $product, $skip_promotion,
 function fn_storages_get_cart_product_data($product_id, &$_pdata, $product, $auth, $cart, $hash) {
     if ($storages = Registry::get('runtime.storages')) {
         $usergroup_ids = $auth['usergroup_ids'];
-
+        $_pdata['min_qty'] = !empty($_pdata['storage_min_qty']) ? $_pdata['storage_min_qty'] : $_pdata['min_qty'];
+        $_pdata['qty_step'] = !empty($_pdata['storage_qty_step']) ? $_pdata['storage_qty_step'] : $_pdata['qty_step'];
 
         $storage = $storages[$product['extra']['storage_id']];
         if (!empty($storage['usergroup_ids'])) {
@@ -362,7 +363,7 @@ function fn_storages_check_amount_in_stock_before_check($product_id, $amount, $p
 
     if ($storage_id) {
         $product = db_get_row(
-            'SELECT p.tracking, s.amount, s.min_qty, p.max_qty, s.qty_step, p.list_qty_count, p.out_of_stock_actions, p.product_type, pd.product'
+            'SELECT p.tracking, s.amount, p.min_qty, p.max_qty, p.qty_step, s.min_qty AS storage_min_qty, s.qty_step AS storage_qty_step, p.list_qty_count, p.out_of_stock_actions, p.product_type, pd.product'
             . ' FROM ?:products AS p'
             . ' LEFT JOIN ?:product_descriptions AS pd ON pd.product_id = p.product_id AND lang_code = ?s'
             . ' RIGHT JOIN ?:storages_products AS s ON s.product_id = p.product_id AND storage_id = ?i'
@@ -371,6 +372,9 @@ function fn_storages_check_amount_in_stock_before_check($product_id, $amount, $p
             $storage_id,
             $product_id
         );
+
+        $product['min_qty'] = !empty($product['storage_min_qty']) ? $product['storage_min_qty'] : $product['min_qty'];
+        $product['qty_step'] = !empty($product['storage_qty_step']) ? $product['storage_qty_step'] : $product['qty_step'];
 
         $product = fn_normalize_product_overridable_fields($product);
 
