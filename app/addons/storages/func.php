@@ -282,6 +282,10 @@ function fn_init_storages() {
     return array(INIT_STATUS_OK);
 }
 
+function fn_storages_login_user_post($user_id, $cu_id, $udata, $auth, $condition, $result) {
+    fn_delete_session_data('storage');
+}
+
 function fn_storages_user_logout_before_save_cart($auth) {
     fn_delete_session_data('storage');
 }
