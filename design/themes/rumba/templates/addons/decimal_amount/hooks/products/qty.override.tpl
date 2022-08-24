@@ -19,7 +19,6 @@
         {if $settings.Appearance.quantity_changer == "Y"}
             <a class="cm-increase ty-value-changer__increase">&#43;</a>
         {/if}
-        {if $product.company_id == 45}<span class="muted" style="margin-right: 5px;">{__('items')}</span>{/if}
         <input type="text" size="5" class="ty-value-changer__input cm-amount" id="qty_count_{$obj_prefix}{$obj_id}" name="product_data[{$obj_id}][amount]" value="{$default_amount}" data-ca-val="{$default_amount}" {if $product.qty_step} data-ca-step="{$product.qty_step}"{/if} data-ca-min-qty="{if $product.min_qty}{$product.min_qty}{/if}" />
         {if $settings.Appearance.quantity_changer == "Y"}
             <a class="cm-decrease ty-value-changer__decrease">&minus;</a>

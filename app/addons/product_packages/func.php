@@ -27,3 +27,12 @@ function fn_product_packages_load_products_extra_data(&$extra_fields, $products,
         ];
     }
 }
+
+function fn_product_packages_pre_add_to_cart(&$product_data) {
+    foreach ($product_data as $key => &$product) {
+        if (isset($product['shop_by_packages']) && !empty($product['shop_by_packages']) && !empty($product['amount'])) {
+            $product['amount'] *= $product['shop_by_packages'];
+            unset($product['shop_by_packages']);
+        }
+    }
+}
