@@ -8,7 +8,8 @@
                 new_step = state ? 1 : $(this).data('caStep');
                 qty_id.attr('data-ca-step', new_step).data('caMinQty', new_step).val(new_step).trigger('change');
                 id = qty_id.attr('id').replace('qty_count_', '');
-                $('#for_qty_count_'+id).data('caBoxContains', new_step);
+                new_box_contains = state ? 1 : $('#for_qty_count_'+id).attr('data-ca-box-contains');
+                $('#for_qty_count_'+id).data('caBoxContains', new_box_contains);
                 $.ceEvent('trigger', 'ce.valuechangerincrease', [qty_id, new_step, new_step, new_step]);
             });
         });
