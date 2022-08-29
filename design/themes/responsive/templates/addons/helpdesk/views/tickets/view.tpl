@@ -9,7 +9,7 @@
                         <span class="ty-discussion-post__author">{$post.user}</span>
                         <div class="ty-discussion-post" id="post_{$post.ticket_id}_{$post.message_id}">
                             <div class="ty-discussion-post__message">
-                                {$post.message|strip_tags nofilter}
+                                {$post.message nofilter}
                                 {if $post.files}
                                     {foreach from=$post.files item="file" name='files'}
                                     <a href="{"tickets.get_file?file_id=`$file.file_id`"|fn_url}">{$file.filename}</a>{if !$smarty.foreach.files.last}<hr/>{/if}
