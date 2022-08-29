@@ -107,7 +107,11 @@ function fn_product_groups_split_cart($cart) {
                 }
                 $p_groups[$group_id]['products'][$cart_id] = $product;
                 $p_groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
-                $package_info = [];
+                $package_info = [
+                    'C' => 0,
+                    'W' => 0,
+                    'I' => 0,
+                ];
                 if (is_array($p_groups[$group_id]['products'])) {
                     foreach ($p_groups[$group_id]['products'] as $key_product => $product) {
                         if (($product['is_edp'] == 'Y' && $product['edp_shipping'] != 'Y') ||

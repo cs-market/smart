@@ -35,9 +35,11 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
 
     if ( isset($auth['company_id']) && YesNo::toBool(db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $auth['company_id']))) {
         $params = [
-            'user_id' => $auth['user_id'],
-            'profile_id' => $cart['profile_id'],
+            'user_id' => $auth['user_id']
         ];
+        if (!empty($cart['profile_id'])) {
+            $params['profile_id'] = $cart['profile_id'];
+        }
 
         fn_set_hook('min_order_amount_extra_additional_ordering', $params, $product_groups, $cart, $cart_products);
 

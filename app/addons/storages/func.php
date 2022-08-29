@@ -271,10 +271,14 @@ function fn_init_storages() {
             fn_set_session_data('storage', $storage, COOKIE_ALIVE_TIME);
         }
 
-        Registry::set('runtime.current_storage', $storages[$storage]);
         Registry::set('runtime.storages', $storages);
-
-        fn_define('STORAGE', $storage);
+        if (!empty($storage)) {
+            Registry::set('runtime.current_storage', $storages[$storage]);
+            fn_define('STORAGE', $storage);
+        } else {
+            Registry::set('runtime.current_storage', false);
+            fn_define('STORAGE', false);
+        }
 
         Tygh::$app['view']->assign('storages', $storages);
     }

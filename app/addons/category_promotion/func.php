@@ -224,7 +224,7 @@ function fn_category_promotion_get_promotions_post($params, $items_per_page, $la
     }
     if (SiteArea::isStorefront(AREA)) {
         $promotions = array_filter($promotions, function($promotion) {
-            $conditions = unserialize($promotion['conditions']);
+            $conditions = (is_string($promotion['conditions'])) ? unserialize($promotion['conditions']) : $promotion['conditions'];
             fn_cleanup_promotion_condition($conditions, ['usergroup', 'users']);
             $promotion['conditions'] = $conditions;
             $cart_products = [];
@@ -234,13 +234,15 @@ function fn_category_promotion_get_promotions_post($params, $items_per_page, $la
 }
 
 function fn_cleanup_promotion_condition(&$conditions_group, $allowed_conditions) {
-    foreach ($conditions_group['conditions'] as $i => &$group_item) {
-        if (isset($group_item['conditions'])) {
-            fn_cleanup_promotion_condition($group_item, $allowed_conditions);
-            if (empty($group_item['conditions'])) unset($conditions_group['conditions'][$i]);
-        } elseif ((is_array($allowed_conditions) && !in_array($group_item['condition'], $allowed_conditions)) || $group_item['condition'] == $allowed_conditions) {
-            unset($conditions_group['conditions'][$i]);
-        }   
+    if (!empty($conditions_group['conditions'])) {
+        foreach ($conditions_group['conditions'] as $i => &$group_item) {
+            if (isset($group_item['conditions'])) {
+                fn_cleanup_promotion_condition($group_item, $allowed_conditions);
+                if (empty($group_item['conditions'])) unset($conditions_group['conditions'][$i]);
+            } elseif ((is_array($allowed_conditions) && !in_array($group_item['condition'], $allowed_conditions)) || $group_item['condition'] == $allowed_conditions) {
+                unset($conditions_group['conditions'][$i]);
+            }
+        }
     }
     //if (empty($conditions_group['conditions'])) unset($conditions_group['conditions']);
 }

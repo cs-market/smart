@@ -29,12 +29,12 @@ function fn_promotion_motivation_promotion_apply_pre($promotions, $zone, &$data,
                                 }
                                 $products = implode(',', $products);
                             }
-                            
+
                             $motivation_replacement = [
                                 '[current_value]' => $formatter->asPrice($current_value),
                                 '[value]' => $formatter->asPrice($motivation_condition['value']),
                                 '[diff]' => $formatter->asPrice(abs($motivation_condition['value'] - $current_value)),
-                                '[gift]' => $products
+                                '[gift]' => $products ?? ''
                             ];
                             $data['promotion_motivation'] = ['title' => $promotion['name'], 'body' => __($motivation_type,  $motivation_replacement)];
                         }

@@ -78,6 +78,7 @@ function fn_promotion_validate_promotion_progress($promotion_id, $promo, $auth, 
 
 if (!is_callable('fn_find_promotion_condition')) {
     function fn_find_promotion_condition(&$conditions_group, $needle, $remove = false) {
+        $res = false;
         foreach ($conditions_group['conditions'] as $i => $group_item) {
             if (isset($group_item['conditions'])) {
                 $res = fn_find_promotion_condition($conditions_group['conditions'][$i], $needle, $remove);
@@ -88,7 +89,7 @@ if (!is_callable('fn_find_promotion_condition')) {
             if ($res) return $res;
         }
 
-        return false;
+        return $res;
     }
 }
 

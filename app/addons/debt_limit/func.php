@@ -10,8 +10,8 @@ function fn_debt_limit_get_user_short_info_pre($user_id, &$fields, $condition, $
 function fn_debt_limit_user_init(&$auth, $user_info)
 {
     // TODO get this data not from auth but from registry user info in templates etc
-    $auth['debt'] = $user_info['debt'];
-    $auth['limit'] = $user_info['limit'];
+    if (isset($user_info['debt'])) $auth['debt'] = $user_info['debt'];
+    if (isset($user_info['limit'])) $auth['limit'] = $user_info['limit'];
 }
 
 function fn_debt_limit_exim_1c_update_order($order_data, $cml) {

@@ -40,7 +40,7 @@ function fn_calendar_delivery_uninstall()
 }
 
 function fn_calendar_delivery_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
-    if (isset($params['delivery_date']) && !empty($params['delivery_date'])) {
+    if (isset($params['delivery_date'])) {
         $condition .= db_quote(' AND (?:orders.delivery_date = ?i OR ?:orders.delivery_date = 0)', $params['delivery_date']);
     }
 }
@@ -281,7 +281,6 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                             $shipping['service_params']['customer_shipping_calendar'] = $delivery_dates;
                         }
                         // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
-                        $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
                         $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $usergroup_working_time_till);
 
                         fn_set_hook('calendar_delivery_service_params', $group, $shipping, $company_settings, $usergroup_working_time_till);
@@ -293,12 +292,13 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
 
                 if (!empty($cart['delivery_date']) && is_array($cart['delivery_date'])) {
                     $chosen_delivery_date = $cart['delivery_date'][$group_id];
-                } else {
+                } elseif (!empty($group['delivery_date'])) {
                     $chosen_delivery_date = $group['delivery_date'];
                 }
 
-                $group['delivery_date'] = $chosen_delivery_date;
-                if (empty($chosen_delivery_date) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
+                if (!empty($chosen_delivery_date)) {
+                    $group['delivery_date'] = $chosen_delivery_date;
+                } elseif (!empty($group['chosen_shippings']) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
                     $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
                     $nearest_delivery_day = $group['shippings'][$chosen_shipping_id]['service_params']['nearest_delivery_day'];
                     $group['delivery_date'] = fn_date_format(strtotime("+ $nearest_delivery_day day"), Registry::get('settings.Appearance.date_format'));
@@ -502,5 +502,5 @@ function fn_calendar_delivery_post_delete_user($user_id, $user_data, $result) {
 }
 
 function fn_calendar_delivery_min_order_amount_extra_additional_ordering(&$params, $product_groups) {
-    $params['delivery_date'] = fn_parse_date($product_groups[0]['delivery_date']);
+    $params['delivery_date'] = (isset($product_groups[0]['delivery_date'])) ? fn_parse_date($product_groups[0]['delivery_date']) : 0;
 }

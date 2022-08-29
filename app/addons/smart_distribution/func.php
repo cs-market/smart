@@ -279,7 +279,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
             }
         }
     }
-    if (YesNo::toBool($params['registration_period'])) {
+    if (isset($params['registration_period']) && YesNo::toBool($params['registration_period'])) {
         list($registration_period_time_from, $registration_period_time_to) = fn_create_periods([
             'period' => $params['registration_period_period'],
             'time_from' => $params['registration_period_time_from'],
@@ -1362,7 +1362,7 @@ function fn_smart_distribution_get_orders_post($params, &$orders) {
 function fn_smart_distribution_extract_cart(&$cart, $user_id, $type, $user_type) {
     if (!empty($cart['products']))
     foreach ($cart['products'] as &$product) {
-        if (!Storage::instance('images')->isExist($product['main_pair']['detailed']['relative_path'])) {
+        if (!isset($product['main_pair']['detailed']['relative_path']) || !Storage::instance('images')->isExist($product['main_pair']['detailed']['relative_path'])) {
             $product['main_pair'] = fn_get_image_pairs($product['product_id'], 'product', 'M', true, true);
         }
     }

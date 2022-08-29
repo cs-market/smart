@@ -8,7 +8,7 @@ use Tygh\Common\OperationResult;
 
 class SraCartContent extends BaseSraCartContent
 {
-    protected function addProducts(array &$cart, array $cart_products, $is_update = false)
+    protected function addProducts(array $cart, array $cart_products, $is_update = false)
     {
         $old_cart_products = [];
         if ($cart['products']) {
