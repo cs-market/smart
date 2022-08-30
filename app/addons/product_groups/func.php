@@ -158,7 +158,7 @@ function fn_product_groups_split_cart($cart) {
 function fn_product_groups_pre_update_order(&$cart, $order_id = 0) {
     $cart['product_groups'] = fn_product_groups_split_cart($cart);
     if (count($cart['product_groups']) == 1) {
-        $cart['group_id'] = reset($cart['product_groups'])['group_id'] ? : 0;
+        $cart['group_id'] = isset(reset($cart['product_groups'])['group_id']) ? reset($cart['product_groups'])['group_id'] : 0;
     }
 }
 

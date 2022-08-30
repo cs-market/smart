@@ -361,7 +361,7 @@ function fn_storages_get_cart_product_data($product_id, &$_pdata, $product, $aut
 }
 
 function fn_storages_generate_cart_id(&$_cid, $extra) {
-    if ($extra['storage_id']) {
+    if (!empty($extra['storage_id'])) {
         $_cid['storage_id'] = $extra['storage_id'];
     }
 }

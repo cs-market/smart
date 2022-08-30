@@ -434,7 +434,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                 continue;
             }
 
-            if (!($cart_delivery_day = $cart['delivery_date'][$group_id])) {
+            if (!(isset($cart['delivery_date'][$group_id]) && $cart_delivery_day = $cart['delivery_date'][$group_id])) {
                 $cart_delivery_day = reset($cart['delivery_date']);
             }
 
@@ -455,7 +455,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                 $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
                 $nearest_delivery_day = $group['shippings'][$chosen_shipping_id]['service_params']['nearest_delivery_day'];
                 
-                $ts = ($nearest_delivery) ? strtotime("+$nearest_delivery days") : time();
+                $ts = ($nearest_delivery_day) ? strtotime("+$nearest_delivery_day days") : time();
                 $compare_ts = fn_ts_this_day($ts);
                 if ($chosen_ts < $compare_ts) {
                     $res = false;
