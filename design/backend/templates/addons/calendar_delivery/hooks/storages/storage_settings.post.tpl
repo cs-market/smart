@@ -34,14 +34,14 @@
     <label for="elm_storage_saturday_shipping" class="control-label">{__("calendar_delivery.saturday_shipping")}:</label>
     <div class="controls">
         <input type="hidden" name="storage_data[saturday_shipping]" value="N">
-        <input type="checkbox" name="storage_data[saturday_shipping]" id="elm_storage_saturday_shipping" value="Y" {if $storage.saturday_shipping == 'Y'} checked="checked" {/if} />
+        <input type="checkbox" name="storage_data[saturday_shipping]" id="elm_storage_saturday_shipping" value="Y" {if $storage.saturday_shipping != 'N'} checked="checked" {/if} />
     </div>
 </div>
 <div class="control-group">
     <label for="elm_storage_sunday_shipping" class="control-label">{__("calendar_delivery.sunday_shipping")}:</label>
     <div class="controls">
         <input type="hidden" name="storage_data[sunday_shipping]" value="N">
-        <input type="checkbox" name="storage_data[sunday_shipping]" id="elm_storage_sunday_shipping" value="Y" {if $storage.sunday_shipping == 'Y'} checked="checked" {/if} />
+        <input type="checkbox" name="storage_data[sunday_shipping]" id="elm_storage_sunday_shipping" value="Y" {if $storage.sunday_shipping != 'N'} checked="checked" {/if} />
     </div>
 </div>
 
@@ -49,6 +49,6 @@
     <label for="elm_storage_monday_rule" class="control-label">{__("calendar_delivery.monday_rule")}:</label>
     <div class="controls">
         <input type="hidden" name="storage_data[monday_rule]" value="N">
-        <input type="checkbox" name="storage_data[monday_rule]" id="elm_storage_monday_rule" value="Y" {if $storage.monday_rule == 'Y'} checked="checked" {/if} />
+        <input type="checkbox" name="storage_data[monday_rule]" id="elm_storage_monday_rule" value="Y" {if $storage.monday_rule != 'N'} checked="checked" {/if} />
     </div>
 </div>
