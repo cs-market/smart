@@ -8,6 +8,9 @@ use Tygh\Registry;
 
 class SraPromotions extends AEntity
 {
+    protected $icon_size_small = [500, 500];
+    protected $icon_size_big = [1000, 1000];
+    
     public function index($id = 0, $params = array())
     {
         $data = ['promotions' => [], 'products' => []];

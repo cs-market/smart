@@ -1404,7 +1404,7 @@ function fn_get_fresh_user_auth_token($user_id, $ttl = 604800)
         'ttl' => TIME
     ));
 
-    if ($ekeys && !$regenerate_key) {
+    if ($ekeys) {
         $ekey = reset($ekeys);
         $token = $ekey['ekey'];
     }

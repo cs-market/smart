@@ -30,6 +30,7 @@ function fn_get_storages($params = [], $items_per_page = 0) {
         if (!empty(Tygh::$app['session']['auth']['company_id'])) {
             $params['company_id'] = Tygh::$app['session']['auth']['company_id'];
         }
+        $params['status'] = 'A';
     }
 
     if (!empty($params['status'])) {
