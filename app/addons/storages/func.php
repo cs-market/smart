@@ -268,12 +268,12 @@ function fn_init_storages() {
             Registry::set('runtime.force_to_choose_storage', true);
         }
 
-        if ($storage != fn_get_session_data('storage')) {
-            fn_set_session_data('storage', $storage, COOKIE_ALIVE_TIME);
-        }
-
         Registry::set('runtime.storages', $storages);
         if (!empty($storage)) {
+            if ($storage != fn_get_session_data('storage')) {
+                fn_set_session_data('storage', $storage, COOKIE_ALIVE_TIME);
+            }
+
             Registry::set('runtime.current_storage', $storages[$storage]);
             fn_define('STORAGE', $storage);
         } else {

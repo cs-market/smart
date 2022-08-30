@@ -842,7 +842,7 @@ function fn_smart_distribution_place_order($order_id, $action, $order_status, $c
         ), 'A', $company_lang_code);
     }
 
-    if (!$cart['order_id']) fn_save_order_log($order_id, $auth['user_id'], 'rus_order_logs_order_total', $cart['total'], TIME);
+    if (!isset($cart['order_id'])) fn_save_order_log($order_id, $auth['user_id'], 'rus_order_logs_order_total', $cart['total'], TIME);
 }
 
 function fn_smart_distribution_update_order($order, $order_id) {

@@ -434,7 +434,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                 continue;
             }
 
-            if (!(isset($cart['delivery_date'][$group_id]) && $cart_delivery_day = $cart['delivery_date'][$group_id])) {
+            if (is_array($cart['delivery_date']) && !(isset($cart['delivery_date'][$group_id]) && $cart_delivery_day = $cart['delivery_date'][$group_id])) {
                 $cart_delivery_day = reset($cart['delivery_date']);
             }
 
