@@ -160,7 +160,7 @@ class Bootstrap
         }
 
         if (!empty($http_auth) && (empty($server['PHP_AUTH_USER']) || empty($server['PHP_AUTH_PW']))) {
-            list($server['PHP_AUTH_USER'], $server['PHP_AUTH_PW']) = explode(':', $http_auth);
+            list($server['PHP_AUTH_USER'], $server['PHP_AUTH_PW']) = array_pad(explode(':', $http_auth), 2, null);
         }
 
         if (self::isWindows()) {

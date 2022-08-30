@@ -111,6 +111,7 @@ function fn_product_groups_split_cart($cart) {
                     'C' => 0,
                     'W' => 0,
                     'I' => 0,
+                    'shipping_freight' => 0,
                 ];
                 if (is_array($p_groups[$group_id]['products'])) {
                     foreach ($p_groups[$group_id]['products'] as $key_product => $product) {

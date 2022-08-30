@@ -37,6 +37,7 @@ function fn_get_fake_image($product_id = 0, $img = []) {
             'https_image_path' => Storage::instance('images')->getUrl($image_name, 'https'),
             'absolute_path' => Storage::instance('images')->getAbsolutePath($image_name),
             'image_path' => Storage::instance('images')->getUrl($image_name),
+            'alt' => '',
         );
         list($detailed['image_x'], $detailed['image_y'], ) = fn_get_image_size($detailed['absolute_path']);
         return $img;
