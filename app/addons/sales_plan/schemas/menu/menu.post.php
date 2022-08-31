@@ -1,27 +1,21 @@
 <?php
 
-$schema['central']['orders']['items']['sales_plan'] = array(
-	'attrs' => array(
-		'class'=>'is-addon'
-	),
-	'href' => 'reports.view?type=sales_report',
-	'alt' => 'reports.view?type=sales_report',
-	'position' => 910
-);
-$schema['central']['orders']['items']['category_reports'] = array(
-	'attrs' => array(
-		'class'=>'is-addon'
-	),
-	'href' => 'reports.view?type=category_report',
-	'alt' => 'reports.view?type=category_report',
-	'position' => 920
-);
-$schema['central']['orders']['items']['unsold_report'] = array(
-	'attrs' => array(
-		'class'=>'is-addon'
-	),
-	'href' => 'reports.view?type=unsold_report',
-	'alt' => 'reports.view?type=unsold_report',
-	'position' => 930
-);
+use Tygh\Registry;
+
+$reports = fn_get_dir_contents(Registry::get('config.dir.addons').'/sales_plan/schemas/reports', false, true);
+
+$position = 900;
+foreach ($reports as $report_file) {
+    $position += 10;
+    $report = (string)pathinfo($report_file, PATHINFO_FILENAME);
+    $schema['central']['orders']['items'][$report] = array(
+        'attrs' => array(
+            'class'=>'is-addon'
+        ),
+        'href' => "reports.view?type=$report",
+        'alt' => "reports.view?type=$report",
+        'position' => $position
+    );
+}
+
 return $schema;
