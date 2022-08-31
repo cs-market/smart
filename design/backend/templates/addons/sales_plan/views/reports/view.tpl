@@ -119,7 +119,12 @@
 					<div class="break">
 						<select name="{$name}" id="elm_{$key}">
 							{foreach from=$item.variants item="variant"}
-								<option value="{$variant}" {if $search.$name == $variant}selected="selected"{/if}>{__($variant)}</option>
+                                {if __($variant)|strpos:'_' === 0}
+                                    {$var = $variant}
+                                {else}
+                                    {$var = __($variant)}
+                                {/if}
+								<option value="{$variant}" {if $search.$name == $variant}selected="selected"{/if}>{$var}</option>
 							{/foreach}
 						</select>
 					</div>
@@ -155,4 +160,4 @@
 {/capture}
 
 
-{include file="common/mainbox.tpl" title=__("sales_report") content=$smarty.capture.mainbox buttons=$smarty.capture.buttons sidebar=$smarty.capture.sidebar}
+{include file="common/mainbox.tpl" title=__($search.type) content=$smarty.capture.mainbox buttons=$smarty.capture.buttons sidebar=$smarty.capture.sidebar}
