@@ -56,6 +56,11 @@ function fn_smart_auth_auth_routines($request, $auth, &$field, &$condition, &$us
 }
 
 function fn_smart_auth_user_exist($user_id, $user_data, &$condition) {
+    $user_data['company_id'] = !empty($user_data['company_id']) ? $user_data['company_id'] : Registry::get('runtime.company_id');
+    if (empty($user_data['user_login'])) {
+        $user_data['user_login'] = db_get_field("SELECT user_login FROM ?:users WHERE user_id = ?i", $user_id);
+    }
+
     if (!empty($user_data['company_id']) && !empty($user_data['user_login'])) {
         $condition = db_quote(' user_login = ?s AND company_id = ?i', $user_data['user_login'], $user_data['company_id']);
         $condition .= db_quote(" AND user_id != ?i", $user_id);
