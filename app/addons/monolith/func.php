@@ -192,8 +192,8 @@ function fn_monolith_parse_soap_response($response) {
     }
     $data = json_decode(json_encode(simplexml_load_string(str_ireplace(['SOAP-ENV:', 'SOAP:'], '', $response))), 1);
     $xml_response = $data['Body']['RequestResponse']['RequestResult'];
-    $result = (array) simplexml_load_string($xml_response);
-    if (isset($result['error']) || isset($result['scheme']['error'])) {
+    $result = simplexml_load_string($xml_response);
+    if (isset($result->error) || isset($result->scheme->error)) {
         return false;
     } else {
         return true;
