@@ -476,6 +476,12 @@ function fn_storages_update_product_amount($new_amount, $product_id, $cart_id, $
     }
 }
 
+function fn_storages_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
+    if (!empty($params['storage_id'])) {
+        $condition .= db_quote(' AND ?:orders.storage_id = ?i', $params['storage_id']);
+    }
+}
+
 function fn_storages_get_order_info(&$order, $additional_data) {
     if (!empty($order['storage_id'])) {
         list($storages,) = fn_get_storages(['storage_id' => $order['storage_id']]);
@@ -486,21 +492,6 @@ function fn_storages_get_order_info(&$order, $additional_data) {
 function fn_storages_monolith_generate_xml($order_info, $monolith_order, &$d_record) {
     if (!empty($order_info['storage'])) {
         $d_record[3] = $order_info['storage']['code'];
-    }
-}
-
-function fn_storages_min_order_amount_extra_check($product_groups, &$cart, $cart_products) {
-    if ($storages = Registry::get('runtime.storages')) {
-        $formatter = Tygh::$app['formatter'];
-        foreach ($cart['product_groups'] as $group) {
-            if ($group['storage_id'] && $min_order = $storages[$group['storage_id']]['min_order_amount']) {
-                if ($min_order > $group['package_info']['C']) {
-                    $min_amount = $formatter->asPrice($min_order);
-                    $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('storages.with_storage') . ' ' . Registry::get('runtime.storages')[$group['storage_id']]['storage'];
-                    $cart['min_order_failed'] = true;
-                }
-            }
-        }
     }
 }
 

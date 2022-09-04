@@ -14,7 +14,7 @@
                     hidden: true,
                     data: params,
                     full_render: true,
-                    result_ids: 'litecheckout_final_section,litecheckout_step_payment,shipping_rates_list,checkout*',
+                    result_ids: 'litecheckout_final_section,checkout*',
                 });
             });
         }
@@ -30,7 +30,7 @@
         }
     });
 
-    $.ceEvent('on', 'ce.commoninit', function() {
+    $(document).ready(function () {
         $.ceCalendarDelivery('init');
     });
 }(Tygh, Tygh.$));

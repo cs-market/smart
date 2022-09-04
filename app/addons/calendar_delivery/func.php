@@ -500,7 +500,3 @@ function fn_calendar_delivery_delete_storages($storage_ids) {
 function fn_calendar_delivery_post_delete_user($user_id, $user_data, $result) {
     if ($result) db_query("DELETE FROM ?:user_storages WHERE user_id = ?i", $user_id);
 }
-
-function fn_calendar_delivery_min_order_amount_extra_additional_ordering(&$params, $product_groups) {
-    $params['delivery_date'] = (isset($product_groups[0]['delivery_date'])) ? fn_parse_date($product_groups[0]['delivery_date']) : 0;
-}

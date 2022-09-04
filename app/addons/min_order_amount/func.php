@@ -33,19 +33,32 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
     $formatter = Tygh::$app['formatter'];
     $orders = array();
 
-    if ( isset($auth['company_id']) && YesNo::toBool(db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $auth['company_id']))) {
-        $params = [
-            'user_id' => $auth['user_id']
-        ];
-        if (!empty($cart['profile_id'])) {
-            $params['profile_id'] = $cart['profile_id'];
+    $additional_ordering_checked = false;
+    $additional_ordering_passed = true;
+    foreach ($cart['product_groups'] as $group_key => $group) {
+        if ($group['company_id'] && YesNo::toBool(db_get_field('SELECT allow_additional_ordering FROM ?:companies WHERE company_id = ?i', $group['company_id']))) {
+            $additional_ordering_checked = true;
+            $params = [
+                'user_id' => $auth['user_id'],
+                'company_id' => $group['company_id']
+            ];
+            if (!empty($cart['profile_id'])) {
+                $params['profile_id'] = $cart['profile_id'];
+            }
+            if (!empty($group['storage_id'])) {
+                $params['storage_id'] = $group['storage_id'];
+            }
+            $params['delivery_date'] = (isset($group['delivery_date'])) ? fn_parse_date($group['delivery_date']) : 0;
+
+            list($orders) = fn_get_orders($params);
+            $additional_ordering_passed = $additional_ordering_passed && !empty($orders);
+        } else {
+            $additional_ordering_passed = false;
+            break;
         }
-
-        fn_set_hook('min_order_amount_extra_additional_ordering', $params, $product_groups, $cart, $cart_products);
-
-        list($orders) = fn_get_orders($params);
-        if (!empty($orders)) return;
     }
+
+    if ($additional_ordering_passed && $additional_ordering_checked) return;
 
     if (!empty($cart['user_data']['min_order_amount'])) {
         if ($cart['total'] < $cart['user_data']['min_order_amount'] && empty($orders)) {
@@ -103,6 +116,21 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
             if ($check_weight && $mins['min_order_weight'] && $mins['min_order_weight'] > $group['package_info']['W']) {
                 $cart['min_order_failed'] = true;
                 $cart['min_order_notification'] = __('text_min_products_weight_required') . ' ' . $mins['min_order_weight'] . ' ' . Registry::get('settings.General.weight_symbol');
+            }
+
+            if ($group['storage_id']) {
+                if ($mins = Registry::get('runtime.storages.'.$group['storage_id'])) {
+                    if ($mins['min_order_amount'] && $mins['min_order_amount'] > $group['package_info']['C'] && $cart['total'] && empty($group_orders)) {
+                        $cart['min_order_failed'] = true;
+                        $min_amount = $formatter->asPrice($mins['min_order_amount']);
+                        $cart['min_order_notification'] = __('text_min_products_amount_required') . ' ' . $min_amount . ' ' . __('storages.with_storage') . ' <b>' . $group['name'] . '</b>';
+                    }
+
+                    if ($check_weight && $mins['min_order_weight'] && $mins['min_order_weight'] > $group['package_info']['W']) {
+                        $cart['min_order_failed'] = true;
+                        $cart['min_order_notification'] = __('text_min_products_weight_required') . ' ' . $mins['min_order_weight'] . ' ' . Registry::get('settings.General.weight_symbol') . ' ' . __('storages.with_storage') . ' <b>' . $group['name'] . '</b>';
+                    }
+                }
             }
         }
 

@@ -25,7 +25,7 @@
 
 <div class="cm-tabs-content">
 <fieldset>
-    {hook name="storages:storage_settings"}
+
     <div class="control-group">
         <label for="storage_{$id}" class="cm-required control-label">{__("name")}:</label>
         <div class="controls">
@@ -47,12 +47,7 @@
         </div>
     </div>
 
-    <div class="control-group">
-        <label for="storage_min_order_{$id}" class="cm-required control-label">{__("storages.min_order_amount")}:</label>
-        <div class="controls">
-            <input type="text" size="70" id="storage_min_order_{$id}" name="storage_data[min_order_amount]" value="{$storage.min_order_amount}" class="input-large">
-        </div>
-    </div>
+    {hook name="storages:storage_settings"}
     {if $storage.company_id}
         <div class="control-group">
             <label class="control-label">{__("usergroups")}:</label>
