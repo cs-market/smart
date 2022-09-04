@@ -31,6 +31,12 @@ if (Registry::get('addons.product_packages.status') == 'A') {
         'filter' => 'fn_promotions_filter_float_condition_value'
     );
 }
+$schema['conditions']['promotion_step_limit'] = array(
+    'operators' => array ('eq'),
+    'type' => 'input',
+    'field_function' => array('fn_promotion_step_unconditional_true'),
+    'zones' => array('cart')
+);
 
 $schema['bonuses']['promotion_step_free_products'] = array(
     'type' => 'picker',

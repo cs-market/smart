@@ -77,6 +77,10 @@ function fn_promotion_step_get_products_amount($promotion_id, $cart, $cart_produ
     return $amount;
 }
 
+function fn_promotion_step_unconditional_true() {
+    return true;
+}
+
 function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_products) {
     $promotion =  fn_get_promotion_data($bonus['promotion_id']);
     if ($bonus['bonus'] == 'promotion_step_free_products') {
@@ -124,9 +128,12 @@ function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_produc
                     )
                 )
             ) {
+                $promotion_step_limit = fn_find_promotion_condition($promotion['conditions'], 'promotion_step_limit');
+
                 foreach ($promotion['conditions']['conditions'] as $key => $condition) {
                     if($condition['operator'] == 'gte' && in_array($condition['condition'], ['promotion_step', 'promotion_package_step']) && $condition['value']){
                         $step = floor($amount/$condition['value']);
+                        if ($promotion_step_limit && $step > $promotion_step_limit['value']) $step = $promotion_step_limit['value'];
 
                         if ($step) {
                             $product_data = array (
@@ -165,7 +172,11 @@ function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_produc
     }
 
     if ($bonus['bonus'] == 'promotion_step_give_condition_products') {
-        $step = fn_find_promotion_condition($promotion['conditions'], 'promotion_step');
+        if ($step = fn_find_promotion_condition($promotion['conditions'], 'promotion_step')) {
+            $step_condition = 'promotion_step';
+        } elseif ($step = fn_find_promotion_condition($promotion['conditions'], 'promotion_package_step')) {
+            $step_condition = 'promotion_package_step';
+        }
 
         $condition_products = fn_find_promotion_condition($promotion['conditions'], 'products');
         if ($condition_products) {
@@ -174,14 +185,23 @@ function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_produc
             // process category conditions here
         }
 
-        foreach (array_column($cart['products'], 'amount', 'product_id') as $product_id => $amount) {
-            if (in_array($product_id, $condition_products)) {
+        foreach ($cart_products as $cart_product) {
+            if (in_array($cart_product['product_id'], $condition_products)) {
+                if ($step_condition == 'promotion_package_step') {
+                    $amount = $cart_product['amount']/$cart_product['items_in_package'];
+                } else {
+                    $amount = $cart_product['amount'];
+                }
+
                 $execution_count = floor($amount/$step['value']);
+                $promotion_step_limit = fn_find_promotion_condition($promotion['conditions'], 'promotion_step_limit');
+                if ($promotion_step_limit && $execution_count > $promotion_step_limit['value']) $execution_count = $promotion_step_limit['value'];
+
                 if ($execution_count) {
                     $product_data = array (
-                        $product_id => array (
+                        $cart_product['product_id'] => array (
                             'amount' => $bonus['value'] * $execution_count,
-                            'product_id' => $product_id,
+                            'product_id' => $cart_product['product_id'],
                             'extra' => array (
                                 'bonus' => 'apply_bonus',
                                 'amount_step' => $execution_count,
@@ -189,7 +209,7 @@ function fn_promotion_step_apply_cart_rule($bonus, &$cart, &$auth, &$cart_produc
                                 'exclude_from_calculate' => true,
                                 'bonus' => 'apply_bonus',
                                 'aoc' => empty($p_data['product_options']),
-                                'saved_options_key' => $bonus['promotion_id'] . '_' . $product_id,
+                                'saved_options_key' => $bonus['promotion_id'] . '_' . $cart_product['product_id'],
                             )
                         ),
                     );
