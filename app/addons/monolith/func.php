@@ -27,12 +27,12 @@ function fn_monolith_generate_xml($order_id) {
             ),
         ),
     );
-
+    $user = fn_get_user_info($order_info['user_id']);
     $d_record = [
         $addon['order_prefix'] . $order_id,
         date("Y-m-d\T00:00:00", $order_info['timestamp']),
         //'', //CompanyId
-        $order_info['fields']['38'], //CRMClientId
+        $user['user_login'], //CRMClientId
         '123',
         $order_info['user_id'],
         date("Y-m-d\T00:00:00", $order_info['delivery_date']),
