@@ -42,6 +42,9 @@ $schema = array(
         'Min order amount' => array (
             'db_field' => 'min_order_amount',
         ),
+        'Min order weight' => array (
+            'db_field' => 'min_order_weight',
+        ),
         'Usergroup IDs' => array(
             'process_get' => array('fn_exim_get_storage_usergroups', '#key'),
             'process_put' => array('fn_exim_set_storage_usergroups', '#key', '#this'),
