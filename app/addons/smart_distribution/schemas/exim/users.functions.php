@@ -112,7 +112,7 @@ function fn_exim_rejoin_user_profiles_export(&$pattern)
                     $is_exist = db_get_field('SELECT field_id FROM ?:profile_fields_data WHERE object_id = ?i AND field_id = ?i AND object_type = ?s', $profile_id, $field['field_id'], 'P');
 
                     if ($is_exist) {
-                        db_query("UPDATE ?:profile_fields_data SET ?u WHERE object_id = ?i AND field_id = ?i", ['value' => $value], $profile_id, $field['field_id']);
+                        db_query("UPDATE ?:profile_fields_data SET ?u WHERE object_id = ?i AND field_id = ?i AND object_type = ?s", ['value' => $value], $profile_id, $field['field_id'], 'P');
                     } else {
                         db_query("INSERT INTO ?:profile_fields_data ?e", [
                             'object_id' => $profile_id,
