@@ -1881,6 +1881,80 @@ fn_print_die($orders_wo_points);
         $res = db_query("UPDATE ?:products SET usergroup_ids = ?p WHERE product_id = ?i", fn_remove_from_set('usergroup_ids', 548), $data['product_id']);
     }
     fn_print_die($products);
+} elseif ($mode == 'correct_profile_fields') {
+    $company_id = 45;
+    $condition = '';
+    //$condition = db_quote(' AND user_id = 126771');
+    //$limit = db_quote(' LIMIT 200');
+
+    $user_ids = db_get_fields("SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = ?s AND user_id != ?i $condition ORDER BY user_id DESC $limit", $company_id, 'C', 5055);
+
+    $i = 0;
+    foreach ($user_ids as $user_id) {
+        $i +=1;
+        if ($i % 100 == 0) fn_echo_br($i);
+        $user_data = fn_get_user_info($user_id);
+        $data = db_get_array('SELECT * FROM ?:profile_fields_data WHERE object_id = ?i', $user_id);
+
+        foreach ($data as $value) {
+            $field_id = $value['field_id'];
+            $user_value = $user_data['fields'][$field_id];
+            if (empty($value['value'])) continue;
+
+            if ($value['value'] == $user_value) {
+                if ($value['object_type'] == 'O') {
+                    $order = fn_get_order_info($value['object_id']);
+                    $order_user = fn_get_user_info($order['user_id']);
+                    $profiles = fn_get_user_profiles($order['user_id']);
+                    if (count($profiles) == 1) {
+                        db_query('UPDATE ?:profile_fields_data SET value = ?s WHERE object_id = ?i AND object_type = ?s AND field_id = ?s', $order_user['fields'][$field_id], $value['object_id'], 'O', $field_id);
+                        $res['O'][$value['object_id']] = $order_user['fields'][$field_id];
+                    } else {
+                        fn_print_die('check here order');
+                    }
+                } elseif ($value['object_type'] == 'P') {
+                    $user_id = db_get_field('SELECT user_id FROM ?:user_profiles WHERE profile_id = ?i', $value['object_id']);
+                    $profiles = fn_get_user_profiles($user_id);
+                    $profile_user = fn_get_user_info($user_id);
+                    if (count($profiles) == 1) {
+                        db_query('UPDATE ?:profile_fields_data SET value = ?s WHERE object_id = ?i AND object_type = ?s AND field_id = ?s', $profile_user['fields'][$field_id], $value['object_id'], 'P', $field_id);
+                        $res['P'][$value['object_id']] = $profile_user['fields'][$field_id];
+                    } else {
+                        fn_print_die('check here profile');
+                    }
+                } elseif ($value['object_type'] == 'U') {
+                    // ну это нормально
+                    //if ($user_data['company_id'] == '45') $user_value = $user_data['user_login'];
+                    //fn_print_die($value, $user_data);
+                    //fn_print_die('check here');
+                }
+            } elseif ($value['object_type'] == 'U') {
+                $profiles = fn_get_user_profiles($value['object_id']);
+                if (count($profiles) == 1) {
+                    // на всякий случай
+                    $user_value = $user_data['user_login'];
+                    db_query('UPDATE ?:profile_fields_data SET value = ?s WHERE object_id = ?i AND object_type = ?s AND field_id = ?s', $user_value, $value['object_id'], 'U', $field_id);
+                    $res['U'][$value['object_id']] = $user_value;
+                } else {
+                    fn_print_die('check here profile');
+                }
+            } elseif ($value['object_type'] == 'O') {
+                $order = fn_get_order_info($value['object_id']);
+                $order_user = fn_get_user_info($order['user_id']);
+                $profiles = fn_get_user_profiles($order['user_id']);
+                if (count($profiles) == 1) {
+                    db_query('UPDATE ?:profile_fields_data SET value = ?s WHERE object_id = ?i AND object_type = ?s AND field_id = ?s', $order_user['fields'][$field_id], $value['object_id'], 'O', $field_id);
+                    $res['O'][$value['object_id']] = $order_user['fields'][$field_id];
+                } else {
+                    $v = db_get_field('SELECT value FROM ?:profile_fields_data WHERE object_id = ?i AND object_type = ?s AND field_id = ?i', $order['profile_id'], 'P', $field_id);
+                    if ($v != $value['value']) {
+                        //fn_print_die('check here order');
+                    }
+                }
+            }
+        }
+    }
+    fn_print_die('end', $res);
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
