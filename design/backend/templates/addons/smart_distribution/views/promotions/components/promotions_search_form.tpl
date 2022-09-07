@@ -29,6 +29,16 @@
                 <input type="text" name="name" id="elm_name" value="{$search.name}" />
             </div>
         </div>
+
+        {* <div class="sidebar-field">
+            <label for="elm_active">{__("active_only")}</label>
+            <div class="break">
+                <input type="checkbox" name="active" id="elm_active" value="Y" {if $search.active == 'Y'} checked="_checked" {/if} />
+            </div>
+        </div> *}
+
+        {include file="common/period_selector.tpl" period=$search.period display="form"}
+
         {if !$runtime.company_id}
             {include file="views/companies/components/company_field.tpl"
                 name="company_id"
@@ -39,9 +49,9 @@
             }
         {/if}
         <div class="sidebar-field">
-            <label for="elm_type">{__("zone")}</label>
+            <label for="elm_zone">{__("zone")}</label>
             <div class="controls">
-                <select name="zone" id="elm_type">
+                <select name="zone" id="elm_zone">
                     {hook name="promotions:search_form_promotion_type"}
                     <option value="">{__("any")}</option>
                     <option {if $search.zone == "catalog"}selected="selected"{/if} value="catalog">{__("catalog")}</option>

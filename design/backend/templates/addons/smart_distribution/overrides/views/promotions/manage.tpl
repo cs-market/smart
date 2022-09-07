@@ -33,13 +33,11 @@
         </th>
         <th>
             <a class="cm-ajax" href="{"`$c_url`&sort_by=name&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("name")}{if $search.sort_by == "name"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
-        <th width="16%" class="center mobile-hide">{__("stop_other_rules")}</th>
-        <th width="10%" class="nowrap center mobile-hide">
-            <a class="cm-ajax" href="{"`$c_url`&sort_by=priority&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("priority")}{if $search.sort_by == "priority"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
-        <th width="10%" class="mobile-hide">
-            <a class="cm-ajax" href="{"`$c_url`&sort_by=zone&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("zone")}{if $search.sort_by == "zone"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
 
         {hook name="promotions:manage_header"}{/hook}
+
+        <th width="10%" class="mobile-hide">
+            <a class="cm-ajax" href="{"`$c_url`&sort_by=zone&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("zone")}{if $search.sort_by == "zone"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
 
         <th width="8%" class="mobile-hide">&nbsp;</th>
         <th width="10%" class="right"><a class="cm-ajax" href="{"`$c_url`&sort_by=status&sort_order=`$search.sort_order_rev`"|fn_url}" data-ca-target-id="pagination_contents">{__("status")}{if $search.sort_by == "status"}{$c_icon nofilter}{else}{$c_dummy nofilter}{/if}</a></th>
@@ -73,17 +71,12 @@
             {if $promotion.short_description|trim}
                 <span class="row-status">{$promotion.short_description nofilter}</span>
             {/if}
-        <td width="16%" class="center mobile-hide" data-th="{__("stop_other_rules")}">
-            <span>{if $promotion.stop_other_rules == "YesNo::YES"|enum}{__("yes")}{else}{__("no")}{/if}</span>
-        </td>
-        <td width="10%" class="center mobile-hide" data-th="{__("priority")}">
-            <span>{$promotion.priority}</span>
-        </td>
+
+        {hook name="promotions:manage_data"}{/hook}
+
         <td width="10%" class="mobile-hide" data-th="{__("zone")}">
             <span class="row-status">{__($promotion.zone)}</span>
         </td>
-
-        {hook name="promotions:manage_data"}{/hook}
 
         <td width="8%" class="right mobile-hide">
             <div class="hidden-tools">
@@ -97,7 +90,6 @@
             {/capture}
             {dropdown content=$smarty.capture.tools_list}
             </div>
-            
         </td>
         <td width="10%" class="nowrap right" data-th="{__("status")}">
             {include file="common/select_popup.tpl" popup_additional_class="dropleft" display=$status_display id=$promotion.promotion_id status=$promotion.status hidden=true object_id_name="promotion_id" table="promotions"}

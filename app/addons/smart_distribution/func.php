@@ -1381,6 +1381,16 @@ function fn_smart_distribution_get_promotions($params, $fields, $sortings, &$con
             ? db_quote(' AND ?:promotions.status IN (?a)', $params['status'])
             : db_quote(' AND ?:promotions.status = ?s', $params['status']);
     }
+        
+    if (!empty($params['period'])) {
+        list($time_from, $time_to) = fn_create_periods($params);
+        if (!empty($time_from) && !empty($params['time_from'])) {
+            $condition .= db_quote(' AND IF(from_date, from_date <= ?i, 1)', $time_to);
+        }
+        if (!empty($time_to) && !empty($params['time_to'])) {
+            $condition .= db_quote(' AND IF(to_date, to_date >= ?i, 1)', $time_from);
+        }
+    }
 }
 
 function fn_smart_distribution_text_cart_amount_corrected_notification($product, $current_amount, $original_amount, $amount) {
