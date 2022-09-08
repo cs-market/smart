@@ -114,7 +114,6 @@ class Products extends AEntity
         $lang_code = $this->getLanguageCode($params);
         $this->prepareFeature($params);
         $this->prepareImages($params, $id);
-        if ($params['prices']) fn_write_r($params);
         $product_id = fn_update_product($params, $id, $lang_code);
 
         if ($product_id) {

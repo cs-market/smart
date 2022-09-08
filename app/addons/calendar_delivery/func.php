@@ -4,6 +4,7 @@ use Tygh\Languages\Languages;
 use Tygh\Languages\Values;
 use Tygh\Registry;
 use Tygh\Enum\YesNo;
+use Tygh\Enum\SiteArea;
 
 if ( !defined('AREA') ) { die('Access denied'); }
 
@@ -192,11 +193,15 @@ function fn_calendar_delivery_form_cart($order_info, &$cart, $auth) {
 
 function fn_calendar_delivery_update_user_pre($user_id, &$user_data, $auth, $ship_to_another, $notify_user) {
     if (isset($user_data['delivery_date'])) {
-        if (is_array($user_data['delivery_date'])) {
-            $user_data['delivery_date'] = fn_delivery_date_to_line($user_data['delivery_date']);
-        }
+        if (SiteArea::isAdmin(AREA)) {
+            if (is_array($user_data['delivery_date'])) {
+                $user_data['delivery_date'] = fn_delivery_date_to_line($user_data['delivery_date']);
+            }
 
-        if ($user_data['delivery_date'] == '0000000') unset($user_data['delivery_date']);
+            if ($user_data['delivery_date'] == '0000000') unset($user_data['delivery_date']);
+        } else {
+            unset($user_data['delivery_date']);
+        }
     }
 }
 
@@ -472,7 +477,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                 }
             }
 
-            if (!$res &&  AREA != A) {
+            if (!$res && SiteArea::isStorefront(AREA)) {
                 $result = false;
                 fn_set_notification('E', __('error'), __('calendar_delivery.choose_another_day'));
                 return;
