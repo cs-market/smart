@@ -67,6 +67,11 @@ select {
         -moz-osx-font-smoothing: grayscale;
     }
 }
+.container-fluid {
+    @media @mobile {
+        padding: 0 10px;
+    }
+}
 
 .ty-tile-button() {
     .border-radius(@border-radius);
@@ -460,6 +465,12 @@ select {
     }
     &__show_inline > &__item {
         margin: initial;
+    }
+}
+.ty-breadcrumbs {
+    @media @mobile {
+        padding: 5px 0;
+        margin: 0;
     }
 }
 // .ty-rumba-icon-mobile-app {
