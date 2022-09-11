@@ -1,4 +1,4 @@
-{if $smarty.const.MOBILE_VIEW == 'Y'}
+{&if $smarty.const.MOBILE_VIEW == 'Y'}
 <script type="text/javascript">
 //<![CDATA[
 (function(_, $) {
@@ -9,4 +9,4 @@
 }(Tygh, Tygh.$));
 //]]>
 </script>
-{/if}
+{/if&}
