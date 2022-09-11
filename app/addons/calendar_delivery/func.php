@@ -123,6 +123,17 @@ function fn_calendar_get_nearest_delivery_day($shipping_params = [], $get_ts = f
         $nearest_delivery = ($diff > $nearest_delivery) ? $diff : $nearest_delivery;
     }
 
+    if (!empty((int) $shipping_params['weekdays_availability'])) {
+        do {
+            $weekday = 1 << getdate(strtotime("+$nearest_delivery day midnight"))['wday'];
+            if (!(bindec($shipping_params['weekdays_availability']) & $weekday)) {
+                $nearest_delivery++;
+            } else {
+                break;
+            }
+        } while (1);
+    }
+
     return $nearest_delivery;
 }
 
@@ -290,8 +301,8 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
 
                         fn_set_hook('calendar_delivery_service_params', $group, $shipping, $company_settings, $usergroup_working_time_till);
 
-                        $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
                         $shipping['service_params']['weekdays_availability'] = strrev($weekdays_availability);
+                        $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
                     }
                 }
 
