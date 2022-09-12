@@ -217,3 +217,7 @@ function fn_monolith_allow_place_order_post(&$cart) {
         $cart['user_data']['email'] = fn_checkout_generate_fake_email_address($cart['user_data'], TIME);
     }
 }
+
+function fn_monolith_get_promotions_search_by_query($search_fields, &$search_condition, $params) {
+    $search_condition[] = db_quote(" (?:promotions.external_id LIKE ?l) ", '%' . $params['name'] . '%');
+}

@@ -1371,7 +1371,17 @@ function fn_smart_distribution_extract_cart(&$cart, $user_id, $type, $user_type)
 
 function fn_smart_distribution_get_promotions($params, $fields, $sortings, &$condition, $join, $group, $lang_code) {
     if (!empty($params['name'])) {
-        $condition .= db_quote(' AND ?:promotion_descriptions.name LIKE ?l', '%' . $params['name'] . '%');
+        $search_fields = ['?:promotion_descriptions.name', '?:promotion_descriptions.short_description'];
+        $search_condition = [];
+
+        foreach ($search_fields as $search_field) {
+            $search_condition[] = db_quote(" ($search_field LIKE ?l) ", '%' . $params['name'] . '%');
+        }
+
+        fn_set_hook('get_promotions_search_by_query', $search_fields, $search_condition, $params, $fields, $sortings);
+
+        $search_condition = implode(' OR ', $search_condition);
+        $condition .= db_quote(" AND ($search_condition)");
     }
     if (!empty($params['company_id'])) {
         $condition .= db_quote(' AND ?:promotions.company_id = ?i', $params['company_id']);
