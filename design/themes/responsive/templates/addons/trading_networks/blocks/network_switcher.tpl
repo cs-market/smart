@@ -17,7 +17,7 @@
             <!--switcher_content_{$block.block_id}--></div>
         </div>
         <div class="buttons-container ty-center">
-            {$auth_url = "auth.baltika_login_form"}
+            {$auth_url = "auth.login_form"}
             <a href="{"auth.logout?redirect_url=`$auth_url`"|fn_url}" class="ty-btn ty-btn__primary ty-btn__big">{__('logout_from_system')}</a>
         </div>
     {/capture}

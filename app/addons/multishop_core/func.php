@@ -51,7 +51,7 @@ function fn_multishop_init_store_params_by_host(&$request, $url, $area = AREA) {
 
 		$config = fn_array_merge($config, $url_data);
 		$config['images_path'] = $config['current_path'] . '/media/images/';
-
+        $config['shop_id'] = $request['switch_shop_id'];
 		Registry::set('config', $config);
  	}
 }
