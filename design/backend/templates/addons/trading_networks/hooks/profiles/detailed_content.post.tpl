@@ -19,7 +19,5 @@
     </div>
 </div>
 {elseif $user_data.user_role == 'N' && $network_users}
-    {foreach from=$network_users item='network_user'}
-        <div><a href="{"profiles.update?user_id=`$network_user.user_id`"|fn_url}" target="_blank">{$network_user.firstname} <i class="icon-external-link"></i></a></div>
-    {/foreach}
+    {include file="pickers/users/picker.tpl" display="checkbox" but_meta="btn" item_ids=$network_users data_id="0" input_name="user_data[network_users]"}
 {/if}
