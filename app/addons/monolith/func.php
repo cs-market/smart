@@ -221,3 +221,11 @@ function fn_monolith_allow_place_order_post(&$cart) {
 function fn_monolith_get_promotions_search_by_query($search_fields, &$search_condition, $params) {
     $search_condition[] = db_quote(" (?:promotions.external_id LIKE ?l) ", '%' . $params['name'] . '%');
 }
+
+function fn_monolith_get_logos_post($company_id, $layout_id, $style_id, &$logos, $storefront_id) {
+    if (Registry::ifGet('runtime.shop_id', 0) == 2 && fn_allowed_for('MULTIVENDOR') && isset($logos['favicon'])) {
+        foreach ($logos['favicon']['image'] as &$data) {
+            $data = str_replace('favicon', 'baltika_favicon', $data);
+        }
+    }
+}
