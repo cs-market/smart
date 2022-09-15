@@ -16,7 +16,7 @@ use Tygh\Storage;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
-function fn_get_fake_image($product_id = 0, $img = []) {
+function fn_get_fake_image($object_id = 0, $img = [], $object_type = 'product', $image_type = 'detailed') {
     $image_name = Registry::get('addons.fake_image.image');
     if (!empty($image_name)) {
         if (empty($img)) {
@@ -27,10 +27,10 @@ function fn_get_fake_image($product_id = 0, $img = []) {
                 'position' => 0,
             );
         }
-        $img['detailed'] = &$detailed;
+        $img[$image_type] = &$detailed;
         $detailed = array(
-            'object_id' => $product_id,
-            'object_type' => 'product',
+            'object_id' => $object_id,
+            'object_type' => $object_type,
             'type' => 'M',
             'relative_path' => $image_name,
             'http_image_path' => Storage::instance('images')->getUrl($image_name, 'http'),
@@ -47,6 +47,14 @@ function fn_get_fake_image($product_id = 0, $img = []) {
 function fn_fake_image_get_product_data_post(&$product_data, $auth, $preview, $lang_code) {
     if (empty($product_data['main_pair']) || !is_file($product_data['main_pair']['detailed']['absolute_path'])) {
         $product_data['main_pair'] = fn_get_fake_image($product_data['product_id'], $product_data['main_pair']);
+    }
+}
+
+function fn_fake_image_get_promotions_post($params, $items_per_page, $lang_code, &$promotions) {
+    foreach ($promotions as &$promotion) {
+        if (empty($promotion['image']) || !is_file($promotion['image']['icon']['absolute_path'])) {
+            $promotion['image'] = fn_get_fake_image($promotion['promotion_id'], "", 'promotion', 'icon');
+        }
     }
 }
 

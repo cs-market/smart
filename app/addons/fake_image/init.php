@@ -16,9 +16,10 @@ if (!defined('BOOTSTRAP')) { die('Access denied'); }
 use Tygh\Registry;
 
 fn_register_hooks(
-	'get_product_data_post',
-	'gather_additional_product_data_before_options',
-	'delete_image_pair'
+    'get_product_data_post',
+    'get_promotions_post',
+    'gather_additional_product_data_before_options',
+    'delete_image_pair'
 );
 
 Registry::set('config.storage.files', array(
