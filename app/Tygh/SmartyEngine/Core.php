@@ -413,11 +413,13 @@ class Core extends \Smarty
      */
     private function initLogos($company_id)
     {
+        // [cs-market] temporary fix logo for baltika
         $key = sprintf(
-            'init_logos_%s_%s_%s',
+            'init_logos_%s_%s_%s_%s',
             $company_id === null ? '_' : (int) $company_id,
             Registry::get('runtime.layout.layout_id'),
-            Registry::get('runtime.layout.style_id')
+            Registry::get('runtime.layout.style_id'),
+            Registry::get('runtime.shop_id')
         );
 
         $logos = Registry::getOrSetCache(
