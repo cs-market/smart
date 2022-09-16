@@ -25,7 +25,7 @@
                         <select name="user_data[delivery_date_by_storage][{$num}][storage_id]">
                             <option value="">---</option>
                             {foreach from=$storages item="storage"}
-                            <option value="{$storage.storage_id}" {if $storage.storage_id == $user_storage.storage_id}selected="_selected"{/if}>{$storage.storage}</option>
+                            <option value="{$storage.storage_id}" {if $storage.storage_id == $user_storage.storage_id}selected="_selected"{/if}>{$storage.storage} ({$storage.code})</option>
                             {/foreach}
                         </select>
                         <a href="{"storages.manage#group`$user_storage.storage_id`"|fn_url}" target="_blank"><i class="icon-external-link"></i></a>
@@ -40,7 +40,7 @@
                         <select name="user_data[delivery_date_by_storage][{$num}][storage_id]">
                             <option value="">---</option>
                             {foreach from=$storages item="storage"}
-                            <option value="{$storage.storage_id}" >{$storage.storage}</option>
+                            <option value="{$storage.storage_id}" >{$storage.storage} ({$storage.code})</option>
                             {/foreach}
                         </select>
                     </td>

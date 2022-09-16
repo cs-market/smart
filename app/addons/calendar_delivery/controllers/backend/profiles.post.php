@@ -21,5 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'update') {
     list($storages, ) = fn_get_storages(['company_id' => $user_data['company_id']]);
+    $storages = fn_sort_array_by_key($storages, 'code');
     Tygh::$app['view']->assign('storages', $storages);
 }
