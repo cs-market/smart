@@ -17,9 +17,10 @@
     </language_variables>
     <queries>
         <item>CREATE TABLE `?:product_groups` (
-          `group_id` mediumint(8) unsigned NOT NULL auto_increment,
+          `group_id` mediumint unsigned NOT NULL AUTO_INCREMENT,
           `group` varchar(32) NOT NULL DEFAULT '',
-          `company_id` INT(11) UNSIGNED NOT NULL DEFAULT '0'
+          `split_order` varchar(1) NOT NULL DEFAULT 'Y',
+          `company_id` int unsigned NOT NULL DEFAULT '0',
           `status` char(1) NOT NULL DEFAULT 'A',
           PRIMARY KEY (`group_id`)
         ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

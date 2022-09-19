@@ -55,21 +55,24 @@ class SraPromotions extends AEntity
         }
         unset($product);
 
-        $products = fn_storefront_rest_api_gather_additional_products_data($products, $params);
+        if (!empty($products)) {
+            $products = fn_storefront_rest_api_gather_additional_products_data($products, $params);
 
-        foreach ($products as &$product) {
-            $amount = $this->getRequestedProductAmount($params, $product['product_id']);
-            if ($amount > 1) {
-                $product = $this->calculateQuantityPrice($product, $amount);
+            foreach ($products as &$product) {
+                $amount = $this->getRequestedProductAmount($params, $product['product_id']);
+                if ($amount > 1) {
+                    $product = $this->calculateQuantityPrice($product, $amount);
+                }
+
+                $product = fn_storefront_rest_api_format_product_prices($product, $currency);
+
+                $product = fn_storefront_rest_api_set_product_icons($product, $params['icon_sizes']);
             }
+            unset($product);
 
-            $product = fn_storefront_rest_api_format_product_prices($product, $currency);
-
-            $product = fn_storefront_rest_api_set_product_icons($product, $params['icon_sizes']);
+            $data['products'] = $products;
         }
-        unset($product);
 
-        $data['products'] = $products;
         return array(
             'status' => Response::STATUS_OK,
             'data' => $data

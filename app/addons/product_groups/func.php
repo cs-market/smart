@@ -22,7 +22,11 @@ function fn_get_product_groups($params) {
     }
 
     if (Registry::get('runtime.company_id')) {
-        $condition .= db_quote(" AND company_id = ?i", Registry::get('runtime.company_id'));
+        $params['company_id'] = Registry::get('runtime.company_id');
+    }
+
+    if (isset($params['company_id'])) {
+        $condition .= db_quote(" AND company_id = ?i", $params['company_id']);
     }
 
     if (isset($params['group_id'])) {
