@@ -73,7 +73,7 @@ function fn_user_from_form_send_form(&$page_data, &$form_values, &$result, $from
                 'description' => __('first_name_and_last_name')
             ],
             'user_code' => [
-                'element_id' => 'user_name', 
+                'element_id' => 'user_code', 
                 'page_id' => $page_data['page_id'], 
                 'parent_id' => 0, 
                 'element_type' => 'T', 
