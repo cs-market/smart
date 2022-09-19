@@ -47,15 +47,16 @@ class SraPromotions extends AEntity
             list($data['promotions'], $products) = fn_category_promotion_split_promotion_by_type($promotions);
         }
 
-        foreach ($products as &$product) {
-            $amount = $this->getRequestedProductAmount($params, $product['product_id']);
-            if ($amount > 1) {
-                $product['price'] = fn_get_product_price($product['product_id'], $amount, $this->auth);
-            }
-        }
-        unset($product);
 
         if (!empty($products)) {
+            foreach ($products as &$product) {
+                $amount = $this->getRequestedProductAmount($params, $product['product_id']);
+                if ($amount > 1) {
+                    $product['price'] = fn_get_product_price($product['product_id'], $amount, $this->auth);
+                }
+            }
+            unset($product);
+
             $products = fn_storefront_rest_api_gather_additional_products_data($products, $params);
 
             foreach ($products as &$product) {
