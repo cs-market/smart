@@ -31,7 +31,7 @@
         <item>
             CREATE TABLE `?:storages` (
                 `storage_id` mediumint(8) unsigned NOT NULL auto_increment,
-                `code` varchar(32) NOT NULL,
+                `code` varchar(128) NOT NULL,
                 `storage` varchar(255) NOT NULL,
                 `company_id` smallint unsigned NOT NULL DEFAULT '0',
                 `min_order` mediumint unsigned NOT NULL DEFAULT '0',
@@ -68,4 +68,10 @@
         <item>ALTER TABLE `?:orders` ADD `storage_id` mediumint(8) unsigned NOT NULL;</item>
         <item for="uninstall">ALTER TABLE `?:products` DROP `storage_id`;</item>
     </queries>
+    <functions>
+        <item for="install">fn_storages_install</item>
+    </functions>
+    <functions>
+        <item for="install">fn_storages_uninstall</item>
+    </functions>
 </addon>

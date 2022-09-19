@@ -54,3 +54,7 @@ if ($mode == 'update') {
         ]);
     }
 }
+if ($mode == 'get_user_price') {
+    list($storages) = fn_get_storages(['company_id' => $_REQUEST['company_id']]);
+    Tygh::$app['view']->assign('storages', $storages);
+}

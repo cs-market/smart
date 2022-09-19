@@ -56,6 +56,8 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
                         'price' => $object['price'],
                     );
                 }
+                fn_set_hook('user_price_exim_product_price_pre', $object, $price);
+
                 if (fn_update_product_user_price($primary_object_id['product_id'], $price, false)) {
                     $processed_data['E'] += count($price);
                 } else {

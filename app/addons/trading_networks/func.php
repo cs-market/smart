@@ -72,3 +72,13 @@ function fn_trading_networks_smart_auth_auth_routines(&$pre_condition) {
         $pre_condition .= db_quote(' AND network_id = 0');
     }
 }
+
+function fn_trading_networks_update_profile($action, $user_data, $current_user_data) {
+    if (isset($user_data['network_users'])) {
+        $network_users = explode(',', $user_data['network_users']);
+        db_query('UPDATE ?:users SET network_id = 0 WHERE network_id = ?i', $user_data['user_id']);
+        if ($user_data['user_role'] == 'N') {
+            db_query('UPDATE ?:users SET network_id = ?i WHERE user_id IN (?a)', $user_data['user_id'], $network_users);
+        }
+    }
+}

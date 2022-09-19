@@ -27,6 +27,8 @@ fn_register_hooks(
     'monolith_generate_xml',
     'calendar_delivery_weekdays_availability',
     'calendar_delivery_service_params',
+    'get_user_price',
+    'user_price_exim_product_price_pre'
 );
 
 fn_init_stack(array('fn_init_storages', &$_REQUEST));

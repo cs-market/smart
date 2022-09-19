@@ -18,6 +18,20 @@ use Tygh\Enum\ProductTracking;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
+function fn_storages_install() {
+    if (Registry::get('addons.user_price.status') == 'A') {
+        db_query("ALTER TABLE ?:user_price ADD storage_id mediumint UNSIGNED NOT NULL DEFAULT '0' AFTER user_id");
+        db_query("ALTER TABLE ?:user_price DROP INDEX `product_user`, ADD PRIMARY `product_user_storage` (`product_id`, `user_id`, `storage_id`)"); 
+    }
+}
+
+function fn_storages_uninstall() {
+    if (Registry::get('addons.user_price.status') == 'A') {
+        db_query("ALTER TABLE ?:user_price DROP INDEX `product_user_storage`, ADD PRIMARY `product_user` (`product_id`, `user_id`)");
+        db_query("ALTER TABLE ?:user_price DROP storage_id");
+    }
+}
+
 function fn_get_storages($params = [], $items_per_page = 0) {
     if (empty(Tygh::$app['session']['auth']['user_id'])) {
         return [false, false];
@@ -228,12 +242,16 @@ function fn_storages_get_products(array &$params, array &$fields, array &$sortin
         // нам нужно исключить из выборки товары не отгружаемые с текущего склада
         $join .= db_quote(
            ' RIGHT JOIN ?:storages_products AS sp'
-           . ' ON sp.product_id = products.product_id AND sp.storage_id = ?i', $storage['storage_id']);
+           . ' ON sp.product_id = products.product_id AND sp.storage_id = ?i ', $storage['storage_id']);
 
         // нам нужно исключить из выборки товары без прайсов
         $auth = Tygh::$app['session']['auth'];
+
+        // и тут же отработать пользовательские цены
+        $join .= db_quote(' LEFT JOIN ?:user_price AS up ON up.product_id = products.product_id AND user_id = ?i AND up.storage_id = ?i', $auth['user_id'], $storage['storage_id']);
+
         $old_price_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
-        $price_condition = db_quote(' AND prices.usergroup_id IN (?n) AND prices.price IS NOT NULL', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
+        $price_condition = db_quote(' AND ((prices.usergroup_id IN (?n) AND prices.price IS NOT NULL) OR up.price IS NOT NULL)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
         $condition = str_replace($old_price_condition, $price_condition, $condition);
     } elseif (!empty(Registry::get('runtime.storages'))) {
         // if we have not selected storage we cannot buy
@@ -328,7 +346,7 @@ function fn_storages_add_product_to_cart_get_price($product_data, $cart, $auth, 
 }
 
 function fn_storages_pre_get_cart_product_data($hash, $product, $skip_promotion, $cart, $auth, $promotion_amount, &$fields, &$join, $params) {
-    if ($storages = Registry::get('runtime.storages') && !empty($product['extra']['storage_id'])) {
+    if ($storages = Registry::get('runtime.storages') && !empty($product['extra']['storage_id']) && !isset($product['extra']['exclude_from_calculate'])) {
         $fields[] = '?:storages_products.qty_step as storage_qty_step';
         $fields[] = '?:storages_products.min_qty storage_min_qty';
         $join .= db_quote(' RIGHT JOIN ?:storages_products ON ?:storages_products.product_id = ?:products.product_id AND ?:storages_products.storage_id = ?i', $product['extra']['storage_id']);
@@ -512,4 +530,31 @@ function fn_storages_calendar_delivery_service_params($group, &$shipping, $compa
         $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
         $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $storage_settings, $usergroup_working_time_till);
     }
+}
+
+function fn_storages_get_user_price($params, $join, &$condition) {
+    if (isset($params['product']['extra']['storage_id'])) {
+        $storage_id = $params['product']['extra']['storage_id'];
+    } elseif ($storage = Registry::get('runtime.current_storage')) {
+        $storage_id = $storage['storage_id'];
+    }
+    if (!empty($storage_id)) {
+        $condition .= db_quote(' AND p.storage_id = ?i ', $storage_id);
+    }
+}
+
+function fn_storages_user_price_exim_product_price_pre($object, &$price) {
+    static $db_storages;
+    if (empty($object['storage_id'])) {
+        $storage_id = 0;  
+    } elseif (!isset($db_storages[$object['storage_id']])) {
+        $db_storages[$object['storage_id']] = db_get_field('SELECT storage_id FROM ?:storages WHERE code = ?s', $object['storage_id']);
+    }
+
+    $storage_id = (!empty($db_storages[$object['storage_id']])) ? $db_storages[$object['storage_id']] : 0;
+
+    foreach ($price as &$row) {
+        $row['storage_id'] = $storage_id;
+    }
+    unset($row);
 }

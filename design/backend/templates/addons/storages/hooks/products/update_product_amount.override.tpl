@@ -1,4 +1,4 @@
-{if $storages}
+{if $storages && $storages_amount}
     <div class="control-group">
         <label class="control-label" for="elm_in_stock">{__("in_stock")}:</label>
         <div class="controls">

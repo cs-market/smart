@@ -18,6 +18,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 {
     public $prices_commerseml = array();
     public $data_prices = array();
+    public $storages_map = array();
     
     public function importCategoriesFile($data_categories, $import_params, $parent_id = 0)
     {
@@ -86,7 +87,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
         foreach ($product_prices as $external_id => $p_price) {
             foreach ($prices_commerseml as $p_commerseml) {
                 if (!empty($p_commerseml['external_id'])) {
-                    if ($external_id == $p_commerseml['external_id']) {
+                    if ($external_id == $p_commerseml['external_id'] || (isset($p_price['external_id']) && $p_commerseml['external_id'] == $p_price['external_id'])) {
                         if ($p_commerseml['type'] == 'base') {
                             $prices['base_price'] = $p_price['price'];
                         }
@@ -99,7 +100,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
                         if ($p_commerseml['type'] == 'user_price') {
                             $prices['user_price'][] = array(
                                 'price' => $p_price['price'],
-                                'user_id' => $p_commerseml['user_id']
+                                'user_id' => $p_commerseml['user_id'],
+                                'storage_id' => $p_price['storage_id'],
                             );
                         }
 
@@ -137,6 +139,39 @@ class SDRusEximCommerceml extends RusEximCommerceml
         return $prices;
     }
 
+    public function importStoragesFromOffersFile($xml)
+    {
+        $cml = $this->cml;
+
+        if (!isset($xml->{$cml['warehouses']}->{$cml['warehouse']})) {
+            return;
+        }
+
+        foreach ($xml->{$cml['warehouses']}->{$cml['warehouse']} as $warehouse_xml_data) {
+            $this->getStorageByXml($warehouse_xml_data);
+        }
+    }
+
+    protected function getStorageByXml($warehouse_xml_data)
+    {
+        $cml = $this->cml;
+        $id = strval($warehouse_xml_data->{$cml['id']});
+        $this->findStorageId($id);
+    }
+
+    protected function findStorageId($uid)
+    {
+        if (isset($this->storages_map[$uid])) {
+            return $this->storages_map[$uid];
+        }
+
+        if ($storage_id = (int) $this->db->getField('SELECT storage_id FROM ?:storages WHERE code = ?s', $uid)) {
+            return $this->storages_map[$uid] = $storage_id;
+        }
+
+        return null;
+    }
+
     public function importProductOffersFile($data_offers, $import_params)
     {
         $cml = $this->cml;
@@ -155,6 +190,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
         
 
         $this->importWarehousesFromOffersFile($data_offers, $import_params);
+        $this->importStoragesFromOffersFile($data_offers, $import_params);
 
         if (isset($data_offers -> {$cml['prices_types']} -> {$cml['price_type']})) {
             $params['price_offers'] = $this->dataPriceOffers($data_offers -> {$cml['prices_types']});
@@ -253,6 +289,56 @@ class SDRusEximCommerceml extends RusEximCommerceml
         }
     }
 
+    protected function convertOfferStoragesStockXmlToOfferStorages($offer)
+    {
+        $cml = $this->cml;
+        $result = [];
+
+        /** @var \SimpleXMLElement $warehouse_info */
+        foreach ($offer->{$cml['warehouse']} as $storage_info) {
+
+            $storage = $storage_info->attributes();
+
+            $storage_id = $this->findStorageId((string) $storage->{$cml['warehouse_id']});
+
+            if ($storage_id === null) {
+                continue;
+            }
+
+            $result[$storage_id] = (int) $storage->{$cml['warehouse_in_stock']};
+            if ($result[$storage_id] < 0) $result[$storage_id] = 0;
+        }
+
+        return $result;
+    }
+
+    protected function importProductStoragesStock($product_id, $offer, $storages_amounts)
+    {
+        $cml = $this->cml;
+
+        if (!isset($offer->{$cml['warehouse']}) || empty($product_id)) {
+            return;
+        }
+
+        $storages_amounts = $this->convertOfferStoragesStockXmlToOfferStorages($offer);
+
+        if ($storages_amounts) {
+            $pdata = $this->db->getRow('SELECT min_qty, qty_step FROM ?:products WHERE product_id = ?i', $product_id);
+
+            foreach ($storages_amounts as $storage_id => $amount) {
+                $u_data[] = [
+                    'storage_id' => $storage_id,
+                    'product_id' => $product_id,
+                    'amount' => $amount,
+                    'min_qty' => $pdata['min_qty'],
+                    'qty_step' => $pdata['qty_step'],
+                ];
+            }
+            $this->db->query('DELETE FROM ?:storages_products WHERE product_id = ?i', $product_id);
+            $this->db->query('REPLACE INTO ?:storages_products ?m', $u_data);
+        }
+    }
+
     protected function importProductOffersAsOptions($product_guid, array $offers, array $params, array $import_params)
     {
         $count_import_offers = 0;
@@ -278,7 +364,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
 
         $product_data = fn_normalize_product_overridable_fields($product_data);
 
-        $warehouses_amounts = [];
+        $storages_amounts = $warehouses_amounts = [];
 
         foreach ($offers as $combination_id => $offer) {
             if (!$this->checkImportPrices($product_data)) {
@@ -307,6 +393,8 @@ class SDRusEximCommerceml extends RusEximCommerceml
             }
 
             $warehouses_amounts = $this->importProductWarehousesStock($product_id, $offer, $warehouses_amounts);
+            $storages_amounts = $this->importProductStoragesStock($product_id, $offer, $storages_amounts);
+
             $this->addProductPrice($product_id, $prices);
             $this->addProductXmlFeaturesAsOptions($offer, $product_id, $import_params, $combination_id, [], isset($product['product_code']) ? $product['product_code'] : false);
             $this->addMessageLog('Added product = ' . strval($offer -> {$cml['name']}) . ', price = ' . $prices['base_price']);
@@ -355,6 +443,35 @@ class SDRusEximCommerceml extends RusEximCommerceml
         }
 
         return isset($amount) ? $amount : false;
+    }
+
+    public function conversionProductPrices($p_prices, $price_offers)
+    {
+        $cml = $this->cml;
+        $product_prices = array();
+
+        if (!empty($p_prices) && !empty($price_offers)) {
+            foreach ($p_prices as $p_price) {
+                $price = strval($p_price -> {$cml['price_per_item']});
+                $external_id = $key = strval($p_price -> {$cml['price_id']});
+                if (!empty($this->storages_map[strval($p_price -> {$cml['warehouse_id']})])) $key .= $this->storages_map[strval($p_price -> {$cml['warehouse_id']})];
+                if (!empty($price_offers[$external_id]['coefficient'])) {
+                    $price = $price * $price_offers[$external_id]['coefficient'];
+                }
+
+                $product_prices[$key] = array(
+                    'price' => $price,
+                    'storage_id' => 0,
+                    'external_id' => $external_id,
+                );
+
+                if (!empty(strval($p_price -> {$cml['warehouse_id']})) && !empty($this->storages_map[strval($p_price -> {$cml['warehouse_id']})])) {
+                    $product_prices[$key]['storage_id'] = $this->storages_map[strval($p_price -> {$cml['warehouse_id']})];
+                }
+            }
+        }
+        
+        return $product_prices;
     }
 
     protected function getProductPricesByOffer($xml_offer, $params)

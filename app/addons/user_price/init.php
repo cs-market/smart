@@ -8,5 +8,7 @@ fn_register_hooks(
   'get_order_items_info_post',
   'get_product_price_post',
   'delete_product_post',
-  'post_delete_user'
+  'post_delete_user',
+  'add_product_to_cart_get_price',
+  'get_cart_product_data'
 );

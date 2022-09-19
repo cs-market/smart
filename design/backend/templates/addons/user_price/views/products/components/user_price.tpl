@@ -72,6 +72,8 @@
             <tr>
                 <th width="65%">{__("user")}</th>
                 <th width="20%">{__("price")}</th>
+                {hook name="user_price:manage_header"}
+                {/hook}
                 <th width="15%">&nbsp;</th>
             </tr>
         </thead>
@@ -95,6 +97,8 @@
                     <td width="20%" class="{$no_hide_input_if_shared_product}">
                         <input type="text" name="product_data[user_price][{$_key}][price]" value="{$price.price}" class="input input-user-price" />
                     </td>
+                    {hook name="user_price:manage_body"}
+                    {/hook}
                     <td width="15%" class="nowrap {$no_hide_input_if_shared_product} right">
                         {include file="buttons/clone_delete.tpl" microformats="cm-delete-price-row" no_confirm=true}
                     </td>
@@ -119,8 +123,10 @@
                 <td width="20%">
                     <input type="text" name="product_data[user_price][{$new_key}][price]" value="" class="input" />
                 </td>
+                {hook name="user_price:manage_body_new_line"}
+                {/hook}
                 <td width="15%" class="right">
-                    {include file="buttons/multiple_buttons.tpl" item_id="add_user_price"}
+                    {include file="buttons/multiple_buttons.tpl" item_id="add_user_price" hide_clone=true}
                 </td>
             </tr>
         </tbody>

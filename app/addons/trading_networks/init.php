@@ -8,7 +8,8 @@ fn_register_hooks(
     'user_logout_after',
     'get_storages',
     'user_roles_get_list',
-    'smart_auth_auth_routines'
+    'smart_auth_auth_routines',
+    'update_profile'
 );
 
 fn_init_stack(array('fn_init_network', &$_REQUEST));

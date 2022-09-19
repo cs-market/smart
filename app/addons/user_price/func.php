@@ -51,7 +51,30 @@ function fn_user_price_get_order_items_info_post(&$order, $v, $k)
     }
 }
 
+function fn_user_price_add_product_to_cart_get_price($product_data, $cart, $auth, $update, $_id, $data, $product_id, $amount, &$price, $zero_price_action, $allow_add) {
+    list($user_prices) = fn_get_product_user_price_with_params([
+        'product_id' => $product_id,
+        'user_ids' => $auth['user_id'],
+        'product' => $data
+    ]);
+    if (!empty($user_prices)) {
+        $price = $user_prices[0]['price'];
+    }
+}
+
+function fn_user_price_get_cart_product_data($product_id, &$_pdata, $product, $auth, $cart, $hash) {
+    list($user_prices) = fn_get_product_user_price_with_params([
+        'product_id' => $product_id,
+        'user_ids' => $auth['user_id'],
+        'product' => $product
+    ]);
+    if (!empty($user_prices)) {
+        $_pdata['price'] = $user_prices[0]['price'];
+    }
+}
+
 function fn_user_price_get_product_price_post($product_id, $amount, $auth, &$price) {
+    // а может это уже и не нужно, если есть два хука выше?
     $user_prices = fn_get_product_user_price($product_id);
     if (!empty($user_prices)) {
         $price = $user_prices[0]['price'];
@@ -61,30 +84,25 @@ function fn_user_price_get_product_price_post($product_id, $amount, $auth, &$pri
 
 function fn_update_product_user_price($product_id, $user_prices, $delete_price = true)
 {
-    if ($delete_price) {
-        //  delete all old data
-        db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);  
-    } else {
-        $user_prices = array_filter($user_prices, function($v) {return (isset($v['user_id']) && is_numeric($v['user_id']));} );
-        $users = array_column($user_prices, 'user_id');
-        db_query("DELETE FROM ?:user_price WHERE product_id = ?i AND user_id IN (?a)", $product_id, $users);  
-    }
-
-    $user_price = array_filter($user_prices, function($v) {
-        static $users;
-        if (!in_array($v['user_id'], $users)) {
-            $users[] = $v['user_id'];
-            return (isset($v['price']) && is_numeric($v['price']));
-        } else {
-            return false;
-        }
+    array_walk($user_prices, function(&$value, $k) use ($product_id) {$value['product_id'] = $product_id;});
+    $user_prices = array_filter($user_prices, function($v) {return (isset($v['user_id']) && is_numeric($v['user_id']));} );
+    $user_prices = array_filter($user_prices, function($v) {
+        return (isset($v['price']) && is_numeric($v['price']));
     });
 
-    if (!empty($user_price)) {
-        array_walk($user_price, function(&$value, $k) use ($product_id) {$value['product_id'] = $product_id;});
-        db_query('INSERT INTO ?:user_price ?m', $user_price);
+    if ($delete_price) {
+        //  delete all old data
+        db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);
+    } else {
+        foreach($user_prices as $where) {
+            unset($where['price']);
+            db_query("DELETE FROM ?:user_price WHERE ?w", $where);
+        }
     }
 
+    if (!empty($user_prices)) {
+        db_query('INSERT INTO ?:user_price ?m', $user_prices);
+    }
     return true;
 }
 
@@ -151,6 +169,8 @@ function fn_get_product_user_price_with_params($params = [])
     }
 
     $calc_found_rows = 'SQL_CALC_FOUND_ROWS';
+
+    fn_set_hook('get_user_price', $params, $join, $condition);
 
     $user_prices = db_get_array("SELECT $calc_found_rows p.* FROM ?:user_price as p $join WHERE 1 $condition $limit");
 
