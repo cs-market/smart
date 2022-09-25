@@ -219,7 +219,7 @@ function fn_category_promotion_get_promotions($params, &$fields, $sortings, &$co
 }
 
 function fn_category_promotion_get_promotions_post($params, $items_per_page, $lang_code, &$promotions) {
-    if (defined('ORDER_MANAGEMENT') && !empty($params['promotion_id'])) {
+    if (defined('ORDER_MANAGEMENT')) {
         return;
     }
     if (SiteArea::isStorefront(AREA)) {

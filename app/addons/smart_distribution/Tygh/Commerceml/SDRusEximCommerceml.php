@@ -985,7 +985,7 @@ class SDRusEximCommerceml extends RusEximCommerceml
                 }
             }
             $link_type = $this->s_commerceml['exim_1c_import_type'];
-
+            fn_define('ORDER_MANAGEMENT', true);
             foreach ($orders_data as $order_data) {
                 $order_info = $xml_products = [];
                 $external_order_id = strval($order_data->{$cml['id']});
@@ -1035,7 +1035,6 @@ class SDRusEximCommerceml extends RusEximCommerceml
                                 'stored_price' => 'Y',
                             ),
                         );
-                        fn_define('ORDER_MANAGEMENT', true);
                         fn_add_product_to_cart($_item, $cart, $customer_auth);
                     }
 

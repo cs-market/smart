@@ -1401,6 +1401,26 @@ function fn_smart_distribution_get_promotions($params, $fields, $sortings, &$con
             $condition .= db_quote(' AND IF(to_date, to_date >= ?i, 1)', $time_from);
         }
     }
+
+    if (!empty($params['active_on_date'])) {
+        $statuses = ['A'];
+        if (!empty($params['get_hidden'])) {
+            $statuses[] = 'H';
+        }
+        $condition .= db_quote(
+            ' AND IF(from_date, from_date <= ?i, 1) AND IF(to_date, to_date >= ?i, 1) AND status IN (?a)',
+            $params['active_on_date'],
+            $params['active_on_date'],
+            $statuses
+        );
+    }
+}
+
+function fn_smart_distribution_promotion_apply_before_get_promotions($zone, $data, $auth, $cart_products, $promotions, $applied_promotions, &$get_promotions_params) {
+    if (defined('ORDER_MANAGEMENT') && !empty($get_promotions_params['active']) && !empty($data['order_id'])) {
+        unset($get_promotions_params['active']);
+        $get_promotions_params['active_on_date'] = db_get_field('SELECT timestamp FROM ?:orders WHERE order_id = ?i', $data['order_id']);
+    }
 }
 
 function fn_smart_distribution_text_cart_amount_corrected_notification($product, $current_amount, $original_amount, $amount) {
@@ -1464,7 +1484,7 @@ function fn_reward_points_promotion_give_percent_points($bonus, &$cart, &$auth, 
     $cart['promotions'][$bonus['promotion_id']]['bonuses'][$bonus['bonus']] = $bonus;
 
     if ($bonus['bonus'] == 'give_percent_points') {
-        $cart['points_info']['additional'] = (!empty($cart['points_info']['additional']) ? $cart['points_info']['additional'] : 0) + round($cart['subtotal'] * $bonus['value'] / 100);
+        $cart['points_info']['additional'] = round($cart['subtotal'] * $bonus['value'] / 100);
     }
 
     return true;

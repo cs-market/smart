@@ -76,6 +76,7 @@ fn_register_hooks(
     'get_orders_post',
     'extract_cart',
     'get_promotions',
+    'promotion_apply_before_get_promotions',
     'text_cart_amount_corrected_notification',
     'get_orders_totals',
     'sberbank_edit_item',
