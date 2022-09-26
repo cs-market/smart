@@ -247,12 +247,14 @@ function fn_auto_exim_run_import($imports, $company_id) {
     Registry::set('runtime.company_id', $company_id);
     foreach ($imports as $import) {
         // make sure no another import processes are still active
+        $debug = isset($_REQUEST['debug']);
+
         $lock_file_path = $import['dirname'].$import['basename'] . '.lock';
         if (is_file($lock_file_path) && filemtime($lock_file_path) < (TIME - 60 * 60)) {
             @unlink($lock_file_path);
         }
 
-        if (is_file($lock_file_path)) {
+        if (is_file($lock_file_path) && !$debug) {
             fn_echo($import['dirname'].$import['basename'] . " in process");
             continue;
         } else {
