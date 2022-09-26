@@ -88,7 +88,7 @@ function fn_monolith_generate_xml($order_id) {
                             $addon['order_prefix'] . $order_id,
                             $applied_promotions[$promotion_id]['external_id'],
                             $applied_promotions[$promotion_id]['name'],
-                            $value['discount'],
+                            $value['discount_value'],
                             $product['product_code']
                         )
                     ];
