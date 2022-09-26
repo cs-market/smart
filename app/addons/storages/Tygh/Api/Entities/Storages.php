@@ -35,7 +35,7 @@ class Storages extends AEntity
         }
 
         return array(
-            'status' => empty($data) ? Response::STATUS_NOT_FOUND : Response::STATUS_OK,
+            'status' => Response::STATUS_OK,
             'data' => $data
         );
     }
