@@ -13,9 +13,9 @@
 </div>
 
 <div class="control-group">
-    <label for="email" class="control-label cm-required">{__("login")}:</label>
+    <label for="login" class="control-label cm-required">{__("login")}:</label>
     <div class="controls">
-        <input type="text" id="email" name="user_data[user_login]" class="input-large" size="32" maxlength="128" value="{$user_data.user_login}" />
+        <input type="text" id="login" name="user_data[user_login]" class="input-large" size="32" maxlength="128" value="{$user_data.user_login}" />
     </div>
 </div>
 
