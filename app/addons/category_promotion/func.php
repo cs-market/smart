@@ -264,7 +264,7 @@ function fn_category_promotion_get_autostickers_pre(&$stickers, &$product, $auth
 function fn_category_promotion_get_product_data_post(&$product_data, $auth, $preview, $lang_code)
 {
     if (!empty($product_data['product_id']) && SiteArea::isStorefront(AREA)) {
-        list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product_data['product_id'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true], 1);
+        list($promotions) = fn_get_promotions(['product_or_bonus_product' => $product_data['product_id'], 'usergroup_ids' => Tygh::$app['session']['auth']['usergroup_ids'], 'active' => true]);
 
         if ($promotions) {
             $promotion = reset($promotions);
