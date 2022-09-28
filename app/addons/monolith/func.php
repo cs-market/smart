@@ -65,11 +65,12 @@ function fn_monolith_generate_xml($order_id) {
             }
             $bonus = $bonuses[max(array_keys($bonuses))];
             if ($bonus['discount_bonus'] == 'by_percentage') {
-                $p['price'] = fn_format_price($p['base_price'] * (1-$bonus['discount_value']/100));
+                $price = fn_format_price($p['base_price'] * (1-$bonus['discount_value']/100));
             } elseif($bonus['discount_bonus'] == 'to_percentage') {
-                $p['price'] = fn_format_price($p['base_price'] * ($bonus['discount_value']/100));
+                $price = fn_format_price($p['base_price'] * ($bonus['discount_value']/100));
             }
         }
+
         $iterator += 1;
         $CRMOrderLine[] = [
             'f' => array(
