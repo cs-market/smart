@@ -82,13 +82,21 @@ function fn_monolith_generate_xml($order_id) {
                     $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
                 }
                 foreach ($promotion['bonuses'] as $value) {
+                    list($external_id) = explode('.', $applied_promotions[$promotion_id]['external_id']);
+                    $discount_value = $value['discount_value'];
+                    if ($value['discount_bonus'] == 'to_percentage') {
+                        $discount_value = 100 - $value['discount_value'];
+                    } elseif ($value['discount_bonus'] == 'to_fixed' || $value['discount_bonus'] == 'by_fixed') {
+                        $discount_value = round($product['discount'] / $product['base_price'] * 100, 2);
+                    }
+
                     $CRMOrderDiscountLine[] = [
                         'f' => array(
                             date("Y-m-d\T00:00:00", $order_info['timestamp']),
                             $addon['order_prefix'] . $order_id,
-                            $applied_promotions[$promotion_id]['external_id'],
+                            $external_id,
                             $applied_promotions[$promotion_id]['name'],
-                            $value['discount_value'],
+                            $discount_value,
                             $product['product_code']
                         )
                     ];
@@ -100,11 +108,12 @@ function fn_monolith_generate_xml($order_id) {
             if (in_array($promotion_id, array_keys($applied_promotions))) continue;
 
             $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
+            list($external_id) = explode('.', $applied_promotions[$promotion_id]['external_id']);
             $CRMOrderDiscountLine[] = [
                 'f' => array(
                     date("Y-m-d\T00:00:00", $order_info['timestamp']),
                     $addon['order_prefix'] . $order_id,
-                    $applied_promotions[$promotion_id]['external_id'], // REPLACE BY PROMOTION EXTERNAL ID
+                    $external_id,
                     $applied_promotions[$promotion_id]['name'],
                     $order_info['subtotal_discount'],
                     'whole_order'
