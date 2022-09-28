@@ -1615,17 +1615,34 @@ fn_print_r($fantoms);
     fn_print_die('done', "новых: $counter", "итого: " . count($values));
 } elseif ($mode == 'correct_reward_points_new1') {
     $orders_wo_points = [];
-    $exclude_users = [58406,58683,58434,61971,64468,59360,58435,42557,58446,58407,58429,58726,58476,58779,58780,58485,65989,65990,55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
-    //$exclude_users = [55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
-    $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id IN (?a) AND user_type = ?s AND user_id NOT IN (?a) AND user_id = ?i', [1810], 'C', $exclude_users, 52642);
-    //$manual_corrections = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id IN (?a) AND reason = ?s', $users, '');
-    $user_orders = db_get_hash_multi_array('SELECT order_id, user_id, total, timestamp FROM ?:orders WHERE user_id IN (?a) AND timestamp > ?i AND status = ?s AND group_id NOT IN (?a) ORDER BY timestamp', array('user_id','order_id'), $users, 1651352400, 'H', [18]);
+    $company_id = 1810;
+    if ($action) {
+        $company_id = $action;
+    }
+    if ($company_id == 2058) {
+        $exclude_users = [55823,53755,56064,54738,55364,55126,55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
+        $group_ids = [18];
+        $promotion_id = 6761;
+    } else {
+        $exclude_users = [58406,58683,58434,61971,64468,59360,58435,42557,58446,58407,58429,58726,58476,58779,58780,58485,65989,65990,55823,53755,56064,54738,55364,55126,
+            55219,55479,55230,56872,55452,54199,55730,70173,54945,56057];
+        $group_ids = [17];
+        $promotion_id = 4993;
+    }
+    $promotion = fn_get_promotion_data($promotion_id);
+    $cond = fn_find_promotion_condition($promotion['conditions'], 'users');
+    $exclude_users = explode(',', $cond['value']);
+
+    $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id IN (?a) AND user_type = ?s AND user_id NOT IN (?a)', [$company_id], 'C', $exclude_users);
     
+    //$manual_corrections = db_get_array('SELECT * FROM ?:reward_point_changes WHERE user_id IN (?a) AND reason = ?s', $users, '');
+    $user_orders = db_get_hash_multi_array('SELECT order_id, user_id, total, timestamp FROM ?:orders WHERE user_id IN (?a) AND timestamp > ?i AND status = ?s AND group_id NOT IN (?a) AND total > 0 AND is_parent_order = "N" ORDER BY timestamp', array('user_id','order_id'), $users, 1656806400, 'H', $group_ids);
+
     foreach ($user_orders as $user_id => $orders) {
         $order_ids = array_keys($orders);
         $first_order_ts = reset($orders)['timestamp'];
-        $ts = strtotime("-3 months", $first_order_ts);
-        $first_order = db_get_field('SELECT max(order_id) FROM ?:orders WHERE order_id < ?i AND timestamp > ?i AND user_id = ?i', reset($order_ids), $ts, $user_id);
+        $ts = strtotime("-6 months", $first_order_ts);
+        $first_order = db_get_field('SELECT max(order_id) FROM ?:orders WHERE order_id < ?i AND timestamp > ?i AND user_id = ?i AND total > 0 AND is_parent_order = "N"', reset($order_ids), $ts, $user_id);
         if (!$first_order) {
             $first_order = array_shift($order_ids);
         }
@@ -1633,7 +1650,10 @@ fn_print_r($fantoms);
         if (!empty($order_ids)) {
             foreach ($order_ids as $order_id) {
                 $order_info = fn_get_order_info($order_id);
-                if (empty($order_info['points_info']['reward'])) {
+                if (empty($order_info['points_info']['reward'])) {//
+                    $is_corrected = db_get_row('SELECT change_id, action, timestamp, amount, reason FROM ?:reward_point_changes WHERE user_id = ?i AND (reason like ?l OR (reason like ?l AND amount = ?i))', $user_id, "%$order_id%", '%Корректировка%', round($order_info['total']*0.02));
+
+                    if (!empty($is_corrected)) continue;
                     $orders_wo_points[] = [
                         'order_id' => $order_id,
                         'user_id' => $order_info['user_id'],
@@ -1647,9 +1667,10 @@ fn_print_r($fantoms);
             }
         }
     }
-    // $params['filename'] = 'reward_pointsT.csv';
-    // $params['force_header'] = true;
-    // $export = fn_exim_put_csv($orders_wo_points, $params, '"');
+
+    $params['filename'] = "reward_points_$company_id.csv";
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($orders_wo_points, $params, '"');
 fn_print_die($orders_wo_points);
     foreach ($orders_wo_points as $order) {
         fn_change_user_points($order['reward'], $order['user_id'], "Корректировка баллов по заказу #$order_id: $reward", CHANGE_DUE_ADDITION);
