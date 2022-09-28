@@ -46,6 +46,7 @@ function fn_promotion_import_build_conditions(&$object) {
         ];
 
         foreach ($conditions as $key => $value) {
+            if (empty($value)) continue;
             list(, $condition, $operator) = explode('.', $key);
             $conditions_to_db['conditions'][] = [
                 'operator' => $operator,
@@ -65,6 +66,7 @@ function fn_promotion_import_build_bonuses(&$object) {
     if (!empty($bonuses)) {
         $bonuses_to_db = [];
         foreach ($bonuses as $key => $value) {
+            if (empty($value)) continue;
             list(, $bonus, $operator) = explode('.', $key);
             if (is_numeric($value)) {
                 $bonuses_to_db[] = [
@@ -140,6 +142,7 @@ function fn_promotion_import_get_value($type, $data, $company_id) {
 
 function fn_promotion_import_generate_promotion_hashes(&$object) {
     // TODO maybe use fn_category_promotion_update_promotion_post directly ?
+    // А ЕСЛИ УСЛОВИЯ НЕ ОБНОВЛЯЮТСЯ ТЕКУЩИМ ИМПОРТОМ?
     $conditions = unserialize($object['conditions']);
     $bonuses = unserialize($object['bonuses']);
 
