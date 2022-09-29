@@ -36,7 +36,7 @@ function fn_promotion_import_put_optional_timestamp($timestamp)
 
 function fn_promotion_import_build_conditions(&$object) {
     $company_id = Registry::ifget('runtime.company_id', $object['company_id']);
-    $conditions = array_filter($object, function($key) {return (strpos($key, 'c.') === 0);}, ARRAY_FILTER_USE_KEY);
+    $conditions = array_filter($object, function($val, $key) {return (strpos($key, 'c.') === 0 && !empty($val));}, ARRAY_FILTER_USE_BOTH);
     $object = array_filter($object, function($key) {return (strpos($key, 'c.') !== 0);}, ARRAY_FILTER_USE_KEY);
     if (!empty($conditions)) {
         $conditions_to_db = [
@@ -46,7 +46,6 @@ function fn_promotion_import_build_conditions(&$object) {
         ];
 
         foreach ($conditions as $key => $value) {
-            if (empty($value)) continue;
             list(, $condition, $operator) = explode('.', $key);
             $conditions_to_db['conditions'][] = [
                 'operator' => $operator,
@@ -61,12 +60,11 @@ function fn_promotion_import_build_conditions(&$object) {
 
 function fn_promotion_import_build_bonuses(&$object) {
     $company_id = Registry::ifget('runtime.company_id', $object['company_id']);
-    $bonuses = array_filter($object, function($key) {return (strpos($key, 'b.') === 0);}, ARRAY_FILTER_USE_KEY);
+    $bonuses = array_filter($object, function($val, $key) {return (strpos($key, 'b.') === 0 && !empty($val));}, ARRAY_FILTER_USE_BOTH);
     $object = array_filter($object, function($key) {return (strpos($key, 'b.') !== 0);}, ARRAY_FILTER_USE_KEY);
     if (!empty($bonuses)) {
         $bonuses_to_db = [];
         foreach ($bonuses as $key => $value) {
-            if (empty($value)) continue;
             list(, $bonus, $operator) = explode('.', $key);
             if (is_numeric($value)) {
                 $bonuses_to_db[] = [
@@ -141,26 +139,27 @@ function fn_promotion_import_get_value($type, $data, $company_id) {
 }
 
 function fn_promotion_import_generate_promotion_hashes(&$object) {
-    // TODO maybe use fn_category_promotion_update_promotion_post directly ?
-    // А ЕСЛИ УСЛОВИЯ НЕ ОБНОВЛЯЮТСЯ ТЕКУЩИМ ИМПОРТОМ?
-    $conditions = unserialize($object['conditions']);
-    $bonuses = unserialize($object['bonuses']);
-
-    $object['conditions_hash'] = fn_promotion_serialize($conditions['conditions']);
-    $object['users_conditions_hash'] = fn_promotion_serialize_users_conditions($conditions['conditions']);
-
     if (Registry::get('addons.category_promotion.status') == 'A') {
-        if (isset($conditions['conditions'])) {
-            fn_get_conditions($conditions['conditions'], $promo_extra);
+        if (!empty($object['conditions'])) {
+            $conditions = unserialize($object['conditions']);
+            $object['conditions_hash'] = fn_promotion_serialize($conditions['conditions']);
+            $object['users_conditions_hash'] = fn_promotion_serialize_users_conditions($conditions['conditions']);
+            if (isset($conditions['conditions'])) {
+                fn_get_conditions($conditions['conditions'], $promo_extra);
+            }
+
+            $default_promo_extra = ['products' => '', 'usergroup' => ''];
+            $promo_extra = array_map(function($arr) {return  implode(',', $arr);}, $promo_extra);
+            $promo_extra = fn_array_merge($default_promo_extra, $promo_extra);
+
+            $object['products'] = $promo_extra['products'];
+            $object['usergroup'] = $promo_extra['usergroup'];
+            $object['condition_categories'] = implode(',', fn_get_promotion_condition_categories($conditions));
         }
 
-        $default_promo_extra = ['products' => '', 'usergroup' => ''];
-        $promo_extra = array_map(function($arr) {return  implode(',', $arr);}, $promo_extra);
-        $promo_extra = fn_array_merge($default_promo_extra, $promo_extra);
-
-        $object['bonus_products'] = $promo_extra['products'];
-        $object['usergroup'] = $promo_extra['usergroup'];
-        $object['bonus_products'] = implode(',', fn_get_promotion_bonus_products($bonuses));
-        $object['condition_categories'] = implode(',', fn_get_promotion_condition_categories($conditions));
+        if (!empty($object['bonuses'])) {
+            $bonuses = unserialize($object['bonuses']);
+            $object['bonus_products'] = implode(',', fn_get_promotion_bonus_products($bonuses));
+        }
     }
 }
