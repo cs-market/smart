@@ -479,6 +479,8 @@ function fn_storages_shippings_group_products_list(&$products, &$groups) {
 function fn_storages_pre_update_order(&$cart, $order_id) {
     if (Registry::get('runtime.storages') && count($cart['product_groups']) == 1) {
         $cart['storage_id'] = $cart['product_groups'][0]['storage_id'];
+    } else {
+        $cart['storage_id'] = 0;
     }
 }
 
