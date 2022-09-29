@@ -24,6 +24,8 @@
         <item lang="ru" id="block_storages">Склады</item>
         <item lang="ru" id="exim_remove_user_storages">Удалить текущие пользовательские дни по складу</item>
         <item lang="ru" id="text_remove_user_storages">При импорте пользовательских дней по складам существующие дни по складу обновляемого пользователя будут удалены</item>
+        <item lang="ru" id="storages.storage_already_exist">Склад с таким кодом уже существует</item>
+        <item lang="ru" id="storages.access_denied">Доступ запрещен</item>
     </language_variables>
     <queries>
         <!-- company_id only for multivendor -->

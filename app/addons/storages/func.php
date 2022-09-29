@@ -99,8 +99,15 @@ function fn_update_storage($storage_data, $storage_id = 0) {
     unset($storage_data['storage_id']);
 
     if (fn_allowed_for('MULTIVENDOR') && Registry::get('runtime.company_id')) {
-        $storage_data['company_id'] = $storage_data['company_id'] ?? Registry::get('runtime.company_id');
-        if (!empty($storage_id) && !($storage_id = db_get_field('SELECT storage_id FROM ?:storages WHERE storage_id = ?i AND company_id = ?i', $storage_id, $storage_data['company_id']))) {
+        $storage_data['company_id'] = Registry::get('runtime.company_id');
+        if (!empty($storage_id) && !(db_get_field('SELECT storage_id FROM ?:storages WHERE storage_id = ?i AND company_id = ?i', $storage_id, $storage_data['company_id']))) {
+            fn_set_notification('E', __('error'), __('storages.access_denied'));
+            return false;
+        }
+
+        $db_storage_id = db_get_field('SELECT storage_id FROM ?:storages WHERE code = ?s AND company_id = ?i', $storage_data['code'], $storage_data['company_id']);
+        if ($db_storage_id && $db_storage_id != $storage_id) {
+            fn_set_notification('E', __('error'), __('storages.storage_already_exist'));
             return false;
         }
     }
