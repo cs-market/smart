@@ -299,19 +299,3 @@ class Products extends AEntity
         return $products;
     }
 }
-
-function fn_write_r() {
-  static $count = 0;
-  $args = func_get_args();
-  $fp = fopen('api_requests.html', 'w+');
-  if (!empty($args)) {
-	fwrite($fp, '<ol style="font-family: Courier; font-size: 12px; border: 1px solid #dedede; background-color: #efefef; float: left; padding-right: 20px;">');
-	foreach ($args as $k => $v) {
-	  $v = htmlspecialchars(print_r($v, true));
-	  if ($v == '') { $v = ' '; }
-	  fwrite($fp, '<li><pre>' . $v . "\n" . '</pre></li>');
-	}
-	fwrite($fp, '</ol><div style="clear:left;"></div>');
-  }
-  $count++;
-}
