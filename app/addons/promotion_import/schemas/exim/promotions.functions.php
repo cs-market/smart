@@ -30,6 +30,7 @@ function fn_promotion_import_put_optional_timestamp($timestamp)
     if (empty($timestamp)) {
         return 0;
     } else {
+        $timestamp = str_replace('.', '/', $timestamp);
         return fn_parse_date($timestamp);
     }
 }
@@ -47,13 +48,37 @@ function fn_promotion_import_build_conditions(&$object) {
 
         foreach ($conditions as $key => $value) {
             list(, $condition, $operator) = explode('.', $key);
-            $conditions_to_db['conditions'][] = [
-                'operator' => $operator,
-                'condition' => $condition,
-                'value' => fn_promotion_import_get_value($condition, $value, $company_id)
-            ];
+            if ($condition == 'products') {
+                $value = array_filter(explode(',', $value));
+                array_walk($value, function(&$v) {list($t['product_code'], $t['amount']) = explode(':', $v);$v = $t;});
+                $products = fn_promotion_import_get_value('products', array_column($value, 'product_code'));
+                // без amount просто имплодим, зону мы можем и не знать
+                foreach ($value as &$data) {
+                    $data['product_id'] = $products[$data['product_code']];
+                    unset($data['product_code']);
+                    if (empty($data['amount'])) unset($data['amount']);
+                }
+                if ($amount = array_column($value, 'amount')) {
+                    $conditions_to_db['conditions'][] = [
+                        'operator' => $operator,
+                        'condition' => $condition,
+                        'value' => $value,
+                    ];
+                } else {
+                    $conditions_to_db['conditions'][] = [
+                        'operator' => $operator,
+                        'condition' => $condition,
+                        'value' => implode(',', $products),
+                    ];
+                }
+            } elseif ($condition == 'users') {
+                $conditions_to_db['conditions'][] = [
+                    'operator' => $operator,
+                    'condition' => $condition,
+                    'value' => fn_promotion_import_get_value($condition, $value, $company_id)
+                ];
+            }
         }
-
         $object['conditions'] = serialize($conditions_to_db);
     }
 }
@@ -66,22 +91,29 @@ function fn_promotion_import_build_bonuses(&$object) {
         $bonuses_to_db = [];
         foreach ($bonuses as $key => $value) {
             list(, $bonus, $operator) = explode('.', $key);
-            if (is_numeric($value)) {
+            if (in_array($bonus, ['product_discount'])) {
                 $bonuses_to_db[] = [
                     'bonus' => $bonus,
                     'discount_bonus' => $operator,
-                    'discount_value' => $value
+                    'discount_value' => fn_promotion_import_get_value('number', $value),
                 ];
-            } else {
-                $data = fn_promotion_import_get_value($bonus, $value, $company_id);
-                $data = fn_array_group($data, 'amount');
-                foreach ($data as $discount_value => $products) {
-                    $bonuses_to_db[] = [
-                        'bonus' => $bonus,
-                        'discount_bonus' => $operator,
-                        'value' => implode(',', array_column($products, 'product_id')),
-                        'discount_value' => $discount_value
-                    ];
+            } elseif($bonus == 'discount_on_products') {
+                $value = array_filter(explode(',', $value));
+                array_walk($value, function(&$v) {list($t['product_code'], $t['discount']) = explode(':', $v);$v = $t;});
+                $value = array_filter($value, function($v) {return !empty($v['discount']);});
+                if (empty($value)) continue;
+                $value = fn_array_group($value, 'discount');
+
+                foreach ($value as $discount_value => $data) {
+                    $products = fn_promotion_import_get_value('products', array_column($data, 'product_code'), $company_id);
+                    if (!empty($products)) {
+                        $bonuses_to_db[] = [
+                            'bonus' => $bonus,
+                            'discount_bonus' => $operator,
+                            'value' => implode(',', $products),
+                            'discount_value' => fn_promotion_import_get_value('number', $discount_value)
+                        ];
+                    }
                 }
             }
         }
@@ -89,9 +121,10 @@ function fn_promotion_import_build_bonuses(&$object) {
     }
 }
 
-function fn_promotion_import_get_value($type, $data, $company_id) {
+function fn_promotion_import_get_value($type, $data, $company_id = 0) {
     if ($type == 'users') {
         $names = explode(',', $data);
+        $names = array_filter($names);
         $search_fields = array('cscart_users.user_login', 'cscart_users.firstname', 'cscart_users.email');
 
         list($fields, $join, $condition) = fn_get_users(['get_conditions' => true, 'company_ids' => [$company_id]], $_SESSION['auth']);
@@ -114,27 +147,18 @@ function fn_promotion_import_get_value($type, $data, $company_id) {
 
         $users = db_get_array("SELECT " . implode(', ', $fields) . " FROM ?:users $join WHERE 1" . implode('', $condition));
         return implode(',', array_column($users, 'user_id'));
-    } elseif ($type == 'products' || $type == 'discount_on_products') {
-        $data = explode(',', $data);
-        array_walk($data, function(&$v) {list($t['product_code'], $t['amount']) = explode(':', $v);$v = $t;});
-
-        $condition['product_code'] = db_quote(' AND product_code IN (?a)', array_column($data, 'product_code'));
-        $condition['company_id'] = fn_get_company_condition('company_id', true, $company_id);
-        $products = db_get_hash_single_array("SELECT product_id, product_code FROM ?:products WHERE 1 " . implode('', $condition), array('product_code', 'product_id'));
-
-        if (!empty(array_filter(array_column($data, 'amount')))) {
-            foreach ($data as $key => &$value) {
-                if (isset($products[$value['product_code']])) {
-                    $value['product_id'] = $products[$value['product_code']];
-                    unset($value['product_code']);
-                } else {
-                    unset($data[$key]);
-                }
-            }
-            return $data;
-        } else {
-            return implode(',', $products);
+    } elseif ($type == 'products') {
+        if (!is_array($data)) {
+            $data = explode(',', $data);
         }
+        $data = array_filter($data);
+        $condition = [
+            'product_code' => db_quote(' AND product_code IN (?a)', $data),
+            'company_id' => fn_get_company_condition('company_id', true, $company_id),
+        ];
+        return db_get_hash_single_array("SELECT product_id, product_code FROM ?:products WHERE 1 " . implode('', $condition), array('product_code', 'product_id'));
+    } elseif ($type == 'number') {
+        return fn_smart_distribution_exim_import_price($data);
     }
 }
 

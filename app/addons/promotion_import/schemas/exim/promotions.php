@@ -135,7 +135,7 @@ $schema = array(
 // }
 
 if (Registry::get('runtime.company_id')) {
-    // uset $company_id
+    $schema['export_fields']['Company']['required'] = false;
 }
 
 return $schema;
