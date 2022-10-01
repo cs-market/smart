@@ -5,7 +5,7 @@ use Tygh\Enum\YesNo;
 
 function fn_get_1c_code($oid) {
     $oi = fn_get_order_info($oid);
-    return (empty($oi['fields']['38'])) ? '' : $oi['fields']['38'];
+    return (empty($oi['fields']['39'])) ? $oi['fields']['38'] : $oi['fields']['39'];
 }
 
 function fn_get_payment_name($payment_id, $lang_code = CART_LANGUAGE) {
