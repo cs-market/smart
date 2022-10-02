@@ -149,7 +149,7 @@ function fn_generate_sales_report($params) {
             }
 
             $row[__('address')] = $user['s_address'];
-            $row[__('code')] = $user['fields'][38];
+            $row[__('code')] = !empty($user['fields'][39]) ? $user['fields'][39] : $user['fields'][38];
             foreach ($intervals as $interval) {
                 $f = $interval['description'];
                 if ($params['show_plan'] == 'Y') {
