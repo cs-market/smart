@@ -275,7 +275,7 @@ function fn_generate_category_report($params) {
                 $output[] = array_merge(array(
                     __('customer') => $user['firstname'],
                     __('address') => $user['b_address'],
-                    __('code') => $user['fields'][38],
+                    __('code') => !empty($user['fields'][39]) ? $user['fields'][39] : $user['fields'][38],
                     __('category') => fn_get_category_name($category_id),
                 ), $o);
             }
@@ -376,7 +376,7 @@ function fn_generate_unsold_report($params) {
             $output[] = array(
                 __('user') => (!empty(trim($user['firstname'])) ? $user['firstname'] : $user['email'])  . " " .  "#" . $user['user_id'],
                 __('address') => $user['b_address'],
-                __('code') => $user['fields'][38],
+                __('code') => !empty($user['fields'][39]) ? $user['fields'][39] : $user['fields'][38],
                 __('sales') => ($purchased_users[$key]['total']) ? $purchased_users[$key]['total'] : 0
             );
         }
@@ -428,7 +428,7 @@ function fn_generate_order_reviews_report($params) {
             $output[] = array(
                 __('customer') => $user['firstname'],
                 __('address') => $user['b_address'],
-                __('code') => $user['fields'][38],
+                __('code') => !empty($user['fields'][39]) ? $user['fields'][39] : $user['fields'][38],
                 __('date') => fn_date_format($discussion['timestamp'], Registry::get('settings.Appearance.date_format')),
                 __('order_id') => $discussion['object_id'],
                 __('rating') => $discussion['rating_value'],
