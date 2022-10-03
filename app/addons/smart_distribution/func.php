@@ -183,8 +183,7 @@ function fn_smart_distribution_get_managers($params = array()) {
         $condition .= db_quote(" AND vc.customer_id = ?i", $params['user_id']);
     }
 
-    $managers = db_get_hash_array("SELECT DISTINCT(vc.vendor_manager) as user_id, u.email, IF(CONCAT(firstname, lastname) = '', email, CONCAT(firstname, ' ', lastname)) AS name, u.company_id FROM ?:vendors_customers AS vc LEFT JOIN ?:users AS u ON u.user_id = vc.vendor_manager WHERE 1 $condition", 'user_id');
-
+    $managers = db_get_hash_array("SELECT DISTINCT(vc.vendor_manager) as user_id, u.email, IF(CONCAT(firstname, lastname) = '', company, CONCAT(firstname, ' ', lastname)) AS name, u.company_id, u.phone FROM ?:vendors_customers AS vc LEFT JOIN ?:users AS u ON u.user_id = vc.vendor_manager WHERE 1 $condition", 'user_id');
     return $managers;
 }
 

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>draft_master</id>
+    <name>Smart distribution: Draft master</name>
+    <version>1.0.1</version>
+    <priority>100</priority>
+    <status>active</status>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <translations> 
+        <item for="name" lang="ru">Smart distribution: Драфт мастер</item>
+    </translations>
+    <language_variables>
+        <item lang="ru" id="block_extra_user_data">Дополнительные данные пользователя</item>
+        <item lang="ru" id="my_equipment">Моё оборудование</item>
+        <item lang="ru" id="contacts">Контакты</item>
+    </language_variables>
+</addon>
