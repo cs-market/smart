@@ -328,6 +328,7 @@ select {
         // ????
         margin-top: 5px;
         border-color: @base;
+        overflow: hidden;
         .ty-account-info__buttons {
             background-color: transparent;
         }
@@ -404,6 +405,10 @@ select {
     }
     tbody tr:nth-child(2n) {
         background: #f7f7f7;
+    }
+    .ty-dropdown-box__content & {
+        border: none;
+        margin: 0;
     }
 }
 .ty-sidebox-general {
