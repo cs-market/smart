@@ -12,5 +12,5 @@
     <has_icon>Y</has_icon>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
-    <!-- dependencies smart_distribution fn_smart_distribution_exim_import_price -->
+    <!-- dependencies smart_distribution fn_smart_distribution_exim_import_price, fn_exim_smart_distribution_get_usergroup_ids -->
 </addon>

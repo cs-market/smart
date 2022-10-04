@@ -51,7 +51,7 @@ function fn_promotion_import_build_conditions(&$object) {
             if ($condition == 'products') {
                 $value = array_filter(explode(',', $value));
                 array_walk($value, function(&$v) {list($t['product_code'], $t['amount']) = explode(':', $v);$v = $t;});
-                $products = fn_promotion_import_get_value('products', array_column($value, 'product_code'));
+                $products = fn_promotion_import_get_value('products', array_column($value, 'product_code'), $company_id);
                 // без amount просто имплодим, зону мы можем и не знать
                 foreach ($value as &$data) {
                     $data['product_id'] = $products[$data['product_code']];
@@ -60,25 +60,50 @@ function fn_promotion_import_build_conditions(&$object) {
                 }
                 if ($amount = array_column($value, 'amount')) {
                     $conditions_to_db['conditions'][] = [
-                        'operator' => $operator,
                         'condition' => $condition,
-                        'value' => $value,
+                        'operator' => $operator,
+                        'value' => fn_promotion_import_get_value('number', $value, $company_id)
                     ];
                 } else {
                     $conditions_to_db['conditions'][] = [
-                        'operator' => $operator,
                         'condition' => $condition,
+                        'operator' => $operator,
                         'value' => implode(',', $products),
                     ];
                 }
             } elseif ($condition == 'users') {
                 $conditions_to_db['conditions'][] = [
-                    'operator' => $operator,
                     'condition' => $condition,
+                    'operator' => $operator,
                     'value' => fn_promotion_import_get_value($condition, $value, $company_id)
+                ];
+            } elseif ($condition == 'usergroup') {
+                $usergroups = fn_promotion_import_get_value($condition, $value, $company_id);
+
+                if ($usergroups) {
+                    foreach ($usergroups as $ug_id) {
+                        $usergroup_conditios[] = [
+                            'condition' => $condition,
+                            'operator' => $operator,
+                            'value' => $ug_id
+                        ];
+                    }
+                    $conditions_to_db['conditions'][] = [
+                        'set' => 'any',
+                        'set_value' => 1,
+                        'conditions' => $usergroup_conditios
+                    ];
+                    unset($usergroup_conditios);
+                }
+            } else {
+                $conditions_to_db['conditions'][] = [
+                    'condition' => $condition,
+                    'operator' => $operator,
+                    'value' => fn_promotion_import_get_value('number', $value, $company_id)
                 ];
             }
         }
+
         $object['conditions'] = serialize($conditions_to_db);
     }
 }
@@ -91,13 +116,13 @@ function fn_promotion_import_build_bonuses(&$object) {
         $bonuses_to_db = [];
         foreach ($bonuses as $key => $value) {
             list(, $bonus, $operator) = explode('.', $key);
-            if (in_array($bonus, ['product_discount'])) {
+            if (in_array($bonus, ['product_discount', 'order_discount'])) {
                 $bonuses_to_db[] = [
                     'bonus' => $bonus,
                     'discount_bonus' => $operator,
                     'discount_value' => fn_promotion_import_get_value('number', $value),
                 ];
-            } elseif($bonus == 'discount_on_products') {
+            } elseif ($bonus == 'discount_on_products') {
                 $value = array_filter(explode(',', $value));
                 array_walk($value, function(&$v) {list($t['product_code'], $t['discount']) = explode(':', $v);$v = $t;});
                 $value = array_filter($value, function($v) {return !empty($v['discount']);});
@@ -115,8 +140,37 @@ function fn_promotion_import_build_bonuses(&$object) {
                         ];
                     }
                 }
+            } elseif (in_array($bonus, ['free_products', 'promotion_step_free_products'])) {
+                $value = array_filter(explode(',', $value));
+                array_walk($value, function(&$v) {list($t['product_code'], $t['amount']) = explode(':', $v);$v = $t;});
+                $products = fn_promotion_import_get_value('products', array_column($value, 'product_code'), $company_id);
+                // без amount просто имплодим, зону мы можем и не знать
+                foreach ($value as $key => &$data) {
+                    $data['product_id'] = $products[$data['product_code']];
+                    unset($data['product_code']);
+                    if (empty($data['amount'])) $data['amount'] = 1;
+                    if (empty($data['product_id'])) unset($value[$key]);
+                }
+                $bonuses_to_db[] = [
+                    'bonus' => $bonus,
+                    'value' => $value,
+                ];
+            } elseif ($bonus == 'give_usergroup') {
+                $value = reset(fn_promotion_import_get_value('usergroup', $value, $company_id));
+                if (!empty($value)) {
+                    $bonuses_to_db[] = [
+                        'bonus' => $bonus,
+                        'value' => $value,
+                    ];
+                }
+            } elseif (!empty(trim($value))) {
+                $bonuses_to_db[] = [
+                    'bonus' => $bonus,
+                    'value' => fn_promotion_import_get_value('number', $value, $company_id),
+                ];
             }
         }
+
         $object['bonuses'] = serialize($bonuses_to_db);
     }
 }
@@ -157,6 +211,8 @@ function fn_promotion_import_get_value($type, $data, $company_id = 0) {
             'company_id' => fn_get_company_condition('company_id', true, $company_id),
         ];
         return db_get_hash_single_array("SELECT product_id, product_code FROM ?:products WHERE 1 " . implode('', $condition), array('product_code', 'product_id'));
+    } elseif ($type == 'usergroup') {
+        return fn_exim_smart_distribution_get_usergroup_ids($data);
     } elseif ($type == 'number') {
         return fn_smart_distribution_exim_import_price($data);
     }
