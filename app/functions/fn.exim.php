@@ -283,6 +283,8 @@ function fn_exim_get_csv($pattern, $file, $options)
         }
 
         if ($f) {
+            $f = fn_exim_clear_bom_symbols_if_exists($f);
+
             // Read import schema from file even when import schema is explicitly specified to skip the first line
             $import_schema = fgetcsv($f, $max_line_size, $delimiter);
             if ($options['import_schema']) {
@@ -2045,4 +2047,24 @@ function fn_exim_get_field_label($value, $action = '')
     }
 
     return $label;
+}
+
+/**
+ * Clears BOM symbols from the beginning of the file if exists
+ *
+ * @param resource $file File resource
+ *
+ * @return resource
+ */
+function fn_exim_clear_bom_symbols_if_exists($file)
+{
+    $byte_order_mark = chr(239) . chr(187) . chr(191);
+    $byte_count = 3;
+
+    // Skip BOM if present
+    if (fread($file, $byte_count) !== $byte_order_mark) {
+        rewind($file); // Or rewind pointer to start of file
+    }
+
+    return $file;
 }
