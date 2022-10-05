@@ -45,4 +45,56 @@ class Users extends BaseUsers
             'data' => $data
         );
     }
+
+    public function create($params)
+    {
+        $status = Response::STATUS_BAD_REQUEST;
+        $data = array();
+        $valid_params = true;
+
+        $auth = $this->auth;
+
+        $params = $this->filterUserData($params);
+
+        $user_id = 0;
+
+        if (empty($params['user_type'])) {
+            $params['user_type'] = 'C';
+        }
+
+        if (empty($params['user_login'])) {
+            $data['message'] = __('api_required_field', array(
+                '[field]' => 'user_login'
+            ));
+            $valid_params = false;
+        }
+
+        if (!isset($params['company_id'])) {
+            if (!empty($auth['company_id'])) {
+                $params['company_id'] = $auth['company_id'];
+            } else {
+                $data['message'] = __('api_required_field', array(
+                    '[field]' => 'company_id'
+                ));
+                $valid_params = false;
+            }
+        }
+
+        if ($valid_params) {
+            list($user_id, $profile_id) = fn_update_user($user_id, $params, $auth, false, false);
+
+            if ($user_id) {
+                $status = Response::STATUS_CREATED;
+                $data = array(
+                    'user_id' => $user_id,
+                    'profile_id' => $profile_id
+                );
+            }
+        }
+
+        return array(
+            'status' => $status,
+            'data' => $data
+        );
+    }
 }
