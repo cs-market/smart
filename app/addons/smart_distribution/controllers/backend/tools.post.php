@@ -1976,6 +1976,13 @@ fn_print_die($orders_wo_points);
         }
     }
     fn_print_die('end', $res);
+} elseif ($mode == 'baltica_maintenance3') {
+    Registry::set('runtime.company_id', 2189);
+    list($users, ) = fn_get_users(array('user_type' => 'C'), $auth);
+    foreach ($users as $user) {
+        fn_delete_user($user_id);        
+    }
+    fn_print_die(count($users));
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
