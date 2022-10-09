@@ -70,7 +70,7 @@ function fn_min_order_amount_calculate_cart_post(&$cart, $auth, $calculate_shipp
     } else {
         $check_weight = true;
         if (is_callable('fn_product_groups_split_cart')) {
-            $p_groups = fn_product_groups_split_cart($cart);
+            $p_groups = fn_product_groups_split_cart($cart, true);
             foreach ($p_groups as $product_group) {
                 if (isset($product_group['group']['min_order'])) {
                     if (count($p_groups) > 1 && isset($product_group['group']) && $product_group['group']['group_id'] == '6') {

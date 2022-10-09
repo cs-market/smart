@@ -40,6 +40,14 @@
         zero_company_id_name_lang_var="none"
     }
 
+    <div class="control-group">
+        <label for="mandatory_order_split_{$id}" class="control-label">{__("product_groups.mandatory_order_split")}:</label>
+        <div class="controls">
+            <input type="hidden" name="product_group_data[mandatory_order_split]" value="{"YesNo::NO"|enum}">
+            <input type="checkbox" size="70" id="mandatory_order_split_{$id}" name="product_group_data[mandatory_order_split]" value="Y" {if $product_group.mandatory_order_split == "YesNo::YES"|enum}checked="_checked"{/if} class="input-large">
+        </div>
+    </div>
+
     {/hook}
 
     {include file="common/select_status.tpl" input_name="product_group_data[status]" id="elm_product_group_status_{$id}" obj=$product_group}

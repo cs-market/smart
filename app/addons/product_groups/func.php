@@ -12,6 +12,7 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 use Tygh\Registry;
+use Tygh\Enum\YesNo;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -87,76 +88,105 @@ function fn_product_groups_get_cart_product_data_post_options($product_id, $_pda
     $product['group_id'] = $_pdata['group_id'] ?? 0;
 }
 
+function fn_product_groups_get_groups_from_products($products) {
+    $groups = [];
+    if (!empty($products) && $group_ids = array_filter(array_unique(fn_array_column($products, 'group_id')))) {
+        $groups = fn_get_product_groups(array('group_ids' => $group_ids));
+    }
+    return $groups;
+}
+
+function fn_product_groups_get_package_info(&$group) {
+    if (is_array($group['products'])) {
+        $weight = db_get_hash_single_array('SELECT product_id, weight FROM ?:products WHERE product_id IN (?a)', ['product_id', 'weight'], array_column($group['products'], 'product_id'));
+
+        $group['package_info'] = [
+            'C' => 0,
+            'W' => 0,
+            'I' => 0,
+            'shipping_freight' => 0,
+        ];
+        foreach ($group['products'] as $key_product => $product) {
+            if (($product['is_edp'] == 'Y' && $product['edp_shipping'] != 'Y') ||
+            (!empty($product['free_shipping']) && $product['free_shipping'] == 'Y')
+            ) {
+                continue;
+            }
+            if (!empty($product['exclude_from_calculate'])) {
+                $product_price = 0;
+            } elseif (!empty($product['subtotal'])) {
+                $product_price = $product['subtotal'];
+            } elseif (!empty($product['price'])) {
+                $product_price = $product['price'];
+            } elseif (!empty($product['base_price'])) {
+                $product_price = $product['base_price'];
+            } else {
+                $product_price = 0;
+            }
+
+            $group['subtotal'] += $product['price'] * $product['amount'];
+
+            if (!(!empty($product['free_shipping']) && $product['free_shipping'] == 'Y')) {
+                $product['weight'] = !empty($product['weight']) ? $product['weight'] : $weight[$product['product_id']];
+                $group['package_info']['C'] += $product_price * $product['amount'];
+                $group['package_info']['W'] += !empty($product['weight']) ? $product['weight'] * $product['amount'] : 0;
+                $group['package_info']['I'] += $product['amount'];
+
+                if (isset($product['shipping_freight'])) {
+                    $group['package_info']['shipping_freight'] += $product['shipping_freight'] * $product['amount'];
+                }
+            }
+        }
+    }
+}
+
 // return product_groups
-function fn_product_groups_split_cart($cart) {
+function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false) {
     $p_groups = array();
     if (!fn_cart_is_empty($cart)) {
-        if ($group_ids = array_filter(array_unique(fn_array_column($cart['products'], 'group_id')))) {
-            $cart['groups'] = fn_get_product_groups(array('group_ids' => $group_ids));
+        foreach ($cart['product_groups'] as $group_key => $group_data) {
+            if ($groups = fn_product_groups_get_groups_from_products($group_data['products'])) {
+                foreach ($groups as $group_id => $group) {
+                    //if (!(YesNo::toBool($group['mandatory_order_split']) || YesNo::toBool($cart['split_order'][$group_id]))) continue;
+                    if (!(YesNo::toBool($group['mandatory_order_split']) || (YesNo::toBool($cart['split_order'][$group_id]) && !$only_mandatory_order_split))) continue;
 
-            $proto = reset($cart['product_groups']);
-            unset($proto['products']);
-            $weight = db_get_hash_single_array('SELECT product_id, weight FROM ?:products WHERE product_id IN (?a)', ['product_id', 'weight'], array_column($cart['products'], 'product_id'));
-            
-            foreach ($cart['products'] as $cart_id => $product) {
-                $group_id = $product['group_id'];
-                if (!isset($p_groups[$group_id])) {
-                    $p_groups[$group_id] = $proto;
-                    $p_groups[$group_id]['group_id'] = $group_id;
-                    if ($group_id) {
-                        $p_groups[$group_id]['group'] = $cart['groups'][$product['group_id']];
-                        $p_groups[$group_id]['name'] = $p_groups[$group_id]['group']['group'];
+                    $proto = $group_data;
+                    $proto['group_id'] = $group_id;
+                    $proto['subtotal'] = 0;
+                    $proto['group'] = $group;
+                    $proto['name'] .= ' (' . $group['group'] . ')';
+                    $proto['products'] = [];
+
+                    foreach ($group_data['products'] as $cart_id => $product) {
+                        if ($product['group_id'] == $group_id) {
+                            $proto['products'][$cart_id] = $product;
+                            unset($group_data['products'][$cart_id]);
+                            fn_product_groups_get_package_info($proto);
+                        }
                     }
-                    $p_groups[$group_id]['subtotal'] = 0;
-                }
-                $p_groups[$group_id]['products'][$cart_id] = $product;
-                $p_groups[$group_id]['subtotal'] += $product['price'] * $product['amount'];
-                $package_info = [
-                    'C' => 0,
-                    'W' => 0,
-                    'I' => 0,
-                    'shipping_freight' => 0,
-                ];
-                if (is_array($p_groups[$group_id]['products'])) {
-                    foreach ($p_groups[$group_id]['products'] as $key_product => $product) {
-                        if (($product['is_edp'] == 'Y' && $product['edp_shipping'] != 'Y') ||
-                            (!empty($product['free_shipping']) && $product['free_shipping'] == 'Y')
-                        ) {
-                            continue;
-                        }
-
-                        if (!empty($product['exclude_from_calculate'])) {
-                            $product_price = 0;
-                        } elseif (!empty($product['subtotal'])) {
-                            $product_price = $product['subtotal'];
-                        } elseif (!empty($product['price'])) {
-                            $product_price = $product['price'];
-                        } elseif (!empty($product['base_price'])) {
-                            $product_price = $product['base_price'];
-                        } else {
-                            $product_price = 0;
-                        }
-
-                        if (!(!empty($product['free_shipping']) && $product['free_shipping'] == 'Y')) {
-                            $product['weight'] = $product['weight'] ?? $weight[$product['product_id']];
-                            $package_info['C'] += $product_price;
-                            $package_info['W'] += !empty($product['weight']) ? $product['weight'] * $product['amount'] : 0;
-                            $package_info['I'] += $product['amount'];
-
-                            if (isset($product['shipping_freight'])) {
-                                $package_info['shipping_freight'] += $product['shipping_freight'] * $product['amount'];
-                            }
-                        }
-
-                    }
+                    $p_groups[] = $proto;
                 }
 
-                if (!empty($package_info)) $p_groups[$group_id]['package_info'] = array_merge($p_groups[$group_id]['package_info'], $package_info);
+                if (!empty($group_data['products'])) {
+                    fn_product_groups_get_package_info($group_data);
+                    $p_groups[] = $group_data;  
+                }
             }
         }
     }
 
-    return !empty($p_groups) ? array_values($p_groups) : $cart['product_groups'];
+    return $p_groups;
+}
+
+function fn_product_groups_calculate_cart_post(&$cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, $cart_products, $product_groups) {
+    unset($cart['ask_to_split_order']);
+    if ($groups = fn_product_groups_get_groups_from_products($cart['products'])) {
+        foreach ($groups as $group) {
+            if (!YesNo::toBool($group['mandatory_order_split'])) {
+                $cart['ask_to_split_order'][$group['group_id']] = $group['group'];
+            }
+        }
+    }
 }
 
 function fn_product_groups_pre_update_order(&$cart, $order_id = 0) {
@@ -179,11 +209,7 @@ function fn_product_groups_place_suborders_pre($order_id, $cart, $auth, $action,
 }
 
 function fn_product_groups_place_suborders($cart, &$suborder_cart) {
-    $group_id = $suborder_cart['group_id'];
     $products = $suborder_cart['products'];
-    $suborder_cart['products'] = array_filter($products, function($product) use ($group_id) {
-        return ($product['group_id'] == $group_id);
-    });
     if ($products != $suborder_cart['products']) {
         unset($suborder_cart['promotions'], $suborder_cart['applied_promotions']);
     }

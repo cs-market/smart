@@ -13,13 +13,15 @@
         <item lang="ru" id="product_groups.add_product_group">Добавить группу товаров</item>
         <item lang="ru" id="product_groups.new_product_group">Новая группа товаров</item>
         <item lang="ru" id="product_groups.product_group">Группа товаров</item>
+        <item lang="ru" id="product_groups.split_order">Отдельная накладная для товаров [group_name]</item>
+        <item lang="ru" id="product_groups.mandatory_order_split">Выделять в отдельный заказ</item>
         <item lang="ru" id="group_id">Группа товаров</item>
     </language_variables>
     <queries>
         <item>CREATE TABLE `?:product_groups` (
           `group_id` mediumint unsigned NOT NULL AUTO_INCREMENT,
           `group` varchar(32) NOT NULL DEFAULT '',
-          `split_order` varchar(1) NOT NULL DEFAULT 'Y',
+          `mandatory_order_split` varchar(1) NOT NULL DEFAULT 'Y',
           `company_id` int unsigned NOT NULL DEFAULT '0',
           `status` char(1) NOT NULL DEFAULT 'A',
           PRIMARY KEY (`group_id`)
