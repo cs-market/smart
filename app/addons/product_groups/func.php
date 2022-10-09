@@ -140,14 +140,12 @@ function fn_product_groups_get_package_info(&$group) {
     }
 }
 
-// return product_groups
 function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false) {
     $p_groups = array();
     if (!fn_cart_is_empty($cart)) {
         foreach ($cart['product_groups'] as $group_key => $group_data) {
             if ($groups = fn_product_groups_get_groups_from_products($group_data['products'])) {
                 foreach ($groups as $group_id => $group) {
-                    //if (!(YesNo::toBool($group['mandatory_order_split']) || YesNo::toBool($cart['split_order'][$group_id]))) continue;
                     if (!(YesNo::toBool($group['mandatory_order_split']) || (YesNo::toBool($cart['split_order'][$group_id]) && !$only_mandatory_order_split))) continue;
 
                     $proto = $group_data;
@@ -166,11 +164,11 @@ function fn_product_groups_split_cart($cart, $only_mandatory_order_split = false
                     }
                     $p_groups[] = $proto;
                 }
+            }
 
-                if (!empty($group_data['products'])) {
-                    fn_product_groups_get_package_info($group_data);
-                    $p_groups[] = $group_data;  
-                }
+            if (!empty($group_data['products'])) {
+                fn_product_groups_get_package_info($group_data);
+                $p_groups[] = $group_data;  
             }
         }
     }
