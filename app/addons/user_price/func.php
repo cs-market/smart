@@ -86,10 +86,7 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
 {
     array_walk($user_prices, function(&$value, $k) use ($product_id) {$value['product_id'] = $product_id;});
     $user_prices = array_filter($user_prices, function($v) {return (isset($v['user_id']) && is_numeric($v['user_id']));} );
-    $user_prices = array_filter($user_prices, function($v) {
-        return (isset($v['price']) && is_numeric($v['price']));
-    });
-
+    
     if ($delete_price) {
         //  delete all old data
         db_query("DELETE FROM ?:user_price WHERE product_id = ?i", $product_id);
@@ -99,6 +96,10 @@ function fn_update_product_user_price($product_id, $user_prices, $delete_price =
             db_query("DELETE FROM ?:user_price WHERE ?w", $where);
         }
     }
+
+    $user_prices = array_filter($user_prices, function($v) {
+        return (isset($v['price']) && is_numeric($v['price']));
+    });
 
     if (!empty($user_prices)) {
         db_query('INSERT INTO ?:user_price ?m', $user_prices);
