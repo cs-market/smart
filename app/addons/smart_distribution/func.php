@@ -222,6 +222,14 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
         $condition['name'] = db_quote(' AND (?:users.firstname LIKE ?l OR ?:users.lastname LIKE ?l OR ?:profile_fields_data.value LIKE ?l)', $search_string, $search_string, $search_string);
         $join .= db_quote(' LEFT JOIN ?:profile_fields_data ON ?:profile_fields_data.object_id = ?:user_profiles.profile_id AND ?:profile_fields_data.object_type = ?s', 'P');
     }
+    if (!empty($condition['user_login'])) {
+        if (isset($params['compact']) && $params['compact'] == YesNo::YES) {
+            $union_condition = ' OR ';
+        } else {
+            $union_condition = ' AND ';
+        }
+        $condition['user_login'] = db_quote(' ?p ?:users.user_login = ?s', $union_condition, trim($params['user_login']));
+    }
 
     $without_order_prefix = 'orders_period_';
     if (!empty($params['user_orders'])) {
