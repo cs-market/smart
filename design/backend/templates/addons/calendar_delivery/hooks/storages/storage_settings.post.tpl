@@ -4,7 +4,7 @@
     <label for="elm_storage_nearest_delivery" class="control-label">{__("calendar_delivery.nearest_delivery")}:</label>
     <div class="controls">
         <label class="radio inline" for="storage_data_nearest_delivery_today"><input type="radio" name="storage_data[nearest_delivery]" id="storage_data_nearest_delivery_today" {if $storage.nearest_delivery == '0'}checked="checked"{/if} value="0">{__('today')}</label>
-        <label class="radio inline" for="storage_data_nearest_delivery_tomorrow"><input type="radio" name="storage_data[nearest_delivery]" id="storage_data_nearest_delivery_tomorrow" {if $storage.nearest_delivery == '1'}checked="checked"{/if} value="1">{__('tomorrow')}</label>
+        <label class="radio inline" for="storage_data_nearest_delivery_tomorrow"><input type="radio" name="storage_data[nearest_delivery]" id="storage_data_nearest_delivery_tomorrow" {if $storage.nearest_delivery == '1' || !$storage}checked="checked"{/if} value="1">{__('tomorrow')}</label>
         <label class="radio inline" for="storage_data_nearest_delivery_aftertomorrow"><input type="radio" name="storage_data[nearest_delivery]" id="storage_data_nearest_delivery_aftertomorrow" {if $storage.nearest_delivery == '2'}checked="checked"{/if} value="2">{__('after_tomorrow')}</label>
     </div>
 </div>
