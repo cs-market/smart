@@ -19,7 +19,7 @@
             data_off=__('product_packages.packages')
             additional_attrs=['data-ca-step' => $product.qty_step, 'data-ca-items-in-package' => $product.items_in_package ]
         } *}
-        <input type="checkbox" class="hidden cm-packages-switcher" id="{"switch_checkbox_`$obj_prefix``$obj_id`"}" data-ca-step="{$product.qty_step}" data-ca-qty-input="qty_count_{$obj_prefix}{$obj_id}" name="product_data[{$obj_id}][shop_by_packages]" value="{$product.items_in_package}">
+        <input type="checkbox" class="hidden cm-packages-switcher" id="{"switch_checkbox_`$obj_prefix``$obj_id`"}" data-ca-step="{if $product.qty_step}{$product.qty_step}{else}1{/if}" data-ca-qty-input="qty_count_{$obj_prefix}{$obj_id}" name="product_data[{$obj_id}][shop_by_packages]" value="{if $product.items_in_package}{$product.items_in_package}{else}1{/if}">
         {strip}
         <span class="ty-switcher-checkbox__control cm-switcher-control" data-ca-state='0' data-ca-target="{"switch_checkbox_`$obj_prefix``$obj_id`"}">{__('product_packages.items')}</span>
         <span class="ty-switcher-checkbox__control cm-switcher-control" data-ca-state='1' data-ca-target="{"switch_checkbox_`$obj_prefix``$obj_id`"}">{__('product_packages.packages')}</span>
