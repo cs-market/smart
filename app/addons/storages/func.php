@@ -571,3 +571,7 @@ function fn_storages_user_price_exim_product_price_pre($object, &$price) {
     }
     unset($row);
 }
+
+function fn_storages_delete_usergroups($usergroup_ids) {
+    db_query('DELETE FROM ?:storage_usergroups WHERE usergroup_id IN (?a)', $usergroup_ids);
+}
