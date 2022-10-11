@@ -13,6 +13,7 @@ class Features extends BaseFeatures
         $status = Response::STATUS_BAD_REQUEST;
         $data = array();
         $valid_params = true;
+        unset($params['feature_id']);
 
         unset($params['category_id']);
 
@@ -45,9 +46,7 @@ class Features extends BaseFeatures
 
             if ($feature_id) {
                 $status = Response::STATUS_CREATED;
-                $data = array(
-                    'feature_id' => $feature_id,
-                );
+                $data = fn_get_product_feature_data($feature_id, true);
             }
         }
 
@@ -55,5 +54,15 @@ class Features extends BaseFeatures
             'status' => $status,
             'data' => $data
         );
+    }
+
+    public function update($id, $params) {
+        $response = parent::update($id, $params);
+        if ($response['status'] == Response::STATUS_OK) {
+            $feature_id = $response['data']['feature_id'];
+            $response['data'] = fn_get_product_feature_data($feature_id, true);
+            
+        }
+        return $response;
     }
 }
