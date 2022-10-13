@@ -504,13 +504,13 @@ function fn_smart_distribution_gather_additional_product_data_post(&$product, $a
         }
 
         // нам нужно значение характеристики "Кол-во штук в коробке" у балтики для рассчетов
-        if ($product['company_id'] == 45) {
-            list($features) = fn_get_product_features(['product_id' => $product['product_id'], 'feature_id' => 859, 'variants' => true, 'variants_selected_only' => true]);
-            $feature = reset($features);
-            if (!empty($feature['variants'])) {
-                $product['box_contains'] = reset($feature['variants'])['variant'];
-            }
-        }
+        // if ($product['company_id'] == 45) {
+        //     list($features) = fn_get_product_features(['product_id' => $product['product_id'], 'feature_id' => 859, 'variants' => true, 'variants_selected_only' => true]);
+        //     $feature = reset($features);
+        //     if (!empty($feature['variants'])) {
+        //         $product['box_contains'] = reset($feature['variants'])['variant'];
+        //     }
+        // }
     }
 }
 

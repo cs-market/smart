@@ -1,4 +1,4 @@
-{if $product.box_contains && $product.box_contains != 1 && $product.package_switcher == "YesNo::YES"|enum}
+{if $product.items_in_package && $product.items_in_package != 1 && $product.package_switcher == "YesNo::YES"|enum}
 
     {if isset($product.selected_amount)}
         {assign var="default_amount" value=$product.selected_amount}
@@ -9,7 +9,7 @@
     {else}
         {assign var="default_amount" value="1"}
     {/if}
-    <div class="ty-left"><span id="for_qty_count_{$obj_prefix}{$obj_id}" data-ca-box-contains="{$product.box_contains}">{($default_amount/$product.box_contains)|round:2}</span>&nbsp;{__('of_box')}</div>
+    <div class="ty-left"><span id="for_qty_count_{$obj_prefix}{$obj_id}" data-ca-box-contains="{$product.items_in_package}">{($default_amount/$product.items_in_package)|round:2}</span>&nbsp;{__('of_box')}</div>
 
     <div class="ty-switcher-checkbox">
         {* {include file="buttons/switch_button.tpl"
