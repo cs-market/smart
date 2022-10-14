@@ -1,7 +1,5 @@
 <?php
 
-use Tygh\SmartApi;
-
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 fn_register_hooks(
@@ -89,7 +87,3 @@ fn_register_hooks(
     'get_available_destination_pre',
     'check_permission_manage_profiles'
 );
-
-if (defined('API')) {
-    Tygh::$app['api'] = new SmartApi();
-}

@@ -81,6 +81,7 @@ class Users extends BaseUsers
         }
 
         if ($valid_params) {
+            if (!empty($params['password'])) fn_password_hash($params['password']);
             list($user_id, $profile_id) = fn_update_user($user_id, $params, $auth, false, false);
 
             if ($user_id) {

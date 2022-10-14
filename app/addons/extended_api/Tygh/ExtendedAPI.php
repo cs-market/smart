@@ -2,7 +2,7 @@
 
 namespace Tygh;
 
-class SmartApi extends Api
+class ExtendedAPI extends Api
 {
     protected $called_version = '5.0';
 
