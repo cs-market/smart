@@ -776,19 +776,24 @@ fn_print_r($fantoms);
     }
     fn_print_die(count($corrected_users), $corrected_users);
 } elseif ($mode == 'fix_user_price') {
-    $users = db_get_fields('SELECT user_id FROM ?:users');
-    $products = db_get_fields('SELECT product_id FROM ?:products');
-    $count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
-    $res = db_query('DELETE FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
-    $count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
-    db_query('DELETE FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
+    // $users = db_get_fields('SELECT user_id FROM ?:users');
+    // $products = db_get_fields('SELECT product_id FROM ?:products');
+    // $count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
+    // $res = db_query('DELETE FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
+    // $count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
+    // db_query('DELETE FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
 
     $user_price_products = db_get_hash_multi_array('SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id', ['company_id', 'product_id', 'product_id']);
     foreach ($user_price_products as $company_id => $products) {
-        $company_users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i', $company_id);
-        db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
+        list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
+        $company_users = array_column($users, 'user_id');
+        //$company_users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i', $company_id);
+        $wrong[$company_id] = db_get_array('SELECT * FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
+
+        //db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
     }
 
+    fn_print_die($wrong[12]);
     fn_print_die('stop');
 } elseif ($mode == 'remove_user_price') {
     $users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i AND user_type = "C"', 1824);
@@ -1977,13 +1982,106 @@ fn_print_die($orders_wo_points);
     }
     fn_print_die('end', $res);
 } elseif ($mode == 'baltica_maintenance3') {
-    Registry::set('runtime.company_id', 2189);
-    list($users, ) = fn_get_users(array('user_type' => 'C'), $auth);
-    foreach ($users as $user) {
-        fn_delete_user($user_id);        
+    $file = 'ug_all.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    $content = array_column($content, 'usergroup', 'usergroup_id');
+    //fn_print_die($content);
+    $another_usergroups = [];
+    $another_usergroup_ids = db_get_fields('SELECT usergroup_ids FROM ?:vendor_plans WHERE plan_id != 29 AND plan_id != 79');
+
+    foreach ($another_usergroup_ids as $ugs) {
+        $another_usergroups = array_merge($another_usergroups, explode(',',$ugs));
     }
-    fn_print_die(count($users));
+    $another_usergroups = array_filter($another_usergroups);
+
+    $usergroups = fn_get_usergroups(['type' => 'C', 'status' => 'A']);
+    $usergroups = array_column($usergroups, 'usergroup', 'usergroup_id');
+
+    ksort($usergroups);
+    foreach ($another_usergroups as $id) {
+        unset($usergroups[$id]);
+    }
+
+    if (empty($action)) {
+        fn_print_die($usergroups);
+    } else {
+        $usergroups = array_slice($usergroups, $action, null, true);
+    }
+
+    $diff = array_diff_key($usergroups, $content);
+
+    if (!empty($diff)) {
+        fn_delete_usergroups(array_keys($diff));
+    }
+    db_query('UPDATE ?:vendor_plans SET usergroup_ids = ?s WHERE plan_id = ?i', implode(',', array_keys($content)), 29);
+    fn_print_die('done');
+} elseif ($mode == 'baltica_maintenance4') {
+    Registry::set('runtime.company_id', 45);
+    list($balt_users, ) = fn_get_users(array('user_type' => 'C'), $auth);
+    $ids = db_get_fields('SELECT user_id FROM ?:users WHERE `company_id` = 45 AND timestamp > 1664917201 ORDER BY `timestamp` DESC;');
+    db_query('DELETE FROM ?:user_session_product WHERE user_id IN (?a) AND user_type = ?s', $ids, 'R');
+    db_query('DELETE FROM ?:user_price WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:user_data WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:user_profiles WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:user_storages WHERE user_id IN (?a)', $ids);
+    db_query('DELETE FROM ?:usergroup_links WHERE user_id IN (?a)', $ids);
+    
+    db_query('DELETE FROM ?:users WHERE user_id IN (?a)', $ids);
+    
+    
+
+    fn_print_die($ids);
+    $ids = array_column($balt_users, 'user_id');
+    //$res = db_query("UPDATE ?:user_profiles SET `profile_name` = '' WHERE user_id IN (?a)", $ids);
+    $profiles = db_get_array('SELECT user_id, max(profile_id) as profile_id, count(profile_id) AS cnt FROM ?:user_profiles WHERE user_id IN (?a) GROUP BY user_id HAVING cnt > 1 ', $ids);
+    $profile_ids = array_column($profiles, 'profile_id');
+    $res = db_query('DELETE FROM ?:user_profiles WHERE profile_id IN (?a)', $profile_ids);
+    fn_print_die($res);
+} elseif ($mode == 'export_rp') {
+    $company_ids = ['1810', '2058'];
+    foreach ($company_ids as $company_id) {
+        list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
+        $user_ids = array_column($users, 'user_id');
+        if ($company_id == 1810) {
+            $from = '01/02/2022';
+        } else {
+            $from = '01/06/2022';
+        }
+
+        foreach ($user_ids as $user_id) {
+            $user_info = fn_get_user_info($user_id);
+            list($orders, ) = fn_get_orders(array('user_id' => $user_id, 'time_from' => $from, 'period' => 'C', 'company_id' => $company_id, 'status' => array('H')));
+            if (empty($orders)) continue;
+            $data[] = array(
+                'user_id' => $user_id,
+                'code' => $user_info['fields'][39],
+                'current_points' => fn_get_user_additional_data(POINTS, $user_id) ?? 0,
+                'sum_orders_total' => array_sum(array_column($orders, 'total')),
+                'used_points' => abs(db_get_field("SELECT sum(amount) FROM ?:reward_point_changes WHERE user_id = ?i AND action = ?s", $user_id, CHANGE_DUE_ORDER_PLACE)),
+            );
+        }
+        $opts = array('delimiter' => ';', 'filename' => 'points_'.$company_id.'.csv');
+        $res = fn_exim_put_csv($data, $opts, '"');
+    }
+    fn_print_die('done');
+} elseif ($mode == 'export_id') {
+    list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => 45), $auth);
+
+    //$user_ids = array_column($users, 'user_id');
+    $opts = array('delimiter' => ';', 'filename' => 'users_.csv');
+    $res = fn_exim_put_csv($users, $opts, '"');
+    fn_print_die($res);
+} elseif ($mode == 'recover_passwords') {
+    list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => 45), $auth);
+    $passwords = db_get_array("SELECT user_id, password FROM ?:users WHERE user_id IN (?a) AND LENGTH(`password`) < 10", array_column($users, 'user_id'));
+    foreach ($passwords as $value) {
+        if (empty($value['password'])) $value['password'] = 1111;
+        $value['password'] = fn_password_hash($value['password']);
+        db_query('UPDATE ?:users SET password = ?s WHERE user_id = ?i', $value['password'], $value['user_id']);
+    }
+    fn_print_die('stop');
 }
+
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
 {
