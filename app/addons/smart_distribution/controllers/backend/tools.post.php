@@ -2080,6 +2080,19 @@ fn_print_die($orders_wo_points);
         db_query('UPDATE ?:users SET password = ?s WHERE user_id = ?i', $value['password'], $value['user_id']);
     }
     fn_print_die('stop');
+} elseif ($mode == 'delete_users') {
+    $file = 'SD_users_na.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    $users = array_column($content, 'user_id');
+    db_query("DELETE FROM ?:user_storages WHERE user_id IN (?a)", $users);
+    db_query('DELETE FROM ?:user_session_products WHERE user_id IN (?a)', $users);
+    db_query('DELETE FROM ?:user_data WHERE user_id IN (?a)', $users);
+    db_query('UPDATE ?:orders SET user_id = 0 WHERE user_id IN (?a)', $users);
+    db_query('DELETE FROM ?:usergroup_links WHERE user_id IN (?a)', $users);
+    db_query('DELETE FROM ?:usergroup_links WHERE user_id IN (?a)', $users);
+    db_query('DELETE FROM ?:user_storages WHERE user_id IN (?a)', $users);
+    db_query('DELETE FROM ?:users WHERE user_id IN (?a)', $users);
+    fn_print_die('stop');
 }
 
 
