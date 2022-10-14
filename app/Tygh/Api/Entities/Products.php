@@ -17,15 +17,25 @@ namespace Tygh\Api\Entities;
 use Tygh\Enum\ProductFeatures;
 use Tygh\Api\AEntity;
 use Tygh\Api\Response;
+use Tygh\Enum\YesNo;
 use Tygh\Registry;
+use Tygh\Enum\UserTypes;
 
 class Products extends AEntity
 {
     public function index($id = 0, $params = array())
     {
         $status = Response::STATUS_OK;
+
         $lang_code = $this->getLanguageCode($params);
         $params['extend'][] = 'categories';
+
+        if (fn_allowed_for('MULTIVENDOR')) {
+            $vendor_id = $this->safeGet($params, 'company_id', null);
+            if ($vendor_id) {
+                Registry::set('runtime.vendor_id', $vendor_id);
+            }
+        }
 
         if ($this->getParentName() == 'categories') {
             $parent_category = $this->getParentData();
@@ -33,7 +43,7 @@ class Products extends AEntity
         }
 
         if (!empty($id)) {
-            $data = fn_get_product_data($id, $this->auth, $lang_code, '', true, true, true, false, false, false, false);
+            $data = fn_get_product_data($id, $this->auth, $lang_code, '', true, true, true, true, false, false, false);
 
             if (empty($data)) {
                 $status = Response::STATUS_NOT_FOUND;
@@ -44,10 +54,31 @@ class Products extends AEntity
             }
 
         } else {
+            if (
+                isset($params['pshort']) && YesNo::toBool($params['pshort'])
+                || isset($params['pfull']) && YesNo::toBool($params['pfull'])
+                || isset($params['pkeywords']) && YesNo::toBool($params['pkeywords'])
+            ) {
+                $params['extend'][] = 'description';
+            }
+
+            // Set default values to input params
+            $default_params = [
+                'match'            => 'all',
+                'subcats'          => YesNo::YES,
+                'pcode_from_q'     => YesNo::YES,
+                'pshort'           => YesNo::YES,
+                'pfull'            => YesNo::YES,
+                'pname'            => YesNo::YES,
+                'pkeywords'        => YesNo::YES,
+                'search_performed' => YesNo::YES
+            ];
+            $params = array_merge($default_params, $params);
+
             $items_per_page = $this->safeGet($params, 'items_per_page', Registry::get('settings.Appearance.admin_elements_per_page'));
             list($products, $search) = fn_get_products($params, $items_per_page, $lang_code);
 
-            $products = $this->getProductsAdditionalData($products, $params);
+            $products = $this->getProductsAdditionalData($products, $search);
 
             $data = array(
                 'products' => array_values($products),
@@ -69,10 +100,15 @@ class Products extends AEntity
         unset($params['product_id']);
 
         if (empty($params['category_ids'])) {
-            $data['message'] = __('api_required_field', array(
-                '[field]' => 'category_ids'
-            ));
-            $valid_params = false;
+            $default_category_id = fn_get_or_create_default_category_id(fn_get_runtime_company_id());
+            if ($default_category_id) {
+                $params['category_ids'] = $default_category_id;
+            } else {
+                $data['message'] = __('api_required_field', [
+                    '[field]' => 'category_ids'
+                ]);
+                $valid_params = false;
+            }
         }
 
         if (!isset($params['price'])) {
@@ -108,25 +144,35 @@ class Products extends AEntity
 
     public function update($id, $params)
     {
-        $data = array();
+        $data = [];
         $status = Response::STATUS_BAD_REQUEST;
+        list($_status, $message) = $this->checkProductCompanyId($id, $params);
+        if ($_status !== Response::STATUS_OK) {
+            return [
+                'status' => $_status,
+                'data' => [
+                    'message' => $message,
+                ],
+            ];
+        }
 
         $lang_code = $this->getLanguageCode($params);
         $this->prepareFeature($params);
         $this->prepareImages($params, $id);
+
         $product_id = fn_update_product($params, $id, $lang_code);
 
         if ($product_id) {
             $status = Response::STATUS_OK;
-            $data = array(
+            $data = [
                 'product_id' => $product_id
-            );
+            ];
         }
 
-        return array(
+        return [
             'status' => $status,
             'data' => $data
-        );
+        ];
     }
 
     public function delete($id)
@@ -136,7 +182,19 @@ class Products extends AEntity
 
         if (!fn_product_exists($id)) {
             $status = Response::STATUS_NOT_FOUND;
-        } elseif (fn_delete_product($id)) {
+        }
+
+        list($_status, $message) = $this->checkProductCompanyId($id);
+        if ($_status !== Response::STATUS_OK) {
+            return [
+                'status' => $_status,
+                'data' => [
+                    'message' => $message,
+                ],
+            ];
+        }
+
+        if (fn_delete_product($id)) {
             $status = Response::STATUS_NO_CONTENT;
         }
 
@@ -254,18 +312,21 @@ class Products extends AEntity
 
             foreach ($features as $feature_id => $feature) {
                 if (!empty($feature['feature_type'])) {
-                    if (strpos(ProductFeatures::TEXT_SELECTBOX . ProductFeatures::NUMBER_SELECTBOX . ProductFeatures::EXTENDED, $feature['feature_type']) !== false) {
+                    if (in_array($feature['feature_type'], [ProductFeatures::TEXT_SELECTBOX, ProductFeatures::NUMBER_SELECTBOX, ProductFeatures::EXTENDED])) {
                         $params['product_features'][$feature_id] = $feature['variant_id'];
 
-                    } elseif (strpos(ProductFeatures::NUMBER_FIELD . ProductFeatures::DATE, $feature['feature_type']) !== false) {
+                    } elseif (in_array($feature['feature_type'], [ProductFeatures::NUMBER_FIELD, ProductFeatures::DATE])) {
                         $params['product_features'][$feature_id] = $feature['value_int'];
 
-                    } elseif (strpos(ProductFeatures::MULTIPLE_CHECKBOX, $feature['feature_type']) !== false) {
+                    } elseif ($feature['feature_type'] === ProductFeatures::MULTIPLE_CHECKBOX) {
                         foreach ($feature['variants'] as $variant) {
                             $params['product_features'][$feature_id][] = $variant['variant_id'];
                         }
 
-                    } else { // SINGLE_CHECKBOX, TEXT_FIELD
+                    } elseif ($feature['feature_type'] === ProductFeatures::TEXT_FIELD) {
+                        $params['product_features'][$feature_id] = $feature['value'];
+                        $params['add_new_variant'][$feature_id]['variant'] = $feature['value'];
+                    } else { // SINGLE_CHECKBOX
                         $params['product_features'][$feature_id] = $feature['value'];
                     }
 
@@ -295,7 +356,58 @@ class Products extends AEntity
         $params['features_display_on'] = 'A';
 
         fn_gather_additional_products_data($products, $params);
+        array_walk($products, static function (&$product) {
+            $product['price'] = fn_format_price($product['price'], CART_PRIMARY_CURRENCY, null, false);
+            $product['base_price'] = fn_format_price($product['base_price'], CART_PRIMARY_CURRENCY, null, false);
+            $product['list_price'] = fn_format_price($product['list_price'], CART_PRIMARY_CURRENCY, null, false);
+            // phpcs:disable SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
+            if (isset($product['prices'])) {
+                array_walk($product['prices'], static function (&$price) {
+                    $price['price'] = fn_format_price($price['price'], CART_PRIMARY_CURRENCY, null, false);
+                });
+            }
+            if (isset($product['original_price'])) {
+                $product['original_price'] = fn_format_price($product['original_price'], CART_PRIMARY_CURRENCY, null, false);
+            }
+            if (isset($product['modifiers_price'])) {
+                $product['modifiers_price'] = fn_format_price($product['modifiers_price'], CART_PRIMARY_CURRENCY, null, false);
+            }
+            if (isset($product['clean_price'])) {
+                $product['clean_price'] = fn_format_price($product['clean_price'], CART_PRIMARY_CURRENCY, null, false);
+                $product['taxed_price'] = fn_format_price($product['taxed_price'], CART_PRIMARY_CURRENCY, null, false);
+                if (isset($product['tax_value'])) {
+                    $product['tax_value'] = fn_format_price($product['tax_value'], CART_PRIMARY_CURRENCY, null, false);
+                }
+            }
+        });
 
         return $products;
+    }
+
+    /**
+     * Checks if the updated product belongs to the same vendor as the one that tries to update it
+     *
+     * @param int                   $product_id Product id
+     * @param array<string, string> $params     Request parameters
+     *
+     * @return array{int,string}
+     */
+    protected function checkProductCompanyId($product_id, array $params = [])
+    {
+        $status = Response::STATUS_OK;
+        $message = '';
+
+        if (fn_allowed_for('MULTIVENDOR') && UserTypes::isVendor($this->auth['user_type'])) {
+            $companies_products = fn_get_company_ids_by_product_ids([$product_id]);
+            if (
+                !array_key_exists($this->auth['company_id'], $companies_products)
+                || (!empty($params['company_id']) && !array_key_exists($params['company_id'], $companies_products))
+            ) {
+                $status = Response::STATUS_FORBIDDEN;
+                $message = __('access_denied');
+            }
+        }
+
+        return [$status, $message];
     }
 }
