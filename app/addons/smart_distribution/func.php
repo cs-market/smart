@@ -1443,26 +1443,6 @@ function fn_smart_distribution_text_cart_amount_corrected_notification($product,
     )));
 }
 
-function fn_get_fresh_user_auth_token($user_id, $ttl = 604800)
-{
-    $token = false;
-    $ekeys = fn_get_ekeys(array(
-        'object_id' => $user_id,
-        'object_type' => 'U',
-        'ttl' => TIME
-    ));
-
-    if ($ekeys) {
-        $ekey = reset($ekeys);
-        $token = $ekey['ekey'];
-    }
-
-    $token = fn_generate_ekey($user_id, 'U', $ttl, $token);
-    $expiry_time = time() + $ttl;
-
-    return array($token, $expiry_time);
-}
-
 function fn_smart_distribution_get_orders_totals($paid_statuses, $join, $condition, $group, &$totals) {
     if (strpos($condition, 'AND ?:order_details.product_id IN (') !== false) {
         $totals['totally_product_paid'] = round(db_get_field(

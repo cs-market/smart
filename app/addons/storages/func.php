@@ -332,7 +332,7 @@ function fn_storages_pre_add_to_cart(&$product_data, $cart, $auth, $update) {
         unset($data);
     } elseif ($storage_id = Registry::ifGet('runtime.current_storage.storage_id', false)) {
         foreach ($product_data as $key => &$data) {
-            $data['extra']['storage_id'] = $storage_id;
+            if (empty($data['extra']['storage_id'])) $data['extra']['storage_id'] = $storage_id;
         }
         unset($data);
     }
@@ -454,9 +454,7 @@ function fn_storages_check_amount_in_stock_before_check($product_id, $amount, $p
 
 function fn_storages_shippings_group_products_list(&$products, &$groups) {
     if ($storages = Registry::get('runtime.storages')) {
-        $stored_storages_ids = array();
 
-        $suppliers = array();
         $storages_groups = array();
         foreach ($groups as $group) {
             foreach ($group['products'] as $cart_id => $product) {
@@ -574,4 +572,16 @@ function fn_storages_user_price_exim_product_price_pre($object, &$price) {
 
 function fn_storages_delete_usergroups($usergroup_ids) {
     db_query('DELETE FROM ?:storage_usergroups WHERE usergroup_id IN (?a)', $usergroup_ids);
+}
+
+function fn_storages_api_runtime_handle_index_request($id, $params, $status, &$data) {
+    if ($id == 'storage') $data['storage'] = Registry::get('runtime.current_storage');
+}
+
+function fn_storages_api_runtime_handle_create_request($params, $status, &$data) {
+    if (isset($params['storage'])) $data['storage'] = Registry::get('runtime.current_storage');
+}
+
+function fn_storages_api_runtime_handle_delete_request($id, $status, $data) {
+    if ($id == 'storage') fn_delete_session_data('storage');
 }

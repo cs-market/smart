@@ -29,7 +29,10 @@ fn_register_hooks(
     'calendar_delivery_service_params',
     'get_user_price',
     'user_price_exim_product_price_pre',
-    'delete_usergroups'
+    'delete_usergroups',
+    'api_runtime_handle_index_request',
+    'api_runtime_handle_create_request',
+    'api_runtime_handle_delete_request'
 );
 
 fn_init_stack(array('fn_init_storages', &$_REQUEST));

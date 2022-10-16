@@ -11,4 +11,5 @@
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
     <has_icon>Y</has_icon>
+    <unmanaged>1</unmanaged>
 </addon>

@@ -7,6 +7,17 @@ class ExtendedAPI extends Api
     protected $called_version = '5.0';
 
     /**
+     * Creates API instance
+     *
+     * @param  array $formats
+     */
+    public function __construct($formats = array('json', 'text', 'form'))
+    {
+        parent::__construct($formats);
+        $this->authenticate();
+    }
+
+    /**
      * Gets a fully qualified class name for entity.
      *
      * @param string $entity_name   Entity name
