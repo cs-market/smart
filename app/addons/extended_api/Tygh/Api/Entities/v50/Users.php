@@ -81,7 +81,7 @@ class Users extends BaseUsers
         }
 
         if ($valid_params) {
-            if (!empty($params['password'])) fn_password_hash($params['password']);
+            if (!empty($params['password'])) $params['password'] = fn_password_hash($params['password']);
             list($user_id, $profile_id) = fn_update_user($user_id, $params, $auth, false, false);
 
             if ($user_id) {
@@ -97,5 +97,11 @@ class Users extends BaseUsers
             'status' => $status,
             'data' => $data
         );
+    }
+
+    public function update($id, $params)
+    {
+        if (!empty($params['password'])) $params['password'] = fn_password_hash($params['password']);
+        return parent::update($id, $params);
     }
 }
