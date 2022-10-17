@@ -568,43 +568,6 @@ if ($mode =='monolith' && !empty($action)) {
         }
     }
     fn_print_die($users);
-} elseif ($mode == 'cleanup_orders') {
-    $max = 87648;
-
-    $current = ($_SESSION['current_order_id']) ? $_SESSION['current_order_id'] : 0;
-    $current = 50001;
-    $max = 50003;
-
-    $some_info = db_get_hash_single_array("SELECT data, order_id FROM ?:order_data WHERE type = 'L' AND order_id > ?i AND order_id <= ?i ORDER BY order_id limit 500", array('order_id', 'data'), $current, $max);
-    $some_info = array_map('unserialize', $some_info);
-    fn_print_die($some_info);
-    
-    $payment_info = db_get_hash_single_array("SELECT data, order_id FROM ?:order_data WHERE type = 'G' AND order_id > ?i AND order_id <= ?i ORDER BY order_id limit 500", array('order_id', 'data'), $current, $max);
-
-    $payment_info = array_map('unserialize', $payment_info);
-
-    foreach ($payment_info as $order_id => &$info) {
-        if ($info[0]['products'])
-        foreach ($info[0]['products'] as &$product) {
-            unset($product['main_pair']);   
-        }
-        unset($info[0]['package_info'], $info[0]['shippings']);
-    }
-
-    $payment_info = array_map('serialize', $payment_info);
-    foreach ($payment_info as $order_id => $data) {
-        db_query("UPDATE ?:order_data SET data = ?s WHERE order_id = ?i AND type = 'G'", $data, $order_id);
-    }
-
-    $_SESSION['current_order_id'] = max(array_keys($payment_info));
-    if ($_SESSION['current_order_id'] < $max) {
-        fn_print_r($_SESSION['current_order_id']);
-        fn_redirect('tools.cleanup_orders');
-    } else {
-        unset($_SESSION['current_order_id']);
-        db_query("OPTIMIZE TABLE `cscart_order_data` ");
-        fn_print_die('done');
-    }
 } elseif ($mode == 'load_pinta_csvs') {
     $products = db_get_fields('SELECT product_id FROM ?:products WHERE company_id IN (?a)', array(41,46));
     $fantoms = 0;
@@ -2092,6 +2055,156 @@ fn_print_die($orders_wo_points);
     db_query('DELETE FROM ?:usergroup_links WHERE user_id IN (?a)', $users);
     db_query('DELETE FROM ?:user_storages WHERE user_id IN (?a)', $users);
     db_query('DELETE FROM ?:users WHERE user_id IN (?a)', $users);
+    fn_print_die('stop');
+} elseif ($mode == 'cleanup') {
+    if ($action == 'products') {
+        $product_ids = db_get_fields('SELECT product_id FROM ?:products');
+        foreach($product_ids as $product_id) {
+            $data = fn_get_product_data($product_id, $auth);
+            if (empty($data)) {
+                $wrong['products'][] = $product_id;
+            }
+        }
+        db_query('DELETE FROM ?:products WHERE product_id IN (?a)', $wrong['products']);
+        fn_print_r('fantoms', count($wrong['products']));
+        $cleanup_db = [
+            'images_links' => [
+                'object_id' => 'product_id', 
+                'object_type' => 'P'
+            ],
+            'also_bought_products',
+            'also_bought_products2' => [
+                'table' => 'also_bought_products',
+                'related_id' => 'product_id'
+            ],
+            'products_categories',
+            'product_descriptions',
+            'product_features_values',
+            'product_point_prices',
+            'product_related_products',
+            'product_related_products2' => [
+                'table' => 'product_related_products',
+                'related_id' => 'product_id'
+            ],
+            'product_sales',
+            'return_products',
+            'reward_points' => [
+                'object_id' => 'product_id', 
+                'object_type' => 'P'
+            ],
+            'storages_products',
+            'user_price',
+            'user_session_products'
+        ];
+        foreach ($cleanup_db as $field => $table ) {
+            $condition = '';
+            if (is_array($table)) {
+                $where = $table;
+                $table = $field;
+            } else {
+                $where = ['product_id'];
+            }
+            if (isset($where['table'])) {
+                $table = $where['table'];
+                unset($where['table']);
+            }
+
+            foreach ($where as $key => $value) {
+                if (empty($key)) $key = 'product_id';
+                if ($value == 'product_id') {
+                    $condition .= db_quote(' AND ?f NOT IN (?a)', $key, $product_ids);
+                } else {
+                    $condition .= db_quote(' AND ?f = ?s', $key, $value);
+                }
+            }
+
+            $res = db_query("DELETE FROM ?:?f WHERE 1 $condition", $table);
+            fn_print_r($table, $res);
+        }
+    }
+    if ($action == 'users') {
+        $user_ids = db_get_fields('SELECT user_id FROM ?:users');
+        $cleanup_db = [
+            'vendors_customers1' => [
+                'table' => 'vendors_customers',
+                'customer_id' => 'user_id'
+            ],
+            'vendors_customers2' => [
+                'table' => 'vendors_customers',
+                'vendor_manager' => 'user_id'
+            ],
+            'user_session_products',
+            'user_profiles',
+            'user_price',
+            'user_data',
+            'user_storages',
+            'usergroup_links',
+            'user_storages',
+            'reward_point_changes'
+        ];
+        foreach ($cleanup_db as $field => $table ) {
+            $condition = '';
+            if (is_array($table)) {
+                $where = $table;
+                $table = $field;
+            } else {
+                $where = ['product_id'];
+            }
+            if (isset($where['table'])) {
+                $table = $where['table'];
+                unset($where['table']);
+            }
+
+            foreach ($where as $key => $value) {
+                if (empty($key)) $key = 'user_id';
+                if ($value == 'user_id') {
+                    $condition .= db_quote(' AND ?f NOT IN (?a)', $key, $user_ids);
+                } else {
+                    $condition .= db_quote(' AND ?f = ?s', $key, $value);
+                }
+            }
+
+            $res = db_query("DELETE FROM ?:?f WHERE 1 $condition", $table);
+            fn_print_r($table, $res);
+        }
+    }
+    if ($action == 'orders') {
+        $iteration = empty($dispatch_extra) ? 1 : $dispatch_extra;
+
+        $step = 500;
+        $limit = ' LIMIT '. ($iteration-1)* $step . ', ' . $step;
+        $order_ids = db_get_fields("SELECT order_id FROM ?:orders WHERE timestamp < ?i ORDER BY order_id ASC $limit", strtotime('-6 months'));
+        if (empty($order_ids)) {
+            fn_print_die('done');
+        } else {
+            fn_print_r(reset($order_ids));
+        }
+        $order_data = db_get_array('SELECT order_data_id, data FROM ?:order_data WHERE type = ?s AND order_id IN (?a)', 'G', $order_ids);
+        foreach($order_data as $id => $entry) {
+            $data = unserialize($entry['data']);
+            $data[0]['shippings'] = array_map(function ($shipping) {
+                $shipping['data'] = [];
+                return $shipping;
+            }
+                , $data[0]['shippings']);
+            $data[0]['chosen_shippings'] = array_map(function ($shipping) {
+                $shipping['data'] = [];
+                return $shipping;
+            }
+                , $data[0]['chosen_shippings']);
+
+            $data[0]['products'] = array_map(function ($product) {
+                $product['main_pair'] = [];
+                $product['user_data'] = [];
+                return $product;
+            }
+                , $data[0]['products']);
+            $data = serialize($data);
+            db_query('UPDATE ?:order_data SET data = ?s WHERE order_data_id = ?i', $data, $id);
+        }
+        $iteration += 1;
+        fn_redirect('tools.cleanup.orders.' . $iteration);
+    }
     fn_print_die('stop');
 }
 
