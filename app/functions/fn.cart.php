@@ -5656,7 +5656,8 @@ function fn_check_amount_in_stock($product_id, $amount, $product_options, $cart_
             && $inventory_tracking
             && !$allow_product_preorder
         ) {
-            fn_set_notification('W', __('warning'), __('text_cart_not_enough_inventory'));
+            //[cs-market] temporarily disable notification
+            //fn_set_notification('W', __('warning'), __('text_cart_not_enough_inventory'));
             if (!defined('ORDER_MANAGEMENT')) {
                 $amount = false;
             }
