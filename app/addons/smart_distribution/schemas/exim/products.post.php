@@ -33,10 +33,18 @@ $schema['export_fields']['Add usergroup IDs'] = $schema['export_fields']['Add us
 
 $schema['export_fields']['Features']['process_put'] = ['fn_exim_smart_distribution_set_product_features', '#key', '#this', '@features_delimiter', '#lang_code', '%Vendor%' ];
 $schema['import_process_data']['fill_vendor_ugroups_if_empty'] = array(
-	'function' => 'fn_fill_vendor_ugroups_if_empty', 
+    'function' => 'fn_fill_vendor_ugroups_if_empty', 
     'args' => array('$primary_object_id', '$object', '$pattern', '$options', '$processed_data', '$processing_groups', '$skip_record'),
     'import_only' => true,
 );
+
+if (fn_allowed_for('MULTIVENDOR')) {
+    $schema['import_process_data']['fill_tracking_for_new_products'] = array(
+        'function' => 'fn_fill_tracking_for_new_products', 
+        'args' => array('$primary_object_id', '$object'),
+        'import_only' => true,
+    );
+}
 
 $schema['export_fields']['Show out of stock']['db_field'] = 'show_out_of_stock_product';
 

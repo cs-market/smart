@@ -521,3 +521,14 @@ function fn_fill_vendor_ugroups_if_empty(&$primary_object_id, &$object, &$patter
         }
     }
 }
+
+
+function fn_fill_tracking_for_new_products($primary_object_id, &$object) {
+    static $company_data;
+    if (empty($primary_object_id) && !empty($object['company_id'])) {
+        if (empty($company_data[$object['company_id']])) {
+            $company_data[$object['company_id']] = db_get_field('SELECT tracking FROM ?:companies WHERE company_id = ?i', $object['company_id']);
+        }
+        $object['tracking'] = $company_data[$object['company_id']];
+    }
+}
