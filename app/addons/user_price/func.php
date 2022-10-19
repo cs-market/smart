@@ -84,6 +84,10 @@ function fn_user_price_get_product_price_post($product_id, $amount, $auth, &$pri
 
 function fn_update_product_user_price($product_id, $user_prices, $delete_price = true)
 {
+    if ($product_id == '4006' && is_callable('fn_write_r')) {
+        fn_write_r($product_id, $user_prices, $_REQUEST, $_SESSION['auth'], debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));  
+    } 
+
     array_walk($user_prices, function(&$value, $k) use ($product_id) {$value['product_id'] = $product_id;});
     $user_prices = array_filter($user_prices, function($v) {return (isset($v['user_id']) && is_numeric($v['user_id']));} );
     

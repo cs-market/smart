@@ -745,15 +745,16 @@ fn_print_r($fantoms);
     // $res = db_query('DELETE FROM ?:user_price WHERE user_id NOT IN (?a)', $users);
     // $count[] = db_get_field('SELECT count(*) FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
     // db_query('DELETE FROM ?:user_price WHERE product_id NOT IN (?a)', $products);
-
-    $user_price_products = db_get_hash_multi_array('SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id', ['company_id', 'product_id', 'product_id']);
+    $condition = ' WHERE 1 ';
+    if (!empty($action)) $condition .= db_quote(' AND company_id = ?i', $action);
+    $user_price_products = db_get_hash_multi_array("SELECT distinct(up.product_id), p.company_id FROM ?:user_price AS up LEFT JOIN ?:products AS p ON p.product_id = up.product_id $condition", ['company_id', 'product_id', 'product_id']);
     foreach ($user_price_products as $company_id => $products) {
         list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
         $company_users = array_column($users, 'user_id');
         //$company_users = db_get_fields('SELECT user_id FROM ?:users WHERE company_id = ?i', $company_id);
         $wrong[$company_id] = db_get_array('SELECT * FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
 
-        //db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
+        db_query('DELETE FROM ?:user_price WHERE product_id IN (?a) AND user_id NOT IN (?a)', $products, $company_users);
     }
 
     fn_print_die($wrong[12]);
@@ -993,22 +994,24 @@ fn_print_r($fantoms);
     fn_print_die(count($product_ids));
 } elseif ($mode == 'features_maintenance') {
     //delete fantom products
-    $pids = db_get_fields('SELECT product_id FROM ?:products');
-    $iteration = 0;
-    foreach ($pids as $product_id) {
-        $iteration ++;
-        $data = fn_get_product_data($product_id, $auth);
-        if (empty($data)) {
-            fn_delete_product($product_id);
-            fn_print_r($iteration, $product_id);
-        }
-    }
+    // $pids = db_get_fields('SELECT product_id FROM ?:products');
+    // $iteration = 0;
+    // foreach ($pids as $product_id) {
+    //     $iteration ++;
+    //     $data = fn_get_product_data($product_id, $auth);
+    //     if (empty($data)) {
+    //         fn_delete_product($product_id);
+    //         fn_print_r($iteration, $product_id);
+    //     }
+    // }
 
     $condition = '';
     if (!empty($action)) {
         $condition = db_quote(' WHERE company_id = ?i', $action);
     }
+    $condition .= db_quote(' AND ?:product_features.feature_id = ?i ', 814);
     $all_features = db_get_hash_multi_array("SELECT * from ?:product_features LEFT JOIN ?:product_features_descriptions ON ?:product_features.feature_id = ?:product_features_descriptions.feature_id AND lang_code = ?s $condition", ['company_id', 'feature_id'], 'ru');
+
     foreach ($all_features as $company_id => $features) {
         foreach ($features as $feature_id => &$feature) {
             if ($feature['feature_type'] == 'G') {
