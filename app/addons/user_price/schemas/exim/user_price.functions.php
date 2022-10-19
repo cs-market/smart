@@ -44,7 +44,7 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
                 if (!empty($users)) {
                     ksort($users);
                     $users = array_unique(array_column(reset($users), 'user_id'));
-                    $db_users[$name] = $users = reset($users);
+                    $db_users[$name] = $users;
                 }
             } else {
                 $users = $db_users[$name];
@@ -54,10 +54,11 @@ function fn_import_user_price(&$primary_object_id, &$object, &$options, &$proces
                 $price = array();
                 foreach ($users as $user) {
                     $price[] = array(
-                        'user_id' => $user['user_id'],
+                        'user_id' => $user,
                         'price' => $object['price'],
                     );
                 }
+
                 fn_set_hook('user_price_exim_product_price_pre', $object, $price);
 
                 if (fn_update_product_user_price($primary_object_id['product_id'], $price, false)) {

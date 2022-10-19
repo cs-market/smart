@@ -4,7 +4,7 @@ use Tygh\Registry;
 
 include_once(Registry::get('config.dir.addons') . 'user_price/schemas/exim/user_price.functions.php');
 
-return array(
+$schema = array(
     'section' => 'products',
     'pattern_id' => 'user_price',
     'name' => __('user_price'),
@@ -55,6 +55,17 @@ return array(
         ),
     ),
 );
-if (Registry::get('runtime.company_id')) {
-    $schema['references']['products']['reference_fields'] = array('product_id' => '#key', 'company_id' => Registry::get('runtime.company_id'));
-}
+
+$schema['import_get_primary_object_id'] = array(
+    'fill_primary_object_company_id' => array(
+        'function' => 'fn_exim_apply_company',
+        'args' => array('$pattern', '$alt_keys', '$object', '$skip_get_primary_object_id'),
+        'import_only' => true,
+    ),
+);
+
+// if (Registry::get('runtime.company_id')) {
+//     $schema['references']['products']['reference_fields'] = array('product_id' => '#key', 'company_id' => Registry::get('runtime.company_id'));
+// }
+
+return $schema;
