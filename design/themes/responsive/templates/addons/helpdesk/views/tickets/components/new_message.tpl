@@ -4,7 +4,7 @@
         <textarea id="helpdesk_message" name="ticket_data[message]" cols="55" rows="2" class="input-large cm-focus" oninput="Tygh.$(this).height('5px');Tygh.$(this).height((Tygh.$(this).prop('scrollHeight')+21+'px'));"></textarea>
     </div>
 </div>
-
+{if !$auth.company_id|in_array:[2186,2187,1790,2184]}
 <div class="ty-control-group ty-float-left">
     {*<label class="ty-control-group__title" for="box_new_file">{__("files")}:</label>*}
     <div id="box_new_file" class="margin-top controls">
@@ -13,3 +13,4 @@
         </div>
     </div>
 </div>
+{/if}
