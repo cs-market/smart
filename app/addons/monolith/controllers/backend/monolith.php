@@ -31,6 +31,24 @@ if ($mode == 'cron') {
                 }
             }
         }
+        $params['time_to'] = strtotime('-30 minutes');
+        $params['time_from'] = strtotime('-7 days');
+        $mailer = Tygh::$app['mailer'];
+        foreach ($allowed_companies as $params['company_id']) {
+            list($orders) = fn_get_orders($params);
+            if (!empty($orders)) {
+                foreach ($orders as $order) {
+                    $mailer->send(array(
+                        'to' => ['novikova_t@baltika.com', 'fedorova_oo@carlsbergee.com', 'lysenko_kn@baltika.com', 'usenko_ls@baltika.com', 'porotova_mv@baltika.com'],
+                        'from' => 'default_company_orders_department',
+                        'data' => array('data' => $data),
+                        'subject' => 'Smart distribution: Не удалось отправить заказ #' . $order['order_id'],
+                        'body' => "Внимание! Не удалось отправить заказ #" . $order['order_id'],
+                    ), 'A');
+                    fn_change_order_status($order['order_id'], 'E');
+                }
+            }
+        }
     }
     exit();
 } elseif ($mode == 'send_order') {
