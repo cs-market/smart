@@ -78,6 +78,7 @@ class UserProfiles extends AEntity
 
         return [
             'status' => Response::STATUS_NO_CONTENT,
+            'data' => ['message'=> __('api_delete_user_message')]
         ];
     }
 
