@@ -73,7 +73,7 @@ class UserProfiles extends AEntity
                     fn_delete_ekey($ekey);
                 }
             }
-            db_query('UPDATE ?:users SET password = ?s WHERE user_id = ?i', fn_generate_password(4), $user_id);
+            db_query('UPDATE ?:users SET status = ?s WHERE user_id = ?i', 'D', $user_id);
         }
 
         return [
