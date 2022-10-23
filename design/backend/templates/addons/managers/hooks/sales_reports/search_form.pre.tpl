@@ -5,7 +5,7 @@
             <option value="">--</option>
             {$managers = ""|fn_get_managers}
             {foreach from=$managers item="manager"}
-                <option value="{$manager.user_id}" {if $dynamic_conditions.managers == $user_id} selected="selected" {/if}>{$manager.name}</option>
+                <option value="{$manager.user_id}" {if $dynamic_conditions.managers == $manager.user_id} selected="selected" {/if}>{$manager.firstname} {$manager.lastname}</option>
             {/foreach}
         </select>
     </div>

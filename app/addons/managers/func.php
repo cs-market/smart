@@ -7,6 +7,7 @@ use Tygh\Enum\UserRoles;
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 function fn_get_managers($params = []) {
+    if (!is_array($params)) $params = [];
     $condition = '';
     $params['user_role'] = 'M';
 
