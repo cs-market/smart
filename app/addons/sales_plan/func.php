@@ -57,10 +57,9 @@ function fn_generate_sales_report($params) {
         if (!empty($params['user_ids'])) {
             $elements_condition['user_id'] = db_quote(' AND u.user_id IN (?a)', explode(',', $params['user_ids']));
         }
-        if (!empty($params['manager'])) {
-            $elements_join['vendors_customers'] = db_quote(' LEFT JOIN ?:vendors_customers AS vc ON vc.customer_id = u.user_id ');
-            $elements_condition['vendor_manager'] = db_quote(' AND vc.vendor_manager = ?i', $params['manager']);
-        }
+
+        fn_set_hook('generate_sales_report', $params, $elements_join, $elements_condition);
+
         if (!empty($params['usergroup_id'])) {
             $elements_join['usergroup_links'] .= db_quote(" LEFT JOIN ?:usergroup_links AS ul ON ul.user_id = u.user_id AND ul.usergroup_id = ?i", $params['usergroup_id']);
             $elements_condition['usergroup_links'] = " AND ul.status = 'A'";
@@ -491,23 +490,26 @@ function fn_sales_plan_delete_company($company_id, $result) {
     }
 }
 
+// TODO CHECK THIS CODE
 function fn_sales_plan_create_order($order) {
-    $manager = db_get_field("SELECT u.email FROM ?:users AS u LEFT JOIN ?:vendors_customers AS vc ON vc.vendor_manager = u.user_id WHERE vc.customer_id = ?i AND vendor_manager IN (SELECT user_id FROM ?:users LEFT JOIN ?:companies ON ?:users.company_id = ?:companies.company_id WHERE user_type = ?s AND ?:users.company_id = ?i AND ?:companies.notify_manager_order_insufficient = 'Y')", $order['user_id'], 'V', $order['company_id']);
+    if (Registry::get('addons.managers.status') == 'A') {
+        $manager = db_get_field("SELECT u.email FROM ?:users AS u LEFT JOIN ?:user_managers AS um ON um.manager_id = u.user_id WHERE um.user_id = ?i AND um.manager_id IN (SELECT user_id FROM ?:users LEFT JOIN ?:companies ON ?:users.company_id = ?:companies.company_id WHERE user_type = ?s AND ?:users.company_id = ?i AND ?:companies.notify_manager_order_insufficient = 'Y')", $order['user_id'], 'V', $order['company_id']);
 
-    if (!empty($manager)) {
-        $notification_data[$manager]['less_placed'][] = $order['user_id'];
-    }
-    
-    $mailer = Tygh::$app['mailer'];
+        if (!empty($manager)) {
+            $notification_data[$manager]['less_placed'][] = $order['user_id'];
+        }
+        
+        $mailer = Tygh::$app['mailer'];
 
-    if ($notification_data) {
-        foreach ($notification_data as $manager_email => $data) {
-            $mailer->send(array(
-                'to' => $manager_email,
-                'from' => 'default_company_orders_department',
-                'data' => array('data' => $data),
-                'tpl' => 'addons/sales_plan/sales_notification.tpl',
-            ), 'A');
+        if ($notification_data) {
+            foreach ($notification_data as $manager_email => $data) {
+                $mailer->send(array(
+                    'to' => $manager_email,
+                    'from' => 'default_company_orders_department',
+                    'data' => array('data' => $data),
+                    'tpl' => 'addons/sales_plan/sales_notification.tpl',
+                ), 'A');
+            }
         }
     }
 }

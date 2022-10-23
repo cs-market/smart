@@ -63,8 +63,8 @@ function fn_trading_networks_get_storages($params, $join, &$condition) {
         $condition .= ' AND 0 ';
     }
 }
-function fn_trading_networks_user_roles_get_list(&$roles) {
-    $roles['N'] = 'trading_network';
+function fn_trading_networks_user_roles_get_list(&$roles, $type) {
+    if (empty($type) || $type == 'C') $roles['N'] = 'trading_network';
 }
 
 function fn_trading_networks_smart_auth_auth_routines(&$pre_condition) {

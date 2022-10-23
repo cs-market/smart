@@ -22,13 +22,6 @@ $schema['import_process_data']['unset_product_id'] = array(
     'import_only' => true,
 );
 
-$schema['export_fields']['Managers'] = [
-    'process_put' => array('fn_exim_smart_distribution_add_vendors_customers', '#key', '#this'),
-    'process_get' => array ('fn_exim_smart_distribution_export_vendors_customers', '#key'),
-    'import_only' => false,
-    'linked' => false,
-];
-
 $schema['export_fields']['Profile id'] = [
     'db_field' => 'profile_id',
     'table' => 'user_profiles',

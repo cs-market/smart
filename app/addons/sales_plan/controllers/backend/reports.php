@@ -48,7 +48,7 @@ if ($mode == 'daily_task') {
 
 		if ($not_placed) {
 			foreach (array_keys($not_placed) as $user_id) {
-				$not_placed[$user_id]['manager'] = db_get_field('SELECT u.email FROM ?:users AS u LEFT JOIN ?:vendors_customers AS vc ON vc.vendor_manager = u.user_id WHERE vc.customer_id = ?i AND vendor_manager IN (?a)', $user_id, $company_managers);
+				$not_placed[$user_id]['manager'] = db_get_field('SELECT u.email FROM ?:users AS u LEFT JOIN ?:user_managers AS um ON um.manager_id = u.user_id WHERE um.user_id = ?i AND vendor_manager IN (?a)', $user_id, $company_managers);
 			}
 			foreach ($not_placed as $user_id => $data) {
 				if (!empty($data['manager'])) {

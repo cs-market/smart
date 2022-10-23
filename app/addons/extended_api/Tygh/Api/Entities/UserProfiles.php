@@ -73,7 +73,12 @@ class UserProfiles extends AEntity
                     fn_delete_ekey($ekey);
                 }
             }
-            db_query('UPDATE ?:users SET status = ?s WHERE user_id = ?i', 'D', $user_id);
+
+            $can_update = true;
+
+            fn_set_hook('api_disable_user', $can_update, $user_id);
+
+            if ($can_update) db_query('UPDATE ?:users SET status = ?s WHERE user_id = ?i', 'D', $user_id);
         }
 
         return [

@@ -1,10 +1,37 @@
 <?xml version="1.0"?>
 <addon scheme="2.0">
     <id>managers</id>
-    <name>Managers</name>
-    <version>1.0</version>
-    <priority>99999999999999999</priority>
+    <name>Smart distribution: Менеджеры пользователя</name>
+    <version>1.0.1</version>
     <position>0</position>
     <status>active</status>
-    <default_language>en</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <default_language>ru</default_language>
+    <compatibility>
+        <dependencies>user_roles</dependencies>
+    </compatibility>
+    <queries>
+        <item>CREATE TABLE `?:user_managers` (
+          `user_id` mediumint(8) unsigned NOT NULL,
+          `manager_id` mediumint(8) unsigned NOT NULL,
+          UNIQUE KEY `user_manager` (`user_id`,`manager_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:user_managers;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `notify_manager_order_create` char(1) NOT NULL DEFAULT 'Y';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `notify_manager_order_create`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `notify_manager_order_update` char(1) NOT NULL DEFAULT 'Y';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `notify_manager_order_update`;</item>
+    </queries>
+    <language_variables>
+        <item lang="ru" id="managers.managers">Менеджеры</item>
+        <item lang="ru" id="exim_managers">Менеджеры пользователя</item>
+        <item lang="ru" id="managers.notify_manager_order_create">Уведомлять менеджеров о создании заказа</item>
+        <item lang="ru" id="managers.notify_manager_order_update">Уведомлять менеджеров о редактировании заказа</item>
+        <item lang="ru" id="management">Управление</item>
+    </language_variables>
 </addon>

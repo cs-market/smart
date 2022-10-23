@@ -26,18 +26,6 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
         }
         $condition .= db_quote(' AND ?:orders.user_id IN (?a)', $params['user_ids']);
     }
-    if (fn_smart_distribution_is_manager($auth['user_id'])) {
-        $params['managers'] = $auth['user_id'];
-    }
-    if (!empty($params['managers'])) {
-        list($users, ) = fn_get_users(array('managers' => $params['managers']), $auth);
-
-        if ($users) {
-            $condition .= db_quote(' AND ?:orders.user_id IN (?a)', array_column($users, 'user_id'));
-        } else {
-            $condition .= db_quote(' AND 0');
-        }
-    }
 
     if (isset($params['promotion_id']) && !empty($params['promotion_id'])) {
         $condition .= db_quote(" AND FIND_IN_SET(?i, promotion_ids)", $params['promotion_id']);
@@ -56,15 +44,7 @@ function fn_smart_distribution_get_orders($params, $fields, $sortings, &$conditi
 
 function fn_smart_distribution_get_order_info(&$order, $additional_data) {
     if (!empty($order)) {
-        $auth = Tygh::$app['session']['auth'];
-        if (AREA == 'A') {
-            if (Registry::get('runtime.mode') == 'details' && fn_smart_distribution_is_manager($auth['user_id'])) {
-                $customer_ids = db_get_fields('SELECT customer_id FROM ?:vendors_customers WHERE vendor_manager = ?i', $auth['user_id']);
-                if (!in_array($order['user_id'], $customer_ids)) {
-                    $order = false;
-                }
-            }
-
+        if (SiteArea::isAdmin(AREA)) {
             if (!($order['profile_id'])) {
                 $user_profiles = fn_get_user_profiles($order['user_id']);
                 if (count($user_profiles) == 1) {
@@ -125,11 +105,6 @@ function fn_smart_distribution_get_product_features_list_before_select(&$fields,
     // [/only vendor features]
 }
 
-function fn_smart_distribution_is_manager($user_id) {
-    $val = db_get_field('SELECT is_manager FROM ?:users WHERE user_id = ?i', $user_id);
-    return ($val == 'Y') ? true : false;
-}
-
 if (fn_allowed_for('MULTIVENDOR') && !function_exists('fn_ult_is_shared_product') ) {
     function fn_ult_is_shared_product($pid) {
         return 'N';
@@ -173,20 +148,6 @@ function fn_smart_distribution_delete_usergroups($usergroup_ids) {
     foreach ($usergroup_ids as $usergroup_id) db_query("UPDATE ?:vendor_plans SET usergroup_ids = ?p", fn_remove_from_set('usergroup_ids', $usergroup_id));
 }
 
-function fn_smart_distribution_get_managers($params = array()) {
-    $condition = '';
-    if (Registry::get('runtime.company_id') || !empty($params['company_id'])) {
-        $company_id = (Registry::get('runtime.company_id')) ? Registry::get('runtime.company_id') : $params['company_id'];
-            $condition .= db_quote(" AND u.company_id = ?i", $company_id);
-    }
-    if (isset($params['user_id'])) {
-        $condition .= db_quote(" AND vc.customer_id = ?i", $params['user_id']);
-    }
-
-    $managers = db_get_hash_array("SELECT DISTINCT(vc.vendor_manager) as user_id, u.email, IF(CONCAT(firstname, lastname) = '', company, CONCAT(firstname, ' ', lastname)) AS name, u.company_id, u.phone FROM ?:vendors_customers AS vc LEFT JOIN ?:users AS u ON u.user_id = vc.vendor_manager WHERE 1 $condition", 'user_id');
-    return $managers;
-}
-
 function fn_smart_distribution_get_users_pre(&$params, $auth, $items_per_page, $custom_view) {
     if (Registry::get('runtime.company_id')) {
         $params['exclude_user_types'] = array('V');
@@ -195,13 +156,6 @@ function fn_smart_distribution_get_users_pre(&$params, $auth, $items_per_page, $
 
 function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condition, &$join, $auth) {
     $fields[] = 'last_update';
-    if (!empty($params['managers'])) {
-        if (!is_array($params['managers'])) {
-            $managers = explode(',', $params['managers']);
-        }
-        $join .= db_quote(' LEFT JOIN ?:vendors_customers ON ?:vendors_customers.customer_id = ?:users.user_id');
-        $condition['vendor_manager'] = db_quote(' AND ?:vendors_customers.vendor_manager in (?a) ', $managers);
-    }
     if (Registry::get('runtime.company_id')) {
         $params['company_id'] = Registry::get('runtime.company_id');
     }
@@ -417,8 +371,6 @@ function fn_smart_distribution_get_user_info_before(&$condition, $user_id, $user
 }
 
 function fn_smart_distribution_get_user_info($user_id, $get_profile, $profile_id, &$user_data) {
-    // get managers for single user
-    if (AREA == 'A') $user_data['managers'] = fn_smart_distribution_get_managers(array('user_id' => $user_id));
     // fix to get correct profile fields
     $user_data['fields'] = fn_array_merge($user_data['fields'], fn_get_profile_fields_data(ProfileDataTypes::PROFILE, $profile_id));
 }
@@ -428,33 +380,6 @@ function fn_smart_distribution_update_user_pre($user_id, &$user_data, $auth, $sh
 }
 
 function fn_smart_distribution_update_user_profile_pre($user_id, &$user_data, $action) {
-    if ($user_data['user_id'] && isset($user_data['managers']) && $user_data['user_type'] == 'C') {
-        $managers = fn_smart_distribution_get_managers(array('user_id' => $user_data['user_id']));
-
-        if ($managers) db_query("DELETE FROM ?:vendors_customers WHERE customer_id = ?i AND vendor_manager IN (?a)", $user_data['user_id'], array_keys($managers));
-
-        $udata = array();
-        if (!empty($user_data['managers'])) {
-            if (!is_array($user_data['managers'])) {
-                $managers = explode(',', $user_data['managers']);
-            } else {
-                $managers = array_column($user_data['managers'], 'user_id');
-            }
-
-            // API OPERATES BY EMAILS!
-            if (defined('API')) {
-                $managers = db_get_fields(
-                "SELECT user_id FROM ?:users WHERE email IN (?a)",
-                array_map('trim', $user_data['managers'])
-                );
-            }
-            foreach ($managers as $m_id) {
-                if ($m_id) $udata[] = array('vendor_manager' => $m_id, 'customer_id' => $user_data['user_id']);
-            }
-
-            if (!empty($udata)) db_query('INSERT INTO ?:vendors_customers ?m', $udata);
-        }
-    }
     $data = fn_get_profile_fields_data(ProfileDataTypes::USER, $user_id);
 
     // Add new profile or update existing
@@ -527,18 +452,15 @@ function fn_smart_distribution_sales_reports_table_condition(&$table_condition, 
                 $users = explode(',', $condition);
                 $condition = array_combine($users, $users);
             }
-            if ($type == 'managers') {
-                $type = 'user';
-                list($users, ) = fn_get_users(array('managers' => $condition), $_SESSION['auth']);
-                $users = array_column($users, 'user_id');
-                $condition = array_combine($users, $users);
-            }
             if ($type == 'usergroup_id') {
                 $type = 'user';
                 list($users, ) = fn_get_users(array('usergroup_id' => $condition), $_SESSION['auth']);
                 $users = array_column($users, 'user_id');
                 $condition = array_combine($users, $users);
             }
+
+            fn_set_hook('sales_reports_dynamic_conditions', $type, $condition, $users);
+
             $table_condition[$type] = $condition;
         }
         if (isset($dynamic_conditions['display'])) {
@@ -702,30 +624,6 @@ function fn_smart_distribution_get_profile_fields($location, $select, &$conditio
     }
 }
 
-function fn_smart_distribution_vendor_communication_add_thread_message_post( $thread_full_data, $result) {
-    if ($thread_full_data['last_message_user_type'] != 'A') {
-        $managers = fn_smart_distribution_get_managers(array('user_id' => $thread_full_data['last_message_user_id']));
-        if (!empty($managers)) {
-            $vendor_email = array_column($managers, 'email');
-            if (!empty($thread_full_data['last_message_user_id'])) {
-                $message_from = fn_vendor_communication_get_user_name($thread_full_data['last_message_user_id']);
-            }
-
-            $email_data = array(
-                'area' => 'A',
-                'email' => $vendor_email,
-                'email_data' => array(
-                    'thread_url' => fn_url("vendor_communication.view&thread_id={$thread_data['thread_id']}", 'V'),
-                    'message_from' => !empty($message_from) ? $message_from : fn_get_company_name($thread_data['company_id']),
-                ),
-                'template_code' => 'vendor_communication.notify_admin',
-            );
-
-            $result = fn_vendor_communication_send_email_notification($email_data);
-        }
-    }
-}
-
 function fn_sd_add_product_to_wishlist($product_data, &$wishlist, &$auth) {
     if (Registry::get('addons.wishlist.status') == 'A') {
         if (!is_callable('fn_add_product_to_wishlist')) {
@@ -815,40 +713,6 @@ function fn_smart_distribution_shippings_get_shippings_list_conditions($group, $
 }
 
 function fn_smart_distribution_place_order($order_id, $action, $order_status, $cart, $auth) {
-    $order_info = fn_get_order_info($order_id);
-    $field = (isset($cart['order_id']) && !empty($cart['order_id'])) ? 'notify_manager_order_update' : 'notify_manager_order_create';
-    if (db_get_field("SELECT $field FROM ?:companies WHERE company_id = ?i", $order_info['company_id']) == 'Y') {
-        $mailer = Tygh::$app['mailer'];
-        list($shipments) = fn_get_shipments_info(array('order_id' => $order_info['order_id'], 'advanced_info' => true));
-        $use_shipments = !fn_one_full_shipped($shipments);
-        $payment_id = !empty($order_info['payment_method']['payment_id']) ? $order_info['payment_method']['payment_id'] : 0;
-        $company_lang_code = fn_get_company_language($order_info['company_id']);
-        $order_statuses = fn_get_statuses(STATUSES_ORDER, array(), true, false, ($order_info['lang_code'] ? $order_info['lang_code'] : CART_LANGUAGE), $order_info['company_id']);
-        $status_settings = $order_statuses[$order_info['status']]['params'];
-
-        $managers = fn_smart_distribution_get_managers(array('user_id' => $order_info['user_id'], 'company_id' => $order_info['company_id']));
-        $email_template_name = 'order_notification.' . (($action == 'save') ? 'y' : 'o');
-
-        $order_status = ($order_status == 'N') ? 'O' : $order_status;
-        $mailer->send(array(
-            'to' => array_column($managers, 'email'),
-            'from' => 'default_company_orders_department',
-            'reply_to' => $order_info['email'],
-            'data' => array(
-                'order_info' => $order_info,
-                'shipments' => $shipments,
-                'use_shipments' => $use_shipments,
-                'order_status' => fn_get_status_data($order_status, STATUSES_ORDER, $order_info['order_id'], $company_lang_code),
-                'payment_method' => fn_get_payment_data($payment_id, $order_info['order_id'], $company_lang_code),
-                'status_settings' => $status_settings,
-                'profile_fields' => fn_get_profile_fields('I', '', $company_lang_code)
-            ),
-            'template_code' => $email_template_name,
-            'tpl' => 'orders/order_notification.tpl', // this parameter is obsolete and is used for back compatibility
-            'company_id' => $order_info['company_id'],
-        ), 'A', $company_lang_code);
-    }
-
     if (!isset($cart['order_id'])) fn_save_order_log($order_id, $auth['user_id'], 'rus_order_logs_order_total', $cart['total'], TIME);
 }
 
@@ -1177,15 +1041,6 @@ function fn_timestamp_to_date_wo_time($timestamp) {
     return !empty($timestamp) ? date('d.m.Y', intval($timestamp)) : '';
 }
 
-function fn_smart_distribution_send_form(&$page_data, $form_values, $result, $from, $sender, $attachments, $is_html, $subject) {
-    if (Tygh::$app['session']['auth']['user_id']) {
-        $managers = fn_smart_distribution_get_managers(['user_id' => Tygh::$app['session']['auth']['user_id']]);
-        if (!empty($managers)) {
-            $page_data['form']['general'][FORM_RECIPIENT] = [$page_data['form']['general'][FORM_RECIPIENT]] + array_column($managers, 'email', 'name');
-        }
-    }
-}
-
 function microtime_float()
 {
     list($usec, $sec) = explode(" ", microtime());
@@ -1330,18 +1185,6 @@ function fn_smart_distribution_get_mailboxes_pre(&$condition) {
             $condition .= db_quote(' AND company_id = ?i', $user_info['company_id']);
         }
     }
-}
-
-function fn_smart_distribution_get_tickets_params(&$params, $condition, $join) {
-    if (ACCOUNT_TYPE == 'vendor' && !fn_smart_distribution_is_manager(Tygh::$app['session']['auth']['user_id'])) {
-        unset($params['user_id']);
-    }
-}
-
-function fn_smart_distribution_update_ticket_pre(&$data) {
-    $sender = reset($data['users']);
-    $managers = fn_smart_distribution_get_managers(['user_id' => $sender]);
-    $data['users'] = array_unique(array_merge($data['users'], array_keys($managers)));
 }
 
 // allow to set usergroup for vendor admin

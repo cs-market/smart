@@ -1,8 +1,9 @@
 <?php
 
 use Tygh\Registry;
+use Tygh\Enum\UserRoles;
 
-if (fn_smart_distribution_is_manager(Tygh::$app['session']['auth']['user_id'])) {
+if (UserRoles::is_manager()) {
     $menu = ['management' => [
         'title' => __('management'),
         'items' => [
@@ -10,13 +11,16 @@ if (fn_smart_distribution_is_manager(Tygh::$app['session']['auth']['user_id'])) 
             'products' => $schema['central']['products']['items']['products'],
             'customers' => $schema['central']['customers']['items']['customers'],
             'customers' => $schema['central']['customers']['items']['customers'],
-            'tickets' => $schema['central']['helpdesk']['items']['tickets'],
-            'new_tickets' => $schema['central']['helpdesk']['items']['new_tickets'],
         ],
         'position' => 100
     ]];
 
-    unset($schema['top']);
+    if (Registry::get('addons.helpdesk.status') == 'A') {
+        $menu['management']['items']['tickets'] = $schema['central']['helpdesk']['items']['tickets'];
+        $menu['management']['items']['new_tickets'] = $schema['central']['helpdesk']['items']['new_tickets'];
+    }
+
+    $schema['top'] = [];
     $schema['central'] = $menu;
 }
 

@@ -80,14 +80,14 @@
             </div>*}
 
             {hook name="profiles:search_form"}{/hook}
-            {if !$runtime.company_id}
+            {*if !$runtime.company_id}
                 {include file="views/companies/components/company_field.tpl"
                     name='company_id'
                     id="elm_company_id"
                     zero_company_id_name_lang_var="none"
                     selected=$search.company_id
                 }
-            {/if}
+            {/if*}
             <div class="control-group">
                 <label class="control-label" for="elm_registration_period">{__("registration_date")}</label>
                 <div class="controls">
@@ -104,7 +104,7 @@
                 }
             </div>
             <div class="control-group hidden">
-                <label class="control-label" for="elm_managers">{__("user_type")}</label>
+                <label class="control-label" for="elm_user_type">{__("user_type")}</label>
                 <div class="controls">
                     <select id="user_type" name="user_type">
                         <option value="">{__("all")}</option>

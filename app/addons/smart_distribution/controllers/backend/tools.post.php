@@ -2209,6 +2209,25 @@ fn_print_die($orders_wo_points);
         fn_redirect('tools.cleanup.orders.' . $iteration);
     }
     fn_print_die('stop');
+} elseif ($mode == 'managers_addon_migration') {
+    $managers = db_get_array('SELECT * FROM ?:vendors_customers');
+    $managers = array_map(function($v) {
+        $v['user_id'] = $v['customer_id'];
+        $v['manager_id'] = $v['vendor_manager'];
+        unset($v['customer_id'], $v['vendor_manager']);
+        return $v;
+    }, $managers);
+
+    db_query("CREATE TABLE `?:user_managers` (
+          `user_id` mediumint(8) unsigned NOT NULL,
+          `manager_id` mediumint(8) unsigned NOT NULL,
+          UNIQUE KEY `user_manager` (`user_id`,`manager_id`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8");
+    db_query('INSERT INTO ?:user_managers ?m', $managers);
+    db_query('DROP TABLE ?:vendors_customers');
+    db_query('UPDATE ?:users SET user_role = ?s WHERE is_manager = ?s', 'M', 'Y');
+    db_query('ALTER TABLE ?:users DROP is_manager');
+    fn_print_die('done');
 }
 
 
