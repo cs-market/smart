@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>locked_users</id>
+    <name>Smart distribution: Заблокированные пользователи</name>
+    <description>пользователи, которых нельзя изменить</description>
+    <status>active</status>
+    <version>1.0.1</version>
+    <priority>4294967294</priority>
+    <position>0</position>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <settings>
+        <sections>
+            <section id="general">
+                <items>
+                    <item id="usergroup_id">
+                        <type>selectbox</type>
+                        <name>Группа пользователей</name>
+                    </item>
+                </items>
+            </section>
+        </sections>
+    </settings>
+</addon>
