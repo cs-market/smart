@@ -56,7 +56,7 @@ function fn_managers_get_order_info(&$order, $additional_data) {
 
 function fn_managers_get_users(&$params, &$fields, &$sortings, &$condition, &$join, $auth) {
     if (UserRoles::is_manager()) {
-        $params['manager_users'] = $auth['user_id'];
+        if ($params['user_type'] == 'C') $params['manager_users'] = $auth['user_id'];
     }
 
     if (!empty($params['manager_users'])) {
