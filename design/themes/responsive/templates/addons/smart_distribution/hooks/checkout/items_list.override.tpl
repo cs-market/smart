@@ -16,10 +16,7 @@
                         <a href="{"products.view?product_id=`$product.product_id`"|fn_url}" class="ty-cart-content__product-title">
                             {$product.product nofilter}
                         </a>
-                        {if !$product.exclude_from_calculate}
-                            <a class="{$ajax_class} ty-cart-content__product-delete ty-delete-big" href="{"checkout.delete?cart_id=`$key`&redirect_mode=`$runtime.mode`"|fn_url}" data-ca-target-id="cart_items,checkout_totals,cart_status*,checkout_steps,checkout_cart" title="{__("remove")}">&nbsp;<i class="ty-delete-big__icon ty-icon-cancel-circle"></i>
-                            </a>
-                        {/if}
+                        
                     {/strip}
                     {hook name="products:product_additional_info"}
                         <div class="ty-cart-content__sku ty-sku cm-hidden-wrapper{if !$product.product_code} hidden{/if}" id="sku_{$key}">
@@ -59,6 +56,10 @@
                     </div>
                     {/if}
                 </div>
+                {if !$product.exclude_from_calculate}
+                    <a class="{$ajax_class} ty-cart-content__product-delete ty-delete-big ty-float-right" href="{"checkout.delete?cart_id=`$key`&redirect_mode=`$runtime.mode`"|fn_url}" data-ca-target-id="cart_items,checkout_totals,cart_status*,checkout_steps,checkout_cart" title="{__("remove")}">&nbsp;<i class="ty-delete-big__icon ty-icon-cancel-circle"></i>
+                    </a>
+                {/if}
             </td>
 
             <td class="ty-cart-content__product-elem ty-cart-content__price cm-reload-{$obj_id}" id="price_display_update_{$obj_id}">

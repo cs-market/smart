@@ -52,6 +52,15 @@
 }
 
 .baltika {
+    @media @mobile {
+        .ty-cart-content tr {
+            display: flex;
+            flex-direction: column;
+            .ty-cart-content__description, .ty-cart-content__qty {
+                order: -1;
+            }
+        }
+    }
     .ty-icon-rumba-star-empty {
         .ty-icon-rumba-heart-empty()
     }
