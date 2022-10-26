@@ -2229,6 +2229,13 @@ fn_print_die($orders_wo_points);
     db_query('UPDATE ?:users SET user_role = ?s WHERE is_manager = ?s', 'M', 'Y');
     db_query('ALTER TABLE ?:users DROP is_manager');
     fn_print_die('done');
+} elseif ($mode == 'delete_storages') {
+    $file = 'storages_balt.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+    $ok_storages = array_column($content, 'storage_id');
+    $storage_ids = db_get_fields('SELECT storage_id FROM ?:storages WHERE company_id = 45 AND storage_id NOT IN (?a)', $ok_storages);
+    fn_delete_storages($storage_ids);
+    fn_print_die('done');
 }
 
 
