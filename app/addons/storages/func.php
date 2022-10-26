@@ -214,6 +214,24 @@ function fn_storages_get_product_data($product_id, &$field_list, &$join, $auth, 
         // если у товара нет прайсов, то тоже не достаем его
         $price_usergroup = db_quote('AND ?:product_prices.usergroup_id IN (?a)', array_diff($usergroup_ids, [USERGROUP_ALL]));
         $condition .= db_quote("AND ?:product_prices.price IS NOT NULL");
+
+        // заменим условие наличия товара
+        // TODO штатно поля show_out_of_stock_product нет!
+        $old_condition = db_quote(
+            ' AND (CASE ?:products.show_out_of_stock_product' .
+            "   WHEN ?s THEN (?:products.amount > 0 OR ?:products.tracking = 'D')" .
+            '   ELSE 1' .
+            ' END)',
+            'N'
+        );
+        $new_condition = db_quote(
+            ' AND (CASE ?:products.show_out_of_stock_product' .
+            "   WHEN ?s THEN (?:storages_products.amount > 0 OR ?:products.tracking = 'D')" .
+            '   ELSE 1' .
+            ' END)',
+            'N'
+        );
+        $condition = str_replace($old_condition, $new_condition, $condition );
     }
 }
 
@@ -264,6 +282,24 @@ function fn_storages_get_products(array &$params, array &$fields, array &$sortin
         $old_price_condition = db_quote(' AND prices.usergroup_id IN (?n)', (($params['area'] == 'A') ? USERGROUP_ALL : array_merge(array(USERGROUP_ALL), $auth['usergroup_ids'])));
         $price_condition = db_quote(' AND ((prices.usergroup_id IN (?n) AND prices.price IS NOT NULL) OR up.price IS NOT NULL)', (($params['area'] == 'A') ? USERGROUP_ALL : array_filter($auth['usergroup_ids'])));
         $condition = str_replace($old_price_condition, $price_condition, $condition);
+
+        // заменим условие наличия товара
+        // TODO штатно поля show_out_of_stock_product нет!
+        $old_condition = db_quote(
+            ' AND (CASE products.show_out_of_stock_product' .
+            "   WHEN ?s THEN (products.amount > 0 OR products.tracking = 'D')" .
+            '   ELSE 1' .
+            ' END)',
+            'N'
+        );
+        $new_condition = db_quote(
+            ' AND (CASE products.show_out_of_stock_product' .
+            "   WHEN ?s THEN (sp.amount > 0 OR products.tracking = 'D')" .
+            '   ELSE 1' .
+            ' END)',
+            'N'
+        );
+        $condition = str_replace($old_condition, $new_condition, $condition );
     } elseif (!empty(Registry::get('runtime.storages'))) {
         // if we have not selected storage we cannot buy
         $condition .= db_quote('AND 0');

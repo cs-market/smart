@@ -2008,6 +2008,7 @@ fn_print_die($orders_wo_points);
     foreach ($company_ids as $company_id) {
         list($users) = fn_get_users(array('user_type' => 'C', 'company_id' => $company_id), $auth);
         $user_ids = array_column($users, 'user_id');
+        $data = [];
         if ($company_id == 1810) {
             $from = '01/02/2022';
         } else {
