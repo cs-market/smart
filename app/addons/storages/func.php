@@ -494,6 +494,7 @@ function fn_storages_shippings_group_products_list(&$products, &$groups) {
         $storages_groups = array();
         foreach ($groups as $group) {
             foreach ($group['products'] as $cart_id => $product) {
+                // extra????? $product['extra']['storage_id']
                 $storage_id = $product['storage_id'];
                 $storages_group_key = $storage_id ? $group['company_id'] . "_" . $storage_id : $group['company_id'];
 
@@ -551,6 +552,12 @@ function fn_storages_get_order_info(&$order, $additional_data) {
     if (!empty($order['storage_id'])) {
         list($storages,) = fn_get_storages(['storage_id' => $order['storage_id']]);
         $order['storage'] = reset($storages);
+    }
+}
+
+function fn_storages_reorder_product($order_info, &$cart, $auth, $product, $amount, $price, $zero_price_action, $k) {
+    if ($storages = Registry::get('runtime.storages')) {
+        if (empty($product['extra']['storage_id'])) $cart['products'][$k]['extra']['storage_id'] = Registry::get('runtime.current_storage.storage_id');
     }
 }
 
