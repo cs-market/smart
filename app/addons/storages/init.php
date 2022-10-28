@@ -24,6 +24,7 @@ fn_register_hooks(
     'update_product_amount',
     'get_orders',
     'get_order_info',
+    'reorder_product',
     'monolith_generate_xml',
     'calendar_delivery_weekdays_availability',
     'calendar_delivery_service_params',
