@@ -25,13 +25,13 @@ function fn_promotion_import_glue_primary_field(&$import_data)
     return true;
 }
 
-function fn_promotion_import_put_optional_timestamp($timestamp)
+function fn_promotion_import_put_optional_timestamp($timestamp, $end_time)
 {
     if (empty($timestamp)) {
         return 0;
     } else {
         $timestamp = str_replace('.', '/', $timestamp);
-        return fn_parse_date($timestamp);
+        return fn_parse_date($timestamp, $end_time);
     }
 }
 

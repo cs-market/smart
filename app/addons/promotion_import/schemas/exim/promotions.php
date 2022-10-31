@@ -71,7 +71,7 @@ $schema = array(
         ],
         'Available till' => [
             'db_field'      => 'to_date',
-            'convert_put'   => ['fn_promotion_import_put_optional_timestamp', '#this'],
+            'convert_put'   => ['fn_promotion_import_put_optional_timestamp', '#this', 'true'],
             'return_result' => true
         ],
         'Stop other rules' => [
