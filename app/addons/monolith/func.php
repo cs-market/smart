@@ -52,7 +52,24 @@ function fn_monolith_generate_xml($order_id) {
     $iterator = 0;
 
     $CRMOrderLine = [];
+
     foreach ($order_info['products'] as $p) {
+        $price = $p['price'];
+        if (!empty($p['promotions'])) {
+            $bonuses = [];
+            foreach ($p['promotions'] as $promotion) {
+                foreach ($promotion['bonuses'] as $bonus) {
+                    if (empty($bonus['discount'])) continue;
+                    $bonuses[$bonus['discount']*100] = $bonus;
+                }
+            }
+            $bonus = $bonuses[max(array_keys($bonuses))];
+            if ($bonus['discount_bonus'] == 'by_percentage') {
+                $p['price'] = fn_format_price($p['base_price'] * (1-$bonus['discount_value']/100));
+            } elseif($bonus['discount_bonus'] == 'to_percentage') {
+                $p['price'] = fn_format_price($p['base_price'] * ($bonus['discount_value']/100));
+            }
+        }
         $iterator += 1;
         $CRMOrderLine[] = [
             'f' => array(
@@ -62,11 +79,12 @@ function fn_monolith_generate_xml($order_id) {
                 // '',
                 $p['product_code'],
                 'ea',
-                $p['price'],
+                $price,
                 $p['amount']
             )
         ];
     }
+
     $monolith_order['d'][] = array(
         '@attributes' => array ('name' => 'CRMOrderLine'),
         'r' => $CRMOrderLine,
