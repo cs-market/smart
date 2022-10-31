@@ -2236,6 +2236,24 @@ fn_print_die($orders_wo_points);
     $storage_ids = db_get_fields('SELECT storage_id FROM ?:storages WHERE company_id = 45 AND storage_id NOT IN (?a)', $ok_storages);
     fn_delete_storages($storage_ids);
     fn_print_die('done');
+} elseif ($mode == 'correct_rp') {
+    $file = 'rp.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+
+    foreach ($content as $value) {
+        fn_change_user_points($value['разница'], $value['user_id'], "Корректировка баллов от 31.10.2022 +" . $value['разница'], CHANGE_DUE_ADDITION);
+    }
+
+    fn_print_r('done 1');
+
+    $file = 'rp1810.csv';
+    $content = fn_exim_get_csv(array(), $file, array('validate_schema'=> false, 'delimiter' => ';') );
+
+    foreach ($content as $value) {
+        fn_change_user_points($value['разница'], $value['user_id'], "Корректировка баллов от 31.10.2022 +" . $value['разница'], CHANGE_DUE_ADDITION);
+    }
+
+    fn_print_die('done');
 }
 
 
