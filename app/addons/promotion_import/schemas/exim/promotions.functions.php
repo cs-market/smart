@@ -13,16 +13,24 @@
 
 use Tygh\Registry;
 
-function fn_promotion_import_glue_primary_field(&$import_data)
-{
+function fn_promotion_import_glue_primary_field(&$import_data) {
     foreach ($import_data as $key => &$data) {
         if (!empty($data['suffix'])) {
             $data['external_id'] = trim($data['external_id']) . '.' . trim($data['suffix']);
             unset($data['suffix']);
-        }
+        }    
     }
 
     return true;
+}
+
+function fn_promotion_import_fill_company_id(&$alt_keys, &$object) {
+    if (fn_allowed_for('MULTIVENDOR')) {
+        if ($cid = Registry::get('runtime.company_id')) {
+            $object['company_id'] = $cid;
+        }
+        $alt_keys['company_id'] = $object['company_id'];
+    }
 }
 
 function fn_promotion_import_put_optional_timestamp($timestamp, $end_time)

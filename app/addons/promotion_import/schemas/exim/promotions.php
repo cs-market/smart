@@ -41,7 +41,6 @@ $schema = array(
             'db_field' => 'company_id',
             'process_get' => array('fn_get_company_name', '#this'),
             'convert_put' => array('fn_get_company_id_by_name', '#this'),
-            'required' => true,
         ),
         'Suffix' => [
             'db_field' => 'suffix',
@@ -112,7 +111,6 @@ $schema = array(
             'import_only' => true,
         ]
     ]
-    // ЕЩЕ НАДО СГЕНЕРИТЬ ХЭШИ ТОВАРОВ И ПОЛЬЗОВАТЕЛЕЙ!!
 );
 
 // $promotion_schema = fn_get_schema('promotions', 'schema');
@@ -134,8 +132,17 @@ $schema = array(
 //     }
 // }
 
-if (Registry::get('runtime.company_id')) {
-    $schema['export_fields']['Company']['required'] = false;
+if (fn_allowed_for('MULTIVENDOR')) {
+    if (!Registry::get('runtime.company_id')) {
+        $schema['export_fields']['Company']['required'] = true;
+    } else {
+        $schema['import_get_primary_object_id']['get_primary_keys'] = [
+            'function' => 'fn_promotion_import_fill_company_id',
+            'args' => array('$alt_keys', '$object'),
+            'import_only' => true,
+        ];
+    }
+    $schema['export_fields']['Company']['alt_key'] = true;
 }
 
 return $schema;
