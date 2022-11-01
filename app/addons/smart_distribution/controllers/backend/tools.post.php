@@ -2254,6 +2254,10 @@ fn_print_die($orders_wo_points);
     }
 
     fn_print_die('done');
+} elseif ($mode == 'remove_fantom_network_id') {
+    $users = db_get_fields('SELECT user_id FROM ?:users');
+    $res = db_query("UPDATE ?:users SET network_id = '' WHERE network_id NOT IN (?a)", $users);
+    fn_print_die($res);
 }
 
 
