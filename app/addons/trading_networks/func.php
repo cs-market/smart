@@ -82,3 +82,7 @@ function fn_trading_networks_update_profile($action, $user_data, $current_user_d
         }
     }
 }
+
+function fn_trading_networks_post_delete_user($user_id, $user_data, $result) {
+    if ($result) db_query('UPDATE ?:users SET network_id = 0 WHERE network_id = ?i', $user_id);
+}

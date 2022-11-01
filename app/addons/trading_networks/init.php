@@ -9,7 +9,8 @@ fn_register_hooks(
     'get_storages',
     'user_roles_get_list',
     'smart_auth_auth_routines',
-    'update_profile'
+    'update_profile',
+    'post_delete_user'
 );
 
 fn_init_stack(array('fn_init_network', &$_REQUEST));
