@@ -1,6 +1,6 @@
 {assign var="_u_type" value=$smarty.request.user_type|default:$user_data.user_type}
 
-{if ($uid != 1 || $_u_type !='A')}
+{if $uid != 1}
     <div class="control-group">
         <label for="user_role" class="control-label cm-required">{__("user_role")}:</label>
         <div class="controls">

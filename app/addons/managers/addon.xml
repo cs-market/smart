@@ -9,6 +9,7 @@
     <supplier_link>http://cs-market.com/</supplier_link>
     <has_icon>Y</has_icon>
     <default_language>ru</default_language>
+    <priority>99999999</priority>
     <compatibility>
         <dependencies>user_roles</dependencies>
     </compatibility>
@@ -29,9 +30,13 @@
     </queries>
     <language_variables>
         <item lang="ru" id="managers.managers">Менеджеры</item>
+        <item lang="ru" id="managers.manager_users">Закрепленные пользователи</item>
         <item lang="ru" id="exim_managers">Менеджеры пользователя</item>
         <item lang="ru" id="managers.notify_manager_order_create">Уведомлять менеджеров о создании заказа</item>
         <item lang="ru" id="managers.notify_manager_order_update">Уведомлять менеджеров о редактировании заказа</item>
         <item lang="ru" id="management">Управление</item>
+        <item lang="ru" id="manager">Менеджер</item>
+        <item lang="ru" id="supervisor">Супервайзер</item>
+        <item lang="ru" id="operator">Оператор</item>
     </language_variables>
 </addon>

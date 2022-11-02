@@ -1,14 +1,10 @@
 {if $item.type == 'manager_selectbox'}
-    <div class="sidebar-field {$item.class}">
-        <label for="elm_{$key}">{__($item.label)}</label>
-        <div class="break">
-            <select name="{$name}" id="elm_{$key}">
-                <option value="">--</option>
-                {$managers = ""|fn_get_managers}
-                {foreach from=$managers item="manager"}
-                    <option value="{$manager.user_id}" {if $search.$key == $manager.user_id} selected="selected" {/if}>{$manager.firstname} {$manager.lastname}</option>
-                {/foreach}
-            </select>
-        </div>
-    </div>
+    {include file="addons/managers/components/managers_selectbox.tpl" 
+        params=['group_by' => 'user_role_descr']
+        class="sidebar-field `$item.class`"
+        label=__($item.label)
+        key=$key
+        name=$name 
+        search_key=$key
+    }
 {/if}
