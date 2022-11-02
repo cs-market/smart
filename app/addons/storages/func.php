@@ -538,6 +538,9 @@ function fn_storages_update_product_amount_pre($product_id, $amount_delta, $prod
 
 function fn_storages_update_product_amount($new_amount, $product_id, $cart_id, $tracking, $notify, $order_info, $amount_delta, $current_amount, $original_amount, $sign) {
     if ($order_info['storage_id']) {
+        if (in_array($product_id, ['157509', '157542', '157541', '157543'])) {
+            return;
+        }
         db_query('UPDATE ?:storages_products SET amount = ?d WHERE product_id = ?i AND storage_id = ?i', $new_amount, $product_id, $order_info['storage_id']);
     }
 }

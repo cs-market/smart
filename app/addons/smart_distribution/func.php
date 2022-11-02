@@ -657,7 +657,13 @@ function fn_smart_distribution_pre_update_order(&$cart, $order_id) {
 // }
 
 // fix qty_discounts update by API for product wo price
-function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $lang_code, $can_update) {
+function fn_smart_distribution_update_product_pre(&$product_data, $product_id, $lang_code, &$can_update) {
+    // temporary deny update product by api
+    if (defined('API')  && in_array($product_id, ['157509', '157542', '157541', '157543'])) {
+        $can_update = false;
+        return;
+    }
+
     if (!isset($product_data['price'])) {
         $price = db_get_field('SELECT price FROM ?:product_prices WHERE product_id = ?i AND usergroup_id = ?i AND lower_limit = ?i', $product_id, 0, 1);
         $qty_price = 0;
