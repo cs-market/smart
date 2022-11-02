@@ -558,6 +558,16 @@ function fn_storages_get_order_info(&$order, $additional_data) {
     }
 }
 
+function fn_storages_calculate_cart_items(&$cart, $cart_products, $auth, $apply_cart_promotions) {
+    if ($storages = Registry::get('runtime.storages')) {
+        foreach ($cart['products'] as $cart_id => $product) {
+            if (!(isset($product['extra']['storage_id']) && in_array($product['extra']['storage_id'], array_column($storages, 'storage_id')))) {
+                fn_delete_cart_product($cart, $cart_id);
+            }
+        }
+    }
+}
+
 function fn_storages_reorder_product($order_info, &$cart, $auth, $product, $amount, $price, $zero_price_action, $k) {
     if ($storages = Registry::get('runtime.storages')) {
         if (empty($product['extra']['storage_id'])) $cart['products'][$k]['extra']['storage_id'] = Registry::get('runtime.current_storage.storage_id');
