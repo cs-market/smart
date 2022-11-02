@@ -52,3 +52,10 @@
         <input type="checkbox" name="storage_data[monday_rule]" id="elm_storage_monday_rule" value="Y" {if $storage.monday_rule != 'N'} checked="checked" {/if} />
     </div>
 </div>
+
+<div class="control-group">
+    <label for="elm_storage_holidays" class="control-label">{__("calendar_delivery.holidays")}:</label>
+    <div class="controls">
+        {include file="addons/calendar_delivery/components/multicalendar.tpl" date_id="elm_storage_holidays" date_name="storage_data[holidays]" date_val=$storage.holidays start_year=$settings.Company.company_start_year}
+    </div>
+</div>

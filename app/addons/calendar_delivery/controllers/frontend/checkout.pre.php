@@ -6,35 +6,12 @@ $cart = &Tygh::$app['session']['cart'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!empty($_REQUEST['delivery_date']) && is_array($_REQUEST['delivery_date'])) {
-        
-        //$cart['delivery_date'] = $_REQUEST['delivery_date'];
         foreach($_REQUEST['delivery_date'] as $group_id => $delivery_date) {
             $cart['delivery_date'][$group_id] = $delivery_date;
         }
-
-        // foreach ($_REQUEST['delivery_period'] as $company_id => $period) {
-        //     $choosed_ts = fn_parse_date($delivery_date[$company_id]);
-
-        //     // if !today
-        //     if (date('d', $choosed_ts) != date('d')) {
-        //         continue;
-        //     }
-
-        //     // if start period hour < now
-        //     if (strstr($period, ':', true) < date('h')) {
-        //         $res = false;
-        //         $c_data = fn_get_company_data($company_id);
-
-        //         if (count($cart['product_groups']) > 1)
-        //             fn_set_notification('N', __('notice'), __('calendar_delivery.choose_another_period_vendor') . ' ' . $c_data['company']);
-        //         else {
-        //             fn_set_notification('N', __('notice'), __('calendar_delivery.choose_another_period'));
-        //         }
-        //     }
-        // }
-        // $cart['delivery_period'] = isset($_REQUEST['delivery_period']) ? $_REQUEST['delivery_period'] : '';
-
-        // if (!$res) return [CONTROLLER_STATUS_REDIRECT, 'checkout.checkout'];
+        foreach ($_REQUEST['delivery_period'] as $group_id => $period) {
+            $cart['delivery_period'][$group_id] = $period;
+        }
     }
     if (!empty($_REQUEST['documents_originals']) && is_array($_REQUEST['documents_originals'])) {
         $cart['documents_originals'] = $_REQUEST['documents_originals'];
