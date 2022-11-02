@@ -338,12 +338,13 @@ function fn_category_promotion_check_unique_amount_conditioned_products($id, $pr
 }
 
 function fn_category_promotion_calculate_cart_post($cart, $auth, $calculate_shipping, $calculate_taxes, $options_style, $apply_cart_promotions, &$cart_products, $product_groups) {
-
-    $applied_promotions = array_keys($cart['applied_promotions']);
-    foreach ($cart_products as &$product) {
-        list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'zone' => 'cart', 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions], 10);
-        if ($promotions) {
-            $product['participates_in_promo'] = reset($promotions);
+    if (!defined(API)) {
+        $applied_promotions = array_keys($cart['applied_promotions']);
+        foreach ($cart_products as &$product) {
+            list($promotions, ) = fn_get_promotions(['product_or_bonus_product' => $product['product_id'], 'zone' => 'cart', 'usergroup_ids' => $auth['usergroup_ids'], 'active' => true, 'track' => true, 'exclude_promotion_ids' => $applied_promotions], 10);
+            if ($promotions) {
+                $product['participates_in_promo'] = reset($promotions);
+            }
         }
     }
 }

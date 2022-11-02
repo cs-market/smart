@@ -114,8 +114,8 @@ class SraCartContent extends ASraEntity
             $lang_code
         );
         $cart['products'] = $this->mergeProductsDataIntoCart($cart['products'], $products);
-        $cart['products'] = $this->getDetailedOptions($cart['products'], $products, $lang_code);
-        $cart['products'] = $this->getTaxedPrices($cart['products'], $this->auth);
+        // $cart['products'] = $this->getDetailedOptions($cart['products'], $products, $lang_code);
+        // $cart['products'] = $this->getTaxedPrices($cart['products'], $this->auth);
 
         $cart['default_location'] = $this->getDefaultLocation($lang_code);
 
