@@ -558,11 +558,12 @@ function fn_storages_get_order_info(&$order, $additional_data) {
     }
 }
 
-function fn_storages_calculate_cart_items(&$cart, $cart_products, $auth, $apply_cart_promotions) {
+function fn_storages_calculate_cart_items(&$cart, &$cart_products, $auth, $apply_cart_promotions) {
     if ($storages = Registry::get('runtime.storages')) {
         foreach ($cart['products'] as $cart_id => $product) {
             if (!(isset($product['extra']['storage_id']) && in_array($product['extra']['storage_id'], array_column($storages, 'storage_id')))) {
                 fn_delete_cart_product($cart, $cart_id);
+                unset($cart_products[$cart_id]);
             }
         }
     }

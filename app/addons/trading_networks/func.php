@@ -24,6 +24,7 @@ function fn_init_network($request) {
     }
     if (isset($request['switch_user_id']) && in_array($request['switch_user_id'], array_keys(Tygh::$app['session']['auth']['network_users']))) {
         $network_id = Tygh::$app['session']['auth']['user_id'];
+        Tygh::$app['session']->regenerateID();
         fn_login_user($request['switch_user_id'], true);
         Tygh::$app['session']['auth']['network_id'] = $network_id;
         fn_redirect(fn_url());
@@ -34,6 +35,7 @@ function fn_init_network($request) {
 
 function fn_trading_networks_user_logout_after($auth) {
     if (!empty($auth['network_id'])) {
+        Tygh::$app['session']->regenerateID();
         fn_login_user($auth['network_id'], true);
     }
 }
