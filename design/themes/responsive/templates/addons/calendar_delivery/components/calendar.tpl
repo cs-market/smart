@@ -29,6 +29,12 @@
                     date_bin = 1 << date.getDay();
                     res = weekdays_availability & date_bin;
                 {/if}
+                {if $service_params.holidays}
+                    holidays = {$service_params.holidays|json_encode nofilter};
+                    dateFormat = '{if $settings.Appearance.calendar_date_format == "month_first"}mm/dd/yy{else}dd/mm/yy{/if}';
+                    formated = $.datepicker.formatDate(dateFormat, date);
+                    res = res && !holidays.includes(formated);
+                {/if}
                 return [res];
             },
             firstDay: {if $settings.Appearance.calendar_week_format == "sunday_first"}0{else}1{/if},

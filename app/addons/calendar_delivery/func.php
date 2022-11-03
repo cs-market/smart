@@ -29,6 +29,18 @@ function fn_calendar_delivery_install()
         $service['lang_code'] = $lang_code;
         db_query('INSERT INTO ?:shipping_service_descriptions ?e', $service);
     }
+    if (Registry::get('addons.storages.status') == 'A') {
+        db_query("ALTER TABLE ?:storages 
+          ADD `nearest_delivery` varchar(1) NOT NULL DEFAULT '1',
+          ADD `working_time_till` varchar(5) NOT NULL DEFAULT '17:00',
+          ADD `exception_days` varchar(7) NOT NULL,
+          ADD `exception_time_till` varchar(5) NOT NULL DEFAULT '11:00',
+          ADD `saturday_shipping` varchar(8) NOT NULL DEFAULT 'Y',
+          ADD `sunday_shipping` varchar(8) NOT NULL DEFAULT 'Y',
+          ADD `monday_rule` varchar(8) NOT NULL DEFAULT 'Y',
+          ADD `holidays` varchar(255) NOT NULL DEFAULT ''
+        ");
+    }
 }
 
 function fn_calendar_delivery_uninstall()
@@ -38,10 +50,22 @@ function fn_calendar_delivery_uninstall()
         db_query('DELETE FROM ?:shipping_services WHERE service_id IN (?a)', $service_ids);
         db_query('DELETE FROM ?:shipping_service_descriptions WHERE service_id IN (?a)', $service_ids);
     }
+    if (Registry::get('addons.storages.status') == 'A') {
+        db_query("ALTER TABLE ?:storages 
+          DROP `nearest_delivery`,
+          DROP `working_time_till`,
+          DROP `exception_days`,
+          DROP `exception_time_till`,
+          DROP `saturday_shipping`,
+          DROP `sunday_shipping`,
+          DROP `monday_rule`,
+          DROP `holidays`
+        ");
+    }
 }
 
 function fn_calendar_delivery_get_orders($params, $fields, $sortings, &$condition, $join, $group) {
-    if (isset($params['delivery_date'])) {
+    if (isset($params['delivery_date']) && !empty($params['delivery_date'])) {
         $condition .= db_quote(' AND (?:orders.delivery_date = ?i OR ?:orders.delivery_date = 0)', $params['delivery_date']);
     }
 }
@@ -83,7 +107,7 @@ function fn_calendar_delivery_get_companies($params, &$fields, $sortings, $condi
     $fields[] = 'sunday_shipping';
     $fields[] = 'monday_rule';
     // backward compatibility remove in June 2020
-    $fields[] = "'Y' as after17rule";
+    // $fields[] = "'Y' as after17rule";
     // extra backward compatibility remove in October 2020
     $fields[] = "'Y' as tomorrow_rule";
     $fields[] = 'working_time_till as tomorrow_timeslot';
@@ -100,12 +124,11 @@ function fn_calendar_delivery_get_company_data($company_id, $lang_code, $extra, 
     $fields[] = "'Y' as tomorrow_rule";
     $fields[] = 'working_time_till as tomorrow_timeslot';
     $fields[] = 'monday_rule as saturday_rule';
-    // remove in June 2020
-    $fields[] = "'Y' as after17rule";
 }
 
 function fn_calendar_get_nearest_delivery_day($shipping_params = [], $get_ts = false) {
     $nearest_delivery = $shipping_params['nearest_delivery'] ?? 0;
+
     if (!empty($shipping_params['working_time_till']) && strtotime(date("G:i")) >= strtotime($shipping_params['working_time_till'])) {
         $nearest_delivery += 1;
     }
@@ -258,67 +281,84 @@ function fn_calendar_delivery_user_init(&$auth, &$user_info) {
 }
 
 function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$product_groups, $calculate_taxes, $auth) {
-    if (!empty($auth['user_id'])) {
-        foreach($product_groups as $group_id => &$group) {
-            $calendar_shippings = array_filter($group['shippings'], function($v) {return (isset($v['service_code']) && $v['service_code'] == 'calendar');});
-            if (!empty($calendar_shippings)) {
-                $delivery_dates = [];
+    foreach($product_groups as $group_id => &$group) {
+        $calendar_shippings = array_filter($group['shippings'], function($v) {return (isset($v['service_code']) && $v['service_code'] == 'calendar');});
+        if (!empty($calendar_shippings)) {
+            $delivery_dates = [];
+            // user_info is empty in API. user_info wrong in backend :)
+            //if (!$user_info = Registry::get('user_info')) {
+                $user_info = fn_get_user_short_info($auth['user_id']);
+                $user_info['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i', 'storage_id', $auth['user_id']);
+            //}
 
-                // user_info is empty in API. user_info wrong in backend :)
-                //if (!$user_info = Registry::get('user_info')) {
-                    $user_info = fn_get_user_short_info($auth['user_id']);
-                    $user_info['delivery_date_by_storage'] = db_get_hash_array('SELECT * FROM ?:user_storages WHERE user_id = ?i', 'storage_id', $auth['user_id']);
-                //}
+            $user_weekdays = $user_info['delivery_date'] ?? '1111111';
 
-                $user_weekdays = $user_info['delivery_date'];
+            if (!empty($group['storage_id']) && !empty($user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'])) {
+                $user_weekdays = $user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'];
+            }
+            $delivery_dates = fn_delivery_date_from_line($user_weekdays);
 
-                if (!empty($group['storage_id']) && !empty($user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'])) {
-                    $user_weekdays = $user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'];
-                }
-                $delivery_dates = fn_delivery_date_from_line($user_weekdays);
+            //TODO может начать кэшировать эти запросы в бд?
+            $usergroup_working_time_till = db_get_row('SELECT working_time_till FROM ?:usergroups WHERE usergroup_id IN (?a) AND working_time_till != ""', Tygh::$app['session']['auth']['usergroup_ids']);
 
-                //TODO может начать кэшировать эти запросы в бд?
-                $usergroup_working_time_till = db_get_row('SELECT working_time_till FROM ?:usergroups WHERE usergroup_id IN (?a) AND working_time_till != ""', Tygh::$app['session']['auth']['usergroup_ids']);
+            //TODO TEMP!! удалить company_settings в середине 2022, надо бы настройки календаря переносить из вендора в шипинг
+            $company_settings = db_get_row('SELECT nearest_delivery, working_time_till, saturday_shipping, sunday_shipping, monday_rule, period_start, period_finish, period_step FROM ?:companies WHERE company_id = ?i', $group['company_id']);
 
-                //TODO TEMP!! удалить company_settings в середине 2022, надо бы настройки календаря переносить из вендора в шипинг
-                $company_settings = db_get_row('SELECT nearest_delivery, working_time_till, saturday_shipping, sunday_shipping, monday_rule, period_start, period_finish, period_step FROM ?:companies WHERE company_id = ?i', $group['company_id']);
+            $general_weekdays = '1111111';
+            $general_weekdays[0] = YesNo::toBool($company_settings['sunday_shipping']) ? 1 : 0;
+            $general_weekdays[6] = YesNo::toBool($company_settings['saturday_shipping']) ? 1 : 0;
 
-                $company_weekdays = '1111111';
-                $company_weekdays[0] = YesNo::toBool($company_settings['sunday_shipping']) ? 1 : 0;
-                $company_weekdays[6] = YesNo::toBool($company_settings['saturday_shipping']) ? 1 : 0;
-
-                $weekdays_availability = $company_weekdays & $user_weekdays;
-
-                fn_set_hook('calendar_delivery_weekdays_availability', $weekdays_availability, $group);
-
-                foreach ($group['shippings'] as $shipping_id => &$shipping) {
-                    if (isset($shipping['module']) && $shipping['module'] == 'calendar_delivery') {
-                        if (isset($shipping['service_params']['limit_weekday']) && $shipping['service_params']['limit_weekday'] == 'C') {
-                            $shipping['service_params']['customer_shipping_calendar'] = $delivery_dates;
-                        }
-                        // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
-                        $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $usergroup_working_time_till);
-
-                        fn_set_hook('calendar_delivery_service_params', $group, $shipping, $company_settings, $usergroup_working_time_till);
-
-                        $shipping['service_params']['weekdays_availability'] = strrev($weekdays_availability);
-                        $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
+            foreach ($group['shippings'] as $shipping_id => &$shipping) {
+                if (isset($shipping['module']) && $shipping['module'] == 'calendar_delivery') {
+                    unset($shipping['service_params']['holidays']);
+                    if (!YesNo::toBool($shipping['service_params']['depends_on_parent'])) {
+                        $general_weekdays = '1111111';
+                        $general_weekdays[0] = YesNo::toBool($shipping['service_params']['sunday_shipping']) ? 1 : 0;
+                        $general_weekdays[6] = YesNo::toBool($shipping['service_params']['saturday_shipping']) ? 1 : 0;
                     }
-                }
 
-                if (!empty($cart['delivery_date']) && is_array($cart['delivery_date'])) {
-                    $chosen_delivery_date = $cart['delivery_date'][$group_id];
-                } elseif (!empty($group['delivery_date'])) {
-                    $chosen_delivery_date = $group['delivery_date'];
-                }
+                    $weekdays_availability = $general_weekdays & $user_weekdays;
 
-                if (!empty($chosen_delivery_date)) {
-                    $group['delivery_date'] = $chosen_delivery_date;
-                } elseif (!empty($group['chosen_shippings']) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
-                    $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
-                    $nearest_delivery_day = $group['shippings'][$chosen_shipping_id]['service_params']['nearest_delivery_day'];
-                    $group['delivery_date'] = fn_date_format(strtotime("+ $nearest_delivery_day day"), Registry::get('settings.Appearance.date_format'));
+                    fn_set_hook('calendar_delivery_weekdays_availability', $weekdays_availability, $group);
+
+                    if (isset($shipping['service_params']['limit_weekday']) && $shipping['service_params']['limit_weekday'] == 'C') {
+                        $shipping['service_params']['customer_shipping_calendar'] = $delivery_dates;
+                    }
+
+                    // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
+                    $shipping['service_params'] = fn_array_merge($company_settings, $shipping['service_params'], $usergroup_working_time_till);
+
+                    fn_set_hook('calendar_delivery_service_params', $group, $shipping, $company_settings, $usergroup_working_time_till);
+
+                    $shipping['service_params']['weekdays_availability'] = strrev($weekdays_availability);
+                    $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
+                    
+
+                    if (!empty($shipping['service_params']['holidays']) && !is_array($shipping['service_params']['holidays'])) $shipping['service_params']['holidays'] = explode(',', $shipping['service_params']['holidays']);
                 }
+            }
+
+            if (!empty($cart['delivery_date']) && is_array($cart['delivery_date'])) {
+                $chosen_delivery_date = $cart['delivery_date'][$group_id];
+            } elseif (!empty($group['delivery_date'])) {
+                $chosen_delivery_date = $group['delivery_date'];
+            }
+            if (!empty($cart['delivery_period']) && is_array($cart['delivery_period'])) {
+                $chosen_delivery_period = $cart['delivery_period'][$group_id];
+            } elseif (!empty($group['delivery_period'])) {
+                $chosen_delivery_period = $group['delivery_period'];
+            }
+
+            if (!empty($chosen_delivery_date)) {
+                $group['delivery_date'] = $chosen_delivery_date;
+            } elseif (!empty($group['chosen_shippings']) && reset($group['chosen_shippings'])['service_code'] == 'calendar') {
+                $chosen_shipping_id = reset($group['chosen_shippings'])['shipping_id'];
+                $nearest_delivery_day = $group['shippings'][$chosen_shipping_id]['service_params']['nearest_delivery_day'];
+                $group['delivery_date'] = fn_date_format(strtotime("+ $nearest_delivery_day day"), Registry::get('settings.Appearance.date_format'));
+            }
+
+            if (!empty($chosen_delivery_period)) {
+                $group['delivery_period'] = $chosen_delivery_period;
             }
         }
     }
@@ -449,10 +489,13 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
             if ($group['chosen_shippings'][0]['module'] != 'calendar_delivery') {
                 continue;
             }
-
             if (is_array($cart['delivery_date']) && !(isset($cart['delivery_date'][$group_id]) && $cart_delivery_day = $cart['delivery_date'][$group_id])) {
                 $cart_delivery_day = reset($cart['delivery_date']);
             }
+            if (is_array($cart['delivery_period']) && !(isset($cart['delivery_period'][$group_id]) && $cart_delivery_period = $cart['delivery_period'][$group_id])) {
+                $cart_delivery_period = reset($cart['delivery_period']);
+            }
+
 
             if (!empty($cart['documents_originals'][$group_id])) {
                 $group['documents_originals'] = $cart['documents_originals'][$group_id];
@@ -461,8 +504,10 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
 
             // backward compatibility (for mobile app)
             $cart['delivery_date'] = $group['delivery_date'] = !empty($group['delivery_date']) ? $group['delivery_date'] : $cart_delivery_day;
+            $cart['delivery_period'] = $group['delivery_period'] = !empty($group['delivery_period']) ? $group['delivery_period'] : $cart_delivery_period;
 
             if (is_array($group['delivery_date'])) $group['delivery_date'] = array_shift($group['delivery_date']);
+            if (is_array($group['delivery_period'])) $group['delivery_period'] = array_shift($group['delivery_period']);
 
             if (empty($group['delivery_date'])) {
                 $res = false;
@@ -487,6 +532,7 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
                     $res = false;
                 }
             }
+            if (empty($cart['delivery_period'])) unset($cart['delivery_period']);
 
             if (!$res && SiteArea::isStorefront(AREA)) {
                 $result = false;

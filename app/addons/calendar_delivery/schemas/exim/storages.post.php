@@ -21,5 +21,8 @@ $schema['export_fields']['Sunday shipping'] = [
 $schema['export_fields']['Monday rule'] = [
     'db_field' => 'monday_rule',
 ];
+$schema['export_fields']['Holidays'] = [
+    'db_field' => 'holidays',
+];
 
 return $schema;

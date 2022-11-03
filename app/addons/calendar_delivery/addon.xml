@@ -2,76 +2,47 @@
 <addon scheme="2.0">
     <id>calendar_delivery</id>
     <name>Calendar delivery</name>
-    <description><![CDATA[© <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <description><![CDATA[Добавляе новый процессор оффлайн доставки с календарем © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
     <priority>26732300</priority>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <position>0</position>
     <status>active</status>
-    <default_language>en</default_language>
+    <default_language>ru</default_language>
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <default_language>ru</default_language>
     <compatibility>
         <core_version>
             <min>4.3.5</min>
         </core_version>
     </compatibility>
-    <language_variables>
-        <item lang="en" id="delivery_date">Delivery date</item>
+    <language_variables>        
         <item lang="ru" id="delivery_date">Дата доставки</item>
-
-        <item lang="en" id="calendar_delivery">Сalendar delivery</item>
         <item lang="ru" id="calendar_delivery">Календарь</item>
-
-        <item lang="en" id="calendar_delivery.sunday_shipping">Sunday shipping allowed</item>
-        <item lang="ru" id="calendar_delivery.sunday_shipping">Доставка в Воскресение</item>
-
-        <item lang="en" id="calendar_delivery.saturday_rule">Saturday shipping for weekend orders</item>
-        <item lang="ru" id="calendar_delivery.saturday_rule">Доставка в понедельник при заказе в выходные</item>
-
-        <item lang="en" id="calendar_delivery.choose_another_day_vendor">Choose another day for vendor</item>
+        <item lang="ru" id="tomorrow">Завтра</item>
+        <item lang="ru" id="after_tomorrow">Послезавтра</item>
+        <item lang="ru" id="calendar_delivery.nearest_delivery">Ближайшая доставка</item>
+        <item lang="ru" id="calendar_delivery.working_time_till">Доставка на ближайшую дату формируется до</item>
+        <item lang="ru" id="calendar_delivery.saturday_shipping">Доставка в субботу</item>
+        <item lang="ru" id="calendar_delivery.sunday_shipping">Доставка в воскресенье</item>
+        <item lang="ru" id="calendar_delivery.monday_rule">Доставка в понедельник при заказе в выходные</item>
         <item lang="ru" id="calendar_delivery.choose_another_day_vendor">Выберите другой день доставки по продавцу</item>
-
-        <item lang="en" id="calendar_delivery.choose_another_day">Choose another day</item>
         <item lang="ru" id="calendar_delivery.choose_another_day">Выберите другой день доставки</item>
-
-        <item lang="en" id="calendar_delivery.period_start">Period start</item>
         <item lang="ru" id="calendar_delivery.period_start">Время начала периода</item>
-
-        <item lang="en" id="calendar_delivery.period_finish">Period finish</item>
         <item lang="ru" id="calendar_delivery.period_finish">Время окончания периода</item>
-
-        <item lang="en" id="calendar_delivery.period_step">Period step</item>
         <item lang="ru" id="calendar_delivery.period_step">Шаг периода</item>
-
-        <item lang="en" id="period_start_error_message">Please, enter correct time</item>
         <item lang="ru" id="period_start_error_message">Пожалуйста, введите корректное значение времени</item>
-
-        <item lang="en" id="calendar_delivery.choose_another_period_vendor">Choose another period for vendor</item>
         <item lang="ru" id="calendar_delivery.choose_another_period_vendor">Выберите другой период доставки по продавцу</item>
-
-        <item lang="en" id="calendar_delivery.choose_another_period">Choose another period</item>
         <item lang="ru" id="calendar_delivery.choose_another_period">Выберите другой период доставки</item>
-
-        <item lang="en" id="calendar_delivery.delivery_period">Delivery period</item>
         <item lang="ru" id="calendar_delivery.delivery_period">Период доставки</item>
-
-        <item lang="en" id="calendar_delivery.from_customer_settings">From customer settings</item>
-        <item lang="ru" id="calendar_delivery.from_customer_settings">Исходя из пользователя</item>
-
-        <item lang="en" id="calendar_delivery.exim_user_delivery_date">Shipping %day%</item>
         <item lang="ru" id="calendar_delivery.exim_user_delivery_date">Shipping %day%</item>
-
-        <item lang="en" id="calendar_delivery.exception_time_till">Exception time till</item>
         <item lang="ru" id="calendar_delivery.exception_time_till">День-исключение работает до</item>
-
-        <item lang="en" id="calendar_delivery.exception_days">Exception days</item>
         <item lang="ru" id="calendar_delivery.exception_days">Дни-исключения</item>
-
-        <item lang="en" id="calendar_delivery.offer_documents">Offer documents</item>
         <item lang="ru" id="calendar_delivery.offer_documents">Прелдагать оригиналы документов</item>
-
-        <item lang="en" id="calendar_delivery.offer_documents_checked">Checked by default</item>
         <item lang="ru" id="calendar_delivery.offer_documents_checked">Отмечено по-умолчанию</item>
+        <item lang="ru" id="calendar_delivery.settings_depends_on_parent">Настройки зависят от общих настроек</item>
+        <item lang="ru" id="calendar_delivery.holidays">Выходные дни</item>
 
         <item lang="ru" id="weekday_exim_1">Monday</item>
         <item lang="ru" id="weekday_exim_2">Tuesday</item>
@@ -83,22 +54,35 @@
     </language_variables>
 
     <queries>
-        <item>ALTER TABLE `?:orders` ADD `delvery_date` int(11) unsigned NOT NULL DEFAULT 0;</item>
-        <item for="uninstall">ALTER TABLE `?:orders` DROP `delvery_date`;</item>
-
-        <item>ALTER TABLE `?:companies` ADD `tomorrow_rule` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `saturday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y', ADD `tomorrow_timeslot` VARCHAR(8) NOT NULL DEFAULT '17:00';</item>
-        <item for="uninstall">ALTER TABLE `cscart_companies` DROP `tomorrow_rule`, DROP `sunday_shipping`, DROP `saturday_rule`, `tomorrow_timeslot`;</item>
-
-        <item>
-            ALTER TABLE `?:companies` 
-                ADD `period_start` varchar(8) NOT NULL DEFAULT '',
-                ADD `period_finish` varchar(8) NOT NULL DEFAULT '',
-                ADD `period_step` varchar(8) NOT NULL DEFAULT '';
-        </item>
-        <item for="uninstall">ALTER TABLE `cscart_companies` DROP `period_start`, `period_finish`, `period_step`;</item>
+        <item>ALTER TABLE `?:orders` ADD `delivery_date` int(11) unsigned NOT NULL DEFAULT 0;</item>
+        <item for="uninstall">ALTER TABLE `?:orders` DROP `delivery_date`;</item>
 
         <item>ALTER TABLE `?:orders` ADD `delivery_period` varchar(30) NOT NULL default '';</item>
         <item for="uninstall">ALTER TABLE `?:orders` DROP `delivery_period`;</item>
+
+        <item >ALTER TABLE `?:companies` 
+            ADD `nearest_delivery` VARCHAR(1) NOT NULL DEFAULT '1',
+            ADD `working_time_till` VARCHAR(8) NOT NULL DEFAULT '17:00',
+            ADD `saturday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y',
+            ADD `sunday_shipping` VARCHAR(1) NOT NULL DEFAULT 'Y', 
+            ADD `monday_rule` VARCHAR(1) NOT NULL DEFAULT 'Y',
+            ADD `period_start` varchar(8) NOT NULL DEFAULT '',
+            ADD `period_finish` varchar(8) NOT NULL DEFAULT '',
+            ADD `period_step` varchar(8) NOT NULL DEFAULT '';
+        </item>
+        <item for="uninstall" >ALTER TABLE `?:companies` 
+            DROP `nearest_delivery`,
+            DROP `working_time_till`,
+            DROP `saturday_shipping`,
+            DROP `sunday_shipping`,
+            DROP `monday_rule`,
+            DROP `period_start`,
+            DROP `period_finish`,
+            DROP `period_step`
+        </item>
+
+        <item>ALTER TABLE `?:users` ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111';</item>
+        <item for="uninstall">ALTER TABLE `?:users` DROP `delivery_date`;</item>
 
         <item>ALTER TABLE `?:usergroups` ADD `working_time_till` varchar(8)  NOT NULL default '';</item>
         <item for="uninstall">ALTER TABLE `?:usergroups` DROP `working_time_till`;</item>

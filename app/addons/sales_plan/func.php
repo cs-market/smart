@@ -143,9 +143,8 @@ function fn_generate_sales_report($params) {
             $row[__('company_name')] = ($user['company_id']) ? fn_get_company_name($user['company_id']) : '-';
             $row[__('date')] = date('d.m.Y', $user['timestamp']);
             $row[__('customer')] = $user['firstname'] . (($params['show_user_id'] == 'Y') ? ' #' . $element['user_id'] : '');//fn_get_user_name($plan['user_id']);
-            if ($params['show_manager'] == 'Y') {
-                $row[__('manager')] = implode(',', array_column($user['managers'], 'name'));;
-            }
+
+            fn_set_hook('generate_sales_report_post', $params, $row, $user);
 
             $row[__('address')] = $user['s_address'];
             $row[__('code')] = !empty($user['fields'][39]) ? $user['fields'][39] : $user['fields'][38];
