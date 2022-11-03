@@ -31,17 +31,17 @@ class AuthTokens extends BaseAuthTokens
     {
         $result = parent::create($params);
         $status = Response::STATUS_BAD_REQUEST;
-        $data = array();
+        $response = array();
 
         $email = $this->safeGet($params, 'email', '');
         $password = $this->safeGet($params, 'password', '');
 
         if (!$email) {
-            $data['message'] = __('api_required_field', array(
+            $response['message'] = __('api_required_field', array(
                 '[field]' => 'email'
             ));
         } elseif (!$password) {
-            $data['message'] = __('api_required_field', array(
+            $response['message'] = __('api_required_field', array(
                 '[field]' => 'password'
             ));
         } else {
@@ -57,19 +57,19 @@ class AuthTokens extends BaseAuthTokens
 
             if ($user_data && fn_user_password_verify((int) $user_data['user_id'], $password, (string) $user_data['password'], $salt)) {
                 \Tygh::$app['session']->regenerateID();
-                list($token, $expiry_time) = fn_get_fresh_user_auth_token($user_data['user_id'], SESSION_ALIVE_TIME);
+
+                list($response['token'], $expiry_time) = fn_get_fresh_user_auth_token($user_data['user_id'], SESSION_ALIVE_TIME);
+                $response['ttl'] = $expiry_time - TIME;
+
+                fn_set_hook('api_get_auth_token', $params, $response, $user_data);
 
                 $status = Response::STATUS_CREATED;
-                $data = array(
-                    'token' => $token,
-                    'ttl'   => $expiry_time - TIME,
-                );
             }
         }
 
         return array(
             'status' => $status,
-            'data' => $data
+            'data' => $response
         );
     }
 }

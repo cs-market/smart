@@ -88,3 +88,15 @@ function fn_trading_networks_update_profile($action, $user_data, $current_user_d
 function fn_trading_networks_post_delete_user($user_id, $user_data, $result) {
     if ($result) db_query('UPDATE ?:users SET network_id = 0 WHERE network_id = ?i', $user_id);
 }
+
+function fn_trading_networks_api_get_auth_token($params, &$response, $user_data) {
+    if (!empty($user_data['user_role']) && $user_data['user_role'] == 'N') {
+        list($network_users) = fn_get_users(['network_id' => $user_data['user_id']], Tygh::$app['session']['auth']);
+        if (!empty($network_users)) {
+            foreach ($network_users as &$user) {
+                list($user['token'], $user['expiry_time']) = fn_get_fresh_user_auth_token($user['user_id'], SESSION_ALIVE_TIME);
+            }
+            $response['network_users'] = $network_users;
+        }
+    }
+}
