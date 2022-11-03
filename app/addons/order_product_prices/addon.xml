@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>order_product_prices</id>
+    <version>1.0.1</version>
+    <default_language>ru</default_language>
+    <priority>100</priority>
+    <status>active</status>
+    <name>Smart distribution: цены на товар в заказе</name>
+    <description>Добавляет вкладку с ценами по каждой позиции в деталях заказа</description>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+</addon>
