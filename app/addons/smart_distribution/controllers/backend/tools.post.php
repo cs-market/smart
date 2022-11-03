@@ -2258,8 +2258,19 @@ fn_print_die($orders_wo_points);
     $users = db_get_fields('SELECT user_id FROM ?:users');
     $res = db_query("UPDATE ?:users SET network_id = '' WHERE network_id NOT IN (?a)", $users);
     fn_print_die($res);
+} elseif ($mode == 'categories_maintenance') {
+    db_query('UPDATE ?:categories SET status = ?s', 'A');
+    $category_ids = db_get_fields('SELECT category_id FROM ?:categories');
+    $empty = [];
+    foreach ($category_ids as $category_id) {
+        list($products) = fn_get_products(['cid' => $category_id, 'subcats' => 'Y']);
+        if (!empty($products)) continue;
+        $empty[$category_id] = fn_get_category_name($category_id);
+        if (mb_stripos($empty[$category_id], 'акции') !== false) unset($empty[$category_id]);
+    }
+    $res = db_query('UPDATE ?:categories SET status = ?s WHERE category_id IN (?a)', 'D', array_keys($empty));
+    fn_print_die($res, $empty);
 }
-
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)
 {
