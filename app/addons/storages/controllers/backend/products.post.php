@@ -34,6 +34,10 @@ if ($mode == 'update') {
     }
 
     list($storages) = fn_get_storages(['company_id' => $product_company_id]);
+    array_walk($storages, function(&$storage){
+        $storage['storage'] .= ' ('. $storage['code'] .')';
+    });
+
     $storages_amount = fn_get_storages_amount($_REQUEST['product_id']);
 
     foreach ($storages_amount as $storage_id => $data) {
