@@ -14,6 +14,7 @@ fn_register_hooks(
     'form_cart',
     'update_user_pre',
     'update_user_profile_pre',
+    'update_usergroup_pre',
     'fill_auth',
     'get_user_info',
     'get_user_short_info_pre',

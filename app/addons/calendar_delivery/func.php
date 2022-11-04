@@ -258,6 +258,19 @@ function fn_calendar_delivery_update_user_profile_pre($user_id, $user_data, $act
     }
 }
 
+function fn_calendar_delivery_update_usergroup_pre(&$usergroup_data, $usergroup_id, $lang_code) {
+    if (isset($usergroup_data['delivery_date'])) {
+        if (SiteArea::isAdmin(AREA)) {
+            if (is_array($usergroup_data['delivery_date'])) {
+                $usergroup_data['delivery_date'] = fn_delivery_date_to_line($usergroup_data['delivery_date']);
+            }
+
+            if ($usergroup_data['delivery_date'] == '0000000') unset($usergroup_data['delivery_date']);
+        } else {
+            unset($usergroup_data['delivery_date']);
+        }
+    }
+}
 
 function fn_calendar_delivery_fill_auth(&$auth, $user_data, $area, $original_auth) {
     if (!empty($user_data['user_id'])) {
@@ -296,6 +309,15 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
             if (!empty($group['storage_id']) && !empty($user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'])) {
                 $user_weekdays = $user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'];
             }
+            if (!empty($auth['usergroup_ids'])) {
+                $usergroup_weekdays = db_get_fields('SELECT delivery_date FROM ?:usergroups WHERE usergroup_id IN (?a)', $auth['usergroup_ids']);
+                if (!empty($usergroup_weekdays)) {
+                    foreach ($usergroup_weekdays as $usergroup_weekdays) {
+                        $user_weekdays = $user_weekdays & $usergroup_weekdays;
+                    }
+                }
+            }
+
             $delivery_dates = fn_delivery_date_from_line($user_weekdays);
 
             //TODO может начать кэшировать эти запросы в бд?
@@ -332,7 +354,6 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
 
                     $shipping['service_params']['weekdays_availability'] = strrev($weekdays_availability);
                     $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
-                    
 
                     if (!empty($shipping['service_params']['holidays']) && !is_array($shipping['service_params']['holidays'])) $shipping['service_params']['holidays'] = explode(',', $shipping['service_params']['holidays']);
                 }
@@ -367,7 +388,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
 }
 
 function fn_calendar_delivery_get_usergroups($params, $lang_code, &$field_list, $join, $condition, $group_by, $order_by, $limit) {
-    $field_list .= ', a.working_time_till';
+    $field_list .= ', a.working_time_till, a.delivery_date';
 }
 
 function fn_get_calendar_delivery_period($period_start, $period_finish, $period_step)

@@ -2892,6 +2892,15 @@ function fn_get_user_usergroup_links($user_id, $criteria = array())
 
 function fn_update_usergroup($usergroup_data, $usergroup_id = 0, $lang_code = DESCR_SL)
 {
+    /**
+     * Executes at the beginning of the method, allowing you to modify the arguments passed to the method.
+     *
+     * @param array<int|string> $usergroup_data User group data
+     * @param int               $usergroup_id   User group integer identifier
+     * @param string            $lang_code      Flag determines if user group was created (true) or just updated (false).
+     */
+    fn_set_hook('update_usergroup_pre', $usergroup_data, $usergroup_id, $lang_code);
+
     if (defined('RESTRICTED_ADMIN')) {
         $user_privileges = db_get_hash_single_array("SELECT privilege FROM ?:usergroup_privileges WHERE usergroup_id IN (?n)", array('privilege', 'privilege'), Tygh::$app['session']['auth']['usergroup_ids']);
 

@@ -87,6 +87,9 @@
         <item>ALTER TABLE `?:usergroups` ADD `working_time_till` varchar(8)  NOT NULL default '';</item>
         <item for="uninstall">ALTER TABLE `?:usergroups` DROP `working_time_till`;</item>
 
+        <item>ALTER TABLE `?:usergroups` ADD `delivery_date` VARCHAR(7) NOT NULL default '1111111';</item>
+        <item for="uninstall">ALTER TABLE `?:usergroups` DROP `usergroups`;</item>
+
         <item>
             CREATE TABLE `?:user_storages` (
                 `storage_id` mediumint(8) unsigned NOT NULL,
