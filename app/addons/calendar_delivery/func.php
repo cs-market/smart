@@ -348,7 +348,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                     }
 
                     // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
-                    $shipping['service_params'] = fn_array_merge($company_settings, $shipping['service_params'], $usergroup_working_time_till);
+                    $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $usergroup_working_time_till);
 
                     fn_set_hook('calendar_delivery_service_params', $group, $shipping, $company_settings, $usergroup_working_time_till);
 
