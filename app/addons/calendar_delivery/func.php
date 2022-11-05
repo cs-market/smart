@@ -137,8 +137,7 @@ function fn_calendar_get_nearest_delivery_day($shipping_params = [], $get_ts = f
         $nearest_delivery = 0;
     }
 
-    if (!YesNo::toBool($shipping_params['monday_rule']) && in_array(getdate()['wday'], [0,6])) {
-
+    if (!YesNo::toBool($shipping_params['monday_rule']) && in_array(getdate()['wday'], [0,6]) && $nearest_delivery != 0) {
         $now = new \DateTime('today');
         $monday = new \DateTime('next tuesday');
         $diff = $now->diff($monday)->d;
@@ -310,9 +309,9 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                 $user_weekdays = $user_info['delivery_date_by_storage'][$group['storage_id']]['delivery_date'];
             }
             if (!empty($auth['usergroup_ids'])) {
-                $usergroup_weekdays = db_get_fields('SELECT delivery_date FROM ?:usergroups WHERE usergroup_id IN (?a)', $auth['usergroup_ids']);
-                if (!empty($usergroup_weekdays)) {
-                    foreach ($usergroup_weekdays as $usergroup_weekdays) {
+                $usergroups_weekdays = db_get_fields('SELECT delivery_date FROM ?:usergroups WHERE usergroup_id IN (?a)', $auth['usergroup_ids']);
+                if (!empty($usergroups_weekdays)) {
+                    foreach ($usergroups_weekdays as $usergroup_weekdays) {
                         $user_weekdays = $user_weekdays & $usergroup_weekdays;
                     }
                 }
@@ -321,7 +320,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
             $delivery_dates = fn_delivery_date_from_line($user_weekdays);
 
             //TODO может начать кэшировать эти запросы в бд?
-            $usergroup_working_time_till = db_get_row('SELECT working_time_till FROM ?:usergroups WHERE usergroup_id IN (?a) AND working_time_till != ""', Tygh::$app['session']['auth']['usergroup_ids']);
+            $usergroup_working_time_till = db_get_row('SELECT working_time_till FROM ?:usergroups WHERE usergroup_id IN (?a) AND working_time_till != ""', $auth['user_id']['usergroup_ids']);
 
             //TODO TEMP!! удалить company_settings в середине 2022, надо бы настройки календаря переносить из вендора в шипинг
             $company_settings = db_get_row('SELECT nearest_delivery, working_time_till, saturday_shipping, sunday_shipping, monday_rule, period_start, period_finish, period_step FROM ?:companies WHERE company_id = ?i', $group['company_id']);
@@ -332,11 +331,13 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
 
             foreach ($group['shippings'] as $shipping_id => &$shipping) {
                 if (isset($shipping['module']) && $shipping['module'] == 'calendar_delivery') {
+                    $shipping_company_settings = $company_settings;
                     unset($shipping['service_params']['holidays']);
                     if (!YesNo::toBool($shipping['service_params']['depends_on_parent'])) {
                         $general_weekdays = '1111111';
                         $general_weekdays[0] = YesNo::toBool($shipping['service_params']['sunday_shipping']) ? 1 : 0;
                         $general_weekdays[6] = YesNo::toBool($shipping['service_params']['saturday_shipping']) ? 1 : 0;
+                        $shipping_company_settings = [];
                     }
 
                     $weekdays_availability = $general_weekdays & $user_weekdays;
@@ -348,9 +349,9 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                     }
 
                     // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
-                    $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $usergroup_working_time_till);
+                    $shipping['service_params'] = fn_array_merge($shipping['service_params'], $shipping_company_settings, $usergroup_working_time_till);
 
-                    fn_set_hook('calendar_delivery_service_params', $group, $shipping, $company_settings, $usergroup_working_time_till);
+                    fn_set_hook('calendar_delivery_service_params', $group, $shipping, $shipping_company_settings, $usergroup_working_time_till);
 
                     $shipping['service_params']['weekdays_availability'] = strrev($weekdays_availability);
                     $shipping['service_params']['nearest_delivery_day'] = fn_calendar_get_nearest_delivery_day($shipping['service_params']);
