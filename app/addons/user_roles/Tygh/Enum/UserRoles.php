@@ -43,6 +43,8 @@ class UserRoles
             } else {
                 return false;
             }
+        } elseif (isset(array_flip(self::getList())[$name])) {
+            return array_flip(self::getList())[$name];
         } else {
             return false;
         }

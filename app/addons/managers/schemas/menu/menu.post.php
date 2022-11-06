@@ -1,7 +1,6 @@
 <?php
-/*
-use Tygh\Registry;
 use Tygh\Enum\UserRoles;
+use Tygh\Registry;
 
 if (UserRoles::is_manager()) {
     $menu = ['management' => [
@@ -22,6 +21,6 @@ if (UserRoles::is_manager()) {
 
     $schema['top'] = [];
     $schema['central'] = $menu;
-}*/
+}
 
 return $schema;

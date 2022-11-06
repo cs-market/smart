@@ -13,6 +13,7 @@ fn_register_hooks(
     'place_order',
     'user_init',
     'generate_sales_report',
+    'generate_sales_report_post',
     'delete_user',
     'get_tickets_params',
     'send_form',
