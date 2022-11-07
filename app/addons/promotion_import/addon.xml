@@ -13,4 +13,7 @@
     <supplier>CS-Market</supplier>
     <supplier_link>http://cs-market.com/</supplier_link>
     <!-- dependencies smart_distribution fn_smart_distribution_exim_import_price, fn_exim_smart_distribution_get_usergroup_ids -->
+    <language_variables>
+        <item lang="ru" id="promotion_import.disabled_promo_notification">Следующие промо были выключены:</item>
+    </language_variables>
 </addon>

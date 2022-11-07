@@ -43,7 +43,7 @@ function fn_promotion_import_put_optional_timestamp($timestamp, $end_time)
     }
 }
 
-function fn_promotion_import_build_conditions(&$object) {
+function fn_promotion_import_build_conditions(&$object, $primary_object_id, &$processed_data) {
     $company_id = Registry::ifget('runtime.company_id', $object['company_id']);
     $conditions = array_filter($object, function($val, $key) {return (strpos($key, 'c.') === 0 && !empty($val));}, ARRAY_FILTER_USE_BOTH);
     $object = array_filter($object, function($key) {return (strpos($key, 'c.') !== 0);}, ARRAY_FILTER_USE_KEY);
@@ -80,11 +80,21 @@ function fn_promotion_import_build_conditions(&$object) {
                     ];
                 }
             } elseif ($condition == 'users') {
-                $conditions_to_db['conditions'][] = [
-                    'condition' => $condition,
-                    'operator' => $operator,
-                    'value' => fn_promotion_import_get_value($condition, $value, $company_id)
-                ];
+                if (!empty($users_value = fn_promotion_import_get_value($condition, $value, $company_id))) {
+                    $conditions_to_db['conditions'][] = [
+                        'condition' => $condition,
+                        'operator' => $operator,
+                        'value' => $users_value
+                    ];
+                } elseif (!empty($value)) {
+                    $object['status'] = 'D';
+                    $processed_data['disabled_promo_notification'][] = [
+                        'promotion_id' => $primary_object_id['promotion_id'],
+                        'external_id' => $object['external_id'],
+                        'object' => $condition,
+                        'value' => $value,
+                    ];
+                }
             } elseif ($condition == 'usergroup') {
                 $usergroups = fn_promotion_import_get_value($condition, $value, $company_id);
 
@@ -102,6 +112,14 @@ function fn_promotion_import_build_conditions(&$object) {
                         'conditions' => $usergroup_conditios
                     ];
                     unset($usergroup_conditios);
+                } elseif (!empty($value)) {
+                    $object['status'] = 'D';
+                    $processed_data['disabled_promo_notification'][] = [
+                        'promotion_id' => $primary_object_id['promotion_id'],
+                        'external_id' => $object['external_id'],
+                        'object' => $condition,
+                        'value' => $value,
+                    ];
                 }
             } else {
                 $conditions_to_db['conditions'][] = [
@@ -248,6 +266,25 @@ function fn_promotion_import_generate_promotion_hashes(&$object) {
         if (!empty($object['bonuses'])) {
             $bonuses = unserialize($object['bonuses']);
             $object['bonus_products'] = implode(',', fn_get_promotion_bonus_products($bonuses));
+        }
+    }
+}
+
+function fn_promotion_import_disabled_promo_notification(&$processed_data) {
+    if (!empty($processed_data['disabled_promo_notification'])) {
+        $promotion_details = array_map(function($data) {
+            $prefix = $body = $suffix = '';
+            if (!empty($data['promotion_id'])) {
+                $prefix = '<a href="' . fn_url('promotions.update?promotion_id='.$data['promotion_id']) . '">';
+                $suffix = '</a> ';
+            }
+            $body = $data['external_id'];
+            $suffix .= $data['object'] . '=>' . $data['value'];
+            return $prefix.$body.$suffix;
+        }, $processed_data['disabled_promo_notification']);
+
+        if (!empty($promotion_details)) {
+            fn_set_notification('W', __('warning'), __('promotion_import.disabled_promo_notification') . ':<br>' . implode('<br>', $promotion_details));
         }
     }
 }

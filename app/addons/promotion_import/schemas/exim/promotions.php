@@ -97,7 +97,7 @@ $schema = array(
     'import_process_data' => [
         'build_conditions' => array(
             'function' => 'fn_promotion_import_build_conditions',
-            'args' => array('$object'),
+            'args' => array('$object', '$primary_object_id', '$processed_data'),
             'import_only' => true,
         ),
         'build_bonuses' => array(
@@ -108,6 +108,13 @@ $schema = array(
         'generate_promotion_hashes' => [
             'function' => 'fn_promotion_import_generate_promotion_hashes',
             'args' => array('$object'),
+            'import_only' => true,
+        ]
+    ],
+    'post_processing' => [
+        'disabled_promo_notification' => [
+            'function' => 'fn_promotion_import_disabled_promo_notification',
+            'args' => ['$processed_data'],
             'import_only' => true,
         ]
     ]
