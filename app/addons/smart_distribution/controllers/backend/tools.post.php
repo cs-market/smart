@@ -4,9 +4,7 @@ use Tygh\Registry;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\ProfileDataTypes;
 
-if ($mode =='monolith' && !empty($action)) {
-    fn_print_die(fn_monolith_generate_xml($action));
-} elseif ($mode == 'base_price' && $action) {
+if ($mode == 'base_price' && $action) {
     list($products,) = fn_get_products(['company_id' => $action]);
     $auth = $_SESSION['auth'];
     foreach ($products as $product_id => $p) {

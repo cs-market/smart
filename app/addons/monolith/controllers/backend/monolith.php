@@ -59,4 +59,10 @@ if ($mode == 'cron') {
         fn_print_die('success', $action);
     }
     fn_print_die('failure', $action);
+} elseif ($mode == 'get_order') {
+    if (empty($action)) fn_print_die('missing order_id');
+    $xml = fn_monolith_generate_xml($action);
+    fn_put_contents(fn_get_files_dir_path() . "/$action.xml", $xml);
+    fn_get_file(fn_get_files_dir_path() . "/$action.xml", "$action.xml");
+    die();
 }
