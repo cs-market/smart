@@ -232,6 +232,18 @@ $schema = array(
                                 ),
                                 '5' => array (
                                     '@attributes' => array (
+                                        'name' => 'DiscountUnit',
+                                        'type' => 'String',
+                                    ),
+                                ),
+                                '6' => array (
+                                    '@attributes' => array (
+                                        'name' => 'DiscountPrice',
+                                        'type' => 'Decimal',
+                                    ),
+                                ),
+                                '7' => array (
+                                    '@attributes' => array (
                                         'name' => 'WareId',
                                         'type' => 'String',
                                     ),

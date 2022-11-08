@@ -100,13 +100,22 @@ function fn_monolith_generate_xml($order_id) {
                 if (!isset($applied_promotions[$promotion_id])) {
                     $applied_promotions[$promotion_id] = fn_get_promotion_data($promotion_id);
                 }
+               
                 foreach ($promotion['bonuses'] as $value) {
                     list($external_id) = explode('.', $applied_promotions[$promotion_id]['external_id']);
-                    $discount_value = $value['discount_value'];
-                    if ($value['discount_bonus'] == 'to_percentage') {
-                        $discount_value = 100 - $value['discount_value'];
-                    } elseif ($value['discount_bonus'] == 'to_fixed' || $value['discount_bonus'] == 'by_fixed') {
-                        $discount_value = round($product['discount'] / $product['base_price'] * 100, 2);
+                    $discount_value = $value['discount'];
+                    $discount_unit = 'руб';
+                    $discount_price = $value['discount_value'];
+
+                    if ($value['discount_bonus'] == 'by_fixed') {
+                        $discount_price = $product['price'];
+                    } elseif (in_array($value['discount_bonus'], ['by_percentage', 'to_percentage'])) {
+                        $discount_value = $value['discount_value'];
+                        $discount_unit = '%';
+                        if ($value['discount_bonus'] == 'to_percentage') {
+                            $discount_value = 100 - $discount_value;
+                        }
+                        $discount_price = fn_format_price($product['base_price'] * (1-$discount_value/100));
                     }
 
                     $CRMOrderDiscountLine[] = [
@@ -116,6 +125,8 @@ function fn_monolith_generate_xml($order_id) {
                             $external_id,
                             $applied_promotions[$promotion_id]['name'],
                             $discount_value,
+                            $discount_unit,
+                            $discount_price,
                             $product['product_code']
                         )
                     ];
