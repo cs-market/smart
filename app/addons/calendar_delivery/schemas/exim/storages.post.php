@@ -12,11 +12,8 @@ $schema['export_fields']['Exception days'] = [
 $schema['export_fields']['Exception time till'] = [
     'db_field' => 'exception_time_till',
 ];
-$schema['export_fields']['Saturday shipping'] = [
-    'db_field' => 'saturday_shipping',
-];
-$schema['export_fields']['Sunday shipping'] = [
-    'db_field' => 'sunday_shipping',
+$schema['export_fields']['Delivery days'] = [
+    'db_field' => 'delivery_date',
 ];
 $schema['export_fields']['Monday rule'] = [
     'db_field' => 'monday_rule',
