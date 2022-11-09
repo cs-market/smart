@@ -2268,6 +2268,18 @@ fn_print_die($orders_wo_points);
     }
     $res = db_query('UPDATE ?:categories SET status = ?s WHERE category_id IN (?a)', 'D', array_keys($empty));
     fn_print_die($res, $empty);
+} elseif ($mode == 'storage_104_upgrade') {
+    db_query("ALTER TABLE ?:storages ADD `delivery_date` VARCHAR(7) NOT NULL DEFAULT '1111111' AFTER `exception_time_till`;");
+    $storages = db_get_array('SELECT storage_id, saturday_shipping, sunday_shipping, delivery_date FROM ?:storages');
+    foreach ($storages as $storage_settings) {
+        $storage_settings['delivery_date'][0] = YesNo::toBool($storage_settings['sunday_shipping']) ? 1 : 0;
+        $storage_settings['delivery_date'][6] = YesNo::toBool($storage_settings['saturday_shipping']) ? 1 : 0;
+        if ($storage_settings['delivery_date'] == '1111111') continue;
+        db_query('UPDATE ?:storages SET delivery_date = ?s WHERE storage_id = ?i', $storage_settings['delivery_date'], $storage_settings['storage_id']);
+        fn_print_r($storage_settings['storage_id']);
+    }
+    db_query("ALTER TABLE ?:storages DROP `saturday_shipping`, DROP `sunday_shipping`;");
+    fn_print_die('done');
 }
 
 function fn_promotion_apply_cust($zone, &$data, &$auth = NULL, &$cart_products = NULL, $promotion_id = false)

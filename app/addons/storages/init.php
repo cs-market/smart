@@ -27,8 +27,6 @@ fn_register_hooks(
     ['calculate_cart_items', 100],
     'reorder_product',
     'monolith_generate_xml',
-    'calendar_delivery_weekdays_availability',
-    'calendar_delivery_service_params',
     'get_user_price',
     'user_price_exim_product_price_pre',
     'delete_usergroups',

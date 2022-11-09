@@ -31,17 +31,9 @@
 </div>
 
 <div class="control-group">
-    <label for="elm_storage_saturday_shipping" class="control-label">{__("calendar_delivery.saturday_shipping")}:</label>
+    <label class="control-label" for="elm_delivery_date">{__("delivery_date")}</label>
     <div class="controls">
-        <input type="hidden" name="storage_data[saturday_shipping]" value="N">
-        <input type="checkbox" name="storage_data[saturday_shipping]" id="elm_storage_saturday_shipping" value="Y" {if $storage.saturday_shipping != 'N'} checked="checked" {/if} />
-    </div>
-</div>
-<div class="control-group">
-    <label for="elm_storage_sunday_shipping" class="control-label">{__("calendar_delivery.sunday_shipping")}:</label>
-    <div class="controls">
-        <input type="hidden" name="storage_data[sunday_shipping]" value="N">
-        <input type="checkbox" name="storage_data[sunday_shipping]" id="elm_storage_sunday_shipping" value="Y" {if $storage.sunday_shipping != 'N'} checked="checked" {/if} />
+        {include file="addons/calendar_delivery/components/weekdays_table.tpl" name="storage_data[delivery_date]" value=$storage.delivery_date|default:"1111111"}
     </div>
 </div>
 

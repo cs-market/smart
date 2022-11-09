@@ -581,25 +581,6 @@ function fn_storages_monolith_generate_xml($order_info, $monolith_order, &$d_rec
     }
 }
 
-function fn_storages_calendar_delivery_weekdays_availability(&$weekdays_availability, $group) {
-    if (!empty($group['storage_id'])) {
-        $storage_weekdays = '1111111';
-
-        $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
-        $storage_weekdays[0] = YesNo::toBool($storage_settings['sunday_shipping']) ? 1 : 0;
-        $storage_weekdays[6] = YesNo::toBool($storage_settings['saturday_shipping']) ? 1 : 0;
-
-        $weekdays_availability = $weekdays_availability & $storage_weekdays;
-    }
-}
-
-function fn_storages_calendar_delivery_service_params($group, &$shipping, $company_settings, $usergroup_working_time_till) {
-    if (!empty($group['storage_id'])) {
-        $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
-        $shipping['service_params'] = fn_array_merge($shipping['service_params'], $company_settings, $storage_settings, $usergroup_working_time_till);
-    }
-}
-
 function fn_storages_get_user_price($params, $join, &$condition) {
     if (isset($params['product']['extra']['storage_id'])) {
         $storage_id = $params['product']['extra']['storage_id'];

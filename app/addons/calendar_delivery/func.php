@@ -35,8 +35,7 @@ function fn_calendar_delivery_install()
           ADD `working_time_till` varchar(5) NOT NULL DEFAULT '17:00',
           ADD `exception_days` varchar(7) NOT NULL,
           ADD `exception_time_till` varchar(5) NOT NULL DEFAULT '11:00',
-          ADD `saturday_shipping` varchar(8) NOT NULL DEFAULT 'Y',
-          ADD `sunday_shipping` varchar(8) NOT NULL DEFAULT 'Y',
+          ADD `delivery_date` varchar(7) NOT NULL DEFAULT '1111111',
           ADD `monday_rule` varchar(8) NOT NULL DEFAULT 'Y',
           ADD `holidays` varchar(255) NOT NULL DEFAULT ''
         ");
@@ -56,8 +55,7 @@ function fn_calendar_delivery_uninstall()
           DROP `working_time_till`,
           DROP `exception_days`,
           DROP `exception_time_till`,
-          DROP `saturday_shipping`,
-          DROP `sunday_shipping`,
+          DROP `delivery_date`,
           DROP `monday_rule`,
           DROP `holidays`
         ");
@@ -340,7 +338,14 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                         $shipping_company_settings = [];
                     }
 
-                    $weekdays_availability = $general_weekdays & $user_weekdays;
+                    $storage_weekdays = '1111111';
+                    $storage_settings = [];
+                    if (!empty($group['storage_id'])) {
+                        $storage_settings = Registry::get('runtime.storages.'.$group['storage_id']);
+                        $storage_weekdays = $storage_settings['delivery_date'];
+                    }
+
+                    $weekdays_availability = $general_weekdays & $user_weekdays & $storage_weekdays;
 
                     fn_set_hook('calendar_delivery_weekdays_availability', $weekdays_availability, $group);
 
@@ -349,7 +354,7 @@ function fn_calendar_delivery_calculate_cart_taxes_pre($cart, $cart_products, &$
                     }
 
                     // TODO грохнуть это к 2023 году так как повсеместно передодим на nearest_delivery_day weekdays_availability
-                    $shipping['service_params'] = fn_array_merge($shipping['service_params'], $shipping_company_settings, $usergroup_working_time_till);
+                    $shipping['service_params'] = fn_array_merge($shipping['service_params'], $shipping_company_settings, $storage_settings, $usergroup_working_time_till);
 
                     fn_set_hook('calendar_delivery_service_params', $group, $shipping, $shipping_company_settings, $usergroup_working_time_till);
 
@@ -568,6 +573,9 @@ function fn_calendar_delivery_allow_place_order_post(&$cart, $auth, $parent_orde
 function fn_calendar_delivery_update_storage_pre(&$storage_data, $storage_id) {
     if (is_array($storage_data['exception_days'])) {
         $storage_data['exception_days'] = fn_delivery_date_to_line($storage_data['exception_days']);
+    }
+    if (is_array($storage_data['delivery_date'])) {
+        $storage_data['delivery_date'] = fn_delivery_date_to_line($storage_data['delivery_date']);
     }
 }
 

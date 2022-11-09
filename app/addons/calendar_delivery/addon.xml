@@ -4,7 +4,7 @@
     <name>Calendar delivery</name>
     <description><![CDATA[Добавляе новый процессор оффлайн доставки с календарем © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
     <priority>26732300</priority>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <position>0</position>
     <status>active</status>
     <default_language>ru</default_language>
