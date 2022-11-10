@@ -15,6 +15,7 @@ use Tygh\Registry;
 use Tygh\Enum\SiteArea;
 use Tygh\Enum\YesNo;
 use Tygh\Enum\ProductTracking;
+use Tygh\Enum\UserRoles;
 
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
@@ -79,7 +80,7 @@ function fn_trading_networks_update_profile($action, $user_data, $current_user_d
     if (isset($user_data['network_users'])) {
         $network_users = explode(',', $user_data['network_users']);
         db_query('UPDATE ?:users SET network_id = 0 WHERE network_id = ?i', $user_data['user_id']);
-        if ($user_data['user_role'] == 'N') {
+        if ($user_data['user_role'] == UserRoles::trading_network()) {
             db_query('UPDATE ?:users SET network_id = ?i WHERE user_id IN (?a)', $user_data['user_id'], $network_users);
         }
     }
@@ -90,7 +91,7 @@ function fn_trading_networks_post_delete_user($user_id, $user_data, $result) {
 }
 
 function fn_trading_networks_api_get_auth_token($params, &$response, $user_data) {
-    if (!empty($user_data['user_role']) && $user_data['user_role'] == 'N') {
+    if (!empty($user_data['user_role']) && $user_data['user_role'] == UserRoles::trading_network()) {
         list($network_users) = fn_get_users(['network_id' => $user_data['user_id']], Tygh::$app['session']['auth']);
         if (!empty($network_users)) {
             foreach ($network_users as &$user) {

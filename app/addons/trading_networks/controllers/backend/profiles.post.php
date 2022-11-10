@@ -1,5 +1,7 @@
 <?php
 
+use Tygh\Enum\UserRoles;
+
 if (!defined('BOOTSTRAP')) { die('Access denied'); }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -8,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($mode == 'update') {
     $user_data = Tygh::$app['view']->getTemplateVars('user_data');
-    list($network_users) = fn_get_users(['network_id' => $user_data['user_id']], $auth);
-    Tygh::$app['view']->assign('network_users', array_column($network_users, 'user_id'));
+    if ($user_data['user_role'] == UserRoles::trading_network()) {
+        list($network_users) = fn_get_users(['network_id' => $user_data['user_id']], $auth);
+        Tygh::$app['view']->assign('network_users', array_column($network_users, 'user_id'));
+    }
 }

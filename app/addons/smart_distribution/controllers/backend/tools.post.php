@@ -2257,17 +2257,29 @@ fn_print_die($orders_wo_points);
     $res = db_query("UPDATE ?:users SET network_id = '' WHERE network_id NOT IN (?a)", $users);
     fn_print_die($res);
 } elseif ($mode == 'categories_maintenance') {
-    db_query('UPDATE ?:categories SET status = ?s', 'A');
-    $category_ids = db_get_fields('SELECT category_id FROM ?:categories');
+    $category_ids = db_get_fields('SELECT category_id FROM ?:categories WHERE status != ?s', 'H');
+    db_query('UPDATE ?:categories SET status = ?s WHERE category_id IN (?a)', 'A', $category_ids);
     $empty = [];
     foreach ($category_ids as $category_id) {
-        list($products) = fn_get_products(['cid' => $category_id, 'subcats' => 'Y']);
+        list($products) = fn_get_products(['cid' => $category_id, 'subcats' => 'Y', 'amount_from' => 1, 'status' => 'A']);
         if (!empty($products)) continue;
         $empty[$category_id] = fn_get_category_name($category_id);
         if (mb_stripos($empty[$category_id], 'акции') !== false) unset($empty[$category_id]);
     }
     $res = db_query('UPDATE ?:categories SET status = ?s WHERE category_id IN (?a)', 'D', array_keys($empty));
-    fn_print_die($res, $empty);
+    $export = [];
+    foreach ($empty as $cid => $category) {
+        $plan = db_get_field('SELECT vpd.plan FROM ?:vendor_plans as vp LEFT JOIN ?:vendor_plan_descriptions AS vpd ON vp.plan_id = vpd.plan_id WHERE FIND_IN_SET(?i, categories)', $cid);
+        $export[] = [
+            'category_id' => $cid,
+            'category' => $category,
+            'plan' => $plan
+        ];
+    }
+    $params['filename'] = 'disable_categories.csv';
+    $params['force_header'] = true;
+    $export = fn_exim_put_csv($export, $params, '"');
+    fn_print_die($res, $empty, count(array_keys($empty)));
 } elseif ($mode == 'storage_104_upgrade') {
     db_query("ALTER TABLE ?:storages ADD `delivery_date` VARCHAR(7) NOT NULL DEFAULT '1111111' AFTER `exception_time_till`;");
     $storages = db_get_array('SELECT storage_id, saturday_shipping, sunday_shipping, delivery_date FROM ?:storages');
