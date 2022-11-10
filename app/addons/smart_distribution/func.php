@@ -297,6 +297,7 @@ function fn_smart_distribution_get_users(&$params, &$fields, &$sortings, &$condi
     }
 
     $sortings['timestamp'] = '?:users.timestamp';
+    $sortings['last_update'] = '?:users.last_update';
 }
 
 function fn_smart_distribution_get_users_post(&$users, $params, $auth) {
