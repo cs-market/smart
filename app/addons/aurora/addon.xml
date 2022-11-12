@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<addon scheme="2.0">
+    <id>aurora</id>
+    <name>Aurora theme</name>
+    <description><![CDATA[Smart, simple and light theme © <a href="http://cs-market.com" target="_blank">CS-Market</a>]]></description>
+    <priority>26732100</priority>
+    <version>1.0.1</version>
+    <position>0</position>
+    <status>active</status>
+    <default_language>ru</default_language>
+    <supplier>CS-Market</supplier>
+    <supplier_link>http://cs-market.com/</supplier_link>
+    <has_icon>Y</has_icon>
+    <language_variables>
+        <item lang="ru" id="app_store">App store</item>
+        <item lang="ru" id="play_market">Play market</item>
+        <item lang="ru" id="app_gallery">App gallery</item>
+        <item lang="ru" id="block_mobile_app_links">Ссылки мобильного приложения</item>
+        <item lang="ru" id="mobile_app_links">Ссылки мобильного приложения</item>
+    </language_variables>
+    <queries>
+        <item>ALTER TABLE `?:companies` ADD `app_store` VARCHAR(255) NOT NULL DEFAULT '';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `app_store`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `play_market` VARCHAR(255) NOT NULL DEFAULT '';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `app_store`;</item>
+
+        <item>ALTER TABLE `?:companies` ADD `app_gallery` VARCHAR(255) NOT NULL DEFAULT '';</item>
+        <item for="uninstall">ALTER TABLE `?:companies` DROP `app_store`;</item>
+    </queries>
+</addon>
