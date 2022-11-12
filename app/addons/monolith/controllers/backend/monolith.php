@@ -26,7 +26,7 @@ if ($mode == 'cron') {
                 foreach ($orders as $order) {
                     $xml = fn_monolith_generate_xml($order['order_id']);
                     if (fn_monolith_send_xml($xml)) {
-                        fn_change_order_status($order['order_id'], 'A');
+                        fn_change_order_status($order['order_id'], 'L');
                     }
                 }
             }
